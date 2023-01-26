@@ -240,6 +240,12 @@ class SecretsManagerRemovePolicyStatement(RemovePolicyBase):
 class SetEncryptionAction(Action):
     """
     Set kms encryption key for secrets, key supports ARN, ID, or alias
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
             - name: set-secret-encryption
               resource: aws.secrets-manager
               actions:
