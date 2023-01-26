@@ -1609,6 +1609,7 @@ class ParameterFilter(ValueFilter):
     schema = type_schema('db-parameter', rinherit=ValueFilter.schema)
     schema_alias = False
     permissions = ('rds:DescribeDBInstances', 'rds:DescribeDBParameters', )
+    policy_annotation = 'c7n:MatchedDBParameter'
 
     @staticmethod
     def recast(val, datatype):
@@ -1635,7 +1636,15 @@ class ParameterFilter(ValueFilter):
 
         return ret_val
 
-    def handle_paramgroup_cache(self, client, paginator, param_groups):
+    # Private method for 'DBParameterGroupName' paginator
+    def _get_param_list(self, pg):
+        client = local_session(self.manager.session_factory).client('rds')
+        paginator = client.get_paginator('describe_db_parameters')
+        param_list = list(itertools.chain(*[p['Parameters']
+            for p in paginator.paginate(DBParameterGroupName=pg)]))
+        return param_list
+
+    def handle_paramgroup_cache(self, param_groups):
         pgcache = {}
         cache = self.manager._cache
 
@@ -1649,8 +1658,7 @@ class ParameterFilter(ValueFilter):
                 if pg_values is not None:
                     pgcache[pg] = pg_values
                     continue
-                param_list = list(itertools.chain(*[p['Parameters']
-                    for p in paginator.paginate(DBParameterGroupName=pg)]))
+                param_list = self._get_param_list(pg)
                 pgcache[pg] = {
                     p['ParameterName']: self.recast(p['ParameterValue'], p['DataType'])
                     for p in param_list if 'ParameterValue' in p}
@@ -1659,17 +1667,14 @@ class ParameterFilter(ValueFilter):
 
     def process(self, resources, event=None):
         results = []
-        client = local_session(self.manager.session_factory).client('rds')
-        paginator = client.get_paginator('describe_db_parameters')
-        param_groups = {db['DBParameterGroups'][0]['DBParameterGroupName']
-                        for db in resources}
-        paramcache = self.handle_paramgroup_cache(client, paginator, param_groups)
-
+        parameter_group_list = {db['DBParameterGroups'][0]['DBParameterGroupName']
+                    for db in resources}
+        paramcache = self.handle_paramgroup_cache(parameter_group_list)
         for resource in resources:
             for pg in resource['DBParameterGroups']:
                 pg_values = paramcache[pg['DBParameterGroupName']]
                 if self.match(pg_values):
-                    resource.setdefault('c7n:MatchedDBParameter', []).append(
+                    resource.setdefault(self.policy_annotation, []).append(
                         self.data.get('key'))
                     results.append(resource)
                     break

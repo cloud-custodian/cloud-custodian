@@ -1011,7 +1011,7 @@ class ClusterConsecutiveSnapshots(Filter):
     def process_resource_set(self, client, resources, lbdate):
         paginator = client.get_paginator('describe_cluster_snapshots')
         paginator.PAGE_ITERATOR_CLS = RetryPageIterator
-        rs_snapshots = paginator.paginate(EndTime=lbdate).build_full_result().get(
+        rs_snapshots = paginator.paginate(StartTime=lbdate).build_full_result().get(
             'Snapshots', [])
 
         cluster_map = {}

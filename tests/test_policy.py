@@ -116,6 +116,19 @@ class PolicyMetaLint(BaseTest):
         except Exception:
             self.fail("Failed to serialize schema")
 
+    def test_detail_spec_format(self):
+
+        failed = []
+        for k, v in manager.resources.items():
+            detail_spec = getattr(v.resource_type, 'detail_spec', None)
+            if not detail_spec:
+                continue
+            if not len(detail_spec) == 4:
+                failed.append(k)
+        if failed:
+            self.fail(
+                "%s resources have invalid detail_specs" % ", ".join(failed))
+
     def test_resource_augment_universal_mask(self):
         # universal tag had a potential bad patterm of masking
         # resource augmentation, scan resources to ensure
