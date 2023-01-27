@@ -1,5 +1,6 @@
 name: "Publish Docs"
 description: "Publish docs to cloudcustodian.io"
+inputs:
   aws-role:
     description: 'AWS Credential Access Role'
     required: true
