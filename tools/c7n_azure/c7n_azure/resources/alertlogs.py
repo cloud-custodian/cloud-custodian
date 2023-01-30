@@ -25,6 +25,7 @@ class AlertLogs(ArmResourceManager):
     """
 
     class resource_type(ArmResourceManager.resource_type):
+        doc_groups = ['Alerts Management']
 
         service = 'azure.mgmt.monitor'
         client = 'MonitorManagementClient'
