@@ -5,7 +5,7 @@ Cloud Custodian
 
 ---
 
-[![](https://badges.gitter.im/cloud-custodian/cloud-custodian.svg)](https://gitter.im/cloud-custodian/cloud-custodian?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![slack](https://img.shields.io/badge/slack-chat-yellow)](https://communityinviter.com/apps/cloud-custodian/c7n-chat)
 [![CI](https://github.com/cloud-custodian/cloud-custodian/workflows/CI/badge.svg?event=push)](https://github.com/cloud-custodian/cloud-custodian/actions?query=workflow%3ACI+branch%3Amaster+event%3Apush)
 [![](https://dev.azure.com/cloud-custodian/cloud-custodian/_apis/build/status/Custodian%20-%20CI?branchName=master)](https://dev.azure.com/cloud-custodian/cloud-custodian/_build)
 [![](https://img.shields.io/badge/license-Apache%202-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0)
@@ -19,7 +19,7 @@ cloud infrastructure, that\'s both secure and cost optimized. It
 consolidates many of the adhoc scripts organizations have into a
 lightweight and flexible tool, with unified metrics and reporting.
 
-Custodian can be used to manage AWS, Azure, and GCP environments by
+Custodian can be used to manage AWS, Azure, Tencent, and GCP environments by
 ensuring real time compliance to security policies (like encryption and
 access requirements), tag policies, and cost management via garbage
 collection of unused resources and off-hours resource management.
@@ -34,7 +34,7 @@ provider to provide for real time enforcement of policies with builtin
 provisioning. Or it can be run as a simple cron job on a server to
 execute against large existing fleets.
 
-Cloud Custodian is a CNCF Sandbox project, lead by a community of hundreds
+Cloud Custodian is a CNCF Incubating project, lead by a community of hundreds
 of contributors.
 
 Features
@@ -64,6 +64,7 @@ Links
 -   [Project Roadmap](https://github.com/orgs/cloud-custodian/projects/1)
 -   [Developer Install](https://cloudcustodian.io/docs/developer/installing.html)
 -   [Presentations](https://www.google.com/search?q=cloud+custodian&source=lnms&tbm=vid)
+-   [YouTube Channel](https://www.youtube.com/channel/UCdeXCdFLluylWnFfS0-jbDA)
 
 Quick Install
 -------------
