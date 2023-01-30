@@ -123,7 +123,7 @@ jobs:
         with:
           aws-role: ${{ secrets.DOCS_PUBLISH_ROLE }}
           bucket-url: s3://docs-stage.cloudcustodian.io/docs/${{github.event.number}}
-          docs-dir: site
+          docs-dir: docs/build/html
 
       - name: Deploy Docs
         if: ${{ github.event_name == 'push' }}
