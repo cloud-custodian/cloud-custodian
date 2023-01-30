@@ -121,7 +121,7 @@ jobs:
         uses: ./.github/composites/docs-publish
         if: ${{ github.event.number }}
         with:
-          aws-role: ${{ secrets.DOC_PUBLISH_ROLE }}
+          aws-role: ${{ secrets.DOCS_PUBLISH_ROLE }}
           bucket-url: s3://docs-stage.cloudcustodian.io/docs/${{github.event.number}}
           docs-dir: site
 
@@ -129,7 +129,7 @@ jobs:
         if: ${{ github.event_name == 'push' }}
         uses: ./.github/composites/docs-publish
         with:
-          aws-role: ${{ secrets.DOC_PUBLISH_ROLE }}
+          aws-role: ${{ secrets.DOCS_PUBLISH_ROLE }}
           docs-dir: docs/build/html
           bucket-url: s3://cloudcustodian.io/docs
 
