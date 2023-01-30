@@ -54,7 +54,7 @@ jobs:
     needs: Lint
     permissions:
       id-token: write
-      contents: read    
+      contents: read
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v2
@@ -117,12 +117,21 @@ jobs:
         run: |
           make sphinx
 
+      - name: Deploy Stage Docs
+        uses: ./.github/composites/docs-publish
+        if: ${{ github.event.number }}
+        with:
+          aws-role: ${{ secrets.DOC_PUBLISH_ROLE }}
+          bucket-url: s3://docs-stage.cloudcustodian.io/docs/${{github.event.number}}
+          docs-dir: site
+
       - name: Deploy Docs
         if: ${{ github.event_name == 'push' }}
         uses: ./.github/composites/docs-publish
         with:
           aws-role: ${{ secrets.DOC_PUBLISH_ROLE }}
-
+          docs-dir: docs/build/html
+          bucket-url: s3://cloudcustodian.io/docs
 
   Tests:
     runs-on: "${{ matrix.os }}"
