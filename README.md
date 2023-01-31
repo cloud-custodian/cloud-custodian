@@ -19,7 +19,7 @@ cloud infrastructure, that\'s both secure and cost optimized. It
 consolidates many of the adhoc scripts organizations have into a
 lightweight and flexible tool, with unified metrics and reporting.
 
-Custodian can be used to manage AWS, Azure, Tencent, and GCP environments by
+Custodian can be used to manage AWS, Azure, and GCP environments by
 ensuring real time compliance to security policies (like encryption and
 access requirements), tag policies, and cost management via garbage
 collection of unused resources and off-hours resource management.
