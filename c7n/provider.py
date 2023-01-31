@@ -3,11 +3,14 @@
 
 import abc
 import importlib
+import logging
 
 from c7n.registry import PluginRegistry
 
 
 clouds = PluginRegistry('c7n.providers')
+
+log = logging.getLogger('c7n.providers')
 
 
 class Provider(metaclass=abc.ABCMeta):
@@ -79,12 +82,13 @@ def import_resource_classes(resource_map, resource_types):
     for rmodule in rmods:
         try:
             mod_map[rmodule] = importlib.import_module(rmodule)
-        except ModuleNotFoundError:
+        except ModuleNotFoundError:  # pragma: no cover
             import_errs.add(rmodule)
 
-    for emod in import_errs:
+    for emod in import_errs:  # pragma: no cover
         for rtype, rclass in resource_map.items():
             if emod == rclass.rsplit('.', 1)[0]:
+                log.warning('unable to import %s from %s', rtype, emod)
                 resource_types.remove(rtype)
 
     for rtype in resource_types:
