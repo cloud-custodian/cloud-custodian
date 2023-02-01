@@ -21,7 +21,6 @@ log = logging.getLogger("c7n.iac")
 
 
 class IACSourceProvider(Provider):
-
     display_name = "IAC"
 
     def get_session_factory(self, options):
@@ -93,7 +92,6 @@ class PolicyMetadata:
 
 
 class ExecutionFilter:
-
     supported_filters = ("policy", "type", "severity", "category", "id")
 
     def __init__(self, filters):
@@ -298,7 +296,6 @@ class PolicyResourceResult:
 
 
 class IACResourceManager(ResourceManager):
-
     filter_registry = FilterRegistry("iac.filters")
     action_registry = ActionRegistry("iac.actions")
     log = log
@@ -319,7 +316,6 @@ IACResourceManager.filter_registry.register("traverse", Traverse)
 
 
 class IACResourceMap(object):
-
     resource_class = None
 
     def __init__(self, prefix):
