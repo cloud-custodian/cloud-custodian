@@ -155,7 +155,7 @@
                     "UpdateDate": "2023-01-30T10:57:56.127000-08:00",
                     "UpdateVersion": 8,
                     "State": "Active",
-                    "PendingDeletion": false
+                    "PendingDeletion": true
                 }
             },
             "AdvancedSecurityOptions": {
