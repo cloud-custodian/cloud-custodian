@@ -622,3 +622,83 @@ class UpdateTlsConfig(Action):
         for r in resources:
             client.update_elasticsearch_domain_config(DomainName=r['DomainName'],
                 DomainEndpointOptions={'EnforceHTTPS': True, 'TLSSecurityPolicy': tls_value})
+
+
+@ElasticSearchDomain.action_registry.register('enable-auditlog')
+class EnableAuditLog(Action):
+
+    """Action to enable audit logs on a domain endpoint
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: enable-auditlog
+                resource: elasticsearch
+                filters:
+                  - type: value
+                    key: 'LogPublishingOptions.AUDIT_LOGS.Enabled'
+                    op: eq
+                    value: false
+                actions:
+                  - type: enable-auditlog
+                    state: True
+    """
+
+    schema = type_schema(
+        'enable-auditlog',
+        state={'type': 'boolean'},
+        required=['state'])
+
+    statement = {
+        "Sid": "OpenSearchCloudWatchLogs",
+        "Effect": "Allow",
+        "Principal": {"Service": ["es.amazonaws.com"]},
+        "Action": ["logs:PutLogEvents", "logs:CreateLogStream"],
+        "Resource": None}
+
+    permissions = (
+        'es:UpdateElasticsearchDomainConfig',
+        'es:ListDomainNames',
+        'logs:DescribeLogGroups',
+        'logs:CreateLogGroup',
+        'logs:PutResourcePolicy')
+
+    def get_loggroup_arn(self, domain):
+        log_group_name = "/aws/OpenSearchService/domains/%s/audit-logs" % (domain)
+        log_group_arn = "arn:aws:logs:{}:{}:log-group:{}:*".format(
+            self.manager.region, self.manager.account_id, log_group_name)
+        return log_group_arn
+
+    def set_permissions(self, log_group_arn):
+        statement = dict(self.statement)
+        statement['Resource'] = log_group_arn
+
+        client = local_session(
+            self.manager.session_factory).client('logs')
+        try:
+            client.create_log_group(logGroupName=log_group_arn.split(":")[-2])
+        except client.exceptions.ResourceAlreadyExistsException:
+            self.log.warning("Log group already exists ...")
+
+        response = client.put_resource_policy(
+            policyName='OpenSearchCloudwatchLogPermissions',
+            policyDocument=json.dumps(
+                {"Version": "2012-10-17", "Statement": [statement]}))
+
+        return response
+
+    def process(self, resources):
+        client = local_session(
+            self.manager.session_factory).client('es')
+        state = self.data.get('state')
+        log_group_arns = {
+            r['DomainName']: self.get_loggroup_arn(r["DomainName"]) for r in resources}
+
+        for r in resources:
+            if state:
+                self.set_permissions(log_group_arns[r["DomainName"]])
+            client.update_elasticsearch_domain_config(DomainName=r['DomainName'],
+                LogPublishingOptions={"AUDIT_LOGS":
+                {'CloudWatchLogsLogGroupArn': log_group_arns[r["DomainName"]], 'Enabled': state}})
