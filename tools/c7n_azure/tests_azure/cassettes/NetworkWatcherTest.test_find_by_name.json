@@ -46,8 +46,7 @@
                                 "type": "Microsoft.Network/networkWatchers",
                                 "location": "westus",
                                 "tags": {
-                                    "product_id": "13742"
-                                    
+                                    "product_id": "13742" 
                                 },
                                 "properties": {
                                     "provisioningState": "Succeeded",
@@ -132,8 +131,7 @@
                                 "type": "Microsoft.Network/networkWatchers",
                                 "location": "westus2",
                                 "tags": {
-                                    "product_id": "13742"
-                                    
+                                    "product_id": "13742"  
                                 },
                                 "properties": {
                                     "provisioningState": "Succeeded",
