@@ -54,7 +54,7 @@ jobs:
     needs: Lint
     permissions:
       id-token: write
-      contents: read    
+      contents: read
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v2
@@ -121,8 +121,9 @@ jobs:
         if: ${{ github.event_name == 'push' }}
         uses: ./.github/composites/docs-publish
         with:
-          aws-role: ${{ secrets.DOC_PUBLISH_ROLE }}
-
+          aws-role: ${{ secrets.DOCS_PUBLISH_ROLE }}
+          docs-dir: docs/build/html
+          bucket-url: s3://cloudcustodian.io/docs
 
   Tests:
     runs-on: "${{ matrix.os }}"

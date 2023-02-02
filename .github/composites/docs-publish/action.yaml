@@ -6,10 +6,14 @@ inputs:
     required: true
   aws-region:
     default: 'us-east-1'
+  docs-dir:
+    required: true
+  bucket-url:
+    default: s3://cloudcustodian.io/docs
 runs:
   using: "composite"
   steps:
-    - uses: aws-actions/configure-aws-credentials@v1.7.0
+    - uses: aws-actions/configure-aws-credentials@v1-node16
       with:
         role-to-assume: ${{ inputs.aws-role }}
         aws-region: ${{ inputs.aws-region }}
@@ -22,4 +26,4 @@ runs:
     - name: Publish
       shell: bash
       run: |
-        aws s3 sync docs/build/html s3://cloudcustodian.io/docs
+        aws s3 sync ${{ inputs.docs-dir }} ${{ inputs.bucket-url }}
