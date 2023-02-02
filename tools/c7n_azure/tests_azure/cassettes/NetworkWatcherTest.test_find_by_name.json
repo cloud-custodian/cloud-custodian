@@ -1,0 +1,149 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Network/networkWatchers?api-version=2020-08-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "x-ms-original-request-ids": [
+                        "ff12a630-1b8d-466d-87fa-a74299ff3f59",
+                        "8fa089cd-130a-4ecf-84d1-e4992a70b69c",
+                        "1aeb9bbb-4236-49c0-ac80-74dec3be30e4",
+                        "4a6846b5-69f9-46c1-be61-5a4473c93e8d",
+                        "e0df583a-386f-4eb7-8861-a3f44142f34f",
+                        "da4be11c-9679-42bd-8bc3-81024495415c",
+                        "34e36e48-5cb7-4602-92d2-ec9e41bd7865"
+                    ],
+                    "content-length": [
+                        "2995"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Tue, 31 Jan 2023 19:57:25 GMT"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "name": "networkwatcher1",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/networkwatcher-testing/providers/Microsoft.Network/networkWatchers/networkwatcher1",
+                                "etag": "W/\"91691d81-8bf3-45dd-80ff-f610c134b19b\"",
+                                "type": "Microsoft.Network/networkWatchers",
+                                "location": "westus",
+                                "tags": {
+                                    "product_id": "13742"
+                                    
+                                },
+                                "properties": {
+                                    "provisioningState": "Succeeded",
+                                    "runningOperationIds": []
+                                }
+                            },
+                            {
+                                "name": "NetworkWatcher_eastus",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/NetworkWatcherRG/providers/Microsoft.Network/networkWatchers/NetworkWatcher_eastus",
+                                "etag": "W/\"d74eeafb-0da0-4c42-a009-a8079a0f881b\"",
+                                "type": "Microsoft.Network/networkWatchers",
+                                "location": "eastus",
+                                "tags": {
+                                    "product_id": "13742"
+                                },
+                                "properties": {
+                                    "provisioningState": "Succeeded",
+                                    "runningOperationIds": []
+                                }
+                            },
+                            {
+                                "name": "demo-nwwatcher",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/success-nwwatcher/providers/Microsoft.Network/networkWatchers/demo-nwwatcher",
+                                "etag": "W/\"8bbc7ab0-0cd2-4522-a89a-4778d15a1146\"",
+                                "type": "Microsoft.Network/networkWatchers",
+                                "location": "northcentralus",
+                                "tags": {
+                                    "c7n": "true",
+                                    "product_id": "13742"
+                                },
+                                "properties": {
+                                    "provisioningState": "Succeeded",
+                                    "runningOperationIds": []
+                                }
+                            },
+                            {
+                                "name": "NetworkWatcher_southcentralus",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/NetworkWatcherRG/providers/Microsoft.Network/networkWatchers/NetworkWatcher_southcentralus",
+                                "etag": "W/\"c6e51ed1-d42d-432c-bdc1-c375e4e9bb3a\"",
+                                "type": "Microsoft.Network/networkWatchers",
+                                "location": "southcentralus",
+                                "tags": {
+                                    "product_id": "13742"
+                                },
+                                "properties": {
+                                    "provisioningState": "Succeeded",
+                                    "runningOperationIds": []
+                                }
+                            },
+                            {
+                                "name": "NetworkWatcher_centralus",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/NetworkWatcherRG/providers/Microsoft.Network/networkWatchers/NetworkWatcher_centralus",
+                                "etag": "W/\"6cc2dd5f-47de-4892-8b67-b21c9faffb82\"",
+                                "type": "Microsoft.Network/networkWatchers",
+                                "location": "centralus",
+                                "tags": {
+                                    "product_id": "13742"
+                                },
+                                "properties": {
+                                    "provisioningState": "Succeeded",
+                                    "runningOperationIds": []
+                                }
+                            },
+                            {
+                                "name": "NetworkWatcher_eastus2",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/NetworkWatcherRG/providers/Microsoft.Network/networkWatchers/NetworkWatcher_eastus2",
+                                "etag": "W/\"970585f9-b4bb-452a-90a7-49eac8e9c1f5\"",
+                                "type": "Microsoft.Network/networkWatchers",
+                                "location": "eastus2",
+                                "tags": {
+                                    "product_id": "13742"
+                                },
+                                "properties": {
+                                    "provisioningState": "Succeeded",
+                                    "runningOperationIds": []
+                                }
+                            },
+                            {
+                                "name": "networkwatcherfail",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/networkwatcherfail-testing/providers/Microsoft.Network/networkWatchers/networkwatcherfail",
+                                "etag": "W/\"97c80981-c2c1-4585-ae30-20d4e697056d\"",
+                                "type": "Microsoft.Network/networkWatchers",
+                                "location": "westus2",
+                                "tags": {
+                                    "product_id": "13742"
+                                    
+                                },
+                                "properties": {
+                                    "provisioningState": "Succeeded",
+                                    "runningOperationIds": []
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}
