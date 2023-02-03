@@ -36,6 +36,7 @@ def custodian_archive(packages=None, deps=()):
     # note we pin requirements to the same versions installed locally.
     requirements = set()
     requirements.update((
+        'boto3',
         'jmespath',
         'retrying',
         'python-dateutil',
