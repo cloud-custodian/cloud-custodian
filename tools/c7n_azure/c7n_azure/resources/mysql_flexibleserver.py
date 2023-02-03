@@ -26,7 +26,7 @@ class MySQLFlexibleServer(ArmResourceManager):
 
 @MySQLFlexibleServer.filter_registry.register('configuration-parameter')
 class ConfigurationParametersFilter(ValueFilter):
-    """Filter by server parameter for mysql flexible server
+    """Filter by configuration parameter for mysql flexible server
 
     :example:
 
