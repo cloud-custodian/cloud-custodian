@@ -4,7 +4,6 @@
 
 
 class TerraformResource(dict):
-
     __slots__ = ("name", "data", "location")
 
     # pygments lexer

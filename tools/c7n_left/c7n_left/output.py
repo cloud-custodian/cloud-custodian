@@ -304,7 +304,6 @@ class MultiOutput:
 
 
 class GithubFormat(Output):
-
     # https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#setting-an-error-message
 
     def on_results(self, results):
