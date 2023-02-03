@@ -203,7 +203,7 @@ class PolicyMetaLint(BaseTest):
         overrides = overrides.difference(
             {'account', 's3', 'hostedzone', 'log-group', 'rest-api', 'redshift-snapshot',
              'rest-stage', 'codedeploy-app', 'codedeploy-group', 'fis-template', 'dlm-policy',
-             'apigwv2', })
+             'apigwv2', 'shield-protection'})
         if overrides:
             raise ValueError("unknown arn overrides in %s" % (", ".join(overrides)))
 
@@ -615,11 +615,11 @@ class PolicyMetaLint(BaseTest):
     def test_resource_arn_info(self):
         missing = []
         whitelist_missing = {
-            'rest-stage', 'rest-resource', 'rest-vpclink', 'rest-client-certificate'}
+            'rest-stage', 'rest-resource', 'rest-vpclink', 'rest-client-certificate',
+            'shield-protection', 'shield-attack'}
         explicit = []
         whitelist_explicit = {
-            'rest-account', 'shield-protection', 'shield-attack',
-            'dlm-policy', 'efs', 'efs-mount-target', 'gamelift-build',
+            'rest-account', 'dlm-policy', 'efs', 'efs-mount-target', 'gamelift-build',
             'glue-connection', 'glue-dev-endpoint', 'cloudhsm-cluster',
             'snowball-cluster', 'snowball', 'ssm-activation',
             'healthcheck', 'event-rule-target', 'log-metric',

@@ -10,20 +10,40 @@ from c7n.query import QueryResourceManager, RetryPageIterator, TypeInfo
 from c7n.utils import local_session, type_schema, get_retry
 
 
+class ShieldResourceManager(QueryResourceManager):
+
+    def get_arns(self, resources):
+        """Convert Shield ARNs to the format used elsewhere
+
+        The resource type portion of an Elastic IP ARN is typically "elastic-ip", as
+        returned by the Resource Groups Tagging API and described in IAM documentation:
+        https://docs.aws.amazon.com/service-authorization/latest/reference/list_amazonec2.html#amazonec2-elastic-ip
+
+        Shield uses "eip-allocation" instead:
+        https://docs.aws.amazon.com/waf/latest/DDOSAPIReference/API_CreateProtection.html
+        """
+        arns = [
+            arn.replace(':eip-allocation', ':elastic-ip')
+            if ':elastic-ip' in arn else arn
+            for arn in
+            super().get_arns(resources)
+        ]
+        return arns
+
+
 @resources.register('shield-protection')
-class ShieldProtection(QueryResourceManager):
+class ShieldProtection(ShieldResourceManager):
 
     class resource_type(TypeInfo):
         service = 'shield'
         enum_spec = ('list_protections', 'Protections', None)
         id = 'Id'
         name = 'Name'
-        arn = False
         config_type = 'AWS::Shield::Protection'
 
 
 @resources.register('shield-attack')
-class ShieldAttack(QueryResourceManager):
+class ShieldAttack(ShieldResourceManager):
 
     class resource_type(TypeInfo):
         service = 'shield'
@@ -34,7 +54,6 @@ class ShieldAttack(QueryResourceManager):
         date = 'StartTime'
         filter_name = 'ResourceArns'
         filter_type = 'list'
-        arn = False
 
 
 def get_protections_paginator(client):
@@ -114,6 +133,13 @@ class SetShieldProtection(BaseAction):
                     ProtectionId=protected_resources[arn]['Id'])
                 continue
             try:
+                # The Elastic IP resource type as described in IAM is "elastic-ip":
+                # https://docs.aws.amazon.com/service-authorization/latest/reference/list_amazonec2.html#amazonec2-elastic-ip
+                #
+                # But Shield requires the resource type to be "eip-allocation":
+                # https://docs.aws.amazon.com/waf/latest/DDOSAPIReference/API_CreateProtection.html
+                if ':elastic-ip' in arn:
+                    arn = arn.replace(':elastic-ip', ':eip-allocation')
                 ShieldRetry(
                     client.create_protection,
                     Name=r[model.name], ResourceArn=arn)
