@@ -139,6 +139,7 @@ def test_image_metadata(image_name):
         "org.opencontainers.image.description",
         "org.opencontainers.image.documentation",
         "org.opencontainers.image.licenses",
+        "org.opencontainers.image.ref.name",
         "org.opencontainers.image.title",
         "org.opencontainers.image.source",
         "org.opencontainers.image.revision",
