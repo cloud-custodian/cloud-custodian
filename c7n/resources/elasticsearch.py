@@ -2,6 +2,8 @@
 # SPDX-License-Identifier: Apache-2.0
 import jmespath
 import json
+import time
+from collections import defaultdict
 
 from c7n.actions import Action, BaseAction, ModifyVpcSecurityGroupsAction, RemovePolicyBase
 from c7n.filters import MetricsFilter, CrossAccountAccessFilter, ValueFilter
@@ -644,11 +646,14 @@ class EnableAuditLog(Action):
                 actions:
                   - type: enable-auditlog
                     state: True
+                    loggroup_prefix: "/aws/es/domains"
+
     """
 
     schema = type_schema(
         'enable-auditlog',
         state={'type': 'boolean'},
+        loggroup_prefix={'type': 'string'},
         required=['state'])
 
     statement = {
@@ -665,27 +670,53 @@ class EnableAuditLog(Action):
         'logs:CreateLogGroup',
         'logs:PutResourcePolicy')
 
-    def get_loggroup_arn(self, domain):
-        log_group_name = "/aws/OpenSearchService/domains/%s/audit-logs" % (domain)
+    def get_loggroup_arn(self, domain, log_prefix=None):
+        if log_prefix:
+            log_group_name = "%s/%s/audit-logs" % (log_prefix, domain)
+        else:
+            log_group_name = "/aws/OpenSearchService/domains/%s/audit-logs" % (domain)
         log_group_arn = "arn:aws:logs:{}:{}:log-group:{}:*".format(
             self.manager.region, self.manager.account_id, log_group_name)
         return log_group_arn
 
+    def merge_dict(self, d1, d2):
+        merged_dict = defaultdict(list)
+
+        for d in (d1, d2):
+            for key, value in d.items():
+                if key == 'Resource':
+                    if isinstance(value, list):
+                        merged_dict[key].extend(value)
+                    else:
+                        merged_dict[key].append(value)
+                else:
+                    merged_dict[key] = value
+
+        return dict(merged_dict)
+
     def set_permissions(self, log_group_arn):
         statement = dict(self.statement)
-        statement['Resource'] = log_group_arn
-
+        statement['Resource'] = [log_group_arn]
         client = local_session(
             self.manager.session_factory).client('logs')
+
         try:
             client.create_log_group(logGroupName=log_group_arn.split(":")[-2])
         except client.exceptions.ResourceAlreadyExistsException:
             self.log.warning("Log group already exists ...")
 
+        for policy in client.describe_resource_policies().get('resourcePolicies'):
+            if policy['policyName'] == "OpenSearchCloudwatchLogPermissions":
+                policy_doc = json.loads(policy['policyDocument'])
+                if log_group_arn not in policy_doc['Statement'][0]['Resource']:
+                    merged_statement = self.merge_dict(statement, policy_doc['Statement'][0])
+                    statement = merged_statement
+                continue
+
         response = client.put_resource_policy(
             policyName='OpenSearchCloudwatchLogPermissions',
             policyDocument=json.dumps(
-                {"Version": "2012-10-17", "Statement": [statement]}))
+                {"Version": "2012-10-17", "Statement": statement}))
 
         return response
 
@@ -693,12 +724,14 @@ class EnableAuditLog(Action):
         client = local_session(
             self.manager.session_factory).client('es')
         state = self.data.get('state')
+        log_prefix = self.data.get('loggroup_prefix')
         log_group_arns = {
-            r['DomainName']: self.get_loggroup_arn(r["DomainName"]) for r in resources}
+            r['DomainName']: self.get_loggroup_arn(r["DomainName"], log_prefix) for r in resources}
 
         for r in resources:
             if state:
                 self.set_permissions(log_group_arns[r["DomainName"]])
+                time.sleep(15)
             client.update_elasticsearch_domain_config(DomainName=r['DomainName'],
                 LogPublishingOptions={"AUDIT_LOGS":
                 {'CloudWatchLogsLogGroupArn': log_group_arns[r["DomainName"]], 'Enabled': state}})
