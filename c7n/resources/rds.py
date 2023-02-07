@@ -2012,6 +2012,20 @@ class DbOptionGroups(ValueFilter):
                 key: OptionName
                 value: NATIVE_NETWORK_ENCRYPTION
                 op: eq
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: rds-oracle-encryption-in-transit
+            resource: aws.rds
+            filters:
+              - Engine: oracle-ee
+              - type: db-option-groups
+                key: OptionSettings[?Name == 'SQLNET.ENCRYPTION_SERVER'].Value
+                value:
+                  - REQUIRED
     """
 
     schema = type_schema('db-option-groups', rinherit=ValueFilter.schema)
@@ -2020,30 +2034,30 @@ class DbOptionGroups(ValueFilter):
     policy_annotation = 'c7n:MatchedDBOptionGroups'
 
     def handle_optiongroup_cache(self, client, paginator, option_groups):
-        pgcache = {}
+        ogcache = {}
         cache = self.manager._cache
 
         with cache:
-            for pg in option_groups:
+            for og in option_groups:
                 cache_key = {
                     'region': self.manager.config.region,
                     'account_id': self.manager.config.account_id,
-                    'rds-pg': pg}
-                pg_values = cache.get(cache_key)
-                if pg_values is not None:
-                    pgcache[pg] = pg_values
+                    'rds-pg': og}
+                og_values = cache.get(cache_key)
+                if og_values is not None:
+                    ogcache[og] = og_values
                     continue
                 option_list = list(itertools.chain(*[p['OptionGroupsList']
-                    for p in paginator.paginate(OptionGroupName=pg)]))
+                    for p in paginator.paginate(OptionGroupName=og)]))
 
-                pgcache[pg] = {}
+                ogcache[og] = {}
                 for option in option_list:
                     if option['Options']:
                         for p in option['Options']:
-                            pgcache[pg].update({'OptionName': p['OptionName']})
-                cache.save(cache_key, pgcache[pg])
+                            ogcache[og].update(p)
+                cache.save(cache_key, ogcache[og])
 
-        return pgcache
+        return ogcache
 
     def process(self, resources, event=None):
         results = []
@@ -2054,11 +2068,13 @@ class DbOptionGroups(ValueFilter):
         optioncache = self.handle_optiongroup_cache(client, paginator, option_groups)
 
         for resource in resources:
-            for pg in resource['OptionGroupMemberships']:
-                pg_values = optioncache[pg['OptionGroupName']]
-                if self.match(pg_values):
+            for og in resource['OptionGroupMemberships']:
+                og_values = optioncache[og['OptionGroupName']]
+                if self.match(og_values):
                     resource.setdefault(self.policy_annotation, []).append({
-                        self.data.get('key'): self.data.get('value')})
+                        k: jmespath.search(k, og_values)
+                        for k in {'OptionName', self.data.get('key')}
+                    })
                     results.append(resource)
                     break
 
