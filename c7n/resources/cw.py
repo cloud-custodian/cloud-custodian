@@ -968,10 +968,18 @@ class SubscriptionFilter(BaseAction):
         role_arn = self.data.get('role_arn')
 
         for r in resources:
-            client.put_subscription_filter(
-                logGroupName=r['logGroupName'],
-                filterName=filter_name,
-                filterPattern=filter_pattern,
-                destinationArn=destination_arn,
-                distribution=distribution,
-                roleArn=role_arn)
+            if role_arn:
+                client.put_subscription_filter(
+                    logGroupName=r['logGroupName'],
+                    filterName=filter_name,
+                    filterPattern=filter_pattern,
+                    destinationArn=destination_arn,
+                    distribution=distribution,
+                    roleArn=role_arn)
+            else:
+                client.put_subscription_filter(
+                    logGroupName=r['logGroupName'],
+                    filterName=filter_name,
+                    filterPattern=filter_pattern,
+                    destinationArn=destination_arn,
+                    distribution=distribution)
