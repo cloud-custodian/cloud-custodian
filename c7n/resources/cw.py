@@ -945,7 +945,7 @@ class SubscriptionFilter(BaseAction):
                 filter_pattern: ip
                 destination_arn: arn:aws:logs:us-east-1:1234567890:destination:lambda
                 distribution: Random
-                role_arn: "arn:aws:iam::123456789012:role/testCrossAccountRole"
+                role_arn: "arn:aws:iam::{account_id}:role/testCrossAccountRole"
     """
     schema = type_schema(
         'put-subscription-filter',
