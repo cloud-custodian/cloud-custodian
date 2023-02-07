@@ -945,6 +945,7 @@ class SubscriptionFilter(BaseAction):
                 filter_pattern: ip
                 destination_arn: arn:aws:logs:us-east-1:1234567890:destination:lambda
                 distribution: Random
+                role_arn: "arn:aws:iam::123456789012:role/testCrossAccountRole"
     """
     schema = type_schema(
         'put-subscription-filter',
@@ -952,6 +953,7 @@ class SubscriptionFilter(BaseAction):
         filter_pattern={'type': 'string'},
         destination_arn={'type': 'string'},
         distribution={'enum': ['Random', 'ByLogStream']},
+        role_arn={'type': 'string'},
         required=['filter_name', 'destination_arn'])
     permissions = ('logs:PutSubscriptionFilter',)
 
@@ -963,6 +965,7 @@ class SubscriptionFilter(BaseAction):
         filter_pattern = self.data.get('filter_pattern', '')
         destination_arn = self.data.get('destination_arn')
         distribution = self.data.get('distribution', 'ByLogStream')
+        role_arn = self.data.get('role_arn')
 
         for r in resources:
             client.put_subscription_filter(
@@ -970,4 +973,5 @@ class SubscriptionFilter(BaseAction):
                 filterName=filter_name,
                 filterPattern=filter_pattern,
                 destinationArn=destination_arn,
-                distribution=distribution)
+                distribution=distribution,
+                roleArn=role_arn)

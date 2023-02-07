@@ -92,6 +92,7 @@ class LogGroupTest(BaseTest):
         filter_pattern = "id"
         destination_arn = "arn:aws:logs:us-east-1:644160558196:destination:lambda"
         distribution = "ByLogStream"
+        role_arn = "arn:aws:iam::123456789012:role/testCrossAccountRole"
         client = factory().client("logs")
         p = self.load_policy(
             {
@@ -102,7 +103,8 @@ class LogGroupTest(BaseTest):
                 "filter_name": filter_name,
                 "filter_pattern": filter_pattern,
                 "destination_arn": destination_arn,
-                "distribution": distribution}],
+                "distribution": distribution,
+                "role_arn": role_arn}],
             },
             session_factory=factory,
         )
@@ -115,6 +117,7 @@ class LogGroupTest(BaseTest):
         self.assertEqual(subscription_filter["filterName"], filter_name)
         self.assertEqual(subscription_filter["destinationArn"], destination_arn)
         self.assertEqual(subscription_filter["distribution"], distribution)
+        self.assertEqual(subscription_filter["roleArn"], role_arn)
 
     def test_age_normalize(self):
         factory = self.replay_flight_data("test_log_group_age_normalize")

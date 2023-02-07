@@ -8,6 +8,7 @@
                 "filterPattern": "id",
                 "destinationArn": "arn:aws:logs:us-east-1:644160558196:destination:lambda",
                 "distribution": "ByLogStream",
+                "roleArn": "arn:aws:iam::123456789012:role/testCrossAccountRole",
                 "creationTime": 1664486090871
             }
         ],
