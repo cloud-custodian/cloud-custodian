@@ -407,3 +407,60 @@ class ProjectTest(BaseTest):
 
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
+    def test_project_missing_filter_false(self):
+        factory = self.replay_flight_data('test_project_missing_filter_false')
+
+        p = self.load_policy(
+            {
+                'name': 'resource',
+                'resource': 'gcp.project',
+                'filters': [{
+                    'type': 'missing',
+                    'policy': {
+                        'resource': 'gcp.bucket'}
+                }]
+            },
+            session_factory=factory
+        )
+
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
+    def test_project_missing_filter_true(self):
+        factory = self.replay_flight_data('test_project_missing_filter_true')
+
+        p = self.load_policy(
+            {
+                'name': 'resource',
+                'resource': 'gcp.project',
+                'filters': [{
+                    'type': 'missing',
+                    'policy': {
+                        'resource': 'gcp.bucket'}
+                }]
+            },
+            session_factory=factory
+        )
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_project_missing_filter_permissions(self):
+
+        p = self.load_policy(
+            {
+                'name': 'resource',
+                'resource': 'gcp.project',
+                'filters': [{
+                    'type': 'missing',
+                    'policy': {
+                        'resource': 'gcp.bucket'}
+                }]
+            }
+        )
+
+        perms = p.resource_manager.filters[0].get_permissions()
+
+        if not perms:
+            self.fail('missing permissions on \"missing\" filter')
