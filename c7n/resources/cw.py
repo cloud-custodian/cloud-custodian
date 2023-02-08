@@ -960,26 +960,15 @@ class SubscriptionFilter(BaseAction):
     def process(self, resources):
         session = local_session(self.manager.session_factory)
         client = session.client('logs')
+        params = dict(
+            filterName=self.data.get('filter_name'),
+            filterPattern=self.data.get('filter_pattern', ''),
+            destinationArn=self.data.get('destination_arn'),
+            distribution=self.data.get('distribution', 'ByLogStream'))
 
-        filter_name = self.data.get('filter_name')
-        filter_pattern = self.data.get('filter_pattern', '')
-        destination_arn = self.data.get('destination_arn')
-        distribution = self.data.get('distribution', 'ByLogStream')
-        role_arn = self.data.get('role_arn')
+        if self.data.get('role_arn'):
+            params['roleArn'] = self.data.get('role_arn')
 
         for r in resources:
-            if role_arn:
-                client.put_subscription_filter(
-                    logGroupName=r['logGroupName'],
-                    filterName=filter_name,
-                    filterPattern=filter_pattern,
-                    destinationArn=destination_arn,
-                    distribution=distribution,
-                    roleArn=role_arn)
-            else:
-                client.put_subscription_filter(
-                    logGroupName=r['logGroupName'],
-                    filterName=filter_name,
-                    filterPattern=filter_pattern,
-                    destinationArn=destination_arn,
-                    distribution=distribution)
+            client.put_subscription_filter(
+                logGroupName=r['logGroupName'], **params)
