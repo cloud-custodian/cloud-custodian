@@ -14,26 +14,26 @@
                     "message": "OK"
                 },
                 "headers": {
-                    "x-ms-original-request-ids": [
-                        "ff12a630-1b8d-466d-87fa-a74299ff3f59",
-                        "8fa089cd-130a-4ecf-84d1-e4992a70b69c",
-                        "1aeb9bbb-4236-49c0-ac80-74dec3be30e4",
-                        "4a6846b5-69f9-46c1-be61-5a4473c93e8d",
-                        "e0df583a-386f-4eb7-8861-a3f44142f34f",
-                        "da4be11c-9679-42bd-8bc3-81024495415c",
-                        "34e36e48-5cb7-4602-92d2-ec9e41bd7865"
-                    ],
-                    "content-length": [
-                        "2995"
+                    "content-type": [
+                        "application/json; charset=utf-8"
                     ],
                     "cache-control": [
                         "no-cache"
                     ],
-                    "content-type": [
-                        "application/json; charset=utf-8"
+                    "x-ms-original-request-ids": [
+                        "a722f3c4-1131-45dc-99d8-6464e00be13e",
+                        "0215946d-fb2e-4c3e-a1e2-646c89960e42",
+                        "c81f2a43-e9b4-46f3-b2ac-349e033b685b",
+                        "90398979-1b68-48fe-b11f-05b29042968f",
+                        "305e2b93-fa5e-4bd8-98c5-c375996f3fc7",
+                        "7b61ac49-8473-4c49-81fa-18282b6c6bef",
+                        "874ca587-a853-4a85-82d7-828ec2cacf81"
                     ],
                     "date": [
-                        "Tue, 31 Jan 2023 19:57:25 GMT"
+                        "Wed, 08 Feb 2023 16:52:20 GMT"
+                    ],
+                    "content-length": [
+                        "3028"
                     ]
                 },
                 "body": {
@@ -46,7 +46,7 @@
                                 "type": "Microsoft.Network/networkWatchers",
                                 "location": "westus",
                                 "tags": {
-                                    "product_id": "13742" 
+                                    "product_id": "13742"
                                 },
                                 "properties": {
                                     "provisioningState": "Succeeded",
@@ -68,13 +68,12 @@
                                 }
                             },
                             {
-                                "name": "demo-nwwatcher",
-                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/success-nwwatcher/providers/Microsoft.Network/networkWatchers/demo-nwwatcher",
-                                "etag": "W/\"8bbc7ab0-0cd2-4522-a89a-4778d15a1146\"",
+                                "name": "networkWatcher",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_networkwatcher/providers/Microsoft.Network/networkWatchers/networkWatcher",
+                                "etag": "W/\"25c34030-81a0-4647-af18-3918aa29d364\"",
                                 "type": "Microsoft.Network/networkWatchers",
                                 "location": "northcentralus",
                                 "tags": {
-                                    "c7n": "true",
                                     "product_id": "13742"
                                 },
                                 "properties": {
@@ -131,7 +130,7 @@
                                 "type": "Microsoft.Network/networkWatchers",
                                 "location": "westus2",
                                 "tags": {
-                                    "product_id": "13742"  
+                                    "product_id": "13742"
                                 },
                                 "properties": {
                                     "provisioningState": "Succeeded",

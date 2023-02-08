@@ -4,8 +4,6 @@ from ..azure_common import BaseTest, arm_template
 
 
 class NetworkWatcherTest(BaseTest):
-    def setUp(self):
-        super(NetworkWatcherTest, self).setUp()
 
     def test_network_watcher_schema_validate(self):
         with self.sign_out_patch():
@@ -24,7 +22,7 @@ class NetworkWatcherTest(BaseTest):
                 {'type': 'value',
                  'key': 'name',
                  'op': 'eq',
-                 'value': 'cctestnetworkwatcher*'}],
+                 'value': 'networkWatcher'}],
         })
         resources = p.run()
         self.assertEqual(len(resources), 1)
