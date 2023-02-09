@@ -17,14 +17,14 @@
                     "content-type": [
                         "application/json; charset=utf-8"
                     ],
-                    "date": [
-                        "Thu, 02 Feb 2023 23:22:50 GMT"
-                    ],
                     "cache-control": [
                         "no-cache"
                     ],
+                    "date": [
+                        "Thu, 09 Feb 2023 14:59:54 GMT"
+                    ],
                     "content-length": [
-                        "2837"
+                        "2892"
                     ]
                 },
                 "body": {
@@ -54,7 +54,7 @@
                                     "haEnabled": "Disabled",
                                     "availabilityZone": "3",
                                     "standbyAvailabilityZone": "",
-                                    "earliestRestoreDate": "2023-01-26T23:22:51.0458517+00:00",
+                                    "earliestRestoreDate": "2023-02-02T14:59:54.5772416+00:00",
                                     "replicationRole": "None",
                                     "replicaCapacity": 10,
                                     "byokEnforcement": "Disabled"
@@ -65,6 +65,43 @@
                                 },
                                 "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/ska-demo-test/providers/Microsoft.DBforMySQL/flexibleServers/azureheight",
                                 "name": "azureheight",
+                                "type": "Microsoft.DBforMySQL/flexibleServers"
+                            },
+                            {
+                                "sku": {
+                                    "name": "Standard_B1ms",
+                                    "tier": "Burstable"
+                                },
+                                "properties": {
+                                    "administratorLogin": "custodian",
+                                    "storageProfile": {
+                                        "storageMB": 20480,
+                                        "storageIops": 0,
+                                        "backupRetentionDays": 7,
+                                        "storageAutogrow": "Enabled",
+                                        "fileStorageSkuName": "Premium_LRS"
+                                    },
+                                    "version": "5.7",
+                                    "state": "Ready",
+                                    "haState": "NotEnabled",
+                                    "fullyQualifiedDomainName": "cctestmyflexibleserverbge56pdztub5y.mysql.database.azure.com",
+                                    "sourceServerId": "",
+                                    "publicNetworkAccess": "Enabled",
+                                    "sslEnforcement": "Disabled",
+                                    "haEnabled": "Disabled",
+                                    "availabilityZone": "3",
+                                    "standbyAvailabilityZone": "",
+                                    "earliestRestoreDate": "2023-02-09T00:02:36.5764855+00:00",
+                                    "replicationRole": "None",
+                                    "replicaCapacity": 10,
+                                    "byokEnforcement": "Disabled"
+                                },
+                                "location": "East US",
+                                "tags": {
+                                    "product_id": "13742"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_mysqlflexible/providers/Microsoft.DBforMySQL/flexibleServers/cctestmyflexibleserverbge56pdztub5y",
+                                "name": "cctestmyflexibleserverbge56pdztub5y",
                                 "type": "Microsoft.DBforMySQL/flexibleServers"
                             },
                             {
@@ -91,7 +128,7 @@
                                     "haEnabled": "Disabled",
                                     "availabilityZone": "2",
                                     "standbyAvailabilityZone": "",
-                                    "earliestRestoreDate": "2023-01-26T23:22:51.0458517+00:00",
+                                    "earliestRestoreDate": "2023-02-02T14:59:54.5772416+00:00",
                                     "replicationRole": "None",
                                     "replicaCapacity": 10,
                                     "byokEnforcement": "Disabled"
@@ -102,44 +139,6 @@
                                 },
                                 "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/stacklet-test-rg-2/providers/Microsoft.DBforMySQL/flexibleServers/mysql-test-server-20221213",
                                 "name": "mysql-test-server-20221213",
-                                "type": "Microsoft.DBforMySQL/flexibleServers"
-                            },
-                            {
-                                "sku": {
-                                    "name": "Standard_B1ms",
-                                    "tier": "Burstable"
-                                },
-                                "properties": {
-                                    "administratorLogin": "ollcwqgz",
-                                    "storageProfile": {
-                                        "storageMB": 20480,
-                                        "storageIops": 0,
-                                        "backupRetentionDays": 7,
-                                        "storageAutogrow": "Enabled",
-                                        "fileStorageSkuName": "Premium_LRS"
-                                    },
-                                    "version": "5.7",
-                                    "state": "Ready",
-                                    "haState": "NotEnabled",
-                                    "fullyQualifiedDomainName": "tls-demo-fmo.mysql.database.azure.com",
-                                    "sourceServerId": "",
-                                    "publicNetworkAccess": "Enabled",
-                                    "sslEnforcement": "Disabled",
-                                    "haEnabled": "Disabled",
-                                    "availabilityZone": "1",
-                                    "standbyAvailabilityZone": "",
-                                    "earliestRestoreDate": "2023-02-02T23:00:40.3649401+00:00",
-                                    "replicationRole": "None",
-                                    "replicaCapacity": 10,
-                                    "byokEnforcement": "Disabled"
-                                },
-                                "location": "East US",
-                                "tags": {
-                                    "c7n": "true",
-                                    "product_id": "13742"
-                                },
-                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/tlsversion-demo-grps/providers/Microsoft.DBforMySQL/flexibleServers/tls-demo-fmo",
-                                "name": "tls-demo-fmo",
                                 "type": "Microsoft.DBforMySQL/flexibleServers"
                             }
                         ]
@@ -163,14 +162,106 @@
                     "content-type": [
                         "application/json; charset=utf-8"
                     ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
                     "date": [
-                        "Thu, 02 Feb 2023 23:22:50 GMT"
+                        "Thu, 09 Feb 2023 14:59:54 GMT"
+                    ],
+                    "content-length": [
+                        "586"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "properties": {
+                            "value": "TLSV1.1",
+                            "description": "Which protocols the server permits for encrypted connections. By default, TLS 1.2 is enforced",
+                            "defaultValue": "TLSv1.2",
+                            "dataType": "Set",
+                            "allowedValues": "TLSv1,TLSv1.1,TLSv1.2",
+                            "source": "user-override",
+                            "isConfigPendingRestart": "True",
+                            "isDynamicConfig": "False",
+                            "isReadOnly": "False"
+                        },
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/ska-demo-test/providers/Microsoft.DBforMySQL/flexibleServers/azureheight/configurations/tls_version",
+                        "name": "tls_version",
+                        "type": "Microsoft.DBforMySQL/flexibleServers/configurations"
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_mysqlflexible/providers/Microsoft.DBForMySql/flexibleServers/cctestmyflexibleserverbge56pdztub5y/configurations/tls_version?api-version=2020-07-01-preview",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
                     ],
                     "cache-control": [
                         "no-cache"
                     ],
+                    "date": [
+                        "Thu, 09 Feb 2023 14:59:55 GMT"
+                    ],
                     "content-length": [
-                        "587"
+                        "617"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "properties": {
+                            "value": "TLSv1.2",
+                            "description": "Which protocols the server permits for encrypted connections. By default, TLS 1.2 is enforced",
+                            "defaultValue": "TLSv1.2",
+                            "dataType": "Set",
+                            "allowedValues": "TLSv1,TLSv1.1,TLSv1.2",
+                            "source": "system-default",
+                            "isConfigPendingRestart": "False",
+                            "isDynamicConfig": "False",
+                            "isReadOnly": "False"
+                        },
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_mysqlflexible/providers/Microsoft.DBforMySQL/flexibleServers/cctestmyflexibleserverbge56pdztub5y/configurations/tls_version",
+                        "name": "tls_version",
+                        "type": "Microsoft.DBforMySQL/flexibleServers/configurations"
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/stacklet-test-rg-2/providers/Microsoft.DBForMySql/flexibleServers/mysql-test-server-20221213/configurations/tls_version?api-version=2020-07-01-preview",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Thu, 09 Feb 2023 14:59:55 GMT"
+                    ],
+                    "content-length": [
+                        "607"
                     ]
                 },
                 "body": {
@@ -186,12 +277,12 @@
                             "isDynamicConfig": "False",
                             "isReadOnly": "False"
                         },
-                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/ska-demo-test/providers/Microsoft.DBforMySQL/flexibleServers/azureheight/configurations/tls_version",
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/stacklet-test-rg-2/providers/Microsoft.DBforMySQL/flexibleServers/mysql-test-server-20221213/configurations/tls_version",
                         "name": "tls_version",
                         "type": "Microsoft.DBforMySQL/flexibleServers/configurations"
                     }
                 }
             }
-        } 
+        }
     ]
 }

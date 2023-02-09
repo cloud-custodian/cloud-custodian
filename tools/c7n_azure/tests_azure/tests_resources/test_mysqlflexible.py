@@ -3,21 +3,19 @@
 from unittest.mock import call, Mock
 
 from ..azure_common import BaseTest, arm_template
-from c7n_azure.resources.mysql_flexibleserver import \
-    ConfigurationParametersFilter
+from c7n_azure.resources.mysql_flexibleserver import ConfigurationParametersFilter
 
 
-class MySQLFlexiblerServerTest(BaseTest):
-
+class MySQLFlexibleServerTest(BaseTest):
     def test_mysql_flexibleserver_schema_validate(self):
         p = self.load_policy({
-            'name': 'test-mysql-flexiblerserver-schema-validate',
+            'name': 'test-azure-mysql-flexibleserver',
             'resource': 'azure.mysql-flexibleserver'
         }, validate=True)
         self.assertTrue(p)
 
-    @arm_template('mysql_flexibleserver.json')
-    def test_find_server_by_name(self):
+    @arm_template('mysqlflexible.json')
+    def test_find_by_name(self):
         p = self.load_policy({
             'name': 'test-azure-mysql-flexibleserver',
             'resource': 'azure.mysql-flexibleserver',
@@ -27,16 +25,14 @@ class MySQLFlexiblerServerTest(BaseTest):
                     'key': 'name',
                     'op': 'glob',
                     'value_type': 'normalize',
-                    'value': 'cctestmysqlflexibleserver*'
+                    'value': 'cctestmyflexibleserverbge56pdztub5y'
                 }
             ],
         })
         resources = p.run()
         self.assertEqual(len(resources), 1)
-
-
-class MySqlFlexibleServerConfigurationParameterFilterTest(BaseTest):
-    @arm_template('mysqlflexibleserver.json')
+    
+    @arm_template('mysqlflexible.json')
     def test_server_configuration_parameter(self):
         p = self.load_policy({
             'name': 'test-azure-mysql-flexibleserver-configurations',
@@ -52,4 +48,4 @@ class MySqlFlexibleServerConfigurationParameterFilterTest(BaseTest):
             ],
         })
         resources = p.run()
-        self.assertEqual(len(resources), 1)
+        self.assertEqual(len(resources), 2)
