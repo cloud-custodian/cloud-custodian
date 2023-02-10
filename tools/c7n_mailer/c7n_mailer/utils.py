@@ -95,7 +95,7 @@ def get_rendered_jinja(
                     datetime.utcnow().timetuple())
             )).isoformat()
     except TypeError as e:
-        logger.warning('unable to lookup \'execution_start\' in decoded message.')
+        logger.warning("unable to lookup 'execution_start' in decoded message %s" % e)
 
     rendered_jinja = template.render(
         recipient=target,
