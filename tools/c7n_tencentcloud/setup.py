@@ -15,8 +15,8 @@ package_data = \
 install_requires = \
 ['argcomplete (>=2.0.0,<3.0.0)',
  'attrs (>=22.2.0,<23.0.0)',
- 'boto3 (>=1.26.51,<2.0.0)',
- 'botocore (>=1.29.51,<2.0.0)',
+ 'boto3 (>=1.26.68,<2.0.0)',
+ 'botocore (>=1.29.68,<2.0.0)',
  'c7n (>=0.9.22,<0.10.0)',
  'cos-python-sdk-v5>=1.9.21,<2.0.0',
  'docutils (>=0.17.1,<0.18.0)',
@@ -36,7 +36,7 @@ install_requires = \
  'tencentcloud-sdk-python>=3.0.783,<4.0.0',
  'typing-extensions (>=4.4.0,<5.0.0)',
  'urllib3 (>=1.26.14,<2.0.0)',
- 'zipp (>=3.11.0,<4.0.0)']
+ 'zipp (>=3.13.0,<4.0.0)']
 
 setup_kwargs = {
     'name': 'c7n-tencentcloud',
