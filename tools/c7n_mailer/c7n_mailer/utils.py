@@ -97,7 +97,7 @@ def get_rendered_jinja(
     except TypeError as e:
         logger.warning("unable to lookup 'execution_start' in decoded message %s" % e)
         execution_start = None
-        
+         
     rendered_jinja = template.render(
         recipient=target,
         resources=resources,
