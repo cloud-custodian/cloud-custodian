@@ -9,7 +9,7 @@ from c7n.credentials import assumed_session
 from c7n.executor import MainThreadExecutor
 from c7n.filters import Filter
 from c7n.query import QueryResourceManager, TypeInfo
-from c7n.resources.aws import AWS, ResourceMap
+from c7n.resources.aws import AWS
 from c7n.utils import local_session, type_schema
 
 
