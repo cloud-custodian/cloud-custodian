@@ -14,6 +14,13 @@ class DescribeKafka(DescribeSource):
 
     def augment(self, resources):
         for r in resources:
+            # preserve backwards compat with extant list_clsuters api
+            if 'Provisioned' in r:
+                for k, v in r['Provisioned'].items():
+                    # dont overwrite
+                    if k in r:
+                        continue
+                    r[k] = v
             if 'Tags' not in r:
                 continue
             tags = []
@@ -28,7 +35,7 @@ class Kafka(QueryResourceManager):
 
     class resource_type(TypeInfo):
         service = 'kafka'
-        enum_spec = ('list_clusters', 'ClusterInfoList', None)
+        enum_spec = ('list_clusters_v2', 'ClusterInfoList', None)
         arn = id = 'ClusterArn'
         name = 'ClusterName'
         date = 'CreationTime'
@@ -50,9 +57,37 @@ class KafkaSGFilter(SecurityGroupFilter):
 
 
 @Kafka.filter_registry.register('subnet')
-class KafkaSubnetFilter(SubnetFilter):
+class KafkaCompoundSubnetFilter(SubnetFilter):
 
-    RelatedIdsExpression = "BrokerNodeGroupInfo.ClientSubnets[]"
+    RelatedIdsExpression = "compound"
+
+    def process(self, resources, event=None):
+        # kafka v2 has both serverless and provisioned resources which have two different
+        # locations for their subnet info
+
+        class ProvisionedSubnetFilter(SubnetFilter):
+            RelatedIdsExpression = "Provisioned.BrokerNodeGroupInfo.ClientSubnets[]"
+
+        class ServerlessSubnetFilter(SubnetFilter):
+            RelatedIdsExpression = "Serverless.VpcConfigs[].SubnetIds[]"
+
+        p = []
+        s = []
+
+        for r in resources:
+            if r['ClusterType'] == 'PROVISIONED':
+                p.append(r)
+            if r['ClusterType'] == 'SERVERLESS':
+                s.append(r)
+
+        result = []
+        for filtered, fil in ((p, ProvisionedSubnetFilter), (s, ServerlessSubnetFilter), ):
+            f = fil(self.data, self.manager)
+            # necessary to validate otherwise the filter wont work
+            f.validate()
+            result.extend(f.process(filtered, event))
+
+        return result
 
 
 @Kafka.filter_registry.register('kms-key')
@@ -74,7 +109,7 @@ class KafkaKmsFilter(KmsRelatedFilter):
                 key: c7n:AliasName
                 value: alias/aws/kafka
     """
-    RelatedIdsExpression = 'EncryptionInfo.EncryptionAtRest.DataVolumeKMSKeyId'
+    RelatedIdsExpression = 'Provisioned.EncryptionInfo.EncryptionAtRest.DataVolumeKMSKeyId'
 
 
 @Kafka.action_registry.register('set-monitoring')

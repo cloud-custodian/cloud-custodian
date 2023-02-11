@@ -566,3 +566,34 @@ class CopyRelatedResourceTag(BaseTest):
             if t['Key'] == 'test-tag':
                 found = True
         self.assertTrue(found)
+
+    def test_copy_related_tag_validate_aws_prefix(self):
+        policy = {
+            'name': 'copy-related-tag-aws-prefix',
+            'resource': 'ami',
+            'actions': [
+                {
+                    'type': 'copy-related-tag',
+                    'resource': 'aws.ebs-snapshot',
+                    'key': '',
+                    'tags': '*',
+                }
+            ]
+        }
+        # policy will validate on load
+        policy = self.load_policy(policy)
+
+    def test_copy_related_tag_validate_aws_prefix_fake_resource(self):
+        policy = {
+            'name': 'copy-related-tag-aws-prefix',
+            'resource': 'ami',
+            'actions': [
+                {
+                    'type': 'copy-related-tag',
+                    'resource': 'aws.not-real',
+                    'key': '',
+                    'tags': '*',
+                }
+            ]
+        }
+        self.assertRaises(PolicyValidationError, self.load_policy, policy)

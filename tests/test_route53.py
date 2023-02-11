@@ -402,8 +402,7 @@ class TestResolverQueryLogConfig(BaseTest):
 class Route53RecoveryReadinessCheckTest(BaseTest):
 
     def test_readiness_check_add_tag(self):
-        session_factory = self.replay_flight_data("test_readiness_check_add_tag",
-                             region="us-west-2")
+        session_factory = self.replay_flight_data("test_readiness_check_add_tag",)
         p = self.load_policy(
             {
                 "name": "readiness-check-add-tag",
@@ -411,7 +410,6 @@ class Route53RecoveryReadinessCheckTest(BaseTest):
                 "filters": [{"tag:TestTag": "absent"}],
                 "actions": [{"type": "tag", "key": "TestTag", "value": "TestValue"}],
             },
-            config={"region": "us-west-2"},
             session_factory=session_factory,
         )
         resources = p.run()
@@ -421,8 +419,7 @@ class Route53RecoveryReadinessCheckTest(BaseTest):
         self.assertEqual(tags, {"TestTag": "TestValue"})
 
     def test_readiness_check_remove_tag(self):
-        session_factory = self.replay_flight_data("test_readiness_check_remove_tag",
-                                 region="us-west-2")
+        session_factory = self.replay_flight_data("test_readiness_check_remove_tag",)
         p = self.load_policy(
             {
                 "name": "readiness-check-remove-tag",
@@ -430,7 +427,6 @@ class Route53RecoveryReadinessCheckTest(BaseTest):
                 "filters": [{"tag:TestTag": "present"}],
                 "actions": [{"type": "remove-tag", "tags": ["TestTag"]}],
             },
-            config={"region": "us-west-2"},
             session_factory=session_factory,
         )
         resources = p.run()
@@ -440,7 +436,7 @@ class Route53RecoveryReadinessCheckTest(BaseTest):
         self.assertEqual(len(tags), 0)
 
     def test_readiness_check_markop(self):
-        session_factory = self.replay_flight_data("test_readiness_check_markop", region="us-west-2")
+        session_factory = self.replay_flight_data("test_readiness_check_markop")
         p = self.load_policy(
             {
                 "name": "readiness-check-markop",
@@ -448,7 +444,6 @@ class Route53RecoveryReadinessCheckTest(BaseTest):
                 "filters": [{"tag:TestTag": "absent"}],
                 "actions": [{"type": "mark-for-op", "op": "notify", "tag": "TestTag", "days": 2}],
             },
-            config={"region": "us-west-2"},
             session_factory=session_factory,
         )
         resources = p.run()
@@ -457,3 +452,22 @@ class Route53RecoveryReadinessCheckTest(BaseTest):
         tags = client.list_tags_for_resources(ResourceArn=resources[0]["ReadinessCheckArn"])['Tags']
         self.assertEqual(len(tags), 1)
         self.assertEqual(tags, {'TestTag': 'Resource does not meet policy: notify@2022/12/29'})
+
+    def test_readiness_cross_account(self):
+        session_factory = self.replay_flight_data("test_readiness_cross_account")
+        p = self.load_policy(
+            {
+                "name": "readiness-cross-account",
+                "resource": "readiness-check",
+                "filters": [
+                    {
+                        'type': 'cross-account',
+                        "whitelist": ["111111111111"]
+                    },
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['c7n:CrossAccountViolations'], ['222222222222'])
