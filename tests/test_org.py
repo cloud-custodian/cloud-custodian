@@ -111,3 +111,44 @@ def test_org_account_moto(test, org_tree):
     )
     resources = p.run()
     assert len(resources) == 1
+
+
+@moto.mock_cloudformation
+def test_org_account_filter_cfn_absent(test):
+    p = test.load_policy(
+        {
+            "name": "org-cfn-check",
+            "resource": "aws.org-account",
+            "filters": [{"type": "cfn-stack", "stack_names": ["bob"]}],
+        }
+    )
+    cfn_stack = p.resource_manager.filters[0]
+    result = cfn_stack.process_account_region(
+        {"Id": "123", "Name": "test-account"}, "us-east-1", boto3.Session()
+    )
+    assert result is True
+
+
+@moto.mock_cloudformation
+def test_org_account_filter_cfn_present(test):
+    p = test.load_policy(
+        {
+            "name": "org-cfn-check",
+            "resource": "aws.org-account",
+            "filters": [
+                {
+                    "type": "cfn-stack",
+                    "status": ["CREATE_COMPLETE", "UPDATE_COMPLETE"],
+                    "stack_names": ["bob"],
+                }
+            ],
+        }
+    )
+    cfn_stack = p.resource_manager.filters[0]
+    s = boto3.Session()
+    cfn = s.client("cloudformation")
+    cfn.create_stack(StackName="bob", TemplateBody=template_body)
+    result = cfn_stack.process_account_region(
+        {"Id": "123", "Name": "test-account"}, "us-east-1", s
+    )
+    assert result is False

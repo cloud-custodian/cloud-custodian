@@ -56,6 +56,8 @@ pytest-recording = "^0.12.1"
 
 [tool.poetry.group.dev.dependencies]
 moto = "^4.1.2"
+docker = "^6.0.1"
+openapi-spec-validator = "^0.5.5"
 
 [tool.black]
 skip-string-normalization = true
