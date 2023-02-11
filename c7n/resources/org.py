@@ -113,6 +113,7 @@ class AccountHierarchy:
 @OrgAccount.filter_registry.register("ou")
 class OrganizationUnit(Filter, AccountHierarchy):
     schema = type_schema("ou", units={"type": "array", "items": {"type": "string"}})
+    permissions = ("organizations:ListChildren",)
 
     def process(self, resources, event=None):
         client = local_session(self.manager.session_factory).client("organizations")
@@ -231,6 +232,7 @@ class StackFilter(Filter, ProcessAccountSet):
         regions={"type": "array", "elements": {"type": "string"}},
     )
 
+    permissions = ('sts:AssumeRole', 'cloudformation:DescribeStacks')
     annotation = "c7n:cfn-stack"
 
     def process(self, resources, event=None):
