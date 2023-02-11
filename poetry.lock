@@ -821,14 +821,14 @@ files = [
 
 [[package]]
 name = "moto"
-version = "4.1.0"
+version = "4.1.2"
 description = ""
 category = "main"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "moto-4.1.0-py2.py3-none-any.whl", hash = "sha256:12f231196ebf22d19774f2a75738fdedae10a8c82abb8fa0877e1819aa799f4f"},
-    {file = "moto-4.1.0.tar.gz", hash = "sha256:e65a692df57abb631b06c8f3f7827c9deceae3416887527e266c775ad722a2fa"},
+    {file = "moto-4.1.2-py2.py3-none-any.whl", hash = "sha256:1b361ece638c74a657325378a259276f368aafce2f8be84f8143e69fa93ce8ec"},
+    {file = "moto-4.1.2.tar.gz", hash = "sha256:63431733d2a02c7bd652ad71ec1da442a0e0d580cbac5eeb50d440a2ce066eac"},
 ]
 
 [package.dependencies]
@@ -858,6 +858,7 @@ dynamodbstreams = ["docker (>=2.5.1)"]
 ebs = ["sshpubkeys (>=3.1.0)"]
 ec2 = ["sshpubkeys (>=3.1.0)"]
 efs = ["sshpubkeys (>=3.1.0)"]
+eks = ["sshpubkeys (>=3.1.0)"]
 glue = ["pyparsing (>=3.0.7)"]
 iotdata = ["jsondiff (>=1.1.2)"]
 route53resolver = ["sshpubkeys (>=3.1.0)"]
@@ -1894,4 +1895,4 @@ testing = ["flake8 (<5)", "func-timeout", "jaraco.functools", "jaraco.itertools"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.7"
-content-hash = "d711655ee419ca2ff56d5838169b478dc3078ba296e82ea312d9c719f4fb77ef"
+content-hash = "793eaf7725e9afff66a70e1da6f3b64ddbb6ba844d0cb7056841c432b1cdb741"

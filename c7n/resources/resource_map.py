@@ -150,6 +150,7 @@ ResourceMap = {
     "aws.ops-item": "c7n.resources.ssm.OpsItem",
     "aws.opswork-cm": "c7n.resources.opsworks.OpsworksCM",
     "aws.opswork-stack": "c7n.resources.opsworks.OpsworkStack",
+    "aws.org-account": "c7n.resources.org.OrgAccount",
     "aws.prefix-list": "c7n.resources.vpc.PrefixList",
     "aws.peering-connection": "c7n.resources.vpc.PeeringConnection",
     'aws.qldb': 'c7n.resources.qldb.QLDB',

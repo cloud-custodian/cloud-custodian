@@ -4,8 +4,6 @@ import boto3
 import moto
 import pytest
 
-from moto.organizations import organizations_backend
-
 template_body = json.dumps(
     {
         "AWSTemplateFormatVersion": "2010-09-09",
@@ -16,9 +14,6 @@ template_body = json.dumps(
 
 @pytest.fixture(scope="function")
 def org_tree(request):
-    def describe_ous():
-        for o in organizations_backend.ou:
-            print(o.describe())
 
     with moto.mock_organizations():
         client = boto3.client("organizations")
@@ -35,14 +30,12 @@ def org_tree(request):
             ParentId=dept_a["Id"], Name="GroupC"
         )["OrganizationalUnit"]
 
-        describe_ous()
         account_a = client.create_account(
             Email="a@example.com",
             AccountName="a",
             Tags=[{"Key": "Owner", "Value": "alice"}],
         )["CreateAccountStatus"]
 
-        describe_ous()
         client.move_account(
             AccountId=account_a["AccountId"],
             SourceParentId=root["Id"],

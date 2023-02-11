@@ -54,6 +54,9 @@ click = "^8.0"
 freezegun = "^1.2.2"
 pytest-recording = "^0.12.1"
 
+[tool.poetry.group.dev.dependencies]
+moto = "^4.1.2"
+
 [tool.black]
 skip-string-normalization = true
 
