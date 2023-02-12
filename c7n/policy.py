@@ -37,7 +37,7 @@ def load(options, path, format=None, validate=True, vars=None):
     from c7n.schema import validate as schema_validate, StructureParser
     if os.path.isdir(path):
         from c7n.loader import DirectoryLoader
-        collection = DirectoryLoader(options).load_directory(path)
+        collection = DirectoryLoader(options).load_directory(path, validate)
         if validate:
             [p.validate() for p in collection]
         return collection
