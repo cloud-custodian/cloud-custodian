@@ -68,6 +68,7 @@ class ProtectedResource:
     def arn_type(self):
         return self.manager.get_model().arn_type
 
+
 class IsShieldProtected(Filter, ProtectedResource):
 
     permissions = ('shield:ListProtections',)
@@ -82,7 +83,6 @@ class IsShieldProtected(Filter, ProtectedResource):
 
         state = self.data.get('state', False)
         results = []
-
 
         for arn, r in zip(self.get_arns(resources), resources):
             r['c7n:ShieldProtected'] = shielded = arn in protected_resources
@@ -175,6 +175,7 @@ class ProtectedEIP:
 
     def arn_type(self):
         return 'eip-allocation'
+
 
 class IsEIPShieldProtected(ProtectedEIP, IsShieldProtected):
     pass
