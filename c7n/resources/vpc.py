@@ -729,7 +729,8 @@ class SGUsage(Filter):
         return list(itertools.chain(
             *[self.manager.get_resource_manager(m).get_permissions()
              for m in
-             ['lambda', 'eni', 'launch-config', 'security-group', 'event-rule-target']]))
+             ['lambda', 'eni', 'launch-config', 'security-group', 'event-rule-target',
+              'aws.batch-compute']]))
 
     def filter_peered_refs(self, resources):
         if not resources:
@@ -754,6 +755,7 @@ class SGUsage(Filter):
             ("launch-configs", self.get_launch_config_sgs),
             ("ecs-cwe", self.get_ecs_cwe_sgs),
             ("codebuild", self.get_codebuild_sgs),
+            ("batch", self.get_batch_sgs),
         )
 
     def scan_groups(self):
@@ -818,6 +820,17 @@ class SGUsage(Filter):
         for rule in self.manager.get_resource_manager(
                 'event-rule-target').resources(augment=False):
             ids = expr.search(rule)
+            if ids:
+                sg_ids.update(ids)
+        return sg_ids
+
+    def get_batch_sgs(self):
+        sg_ids = set()
+        expr = jmespath.compile(
+            'computeResources.securityGroupIds[]')
+        for compute in self.manager.get_resource_manager(
+                'aws.batch-compute').resources(augment=False):
+            ids = expr.search(compute)
             if ids:
                 sg_ids.update(ids)
         return sg_ids
