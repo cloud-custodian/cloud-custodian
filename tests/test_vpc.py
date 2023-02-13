@@ -1043,6 +1043,22 @@ class NetworkAddrTest(BaseTest):
 
         self.assert_policy_release_failed(factory, ec2, network_addrs["Addresses"][0])
 
+    def test_eip_shield(self):
+        session_factory = self.replay_flight_data("test_eip_shield")
+        p = self.load_policy(
+            {
+                "name": "eip-shield",
+                "resource": "network-addr",
+                "filters": [
+                    {"type": "shield-enabled", "state": False},
+                ],
+                "actions": ["set-shield"],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
 
 class RouteTableTest(BaseTest):
 
