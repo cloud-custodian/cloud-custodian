@@ -1,9 +1,7 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
-from unittest.mock import call, Mock
 
 from ..azure_common import BaseTest, arm_template
-from c7n_azure.resources.mysql_flexibleserver import ConfigurationParametersFilter
 
 
 class MySQLFlexibleServerTest(BaseTest):
@@ -31,7 +29,7 @@ class MySQLFlexibleServerTest(BaseTest):
         })
         resources = p.run()
         self.assertEqual(len(resources), 1)
-    
+
     @arm_template('mysqlflexible.json')
     def test_server_configuration_parameter(self):
         p = self.load_policy({

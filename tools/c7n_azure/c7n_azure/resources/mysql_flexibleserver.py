@@ -70,8 +70,8 @@ class ConfigurationParametersFilter(ValueFilter):
         required=['type', 'name'],
         rinherit=ValueFilter.schema,
         name={
-          'type': 'string',
-          'allowed_value': ['TLSv1.2']
+            'type': 'string',
+            'allowed_value': ['TLSv1.2']
         }
     )
 
