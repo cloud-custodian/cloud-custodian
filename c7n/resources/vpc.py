@@ -20,7 +20,7 @@ from c7n.utils import (
     chunks, local_session, type_schema, get_retry, parse_cidr, get_eni_resource_type)
 
 from c7n.resources.aws import shape_validate
-from c7n.resources.shield import IsShieldProtected, SetShieldProtection
+from c7n.resources.shield import IsEIPShieldProtected, SetEIPShieldProtection
 
 
 @resources.register('vpc')
@@ -2130,8 +2130,8 @@ class NetworkAddress(query.QueryResourceManager):
     }
 
 
-NetworkAddress.filter_registry.register('shield-enabled', IsShieldProtected)
-NetworkAddress.action_registry.register('set-shield', SetShieldProtection)
+NetworkAddress.filter_registry.register('shield-enabled', IsEIPShieldProtected)
+NetworkAddress.action_registry.register('set-shield', SetEIPShieldProtection)
 
 
 @NetworkAddress.action_registry.register('release')

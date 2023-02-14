@@ -381,3 +381,60 @@ class AutoTagCreator(BaseTest):
         self.assertEqual(
             result, {"Owner": "204.63.44.142"}
         )
+
+    def test_auto_tag_user_with_principal_id_value_class_method_process(self):
+        # check that it works with IAMUser creator
+        event = {
+            "detail": event_data("event-cloud-trail-run-instance-creator.json"),
+            "debug": True,
+        }
+        session_factory = self.replay_flight_data("test_ec2_autotag_creator")
+        policy = self.load_policy(
+            {
+                "name": "ec2-auto-tag",
+                "resource": "ec2",
+                "mode": {"type": "cloudtrail", "events": ["RunInstances"]},
+                "actions": [
+                    {
+                        "type": "auto-tag-user",
+                        "tag": "CreatorName",
+                        "value": "principalId",
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = policy.push(event, None)
+        auto_tag_user = AutoTagUser()
+        auto_tag_user.data = {"tag": "CreatorName", "value": "principalId"}
+        auto_tag_user.manager = MagicMock()
+        result = auto_tag_user.process(resources, event)
+        self.assertEqual(result["CreatorName"], "AIDAJEZOTH6YPO3DY45QW")
+
+        # check that it works with assumeRole creator
+        session_factory = self.replay_flight_data("test_ec2_autotag_assumed")
+        policy = self.load_policy(
+            {
+                "name": "ec2-auto-tag",
+                "resource": "ec2",
+                "mode": {"type": "cloudtrail", "events": ["RunInstances"]},
+                "actions": [
+                    {
+                        "type": "auto-tag-user",
+                        "tag": "creatorId",
+                        "value": "principalId",
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        event = {
+            "detail": event_data("event-cloud-trail-run-instance-creator-assumed.json"),
+            "debug": True,
+        }
+        resources = policy.push(event, None)
+        auto_tag_user.data = {"tag": "CreatorId", "value": "principalId"}
+        result = auto_tag_user.process(resources, event)
+        self.assertEqual(
+            result, {"CreatorId": "AROAIFMJLHZRIKEFRKUUF:Radiant"}
+        )
