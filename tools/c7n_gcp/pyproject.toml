@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "c7n_gcp"
-version = "0.4.20"
+version = "0.4.21"
 description = "Cloud Custodian - Google Cloud Provider"
 readme = "readme.md"
 homepage = "https://cloudcustodian.io"
@@ -22,9 +22,6 @@ google-api-python-client = "^2.0"
 # pin these for now
 google-api-core = "2.10.2"
 grpcio = "1.49.1"
-
-# pin for cos-python-sdk-v5
-requests = "2.27.1"
 
 google-cloud-logging = "^3.2"
 google-auth = "^2.1.0"

@@ -11,6 +11,7 @@ from c7n_gcp.query import QueryResourceManager, TypeInfo
 from c7n.resolver import ValuesFrom
 from c7n.utils import type_schema, local_session
 from c7n.filters.core import ValueFilter
+from c7n.filters.missing import Missing
 
 
 @resources.register('organization')
@@ -128,6 +129,9 @@ class Project(QueryResourceManager):
             for child in self.data.get('query'):
                 if 'filter' in child:
                     return {'filter': child['filter']}
+
+
+Project.filter_registry.register('missing', Missing)
 
 
 @Project.filter_registry.register('iam-policy')
