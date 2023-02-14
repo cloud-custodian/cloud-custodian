@@ -62,9 +62,11 @@ class ProtectedResource:
     """Base class with helper methods for dealing with
     ARNs of resources protected by Shield
     """
+
     def get_arns(self, resources):
         return self.manager.get_arns(resources)
 
+    @property
     def arn_type(self):
         return self.manager.get_model().arn_type
 
@@ -78,7 +80,7 @@ class IsShieldProtected(Filter, ProtectedResource):
         client = local_session(self.manager.session_factory).client(
             'shield', region_name='us-east-1')
 
-        protections = get_type_protections(client, self.arn_type())
+        protections = get_type_protections(client, self.arn_type)
         protected_resources = {p['ResourceArn'] for p in protections}
 
         state = self.data.get('state', False)
@@ -110,7 +112,7 @@ class SetShieldProtection(BaseAction, ProtectedResource):
         client = local_session(self.manager.session_factory).client(
             'shield', region_name='us-east-1')
         model = self.manager.get_model()
-        protections = get_type_protections(client, self.arn_type())
+        protections = get_type_protections(client, self.arn_type)
         protected_resources = {p['ResourceArn']: p for p in protections}
         state = self.data.get('state', True)
 
@@ -164,6 +166,7 @@ class ProtectedEIP:
     But Shield requires the resource type to be "eip-allocation":
     https://docs.aws.amazon.com/waf/latest/DDOSAPIReference/API_CreateProtection.html
     """
+
     def get_arns(self, resources):
         arns = [
             arn.replace(':elastic-ip', ':eip-allocation')
@@ -173,6 +176,7 @@ class ProtectedEIP:
         ]
         return arns
 
+    @property
     def arn_type(self):
         return 'eip-allocation'
 
