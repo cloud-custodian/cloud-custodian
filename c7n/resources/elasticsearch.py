@@ -654,6 +654,7 @@ class EnableAuditLog(Action):
         'enable-auditlog',
         state={'type': 'boolean'},
         loggroup_prefix={'type': 'string'},
+        delay={'type': 'number'},
         required=['state'])
 
     statement = {
@@ -703,7 +704,7 @@ class EnableAuditLog(Action):
         try:
             client.create_log_group(logGroupName=log_group_arn.split(":")[-2])
         except client.exceptions.ResourceAlreadyExistsException:
-            self.log.warning("Log group already exists ...")
+            pass
 
         for policy in client.describe_resource_policies().get('resourcePolicies'):
             if policy['policyName'] == "OpenSearchCloudwatchLogPermissions":
@@ -731,7 +732,7 @@ class EnableAuditLog(Action):
         for r in resources:
             if state:
                 self.set_permissions(log_group_arns[r["DomainName"]])
-                time.sleep(15)
+                time.sleep(self.data.get('delay', 15))
             client.update_elasticsearch_domain_config(DomainName=r['DomainName'],
                 LogPublishingOptions={"AUDIT_LOGS":
                 {'CloudWatchLogsLogGroupArn': log_group_arns[r["DomainName"]], 'Enabled': state}})

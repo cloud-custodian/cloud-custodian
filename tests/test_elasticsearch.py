@@ -618,7 +618,7 @@ class ElasticSearch(BaseTest):
                 "name": "test_elasticsearch_enable_auditlog",
                 "resource": "elasticsearch",
                 "filters": [{"DomainName": "test-es-dom"}],
-                "actions": [{"type": "enable-auditlog", "state": True}],
+                "actions": [{"type": "enable-auditlog", "state": True, "delay": 1}],
             },
             session_factory=factory,
         )
