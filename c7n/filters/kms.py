@@ -69,7 +69,14 @@ class KmsRelatedFilter(RelatedResourceFilter):
         normalized_ids = []
         for rid in related_ids:
             if rid.startswith('arn:'):
-                normalized_ids.append(rid.rsplit('/', 1)[-1])
+                # Normalize ARNs to alias name or key ID:
+                #
+                # arn:aws:kms:us-east-1:644160558196:alias/test
+                # --> alias/test
+                #
+                # arn:aws:kms:us-east-1:644160558196:key/36812ccf-daaf-49b1-a24b-0eef254ffe41
+                # --> 36812ccf-daaf-49b1-a24b-0eef254ffe41
+                normalized_ids.append(rid.rsplit(':', 1)[-1].lstrip('key/'))
             else:
                 normalized_ids.append(rid)
         return normalized_ids

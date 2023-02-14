@@ -8,6 +8,7 @@ import jmespath
 from c7n.actions import ActionRegistry, BaseAction
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import FilterRegistry, MetricsFilter
+from c7n.filters.kms import KmsRelatedFilter
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, TypeInfo, ConfigSource, DescribeSource
 from c7n.tags import universal_augment
@@ -329,6 +330,30 @@ class EMRSecurityConfiguration(QueryResourceManager):
         for r in resources:
             r['SecurityConfiguration'] = json.loads(r['SecurityConfiguration'])
         return resources
+
+
+@EMRSecurityConfiguration.filter_registry.register('kms-key')
+class EmrSecurityConfigurationKmsFilter(KmsRelatedFilter):
+    """
+    Filter a resource by its associcated kms key and optionally the alias name
+    of the kms key by using 'c7n:AliasName'
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: emr-security-configuration-kms-key
+                resource: aws.emr-security-configuration
+                filters:
+                  - type: kms-key
+                    key: c7n:AliasName
+                    value: "^(alias/aws/)"
+                    op: regex
+    """
+
+    RelatedIdsExpression = 'SecurityConfiguration.EncryptionConfiguration.AtRestEncryptionConfiguration.\
+                            LocalDiskEncryptionConfiguration.AwsKmsKey'
 
 
 @EMRSecurityConfiguration.action_registry.register('delete')

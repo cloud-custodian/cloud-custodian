@@ -1,0 +1,18 @@
+{
+    "status_code": 200,
+    "data": {
+        "Name": "test",
+        "SecurityConfiguration": "{\"EncryptionConfiguration\":{\"AtRestEncryptionConfiguration\":{\"LocalDiskEncryptionConfiguration\":{\"EncryptionKeyProviderType\":\"AwsKms\",\"AwsKmsKey\":\"arn:aws:kms:us-east-1:644160558196:alias/test\",\"EnableEbsEncryption\":true}},\"EnableInTransitEncryption\":false,\"EnableAtRestEncryption\":true}}",
+        "CreationDateTime": {
+            "__class__": "datetime",
+            "year": 2020,
+            "month": 12,
+            "day": 14,
+            "hour": 15,
+            "minute": 47,
+            "second": 4,
+            "microsecond": 624000
+        },
+        "ResponseMetadata": {}
+    }
+}
