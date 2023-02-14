@@ -41,6 +41,7 @@ ResourceMap = {
     "azure.mysql": "c7n_azure.resources.mysql.MySQL",
     "azure.networkinterface": "c7n_azure.resources.network_interface.NetworkInterface",
     "azure.networksecuritygroup": "c7n_azure.resources.network_security_group.NetworkSecurityGroup",
+    "azure.networkwatcher": "c7n_azure.resources.network_watcher.NetworkWatcher",
     "azure.policyassignments": "c7n_azure.resources.policy_assignments.PolicyAssignments",
     "azure.postgresql-database": "c7n_azure.resources.postgresql_database.PostgresqlDatabase",
     "azure.postgresql-server": "c7n_azure.resources.postgresql_server.PostgresqlServer",

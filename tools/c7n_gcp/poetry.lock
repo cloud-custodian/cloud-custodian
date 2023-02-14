@@ -39,18 +39,18 @@ tests-no-zope = ["cloudpickle", "cloudpickle", "hypothesis", "hypothesis", "mypy
 
 [[package]]
 name = "boto3"
-version = "1.26.51"
+version = "1.26.70"
 description = "The AWS SDK for Python"
 category = "dev"
 optional = false
 python-versions = ">= 3.7"
 files = [
-    {file = "boto3-1.26.51-py3-none-any.whl", hash = "sha256:b4aefdc72191c40a0155511b9ce933c94dcbdd1834ffc1204e90a30e7849ef13"},
-    {file = "boto3-1.26.51.tar.gz", hash = "sha256:d599ce626b03e7236b0cda051c3cedc128fd75e0ec2f799fab9b2eabdf32d945"},
+    {file = "boto3-1.26.70-py3-none-any.whl", hash = "sha256:5324c2a9dbc271d2b25eb79f7469b422de411665f9ab1c0b410e8ac820859b1a"},
+    {file = "boto3-1.26.70.tar.gz", hash = "sha256:123cf34f3cc58772b4f806dfbb1ae9ffae47459de5088e971be9d3cd2b198975"},
 ]
 
 [package.dependencies]
-botocore = ">=1.29.51,<1.30.0"
+botocore = ">=1.29.70,<1.30.0"
 jmespath = ">=0.7.1,<2.0.0"
 s3transfer = ">=0.6.0,<0.7.0"
 
@@ -59,14 +59,14 @@ crt = ["botocore[crt] (>=1.21.0,<2.0a0)"]
 
 [[package]]
 name = "botocore"
-version = "1.29.51"
+version = "1.29.70"
 description = "Low-level, data-driven core of boto 3."
 category = "dev"
 optional = false
 python-versions = ">= 3.7"
 files = [
-    {file = "botocore-1.29.51-py3-none-any.whl", hash = "sha256:bbb92420902b4d9e4b854fcfae20d1029f1c3396e0579894f115278bc51d6198"},
-    {file = "botocore-1.29.51.tar.gz", hash = "sha256:f2f521fbd2343879f3c2d42392c88f1e7f15ea147a6dc5a3dab7b8686d90fcb6"},
+    {file = "botocore-1.29.70-py3-none-any.whl", hash = "sha256:7d9abef42846c1c2f31dacaa559f8450f6fbda74c2c9e3dc6630e06e882ad026"},
+    {file = "botocore-1.29.70.tar.gz", hash = "sha256:caaa144f49ef0d01b5e8812c9afa729def2c3358d9c4d9204789be2b56c5e849"},
 ]
 
 [package.dependencies]
@@ -75,11 +75,11 @@ python-dateutil = ">=2.1,<3.0.0"
 urllib3 = ">=1.25.4,<1.27"
 
 [package.extras]
-crt = ["awscrt (==0.15.3)"]
+crt = ["awscrt (==0.16.9)"]
 
 [[package]]
 name = "c7n"
-version = "0.9.22"
+version = "0.9.23"
 description = "Cloud Custodian - Policy Rules Engine"
 category = "dev"
 optional = false
@@ -103,14 +103,14 @@ url = "../.."
 
 [[package]]
 name = "cachetools"
-version = "5.2.1"
+version = "5.3.0"
 description = "Extensible memoizing collections and decorators"
 category = "main"
 optional = false
 python-versions = "~=3.7"
 files = [
-    {file = "cachetools-5.2.1-py3-none-any.whl", hash = "sha256:8462eebf3a6c15d25430a8c27c56ac61340b2ecf60c9ce57afc2b97e450e47da"},
-    {file = "cachetools-5.2.1.tar.gz", hash = "sha256:5991bc0e08a1319bb618d3195ca5b6bc76646a49c21d55962977197b301cc1fe"},
+    {file = "cachetools-5.3.0-py3-none-any.whl", hash = "sha256:429e1a1e845c008ea6c85aa35d4b98b65d6a9763eeef3e37e92728a12d1de9d4"},
+    {file = "cachetools-5.3.0.tar.gz", hash = "sha256:13dfddc7b8df938c21a940dfa6557ce6e94a2f1cdfa58eb90c805721d58f2c14"},
 ]
 
 [[package]]
@@ -319,14 +319,14 @@ grpcio-gcp = ["grpcio-gcp (>=0.2.2,<1.0dev)"]
 
 [[package]]
 name = "google-api-python-client"
-version = "2.73.0"
+version = "2.77.0"
 description = "Google API Client Library for Python"
 category = "main"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "google-api-python-client-2.73.0.tar.gz", hash = "sha256:7e860e3ec27b504fb797fa23c07c012a874dd736491fddbe50a20d3bdde8ace6"},
-    {file = "google_api_python_client-2.73.0-py2.py3-none-any.whl", hash = "sha256:bafce2a02b06ee501df039eba5874afc7d28c9cf5ef92253327776448706556d"},
+    {file = "google-api-python-client-2.77.0.tar.gz", hash = "sha256:f18e9dbb365f0485194a8daf5d60da2cff6a80ce2c9a694efc2b279922cb3dd0"},
+    {file = "google_api_python_client-2.77.0-py2.py3-none-any.whl", hash = "sha256:42a44e9adfca6bb27540ce52348aa1d3b81e214bcc53d454a76ebfbe8eee1483"},
 ]
 
 [package.dependencies]
@@ -432,14 +432,14 @@ grpc = ["grpcio (>=1.38.0,<2.0dev)"]
 
 [[package]]
 name = "google-cloud-logging"
-version = "3.4.0"
+version = "3.5.0"
 description = "Stackdriver Logging API client library"
 category = "main"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "google-cloud-logging-3.4.0.tar.gz", hash = "sha256:cde0f59fadb917468746252baf4b11ea00f6d686ef02139183eaf921f3aee6b4"},
-    {file = "google_cloud_logging-3.4.0-py2.py3-none-any.whl", hash = "sha256:afe1d558346e4a6ff8203bfb4266cff8f5fb46816ad0930a9af0d3956a218838"},
+    {file = "google-cloud-logging-3.5.0.tar.gz", hash = "sha256:f11544a21ea3556f70ebac7bc338ffa8a197913834ecdd8853d176b870823aaa"},
+    {file = "google_cloud_logging-3.5.0-py2.py3-none-any.whl", hash = "sha256:def71f6a7bb6652ce8fee18f0cad8c32157ac606fe1512802254a471bcdfe5e8"},
 ]
 
 [package.dependencies]
@@ -448,19 +448,22 @@ google-cloud-appengine-logging = ">=0.1.0,<2.0.0dev"
 google-cloud-audit-log = ">=0.1.0,<1.0.0dev"
 google-cloud-core = ">=2.0.0,<3.0.0dev"
 grpc-google-iam-v1 = ">=0.12.4,<1.0.0dev"
-proto-plus = ">=1.22.0,<2.0.0dev"
+proto-plus = [
+    {version = ">=1.22.0,<2.0.0dev", markers = "python_version < \"3.11\""},
+    {version = ">=1.22.2,<2.0.0dev", markers = "python_version >= \"3.11\""},
+]
 protobuf = ">=3.19.5,<3.20.0 || >3.20.0,<3.20.1 || >3.20.1,<4.21.0 || >4.21.0,<4.21.1 || >4.21.1,<4.21.2 || >4.21.2,<4.21.3 || >4.21.3,<4.21.4 || >4.21.4,<4.21.5 || >4.21.5,<5.0.0dev"
 
 [[package]]
 name = "google-cloud-monitoring"
-version = "2.14.0"
+version = "2.14.1"
 description = "Stackdriver Monitoring API client library"
 category = "main"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "google-cloud-monitoring-2.14.0.tar.gz", hash = "sha256:167db59105413e3664f69bec2ced96d2f2da95b5e4de648e28a9ffba27ae75a6"},
-    {file = "google_cloud_monitoring-2.14.0-py2.py3-none-any.whl", hash = "sha256:753edea8066d16aeca20cb1750f680e0789227c386088ef33fb0fc7f99fd6316"},
+    {file = "google-cloud-monitoring-2.14.1.tar.gz", hash = "sha256:14a8369c499ce6660a496270574c06d3d90ae19425f936a7fbd06a6f027ff1e0"},
+    {file = "google_cloud_monitoring-2.14.1-py2.py3-none-any.whl", hash = "sha256:0e0b6c8fb54880175cfaa3e22c2ac7efae807f0cd4ce3b1c9249f43d854a5f92"},
 ]
 
 [package.dependencies]
@@ -578,14 +581,14 @@ testing = ["pytest"]
 
 [[package]]
 name = "google-resumable-media"
-version = "2.4.0"
+version = "2.4.1"
 description = "Utilities for Google Media Downloads and Resumable Uploads"
 category = "main"
 optional = false
 python-versions = ">= 3.7"
 files = [
-    {file = "google-resumable-media-2.4.0.tar.gz", hash = "sha256:8d5518502f92b9ecc84ac46779bd4f09694ecb3ba38a3e7ca737a86d15cbca1f"},
-    {file = "google_resumable_media-2.4.0-py2.py3-none-any.whl", hash = "sha256:2aa004c16d295c8f6c33b2b4788ba59d366677c0a25ae7382436cb30f776deaa"},
+    {file = "google-resumable-media-2.4.1.tar.gz", hash = "sha256:15b8a2e75df42dc6502d1306db0bce2647ba6013f9cd03b6e17368c0886ee90a"},
+    {file = "google_resumable_media-2.4.1-py2.py3-none-any.whl", hash = "sha256:831e86fd78d302c1a034730a0c6e5369dd11d37bad73fa69ca8998460d5bae8d"},
 ]
 
 [package.dependencies]
@@ -869,14 +872,14 @@ testing = ["pytest", "pytest-benchmark"]
 
 [[package]]
 name = "portalocker"
-version = "2.6.0"
+version = "2.7.0"
 description = "Wraps the portalocker recipe for easy usage"
 category = "dev"
 optional = false
 python-versions = ">=3.5"
 files = [
-    {file = "portalocker-2.6.0-py2.py3-none-any.whl", hash = "sha256:102ed1f2badd8dec9af3d732ef70e94b215b85ba45a8d7ff3c0003f19b442f4e"},
-    {file = "portalocker-2.6.0.tar.gz", hash = "sha256:964f6830fb42a74b5d32bce99ed37d8308c1d7d44ddf18f3dd89f4680de97b39"},
+    {file = "portalocker-2.7.0-py2.py3-none-any.whl", hash = "sha256:a07c5b4f3985c3cf4798369631fb7011adb498e2a46d8440efc75a8f29a0f983"},
+    {file = "portalocker-2.7.0.tar.gz", hash = "sha256:032e81d534a88ec1736d03f780ba073f047a06c478b06e2937486f334e955c51"},
 ]
 
 [package.dependencies]
@@ -885,7 +888,7 @@ pywin32 = {version = ">=226", markers = "platform_system == \"Windows\""}
 [package.extras]
 docs = ["sphinx (>=1.7.1)"]
 redis = ["redis"]
-tests = ["pytest (>=5.4.1)", "pytest-cov (>=2.8.1)", "pytest-mypy (>=0.8.0)", "pytest-timeout (>=2.1.0)", "redis", "sphinx (>=3.0.3)"]
+tests = ["pytest (>=5.4.1)", "pytest-cov (>=2.8.1)", "pytest-mypy (>=0.8.0)", "pytest-timeout (>=2.1.0)", "redis", "sphinx (>=6.0.0)"]
 
 [[package]]
 name = "proto-plus"
@@ -973,14 +976,14 @@ diagrams = ["jinja2", "railroad-diagrams"]
 
 [[package]]
 name = "pyrate-limiter"
-version = "2.8.5"
+version = "2.9.0"
 description = "Python Rate-Limiter using Leaky-Bucket Algorithm"
 category = "main"
 optional = false
 python-versions = ">=3.7,<4.0"
 files = [
-    {file = "pyrate_limiter-2.8.5-py3-none-any.whl", hash = "sha256:dc53539f571c27b70ebb43908d7ae8595806755d7e87adbf5dc29f76f6025525"},
-    {file = "pyrate_limiter-2.8.5.tar.gz", hash = "sha256:8ef17aa816b8583ddd6a74ceac1a6a930dbc1f80f0a8d0ddcdca0e87e531d08a"},
+    {file = "pyrate_limiter-2.9.0-py3-none-any.whl", hash = "sha256:90bc85de0739cbda32bc80b9df19a8307150c0b503d4d22fc31e2135d7d9524d"},
+    {file = "pyrate_limiter-2.9.0.tar.gz", hash = "sha256:a5ca4f53723cd1c565ae25654b1ee22ca221d904270cb13361e1d7c5ce34f4b4"},
 ]
 
 [package.extras]
@@ -1069,14 +1072,14 @@ pytest-xdist = ">=1.31.0"
 
 [[package]]
 name = "pytest-xdist"
-version = "3.1.0"
+version = "3.2.0"
 description = "pytest xdist plugin for distributed testing, most importantly across multiple CPUs"
 category = "dev"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "pytest-xdist-3.1.0.tar.gz", hash = "sha256:40fdb8f3544921c5dfcd486ac080ce22870e71d82ced6d2e78fa97c2addd480c"},
-    {file = "pytest_xdist-3.1.0-py3-none-any.whl", hash = "sha256:70a76f191d8a1d2d6be69fc440cdf85f3e4c03c08b520fd5dc5d338d6cf07d89"},
+    {file = "pytest-xdist-3.2.0.tar.gz", hash = "sha256:fa10f95a2564cd91652f2d132725183c3b590d9fdcdec09d3677386ecf4c1ce9"},
+    {file = "pytest_xdist-3.2.0-py3-none-any.whl", hash = "sha256:336098e3bbd8193276867cc87db8b22903c3927665dff9d1ac8684c02f597b68"},
 ]
 
 [package.dependencies]
@@ -1329,18 +1332,18 @@ socks = ["PySocks (>=1.5.6,!=1.5.7,<2.0)"]
 
 [[package]]
 name = "zipp"
-version = "3.11.0"
+version = "3.13.0"
 description = "Backport of pathlib-compatible object wrapper for zip files"
 category = "dev"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "zipp-3.11.0-py3-none-any.whl", hash = "sha256:83a28fcb75844b5c0cdaf5aa4003c2d728c77e05f5aeabe8e95e56727005fbaa"},
-    {file = "zipp-3.11.0.tar.gz", hash = "sha256:a7a22e05929290a67401440b39690ae6563279bced5f314609d9d03798f56766"},
+    {file = "zipp-3.13.0-py3-none-any.whl", hash = "sha256:e8b2a36ea17df80ffe9e2c4fda3f693c3dad6df1697d3cd3af232db680950b0b"},
+    {file = "zipp-3.13.0.tar.gz", hash = "sha256:23f70e964bc11a34cef175bc90ba2914e1e4545ea1e3e2f67c079671883f9cb6"},
 ]
 
 [package.extras]
-docs = ["furo", "jaraco.packaging (>=9)", "jaraco.tidelift (>=1.4)", "rst.linker (>=1.9)", "sphinx (>=3.5)"]
+docs = ["furo", "jaraco.packaging (>=9)", "jaraco.tidelift (>=1.4)", "rst.linker (>=1.9)", "sphinx (>=3.5)", "sphinx-lint"]
 testing = ["flake8 (<5)", "func-timeout", "jaraco.functools", "jaraco.itertools", "more-itertools", "pytest (>=6)", "pytest-black (>=0.3.7)", "pytest-checkdocs (>=2.4)", "pytest-cov", "pytest-enabler (>=1.3)", "pytest-flake8", "pytest-mypy (>=0.9.1)"]
 
 [metadata]

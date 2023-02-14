@@ -12,9 +12,9 @@ package_data = \
 install_requires = \
 ['argcomplete (>=2.0.0,<3.0.0)',
  'attrs (>=22.2.0,<23.0.0)',
- 'boto3 (>=1.26.51,<2.0.0)',
- 'botocore (>=1.29.51,<2.0.0)',
- 'c7n (>=0.9.22,<0.10.0)',
+ 'boto3 (>=1.26.70,<2.0.0)',
+ 'botocore (>=1.29.70,<2.0.0)',
+ 'c7n (>=0.9.23,<0.10.0)',
  'click>=8.0,<9.0',
  'docutils (>=0.17.1,<0.18.0)',
  'importlib-metadata (>=4.13.0,<5.0.0)',
@@ -31,11 +31,11 @@ install_requires = \
  'tabulate (>=0.8.10,<0.9.0)',
  'typing-extensions (>=4.4.0,<5.0.0)',
  'urllib3 (>=1.26.14,<2.0.0)',
- 'zipp (>=3.11.0,<4.0.0)']
+ 'zipp (>=3.13.0,<4.0.0)']
 
 setup_kwargs = {
     'name': 'c7n-terraform',
-    'version': '0.1.12',
+    'version': '0.1.13',
     'description': 'Cloud Custodian Provider for evaluating Terraform',
     'license': 'Apache-2.0',
     'classifiers': [
