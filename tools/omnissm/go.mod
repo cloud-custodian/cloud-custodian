@@ -3,7 +3,7 @@ module github.com/capitalone/cloud-custodian/tools/omnissm
 require (
 	github.com/aws/amazon-ssm-agent v0.0.0-20181107231829-b9654b268afc
 	github.com/aws/aws-lambda-go v1.6.0
-	github.com/aws/aws-sdk-go v1.33.0
+	github.com/aws/aws-sdk-go v1.34.0
 	github.com/aws/aws-xray-sdk-go v1.0.0-rc.5
 	github.com/golang/time v0.0.0-20180412165947-fbb02b2291d2
 	github.com/google/go-cmp v0.2.0
