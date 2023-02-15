@@ -34,6 +34,7 @@ ResourceMap = {
     "azure.iothub": "c7n_azure.resources.iot_hub.IoTHub",
     "azure.keyvault": "c7n_azure.resources.key_vault.KeyVault",
     "azure.keyvault-certificate": "c7n_azure.resources.key_vault_certificate.KeyVaultCertificate",
+    "azure.keyvault-secret": "c7n_azure.resources.key_vault_secret.KeyVaultSecret",
     "azure.keyvault-key": "c7n_azure.resources.key_vault_keys.KeyVaultKeys",
     "azure.keyvault-keys": "c7n_azure.resources.key_vault_keys.KeyVaultKeys",
     "azure.loadbalancer": "c7n_azure.resources.load_balancer.LoadBalancer",
@@ -41,6 +42,7 @@ ResourceMap = {
     "azure.mysql": "c7n_azure.resources.mysql.MySQL",
     "azure.networkinterface": "c7n_azure.resources.network_interface.NetworkInterface",
     "azure.networksecuritygroup": "c7n_azure.resources.network_security_group.NetworkSecurityGroup",
+    "azure.networkwatcher": "c7n_azure.resources.network_watcher.NetworkWatcher",
     "azure.policyassignments": "c7n_azure.resources.policy_assignments.PolicyAssignments",
     "azure.postgresql-database": "c7n_azure.resources.postgresql_database.PostgresqlDatabase",
     "azure.postgresql-server": "c7n_azure.resources.postgresql_server.PostgresqlServer",
@@ -65,5 +67,7 @@ ResourceMap = {
     "azure.vm": "c7n_azure.resources.vm.VirtualMachine",
     "azure.vmss": "c7n_azure.resources.vmss.VMScaleSet",
     "azure.vnet": "c7n_azure.resources.vnet.Vnet",
-    "azure.webapp": "c7n_azure.resources.web_app.WebApp"
+    "azure.webapp": "c7n_azure.resources.web_app.WebApp",
+    "azure.defender-alert": "c7n_azure.resources.defender.DefenderAlertSettings",
+    "azure.alert-logs": "c7n_azure.resources.alertlogs.AlertLogs"
 }

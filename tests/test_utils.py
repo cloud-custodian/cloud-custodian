@@ -58,10 +58,13 @@ class Backoff(BaseTest):
         )
 
     def test_delays_jitter(self):
-        for idx, i in enumerate(utils.backoff_delays(1, 256, jitter=True)):
-            maxv = 2 ** idx
-            self.assertTrue(i > 0)
-            self.assertTrue(i < maxv)
+        count = 0
+        while(count < 100000):
+            count += 1
+            for idx, i in enumerate(utils.backoff_delays(1, 256, jitter=True)):
+                maxv = 2 ** idx
+                self.assertTrue(i >= maxv / 5)
+                self.assertTrue(i < maxv)
 
 
 class UrlConfTest(BaseTest):

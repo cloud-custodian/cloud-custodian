@@ -27,13 +27,11 @@ class TerraformResourceManager(IACResourceManager):
 
 
 class TerraformResourceMap(IACResourceMap):
-
     resource_class = TerraformResourceManager
 
 
 @clouds.register("terraform")
 class TerraformProvider(IACSourceProvider):
-
     display_name = "Terraform"
     resource_prefix = "terraform"
     resource_map = TerraformResourceMap(resource_prefix)
@@ -58,5 +56,4 @@ class TerraformProvider(IACSourceProvider):
 
 @execution.register("terraform-source")
 class TerraformSource(IACSourceMode):
-
     schema = type_schema("terraform-source")

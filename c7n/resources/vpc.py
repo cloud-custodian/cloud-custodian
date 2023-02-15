@@ -20,7 +20,7 @@ from c7n.utils import (
     chunks, local_session, type_schema, get_retry, parse_cidr, get_eni_resource_type)
 
 from c7n.resources.aws import shape_validate
-from c7n.resources.shield import IsShieldProtected, SetShieldProtection
+from c7n.resources.shield import IsEIPShieldProtected, SetEIPShieldProtection
 
 
 @resources.register('vpc')
@@ -1649,7 +1649,7 @@ class NetworkInterface(query.QueryResourceManager):
 
     class resource_type(query.TypeInfo):
         service = 'ec2'
-        arn_type = 'eni'
+        arn_type = 'network-interface'
         enum_spec = ('describe_network_interfaces', 'NetworkInterfaces', None)
         name = id = 'NetworkInterfaceId'
         filter_name = 'NetworkInterfaceIds'
@@ -2115,7 +2115,7 @@ class NetworkAddress(query.QueryResourceManager):
 
     class resource_type(query.TypeInfo):
         service = 'ec2'
-        arn_type = 'eip-allocation'
+        arn_type = 'elastic-ip'
         enum_spec = ('describe_addresses', 'Addresses', None)
         name = 'PublicIp'
         id = 'AllocationId'
@@ -2130,8 +2130,8 @@ class NetworkAddress(query.QueryResourceManager):
     }
 
 
-NetworkAddress.filter_registry.register('shield-enabled', IsShieldProtected)
-NetworkAddress.action_registry.register('set-shield', SetShieldProtection)
+NetworkAddress.filter_registry.register('shield-enabled', IsEIPShieldProtected)
+NetworkAddress.action_registry.register('set-shield', SetEIPShieldProtection)
 
 
 @NetworkAddress.action_registry.register('release')
@@ -2258,7 +2258,7 @@ class NATGateway(query.QueryResourceManager):
 
     class resource_type(query.TypeInfo):
         service = 'ec2'
-        arn_type = 'nat-gateway'
+        arn_type = 'natgateway'
         enum_spec = ('describe_nat_gateways', 'NatGateways', None)
         name = id = 'NatGatewayId'
         filter_name = 'NatGatewayIds'
@@ -2287,7 +2287,7 @@ class VPNConnection(query.QueryResourceManager):
 
     class resource_type(query.TypeInfo):
         service = 'ec2'
-        arn_type = 'vpc-connection'
+        arn_type = 'vpn-connection'
         enum_spec = ('describe_vpn_connections', 'VpnConnections', None)
         name = id = 'VpnConnectionId'
         filter_name = 'VpnConnectionIds'
@@ -2301,7 +2301,7 @@ class VPNGateway(query.QueryResourceManager):
 
     class resource_type(query.TypeInfo):
         service = 'ec2'
-        arn_type = 'vpc-gateway'
+        arn_type = 'vpn-gateway'
         enum_spec = ('describe_vpn_gateways', 'VpnGateways', None)
         name = id = 'VpnGatewayId'
         filter_name = 'VpnGatewayIds'

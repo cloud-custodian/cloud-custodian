@@ -1,0 +1,52 @@
+{
+    "status_code": 200,
+    "data": {
+        "Attributes": [
+            {
+                "Key": "proxy_protocol_v2.enabled",
+                "Value": "false"
+            },
+            {
+                "Key": "target_group_health.unhealthy_state_routing.minimum_healthy_targets.count",
+                "Value": "1"
+            },
+            {
+                "Key": "preserve_client_ip.enabled",
+                "Value": "false"
+            },
+            {
+                "Key": "stickiness.enabled",
+                "Value": "false"
+            },
+            {
+                "Key": "target_group_health.unhealthy_state_routing.minimum_healthy_targets.percentage",
+                "Value": "off"
+            },
+            {
+                "Key": "deregistration_delay.timeout_seconds",
+                "Value": "300"
+            },
+            {
+                "Key": "target_group_health.dns_failover.minimum_healthy_targets.count",
+                "Value": "1"
+            },
+            {
+                "Key": "stickiness.type",
+                "Value": "source_ip"
+            },
+            {
+                "Key": "deregistration_delay.connection_termination.enabled",
+                "Value": "false"
+            },
+            {
+                "Key": "load_balancing.cross_zone.enabled",
+                "Value": "use_load_balancer_configuration"
+            },
+            {
+                "Key": "target_group_health.dns_failover.minimum_healthy_targets.percentage",
+                "Value": "off"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

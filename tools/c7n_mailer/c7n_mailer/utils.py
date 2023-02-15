@@ -1,7 +1,6 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import base64
-import boto3
 from datetime import datetime, timedelta
 import functools
 import json
@@ -27,6 +26,7 @@ class Providers:
 
 
 def session_factory(mailer_config):
+    import boto3
     return boto3.Session(
         region_name=mailer_config['region'],
         profile_name=mailer_config.get('profile', None))
@@ -87,12 +87,10 @@ def get_rendered_jinja(
     # recast seconds since epoch as utc iso datestring, template
     # authors can use date_time_format helper func to convert local
     # tz. if no execution start time was passed use current time.
-    execution_start = datetime.utcfromtimestamp(
-        sqs_message.get(
-            'execution_start',
-            time.mktime(
-                datetime.utcnow().timetuple())
-        )).isoformat()
+    execution_start = sqs_message.get('execution_start')
+    if not execution_start:
+        execution_start = time.mktime(datetime.utcnow().timetuple())
+    execution_start = datetime.utcfromtimestamp(execution_start).isoformat()
 
     rendered_jinja = template.render(
         recipient=target,

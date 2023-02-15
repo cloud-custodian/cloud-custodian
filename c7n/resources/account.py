@@ -100,6 +100,71 @@ class AccountCredentialReport(CredentialReport):
         return results
 
 
+@filters.register('organization')
+class AccountOrganization(ValueFilter):
+    """Check organization enrollment and configuration
+
+    :example:
+
+    determine if an account is not in an organization
+
+    .. code-block:: yaml
+
+      policies:
+        - name: no-org
+          resource: account
+          filters:
+            - type: organization
+              key: Id
+              value: absent
+
+
+    :example:
+
+    determine if an account is setup for organization policies
+
+    .. code-block:: yaml
+
+       policies:
+         - name: org-policies-not-enabled
+           resource: account
+           filters:
+             - type: organization
+               key: FeatureSet
+               value: ALL
+               op: not-equal
+    """
+    schema = type_schema('organization', rinherit=ValueFilter.schema)
+    schema_alias = False
+
+    annotation_key = 'c7n:org'
+    annotate = False
+
+    permissions = ('organizations:DescribeOrganization',)
+
+    def get_org_info(self, account):
+        client = local_session(
+            self.manager.session_factory).client('organizations')
+        try:
+            org_info = client.describe_organization().get('Organization')
+        except client.exceptions.AWSOrganizationsNotInUseException:
+            org_info = {}
+        except ClientError as e:
+            self.log.warning('organization filter error accessing org info %s', e)
+            org_info = None
+        account[self.annotation_key] = org_info
+
+    def process(self, resources, event=None):
+        if self.annotation_key not in resources[0]:
+            self.get_org_info(resources[0])
+        # if we can't access org info, we've already logged, and return
+        if resources[0][self.annotation_key] is None:
+            return []
+        if super().process([resources[0][self.annotation_key]]):
+            return resources
+        return []
+
+
 @filters.register('check-macie')
 class MacieEnabled(ValueFilter):
     """Check status of macie v2 in the account.
@@ -188,7 +253,7 @@ class CloudTrailEnabled(Filter):
 
     permissions = ('cloudtrail:DescribeTrails', 'cloudtrail:GetTrailStatus',
                    'cloudtrail:GetEventSelectors', 'cloudwatch:DescribeAlarmsForMetric',
-                   'logs:DescribeMetricFilters', 'sns:ListSubscriptions')
+                   'logs:DescribeMetricFilters', 'sns:ListSubscriptionsByTopic')
 
     def process(self, resources, event=None):
         session = local_session(self.manager.session_factory)
@@ -234,7 +299,7 @@ class CloudTrailEnabled(Filter):
         if self.data.get('log-metric-filter-pattern'):
             client_logs = session.client('logs')
             client_cw = session.client('cloudwatch')
-            sns_manager = self.manager.get_resource_manager('sns-subscription')
+            client_sns = session.client('sns')
             matched = []
             for t in list(trails):
                 if 'CloudWatchLogsLogGroupArn' not in t.keys():
@@ -265,10 +330,15 @@ class CloudTrailEnabled(Filter):
                 if not alarm_actions:
                     continue
                 alarm_actions = set(alarm_actions)
-                sns_subscriptions = sns_manager.resources()
-                for s in sns_subscriptions:
-                    if s['TopicArn'] in alarm_actions:
-                        matched.append(t)
+                for a in alarm_actions:
+                    try:
+                        subs = client_sns.list_subscriptions_by_topic(TopicArn=a)
+                        if len(subs['Subscriptions']) > 0:
+                            matched.append(t)
+                    except client_sns.exceptions.InvalidParameterValueException:
+                        # we can ignore any exception here, the alarm action might
+                        # not be an sns topic for instance
+                        continue
             trails = matched
         if trails:
             return []

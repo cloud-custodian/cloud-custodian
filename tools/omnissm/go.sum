@@ -8,8 +8,8 @@ github.com/aws/amazon-ssm-agent v0.0.0-20181107231829-b9654b268afc h1:nPfw+TutDK
 github.com/aws/amazon-ssm-agent v0.0.0-20181107231829-b9654b268afc/go.mod h1:hakw1QP1RD4yZbTQBm7b8EOSYsHKpHK+i+WMEZxF50U=
 github.com/aws/aws-lambda-go v1.6.0 h1:T+u/g79zPKw1oJM7xYhvpq7i4Sjc0iVsXZUaqRVVSOg=
 github.com/aws/aws-lambda-go v1.6.0/go.mod h1:zUsUQhAUjYzR8AuduJPCfhBuKWUaDbQiPOG+ouzmE1A=
-github.com/aws/aws-sdk-go v1.33.0 h1:Bq5Y6VTLbfnJp1IV8EL/qUU5qO1DYHda/zis/sqevkY=
-github.com/aws/aws-sdk-go v1.33.0/go.mod h1:5zCpMtNQVjRREroY7sYe8lOMRSxkhG6MZveU8YkpAk0=
+github.com/aws/aws-sdk-go v1.34.0 h1:brux2dRrlwCF5JhTL7MUT3WUwo9zfDHZZp3+g3Mvlmo=
+github.com/aws/aws-sdk-go v1.34.0/go.mod h1:5zCpMtNQVjRREroY7sYe8lOMRSxkhG6MZveU8YkpAk0=
 github.com/aws/aws-xray-sdk-go v1.0.0-rc.5 h1:7a0ES/UQniY+MWQ9TQd2rxzVbeTIFfX9lLGrM+UyNxI=
 github.com/aws/aws-xray-sdk-go v1.0.0-rc.5/go.mod h1:XtMKdBQfpVut+tJEwI7+dJFRxxRdxHDyVNp2tHXRq04=
 github.com/cihub/seelog v0.0.0-20170130134532-f561c5e57575 h1:kHaBemcxl8o/pQ5VM1c8PVE1PubbNx3mjUr09OqWGCs=

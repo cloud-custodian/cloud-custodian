@@ -16,6 +16,9 @@ from c7n.filters import Filter
 from c7n.resources.shield import IsShieldProtected, SetShieldProtection
 from c7n.tags import RemoveTag, Tag
 from c7n.filters.related import RelatedResourceFilter
+from c7n import tags
+from c7n.filters.iamaccess import CrossAccountAccessFilter
+from c7n.resolver import ValuesFrom
 
 
 class Route53Base:
@@ -500,7 +503,7 @@ class ResolverQueryLogConfig(QueryResourceManager):
 
     class resource_type(TypeInfo):
         service = 'route53resolver'
-        arn_type = 'query_log_config'
+        arn_type = 'resolver-query-log-config'
         enum_spec = ('list_resolver_query_log_configs', 'ResolverQueryLogConfigs', None)
         name = 'Name'
         id = 'Id'
@@ -611,5 +614,124 @@ class LogConfigAssociationsFilter(Filter):
 
             if status:
                 results.append(resource)
+
+        return results
+
+
+# Readiness check in Amazon Route53 ARC is global feature. However,
+# US West (N. California) Region must be specified in Route53 ARC readiness check api call.
+# Please reference this AWS document:
+# https://docs.aws.amazon.com/r53recovery/latest/dg/introduction-regions.html
+ARC_REGION = 'us-west-2'
+
+
+@resources.register('readiness-check')
+class ReadinessCheck(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'route53-recovery-readiness'
+        arn_type = 'readiness-check'
+        enum_spec = ('list_readiness_checks', 'ReadinessChecks', None)
+        name = id = 'ReadinessCheckName'
+        global_resource = True
+
+    def get_client(self):
+        return local_session(self.session_factory) \
+            .client('route53-recovery-readiness', region_name=ARC_REGION)
+
+    def augment(self, readiness_checks):
+        for r in readiness_checks:
+            Tags = self.retry(
+                self.get_client().list_tags_for_resources,
+                ResourceArn=r['ReadinessCheckArn'])['Tags']
+            r['Tags'] = [{'Key': k, "Value": v} for k, v in Tags.items()]
+        return readiness_checks
+
+
+@ReadinessCheck.action_registry.register('tag')
+class ReadinessAddTag(Tag):
+    """Adds tags to a readiness check
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: readiness-tag
+            resource: readiness-check
+            filters:
+              - "tag:DesiredTag": absent
+            actions:
+              - type: tag
+                key: DesiredTag
+                value: DesiredValue
+    """
+    permissions = ('route53-recovery-readiness:TagResource',)
+
+    def process_resource_set(self, client, readiness_checks, tags):
+        Tags = {r['Key']: r['Value'] for r in tags}
+        for r in readiness_checks:
+            client.tag_resource(
+                ResourceArn=r['ReadinessCheckArn'],
+                Tags=Tags)
+
+
+@ReadinessCheck.action_registry.register('remove-tag')
+class ReadinessCheckRemoveTag(RemoveTag):
+    """Remove tags from a readiness check
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: readiness-check-remove-tag
+            resource: readiness-check
+            filters:
+              - "tag:ExpiredTag": present
+            actions:
+              - type: remove-tag
+                tags: ['ExpiredTag']
+    """
+    permissions = ('route53-recovery-readiness:UntagResource',)
+
+    def process_resource_set(self, client, readiness_checks, keys):
+        for r in readiness_checks:
+            client.untag_resource(
+                ResourceArn=r['ReadinessCheckArn'],
+                TagKeys=keys)
+
+
+ReadinessCheck.action_registry.register('mark-for-op', tags.TagDelayedAction)
+ReadinessCheck.filter_registry.register('marked-for-op', tags.TagActionFilter)
+
+
+@ReadinessCheck.filter_registry.register('cross-account')
+class ReadinessCheckCrossAccount(CrossAccountAccessFilter):
+
+    schema = type_schema(
+        'cross-account',
+        # white list accounts
+        whitelist_from=ValuesFrom.schema,
+        whitelist={'type': 'array', 'items': {'type': 'string'}})
+    permissions = ('route53-recovery-readiness:ListCrossAccountAuthorizations',)
+
+    def process(self, resources, event=None):
+        allowed_accounts = set(self.get_accounts())
+        results, account_ids, found = [], [], False
+
+        paginator = self.manager.get_client().get_paginator('list_cross_account_authorizations')
+        paginator.PAGE_ITERATOR_CLASS = RetryPageIterator
+        arns = paginator.paginate().build_full_result()["CrossAccountAuthorizations"]
+
+        for arn in arns:
+            account_id = arn.split(':', 5)[4]
+            if account_id not in allowed_accounts:
+                account_ids.append(account_id)
+                found = True
+        if (found):
+            for r in resources:
+                r['c7n:CrossAccountViolations'] = account_ids
+                results.append(r)
 
         return results
