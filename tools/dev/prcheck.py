@@ -1,10 +1,11 @@
-from ghapi.all import GhApi, paged
 import pprint
 import json
 import operator
 from pathlib import Path
 
 import click
+from ghapi.all import GhApi
+from ghapi.all import paged
 from rich.console import Console
 from rich.table import Table
 
@@ -62,7 +63,6 @@ def inspect(input, tree):
             for p in Path(fname).parents:
                 if p in dirs and p not in pr_dirs:
                     pr_dirs.add(p)
-                    found = True
         pr_meta.pop('files')
         pr_meta['dirs'] = list(pr_dirs)
         if pr_dirs:
@@ -122,8 +122,8 @@ if __name__ == '__main__':
         cli()
     except SystemExit:
         raise
-    except:
-        import sys, pdb, traceback
+    except: # noqa
+        import sys, pdb, traceback  # noqa
 
         traceback.print_exc()
         pdb.post_mortem(sys.exc_info()[-1])
