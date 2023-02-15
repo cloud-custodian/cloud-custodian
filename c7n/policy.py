@@ -34,10 +34,10 @@ def load(options, path, format=None, validate=True, vars=None):
     if not os.path.exists(path):
         raise IOError("Invalid path for config %r" % path)
 
-    from c7n.schema import validate, StructureParser
+    from c7n.schema import validate as schema_validate, StructureParser
     if os.path.isdir(path):
         from c7n.loader import DirectoryLoader
-        collection = DirectoryLoader(options).load_directory(path)
+        collection = DirectoryLoader(options).load_directory(path, validate)
         if validate:
             [p.validate() for p in collection]
         return collection
@@ -55,7 +55,7 @@ def load(options, path, format=None, validate=True, vars=None):
         return None
 
     if validate:
-        errors = validate(data, resource_types=rtypes)
+        errors = schema_validate(data, resource_types=rtypes)
         if errors:
             raise PolicyValidationError(
                 "Failed to validate policy %s \n %s" % (

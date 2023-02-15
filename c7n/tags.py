@@ -21,6 +21,7 @@ import time
 from c7n.manager import resources as aws_resources
 from c7n.actions import BaseAction as Action, AutoTagUser
 from c7n.exceptions import PolicyValidationError, PolicyExecutionError
+from c7n.resources import load_resources
 from c7n.filters import Filter, OPERATORS
 from c7n.filters.offhours import Time
 from c7n import deprecated, utils
@@ -1058,6 +1059,9 @@ class CopyRelatedResourceTag(Tag):
 
     def validate(self):
         related_resource = self.data['resource']
+        if '.' in self.data['resource']:
+            related_resource = self.data['resource'].split('.')[-1]
+        load_resources((f'aws.{related_resource}', ))
         if (
             related_resource not in aws_resources.keys() and
             related_resource != "resourcegroupstaggingapi"

@@ -1,7 +1,7 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
-from .common import BaseTest
 import json
+from .common import BaseTest
 from c7n.exceptions import PolicyValidationError
 
 
@@ -140,6 +140,23 @@ class TestSecretsManager(BaseTest):
         self.assertEqual(len(resources[0].get('ReplicationStatus')), 2)
         secret_for_del = client.describe_secret(SecretId=resources[0]['ARN'])
         self.assertTrue('DeletedDate' in secret_for_del)
+
+    def test_secrets_manager_set_key(self):
+        session_factory = self.replay_flight_data('test_secrets_manager_set_encryption_key')
+        client = session_factory().client('secretsmanager')
+        p = self.load_policy(
+            {
+                'name': 'secrets-manager-set-key',
+                'resource': 'aws.secrets-manager',
+                'filters': [{'Name': 'ewerwrwe'}],
+                'actions': [{'type': 'set-encryption', 'key': 'alias/qewrqwer'}]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        response = client.describe_secret(SecretId=resources[0]['Name'])
+        self.assertEqual(response['KmsKeyId'], 'alias/qewrqwer')
 
     def test_secretsmanager_remove_matched(self):
         session_factory = self.replay_flight_data("test_secretsmanager_remove_matched")

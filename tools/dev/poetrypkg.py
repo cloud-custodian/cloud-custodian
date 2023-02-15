@@ -231,6 +231,7 @@ def locked_deps(package, poetry, exclude=(), remove=()):
     deps = get_project_dependency_packages(
         locker=poetry._locker,
         project_requires=package.requires,
+        root_package_name=package.name,
         project_python_marker=package.python_marker,
         extras=package.extras)
 
