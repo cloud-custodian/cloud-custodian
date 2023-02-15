@@ -73,7 +73,8 @@ class ConfigurationParametersFilter(ValueFilter):
         name={
             'type': 'string',
             'allowed_value': ['TLSv1.2']
-        }
+        },
+        schema_alias=False
     )
 
     def __call__(self, resource):
