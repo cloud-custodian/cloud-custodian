@@ -1,7 +1,3 @@
-
-
----
-
 apiVersion: skaffold/v2beta29
 kind: Config
 metadata:
@@ -10,7 +6,6 @@ deploy:
   kubectl:
     manifests:
       - .skaffold/namespace.yaml
-
 ---
 apiVersion: skaffold/v2beta29
 kind: Config
@@ -32,13 +27,17 @@ deploy:
       - .skaffold/templates/*.yaml
 
   helm:
+    flags:
+      global:
+        - "--debug"
     releases:
       - artifactOverrides:
-          image: c7n-kube
-        chartPath: ../../../c7n-helm-charts/c7n_kube/
+          controller.image: c7n-kube
         imageStrategy:
           fqn: {}
         name: c7n-kube
         namespace: c7n-system
+        remoteChart: c7n-kube
+        repo: https://cloud-custodian.github.io/helm-charts/
         valuesFiles:
           - .skaffold/values.yaml

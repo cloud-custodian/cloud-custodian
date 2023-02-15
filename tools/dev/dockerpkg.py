@@ -65,7 +65,7 @@ BUILD_STAGE = """\
 
 FROM {base_build_image} as build-env
 
-ARG POETRY_VERSION="1.2.1"
+ARG POETRY_VERSION="1.2.2"
 SHELL ["/bin/bash", "-c"]
 
 # pre-requisite distro deps, and build env setup
@@ -79,14 +79,11 @@ WORKDIR /src
 
 # Add core & aws packages
 ADD pyproject.toml poetry.lock README.md /src/
-RUN . /usr/local/bin/activate && pip install -U pip
+RUN . /usr/local/bin/activate && pip install -qU pip wheel aws-xray-sdk psutil jsonpatch
 
 # Ignore root first pass so if source changes we don't have to invalidate
 # dependency install
 RUN . /usr/local/bin/activate && poetry install --without dev --no-root
-RUN . /usr/local/bin/activate && pip install -q wheel && \
-      pip install -U pip
-RUN . /usr/local/bin/activate && pip install -q aws-xray-sdk psutil jsonpatch
 
 ARG providers="{providers}"
 # Add provider packages
@@ -186,7 +183,7 @@ LABEL "org.opencontainers.image.documentation"="https://cloudcustodian.io/docs"
 BUILD_MAILER = """\
 # Install c7n-mailer
 ADD tools/c7n_mailer /src/tools/c7n_mailer
-RUN . /usr/local/bin/activate && cd tools/c7n_mailer && poetry install
+RUN . /usr/local/bin/activate && cd tools/c7n_mailer && poetry install --all-extras
 
 """
 

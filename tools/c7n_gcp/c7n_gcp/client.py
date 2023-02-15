@@ -29,6 +29,7 @@ import threading
 import os
 import socket
 import ssl
+from contextlib import nullcontext as no_rate_limiter
 from urllib.error import URLError
 
 from googleapiclient import discovery, errors  # NOQA
@@ -38,7 +39,8 @@ import google.oauth2.credentials
 import google_auth_httplib2
 
 import httplib2
-from ratelimiter import RateLimiter
+from pyrate_limiter import Limiter, RequestRate
+
 from retrying import retry
 
 
@@ -166,7 +168,7 @@ class Session:
             credentials (object): GoogleCredentials.
             quota_max_calls (int): Allowed requests per <quota_period> for the
                 API.
-            quota_period (float): The time period to track requests over.
+            quota_period (float): The time period (in seconds) to track requests over.
             use_rate_limiter (bool): Set to false to disable the use of a rate
                 limiter for this service.
             **kwargs (dict): Additional args such as version.
@@ -179,10 +181,10 @@ class Session:
             get_default_project())
         self._credentials = with_scopes_if_required(credentials, list(CLOUD_SCOPES))
         if use_rate_limiter:
-            self._rate_limiter = RateLimiter(max_calls=quota_max_calls,
-                                             period=quota_period)
+            limiter = Limiter(RequestRate(quota_max_calls, quota_period))
+            self._rate_limiter = limiter.ratelimit('gcp_session', delay=True)
         else:
-            self._rate_limiter = None
+            self._rate_limiter = no_rate_limiter()
         self._http = http
 
         self.project_id = project_id
@@ -479,12 +481,5 @@ class ServiceClient:
         Returns:
             dict: The response from the API.
         """
-        if self._rate_limiter:
-            # Since the ratelimiter library only exposes a context manager
-            # interface the code has to be duplicated to handle the case where
-            # no rate limiter is defined.
-            with self._rate_limiter:
-                return request.execute(http=self.http,
-                                       num_retries=self._num_retries)
-        return request.execute(http=self.http,
-                               num_retries=self._num_retries)
+        with self._rate_limiter:
+            return request.execute(http=self.http, num_retries=self._num_retries)

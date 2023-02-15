@@ -268,7 +268,7 @@ class Kinesis(BaseTest):
             session_factory=session_factory,
         )
         resources = p.run()
-        self.assertTrue(len(resources), 1)
+        self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['KmsKeyId'],
             'arn:aws:kms:us-east-1:123456789012:key/0d543df5-915c-42a1-afa1-c9c5f1f97955')
 

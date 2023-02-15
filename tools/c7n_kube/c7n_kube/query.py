@@ -153,6 +153,7 @@ class TypeInfo(metaclass=TypeMeta):
     enum_spec = ()
     namespaced = True
     id = "metadata.uid"
+    name = "metadata.name"
 
 
 class CustomTypeInfo(TypeInfo, metaclass=TypeMeta):

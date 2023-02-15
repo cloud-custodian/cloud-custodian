@@ -8,6 +8,10 @@ import uuid
 import time
 
 from operator import itemgetter
+from c7n.testing import mock_datetime_now
+from dateutil import parser
+import c7n.resources.efs
+import c7n.filters.backup
 
 
 class ElasticFileSystem(BaseTest):
@@ -236,3 +240,70 @@ class ElasticFileSystem(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["Name"], "efs-without-secure-transport")
+
+    def test_efs_has_statement(self):
+        factory = self.replay_flight_data("test_efs_has_statement")
+        p = self.load_policy(
+            {
+                "name": "efs-has-statement",
+                "resource": "efs",
+                "filters": [
+                    {
+                        "type": "has-statement",
+                        "statements": [
+                            {
+                                "Effect": "Allow",
+                                "Condition":
+                                    {"Bool": {"elasticfilesystem:AccessedViaMountTarget": "true"}},
+                                "Resource": "{fs_arn}"
+                            }
+                        ]
+                    }
+                ],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["Name"], "efs-has-statement")
+
+        p = self.load_policy(
+            {
+                "name": "efs-has-statement",
+                "resource": "efs",
+                "filters": [
+                    {
+                        "type": "has-statement",
+                        "statements": [
+                            {
+                                "Effect": "Deny"
+                            }
+                        ]
+                    }
+                ],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
+    def test_efs_consecutive_aws_backups_count_filter(self):
+        session_factory = self.replay_flight_data("test_efs_consecutive_aws_backups_count_filter")
+        p = self.load_policy(
+            {
+                "name": "efs_consecutive_aws_backups_count_filter",
+                "resource": "efs",
+                "filters": [
+                    {
+                        "type": "consecutive-aws-backups",
+                        "count": 2,
+                        "period": "days",
+                        "status": "COMPLETED"
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+        with mock_datetime_now(parser.parse("2022-09-09T00:00:00+00:00"), c7n.filters.backup):
+            resources = p.run()
+        self.assertEqual(len(resources), 1)

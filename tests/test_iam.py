@@ -718,6 +718,55 @@ class IamUserTest(BaseTest):
         client = factory().client('iam')
         assert client.get_user(UserName='devbot')['User'].get('PermissionsBoundary', {}) == {}
 
+    def test_iam_user_set_policy(self):
+        session_factory = self.replay_flight_data("test_iam_user_set_policy")
+        client = session_factory().client("iam")
+
+        p = self.load_policy(
+            {
+                "name": "iam-user-set-policy",
+                "resource": "aws.iam-user",
+                "actions": [
+                    {
+                        "type": "set-policy",
+                        "state": "attached",
+                        "arn": "arn:aws:iam::123456789012:policy/my-iam-policy"
+                    }
+                ]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+
+        self.assertEqual(len(resources), 1)
+        self.assertIn('test', resources[0]['UserName'])
+
+        policies = client.list_attached_user_policies(UserName="test")
+        self.assertEqual(len(policies['AttachedPolicies']), 1)
+        self.assertEqual(policies['AttachedPolicies'][0]["PolicyName"], "my-iam-policy")
+
+        p = self.load_policy(
+            {
+                "name": "iam-user-set-policy",
+                "resource": "aws.iam-user",
+                "actions": [
+                    {
+                        "type": "set-policy",
+                        "state": "detached",
+                        "arn": "*"
+                    }
+                ]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+
+        self.assertEqual(len(resources), 1)
+        self.assertIn('test', resources[0]['UserName'])
+
+        policies = client.list_attached_user_policies(UserName="test")
+        self.assertEqual(len(policies['AttachedPolicies']), 0)
+
     def test_iam_user_usage_no_such_entity(self):
         p = self.load_policy({
             'name': 'usage-check',
@@ -1100,6 +1149,47 @@ class IamInstanceProfileFilterUsage(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["Arn"], "arn:aws:iam::644160558196:instance-profile/mandeep")
         self.assertEqual(resources[0]["InstanceProfileName"], "mandeep")
+
+
+class IamInstanceProfileActions(BaseTest):
+
+    def test_iam_instance_profile_set_role(self):
+        session_factory = self.replay_flight_data("test_iam_instance_profile_set_role")
+        client = session_factory().client("iam")
+        p = self.load_policy(
+            {
+                "name": "iam-instance-profile-set-role",
+                "resource": "iam-profile",
+                "actions": [
+                    {"type": "set-role", "role": "my-test-role"}
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 3)
+        instance_profiles = client.list_instance_profiles()
+        for profile in instance_profiles['InstanceProfiles']:
+            self.assertEqual(profile['Roles'][0]['RoleName'], 'my-test-role')
+
+    def test_iam_instance_profile_set_role_remove(self):
+        session_factory = self.replay_flight_data("test_iam_instance_profile_set_role_remove")
+        client = session_factory().client("iam")
+        p = self.load_policy(
+            {
+                "name": "iam-instance-profile-set-role-remove",
+                "resource": "iam-profile",
+                "actions": [
+                    {"type": "set-role", "role": ""}
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 3)
+        instance_profiles = client.list_instance_profiles()
+        for profile in instance_profiles['InstanceProfiles']:
+            self.assertEqual(len(profile['Roles']), 0)
 
 
 class IamPolicyFilterUsage(BaseTest):
@@ -1909,6 +1999,7 @@ class SNSCrossAccount(BaseTest):
                     {
                         "type": "cross-account",
                         "whitelist_endpoints": ["@whitelist.com"],
+                        "whitelist_conditions": ["aws:UserName"]
                     },
                 ],
             },
@@ -2296,3 +2387,25 @@ class DeleteRoleAction(BaseTest):
         client = factory().client("iam")
         self.assertTrue(
             client.get_role(RoleName=resources[0]['RoleName']), 'AWSServiceRoleForSupport')
+
+
+class TestIamProfileHasSpecificManagedPolicyFilter(BaseTest):
+
+    def test_iam_profile_has_specific_managed_policy_filter(self):
+        factory = self.replay_flight_data("test_iam_profile_has_specific_managed_policy")
+        p = self.load_policy(
+            {
+                "name": "iam-profile-has-admin-policy",
+                "resource": "iam-profile",
+                "filters": [
+                    {
+                        "type": "has-specific-managed-policy",
+                        "value": "admin-policy",
+                    }
+                ],
+            },
+            config={"region": "us-west-2"},
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 3)

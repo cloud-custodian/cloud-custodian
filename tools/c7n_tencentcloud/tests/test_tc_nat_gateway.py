@@ -28,3 +28,33 @@ class TestNatGateway(BaseTest):
         )
         resources = policy.run()
         assert resources[0]["NatGatewayId"] == "nat-lf1cl2ne"
+
+    @pytest.mark.vcr
+    def test_metrics(self):
+        policy = self.load_policy(
+            {
+                "name": "nat-gateway-metrics-filter",
+                "resource": "tencentcloud.nat-gateway",
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": "CreatedTime",
+                        "value_type": "age",
+                        "op": "greater-than",
+                        "value": 7
+                    },
+                    {
+                        "type": "metrics",
+                        "name": "Conns",
+                        "statistics": "Maximum",
+                        "days": 7,
+                        "value": 0,
+                        "missing-value": 0,
+                        "op": "equal",
+                        "period": 3600
+                    }
+                ]
+            }
+        )
+        resources = policy.run()
+        assert len(resources) == 1

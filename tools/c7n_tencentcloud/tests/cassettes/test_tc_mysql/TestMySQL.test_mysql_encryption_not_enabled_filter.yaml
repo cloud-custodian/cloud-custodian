@@ -1,0 +1,130 @@
+interactions:
+- request:
+    body: '{"InstanceIds": ["cdb-lbxusyi7"], "Offset": 0, "Limit": 20}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '59'
+      Content-Type:
+      - application/json
+      Host:
+      - cdb.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - DescribeDBInstances
+      X-TC-Region:
+      - ap-singapore
+      X-TC-Version:
+      - '2017-03-20'
+    method: POST
+    uri: https://cdb.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"Items":[{"AutoRenew":0,"CageId":"","CdbError":0,"Cpu":2,"CreateTime":"2022-10-17
+        17:04:48","DeadlineTime":"0000-00-00 00:00:00","DeployGroupId":"","DeployMode":0,"DeviceClass":"","DeviceType":"UNIVERSAL","DiskType":"","DrInfo":[],"EngineType":"RocksDB","EngineVersion":"8.0","ExClusterId":"","ExClusterName":"","HourFeeStatus":1,"InitFlag":1,"InstanceId":"cdb-lbxusyi7","InstanceName":"cdb81905","InstanceNodes":2,"InstanceType":1,"IsolateTime":"0000-00-00
+        00:00:00","MasterInfo":null,"MaxDelayTime":0,"Memory":4000,"OfflineTime":"","ParamVersionFlow":800030001,"PayType":1,"PhysicalId":"","ProjectId":0,"ProtectMode":0,"Qps":4400,"Region":"ap-singapore","RegionId":9,"ResourceId":"","RoGroups":[],"RoInstType":"","RoVipInfo":null,"SecurityGroupIds":[],"SlaveInfo":{"First":{"Region":"ap-singapore","Vip":"","VpcId":0,"Vport":0,"Zone":"ap-singapore-1"},"Second":null},"Status":1,"SubnetId":311924,"TagList":null,"TaskStatus":0,"UniqSubnetId":"subnet-1miim8ks","UniqVpcId":"vpc-3aajxqgr","Vip":"172.22.32.14","Volume":200,"VpcId":830620,"Vport":3306,"WanDomain":"","WanPort":0,"WanStatus":0,"Zone":"ap-singapore-1","ZoneId":900001,"ZoneName":""}],"RequestId":"7382ac6f-6d69-4cd1-92c9-85e8c3859824","TotalCount":1}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '1227'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 18 Oct 2022 02:38:09 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"ResourceList": ["qcs::cdb:ap-singapore:uin/100000750436:instanceId/cdb-lbxusyi7"]}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '84'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetResources
+      X-TC-Region:
+      - ap-singapore
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"","ResourceTagMappingList":[],"RequestId":"9991e5db-6fa1-4b59-8ffc-225683926d93"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '114'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 18 Oct 2022 02:38:11 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"InstanceId": "cdb-lbxusyi7"}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '30'
+      Content-Type:
+      - application/json
+      Host:
+      - cdb.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - DescribeDBInstanceInfo
+      X-TC-Region:
+      - ap-singapore
+      X-TC-Version:
+      - '2017-03-20'
+    method: POST
+    uri: https://cdb.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"DefaultKmsRegion":"ap-singapore","Encryption":"NO","InstanceId":"cdb-lbxusyi7","InstanceName":"cdb81905","Ipv6Infos":null,"KeyId":"","KeyRegion":"","RequestId":"a638df41-0e96-4459-a1fd-6d2b08144a4e"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '214'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 18 Oct 2022 02:38:11 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+version: 1

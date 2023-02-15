@@ -1,5 +1,6 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+import base64
 import json
 import os
 import http.server
@@ -14,9 +15,6 @@ import logging
 
 log = logging.getLogger("c7n_kube.server")
 log.setLevel(logging.DEBUG)
-
-
-HOST = "0.0.0.0"
 
 
 class AdmissionControllerServer(http.server.HTTPServer):
@@ -40,10 +38,12 @@ class AdmissionControllerHandler(http.server.BaseHTTPRequestHandler):
     def run_policies(self, req):
         failed_policies = []
         warn_policies = []
+        patches = []
         for p in self.server.policy_collection.policies:
             # fail_message and warning_message are set on exception
             warning_message = None
             deny_message = None
+            resources = None
             try:
                 resources = p.push(req)
                 action = p.data['mode'].get('on-match', 'deny')
@@ -79,7 +79,9 @@ class AdmissionControllerHandler(http.server.BaseHTTPRequestHandler):
                         "description": warning_message or p.data.get('description', '')
                     }
                 )
-        return failed_policies, warn_policies
+            if resources:
+                patches.extend(resources[0].get('c7n:patches', []))
+        return failed_policies, warn_policies, patches
 
     def get_request_body(self):
         token = self.rfile.read(int(self.headers["Content-length"]))
@@ -112,20 +114,27 @@ class AdmissionControllerHandler(http.server.BaseHTTPRequestHandler):
             self.wfile.write(json.dumps({"error": str(e)}).encode('utf-8'))
             return
 
-        failed_policies, warn_policies = self.run_policies(req)
+        failed_policies, warn_policies, patches = self.run_policies(req)
 
         self.send_response(200)
         self.send_header('Content-Type', 'application/json')
         self.end_headers()
+
+        if patches:
+            patches = base64.b64encode(json.dumps(patches).encode('utf-8')).decode()
+
         response = self.create_admission_response(
             uid=req['request']['uid'],
             failed_policies=failed_policies,
-            warn_policies=warn_policies
+            warn_policies=warn_policies,
+            patches=patches
         )
         log.info(response)
         self.wfile.write(response.encode('utf-8'))
 
-    def create_admission_response(self, uid, failed_policies=None, warn_policies=None):
+    def create_admission_response(
+        self, uid, failed_policies=None, warn_policies=None, patches=None
+    ):
         code = 200 if len(failed_policies) == 0 else 400
         message = 'OK'
         warnings = []
@@ -135,7 +144,7 @@ class AdmissionControllerHandler(http.server.BaseHTTPRequestHandler):
             for p in warn_policies:
                 warnings.append(f"{p['name']}:{p['description']}")
 
-        return json.dumps({
+        response = {
             "apiVersion": "admission.k8s.io/v1",
             "kind": "AdmissionReview",
             "response": {
@@ -147,11 +156,19 @@ class AdmissionControllerHandler(http.server.BaseHTTPRequestHandler):
                     "message": message
                 }
             }
-        })
+        }
+
+        if patches:
+            patch = {
+                "patchType": "JSONPatch",
+                "patch": patches
+            }
+            response['response'].update(patch)
+        return json.dumps(response)
 
 
 def init(
-    port, policy_dir, on_exception='warn', serve_forever=True,
+    host, port, policy_dir, on_exception='warn', serve_forever=True,
     *, cert_path=None, cert_key_path=None, ca_cert_path=None,
 ):
     use_tls = any((cert_path, cert_key_path))
@@ -161,12 +178,11 @@ def init(
         )
 
     server = AdmissionControllerServer(
-        server_address=(HOST, port),
+        server_address=(host, port),
         RequestHandlerClass=AdmissionControllerHandler,
         policy_dir=policy_dir,
         on_exception=on_exception,
     )
-
     if use_tls:
         import ssl
         server.socket = ssl.wrap_socket(
@@ -177,7 +193,7 @@ def init(
             ca_certs=ca_cert_path,
         )
 
-    log.info(f"Serving at http{'s' if use_tls else ''}://{HOST}:{port}")
+    log.info(f"Serving at http{'s' if use_tls else ''}://{host}:{port}")
     while True:
         server.serve_forever()
         # for testing purposes

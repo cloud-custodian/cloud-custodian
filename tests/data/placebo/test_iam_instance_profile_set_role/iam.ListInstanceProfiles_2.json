@@ -1,0 +1,114 @@
+{
+    "status_code": 200,
+    "data": {
+        "InstanceProfiles": [
+            {
+                "Path": "/",
+                "InstanceProfileName": "test-instance-profile-matching-role",
+                "InstanceProfileId": "AIPA2Q7BQUVCYN435YX4A",
+                "Arn": "arn:aws:iam::644160558196:instance-profile/test-instance-profile-matching-role",
+                "CreateDate": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 11,
+                    "day": 17,
+                    "hour": 1,
+                    "minute": 38,
+                    "second": 57,
+                    "microsecond": 0
+                },
+                "Roles": [
+                    {
+                        "Path": "/",
+                        "RoleName": "my-test-role",
+                        "RoleId": "AROA2Q7BQUVCR7H37AES3",
+                        "Arn": "arn:aws:iam::644160558196:role/my-test-role",
+                        "CreateDate": {
+                            "__class__": "datetime",
+                            "year": 2022,
+                            "month": 11,
+                            "day": 9,
+                            "hour": 1,
+                            "minute": 47,
+                            "second": 22,
+                            "microsecond": 0
+                        },
+                        "AssumeRolePolicyDocument": "%7B%22Version%22%3A%222012-10-17%22%2C%22Statement%22%3A%5B%7B%22Effect%22%3A%22Allow%22%2C%22Principal%22%3A%7B%22Service%22%3A%22ec2.amazonaws.com%22%7D%2C%22Action%22%3A%22sts%3AAssumeRole%22%7D%5D%7D"
+                    }
+                ]
+            },
+            {
+                "Path": "/",
+                "InstanceProfileName": "test-instance-profile-no-role",
+                "InstanceProfileId": "AIPA2Q7BQUVCYKOAA44IX",
+                "Arn": "arn:aws:iam::644160558196:instance-profile/test-instance-profile-no-role",
+                "CreateDate": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 11,
+                    "day": 17,
+                    "hour": 1,
+                    "minute": 38,
+                    "second": 32,
+                    "microsecond": 0
+                },
+                "Roles": [
+                    {
+                        "Path": "/",
+                        "RoleName": "my-test-role",
+                        "RoleId": "AROA2Q7BQUVCR7H37AES3",
+                        "Arn": "arn:aws:iam::644160558196:role/my-test-role",
+                        "CreateDate": {
+                            "__class__": "datetime",
+                            "year": 2022,
+                            "month": 11,
+                            "day": 9,
+                            "hour": 1,
+                            "minute": 47,
+                            "second": 22,
+                            "microsecond": 0
+                        },
+                        "AssumeRolePolicyDocument": "%7B%22Version%22%3A%222012-10-17%22%2C%22Statement%22%3A%5B%7B%22Effect%22%3A%22Allow%22%2C%22Principal%22%3A%7B%22Service%22%3A%22ec2.amazonaws.com%22%7D%2C%22Action%22%3A%22sts%3AAssumeRole%22%7D%5D%7D"
+                    }
+                ]
+            },
+            {
+                "Path": "/",
+                "InstanceProfileName": "test-instance-profile-not-matching-role",
+                "InstanceProfileId": "AIPA2Q7BQUVCSS2QTJWEW",
+                "Arn": "arn:aws:iam::644160558196:instance-profile/test-instance-profile-not-matching-role",
+                "CreateDate": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 11,
+                    "day": 17,
+                    "hour": 1,
+                    "minute": 40,
+                    "second": 18,
+                    "microsecond": 0
+                },
+                "Roles": [
+                    {
+                        "Path": "/",
+                        "RoleName": "my-test-role",
+                        "RoleId": "AROA2Q7BQUVCR7H37AES3",
+                        "Arn": "arn:aws:iam::644160558196:role/my-test-role",
+                        "CreateDate": {
+                            "__class__": "datetime",
+                            "year": 2022,
+                            "month": 11,
+                            "day": 9,
+                            "hour": 1,
+                            "minute": 47,
+                            "second": 22,
+                            "microsecond": 0
+                        },
+                        "AssumeRolePolicyDocument": "%7B%22Version%22%3A%222012-10-17%22%2C%22Statement%22%3A%5B%7B%22Effect%22%3A%22Allow%22%2C%22Principal%22%3A%7B%22Service%22%3A%22ec2.amazonaws.com%22%7D%2C%22Action%22%3A%22sts%3AAssumeRole%22%7D%5D%7D"
+                    }
+                ]
+            }
+        ],
+        "IsTruncated": false,
+        "ResponseMetadata": {}
+    }
+}

@@ -19,9 +19,9 @@ class TestAmi(BaseTest):
                     }, {
                         "type": "value",
                         "key": "CreatedTime",
-                        "value_type": "age",
-                        "value": 90,
-                        "op": "greater-than"
+                        "value_type": "date",
+                        "value": "2022-06-16",
+                        "op": "lt"
                     }
                 ]
             }

@@ -19,17 +19,19 @@ from .graph import TerraformGraph
 
 
 class TerraformResourceManager(IACResourceManager):
-    pass
+    class resource_type:
+        id = "id"
+
+    def get_model(self):
+        return self.resource_type
 
 
 class TerraformResourceMap(IACResourceMap):
-
     resource_class = TerraformResourceManager
 
 
 @clouds.register("terraform")
 class TerraformProvider(IACSourceProvider):
-
     display_name = "Terraform"
     resource_prefix = "terraform"
     resource_map = TerraformResourceMap(resource_prefix)
@@ -42,7 +44,8 @@ class TerraformProvider(IACSourceProvider):
 
     def parse(self, source_dir):
         graph = TerraformGraph(load_from_path(source_dir), source_dir)
-        log.debug("Loaded %d resources", len(graph))
+        graph.build()
+        log.debug("Loaded %d %s resources", len(graph), self.type)
         return graph
 
     def match_dir(self, source_dir):
@@ -53,5 +56,4 @@ class TerraformProvider(IACSourceProvider):
 
 @execution.register("terraform-source")
 class TerraformSource(IACSourceMode):
-
     schema = type_schema("terraform-source")

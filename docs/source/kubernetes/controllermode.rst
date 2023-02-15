@@ -19,6 +19,9 @@ Install the Server
 Dynamic Admission Controllers can only operate against HTTPS webhooks. To get started, you can either
 create a service inside of your Kubernetes Cluster or use a cloud provider to run a web server.
 
+Option 1: Manual installation
+=============================
+
 To get started, create a new directory of policies:
 
 .. code-block:: bash
@@ -59,7 +62,50 @@ Next, on your server, start c7n-kates:
 
    c7n-kates --policy-dir policies
 
-Next, we can apply a pod manifest to see the warning, create a new file ``pod.yaml`` and add the following:
+Option 2: Helm chart
+====================
+
+First configure the chart. The following  will configure a sample policy, use
+cert-manager to sign your webhook, and operate against all pods when they are
+created or updated. Adjust values.yaml as needed.
+
+.. code-block:: bash
+
+    cat << EOF > values.yaml
+    certManager:
+      enabled: true
+
+    policies:
+      source: configMap
+      configMap:
+        policies:
+          # insert your policies here
+
+          - name: 'example-warn-policy'
+            resource: 'k8s.pod'
+            description: 'This is a sample policy'
+            mode:
+              type: k8s-admission
+              on-match: warn
+              operations:
+                - CREATE
+
+    # These will need to be modified to match your policies.
+    rules:
+      - apiGroups: [""]
+        apiVersions: [v1]
+        operations: [CREATE, UPDATE]
+        resources: [pods]
+        scope: Namespaced
+    EOF
+
+    helm repo add c7n https://cloud-custodian.github.io/helm-charts/`
+    helm install c7n-kube c7n/c7n-kube --values values.yaml
+
+Testing
+-------
+
+We can apply a pod manifest to see the warning, create a new file ``pod.yaml`` and add the following:
 
 .. code-block:: yaml
 
@@ -87,7 +133,7 @@ Which should result in the following message:
    Warning: example-warn-policy:This is a sample policy
    pod/nginx created
 
-  
+
 On the server, you should see:
 
 .. code-block:: bash
@@ -202,18 +248,18 @@ A sample event looks like:
                        "f:metadata":{
                           "f:annotations":{
                              ".":{
-                                
+
                              },
                              "f:kubectl.kubernetes.io/last-applied-configuration":{
-                                
+
                              }
                           },
                           "f:labels":{
                              ".":{
-                                
+
                              },
                              "f:role":{
-                                
+
                              }
                           }
                        },
@@ -221,64 +267,64 @@ A sample event looks like:
                           "f:containers":{
                              "k:{\"name\":\"web\"}":{
                                 ".":{
-                                   
+
                                 },
                                 "f:image":{
-                                   
+
                                 },
                                 "f:imagePullPolicy":{
-                                   
+
                                 },
                                 "f:name":{
-                                   
+
                                 },
                                 "f:ports":{
                                    ".":{
-                                      
+
                                    },
                                    "k:{\"containerPort\":80,\"protocol\":\"TCP\"}":{
                                       ".":{
-                                         
+
                                       },
                                       "f:containerPort":{
-                                         
+
                                       },
                                       "f:name":{
-                                         
+
                                       },
                                       "f:protocol":{
-                                         
+
                                       }
                                    }
                                 },
                                 "f:resources":{
-                                   
+
                                 },
                                 "f:terminationMessagePath":{
-                                   
+
                                 },
                                 "f:terminationMessagePolicy":{
-                                   
+
                                 }
                              }
                           },
                           "f:dnsPolicy":{
-                             
+
                           },
                           "f:enableServiceLinks":{
-                             
+
                           },
                           "f:restartPolicy":{
-                             
+
                           },
                           "f:schedulerName":{
-                             
+
                           },
                           "f:securityContext":{
-                             
+
                           },
                           "f:terminationGracePeriodSeconds":{
-                             
+
                           }
                        }
                     }
@@ -338,7 +384,7 @@ A sample event looks like:
                        }
                     ],
                     "resources":{
-                       
+
                     },
                     "volumeMounts":[
                        {
@@ -358,7 +404,7 @@ A sample event looks like:
               "serviceAccountName":"default",
               "serviceAccount":"default",
               "securityContext":{
-                 
+
               },
               "schedulerName":"default-scheduler",
               "tolerations":[

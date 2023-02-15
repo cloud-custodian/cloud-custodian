@@ -326,7 +326,6 @@ class LambdaPostFinding(PostFinding):
              'DeadLetterConfig',
              'Environment',
              'Handler',
-             'KMSKeyArn',
              'LastModified',
              'MemorySize',
              'MasterArn',
@@ -337,6 +336,10 @@ class LambdaPostFinding(PostFinding):
              'Timeout',
              'Version',
              'VpcConfig']))
+        # check and set the correct formatting value for kms key arn if it exists
+        kms_value = r.get('KMSKeyArn')
+        if kms_value is not None:
+            details['KmsKeyArn'] = kms_value
         # do the brain dead parts Layers, Code, TracingConfig
         if 'Layers' in r:
             r['Layers'] = {

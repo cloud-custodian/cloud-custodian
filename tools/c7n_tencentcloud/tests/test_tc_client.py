@@ -1,12 +1,19 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
+import os
+import socket
+
 from datetime import datetime
+from unittest.mock import patch
+
 import jmespath
 import pytest
-import socket
-from retrying import RetryError
+
 from c7n_tencentcloud.utils import PageMethod
+from c7n_tencentcloud.client import Session
+
+from retrying import RetryError
 from tencentcloud.common.abstract_client import AbstractClient
 from tencentcloud.common.exception.tencent_cloud_sdk_exception import TencentCloudSDKException
 
@@ -133,3 +140,32 @@ class TestClient:
         }
         res = client_tag.execute_paged_query("GetTagValues", params, jsonpath, paging_def)
         assert len(res) == 233
+
+    @patch.dict(
+        os.environ,
+        {
+            "TENCENTCLOUD_TOKEN": "foo",
+            "TENCENTCLOUD_SECRET_KEY": "bar",
+            "TENCENTCLOUD_SECRET_ID": "baz",
+        }, clear=True
+    )
+    def test_tc_client_token(self):
+        session = Session()
+        assert session._cred.token == 'foo'
+        assert session._cred.secret_key == 'bar'
+        assert session._cred.secret_id == 'baz'
+
+    @patch.dict(
+        os.environ,
+        {
+            "TENCENTCLOUD_TOKEN": "foo",
+            "TENCENTCLOUD_SECRET_ID": "baz",
+        }, clear=True
+    )
+    def test_tc_client_token_missing_key(self):
+        found = False
+        try:
+            Session()
+        except TencentCloudSDKException:
+            found = True
+        assert found

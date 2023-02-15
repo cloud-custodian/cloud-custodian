@@ -246,6 +246,12 @@ class LambdaTest(BaseTest):
                 'Timeout': 900,
                 'TracingConfig': {'Mode': 'PassThrough'},
                 'Version': '$LATEST',
+                'KmsKeyArn':
+                    'arn:aws:kms:us-west-2:644160558196:key/798bc4bb-3079-4a9a-bc27-2c7f2b6c91d0',
+                'Environment': {'Variables': {
+                    'DISABLE_ACTIONS': 'true',
+                    'VERBOSE': 'false',
+                    'DISABLE_OUTPUT_PARAMETERS': 'true'}},
                 'VpcConfig': {'SecurityGroupIds': [],
                               'SubnetIds': []}}},
              'Id': 'arn:aws:lambda:us-west-2:644160558196:function:custodian-ec2-ssm-query',
@@ -672,7 +678,7 @@ class TestModifyVpcSecurityGroupsAction(BaseTest):
             session_factory=session_factory,
         )
         resources = p.run()
-        self.assertTrue(len(resources), 1)
+        self.assertEqual(len(resources), 1)
         aliases = kms.list_aliases(KeyId=resources[0]['KMSKeyArn'])
         self.assertEqual(aliases['Aliases'][0]['AliasName'], 'alias/skunk/trails')
 

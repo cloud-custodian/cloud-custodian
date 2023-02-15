@@ -176,6 +176,16 @@ class IsWafV2Enabled(Filter):
 
             policies:
               - name: filter-distribution-wafv2
+                description: |
+                  match resources that are NOT associated with any wafV2 web-acls
+                resource: distribution
+                filters:
+                  - type: wafv2-enabled
+                    state: false
+
+              - name: filter-distribution-wafv2-specific-acl
+                description: |
+                  match resources that are NOT associated with wafV2's testv2 web-acl
                 resource: distribution
                 filters:
                   - type: wafv2-enabled
@@ -183,6 +193,9 @@ class IsWafV2Enabled(Filter):
                     web-acl: testv2
 
               - name: filter-distribution-wafv2-regex
+                description: |
+                  match resources that are NOT associated with specified
+                  wafV2 web-acl regex
                 resource: distribution
                 filters:
                   - type: wafv2-enabled
@@ -206,19 +219,14 @@ class IsWafV2Enabled(Filter):
         state = self.data.get('state', False)
         target_acl_ids = [v for k, v in waf_name_id_map.items() if
                           re.match(target_acl, k)]
-
         results = []
         for r in resources:
             r_web_acl_id = r.get('WebACLId')
             if state:
-                if not target_acl and r_web_acl_id:
-                    results.append(r)
-                elif target_acl and r_web_acl_id in target_acl_ids:
+                if r_web_acl_id and r_web_acl_id in target_acl_ids:
                     results.append(r)
             else:
-                if not target_acl and not r_web_acl_id:
-                    results.append(r)
-                elif target_acl and r_web_acl_id not in target_acl_ids:
+                if not r_web_acl_id or r_web_acl_id not in target_acl_ids:
                     results.append(r)
         return results
 
@@ -326,8 +334,8 @@ class MismatchS3Origin(Filter):
                     check_custom_origins: true
    """
 
-    s3_prefix = re.compile(r'.*(?=\.s3(-.*)?\.amazonaws.com)')
-    s3_suffix = re.compile(r'^([^.]+\.)?s3(-.*)?\.amazonaws.com')
+    s3_prefix = re.compile(r'.*(?=\.s3(-.*)?(\..*-\d)?\.amazonaws.com)')
+    s3_suffix = re.compile(r'^([^.]+\.)?s3(-.*)?(\..*-\d)?\.amazonaws.com')
 
     schema = type_schema(
         'mismatch-s3-origin',

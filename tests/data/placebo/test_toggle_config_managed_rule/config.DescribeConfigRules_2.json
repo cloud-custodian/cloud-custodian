@@ -1,0 +1,30 @@
+{
+    "status_code": 200,
+    "data": {
+        "ConfigRules": [
+            {
+                "ConfigRuleName": "test-enable-config-managed-rule",
+                "ConfigRuleArn": "arn:aws:config:us-east-1:644160558196:config-rule/config-rule-xtqwge",
+                "ConfigRuleId": "config-rule-xtqwge",
+                "Description": "cloud-custodian AWS Config Managed Rule policy",
+                "Scope": {
+                    "ComplianceResourceTypes": [
+                        "AWS::S3::Bucket"
+                    ]
+                },
+                "Source": {
+                    "Owner": "AWS",
+                    "SourceIdentifier": "S3_BUCKET_PUBLIC_WRITE_PROHIBITED"
+                },
+                "InputParameters": "{}",
+                "ConfigRuleState": "DELETING",
+                "EvaluationModes": [
+                    {
+                        "Mode": "DETECTIVE"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

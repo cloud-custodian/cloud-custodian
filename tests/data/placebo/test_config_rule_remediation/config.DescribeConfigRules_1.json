@@ -1,0 +1,482 @@
+{
+    "status_code": 200,
+    "data": {
+        "ConfigRules": [
+            {
+                "ConfigRuleName": "FMManagedWafv2GlobalResourceConfigRule12042ace-adda-41bd-8ddf-18c5764e44fc",
+                "ConfigRuleArn": "arn:aws:config:us-east-1:644160558196:config-rule/aws-service-rule/fms.amazonaws.com/config-rule-8cw6rk",
+                "ConfigRuleId": "config-rule-8cw6rk",
+                "Description": "Config rule for tracking changes to fms wafv2 policy:12042ace-adda-41bd-8ddf-18c5764e44fc",
+                "Scope": {
+                    "ComplianceResourceTypes": [
+                        "AWS::CloudFront::Distribution"
+                    ]
+                },
+                "Source": {
+                    "Owner": "AWS",
+                    "SourceIdentifier": "FMS_WEBACL_RESOURCE_POLICY_CHECK_V2"
+                },
+                "InputParameters": "{\"webAclArn\":\"arn:aws:wafv2:us-east-1:644160558196:global/webacl/FMManagedWebACLV2-FMS-Intuit-Only-Compliance-GLOBAL-1644348455514/e287dac6-a33f-4d43-9c2a-d4a0178f1900\",\"policyId\":\"12042ace-adda-41bd-8ddf-18c5764e44fc\",\"resourceTags\":\"{\\\"intu-waf\\\":[\\\"intuitonly\\\"]}\",\"excludeResourceTags\":\"false\"}",
+                "ConfigRuleState": "ACTIVE",
+                "CreatedBy": "fms.amazonaws.com"
+            },
+            {
+                "ConfigRuleName": "FMManagedWafv2GlobalResourceConfigRule92bb1456-6820-47d5-97a2-08be3ff01358",
+                "ConfigRuleArn": "arn:aws:config:us-east-1:644160558196:config-rule/aws-service-rule/fms.amazonaws.com/config-rule-jwhxsv",
+                "ConfigRuleId": "config-rule-jwhxsv",
+                "Description": "Config rule for tracking changes to fms wafv2 policy:92bb1456-6820-47d5-97a2-08be3ff01358",
+                "Scope": {
+                    "ComplianceResourceTypes": [
+                        "AWS::CloudFront::Distribution"
+                    ]
+                },
+                "Source": {
+                    "Owner": "AWS",
+                    "SourceIdentifier": "FMS_WEBACL_RESOURCE_POLICY_CHECK_V2"
+                },
+                "InputParameters": "{\"webAclArn\":\"arn:aws:wafv2:us-east-1:644160558196:global/webacl/FMManagedWebACLV2-FMS-ECB-Compliance-GLOBAL-1644348474601/04a1f3dd-afb1-4b43-94c7-17741b845cb4\",\"policyId\":\"92bb1456-6820-47d5-97a2-08be3ff01358\",\"resourceTags\":\"{\\\"intu-waf\\\":[\\\"ecb\\\"]}\",\"excludeResourceTags\":\"false\"}",
+                "ConfigRuleState": "ACTIVE",
+                "CreatedBy": "fms.amazonaws.com"
+            },
+            {
+                "ConfigRuleName": "FMManagedWafv2GlobalResourceConfigRule9d99fb72-9b82-4c59-9e7e-023cd2fea29a",
+                "ConfigRuleArn": "arn:aws:config:us-east-1:644160558196:config-rule/aws-service-rule/fms.amazonaws.com/config-rule-ij8v5s",
+                "ConfigRuleId": "config-rule-ij8v5s",
+                "Description": "Config rule for tracking changes to fms wafv2 policy:9d99fb72-9b82-4c59-9e7e-023cd2fea29a",
+                "Scope": {
+                    "ComplianceResourceTypes": [
+                        "AWS::CloudFront::Distribution"
+                    ]
+                },
+                "Source": {
+                    "Owner": "AWS",
+                    "SourceIdentifier": "FMS_WEBACL_RESOURCE_POLICY_CHECK_V2"
+                },
+                "InputParameters": "{\"webAclArn\":\"arn:aws:wafv2:us-east-1:644160558196:global/webacl/FMManagedWebACLV2-FMS-Intuit-ApiGW-Compliance-GLOBAL-1644348481240/6339c80b-4b7d-4235-a32c-29e0f097091d\",\"policyId\":\"9d99fb72-9b82-4c59-9e7e-023cd2fea29a\",\"resourceTags\":\"{\\\"intu-waf\\\":[\\\"intuit-apigw\\\"]}\",\"excludeResourceTags\":\"false\"}",
+                "ConfigRuleState": "ACTIVE",
+                "CreatedBy": "fms.amazonaws.com"
+            },
+            {
+                "ConfigRuleName": "FMManagedWafv2RegionalResourceConfigRule62691297-b3c2-406c-a663-6e14d5508329",
+                "ConfigRuleArn": "arn:aws:config:us-east-1:644160558196:config-rule/aws-service-rule/fms.amazonaws.com/config-rule-3ybo6u",
+                "ConfigRuleId": "config-rule-3ybo6u",
+                "Description": "Config rule for tracking changes to fms wafv2 policy:62691297-b3c2-406c-a663-6e14d5508329",
+                "Scope": {
+                    "ComplianceResourceTypes": [
+                        "AWS::ApiGateway::Stage",
+                        "AWS::ElasticLoadBalancingV2::LoadBalancer"
+                    ]
+                },
+                "Source": {
+                    "Owner": "AWS",
+                    "SourceIdentifier": "FMS_WEBACL_RESOURCE_POLICY_CHECK_V2"
+                },
+                "InputParameters": "{\"webAclArn\":\"arn:aws:wafv2:us-east-1:644160558196:regional/webacl/FMManagedWebACLV2-FMS-ECB-Compliance-US-EAST-1-1644348523123/c5d6908b-78b3-4f3a-a3d7-39b1b60f9927\",\"policyId\":\"62691297-b3c2-406c-a663-6e14d5508329\",\"resourceTags\":\"{\\\"intu-waf\\\":[\\\"ecb\\\"]}\",\"excludeResourceTags\":\"false\"}",
+                "ConfigRuleState": "ACTIVE",
+                "CreatedBy": "fms.amazonaws.com"
+            },
+            {
+                "ConfigRuleName": "FMManagedWafv2RegionalResourceConfigRulec6017ea4-01a9-4dcb-81b7-aac864853b36",
+                "ConfigRuleArn": "arn:aws:config:us-east-1:644160558196:config-rule/aws-service-rule/fms.amazonaws.com/config-rule-zntvza",
+                "ConfigRuleId": "config-rule-zntvza",
+                "Description": "Config rule for tracking changes to fms wafv2 policy:c6017ea4-01a9-4dcb-81b7-aac864853b36",
+                "Scope": {
+                    "ComplianceResourceTypes": [
+                        "AWS::ApiGateway::Stage",
+                        "AWS::ElasticLoadBalancingV2::LoadBalancer"
+                    ]
+                },
+                "Source": {
+                    "Owner": "AWS",
+                    "SourceIdentifier": "FMS_WEBACL_RESOURCE_POLICY_CHECK_V2"
+                },
+                "InputParameters": "{\"webAclArn\":\"arn:aws:wafv2:us-east-1:644160558196:regional/webacl/FMManagedWebACLV2-FMS-Intuit-Only-Compliance-US-EAST-1-1644348540337/56e8f7c5-bb41-453e-8173-f9578887ff30\",\"policyId\":\"c6017ea4-01a9-4dcb-81b7-aac864853b36\",\"resourceTags\":\"{\\\"intu-waf\\\":[\\\"intuitonly\\\"]}\",\"excludeResourceTags\":\"false\"}",
+                "ConfigRuleState": "ACTIVE",
+                "CreatedBy": "fms.amazonaws.com"
+            },
+            {
+                "ConfigRuleName": "FMManagedWafv2RegionalResourceConfigRuled1b4c52a-2c26-4a98-b41e-d2b1b3f5a0ee",
+                "ConfigRuleArn": "arn:aws:config:us-east-1:644160558196:config-rule/aws-service-rule/fms.amazonaws.com/config-rule-otqkei",
+                "ConfigRuleId": "config-rule-otqkei",
+                "Description": "Config rule for tracking changes to fms wafv2 policy:d1b4c52a-2c26-4a98-b41e-d2b1b3f5a0ee",
+                "Scope": {
+                    "ComplianceResourceTypes": [
+                        "AWS::ApiGateway::Stage",
+                        "AWS::ElasticLoadBalancingV2::LoadBalancer"
+                    ]
+                },
+                "Source": {
+                    "Owner": "AWS",
+                    "SourceIdentifier": "FMS_WEBACL_RESOURCE_POLICY_CHECK_V2"
+                },
+                "InputParameters": "{\"webAclArn\":\"arn:aws:wafv2:us-east-1:644160558196:regional/webacl/FMManagedWebACLV2-FMS-AWS-CloudFront-Compliance-US-EAST-1-1644348501056/ca6e12c7-e1fe-4f8d-b210-682a75cab490\",\"policyId\":\"d1b4c52a-2c26-4a98-b41e-d2b1b3f5a0ee\",\"resourceTags\":\"{\\\"intu-waf\\\":[\\\"aws-cloudfront\\\"]}\",\"excludeResourceTags\":\"false\"}",
+                "ConfigRuleState": "ACTIVE",
+                "CreatedBy": "fms.amazonaws.com"
+            },
+            {
+                "ConfigRuleName": "custodian-config-custom-alb-ecb-set-waf-remediate-event",
+                "ConfigRuleArn": "arn:aws:config:us-east-1:644160558196:config-rule/config-rule-o8b8td",
+                "ConfigRuleId": "config-rule-o8b8td",
+                "Description": "Tag intu-waf=ecb and attach ECB WAF if ALB is in the exception list for Development account.\n",
+                "Scope": {
+                    "ComplianceResourceTypes": [
+                        "AWS::ElasticLoadBalancingV2::LoadBalancer"
+                    ]
+                },
+                "Source": {
+                    "Owner": "CUSTOM_LAMBDA",
+                    "SourceIdentifier": "arn:aws:lambda:us-east-1:644160558196:function:custodian-config-custom-alb-ecb-set-waf-remediate-event",
+                    "SourceDetails": [
+                        {
+                            "EventSource": "aws.config",
+                            "MessageType": "ConfigurationItemChangeNotification"
+                        }
+                    ]
+                },
+                "ConfigRuleState": "ACTIVE"
+            },
+            {
+                "ConfigRuleName": "custodian-config-custom-alb-ecb-set-waf-remediate-hourly",
+                "ConfigRuleArn": "arn:aws:config:us-east-1:644160558196:config-rule/config-rule-mhzmzl",
+                "ConfigRuleId": "config-rule-mhzmzl",
+                "Description": "Tag intu-waf=ecb and attach ECB WAF if ALB is in the exception list for Development account.\n",
+                "Source": {
+                    "Owner": "CUSTOM_LAMBDA",
+                    "SourceIdentifier": "arn:aws:lambda:us-east-1:644160558196:function:custodian-config-custom-alb-ecb-set-waf-remediate-hourly",
+                    "SourceDetails": [
+                        {
+                            "EventSource": "aws.config",
+                            "MessageType": "ScheduledNotification",
+                            "MaximumExecutionFrequency": "One_Hour"
+                        }
+                    ]
+                },
+                "ConfigRuleState": "ACTIVE"
+            },
+            {
+                "ConfigRuleName": "custodian-config-custom-alb-ecb-waf-report-acp-daily",
+                "ConfigRuleArn": "arn:aws:config:us-east-1:644160558196:config-rule/config-rule-lkmpyi",
+                "ConfigRuleId": "config-rule-lkmpyi",
+                "Description": "Check if Firewall Managed FMManagedWebACLV2-FMS-Intuit WAF is attached to Application Loadbalancer in Learning/Development.\n",
+                "Source": {
+                    "Owner": "CUSTOM_LAMBDA",
+                    "SourceIdentifier": "arn:aws:lambda:us-east-1:644160558196:function:custodian-config-custom-alb-ecb-waf-report-acp-daily",
+                    "SourceDetails": [
+                        {
+                            "EventSource": "aws.config",
+                            "MessageType": "ScheduledNotification",
+                            "MaximumExecutionFrequency": "One_Hour"
+                        }
+                    ]
+                },
+                "ConfigRuleState": "ACTIVE"
+            },
+            {
+                "ConfigRuleName": "custodian-config-custom-alb-intuit-set-waf-remediate-event",
+                "ConfigRuleArn": "arn:aws:config:us-east-1:644160558196:config-rule/config-rule-0i0jsu",
+                "ConfigRuleId": "config-rule-0i0jsu",
+                "Description": "Tag intu-waf=intuitonly and attach IntuitOnly WAF if ALB is not in the exception list for Learning/Development account.\n",
+                "Scope": {
+                    "ComplianceResourceTypes": [
+                        "AWS::ElasticLoadBalancingV2::LoadBalancer"
+                    ]
+                },
+                "Source": {
+                    "Owner": "CUSTOM_LAMBDA",
+                    "SourceIdentifier": "arn:aws:lambda:us-east-1:644160558196:function:custodian-config-custom-alb-intuit-set-waf-remediate-event",
+                    "SourceDetails": [
+                        {
+                            "EventSource": "aws.config",
+                            "MessageType": "ConfigurationItemChangeNotification"
+                        }
+                    ]
+                },
+                "ConfigRuleState": "ACTIVE"
+            },
+            {
+                "ConfigRuleName": "custodian-config-custom-alb-intuit-set-waf-remediate-hourly",
+                "ConfigRuleArn": "arn:aws:config:us-east-1:644160558196:config-rule/config-rule-plmf0i",
+                "ConfigRuleId": "config-rule-plmf0i",
+                "Description": "Tag intu-waf=intuitonly and attach IntuitOnly WAF if ALB is not in the exception list for Learning/Development account.\n",
+                "Source": {
+                    "Owner": "CUSTOM_LAMBDA",
+                    "SourceIdentifier": "arn:aws:lambda:us-east-1:644160558196:function:custodian-config-custom-alb-intuit-set-waf-remediate-hourly",
+                    "SourceDetails": [
+                        {
+                            "EventSource": "aws.config",
+                            "MessageType": "ScheduledNotification",
+                            "MaximumExecutionFrequency": "One_Hour"
+                        }
+                    ]
+                },
+                "ConfigRuleState": "ACTIVE"
+            },
+            {
+                "ConfigRuleName": "custodian-config-custom-alb-logging-check-acp-daily",
+                "ConfigRuleArn": "arn:aws:config:us-east-1:644160558196:config-rule/config-rule-xnsub6",
+                "ConfigRuleId": "config-rule-xnsub6",
+                "Description": "Policy checks ALB SECURITY LOGGING Attributes for lynx-t058-<region>/alb, if enabled is true then report to ACP as compliance.\n",
+                "Source": {
+                    "Owner": "CUSTOM_LAMBDA",
+                    "SourceIdentifier": "arn:aws:lambda:us-east-1:644160558196:function:custodian-config-custom-alb-logging-check-acp-daily",
+                    "SourceDetails": [
+                        {
+                            "EventSource": "aws.config",
+                            "MessageType": "ScheduledNotification",
+                            "MaximumExecutionFrequency": "TwentyFour_Hours"
+                        }
+                    ]
+                },
+                "ConfigRuleState": "ACTIVE"
+            },
+            {
+                "ConfigRuleName": "custodian-config-custom-alb-unset-waf-remediate-event",
+                "ConfigRuleArn": "arn:aws:config:us-east-1:644160558196:config-rule/config-rule-pxnfki",
+                "ConfigRuleId": "config-rule-pxnfki",
+                "Description": "Checks if ALB Security Groups only allowing IntuitOnly IPs then add a Tag intu-waf=proxy-intuitonly-apigw and detach WAF.\n",
+                "Scope": {
+                    "ComplianceResourceTypes": [
+                        "AWS::ElasticLoadBalancingV2::LoadBalancer"
+                    ]
+                },
+                "Source": {
+                    "Owner": "CUSTOM_LAMBDA",
+                    "SourceIdentifier": "arn:aws:lambda:us-east-1:644160558196:function:custodian-config-custom-alb-unset-waf-remediate-event",
+                    "SourceDetails": [
+                        {
+                            "EventSource": "aws.config",
+                            "MessageType": "ConfigurationItemChangeNotification"
+                        }
+                    ]
+                },
+                "ConfigRuleState": "ACTIVE"
+            },
+            {
+                "ConfigRuleName": "custodian-config-custom-alb-unset-waf-remediate-hourly",
+                "ConfigRuleArn": "arn:aws:config:us-east-1:644160558196:config-rule/config-rule-kg6v88",
+                "ConfigRuleId": "config-rule-kg6v88",
+                "Description": "Checks if ALB Security Groups only allowing IntuitOnly IPs then add a Tag intu-waf=proxy-intuitonly-apigw and detach WAF.\n",
+                "Source": {
+                    "Owner": "CUSTOM_LAMBDA",
+                    "SourceIdentifier": "arn:aws:lambda:us-east-1:644160558196:function:custodian-config-custom-alb-unset-waf-remediate-hourly",
+                    "SourceDetails": [
+                        {
+                            "EventSource": "aws.config",
+                            "MessageType": "ScheduledNotification",
+                            "MaximumExecutionFrequency": "One_Hour"
+                        }
+                    ]
+                },
+                "ConfigRuleState": "ACTIVE"
+            },
+            {
+                "ConfigRuleName": "custodian-config-custom-alb-waf-fail-open-acp-daily",
+                "ConfigRuleArn": "arn:aws:config:us-east-1:644160558196:config-rule/config-rule-cvp9vz",
+                "ConfigRuleId": "config-rule-cvp9vz",
+                "Description": "Policy checks ALB WAF FAIL Open Attribute, if enabled is true then report to ACP as non-compliance.\n",
+                "Source": {
+                    "Owner": "CUSTOM_LAMBDA",
+                    "SourceIdentifier": "arn:aws:lambda:us-east-1:644160558196:function:custodian-config-custom-alb-waf-fail-open-acp-daily",
+                    "SourceDetails": [
+                        {
+                            "EventSource": "aws.config",
+                            "MessageType": "ScheduledNotification",
+                            "MaximumExecutionFrequency": "TwentyFour_Hours"
+                        }
+                    ]
+                },
+                "ConfigRuleState": "ACTIVE"
+            },
+            {
+                "ConfigRuleName": "custodian-config-custom-alb-waf-report-acp-daily",
+                "ConfigRuleArn": "arn:aws:config:us-east-1:644160558196:config-rule/config-rule-5c4uor",
+                "ConfigRuleId": "config-rule-5c4uor",
+                "Description": "Check if Firewall Managed WAF is attached to Application Loadbalancer in Learning/Development/Production excluding IKS\n",
+                "Source": {
+                    "Owner": "CUSTOM_LAMBDA",
+                    "SourceIdentifier": "arn:aws:lambda:us-east-1:644160558196:function:custodian-config-custom-alb-waf-report-acp-daily",
+                    "SourceDetails": [
+                        {
+                            "EventSource": "aws.config",
+                            "MessageType": "ScheduledNotification",
+                            "MaximumExecutionFrequency": "TwentyFour_Hours"
+                        }
+                    ]
+                },
+                "ConfigRuleState": "ACTIVE"
+            },
+            {
+                "ConfigRuleName": "custodian-config-custom-alb-waf-tag-acp-daily",
+                "ConfigRuleArn": "arn:aws:config:us-east-1:644160558196:config-rule/config-rule-ne960s",
+                "ConfigRuleId": "config-rule-ne960s",
+                "Description": "Probe WAF tag for the new and existing Learning/Development/Production Application Loadbalancer and report COMPLIANT/NONCOMPLIANT.\n",
+                "Source": {
+                    "Owner": "CUSTOM_LAMBDA",
+                    "SourceIdentifier": "arn:aws:lambda:us-east-1:644160558196:function:custodian-config-custom-alb-waf-tag-acp-daily",
+                    "SourceDetails": [
+                        {
+                            "EventSource": "aws.config",
+                            "MessageType": "ScheduledNotification",
+                            "MaximumExecutionFrequency": "TwentyFour_Hours"
+                        }
+                    ]
+                },
+                "ConfigRuleState": "ACTIVE"
+            },
+            {
+                "ConfigRuleName": "custodian-config-custom-apigateway-ecb-waf-report-acp-daily",
+                "ConfigRuleArn": "arn:aws:config:us-east-1:644160558196:config-rule/config-rule-wx3nyn",
+                "ConfigRuleId": "config-rule-wx3nyn",
+                "Description": "Check if Firewall Managed (IntuitOnly, Intuit-Internal, Intuit-Only4GW or Intuit-ApiGW) WAF is attached to AWS APIgateway in Learning/Development environments and mark it as NonCompliant if not.\n",
+                "Source": {
+                    "Owner": "CUSTOM_LAMBDA",
+                    "SourceIdentifier": "arn:aws:lambda:us-east-1:644160558196:function:custodian-config-custom-apigateway-ecb-waf-report-acp-daily",
+                    "SourceDetails": [
+                        {
+                            "EventSource": "aws.config",
+                            "MessageType": "ScheduledNotification",
+                            "MaximumExecutionFrequency": "TwentyFour_Hours"
+                        }
+                    ]
+                },
+                "ConfigRuleState": "ACTIVE"
+            },
+            {
+                "ConfigRuleName": "custodian-config-custom-apigw-set-ecb-waf-remediate-daily",
+                "ConfigRuleArn": "arn:aws:config:us-east-1:644160558196:config-rule/config-rule-ehgu6a",
+                "ConfigRuleId": "config-rule-ehgu6a",
+                "Description": "Tag intu-waf=ecb and attach ECB WAF if APIGW stage is in the exception list for development account.\n",
+                "Source": {
+                    "Owner": "CUSTOM_LAMBDA",
+                    "SourceIdentifier": "arn:aws:lambda:us-east-1:644160558196:function:custodian-config-custom-apigw-set-ecb-waf-remediate-daily",
+                    "SourceDetails": [
+                        {
+                            "EventSource": "aws.config",
+                            "MessageType": "ScheduledNotification",
+                            "MaximumExecutionFrequency": "TwentyFour_Hours"
+                        }
+                    ]
+                },
+                "ConfigRuleState": "ACTIVE"
+            },
+            {
+                "ConfigRuleName": "custodian-config-custom-apigw-set-ecb-waf-remediate-event",
+                "ConfigRuleArn": "arn:aws:config:us-east-1:644160558196:config-rule/config-rule-h7dsql",
+                "ConfigRuleId": "config-rule-h7dsql",
+                "Description": "Tag intu-waf=ecb and attach ECB WAF if APIGW stage is in the exception list for development account.\n",
+                "Scope": {
+                    "ComplianceResourceTypes": [
+                        "AWS::ApiGateway::Stage"
+                    ]
+                },
+                "Source": {
+                    "Owner": "CUSTOM_LAMBDA",
+                    "SourceIdentifier": "arn:aws:lambda:us-east-1:644160558196:function:custodian-config-custom-apigw-set-ecb-waf-remediate-event",
+                    "SourceDetails": [
+                        {
+                            "EventSource": "aws.config",
+                            "MessageType": "ConfigurationItemChangeNotification"
+                        }
+                    ]
+                },
+                "ConfigRuleState": "ACTIVE"
+            },
+            {
+                "ConfigRuleName": "custodian-config-custom-apigw-set-intuit-waf-remediate-daily",
+                "ConfigRuleArn": "arn:aws:config:us-east-1:644160558196:config-rule/config-rule-o0aea4",
+                "ConfigRuleId": "config-rule-o0aea4",
+                "Description": "Tag intu-waf=intuitonly and attach IntuitOnly WAF if APIGW stage is not in the exception list for development account.\n",
+                "Source": {
+                    "Owner": "CUSTOM_LAMBDA",
+                    "SourceIdentifier": "arn:aws:lambda:us-east-1:644160558196:function:custodian-config-custom-apigw-set-intuit-waf-remediate-daily",
+                    "SourceDetails": [
+                        {
+                            "EventSource": "aws.config",
+                            "MessageType": "ScheduledNotification",
+                            "MaximumExecutionFrequency": "TwentyFour_Hours"
+                        }
+                    ]
+                },
+                "ConfigRuleState": "ACTIVE"
+            },
+            {
+                "ConfigRuleName": "custodian-config-custom-apigw-set-intuit-waf-remediate-event",
+                "ConfigRuleArn": "arn:aws:config:us-east-1:644160558196:config-rule/config-rule-pdi93s",
+                "ConfigRuleId": "config-rule-pdi93s",
+                "Description": "Tag intu-waf=intuitonly and attach IntuitOnly WAF if APIGW stage is not in the exception list for development account.\n",
+                "Scope": {
+                    "ComplianceResourceTypes": [
+                        "AWS::ApiGateway::Stage"
+                    ]
+                },
+                "Source": {
+                    "Owner": "CUSTOM_LAMBDA",
+                    "SourceIdentifier": "arn:aws:lambda:us-east-1:644160558196:function:custodian-config-custom-apigw-set-intuit-waf-remediate-event",
+                    "SourceDetails": [
+                        {
+                            "EventSource": "aws.config",
+                            "MessageType": "ConfigurationItemChangeNotification"
+                        }
+                    ]
+                },
+                "ConfigRuleState": "ACTIVE"
+            },
+            {
+                "ConfigRuleName": "custodian-config-custom-apigw-tls-domain-acp-daily",
+                "ConfigRuleArn": "arn:aws:config:us-east-1:644160558196:config-rule/config-rule-xnylxg",
+                "ConfigRuleId": "config-rule-xnylxg",
+                "Description": "Checks on Api Gateway custom domain names security configuration and reports.\n",
+                "Source": {
+                    "Owner": "CUSTOM_LAMBDA",
+                    "SourceIdentifier": "arn:aws:lambda:us-east-1:644160558196:function:custodian-config-custom-apigw-tls-domain-acp-daily",
+                    "SourceDetails": [
+                        {
+                            "EventSource": "aws.config",
+                            "MessageType": "ScheduledNotification",
+                            "MaximumExecutionFrequency": "TwentyFour_Hours"
+                        }
+                    ]
+                },
+                "ConfigRuleState": "ACTIVE"
+            },
+            {
+                "ConfigRuleName": "custodian-config-custom-apigw-waf-report-acp-daily",
+                "ConfigRuleArn": "arn:aws:config:us-east-1:644160558196:config-rule/config-rule-snrdtu",
+                "ConfigRuleId": "config-rule-snrdtu",
+                "Description": "Check if Firewall Managed (ECB, IntuitOnly, Intuit-Internal, Intuit-Only4GW, Intuit-ApiGW or AWS-CloudFront) WAF is attached to AWS APIgateway in Learning/Development/Production environments and mark it as NonCompliant if not.\n",
+                "Source": {
+                    "Owner": "CUSTOM_LAMBDA",
+                    "SourceIdentifier": "arn:aws:lambda:us-east-1:644160558196:function:custodian-config-custom-apigw-waf-report-acp-daily",
+                    "SourceDetails": [
+                        {
+                            "EventSource": "aws.config",
+                            "MessageType": "ScheduledNotification",
+                            "MaximumExecutionFrequency": "TwentyFour_Hours"
+                        }
+                    ]
+                },
+                "ConfigRuleState": "ACTIVE"
+            },
+            {
+                "ConfigRuleName": "custodian-config-custom-appsync-set-intuit-waf-remediate-daily",
+                "ConfigRuleArn": "arn:aws:config:us-east-1:644160558196:config-rule/config-rule-aop8xi",
+                "ConfigRuleId": "config-rule-aop8xi",
+                "Description": "Policy checks Appsync Graphql Apis for WAF protection, if  wafWebAclArn is not set to a supported waf rule then it is enabled.\n",
+                "Source": {
+                    "Owner": "CUSTOM_LAMBDA",
+                    "SourceIdentifier": "arn:aws:lambda:us-east-1:644160558196:function:custodian-config-custom-appsync-set-intuit-waf-remediate-daily",
+                    "SourceDetails": [
+                        {
+                            "EventSource": "aws.config",
+                            "MessageType": "ScheduledNotification",
+                            "MaximumExecutionFrequency": "TwentyFour_Hours"
+                        }
+                    ]
+                },
+                "ConfigRuleState": "ACTIVE"
+            }
+        ],
+        "NextToken": "eyJlbmNyeXB0ZWREYXRhIjpbMzIsMzEsMzAsNzksMTMsLTQ3LDU5LC01MSwtODUsLTM2LDQ2LC01OCwtMTEyLC05LC00OCwtOTMsLTUzLC0xMDIsNTAsMTA4LC05OSwxMDIsMTAzLC0xMjAsLTkzLC02LC04NCwtMTE4LDI4LDk1LC0xMjgsLTcyLC00MiwtNjQsMTA2LC0xNSwyMywtMTcsMTMsLTI4LC0xMDksMTA2LC04OCwtOTYsNDEsMTAzLC0yNSw3OCwxMCwtMTAyLDEzLDEwNyw0NiwxMjQsLTg2LC0xMDcsMjUsNDksLTEzLC0zMywtNjUsMTgsOTIsLTgxLDI2LDAsMTcsMzgsMTIwLDczLDIxLC0xMDYsNzUsLTIyLDgyLC04MywtOTIsMzEsLTkyLC01MCw0NywxNCwtNSw1NywtNzUsMzQsNTEsLTgzLDU4LDU0LC0xNSw4OCwwLC02NywtMTAxLDEwOCwtNjksLTExMCwxMDYsMTAyLC0zMiwtNDcsMTAyLC05NywtOTAsLTYxLC02OSwtODQsOTUsNjMsLTEwMiwxMTIsLTEyNiwtMTksODEsLTk1LC0xMDAsMzgsNzUsLTUxLC04MCw1NCw3NywtNDIsLTUzLDQyLC05NywtMTUsLTIwLDEwMiwwLC0xMjcsODYsLTk0LC0zMSwtODAsMTA2LDgzLDIwLDg0LDk5LDMzLDkwLC05OSw1Niw1MCwxMTEsLTEyMiwtNzUsMTEzLC0yNSw3MywtNDUsMTAwLC04NywtMTEwLC00NCw1OCwtMTAwLC0zNSwtOTIsOTksOTcsLTg2LC0xMDIsLTEzLDI4LDExMCwtNzksLTE2LDM2LDUxLC0xOCwtMjIsODQsLTkxLC02MywxMjEsODIsLTUyLC0zMyw4NSwtNDUsLTMsNjEsLTM1LC03LDEyNyw0OSwtMjcsMTE5LDEyNSwzLDEwMSwtOCwtNzEsNjksLTY5LC04MiwtMTEzLC02OSwtNCwtMzksLTYzLDcxLC03NiwtOTcsMTA2LC0xMDEsLTExNiwtOTEsLTM3LDEyMywxMDEsNTgsNTQsLTg5LC03OSwxMjQsODYsLTIyLDM2LC00MSwtMTEzLC0zNiwtMzUsLTIwLC04MSwxMDgsMzMsLTEyLDksODUsODMsNzgsLTEwMCwtMTIwLDQwLC0xMDMsLTk0LDg1LDMsNzIsNCwtNjQsMzEsMTIsNzQsLTYwLDEwMSw3MSwxMjEsLTY5LC0xMDYsLTU1LC02MSwtMTcsMzUsMTA5XSwibWF0ZXJpYWxTZXRTZXJpYWxOdW1iZXIiOjEsIml2UGFyYW1ldGVyU3BlYyI6eyJpdiI6WzkxLDE4LC00OSwtMTA0LDEyLC02OCw1OSwzMiwxMDcsLTM3LC0xMjEsLTU3LC05OSwtNjYsLTk3LDExMl19fQ==",
+        "ResponseMetadata": {}
+    }
+}

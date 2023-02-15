@@ -294,7 +294,7 @@ class ElasticSearch(BaseTest):
             session_factory=session_factory
         )
         resources = p.run()
-        self.assertTrue(len(resources), 1)
+        self.assertEqual(len(resources), 1)
         aliases = kms.list_aliases(KeyId=resources[0]['EncryptionAtRestOptions']['KmsKeyId'])
         self.assertEqual(aliases['Aliases'][0]['AliasName'], 'alias/aws/es')
 
@@ -590,6 +590,26 @@ class ElasticSearch(BaseTest):
 
         resp = client.describe_elasticsearch_domain(DomainName=resources[0]['DomainName'])
         self.assertNotIn('10.0.0.0/24', resp['DomainStatus']['AccessPolicies'])
+
+    def test_elasticsearch_update_tls_config(self):
+        factory = self.replay_flight_data("test_elasticsearch_update_tls_config")
+        p = self.load_policy(
+            {
+                "name": "test_elasticsearch_update_tls_config",
+                "resource": "elasticsearch",
+                "filters": [{"DomainName": "test-es"}],
+                "actions": [{"type": "update-tls-config", "value": "Policy-Min-TLS-1-2-2019-07"}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["DomainName"], "test-es")
+        client = factory().client("es")
+        state = client.describe_elasticsearch_domain(DomainName="test-es")['DomainStatus'][
+            'DomainEndpointOptions']
+        self.assertEqual(state['EnforceHTTPS'], True)
+        self.assertEqual(state['TLSSecurityPolicy'], "Policy-Min-TLS-1-2-2019-07")
 
 
 class TestReservedInstances(BaseTest):

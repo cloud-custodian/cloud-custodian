@@ -8,6 +8,7 @@ import io
 import shutil
 import tempfile
 import time  # NOQA needed for some recordings
+import mock
 
 from unittest import TestCase
 
@@ -3677,6 +3678,29 @@ class S3Test(BaseTest):
             time.sleep(5)
         with self.assertRaises(Exception):
             client.get_bucket_encryption(Bucket=bname)
+
+    @mock.patch('c7n.actions.invoke.assumed_session')
+    def test_s3_invoke_lambda_assume_role_action(self, mock_assumed_session):
+
+        session_factory = self.replay_flight_data("test_s3_invoke_lambda_assume_role")
+
+        p = self.load_policy(
+            {
+                "name": "s3-invoke-lambda-assume-role",
+                "resource": "s3",
+                "actions": [{"type": "invoke-lambda",
+                             "function": "lambda-invoke-with-assume-role", "assume-role":
+                                 "arn:aws:iam::0123456789:role/service-role/lambda-assumed-role"}],
+            },
+            session_factory=session_factory,
+        )
+
+        p.resource_manager.actions[0].process([{
+            "FunctionName": "abc",
+            "payload": {},
+        }])
+
+        assert mock_assumed_session.call_count == 1
 
 
 class S3LifecycleTest(BaseTest):

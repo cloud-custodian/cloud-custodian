@@ -2,6 +2,8 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import pytest
+import json
+
 from c7n.config import Config
 from c7n.ctx import ExecutionContext
 from c7n_tencentcloud.client import Session
@@ -17,8 +19,28 @@ def credential_env_vars(monkeypatch):
 @pytest.fixture(scope="package")
 def vcr_config():
     return {
-        "filter_headers": ["authorization", "X-TC-Timestamp", "X-TC-RequestClient", "X-TC-Language"]
+        "filter_headers": ["authorization", "X-TC-Timestamp", "X-TC-RequestClient",
+                           "X-TC-Language"],
+        "before_record_response": scrub_string(["IntranetUrl", "InternetUrl", "Url"]),
     }
+
+
+def scrub_string(keys, replacement=''):
+    def before_record_response(response):
+        response_value = response['body']['string']
+        try:
+            res = json.loads(response_value)
+            if "Response" in res and "Items" in res["Response"]:
+                for i in res["Response"]["Items"]:
+                    for key in keys:
+                        if key in i:
+                            i[key] = replacement
+                response['body']['string'] = str.encode(json.dumps(res))
+            return response
+        except ValueError:
+            return response
+
+    return before_record_response
 
 
 @pytest.fixture

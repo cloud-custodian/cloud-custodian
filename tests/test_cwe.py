@@ -1,6 +1,8 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+import json
 import jmespath
+import jmespath.parser
 from pytest_terraform import terraform
 from unittest import TestCase
 
@@ -8,6 +10,13 @@ from .common import event_data, BaseTest
 
 from c7n.cwe import CloudWatchEvents
 from c7n.resources import cw
+
+
+class JmespathEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, jmespath.parser.ParsedResult):
+            return obj.parsed
+        return json.JSONEncoder.default(self, obj)
 
 
 @terraform('event_bridge_bus')
@@ -50,6 +59,48 @@ class CloudWatchEventTest(BaseTest):
                     ResourceARN=policy.resource_manager.get_arns(resources)[0]).get(
                         'Tags')}
         self.assertEqual(tags, {'App': 'Custodian'})
+
+    def test_event_rule_enable(self):
+        factory = self.replay_flight_data('test_cwe_enable_rule')
+        client = factory().client('events')
+        policy = self.load_policy(
+            {
+                'name': 'cwe-enable-rule',
+                'resource': 'aws.event-rule',
+                'actions': [
+                    {
+                        'type': 'set-rule-state',
+                        'enabled': True
+                    }
+                ]
+            },
+            session_factory=factory,
+        )
+        resources = policy.run()
+        response = client.describe_rule(
+            Name=resources[0]['Name'])
+        self.assertEqual(response['State'], 'ENABLED')
+
+    def test_event_rule_disable(self):
+        factory = self.replay_flight_data('test_cwe_disable_rule')
+        client = factory().client('events')
+        policy = self.load_policy(
+            {
+                'name': 'cwe-enable-rule',
+                'resource': 'aws.event-rule',
+                'actions': [
+                    {
+                        'type': 'set-rule-state',
+                        'enabled': False
+                    }
+                ]
+            },
+            session_factory=factory,
+        )
+        resources = policy.run()
+        response = client.describe_rule(
+            Name=resources[0]['Name'])
+        self.assertEqual(response['State'], 'DISABLED')
 
     def test_target_cross_account_remove(self):
         session_factory = self.replay_flight_data("test_cwe_rule_target_cross")
@@ -273,10 +324,13 @@ class CloudWatchEventsFacadeTest(TestCase):
             self.assertFalse(CloudWatchEvents.match(event_data(event)))
 
     def test_cloud_trail_resource(self):
+        matched_event = CloudWatchEvents.match(event_data("event-cloud-trail-s3.json"))
+        expected_event = {
+            "source": "s3.amazonaws.com",
+            "ids": jmespath.compile("detail.requestParameters.bucketName"),
+        }
+
         self.assertEqual(
-            CloudWatchEvents.match(event_data("event-cloud-trail-s3.json")),
-            {
-                "source": "s3.amazonaws.com",
-                "ids": jmespath.compile("detail.requestParameters.bucketName"),
-            },
+            json.dumps(matched_event, sort_keys=True, cls=JmespathEncoder),
+            json.dumps(expected_event, sort_keys=True, cls=JmespathEncoder),
         )

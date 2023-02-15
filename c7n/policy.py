@@ -34,10 +34,10 @@ def load(options, path, format=None, validate=True, vars=None):
     if not os.path.exists(path):
         raise IOError("Invalid path for config %r" % path)
 
-    from c7n.schema import validate, StructureParser
+    from c7n.schema import validate as schema_validate, StructureParser
     if os.path.isdir(path):
         from c7n.loader import DirectoryLoader
-        collection = DirectoryLoader(options).load_directory(path)
+        collection = DirectoryLoader(options).load_directory(path, validate)
         if validate:
             [p.validate() for p in collection]
         return collection
@@ -55,7 +55,7 @@ def load(options, path, format=None, validate=True, vars=None):
         return None
 
     if validate:
-        errors = validate(data, resource_types=rtypes)
+        errors = schema_validate(data, resource_types=rtypes)
         if errors:
             raise PolicyValidationError(
                 "Failed to validate policy %s \n %s" % (
@@ -899,13 +899,16 @@ class ConfigPollRuleMode(LambdaMode, PullMode):
         token = event.get('resultToken')
         cfg_rule_name = event['configRuleName']
         ordering_ts = cfg_event['notificationCreationTime']
+        policy_data = self.policy.data.copy()
+        policy_data.pop("filters", None)
 
         matched_resources = set()
+        unmatched_resources = set()
         for r in PullMode.run(self):
             matched_resources.add(r[resource_id])
-        unmatched_resources = set()
         for r in self.policy.resource_manager.get_resource_manager(
-                self.policy.resource_type).resources():
+                self.policy.resource_type,
+                policy_data).resources():
             if r[resource_id] not in matched_resources:
                 unmatched_resources.add(r[resource_id])
 
@@ -1271,6 +1274,10 @@ class Policy:
 
         # Update ourselves in place
         self.data = updated
+
+        # NOTE rebuild the policy conditions base on the new self.data
+        self.conditions = PolicyConditions(self, self.data)
+
         # Reload filters/actions using updated data, we keep a reference
         # for some compatiblity preservation work.
         m = self.resource_manager

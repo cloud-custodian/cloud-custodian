@@ -15,7 +15,27 @@ from c7n_tencentcloud.utils import PageMethod
 
 @resources.register("cbs")
 class CBS(QueryResourceManager):
-    """CBS"""
+    """CBS: Cloud Block Storage
+
+    Docs on CBS
+    https://www.tencentcloud.com/document/product/362
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+        - name: cbs_not_encrypt
+          resource: tencentcloud.cbs
+          filters:
+            - type: value
+              key: Encrypt
+              value: false
+        - name: cbs_unattached
+          resource: tencentcloud.cbs
+          filters:
+            - DiskState: UNATTACHED
+    """
 
     class resource_type(ResourceTypeInfo):
         """resource_type"""
@@ -24,14 +44,40 @@ class CBS(QueryResourceManager):
         service = "cbs"
         version = "2017-03-12"
         enum_spec = ("DescribeDisks", "Response.DiskSet[]", {})
-        metrics_instance_id_name = "DiskId"
         paging_def = {"method": PageMethod.Offset, "limit": {"key": "Limit", "value": 20}}
         resource_prefix = "instance"
         taggable = True
+        metrics_enabled = True
+        metrics_dimension_def = [("diskId", "DiskId")]
+        metrics_instance_id_name = "diskId"
+        metrics_namespace = "QCE/BLOCK_STORAGE"
 
 
 @CBS.action_registry.register('copy-instance-tags')
 class CbsCopyInstanceTagsAction(TencentCloudBaseAction):
+    """Action to copy tags from instance to cbs resources which are attached to it
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: copy_instance_tags
+            resource: tencentcloud.cbs
+            filters:
+              - DiskState: ATTACHED
+              - type: value
+                key: 'InstanceIdList[0]'
+                value: not-null
+            actions:
+              - type: copy-instance-tags
+                tags:
+                  - test_pro_16
+                  - test_pro_17
+              - type: copy-instance-tags
+                tags:
+                  - test_pro_18
+    """
     schema_alias = True
     schema = type_schema("copy-instance-tags",
                          tags={"type": "array"})
