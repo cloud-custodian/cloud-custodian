@@ -59,7 +59,7 @@ class SecurityHubFindingFilter(Filter):
                 query:
                   Id:
                     - Comparison: PREFIX
-                      Value: 'arn:aws:securityhub:{region}:{account_id}:subscription/aws-foundational-security-best-practices/v/1.0.0/KMS.2'  # noqa
+                      Value: 'arn:aws:securityhub:{region}:{account_id}:subscription/aws-foundational-security-best-practices/v/1.0.0/KMS.2'
                   Title:
                     - Comparison: EQUALS
                       Value: >-

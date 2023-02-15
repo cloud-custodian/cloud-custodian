@@ -60,6 +60,10 @@ skip-string-normalization = true
 
 [tool.ruff]
 line-length = 100
+# E741 - single char variables
+# E401 - multiple imports in a single line
+ignore = ["E741", "E401"]
+exclude = ["__init__.py"]
 
 [tool.pytest.ini_options]
 junit_family = "xunit2"
