@@ -43,21 +43,29 @@ def download(output):
 
 @cli.command()
 @click.option('--input', type=click.File('r'))
-@click.option('--tree', type=click.Path())
+@click.option('--tree', type=click.Path(), multiple=True)
 def inspect(input, tree):
     """show the prs that modify a given directory"""
 
     pr_data = json.load(input)
-    root = Path(str(tree))
-    dirs = set(sorted(get_dirs(root)))
 
-    table = Table(title="Pull requests")
+    for root in tree:
+        root = Path(str(root))
+        _inspect_tree(pr_data, root)
+
+
+def _inspect_tree(pr_data, root):
+    dirs = set(sorted(get_dirs(root)))
+    table = Table(title="Pull requests %s" % root.name)
     table.add_column("PR")
     table.add_column("Author")
     table.add_column("Created")
     table.add_column("Title")
 
+    found = False
+
     for pr_meta in sorted(pr_data, key=operator.itemgetter('created_at')):
+        pr_meta = dict(pr_meta)
         pr_dirs = set()
         for fname in pr_meta['files']:
             for p in Path(fname).parents:
@@ -66,14 +74,17 @@ def inspect(input, tree):
         pr_meta.pop('files')
         pr_meta['dirs'] = list(pr_dirs)
         if pr_dirs:
+            found = True
             table.add_row(
                 str(pr_meta['number']),
                 pr_meta['user'],
                 pr_meta['created_at'],
                 pr_meta['title'].strip(),
             )
-
-    console.print(table)
+    if found:
+        console.print(table)
+    else:
+        print('%s - no prs found' % root.name)
 
 
 @cli.command()
@@ -122,7 +133,7 @@ if __name__ == '__main__':
         cli()
     except SystemExit:
         raise
-    except: # noqa
+    except:  # noqa
         import sys, pdb, traceback  # noqa
 
         traceback.print_exc()
