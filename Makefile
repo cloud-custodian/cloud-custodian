@@ -124,7 +124,7 @@ ghpages:
 	git commit -m "Updated generated Sphinx documentation"
 
 lint:
-	flake8 c7n tests tools
+	ruff c7n tests tools
 
 clean:
 	make -f docs/Makefile.sphinx clean

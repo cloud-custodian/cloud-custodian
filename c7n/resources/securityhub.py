@@ -71,7 +71,7 @@ class SecurityHubFindingFilter(Filter):
                   RecordState:
                     - Comparison: EQUALS
                       Value: 'ACTIVE'
-    """
+    """  # noqa: E501
     schema = type_schema(
         'finding',
         # Many folks do an aggregator region, allow them to use that

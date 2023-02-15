@@ -1114,7 +1114,7 @@ class NoSpecificIamRoleManagedPolicy(Filter):
     def process(self, resources, event=None):
         c = local_session(self.manager.session_factory).client('iam')
         if self.data.get('value'):
-            return [r for r in resources if not self.data.get('value') in
+            return [r for r in resources if self.data.get('value') not in
             self._managed_policies(c, r)]
         return []
 
