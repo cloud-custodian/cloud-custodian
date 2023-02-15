@@ -62,6 +62,7 @@ class ConfigurationParametersFilter(ValueFilter):
                 key: value
                 op: eq
                 value: 'TLSv1.2'
+                schema_alias: False
 
     """
 
