@@ -30,9 +30,9 @@ from c7n.policy import PolicyCollection
 from c7n.provider import get_resource_class, clouds as cloud_providers
 from c7n.reports.csvout import Formatter, fs_record_set, record_set, strip_output_path
 from c7n.resources import load_available
-from c7n.utils import CONN_CACHE, dumps, filter_empty, format_string_values
+from c7n.utils import CONN_CACHE, dumps, filter_empty, format_string_values, get_policy_provider
 
-from c7n_org.utils import environ, account_tags, get_policy_provider
+from c7n_org.utils import environ, account_tags
 
 log = logging.getLogger('c7n_org')
 
