@@ -4,8 +4,6 @@
 from c7n.provider import clouds, Provider
 
 from collections import Counter, namedtuple
-from urllib.request import urlopen, urlparse, Request
-from urllib.error import HTTPError
 import contextlib
 import copy
 import datetime
@@ -17,6 +15,9 @@ import sys
 import time
 import threading
 import traceback
+from urllib import parse as urlparse
+from urllib.request import urlopen, Request
+from urllib.error import HTTPError
 
 import boto3
 
@@ -27,6 +28,7 @@ from c7n.credentials import SessionFactory
 from c7n.config import Bag
 from c7n.exceptions import ClientError, InvalidOutputConfig, PolicyValidationError
 from c7n.log import CloudWatchLogHandler
+from c7n.utils import parse_url_config
 
 from .resource_map import ResourceMap
 
@@ -115,6 +117,32 @@ def _default_account_id(options):
         options.account_id = None
 
 
+def _default_bucket_region(options):
+    if not options.output_dir.startswith('s3://'):
+        return
+    parsed = urlparse.urlparse(options.output_dir)
+    s3_conf = parse_url_config(options.output_dir)    
+    if parsed.query and s3_conf.get('region'):
+        return
+
+    client = boto3.client('s3', region_name=options.regions[0])
+    region = get_bucket_region_clientless(s3_conf.netloc, client.meta.endpoint_url)
+    if not region:
+        try:
+            region = get_bucket_region(s3_conf.netloc, client)
+        except ClientError as err:
+            raise InvalidOutputConfig(
+                f"unable to determine a region for output bucket. use explicit ?region=region_name. {s3_conf.url}: {err}"  # noqa
+            ) from None
+
+    query = f"?region={region}"
+    if parsed.query:
+        query = parsed.query + f"&region={region}"
+    parts = list(parsed)
+    parts[4] = query
+    options.output_dir = urlparse.urlunparse(parts)
+
+
 def shape_validate(params, shape_name, service):
     session = fake_session()._session
     model = session.get_service_model(service)
@@ -143,7 +171,7 @@ def get_bucket_region_clientless(bucket, s3_endpoint):
     Return a region string, or None if we're unable to determine one.
     """
     region = None
-    s3_endpoint_parts = urlparse(s3_endpoint)
+    s3_endpoint_parts = urlparse.urlparse(s3_endpoint)
     # Use a "path-style" S3 URL here to avoid failing TLS certificate validation
     # on buckets with a dot in the name.
     #
@@ -596,22 +624,16 @@ class S3Output(BlobOutput):
 
     def __init__(self, ctx, config):
         super().__init__(ctx, config)
-        # can't use a local session as we dont want an unassumed session cached.
-        s3_client = self.ctx.session_factory(assume=False).client('s3')
+        self._transfer = None
 
-        # Try determining the output bucket region via HTTP requests since
-        # that works more consistently in cross-region scenarios. Fall back
-        # the GetBucketLocation API if necessary.
-        try:
-            self.bucket_region = (
-                get_bucket_region_clientless(self.bucket, s3_client.meta.endpoint_url) or
-                get_bucket_region(self.bucket, s3_client)
-            )
-        except ClientError as err:
-            raise InvalidOutputConfig(
-                f'unable to determine a region for output bucket {self.bucket}: {err}') from None
-        self.transfer = S3Transfer(
-            self.ctx.session_factory(region=self.bucket_region, assume=False).client('s3'))
+    @property
+    def transfer(self):
+        if self._transfer:
+            return self._transfer
+        bucket_region = self.config.region or None
+        self._transfer = S3Transfer(
+            self.ctx.session_factory(region=bucket_region, assume=False).client('s3'))
+        return self._transfer
 
     def upload_file(self, path, key):
         self.transfer.upload_file(
@@ -636,9 +658,10 @@ class AWS(Provider):
         """
         _default_region(options)
         _default_account_id(options)
+        _default_bucket_region(options)
+
         if options.tracer and options.tracer.startswith('xray') and HAVE_XRAY:
             XrayTracer.initialize(utils.parse_url_config(options.tracer))
-
         return options
 
     def get_session_factory(self, options):
