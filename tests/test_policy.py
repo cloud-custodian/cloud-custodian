@@ -338,7 +338,6 @@ class PolicyMetaLint(BaseTest):
             'AwsRdsDbSnapshot',
             'AwsSecretsManagerSecret',
             # older wave
-            'AwsRdsDbInstance',
             'AwsElbv2LoadBalancer',
             'AwsEc2SecurityGroup',
             'AwsIamAccessKey',

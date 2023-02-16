@@ -3,7 +3,7 @@
     "data": {
         "metricFilters": [
             {
-                "filterName": "test-filter-name",
+                "filterName": "test-filter-name-40313",
                 "filterPattern": "{ ($.eventName = ConsoleLogin) && ($.additionalEventData.MFAUsed != Yes) }",
                 "metricTransformations": [
                     {
@@ -13,8 +13,8 @@
                         "unit": "None"
                     }
                 ],
-                "creationTime": 1668798292862,
-                "logGroupName": "cloudtrail-test-group"
+                "creationTime": 1669136241675,
+                "logGroupName": "cloudtrail-test-group20221122165720932700000003"
             }
         ],
         "ResponseMetadata": {}

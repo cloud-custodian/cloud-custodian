@@ -17,6 +17,7 @@ classifiers = [
 [tool.poetry.dependencies]
 python = "^3.7"
 kubernetes = "^10.0.1"
+jsonpatch = "^1.32"
 
 [tool.poetry.dev-dependencies]
 c7n = {path = "../..", develop = true}
