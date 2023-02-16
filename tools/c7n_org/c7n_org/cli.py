@@ -27,7 +27,7 @@ from c7n.credentials import assumed_session, SessionFactory
 from c7n.executor import MainThreadExecutor
 from c7n.config import Config
 from c7n.policy import PolicyCollection
-from c7n.provider import get_resource_class
+from c7n.provider import get_resource_class, clouds as cloud_providers
 from c7n.reports.csvout import Formatter, fs_record_set, record_set, strip_output_path
 from c7n.resources import load_available
 from c7n.utils import CONN_CACHE, dumps, filter_empty, format_string_values
@@ -660,6 +660,28 @@ def run_account(account, region, policies_config, output_path,
     return policy_counts, success
 
 
+def initialize_provider_output(policies_config, output_dir, regions):
+    """attempt to allow the provider an opportunity to initialize the output directory.
+    """
+    # most of this function is hideous :/
+
+    # use just enough configuration to attempt to limit initialization to the output
+    # dir.
+    policy_config = Config.empty(
+        account_id='112233445566',
+        output_dir=output_dir,
+        region=regions and regions[0] or "us-east-1"
+    )
+    # We just need one policy to get the provider, might be useful to have a utility for
+    # this purpose that can operate directly on data without the initialization.
+    provider_policy = {'policies': [policies_config['policies'][0]]}
+    policies = list(PolicyCollection.from_data(provider_policy, policy_config))
+
+    provider = cloud_providers[policies[0].provider_name]()
+    provider.initialize(policy_config)
+    return policy_config.output_dir
+
+
 @cli.command(name='run')
 @click.option('-c', '--config', required=True, help="Accounts config file")
 @click.option("-u", "--use", required=True)
@@ -700,6 +722,8 @@ def run(config, use, output_dir, accounts, not_accounts, tags, region,
         cache_path = os.path.expanduser("~/.cache/c7n-org")
         if not os.path.exists(cache_path):
             os.makedirs(cache_path)
+
+    output_dir = initialize_provider_output(custodian_config, output_dir, region)
 
     with executor(max_workers=WORKER_COUNT) as w:
         futures = {}

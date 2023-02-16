@@ -125,7 +125,10 @@ def _default_bucket_region(options):
     if parsed.query and s3_conf.get('region'):
         return
 
-    client = boto3.client('s3', region_name=options.regions[0])
+    params = {}
+    if options.regions:
+        params['region_name'] = options.regions[0]
+    client = boto3.client('s3', **params)
     region = get_bucket_region_clientless(s3_conf.netloc, client.meta.endpoint_url)
     if not region:
         try:
