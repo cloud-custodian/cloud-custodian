@@ -622,6 +622,15 @@ def parse_url_config(url):
     return conf
 
 
+def get_policy_provider(policy_data):
+    if isinstance(policy_data['resource'], list):
+        provider_name, _ = policy_data['resource'][0].split('.', 1)
+    elif '.' in policy_data['resource']:
+        provider_name, resource_type = policy_data['resource'].split('.', 1)
+    else:
+        provider_name = 'aws'
+    return provider_name
+
 def get_proxy_url(url):
     proxies = getproxies()
     parsed = urlparse.urlparse(url)

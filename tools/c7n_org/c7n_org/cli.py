@@ -32,7 +32,7 @@ from c7n.reports.csvout import Formatter, fs_record_set, record_set, strip_outpu
 from c7n.resources import load_available
 from c7n.utils import CONN_CACHE, dumps, filter_empty, format_string_values
 
-from c7n_org.utils import environ, account_tags
+from c7n_org.utils import environ, account_tags, get_policy_provider
 
 log = logging.getLogger('c7n_org')
 
@@ -672,12 +672,8 @@ def initialize_provider_output(policies_config, output_dir, regions):
         output_dir=output_dir,
         region=regions and regions[0] or "us-east-1"
     )
-    # We just need one policy to get the provider, might be useful to have a utility for
-    # this purpose that can operate directly on data without the initialization.
-    provider_policy = {'policies': [policies_config['policies'][0]]}
-    policies = list(PolicyCollection.from_data(provider_policy, policy_config))
-
-    provider = cloud_providers[policies[0].provider_name]()
+    provider_name = get_policy_provider(policies_config['policies'][0])
+    provider = cloud_providers[provider_name]()
     provider.initialize(policy_config)
     return policy_config.output_dir
 
