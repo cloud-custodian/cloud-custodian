@@ -631,6 +631,7 @@ def get_policy_provider(policy_data):
         provider_name = 'aws'
     return provider_name
 
+
 def get_proxy_url(url):
     proxies = getproxies()
     parsed = urlparse.urlparse(url)

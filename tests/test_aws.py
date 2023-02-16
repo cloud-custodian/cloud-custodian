@@ -394,7 +394,7 @@ def test_default_bucket_region_with_explicit_region():
     'tests/data/vcr_cassettes/test_output/default_bucket_region_public.yaml', record_mode='all')
 def test_default_bucket_region_is_public():
     output_dir = "s3://awsapichanges.info"
-    conf = Config.empty(output_dir=output_dir, region="us-west-2")
+    conf = Config.empty(output_dir=output_dir, regions=["us-east-1"])
     with pytest.raises(InvalidOutputConfig) as ecm:
         aws._default_bucket_region(conf)
 
@@ -405,7 +405,7 @@ def test_default_bucket_region_is_public():
     'tests/data/vcr_cassettes/test_output/default_bucket_region.yaml', record_mode='none')
 def test_default_bucket_region_s3():
     output_dir = "s3://slack.cloudcustodian.io"
-    conf = Config.empty(output_dir=output_dir, region="all")
+    conf = Config.empty(output_dir=output_dir, regions=["all"])
     aws._default_bucket_region(conf)
     assert conf.output_dir == output_dir + "?region=us-east-1"
 
@@ -414,7 +414,7 @@ def test_default_bucket_region_s3():
     'tests/data/vcr_cassettes/test_output/default_bucket_not_found.yaml', record_mode='none')
 def test_default_bucket_region_not_found():
     output_dir = "s3://myfakebucketdoesnotexist"
-    conf = Config.empty(output_dir=output_dir, region="us-west-2")
+    conf = Config.empty(output_dir=output_dir, regions=["us-west-2"])
     with pytest.raises(InvalidOutputConfig) as ecm:
         aws._default_bucket_region(conf)
 

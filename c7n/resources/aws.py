@@ -206,17 +206,22 @@ def inspect_bucket_region(bucket, s3_endpoint, allow_public=False):
     bucket_endpoint = f'https://{s3_endpoint_parts.netloc}/{bucket}'
     request = Request(bucket_endpoint, method='HEAD')
     try:
-        # Unauthenticated request always raise an error the status code
-        # and response headers provide context for where the bucket is.
+        # For private buckets the head request will always raise an
+        # http error, the status code and response headers provide
+        # context for where the bucket is. For public buckets we
+        # default to raising an exception as unsuitable location at
+        # least for the output use case.
         #
-        # Dynamic use of urllib trips up static analyzers because
-        # of the potential to accidentally allow unexpected schemes
-        # like file:/. Here we're hardcoding the https scheme, so
-        # we can ignore those specific checks.
+        # Dynamic use of urllib trips up static analyzers because of
+        # the potential to accidentally allow unexpected schemes like
+        # file:/. Here we're hardcoding the https scheme, so we can
+        # ignore those specific checks.
         #
         # nosemgrep: python.lang.security.audit.dynamic-urllib-use-detected.dynamic-urllib-use-detected # noqa
         response = urlopen(request)  # nosec B310
+        # Successful response indicates a public accessible bucket in the same region
         region = response.headers.get('x-amz-bucket-region')
+
         if not allow_public:
             raise ValueError("bucket: '{bucket}' is publicly accessible")
     except HTTPError as err:
@@ -230,7 +235,6 @@ def inspect_bucket_region(bucket, s3_endpoint, allow_public=False):
         region = err.headers.get('x-amz-bucket-region')
 
     return region
-
 
 
 class Arn(namedtuple('_Arn', (
