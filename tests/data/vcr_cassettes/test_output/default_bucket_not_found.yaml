@@ -239,4 +239,64 @@ interactions:
     status:
       code: 404
       message: Not Found
+- request:
+    body: null
+    headers:
+      Connection:
+      - close
+      Host:
+      - s3.us-west-2.amazonaws.com
+      User-Agent:
+      - Python-urllib/3.10
+    method: HEAD
+    uri: https://s3.us-west-2.amazonaws.com/myfakebucketdoesnotexist
+  response:
+    body:
+      string: ''
+    headers:
+      Connection:
+      - close
+      Content-Type:
+      - application/xml
+      Date:
+      - Thu, 16 Feb 2023 23:31:03 GMT
+      Server:
+      - AmazonS3
+      x-amz-id-2:
+      - mT3g8cYh+V9SLCP+nNfRfa1fud7+6Pk48HY5WV+zljjnC8S9aE0XnmJVtZfEbugjbOwZpO6ZeH0=
+      x-amz-request-id:
+      - JDG2B7NZFVRKWNDW
+    status:
+      code: 404
+      message: Not Found
+- request:
+    body: null
+    headers:
+      Connection:
+      - close
+      Host:
+      - s3.us-west-2.amazonaws.com
+      User-Agent:
+      - Python-urllib/3.10
+    method: HEAD
+    uri: https://s3.us-west-2.amazonaws.com/myfakebucketdoesnotexist
+  response:
+    body:
+      string: ''
+    headers:
+      Connection:
+      - close
+      Content-Type:
+      - application/xml
+      Date:
+      - Thu, 16 Feb 2023 23:31:29 GMT
+      Server:
+      - AmazonS3
+      x-amz-id-2:
+      - ouq5nPVXnW+nEj1kk8OFp2mW6oVp4Atj3tGJLkrnLNam8MprSIb6T0vaELcR921dNblKmFIz21E=
+      x-amz-request-id:
+      - C3YPBM27CZEYHE86
+    status:
+      code: 404
+      message: Not Found
 version: 1

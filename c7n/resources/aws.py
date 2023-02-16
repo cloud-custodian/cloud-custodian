@@ -11,13 +11,14 @@ import itertools
 import logging
 import os
 import operator
+import socket
 import sys
 import time
 import threading
 import traceback
 from urllib import parse as urlparse
 from urllib.request import urlopen, Request
-from urllib.error import HTTPError
+from urllib.error import HTTPError, URLError
 
 import boto3
 
@@ -28,7 +29,7 @@ from c7n.credentials import SessionFactory
 from c7n.config import Bag
 from c7n.exceptions import InvalidOutputConfig, PolicyValidationError
 from c7n.log import CloudWatchLogHandler
-from c7n.utils import parse_url_config
+from c7n.utils import parse_url_config, backoff_delays
 
 from .resource_map import ResourceMap
 
@@ -218,7 +219,7 @@ def inspect_bucket_region(bucket, s3_endpoint, allow_public=False):
         # ignore those specific checks.
         #
         # nosemgrep: python.lang.security.audit.dynamic-urllib-use-detected.dynamic-urllib-use-detected # noqa
-        response = urlopen(request)  # nosec B310
+        response = socket_retry(urlopen, request)  # nosec B310
         # Successful response indicates a public accessible bucket in the same region
         region = response.headers.get('x-amz-bucket-region')
 
@@ -235,6 +236,24 @@ def inspect_bucket_region(bucket, s3_endpoint, allow_public=False):
         region = err.headers.get('x-amz-bucket-region')
 
     return region
+
+
+def socket_retry(func, *args, **kw):
+    for idx, delay in enumerate(backoff_delays(1, 4, 4 ** 4, jitter=True)):
+        try:
+            return func(*args, **kw)
+        except URLError as err:
+            if not isinstance(err.reason, socket.error):
+                raise
+            # we want to capture some common issues
+            # for cases where we are connecting through an intermediary proxy.
+            # 104 - Connection reset by peer
+            # 110 - Connection timed out
+            if err.reason.errno not in (104, 110):
+                raise
+            if idx == 4:
+                raise            
+        time.sleep(delay)
 
 
 class Arn(namedtuple('_Arn', (
