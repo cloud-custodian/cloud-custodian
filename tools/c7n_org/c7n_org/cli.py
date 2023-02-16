@@ -661,12 +661,13 @@ def run_account(account, region, policies_config, output_path,
 
 
 def initialize_provider_output(policies_config, output_dir, regions):
-    """attempt to allow the provider an opportunity to initialize the output directory.
+    """allow the provider an opportunity to initialize the output config.
     """
-    # most of this function is hideous :/
-
-    # use just enough configuration to attempt to limit initialization to the output
-    # dir.
+    # use just enough configuration to attempt to limit initialization
+    # to the output dir. we pass in dummy values for several settings
+    # that if missing would cause at least the aws or azure provider
+    # to do additional dynamic lookups that aren't meaningful in the
+    # context of c7n-org.
     policy_config = Config.empty(
         account_id='112233445566',
         output_dir=output_dir,
