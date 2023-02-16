@@ -26,7 +26,7 @@ from boto3.s3.transfer import S3Transfer
 
 from c7n.credentials import SessionFactory
 from c7n.config import Bag
-from c7n.exceptions import ClientError, InvalidOutputConfig, PolicyValidationError
+from c7n.exceptions import InvalidOutputConfig, PolicyValidationError
 from c7n.log import CloudWatchLogHandler
 from c7n.utils import parse_url_config
 
@@ -118,32 +118,31 @@ def _default_account_id(options):
 
 
 def _default_bucket_region(options):
+    # modify options to format s3 output urls with explicit region.
     if not options.output_dir.startswith('s3://'):
         return
+
     parsed = urlparse.urlparse(options.output_dir)
     s3_conf = parse_url_config(options.output_dir)    
-    if parsed.query and s3_conf.get('region'):
+    if parsed.query and s3_conf.get("region"):
         return
 
-    params = {}
+    # s3 clients default to us-east-1 if no region is specified, but for partition
+    # support we default to using a passed in region if given.
+    region = None
     if options.regions:
-        params['region_name'] = options.regions[0]
-    client = boto3.client('s3', **params)
-    region = get_bucket_region_clientless(s3_conf.netloc, client.meta.endpoint_url)
-    if not region:
-        try:
-            region = get_bucket_region(s3_conf.netloc, client)
-        except ClientError as err:
-            raise InvalidOutputConfig(
-                f"unable to determine a region for output bucket. use explicit ?region=region_name. {s3_conf.url}: {err}"  # noqa
-            ) from None
+        region = options.regions[0]
 
-    query = f"?region={region}"
-    if parsed.query:
-        query = parsed.query + f"&region={region}"
-    parts = list(parsed)
-    parts[4] = query
-    options.output_dir = urlparse.urlunparse(parts)
+    # we're operating pre the expansion of symbolic name all into actual regions.
+    if region == "all":
+        region = None
+
+    try:
+        options.output_dir = get_bucket_url_with_region(options.output_dir, region)
+    except ValueError as err:
+        invalid_output = InvalidOutputConfig(str(err))
+        invalid_output.__suppress_context__ = True
+        raise invalid_output
 
 
 def shape_validate(params, shape_name, service):
@@ -156,12 +155,31 @@ def shape_validate(params, shape_name, service):
         raise PolicyValidationError(report.generate_report())
 
 
-def get_bucket_region_clientless(bucket, s3_endpoint):
+def get_bucket_url_with_region(bucket_url, region):
+    parsed = urlparse.urlparse(bucket_url)
+    s3_conf = parse_url_config(bucket_url)
+    params = {}
+    if region:
+        params['region_name'] = region
+
+    client = boto3.client('s3', **params)
+    region = inspect_bucket_region(s3_conf.netloc, client.meta.endpoint_url)
+    if not region:
+        raise ValueError(f"could not determine region for output bucket, use explicit ?region=region_name. {s3_conf.url}")  # noqa
+    query = f"region={region}"
+    if parsed.query:
+        query = parsed.query + f"&region={region}"
+    parts = list(parsed)
+    parts[4] = query
+    return urlparse.urlunparse(parts)
+    
+
+def inspect_bucket_region(bucket, s3_endpoint):
     """Attempt to determine a bucket region without a client
 
     We can make an unauthenticated HTTP HEAD request to S3 in an attempt to find a bucket's
     region. This avoids some issues with cross-account/cross-region uses of the
-    GetBucketPolicy API action. Because bucket names are unique within
+    GetBucketLocation or HeadBucket API action. Because bucket names are unique within
     AWS partitions, we can make requests to a single regional S3 endpoint
     and get redirected if a bucket lives in another region within the
     same partition.
@@ -188,32 +206,28 @@ def get_bucket_region_clientless(bucket, s3_endpoint):
     bucket_endpoint = f'https://{s3_endpoint_parts.netloc}/{bucket}'
     request = Request(bucket_endpoint, method='HEAD')
     try:
+        # Unauthenticated request always raise an error the status code
+        # and response headers provide context for where the bucket is.
+        #
         # Dynamic use of urllib trips up static analyzers because
         # of the potential to accidentally allow unexpected schemes
         # like file:/. Here we're hardcoding the https scheme, so
         # we can ignore those specific checks.
+        #
         # nosemgrep: python.lang.security.audit.dynamic-urllib-use-detected.dynamic-urllib-use-detected # noqa
-        response = urlopen(request)  # nosec B310
-        region = response.headers.get('x-amz-bucket-region')
+        urlopen(request)  # nosec B310
     except HTTPError as err:
-        # Permission errors or redirects for valid buckets should still contain a
-        # header we can use to determine the bucket region.
+        # Returns 404 'Not Found' for buckets that don't exist
+        if err.status == 404:
+            raise ValueError(f"bucket '{bucket}' does not exist")
+        # Permission errors (403) or redirects (301) for valid buckets
+        # should still contain a header we can use to determine the
+        # bucket region. Permission errors are indicative of correct
+        # region, while redirects are for cross region.
         region = err.headers.get('x-amz-bucket-region')
 
     return region
 
-
-def get_bucket_region(bucket, client):
-    """Determine a bucket's region using the GetBucketLocation API action
-
-    Look up a bucket's location constraint and map it to a region name as described in
-    https://docs.aws.amazon.com/AmazonS3/latest/API/API_GetBucketLocation.html
-    """
-    location = client.get_bucket_location(Bucket=bucket)['LocationConstraint']
-
-    # Remap region for cases where the location constraint doesn't match
-    region = {None: 'us-east-1', 'EU': 'eu-west-1'}.get(location, location)
-    return region
 
 
 class Arn(namedtuple('_Arn', (

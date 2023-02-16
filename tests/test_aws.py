@@ -4,10 +4,10 @@
 import json
 import threading
 
-from mock import Mock
+from unittest.mock import Mock
 
-from c7n.config import Bag
-from c7n.exceptions import PolicyValidationError
+from c7n.config import Bag, Config
+from c7n.exceptions import PolicyValidationError, InvalidOutputConfig
 from c7n.resources import aws, load_resources
 from c7n import output
 
@@ -19,6 +19,9 @@ from .common import BaseTest
 
 from aws_xray_sdk.core.models.segment import Segment
 from aws_xray_sdk.core.models.subsegment import Subsegment
+
+import pytest
+import vcr
 
 
 class TraceDoc(Bag):
@@ -371,3 +374,67 @@ class OutputLogsTest(BaseTest):
             'aws://master/custodian?region=us-east-2&stream=testing', ctx)
         stream = log_output.get_handler()
         self.assertTrue(stream.log_stream == 'testing')
+
+
+def test_default_bucket_region_with_no_s3():
+    output_dir = "/tmp"
+    conf = Config.empty(output_dir=output_dir)
+    aws._default_bucket_region(conf)
+    assert output_dir == conf.output_dir
+
+
+def test_default_bucket_region_with_explicit_region():
+    output_dir = "s3://aws?region=xyz"
+    conf = Config.empty(output_dir=output_dir)
+    aws._default_bucket_region(conf)
+    assert output_dir == conf.output_dir
+
+
+@vcr.use_cassette(
+    'tests/data/vcr_cassettes/test_output/default_bucket_region.yaml', record_mode='none')
+def test_default_bucket_region_s3():
+    output_dir = "s3://slack.cloudcustodian.io"
+    conf = Config.empty(output_dir=output_dir, region="all")
+    aws._default_bucket_region(conf)
+    assert conf.output_dir == output_dir + "?region=us-east-1"
+
+
+@vcr.use_cassette(
+    'tests/data/vcr_cassettes/test_output/default_bucket_not_found.yaml', record_mode='none')
+def test_default_bucket_region_not_found():
+    output_dir = "s3://myfakebucketdoesnotexist"
+    conf = Config.empty(output_dir=output_dir, region="us-west-2")
+    with pytest.raises(InvalidOutputConfig) as ecm:
+        aws._default_bucket_region(conf)
+
+    assert "does not exist" in str(ecm.value)
+
+
+@vcr.use_cassette(
+    'tests/data/vcr_cassettes/test_output/bucket_not_found.yaml', record_mode='none')
+def test_get_bucket_url_s3_not_found():
+    with pytest.raises(ValueError) as ecm:
+        aws.get_bucket_url_with_region(
+            "s3://myfakebucketdoesnotexist", None
+        )
+    assert "does not exist" in str(ecm.value)
+
+
+@vcr.use_cassette(
+    'tests/data/vcr_cassettes/test_output/cross_region.yaml', record_mode='none')
+def test_get_bucket_url_s3_cross_region():
+    assert aws.get_bucket_url_with_region(
+        "s3://slack.cloudcustodian.io",
+        "us-west-2") == "s3://slack.cloudcustodian.io?region=us-east-1"
+
+
+@vcr.use_cassette(
+    'tests/data/vcr_cassettes/test_output/same_region.yaml', record_mode='none')
+def test_get_bucket_url_s3_same_region():
+    assert aws.get_bucket_url_with_region(
+        "s3://slack.cloudcustodian.io?",
+        None) == "s3://slack.cloudcustodian.io?region=us-east-1"
+
+    assert aws.get_bucket_url_with_region(
+        "s3://slack.cloudcustodian.io?param=x",
+        "us-east-1") == "s3://slack.cloudcustodian.io?param=x&region=us-east-1"
