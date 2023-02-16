@@ -174,7 +174,7 @@ def get_bucket_url_with_region(bucket_url, region):
     return urlparse.urlunparse(parts)
     
 
-def inspect_bucket_region(bucket, s3_endpoint):
+def inspect_bucket_region(bucket, s3_endpoint, allow_public=False):
     """Attempt to determine a bucket region without a client
 
     We can make an unauthenticated HTTP HEAD request to S3 in an attempt to find a bucket's
@@ -215,7 +215,10 @@ def inspect_bucket_region(bucket, s3_endpoint):
         # we can ignore those specific checks.
         #
         # nosemgrep: python.lang.security.audit.dynamic-urllib-use-detected.dynamic-urllib-use-detected # noqa
-        urlopen(request)  # nosec B310
+        response = urlopen(request)  # nosec B310
+        region = response.headers.get('x-amz-bucket-region')
+        if not allow_public:
+            raise ValueError("bucket: '{bucket}' is publicly accessible")
     except HTTPError as err:
         # Returns 404 'Not Found' for buckets that don't exist
         if err.status == 404:

@@ -391,6 +391,17 @@ def test_default_bucket_region_with_explicit_region():
 
 
 @vcr.use_cassette(
+    'tests/data/vcr_cassettes/test_output/default_bucket_region_public.yaml', record_mode='all')
+def test_default_bucket_region_is_public():
+    output_dir = "s3://awsapichanges.info"
+    conf = Config.empty(output_dir=output_dir, region="us-west-2")
+    with pytest.raises(InvalidOutputConfig) as ecm:
+        aws._default_bucket_region(conf)
+
+    assert "is publicly accessible" in str(ecm.value)
+
+
+@vcr.use_cassette(
     'tests/data/vcr_cassettes/test_output/default_bucket_region.yaml', record_mode='none')
 def test_default_bucket_region_s3():
     output_dir = "s3://slack.cloudcustodian.io"
