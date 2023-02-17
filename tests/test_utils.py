@@ -671,3 +671,13 @@ def test_parse_date_floor():
     assert utils.parse_date(1) is None
     assert utils.parse_date('3000') is None
     assert utils.parse_date('30') is None
+
+
+def test_output_path_join():
+    assert utils.join_output_path(
+        's3://cross-region-c7n/iam-check?region=us-east-2',
+        'Samuel',
+        'us-east-1'
+    ) == 's3://cross-region-c7n/iam-check/Samuel/us-east-1?region=us-east-2'
+        
+    

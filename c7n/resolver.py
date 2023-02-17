@@ -57,7 +57,7 @@ class URIResolver:
         if parsed.query:
             params.update(dict(parse_qsl(parsed.query)))
         region = params.pop('region', None)
-        client = self.session_factory().client('s3', region_name=region) 
+        client = self.session_factory().client('s3', region_name=region)
         result = client.get_object(**params)
         body = result['Body'].read()
         if isinstance(body, str):

@@ -5,12 +5,13 @@
 
 import csv
 from collections import Counter
+from datetime import timedelta, datetime
 import logging
 import os
 import time
+from urllib import parse as urlparse
 import subprocess  # nosec
 import sys
-from datetime import timedelta, datetime
 
 import multiprocessing
 from concurrent.futures import (
@@ -25,12 +26,13 @@ import jsonschema
 
 from c7n.credentials import assumed_session, SessionFactory
 from c7n.executor import MainThreadExecutor
+from c7n.exceptions import InvalidOutputConfig
 from c7n.config import Config
 from c7n.policy import PolicyCollection
 from c7n.provider import get_resource_class, clouds as cloud_providers
 from c7n.reports.csvout import Formatter, fs_record_set, record_set, strip_output_path
 from c7n.resources import load_available
-from c7n.utils import CONN_CACHE, dumps, filter_empty, format_string_values, get_policy_provider
+from c7n.utils import CONN_CACHE, dumps, filter_empty, format_string_values, get_policy_provider, join_output_path
 
 from c7n_org.utils import environ, account_tags
 
@@ -509,6 +511,9 @@ def run_script(config, output_dir, accounts, tags, region, echo, serial, script_
 
     success = True
 
+    if "://" in output_dir:
+        raise InvalidOutputConfig('run-script only supports local directory outputs')
+
     with executor(max_workers=WORKER_COUNT) as w:
         futures = {}
         for a in accounts_config.get('accounts', ()):
@@ -582,9 +587,7 @@ def run_account(account, region, policies_config, output_path,
     CONN_CACHE.time = None
     load_available()
 
-    # allow users to specify interpolated output paths
-    if '{' not in output_path:
-        output_path = os.path.join(output_path, account['name'], region)
+    output_path = join_output_path(output_path, account['name'], region)
 
     cache_path = os.path.join(cache_path, "%s-%s.cache" % (account['account_id'], region))
 
