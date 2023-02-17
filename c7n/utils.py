@@ -632,7 +632,7 @@ def join_output_path(output_path, *parts):
 
     # handle urls with query strings
     parsed = urlparse.urlparse(output_path)
-    updated_path = "/".join(parsed.path, *parts)
+    updated_path = "/".join((parsed.path, *parts))
     parts = list(parsed)
     parts[2] = updated_path
     return urlparse.urlunparse(parts)
