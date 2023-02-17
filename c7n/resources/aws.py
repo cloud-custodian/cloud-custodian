@@ -124,7 +124,7 @@ def _default_bucket_region(options):
         return
 
     parsed = urlparse.urlparse(options.output_dir)
-    s3_conf = parse_url_config(options.output_dir)    
+    s3_conf = parse_url_config(options.output_dir)
     if parsed.query and s3_conf.get("region"):
         return
 
@@ -173,7 +173,7 @@ def get_bucket_url_with_region(bucket_url, region):
     parts = list(parsed)
     parts[4] = query
     return urlparse.urlunparse(parts)
-    
+
 
 def inspect_bucket_region(bucket, s3_endpoint, allow_public=False):
     """Attempt to determine a bucket region without a client
@@ -219,7 +219,7 @@ def inspect_bucket_region(bucket, s3_endpoint, allow_public=False):
         # ignore those specific checks.
         #
         # nosemgrep: python.lang.security.audit.dynamic-urllib-use-detected.dynamic-urllib-use-detected # noqa
-        response = socket_retry(urlopen, request)  # nosec B310
+        response = url_socket_retry(urlopen, request)  # nosec B310
         # Successful response indicates a public accessible bucket in the same region
         region = response.headers.get('x-amz-bucket-region')
 
@@ -238,21 +238,30 @@ def inspect_bucket_region(bucket, s3_endpoint, allow_public=False):
     return region
 
 
-def socket_retry(func, *args, **kw):
-    for idx, delay in enumerate(backoff_delays(1, 4, 4 ** 4, jitter=True)):
+def url_socket_retry(func, *args, **kw):
+    """retry a urllib operations  in the event of certain socket errors.
+
+    we want to capture some common issues for cases where we are
+    connecting through an intermediary proxy.
+
+     - 104 - Connection reset by peer
+     - 110 - Connection timed out
+    """
+    min_delay = 1
+    max_delay = 32
+    max_attempts = 4
+
+    for idx, delay in enumerate(
+            backoff_delays(min_delay, max_delay, jitter=True)):
         try:
             return func(*args, **kw)
         except URLError as err:
             if not isinstance(err.reason, socket.error):
                 raise
-            # we want to capture some common issues
-            # for cases where we are connecting through an intermediary proxy.
-            # 104 - Connection reset by peer
-            # 110 - Connection timed out
             if err.reason.errno not in (104, 110):
                 raise
-            if idx == 4:
-                raise            
+            if idx == max_attempts - 1:
+                raise
         time.sleep(delay)
 
 

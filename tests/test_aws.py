@@ -2,8 +2,10 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import json
+import time
 import threading
-
+import socket
+from urllib.error import URLError
 from unittest.mock import Mock
 
 from c7n.config import Bag, Config
@@ -374,6 +376,44 @@ class OutputLogsTest(BaseTest):
             'aws://master/custodian?region=us-east-2&stream=testing', ctx)
         stream = log_output.get_handler()
         self.assertTrue(stream.log_stream == 'testing')
+
+
+def test_url_socket_retry(monkeypatch):
+    monkeypatch.setattr(time, "sleep", lambda x: x)
+
+    # case for unknown error
+    fvalues = [URLError(socket.error(104, 'Connection reset by peer')),
+               URLError(socket.gaierror(8, 'Name or node unknown'))]
+
+    def freturns():
+        ret = fvalues.pop()
+        if isinstance(ret, URLError):
+            raise ret
+        return ret
+
+    with pytest.raises(URLError) as ecm:
+        aws.url_socket_retry(freturns)
+
+    assert 'Name or node unknown' in str(ecm.value)
+
+    # case for retry exhaustion
+    fvalues[:] = [
+        URLError(socket.error(110, 'Connection timed out')),
+        URLError(socket.error(110, 'Connection timed out')),
+        URLError(socket.error(110, 'Connection timed out')),
+        URLError(socket.error(110, 'Connection timed out')),
+    ]
+
+    with pytest.raises(URLError) as ecm:
+        aws.url_socket_retry(freturns)
+
+    # case for success
+    fvalues[:] = [
+        URLError(socket.error(110, 'Connection timed out')),
+        42
+    ]
+
+    assert aws.url_socket_retry(freturns) == 42
 
 
 def test_default_bucket_region_with_no_s3():
