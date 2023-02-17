@@ -181,6 +181,7 @@ class RuleRemediation(Filter):
 
     schema = type_schema('remediation',
         rule_name={'type': 'string'},
+        rule_prefix={'type': 'string'},
         remediation={
             'type': 'object',
             'properties': {

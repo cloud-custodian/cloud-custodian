@@ -985,35 +985,105 @@ class IamRoleInlinePolicy(Filter):
 
 
 @Role.filter_registry.register('has-specific-managed-policy')
-class SpecificIamRoleManagedPolicy(Filter):
-    """Filter IAM roles that has a specific policy attached
-
-    For example, if the user wants to check all roles with 'admin-policy':
+class SpecificIamRoleManagedPolicy(ValueFilter):
+    """Find IAM roles that have a specific policy attached
 
     :example:
+
+    Check for roles with 'admin-policy' attached:
 
     .. code-block:: yaml
 
         policies:
           - name: iam-roles-have-admin
-            resource: iam-role
+            resource: aws.iam-role
             filters:
               - type: has-specific-managed-policy
                 value: admin-policy
+
+    :example:
+
+    Check for roles with an attached policy matching
+    a given list:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: iam-roles-with-selected-policies
+            resource: aws.iam-role
+            filters:
+              - type: has-specific-managed-policy
+                op: in
+                value:
+                  - AmazonS3FullAccess
+                  - AWSOrganizationsFullAccess
+
+    :example:
+
+    Check for roles with attached policy names matching a pattern:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: iam-roles-with-full-access-policies
+            resource: aws.iam-role
+            filters:
+              - type: has-specific-managed-policy
+                op: glob
+                value: "*FullAccess"
+
+    Check for roles with attached policy ARNs matching a pattern:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: iam-roles-with-aws-full-access-policies
+            resource: aws.iam-role
+            filters:
+              - type: has-specific-managed-policy
+                key: PolicyArn
+                op: regex
+                value: "arn:aws:iam::aws:policy/.*FullAccess"
     """
 
-    schema = type_schema('has-specific-managed-policy', value={'type': 'string'})
+    schema = type_schema('has-specific-managed-policy', rinherit=ValueFilter.schema)
     permissions = ('iam:ListAttachedRolePolicies',)
+    annotation_key = 'c7n:AttachedPolicies'
+    matched_annotation_key = 'c7n:MatchedPolicies'
+    schema_alias = False
 
-    def _managed_policies(self, client, resource):
-        return [r['PolicyName'] for r in client.list_attached_role_policies(
-            RoleName=resource['RoleName'])['AttachedPolicies']]
+    def __init__(self, data, manager=None):
+        # Preserve backward compatibility
+        if 'key' not in data:
+            data['key'] = 'PolicyName'
+        super(SpecificIamRoleManagedPolicy, self).__init__(data, manager)
+
+    def get_managed_policies(self, client, role_set):
+        for role in role_set:
+            role[self.annotation_key] = [
+                role_policy
+                for role_policy
+                in client.list_attached_role_policies(
+                    RoleName=role['RoleName'])['AttachedPolicies']
+            ]
 
     def process(self, resources, event=None):
-        c = local_session(self.manager.session_factory).client('iam')
-        if self.data.get('value'):
-            return [r for r in resources if self.data.get('value') in self._managed_policies(c, r)]
-        return []
+        client = local_session(self.manager.session_factory).client('iam')
+        with self.executor_factory(max_workers=2) as w:
+            augment_set = [r for r in resources if self.annotation_key not in r]
+            self.log.debug(
+                "Querying %d roles' attached policies" % len(augment_set))
+            list(w.map(
+                functools.partial(self.get_managed_policies, client),
+                chunks(augment_set, 50)))
+
+        matched = []
+        for r in resources:
+            matched_keys = [k for k in r[self.annotation_key] if self.match(k)]
+            self.merge_annotation(r, self.matched_annotation_key, matched_keys)
+            if matched_keys:
+                matched.append(r)
+        return matched
 
 
 @Role.filter_registry.register('no-specific-managed-policy')
@@ -2817,38 +2887,109 @@ class OpenIdProvider(QueryResourceManager):
 
 
 @InstanceProfile.filter_registry.register('has-specific-managed-policy')
-class SpecificIamProfileManagedPolicy(Filter):
+class SpecificIamProfileManagedPolicy(ValueFilter):
     """Filter an IAM instance profile that contains an IAM role that has a specific managed IAM
        policy. If an IAM instance profile does not contain an IAM role, then it will be treated
        as not having the policy.
 
-    :Example:
+    :example:
+
+    Check for instance profile roles with 'admin-policy' attached:
 
     .. code-block:: yaml
 
         policies:
-          - name: iam-profile-has-admin-policy
-            resource: iam-profile
+          - name: iam-profiles-have-admin
+            resource: aws.iam-profile
             filters:
               - type: has-specific-managed-policy
                 value: admin-policy
+
+    :example:
+
+    Check for instance profile roles with an attached policy matching
+    a given list:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: iam-profiles-with-selected-policies
+            resource: aws.iam-profile
+            filters:
+              - type: has-specific-managed-policy
+                value:
+                  - AmazonS3FullAccess
+                  - AWSOrganizationsFullAccess
+
+    :example:
+
+    Check for instance profile roles with attached policy names matching
+    a pattern:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: iam-profiles-with-full-access-policies
+            resource: aws.iam-profile
+            filters:
+              - type: has-specific-managed-policy
+                op: glob
+                value: "*FullAccess"
+
+    Check for instance profile roles with attached policy ARNs matching
+    a pattern:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: iam-profiles-with-aws-full-access-policies
+            resource: aws.iam-profile
+            filters:
+              - type: has-specific-managed-policy
+                key: PolicyArn
+                op: regex
+                value: "arn:aws:iam::aws:policy/.*FullAccess"
     """
 
-    schema = type_schema('has-specific-managed-policy', value={'type': 'string'})
+    schema = type_schema('has-specific-managed-policy', rinherit=ValueFilter.schema)
     permissions = ('iam:ListAttachedRolePolicies',)
+    annotation_key = 'c7n:AttachedPolicies'
+    matched_annotation_key = 'c7n:MatchedPolicies'
+    schema_alias = False
 
-    def _managed_policies(self, client, role_name):
-        attached_policies = client.list_attached_role_policies(
-            RoleName=role_name)['AttachedPolicies']
-        return [p['PolicyName'] for p in attached_policies]
+    def __init__(self, data, manager=None):
+        # Preserve backward compatibility
+        if 'key' not in data:
+            data['key'] = 'PolicyName'
+        super(SpecificIamProfileManagedPolicy, self).__init__(data, manager)
 
-    def has_managed_policy(self, client, resource):
-        for role in resource.get('Roles', []):
-            managed_policies = self._managed_policies(client, role.get('RoleName'))
-            if self.data.get('value') in managed_policies:
-                return True
-        return False
+    # This code assumes a single IAM role in the profile and the annotation
+    # is added to the profile resource, not the role
+    def get_managed_policies(self, client, prof_set):
+        for prof in prof_set:
+            prof[self.annotation_key] = []
+            for role in prof.get('Roles', []):
+                prof[self.annotation_key] = [
+                    role_policy
+                    for role_policy
+                    in client.list_attached_role_policies(
+                        RoleName=role['RoleName'])['AttachedPolicies']
+                ]
 
     def process(self, resources, event=None):
-        c = local_session(self.manager.session_factory).client('iam')
-        return [r for r in resources if self.has_managed_policy(c, r)]
+        client = local_session(self.manager.session_factory).client('iam')
+        with self.executor_factory(max_workers=2) as w:
+            augment_set = [r for r in resources if self.annotation_key not in r]
+            self.log.debug(
+                "Querying %d roles' attached policies" % len(augment_set))
+            list(w.map(
+                functools.partial(self.get_managed_policies, client),
+                chunks(augment_set, 50)))
+
+        matched = []
+        for r in resources:
+            matched_keys = [k for k in r[self.annotation_key] if self.match(k)]
+            self.merge_annotation(r, self.matched_annotation_key, matched_keys)
+            if matched_keys:
+                matched.append(r)
+        return matched

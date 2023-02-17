@@ -11,7 +11,7 @@ class TerraformGraph(ResourceGraph):
     resolver = None
 
     def __len__(self):
-        return sum(map(len, self.resource_data.values()))
+        return sum([len(v) for k, v in self.resource_data.items() if "_" in k])
 
     def get_resources_by_type(self, types=()):
         if isinstance(types, str):

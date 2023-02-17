@@ -309,7 +309,7 @@ class DescribeRestStage(query.ChildDescribeSource):
             self.manager.session_factory).client('apigateway')
         for id in ids:
             # if we get stage arn, we pick rest_api_id and stageName to get deploymentId
-            if id.startswith('arn:'):
+            if id.startswith('arn:aws:apigateway'):
                 _, ident = id.rsplit(':', 1)
                 parts = ident.split('/', 4)
                 # if we get stage name in arn, use stage_name to get stage information

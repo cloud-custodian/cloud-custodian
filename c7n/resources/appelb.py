@@ -1372,3 +1372,144 @@ class AppELBTargetGroupDeleteAction(BaseAction):
         self.manager.retry(
             client.delete_target_group,
             TargetGroupArn=target_group['TargetGroupArn'])
+
+
+class TargetGroupAttributeFilterBase:
+    """ Mixin base class for filters that query Target Group attributes.
+    """
+
+    def initialize(self, tgs):
+        client = local_session(self.manager.session_factory).client('elbv2')
+
+        def _process_attributes(tg):
+            if 'c7n:TargetGroupAttributes' not in tg:
+                tg['c7n:TargetGroupAttributes'] = {}
+                results = client.describe_target_group_attributes(
+                    TargetGroupArn=tg['TargetGroupArn'])
+                # flatten out the list of dicts and cast
+                for pair in results['Attributes']:
+                    k = pair['Key']
+                    v = parse_attribute_value(pair['Value'])
+                    tg['c7n:TargetGroupAttributes'][k] = v
+
+        with self.manager.executor_factory(max_workers=2) as w:
+            list(w.map(_process_attributes, tgs))
+
+
+@AppELBTargetGroup.filter_registry.register('attributes')
+class TargetGroupCheckAttributes(ValueFilter, TargetGroupAttributeFilterBase):
+    """ Value filter that allows filtering on Target group attributes
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+                - name: target-group-check-attributes
+                  resource: app-elb-target-group
+                  filters:
+                    - type: attributes
+                      key: preserve_client_ip.enabled
+                      value: True
+                      op: eq
+    """
+    annotate: False  # no annotation from value Filter
+    permissions = ("elasticloadbalancing:DescribeTargetGroupAttributes",)
+    schema = type_schema('attributes', rinherit=ValueFilter.schema)
+    schema_alias = False
+
+    def process(self, resources, event=None):
+        self.augment(resources)
+        return super().process(resources, event)
+
+    def augment(self, resources):
+        self.initialize(resources)
+
+    def __call__(self, r):
+        return super().__call__(r['c7n:TargetGroupAttributes'])
+
+
+@AppELBTargetGroup.action_registry.register('modify-attributes')
+class AppELBTargetGroupModifyAttributes(BaseAction):
+    """Modify target group attributes.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: modify-preserve-client-ip-enable
+                resource: app-elb-target-group
+                filters:
+                  - type: attributes
+                    key: "preserve_client_ip.enabled"
+                    value: False
+                actions:
+                  - type: modify-attributes
+                    attributes:
+                      "preserve_client_ip.enabled": "true"
+    """
+    schema = {
+        'type': 'object',
+        'additionalProperties': False,
+        'properties': {
+            'type': {
+                'enum': ['modify-attributes']},
+            'attributes': {
+                'type': 'object',
+                'additionalProperties': False,
+                'properties': {
+                    'proxy_protocol_v2.enabled': {
+                        'enum': ['true', 'false', True, False]},
+                    'preserve_client_ip.enabled': {
+                        'enum': ['true', 'false', True, False]},
+                    'stickiness.enabled': {
+                        'enum': ['true', 'false', True, False]},
+                    'lambda.multi_value_headers.enabled': {
+                        'enum': ['true', 'false', True, False]},
+                    'deregistration_delay.connection_termination.enabled': {
+                        'enum': ['true', 'false', True, False]},
+                    'target_group_health.unhealthy_state_routing.'
+                    'minimum_healthy_targets.count': {'type': 'number'},
+                    'target_group_health.unhealthy_state_routing.'
+                    'minimum_healthy_targets.percentage': {'type': 'string'},
+                    'deregistration_delay.timeout_seconds': {'type': 'number'},
+                    'target_group_health.dns_failover.minimum_healthy_targets.count': {
+                        'type': 'string'},
+                    'stickiness.type': {
+                        'enum': ['lb_cookie', 'app_cookie', 'source_ip',
+                                 'source_ip_dest_ip', 'source_ip_dest_ip_proto']},
+                    'load_balancing.cross_zone.enabled': {
+                        'enum': ['true', 'false', True, False, 'use_load_balancer_configuration']},
+                    'target_group_health.dns_failover.minimum_healthy_targets.percentage': {
+                        'type': 'string'},
+                    'stickiness.app_cookie.cookie_name': {'type': 'string'},
+                    'stickiness.lb_cookie.duration_seconds': {'type': 'number'},
+                    'slow_start.duration_seconds': {'type': 'number'},
+                    'stickiness.app_cookie.duration_seconds': {'type': 'number'},
+                    'load_balancing.algorithm.type': {
+                        'enum': ['round_robin', 'least_outstanding_requests']},
+                    'target_failover.on_deregistration': {
+                        'enum': ['rebalance', 'no_rebalance']},
+                    'target_failover.on_unhealthy': {
+                        'enum': ['rebalance', 'no_rebalance']},
+                },
+            },
+        },
+    }
+    permissions = ("elasticloadbalancing:ModifyTargetGroupAttributes",)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('elbv2')
+        self.log.info(resources)
+        for targetgroup in resources:
+            self.manager.retry(
+                client.modify_target_group_attributes,
+                TargetGroupArn=targetgroup['TargetGroupArn'],
+                Attributes=[
+                    {'Key': key, 'Value': serialize_attribute_value(value)}
+                    for (key, value) in self.data['attributes'].items()
+                ],
+                ignore_err_codes=('TargetGroupNotFoundException',),
+            )
+        return resources
