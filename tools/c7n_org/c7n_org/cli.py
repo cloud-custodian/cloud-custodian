@@ -9,7 +9,6 @@ from datetime import timedelta, datetime
 import logging
 import os
 import time
-from urllib import parse as urlparse
 import subprocess  # nosec
 import sys
 
