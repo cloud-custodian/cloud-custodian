@@ -239,13 +239,18 @@ def inspect_bucket_region(bucket, s3_endpoint, allow_public=False):
 
 
 def url_socket_retry(func, *args, **kw):
-    """retry a urllib operations  in the event of certain socket errors.
+    """retry a urllib operation in the event of certain errors.
 
-    we want to capture some common issues for cases where we are
-    connecting through an intermediary proxy.
+    we want to retry on some common issues for cases where we are
+    connecting through an intermediary proxy or where the downstream
+    is overloaded.
 
+    socket errors
      - 104 - Connection reset by peer
      - 110 - Connection timed out
+
+    http errors
+     - 503 - Slow Down | Service Unavailable
     """
     min_delay = 1
     max_delay = 32
@@ -255,6 +260,11 @@ def url_socket_retry(func, *args, **kw):
             backoff_delays(min_delay, max_delay, jitter=True)):
         try:
             return func(*args, **kw)
+        except HTTPError as err:
+            if not (err.status == 503 and 'Slow Down' in err.reason):
+                raise
+            if idx == max_attempts - 1:
+                raise
         except URLError as err:
             if not isinstance(err.reason, socket.error):
                 raise
@@ -262,6 +272,7 @@ def url_socket_retry(func, *args, **kw):
                 raise
             if idx == max_attempts - 1:
                 raise
+
         time.sleep(delay)
 
 

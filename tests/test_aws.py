@@ -5,7 +5,7 @@ import json
 import time
 import threading
 import socket
-from urllib.error import URLError
+from urllib.error import URLError, HTTPError
 from unittest.mock import Mock
 
 from c7n.config import Bag, Config
@@ -410,6 +410,42 @@ def test_url_socket_retry(monkeypatch):
     # case for success
     fvalues[:] = [
         URLError(socket.error(110, 'Connection timed out')),
+        42
+    ]
+
+def test_http_socket_retry(monkeypatch):
+    monkeypatch.setattr(time, "sleep", lambda x: x)
+
+    # case for unknown error
+    fvalues = [HTTPError('https://lwn.net', 404, 'Unknown', {}, None)]
+
+    def freturns():
+        ret = fvalues.pop()
+        if isinstance(ret, URLError):
+            raise ret
+        return ret
+
+    with pytest.raises(URLError) as ecm:
+        aws.url_socket_retry(freturns)
+
+    assert 'Unknown' in str(ecm.value)
+
+    # case for retry exhaustion    
+    fvalues[:] = [
+        HTTPError('https://lwn.net', 503, 'Slow Down', {}, None),
+        HTTPError('https://lwn.net', 503, 'Slow Down', {}, None),
+        HTTPError('https://lwn.net', 503, 'Slow Down', {}, None),
+        HTTPError('https://lwn.net', 503, 'Slow Down', {}, None),
+    ]
+
+    # this is really an indirect assertion that is ascertained via
+    # coverage.
+    with pytest.raises(URLError) as ecm:
+        aws.url_socket_retry(freturns)    
+
+    # case for success
+    fvalues[:] = [
+        HTTPError('https://lwn.net', 503, 'Slow Down', {}, None),
         42
     ]
 
