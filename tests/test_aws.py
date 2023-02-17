@@ -5,6 +5,7 @@ import json
 import time
 import threading
 import socket
+import sys
 from urllib.error import URLError, HTTPError
 from unittest.mock import Mock
 
@@ -413,6 +414,7 @@ def test_url_socket_retry(monkeypatch):
         42
     ]
 
+@pytest.mark.skipif(sys.version_info < (3, 9), reason="requires python3.9 or higher")
 def test_http_socket_retry(monkeypatch):
     monkeypatch.setattr(time, "sleep", lambda x: x)
 
