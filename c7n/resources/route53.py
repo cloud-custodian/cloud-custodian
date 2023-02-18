@@ -735,3 +735,47 @@ class ReadinessCheckCrossAccount(CrossAccountAccessFilter):
                 results.append(r)
 
         return results
+
+
+@HostedZone.filter_registry.register('dangling-records')
+class DanglingRecords(Filter):
+    """Filter for hosted zones that have dangling records
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: dangling-records
+            resource: hostedzone
+            filters:
+              - type: dangling-records
+    """
+
+    permissions = ('route53:ListResourceRecordSets',
+                   'route53:GetHostedZone',
+                   'ec2:DescribeAddresses')
+    schema = type_schema('dangling-records')
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('route53')
+        ec2 = local_session(self.manager.session_factory).client('ec2')
+        results = []
+
+        for r in resources:
+            zid = r['Id'].split('/', 2)[-1]
+            record_sets = self.manager.retry(
+                client.list_resource_record_sets, HostedZoneId=zid)['ResourceRecordSets']
+            record_sets = [record_set for record_set in record_sets if record_set['Type'] == 'A']
+            eips = [eip for record_set in record_sets for eip in record_set['ResourceRecords']]
+            eips = [eip['Value'] for eip in eips]
+            if not eips:
+                continue
+            for ind, eip in enumerate(eips):
+                addresses = self.manager.retry(ec2.describe_addresses,
+                                Filters=[{'Name': 'public-ip', 'Values': [eip]}])['Addresses']
+                if not addresses:
+                    r.setdefault('c7n:dangling-records', []).append(record_sets[ind])
+            if 'c7n:dangling-records' in r and r['c7n:dangling-records']:
+                results.append(r)
+        return results
