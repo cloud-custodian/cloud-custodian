@@ -685,4 +685,4 @@ def test_output_path_join():
 
     output_dir = './local-dir'
     assert utils.join_output_path(output_dir, 'Samuel', 'us-east-1') == (
-        "./local-dir/Samuel/us-east-1")
+        f"./local-dir{os.sep}Samuel{os.sep}us-east-1")
