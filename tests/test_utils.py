@@ -679,5 +679,10 @@ def test_output_path_join():
         'Samuel',
         'us-east-1'
     ) == 's3://cross-region-c7n/iam-check/Samuel/us-east-1?region=us-east-2'
-        
-    
+
+    output_dir = 's3://cross-region-c7n/iam-checks/{account}/{now:%Y-%m}/{uuid}'
+    assert utils.join_output_path(output_dir, 'Samuel', 'us-east-1') == output_dir
+
+    output_dir = './local-dir'
+    assert utils.join_output_path(output_dir, 'Samuel', 'us-east-1') == (
+        "./local-dir/Samuel/us-east-1")

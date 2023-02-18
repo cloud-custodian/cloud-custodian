@@ -414,6 +414,7 @@ def test_url_socket_retry(monkeypatch):
         42
     ]
 
+
 @pytest.mark.skipif(sys.version_info < (3, 9), reason="requires python3.9 or higher")
 def test_http_socket_retry(monkeypatch):
     monkeypatch.setattr(time, "sleep", lambda x: x)
@@ -432,7 +433,7 @@ def test_http_socket_retry(monkeypatch):
 
     assert 'Unknown' in str(ecm.value)
 
-    # case for retry exhaustion    
+    # case for retry exhaustion
     fvalues[:] = [
         HTTPError('https://lwn.net', 503, 'Slow Down', {}, None),
         HTTPError('https://lwn.net', 503, 'Slow Down', {}, None),
@@ -443,7 +444,7 @@ def test_http_socket_retry(monkeypatch):
     # this is really an indirect assertion that is ascertained via
     # coverage.
     with pytest.raises(URLError) as ecm:
-        aws.url_socket_retry(freturns)    
+        aws.url_socket_retry(freturns)
 
     # case for success
     fvalues[:] = [
