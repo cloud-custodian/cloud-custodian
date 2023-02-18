@@ -1,8 +1,6 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
-from azure.mgmt.logic import LogicManagementClient
-
 from c7n.actions.webhook import Webhook
 from c7n.utils import type_schema
 
@@ -59,7 +57,6 @@ class LogicAppAction(Webhook):
     def get_callback_url(self, resource_group, workflow_name):
         """ Gets the logic app invoke trigger with secrets using RBAC """
 
-        # type: LogicManagementClient
         client = self.manager.get_client(
             'azure.mgmt.logic.LogicManagementClient')
 

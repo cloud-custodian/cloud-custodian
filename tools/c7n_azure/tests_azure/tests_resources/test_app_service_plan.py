@@ -1,6 +1,5 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
-from azure.mgmt.web import WebSiteManagementClient
 from ..azure_common import BaseTest, arm_template, cassette_name
 from c7n_azure.session import Session
 from mock import patch
@@ -15,7 +14,7 @@ class AppServicePlanTest(BaseTest):
         super(AppServicePlanTest, self).setUp()
         self.session = local_session(Session)
         self.client = local_session(Session).client(
-            'azure.mgmt.web.WebSiteManagementClient')  # type: WebSiteManagementClient
+            'azure.mgmt.web.WebSiteManagementClient')
         self.update_mock_path =\
             'azure.mgmt.web.v{}.operations._app_service_plans_operations.' \
             'AppServicePlansOperations.update'\

@@ -197,6 +197,15 @@ policies:
       - "tag:CostCenter": "{charge_code}"
 ```
 
+Another enhancement for `c7n-org run-script` is to support a few vars in the script arg.
+The available vars are `account`, `account_id`, `region` and `output_dir`.
+
+```shell
+c7n-org run-script -s . -c my-projects.yml gcp_check_{region}.sh
+# or
+c7n-org run-script -s . -c my-projects.yml use_another_policy_result.sh {output_dir}
+```
+
 **Note** Variable interpolation is sensitive to proper quoting and spacing,
 i.e., `{ charge_code }` would be invalid due to the extra white space. Additionally,
 yaml parsing can transform a value like `{charge_code}` to null, unless it's quoted
@@ -205,10 +214,12 @@ don't require quoting, i.e., "my_{charge_code}".
 
 ## Other commands
 
-c7n-org also supports running arbitrary scripts against accounts via the run-script command.
-For AWS the standard AWS SDK credential information is exported into the process environment before executing.
-For Azure and GCP, only the environment variables `AZURE_SUBSCRIPTION_ID` and `PROJECT_ID` are exported(in addition
-of the system env variables).
+c7n-org also supports running arbitrary scripts against accounts via
+the run-script command.  For AWS the standard AWS SDK credential
+information is exported into the process environment before executing.
+For Azure and GCP, only the environment variables
+`AZURE_SUBSCRIPTION_ID` and `PROJECT_ID` are exported(in addition of
+the system env variables).
 
 c7n-org also supports generating reports for a given policy execution
 across accounts via the `c7n-org report` subcommand.

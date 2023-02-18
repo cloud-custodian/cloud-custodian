@@ -1,15 +1,20 @@
 from .common import BaseTest
 
 
-class LakeFormationTest(BaseTest):
+class DataLakeRegisteredLocation(BaseTest):
 
-    def test_lakeformation_value_filter(self):
-        factory = self.replay_flight_data("test_lakeformation_list_resources")
+    def test_datalake_cross_account_deregister(self):
+        factory = self.replay_flight_data('test_datalake_cross_account_deregister')
         p = self.load_policy({
-            'name': 'list_lakeformation_resources',
-            'resource': 'lakeformation',
-            "filters": [{"RoleArn": "present"}], },
+            'name': 'datalake-location-cross-account',
+            'resource': 'datalake-location',
+            'filters': [{'type': 'cross-account'}],
+            'actions': [{'type': 'deregister'}]},
             session_factory=factory)
         resources = p.run()
-        print(resources)
-        self.assertEqual(len(resources), 2)
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['ResourceArn'], 'arn:aws:s3:::unknown-bucket')
+        client = factory().client("lakeformation")
+        reg_loc = client.list_resources()['ResourceInfoList']
+        self.assertEqual(len(reg_loc), 1)
+        self.assertNotEqual((r.get('ResourceArn') for r in reg_loc), 'arn:aws:s3:::pratyush-123')

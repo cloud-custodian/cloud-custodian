@@ -13,9 +13,12 @@ from c7n.manager import resources
 from c7n.utils import chunks, get_retry, generate_arn, local_session, type_schema
 from c7n.actions import BaseAction
 from c7n.filters import Filter
-
 from c7n.resources.shield import IsShieldProtected, SetShieldProtection
 from c7n.tags import RemoveTag, Tag
+from c7n.filters.related import RelatedResourceFilter
+from c7n import tags
+from c7n.filters.iamaccess import CrossAccountAccessFilter
+from c7n.resolver import ValuesFrom
 
 
 class Route53Base:
@@ -105,6 +108,7 @@ class HealthCheck(Route53Base, QueryResourceManager):
         name = id = 'Id'
         universal_taggable = True
         cfn_type = 'AWS::Route53::HealthCheck'
+        global_resource = True
 
 
 @resources.register('rrset')
@@ -117,6 +121,7 @@ class ResourceRecordSet(ChildResourceManager):
         enum_spec = ('list_resource_record_sets', 'ResourceRecordSets', None)
         name = id = 'Name'
         cfn_type = 'AWS::Route53::RecordSet'
+        global_resource = True
 
 
 @resources.register('r53domain')
@@ -460,11 +465,13 @@ def get_logging_config_paginator(client):
 @HostedZone.filter_registry.register('query-logging-enabled')
 class IsQueryLoggingEnabled(Filter):
 
-    permissions = ('route53:GetQueryLoggingConfig', 'route53:GetHostedZone')
+    permissions = ('route53:GetQueryLoggingConfig', 'route53:GetHostedZone',
+                   'logs:DescribeSubscriptionFilters')
     schema = type_schema('query-logging-enabled', state={'type': 'boolean'})
 
     def process(self, resources, event=None):
         client = local_session(self.manager.session_factory).client('route53')
+        cw_client = local_session(self.manager.session_factory).client('logs')
         state = self.data.get('state', False)
         results = []
 
@@ -481,7 +488,250 @@ class IsQueryLoggingEnabled(Filter):
             logging = zid in enabled_zones
             if logging and state:
                 r['c7n:log-config'] = enabled_zones[zid]
+                log_group_name = r['c7n:log-config']['CloudWatchLogsLogGroupArn'].split(":")[-1]
+                response = cw_client.describe_subscription_filters(logGroupName=log_group_name)
+                r['c7n:log-config']['loggroup_subscription'] = response['subscriptionFilters']
                 results.append(r)
             elif not logging and not state:
                 results.append(r)
+
+        return results
+
+
+@resources.register('resolver-logs')
+class ResolverQueryLogConfig(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'route53resolver'
+        arn_type = 'resolver-query-log-config'
+        enum_spec = ('list_resolver_query_log_configs', 'ResolverQueryLogConfigs', None)
+        name = 'Name'
+        id = 'Id'
+        cfn_type = 'AWS::Route53Resolver::ResolverQueryLoggingConfig'
+
+    annotation_key = 'c7n:Associations'
+    permissions = (
+        'route53resolver:ListResolverQueryLogConfigs',
+        'route53resolver:ListResolverQueryLogConfigAssociations')
+
+    def augment(self, rqlcs):
+        client = local_session(self.session_factory).client('route53resolver')
+        for rqlc in rqlcs:
+            rqlc['Tags'] = self.retry(
+                client.list_tags_for_resource,
+                ResourceArn=rqlc['Arn'])['Tags']
+            rqlc[self.annotation_key] = client.list_resolver_query_log_config_associations().get(
+                'ResolverQueryLogConfigAssociations')
+        return rqlcs
+
+
+@ResolverQueryLogConfig.action_registry.register('associate-vpc')
+class ResolverQueryLogConfigAssociate(BaseAction):
+    """Associates ResolverQueryLogConfig to a VPC
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: r53-resolver-query-log-config-associate
+            resource: resolver-logs
+            filters:
+              - type: value
+                key: 'Name'
+                op: eq
+                value: "Test-rqlc"
+            actions:
+              - type: associate-vpc
+                vpcid: all
+
+    """
+    permissions = (
+        'route53resolver:AssociateResolverQueryLogConfig',
+        'route53resolver:ListResolverQueryLogConfigAssociations')
+    schema = type_schema('associate-vpc', vpcid={'type': 'string',
+        'pattern': '^(?:vpc-[0-9a-f]{8,17}|all)$'}, required=['vpcid'])
+    RelatedResource = 'c7n.resources.vpc.Vpc'
+    RelatedIdsExpression = 'ResourceArn'
+
+    def get_vpc_id(self):
+        vpcs = RelatedResourceFilter.get_resource_manager(self).resources()
+        if self.data.get('vpcid') == 'all':
+            vpc_ids = [v['VpcId'] for v in vpcs]
+        else:
+            vpc_ids = [self.data.get('vpcid')]
+        return vpc_ids
+
+    def is_associated(self, resource, vpc_id):
+        associated = False
+        for association in resource['c7n:Associations']:
+            if association['ResourceId'] == vpc_id:
+                associated = True
+                break
+        return associated
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('route53resolver')
+        vpc_ids = self.get_vpc_id()
+
+        for resource in resources:
+            for vpc_id in vpc_ids:
+                if not self.is_associated(resource, vpc_id):
+                    client.associate_resolver_query_log_config(
+                        ResolverQueryLogConfigId=resource['Id'], ResourceId=vpc_id)
+
+
+@ResolverQueryLogConfig.filter_registry.register('is-associated')
+class LogConfigAssociationsFilter(Filter):
+    """ Checks LogConfig Associations for VPCs.
+
+    :example:
+
+    .. code-block:: yaml
+            policies:
+                - name: r53-resolver-query-log-config-associations
+                  resource: resolver-logs
+                  filters:
+                   - type: is-associated
+                     vpcid: "vpc-12345678"
+
+    """
+    permissions = ('route53resolver:ListResolverQueryLogConfigAssociations',)
+    schema = type_schema('is-associated',
+        vpcid={'type': 'string', 'pattern': '^(?:vpc-[0-9a-f]{8,17}|all)$'},)
+    RelatedResource = 'c7n.resources.vpc.Vpc'
+    RelatedIdsExpression = 'ResourceArn'
+
+    def process(self, resources, event=None):
+        results = []
+        vpc_ids = ResolverQueryLogConfigAssociate.get_vpc_id(self)
+        for resource in resources:
+            status = True
+            for vpc_id in vpc_ids:
+                if not ResolverQueryLogConfigAssociate.is_associated(self, resource, vpc_id):
+                    status = False
+                    break
+
+            if status:
+                results.append(resource)
+
+        return results
+
+
+# Readiness check in Amazon Route53 ARC is global feature. However,
+# US West (N. California) Region must be specified in Route53 ARC readiness check api call.
+# Please reference this AWS document:
+# https://docs.aws.amazon.com/r53recovery/latest/dg/introduction-regions.html
+ARC_REGION = 'us-west-2'
+
+
+@resources.register('readiness-check')
+class ReadinessCheck(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'route53-recovery-readiness'
+        arn_type = 'readiness-check'
+        enum_spec = ('list_readiness_checks', 'ReadinessChecks', None)
+        name = id = 'ReadinessCheckName'
+        global_resource = True
+
+    def get_client(self):
+        return local_session(self.session_factory) \
+            .client('route53-recovery-readiness', region_name=ARC_REGION)
+
+    def augment(self, readiness_checks):
+        for r in readiness_checks:
+            Tags = self.retry(
+                self.get_client().list_tags_for_resources,
+                ResourceArn=r['ReadinessCheckArn'])['Tags']
+            r['Tags'] = [{'Key': k, "Value": v} for k, v in Tags.items()]
+        return readiness_checks
+
+
+@ReadinessCheck.action_registry.register('tag')
+class ReadinessAddTag(Tag):
+    """Adds tags to a readiness check
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: readiness-tag
+            resource: readiness-check
+            filters:
+              - "tag:DesiredTag": absent
+            actions:
+              - type: tag
+                key: DesiredTag
+                value: DesiredValue
+    """
+    permissions = ('route53-recovery-readiness:TagResource',)
+
+    def process_resource_set(self, client, readiness_checks, tags):
+        Tags = {r['Key']: r['Value'] for r in tags}
+        for r in readiness_checks:
+            client.tag_resource(
+                ResourceArn=r['ReadinessCheckArn'],
+                Tags=Tags)
+
+
+@ReadinessCheck.action_registry.register('remove-tag')
+class ReadinessCheckRemoveTag(RemoveTag):
+    """Remove tags from a readiness check
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: readiness-check-remove-tag
+            resource: readiness-check
+            filters:
+              - "tag:ExpiredTag": present
+            actions:
+              - type: remove-tag
+                tags: ['ExpiredTag']
+    """
+    permissions = ('route53-recovery-readiness:UntagResource',)
+
+    def process_resource_set(self, client, readiness_checks, keys):
+        for r in readiness_checks:
+            client.untag_resource(
+                ResourceArn=r['ReadinessCheckArn'],
+                TagKeys=keys)
+
+
+ReadinessCheck.action_registry.register('mark-for-op', tags.TagDelayedAction)
+ReadinessCheck.filter_registry.register('marked-for-op', tags.TagActionFilter)
+
+
+@ReadinessCheck.filter_registry.register('cross-account')
+class ReadinessCheckCrossAccount(CrossAccountAccessFilter):
+
+    schema = type_schema(
+        'cross-account',
+        # white list accounts
+        whitelist_from=ValuesFrom.schema,
+        whitelist={'type': 'array', 'items': {'type': 'string'}})
+    permissions = ('route53-recovery-readiness:ListCrossAccountAuthorizations',)
+
+    def process(self, resources, event=None):
+        allowed_accounts = set(self.get_accounts())
+        results, account_ids, found = [], [], False
+
+        paginator = self.manager.get_client().get_paginator('list_cross_account_authorizations')
+        paginator.PAGE_ITERATOR_CLASS = RetryPageIterator
+        arns = paginator.paginate().build_full_result()["CrossAccountAuthorizations"]
+
+        for arn in arns:
+            account_id = arn.split(':', 5)[4]
+            if account_id not in allowed_accounts:
+                account_ids.append(account_id)
+                found = True
+        if (found):
+            for r in resources:
+                r['c7n:CrossAccountViolations'] = account_ids
+                results.append(r)
+
         return results

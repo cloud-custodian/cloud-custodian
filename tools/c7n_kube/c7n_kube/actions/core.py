@@ -16,6 +16,16 @@ class Action(BaseAction):
     pass
 
 
+class EventAction(BaseAction):
+
+    def validate(self):
+        modes = ('k8s-admission',)
+        policy = self.manager.data
+        if policy.get('mode', {}).get('type') not in modes:
+            raise PolicyValidationError(
+                "Event Actions are only supported for k8s-admission mode policies")
+
+
 class MethodAction(Action):
     method_spec = ()
     chunk_size = 20

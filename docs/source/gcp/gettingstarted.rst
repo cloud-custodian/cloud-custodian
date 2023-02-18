@@ -12,9 +12,10 @@ writing policies which interact with GCP related resources.
 Install GCP Plugin
 ------------------
 
-First, ensure you have :ref:`installed the base Cloud Custodian application <install-cc>`. 
-Cloud Custodian is a Python application that supports Python 2 and 3 on Linux and Windows. 
-We recommend using Python 3.6 or higher.
+First, ensure you have :ref:`installed the base Cloud Custodian application
+<install-cc>`. Cloud Custodian is a Python application and must run on an
+`actively supported <https://devguide.python.org/#status-of-python-branches>`_
+version. 
 
 Once the base install is complete, you are now ready to install the GCP provider package
 using one of the following options:

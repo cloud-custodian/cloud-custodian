@@ -149,6 +149,10 @@ class QueryMeta(type):
 
 
 class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
+    # The resource manager type is injected by the PluginRegistry.register
+    # decorator.
+    type: str
+    resource_type: 'TypeInfo'
 
     def __init__(self, data, options):
         super(QueryResourceManager, self).__init__(data, options)
@@ -188,14 +192,28 @@ class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
 
     def resources(self, query=None):
         q = query or self.get_resource_query()
-        key = self.get_cache_key(q)
-        resources = self._fetch_resources(q)
-        self._cache.save(key, resources)
+        cache_key = self.get_cache_key(q)
+        resources = None
 
+        if self._cache.load():
+            resources = self._cache.get(cache_key)
+            if resources is not None:
+                self.log.debug("Using cached %s: %d" % (
+                    "%s.%s" % (self.__class__.__module__,
+                               self.__class__.__name__),
+                    len(resources)))
+
+        if resources is None:
+            with self.ctx.tracer.subsegment('resource-fetch'):
+                resources = self._fetch_resources(q)
+            self._cache.save(cache_key, resources)
+
+        self._cache.close()
         resource_count = len(resources)
-        resources = self.filter_resources(resources)
+        with self.ctx.tracer.subsegment('filter'):
+            resources = self.filter_resources(resources)
 
-        # Check if we're out of a policies execution limits.
+        # Check resource limits if we're the current policy execution.
         if self.data == self.ctx.policy.data:
             self.check_resource_limit(len(resources), resource_count)
         return resources
@@ -229,6 +247,25 @@ class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
 
     def augment(self, resources):
         return resources
+
+    def get_urns(self, resources):
+        """Generate URNs for the resources.
+
+        A Uniform Resource Name (URN) is a URI that identifies a resource by
+        name in a particular namespace. A URN may be used to talk about a
+        resource without implying its location or how to access it.
+
+        The generated URNs can uniquely identify any given resource.
+
+        The generated URN is intended to follow a similar pattern to ARN, but be
+        specific to GCP.
+
+        gcp:<service>:<region>:<project>:<resource-type>/<resource-id>
+
+        If the region is "global" then it is omitted from the URN.
+        """
+        return self.resource_type.get_urns(
+            resources, local_session(self.session_factory).project_id)
 
 
 class ChildResourceManager(QueryResourceManager):
@@ -337,9 +374,85 @@ class TypeInfo(metaclass=TypeMeta):
     # cloud asset inventory type
     asset_type = None
 
+    # URN generation
+    urn_region_key = 'region'
+    # A jmespath into the resource object to find the id element of the URN.
+    # If unset, it uses the value for id.
+    urn_id_path = None
+    # It is frequent enough that the id we want for the URN is made up of one or more
+    # path segments from the id. Ids are frequently '/' delimited strings.
+    # If set, this should be an iterable of integer indices into the segments.
+    urn_id_segments = None
+    # By default the component is taken for the URN. Can be overridden by specifying
+    # a specific urn_component.
+    urn_component = None
+    # Truly global resources should override this to the empty string.
+    urn_has_project = True
+    # The location element is a zone, not a region.
+    urn_zonal = False
+
     @classmethod
     def get_metric_resource_name(cls, resource):
         return resource.get(cls.name)
+
+    @classmethod
+    def get_urns(cls, resources, project_id):
+        """Generate URNs for the resources.
+
+        A Uniform Resource Name (URN) is a URI that identifies a resource by
+        name in a particular namespace. A URN may be used to talk about a
+        resource without implying its location or how to access it.
+
+        The generated URNs can uniquely identify any given resource.
+
+        The generated URN is intended to follow a similar pattern to ARN, but be
+        specific to GCP.
+
+        gcp:<service>:<location>:<project>:<resource-type>/<resource-id>
+
+        If the region is "global" then it is omitted from the URN.
+        """
+        return [cls._get_urn(r, project_id) for r in resources]
+
+    @classmethod
+    def _get_urn(cls, resource, project_id) -> str:
+        "Generate an URN for the resource."
+        location = cls._get_location(resource)
+        if location == "global":
+            location = ""
+        id = cls._get_urn_id(resource)
+        if not cls.urn_has_project:
+            project_id = ""
+        # NOTE: not sure whether to use `component` or just the last part of
+        # `component` (split on '.') for the part after project
+        return f"gcp:{cls.service}:{location}:{project_id}:{cls.urn_component}/{id}"
+
+    @classmethod
+    def _get_urn_id(cls, resource):
+        path = cls.urn_id_path
+        if path is None:
+            path = cls.id
+        id = jmespath.search(path, resource)
+        if cls.urn_id_segments:
+            parts = id.split('/')
+            id = '/'.join([parts[index] for index in cls.urn_id_segments])
+        return id
+
+    @classmethod
+    def _get_location(cls, resource):
+        """Get the region for a single resource.
+
+        Resources are either global, regional, or zonal. When a resource is
+        is zonal, the region is determined from the zone.
+        """
+        if cls.urn_zonal and "zone" in resource:
+            zone = resource["zone"].rsplit("/", 1)[-1]
+            return zone
+
+        if cls.urn_region_key in resource:
+            return resource[cls.urn_region_key].rsplit("/", 1)[-1]
+
+        return "global"
 
 
 class ChildTypeInfo(TypeInfo):
@@ -350,6 +463,11 @@ class ChildTypeInfo(TypeInfo):
     def get_parent_annotation_key(cls):
         parent_resource = cls.parent_spec['resource']
         return 'c7n:{}'.format(parent_resource)
+
+    @classmethod
+    def get_parent(cls, resource):
+        "Return the annotated parent resource."
+        return resource[cls.get_parent_annotation_key()]
 
 
 ERROR_REASON = jmespath.compile('error.errors[0].reason')

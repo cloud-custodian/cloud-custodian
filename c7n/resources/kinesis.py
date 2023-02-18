@@ -17,6 +17,21 @@ class DescribeStream(DescribeSource):
         return universal_augment(self.manager, super().augment(resources))
 
 
+class ConfigStream(ConfigSource):
+
+    def load_resource(self, item):
+        resource = super().load_resource(item)
+        for ck, dk in {
+                'Arn': 'StreamARN',
+                'Name': 'StreamName'}.items():
+            resource[dk] = resource.pop(ck, None)
+        if 'StreamEncryption' in resource:
+            encrypt = resource.pop('StreamEncryption')
+            resource['EncryptionType'] = encrypt['EncryptionType']
+            resource['KeyId'] = encrypt['KeyId']
+        return resource
+
+
 @resources.register('kinesis')
 class KinesisStream(QueryResourceManager):
     retry = staticmethod(
@@ -36,7 +51,7 @@ class KinesisStream(QueryResourceManager):
 
     source_mapping = {
         'describe': DescribeStream,
-        'config': ConfigSource
+        'config': ConfigStream
     }
 
 

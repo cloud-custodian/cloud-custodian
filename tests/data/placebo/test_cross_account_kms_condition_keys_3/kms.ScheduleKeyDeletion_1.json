@@ -1,0 +1,19 @@
+{
+    "status_code": 200,
+    "data": {
+        "KeyId": "arn:aws:kms:af-south-1:644160558196:key/a330b187-ba70-4a78-b5ef-26e96f3c106f",
+        "DeletionDate": {
+            "__class__": "datetime",
+            "year": 2022,
+            "month": 8,
+            "day": 29,
+            "hour": 10,
+            "minute": 25,
+            "second": 28,
+            "microsecond": 409000
+        },
+        "KeyState": "PendingDeletion",
+        "PendingWindowInDays": 7,
+        "ResponseMetadata": {}
+    }
+}

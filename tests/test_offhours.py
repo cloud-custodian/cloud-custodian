@@ -416,6 +416,12 @@ class OffHoursFilterTest(BaseTest):
                 results.append(OnHour({})(i))
             self.assertEqual(results, [True, False])
 
+    def test_unescape_tag_restrictions(self):
+        unescaped = Time.unescape_tag_restrictions("off=u28M-Fu2c18u29u3btz=Australia/Sydney")
+        assert unescaped == "off=(M-F,18);tz=Australia/Sydney"
+        unescaped2 = Time.unescape_tag_restrictions("off=u5bu28M-Fu2c18u29u2cu28Su2c13u29u5d")
+        assert unescaped2 == "off=[(M-F,18),(S,13)]"
+
     def test_arizona_tz(self):
         t = datetime.datetime.now(tzutil.gettz("America/New_York"))
         t = t.replace(year=2016, month=5, day=26, hour=7, minute=00)

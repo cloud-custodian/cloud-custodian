@@ -1,0 +1,65 @@
+{
+  "version": "0",
+  "id": "xxxxx-84b9-4e68-a930-03a7f8d62b50",
+  "detail-type": "AWS API Call via CloudTrail",
+  "source": "aws.rds",
+  "account": "687174582794",
+  "time": "2021-05-26T09:51:58Z",
+  "region": "us-east-1",
+  "resources": [],
+  "detail": {
+    "eventVersion": "1.08",
+    "userIdentity": {
+      "type": "AssumedRole",
+      "principalId": "AROAILJD4VDVFFUUQB4VM:xxxxx-4dea-91bf-70a953d01bda_cred_session",
+      "arn": "arn:aws:sts::123456789:assumed-role/XXXX1OT8CHKE29AQJ/XXXX-d10e-4dea-91bf-70a953d01bda_cred_session",
+      "accountId": "123456789",
+      "accessKeyId": "XXXXXXX",
+      "sessionContext": {
+        "sessionIssuer": {
+          "type": "Role",
+          "principalId": "XXXXXX",
+          "arn": "arn:aws:iam::123456789:role/role-xxxx",
+          "accountId": "123456789",
+          "userName": "xxxx"
+        },
+        "webIdFederationData": {},
+        "attributes": {
+          "creationDate": "2021-12-01T14:24:34Z",
+          "mfaAuthenticated": "False"
+        }
+      }
+    },
+    "eventTime": "2021-12-01T14:25:42Z",
+    "eventSource": "cloudsearch.amazonaws.com",
+    "eventName": "CreateDomain",
+    "awsRegion": "us-east-1",
+    "sourceIPAddress": "148.177.96.202",
+    "userAgent": "console.amazonaws.com",
+    "requestParameters": {
+      "domainName": "demo-search"
+    },
+    "responseElements": {
+      "domainStatus": {
+        "aRN": "arn:aws:cloudsearch:us-east-1:123456789:domain/demo-search",
+        "searchInstanceCount": 0,
+        "docService": {},
+        "requiresIndexDocuments": false,
+        "deleted": false,
+        "searchService": {},
+        "domainId": "123456789/demo-search",
+        "processing": false,
+        "created": true,
+        "searchPartitionCount": 0,
+        "domainName": "demo-search"
+      }
+    },
+    "requestID": "d8c5a08a-f0dd-4e81-b41d-ed216546448a",
+    "eventID": "9f17a0f0-a75d-425e-8d25-7fd72e7885ae",
+    "readOnly": false,
+    "eventType": "AwsApiCall",
+    "managementEvent": true,
+    "recipientAccountId": "123456789",
+    "eventCategory": "Management"
+  }
+}

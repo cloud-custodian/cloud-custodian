@@ -56,7 +56,7 @@ def _default_options(p, exclude=[]):
     # -c is deprecated.  Supported for legacy reasons
     config.add_argument("-c", "--config", help=argparse.SUPPRESS)
     config.add_argument("configs", nargs='*',
-                        help="Policy configuration file(s)")
+                        help="Policy configuration file(s) or directory")
     config.add_argument("-p", "--policies", default=[], dest='policy_filters',
                         action='append', help="Only use named/matched policies")
     config.add_argument("-t", "--resource", default=[], dest='resource_types',

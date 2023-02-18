@@ -25,6 +25,8 @@ class Service(QueryResourceManager):
         name = id = 'name'
         default_report_fields = [name, "state"]
         asset_type = 'serviceusage.googleapis.com/Service'
+        urn_component = "service"
+        urn_id_segments = (-1,)  # Just use the last segment of the id in the URN
 
         @staticmethod
         def get(client, resource_info):

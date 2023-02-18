@@ -12,7 +12,7 @@ EOF
 }
 
 resource "aws_iam_role" "lambda" {
-  name = "c7n_test_check_permissions"
+  name_prefix = "c7n_test_check_permissions"
 
   assume_role_policy = <<EOF
 {

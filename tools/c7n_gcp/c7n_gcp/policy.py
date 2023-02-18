@@ -58,6 +58,8 @@ class PeriodicMode(FunctionMode, PullMode):
 
     Default region the function is deployed to is ``us-central1``. In
     case you want to change that, use the cli ``--region`` flag.
+
+    `target-type`: `pubsub` is recommended
     """
 
     schema = type_schema(
@@ -80,6 +82,12 @@ class PeriodicMode(FunctionMode, PullMode):
             tzinfo = tz.gettz(mode['tz'])
             if tzinfo is None:
                 raise error
+        if mode.get('target-type', 'http') == 'http':
+            if mode.get('service-account') is None:
+                raise PolicyValidationError(
+                    'policy:%s gcp-periodic requires service-account for http target'
+                    % self.policy.name
+                )
 
     def _get_function(self):
         events = [mu.PeriodicEvent(

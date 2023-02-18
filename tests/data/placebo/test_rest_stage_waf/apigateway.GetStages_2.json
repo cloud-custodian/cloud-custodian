@@ -1,0 +1,48 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {
+            "RequestId": "9be03f7a-fd38-11e7-a239-c1dc20443a92",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "date": "Fri, 19 Jan 2018 16:48:43 GMT",
+                "content-type": "application/json",
+                "content-length": "233",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "9be03f7a-fd38-11e7-a239-c1dc20443a92"
+            },
+            "RetryAttempts": 0
+        },
+        "item": [
+            {
+                "deploymentId": "r2pi2v",
+                "stageName": "prod",
+                "description": "Created by AWS Lambda",
+                "cacheClusterEnabled": false,
+                "cacheClusterStatus": "NOT_AVAILABLE",
+                "methodSettings": {},
+                "createdDate": {
+                    "__class__": "datetime",
+                    "year": 2017,
+                    "month": 4,
+                    "day": 5,
+                    "hour": 10,
+                    "minute": 35,
+                    "second": 32,
+                    "microsecond": 0
+                },
+                "lastUpdatedDate": {
+                    "__class__": "datetime",
+                    "year": 2017,
+                    "month": 4,
+                    "day": 5,
+                    "hour": 10,
+                    "minute": 35,
+                    "second": 32,
+                    "microsecond": 0
+                },
+                "webAclArn": "arn:aws:waf-regional:us-east-1:1234567890:webacl/91f9fc9-16bb-4d32-8f6a-b55e9b6f11c8"
+            }
+        ]
+    }
+}

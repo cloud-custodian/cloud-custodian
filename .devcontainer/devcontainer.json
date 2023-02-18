@@ -10,7 +10,9 @@
 		"python.linting.enabled": true
 	},
 
-	"extensions": ["ms-python.python"],
+	"extensions": [
+		"ms-python.python"
+	],
 
-	"postCreateCommand": "cd .devcontainer && ./prep_container.sh",
+	"postCreateCommand": "cd .devcontainer && bash ./prep_container.sh"
 }

@@ -1,0 +1,20 @@
+{
+    "status_code": 200,
+    "data": {
+        "Parameters": [
+            {
+                "ParameterName": "rds.force_admin_logging_level",
+                "ParameterValue": "info",
+                "Description": "See log messages for RDS admin user actions in customer databases.",
+                "Source": "user",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "AllowedValues": "disabled,debug5,debug4,debug3,debug2,debug1,info,notice,warning,error,log,fatal,panic",
+                "IsModifiable": true,
+                "ApplyMethod": "immediate"
+            }
+        ],
+        "Marker": "dGltZXpvbmU=",
+        "ResponseMetadata": {}
+    }
+}

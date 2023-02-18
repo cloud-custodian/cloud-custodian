@@ -16,7 +16,8 @@
         "WebACLs": [
             {
                 "WebACLId": "1ebe0b46-0fd2-4e07-a74c-27bf25adc0bf", 
-                "Name": "test"
+                "Name": "test",
+                "ARN": "arn:aws:wafv2:us-east-1:1234567890:regional/webacl/test/1ebe0b46-0fd2-4e07-a74c-27bf25adc0bf"
             }
         ]
     }

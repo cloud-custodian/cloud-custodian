@@ -7,15 +7,20 @@ import mock
 import shutil
 import os
 
+from contextlib import nullcontext as no_exception
 from dateutil.parser import parse as date_parse
 
 from c7n.ctx import ExecutionContext
 from c7n.config import Config
+from c7n.exceptions import InvalidOutputConfig
 from c7n.output import DirectoryOutput, BlobOutput, LogFile, metrics_outputs
-from c7n.resources.aws import S3Output, MetricsOutput
+from c7n.resources.aws import S3Output, MetricsOutput, get_bucket_region_clientless
 from c7n.testing import mock_datetime_now, TestUtils
 
 from .common import Bag, BaseTest
+
+import pytest
+import vcr
 
 
 class MetricsTest(BaseTest):
@@ -48,12 +53,13 @@ class S3OutputTest(TestUtils):
     def get_s3_output(self, output_url=None, cleanup=True, klass=S3Output):
         if output_url is None:
             output_url = "s3://cloud-custodian/policies"
-        output = klass(
-            ExecutionContext(
-                lambda assume=False: mock.MagicMock(),
-                Bag(name="xyz", provider_name="ostack"),
-                Config.empty(output_dir=output_url, account_id='112233445566')),
-            {'url': output_url, 'test': True})
+        with mock.patch('c7n.resources.aws.get_bucket_region_clientless', return_value='us-east-1'):
+            output = klass(
+                ExecutionContext(
+                    lambda assume=False, region="us-east-1": mock.MagicMock(),
+                    Bag(name="xyz", provider_name="ostack"),
+                    Config.empty(output_dir=output_url, account_id='112233445566')),
+                {'url': output_url, 'test': True})
 
         if cleanup:
             self.addCleanup(shutil.rmtree, output.root_dir)
@@ -173,3 +179,78 @@ class S3OutputTest(TestUtils):
             "%s/foo.txt" % output.key_prefix.lstrip('/'),
             extra_args={"ACL": "bucket-owner-full-control", "ServerSideEncryption": "AES256"},
         )
+
+
+@pytest.mark.parametrize(
+    'bucket, endpoint, expected_region',
+    [
+        pytest.param(
+            'gis-publicportal',
+            'https://s3-us-gov-east-1.amazonaws.com',
+            'us-gov-west-1',
+            id='govcloud-cross-region',
+        ),
+        pytest.param(
+            'gis-publicportal',
+            'https://s3-us-gov-west-1.amazonaws.com',
+            'us-gov-west-1',
+            id='govcloud-same-region',
+        ),
+        pytest.param(
+            'apigateway',
+            'https://s3.us-east-1.amazonaws.com',
+            'us-east-1',
+            id='us-same-region',
+        ),
+        pytest.param(
+            'apigateway',
+            'https://s3.us-west-2.amazonaws.com',
+            'us-east-1',
+            id='us-cross-region',
+        ),
+    ]
+)
+def test_get_bucket_region_http(bucket, endpoint, expected_region, request):
+    """Test finding the output bucket region via HTTP requests"""
+
+    with vcr.use_cassette(
+        f'tests/data/vcr_cassettes/test_output/{request.node.name}.yaml',
+        record_mode='none'
+    ):
+        region = get_bucket_region_clientless(bucket, endpoint)
+        assert region == expected_region
+
+
+@pytest.mark.parametrize(
+    'output_url, expected_region, expected_flow',
+    [
+        pytest.param(
+            's3://c7n-test-us-west-2/out',
+            'us-west-2',
+            no_exception(),
+            id='success',
+        ),
+        pytest.param(
+            's3://nonexistentbucket/out',
+            None,
+            pytest.raises(InvalidOutputConfig),
+            id='error',
+        ),
+    ]
+)
+def test_get_bucket_location_api(test, request, output_url, expected_region, expected_flow):
+    """Test finding the output bucket region via API calls"""
+
+    factory = test.replay_flight_data(request.node.name)
+
+    with expected_flow, mock.patch(
+        # simulate a failure checking the bucket region via HTTP requests
+        'c7n.resources.aws.get_bucket_region_clientless', return_value=None
+    ):
+        ctx = ExecutionContext(
+            factory,
+            Bag(name="test", provider_name="aws"),
+            Config.empty(output_dir=output_url, account_id='123456789012')
+        )
+        output = S3Output(ctx, {'url': output_url, 'test': True})
+        assert output.bucket_region == expected_region

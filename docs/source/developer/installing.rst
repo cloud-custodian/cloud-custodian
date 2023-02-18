@@ -6,9 +6,11 @@ Installing for Developers
 Installing Prerequisites
 ------------------------
 
-Cloud Custodian supports Python 3.6, 3.7, 3.8 and above. To develop the
-Custodian, you will need to have a make/C toolchain, Python3 and some
-basic Python tools.
+Cloud Custodian supports Python 3.7 and above. To work on Custodian's code base, you will need:
+
+* A make/C toolchain
+* A supported release of Python 3
+* Some basic Python tools
 
 
 Install Python 3
@@ -21,32 +23,21 @@ Here are instructions for a way to do it on Ubuntu and Mac OS X.
 On Ubuntu
 *********
 
-On most recent versions of Ubuntu, Python 3 is included by default.
+Python 3 is included in recent Ubuntu releases.
 
-To get Python 3.8, first add the deadsnakes package repository:
-
-.. code-block:: bash
-
-    sudo add-apt-repository ppa:deadsnakes/ppa
-
-Next, install python3.8 and the development headers for it:
+To install Ubuntu's default Python 3 version along with additional packages required
+to manage Python packages and environments, run:
 
 .. code-block:: bash
 
-    sudo apt-get install python3.8 python3.8-dev
-
-Then, install ``pip``:
-
-.. code-block::
-
-    sudo apt-get install python3-pip
+    sudo apt-get install python3 python3-venv python3-pip
 
 When this is complete you should be able to check that you have pip properly installed:
 
 .. code-block::
 
-    python3.8 -m pip --version
-    pip 9.0.1 from /usr/lib/python3/dist-packages (python 3.8)
+    python3 -m pip --version
+    pip 20.0.2 from /usr/lib/python3/dist-packages/pip (python 3.8)
 
 (your exact version numbers will likely differ)
 
@@ -58,20 +49,44 @@ On macOS with Homebrew
 
     brew install python3
 
-Installing ``python3`` will get you the latest version of Python 3 supported by Homebrew, currently Python 3.7.
+Installing ``python3`` will get you the latest version of Python 3 supported by Homebrew, currently Python 3.9.
 
 
-Basic Python Tools
-~~~~~~~~~~~~~~~~~~
+On Windows
+**********
 
-Once your Python installation is squared away, you will need to install ``tox``:
+The Windows Store provides `apps <https://www.microsoft.com/en-us/search/shop/apps?q=python&devicetype=pc&category=Developer+tools%5cDevelopment+kits>`_
+for active Python 3 releases.
+
+
+Other Installation Methods
+**************************
+
+If ``python3 --version`` shows a Python version that is not
+`actively supported <https://devguide.python.org/#status-of-python-branches>`_ and the steps
+above don't apply to your environment, you can still install a current release of Python
+manually. `This guide <https://realpython.com/installing-python/>`_ may be a useful reference.
+
+
+Install Poetry
+~~~~~~~~~~~~~~
+
+Cloud Custodian uses `Poetry <https://python-poetry.org>`_ to manage its dependencies. Once your
+Python environment is set up, you will need to install `install Poetry <https://python-poetry.org/docs/#installation>`_.
+
+On Mac/Linux
+************
 
 .. code-block:: bash
 
-    python3.7 -m pip install -U pip tox
+    curl -sSL https://install.python-poetry.org | python3 -
 
-(note that we also updated ``pip`` in order to get the latest version)
+On Windows with Powershell
+**************************
 
+.. code-block:: powershell
+
+    (Invoke-WebRequest -Uri https://install.python-poetry.org -UseBasicParsing).Content | python -
 
 Installing Custodian
 --------------------
@@ -108,104 +123,42 @@ First, clone the repository:
         git merge upstream/master
 
 
-Now that the repository is set up, build the software with `tox <https://tox.readthedocs.io/en/latest/>`_:
+Now that the repository is set up, perform a developer installation using Poetry:
 
 .. code-block:: bash
 
-    tox
+    make install-poetry
 
-Tox creates a sandboxed "virtual environment" ("venv") for each Python version, 3.6, 3.7, 3.8
-These are stored in the ``.tox/`` directory.
-It then runs the test suite under all versions of Python, per the ``tox.ini`` file.
-If tox is unable to find a Python executable on your system for one of the supported versions, it will fail for that environment.
-You can safely ignore these failures when developing locally.
+This creates a sandboxed "virtual environment" ("venv") inside the ``cloud-custodian``
+directory, and installs the full suite of Cloud Custodian packages.
 
-You can run the test suite in a single environment with the ``-e`` flag:
+You can run tests via Poetry as well:
 
 .. code-block:: bash
 
-    tox -e py38
+    make test-poetry
 
-To access the executables installed in one or the other virtual environment,
-source the venv into your current shell, e.g.:
-
-.. code-block:: bash
-
-    source .tox/py37/bin/activate
-
-You should then have, e.g., the ``custodian`` command available:
+To run executables from your Poetry environment, precede them with ``poetry run``:
 
 .. code-block:: bash
 
-    (py37)$ custodian -h
+    poetry run custodian version
+
+Alternatively, activate a Poetry shell so that commands will run from your
+development environment by default:
+
+.. code-block:: bash
+
+    poetry shell
+    custodian version
+    custodian schema
 
 You'll also be able to invoke `pytest <https://docs.pytest.org/en/latest/>`_ directly
-with the arguments of your choosing, e.g.:
+with the arguments of your choosing, though that requires mimicking ``make test-poetry``'s
+environment preparation:
 
 .. code-block:: bash
 
-    (py37) $ pytest tests/test_s3.py -x -k replication
-
-Note that you'll have to set up environment variables appropriately per the tox.ini
-for provider credentials. See below for the best way to do that.
-
-
-Installing in Your Own Virtual Environment
-------------------------------------------
-
-Running directly from a tox sandbox, while very easy to set up, might not be
-the most comfortable way of working. You might want to create your own virtual
-environment and use that for running Custodian. This can be done using the ``venv``
-module. It can be done right inside the cloned Cloud Custodian repository:
-
-.. code-block:: bash
-
-    python3 -m venv .
-
-The above command assumes the current directory is the Cloud Custodian checkout.
-
-Next, you'll need to install all the development dependencies. Cloud Custodian uses
-`poetry <https://python-poetry.org>`_ for packaging and dependency management.
-Poetry uses a custom installer, to be fully isolated from the rest of your system.
-
-For osx and linux, poetry recommends running this for installing:
-
-.. code-block:: bash
-
-    curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python -
-
-For windows powershell use this command:
-
-.. code-block:: bash
-
-    (Invoke-WebRequest -Uri https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py -UseBasicParsing).Content | python -
-
-
-Once poetry is installed, you can set up Cloud Custodian using the included Makefile:
-
-.. code-block:: bash
-
-    source bin/activate
-    (cloud-custodian) $ make install-poetry
-
-.. note::
-    It's important to activate the venv before running the installer, or poetry will
-    create a venv for each dependency folder included in the Cloud Custodian repository.
-
-Once this is done, poetry can be used to run the tests as well:
-
-.. code-block:: bash
-
-    (cloud-custodian) $ make test-poetry
-
-You could also use ``pytest`` to run the tests, but you will need to set up some
-environment variables to successfully run the full test suite. The best way to do
-that is to edit the ``test.env`` file in the root of the repository and "source" it,
-using the shell:
-
-.. code-block:: bash
-
+    poetry shell
     source test.env
-
-In general, it's best to use ``tox`` to run the full test suite, and use ``pytest``
-to run specific tests that you are working on.
+    pytest tests/test_s3.py -x -k replication

@@ -1,0 +1,24 @@
+{
+    "status_code": 200,
+    "data": {
+        "Attributes": {
+            "QueueArn": "arn:aws:sqs:us-east-1:644160558196:bar",
+            "ApproximateNumberOfMessages": "0",
+            "ApproximateNumberOfMessagesNotVisible": "0",
+            "ApproximateNumberOfMessagesDelayed": "0",
+            "CreatedTimestamp": "1648601669",
+            "LastModifiedTimestamp": "1648601750",
+            "VisibilityTimeout": "450",
+            "MaximumMessageSize": "262144",
+            "MessageRetentionPeriod": "345600",
+            "DelaySeconds": "0",
+            "Policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"\",\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"sns.amazonaws.com\"},\"Action\":\"sqs:SendMessage\",\"Resource\":\"arn:aws:sqs:us-east-1:644160558196:bar\",\"Condition\":{\"ArnEquals\":{\"aws:SourceArn\":\"arn:aws:sns:*:644160558196:*\"}}}]}",
+            "RedrivePolicy": "{\"deadLetterTargetArn\":\"arn:aws:sqs:us-east-1:644160558196:bar_dlq\",\"maxReceiveCount\":3}",
+            "ReceiveMessageWaitTimeSeconds": "0",
+            "KmsMasterKeyId": "arn:aws:kms:us-east-1:644160558196:key/75a0b693-ba69-4934-882b-10ba0f457567",
+            "KmsDataKeyReusePeriodSeconds": "3600",
+            "SqsManagedSseEnabled": "false"
+        },
+        "ResponseMetadata": {}
+    }
+}

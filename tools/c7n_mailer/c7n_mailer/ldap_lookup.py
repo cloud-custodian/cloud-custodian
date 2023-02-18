@@ -55,6 +55,8 @@ class LdapLookup:
             )
         except LDAPSocketOpenError:
             self.log.error('Not able to establish a connection with LDAP.')
+        except Exception as e:
+            self.log.warning(f'Error occurred getting LDAP connection: {e}')
 
     def search_ldap(self, base_dn, ldap_filter, attributes):
         self.connection.search(base_dn, ldap_filter, attributes=self.attributes)

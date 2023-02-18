@@ -1,0 +1,83 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "cluster": {
+            "name": "pod2-9756",
+            "arn": "arn:aws:eks:us-east-1:644160558196:cluster/pod2-9756",
+            "createdAt": {
+                "__class__": "datetime",
+                "year": 2022,
+                "month": 8,
+                "day": 29,
+                "hour": 12,
+                "minute": 7,
+                "second": 22,
+                "microsecond": 288000
+            },
+            "version": "1.22",
+            "endpoint": "https://26B111A1284F4828DEE0ECAF3F0A4C7B.gr7.us-east-1.eks.amazonaws.com",
+            "roleArn": "arn:aws:iam::644160558196:role/eksctl-devk8s-cluster-ServiceRole-1JNA85I5147VF",
+            "resourcesVpcConfig": {
+                "subnetIds": [
+                    "subnet-083ab4dd1a8b6eaa6",
+                    "subnet-0544e30702e2e1ad4"
+                ],
+                "securityGroupIds": [],
+                "clusterSecurityGroupId": "sg-0e57ab517e0ce06e5",
+                "vpcId": "vpc-0598080981e0332f9",
+                "endpointPublicAccess": true,
+                "endpointPrivateAccess": false,
+                "publicAccessCidrs": [
+                    "0.0.0.0/0"
+                ]
+            },
+            "kubernetesNetworkConfig": {
+                "serviceIpv4Cidr": "10.100.0.0/16",
+                "ipFamily": "ipv4"
+            },
+            "logging": {
+                "clusterLogging": [
+                    {
+                        "types": [
+                            "api"
+                        ],
+                        "enabled": true
+                    },
+                    {
+                        "types": [
+                            "audit",
+                            "authenticator",
+                            "controllerManager",
+                            "scheduler"
+                        ],
+                        "enabled": false
+                    }
+                ]
+            },
+            "identity": {
+                "oidc": {
+                    "issuer": "https://oidc.eks.us-east-1.amazonaws.com/id/26B111A1284F4828DEE0ECAF3F0A4C7B"
+                }
+            },
+            "status": "ACTIVE",
+            "certificateAuthority": {
+                "data": "LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUMvakNDQWVhZ0F3SUJBZ0lCQURBTkJna3Foa2lHOXcwQkFRc0ZBREFWTVJNd0VRWURWUVFERXdwcmRXSmwKY201bGRHVnpNQjRYRFRJeU1EZ3lPVEUyTVRNeU5Gb1hEVE15TURneU5qRTJNVE15TkZvd0ZURVRNQkVHQTFVRQpBeE1LYTNWaVpYSnVaWFJsY3pDQ0FTSXdEUVlKS29aSWh2Y05BUUVCQlFBRGdnRVBBRENDQVFvQ2dnRUJBUFJYCkNUZm4wN1lQQThIbUdGWDkyMUl2MExjeWJkaUlKa3hZSzNNS0t5cHN1bSt6aUJEeWZRdHpIWXFld0tQTEZyblIKbFJKMm5MS3FDMWhRQTBqR1RrTUZNZ09IQ1p6V1dVYlhJZmRIRkZWdzZRWDhvMG9VWDc4bjY2cStmTHBRbWJ4ZAp1bERsWkdBaVpGc2c5UEpkV1QrQkdOelBocmRNbThveDFaQkxMb0s5RjRPMTVCa2h5R1NIYW01MEtPc0VOQVZ5CkpMMWtNT2V2STVET2IzV3ljU2h2MjRsRVRlQ1ZUR2dkL2NaMzRFZG9QSU03Rk9OSlV2aTQ3a3NoNVF5S2JQbHUKa2ZKMGE0Vkp5YUNOY0JYWDI3TUpEQktLWmlPdHlySjJ1SUtMUGVqNmtBdkI0YjVhOStRWmRlaG14YkV0NVFFdwpZWm9tZkhIVWVvdXlXV2tjTW44Q0F3RUFBYU5aTUZjd0RnWURWUjBQQVFIL0JBUURBZ0trTUE4R0ExVWRFd0VCCi93UUZNQU1CQWY4d0hRWURWUjBPQkJZRUZFbDBmTHkycFpMTkpXNnJ5R0FaRDBxK1grbkhNQlVHQTFVZEVRUU8KTUF5Q0NtdDFZbVZ5Ym1WMFpYTXdEUVlKS29aSWh2Y05BUUVMQlFBRGdnRUJBQTZBTHJ2cXFTWWR6WDRDdTFRNApYRXpBL2lTQ0JoaFQyK0pvdkNKMzYzaDdOeW5YY2xJRXE3NDJLcHFOR2VKeFNWdFRoZHZtZ3p3WW1CL3BCODVHCnJiVi9ieTF6Z20velZQYVNoczg2eVFtYkpqZ1ZEQTZFNVY5UkV3NHplUG81b0lhQlZyZUIyeXl5Qjd4MFMvZXUKeUJLcVhzTGlHamgzS3k0VXYvK09zUU1ZbW5mQWFISHlKQXhjMEtSVmhhOTJ1ZU9DYlVyc0IydHlCZ0p5SEZSbQpKeWtaZkpXM01LeC94T2dZYlRBeHdyRE5yN2djT0dhVWtmemR0anVHRDNReGpxcjdBZE5kRFBrZk81T2gwemtNCkZaVDZzYVlGZ1RkT1YwNUdmL1dPSWtIa2VlZGcxb1VoTTg1T1VJYjVwUXRKNVVDb2syMDltajBoYTZYTFlPZEIKbmlZPQotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0tCg=="
+            },
+            "platformVersion": "eks.5",
+            "tags": {
+                "name": "Jerry"
+            },
+            "encryptionConfig": [
+                {
+                    "resources": [
+                        "secrets"
+                    ],
+                    "provider": {
+                        "keyArn": "arn:aws:kms:us-east-1:644160558196:key/361001ad-9c5e-42cb-9a09-5de1e80e822f"
+                    }
+                }
+            ]
+        }
+    }
+}

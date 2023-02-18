@@ -13,7 +13,7 @@ class ArtifactDomain(QueryResourceManager):
         service = 'codeartifact'
         enum_spec = ('list_domains', 'domains', None)
         detail_spec = ('describe_domain', 'domain', 'name', 'domain')
-        cfn_type = 'AWS::CodeArtifact::Repository'
+        cfn_type = 'AWS::CodeArtifact::Domain'
         id = name = 'name'
         arn = 'arn'
 
@@ -114,6 +114,7 @@ class ArtifactRepo(QueryResourceManager):
     class resource_type(TypeInfo):
         service = 'codeartifact'
         enum_spec = ('list_repositories', 'repositories', None)
+        cfn_type = 'AWS::CodeArtifact::Repository'
         id = name = 'name'
         arn = 'arn'
 

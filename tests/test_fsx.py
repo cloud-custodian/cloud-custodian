@@ -1,8 +1,12 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
-from .common import BaseTest
 import time
+from dateutil.parser import parse as date_parse
+
+import c7n.resources.fsx
+from c7n.testing import mock_datetime_now
+from .common import BaseTest
 
 
 class TestFSx(BaseTest):
@@ -309,7 +313,7 @@ class TestFSx(BaseTest):
             session_factory=session_factory
         )
         resources = p.run()
-        self.assertTrue(len(resources), 1)
+        self.assertEqual(len(resources), 1)
         client = session_factory().client('fsx')
         fs = client.describe_file_systems(
             FileSystemIds=[resources[0]['FileSystemId']])['FileSystems']
@@ -355,7 +359,7 @@ class TestFSx(BaseTest):
             session_factory=session_factory
         )
         resources = p.run()
-        self.assertTrue(len(resources), 1)
+        self.assertEqual(len(resources), 1)
         client = session_factory().client('fsx')
         fs = client.describe_file_systems(
             FileSystemIds=[resources[0]['FileSystemId']])['FileSystems']
@@ -395,7 +399,7 @@ class TestFSx(BaseTest):
             session_factory=session_factory
         )
         resources = p.run()
-        self.assertTrue(len(resources), 1)
+        self.assertEqual(len(resources), 1)
         client = session_factory().client('fsx')
         fs = client.describe_file_systems(
             FileSystemIds=[resources[0]['FileSystemId']])['FileSystems']
@@ -408,6 +412,35 @@ class TestFSx(BaseTest):
             session_factory=session_factory)
         resources = p.resource_manager.get_resources(
             ["arn:aws:fsx:us-east-1:644160558196:file-system/fs-0bc98cbfb6b356896"])
+        self.assertEqual(len(resources), 1)
+
+    def test_fsx_backup_count_filter(self):
+        session_factory = self.replay_flight_data("test_fsx_backup_count_filter")
+        p = self.load_policy(
+            {
+                "name": "fsx-backup-count-filter",
+                "resource": "fsx",
+                "filters": [{"type": "consecutive-backups", "days": 2}],
+            },
+            config={'region': 'us-west-2'},
+            session_factory=session_factory,
+        )
+        with mock_datetime_now(date_parse("2022-07-04"), c7n.resources.fsx):
+            resources = p.run()
+        self.assertEqual(len(resources), 3)
+
+    def test_fsx_igw_subnet(self):
+        factory = self.replay_flight_data('test_fsx_public_subnet')
+        p = self.load_policy({
+            'name': 'fsx-public',
+            'resource': 'fsx',
+            'filters': [
+                {'type': 'subnet',
+                 'key': 'SubnetId',
+                 'value': 'present',
+                 'igw': True}
+            ]}, config={'region': 'us-west-2'}, session_factory=factory)
+        resources = p.run()
         self.assertEqual(len(resources), 1)
 
 
@@ -460,7 +493,7 @@ class TestFSxBackup(BaseTest):
             session_factory=session_factory
         )
         resources = p.run()
-        self.assertTrue(len(resources), 1)
+        self.assertEqual(len(resources), 1)
         client = session_factory().client('fsx')
         backups = client.describe_backups(
             Filters=[
@@ -497,7 +530,7 @@ class TestFSxBackup(BaseTest):
             session_factory=session_factory
         )
         resources = p.run()
-        self.assertTrue(len(resources), 1)
+        self.assertEqual(len(resources), 1)
 
         client = session_factory().client('fsx')
         backups = client.describe_backups(
@@ -533,7 +566,7 @@ class TestFSxBackup(BaseTest):
             session_factory=session_factory
         )
         resources = p.run()
-        self.assertTrue(len(resources), 1)
+        self.assertEqual(len(resources), 1)
 
         client = session_factory().client('fsx')
         backups = client.describe_backups(

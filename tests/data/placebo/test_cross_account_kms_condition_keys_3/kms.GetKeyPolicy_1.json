@@ -1,0 +1,7 @@
+{
+    "status_code": 200,
+    "data": {
+        "Policy": "{\n  \"Version\" : \"2012-10-17\",\n  \"Id\" : \"Lulu\",\n  \"Statement\" : [ {\n    \"Sid\" : \"Enable IAM User Permissions\",\n    \"Effect\" : \"Allow\",\n    \"Principal\" : {\n      \"AWS\" : \"arn:aws:iam::644160558196:root\"\n    },\n    \"Action\" : \"kms:*\",\n    \"Resource\" : \"*\"\n  }, {\n    \"Sid\" : \"Bad condition key\",\n    \"Effect\" : \"Allow\",\n    \"Principal\" : {\n      \"AWS\" : \"*\"\n    },\n    \"Action\" : \"kms:Encrypt\",\n    \"Resource\" : \"*\",\n    \"Condition\" : {\n      \"StringEquals\" : {\n        \"kms:CallerAccount\" : \"*\",\n        \"kms:ViaService\" : \"s3.af-south-1.amazonaws.com\"\n      },\n      \"ForAllValues:StringEquals\" : {\n        \"kms:GrantOperations\" : \"Encrypt\"\n      }\n    }\n  } ]\n}",
+        "ResponseMetadata": {}
+    }
+}

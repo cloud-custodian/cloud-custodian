@@ -15,6 +15,12 @@
         "LaunchPermissions": [
             {
                 "UserId": "185106417252"
+            },
+            {
+                "OrganizationArn": "arn:aws:organizations::112233445566:organization/o-xyzabc123w"
+            },
+            {
+                "OrganizationalUnitArn": "arn:aws:organizations::112233445566:ou/o-xyzabc123w/ou-1xyz-abc123yz"
             }
         ], 
         "ImageId": "ami-a63ae2db"

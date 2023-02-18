@@ -37,7 +37,6 @@ def get_trail_groups(session_factory, trails):
 
 @resources.register('cloudtrail')
 class CloudTrail(QueryResourceManager):
-
     class resource_type(TypeInfo):
         service = 'cloudtrail'
         enum_spec = ('describe_trails', 'trailList', None)
@@ -72,7 +71,7 @@ class IsShadow(Filter):
         trails = [t for t in resources if (self.is_shadow(t) == self.data.get('state', True))]
         if len(trails) != rcount and self.embedded:
             self.log.info("implicitly filtering shadow trails %d -> %d",
-                     rcount, len(trails))
+                          rcount, len(trails))
         return trails
 
     def is_shadow(self, t):

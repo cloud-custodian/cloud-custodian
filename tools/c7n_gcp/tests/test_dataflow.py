@@ -19,6 +19,12 @@ class DataflowJobTest(BaseTest):
         self.assertEqual(resource[0]['projectId'], project_id)
         self.assertEqual(resource[0]['location'], 'us-central1')
         self.assertTrue(resource[0].get("environment"))
+        self.assertEqual(
+            p.resource_manager.get_urns(resource),
+            [
+                'gcp:dataflow:us-central1:cloud-custodian:job/test'
+            ],
+        )
 
     def test_job_get(self):
         project_id = 'cloud-custodian'
@@ -39,3 +45,9 @@ class DataflowJobTest(BaseTest):
         self.assertEqual(resource[0]['name'], 'test1')
         self.assertEqual(resource[0]['projectId'], project_id)
         self.assertEqual(resource[0]['location'], 'us-central1')
+        self.assertEqual(
+            p.resource_manager.get_urns(resource),
+            [
+                'gcp:dataflow:us-central1:cloud-custodian:job/test1'
+            ],
+        )

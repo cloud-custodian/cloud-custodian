@@ -1,0 +1,50 @@
+interactions:
+- request:
+    body: '{"Offset": 0, "Limit": 20}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '26'
+      Content-Type:
+      - application/json
+      Host:
+      - cls.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.27.1
+      X-TC-Action:
+      - DescribeTopics
+      X-TC-Region:
+      - ap-singapore
+      X-TC-Version:
+      - '2020-10-16'
+    method: POST
+    uri: https://cls.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"Topics":[{"LogsetId":"f2fba44e-8e19-45cd-9c56-7f53b1f7cfb7","TopicId":"17d8c3c9-c736-4117-b0e9-96995568b573","TopicName":"custodian-test","PartitionCount":1,"Index":false,"AssumerUin":0,"AssumerName":"","SubAssumerName":"","RoleName":"","CreateTime":"2022-10-17
+        17:36:52","Status":true,"TopicModifyAcl":0,"TopicShowAcl":0,"Tags":[{"Key":"test_pro_26","Value":"test_pro_26"},{"Key":"test_pro_00001","Value":"this
+        is test"}],"AutoSplit":true,"MaxSplitPartitions":50,"StorageType":"hot","Period":3600,"SubUin":100000750436,"UserSample":"","UserSampleStatus":false,"LogsetInfo":{"LogsetId":"f2fba44e-8e19-45cd-9c56-7f53b1f7cfb7","LogsetName":"zzhli-cloudaudit-trace","CreateTime":"","AssumerUin":0,"AssumerName":"","LogsetModifyAcl":0,"LogsetShowAcl":0,"Tags":null,"Period":0,"TopicCount":2,"RoleName":"","LogsetDelACL":0},"Describes":"custodian-test","WhitelistInfo":{"CloudQueryLanguage":false},"HotPeriod":0},{"LogsetId":"f2fba44e-8e19-45cd-9c56-7f53b1f7cfb7","TopicId":"3cbe0793-0817-4674-a70c-77948ef4e2ca","TopicName":"cloudaudit","PartitionCount":1,"Index":true,"AssumerUin":0,"AssumerName":"","SubAssumerName":"","RoleName":"","CreateTime":"2022-06-21
+        20:51:12","Status":true,"TopicModifyAcl":0,"TopicShowAcl":0,"Tags":[],"AutoSplit":true,"MaxSplitPartitions":50,"StorageType":"hot","Period":7,"SubUin":200022436235,"UserSample":"","UserSampleStatus":false,"LogsetInfo":{"LogsetId":"f2fba44e-8e19-45cd-9c56-7f53b1f7cfb7","LogsetName":"zzhli-cloudaudit-trace","CreateTime":"","AssumerUin":0,"AssumerName":"","LogsetModifyAcl":0,"LogsetShowAcl":0,"Tags":null,"Period":0,"TopicCount":2,"RoleName":"","LogsetDelACL":0},"Describes":"","WhitelistInfo":{"CloudQueryLanguage":false},"HotPeriod":0},{"LogsetId":"e8f59ad5-c6bd-44e4-a75f-bf153dc29b9d","TopicId":"95583241-1165-4338-b72d-d68b97b97f95","TopicName":"tke-audit-cls-4bqctahq-102564","PartitionCount":1,"Index":true,"AssumerUin":91000000016,"AssumerName":"TKE","SubAssumerName":"TKE-Audit","RoleName":"TKE_QCSRole","CreateTime":"2022-02-24
+        08:56:12","Status":true,"TopicModifyAcl":29,"TopicShowAcl":31,"Tags":[],"AutoSplit":true,"MaxSplitPartitions":50,"StorageType":"hot","Period":30,"SubUin":0,"UserSample":"","UserSampleStatus":false,"LogsetInfo":{"LogsetId":"e8f59ad5-c6bd-44e4-a75f-bf153dc29b9d","LogsetName":"TKE-cls-4bqctahq-102564","CreateTime":"","AssumerUin":91000000016,"AssumerName":"TKE","LogsetModifyAcl":1,"LogsetShowAcl":1,"Tags":null,"Period":0,"TopicCount":1,"RoleName":"TKE_QCSRole","LogsetDelACL":1},"Describes":"","WhitelistInfo":{"CloudQueryLanguage":false},"HotPeriod":0},{"LogsetId":"87311d63-d215-4e43-a160-493ca992d751","TopicId":"f01467ef-a621-4eb2-8be2-9481422b7b30","TopicName":"tke-audit-cls-55klgp4m-102564","PartitionCount":1,"Index":true,"AssumerUin":91000000016,"AssumerName":"TKE","SubAssumerName":"TKE-Audit","RoleName":"TKE_QCSRole","CreateTime":"2022-02-24
+        06:57:34","Status":true,"TopicModifyAcl":29,"TopicShowAcl":31,"Tags":[],"AutoSplit":true,"MaxSplitPartitions":50,"StorageType":"hot","Period":30,"SubUin":0,"UserSample":"","UserSampleStatus":false,"LogsetInfo":{"LogsetId":"87311d63-d215-4e43-a160-493ca992d751","LogsetName":"TKE-cls-55klgp4m-102564","CreateTime":"","AssumerUin":91000000016,"AssumerName":"TKE","LogsetModifyAcl":1,"LogsetShowAcl":1,"Tags":null,"Period":0,"TopicCount":1,"RoleName":"TKE_QCSRole","LogsetDelACL":1},"Describes":"","WhitelistInfo":{"CloudQueryLanguage":false},"HotPeriod":0},{"LogsetId":"c3eab355-cac3-4d7f-bf93-8716f94ec7de","TopicId":"58c8c2f1-2e46-4236-99e4-c44c82b8142d","TopicName":"tke-audit-cls-9jvmwxa2-102564","PartitionCount":1,"Index":true,"AssumerUin":91000000016,"AssumerName":"TKE","SubAssumerName":"TKE-Audit","RoleName":"TKE_QCSRole","CreateTime":"2022-02-16
+        05:44:12","Status":true,"TopicModifyAcl":29,"TopicShowAcl":31,"Tags":[],"AutoSplit":true,"MaxSplitPartitions":50,"StorageType":"hot","Period":30,"SubUin":0,"UserSample":"","UserSampleStatus":false,"LogsetInfo":{"LogsetId":"c3eab355-cac3-4d7f-bf93-8716f94ec7de","LogsetName":"TKE-cls-9jvmwxa2-102564","CreateTime":"","AssumerUin":91000000016,"AssumerName":"TKE","LogsetModifyAcl":1,"LogsetShowAcl":1,"Tags":null,"Period":0,"TopicCount":1,"RoleName":"TKE_QCSRole","LogsetDelACL":1},"Describes":"","WhitelistInfo":{"CloudQueryLanguage":false},"HotPeriod":0}],"RequestId":"5c81ef1e-1067-4fd0-ad5f-3bc2771c097b","TotalCount":5}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '4341'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 18 Oct 2022 08:15:45 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+version: 1

@@ -93,6 +93,26 @@
                     "ComputeTypeName": "POWER"
                 },
                 "ModificationStates": []
+            },
+            {
+                "WorkspaceId": "ws-5fm1ykjjj",
+                "DirectoryId": "d-5183055e94",
+                "UserName": "rburnham",
+                "State": "ERROR",
+                "BundleId": "wsb-c4dc00cc1",
+                "ErrorMessage": "There was an issue joining the WorkSpace to your domain.  Verify that your service account is allowed to complete domain join operations.  If you continue to see an issue, contact AWS Support.",
+                "ErrorCode": "ConfigureWorkspace.DomainJoin",
+                "VolumeEncryptionKey": "arn:aws:kms:us-east-1:644160558196:key/14a03569-d26b-4496-92e5-dfe8cb1855fe",
+                "UserVolumeEncryptionEnabled": true,
+                "RootVolumeEncryptionEnabled": true,
+                "WorkspaceProperties": {
+                    "RunningMode": "AUTO_STOP",
+                    "RunningModeAutoStopTimeoutInMinutes": 120,
+                    "RootVolumeSizeGib": 80,
+                    "UserVolumeSizeGib": 100,
+                    "ComputeTypeName": "POWER"
+                },
+                "ModificationStates": []
             }
         ],
         "NextToken": "",

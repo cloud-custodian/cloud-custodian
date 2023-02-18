@@ -4,20 +4,31 @@
         "Aliases": [
             {
                 "AliasName": "alias/skunk/trails",
-                "AliasArn": "arn:aws:kms:us-east-1:644160558196:alias/skunk/trails",
-                "TargetKeyId": "36812ccf-daaf-49b1-a24b-0eef254ffe41"
+                "AliasArn": "arn:aws:kms:ap-northeast-2:644160558196:alias/skunk/trails",
+                "TargetKeyId": "4e587a21-567d-4504-aa8e-879b1b98ca15",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 12,
+                    "day": 9,
+                    "hour": 12,
+                    "minute": 8,
+                    "second": 27,
+                    "microsecond": 381000
+                },
+                "LastUpdatedDate": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 12,
+                    "day": 9,
+                    "hour": 12,
+                    "minute": 8,
+                    "second": 27,
+                    "microsecond": 381000
+                }
             }
         ],
         "Truncated": false,
-        "ResponseMetadata": {
-            "RequestId": "4b79e6f0-60e3-435a-acce-7f3cf255b4d0",
-            "HTTPStatusCode": 200,
-            "HTTPHeaders": {
-                "x-amzn-requestid": "4b79e6f0-60e3-435a-acce-7f3cf255b4d0",
-                "content-type": "application/x-amz-json-1.1",
-                "content-length": "202"
-            },
-            "RetryAttempts": 0
-        }
+        "ResponseMetadata": {}
     }
 }

@@ -5,7 +5,7 @@ Cloud Custodian
 
 ---
 
-[![](https://badges.gitter.im/cloud-custodian/cloud-custodian.svg)](https://gitter.im/cloud-custodian/cloud-custodian?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![slack](https://img.shields.io/badge/slack-chat-yellow)](https://communityinviter.com/apps/cloud-custodian/c7n-chat)
 [![CI](https://github.com/cloud-custodian/cloud-custodian/workflows/CI/badge.svg?event=push)](https://github.com/cloud-custodian/cloud-custodian/actions?query=workflow%3ACI+branch%3Amaster+event%3Apush)
 [![](https://dev.azure.com/cloud-custodian/cloud-custodian/_apis/build/status/Custodian%20-%20CI?branchName=master)](https://dev.azure.com/cloud-custodian/cloud-custodian/_build)
 [![](https://img.shields.io/badge/license-Apache%202-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0)
@@ -34,7 +34,7 @@ provider to provide for real time enforcement of policies with builtin
 provisioning. Or it can be run as a simple cron job on a server to
 execute against large existing fleets.
 
-Cloud Custodian is a CNCF Sandbox project, lead by a community of hundreds
+Cloud Custodian is a CNCF Incubating project, lead by a community of hundreds
 of contributors.
 
 Features
@@ -64,6 +64,7 @@ Links
 -   [Project Roadmap](https://github.com/orgs/cloud-custodian/projects/1)
 -   [Developer Install](https://cloudcustodian.io/docs/developer/installing.html)
 -   [Presentations](https://www.google.com/search?q=cloud+custodian&source=lnms&tbm=vid)
+-   [YouTube Channel](https://www.youtube.com/channel/UCdeXCdFLluylWnFfS0-jbDA)
 
 Quick Install
 -------------
@@ -213,7 +214,8 @@ Get Involved
 ------------
 
 -   [GitHub](https://github.com/cloud-custodian/cloud-custodian) - (This page)
--   [Gitter](https://gitter.im/cloud-custodian/cloud-custodian) - Real time chat if you're looking for help
+-   [Slack](https://communityinviter.com/apps/cloud-custodian/c7n-chat) - Real time chat if you're looking for help or interested in contributing to Custodian! 
+    - [Gitter](https://gitter.im/cloud-custodian/cloud-custodian) - (Older real time chat, we're likely migrating away from this)
 -   [Mailing List](https://groups.google.com/forum/#!forum/cloud-custodian) - Our project mailing list, subscribe here for important project announcements, feel free to ask questions
 -   [Reddit](https://reddit.com/r/cloudcustodian) - Our subreddit
 -   [StackOverflow](https://stackoverflow.com/questions/tagged/cloudcustodian) - Q&A site for developers, we keep an eye on the `cloudcustodian` tag
@@ -227,7 +229,7 @@ Joining the [mailing list](https://groups.google.com/forum/#!forum/cloud-custodi
 See the notes below for more technical information on joining the meeting. 
 
 - [Community Meeting Videos](https://www.youtube.com/watch?v=qy250y0UT-4&list=PLJ2Un8H_N5uBeAAWK95SnWvm_AuNJ8q2x)
-- [Community Meeting Notes Archive](https://github.com/cloud-custodian/community/discussions)
+- [Community Meeting Notes Archive](https://github.com/orgs/cloud-custodian/discussions/categories/announcements)
 - [Upcoming Community Events](https://cloudcustodian.io/events/)
 - [Cloud Custodian Annual Report 2021](https://github.com/cncf/toc/blob/main/reviews/2021-cloud-custodian-annual.md) - Annual health check provided to the CNCF outlining the health of the project
 

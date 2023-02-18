@@ -14,3 +14,4 @@ class Deployment(QueryResourceManager):
         patch = 'patch_namespaced_deployment'
         delete = 'delete_namespaced_deployment'
         enum_spec = ('list_deployment_for_all_namespaces', 'items', None)
+        plural = 'deployments'

@@ -11,22 +11,21 @@ import zlib
 
 from c7n_mailer.azure_mailer.sendgrid_delivery import SendGridDelivery
 from c7n_mailer.smtp_delivery import SmtpDelivery
+from c7n_mailer.target import MessageTargetMixin
 
 try:
     from c7n_azure.storage_utils import StorageUtilities
     from c7n_azure.session import Session
 except ImportError:
-    StorageUtilities = None
-    Session = None
-    pass
+    raise ImportError(
+        "c7n-mailer is configured for Azure Queues, which requires additional packages. "
+        "Run 'pip install c7n-mailer[azure]' to install them."
+    )
 
 
-class MailerAzureQueueProcessor:
+class MailerAzureQueueProcessor(MessageTargetMixin):
 
     def __init__(self, config, logger, session=None, max_num_processes=16):
-        if StorageUtilities is None:
-            raise Exception("Using Azure queue requires package c7n_azure to be installed.")
-
         self.max_num_processes = max_num_processes
         self.config = config
         self.logger = logger
@@ -48,7 +47,9 @@ class MailerAzureQueueProcessor:
             for queue_message in queue_messages:
                 self.logger.debug("Message id: %s received" % queue_message.id)
 
-                if (self.process_azure_queue_message(queue_message) or
+                if (
+                    self.process_azure_queue_message(
+                        queue_message, str(queue_message.inserted_on)) or
                         queue_message.dequeue_count > self.max_message_retry):
                     # If message handled successfully or max retry hit, delete
                     StorageUtilities.delete_queue_message(*queue_settings, message=queue_message)
@@ -58,7 +59,7 @@ class MailerAzureQueueProcessor:
 
         self.logger.info('No messages left on the azure storage queue, exiting c7n_mailer.')
 
-    def process_azure_queue_message(self, encoded_azure_queue_message):
+    def process_azure_queue_message(self, encoded_azure_queue_message, timestamp):
         queue_message = json.loads(
             zlib.decompress(base64.b64decode(encoded_azure_queue_message.content)))
 
@@ -68,14 +69,9 @@ class MailerAzureQueueProcessor:
             queue_message['policy']['resource'],
             len(queue_message['resources']),
             queue_message['policy']['name'],
-            ', '.join(queue_message['action'].get('to'))))
+            ', '.join(queue_message['action'].get('to', []))))
 
-        if any(e.startswith('slack') or e.startswith('https://hooks.slack.com/')
-                for e in queue_message.get('action', ()).get('to')):
-            self._deliver_slack_message(queue_message)
-
-        if any(e.startswith('datadog') for e in queue_message.get('action', ()).get('to')):
-            self._deliver_datadog_message(queue_message)
+        self.handle_targets(queue_message, timestamp, email_delivery=False, sns_delivery=False)
 
         email_result = self._deliver_email(queue_message)
 
@@ -83,29 +79,6 @@ class MailerAzureQueueProcessor:
             return email_result
         else:
             return True
-
-    def _deliver_slack_message(self, queue_message):
-        from c7n_mailer.slack_delivery import SlackDelivery
-        slack_delivery = SlackDelivery(self.config,
-                                       self.logger,
-                                       SendGridDelivery(self.config, self.session, self.logger))
-        slack_messages = slack_delivery.get_to_addrs_slack_messages_map(queue_message)
-        try:
-            self.logger.info('Sending message to Slack.')
-            slack_delivery.slack_handler(queue_message, slack_messages)
-        except Exception as error:
-            self.logger.exception(error)
-
-    def _deliver_datadog_message(self, queue_message):
-        from c7n_mailer.datadog_delivery import DataDogDelivery
-        datadog_delivery = DataDogDelivery(self.config, self.session, self.logger)
-        datadog_message_packages = datadog_delivery.get_datadog_message_packages(queue_message)
-
-        try:
-            self.logger.info('Sending message to Datadog.')
-            datadog_delivery.deliver_datadog_messages(datadog_message_packages, queue_message)
-        except Exception as error:
-            self.logger.exception(error)
 
     def _deliver_email(self, queue_message):
         try:

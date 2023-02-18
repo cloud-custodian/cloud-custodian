@@ -1,26 +1,16 @@
 {
-    "status_code": 200, 
+    "status_code": 200,
     "data": {
         "Attributes": {
-            "SubscriptionsConfirmed": "0", 
-            "DisplayName": "", 
-            "SubscriptionsDeleted": "0", 
-            "EffectiveDeliveryPolicy": "{\"http\":{\"defaultHealthyRetryPolicy\":{\"minDelayTarget\":20,\"maxDelayTarget\":20,\"numRetries\":3,\"numMaxDelayRetries\":0,\"numNoDelayRetries\":0,\"numMinDelayRetries\":0,\"backoffFunction\":\"linear\"},\"disableSubscriptionOverrides\":false}}", 
-            "Owner": "644160558196", 
-            "Policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"ReplaceWithMe\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":\"SNS:GetTopicAttributes\",\"Resource\":\"arn:aws:sns:us-west-1:644160558196:test_sns_modify_replace_policy\"}]}", 
-            "TopicArn": "arn:aws:sns:us-west-1:644160558196:test_sns_modify_replace_policy", 
-            "SubscriptionsPending": "0"
-        }, 
-        "ResponseMetadata": {
-            "RetryAttempts": 0, 
-            "HTTPStatusCode": 200, 
-            "RequestId": "e7a1e1d3-b9ef-579a-b904-b2d46ce10b6b", 
-            "HTTPHeaders": {
-                "x-amzn-requestid": "e7a1e1d3-b9ef-579a-b904-b2d46ce10b6b", 
-                "date": "Wed, 21 Feb 2018 20:13:01 GMT", 
-                "content-length": "1756", 
-                "content-type": "text/xml"
-            }
-        }
+            "Policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"ReplaceWithMe\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":\"SNS:GetTopicAttributes\",\"Resource\":\"arn:aws:sns:ap-northeast-2:644160558196:test_sns_modify_replace_policy\"}]}",
+            "Owner": "644160558196",
+            "SubscriptionsPending": "0",
+            "TopicArn": "arn:aws:sns:ap-northeast-2:644160558196:test_sns_modify_replace_policy",
+            "EffectiveDeliveryPolicy": "{\"http\":{\"defaultHealthyRetryPolicy\":{\"minDelayTarget\":20,\"maxDelayTarget\":20,\"numRetries\":3,\"numMaxDelayRetries\":0,\"numNoDelayRetries\":0,\"numMinDelayRetries\":0,\"backoffFunction\":\"linear\"},\"disableSubscriptionOverrides\":false}}",
+            "SubscriptionsConfirmed": "0",
+            "DisplayName": "",
+            "SubscriptionsDeleted": "0"
+        },
+        "ResponseMetadata": {}
     }
 }
