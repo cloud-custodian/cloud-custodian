@@ -469,7 +469,7 @@ def test_default_bucket_region_with_explicit_region():
 
 
 @vcr.use_cassette(
-    'tests/data/vcr_cassettes/test_output/default_bucket_region_public.yaml', record_mode='all')
+    'tests/data/vcr_cassettes/test_output/default_bucket_region_public.yaml')
 def test_default_bucket_region_is_public():
     output_dir = "s3://awsapichanges.info"
     conf = Config.empty(output_dir=output_dir, regions=["us-east-1"])
@@ -480,7 +480,7 @@ def test_default_bucket_region_is_public():
 
 
 @vcr.use_cassette(
-    'tests/data/vcr_cassettes/test_output/default_bucket_region.yaml', record_mode='none')
+    'tests/data/vcr_cassettes/test_output/default_bucket_region.yaml')
 def test_default_bucket_region_s3():
     output_dir = "s3://slack.cloudcustodian.io"
     conf = Config.empty(output_dir=output_dir, regions=["all"])
@@ -489,7 +489,7 @@ def test_default_bucket_region_s3():
 
 
 @vcr.use_cassette(
-    'tests/data/vcr_cassettes/test_output/default_bucket_not_found.yaml', record_mode='none')
+    'tests/data/vcr_cassettes/test_output/default_bucket_not_found.yaml')
 def test_default_bucket_region_not_found():
     output_dir = "s3://myfakebucketdoesnotexist"
     conf = Config.empty(output_dir=output_dir, regions=["us-west-2"])
@@ -500,7 +500,7 @@ def test_default_bucket_region_not_found():
 
 
 @vcr.use_cassette(
-    'tests/data/vcr_cassettes/test_output/bucket_not_found.yaml', record_mode='none')
+    'tests/data/vcr_cassettes/test_output/bucket_not_found.yaml')
 def test_get_bucket_url_s3_not_found():
     with pytest.raises(ValueError) as ecm:
         aws.get_bucket_url_with_region(
@@ -510,7 +510,7 @@ def test_get_bucket_url_s3_not_found():
 
 
 @vcr.use_cassette(
-    'tests/data/vcr_cassettes/test_output/cross_region.yaml', record_mode='none')
+    'tests/data/vcr_cassettes/test_output/cross_region.yaml')
 def test_get_bucket_url_s3_cross_region():
     assert aws.get_bucket_url_with_region(
         "s3://slack.cloudcustodian.io",
@@ -518,7 +518,7 @@ def test_get_bucket_url_s3_cross_region():
 
 
 @vcr.use_cassette(
-    'tests/data/vcr_cassettes/test_output/same_region.yaml', record_mode='none')
+    'tests/data/vcr_cassettes/test_output/same_region.yaml')
 def test_get_bucket_url_s3_same_region():
     assert aws.get_bucket_url_with_region(
         "s3://slack.cloudcustodian.io?",
