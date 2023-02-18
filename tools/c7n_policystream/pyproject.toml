@@ -19,10 +19,10 @@ packages = [{"include" = "policystream.py"}]
 c7n-policystream = 'policystream:cli'
 
 [tool.poetry.dependencies]
-python = "^3.7"
+python = "^3.8"
 click = "^8.0"
 pyyaml = ">=5.4.0"
-pygit2 = "^1.9"
+pygit2 = ">=1.11"
 boto3 = "^1.12.0"
 requests = "^2.22.0"
 
