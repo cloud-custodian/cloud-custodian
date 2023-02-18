@@ -170,20 +170,18 @@ class UsageFilter(MetricsFilter):
             if stat not in self.metric_map and self.percentile_regex.match(stat) is None:
                 continue
 
-            period_value = {"PeriodValue": 1, "PeriodUnit": "SECOND"}
-            # NOTE Hot fix for "QuotaName": "Concurrently executing Automations"
-            if r.get("QuotaCode") == "L-09101E66" and "Period" not in r:
-                r["Period"] = period_value
-
-            metric_scale = 1
             if 'Period' in r:
                 period_unit = self.time_delta_map[r['Period']['PeriodUnit']]
                 period = int(timedelta(**{period_unit: r['Period']['PeriodValue']}).total_seconds())
-                if period_unit == "seconds" and period < min_period and stat == "Sum":
-                    metric_scale = min_period / period
-                    period = min_period
             else:
                 period = int(timedelta(1).total_seconds())
+
+           # Use scaling to avoid CW limit of 1440 data points
+            metric_scale = 1
+            if period < min_period and stat == "Sum":
+                metric_scale = min_period / period
+                period = min_period
+
             res = client.get_metric_statistics(
                 Namespace=metric['MetricNamespace'],
                 MetricName=metric['MetricName'],
