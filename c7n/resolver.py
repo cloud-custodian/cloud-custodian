@@ -13,7 +13,7 @@ import zlib
 from contextlib import closing
 
 from c7n.cache import NullCache
-from c7n.utils import format_string_values
+from c7n.utils import format_string_values, local_session
 
 log = logging.getLogger('custodian.resolver')
 
@@ -51,7 +51,7 @@ class URIResolver:
 
     def get_s3_uri(self, uri):
         parsed = urlparse(uri)
-        client = self.session_factory().client('s3')
+        client = local_session(self.session_factory).client('s3')
         params = dict(
             Bucket=parsed.netloc,
             Key=parsed.path[1:])
@@ -95,6 +95,13 @@ class ValuesFrom:
          format: csv2dict
          expr: key[1]
 
+      # using cql against dynamodb
+      value_from:
+         url: dynamodb
+         query: |
+           select resource_id from exceptions
+           where account_id = '{account_id} and policy = '{policy.name}'
+         expr: [].resource_id
        # inferred from extension
        format: [json, csv, csv2dict, txt]
     """
@@ -107,6 +114,7 @@ class ValuesFrom:
         'required': ['url'],
         'properties': {
             'url': {'type': 'string'},
+            'query': {'type': 'string'},
             'format': {'enum': ['csv', 'json', 'txt', 'csv2dict']},
             'expr': {'oneOf': [
                 {'type': 'integer'},
@@ -140,17 +148,41 @@ class ValuesFrom:
         return contents, format
 
     def get_values(self):
-        key = [self.data.get(i) for i in ('url', 'format', 'expr')]
+        cache_key = [self.data.get(i) for i in ('url', 'format', 'expr')]
         with self.cache:
             # use these values as a key to cache the result so if we have
             # the same filter happening across many resources, we can reuse
             # the results.
-            contents = self.cache.get(("value-from", key))
+            contents = self.cache.get(("value-from", cache_key))
             if contents is not None:
                 return contents
-            contents = self._get_values()
-            self.cache.save(("value-from", key), contents)
+            if self.data['url'] == 'dynamodb':
+                contents = self._get_ddb_values()
+            else:
+                contents = self._get_values()
+            self.cache.save(("value-from", cache_key), contents)
             return contents
+
+    def _get_ddb_values(self):
+        if not self.data['query']:
+            return
+        if not self.data['query'].lower().startswith('select'):
+            return
+
+        from boto3.dynamodb.types import TypeDeserializer
+
+        client = local_session(self.manager.session_factory).client('dynamodb')
+        pager = client.get_paginator('execute_statement')
+        deserializer = TypeDeserializer()
+
+        results = []
+        for page in pager.paginate(Statement=self.data['query']):
+            rows = page.get('Items')
+            for r in rows:
+                results.append({k: deserializer.deserialize(v) for k, v in r.items()})
+        if self.data.get('expr'):
+            return self._get_resource_values(results)
+        return results
 
     def _get_values(self):
         contents, format = self.get_contents()
