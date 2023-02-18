@@ -102,7 +102,9 @@ class UsageFilter(MetricsFilter):
     Filter service quotas by usage, only compatible with service quotas
     that return a UsageMetric attribute.
 
-    Default limit is 80%
+    Default limit is 80%.
+    Default min_period (minimal period) is 300 seconds and is automatically
+    set to 60 seconds if users try to set it to anything lower than that.
 
     .. code-block:: yaml
 
@@ -176,7 +178,7 @@ class UsageFilter(MetricsFilter):
             else:
                 period = int(timedelta(1).total_seconds())
 
-           # Use scaling to avoid CW limit of 1440 data points
+            # Use scaling to avoid CW limit of 1440 data points
             metric_scale = 1
             if period < min_period and stat == "Sum":
                 metric_scale = min_period / period
