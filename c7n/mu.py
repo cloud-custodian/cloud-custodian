@@ -1200,7 +1200,7 @@ class CloudWatchEventSource(AWSEventBase):
 
         if rule:
             old_tags = self.client.list_tags_for_resource(ResourceARN=rule['Arn']).get("Tags", [])
-            new_tags = self.update_tags(old_tags, params['Tags'])
+            new_tags = self.update_tags(old_tags, params.get('Tags', []))
 
             rule['Tags'] = sorted(old_tags, key=lambda x: x['Key'])
             params['Tags'] = sorted(new_tags, key=lambda x: x['Key'])

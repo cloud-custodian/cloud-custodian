@@ -460,7 +460,7 @@ class PolicyLambdaProvision(Publish):
         # the function code / which invalidate the recorded data and
         # the focus of the test.
 
-        session_factory = self.replay_flight_data("test_cwe_update", zdata=True)
+        session_factory = self.replay_flight_data("test_cwe_update")
         p = self.load_policy({
             "resource": "s3",
             "name": "s3-bucket-policy",

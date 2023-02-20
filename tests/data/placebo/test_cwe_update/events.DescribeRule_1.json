@@ -1,0 +1,21 @@
+{
+    "status_code": 400, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 400, 
+            "RequestId": "3ff8e4c2-3ba8-11e7-be17-919aeab611ee", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "3ff8e4c2-3ba8-11e7-be17-919aeab611ee", 
+                "date": "Thu, 18 May 2017 08:59:06 GMT", 
+                "content-length": "98", 
+                "content-type": "application/x-amz-json-1.1", 
+                "connection": "close"
+            }
+        }, 
+        "Error": {
+            "Message": "Rule custodian-s3-bucket-policy does not exist.", 
+            "Code": "ResourceNotFoundException"
+        }
+    }
+}

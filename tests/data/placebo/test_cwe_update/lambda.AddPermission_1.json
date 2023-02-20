@@ -1,0 +1,18 @@
+{
+    "status_code": 201, 
+    "data": {
+        "Statement": "{\"Sid\":\"custodian-s3-bucket-policy\",\"Resource\":\"arn:aws:lambda:us-west-2:644160558196:function:custodian-s3-bucket-policy\",\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"events.amazonaws.com\"},\"Action\":[\"lambda:InvokeFunction\"],\"Condition\":{\"ArnLike\":{\"AWS:SourceArn\":\"arn:aws:events:us-west-2:644160558196:rule/custodian-s3-bucket-policy\"}}}", 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 201, 
+            "RequestId": "408916fc-3ba8-11e7-b6a2-13ecf7492491", 
+            "HTTPHeaders": {
+                "date": "Thu, 18 May 2017 08:59:07 GMT", 
+                "x-amzn-requestid": "408916fc-3ba8-11e7-b6a2-13ecf7492491", 
+                "content-length": "382", 
+                "content-type": "application/json", 
+                "connection": "keep-alive"
+            }
+        }
+    }
+}

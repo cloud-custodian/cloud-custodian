@@ -1,0 +1,22 @@
+{
+    "status_code": 404, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 404, 
+            "RequestId": "3cb4ddff-3ba8-11e7-ab96-e17e94431a4e", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "3cb4ddff-3ba8-11e7-ab96-e17e94431a4e", 
+                "content-length": "125", 
+                "connection": "keep-alive", 
+                "date": "Thu, 18 May 2017 08:59:01 GMT", 
+                "content-type": "application/json", 
+                "x-amzn-errortype": "ResourceNotFoundException"
+            }
+        }, 
+        "Error": {
+            "Message": "Function not found: arn:aws:lambda:us-west-2:644160558196:function:custodian-s3-bucket-policy:Dev", 
+            "Code": "ResourceNotFoundException"
+        }
+    }
+}

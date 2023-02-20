@@ -1,0 +1,36 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Functions": [
+            {
+                "TracingConfig": {
+                    "Mode": "PassThrough"
+                }, 
+                "Version": "$LATEST", 
+                "CodeSha256": "z5EYIT4th5s2pFLog/OD7uBBxTqvr/tN7YkQuVnHkw0=", 
+                "FunctionName": "custodian-s3-bucket-policy", 
+                "MemorySize": 256, 
+                "CodeSize": 1364083, 
+                "FunctionArn": "arn:aws:lambda:us-west-2:644160558196:function:custodian-s3-bucket-policy", 
+                "Handler": "custodian_policy.run", 
+                "Role": "arn:aws:iam::644160558196:role/custodian-mu", 
+                "Timeout": 60, 
+                "LastModified": "2017-05-18T08:59:12.907+0000", 
+                "Runtime": "python2.7", 
+                "Description": "cloud-custodian lambda policy"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "45559305-3ba8-11e7-8723-d539c75812ba", 
+            "HTTPHeaders": {
+                "date": "Thu, 18 May 2017 08:59:15 GMT", 
+                "x-amzn-requestid": "45559305-3ba8-11e7-8723-d539c75812ba", 
+                "content-length": "631", 
+                "content-type": "application/json", 
+                "connection": "keep-alive"
+            }
+        }
+    }
+}
