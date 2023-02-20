@@ -1078,7 +1078,7 @@ class CloudWatchEventSource(AWSEventBase):
         dupl_tags = []
         for v in old_tags:
             for k in new_tags:
-                if v["key"] == k["key"]:
+                if v["Key"] == k["Key"]:
                     dupl_tags.append(v)
 
         only_old_tags = [x for x in old_tags if x not in dupl_tags]
@@ -1199,15 +1199,16 @@ class CloudWatchEventSource(AWSEventBase):
         rule = self.get(func.event_name)
 
         if rule:
-            old_tags = self.client.list_tags_for_resource(ResourceARN=rule['Arn'])
+            old_tags = self.client.list_tags_for_resource(ResourceARN=rule['Arn']).get("Tags", [])
             new_tags = self.update_tags(old_tags, params['Tags'])
 
-            rule['Tags'] = sorted(old_tags, key=lambda x: x['key'])
-            params['Tags'] = sorted(new_tags, key=lambda x: x['key'])
+            rule['Tags'] = sorted(old_tags, key=lambda x: x['Key'])
+            params['Tags'] = sorted(new_tags, key=lambda x: x['Key'])
 
         if rule and self.delta(rule, params):
             log.debug("Updating cwe rule for %s" % func.event_name)
             response = self.client.put_rule(**params)
+            self.client.tag_resource(ResourceARN=rule['Arn'], Tags=params['Tags'])
         elif not rule:
             log.debug("Creating cwe rule for %s" % (self))
             response = self.client.put_rule(**params)
