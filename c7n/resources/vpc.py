@@ -825,7 +825,6 @@ class SGUsage(Filter):
         return sg_ids
 
     def get_batch_sgs(self):
-        sg_ids = set()
         expr = jmespath.compile('[].computeResources.securityGroupIds[]')
         resources = self.manager.get_resource_manager('aws.batch-compute').resources(augment=False)
         return set(expr.search(resources) or [])
