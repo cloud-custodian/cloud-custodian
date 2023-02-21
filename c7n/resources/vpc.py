@@ -826,14 +826,9 @@ class SGUsage(Filter):
 
     def get_batch_sgs(self):
         sg_ids = set()
-        expr = jmespath.compile(
-            'computeResources.securityGroupIds[]')
-        for compute in self.manager.get_resource_manager(
-                'aws.batch-compute').resources(augment=False):
-            ids = expr.search(compute)
-            if ids:
-                sg_ids.update(ids)
-        return sg_ids
+        expr = jmespath.compile('[].computeResources.securityGroupIds[]')
+        resources = self.manager.get_resource_manager('aws.batch-compute').resources(augment=False)
+        return set(expr.search(resources) or [])
 
 
 @SecurityGroup.filter_registry.register('unused')
