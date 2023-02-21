@@ -465,7 +465,8 @@ class PolicyLambdaProvision(Publish):
             "resource": "s3",
             "name": "s3-bucket-policy",
             "mode": {"type": "cloudtrail",
-                     "events": ["CreateBucket"], 'runtime': 'python2.7'},
+                     "events": ["CreateBucket"],
+                     "runtime": "python2.7"},
             "filters": [
                 {"type": "missing-policy-statement",
                  "statement_ids": ["RequireEncryptedPutObject"]},
@@ -484,7 +485,8 @@ class PolicyLambdaProvision(Publish):
                 "mode": {
                     "type": "cloudtrail",
                     "memory": 256,
-                    'runtime': 'python2.7',
+                    "runtime": 'python2.7',
+                    "tags": {"App": "Custodian"},
                     "events": [
                         "CreateBucket",
                         {
