@@ -55,7 +55,7 @@ class ServerParametersFilter(ValueFilter):
 
         policies:
           - name: mysql-flexible-server-tls-version
-            resource: azure.mysql-flexibleservers
+            resource: azure.mysql-flexibleserver
             filters:
               - type: server-parameter
                 name: tls_version
