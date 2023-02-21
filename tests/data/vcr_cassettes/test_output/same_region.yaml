@@ -1,0 +1,290 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Connection:
+      - close
+      Host:
+      - s3.amazonaws.com
+      User-Agent:
+      - Python-urllib/3.10
+    method: HEAD
+    uri: https://s3.amazonaws.com/slack.cloudcustodian.io
+  response:
+    body:
+      string: ''
+    headers:
+      Connection:
+      - close
+      Content-Type:
+      - application/xml
+      Date:
+      - Thu, 16 Feb 2023 19:52:10 GMT
+      Server:
+      - AmazonS3
+      x-amz-bucket-region:
+      - us-east-1
+      x-amz-id-2:
+      - vrKJRR0kU4W31aWya0CR2HT/Sm2jKJL9diIrmuO8JIXqL0f+bCb6zDXNIgqeTF6/CL+617AGkBM=
+      x-amz-request-id:
+      - 8DG2X16KE26FE8QT
+    status:
+      code: 403
+      message: Forbidden
+- request:
+    body: null
+    headers:
+      Connection:
+      - close
+      Host:
+      - s3.amazonaws.com
+      User-Agent:
+      - Python-urllib/3.10
+    method: HEAD
+    uri: https://s3.amazonaws.com/slack.cloudcustodian.io
+  response:
+    body:
+      string: ''
+    headers:
+      Connection:
+      - close
+      Content-Type:
+      - application/xml
+      Date:
+      - Thu, 16 Feb 2023 19:54:13 GMT
+      Server:
+      - AmazonS3
+      x-amz-bucket-region:
+      - us-east-1
+      x-amz-id-2:
+      - H/sCZgZEuAgj2EQKpQOsb+JS6Zetyf+2zyahqyCmyK8CGGuxShEpznof1Wo/eVl6LrN7gGJZxUI=
+      x-amz-request-id:
+      - YNH0BCK95XBWJF5B
+    status:
+      code: 403
+      message: Forbidden
+- request:
+    body: null
+    headers:
+      Connection:
+      - close
+      Host:
+      - s3.amazonaws.com
+      User-Agent:
+      - Python-urllib/3.10
+    method: HEAD
+    uri: https://s3.amazonaws.com/slack.cloudcustodian.io
+  response:
+    body:
+      string: ''
+    headers:
+      Connection:
+      - close
+      Content-Type:
+      - application/xml
+      Date:
+      - Thu, 16 Feb 2023 19:54:13 GMT
+      Server:
+      - AmazonS3
+      x-amz-bucket-region:
+      - us-east-1
+      x-amz-id-2:
+      - HcxVZdlrv1QoUb8T9UHi/by7iHrqX3VO4fFoqj/BqnQpZ/EDHSHW+K9lhaPbypw8cJz6+aZO1sg=
+      x-amz-request-id:
+      - YNHDZ33556EB72YN
+    status:
+      code: 403
+      message: Forbidden
+- request:
+    body: null
+    headers:
+      Connection:
+      - close
+      Host:
+      - s3.amazonaws.com
+      User-Agent:
+      - Python-urllib/3.10
+    method: HEAD
+    uri: https://s3.amazonaws.com/slack.cloudcustodian.io
+  response:
+    body:
+      string: ''
+    headers:
+      Connection:
+      - close
+      Content-Type:
+      - application/xml
+      Date:
+      - Thu, 16 Feb 2023 19:55:24 GMT
+      Server:
+      - AmazonS3
+      x-amz-bucket-region:
+      - us-east-1
+      x-amz-id-2:
+      - /602elliXP0akMShquY9niZ0rH4knzrivCpIIwBkkRvl4XehxFGd5WY3QjFIBdcD3BBqmunINSg=
+      x-amz-request-id:
+      - JZT48WFZHQE91W94
+    status:
+      code: 403
+      message: Forbidden
+- request:
+    body: null
+    headers:
+      Connection:
+      - close
+      Host:
+      - s3.amazonaws.com
+      User-Agent:
+      - Python-urllib/3.10
+    method: HEAD
+    uri: https://s3.amazonaws.com/slack.cloudcustodian.io
+  response:
+    body:
+      string: ''
+    headers:
+      Connection:
+      - close
+      Content-Type:
+      - application/xml
+      Date:
+      - Thu, 16 Feb 2023 19:55:24 GMT
+      Server:
+      - AmazonS3
+      x-amz-bucket-region:
+      - us-east-1
+      x-amz-id-2:
+      - D6VC3jIDnL2Uh9jhVp8rgP2O4VWfgPZIIl8gpltkdROsuOQUw2z4KbDUrucAS+azB2uW7zpFPuw=
+      x-amz-request-id:
+      - JZTE849MNEYQRZ78
+    status:
+      code: 403
+      message: Forbidden
+- request:
+    body: null
+    headers:
+      Connection:
+      - close
+      Host:
+      - s3.amazonaws.com
+      User-Agent:
+      - Python-urllib/3.10
+    method: HEAD
+    uri: https://s3.amazonaws.com/slack.cloudcustodian.io
+  response:
+    body:
+      string: ''
+    headers:
+      Connection:
+      - close
+      Content-Type:
+      - application/xml
+      Date:
+      - Thu, 16 Feb 2023 19:57:19 GMT
+      Server:
+      - AmazonS3
+      x-amz-bucket-region:
+      - us-east-1
+      x-amz-id-2:
+      - a6DEElQhOOdLdx7xCUyYLu/fyGvgLmrHVTHeV855LzWDdXlZDe4Eqc4F7FT8rBMxe8QIup9Cz3U=
+      x-amz-request-id:
+      - 25XK0QCKJH7FSDD6
+    status:
+      code: 403
+      message: Forbidden
+- request:
+    body: null
+    headers:
+      Connection:
+      - close
+      Host:
+      - s3.amazonaws.com
+      User-Agent:
+      - Python-urllib/3.10
+    method: HEAD
+    uri: https://s3.amazonaws.com/slack.cloudcustodian.io
+  response:
+    body:
+      string: ''
+    headers:
+      Connection:
+      - close
+      Content-Type:
+      - application/xml
+      Date:
+      - Thu, 16 Feb 2023 19:57:19 GMT
+      Server:
+      - AmazonS3
+      x-amz-bucket-region:
+      - us-east-1
+      x-amz-id-2:
+      - Tnl+AJNjafTzfCPa4nI2xCUwPQ5k66Bc/cWbs/69hDKVtqc/PzPx5jdR4G1D2L4k+z7GSp18FsU=
+      x-amz-request-id:
+      - 25XGYYAAQW3YY87Y
+    status:
+      code: 403
+      message: Forbidden
+- request:
+    body: null
+    headers:
+      Connection:
+      - close
+      Host:
+      - s3.amazonaws.com
+      User-Agent:
+      - Python-urllib/3.10
+    method: HEAD
+    uri: https://s3.amazonaws.com/slack.cloudcustodian.io
+  response:
+    body:
+      string: ''
+    headers:
+      Connection:
+      - close
+      Content-Type:
+      - application/xml
+      Date:
+      - Thu, 16 Feb 2023 19:57:30 GMT
+      Server:
+      - AmazonS3
+      x-amz-bucket-region:
+      - us-east-1
+      x-amz-id-2:
+      - HywbAjl7c4ppyylvY7YEq8JcURGc9XAtLa+TSU9r66yVfbQA85B06qUhIQ0SQcpX6FaDnKy4YRk=
+      x-amz-request-id:
+      - E1PKD7EM0NJ4C1W5
+    status:
+      code: 403
+      message: Forbidden
+- request:
+    body: null
+    headers:
+      Connection:
+      - close
+      Host:
+      - s3.amazonaws.com
+      User-Agent:
+      - Python-urllib/3.10
+    method: HEAD
+    uri: https://s3.amazonaws.com/slack.cloudcustodian.io
+  response:
+    body:
+      string: ''
+    headers:
+      Connection:
+      - close
+      Content-Type:
+      - application/xml
+      Date:
+      - Thu, 16 Feb 2023 19:57:30 GMT
+      Server:
+      - AmazonS3
+      x-amz-bucket-region:
+      - us-east-1
+      x-amz-id-2:
+      - TUv6JHrn6wWtS01ZY4Vb40f9BXi3xHS7KQTriQEF8Os/LqtVKLR0VJZhmnEn5djkCeDXq6Q7dE4=
+      x-amz-request-id:
+      - E1PSMX799YXAD8SQ
+    status:
+      code: 403
+      message: Forbidden
+version: 1

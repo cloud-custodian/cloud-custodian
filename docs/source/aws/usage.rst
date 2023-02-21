@@ -85,7 +85,7 @@ To send your logs to a region in the master account use::
 
 This will set up a stream for every region/account you run custodian against within the specified log group. 
 
-The default log stream format looks like this:
+The default log stream format looks like this::
 
   account_id/region/policy_name
 
@@ -93,7 +93,8 @@ If you want to override this then you can pass the the log stream parameter like
 
   custodian run --log-group="aws://master/<log-group-name>?region=<region>&stream=custodian_{region}_{account}_{policy} <policyfile>.yml"
 
-it currently accepts these variables:
+it currently accepts these variables::
+
   {account}: the account where the check was executed.
   {region}: the region where the check was executed.
   {policy}: the name of the policy that was executed.
@@ -108,6 +109,32 @@ with its log files for archival purposes.
 The S3 bucket and prefix can be specified via parameters::
 
   custodian run --output-dir s3://<my-bucket>/<my-prefix> <policyfile>.yml
+
+
+Custodian will attempt to auto detect the bucket's region, but it can
+also be explicitly specified by adding a query parameter region::
+
+  custodian run --output-dir s3://some-bucket/some-prefix?region=us-west-2 mypolicies.yml
+
+
+By default the output location suffix is {policy_name}/{now:%Y}/{now:%m}/{now:%d}/{now:%H}
+
+.. warning::
+
+   The customizing the default s3 output location is incompatible with the report
+   commands.
+
+It can be customized by specifying a custom output location::
+
+   custodian run --output-dir s3://some-bucket/some-prefix/{account}/{now:%Y}-{now:%m}/{uuid}
+
+it currently accepts these variables::
+
+  {account}: the account where the check was executed.
+  {region}: the region where the check was executed.
+  {policy_name}: the name of the policy that was executed.
+  {now}: a datetime representing utc timestamp (see formatting options https://pyformat.info/#datetime)
+  {uuid}: a one time uuid
 
 Reports
 -------
