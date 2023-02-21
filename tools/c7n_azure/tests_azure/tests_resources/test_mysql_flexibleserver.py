@@ -23,7 +23,7 @@ class MySQLFlexibleServerTest(BaseTest):
                     'key': 'name',
                     'op': 'glob',
                     'value_type': 'normalize',
-                    'value': 'cctestmyflexibleserverbge56pdztub5y'
+                    'value': 'cctestmyflexibleserveradeqcukmdv6zs'
                 }
             ],
         })

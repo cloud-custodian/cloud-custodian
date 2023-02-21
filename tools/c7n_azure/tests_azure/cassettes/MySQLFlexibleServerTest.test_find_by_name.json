@@ -14,17 +14,17 @@
                     "message": "OK"
                 },
                 "headers": {
-                    "content-type": [
-                        "application/json; charset=utf-8"
-                    ],
                     "cache-control": [
                         "no-cache"
                     ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
                     "date": [
-                        "Tue, 21 Feb 2023 15:33:46 GMT"
+                        "Tue, 21 Feb 2023 16:59:06 GMT"
                     ],
                     "content-length": [
-                        "2892"
+                        "2898"
                     ]
                 },
                 "body": {
@@ -54,7 +54,7 @@
                                     "haEnabled": "Disabled",
                                     "availabilityZone": "3",
                                     "standbyAvailabilityZone": "",
-                                    "earliestRestoreDate": "2023-02-14T15:33:46.0031763+00:00",
+                                    "earliestRestoreDate": "2023-02-14T16:59:06.5497275+00:00",
                                     "replicationRole": "None",
                                     "replicaCapacity": 10,
                                     "byokEnforcement": "Disabled"
@@ -84,14 +84,14 @@
                                     "version": "5.7",
                                     "state": "Ready",
                                     "haState": "NotEnabled",
-                                    "fullyQualifiedDomainName": "cctestmyflexibleserverbge56pdztub5y.mysql.database.azure.com",
+                                    "fullyQualifiedDomainName": "cctestmyflexibleserveradeqcukmdv6zs.mysql.database.azure.com",
                                     "sourceServerId": "",
                                     "publicNetworkAccess": "Enabled",
                                     "sslEnforcement": "Disabled",
                                     "haEnabled": "Disabled",
                                     "availabilityZone": "3",
                                     "standbyAvailabilityZone": "",
-                                    "earliestRestoreDate": "2023-02-21T15:29:13.1512987+00:00",
+                                    "earliestRestoreDate": "2023-02-21T16:32:29.983741+00:00",
                                     "replicationRole": "None",
                                     "replicaCapacity": 10,
                                     "byokEnforcement": "Disabled"
@@ -100,8 +100,8 @@
                                 "tags": {
                                     "product_id": "13742"
                                 },
-                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_mysqlflexible/providers/Microsoft.DBforMySQL/flexibleServers/cctestmyflexibleserverbge56pdztub5y",
-                                "name": "cctestmyflexibleserverbge56pdztub5y",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_mysql-flexibleserver/providers/Microsoft.DBforMySQL/flexibleServers/cctestmyflexibleserveradeqcukmdv6zs",
+                                "name": "cctestmyflexibleserveradeqcukmdv6zs",
                                 "type": "Microsoft.DBforMySQL/flexibleServers"
                             },
                             {
@@ -128,7 +128,7 @@
                                     "haEnabled": "Disabled",
                                     "availabilityZone": "2",
                                     "standbyAvailabilityZone": "",
-                                    "earliestRestoreDate": "2023-02-14T15:33:46.0031763+00:00",
+                                    "earliestRestoreDate": "2023-02-14T16:59:06.5497275+00:00",
                                     "replicationRole": "None",
                                     "replicaCapacity": 10,
                                     "byokEnforcement": "Disabled"
