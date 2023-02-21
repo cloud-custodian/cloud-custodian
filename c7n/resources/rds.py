@@ -232,7 +232,7 @@ def _get_available_engine_upgrades(client, major=False):
     for page in paginator.paginate():
         engine_versions = page['DBEngineVersions']
         for v in engine_versions:
-            if not v['Engine'] in results:
+            if v['Engine'] not in results:
                 results[v['Engine']] = {}
             if 'ValidUpgradeTarget' not in v or len(v['ValidUpgradeTarget']) == 0:
                 continue

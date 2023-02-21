@@ -149,7 +149,7 @@ class TestServer(KubeTest):
         policies = {
             'policies': [
                 {
-                    'name': 'test-validator',
+                    'name': 'test-admission',
                     'resource': 'k8s.pod',
                     'mode': {
                         'type': 'k8s-admission',
@@ -195,7 +195,7 @@ class TestServer(KubeTest):
         policies = {
             'policies': [
                 {
-                    'name': 'test-validator',
+                    'name': 'test-admission',
                     'resource': 'k8s.pod',
                     'mode': {
                         'type': 'k8s-admission',
@@ -217,7 +217,7 @@ class TestServer(KubeTest):
         policies = {
             'policies': [
                 {
-                    'name': 'test-validator',
+                    'name': 'test-admission',
                     'resource': 'k8s.pod',
                     'mode': {
                         'type': 'k8s-admission',
@@ -239,7 +239,7 @@ class TestServer(KubeTest):
         policies = {
             'policies': [
                 {
-                    'name': 'test-validator-deployment',
+                    'name': 'test-admission-deployment',
                     'resource': 'k8s.deployment',
                     'description': 'description deployment',
                     'mode': {
@@ -251,7 +251,7 @@ class TestServer(KubeTest):
                     }
                 },
                 {
-                    'name': 'test-validator',
+                    'name': 'test-admission',
                     'resource': 'k8s.pod',
                     'description': 'description 1',
                     'mode': {
@@ -263,7 +263,7 @@ class TestServer(KubeTest):
                     }
                 },
                 {
-                    'name': 'test-validator-2',
+                    'name': 'test-admission-2',
                     'description': 'description 2',
                     'resource': 'k8s.pod',
                     'mode': {
@@ -285,14 +285,14 @@ class TestServer(KubeTest):
             res.json()['response']['status']['message'].split(':', 1)[-1]
         )
         self.assertEqual(len(failures), 2)
-        self.assertEqual(failures[0], {'name': 'test-validator', 'description': 'description 1'})
-        self.assertEqual(failures[1], {'name': 'test-validator-2', 'description': 'description 2'})
+        self.assertEqual(failures[0], {'name': 'test-admission', 'description': 'description 1'})
+        self.assertEqual(failures[1], {'name': 'test-admission-2', 'description': 'description 2'})
 
     def test_server_onmatch_warn(self):
         policies = {
             'policies': [
                 {
-                    'name': 'test-validator-pod',
+                    'name': 'test-admission-pod',
                     'resource': 'k8s.pod',
                     'description': 'description deployment',
                     'mode': {
@@ -312,13 +312,14 @@ class TestServer(KubeTest):
         self.assertTrue(res.json()['response']['allowed'])
         self.assertEqual(
             res.json()['response']['warnings'],
-            ['test-validator-pod:description deployment']
+            ['test-admission-pod:description deployment']
         )
 
     def test_server_init(self):
+        policies = {"policies": []}
         with patch('c7n_kube.server.AdmissionControllerServer') as patched:
-            port = self.find_port()
-            init('0.0.0.0', port, 'policies', serve_forever=False)
+            server, port = self._server(policies)
+            init(host='0.0.0.0', port=port, policy_dir='policies', serve_forever=False)
             patched.assert_called_once()
             patched.assert_called_with(
                 server_address=('0.0.0.0', port),
@@ -335,11 +336,51 @@ class TestServer(KubeTest):
         self.assertEqual(res.status_code, 400)
         self.assertEqual(res.json(), {'error': 'Expecting value: line 1 column 1 (char 0)'})
 
+    def test_server_response_with_patch(self):
+        policies = {
+            'policies': [
+                {
+                    'name': 'label-pod',
+                    'resource': 'k8s.pod',
+                    'description': 'warning goes here',
+                    'mode': {
+                        'type': 'k8s-admission',
+                        'on-match': 'warn',
+                        'operations': ['CREATE']
+                    },
+                    'actions': [
+                        {
+                            'type': 'event-label',
+                            'labels': {
+                                'foo': 'bar',
+                                'role': 'different role',
+                                'test': None
+                            }
+                        }
+                    ]
+
+                },
+            ]
+        }
+        server, port = self._server(policies)
+        event = self.get_event('create_pod')
+        res = requests.post(f'http://localhost:{port}', json=event)
+        self.assertEqual(res.status_code, 200)
+        self.assertTrue(res.json()['response']['allowed'])
+        self.assertEqual(
+            res.json()['response']['warnings'],
+            ['label-pod:warning goes here']
+        )
+        self.assertEqual(res.json()['response']['patchType'], 'JSONPatch')
+        self.assertEqual(
+            res.json()['response']['patch'],
+            "W3sib3AiOiAicmVtb3ZlIiwgInBhdGgiOiAiL21ldGFkYXRhL2xhYmVscy90ZXN0In0sIHsib3AiOiAiYWRkIiwgInBhdGgiOiAiL21ldGFkYXRhL2xhYmVscy9mb28iLCAidmFsdWUiOiAiYmFyIn0sIHsib3AiOiAicmVwbGFjZSIsICJwYXRoIjogIi9tZXRhZGF0YS9sYWJlbHMvcm9sZSIsICJ2YWx1ZSI6ICJkaWZmZXJlbnQgcm9sZSJ9XQ==")  # noqa
+
     def test_server_bad_policy_execution_warn(self):
         policies = {
             'policies': [
                 {
-                    'name': 'test-validator-pod',
+                    'name': 'test-admission-pod',
                     'resource': 'k8s.pod',
                     'description': 'description deployment',
                     'mode': {
@@ -358,11 +399,11 @@ class TestServer(KubeTest):
         server.policy_collection.policies = []
 
         mock_policy_1 = MagicMock()
-        mock_policy_1.name = 'test-validator-pod'
+        mock_policy_1.name = 'test-admission-pod'
         mock_policy_1.push.side_effect = Exception('foo')
 
         mock_policy_2 = MagicMock()
-        mock_policy_2.name = 'test-validator-pod-2'
+        mock_policy_2.name = 'test-admission-pod-2'
         mock_policy_2.push.side_effect = Exception('bar')
 
         server.policy_collection.policies.append(mock_policy_1)
@@ -374,8 +415,8 @@ class TestServer(KubeTest):
         self.assertEqual(
             res.json()['response']['warnings'],
             [
-                'test-validator-pod:Error in executing policy: foo',
-                'test-validator-pod-2:Error in executing policy: bar'
+                'test-admission-pod:Error in executing policy: foo',
+                'test-admission-pod-2:Error in executing policy: bar'
             ]
         )
 
@@ -383,7 +424,7 @@ class TestServer(KubeTest):
         policies = {
             'policies': [
                 {
-                    'name': 'test-validator-pod',
+                    'name': 'test-admission-pod',
                     'resource': 'k8s.pod',
                     'description': 'description deployment',
                     'mode': {
@@ -402,11 +443,11 @@ class TestServer(KubeTest):
         server.policy_collection.policies = []
 
         mock_policy_1 = MagicMock()
-        mock_policy_1.name = 'test-validator-pod'
+        mock_policy_1.name = 'test-admission-pod'
         mock_policy_1.push.side_effect = Exception('foo')
 
         mock_policy_2 = MagicMock()
-        mock_policy_2.name = 'test-validator-pod-2'
+        mock_policy_2.name = 'test-admission-pod-2'
         mock_policy_2.push.side_effect = Exception('bar')
 
         server.policy_collection.policies.append(mock_policy_1)
@@ -422,7 +463,7 @@ class TestServer(KubeTest):
         self.assertEqual(
             failures,
             [
-                {"name": "test-validator-pod", "description": "Error in executing policy: foo"},
-                {"name": "test-validator-pod-2", "description": "Error in executing policy: bar"}
+                {"name": "test-admission-pod", "description": "Error in executing policy: foo"},
+                {"name": "test-admission-pod-2", "description": "Error in executing policy: bar"}
             ]
         )

@@ -671,3 +671,18 @@ def test_parse_date_floor():
     assert utils.parse_date(1) is None
     assert utils.parse_date('3000') is None
     assert utils.parse_date('30') is None
+
+
+def test_output_path_join():
+    assert utils.join_output_path(
+        's3://cross-region-c7n/iam-check?region=us-east-2',
+        'Samuel',
+        'us-east-1'
+    ) == 's3://cross-region-c7n/iam-check/Samuel/us-east-1?region=us-east-2'
+
+    output_dir = 's3://cross-region-c7n/iam-checks/{account}/{now:%Y-%m}/{uuid}'
+    assert utils.join_output_path(output_dir, 'Samuel', 'us-east-1') == output_dir
+
+    output_dir = './local-dir'
+    assert utils.join_output_path(output_dir, 'Samuel', 'us-east-1') == (
+        f"./local-dir{os.sep}Samuel{os.sep}us-east-1")

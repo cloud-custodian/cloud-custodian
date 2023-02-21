@@ -149,8 +149,8 @@ class MetricsFilter(Filter):
         Ensure that the window aligns with time segments based on CloudWatch's retention
         schedule defined here:
 
-        https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/cloudwatch_concepts.html#Metric  # noqa
-        """
+        https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/cloudwatch_concepts.html#Metric
+        """  # noqa: E501
 
         duration = timedelta(self.days)
         now = datetime.utcnow()

@@ -132,6 +132,14 @@ def test_graph_resolver_inner_block_ref():
     )
 
 
+def test_graph_resolver_local_modules():
+    graph = TerraformProvider().parse(terraform_dir / "local_modules/root")
+    queues = list(graph.get_resources_by_type("aws_sqs_queue"))
+    # prove that we got the parent module resources.
+    assert len(queues[0][1]) == 2
+    assert queues[0][1][1]["name"] == "parent_queue"
+
+
 def test_graph_resolver_id():
     resolver = Resolver()
     assert resolver.is_id_ref("4b3db3ec-98ad-4382-a460-d8e392d128b7") is True

@@ -42,7 +42,6 @@ pytest-terraform = "^0.6.0"
 mock = "^4.0.1"
 vcrpy = "^4.0.2"
 aws-xray-sdk = "^2.5.0"
-flake8 = "<4"
 # tox = "^3.14.5"
 jsonpatch = "^1.25"
 psutil = "^5.7.0"
@@ -53,9 +52,18 @@ click = "^8.0"
 freezegun = "^1.2.2"
 pytest-recording = "^0.12.1"
 
+[tool.poetry.group.dev.dependencies]
+ruff = "^0.0.246"
+
 [tool.black]
 skip-string-normalization = true
 
+[tool.ruff]
+line-length = 100
+# E741 - single char variables
+# E401 - multiple imports in a single line
+ignore = ["E741", "E401"]
+exclude = ["__init__.py"]
 
 [tool.pytest.ini_options]
 junit_family = "xunit2"
