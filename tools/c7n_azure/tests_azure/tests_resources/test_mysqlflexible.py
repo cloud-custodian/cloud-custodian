@@ -31,13 +31,13 @@ class MySQLFlexibleServerTest(BaseTest):
         self.assertEqual(len(resources), 1)
 
     @arm_template('mysqlflexible.json')
-    def test_server_configuration_parameter(self):
+    def test_server_server_parameter(self):
         p = self.load_policy({
             'name': 'test-azure-mysql-flexibleserver-configurations',
             'resource': 'azure.mysql-flexibleserver',
             'filters': [
                 {
-                    'type': 'configuration-parameter',
+                    'type': 'server-parameter',
                     'name': 'tls_version',
                     'key': 'value',
                     'op': 'ne',

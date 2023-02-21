@@ -21,7 +21,7 @@
                         "no-cache"
                     ],
                     "date": [
-                        "Thu, 09 Feb 2023 14:59:52 GMT"
+                        "Tue, 21 Feb 2023 15:33:46 GMT"
                     ],
                     "content-length": [
                         "2892"
@@ -54,7 +54,7 @@
                                     "haEnabled": "Disabled",
                                     "availabilityZone": "3",
                                     "standbyAvailabilityZone": "",
-                                    "earliestRestoreDate": "2023-02-02T14:59:52.8285249+00:00",
+                                    "earliestRestoreDate": "2023-02-14T15:33:46.0031763+00:00",
                                     "replicationRole": "None",
                                     "replicaCapacity": 10,
                                     "byokEnforcement": "Disabled"
@@ -91,7 +91,7 @@
                                     "haEnabled": "Disabled",
                                     "availabilityZone": "3",
                                     "standbyAvailabilityZone": "",
-                                    "earliestRestoreDate": "2023-02-09T00:02:36.5764855+00:00",
+                                    "earliestRestoreDate": "2023-02-21T15:29:13.1512987+00:00",
                                     "replicationRole": "None",
                                     "replicaCapacity": 10,
                                     "byokEnforcement": "Disabled"
@@ -128,7 +128,7 @@
                                     "haEnabled": "Disabled",
                                     "availabilityZone": "2",
                                     "standbyAvailabilityZone": "",
-                                    "earliestRestoreDate": "2023-02-02T14:59:52.8285249+00:00",
+                                    "earliestRestoreDate": "2023-02-14T15:33:46.0031763+00:00",
                                     "replicationRole": "None",
                                     "replicaCapacity": 10,
                                     "byokEnforcement": "Disabled"

@@ -24,8 +24,8 @@ class MySQLFlexibleServer(ArmResourceManager):
         resource_type = 'Microsoft.DBForMySQL/flexibleservers/configurations'
 
 
-@MySQLFlexibleServer.filter_registry.register('configuration-parameter')
-class ConfigurationParametersFilter(ValueFilter):
+@MySQLFlexibleServer.filter_registry.register('server-parameter')
+class ServerParametersFilter(ValueFilter):
     """Filter by configuration parameter for mysql flexible server
 
     :example:
@@ -57,24 +57,22 @@ class ConfigurationParametersFilter(ValueFilter):
           - name: mysql-flexible-server-tls-version
             resource: azure.mysql-flexibleservers
             filters:
-              - type: configuration-parameter
+              - type: server-parameter
                 name: tls_version
                 key: value
                 op: eq
                 value: 'TLSv1.2'
-                schema_alias: False
 
     """
 
     schema = type_schema(
-        'configuration-parameter',
+        'server-parameter',
         required=['type', 'name'],
         rinherit=ValueFilter.schema,
         name={
             'type': 'string',
             'allowed_value': ['TLSv1.2']
         },
-        schema_alias=False
     )
 
     def __call__(self, resource):
