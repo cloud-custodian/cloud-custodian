@@ -262,6 +262,12 @@ class VulnerabilityAssessmentFilter(ValueFilter):
 
 @SqlServer.filter_registry.register('firewall-rules')
 class SqlServerFirewallRulesFilter(FirewallRulesFilter):
+    schema = type_schema(
+        'firewall-rules',
+        rinherit=FirewallRulesFilter.schema,
+        include_azure_services_rule=dict(type='boolean')
+    )
+
     def _query_rules(self, resource):
         query = self.client.firewall_rules.list_by_server(
             resource['resourceGroup'],
@@ -271,7 +277,7 @@ class SqlServerFirewallRulesFilter(FirewallRulesFilter):
 
         for r in query:
             rule = IPRange(r.start_ip_address, r.end_ip_address)
-            if rule == AZURE_SERVICES:
+            if rule == AZURE_SERVICES and not self.data.get('include_azure_services_rule', False):
                 # Ignore 0.0.0.0 magic value representing Azure Cloud bypass
                 continue
             resource_rules.add(rule)
