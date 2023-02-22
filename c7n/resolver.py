@@ -27,7 +27,7 @@ class URIResolver:
         self.cache = cache
 
     def resolve(self, data):
-        uri = data.get('uri')
+        uri = data.get('url')
         headers = data.get('headers', {})
 
         contents = self.cache.get(("uri-resolver", uri))
