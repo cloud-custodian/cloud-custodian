@@ -26,10 +26,7 @@ class URIResolver:
         self.session_factory = session_factory
         self.cache = cache
 
-    def resolve(self, data):
-        uri = data.get('url')
-        headers = data.get('headers', {})
-
+    def resolve(self, uri, headers={}):
         contents = self.cache.get(("uri-resolver", uri))
         if contents is not None:
             return contents
@@ -144,7 +141,13 @@ class ValuesFrom:
             raise ValueError(
                 "Unsupported format %s for url %s",
                 format, self.data['url'])
-        contents = str(self.resolver.resolve(self.data))
+
+        params = dict(
+            uri=self.data.get('url'),
+            headers=self.data.get('headers', {})
+        )
+        
+        contents = str(self.resolver.resolve(**params))
         return contents, format
 
     def get_values(self):

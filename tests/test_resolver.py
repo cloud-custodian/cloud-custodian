@@ -51,7 +51,7 @@ class FakeResolver:
             contents = contents.decode("utf8")
         self.contents = contents
 
-    def resolve(self, uri):
+    def resolve(self, uri, headers):
         return self.contents
 
 

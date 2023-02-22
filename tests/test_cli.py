@@ -301,7 +301,8 @@ class SchemaTest(CliTest):
                     'format': {'enum': ['csv', 'json', 'txt', 'csv2dict']},
                     'expr': {'oneOf': [
                         {'type': 'integer'},
-                        {'type': 'string'}]}
+                        {'type': 'string'}]},
+                    'headers': {'type': 'object'},
                 }
             },
             'schema2': {
@@ -313,7 +314,8 @@ class SchemaTest(CliTest):
                     'format': {'enum': ['csv', 'json', 'txt', 'csv2dict']},
                     'expr': {'oneOf': [
                         {'type': 'integer'},
-                        {'type': 'string'}]}
+                        {'type': 'string'}]},
+                    'headers': {'type': 'object'},
                 }
             }
         })
