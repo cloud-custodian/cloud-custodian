@@ -37,7 +37,8 @@ class URIResolver:
         if uri.startswith('s3://'):
             contents = self.get_s3_uri(uri)
         else:
-            req = Request(uri, headers=headers.update({"Accept-Encoding": "gzip"}))
+            headers.update({"Accept-Encoding": "gzip"})
+            req = Request(uri, headers=headers)
             with closing(urlopen(req)) as response:  # nosec nosemgrep
                 contents = self.handle_response_encoding(response)
 
