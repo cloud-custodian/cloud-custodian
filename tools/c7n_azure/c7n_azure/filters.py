@@ -564,7 +564,8 @@ class FirewallRulesFilter(Filter, metaclass=ABCMeta):
             'include': {'type': 'array', 'items': {'type': 'string'}},
             'any': {'type': 'array', 'items': {'type': 'string'}},
             'only': {'type': 'array', 'items': {'type': 'string'}},
-            'equal': {'type': 'array', 'items': {'type': 'string'}}
+            'equal': {'type': 'array', 'items': {'type': 'string'}},
+            'include_azure_services_rule': {'type': 'boolean'}
         },
         'oneOf': [
             {"required": ["type", "include"]},

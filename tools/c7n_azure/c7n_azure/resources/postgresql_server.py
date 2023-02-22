@@ -59,12 +59,6 @@ class PostgresqlServer(ArmResourceManager):
 
 @PostgresqlServer.filter_registry.register('firewall-rules')
 class PostgresqlServerFirewallRulesFilter(FirewallRulesFilter):
-    schema = type_schema(
-        'firewall-rules',
-        rinherit=FirewallRulesFilter.schema,
-        include_azure_services_rule=dict(type='boolean')
-    )
-
     def _query_rules(self, resource):
         query = self.client.firewall_rules.list_by_server(
             resource['resourceGroup'],
