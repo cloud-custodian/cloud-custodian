@@ -245,8 +245,7 @@ class ConfigValidFilter(Filter):
                       'app-elb-target-group', 'ebs-snapshot', 'ami')]))
 
     def validate(self):
-        execution_mode = self.manager.data.get('mode', {'type': 'pull'})['type']
-        if issubclass(c7n.policy.execution.get(execution_mode), c7n.policy.LambdaMode):
+        if isinstance(self.manager.ctx.policy.get_execution_mode(), c7n.policy.LambdaMode):
             raise PolicyValidationError(
                 "invalid-config makes too many queries to be run in lambda")
         return self
