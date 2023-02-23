@@ -844,6 +844,8 @@ class AutoScalingTest(BaseTest):
             "filters": ["invalid"],
         }
 
+        # Policy should validate cleanly for pull mode, whether it's the implicit
+        # default mode or specified explicitly.
         p = self.load_policy(base_policy)
         p.validate()
         p = self.load_policy({**base_policy, "mode": {"type": "pull"}})
