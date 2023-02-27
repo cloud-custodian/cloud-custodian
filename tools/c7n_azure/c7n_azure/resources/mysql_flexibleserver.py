@@ -87,4 +87,4 @@ class ServerParametersFilter(ValueFilter):
 
             resource['properties'][key] = query.serialize(True).get('properties')
 
-        return super().__call__(resource['properties'][key])
+        return super().__call__(resource['properties'].get(key))
