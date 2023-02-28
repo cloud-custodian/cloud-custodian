@@ -126,7 +126,7 @@ def gen_version_file(package_dir, version_file):
 def gen_setup(package_dir):
     """Generate a setup suitable for dev compatibility with pip."""
     from poetry.core.masonry.builders import sdist
-    from poetry.factory import Factory
+    from poetry.core.factory import Factory
 
     factory = Factory()
     poetry = factory.create_poetry(package_dir)
@@ -164,7 +164,7 @@ def gen_setup(package_dir):
 def gen_frozensetup(package_dir, output, exclude, remove):
     """Generate a frozen setup suitable for distribution."""
     from poetry.core.masonry.builders import sdist
-    from poetry.factory import Factory
+    from poetry.core.factory import Factory
 
     factory = Factory()
     poetry = factory.create_poetry(package_dir)
