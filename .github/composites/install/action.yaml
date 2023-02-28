@@ -16,7 +16,6 @@ runs:
       uses: actions/setup-python@v4
       with:
         python-version: ${{ inputs.python-version }}
-        cache: "poetry"
 
     - name: Set up cache
       uses: actions/cache@v2
@@ -30,11 +29,9 @@ runs:
       run: |
         if [[ "$OSTYPE" == "msys" ]]
         then
-          echo "$APPDATA\Python\Scripts" >> $GITHUB_PATH
           echo "$PWD\.venv\Scripts" >> $GITHUB_PATH
           echo "VIRTUAL_ENV=$PWD\.venv" >> $GITHUB_ENV
         else
-          echo "$HOME/.local/bin" >> $GITHUB_PATH
           echo "$PWD/.venv/bin" >> $GITHUB_PATH
           echo "VIRTUAL_ENV=$PWD/.venv" >> $GITHUB_ENV
         fi
