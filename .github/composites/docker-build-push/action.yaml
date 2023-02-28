@@ -86,6 +86,7 @@ runs:
         cache-to: type=gha,mode=max        
 
     - name: Install poetry
+      shell: bash
       run: pipx install poetry==$POETRY_VERSION        
 
     - name: Set up Python 3.11
