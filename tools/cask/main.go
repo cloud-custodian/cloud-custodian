@@ -378,8 +378,8 @@ func handleSignals(ctx context.Context, id string, dockerClient *client.Client) 
 	go func() {
 		sig := <-gracefulExit
 		fmt.Printf("Received %v, stopping container\n", sig)
-		timeout := 0 * time.Second
-		err := dockerClient.ContainerStop(ctx, id, &timeout)
+		timeout := 0
+		err := dockerClient.ContainerStop(ctx, id, container.StopOptions{Timeout: &timeout})
 		if err != nil {
 			fmt.Printf("Error stopping container: %v\n", err)
 		}
