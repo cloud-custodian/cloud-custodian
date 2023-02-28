@@ -34,3 +34,7 @@ freezegun = "^1.2.2"
 pytest = "^7.1.2"
 pytest-terraform = "^0.6.0"
 c7n = {path = "../..", develop = true}
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

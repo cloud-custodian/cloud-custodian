@@ -89,5 +89,5 @@ vcrpy-unittest = "^0.1.7"
 parameterized = "^0.7.1"
 
 [build-system]
-requires = ["poetry>=0.12", "setuptools"]
-build-backend = "poetry.masonry.api"
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
