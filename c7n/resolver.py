@@ -26,7 +26,7 @@ class URIResolver:
         self.session_factory = session_factory
         self.cache = cache
 
-    def resolve(self, uri, headers={}):
+    def resolve(self, uri, headers):
         contents = self.cache.get(("uri-resolver", uri))
         if contents is not None:
             return contents
@@ -115,7 +115,12 @@ class ValuesFrom:
             'expr': {'oneOf': [
                 {'type': 'integer'},
                 {'type': 'string'}]},
-            'headers': {"type": "object"},
+            'headers': {
+                'type': 'object',
+                'patternProperties': {
+                    '': {'type': 'string'},
+                },
+            },
         }
     }
 

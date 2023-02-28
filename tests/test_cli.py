@@ -302,7 +302,12 @@ class SchemaTest(CliTest):
                     'expr': {'oneOf': [
                         {'type': 'integer'},
                         {'type': 'string'}]},
-                    'headers': {'type': 'object'},
+                    'headers': {
+                        'type': 'object',
+                        'patternProperties': {
+                            '': {'type': 'string'},
+                        },
+                    },
                 }
             },
             'schema2': {
@@ -315,7 +320,12 @@ class SchemaTest(CliTest):
                     'expr': {'oneOf': [
                         {'type': 'integer'},
                         {'type': 'string'}]},
-                    'headers': {'type': 'object'},
+                    'headers': {
+                        'type': 'object',
+                        'patternProperties': {
+                            '': {'type': 'string'},
+                        },
+                    },
                 }
             }
         })
