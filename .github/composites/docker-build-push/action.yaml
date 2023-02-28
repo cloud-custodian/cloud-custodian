@@ -14,7 +14,7 @@ inputs:
     default: false
   poetry_version:
     description: "Poetry Version to use"
-    default: "1.3.1"
+    default: "1.4.0"
   platforms:
     description: "Platforms to build, e.g. linux/arm64,linux/amd64"
     default: "linux/amd64"
@@ -85,41 +85,29 @@ runs:
         cache-from: type=gha
         cache-to: type=gha,mode=max        
 
-    - name: Cache Poetry cache
-      uses: actions/cache@v2
-      with:
-        path: ~/.cache/pypoetry
-        key: poetry-cache-${{ runner.os }}-3.10-${{ inputs.poetry_version }}
+    - name: Install poetry
+      run: pipx install poetry==$POETRY_VERSION        
 
-    - name: Cache Packages
-      uses: actions/cache@v2
-      with:
-        path: ~/.local
-        key: poetry-${{ runner.os }}-3.10-${{ hashFiles('**/poetry.lock') }}-${{ hashFiles('.github/workflows/*.yml') }}
-
-    - name: Set up Python 3.10
+    - name: Set up Python 3.11
       uses: actions/setup-python@v4
       with:
-        # note the usage of qutoes here for 3.10, without quotes it's interrpeted as 3.1
-        python-version: "3.10"
+        python-version: "3.11"
+        cache: "poetry"
 
+    - name: Install Deps
+      shell: bash
+      run: |
+        make install-poetry        
     - name: Test
       shell: bash
       env:
         tags: ${{ steps.meta.outputs.tags }}
       run : |
-        curl -sL https://raw.githubusercontent.com/python-poetry/poetry/master/install-poetry.py | python - -y --version ${{ inputs.poetry_version }}
-
         image_var=${{inputs.name}}
         image_var=CUSTODIAN_${image_var//[-]/_}_IMAGE
         image_var=${image_var^^}
         export ${image_var}="$(echo $tags | cut -d ',' -f 1)"
-
-        python -m venv .
-        . bin/activate && poetry install
-        . bin/activate && pip install docker
-        . bin/activate && TEST_DOCKER=yes \
-                          pytest -p no:terraform -v tests/test_docker.py
+        TEST_DOCKER=yes poetry run pytest -p no:terraform -v tests/test_docker.py
 
     # actually push the multi arch image
     - name: Push
@@ -139,7 +127,7 @@ runs:
 
     - name: Install cosign
       if: "${{ inputs.push == 'true' }}"
-      uses: sigstore/cosign-installer@v2.8.0
+      uses: sigstore/cosign-installer@v2
       with:
         cosign-release: 'v1.13.0'
 
