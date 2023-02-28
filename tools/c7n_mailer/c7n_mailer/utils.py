@@ -382,7 +382,7 @@ def resource_format(resource, resource_type):
             resource['InternetGatewayId'],
             len(resource['Attachments']))
     elif resource_type == 'lambda':
-        return "Name: %s  PackageType: %s  RunTime: %s  \n" % (
+        return "Name: %s  Package Type: %s  Runtime: %s  \n" % (
             resource['FunctionName'],
             resource['PackageType'],
             resource.get('Runtime', 'N/A'))
