@@ -166,6 +166,34 @@ class TestEMR(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["Name"], "pratyush-emr-test")
 
+    def test_emr_security_configuration(self):
+        session_factory = self.replay_flight_data("test_emr_sc")
+        p = self.load_policy(
+            {
+                "name": "emr-sc-filter",
+                "resource": "emr",
+                "filters": [
+                    {
+                        "type": "security-configuration",
+                        "key": "EncryptionConfiguration.EnableAtRestEncryption",
+                        "value": True
+                    }
+                ],
+            },
+            config={"region": "us-west-2"},
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            resources[0]["c7n:SecurityConfiguration"],
+            {'EncryptionConfiguration': {
+                'AtRestEncryptionConfiguration': {
+                    'S3EncryptionConfiguration': {
+                        'EncryptionMode': 'SSE-S3'}},
+                'EnableAtRestEncryption': True,
+                'EnableInTransitEncryption': False}})
+
 
 class TestEMRQueryFilter(unittest.TestCase):
 

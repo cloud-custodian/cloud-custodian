@@ -59,7 +59,7 @@ class SecurityHubFindingFilter(Filter):
                 query:
                   Id:
                     - Comparison: PREFIX
-                      Value: 'arn:aws:securityhub:{region}:{account_id}:subscription/aws-foundational-security-best-practices/v/1.0.0/KMS.2'  # noqa
+                      Value: 'arn:aws:securityhub:{region}:{account_id}:subscription/aws-foundational-security-best-practices/v/1.0.0/KMS.2'
                   Title:
                     - Comparison: EQUALS
                       Value: >-
@@ -71,7 +71,7 @@ class SecurityHubFindingFilter(Filter):
                   RecordState:
                     - Comparison: EQUALS
                       Value: 'ACTIVE'
-    """
+    """  # noqa: E501
     schema = type_schema(
         'finding',
         # Many folks do an aggregator region, allow them to use that

@@ -323,9 +323,9 @@ class ELBModifyVpcSecurityGroups(ModifyVpcSecurityGroupsAction):
         client = local_session(self.manager.session_factory).client('elb')
         groups = super(ELBModifyVpcSecurityGroups, self).get_groups(
             load_balancers)
-        for idx, l in enumerate(load_balancers):
+        for idx, lb in enumerate(load_balancers):
             client.apply_security_groups_to_load_balancer(
-                LoadBalancerName=l['LoadBalancerName'],
+                LoadBalancerName=lb['LoadBalancerName'],
                 SecurityGroups=groups[idx])
 
 

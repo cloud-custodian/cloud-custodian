@@ -51,12 +51,13 @@ class URIResolver:
 
     def get_s3_uri(self, uri):
         parsed = urlparse(uri)
-        client = self.session_factory().client('s3')
         params = dict(
             Bucket=parsed.netloc,
             Key=parsed.path[1:])
         if parsed.query:
             params.update(dict(parse_qsl(parsed.query)))
+        region = params.pop('region', None)
+        client = self.session_factory().client('s3', region_name=region)
         result = client.get_object(**params)
         body = result['Body'].read()
         if isinstance(body, str):

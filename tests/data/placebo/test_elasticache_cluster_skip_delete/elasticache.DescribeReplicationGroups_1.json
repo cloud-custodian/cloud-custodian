@@ -1,0 +1,59 @@
+{
+    "status_code": 200,
+    "data": {
+        "ReplicationGroups": [
+            {
+                "ReplicationGroupId": "myec", 
+                "Description": " ",
+                "GlobalReplicationGroupInfo": {},
+                "Status": "available",
+                "PendingModifiedValues": {},
+                "MemberClusters": [
+                    "myec-001",
+                    "myec-002",
+                    "myec-003"
+                ],
+                "NodeGroups": [
+                    {
+                        "NodeGroupId": "0001",
+                        "Status": "available",
+                        "Slots": "0-5461",
+                        "NodeGroupMembers": [
+                            {
+                                "CacheClusterId": "myec-0001-001",
+                                "CacheNodeId": "0001",
+                                "PreferredAvailabilityZone": "us-east-1b"
+                            },
+                            {
+                                "CacheClusterId": "myec-0001-002",
+                                "CacheNodeId": "0001",
+                                "PreferredAvailabilityZone": "us-east-1a"
+                            },
+                            {
+                                "CacheClusterId": "myec-0001-003",
+                                "CacheNodeId": "0001",
+                                "PreferredAvailabilityZone": "us-east-1d"
+                            }
+                        ]
+                    }
+                ],
+                "AutomaticFailover": "enabled",
+                "MultiAZ": "enabled",
+                "ConfigurationEndpoint": {
+                    "Address": "myec.qgcgte.clustercfg.use1.cache.amazonaws.com",
+                    "Port": 6379
+                },
+                "SnapshotRetentionLimit": 1,
+                "SnapshotWindow": "07:30-08:30",
+                "ClusterEnabled": true,
+                "CacheNodeType": "cache.r6g.large",
+                "AuthTokenEnabled": false,
+                "TransitEncryptionEnabled": false,
+                "AtRestEncryptionEnabled": false,
+                "ARN": "arn:aws:elasticache:us-east-1:644160558196:replicationgroup:myec",
+                "LogDeliveryConfigurations": []
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

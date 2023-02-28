@@ -166,6 +166,7 @@ ResourceMap = {
     "aws.rds-subscription": "c7n.resources.rds.RDSSubscription",
     "aws.rds-proxy": "c7n.resources.rds.RDSProxy",
     "aws.readiness-check": "c7n.resources.route53.ReadinessCheck",
+    "aws.recovery-cluster": "c7n.resources.route53.RecoveryCluster",
     "aws.redshift": "c7n.resources.redshift.Redshift",
     "aws.redshift-snapshot": "c7n.resources.redshift.RedshiftSnapshot",
     "aws.redshift-subnet-group": "c7n.resources.redshift.RedshiftSubnetGroup",
