@@ -71,7 +71,7 @@ runs:
     # https://github.com/docker/buildx/issues/166
     # https://github.com/docker/buildx/issues/59
     - name: Build
-      uses: docker/build-push-action@v3
+      uses: docker/build-push-action@v4
       with:
         context: .
         build-args: |
@@ -124,7 +124,7 @@ runs:
     # actually push the multi arch image
     - name: Push
       if: "${{ inputs.push == 'true' }}"
-      uses: docker/build-push-action@v3.1.1
+      uses: docker/build-push-action@v4
       with:
         context: .
         build-args: |
