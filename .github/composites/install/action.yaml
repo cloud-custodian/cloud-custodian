@@ -1,0 +1,63 @@
+name: "Install"
+description: "Install Cloud Custodian"
+inputs:
+  python-version:
+    required: true
+  poetry-version:
+    default: "1.4.0"
+runs:
+  using: "composite"
+  steps:
+    - name: Install poetry
+      shell: bash
+      run: pipx install poetry==$POETRY_VERSION
+
+    - name: Set up Python ${{ inputs.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ inputs.python-version }}
+        cache: "poetry"
+
+    - name: Set up cache
+      uses: actions/cache@v2
+      id: cache
+      with:
+        path: .venv
+        key: venv-${{ runner.os }}-${{ inputs.python-version }}-${{ hashFiles('**/poetry.lock') }}  
+
+    - name: Update PATH
+      shell: bash
+      run: |
+        if [[ "$OSTYPE" == "msys" ]]
+        then
+          echo "$APPDATA\Python\Scripts" >> $GITHUB_PATH
+          echo "$PWD\.venv\Scripts" >> $GITHUB_PATH
+          echo "VIRTUAL_ENV=$PWD\.venv" >> $GITHUB_ENV
+        else
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+          echo "$PWD/.venv/bin" >> $GITHUB_PATH
+          echo "VIRTUAL_ENV=$PWD/.venv" >> $GITHUB_ENV
+        fi
+
+    - name: Ensure cache is healthy
+      if: steps.cache.outputs.cache-hit == 'true'
+      id: cache_check
+      shell: bash
+      run: |
+        (poetry run custodian version && echo "::set-output name=venv::success") || (rm -rf .venv && echo "::set-output name=venv::recreate")
+
+    - name: Virtualenv
+      if: steps.cache.outputs.cache-hit != 'true' || steps.cache_check.outputs.venv != 'success'
+      shell: bash
+      env:
+        CHECK_VENV: ${{ steps.cache_check.outputs.venv }}
+        CACHE_HIT: ${{ steps.cache.outputs.cache-hit }}
+      run: |
+        echo "check venv $CHECK_VENV"
+        echo "cache hit $CACHE_HIT"
+        python -m venv .venv
+
+    - name: Install Deps
+      shell: bash
+      run: |
+        make install-poetry

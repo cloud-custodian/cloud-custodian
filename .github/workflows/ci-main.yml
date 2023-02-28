@@ -55,13 +55,11 @@ jobs:
       contents: read
     steps:
       - uses: actions/checkout@v3
-      - name: Install poetry
-        run: pipx install poetry==$POETRY_VERSION
 
-      - uses: actions/setup-python@v4
+      - name: Install Custodian
+        uses: ./.github/composites/install
         with:
           python-version: "3.11"
-          cache: 'poetry'
 
       - name: Set up doc cache
         uses: actions/cache@v3
@@ -73,13 +71,8 @@ jobs:
             docs/source/gcp/resources
             docs/source/azure/resources
             docs/source/awscc/resources
-            docs/source/tencentcloud/resources            
+            docs/source/tencentcloud/resources
           key: sphinx-docs-${{ runner.os }}-3.11-v1-${{ hashFiles('**/poetry.lock') }}
-
-      - name: Install Deps
-        shell: bash
-        run: |
-          make install-poetry
 
       - name: Build Docs
         shell: bash
@@ -110,33 +103,21 @@ jobs:
             python-version: "3.8"
     steps:
       - uses: actions/checkout@v3
-        with:
-          fetch-depth: 2
-
-      - name: Install poetry
-        shell: bash
-        run: pipx install poetry==$POETRY_VERSION
 
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v2
         with:
-          terraform_wrapper: false        
+          terraform_wrapper: false
 
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v4
+      - name: Install Custodian
+        uses: ./.github/composites/install
         with:
           python-version: ${{ matrix.python-version }}
-          cache: "poetry"
-
-      - name: Install Deps
-        shell: bash
-        run: |
-          make install-poetry
 
       - name: Test
         shell: bash
         env:
-          COV_RUN: ${{ contains(matrix.python-version, '3.10') && contains(matrix.os, 'ubuntu') }}
+          COV_RUN: ${{ contains(matrix.python-version, '3.11') && contains(matrix.os, 'ubuntu') }}
         run: |
           if [[ "$COV_RUN" == "true" ]]
           then
@@ -156,13 +137,13 @@ jobs:
 
       - name: Upload Code Coverage
         uses: codecov/codecov-action@v3
-        if: contains(matrix.python-version, '3.10') && contains(matrix.os, 'ubuntu')
+        if: contains(matrix.python-version, '3.11') && contains(matrix.os, 'ubuntu')
         with:
           files: ./coverage.xml
           name: codecov
           verbose: true
 
       - name: License Check
-        if: contains(matrix.python-version, '3.9') && contains(matrix.os, 'ubuntu')
+        if: contains(matrix.python-version, '3.11') && contains(matrix.os, 'ubuntu')
         run: |
           poetry run python tools/dev/license-check.py

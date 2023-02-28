@@ -85,20 +85,11 @@ runs:
         cache-from: type=gha
         cache-to: type=gha,mode=max        
 
-    - name: Install poetry
-      shell: bash
-      run: pipx install poetry==$POETRY_VERSION        
-
-    - name: Set up Python 3.11
-      uses: actions/setup-python@v4
+    - name: Install Custodian
+      uses: ./.github/composites/install
       with:
-        python-version: "3.11"
-        cache: "poetry"
+        python-version: ${{ matrix.python-version }}
 
-    - name: Install Deps
-      shell: bash
-      run: |
-        make install-poetry        
     - name: Test
       shell: bash
       env:
