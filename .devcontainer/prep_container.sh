@@ -8,8 +8,7 @@ cd ..
 pip3 install -U virtualenv tox
 
 # Poetry
-curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python -
-source $HOME/.poetry/env
+curl -sSL https://install.python-poetry.org | python3 -
 
 # Virtual env
 python3 -m venv .venv
