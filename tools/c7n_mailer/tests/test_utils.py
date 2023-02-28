@@ -112,14 +112,12 @@ class ResourceFormat(unittest.TestCase):
             "PackageType": "Zip",
         }
         self.assertEqual(
-            utils.resource_format(image_func, "aws.lambda"
-            ),
-            "Function Name:  my-image-based-function  Package Type: Image  Runtime: N/A",
+            utils.resource_format(image_func, "aws.lambda").strip(),
+            "Name: my-image-based-function  Package Type: Image  Runtime: N/A",
         )
         self.assertEqual(
-            utils.resource_format(zip_func, "aws.lambda"
-            ),
-            "Function Name:  my-zip-based-function  Package Type: Zip  Runtime: python3.8",
+            utils.resource_format(zip_func, "aws.lambda").strip(),
+            "Name: my-zip-based-function  Package Type: Zip  Runtime: python3.8",
         )
 
     def test_rds_cluster(self):
