@@ -114,6 +114,7 @@ jobs:
           fetch-depth: 2
 
       - name: Install poetry
+        shell: bash
         run: pipx install poetry==$POETRY_VERSION
 
       - name: Set up Terraform
