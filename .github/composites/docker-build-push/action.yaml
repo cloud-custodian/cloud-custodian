@@ -82,6 +82,8 @@ runs:
         # makes the image available in docker, e.g. docker images inspect
         load: true
         file: "docker/${{ inputs.name }}"
+        cache-from: type=gha
+        cache-to: type=gha,mode=max        
 
     - name: Cache Poetry cache
       uses: actions/cache@v2
@@ -132,6 +134,8 @@ runs:
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
         file: "docker/${{ inputs.name }}"
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
 
     - name: Install cosign
       if: "${{ inputs.push == 'true' }}"
