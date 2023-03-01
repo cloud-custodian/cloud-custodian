@@ -7,7 +7,7 @@ PLATFORM_OS := $(shell python3 -c "import platform; print(platform.system())")
 PY_VERSION := $(shell python3 -c "import sys; print('%s.%s' % (sys.version_info.major, sys.version_info.minor))")
 
 COVERAGE_TYPE := html
-
+ARGS := 
 
 ifneq "$(findstring $(PLATFORM_OS), Linux Darwin)" ""
   ifneq "$(findstring $(PY_VERSION), 3.10)" ""
@@ -16,6 +16,9 @@ ifneq "$(findstring $(PLATFORM_OS), Linux Darwin)" ""
 endif
 
 
+###
+# Common developer targets
+
 install:
 	poetry install
 	for pkg in $(PKG_SET); do echo "Install $$pkg" && cd $$pkg && poetry install --all-extras && cd ../..; done
@@ -23,7 +26,7 @@ install:
 .PHONY: test
 
 test:
-	. $(PWD)/test.env && poetry run pytest -n auto tests tools
+	. $(PWD)/test.env && poetry run pytest -n auto tests tools $(ARGS)
 
 test-coverage:
 	. $(PWD)/test.env && poetry run pytest -n auto \
@@ -33,16 +36,15 @@ test-coverage:
             --cov tools/c7n_gcp/c7n_gcp \
             --cov tools/c7n_kube/c7n_kube \
             --cov tools/c7n_left/c7n_left \
+            --cov tools/c7n_terraform/c7n_terraform \
             --cov tools/c7n_mailer/c7n_mailer \
             --cov tools/c7n_policystream/c7n_policystream \
             --cov tools/c7n_tencentcloud/c7n_tencentcloud \
-            tests tools
+            tests tools $(ARGS)
 
-ftest:
-	C7N_FUNCTIONAL=yes AWS_DEFAULT_REGION=us-east-2 pytest tests -m functional
-
-ttest:
-	C7N_FUNCTIONAL=yes AWS_DEFAULT_REGION=us-east-2 pytest tests -m terraform
+test-functional:
+# note this will provision real resources in a cloud environment
+	C7N_FUNCTIONAL=yes AWS_DEFAULT_REGION=us-east-2 pytest tests -m functional $(ARGS)
 
 sphinx:
 	make -f docs/Makefile.sphinx html
@@ -54,6 +56,11 @@ clean:
 	make -f docs/Makefile.sphinx clean
 	rm -rf .tox .Python bin include lib pip-selfcheck.json
 
+
+
+###
+# Package Management Targets
+# - primarily used to help drive frozen releases and dependency upgrades
 
 pkg-rebase:
 	rm -f poetry.lock
@@ -123,6 +130,10 @@ pkg-publish-wheel:
 # upload to test pypi
 	twine upload -r $(PKG_REPO) dist/*
 	for pkg in $(PKG_SET); do cd $$pkg && twine upload -r $(PKG_REPO) dist/* && cd ../..; done
+
+
+###
+# Static analyzers
 
 analyzer-bandit:
 	bandit -i -s B101,B311 \
