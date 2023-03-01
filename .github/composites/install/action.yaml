@@ -5,6 +5,11 @@ inputs:
     required: true
   poetry-version:
     default: "1.4.0"
+outputs:
+  poetry-version:
+    description: "poetry version"
+    value: ${{ steps.echo-poetry-version.outputs.poetry-version }}
+
 runs:
   using: "composite"
   steps:
@@ -58,3 +63,8 @@ runs:
       shell: bash
       run: |
         make install
+
+    - name: Output Poetry Version
+      shell: bash
+      id: echo-poetry-version
+      run: echo "poetry-version=${{ inputs.poetry-version }}" >> $GITHUB_OUTPUT

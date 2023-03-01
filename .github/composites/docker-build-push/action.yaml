@@ -12,9 +12,6 @@ inputs:
     description: 'Push image: true/false'
     required: true
     default: false
-  poetry_version:
-    description: "Poetry Version to use"
-    default: "1.4.0"
   platforms:
     description: "Platforms to build, e.g. linux/arm64,linux/amd64"
     default: "linux/amd64"
@@ -66,6 +63,12 @@ runs:
           type=raw,value=${{ steps.get_tag.outputs.tag }}
         sep-tags: ','
 
+    - name: Install Custodian
+      id: install-custodian
+      uses: ./.github/composites/install
+      with:
+        python-version: "3.11"
+
     # build a single platform image first in order to actually load the image from buildx
     # manifests are not supported yet
     # https://github.com/docker/buildx/issues/166
@@ -75,20 +78,15 @@ runs:
       with:
         context: .
         build-args: |
-          POETRY_VERSION=${{ inputs.poetry_version }}
+          POETRY_VERSION=${{ steps.install-custodian.poetry_version }}
         push: false
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
-        # makes the image available in docker, e.g. docker images inspect
+        # load the image back into docker for tests.
         load: true
         file: "docker/${{ inputs.name }}"
         cache-from: type=gha
         cache-to: type=gha,mode=max        
-
-    - name: Install Custodian
-      uses: ./.github/composites/install
-      with:
-        python-version: ${{ matrix.python-version }}
 
     - name: Test
       shell: bash
