@@ -7,7 +7,9 @@ PLATFORM_OS := $(shell python3 -c "import platform; print(platform.system())")
 PY_VERSION := $(shell python3 -c "import sys; print('%s.%s' % (sys.version_info.major, sys.version_info.minor))")
 
 COVERAGE_TYPE := html
-ARGS := 
+ARGS :=
+IMAGE := c7n
+IMAGE_TAG := latest
 
 ifneq "$(findstring $(PLATFORM_OS), Linux Darwin)" ""
   ifneq "$(findstring $(PY_VERSION), 3.10)" ""
@@ -56,7 +58,8 @@ clean:
 	make -f docs/Makefile.sphinx clean
 	rm -rf .tox .Python bin include lib pip-selfcheck.json
 
-
+image:
+	docker build -f docker/$(IMAGE) -t $(IMAGE):$(IMAGE_TAG) .
 
 ###
 # Package Management Targets

@@ -162,6 +162,7 @@ def test_cli_providers_available():
 
     client = docker.from_env()
     output = client.containers.run(CUSTODIAN_IMAGE, "schema", stderr=True)
+    print(output)
     resources = yaml.safe_load(output.strip())["resources"]
     found_providers = {r.split(".", 1)[0] for r in resources}
     assert providers == found_providers
