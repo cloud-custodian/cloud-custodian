@@ -101,6 +101,25 @@ class ResourceFormat(unittest.TestCase):
             "id: igw-x  attachments: 0",
         )
 
+    def test_lambda(self):
+        image_func = {
+            "FunctionName": "my-image-based-function",
+            "PackageType": "Image",
+        }
+        zip_func = {
+            "FunctionName": "my-zip-based-function",
+            "Runtime": "python3.8",
+            "PackageType": "Zip",
+        }
+        self.assertEqual(
+            utils.resource_format(image_func, "aws.lambda").strip(),
+            "Name: my-image-based-function  Package Type: Image  Runtime: N/A",
+        )
+        self.assertEqual(
+            utils.resource_format(zip_func, "aws.lambda").strip(),
+            "Name: my-zip-based-function  Package Type: Zip  Runtime: python3.8",
+        )
+
     def test_rds_cluster(self):
         self.assertEqual(
             utils.resource_format(

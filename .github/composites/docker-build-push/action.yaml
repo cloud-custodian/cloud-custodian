@@ -86,7 +86,7 @@ runs:
         load: true
         file: "docker/${{ inputs.name }}"
         cache-from: type=gha
-        cache-to: type=gha,mode=max        
+        cache-to: type=gha,mode=max
 
     - name: Test
       shell: bash
