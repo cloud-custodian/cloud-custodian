@@ -54,7 +54,7 @@ runs:
         echo "cache hit $CACHE_HIT"
         python -m venv .venv
 
-    - name: Install Deps
+    - name: Install
       shell: bash
       run: |
-        make install-poetry
+        make install

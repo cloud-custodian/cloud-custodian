@@ -6,6 +6,8 @@ PLATFORM_ARCH := $(shell python3 -c "import platform; print(platform.machine())"
 PLATFORM_OS := $(shell python3 -c "import platform; print(platform.system())")
 PY_VERSION := $(shell python3 -c "import sys; print('%s.%s' % (sys.version_info.major, sys.version_info.minor))")
 
+COVERAGE_TYPE := html
+
 
 ifneq "$(findstring $(PLATFORM_OS), Linux Darwin)" ""
   ifneq "$(findstring $(PY_VERSION), 3.10)" ""
@@ -18,12 +20,14 @@ install:
 	poetry install
 	for pkg in $(PKG_SET); do echo "Install $$pkg" && cd $$pkg && poetry install --all-extras && cd ../..; done
 
+.PHONY: test
+
 test:
 	. $(PWD)/test.env && poetry run pytest -n auto tests tools
 
-test-cov:
+test-coverage:
 	. $(PWD)/test.env && poetry run pytest -n auto \
-            --cov-report html \
+            --cov-report $(COVERAGE_TYPE) \
             --cov c7n \
             --cov tools/c7n_azure/c7n_azure \
             --cov tools/c7n_gcp/c7n_gcp \
@@ -32,7 +36,7 @@ test-cov:
             --cov tools/c7n_mailer/c7n_mailer \
             --cov tools/c7n_policystream/c7n_policystream \
             --cov tools/c7n_tencentcloud/c7n_tencentcloud \
-            tests tools {posargs}
+            tests tools
 
 ftest:
 	C7N_FUNCTIONAL=yes AWS_DEFAULT_REGION=us-east-2 pytest tests -m functional
