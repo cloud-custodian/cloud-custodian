@@ -15,12 +15,41 @@ endif
 
 
 install:
-	python3 -m venv .
-	. bin/activate && pip install -r requirements-dev.txt
-
-install-poetry:
 	poetry install
 	for pkg in $(PKG_SET); do echo "Install $$pkg" && cd $$pkg && poetry install --all-extras && cd ../..; done
+
+test:
+	. $(PWD)/test.env && poetry run pytest -n auto tests tools
+
+test-cov:
+	. $(PWD)/test.env && poetry run pytest -n auto \
+            --cov-report html \
+            --cov c7n \
+            --cov tools/c7n_azure/c7n_azure \
+            --cov tools/c7n_gcp/c7n_gcp \
+            --cov tools/c7n_kube/c7n_kube \
+            --cov tools/c7n_left/c7n_left \
+            --cov tools/c7n_mailer/c7n_mailer \
+            --cov tools/c7n_policystream/c7n_policystream \
+            --cov tools/c7n_tencentcloud/c7n_tencentcloud \
+            tests tools {posargs}
+
+ftest:
+	C7N_FUNCTIONAL=yes AWS_DEFAULT_REGION=us-east-2 pytest tests -m functional
+
+ttest:
+	C7N_FUNCTIONAL=yes AWS_DEFAULT_REGION=us-east-2 pytest tests -m terraform
+
+sphinx:
+	make -f docs/Makefile.sphinx html
+
+lint:
+	ruff c7n tests tools
+
+clean:
+	make -f docs/Makefile.sphinx clean
+	rm -rf .tox .Python bin include lib pip-selfcheck.json
+
 
 pkg-rebase:
 	rm -f poetry.lock
@@ -90,45 +119,6 @@ pkg-publish-wheel:
 # upload to test pypi
 	twine upload -r $(PKG_REPO) dist/*
 	for pkg in $(PKG_SET); do cd $$pkg && twine upload -r $(PKG_REPO) dist/* && cd ../..; done
-
-test-poetry:
-	. $(PWD)/test.env && poetry run pytest -n auto tests tools
-
-test-poetry-cov:
-	. $(PWD)/test.env && poetry run pytest -n auto \
-            --cov c7n --cov tools/c7n_azure/c7n_azure \
-            --cov tools/c7n_gcp/c7n_gcp --cov tools/c7n_kube/c7n_kube \
-            --cov tools/c7n_mailer/c7n_mailer \
-            tests tools {posargs}
-
-test:
-	./bin/tox -e py38
-
-ftest:
-	C7N_FUNCTIONAL=yes AWS_DEFAULT_REGION=us-east-2 pytest tests -m functional
-
-ttest:
-	C7N_FUNCTIONAL=yes AWS_DEFAULT_REGION=us-east-2 pytest tests -m terraform
-
-sphinx:
-# if this errors either tox -e docs or cd tools/c7n_sphinext && poetry install
-	make -f docs/Makefile.sphinx html
-
-ghpages:
-	-git checkout gh-pages && \
-	mv docs/build/html new-docs && \
-	rm -rf docs && \
-	mv new-docs docs && \
-	git add -u && \
-	git add -A && \
-	git commit -m "Updated generated Sphinx documentation"
-
-lint:
-	ruff c7n tests tools
-
-clean:
-	make -f docs/Makefile.sphinx clean
-	rm -rf .tox .Python bin include lib pip-selfcheck.json
 
 analyzer-bandit:
 	bandit -i -s B101,B311 \
