@@ -61,6 +61,8 @@ clean:
 image:
 	docker build -f docker/$(IMAGE) -t $(IMAGE):$(IMAGE_TAG) .
 
+gen-docker:
+	python tools/dev/dockerpkg.py generate
 ###
 # Package Management Targets
 # - primarily used to help drive frozen releases and dependency upgrades
