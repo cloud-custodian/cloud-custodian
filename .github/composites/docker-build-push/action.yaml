@@ -50,7 +50,7 @@ runs:
           elif "${{ github.ref }}".startswith("refs/pull"):
             # ref looks like: refs/pull/$pr_number/merge
             id = "${{ github.ref }}".split("/")[-2]
-            print(f"tag==pr-{id}", file=output)
+            print(f"tag=pr-{id}", file=output)
           else:
             # this should just be the branch
             id = "${{ github.ref }}".split("/")[-1]
