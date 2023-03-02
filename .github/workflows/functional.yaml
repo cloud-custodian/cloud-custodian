@@ -1,15 +1,11 @@
 name: "Functional"
 
 env:
-  terraform_version: "1.2.8"
   C7N_FUNCTIONAL: true
   C7N_TEST_RUN: true
 
 on:
   workflow_dispatch: {}
-  schedule:
-    # UTC 6 AM aka 11 PM PST, 2 AM EST, everyday
-    - cron: "0 6 * * *"
 
 jobs:
   AWS:
@@ -22,9 +18,9 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v4.2.0
         with:
-          python-version: "3.8"
+          python-version: "3.11"
 
-      - uses: aws-actions/configure-aws-credentials@v1.7.0
+      - uses: aws-actions/configure-aws-credentials@v1-node16
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           aws-region: us-east-1
@@ -32,6 +28,7 @@ jobs:
       - uses: hashicorp/setup-terraform@v2
         with:
           terraform_version: "${{ env.terraform_version }}"
+          terraform_wrapper: false
 
       - name: Install Requirements
         run: |
