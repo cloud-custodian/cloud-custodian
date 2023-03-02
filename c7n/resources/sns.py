@@ -490,7 +490,7 @@ class UnusedSNSSubscription(CrossAccountAccessFilter):
         for r in resources:
             try:
                 client.get_topic_attributes(TopicArn=r['TopicArn'])
-            except Exception as e:
+            except client.exceptions.NotFoundException:
                 results.append(r)
         return results
 
