@@ -66,9 +66,7 @@ class ElasticSearch(BaseTest):
             },
             session_factory=factory,
         )
-        print(dir(p.resource_manager))
         resources = p.run()
-        print(resources)
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["DomainName"], "c7n-test-opensearch")
 
