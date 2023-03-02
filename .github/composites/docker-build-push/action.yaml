@@ -78,7 +78,7 @@ runs:
       with:
         context: .
         build-args: |
-          POETRY_VERSION=${{ steps.install-custodian.poetry-version }}
+          POETRY_VERSION=${{ steps.install-custodian.outputs.poetry-version }}
         push: false
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
