@@ -9,7 +9,7 @@ from c7n.exceptions import PolicyValidationError
 from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter, VpcFilter, Filter
 from c7n.manager import resources
 from c7n.query import ConfigSource, DescribeSource, QueryResourceManager, TypeInfo
-from c7n.utils import chunks, local_session, type_schema
+from c7n.utils import chunks, local_session, type_schema, merge_dict_list
 from c7n.tags import Tag, RemoveTag, TagActionFilter, TagDelayedAction
 from c7n.filters.kms import KmsRelatedFilter
 import c7n.filters.policystatement as polstmt_filter
@@ -57,6 +57,13 @@ class ElasticSearchDomain(QueryResourceManager):
         name = 'Name'
         dimension = "DomainName"
         cfn_type = config_type = 'AWS::Elasticsearch::Domain'
+
+    def resources(self, query=None):
+        if 'query' in self.data:
+            query = merge_dict_list(self.data['query'])
+        elif query is None:
+            query = {}
+        return super(ElasticSearchDomain, self).resources(query=query)
 
     source_mapping = {
         'describe': DescribeDomain,
