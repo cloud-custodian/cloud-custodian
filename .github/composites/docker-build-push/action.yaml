@@ -38,19 +38,23 @@ runs:
       id: get_tag
       shell: python
       run: |
-        if "${{ github.ref }}".startswith("refs/tags"):
-          print("::set-output name=tag::latest")
-        elif "${{ github.ref }}" == "refs/heads/master":
-          print("::set-output name=tag::dev")
-        # Pull requests dont get pushed so this should be fine
-        elif "${{ github.ref }}".startswith("refs/pull"):
-          # ref looks like: refs/pull/$pr_number/merge
-          id = "${{ github.ref }}".split("/")[-2]
-          print(f"::set-output name=tag::pr-{id}")
-        else:
-          # this should just be the branch
-          id = "${{ github.ref }}".split("/")[-1]
-          print(f"::set-output name=tag::{id}")
+        import os
+        with open(os.environ['GITHUB_OUTPUT'], 'a') as output:
+          # release tags are picked up by docker meta below
+          # we set the alias latest to point to the latest tag.
+          if "${{ github.ref }}".startswith("refs/tags"):
+            print("tag=latest", file=output)
+          elif "${{ github.ref }}" == "refs/heads/main":
+            print("tag=dev", file=output)
+          # Pull requests dont get pushed so this should be fine
+          elif "${{ github.ref }}".startswith("refs/pull"):
+            # ref looks like: refs/pull/$pr_number/merge
+            id = "${{ github.ref }}".split("/")[-2]
+            print(f"tag==pr-{id}", file=output)
+          else:
+            # this should just be the branch
+            id = "${{ github.ref }}".split("/")[-1]
+            print(f"tag={id}", file=output)
 
     - name: Docker meta
       id: meta
