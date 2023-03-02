@@ -57,7 +57,9 @@ runs:
       run: |
         echo "check venv $CHECK_VENV"
         echo "cache hit $CACHE_HIT"
-        mv .venv .venv-old
+        if [ -d ".venv" ]; then
+          mv .venv .venv-old
+        fi
         python -m venv .venv
 
     - name: Install
