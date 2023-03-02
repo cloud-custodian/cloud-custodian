@@ -464,6 +464,35 @@ class SNSSubscription(QueryResourceManager):
             'TopicArn'
         )
 
+@SNSSubscription.filter_registry.register('unused')
+class UnusedSNSSubscription(CrossAccountAccessFilter):
+
+    """
+    Filters subscriptons based on invalid topic arn
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: sns-subscription-unused
+                resource: sns-subscription
+                filters:
+                  - type: unused
+    """
+
+    schema = type_schema('unused')
+    permissions = ('sns:GetTopicAttributes',)
+
+    def process(self, resources, event=None):
+        results = []
+        client = local_session(self.manager.session_factory).client('sns')
+        for r in resources:
+            try:
+                client.get_topic_attributes(TopicArn=r['TopicArn'])
+            except Exception as e:
+                results.append(r)
+        return results
 
 @SNSSubscription.action_registry.register('delete')
 class SubscriptionDeleteAction(BaseAction):
