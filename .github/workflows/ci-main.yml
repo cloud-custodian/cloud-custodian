@@ -120,7 +120,8 @@ jobs:
           if [[ "$COV_RUN" == "true" ]]
           then
             echo "Running Coverage Test"
-            make test-coverage COVERAGE_TYPE=xml
+            make test-coverage COVERAGE_TYPE=term
+            poetry run coverage xml
           else
             make test
           fi
