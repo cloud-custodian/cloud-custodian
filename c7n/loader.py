@@ -225,7 +225,7 @@ class DirectoryLoader(PolicyLoader):
             else:
                 names.append(p['name'])
 
-        return self.load_data({'policies': policies}, directory)
+        return self.load_data({'policies': policies}, directory, validate=validate)
 
 
 def is_hidden(path):

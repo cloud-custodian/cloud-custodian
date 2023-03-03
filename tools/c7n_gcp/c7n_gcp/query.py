@@ -154,8 +154,8 @@ class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
     type: str
     resource_type: 'TypeInfo'
 
-    def __init__(self, data, options):
-        super(QueryResourceManager, self).__init__(data, options)
+    def __init__(self, ctx, data):
+        super(QueryResourceManager, self).__init__(ctx, data)
         self.source = self.get_source(self.source_type)
 
     def get_permissions(self):

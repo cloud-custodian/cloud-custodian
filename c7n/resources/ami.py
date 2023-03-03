@@ -381,8 +381,8 @@ class SetPermissions(BaseAction):
         remove = []
         add = []
         account_regex = re.compile('\\d{12}')
-        org_regex = re.compile('arn:[a-zA-Z-]+:organizations::\\d{12}:organization/o-.*')
-        ou_regex = re.compile('arn:[a-zA-Z-]+:organizations::\\d{12}:ou/o-.*/ou-.*')
+        org_regex = re.compile('arn:[a-zA-Z-]+:organizations:\\d{12}:organization/o-.*')
+        ou_regex = re.compile('arn:[a-zA-Z-]+:organizations:\\d{12}:ou/o-.*/ou-.*')
         if to_remove:
             if 'all' in to_remove:
                 remove.append({'Group': 'all'})
@@ -415,16 +415,17 @@ class SetPermissions(BaseAction):
                 if principals:
                     add.extend([{'OrganizationalUnitArn': a} for a in principals])
 
-        if not remove and not add:
-            return
-        self.manager.retry(client.modify_image_attribute,
-            ImageId=image['ImageId'],
-            LaunchPermission={'Remove': remove},
-            OperationType='remove')
-        self.manager.retry(client.modify_image_attribute,
-            ImageId=image['ImageId'],
-            LaunchPermission={'Add': add},
-            OperationType='add')
+        if remove:
+            self.manager.retry(client.modify_image_attribute,
+                ImageId=image['ImageId'],
+                LaunchPermission={'Remove': remove},
+                OperationType='remove')
+
+        if add:
+            self.manager.retry(client.modify_image_attribute,
+                ImageId=image['ImageId'],
+                LaunchPermission={'Add': add},
+                OperationType='add')
 
 
 @AMI.action_registry.register('copy')
