@@ -128,7 +128,6 @@ class BigQueryTable(ChildResourceManager):
             return client.execute_query('get', {
                 'projectId': event['project_id'],
                 'datasetId': event['dataset_id'],
-                #'encryptionConfiguration': event['encryptionCconfiguration'],
                 'tableId': event['resourceName'].rsplit('/', 1)[-1]
             })
 
@@ -141,7 +140,7 @@ class BigQueryTable(ChildResourceManager):
                 client.execute_query(
                     'get', verb_arguments=ref))
         return results
-        
+
 
 @BigQueryTable.action_registry.register('delete')
 class DeleteBQTable(MethodAction):
