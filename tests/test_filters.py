@@ -285,6 +285,24 @@ class TestValueFilter(unittest.TestCase):
             "key": "ingress"})
         self.assertRaises(TypeError, vf.match(resource))
 
+    def test_value_path(self):
+        resource = {'list':[{'a':['one','two'],'b':'one'},{'a':['one'],'b':'two'}]}
+        vf = filters.factory({
+            "type": "value",
+            "key": "list[?(b=='one')].a[]",
+            "value_path": "list[?(b=='two')].a[]",
+            "op": "intersect"})
+        res = vf.match(resource)
+        self.assertEqual(res,True)
+
+        vf = filters.factory({
+            "type": "value",
+            "key": "list[?(b=='one')].a[]",
+            "value_path": "list[?(b=='three')].a[]",
+            "op": "intersect"})
+        res = vf.match(resource)
+        self.assertEqual(res,False)
+        
 
 class TestAgeFilter(unittest.TestCase):
 
