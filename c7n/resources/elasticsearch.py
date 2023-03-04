@@ -242,6 +242,7 @@ class SourceIP(Filter):
     :example:
     Find ElasticSearch domains that allow traffic from IP addresses
     not in the approved list (string matching)
+
     .. code-block: yaml
 
       - type: source-ip
@@ -250,6 +251,7 @@ class SourceIP(Filter):
 
     Same  as above but using cidr matching instead of string matching
     .. code-block: yaml
+
       - type: source-ip
         op: not-in
         value_type: cidr
@@ -513,6 +515,7 @@ class RemoveMatchedSourceIps(BaseAction):
 
     :example:
     .. code-block:: yaml
+
             policies:
               - name: es-access-revoke
                 resource: elasticsearch

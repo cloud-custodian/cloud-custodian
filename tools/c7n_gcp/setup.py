@@ -12,19 +12,17 @@ package_data = \
 install_requires = \
 ['argcomplete (>=2.0.0,<3.0.0)',
  'attrs (>=22.2.0,<23.0.0)',
- 'boto3 (>=1.26.70,<2.0.0)',
- 'botocore (>=1.29.70,<2.0.0)',
+ 'boto3 (>=1.26.84,<2.0.0)',
+ 'botocore (>=1.29.84,<2.0.0)',
  'c7n (>=0.9.23,<0.10.0)',
  'docutils (>=0.17.1,<0.18.0)',
- 'google-api-core==2.10.2',
  'google-api-python-client>=2.0,<3.0',
  'google-auth>=2.1.0,<3.0.0',
  'google-cloud-logging>=3.2,<4.0',
  'google-cloud-monitoring>=2.5.0,<3.0.0',
- 'google-cloud-storage>=1.42.2,<2.0.0',
- 'grpcio==1.49.1',
+ 'google-cloud-storage>=2.7,<3.0',
  'importlib-metadata (>=4.13.0,<5.0.0)',
- 'importlib-resources (>=5.10.2,<6.0.0)',
+ 'importlib-resources (>=5.12.0,<6.0.0)',
  'jmespath (>=1.0.1,<2.0.0)',
  'jsonschema (>=4.17.3,<5.0.0)',
  'pkgutil-resolve-name (>=1.3.10,<2.0.0)',
@@ -35,10 +33,10 @@ install_requires = \
  'retrying>=1.3.3,<2.0.0',
  's3transfer (>=0.6.0,<0.7.0)',
  'six (>=1.16.0,<2.0.0)',
- 'tabulate (>=0.8.10,<0.9.0)',
- 'typing-extensions (>=4.4.0,<5.0.0)',
+ 'tabulate (>=0.9.0,<0.10.0)',
+ 'typing-extensions (>=4.5.0,<5.0.0)',
  'urllib3 (>=1.26.14,<2.0.0)',
- 'zipp (>=3.13.0,<4.0.0)']
+ 'zipp (>=3.15.0,<4.0.0)']
 
 setup_kwargs = {
     'name': 'c7n-gcp',
