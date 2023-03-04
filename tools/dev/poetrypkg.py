@@ -82,24 +82,24 @@ from setuptools import setup
 
 {before}
 setup_kwargs = {{
-    'name': {name!r},
-    'version': {version!r},
-    'description': {description!r},
-    'license': 'Apache-2.0',
-    'classifiers': [
-        'License :: OSI Approved :: Apache Software License',
-        'Topic :: System :: Systems Administration',
-        'Topic :: System :: Distributed Computing'
+    "name": {name!r},
+    "version": {version!r},
+    "description": {description!r},
+    "license": "Apache-2.0",
+    "classifiers": [
+        "License :: OSI Approved :: Apache Software License",
+        "Topic :: System :: Systems Administration",
+        "Topic :: System :: Distributed Computing"
     ],
-    'long_description': {long_description!r},
-    'long_description_content_type': 'text/markdown',
-    'author': 'Cloud Custodian Project',
-    'author_email': 'cloud-custodian@googlegroups.com',
-    'project_urls': {{
-       'Homepage': {url!r},
-       'Documentation': 'https://cloudcustodian.io/docs/',
-       'Source': 'https://github.com/cloud-custodian/cloud-custodian',
-       'Issue Tracker': 'https://github.com/cloud-custodian/cloud-custodian/issues',
+    "long_description": {long_description!r},
+    "long_description_content_type": "text/markdown",
+    "author": "Cloud Custodian Project",
+    "author_email": "cloud-custodian@googlegroups.com",
+    "project_urls": {{
+       "Homepage": {url!r},
+       "Documentation": "https://cloudcustodian.io/docs/",
+       "Source": "https://github.com/cloud-custodian/cloud-custodian",
+       "Issue Tracker": "https://github.com/cloud-custodian/cloud-custodian/issues",
     }},
     {extra}
 }}

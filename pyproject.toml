@@ -56,8 +56,6 @@ docker = "^6.0.1"
 
 [tool.black]
 skip-string-normalization = true
-# these files are generated
-extend-exclude = "setup.py"
 
 [tool.ruff]
 line-length = 100
