@@ -43,7 +43,7 @@ entry_points = \
 
 setup_kwargs = {
     'name': 'c7n-kube',
-    'version': '0.2.22',
+    'version': '0.2.23',
     'description': 'Cloud Custodian - Kubernetes Provider',
     'license': 'Apache-2.0',
     'classifiers': [
