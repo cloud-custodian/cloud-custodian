@@ -22,6 +22,8 @@ endif
 # Common developer targets
 
 install:
+	@if [[ -z "$(VIRTUAL_ENV)" ]]; then python3 -m venv .venv; export VIRTUAL_ENV=${PWD}/.venv;  export PATH=${PWD}/.venv:${PATH}; fi
+
 	poetry install
 	for pkg in $(PKG_SET); do echo "Install $$pkg" && cd $$pkg && poetry install --all-extras && cd ../..; done
 
