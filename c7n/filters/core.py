@@ -588,6 +588,29 @@ class ValueFilter(BaseValueFilter):
         return super(ValueFilter, self).get_resource_value(k, i, self.data.get('value_regex'))
     
     def get_path_value(self,i):
+        """Retrieve values using JMESPath.
+
+        When using a Value Filter, a ``value_path`` can be specified.
+        This means the value(s) the filter will compare against are
+        calculated during the initialization of the filter. 
+
+        Note that this option only pulls properties of the resource
+        currently being filtered.
+
+        .. code-block:: yaml
+            - name: find-admins-with-user-roles
+              resource: gcp.project
+              filters:
+                - type: iam-policy
+                  doc:
+                    key: bindings[?(role=='roles/admin')].members[]
+                    op: intersect
+                    value_path: bindings[?(role=='roles/user_access')].members[]
+
+        The iam-policy use the implementation of the generic Value Filter.
+        This implementation allows for the comparison of two separate lists of values
+        within the same resource.
+        """
         compiled = jmespath.compile(self.data.get('value_path'))
         return compiled.search(i)
 
