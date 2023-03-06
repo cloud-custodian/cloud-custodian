@@ -481,6 +481,8 @@ class UnusedSNSSubscription(RelatedResourceFilter):
                 resource: sns-subscription
                 filters:
                   - type: unused
+                    key: TopicArn
+		    value: absent
     """
 
     RelatedResource = 'c7n.resources.sns.SNS'
