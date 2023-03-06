@@ -3,9 +3,7 @@
 import json
 
 from c7n.actions import RemovePolicyBase, ModifyPolicyBase, BaseAction
-from c7n.filters import (
-	CrossAccountAccessFilter, PolicyChecker, ValueFilter,
-	ANNOTATION_KEY)
+from c7n.filters import CrossAccountAccessFilter, PolicyChecker, ValueFilter
 from c7n.filters.kms import KmsRelatedFilter
 import c7n.filters.policystatement as polstmt_filter
 from c7n.manager import resources
