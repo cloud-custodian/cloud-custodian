@@ -25,6 +25,7 @@ from c7n import deprecated, utils
 from c7n.version import version
 from c7n.query import RetryPageIterator
 from c7n.varfmt import VarFormat
+from c7n.utils import get_policy_provider
 
 log = logging.getLogger('c7n.policy')
 
@@ -34,10 +35,10 @@ def load(options, path, format=None, validate=True, vars=None):
     if not os.path.exists(path):
         raise IOError("Invalid path for config %r" % path)
 
-    from c7n.schema import validate, StructureParser
+    from c7n.schema import validate as schema_validate, StructureParser
     if os.path.isdir(path):
         from c7n.loader import DirectoryLoader
-        collection = DirectoryLoader(options).load_directory(path)
+        collection = DirectoryLoader(options).load_directory(path, validate)
         if validate:
             [p.validate() for p in collection]
         return collection
@@ -55,7 +56,7 @@ def load(options, path, format=None, validate=True, vars=None):
         return None
 
     if validate:
-        errors = validate(data, resource_types=rtypes)
+        errors = schema_validate(data, resource_types=rtypes)
         if errors:
             raise PolicyValidationError(
                 "Failed to validate policy %s \n %s" % (
@@ -1151,13 +1152,7 @@ class Policy:
 
     @property
     def provider_name(self) -> str:
-        if isinstance(self.resource_type, list):
-            provider_name, _ = self.resource_type[0].split('.', 1)
-        elif '.' in self.resource_type:
-            provider_name, resource_type = self.resource_type.split('.', 1)
-        else:
-            provider_name = 'aws'
-        return provider_name
+        return get_policy_provider(self.data)
 
     def is_runnable(self, event=None):
         return self.conditions.evaluate(event)
@@ -1274,6 +1269,10 @@ class Policy:
 
         # Update ourselves in place
         self.data = updated
+
+        # NOTE rebuild the policy conditions base on the new self.data
+        self.conditions = PolicyConditions(self, self.data)
+
         # Reload filters/actions using updated data, we keep a reference
         # for some compatiblity preservation work.
         m = self.resource_manager

@@ -119,12 +119,7 @@ class BigQueryTableTest(BaseTest):
             {
                 'name': 'bq-table-delete',
                 'resource': 'gcp.bq-table',
-                'filters': [{
-                    'type': 'value',
-                    'key': 'tag:delete_me',
-                    'value': 'yes',
-                    'op': 'equal'
-                }],
+                'filters': [{'tag:delete_me': 'yes'}],
                 'actions': [
                     'delete'
                 ]

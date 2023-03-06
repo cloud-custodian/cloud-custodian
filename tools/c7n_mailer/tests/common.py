@@ -1,7 +1,10 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+import base64
+import json
 import logging
 import os
+import zlib
 
 import fakeredis
 from ldap3 import MOCK_SYNC, Connection, Server
@@ -151,6 +154,16 @@ SQS_MESSAGE_1 = {
     },
     "event": None,
     "resources": [RESOURCE_1],
+}
+
+SQS_MESSAGE_1_ENCODED = {
+    "Body": base64.b64encode(
+        zlib.compress(json.dumps(SQS_MESSAGE_1).encode("utf8"))
+    ),
+    "MessageId": "1",
+    "Attributes": {
+        "SentTimestamp": "2023-01-01T12:00:00"
+    }
 }
 
 SQS_MESSAGE_2 = {

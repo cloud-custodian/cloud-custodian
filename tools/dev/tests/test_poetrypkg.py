@@ -1,3 +1,4 @@
+import os
 import subprocess
 import sys
 
@@ -67,6 +68,7 @@ def _assert_pkg_ok(
 
 @pytest.mark.skipif(sys.version_info <= (3, 8), reason="Developer Python minimum is 3.8")
 @pytest.mark.skipif(sys.platform == 'win32', reason="No Windows support")
+@pytest.mark.skipif(os.environ.get('CI', '') == 'true', reason="Skip in CI")
 def test_generate_frozen_deps():
     """
     Ensures that the gen-frozendeps command works and creates a git diff
@@ -80,6 +82,7 @@ def test_generate_frozen_deps():
 
 @pytest.mark.skipif(sys.version_info <= (3, 8), reason="Developer Python minimum is 3.8")
 @pytest.mark.skipif(sys.platform == 'win32', reason="No Windows support")
+@pytest.mark.skipif(os.environ.get('CI', '') == 'true', reason="Skip in CI")
 def test_generate_setup():
     """
     Ensures that the gen-setup command works

@@ -12,9 +12,9 @@ package_data = \
 install_requires = \
 ['argcomplete (>=2.0.0,<3.0.0)',
  'attrs (>=22.2.0,<23.0.0)',
- 'boto3 (>=1.26.50,<2.0.0)',
- 'botocore (>=1.29.50,<2.0.0)',
- 'c7n (>=0.9.22,<0.10.0)',
+ 'boto3 (>=1.26.70,<2.0.0)',
+ 'botocore (>=1.29.70,<2.0.0)',
+ 'c7n (>=0.9.23,<0.10.0)',
  'docutils (>=0.17.1,<0.18.0)',
  'google-api-core==2.10.2',
  'google-api-python-client>=2.0,<3.0',
@@ -32,18 +32,17 @@ install_requires = \
  'pyrsistent (>=0.19.3,<0.20.0)',
  'python-dateutil (>=2.8.2,<3.0.0)',
  'pyyaml (>=6.0,<7.0)',
- 'requests==2.27.1',
  'retrying>=1.3.3,<2.0.0',
  's3transfer (>=0.6.0,<0.7.0)',
  'six (>=1.16.0,<2.0.0)',
  'tabulate (>=0.8.10,<0.9.0)',
  'typing-extensions (>=4.4.0,<5.0.0)',
  'urllib3 (>=1.26.14,<2.0.0)',
- 'zipp (>=3.11.0,<4.0.0)']
+ 'zipp (>=3.13.0,<4.0.0)']
 
 setup_kwargs = {
     'name': 'c7n-gcp',
-    'version': '0.4.21',
+    'version': '0.4.22',
     'description': 'Cloud Custodian - Google Cloud Provider',
     'license': 'Apache-2.0',
     'classifiers': [

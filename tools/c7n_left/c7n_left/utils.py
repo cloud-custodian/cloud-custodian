@@ -6,8 +6,10 @@ from c7n.provider import clouds
 from c7n.loader import DirectoryLoader
 
 
-def load_policies(policy_dir, options):
+SEVERITY_LEVELS = {"critical": 0, "high": 10, "medium": 20, "low": 30, "unknown": 40}
 
+
+def load_policies(policy_dir, options):
     loader = DirectoryLoader(config=options)
     policies = loader.load_directory(policy_dir)
     if not policies:
