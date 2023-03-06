@@ -3,7 +3,9 @@
 import json
 
 from c7n.actions import RemovePolicyBase, ModifyPolicyBase, BaseAction
-from c7n.filters import CrossAccountAccessFilter, PolicyChecker
+from c7n.filters import (
+	CrossAccountAccessFilter, PolicyChecker, ValueFilter,
+	ANNOTATION_KEY)
 from c7n.filters.kms import KmsRelatedFilter
 import c7n.filters.policystatement as polstmt_filter
 from c7n.manager import resources
@@ -11,6 +13,7 @@ from c7n.query import ConfigSource, DescribeSource, QueryResourceManager, TypeIn
 from c7n.resolver import ValuesFrom
 from c7n.utils import local_session, type_schema
 from c7n.tags import RemoveTag, Tag, TagDelayedAction, TagActionFilter, universal_augment
+from c7n.filters.related import RelatedResourceFilter
 
 from c7n.resources.securityhub import PostFinding
 
@@ -464,12 +467,13 @@ class SNSSubscription(QueryResourceManager):
             'TopicArn'
         )
 
+
 @SNSSubscription.filter_registry.register('unused')
-class UnusedSNSSubscription(CrossAccountAccessFilter):
+class UnusedSNSSubscription(RelatedResourceFilter):
 
     """
     Filters subscriptons based on invalid topic arn
-
+    
     :example:
 
     .. code-block:: yaml
@@ -481,20 +485,13 @@ class UnusedSNSSubscription(CrossAccountAccessFilter):
                   - type: unused
     """
 
-    schema = type_schema('unused')
-    permissions = ('sns:GetTopicAttributes',)
+    RelatedResource = 'c7n.resources.sns.SNS'
+    RelatedIdsExpression = 'TopicArn'
+    AnnotationKey = 'Topic'
 
-    def process(self, resources, event=None):
-        results = []
-        client = local_session(self.manager.session_factory).client('sns')
-        for r in resources:
-            try:
-                client.get_topic_attributes(TopicArn=r['TopicArn'])
-            except Exception:
-                self.log.debug(
-                    "Error processing sns:%s", r['TopicArn'])
-                results.append(r)
-        return results
+    schema = type_schema(
+        'unused', rinherit=ValueFilter.schema)
+
 
 @SNSSubscription.action_registry.register('delete')
 class SubscriptionDeleteAction(BaseAction):
