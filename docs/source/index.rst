@@ -82,13 +82,6 @@ Navigate below to your cloud provider and get started with Cloud Custodian!
 
 .. toctree::
    :maxdepth: 1
-   :caption: AWS Cloud Control
-
-   awscc/resources/index
-
-
-.. toctree::
-   :maxdepth: 1
    :caption: Kubernetes
 
    kubernetes/gettingstarted

@@ -62,7 +62,7 @@ clean:
 	rm -f $(SRCDIR)/aws/resources/*
 	rm -f $(SRCDIR)/gcp/resources/*
 	rm -f $(SRCDIR)/azure/resources/*
-	rm -f $(SRCDIR)/awscc/resources/*
+#	rm -f $(SRCDIR)/awscc/resources/*
 	rm -f $(SRCDIR)/tools/*.md
 
 html:
@@ -88,8 +88,6 @@ html:
 	cp -p tools/c7n_kube/readme.md $(SRCDIR)/tools/c7n-kube.md
 	mkdir -p $(SRCDIR)/aws/resources
 	c7n-sphinxext --provider aws --output-dir $(SRCDIR)/aws/resources --group-by=resource_type.service
-	mkdir -p $(SRCDIR)/awscc/resources
-	c7n-sphinxext --provider awscc --output-dir $(SRCDIR)/awscc/resources --group-by=resource_type.service
 	mkdir -p $(SRCDIR)/gcp/resources
 	c7n-sphinxext --provider gcp --output-dir $(SRCDIR)/gcp/resources --group-by=resource_type.service
 	mkdir -p $(SRCDIR)/azure/resources

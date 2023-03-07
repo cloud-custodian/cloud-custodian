@@ -70,7 +70,7 @@ jobs:
             docs/source/azure/resources
             docs/source/awscc/resources
             docs/source/tencentcloud/resources
-          key: sphinx-docs-${{ runner.os }}-3.11-v1-${{ hashFiles('**/poetry.lock') }}
+          key: sphinx-docs-${{ runner.os }}-3.11-v2-${{ hashFiles('**/poetry.lock') }}
 
       - name: Build Docs
         shell: bash
