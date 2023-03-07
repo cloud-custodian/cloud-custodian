@@ -19,7 +19,7 @@ install_requires = \
  'jmespath (>=1.0.1,<2.0.0)',
  'jsonschema (>=4.17.3,<5.0.0)',
  'pkgutil-resolve-name (>=1.3.10,<2.0.0)',
- 'pygit2>=1.9,<2.0',
+ 'pygit2>=1.11',
  'pyrsistent (>=0.19.3,<0.20.0)',
  'python-dateutil (>=2.8.2,<3.0.0)',
  'pyyaml (>=6.0,<7.0)',
@@ -28,7 +28,6 @@ install_requires = \
  's3transfer (>=0.6.0,<0.7.0)',
  'six (>=1.16.0,<2.0.0)',
  'tabulate (>=0.8.10,<0.9.0)',
- 'typing-extensions (>=4.4.0,<5.0.0)',
  'urllib3 (>=1.26.14,<2.0.0)',
  'zipp (>=3.13.0,<4.0.0)']
 
@@ -58,7 +57,7 @@ setup_kwargs = {
     'py_modules': modules,
     'install_requires': install_requires,
     'entry_points': entry_points,
-    'python_requires': '>=3.7,<4.0',
+    'python_requires': '>=3.8,<4.0',
 }
 
 

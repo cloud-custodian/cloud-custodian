@@ -32,5 +32,5 @@ c7n = {path = "../..", develop = true}
 mock = "^4.0.2"
 
 [build-system]
-requires = ["poetry>=0.12", "setuptools"]
-build-backend = "poetry.masonry.api"
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

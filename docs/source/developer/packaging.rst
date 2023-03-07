@@ -5,7 +5,7 @@ Packaging Custodian
 
 Custodian uses ``poetry`` https://python-poetry.org/ for
 managing dependencies and providing for repeatable installs. Its not
-typically required for developers as we maintain setuptools/pip/tox
+typically required for developers as we maintain setuptools/pip
 compatible environments, however familiarity is needed when making
 changes to the dependency graph (add/update/remove) dependencies,
 as all the setup.py/requirements files are generated artifacts.
@@ -36,8 +36,7 @@ Usage
 We maintain several makefile targets that can be used to front end
 poetry.
 
-  - `make install-poetry` an alternative custodian installation method, assumes
-    poetry is already installed.
+  - `make install` installs custodian using poetry.
 
   - `make pkg-show-update` show available updates to packages in poetry
     lockfiles.

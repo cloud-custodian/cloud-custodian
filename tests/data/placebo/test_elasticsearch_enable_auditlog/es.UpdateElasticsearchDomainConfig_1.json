@@ -1,0 +1,200 @@
+{
+    "status_code": 200, 
+    "data": {
+        "DomainConfig": {
+            "ElasticsearchVersion": {
+                "Options": "OpenSearch_2.3",
+                "Status": {
+                    "CreationDate": "2023-01-30T10:44:16.812000-08:00",
+                    "UpdateDate": "2023-01-30T10:57:56.126000-08:00",
+                    "UpdateVersion": 8,
+                    "State": "Active",
+                    "PendingDeletion": false
+                }
+            },
+            "ElasticsearchClusterConfig": {
+                "Options": {
+                    "InstanceType": "r6g.large.elasticsearch",
+                    "InstanceCount": 1,
+                    "DedicatedMasterEnabled": false,
+                    "ZoneAwarenessEnabled": false,
+                    "WarmEnabled": false,
+                    "ColdStorageOptions": {
+                        "Enabled": false
+                    }
+                },
+                "Status": {
+                    "CreationDate": "2023-01-30T10:44:16.812000-08:00",
+                    "UpdateDate": "2023-01-30T10:57:56.126000-08:00",
+                    "UpdateVersion": 8,
+                    "State": "Active",
+                    "PendingDeletion": false
+                }
+            },
+            "EBSOptions": {
+                "Options": {
+                    "EBSEnabled": true,
+                    "VolumeType": "gp3",
+                    "VolumeSize": 10,
+                    "Iops": 3000
+                },
+                "Status": {
+                    "CreationDate": "2023-01-30T10:44:16.812000-08:00",
+                    "UpdateDate": "2023-01-30T10:57:56.127000-08:00",
+                    "UpdateVersion": 8,
+                    "State": "Active",
+                    "PendingDeletion": false
+                }
+            },
+            "AccessPolicies": {
+                "Options": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Deny\",\"Principal\":{\"AWS\":\"*\"},\"Action\":\"es:*\",\"Resource\":\"arn:aws:es:us-east-1:123456789012:domain/test-es-dom/*\"}]}",
+                "Status": {
+                    "CreationDate": "2023-01-30T10:44:16.812000-08:00",
+                    "UpdateDate": "2023-01-30T10:57:56.127000-08:00",
+                    "UpdateVersion": 8,
+                    "State": "Active",
+                    "PendingDeletion": false
+                }
+            },
+            "SnapshotOptions": {
+                "Options": {
+                    "AutomatedSnapshotStartHour": 0
+                },
+                "Status": {
+                    "CreationDate": "2023-01-30T10:44:16.812000-08:00",
+                    "UpdateDate": "2023-01-30T10:57:56.127000-08:00",
+                    "UpdateVersion": 8,
+                    "State": "Active",
+                    "PendingDeletion": false
+                }
+            },
+            "VPCOptions": {
+                "Options": {},
+                "Status": {
+                    "CreationDate": "2023-01-31T19:14:05.836000-08:00",
+                    "UpdateDate": "2023-01-31T19:14:05.836000-08:00",
+                    "UpdateVersion": 64,
+                    "State": "Active",
+                    "PendingDeletion": false
+                }
+            },
+            "CognitoOptions": {
+                "Options": {
+                    "Enabled": false
+                },
+                "Status": {
+                    "CreationDate": "2023-01-31T19:14:05.836000-08:00",
+                    "UpdateDate": "2023-01-31T19:14:05.836000-08:00",
+                    "UpdateVersion": 64,
+                    "State": "Active",
+                    "PendingDeletion": false
+                }
+            },
+            "EncryptionAtRestOptions": {
+                "Options": {
+                    "Enabled": true,
+                    "KmsKeyId": "arn:aws:kms:us-east-1:123456789012:key/65cd52ed-5eee-5ed0-444b-123456789"
+                },
+                "Status": {
+                    "CreationDate": "2023-01-30T10:44:16.812000-08:00",
+                    "UpdateDate": "2023-01-30T10:57:56.126000-08:00",
+                    "UpdateVersion": 8,
+                    "State": "Active",
+                    "PendingDeletion": false
+                }
+            },
+            "NodeToNodeEncryptionOptions": {
+                "Options": {
+                    "Enabled": true
+                },
+                "Status": {
+                    "CreationDate": "2023-01-30T10:44:16.812000-08:00",
+                    "UpdateDate": "2023-01-30T10:57:56.126000-08:00",
+                    "UpdateVersion": 8,
+                    "State": "Active",
+                    "PendingDeletion": false
+                }
+            },
+            "AdvancedOptions": {
+                "Options": {
+                    "indices.fielddata.cache.size": "",
+                    "override_main_response_version": "false",
+                    "rest.action.multi.allow_explicit_index": "true"
+                },
+                "Status": {
+                    "CreationDate": "2023-01-30T10:44:16.812000-08:00",
+                    "UpdateDate": "2023-01-30T14:18:25.579000-08:00",
+                    "UpdateVersion": 14,
+                    "State": "Active",
+                    "PendingDeletion": false
+                }
+            },
+            "LogPublishingOptions": {
+                "Options": {
+                    "AUDIT_LOGS": {
+                        "CloudWatchLogsLogGroupArn": "arn:aws:logs:us-east-1:123456789012:log-group:/aws/domains/test-es-dom/audit-logs:*",
+                        "Enabled": true
+                    }
+                },
+                "Status": {
+                    "CreationDate": "2023-01-31T08:48:14.245000-08:00",
+                    "UpdateDate": "2023-01-31T18:58:05.576000-08:00",
+                    "UpdateVersion": 63,
+                    "State": "Active",
+                    "PendingDeletion": false
+                }
+            },
+            "DomainEndpointOptions": {
+                "Options": {
+                    "EnforceHTTPS": true,
+                    "TLSSecurityPolicy": "Policy-Min-TLS-1-0-2019-07",
+                    "CustomEndpointEnabled": false
+                },
+                "Status": {
+                    "CreationDate": "2023-01-30T10:44:16.812000-08:00",
+                    "UpdateDate": "2023-01-30T10:57:56.127000-08:00",
+                    "UpdateVersion": 8,
+                    "State": "Active",
+                    "PendingDeletion": false
+                }
+            },
+            "AdvancedSecurityOptions": {
+                "Options": {
+                    "Enabled": true,
+                    "InternalUserDatabaseEnabled": true,
+                    "AnonymousAuthEnabled": false
+                },
+                "Status": {
+                    "CreationDate": "2023-01-30T10:44:16.812000-08:00",
+                    "UpdateDate": "2023-01-31T09:25:19.604000-08:00",
+                    "UpdateVersion": 30,
+                    "State": "Active",
+                    "PendingDeletion": false
+                }
+            },
+            "AutoTuneOptions": {
+                "Options": {
+                    "DesiredState": "DISABLED",
+                    "RollbackOnDisable": "NO_ROLLBACK",
+                    "MaintenanceSchedules": [
+                        {
+                            "StartAt": "2023-01-31T18:41:39-08:00",
+                            "Duration": {
+                                "Value": 4,
+                                "Unit": "HOURS"
+                            },
+                            "CronExpressionForRecurrence": ""
+                        }
+                    ]
+                },
+                "Status": {
+                    "CreationDate": "2023-01-30T10:44:16.812000-08:00",
+                    "UpdateDate": "2023-01-31T18:58:16.272000-08:00",
+                    "UpdateVersion": 64,
+                    "State": "DISABLED",
+                    "PendingDeletion": false
+                }
+            }
+        }
+    }
+}
