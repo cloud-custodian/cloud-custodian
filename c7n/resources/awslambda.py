@@ -260,7 +260,9 @@ class LambdaEnableXrayTracing(Action):
     """
         This action allows for enable Xray tracing to Active
        :example:
+
        .. code-block:: yaml
+
            actions:
              - type: enable-xray-tracing
     """

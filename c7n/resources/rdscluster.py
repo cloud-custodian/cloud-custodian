@@ -667,8 +667,11 @@ class ConsecutiveSnapshots(Filter):
 class ClusterParameterFilter(ParameterFilter):
     """
     Applies value type filter on set db cluster parameter values.
+
     :example:
+
     .. code-block:: yaml
+
             policies:
               - name: rdscluster-pg
                 resource: rds-cluster

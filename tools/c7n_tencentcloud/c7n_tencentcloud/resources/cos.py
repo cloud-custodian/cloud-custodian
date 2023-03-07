@@ -91,6 +91,7 @@ class HasStatementFilter(BucketFilterBase):
     :example:
 
     .. code-block:: yaml
+
         policies:
             - name: bucket statement
               resource: tencentcloud.cos
@@ -304,6 +305,7 @@ class BucketLifecycle(Filter):
     :example:
 
     .. code-block:: yaml
+
         policies:
             - name: no-mpu-cleanup-rule
               resource: tencentcloud.cos
