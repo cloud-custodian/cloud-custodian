@@ -297,8 +297,10 @@ There are several ways to get a list of possible keys for each resource.
 
 - Value Path:
 
-  Retrieve values using JMESPath. The filter expects that a properly formatted
-  'string' is passed containing a valid JMESPath. (Tutorial here on `JMESPath <http://jmespath.org/tutorial.html>`_ syntax)
+  Retrieve values using JMESPath. 
+  
+  The filter expects that a properly formatted 'string' is passed 
+  containing a valid JMESPath. (Tutorial here on `JMESPath <http://jmespath.org/tutorial.html>`_ syntax)
 
   When using a Value Filter, a ``value_path`` can be specified.
   This means the value(s) the filter will compare against are
@@ -308,6 +310,7 @@ There are several ways to get a list of possible keys for each resource.
   currently being filtered.
 
   .. code-block:: yaml
+
       - name: find-admins-with-user-roles
         resource: gcp.project
         filters:
@@ -332,7 +335,7 @@ describe resource call as is the case in the ValueFilter
 
      - name: no-ec2-public-ips
        resource: aws.ec2
-       mode:
+       mode:make 
          type: cloudtrail
          events:
              - RunInstances
