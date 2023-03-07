@@ -85,6 +85,17 @@ jobs:
           docs-dir: docs/build/html
           bucket-url: s3://cloudcustodian.io/docs
 
+  Docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: c7n build and test
+        uses: ./.github/composites/docker-build-push
+        with:
+          name: c7n
+          push: false
+          platforms: linux/amd64
+
   Tests:
     runs-on: "${{ matrix.os }}"
     needs: Lint
@@ -119,7 +130,6 @@ jobs:
         run: |
           if [[ "$COV_RUN" == "true" ]]
           then
-            echo "Running Coverage Test"
             make test-coverage COVERAGE_TYPE=term
             poetry run coverage xml
           else
@@ -132,7 +142,6 @@ jobs:
         with:
           files: ./coverage.xml
           name: codecov
-          verbose: true
 
       - name: License Check
         if: contains(matrix.python-version, '3.10') && contains(matrix.os, 'ubuntu')

@@ -1,3 +1,4 @@
+SHELL := /bin/bash
 SELF_MAKE := $(lastword $(MAKEFILE_LIST))
 PKG_REPO = testpypi
 PKG_SET := tools/c7n_gcp tools/c7n_kube tools/c7n_openstack tools/c7n_mailer tools/c7n_logexporter tools/c7n_policystream tools/c7n_trailcreator tools/c7n_org tools/c7n_sphinxext tools/c7n_terraform tools/c7n_awscc tools/c7n_tencentcloud tools/c7n_azure

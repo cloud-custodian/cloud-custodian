@@ -1,8 +1,9 @@
 name: "Docker Build"
 on:
+  # build a daily dev image  
+  schedule:
+    - cron: "42 6 * * *"
   push:
-    branches:
-      - main
     tags:
       # todo: update for 1.0
       - 0.*

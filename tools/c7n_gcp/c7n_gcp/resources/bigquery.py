@@ -131,6 +131,16 @@ class BigQueryTable(ChildResourceManager):
                 'tableId': event['resourceName'].rsplit('/', 1)[-1]
             })
 
+    def augment(self, resources):
+        client = self.get_client()
+        results = []
+        for r in resources:
+            ref = r['tableReference']
+            results.append(
+                client.execute_query(
+                    'get', verb_arguments=ref))
+        return results
+
 
 @BigQueryTable.action_registry.register('delete')
 class DeleteBQTable(MethodAction):
