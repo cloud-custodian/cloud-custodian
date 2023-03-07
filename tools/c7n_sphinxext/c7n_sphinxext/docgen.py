@@ -78,7 +78,7 @@ def eperm(provider, el, r=None):
 
     try:
         pset = loader.load_data({'policies': [pdata]}, ':mem:', validate=False)
-    except Exception as e:
+    except Exception:
         # print(f'error loading {el} as {element_type}:{el.type} error: {e} \n {pdata}')
         return []
     el = get_policy_element(el, list(pset)[0])
