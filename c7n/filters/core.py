@@ -491,7 +491,8 @@ class ValueFilter(BaseValueFilter):
             'value_regex': {'type': 'string'},
             'value_from': {'$ref': '#/definitions/filters_common/value_from'},
             'value': {'$ref': '#/definitions/filters_common/value'},
-            'op': {'$ref': '#/definitions/filters_common/comparison_operators'}
+            'op': {'$ref': '#/definitions/filters_common/comparison_operators'},
+            'value_path': {'type':'string'}
         }
     }
     schema_alias = True
@@ -544,6 +545,7 @@ class ValueFilter(BaseValueFilter):
                 "Missing 'key' in value filter %s" % self.data)
         if ('value' not in self.data and
                 'value_from' not in self.data and
+                'value_path' not in self.data and
                 'value' in self.required_keys):
             raise PolicyValidationError(
                 "Missing 'value' in value filter %s" % self.data)
@@ -584,6 +586,33 @@ class ValueFilter(BaseValueFilter):
 
     def get_resource_value(self, k, i):
         return super(ValueFilter, self).get_resource_value(k, i, self.data.get('value_regex'))
+    
+    def get_path_value(self,i):
+        """Retrieve values using JMESPath.
+
+        When using a Value Filter, a ``value_path`` can be specified.
+        This means the value(s) the filter will compare against are
+        calculated during the initialization of the filter. 
+
+        Note that this option only pulls properties of the resource
+        currently being filtered.
+
+        .. code-block:: yaml
+            - name: find-admins-with-user-roles
+              resource: gcp.project
+              filters:
+                - type: iam-policy
+                  doc:
+                    key: bindings[?(role=='roles/admin')].members[]
+                    op: intersect
+                    value_path: bindings[?(role=='roles/user_access')].members[]
+
+        The iam-policy use the implementation of the generic Value Filter.
+        This implementation allows for the comparison of two separate lists of values
+        within the same resource.
+        """
+        compiled = jmespath.compile(self.data.get('value_path'))
+        return compiled.search(i)
 
     def match(self, i):
         if self.v is None and len(self.data) == 1:
@@ -594,6 +623,8 @@ class ValueFilter(BaseValueFilter):
             if 'value_from' in self.data:
                 values = ValuesFrom(self.data['value_from'], self.manager)
                 self.v = values.get_values()
+            elif 'value_path' in self.data:
+                self.v = self.get_path_value(i)
             else:
                 self.v = self.data.get('value')
             self.content_initialized = True

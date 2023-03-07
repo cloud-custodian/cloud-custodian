@@ -295,6 +295,35 @@ There are several ways to get a list of possible keys for each resource.
 
   .. autodoconly:: c7n.resolver.ValuesFrom
 
+- Value Path:
+
+  Retrieve values using JMESPath. 
+  
+  The filter expects that a properly formatted 'string' is passed 
+  containing a valid JMESPath. (Tutorial here on `JMESPath <http://jmespath.org/tutorial.html>`_ syntax)
+
+  When using a Value Filter, a ``value_path`` can be specified.
+  This means the value(s) the filter will compare against are
+  calculated during the initialization of the filter. 
+
+  Note that this option only pulls properties of the resource
+  currently being filtered.
+
+  .. code-block:: yaml
+
+      - name: find-admins-with-user-roles
+        resource: gcp.project
+        filters:
+          - type: iam-policy
+            doc:
+              key: bindings[?(role=='roles/admin')].members[]
+              op: intersect
+              value_path: bindings[?(role=='roles/user_access')].members[]
+
+  The iam-policy uses the generic Value Filter implementation.
+  This implementation allows for the comparison of two separate lists of values
+  within the same resource.
+
 Event Filter
 -------------
 
@@ -306,7 +335,7 @@ describe resource call as is the case in the ValueFilter
 
      - name: no-ec2-public-ips
        resource: aws.ec2
-       mode:
+       mode:make 
          type: cloudtrail
          events:
              - RunInstances
