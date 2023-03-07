@@ -1,9 +1,6 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
-from collections import defaultdict
 import click
-import os
-import sys
 import tomli as toml
 from pathlib import Path
 
@@ -14,6 +11,7 @@ def cli():
 
     some simple tooling to sync poetry files to setup/pip
     """
+
 
 @cli.command()
 @click.option('-p', '--package-dir', type=click.Path())
@@ -26,6 +24,7 @@ def gen_version_file(package_dir, version_file):
     with open(version_file, 'w') as fh:
         fh.write('# Generated via tools/dev/poetrypkg.py\n')
         fh.write('version = "{}"\n'.format(version))
+
 
 if __name__ == '__main__':
     cli()
