@@ -177,6 +177,7 @@ class BucketEncryption(Filter):
     :example:
 
     .. code-block:: yaml
+
         policies:
             - name: cos-enable-default-bucket-encryption-reporting-pull
               resource: tencentcloud.cos
@@ -232,6 +233,7 @@ class BucketLoggingFilter(BucketFilterBase):
     :example:
 
     .. code-block:: yaml
+
         policies:
         - name: bucket-logging
           resource: tencentcloud.cos

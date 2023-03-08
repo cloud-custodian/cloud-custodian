@@ -79,10 +79,14 @@ def eperm(provider, el, r=None):
     try:
         pset = loader.load_data({'policies': [pdata]}, ':mem:', validate=False)
     except Exception:
+        eperm.errors.append(el)
         # print(f'error loading {el} as {element_type}:{el.type} error: {e} \n {pdata}')
         return []
     el = get_policy_element(el, list(pset)[0])
     return el.get_permissions()
+
+
+eperm.errors = []
 
 
 def get_policy_element(el, p):
@@ -408,5 +412,7 @@ def _main(provider, output_dir, group_by):
             provider_name=provider_class.display_name,
             files=files))
 
+    if eperm.errors:
+        log.info("%s permission errors %d", provider.title(), len(eperm.errors))
     if written:
         log.info("%s Wrote %d files", provider.title(), written)
