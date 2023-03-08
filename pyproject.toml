@@ -70,3 +70,7 @@ addopts = "--tb=native"
 markers = ["functional", "skiplive"]
 python_files = "test_*.py"
 norecursedirs = ["data", "cassettes", "templates", "terraform"]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
