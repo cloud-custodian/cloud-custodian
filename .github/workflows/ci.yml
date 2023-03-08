@@ -77,6 +77,22 @@ jobs:
         run: |
           make sphinx
 
+      - name: Update Docs Cache
+        # basically to prevent the docs cache from going stale as we're not keying
+        # on its contents, on merges to main we update the cache to prevent
+        # staleness.
+        if ${{ github.event_name == 'push' }}
+        uses: actions/cache/save@v3
+        with:
+          path: |
+            docs/build
+            docs/source/aws/resources
+            docs/source/gcp/resources
+            docs/source/azure/resources
+            docs/source/awscc/resources
+            docs/source/tencentcloud/resources
+          key: sphinx-docs-${{ runner.os }}-3.11-v2-${{ hashFiles('**/poetry.lock') }}
+
       - name: Deploy Docs
         if: ${{ github.event_name == 'push' }}
         uses: ./.github/composites/docs-publish
