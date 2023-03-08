@@ -30,7 +30,7 @@ jobs:
       - name: Check Workflows
         run: |
           bash <(curl https://raw.githubusercontent.com/rhysd/actionlint/main/scripts/download-actionlint.bash)
-          actionlint -color
+          ./actionlint -color
   Analyzer:
     runs-on: ubuntu-latest
     needs: Lint
