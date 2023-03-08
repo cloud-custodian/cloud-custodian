@@ -107,7 +107,13 @@ pkg-build-wheel:
 	poetry build --format wheel
 	for pkg in $(PKG_SET); do cd $$pkg && poetry build --format wheel && cd ../..; done
 
-	poetry freeze-wheel
+	poetry freeze-wheel || { \
+		echo "Error freezing wheels. Ensure that the Freeze Wheels plugin is available" ;\
+		echo "by running:" ;\
+		echo ;\
+		echo "poetry self add poetry-plugin-freeze" ;\
+		exit 1 ;\
+	}
 
 	twine check --strict dist/*
 	for pkg in $(PKG_SET); do cd $$pkg && twine check --strict dist/* && cd ../..; done
