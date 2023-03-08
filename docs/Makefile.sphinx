@@ -96,7 +96,7 @@ html:
 	cp -p tools/c7n_tencentcloud/readme.md $(SRCDIR)/tencentcloud/gettingstarted.md
 	c7n-sphinxext --provider tencentcloud --output-dir $(SRCDIR)/tencentcloud/resources --group-by=resource_type.service
 
-	$(SPHINXBUILD) -j auto -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
+	$(SPHINXBUILD) -vv -j auto -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
 
 	@echo
 	@echo "Build finished. The HTML pages are in $(BUILDDIR)/html."
