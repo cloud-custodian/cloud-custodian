@@ -597,6 +597,7 @@ class LogConfigAssociationsFilter(Filter):
     :example:
 
     .. code-block:: yaml
+
             policies:
                 - name: r53-resolver-query-log-config-associations
                   resource: resolver-logs

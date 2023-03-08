@@ -872,8 +872,11 @@ class UsedSecurityGroup(SGUsage):
     """Filter to security groups that are used.
     This operates as a complement to the unused filter for multi-step
     workflows.
+
     :example:
+
     .. code-block:: yaml
+
             policies:
               - name: security-groups-in-use
                 resource: security-group
@@ -1113,7 +1116,9 @@ class SGPermission(Filter):
             url: s3://a-policy-data-us-west-2/allowed_cidrs.csv
             format: csv
 
-    or value can be specified as a list:
+    or value can be specified as a list.
+
+    .. code-block:: yaml
 
       - type: ingress
         Cidr:
@@ -2816,7 +2821,9 @@ class CrossAZRouteTable(Filter):
     cross from one availability zone (AZ) to another AZ.
 
     :Example:
+
     .. code-block:: yaml
+
             policies:
               - name: cross-az-nat-gateway-traffic
                 resource: aws.route-table
