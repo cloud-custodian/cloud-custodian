@@ -58,9 +58,12 @@ class DescribeCos(DescribeSource):
 @resources.register("cos")
 class COS(QueryResourceManager):
     """
-    COS - Cloud Object Storage (COS) is a powerful Tencent Cloud distributed storage service
-        that features low costs and high scalability
+    COS - Cloud Object Storage (COS) is a powerful Tencent Cloud
+    distributed storage service that features low costs and high
+    scalability
+
     https://www.tencentcloud.com/document/product/436/6222?lang=en&pg=
+
     """
 
     class resource_type(ResourceTypeInfo):

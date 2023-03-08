@@ -258,13 +258,14 @@ class KmsFilter(KmsRelatedFilter):
 @AWSLambda.action_registry.register('set-xray-tracing')
 class LambdaEnableXrayTracing(Action):
     """
-        This action allows for enable Xray tracing to Active
-       :example:
+    This action allows for enable Xray tracing to Active
+ 
+    :example:
+    
+    .. code-block:: yaml
 
-       .. code-block:: yaml
-
-           actions:
-             - type: enable-xray-tracing
+      actions:
+        - type: enable-xray-tracing
     """
 
     schema = type_schema(
