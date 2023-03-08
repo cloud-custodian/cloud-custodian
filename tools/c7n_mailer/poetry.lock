@@ -2159,14 +2159,14 @@ files = [
 
 [[package]]
 name = "importlib-metadata"
-version = "6.0.0"
+version = "5.2.0"
 description = "Read metadata from Python packages"
 category = "main"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "importlib_metadata-6.0.0-py3-none-any.whl", hash = "sha256:7efb448ec9a5e313a57655d35aa54cd3e01b7e1fbcf72dce1bf06119420f5bad"},
-    {file = "importlib_metadata-6.0.0.tar.gz", hash = "sha256:e354bedeb60efa6affdcc8ae121b73544a7aa74156d047311948f6d711cd378d"},
+    {file = "importlib_metadata-5.2.0-py3-none-any.whl", hash = "sha256:0eafa39ba42bf225fc00e67f701d71f85aead9f878569caf13c3724f704b970f"},
+    {file = "importlib_metadata-5.2.0.tar.gz", hash = "sha256:404d48d62bba0b7a77ff9d405efd91501bef2e67ff4ace0bed40a0cf28c3c7cd"},
 ]
 
 [package.dependencies]
@@ -3283,4 +3283,4 @@ gcp = ["c7n-gcp", "google-cloud-secret-manager"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.7"
-content-hash = "5f827720160b56d14ef314375aeadf34f3bc26b4f80a1e3e6e82b5cf4a7e4c61"
+content-hash = "83011a85cc825abf126a23605bd086d93de12842dc4adb010020c26fb24a6052"
