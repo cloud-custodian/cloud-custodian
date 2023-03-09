@@ -117,6 +117,7 @@ class Route53HostedZoneTest(BaseTest):
         self.assertTrue("abc" in tags["ResourceTagSet"]["Tags"][0].values())
 
 
+@pytest.mark.audited
 @terraform('route53_hostedzone_delete', teardown=terraform.TEARDOWN_IGNORE)
 def test_route53_hostedzone_delete(test, route53_hostedzone_delete):
     session_factory = test.replay_flight_data("test_route53_hostedzone_delete")

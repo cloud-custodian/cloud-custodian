@@ -12,9 +12,12 @@ from c7n.exceptions import PolicyExecutionError, PolicyValidationError
 from c7n.utils import yaml_load
 
 from .common import BaseTest
+
+import pytest
 from pytest_terraform import terraform
 
 
+@pytest.mark.audited
 @terraform('tag_action_filter_call')
 def test_tag_action_filter_call(test, tag_action_filter_call):
     aws_region = 'us-east-1'

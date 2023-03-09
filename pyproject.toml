@@ -67,7 +67,7 @@ exclude = ["__init__.py"]
 [tool.pytest.ini_options]
 junit_family = "xunit2"
 addopts = "--tb=native"
-markers = ["functional", "skiplive"]
+markers = ["functional", "skiplive", "audited"]
 python_files = "test_*.py"
 norecursedirs = ["data", "cassettes", "templates", "terraform"]
 
