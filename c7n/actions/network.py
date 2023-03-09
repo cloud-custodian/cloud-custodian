@@ -29,6 +29,27 @@ class ModifyVpcSecurityGroupsAction(Action):
         isolation-group: sg-xyz
         add-by-tag: {}
 
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: set-prod-security-groups
+                resource: ec2
+                filters:
+                  - type: value
+                    key: 'tag:env'
+                    value: 'prod'
+                actions:
+                  - type: modify-security-groups
+                    add: prod-default-sg
+                    remove:
+                      - launch-wizard-1
+                      - launch-wizard-2
+                    add-by-tag: 
+                      key: environment
+                      values: 
+                        - production
     """
     schema_alias = True
     schema = {
@@ -142,8 +163,6 @@ class ModifyVpcSecurityGroupsAction(Action):
 
     def get_groups_by_tag(self, key, values, vpc_id):
         """Get security groups that match tag values."""
-        if not key:
-            return []
         client = utils.local_session(
             self.manager.session_factory).client('ec2')
         sgs = self.manager.retry(
