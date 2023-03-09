@@ -37,8 +37,9 @@ import logging
 import operator
 import jmespath
 import re
+import datetime
 
-from datetime import timedelta, datetime
+from datetime import timedelta
 
 from decimal import Decimal as D, ROUND_HALF_UP
 
@@ -716,7 +717,7 @@ class DbInstanceFinding(PostFinding):
         for f in fields:
             if r.get(f):
                 value = r[f]
-                if isinstance(r[f], datetime):
+                if isinstance(r[f], datetime.datetime):
                     value = r[f].isoformat()
                 details.setdefault(f, value)
 
@@ -1930,7 +1931,7 @@ class ConsecutiveSnapshots(Filter):
         client = local_session(self.manager.session_factory).client('rds')
         results = []
         retention = self.data.get('days')
-        utcnow = datetime.utcnow()
+        utcnow = datetime.datetime.utcnow()
         expected_dates = set()
         for days in range(1, retention + 1):
             expected_dates.add((utcnow - timedelta(days=days)).strftime('%Y-%m-%d'))
