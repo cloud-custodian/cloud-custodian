@@ -27,6 +27,7 @@ class ModifyVpcSecurityGroupsAction(Action):
         add: []
         remove: [] | matched | network-location
         isolation-group: sg-xyz
+        add-by-tag: {}
 
     """
     schema_alias = True
@@ -48,11 +49,13 @@ class ModifyVpcSecurityGroupsAction(Action):
             'isolation-group': {'oneOf': [
                 {'type': 'string'},
                 {'type': 'array', 'items': {
-                    'type': 'string'}}]}},
+                    'type': 'string'}}]},
+            'add-by-tag': {}},
         'anyOf': [
             {'required': ['isolation-group', 'remove', 'type']},
             {'required': ['add', 'remove', 'type']},
-            {'required': ['add', 'type']}]
+            {'required': ['add', 'type']},
+            {'required': ['add-by-tag', 'type']}]
     }
 
     SYMBOLIC_SGS = {'all', 'matched', 'network-location'}
@@ -137,6 +140,24 @@ class ModifyVpcSecurityGroupsAction(Action):
                 names=list(unresolved), groups=[g['GroupId'] for g in sgs]))
         return sgs
 
+    def get_groups_by_tag(self, key, values, vpc_id):
+        """Get security groups that match tag values."""
+        if not key:
+            return []
+        client = utils.local_session(
+            self.manager.session_factory).client('ec2')
+        sgs = self.manager.retry(
+            client.describe_security_groups,
+            Filters=[{
+                'Name': 'tag:' + key, 'Values': values},{
+                'Name': 'vpc-id', 'Values': [vpc_id]}]).get(
+                    'SecurityGroups', [])
+        sg_ids = []
+        for s in sgs:
+            if s['GroupId'] not in sg_ids:
+                sg_ids.append(s['GroupId'])
+        return sg_ids
+
     def resolve_group_names(self, r, target_group_ids, groups):
         """Resolve any security group names to the corresponding group ids
 
@@ -189,8 +210,8 @@ class ModifyVpcSecurityGroupsAction(Action):
         """Return lists of security groups to set on each resource
 
         For each input resource, parse the various add/remove/isolation-
-        group policies for 'modify-security-groups' to find the resulting
-        set of VPC security groups to attach to that resource.
+        group/add-by-tag policies for 'modify-security-groups' to find the
+        resulting set of VPC security groups to attach to that resource.
 
         Returns a list of lists containing the resulting VPC security groups
         that should end up on each resource passed in.
@@ -214,10 +235,19 @@ class ModifyVpcSecurityGroupsAction(Action):
             isolation_groups = self.resolve_group_names(
                 r, self._get_array('isolation-group'), resolved_groups)
 
+            tag = self._get_array('add-by-tag')
+            if tag:
+                add_by_tag_groups = self.get_groups_by_tag(tag['key'],tag['values'],r['VpcId'])
+            else:
+                add_by_tag_groups = []
+
             for g in remove_groups:
                 if g in rgroups:
                     rgroups.remove(g)
             for g in add_groups:
+                if g not in rgroups:
+                    rgroups.append(g)
+            for g in add_by_tag_groups:
                 if g not in rgroups:
                     rgroups.append(g)
 
