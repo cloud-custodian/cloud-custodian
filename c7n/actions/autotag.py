@@ -65,7 +65,8 @@ class AutoTagUser(EventAction):
                      'enum': [
                          'userName',
                          'arn',
-                         'sourceIPAddress'
+                         'sourceIPAddress',
+                         'principalId'
                      ]},
            }
     )
@@ -103,6 +104,8 @@ class AutoTagUser(EventAction):
             value = event['userIdentity'].get('arn', '')
         elif vtype == "sourceIPAddress":
             value = event.get('sourceIPAddress', '')
+        elif vtype == "principalId":
+            value = event['userIdentity'].get('principalId', '')
 
         return value
 

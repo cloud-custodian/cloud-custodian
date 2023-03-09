@@ -2,12 +2,15 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import json
+import time
 import threading
+import socket
+import sys
+from urllib.error import URLError, HTTPError
+from unittest.mock import Mock
 
-from mock import Mock
-
-from c7n.config import Bag
-from c7n.exceptions import PolicyValidationError
+from c7n.config import Bag, Config
+from c7n.exceptions import PolicyValidationError, InvalidOutputConfig
 from c7n.resources import aws, load_resources
 from c7n import output
 
@@ -19,6 +22,9 @@ from .common import BaseTest
 
 from aws_xray_sdk.core.models.segment import Segment
 from aws_xray_sdk.core.models.subsegment import Subsegment
+
+import pytest
+import vcr
 
 
 class TraceDoc(Bag):
@@ -371,3 +377,154 @@ class OutputLogsTest(BaseTest):
             'aws://master/custodian?region=us-east-2&stream=testing', ctx)
         stream = log_output.get_handler()
         self.assertTrue(stream.log_stream == 'testing')
+
+
+def test_url_socket_retry(monkeypatch):
+    monkeypatch.setattr(time, "sleep", lambda x: x)
+
+    # case for unknown error
+    fvalues = [URLError(socket.error(104, 'Connection reset by peer')),
+               URLError(socket.gaierror(8, 'Name or node unknown'))]
+
+    def freturns():
+        ret = fvalues.pop()
+        if isinstance(ret, URLError):
+            raise ret
+        return ret
+
+    with pytest.raises(URLError) as ecm:
+        aws.url_socket_retry(freturns)
+
+    assert 'Name or node unknown' in str(ecm.value)
+
+    # case for retry exhaustion
+    fvalues[:] = [
+        URLError(socket.error(110, 'Connection timed out')),
+        URLError(socket.error(110, 'Connection timed out')),
+        URLError(socket.error(110, 'Connection timed out')),
+        URLError(socket.error(110, 'Connection timed out')),
+    ]
+
+    with pytest.raises(URLError) as ecm:
+        aws.url_socket_retry(freturns)
+
+    # case for success
+    fvalues[:] = [
+        URLError(socket.error(110, 'Connection timed out')),
+        42
+    ]
+
+
+@pytest.mark.skipif(sys.version_info < (3, 9), reason="requires python3.9 or higher")
+def test_http_socket_retry(monkeypatch):
+    monkeypatch.setattr(time, "sleep", lambda x: x)
+
+    # case for unknown error
+    fvalues = [HTTPError('https://lwn.net', 404, 'Unknown', {}, None)]
+
+    def freturns():
+        ret = fvalues.pop()
+        if isinstance(ret, URLError):
+            raise ret
+        return ret
+
+    with pytest.raises(URLError) as ecm:
+        aws.url_socket_retry(freturns)
+
+    assert 'Unknown' in str(ecm.value)
+
+    # case for retry exhaustion
+    fvalues[:] = [
+        HTTPError('https://lwn.net', 503, 'Slow Down', {}, None),
+        HTTPError('https://lwn.net', 503, 'Slow Down', {}, None),
+        HTTPError('https://lwn.net', 503, 'Slow Down', {}, None),
+        HTTPError('https://lwn.net', 503, 'Slow Down', {}, None),
+    ]
+
+    # this is really an indirect assertion that is ascertained via
+    # coverage.
+    with pytest.raises(URLError) as ecm:
+        aws.url_socket_retry(freturns)
+
+    # case for success
+    fvalues[:] = [
+        HTTPError('https://lwn.net', 503, 'Slow Down', {}, None),
+        42
+    ]
+
+    assert aws.url_socket_retry(freturns) == 42
+
+
+def test_default_bucket_region_with_no_s3():
+    output_dir = "/tmp"
+    conf = Config.empty(output_dir=output_dir)
+    aws._default_bucket_region(conf)
+    assert output_dir == conf.output_dir
+
+
+def test_default_bucket_region_with_explicit_region():
+    output_dir = "s3://aws?region=xyz"
+    conf = Config.empty(output_dir=output_dir)
+    aws._default_bucket_region(conf)
+    assert output_dir == conf.output_dir
+
+
+@vcr.use_cassette(
+    'tests/data/vcr_cassettes/test_output/default_bucket_region_public.yaml')
+def test_default_bucket_region_is_public():
+    output_dir = "s3://awsapichanges.info"
+    conf = Config.empty(output_dir=output_dir, regions=["us-east-1"])
+    with pytest.raises(InvalidOutputConfig) as ecm:
+        aws._default_bucket_region(conf)
+
+    assert "is publicly accessible" in str(ecm.value)
+
+
+@vcr.use_cassette(
+    'tests/data/vcr_cassettes/test_output/default_bucket_region.yaml')
+def test_default_bucket_region_s3():
+    output_dir = "s3://slack.cloudcustodian.io"
+    conf = Config.empty(output_dir=output_dir, regions=["all"])
+    aws._default_bucket_region(conf)
+    assert conf.output_dir == output_dir + "?region=us-east-1"
+
+
+@vcr.use_cassette(
+    'tests/data/vcr_cassettes/test_output/default_bucket_not_found.yaml')
+def test_default_bucket_region_not_found():
+    output_dir = "s3://myfakebucketdoesnotexist"
+    conf = Config.empty(output_dir=output_dir, regions=["us-west-2"])
+    with pytest.raises(InvalidOutputConfig) as ecm:
+        aws._default_bucket_region(conf)
+
+    assert "does not exist" in str(ecm.value)
+
+
+@vcr.use_cassette(
+    'tests/data/vcr_cassettes/test_output/bucket_not_found.yaml')
+def test_get_bucket_url_s3_not_found():
+    with pytest.raises(ValueError) as ecm:
+        aws.get_bucket_url_with_region(
+            "s3://myfakebucketdoesnotexist", None
+        )
+    assert "does not exist" in str(ecm.value)
+
+
+@vcr.use_cassette(
+    'tests/data/vcr_cassettes/test_output/cross_region.yaml')
+def test_get_bucket_url_s3_cross_region():
+    assert aws.get_bucket_url_with_region(
+        "s3://slack.cloudcustodian.io",
+        "us-west-2") == "s3://slack.cloudcustodian.io?region=us-east-1"
+
+
+@vcr.use_cassette(
+    'tests/data/vcr_cassettes/test_output/same_region.yaml')
+def test_get_bucket_url_s3_same_region():
+    assert aws.get_bucket_url_with_region(
+        "s3://slack.cloudcustodian.io?",
+        None) == "s3://slack.cloudcustodian.io?region=us-east-1"
+
+    assert aws.get_bucket_url_with_region(
+        "s3://slack.cloudcustodian.io?param=x",
+        "us-east-1") == "s3://slack.cloudcustodian.io?param=x&region=us-east-1"

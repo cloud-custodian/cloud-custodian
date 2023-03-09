@@ -2,11 +2,11 @@
 # SPDX-License-Identifier: Apache-2.0
 import logging
 
+from c7n.exceptions import PolicyValidationError
 from c7n.policy import PolicyExecutionMode, execution
 from c7n.utils import type_schema, dumps
 
 from c7n_kube.exceptions import EventNotMatchedException, PolicyNotRunnableException
-
 
 log = logging.getLogger('custodian.k8s.policy')
 
@@ -62,6 +62,17 @@ class ValidatingControllerMode(K8sEventMode):
             }
         }
     )
+
+    def validate(self):
+        from c7n_kube.actions.core import EventAction
+        actions = self.policy.resource_manager.actions
+        errors = []
+        for a in actions:
+            if not isinstance(a, EventAction):
+                errors.append(a.type)
+        if errors:
+            raise PolicyValidationError(
+                f"Only Event Based actions are allowed: {errors} are not compatible")
 
     def _handle_scope(self, request, value):
         if request.get('namespace') and value == 'Namespaced':
@@ -172,7 +183,15 @@ class ValidatingControllerMode(K8sEventMode):
                 )
 
             ctx.output.write_file('resources.json', dumps(resources, indent=2))
-            # we dont run any actions for validating admission controllers
+            for action in self.policy.resource_manager.actions:
+                self.policy.log.info(
+                    "policy:%s invoking action:%s resources:%d",
+                    self.policy.name,
+                    action.name,
+                    len(resources),
+                )
+                results = action.process(resources, event)
+                ctx.output.write_file("action-%s" % action.name, dumps(results))
         return resources
 
     def run(self, event, _):

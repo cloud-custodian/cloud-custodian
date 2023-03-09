@@ -1,0 +1,302 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Connection:
+      - close
+      Host:
+      - s3.amazonaws.com
+      User-Agent:
+      - Python-urllib/3.10
+    method: HEAD
+    uri: https://s3.amazonaws.com/myfakebucketdoesnotexist
+  response:
+    body:
+      string: ''
+    headers:
+      Connection:
+      - close
+      Content-Type:
+      - application/xml
+      Date:
+      - Thu, 16 Feb 2023 20:15:20 GMT
+      Server:
+      - AmazonS3
+      x-amz-id-2:
+      - dNeyY3qL6g/bDknlhnP4om7TwMk3NaYsOv3pn/aBaSllwSOXzT//WhzKNgoarJ33AOT/cP5kfGk=
+      x-amz-request-id:
+      - 4VSPMH9HR96ZB89B
+    status:
+      code: 404
+      message: Not Found
+- request:
+    body: null
+    headers:
+      Connection:
+      - close
+      Host:
+      - s3.amazonaws.com
+      User-Agent:
+      - Python-urllib/3.10
+    method: HEAD
+    uri: https://s3.amazonaws.com/myfakebucketdoesnotexist
+  response:
+    body:
+      string: ''
+    headers:
+      Connection:
+      - close
+      Content-Type:
+      - application/xml
+      Date:
+      - Thu, 16 Feb 2023 20:15:53 GMT
+      Server:
+      - AmazonS3
+      x-amz-id-2:
+      - dJFdoSMBEH4PQlDC3Xrktg/nr381ojwSCZomart0yIe0KAJxGz5KBS1AT4d7lixk2LRJsARs7os=
+      x-amz-request-id:
+      - KD3ZWXHDKJTREN5J
+    status:
+      code: 404
+      message: Not Found
+- request:
+    body: null
+    headers:
+      Connection:
+      - close
+      Host:
+      - s3.amazonaws.com
+      User-Agent:
+      - Python-urllib/3.10
+    method: HEAD
+    uri: https://s3.amazonaws.com/myfakebucketdoesnotexist
+  response:
+    body:
+      string: ''
+    headers:
+      Connection:
+      - close
+      Content-Type:
+      - application/xml
+      Date:
+      - Thu, 16 Feb 2023 20:18:09 GMT
+      Server:
+      - AmazonS3
+      x-amz-id-2:
+      - kLTAD15uDe0a3eFH+FMVJhC4wXX7ua+D4giKH+/JzR6AnhUqdZzlAoeksFjCg5NKpCAWa4vo8Vg=
+      x-amz-request-id:
+      - 3RE7F4PKWGCF582K
+    status:
+      code: 404
+      message: Not Found
+- request:
+    body: null
+    headers:
+      Connection:
+      - close
+      Host:
+      - s3.amazonaws.com
+      User-Agent:
+      - Python-urllib/3.10
+    method: HEAD
+    uri: https://s3.amazonaws.com/myfakebucketdoesnotexist
+  response:
+    body:
+      string: ''
+    headers:
+      Connection:
+      - close
+      Content-Type:
+      - application/xml
+      Date:
+      - Thu, 16 Feb 2023 20:19:16 GMT
+      Server:
+      - AmazonS3
+      x-amz-id-2:
+      - 4l/w4ZniBcELzdjAG74n7+8gWaZ8jGztqRyv6i3OSCrU7156Dp+AMlQSpokCWu5eIQxaAr6O1IU=
+      x-amz-request-id:
+      - 21FS96B2NEFR99X0
+    status:
+      code: 404
+      message: Not Found
+- request:
+    body: null
+    headers:
+      Connection:
+      - close
+      Host:
+      - s3.amazonaws.com
+      User-Agent:
+      - Python-urllib/3.10
+    method: HEAD
+    uri: https://s3.amazonaws.com/myfakebucketdoesnotexist
+  response:
+    body:
+      string: ''
+    headers:
+      Connection:
+      - close
+      Content-Type:
+      - application/xml
+      Date:
+      - Thu, 16 Feb 2023 20:19:59 GMT
+      Server:
+      - AmazonS3
+      x-amz-id-2:
+      - nhTP2ytcgvUh1YjDq6KFChZMXf+qEom98ZFq3f7IITh51mJxDi3OJ2MNoeHTE8X8NqMixFXouLI=
+      x-amz-request-id:
+      - GJKAB3VM8S19VGR2
+    status:
+      code: 404
+      message: Not Found
+- request:
+    body: null
+    headers:
+      Connection:
+      - close
+      Host:
+      - s3.amazonaws.com
+      User-Agent:
+      - Python-urllib/3.10
+    method: HEAD
+    uri: https://s3.amazonaws.com/myfakebucketdoesnotexist
+  response:
+    body:
+      string: ''
+    headers:
+      Connection:
+      - close
+      Content-Type:
+      - application/xml
+      Date:
+      - Thu, 16 Feb 2023 20:21:27 GMT
+      Server:
+      - AmazonS3
+      x-amz-id-2:
+      - qoPgO3cMnZOIZajqHhjD3THNjOMWU25440waH/9ALJ/KLzKZ3dQjRQ+wMr0q8AL4PwgVx5K3wj0=
+      x-amz-request-id:
+      - P4CQXSR2AMQF1PNN
+    status:
+      code: 404
+      message: Not Found
+- request:
+    body: null
+    headers:
+      Connection:
+      - close
+      Host:
+      - s3.amazonaws.com
+      User-Agent:
+      - Python-urllib/3.10
+    method: HEAD
+    uri: https://s3.amazonaws.com/myfakebucketdoesnotexist
+  response:
+    body:
+      string: ''
+    headers:
+      Connection:
+      - close
+      Content-Type:
+      - application/xml
+      Date:
+      - Thu, 16 Feb 2023 20:21:51 GMT
+      Server:
+      - AmazonS3
+      x-amz-id-2:
+      - U+4dui0rn9LxGXqdrfwG84AaLvS8m2rntk1Sd8m2RF2X/Y0H1RqxlmSJQ9s/3VyrRX4vRpEjRrU=
+      x-amz-request-id:
+      - WXP4MY2E9GC9NK0K
+    status:
+      code: 404
+      message: Not Found
+- request:
+    body: null
+    headers:
+      Connection:
+      - close
+      Host:
+      - s3.amazonaws.com
+      User-Agent:
+      - Python-urllib/3.10
+    method: HEAD
+    uri: https://s3.amazonaws.com/myfakebucketdoesnotexist
+  response:
+    body:
+      string: ''
+    headers:
+      Connection:
+      - close
+      Content-Type:
+      - application/xml
+      Date:
+      - Thu, 16 Feb 2023 20:22:20 GMT
+      Server:
+      - AmazonS3
+      x-amz-id-2:
+      - EWP4pQaIQLpAForvZGOPZyc/Xkhw8t3b1H3PbnmhzxVJqvX4kL7Ngq9TUtDXG6joINh4I2rOuwc=
+      x-amz-request-id:
+      - 6NSKCCNF9NHVNPZ0
+    status:
+      code: 404
+      message: Not Found
+- request:
+    body: null
+    headers:
+      Connection:
+      - close
+      Host:
+      - s3.us-west-2.amazonaws.com
+      User-Agent:
+      - Python-urllib/3.10
+    method: HEAD
+    uri: https://s3.us-west-2.amazonaws.com/myfakebucketdoesnotexist
+  response:
+    body:
+      string: ''
+    headers:
+      Connection:
+      - close
+      Content-Type:
+      - application/xml
+      Date:
+      - Thu, 16 Feb 2023 23:31:03 GMT
+      Server:
+      - AmazonS3
+      x-amz-id-2:
+      - mT3g8cYh+V9SLCP+nNfRfa1fud7+6Pk48HY5WV+zljjnC8S9aE0XnmJVtZfEbugjbOwZpO6ZeH0=
+      x-amz-request-id:
+      - JDG2B7NZFVRKWNDW
+    status:
+      code: 404
+      message: Not Found
+- request:
+    body: null
+    headers:
+      Connection:
+      - close
+      Host:
+      - s3.us-west-2.amazonaws.com
+      User-Agent:
+      - Python-urllib/3.10
+    method: HEAD
+    uri: https://s3.us-west-2.amazonaws.com/myfakebucketdoesnotexist
+  response:
+    body:
+      string: ''
+    headers:
+      Connection:
+      - close
+      Content-Type:
+      - application/xml
+      Date:
+      - Thu, 16 Feb 2023 23:31:29 GMT
+      Server:
+      - AmazonS3
+      x-amz-id-2:
+      - ouq5nPVXnW+nEj1kk8OFp2mW6oVp4Atj3tGJLkrnLNam8MprSIb6T0vaELcR921dNblKmFIz21E=
+      x-amz-request-id:
+      - C3YPBM27CZEYHE86
+    status:
+      code: 404
+      message: Not Found
+version: 1

@@ -426,3 +426,26 @@ class TestAMI(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
+    def test_ami_set_permissions_remove_matched_no_add(self):
+        factory = self.replay_flight_data('test_ami_set_permissions_remove_matched_no_add')
+        p = self.load_policy({
+            'name': 'ami-check',
+            'resource': 'aws.ami',
+            'filters': [{'type': 'cross-account'},
+            {'type': 'value',
+            'key': 'Name',
+            'value': 'test-ami'}],
+            'actions': [{
+                'type': 'set-permissions',
+                'remove': 'matched'
+            }]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['c7n:CrossAccountViolations'], ['898786471159'])
+        client = factory().client('ec2')
+        perms = client.describe_image_attribute(
+            ImageId=resources[0]['ImageId'],
+            Attribute='launchPermission')['LaunchPermissions']
+        assert perms == []

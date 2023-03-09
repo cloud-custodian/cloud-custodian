@@ -14,6 +14,7 @@ accept = (
     'MPL 2.0',
     'BSD-3-Clause',
     'Apache-2.0',
+    'Apache-2',
 )
 
 accept_classifiers = set(

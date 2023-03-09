@@ -518,7 +518,8 @@ class ValueFilter(BaseValueFilter):
                 "`value` must be an integer in resource_count filter %s" % self.data)
 
         # I don't see how to support regex for this?
-        if (self.data['op'] not in OPERATORS or self.data['op'] in {'regex', 'regex-case'} or
+        if (self.data['op'] not in OPERATORS or
+            self.data['op'] in {'regex', 'regex-case'} or
                 'value_regex' in self.data):
             raise PolicyValidationError(
                 "Invalid operator in value filter %s" % self.data)
@@ -547,7 +548,7 @@ class ValueFilter(BaseValueFilter):
             raise PolicyValidationError(
                 "Missing 'value' in value filter %s" % self.data)
         if 'op' in self.data:
-            if not self.data['op'] in OPERATORS:
+            if self.data['op'] not in OPERATORS:
                 raise PolicyValidationError(
                     "Invalid operator in value filter %s" % self.data)
             if self.data['op'] in {'regex', 'regex-case'}:

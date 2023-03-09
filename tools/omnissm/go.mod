@@ -3,7 +3,7 @@ module github.com/capitalone/cloud-custodian/tools/omnissm
 require (
 	github.com/aws/amazon-ssm-agent v0.0.0-20181107231829-b9654b268afc
 	github.com/aws/aws-lambda-go v1.6.0
-	github.com/aws/aws-sdk-go v1.33.0
+	github.com/aws/aws-sdk-go v1.34.0
 	github.com/aws/aws-xray-sdk-go v1.0.0-rc.5
 	github.com/golang/time v0.0.0-20180412165947-fbb02b2291d2
 	github.com/google/go-cmp v0.2.0
@@ -17,8 +17,8 @@ require (
 	github.com/spf13/cobra v0.0.3
 	github.com/spf13/pflag v1.0.2
 	github.com/spf13/viper v1.1.0
-	golang.org/x/sync v0.0.0-20180314180146-1d60e4601c6f
-	golang.org/x/sys v0.0.0-20190215142949-d0b11bdaac8a
+	golang.org/x/sync v0.0.0-20220722155255-886fb9371eb4
+	golang.org/x/sys v0.5.0
 	gopkg.in/yaml.v2 v2.2.8
 )
 
@@ -43,7 +43,7 @@ require (
 	github.com/spf13/afero v1.1.1 // indirect
 	github.com/spf13/cast v1.2.0 // indirect
 	github.com/spf13/jwalterweatherman v0.0.0-20180814060501-14d3d4c51834 // indirect
-	golang.org/x/net v0.0.0-20200202094626-16171245cfb2 // indirect
-	golang.org/x/text v0.3.0 // indirect
+	golang.org/x/net v0.7.0 // indirect
+	golang.org/x/text v0.7.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127 // indirect
 )

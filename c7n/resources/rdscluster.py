@@ -67,6 +67,7 @@ class RDSCluster(QueryResourceManager):
         arn_separator = ":"
         enum_spec = ('describe_db_clusters', 'DBClusters', None)
         name = id = 'DBClusterIdentifier'
+        config_id = 'DbClusterResourceId'
         dimension = 'DBClusterIdentifier'
         universal_taggable = True
         permissions_enum = ('rds:DescribeDBClusters',)
@@ -666,8 +667,11 @@ class ConsecutiveSnapshots(Filter):
 class ClusterParameterFilter(ParameterFilter):
     """
     Applies value type filter on set db cluster parameter values.
+
     :example:
+
     .. code-block:: yaml
+
             policies:
               - name: rdscluster-pg
                 resource: rds-cluster

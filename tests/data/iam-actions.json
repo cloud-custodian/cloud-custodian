@@ -8688,6 +8688,9 @@
     "ListControlPanels",
     "ListRoutingControls",
     "ListSafetyRules",
+    "ListTagsForResource",
+    "TagResource",
+    "UntagResource",
     "UpdateControlPanel",
     "UpdateRoutingControl",
     "UpdateSafetyRule"

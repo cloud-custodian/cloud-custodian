@@ -1,6 +1,7 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 from common_kube import KubeTest
+from c7n.exceptions import PolicyValidationError
 from c7n_kube.utils import evaluate_result
 
 
@@ -9,7 +10,7 @@ class TestAdmissionControllerMode(KubeTest):
         factory = self.replay_flight_data()
         policy = self.load_policy(
             {
-                'name': 'test-validator',
+                'name': 'test-admission',
                 'resource': 'k8s.pod',
                 'mode': {
                     'type': 'k8s-admission',
@@ -91,7 +92,7 @@ class TestAdmissionControllerMode(KubeTest):
         result = evaluate_result('deny', resources)
         self.assertEqual(result, 'deny')
 
-    def test_validator_warn_event(self):
+    def test_admission_warn_event(self):
         factory = self.replay_flight_data()
         policy = self.load_policy(
             {
@@ -112,7 +113,7 @@ class TestAdmissionControllerMode(KubeTest):
         result = evaluate_result('warn', resources)
         self.assertEqual(result, 'warn')
 
-    def test_validator_warn_event_no_results(self):
+    def test_admission_warn_event_no_results(self):
         factory = self.replay_flight_data()
         policy = self.load_policy(
             {
@@ -136,7 +137,7 @@ class TestAdmissionControllerMode(KubeTest):
         result = evaluate_result('warn', resources)
         self.assertEqual(result, 'allow')
 
-    def test_validator_allow_crd(self):
+    def test_admission_allow_crd(self):
         factory = self.replay_flight_data()
         policy = self.load_policy(
             {
@@ -163,6 +164,31 @@ class TestAdmissionControllerMode(KubeTest):
         self.assertEqual(len(resources), 1)
         result = evaluate_result('deny', resources)
         self.assertEqual(result, 'deny')
+
+    def test_admission_action_validate(self):
+        factory = self.replay_flight_data()
+        with self.assertRaises(PolicyValidationError):
+            self.load_policy(
+                {
+                    'name': 'label-pod',
+                    'resource': 'k8s.pod',
+                    'mode': {
+                        'type': 'k8s-admission',
+                        'on-match': 'allow',
+                        'operations': ['CREATE']
+                    },
+                    'actions': [
+                        {
+                            'type': 'label',
+                            'labels': {
+                                'foo': 'bar'
+                            }
+                        }
+                    ]
+
+                },
+                session_factory=factory,
+            )
 
     def test_sub_resource_pod_exec(self):
         factory = self.replay_flight_data()

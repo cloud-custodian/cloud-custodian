@@ -280,6 +280,7 @@ class Time(Filter):
         'properties': {
             'tag': {'type': 'string'},
             'default_tz': {'type': 'string'},
+            'fallback-schedule': {'type': 'string'},
             'fallback_schedule': {'type': 'string'},
             'weekends': {'type': 'boolean'},
             'weekends-only': {'type': 'boolean'},
@@ -344,7 +345,12 @@ class Time(Filter):
         self.weekends_only = self.data.get('weekends-only', False)
         self.opt_out = self.data.get('opt-out', False)
         self.tag_key = self.data.get('tag', self.DEFAULT_TAG).lower()
-        self.fallback_schedule = self.data.get('fallback-schedule', None)
+        # we originally had fallback_schedule, but the code was looking for
+        # fallback-schedule, we want to deprecate the underscore form.
+        self.fallback_schedule = (
+            self.data.get('fallback-schedule') or
+            self.data.get('fallback_schedule')
+        )
         self.default_schedule = self.get_default_schedule()
         self.parser = ScheduleParser(self.default_schedule)
 

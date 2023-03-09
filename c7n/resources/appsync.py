@@ -27,8 +27,11 @@ class GraphQLApi(QueryResourceManager):
 @GraphQLApi.filter_registry.register('wafv2-enabled')
 class WafV2Enabled(Filter):
     """Filter AppSync GraphQLApi by wafv2 web-acl
+
     :example:
+
     .. code-block:: yaml
+
             policies:
               - name: filter-graphql-api-wafv2
                 resource: graphql-api
@@ -79,8 +82,11 @@ class WafV2Enabled(Filter):
 @GraphQLApi.filter_registry.register('api-cache')
 class ApiCache(ValueFilter):
     """Filter AppSync GraphQLApi based on the api cache attributes
+
     :example:
+
     .. code-block:: yaml
+
        policies:
          - name: filter-graphql-api-cache
            resource: aws.graphql-api

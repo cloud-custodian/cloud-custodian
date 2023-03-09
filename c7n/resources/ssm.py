@@ -530,7 +530,7 @@ class PostItem(Action):
                 remainder.append(a)
 
         for i in items:
-            if not i['OpsItemId'] in updated:
+            if i['OpsItemId'] not in updated:
                 continue
             i = dict(i)
             for k in ('CreatedBy', 'CreatedTime', 'Source', 'LastModifiedBy',
