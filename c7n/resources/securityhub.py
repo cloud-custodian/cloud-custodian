@@ -8,6 +8,7 @@ import jmespath
 import json
 import hashlib
 import logging
+import sys
 
 from c7n import deprecated
 from c7n.actions import Action
@@ -508,17 +509,21 @@ class PostFinding(Action):
         if existing_finding_id:
             finding_id = existing_finding_id
         else:
+            # for fips compliance we need to explicit pass the usage param but it doesn't
+            # exist on python 3.8, directly pass when we drop 3.8 support.
+            params = (sys.version_info.major > 3 and sys.version_info.minor > 8) and {
+                'usedforsecurity': False} or {}
             finding_id = '{}/{}/{}/{}'.format(
                 self.manager.config.region,
                 self.manager.config.account_id,
                 # we use md5 for id, equiv to using crc32
-                hashlib.md5( # nosemgrep
+                hashlib.md5( # nosec nosemgrep
                     json.dumps(policy.data).encode('utf8'),
-                    usedforsecurity=False).hexdigest(),
-                hashlib.md5( # nosemgrep
+                    **params).hexdigest(),
+                hashlib.md5( # nosec nosemgrep
                     json.dumps(list(sorted([r[model.id] for r in resources]))).encode('utf8'),
-                    usedforsecurity=False
-                ).hexdigest())
+                    **params).hexdigest()
+            )
         finding = {
             "SchemaVersion": self.FindingVersion,
             "ProductArn": "arn:{}:securityhub:{}::product/cloud-custodian/cloud-custodian".format(
