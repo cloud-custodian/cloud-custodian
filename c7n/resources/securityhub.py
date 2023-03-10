@@ -511,11 +511,14 @@ class PostFinding(Action):
             finding_id = '{}/{}/{}/{}'.format(
                 self.manager.config.region,
                 self.manager.config.account_id,
-                hashlib.md5(json.dumps(  # nosec nosemgrep
-                    policy.data, usedforsecurity=False).encode('utf8')).hexdigest(),
-                hashlib.md5(json.dumps(list(sorted(  # nosec nosemgrep
-                    [r[model.id] for r in resources])), usedforsecurity=False).encode(
-                        'utf8')).hexdigest())
+                # we use md5 for id, equiv to using crc32
+                hashlib.md5( # nosemgrep
+                    json.dumps(policy.data).encode('utf8'),
+                    usedforsecurity=False).hexdigest(),
+                hashlib.md5( # nosemgrep
+                    json.dumps(list(sorted([r[model.id] for r in resources]))).encode('utf8'),
+                    usedforsecurity=False
+                ).hexdigest())
         finding = {
             "SchemaVersion": self.FindingVersion,
             "ProductArn": "arn:{}:securityhub:{}::product/cloud-custodian/cloud-custodian".format(
