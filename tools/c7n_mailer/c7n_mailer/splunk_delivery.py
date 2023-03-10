@@ -208,7 +208,8 @@ class SplunkHecDelivery:
                         'splunk_hec_token'
                     ]
                 },
-                data=payload
+                data=payload,
+                timeout=60
             )
         except Exception:
             self.logger.error('Exception during Splunk POST to %s of %s',

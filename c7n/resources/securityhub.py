@@ -508,13 +508,13 @@ class PostFinding(Action):
         if existing_finding_id:
             finding_id = existing_finding_id
         else:
-            finding_id = '{}/{}/{}/{}'.format(  # nosec
+            finding_id = '{}/{}/{}/{}'.format(
                 self.manager.config.region,
                 self.manager.config.account_id,
-                hashlib.md5(json.dumps(  # nosemgrep
-                    policy.data).encode('utf8')).hexdigest(),
-                hashlib.md5(json.dumps(list(sorted(  # nosemgrep
-                    [r[model.id] for r in resources]))).encode(
+                hashlib.md5(json.dumps(  # nosec nosemgrep
+                    policy.data, usedforsecurity=False).encode('utf8')).hexdigest(),
+                hashlib.md5(json.dumps(list(sorted(  # nosec nosemgrep
+                    [r[model.id] for r in resources])), usedforsecurity=False).encode(
                         'utf8')).hexdigest())
         finding = {
             "SchemaVersion": self.FindingVersion,
