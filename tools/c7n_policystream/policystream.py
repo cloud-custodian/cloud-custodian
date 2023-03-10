@@ -663,7 +663,7 @@ def github_repos(organization, github_url, github_token):
     while next_cursor is not False:
         params = {'query': query, 'variables': {
             'organization': organization, 'cursor': next_cursor}}
-        response = requests.post(github_url, headers=headers, json=params)
+        response = requests.post(github_url, headers=headers, json=params, timeout=60)
         result = response.json()
         if response.status_code != 200 or 'errors' in result:
             raise ValueError("Github api error %s" % (
