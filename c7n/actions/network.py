@@ -175,14 +175,6 @@ class ModifyVpcSecurityGroupsAction(Action):
         for s in sgs:
             if s['GroupId'] not in sg_ids:
                 sg_ids.append(s['GroupId'])
-        if len(sg_ids) > 5:
-            raise PolicyExecutionError(self._format_error(
-                "policy:{policy} - the number of security groups with "
-                "the matching key-value pair exceeds 5. "
-                "key:{key}, values:{values}, found: {sg_ids}",
-                key=key,
-                values=values,
-                sg_ids=sg_ids))
         return sg_ids
 
     def resolve_group_names(self, r, target_group_ids, groups):
@@ -280,6 +272,12 @@ class ModifyVpcSecurityGroupsAction(Action):
 
             if not rgroups:
                 rgroups = list(isolation_groups)
+
+            if len(rgroups) > 5:
+                raise PolicyExecutionError(self._format_error(
+                    "policy:{policy} - the number of security groups exceeds 5. "
+                    "groups: {rgroups}",
+                    rgroups=rgroups))
 
             return_groups.append(rgroups)
 
