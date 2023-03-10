@@ -16,7 +16,7 @@ from c7n.filters import Filter
 from c7n.resources.shield import IsShieldProtected, SetShieldProtection
 from c7n.tags import RemoveTag, Tag
 from c7n.filters.related import RelatedResourceFilter
-from c7n import tags
+from c7n import tags, query
 from c7n.filters.iamaccess import CrossAccountAccessFilter
 from c7n.resolver import ValuesFrom
 
@@ -770,7 +770,7 @@ class RecoveryCluster(QueryResourceManager):
         service = 'route53-recovery-control-config'
         arn_type = 'cluster'
         enum_spec = ('list_clusters', 'Clusters', None)
-        name = id = 'Name'
+        name = id = 'ClusterArn'
         global_resource = True
 
     def get_client(self):
@@ -823,6 +823,8 @@ class RecoveryClusterRemoveTag(RemoveTag):
 
     :example:
 
+
+
     .. code-block:: yaml
 
         policies:
@@ -839,8 +841,107 @@ class RecoveryClusterRemoveTag(RemoveTag):
     def get_client(self):
         return self.manager.get_client()
 
-    def process_resource_set(self, client, readiness_checks, keys):
-        for r in readiness_checks:
+    def process_resource_set(self, client, clusters, keys):
+        for r in clusters:
             client.untag_resource(
                 ResourceArn=r['ClusterArn'],
+                TagKeys=keys)
+
+
+@query.sources.register('describe-control-panel')
+class DescribeControlPanel(query.ChildDescribeSource):
+
+    def __init__(self, manager):
+        self.manager = manager
+        self.query = query.ChildResourceQuery(
+            self.manager.session_factory, self.manager)
+
+    def augment(self, controlpanels):
+        for r in controlpanels:
+            Tags = self.manager.retry(
+                self.manager.get_client().list_tags_for_resource,
+                ResourceArn=r['ControlPanelArn'])['Tags']
+            r['Tags'] = [{'Key': k, "Value": v} for k, v in Tags.items()]
+        return controlpanels
+
+
+@resources.register('recovery-control-panel')
+class ControlPanel(query.ChildResourceManager):
+
+    class resource_type(query.TypeInfo):
+        service = 'route53-recovery-control-config'
+        arn_type = 'controlpanel'
+        parent_spec = ('recovery-cluster', 'ClusterArn', None)
+        enum_spec = ('list_control_panels', 'ControlPanels', None)
+        name = id = 'ControlPanelArn'
+        global_resource = True
+
+    child_source = 'describe'
+    source_mapping = {
+        'describe': DescribeControlPanel,
+        'config': query.ConfigSource
+    }
+
+    def get_client(self):
+        return local_session(self.session_factory) \
+            .client('route53-recovery-control-config', region_name=ARC_REGION)
+
+
+@ControlPanel.action_registry.register('tag')
+class ControlPanelAddTag(Tag):
+    """Adds tags to a control panel
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: control-panel-tag
+            resource: recovery-control-panel
+            filters:
+              - "tag:DesiredTag": absent
+            actions:
+              - type: tag
+                key: DesiredTag
+                value: DesiredValue
+    """
+    permissions = ('route53-recovery-control-config:TagResource',)
+
+    def get_client(self):
+        return self.manager.get_client()
+
+    def process_resource_set(self, client, controlpanels, tags):
+        Tags = {r['Key']: r['Value'] for r in tags}
+        for r in controlpanels:
+            client.tag_resource(
+                ResourceArn=r['ControlPanelArn'],
+                Tags=Tags)
+
+
+@ControlPanel.action_registry.register('remove-tag')
+class ControlPanelRemoveTag(RemoveTag):
+    """Remove tags from a control panel
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: control-panel-remove-tag
+            resource: recovery-control-panel
+            filters:
+              - "tag:ExpiredTag": present
+            actions:
+              - type: remove-tag
+                tags: ['ExpiredTag']
+    """
+    permissions = ('route53-recovery-control-config:UntagResource',)
+
+    def get_client(self):
+        return self.manager.get_client()
+
+    def process_resource_set(self, client, control_panels, keys):
+        for r in control_panels:
+            client.untag_resource(
+                ResourceArn=r['ControlPanelArn'],
                 TagKeys=keys)
