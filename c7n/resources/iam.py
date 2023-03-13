@@ -1953,11 +1953,27 @@ class UserPolicy(ValueFilter):
               - type: policy
                 key: PolicyName
                 value: AdministratorAccess
+                include-via: true
     """
 
     schema = type_schema('policy', rinherit=ValueFilter.schema)
     schema_alias = False
-    permissions = ('iam:ListAttachedUserPolicies',)
+    permissions = (
+        'iam:ListAttachedUserPolicies',
+        'iam:ListGroupsForUser',
+        'iam:ListAttachedGroupPolicies',
+    )
+
+    def user_groups_policies(self, client, u):
+        u['c7n:Groups'] = client.list_groups_for_user(
+            UserName=u['UserName'])['Groups']
+        for ug in u['c7n:Groups']:
+            aps = client.list_attached_group_policies(
+                UserName=ug['GroupName'])['AttachedPolicies']
+            for ap in aps:
+                u['c7n:Policies'].append(
+                    client.get_policy(PolicyArn=ap['PolicyArn'])['Policy'])
+        return u
 
     def user_policies(self, user_set):
         client = local_session(self.manager.session_factory).client('iam')
@@ -1969,6 +1985,8 @@ class UserPolicy(ValueFilter):
             for ap in aps:
                 u['c7n:Policies'].append(
                     client.get_policy(PolicyArn=ap['PolicyArn'])['Policy'])
+            if self.data.get('include-via'):
+                u = self.user_groups_policies(client, u)
 
     def process(self, resources, event=None):
         user_set = chunks(resources, size=50)
