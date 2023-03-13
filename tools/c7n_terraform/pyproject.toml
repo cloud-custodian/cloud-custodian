@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "c7n_terraform"
-version = "0.1.13"
+version = "0.1.14"
 readme = "readme.md"
 description = "Cloud Custodian Provider for evaluating Terraform"
 repository = "https://github.com/cloud-custodian/cloud-custodian"
@@ -23,5 +23,5 @@ pytest = "^7.1.2"
 c7n = {path = "../..", develop = true}
 
 [build-system]
-requires = ["poetry>=0.12", "setuptools"]
-build-backend = "poetry.masonry.api"
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

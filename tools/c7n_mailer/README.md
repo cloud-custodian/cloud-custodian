@@ -23,7 +23,7 @@ should be cross-account enabled for sending between accounts.
 Our goal in starting out with the Custodian mailer is to install the mailer,
 and run a policy that triggers an email to your inbox.
 
-1. [Install](#developer-install-os-x-el-capitan) the mailer on your laptop (if you are not running as a [Docker container](https://hub.docker.com/r/cloudcustodian/mailer)
+1. [Install](#Developer Install (OS X El Capitan) the mailer on your laptop (if you are not running as a [Docker container](https://hub.docker.com/r/cloudcustodian/mailer)
    - or use `pip install c7n-mailer`
 2. In your text editor, create a `mailer.yml` file to hold your mailer config.
 3. In the AWS console, create a new standard SQS queue (quick create is fine).
@@ -250,7 +250,7 @@ Custodian mailer.
 
 ## Usage & Configuration
 
-Once [installed](#developer-install-os-x-el-capitan) you should have a
+Once [installed](#Developer Install (OS X El Capitan)) you should have a
 `c7n-mailer` executable on your path:
 aws
 ```
@@ -263,7 +263,7 @@ c7n-mailer: error: argument -c/--config is required
 Fundamentally what `c7n-mailer` does is deploy a Lambda (using
 [Mu](http://cloudcustodian.io/docs/policy/mu.html)) based on
 configuration you specify in a YAML file.  Here is [the
-schema](./c7n_mailer/cli.py#L11-L41) to which the file must conform,
+schema](https://github.com/cloud-custodian/cloud-custodian/blob/18d4247e913d54f36a078ed61386695362a3b10d/tools/c7n_mailer/c7n_mailer/cli.py#L43) to which the file must conform,
 and here is a description of the options:
 
 | Required? | Key             | Type             | Notes                                                             |
@@ -461,7 +461,7 @@ policies:
 
 So breaking it down, you add an action of type `notify`. You can specify a
 template that's used to format the email; customizing templates is described
-[below](#writing-an-email-template).
+[below](#Writing an email template).
 
 The `to` list specifies the intended recipient for the email. You can specify
 either an email address, an SNS topic, a Datadog Metric, or a special value. The special values

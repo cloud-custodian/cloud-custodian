@@ -56,6 +56,20 @@ class ElasticSearch(BaseTest):
             )
         )
 
+    def test_elasticsearch_with_prequery_filter(self):
+        factory = self.replay_flight_data("test_elasticsearch_with_prequery_filter")
+        p = self.load_policy(
+            {
+                "name": "es-query-2",
+                "resource": "elasticsearch",
+                "query": [{"EngineType": "OpenSearch"}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["DomainName"], "c7n-test-opensearch")
+
     def test_metrics_domain(self):
         factory = self.replay_flight_data("test_elasticsearch_delete")
         p = self.load_policy(
@@ -610,6 +624,27 @@ class ElasticSearch(BaseTest):
             'DomainEndpointOptions']
         self.assertEqual(state['EnforceHTTPS'], True)
         self.assertEqual(state['TLSSecurityPolicy'], "Policy-Min-TLS-1-2-2019-07")
+
+    def test_elasticsearch_enable_auditlog(self):
+        factory = self.replay_flight_data("test_elasticsearch_enable_auditlog")
+        p = self.load_policy(
+            {
+                "name": "test_elasticsearch_enable_auditlog",
+                "resource": "elasticsearch",
+                "filters": [{"DomainName": "test-es-dom"}],
+                "actions": [{"type": "enable-auditlog", "state": True, "delay": 1}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["DomainName"], "test-es-dom")
+        client = factory().client("es")
+        state = client.describe_elasticsearch_domain(DomainName="test-es-dom")['DomainStatus'][
+            'LogPublishingOptions']
+        self.assertEqual(state['AUDIT_LOGS']['Enabled'], True)
+        self.assertEqual(state['AUDIT_LOGS']['CloudWatchLogsLogGroupArn'],
+            "arn:aws:logs:us-east-1:123456789012:log-group:/aws/domains/test-es-dom/audit-logs:*")
 
 
 class TestReservedInstances(BaseTest):
