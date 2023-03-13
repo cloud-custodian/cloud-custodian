@@ -161,21 +161,16 @@ class ModifyVpcSecurityGroupsAction(Action):
                 names=list(unresolved), groups=[g['GroupId'] for g in sgs]))
         return sgs
 
-    def get_groups_by_tag(self, key, values, vpc_id):
+    def get_groups_by_tag(self, key, values):
         """Get security groups that match tag values."""
         client = utils.local_session(
             self.manager.session_factory).client('ec2')
         sgs = self.manager.retry(
             client.describe_security_groups,
             Filters=[{
-                'Name': 'tag:' + key, 'Values': values},{
-                'Name': 'vpc-id', 'Values': [vpc_id]}]).get(
+                'Name': 'tag:' + key, 'Values': values}]).get(
                     'SecurityGroups', [])
-        sg_ids = []
-        for s in sgs:
-            if s['GroupId'] not in sg_ids:
-                sg_ids.append(s['GroupId'])
-        return sg_ids
+        return sgs
 
     def resolve_group_names(self, r, target_group_ids, groups):
         """Resolve any security group names to the corresponding group ids
@@ -242,6 +237,12 @@ class ModifyVpcSecurityGroupsAction(Action):
         resolved_groups = self.get_groups_by_names(self.get_action_group_names())
         return_groups = []
 
+        tag = self._get_array('add-by-tag')
+        if tag:
+            tag_filtered_groups = self.get_groups_by_tag(tag['key'],tag['values'])
+        else:
+            tag_filtered_groups = []
+
         for idx, r in enumerate(resources):
             rgroups = self.sg_expr.search(r) or []
             add_groups = self.resolve_group_names(
@@ -254,11 +255,10 @@ class ModifyVpcSecurityGroupsAction(Action):
             isolation_groups = self.resolve_group_names(
                 r, self._get_array('isolation-group'), resolved_groups)
 
-            tag = self._get_array('add-by-tag')
-            if tag:
-                add_by_tag_groups = self.get_groups_by_tag(tag['key'],tag['values'],r['VpcId'])
-            else:
-                add_by_tag_groups = []
+            add_by_tag_groups = []
+            for sg in tag_filtered_groups:
+                if sg['VpcId'] in r['VpcId']:
+                    add_by_tag_groups.append(sg['GroupId'])
 
             for g in remove_groups:
                 if g in rgroups:
