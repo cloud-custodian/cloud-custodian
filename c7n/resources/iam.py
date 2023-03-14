@@ -1969,7 +1969,7 @@ class UserPolicy(ValueFilter):
             UserName=u['UserName'])['Groups']
         for ug in u['c7n:Groups']:
             aps = client.list_attached_group_policies(
-                UserName=ug['GroupName'])['AttachedPolicies']
+                GroupName=ug['GroupName'])['AttachedPolicies']
             for ap in aps:
                 u['c7n:Policies'].append(
                     client.get_policy(PolicyArn=ap['PolicyArn'])['Policy'])
