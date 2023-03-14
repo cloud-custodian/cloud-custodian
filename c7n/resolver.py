@@ -15,6 +15,8 @@ from contextlib import closing
 from c7n.cache import NullCache
 from c7n.utils import format_string_values
 
+import boto3
+
 log = logging.getLogger('custodian.resolver')
 
 ZIP_OR_GZIP_HEADER_DETECT = zlib.MAX_WBITS | 32
@@ -115,6 +117,7 @@ class ValuesFrom:
             'expr': {'oneOf': [
                 {'type': 'integer'},
                 {'type': 'string'}]},
+            'api_key_secret': {'type': 'string'},
             'headers': {
                 'type': 'object',
                 'patternProperties': {
@@ -134,6 +137,14 @@ class ValuesFrom:
         self.cache = manager._cache or NullCache({})
         self.resolver = URIResolver(manager.session_factory, self.cache)
 
+    def _attach_api_key(self, config, headers):
+        api_key = config.get('api_key_secret')
+        if api_key is not None:
+            if api_key.startswith('arn:aws:secretsmanager'):
+                client = boto3.client('secretsmanager')
+                apiKey = client.get_secret_value(SecretId=api_key)['SecretString']
+                headers.update({'x-api-key': apiKey})
+
     def get_contents(self):
         _, format = os.path.splitext(self.data['url'])
 
@@ -151,6 +162,7 @@ class ValuesFrom:
             uri=self.data.get('url'),
             headers=self.data.get('headers', {})
         )
+        self._attach_api_key(self.data, params['headers'])
         
         contents = str(self.resolver.resolve(**params))
         return contents, format
