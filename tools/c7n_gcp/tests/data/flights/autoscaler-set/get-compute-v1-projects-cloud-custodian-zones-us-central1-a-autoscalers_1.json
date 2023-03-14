@@ -1,0 +1,48 @@
+{
+  "body": {
+    "items": [
+      {
+        "status": "ACTIVE", 
+        "kind": "compute#autoscaler", 
+        "target": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-a/instanceGroupManagers/instance-group-2", 
+        "zone": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-a", 
+        "autoscalingPolicy": {
+          "maxNumReplicas": 4, 
+          "cpuUtilization": {
+            "utilizationTarget": 0.7
+          }, 
+          "minNumReplicas": 1, 
+          "coolDownPeriodSec": 30, 
+          "loadBalancingUtilization": {
+            "utilizationTarget": 0.7
+          }
+        }, 
+        "creationTimestamp": "2019-07-23T05:29:43.001-07:00", 
+        "id": "8716951130931413849", 
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-a/autoscalers/instance-group-2", 
+        "name": "instance-group-2"
+      }
+    ], 
+    "kind": "compute#autoscalerList", 
+    "id": "projects/cloud-custodian/zones/us-central1-a/autoscalers", 
+    "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-a/autoscalers"
+  }, 
+  "headers": {
+    "status": "200", 
+    "content-length": "1027", 
+    "transfer-encoding": "chunked", 
+    "expires": "Tue, 23 Jul 2019 12:58:49 GMT", 
+    "vary": "Origin, X-Origin", 
+    "-content-encoding": "gzip", 
+    "date": "Tue, 23 Jul 2019 12:58:49 GMT", 
+    "x-xss-protection": "1; mode=block", 
+    "content-location": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-a/autoscalers?filter=name+%3D+instance-group-2&alt=json", 
+    "x-content-type-options": "nosniff", 
+    "server": "GSE", 
+    "etag": "\"Fz-NEjnntazwVczpYKjtsPFaf3A=/c5vigdo4nHanypNfoejXl16cOtQ=\"", 
+    "cache-control": "private, max-age=0, must-revalidate, no-transform", 
+    "x-frame-options": "SAMEORIGIN", 
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"46,43,39\"", 
+    "content-type": "application/json; charset=UTF-8"
+  }
+}

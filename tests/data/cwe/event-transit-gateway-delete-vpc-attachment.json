@@ -1,0 +1,68 @@
+{
+    "version": "0",
+    "id": "f6c00f02-bf83-11c3-6476-188a4462be21",
+    "detail-type": "AWS API Call via CloudTrail",
+    "source": "aws.ec2",
+    "account": "012345678912",
+    "time": "2022-11-09T09:24:20Z",
+    "region": "us-west-2",
+    "resources": [],
+    "detail": {
+        "eventVersion": "1.08",
+        "userIdentity": {
+            "type": "AssumedRole",
+            "principalId": "AROA3OCGVC4GCMEU2DIEW:pmuniswamy",
+            "arn": "arn:aws:sts::012345678912:assumed-role/c7nbot/pmuniswamy",
+            "accountId": "012345678912",
+            "accessKeyId": "ASIA3OCGVC4GKK15OTHH3",
+            "sessionContext": {
+                "sessionIssuer": {
+                    "type": "Role",
+                    "principalId": "AROA3OCGVC4GCMEU2DKK1",
+                    "arn": "arn:aws:iam::012345678912:role/c7nbot",
+                    "accountId": "012345678912",
+                    "userName": "c7nbot"
+                },
+                "webIdFederationData": {},
+                "attributes": {
+                    "creationDate": "2022-11-09T08:48:05Z",
+                    "mfaAuthenticated": "false"
+                }
+            }
+        },
+        "eventTime": "2022-11-09T09:24:20Z",
+        "eventSource": "ec2.amazonaws.com",
+        "eventName": "DeleteTransitGatewayVpcAttachment",
+        "awsRegion": "us-west-2",
+        "sourceIPAddress": "AWS Internal",
+        "userAgent": "AWS Internal",
+        "requestParameters": {
+            "DelTGwVpcAttachReq": {
+                "TransitGatewayAttachmentId": "tgw-attach-0814a77755bf02f0e"
+            }
+        },
+        "responseElements": {
+            "DeleteTransitGatewayVpcAttachmentResponse": {
+                "xmlns": "http://ec2.amazonaws.com/doc/2016-11-15/",
+                "transitGatewayVpcAttachment": {
+                    "creationTime": "2022-11-09T09:23:12.000Z",
+                    "transitGatewayAttachmentId": "tgw-attach-0814a77755bf02f0e",
+                    "transitGatewayId": "tgw-008fe7d47ebe2dbeb",
+                    "vpcId": "vpc-0e2a18296548d753e",
+                    "state": "deleting",
+                    "vpcOwnerId": "012345678912"
+                },
+                "requestId": "61682dec-77d6-4be2-823a-81b218e55755"
+            }
+        },
+        "requestID": "61682dec-77d6-4be2-823a-81b218e55755",
+        "eventID": "10fe783b-14ea-4f67-8dbc-b1596716e57c",
+        "readOnly": false,
+        "eventType": "AwsApiCall",
+        "managementEvent": true,
+        "recipientAccountId": "012345678912",
+        "eventCategory": "Management",
+        "sessionCredentialFromConsole": "true"
+    },
+    "debug": true
+}

@@ -1,20 +1,20 @@
 {
-    "status_code": 200, 
+    "status_code": 200,
     "data": {
         "AccountAliases": [
-            "custodian-skunk-works"
-        ], 
-        "IsTruncated": false, 
+            "custodian-skunkworks"
+        ],
+        "IsTruncated": false,
         "ResponseMetadata": {
-            "RetryAttempts": 0, 
-            "HTTPStatusCode": 200, 
-            "RequestId": "6f92ccac-fc34-11e7-8667-d3eca4ef75b7", 
+            "RequestId": "f1ee28f4-dd8b-46aa-bf2b-1ad09c535307",
+            "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "x-amzn-requestid": "6f92ccac-fc34-11e7-8667-d3eca4ef75b7", 
-                "date": "Thu, 18 Jan 2018 09:46:19 GMT", 
-                "content-length": "400", 
-                "content-type": "text/xml"
-            }
+                "x-amzn-requestid": "f1ee28f4-dd8b-46aa-bf2b-1ad09c535307",
+                "content-type": "text/xml",
+                "content-length": "393",
+                "date": "Fri, 20 Dec 2019 23:00:13 GMT"
+            },
+            "RetryAttempts": 0
         }
     }
 }

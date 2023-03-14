@@ -1,3 +1,0 @@
-click
-c7n
-structlog

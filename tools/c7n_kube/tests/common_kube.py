@@ -1,21 +1,10 @@
-# Copyright 2018-2019 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import atexit
 from functools import partial
 import json
 import os
-from six.moves.urllib.parse import urlparse
+from urllib.parse import urlparse
 
 import tempfile
 import vcr
@@ -63,6 +52,12 @@ class KubeTest(TestUtils):
     KubeConfigPath = init_kube_config()
     recording = False
 
+    def get_event(self, name):
+        event_dir = self._get_cassette_library_dir('events')
+        with open(os.path.join(event_dir, f'{name}.json')) as f:
+            event = json.load(f)
+        return event
+
     def replay_flight_data(self, name=None):
         kw = self._get_vcr_kwargs()
         kw['record_mode'] = 'none'
@@ -101,10 +96,10 @@ class KubeTest(TestUtils):
         myvcr.match_on = ['kubematcher', 'method']
         return myvcr
 
-    def _get_cassette_library_dir(self):
+    def _get_cassette_library_dir(self, name='flights'):
         return os.path.join(
             os.path.dirname(__file__),
-            'data', 'flights')
+            'data', name)
 
     def _get_cassette_name(self):
         return '{0}.{1}.yaml'.format(self.__class__.__name__,

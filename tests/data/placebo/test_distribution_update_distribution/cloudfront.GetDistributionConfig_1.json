@@ -1,0 +1,18 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "ETag": "ETAPGKTC9B1VZ",
+        "DistributionConfig": {
+            "CallerReference": "6441605581961",
+            "Comment": "",
+            "Enabled": true,
+            "Logging": {
+                "Enabled": false,
+                "IncludeCookies": false,
+                "Bucket": "",
+                "Prefix": ""
+            }
+        }
+    }
+}

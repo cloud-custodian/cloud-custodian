@@ -1,4 +1,6 @@
-from msrestazure.azure_exceptions import CloudError
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
+from azure.core.exceptions import ResourceNotFoundError
 
 from c7n_azure.provisioning.deployment_unit import DeploymentUnit
 from c7n_azure.provisioning.resource_group import ResourceGroupUnit
@@ -15,7 +17,7 @@ class StorageAccountUnit(DeploymentUnit):
         try:
             return self.client.storage_accounts.get_properties(params['resource_group_name'],
                                                                params['name'])
-        except CloudError:
+        except ResourceNotFoundError:
             return None
 
     def _provision(self, params):
@@ -26,6 +28,6 @@ class StorageAccountUnit(DeploymentUnit):
         sa_params = {'sku': {'name': 'Standard_LRS'},
                     'kind': 'Storage',
                     'location': params['location']}
-        return self.client.storage_accounts.create(params['resource_group_name'],
-                                                   params['name'],
-                                                   sa_params).result()
+        return self.client.storage_accounts.begin_create(params['resource_group_name'],
+                                                         params['name'],
+                                                         sa_params).result()

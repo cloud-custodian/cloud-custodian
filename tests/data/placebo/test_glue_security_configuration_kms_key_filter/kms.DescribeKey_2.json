@@ -1,0 +1,21 @@
+{
+    "status_code": 200,
+    "data": {
+        "KeyMetadata": {
+            "AWSAccountId": "0123456789012",
+            "KeyId": "358f7699-4ea5-455a-9c78-1c868301e5a8",
+            "Arn": "arn:aws:kms:us-east-1:0123456789012:key/358f7699-4ea5-455a-9c78-1c868301e5a8",
+            "Enabled": false,
+            "Description": "",
+            "KeyUsage": "ENCRYPT_DECRYPT",
+            "KeyState": "Disabled",
+            "Origin": "AWS_KMS",
+            "KeyManager": "CUSTOMER",
+            "CustomerMasterKeySpec": "SYMMETRIC_DEFAULT",
+            "EncryptionAlgorithms": [
+                "SYMMETRIC_DEFAULT"
+            ]
+        },
+        "ResponseMetadata": {}
+    }
+}

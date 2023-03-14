@@ -1,18 +1,5 @@
-# Copyright 2016-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 from datetime import datetime
 import re
 
@@ -24,6 +11,7 @@ from c7n.actions import (
     ActionRegistry, BaseAction, ModifyVpcSecurityGroupsAction)
 from c7n.filters import FilterRegistry, AgeFilter
 import c7n.filters.vpc as net_filters
+from c7n.filters.kms import KmsRelatedFilter
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, TypeInfo
 from c7n.tags import universal_augment
@@ -51,6 +39,7 @@ class ElastiCacheCluster(QueryResourceManager):
         date = 'CacheClusterCreateTime'
         dimension = 'CacheClusterId'
         universal_taggable = True
+        cfn_type = 'AWS::ElastiCache::CacheCluster'
 
     filter_registry = filters
     action_registry = actions
@@ -160,7 +149,19 @@ class DeleteElastiCacheCluster(BaseAction):
                 'Deleted ElastiCache cluster: %s',
                 cluster['CacheClusterId'])
 
+        cacheClusterIds = set([c["CacheClusterId"] for c in clusters])
         for replication_group in replication_groups_to_delete:
+            # NOTE don't delete the group if it's not empty
+            rg = client.describe_replication_groups(
+                ReplicationGroupId=replication_group)["ReplicationGroups"][0]
+            if not all(cluster in cacheClusterIds for cluster in rg["MemberClusters"]):
+                # NOTE mark members for better presentation on notifications
+                for c in clusters:
+                    if c.get("ReplicationGroupId") == replication_group:
+                        c["MemberClusters"] = rg["MemberClusters"]
+                self.log.info(f'{replication_group} is not empty: {rg["MemberClusters"]}')
+                continue
+
             params = {'ReplicationGroupId': replication_group,
                       'RetainPrimaryCluster': False}
             if not skip:
@@ -259,12 +260,13 @@ class ElastiCacheSubnetGroup(QueryResourceManager):
 
     class resource_type(TypeInfo):
         service = 'elasticache'
-        arn_type = 'subnet-group'
+        arn_type = 'subnetgroup'
         enum_spec = ('describe_cache_subnet_groups',
                      'CacheSubnetGroups', None)
         name = id = 'CacheSubnetGroupName'
         filter_name = 'CacheSubnetGroupName'
         filter_type = 'scalar'
+        cfn_type = 'AWS::ElastiCache::SubnetGroup'
 
 
 @resources.register('cache-snapshot')
@@ -458,3 +460,63 @@ def _cluster_eligible_for_snapshot(cluster):
         cluster['Engine'] != 'memcached' and not
         TTYPE.match(cluster['CacheNodeType'])
     )
+
+
+@resources.register('elasticache-group')
+class ElastiCacheReplicationGroup(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+        service = "elasticache"
+        enum_spec = ('describe_replication_groups',
+                     'ReplicationGroups[]', None)
+        arn_type = 'replicationgroup'
+        id = name = dimension = 'ReplicationGroupId'
+        cfn_type = 'AWS::ElastiCache::ReplicationGroup'
+        arn_separator = ":"
+        universal_taggable = object()
+
+    augment = universal_augment
+    permissions = ('elasticache:DescribeReplicationGroups',)
+
+
+@ElastiCacheReplicationGroup.filter_registry.register('kms-key')
+class KmsFilter(KmsRelatedFilter):
+
+    RelatedIdsExpression = 'KmsKeyId'
+
+
+@ElastiCacheReplicationGroup.action_registry.register('delete')
+class DeleteReplicationGroup(BaseAction):
+    """Action to delete a cache replication group
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: elasticache-delete-replication-group
+                resource: aws.elasticache-group
+                filters:
+                  - type: value
+                    key: AtRestEncryptionEnabled
+                    value: False
+                actions:
+                  - type: delete
+                    snapshot: False
+
+    """
+    schema = type_schema(
+        'delete', **{'snapshot': {'type': 'boolean'}})
+
+    valid_origin_states = ('available',)
+    permissions = ('elasticache:DeleteReplicationGroup',)
+
+    def process(self, resources):
+        resources = self.filter_resources(resources, 'Status', self.valid_origin_states)
+        client = local_session(self.manager.session_factory).client('elasticache')
+        for r in resources:
+            params = {'ReplicationGroupId': r['ReplicationGroupId']}
+            if self.data.get('snapshot', False):
+                params.update({'FinalSnapshotIdentifier': r['ReplicationGroupId'] + '-snapshot'})
+            self.manager.retry(client.delete_replication_group, **params, ignore_err_codes=(
+                'ReplicationGroupNotFoundFault',))

@@ -1,0 +1,10 @@
+{
+    "status_code": 400,
+    "data": {
+        "Error": {
+            "Code": "InvalidPermission.Duplicate",
+            "Message": "the specified rule \"peer: 0.0.0.0/0, TCP, from port: 22, to port: 22, ALLOW\" already exists"
+        },
+        "ResponseMetadata": {}
+    }
+}

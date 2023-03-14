@@ -1,0 +1,26 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "networkWatcherName": {
+            "defaultValue": "networkWatcher",
+            "type": "string"
+        },
+        "location": {
+            "type": "string",
+            "defaultValue": "North Central US"
+        }
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Network/networkWatchers",
+            "apiVersion": "2020-05-01",
+            "name": "[parameters('networkWatcherName')]",
+            "location": "northcentralus",
+            "properties": {
+                "provisioningState": "Succeeded",
+                "runningOperationIds": []
+            }
+        }
+    ]
+}

@@ -1,0 +1,48 @@
+{
+  "body": {
+    "deployments": [
+      {
+        "updateTime": "2019-03-14T05:08:00.249-07:00", 
+        "name": "mydep2", 
+        "manifest": "https://www.googleapis.com/deploymentmanager/v2/projects/cloud-custodian/global/deployments/mydep2/manifests/manifest-1552565247097", 
+        "insertTime": "2019-03-14T05:07:27.065-07:00", 
+        "fingerprint": "KNAsmcfEULhej4f8ewBxzA==", 
+        "operation": {
+          "status": "DONE", 
+          "kind": "deploymentmanager#operation", 
+          "name": "operation-1552565246916-5840cc40878a8-282b993c-5814fc49", 
+          "startTime": "2019-03-14T05:07:27.234-07:00", 
+          "insertTime": "1969-12-31T16:00:00.000-08:00", 
+          "targetId": "7713223424225049872", 
+          "targetLink": "https://www.googleapis.com/deploymentmanager/v2/projects/cloud-custodian/global/deployments/mydep2", 
+          "operationType": "insert", 
+          "progress": 100, 
+          "endTime": "2019-03-14T05:08:00.376-07:00", 
+          "id": "0", 
+          "selfLink": "https://www.googleapis.com/deploymentmanager/v2/projects/0/global/operations/operation-1552565246916-5840cc40878a8-282b993c-5814fc49", 
+          "user": "pavel.109.fromby@gmail.com"
+        }, 
+        "id": "7713223424225049872", 
+        "selfLink": "https://www.googleapis.com/deploymentmanager/v2/projects/cloud-custodian/global/deployments/mydep2"
+      }
+    ]
+  }, 
+  "headers": {
+    "status": "200", 
+    "content-length": "1208", 
+    "transfer-encoding": "chunked", 
+    "expires": "Fri, 15 Mar 2019 12:38:27 GMT", 
+    "vary": "Origin, X-Origin", 
+    "-content-encoding": "gzip", 
+    "date": "Fri, 15 Mar 2019 12:38:27 GMT", 
+    "x-xss-protection": "1; mode=block", 
+    "content-location": "https://www.googleapis.com/deploymentmanager/v2/projects/cloud-custodian/global/deployments?alt=json", 
+    "x-content-type-options": "nosniff", 
+    "server": "GSE", 
+    "etag": "\"MBVBbqFwoL314QGz63rX-F3C9f8/jEPH-ycIWfMWG841XE5KIrjNo78\"", 
+    "cache-control": "private, max-age=0, must-revalidate, no-transform", 
+    "x-frame-options": "SAMEORIGIN", 
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"46,44,43,39\"", 
+    "content-type": "application/json; charset=UTF-8"
+  }
+}

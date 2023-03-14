@@ -1,26 +1,15 @@
-# Copyright 2018 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
+import copy
 import time
 
 import requests
-import six
 from c7n_mailer.ldap_lookup import Redis
 from c7n_mailer.utils import get_rendered_jinja
 from c7n_mailer.utils_email import is_email
 
 
-class SlackDelivery(object):
+class SlackDelivery:
 
     def __init__(self, config, logger, email_handler):
         self.caching = self.cache_factory(config, config.get('cache_engine', None))
@@ -36,18 +25,16 @@ class SlackDelivery(object):
             return None
 
     def get_to_addrs_slack_messages_map(self, sqs_message):
-        resource_list = []
-        for resource in sqs_message['resources']:
-            resource_list.append(resource)
+        resource_list = copy.deepcopy(sqs_message['resources'])
 
         slack_messages = {}
 
         # Check for Slack targets in 'to' action and render appropriate template.
-        for target in sqs_message.get('action', ()).get('to'):
+        for target in sqs_message.get('action', ()).get('to', []):
             if target == 'slack://owners':
                 to_addrs_to_resources_map = \
                     self.email_handler.get_email_to_addrs_to_resources_map(sqs_message)
-                for to_addrs, resources in six.iteritems(to_addrs_to_resources_map):
+                for to_addrs, resources in to_addrs_to_resources_map.items():
 
                     resolved_addrs = self.retrieve_user_im(list(to_addrs))
 
@@ -90,25 +77,29 @@ class SlackDelivery(object):
                     resource_list,
                     self.logger, 'slack_template', 'slack_default',
                     self.config['templates_folders'])
-            elif target.startswith('slack://tag/') and 'Tags' in resource:
+            elif target.startswith('slack://tag/') and 'Tags' in resource_list[0]:
                 tag_name = target.split('tag/', 1)[1]
-                result = next((item for item in resource.get('Tags', [])
+                result = next((item for item in resource_list[0].get('Tags', [])
                                if item["Key"] == tag_name), None)
                 if not result:
                     self.logger.debug(
                         "No %s tag found in resource." % tag_name)
                     continue
 
-                resolved_addrs = result['Value']
+                resolved_addr = slack_target = result['Value']
 
-                if not resolved_addrs.startswith("#"):
-                    resolved_addrs = "#" + resolved_addrs
+                if is_email(resolved_addr):
+                    ims = self.retrieve_user_im([resolved_addr])
+                    slack_target = ims[resolved_addr]
+                elif not resolved_addr.startswith("#"):
+                    resolved_addr = "#" + resolved_addr
+                    slack_target = resolved_addr
 
-                slack_messages[resolved_addrs] = get_rendered_jinja(
-                    resolved_addrs, sqs_message,
-                    resource_list,
+                slack_messages[resolved_addr] = get_rendered_jinja(
+                    slack_target, sqs_message, resource_list,
                     self.logger, 'slack_template', 'slack_default',
-                    self.config['templates_folders'])
+                    self.config['templates_folders']
+                )
                 self.logger.debug("Generating message for specified Slack channel.")
         return slack_messages
 
@@ -123,7 +114,7 @@ class SlackDelivery(object):
                 key)
             )
 
-            self.send_slack_msg(key, payload)
+            self.send_slack_msg(key, payload.encode('utf-8'))
 
     def retrieve_user_im(self, email_addresses):
         list = {}
@@ -141,7 +132,9 @@ class SlackDelivery(object):
                 url='https://slack.com/api/users.lookupByEmail',
                 data={'email': address},
                 headers={'Content-Type': 'application/x-www-form-urlencoded',
-                         'Authorization': 'Bearer %s' % self.config.get('slack_token')}).json()
+                         'Authorization': 'Bearer %s' % self.config.get('slack_token')},
+                timeout=60
+            ).json()
 
             if not response["ok"]:
                 if "headers" in response.keys() and "Retry-After" in response["headers"]:
@@ -179,13 +172,17 @@ class SlackDelivery(object):
             response = requests.post(
                 url=key,
                 data=message_payload,
-                headers={'Content-Type': 'application/json'})
+                headers={'Content-Type': 'application/json;charset=utf-8'},
+                timeout=60
+            )
         else:
             response = requests.post(
                 url='https://slack.com/api/chat.postMessage',
                 data=message_payload,
                 headers={'Content-Type': 'application/json;charset=utf-8',
-                         'Authorization': 'Bearer %s' % self.config.get('slack_token')})
+                         'Authorization': 'Bearer %s' % self.config.get('slack_token')},
+                timeout=60
+            )
 
         if response.status_code == 429 and "Retry-After" in response.headers:
             self.logger.info(

@@ -1,0 +1,12 @@
+{
+    "status_code": 200,
+    "data": {
+        "Targets": [
+            {
+                "Id": "Compliance-Change-Topic",
+                "Arn": "arn:aws:sns:us-east-1:644160558196:aws-controltower-SecurityNotifications"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

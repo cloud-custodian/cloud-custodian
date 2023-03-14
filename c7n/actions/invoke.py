@@ -1,16 +1,5 @@
-# Copyright 2017-2018 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 
 try:
     from botocore.config import Config
@@ -21,6 +10,7 @@ from .core import EventAction
 from c7n import utils
 from c7n.manager import resources
 from c7n.version import version as VERSION
+from c7n.credentials import assumed_session
 
 
 class LambdaInvoke(EventAction):
@@ -43,6 +33,7 @@ class LambdaInvoke(EventAction):
 
      - type: invoke-lambda
        function: my-function
+       assume-role: iam-role-arn
 
     Note if your synchronously invoking the lambda, you may also need
     to configure the timeout, to avoid multiple invokes. The default
@@ -59,6 +50,7 @@ class LambdaInvoke(EventAction):
         'properties': {
             'type': {'enum': ['invoke-lambda']},
             'function': {'type': 'string'},
+            'assume-role': {'type': 'string'},
             'region': {'type': 'string'},
             'async': {'type': 'boolean'},
             'qualifier': {'type': 'string'},
@@ -68,9 +60,24 @@ class LambdaInvoke(EventAction):
         }
     }
 
-    permissions = ('lambda:InvokeFunction',)
+    permissions = ('lambda:InvokeFunction',
+               'iam:ListAccountAliases',)
 
     def process(self, resources, event=None):
+
+        config = Config(read_timeout=self.data.get(
+            'timeout', 90), region_name=self.data.get('region', None))
+        session = utils.local_session(self.manager.session_factory)
+        assumed_role = self.data.get('assume-role', '')
+
+        if assumed_role:
+            self.log.debug('Assuming role: {}'.format(assumed_role))
+            target_session = assumed_session(assumed_role, 'LambdaAssumedRoleSession', session)
+            client = target_session.client('lambda', config=config)
+        else:
+            client = utils.local_session(
+                self.manager.session_factory).client('lambda', config=config)
+
         params = dict(FunctionName=self.data['function'])
         if self.data.get('qualifier'):
             params['Qualifier'] = self.data['Qualifier']
@@ -78,14 +85,15 @@ class LambdaInvoke(EventAction):
         if self.data.get('async', True):
             params['InvocationType'] = 'Event'
 
-        config = Config(read_timeout=self.data.get(
-            'timeout', 90), region_name=self.data.get('region', None))
-        client = utils.local_session(
-            self.manager.session_factory).client('lambda', config=config)
+        alias = utils.get_account_alias_from_sts(
+            utils.local_session(self.manager.session_factory))
 
         payload = {
             'version': VERSION,
             'event': event,
+            'account_id': self.manager.config.account_id,
+            'account': alias,
+            'region': self.manager.config.region,
             'action': self.data,
             'policy': self.manager.data}
 
@@ -100,11 +108,10 @@ class LambdaInvoke(EventAction):
             results.append(result)
         return results
 
+    @classmethod
+    def register_resources(klass, registry, resource_class):
+        if 'invoke-lambda' not in resource_class.action_registry:
+            resource_class.action_registry.register('invoke-lambda', LambdaInvoke)
 
-def register_action_invoke_lambda(registry, _):
-    for resource in registry.keys():
-        klass = registry.get(resource)
-        klass.action_registry.register('invoke-lambda', LambdaInvoke)
 
-
-resources.subscribe(resources.EVENT_FINAL, register_action_invoke_lambda)
+resources.subscribe(LambdaInvoke.register_resources)

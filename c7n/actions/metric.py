@@ -1,16 +1,5 @@
-# Copyright 2017-2018 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 from datetime import datetime
 import jmespath
 
@@ -174,12 +163,10 @@ class PutMetric(BaseAction):
 
         return resources
 
-
-def register_action_put_metric(registry, _):
-    # apply put metric to each resource
-    for resource in registry.keys():
-        klass = registry.get(resource)
-        klass.action_registry.register('put-metric', PutMetric)
+    @classmethod
+    def register_resources(cls, registry, resource_class):
+        if 'put-metric' not in resource_class.action_registry:
+            resource_class.action_registry.register('put-metric', PutMetric)
 
 
-resources.subscribe(resources.EVENT_FINAL, register_action_put_metric)
+resources.subscribe(PutMetric.register_resources)

@@ -35,6 +35,12 @@
                         "Device": "/dev/xvda"
                     }
                 ], 
+                "Tags": [
+                    {
+                        "Key": "owner",
+                        "Value": "custodian"
+                    }
+                ], 
                 "Encrypted": true, 
                 "VolumeType": "gp2", 
                 "VolumeId": "vol-072dfa20eef03dd38", 

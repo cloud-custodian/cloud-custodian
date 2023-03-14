@@ -1,35 +1,44 @@
 {
-    "status_code": 200, 
+    "status_code": 200,
     "data": {
         "Vpcs": [
             {
-                "VpcId": "vpc-3065db49", 
-                "InstanceTenancy": "default", 
-                "State": "available", 
-                "DhcpOptionsId": "dopt-24ff1940", 
-                "CidrBlock": "10.4.0.0/16", 
+                "CidrBlock": "10.2.0.0/16",
+                "DhcpOptionsId": "dopt-daa1e3a0",
+                "State": "available",
+                "VpcId": "vpc-0d2f08cdd14782e56",
+                "OwnerId": "644160558196",
+                "InstanceTenancy": "default",
+                "CidrBlockAssociationSet": [
+                    {
+                        "AssociationId": "vpc-cidr-assoc-035c84f744941cd52",
+                        "CidrBlock": "10.2.0.0/16",
+                        "CidrBlockState": {
+                            "State": "associated"
+                        }
+                    }
+                ],
                 "IsDefault": false
-            }, 
+            },
             {
-                "VpcId": "vpc-d2d616b5", 
-                "InstanceTenancy": "default", 
-                "State": "available", 
-                "DhcpOptionsId": "dopt-24ff1940", 
-                "CidrBlock": "172.31.0.0/16", 
-                "IsDefault": true
+                "CidrBlock": "10.1.0.0/16",
+                "DhcpOptionsId": "dopt-daa1e3a0",
+                "State": "available",
+                "VpcId": "vpc-065087ed31e016b80",
+                "OwnerId": "644160558196",
+                "InstanceTenancy": "default",
+                "CidrBlockAssociationSet": [
+                    {
+                        "AssociationId": "vpc-cidr-assoc-0864dcc1191842ca0",
+                        "CidrBlock": "10.1.0.0/16",
+                        "CidrBlockState": {
+                            "State": "associated"
+                        }
+                    }
+                ],
+                "IsDefault": false
             }
-        ], 
-        "ResponseMetadata": {
-            "RetryAttempts": 0, 
-            "HTTPStatusCode": 200, 
-            "RequestId": "9f8c0cd6-45a0-4d9d-8b85-572b2006ff6d", 
-            "HTTPHeaders": {
-                "transfer-encoding": "chunked", 
-                "vary": "Accept-Encoding", 
-                "server": "AmazonEC2", 
-                "content-type": "text/xml;charset=UTF-8", 
-                "date": "Mon, 26 Jun 2017 18:27:40 GMT"
-            }
-        }
+        ],
+        "ResponseMetadata": {}
     }
 }

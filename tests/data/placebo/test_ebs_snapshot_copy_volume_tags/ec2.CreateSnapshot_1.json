@@ -1,0 +1,30 @@
+{
+  "status_code": 200,
+  "data": {
+    "Description": "",
+    "ResponseMetadata": {},
+    "Encrypted": false,
+    "VolumeId": "vol-0252f61378ede9d01",
+    "State": "pending",
+    "VolumeSize": 8,
+    "Progress": "",
+    "StartTime": {
+      "hour": 14,
+      "__class__": "datetime",
+      "month": 5,
+      "second": 17,
+      "microsecond": 0,
+      "year": 2017,
+      "day": 3,
+      "minute": 43
+    },
+    "SnapshotId": "snap-0c8b611065fed033e",
+    "Tags": [
+      {
+        "Key": "test-tag",
+        "Value": "custodian"
+      }
+    ],
+    "OwnerId": "644160558196"
+  }
+}

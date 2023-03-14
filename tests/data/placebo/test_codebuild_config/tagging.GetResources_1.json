@@ -1,0 +1,18 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:codebuild:us-east-1:644160558196:project/test-project",
+                "Tags": [
+                    {
+                        "Key": "Environment",
+                        "Value": "Test"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

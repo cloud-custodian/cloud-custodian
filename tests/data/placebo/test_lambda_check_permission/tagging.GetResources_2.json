@@ -1,0 +1,18 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:lambda:us-east-2:644160558196:function:custodian-ec2-public",
+                "Tags": [
+                    {
+                        "Key": "custodian-info",
+                        "Value": "mode=cloudtrail:version=0.9.14"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

@@ -1,0 +1,64 @@
+{
+    "status_code": 200,
+    "data": {
+        "NetworkInterfaces": [
+            {
+                "AvailabilityZone": "us-east-1c",
+                "Description": "private",
+                "Groups": [
+                    {
+                        "GroupName": "bastion-access",
+                        "GroupId": "sg-f1850a95"
+                    }
+                ],
+                "InterfaceType": "interface",
+                "Ipv6Addresses": [],
+                "MacAddress": "06:b4:af:ec:65:ab",
+                "NetworkInterfaceId": "eni-0d47bf614f6182182",
+                "OwnerId": "644160558196",
+                "PrivateIpAddress": "10.0.1.152",
+                "PrivateIpAddresses": [
+                    {
+                        "Primary": true,
+                        "PrivateIpAddress": "10.0.1.152"
+                    }
+                ],
+                "RequesterManaged": false,
+                "SourceDestCheck": true,
+                "Status": "available",
+                "SubnetId": "subnet-b2cb8788",
+                "TagSet": [],
+                "VpcId": "vpc-65db9700"
+            },
+            {
+                "AvailabilityZone": "us-east-1c",
+                "Description": "public",
+                "Groups": [
+                    {
+                        "GroupName": "default",
+                        "GroupId": "sg-fe87089a"
+                    }
+                ],
+                "InterfaceType": "interface",
+                "Ipv6Addresses": [],
+                "MacAddress": "06:f9:25:64:72:2d",
+                "NetworkInterfaceId": "eni-0911a059630a4a75c",
+                "OwnerId": "644160558196",
+                "PrivateIpAddress": "10.0.5.143",
+                "PrivateIpAddresses": [
+                    {
+                        "Primary": true,
+                        "PrivateIpAddress": "10.0.5.143"
+                    }
+                ],
+                "RequesterManaged": false,
+                "SourceDestCheck": true,
+                "Status": "available",
+                "SubnetId": "subnet-cdcb87f7",
+                "TagSet": [],
+                "VpcId": "vpc-65db9700"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

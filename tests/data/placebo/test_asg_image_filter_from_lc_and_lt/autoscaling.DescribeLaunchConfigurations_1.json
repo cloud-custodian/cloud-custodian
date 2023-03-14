@@ -1,0 +1,66 @@
+{
+    "status_code": 200,
+    "data": {
+        "LaunchConfigurations": [
+            {
+                "LaunchConfigurationName": "custodian-test-lc-1",
+                "LaunchConfigurationARN": "arn:aws:autoscaling:us-east-1:123456789012:launchConfiguration:c218eb70-29d1-4134-842c-2f27440e79a5:launchConfigurationName/custodian-test-lc-1",
+                "ImageId": "ami-02354e95b39ca8dec",
+                "KeyName": "",
+                "SecurityGroups": [
+                    "sg-58b94e0b"
+                ],
+                "ClassicLinkVPCSecurityGroups": [],
+                "UserData": "",
+                "InstanceType": "t2.micro",
+                "KernelId": "",
+                "RamdiskId": "",
+                "BlockDeviceMappings": [],
+                "InstanceMonitoring": {
+                    "Enabled": true
+                },
+                "CreatedTime": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 8,
+                    "day": 16,
+                    "hour": 21,
+                    "minute": 8,
+                    "second": 7,
+                    "microsecond": 388000
+                },
+                "EbsOptimized": false
+            },
+            {
+                "LaunchConfigurationName": "custodian-test-lc-2",
+                "LaunchConfigurationARN": "arn:aws:autoscaling:us-east-1:123456789012:launchConfiguration:e1022153-d238-4ecf-9dd4-ec0bb439ed05:launchConfigurationName/custodian-test-lc-2",
+                "ImageId": "ami-0bcc094591f354be2",
+                "KeyName": "",
+                "SecurityGroups": [
+                    "sg-58b94e0b"
+                ],
+                "ClassicLinkVPCSecurityGroups": [],
+                "UserData": "",
+                "InstanceType": "t3a.micro",
+                "KernelId": "",
+                "RamdiskId": "",
+                "BlockDeviceMappings": [],
+                "InstanceMonitoring": {
+                    "Enabled": true
+                },
+                "CreatedTime": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 8,
+                    "day": 16,
+                    "hour": 22,
+                    "minute": 12,
+                    "second": 31,
+                    "microsecond": 877000
+                },
+                "EbsOptimized": false
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

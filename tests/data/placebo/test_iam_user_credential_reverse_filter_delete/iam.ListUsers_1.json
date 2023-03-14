@@ -1,0 +1,25 @@
+{
+  "status_code": 200,
+  "data": {
+    "Users": [
+      {
+        "Path": "/",
+        "UserName": "zscholl",
+        "UserId": "AIDAJEZOTH6YPO3DY45QW",
+        "Arn": "arn:aws:iam::123456789012:user/zscholl",
+        "CreateDate": {
+          "__class__": "datetime",
+          "year": 2016,
+          "month": 5,
+          "day": 16,
+          "hour": 19,
+          "minute": 3,
+          "second": 36,
+          "microsecond": 0
+        }
+      }
+    ],
+    "IsTruncated": false,
+    "ResponseMetadata": {}
+  }
+}

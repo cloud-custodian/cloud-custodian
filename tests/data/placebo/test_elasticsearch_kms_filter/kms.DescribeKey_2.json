@@ -1,0 +1,21 @@
+{
+    "status_code": 200,
+    "data": {
+        "KeyMetadata": {
+            "AWSAccountId": "0123456789012",
+            "KeyId": "6917a312-adce-4bbc-8202-958f2db490fa",
+            "Arn": "arn:aws:kms:us-east-1:0123456789012:key/6917a312-adce-4bbc-8202-958f2db490fa",
+            "Enabled": true,
+            "Description": "Default master key that protects my Elasticsearch data when no other key is defined",
+            "KeyUsage": "ENCRYPT_DECRYPT",
+            "KeyState": "Enabled",
+            "Origin": "AWS_KMS",
+            "KeyManager": "AWS",
+            "CustomerMasterKeySpec": "SYMMETRIC_DEFAULT",
+            "EncryptionAlgorithms": [
+                "SYMMETRIC_DEFAULT"
+            ]
+        },
+        "ResponseMetadata": {}
+    }
+}

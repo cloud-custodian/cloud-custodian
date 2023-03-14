@@ -1,0 +1,20 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "DistributionList": {
+            "Marker": "",
+            "MaxItems": 100,
+            "IsTruncated": false,
+            "Quantity": 1,
+            "Items": [
+                {
+                    "Id": "E1FBPN9VF9FG4X",
+                    "ARN": "arn:aws:cloudfront::123456789012:distribution/E1FBPN9VF9FG4X",
+                    "Status": "InProgress",
+                    "Comment": ""
+                }
+            ]
+        }
+    }
+}

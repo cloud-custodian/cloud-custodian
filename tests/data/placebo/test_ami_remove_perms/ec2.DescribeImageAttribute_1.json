@@ -1,0 +1,21 @@
+{
+    "status_code": 200,
+    "data": {
+        "ImageId": "ami-03f9a84f3963d5028",
+        "LaunchPermissions": [
+            {
+                "UserId": "112233445566"
+            },
+            {
+                "UserId": "665544332211"
+            },
+            {
+                "OrganizationArn": "arn:aws:organizations:112233445566:organization/o-xyz123abc"
+            },
+            {
+                "OrganizationalUnitArn": "arn:aws:organizations:112233445566:ou/o-xyz123abc/ou-a123-xyzab123"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

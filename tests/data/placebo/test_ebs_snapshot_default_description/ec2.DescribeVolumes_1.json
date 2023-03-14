@@ -1,0 +1,37 @@
+{
+    "status_code": 200,
+    "data": {
+        "Volumes": [
+            {
+                "Attachments": [],
+                "AvailabilityZone": "us-east-1a",
+                "CreateTime": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 2,
+                    "day": 28,
+                    "hour": 18,
+                    "minute": 47,
+                    "second": 57,
+                    "microsecond": 281000
+                },
+                "Encrypted": true,
+                "KmsKeyId": "arn:aws:kms:us-east-1:644160558196:key/f6d98445-ca15-466d-8552-95397d4ab83d",
+                "Size": 100,
+                "SnapshotId": "",
+                "State": "available",
+                "VolumeId": "vol-0cc137cb158adbc32",
+                "Iops": 300,
+                "Tags": [
+                    {
+                        "Key": "del_status",
+                        "Value": "Resource does not meet policy: delete@2022/03/31"
+                    }
+                ],
+                "VolumeType": "gp2",
+                "MultiAttachEnabled": false
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

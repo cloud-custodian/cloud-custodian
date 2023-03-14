@@ -1,0 +1,36 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {
+            "RequestId": "bd57a2f5-7b66-458b-a7da-781637495119",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "content-type": "application/json",
+                "date": "Tue, 3 Mar 2020 22:43:28 GMT",
+                "x-amzn-requestid": "bd57a2f5-7b66-458b-a7da-781637495119",
+                "content-length": "332",
+                "connection": "keep-alive"
+            },
+            "RetryAttempts": 0
+        },
+        "BackupVaultList": [
+            {
+                "BackupVaultName": "Default",
+                "BackupVaultArn": "arn:aws:backup:us-east-1:644160558196:backup-vault:Default",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 11,
+                    "day": 19,
+                    "hour": 11,
+                    "minute": 42,
+                    "second": 20,
+                    "microsecond": 907000
+                },
+                "EncryptionKeyArn": "arn:aws:kms:us-east-1:644160558196:key/8d56db16-21c6-412f-b949-7a012e11ee6e",
+                "CreatorRequestId": "Default",
+                "NumberOfRecoveryPoints": 35
+            }
+        ]
+    }
+}

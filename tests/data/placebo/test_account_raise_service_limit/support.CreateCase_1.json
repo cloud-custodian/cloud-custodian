@@ -1,17 +1,7 @@
 {
-    "status_code": 200, 
-    "data": {
-        "caseId": "case-644160558196-muen-2017-db7503fb7487ee2c", 
-        "ResponseMetadata": {
-            "RetryAttempts": 0, 
-            "HTTPStatusCode": 200, 
-            "RequestId": "cf67138e-2118-11e7-a004-3f9f6a574827", 
-            "HTTPHeaders": {
-                "x-amzn-requestid": "cf67138e-2118-11e7-a004-3f9f6a574827", 
-                "date": "Fri, 14 Apr 2017 13:46:51 GMT", 
-                "content-length": "57", 
-                "content-type": "application/x-amz-json-1.1"
-            }
-        }
-    }
+  "status_code": 200,
+  "data": {
+    "caseId": "case-644160558196-muen-2017-db7503fb7487ee2c",
+    "ResponseMetadata": {}
+  }
 }

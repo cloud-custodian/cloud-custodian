@@ -1,0 +1,12 @@
+{
+    "status_code": 200,
+    "data": {
+        "ContinuousBackupsDescription": {
+            "ContinuousBackupsStatus": "ENABLED",
+            "PointInTimeRecoveryDescription": {
+                "PointInTimeRecoveryStatus": "DISABLED"
+            }
+        },
+        "ResponseMetadata": {}
+    }
+}

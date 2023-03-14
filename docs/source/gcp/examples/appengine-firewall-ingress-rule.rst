@@ -1,6 +1,6 @@
 App Engine - Check if a Firewall Rule is in Place
 ==================================================
-Custodian can check and notify if App Engine firewall ingress rules have been mis-configured. Note that the ``notify`` action requires a Pub/Sub topic to be configured.
+Custodian can check and notify if App Engine firewall ingress rules have been misconfigured. Note that the ``notify`` action requires a Pub/Sub topic to be configured.
 
 In the example below, the policy checks that there is only one rule allowing all connections.
 

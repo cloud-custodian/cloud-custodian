@@ -1,16 +1,5 @@
-# Copyright 2018 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 from c7n.utils import type_schema
 
 from c7n_gcp.actions import MethodAction
@@ -22,17 +11,25 @@ todo, needs detail_spec
 """
 
 
+class PubSubTypeInfo(TypeInfo):
+    service = 'pubsub'
+    version = 'v1'
+    scope_template = 'projects/{}'
+    name = id = "name"
+    urn_id_segments = (-1,)  # Just use the last segment of the id in the URN
+
+
 @resources.register('pubsub-topic')
 class PubSubTopic(QueryResourceManager):
     """GCP resource: https://cloud.google.com/pubsub/docs/reference/rest/v1/projects.topics
     """
-    class resource_type(TypeInfo):
-        service = 'pubsub'
-        version = 'v1'
+    class resource_type(PubSubTypeInfo):
         component = 'projects.topics'
         enum_spec = ('list', 'topics[]', None)
-        scope_template = "projects/{}"
-        id = "name"
+        default_report_fields = ["name", "kmsKeyName"]
+        asset_type = "pubsub.googleapis.com/Topic"
+        metric_key = "resource.labels.topic_id"
+        urn_component = "topic"
 
         @staticmethod
         def get(client, resource_info):
@@ -54,13 +51,15 @@ class DeletePubSubTopic(MethodAction):
 class PubSubSubscription(QueryResourceManager):
     """GCP resource: https://cloud.google.com/pubsub/docs/reference/rest/v1/projects.subscriptions
     """
-    class resource_type(TypeInfo):
-        service = 'pubsub'
-        version = 'v1'
+    class resource_type(PubSubTypeInfo):
         component = 'projects.subscriptions'
         enum_spec = ('list', 'subscriptions[]', None)
-        scope_template = 'projects/{}'
-        id = 'name'
+        default_report_fields = [
+            "name", "topic", "ackDeadlineSeconds",
+            "retainAckedMessages", "messageRetentionDuration"]
+        asset_type = "pubsub.googleapis.com/Subscription"
+        metric_key = 'resource.labels.subscription_id'
+        urn_component = "subscription"
 
         @staticmethod
         def get(client, resource_info):
@@ -82,13 +81,12 @@ class DeletePubSubSubscription(MethodAction):
 class PubSubSnapshot(QueryResourceManager):
     """GCP resource: https://cloud.google.com/pubsub/docs/reference/rest/v1/projects.snapshots
     """
-    class resource_type(TypeInfo):
-        service = 'pubsub'
-        version = 'v1'
+    class resource_type(PubSubTypeInfo):
         component = 'projects.snapshots'
         enum_spec = ('list', 'snapshots[]', None)
-        scope_template = 'projects/{}'
-        id = 'name'
+        default_report_fields = [
+            "name", "topic", "expireTime"]
+        urn_component = "snapshot"
 
 
 @PubSubSnapshot.action_registry.register('delete')

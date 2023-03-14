@@ -1,0 +1,28 @@
+{
+    "status_code": 200,
+    "data": {
+        "Attributes": [
+            {
+                "Value": "true",
+                "Key": "access_logs.s3.enabled"
+            },
+            {
+                "Value": "elbv2logtest",
+                "Key": "access_logs.s3.bucket"
+            },
+            {
+                "Value": "gah5/nlb1",
+                "Key": "access_logs.s3.prefix"
+            },
+            {
+                "Value": "false",
+                "Key": "deletion_protection.enabled"
+            },
+            {
+                "Value": "false",
+                "Key": "load_balancing.cross_zone_enabled"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

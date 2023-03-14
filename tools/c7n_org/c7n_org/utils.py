@@ -1,3 +1,5 @@
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import os
 from c7n.utils import reset_session_cache
 from contextlib import contextmanager

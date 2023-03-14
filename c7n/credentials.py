@@ -1,21 +1,8 @@
-# Copyright 2016-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 """
 Authentication utilities
 """
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import os
 
 from botocore.credentials import RefreshableCredentials
@@ -32,7 +19,7 @@ USE_STS_REGIONAL = os.environ.get(
     'C7N_USE_STS_REGIONAL', '').lower() in ('yes', 'true')
 
 
-class SessionFactory(object):
+class SessionFactory:
 
     def __init__(self, region, profile=None, assume_role=None, external_id=None):
         self.region = region

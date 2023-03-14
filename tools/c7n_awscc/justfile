@@ -1,0 +1,6 @@
+
+
+lint:
+    black c7n_awscc tests
+    flake8 c7n_awscc tests
+

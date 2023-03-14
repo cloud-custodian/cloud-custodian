@@ -1,0 +1,49 @@
+{
+    "status_code": 200,
+    "data": {
+        "EvaluationResults": [
+            {
+                "EvaluationResultIdentifier": {
+                    "EvaluationResultQualifier": {
+                        "ConfigRuleName": "custodian-dev",
+                        "ResourceType": "AWS::ApiGateway::Stage",
+                        "ResourceId": "arn:aws:apigateway:us-west-2::/restapis/atgw0gohmh/stages/test"
+                    },
+                    "OrderingTimestamp": {
+                        "__class__": "datetime",
+                        "year": 2022,
+                        "month": 9,
+                        "day": 22,
+                        "hour": 15,
+                        "minute": 29,
+                        "second": 18,
+                        "microsecond": 0
+                    }
+                },
+                "ComplianceType": "NON_COMPLIANT",
+                "ResultRecordedTime": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 9,
+                    "day": 22,
+                    "hour": 15,
+                    "minute": 29,
+                    "second": 57,
+                    "microsecond": 493000
+                },
+                "ConfigRuleInvokedTime": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 9,
+                    "day": 22,
+                    "hour": 15,
+                    "minute": 29,
+                    "second": 55,
+                    "microsecond": 282000
+                },
+                "Annotation": "The resource is not compliant with policy:dev."
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

@@ -1,18 +1,16 @@
-from __future__ import absolute_import, division, print_function, unicode_literals
-
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import argparse
 import functools
 import logging
 from os import path
 
-import boto3
 import jsonschema
+import yaml
 from c7n_mailer import deploy, utils
-from c7n_mailer.azure_mailer.azure_queue_processor import MailerAzureQueueProcessor
 from c7n_mailer.azure_mailer import deploy as azure_deploy
-from c7n_mailer.sqs_queue_processor import MailerSqsQueueProcessor
-from c7n_mailer.utils import get_provider, Providers
-from ruamel import yaml
+# from c7n_mailer.gcp_mailer import deploy as gcp_deploy
+from c7n_mailer.utils import session_factory, get_processor, get_provider, Providers
 
 AZURE_KV_SECRET_SCHEMA = {
     'type': 'object',
@@ -24,10 +22,21 @@ AZURE_KV_SECRET_SCHEMA = {
     'additionalProperties': False
 }
 
+GCP_SECRET_SCHEMA = {
+    'type': 'object',
+    'properties': {
+        'type': {'enum': ['gcp.secretmanager']},
+        'secret': {'type': 'string'}
+    },
+    'required': ['type', 'secret'],
+    'additionalProperties': False
+}
+
 SECURED_STRING_SCHEMA = {
     'oneOf': [
         {'type': 'string'},
-        AZURE_KV_SECRET_SCHEMA
+        AZURE_KV_SECRET_SCHEMA,
+        GCP_SECRET_SCHEMA
     ]
 }
 
@@ -39,7 +48,14 @@ CONFIG_SCHEMA = {
     'required': ['queue_url'],
     'properties': {
         'queue_url': {'type': 'string'},
+        'endpoint_url': {'type': 'string'},
         'from_address': {'type': 'string'},
+        'additional_email_headers': {
+            'type': 'object',
+            'patternProperties': {
+                '': {'type': 'string'},
+            }
+        },
         'contact_tags': {'type': 'array', 'items': {'type': 'string'}},
         'org_domain': {'type': 'string'},
 
@@ -60,6 +76,16 @@ CONFIG_SCHEMA = {
         # Azure Function Config
         'function_properties': {
             'type': 'object',
+            'identity': {
+                'type': 'object',
+                'additionalProperties': False,
+                'properties': {
+                    'type': {'enum': [
+                        "Embedded", "SystemAssigned", "UserAssigned"]},
+                    'client_id': {'type': 'string'},
+                    'id': {'type': 'string'},
+                },
+            },
             'appInsights': {
                 'type': 'object',
                 'oneOf': [
@@ -99,9 +125,11 @@ CONFIG_SCHEMA = {
                 ]
             },
         },
-        'function_schedule': {'type': 'string'},
-        'function_skuCode': {'type': 'string'},
-        'function_sku': {'type': 'string'},
+        # GCP Cloud Function Config # TODO:
+        # 'function_schedule': {'type': 'string'},
+        # 'function_skuCode': {'type': 'string'},
+        # 'function_sku': {'type': 'string'},
+        'email_base_url': {'type': 'string'},
 
         # Mailer Infrastructure Config
         'cache_engine': {'type': 'string'},
@@ -121,7 +149,7 @@ CONFIG_SCHEMA = {
         'ldap_manager_attribute': {'type': 'string'},
         'ldap_email_attribute': {'type': 'string'},
         'ldap_bind_password_in_kms': {'type': 'boolean'},
-        'ldap_bind_password': {'type': 'string'},
+        'ldap_bind_password': SECURED_STRING_SCHEMA,
         'cross_accounts': {'type': 'object'},
         'ses_region': {'type': 'string'},
         'redis_host': {'type': 'string'},
@@ -140,6 +168,7 @@ CONFIG_SCHEMA = {
         'splunk_actions_list': {'type': 'boolean'},
         'splunk_max_attempts': {'type': 'integer'},
         'splunk_hec_max_length': {'type': 'integer'},
+        'splunk_hec_sourcetype': {'type': 'string'},
 
         # SDK Config
         'profile': {'type': 'string'},
@@ -150,12 +179,6 @@ CONFIG_SCHEMA = {
         'account_emails': {'type': 'object'}
     }
 }
-
-
-def session_factory(mailer_config):
-    return boto3.Session(
-        region_name=mailer_config['region'],
-        profile_name=mailer_config.get('profile', None))
 
 
 def get_logger(debug=False):
@@ -233,6 +256,8 @@ def main():
 
         if provider == Providers.Azure:
             azure_deploy.provision(mailer_config)
+        # elif provider == Providers.GCP:  # TODO:
+        #     gcp_deploy.provision(mailer_config)
         elif provider == Providers.AWS:
             deploy.provision(mailer_config, functools.partial(session_factory, mailer_config))
 
@@ -240,11 +265,7 @@ def main():
         max_num_processes = args_dict.get('max_num_processes')
 
         # Select correct processor
-        if provider == Providers.Azure:
-            processor = MailerAzureQueueProcessor(mailer_config, logger)
-        elif provider == Providers.AWS:
-            aws_session = session_factory(mailer_config)
-            processor = MailerSqsQueueProcessor(mailer_config, aws_session, logger)
+        processor = get_processor(mailer_config, logger)
 
         # Execute
         if max_num_processes:

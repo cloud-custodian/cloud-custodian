@@ -1,0 +1,34 @@
+{
+    "status_code": 200,
+    "data": {
+        "Cluster": {
+            "BackupPolicy": "DEFAULT",
+            "BackupRetentionPolicy": {
+                "Type": "DAYS",
+                "Value": "90"
+            },
+            "ClusterId": "cluster-mrq6aozbe5s",
+            "CreateTimestamp": {
+                "__class__": "datetime",
+                "year": 2022,
+                "month": 11,
+                "day": 15,
+                "hour": 10,
+                "minute": 30,
+                "second": 15,
+                "microsecond": 468000
+            },
+            "Hsms": [],
+            "HsmType": "hsm1.medium",
+            "SecurityGroup": "sg-0e3c27dfc7ba4648d",
+            "State": "DELETE_IN_PROGRESS",
+            "StateMessage": "The cluster is being deleted.",
+            "SubnetMapping": {
+                "us-east-1a": "subnet-914763e7"
+            },
+            "VpcId": "vpc-d2d616b5",
+            "Certificates": {}
+        },
+        "ResponseMetadata": {}
+    }
+}

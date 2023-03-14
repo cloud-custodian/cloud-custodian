@@ -1,0 +1,22 @@
+{
+    "status_code": 200,
+    "data": {
+        "EndpointConfigs": [
+            {
+                "EndpointConfigName": "kms-test",
+                "EndpointConfigArn": "arn:aws:sagemaker:us-east-1:644160558196:endpoint-config/kms-test",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 4,
+                    "day": 20,
+                    "hour": 22,
+                    "minute": 59,
+                    "second": 24,
+                    "microsecond": 590000
+                }
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

@@ -1,54 +1,44 @@
 {
-    "status_code": 200,
-    "data": {
-        "Tags": [
-            {
-                "Key": "aws:autoscaling:groupName",
-                "ResourceId": "i-0aca1d4f8f943d73e",
-                "ResourceType": "instance",
-                "Value": "test2"
-            },
-            {
-                "Key": "aws:ec2launchtemplate:id",
-                "ResourceId": "i-0aca1d4f8f943d73e",
-                "ResourceType": "instance",
-                "Value": "lt-0877401c93c294001"
-            },
-            {
-                "Key": "aws:ec2launchtemplate:version",
-                "ResourceId": "i-0aca1d4f8f943d73e",
-                "ResourceType": "instance",
-                "Value": "4"
-            },
-            {
-                "Key": "aws:autoscaling:groupName",
-                "ResourceId": "i-0db184a69847143fb",
-                "ResourceType": "instance",
-                "Value": "test2"
-            },
-            {
-                "Key": "aws:ec2launchtemplate:id",
-                "ResourceId": "i-0db184a69847143fb",
-                "ResourceType": "instance",
-                "Value": "lt-0877401c93c294001"
-            },
-            {
-                "Key": "aws:ec2launchtemplate:version",
-                "ResourceId": "i-0db184a69847143fb",
-                "ResourceType": "instance",
-                "Value": "4"
-            }
-        ],
-        "ResponseMetadata": {
-            "RequestId": "9ba8de1b-bd9d-43f1-a69f-e94707e4c481",
-            "HTTPStatusCode": 200,
-            "HTTPHeaders": {
-                "content-type": "text/xml;charset=UTF-8",
-                "content-length": "1573",
-                "date": "Thu, 28 Feb 2019 14:28:01 GMT",
-                "server": "AmazonEC2"
-            },
-            "RetryAttempts": 0
-        }
-    }
+  "status_code": 200,
+  "data": {
+    "Tags": [
+      {
+        "Key": "aws:autoscaling:groupName",
+        "ResourceId": "i-0aca1d4f8f943d73e",
+        "ResourceType": "instance",
+        "Value": "test2"
+      },
+      {
+        "Key": "aws:ec2launchtemplate:id",
+        "ResourceId": "i-0aca1d4f8f943d73e",
+        "ResourceType": "instance",
+        "Value": "lt-0877401c93c294001"
+      },
+      {
+        "Key": "aws:ec2launchtemplate:version",
+        "ResourceId": "i-0aca1d4f8f943d73e",
+        "ResourceType": "instance",
+        "Value": "4"
+      },
+      {
+        "Key": "aws:autoscaling:groupName",
+        "ResourceId": "i-0db184a69847143fb",
+        "ResourceType": "instance",
+        "Value": "test2"
+      },
+      {
+        "Key": "aws:ec2launchtemplate:id",
+        "ResourceId": "i-0db184a69847143fb",
+        "ResourceType": "instance",
+        "Value": "lt-0877401c93c294001"
+      },
+      {
+        "Key": "aws:ec2launchtemplate:version",
+        "ResourceId": "i-0db184a69847143fb",
+        "ResourceType": "instance",
+        "Value": "4"
+      }
+    ],
+    "ResponseMetadata": {}
+  }
 }

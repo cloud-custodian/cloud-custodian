@@ -1,48 +1,24 @@
 {
-    "status_code": 200, 
+    "status_code": 200,
     "data": {
-        "ResponseMetadata": {
-            "RetryAttempts": 0, 
-            "HTTPStatusCode": 200, 
-            "RequestId": "5b77d89e-a46d-11e6-9f53-4d19b0ae14a7", 
-            "HTTPHeaders": {
-                "x-amzn-requestid": "5b77d89e-a46d-11e6-9f53-4d19b0ae14a7", 
-                "date": "Sun, 06 Nov 2016 22:07:07 GMT", 
-                "content-length": "1521", 
-                "content-type": "text/xml"
-            }
-        }, 
         "DBSubnetGroups": [
             {
-                "Subnets": [
-                    {
-                        "SubnetStatus": "Active", 
-                        "SubnetIdentifier": "subnet-15452171", 
-                        "SubnetAvailabilityZone": {
-                            "Name": "us-west-2a"
-                        }
-                    }, 
-                    {
-                        "SubnetStatus": "Active", 
-                        "SubnetIdentifier": "subnet-63c97615", 
-                        "SubnetAvailabilityZone": {
-                            "Name": "us-west-2b"
-                        }
-                    }, 
-                    {
-                        "SubnetStatus": "Active", 
-                        "SubnetIdentifier": "subnet-5fb47507", 
-                        "SubnetAvailabilityZone": {
-                            "Name": "us-west-2c"
-                        }
-                    }
-                ], 
-                "VpcId": "vpc-4a9ff72e", 
-                "DBSubnetGroupDescription": "default", 
-                "SubnetGroupStatus": "Complete", 
-                "DBSubnetGroupArn": "arn:aws:rds:us-west-2:644160558196:subgrp:default", 
-                "DBSubnetGroupName": "default"
+                "DBSubnetGroupName": "default",
+                "DBSubnetGroupDescription": "default",
+                "VpcId": "vpc-d2d616b5",
+                "SubnetGroupStatus": "Complete",
+                "Subnets": [],
+                "DBSubnetGroupArn": "arn:aws:rds:us-east-1:644160558196:subgrp:default"
+            },
+            {
+                "DBSubnetGroupName": "not-used",
+                "DBSubnetGroupDescription": "not used",
+                "VpcId": "vpc-d2d616b5",
+                "SubnetGroupStatus": "Complete",
+                "Subnets": [],
+                "DBSubnetGroupArn": "arn:aws:rds:us-east-1:644160558196:subgrp:not-used"
             }
-        ]
+        ],
+        "ResponseMetadata": {}
     }
 }

@@ -2,12 +2,18 @@
 
 set -e
 
+rg_name=cloud-custodian-test-functions-$RANDOM
+rg_identity_name="${rg_name}-identity"
+identity_name="c7n-identity"
+
 function cleanup {
     set +e
+    rm -f policies.yaml
     echo "Removing resource groups"
-    $(az group delete -n custodian-function-test-rg -y)
-    $(az group delete -n custodian-function-test-dedicated -y)
-    $(az group delete -n custodian-function-test-consumption -y)
+    $(az group delete -n ${rg_name} -y)
+    $(az group delete -n ${rg_name}-dedicated -y)
+    $(az group delete -n ${rg_name}-consumption -y)
+    $(az group delete -n ${rg_identity_name}-consumption -y)
 }
 trap cleanup EXIT
 
@@ -15,14 +21,19 @@ echo "Logging to Azure"
 az login --service-principal -u $AZURE_CLIENT_ID -p $AZURE_CLIENT_SECRET -t $AZURE_TENANT_ID -o none
 az account set -s $AZURE_SUBSCRIPTION_ID -o none
 
+echo "Creating user managed identity"
+az group create -l westus -n ${rg_identity_name} -o none
+identity_principal=$(az identity create -g ${rg_identity_name} --name ${identity_name} --query clientId -o tsv)
+sleep 60
+az role assignment create --assignee-object-id ${identity_principal} --assignee-principal-type "ServicePrincipal" --role "Owner" --scope "/subscriptions/${AZURE_SUBSCRIPTION_ID}" -o None
+
+eval "echo \"$(cat templates/policies.yaml)\"" > policies.yaml
+
 echo "Running Cloud Custodian"
-custodian run -s=/dev/null policy_timer_dedicated.yaml
-custodian run -s=/dev/null policy_event_dedicated.yaml
-custodian run -s=/dev/null policy_timer_consumption.yaml
-custodian run -s=/dev/null policy_event_consumption.yaml
+custodian run -s=/dev/null policies.yaml
 
 echo "Creating new resource group"
-az group create -l westus -n custodian-function-test-rg -o none
+az group create -l westus -n ${rg_name} -o none
 
 result=1
 max_attempts=60
@@ -32,7 +43,7 @@ for i in $(seq 1 ${max_attempts})
 do
     sleep 30s
     echo "Attempt ${i}/${max_attempts}..."
-    tags=$(az group show -n custodian-function-test-rg --query 'tags' -o json)
+    tags=$(az group show -n ${rg_name} --query 'tags' -o json)
     echo ${tags}
     if [[ $(echo $tags | grep -o 'custodian-function-' | wc -l) -eq 4 ]]; then
         result=0

@@ -1,0 +1,27 @@
+{
+    "status_code": 200,
+    "data": {
+        "KeyMetadata": {
+            "AWSAccountId": "644160558196",
+            "KeyId": "f1f33a6b-91aa-4b0a-904c-f2a0378277f0",
+            "Arn": "arn:aws:kms:us-east-1:644160558196:key/f1f33a6b-91aa-4b0a-904c-f2a0378277f0",
+            "CreationDate": {
+                "__class__": "datetime",
+                "year": 2017,
+                "month": 10,
+                "day": 31,
+                "hour": 5,
+                "minute": 2,
+                "second": 54,
+                "microsecond": 335000
+            },
+            "Enabled": true,
+            "Description": "Default master key that protects my DMS replication instance volumes when no other key is defined",
+            "KeyUsage": "ENCRYPT_DECRYPT",
+            "KeyState": "Enabled",
+            "Origin": "AWS_KMS",
+            "KeyManager": "AWS"
+        },
+        "ResponseMetadata": {}
+    }
+}

@@ -1,0 +1,9 @@
+{
+    "status_code": 200,
+    "data": {
+        "UserId": "AROAXYCHC33BTMJIK3JOU:sonny@stacklet.io",
+        "Account": "644160558196",
+        "Arn": "arn:aws:sts::644160558196:assumed-role/AWSReservedSSO_AWSAdministratorAccess_32be95b7471a99e1/sonny@stacklet.io",
+        "ResponseMetadata": {}
+    }
+}

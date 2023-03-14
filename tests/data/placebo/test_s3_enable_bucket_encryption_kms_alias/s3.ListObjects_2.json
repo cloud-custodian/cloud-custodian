@@ -1,0 +1,12 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "IsTruncated": false,
+        "Marker": "",
+        "Name": "custodian-enable-bucket-encryption-kms-alias",
+        "Prefix": "",
+        "MaxKeys": 1000,
+        "EncodingType": "url"
+    }
+}

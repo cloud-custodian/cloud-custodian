@@ -1,0 +1,50 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {
+            "RequestId": "c911eebe-3bc1-4360-9e40-58a0a5d06554",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "c911eebe-3bc1-4360-9e40-58a0a5d06554",
+                "content-type": "application/json",
+                "content-length": "528",
+                "date": "Sun, 26 Jan 2020 00:35:38 GMT"
+            },
+            "RetryAttempts": 0
+        },
+        "FileSystems": [
+            {
+                "OwnerId": "644160558196",
+                "CreationToken": "console-13ad1ab9-b969-4df9-9dd4-f4fa152d45f3",
+                "FileSystemId": "fs-fac23c7a",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 1,
+                    "day": 25,
+                    "hour": 19,
+                    "minute": 11,
+                    "second": 48,
+                    "microsecond": 0
+                },
+                "LifeCycleState": "available",
+                "Name": "c7n-test",
+                "NumberOfMountTargets": 1,
+                "SizeInBytes": {
+                    "Value": 6144,
+                    "ValueInIA": 0,
+                    "ValueInStandard": 6144
+                },
+                "PerformanceMode": "generalPurpose",
+                "Encrypted": false,
+                "ThroughputMode": "bursting",
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "c7n-test"
+                    }
+                ]
+            }
+        ]
+    }
+}

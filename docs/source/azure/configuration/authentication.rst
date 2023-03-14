@@ -90,7 +90,7 @@ For fake test authentication, environment variables should be configured:
     AZURE_ACCESS_TOKEN=fake_token
     AZURE_SUBSCRIPTION_ID=ea42f556-5106-4743-99b0-c129bfa71a47
 
-You will also find this configuration in tox.ini.
+You will also find this configuration in `test.env`.
 
 Managed Service Identity
 ------------------------
@@ -155,3 +155,20 @@ Note: you cannot leverage Azure Storage functionality if you use Access Token fo
 
 More details about Azure Storage access rights:
 `Azure Documents <https://docs.microsoft.com/en-us/azure/storage/common/storage-auth-aad-rbac>`_
+
+Azure Cloud Offerings
+---------------------
+
+Cloud Custodian supports four different Cloud offerings:
+1. Default Azure Public Cloud (`AzureCloud`)
+2. Azure China Cloud (`AzureChinaCloud`)
+3. Azure German Cloud (`AzureGermanCloud`)
+4. Azure US Government (`AzureUSGovernment`)
+
+To target these Clouds, pass the cloud name in the ``--region`` flag
+
+.. code-block:: bash
+
+    custodian run -s . --region=AzureChinaCloud my-policy.yml
+
+**Note**: All Custodian features may not be available in every Cloud.

@@ -1,25 +1,14 @@
-# Copyright 2016-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import json
 import hashlib
 import operator
 
+from concurrent.futures import as_completed
 from c7n.actions import Action
 from c7n.exceptions import PolicyValidationError
-from c7n.filters import Filter
+from c7n.filters import Filter, CrossAccountAccessFilter
+from c7n.filters.kms import KmsRelatedFilter
 from c7n.query import QueryResourceManager, TypeInfo
 from c7n.manager import resources
 from c7n.tags import universal_augment
@@ -40,12 +29,27 @@ class SSMParameter(QueryResourceManager):
         id = "Name"
         universal_taggable = True
         arn_type = "parameter"
+        cfn_type = 'AWS::SSM::Parameter'
 
     retry = staticmethod(get_retry(('Throttled',)))
     permissions = ('ssm:GetParameters',
                    'ssm:DescribeParameters')
 
     augment = universal_augment
+
+
+@SSMParameter.action_registry.register('delete')
+class DeleteParameter(Action):
+
+    schema = type_schema('delete')
+    permissions = ("ssm:DeleteParameter",)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('ssm')
+        for r in resources:
+            self.manager.retry(
+                client.delete_parameter, Name=r['Name'],
+                ignore_err_codes=('ParameterNotFound',))
 
 
 @resources.register('ssm-managed-instance')
@@ -178,7 +182,7 @@ class OpsItem(QueryResourceManager):
             'Status', 'Title', 'LastModifiedTime',
             'CreatedBy', 'CreatedTime')
 
-    QueryKeys = set((
+    QueryKeys = {
         'Status',
         'CreatedBy',
         'Source',
@@ -191,8 +195,8 @@ class OpsItem(QueryResourceManager):
         'OperationalDataKey',
         'OperationalDataValue',
         'ResourceId',
-        'AutomationId'))
-    QueryOperators = set(('Equal', 'LessThan', 'GreaterThan', 'Contains'))
+        'AutomationId'}
+    QueryOperators = {'Equal', 'LessThan', 'GreaterThan', 'Contains'}
 
     def validate(self):
         self.query = self.resource_query()
@@ -217,7 +221,7 @@ class OpsItem(QueryResourceManager):
         filters = []
         for q in self.data.get('query', ()):
             if (not isinstance(q, dict) or
-                not set(q.keys()) == set(('Key', 'Values', 'Operator')) or
+                not set(q.keys()) == {'Key', 'Values', 'Operator'} or
                 q['Key'] not in self.QueryKeys or
                     q['Operator'] not in self.QueryOperators):
                 raise PolicyValidationError(
@@ -350,13 +354,12 @@ class OpsItemFilter(Filter):
         return {'OpsItemFilters': q}
 
     @classmethod
-    def register(cls, registry, _):
-        for resource in registry.keys():
-            klass = registry.get(resource)
-            klass.filter_registry.register('ops-item', cls)
+    def register_resource(cls, registry, resource_class):
+        if 'ops-item' not in resource_class.filter_registry:
+            resource_class.filter_registry.register('ops-item', cls)
 
 
-resources.subscribe(resources.EVENT_FINAL, OpsItemFilter.register)
+resources.subscribe(OpsItemFilter.register_resource)
 
 
 class PostItem(Action):
@@ -527,7 +530,7 @@ class PostItem(Action):
                 remainder.append(a)
 
         for i in items:
-            if not i['OpsItemId'] in updated:
+            if i['OpsItemId'] not in updated:
                 continue
             i = dict(i)
             for k in ('CreatedBy', 'CreatedTime', 'Source', 'LastModifiedBy',
@@ -547,7 +550,7 @@ class PostItem(Action):
             self.manager.config.region,
             self.manager.config.account_id)).encode('utf8')
         # size restrictions on this value is 4-20, digest is 32
-        dedup = hashlib.md5(dedup).hexdigest()[:20]
+        dedup = hashlib.md5(dedup).hexdigest()[:20]  # nosec nosemgrep
 
         i = dict(
             Title=title,
@@ -590,10 +593,240 @@ class PostItem(Action):
         return filter_empty(i)
 
     @classmethod
-    def register(cls, registry, _):
-        for resource in registry.keys():
-            klass = registry.get(resource)
-            klass.action_registry.register('post-item', cls)
+    def register_resource(cls, registry, resource_class):
+        if 'post-item' not in resource_class.action_registry:
+            resource_class.action_registry.register('post-item', cls)
 
 
-resources.subscribe(resources.EVENT_FINAL, PostItem.register)
+resources.subscribe(PostItem.register_resource)
+
+
+@resources.register('ssm-document')
+class SSMDocument(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'ssm'
+        enum_spec = ('list_documents', 'DocumentIdentifiers', {'Filters': [
+            {
+                'Key': 'Owner',
+                'Values': ['Self']}]})
+        name = id = 'Name'
+        date = 'RegistrationDate'
+        arn_type = 'document'
+
+    permissions = ('ssm:ListDocuments',)
+
+
+@SSMDocument.filter_registry.register('cross-account')
+class SSMDocumentCrossAccount(CrossAccountAccessFilter):
+    """Filter SSM documents which have cross account permissions
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: ssm-cross-account
+                resource: ssm-document
+                filters:
+                  - type: cross-account
+                    whitelist: [xxxxxxxxxxxx]
+    """
+
+    permissions = ('ssm:DescribeDocumentPermission',)
+
+    def process(self, resources, event=None):
+        self.accounts = self.get_accounts()
+        results = []
+        client = local_session(self.manager.session_factory).client('ssm')
+        with self.executor_factory(max_workers=3) as w:
+            futures = []
+            for resource_set in chunks(resources, 10):
+                futures.append(w.submit(
+                    self.process_resource_set, client, resource_set))
+            for f in as_completed(futures):
+                if f.exception():
+                    self.log.error(
+                        "Exception checking cross account access \n %s" % (
+                            f.exception()))
+                    continue
+                results.extend(f.result())
+        return results
+
+    def process_resource_set(self, client, resource_set):
+        results = []
+        for r in resource_set:
+            attrs = self.manager.retry(
+                client.describe_document_permission,
+                Name=r['Name'],
+                PermissionType='Share',
+                ignore_err_codes=('InvalidDocument',))['AccountSharingInfoList']
+            shared_accounts = {
+                g.get('AccountId') for g in attrs}
+            delta_accounts = shared_accounts.difference(self.accounts)
+            if delta_accounts:
+                r['c7n:CrossAccountViolations'] = list(delta_accounts)
+                results.append(r)
+        return results
+
+
+@SSMDocument.action_registry.register('set-sharing')
+class RemoveSharingSSMDocument(Action):
+    """Edit list of accounts that share permissions on an SSM document. Pass in a list of account
+    IDs to the 'add' or 'remove' fields to edit document sharing permissions.
+    Set 'remove' to 'matched' to automatically remove any external accounts on a
+    document (use in conjunction with the cross-account filter).
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: ssm-set-sharing
+                resource: ssm-document
+                filters:
+                  - type: cross-account
+                    whitelist: [xxxxxxxxxxxx]
+                actions:
+                  - type: set-sharing
+                    add: [yyyyyyyyyy]
+                    remove: matched
+    """
+
+    schema = type_schema('set-sharing',
+                        remove={
+                            'oneOf': [
+                                {'enum': ['matched']},
+                                {'type': 'array', 'items': {
+                                    'type': 'string'}},
+                            ]},
+                        add={
+                            'type': 'array', 'items': {
+                                'type': 'string'}})
+    permissions = ('ssm:ModifyDocumentPermission',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('ssm')
+        add_accounts = self.data.get('add', [])
+        remove_accounts = self.data.get('remove', [])
+        if self.data.get('remove') == 'matched':
+            for r in resources:
+                try:
+                    client.modify_document_permission(
+                        Name=r['Name'],
+                        PermissionType='Share',
+                        AccountIdsToAdd=add_accounts,
+                        AccountIdsToRemove=r['c7n:CrossAccountViolations']
+                    )
+                except client.exceptions.InvalidDocumentOperation as e:
+                    raise e
+        else:
+            for r in resources:
+                try:
+                    client.modify_document_permission(
+                        Name=r['Name'],
+                        PermissionType='Share',
+                        AccountIdsToAdd=add_accounts,
+                        AccountIdsToRemove=remove_accounts
+                    )
+                except client.exceptions.InvalidDocumentOperation as e:
+                    raise e
+
+
+@SSMDocument.action_registry.register('delete')
+class DeleteSSMDocument(Action):
+    """Delete SSM documents. Set force flag to True to force delete on documents that are
+    shared across accounts. This will remove those shared accounts, and then delete the document.
+    Otherwise, delete will fail and raise InvalidDocumentOperation exception
+    if a document is shared with other accounts. Default value for force is False.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: ssm-delete-documents
+                resource: ssm-document
+                filters:
+                  - type: cross-account
+                    whitelist: [xxxxxxxxxxxx]
+                actions:
+                  - type: delete
+                    force: True
+    """
+
+    schema = type_schema(
+        'delete',
+        force={'type': 'boolean'}
+    )
+
+    permissions = ('ssm:DeleteDocument', 'ssm:ModifyDocumentPermission',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('ssm')
+        for r in resources:
+            try:
+                client.delete_document(Name=r['Name'], Force=True)
+            except client.exceptions.InvalidDocumentOperation as e:
+                if self.data.get('force', False):
+                    response = client.describe_document_permission(
+                        Name=r['Name'],
+                        PermissionType='Share'
+                    )
+                    client.modify_document_permission(
+                        Name=r['Name'],
+                        PermissionType='Share',
+                        AccountIdsToRemove=response.get('AccountIds', [])
+                    )
+                    client.delete_document(
+                        Name=r['Name'],
+                        Force=True
+                    )
+                else:
+                    raise e
+
+
+@resources.register('ssm-data-sync')
+class SSMDataSync(QueryResourceManager):
+    """Resource for AWS DataSync
+    https://docs.aws.amazon.com/systems-manager/latest/userguide/sysman-inventory-datasync.html
+    """
+    class resource_type(TypeInfo):
+
+        enum_spec = ('list_resource_data_sync', 'ResourceDataSyncItems', None)
+        service = 'ssm'
+        arn_type = 'resource-data-sync'
+        id = name = 'SyncName'
+
+    permissions = ('ssm:ListResourceDataSync',)
+
+
+@SSMDataSync.filter_registry.register('kms-key')
+class KmsFilter(KmsRelatedFilter):
+    RelatedIdsExpression = 'S3Destination.AWSKMSKeyARN'
+
+
+@SSMDataSync.action_registry.register('delete')
+class DeleteDataSync(Action):
+    """Delete SSM data sync resources.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: delete-resource-data-sync
+            resource: ssm-data-sync
+            actions:
+              - type: delete
+    """
+    permissions = ('ssm:DeleteResourceDataSync',)
+    schema = type_schema('delete')
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('ssm')
+        for r in resources:
+            try:
+                client.delete_resource_data_sync(SyncName=r['SyncName'])
+            except client.exceptions.ResourceDataSyncNotFoundException:
+                continue

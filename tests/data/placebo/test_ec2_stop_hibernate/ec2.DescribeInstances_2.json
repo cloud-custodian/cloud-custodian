@@ -1,0 +1,315 @@
+{
+    "status_code": 200,
+    "data": {
+        "Reservations": [
+            {
+                "Groups": [],
+                "Instances": [
+                    {
+                        "AmiLaunchIndex": 0,
+                        "ImageId": "ami-04590e7389a6e577c",
+                        "InstanceId": "i-07c27e1f49b65196b",
+                        "InstanceType": "t2.micro",
+                        "LaunchTime": {
+                            "__class__": "datetime",
+                            "year": 2020,
+                            "month": 2,
+                            "day": 14,
+                            "hour": 22,
+                            "minute": 2,
+                            "second": 49,
+                            "microsecond": 0
+                        },
+                        "Monitoring": {
+                            "State": "disabled"
+                        },
+                        "Placement": {
+                            "AvailabilityZone": "us-west-2b",
+                            "GroupName": "",
+                            "Tenancy": "default"
+                        },
+                        "PrivateDnsName": "ip-10-92-38-136.us-west-2.compute.internal",
+                        "PrivateIpAddress": "10.92.38.136",
+                        "ProductCodes": [],
+                        "PublicDnsName": "",
+                        "State": {
+                            "Code": 80,
+                            "Name": "stopped"
+                        },
+                        "StateTransitionReason": "User initiated (2020-02-14 22:03:45 GMT)",
+                        "SubnetId": "subnet-058eb3a06002cfe49",
+                        "VpcId": "vpc-04445e6bd4e9255b4",
+                        "Architecture": "x86_64",
+                        "BlockDeviceMappings": [
+                            {
+                                "DeviceName": "/dev/xvda",
+                                "Ebs": {
+                                    "AttachTime": {
+                                        "__class__": "datetime",
+                                        "year": 2020,
+                                        "month": 2,
+                                        "day": 11,
+                                        "hour": 16,
+                                        "minute": 55,
+                                        "second": 31,
+                                        "microsecond": 0
+                                    },
+                                    "DeleteOnTermination": true,
+                                    "Status": "attached",
+                                    "VolumeId": "vol-0564106182b323e2f"
+                                }
+                            }
+                        ],
+                        "ClientToken": "",
+                        "EbsOptimized": false,
+                        "EnaSupport": true,
+                        "Hypervisor": "xen",
+                        "NetworkInterfaces": [
+                            {
+                                "Attachment": {
+                                    "AttachTime": {
+                                        "__class__": "datetime",
+                                        "year": 2020,
+                                        "month": 2,
+                                        "day": 11,
+                                        "hour": 16,
+                                        "minute": 55,
+                                        "second": 30,
+                                        "microsecond": 0
+                                    },
+                                    "AttachmentId": "eni-attach-0014eb62edc32e078",
+                                    "DeleteOnTermination": true,
+                                    "DeviceIndex": 0,
+                                    "Status": "attached"
+                                },
+                                "Description": "Primary network interface",
+                                "Groups": [
+                                    {
+                                        "GroupName": "launch-wizard-2",
+                                        "GroupId": "sg-00eb39e5e552ad2f2"
+                                    }
+                                ],
+                                "Ipv6Addresses": [],
+                                "MacAddress": "06:af:6c:21:11:1a",
+                                "NetworkInterfaceId": "eni-02077892d27b5340f",
+                                "OwnerId": "123456789012",
+                                "PrivateDnsName": "ip-10-92-38-136.us-west-2.compute.internal",
+                                "PrivateIpAddress": "10.92.38.136",
+                                "PrivateIpAddresses": [
+                                    {
+                                        "Primary": true,
+                                        "PrivateDnsName": "ip-10-92-38-136.us-west-2.compute.internal",
+                                        "PrivateIpAddress": "10.92.38.136"
+                                    }
+                                ],
+                                "SourceDestCheck": true,
+                                "Status": "in-use",
+                                "SubnetId": "subnet-058eb3a06002cfe49",
+                                "VpcId": "vpc-04445e6bd4e9255b4",
+                                "InterfaceType": "interface"
+                            }
+                        ],
+                        "RootDeviceName": "/dev/xvda",
+                        "RootDeviceType": "ebs",
+                        "SecurityGroups": [
+                            {
+                                "GroupName": "launch-wizard-2",
+                                "GroupId": "sg-00eb39e5e552ad2f2"
+                            }
+                        ],
+                        "SourceDestCheck": true,
+                        "StateReason": {
+                            "Code": "Client.UserInitiatedShutdown",
+                            "Message": "Client.UserInitiatedShutdown: User initiated shutdown"
+                        },
+                        "Tags": [
+                            {
+                                "Key": "Testing",
+                                "Value": "yes"
+                            }
+                        ],
+                        "VirtualizationType": "hvm",
+                        "CpuOptions": {
+                            "CoreCount": 1,
+                            "ThreadsPerCore": 1
+                        },
+                        "CapacityReservationSpecification": {
+                            "CapacityReservationPreference": "open"
+                        },
+                        "HibernationOptions": {
+                            "Configured": false
+                        },
+                        "MetadataOptions": {
+                            "State": "applied",
+                            "HttpTokens": "optional",
+                            "HttpPutResponseHopLimit": 1,
+                            "HttpEndpoint": "enabled"
+                        }
+                    }
+                ],
+                "OwnerId": "123456789012",
+                "ReservationId": "r-06762b640bf9c8f86"
+            },
+            {
+                "Groups": [],
+                "Instances": [
+                    {
+                        "AmiLaunchIndex": 0,
+                        "ImageId": "ami-0e8c04af2729ff1bb",
+                        "InstanceId": "i-0b368f4b8fbd34f3a",
+                        "InstanceType": "c5.large",
+                        "LaunchTime": {
+                            "__class__": "datetime",
+                            "year": 2020,
+                            "month": 2,
+                            "day": 14,
+                            "hour": 22,
+                            "minute": 2,
+                            "second": 42,
+                            "microsecond": 0
+                        },
+                        "Monitoring": {
+                            "State": "disabled"
+                        },
+                        "Placement": {
+                            "AvailabilityZone": "us-west-2b",
+                            "GroupName": "",
+                            "Tenancy": "default"
+                        },
+                        "PrivateDnsName": "ip-10-92-36-186.us-west-2.compute.internal",
+                        "PrivateIpAddress": "10.92.36.186",
+                        "ProductCodes": [],
+                        "PublicDnsName": "",
+                        "State": {
+                            "Code": 64,
+                            "Name": "stopping"
+                        },
+                        "StateTransitionReason": "User initiated (2020-02-14 22:03:45 GMT)",
+                        "SubnetId": "subnet-058eb3a06002cfe49",
+                        "VpcId": "vpc-04445e6bd4e9255b4",
+                        "Architecture": "x86_64",
+                        "BlockDeviceMappings": [
+                            {
+                                "DeviceName": "/dev/xvda",
+                                "Ebs": {
+                                    "AttachTime": {
+                                        "__class__": "datetime",
+                                        "year": 2020,
+                                        "month": 2,
+                                        "day": 14,
+                                        "hour": 21,
+                                        "minute": 9,
+                                        "second": 29,
+                                        "microsecond": 0
+                                    },
+                                    "DeleteOnTermination": true,
+                                    "Status": "attached",
+                                    "VolumeId": "vol-0a392ef8ccd01f06a"
+                                }
+                            }
+                        ],
+                        "ClientToken": "",
+                        "EbsOptimized": true,
+                        "EnaSupport": true,
+                        "Hypervisor": "xen",
+                        "NetworkInterfaces": [
+                            {
+                                "Attachment": {
+                                    "AttachTime": {
+                                        "__class__": "datetime",
+                                        "year": 2020,
+                                        "month": 2,
+                                        "day": 14,
+                                        "hour": 21,
+                                        "minute": 9,
+                                        "second": 29,
+                                        "microsecond": 0
+                                    },
+                                    "AttachmentId": "eni-attach-0084101e860ba0cd4",
+                                    "DeleteOnTermination": true,
+                                    "DeviceIndex": 0,
+                                    "Status": "attached"
+                                },
+                                "Description": "Primary network interface",
+                                "Groups": [
+                                    {
+                                        "GroupName": "launch-wizard-3",
+                                        "GroupId": "sg-021f3f7ab1719de5c"
+                                    }
+                                ],
+                                "Ipv6Addresses": [],
+                                "MacAddress": "06:93:b1:c9:ee:e8",
+                                "NetworkInterfaceId": "eni-02b787d5627e35819",
+                                "OwnerId": "123456789012",
+                                "PrivateDnsName": "ip-10-92-36-186.us-west-2.compute.internal",
+                                "PrivateIpAddress": "10.92.36.186",
+                                "PrivateIpAddresses": [
+                                    {
+                                        "Primary": true,
+                                        "PrivateDnsName": "ip-10-92-36-186.us-west-2.compute.internal",
+                                        "PrivateIpAddress": "10.92.36.186"
+                                    }
+                                ],
+                                "SourceDestCheck": true,
+                                "Status": "in-use",
+                                "SubnetId": "subnet-058eb3a06002cfe49",
+                                "VpcId": "vpc-04445e6bd4e9255b4",
+                                "InterfaceType": "interface"
+                            }
+                        ],
+                        "RootDeviceName": "/dev/xvda",
+                        "RootDeviceType": "ebs",
+                        "SecurityGroups": [
+                            {
+                                "GroupName": "launch-wizard-3",
+                                "GroupId": "sg-021f3f7ab1719de5c"
+                            }
+                        ],
+                        "SourceDestCheck": true,
+                        "StateReason": {
+                            "Code": "Client.UserInitiatedHibernate",
+                            "Message": "Client.UserInitiatedHibernate: User initiated hibernate"
+                        },
+                        "Tags": [
+                            {
+                                "Key": "Testing",
+                                "Value": "yes"
+                            }
+                        ],
+                        "VirtualizationType": "hvm",
+                        "CpuOptions": {
+                            "CoreCount": 1,
+                            "ThreadsPerCore": 2
+                        },
+                        "CapacityReservationSpecification": {
+                            "CapacityReservationPreference": "open"
+                        },
+                        "HibernationOptions": {
+                            "Configured": true
+                        },
+                        "MetadataOptions": {
+                            "State": "pending",
+                            "HttpTokens": "optional",
+                            "HttpPutResponseHopLimit": 1,
+                            "HttpEndpoint": "enabled"
+                        }
+                    }
+                ],
+                "OwnerId": "123456789012",
+                "ReservationId": "r-001ae77823a4413a5"
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "dea34803-c65f-45c7-a9db-0838415affec",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "content-type": "text/xml;charset=UTF-8",
+                "transfer-encoding": "chunked",
+                "vary": "accept-encoding",
+                "date": "Fri, 14 Feb 2020 22:04:10 GMT",
+                "server": "AmazonEC2"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

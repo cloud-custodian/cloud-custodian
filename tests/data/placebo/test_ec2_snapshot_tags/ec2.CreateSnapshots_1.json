@@ -1,0 +1,110 @@
+{
+    "status_code": 200,
+    "data": {
+        "Snapshots": [
+            {
+                "Description": "",
+                "Tags": [
+                    {
+                        "Key": "Stage",
+                        "Value": "Dev"
+                    },
+                    {
+                        "Key": "test-tag",
+                        "Value": "custodian"
+                    },
+                    {
+                        "Key": "Name",
+                        "Value": "Foo"
+                    }
+                ],
+                "Encrypted": false,
+                "VolumeId": "vol-0caf24c45a8aa4b11",
+                "State": "pending",
+                "VolumeSize": 8,
+                "StartTime": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 6,
+                    "day": 11,
+                    "hour": 21,
+                    "minute": 25,
+                    "second": 25,
+                    "microsecond": 0
+                },
+                "Progress": "",
+                "OwnerId": "644160558196",
+                "SnapshotId": "snap-07187bfeb49818609"
+            },
+            {
+                "Description": "",
+                "Tags": [
+                    {
+                        "Key": "Stage",
+                        "Value": "Dev"
+                    },
+                    {
+                        "Key": "test-tag",
+                        "Value": "custodian"
+                    },
+                    {
+                        "Key": "Name",
+                        "Value": "Foo"
+                    }
+                ],
+                "Encrypted": false,
+                "VolumeId": "vol-05117418b3ad30481",
+                "State": "pending",
+                "VolumeSize": 8,
+                "StartTime": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 6,
+                    "day": 11,
+                    "hour": 21,
+                    "minute": 25,
+                    "second": 25,
+                    "microsecond": 0
+                },
+                "Progress": "",
+                "OwnerId": "644160558196",
+                "SnapshotId": "snap-051cf33e858fe7bf7"
+            },
+            {
+                "Description": "",
+                "Tags": [
+                    {
+                        "Key": "Stage",
+                        "Value": "Dev"
+                    },
+                    {
+                        "Key": "test-tag",
+                        "Value": "custodian"
+                    },
+                    {
+                        "Key": "Name",
+                        "Value": "Foo"
+                    }
+                ],
+                "Encrypted": false,
+                "VolumeId": "vol-0188a91cfcb95c342",
+                "State": "pending",
+                "VolumeSize": 8,
+                "StartTime": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 6,
+                    "day": 11,
+                    "hour": 21,
+                    "minute": 25,
+                    "second": 25,
+                    "microsecond": 0
+                },
+                "Progress": "",
+                "OwnerId": "644160558196",
+                "SnapshotId": "snap-04589ad9a763d4cfd"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

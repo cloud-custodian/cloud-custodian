@@ -1,0 +1,66 @@
+# Syncs files from repository to blob storage
+
+# Triggers when a PR is opened into master branch
+pr:
+  - master
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+# Needed pipeline variables
+#   POLICY_FILE_PATH: path to the directory of files to copy
+
+steps:
+  - task: Bash@3
+    displayName: Git Diff and Custodian Install
+    inputs:
+      targetType: 'inline'
+      script: |
+        #Installs cask version of custodian
+        sudo sh -c 'wget -q https://cloudcustodian.io/downloads/custodian-cask/linux-latest/custodian-cask -O /usr/local/bin/custodian-cask && chmod +x /usr/local/bin/custodian-cask'
+
+        # Saves a list of all changed files locally
+        git diff --name-only origin/master -- $(POLICY_FILE_PATH) > changedfiles.txt
+
+  - task: Bash@3
+    displayName: Custodian Validate Schema
+    inputs:
+      targetType: 'inline'
+      script: |
+        declare -a policyFiles
+        declare -a failedFiles
+
+        # Creates an array of policy file paths
+        for file in `cat changedfiles.txt`
+        do
+          policyFiles=("${policyFiles[@]}" "$file")
+        done
+
+        if [ ${#policyFiles[@]} -eq 0 ]
+        then
+          echo "No policy files were modified"
+          exit 0
+        fi
+
+        # Runs custodian validate on them
+        tmpFile="temporarylogoutput.txt"
+        for file in `echo "${policyFiles[@]}"`
+        do
+          echo "Processing file: $file"
+          custodian-cask validate $file | tee $tmpFile
+          failed=`cat $tmpFile | grep ERROR | wc -l`
+          if [ $failed -gt 0 ]
+          then
+            failedFiles=("${failedFiles[@]}" "$file")
+          fi
+        done
+
+        rm $tmpFile
+        
+        numFailed=`echo ${#failedFiles[@]}`
+        if [ $numFailed -gt 0 ]
+        then
+          echo "##vso[task.logissue type=error]The following files do not have valid schemas: ${failedFiles[*]}"
+        fi
+
+        exit $numFailed

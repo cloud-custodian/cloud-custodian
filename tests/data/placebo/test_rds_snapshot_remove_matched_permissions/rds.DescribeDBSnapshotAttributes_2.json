@@ -1,0 +1,17 @@
+{
+    "status_code": 200,
+    "data": {
+        "DBSnapshotAttributesResult": {
+            "DBSnapshotIdentifier": "testing",
+            "DBSnapshotAttributes": [
+                {
+                    "AttributeName": "restore",
+                    "AttributeValues": [
+                        "644160558196"
+                    ]
+                }
+            ]
+        },
+        "ResponseMetadata": {}
+    }
+}

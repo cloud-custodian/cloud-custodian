@@ -1,0 +1,216 @@
+{
+    "status_code": 200,
+    "data": {
+        "Aliases": [
+            {
+                "AliasName": "alias/aws/dynamodb",
+                "AliasArn": "arn:aws:kms:us-east-2:644160558196:alias/aws/dynamodb"
+            },
+            {
+                "AliasName": "alias/aws/ebs",
+                "AliasArn": "arn:aws:kms:us-east-2:644160558196:alias/aws/ebs"
+            },
+            {
+                "AliasName": "alias/aws/elasticfilesystem",
+                "AliasArn": "arn:aws:kms:us-east-2:644160558196:alias/aws/elasticfilesystem"
+            },
+            {
+                "AliasName": "alias/aws/es",
+                "AliasArn": "arn:aws:kms:us-east-2:644160558196:alias/aws/es",
+                "TargetKeyId": "e0706ac4-e9c7-4685-9e75-be4e221d1e5a",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 11,
+                    "day": 29,
+                    "hour": 21,
+                    "minute": 33,
+                    "second": 0,
+                    "microsecond": 683000
+                },
+                "LastUpdatedDate": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 11,
+                    "day": 29,
+                    "hour": 21,
+                    "minute": 33,
+                    "second": 0,
+                    "microsecond": 683000
+                }
+            },
+            {
+                "AliasName": "alias/aws/glue",
+                "AliasArn": "arn:aws:kms:us-east-2:644160558196:alias/aws/glue"
+            },
+            {
+                "AliasName": "alias/aws/kinesisvideo",
+                "AliasArn": "arn:aws:kms:us-east-2:644160558196:alias/aws/kinesisvideo"
+            },
+            {
+                "AliasName": "alias/aws/lambda",
+                "AliasArn": "arn:aws:kms:us-east-2:644160558196:alias/aws/lambda",
+                "TargetKeyId": "e51d2b0a-0c93-4025-8d88-a31c48e904fd",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 11,
+                    "day": 23,
+                    "hour": 14,
+                    "minute": 0,
+                    "second": 22,
+                    "microsecond": 609000
+                },
+                "LastUpdatedDate": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 11,
+                    "day": 23,
+                    "hour": 14,
+                    "minute": 0,
+                    "second": 22,
+                    "microsecond": 609000
+                }
+            },
+            {
+                "AliasName": "alias/aws/rds",
+                "AliasArn": "arn:aws:kms:us-east-2:644160558196:alias/aws/rds",
+                "TargetKeyId": "72c87446-729b-4624-9faa-137b26402e0f",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 1,
+                    "day": 19,
+                    "hour": 9,
+                    "minute": 22,
+                    "second": 14,
+                    "microsecond": 777000
+                },
+                "LastUpdatedDate": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 1,
+                    "day": 19,
+                    "hour": 9,
+                    "minute": 22,
+                    "second": 14,
+                    "microsecond": 777000
+                }
+            },
+            {
+                "AliasName": "alias/aws/redshift",
+                "AliasArn": "arn:aws:kms:us-east-2:644160558196:alias/aws/redshift"
+            },
+            {
+                "AliasName": "alias/aws/s3",
+                "AliasArn": "arn:aws:kms:us-east-2:644160558196:alias/aws/s3"
+            },
+            {
+                "AliasName": "alias/aws/sqs",
+                "AliasArn": "arn:aws:kms:us-east-2:644160558196:alias/aws/sqs",
+                "TargetKeyId": "10454d3b-0713-4cc2-968b-a6caa83577ca",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 11,
+                    "day": 24,
+                    "hour": 12,
+                    "minute": 53,
+                    "second": 6,
+                    "microsecond": 299000
+                },
+                "LastUpdatedDate": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 11,
+                    "day": 24,
+                    "hour": 12,
+                    "minute": 53,
+                    "second": 6,
+                    "microsecond": 299000
+                }
+            },
+            {
+                "AliasName": "alias/aws/ssm",
+                "AliasArn": "arn:aws:kms:us-east-2:644160558196:alias/aws/ssm",
+                "TargetKeyId": "29d5b40f-5d73-455b-87d1-21fa5ee9311a",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 12,
+                    "day": 18,
+                    "hour": 17,
+                    "minute": 25,
+                    "second": 56,
+                    "microsecond": 699000
+                },
+                "LastUpdatedDate": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 12,
+                    "day": 18,
+                    "hour": 17,
+                    "minute": 25,
+                    "second": 56,
+                    "microsecond": 699000
+                }
+            },
+            {
+                "AliasName": "alias/aws/timestream",
+                "AliasArn": "arn:aws:kms:us-east-2:644160558196:alias/aws/timestream",
+                "TargetKeyId": "ed51b641-7bd6-4058-9f47-d97c37552fdd",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 2,
+                    "day": 6,
+                    "hour": 0,
+                    "minute": 29,
+                    "second": 6,
+                    "microsecond": 98000
+                },
+                "LastUpdatedDate": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 2,
+                    "day": 6,
+                    "hour": 0,
+                    "minute": 29,
+                    "second": 6,
+                    "microsecond": 98000
+                }
+            },
+            {
+                "AliasName": "alias/aws/xray",
+                "AliasArn": "arn:aws:kms:us-east-2:644160558196:alias/aws/xray"
+            },
+            {
+                "AliasName": "alias/test",
+                "AliasArn": "arn:aws:kms:us-east-2:644160558196:alias/test",
+                "TargetKeyId": "4d93263b-dd48-4b77-a5f0-35938446c8fc",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 12,
+                    "day": 18,
+                    "hour": 17,
+                    "minute": 19,
+                    "second": 21,
+                    "microsecond": 882000
+                },
+                "LastUpdatedDate": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 12,
+                    "day": 18,
+                    "hour": 17,
+                    "minute": 19,
+                    "second": 21,
+                    "microsecond": 882000
+                }
+            }
+        ],
+        "Truncated": false,
+        "ResponseMetadata": {}
+    }
+}

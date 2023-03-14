@@ -1,0 +1,18 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:dms:us-east-1:1112223334445:endpoint:AFDRQSDLIZ2X6KNOS4PBGNWUWQ",
+                "Tags": [
+                    {
+                        "Key": "Owner",
+                        "Value": "pikachu"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

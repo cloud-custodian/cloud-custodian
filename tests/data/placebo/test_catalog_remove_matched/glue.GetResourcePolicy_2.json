@@ -1,0 +1,28 @@
+{
+    "status_code": 200,
+    "data": {
+        "PolicyInJson": "{\n  \"Version\" : \"2012-10-17\",\n  \"Statement\" : [ {\n    \"Sid\" : \"SpecificAllow\",\n    \"Effect\" : \"Allow\",\n    \"Principal\" : {\n      \"AWS\" : \"arn:aws:iam::644160558196:root\"\n    },\n    \"Action\" : \"glue:GetDatabase\",\n    \"Resource\" : \"arn:aws:glue:us-east-1:644160558196:catalog\"\n  } ]\n}",
+        "PolicyHash": "5V9sCbFtrjJ6N1gmoX+K7Q==",
+        "CreateTime": {
+            "__class__": "datetime",
+            "year": 2020,
+            "month": 5,
+            "day": 27,
+            "hour": 23,
+            "minute": 23,
+            "second": 42,
+            "microsecond": 470000
+        },
+        "UpdateTime": {
+            "__class__": "datetime",
+            "year": 2020,
+            "month": 5,
+            "day": 27,
+            "hour": 23,
+            "minute": 23,
+            "second": 45,
+            "microsecond": 47000
+        },
+        "ResponseMetadata": {}
+    }
+}

@@ -1,0 +1,132 @@
+{
+  "headers": {
+    "etag": "jwidTCp5y3dkOQ9Tfh72poYRWO0=/vIh6E09d90YlLs63DZapzrai_ls=",
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Fri, 29 May 2020 16:39:32 GMT",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3-27=\":443\"; ma=2592000,h3-25=\":443\"; ma=2592000,h3-T050=\":443\"; ma=2592000,h3-Q050=\":443\"; ma=2592000,h3-Q049=\":443\"; ma=2592000,h3-Q048=\":443\"; ma=2592000,h3-Q046=\":443\"; ma=2592000,h3-Q043=\":443\"; ma=2592000,quic=\":443\"; ma=2592000; v=\"46,43\"",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "26142",
+    "-content-encoding": "gzip",
+    "content-location": "https://compute.googleapis.com/compute/v1/projects/cloud-custodian/aggregated/instances?alt=json"
+  },
+  "body": {
+    "id": "projects/cloud-custodian/aggregated/instances",
+    "items": {
+      "zones/us-central1-a": {
+        "instances": [
+          {
+            "id": "642744439277452381",
+            "creationTimestamp": "2020-05-29T01:07:14.742-07:00",
+            "name": "instance-1",
+            "description": "",
+            "tags": {
+              "fingerprint": "42WmSpB8rSM="
+            },
+            "machineType": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-a/machineTypes/n1-standard-1",
+            "status": "TERMINATED",
+            "zone": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-a",
+            "canIpForward": false,
+            "networkInterfaces": [
+              {
+                "network": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/networks/default",
+                "subnetwork": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-central1/subnetworks/default",
+                "networkIP": "10.128.0.2",
+                "name": "nic0",
+                "accessConfigs": [
+                  {
+                    "type": "ONE_TO_ONE_NAT",
+                    "name": "External NAT",
+                    "networkTier": "PREMIUM",
+                    "kind": "compute#accessConfig"
+                  }
+                ],
+                "fingerprint": "OYkVi-dox1s=",
+                "kind": "compute#networkInterface"
+              }
+            ],
+            "disks": [
+              {
+                "type": "PERSISTENT",
+                "mode": "READ_WRITE",
+                "source": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-a/disks/instance-1",
+                "deviceName": "instance-1",
+                "index": 0,
+                "boot": true,
+                "autoDelete": true,
+                "licenses": [
+                  "https://www.googleapis.com/compute/v1/projects/debian-cloud/global/licenses/debian-10-buster"
+                ],
+                "interface": "SCSI",
+                "guestOsFeatures": [
+                  {
+                    "type": "VIRTIO_SCSI_MULTIQUEUE"
+                  },
+                  {
+                    "type": "UEFI_COMPATIBLE"
+                  }
+                ],
+                "diskSizeGb": "10",
+                "kind": "compute#attachedDisk"
+              }
+            ],
+            "metadata": {
+              "fingerprint": "Vj5XvjedRmA=",
+              "kind": "compute#metadata"
+            },
+            "serviceAccounts": [
+              {
+                "email": "1098479648729-compute@developer.gserviceaccount.com",
+                "scopes": [
+                  "https://www.googleapis.com/auth/devstorage.read_only",
+                  "https://www.googleapis.com/auth/logging.write",
+                  "https://www.googleapis.com/auth/monitoring.write",
+                  "https://www.googleapis.com/auth/servicecontrol",
+                  "https://www.googleapis.com/auth/service.management.readonly",
+                  "https://www.googleapis.com/auth/trace.append"
+                ]
+              }
+            ],
+            "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-a/instances/instance-1",
+            "scheduling": {
+              "onHostMaintenance": "MIGRATE",
+              "automaticRestart": true,
+              "preemptible": false
+            },
+            "cpuPlatform": "Unknown CPU Platform",
+            "labels": {
+              "quarantined": "testing"
+            },
+            "labelFingerprint": "Xty5LTmPsGw=",
+            "startRestricted": false,
+            "deletionProtection": false,
+            "reservationAffinity": {
+              "consumeReservationType": "ANY_RESERVATION"
+            },
+            "displayDevice": {
+              "enableDisplay": false
+            },
+            "shieldedInstanceConfig": {
+              "enableSecureBoot": false,
+              "enableVtpm": true,
+              "enableIntegrityMonitoring": true
+            },
+            "shieldedInstanceIntegrityPolicy": {
+              "updateAutoLearnPolicy": true
+            },
+            "fingerprint": "VR3_nDvn2mU=",
+            "kind": "compute#instance"
+          }
+        ]
+      }
+    },
+    "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/aggregated/instances",
+    "kind": "compute#instanceAggregatedList"
+  }
+}

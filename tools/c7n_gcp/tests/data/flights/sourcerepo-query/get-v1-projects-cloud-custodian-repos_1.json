@@ -1,0 +1,26 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Wed, 18 May 2022 01:40:12 GMT",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000,h3-Q050=\":443\"; ma=2592000,h3-Q046=\":443\"; ma=2592000,h3-Q043=\":443\"; ma=2592000,quic=\":443\"; ma=2592000; v=\"46,43\"",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "167",
+    "-content-encoding": "gzip",
+    "content-location": "https://sourcerepo.googleapis.com/v1/projects/cloud-custodian/repos?alt=json"
+  },
+  "body": {
+    "repos": [
+      {
+        "name": "projects/cloud-custodian/repos/test-repo",
+        "url": "https://source.developers.google.com/p/cloud-custodian/r/test-repo"
+      }
+    ]
+  }
+}

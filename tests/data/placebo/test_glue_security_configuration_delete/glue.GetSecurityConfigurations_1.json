@@ -1,0 +1,12 @@
+{
+  "status_code": 200,
+  "data": {
+    "SecurityConfigurations": [
+      {
+        "Name": "test"
+      }
+    ],
+    "NextToken": "",
+    "ResponseMetadata": {}
+  }
+}

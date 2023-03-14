@@ -1,0 +1,14 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "domains": [
+            {
+                "name": "pizzaspace",
+                "owner": "644160558196",
+                "status": "Active",
+                "encryptionKey": "arn:aws:kms:us-east-1:644160558196:key/a46cfc7a-5490-42d3-95b4-4e1b2f2de3c8"
+            }
+        ]
+    }
+}

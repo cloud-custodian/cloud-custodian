@@ -1,0 +1,18 @@
+{
+    "status_code": 200,
+    "data": {
+        "resourceIdentifiers": [
+            {
+                "resourceType": "AWS::RDS::DBClusterSnapshot",
+                "resourceId": "rds:database-1-2020-05-19-05-58",
+                "resourceName": "rds:database-1-2020-05-19-05-58"
+            },
+            {
+                "resourceType": "AWS::RDS::DBClusterSnapshot",
+                "resourceId": "verify",
+                "resourceName": "verify"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

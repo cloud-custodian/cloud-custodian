@@ -23,16 +23,16 @@ tool like Github. This allows us to version and enable collaboration through
 git pull requests and issues. In this example, we will be setting up a new repo
 in Github.
 
-First, set up a new repo in Github and grab the reporistory url. You don't need
-need to add a README or any other files to it first.
+First, set up a new repo in Github and grab the repository url. You don't need
+to add a README or any other files to it first.
 
 .. code-block:: bash
 
-    $ mkdir my-policies
-    $ cd my-policies
-    $ git init
-    $ git remote add origin <github repo url>
-    $ touch policy.yml
+    mkdir my-policies
+    cd my-policies
+    git init
+    git remote add origin <github repo url>
+    touch policy.yml
 
 Next, we'll add a policy to our new ``policy.yml`` file.
 
@@ -48,11 +48,11 @@ working directory and push it up to our remote:
 .. code-block:: bash
 
     # this should show your policy.yml as an untracked file
-    $ git status
+    git status
 
-    $ git add policy.yml
-    $ git commit -m 'init my first policy'
-    $ git push -u origin master
+    git add policy.yml
+    git commit -m 'init my first policy'
+    git push -u origin master
 
 Once you've pushed your changes you should be able to see your new changes inside
 of Github. Congratulations, you're now ready to start automatically validating and
@@ -73,7 +73,7 @@ First, navigate to https://azure.microsoft.com/en-us/services/devops/pipelines/ 
 click the "Start pipelines free with Github" button and follow the flow to connect
 your Github account with Devops Pipelines.
 
-Next click on the Piplines section in the left hand side of the sidebar and connect
+Next click on the Pipelines section in the left hand side of the sidebar and connect
 with Github. Once the pipeline is setup, we can add the following azure devops
 configuration to our repo:
 
@@ -163,10 +163,10 @@ In AWS, you will need ReadOnly access as well as the following permissions:
                     "lambda:DeleteFunctionConcurrency",
                     "lambda:DeleteEventSourceMapping",
                     "lambda:RemovePermission",
-                    "lambda:CreateAlias"
+                    "lambda:CreateAlias",
                     "logs:CreateLogStream",
                     "logs:PutLogEvents",
-                    "logs:CreateLogGroup",
+                    "logs:CreateLogGroup"
                 ],
                 "Resource": "*"
             }
@@ -185,13 +185,13 @@ Single Node Deployment
 
 Now that your policies are stored and available in source control, you can now
 fill in the next pieces of the puzzle to deploy. The simplest way to operate
-Cloud Custodian is to start with running Cloud Custodian against a single account
-on a virtual machine.
+Cloud Custodian is to start with running Cloud Custodian against a single account (or subscription or project) on a virtual machine.
 
 To start, create a virtual machine on your cloud provider of choice.
 It's recommended to execute Cloud Custodian in the same cloud provider
-that you are operating against to prevent a hard dependency on one cloud
-to another.
+that you are operating against to prevent a hard dependency on one
+cloud to another as well being able to utilize your cloud's best practices
+for credentials (instance profile, service account, etc).
 
 Then, log into the instance and set up Custodian, following the instructions
 in the  :ref:`install-cc` guide.
@@ -199,7 +199,7 @@ in the  :ref:`install-cc` guide.
 Once you have Cloud Custodian installed, download your policies that you created
 in the :ref:`compliance_as_code` section. If using git, just simply do a ``git clone``::
 
-    $ git clone <repository-url>
+    git clone <repository-url>
 
 You now have your policies and custodian available on the instance. Typically, policies
 that query the extant resources in the account/project/subscription should be run
@@ -218,13 +218,13 @@ When executing Custodian, you can enable metrics simply by adding the ``-m`` fla
 cloud provider::
 
   # AWS
-  $ custodian run -s output -m aws policy.yml
+  custodian run -s output -m aws policy.yml
 
   # Azure
-  $ custodian run -s output -m azure policy.yml
+  custodian run -s output -m azure policy.yml
 
   # GCP
-  $ custodian run -s output -m gcp policy.yml
+  custodian run -s output -m gcp policy.yml
 
 When you enable metrics, a new namespace will be created and the following metrics will be
 recorded there:
@@ -236,22 +236,22 @@ recorded there:
 To enable logging to CloudWatch logs, Stackdriver, or Azure AppInsights, use the ``-l`` flag::
 
   # AWS CloudWatch Logs
-  $ custodian run -s output -l /cloud-custodian/policies policy.yml
+  custodian run -s output -l /cloud-custodian/policies policy.yml
 
   # Azure App Insights Logs
-  $ custodian run -s output -l azure://cloud-custodian/policies policy.yml
+  custodian run -s output -l azure://cloud-custodian/policies policy.yml
 
   # Stackdriver Logs
-  $ custodian run -s output -l gcp://cloud-custodian/policies policy.yml
+  custodian run -s output -l gcp://cloud-custodian/policies policy.yml
 
 You can also store the output of your Custodian logs in a cloud provider's blob storage like S3
 or Azure Storage accounts::
 
   # AWS S3
-  $ custodian run -s s3://my-custodian-bucket policy.yml
+  custodian run -s s3://my-custodian-bucket policy.yml
 
   # Azure Storage Accounts
-  $ custodian run -s azure://my-custodian-storage-account policy.yml
+  custodian run -s azure://my-custodian-storage-account policy.yml
 
 .. _mailer_and_notifications_deployment:
 
@@ -287,9 +287,9 @@ recent commit and master.
 .. code-block:: bash
 
     # in your git directory for policies
-    $ docker pull cloudcustodian/policystream
-    $ docker run -v $(pwd):/home/custodian/policies cloudcustodian > policystream-diff.yml
-    $ custodian run -s output -v --dryrun policystream-diff.yml
+    docker pull cloudcustodian/policystream
+    docker run -v $(pwd):/home/custodian/policies cloudcustodian > policystream-diff.yml
+    custodian run -s output -v --dryrun policystream-diff.yml
 
 After running your new policy file (policystream-diff.yml), the outputs will be stored
 in the output directory.

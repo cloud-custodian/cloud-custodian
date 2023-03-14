@@ -1,0 +1,44 @@
+name: "Docker Build"
+on:
+  # build a daily dev image  
+  schedule:
+    - cron: "42 6 * * *"
+  push:
+    tags:
+      # todo: update for 1.0
+      - 0.*
+jobs:
+  Publish:
+    permissions:
+      id-token: write
+    strategy:
+      matrix:
+        image:
+          - c7n
+          - c7n-org
+          - mailer
+          - policystream
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: ${{ matrix.image }} build and push
+        uses: ./.github/composites/docker-build-push
+        env:
+          HUB_USER: c7nbuild
+          HUB_TOKEN: ${{ secrets.DOCKER_CI_HUB_TOKEN }}
+        with:
+          name: ${{ matrix.image }}
+          push: true
+          platforms: linux/arm64,linux/amd64
+
+      - name: Notify Slack
+        uses: ravsamhq/notify-slack-action@v2
+        if: always()
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_CI_HOOK }}
+        with:
+          status: ${{ job.status }}
+          notification_title: "{workflow}:{job} has {status_message}"
+          message_format: "{emoji} *{workflow}:{job}* {status_message} in <{repo_url}|{repo}>"
+          footer: "Logs <{run_url}|{job}>"
+          notify_when: "failure,success"

@@ -1,3 +1,5 @@
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 #  Copyright 2015 Observable Networks
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,8 +20,6 @@
 # - lazy load on datetime parse
 # - handle exported log record format
 
-from __future__ import print_function
-
 from datetime import datetime
 
 
@@ -29,7 +29,7 @@ SKIPDATA = 'SKIPDATA'
 NODATA = 'NODATA'
 
 
-class FlowRecord(object):
+class FlowRecord:
     """
     Given a VPC Flow Logs event dictionary, returns a Python object whose
     attributes match the field names in the event record. Integers are stored

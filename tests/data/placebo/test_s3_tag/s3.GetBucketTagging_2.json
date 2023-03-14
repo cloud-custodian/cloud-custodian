@@ -1,27 +1,11 @@
 {
     "status_code": 200,
     "data": {
-        "ResponseMetadata": {
-            "RequestId": "881FA07C340A8C27",
-            "HostId": "1qKW/J7Ee9oEs4+uP8ZoK/cE2TPoVmHx8JTzD0F2AFFsalIKuq9cC/azJrf+ZU7OM6KriUg040w=",
-            "HTTPStatusCode": 200,
-            "HTTPHeaders": {
-                "x-amz-id-2": "1qKW/J7Ee9oEs4+uP8ZoK/cE2TPoVmHx8JTzD0F2AFFsalIKuq9cC/azJrf+ZU7OM6KriUg040w=",
-                "x-amz-request-id": "881FA07C340A8C27",
-                "date": "Wed, 28 Mar 2018 10:37:09 GMT",
-                "transfer-encoding": "chunked",
-                "server": "AmazonS3"
-            },
-            "RetryAttempts": 1
-        },
+        "ResponseMetadata": {},
         "TagSet": [
             {
-                "Key": "rudolph",
-                "Value": "reindeer"
-            },
-            {
-                "Key": "platform",
-                "Value": "lxwee"
+                "Key": "original-tag",
+                "Value": "original-value"
             }
         ]
     }

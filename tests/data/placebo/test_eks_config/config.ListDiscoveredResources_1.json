@@ -1,0 +1,13 @@
+{
+    "status_code": 200,
+    "data": {
+        "resourceIdentifiers": [
+            {
+                "resourceType": "AWS::EKS::Cluster",
+                "resourceId": "kapil-dev",
+                "resourceName": "kapil-dev"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

@@ -1,24 +1,10 @@
-# Copyright 2015-2018 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
-from azure.mgmt.web import WebSiteManagementClient
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 from ..azure_common import BaseTest, arm_template, cassette_name
 from c7n_azure.session import Session
-from jsonschema import ValidationError
 from mock import patch
 
+from c7n.exceptions import PolicyValidationError
 from c7n.utils import local_session
 
 
@@ -28,7 +14,7 @@ class AppServicePlanTest(BaseTest):
         super(AppServicePlanTest, self).setUp()
         self.session = local_session(Session)
         self.client = local_session(Session).client(
-            'azure.mgmt.web.WebSiteManagementClient')  # type: WebSiteManagementClient
+            'azure.mgmt.web.WebSiteManagementClient')
         self.update_mock_path =\
             'azure.mgmt.web.v{}.operations._app_service_plans_operations.' \
             'AppServicePlansOperations.update'\
@@ -55,7 +41,7 @@ class AppServicePlanTest(BaseTest):
             self.assertTrue(p)
 
         # size and count are missing
-        with self.assertRaises(ValidationError):
+        with self.assertRaises(PolicyValidationError):
             self.load_policy({
                 'name': 'test-azure-appserviceplan',
                 'resource': 'azure.appserviceplan',

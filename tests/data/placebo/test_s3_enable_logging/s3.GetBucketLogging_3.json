@@ -1,19 +1,23 @@
 {
-    "status_code": 200, 
+    "status_code": 200,
     "data": {
         "ResponseMetadata": {
-            "HTTPStatusCode": 200, 
-            "RetryAttempts": 0, 
-            "HostId": "Q6O8HwhHyA69PGxMArSPCDTfztqN55phMb3KaI0BS5HYoCZspVjc3pPhXcYk41A1EziT3OI/2Mo=", 
-            "RequestId": "BE8591993FD3D0ED", 
+            "RequestId": "71F96DB0FB549671",
+            "HostId": "lOU9ifGXINtOgwOMxMp8Vryu/OZDOzBCFxY3SLcRty1323uiYguEnlwrAVU6e/0s0WM69g16oVA=",
+            "HTTPStatusCode": 200,
             "HTTPHeaders": {
-                "content-length": "289", 
-                "x-amz-id-2": "Q6O8HwhHyA69PGxMArSPCDTfztqN55phMb3KaI0BS5HYoCZspVjc3pPhXcYk41A1EziT3OI/2Mo=", 
-                "server": "AmazonS3", 
-                "x-amz-request-id": "BE8591993FD3D0ED", 
-                "date": "Thu, 18 Jan 2018 09:46:20 GMT", 
-                "content-type": "application/xml"
-            }
+                "x-amz-id-2": "lOU9ifGXINtOgwOMxMp8Vryu/OZDOzBCFxY3SLcRty1323uiYguEnlwrAVU6e/0s0WM69g16oVA=",
+                "x-amz-request-id": "71F96DB0FB549671",
+                "date": "Fri, 20 Dec 2019 23:00:27 GMT",
+                "content-type": "application/xml",
+                "transfer-encoding": "chunked",
+                "server": "AmazonS3"
+            },
+            "RetryAttempts": 0
+        },
+        "LoggingEnabled": {
+            "TargetBucket": "superduper-and-magic",
+            "TargetPrefix": "custodian-skunkworks/superduper-and-magic"
         }
     }
 }

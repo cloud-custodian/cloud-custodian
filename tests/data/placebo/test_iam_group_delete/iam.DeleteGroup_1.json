@@ -1,0 +1,11 @@
+{
+    "status_code": 409,
+    "data": {
+        "Error": {
+            "Type": "Sender",
+            "Code": "DeleteConflict",
+            "Message": "Cannot delete entity, must remove users from group first."
+        },
+        "ResponseMetadata": {}
+    }
+}

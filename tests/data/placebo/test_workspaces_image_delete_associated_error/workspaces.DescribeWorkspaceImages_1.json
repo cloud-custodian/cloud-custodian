@@ -1,0 +1,28 @@
+{
+    "status_code": 200,
+    "data": {
+        "Images": [
+            {
+                "ImageId": "wsi-d21f7nrtk",
+                "Name": "test1",
+                "Description": "test1",
+                "OperatingSystem": {
+                    "Type": "LINUX"
+                },
+                "State": "AVAILABLE",
+                "RequiredTenancy": "DEFAULT",
+                "Created": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 9,
+                    "day": 22,
+                    "hour": 10,
+                    "minute": 50,
+                    "second": 48,
+                    "microsecond": 315000
+                }
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

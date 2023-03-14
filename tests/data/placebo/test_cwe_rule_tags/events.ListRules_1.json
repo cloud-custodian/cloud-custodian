@@ -1,0 +1,16 @@
+{
+    "status_code": 200,
+    "data": {
+        "Rules": [
+            {
+                "Name": "cloud-custodian-mailer",
+                "Arn": "arn:aws:events:us-west-2:644160558196:rule/cloud-custodian-mailer",
+                "State": "ENABLED",
+                "Description": "Cloud Custodian Mailer",
+                "ScheduleExpression": "rate(5 minutes)",
+                "EventBusName": "default"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

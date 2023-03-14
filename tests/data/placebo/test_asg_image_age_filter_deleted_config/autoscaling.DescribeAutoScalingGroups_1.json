@@ -1,0 +1,100 @@
+{
+    "status_code": 200,
+    "data": {
+        "AutoScalingGroups": [
+            {
+                "AutoScalingGroupName": "devx",
+                "AutoScalingGroupARN": "arn:aws:autoscaling:us-east-1:644160558196:autoScalingGroup:94c763b0-e6ce-49ee-a7e9-d014090fad73:autoScalingGroupName/devx",
+                "MixedInstancesPolicy": {
+                    "LaunchTemplate": {
+                        "LaunchTemplateSpecification": {
+                            "LaunchTemplateId": "lt-0877401c93c294001",
+                            "LaunchTemplateName": "test",
+                            "Version": "4"
+                        },
+                        "Overrides": [
+                            {
+                                "InstanceType": "t3.medium"
+                            }
+                        ]
+                    },
+                    "InstancesDistribution": {
+                        "OnDemandAllocationStrategy": "prioritized",
+                        "OnDemandBaseCapacity": 1,
+                        "OnDemandPercentageAboveBaseCapacity": 0,
+                        "SpotAllocationStrategy": "capacity-optimized"
+                    }
+                },
+                "MinSize": 0,
+                "MaxSize": 2,
+                "DesiredCapacity": 1,
+                "DefaultCooldown": 300,
+                "AvailabilityZones": [
+                    "us-east-1d",
+                    "us-east-1e"
+                ],
+                "LoadBalancerNames": [],
+                "TargetGroupARNs": [],
+                "HealthCheckType": "EC2",
+                "HealthCheckGracePeriod": 300,
+                "Instances": [
+                    {
+                        "InstanceId": "i-04e252315a3b7940a",
+                        "InstanceType": "t1.micro",
+                        "AvailabilityZone": "us-east-1d",
+                        "LifecycleState": "InService",
+                        "HealthStatus": "Healthy",
+                        "LaunchTemplate": {
+                            "LaunchTemplateId": "lt-0877401c93c294001",
+                            "LaunchTemplateName": "test",
+                            "Version": "4"
+                        },
+                        "ProtectedFromScaleIn": false
+                    }
+                ],
+                "CreatedTime": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 10,
+                    "day": 29,
+                    "hour": 14,
+                    "minute": 37,
+                    "second": 33,
+                    "microsecond": 482000
+                },
+                "SuspendedProcesses": [],
+                "VPCZoneIdentifier": "subnet-3a334610,subnet-e3b194de",
+                "EnabledMetrics": [],
+                "Tags": [
+                    {
+                        "ResourceId": "devx",
+                        "ResourceType": "auto-scaling-group",
+                        "Key": "Creator",
+                        "Value": "xyz@gmail.com",
+                        "PropagateAtLaunch": false
+                    },
+                    {
+                        "ResourceId": "devx",
+                        "ResourceType": "auto-scaling-group",
+                        "Key": "Env",
+                        "Value": "App",
+                        "PropagateAtLaunch": true
+                    },
+                    {
+                        "ResourceId": "devx",
+                        "ResourceType": "auto-scaling-group",
+                        "Key": "Owner",
+                        "Value": "test",
+                        "PropagateAtLaunch": true
+                    }
+                ],
+                "TerminationPolicies": [
+                    "Default"
+                ],
+                "NewInstancesProtectedFromScaleIn": false,
+                "ServiceLinkedRoleARN": "arn:aws:iam::644160558196:role/aws-service-role/autoscaling.amazonaws.com/AWSServiceRoleForAutoScaling"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

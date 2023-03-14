@@ -1,0 +1,18 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {
+            "RequestId": "EF2E2B55FD2168E6",
+            "HostId": "ER/bpSpzke9tCfmF3HPL8oyojVF1uaVBRMHfufTaXjz6o2vScw3eMAtn/i7FpZMXRUTMvehlvv0=",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amz-id-2": "ER/bpSpzke9tCfmF3HPL8oyojVF1uaVBRMHfufTaXjz6o2vScw3eMAtn/i7FpZMXRUTMvehlvv0=",
+                "x-amz-request-id": "EF2E2B55FD2168E6",
+                "date": "Fri, 20 Dec 2019 23:00:35 GMT",
+                "content-length": "0",
+                "server": "AmazonS3"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

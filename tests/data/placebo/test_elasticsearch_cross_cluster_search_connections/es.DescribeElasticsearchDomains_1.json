@@ -1,0 +1,160 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "DomainStatusList": [
+            {
+                "DomainId": "644160558196/default-inbound",
+                "DomainName": "default-inbound",
+                "ARN": "arn:aws:es:us-east-1:644160558196:domain/default-inbound",
+                "Created": true,
+                "Deleted": false,
+                "Endpoint": "search-default-inbound-i34326irggwdt5ovbywdbd4xme.us-east-1.es.amazonaws.com",
+                "Processing": false,
+                "UpgradeProcessing": false,
+                "ElasticsearchVersion": "7.10",
+                "ElasticsearchClusterConfig": {
+                    "InstanceType": "m4.large.elasticsearch",
+                    "InstanceCount": 1,
+                    "DedicatedMasterEnabled": false,
+                    "ZoneAwarenessEnabled": false,
+                    "WarmEnabled": false,
+                    "ColdStorageOptions": {
+                        "Enabled": false
+                    }
+                },
+                "EBSOptions": {
+                    "EBSEnabled": true,
+                    "VolumeType": "gp2",
+                    "VolumeSize": 10
+                },
+                "AccessPolicies": "",
+                "SnapshotOptions": {
+                    "AutomatedSnapshotStartHour": 0
+                },
+                "CognitoOptions": {
+                    "Enabled": false
+                },
+                "EncryptionAtRestOptions": {
+                    "Enabled": true,
+                    "KmsKeyId": "arn:aws:kms:us-east-1:644160558196:key/6917a312-adce-4bbc-8202-958f2db490fa"
+                },
+                "NodeToNodeEncryptionOptions": {
+                    "Enabled": true
+                },
+                "AdvancedOptions": {
+                    "override_main_response_version": "false",
+                    "rest.action.multi.allow_explicit_index": "true"
+                },
+                "ServiceSoftwareOptions": {
+                    "CurrentVersion": "R20220323-P3",
+                    "NewVersion": "",
+                    "UpdateAvailable": false,
+                    "Cancellable": false,
+                    "UpdateStatus": "COMPLETED",
+                    "Description": "There is no software update available for this domain.",
+                    "AutomatedUpdateDate": {
+                        "__class__": "datetime",
+                        "year": 1969,
+                        "month": 12,
+                        "day": 31,
+                        "hour": 19,
+                        "minute": 0,
+                        "second": 0,
+                        "microsecond": 0
+                    },
+                    "OptionalDeployment": true
+                },
+                "DomainEndpointOptions": {
+                    "EnforceHTTPS": true,
+                    "TLSSecurityPolicy": "Policy-Min-TLS-1-2-2019-07",
+                    "CustomEndpointEnabled": false
+                },
+                "AdvancedSecurityOptions": {
+                    "Enabled": true,
+                    "InternalUserDatabaseEnabled": true,
+                    "AnonymousAuthEnabled": false
+                },
+                "AutoTuneOptions": {
+                    "State": "ENABLED"
+                }
+            },
+            {
+                "DomainId": "644160558196/default-outbound",
+                "DomainName": "default-outbound",
+                "ARN": "arn:aws:es:us-east-1:644160558196:domain/default-outbound",
+                "Created": true,
+                "Deleted": false,
+                "Endpoint": "search-default-outbound-tvf5alftlpxekueo4r7ncecsby.us-east-1.es.amazonaws.com",
+                "Processing": false,
+                "UpgradeProcessing": false,
+                "ElasticsearchVersion": "7.10",
+                "ElasticsearchClusterConfig": {
+                    "InstanceType": "m4.large.elasticsearch",
+                    "InstanceCount": 1,
+                    "DedicatedMasterEnabled": false,
+                    "ZoneAwarenessEnabled": false,
+                    "WarmEnabled": false,
+                    "ColdStorageOptions": {
+                        "Enabled": false
+                    }
+                },
+                "EBSOptions": {
+                    "EBSEnabled": true,
+                    "VolumeType": "gp2",
+                    "VolumeSize": 10
+                },
+                "AccessPolicies": "",
+                "SnapshotOptions": {
+                    "AutomatedSnapshotStartHour": 0
+                },
+                "CognitoOptions": {
+                    "Enabled": false
+                },
+                "EncryptionAtRestOptions": {
+                    "Enabled": true,
+                    "KmsKeyId": "arn:aws:kms:us-east-1:644160558196:key/6917a312-adce-4bbc-8202-958f2db490fa"
+                },
+                "NodeToNodeEncryptionOptions": {
+                    "Enabled": true
+                },
+                "AdvancedOptions": {
+                    "override_main_response_version": "false",
+                    "rest.action.multi.allow_explicit_index": "true"
+                },
+                "ServiceSoftwareOptions": {
+                    "CurrentVersion": "R20220323-P3",
+                    "NewVersion": "",
+                    "UpdateAvailable": false,
+                    "Cancellable": false,
+                    "UpdateStatus": "COMPLETED",
+                    "Description": "There is no software update available for this domain.",
+                    "AutomatedUpdateDate": {
+                        "__class__": "datetime",
+                        "year": 1969,
+                        "month": 12,
+                        "day": 31,
+                        "hour": 19,
+                        "minute": 0,
+                        "second": 0,
+                        "microsecond": 0
+                    },
+                    "OptionalDeployment": true
+                },
+                "DomainEndpointOptions": {
+                    "EnforceHTTPS": true,
+                    "TLSSecurityPolicy": "Policy-Min-TLS-1-2-2019-07",
+                    "CustomEndpointEnabled": false
+                },
+                "AdvancedSecurityOptions": {
+                    "Enabled": true,
+                    "InternalUserDatabaseEnabled": true,
+                    "AnonymousAuthEnabled": false
+                },
+                "AutoTuneOptions": {
+                    "State": "ENABLED"
+                }
+            }
+        ]
+    }
+}

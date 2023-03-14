@@ -1,0 +1,109 @@
+{
+    "status_code": 200,
+    "data": {
+        "ReplicationGroups": [
+            {
+                "ReplicationGroupId": "test-c7n-rg",
+                "Description": " ",
+                "GlobalReplicationGroupInfo": {},
+                "Status": "available",
+                "PendingModifiedValues": {},
+                "MemberClusters": [
+                    "test-c7n-rg-0001-001",
+                    "test-c7n-rg-0001-002",
+                    "test-c7n-rg-0001-003",
+                    "test-c7n-rg-0002-001",
+                    "test-c7n-rg-0002-002",
+                    "test-c7n-rg-0002-003",
+                    "test-c7n-rg-0003-001",
+                    "test-c7n-rg-0003-002",
+                    "test-c7n-rg-0003-003"
+                ],
+                "NodeGroups": [
+                    {
+                        "NodeGroupId": "0001",
+                        "Status": "available",
+                        "Slots": "0-5461",
+                        "NodeGroupMembers": [
+                            {
+                                "CacheClusterId": "test-c7n-rg-0001-001",
+                                "CacheNodeId": "0001",
+                                "PreferredAvailabilityZone": "us-east-1b"
+                            },
+                            {
+                                "CacheClusterId": "test-c7n-rg-0001-002",
+                                "CacheNodeId": "0001",
+                                "PreferredAvailabilityZone": "us-east-1a"
+                            },
+                            {
+                                "CacheClusterId": "test-c7n-rg-0001-003",
+                                "CacheNodeId": "0001",
+                                "PreferredAvailabilityZone": "us-east-1d"
+                            }
+                        ]
+                    },
+                    {
+                        "NodeGroupId": "0002",
+                        "Status": "available",
+                        "Slots": "5462-10922",
+                        "NodeGroupMembers": [
+                            {
+                                "CacheClusterId": "test-c7n-rg-0002-001",
+                                "CacheNodeId": "0001",
+                                "PreferredAvailabilityZone": "us-east-1b"
+                            },
+                            {
+                                "CacheClusterId": "test-c7n-rg-0002-002",
+                                "CacheNodeId": "0001",
+                                "PreferredAvailabilityZone": "us-east-1d"
+                            },
+                            {
+                                "CacheClusterId": "test-c7n-rg-0002-003",
+                                "CacheNodeId": "0001",
+                                "PreferredAvailabilityZone": "us-east-1a"
+                            }
+                        ]
+                    },
+                    {
+                        "NodeGroupId": "0003",
+                        "Status": "available",
+                        "Slots": "10923-16383",
+                        "NodeGroupMembers": [
+                            {
+                                "CacheClusterId": "test-c7n-rg-0003-001",
+                                "CacheNodeId": "0001",
+                                "PreferredAvailabilityZone": "us-east-1a"
+                            },
+                            {
+                                "CacheClusterId": "test-c7n-rg-0003-002",
+                                "CacheNodeId": "0001",
+                                "PreferredAvailabilityZone": "us-east-1d"
+                            },
+                            {
+                                "CacheClusterId": "test-c7n-rg-0003-003",
+                                "CacheNodeId": "0001",
+                                "PreferredAvailabilityZone": "us-east-1b"
+                            }
+                        ]
+                    }
+                ],
+                "AutomaticFailover": "enabled",
+                "MultiAZ": "enabled",
+                "ConfigurationEndpoint": {
+                    "Address": "test-c7n-rg.qgcgte.clustercfg.use1.cache.amazonaws.com",
+                    "Port": 6379
+                },
+                "SnapshotRetentionLimit": 1,
+                "SnapshotWindow": "07:30-08:30",
+                "ClusterEnabled": true,
+                "CacheNodeType": "cache.r6g.large",
+                "AuthTokenEnabled": false,
+                "TransitEncryptionEnabled": false,
+                "AtRestEncryptionEnabled": false,
+                "ARN": "arn:aws:elasticache:us-east-1:644160558196:replicationgroup:test-c7n-rg",
+                "LogDeliveryConfigurations": []
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

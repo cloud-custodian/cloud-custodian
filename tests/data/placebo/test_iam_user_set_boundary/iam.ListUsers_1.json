@@ -1,0 +1,25 @@
+{
+  "status_code": 200,
+  "data": {
+    "Users": [
+      {
+        "Path": "/",
+        "UserName": "devbot",
+        "UserId": "AIDAZL6XWCR2OXOEADG5A",
+        "Arn": "arn:aws:iam::644160558196:user/devbot",
+        "CreateDate": {
+          "__class__": "datetime",
+          "year": 2020,
+          "month": 4,
+          "day": 2,
+          "hour": 10,
+          "minute": 36,
+          "second": 22,
+          "microsecond": 0
+        }
+      }
+    ],
+    "IsTruncated": false,
+    "ResponseMetadata": {}
+  }
+}

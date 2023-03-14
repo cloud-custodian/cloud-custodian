@@ -1,0 +1,39 @@
+{
+    "status_code": 200,
+    "data": {
+        "AccessKeyMetadata": [
+            {
+                "UserName": "test1",
+                "AccessKeyId": "AKIAY5Y4D45RM747RB4P",
+                "Status": "Inactive",
+                "CreateDate": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 2,
+                    "day": 3,
+                    "hour": 9,
+                    "minute": 50,
+                    "second": 7,
+                    "microsecond": 0
+                }
+            },
+            {
+                "UserName": "test1",
+                "AccessKeyId": "AKIAY5Y4D45RLQZNWRQL",
+                "Status": "Active",
+                "CreateDate": {
+                    "__class__": "datetime",
+                    "year": 2099,
+                    "month": 2,
+                    "day": 3,
+                    "hour": 9,
+                    "minute": 50,
+                    "second": 21,
+                    "microsecond": 0
+                }
+            }
+        ],
+        "IsTruncated": false,
+        "ResponseMetadata": {}
+    }
+}

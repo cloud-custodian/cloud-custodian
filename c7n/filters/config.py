@@ -1,18 +1,5 @@
-# Copyright 2018 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 from c7n.filters import ValueFilter
 from c7n.manager import resources
 from c7n.utils import local_session, type_schema
@@ -47,7 +34,7 @@ class ConfigCompliance(Filter):
                - custodian-ec2-tags-required
 
     Also note, custodian has direct support for deploying policies as config
-    rules see https://bit.ly/2mblVpq
+    rules see https://cloudcustodian.io/docs/policy/lambda.html#config-rules
     """
     permissions = ('config:DescribeComplianceByConfigRule',)
     schema = type_schema(
@@ -85,7 +72,9 @@ class ConfigCompliance(Filter):
                     # for multi resource type rules, only look at
                     # results for the resource type currently being
                     # processed.
-                    if rident['ResourceType'] != resource_model.config_type:
+                    if rident['ResourceType'] not in (
+                            resource_model.config_type,
+                            resource_model.cfn_type):
                         continue
 
                     if not filters:
@@ -109,11 +98,26 @@ class ConfigCompliance(Filter):
         resource_model = self.manager.get_model()
         resource_map = self.get_resource_map(filters, resource_model, resources)
 
+        # Avoid static/import time dep on boto in filters package
+        from c7n.resources.aws import Arn
         results = []
-        for r in resources:
-            if r[resource_model.id] not in resource_map:
+        for arn, r in zip(self.manager.get_arns(resources), resources):
+            # many aws provided rules are inconsistent in their
+            # treatment of resource ids, some use arns, some use names
+            # as identifiers for the same resource type. security
+            # hub in particular is bad at consistency.
+            rid = None
+            if arn in resource_map:
+                rid = arn
+            elif r[resource_model.id] in resource_map:
+                rid = r[resource_model.id]
+            if arn == r[resource_model.id] and not rid:
+                rid = Arn.parse(arn).resource
+                if rid not in resource_map:
+                    rid = None
+            if rid is None:
                 continue
-            r[self.annotation_key] = resource_map[r[resource_model.id]]
+            r[self.annotation_key] = resource_map[rid]
             results.append(r)
         return results
 
@@ -121,14 +125,14 @@ class ConfigCompliance(Filter):
     def register_resources(klass, registry, resource_class):
         """model resource subscriber on resource registration.
 
-        Watch for new resource types being registered if they support aws config,
-        automatically, register the config-compliance filter.
+        Watch for new resource types being registered if they are
+        supported by aws config, automatically, register the
+        config-compliance filter.
         """
-
-        config_type = getattr(resource_class.resource_type, 'config_type', None)
-        if config_type is None:
+        if (resource_class.resource_type.cfn_type is None and
+                resource_class.resource_type.config_type is None):
             return
         resource_class.filter_registry.register('config-compliance', klass)
 
 
-resources.subscribe(resources.EVENT_REGISTER, ConfigCompliance.register_resources)
+resources.subscribe(ConfigCompliance.register_resources)

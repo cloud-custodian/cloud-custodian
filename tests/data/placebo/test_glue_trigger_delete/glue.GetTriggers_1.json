@@ -1,0 +1,20 @@
+{
+  "status_code": 200,
+  "data": {
+    "Triggers": [
+      {
+        "Name": "test",
+        "Actions": [
+          {
+            "JobName": "test",
+            "Arguments": {
+              "--job-bookmark-option": "job-bookmark-enable"
+            },
+            "Timeout": 2880
+          }
+        ]
+      }
+    ],
+    "ResponseMetadata": {}
+  }
+}

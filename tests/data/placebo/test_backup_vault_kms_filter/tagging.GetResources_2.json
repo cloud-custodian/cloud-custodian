@@ -1,0 +1,28 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:kms:us-east-1:644160558196:key/2a7ce99a-7237-4fa5-b649-c700a8d0996c",
+                "Tags": [
+                    {
+                        "Key": "asd",
+                        "Value": "asd"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "56cc71a5-843c-420f-b0e0-dd9562a4d81f",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "56cc71a5-843c-420f-b0e0-dd9562a4d81f",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "180",
+                "date": "Tue, 03 Mar 2020 22:43:28 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

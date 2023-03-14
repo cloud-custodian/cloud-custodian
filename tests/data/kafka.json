@@ -1,0 +1,55 @@
+{
+    "BrokerNodeGroupInfo": {
+        "BrokerAZDistribution": "DEFAULT",
+        "ClientSubnets": [
+            "subnet-8136ffcb",
+            "subnet-bbb8bde6"
+        ],
+        "InstanceType": "kafka.m5.large",
+        "SecurityGroups": [
+            "sg-65878213"
+        ],
+        "StorageInfo": {
+            "EbsStorageInfo": {
+                "VolumeSize": 1
+            }
+        }
+    },
+    "ClusterArn": "arn:aws:kafka:us-east-1:123456789000:cluster/Test-ACCS-Enforce-Encryption/c9739447-7d75-45dc-8709-48f664a612ab-5",
+    "ClusterName": "Test-ACCS-Enforce-Encryption",
+    "CreationTime": "2020-02-28T19:49:13.084000+00:00",
+    "CurrentBrokerSoftwareInfo": {
+        "KafkaVersion": "2.2.1"
+    },
+    "CurrentVersion": "K2EUQ1WTGCTBG2",
+    "EncryptionInfo": {
+        "EncryptionAtRest": {
+            "DataVolumeKMSKeyId": "arn:aws:kms:us-east-1:123456789000:key/d4c21e0d-8b16-4f08-901c-b76970685858"
+        },
+        "EncryptionInTransit": {
+            "ClientBroker": "PLAINTEXT",
+            "InCluster": false
+        }
+    },
+    "EnhancedMonitoring": "DEFAULT",
+    "OpenMonitoring": {
+        "Prometheus": {
+            "JmxExporter": {
+                "EnabledInBroker": false
+            },
+            "NodeExporter": {
+                "EnabledInBroker": false
+            }
+        }
+    },
+    "NumberOfBrokerNodes": 2,
+    "State": "ACTIVE",
+    "Tags": {
+        "ResourceContact": "ouremailaddress@company.com"
+    },
+    "ZookeeperConnectString": "z-2.test-accs-enforce-encr.tnr2qf.c5.kafka.us-east-1.amazonaws.com:2181,z-3.test-accs-enforce-encr.tnr2qf.c5.kafka.us-east-1.amazonaws.com:2181,z-1.test-accs-enforce-encr.tnr2qf.c5.kafka.us-east-1.amazonaws.com:2181",
+    "c7n:MatchedFilters": [
+        "EncryptionInfo.EncryptionInTransit.ClientBroker",
+        "CreationTime"
+    ]
+}

@@ -1,0 +1,7 @@
+{
+    "status_code": 200,
+    "data": {
+        "StackId": "arn:aws:cloudformation:us-east-1:644160558196:stack/c7n-test-delete-force/4e14aae0-84f6-11ea-89fb-0e3b177c99d5",
+        "ResponseMetadata": {}
+    }
+}

@@ -1,0 +1,10 @@
+{
+    "status_code": 403,
+    "data": {
+        "Error": {
+            "Message": "Thank you for your interest in Amazon Machine Learning. AmazonML is no longer available to new customers.  Please consider using Amazon SageMaker.",
+            "Code": "AccessDeniedException"
+        },
+        "ResponseMetadata": {}
+    }
+}

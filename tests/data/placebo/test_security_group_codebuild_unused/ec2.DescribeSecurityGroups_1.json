@@ -1,0 +1,148 @@
+{
+    "status_code": 200,
+    "data": {
+        "SecurityGroups": [
+            {
+                "Description": "default VPC security group",
+                "GroupName": "default",
+                "IpPermissions": [
+                    {
+                        "IpProtocol": "-1",
+                        "IpRanges": [],
+                        "Ipv6Ranges": [],
+                        "PrefixListIds": [],
+                        "UserIdGroupPairs": [
+                            {
+                                "GroupId": "sg-053f54b1170d9c80e",
+                                "UserId": "644160558196"
+                            }
+                        ]
+                    }
+                ],
+                "OwnerId": "644160558196",
+                "GroupId": "sg-053f54b1170d9c80e",
+                "IpPermissionsEgress": [
+                    {
+                        "IpProtocol": "-1",
+                        "IpRanges": [
+                            {
+                                "CidrIp": "0.0.0.0/0"
+                            }
+                        ],
+                        "Ipv6Ranges": [],
+                        "PrefixListIds": [],
+                        "UserIdGroupPairs": []
+                    }
+                ],
+                "VpcId": "vpc-0e2ce3db654f9651a"
+            },
+            {
+                "Description": "default VPC security group",
+                "GroupName": "default",
+                "IpPermissions": [
+                    {
+                        "IpProtocol": "-1",
+                        "IpRanges": [],
+                        "Ipv6Ranges": [],
+                        "PrefixListIds": [],
+                        "UserIdGroupPairs": [
+                            {
+                                "GroupId": "sg-092723c6c101804b9",
+                                "UserId": "644160558196"
+                            }
+                        ]
+                    }
+                ],
+                "OwnerId": "644160558196",
+                "GroupId": "sg-092723c6c101804b9",
+                "IpPermissionsEgress": [
+                    {
+                        "IpProtocol": "-1",
+                        "IpRanges": [
+                            {
+                                "CidrIp": "0.0.0.0/0"
+                            }
+                        ],
+                        "Ipv6Ranges": [],
+                        "PrefixListIds": [],
+                        "UserIdGroupPairs": []
+                    }
+                ],
+                "VpcId": "vpc-0a238ebd387b44e4e"
+            },
+            {
+                "Description": "Unused",
+                "GroupName": "example2",
+                "IpPermissions": [
+                    {
+                        "FromPort": 443,
+                        "IpProtocol": "tcp",
+                        "IpRanges": [
+                            {
+                                "CidrIp": "10.0.0.0/16",
+                                "Description": "TLS from VPC"
+                            }
+                        ],
+                        "Ipv6Ranges": [],
+                        "PrefixListIds": [],
+                        "ToPort": 443,
+                        "UserIdGroupPairs": []
+                    }
+                ],
+                "OwnerId": "644160558196",
+                "GroupId": "sg-0ed6c6d872d445a0d",
+                "IpPermissionsEgress": [
+                    {
+                        "IpProtocol": "-1",
+                        "IpRanges": [
+                            {
+                                "CidrIp": "0.0.0.0/0"
+                            }
+                        ],
+                        "Ipv6Ranges": [],
+                        "PrefixListIds": [],
+                        "UserIdGroupPairs": []
+                    }
+                ],
+                "VpcId": "vpc-0e2ce3db654f9651a"
+            },
+            {
+                "Description": "In use",
+                "GroupName": "example1",
+                "IpPermissions": [
+                    {
+                        "FromPort": 443,
+                        "IpProtocol": "tcp",
+                        "IpRanges": [
+                            {
+                                "CidrIp": "10.0.0.0/16",
+                                "Description": "TLS from VPC"
+                            }
+                        ],
+                        "Ipv6Ranges": [],
+                        "PrefixListIds": [],
+                        "ToPort": 443,
+                        "UserIdGroupPairs": []
+                    }
+                ],
+                "OwnerId": "644160558196",
+                "GroupId": "sg-0f31edd750f0b3f9f",
+                "IpPermissionsEgress": [
+                    {
+                        "IpProtocol": "-1",
+                        "IpRanges": [
+                            {
+                                "CidrIp": "0.0.0.0/0"
+                            }
+                        ],
+                        "Ipv6Ranges": [],
+                        "PrefixListIds": [],
+                        "UserIdGroupPairs": []
+                    }
+                ],
+                "VpcId": "vpc-0e2ce3db654f9651a"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

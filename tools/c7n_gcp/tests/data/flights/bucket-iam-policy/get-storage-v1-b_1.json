@@ -1,0 +1,101 @@
+{
+  "headers": {
+    "x-guploader-uploadid": "ABg5-Uw9PimUJwYAIHYNEBvtU_aXQie3d14SDjr62EHvcEsq9YGRF_vjK_GGpcaNpY0jA29UqUwDCxewRhhWLF6xdiY",
+    "content-type": "application/json; charset=UTF-8",
+    "date": "Thu, 17 Jun 2021 21:11:58 GMT",
+    "vary": "Origin, X-Origin",
+    "cache-control": "private, max-age=0, must-revalidate, no-transform",
+    "expires": "Thu, 17 Jun 2021 21:11:58 GMT",
+    "content-length": "10922",
+    "server": "UploadServer",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000,h3-T051=\":443\"; ma=2592000,h3-Q050=\":443\"; ma=2592000,h3-Q046=\":443\"; ma=2592000,h3-Q043=\":443\"; ma=2592000,quic=\":443\"; ma=2592000; v=\"46,43\"",
+    "status": "200",
+    "content-location": "https://storage.googleapis.com/storage/v1/b?project=custodian&projection=full&alt=json"
+  },
+  "body": {
+    "kind": "storage#buckets",
+    "items": [
+      {
+        "kind": "storage#bucket",
+        "selfLink": "https://www.googleapis.com/storage/v1/b/cloud-custodian-test-1",
+        "id": "cloud-custodian-test-1",
+        "name": "cloud-custodian-test-1",
+        "projectNumber": "624100000705",
+        "metageneration": "2",
+        "location": "US-EAST1",
+        "storageClass": "STANDARD",
+        "etag": "CAI=",
+        "defaultEventBasedHold": false,
+        "timeCreated": "2021-06-08T23:22:05.793Z",
+        "updated": "2021-06-08T23:22:40.234Z",
+        "iamConfiguration": {
+          "bucketPolicyOnly": {
+            "enabled": true,
+            "lockedTime": "2021-09-06T23:22:05.793Z"
+          },
+          "uniformBucketLevelAccess": {
+            "enabled": true,
+            "lockedTime": "2021-09-06T23:22:05.793Z"
+          },
+          "publicAccessPrevention": "unspecified"
+        },
+        "locationType": "region",
+        "satisfiesPZS": false
+      },
+      {
+        "kind": "storage#bucket",
+        "selfLink": "https://www.googleapis.com/storage/v1/b/cloud-custodian-test-2",
+        "id": "cloud-custodian-test-2",
+        "name": "cloud-custodian-test-2",
+        "projectNumber": "888888784725",
+        "metageneration": "2",
+        "location": "US-EAST1",
+        "storageClass": "STANDARD",
+        "etag": "CAI=",
+        "defaultEventBasedHold": false,
+        "timeCreated": "2021-06-08T23:22:05.793Z",
+        "updated": "2021-06-08T23:22:40.234Z",
+        "iamConfiguration": {
+          "bucketPolicyOnly": {
+            "enabled": true,
+            "lockedTime": "2020-08-06T23:22:05.793Z"
+          },
+          "uniformBucketLevelAccess": {
+            "enabled": false,
+            "lockedTime": "2020-08-06T23:22:05.793Z"
+          },
+          "publicAccessPrevention": "unspecified"
+        },
+        "locationType": "region",
+        "satisfiesPZS": false
+      },
+      {
+        "kind": "storage#bucket",
+        "selfLink": "https://www.googleapis.com/storage/v1/b/cloud-custodian-test-2",
+        "id": "cloud-custodian-test-3",
+        "name": "cloud-custodian-test-3",
+        "projectNumber": "383838584725",
+        "metageneration": "2",
+        "location": "US-EAST1",
+        "storageClass": "STANDARD",
+        "etag": "CAI=",
+        "defaultEventBasedHold": false,
+        "timeCreated": "2019-06-04T23:22:05.793Z",
+        "updated": "2019-06-04T23:22:40.234Z",
+        "iamConfiguration": {
+          "bucketPolicyOnly": {
+            "enabled": true,
+            "lockedTime": "2020-08-06T23:22:05.793Z"
+          },
+          "uniformBucketLevelAccess": {
+            "enabled": false,
+            "lockedTime": "2020-08-06T23:22:05.793Z"
+          },
+          "publicAccessPrevention": "unspecified"
+        },
+        "locationType": "region",
+        "satisfiesPZS": false
+      }
+    ]
+  }
+}

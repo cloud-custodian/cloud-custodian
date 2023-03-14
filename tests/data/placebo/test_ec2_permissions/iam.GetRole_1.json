@@ -1,0 +1,19 @@
+{
+    "status_code": 200,
+    "data": {
+    "Role": {
+        "Path": "/",
+        "RoleName": "CloudCustodianRole",
+        "RoleId": "AROAI7ZS26HIW5UKQGHRM",
+        "Arn": "arn:aws:iam::644160558196:role/CloudCustodianRole",
+        "CreateDate": "2016-10-29T19:39:43Z",
+        "AssumeRolePolicyDocument": "%7B%22Version%22%3A%222012-10-17%22%2C%22Statement%22%3A%5B%7B%22Effect%22%3A%22Allow%22%2C%22Principal%22%3A%7B%22Service%22%3A%22ec2.amazonaws.com%22%7D%2C%22Action%22%3A%22sts%3AAssumeRole%22%7D%5D%7D",
+        "MaxSessionDuration": 3600,
+        "RoleLastUsed": {
+            "LastUsedDate": "2020-04-01T17:38:54Z",
+            "Region": "us-east-1"
+        }
+    },
+	"ResponseMetadata": {}
+    }
+}

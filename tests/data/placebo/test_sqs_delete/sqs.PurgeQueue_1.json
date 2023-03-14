@@ -1,24 +1,12 @@
 {
-    "status_code": 400, 
+    "status_code": 400,
     "data": {
-        "ResponseMetadata": {
-            "RetryAttempts": 0, 
-            "HTTPStatusCode": 400, 
-            "RequestId": "f1656e37-e88d-54e3-838f-3fa04dc7675d", 
-            "HTTPHeaders": {
-                "x-amzn-requestid": "f1656e37-e88d-54e3-838f-3fa04dc7675d", 
-                "content-length": "333", 
-                "server": "Server", 
-                "connection": "keep-alive", 
-                "date": "Thu, 18 May 2017 13:35:06 GMT", 
-                "content-type": "text/xml"
-            }
-        }, 
         "Error": {
-            "Message": "The specified queue does not exist for this wsdl version.", 
-            "Code": "AWS.SimpleQueueService.NonExistentQueue", 
-            "Type": "Sender", 
+            "Type": "Sender",
+            "Code": "AWS.SimpleQueueService.NonExistentQueue",
+            "Message": "The specified queue does not exist for this wsdl version.",
             "Detail": null
-        }
+        },
+        "ResponseMetadata": {}
     }
 }

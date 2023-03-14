@@ -1,23 +1,59 @@
-# Copyright 2018 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import time
+import pytest
 from .common import BaseTest
+
+from pytest_terraform import terraform
+
+
+@pytest.mark.skiplive
+@terraform('eks_nodegroup_delete')
+def test_eks_nodegroup_delete(test, eks_nodegroup_delete):
+    aws_region = 'eu-central-1'
+    session_factory = test.replay_flight_data('test_eks_nodegroup_delete', region=aws_region)
+
+    client = session_factory().client('eks')
+    eks_cluster_name = eks_nodegroup_delete['aws_eks_node_group.deleted_example.cluster_name']
+    eks_nodegroup_name = eks_nodegroup_delete['aws_eks_node_group.deleted_example.node_group_name']
+
+    p = test.load_policy(
+        {
+            'name': 'eks-nodegroup-delete',
+            'resource': 'eks-nodegroup',
+            'filters': [
+                {'clusterName': eks_cluster_name},
+                {'and': [
+                    {'tag:Name': eks_nodegroup_name},
+                    {'tag:ClusterName': eks_cluster_name},
+                ]},
+            ],
+            'actions': [{'type': 'delete'}],
+        },
+        session_factory=session_factory,
+        config={'region': aws_region},
+    )
+
+    resources = p.run()
+    test.assertEqual(len(resources), 1)
+
+    nodegroup = client.describe_nodegroup(
+        clusterName=eks_cluster_name,
+        nodegroupName=eks_nodegroup_name
+    )['nodegroup']
+    test.assertEqual(nodegroup['status'], 'DELETING')
 
 
 class EKS(BaseTest):
+
+    def test_config(self):
+        factory = self.replay_flight_data('test_eks_config')
+        p = self.load_policy(
+            {"name": "eks", "source": "config", "resource": "eks"},
+            session_factory=factory,
+            config={'region': 'us-east-2'})
+        resources = p.run()
+        assert resources[0]['name'] == 'kapil-dev'
 
     def test_query_with_subnet_sg_filter(self):
         factory = self.replay_flight_data("test_eks_query")
@@ -79,6 +115,34 @@ class EKS(BaseTest):
         cluster = client.describe_cluster(name='dev').get('cluster')
         self.assertEqual(cluster['status'], 'DELETING')
 
+    def test_delete_eks_with_both(self):
+        name = "test_f1"
+        factory = self.replay_flight_data("test_eks_delete_with_both")
+        client = factory().client("eks")
+        nodegroupNames = client.list_nodegroups(clusterName=name)['nodegroups']
+        self.assertEqual(len(nodegroupNames), 1)
+        fargateProfileNames = client.list_fargate_profiles(
+            clusterName=name)['fargateProfileNames']
+        self.assertEqual(len(fargateProfileNames), 1)
+        p = self.load_policy(
+            {
+                "name": "eks-delete",
+                "resource": "eks",
+                "filters": [{"name": name}],
+                "actions": ["delete"],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        nodegroupNames = client.list_nodegroups(clusterName=resources[0]['name'])['nodegroups']
+        self.assertEqual(len(nodegroupNames), 0)
+        fargateProfileNames = client.list_fargate_profiles(
+            clusterName=resources[0]['name'])['fargateProfileNames']
+        self.assertEqual(len(fargateProfileNames), 0)
+        cluster = client.describe_cluster(name=name).get('cluster')
+        self.assertEqual(cluster['status'], 'DELETING')
+
     def test_tag_and_remove_tag(self):
         factory = self.replay_flight_data('test_eks_tag_and_remove_tag')
         p = self.load_policy({
@@ -97,3 +161,27 @@ class EKS(BaseTest):
             client.describe_cluster(
                 name='devx')['cluster']['tags'],
             {'App': 'Custodian'})
+
+    def test_kms_filter(self):
+        factory = self.replay_flight_data('test_eks_kms_filter')
+        kms = factory().client('kms')
+        p = self.load_policy(
+            {
+                'name': 'test-eks-kms-filter',
+                'resource': 'aws.eks',
+                'filters': [
+                    {
+                        'type': 'kms-key',
+                        'key': 'c7n:AliasName',
+                        'value': '^(alias/eks)',
+                        'op': 'regex'
+                    }
+                ]
+            },
+            session_factory=factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        kmsKeyId = resources[0]['encryptionConfig'][0]['provider']['keyArn']
+        aliases = kms.list_aliases(KeyId=kmsKeyId)
+        self.assertEqual(aliases['Aliases'][0]['AliasName'], 'alias/eks')

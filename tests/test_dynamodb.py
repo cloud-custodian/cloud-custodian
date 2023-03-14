@@ -1,22 +1,14 @@
-# Copyright 2016-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 from .common import BaseTest
 import datetime
 from dateutil import tz as tzutil
+from unittest.mock import MagicMock
+from c7n.testing import mock_datetime_now
+from dateutil import parser
 
+import c7n.resources.dynamodb
+import c7n.filters.backup
 from c7n.resources.dynamodb import DeleteTable
 from c7n.executor import MainThreadExecutor
 
@@ -62,6 +54,22 @@ class DynamodbTest(BaseTest):
         resources = p.run()
         self.assertEqual(resources[0]["TableName"], "c7n.DynamoDB.01")
 
+    def test_update_tables(self):
+        session_factory = self.replay_flight_data("test_dynamodb_update_table")
+        client = session_factory().client("dynamodb")
+        p = self.load_policy(
+            {
+                "name": "update-empty-tables",
+                "resource": "dynamodb-table",
+                "actions": [{"type": "update", "BillingMode": "PAY_PER_REQUEST"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        assert resources[0]["TableName"] == "cc-testing-table"
+        t = client.describe_table(TableName="cc-testing-table")["Table"]
+        assert t["BillingModeSummary"]["BillingMode"] == "PAY_PER_REQUEST"
+
     def test_tag_filter(self):
         session_factory = self.replay_flight_data("test_dynamodb_tag_filter")
         client = session_factory().client("dynamodb")
@@ -102,6 +110,102 @@ class DynamodbTest(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["TableName"], "test-table-kms-filter")
 
+    def test_continuous_backup_filter(self):
+        session_factory = self.replay_flight_data("test_dynamodb_continuous_backup_filter")
+        p = self.load_policy(
+            {
+                "name": "dynamodb-continuous_backup-filters",
+                "resource": "dynamodb-table",
+                "filters": [
+                    {
+                        "type": "continuous-backup",
+                        "key": "PointInTimeRecoveryDescription.PointInTimeRecoveryStatus",
+                        "value": "ENABLED",
+                        "op": "ne"
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            resources[0]["c7n:continuous-backup"]["PointInTimeRecoveryDescription"]["PointInTimeRecoveryStatus"], # noqa
+            "DISABLED")
+
+    def test_continuous_backup_action(self):
+        session_factory = self.replay_flight_data("test_dynamodb_continuous_backup_action")
+        client = session_factory().client("dynamodb")
+        p = self.load_policy(
+            {
+                "name": "dynamodb-continuous_backup-action",
+                "resource": "dynamodb-table",
+                "filters": [
+                    {
+                        "type": "continuous-backup",
+                        "key": "PointInTimeRecoveryDescription.PointInTimeRecoveryStatus",
+                        "value": "ENABLED",
+                        "op": "ne"
+                    }
+                ],
+                "actions": [
+                    {
+                        "type": "set-continuous-backup"
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            resources[0]["c7n:continuous-backup"]["PointInTimeRecoveryDescription"]["PointInTimeRecoveryStatus"],  # noqa
+            "DISABLED")
+        res = client.describe_continuous_backups(TableName=resources[0]["TableName"])['ContinuousBackupsDescription']  # noqa
+        self.assertEqual(
+            res['PointInTimeRecoveryDescription']["PointInTimeRecoveryStatus"],
+            'ENABLED')
+
+    def test_continuous_backup_action_error(self):
+        factory = self.replay_flight_data("test_dynamodb_continuous_backup_action")
+
+        client = factory().client("dynamodb")
+        mock_factory = MagicMock()
+        mock_factory.region = 'us-east-1'
+        mock_factory().client(
+            'dynamodb').exceptions.TableNotFoundException = (
+                client.exceptions.TableNotFoundException)
+
+        mock_factory().client('dynamodb').update_continuous_backups.side_effect = (
+            client.exceptions.TableNotFoundException(
+                {'Error': {'Code': 'xyz'}},
+                operation_name='update_continuous_backups'))
+        p = self.load_policy(
+            {
+                "name": "dynamodb-continuous_backup-action",
+                "resource": "dynamodb-table",
+                "filters": [
+                    {
+                        "type": "continuous-backup",
+                        "key": "PointInTimeRecoveryDescription.PointInTimeRecoveryStatus",
+                        "value": "ENABLED",
+                        "op": "ne"
+                    }
+                ],
+                "actions": [
+                    {
+                        "type": "set-continuous-backup"
+                    }
+                ]
+            },
+            session_factory=mock_factory,
+        )
+        try:
+            p.resource_manager.actions[0].process([{'TableName': 'abc', 'TableStatus': 'ACTIVE'}])
+        except client.exceptions.TableNotFoundException:
+            self.fail('should not raise')
+        mock_factory().client('dynamodb').update_continuous_backups.assert_called_once()
+
     def test_dynamodb_mark(self):
         session_factory = self.replay_flight_data("test_dynamodb_mark")
         client = session_factory().client("dynamodb")
@@ -116,7 +220,7 @@ class DynamodbTest(BaseTest):
                 "actions": [
                     {
                         "type": "mark-for-op",
-                        "days": 0,
+                        "days": 1,
                         "op": "delete",
                         "tag": "test_tag",
                     }
@@ -456,3 +560,143 @@ class DynamoDbAccelerator(BaseTest):
             ["c7n-test-cluster"])
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['TotalNodes'], 1)
+
+    def test_dynamodb_consecutive_backup_count_filter(self):
+        session_factory = self.replay_flight_data("test_dynamodb_consecutive_backup_count_filter")
+        p = self.load_policy(
+            {
+                "name": "dynamodb_consecutive_backup_count_filter",
+                "resource": "dynamodb-table",
+                "filters": [
+                    {
+                        "type": "consecutive-backups",
+                        "count": 2,
+                        "period": "days",
+                        "backuptype": "ALL",
+                        "status": "AVAILABLE"
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+        with mock_datetime_now(parser.parse("2022-08-31T00:00:00+00:00"), c7n.resources.dynamodb):
+            resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['c7n:DynamodbBackups'][0]['BackupStatus'], "AVAILABLE")
+        self.assertEqual(resources[0]['c7n:DynamodbBackups'][0]['BackupType'], "USER")
+        self.assertEqual(resources[0]['c7n:DynamodbBackups'][0]['BackupCreationDateTime'],
+            datetime.datetime(2022, 8, 31, 19, 4, 52, 776000, tzinfo=datetime.timezone.utc))
+
+    def test_dynamodb_consecutive_backup_hourly_count_filter(self):
+        session_factory = self.replay_flight_data(
+            "test_dynamodb_consecutive_backup_hourly_count_filter")
+        p = self.load_policy(
+            {
+                "name": "dynamodb_consecutive_backup_count_filter",
+                "resource": "dynamodb-table",
+                "filters": [
+                    {
+                        "type": "consecutive-backups",
+                        "count": 2,
+                        "period": "hours",
+                        "backuptype": "ALL",
+                        "status": "AVAILABLE"
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+        with mock_datetime_now(parser.parse("2022-08-30T21:00:00+00:00"), c7n.resources.dynamodb):
+            resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_dynamodb_consecutive_backup_weekly_count_filter(self):
+        session_factory = self.replay_flight_data(
+            "test_dynamodb_consecutive_backup_weekly_count_filter")
+        p = self.load_policy(
+            {
+                "name": "dynamodb_consecutive_backup_weekly_count_filter",
+                "resource": "dynamodb-table",
+                "filters": [
+                    {
+                        "type": "consecutive-backups",
+                        "count": 1,
+                        "period": "weeks",
+                        "backuptype": "ALL",
+                        "status": "AVAILABLE"
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+        with mock_datetime_now(parser.parse("2022-08-31T00:00:00+00:00"), c7n.resources.dynamodb):
+            resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_dynamodb_consecutive_aws_backup_count_filter(self):
+        session_factory = self.replay_flight_data("test_dynamodb_consecutive_backup_count_filter")
+        p = self.load_policy(
+            {
+                "name": "dynamodb_consecutive_aws_backup_count_filter",
+                "resource": "dynamodb-table",
+                "filters": [
+                    {
+                        "type": "consecutive-aws-backups",
+                        "count": 2,
+                        "period": "days",
+                        "status": "COMPLETED"
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+        with mock_datetime_now(parser.parse("2022-08-31T00:00:00+00:00"), c7n.filters.backup):
+            resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['c7n:AwsBackups'][0]['Status'], "COMPLETED")
+        self.assertEqual(resources[0]['c7n:AwsBackups'][0]['CreationDate'],
+            datetime.datetime(2022, 8, 31, 19, 4, 52, 776000, tzinfo=datetime.timezone.utc))
+
+    def test_dynamodb_consecutive_aws_backup_hourly_count_filter(self):
+        session_factory = self.replay_flight_data(
+            "test_dynamodb_consecutive_backup_hourly_count_filter")
+        p = self.load_policy(
+            {
+                "name": "dynamodb_consecutive_aws_backup_count_filter",
+                "resource": "dynamodb-table",
+                "filters": [
+                    {
+                        "type": "consecutive-aws-backups",
+                        "count": 2,
+                        "period": "hours",
+                        "status": "COMPLETED"
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+        with mock_datetime_now(parser.parse("2022-08-30T21:00:00+00:00"), c7n.filters.backup):
+            resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_dynamodb_consecutive_aws_backup_weekly_count_filter(self):
+        session_factory = self.replay_flight_data(
+            "test_dynamodb_consecutive_backup_weekly_count_filter")
+        p = self.load_policy(
+            {
+                "name": "dynamodb_consecutive_aws_backup_weekly_count_filter",
+                "resource": "dynamodb-table",
+                "filters": [
+                    {
+                        "type": "consecutive-aws-backups",
+                        "count": 1,
+                        "period": "weeks",
+                        "status": "COMPLETED"
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+        with mock_datetime_now(parser.parse("2022-08-31T00:00:00+00:00"), c7n.filters.backup):
+            resources = p.run()
+        self.assertEqual(len(resources), 1)

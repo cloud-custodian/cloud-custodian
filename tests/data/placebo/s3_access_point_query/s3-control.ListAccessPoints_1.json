@@ -1,0 +1,14 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "AccessPointList": [
+            {
+                "Name": "c7n-ap-liberal-anemone",
+                "NetworkOrigin": "Internet",
+                "Bucket": "c7n-ap-liberal-anemone",
+                "AccessPointArn": "arn:aws:s3:us-east-2:644160558196:accesspoint/c7n-ap-liberal-anemone"
+            }
+        ]
+    }
+}

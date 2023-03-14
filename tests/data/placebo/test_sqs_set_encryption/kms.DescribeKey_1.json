@@ -1,36 +1,31 @@
 {
-    "status_code": 200, 
+    "status_code": 200,
     "data": {
         "KeyMetadata": {
-            "Origin": "AWS_KMS", 
-            "KeyId": "b5f0e072-1669-48e5-b110-c4989287ba54", 
-            "Description": "West SQS encryption key", 
-            "KeyManager": "CUSTOMER", 
-            "Enabled": true, 
-            "KeyUsage": "ENCRYPT_DECRYPT", 
-            "KeyState": "Enabled", 
+            "AWSAccountId": "644160558196",
+            "KeyId": "73d5da2e-80ec-46be-8fd8-d9a50b4b2191",
+            "Arn": "arn:aws:kms:us-west-2:644160558196:key/73d5da2e-80ec-46be-8fd8-d9a50b4b2191",
             "CreationDate": {
-                "hour": 6, 
-                "__class__": "datetime", 
-                "month": 11, 
-                "second": 47, 
-                "microsecond": 647000, 
-                "year": 2017, 
-                "day": 4, 
-                "minute": 45
-            }, 
-            "Arn": "arn:aws:kms:us-east-1:644160558196:key/b5f0e072-1669-48e5-b110-c4989287ba54", 
-            "AWSAccountId": "644160558196"
-        }, 
-        "ResponseMetadata": {
-            "RetryAttempts": 0, 
-            "HTTPStatusCode": 200, 
-            "RequestId": "636538c0-c14d-11e7-b9b8-396ffefb6e91", 
-            "HTTPHeaders": {
-                "x-amzn-requestid": "636538c0-c14d-11e7-b9b8-396ffefb6e91", 
-                "content-length": "358", 
-                "content-type": "application/x-amz-json-1.1"
-            }
-        }
+                "__class__": "datetime",
+                "year": 2020,
+                "month": 9,
+                "day": 2,
+                "hour": 22,
+                "minute": 13,
+                "second": 27,
+                "microsecond": 725000
+            },
+            "Enabled": true,
+            "Description": "",
+            "KeyUsage": "ENCRYPT_DECRYPT",
+            "KeyState": "Enabled",
+            "Origin": "AWS_KMS",
+            "KeyManager": "CUSTOMER",
+            "CustomerMasterKeySpec": "SYMMETRIC_DEFAULT",
+            "EncryptionAlgorithms": [
+                "SYMMETRIC_DEFAULT"
+            ]
+        },
+        "ResponseMetadata": {}
     }
 }

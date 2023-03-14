@@ -1,0 +1,32 @@
+{
+    "status_code": 200,
+    "data": {
+        "SecurityGroups": [
+            {
+                "Description": "launch-wizard-11 created 2020-03-18T16:43:39.293-04:00",
+                "GroupName": "launch-wizard-11",
+                "IpPermissions": [
+                    {
+                        "FromPort": 443,
+                        "IpProtocol": "tcp",
+                        "IpRanges": [
+                            {
+                                "CidrIp": "0.0.0.0/0",
+                                "Description": "SSL To The World"
+                            }
+                        ],
+                        "Ipv6Ranges": [],
+                        "PrefixListIds": [],
+                        "ToPort": 443,
+                        "UserIdGroupPairs": []
+                    }
+                ],
+                "OwnerId": "644160558196",
+                "GroupId": "sg-04ececeaf1ed666cb",
+                "IpPermissionsEgress": [],
+                "VpcId": "vpc-d2d616b5"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

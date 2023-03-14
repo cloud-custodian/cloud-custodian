@@ -1,0 +1,32 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Thu, 14 Nov 2019 10:16:30 GMT",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"46,43\",h3-Q050=\":443\"; ma=2592000,h3-Q049=\":443\"; ma=2592000,h3-Q048=\":443\"; ma=2592000,h3-Q046=\":443\"; ma=2592000,h3-Q043=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "755",
+    "-content-encoding": "gzip"
+  },
+  "body": {
+    "id": "2852512229878699921",
+    "name": "operation-1573726590284-5974bc6633343-4f7a5016-ead9a17c",
+    "zone": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-c",
+    "operationType": "setLabels",
+    "targetLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-c/instances/test-ingwar",
+    "targetId": "8759471929923434140",
+    "status": "RUNNING",
+    "user": "karol.lassak@optiva.com",
+    "progress": 0,
+    "insertTime": "2019-11-14T02:16:30.654-08:00",
+    "startTime": "2019-11-14T02:16:30.665-08:00",
+    "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-c/operations/operation-1573726590284-5974bc6633343-4f7a5016-ead9a17c",
+    "kind": "compute#operation"
+  }
+}

@@ -53,7 +53,7 @@ email, limited to 10 days of logs to identify the creator.
              tag: CreatorEmail
              days: 10
 
-Event grid triggered policy to tag all virual machines and storage accounts
+Event grid triggered policy to tag all virtual machines and storage accounts
 with the creator email. The creator email is contained in the event message, 
 so days is not needed.
 

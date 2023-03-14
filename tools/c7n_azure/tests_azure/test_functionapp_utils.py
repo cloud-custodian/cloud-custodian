@@ -1,18 +1,5 @@
-# Copyright 2015-2018 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 from .azure_common import BaseTest, arm_template
 from c7n_azure.function_package import FunctionPackage, AzurePythonPackageArchive
 from c7n_azure.functionapp_utils import FunctionAppUtilities
@@ -70,8 +57,8 @@ class FunctionAppUtilsTest(BaseTest):
                 'name': 'cloud-custodian-test',
                 'location': 'westus2'
             },
-            function_app_resource_group_name=CONST_GROUP_NAME,
-            function_app_name='custodian-test-app')
+            function_app={'resource_group_name': CONST_GROUP_NAME,
+                          'name': 'custodian-test-app'})
 
         app = FunctionAppUtilities.deploy_function_app(parameters)
         self.assertIsNotNone(app)
@@ -95,8 +82,9 @@ class FunctionAppUtilsTest(BaseTest):
                 'name': 'cloud-custodian-test',
                 'sku_tier': 'something wrong'
             },
-            function_app_resource_group_name=CONST_GROUP_NAME,
-            function_app_name=self.dedicated_function_name)
+            function_app={
+                'name': self.dedicated_function_name,
+                'resource_group_name': CONST_GROUP_NAME})
 
         FunctionAppUtilities.deploy_function_app(parameters)
         self.assertEqual(parameters.service_plan['sku_tier'], 'Basic')
@@ -129,8 +117,9 @@ class FunctionAppUtilsTest(BaseTest):
             service_plan={
                 'sku_tier': 'dynamic'
             },
-            function_app_resource_group_name=CONST_GROUP_NAME,
-            function_app_name='cloud-custodian-test')
+            function_app={
+                'resource_group_name': CONST_GROUP_NAME,
+                'name': 'cloud-custodian-test'})
 
         self.assertTrue(FunctionAppUtilities.is_consumption_plan(params))
 
@@ -158,8 +147,8 @@ class FunctionAppUtilsTest(BaseTest):
                 'name': 'cloud-custodian-test',
                 'sku_tier': 'dynamic'
             },
-            function_app_resource_group_name=CONST_GROUP_NAME,
-            function_app_name=function_app_name)
+            function_app={'resource_group_name': CONST_GROUP_NAME,
+                          'name': function_app_name})
 
         package = FunctionPackage("TestPolicy")
         package.pkg = AzurePythonPackageArchive()
@@ -172,11 +161,11 @@ class FunctionAppUtilsTest(BaseTest):
         wc = self.session.client('azure.mgmt.web.WebSiteManagementClient')
         app_settings = wc.web_apps.list_application_settings(
             CONST_GROUP_NAME, function_app_name)
-        self.assertIsNotNone(app_settings.properties['WEBSITE_RUN_FROM_PACKAGE'])
+        self.assertNotIn('WEBSITE_RUN_FROM_PACKAGE', app_settings.properties)
 
     @arm_template('functionapp-reqs.json')
-    @patch('c7n_azure.function_package.FunctionPackage.publish')
-    def test_publish_functions_package_dedicated(self, mock_function_package_publish):
+    @patch('time.sleep')
+    def test_publish_functions_package_dedicated(self, _1):
         parameters = FunctionAppUtilities.FunctionAppInfrastructureParameters(
             app_insights={
                 'id': '',
@@ -194,8 +183,12 @@ class FunctionAppUtilsTest(BaseTest):
                 'name': 'cloud-custodian-test',
                 'sku_tier': 'Basic'
             },
-            function_app_resource_group_name=CONST_GROUP_NAME,
-            function_app_name=self.dedicated_function_name)
+            function_app={
+                'resource_group_name': CONST_GROUP_NAME,
+                'name': self.dedicated_function_name})
 
-        FunctionAppUtilities.publish_functions_package(parameters, FunctionPackage("TestPolicy"))
-        mock_function_package_publish.assert_called_once()
+        package = FunctionPackage("TestPolicy")
+        package.pkg = AzurePythonPackageArchive()
+        package.close()
+
+        FunctionAppUtilities.publish_functions_package(parameters, package)

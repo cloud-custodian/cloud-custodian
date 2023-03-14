@@ -1,16 +1,5 @@
-# Copyright 2017-2018 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 
 from c7n.utils import type_schema
 
@@ -30,12 +19,16 @@ class Function(QueryResourceManager):
         scope = 'project'
         scope_key = 'parent'
         scope_template = "projects/{}/locations/-"
-        id = "name"
+        name = id = "name"
+        metric_key = "resource.labels.function_name"
+        default_report_fields = [
+            'name', 'runtime', 'eventTrigger.eventType', 'status', 'updateTime']
 
         events = {
             'create': 'google.cloud.functions.v1.CloudFunctionsService.CreateFunction',
             'delete': 'google.cloud.functions.v1.CloudFunctionsService.DeleteFunction',
             'update': 'google.cloud.functions.v1.CloudFunctionsService.UpdateFunction'}
+        urn_component = "function"
 
         @staticmethod
         def get(client, resource_info):
@@ -44,6 +37,16 @@ class Function(QueryResourceManager):
                     'projects/{project_id}/locations/'
                     '{location_id}/functions/{function_name}').format(
                         **resource_info)})
+
+        @classmethod
+        def _get_location(cls, resource):
+            "The region is the fourth segment of the name."
+            return resource["name"].split('/')[3]
+
+        @classmethod
+        def _get_urn_id(cls, resource):
+            "The id is the last segment of the name ."
+            return resource["name"].split('/', 6)[-1]
 
 
 @Function.action_registry.register('delete')

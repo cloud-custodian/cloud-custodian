@@ -1,0 +1,52 @@
+{
+    "version": "0",
+    "id": "b782ed03-9c34-41d8-4444-bc7c6a5e2cfd",
+    "detail-type": "AWS API Call via CloudTrail",
+    "source": "aws.glue",
+    "account": "644160558196",
+    "time": "2020-06-05T16:10:47Z",
+    "region": "us-east-1",
+    "resources": [],
+    "detail": {
+        "eventVersion": "1.05",
+        "userIdentity": {
+            "type": "AssumedRole",
+            "principalId": "23454235342523:custodian-net-change-encryption",
+            "arn": "arn:aws:sts::644160558196:assumed-role/CloudCustodianRole/custodian-net-change-encryption",
+            "accountId": "644160558196",
+            "accessKeyId": "1525415421513245",
+            "sessionContext": {
+                "sessionIssuer": {
+                    "type": "Role",
+                    "principalId": "23454235342523",
+                    "arn": "arn:aws:iam::644160558196:role/CloudCustodianRole",
+                    "accountId": "644160558196",
+                    "userName": "CloudCustodianRole"
+                },
+                "webIdFederationData": {},
+                "attributes": {
+                    "mfaAuthenticated": "false",
+                    "creationDate": "2020-06-05T16:09:41Z"
+                }
+            }
+        },
+        "eventTime": "2020-06-05T16:10:47Z",
+        "eventSource": "glue.amazonaws.com",
+        "eventName": "PutDataCatalogEncryptionSettings",
+        "awsRegion": "us-east-1",
+        "sourceIPAddress": "35.171.244.77",
+        "userAgent": "CloudCustodian(net-change-encryption)/0.9.2 Python/3.8.3 Linux/4.14.165-102.205.amzn2.x86_64 exec-env/AWS_Lambda_python3.8 Botocore/1.15.49",
+        "requestParameters": {
+            "dataCatalogEncryptionSettings": {
+                "encryptionAtRest": {
+                    "catalogEncryptionMode": "SSE-KMS"
+                }
+            }
+        },
+        "responseElements": null,
+        "requestID": "b86bcd00-4444-4127-a74c-6c5f04d6534c",
+        "eventID": "3cda2b5f-a6c7-4c68-4444-93b0f6e1963c",
+        "eventType": "AwsApiCall"
+    },
+    "debug": true
+}

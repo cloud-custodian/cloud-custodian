@@ -1,0 +1,121 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "aws_iam_instance_profile": {
+            "test_profile": {
+                "arn": "arn:aws:iam::644160558196:instance-profile/test_profile",
+                "create_date": "2021-02-24T15:07:06Z",
+                "id": "test_profile",
+                "name": "test_profile",
+                "name_prefix": null,
+                "path": "/",
+                "role": "test_role",
+                "unique_id": "AIPA2BS54WNI5AWK6A2VR"
+            }
+        },
+        "aws_iam_policy": {
+            "policy": {
+                "arn": "arn:aws:iam::644160558196:policy/test-policy",
+                "description": "A test policy",
+                "id": "arn:aws:iam::644160558196:policy/test-policy",
+                "name": "test-policy",
+                "name_prefix": null,
+                "path": "/",
+                "policy": "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Action\": [\n        \"ec2:Describe*\"\n      ],\n      \"Effect\": \"Allow\",\n      \"Resource\": \"*\"\n    }\n  ]\n}\n"
+            }
+        },
+        "aws_iam_role": {
+            "test_role": {
+                "arn": "arn:aws:iam::644160558196:role/test_role",
+                "assume_role_policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"\",\"Effect\":\"Allow\",\"Principal\":{\"Service\":[\"ec2.amazonaws.com\",\"lambda.amazonaws.com\"]},\"Action\":\"sts:AssumeRole\"}]}",
+                "create_date": "2021-02-24T15:07:04Z",
+                "description": "",
+                "force_detach_policies": false,
+                "id": "test_role",
+                "inline_policy": [
+                    {
+                        "name": "",
+                        "policy": ""
+                    }
+                ],
+                "managed_policy_arns": [],
+                "max_session_duration": 3600,
+                "name": "test_role",
+                "name_prefix": null,
+                "path": "/",
+                "permissions_boundary": null,
+                "tags": {
+                    "tag-key": "tag-value"
+                },
+                "unique_id": "AROA2BS54WNIWTFSVXXPZ"
+            }
+        },
+        "aws_iam_role_policy": {
+            "test_policy": {
+                "id": "test_role:test_policy",
+                "name": "test_policy",
+                "name_prefix": null,
+                "policy": "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Action\": [\n        \"ec2:Describe*\"\n      ],\n      \"Effect\": \"Allow\",\n      \"Resource\": \"*\"\n    }\n  ]\n}\n",
+                "role": "test_role"
+            }
+        },
+        "aws_iam_role_policy_attachment": {
+            "test-attach": {
+                "id": "test_role-20210224150706794500000001",
+                "policy_arn": "arn:aws:iam::644160558196:policy/test-policy",
+                "role": "test_role"
+            }
+        },
+        "aws_lambda_function": {
+            "test_lambda": {
+                "arn": "arn:aws:lambda:eu-central-1:644160558196:function:test_function_role",
+                "code_signing_config_arn": "",
+                "dead_letter_config": [],
+                "description": "",
+                "environment": [
+                    {
+                        "variables": {
+                            "foo": "bar"
+                        }
+                    }
+                ],
+                "file_system_config": [],
+                "filename": "payload.zip",
+                "function_name": "test_function_role",
+                "handler": "main.handler",
+                "id": "test_function_role",
+                "image_config": [],
+                "image_uri": "",
+                "invoke_arn": "arn:aws:apigateway:eu-central-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-central-1:644160558196:function:test_function_role/invocations",
+                "kms_key_arn": "",
+                "last_modified": "2021-02-24T15:07:15.255+0000",
+                "layers": null,
+                "memory_size": 128,
+                "package_type": "Zip",
+                "publish": false,
+                "qualified_arn": "arn:aws:lambda:eu-central-1:644160558196:function:test_function_role:$LATEST",
+                "reserved_concurrent_executions": -1,
+                "role": "arn:aws:iam::644160558196:role/test_role",
+                "runtime": "python3.8",
+                "s3_bucket": null,
+                "s3_key": null,
+                "s3_object_version": null,
+                "signing_job_arn": "",
+                "signing_profile_version_arn": "",
+                "source_code_hash": "s6uSwd2/b8HQOfHGDIFWDjJHusxPkXBlqgfzJPbZR6g=",
+                "source_code_size": 216,
+                "tags": null,
+                "timeout": 3,
+                "timeouts": null,
+                "tracing_config": [
+                    {
+                        "mode": "PassThrough"
+                    }
+                ],
+                "version": "$LATEST",
+                "vpc_config": []
+            }
+        }
+    }
+}

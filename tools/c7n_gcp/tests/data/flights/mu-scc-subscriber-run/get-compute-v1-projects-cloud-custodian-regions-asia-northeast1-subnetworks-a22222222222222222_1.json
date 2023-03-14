@@ -1,0 +1,30 @@
+{
+  "headers": {
+    "etag": "sbdFmx77i1RbY1n5Y5HAh3_gEbA=/6I-SqQNS4M73JMOHf149Vxf66OQ=",
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Mon, 29 Mar 2021 15:41:30 GMT",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3-29=\":443\"; ma=2592000,h3-T051=\":443\"; ma=2592000,h3-Q050=\":443\"; ma=2592000,h3-Q046=\":443\"; ma=2592000,h3-Q043=\":443\"; ma=2592000,quic=\":443\"; ma=2592000; v=\"46,43\"",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "649",
+    "-content-encoding": "gzip",
+    "content-location": "https://compute.googleapis.com/compute/v1/projects/cloud-custodian/regions/asia-northeast1/subnetworks/a22222222222222222?alt=json"
+  },
+  "body": {
+    "id": "a22222222222222222",
+    "creationTimestamp": "2021-03-02T10:45:17.960-08:00",
+    "name": "default",
+    "network": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/networks/default",
+    "region": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/asia-northeast1",
+    "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/asia-northeast1/subnetworks/default",
+    "fingerprint": "QmcEMdCHRrc=",
+    "purpose": "PRIVATE",
+    "kind": "compute#subnetwork"
+  }
+}

@@ -1,0 +1,50 @@
+{
+    "status_code": 200,
+    "data": {
+        "Keys": [
+            {
+                "KeyId": "20eda8de-7c17-47bd-891f-246986ccba12",
+                "KeyArn": "arn:aws:kms:us-east-1:644160558196:key/20eda8de-7c17-47bd-891f-246986ccba12"
+            },
+            {
+                "KeyId": "2a7ce99a-7237-4fa5-b649-c700a8d0996c",
+                "KeyArn": "arn:aws:kms:us-east-1:644160558196:key/2a7ce99a-7237-4fa5-b649-c700a8d0996c"
+            },
+            {
+                "KeyId": "47a6a783-f430-4b74-bc4c-bb18b2c562b2",
+                "KeyArn": "arn:aws:kms:us-east-1:644160558196:key/47a6a783-f430-4b74-bc4c-bb18b2c562b2"
+            },
+            {
+                "KeyId": "8d56db16-21c6-412f-b949-7a012e11ee6e",
+                "KeyArn": "arn:aws:kms:us-east-1:644160558196:key/8d56db16-21c6-412f-b949-7a012e11ee6e"
+            },
+            {
+                "KeyId": "c4d8657f-c6cd-422d-8d7a-0c9d7b362a15",
+                "KeyArn": "arn:aws:kms:us-east-1:644160558196:key/c4d8657f-c6cd-422d-8d7a-0c9d7b362a15"
+            },
+            {
+                "KeyId": "ec3a2796-4432-49a4-a595-c5c264fd780d",
+                "KeyArn": "arn:aws:kms:us-east-1:644160558196:key/ec3a2796-4432-49a4-a595-c5c264fd780d"
+            },
+            {
+                "KeyId": "fd5836c6-305c-460f-8c49-79191c4c46b9",
+                "KeyArn": "arn:aws:kms:us-east-1:644160558196:key/fd5836c6-305c-460f-8c49-79191c4c46b9"
+            }
+        ],
+        "Truncated": false,
+        "ResponseMetadata": {
+            "RequestId": "904057e0-ff1b-4192-aa65-cb8a097a791a",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "904057e0-ff1b-4192-aa65-cb8a097a791a",
+                "cache-control": "no-cache, no-store, must-revalidate, private",
+                "expires": "0",
+                "pragma": "no-cache",
+                "date": "Tue, 3 Mar 2020 22:43:28 GMT",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "993"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

@@ -1,0 +1,35 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Functions": [
+            {
+                "FunctionName": "custodian-ec2-public",
+                "FunctionArn": "arn:aws:lambda:us-east-2:644160558196:function:custodian-ec2-public",
+                "Runtime": "python3.8",
+                "Role": "arn:aws:iam::644160558196:role/custodian-with-boundary",
+                "Handler": "custodian_policy.run",
+                "CodeSize": 494639,
+                "Description": "cloud-custodian lambda policy",
+                "Timeout": 900,
+                "MemorySize": 512,
+                "LastModified": "2021-11-24T20:20:37.044+0000",
+                "CodeSha256": "frO3SmvIXmsaf/tpvQT4OHfyv1o5by6MOXZMqPV+jvw=",
+                "Version": "$LATEST",
+                "VpcConfig": {
+                    "SubnetIds": [],
+                    "SecurityGroupIds": [],
+                    "VpcId": ""
+                },
+                "TracingConfig": {
+                    "Mode": "PassThrough"
+                },
+                "RevisionId": "1b099184-ae55-40b4-b3d6-2de39d4b2a3c",
+                "PackageType": "Zip",
+                "Architectures": [
+                    "x86_64"
+                ]
+            }
+        ]
+    }
+}

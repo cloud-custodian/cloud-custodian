@@ -1,26 +1,16 @@
-# Copyright 2016-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import json
+import time
 from mock import patch
 
 from botocore.exceptions import ClientError
 from .common import BaseTest, functional
 from c7n.executor import MainThreadExecutor
+from c7n.resources.aws import shape_validate
 from c7n.resources.awslambda import AWSLambda, ReservedConcurrency
 from c7n.mu import PythonPackageArchive
+from pytest_terraform import terraform
 
 
 SAMPLE_FUNC = """\
@@ -156,6 +146,54 @@ class LambdaLayerTest(BaseTest):
 
 class LambdaTest(BaseTest):
 
+    def test_lambda_trim_versions(self):
+        factory = self.replay_flight_data('test_lambda_trim_versions')
+        client = factory().client('lambda')
+        p = self.load_policy(
+            {
+                'name': 'lambda-check',
+                'resource': 'lambda',
+                'actions': [{
+                    'type': 'trim-versions',
+                    'retain-latest': True
+                }]
+            },
+            session_factory=factory)
+        p.resource_manager.actions[0].process(
+            [{'FunctionName': 'custodian-ec2-check'}])
+        versions = {v['Version']: v for v in
+                    client.list_versions_by_function(
+                        FunctionName='custodian-ec2-check').get('Versions')}
+        aliases = client.list_aliases(
+            FunctionName='custodian-ec2-check').get('Aliases')
+        assert len(aliases) == 1
+        assert aliases[0]['FunctionVersion'] in versions
+        assert '$LATEST' in versions
+        assert set(versions) == {'$LATEST', '6', '12'}
+
+    def test_lambda_check_permission(self):
+        # lots of pre-conditions, iam role with iam read only policy attached
+        # and a permission boundary with deny on iam read access.
+        factory = self.replay_flight_data('test_lambda_check_permission')
+        p = self.load_policy(
+            {
+                'name': 'lambda-check',
+                'resource': 'lambda',
+                'filters': [
+                    {'FunctionName': 'custodian-ec2-public'},
+                    {'type': 'check-permissions',
+                     'match': 'allowed',
+                     'actions': ['iam:ListUsers']}]
+            },
+            session_factory=factory)
+        resources = p.run()
+        assert not resources
+
+        # Re-run, without respecting permission boundaries
+        p.data['filters'][1]['boundaries'] = False
+        resources = p.run()
+        assert len(resources) == 1
+
     def test_lambda_config_source(self):
         factory = self.replay_flight_data("test_aws_lambda_config_source")
         p = self.load_policy(
@@ -176,6 +214,54 @@ class LambdaTest(BaseTest):
             resources[0]["Tags"], [{"Key": "lambda:createdBy", "Value": "SAM"}]
         )
         self.assertTrue("c7n:Policy" in resources[0])
+
+    def test_post_finding(self):
+        factory = self.replay_flight_data('test_lambda_post_finding')
+        p = self.load_policy({
+            'name': 'lambda',
+            'resource': 'aws.lambda',
+            'actions': [
+                {'type': 'post-finding',
+                 'types': [
+                     'Software and Configuration Checks/OrgStandard/abc-123']}]},
+            session_factory=factory, config={'region': 'us-west-2'})
+        functions = p.resource_manager.get_resources([
+            'custodian-ec2-ssm-query'])
+        rfinding = p.resource_manager.actions[0].format_resource(functions[0])
+        self.maxDiff = None
+        self.assertEqual(
+            rfinding,
+            {'Details': {'AwsLambdaFunction': {
+                'CodeSha256': 'Pq32lM46RbVovW/Abh14XfrFHIeUM/cAEC51fwkf+tk=',
+                'Code': {
+                    'S3Bucket': 'awslambda-us-west-2-tasks',
+                    'S3Key': 'snapshots/644160558196/custodian-ec2-ssm-query-c3bed681-aa99-4bb2-a155-2f5897de20d2',  # noqa
+                    'S3ObjectVersion': 'Nupr9wOmyG9eZbta8NGFUV9lslQ5NI7m'},
+                'Handler': 'custodian_policy.run',
+                'LastModified': '2019-07-29T22:37:20.844+0000',
+                'MemorySize': 512,
+                'RevisionId': '8bbaf510-0ae1-40a5-8980-084bebd3f9c6',
+                'Role': 'arn:aws:iam::644160558196:role/CloudCustodianRole',
+                'Runtime': 'python3.7',
+                'Timeout': 900,
+                'TracingConfig': {'Mode': 'PassThrough'},
+                'Version': '$LATEST',
+                'KmsKeyArn':
+                    'arn:aws:kms:us-west-2:644160558196:key/798bc4bb-3079-4a9a-bc27-2c7f2b6c91d0',
+                'Environment': {'Variables': {
+                    'DISABLE_ACTIONS': 'true',
+                    'VERBOSE': 'false',
+                    'DISABLE_OUTPUT_PARAMETERS': 'true'}},
+                'VpcConfig': {'SecurityGroupIds': [],
+                              'SubnetIds': []}}},
+             'Id': 'arn:aws:lambda:us-west-2:644160558196:function:custodian-ec2-ssm-query',
+             'Partition': 'aws',
+             'Region': 'us-west-2',
+             'Tags': {'custodian-info': 'mode=config-rule:version=0.8.44.2'},
+             'Type': 'AwsLambdaFunction'})
+        shape_validate(
+            rfinding['Details']['AwsLambdaFunction'],
+            'AwsLambdaFunctionDetails', 'securityhub')
 
     def test_delete(self):
         factory = self.replay_flight_data("test_aws_lambda_delete")
@@ -237,7 +323,7 @@ class LambdaTest(BaseTest):
                     {
                         "type": "set-concurrency",
                         "expr": True,
-                        "value": '"c7n.metrics"."AWS/Lambda.Invocations.Sum"[0].Sum',
+                        "value": '"c7n.metrics"."AWS/Lambda.Invocations.Sum.14"[0].Sum',
                     }
                 ],
             },
@@ -284,7 +370,7 @@ class LambdaTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 2)
         self.assertEqual(
-            {r["c7n:EventSources"][0] for r in resources}, set(["iot.amazonaws.com"])
+            {r["c7n:EventSources"][0] for r in resources}, {"iot.amazonaws.com"}
         )
 
     def test_sg_filter(self):
@@ -304,6 +390,66 @@ class LambdaTest(BaseTest):
         resources = p.run()
         self.assertEqual(resources[0]["FunctionName"], "mys3")
         self.assertEqual(resources[0]["c7n:matched-security-groups"], ["sg-f9cc4d9f"])
+
+    def test_set_xray_tracing_true(self):
+        factory = self.replay_flight_data("test_set_xray_tracing_true")
+
+        p = self.load_policy(
+            {
+                "name": "xray-lambda",
+                "resource": "lambda",
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": "TracingConfig.Mode",
+                        "value": "PassThrough",
+                        "op": "equal"
+                    }
+                ],
+                "actions": [
+                    {
+                        "type": "set-xray-tracing",
+                        "state": True
+                    }
+                ]
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        client = factory().client('lambda')
+        response = client.get_function(
+            FunctionName=resources[0]['FunctionName'])
+        self.assertEqual(response['Configuration']['TracingConfig']['Mode'], 'Active')
+
+    def test_set_xray_tracing_false(self):
+        factory = self.replay_flight_data("test_set_xray_tracing_false")
+
+        p = self.load_policy(
+            {
+                "name": "xray-lambda",
+                "resource": "lambda",
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": "TracingConfig.Mode",
+                        "value": "Active",
+                        "op": "equal"
+                    }
+                ],
+                "actions": [
+                    {
+                        "type": "set-xray-tracing",
+                        "state": False
+                    }
+                ]
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        client = factory().client('lambda')
+        response = client.get_function(
+            FunctionName=resources[0]['FunctionName'])
+        self.assertEqual(response['Configuration']['TracingConfig']['Mode'], 'PassThrough')
 
 
 class LambdaTagTest(BaseTest):
@@ -510,3 +656,61 @@ class TestModifyVpcSecurityGroupsAction(BaseTest):
                 groups = ['sg-12121212', 'sg-34343434']
                 updatefunc(FunctionName='badname', VpcConfig={'SecurityGroupIds': groups})
                 updatefunc.assert_called_once()
+
+    def test_lambda_kms_alias(self):
+        session_factory = self.replay_flight_data("test_lambda_kms_key_filter")
+        kms = session_factory().client('kms')
+        p = self.load_policy(
+            {
+                "name": "lambda-kms-alias",
+                "resource": "lambda",
+                "filters": [
+                    {
+                        'FunctionName': "test"
+                    },
+                    {
+                        "type": "kms-key",
+                        "key": "c7n:AliasName",
+                        "value": "alias/skunk/trails",
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        aliases = kms.list_aliases(KeyId=resources[0]['KMSKeyArn'])
+        self.assertEqual(aliases['Aliases'][0]['AliasName'], 'alias/skunk/trails')
+
+
+@terraform('aws_lambda_check_permissions', teardown=terraform.TEARDOWN_IGNORE)
+def test_lambda_check_permission_deleted_role(test, aws_lambda_check_permissions):
+    '''Ensure that the check-permissions filter doesn't raise an exception if
+    a Lambda function's role has been deleted.'''
+
+    factory = test.replay_flight_data('test_aws_lambda_check_permission_deleted_role')
+
+    iam_client = factory().client('iam')
+    role_name = aws_lambda_check_permissions['aws_iam_role.lambda.name']
+    function_name = aws_lambda_check_permissions[
+        'aws_lambda_function.test_check_permissions.function_name']
+
+    iam_client.delete_role(RoleName=role_name)
+    if test.recording:
+        time.sleep(5)
+
+    p = test.load_policy(
+        {
+            'name': 'lambda-check-deleted-role',
+            'resource': 'aws.lambda',
+            'filters': [
+                {'FunctionName': function_name},
+                {'type': 'check-permissions',
+                 'match': 'denied',
+                 'actions': ['iam:CreateUser']}
+            ]
+        },
+        session_factory=factory)
+
+    resources = p.run()
+    test.assertEqual(len(resources), 1)

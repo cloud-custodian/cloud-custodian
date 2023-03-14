@@ -1,0 +1,16 @@
+{
+    "status_code": 200,
+    "data": {
+        "Clusters": [
+            {
+                "ClusterIdentifier": "test",
+                "PendingModifiedValues": {
+                    "MaintenanceTrackName": "trailing"
+                },
+                "AllowVersionUpgrade": false,
+                "PubliclyAccessible": false
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

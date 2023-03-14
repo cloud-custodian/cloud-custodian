@@ -1,18 +1,5 @@
-# Copyright 2016-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 from .common import BaseTest, functional
 
 import base64
@@ -86,19 +73,18 @@ class NotifyTest(BaseTest):
         body = json.loads(zlib.decompress(base64.b64decode(messages[0]["Body"])))
         self.assertEqual(
             set(body.keys()),
-            set(
-                (
-                    "account_id",
-                    "action",
-                    "event",
-                    "policy",
-                    "region",
-                    "account",
-                    "resources",
-                )
-            ),
+            {
+                "account_id",
+                "action",
+                "event",
+                "policy",
+                "region",
+                "account",
+                "resources",
+            },
         )
 
+    # TODO refactor - extract method
     def test_resource_prep(self):
         session_factory = self.record_flight_data("test_notify_resource_prep")
         policy = self.load_policy(
@@ -137,9 +123,21 @@ class NotifyTest(BaseTest):
                 [{'c7n:user-data': 'xyz', 'Id': 'a-123'}]),
             [{'Id': 'a-123'}])
 
+        policy = self.load_policy(
+            {"name": "notify-sns",
+             "resource": "iam-saml-provider",
+             "actions": [
+                 {"type": "notify", "to": ["noone@example.com"],
+                  "transport": {"type": "sns", "topic": "zebra"}}]},
+            session_factory=session_factory)
+        self.assertEqual(
+            policy.resource_manager.actions[0].prepare_resources(
+                [{'SAMLMetadataDocument': 'xyz', 'IDPSSODescriptor': 'abc', 'Id': 'a-123'}]),
+            [{'Id': 'a-123'}])
+
     def test_sns_notify(self):
         session_factory = self.replay_flight_data("test_sns_notify_action")
-        client = session_factory().client("sns")
+        client = session_factory().client("sns", region_name='ap-northeast-2')
         topic = client.create_topic(Name="c7n-notify-test")["TopicArn"]
         self.addCleanup(client.delete_topic, TopicArn=topic)
 
@@ -157,6 +155,7 @@ class NotifyTest(BaseTest):
                 ],
             },
             session_factory=session_factory,
+            config={'region': 'ap-northeast-2'}
         )
         resources = policy.run()
         self.assertEqual(len(resources), 1)
@@ -164,8 +163,8 @@ class NotifyTest(BaseTest):
     def test_sns_notify_with_msg_attr(self):
         session_factory = self.replay_flight_data("test_sns_notify_action_with_msg_attr")
 
-        sqs = session_factory().client('sqs')
-        sns = session_factory().client('sns')
+        sqs = session_factory().client('sqs', region_name='us-east-1')
+        sns = session_factory().client('sns', region_name='us-east-1')
 
         topic = 'arn:aws:sns:us-east-1:644160558196:test'
 
@@ -200,7 +199,11 @@ class NotifyTest(BaseTest):
             TopicArn=topic)['Subscriptions'][0]['Endpoint']
         self.assertEqual(subscription, 'arn:aws:sqs:us-east-1:644160558196:test-queue')
 
-        self.load_policy(policy, session_factory=session_factory).run()
+        self.load_policy(
+            policy,
+            session_factory=session_factory,
+            config={'region': 'us-east-1'}
+        ).run()
         if self.recording:
             time.sleep(20)
 

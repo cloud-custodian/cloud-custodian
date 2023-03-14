@@ -1,0 +1,13 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:events:us-west-2:644160558196:rule/cloud-custodian-mailer",
+                "Tags": []
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

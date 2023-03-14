@@ -1,0 +1,12 @@
+{
+    "status_code": 200,
+    "data": {
+        "SecurityConfigurations": [
+            {
+                "Name": "test",
+                "CreationDateTime": "2020-04-21T00:26:08.759000-04:00"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

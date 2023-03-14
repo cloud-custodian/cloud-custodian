@@ -1,0 +1,70 @@
+{
+    "status_code": 200,
+    "data": {
+        "Clusters": [
+            {
+                "BackupPolicy": "DEFAULT",
+                "BackupRetentionPolicy": {
+                    "Type": "DAYS",
+                    "Value": "90"
+                },
+                "ClusterId": "cluster-jz56hthw75g",
+                "CreateTimestamp": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 11,
+                    "day": 15,
+                    "hour": 10,
+                    "minute": 20,
+                    "second": 17,
+                    "microsecond": 344000
+                },
+                "Hsms": [],
+                "HsmType": "hsm1.medium",
+                "SecurityGroup": "sg-0aa06bb977e3b2661",
+                "State": "UNINITIALIZED",
+                "SubnetMapping": {
+                    "us-east-1a": "subnet-083ab4dd1a8b6eaa6",
+                    "us-east-1b": "subnet-0544e30702e2e1ad4"
+                },
+                "VpcId": "vpc-0598080981e0332f9",
+                "Certificates": {},
+                "TagList": [
+                    {
+                        "Key": "c7n",
+                        "Value": "test"
+                    }
+                ]
+            },
+            {
+                "BackupPolicy": "DEFAULT",
+                "BackupRetentionPolicy": {
+                    "Type": "DAYS",
+                    "Value": "90"
+                },
+                "ClusterId": "cluster-mrq6aozbe5s",
+                "CreateTimestamp": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 11,
+                    "day": 15,
+                    "hour": 10,
+                    "minute": 30,
+                    "second": 15,
+                    "microsecond": 468000
+                },
+                "Hsms": [],
+                "HsmType": "hsm1.medium",
+                "SecurityGroup": "sg-0e3c27dfc7ba4648d",
+                "State": "UNINITIALIZED",
+                "SubnetMapping": {
+                    "us-east-1a": "subnet-914763e7"
+                },
+                "VpcId": "vpc-d2d616b5",
+                "Certificates": {},
+                "TagList": []
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

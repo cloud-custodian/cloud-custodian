@@ -1,16 +1,5 @@
-# Copyright 2016-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 """Salactus, eater of s3 buckets.
 
 queues:
@@ -410,7 +399,7 @@ def dispatch_object_source(client, account_info, bid, bucket_info):
         invoke(process_bucket_iterator, bid)
 
 
-class CharSet(object):
+class CharSet:
     """Sets of character/gram populations for the ngram partition strategy.
     """
     hex_lower = set(string.hexdigits.lower())
@@ -434,7 +423,7 @@ class CharSet(object):
             cls.ascii_alphanum]
 
 
-class Strategy(object):
+class Strategy:
     """ Partitioning strategy for an s3 bucket.
     """
 
@@ -536,7 +525,7 @@ def get_keys_charset(keys, bid):
     if charset is None:
         raise ValueError(
             "Bucket: %s Failed charset ngram detection %r\n%s" % (
-                bid, "".join(chars)), "\n".join(sorted(keys)))
+                bid, "".join(chars), "\n".join(sorted(keys))))
 
     for n, sset in normalized.items():
         charset = charset.symmetric_difference(sset)

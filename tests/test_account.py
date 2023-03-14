@@ -1,39 +1,124 @@
-# Copyright 2016-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 from .common import BaseTest
 from c7n.provider import clouds
 from c7n.exceptions import PolicyValidationError
 from c7n.executor import MainThreadExecutor
-from c7n.utils import local_session
+from c7n.utils import local_session, format_string_values
 from c7n.resources import account
-from jsonschema.exceptions import ValidationError
+from c7n.testing import mock_datetime_now
+
+from pytest_terraform import terraform
 
 import datetime
-from dateutil import parser
+from dateutil import parser, tz
 import json
 import mock
 import time
 
-from .test_offhours import mock_datetime_now
-from .common import TestConfig as Config, functional
+from .common import functional
 
 TRAIL = "nosetest"
 
 
 class AccountTests(BaseTest):
+
+    def test_macie(self):
+        factory = self.replay_flight_data(
+            'test_account_check_macie')
+        p = self.load_policy({
+            'name': 'macie-check',
+            'resource': 'aws.account',
+            'filters': [{
+                'or': [
+                    {'type': 'check-macie',
+                     'value': 'absent',
+                     'key': 'master.accountId'},
+                    {'type': 'check-macie',
+                     'key': 'status',
+                     'value': 'ENABLED'}]}]
+        }, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        assert resources[0]['c7n:macie'] == {
+            'createdAt': datetime.datetime(
+                2020, 12, 3, 16, 22, 14, 821000, tzinfo=tz.tzutc()),
+            'findingPublishingFrequency': 'FIFTEEN_MINUTES',
+            'master': {},
+            'serviceRole': ('arn:aws:iam::{}:role/aws-service-role/'
+                            'macie.amazonaws.com/'
+                            'AWSServiceRoleForAmazonMacie').format(
+                                p.options.account_id),
+            'status': 'ENABLED',
+            'updatedAt': datetime.datetime(
+                2020, 12, 3, 16, 22, 14, 821000, tzinfo=tz.tzutc()),
+        }
+
+    def test_macie_disabled(self):
+        factory = self.replay_flight_data(
+            'test_account_check_macie_disabled')
+        p = self.load_policy({
+            'name': 'macie-check-disabled',
+            'resource': 'aws.account',
+            'filters': [{
+                'not': [
+                    {'type': 'check-macie',
+                     'key': 'status',
+                     'value': 'ENABLED'}]}]
+        }, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_org_no_org(self):
+        factory = self.replay_flight_data(
+            'test_account_org_no_org')
+        p = self.load_policy({
+            'name': 'org-check',
+            'resource': 'aws.account',
+            'filters': [{
+                'type': 'organization',
+                'key': 'Id',
+                'value': 'absent'
+            }]},
+            session_factory=factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_org_denied(self):
+        factory = self.replay_flight_data(
+            'test_account_org_info_denied')
+        p = self.load_policy({
+            'name': 'org-check',
+            'resource': 'aws.account',
+            'filters': [{
+                'type': 'organization',
+                'key': 'Id',
+                'value': 'absent'
+            }]},
+            session_factory=factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
+    def test_org_info(self):
+        factory = self.replay_flight_data(
+            'test_account_org_info')
+        p = self.load_policy({
+            'name': 'org-check',
+            'resource': 'aws.account',
+            'filters': [{
+                'type': 'organization',
+                'key': 'Id',
+                'op': 'not-equal',
+                'value': 'o-xyz'
+            }]},
+            session_factory=factory
+        )
+        resources = p.run()
+
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['c7n:org']['FeatureSet'], 'ALL')
 
     def test_missing(self):
         session_factory = self.replay_flight_data(
@@ -57,11 +142,11 @@ class AccountTests(BaseTest):
         # as a global resource, while the resources are typically regional
         # specific. By default missing fires if any region executed against
         # is missing the regional resource.
-        cfg = Config.empty(regions=["eu-west-1", "us-west-2"])
+        cfg = dict(regions=["eu-west-1", "us-west-2"])
 
         session_factory = self.replay_flight_data('test_account_missing_region_resource')
 
-        class SessionFactory(object):
+        class SessionFactory:
 
             def __init__(self, options):
                 self.region = options.region
@@ -369,22 +454,8 @@ class AccountTests(BaseTest):
 
         self.patch(account.time, 'sleep', time_sleep)
         self.assertEqual(
-            account.ServiceLimit.get_check_result(client, account.ServiceLimit.check_id),
+            account.ServiceLimit.get_check_result(client, 'bogusid'),
             True)
-
-    def test_service_limit(self):
-        session_factory = self.replay_flight_data("test_account_service_limit")
-        p = self.load_policy(
-            {
-                "name": "service-limit",
-                "resource": "account",
-                "filters": [{"type": "service-limit", "threshold": 0}],
-            },
-            session_factory=session_factory,
-        )
-        resources = p.run()
-        self.assertEqual(len(resources), 1)
-        self.assertEqual(len(resources[0]["c7n:ServiceLimitsExceeded"]), 10)
 
     def test_service_limit_specific_check(self):
         session_factory = self.replay_flight_data("test_account_service_limit")
@@ -395,47 +466,51 @@ class AccountTests(BaseTest):
                 "filters": [
                     {
                         "type": "service-limit",
-                        "limits": ["DB security groups"],
+                        "names": ["RDS DB Instances"],
                         "threshold": 1.0,
                     }
                 ],
             },
             session_factory=session_factory,
         )
-        resources = p.run()
+        # use this to prevent attempts at refreshing check
+        with mock_datetime_now(parser.parse("2017-02-23T00:40:00+00:00"), datetime):
+            resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(
-            set([l["service"] for l in resources[0]["c7n:ServiceLimitsExceeded"]]),
-            set(["RDS"]),
+            {l["service"] for l in resources[0]["c7n:ServiceLimitsExceeded"]},
+            {"RDS"},
         )
         self.assertEqual(
-            set([l["region"] for l in resources[0]["c7n:ServiceLimitsExceeded"]]),
-            set(["us-east-1"]),
+            {l["region"] for l in resources[0]["c7n:ServiceLimitsExceeded"]},
+            {"us-east-1"},
         )
         self.assertEqual(
-            set([l["check"] for l in resources[0]["c7n:ServiceLimitsExceeded"]]),
-            set(["DB security groups"]),
+            {l["check"] for l in resources[0]["c7n:ServiceLimitsExceeded"]},
+            {"DB instances"},
         )
         self.assertEqual(len(resources[0]["c7n:ServiceLimitsExceeded"]), 1)
 
     def test_service_limit_specific_service(self):
-        session_factory = self.replay_flight_data("test_account_service_limit")
+        session_factory = self.replay_flight_data("test_account_service_limit_specific_service")
         p = self.load_policy(
             {
                 "name": "service-limit",
                 "resource": "account",
                 "region": "us-east-1",
                 "filters": [
-                    {"type": "service-limit", "services": ["IAM"], "threshold": 1.0}
+                    {"type": "service-limit", "services": ["IAM"], "threshold": 0.1}
                 ],
             },
             session_factory=session_factory,
         )
-        resources = p.run()
+        # use this to prevent attempts at refreshing check
+        with mock_datetime_now(parser.parse("2017-02-23T00:40:00+00:00"), datetime):
+            resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(
-            set([l["service"] for l in resources[0]["c7n:ServiceLimitsExceeded"]]),
-            set(["IAM"]),
+            {l["service"] for l in resources[0]["c7n:ServiceLimitsExceeded"]},
+            {"IAM"},
         )
         self.assertEqual(len(resources[0]["c7n:ServiceLimitsExceeded"]), 2)
 
@@ -458,7 +533,9 @@ class AccountTests(BaseTest):
             },
             session_factory=session_factory,
         )
-        resources = p.run()
+        # use this to prevent attempts at refreshing check
+        with mock_datetime_now(parser.parse("2017-02-23T00:40:00+00:00"), datetime):
+            resources = p.run()
         self.assertEqual(len(resources), 0)
 
     def test_account_virtual_mfa(self):
@@ -518,6 +595,118 @@ class AccountTests(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
+        assert resources[0]['c7n:password_policy']['PasswordPolicyConfigured'] is False
+
+    def test_account_password_policy_update(self):
+        factory = self.replay_flight_data("test_account_password_policy_update")
+        p = self.load_policy(
+            {
+                "name": "set-password-policy",
+                "resource": "account",
+                "filters": [
+                    {
+                        "or": [
+                            {
+                                "not": [
+                                    {
+                                        "type": "password-policy",
+                                        "key": "MinimumPasswordLength",
+                                        "value": 12,
+                                        "op": "ge"
+                                    },
+                                    {
+                                        "type": "password-policy",
+                                        "key": "RequireSymbols",
+                                        "value": True
+                                    },
+                                    {
+                                        "type": "password-policy",
+                                        "key": "RequireNumbers",
+                                        "value": True
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ],
+                "actions": [
+                    {
+                        "type": "set-password-policy",
+                        "policy": {
+                            "MinimumPasswordLength": 12,
+                            "RequireSymbols": True,
+                            "RequireNumbers": True
+                        }
+                    }
+                ]
+            },
+            session_factory=factory,
+        )
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = local_session(factory).client('iam')
+        policy = client.get_account_password_policy().get('PasswordPolicy')
+        self.assertEqual(
+            [
+                policy['MinimumPasswordLength'],
+                policy['RequireSymbols'],
+                policy['RequireNumbers'],
+            ],
+            [
+                12,
+                True,
+                True,
+            ]
+        )
+
+    def test_account_password_policy_update_first_time(self):
+        factory = self.replay_flight_data("test_account_password_policy_update_first_time")
+        p = self.load_policy(
+            {
+                "name": "set-password-policy",
+                "resource": "account",
+                "filters": [
+                    {
+                        "type": "password-policy",
+                        "key": "PasswordPolicyConfigured",
+                        "value": False,
+                    }
+                ],
+                "actions": [
+                    {
+                        "type": "set-password-policy",
+                        "policy": {
+                            "MinimumPasswordLength": 12
+                        }
+                    }
+                ]
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = local_session(factory).client('iam')
+        policy = client.get_account_password_policy().get('PasswordPolicy')
+        assert policy['MinimumPasswordLength'] == 12
+        # assert defaults being set
+        self.assertEqual(
+            [
+                policy['RequireSymbols'],
+                policy['RequireNumbers'],
+                policy['RequireUppercaseCharacters'],
+                policy['RequireLowercaseCharacters'],
+                policy['AllowUsersToChangePassword']
+            ],
+            [
+                False,
+                False,
+                False,
+                False,
+                False,
+            ]
+        )
+
     def test_create_trail(self):
         factory = self.replay_flight_data("test_cloudtrail_create")
         p = self.load_policy(
@@ -543,7 +732,7 @@ class AccountTests(BaseTest):
         self.assertTrue(status["IsLogging"])
 
     def test_create_trail_bucket_exists_in_west(self):
-        config = Config.empty(region="us-west-1")
+        config = dict(region="us-west-1")
         factory = self.replay_flight_data(
             "test_cloudtrail_create_bucket_exists_in_west"
         )
@@ -594,7 +783,9 @@ class AccountTests(BaseTest):
             session_factory=session_factory,
         )
 
-        resources = p.run()
+        # use this to prevent attempts at refreshing check
+        with mock_datetime_now(parser.parse("2017-02-23T00:40:00+00:00"), datetime):
+            resources = p.run()
         self.assertEqual(len(resources), 1)
 
         # Validate that a case was created
@@ -636,7 +827,9 @@ class AccountTests(BaseTest):
             session_factory=session_factory,
         )
 
-        resources = p.run()
+        # use this to prevent attempts at refreshing check
+        with mock_datetime_now(parser.parse("2017-02-23T00:40:00+00:00"), datetime):
+            resources = p.run()
         self.assertEqual(len(resources), 1)
 
         # Validate that a case was created
@@ -684,7 +877,9 @@ class AccountTests(BaseTest):
             session_factory=session_factory,
         )
 
-        resources = p.run()
+        # use this to prevent attempts at refreshing check
+        with mock_datetime_now(parser.parse("2017-02-23T00:40:00+00:00"), datetime):
+            resources = p.run()
         self.assertEqual(len(resources), 1)
 
         # Validate that a case was created
@@ -720,7 +915,8 @@ class AccountTests(BaseTest):
                 }
             ],
         }
-        self.assertRaises(ValidationError, self.load_policy, policy, validate=True)
+        self.assertRaises(
+            PolicyValidationError, self.load_policy, policy, validate=True)
 
     def test_enable_trail(self):
         factory = self.replay_flight_data("test_cloudtrail_enable")
@@ -756,6 +952,22 @@ class AccountTests(BaseTest):
         arn = test_trail["TrailARN"]
         status = client.get_trail_status(Name=arn)
         self.assertTrue(status["IsLogging"])
+
+    def test_account_access_analyzer_filter(self):
+        session_factory = self.replay_flight_data("test_account_access_analyzer_filter")
+        p = self.load_policy(
+            {
+                "name": "account-access-analyzer",
+                "resource": "account",
+                "filters": [{"type": "access-analyzer",
+                             "key": "status",
+                             "value": "ACTIVE",
+                             "op": "eq"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
 
     def test_account_shield_filter(self):
         session_factory = self.replay_flight_data("test_account_shield_advanced_filter")
@@ -847,13 +1059,109 @@ class AccountTests(BaseTest):
 
         self.assertEqual(len(resources), 1)
 
+    def test_get_emr_block_public_access_configuration(self):
+        session_factory = self.replay_flight_data("test_emr_block_public_access_configuration")
+        p = self.load_policy(
+            {
+                'name': 'get-emr-block-public-access-configuration',
+                'resource': 'account',
+                'filters': [{
+                    'type': 'emr-block-public-access',
+                    'key': 'BlockPublicAccessConfiguration',
+                    'value': 'not-null'
+                }]
+            },
+            session_factory=session_factory)
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["c7n:emr-block-public-access"]
+            ['BlockPublicAccessConfigurationMetadata']['CreatedByArn'],
+            "arn:aws:iam::12345678901:user/test")
+
+    def test_set_emr_block_public_access_configuration(self):
+        session_factory = self.replay_flight_data("test_set_emr_block_public_access_configuration")
+        p = self.load_policy(
+            {
+                'name': 'emr',
+                'resource': 'account',
+                'actions': [{
+                    "type": "set-emr-block-public-access",
+                    "config": {
+                        "BlockPublicSecurityGroupRules": True,
+                        "PermittedPublicSecurityGroupRuleRanges": [{
+                            "MinRange": 23,
+                            "MaxRange": 23,
+                        }]
+                    }
+                }],
+            },
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        client = local_session(session_factory).client("emr")
+        resp = client.get_block_public_access_configuration()
+
+        self.assertEqual(resp["BlockPublicAccessConfiguration"]
+            ["PermittedPublicSecurityGroupRuleRanges"][0]['MinRange'], 23)
+        self.assertEqual(resp["BlockPublicAccessConfiguration"]
+            ["PermittedPublicSecurityGroupRuleRanges"][0]['MaxRange'], 23)
+
+    def test_ses_agg_send_stats(self):
+        factory = self.replay_flight_data('test_ses_agg_send_stats')
+        p = self.load_policy({
+            'name': 'ses-agg-send-stats-policy',
+            'resource': 'account',
+            'filters': [{"type": "ses-agg-send-stats"}]},
+            config={'region': 'us-west-2'},
+            session_factory=factory)
+        resources = p.run()
+        expected_agg_send_stats = {
+            'DeliveryAttempts': 130,
+            'Bounces': 1,
+            'Complaints': 0,
+            'Rejects': 0,
+            'BounceRate': 1
+        }
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['c7n:ses-send-agg'], expected_agg_send_stats)
+
+    def test_ses_consecutive_send_stats(self):
+        factory = self.replay_flight_data('test_ses_agg_send_stats')
+        p = self.load_policy({
+            'name': 'ses-consecutive-stats',
+            'resource': 'account',
+            'filters': [{"type": "ses-send-stats", "days": 2}]},
+            config={'region': 'us-west-2'},
+            session_factory=factory)
+        with mock_datetime_now(parser.parse("2022-10-26T00:00:00+00:00"), datetime):
+            resources = p.run()
+        self.assertEqual(len(resources), 1)
+        expected_send_stats = [{
+            'DeliveryAttempts': 17,
+            'Bounces': 1,
+            'Complaints': 0,
+            'Rejects': 0,
+            'BounceRate': 6,
+            'Date': '2022-10-25'}, {
+            'DeliveryAttempts': 20,
+            'Bounces': 0,
+            'Complaints': 0,
+            'Rejects': 0,
+            'BounceRate': 0,
+            'Date': '2022-10-24'}
+        ]
+        self.assertEqual(resources[0]['c7n:ses-send-stats'], expected_send_stats)
+        self.assertEqual(resources[0]['c7n:ses-max-bounce-rate'], 6)
+
 
 class AccountDataEvents(BaseTest):
 
     def make_bucket(self, session_factory, name):
         client = session_factory().client("s3")
 
-        buckets = set([b["Name"] for b in client.list_buckets()["Buckets"]])
+        buckets = {b["Name"] for b in client.list_buckets()["Buckets"]}
         if name in buckets:
             self.destroyBucket(client, name)
 
@@ -1005,3 +1313,273 @@ class AccountDataEvents(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
+    def test_enable_securityhub(self):
+        session_factory = self.replay_flight_data("test_enable_securityhub")
+        p = self.load_policy(
+            {
+                'name': 'enable-sechub',
+                'resource': 'account',
+                'filters': [{
+                    'type': 'securityhub',
+                    'enabled': False
+                }],
+            },
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_lakeformation_filter(self):
+        factory = self.replay_flight_data("test_lakeformation_cross_account_s3")
+        p = self.load_policy(
+            {
+                'name': 'test-lakeformation-cross-account-bucket',
+                'resource': 'account',
+                'filters': [{
+                    'type': 'lakeformation-s3-cross-account'
+                }],
+            },
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        self.assertEqual(
+            resources[0]["c7n:lake-cross-account-s3"], ["testarena.com"])
+
+    def test_toggle_config_managed_rule_validation(self):
+        policy = {
+            "name": "enable-config-managed-rule-valid",
+            "resource": "account",
+            "actions": [
+                {
+                    "type": "toggle-config-managed-rule",
+                    "rule_name": "enable-config-managed-rule",
+                    "rule_prefix": "test-",
+                    "managed_rule_id": "S3_BUCKET_PUBLIC_WRITE_PROHIBITED",
+                    "resource_types": [
+                        "AWS::S3::Bucket"
+                    ],
+                }
+            ]
+        }
+        p = self.load_policy(policy)
+        p.validate()
+
+        # Make the policy invalid
+        del policy["actions"][0]["managed_rule_id"]
+        with self.assertRaises(
+            PolicyValidationError, msg="managed_rule_id required to enable"
+        ):
+            p.validate()
+
+    def test_toggle_config_managed_rule(self):
+        session_factory = self.replay_flight_data("test_toggle_config_managed_rule")
+        policy = {
+            "name": "enable-config-managed-rule",
+            "resource": "account",
+            "actions": [
+                {
+                    "type": "toggle-config-managed-rule",
+                    "rule_name": "enable-config-managed-rule",
+                    "rule_prefix": "test-",
+                    "managed_rule_id": "S3_BUCKET_PUBLIC_WRITE_PROHIBITED",
+                    "resource_types": [
+                        "AWS::S3::Bucket"
+                    ],
+                    "rule_parameters": "{}",
+                    "remediation": {
+                        "TargetId": "AWS-DisableS3BucketPublicReadWrite",
+                        "Automatic": True,
+                        "MaximumAutomaticAttempts": 5,
+                        "RetryAttemptSeconds": 211,
+                        "Parameters": {
+                            "AutomationAssumeRole": {
+                                "StaticValue": {
+                                    "Values": [
+                                        "arn:aws:iam::{account_id}:role/myrole"
+                                    ]
+                                }
+                            },
+                            "S3BucketName": {
+                                "ResourceValue": {
+                                    "Value": "RESOURCE_ID"
+                                }
+                            }
+                        }
+                    }
+                }
+            ]
+        }
+
+        # Enable the managed rule
+        p = self.load_policy(
+            policy,
+            session_factory=session_factory,
+        )
+        p.expand_variables(p.get_variables())
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = local_session(session_factory).client('config')
+        resp = client.describe_config_rules(
+            ConfigRuleNames=['test-enable-config-managed-rule']
+        )
+        self.assertEqual(len(resp['ConfigRules']), 1)
+        resp = client.describe_remediation_configurations(
+            ConfigRuleNames=['test-enable-config-managed-rule']
+        )
+        self.assertEqual(len(resp['RemediationConfigurations']), 1)
+
+        # Disable the rule we just enabled
+        policy["actions"][0]["enabled"] = False
+        p = self.load_policy(
+            policy,
+            session_factory=session_factory,
+        )
+        p.expand_variables(p.get_variables())
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        resp = client.describe_config_rules(
+            ConfigRuleNames=['test-enable-config-managed-rule']
+        )
+        self.assertEqual(resp['ConfigRules'][0]['ConfigRuleState'], 'DELETING')
+
+
+@terraform('cloudtrail_success_log_metric_filter')
+def test_cloudtrail_success_log_metric_filter(test, cloudtrail_success_log_metric_filter):
+    session_factory = test.replay_flight_data('test_cloudtrail_success_log_metric_filter')
+    pdata = {
+        'name': 'check-filter-pattern',
+        'resource': 'aws.account',
+        'filters': [
+            {
+                'type': 'check-cloudtrail',
+                'log-metric-filter-pattern':
+                    "{{ ($.eventName = ConsoleLogin) && ($.additionalEventData.MFAUsed != Yes) }}"
+            },
+        ]
+    }
+    pdata['filters'][0]['log-metric-filter-pattern'] = \
+        format_string_values(pdata['filters'][0]['log-metric-filter-pattern'])
+    p = test.load_policy(
+        pdata,
+        session_factory=session_factory
+    )
+    return_value = p.run()
+    test.assertEqual(len(return_value), 0)
+
+
+@terraform('cloudtrail_fail_log_metric_filter_no_alarm')
+def test_cloudtrail_fail_log_metric_filter_no_alarm(test,
+                                                    cloudtrail_fail_log_metric_filter_no_alarm):
+    session_factory = test.replay_flight_data('test_cloudtrail_fail_log_metric_filter_no_alarm')
+    pdata = {
+        'name': 'check-filter-pattern',
+        'resource': 'aws.account',
+        'filters': [
+            {
+                'type': 'check-cloudtrail',
+                'log-metric-filter-pattern':
+                    "{{ ($.eventName = ConsoleLogin) && ($.additionalEventData.MFAUsed != Yes) }}"
+            },
+        ]
+    }
+    pdata['filters'][0]['log-metric-filter-pattern'] = \
+        format_string_values(pdata['filters'][0]['log-metric-filter-pattern'])
+    p = test.load_policy(
+        pdata,
+        session_factory=session_factory
+    )
+    return_value = p.run()
+    test.assertEqual(len(return_value), 1)
+
+
+@terraform('cloudtrail_fail_log_metric_filter_no_sns')
+def test_cloudtrail_fail_log_metric_filter_no_sns(test, cloudtrail_fail_log_metric_filter_no_sns):
+    session_factory = test.replay_flight_data('test_cloudtrail_fail_log_metric_filter_no_sns')
+    pdata = {
+        'name': 'check-filter-pattern',
+        'resource': 'aws.account',
+        'filters': [
+            {
+                'type': 'check-cloudtrail',
+                'log-metric-filter-pattern':
+                    "{{ ($.eventName = ConsoleLogin) && ($.additionalEventData.MFAUsed != Yes) }}"
+            },
+        ]
+    }
+    pdata['filters'][0]['log-metric-filter-pattern'] = \
+        format_string_values(pdata['filters'][0]['log-metric-filter-pattern'])
+    p = test.load_policy(
+        pdata,
+        session_factory=session_factory
+    )
+    return_value = p.run()
+    test.assertEqual(len(return_value), 1)
+
+
+@terraform('cloudtrail_fail_log_metric_filter')
+def test_cloudtrail_fail_log_metric_filter(test, cloudtrail_fail_log_metric_filter):
+    session_factory = test.replay_flight_data('test_cloudtrail_fail_log_metric_filter')
+    pdata = {
+        'name': 'check-filter-pattern',
+        'resource': 'aws.account',
+        'filters': [
+            {
+                'type': 'check-cloudtrail',
+                'log-metric-filter-pattern':
+                    "{{ ($.eventName = ConsoleLogin) }}"
+            },
+        ]
+    }
+    pdata['filters'][0]['log-metric-filter-pattern'] = \
+        format_string_values(pdata['filters'][0]['log-metric-filter-pattern'])
+    p = test.load_policy(
+        pdata,
+        session_factory=session_factory
+    )
+    return_value = p.run()
+    test.assertEqual(len(return_value), 1)
+
+
+@terraform('cloudtrail_success_include_management_events')
+def test_success_cloudtrail_include_management_events(test,
+                                                      cloudtrail_success_include_management_events):
+    session_factory = \
+        test.replay_flight_data('test_cloudtrail_success_cloudtrail_include_management_events')
+    pdata = {
+        'name': 'check-filter-pattern',
+        'resource': 'aws.account',
+        'filters': [
+            {
+                'type': 'check-cloudtrail',
+                'include-management-events': True
+            },
+        ]
+    }
+    p = test.load_policy(
+        pdata,
+        session_factory=session_factory
+    )
+    return_value = p.run()
+    test.assertEqual(len(return_value), 0)
+
+
+@terraform('cloudtrail_fail_include_management_events')
+def test_fail_cloudtrail_include_management_events(test, cloudtrail_fail_include_management_events):
+    session_factory = test.replay_flight_data('test_cloudtrail_fail_include_management_events')
+    pdata = {
+        'name': 'check-filter-pattern',
+        'resource': 'aws.account',
+        'filters': [
+            {
+                'type': 'check-cloudtrail',
+                'include-management-events': True
+            },
+        ]
+    }
+    p = test.load_policy(
+        pdata,
+        session_factory=session_factory
+    )
+    return_value = p.run()
+    test.assertEqual(len(return_value), 1)

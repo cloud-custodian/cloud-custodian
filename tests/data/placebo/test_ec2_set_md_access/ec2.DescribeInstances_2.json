@@ -1,0 +1,187 @@
+{
+    "status_code": 200,
+    "data": {
+        "Reservations": [
+            {
+                "Groups": [],
+                "Instances": [
+                    {
+                        "AmiLaunchIndex": 0,
+                        "ImageId": "ami-0eaa18f39758dc93c",
+                        "InstanceId": "i-0d4526dcaa95692db",
+                        "InstanceType": "t2.micro",
+                        "KeyName": "intapp-devopssbx@intapp.com",
+                        "LaunchTime": {
+                            "__class__": "datetime",
+                            "year": 2022,
+                            "month": 10,
+                            "day": 5,
+                            "hour": 0,
+                            "minute": 45,
+                            "second": 25,
+                            "microsecond": 0
+                        },
+                        "Monitoring": {
+                            "State": "enabled"
+                        },
+                        "Placement": {
+                            "AvailabilityZone": "us-east-1f",
+                            "GroupName": "",
+                            "Tenancy": "default"
+                        },
+                        "PrivateDnsName": "ip-172-31-69-131.ec2.internal",
+                        "PrivateIpAddress": "172.31.69.131",
+                        "ProductCodes": [],
+                        "PublicDnsName": "",
+                        "State": {
+                            "Code": 80,
+                            "Name": "stopped"
+                        },
+                        "StateTransitionReason": "User initiated (2022-10-06 05:52:38 GMT)",
+                        "SubnetId": "subnet-02155f0d",
+                        "VpcId": "vpc-af3f92d5",
+                        "Architecture": "x86_64",
+                        "BlockDeviceMappings": [
+                            {
+                                "DeviceName": "/dev/xvda",
+                                "Ebs": {
+                                    "AttachTime": {
+                                        "__class__": "datetime",
+                                        "year": 2022,
+                                        "month": 10,
+                                        "day": 5,
+                                        "hour": 0,
+                                        "minute": 45,
+                                        "second": 25,
+                                        "microsecond": 0
+                                    },
+                                    "DeleteOnTermination": true,
+                                    "Status": "attached",
+                                    "VolumeId": "vol-09bcf3a2a15c07966"
+                                }
+                            }
+                        ],
+                        "ClientToken": "50C001C2-75A6-446A-BE72-FA50D2B16F1A",
+                        "EbsOptimized": false,
+                        "EnaSupport": true,
+                        "Hypervisor": "xen",
+                        "NetworkInterfaces": [
+                            {
+                                "Attachment": {
+                                    "AttachTime": {
+                                        "__class__": "datetime",
+                                        "year": 2022,
+                                        "month": 10,
+                                        "day": 5,
+                                        "hour": 0,
+                                        "minute": 45,
+                                        "second": 25,
+                                        "microsecond": 0
+                                    },
+                                    "AttachmentId": "eni-attach-055a0fc30dc88dfe2",
+                                    "DeleteOnTermination": true,
+                                    "DeviceIndex": 0,
+                                    "Status": "attached",
+                                    "NetworkCardIndex": 0
+                                },
+                                "Description": "",
+                                "Groups": [
+                                    {
+                                        "GroupName": "default",
+                                        "GroupId": "sg-022df042"
+                                    }
+                                ],
+                                "Ipv6Addresses": [],
+                                "MacAddress": "16:1e:bb:f9:9e:eb",
+                                "NetworkInterfaceId": "eni-07b8f764b33d141e9",
+                                "OwnerId": "644160558196",
+                                "PrivateDnsName": "ip-172-31-69-131.ec2.internal",
+                                "PrivateIpAddress": "172.31.69.131",
+                                "PrivateIpAddresses": [
+                                    {
+                                        "Primary": true,
+                                        "PrivateDnsName": "ip-172-31-69-131.ec2.internal",
+                                        "PrivateIpAddress": "172.31.69.131"
+                                    }
+                                ],
+                                "SourceDestCheck": true,
+                                "Status": "in-use",
+                                "SubnetId": "subnet-02155f0d",
+                                "VpcId": "vpc-af3f92d5",
+                                "InterfaceType": "interface"
+                            }
+                        ],
+                        "RootDeviceName": "/dev/xvda",
+                        "RootDeviceType": "ebs",
+                        "SecurityGroups": [
+                            {
+                                "GroupName": "default",
+                                "GroupId": "sg-022df042"
+                            }
+                        ],
+                        "SourceDestCheck": true,
+                        "StateReason": {
+                            "Code": "Client.UserInitiatedShutdown",
+                            "Message": "Client.UserInitiatedShutdown: User initiated shutdown"
+                        },
+                        "Tags": [
+                            {
+                                "Key": "Environment",
+                                "Value": "dev"
+                            },
+                            {
+                                "Key": "Name",
+                                "Value": "Custodian_test_instance-2"
+                            }
+                        ],
+                        "VirtualizationType": "hvm",
+                        "CpuOptions": {
+                            "CoreCount": 1,
+                            "ThreadsPerCore": 1
+                        },
+                        "CapacityReservationSpecification": {
+                            "CapacityReservationPreference": "open"
+                        },
+                        "HibernationOptions": {
+                            "Configured": false
+                        },
+                        "MetadataOptions": {
+                            "State": "applied",
+                            "HttpTokens": "required",
+                            "HttpPutResponseHopLimit": 1,
+                            "HttpEndpoint": "enabled",
+                            "HttpProtocolIpv6": "disabled",
+                            "InstanceMetadataTags": "enabled"
+                        },
+                        "EnclaveOptions": {
+                            "Enabled": false
+                        },
+                        "PlatformDetails": "Linux/UNIX",
+                        "UsageOperation": "RunInstances",
+                        "UsageOperationUpdateTime": {
+                            "__class__": "datetime",
+                            "year": 2022,
+                            "month": 10,
+                            "day": 5,
+                            "hour": 0,
+                            "minute": 45,
+                            "second": 25,
+                            "microsecond": 0
+                        },
+                        "PrivateDnsNameOptions": {
+                            "HostnameType": "ip-name",
+                            "EnableResourceNameDnsARecord": false,
+                            "EnableResourceNameDnsAAAARecord": false
+                        },
+                        "MaintenanceOptions": {
+                            "AutoRecovery": "default"
+                        }
+                    }
+                ],
+                "OwnerId": "644160558196",
+                "ReservationId": "r-013ad6312c6a7e3c2"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

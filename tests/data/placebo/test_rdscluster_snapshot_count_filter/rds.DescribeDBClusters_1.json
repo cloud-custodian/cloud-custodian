@@ -1,0 +1,152 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0,
+            "HTTPStatusCode": 200
+        },
+        "DBClusters": [
+            {
+                "DBClusterIdentifier": "abc-restore",
+                "DBInstanceClass": "string",
+                "Engine": "postgres",
+                "MasterUsername": "dbadmin",
+                "Endpoint": {
+                    "Address": "string",
+                    "Port": 123,
+                    "HostedZoneId": "string"
+                },
+                "ClusterCreateTime": {
+                    "hour": 3,
+                    "__class__": "datetime",
+                    "month": 3,
+                    "second": 42,
+                    "microsecond": 265000,
+                    "year": 2022,
+                    "day": 8,
+                    "minute": 33
+                },
+                "AvailabilityZones": [
+                    "us-east-1b"
+                ],
+                "BackupRetentionPeriod": 123,
+                "CharacterSetName": "string",
+                "DatabaseName": "abc-restore",
+                "DBClusterParameterGroup": "string",
+                "DBSubnetGroup": "string",
+                "Status": "string",
+                "PercentProgress": "string",
+                "ReaderEndpoint": "string",
+                "CustomEndpoints": [
+                    "string"
+                ],
+                "MultiAZ": true,
+                "EngineVersion": "string",
+                "Port": 123,
+                "DBClusterOptionGroupMemberships": [
+                    {
+                        "DBClusterOptionGroupName": "string",
+                        "Status": "string"
+                    }
+                ],
+                "PreferredBackupWindow": "string",
+                "PreferredMaintenanceWindow": "string",
+                "ReplicationSourceIdentifier": "string",
+                "ReadReplicaIdentifiers": [
+                    "string"
+                ],
+                "DBClusterMembers": [
+                    {
+                        "DBInstanceIdentifier": "string",
+                        "IsClusterWriter": true,
+                        "DBClusterParameterGroupStatus": "string",
+                        "PromotionTier": 123
+                    }
+                ],
+                "VpcSecurityGroups": [
+                    {
+                        "VpcSecurityGroupId": "string",
+                        "Status": "string"
+                    }
+                ],
+                "HostedZoneId": "string",
+                "StorageEncrypted": true,
+                "KmsKeyId": "string",
+                "DbClusterResourceId": "string",
+                "DBClusterArn": "string",
+                "AssociatedRoles": [
+                    {
+                        "RoleArn": "string",
+                        "Status": "string",
+                        "FeatureName": "string"
+                    }
+                ],
+                "IAMDatabaseAuthenticationEnabled": true,
+                "CloneGroupId": "string",
+                "BacktrackWindow": 123,
+                "BacktrackConsumedChangeRecords": 123,
+                "EnabledCloudwatchLogsExports": [
+                    "string"
+                ],
+                "Capacity": 123,
+                "EngineMode": "string",
+                "ScalingConfigurationInfo": {
+                    "MinCapacity": 123,
+                    "MaxCapacity": 123,
+                    "AutoPause": true,
+                    "SecondsUntilAutoPause": 123,
+                    "TimeoutAction": "string",
+                    "SecondsBeforeTimeout": 123
+                },
+                "DeletionProtection": true,
+                "HttpEndpointEnabled": true,
+                "ActivityStreamMode": "sync",
+                "ActivityStreamStatus": "stopped",
+                "ActivityStreamKmsKeyId": "string",
+                "ActivityStreamKinesisStreamName": "string",
+                "CopyTagsToSnapshot": true,
+                "CrossAccountClone": true,
+                "DomainMemberships": [
+                    {
+                        "Domain": "string",
+                        "Status": "string",
+                        "FQDN": "string",
+                        "IAMRoleName": "string"
+                    }
+                ],
+                "TagList": [
+                    {
+                        "Key": "string",
+                        "Value": "string"
+                    }
+                ],
+                "GlobalWriteForwardingStatus": "enabled",
+                "GlobalWriteForwardingRequested": true,
+                "PendingModifiedValues": {
+                    "PendingCloudwatchLogsExports": {
+                        "LogTypesToEnable": [
+                            "string"
+                        ],
+                        "LogTypesToDisable": [
+                            "string"
+                        ]
+                    },
+                    "DBClusterIdentifier": "string",
+                    "MasterUserPassword": "string",
+                    "IAMDatabaseAuthenticationEnabled": true,
+                    "EngineVersion": "string"
+                },
+                "DBClusterInstanceClass": "string",
+                "StorageType": "string",
+                "Iops": 123,
+                "PubliclyAccessible": true,
+                "AutoMinorVersionUpgrade": true,
+                "MonitoringInterval": 123,
+                "MonitoringRoleArn": "string",
+                "PerformanceInsightsEnabled": true,
+                "PerformanceInsightsKMSKeyId": "string",
+                "PerformanceInsightsRetentionPeriod": 123
+            }
+        ]
+    }
+}

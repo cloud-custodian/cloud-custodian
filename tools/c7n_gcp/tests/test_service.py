@@ -1,16 +1,5 @@
-# Copyright 2018 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 
 from gcp_common import BaseTest
 
@@ -24,7 +13,28 @@ class ServiceTest(BaseTest):
              'resource': 'gcp.service'},
             session_factory=factory)
         resources = p.run()
-        self.assertEqual(len(resources), 26)
+        self.assertEqual(len(resources), 16)
+        self.assertEqual(
+            p.resource_manager.get_urns(resources),
+            [
+                "gcp:serviceusage::cloud-custodian:service/bigquery.googleapis.com",
+                "gcp:serviceusage::cloud-custodian:service/bigquerystorage.googleapis.com",
+                "gcp:serviceusage::cloud-custodian:service/cloudapis.googleapis.com",
+                "gcp:serviceusage::cloud-custodian:service/clouddebugger.googleapis.com",
+                "gcp:serviceusage::cloud-custodian:service/cloudtrace.googleapis.com",
+                "gcp:serviceusage::cloud-custodian:service/datastore.googleapis.com",
+                "gcp:serviceusage::cloud-custodian:service/logging.googleapis.com",
+                "gcp:serviceusage::cloud-custodian:service/monitoring.googleapis.com",
+                "gcp:serviceusage::cloud-custodian:service/pubsub.googleapis.com",
+                "gcp:serviceusage::cloud-custodian:service/servicemanagement.googleapis.com",
+                "gcp:serviceusage::cloud-custodian:service/serviceusage.googleapis.com",
+                "gcp:serviceusage::cloud-custodian:service/source.googleapis.com",
+                "gcp:serviceusage::cloud-custodian:service/sql-component.googleapis.com",
+                "gcp:serviceusage::cloud-custodian:service/storage-api.googleapis.com",
+                "gcp:serviceusage::cloud-custodian:service/storage-component.googleapis.com",
+                "gcp:serviceusage::cloud-custodian:service/storage.googleapis.com",
+            ],
+        )
 
     def test_service_disable(self):
         factory = self.replay_flight_data('service-disable')
@@ -32,14 +42,12 @@ class ServiceTest(BaseTest):
             {'name': 'disable-service',
              'resource': 'gcp.service',
              'filters': [
-                 {'serviceName': 'deploymentmanager.googleapis.com'}],
+                 {'config.name': 'deploymentmanager.googleapis.com'}],
              'actions': ['disable']},
             session_factory=factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        self.assertEqual(
-            resources[0]['serviceName'],
-            'deploymentmanager.googleapis.com')
+        self.assertJmes('config.name', resources[0], 'deploymentmanager.googleapis.com')
 
     def test_service_get(self):
         factory = self.replay_flight_data('service-get')
@@ -47,9 +55,11 @@ class ServiceTest(BaseTest):
             {'name': 'one-service', 'resource': 'gcp.service'},
             session_factory=factory)
         service = p.resource_manager.get_resource(
-            {'resourceName': (
-                'projects/604150802624/'
-                'services/[deploymentmanager.googleapis.com]')})
+            {'resourceName': 'projects/stacklet-sam/services/deploymentmanager.googleapis.com'})
+        self.assertJmes('config.name', service, 'deploymentmanager.googleapis.com')
         self.assertEqual(
-            service, {
-                'serviceName': 'deploymentmanager.googleapis.com'})
+            p.resource_manager.get_urns([service]),
+            [
+                "gcp:serviceusage::cloud-custodian:service/deploymentmanager.googleapis.com",
+            ],
+        )

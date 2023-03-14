@@ -1,0 +1,11 @@
+{
+    "status_code": 400,
+    "data": {
+        "Error": {
+            "Message": "The specified hosted zone contains non-required resource record sets  and so cannot be deleted.",
+            "Code": "HostedZoneNotEmpty",
+            "Type": "Sender"
+        },
+        "ResponseMetadata": {}
+    }
+}

@@ -1,0 +1,28 @@
+{
+    "status_code": 200,
+    "data": {
+        "PolicyInJson": "{\n  \"Version\" : \"2012-10-17\",\n  \"Statement\" : [ {\n    \"Effect\" : \"Allow\",\n    \"Principal\" : \"*\",\n    \"Action\" : \"glue:*\",\n    \"Resource\" : \"arn:aws:glue:us-east-1:644160558196:catalog\",\n    \"Condition\" : {\n      \"StringEquals\" : {\n        \"aws:PrincipalOrgID\" : \"o-4amkskbcf1\"\n      }\n    }\n  } ]\n}",
+        "PolicyHash": "hfAqfsBoPt7ZUGlZjU5mMQ==",
+        "CreateTime": {
+            "__class__": "datetime",
+            "year": 2020,
+            "month": 6,
+            "day": 5,
+            "hour": 12,
+            "minute": 26,
+            "second": 52,
+            "microsecond": 531000
+        },
+        "UpdateTime": {
+            "__class__": "datetime",
+            "year": 2020,
+            "month": 6,
+            "day": 5,
+            "hour": 12,
+            "minute": 26,
+            "second": 52,
+            "microsecond": 531000
+        },
+        "ResponseMetadata": {}
+    }
+}

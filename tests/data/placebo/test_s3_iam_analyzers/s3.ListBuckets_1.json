@@ -1,0 +1,25 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Buckets": [
+            {
+                "Name": "stacklet-tfstate",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 4,
+                    "day": 21,
+                    "hour": 11,
+                    "minute": 5,
+                    "second": 49,
+                    "microsecond": 0
+                }
+            }
+        ],
+        "Owner": {
+            "DisplayName": "aws-backoffice+sandbox-sontek",
+            "ID": "a9c5c1df0336f80c56886067a659c42e3e6b2df97418b44cbe66c453b5284bfb"
+        }
+    }
+}

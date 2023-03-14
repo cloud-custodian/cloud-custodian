@@ -38,7 +38,7 @@ Options
   - ``crypto`` for determining the crypto mechanism, this can either be
     ``aws:kms`` or ``AES256`` (default)
 
-  - ``key-id`` for specifiying the customer KMS key to use for the SSE, if the
+  - ``key-id`` for specifying the customer KMS key to use for the SSE, if the
     ``crypto`` value passed is ``aws:kms`` the AWS default KMS key will be used
     instead.
 

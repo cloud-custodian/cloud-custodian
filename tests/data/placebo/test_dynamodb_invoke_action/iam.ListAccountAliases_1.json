@@ -1,0 +1,18 @@
+{
+    "status_code": 200,
+    "data": {
+        "IsTruncated": false,
+        "AccountAliases": ["rolltop-account"],
+        "ResponseMetadata": {
+            "RequestId": "15b6d484-217e-11e9-872f-c56b57c1cf00",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "15b6d484-217e-11e9-872f-c56b57c1cf00",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "230",
+                "date": "Sat, 26 Jan 2019 15:21:42 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

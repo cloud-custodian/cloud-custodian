@@ -1,0 +1,49 @@
+{
+    "status_code": 200,
+    "data": {
+        "Images": [
+            {
+                "Architecture": "x86_64",
+                "CreationDate": "2022-07-04T12:09:37.000Z",
+                "ImageId": "ami-02a11ce792e2bc296",
+                "ImageLocation": "644160558196/testing_to_be_deleted",
+                "ImageType": "machine",
+                "Public": false,
+                "OwnerId": "644160558196",
+                "PlatformDetails": "Linux/UNIX",
+                "UsageOperation": "RunInstances",
+                "State": "available",
+                "BlockDeviceMappings": [
+                    {
+                        "DeviceName": "/dev/xvda",
+                        "Ebs": {
+                            "DeleteOnTermination": true,
+                            "SnapshotId": "snap-0b1ddd0e294677f70",
+                            "VolumeSize": 8,
+                            "VolumeType": "gp2",
+                            "Encrypted": false
+                        }
+                    },
+                    {
+                        "DeviceName": "/dev/sdf",
+                        "Ebs": {
+                            "DeleteOnTermination": false,
+                            "SnapshotId": "snap-0e33daec301202727",
+                            "VolumeSize": 4,
+                            "VolumeType": "gp2",
+                            "Encrypted": false
+                        }
+                    }
+                ],
+                "EnaSupport": true,
+                "Hypervisor": "xen",
+                "Name": "testing_to_be_deleted",
+                "RootDeviceName": "/dev/xvda",
+                "RootDeviceType": "ebs",
+                "SriovNetSupport": "simple",
+                "VirtualizationType": "hvm"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

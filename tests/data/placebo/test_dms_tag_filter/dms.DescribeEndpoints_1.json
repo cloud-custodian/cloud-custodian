@@ -1,0 +1,22 @@
+{
+    "status_code": 200,
+    "data": {
+        "Endpoints": [
+            {
+                "EndpointIdentifier": "myendpoint",
+                "EndpointType": "SOURCE",
+                "EngineName": "oracle",
+                "EngineDisplayName": "Oracle",
+                "Username": "1234",
+                "ServerName": "orkie",
+                "Port": 1234,
+                "DatabaseName": "orkle",
+                "Status": "active",
+                "KmsKeyId": "arn:aws:kms:us-east-1:1112223334445:key/219c196b-3893-4778-b277-a05322f0ea0d",
+                "EndpointArn": "arn:aws:dms:us-east-1:1112223334445:endpoint:AFDRQSDLIZ2X6KNOS4PBGNWUWQ",
+                "SslMode": "none"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

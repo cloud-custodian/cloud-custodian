@@ -1,0 +1,20 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Owner": {
+            "DisplayName": "vpc",
+            "ID": "929724ecab8ae5995c68a684b2d1382ebee878c5f3d75526decf7a86e14e2468"
+        },
+        "Grants": [
+            {
+                "Grantee": {
+                    "DisplayName": "vpc",
+                    "ID": "929724ecab8ae5995c68a684b2d1382ebee878c5f3d75526decf7a86e14e2468",
+                    "Type": "CanonicalUser"
+                },
+                "Permission": "FULL_CONTROL"
+            }
+        ]
+    }
+}

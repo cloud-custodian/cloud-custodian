@@ -1,0 +1,22 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:sqs:us-east-1:644160558196:test-queue",
+                "Tags": [
+                    {
+                        "Key": "App",
+                        "Value": "Args"
+                    },
+                    {
+                        "Key": "Env",
+                        "Value": "Dev"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

@@ -1,0 +1,28 @@
+{
+    "status_code": 200,
+    "data": {
+        "ReservedNodes": [
+            {
+                "ReservedNodeId": "1ba8e2e3-bc01-4d65-b35d-a4a3e931547e",
+                "ReservedNodeOfferingId": "ceb6a579-cf4c-4343-be8b-d832c45ab51c",
+                "NodeType": "dc2.xlarge",
+                "StartTime": "2020-06-07T11:08:39.051Z",
+                "Duration": 31536000,
+                "FixedPrice": 1380.0,
+                "UsagePrice": 0.0,
+                "CurrencyCode": "USD",
+                "NodeCount": 1,
+                "State": "active",
+                "OfferingType": "All Upfront",
+                "RecurringCharges": [
+                    {
+                        "RecurringChargeAmount": 0.0,
+                        "RecurringChargeFrequency": "Hourly"
+                    }
+                ],
+                "ReservedNodeOfferingType": "Regular"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+ }

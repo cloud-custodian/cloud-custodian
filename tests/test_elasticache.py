@@ -1,21 +1,8 @@
-# Copyright 2016-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 from c7n.resources.elasticache import _cluster_eligible_for_snapshot
 
-from .common import BaseTest, TestConfig as Config
+from .common import BaseTest
 
 
 class TestElastiCacheCluster(BaseTest):
@@ -118,7 +105,7 @@ class TestElastiCacheCluster(BaseTest):
                     }
                 ],
             },
-            config=Config.empty(region="us-east-2"),
+            config=dict(region="us-east-2"),
             session_factory=factory,
         )
         resources = p.run()
@@ -150,7 +137,7 @@ class TestElastiCacheCluster(BaseTest):
                 "resource": "cache-snapshot",
                 "actions": [{"type": "copy-cluster-tags", "tags": ["tagkey"]}],
             },
-            Config.empty(region="us-east-1"),
+            config=dict(region="us-east-1"),
             session_factory=session_factory,
         )
 
@@ -216,6 +203,7 @@ class TestElastiCacheCluster(BaseTest):
 
     def test_elasticache_cluster_delete(self):
         session_factory = self.replay_flight_data("test_elasticache_cluster_delete")
+        log_output = self.capture_logging('custodian.actions')
         p = self.load_policy(
             {
                 "name": "elasticache-cluster-delete",
@@ -227,6 +215,24 @@ class TestElastiCacheCluster(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 3)
+        assert "Deleted ElastiCache replication group: myec" in log_output.getvalue()
+
+    def test_elasticache_cluster_skip_delete_if_not_empty(self):
+        session_factory = self.replay_flight_data("test_elasticache_cluster_skip_delete")
+        log_output = self.capture_logging('custodian.actions')
+        p = self.load_policy(
+            {
+                "name": "elasticache-cluster-skip-delete",
+                "resource": "cache-cluster",
+                "filters": [{"type": "value", "key": "CacheClusterId", "value": "myec-001"}],
+                "actions": [{"type": "delete"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        assert "Deleted ElastiCache replication group: myec" not in log_output.getvalue()
+        assert "myec is not empty" in log_output.getvalue()
 
     def test_elasticache_cluster_snapshot(self):
         session_factory = self.replay_flight_data("test_elasticache_cluster_snapshot")
@@ -458,3 +464,57 @@ class TestModifyVpcSecurityGroupsAction(BaseTest):
         self.assertEqual(len(resources[0]["SecurityGroups"]), 1)
         self.assertEqual(len(clean_resources[0]["SecurityGroups"]), 2)
         self.assertEqual(len(clean_resources), 3)
+
+
+class TestElastiCacheReplicationGroup(BaseTest):
+
+    def test_elasticache_replication_group(self):
+        session_factory = self.replay_flight_data("test_elasticache_replication_group")
+        p = self.load_policy(
+            {"name": "elasticache-rg", "resource": "elasticache-group"},
+            session_factory=session_factory,)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['ReplicationGroupId'], 'test-c7n-rg')
+
+    def test_elasticache_replication_group_delete(self):
+        session_factory = self.replay_flight_data("test_elasticache_replication_group_delete")
+        p = self.load_policy(
+            {
+                "name": "replication-group-enc-delete",
+                "resource": "elasticache-group",
+                "filters": [{"type": "value", "key": "AtRestEncryptionEnabled", "value": False}],
+                "actions": [{"type": "delete", "snapshot": True}],
+            },
+            session_factory=session_factory,)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['ReplicationGroupId'], 'c7n-delete')
+        client = session_factory().client("elasticache")
+        response = client.describe_replication_groups(ReplicationGroupId='c7n-delete')
+        self.assertEqual(response.get('ReplicationGroups')[0].get('Status'), 'deleting')
+
+    def test_elasticache_replication_group_tag(self):
+        # the elasticache resource uses the universal_taggable wrapper for the AWS
+        # resource tagging API - this test ensures that API works for RGs
+        session_factory = self.replay_flight_data(
+            "test_elasticache_replication_group_tag")
+        p = self.load_policy(
+            {
+                "name": "tag-ElastiCacheReplicationGroup",
+                "resource": "elasticache-group",
+                "filters": [{"tag:Tagging": "absent"}],
+                "actions": [{"type": "tag", "key": "Tagging", "value": "added"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        client = session_factory().client("elasticache")
+        response = client.describe_replication_groups(ReplicationGroupId='c7n-tagging')
+        while response.get('ReplicationGroups')[0].get('Status') == 'modifying':
+            response = client.describe_replication_groups(ReplicationGroupId='c7n-tagging')
+        arn = p.resource_manager.get_arns(resources)[0]
+        tags = client.list_tags_for_resource(ResourceName=arn)["TagList"]
+        self.assertEqual(tags[0]["Value"], "added")

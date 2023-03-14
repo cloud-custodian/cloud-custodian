@@ -1,0 +1,28 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:elasticfilesystem:us-east-1:644160558196:file-system/fs-fac23c7a",
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "c7n-test"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "ac875717-fc8b-4d4b-ae3a-793f6b675848",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "ac875717-fc8b-4d4b-ae3a-793f6b675848",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "183",
+                "date": "Sun, 26 Jan 2020 00:35:38 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

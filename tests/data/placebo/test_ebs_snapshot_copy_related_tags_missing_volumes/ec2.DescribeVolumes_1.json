@@ -1,0 +1,10 @@
+{
+    "status_code": 400,
+    "data": {
+        "Error": {
+            "Code": "InvalidVolume.NotFound",
+            "Message": "The volume 'vol-04c1b309bb8d18d71' does not exist."
+        },
+        "ResponseMetadata": {}
+    }
+}

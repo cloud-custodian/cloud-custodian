@@ -4,7 +4,7 @@
         {
             "request": {
                 "method": "POST",
-                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_functionapp-reqs/providers/Microsoft.Web/sites/cloud-custodian-test-dedicatedc129bfa71a47/config/publishingcredentials/list?api-version=2018-11-01",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_functionapp-reqs/providers/Microsoft.Web/sites/cloud-custodian-test-dedicatedc129bfa71a47/config/publishingcredentials/list?api-version=2019-08-01",
                 "body": null,
                 "headers": {}
             },
@@ -14,17 +14,17 @@
                     "message": "OK"
                 },
                 "headers": {
-                    "date": [
-                        "Fri, 13 Sep 2019 22:07:28 GMT"
+                    "x-ms-ratelimit-remaining-subscription-resource-requests": [
+                        "11999"
                     ],
                     "cache-control": [
                         "no-cache"
                     ],
+                    "date": [
+                        "Wed, 04 Mar 2020 19:28:02 GMT"
+                    ],
                     "content-type": [
                         "application/json"
-                    ],
-                    "x-ms-ratelimit-remaining-subscription-resource-requests": [
-                        "11998"
                     ],
                     "content-length": [
                         "834"
@@ -39,12 +39,12 @@
                         "properties": {
                             "name": null,
                             "publishingUserName": "$cloud-custodian-test-dedicatedc129bfa71a47",
-                            "publishingPassword": "dbB2cxzBD27CacXmai6nhoZfhD9HhBa7TLW93muARxHp4s6l4ajhhfrLzEGm",
+                            "publishingPassword": "r1ipBoarZtWTM6jCSRbXqwuonSveKMZA1CctZk2EWd6evBTMnhR2CtK33eKo",
                             "publishingPasswordHash": null,
                             "publishingPasswordHashSalt": null,
                             "metadata": null,
                             "isDeleted": false,
-                            "scmUri": "https://$cloud-custodian-test-dedicatedc129bfa71a47:dbB2cxzBD27CacXmai6nhoZfhD9HhBa7TLW93muARxHp4s6l4ajhhfrLzEGm@cloud-custodian-test-dedicatedc129bfa71a47.scm.azurewebsites.net"
+                            "scmUri": "https://$cloud-custodian-test-dedicatedc129bfa71a47:r1ipBoarZtWTM6jCSRbXqwuonSveKMZA1CctZk2EWd6evBTMnhR2CtK33eKo@cloud-custodian-test-dedicatedc129bfa71a47.scm.azurewebsites.net"
                         }
                     }
                 }
@@ -63,17 +63,17 @@
                     "message": "OK"
                 },
                 "headers": {
-                    "date": [
-                        "Fri, 13 Sep 2019 22:08:36 GMT"
-                    ],
-                    "set-cookie": [
-                        "ARRAffinity=801dcea84801119dfe0a0198d0d0a04dd3c698f312730808e7b1551de2ad661f;Path=/;HttpOnly;Domain=cloud-custodian-test-dedicatede3da21c66828.scm.azurewebsites.net"
-                    ],
                     "etag": [
-                        "\"4e9c0286\""
+                        "\"ffffffff9135224c\""
+                    ],
+                    "date": [
+                        "Wed, 04 Mar 2020 19:28:03 GMT"
                     ],
                     "content-type": [
                         "application/json; charset=utf-8"
+                    ],
+                    "set-cookie": [
+                        "ARRAffinity=fb2209b88e7914e96216316c42f79002bf0981b064aa4573a323753dd4f8dede;Path=/;HttpOnly;Domain=cloud-custodian-test-dedicated382f3715d07e.scm.azurewebsites.net"
                     ],
                     "content-length": [
                         "2"
@@ -81,6 +81,178 @@
                 },
                 "body": {
                     "data": []
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "POST",
+                "uri": "https://cloud-custodian-test-dedicatedc129bfa71a47.scm.azurewebsites.net/api/zipdeploy?isAsync=true&synctriggers=true",
+                "body": "mock_body",
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 202,
+                    "message": "Accepted"
+                },
+                "headers": {
+                    "content-length": [
+                        "0"
+                    ],
+                    "date": [
+                        "Wed, 04 Mar 2020 19:28:05 GMT"
+                    ],
+                    "set-cookie": [
+                        "ARRAffinity=fb2209b88e7914e96216316c42f79002bf0981b064aa4573a323753dd4f8dede;Path=/;HttpOnly;Domain=cloud-custodian-test-dedicated382f3715d07e.scm.azurewebsites.net"
+                    ],
+                    "location": [
+                        "https://cloud-custodian-test-dedicated382f3715d07e.scm.azurewebsites.net:443/api/deployments/latest?deployer=Push-Deployer&time=2020-03-04_19-28-04Z"
+                    ]
+                },
+                "body": {
+                    "string": ""
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://cloud-custodian-test-dedicatedc129bfa71a47.scm.azurewebsites.net/api/isdeploying",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "date": [
+                        "Wed, 04 Mar 2020 19:28:15 GMT"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "set-cookie": [
+                        "ARRAffinity=fb2209b88e7914e96216316c42f79002bf0981b064aa4573a323753dd4f8dede;Path=/;HttpOnly;Domain=cloud-custodian-test-dedicated382f3715d07e.scm.azurewebsites.net"
+                    ],
+                    "content-length": [
+                        "26"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": "False",
+                        "msg": ""
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://cloud-custodian-test-dedicatedc129bfa71a47.scm.azurewebsites.net/deployments",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "etag": [
+                        "\"8d7c0726eb6fdce\""
+                    ],
+                    "date": [
+                        "Wed, 04 Mar 2020 19:28:27 GMT"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "set-cookie": [
+                        "ARRAffinity=fb2209b88e7914e96216316c42f79002bf0981b064aa4573a323753dd4f8dede;Path=/;HttpOnly;Domain=cloud-custodian-test-dedicated382f3715d07e.scm.azurewebsites.net"
+                    ],
+                    "content-length": [
+                        "758"
+                    ]
+                },
+                "body": {
+                    "data": [
+                        {
+                            "id": "ed5b3daa58f340f480bbcc201dfda241",
+                            "status": 4,
+                            "status_text": "",
+                            "author_email": "N/A",
+                            "author": "N/A",
+                            "deployer": "Push-Deployer",
+                            "message": "Created via a push deployment",
+                            "progress": "",
+                            "received_time": "2020-03-04T19:28:05.525312Z",
+                            "start_time": "2020-03-04T19:28:05.686787Z",
+                            "end_time": "2020-03-04T19:28:10.9784537Z",
+                            "last_success_end_time": "2020-03-04T19:28:10.9784537Z",
+                            "complete": true,
+                            "active": true,
+                            "is_temp": false,
+                            "is_readonly": true,
+                            "url": "https://cloud-custodian-test-dedicated382f3715d07e.scm.azurewebsites.net/deployments/ed5b3daa58f340f480bbcc201dfda241",
+                            "log_url": "https://cloud-custodian-test-dedicated382f3715d07e.scm.azurewebsites.net/deployments/ed5b3daa58f340f480bbcc201dfda241/log",
+                            "site_name": "cloud-custodian-test-dedicated382f3715d07e"
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://cloud-custodian-test-dedicatedc129bfa71a47.scm.azurewebsites.net/deployments/ed5b3daa58f340f480bbcc201dfda241",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "date": [
+                        "Wed, 04 Mar 2020 19:28:27 GMT"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "set-cookie": [
+                        "ARRAffinity=fb2209b88e7914e96216316c42f79002bf0981b064aa4573a323753dd4f8dede;Path=/;HttpOnly;Domain=cloud-custodian-test-dedicated382f3715d07e.scm.azurewebsites.net"
+                    ],
+                    "content-length": [
+                        "756"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "id": "ed5b3daa58f340f480bbcc201dfda241",
+                        "status": 4,
+                        "status_text": "",
+                        "author_email": "N/A",
+                        "author": "N/A",
+                        "deployer": "Push-Deployer",
+                        "message": "Created via a push deployment",
+                        "progress": "",
+                        "received_time": "2020-03-04T19:28:05.525312Z",
+                        "start_time": "2020-03-04T19:28:05.686787Z",
+                        "end_time": "2020-03-04T19:28:10.9784537Z",
+                        "last_success_end_time": "2020-03-04T19:28:10.9784537Z",
+                        "complete": true,
+                        "active": true,
+                        "is_temp": false,
+                        "is_readonly": true,
+                        "url": "https://cloud-custodian-test-dedicated382f3715d07e.scm.azurewebsites.net/deployments/ed5b3daa58f340f480bbcc201dfda241",
+                        "log_url": "https://cloud-custodian-test-dedicated382f3715d07e.scm.azurewebsites.net/deployments/ed5b3daa58f340f480bbcc201dfda241/log",
+                        "site_name": "cloud-custodian-test-dedicated382f3715d07e"
+                    }
                 }
             }
         }

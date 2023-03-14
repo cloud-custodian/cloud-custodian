@@ -1,0 +1,14 @@
+{
+    "status_code": 200,
+    "data": {
+        "Label": "TCP_ELB_Reset_Count",
+        "Datapoints": [
+            {
+                "Timestamp": "2020-04-18T07:10:00+00:00",
+                "Sum": 37.0,
+                "Unit": "Count"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

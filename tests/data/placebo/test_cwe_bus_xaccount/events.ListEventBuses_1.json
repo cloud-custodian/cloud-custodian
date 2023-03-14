@@ -1,0 +1,17 @@
+{
+    "status_code": 200,
+    "data": {
+        "EventBuses": [
+            {
+                "Name": "default",
+                "Arn": "arn:aws:events:us-east-1:644160558196:event-bus/default"
+            },
+            {
+                "Name": "chat-messages",
+                "Arn": "arn:aws:events:us-east-1:644160558196:event-bus/chat-messages",
+                "Policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"DevAccountAccess\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::644160558196:root\"},\"Action\":\"events:PutEvents\",\"Resource\":\"arn:aws:events:us-east-1:644160558196:event-bus/chat-messages\"}]}"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

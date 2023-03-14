@@ -18,6 +18,10 @@
             }, 
             "Tags": [
                 {
+                    "Key": "maid_status",
+                    "Value": "Resource does not meet policy: delete@2019/01/25"
+                },
+                {
                     "Value": "One", 
                     "Key": "Application"
                 }, 

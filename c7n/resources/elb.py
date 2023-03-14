@@ -1,21 +1,8 @@
-# Copyright 2015-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 """
 Elastic Load Balancers
 """
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 from concurrent.futures import as_completed
 import re
 
@@ -28,10 +15,9 @@ from c7n.filters import (
     ShieldMetrics)
 import c7n.filters.vpc as net_filters
 from datetime import datetime
-from dateutil.tz import tzutc
 from c7n import tags
 from c7n.manager import resources
-from c7n.query import QueryResourceManager, DescribeSource, TypeInfo
+from c7n.query import ConfigSource, QueryResourceManager, DescribeSource, TypeInfo
 from c7n.utils import local_session, chunks, type_schema
 
 from c7n.resources.shield import IsShieldProtected, SetShieldProtection
@@ -46,13 +32,19 @@ filters.register('shield-enabled', IsShieldProtected)
 filters.register('shield-metrics', ShieldMetrics)
 
 
+class DescribeELB(DescribeSource):
+
+    def augment(self, resources):
+        return tags.universal_augment(self.manager, resources)
+
+
 @resources.register('elb')
 class ELB(QueryResourceManager):
 
     class resource_type(TypeInfo):
         service = 'elb'
         arn_type = 'loadbalancer'
-        arn_service = 'elasticloadbalancing'
+        permission_prefix = arn_service = 'elasticloadbalancing'
         enum_spec = ('describe_load_balancers',
                      'LoadBalancerDescriptions', None)
         id = 'LoadBalancerName'
@@ -61,7 +53,7 @@ class ELB(QueryResourceManager):
         name = 'DNSName'
         date = 'CreatedTime'
         dimension = 'LoadBalancerName'
-        config_type = "AWS::ElasticLoadBalancing::LoadBalancer"
+        cfn_type = config_type = "AWS::ElasticLoadBalancing::LoadBalancer"
         default_report_fields = (
             'LoadBalancerName',
             'DNSName',
@@ -71,23 +63,16 @@ class ELB(QueryResourceManager):
 
     filter_registry = filters
     action_registry = actions
+    source_mapping = {
+        'describe': DescribeELB,
+        'config': ConfigSource
+    }
 
     @classmethod
     def get_permissions(cls):
         return ('elasticloadbalancing:DescribeLoadBalancers',
                 'elasticloadbalancing:DescribeLoadBalancerAttributes',
                 'elasticloadbalancing:DescribeTags')
-
-    def get_source(self, source_type):
-        if source_type == 'describe':
-            return DescribeELB(self)
-        return super(ELB, self).get_source(source_type)
-
-
-class DescribeELB(DescribeSource):
-
-    def augment(self, resources):
-        return tags.universal_augment(self.manager, resources)
 
 
 @actions.register('set-shield')
@@ -178,7 +163,7 @@ class RemoveTag(tags.RemoveTag):
     def process_resource_set(self, client, resource_set, tag_keys):
         client.remove_tags(
             LoadBalancerNames=[r['LoadBalancerName'] for r in resource_set],
-            Tags=[{'Key': k for k in tag_keys}])
+            Tags=[{'Key': k} for k in tag_keys])
 
 
 @actions.register('delete')
@@ -220,21 +205,38 @@ class SetSslListenerPolicy(BaseAction):
     .. code-block:: yaml
 
             policies:
-              - name: elb-set-listener-policy
+              - name: elb-set-listener-custom-policy
                 resource: elb
                 actions:
                   - type: set-ssl-listener-policy
-                    name: SSLNegotiation-Policy-01
+                    name: SSLNegotiation-Custom-Policy-01
                     attributes:
                       - Protocol-SSLv3
                       - Protocol-TLSv1.1
                       - DHE-RSA-AES256-SHA256
+
+
+    Alternatively, you can specify one of AWS recommended policies
+    (https://docs.aws.amazon.com/elasticloadbalancing/latest/classic/elb-security-policy-table.html)
+    by specifying an attribute where key=Reference-Security-Policy
+    and value=name of the predefined policy. For example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: elb-set-listener-predefined-policy
+                resource: elb
+                actions:
+                  - type: set-ssl-listener-policy
+                    name: SSLNegotiation-Predefined-Policy-01
+                    attributes:
+                      Reference-Security-Policy: ELBSecurityPolicy-TLS-1-2-2017-01
     """
 
     schema = type_schema(
         'set-ssl-listener-policy',
         name={'type': 'string'},
-        attributes={'type': 'array', 'items': {'type': 'string'}},
+        attributes={'anyOf': [{'type': 'object'}, {'type': 'array', 'items': {'type': 'string'}}]},
         required=['name', 'attributes'])
 
     permissions = (
@@ -269,11 +271,16 @@ class SetSslListenerPolicy(BaseAction):
         # to make it unique within the
         # set of policies for this load balancer.
         policy_name = self.data.get('name') + '-' + \
-            str(int(datetime.now(tz=tzutc()).strftime("%s")) * 1000)
+            str(int(datetime.utcnow().timestamp() * 1000))
         lb_name = elb['LoadBalancerName']
         attrs = self.data.get('attributes')
-        policy_attributes = [{'AttributeName': attr, 'AttributeValue': 'true'}
-            for attr in attrs]
+
+        if type(attrs) is dict:
+            policy_attributes = [{'AttributeName': name, 'AttributeValue': value}
+                for name, value in attrs.items()]
+        else:
+            policy_attributes = [{'AttributeName': attr, 'AttributeValue': 'true'}
+                for attr in attrs]
 
         try:
             client.create_load_balancer_policy(
@@ -316,9 +323,9 @@ class ELBModifyVpcSecurityGroups(ModifyVpcSecurityGroupsAction):
         client = local_session(self.manager.session_factory).client('elb')
         groups = super(ELBModifyVpcSecurityGroups, self).get_groups(
             load_balancers)
-        for idx, l in enumerate(load_balancers):
+        for idx, lb in enumerate(load_balancers):
             client.apply_security_groups_to_load_balancer(
-                LoadBalancerName=l['LoadBalancerName'],
+                LoadBalancerName=lb['LoadBalancerName'],
                 SecurityGroups=groups[idx])
 
 
@@ -695,7 +702,7 @@ class SSLPolicyFilter(Filter):
 
 @filters.register('healthcheck-protocol-mismatch')
 class HealthCheckProtocolMismatch(Filter):
-    """Filters ELB that have a healtch check protocol mismatch
+    """Filters ELB that have a health check protocol mismatch
 
     The mismatch occurs if the ELB has a different protocol to check than
     the associated instances allow to determine health status.
@@ -751,7 +758,7 @@ class DefaultVpc(DefaultVpcBase):
         return elb.get('VPCId') and self.match(elb.get('VPCId')) or False
 
 
-class ELBAttributeFilterBase(object):
+class ELBAttributeFilterBase:
     """ Mixin base class for filters that query LB attributes.
     """
 
@@ -855,3 +862,37 @@ class IsNotLoggingFilter(Filter, ELBAttributeFilterBase):
                     'AccessLog'].get(
                     'S3BucketPrefix', None))
                 ]
+
+
+@filters.register('attributes')
+class CheckAttributes(ValueFilter, ELBAttributeFilterBase):
+    """Value Filter that allows filtering on ELB attributes
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+                - name: elb-is-connection-draining
+                  resource: elb
+                  filters:
+                    - type: attributes
+                      key: ConnectionDraining.Enabled
+                      value: true
+                      op: eq
+
+    """
+    annotate = False  # no annotation from value filter
+    permissions = ("elasticloadbalancing:DescribeLoadBalancerAttributes",)
+    schema = type_schema('attributes', rinherit=ValueFilter.schema)
+    schema_alias = False
+
+    def process(self, resources, event=None):
+        self.augment(resources)
+        return super().process(resources, event)
+
+    def augment(self, resources):
+        self.initialize(resources)
+
+    def __call__(self, r):
+        return super().__call__(r['Attributes'])

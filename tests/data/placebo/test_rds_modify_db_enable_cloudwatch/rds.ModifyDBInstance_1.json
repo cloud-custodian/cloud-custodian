@@ -1,0 +1,11 @@
+{
+    "status_code": 200,
+    "data": {
+        "DBInstance": {
+            "DBInstanceIdentifier": "database-2",
+            "Engine": "mysql",
+            "DBInstanceArn": "arn:aws:rds:us-east-1:644160558196:db:database-2"
+        },
+        "ResponseMetadata": {}
+    }
+}

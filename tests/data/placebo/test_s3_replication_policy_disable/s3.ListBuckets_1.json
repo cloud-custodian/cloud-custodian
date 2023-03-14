@@ -1,0 +1,25 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Buckets": [
+            {
+                "Name": "repela",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 3,
+                    "day": 10,
+                    "hour": 20,
+                    "minute": 20,
+                    "second": 1,
+                    "microsecond": 0
+                }
+            }
+        ],
+        "Owner": {
+            "DisplayName": "pikachu",
+            "ID": "50b875c3f7a799a2ee2281c11dec0f4ec7679cee45273cbf7514cdf908e77c0a"
+        }
+    }
+}

@@ -1,0 +1,116 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "nodeTypeName": {
+            "type": "string",
+            "maxLength": 9,
+            "defaultValue": "NT1"
+        },
+        "vmImagePublisher": {
+            "type": "string",
+            "defaultValue": "MicrosoftWindowsServer"
+        },
+        "vmImageOffer": {
+            "type": "string",
+            "defaultValue": "WindowsServer"
+        },
+        "vmImageSku": {
+            "type": "string",
+            "defaultValue": "2019-Datacenter"
+        },
+        "vmImageVersion": {
+            "type": "string",
+            "defaultValue": "latest"
+        },
+        "vmSize": {
+            "type": "string",
+            "defaultValue": "Standard_D2s_v3"
+        },
+        "vmInstanceCount": {
+            "type": "int",
+            "defaultValue": 3
+        },
+        "dataDiskSizeGB": {
+            "type": "int",
+            "defaultValue": 128
+        },
+        "managedDataDiskType": {
+            "type": "string",
+            "allowedValues": [
+                "Standard_LRS",
+                "StandardSSD_LRS",
+                "Premium_LRS"
+            ],
+            "defaultValue": "StandardSSD_LRS"
+        }
+    },
+    "variables": {
+        "sfApiVersion": "2021-05-01",
+        "suffix":"[substring(subscription().subscriptionId, 24, 12)]",
+        "clusterName": "[concat('ccfabric', variables('suffix'))]"
+    },
+    "resources": [
+        {
+            "apiVersion": "[variables('sfApiVersion')]",
+            "type": "Microsoft.ServiceFabric/managedclusters",
+            "name": "[variables('clusterName')]",
+            "location": "[resourcegroup().location]",
+            "sku": {
+                "name" : "Basic"
+            },
+            "properties": {
+                "dnsName": "[toLower(variables('clusterName'))]",
+                "adminUserName": "[variables('clusterName')]",
+                "adminPassword": "[concat('Pass12@', variables('suffix'))]",
+                "clientConnectionPort": 19000,
+                "httpGatewayConnectionPort": 19080,
+                "clients" : [
+                ],
+                "loadBalancingRules": [
+                    {
+                        "frontendPort": 8080,
+                        "backendPort": 8080,
+                        "protocol": "tcp",
+                        "probeProtocol": "tcp"
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "[variables('sfApiVersion')]",
+            "type": "Microsoft.ServiceFabric/managedclusters/nodetypes",
+            "name": "[concat(variables('clusterName'), '/', parameters('nodeTypeName'))]",
+            "location": "[resourcegroup().location]",
+            "dependsOn": [
+              "[concat('Microsoft.ServiceFabric/managedclusters/', variables('clusterName'))]"
+            ],
+            "properties": {
+                "isPrimary": true,
+                "vmImagePublisher": "[parameters('vmImagePublisher')]",
+                "vmImageOffer": "[parameters('vmImageOffer')]",
+                "vmImageSku": "[parameters('vmImageSku')]",
+                "vmImageVersion": "[parameters('vmImageVersion')]",
+                "vmSize": "[parameters('vmSize')]",
+                "vmInstanceCount": "[parameters('vmInstanceCount')]",
+                "dataDiskSizeGB": "[parameters('dataDiskSizeGB')]",
+                "dataDiskType":"[parameters('managedDataDiskType')]"
+
+            }
+        }
+    ],
+    "outputs": {
+         "serviceFabricExplorer": {
+            "value": "[concat('https://', reference(variables('clusterName')).fqdn, ':', reference(variables('clusterName')).httpGatewayConnectionPort)]",
+            "type": "string"
+        },
+        "clientConnectionEndpoint": {
+             "value": "[concat(reference(variables('clusterName')).fqdn, ':', reference(variables('clusterName')).clientConnectionPort)]",
+             "type": "string"
+        },
+        "clusterProperties": {
+            "value": "[reference(variables('clusterName'))]",
+            "type": "object"
+        }
+    }
+}

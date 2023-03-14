@@ -1,31 +1,20 @@
 {
-    "status_code": 200, 
+    "status_code": 200,
     "data": {
-        "ResponseMetadata": {
-            "RetryAttempts": 0, 
-            "HTTPStatusCode": 200, 
-            "RequestId": "c8cd6e7a-1c13-4e1c-b27a-3b23c4db1e05", 
-            "HTTPHeaders": {
-                "date": "Wed, 31 Jan 2018 20:16:22 GMT", 
-                "x-amzn-requestid": "c8cd6e7a-1c13-4e1c-b27a-3b23c4db1e05", 
-                "content-length": "167", 
-                "content-type": "application/x-amz-json-1.1", 
-                "connection": "keep-alive"
-            }
-        }, 
         "Tags": [
             {
-                "Value": "OpMe", 
-                "Key": "OpMe"
-            }, 
+                "Key": "OpMe",
+                "Value": "TestValue"
+            },
             {
-                "Value": "TestValue", 
-                "Key": "TestValue"
-            }, 
+                "Key": "custodian_cleanup",
+                "Value": "Resource does not meet policy: delete@2021/06/26"
+            },
             {
-                "Value": "Resource does not meet policy: delete@2018/02/01", 
-                "Key": "custodian_cleanup"
+                "Key": "Category",
+                "Value": "TestValue"
             }
-        ]
+        ],
+        "ResponseMetadata": {}
     }
 }

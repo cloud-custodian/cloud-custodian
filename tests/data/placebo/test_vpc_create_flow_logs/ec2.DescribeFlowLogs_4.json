@@ -1,0 +1,31 @@
+{
+    "status_code": 200,
+    "data": {
+        "FlowLogs": [
+            {
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 4,
+                    "day": 27,
+                    "hour": 4,
+                    "minute": 33,
+                    "second": 17,
+                    "microsecond": 121000
+                },
+                "DeliverLogsPermissionArn": "arn:aws:iam::644160558196:role/flowlogsRole",
+                "DeliverLogsStatus": "SUCCESS",
+                "FlowLogId": "fl-0c28f7d7b5cd29477",
+                "FlowLogStatus": "ACTIVE",
+                "LogGroupName": "/custodian/vpc_log/",
+                "ResourceId": "vpc-03005fb9b8740263d",
+                "TrafficType": "ALL",
+                "LogDestinationType": "cloud-watch-logs",
+                "LogFormat": "${version} ${account-id} ${interface-id} ${srcaddr} ${dstaddr} ${srcport} ${dstport} ${protocol} ${packets} ${bytes} ${start} ${end} ${action} ${log-status}",
+                "Tags": [],
+                "MaxAggregationInterval": 600
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

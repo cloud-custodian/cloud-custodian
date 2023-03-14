@@ -1,0 +1,13 @@
+{
+    "status_code": 200,
+    "data": {
+        "resourceIdentifiers": [
+            {
+                "resourceType": "AWS::NetworkFirewall::Firewall",
+                "resourceId": "f80c47ff-8cd0-46f9-aeb7-e4093414f0ed",
+                "resourceName": "unicron"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

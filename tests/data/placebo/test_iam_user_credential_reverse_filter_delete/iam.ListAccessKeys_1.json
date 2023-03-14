@@ -1,0 +1,39 @@
+{
+  "status_code": 200,
+  "data": {
+    "AccessKeyMetadata": [
+      {
+        "UserName": "zscholl",
+        "AccessKeyId": "AKIAJEZJDQQX4TZNRMKQ",
+        "Status": "Active",
+        "CreateDate": {
+          "__class__": "datetime",
+          "year": 2019,
+          "month": 9,
+          "day": 25,
+          "hour": 10,
+          "minute": 52,
+          "second": 11,
+          "microsecond": 0
+        }
+      },
+      {
+        "UserName": "zscholl",
+        "AccessKeyId": "AKIAIFX6HPKAM5F7JVAA",
+        "Status": "Active",
+        "CreateDate": {
+          "__class__": "datetime",
+          "year": 2099,
+          "month": 8,
+          "day": 10,
+          "hour": 11,
+          "minute": 12,
+          "second": 31,
+          "microsecond": 0
+        }
+      }
+    ],
+    "IsTruncated": false,
+    "ResponseMetadata": {}
+  }
+}

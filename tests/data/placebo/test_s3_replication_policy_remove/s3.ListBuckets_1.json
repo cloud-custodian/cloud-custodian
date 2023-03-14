@@ -1,0 +1,25 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Buckets": [
+            {
+                "Name": "replication-from-12345",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 3,
+                    "day": 14,
+                    "hour": 0,
+                    "minute": 33,
+                    "second": 50,
+                    "microsecond": 0
+                }
+            }
+        ],
+        "Owner": {
+            "DisplayName": "pikachudev",
+            "ID": "50b875c3f7a799a2ee2281c11dec0f4ec7679cee45273cbf7514cdf908e77c0a"
+        }
+    }
+}

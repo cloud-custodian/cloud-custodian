@@ -1,0 +1,14 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "StreamInfo": {
+            "StreamName": "test-video",
+            "StreamARN": "arn:aws:kinesisvideo:us-east-1:123456789012:stream/test-video/1614617127243",
+            "KmsKeyId": "arn:aws:kms:us-east-1:123456789012:alias/aws/kinesisvideo",
+            "Version": "UFzWy9XNbSFdyFr5OtDV",
+            "Status": "DELETING",
+            "DataRetentionInHours": 24
+        }
+    }
+}

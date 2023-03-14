@@ -1,0 +1,105 @@
+{
+    "status_code": 200,
+    "data": {
+        "projects": [
+            {
+                "name": "test-project",
+                "arn": "arn:aws:codebuild:us-east-1:644160558196:project/test-project",
+                "description": "test_codebuild_project",
+                "source": {
+                    "type": "GITHUB",
+                    "location": "https://github.com/mitchellh/packer.git",
+                    "gitCloneDepth": 1,
+                    "gitSubmodulesConfig": {
+                        "fetchSubmodules": true
+                    },
+                    "buildspec": "",
+                    "reportBuildStatus": false,
+                    "insecureSsl": false
+                },
+                "sourceVersion": "master",
+                "artifacts": {
+                    "type": "NO_ARTIFACTS",
+                    "overrideArtifactName": false
+                },
+                "cache": {
+                    "type": "NO_CACHE"
+                },
+                "environment": {
+                    "type": "LINUX_CONTAINER",
+                    "image": "aws/codebuild/standard:1.0",
+                    "computeType": "BUILD_GENERAL1_SMALL",
+                    "environmentVariables": [
+                        {
+                            "name": "SOME_KEY1",
+                            "value": "SOME_VALUE1",
+                            "type": "PLAINTEXT"
+                        },
+                        {
+                            "name": "SOME_KEY2",
+                            "value": "SOME_VALUE2",
+                            "type": "PARAMETER_STORE"
+                        }
+                    ],
+                    "privilegedMode": false,
+                    "imagePullCredentialsType": "CODEBUILD"
+                },
+                "serviceRole": "arn:aws:iam::644160558196:role/example",
+                "timeoutInMinutes": 5,
+                "queuedTimeoutInMinutes": 480,
+                "encryptionKey": "arn:aws:kms:us-east-1:644160558196:alias/aws/s3",
+                "tags": [
+                    {
+                        "key": "Environment",
+                        "value": "Test"
+                    }
+                ],
+                "created": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 10,
+                    "day": 7,
+                    "hour": 10,
+                    "minute": 39,
+                    "second": 35,
+                    "microsecond": 814000
+                },
+                "lastModified": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 10,
+                    "day": 7,
+                    "hour": 10,
+                    "minute": 39,
+                    "second": 35,
+                    "microsecond": 814000
+                },
+                "vpcConfig": {
+                    "vpcId": "vpc-0ef5a04184aee6026",
+                    "subnets": [
+                        "subnet-06a50bc476820b18c"
+                    ],
+                    "securityGroupIds": [
+                        "sg-0d4546977e35db448"
+                    ]
+                },
+                "badge": {
+                    "badgeEnabled": false
+                },
+                "logsConfig": {
+                    "cloudWatchLogs": {
+                        "status": "ENABLED",
+                        "groupName": "log-group",
+                        "streamName": "log-stream"
+                    },
+                    "s3Logs": {
+                        "status": "DISABLED",
+                        "encryptionDisabled": false
+                    }
+                }
+            }
+        ],
+        "projectsNotFound": [],
+        "ResponseMetadata": {}
+    }
+}

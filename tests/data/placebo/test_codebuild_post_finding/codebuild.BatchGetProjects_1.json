@@ -1,0 +1,72 @@
+{
+    "status_code": 200,
+    "data": {
+        "projects": [
+            {
+                "name": "custodian",
+                "arn": "arn:aws:codebuild:us-east-2:644160558196:project/custodian",
+                "source": {
+                    "type": "GITHUB",
+                    "location": "https://github.com/kapilt/cloud-custodian",
+                    "gitCloneDepth": 0,
+                    "buildspec": "version: 0.2\nphases:\n  build:\n    commands:\n      - pip install tox && tox -e py27\ncache:\n  paths:\n   - /root/.cache/pip",
+                    "auth": {
+                        "type": "OAUTH"
+                    },
+                    "reportBuildStatus": false,
+                    "insecureSsl": false
+                },
+                "artifacts": {
+                    "type": "NO_ARTIFACTS"
+                },
+                "cache": {
+                    "type": "S3",
+                    "location": "c7n-ssm-build/custodian-build"
+                },
+                "environment": {
+                    "type": "LINUX_CONTAINER",
+                    "image": "aws/codebuild/python:2.7.12",
+                    "computeType": "BUILD_GENERAL1_LARGE",
+                    "environmentVariables": [],
+                    "privilegedMode": false,
+                    "imagePullCredentialsType": "CODEBUILD"
+                },
+                "serviceRole": "arn:aws:iam::644160558196:role/service-role/codebuild-test-service-role",
+                "timeoutInMinutes": 60,
+                "queuedTimeoutInMinutes": 480,
+                "encryptionKey": "arn:aws:kms:us-east-2:644160558196:alias/aws/s3",
+                "tags": [],
+                "created": {
+                    "__class__": "datetime",
+                    "year": 2017,
+                    "month": 9,
+                    "day": 6,
+                    "hour": 20,
+                    "minute": 19,
+                    "second": 59,
+                    "microsecond": 814000
+                },
+                "lastModified": {
+                    "__class__": "datetime",
+                    "year": 2018,
+                    "month": 5,
+                    "day": 5,
+                    "hour": 14,
+                    "minute": 13,
+                    "second": 37,
+                    "microsecond": 654000
+                },
+                "webhook": {
+                    "url": "https://api.github.com/repos/kapilt/cloud-custodian/hooks/28369442",
+                    "payloadUrl": "https://codebuild.us-east-2.amazonaws.com/webhooks?t=eyJlbmNyeXB0ZWREYXRhIjoidmcwVlI3aHBLRkNtV1oxM2ZmZVVYc056emJjWEY2eTJKUDBDdHVSL2JCWEFFTGtDS3g5Q1d6N0hvUGxtSjNZZ211ekpIOXdiU2NVM25HcjBocjd3WWljPSIsIml2UGFyYW1ldGVyU3BlYyI6Inh2byttVEV5S0wyQS9GRjIiLCJtYXRlcmlhbFNldFNlcmlhbCI6MX0%3D&v=1"
+                },
+                "badge": {
+                    "badgeEnabled": true,
+                    "badgeRequestUrl": "https://codebuild.us-east-2.amazonaws.com/badges?uuid=eyJlbmNyeXB0ZWREYXRhIjoiUTVPVlBLQlJhMGxaaHhST0VicWRJMUwyVTNBWkl1ei9rRTc3OVJMcVN1aWtwZTFzQVAzdVpWOXBwd2wrcmJ3T1VYVDNDUXorZWNtMURwM3BhNlE2RVNnPSIsIml2UGFyYW1ldGVyU3BlYyI6IklNdktmaktEY3dkUHlRbWgiLCJtYXRlcmlhbFNldFNlcmlhbCI6MX0%3D&branch=master"
+                }
+            }
+        ],
+        "projectsNotFound": [],
+        "ResponseMetadata": {}
+    }
+}

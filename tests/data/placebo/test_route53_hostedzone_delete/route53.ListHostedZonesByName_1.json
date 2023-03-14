@@ -1,0 +1,10 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "HostedZones": [],
+        "DNSName": "custodian.net",
+        "IsTruncated": false,
+        "MaxItems": "100"
+    }
+}

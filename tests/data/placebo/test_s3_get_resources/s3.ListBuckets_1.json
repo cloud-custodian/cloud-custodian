@@ -1,0 +1,25 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Buckets": [
+            {
+                "Name": "c7n-codebuild",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 12,
+                    "day": 20,
+                    "hour": 23,
+                    "minute": 0,
+                    "second": 14,
+                    "microsecond": 0
+                }
+            }
+        ],
+        "Owner": {
+            "DisplayName": "custodian-skunkworks",
+            "ID": "631e4e145c2211ed2e31307ba841b1862307d16de5eab6f5399a23bbbecc26e2"
+        }
+    }
+}

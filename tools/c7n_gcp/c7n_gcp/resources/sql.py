@@ -1,21 +1,11 @@
-# Copyright 2018 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 
 import jmespath
 import re
 
 from c7n.utils import type_schema
+from c7n.filters.offhours import OffHour, OnHour
 from c7n_gcp.actions import MethodAction
 from c7n_gcp.provider import resources
 from c7n_gcp.query import (
@@ -34,13 +24,50 @@ class SqlInstance(QueryResourceManager):
         component = 'instances'
         enum_spec = ('list', 'items[]', None)
         scope = 'project'
-        id = 'name'
+        labels = True
+        labels_op = 'patch'
+        name = id = 'name'
+        default_report_fields = [
+            "name", "state", "databaseVersion", "settings.tier", "settings.dataDiskSizeGb"]
+        asset_type = "sqladmin.googleapis.com/Instance"
+        scc_type = "google.cloud.sql.Instance"
+        metric_key = 'resource.labels.database_id'
+        perm_service = 'cloudsql'
+        urn_component = "instance"
 
         @staticmethod
         def get(client, resource_info):
             return client.execute_command(
                 'get', {'project': resource_info['project_id'],
                         'instance': resource_info['database_id'].rsplit(':', 1)[-1]})
+
+        @staticmethod
+        def get_metric_resource_name(resource):
+            return "{}:{}".format(resource["project"], resource["name"])
+
+        @staticmethod
+        def get_label_params(resource, all_labels):
+            path_param_re = re.compile('.*?/projects/(.*?)/instances/(.*)')
+            project, instance = path_param_re.match(
+                resource['selfLink']).groups()
+            return {
+                'project': project, 'instance': instance,
+                'body': {
+                    'settings': {
+                        'userLabels': all_labels
+                    }
+                }
+            }
+
+    def augment(self, resources):
+        for r in resources:
+            if 'userLabels' in r['settings']:
+                r['labels'] = r['settings']['userLabels']
+        return resources
+
+
+SqlInstance.filter_registry.register('offhour', OffHour)
+SqlInstance.filter_registry.register('onhour', OnHour)
 
 
 class SqlInstanceAction(MethodAction):
@@ -66,6 +93,7 @@ class SqlInstanceStop(MethodAction):
     schema = type_schema('stop')
     method_spec = {'op': 'patch'}
     path_param_re = re.compile('.*?/projects/(.*?)/instances/(.*)')
+    method_perm = 'update'
 
     def get_resource_params(self, model, resource):
         project, instance = self.path_param_re.match(
@@ -75,21 +103,51 @@ class SqlInstanceStop(MethodAction):
                 'body': {'settings': {'activationPolicy': 'NEVER'}}}
 
 
+@SqlInstance.action_registry.register('start')
+class SqlInstanceStart(MethodAction):
+
+    schema = type_schema('start')
+    method_spec = {'op': 'patch'}
+    path_param_re = re.compile('.*?/projects/(.*?)/instances/(.*)')
+    method_perm = 'update'
+
+    def get_resource_params(self, model, resource):
+        project, instance = self.path_param_re.match(
+            resource['selfLink']).groups()
+        return {'project': project,
+                'instance': instance,
+                'body': {'settings': {'activationPolicy': 'ALWAYS'}}}
+
+
+class SQLInstanceChildTypeInfo(ChildTypeInfo):
+    service = 'sqladmin'
+    version = 'v1beta4'
+    parent_spec = {
+        'resource': 'sql-instance',
+        'child_enum_params': [
+            ('name', 'instance')
+        ]
+    }
+    perm_service = 'cloudsql'
+
+    @classmethod
+    def _get_location(cls, resource):
+        return super()._get_location(cls.get_parent(resource))
+
+    @classmethod
+    def _get_urn_id(cls, resource):
+        return f"{resource['instance']}/{resource[cls.id]}"
+
+
 @resources.register('sql-user')
 class SqlUser(ChildResourceManager):
 
-    class resource_type(ChildTypeInfo):
-        service = 'sqladmin'
-        version = 'v1beta4'
+    class resource_type(SQLInstanceChildTypeInfo):
         component = 'users'
         enum_spec = ('list', 'items[]', None)
-        id = 'name'
-        parent_spec = {
-            'resource': 'sql-instance',
-            'child_enum_params': [
-                ('name', 'instance')
-            ]
-        }
+        name = id = 'name'
+        default_report_fields = ["name", "project", "instance"]
+        urn_component = "user"
 
 
 class SqlInstanceChildWithSelfLink(ChildResourceManager):
@@ -108,20 +166,17 @@ class SqlInstanceChildWithSelfLink(ChildResourceManager):
 
 @resources.register('sql-backup-run')
 class SqlBackupRun(SqlInstanceChildWithSelfLink):
-
-    class resource_type(ChildTypeInfo):
-        service = 'sqladmin'
-        version = 'v1beta4'
+    """GCP Resource
+    https://cloud.google.com/sql/docs/mysql/admin-api/rest/v1beta4/backupRuns
+    """
+    class resource_type(SQLInstanceChildTypeInfo):
         component = 'backupRuns'
         enum_spec = ('list', 'items[]', None)
         get_requires_event = True
-        id = 'id'
-        parent_spec = {
-            'resource': 'sql-instance',
-            'child_enum_params': [
-                ('name', 'instance')
-            ]
-        }
+        name = id = 'id'
+        default_report_fields = [
+            name, "status", "instance", "location", "enqueuedTime", "startTime", "endTime"]
+        urn_component = "backup-run"
 
         @staticmethod
         def get(client, event):
@@ -149,20 +204,18 @@ class SqlBackupRun(SqlInstanceChildWithSelfLink):
 
 @resources.register('sql-ssl-cert')
 class SqlSslCert(SqlInstanceChildWithSelfLink):
-
-    class resource_type(ChildTypeInfo):
-        service = 'sqladmin'
-        version = 'v1beta4'
+    """GCP Resource
+    https://cloud.google.com/sql/docs/mysql/admin-api/rest/v1beta4/sslCerts
+    """
+    class resource_type(SQLInstanceChildTypeInfo):
         component = 'sslCerts'
         enum_spec = ('list', 'items[]', None)
         get_requires_event = True
         id = 'sha1Fingerprint'
-        parent_spec = {
-            'resource': 'sql-instance',
-            'child_enum_params': [
-                ('name', 'instance')
-            ]
-        }
+        name = "commonName"
+        default_report_fields = [
+            id, name, "instance", "expirationTime"]
+        urn_component = "ssl-cert"
 
         @staticmethod
         def get(client, event):

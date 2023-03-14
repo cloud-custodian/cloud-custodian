@@ -1,0 +1,44 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "StreamingDistributionList": {
+            "Marker": "",
+            "MaxItems": 100,
+            "IsTruncated": false,
+            "Quantity": 1,
+            "Items": [
+                {
+                    "Id": "E3BPM6WYW0D1BJ",
+                    "ARN": "arn:aws:cloudfront::644160558196:streaming-distribution/E3BPM6WYW0D1BJ",
+                    "Status": "InProgress",
+                    "LastModifiedTime": {
+                        "__class__": "datetime",
+                        "year": 2020,
+                        "month": 5,
+                        "day": 1,
+                        "hour": 14,
+                        "minute": 54,
+                        "second": 22,
+                        "microsecond": 422000
+                    },
+                    "DomainName": "s2pfn6gzgqji67.cloudfront.net",
+                    "S3Origin": {
+                        "DomainName": "test-pratyush.s3.amazonaws.com",
+                        "OriginAccessIdentity": ""
+                    },
+                    "Aliases": {
+                        "Quantity": 0
+                    },
+                    "TrustedSigners": {
+                        "Enabled": false,
+                        "Quantity": 0
+                    },
+                    "Comment": "",
+                    "PriceClass": "PriceClass_All",
+                    "Enabled": true
+                }
+            ]
+        }
+    }
+}

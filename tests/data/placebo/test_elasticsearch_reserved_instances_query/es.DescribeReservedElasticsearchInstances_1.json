@@ -1,0 +1,28 @@
+{
+  "status_code": 200,
+  "data": {
+    "ReservedElasticsearchInstances": [
+      {
+          "ReservationName": "07-2020-r4-xlarge",
+          "ReservedElasticsearchInstanceId": "036381d0-4fa5-4484-bd1a-efc1b43af0bf",
+          "ReservedElasticsearchInstanceOfferingId": "ded48a98-9629-4411-a3dc-e3a18c0e963c",
+          "ElasticsearchInstanceType": "r4.xlarge.elasticsearch",
+          "StartTime": 1594156197.683,
+          "Duration": 94608000,
+          "FixedPrice": 0.0,
+          "UsagePrice": 0.0,
+          "CurrencyCode": "USD",
+          "ElasticsearchInstanceCount": 12,
+          "State": "active",
+          "PaymentOption": "NO_UPFRONT",
+          "RecurringCharges": [
+              {
+                  "RecurringChargeAmount": 0.204,
+                  "RecurringChargeFrequency": "Hourly"
+              }
+          ]
+      }
+    ],
+    "ResponseMetadata": {}
+  }
+}

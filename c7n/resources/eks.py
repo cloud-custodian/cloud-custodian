@@ -1,26 +1,92 @@
-# Copyright 2018 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-from __future__ import absolute_import, division, print_function, unicode_literals
-
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 from c7n.actions import Action
 from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter, VpcFilter
 from c7n.manager import resources
-from c7n import tags
-from c7n.query import QueryResourceManager, TypeInfo
-from c7n.utils import local_session, type_schema
-
+from c7n import tags, query
+from c7n.query import QueryResourceManager, TypeInfo, DescribeSource, \
+    ChildResourceManager, ChildDescribeSource
+from c7n.utils import local_session, type_schema, get_retry
+from botocore.waiter import WaiterModel, create_waiter_with_client
 from .aws import shape_validate
+from .ecs import ContainerConfigSource
+from c7n.filters.kms import KmsRelatedFilter
+
+
+@query.sources.register('describe-eks-nodegroup')
+class NodeGroupDescribeSource(ChildDescribeSource):
+
+    def get_query(self):
+        query = super(NodeGroupDescribeSource, self).get_query()
+        query.capture_parent_id = True
+        return query
+
+    def augment(self, resources):
+        results = []
+        client = local_session(self.manager.session_factory).client('eks')
+        for cluster_name, nodegroup_name in resources:
+            nodegroup = client.describe_nodegroup(
+                clusterName=cluster_name,
+                nodegroupName=nodegroup_name)['nodegroup']
+            if 'tags' in nodegroup:
+                nodegroup['Tags'] = [{'Key': k, 'Value': v} for k, v in nodegroup['tags'].items()]
+            results.append(nodegroup)
+        return results
+
+
+@resources.register('eks-nodegroup')
+class NodeGroup(ChildResourceManager):
+
+    class resource_type(TypeInfo):
+
+        service = 'eks'
+        arn = 'nodegroupArn'
+        arn_type = 'nodegroup'
+        id = 'nodegroupArn'
+        name = 'nodegroupName'
+        enum_spec = ('list_nodegroups', 'nodegroups', None)
+        parent_spec = ('eks', 'clusterName', None)
+        permissions_enum = ('eks:DescribeNodegroup',)
+        date = 'createdAt'
+
+    source_mapping = {
+        'describe-child': NodeGroupDescribeSource,
+        'describe': NodeGroupDescribeSource,
+    }
+
+
+@NodeGroup.action_registry.register('delete')
+class DeleteNodeGroup(Action):
+    """Delete node group(s)."""
+
+    schema = type_schema('delete')
+    permissions = ('eks:DeleteNodegroup',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('eks')
+        retry = get_retry(('Throttling',))
+        for r in resources:
+            try:
+                retry(client.delete_nodegroup,
+                      clusterName=r['clusterName'],
+                      nodegroupName=r['nodegroupName'])
+            except client.exceptions.ResourceNotFoundException:
+                continue
+
+
+class EKSDescribeSource(DescribeSource):
+
+    def augment(self, resources):
+        resources = super().augment(resources)
+        for r in resources:
+            if 'tags' not in r:
+                continue
+            r['Tags'] = [{'Key': k, 'Value': v} for k, v in r['tags'].items()]
+        return resources
+
+
+class EKSConfigSource(ContainerConfigSource):
+    mapped_keys = {'certificateAuthorityData': 'certificateAuthority'}
 
 
 @resources.register('eks')
@@ -34,14 +100,12 @@ class EKS(QueryResourceManager):
         detail_spec = ('describe_cluster', 'name', None, 'cluster')
         id = name = 'name'
         date = 'createdAt'
+        config_type = cfn_type = 'AWS::EKS::Cluster'
 
-    def augment(self, resources):
-        resources = super(EKS, self).augment(resources)
-        for r in resources:
-            if 'tags' not in r:
-                continue
-            r['Tags'] = [{'Key': k, 'Value': v} for k, v in r['tags'].items()]
-        return resources
+    source_mapping = {
+        'config': EKSConfigSource,
+        'describe': EKSDescribeSource
+    }
 
 
 @EKS.filter_registry.register('subnet')
@@ -60,6 +124,11 @@ class EKSSGFilter(SecurityGroupFilter):
 class EKSVpcFilter(VpcFilter):
 
     RelatedIdsExpression = 'resourcesVpcConfig.vpcId'
+
+
+@EKS.filter_registry.register('kms-key')
+class KmsFilter(KmsRelatedFilter):
+    RelatedIdsExpression = 'encryptionConfig[].provider.keyArn'
 
 
 @EKS.action_registry.register('tag')
@@ -149,6 +218,59 @@ class Delete(Action):
         client = local_session(self.manager.session_factory).client('eks')
         for r in resources:
             try:
+                self.delete_associated(r, client)
                 client.delete_cluster(name=r['name'])
             except client.exceptions.ResourceNotFoundException:
                 continue
+
+    def delete_associated(self, r, client):
+        nodegroups = client.list_nodegroups(clusterName=r['name'])['nodegroups']
+        fargate_profiles = client.list_fargate_profiles(
+            clusterName=r['name'])['fargateProfileNames']
+        waiters = []
+        if nodegroups:
+            for nodegroup in nodegroups:
+                self.manager.retry(
+                    client.delete_nodegroup, clusterName=r['name'], nodegroupName=nodegroup)
+                # Nodegroup supports parallel delete so process in parallel, check these later on
+                waiters.append({"clusterName": r['name'], "nodegroupName": nodegroup})
+        if fargate_profiles:
+            waiter = self.fargate_delete_waiter(client)
+            for profile in fargate_profiles:
+                self.manager.retry(
+                    client.delete_fargate_profile,
+                    clusterName=r['name'], fargateProfileName=profile)
+                # Fargate profiles don't support parallel deletes so process serially
+                waiter.wait(
+                    clusterName=r['name'], fargateProfileName=profile)
+        if waiters:
+            waiter = client.get_waiter('nodegroup_deleted')
+            for w in waiters:
+                waiter.wait(**w)
+
+    def fargate_delete_waiter(self, client):
+        # Fargate profiles seem to delete faster @ roughly 2 minutes each so keeping defaults
+        config = {
+            'version': 2,
+            'waiters': {
+                "FargateProfileDeleted": {
+                    'operation': 'DescribeFargateProfile',
+                    'delay': 30,
+                    'maxAttempts': 40,
+                    'acceptors': [
+                        {
+                            "expected": "DELETE_FAILED",
+                            "matcher": "path",
+                            "state": "failure",
+                            "argument": "fargateprofile.status"
+                        },
+                        {
+                            "expected": "ResourceNotFoundException",
+                            "matcher": "error",
+                            "state": "success"
+                        }
+                    ]
+                }
+            }
+        }
+        return create_waiter_with_client("FargateProfileDeleted", WaiterModel(config), client)

@@ -1,20 +1,10 @@
 # Copyright 2019 Manheim / Cox Automotive
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 
 import json
 from time import sleep
-from six.moves.urllib.parse import urlparse
+from urllib.parse import urlparse
 from random import uniform
 import requests
 from jsonpointer import resolve_pointer, JsonPointerException
@@ -23,7 +13,7 @@ from copy import deepcopy
 from .utils import get_aws_username_from_event
 
 
-class SplunkHecDelivery(object):
+class SplunkHecDelivery:
     """
     Delivery class to send c7n message from SQS to Splunk HTTP Event Collector
     """
@@ -57,6 +47,7 @@ class SplunkHecDelivery(object):
         payloads = []
         events = self.get_splunk_events(msg)
         indices = self._splunk_indices_for_message(msg)
+        sourcetype = self.config.get('splunk_hec_sourcetype', '_json')
         for event in events:
             for index in indices:
                 payloads.append({
@@ -65,7 +56,7 @@ class SplunkHecDelivery(object):
                     'source': '%s-cloud-custodian' % event.get(
                         'account', 'unknown'
                     ),
-                    'sourcetype': '_json',
+                    'sourcetype': sourcetype,
                     'index': index,
                     'event': event
                 })
@@ -210,14 +201,14 @@ class SplunkHecDelivery(object):
         url = self.config['splunk_hec_url']
         self.logger.debug('Send to Splunk (%s): %s', url, payload)
         try:
-            r = requests.post(
+            r = requests.post(  # nosec
                 url,
                 headers={
                     'Authorization': 'Splunk %s' % self.config[
                         'splunk_hec_token'
                     ]
                 },
-                data=payload
+                data=payload,
             )
         except Exception:
             self.logger.error('Exception during Splunk POST to %s of %s',
@@ -274,7 +265,7 @@ class SplunkHecDelivery(object):
         """
         indices = set()
         if msg and msg.get('action', False) and msg['action'].get('to', False):
-            for to in msg['action']['to']:
+            for to in msg['action'].get('to', []):
                 if not to.startswith('splunkhec://'):
                     continue
                 parsed = urlparse(to)

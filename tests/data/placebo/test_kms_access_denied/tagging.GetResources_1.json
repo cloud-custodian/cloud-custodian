@@ -1,0 +1,27 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:kms:us-west-1:644160558196:key/d01ee9b3-ce85-4622-8e1c-ce85b8cdc89d",
+                "Tags": [
+                    {
+                        "Key": "AccessTesting",
+                        "Value": "restrictive"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:kms:us-west-1:644160558196:key/fb019403-0594-4a97-b987-8e493fb76181",
+                "Tags": [
+                    {
+                        "Key": "AccessTesting",
+                        "Value": "permissive"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

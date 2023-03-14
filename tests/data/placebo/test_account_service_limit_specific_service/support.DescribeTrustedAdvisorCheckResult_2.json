@@ -1,0 +1,38 @@
+{
+  "status_code": 200,
+  "data": {
+    "result": {
+      "checkId": "oQ7TT0l7J9",
+      "timestamp": "2020-02-21T01:32:41Z",
+      "status": "ok",
+      "resourcesSummary": {
+        "resourcesProcessed": 1,
+        "resourcesFlagged": 0,
+        "resourcesIgnored": 0,
+        "resourcesSuppressed": 0
+      },
+      "categorySpecificSummary": {
+        "costOptimizing": {
+          "estimatedMonthlySavings": 0.0,
+          "estimatedPercentMonthlySavings": 0.0
+        }
+      },
+      "flaggedResources": [
+        {
+          "status": "ok",
+          "resourceId": "X1mS1mJtwxEbPnUS2lGjeynE4JW52Dz63T_uRQ8qVh0",
+          "isSuppressed": false,
+          "metadata": [
+            "-",
+            "IAM",
+            "Roles",
+            "1000",
+            "39",
+            "Green"
+          ]
+        }
+      ]
+    },
+    "ResponseMetadata": {}
+  }
+}

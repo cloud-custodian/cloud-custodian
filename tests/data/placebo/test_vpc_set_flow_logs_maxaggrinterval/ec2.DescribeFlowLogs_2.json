@@ -1,0 +1,30 @@
+{
+  "status_code": 200,
+  "data": {
+    "FlowLogs": [
+      {
+        "CreationTime": {
+          "__class__": "datetime",
+          "year": 2020,
+          "month": 3,
+          "day": 16,
+          "hour": 17,
+          "minute": 23,
+          "second": 17,
+          "microsecond": 970000
+        },
+        "DeliverLogsStatus": "SUCCESS",
+        "FlowLogId": "fl-0bb8640b899a159d7",
+        "FlowLogStatus": "ACTIVE",
+        "ResourceId": "vpc-d2d616b5",
+        "TrafficType": "ALL",
+        "LogDestinationType": "s3",
+        "LogDestination": "arn:aws:s3:::c7n-vpc-flow-logs/test.log.gz",
+        "LogFormat": "${version} ${account-id} ${interface-id} ${srcaddr} ${dstaddr} ${srcport} ${dstport} ${protocol} ${packets} ${bytes} ${start} ${end} ${action} ${log-status}",
+        "Tags": [],
+        "MaxAggregationInterval": 60
+      }
+    ],
+    "ResponseMetadata": {}
+  }
+}

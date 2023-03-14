@@ -1,0 +1,14 @@
+{
+    "status_code": 200,
+    "data": {
+        "Aliases": [
+            {
+                "AliasName": "alias/aws/es",
+                "AliasArn": "arn:aws:kms:us-east-1:0123456789012:alias/aws/es",
+                "TargetKeyId": "6917a312-adce-4bbc-8202-958f2db490fa"
+            }
+        ],
+        "Truncated": false,
+        "ResponseMetadata": {}
+    }
+}

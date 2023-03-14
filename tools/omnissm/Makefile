@@ -8,7 +8,7 @@ functions := $(wildcard functions/*/.)
 build:
 	@mkdir -p bin
 	@go build -gcflags $(GCFLAGS) -ldflags $(LDFLAGS) -o bin/omnissm-agent ./cmd/omnissm-agent
-	
+
 build-linux:
 	@mkdir -p bin
 	@GOOS=linux GOARCH=amd64 go build -gcflags $(GCFLAGS) -ldflags $(LDFLAGS) -o bin/omnissm-agent-linux-amd64 ./cmd/omnissm-agent

@@ -1,0 +1,32 @@
+{
+    "status_code": 200,
+    "data": {
+        "ContinuousBackupsDescription": {
+            "ContinuousBackupsStatus": "ENABLED",
+            "PointInTimeRecoveryDescription": {
+                "PointInTimeRecoveryStatus": "ENABLED",
+                "EarliestRestorableDateTime": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 5,
+                    "day": 2,
+                    "hour": 13,
+                    "minute": 57,
+                    "second": 39,
+                    "microsecond": 0
+                },
+                "LatestRestorableDateTime": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 5,
+                    "day": 2,
+                    "hour": 13,
+                    "minute": 57,
+                    "second": 39,
+                    "microsecond": 0
+                }
+            }
+        },
+        "ResponseMetadata": {}
+    }
+}

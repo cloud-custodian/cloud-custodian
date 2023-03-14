@@ -1,0 +1,31 @@
+{
+    "status_code": 200,
+    "data": {
+        "Stacks": [
+            {
+                "StackId": "arn:aws:cloudformation:us-east-1:644160558196:stack/c7n-test-delete-force/4e14aae0-84f6-11ea-89fb-0e3b177c99d5",
+                "StackName": "c7n-test-delete-force",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 4,
+                    "day": 23,
+                    "hour": 0,
+                    "minute": 6,
+                    "second": 39,
+                    "microsecond": 536000
+                },
+                "RollbackConfiguration": {},
+                "StackStatus": "CREATE_COMPLETE",
+                "DisableRollback": false,
+                "NotificationARNs": [],
+                "Tags": [],
+                "EnableTerminationProtection": true,
+                "DriftInformation": {
+                    "StackDriftStatus": "NOT_CHECKED"
+                }
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

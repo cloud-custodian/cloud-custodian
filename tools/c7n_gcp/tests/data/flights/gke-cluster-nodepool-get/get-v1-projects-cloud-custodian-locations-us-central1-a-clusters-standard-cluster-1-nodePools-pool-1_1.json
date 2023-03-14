@@ -1,0 +1,30 @@
+{
+  "body": {
+    "status": "RUNNING", 
+    "management": {},
+    "name": "pool-1", 
+    "instanceGroupUrls": [],
+    "autoscaling": {}, 
+    "version": "1.12.7-gke.10", 
+    "initialNodeCount": 1, 
+    "podIpv4CidrSize": 24, 
+    "config": {},
+    "selfLink": "https://container.googleapis.com/v1/projects/cloud-custodian/zones/us-central1-a/clusters/standard-cluster-1/nodePools/pool-1"
+  }, 
+  "headers": {
+    "status": "200", 
+    "content-length": "1149", 
+    "x-xss-protection": "0", 
+    "content-location": "https://container.googleapis.com/v1/projects/cloud-custodian/locations/us-central1-a/clusters/standard-cluster-1/nodePools/pool-1?alt=json", 
+    "x-content-type-options": "nosniff", 
+    "transfer-encoding": "chunked", 
+    "vary": "Origin, X-Origin, Referer", 
+    "server": "ESF", 
+    "-content-encoding": "gzip", 
+    "cache-control": "private", 
+    "date": "Mon, 20 May 2019 14:14:40 GMT", 
+    "x-frame-options": "SAMEORIGIN", 
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"46,44,43,39\"", 
+    "content-type": "application/json; charset=UTF-8"
+  }
+}

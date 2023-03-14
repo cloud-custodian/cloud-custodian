@@ -1,0 +1,25 @@
+{
+  "status_code": 200,
+  "data": {
+    "ResponseMetadata": {},
+    "BackupVaultList": [
+      {
+        "BackupVaultName": "Default",
+        "BackupVaultArn": "arn:aws:backup:us-east-1:644160558196:backup-vault:Default",
+        "CreationDate": {
+          "__class__": "datetime",
+          "year": 2019,
+          "month": 11,
+          "day": 19,
+          "hour": 11,
+          "minute": 42,
+          "second": 20,
+          "microsecond": 907000
+        },
+        "EncryptionKeyArn": "arn:aws:kms:us-east-1:644160558196:key/8d56db16-21c6-412f-b949-7a012e11ee6e",
+        "CreatorRequestId": "Default",
+        "NumberOfRecoveryPoints": 35
+      }
+    ]
+  }
+}

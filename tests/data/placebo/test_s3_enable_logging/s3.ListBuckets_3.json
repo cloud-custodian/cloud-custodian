@@ -1,0 +1,38 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {
+            "RequestId": "04F87FD754CFE204",
+            "HostId": "2pKblHTImtaV3GlkZynYBnuPM4FROiYXXnS0mzCKQX5VCIb2lpFCfDhnx+AGI5+QH2vi3LIT02U=",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amz-id-2": "2pKblHTImtaV3GlkZynYBnuPM4FROiYXXnS0mzCKQX5VCIb2lpFCfDhnx+AGI5+QH2vi3LIT02U=",
+                "x-amz-request-id": "04F87FD754CFE204",
+                "date": "Fri, 20 Dec 2019 23:00:34 GMT",
+                "content-type": "application/xml",
+                "transfer-encoding": "chunked",
+                "server": "AmazonS3"
+            },
+            "RetryAttempts": 0
+        },
+        "Buckets": [
+            {
+                "Name": "superduper-and-magic",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 12,
+                    "day": 20,
+                    "hour": 23,
+                    "minute": 0,
+                    "second": 14,
+                    "microsecond": 0
+                }
+            }
+        ],
+        "Owner": {
+            "DisplayName": "custodian-skunkworks",
+            "ID": "631e4e145c2211ed2e31307ba841b1862307d16de5eab6f5399a23bbbecc26e2"
+        }
+    }
+}

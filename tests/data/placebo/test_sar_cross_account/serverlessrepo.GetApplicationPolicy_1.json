@@ -1,0 +1,31 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Statements": [
+            {
+                "Actions": [
+                    "Deploy",
+                    "UnshareApplication"
+                ],
+                "PrincipalOrgIDs": [
+                    "o-4adkskbcff"
+                ],
+                "Principals": [
+                    "*"
+                ],
+                "StatementId": "cab89702-05f0-4751-818e-ced6e98ef5f9"
+            },
+            {
+                "Actions": [
+                    "Deploy"
+                ],
+                "PrincipalOrgIDs": [],
+                "Principals": [
+                    "112233445566"
+                ],
+                "StatementId": "b364d84f-62d2-411c-9787-3636b2b1975c"
+            }
+        ]
+    }
+}

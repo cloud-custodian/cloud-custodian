@@ -1,0 +1,13 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:dynamodb:us-east-1:644160558196:table/mosdef2-DDBTable-VV01OCO2TJ72",
+                "Tags": []
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

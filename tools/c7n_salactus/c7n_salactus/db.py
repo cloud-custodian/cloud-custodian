@@ -1,16 +1,5 @@
-# Copyright 2016-2017 Capital One Services, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import json
 import os
 from collections import Counter
@@ -20,7 +9,7 @@ from dateutil.parser import parse
 from c7n_salactus.worker import connection as conn
 
 
-class Database(object):
+class Database:
 
     def __init__(self, path=None):
         if path:
@@ -59,7 +48,7 @@ def db(dbpath=None):
     return Database(dbpath)
 
 
-class Account(object):
+class Account:
 
     __slots__ = ('name', 'buckets')
 
@@ -95,7 +84,7 @@ class Account(object):
         return min(float(self.scanned) / (size or 1) * 100.0, 100.0)
 
 
-class Bucket(object):
+class Bucket:
 
     def __init__(self, bucket_id, data):
         self.bucket_id = bucket_id
