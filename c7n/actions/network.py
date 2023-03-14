@@ -265,9 +265,6 @@ class ModifyVpcSecurityGroupsAction(Action):
             for g in add_groups:
                 if g not in rgroups:
                     rgroups.append(g)
-            for g in add_by_tag_groups:
-                if g not in rgroups:
-                    rgroups.append(g)
 
             if not rgroups:
                 rgroups = list(isolation_groups)
