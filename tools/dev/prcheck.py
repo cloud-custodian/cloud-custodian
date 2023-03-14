@@ -118,8 +118,6 @@ def print_prs(root, prs):
     table.add_column("Created")
     table.add_column("Title")
 
-    found = False
-
     for pr_meta in prs:
         table.add_row(
             str(pr_meta['number']),
