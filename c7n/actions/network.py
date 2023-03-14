@@ -255,10 +255,9 @@ class ModifyVpcSecurityGroupsAction(Action):
             isolation_groups = self.resolve_group_names(
                 r, self._get_array('isolation-group'), resolved_groups)
 
-            add_by_tag_groups = []
             for sg in tag_filtered_groups:
-                if sg['VpcId'] in r['VpcId']:
-                    add_by_tag_groups.append(sg['GroupId'])
+                if sg['VpcId'] == r['VpcId']:
+                    add_groups.append(sg['GroupId'])
 
             for g in remove_groups:
                 if g in rgroups:
