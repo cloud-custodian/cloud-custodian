@@ -4,7 +4,6 @@ SELF_MAKE := $(lastword $(MAKEFILE_LIST))
 PKG_REPO = testpypi
 PKG_INCREMENT := patch
 PKG_SET := tools/c7n_gcp tools/c7n_kube tools/c7n_openstack tools/c7n_mailer tools/c7n_logexporter tools/c7n_policystream tools/c7n_trailcreator tools/c7n_org tools/c7n_sphinxext tools/c7n_terraform tools/c7n_awscc tools/c7n_tencentcloud tools/c7n_azure
-
 FMT_SET := tools/c7n_left
 
 PLATFORM_ARCH := $(shell python3 -c "import platform; print(platform.machine())")
@@ -59,10 +58,19 @@ sphinx:
 
 lint:
 	ruff c7n tests tools
+<<<<<<< HEAD
 	black --check $(FMT_SET)
 
 format:
 	black $(FMT_SET)
+||||||| parent of 6a9a2f14d (makefile fmt)
+	black --check tools/c7n_left
+=======
+	black --check $(FMT_SET)
+
+fmt:
+	black $(FMT_SET)
+>>>>>>> 6a9a2f14d (makefile fmt)
 
 clean:
 	make -f docs/Makefile.sphinx clean
