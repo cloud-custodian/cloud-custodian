@@ -35,7 +35,8 @@ class TestInit(DeliveryTester):
 
 class TestGetSplunkPayloads(DeliveryTester):
     @patch(
-        "%s.get_splunk_events" % pb, return_value=[{"account": "A", "resource": 1}, {"resource": 2}]
+        "%s.get_splunk_events" % pb,
+        return_value=[{"account": "A", "resource": 1}, {"resource": 2}],
     )
     @patch("%s._splunk_indices_for_message" % pb, return_value=["indexA", "indexB"])
     def test_payloads(self, mock_gse, mock_sifm):
@@ -80,7 +81,8 @@ class TestGetSplunkPayloads(DeliveryTester):
         assert mock_sifm.mock_calls == [call(msg)]
 
     @patch(
-        "%s.get_splunk_events" % pb, return_value=[{"account": "A", "resource": 1}, {"resource": 2}]
+        "%s.get_splunk_events" % pb,
+        return_value=[{"account": "A", "resource": 1}, {"resource": 2}],
     )
     @patch("%s._splunk_indices_for_message" % pb, return_value=["indexA", "indexB"])
     def test_sourcetype(self, mock_gse, mock_sifm):
@@ -211,7 +213,11 @@ class TestGetSplunkEvents(DeliveryTester):
                         "name": "pname",
                         "actions": ["foo", {"type": "bar"}, {"type": "notify"}, "baz"],
                     },
-                    "resource": {"InstanceId": "i-789", "c7n.metrics": {"foo": "bar"}, "tags": {}},
+                    "resource": {
+                        "InstanceId": "i-789",
+                        "c7n.metrics": {"foo": "bar"},
+                        "tags": {},
+                    },
                     "event_triggering_user": "uname",
                 }
             ),
@@ -301,7 +307,11 @@ class TestGetSplunkEvents(DeliveryTester):
                         "name": "pname",
                         "actions": ["foo", {"type": "bar"}, {"type": "notify"}, "baz"],
                     },
-                    "resource": {"InstanceId": "i-789", "c7n.metrics": {"foo": "bar"}, "tags": {}},
+                    "resource": {
+                        "InstanceId": "i-789",
+                        "c7n.metrics": {"foo": "bar"},
+                        "tags": {},
+                    },
                     "event_triggering_user": "uname",
                     "actions": ["foo", "bar", "notify", "baz"],
                 }
@@ -318,13 +328,19 @@ class TestPruneLogMessage(DeliveryTester):
         msg = {
             "foo": "123",
             "bar": ["A", "B", "C"],
-            "baz": {"blam": {"one": 1, "two": 2, "three": 3, "four": 4}, "blarg": {"quux": False}},
+            "baz": {
+                "blam": {"one": 1, "two": 2, "three": 3, "four": 4},
+                "blarg": {"quux": False},
+            },
         }
         self.config["splunk_remove_paths"] = ["/no/value/here", "/bad", "/not/a/path"]
         expected = {
             "foo": "123",
             "bar": ["A", "B", "C"],
-            "baz": {"blam": {"one": 1, "two": 2, "three": 3, "four": 4}, "blarg": {"quux": False}},
+            "baz": {
+                "blam": {"one": 1, "two": 2, "three": 3, "four": 4},
+                "blarg": {"quux": False},
+            },
         }
         assert self.cls._prune_log_message(msg) == expected
 
@@ -332,7 +348,10 @@ class TestPruneLogMessage(DeliveryTester):
         msg = {
             "foo": "123",
             "bar": ["A", "B", "C"],
-            "baz": {"blam": {"one": 1, "two": 2, "three": 3, "four": 4}, "blarg": {"quux": False}},
+            "baz": {
+                "blam": {"one": 1, "two": 2, "three": 3, "four": 4},
+                "blarg": {"quux": False},
+            },
             "resource": {"r1": "r2", "c7n.metrics": ["a", "b"]},
         }
         self.config["splunk_remove_paths"] = [
@@ -454,9 +473,15 @@ class TestTrySend(DeliveryTester):
             call('{"foo": "bar"}'),
         ]
         assert self.mock_logger.mock_calls == [
-            call.warning("Caught exception sending to Splunk; retry in %s seconds", 1.2),
-            call.warning("Caught exception sending to Splunk; retry in %s seconds", 1.2),
-            call.warning("Caught exception sending to Splunk; retry in %s seconds", 1.2),
+            call.warning(
+                "Caught exception sending to Splunk; retry in %s seconds", 1.2
+            ),
+            call.warning(
+                "Caught exception sending to Splunk; retry in %s seconds", 1.2
+            ),
+            call.warning(
+                "Caught exception sending to Splunk; retry in %s seconds", 1.2
+            ),
             call.error("ERROR - Could not POST to Splunk after %d tries.", 3),
         ]
 
@@ -482,7 +507,9 @@ class TestSendSplunk(DeliveryTester):
             call.post().json(),
         ]
         assert self.mock_logger.mock_calls == [
-            call.debug("Send to Splunk (%s): %s", "https://splunk.url/foo", '{"foo": "bar"}'),
+            call.debug(
+                "Send to Splunk (%s): %s", "https://splunk.url/foo", '{"foo": "bar"}'
+            ),
             call.debug(
                 "Splunk POST got response code %s HEADERS=%s BODY: %s",
                 200,
@@ -510,7 +537,9 @@ class TestSendSplunk(DeliveryTester):
             )
         ]
         assert self.mock_logger.mock_calls == [
-            call.debug("Send to Splunk (%s): %s", "https://splunk.url/foo", '{"foo": "bar"}'),
+            call.debug(
+                "Send to Splunk (%s): %s", "https://splunk.url/foo", '{"foo": "bar"}'
+            ),
             call.error(
                 "Exception during Splunk POST to %s of %s",
                 "https://splunk.url/foo",
@@ -539,7 +568,9 @@ class TestSendSplunk(DeliveryTester):
             )
         ]
         assert self.mock_logger.mock_calls == [
-            call.debug("Send to Splunk (%s): %s", "https://splunk.url/foo", '{"foo": "bar"}'),
+            call.debug(
+                "Send to Splunk (%s): %s", "https://splunk.url/foo", '{"foo": "bar"}'
+            ),
             call.debug(
                 "Splunk POST got response code %s HEADERS=%s BODY: %s",
                 403,
@@ -575,14 +606,18 @@ class TestSendSplunk(DeliveryTester):
             call.post().json(),
         ]
         assert self.mock_logger.mock_calls == [
-            call.debug("Send to Splunk (%s): %s", "https://splunk.url/foo", '{"foo": "bar"}'),
+            call.debug(
+                "Send to Splunk (%s): %s", "https://splunk.url/foo", '{"foo": "bar"}'
+            ),
             call.debug(
                 "Splunk POST got response code %s HEADERS=%s BODY: %s",
                 200,
                 {"H1": "V1"},
                 '{"text": "Failure"}',
             ),
-            call.error("Splunk POST returned non-success response: %s", {"text": "Failure"}),
+            call.error(
+                "Splunk POST returned non-success response: %s", {"text": "Failure"}
+            ),
         ]
 
     def test_send_non_success_no_json(self):
@@ -610,7 +645,9 @@ class TestSendSplunk(DeliveryTester):
             call.post().json(),
         ]
         assert self.mock_logger.mock_calls == [
-            call.debug("Send to Splunk (%s): %s", "https://splunk.url/foo", '{"foo": "bar"}'),
+            call.debug(
+                "Send to Splunk (%s): %s", "https://splunk.url/foo", '{"foo": "bar"}'
+            ),
             call.debug(
                 "Splunk POST got response code %s HEADERS=%s BODY: %s",
                 200,
@@ -618,7 +655,8 @@ class TestSendSplunk(DeliveryTester):
                 '{"text": "Failure"}',
             ),
             call.error(
-                "Splunk POST returned non-success response: %s", {"text": '{"text": "Failure"}'}
+                "Splunk POST returned non-success response: %s",
+                {"text": '{"text": "Failure"}'},
             ),
         ]
 

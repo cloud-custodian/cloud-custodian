@@ -24,8 +24,7 @@ from c7n.actions import Action
 from c7n.config import Config, Bag
 from c7n.filters import Filter
 from c7n.manager import ResourceManager
-from c7n.schema import (
-    ElementSchema, resource_vocabulary, generate as generate_schema)
+from c7n.schema import ElementSchema, resource_vocabulary, generate as generate_schema
 from c7n.policy import execution, PolicyExecutionMode
 from c7n.resources import load_resources
 from c7n.provider import clouds
@@ -70,10 +69,7 @@ def eperm(provider, el, r=None):
     # print(f'policy construction lookup {r.type}.{element_type}.{el.type}')
 
     loader = PolicyLoader(Config.empty())
-    pdata = {
-        'name': f'permissions-{r.type}',
-        'resource': f'{provider}.{r.type}'
-    }
+    pdata = {'name': f'permissions-{r.type}', 'resource': f'{provider}.{r.type}'}
     pdata[element_type] = get_element_data(element_type, el)
 
     try:
@@ -92,12 +88,10 @@ eperm.errors = []
 def get_policy_element(el, p):
     el_type = get_element_type(el)
     el_map = {
-        'filters': (
-            p.resource_manager.filters and p.resource_manager.filters[0]),
-        'actions': (
-            p.resource_manager.actions and p.resource_manager.actions[0]),
+        'filters': (p.resource_manager.filters and p.resource_manager.filters[0]),
+        'actions': (p.resource_manager.actions and p.resource_manager.actions[0]),
         'mode': p.get_execution_mode(),
-        'resource': p.resource_manager
+        'resource': p.resource_manager,
     }
     return el_map[el_type]
 
@@ -127,13 +121,11 @@ def get_element_type(el):
 
 
 class SafeNoAliasDumper(yaml.SafeDumper):
-
     def ignore_aliases(self, data):
         return True
 
 
 class CustodianDirective(Directive):
-
     has_content = True
     required_arguments = 1
 
@@ -150,8 +142,7 @@ class CustodianDirective(Directive):
         return node.children
 
     def _nodify(self, template_name, annotation, variables):
-        return self._parse(
-            self._render(template_name, variables), annotation)
+        return self._parse(self._render(template_name, variables), annotation)
 
     @classmethod
     def _render(cls, template_name, variables):
@@ -164,42 +155,50 @@ class CustodianDirective(Directive):
 
 
 class CustodianResource(CustodianDirective):
-
     @classmethod
     def render_resource(cls, resource_path):
         resource_class = cls.resolve(resource_path)
         provider_type, resource_name = resource_path.split('.', 1)
-        return cls._render('resource.rst',
+        return cls._render(
+            'resource.rst',
             variables=dict(
                 provider_name=clouds[provider_type].display_name,
                 provider_type=provider_type,
                 resource_name="%s.%s" % (provider_type, resource_class.type),
                 filters=ElementSchema.elements(resource_class.filter_registry),
                 actions=ElementSchema.elements(resource_class.action_registry),
-                resource=resource_class))
+                resource=resource_class,
+            ),
+        )
 
 
 class CustodianSchema(CustodianDirective):
-
     option_spec = {'module': unchanged}
 
     @classmethod
     def render_schema(cls, el):
         return cls._render(
             'schema.rst',
-            {'schema_yaml': yaml.dump(
-                ElementSchema.schema(cls.definitions, el),
-                Dumper=SafeNoAliasDumper,
-                default_flow_style=False)})
+            {
+                'schema_yaml': yaml.dump(
+                    ElementSchema.schema(cls.definitions, el),
+                    Dumper=SafeNoAliasDumper,
+                    default_flow_style=False,
+                )
+            },
+        )
 
     def run(self):
         schema_path = self.arguments[0]
         el = self.resolve(schema_path)
         schema_yaml = yaml.safe_dump(
-            ElementSchema.schema(self.definitions, el), default_flow_style=False)
+            ElementSchema.schema(self.definitions, el), default_flow_style=False
+        )
         return self._nodify(
-            'schema.rst', '<c7n-schema>',
-            dict(name=schema_path, schema_yaml=schema_yaml))
+            'schema.rst',
+            '<c7n-schema>',
+            dict(name=schema_path, schema_yaml=schema_yaml),
+        )
 
 
 def get_provider_modes(provider):
@@ -239,15 +238,11 @@ def setup(app):
     # a sphinx/rst generator. we need to update our setup.py
     # metadata
     init(None)
-    app.add_directive_to_domain(
-        'py', 'c7n-schema', CustodianSchema)
+    app.add_directive_to_domain('py', 'c7n-schema', CustodianSchema)
 
-    app.add_directive_to_domain(
-        'py', 'c7n-resource', CustodianResource)
+    app.add_directive_to_domain('py', 'c7n-resource', CustodianResource)
 
-    return {'version': '0.1',
-            'parallel_read_safe': True,
-            'parallel_write_safe': True}
+    return {'version': '0.1', 'parallel_read_safe': True, 'parallel_write_safe': True}
 
 
 @click.command()
@@ -259,6 +254,7 @@ def main(provider, output_dir, group_by):
         _main(provider, output_dir, group_by)
     except Exception:
         import traceback, pdb
+
         traceback.print_exc()
         pdb.post_mortem(sys.exc_info()[-1])
 
@@ -283,7 +279,9 @@ def write_modified_file(fpath, content, diff_changes=False):
             difflib.context_diff(
                 content.split('\n'),
                 disk_content.split('\n'),
-                fromfile='a/%s' % fpath, tofile='b/%s' % fpath)
+                fromfile='a/%s' % fpath,
+                tofile='b/%s' % fpath,
+            )
         )
 
     log.info(f'wrote {fpath}')
@@ -293,13 +291,11 @@ def write_modified_file(fpath, content, diff_changes=False):
 
 
 def resource_file_name(output_dir, r):
-    return os.path.join(
-        output_dir, ("%s.rst" % r.type).replace(' ', '-').lower())
+    return os.path.join(output_dir, ("%s.rst" % r.type).replace(' ', '-').lower())
 
 
 def _main(provider, output_dir, group_by):
-    """Generate RST docs for a given cloud provider's resources
-    """
+    """Generate RST docs for a given cloud provider's resources"""
     env = init(provider)
 
     logging.basicConfig(level=logging.INFO)
@@ -325,26 +321,27 @@ def _main(provider, output_dir, group_by):
         # FIXME / TODO: temporary work arounds for a few types that have recursion
         # in jsonschema on these types.
         if provider == 'awscc' and r.type in (
-                'wafv2_rulegroup',
-                'wafv2_webacl',
-                'amplifyuibuilder_theme',
-                'amplifyuibuilder_component',
-                'amplifybuilder_component'):
+            'wafv2_rulegroup',
+            'wafv2_webacl',
+            'amplifyuibuilder_theme',
+            'amplifyuibuilder_component',
+            'amplifybuilder_component',
+        ):
             continue
         rpath = resource_file_name(output_dir, r)
         t = env.get_template('provider-resource.rst')
         written += write_modified_file(
-            rpath, t.render(
-                provider_name=provider,
-                provider_type=provider,
-                resource=r),
-            diff_changes=not written)
+            rpath,
+            t.render(provider_name=provider, provider_type=provider, resource=r),
+            diff_changes=not written,
+        )
 
     # Create files for all groups
     for key, group in sorted(groups.items()):
         group = sorted(group, key=operator.attrgetter('type'))
         rpath = os.path.join(
-            output_dir, ("group-%s.rst" % key).replace(' ', '-').lower())
+            output_dir, ("group-%s.rst" % key).replace(' ', '-').lower()
+        )
         t = env.get_template('provider-group.rst')
         written += write_modified_file(
             rpath,
@@ -352,9 +349,12 @@ def _main(provider, output_dir, group_by):
                 provider_name=provider,
                 provider_type=provider_class.type,
                 key=key,
-                resource_files=[os.path.basename(
-                    resource_file_name(output_dir, r)) for r in group],
-                resources=group))
+                resource_files=[
+                    os.path.basename(resource_file_name(output_dir, r)) for r in group
+                ],
+                resources=group,
+            ),
+        )
         files.append(os.path.basename(rpath))
 
     # Write out common provider filters & actions
@@ -372,8 +372,8 @@ def _main(provider, output_dir, group_by):
             common_actions[ElementSchema.name(a)] = (a, r)
 
     fpath = os.path.join(
-        output_dir,
-        ("%s-common-filters.rst" % provider_class.type.lower()))
+        output_dir, ("%s-common-filters.rst" % provider_class.type.lower())
+    )
 
     t = env.get_template('provider-common-elements.rst')
     written += write_modified_file(
@@ -382,12 +382,14 @@ def _main(provider, output_dir, group_by):
             provider_name=provider_class.display_name,
             provider_type=provider_class.type,
             element_type='filters',
-            elements=[common_filters[k] for k in sorted(common_filters)]))
+            elements=[common_filters[k] for k in sorted(common_filters)],
+        ),
+    )
     files.insert(0, os.path.basename(fpath))
 
     fpath = os.path.join(
-        output_dir,
-        ("%s-common-actions.rst" % provider_class.type.lower()))
+        output_dir, ("%s-common-actions.rst" % provider_class.type.lower())
+    )
     t = env.get_template('provider-common-elements.rst')
     written += write_modified_file(
         fpath,
@@ -395,7 +397,9 @@ def _main(provider, output_dir, group_by):
             provider_name=provider_class.display_name,
             provider_type=provider_class.type,
             element_type='actions',
-            elements=[common_actions[k] for k in sorted(common_actions)]))
+            elements=[common_actions[k] for k in sorted(common_actions)],
+        ),
+    )
     files.insert(0, os.path.basename(fpath))
 
     # Write out provider modes
@@ -407,7 +411,9 @@ def _main(provider, output_dir, group_by):
         t.render(
             provider_name=provider_class.display_name,
             provider_type=provider_class.type,
-            modes=modes))
+            modes=modes,
+        ),
+    )
     files.insert(0, os.path.basename(mode_path))
 
     # Write out the provider index
@@ -418,7 +424,9 @@ def _main(provider, output_dir, group_by):
         t.render(
             provider_name=provider_class.display_name,
             provider_type=provider_class.type,
-            files=files))
+            files=files,
+        ),
+    )
 
     if eperm.errors:
         log.info("%s permission errors %d", provider.title(), len(eperm.errors))

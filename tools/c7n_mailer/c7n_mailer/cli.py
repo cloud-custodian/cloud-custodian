@@ -9,35 +9,29 @@ import jsonschema
 import yaml
 from c7n_mailer import deploy, utils
 from c7n_mailer.azure_mailer import deploy as azure_deploy
+
 # from c7n_mailer.gcp_mailer import deploy as gcp_deploy
 from c7n_mailer.utils import session_factory, get_processor, get_provider, Providers
 
 AZURE_KV_SECRET_SCHEMA = {
     'type': 'object',
-    'properties': {
-        'type': {'enum': ['azure.keyvault']},
-        'secret': {'type': 'string'}
-    },
+    'properties': {'type': {'enum': ['azure.keyvault']}, 'secret': {'type': 'string'}},
     'required': ['type', 'secret'],
-    'additionalProperties': False
+    'additionalProperties': False,
 }
 
 GCP_SECRET_SCHEMA = {
     'type': 'object',
     'properties': {
         'type': {'enum': ['gcp.secretmanager']},
-        'secret': {'type': 'string'}
+        'secret': {'type': 'string'},
     },
     'required': ['type', 'secret'],
-    'additionalProperties': False
+    'additionalProperties': False,
 }
 
 SECURED_STRING_SCHEMA = {
-    'oneOf': [
-        {'type': 'string'},
-        AZURE_KV_SECRET_SCHEMA,
-        GCP_SECRET_SCHEMA
-    ]
+    'oneOf': [{'type': 'string'}, AZURE_KV_SECRET_SCHEMA, GCP_SECRET_SCHEMA]
 }
 
 CONFIG_SCHEMA = {
@@ -54,11 +48,10 @@ CONFIG_SCHEMA = {
             'type': 'object',
             'patternProperties': {
                 '': {'type': 'string'},
-            }
+            },
         },
         'contact_tags': {'type': 'array', 'items': {'type': 'string'}},
         'org_domain': {'type': 'string'},
-
         # Standard Lambda Function Config
         'region': {'type': 'string'},
         'role': {'type': 'string'},
@@ -72,7 +65,6 @@ CONFIG_SCHEMA = {
         'lambda_description': {'type': 'string'},
         'lambda_tags': {'type': 'object'},
         'lambda_schedule': {'type': 'string'},
-
         # Azure Function Config
         'function_properties': {
             'type': 'object',
@@ -80,8 +72,7 @@ CONFIG_SCHEMA = {
                 'type': 'object',
                 'additionalProperties': False,
                 'properties': {
-                    'type': {'enum': [
-                        "Embedded", "SystemAssigned", "UserAssigned"]},
+                    'type': {'enum': ["Embedded", "SystemAssigned", "UserAssigned"]},
                     'client_id': {'type': 'string'},
                     'id': {'type': 'string'},
                 },
@@ -90,39 +81,45 @@ CONFIG_SCHEMA = {
                 'type': 'object',
                 'oneOf': [
                     {'type': 'string'},
-                    {'type': 'object',
+                    {
+                        'type': 'object',
                         'properties': {
                             'name': 'string',
                             'location': 'string',
-                            'resourceGroupName': 'string'}
-                     }
-                ]
+                            'resourceGroupName': 'string',
+                        },
+                    },
+                ],
             },
             'storageAccount': {
                 'type': 'object',
                 'oneOf': [
                     {'type': 'string'},
-                    {'type': 'object',
+                    {
+                        'type': 'object',
                         'properties': {
                             'name': 'string',
                             'location': 'string',
-                            'resourceGroupName': 'string'}
-                     }
-                ]
+                            'resourceGroupName': 'string',
+                        },
+                    },
+                ],
             },
             'servicePlan': {
                 'type': 'object',
                 'oneOf': [
                     {'type': 'string'},
-                    {'type': 'object',
+                    {
+                        'type': 'object',
                         'properties': {
                             'name': 'string',
                             'location': 'string',
                             'resourceGroupName': 'string',
                             'skuTier': 'string',
-                            'skuName': 'string'}
-                     }
-                ]
+                            'skuName': 'string',
+                        },
+                    },
+                ],
             },
         },
         # GCP Cloud Function Config # TODO:
@@ -130,7 +127,6 @@ CONFIG_SCHEMA = {
         # 'function_skuCode': {'type': 'string'},
         # 'function_sku': {'type': 'string'},
         'email_base_url': {'type': 'string'},
-
         # Mailer Infrastructure Config
         'cache_engine': {'type': 'string'},
         'smtp_server': {'type': 'string'},
@@ -155,30 +151,25 @@ CONFIG_SCHEMA = {
         'ses_role': {'type': 'string'},
         'redis_host': {'type': 'string'},
         'redis_port': {'type': 'integer'},
-        'datadog_api_key': {'type': 'string'},              # TODO: encrypt with KMS?
-        'datadog_application_key': {'type': 'string'},      # TODO: encrypt with KMS?
+        'datadog_api_key': {'type': 'string'},  # TODO: encrypt with KMS?
+        'datadog_application_key': {'type': 'string'},  # TODO: encrypt with KMS?
         'slack_token': {'type': 'string'},
         'slack_webhook': {'type': 'string'},
         'sendgrid_api_key': SECURED_STRING_SCHEMA,
         'splunk_hec_url': {'type': 'string'},
         'splunk_hec_token': {'type': 'string'},
-        'splunk_remove_paths': {
-            'type': 'array',
-            'items': {'type': 'string'}
-        },
+        'splunk_remove_paths': {'type': 'array', 'items': {'type': 'string'}},
         'splunk_actions_list': {'type': 'boolean'},
         'splunk_max_attempts': {'type': 'integer'},
         'splunk_hec_max_length': {'type': 'integer'},
         'splunk_hec_sourcetype': {'type': 'string'},
-
         # SDK Config
         'profile': {'type': 'string'},
         'http_proxy': {'type': 'string'},
         'https_proxy': {'type': 'string'},
-
         # Mapping account / emails
-        'account_emails': {'type': 'object'}
-    }
+        'account_emails': {'type': 'object'},
+    },
 }
 
 
@@ -206,16 +197,28 @@ def get_and_validate_mailer_config(args):
 def get_c7n_mailer_parser():
     parser = argparse.ArgumentParser()
     parser.add_argument('-c', '--config', required=True, help='mailer.yml config file')
-    debug_help_msg = 'sets c7n_mailer logger to debug, for maximum output (the default is INFO)'
+    debug_help_msg = (
+        'sets c7n_mailer logger to debug, for maximum output (the default is INFO)'
+    )
     parser.add_argument('--debug', action='store_true', help=debug_help_msg)
-    max_num_processes_help_msg = 'will run the mailer in parallel, integer of max processes allowed'
-    parser.add_argument('--max-num-processes', type=int, help=max_num_processes_help_msg)
+    max_num_processes_help_msg = (
+        'will run the mailer in parallel, integer of max processes allowed'
+    )
+    parser.add_argument(
+        '--max-num-processes', type=int, help=max_num_processes_help_msg
+    )
     templates_folder_help_msg = 'message templates folder location'
     parser.add_argument('-t', '--templates', help=templates_folder_help_msg)
     group = parser.add_mutually_exclusive_group(required=True)
-    update_lambda_help_msg = 'packages your c7n_mailer, uploads the zip to aws lambda as a function'
-    group.add_argument('--update-lambda', action='store_true', help=update_lambda_help_msg)
-    run_help_msg = 'run c7n-mailer locally, process sqs messages and send emails or sns messages'
+    update_lambda_help_msg = (
+        'packages your c7n_mailer, uploads the zip to aws lambda as a function'
+    )
+    group.add_argument(
+        '--update-lambda', action='store_true', help=update_lambda_help_msg
+    )
+    run_help_msg = (
+        'run c7n-mailer locally, process sqs messages and send emails or sns messages'
+    )
     group.add_argument('--run', action='store_true', help=run_help_msg)
     return parser
 
@@ -236,12 +239,16 @@ def main():
     logger = get_logger(debug=args_dict.get('debug', False))
 
     module_dir = path.dirname(path.abspath(__file__))
-    default_templates = [path.abspath(path.join(module_dir, 'msg-templates')),
-                         path.abspath(path.join(module_dir, '..', 'msg-templates')),
-                         path.abspath('.')]
+    default_templates = [
+        path.abspath(path.join(module_dir, 'msg-templates')),
+        path.abspath(path.join(module_dir, '..', 'msg-templates')),
+        path.abspath('.'),
+    ]
     templates = args_dict.get('templates', None)
     if templates:
-        default_templates.append(path.abspath(path.expanduser(path.expandvars(templates))))
+        default_templates.append(
+            path.abspath(path.expanduser(path.expandvars(templates)))
+        )
 
     mailer_config['templates_folders'] = default_templates
 
@@ -251,8 +258,10 @@ def main():
             print('\n** --debug is only supported with --run, not --update-lambda **\n')
             return
         if args_dict.get('max_num_processes'):
-            print('\n** --max-num-processes is only supported '
-                  'with --run, not --update-lambda **\n')
+            print(
+                '\n** --max-num-processes is only supported '
+                'with --run, not --update-lambda **\n'
+            )
             return
 
         if provider == Providers.Azure:
@@ -260,7 +269,9 @@ def main():
         # elif provider == Providers.GCP:  # TODO:
         #     gcp_deploy.provision(mailer_config)
         elif provider == Providers.AWS:
-            deploy.provision(mailer_config, functools.partial(session_factory, mailer_config))
+            deploy.provision(
+                mailer_config, functools.partial(session_factory, mailer_config)
+            )
 
     if args_dict.get('run'):
         max_num_processes = args_dict.get('max_num_processes')

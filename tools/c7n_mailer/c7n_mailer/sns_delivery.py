@@ -3,12 +3,10 @@
 
 from boto3 import Session
 
-from .utils import (
-    get_message_subject, get_resource_tag_targets, get_rendered_jinja)
+from .utils import get_message_subject, get_resource_tag_targets, get_rendered_jinja
 
 
 class SnsDelivery:
-
     def __init__(self, config, session, logger):
         self.config = config
         self.logger = logger
@@ -29,7 +27,9 @@ class SnsDelivery:
                 sns_addresses.append(target)
         return sns_addresses
 
-    def get_sns_message_package(self, sqs_message, policy_sns_address, subject, resources):
+    def get_sns_message_package(
+        self, sqs_message, policy_sns_address, subject, resources
+    ):
         rendered_jinja_body = get_rendered_jinja(
             policy_sns_address,
             sqs_message,
@@ -37,12 +37,12 @@ class SnsDelivery:
             self.logger,
             'template',
             'default',
-            self.config['templates_folders']
+            self.config['templates_folders'],
         )
         return {
             'topic': policy_sns_address,
             'subject': subject,
-            'sns_message': rendered_jinja_body
+            'sns_message': rendered_jinja_body,
         }
 
     def get_sns_message_packages(self, sqs_message):
@@ -53,12 +53,7 @@ class SnsDelivery:
         # to sns_addrs_to_rendered_jinja_messages as an sns_message package
         for sns_topic, resources in sns_to_resources_map.items():
             sns_addrs_to_rendered_jinja_messages.append(
-                self.get_sns_message_package(
-                    sqs_message,
-                    sns_topic,
-                    subject,
-                    resources
-                )
+                self.get_sns_message_package(sqs_message, sns_topic, subject, resources)
             )
 
         if sns_addrs_to_rendered_jinja_messages == []:
@@ -66,7 +61,9 @@ class SnsDelivery:
         return sns_addrs_to_rendered_jinja_messages
 
     def get_sns_addrs_to_resources_map(self, sqs_message):
-        policy_to_sns_addresses = self.get_valid_sns_from_list(sqs_message['action'].get('to', []))
+        policy_to_sns_addresses = self.get_valid_sns_from_list(
+            sqs_message['action'].get('to', [])
+        )
         sns_addrs_to_resources_map = {}
         # go over all sns_addresses from the to field
         for policy_sns_address in policy_to_sns_addresses:
@@ -75,8 +72,7 @@ class SnsDelivery:
         for resource in sqs_message['resources']:
             resource_owner_tag_keys = self.config.get('contact_tags', [])
             possible_sns_tag_values = get_resource_tag_targets(
-                resource,
-                resource_owner_tag_keys
+                resource, resource_owner_tag_keys
             )
             sns_tag_values = self.get_valid_sns_from_list(possible_sns_tag_values)
             # for each resource, get any valid sns topics, and add them to the map
@@ -84,7 +80,9 @@ class SnsDelivery:
                 # skip sns topics in tags if they're already in the to field
                 if sns_tag_value in policy_to_sns_addresses:
                     continue
-                sns_addrs_to_resources_map.setdefault(sns_tag_value, []).append(resource)
+                sns_addrs_to_resources_map.setdefault(sns_tag_value, []).append(
+                    resource
+                )
         return sns_addrs_to_resources_map
 
     def target_is_sns(self, target):
@@ -107,20 +105,27 @@ class SnsDelivery:
                 else:
                     creds = self.aws_sts.assume_role(
                         RoleArn=self.config['cross_accounts'][account],
-                        RoleSessionName="CustodianNotification")['Credentials']
+                        RoleSessionName="CustodianNotification",
+                    )['Credentials']
                     session = Session(
                         aws_access_key_id=creds['AccessKeyId'],
                         aws_secret_access_key=creds['SecretAccessKey'],
-                        aws_session_token=creds['SessionToken'])
+                        aws_session_token=creds['SessionToken'],
+                    )
                 self.sns_cache[account] = sns = session.client('sns')
 
-            self.logger.info("Sending account:%s policy:%s sns:%s to %s" % (
-                sqs_message.get('account', ''),
-                sqs_message['policy']['name'],
-                sqs_message['action'].get('template', 'default'),
-                topic))
+            self.logger.info(
+                "Sending account:%s policy:%s sns:%s to %s"
+                % (
+                    sqs_message.get('account', ''),
+                    sqs_message['policy']['name'],
+                    sqs_message['action'].get('template', 'default'),
+                    topic,
+                )
+            )
             sns.publish(TopicArn=topic, Subject=subject, Message=rendered_jinja_body)
         except Exception as e:
             self.logger.warning(
-                "Error policy:%s account:%s sending sns to %s \n %s" % (
-                    sqs_message['policy'], sqs_message.get('account', 'na'), topic, e))
+                "Error policy:%s account:%s sending sns to %s \n %s"
+                % (sqs_message['policy'], sqs_message.get('account', 'na'), topic, e)
+            )

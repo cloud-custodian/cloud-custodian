@@ -4,13 +4,12 @@ from common_openstack import OpenStackTest
 
 
 class ProjectTest(OpenStackTest):
-
     def test_project_query(self):
         factory = self.replay_flight_data()
-        p = self.load_policy({
-            'name': 'all-projects',
-            'resource': 'openstack.project'},
-            session_factory=factory)
+        p = self.load_policy(
+            {'name': 'all-projects', 'resource': 'openstack.project'},
+            session_factory=factory,
+        )
         resources = p.run()
         self.assertEqual(len(resources), 3)
 

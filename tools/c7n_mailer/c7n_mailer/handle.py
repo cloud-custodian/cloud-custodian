@@ -32,4 +32,6 @@ def start_c7n_mailer(logger, config=None, parallel=False):
         mailer_sqs_queue_processor = MailerSqsQueueProcessor(config, session, logger)
         mailer_sqs_queue_processor.run(parallel)
     except Exception as e:
-        logger.exception("Error starting mailer MailerSqsQueueProcessor(). \n Error: %s \n" % (e))
+        logger.exception(
+            "Error starting mailer MailerSqsQueueProcessor(). \n Error: %s \n" % (e)
+        )

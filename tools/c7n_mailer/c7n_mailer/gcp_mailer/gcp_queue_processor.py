@@ -49,13 +49,19 @@ class MailerGcpQueueProcessor(MessageTargetMixin):
             self.ack_messages(discard_date)
             messages = self.receive_messages()
 
-        self.logger.info("No messages left in the gcp topic subscription, now exiting c7n_mailer.")
+        self.logger.info(
+            "No messages left in the gcp topic subscription, now exiting c7n_mailer."
+        )
 
     # This function, when processing gcp pubsub messages, will deliver messages over email.
     # Also support for Datadog and Slack
     def process_message(self, encoded_gcp_pubsub_message, publish_date):
-        pubsub_message = self.unpack_to_dict(encoded_gcp_pubsub_message["message"]["data"])
-        self.handle_targets(pubsub_message, publish_date, email_delivery=True, sns_delivery=False)
+        pubsub_message = self.unpack_to_dict(
+            encoded_gcp_pubsub_message["message"]["data"]
+        )
+        self.handle_targets(
+            pubsub_message, publish_date, email_delivery=True, sns_delivery=False
+        )
         return True
 
     def receive_messages(self):
@@ -71,7 +77,8 @@ class MailerGcpQueueProcessor(MessageTargetMixin):
     def ack_messages(self, discard_datetime):
         """Acknowledge and Discard messages up to datetime using seek api command"""
         return self.client.execute_command(
-            "seek", {"subscription": self.subscription, "body": {"time": discard_datetime}}
+            "seek",
+            {"subscription": self.subscription, "body": {"time": discard_datetime}},
         )
 
     @staticmethod

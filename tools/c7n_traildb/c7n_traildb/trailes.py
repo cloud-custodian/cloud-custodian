@@ -36,29 +36,26 @@ CONFIG_SCHEMA = {
                 'user': {'type': 'string'},
                 'password': {'type': 'string'},
                 'idx_name': {'type': 'string'},
-                'query': {'type': 'string'}
+                'query': {'type': 'string'},
             },
-            'additionalProperties': True
+            'additionalProperties': True,
         },
         'accounts': {
             'type': 'array',
             'items': {
                 'type': 'object',
-                'anyOf': [
-                    {"required": ['profile']},
-                    {"required": ['role']}
-                ],
+                'anyOf': [{"required": ['profile']}, {"required": ['role']}],
                 'required': ['name', 'bucket', 'regions', 'title'],
                 'properties': {
                     'name': {'type': 'string'},
                     'title': {'type': 'string'},
                     'tags': {'type': 'object'},
                     'bucket': {'type': 'string'},
-                    'regions': {'type': 'array', 'items': {'type': 'string'}}
-                }
-            }
-        }
-    }
+                    'regions': {'type': 'array', 'items': {'type': 'string'}},
+                },
+            },
+        },
+    },
 }
 
 
@@ -93,8 +90,9 @@ def dict_factory(cursor, row):
 
 def fetch_events(cursor, config, account_name):
     """Generator that returns the events"""
-    query = config['indexer'].get('query',
-        'select * from events where user_agent glob \'*CloudCustodian*\'')
+    query = config['indexer'].get(
+        'query', 'select * from events where user_agent glob \'*CloudCustodian*\''
+    )
 
     for event in cursor.execute(query):
         event['account'] = account_name
@@ -104,8 +102,7 @@ def fetch_events(cursor, config, account_name):
 
 
 def get_traildb(bucket, key, session_factory, directory):
-    local_db_file = directory + "/traildb" + \
-        str(thread.get_ident())
+    local_db_file = directory + "/traildb" + str(thread.get_ident())
     local_bz2_file = local_db_file + '.bz2'
 
     s3 = local_session(session_factory).resource('s3')
@@ -119,9 +116,9 @@ def get_traildb(bucket, key, session_factory, directory):
 
 
 def valid_date(key, config_date):
-    """ traildb bucket folders are not zero-padded so this validation
-        checks that the keys returned by the paginator are
-        *really after* the config date
+    """traildb bucket folders are not zero-padded so this validation
+    checks that the keys returned by the paginator are
+    *really after* the config date
     """
     key_date = "/".join(key.split("/")[4:7])
     return parse_date(key_date) > parse_date(config_date)
@@ -131,8 +128,10 @@ def index_account_trails(config, account, region, date, directory):
     es_client = get_es_client(config)
 
     s3 = local_session(
-        lambda: SessionFactory(region, profile=account.get('profile'),
-        assume_role=account.get('role'))()).client('s3')
+        lambda: SessionFactory(
+            region, profile=account.get('profile'), assume_role=account.get('role')
+        )()
+    ).client('s3')
 
     bucket = account['bucket']
     key_prefix = "accounts/{}/{}/traildb".format(account['name'], region)
@@ -150,14 +149,23 @@ def index_account_trails(config, account, region, date, directory):
                 continue
             keys = []
             for k in key_set['Contents']:
-                if (k['Key'].endswith('trail.db.bz2') and valid_date(k['Key'], date)):
+                if k['Key'].endswith('trail.db.bz2') and valid_date(k['Key'], date):
                     keys.append(k)
 
-            futures = map(lambda k: w.submit(
-                get_traildb, bucket, k,
-                lambda: SessionFactory(region, profile=account.get('profile'),
-                assume_role=account.get('role'))(), directory),
-                keys)
+            futures = map(
+                lambda k: w.submit(
+                    get_traildb,
+                    bucket,
+                    k,
+                    lambda: SessionFactory(
+                        region,
+                        profile=account.get('profile'),
+                        assume_role=account.get('role'),
+                    )(),
+                    directory,
+                ),
+                keys,
+            )
 
             for f in as_completed(futures):
                 local_db_file = f.result()
@@ -170,8 +178,9 @@ def index_account_trails(config, account, region, date, directory):
                 try:
                     os.remove(local_db_file)
                 except Exception:
-                    log.warning("Failed to remove temporary file: {}".format(
-                        local_db_file))
+                    log.warning(
+                        "Failed to remove temporary file: {}".format(local_db_file)
+                    )
                     pass
 
 
@@ -201,8 +210,14 @@ def trailes():
 @click.option('-t', '--tag')
 @click.option('--verbose/--no-verbose', default=False)
 def index(
-        config, date=None, directory=None, concurrency=5, accounts=None,
-        tag=None, verbose=False):
+    config,
+    date=None,
+    directory=None,
+    concurrency=5,
+    accounts=None,
+    tag=None,
+    verbose=False,
+):
     """index traildbs directly from s3 for multiple accounts.
 
     context: assumes a daily traildb file in s3 with dated key path
@@ -242,19 +257,22 @@ def index(
                 jobs.append(p)
 
         for j in jobs:
-            log.debug("submit account:{} region:{} date:{}".format(
-                j[1]['name'], j[2], j[3]))
+            log.debug(
+                "submit account:{} region:{} date:{}".format(j[1]['name'], j[2], j[3])
+            )
             futures[w.submit(index_account_trails, *j)] = j
 
         # Process completed
         for f in as_completed(futures):
             config, account, region, date, directory = futures[f]
             if f.exception():
-                log.warning("error account:{} region:{} error:{}".format(
-                    account['name'], region, f.exception()))
+                log.warning(
+                    "error account:{} region:{} error:{}".format(
+                        account['name'], region, f.exception()
+                    )
+                )
                 continue
-            log.info("complete account:{} region:{}".format(
-                account['name'], region))
+            log.info("complete account:{} region:{}".format(account['name'], region))
 
 
 if __name__ == '__main__':

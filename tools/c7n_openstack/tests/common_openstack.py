@@ -34,7 +34,6 @@ def init_openstack_config():
 
 
 class OpenStackTest(TestUtils):
-
     init_openstack_config()
     recording = False
 
@@ -42,8 +41,9 @@ class OpenStackTest(TestUtils):
         kw = self._get_vcr_kwargs()
         kw['record_mode'] = 'any'
         self.myvcr = self._get_vcr(**kw)
-        cm = self.myvcr.use_cassette(name or self._get_cassette_name(),
-                                     allow_playback_repeats=True)
+        cm = self.myvcr.use_cassette(
+            name or self._get_cassette_name(), allow_playback_repeats=True
+        )
         cm.__enter__()
         self.addCleanup(cm.__exit__, None, None, None)
         return partial(Session)
@@ -54,7 +54,8 @@ class OpenStackTest(TestUtils):
         self.myvcr = self._get_vcr(**kw)
 
         flight_path = os.path.join(
-            kw['cassette_library_dir'], name or self._get_cassette_name())
+            kw['cassette_library_dir'], name or self._get_cassette_name()
+        )
         if os.path.exists(flight_path):
             os.unlink(flight_path)
 
@@ -66,22 +67,23 @@ class OpenStackTest(TestUtils):
         return Session
 
     def _get_vcr_kwargs(self):
-        return dict(filter_headers=['authorization'],
-                    cassette_library_dir=self._get_cassette_library_dir())
+        return dict(
+            filter_headers=['authorization'],
+            cassette_library_dir=self._get_cassette_library_dir(),
+        )
 
     def _get_vcr(self, **kwargs):
         myvcr = vcr.VCR(**kwargs)
         return myvcr
 
     def _get_cassette_library_dir(self):
-        return os.path.join(
-            os.path.dirname(__file__),
-            'data', 'flights')
+        return os.path.join(os.path.dirname(__file__), 'data', 'flights')
 
     def _get_cassette_name(self):
         cassette_dir = self._get_cassette_library_dir()
-        cassette_file = '{0}.{1}.yaml'.format(self.__class__.__name__,
-                                              self._testMethodName)
+        cassette_file = '{0}.{1}.yaml'.format(
+            self.__class__.__name__, self._testMethodName
+        )
         if os.path.isfile(cassette_dir + '/' + cassette_file):
             return cassette_file
         cassette_file = '{0}.yaml'.format(self.__class__.__name__)

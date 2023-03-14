@@ -14,7 +14,6 @@ log = logging.getLogger('custodian.openstack')
 
 @clouds.register('openstack')
 class OpenStack(Provider):
-
     display_name = 'openstack'
     resource_prefix = 'openstack'
     resources = PluginRegistry('%s.resources' % resource_prefix)

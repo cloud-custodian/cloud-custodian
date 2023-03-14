@@ -7,7 +7,6 @@ from c7n_kube.provider import resources
 
 @resources.register('cluster-role')
 class ClusterRole(QueryResourceManager):
-
     class resource_type(TypeInfo):
         group = 'RbacAuthorization'
         version = 'V1'
@@ -20,7 +19,6 @@ class ClusterRole(QueryResourceManager):
 
 @resources.register('role')
 class NamespacedRole(QueryResourceManager):
-
     class resource_type(TypeInfo):
         group = 'RbacAuthorization'
         version = 'V1'

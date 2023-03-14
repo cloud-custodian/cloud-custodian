@@ -48,14 +48,12 @@ def chunks(iterable, size=50):
         yield batch
 
 
-def process_trail_set(
-        object_set, map_records, reduce_results=None, trail_bucket=None):
-
+def process_trail_set(object_set, map_records, reduce_results=None, trail_bucket=None):
     session_factory = SessionFactory(
-        options.region, options.profile, options.assume_role)
+        options.region, options.profile, options.assume_role
+    )
 
-    s3 = session_factory().client(
-        's3', config=Config(signature_version='s3v4'))
+    s3 = session_factory().client('s3', config=Config(signature_version='s3v4'))
 
     previous = None
     for o in object_set:
@@ -69,7 +67,6 @@ def process_trail_set(
 
 
 class TrailDB:
-
     def __init__(self, path):
         self.path = path
         self.conn = sqlite3.connect(self.path)
@@ -142,13 +139,14 @@ def process_record_set(object_processor, q):
         return r
 
 
-def process_records(records,
-                    uid_filter=None,
-                    event_filter=None,
-                    service_filter=None,
-                    not_service_filter=None,
-                    data_dir=None):
-
+def process_records(
+    records,
+    uid_filter=None,
+    event_filter=None,
+    service_filter=None,
+    not_service_filter=None,
+    data_dir=None,
+):
     user_records = []
     for r in records:
         if not_service_filter and r['eventSource'] == not_service_filter:
@@ -180,14 +178,14 @@ def process_records(records,
             r.get('sourceIPAddress', ''),
             uid,
             r.get('errorCode', None),
-            r.get('errorMessage', None)
+            r.get('errorMessage', None),
         )
 
         # Optional data can be added to each record.
         # Field names are Case Sensitive.
         if options.field:
             for field in options.field:
-                user_record += (json.dumps(r[field]), )
+                user_record += (json.dumps(r[field]),)
 
         user_records.append(user_record)
 
@@ -204,15 +202,20 @@ def process_records(records,
 
 
 def process_bucket(
-        bucket_name, prefix,
-        output=None, uid_filter=None, event_filter=None,
-        service_filter=None, not_service_filter=None, data_dir=None):
-
+    bucket_name,
+    prefix,
+    output=None,
+    uid_filter=None,
+    event_filter=None,
+    service_filter=None,
+    not_service_filter=None,
+    data_dir=None,
+):
     session_factory = SessionFactory(
-        options.region, options.profile, options.assume_role)
+        options.region, options.profile, options.assume_role
+    )
 
-    s3 = session_factory().client(
-        's3', config=Config(signature_version='s3v4'))
+    s3 = session_factory().client('s3', config=Config(signature_version='s3v4'))
 
     paginator = s3.get_paginator('list_objects')
     # PyPy has some memory leaks.... :-(
@@ -220,9 +223,7 @@ def process_bucket(
     t = time.time()
     object_count = object_size = 0
 
-    log.info("Processing:%d cloud-trail %s" % (
-        cpu_count(),
-        prefix))
+    log.info("Processing:%d cloud-trail %s" % (cpu_count(), prefix))
 
     record_processor = partial(
         process_records,
@@ -230,13 +231,15 @@ def process_bucket(
         event_filter=event_filter,
         service_filter=service_filter,
         not_service_filter=not_service_filter,
-        data_dir=data_dir)
+        data_dir=data_dir,
+    )
 
     object_processor = partial(
         process_trail_set,
         map_records=record_processor,
         reduce_results=reduce_records,
-        trail_bucket=bucket_name)
+        trail_bucket=bucket_name,
+    )
     db = TrailDB(output)
 
     bsize = math.ceil(1000 / float(cpu_count()))
@@ -261,20 +264,23 @@ def process_bucket(
                 os.remove(fpath)
             db.flush()
 
-        l = t # NOQA
+        l = t  # NOQA
         t = time.time()
 
         log.info("Stored page time:%0.2fs", t - st)
         log.info(
-            "Processed paged time:%0.2f size:%s count:%s" % (
-                t - l, object_size, object_count))
+            "Processed paged time:%0.2f size:%s count:%s"
+            % (t - l, object_size, object_count)
+        )
         if objects:
             log.info('Last Page Key: %s', objects[-1]['Key'])
 
 
 def get_bucket_path(options):
     prefix = "AWSLogs/%(account)s/CloudTrail/%(region)s/" % {
-        'account': options.account, 'region': options.region}
+        'account': options.account,
+        'region': options.region,
+    }
     if options.prefix:
         prefix = "%s/%s" % (options.prefix.strip('/'), prefix)
     if options.day:
@@ -303,14 +309,19 @@ def setup_parser():
     parser.add_argument("--region", default="us-east-1")
     parser.add_argument("--output", default="results.db")
     parser.add_argument(
-        "--profile", default=os.environ.get('AWS_PROFILE'),
-        help="AWS Account Config File Profile to utilize")
+        "--profile",
+        default=os.environ.get('AWS_PROFILE'),
+        help="AWS Account Config File Profile to utilize",
+    )
     parser.add_argument(
-        "--assume", default=None, dest="assume_role",
-        help="Role to assume")
-    parser.add_argument('--field', action='append',
+        "--assume", default=None, dest="assume_role", help="Role to assume"
+    )
+    parser.add_argument(
+        '--field',
+        action='append',
         help='additonal fields that can be added to each record',
-        choices=['userIdentity', 'requestParameters', 'responseElements'])
+        choices=['userIdentity', 'requestParameters', 'responseElements'],
+    )
     return parser
 
 
@@ -334,7 +345,7 @@ def main():
         options.event,
         options.source,
         options.not_source,
-        options.tmpdir
+        options.tmpdir,
     )
 
 

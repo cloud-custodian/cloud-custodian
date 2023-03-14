@@ -23,6 +23,7 @@ from tabulate import tabulate
 import yaml
 
 from c7n.executor import MainThreadExecutor
+
 MainThreadExecutor.c7n_async = False
 
 logging.basicConfig(level=logging.INFO)
@@ -63,26 +64,24 @@ CONFIG_SCHEMA = {
             'properties': {
                 'name': {'type': 'string'},
                 'subscription-role': {'type': 'string'},
-                'role': {'oneOf': [
-                    {'type': 'array', 'items': {'type': 'string'}},
-                    {'type': 'string'}]},
-                'groups': {
-                    'type': 'array', 'items': {'type': 'string'}
-                }
-            }
-        }
+                'role': {
+                    'oneOf': [
+                        {'type': 'array', 'items': {'type': 'string'}},
+                        {'type': 'string'},
+                    ]
+                },
+                'groups': {'type': 'array', 'items': {'type': 'string'}},
+            },
+        },
     },
     'type': 'object',
     'additionalProperties': False,
     'required': ['accounts', 'destination'],
     'properties': {
-        'accounts': {
-            'type': 'array',
-            'items': {'$ref': '#/definitions/account'}
-        },
+        'accounts': {'type': 'array', 'items': {'$ref': '#/definitions/account'}},
         'destination': {'$ref': '#/definitions/destination'},
-        'subscription': {'$ref': '#/definitions/subscription'}
-    }
+        'subscription': {'$ref': '#/definitions/subscription'},
+    },
 }
 
 
@@ -97,9 +96,11 @@ def debug(func):
             import traceback
             import pdb
             import sys
+
             traceback.print_exc()
             pdb.post_mortem(sys.exc_info()[-1])
             raise
+
     return run
 
 
@@ -133,24 +134,28 @@ def validate(config):
 
 def _process_subscribe_group(client, group_name, subscription, distribution, role_arn):
     sub_name = subscription.get('name', 'FlowLogStream')
-    filters = client.describe_subscription_filters(
-        logGroupName=group_name).get('subscriptionFilters', ())
+    filters = client.describe_subscription_filters(logGroupName=group_name).get(
+        'subscriptionFilters', ()
+    )
     if filters:
         f = filters.pop()
-        if (f['filterName'] == sub_name and
-                f['destinationArn'] == subscription['destination-arn'] and
-                f['distribution'] == distribution):
+        if (
+            f['filterName'] == sub_name
+            and f['destinationArn'] == subscription['destination-arn']
+            and f['distribution'] == distribution
+        ):
             return
         else:
             client.delete_subscription_filter(
-                logGroupName=group_name, filterName=sub_name)
+                logGroupName=group_name, filterName=sub_name
+            )
     kwargs = {
         'logGroupName': group_name,
         'destinationArn': subscription['destination-arn'],
         'filterName': sub_name,
         'filterPattern': "",
         'distribution': distribution,
-        'roleArn': role_arn
+        'roleArn': role_arn,
     }
     client.put_subscription_filter(**{k: v for k, v in kwargs.items() if v is not None})
 
@@ -174,10 +179,12 @@ def subscribe(config, accounts, region, merge, debug):
         destination_name = subscription['destination-arn'].rsplit(':', 1)[-1]
         try:
             extant_destinations = client.describe_destinations(
-                DestinationNamePrefix=destination_name).get('destinations')
+                DestinationNamePrefix=destination_name
+            ).get('destinations')
         except ClientError:
-            log.error("Log group destination not found: %s",
-                      subscription['destination-arn'])
+            log.error(
+                "Log group destination not found: %s", subscription['destination-arn']
+            )
             sys.exit(1)
 
         account_ids = set()
@@ -196,13 +203,20 @@ def subscribe(config, accounts, region, merge, debug):
 
         client.put_destination_policy(
             destinationName=destination_name,
-            accessPolicy=json.dumps({
-                'Statement': [{
-                    'Action': 'logs:PutSubscriptionFilter',
-                    'Effect': 'Allow',
-                    'Principal': {'AWS': list(account_ids)},
-                    'Resource': subscription['destination-arn'],
-                    'Sid': 'CrossAccountDelivery'}]}))
+            accessPolicy=json.dumps(
+                {
+                    'Statement': [
+                        {
+                            'Action': 'logs:PutSubscriptionFilter',
+                            'Effect': 'Allow',
+                            'Principal': {'AWS': list(account_ids)},
+                            'Resource': subscription['destination-arn'],
+                            'Sid': 'CrossAccountDelivery',
+                        }
+                    ]
+                }
+            ),
+        )
 
     def subscribe_account(t_account, subscription, region):
         session = get_session(t_account['role'], region)
@@ -211,15 +225,20 @@ def subscribe(config, accounts, region, merge, debug):
         role_arn = account.get('subscription-role')
 
         for g in account.get('groups'):
-            if (g.endswith('*')):
+            if g.endswith('*'):
                 g = g.replace('*', '')
                 paginator = client.get_paginator('describe_log_groups')
-                allLogGroups = paginator.paginate(logGroupNamePrefix=g).build_full_result()
+                allLogGroups = paginator.paginate(
+                    logGroupNamePrefix=g
+                ).build_full_result()
                 for l in allLogGroups['logGroups']:
                     _process_subscribe_group(
-                        client, l['logGroupName'], subscription, distribution, role_arn)
+                        client, l['logGroupName'], subscription, distribution, role_arn
+                    )
             else:
-                _process_subscribe_group(client, g, subscription, distribution, role_arn)
+                _process_subscribe_group(
+                    client, g, subscription, distribution, role_arn
+                )
 
     if subscription.get('managed-policy'):
         if subscription.get('destination-role'):
@@ -235,13 +254,14 @@ def subscribe(config, accounts, region, merge, debug):
         for account in config.get('accounts', ()):
             if accounts and account['name'] not in accounts:
                 continue
-            futures[w.submit(subscribe_account, account, subscription, region)] = account
+            futures[
+                w.submit(subscribe_account, account, subscription, region)
+            ] = account
 
         for f in as_completed(futures):
             account = futures[f]
             if f.exception():
-                log.error("Error on account %s err: %s",
-                          account['name'], f.exception())
+                log.error("Error on account %s err: %s", account['name'], f.exception())
             log.info("Completed %s", account['name'])
 
 
@@ -265,13 +285,12 @@ def run(config, start, end, accounts, region, debug):
             if accounts and account['name'] not in accounts:
                 continue
             futures[
-                w.submit(process_account, account, start,
-                         end, destination, region)] = account
+                w.submit(process_account, account, start, end, destination, region)
+            ] = account
         for f in as_completed(futures):
             account = futures[f]
             if f.exception():
-                log.error("Error on account %s err: %s",
-                          account['name'], f.exception())
+                log.error("Error on account %s err: %s", account['name'], f.exception())
             log.info("Completed %s", account['name'])
 
 
@@ -289,12 +308,17 @@ def lambdafan(func):
         client.invoke(
             FunctionName=os.environ['AWS_LAMBDA_FUNCTION_NAME'],
             InvocationType='Event',
-            Payload=dumps({
-                'event': 'fanout',
-                'function': func.__name__,
-                'args': args,
-                'kwargs': kw}),
-            Qualifier=os.environ['AWS_LAMBDA_FUNCTION_VERSION'])
+            Payload=dumps(
+                {
+                    'event': 'fanout',
+                    'function': func.__name__,
+                    'args': args,
+                    'kwargs': kw,
+                }
+            ),
+            Qualifier=os.environ['AWS_LAMBDA_FUNCTION_VERSION'],
+        )
+
     return scaleout
 
 
@@ -310,8 +334,8 @@ def process_account(account, start, end, destination, region, incremental=True):
 
     group_count = len(all_groups)
     groups = filter_creation_date(
-        filter_group_names(all_groups, account['groups']),
-        start, end)
+        filter_group_names(all_groups, account['groups']), start, end
+    )
 
     if incremental:
         groups = filter_last_write(client, groups, start)
@@ -319,24 +343,37 @@ def process_account(account, start, end, destination, region, incremental=True):
     account_id = session.client('sts').get_caller_identity()['Account']
     prefix = destination.get('prefix', '').rstrip('/') + '/%s' % account_id
 
-    log.info("account:%s matched %d groups of %d",
-             account.get('name', account_id), len(groups), group_count)
+    log.info(
+        "account:%s matched %d groups of %d",
+        account.get('name', account_id),
+        len(groups),
+        group_count,
+    )
 
     if not groups:
-        log.warning("account:%s no groups matched, all groups \n  %s",
-                    account.get('name', account_id), "\n  ".join(
-                        [g['logGroupName'] for g in all_groups]))
+        log.warning(
+            "account:%s no groups matched, all groups \n  %s",
+            account.get('name', account_id),
+            "\n  ".join([g['logGroupName'] for g in all_groups]),
+        )
     t = time.time()
     for g in groups:
         export.callback(
             g,
-            destination['bucket'], prefix,
-            g['exportStart'], end, account['role'],
-            name=account['name'])
+            destination['bucket'],
+            prefix,
+            g['exportStart'],
+            end,
+            account['role'],
+            name=account['name'],
+        )
 
-    log.info("account:%s exported %d log groups in time:%0.2f",
-             account.get('name') or account_id,
-             len(groups), time.time() - t)
+    log.info(
+        "account:%s exported %d log groups in time:%0.2f",
+        account.get('name') or account_id,
+        len(groups),
+        time.time() - t,
+    )
 
 
 def get_session(role, region, session_name="c7n-log-exporter", session=None):
@@ -354,8 +391,7 @@ def get_session(role, region, session_name="c7n-log-exporter", session=None):
 
 
 def filter_group_names(groups, patterns):
-    """Filter log groups by shell patterns.
-    """
+    """Filter log groups by shell patterns."""
     group_names = [g['logGroupName'] for g in groups]
     matched = set()
     for p in patterns:
@@ -383,8 +419,7 @@ def filter_creation_date(groups, start, end):
 
 
 def filter_last_write(client, groups, start):
-    """Filter log groups where the last write was before the start date.
-    """
+    """Filter log groups where the last write was before the start date."""
     retry = get_retry(('ThrottlingException',))
 
     def process_group(group_set):
@@ -394,15 +429,21 @@ def filter_last_write(client, groups, start):
                 client.describe_log_streams,
                 logGroupName=g['logGroupName'],
                 orderBy='LastEventTime',
-                limit=1, descending=True)
+                limit=1,
+                descending=True,
+            )
             if not streams.get('logStreams'):
                 continue
             stream = streams['logStreams'][0]
-            if stream['storedBytes'] == 0 and datetime.fromtimestamp(
-                    stream['creationTime'] / 1000) > start:
+            if (
+                stream['storedBytes'] == 0
+                and datetime.fromtimestamp(stream['creationTime'] / 1000) > start
+            ):
                 matched.append(g)
-            elif 'lastIngestionTime' in stream and datetime.fromtimestamp(
-                    stream['lastIngestionTime'] / 1000) > start:
+            elif (
+                'lastIngestionTime' in stream
+                and datetime.fromtimestamp(stream['lastIngestionTime'] / 1000) > start
+            ):
                 matched.append(g)
         return matched
 
@@ -416,17 +457,15 @@ def filter_last_write(client, groups, start):
         for f in as_completed(futures):
             if f.exception():
                 log.error(
-                    "Error processing groupset:%s error:%s",
-                    group_set,
-                    f.exception())
+                    "Error processing groupset:%s error:%s", group_set, f.exception()
+                )
             results.extend(f.result())
 
     return results
 
 
 def filter_extant_exports(client, bucket, prefix, days, start, end=None):
-    """Filter days where the bucket already has extant export keys.
-    """
+    """Filter days where the bucket already has extant export keys."""
     end = end or datetime.now()
     # days = [start + timedelta(i) for i in range((end-start).days)]
     try:
@@ -470,8 +509,8 @@ def access(config, region, accounts=()):
         if ':assumed-role' in policy_arn:
             policy_arn = policy_arn.replace(':assumed-role', ':role')
         evaluation = client.simulate_principal_policy(
-            PolicySourceArn=policy_arn,
-            ActionNames=['logs:CreateExportTask'])['EvaluationResults']
+            PolicySourceArn=policy_arn, ActionNames=['logs:CreateExportTask']
+        )['EvaluationResults']
         account['access'] = evaluation[0]['EvalDecision']
 
     with ThreadPoolExecutor(max_workers=16) as w:
@@ -509,9 +548,7 @@ def size(config, accounts=(), day=None, group=None, human=True, region=None):
         prefix = destination.get('prefix', '').rstrip('/') + '/%s' % account_id
         prefix = "%s/%s/%s" % (prefix, group, day.strftime("%Y/%m/%d"))
         account['account_id'] = account_id
-        for page in paginator.paginate(
-                Bucket=destination['bucket'],
-                Prefix=prefix):
+        for page in paginator.paginate(Bucket=destination['bucket'], Prefix=prefix):
             for k in page.get('Contents', ()):
                 size += k['Size']
                 count += 1
@@ -586,7 +623,8 @@ def sync(config, group, accounts=(), dryrun=False, region=None):
             last_export = None
         try:
             tag_set = client.get_object_tagging(
-                Bucket=destination['bucket'], Key=prefix).get('TagSet', [])
+                Bucket=destination['bucket'], Key=prefix
+            ).get('TagSet', [])
         except ClientError:
             tag_set = []
 
@@ -614,18 +652,26 @@ def sync(config, group, accounts=(), dryrun=False, region=None):
             Key=prefix,
             Body=json.dumps({}),
             ACL="bucket-owner-full-control",
-            ServerSideEncryption="AES256")
+            ServerSideEncryption="AES256",
+        )
 
         export_time = datetime.now().replace(tzinfo=tzlocal()).astimezone(tzutc())
         export_time = export_time.replace(
-            year=last_export[0], month=last_export[1], day=last_export[2],
-            minute=0, second=0, microsecond=0, hour=0)
+            year=last_export[0],
+            month=last_export[1],
+            day=last_export[2],
+            minute=0,
+            second=0,
+            microsecond=0,
+            hour=0,
+        )
         client.put_object_tagging(
-            Bucket=destination['bucket'], Key=prefix,
+            Bucket=destination['bucket'],
+            Key=prefix,
             Tagging={
-                'TagSet': [{
-                    'Key': 'LastExport',
-                    'Value': export_time.isoformat()}]})
+                'TagSet': [{'Key': 'LastExport', 'Value': export_time.isoformat()}]
+            },
+        )
 
     accounts_report = []
     for a in config.get('accounts'):
@@ -671,7 +717,8 @@ def status(config, group, accounts=(), region=None):
 
         try:
             tag_set = client.get_object_tagging(
-                Bucket=destination['bucket'], Key=prefix).get('TagSet', [])
+                Bucket=destination['bucket'], Key=prefix
+            ).get('TagSet', [])
         except ClientError:
             account['export'] = 'missing'
             continue
@@ -689,10 +736,10 @@ def status(config, group, accounts=(), region=None):
 
 
 def get_exports(client, bucket, prefix, latest=True):
-    """Find exports for a given account
-    """
-    keys = client.list_objects_v2(
-        Bucket=bucket, Prefix=prefix, Delimiter='/').get('CommonPrefixes', [])
+    """Find exports for a given account"""
+    keys = client.list_objects_v2(Bucket=bucket, Prefix=prefix, Delimiter='/').get(
+        'CommonPrefixes', []
+    )
     found = []
     years = []
     for y in keys:
@@ -711,8 +758,8 @@ def get_exports(client, bucket, prefix, latest=True):
 
     for y in years:
         keys = client.list_objects_v2(
-            Bucket=bucket, Prefix="%s/%d/" % (prefix.strip('/'), y),
-            Delimiter='/').get('CommonPrefixes', [])
+            Bucket=bucket, Prefix="%s/%d/" % (prefix.strip('/'), y), Delimiter='/'
+        ).get('CommonPrefixes', [])
         months = []
         for m in keys:
             part = m['Prefix'].rsplit('/', 2)[-2]
@@ -728,9 +775,10 @@ def get_exports(client, bucket, prefix, latest=True):
             months = [months[0]]
         for m in months:
             keys = client.list_objects_v2(
-                Bucket=bucket, Prefix="%s/%d/%s/" % (
-                    prefix.strip('/'), y, ('%d' % m).rjust(2, '0')),
-                Delimiter='/').get('CommonPrefixes', [])
+                Bucket=bucket,
+                Prefix="%s/%d/%s/" % (prefix.strip('/'), y, ('%d' % m).rjust(2, '0')),
+                Delimiter='/',
+            ).get('CommonPrefixes', [])
             for d in keys:
                 part = d['Prefix'].rsplit('/', 2)[-2]
                 if not part.isdigit():
@@ -747,7 +795,9 @@ def get_exports(client, bucket, prefix, latest=True):
 @cli.command()
 @click.option('--group', required=True, help="log group to export to s3.")
 @click.option('--bucket', required=True, help="s3 bucket name export to.")
-@click.option('--prefix', help="name of the tag to filter with using get_object_tagging API.")
+@click.option(
+    '--prefix', help="name of the tag to filter with using get_object_tagging API."
+)
 @click.option('--start', required=True, help="export logs from this date")
 @click.option('--end', help="export logs before this date")
 @click.option('--role', help="sts role to assume for log group access")
@@ -756,12 +806,21 @@ def get_exports(client, bucket, prefix, latest=True):
 # @click.option('--bucket-role', help="role to scan destination bucket")
 # @click.option('--stream-prefix)
 @lambdafan
-def export(group, bucket, prefix, start, end, role, poll_period=120,
-           session=None, name="", region=None):
+def export(
+    group,
+    bucket,
+    prefix,
+    start,
+    end,
+    role,
+    poll_period=120,
+    session=None,
+    name="",
+    region=None,
+):
     """export a given log group to s3"""
     start = start and isinstance(start, str) and parse(start) or start
-    end = (end and isinstance(start, str) and
-           parse(end) or end or datetime.now())
+    end = end and isinstance(start, str) and parse(end) or end or datetime.now()
     start = start.replace(tzinfo=tzlocal()).astimezone(tzutc())
     end = end.replace(tzinfo=tzlocal()).astimezone(tzutc())
 
@@ -798,19 +857,26 @@ def export(group, bucket, prefix, start, end, role, poll_period=120,
         end.strftime('%Y/%m/%d'),
         bucket,
         prefix,
-        group['storedBytes'])
+        group['storedBytes'],
+    )
 
     t = time.time()
-    days = [(
-        start + timedelta(i)).replace(minute=0, hour=0, second=0, microsecond=0)
-        for i in range((end - start).days)]
+    days = [
+        (start + timedelta(i)).replace(minute=0, hour=0, second=0, microsecond=0)
+        for i in range((end - start).days)
+    ]
     day_count = len(days)
     s3 = boto3.Session().client('s3')
     days = filter_extant_exports(s3, bucket, prefix, days, start, end)
 
-    log.info("Group:%s filtering s3 extant keys from %d to %d start:%s end:%s",
-             named_group, day_count, len(days),
-             days[0] if days else '', days[-1] if days else '')
+    log.info(
+        "Group:%s filtering s3 extant keys from %d to %d start:%s end:%s",
+        named_group,
+        day_count,
+        len(days),
+        days[0] if days else '',
+        days[-1] if days else '',
+    )
     t = time.time()
 
     retry = get_retry(('SlowDown',))
@@ -819,17 +885,18 @@ def export(group, bucket, prefix, start, end, role, poll_period=120,
         date = d.replace(minute=0, microsecond=0, hour=0)
         export_prefix = "%s%s" % (prefix, date.strftime("/%Y/%m/%d"))
         params = {
-            'taskName': "%s-%s" % ("c7n-log-exporter",
-                                   date.strftime("%Y-%m-%d")),
+            'taskName': "%s-%s" % ("c7n-log-exporter", date.strftime("%Y-%m-%d")),
             'logGroupName': group['logGroupName'],
-            'fromTime': int(time.mktime(
-                date.replace(
-                    minute=0, microsecond=0, hour=0).timetuple()) * 1000),
-            'to': int(time.mktime(
-                date.replace(
-                    minute=59, hour=23, microsecond=0).timetuple()) * 1000),
+            'fromTime': int(
+                time.mktime(date.replace(minute=0, microsecond=0, hour=0).timetuple())
+                * 1000
+            ),
+            'to': int(
+                time.mktime(date.replace(minute=59, hour=23, microsecond=0).timetuple())
+                * 1000
+            ),
             'destination': bucket,
-            'destinationPrefix': export_prefix
+            'destinationPrefix': export_prefix,
         }
 
         # if stream_prefix:
@@ -844,7 +911,8 @@ def export(group, bucket, prefix, start, end, role, poll_period=120,
                 Key=prefix,
                 Body=json.dumps({}),
                 ACL="bucket-owner-full-control",
-                ServerSideEncryption="AES256")
+                ServerSideEncryption="AES256",
+            )
 
         t = time.time()
         counter = 0
@@ -859,17 +927,18 @@ def export(group, bucket, prefix, start, end, role, poll_period=120,
                     if counter % 6 == 0:
                         log.debug(
                             "group:%s day:%s waiting for %0.2f minutes",
-                            named_group, d.strftime('%Y-%m-%d'),
-                            (counter * poll_period) / 60.0)
+                            named_group,
+                            d.strftime('%Y-%m-%d'),
+                            (counter * poll_period) / 60.0,
+                        )
                     continue
                 raise
             retry(
                 s3.put_object_tagging,
-                Bucket=bucket, Key=prefix,
-                Tagging={
-                    'TagSet': [{
-                        'Key': 'LastExport',
-                        'Value': d.isoformat()}]})
+                Bucket=bucket,
+                Key=prefix,
+                Tagging={'TagSet': [{'Key': 'LastExport', 'Value': d.isoformat()}]},
+            )
             break
 
         log.info(
@@ -879,18 +948,22 @@ def export(group, bucket, prefix, start, end, role, poll_period=120,
             d.strftime("%Y-%m-%d"),
             bucket,
             params['destinationPrefix'],
-            result['taskId'])
+            result['taskId'],
+        )
 
     log.info(
-        ("Exported log group:%s time:%0.2f days:%d start:%s"
-         " end:%s bucket:%s prefix:%s"),
+        (
+            "Exported log group:%s time:%0.2f days:%d start:%s"
+            " end:%s bucket:%s prefix:%s"
+        ),
         named_group,
         time.time() - t,
         len(days),
         start.strftime('%Y/%m/%d'),
         end.strftime('%Y/%m/%d'),
         bucket,
-        prefix)
+        prefix,
+    )
 
 
 if __name__ == '__main__':

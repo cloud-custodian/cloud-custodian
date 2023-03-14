@@ -32,7 +32,11 @@ class Session:
         if self.cloud_name:
             log.debug(f"Connect to OpenStack cloud {self.cloud_name}")
         else:
-            log.debug(("OpenStack cloud name not set, "
-                       "try to get openstack credential from environment"))
+            log.debug(
+                (
+                    "OpenStack cloud name not set, "
+                    "try to get openstack credential from environment"
+                )
+            )
         cloud = openstack.connect(cloud=self.cloud_name)
         return cloud

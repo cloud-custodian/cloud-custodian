@@ -25,8 +25,8 @@ import yaml
 
 
 logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s: %(name)s:%(levelname)s %(message)s")
+    level=logging.INFO, format="%(asctime)s: %(name)s:%(levelname)s %(message)s"
+)
 
 # logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
 logging.getLogger('requests').setLevel(logging.INFO)
@@ -48,7 +48,7 @@ CONFIG_SCHEMA = {
                 'host': {'type': 'string'},
                 'user': {'type': 'string'},
                 'password': {'type': 'string'},
-            }
+            },
         },
         'accounts': {
             'type': 'array',
@@ -59,11 +59,11 @@ CONFIG_SCHEMA = {
                     'name': {'type': 'string'},
                     'title': {'type': 'string'},
                     'bucket': {'type': 'string'},
-                    'regions': {'type': 'array', 'items': {'type': 'string'}}
-                }
-            }
-        }
-    }
+                    'regions': {'type': 'array', 'items': {'type': 'string'}},
+                },
+            },
+        },
+    },
 }
 
 
@@ -72,8 +72,13 @@ def process_traildb(db, influx, account_name, region, since=None):
     t = md.tables['events']
 
     qt = time.time()
-    log.debug("query account:%s region:%s services time:%0.2f incremental:%s",
-              account_name, region, time.time() - qt, since)
+    log.debug(
+        "query account:%s region:%s services time:%0.2f incremental:%s",
+        account_name,
+        region,
+        time.time() - qt,
+        since,
+    )
 
     record_count = 0
     for b in ['console', 'program']:
@@ -86,7 +91,13 @@ def process_traildb(db, influx, account_name, region, since=None):
 
             log.debug(
                 "query account:%s region:%s bucket:%s field:%s points:%d time:%0.2f",
-                account_name, region, b, f, len(results), time.time() - qt)
+                account_name,
+                region,
+                b,
+                f,
+                len(results),
+                time.time() - qt,
+            )
             measurements = []
             for p in results:
                 if f == 'user_id':
@@ -94,43 +105,55 @@ def process_traildb(db, influx, account_name, region, since=None):
                     if '/' in v:
                         parts = v.split('/')
                         # roll up old lambda functions to their role name
-                        if parts[-1].startswith('i-') or parts[-1].startswith('awslambda'):
+                        if parts[-1].startswith('i-') or parts[-1].startswith(
+                            'awslambda'
+                        ):
                             v = parts[1]
                 else:
                     v = p[2]
-                measurements.append({
-                    'measurement': '%s_%s' % (b, f),
-                    'tags': {
-                        'region': region,
-                        'account': account_name,
-                        'service': p[3],
-                        'bucket': b,
-                        f: v},
-                    'time': '%sZ' % p[0],
-                    'fields': {
-                        'call_count': p[1]}})
+                measurements.append(
+                    {
+                        'measurement': '%s_%s' % (b, f),
+                        'tags': {
+                            'region': region,
+                            'account': account_name,
+                            'service': p[3],
+                            'bucket': b,
+                            f: v,
+                        },
+                        'time': '%sZ' % p[0],
+                        'fields': {'call_count': p[1]},
+                    }
+                )
             pt = time.time()
             influx.write_points(measurements)
             record_count += len(measurements)
             log.debug(
                 "post account:%s region:%s bucket:%s field:%s points:%d time:%0.2f",
-                account_name, region, b, f, len(measurements), time.time() - pt)
+                account_name,
+                region,
+                b,
+                f,
+                len(measurements),
+                time.time() - pt,
+            )
     return record_count
 
 
-def query_by(
-        t, field, bucket='console', error=False, throttle=False, since=None):
-
+def query_by(t, field, bucket='console', error=False, throttle=False, since=None):
     fields = [
-        rdb.func.strftime(
-            "%Y-%m-%dT%H:%M", t.c.event_date).label('short_time'),
+        rdb.func.strftime("%Y-%m-%dT%H:%M", t.c.event_date).label('short_time'),
         rdb.func.count().label('call_count'),
         t.c[field],
-        t.c.event_source]
+        t.c.event_source,
+    ]
 
-    query = rdb.select(fields).group_by(
-        'short_time').group_by(t.c[field]).having(
-            rdb.text('call_count > 3'))
+    query = (
+        rdb.select(fields)
+        .group_by('short_time')
+        .group_by(t.c[field])
+        .having(rdb.text('call_count > 3'))
+    )
 
     if field == 'error_code':
         query = query.where(t.c.error_code is not None)
@@ -141,29 +164,39 @@ def query_by(
         query = query.where(
             rdb.and_(
                 t.c.user_agent != 'console.amazonaws.com',
-                t.c.user_agent != 'console.ec2.amazonaws.com'))
+                t.c.user_agent != 'console.ec2.amazonaws.com',
+            )
+        )
     else:
         query = query.where(
             rdb.or_(
                 t.c.user_agent == 'console.amazonaws.com',
-                t.c.user_agent == 'console.ec2.amazonaws.com'))
+                t.c.user_agent == 'console.ec2.amazonaws.com',
+            )
+        )
 
     if throttle:
         query = query.where(
             rdb.or_(
                 t.c.error_code == 'ThrottlingException',
-                t.c.error_code == 'Client.RequestLimitExceeded'))
+                t.c.error_code == 'Client.RequestLimitExceeded',
+            )
+        )
     elif error:
         query = query.where(
             rdb.and_(
                 t.c.error_code is not None,
                 rdb.or_(
                     t.c.error_code != 'ThrottlingException',
-                    t.c.error_code != 'Client.RequestLimitExceeded')))
+                    t.c.error_code != 'Client.RequestLimitExceeded',
+                ),
+            )
+        )
 
     if since:
         query = query.where(
-            rdb.text("short_time > '%s'" % (since.strftime("%Y-%m-%dT%H:%M"))))
+            rdb.text("short_time > '%s'" % (since.strftime("%Y-%m-%dT%H:%M")))
+        )
 
     return query
 
@@ -174,20 +207,21 @@ def index_account(config, region, account, day, incremental):
         username=config['influx']['user'],
         password=config['influx']['password'],
         database=config['influx']['db'],
-        host=config['influx'].get('host'))
+        host=config['influx'].get('host'),
+    )
     s3 = boto3.client('s3')
     bucket = account.get('bucket')
     name = account.get('name')
     key_template = config.get('key_template')
 
-    log.debug("processing account:%s region:%s day:%s",
-              name, region, day.strftime("%Y/%m/%d"))
+    log.debug(
+        "processing account:%s region:%s day:%s", name, region, day.strftime("%Y/%m/%d")
+    )
 
     with tempfile.NamedTemporaryFile(suffix='.db.bz2', delete=False) as fh:
         key_data = dict(account)
         key_data['region'] = region
-        key_data['date_fmt'] = "%s/%s/%s" % (
-            day.year, day.month, day.day)
+        key_data['date_fmt'] = "%s/%s/%s" % (day.year, day.month, day.day)
         key = key_template % key_data
         st = time.time()
 
@@ -195,13 +229,11 @@ def index_account(config, region, account, day, incremental):
             key_info = s3.head_object(Bucket=bucket, Key=key)
         except ClientError as e:
             if e.response['Error']['Code'] == '404':
-                log.warning("account:%s region:%s missing key:%s",
-                            name, region, key)
+                log.warning("account:%s region:%s missing key:%s", name, region, key)
                 os.remove(fh.name)
                 return
             if e.response['Error']['Code'] == '403':
-                msg = "account:%s region:%s forbidden key:%s" % (
-                    name, region, key)
+                msg = "account:%s region:%s forbidden key:%s" % (name, region, key)
                 log.warning(msg)
                 raise ValueError(msg)
             raise
@@ -217,17 +249,30 @@ def index_account(config, region, account, day, incremental):
 
         record_count = process_traildb(
             rdb.create_engine("sqlite:////%s" % fh.name[:-4]),
-            influx, name, region, since)
+            influx,
+            name,
+            region,
+            since,
+        )
         log.debug("indexed %s in %0.2f", fh.name, time.time() - t)
         os.remove(fh.name[:-4])
-        log.debug("account:%s day:%s region:%s records:%d complete:%0.2f",
-                  name, day.strftime("%Y-%m-%d"), region,
-                  record_count,
-                  time.time() - st)
+        log.debug(
+            "account:%s day:%s region:%s records:%d complete:%0.2f",
+            name,
+            day.strftime("%Y-%m-%d"),
+            region,
+            record_count,
+            time.time() - st,
+        )
 
-    return {'time': time.time() - st, 'records': record_count, 'region': region,
-            'account': name, 'day': day.strftime("%Y-%m-%d"),
-            'db-date': key_info['LastModified']}
+    return {
+        'time': time.time() - st,
+        'records': record_count,
+        'region': region,
+        'account': name,
+        'day': day.strftime("%Y-%m-%d"),
+        'db-date': key_info['LastModified'],
+    }
 
 
 def get_date_range(start, end):
@@ -236,8 +281,7 @@ def get_date_range(start, end):
     if end and not isinstance(end, datetime.datetime):
         end = parse_date(end)
 
-    now = datetime.datetime.utcnow().replace(
-        hour=0, minute=0, second=0, microsecond=0)
+    now = datetime.datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0)
     if end and not start:
         raise ValueError("Missing start date")
     elif start and not end:
@@ -261,23 +305,27 @@ def get_incremental_starts(config, default_start):
         username=config['influx']['user'],
         password=config['influx']['password'],
         database=config['influx']['db'],
-        host=config['influx'].get('host'))
+        host=config['influx'].get('host'),
+    )
 
     account_starts = {}
     for account in config.get('accounts'):
         for region in account.get('regions'):
-            res = influx.query("""
+            res = influx.query(
+                """
                 select * from program_event_name
                 where account = '%s'
                   and region = '%s'
-                order by time desc limit 1""" % (
-                account['name'], region))
+                order by time desc limit 1"""
+                % (account['name'], region)
+            )
             if res is None or len(res) == 0:
                 account_starts[(account['name'], region)] = default_start
                 continue
             # its all utc
             account_starts[(account['name'], region)] = parse_date(
-                res.raw['series'][0]['values'][0][0]).replace(tzinfo=None)
+                res.raw['series'][0]['values'][0][0]
+            ).replace(tzinfo=None)
 
     return account_starts
 
@@ -316,8 +364,7 @@ def download(config, account, day, region, output):
 
     key_data = dict(found)
     key_data['region'] = region
-    key_data['date_fmt'] = "%s/%s/%s" % (
-        day.year, day.month, day.day)
+    key_data['date_fmt'] = "%s/%s/%s" % (day.year, day.month, day.day)
     key = config['key_template'] % key_data
 
     s3.download_file(found['bucket'], key, output + '.bz2')
@@ -342,13 +389,17 @@ def status(config):
 @click.option('-c', '--config', required=True, help="Config file")
 @click.option('--start', required=True, help="Start date")
 @click.option('--end', required=False, help="End Date")
-@click.option('--incremental/--no-incremental', default=False,
-              help="Sync from last indexed timestamp")
+@click.option(
+    '--incremental/--no-incremental',
+    default=False,
+    help="Sync from last indexed timestamp",
+)
 @click.option('--concurrency', default=5)
 @click.option('-a', '--accounts', multiple=True)
 @click.option('--verbose/--no-verbose', default=False)
-def index(config, start, end, incremental=False, concurrency=5, accounts=None,
-          verbose=False):
+def index(
+    config, start, end, incremental=False, concurrency=5, accounts=None, verbose=False
+):
     """index traildbs directly from s3 for multiple accounts.
 
     context: assumes a daily traildb file in s3 with key path
@@ -368,14 +419,13 @@ def index(config, start, end, incremental=False, concurrency=5, accounts=None,
         if incremental:
             account_starts = get_incremental_starts(config, start)
         else:
-            account_starts = defaultdict(lambda : start) # NOQA E203
+            account_starts = defaultdict(lambda: start)  # NOQA E203
 
         for account in config.get('accounts'):
             if accounts and account['name'] not in accounts:
                 continue
             for region in account.get('regions'):
-                for d in get_date_range(
-                        account_starts[(account['name'], region)], end):
+                for d in get_date_range(account_starts[(account['name'], region)], end):
                     i = bool(d.hour or d.minute)
                     p = (config, region, account, d, i)
                     futures[w.submit(index_account, *p)] = p
@@ -387,9 +437,12 @@ def index(config, start, end, incremental=False, concurrency=5, accounts=None,
             if result is None:
                 continue
             log.info(
-                ("processed account:%(account)s day:%(day)s region:%(region)s "
-                 "records:%(records)s time:%(time)0.2f db-date:%(db-date)s"
-                 ) % result)
+                (
+                    "processed account:%(account)s day:%(day)s region:%(region)s "
+                    "records:%(records)s time:%(time)0.2f db-date:%(db-date)s"
+                )
+                % result
+            )
 
 
 if __name__ == '__main__':

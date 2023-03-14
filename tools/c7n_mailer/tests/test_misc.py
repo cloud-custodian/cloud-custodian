@@ -15,7 +15,12 @@ from c7n_mailer import deploy
 from c7n_mailer.azure_mailer import azure_queue_processor
 from c7n_mailer.gcp_mailer import gcp_queue_processor
 from c7n.mu import PythonPackageArchive
-from common import MAILER_CONFIG, MAILER_CONFIG_GCP, MAILER_CONFIG_AZURE, SQS_MESSAGE_1_ENCODED
+from common import (
+    MAILER_CONFIG,
+    MAILER_CONFIG_GCP,
+    MAILER_CONFIG_AZURE,
+    SQS_MESSAGE_1_ENCODED,
+)
 
 
 class AWSMailerTests(unittest.TestCase):
@@ -31,7 +36,8 @@ class AWSMailerTests(unittest.TestCase):
         MAILER_CONFIG["https_proxy"] = https_proxy
         config = handle.config_setup(MAILER_CONFIG)
         self.assertEqual(
-            [config.get("http_proxy"), config.get("https_proxy")], [http_proxy, https_proxy]
+            [config.get("http_proxy"), config.get("https_proxy")],
+            [http_proxy, https_proxy],
         )
         # Clear http proxy
         MAILER_CONFIG["http_proxy"] = ""
@@ -45,7 +51,8 @@ class AWSMailerTests(unittest.TestCase):
             MAILER_CONFIG, boto3.Session(), logging.getLogger("c7n_mailer")
         )
         self.assertIs(
-            mailer_sqs_queue_processor.__class__, sqs_queue_processor.MailerSqsQueueProcessor
+            mailer_sqs_queue_processor.__class__,
+            sqs_queue_processor.MailerSqsQueueProcessor,
         )
 
         mailer_sqs_queue_processor.process_sqs_message(SQS_MESSAGE_1_ENCODED)
@@ -55,7 +62,9 @@ class AWSMailerTests(unittest.TestCase):
         processor = azure_queue_processor.MailerAzureQueueProcessor(
             MAILER_CONFIG_AZURE, logging.getLogger("c7n_mailer")
         )
-        self.assertIs(processor.__class__, azure_queue_processor.MailerAzureQueueProcessor)
+        self.assertIs(
+            processor.__class__, azure_queue_processor.MailerAzureQueueProcessor
+        )
 
     def test_gcp_queue_processor(self):
         processor = gcp_queue_processor.MailerGcpQueueProcessor(
@@ -70,7 +79,9 @@ class AWSMailerTests(unittest.TestCase):
         parser = cli.get_c7n_mailer_parser()
         self.assertIs(parser.__class__, argparse.ArgumentParser)
         session = cli.session_factory(MAILER_CONFIG)
-        self.assertEqual([session.region_name, session.profile_name], ["us-east-1", "default"])
+        self.assertEqual(
+            [session.region_name, session.profile_name], ["us-east-1", "default"]
+        )
 
 
 class DeployTests(unittest.TestCase):

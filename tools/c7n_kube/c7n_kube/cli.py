@@ -16,7 +16,8 @@ log = logging.getLogger('custodian.k8s.cli')
 logging.basicConfig(
     # TODO: make this configurable
     level=logging.INFO,
-    format="%(asctime)s: %(name)s:%(levelname)s %(message)s")
+    format="%(asctime)s: %(name)s:%(levelname)s %(message)s",
+)
 
 
 TEMPLATE = {
@@ -27,11 +28,13 @@ TEMPLATE = {
         "labels": {
             "app.kubernetes.io/name": "c7n-kates",
             "app.kubernetes.io/instance": "c7n-kates",
-            "app.kubernetes.io/version": pkg_resources.get_distribution("c7n_kube").version,
+            "app.kubernetes.io/version": pkg_resources.get_distribution(
+                "c7n_kube"
+            ).version,
             "app.kubernetes.io/component": "AdmissionController",
             "app.kubernetes.io/part-of": "c7n_kube",
-            "app.kubernetes.io/managed-by": "c7n"
-        }
+            "app.kubernetes.io/managed-by": "c7n",
+        },
     },
     "webhooks": [
         {
@@ -45,37 +48,43 @@ TEMPLATE = {
                     "resources": [],
                 }
             ],
-            "admissionReviewVersions": [
-                "v1",
-                "v1beta1"
-            ],
-            "clientConfig": {
-                "url": "${ENDPOINT}"
-            },
+            "admissionReviewVersions": ["v1", "v1beta1"],
+            "clientConfig": {"url": "${ENDPOINT}"},
             "sideEffects": "None",
-            "failurePolicy": "Fail"
+            "failurePolicy": "Fail",
         }
-    ]
+    ],
 }
 
 
 def _parser():
     parser = argparse.ArgumentParser(description='Cloud Custodian Admission Controller')
     parser.add_argument('--host', type=str, help='Listen host', default='127.0.0.1')
-    parser.add_argument('--port', type=int, help='Listen port', nargs='?', default='8800')
-    parser.add_argument('--policy-dir', type=str, required=True, help='policy directory')
     parser.add_argument(
-        '--on-exception', type=str.lower, required=False, default='warn',
+        '--port', type=int, help='Listen port', nargs='?', default='8800'
+    )
+    parser.add_argument(
+        '--policy-dir', type=str, required=True, help='policy directory'
+    )
+    parser.add_argument(
+        '--on-exception',
+        type=str.lower,
+        required=False,
+        default='warn',
         choices=['warn', 'deny'],
-        help='warn or deny on policy exceptions')
+        help='warn or deny on policy exceptions',
+    )
     parser.add_argument(
         '--endpoint',
         help='Endpoint for webhook, used for generating manfiest',
         required=True,
     )
     parser.add_argument(
-        '--generate', default=False, action="store_true",
-        help='Generate a k8s manifest for ValidatingWebhookConfiguration')
+        '--generate',
+        default=False,
+        action="store_true",
+        help='Generate a k8s manifest for ValidatingWebhookConfiguration',
+    )
     parser.add_argument('--cert', help='Path to TLS certifciate')
     parser.add_argument('--ca-cert', help='Path to the CA certificate')
     parser.add_argument('--cert-key', help='Path to the certificate\'s private key')
@@ -91,7 +100,8 @@ def cli():
     if args.generate:
         directory_loader = DirectoryLoader(Config.empty())
         policy_collection = directory_loader.load_directory(
-            os.path.abspath(args.policy_dir))
+            os.path.abspath(args.policy_dir)
+        )
         operations = []
         groups = []
         api_versions = []
@@ -113,9 +123,13 @@ def cli():
             api_versions.append(mvals['apiVersions'])
             resources.extend(mvals['resources'])
 
-        TEMPLATE['webhooks'][0]['rules'][0]['operations'] = sorted(list(set(operations)))
+        TEMPLATE['webhooks'][0]['rules'][0]['operations'] = sorted(
+            list(set(operations))
+        )
         TEMPLATE['webhooks'][0]['rules'][0]['apiGroups'] = sorted(list(set(groups)))
-        TEMPLATE['webhooks'][0]['rules'][0]['apiVersions'] = sorted(list(set(api_versions)))
+        TEMPLATE['webhooks'][0]['rules'][0]['apiVersions'] = sorted(
+            list(set(api_versions))
+        )
         TEMPLATE['webhooks'][0]['rules'][0]['resources'] = sorted(list(set(resources)))
 
         if args.endpoint:
@@ -124,7 +138,10 @@ def cli():
         print(yaml.dump(TEMPLATE))
     else:
         init(
-            args.host, args.port, args.policy_dir, args.on_exception,
+            args.host,
+            args.port,
+            args.policy_dir,
+            args.on_exception,
             cert_path=args.cert,
             cert_key_path=args.cert_key,
             ca_cert_path=args.ca_cert,

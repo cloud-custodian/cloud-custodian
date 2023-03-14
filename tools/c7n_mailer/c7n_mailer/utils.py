@@ -27,9 +27,11 @@ class Providers:
 
 def session_factory(mailer_config):
     import boto3
+
     return boto3.Session(
         region_name=mailer_config['region'],
-        profile_name=mailer_config.get('profile', None))
+        profile_name=mailer_config.get('profile', None),
+    )
 
 
 def get_processor(mailer_config, logger):
@@ -42,13 +44,18 @@ def get_processor(mailer_config, logger):
     provider = get_provider(mailer_config)
 
     if provider == Providers.Azure:
-        from c7n_mailer.azure_mailer.azure_queue_processor import MailerAzureQueueProcessor
+        from c7n_mailer.azure_mailer.azure_queue_processor import (
+            MailerAzureQueueProcessor,
+        )
+
         processor = MailerAzureQueueProcessor(mailer_config, logger)
     elif provider == Providers.GCP:
         from c7n_mailer.gcp_mailer.gcp_queue_processor import MailerGcpQueueProcessor
+
         processor = MailerGcpQueueProcessor(mailer_config, logger)
     elif provider == Providers.AWS:
         from c7n_mailer.sqs_queue_processor import MailerSqsQueueProcessor
+
         aws_session = session_factory(mailer_config)
         processor = MailerSqsQueueProcessor(mailer_config, aws_session, logger)
 
@@ -57,7 +64,9 @@ def get_processor(mailer_config, logger):
 
 def get_jinja_env(template_folders):
     env = jinja2.Environment(trim_blocks=True, autoescape=False)  # nosec nosemgrep
-    env.filters['yaml_safe'] = functools.partial(yaml.safe_dump, default_flow_style=False)
+    env.filters['yaml_safe'] = functools.partial(
+        yaml.safe_dump, default_flow_style=False
+    )
     env.filters['date_time_format'] = date_time_format
     env.filters['get_date_time_delta'] = get_date_time_delta
     env.filters['from_json'] = json.loads
@@ -72,8 +81,14 @@ def get_jinja_env(template_folders):
 
 
 def get_rendered_jinja(
-        target, sqs_message, resources, logger,
-        specified_template, default_template, template_folders):
+    target,
+    sqs_message,
+    resources,
+    logger,
+    specified_template,
+    default_template,
+    template_folders,
+):
     env = get_jinja_env(template_folders)
     mail_template = sqs_message['action'].get(specified_template, default_template)
     if not os.path.isabs(mail_template):
@@ -102,7 +117,8 @@ def get_rendered_jinja(
         action=sqs_message['action'],
         policy=sqs_message['policy'],
         execution_start=execution_start,
-        region=sqs_message.get('region', ''))
+        region=sqs_message.get('region', ''),
+    )
     return rendered_jinja
 
 
@@ -133,7 +149,7 @@ def get_message_subject(sqs_message):
         event=sqs_message.get('event', None),
         action=sqs_message['action'],
         policy=sqs_message['policy'],
-        region=sqs_message.get('region', '')
+        region=sqs_message.get('region', ''),
     )
     return subject
 
@@ -185,7 +201,7 @@ def get_resource_tag_value(resource, k):
 
 def strip_prefix(value, prefix):
     if value.startswith(prefix):
-        return value[len(prefix):]
+        return value[len(prefix) :]
     return value
 
 
@@ -200,10 +216,14 @@ def resource_format(resource, resource_type):
             resource['InstanceType'],
             resource.get('LaunchTime'),
             tag_map.get('Name', ''),
-            resource.get('PrivateIpAddress'))
+            resource.get('PrivateIpAddress'),
+        )
     elif resource_type == 'ami':
         return "%s %s %s" % (
-            resource.get('Name'), resource['ImageId'], resource['CreationDate'])
+            resource.get('Name'),
+            resource['ImageId'],
+            resource['CreationDate'],
+        )
     elif resource_type == 'sagemaker-notebook':
         return "%s" % (resource['NotebookInstanceName'])
     elif resource_type == 's3':
@@ -213,26 +233,28 @@ def resource_format(resource, resource_type):
             resource['VolumeId'],
             resource['Size'],
             resource['State'],
-            resource['CreateTime'])
+            resource['CreateTime'],
+        )
     elif resource_type == 'rds':
         return "%s %s %s %s" % (
             resource['DBInstanceIdentifier'],
-            "%s-%s" % (
-                resource['Engine'], resource['EngineVersion']),
+            "%s-%s" % (resource['Engine'], resource['EngineVersion']),
             resource['DBInstanceClass'],
-            resource['AllocatedStorage'])
+            resource['AllocatedStorage'],
+        )
     elif resource_type == 'rds-cluster':
         return "%s %s %s" % (
             resource['DBClusterIdentifier'],
-            "%s-%s" % (
-                resource['Engine'], resource['EngineVersion']),
-            resource['AllocatedStorage'])
+            "%s-%s" % (resource['Engine'], resource['EngineVersion']),
+            resource['AllocatedStorage'],
+        )
     elif resource_type == 'asg':
         tag_map = {t['Key']: t['Value'] for t in resource.get('Tags', ())}
         return "%s %s %s" % (
             resource['AutoScalingGroupName'],
             tag_map.get('Name', ''),
-            "instances: %d" % (len(resource.get('Instances', []))))
+            "instances: %d" % (len(resource.get('Instances', []))),
+        )
     elif resource_type == 'elb':
         tag_map = {t['Key']: t['Value'] for t in resource.get('Tags', ())}
         if 'ProhibitedPolicies' in resource:
@@ -240,27 +262,25 @@ def resource_format(resource, resource_type):
                 resource['LoadBalancerName'],
                 "instances: %d" % len(resource['Instances']),
                 "zones: %d" % len(resource['AvailabilityZones']),
-                "prohibited_policies: %s" % ','.join(
-                    resource['ProhibitedPolicies']))
+                "prohibited_policies: %s" % ','.join(resource['ProhibitedPolicies']),
+            )
         return "%s %s %s" % (
             resource['LoadBalancerName'],
             "instances: %d" % len(resource['Instances']),
-            "zones: %d" % len(resource['AvailabilityZones']))
+            "zones: %d" % len(resource['AvailabilityZones']),
+        )
     elif resource_type == 'redshift':
         return "%s %s %s" % (
             resource['ClusterIdentifier'],
             'nodes:%d' % len(resource['ClusterNodes']),
-            'encrypted:%s' % resource['Encrypted'])
+            'encrypted:%s' % resource['Encrypted'],
+        )
     elif resource_type == 'emr':
-        return "%s status:%s" % (
-            resource['Id'],
-            resource['Status']['State'])
+        return "%s status:%s" % (resource['Id'], resource['Status']['State'])
     elif resource_type == 'cfn':
-        return "%s" % (
-            resource['StackName'])
+        return "%s" % (resource['StackName'])
     elif resource_type == 'launch-config':
-        return "%s" % (
-            resource['LaunchConfigurationName'])
+        return "%s" % (resource['LaunchConfigurationName'])
     elif resource_type == 'security-group':
         name = resource.get('GroupName', '')
         for t in resource.get('Tags', ()):
@@ -271,35 +291,34 @@ def resource_format(resource, resource_type):
             resource['GroupId'],
             resource.get('VpcId', 'na'),
             len(resource.get('IpPermissions', ())),
-            len(resource.get('IpPermissionsEgress', ())))
+            len(resource.get('IpPermissionsEgress', ())),
+        )
     elif resource_type == 'log-group':
         if 'lastWrite' in resource:
             return "name: %s last_write: %s" % (
                 resource['logGroupName'],
-                resource['lastWrite'])
+                resource['lastWrite'],
+            )
         return "name: %s" % (resource['logGroupName'])
     elif resource_type == 'cache-cluster':
         return "name: %s created: %s status: %s" % (
             resource['CacheClusterId'],
             resource['CacheClusterCreateTime'],
-            resource['CacheClusterStatus'])
+            resource['CacheClusterStatus'],
+        )
     elif resource_type == 'cache-snapshot':
         cid = resource.get('CacheClusterId')
         if cid is None:
-            cid = ', '.join([
-                ns['CacheClusterId'] for ns in resource['NodeSnapshots']])
+            cid = ', '.join([ns['CacheClusterId'] for ns in resource['NodeSnapshots']])
         return "name: %s cluster: %s source: %s" % (
             resource['SnapshotName'],
             cid,
-            resource['SnapshotSource'])
+            resource['SnapshotSource'],
+        )
     elif resource_type == 'redshift-snapshot':
-        return "name: %s db: %s" % (
-            resource['SnapshotIdentifier'],
-            resource['DBName'])
+        return "name: %s db: %s" % (resource['SnapshotIdentifier'], resource['DBName'])
     elif resource_type == 'ebs-snapshot':
-        return "name: %s date: %s" % (
-            resource['SnapshotId'],
-            resource['StartTime'])
+        return "name: %s date: %s" % (resource['SnapshotId'], resource['StartTime'])
     elif resource_type == 'subnet':
         return "%s %s %s %s %s %s" % (
             resource['SubnetId'],
@@ -307,92 +326,89 @@ def resource_format(resource, resource_type):
             resource['AvailabilityZone'],
             resource['State'],
             resource['CidrBlock'],
-            resource['AvailableIpAddressCount'])
+            resource['AvailableIpAddressCount'],
+        )
     elif resource_type == 'account':
-        return " %s %s" % (
-            resource['account_id'],
-            resource['account_name'])
+        return " %s %s" % (resource['account_id'], resource['account_name'])
     elif resource_type == 'cloudtrail':
-        return "%s" % (
-            resource['Name'])
+        return "%s" % (resource['Name'])
     elif resource_type == 'vpc':
-        return "%s " % (
-            resource['VpcId'])
+        return "%s " % (resource['VpcId'])
     elif resource_type == 'iam-group':
         return " %s %s %s" % (
             resource['GroupName'],
             resource['Arn'],
-            resource['CreateDate'])
+            resource['CreateDate'],
+        )
     elif resource_type == 'rds-snapshot':
         return " %s %s %s" % (
             resource['DBSnapshotIdentifier'],
             resource['DBInstanceIdentifier'],
-            resource['SnapshotCreateTime'])
+            resource['SnapshotCreateTime'],
+        )
     elif resource_type == 'iam-user':
-        return " %s " % (
-            resource['UserName'])
+        return " %s " % (resource['UserName'])
     elif resource_type == 'iam-role':
-        return " %s %s " % (
-            resource['RoleName'],
-            resource['CreateDate'])
+        return " %s %s " % (resource['RoleName'], resource['CreateDate'])
     elif resource_type == 'iam-policy':
-        return " %s " % (
-            resource['PolicyName'])
+        return " %s " % (resource['PolicyName'])
     elif resource_type == 'iam-profile':
-        return " %s " % (
-            resource['InstanceProfileId'])
+        return " %s " % (resource['InstanceProfileId'])
     elif resource_type == 'dynamodb-table':
         return "name: %s created: %s status: %s" % (
             resource['TableName'],
             resource['CreationDateTime'],
-            resource['TableStatus'])
+            resource['TableStatus'],
+        )
     elif resource_type == "sqs":
         return "QueueURL: %s QueueArn: %s " % (
             resource['QueueUrl'],
-            resource['QueueArn'])
+            resource['QueueArn'],
+        )
     elif resource_type == "efs":
         return "name: %s  id: %s  state: %s" % (
             resource.get('Name', ''),
             resource['FileSystemId'],
-            resource['LifeCycleState']
+            resource['LifeCycleState'],
         )
     elif resource_type == "network-addr":
         return "ip: %s  id: %s  scope: %s" % (
             resource['PublicIp'],
             resource['AllocationId'],
-            resource['Domain']
+            resource['Domain'],
         )
     elif resource_type == "route-table":
-        return "id: %s  vpc: %s" % (
-            resource['RouteTableId'],
-            resource['VpcId']
-        )
+        return "id: %s  vpc: %s" % (resource['RouteTableId'], resource['VpcId'])
     elif resource_type == "app-elb":
         return "arn: %s  zones: %s  scheme: %s" % (
             resource['LoadBalancerArn'],
             len(resource['AvailabilityZones']),
-            resource['Scheme'])
+            resource['Scheme'],
+        )
     elif resource_type == "nat-gateway":
         return "id: %s  state: %s  vpc: %s" % (
             resource['NatGatewayId'],
             resource['State'],
-            resource['VpcId'])
+            resource['VpcId'],
+        )
     elif resource_type == "internet-gateway":
         return "id: %s  attachments: %s" % (
             resource['InternetGatewayId'],
-            len(resource['Attachments']))
+            len(resource['Attachments']),
+        )
     elif resource_type == 'lambda':
         return "Name: %s  Package Type: %s  Runtime: %s  \n" % (
             resource['FunctionName'],
             resource['PackageType'],
-            resource.get('Runtime', 'N/A'))
+            resource.get('Runtime', 'N/A'),
+        )
     elif resource_type == 'service-quota':
         try:
             return "ServiceName: %s QuotaName: %s Quota: %i Usage: %i\n" % (
                 resource['ServiceName'],
                 resource['QuotaName'],
                 resource['c7n:UsageMetric']['quota'],
-                resource['c7n:UsageMetric']['metric']
+                resource['c7n:UsageMetric']['metric'],
             )
         except KeyError:
             return "ServiceName: %s QuotaName: %s\n" % (
@@ -416,18 +432,20 @@ def kms_decrypt(config, logger, session, encrypted_field):
         try:
             kms = session.client('kms')
             return kms.decrypt(
-                CiphertextBlob=base64.b64decode(config[encrypted_field]))[
-                    'Plaintext'].decode('utf8')
+                CiphertextBlob=base64.b64decode(config[encrypted_field])
+            )['Plaintext'].decode('utf8')
         except (TypeError, base64.binascii.Error) as e:
             logger.warning(
-                "Error: %s Unable to base64 decode %s, will assume plaintext." %
-                (e, encrypted_field))
+                "Error: %s Unable to base64 decode %s, will assume plaintext."
+                % (e, encrypted_field)
+            )
         except ClientError as e:
             if e.response['Error']['Code'] != 'InvalidCiphertextException':
                 raise
             logger.warning(
-                "Error: %s Unable to decrypt %s with kms, will assume plaintext." %
-                (e, encrypted_field))
+                "Error: %s Unable to decrypt %s with kms, will assume plaintext."
+                % (e, encrypted_field)
+            )
         return config[encrypted_field]
     else:
         logger.debug("No encrypted value to decrypt.")
@@ -439,9 +457,11 @@ def decrypt(config, logger, session, encrypted_field):
         provider = get_provider(config)
         if provider == Providers.Azure:
             from c7n_mailer.azure_mailer.utils import azure_decrypt
+
             return azure_decrypt(config, logger, session, encrypted_field)
         elif provider == Providers.GCP:
             from c7n_mailer.gcp_mailer.utils import gcp_decrypt
+
             return gcp_decrypt(config, logger, encrypted_field)
         elif provider == Providers.AWS:
             return kms_decrypt(config, logger, session, encrypted_field)
@@ -458,15 +478,18 @@ def get_aws_username_from_event(logger, event):
         return None
     identity = event.get('detail', {}).get('userIdentity', {})
     if not identity:
-        logger.warning("Could not get recipient from event \n %s" % (
-            format_struct(event)))
+        logger.warning(
+            "Could not get recipient from event \n %s" % (format_struct(event))
+        )
         return None
     if identity['type'] == 'AssumedRole':
         logger.debug(
             'In some cases there is no ldap uid is associated with AssumedRole: %s',
-            identity['arn'])
+            identity['arn'],
+        )
         logger.debug(
-            'We will try to assume that identity is in the AssumedRoleSessionName')
+            'We will try to assume that identity is in the AssumedRoleSessionName'
+        )
         user = identity['arn'].rsplit('/', 1)[-1]
         if user is None or user.startswith('i-') or user.startswith('awslambda'):
             return None
@@ -488,4 +511,3 @@ def get_aws_username_from_event(logger, event):
 
 def unique(seq):
     return list({k: None for k in seq})
-   

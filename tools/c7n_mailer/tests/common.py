@@ -49,7 +49,7 @@ MAILER_CONFIG = {
     "templates_folders": [
         os.path.abspath(os.path.dirname(__file__)),
         os.path.abspath("/"),
-        ""
+        "",
     ],
 }
 MAILER_CONFIG_AZURE = {
@@ -60,7 +60,7 @@ MAILER_CONFIG_AZURE = {
         os.path.abspath(os.path.dirname(__file__)),
         os.path.abspath("/"),
         os.path.abspath(os.path.join(os.path.dirname(__file__), "test-templates")),
-        ""
+        "",
     ],
 }
 
@@ -75,7 +75,7 @@ MAILER_CONFIG_GCP = {
     "templates_folders": [
         os.path.abspath(os.path.dirname(__file__)),
         os.path.abspath("/"),
-        ""
+        "",
     ],
 }
 
@@ -157,26 +157,28 @@ SQS_MESSAGE_1 = {
 }
 
 SQS_MESSAGE_1_ENCODED = {
-    "Body": base64.b64encode(
-        zlib.compress(json.dumps(SQS_MESSAGE_1).encode("utf8"))
-    ),
+    "Body": base64.b64encode(zlib.compress(json.dumps(SQS_MESSAGE_1).encode("utf8"))),
     "MessageId": "1",
-    "Attributes": {
-        "SentTimestamp": "2023-01-01T12:00:00"
-    }
+    "Attributes": {"SentTimestamp": "2023-01-01T12:00:00"},
 }
 
 SQS_MESSAGE_2 = {
     "account": "core-services-dev",
     "account_id": "000000000000",
     "region": "us-east-1",
-    "action": {"type": "notify", "to": ["datadog://?metric_name=EBS_volume.available.size"]},
+    "action": {
+        "type": "notify",
+        "to": ["datadog://?metric_name=EBS_volume.available.size"],
+    },
     "policy": {
         "filters": [{"Attachments": []}, {"tag:maid_status": "absent"}],
         "resource": "ebs",
         "actions": [
             {"type": "mark-for-op", "days": 15, "op": "delete"},
-            {"type": "notify", "to": ["datadog://?metric_name=EBS_volume.available.size"]},
+            {
+                "type": "notify",
+                "to": ["datadog://?metric_name=EBS_volume.available.size"],
+            },
         ],
         "comments": "We are deleting your EBS volumes.",
         "name": "ebs-mark-unattached-deletion",
@@ -191,7 +193,9 @@ SQS_MESSAGE_3 = {
     "region": "us-east-1",
     "action": {
         "type": "notify",
-        "to": ["datadog://?metric_name=EBS_volume.available.size&metric_value_tag=Size"],
+        "to": [
+            "datadog://?metric_name=EBS_volume.available.size&metric_value_tag=Size"
+        ],
     },
     "policy": {
         "filters": [{"Attachments": []}, {"tag:maid_status": "absent"}],
@@ -200,7 +204,9 @@ SQS_MESSAGE_3 = {
             {"type": "mark-for-op", "days": 15, "op": "delete"},
             {
                 "type": "notify",
-                "to": ["datadog://?metric_name=EBS_volume.available.size&metric_value_tag=Size"],
+                "to": [
+                    "datadog://?metric_name=EBS_volume.available.size&metric_value_tag=Size"
+                ],
             },
         ],
         "comments": "We are deleting your EBS volumes.",
@@ -632,7 +638,10 @@ GCP_SMTP_MESSAGE = {
                 "template": "default",
                 "to": ["resource-owner", "ldap_uid_tags"],
                 "email_ldap_username_manager": True,
-                "transport": {"topic": "projects/c7n-dev/topics/c7n_notify", "type": "pubsub"},
+                "transport": {
+                    "topic": "projects/c7n-dev/topics/c7n_notify",
+                    "type": "pubsub",
+                },
                 "type": "notify",
             }
         ],
@@ -641,7 +650,9 @@ GCP_SMTP_MESSAGE = {
         "resource": "gcp.pubsub-topic",
     },
     "region": "all",
-    "resources": [{"c7n:MatchedFilters": ["name"], "name": "projects/c7n-dev/topics/c7n_notify"}],
+    "resources": [
+        {"c7n:MatchedFilters": ["name"], "name": "projects/c7n-dev/topics/c7n_notify"}
+    ],
 }
 
 PUBSUB_MESSAGE_DATADOG = """{
@@ -733,7 +744,6 @@ def get_ldap_lookup(cache_engine=None, uid_regex=None):
 
 
 class MockLdapLookup(LdapLookup):
-
     # allows us to instantiate this object and not need a redis daemon
     def get_redis_connection(self, redis_host, redis_port):
         return MockRedisLookup()

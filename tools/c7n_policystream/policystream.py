@@ -33,6 +33,7 @@ import boto3
 
 try:
     import sqlalchemy as rdb
+
     HAVE_SQLA = True
 except ImportError:
     HAVE_SQLA = False
@@ -43,7 +44,6 @@ EMPTY_TREE = '4b825dc642cb6eb9a060e54bf8d69288fbee4904'
 
 
 class TempDir:
-
     def __init__(self):
         self.path = None
 
@@ -58,7 +58,6 @@ class TempDir:
 
 
 class ChangeType:
-
     ADD = 1
     REMOVE = 2
     MODIFIED = 3
@@ -68,15 +67,10 @@ class ChangeType:
 SORT_TYPE = {
     'topo': pygit2.GIT_SORT_TOPOLOGICAL,
     'time': pygit2.GIT_SORT_TIME,
-    'reverse': pygit2.GIT_SORT_REVERSE
+    'reverse': pygit2.GIT_SORT_REVERSE,
 }
 
-CHANGE_TYPE = {
-    1: 'ADD',
-    2: 'REMOVE',
-    3: 'MODIFIED',
-    4: 'MOVED'
-}
+CHANGE_TYPE = {1: 'ADD', 2: 'REMOVE', 3: 'MODIFIED', 4: 'MOVED'}
 
 GIT_DELTA = {
     0: 'GIT_DELTA_UNMODIFIED',
@@ -88,14 +82,14 @@ GIT_DELTA = {
     6: 'GIT_DELTA_IGNORED',
     7: 'GIT_DELTA_UNTRACKED',
     8: 'GIT_DELTA_TYPECHANGE',
-    9: 'GIT_DELTA_UNREADABLE'}
+    9: 'GIT_DELTA_UNREADABLE',
+}
 
 GIT_DELTA_INVERT = {v: k for k, v in GIT_DELTA.items()}
 
 
 class PolicyChange:
-    """References a policy change within a given commit.
-    """
+    """References a policy change within a given commit."""
 
     def __init__(self, policy, repo_uri, commit, change, previous=None):
         self.policy = policy
@@ -113,7 +107,6 @@ class PolicyChange:
         return commit_date(self.commit)
 
     def __repr__(self):
-
         return "<policy-{} policy:{} provider:{} resource:{} date:{} author:{} commit:{}>".format(
             CHANGE_TYPE[self.kind].lower(),
             self.policy.name,
@@ -121,7 +114,8 @@ class PolicyChange:
             self.policy.resource_type,
             self.date.isoformat(),
             self.commit.author.name,
-            str(self.commit.id)[:6])
+            str(self.commit.id)[:6],
+        )
 
     def data(self, indent=2):
         d = {
@@ -137,12 +131,13 @@ class PolicyChange:
                 'author': str(self.commit.author.name),
                 'email': str(self.commit.author.email),
                 'date': self.date.isoformat(),
-            }
+            },
         }
         if self.previous:
             d['previous'] = {
                 'data': dict(self.previous.data),
-                'file': self.previous.file_path}
+                'file': self.previous.file_path,
+            }
         return d
 
 
@@ -165,7 +160,9 @@ class CollectionDelta:
         added = set(self.curr.keys()) - set(self.prev.keys())
 
         for r in removed:
-            yield PolicyChange(self.prev[r], self.repo_uri, self.commit, ChangeType.REMOVE)
+            yield PolicyChange(
+                self.prev[r], self.repo_uri, self.commit, ChangeType.REMOVE
+            )
 
         for a in added:
             yield PolicyChange(self.curr[a], self.repo_uri, self.commit, ChangeType.ADD)
@@ -173,16 +170,25 @@ class CollectionDelta:
         for extant in set(self.curr.keys()).intersection(set(self.prev.keys())):
             if self.curr[extant].data != self.prev[extant].data:
                 yield PolicyChange(
-                    self.curr[extant], self.repo_uri, self.commit,
-                    ChangeType.MODIFIED, self.prev[extant])
+                    self.curr[extant],
+                    self.repo_uri,
+                    self.commit,
+                    ChangeType.MODIFIED,
+                    self.prev[extant],
+                )
             elif self.curr[extant].file_path != self.prev[extant].file_path:
                 yield PolicyChange(
-                    self.curr[extant], self.repo_uri, self.commit,
-                    ChangeType.MOVED, self.prev[extant])
+                    self.curr[extant],
+                    self.repo_uri,
+                    self.commit,
+                    ChangeType.MOVED,
+                    self.prev[extant],
+                )
 
 
 class Policy(BasePolicy):
     """Policy that tracks its file origin."""
+
     def __init__(self, data, options, file_path):
         self.file_path = file_path
         self.data = data
@@ -208,7 +214,8 @@ class PolicyCollection(BaseCollection):
     def select(self, names):
         """return the named subset of policies"""
         return PolicyCollection(
-            [p for p in self.policies if p.name in names], self.options)
+            [p for p in self.policies if p.name in names], self.options
+        )
 
     def add(self, p):
         assert p.name not in self.pmap
@@ -233,8 +240,8 @@ class PolicyCollection(BaseCollection):
     @classmethod
     def from_data(cls, data, options, file_path):
         policies = [
-            cls.policy_class(p, options, file_path)
-            for p in data.get('policies', ())]
+            cls.policy_class(p, options, file_path) for p in data.get('policies', ())
+        ]
         return cls(policies, options)
 
 
@@ -251,8 +258,8 @@ def policy_path_matcher(path, patterns=('*.yaml', '*.yml')):
 
 
 class PolicyRepo:
-    """Models a git repository containing policy files.
-    """
+    """Models a git repository containing policy files."""
+
     def __init__(self, repo_uri, repo, matcher=None):
         self.repo_uri = repo_uri
         self.repo = repo
@@ -268,7 +275,9 @@ class PolicyRepo:
                 continue
             self.policy_files[fpath] = PolicyCollection.from_data(
                 yaml.safe_load(self.repo.get(tree[fpath].id).data),
-                Config.empty(), fpath)
+                Config.empty(),
+                fpath,
+            )
 
     def _get_policy_fents(self, tree):
         # get policy file entries from a tree recursively
@@ -278,9 +287,7 @@ class PolicyRepo:
             t, prefix = q.popleft()
             for fent in t:
                 if fent.type == pygit2.GIT_OBJ_TREE:
-                    q.append((
-                        self.repo.get(fent.id),
-                        os.path.join(prefix, fent.name)))
+                    q.append((self.repo.get(fent.id), os.path.join(prefix, fent.name)))
                 elif self.matcher(fent.name):
                     results[os.path.join(prefix, fent.name)] = fent
         return results
@@ -312,13 +319,18 @@ class PolicyRepo:
             baseline_policies += self._policy_file_rev(f, baseline)
 
         return CollectionDelta(
-            baseline_policies, target_policies, target, self.repo_uri).delta()
+            baseline_policies, target_policies, target, self.repo_uri
+        ).delta()
 
-    def delta_stream(self, target='HEAD', limit=None,
-                     sort=pygit2.GIT_SORT_TIME | pygit2.GIT_SORT_REVERSE,
-                     after=None, before=None):
-        """Return an iterator of policy changes along a commit lineage in a repo.
-        """
+    def delta_stream(
+        self,
+        target='HEAD',
+        limit=None,
+        sort=pygit2.GIT_SORT_TIME | pygit2.GIT_SORT_REVERSE,
+        after=None,
+        before=None,
+    ):
+        """Return an iterator of policy changes along a commit lineage in a repo."""
         if target == 'HEAD':
             target = self.repo.head.target
 
@@ -327,8 +339,11 @@ class PolicyRepo:
             cdate = commit_date(commit)
             log.debug(
                 "processing commit id:%s date:%s parents:%d msg:%s",
-                str(commit.id)[:6], cdate.isoformat(),
-                len(commit.parents), commit.message)
+                str(commit.id)[:6],
+                cdate.isoformat(),
+                len(commit.parents),
+                commit.message,
+            )
             if after and cdate > after:
                 continue
             if before and cdate < before:
@@ -350,12 +365,19 @@ class PolicyRepo:
             return self._validate_policies(
                 PolicyCollection.from_data(
                     yaml.safe_load(self.repo.get(commit.tree[f].id).data),
-                    Config.empty(), f))
+                    Config.empty(),
+                    f,
+                )
+            )
         except Exception as e:
             log.warning(
                 "invalid policy file %s @ %s %s %s \n error:%s",
-                f, str(commit.id)[:6], commit_date(commit).isoformat(),
-                commit.author.name, e)
+                f,
+                str(commit.id)[:6],
+                commit_date(commit).isoformat(),
+                commit.author.name,
+                e,
+            )
             return PolicyCollection()
 
     def _validate_policies(self, policies):
@@ -377,11 +399,14 @@ class PolicyRepo:
 
         log.debug(
             "processing commit id:%s date:%s parents:%d add:%d del:%d files:%d change:%s",
-            str(change.id)[:6], commit_date(change).isoformat(), len(change.parents),
+            str(change.id)[:6],
+            commit_date(change).isoformat(),
+            len(change.parents),
             change_diff.stats.insertions,
             change_diff.stats.deletions,
             change_diff.stats.files_changed,
-            change.message.strip())
+            change.message.strip(),
+        )
 
         change_policies = PolicyCollection()
         current_policies = PolicyCollection()
@@ -410,11 +435,17 @@ class PolicyRepo:
             else:
                 log.info(
                     "unhandled delta type:%s path:%s commit_id:%s",
-                    GIT_DELTA[delta.status], delta.new_file.path, change.id)
+                    GIT_DELTA[delta.status],
+                    delta.new_file.path,
+                    change.id,
+                )
                 continue
 
-        for change in self._process_stream_delta(CollectionDelta(
-                current_policies, change_policies, change, self.repo_uri).delta()):
+        for change in self._process_stream_delta(
+            CollectionDelta(
+                current_policies, change_policies, change, self.repo_uri
+            ).delta()
+        ):
             yield change
 
         for r in removed:
@@ -424,21 +455,31 @@ class PolicyRepo:
         """Bookkeeping on internal data structures while iterating a stream."""
         for pchange in delta_stream:
             if pchange.kind == ChangeType.ADD:
-                self.policy_files.setdefault(
-                    pchange.file_path, PolicyCollection()).add(pchange.policy)
+                self.policy_files.setdefault(pchange.file_path, PolicyCollection()).add(
+                    pchange.policy
+                )
             elif pchange.kind == ChangeType.REMOVE:
                 self.policy_files[pchange.file_path].remove(pchange.policy)
             elif pchange.kind in (ChangeType.MOVED, ChangeType.MODIFIED):
                 if pchange.policy.file_path != pchange.previous.file_path:
-                    self.policy_files[pchange.previous.file_path].remove(pchange.previous)
-                    if (pchange.policy.file_path in self.policy_files and
-                            pchange.policy.name in self.policy_files[pchange.file_path]):
-                        self.policy_files[pchange.file_path][pchange.policy.name] = pchange.policy
+                    self.policy_files[pchange.previous.file_path].remove(
+                        pchange.previous
+                    )
+                    if (
+                        pchange.policy.file_path in self.policy_files
+                        and pchange.policy.name in self.policy_files[pchange.file_path]
+                    ):
+                        self.policy_files[pchange.file_path][
+                            pchange.policy.name
+                        ] = pchange.policy
                     else:
                         self.policy_files.setdefault(
-                            pchange.file_path, PolicyCollection()).add(pchange.policy)
+                            pchange.file_path, PolicyCollection()
+                        ).add(pchange.policy)
                 else:
-                    self.policy_files[pchange.file_path][pchange.policy.name] = pchange.policy
+                    self.policy_files[pchange.file_path][
+                        pchange.policy.name
+                    ] = pchange.policy
             yield pchange
 
 
@@ -452,7 +493,7 @@ def parse_arn(arn):
         'region': elements[3],
         'account': elements[4],
         'resource': elements[5],
-        'resource_type': None
+        'resource_type': None,
     }
     if '/' in result['resource']:
         result['resource_type'], result['resource'] = result['resource'].split('/', 1)
@@ -462,7 +503,6 @@ def parse_arn(arn):
 
 
 class Transport:
-
     BUF_SIZE = 1
 
     def __init__(self, session, info):
@@ -488,7 +528,6 @@ class Transport:
 
 
 class KinesisTransport(Transport):
-
     BUF_SIZE = 50
 
     retry = staticmethod(get_retry(('ProvisionedThroughputExceededException',)))
@@ -502,9 +541,9 @@ class KinesisTransport(Transport):
             self.client.put_records,
             StreamName=self.info['resource'],
             Records=[
-                {'Data': json.dumps(c.data()),
-                 'PartitionKey': c.repo_uri}
-                for c in buf])
+                {'Data': json.dumps(c.data()), 'PartitionKey': c.repo_uri} for c in buf
+            ],
+        )
 
 
 class IndexedTransport(Transport):
@@ -515,14 +554,14 @@ class IndexedTransport(Transport):
 
 
 class SQLTransport(IndexedTransport):
-
     BUF_SIZE = 200
 
     def __init__(self, session, info):
         super(SQLTransport, self).__init__(session, info)
         self.metadata = rdb.MetaData()
         self.table = rdb.Table(
-            'policy_changes', self.metadata,
+            'policy_changes',
+            self.metadata,
             rdb.Column('commit_id', rdb.String(32), primary_key=True),
             rdb.Column('policy_name', rdb.String(256), primary_key=True),
             rdb.Column('resource_type', rdb.String(32)),
@@ -533,7 +572,7 @@ class SQLTransport(IndexedTransport):
             rdb.Column('repo_uri', rdb.String(384)),
             rdb.Column('repo_file', rdb.String(1024)),
             rdb.Column('commit_msg', rdb.String(4096)),
-            rdb.Column('policy', rdb.Text())
+            rdb.Column('policy', rdb.Text()),
         )
         self.engine = rdb.create_engine(info['db_uri'])
         self.metadata.bind = self.engine
@@ -544,23 +583,28 @@ class SQLTransport(IndexedTransport):
         with self.conn.begin():
             self.conn.execute(
                 self.table.insert(),
-                [dict(
-                    commit_id=str(c.commit.id),
-                    policy_name=c.policy.name,
-                    resource_type=c.policy.resource_type,
-                    change_type=c.kind,
-                    commit_date=c.date,
-                    committer_name=c.commit.committer.name,
-                    committer_email=c.commit.committer.email,
-                    repo_uri=c.repo_uri,
-                    repo_file=c.file_path,
-                    commit_msg=c.commit.message,
-                    policy=json.dumps(c.policy.data))
-                 for c in buf])
+                [
+                    dict(
+                        commit_id=str(c.commit.id),
+                        policy_name=c.policy.name,
+                        resource_type=c.policy.resource_type,
+                        change_type=c.kind,
+                        commit_date=c.date,
+                        committer_name=c.commit.committer.name,
+                        committer_email=c.commit.committer.email,
+                        repo_uri=c.repo_uri,
+                        repo_file=c.file_path,
+                        commit_msg=c.commit.message,
+                        policy=json.dumps(c.policy.data),
+                    )
+                    for c in buf
+                ],
+            )
 
     def last(self):
         value = self.conn.execute(
-            'select max(commit_date) from policy_changes').fetchone()[0]
+            'select max(commit_date) from policy_changes'
+        ).fetchone()[0]
         if not value:
             return None
         if isinstance(value, str):
@@ -574,7 +618,6 @@ class SQLTransport(IndexedTransport):
 
 
 class SQSTransport(Transport):
-
     BUF_SIZE = 10
 
     def __init__(self, session, info):
@@ -584,16 +627,20 @@ class SQSTransport(Transport):
     def _flush(self, buf):
         self.client.send_message_batch(
             QueueUrl=self.info['resource'],
-            Entries=[{
-                'Id': str(change.commit.id) + change.policy.name,
-                'MessageDeduplicationId': str(change.commit.id) + change.policy.name,
-                'MessageGroupId': change.repo_uri,
-                'MessageBody': json.dumps(change.data())}
-                for change in buf])
+            Entries=[
+                {
+                    'Id': str(change.commit.id) + change.policy.name,
+                    'MessageDeduplicationId': str(change.commit.id)
+                    + change.policy.name,
+                    'MessageGroupId': change.repo_uri,
+                    'MessageBody': json.dumps(change.data()),
+                }
+                for change in buf
+            ],
+        )
 
 
 class OutputTransport(Transport):
-
     def send(self, change):
         if self.info.get('format', '') == 'jsonline':
             print(json.dumps(change.data(), indent=None))
@@ -606,9 +653,11 @@ def transport(stream_uri, assume):
         return OutputTransport(None, {})
     elif stream_uri == 'jsonline':
         return OutputTransport(None, {'format': 'jsonline'})
-    if (stream_uri.startswith('sqlite') or
-            stream_uri.startswith('postgresql') or
-            stream_uri.startswith('mysql')):
+    if (
+        stream_uri.startswith('sqlite')
+        or stream_uri.startswith('postgresql')
+        or stream_uri.startswith('mysql')
+    ):
         if not HAVE_SQLA:
             raise ValueError("missing dependency sqlalchemy")
         return SQLTransport(None, {'db_uri': stream_uri})
@@ -661,51 +710,69 @@ def github_repos(organization, github_url, github_token):
     next_cursor = None
 
     while next_cursor is not False:
-        params = {'query': query, 'variables': {
-            'organization': organization, 'cursor': next_cursor}}
+        params = {
+            'query': query,
+            'variables': {'organization': organization, 'cursor': next_cursor},
+        }
         response = requests.post(github_url, headers=headers, json=params, timeout=60)
         result = response.json()
         if response.status_code != 200 or 'errors' in result:
-            raise ValueError("Github api error %s" % (
-                response.content.decode('utf8'),))
+            raise ValueError("Github api error %s" % (response.content.decode('utf8'),))
 
-        repos = jmespath.search(
-            'data.organization.repositories.edges[].node', result)
+        repos = jmespath.search('data.organization.repositories.edges[].node', result)
         for r in repos:
             yield r
-        page_info = jmespath.search(
-            'data.organization.repositories.pageInfo', result)
+        page_info = jmespath.search('data.organization.repositories.pageInfo', result)
         if page_info:
-            next_cursor = (page_info['hasNextPage'] and
-                           page_info['endCursor'] or False)
+            next_cursor = page_info['hasNextPage'] and page_info['endCursor'] or False
         else:
             next_cursor = False
 
 
 @cli.command(name='org-stream')
-@click.option('--organization', envvar="GITHUB_ORG",
-              required=True, help="Github Organization")
-@click.option('--github-url', envvar="GITHUB_API_URL",
-              default='https://api.github.com/graphql')
-@click.option('--github-token', envvar='GITHUB_TOKEN',
-              help="Github credential token")
+@click.option(
+    '--organization', envvar="GITHUB_ORG", required=True, help="Github Organization"
+)
+@click.option(
+    '--github-url', envvar="GITHUB_API_URL", default='https://api.github.com/graphql'
+)
+@click.option('--github-token', envvar='GITHUB_TOKEN', help="Github credential token")
 @click.option('-v', '--verbose', default=False, help="Verbose", is_flag=True)
 @click.option('-d', '--clone-dir', help="Local directory to checkout repos to")
-@click.option('-f', '--filter', multiple=True, help="glob for repositories within org to include")
-@click.option('-e', '--exclude', multiple=True, help="glob for repository within org to exclude")
-@click.option('-s', '--stream-uri', default="stdout",
-              help=("Destination stream for logical changes "
-                    "(default stdout supports jsonline/kinesis/sqs/sqlalchemy)"))
-@click.option('--assume', '--assume',
-              help="Assume role for cloud stream destinations")
+@click.option(
+    '-f', '--filter', multiple=True, help="glob for repositories within org to include"
+)
+@click.option(
+    '-e', '--exclude', multiple=True, help="glob for repository within org to exclude"
+)
+@click.option(
+    '-s',
+    '--stream-uri',
+    default="stdout",
+    help=(
+        "Destination stream for logical changes "
+        "(default stdout supports jsonline/kinesis/sqs/sqlalchemy)"
+    ),
+)
+@click.option('--assume', '--assume', help="Assume role for cloud stream destinations")
 @click.pass_context
-def org_stream(ctx, organization, github_url, github_token, clone_dir,
-               verbose, filter, exclude, stream_uri, assume):
-    """Stream changes for repos in a GitHub organization.
-    """
+def org_stream(
+    ctx,
+    organization,
+    github_url,
+    github_token,
+    clone_dir,
+    verbose,
+    filter,
+    exclude,
+    stream_uri,
+    assume,
+):
+    """Stream changes for repos in a GitHub organization."""
     logging.basicConfig(
         format="%(asctime)s: %(name)s:%(levelname)s %(message)s",
-        level=(verbose and logging.DEBUG or logging.INFO))
+        level=(verbose and logging.DEBUG or logging.INFO),
+    )
 
     log.info("Checkout/Update org repos")
     repos = ctx.invoke(
@@ -716,40 +783,40 @@ def org_stream(ctx, organization, github_url, github_token, clone_dir,
         clone_dir=clone_dir,
         verbose=verbose,
         filter=filter,
-        exclude=exclude)
+        exclude=exclude,
+    )
 
     log.info('Streaming org changes')
     change_count = 0
     for r in repos:
         change_count += ctx.invoke(
-            stream,
-            repo_uri=r,
-            stream_uri=stream_uri,
-            verbose=verbose,
-            assume=assume)
+            stream, repo_uri=r, stream_uri=stream_uri, verbose=verbose, assume=assume
+        )
     log.info("Streamed %d org changes", change_count)
 
 
 @cli.command(name='org-checkout')
-@click.option('--organization', envvar="GITHUB_ORG",
-              required=True, help="Github Organization")
-@click.option('--github-url', envvar="GITHUB_API_URL",
-              default='https://api.github.com/graphql')
-@click.option('--github-token', envvar='GITHUB_TOKEN',
-              help="Github credential token")
+@click.option(
+    '--organization', envvar="GITHUB_ORG", required=True, help="Github Organization"
+)
+@click.option(
+    '--github-url', envvar="GITHUB_API_URL", default='https://api.github.com/graphql'
+)
+@click.option('--github-token', envvar='GITHUB_TOKEN', help="Github credential token")
 @click.option('-v', '--verbose', default=False, help="Verbose", is_flag=True)
 @click.option('-d', '--clone-dir')
 @click.option('-f', '--filter', multiple=True)
 @click.option('-e', '--exclude', multiple=True)
-def org_checkout(organization, github_url, github_token, clone_dir,
-                 verbose, filter, exclude):
+def org_checkout(
+    organization, github_url, github_token, clone_dir, verbose, filter, exclude
+):
     """Checkout repositories from a GitHub organization."""
     logging.basicConfig(
         format="%(asctime)s: %(name)s:%(levelname)s %(message)s",
-        level=(verbose and logging.DEBUG or logging.INFO))
+        level=(verbose and logging.DEBUG or logging.INFO),
+    )
 
-    callbacks = pygit2.RemoteCallbacks(
-        pygit2.UserPass(github_token, 'x-oauth-basic'))
+    callbacks = pygit2.RemoteCallbacks(pygit2.UserPass(github_token, 'x-oauth-basic'))
 
     repos = []
     for r in github_repos(organization, github_url, github_token):
@@ -775,8 +842,7 @@ def org_checkout(organization, github_url, github_token, clone_dir,
         repos.append(repo_path)
         if not os.path.exists(repo_path):
             log.debug("Cloning repo: %s/%s" % (organization, r['name']))
-            repo = pygit2.clone_repository(
-                r['url'], repo_path, callbacks=callbacks)
+            repo = pygit2.clone_repository(r['url'], repo_path, callbacks=callbacks)
         else:
             repo = pygit2.Repository(repo_path)
             if repo.status():
@@ -841,7 +907,8 @@ def diff(repo_uri, source, target, output, verbose):
     """
     logging.basicConfig(
         format="%(asctime)s: %(name)s:%(levelname)s %(message)s",
-        level=(verbose and logging.DEBUG or logging.INFO))
+        level=(verbose and logging.DEBUG or logging.INFO),
+    )
     logging.getLogger('botocore').setLevel(logging.WARNING)
 
     if repo_uri is None:
@@ -863,30 +930,60 @@ def diff(repo_uri, source, target, output, verbose):
         source = 'master'
 
     policy_repo = PolicyRepo(repo_uri, repo)
-    changes = list(policy_repo.delta_commits(
-        repo.revparse_single(source), repo.revparse_single(target)))
+    changes = list(
+        policy_repo.delta_commits(
+            repo.revparse_single(source), repo.revparse_single(target)
+        )
+    )
     output.write(
-        yaml.safe_dump({
-            'policies': [c.policy.data for c in changes
-                         if c.kind != ChangeType.REMOVE]}).encode('utf8'))
+        yaml.safe_dump(
+            {
+                'policies': [
+                    c.policy.data for c in changes if c.kind != ChangeType.REMOVE
+                ]
+            }
+        ).encode('utf8')
+    )
 
 
 @cli.command()
 @click.option('-r', '--repo-uri', help="Path/Url to git repository")
 @click.option(
-    '-s', '--stream-uri', default="stdout",
-    help=("Destination stream for logical changes "
-          "(supports stdout/jsonline/kinesis/sqs/sqlalchemy)"))
+    '-s',
+    '--stream-uri',
+    default="stdout",
+    help=(
+        "Destination stream for logical changes "
+        "(supports stdout/jsonline/kinesis/sqs/sqlalchemy)"
+    ),
+)
 @click.option('-v', '--verbose', default=False, help="Verbose", is_flag=True)
 @click.option('--assume', help="Role assumption for AWS stream outputs")
 @click.option('--before', help="Only stream commits before given date")
 @click.option('--after', help="Only stream commits after given date")
-@click.option('--policy-pattern', multiple=True, default=[],
-              help="Only look at policy files matching the giving glob pattern (including dir)")
-@click.option('--sort', multiple=True, default=["reverse", "time"],
-              type=click.Choice(SORT_TYPE.keys()),
-              help="Git sort ordering")
-def stream(repo_uri, stream_uri, verbose, assume, sort, before=None, after=None, policy_pattern=()):
+@click.option(
+    '--policy-pattern',
+    multiple=True,
+    default=[],
+    help="Only look at policy files matching the giving glob pattern (including dir)",
+)
+@click.option(
+    '--sort',
+    multiple=True,
+    default=["reverse", "time"],
+    type=click.Choice(SORT_TYPE.keys()),
+    help="Git sort ordering",
+)
+def stream(
+    repo_uri,
+    stream_uri,
+    verbose,
+    assume,
+    sort,
+    before=None,
+    after=None,
+    policy_pattern=(),
+):
     """Stream git history policy changes to destination.
 
 
@@ -903,7 +1000,8 @@ def stream(repo_uri, stream_uri, verbose, assume, sort, before=None, after=None,
     """
     logging.basicConfig(
         format="%(asctime)s: %(name)s:%(levelname)s %(message)s",
-        level=(verbose and logging.DEBUG or logging.INFO))
+        level=(verbose and logging.DEBUG or logging.INFO),
+    )
     logging.getLogger('botocore').setLevel(logging.WARNING)
 
     if before:
@@ -947,7 +1045,8 @@ if __name__ == '__main__':
         raise
     except KeyboardInterrupt:
         raise
-    except: # NOQA
+    except:  # NOQA
         import traceback, pdb, sys
+
         traceback.print_exc()
         pdb.post_mortem(sys.exc_info()[-1])

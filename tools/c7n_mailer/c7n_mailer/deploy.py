@@ -9,7 +9,8 @@ from c7n.mu import (
     CloudWatchEventSource,
     LambdaFunction,
     LambdaManager,
-    PythonPackageArchive)
+    PythonPackageArchive,
+)
 
 
 log = logging.getLogger('custodian-mailer')
@@ -30,17 +31,32 @@ def dispatch(event, context):
 
 CORE_DEPS = [
     # core deps
-    'jinja2', 'markupsafe', 'yaml', 'ldap3', 'pyasn1', 'redis', 'jmespath',
+    'jinja2',
+    'markupsafe',
+    'yaml',
+    'ldap3',
+    'pyasn1',
+    'redis',
+    'jmespath',
     # for other dependencies
     'pkg_resources',
     # transport datadog - recursive deps
-    'datadog', 'decorator',
+    'datadog',
+    'decorator',
     # requests (recursive deps), needed by datadog, slackclient, splunk
-    'requests', 'urllib3', 'idna', 'charset_normalizer', 'certifi',
+    'requests',
+    'urllib3',
+    'idna',
+    'charset_normalizer',
+    'certifi',
     # used by splunk mailer transport
-    'jsonpointer', 'jsonpatch',
+    'jsonpointer',
+    'jsonpatch',
     # sendgrid dependencies
-    'sendgrid', 'python_http_client', 'ellipticcurve']
+    'sendgrid',
+    'python_http_client',
+    'ellipticcurve',
+]
 
 
 def get_archive(config):
@@ -78,10 +94,14 @@ def provision(config, session_factory):
         dead_letter_config=config.get('dead_letter_config', {}),
         events=[
             CloudWatchEventSource(
-                {'type': 'periodic',
-                 'schedule': config.get('lambda_schedule', 'rate(5 minutes)')},
-                session_factory)
-        ])
+                {
+                    'type': 'periodic',
+                    'schedule': config.get('lambda_schedule', 'rate(5 minutes)'),
+                },
+                session_factory,
+            )
+        ],
+    )
 
     archive = get_archive(config)
     func = LambdaFunction(func_config, archive)

@@ -3,7 +3,7 @@
 
 import logging
 
-import c7n_kube.actions.shared # noqa
+import c7n_kube.actions.shared  # noqa
 
 from c7n_kube.resources.core import (
     configmap,
@@ -14,13 +14,10 @@ from c7n_kube.resources.core import (
     secret,
     service,
     serviceaccount,
-    volume)
+    volume,
+)
 
-from c7n_kube.resources.apps import (
-    daemonset,
-    deployment,
-    replicaset,
-    statefulset)
+from c7n_kube.resources.apps import daemonset, deployment, replicaset, statefulset
 
 from c7n_kube.resources import crd
 
@@ -42,9 +39,9 @@ ALL = [
     volume,
     daemonset,
     replicaset,
-    statefulset]
+    statefulset,
+]
 
 
 def initialize_kube():
-    """kubernetes entry point
-    """
+    """kubernetes entry point"""

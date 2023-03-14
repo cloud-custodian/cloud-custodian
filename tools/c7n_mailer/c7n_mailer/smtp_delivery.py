@@ -7,7 +7,6 @@ import c7n_mailer.utils as utils
 
 
 class SmtpDelivery:
-
     def __init__(self, config, session, logger):
         smtp_server = config['smtp_server']
         smtp_port = int(config.get('smtp_port', 25))

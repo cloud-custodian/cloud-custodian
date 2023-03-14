@@ -21,7 +21,9 @@ def gcp_decrypt(config, logger, encrypted_field, client=None):
             logger.debug(f"Using cached value for {secret}")
             return CACHE[secret]
         logger.debug(f'Accessing {data["secret"]}')
-        secret_value = client.access_secret_version(name=secret).payload.data.decode("UTF-8")
+        secret_value = client.access_secret_version(name=secret).payload.data.decode(
+            "UTF-8"
+        )
         if secret not in CACHE:
             CACHE[secret] = secret_value
         return secret_value

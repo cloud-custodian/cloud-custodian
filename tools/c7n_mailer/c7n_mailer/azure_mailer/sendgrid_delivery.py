@@ -11,7 +11,6 @@ from c7n_mailer.utils_email import get_mimetext_message, is_email
 
 
 class SendGridDelivery:
-
     def __init__(self, config, session, logger):
         self.config = config
         self.logger = logger
@@ -21,16 +20,14 @@ class SendGridDelivery:
 
     def get_to_addrs_sendgrid_messages_map(self, queue_message):
         # eg: { ('milton@initech.com', 'peter@initech.com'): [resource1, resource2, etc] }
-        to_addrs_to_resources_map = self.get_email_to_addrs_to_resources_map(queue_message)
+        to_addrs_to_resources_map = self.get_email_to_addrs_to_resources_map(
+            queue_message
+        )
 
         to_addrs_to_content_map = {}
         for to_addrs, resources in to_addrs_to_resources_map.items():
             to_addrs_to_content_map[to_addrs] = get_mimetext_message(
-                self.config,
-                self.logger,
-                queue_message,
-                resources,
-                list(to_addrs)
+                self.config, self.logger, queue_message, resources, list(to_addrs)
             )
         # eg: { ('milton@initech.com', 'peter@initech.com'): message }
         return to_addrs_to_content_map
@@ -58,7 +55,9 @@ class SendGridDelivery:
             resource_emails = tuple(sorted(set(resource_emails)))
 
             if resource_emails:
-                email_to_addrs_to_resources_map.setdefault(resource_emails, []).append(resource)
+                email_to_addrs_to_resources_map.setdefault(resource_emails, []).append(
+                    resource
+                )
 
         if email_to_addrs_to_resources_map == {}:
             self.logger.debug('Found no email addresses, sending no emails.')
@@ -66,29 +65,36 @@ class SendGridDelivery:
         return email_to_addrs_to_resources_map
 
     def sendgrid_handler(self, queue_message, to_addrs_to_email_messages_map):
-        self.logger.info("Sending account:%s policy:%s %s:%s email:%s to %s" % (
-            queue_message.get('account', ''),
-            queue_message['policy']['name'],
-            queue_message['policy']['resource'],
-            str(len(queue_message['resources'])),
-            queue_message['action'].get('template', 'default'),
-            to_addrs_to_email_messages_map))
+        self.logger.info(
+            "Sending account:%s policy:%s %s:%s email:%s to %s"
+            % (
+                queue_message.get('account', ''),
+                queue_message['policy']['name'],
+                queue_message['policy']['resource'],
+                str(len(queue_message['resources'])),
+                queue_message['action'].get('template', 'default'),
+                to_addrs_to_email_messages_map,
+            )
+        )
 
         for email_to_addrs, message in to_addrs_to_email_messages_map.items():
             for to_address in email_to_addrs:
                 try:
-                    mail = SendGridDelivery._sendgrid_mail_from_email_message(message, to_address)
+                    mail = SendGridDelivery._sendgrid_mail_from_email_message(
+                        message, to_address
+                    )
                     self.sendgrid_client.send(mail)
                 except (exceptions.UnauthorizedError, exceptions.BadRequestsError) as e:
                     self.logger.warning(
                         "\n**Error \nPolicy:%s \nAccount:%s \nSending to:%s \n\nRequest body:"
-                        "\n%s\n\nRequest headers:\n%s\n\n mailer.yml: %s" % (
+                        "\n%s\n\nRequest headers:\n%s\n\n mailer.yml: %s"
+                        % (
                             queue_message['policy'],
                             queue_message.get('account', ''),
                             email_to_addrs,
                             e.body,
                             e.headers,
-                            self.config
+                            self.config,
                         )
                     )
                     return False
@@ -109,7 +115,6 @@ class SendGridDelivery:
         mail = Mail(
             from_email=Email(message.get('From')),
             subject=message.get('Subject'),
-
             # Create a To object instead of an Email object
             to_emails=To(to_address),
         )
@@ -118,16 +123,23 @@ class SendGridDelivery:
         except AttributeError:
             # Python2
             body = message.get_payload(decode=True).decode('utf-8')
-        mail.add_content(Content(
-            message.get_content_type(),
-            body.strip()
-        ))
+        mail.add_content(Content(message.get_content_type(), body.strip()))
 
         # These headers are not allowed on the message object
         # https://sendgrid.com/docs/API_Reference/Web_API_v3/Mail/errors.html#message.headers
         skip_headers = [
-            'x-sg-id', 'x-sg-eid', 'received', 'dkim-signature', 'Content-Type',
-            'Content-Transfer-Encoding', 'To', 'From', 'Subject', 'Reply-To', 'CC', 'BCC'
+            'x-sg-id',
+            'x-sg-eid',
+            'received',
+            'dkim-signature',
+            'Content-Type',
+            'Content-Transfer-Encoding',
+            'To',
+            'From',
+            'Subject',
+            'Reply-To',
+            'CC',
+            'BCC',
         ]
 
         for k, v in message.items():

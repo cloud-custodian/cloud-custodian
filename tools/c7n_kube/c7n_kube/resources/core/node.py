@@ -7,7 +7,6 @@ from c7n_kube.provider import resources
 
 @resources.register('node')
 class Node(QueryResourceManager):
-
     class resource_type(TypeInfo):
         group = 'Core'
         version = 'V1'

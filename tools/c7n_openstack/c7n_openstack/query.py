@@ -51,13 +51,12 @@ class DescribeSource:
 
 class QueryMeta(type):
     """metaclass to have consistent action/filter registry for new resources"""
+
     def __new__(cls, name, parents, attrs):
         if 'filter_registry' not in attrs:
-            attrs['filter_registry'] = FilterRegistry(
-                '%s.filters' % name.lower())
+            attrs['filter_registry'] = FilterRegistry('%s.filters' % name.lower())
         if 'action_registry' not in attrs:
-            attrs['action_registry'] = ActionRegistry(
-                '%s.actions' % name.lower())
+            attrs['action_registry'] = ActionRegistry('%s.actions' % name.lower())
 
         return super(QueryMeta, cls).__new__(cls, name, parents, attrs)
 
@@ -104,9 +103,7 @@ class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
 
 class TypeMeta(type):
     def __repr__(cls):
-        return "<TypeInfo group:%s version:%s>" % (
-            cls.group,
-            cls.version)
+        return "<TypeInfo group:%s version:%s>" % (cls.group, cls.version)
 
 
 class TypeInfo(metaclass=TypeMeta):

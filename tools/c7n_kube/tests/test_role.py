@@ -7,10 +7,10 @@ class ClusterRoleTest(KubeTest):
     def test_cluster_role_query(self):
         factory = self.replay_flight_data()
         # factory = self.record_flight_data()
-        p = self.load_policy({
-            'name': 'cluster-roles',
-            'resource': 'k8s.cluster-role'},
-            session_factory=factory)
+        p = self.load_policy(
+            {'name': 'cluster-roles', 'resource': 'k8s.cluster-role'},
+            session_factory=factory,
+        )
         resources = p.run()
         self.assertEqual(len(resources), 78)
         sorted_resources = sorted([r['metadata']['name'] for r in resources])
@@ -21,10 +21,9 @@ class ClusterRoleTest(KubeTest):
 class RoleTest(KubeTest):
     def test_cluster_role_query(self):
         factory = self.replay_flight_data()
-        p = self.load_policy({
-            'name': 'role',
-            'resource': 'k8s.role'},
-            session_factory=factory)
+        p = self.load_policy(
+            {'name': 'role', 'resource': 'k8s.role'}, session_factory=factory
+        )
         resources = p.run()
         self.assertEqual(len(resources), 14)
         sorted_resources = sorted([r['metadata']['name'] for r in resources])
