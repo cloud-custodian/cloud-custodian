@@ -211,9 +211,10 @@ class EKS(BaseTest):
         matched = resources.pop()
         self.assertEqual(
             matched["Tags"],
-            [{
-                'Key': 'NetworkLocation',
-                'Value': 'Customer'
-            }]
+            [
+                {
+                    'Key': 'NetworkLocation',
+                    'Value': 'Customer'
+                }
+            ]
         )
-
