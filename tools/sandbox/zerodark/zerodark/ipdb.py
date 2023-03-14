@@ -285,9 +285,7 @@ def index_ec2_files(db, record_stream):
                 stats['Records'] += 1
                 stats['Record%s' % cfg['configurationItemStatus']] += 1
                 if cfg['configurationItemStatus'] in ('ResourceDeleted',):
-                    deletes.append(
-                        ((cfg['configurationItemCaptureTime'], cfg['resourceId']))
-                    )
+                    deletes.append(((cfg['configurationItemCaptureTime'], cfg['resourceId'])))
                     continue
                 if not cfg.get('tags'):
                     continue
@@ -519,8 +517,7 @@ def index_eni_files(db, record_stream):
                         rtype,
                         eni['subnetId'],
                         REGION_KEY[cfg['awsRegion']],
-                        eni['attachment'].get('attachTime')
-                        or cfg['configurationItemCaptureTime'],
+                        eni['attachment'].get('attachTime') or cfg['configurationItemCaptureTime'],
                         None,
                     )
                 )
@@ -543,9 +540,7 @@ def index_eni_files(db, record_stream):
                     rows[idx][-1] = deletes[r[0]]
                     del deletes[r[0]]
             try:
-                cursor.executemany(
-                    '''insert into enis values (?, ?, ?, ?, ?, ?, ?, ?, ?)''', rows
-                )
+                cursor.executemany('''insert into enis values (?, ?, ?, ?, ?, ?, ?, ?, ?)''', rows)
             except Exception:
                 log.error(
                     "Error inserting enis account:%s rows:%d",

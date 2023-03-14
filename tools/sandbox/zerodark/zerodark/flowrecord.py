@@ -113,9 +113,7 @@ class FlowRecord:
 
     def __eq__(self, other):
         try:
-            return all(
-                getattr(self, x) == getattr(other, x) for x in self.__slots__[:-2]
-            )
+            return all(getattr(self, x) == getattr(other, x) for x in self.__slots__[:-2])
         except AttributeError:
             return False
 

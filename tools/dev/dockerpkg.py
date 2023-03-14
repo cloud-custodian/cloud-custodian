@@ -313,9 +313,7 @@ def cli():
 
     slices, dices, and blends :-)
     """
-    logging.basicConfig(
-        level=logging.INFO, format="%(asctime)s:%(levelname)s %(message)s"
-    )
+    logging.basicConfig(level=logging.INFO, format="%(asctime)s:%(levelname)s %(message)s")
     logging.getLogger("docker").setLevel(logging.INFO)
     logging.getLogger("urllib3").setLevel(logging.INFO)
 
@@ -332,14 +330,10 @@ def cli():
 
 @cli.command()
 @click.option("-p", "--provider", multiple=True)
-@click.option(
-    "-r", "--registry", multiple=True, help="Registries for image repo on tag and push"
-)
+@click.option("-r", "--registry", multiple=True, help="Registries for image repo on tag and push")
 @click.option("-t", "--tag", help="Static tag for the image")
 @click.option("--push", is_flag=True, help="Push images to registries")
-@click.option(
-    "--test", help="Run lightweight functional tests with image", is_flag=True
-)
+@click.option("--test", help="Run lightweight functional tests with image", is_flag=True)
 @click.option("--scan", help="scan the image for cve with trivy", is_flag=True)
 @click.option("-q", "--quiet", is_flag=True)
 @click.option("-i", "--image", multiple=True)
@@ -535,8 +529,7 @@ def test_image(image_id, image_name, providers):
     env.update(
         {
             "TEST_DOCKER": "yes",
-            "CUSTODIAN_%s_IMAGE"
-            % image_name.upper().split("-", 1)[0]: image_id.split(":")[-1],
+            "CUSTODIAN_%s_IMAGE" % image_name.upper().split("-", 1)[0]: image_id.split(":")[-1],
         }
     )
     if providers not in (None, ()):

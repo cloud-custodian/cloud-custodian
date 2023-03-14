@@ -69,9 +69,7 @@ class KubeTest(TestUtils):
         kw['before_record_request'] = self._record_change_host
         self.myvcr = self._get_vcr(**kw)
 
-        flight_path = os.path.join(
-            kw['cassette_library_dir'], name or self._get_cassette_name()
-        )
+        flight_path = os.path.join(kw['cassette_library_dir'], name or self._get_cassette_name())
         if os.path.exists(flight_path):
             os.unlink(flight_path)
 

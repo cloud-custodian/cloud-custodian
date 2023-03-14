@@ -85,10 +85,7 @@ class ImageUnusedFilter(Filter):
     def get_permissions(self):
         return list(
             itertools.chain(
-                *[
-                    self.manager.get_resource_manager(m).get_permissions()
-                    for m in ('ami', 'cvm')
-                ]
+                *[self.manager.get_resource_manager(m).get_permissions() for m in ('ami', 'cvm')]
             )
         )
 

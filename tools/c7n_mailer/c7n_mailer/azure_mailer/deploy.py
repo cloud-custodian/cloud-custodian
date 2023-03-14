@@ -84,20 +84,14 @@ def build_function_package(config, function_name, sub_id):
             continue
         for t in [f for f in os.listdir(d) if os.path.splitext(f)[1] == '.j2']:
             with open(os.path.join(d, t)) as fh:
-                package.pkg.add_contents(
-                    function_path + '/msg-templates/%s' % t, fh.read()
-                )
+                package.pkg.add_contents(function_path + '/msg-templates/%s' % t, fh.read())
 
     function_config = copy.deepcopy(config)
 
-    functions_full_template_path = (
-        '/home/site/wwwroot/' + function_path + '/msg-templates/'
-    )
+    functions_full_template_path = '/home/site/wwwroot/' + function_path + '/msg-templates/'
     function_config['templates_folders'] = [functions_full_template_path]
 
-    package.pkg.add_contents(
-        function_path + '/config.json', contents=json.dumps(function_config)
-    )
+    package.pkg.add_contents(function_path + '/config.json', contents=json.dumps(function_config))
 
     package.close()
     return package
@@ -152,9 +146,7 @@ def provision(config):
         '-'.join([service_plan['name'], function_name]), suffix
     )
     FunctionAppUtilities.validate_function_name(function_app_name)
-    identity = jmespath.search('function_properties.identity', config) or {
-        'type': AUTH_TYPE_EMBED
-    }
+    identity = jmespath.search('function_properties.identity', config) or {'type': AUTH_TYPE_EMBED}
 
     params = FunctionAppUtilities.FunctionAppInfrastructureParameters(
         app_insights=app_insights,
@@ -172,9 +164,6 @@ def provision(config):
     log.info("Building function package for %s" % function_app_name)
     package = build_function_package(config, function_name, sub_id)
 
-    log.info(
-        "Function package built, size is %0.2f MB"
-        % (package.pkg.size / (1024 * 1024.0))
-    )
+    log.info("Function package built, size is %0.2f MB" % (package.pkg.size / (1024 * 1024.0)))
 
     FunctionAppUtilities.publish_functions_package(params, package)

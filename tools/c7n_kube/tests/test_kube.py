@@ -8,9 +8,7 @@ import pytest
 
 
 class TestKube(KubeTest):
-    @pytest.mark.skipif(
-        sys.platform == 'win32', reason="Windows CI has issues running this test"
-    )
+    @pytest.mark.skipif(sys.platform == 'win32', reason="Windows CI has issues running this test")
     def test_kube_cache(self):
         # Run once to create cache
         factory = self.replay_flight_data()

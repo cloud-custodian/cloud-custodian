@@ -100,15 +100,11 @@ class CLBMetricsFilter(MetricsFilter):
     DEFAULT_NAMESPACE = {"clb:clb": "QCE/LB_PUBLIC"}
 
     def _get_request_params(self, resources, namespace):
-        dimension_metadata = [
-            (res["LoadBalancerVips"][0], res["VpcId"]) for res in resources
-        ]
+        dimension_metadata = [(res["LoadBalancerVips"][0], res["VpcId"]) for res in resources]
         dimensions = []
         for metadata_pair in dimension_metadata:
             if namespace == "QCE/LB_PUBLIC":
-                dimensions.append(
-                    {"Dimensions": [{"Name": "vip", "Value": metadata_pair[0]}]}
-                )
+                dimensions.append({"Dimensions": [{"Name": "vip", "Value": metadata_pair[0]}]})
             if namespace == "QCE/LB_PRIVATE":
                 dimensions.append(
                     {

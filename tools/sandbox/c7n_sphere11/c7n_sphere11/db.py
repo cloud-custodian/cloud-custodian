@@ -14,9 +14,7 @@ class LockDb:
 
     def __init__(self, session, table_name, endpoint=None):
         self.client = session.client('dynamodb', endpoint_url=endpoint)
-        self.table = session.resource('dynamodb', endpoint_url=endpoint).Table(
-            table_name
-        )
+        self.table = session.resource('dynamodb', endpoint_url=endpoint).Table(table_name)
         self.table_name = table_name
 
     def record(self, account_id, resource_id):
@@ -39,9 +37,7 @@ class LockDb:
     def iter_pending(self, account_id):
         expr = conditions.Key('AccountId').eq(account_id)
         expr & conditions.Key("LockStatus").eq("pending")
-        results = self.table.query(
-            IndexName='PendingLocks', KeyConditionExpression=expr
-        )
+        results = self.table.query(IndexName='PendingLocks', KeyConditionExpression=expr)
         return results.get('Items', ())
 
     def iter_resources(self, account_id, resource_type=None):

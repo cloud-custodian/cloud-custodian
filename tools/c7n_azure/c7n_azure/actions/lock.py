@@ -72,9 +72,7 @@ class LockAction(AzureBaseAction):
         self.lock_type = self.data['lock-type']
 
     def _prepare_processing(self):
-        self.client = self.manager.get_client(
-            'azure.mgmt.resource.locks.ManagementLockClient'
-        )
+        self.client = self.manager.get_client('azure.mgmt.resource.locks.ManagementLockClient')
 
     def _process_resource(self, resource):
         lock_name = self._get_lock_name(resource)
@@ -96,9 +94,7 @@ class LockAction(AzureBaseAction):
         return {"locked": self.lock_type}
 
     def _get_lock_name(self, resource):
-        return self.data.get(
-            'lock-name', "c7n-policy-{}".format(self.manager.data['name'])
-        )
+        return self.data.get('lock-name', "c7n-policy-{}".format(self.manager.data['name']))
 
     def _get_lock_notes(self, resource):
         return self.data.get('lock-notes')

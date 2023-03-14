@@ -6,9 +6,7 @@ from c7n_azure import constants
 
 class AutoScaleUnit(DeploymentUnit):
     def __init__(self):
-        super(AutoScaleUnit, self).__init__(
-            'azure.mgmt.monitor.MonitorManagementClient'
-        )
+        super(AutoScaleUnit, self).__init__('azure.mgmt.monitor.MonitorManagementClient')
         self.type = "AutoScale"
 
     def _get(self, params):

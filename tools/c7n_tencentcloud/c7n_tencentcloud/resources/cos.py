@@ -35,9 +35,7 @@ class DescribeCos(DescribeSource):
         resources = jmespath.search(jsonpath, resp)
         if not resources:
             return []
-        resources = [
-            r for r in resources if r["Location"] == self.resource_manager.config.region
-        ]
+        resources = [r for r in resources if r["Location"] == self.resource_manager.config.region]
 
         self.augment(resources)
         return resources
@@ -147,9 +145,7 @@ class HasStatementFilter(BucketFilterBase):
             # For the cos interface, if the data cannot be queried,
             # the cos client returns an error code whose code is NoSuch prefix.
             if not e.get_error_code().startswith("NoSuch"):
-                self.log.error(
-                    'error cos client error:%s\n%s', b['Name'], e.get_error_msg()
-                )
+                self.log.error('error cos client error:%s\n%s', b['Name'], e.get_error_msg())
             return None
 
     def process_resource(self, resource):
@@ -217,15 +213,13 @@ class BucketEncryption(Filter):
     def process_bucket(self, b):
         rules = []
         try:
-            resp = self.manager.source.get_cos_client(
-                b["Location"]
-            ).get_bucket_encryption(Bucket=b['Name'])
+            resp = self.manager.source.get_cos_client(b["Location"]).get_bucket_encryption(
+                Bucket=b['Name']
+            )
             rules = resp["Rule"]
         except CosServiceError as e:
             if not e.get_error_code().startswith("NoSuch"):
-                self.log.error(
-                    'error cos client error:%s\n%s', b['Name'], e.get_error_msg()
-                )
+                self.log.error('error cos client error:%s\n%s', b['Name'], e.get_error_msg())
 
         if self.data.get('state', True):
             for sse in rules:
@@ -279,9 +273,7 @@ class BucketLoggingFilter(BucketFilterBase):
             )
         except CosServiceError as e:
             if not e.get_error_code().startswith("NoSuch"):
-                self.log.error(
-                    'error cos client error:%s\n%s', b['Name'], e.get_error_msg()
-                )
+                self.log.error('error cos client error:%s\n%s', b['Name'], e.get_error_msg())
             return {}
 
     def process(self, buckets, event=None):
@@ -316,9 +308,7 @@ class BucketLoggingFilter(BucketFilterBase):
         target_prefix = target_data.get('target_prefix', b['Name'] + '/')
 
         target_config = (
-            {"TargetBucket": target_bucket, "TargetPrefix": target_prefix}
-            if target_bucket
-            else {}
+            {"TargetBucket": target_bucket, "TargetPrefix": target_prefix} if target_bucket else {}
         )
 
         if op in ('not-equal', 'ne'):
@@ -358,14 +348,12 @@ class BucketLifecycle(Filter):
 
     def get_lifecycle(self, b):
         try:
-            return self.manager.source.get_cos_client(
-                b["Location"]
-            ).get_bucket_lifecycle(Bucket=b['Name'])
+            return self.manager.source.get_cos_client(b["Location"]).get_bucket_lifecycle(
+                Bucket=b['Name']
+            )
         except CosServiceError as e:
             if not e.get_error_code().startswith("NoSuch"):
-                self.log.error(
-                    'error cos client error:%s\n%s', b['Name'], e.get_error_msg()
-                )
+                self.log.error('error cos client error:%s\n%s', b['Name'], e.get_error_msg())
         return None
 
     def process(self, buckets, event=None):

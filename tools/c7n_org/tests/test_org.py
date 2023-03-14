@@ -238,9 +238,7 @@ class OrgTest(TestUtils):
 
         t1 = copy.deepcopy(d)
         org.filter_policies(t1, [], [], [], [])
-        self.assertEqual(
-            [n['name'] for n in t1['policies']], ['find-ml', 'find-serverless']
-        )
+        self.assertEqual([n['name'] for n in t1['policies']], ['find-ml', 'find-serverless'])
 
         t2 = copy.deepcopy(d)
         org.filter_policies(t2, ['blue', 'red'], [], [], [])

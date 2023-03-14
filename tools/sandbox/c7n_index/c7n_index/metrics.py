@@ -149,9 +149,7 @@ class S3Archiver(Indexer):
         # account, region in templ
         key = self.config['indexer']['template'].format(points[0])
         # day aggregation
-        self.client.put_object(
-            Bucket=self.config['indexer']['Bucket'], Key=key, Body=dumps(points)
-        )
+        self.client.put_object(Bucket=self.config['indexer']['Bucket'], Key=key, Body=dumps(points))
 
 
 @indexers.register('influx')
@@ -189,9 +187,7 @@ class InfluxIndexer(Indexer):
 
 
 def index_metric_set(indexer, account, region, metric_set, start, end, period):
-    session = local_session(
-        lambda: assumed_session(account['role'], 'PolicyIndex')
-    )  # NOQA E203
+    session = local_session(lambda: assumed_session(account['role'], 'PolicyIndex'))  # NOQA E203
     client = session.client('cloudwatch', region_name=region)
 
     t = time.time()
@@ -296,16 +292,11 @@ def index_account_metrics(config, idx_name, region, account, start, end, period)
     # originally was parallel thread, but rate limits around get
     # metric stat polling means single threaded is faster.
     for metric_set in chunks(account_metrics, 20):
-        mt, mp = index_metric_set(
-            indexer, account, region, metric_set, start, end, period
-        )
+        mt, mp = index_metric_set(indexer, account, region, metric_set, start, end, period)
         region_time += mt
         region_points += mp
     log.info(
-        (
-            "indexed account:%s region:%s metrics:%d"
-            " points:%d start:%s end:%s time:%0.2f"
-        ),
+        ("indexed account:%s region:%s metrics:%d" " points:%d start:%s end:%s time:%0.2f"),
         account['name'],
         region,
         len(account_metrics),
@@ -320,9 +311,7 @@ def index_account_metrics(config, idx_name, region, account, start, end, period)
 def index_account_resources(config, account, region, policy, date):
     indexer = get_indexer(config, type=policy['resource'])
     bucket = account['bucket']
-    key_prefix = "accounts/{}/{}/policies/{}".format(
-        account['name'], region, policy['name']
-    )
+    key_prefix = "accounts/{}/{}/policies/{}".format(account['name'], region, policy['name'])
 
     # Look for AWS profile in config before Instance role
     records = s3_resource_parser.record_set(
@@ -476,8 +465,7 @@ def index_metrics(
 
         for j in jobs:
             log.debug(
-                "submit account:%s region:%s start:%s end:%s"
-                % (j[3]['name'], j[2], j[4], j[5])
+                "submit account:%s region:%s start:%s end:%s" % (j[3]['name'], j[2], j[4], j[5])
             )
             futures[w.submit(index_account_metrics, *j)] = j
 

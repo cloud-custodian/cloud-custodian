@@ -134,12 +134,8 @@ class CbsCopyInstanceTagsAction(TencentCloudBaseAction):
         get instances tag
         """
         dict_tag: dir = {}
-        qcs = self.manager.get_resource_manager('tencentcloud.cvm').get_qcs_for_cbs(
-            resources
-        )
-        tags = self.manager.source.query_helper.get_resource_tags(
-            self.manager.config.region, qcs
-        )
+        qcs = self.manager.get_resource_manager('tencentcloud.cvm').get_qcs_for_cbs(resources)
+        tags = self.manager.source.query_helper.get_resource_tags(self.manager.config.region, qcs)
         for tag in tags:
             dict_tag.update({tag["Resource"].split('/')[-1]: tag["Tags"]})
         return dict_tag

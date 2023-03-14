@@ -65,13 +65,9 @@ class TestServer(KubeTest):
             with open(f"{temp_dir}/policy.yaml", "w+") as f:
                 json.dump({"policies": [{'name': 'test', 'resource': 'k8s.pod'}]}, f)
             with open(f"{temp_dir}/policy2.yaml", "w+") as f:
-                json.dump(
-                    {"policies": [{'name': 'test2', 'resource': 'k8s.deployment'}]}, f
-                )
+                json.dump({"policies": [{'name': 'test2', 'resource': 'k8s.deployment'}]}, f)
             with open(f"{temp_dir}/policy3.yaml", "w+") as f:
-                json.dump(
-                    {"policies": [{'name': 'test3', 'resource': 'k8s.service'}]}, f
-                )
+                json.dump({"policies": [{'name': 'test3', 'resource': 'k8s.service'}]}, f)
             server = TestAdmissionControllerServer(
                 server_address=('localhost', 8082),
                 RequestHandlerClass=AdmissionControllerHandler,
@@ -115,9 +111,7 @@ class TestServer(KubeTest):
                     f,
                 )
             with open(f"{temp_dir}/policy3.yaml", "w+") as f:
-                json.dump(
-                    {"policies": [{'name': 'test3', 'resource': 'k8s.service'}]}, f
-                )
+                json.dump({"policies": [{'name': 'test3', 'resource': 'k8s.service'}]}, f)
             server = TestAdmissionControllerServer(
                 server_address=('localhost', 8080),
                 RequestHandlerClass=AdmissionControllerHandler,
@@ -265,16 +259,10 @@ class TestServer(KubeTest):
         res = requests.post(f'http://localhost:{port}', json=event)
         self.assertEqual(res.status_code, 200)
         self.assertFalse(res.json()['response']['allowed'])
-        failures = json.loads(
-            res.json()['response']['status']['message'].split(':', 1)[-1]
-        )
+        failures = json.loads(res.json()['response']['status']['message'].split(':', 1)[-1])
         self.assertEqual(len(failures), 2)
-        self.assertEqual(
-            failures[0], {'name': 'test-admission', 'description': 'description 1'}
-        )
-        self.assertEqual(
-            failures[1], {'name': 'test-admission-2', 'description': 'description 2'}
-        )
+        self.assertEqual(failures[0], {'name': 'test-admission', 'description': 'description 1'})
+        self.assertEqual(failures[1], {'name': 'test-admission-2', 'description': 'description 2'})
 
     def test_server_onmatch_warn(self):
         policies = {
@@ -322,9 +310,7 @@ class TestServer(KubeTest):
         server, port = self._server(policies)
         res = requests.post(f'http://localhost:{port}', data='bad data')
         self.assertEqual(res.status_code, 400)
-        self.assertEqual(
-            res.json(), {'error': 'Expecting value: line 1 column 1 (char 0)'}
-        )
+        self.assertEqual(res.json(), {'error': 'Expecting value: line 1 column 1 (char 0)'})
 
     def test_server_response_with_patch(self):
         policies = {
@@ -356,9 +342,7 @@ class TestServer(KubeTest):
         res = requests.post(f'http://localhost:{port}', json=event)
         self.assertEqual(res.status_code, 200)
         self.assertTrue(res.json()['response']['allowed'])
-        self.assertEqual(
-            res.json()['response']['warnings'], ['label-pod:warning goes here']
-        )
+        self.assertEqual(res.json()['response']['warnings'], ['label-pod:warning goes here'])
         self.assertEqual(res.json()['response']['patchType'], 'JSONPatch')
         self.assertEqual(
             res.json()['response']['patch'],
@@ -446,9 +430,7 @@ class TestServer(KubeTest):
         res = requests.post(f'http://localhost:{port}', json=event)
         self.assertEqual(res.status_code, 200)
         self.assertFalse(res.json()['response']['allowed'])
-        failures = json.loads(
-            res.json()['response']['status']['message'].split(':', 1)[-1]
-        )
+        failures = json.loads(res.json()['response']['status']['message'].split(':', 1)[-1])
         self.assertEqual(
             failures,
             [

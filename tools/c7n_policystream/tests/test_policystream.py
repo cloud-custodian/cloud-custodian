@@ -36,9 +36,7 @@ class GitRepo:
         self.git_config = git_config or DEFAULT_CONFIG
 
     def init(self):
-        subprocess.check_output(
-            ['git', 'init', '--initial-branch', 'main'], cwd=self.repo_path
-        )
+        subprocess.check_output(['git', 'init', '--initial-branch', 'main'], cwd=self.repo_path)
         with open(os.path.join(self.repo_path, '.git', 'config'), 'w') as fh:
             fh.write(self.git_config)
 
@@ -75,9 +73,7 @@ class GitRepo:
         if email:
             env['GIT_AUTHOR_EMAIL'] = email
 
-        subprocess.check_output(
-            ['git', 'commit', '-am', msg], cwd=self.repo_path, env=env
-        )
+        subprocess.check_output(['git', 'commit', '-am', msg], cwd=self.repo_path, env=env)
 
     def checkout(self, branch, create=True):
         args = ['git', 'checkout']
@@ -137,9 +133,7 @@ class StreamTest(TestUtils):
         )
         git.commit('new stuff')
         runner = CliRunner()
-        result = runner.invoke(
-            policystream.cli, ['diff', '-r', git.repo_path, '--source', 'main']
-        )
+        result = runner.invoke(policystream.cli, ['diff', '-r', git.repo_path, '--source', 'main'])
         self.assertEqual(result.exit_code, 0)
         self.assertEqual(
             yaml.safe_load(result.stdout),
@@ -196,17 +190,13 @@ class StreamTest(TestUtils):
     def test_cli_stream_basic(self):
         git = self.setup_basic_repo()
         runner = CliRunner()
-        result = runner.invoke(
-            policystream.cli, ['stream', '-r', git.repo_path, '-s', 'jsonline']
-        )
+        result = runner.invoke(policystream.cli, ['stream', '-r', git.repo_path, '-s', 'jsonline'])
         self.assertEqual(result.exit_code, 0)
 
         rows = [json.loads(l) for l in result.stdout.splitlines()]
         self.maxDiff = None
         self.assertEqual(len(rows), 3)
-        self.assertEqual(
-            list(sorted(rows[0].keys())), ['change', 'commit', 'policy', 'repo_uri']
-        )
+        self.assertEqual(list(sorted(rows[0].keys())), ['change', 'commit', 'policy', 'repo_uri'])
         self.assertEqual([r['change'] for r in rows], ['add', 'remove', 'add'])
         self.assertEqual(
             rows[-1]['policy'],
@@ -248,9 +238,7 @@ class StreamTest(TestUtils):
     def test_stream_move_subdir(self):
         git = GitRepo(self.get_temp_dir())
         git.init()
-        git.change(
-            'aws/ec2.yml', {'policies': [{'name': 'ec2-check', 'resource': 'aws.ec2'}]}
-        )
+        git.change('aws/ec2.yml', {'policies': [{'name': 'ec2-check', 'resource': 'aws.ec2'}]})
         git.change(
             'lambda.yml',
             {'policies': [{'name': 'lambda-check', 'resource': 'aws.lambda'}]},
@@ -308,9 +296,7 @@ class StreamTest(TestUtils):
 
     def test_stream_move_policy(self):
         git = self.setup_basic_repo()
-        git.change(
-            'newfile.yml', {'policies': [{'name': 'ec2-check', 'resource': 'aws.ec2'}]}
-        )
+        git.change('newfile.yml', {'policies': [{'name': 'ec2-check', 'resource': 'aws.ec2'}]})
         git.commit('new file')
         git.rm('example.yml')
         git.change(

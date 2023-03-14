@@ -19,9 +19,7 @@ def create_html_file(config):
     the code directly in this script or the associated jinja2 template
     """
     logging.debug("Starting create_html_file")
-    logging.debug(
-        "\tjinja2_template_file = {}".format(config['jinja2_template_filename'])
-    )
+    logging.debug("\tjinja2_template_file = {}".format(config['jinja2_template_filename']))
     logging.debug("\ttrendered_filename = {}".format(config['rendered_filename']))
 
     ts = time.time()
@@ -41,9 +39,7 @@ def create_html_file(config):
 
     with open(rendered_file_path, "w") as result_file:
         result_file.write(
-            environment.get_template(config['jinja2_template_filename']).render(
-                render_vars
-            )
+            environment.get_template(config['jinja2_template_filename']).render(render_vars)
         )
 
     logging.debug("File created: %s", rendered_file_path)

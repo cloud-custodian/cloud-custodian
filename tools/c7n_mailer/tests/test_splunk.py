@@ -473,15 +473,9 @@ class TestTrySend(DeliveryTester):
             call('{"foo": "bar"}'),
         ]
         assert self.mock_logger.mock_calls == [
-            call.warning(
-                "Caught exception sending to Splunk; retry in %s seconds", 1.2
-            ),
-            call.warning(
-                "Caught exception sending to Splunk; retry in %s seconds", 1.2
-            ),
-            call.warning(
-                "Caught exception sending to Splunk; retry in %s seconds", 1.2
-            ),
+            call.warning("Caught exception sending to Splunk; retry in %s seconds", 1.2),
+            call.warning("Caught exception sending to Splunk; retry in %s seconds", 1.2),
+            call.warning("Caught exception sending to Splunk; retry in %s seconds", 1.2),
             call.error("ERROR - Could not POST to Splunk after %d tries.", 3),
         ]
 
@@ -507,9 +501,7 @@ class TestSendSplunk(DeliveryTester):
             call.post().json(),
         ]
         assert self.mock_logger.mock_calls == [
-            call.debug(
-                "Send to Splunk (%s): %s", "https://splunk.url/foo", '{"foo": "bar"}'
-            ),
+            call.debug("Send to Splunk (%s): %s", "https://splunk.url/foo", '{"foo": "bar"}'),
             call.debug(
                 "Splunk POST got response code %s HEADERS=%s BODY: %s",
                 200,
@@ -537,9 +529,7 @@ class TestSendSplunk(DeliveryTester):
             )
         ]
         assert self.mock_logger.mock_calls == [
-            call.debug(
-                "Send to Splunk (%s): %s", "https://splunk.url/foo", '{"foo": "bar"}'
-            ),
+            call.debug("Send to Splunk (%s): %s", "https://splunk.url/foo", '{"foo": "bar"}'),
             call.error(
                 "Exception during Splunk POST to %s of %s",
                 "https://splunk.url/foo",
@@ -568,9 +558,7 @@ class TestSendSplunk(DeliveryTester):
             )
         ]
         assert self.mock_logger.mock_calls == [
-            call.debug(
-                "Send to Splunk (%s): %s", "https://splunk.url/foo", '{"foo": "bar"}'
-            ),
+            call.debug("Send to Splunk (%s): %s", "https://splunk.url/foo", '{"foo": "bar"}'),
             call.debug(
                 "Splunk POST got response code %s HEADERS=%s BODY: %s",
                 403,
@@ -606,18 +594,14 @@ class TestSendSplunk(DeliveryTester):
             call.post().json(),
         ]
         assert self.mock_logger.mock_calls == [
-            call.debug(
-                "Send to Splunk (%s): %s", "https://splunk.url/foo", '{"foo": "bar"}'
-            ),
+            call.debug("Send to Splunk (%s): %s", "https://splunk.url/foo", '{"foo": "bar"}'),
             call.debug(
                 "Splunk POST got response code %s HEADERS=%s BODY: %s",
                 200,
                 {"H1": "V1"},
                 '{"text": "Failure"}',
             ),
-            call.error(
-                "Splunk POST returned non-success response: %s", {"text": "Failure"}
-            ),
+            call.error("Splunk POST returned non-success response: %s", {"text": "Failure"}),
         ]
 
     def test_send_non_success_no_json(self):
@@ -645,9 +629,7 @@ class TestSendSplunk(DeliveryTester):
             call.post().json(),
         ]
         assert self.mock_logger.mock_calls == [
-            call.debug(
-                "Send to Splunk (%s): %s", "https://splunk.url/foo", '{"foo": "bar"}'
-            ),
+            call.debug("Send to Splunk (%s): %s", "https://splunk.url/foo", '{"foo": "bar"}'),
             call.debug(
                 "Splunk POST got response code %s HEADERS=%s BODY: %s",
                 200,

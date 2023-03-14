@@ -8,9 +8,7 @@ from c7n_azure.provisioning.resource_group import ResourceGroupUnit
 
 class StorageAccountUnit(DeploymentUnit):
     def __init__(self):
-        super(StorageAccountUnit, self).__init__(
-            'azure.mgmt.storage.StorageManagementClient'
-        )
+        super(StorageAccountUnit, self).__init__('azure.mgmt.storage.StorageManagementClient')
         self.type = "Storage Account"
 
     def _get(self, params):

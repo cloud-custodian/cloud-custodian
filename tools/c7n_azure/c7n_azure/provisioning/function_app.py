@@ -14,9 +14,7 @@ from c7n_azure.utils import azure_name_value_pair
 
 class FunctionAppDeploymentUnit(DeploymentUnit):
     def __init__(self):
-        super(FunctionAppDeploymentUnit, self).__init__(
-            'azure.mgmt.web.WebSiteManagementClient'
-        )
+        super(FunctionAppDeploymentUnit, self).__init__('azure.mgmt.web.WebSiteManagementClient')
         self.type = "Function Application"
 
     def _get(self, params):
@@ -60,35 +58,25 @@ class FunctionAppDeploymentUnit(DeploymentUnit):
         app_insights_key = params['app_insights_key']
         if app_insights_key:
             site_config.app_settings.append(
-                azure_name_value_pair(
-                    'APPINSIGHTS_INSTRUMENTATIONKEY', app_insights_key
-                )
+                azure_name_value_pair('APPINSIGHTS_INSTRUMENTATIONKEY', app_insights_key)
             )
 
         # Don't generate pycache
-        site_config.app_settings.append(
-            azure_name_value_pair('PYTHONDONTWRITEBYTECODE', 1)
-        )
+        site_config.app_settings.append(azure_name_value_pair('PYTHONDONTWRITEBYTECODE', 1))
 
         # Enable server side build
-        site_config.app_settings.append(
-            azure_name_value_pair('ENABLE_ORYX_BUILD', 'true')
-        )
+        site_config.app_settings.append(azure_name_value_pair('ENABLE_ORYX_BUILD', 'true'))
         site_config.app_settings.append(
             azure_name_value_pair('SCM_DO_BUILD_DURING_DEPLOYMENT', 'true')
         )
 
         # general app settings
         con_string = params['storage_account_connection_string']
-        site_config.app_settings.append(
-            azure_name_value_pair('AzureWebJobsStorage', con_string)
-        )
+        site_config.app_settings.append(azure_name_value_pair('AzureWebJobsStorage', con_string))
         site_config.app_settings.append(
             azure_name_value_pair('FUNCTIONS_EXTENSION_VERSION', FUNCTION_EXT_VERSION)
         )
-        site_config.app_settings.append(
-            azure_name_value_pair('FUNCTIONS_WORKER_RUNTIME', 'python')
-        )
+        site_config.app_settings.append(azure_name_value_pair('FUNCTIONS_WORKER_RUNTIME', 'python'))
 
         return self.client.web_apps.begin_create_or_update(
             params['resource_group_name'], params['name'], functionapp_def

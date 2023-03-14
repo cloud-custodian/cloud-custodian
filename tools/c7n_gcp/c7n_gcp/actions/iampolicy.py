@@ -110,9 +110,7 @@ class SetIamPolicy(MethodAction):
         params = self._verb_arguments(resource)
         existing_bindings = self._get_existing_bindings(model, resource)
         add_bindings = self.data['add-bindings'] if 'add-bindings' in self.data else []
-        remove_bindings = (
-            self.data['remove-bindings'] if 'remove-bindings' in self.data else []
-        )
+        remove_bindings = self.data['remove-bindings'] if 'remove-bindings' in self.data else []
         bindings_to_set = self._add_bindings(existing_bindings, add_bindings)
         bindings_to_set = self._remove_bindings(bindings_to_set, remove_bindings)
         params['body'] = {
@@ -135,9 +133,7 @@ class SetIamPolicy(MethodAction):
                 self.manager.resource_type.version,
                 model.component,
             )
-            .execute_query(
-                'getIamPolicy', verb_arguments=self._verb_arguments(resource)
-            )
+            .execute_query('getIamPolicy', verb_arguments=self._verb_arguments(resource))
         )
         return existing_bindings['bindings'] if 'bindings' in existing_bindings else []
 
@@ -218,9 +214,7 @@ class SetIamPolicy(MethodAction):
         """
         bindings = []
         roles_to_existing_bindings = self._get_roles_to_bindings_dict(existing_bindings)
-        roles_to_bindings_to_remove = self._get_roles_to_bindings_dict(
-            bindings_to_remove
-        )
+        roles_to_bindings_to_remove = self._get_roles_to_bindings_dict(bindings_to_remove)
         for role in roles_to_bindings_to_remove:
             if (
                 role in roles_to_existing_bindings

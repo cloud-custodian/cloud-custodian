@@ -60,9 +60,7 @@ class DeleteAction(AzureBaseAction):
     def _prepare_processing(
         self,
     ):
-        self.client = self.manager.get_client(
-            'azure.mgmt.resource.ResourceManagementClient'
-        )
+        self.client = self.manager.get_client('azure.mgmt.resource.ResourceManagementClient')
 
     def _process_resource(self, resource):
         if is_resource_group(resource):

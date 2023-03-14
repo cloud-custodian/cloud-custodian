@@ -79,8 +79,6 @@ class RoleFilter(Filter):
         assignments = openstack.list_role_assignments()
         for user in resources:
             user_id = user.id
-            if self.user_match_role(
-                assignments, user_id, role_id, project_id, system_scope
-            ):
+            if self.user_match_role(assignments, user_id, role_id, project_id, system_scope):
                 results.append(user)
         return results

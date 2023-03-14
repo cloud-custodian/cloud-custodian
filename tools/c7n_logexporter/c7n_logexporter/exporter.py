@@ -146,9 +146,7 @@ def _process_subscribe_group(client, group_name, subscription, distribution, rol
         ):
             return
         else:
-            client.delete_subscription_filter(
-                logGroupName=group_name, filterName=sub_name
-            )
+            client.delete_subscription_filter(logGroupName=group_name, filterName=sub_name)
     kwargs = {
         'logGroupName': group_name,
         'destinationArn': subscription['destination-arn'],
@@ -182,9 +180,7 @@ def subscribe(config, accounts, region, merge, debug):
                 DestinationNamePrefix=destination_name
             ).get('destinations')
         except ClientError:
-            log.error(
-                "Log group destination not found: %s", subscription['destination-arn']
-            )
+            log.error("Log group destination not found: %s", subscription['destination-arn'])
             sys.exit(1)
 
         account_ids = set()
@@ -228,17 +224,13 @@ def subscribe(config, accounts, region, merge, debug):
             if g.endswith('*'):
                 g = g.replace('*', '')
                 paginator = client.get_paginator('describe_log_groups')
-                allLogGroups = paginator.paginate(
-                    logGroupNamePrefix=g
-                ).build_full_result()
+                allLogGroups = paginator.paginate(logGroupNamePrefix=g).build_full_result()
                 for l in allLogGroups['logGroups']:
                     _process_subscribe_group(
                         client, l['logGroupName'], subscription, distribution, role_arn
                     )
             else:
-                _process_subscribe_group(
-                    client, g, subscription, distribution, role_arn
-                )
+                _process_subscribe_group(client, g, subscription, distribution, role_arn)
 
     if subscription.get('managed-policy'):
         if subscription.get('destination-role'):
@@ -254,9 +246,7 @@ def subscribe(config, accounts, region, merge, debug):
         for account in config.get('accounts', ()):
             if accounts and account['name'] not in accounts:
                 continue
-            futures[
-                w.submit(subscribe_account, account, subscription, region)
-            ] = account
+            futures[w.submit(subscribe_account, account, subscription, region)] = account
 
         for f in as_completed(futures):
             account = futures[f]
@@ -284,9 +274,7 @@ def run(config, start, end, accounts, region, debug):
         for account in config.get('accounts', ()):
             if accounts and account['name'] not in accounts:
                 continue
-            futures[
-                w.submit(process_account, account, start, end, destination, region)
-            ] = account
+            futures[w.submit(process_account, account, start, end, destination, region)] = account
         for f in as_completed(futures):
             account = futures[f]
             if f.exception():
@@ -333,9 +321,7 @@ def process_account(account, start, end, destination, region, incremental=True):
         all_groups.extend([g for g in p.get('logGroups', ())])
 
     group_count = len(all_groups)
-    groups = filter_creation_date(
-        filter_group_names(all_groups, account['groups']), start, end
-    )
+    groups = filter_creation_date(filter_group_names(all_groups, account['groups']), start, end)
 
     if incremental:
         groups = filter_last_write(client, groups, start)
@@ -456,9 +442,7 @@ def filter_last_write(client, groups, start):
 
         for f in as_completed(futures):
             if f.exception():
-                log.error(
-                    "Error processing groupset:%s error:%s", group_set, f.exception()
-                )
+                log.error("Error processing groupset:%s error:%s", group_set, f.exception())
             results.extend(f.result())
 
     return results
@@ -622,9 +606,9 @@ def sync(config, group, accounts=(), dryrun=False, region=None):
             account['export'] = 'missing'
             last_export = None
         try:
-            tag_set = client.get_object_tagging(
-                Bucket=destination['bucket'], Key=prefix
-            ).get('TagSet', [])
+            tag_set = client.get_object_tagging(Bucket=destination['bucket'], Key=prefix).get(
+                'TagSet', []
+            )
         except ClientError:
             tag_set = []
 
@@ -668,9 +652,7 @@ def sync(config, group, accounts=(), dryrun=False, region=None):
         client.put_object_tagging(
             Bucket=destination['bucket'],
             Key=prefix,
-            Tagging={
-                'TagSet': [{'Key': 'LastExport', 'Value': export_time.isoformat()}]
-            },
+            Tagging={'TagSet': [{'Key': 'LastExport', 'Value': export_time.isoformat()}]},
         )
 
     accounts_report = []
@@ -716,9 +698,9 @@ def status(config, group, accounts=(), region=None):
         account.pop('groups')
 
         try:
-            tag_set = client.get_object_tagging(
-                Bucket=destination['bucket'], Key=prefix
-            ).get('TagSet', [])
+            tag_set = client.get_object_tagging(Bucket=destination['bucket'], Key=prefix).get(
+                'TagSet', []
+            )
         except ClientError:
             account['export'] = 'missing'
             continue
@@ -795,9 +777,7 @@ def get_exports(client, bucket, prefix, latest=True):
 @cli.command()
 @click.option('--group', required=True, help="log group to export to s3.")
 @click.option('--bucket', required=True, help="s3 bucket name export to.")
-@click.option(
-    '--prefix', help="name of the tag to filter with using get_object_tagging API."
-)
+@click.option('--prefix', help="name of the tag to filter with using get_object_tagging API.")
 @click.option('--start', required=True, help="export logs from this date")
 @click.option('--end', help="export logs before this date")
 @click.option('--role', help="sts role to assume for log group access")
@@ -888,12 +868,10 @@ def export(
             'taskName': "%s-%s" % ("c7n-log-exporter", date.strftime("%Y-%m-%d")),
             'logGroupName': group['logGroupName'],
             'fromTime': int(
-                time.mktime(date.replace(minute=0, microsecond=0, hour=0).timetuple())
-                * 1000
+                time.mktime(date.replace(minute=0, microsecond=0, hour=0).timetuple()) * 1000
             ),
             'to': int(
-                time.mktime(date.replace(minute=59, hour=23, microsecond=0).timetuple())
-                * 1000
+                time.mktime(date.replace(minute=59, hour=23, microsecond=0).timetuple()) * 1000
             ),
             'destination': bucket,
             'destinationPrefix': export_prefix,
@@ -952,10 +930,7 @@ def export(
         )
 
     log.info(
-        (
-            "Exported log group:%s time:%0.2f days:%d start:%s"
-            " end:%s bucket:%s prefix:%s"
-        ),
+        ("Exported log group:%s time:%0.2f days:%d start:%s" " end:%s bucket:%s prefix:%s"),
         named_group,
         time.time() - t,
         len(days),

@@ -24,9 +24,7 @@ import sqlalchemy as rdb
 import yaml
 
 
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s: %(name)s:%(levelname)s %(message)s"
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s: %(name)s:%(levelname)s %(message)s")
 
 # logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
 logging.getLogger('requests').setLevel(logging.INFO)
@@ -105,9 +103,7 @@ def process_traildb(db, influx, account_name, region, since=None):
                     if '/' in v:
                         parts = v.split('/')
                         # roll up old lambda functions to their role name
-                        if parts[-1].startswith('i-') or parts[-1].startswith(
-                            'awslambda'
-                        ):
+                        if parts[-1].startswith('i-') or parts[-1].startswith('awslambda'):
                             v = parts[1]
                 else:
                     v = p[2]
@@ -194,9 +190,7 @@ def query_by(t, field, bucket='console', error=False, throttle=False, since=None
         )
 
     if since:
-        query = query.where(
-            rdb.text("short_time > '%s'" % (since.strftime("%Y-%m-%dT%H:%M")))
-        )
+        query = query.where(rdb.text("short_time > '%s'" % (since.strftime("%Y-%m-%dT%H:%M"))))
 
     return query
 
@@ -214,9 +208,7 @@ def index_account(config, region, account, day, incremental):
     name = account.get('name')
     key_template = config.get('key_template')
 
-    log.debug(
-        "processing account:%s region:%s day:%s", name, region, day.strftime("%Y/%m/%d")
-    )
+    log.debug("processing account:%s region:%s day:%s", name, region, day.strftime("%Y/%m/%d"))
 
     with tempfile.NamedTemporaryFile(suffix='.db.bz2', delete=False) as fh:
         key_data = dict(account)
@@ -397,9 +389,7 @@ def status(config):
 @click.option('--concurrency', default=5)
 @click.option('-a', '--accounts', multiple=True)
 @click.option('--verbose/--no-verbose', default=False)
-def index(
-    config, start, end, incremental=False, concurrency=5, accounts=None, verbose=False
-):
+def index(config, start, end, incremental=False, concurrency=5, accounts=None, verbose=False):
     """index traildbs directly from s3 for multiple accounts.
 
     context: assumes a daily traildb file in s3 with key path

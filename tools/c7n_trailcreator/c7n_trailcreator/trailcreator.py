@@ -85,9 +85,7 @@ RESOURCE_SCHEMA = {
         },
     },
     'additionalProperties': False,
-    'properties': {
-        'resources': {'type': 'array', 'items': {'$ref': '#/definitions/resource'}}
-    },
+    'properties': {'resources': {'type': 'array', 'items': {'$ref': '#/definitions/resource'}}},
 }
 
 
@@ -303,9 +301,7 @@ def process_athena_query(
     log.info("Athena query:%s", query_id)
 
     while True:
-        qexec = athena.get_query_execution(QueryExecutionId=query_id).get(
-            'QueryExecution'
-        )
+        qexec = athena.get_query_execution(QueryExecutionId=query_id).get('QueryExecution')
         if qexec.get('Statistics'):
             stats['QueryExecutionTime'] = (
                 qexec['Statistics'].get(
@@ -314,9 +310,7 @@ def process_athena_query(
                 )
                 / 1000.0
             )
-            stats['DataScannedInBytes'] = qexec['Statistics'].get(
-                'DataScannedInBytes', 1
-            )
+            stats['DataScannedInBytes'] = qexec['Statistics'].get('DataScannedInBytes', 1)
             log.info(
                 "Polling athena query progress scanned:%s qexec:%0.2fs",
                 format_bytes(stats['DataScannedInBytes']),
@@ -427,9 +421,7 @@ def process_bucket(session_factory, bucket_name, prefix, db_path):
     bsize = 100
     workers = 10
 
-    log.info(
-        "Processing workers:%d cloud-trail:%s page_size:%d", workers, prefix, bsize
-    )
+    log.info("Processing workers:%d cloud-trail:%s page_size:%d", workers, prefix, bsize)
     for page in paginator.paginate(Bucket=bucket_name, Prefix=prefix):
         objects = page.get('Contents', ())
         page_stats = Counter()
@@ -441,9 +433,7 @@ def process_bucket(session_factory, bucket_name, prefix, db_path):
         with ThreadPoolExecutor(max_workers=workers) as w:
             futures = {}
             for page_objects in chunks(objects, bsize):
-                futures[
-                    w.submit(process_select_set, s3, bucket_name, page_objects)
-                ] = page_objects
+                futures[w.submit(process_select_set, s3, bucket_name, page_objects)] = page_objects
 
             for f in as_completed(futures):
                 if f.exception():
@@ -589,9 +579,7 @@ class ResourceTagger:
                 },
             )
 
-        policy = list(
-            PolicyCollection.from_data({'policies': [policy_data]}, self.config)
-        ).pop()
+        policy = list(PolicyCollection.from_data({'policies': [policy_data]}, self.config)).pop()
         if 'tag' not in policy.resource_manager.action_registry:
             return [], None
         resources = policy.run()
@@ -701,10 +689,7 @@ def load(
 @click.option(
     '--account',
     default=None,
-    help=(
-        "Account to process trail records for, default"
-        " is all accounts in the trail data"
-    ),
+    help=("Account to process trail records for, default" " is all accounts in the trail data"),
 )
 @click.option('--region', required=True, help="Region to process trail records for")
 @click.option(
@@ -713,9 +698,7 @@ def load(
     help="Resource map of events and id selectors",
     type=click.File(),
 )
-@click.option(
-    '--workgroup', default="primary", help="Athena Workgroup (default: primary)"
-)
+@click.option('--workgroup', default="primary", help="Athena Workgroup (default: primary)")
 @click.option('--table', required=True, help="Cloud Trail Athena Table")
 @click.option('--athena-db', default="default", help="Athena DB")
 @click.option('--athena-output', help="Athena S3 Output Location")
@@ -772,15 +755,9 @@ def load_athena(
 
 
 @cli.command()
-@click.option(
-    '--config', required=True, help="c7n-org Accounts config file", type=click.Path()
-)
-@click.option(
-    '--db', required=True, help="Resource Owner DB (sqlite)", type=click.Path()
-)
-@click.option(
-    '--creator-tag', required=True, help="Tag to utilize for resource creator"
-)
+@click.option('--config', required=True, help="c7n-org Accounts config file", type=click.Path())
+@click.option('--db', required=True, help="Resource Owner DB (sqlite)", type=click.Path())
+@click.option('--creator-tag', required=True, help="Tag to utilize for resource creator")
 @click.option('--user-suffix', help="Ignore users without the given suffix")
 @click.option('--dryrun', is_flag=True)
 @click.option('-a', '--accounts', multiple=True, default=None)
@@ -897,12 +874,8 @@ def tag_org_account(account, region, db, creator_tag, user_suffix, dryrun, type)
 
 
 @cli.command()
-@click.option(
-    '--db', required=True, help="Resource Owner DB (sqlite)", type=click.Path()
-)
-@click.option(
-    '--creator-tag', required=True, help="Tag to utilize for resource creator"
-)
+@click.option('--db', required=True, help="Resource Owner DB (sqlite)", type=click.Path())
+@click.option('--creator-tag', required=True, help="Tag to utilize for resource creator")
 @click.option('--region', required=True, help="Aws region to process")
 @click.option('--assume', help="Assume role for resource tagging")
 @click.option('--user-suffix', help="Ignore users without the given suffix")
@@ -929,13 +902,9 @@ def tag(
             output_dir=output_dir, assume=assume, region=region, profile=profile
         )
         factory = aws.AWS().get_session_factory(config)
-        account_id = (
-            local_session(factory).client('sts').get_caller_identity().get('Account')
-        )
+        account_id = local_session(factory).client('sts').get_caller_identity().get('Account')
         config['account_id'] = account_id
-        tagger = ResourceTagger(
-            trail_db, config, creator_tag, user_suffix, dryrun, type
-        )
+        tagger = ResourceTagger(trail_db, config, creator_tag, user_suffix, dryrun, type)
 
         try:
             stats = tagger.process()

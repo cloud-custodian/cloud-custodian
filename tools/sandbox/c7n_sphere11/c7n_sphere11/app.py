@@ -47,9 +47,7 @@ def info(account_id, resource_id):
     request_data = request.query
     if resource_id.startswith('sg-') and 'parent_id' not in request_data:
         abort(400, "Missing required parameter parent_id")
-    result = controller.info(
-        account_id, resource_id, request_data.get('parent_id', resource_id)
-    )
+    result = controller.info(account_id, resource_id, request_data.get('parent_id', resource_id))
     response.content_type = "application/json"
     return json.dumps(result, indent=2, cls=Encoder)
 

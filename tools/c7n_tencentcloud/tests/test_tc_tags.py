@@ -143,15 +143,11 @@ class TestCvmTagAction(BaseTest):
                 "resource": "tencentcloud.cvm",
                 "query": [{"InstanceIds": ["ins-00lycyy6"]}],
                 "filters": [{"tag:tag_add_test_key_for_test_rename": "present"}],
-                "actions": [
-                    {"type": "remove-tag", "tags": ["tag_add_test_key_for_test_rename"]}
-                ],
+                "actions": [{"type": "remove-tag", "tags": ["tag_add_test_key_for_test_rename"]}],
             },
         )
         resources = policy.run()
         assert resources
         if self.recording:
             time.sleep(3)
-        assert 'tag_add_test_key_for_test_rename' not in get_tags(
-            policy, resources.pop()
-        )
+        assert 'tag_add_test_key_for_test_rename' not in get_tags(policy, resources.pop())

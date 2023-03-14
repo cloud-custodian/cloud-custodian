@@ -206,9 +206,7 @@ def process_eni_metrics(
     return stats
 
 
-def eni_log_analyze(
-    ips, flow_stream, start=None, end=None, reject=None, target_ips=None, ports=()
-):
+def eni_log_analyze(ips, flow_stream, start=None, end=None, reject=None, target_ips=None, ports=()):
     # in_packets = Counter()
     in_bytes = Counter()
     in_ports = Counter()
@@ -275,11 +273,7 @@ def resolve_ip_address(counter, resolver, start, end):
                 '%s %s'
                 % (
                     k,
-                    (
-                        " ".join(
-                            ["%s:%s" % (ik, iv) for ik, iv in i.items() if iv]
-                        ).strip()
-                    ),
+                    (" ".join(["%s:%s" % (ik, iv) for ik, iv in i.items() if iv]).strip()),
                 )
             ] += v
     return counter
@@ -340,12 +334,8 @@ def analyze_app(
 
     for rtype_name in resources:
         rtype = Resource.get_type(rtype_name)
-        resource_map = {
-            rtype.id(r): r for r in rtype.get_resources(ipdb, start, end, app, env)
-        }
-        log.info(
-            "App:%s Env:%s Type:%s Found:%d", app, env, rtype_name, len(resource_map)
-        )
+        resource_map = {rtype.id(r): r for r in rtype.get_resources(ipdb, start, end, app, env)}
+        log.info("App:%s Env:%s Type:%s Found:%d", app, env, rtype_name, len(resource_map))
 
         with sqlite3.connect(ipdb) as db:
             db.row_factory = row_factory
@@ -483,9 +473,7 @@ def analyze_enis(
     agg_outport_traffic = Counter()
 
     for eni, ip in zip(enis, ips):
-        files = eni_download_flows(
-            client, bucket, log_prefix, start, end, eni, store_dir
-        )
+        files = eni_download_flows(client, bucket, log_prefix, start, end, eni, store_dir)
 
         in_traffic, out_traffic, inport_traffic, outport_traffic = eni_log_analyze(
             set(ips),
@@ -502,15 +490,15 @@ def analyze_enis(
         agg_outport_traffic.update(outport_traffic)
 
     print("Inbound %d Most Commmon" % sample_count)
-    for ip, bcount in resolve_ip_address(
-        agg_in_traffic, resolver, start, end
-    ).most_common(sample_count):
+    for ip, bcount in resolve_ip_address(agg_in_traffic, resolver, start, end).most_common(
+        sample_count
+    ):
         print("%s %s" % ip, human_size(bcount))
 
     print("Outbound %d Most Common" % sample_count)
-    for ip, bcount in resolve_ip_address(
-        agg_out_traffic, resolver, start, end
-    ).most_common(sample_count):
+    for ip, bcount in resolve_ip_address(agg_out_traffic, resolver, start, end).most_common(
+        sample_count
+    ):
         print("%s %s" % ip, human_size(bcount))
 
 

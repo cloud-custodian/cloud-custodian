@@ -195,15 +195,11 @@ class InfluxIndexer:
         )
 
     def first(self, resource, resource_type, metric):
-        mkey = (
-            "%s_%s" % (resource_type.namespace.split('/')[-1], metric['name'])
-        ).lower()
+        mkey = ("%s_%s" % (resource_type.namespace.split('/')[-1], metric['name'])).lower()
         return self.get_resource_time(resource_type.id(resource), mkey, 'desc')
 
     def last(self, resource, resource_type, metric):
-        mkey = (
-            "%s_%s" % (resource_type.namespace.split('/')[-1], metric['name'])
-        ).lower()
+        mkey = ("%s_%s" % (resource_type.namespace.split('/')[-1], metric['name'])).lower()
         return self.get_resource_time(resource_type.id(resource), mkey, 'desc')
 
     def get_resource_time(self, rid, mkey, direction='desc'):
@@ -237,9 +233,7 @@ class InfluxIndexer:
                     pu = p.pop('Unit', None)
                     if pu != 'None':
                         p['fields']['Unit'] = pu
-                p['measurement'] = (
-                    "%s_%s" % (rtype.namespace.split('/')[-1], m['name'])
-                ).lower()
+                p['measurement'] = ("%s_%s" % (rtype.namespace.split('/')[-1], m['name'])).lower()
                 p['time'] = p.pop('Timestamp')
                 p['tags'] = rtags
                 points.append(p)
@@ -278,9 +272,7 @@ def get_clients(accounts_config, account_ids, regions, service='cloudwatch'):
             continue
         session = assumed_session(a['role'], 'app-metrics')
         for r in regions:
-            clients['%s-%s' % (a['account_id'], r)] = session.client(
-                service, region_name=r
-            )
+            clients['%s-%s' % (a['account_id'], r)] = session.client(service, region_name=r)
     return clients
 
 

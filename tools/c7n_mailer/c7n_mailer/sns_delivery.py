@@ -27,9 +27,7 @@ class SnsDelivery:
                 sns_addresses.append(target)
         return sns_addresses
 
-    def get_sns_message_package(
-        self, sqs_message, policy_sns_address, subject, resources
-    ):
+    def get_sns_message_package(self, sqs_message, policy_sns_address, subject, resources):
         rendered_jinja_body = get_rendered_jinja(
             policy_sns_address,
             sqs_message,
@@ -61,9 +59,7 @@ class SnsDelivery:
         return sns_addrs_to_rendered_jinja_messages
 
     def get_sns_addrs_to_resources_map(self, sqs_message):
-        policy_to_sns_addresses = self.get_valid_sns_from_list(
-            sqs_message['action'].get('to', [])
-        )
+        policy_to_sns_addresses = self.get_valid_sns_from_list(sqs_message['action'].get('to', []))
         sns_addrs_to_resources_map = {}
         # go over all sns_addresses from the to field
         for policy_sns_address in policy_to_sns_addresses:
@@ -71,18 +67,14 @@ class SnsDelivery:
         # get sns topics / messages inside resource-owners tags
         for resource in sqs_message['resources']:
             resource_owner_tag_keys = self.config.get('contact_tags', [])
-            possible_sns_tag_values = get_resource_tag_targets(
-                resource, resource_owner_tag_keys
-            )
+            possible_sns_tag_values = get_resource_tag_targets(resource, resource_owner_tag_keys)
             sns_tag_values = self.get_valid_sns_from_list(possible_sns_tag_values)
             # for each resource, get any valid sns topics, and add them to the map
             for sns_tag_value in sns_tag_values:
                 # skip sns topics in tags if they're already in the to field
                 if sns_tag_value in policy_to_sns_addresses:
                     continue
-                sns_addrs_to_resources_map.setdefault(sns_tag_value, []).append(
-                    resource
-                )
+                sns_addrs_to_resources_map.setdefault(sns_tag_value, []).append(resource)
         return sns_addrs_to_resources_map
 
     def target_is_sns(self, target):

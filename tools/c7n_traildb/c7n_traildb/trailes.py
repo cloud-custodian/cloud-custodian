@@ -178,9 +178,7 @@ def index_account_trails(config, account, region, date, directory):
                 try:
                     os.remove(local_db_file)
                 except Exception:
-                    log.warning(
-                        "Failed to remove temporary file: {}".format(local_db_file)
-                    )
+                    log.warning("Failed to remove temporary file: {}".format(local_db_file))
                     pass
 
 
@@ -257,9 +255,7 @@ def index(
                 jobs.append(p)
 
         for j in jobs:
-            log.debug(
-                "submit account:{} region:{} date:{}".format(j[1]['name'], j[2], j[3])
-            )
+            log.debug("submit account:{} region:{} date:{}".format(j[1]['name'], j[2], j[3]))
             futures[w.submit(index_account_trails, *j)] = j
 
         # Process completed

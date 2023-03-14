@@ -46,8 +46,8 @@ class LdapLookup:
             # environments, where /tmp is the only writeable space and
             # is effectively isolated to this process.
             self.caching = LocalSqlite(
-                config.get('ldap_cache_file', '/var/tmp/ldap.cache'), logger
-            )  # nosec
+                config.get('ldap_cache_file', '/var/tmp/ldap.cache'), logger  # nosec
+            )
 
     def get_redis_connection(self, redis_host, redis_port):
         return Redis(redis_host=redis_host, redis_port=redis_port, db=0)
@@ -72,9 +72,7 @@ class LdapLookup:
     def search_ldap(self, base_dn, ldap_filter, attributes):
         self.connection.search(base_dn, ldap_filter, attributes=self.attributes)
         if len(self.connection.entries) == 0:
-            self.log.warning(
-                "user not found. base_dn: %s filter: %s", base_dn, ldap_filter
-            )
+            self.log.warning("user not found. base_dn: %s filter: %s", base_dn, ldap_filter)
             return {}
         if len(self.connection.entries) > 1:
             self.log.warning("too many results for search %s", ldap_filter)
@@ -106,13 +104,9 @@ class LdapLookup:
                 self.log.debug(cache_msg)
                 return cache_result
         ldap_filter = '(%s=*)' % self.uid_key
-        ldap_results = self.search_ldap(
-            user_dn, ldap_filter, attributes=self.attributes
-        )
+        ldap_results = self.search_ldap(user_dn, ldap_filter, attributes=self.attributes)
         if ldap_results:
-            ldap_user_metadata = self.get_dict_from_ldap_object(
-                self.connection.entries[0]
-            )
+            ldap_user_metadata = self.get_dict_from_ldap_object(self.connection.entries[0])
         else:
             self.caching.set(user_dn, {})
             return {}
@@ -157,13 +151,9 @@ class LdapLookup:
                 self.log.debug(cache_msg)
                 return cache_result
         ldap_filter = '(%s=%s)' % (self.uid_key, uid)
-        ldap_results = self.search_ldap(
-            self.base_dn, ldap_filter, attributes=self.attributes
-        )
+        ldap_results = self.search_ldap(self.base_dn, ldap_filter, attributes=self.attributes)
         if ldap_results:
-            ldap_user_metadata = self.get_dict_from_ldap_object(
-                self.connection.entries[0]
-            )
+            ldap_user_metadata = self.get_dict_from_ldap_object(self.connection.entries[0])
             if self.cache_engine:
                 self.log.debug('Writing user: %s metadata to cache engine.' % uid)
                 if ldap_user_metadata.get('dn'):
@@ -186,29 +176,20 @@ class LocalSqlite:
     def __init__(self, local_filename, logger):
         self.log = logger
         self.sqlite = sqlite3.connect(local_filename)
-        self.sqlite.execute(
-            '''CREATE TABLE IF NOT EXISTS ldap_cache(key text, value text)'''
-        )
+        self.sqlite.execute('''CREATE TABLE IF NOT EXISTS ldap_cache(key text, value text)''')
 
     def get(self, key):
-        sqlite_result = self.sqlite.execute(
-            "select * FROM ldap_cache WHERE key=?", (key,)
-        )
+        sqlite_result = self.sqlite.execute("select * FROM ldap_cache WHERE key=?", (key,))
         result = sqlite_result.fetchall()
         if len(result) != 1:
-            error_msg = (
-                'Did not get 1 result from sqlite, something went wrong with key: %s'
-                % key
-            )
+            error_msg = 'Did not get 1 result from sqlite, something went wrong with key: %s' % key
             self.log.error(error_msg)
             return None
         return json.loads(result[0][1])
 
     def set(self, key, value):
         # note, the ? marks are required to ensure escaping into the database.
-        self.sqlite.execute(
-            "INSERT INTO ldap_cache VALUES (?, ?)", (key, json.dumps(value))
-        )
+        self.sqlite.execute("INSERT INTO ldap_cache VALUES (?, ?)", (key, json.dumps(value)))
         self.sqlite.commit()
 
 

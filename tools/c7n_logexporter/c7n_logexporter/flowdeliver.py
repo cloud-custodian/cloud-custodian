@@ -31,9 +31,7 @@ def handle(event, context):
         log.warning("Unknown event source %s", json.dumps(event, indent=2))
         return
     bodies = [
-        sns['Sns']['Message']
-        for sns in event.get('Records')
-        if sns.get('EventSource') == "aws:sns"
+        sns['Sns']['Message'] for sns in event.get('Records') if sns.get('EventSource') == "aws:sns"
     ]
 
     for b in bodies:
@@ -55,9 +53,7 @@ def process_firehose_archive(bucket, key):
     data = {}
     with tempfile.NamedTemporaryFile(mode='w+b') as fh:
         s3.download_file(bucket, key, fh.name)
-        log.warning(
-            "Downloaded Key Size:%s Key:%s", sizeof_fmt(os.path.getsize(fh.name)), key
-        )
+        log.warning("Downloaded Key Size:%s Key:%s", sizeof_fmt(os.path.getsize(fh.name)), key)
         fh.seek(0, 0)
         record_count = 0
         iteration_count = 0
@@ -67,9 +63,7 @@ def process_firehose_archive(bucket, key):
             key = '%s/%s/%s' % (r['owner'], r['logGroup'], r['logStream'])
             data.setdefault(key, []).extend(r['logEvents'])
             if record_count > EVENTS_SIZE_BUFFER:
-                log.warning(
-                    "Incremental Data Load records:%d enis:%d", record_count, len(data)
-                )
+                log.warning("Incremental Data Load records:%d enis:%d", record_count, len(data))
                 for k in data:
                     process_record_set(k, data[k])
                 data.clear()
@@ -98,9 +92,7 @@ def process_record_set(k, records):
     )
 
     with tempfile.NamedTemporaryFile() as out_fh:
-        with gzip.GzipFile(
-            records_key, mode='wb', fileobj=open(out_fh.name, 'wb')
-        ) as records_fh:
+        with gzip.GzipFile(records_key, mode='wb', fileobj=open(out_fh.name, 'wb')) as records_fh:
             timestamp = None
             record_counter = 0
             buf = []

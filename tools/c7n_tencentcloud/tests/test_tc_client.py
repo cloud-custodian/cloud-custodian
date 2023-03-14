@@ -23,9 +23,7 @@ from tencentcloud.common.exception.tencent_cloud_sdk_exception import (
 class TestClient:
     @pytest.fixture
     def simple_client(self, session):
-        return session.client(
-            "region.tencentcloudapi.com", "region", "2022-06-27", "ap-shanghai"
-        )
+        return session.client("region.tencentcloudapi.com", "region", "2022-06-27", "ap-shanghai")
 
     @pytest.mark.vcr
     def test_query_simple(self, simple_client):
@@ -118,9 +116,7 @@ class TestClient:
             "limit": {"key": "Limit", "value": 3},
         }
         params = {}
-        res = client_cvm.execute_paged_query(
-            "DescribeInstances", params, jsonpath, paging_def
-        )
+        res = client_cvm.execute_paged_query("DescribeInstances", params, jsonpath, paging_def)
         assert len(res) == 6
 
     @pytest.mark.vcr
@@ -132,9 +128,7 @@ class TestClient:
             "limit": {"key": "MaxResults", "value": 50},
         }
         params = {"TagKeys": ["tke-lb-serviceuuid"]}
-        res = client_tag.execute_paged_query(
-            "GetTagValues", params, jsonpath, paging_def
-        )
+        res = client_tag.execute_paged_query("GetTagValues", params, jsonpath, paging_def)
         assert len(res) == 233
 
     @patch.dict(

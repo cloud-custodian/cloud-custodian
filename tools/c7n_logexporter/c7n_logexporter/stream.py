@@ -75,9 +75,7 @@ def handler(event, context):
         )
 
         with open('/tmp/%s' % record_key, 'w+') as fh:
-            record_file = gzip.GzipFile(
-                record_key, mode='wb', compresslevel=5, fileobj=fh
-            )
+            record_file = gzip.GzipFile(record_key, mode='wb', compresslevel=5, fileobj=fh)
             for r in flow_records:
                 if timestamp is None:
                     timestamp = datetime.fromtimestamp(r['timestamp'] / 1000).strftime(

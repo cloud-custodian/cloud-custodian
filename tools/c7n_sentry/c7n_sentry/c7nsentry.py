@@ -88,9 +88,7 @@ def process_log_event(event, context):
     init()
     # Grab the actual error log payload
     serialized = event['awslogs'].pop('data')
-    data = json.loads(
-        zlib.decompress(base64.b64decode(serialized), 16 + zlib.MAX_WBITS)
-    )
+    data = json.loads(zlib.decompress(base64.b64decode(serialized), 16 + zlib.MAX_WBITS))
     msg = get_sentry_message(config, data)
     if msg is None:
         return
@@ -116,9 +114,7 @@ def process_log_group(config):
     session = factory()
     client = session.client('logs')
 
-    params = dict(
-        logGroupName=config.log_group, filterPattern='Traceback', interleaved=True
-    )
+    params = dict(logGroupName=config.log_group, filterPattern='Traceback', interleaved=True)
     if config.log_streams:
         params['logStreamNames'] = config.log_streams
 
@@ -216,9 +212,7 @@ def get_sentry_message(config, data, log_client=None, is_lambda=True):
     # Parse the stringified traceback to get a structured exception
     # for sentry.
     try:
-        error_msg, error = parse_traceback(
-            data['logEvents'][0]['message'], module_prefix
-        )
+        error_msg, error = parse_traceback(data['logEvents'][0]['message'], module_prefix)
     except IndexError:
         # error messages without a traceback .. skip
         log.info("no traceback, %s" % data['logEvents'][0]['message'])
@@ -256,9 +250,7 @@ def get_sentry_message(config, data, log_client=None, is_lambda=True):
 
     sentry_msg = {
         'event_id': uuid.uuid4().hex,
-        'timestamp': datetime.fromtimestamp(
-            data['logEvents'][0]['timestamp'] / 1000
-        ).isoformat(),
+        'timestamp': datetime.fromtimestamp(data['logEvents'][0]['timestamp'] / 1000).isoformat(),
         'user': {'id': config['account_id'], 'username': config['account_name']},
         'level': level.lower(),
         'culprit': culprit,
@@ -370,9 +362,7 @@ def get_function(
             }
         ),
     )
-    archive.add_contents(
-        'handler.py', 'from c7n_sentry.c7nsentry import process_log_event'
-    )
+    archive.add_contents('handler.py', 'from c7n_sentry.c7nsentry import process_log_event')
     archive.close()
 
     return LambdaFunction(config, archive)
@@ -396,8 +386,7 @@ def orgreplay(options):
 
     log.info("sentry endpoint: %s", endpoint)
     teams = {
-        t['slug']
-        for t in sget(endpoint + "organizations/%s/teams/" % options.sentry_org).json()
+        t['slug'] for t in sget(endpoint + "organizations/%s/teams/" % options.sentry_org).json()
     }
     projects = {p['name']: p for p in sget(endpoint + "projects/").json()}
 
@@ -541,9 +530,7 @@ def main():
     parser = setup_parser()
     options = parser.parse_args()
     level = options.verbose and logging.DEBUG or logging.INFO
-    logging.basicConfig(
-        level=level, format="%(asctime)s: %(name)s:%(levelname)s %(message)s"
-    )
+    logging.basicConfig(level=level, format="%(asctime)s: %(name)s:%(levelname)s %(message)s")
     logging.getLogger('botocore').setLevel(logging.ERROR)
 
     if not options.regions:

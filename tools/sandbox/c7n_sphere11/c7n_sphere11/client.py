@@ -29,9 +29,7 @@ class Client:
     def list_locks(self, account_id=None):
         """Get extant locks for the given account."""
         account_id = self.get_account_id(account_id)
-        return self.http.get(
-            "%s/%s/locks" % (self.endpoint, account_id), auth=self.get_api_auth()
-        )
+        return self.http.get("%s/%s/locks" % (self.endpoint, account_id), auth=self.get_api_auth())
 
     def lock_status(self, resource_id, parent_id=None, account_id=None):
         """Get the lock status for a given resource.
@@ -81,9 +79,7 @@ class Client:
         return account
 
     def get_api_auth(self):
-        return SignatureAuth(
-            self.api_session.get_credentials(), "us-east-1", "execute-api"
-        )
+        return SignatureAuth(self.api_session.get_credentials(), "us-east-1", "execute-api")
 
     def get_session(self, session_name=None):
         session = boto3.Session()

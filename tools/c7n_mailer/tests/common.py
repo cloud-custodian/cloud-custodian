@@ -193,9 +193,7 @@ SQS_MESSAGE_3 = {
     "region": "us-east-1",
     "action": {
         "type": "notify",
-        "to": [
-            "datadog://?metric_name=EBS_volume.available.size&metric_value_tag=Size"
-        ],
+        "to": ["datadog://?metric_name=EBS_volume.available.size&metric_value_tag=Size"],
     },
     "policy": {
         "filters": [{"Attachments": []}, {"tag:maid_status": "absent"}],
@@ -204,9 +202,7 @@ SQS_MESSAGE_3 = {
             {"type": "mark-for-op", "days": 15, "op": "delete"},
             {
                 "type": "notify",
-                "to": [
-                    "datadog://?metric_name=EBS_volume.available.size&metric_value_tag=Size"
-                ],
+                "to": ["datadog://?metric_name=EBS_volume.available.size&metric_value_tag=Size"],
             },
         ],
         "comments": "We are deleting your EBS volumes.",
@@ -650,9 +646,7 @@ GCP_SMTP_MESSAGE = {
         "resource": "gcp.pubsub-topic",
     },
     "region": "all",
-    "resources": [
-        {"c7n:MatchedFilters": ["name"], "name": "projects/c7n-dev/topics/c7n_notify"}
-    ],
+    "resources": [{"c7n:MatchedFilters": ["name"], "name": "projects/c7n-dev/topics/c7n_notify"}],
 }
 
 PUBSUB_MESSAGE_DATADOG = """{

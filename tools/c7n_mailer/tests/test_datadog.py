@@ -88,9 +88,7 @@ class TestDataDogDelivery(unittest.TestCase):
         self.session = patch("boto3.Session")
         self.logger = MagicMock()
 
-        self.patcher_datadog_initialize = patch(
-            "c7n_mailer.datadog_delivery.initialize"
-        )
+        self.patcher_datadog_initialize = patch("c7n_mailer.datadog_delivery.initialize")
         self.mock_datadog_initialize = self.patcher_datadog_initialize.start()
 
     def tearDown(self):
@@ -132,12 +130,8 @@ class TestDataDogDelivery(unittest.TestCase):
         self, mock_datadog_api, mock_time
     ):
         datadog_delivery = DataDogDelivery(self.config, self.session, self.logger)
-        datadog_message_packages = datadog_delivery.get_datadog_message_packages(
-            SQS_MESSAGE_2
-        )
-        datadog_delivery.deliver_datadog_messages(
-            datadog_message_packages, SQS_MESSAGE_2
-        )
+        datadog_message_packages = datadog_delivery.get_datadog_message_packages(SQS_MESSAGE_2)
+        datadog_delivery.deliver_datadog_messages(datadog_message_packages, SQS_MESSAGE_2)
 
         answer = mock_datadog_api.mock_calls[0][1][0]
         answer[0]["tags"].sort()
@@ -151,12 +145,8 @@ class TestDataDogDelivery(unittest.TestCase):
         self, mock_datadog_api, mock_time
     ):
         datadog_delivery = DataDogDelivery(self.config, self.session, self.logger)
-        datadog_message_packages = datadog_delivery.get_datadog_message_packages(
-            SQS_MESSAGE_3
-        )
-        datadog_delivery.deliver_datadog_messages(
-            datadog_message_packages, SQS_MESSAGE_3
-        )
+        datadog_message_packages = datadog_delivery.get_datadog_message_packages(SQS_MESSAGE_3)
+        datadog_delivery.deliver_datadog_messages(datadog_message_packages, SQS_MESSAGE_3)
 
         answer = mock_datadog_api.mock_calls[0][1][0]
         answer[0]["tags"].sort()

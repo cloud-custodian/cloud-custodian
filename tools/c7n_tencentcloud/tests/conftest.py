@@ -54,16 +54,12 @@ def session():
 
 @pytest.fixture
 def client_cvm(session):
-    return session.client(
-        "cvm.tencentcloudapi.com", "cvm", "2017-03-12", "ap-singapore"
-    )
+    return session.client("cvm.tencentcloudapi.com", "cvm", "2017-03-12", "ap-singapore")
 
 
 @pytest.fixture
 def client_tag(session):
-    return session.client(
-        "tag.tencentcloudapi.com", "tag", "2018-08-13", "ap-singapore"
-    )
+    return session.client("tag.tencentcloudapi.com", "tag", "2018-08-13", "ap-singapore")
 
 
 @pytest.fixture

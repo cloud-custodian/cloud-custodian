@@ -9,9 +9,7 @@ from mock import MagicMock
 
 class GcpUtilsTest(unittest.TestCase):
     def test_gcp_decrypt_raw(self):
-        self.assertEqual(
-            gcp_decrypt({"test": "value"}, MagicMock(), "test", MagicMock()), "value"
-        )
+        self.assertEqual(gcp_decrypt({"test": "value"}, MagicMock(), "test", MagicMock()), "value")
 
     def test_gcp_decrypt_raw_latest(self):
         mock_client = MagicMock()
@@ -25,9 +23,7 @@ class GcpUtilsTest(unittest.TestCase):
         mock_client.access_secret_version.assert_called_with(name="foo/versions/latest")
         self.assertTrue("foo/versions/latest" in CACHE)
         # the value should be cached and we should only see one access secret version call
-        value = gcp_decrypt(
-            {"test": {"secret": "foo"}}, MagicMock(), "test", mock_client
-        )
+        value = gcp_decrypt({"test": {"secret": "foo"}}, MagicMock(), "test", mock_client)
         mock_client.access_secret_version.assert_called_once()
 
         # of course, the value of the secret should not have changed

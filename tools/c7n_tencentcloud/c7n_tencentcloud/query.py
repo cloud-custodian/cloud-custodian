@@ -106,9 +106,7 @@ class ResourceQuery:
         if extra_params:
             params.update(extra_params)
         try:
-            resp = cli.execute_paged_query(
-                action, params, jsonpath, resource_type.paging_def
-            )
+            resp = cli.execute_paged_query(action, params, jsonpath, resource_type.paging_def)
             return resp
         except (RetryError, TencentCloudSDKException) as err:
             raise PolicyExecutionError(err) from err
@@ -143,9 +141,7 @@ class DescribeSource:
     @property
     def query_helper(self):
         if self._query_helper is None:
-            self._query_helper = ResourceQuery(
-                local_session(self.resource_manager.session_factory)
-            )
+            self._query_helper = ResourceQuery(local_session(self.resource_manager.session_factory))
         return self._query_helper
 
     def resources(self, params=None):
@@ -341,9 +337,7 @@ class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
         for s in resources:
             dimensions = []
             for item in self.resource_type.metrics_dimension_def:
-                dimensions.append(
-                    {"Name": item[0], "Value": str(s[item[1]])}  # force to string
-                )
+                dimensions.append({"Name": item[0], "Value": str(s[item[1]])})  # force to string
             instances.append({"Dimensions": dimensions})
 
         return (self.resource_type.metrics_namespace, instances)

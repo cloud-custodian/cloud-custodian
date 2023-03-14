@@ -88,9 +88,7 @@ class Client:
             params[PageMethod.PaginationToken.name] = ""
             pagination_token_path = paging_def.get("pagination_token_path", "")
             if not pagination_token_path:
-                raise PolicyExecutionError(
-                    "config to use pagination_token but not set token path"
-                )
+                raise PolicyExecutionError("config to use pagination_token but not set token path")
             params[paging_def["limit"]["key"]] = paging_def["limit"]["value"]
         elif paging_method == PageMethod.Page:
             params[PageMethod.Page.name] = 1
@@ -107,9 +105,7 @@ class Client:
                 raise PolicyExecutionError("get too many resources from cloud provider")
 
             # some api Offset and Limit fields are string
-            if paging_method == PageMethod.Offset and isinstance(
-                paging_def["limit"]["value"], str
-            ):
+            if paging_method == PageMethod.Offset and isinstance(paging_def["limit"]["value"], str):
                 params[PageMethod.Offset.name] = str(params[PageMethod.Offset.name])
 
             result = self.execute_query(action, params)
@@ -121,9 +117,9 @@ class Client:
                     if len(items) < int(paging_def["limit"]["value"]):
                         # no more data
                         break
-                    params[PageMethod.Offset.name] = int(
-                        params[PageMethod.Offset.name]
-                    ) + int(paging_def["limit"]["value"])
+                    params[PageMethod.Offset.name] = int(params[PageMethod.Offset.name]) + int(
+                        paging_def["limit"]["value"]
+                    )
                 elif paging_method == PageMethod.Page:
                     if len(items) < int(paging_def["limit"]["value"]):
                         # no more data

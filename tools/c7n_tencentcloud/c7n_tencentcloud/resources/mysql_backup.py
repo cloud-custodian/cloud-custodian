@@ -42,17 +42,13 @@ class MySQLBackUp(QueryResourceManager):
         }
         resource_prefix = "instanceId"
         taggable = True
-        datetime_fields_format = {
-            "Date": ("%Y-%m-%d %H:%M:%S", pytz.timezone("Asia/Shanghai"))
-        }
+        datetime_fields_format = {"Date": ("%Y-%m-%d %H:%M:%S", pytz.timezone("Asia/Shanghai"))}
 
     def augment(self, resources):
         backup_resources = []
         cli = self.get_client()
         for resource in resources:
-            resp = cli.execute_query(
-                "DescribeBackups", {"InstanceId": resource["InstanceId"]}
-            )
+            resp = cli.execute_query("DescribeBackups", {"InstanceId": resource["InstanceId"]})
             items = resp["Response"]["Items"]
             field_format = self.resource_type.datetime_fields_format["Date"]
             for item in items:

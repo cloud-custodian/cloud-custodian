@@ -11,9 +11,7 @@ class TestLogGroup(BaseTest):
             {
                 "name": "cls_test",
                 "resource": "tencentcloud.cls",
-                "filters": [
-                    {"or": [{"Period": 7}, {"Period": None}, {"Period": 3600}]}
-                ],
+                "filters": [{"or": [{"Period": 7}, {"Period": None}, {"Period": 3600}]}],
             }
         )
         resources = policy.run()

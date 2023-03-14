@@ -15,9 +15,7 @@ class AppInsightsUnit(DeploymentUnit):
 
     def _get(self, params):
         try:
-            return self.client.components.get(
-                params['resource_group_name'], params['name']
-            )
+            return self.client.components.get(params['resource_group_name'], params['name'])
         except ResourceNotFoundError:
             return None
 

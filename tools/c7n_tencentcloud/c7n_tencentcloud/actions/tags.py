@@ -97,9 +97,7 @@ class RenameTagAction(TagAction):
     you need to delete it first and then add it
     """
 
-    schema = type_schema(
-        "rename-tag", old_key={"type": "string"}, new_key={"type": "string"}
-    )
+    schema = type_schema("rename-tag", old_key={"type": "string"}, new_key={"type": "string"})
     schema_alias = True
     t_api_method_name = "ModifyResourceTags"
 
@@ -128,9 +126,7 @@ class RenameTagAction(TagAction):
         param.update({"Resource": qcs_list[0]})
         if old_tag is not None:
             replaceTags = {
-                "ReplaceTags": [
-                    {"TagKey": self.data.get("new_key"), "TagValue": old_tag["Value"]}
-                ]
+                "ReplaceTags": [{"TagKey": self.data.get("new_key"), "TagValue": old_tag["Value"]}]
             }
             param.update(replaceTags)
 
@@ -215,15 +211,11 @@ class TagDelayedAction(TagAction):
         """validate"""
         op = self.data.get("op")
         if self.manager and op not in self.manager.action_registry.keys():
-            raise PolicyValidationError(
-                f"mark-for-op invalid op:{op} in {self.manager.data}"
-            )
+            raise PolicyValidationError(f"mark-for-op invalid op:{op} in {self.manager.data}")
         try:
             self.tz = pytz.timezone(self.data.get("tz", "utc"))
         except pytz.exceptions.UnknownTimeZoneError as err:
-            raise PolicyValidationError(
-                f"Invalid tz specified in {self.manager.data}"
-            ) from err
+            raise PolicyValidationError(f"Invalid tz specified in {self.manager.data}") from err
 
     def generate_timestamp(self, days, hours):
         """generate_timestamp"""
@@ -288,9 +280,7 @@ class TagActionFilter(Filter):
         """validate"""
         op = self.data.get("op")
         if self.manager and op not in self.manager.action_registry.keys():
-            raise PolicyValidationError(
-                f"Invalid marked-for-op op:{op} in {self.manager.data}"
-            )
+            raise PolicyValidationError(f"Invalid marked-for-op op:{op} in {self.manager.data}")
         return self
 
     def process(self, resources, event=None):
@@ -334,6 +324,4 @@ class TagActionFilter(Filter):
         # current_date must match timezones with the parsed date string
         # NOTICE: we only use the tz from tag_value
         current_dt = datetime.now(tz=action_dt.tzinfo)
-        return current_dt >= (
-            action_dt - timedelta(days=self.skew, hours=self.skew_hours)
-        )
+        return current_dt >= (action_dt - timedelta(days=self.skew, hours=self.skew_hours))

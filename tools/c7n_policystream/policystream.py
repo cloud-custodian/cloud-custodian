@@ -160,9 +160,7 @@ class CollectionDelta:
         added = set(self.curr.keys()) - set(self.prev.keys())
 
         for r in removed:
-            yield PolicyChange(
-                self.prev[r], self.repo_uri, self.commit, ChangeType.REMOVE
-            )
+            yield PolicyChange(self.prev[r], self.repo_uri, self.commit, ChangeType.REMOVE)
 
         for a in added:
             yield PolicyChange(self.curr[a], self.repo_uri, self.commit, ChangeType.ADD)
@@ -213,9 +211,7 @@ class PolicyCollection(BaseCollection):
 
     def select(self, names):
         """return the named subset of policies"""
-        return PolicyCollection(
-            [p for p in self.policies if p.name in names], self.options
-        )
+        return PolicyCollection([p for p in self.policies if p.name in names], self.options)
 
     def add(self, p):
         assert p.name not in self.pmap
@@ -239,9 +235,7 @@ class PolicyCollection(BaseCollection):
 
     @classmethod
     def from_data(cls, data, options, file_path):
-        policies = [
-            cls.policy_class(p, options, file_path) for p in data.get('policies', ())
-        ]
+        policies = [cls.policy_class(p, options, file_path) for p in data.get('policies', ())]
         return cls(policies, options)
 
 
@@ -318,9 +312,7 @@ class PolicyRepo:
             target_policies += self._policy_file_rev(f, target)
             baseline_policies += self._policy_file_rev(f, baseline)
 
-        return CollectionDelta(
-            baseline_policies, target_policies, target, self.repo_uri
-        ).delta()
+        return CollectionDelta(baseline_policies, target_policies, target, self.repo_uri).delta()
 
     def delta_stream(
         self,
@@ -442,9 +434,7 @@ class PolicyRepo:
                 continue
 
         for change in self._process_stream_delta(
-            CollectionDelta(
-                current_policies, change_policies, change, self.repo_uri
-            ).delta()
+            CollectionDelta(current_policies, change_policies, change, self.repo_uri).delta()
         ):
             yield change
 
@@ -462,24 +452,18 @@ class PolicyRepo:
                 self.policy_files[pchange.file_path].remove(pchange.policy)
             elif pchange.kind in (ChangeType.MOVED, ChangeType.MODIFIED):
                 if pchange.policy.file_path != pchange.previous.file_path:
-                    self.policy_files[pchange.previous.file_path].remove(
-                        pchange.previous
-                    )
+                    self.policy_files[pchange.previous.file_path].remove(pchange.previous)
                     if (
                         pchange.policy.file_path in self.policy_files
                         and pchange.policy.name in self.policy_files[pchange.file_path]
                     ):
-                        self.policy_files[pchange.file_path][
-                            pchange.policy.name
-                        ] = pchange.policy
+                        self.policy_files[pchange.file_path][pchange.policy.name] = pchange.policy
                     else:
-                        self.policy_files.setdefault(
-                            pchange.file_path, PolicyCollection()
-                        ).add(pchange.policy)
+                        self.policy_files.setdefault(pchange.file_path, PolicyCollection()).add(
+                            pchange.policy
+                        )
                 else:
-                    self.policy_files[pchange.file_path][
-                        pchange.policy.name
-                    ] = pchange.policy
+                    self.policy_files[pchange.file_path][pchange.policy.name] = pchange.policy
             yield pchange
 
 
@@ -540,9 +524,7 @@ class KinesisTransport(Transport):
         self.retry(
             self.client.put_records,
             StreamName=self.info['resource'],
-            Records=[
-                {'Data': json.dumps(c.data()), 'PartitionKey': c.repo_uri} for c in buf
-            ],
+            Records=[{'Data': json.dumps(c.data()), 'PartitionKey': c.repo_uri} for c in buf],
         )
 
 
@@ -602,9 +584,7 @@ class SQLTransport(IndexedTransport):
             )
 
     def last(self):
-        value = self.conn.execute(
-            'select max(commit_date) from policy_changes'
-        ).fetchone()[0]
+        value = self.conn.execute('select max(commit_date) from policy_changes').fetchone()[0]
         if not value:
             return None
         if isinstance(value, str):
@@ -630,8 +610,7 @@ class SQSTransport(Transport):
             Entries=[
                 {
                     'Id': str(change.commit.id) + change.policy.name,
-                    'MessageDeduplicationId': str(change.commit.id)
-                    + change.policy.name,
+                    'MessageDeduplicationId': str(change.commit.id) + change.policy.name,
                     'MessageGroupId': change.repo_uri,
                     'MessageBody': json.dumps(change.data()),
                 }
@@ -730,21 +709,13 @@ def github_repos(organization, github_url, github_token):
 
 
 @cli.command(name='org-stream')
-@click.option(
-    '--organization', envvar="GITHUB_ORG", required=True, help="Github Organization"
-)
-@click.option(
-    '--github-url', envvar="GITHUB_API_URL", default='https://api.github.com/graphql'
-)
+@click.option('--organization', envvar="GITHUB_ORG", required=True, help="Github Organization")
+@click.option('--github-url', envvar="GITHUB_API_URL", default='https://api.github.com/graphql')
 @click.option('--github-token', envvar='GITHUB_TOKEN', help="Github credential token")
 @click.option('-v', '--verbose', default=False, help="Verbose", is_flag=True)
 @click.option('-d', '--clone-dir', help="Local directory to checkout repos to")
-@click.option(
-    '-f', '--filter', multiple=True, help="glob for repositories within org to include"
-)
-@click.option(
-    '-e', '--exclude', multiple=True, help="glob for repository within org to exclude"
-)
+@click.option('-f', '--filter', multiple=True, help="glob for repositories within org to include")
+@click.option('-e', '--exclude', multiple=True, help="glob for repository within org to exclude")
 @click.option(
     '-s',
     '--stream-uri',
@@ -796,20 +767,14 @@ def org_stream(
 
 
 @cli.command(name='org-checkout')
-@click.option(
-    '--organization', envvar="GITHUB_ORG", required=True, help="Github Organization"
-)
-@click.option(
-    '--github-url', envvar="GITHUB_API_URL", default='https://api.github.com/graphql'
-)
+@click.option('--organization', envvar="GITHUB_ORG", required=True, help="Github Organization")
+@click.option('--github-url', envvar="GITHUB_API_URL", default='https://api.github.com/graphql')
 @click.option('--github-token', envvar='GITHUB_TOKEN', help="Github credential token")
 @click.option('-v', '--verbose', default=False, help="Verbose", is_flag=True)
 @click.option('-d', '--clone-dir')
 @click.option('-f', '--filter', multiple=True)
 @click.option('-e', '--exclude', multiple=True)
-def org_checkout(
-    organization, github_url, github_token, clone_dir, verbose, filter, exclude
-):
+def org_checkout(organization, github_url, github_token, clone_dir, verbose, filter, exclude):
     """Checkout repositories from a GitHub organization."""
     logging.basicConfig(
         format="%(asctime)s: %(name)s:%(levelname)s %(message)s",
@@ -931,17 +896,11 @@ def diff(repo_uri, source, target, output, verbose):
 
     policy_repo = PolicyRepo(repo_uri, repo)
     changes = list(
-        policy_repo.delta_commits(
-            repo.revparse_single(source), repo.revparse_single(target)
-        )
+        policy_repo.delta_commits(repo.revparse_single(source), repo.revparse_single(target))
     )
     output.write(
         yaml.safe_dump(
-            {
-                'policies': [
-                    c.policy.data for c in changes if c.kind != ChangeType.REMOVE
-                ]
-            }
+            {'policies': [c.policy.data for c in changes if c.kind != ChangeType.REMOVE]}
         ).encode('utf8')
     )
 

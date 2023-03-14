@@ -63,9 +63,7 @@ class SGPermission(Filter):
 
     def process(self, resources, event=None):
         self.ports = 'Ports' in self.data and self.data['Ports'] or ()
-        self.any_ports_except = (
-            'AnyPortsExcept' in self.data and self.data['AnyPortsExcept'] or ()
-        )
+        self.any_ports_except = 'AnyPortsExcept' in self.data and self.data['AnyPortsExcept'] or ()
         return super(SGPermission, self).process(resources, event)
 
     # Supported Tencentcloud security-group policy port schema:
@@ -140,9 +138,7 @@ class SGPermission(Filter):
             perm_matches['cidrs'] = self.process_cidrs(perm)
             """None means that the term does not exist in the filter condition,
             and the none result is ignored"""
-            perm_match_values = list(
-                filter(lambda x: x is not None, perm_matches.values())
-            )
+            perm_match_values = list(filter(lambda x: x is not None, perm_matches.values()))
 
             """ if process_xxx() method returns None, it means there is no related rule config in
             security group. In Python all([]) returns True, which should be fixed in this case:
@@ -157,9 +153,7 @@ class SGPermission(Filter):
                 matched.append(perm)
 
         if matched:
-            resource.setdefault('Matched%s' % self.ip_permissions_key, []).extend(
-                matched
-            )
+            resource.setdefault('Matched%s' % self.ip_permissions_key, []).extend(matched)
             return True
 
 

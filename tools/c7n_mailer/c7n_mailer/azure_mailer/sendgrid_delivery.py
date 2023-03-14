@@ -20,9 +20,7 @@ class SendGridDelivery:
 
     def get_to_addrs_sendgrid_messages_map(self, queue_message):
         # eg: { ('milton@initech.com', 'peter@initech.com'): [resource1, resource2, etc] }
-        to_addrs_to_resources_map = self.get_email_to_addrs_to_resources_map(
-            queue_message
-        )
+        to_addrs_to_resources_map = self.get_email_to_addrs_to_resources_map(queue_message)
 
         to_addrs_to_content_map = {}
         for to_addrs, resources in to_addrs_to_resources_map.items():
@@ -55,9 +53,7 @@ class SendGridDelivery:
             resource_emails = tuple(sorted(set(resource_emails)))
 
             if resource_emails:
-                email_to_addrs_to_resources_map.setdefault(resource_emails, []).append(
-                    resource
-                )
+                email_to_addrs_to_resources_map.setdefault(resource_emails, []).append(resource)
 
         if email_to_addrs_to_resources_map == {}:
             self.logger.debug('Found no email addresses, sending no emails.')
@@ -80,9 +76,7 @@ class SendGridDelivery:
         for email_to_addrs, message in to_addrs_to_email_messages_map.items():
             for to_address in email_to_addrs:
                 try:
-                    mail = SendGridDelivery._sendgrid_mail_from_email_message(
-                        message, to_address
-                    )
+                    mail = SendGridDelivery._sendgrid_mail_from_email_message(message, to_address)
                     self.sendgrid_client.send(mail)
                 except (exceptions.UnauthorizedError, exceptions.BadRequestsError) as e:
                     self.logger.warning(

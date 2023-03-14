@@ -94,9 +94,7 @@ class User(QueryResourceManager):
         """augment"""
         for item in resources:
             fm = self.resource_type.datetime_fields_format["CreateTime"]
-            item["CreateTime"] = isoformat_datetime_str(
-                item["CreateTime"], fm[0], fm[1]
-            )
+            item["CreateTime"] = isoformat_datetime_str(item["CreateTime"], fm[0], fm[1])
         return resources
 
 
@@ -142,9 +140,7 @@ class GroupMembership(ValueFilter):
         # get users' group
         with self.executor_factory(max_workers=2) as w:
             futures = []
-            for user_set in chunks(
-                [r for r in resources if self.group_field_name not in r]
-            ):
+            for user_set in chunks([r for r in resources if self.group_field_name not in r]):
                 futures.append(w.submit(self.get_user_groups, user_set))
             for f in as_completed(futures):
                 pass
@@ -253,9 +249,7 @@ class CredentialFilter(Filter):
                             v["LastUsedDate"], fm[0], fm[1]
                         )
                     # pre-process for filter
-                    fm = self.manager.resource_type.datetime_fields_format[
-                        "access_keys.CreateTime"
-                    ]
+                    fm = self.manager.resource_type.datetime_fields_format["access_keys.CreateTime"]
                     batch[idx]["CreateTime"] = isoformat_datetime_str(
                         batch[idx]["CreateTime"], fm[0], fm[1]
                     )
@@ -271,9 +265,7 @@ class CredentialFilter(Filter):
             for resource in batch:
                 uin = resource[self.manager.resource_type.id]
                 if uin in uin_map:
-                    fm = self.manager.resource_type.datetime_fields_format[
-                        "LastLoginTime"
-                    ]
+                    fm = self.manager.resource_type.datetime_fields_format["LastLoginTime"]
                     resource["LastLoginTime"] = isoformat_datetime_str(
                         uin_map[uin]["LastLoginTime"], fm[0], fm[1]
                     )
@@ -489,9 +481,7 @@ class AllowAllIamPolicies(Filter):
     def process(self, resources, event=None):
         """process"""
         results = [r for r in resources if self.has_allow_all_policy(r)]
-        self.log.info(
-            "%d of %d cam policies have allow all.", len(results), len(resources)
-        )
+        self.log.info("%d of %d cam policies have allow all.", len(results), len(resources))
         return results
 
 

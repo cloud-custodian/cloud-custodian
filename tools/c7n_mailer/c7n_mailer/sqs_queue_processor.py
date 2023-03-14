@@ -53,9 +53,7 @@ class MailerSqsQueueIterator:
     next = __next__  # python2.7
 
     def ack(self, m):
-        self.aws_sqs.delete_message(
-            QueueUrl=self.queue_url, ReceiptHandle=m['ReceiptHandle']
-        )
+        self.aws_sqs.delete_message(QueueUrl=self.queue_url, ReceiptHandle=m['ReceiptHandle'])
 
 
 class MailerSqsQueueProcessor(MessageTargetMixin):
@@ -108,9 +106,7 @@ class MailerSqsQueueProcessor(MessageTargetMixin):
             if msg_kind:
                 msg_kind = msg_kind['StringValue']
             if not msg_kind == DATA_MESSAGE:
-                warning_msg = 'Unknown sqs_message or sns format %s' % (
-                    sqs_message['Body'][:50]
-                )
+                warning_msg = 'Unknown sqs_message or sns format %s' % (sqs_message['Body'][:50])
                 self.logger.warning(warning_msg)
             if parallel:
                 process_pool.apply_async(self.process_sqs_message, args=sqs_message)

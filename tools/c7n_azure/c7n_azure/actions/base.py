@@ -76,9 +76,7 @@ class AzureBaseAction(BaseAction, metaclass=abc.ABCMeta):
                     raise e
                 if isinstance(e, CloudError):
                     self.log.error(
-                        "{0} failed for '{1}'. {2}".format(
-                            self.type, r['name'], e.message
-                        ),
+                        "{0} failed for '{1}'. {2}".format(self.type, r['name'], e.message),
                         extra=self._get_action_log_metadata(r),
                     )
                 else:
@@ -109,9 +107,7 @@ class AzureEventAction(EventAction, AzureBaseAction, metaclass=abc.ABCMeta):
                     raise e
                 if isinstance(e, CloudError):
                     self.log.error(
-                        "{0} failed for '{1}'. {2}".format(
-                            self.type, r['name'], e.message
-                        ),
+                        "{0} failed for '{1}'. {2}".format(self.type, r['name'], e.message),
                         extra=self._get_action_log_metadata(r),
                     )
                 else:

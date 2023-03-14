@@ -124,9 +124,7 @@ def get_mimetext_message(config, logger, message, resources, to_addrs):
     email_format = message['action'].get('template_format', None)
     if not email_format:
         email_format = (
-            message['action'].get('template', 'default').endswith('html')
-            and 'html'
-            or 'plain'
+            message['action'].get('template', 'default').endswith('html') and 'html' or 'plain'
         )
 
     return set_mimetext_headers(

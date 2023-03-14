@@ -119,32 +119,24 @@ class EmailTest(unittest.TestCase):
             "bill@initech.com",
         ]
         valid_emails = self.email_delivery.get_valid_emails_from_list(list_1)
-        self.assertEqual(
-            valid_emails, ["michael_bolton@initech.com", "bill@initech.com"]
-        )
+        self.assertEqual(valid_emails, ["michael_bolton@initech.com", "bill@initech.com"])
 
     def test_event_owner_ldap_flow(self):
         targets = ["event-owner"]
-        michael_bolton_email = self.email_delivery.get_event_owner_email(
-            targets, CLOUDTRAIL_EVENT
-        )
+        michael_bolton_email = self.email_delivery.get_event_owner_email(targets, CLOUDTRAIL_EVENT)
         self.assertEqual(michael_bolton_email, ["michael_bolton@initech.com"])
 
     def test_get_ldap_emails_from_resource(self):
         SQS_MESSAGE_1["action"]["email_ldap_username_manager"] = False
-        ldap_emails = self.email_delivery.get_ldap_emails_from_resource(
-            SQS_MESSAGE_1, RESOURCE_1
-        )
+        ldap_emails = self.email_delivery.get_ldap_emails_from_resource(SQS_MESSAGE_1, RESOURCE_1)
         self.assertEqual(ldap_emails, ["peter@initech.com"])
         SQS_MESSAGE_1["action"]["email_ldap_username_manager"] = True
-        ldap_emails = self.email_delivery.get_ldap_emails_from_resource(
-            SQS_MESSAGE_1, RESOURCE_1
-        )
+        ldap_emails = self.email_delivery.get_ldap_emails_from_resource(SQS_MESSAGE_1, RESOURCE_1)
         self.assertEqual(ldap_emails, ["peter@initech.com", "bill_lumberg@initech.com"])
 
     def test_email_to_resources_map_with_ldap_manager(self):
-        emails_to_resources_map = (
-            self.email_delivery.get_email_to_addrs_to_resources_map(SQS_MESSAGE_1)
+        emails_to_resources_map = self.email_delivery.get_email_to_addrs_to_resources_map(
+            SQS_MESSAGE_1
         )
         # make sure only 1 email is queued to go out
         self.assertEqual(len(emails_to_resources_map.items()), 1)
@@ -158,8 +150,8 @@ class EmailTest(unittest.TestCase):
     def test_email_to_email_message_map_without_ldap_manager(self):
         SQS_MESSAGE = copy.deepcopy(SQS_MESSAGE_1)
         SQS_MESSAGE["policy"]["actions"][1].pop("email_ldap_username_manager", None)
-        email_addrs_to_email_message_map = (
-            self.email_delivery.get_to_addrs_email_messages_map(SQS_MESSAGE)
+        email_addrs_to_email_message_map = self.email_delivery.get_to_addrs_email_messages_map(
+            SQS_MESSAGE
         )
         to_emails = (
             "bill_lumberg@initech.com",
@@ -176,8 +168,8 @@ class EmailTest(unittest.TestCase):
         email_delivery = MockEmailDelivery(conf, self.aws_session, logger)
         SQS_MESSAGE = copy.deepcopy(SQS_MESSAGE_1)
         SQS_MESSAGE["policy"]["actions"][1].pop("email_ldap_username_manager", None)
-        email_addrs_to_email_message_map = (
-            email_delivery.get_to_addrs_email_messages_map(SQS_MESSAGE)
+        email_addrs_to_email_message_map = email_delivery.get_to_addrs_email_messages_map(
+            SQS_MESSAGE
         )
         for _, mimetext_msg in email_addrs_to_email_message_map.items():
             self.assertEqual(mimetext_msg["X-Foo"], "X-Foo-Value")
@@ -185,14 +177,12 @@ class EmailTest(unittest.TestCase):
 
     def test_smtp_called_once(self):
         SQS_MESSAGE = copy.deepcopy(SQS_MESSAGE_1)
-        to_addrs_to_email_messages_map = (
-            self.email_delivery.get_to_addrs_email_messages_map(SQS_MESSAGE)
+        to_addrs_to_email_messages_map = self.email_delivery.get_to_addrs_email_messages_map(
+            SQS_MESSAGE
         )
         with patch("smtplib.SMTP") as mock_smtp:
             for email_addrs, mimetext_msg in to_addrs_to_email_messages_map.items():
-                self.email_delivery.send_c7n_email(
-                    SQS_MESSAGE, list(email_addrs), mimetext_msg
-                )
+                self.email_delivery.send_c7n_email(SQS_MESSAGE, list(email_addrs), mimetext_msg)
 
                 self.assertEqual(mimetext_msg["X-Priority"], "1 (Highest)")
             # Get instance of mocked SMTP object
@@ -229,14 +219,12 @@ class EmailTest(unittest.TestCase):
             "VolumeId": "vol-01a0e6ea6b8lsdkj93",
         }
         SQS_MESSAGE["resources"].append(RESOURCE_2)
-        to_addrs_to_email_messages_map = (
-            self.email_delivery.get_to_addrs_email_messages_map(SQS_MESSAGE)
+        to_addrs_to_email_messages_map = self.email_delivery.get_to_addrs_email_messages_map(
+            SQS_MESSAGE
         )
         with patch("smtplib.SMTP") as mock_smtp:
             for email_addrs, mimetext_msg in to_addrs_to_email_messages_map.items():
-                self.email_delivery.send_c7n_email(
-                    SQS_MESSAGE, list(email_addrs), mimetext_msg
-                )
+                self.email_delivery.send_c7n_email(SQS_MESSAGE, list(email_addrs), mimetext_msg)
                 self.assertEqual(mimetext_msg.get("X-Priority"), None)
                 # self.assertEqual(mimetext_msg.get('X-Priority'), None)
             # Get instance of mocked SMTP object
@@ -256,8 +244,8 @@ class EmailTest(unittest.TestCase):
             "VolumeId": "vol-01a0e6ea6b8lsdkj93",
         }
         SQS_MESSAGE["resources"].append(RESOURCE_2)
-        emails_to_resources_map = (
-            self.email_delivery.get_email_to_addrs_to_resources_map(SQS_MESSAGE)
+        emails_to_resources_map = self.email_delivery.get_email_to_addrs_to_resources_map(
+            SQS_MESSAGE
         )
         email_1_to_addrs = (
             "bill_lumberg@initech.com",
@@ -279,8 +267,8 @@ class EmailTest(unittest.TestCase):
             "VolumeId": "vol-01a0e6ea6b89f0099",
         }
         SQS_MESSAGE["resources"] = [RESOURCE_2]
-        emails_to_resources_map = (
-            self.email_delivery.get_email_to_addrs_to_resources_map(SQS_MESSAGE)
+        emails_to_resources_map = self.email_delivery.get_email_to_addrs_to_resources_map(
+            SQS_MESSAGE
         )
         email_1_to_addrs = (
             "bill_lumberg@initech.com",
@@ -293,8 +281,8 @@ class EmailTest(unittest.TestCase):
         SQS_MESSAGE = copy.deepcopy(SQS_MESSAGE_1)
         SQS_MESSAGE['action'].get('to', []).remove('ldap_uid_tags')
         SQS_MESSAGE['resources'][0].pop('Tags', None)
-        emails_to_resources_map = (
-            self.email_delivery.get_email_to_addrs_to_resources_map(SQS_MESSAGE)
+        emails_to_resources_map = self.email_delivery.get_email_to_addrs_to_resources_map(
+            SQS_MESSAGE
         )
         self.assertEqual(emails_to_resources_map, {})
 
@@ -342,9 +330,7 @@ class EmailTest(unittest.TestCase):
 
         assert org_emails == ["milton@initech.com", "peter@initech.com"]
         assert (
-            call(
-                "Using org_domain to reconstruct email addresses from contact_tags values"
-            )
+            call("Using org_domain to reconstruct email addresses from contact_tags values")
             not in logger_mock.debug.call_args_list
         )
 

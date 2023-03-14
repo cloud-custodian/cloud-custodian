@@ -88,9 +88,7 @@ class PostFinding(MethodAction):
         return super(PostFinding, self).process(resources)
 
     def get_client(self, session, model):
-        return session.client(
-            self.Service, self.ServiceVersion, 'organizations.sources.findings'
-        )
+        return session.client(self.Service, self.ServiceVersion, 'organizations.sources.findings')
 
     def get_resource_params(self, model, resource):
         return self.get_finding(resource)
@@ -119,9 +117,7 @@ class PostFinding(MethodAction):
             org_id = res[0]['name'].rsplit('/', 1)[-1]
 
         # Resolve Source
-        client = session.client(
-            self.Service, self.ServiceVersion, 'organizations.sources'
-        )
+        client = session.client(self.Service, self.ServiceVersion, 'organizations.sources')
         source = None
         res = [
             s

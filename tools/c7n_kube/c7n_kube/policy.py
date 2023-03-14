@@ -181,9 +181,7 @@ class ValidatingControllerMode(K8sEventMode):
             )
 
             if 'debug' in event:
-                self.policy.log.info(
-                    "Invoking actions %s", self.policy.resource_manager.actions
-                )
+                self.policy.log.info("Invoking actions %s", self.policy.resource_manager.actions)
 
             ctx.output.write_file('resources.json', dumps(resources, indent=2))
             for action in self.policy.resource_manager.actions:

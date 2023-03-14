@@ -17,9 +17,7 @@ class DataDogDelivery:
         self.logger = logger
         self.session = session
         self.datadog_api_key = self.config.get(self.DATADOG_API_KEY, None)
-        self.datadog_application_key = self.config.get(
-            self.DATADOG_APPLICATION_KEY, None
-        )
+        self.datadog_application_key = self.config.get(self.DATADOG_APPLICATION_KEY, None)
 
         # Initialize datadog
         if self.datadog_api_key and self.datadog_application_key:
@@ -67,9 +65,7 @@ class DataDogDelivery:
                             "metric": metric_config['metric_name'],
                             "points": (
                                 date_time,
-                                self._get_metric_value(
-                                    metric_config=metric_config, tags=tags
-                                ),
+                                self._get_metric_value(metric_config=metric_config, tags=tags),
                             ),
                             "tags": tags,
                         }

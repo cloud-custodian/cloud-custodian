@@ -31,9 +31,7 @@ logger = logging.getLogger(__name__)
 
 
 class MailerTester:
-    def __init__(
-        self, config, raw=None, msg_file=None, msg_plain=False, json_dump_file=None
-    ):
+    def __init__(self, config, raw=None, msg_file=None, msg_plain=False, json_dump_file=None):
         if msg_file:
             if not os.path.exists(msg_file):
                 raise RuntimeError("File does not exist: %s" % msg_file)
@@ -154,9 +152,7 @@ def setup_parser():
         nargs="?",
         help='Path to SQS message dump/content file',
     )
-    parser.add_argument(
-        '-f', '--policy-file', type=str, help='Policy file to mimic MESSAGE_FILE'
-    )
+    parser.add_argument('-f', '--policy-file', type=str, help='Policy file to mimic MESSAGE_FILE')
     parser.add_argument(
         '--policy-name',
         type=str,
@@ -180,9 +176,7 @@ def setup_parser():
 
 
 def session_factory(config):
-    return boto3.Session(
-        region_name=config['region'], profile_name=config.get('profile')
-    )
+    return boto3.Session(region_name=config['region'], profile_name=config.get('profile'))
 
 
 def mimic_sqs(region, policy_file, policy_name, notify_index, output_dir):
@@ -247,9 +241,7 @@ def main():
     ]
     templates = options.templates
     if templates:
-        default_templates.append(
-            os.path.abspath(os.path.expanduser(os.path.expandvars(templates)))
-        )
+        default_templates.append(os.path.abspath(os.path.expanduser(os.path.expandvars(templates))))
 
     log_format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
     logging.basicConfig(level=logging.DEBUG, format=log_format)

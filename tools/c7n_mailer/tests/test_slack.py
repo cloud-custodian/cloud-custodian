@@ -22,9 +22,7 @@ class TestSlackDelivery(unittest.TestCase):
             "templates_folders": [
                 os.path.abspath(os.path.dirname(__file__)),
                 os.path.abspath("/"),
-                os.path.join(
-                    os.path.abspath(os.path.dirname(__file__)), "test-templates/"
-                ),
+                os.path.join(os.path.abspath(os.path.dirname(__file__)), "test-templates/"),
             ],
         }
 
@@ -49,9 +47,7 @@ class TestSlackDelivery(unittest.TestCase):
         slack = SlackDelivery(self.config, self.logger, self.email_delivery)
         message_destination = ["slack://tag/SlackChannel"]
 
-        self.resource["Tags"].append(
-            {"Key": "SlackChannel", "Value": self.target_channel}
-        )
+        self.resource["Tags"].append({"Key": "SlackChannel", "Value": self.target_channel})
         self.message["action"]["to"] = message_destination
         self.message["policy"]["actions"][1]["to"] = message_destination
 
@@ -59,9 +55,7 @@ class TestSlackDelivery(unittest.TestCase):
 
         assert self.target_channel in result
         assert json.loads(result[self.target_channel])["channel"] == self.target_channel
-        self.logger.debug.assert_called_with(
-            "Generating message for specified Slack channel."
-        )
+        self.logger.debug.assert_called_with("Generating message for specified Slack channel.")
 
     def test_map_sending_to_tag_channel_without_hash(self):
         self.target_channel = "tag-channel"
@@ -70,9 +64,7 @@ class TestSlackDelivery(unittest.TestCase):
         slack = SlackDelivery(self.config, self.logger, self.email_delivery)
         message_destination = ["slack://tag/SlackChannel"]
 
-        self.resource["Tags"].append(
-            {"Key": "SlackChannel", "Value": self.target_channel}
-        )
+        self.resource["Tags"].append({"Key": "SlackChannel", "Value": self.target_channel})
         self.message["action"]["to"] = message_destination
         self.message["policy"]["actions"][1]["to"] = message_destination
 
@@ -80,9 +72,7 @@ class TestSlackDelivery(unittest.TestCase):
 
         assert channel_name in result
         assert json.loads(result[channel_name])["channel"] == channel_name
-        self.logger.debug.assert_called_with(
-            "Generating message for specified Slack channel."
-        )
+        self.logger.debug.assert_called_with("Generating message for specified Slack channel.")
 
     def test_map_sending_to_tag_channel_no_tag(self):
         slack = SlackDelivery(self.config, self.logger, self.email_delivery)

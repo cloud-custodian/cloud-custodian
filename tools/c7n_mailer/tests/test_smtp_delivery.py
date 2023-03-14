@@ -92,9 +92,7 @@ class SmtpDeliveryTest(unittest.TestCase):
         }
         d = SmtpDelivery(config, MagicMock(), MagicMock())
         message_mock = MagicMock()
-        message_mock.__getitem__.side_effect = (
-            lambda x: "t@test.com" if x == "From" else None
-        )
+        message_mock.__getitem__.side_effect = lambda x: "t@test.com" if x == "From" else None
         message_mock.as_string.return_value = "mock_text"
         d.send_message(message_mock, ["test1@test.com"])
         del d

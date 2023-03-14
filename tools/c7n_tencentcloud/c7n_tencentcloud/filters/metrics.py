@@ -144,19 +144,13 @@ class MetricsFilter(Filter):
 
     def process(self, resources, event=None):
         """process"""
-        log.debug(
-            "[metrics filter]start_time=%s, end_time=%s", self.start_time, self.end_time
-        )
+        log.debug("[metrics filter]start_time=%s, end_time=%s", self.start_time, self.end_time)
 
         matched_resource_ids = []
         for data_point in self.get_metrics_data_point(resources):
-            resource_id = self.manager.get_resource_id_from_dimensions(
-                data_point["Dimensions"]
-            )
+            resource_id = self.manager.get_resource_id_from_dimensions(data_point["Dimensions"])
             if resource_id is None:
-                raise PolicyExecutionError(
-                    "get resource id from metrics response data error"
-                )
+                raise PolicyExecutionError("get resource id from metrics response data error")
             if self.match(data_point):
                 matched_resource_ids.append(resource_id)
             else:

@@ -29,9 +29,7 @@ class FormatStruct(unittest.TestCase):
 
 class StripPrefix(unittest.TestCase):
     def test_strip_prefix(self):
-        self.assertEqual(
-            utils.strip_prefix("aws.internet-gateway", "aws."), "internet-gateway"
-        )
+        self.assertEqual(utils.strip_prefix("aws.internet-gateway", "aws."), "internet-gateway")
         self.assertEqual(utils.strip_prefix("aws.s3", "aws."), "s3")
         self.assertEqual(utils.strip_prefix("aws.webserver", "aws."), "webserver")
         self.assertEqual(utils.strip_prefix("nothing", "aws."), "nothing")
@@ -141,9 +139,7 @@ class ResourceFormat(unittest.TestCase):
         )
 
     def test_s3(self):
-        self.assertEqual(
-            utils.resource_format({"Name": "bucket-x"}, "aws.s3"), "bucket-x"
-        )
+        self.assertEqual(utils.resource_format({"Name": "bucket-x"}, "aws.s3"), "bucket-x")
 
     def test_alb(self):
         self.assertEqual(
@@ -242,23 +238,15 @@ class GetAwsUsernameFromEvent(unittest.TestCase):
         self.assertEqual(utils.get_aws_username_from_event(Mock(), evt), "foo")
 
     def test_get_username_assumed_role_instance(self):
-        evt = {
-            "detail": {"userIdentity": {"type": "AssumedRole", "arn": "foo/i-12345678"}}
-        }
+        evt = {"detail": {"userIdentity": {"type": "AssumedRole", "arn": "foo/i-12345678"}}}
         self.assertEqual(utils.get_aws_username_from_event(Mock(), evt), None)
 
     def test_get_username_assumed_role_lambda(self):
-        evt = {
-            "detail": {"userIdentity": {"type": "AssumedRole", "arn": "foo/awslambda"}}
-        }
+        evt = {"detail": {"userIdentity": {"type": "AssumedRole", "arn": "foo/awslambda"}}}
         self.assertEqual(utils.get_aws_username_from_event(Mock(), evt), None)
 
     def test_get_username_assumed_role_colons(self):
-        evt = {
-            "detail": {
-                "userIdentity": {"type": "AssumedRole", "arn": "foo/bar:baz:blam"}
-            }
-        }
+        evt = {"detail": {"userIdentity": {"type": "AssumedRole", "arn": "foo/bar:baz:blam"}}}
         self.assertEqual(utils.get_aws_username_from_event(Mock(), evt), "baz:blam")
 
     def test_get_username_iam(self):
@@ -309,9 +297,7 @@ class ProviderSelector(unittest.TestCase):
             return _real_import(name, *args, **kwargs)
 
         with patch.object(builtins, '__import__', side_effect=fake_import_missing_deps):
-            with self.assertRaisesRegex(
-                ImportError, r'pip install c7n-mailer\[azure\]'
-            ):
+            with self.assertRaisesRegex(ImportError, r'pip install c7n-mailer\[azure\]'):
                 reload(c7n_mailer.azure_mailer.azure_queue_processor)
             with self.assertRaisesRegex(ImportError, r'pip install c7n-mailer\[gcp\]'):
                 reload(c7n_mailer.gcp_mailer.gcp_queue_processor)
@@ -334,15 +320,9 @@ class DecryptTests(unittest.TestCase):
         gcp_decrypt_mock.assert_called_once()
 
     def test_decrypt_none(self):
-        self.assertEqual(
-            utils.decrypt({"queue_url": "aws"}, Mock(), Mock(), "test"), None
-        )
-        self.assertEqual(
-            utils.decrypt({"queue_url": "asq://"}, Mock(), Mock(), "test"), None
-        )
-        self.assertEqual(
-            utils.decrypt({"queue_url": "projects"}, Mock(), Mock(), "test"), None
-        )
+        self.assertEqual(utils.decrypt({"queue_url": "aws"}, Mock(), Mock(), "test"), None)
+        self.assertEqual(utils.decrypt({"queue_url": "asq://"}, Mock(), Mock(), "test"), None)
+        self.assertEqual(utils.decrypt({"queue_url": "projects"}, Mock(), Mock(), "test"), None)
 
 
 class OtherTests(unittest.TestCase):
@@ -420,9 +400,7 @@ class OtherTests(unittest.TestCase):
         subject = utils.get_message_subject(SQS_MESSAGE_1)
         self.assertEqual(
             subject,
-            SQS_MESSAGE_1["action"]["subject"].replace(
-                "{{ account }}", SQS_MESSAGE_1["account"]
-            ),
+            SQS_MESSAGE_1["action"]["subject"].replace("{{ account }}", SQS_MESSAGE_1["account"]),
         )
 
     def test_kms_decrypt(self):
@@ -431,6 +409,4 @@ class OtherTests(unittest.TestCase):
         session_mock.client().get_secret().value = "value"
         session_mock.get_session_for_resource.return_value = session_mock
 
-        self.assertEqual(
-            utils.kms_decrypt(config, Mock(), session_mock, "test"), config["test"]
-        )
+        self.assertEqual(utils.kms_decrypt(config, Mock(), session_mock, "test"), config["test"])

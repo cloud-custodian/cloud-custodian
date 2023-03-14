@@ -124,19 +124,13 @@ class GcpTest(unittest.TestCase):
         gcp_processor.process_message(pubsub_message, "a timestamp")
 
         mock_datadog.assert_has_calls(
-            [
-                call().deliver_datadog_messages(
-                    "mock_datadog_message_map", datadog_loaded_message
-                )
-            ]
+            [call().deliver_datadog_messages("mock_datadog_message_map", datadog_loaded_message)]
         )
 
     @patch.object(MailerGcpQueueProcessor, "ack_messages")
     @patch.object(MailerGcpQueueProcessor, "process_message")
     @patch.object(MailerGcpQueueProcessor, "receive_messages")
-    def test_gcp_queue_processor_run(
-        self, mock_receive, mock_process_message, mock_ack_messages
-    ):
+    def test_gcp_queue_processor_run(self, mock_receive, mock_process_message, mock_ack_messages):
         mock_receive.side_effect = [
             self._pull_messages(1),
             self._pull_messages(0),

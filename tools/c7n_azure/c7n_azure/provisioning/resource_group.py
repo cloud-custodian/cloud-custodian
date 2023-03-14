@@ -7,9 +7,7 @@ from c7n_azure.provisioning.deployment_unit import DeploymentUnit
 
 class ResourceGroupUnit(DeploymentUnit):
     def __init__(self):
-        super(ResourceGroupUnit, self).__init__(
-            'azure.mgmt.resource.ResourceManagementClient'
-        )
+        super(ResourceGroupUnit, self).__init__('azure.mgmt.resource.ResourceManagementClient')
         self.type = "Resource Group"
 
     def verify_params(self, params):

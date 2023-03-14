@@ -22,9 +22,7 @@ class MailerSchemaTest(unittest.TestCase):
 
         with self.assertRaises(exceptions.ValidationError):
             jsonschema.validate({"test": {"wrong": "value"}}, property_schema)
-            jsonschema.validate(
-                {"test": {"secret": "https://secret_uri"}}, property_schema
-            )
+            jsonschema.validate({"test": {"secret": "https://secret_uri"}}, property_schema)
             jsonschema.validate(
                 {
                     "test": {

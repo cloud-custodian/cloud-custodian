@@ -54,8 +54,7 @@ class SplunkHecDelivery:
                     {
                         'time': msg_timestamp,
                         'host': 'cloud-custodian',
-                        'source': '%s-cloud-custodian'
-                        % event.get('account', 'unknown'),
+                        'source': '%s-cloud-custodian' % event.get('account', 'unknown'),
                         'sourcetype': sourcetype,
                         'index': index,
                         'event': event,
@@ -186,9 +185,7 @@ class SplunkHecDelivery:
                     sleep_sec,
                 )
                 sleep(sleep_sec)
-        self.logger.error(
-            'ERROR - Could not POST to Splunk after %d tries.', max_attempts
-        )
+        self.logger.error('ERROR - Could not POST to Splunk after %d tries.', max_attempts)
         return False
 
     def _send_splunk(self, payload):
@@ -204,9 +201,7 @@ class SplunkHecDelivery:
         try:
             r = requests.post(  # nosec
                 url,
-                headers={
-                    'Authorization': 'Splunk %s' % self.config['splunk_hec_token']
-                },
+                headers={'Authorization': 'Splunk %s' % self.config['splunk_hec_token']},
                 data=payload,
             )
         except Exception:
@@ -248,9 +243,7 @@ class SplunkHecDelivery:
         try:
             return {x['Key']: x['Value'] for x in res.get('Tags', [])}
         except Exception:
-            self.logger.warning(
-                'Exception building tags dict; Tags=%s', res.get('Tags', None)
-            )
+            self.logger.warning('Exception building tags dict; Tags=%s', res.get('Tags', None))
             return {}
 
     @staticmethod

@@ -137,9 +137,7 @@ class Host:
 
         try:
             # All blobs with YAML extension
-            blobs = [
-                b for b in client.list_blobs(container) if Host.has_yaml_ext(b.name)
-            ]
+            blobs = [b for b in client.list_blobs(container) if Host.has_yaml_ext(b.name)]
         except AzureHttpError as e:
             # If blob methods are failing don't keep
             # a cached client
@@ -150,13 +148,9 @@ class Host:
         new_blobs = self._get_new_blobs(blobs)
 
         # Get all YAML files on disk that are no longer in blob storage
-        cached_policy_files = [
-            f for f in os.listdir(self.policy_cache) if Host.has_yaml_ext(f)
-        ]
+        cached_policy_files = [f for f in os.listdir(self.policy_cache) if Host.has_yaml_ext(f)]
 
-        removed_files = [
-            f for f in cached_policy_files if f not in [b.name for b in blobs]
-        ]
+        removed_files = [f for f in cached_policy_files if f not in [b.name for b in blobs]]
 
         if not (removed_files or new_blobs):
             return
@@ -268,9 +262,7 @@ class Host:
             try:
                 policy_config = yaml.safe_load(stream)
             except yaml.YAMLError as exc:
-                log.warning(
-                    'Failure loading cached policy for cleanup %s %s' % (path, exc)
-                )
+                log.warning('Failure loading cached policy for cleanup %s %s' % (path, exc))
                 os.unlink(path)
                 return path
 
@@ -290,9 +282,7 @@ class Host:
                 if p.get('mode', {}).get('schedule')
             ]
             periodic_to_remove = [
-                p
-                for p in periodic_names
-                if p in [j.id for j in self.scheduler.get_jobs()]
+                p for p in periodic_names if p in [j.id for j in self.scheduler.get_jobs()]
             ]
 
             for name in periodic_to_remove:
@@ -421,9 +411,7 @@ class Host:
         as this is what we require for event subscriptions
         """
 
-        storage_client = self.storage_session.client(
-            'azure.mgmt.storage.StorageManagementClient'
-        )
+        storage_client = self.storage_session.client('azure.mgmt.storage.StorageManagementClient')
 
         account = storage_client.storage_accounts.get_properties(
             ResourceIdParser.get_resource_group(queue_resource_id),
@@ -447,9 +435,7 @@ class Host:
         """
         if not output_dir:
             output_dir = tempfile.mkdtemp()
-            log.warning(
-                'Output directory not specified.  Using directory: %s' % output_dir
-            )
+            log.warning('Output directory not specified.  Using directory: %s' % output_dir)
 
         config = Config.empty(
             **{'log_group': log_group, 'metrics': metrics, 'output_dir': output_dir}

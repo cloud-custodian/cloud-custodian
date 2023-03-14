@@ -339,9 +339,7 @@ def _main(provider, output_dir, group_by):
     # Create files for all groups
     for key, group in sorted(groups.items()):
         group = sorted(group, key=operator.attrgetter('type'))
-        rpath = os.path.join(
-            output_dir, ("group-%s.rst" % key).replace(' ', '-').lower()
-        )
+        rpath = os.path.join(output_dir, ("group-%s.rst" % key).replace(' ', '-').lower())
         t = env.get_template('provider-group.rst')
         written += write_modified_file(
             rpath,
@@ -349,9 +347,7 @@ def _main(provider, output_dir, group_by):
                 provider_name=provider,
                 provider_type=provider_class.type,
                 key=key,
-                resource_files=[
-                    os.path.basename(resource_file_name(output_dir, r)) for r in group
-                ],
+                resource_files=[os.path.basename(resource_file_name(output_dir, r)) for r in group],
                 resources=group,
             ),
         )
@@ -371,9 +367,7 @@ def _main(provider, output_dir, group_by):
                 continue
             common_actions[ElementSchema.name(a)] = (a, r)
 
-    fpath = os.path.join(
-        output_dir, ("%s-common-filters.rst" % provider_class.type.lower())
-    )
+    fpath = os.path.join(output_dir, ("%s-common-filters.rst" % provider_class.type.lower()))
 
     t = env.get_template('provider-common-elements.rst')
     written += write_modified_file(
@@ -387,9 +381,7 @@ def _main(provider, output_dir, group_by):
     )
     files.insert(0, os.path.basename(fpath))
 
-    fpath = os.path.join(
-        output_dir, ("%s-common-actions.rst" % provider_class.type.lower())
-    )
+    fpath = os.path.join(output_dir, ("%s-common-actions.rst" % provider_class.type.lower()))
     t = env.get_template('provider-common-elements.rst')
     written += write_modified_file(
         fpath,

@@ -49,9 +49,7 @@ def chunks(iterable, size=50):
 
 
 def process_trail_set(object_set, map_records, reduce_results=None, trail_bucket=None):
-    session_factory = SessionFactory(
-        options.region, options.profile, options.assume_role
-    )
+    session_factory = SessionFactory(options.region, options.profile, options.assume_role)
 
     s3 = session_factory().client('s3', config=Config(signature_version='s3v4'))
 
@@ -211,9 +209,7 @@ def process_bucket(
     not_service_filter=None,
     data_dir=None,
 ):
-    session_factory = SessionFactory(
-        options.region, options.profile, options.assume_role
-    )
+    session_factory = SessionFactory(options.region, options.profile, options.assume_role)
 
     s3 = session_factory().client('s3', config=Config(signature_version='s3v4'))
 
@@ -268,10 +264,7 @@ def process_bucket(
         t = time.time()
 
         log.info("Stored page time:%0.2fs", t - st)
-        log.info(
-            "Processed paged time:%0.2f size:%s count:%s"
-            % (t - l, object_size, object_count)
-        )
+        log.info("Processed paged time:%0.2f size:%s count:%s" % (t - l, object_size, object_count))
         if objects:
             log.info('Last Page Key: %s', objects[-1]['Key'])
 
@@ -313,9 +306,7 @@ def setup_parser():
         default=os.environ.get('AWS_PROFILE'),
         help="AWS Account Config File Profile to utilize",
     )
-    parser.add_argument(
-        "--assume", default=None, dest="assume_role", help="Role to assume"
-    )
+    parser.add_argument("--assume", default=None, dest="assume_role", help="Role to assume")
     parser.add_argument(
         '--field',
         action='append',

@@ -51,9 +51,7 @@ def raster_metrics(data):
     incr = min(data)
     width = (max(data) - min(data)) / (len(BARS) - 1)
     bins = [i * width + incr for i in range(len(BARS))]
-    indexes = [
-        i for n in data for i, thres in enumerate(bins) if thres <= n < thres + width
-    ]
+    indexes = [i for n in data for i, thres in enumerate(bins) if thres <= n < thres + width]
     return ''.join(BARS[i] for i in indexes)
 
 
@@ -96,9 +94,7 @@ def metrics(function, api, start, period):
         return
 
     print("Api Metrics")
-    metrics = gateway_metrics(
-        boto3.Session, api, "latest", start, datetime.utcnow(), period
-    )
+    metrics = gateway_metrics(boto3.Session, api, "latest", start, datetime.utcnow(), period)
     for k, data in metrics.items():
         if "Count" in k:
             values = [n['Sum'] for n in data]
@@ -169,9 +165,7 @@ def gateway_metrics(session_factory, gateway_id, stage_name, start, end, period)
 
 def parse_timedelta(datetime_text, default=timedelta(seconds=60 * 5 * -1)):
     # from awslogs script
-    ago_regexp = (
-        r'(\d+)\s?(m|minute|minutes|h|hour|hours|d|day|days|w|weeks|weeks)(?: ago)?'
-    )
+    ago_regexp = r'(\d+)\s?(m|minute|minutes|h|hour|hours|d|day|days|w|weeks|weeks)(?: ago)?'
     ago_match = re.match(ago_regexp, datetime_text)
     if ago_match:
         amount, unit = ago_match.groups()
@@ -229,15 +223,9 @@ def config_status():
             yaml.safe_dump(
                 {
                     c['name']: dict(
-                        snapshot=str(
-                            c['configSnapshotDeliveryInfo'].get('lastSuccessfulTime')
-                        ),
-                        history=str(
-                            c['configHistoryDeliveryInfo'].get('lastSuccessfulTime')
-                        ),
-                        stream=str(
-                            c['configStreamDeliveryInfo'].get('lastStatusChangeTime')
-                        ),
+                        snapshot=str(c['configSnapshotDeliveryInfo'].get('lastSuccessfulTime')),
+                        history=str(c['configHistoryDeliveryInfo'].get('lastSuccessfulTime')),
+                        stream=str(c['configStreamDeliveryInfo'].get('lastStatusChangeTime')),
                     ),
                 },
                 default_flow_style=False,

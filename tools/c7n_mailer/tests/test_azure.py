@@ -35,9 +35,7 @@ class AzureTest(unittest.TestCase):
 
         self.multiple_addrs_message = json.loads(ASQ_MESSAGE_MULTIPLE_ADDRS)
 
-    @patch(
-        "c7n_mailer.azure_mailer.sendgrid_delivery.SendGridDelivery.sendgrid_handler"
-    )
+    @patch("c7n_mailer.azure_mailer.sendgrid_delivery.SendGridDelivery.sendgrid_handler")
     @patch(
         "c7n_mailer.azure_mailer.sendgrid_delivery.SendGridDelivery"
         ".get_to_addrs_sendgrid_messages_map"
@@ -49,18 +47,14 @@ class AzureTest(unittest.TestCase):
         # Run the process messages method
         azure_processor = MailerAzureQueueProcessor(MAILER_CONFIG_AZURE, logger)
         self.assertTrue(
-            azure_processor.process_azure_queue_message(
-                self.compressed_message, "timestamp"
-            )
+            azure_processor.process_azure_queue_message(self.compressed_message, "timestamp")
         )
 
         # Verify mock calls were correct
         mock_get_addr.assert_called_with(self.loaded_message)
         mock_handler.assert_called_with(self.loaded_message, 42)
 
-    @patch(
-        "c7n_mailer.azure_mailer.sendgrid_delivery.SendGridDelivery.sendgrid_handler"
-    )
+    @patch("c7n_mailer.azure_mailer.sendgrid_delivery.SendGridDelivery.sendgrid_handler")
     @patch(
         "c7n_mailer.azure_mailer.sendgrid_delivery.SendGridDelivery"
         ".get_to_addrs_sendgrid_messages_map"
@@ -72,9 +66,7 @@ class AzureTest(unittest.TestCase):
         # Run the process messages method
         azure_processor = MailerAzureQueueProcessor(MAILER_CONFIG_AZURE, logger)
         self.assertFalse(
-            azure_processor.process_azure_queue_message(
-                self.compressed_message, "timestamp"
-            )
+            azure_processor.process_azure_queue_message(self.compressed_message, "timestamp")
         )
 
         # Verify mock calls were correct
@@ -104,9 +96,7 @@ class AzureTest(unittest.TestCase):
         sendgrid_messages = sendgrid_delivery.get_to_addrs_sendgrid_messages_map(
             self.loaded_message
         )
-        result = sendgrid_delivery.sendgrid_handler(
-            self.loaded_message, sendgrid_messages
-        )
+        result = sendgrid_delivery.sendgrid_handler(self.loaded_message, sendgrid_messages)
         self.assertTrue(result)
         mock_send.assert_called_once()
         mail_contents = mock_send.call_args[0][0].contents[0].content
@@ -118,21 +108,15 @@ class AzureTest(unittest.TestCase):
         sendgrid_messages = sendgrid_delivery.get_to_addrs_sendgrid_messages_map(
             self.multiple_addrs_message
         )
-        result = sendgrid_delivery.sendgrid_handler(
-            self.multiple_addrs_message, sendgrid_messages
-        )
+        result = sendgrid_delivery.sendgrid_handler(self.multiple_addrs_message, sendgrid_messages)
         self.assertTrue(result)
         self.assertEqual(2, mock_send.call_count)
         mail_contents = mock_send.call_args[0][0].contents[0].content
         self.assertIn("The following azure.keyvault resources", mail_contents)
 
-        address_one = (
-            mock_send.call_args_list[0][0][0].personalizations[0].tos[0]["email"]
-        )
+        address_one = mock_send.call_args_list[0][0][0].personalizations[0].tos[0]["email"]
         self.assertEqual("user2@domain.com", address_one)
-        address_two = (
-            mock_send.call_args_list[1][0][0].personalizations[0].tos[0]["email"]
-        )
+        address_two = mock_send.call_args_list[1][0][0].personalizations[0].tos[0]["email"]
         self.assertEqual("user@domain.com", address_two)
 
     def test_azure_mailer_requirements(self):
@@ -287,16 +271,10 @@ class AzureTest(unittest.TestCase):
         ):
             azure_processor = MailerAzureQueueProcessor(smtp_mailer_config, logger)
             self.assertTrue(
-                azure_processor.process_azure_queue_message(
-                    self.compressed_message, "timestamp"
-                )
+                azure_processor.process_azure_queue_message(self.compressed_message, "timestamp")
             )
             mock_smtp.assert_has_calls(
-                [
-                    call().send_message(
-                        message=self.loaded_message, to_addrs=["mock@test.com"]
-                    )
-                ]
+                [call().send_message(message=self.loaded_message, to_addrs=["mock@test.com"])]
             )
 
     @patch("c7n_mailer.slack_delivery.SlackDelivery")
@@ -319,9 +297,7 @@ class AzureTest(unittest.TestCase):
         azure_processor = MailerAzureQueueProcessor(slack_mailer_config, logger)
 
         self.assertTrue(
-            azure_processor.process_azure_queue_message(
-                slack_compressed_message, "timestamp"
-            )
+            azure_processor.process_azure_queue_message(slack_compressed_message, "timestamp")
         )
         mock_slack.assert_has_calls(
             [call().slack_handler(slack_loaded_message, "mock_slack_message_map")]
@@ -348,14 +324,8 @@ class AzureTest(unittest.TestCase):
         azure_processor = MailerAzureQueueProcessor(datadog_mailer_config, logger)
 
         self.assertTrue(
-            azure_processor.process_azure_queue_message(
-                datadog_compressed_message, "timestamp"
-            )
+            azure_processor.process_azure_queue_message(datadog_compressed_message, "timestamp")
         )
         mock_datadog.assert_has_calls(
-            [
-                call().deliver_datadog_messages(
-                    "mock_datadog_message_map", datadog_loaded_message
-                )
-            ]
+            [call().deliver_datadog_messages("mock_datadog_message_map", datadog_loaded_message)]
         )

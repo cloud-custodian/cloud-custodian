@@ -41,9 +41,7 @@ class OpenStackTest(TestUtils):
         kw = self._get_vcr_kwargs()
         kw['record_mode'] = 'any'
         self.myvcr = self._get_vcr(**kw)
-        cm = self.myvcr.use_cassette(
-            name or self._get_cassette_name(), allow_playback_repeats=True
-        )
+        cm = self.myvcr.use_cassette(name or self._get_cassette_name(), allow_playback_repeats=True)
         cm.__enter__()
         self.addCleanup(cm.__exit__, None, None, None)
         return partial(Session)
@@ -53,9 +51,7 @@ class OpenStackTest(TestUtils):
         kw['record_mode'] = 'all'
         self.myvcr = self._get_vcr(**kw)
 
-        flight_path = os.path.join(
-            kw['cassette_library_dir'], name or self._get_cassette_name()
-        )
+        flight_path = os.path.join(kw['cassette_library_dir'], name or self._get_cassette_name())
         if os.path.exists(flight_path):
             os.unlink(flight_path)
 
@@ -81,9 +77,7 @@ class OpenStackTest(TestUtils):
 
     def _get_cassette_name(self):
         cassette_dir = self._get_cassette_library_dir()
-        cassette_file = '{0}.{1}.yaml'.format(
-            self.__class__.__name__, self._testMethodName
-        )
+        cassette_file = '{0}.{1}.yaml'.format(self.__class__.__name__, self._testMethodName)
         if os.path.isfile(cassette_dir + '/' + cassette_file):
             return cassette_file
         cassette_file = '{0}.yaml'.format(self.__class__.__name__)

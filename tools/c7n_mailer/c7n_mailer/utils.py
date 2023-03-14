@@ -64,9 +64,7 @@ def get_processor(mailer_config, logger):
 
 def get_jinja_env(template_folders):
     env = jinja2.Environment(trim_blocks=True, autoescape=False)  # nosec nosemgrep
-    env.filters['yaml_safe'] = functools.partial(
-        yaml.safe_dump, default_flow_style=False
-    )
+    env.filters['yaml_safe'] = functools.partial(yaml.safe_dump, default_flow_style=False)
     env.filters['date_time_format'] = date_time_format
     env.filters['get_date_time_delta'] = get_date_time_delta
     env.filters['from_json'] = json.loads
@@ -431,9 +429,9 @@ def kms_decrypt(config, logger, session, encrypted_field):
     if config.get(encrypted_field):
         try:
             kms = session.client('kms')
-            return kms.decrypt(
-                CiphertextBlob=base64.b64decode(config[encrypted_field])
-            )['Plaintext'].decode('utf8')
+            return kms.decrypt(CiphertextBlob=base64.b64decode(config[encrypted_field]))[
+                'Plaintext'
+            ].decode('utf8')
         except (TypeError, base64.binascii.Error) as e:
             logger.warning(
                 "Error: %s Unable to base64 decode %s, will assume plaintext."
@@ -478,18 +476,14 @@ def get_aws_username_from_event(logger, event):
         return None
     identity = event.get('detail', {}).get('userIdentity', {})
     if not identity:
-        logger.warning(
-            "Could not get recipient from event \n %s" % (format_struct(event))
-        )
+        logger.warning("Could not get recipient from event \n %s" % (format_struct(event)))
         return None
     if identity['type'] == 'AssumedRole':
         logger.debug(
             'In some cases there is no ldap uid is associated with AssumedRole: %s',
             identity['arn'],
         )
-        logger.debug(
-            'We will try to assume that identity is in the AssumedRoleSessionName'
-        )
+        logger.debug('We will try to assume that identity is in the AssumedRoleSessionName')
         user = identity['arn'].rsplit('/', 1)[-1]
         if user is None or user.startswith('i-') or user.startswith('awslambda'):
             return None

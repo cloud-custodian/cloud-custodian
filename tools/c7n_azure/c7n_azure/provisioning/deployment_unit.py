@@ -40,9 +40,7 @@ class DeploymentUnit(metaclass=ABCMeta):
         result = self.get(params)
         if result is None:
             if 'id' in params.keys():
-                raise Exception(
-                    '%s with %s id is not found' % (self.type, params['id'])
-                )
+                raise Exception('%s with %s id is not found' % (self.type, params['id']))
             result = self.provision(params)
         return result
 
