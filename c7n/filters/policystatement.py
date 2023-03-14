@@ -8,8 +8,10 @@ from c7n.utils import type_schema, format_string_values
 
 class HasStatementFilter(Filter):
     """Find resources with matching access policy statements.
-    :example:
+    :Example:
+
     .. code-block:: yaml
+
             policies:
               - name: sns-check-statement-id
                 resource: sns

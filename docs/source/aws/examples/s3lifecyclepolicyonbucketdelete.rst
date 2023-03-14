@@ -1,5 +1,5 @@
 S3 - Add lifecycle policy on bucket delete
-==================
+==========================================
 
 When a bucket is attempted to be deleted, add a lifecycle policy to empty the bucket. This is useful for more "ephemeral" environments to allow for async deletion of bucket objects which removes the need for consumers to manually empty buckets.
 

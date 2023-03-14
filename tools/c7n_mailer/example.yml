@@ -49,3 +49,5 @@ cross_accounts:
 # to send to
 org_domain: example.com
 
+# role to assume to send email with SES in a centralized account
+ses_role: 'arn:aws:iam::012345678912:role/SESSenderRole'

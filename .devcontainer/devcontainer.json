@@ -14,5 +14,9 @@
 		"ms-python.python"
 	],
 
+	"remoteEnv": {
+		"PATH": "${containerEnv:PATH}:/root/.local/bin/"
+	},
+
 	"postCreateCommand": "cd .devcontainer && bash ./prep_container.sh"
 }

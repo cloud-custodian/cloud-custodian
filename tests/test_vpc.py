@@ -1358,6 +1358,26 @@ class SecurityGroupTest(BaseTest):
         resources = p.run()
         assert resources == []
 
+    def test_unused_batch(self):
+        factory = self.replay_flight_data("test_security_group_batch_unused")
+        # 2 security groups in this flight data:
+        # * sg-0f026884bba48e351 (used by the compute environment)
+        # * sg-e2842c8b (not used -> should be returned as such)
+        p = self.load_policy(
+            {'name': 'sg-xyz',
+             'resource': 'security-group',
+             'filters': ['unused']},
+            session_factory=factory)
+        unused = p.resource_manager.filters[0]
+        self.patch(
+            unused,
+            'get_scanners',
+            lambda: (('batch', unused.get_batch_sgs),))
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertNotEqual(resources[0]["GroupId"], "sg-0f026884bba48e351") # used
+        self.assertEqual(resources[0]["GroupId"], "sg-e2842c8b")             # not used
+
     def test_unused(self):
         factory = self.replay_flight_data("test_security_group_unused")
         p = self.load_policy(

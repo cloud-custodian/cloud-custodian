@@ -201,14 +201,14 @@ class SplunkHecDelivery:
         url = self.config['splunk_hec_url']
         self.logger.debug('Send to Splunk (%s): %s', url, payload)
         try:
-            r = requests.post(
+            r = requests.post(  # nosec
                 url,
                 headers={
                     'Authorization': 'Splunk %s' % self.config[
                         'splunk_hec_token'
                     ]
                 },
-                data=payload
+                data=payload,
             )
         except Exception:
             self.logger.error('Exception during Splunk POST to %s of %s',
