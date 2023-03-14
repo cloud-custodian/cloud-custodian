@@ -1,0 +1,181 @@
+{
+    "status_code": 200,
+    "data": {
+        "TransitGateways": [
+            {
+                "TransitGatewayId": "tgw-00857fd89ceffdad7",
+                "TransitGatewayArn": "arn:aws:ec2:us-west-2:644160558196:transit-gateway/tgw-00857fd89ceffdad7",
+                "State": "available",
+                "OwnerId": "644160558196",
+                "Description": "tgw-data-test-dev1",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 3,
+                    "day": 22,
+                    "hour": 17,
+                    "minute": 4,
+                    "second": 14,
+                    "microsecond": 0
+                },
+                "Options": {
+                    "AmazonSideAsn": 64512,
+                    "AutoAcceptSharedAttachments": "enable",
+                    "DefaultRouteTableAssociation": "enable",
+                    "AssociationDefaultRouteTableId": "tgw-rtb-0c2d6c71cda2431d0",
+                    "DefaultRouteTablePropagation": "enable",
+                    "PropagationDefaultRouteTableId": "tgw-rtb-0c2d6c71cda2431d0",
+                    "VpnEcmpSupport": "enable",
+                    "DnsSupport": "enable",
+                    "MulticastSupport": "disable"
+                },
+                "Tags": []
+            },
+            {
+                "TransitGatewayId": "tgw-008fe7d47ebe2dbeb",
+                "TransitGatewayArn": "arn:aws:ec2:us-west-2:644160558196:transit-gateway/tgw-008fe7d47ebe2dbeb",
+                "State": "available",
+                "OwnerId": "644160558196",
+                "Description": "A TGW sample",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 9,
+                    "day": 1,
+                    "hour": 16,
+                    "minute": 44,
+                    "second": 29,
+                    "microsecond": 0
+                },
+                "Options": {
+                    "AmazonSideAsn": 64512,
+                    "AutoAcceptSharedAttachments": "enable",
+                    "DefaultRouteTableAssociation": "enable",
+                    "AssociationDefaultRouteTableId": "tgw-rtb-0dd49d1ea80803d53",
+                    "DefaultRouteTablePropagation": "enable",
+                    "PropagationDefaultRouteTableId": "tgw-rtb-0dd49d1ea80803d53",
+                    "VpnEcmpSupport": "enable",
+                    "DnsSupport": "enable",
+                    "MulticastSupport": "disable"
+                },
+                "Tags": []
+            },
+            {
+                "TransitGatewayId": "tgw-089825ccd90d171ea",
+                "TransitGatewayArn": "arn:aws:ec2:us-west-2:644160558196:transit-gateway/tgw-089825ccd90d171ea",
+                "State": "available",
+                "OwnerId": "644160558196",
+                "Description": "tgw-data-test-dev2",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 3,
+                    "day": 22,
+                    "hour": 17,
+                    "minute": 7,
+                    "second": 2,
+                    "microsecond": 0
+                },
+                "Options": {
+                    "AmazonSideAsn": 64512,
+                    "AutoAcceptSharedAttachments": "enable",
+                    "DefaultRouteTableAssociation": "enable",
+                    "AssociationDefaultRouteTableId": "tgw-rtb-0b118049ce185461a",
+                    "DefaultRouteTablePropagation": "enable",
+                    "PropagationDefaultRouteTableId": "tgw-rtb-0b118049ce185461a",
+                    "VpnEcmpSupport": "enable",
+                    "DnsSupport": "enable",
+                    "MulticastSupport": "disable"
+                },
+                "Tags": []
+            },
+            {
+                "TransitGatewayId": "tgw-0a1b4d3f1a66473e6",
+                "TransitGatewayArn": "arn:aws:ec2:us-west-2:644160558196:transit-gateway/tgw-0a1b4d3f1a66473e6",
+                "State": "available",
+                "OwnerId": "644160558196",
+                "Description": "Test E2E TransitGateway",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 6,
+                    "day": 20,
+                    "hour": 22,
+                    "minute": 17,
+                    "second": 26,
+                    "microsecond": 0
+                },
+                "Options": {
+                    "AmazonSideAsn": 65252,
+                    "AutoAcceptSharedAttachments": "enable",
+                    "DefaultRouteTableAssociation": "enable",
+                    "AssociationDefaultRouteTableId": "tgw-rtb-096e26da3b58f6ab5",
+                    "DefaultRouteTablePropagation": "disable",
+                    "VpnEcmpSupport": "enable",
+                    "DnsSupport": "enable",
+                    "MulticastSupport": "disable"
+                },
+                "Tags": []
+            },
+            {
+                "TransitGatewayId": "tgw-0ae92474bae91f567",
+                "TransitGatewayArn": "arn:aws:ec2:us-west-2:644160558196:transit-gateway/tgw-0ae92474bae91f567",
+                "State": "available",
+                "OwnerId": "644160558196",
+                "Description": "tgw-data-test-dev3",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 3,
+                    "day": 22,
+                    "hour": 17,
+                    "minute": 14,
+                    "second": 7,
+                    "microsecond": 0
+                },
+                "Options": {
+                    "AmazonSideAsn": 64512,
+                    "AutoAcceptSharedAttachments": "enable",
+                    "DefaultRouteTableAssociation": "enable",
+                    "AssociationDefaultRouteTableId": "tgw-rtb-0260f577f316babfd",
+                    "DefaultRouteTablePropagation": "enable",
+                    "PropagationDefaultRouteTableId": "tgw-rtb-0260f577f316babfd",
+                    "VpnEcmpSupport": "enable",
+                    "DnsSupport": "enable",
+                    "MulticastSupport": "disable"
+                },
+                "Tags": []
+            },
+            {
+                "TransitGatewayId": "tgw-0f96ed6067afecc1b",
+                "TransitGatewayArn": "arn:aws:ec2:us-west-2:644160558196:transit-gateway/tgw-0f96ed6067afecc1b",
+                "State": "available",
+                "OwnerId": "644160558196",
+                "Description": "tgw-data-test-dev4",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 3,
+                    "day": 22,
+                    "hour": 17,
+                    "minute": 0,
+                    "second": 21,
+                    "microsecond": 0
+                },
+                "Options": {
+                    "AmazonSideAsn": 64512,
+                    "AutoAcceptSharedAttachments": "enable",
+                    "DefaultRouteTableAssociation": "enable",
+                    "AssociationDefaultRouteTableId": "tgw-rtb-0e5b01ca3d51a4631",
+                    "DefaultRouteTablePropagation": "enable",
+                    "PropagationDefaultRouteTableId": "tgw-rtb-0e5b01ca3d51a4631",
+                    "VpnEcmpSupport": "enable",
+                    "DnsSupport": "enable",
+                    "MulticastSupport": "disable"
+                },
+                "Tags": []
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

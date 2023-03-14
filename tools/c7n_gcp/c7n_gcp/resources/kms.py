@@ -7,6 +7,8 @@ from c7n.utils import local_session
 from c7n_gcp.provider import resources
 from c7n_gcp.query import QueryResourceManager, TypeInfo, ChildResourceManager, ChildTypeInfo, \
     GcpLocation
+from c7n_gcp.actions import SetIamPolicy
+from c7n_gcp.filters import IamPolicyFilter
 
 
 @resources.register('kms-keyring')
@@ -22,6 +24,8 @@ class KmsKeyRing(QueryResourceManager):
         default_report_fields = [
             "name", "createTime"]
         asset_type = "cloudkms.googleapis.com/KeyRing"
+        urn_component = "keyring"
+        urn_id_segments = (-1,)  # Just use the last segment of the id in the URN
 
         @staticmethod
         def get(client, resource_info):
@@ -30,6 +34,10 @@ class KmsKeyRing(QueryResourceManager):
                         resource_info['location'],
                         resource_info['key_ring_id'])
             return client.execute_command('get', {'name': name})
+
+        @classmethod
+        def _get_location(cls, resource):
+            return resource["name"].split('/')[3]
 
     def get_resource_query(self):
         if 'query' in self.data:
@@ -89,6 +97,8 @@ class KmsCryptoKey(ChildResourceManager):
         }
         asset_type = "cloudkms.googleapis.com/CryptoKey"
         scc_type = "google.cloud.kms.CryptoKey"
+        urn_component = "cryptokey"
+        urn_id_segments = (5, 7)
 
         @staticmethod
         def get(client, resource_info):
@@ -98,6 +108,23 @@ class KmsCryptoKey(ChildResourceManager):
                         resource_info['key_ring_id'],
                         resource_info['crypto_key_id'])
             return client.execute_command('get', {'name': name})
+
+        @classmethod
+        def _get_location(cls, resource):
+            return resource["name"].split('/')[3]
+
+
+@KmsCryptoKey.filter_registry.register('iam-policy')
+class KmsCryptokeyIamPolicyFilter(IamPolicyFilter):
+    """
+    Overrides the base implementation to process KMS Cryptokey resources correctly.
+    """
+    permissions = ('cloudkms.cryptoKeys.get', 'cloudkms.cryptoKeys.list',
+    'cloudkms.cryptoKeys.update', 'resourcemanager.projects.get')
+
+    def _verb_arguments(self, resource):
+        verb_arguments = SetIamPolicy._verb_arguments(self, resource)
+        return verb_arguments
 
 
 @resources.register('kms-cryptokey-version')
@@ -136,6 +163,8 @@ class KmsCryptoKeyVersion(ChildResourceManager):
             'use_child_query': True
         }
         asset_type = "cloudkms.googleapis.com/CryptoKeyVersion"
+        urn_component = "cryptokey-version"
+        urn_id_segments = (5, 7, 9)
 
         @staticmethod
         def get(client, resource_info):
@@ -146,3 +175,7 @@ class KmsCryptoKeyVersion(ChildResourceManager):
                         resource_info['crypto_key_id'],
                         resource_info['crypto_key_version_id'])
             return client.execute_command('get', {'name': name})
+
+        @classmethod
+        def _get_location(cls, resource):
+            return resource["name"].split('/')[3]

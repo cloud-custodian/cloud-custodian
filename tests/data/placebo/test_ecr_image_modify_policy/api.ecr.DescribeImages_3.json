@@ -1,0 +1,30 @@
+{
+    "status_code": 200,
+    "data": {
+        "imageDetails": [
+            {
+                "registryId": "644160558196",
+                "repositoryName": "nginx",
+                "imageDigest": "sha256:4424e31f2c366108433ecca7890ad527b243361577180dfd9a5bb36e828abf47",
+                "imageTags": [
+                    "sastest",
+                    "latest"
+                ],
+                "imageSizeInBytes": 56729126,
+                "imagePushedAt": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 12,
+                    "day": 14,
+                    "hour": 9,
+                    "minute": 37,
+                    "second": 8,
+                    "microsecond": 0
+                },
+                "imageManifestMediaType": "application/vnd.docker.distribution.manifest.v2+json",
+                "artifactMediaType": "application/vnd.docker.container.image.v1+json"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

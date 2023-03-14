@@ -1,19 +1,8 @@
 {
     "status_code": 200,
     "data": {
-        "ResponseMetadata": {
-            "RequestId": "3aa70f82-02af-11e9-8f13-8b7358831acf",
-            "HTTPStatusCode": 200,
-            "HTTPHeaders": {
-                "date": "Tue, 18 Dec 2018 10:25:23 GMT",
-                "content-type": "application/json",
-                "content-length": "295",
-                "connection": "keep-alive",
-                "x-amzn-requestid": "3aa70f82-02af-11e9-8f13-8b7358831acf"
-            },
-            "RetryAttempts": 0
-        },
-        "Policy": "{\"Version\":\"2012-10-17\",\"Id\":\"default\",\"Statement\":[{\"Sid\":\"Grant\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":\"lambda:GetLayerVersion\",\"Resource\":\"arn:aws:lambda:us-east-1:644160558196:layer:test:2\"}]}",
-        "RevisionId": "dc14c754-0f12-49cb-b263-95dd45f45bd3"
+        "ResponseMetadata": {},
+        "Policy": "{\"Version\":\"2012-10-17\",\"Id\":\"default\",\"Statement\":[{\"Sid\":\"xaccount2\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::123456789123:root\"},\"Action\":\"lambda:GetLayerVersion\",\"Resource\":\"arn:aws:lambda:us-east-1:644160558196:layer:c7n-botocore1-20-33-boto31-17-33:1\"}]}",
+        "RevisionId": "23d7f01d-6216-49c4-8eb4-c395afcfb47d"
     }
 }

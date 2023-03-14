@@ -1,0 +1,9 @@
+{
+    "status_code": 200,
+    "data": {
+        "Attributes": {
+            "QueueArn": "arn:aws:sqs:us-east-1:644160558196:custodian-waiter-95948667-550b-4da9-a16b-aa7d3e2b6401"
+        },
+        "ResponseMetadata": {}
+    }
+}

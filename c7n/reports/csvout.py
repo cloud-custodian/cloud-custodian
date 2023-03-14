@@ -96,7 +96,7 @@ def report(policies, start_date, options, output_fh, raw_output_fh=None):
 
         records += policy_records
 
-    rows = formatter.to_csv(records)
+    rows = formatter.to_csv(records, unique=not options.all_findings)
 
     if options.format == 'csv':
         writer = csv.writer(output_fh, formatter.headers(), quoting=csv.QUOTE_ALL)
@@ -193,8 +193,14 @@ class Formatter:
         """Only the first record for each id"""
         uniq = []
         keys = set()
+        compiled = None
+        if '.' in self._id_field:
+            compiled = jmespath.compile(self._id_field)
         for rec in records:
-            rec_id = rec[self._id_field]
+            if compiled:
+                rec_id = compiled.search(rec)
+            else:
+                rec_id = rec[self._id_field]
             if rec_id not in keys:
                 uniq.append(rec)
                 keys.add(rec_id)
@@ -213,9 +219,10 @@ class Formatter:
 
         if unique:
             uniq = self.uniq_by_id(records)
+            log.debug("Uniqued from %d to %d" % (len(records), len(uniq)))
         else:
             uniq = records
-        log.debug("Uniqued from %d to %d" % (len(records), len(uniq)))
+            log.debug("Selected %d record(s)" % len(records))
         rows = list(map(self.extract_csv, uniq))
         return rows
 

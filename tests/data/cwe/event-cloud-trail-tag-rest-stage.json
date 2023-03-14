@@ -1,0 +1,59 @@
+{
+    "version": "0",
+    "id": "06e856f8-a9f2-85c3-4908-54363fe9ef83",
+    "detail-type": "AWS API Call via CloudTrail",
+    "source": "aws.apigateway",
+    "account": "012345678901",
+    "time": "2022-07-13T19:36:44Z",
+    "region": "us-east-1",
+    "resources": [],
+    "detail": {
+        "eventVersion": "1.08",
+        "userIdentity": {
+            "type": "AssumedRole",
+            "principalId": "AROAVD4IK2M7GWZXER5DZ:HarishAchappa",
+            "arn": "arn:aws:sts::012345678901:assumed-role/c7nbot/HarishAchappa",
+            "accountId": "012345678901",
+            "accessKeyId": "ASIAVD4IK2M7HVX6KJF6",
+            "sessionContext": {
+                "sessionIssuer": {
+                    "type": "Role",
+                    "principalId": "AROAVD4IK2M7GWZXER5DZ",
+                    "arn": "arn:aws:iam::012345678901:role/c7nbot",
+                    "accountId": "012345678901",
+                    "userName": "c7nbot"
+                },
+                "webIdFederationData": {},
+                "attributes": {
+                    "creationDate": "2022-07-13T19:09:22Z",
+                    "mfaAuthenticated": "false"
+                }
+            }
+        },
+        "eventTime": "2022-07-13T19:36:44Z",
+        "eventSource": "apigateway.amazonaws.com",
+        "eventName": "TagResource",
+        "awsRegion": "us-east-1",
+        "sourceIPAddress": "AWS Internal",
+        "userAgent": "AWS Internal",
+        "requestParameters": {
+            "tagResourceInput": {
+                "tags": {
+                    "WAF": "BR-IP"
+                }
+            },
+            "resourceArn": "arn:aws:apigateway:us-east-1::/restapis/abcdef74gh/stages/test2",
+            "template": false
+        },
+        "responseElements": null,
+        "requestID": "7660d579-2191-4d8a-9175-4f27ed9faf62",
+        "eventID": "94808787-0330-494e-9eec-5d35c3e0dce7",
+        "readOnly": false,
+        "eventType": "AwsApiCall",
+        "managementEvent": true,
+        "recipientAccountId": "012345678901",
+        "eventCategory": "Management",
+        "sessionCredentialFromConsole": "true"
+    },
+    "debug": true
+}

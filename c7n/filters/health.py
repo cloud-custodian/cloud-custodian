@@ -41,7 +41,7 @@ class HealthEventFilter(Filter):
         found = set()
         seen = set()
 
-        for resource_set in chunks(resource_map.keys(), 100):
+        for resource_set in chunks(resource_map.keys(), 99):
             f['entityValues'] = resource_set
             events = client.describe_events(filter=f)['events']
             events = [e for e in events if e['arn'] not in seen]

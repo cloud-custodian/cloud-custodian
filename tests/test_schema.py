@@ -73,6 +73,14 @@ class StructureParserTest(BaseTest):
         self.assertTrue(str(ecm.exception).startswith(
             'policy:foo action must be a mapping/dict found:list'))
 
+    def test_null_actions(self):
+        p = StructureParser()
+        p.validate({'policies': [{'name': 'foo', 'resource': 'ec2', 'actions': None}]})
+
+    def test_null_filters(self):
+        p = StructureParser()
+        p.validate({'policies': [{'name': 'foo', 'resource': 'ec2', 'filters': None}]})
+
     def test_invalid_filter(self):
         p = StructureParser()
         with self.assertRaises(PolicyValidationError) as ecm:

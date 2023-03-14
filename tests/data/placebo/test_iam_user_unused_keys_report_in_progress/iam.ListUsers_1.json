@@ -1,0 +1,67 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Users": [
+            {
+                "UserName": "Hazmat", 
+                "Path": "/", 
+                "CreateDate": {
+                    "hour": 8, 
+                    "__class__": "datetime", 
+                    "month": 3, 
+                    "second": 42, 
+                    "microsecond": 0, 
+                    "year": 2013, 
+                    "day": 1, 
+                    "minute": 34
+                }, 
+                "UserId": "AIDAIBNPVMN4XKBO4M5UM", 
+                "Arn": "arn:aws:iam::644160558196:user/Hazmat"
+            }, 
+            {
+                "UserName": "kapilt", 
+                "Path": "/", 
+                "CreateDate": {
+                    "hour": 2, 
+                    "__class__": "datetime", 
+                    "month": 10, 
+                    "second": 23, 
+                    "microsecond": 0, 
+                    "year": 2015, 
+                    "day": 4, 
+                    "minute": 59
+                }, 
+                "UserId": "AIDAIQFMQCY3QRM432ITE", 
+                "Arn": "arn:aws:iam::644160558196:user/kapilt"
+            }, 
+            {
+                "UserName": "rome", 
+                "Path": "/", 
+                "CreateDate": {
+                    "hour": 9, 
+                    "__class__": "datetime", 
+                    "month": 11, 
+                    "second": 34, 
+                    "microsecond": 0, 
+                    "year": 2016, 
+                    "day": 25, 
+                    "minute": 37
+                }, 
+                "UserId": "AIDAJ2WFT4W7PHV4EOV2O", 
+                "Arn": "arn:aws:iam::644160558196:user/rome"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "bdce46cf-b31b-11e6-9b38-0fb23af37c82", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "bdce46cf-b31b-11e6-9b38-0fb23af37c82", 
+                "date": "Fri, 25 Nov 2016 14:30:40 GMT", 
+                "content-length": "2039", 
+                "content-type": "text/xml"
+            }
+        }, 
+        "IsTruncated": false
+    }
+}

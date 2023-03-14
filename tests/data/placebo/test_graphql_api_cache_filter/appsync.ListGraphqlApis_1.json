@@ -1,0 +1,32 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "graphqlApis": [
+            {
+                "name": "My AppSync App",
+                "apiId": "cbns7htygbbxnk5bj2udeibawq",
+                "authenticationType": "API_KEY",
+                "arn": "arn:aws:appsync:us-east-1:644160558196:apis/cbns7htygbbxnk5bj2udeibawq",
+                "uris": {
+                    "REALTIME": "wss://mcom34eq4bgdrgkulx46bmkokq.appsync-realtime-api.us-east-1.amazonaws.com/graphql",
+                    "GRAPHQL": "https://mcom34eq4bgdrgkulx46bmkokq.appsync-api.us-east-1.amazonaws.com/graphql"
+                },
+                "tags": {},
+                "xrayEnabled": false
+            },
+            {
+                "name": "My AppSync App2",
+                "apiId": "heim6ph2ejepjh33s5wx57dwpu",
+                "authenticationType": "API_KEY",
+                "arn": "arn:aws:appsync:us-east-1:644160558196:apis/heim6ph2ejepjh33s5wx57dwpu",
+                "uris": {
+                    "REALTIME": "wss://api6mfvgnvdcng3e63fdz4y3gi.appsync-realtime-api.us-east-1.amazonaws.com/graphql",
+                    "GRAPHQL": "https://api6mfvgnvdcng3e63fdz4y3gi.appsync-api.us-east-1.amazonaws.com/graphql"
+                },
+                "tags": {},
+                "xrayEnabled": false
+            }
+        ]
+    }
+}

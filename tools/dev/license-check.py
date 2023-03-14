@@ -1,3 +1,5 @@
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 from importlib import metadata
 import sys
 
@@ -12,6 +14,7 @@ accept = (
     'MPL 2.0',
     'BSD-3-Clause',
     'Apache-2.0',
+    'Apache-2',
 )
 
 accept_classifiers = set(
@@ -22,6 +25,7 @@ accept_classifiers = set(
         'License :: OSI Approved :: MIT License',
         'License :: OSI Approved :: BSD License',
         'License :: OSI Approved :: Mozilla Public License 2.0 (MPL 2.0)',
+        'License :: Public Domain'
         #    'License :: OSI Approved :: GNU Library or Lesser General Public License (LGPL)'
     )
 )
@@ -37,7 +41,7 @@ whitelist_packages = set(
         'ldap3',  # mailer dependency, LGPL
         'sphinx-markdown-tables',  # docgen - GPL
         'docutils',  # docgen - couple of different licenses but bulk is public domain
-        'chardet',  # requests dep - LPGL
+        # 'chardet',  # requests dep - LPGL
         'websocket-client',  # c7n_kube dep - LGPL-2.1
         #
         # packages with bad metadata
@@ -58,8 +62,9 @@ def main():
     found = False
     for d in sorted(metadata.distributions(), key=lambda d: d.metadata['Name']):
         dname = d.metadata['Name']
-
         if dname in seen:
+            continue
+        if d.metadata['License'] in accept:
             continue
 
         classifiers = d.metadata.get_all('Classifier') or ()
@@ -70,6 +75,7 @@ def main():
             print(f"{dname}: {d.metadata['License']} {classifiers}")
 
         seen.add(dname)
+
     if found:
         sys.exit(1)
 

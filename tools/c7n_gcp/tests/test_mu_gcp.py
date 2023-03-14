@@ -99,6 +99,7 @@ class FunctionTest(BaseTest):
             'resource': 'gcp.instance',
             'mode': {
                 'type': 'gcp-periodic',
+                'service-account': 'foo',
                 'schedule': 'every 2 hours'}},
             output_dir='gs://somebucket/some-prefix',
             log_group='gcp',
@@ -117,8 +118,41 @@ class FunctionTest(BaseTest):
             {'name': 'instance-off',
              'resource': 'gcp.instance',
              'mode': {'type': 'gcp-periodic',
+                      'service-account': 'foo',
                       'schedule': 'every 2 hours',
                       'tz': 'zulugold'}})
+
+    def test_periodic_validate_service_account(self):
+        # no target type or http should require service-account
+        self.assertRaises(
+            PolicyValidationError,
+            self.load_policy,
+            {'name': 'instance-off',
+             'resource': 'gcp.instance',
+             'mode': {'type': 'gcp-periodic',
+                      'schedule': 'every 2 hours'}})
+
+        self.assertRaises(
+            PolicyValidationError,
+            self.load_policy,
+            {'name': 'instance-off',
+             'resource': 'gcp.instance',
+             'mode': {'type': 'gcp-periodic',
+                      'target-type': 'http',
+                      'schedule': 'every 2 hours'}})
+
+        # pubsub target type should not require service-account
+        self.load_policy(
+            {
+                'name': 'instance-off',
+                'resource': 'gcp.instance',
+                'mode': {
+                    'type': 'gcp-periodic',
+                    'target-type': 'pubsub',
+                    'schedule': 'every 2 hours'
+                }
+            }
+        )
 
     def test_periodic_update_schedule(self):
         factory = self.replay_flight_data('mu-perodic-update-schedule')
@@ -135,7 +169,10 @@ class FunctionTest(BaseTest):
         p = self.load_policy({
             'name': 'gcp-find-instances',
             'resource': 'gcp.instance',
-            'mode': {'type': 'gcp-periodic', 'schedule': 'every 2 hours'}},
+            'mode': {
+                'type': 'gcp-periodic',
+                'schedule': 'every 2 hours',
+                'service-account': 'foo'}},
             session_factory=factory)
         p.run()
 
@@ -152,7 +189,10 @@ class FunctionTest(BaseTest):
         p = self.load_policy({
             'name': 'instance-off',
             'resource': 'gcp.instance',
-            'mode': {'type': 'gcp-periodic', 'schedule': 'every 2 hours'}},
+            'mode': {
+                'type': 'gcp-periodic',
+                'schedule': 'every 2 hours',
+                'service-account': 'foo'}},
             session_factory=factory)
 
         p.provision()

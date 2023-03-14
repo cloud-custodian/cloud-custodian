@@ -8,11 +8,13 @@
             "Status": "deleting",
             "PendingModifiedValues": {},
             "AutomaticFailover": "enabled",
-            "MultiAZ": "disabled",
-            "SnapshotRetentionLimit": 0,
-            "SnapshotWindow": "09:00-10:00",
+            "MultiAZ": "enabled",
+            "SnapshotRetentionLimit": 1,
+            "SnapshotWindow": "10:00-11:00",
             "TransitEncryptionEnabled": false,
-            "AtRestEncryptionEnabled": false
+            "AtRestEncryptionEnabled": false,
+            "ARN": "arn:aws:elasticache:us-east-1:644160558196:replicationgroup:c7n-delete",
+            "LogDeliveryConfigurations": []
         },
         "ResponseMetadata": {}
     }

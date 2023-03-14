@@ -1,0 +1,22 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:workspaces:us-east-1:644160558196:directory/d-90677cc91c",
+                "Tags": []
+            },
+            {
+                "ResourceARN": "arn:aws:workspaces:us-east-1:644160558196:directory/d-90675153fc",
+                "Tags": [
+                    {
+                        "Key": "c7n",
+                        "Value": "test"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

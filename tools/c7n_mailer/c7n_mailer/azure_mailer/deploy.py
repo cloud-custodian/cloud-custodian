@@ -27,7 +27,7 @@ def cache_path():
 
 
 def get_mailer_requirements():
-    deps = ['azure-mgmt-managementgroups', 'azure-mgmt-web',
+    deps = ['azure-identity', 'azure-mgmt-managementgroups', 'azure-mgmt-web',
             'azure-graphrbac', 'azure-keyvault', 'azure-storage-queue',
             'azure-storage-blob', 'netaddr', 'sendgrid', 'pyyaml'] + list(CORE_DEPS)
     requirements = generate_requirements(

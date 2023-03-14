@@ -1,0 +1,74 @@
+{
+    "status_code": 200,
+    "data": {
+        "Quotas": [
+            {
+                "ServiceCode": "AWSCloudMap",
+                "ServiceName": "AWS Cloud Map",
+                "QuotaArn": "arn:aws:servicequotas:us-east-1::AWSCloudMap/L-D589BB26",
+                "QuotaCode": "L-D589BB26",
+                "QuotaName": "Custom attributes per instance",
+                "Value": 30.0,
+                "Unit": "None",
+                "Adjustable": false,
+                "GlobalQuota": false
+            },
+            {
+                "ServiceCode": "AWSCloudMap",
+                "ServiceName": "AWS Cloud Map",
+                "QuotaArn": "arn:aws:servicequotas:us-east-1::AWSCloudMap/L-76CF203B",
+                "QuotaCode": "L-76CF203B",
+                "QuotaName": "DiscoverInstances operation per account burst rate",
+                "Value": 2000.0,
+                "Unit": "None",
+                "Adjustable": true,
+                "GlobalQuota": false
+            },
+            {
+                "ServiceCode": "AWSCloudMap",
+                "ServiceName": "AWS Cloud Map",
+                "QuotaArn": "arn:aws:servicequotas:us-east-1::AWSCloudMap/L-514A639A",
+                "QuotaCode": "L-514A639A",
+                "QuotaName": "DiscoverInstances operation per account steady rate",
+                "Value": 1000.0,
+                "Unit": "None",
+                "Adjustable": true,
+                "GlobalQuota": false
+            },
+            {
+                "ServiceCode": "AWSCloudMap",
+                "ServiceName": "AWS Cloud Map",
+                "QuotaArn": "arn:aws:servicequotas:us-east-1::AWSCloudMap/L-D95E8A57",
+                "QuotaCode": "L-D95E8A57",
+                "QuotaName": "Instances per namespace",
+                "Value": 2000.0,
+                "Unit": "None",
+                "Adjustable": true,
+                "GlobalQuota": false
+            },
+            {
+                "ServiceCode": "AWSCloudMap",
+                "ServiceName": "AWS Cloud Map",
+                "QuotaArn": "arn:aws:servicequotas:us-east-1::AWSCloudMap/L-2DA90E5C",
+                "QuotaCode": "L-2DA90E5C",
+                "QuotaName": "Instances per service",
+                "Value": 1000.0,
+                "Unit": "None",
+                "Adjustable": false,
+                "GlobalQuota": false
+            },
+            {
+                "ServiceCode": "AWSCloudMap",
+                "ServiceName": "AWS Cloud Map",
+                "QuotaArn": "arn:aws:servicequotas:us-east-1::AWSCloudMap/L-0FE3F50E",
+                "QuotaCode": "L-0FE3F50E",
+                "QuotaName": "Namespaces per Region",
+                "Value": 50.0,
+                "Unit": "None",
+                "Adjustable": true,
+                "GlobalQuota": false
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

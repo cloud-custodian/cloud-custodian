@@ -24,6 +24,7 @@ class Network(QueryResourceManager):
             "autoCreateSubnetworks", "IPv4Range", "gatewayIPv4"]
         asset_type = "compute.googleapis.com/Network"
         scc_type = "google.compute.Network"
+        urn_component = "vpc"
 
         @staticmethod
         def get(client, resource_info):
@@ -50,12 +51,13 @@ class Subnet(QueryResourceManager):
         asset_type = "compute.googleapis.com/Subnetwork"
         scc_type = "google.compute.Subnetwork"
         metric_key = "resource.labels.subnetwork_name"
+        urn_component = "subnet"
 
         @staticmethod
         def get(client, resource_info):
 
             path_param_re = re.compile(
-                '.*?/projects/(.*?)/regions/(.*?)/subnetworks/(.*)')
+                '.*?projects/(.*?)/regions/(.*?)/subnetworks/(.*)')
             project, region, subnet = path_param_re.match(
                 resource_info["resourceName"]).groups()
             return client.execute_query(
@@ -99,9 +101,14 @@ class SetFlowLog(SubnetAction):
 
     def get_resource_params(self, m, r):
         params = super(SetFlowLog, self).get_resource_params(m, r)
-        params['body'] = dict(r)
-        params['body']['enableFlowLogs'] = self.data.get('state', True)
-        return params
+        return {
+            'project': params['project'],
+            'region': params['region'],
+            'subnetwork': params['subnetwork'],
+            'body': {
+                'fingerprint': r['fingerprint'],
+                'enableFlowLogs': self.data.get('state', True)}
+        }
 
 
 @Subnet.action_registry.register('set-private-api')
@@ -135,6 +142,7 @@ class Firewall(QueryResourceManager):
         asset_type = "compute.googleapis.com/Firewall"
         scc_type = "google.compute.Firewall"
         metric_key = 'metric.labels.firewall_name'
+        urn_component = "firewall"
 
         @staticmethod
         def get(client, resource_info):
@@ -234,6 +242,7 @@ class Router(QueryResourceManager):
         default_report_fields = [
             "name", "description", "creationTimestamp", "region", "network"]
         asset_type = "compute.googleapis.com/Router"
+        urn_component = "router"
 
         @staticmethod
         def get(client, resource_info):
@@ -285,6 +294,7 @@ class Route(QueryResourceManager):
         default_report_fields = [
             "name", "description", "creationTimestamp", "network", "priority", "destRange"]
         asset_type = "compute.googleapis.com/Route"
+        urn_component = "route"
 
         @staticmethod
         def get(client, resource_info):

@@ -29,11 +29,14 @@ resources never became available.
 Cloud Custodian Integration
 ===========================
 
-Custodian provides for policy level execution against any CWE event stream.
-Each Custodian policy can be deployed as an independent Lambda function. The
-only difference between a Custodian policy that runs in Lambda and one that
-runs directly from the CLI in poll mode is the specification of the
-subscription of the events in the mode config block of the policy.
+Custodian provides for policy level execution against any `Amazon CloudWatch
+Event
+<https://docs.aws.amazon.com/AmazonCloudWatch/latest/events/WhatIsCloudWatchEvents.html>`_
+stream. Henceforth "CloudWatch Events" will be abbreviated as CWE. Each
+Custodian policy can be deployed as an independent Lambda function. The only
+difference between a Custodian policy that runs in Lambda and one that runs
+directly from the CLI in poll mode is the specification of the subscription of
+the events in the mode config block of the policy.
 
 Internally Custodian will reconstitute current state for all the resources
 in the event, execute the policy against them, match against the
@@ -43,7 +46,7 @@ policy filters, and apply the policy actions to matching resources.
 CloudTrail API Calls
 ++++++++++++++++++++
 
-Lambdas can receive CWE over CloudTrail API calls with delay of 90s at P99.
+Lambdas can receive CWE over CloudTrail API calls within seconds of delay at P99.
 
 .. code-block:: yaml
 
@@ -62,11 +65,12 @@ Lambdas can receive CWE over CloudTrail API calls with delay of 90s at P99.
 Because the total AWS API surface area is so large most CloudTrail API
 event subscriptions need two additional fields:
 
-#. For CloudTrail events we need to reference the source API call.
+#. For CloudTrail events we need to reference the source API call. In the code
+   block example below this is the ``source:`` key.
 
 #. To work transparently with existing resource policies, we also need to
    specify how to extract the resource IDs from the event via JMESPath so that
-   the resources can be queried.
+   the resources can be queried. In the code block example below this is the ``ids:`` key. 
 
 For very common API calls for policies, some `shortcuts
 <https://github.com/cloud-custodian/cloud-custodian/blob/master/c7n/cwe.py#L28-L69>`_
@@ -80,11 +84,15 @@ have been defined to allow for easier policy writing as for the
         event: RunInstances
         ids: "responseElements.instancesSet.items[].instanceId"
 
+Refer to the `AWS execution modes documention
+<https://cloudcustodian.io/docs/aws/resources/aws-modes.html#cloudtrail>`_ for a
+list of other configurable options. 
+
 
 EC2 Instance State Events
 +++++++++++++++++++++++++
 
-Lambdas can receive EC2 instance state events in real time (seconds delay).
+Policies can react to EC2 instance state events in real time. 
 
 .. code-block:: yaml
 
@@ -103,6 +111,9 @@ Lambdas can receive EC2 instance state events in real time (seconds delay).
          - mark
          - terminate
 
+Refer to `AWS execution modes documentation
+<https://cloudcustodian.io/docs/aws/resources/aws-modes.html#ec2-instance-state>`_
+for a list of configurable options. 
 
 Periodic Function
 +++++++++++++++++

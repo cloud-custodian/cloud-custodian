@@ -38,7 +38,11 @@ class LdapLookup:
         elif self.cache_engine == 'sqlite':  # nosec
             if not have_sqlite:
                 raise RuntimeError('No sqlite available: stackoverflow.com/q/44058239')
-            self.caching = LocalSqlite(config.get('ldap_cache_file', '/var/tmp/ldap.cache'), logger)
+            # re nosec, this is running in serverless compute
+            # environments, where /tmp is the only writeable space and
+            # is effectively isolated to this process.
+            self.caching = LocalSqlite(
+                config.get('ldap_cache_file', '/var/tmp/ldap.cache'), logger)  # nosec
 
     def get_redis_connection(self, redis_host, redis_port):
         return Redis(redis_host=redis_host, redis_port=redis_port, db=0)
@@ -55,6 +59,8 @@ class LdapLookup:
             )
         except LDAPSocketOpenError:
             self.log.error('Not able to establish a connection with LDAP.')
+        except Exception as e:
+            self.log.warning(f'Error occurred getting LDAP connection: {e}')
 
     def search_ldap(self, base_dn, ldap_filter, attributes):
         self.connection.search(base_dn, ldap_filter, attributes=self.attributes)

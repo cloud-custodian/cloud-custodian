@@ -15,13 +15,14 @@ from c7n.exceptions import PolicyValidationError
 from c7n.filters import ValueFilter, AgeFilter, Filter
 from c7n.filters.offhours import OffHour, OnHour
 import c7n.filters.vpc as net_filters
+import c7n.policy
 
 from c7n.manager import resources
 from c7n import query
 from c7n.resources.securityhub import PostFinding
 from c7n.tags import TagActionFilter, DEFAULT_TAG, TagCountFilter, TagTrim, TagDelayedAction
 from c7n.utils import (
-    local_session, type_schema, chunks, get_retry, select_keys)
+    FormatDate, local_session, type_schema, chunks, get_retry, select_keys)
 
 from .ec2 import deserialize_user_data
 
@@ -244,7 +245,7 @@ class ConfigValidFilter(Filter):
                       'app-elb-target-group', 'ebs-snapshot', 'ami')]))
 
     def validate(self):
-        if self.manager.data.get('mode'):
+        if isinstance(self.manager.ctx.policy.get_execution_mode(), c7n.policy.LambdaMode):
             raise PolicyValidationError(
                 "invalid-config makes too many queries to be run in lambda")
         return self
@@ -1146,6 +1147,8 @@ class Tag(Action):
         tags = self.get_tag_set()
         error = None
 
+        self.interpolate_values(tags)
+
         client = self.get_client()
         with self.executor_factory(max_workers=2) as w:
             futures = {}
@@ -1178,6 +1181,14 @@ class Tag(Action):
                 tag_params.append(atags)
                 a.setdefault('Tags', []).append(atags)
         self.manager.retry(client.create_or_update_tags, Tags=tag_params)
+
+    def interpolate_values(self, tags):
+        params = {
+            'account_id': self.manager.config.account_id,
+            'now': FormatDate.utcnow(),
+            'region': self.manager.config.region}
+        for t in tags:
+            t['Value'] = t['Value'].format(**params)
 
     def get_client(self):
         return local_session(self.manager.session_factory).client('autoscaling')
@@ -1528,6 +1539,7 @@ class Suspend(Action):
             retry(ec2_client.stop_instances, InstanceIds=instance_ids)
         except ClientError as e:
             if e.response['Error']['Code'] in (
+                    'UnsupportedOperation',
                     'InvalidInstanceID.NotFound',
                     'IncorrectInstanceState'):
                 self.log.warning("Erroring stopping asg instances %s %s" % (

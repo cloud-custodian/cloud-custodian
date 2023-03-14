@@ -4,7 +4,7 @@
         {
             "request": {
                 "method": "GET",
-                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resources?$filter=resourceType%20eq%20%27Microsoft.KeyVault%2Fvaults%27&api-version=2015-11-01",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.KeyVault/vaults?api-version=2019-09-01",
                 "body": null,
                 "headers": {}
             },
@@ -14,30 +14,125 @@
                     "message": "OK"
                 },
                 "headers": {
-                    "content-length": [
-                        "297"
+                    "cache-control": [
+                        "no-cache"
                     ],
                     "content-type": [
                         "application/json; charset=utf-8"
                     ],
                     "date": [
-                        "Fri, 05 Mar 2021 18:47:42 GMT"
+                        "Thu, 20 Oct 2022 19:46:54 GMT"
                     ],
-                    "cache-control": [
-                        "no-cache"
+                    "content-length": [
+                        "1597"
                     ]
                 },
                 "body": {
                     "data": {
                         "value": [
                             {
-                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_keyvault/providers/Microsoft.KeyVault/vaults/cckeyvault1zd2yzvhwvtnsu",
-                                "name": "cckeyvault1zd2yzvhwvtnsu",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_keyvault/providers/Microsoft.KeyVault/vaults/cckeyvault1yghq6zt4ewg2e",
+                                "name": "cckeyvault1yghq6zt4ewg2e",
                                 "type": "Microsoft.KeyVault/vaults",
                                 "location": "southcentralus",
-                                "tags": {}
+                                "tags": {
+                                    "product_id": "13742"
+                                },
+                                "properties": {
+                                    "sku": {
+                                        "family": "A",
+                                        "name": "Standard"
+                                    },
+                                    "tenantId": "00000000-0000-0000-0000-000000000003",
+                                    "networkAcls": {
+                                        "bypass": "AzureServices",
+                                        "defaultAction": "Deny",
+                                        "ipRules": [
+                                            {
+                                                "value": "0.0.0.0/2"
+                                            },
+                                            {
+                                                "value": "64.0.0.0/3"
+                                            },
+                                            {
+                                                "value": "96.0.0.0/4"
+                                            },
+                                            {
+                                                "value": "112.0.0.0/5"
+                                            },
+                                            {
+                                                "value": "120.0.0.0/6"
+                                            },
+                                            {
+                                                "value": "124.0.0.0/7"
+                                            },
+                                            {
+                                                "value": "126.0.0.0/8"
+                                            },
+                                            {
+                                                "value": "128.0.0.0/1"
+                                            }
+                                        ],
+                                        "virtualNetworkRules": []
+                                    },
+                                    "accessPolicies": [
+                                        {
+                                            "tenantId": "00000000-0000-0000-0000-000000000003",
+                                            "objectId": "cfb71ed8-fcd0-4fe2-8384-7076080a219b",
+                                            "permissions": {
+                                                "keys": [
+                                                    "Get",
+                                                    "List",
+                                                    "Update",
+                                                    "Create",
+                                                    "Import",
+                                                    "Delete",
+                                                    "Recover",
+                                                    "Backup",
+                                                    "Restore"
+                                                ],
+                                                "secrets": [
+                                                    "Get",
+                                                    "List",
+                                                    "Set",
+                                                    "Delete",
+                                                    "Recover",
+                                                    "Backup",
+                                                    "Restore"
+                                                ],
+                                                "certificates": [
+                                                    "Get",
+                                                    "List",
+                                                    "Update",
+                                                    "Create",
+                                                    "Import",
+                                                    "Delete",
+                                                    "Recover",
+                                                    "ManageContacts",
+                                                    "ManageIssuers",
+                                                    "GetIssuers",
+                                                    "ListIssuers",
+                                                    "SetIssuers",
+                                                    "DeleteIssuers"
+                                                ],
+                                                "storage": [
+                                                    "Get",
+                                                    "List",
+                                                    "Set",
+                                                    "regeneratekey"
+                                                ]
+                                            }
+                                        }
+                                    ],
+                                    "enabledForDeployment": false,
+                                    "enabledForDiskEncryption": false,
+                                    "enabledForTemplateDeployment": false,
+                                    "vaultUri": "https://cckeyvault1yghq6zt4ewg2e.vault.azure.net/",
+                                    "provisioningState": "Succeeded"
+                                }
                             }
-                        ]
+                        ],
+                        "nextLink": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.KeyVault/vaults?api-version=2019-09-01&$skiptoken=dGVzdF9rZXl2YXVsdHxjY2tleXZhdWx0MXlnaHE2enQ0ZXdnMmU="
                     }
                 }
             }
@@ -45,7 +140,7 @@
         {
             "request": {
                 "method": "GET",
-                "uri": "https://cckeyvault1zd2yzvhwvtnsu.vault.azure.net/keys?api-version=7.1",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.KeyVault/vaults?api-version=2019-09-01&$skiptoken=dGVzdF9rZXl2YXVsdHxjY2tleXZhdWx0MXlnaHE2enQ0ZXdnMmU=",
                 "body": null,
                 "headers": {}
             },
@@ -55,66 +150,101 @@
                     "message": "OK"
                 },
                 "headers": {
-                    "content-length": [
-                        "896"
+                    "cache-control": [
+                        "no-cache"
                     ],
                     "content-type": [
                         "application/json; charset=utf-8"
                     ],
                     "date": [
-                        "Fri, 05 Mar 2021 18:47:43 GMT"
+                        "Thu, 20 Oct 2022 19:46:55 GMT"
                     ],
+                    "content-length": [
+                        "12"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": []
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://cckeyvault1yghq6zt4ewg2e.vault.azure.net/keys?api-version=7.3",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
                     "cache-control": [
                         "no-cache"
+                    ],
+                    "content-length": [
+                        "934"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Thu, 20 Oct 2022 19:46:56 GMT"
                     ]
                 },
                 "body": {
                     "data": {
                         "value": [
                             {
-                                "kid": "https://cckeyvault1zd2yzvhwvtnsu.vault.azure.net/keys/cctest1",
+                                "kid": "https://cckeyvault1yghq6zt4ewg2e.vault.azure.net/keys/cctest1",
                                 "attributes": {
                                     "enabled": true,
-                                    "nbf": 1605762963,
-                                    "exp": 1637299563,
-                                    "created": 1605763564,
-                                    "updated": 1605763564,
+                                    "nbf": 1666285012,
+                                    "exp": 1697821612,
+                                    "created": 1666285612,
+                                    "updated": 1666285612,
                                     "recoveryLevel": "Purgeable",
                                     "recoverableDays": 0
                                 },
                                 "managed": true
                             },
                             {
-                                "kid": "https://cckeyvault1zd2yzvhwvtnsu.vault.azure.net/keys/cctest2",
+                                "kid": "https://cckeyvault1yghq6zt4ewg2e.vault.azure.net/keys/cctest2",
                                 "attributes": {
                                     "enabled": true,
-                                    "nbf": 1605762982,
-                                    "exp": 1637299582,
-                                    "created": 1605763582,
-                                    "updated": 1605763582,
+                                    "nbf": 1666285025,
+                                    "exp": 1697821625,
+                                    "created": 1666285625,
+                                    "updated": 1666285625,
                                     "recoveryLevel": "Purgeable",
                                     "recoverableDays": 0
                                 },
                                 "managed": true
                             },
                             {
-                                "kid": "https://cckeyvault1zd2yzvhwvtnsu.vault.azure.net/keys/cctestec",
+                                "kid": "https://cckeyvault1yghq6zt4ewg2e.vault.azure.net/keys/cctestec",
                                 "attributes": {
                                     "enabled": true,
-                                    "created": 1605763550,
-                                    "updated": 1605763550,
+                                    "created": 1666285608,
+                                    "updated": 1666285608,
                                     "recoveryLevel": "Purgeable",
-                                    "recoverableDays": 0
+                                    "recoverableDays": 0,
+                                    "exportable": false
                                 }
                             },
                             {
-                                "kid": "https://cckeyvault1zd2yzvhwvtnsu.vault.azure.net/keys/cctestrsa",
+                                "kid": "https://cckeyvault1yghq6zt4ewg2e.vault.azure.net/keys/cctestrsa",
                                 "attributes": {
                                     "enabled": true,
-                                    "created": 1605763549,
-                                    "updated": 1605763549,
+                                    "created": 1666285606,
+                                    "updated": 1666285606,
                                     "recoveryLevel": "Purgeable",
-                                    "recoverableDays": 0
+                                    "recoverableDays": 0,
+                                    "exportable": false
                                 }
                             }
                         ],
@@ -126,7 +256,7 @@
         {
             "request": {
                 "method": "GET",
-                "uri": "https://cckeyvault1zd2yzvhwvtnsu.vault.azure.net/keys/cctestec/?api-version=7.1",
+                "uri": "https://cckeyvault1yghq6zt4ewg2e.vault.azure.net/keys/cctestec/?api-version=7.3",
                 "body": null,
                 "headers": {}
             },
@@ -136,38 +266,39 @@
                     "message": "OK"
                 },
                 "headers": {
+                    "cache-control": [
+                        "no-cache"
+                    ],
                     "content-length": [
-                        "386"
+                        "405"
                     ],
                     "content-type": [
                         "application/json; charset=utf-8"
                     ],
                     "date": [
-                        "Fri, 05 Mar 2021 18:47:43 GMT"
-                    ],
-                    "cache-control": [
-                        "no-cache"
+                        "Thu, 20 Oct 2022 19:46:56 GMT"
                     ]
                 },
                 "body": {
                     "data": {
                         "key": {
-                            "kid": "https://cckeyvault1zd2yzvhwvtnsu.vault.azure.net/keys/cctestec/92846f2071a8471da0c3ae352fe1c07a",
+                            "kid": "https://cckeyvault1yghq6zt4ewg2e.vault.azure.net/keys/cctestec/1fee0647838f46a58b928ebcae85e363",
                             "kty": "EC",
                             "key_ops": [
                                 "sign",
                                 "verify"
                             ],
                             "crv": "P-256",
-                            "x": "b7kgvCJXlGn0olpD7-d2oEmf49aDMRzjFe0tcA2Ibgg",
-                            "y": "qpmafJD6KkHCTJI81UZr8ky3pWSeJ5sHn3MUFwPW168"
+                            "x": "_D4BmlDYiHHUGQBv_Gk9aSsdFZb509UoLvfdWqc_4mA",
+                            "y": "dtNENPdhYFpTWb4C-1jRXfDC2f5FSlM_l5VchU7LdiA"
                         },
                         "attributes": {
                             "enabled": true,
-                            "created": 1605763550,
-                            "updated": 1605763550,
+                            "created": 1666285608,
+                            "updated": 1666285608,
                             "recoveryLevel": "Purgeable",
-                            "recoverableDays": 0
+                            "recoverableDays": 0,
+                            "exportable": false
                         }
                     }
                 }
@@ -176,7 +307,7 @@
         {
             "request": {
                 "method": "GET",
-                "uri": "https://cckeyvault1zd2yzvhwvtnsu.vault.azure.net/keys/cctestrsa/?api-version=7.1",
+                "uri": "https://cckeyvault1yghq6zt4ewg2e.vault.azure.net/keys/cctestrsa/?api-version=7.3",
                 "body": null,
                 "headers": {}
             },
@@ -186,23 +317,23 @@
                     "message": "OK"
                 },
                 "headers": {
+                    "cache-control": [
+                        "no-cache"
+                    ],
                     "content-length": [
-                        "676"
+                        "695"
                     ],
                     "content-type": [
                         "application/json; charset=utf-8"
                     ],
                     "date": [
-                        "Fri, 05 Mar 2021 18:47:43 GMT"
-                    ],
-                    "cache-control": [
-                        "no-cache"
+                        "Thu, 20 Oct 2022 19:46:57 GMT"
                     ]
                 },
                 "body": {
                     "data": {
                         "key": {
-                            "kid": "https://cckeyvault1zd2yzvhwvtnsu.vault.azure.net/keys/cctestrsa/88cbaa2d2e704acba2acf19f6fc4ff9c",
+                            "kid": "https://cckeyvault1yghq6zt4ewg2e.vault.azure.net/keys/cctestrsa/451c01573b6d4bf886c393132be12de0",
                             "kty": "RSA",
                             "key_ops": [
                                 "encrypt",
@@ -212,15 +343,16 @@
                                 "wrapKey",
                                 "unwrapKey"
                             ],
-                            "n": "xQSlRvvN_k08oPpYQmSE0u-OVrpkNL0nX9CX4tBHkR9WMHhPZBK9YHz7mrlHS6YTl1G_7jy3FnKJpj_QfI_G8E7UtYarTAhedTdnlp4LzRogHd6fujVR51Xx5oXApUUZeZCwRZzZ-go-wMbBjs6XmEYbVaow9wmvqhsSvHT43OY9ydSUbyXNRFJwv2wt_LN4ytghVB3sbPuIQQLGYkh8dHDUIFbZUSGuh5raYd7s_LS9zj9uGfOUvNgG_5XtqnW3RCHZQqz5x0pMNqs46FM2l4WRmUZsp4dXAwtT6_mhIf3YdeMJPLtWNBQ6tL3wdqvLLJBaVp9czLoln08q3JwVEQ",
+                            "n": "myf-S2LhT2R9CH7PFRhS4IEfgvBo6FEUsVs4stjJvBsrE7mSY46jrYMSg_4lSIwwhF09eYFzKHwV61osjiOo58jyaq4fmLOlK72B74ITN1ErHVdfrzbCMjfdCMBKDNxOetBfw35nSvdNGchzTQ3LS6l83aAK-8tEOX8LlLKFT9pgAunVBsa360Cl36yYWrHGw9W-MraWSKr4m6wsENvKjQt5ZEy1jwG29DKf5ZfZgWLB29lOd44j7OqpeTt2FCWh5Qf6dEJ2FOL_1VYIudRcwZ-dBAQpPZrZXBeoGgQ0MEX_KDUgSueJA-hbEtRbx860-XaP9OxBX6GJY4bBqka0iQ",
                             "e": "AQAB"
                         },
                         "attributes": {
                             "enabled": true,
-                            "created": 1605763549,
-                            "updated": 1605763549,
+                            "created": 1666285606,
+                            "updated": 1666285606,
                             "recoveryLevel": "Purgeable",
-                            "recoverableDays": 0
+                            "recoverableDays": 0,
+                            "exportable": false
                         }
                     }
                 }

@@ -1,6 +1,7 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 ResourceMap = {
+    "gcp.api-key": "c7n_gcp.resources.iam.ApiKey",
     "gcp.app-engine": "c7n_gcp.resources.appengine.AppEngineApp",
     "gcp.app-engine-certificate": "c7n_gcp.resources.appengine.AppEngineCertificate",
     "gcp.app-engine-domain": "c7n_gcp.resources.appengine.AppEngineDomain",
@@ -10,7 +11,6 @@ ResourceMap = {
     "gcp.autoscaler": "c7n_gcp.resources.compute.Autoscaler",
     "gcp.bq-dataset": "c7n_gcp.resources.bigquery.DataSet",
     "gcp.bq-job": "c7n_gcp.resources.bigquery.BigQueryJob",
-    "gcp.bq-project": "c7n_gcp.resources.bigquery.BigQueryProject",
     "gcp.bq-table": "c7n_gcp.resources.bigquery.BigQueryTable",
     "gcp.bucket": "c7n_gcp.resources.storage.Bucket",
     "gcp.build": "c7n_gcp.resources.build.CloudBuild",

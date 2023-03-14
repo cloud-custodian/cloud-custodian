@@ -1,38 +1,25 @@
 {
     "status_code": 200,
     "data": {
-        "ResponseMetadata": {
-            "RequestId": "90b315b0-f022-11e8-8b62-c7b4382bf2e5",
-            "HTTPStatusCode": 200,
-            "HTTPHeaders": {
-                "x-amzn-requestid": "90b315b0-f022-11e8-8b62-c7b4382bf2e5",
-                "content-type": "text/xml",
-                "content-length": "976",
-                "date": "Sat, 24 Nov 2018 19:53:07 GMT"
-            },
-            "RetryAttempts": 0
-        },
+        "ResponseMetadata": {},
         "HostedZones": [
             {
-                "Id": "/hostedzone/Z2UGBO0SA2RMJ1",
-                "Name": "local.",
-                "CallerReference": "6c6azf4uswtoblvusgbbncdrvs7pkl5u-jopzl8e7",
+                "Id": "/hostedzone/Z0423603VKO3K9HA5YQD",
+                "Name": "custodian.io.",
+                "CallerReference": "6aaa3172-47b9-4c2e-84aa-acd9081fa3fa",
                 "Config": {
-                    "Comment": "Created by Route 53 Auto Naming",
-                    "PrivateZone": true
+                    "Comment": "custodian.io",
+                    "PrivateZone": false
                 },
-                "ResourceRecordSetCount": 2,
-                "LinkedService": {
-                    "ServicePrincipal": "servicediscovery.amazonaws.com",
-                    "Description": "arn:aws:servicediscovery:us-east-1:644160558196:namespace/ns-yolek4rawejl6tpc"
-                }
+                "ResourceRecordSetCount": 2
             },
             {
-                "Id": "/hostedzone/Z20H1474487I0O",
-                "Name": "cloudcustodian.io.",
-                "CallerReference": "82155185-1D01-4ED0-8F5E-490E8715D384",
+                "Id": "/hostedzone/Z10481101M6AKWLAEHU70",
+                "Name": "vpc.internal.",
+                "CallerReference": "2022-11-15 09:29:34.722",
                 "Config": {
-                    "PrivateZone": false
+                    "Comment": "Private Route53 hosted zone - vpc-0d9dd54496f180583",
+                    "PrivateZone": true
                 },
                 "ResourceRecordSetCount": 2
             }

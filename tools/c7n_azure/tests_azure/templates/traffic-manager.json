@@ -1,0 +1,36 @@
+  {
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+
+    },
+    "variables": {
+        "suffix":"[substring(subscription().subscriptionId, 24, 12)]",
+        "name": "[concat('cctrafficmanager', variables('suffix'))]"
+    },
+    "resources": [
+      {
+      "apiVersion": "2018-08-01",
+      "type": "Microsoft.Network/trafficManagerProfiles",
+      "name": "[variables('name')]",
+      "location": "global",
+      "properties": {
+        "profileStatus": "Enabled",
+        "trafficRoutingMethod": "Weighted",
+        "dnsConfig": {
+          "relativeName": "[variables('name')]",
+          "ttl": 30
+        },
+        "monitorConfig": {
+          "protocol": "HTTP",
+          "port": 80,
+          "path": "/"
+        },
+        "copy": [
+
+        ]
+      }
+    }
+    ],
+    "outputs": {}
+}

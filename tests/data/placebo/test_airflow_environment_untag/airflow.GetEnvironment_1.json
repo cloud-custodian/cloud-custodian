@@ -1,0 +1,83 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Environment": {
+            "AirflowConfigurationOptions": {},
+            "AirflowVersion": "2.0.2",
+            "Arn": "arn:aws:airflow:us-east-1:644160558196:environment/testEnvironment",
+            "CreatedAt": {
+                "__class__": "datetime",
+                "year": 2021,
+                "month": 7,
+                "day": 14,
+                "hour": 13,
+                "minute": 53,
+                "second": 4,
+                "microsecond": 0
+            },
+            "DagS3Path": "DAGs",
+            "EnvironmentClass": "mw1.small",
+            "ExecutionRoleArn": "arn:aws:iam::644160558196:role/service-role/AmazonMWAA-testEnvironment-8hhxpU",
+            "KmsKey": "arn:aws:kms:us-east-1:644160558196:key/f9ee2a11-fe4a-4d98-a611-3621e71fd212",
+            "LastUpdate": {
+                "CreatedAt": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 7,
+                    "day": 14,
+                    "hour": 13,
+                    "minute": 53,
+                    "second": 4,
+                    "microsecond": 0
+                },
+                "Status": "SUCCESS"
+            },
+            "LoggingConfiguration": {
+                "DagProcessingLogs": {
+                    "Enabled": false,
+                    "LogLevel": "WARNING"
+                },
+                "SchedulerLogs": {
+                    "Enabled": false,
+                    "LogLevel": "WARNING"
+                },
+                "TaskLogs": {
+                    "Enabled": false,
+                    "LogLevel": "INFO"
+                },
+                "WebserverLogs": {
+                    "Enabled": false,
+                    "LogLevel": "WARNING"
+                },
+                "WorkerLogs": {
+                    "Enabled": false,
+                    "LogLevel": "WARNING"
+                }
+            },
+            "MaxWorkers": 10,
+            "MinWorkers": 1,
+            "Name": "testEnvironment",
+            "NetworkConfiguration": {
+                "SecurityGroupIds": [
+                    "sg-0566a027c6af2731f",
+                    "sg-0d30141b566cfa039"
+                ],
+                "SubnetIds": [
+                    "subnet-068dfbf3f275a6ae8",
+                    "subnet-03ec1a55eadb55221"
+                ]
+            },
+            "Schedulers": 2,
+            "ServiceRoleArn": "arn:aws:iam::644160558196:role/aws-service-role/airflow.amazonaws.com/AWSServiceRoleForAmazonMWAA",
+            "SourceBucketArn": "arn:aws:s3:::airflow-test-c7n",
+            "Status": "AVAILABLE",
+            "Tags": {
+                "env": "dev"
+            },
+            "WebserverAccessMode": "PRIVATE_ONLY",
+            "WebserverUrl": "74b5c399-66b1-40ea-b332-dc50ecf8c560-vpce.c36.us-east-1.airflow.amazonaws.com",
+            "WeeklyMaintenanceWindowStart": "SUN:14:00"
+        }
+    }
+}

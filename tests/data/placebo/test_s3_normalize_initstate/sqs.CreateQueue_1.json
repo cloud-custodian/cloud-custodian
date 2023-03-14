@@ -1,0 +1,7 @@
+{
+    "status_code": 200,
+    "data": {
+        "QueueUrl": "https://queue.amazonaws.com/644160558196/custodian-waiter-95948667-550b-4da9-a16b-aa7d3e2b6401",
+        "ResponseMetadata": {}
+    }
+}

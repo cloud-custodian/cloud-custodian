@@ -1,0 +1,20 @@
+{
+    "status_code": 200,
+    "data": {
+        "Attributes": {
+            "QueueArn": "arn:aws:sqs:us-east-1:644160558196:devtest2",
+            "ApproximateNumberOfMessages": "0",
+            "ApproximateNumberOfMessagesNotVisible": "0",
+            "ApproximateNumberOfMessagesDelayed": "0",
+            "CreatedTimestamp": "1549200767",
+            "LastModifiedTimestamp": "1549200767",
+            "VisibilityTimeout": "30",
+            "MaximumMessageSize": "262144",
+            "MessageRetentionPeriod": "345600",
+            "DelaySeconds": "0",
+            "ReceiveMessageWaitTimeSeconds": "0",
+            "SqsManagedSseEnabled": "false"
+        },
+        "ResponseMetadata": {}
+    }
+}

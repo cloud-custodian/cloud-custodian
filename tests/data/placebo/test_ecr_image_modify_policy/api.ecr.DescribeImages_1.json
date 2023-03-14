@@ -1,0 +1,29 @@
+{
+    "status_code": 200,
+    "data": {
+        "imageDetails": [
+            {
+                "registryId": "644160558196",
+                "repositoryName": "jenkins",
+                "imageDigest": "sha256:85942973eaebc9747fd6122d6cc3cc5686d740b588b36d2d33f64d98cec00e10",
+                "imageTags": [
+                    "saasmon"
+                ],
+                "imageSizeInBytes": 313015065,
+                "imagePushedAt": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 12,
+                    "day": 15,
+                    "hour": 10,
+                    "minute": 20,
+                    "second": 24,
+                    "microsecond": 0
+                },
+                "imageManifestMediaType": "application/vnd.docker.distribution.manifest.v2+json",
+                "artifactMediaType": "application/vnd.docker.container.image.v1+json"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

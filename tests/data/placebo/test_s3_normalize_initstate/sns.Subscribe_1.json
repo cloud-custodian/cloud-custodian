@@ -1,0 +1,7 @@
+{
+    "status_code": 200,
+    "data": {
+        "SubscriptionArn": "arn:aws:sns:us-east-1:644160558196:config-topic:39a62b6a-16cf-4bb1-8231-229cfb02a66e",
+        "ResponseMetadata": {}
+    }
+}

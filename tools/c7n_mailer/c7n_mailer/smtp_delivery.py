@@ -26,7 +26,10 @@ class SmtpDelivery:
         self._smtp_connection = smtp_connection
 
     def __del__(self):
-        self._smtp_connection.quit()
+        try:
+            self._smtp_connection.quit()
+        except smtplib.SMTPServerDisconnected:
+            pass
 
     def send_message(self, message, to_addrs):
         self._smtp_connection.sendmail(message['From'], to_addrs, message.as_string())

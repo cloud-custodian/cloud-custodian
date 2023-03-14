@@ -1,0 +1,11 @@
+{
+    "status_code": 400,
+    "data": {
+        "Error": {
+            "Message": "The specified directory could not be found. Confirm that the directory exists in your AWS account and that you own the directory.",
+            "Code": "ResourceNotFoundException"
+        },
+        "ResponseMetadata": {},
+        "message": "The specified directory could not be found. Confirm that the directory exists in your AWS account and that you own the directory."
+    }
+}

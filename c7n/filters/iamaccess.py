@@ -22,6 +22,9 @@ References
 - IAM Policy Reference
   https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_elements.html
 
+- IAM Global Condition Context Keys
+  https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_condition-keys.html
+
 """
 import fnmatch
 import logging
@@ -37,7 +40,7 @@ log = logging.getLogger('custodian.iamaccess')
 def _account(arn):
     # we could try except but some minor runtime cost, basically flag
     # invalids values
-    if ':' not in arn:
+    if arn.count(":") < 4:
         return arn
     return arn.split(':', 5)[4]
 
@@ -69,7 +72,7 @@ class PolicyChecker:
 
     @property
     def whitelist_conditions(self):
-        return self.checker_config.get('whitelist_conditions', ())
+        return set(v.lower() for v in self.checker_config.get('whitelist_conditions', ()))
 
     @property
     def allowed_vpce(self):
@@ -119,28 +122,24 @@ class PolicyChecker:
     def handle_principal(self, s):
         if 'NotPrincipal' in s:
             return True
-        if 'Principal' not in s:
-            return True
-        # Skip service principals
-        if 'Service' in s['Principal']:
-            s['Principal'].pop('Service')
-            if not s['Principal']:
-                return False
 
-        assert len(s['Principal']) == 1, "Too many principals %s" % s
-
-        if isinstance(s['Principal'], str):
-            p = s['Principal']
-        elif 'AWS' in s['Principal']:
-            p = s['Principal']['AWS']
-        elif 'Federated' in s['Principal']:
-            p = s['Principal']['Federated']
-        else:
+        principals = s.get('Principal')
+        if not principals:
             return True
+        if not isinstance(principals, dict):
+            principals = {'AWS': principals}
+
+        # Ignore service principals, merge the rest into a single set
+        non_service_principals = set()
+        for principal_type in set(principals) - {'Service'}:
+            p = principals[principal_type]
+            non_service_principals.update({p} if isinstance(p, str) else p)
+
+        if not non_service_principals:
+            return False
 
         principal_ok = True
-        p = isinstance(p, str) and (p,) or p
-        for pid in p:
+        for pid in non_service_principals:
             if pid == '*':
                 principal_ok = False
             elif self.everyone_only:
@@ -211,12 +210,12 @@ class PolicyChecker:
 
     # Condition handlers
 
-    # kms specific
-    def handle_kms_calleraccount(self, s, c):
-        return bool(set(map(_account, c['values'])).difference(self.allowed_accounts))
-
     # sns default policy
     def handle_aws_sourceowner(self, s, c):
+        return bool(set(map(_account, c['values'])).difference(self.allowed_accounts))
+
+    # AWS Connect default policy on Lex
+    def handle_aws_sourceaccount(self, s, c):
         return bool(set(map(_account, c['values'])).difference(self.allowed_accounts))
 
     # s3 logging

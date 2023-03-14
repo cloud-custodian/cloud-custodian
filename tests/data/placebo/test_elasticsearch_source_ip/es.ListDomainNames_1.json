@@ -1,0 +1,16 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "DomainNames": [
+            {
+                "DomainName": "ddaotest2",
+                "EngineType": "OpenSearch"
+            },
+            {
+                "DomainName": "ddaotest",
+                "EngineType": "OpenSearch"
+            }
+        ]
+    }
+}

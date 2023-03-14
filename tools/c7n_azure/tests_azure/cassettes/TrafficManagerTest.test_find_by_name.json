@@ -1,0 +1,70 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Network/trafficmanagerprofiles?api-version=2018-04-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "date": [
+                        "Mon, 21 Jun 2021 18:00:29 GMT"
+                    ],
+                    "cache-control": [
+                        "private"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-resource-requests": [
+                        "10799"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "content-length": [
+                        "750"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/632790a5-a1aa-4e0c-8cc1-fafbee1d5b39/resourceGroups/test_traffic-manager/providers/Microsoft.Network/trafficManagerProfiles/cctrafficmanagerfafbee1d5b39",
+                                "name": "cctrafficmanagerfafbee1d5b39",
+                                "type": "Microsoft.Network/trafficManagerProfiles",
+                                "location": "global",
+                                "tags": {},
+                                "properties": {
+                                    "profileStatus": "Enabled",
+                                    "trafficRoutingMethod": "Weighted",
+                                    "dnsConfig": {
+                                        "relativeName": "cctrafficmanagerfafbee1d5b39",
+                                        "fqdn": "cctrafficmanagerfafbee1d5b39.trafficmanager.net",
+                                        "ttl": 30
+                                    },
+                                    "monitorConfig": {
+                                        "profileMonitorStatus": null,
+                                        "protocol": "HTTP",
+                                        "port": 80,
+                                        "path": "/",
+                                        "intervalInSeconds": 30,
+                                        "toleratedNumberOfFailures": 3,
+                                        "timeoutInSeconds": 10
+                                    },
+                                    "endpoints": [],
+                                    "trafficViewEnrollmentStatus": "Disabled",
+                                    "maxReturn": null
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}

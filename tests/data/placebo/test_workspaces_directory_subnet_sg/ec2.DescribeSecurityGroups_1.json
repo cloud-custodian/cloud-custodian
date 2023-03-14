@@ -1,0 +1,39 @@
+{
+    "status_code": 200,
+    "data": {
+        "SecurityGroups": [
+            {
+                "Description": "Amazon WorkSpaces Security Group",
+                "GroupName": "d-90675153fc_workspacesMembers",
+                "IpPermissions": [],
+                "OwnerId": "644160558196",
+                "GroupId": "sg-07f76375bda506a4a",
+                "IpPermissionsEgress": [
+                    {
+                        "IpProtocol": "-1",
+                        "IpRanges": [
+                            {
+                                "CidrIp": "0.0.0.0/0"
+                            }
+                        ],
+                        "Ipv6Ranges": [],
+                        "PrefixListIds": [],
+                        "UserIdGroupPairs": []
+                    }
+                ],
+                "Tags": [
+                    {
+                        "Key": "NetworkLocation",
+                        "Value": "Private"
+                    },
+                    {
+                        "Key": "Created by Amazon WorkSpaces",
+                        "Value": "Amazon WorkSpaces"
+                    }
+                ],
+                "VpcId": "vpc-d2d616b5"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

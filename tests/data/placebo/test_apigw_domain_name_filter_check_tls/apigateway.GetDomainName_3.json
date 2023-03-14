@@ -1,0 +1,28 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "domainName": "good.example.com",
+        "certificateUploadDate": {
+            "__class__": "datetime",
+            "year": 2021,
+            "month": 12,
+            "day": 13,
+            "hour": 11,
+            "minute": 8,
+            "second": 54,
+            "microsecond": 0
+        },
+        "regionalDomainName": "d-wm3xrm7wd8.execute-api.us-east-1.amazonaws.com",
+        "regionalHostedZoneId": "Z1UJRXOUMOOFQ8",
+        "regionalCertificateArn": "arn:aws:acm:us-east-1:644160558196:certificate/9d7fca5a-5c58-4d43-b1df-7c7e31c2d47f",
+        "endpointConfiguration": {
+            "types": [
+                "REGIONAL"
+            ]
+        },
+        "domainNameStatus": "AVAILABLE",
+        "securityPolicy": "TLS_1_2",
+        "tags": {}
+    }
+}

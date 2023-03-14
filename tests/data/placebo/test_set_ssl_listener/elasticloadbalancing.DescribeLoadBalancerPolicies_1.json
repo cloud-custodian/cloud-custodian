@@ -1,401 +1,386 @@
 {
-    "status_code": 200, 
+    "status_code": 200,
     "data": {
         "PolicyDescriptions": [
             {
+                "PolicyName": "AWSConsole-SSLNegotiationPolicy-test-elb-1646765145761",
+                "PolicyTypeName": "SSLNegotiationPolicyType",
                 "PolicyAttributeDescriptions": [
                     {
-                        "AttributeName": "Reference-Security-Policy", 
-                        "AttributeValue": "ELBSecurityPolicy-TLS-1-2-2017-01"
-                    }, 
-                    {
-                        "AttributeName": "Protocol-TLSv1", 
-                        "AttributeValue": "false"
-                    }, 
-                    {
-                        "AttributeName": "Protocol-SSLv3", 
-                        "AttributeValue": "false"
-                    }, 
-                    {
-                        "AttributeName": "Protocol-TLSv1.1", 
-                        "AttributeValue": "false"
-                    }, 
-                    {
-                        "AttributeName": "Protocol-TLSv1.2", 
+                        "AttributeName": "Protocol-TLSv1",
                         "AttributeValue": "true"
-                    }, 
+                    },
                     {
-                        "AttributeName": "Server-Defined-Cipher-Order", 
+                        "AttributeName": "Protocol-SSLv3",
                         "AttributeValue": "true"
-                    }, 
+                    },
                     {
-                        "AttributeName": "ECDHE-ECDSA-AES128-GCM-SHA256", 
+                        "AttributeName": "Protocol-TLSv1.1",
                         "AttributeValue": "true"
-                    }, 
+                    },
                     {
-                        "AttributeName": "ECDHE-RSA-AES128-GCM-SHA256", 
+                        "AttributeName": "Protocol-TLSv1.2",
                         "AttributeValue": "true"
-                    }, 
+                    },
                     {
-                        "AttributeName": "ECDHE-ECDSA-AES128-SHA256", 
+                        "AttributeName": "Server-Defined-Cipher-Order",
                         "AttributeValue": "true"
-                    }, 
+                    },
                     {
-                        "AttributeName": "ECDHE-RSA-AES128-SHA256", 
+                        "AttributeName": "ECDHE-ECDSA-AES128-GCM-SHA256",
                         "AttributeValue": "true"
-                    }, 
+                    },
                     {
-                        "AttributeName": "ECDHE-ECDSA-AES128-SHA", 
-                        "AttributeValue": "false"
-                    }, 
-                    {
-                        "AttributeName": "ECDHE-RSA-AES128-SHA", 
-                        "AttributeValue": "false"
-                    }, 
-                    {
-                        "AttributeName": "DHE-RSA-AES128-SHA", 
-                        "AttributeValue": "false"
-                    }, 
-                    {
-                        "AttributeName": "ECDHE-ECDSA-AES256-GCM-SHA384", 
+                        "AttributeName": "ECDHE-RSA-AES128-GCM-SHA256",
                         "AttributeValue": "true"
-                    }, 
+                    },
                     {
-                        "AttributeName": "ECDHE-RSA-AES256-GCM-SHA384", 
+                        "AttributeName": "ECDHE-ECDSA-AES128-SHA256",
                         "AttributeValue": "true"
-                    }, 
+                    },
                     {
-                        "AttributeName": "ECDHE-ECDSA-AES256-SHA384", 
+                        "AttributeName": "ECDHE-RSA-AES128-SHA256",
                         "AttributeValue": "true"
-                    }, 
+                    },
                     {
-                        "AttributeName": "ECDHE-RSA-AES256-SHA384", 
+                        "AttributeName": "ECDHE-ECDSA-AES128-SHA",
                         "AttributeValue": "true"
-                    }, 
+                    },
                     {
-                        "AttributeName": "ECDHE-RSA-AES256-SHA", 
-                        "AttributeValue": "false"
-                    }, 
-                    {
-                        "AttributeName": "ECDHE-ECDSA-AES256-SHA", 
-                        "AttributeValue": "false"
-                    }, 
-                    {
-                        "AttributeName": "AES128-GCM-SHA256", 
+                        "AttributeName": "ECDHE-RSA-AES128-SHA",
                         "AttributeValue": "true"
-                    }, 
+                    },
                     {
-                        "AttributeName": "AES128-SHA256", 
+                        "AttributeName": "DHE-RSA-AES128-SHA",
+                        "AttributeValue": "false"
+                    },
+                    {
+                        "AttributeName": "ECDHE-ECDSA-AES256-GCM-SHA384",
                         "AttributeValue": "true"
-                    }, 
+                    },
                     {
-                        "AttributeName": "AES128-SHA", 
-                        "AttributeValue": "false"
-                    }, 
-                    {
-                        "AttributeName": "AES256-GCM-SHA384", 
+                        "AttributeName": "ECDHE-RSA-AES256-GCM-SHA384",
                         "AttributeValue": "true"
-                    }, 
+                    },
                     {
-                        "AttributeName": "AES256-SHA256", 
+                        "AttributeName": "ECDHE-ECDSA-AES256-SHA384",
                         "AttributeValue": "true"
-                    }, 
+                    },
                     {
-                        "AttributeName": "AES256-SHA", 
-                        "AttributeValue": "false"
-                    }, 
+                        "AttributeName": "ECDHE-RSA-AES256-SHA384",
+                        "AttributeValue": "true"
+                    },
+                    {
+                        "AttributeName": "ECDHE-RSA-AES256-SHA",
+                        "AttributeValue": "true"
+                    },
+                    {
+                        "AttributeName": "ECDHE-ECDSA-AES256-SHA",
+                        "AttributeValue": "true"
+                    },
+                    {
+                        "AttributeName": "AES128-GCM-SHA256",
+                        "AttributeValue": "true"
+                    },
+                    {
+                        "AttributeName": "AES128-SHA256",
+                        "AttributeValue": "true"
+                    },
+                    {
+                        "AttributeName": "AES128-SHA",
+                        "AttributeValue": "true"
+                    },
+                    {
+                        "AttributeName": "AES256-GCM-SHA384",
+                        "AttributeValue": "true"
+                    },
+                    {
+                        "AttributeName": "AES256-SHA256",
+                        "AttributeValue": "true"
+                    },
+                    {
+                        "AttributeName": "AES256-SHA",
+                        "AttributeValue": "true"
+                    },
                     {
-                        "AttributeName": "DHE-DSS-AES128-SHA", 
+                        "AttributeName": "DHE-DSS-AES128-SHA",
                         "AttributeValue": "false"
-                    }, 
+                    },
                     {
-                        "AttributeName": "CAMELLIA128-SHA", 
+                        "AttributeName": "CAMELLIA128-SHA",
                         "AttributeValue": "false"
-                    }, 
+                    },
                     {
-                        "AttributeName": "EDH-RSA-DES-CBC3-SHA", 
+                        "AttributeName": "EDH-RSA-DES-CBC3-SHA",
                         "AttributeValue": "false"
-                    }, 
+                    },
                     {
-                        "AttributeName": "DES-CBC3-SHA", 
+                        "AttributeName": "DES-CBC3-SHA",
                         "AttributeValue": "false"
-                    }, 
+                    },
                     {
-                        "AttributeName": "ECDHE-RSA-RC4-SHA", 
+                        "AttributeName": "ECDHE-RSA-RC4-SHA",
                         "AttributeValue": "false"
-                    }, 
+                    },
                     {
-                        "AttributeName": "RC4-SHA", 
+                        "AttributeName": "RC4-SHA",
                         "AttributeValue": "false"
-                    }, 
+                    },
                     {
-                        "AttributeName": "ECDHE-ECDSA-RC4-SHA", 
+                        "AttributeName": "ECDHE-ECDSA-RC4-SHA",
                         "AttributeValue": "false"
-                    }, 
+                    },
                     {
-                        "AttributeName": "DHE-DSS-AES256-GCM-SHA384", 
+                        "AttributeName": "DHE-DSS-AES256-GCM-SHA384",
                         "AttributeValue": "false"
-                    }, 
+                    },
                     {
-                        "AttributeName": "DHE-RSA-AES256-GCM-SHA384", 
+                        "AttributeName": "DHE-RSA-AES256-GCM-SHA384",
                         "AttributeValue": "false"
-                    }, 
+                    },
                     {
-                        "AttributeName": "DHE-RSA-AES256-SHA256", 
+                        "AttributeName": "DHE-RSA-AES256-SHA256",
                         "AttributeValue": "false"
-                    }, 
+                    },
                     {
-                        "AttributeName": "DHE-DSS-AES256-SHA256", 
+                        "AttributeName": "DHE-DSS-AES256-SHA256",
                         "AttributeValue": "false"
-                    }, 
+                    },
                     {
-                        "AttributeName": "DHE-RSA-AES256-SHA", 
+                        "AttributeName": "DHE-RSA-AES256-SHA",
                         "AttributeValue": "false"
-                    }, 
+                    },
                     {
-                        "AttributeName": "DHE-DSS-AES256-SHA", 
+                        "AttributeName": "DHE-DSS-AES256-SHA",
                         "AttributeValue": "false"
-                    }, 
+                    },
                     {
-                        "AttributeName": "DHE-RSA-CAMELLIA256-SHA", 
+                        "AttributeName": "DHE-RSA-CAMELLIA256-SHA",
                         "AttributeValue": "false"
-                    }, 
+                    },
                     {
-                        "AttributeName": "DHE-DSS-CAMELLIA256-SHA", 
+                        "AttributeName": "DHE-DSS-CAMELLIA256-SHA",
                         "AttributeValue": "false"
-                    }, 
+                    },
                     {
-                        "AttributeName": "CAMELLIA256-SHA", 
+                        "AttributeName": "CAMELLIA256-SHA",
                         "AttributeValue": "false"
-                    }, 
+                    },
                     {
-                        "AttributeName": "EDH-DSS-DES-CBC3-SHA", 
+                        "AttributeName": "EDH-DSS-DES-CBC3-SHA",
                         "AttributeValue": "false"
-                    }, 
+                    },
                     {
-                        "AttributeName": "DHE-DSS-AES128-GCM-SHA256", 
+                        "AttributeName": "DHE-DSS-AES128-GCM-SHA256",
                         "AttributeValue": "false"
-                    }, 
+                    },
                     {
-                        "AttributeName": "DHE-RSA-AES128-GCM-SHA256", 
+                        "AttributeName": "DHE-RSA-AES128-GCM-SHA256",
                         "AttributeValue": "false"
-                    }, 
+                    },
                     {
-                        "AttributeName": "DHE-RSA-AES128-SHA256", 
+                        "AttributeName": "DHE-RSA-AES128-SHA256",
                         "AttributeValue": "false"
-                    }, 
+                    },
                     {
-                        "AttributeName": "DHE-DSS-AES128-SHA256", 
+                        "AttributeName": "DHE-DSS-AES128-SHA256",
                         "AttributeValue": "false"
-                    }, 
+                    },
                     {
-                        "AttributeName": "DHE-RSA-CAMELLIA128-SHA", 
+                        "AttributeName": "DHE-RSA-CAMELLIA128-SHA",
                         "AttributeValue": "false"
-                    }, 
+                    },
                     {
-                        "AttributeName": "DHE-DSS-CAMELLIA128-SHA", 
+                        "AttributeName": "DHE-DSS-CAMELLIA128-SHA",
                         "AttributeValue": "false"
-                    }, 
+                    },
                     {
-                        "AttributeName": "ADH-AES128-GCM-SHA256", 
+                        "AttributeName": "ADH-AES128-GCM-SHA256",
                         "AttributeValue": "false"
-                    }, 
+                    },
                     {
-                        "AttributeName": "ADH-AES128-SHA", 
+                        "AttributeName": "ADH-AES128-SHA",
                         "AttributeValue": "false"
-                    }, 
+                    },
                     {
-                        "AttributeName": "ADH-AES128-SHA256", 
+                        "AttributeName": "ADH-AES128-SHA256",
                         "AttributeValue": "false"
-                    }, 
+                    },
                     {
-                        "AttributeName": "ADH-AES256-GCM-SHA384", 
+                        "AttributeName": "ADH-AES256-GCM-SHA384",
                         "AttributeValue": "false"
-                    }, 
+                    },
                     {
-                        "AttributeName": "ADH-AES256-SHA", 
+                        "AttributeName": "ADH-AES256-SHA",
                         "AttributeValue": "false"
-                    }, 
+                    },
                     {
-                        "AttributeName": "ADH-AES256-SHA256", 
+                        "AttributeName": "ADH-AES256-SHA256",
                         "AttributeValue": "false"
-                    }, 
+                    },
                     {
-                        "AttributeName": "ADH-CAMELLIA128-SHA", 
+                        "AttributeName": "ADH-CAMELLIA128-SHA",
                         "AttributeValue": "false"
-                    }, 
+                    },
                     {
-                        "AttributeName": "ADH-CAMELLIA256-SHA", 
+                        "AttributeName": "ADH-CAMELLIA256-SHA",
                         "AttributeValue": "false"
-                    }, 
+                    },
                     {
-                        "AttributeName": "ADH-DES-CBC3-SHA", 
+                        "AttributeName": "ADH-DES-CBC3-SHA",
                         "AttributeValue": "false"
-                    }, 
+                    },
                     {
-                        "AttributeName": "ADH-DES-CBC-SHA", 
+                        "AttributeName": "ADH-DES-CBC-SHA",
                         "AttributeValue": "false"
-                    }, 
+                    },
                     {
-                        "AttributeName": "ADH-RC4-MD5", 
+                        "AttributeName": "ADH-RC4-MD5",
                         "AttributeValue": "false"
-                    }, 
+                    },
                     {
-                        "AttributeName": "ADH-SEED-SHA", 
+                        "AttributeName": "ADH-SEED-SHA",
                         "AttributeValue": "false"
-                    }, 
+                    },
                     {
-                        "AttributeName": "DES-CBC-SHA", 
+                        "AttributeName": "DES-CBC-SHA",
                         "AttributeValue": "false"
-                    }, 
+                    },
                     {
-                        "AttributeName": "DHE-DSS-SEED-SHA", 
+                        "AttributeName": "DHE-DSS-SEED-SHA",
                         "AttributeValue": "false"
-                    }, 
+                    },
                     {
-                        "AttributeName": "DHE-RSA-SEED-SHA", 
+                        "AttributeName": "DHE-RSA-SEED-SHA",
                         "AttributeValue": "false"
-                    }, 
+                    },
                     {
-                        "AttributeName": "EDH-DSS-DES-CBC-SHA", 
+                        "AttributeName": "EDH-DSS-DES-CBC-SHA",
                         "AttributeValue": "false"
-                    }, 
+                    },
                     {
-                        "AttributeName": "EDH-RSA-DES-CBC-SHA", 
+                        "AttributeName": "EDH-RSA-DES-CBC-SHA",
                         "AttributeValue": "false"
-                    }, 
+                    },
                     {
-                        "AttributeName": "IDEA-CBC-SHA", 
+                        "AttributeName": "IDEA-CBC-SHA",
                         "AttributeValue": "false"
-                    }, 
+                    },
                     {
-                        "AttributeName": "RC4-MD5", 
+                        "AttributeName": "RC4-MD5",
                         "AttributeValue": "false"
-                    }, 
+                    },
                     {
-                        "AttributeName": "SEED-SHA", 
+                        "AttributeName": "SEED-SHA",
                         "AttributeValue": "false"
-                    }, 
+                    },
                     {
-                        "AttributeName": "DES-CBC3-MD5", 
+                        "AttributeName": "DES-CBC3-MD5",
                         "AttributeValue": "false"
-                    }, 
+                    },
                     {
-                        "AttributeName": "DES-CBC-MD5", 
+                        "AttributeName": "DES-CBC-MD5",
                         "AttributeValue": "false"
-                    }, 
+                    },
                     {
-                        "AttributeName": "RC2-CBC-MD5", 
+                        "AttributeName": "RC2-CBC-MD5",
                         "AttributeValue": "false"
-                    }, 
+                    },
                     {
-                        "AttributeName": "PSK-AES256-CBC-SHA", 
+                        "AttributeName": "PSK-AES256-CBC-SHA",
                         "AttributeValue": "false"
-                    }, 
+                    },
                     {
-                        "AttributeName": "PSK-3DES-EDE-CBC-SHA", 
+                        "AttributeName": "PSK-3DES-EDE-CBC-SHA",
                         "AttributeValue": "false"
-                    }, 
+                    },
                     {
-                        "AttributeName": "KRB5-DES-CBC3-SHA", 
+                        "AttributeName": "KRB5-DES-CBC3-SHA",
                         "AttributeValue": "false"
-                    }, 
+                    },
                     {
-                        "AttributeName": "KRB5-DES-CBC3-MD5", 
+                        "AttributeName": "KRB5-DES-CBC3-MD5",
                         "AttributeValue": "false"
-                    }, 
+                    },
                     {
-                        "AttributeName": "PSK-AES128-CBC-SHA", 
+                        "AttributeName": "PSK-AES128-CBC-SHA",
                         "AttributeValue": "false"
-                    }, 
+                    },
                     {
-                        "AttributeName": "PSK-RC4-SHA", 
+                        "AttributeName": "PSK-RC4-SHA",
                         "AttributeValue": "false"
-                    }, 
+                    },
                     {
-                        "AttributeName": "KRB5-RC4-SHA", 
+                        "AttributeName": "KRB5-RC4-SHA",
                         "AttributeValue": "false"
-                    }, 
+                    },
                     {
-                        "AttributeName": "KRB5-RC4-MD5", 
+                        "AttributeName": "KRB5-RC4-MD5",
                         "AttributeValue": "false"
-                    }, 
+                    },
                     {
-                        "AttributeName": "KRB5-DES-CBC-SHA", 
+                        "AttributeName": "KRB5-DES-CBC-SHA",
                         "AttributeValue": "false"
-                    }, 
+                    },
                     {
-                        "AttributeName": "KRB5-DES-CBC-MD5", 
+                        "AttributeName": "KRB5-DES-CBC-MD5",
                         "AttributeValue": "false"
-                    }, 
+                    },
                     {
-                        "AttributeName": "EXP-EDH-RSA-DES-CBC-SHA", 
+                        "AttributeName": "EXP-EDH-RSA-DES-CBC-SHA",
                         "AttributeValue": "false"
-                    }, 
+                    },
                     {
-                        "AttributeName": "EXP-EDH-DSS-DES-CBC-SHA", 
+                        "AttributeName": "EXP-EDH-DSS-DES-CBC-SHA",
                         "AttributeValue": "false"
-                    }, 
+                    },
                     {
-                        "AttributeName": "EXP-ADH-DES-CBC-SHA", 
+                        "AttributeName": "EXP-ADH-DES-CBC-SHA",
                         "AttributeValue": "false"
-                    }, 
+                    },
                     {
-                        "AttributeName": "EXP-DES-CBC-SHA", 
+                        "AttributeName": "EXP-DES-CBC-SHA",
                         "AttributeValue": "false"
-                    }, 
+                    },
                     {
-                        "AttributeName": "EXP-RC2-CBC-MD5", 
+                        "AttributeName": "EXP-RC2-CBC-MD5",
                         "AttributeValue": "false"
-                    }, 
+                    },
                     {
-                        "AttributeName": "EXP-KRB5-RC2-CBC-SHA", 
+                        "AttributeName": "EXP-KRB5-RC2-CBC-SHA",
                         "AttributeValue": "false"
-                    }, 
+                    },
                     {
-                        "AttributeName": "EXP-KRB5-DES-CBC-SHA", 
+                        "AttributeName": "EXP-KRB5-DES-CBC-SHA",
                         "AttributeValue": "false"
-                    }, 
+                    },
                     {
-                        "AttributeName": "EXP-KRB5-RC2-CBC-MD5", 
+                        "AttributeName": "EXP-KRB5-RC2-CBC-MD5",
                         "AttributeValue": "false"
-                    }, 
+                    },
                     {
-                        "AttributeName": "EXP-KRB5-DES-CBC-MD5", 
+                        "AttributeName": "EXP-KRB5-DES-CBC-MD5",
                         "AttributeValue": "false"
-                    }, 
+                    },
                     {
-                        "AttributeName": "EXP-ADH-RC4-MD5", 
+                        "AttributeName": "EXP-ADH-RC4-MD5",
                         "AttributeValue": "false"
-                    }, 
+                    },
                     {
-                        "AttributeName": "EXP-RC4-MD5", 
+                        "AttributeName": "EXP-RC4-MD5",
                         "AttributeValue": "false"
-                    }, 
+                    },
                     {
-                        "AttributeName": "EXP-KRB5-RC4-SHA", 
+                        "AttributeName": "EXP-KRB5-RC4-SHA",
                         "AttributeValue": "false"
-                    }, 
+                    },
                     {
-                        "AttributeName": "EXP-KRB5-RC4-MD5", 
+                        "AttributeName": "EXP-KRB5-RC4-MD5",
                         "AttributeValue": "false"
                     }
-                ], 
-                "PolicyName": "AWSConsole-SSLNegotiationPolicy-GitPrime-ELB-1493735340856", 
-                "PolicyTypeName": "SSLNegotiationPolicyType"
+                ]
             }
-        ], 
-        "ResponseMetadata": {
-            "RetryAttempts": 0, 
-            "HTTPStatusCode": 200, 
-            "RequestId": "d285e81d-2f66-11e7-b74b-39bff6e4040b", 
-            "HTTPHeaders": {
-                "x-amzn-requestid": "d285e81d-2f66-11e7-b74b-39bff6e4040b", 
-                "vary": "Accept-Encoding", 
-                "content-length": "14943", 
-                "content-type": "text/xml", 
-                "date": "Tue, 02 May 2017 18:40:31 GMT"
-            }
-        }
+        ],
+        "ResponseMetadata": {}
     }
 }

@@ -15,3 +15,4 @@ class Node(QueryResourceManager):
         patch = 'patch_node'
         delete = 'delete_node'
         enum_spec = ('list_node', 'items', None)
+        plural = 'nodes'

@@ -159,7 +159,6 @@ class ChildResourceQuery(ResourceQuery):
                             .format(parent[parents.resource_type.id], e))
                 if m.raise_on_exception:
                     raise e
-
         return results
 
 
@@ -223,8 +222,8 @@ class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
     class resource_type(TypeInfo):
         pass
 
-    def __init__(self, data, options):
-        super(QueryResourceManager, self).__init__(data, options)
+    def __init__(self, ctx, data):
+        super(QueryResourceManager, self).__init__(ctx, data)
         self.source = self.get_source(self.source_type)
         self._session = None
 
@@ -281,6 +280,8 @@ class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
                 with self.ctx.tracer.subsegment('resource-augment'):
                     resources = self.augment(resources)
             self._cache.save(cache_key, resources)
+
+        self._cache.close()
 
         with self.ctx.tracer.subsegment('filter'):
             resource_count = len(resources)

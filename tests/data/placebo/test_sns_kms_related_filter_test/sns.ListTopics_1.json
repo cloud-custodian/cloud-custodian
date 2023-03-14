@@ -3,40 +3,9 @@
     "data": {
         "Topics": [
             {
-                "TopicArn": "arn:aws:sns:us-east-1:644160558196:cof-guard-duty-archive-notify"
-            },
-            {
-                "TopicArn": "arn:aws:sns:us-east-1:644160558196:cof-guard-duty-stream-notify"
-            },
-            {
-                "TopicArn": "arn:aws:sns:us-east-1:644160558196:config-topic"
-            },
-            {
-                "TopicArn": "arn:aws:sns:us-east-1:644160558196:custodian-test-data-22"
-            },
-            {
-                "TopicArn": "arn:aws:sns:us-east-1:644160558196:dynamodb"
-            },
-            {
-                "TopicArn": "arn:aws:sns:us-east-1:644160558196:sphere11-lock-notifications"
-            },
-            {
-                "TopicArn": "arn:aws:sns:us-east-1:644160558196:sphere11-revert-notifications"
-            },
-            {
-                "TopicArn": "arn:aws:sns:us-east-1:644160558196:test"
+                "TopicArn": "arn:aws:sns:ap-northeast-2:644160558196:my-encrypted-topic"
             }
         ],
-        "ResponseMetadata": {
-            "RequestId": "64be2466-3a4e-5a96-892a-70efe33b1ecf",
-            "HTTPStatusCode": 200,
-            "HTTPHeaders": {
-                "x-amzn-requestid": "64be2466-3a4e-5a96-892a-70efe33b1ecf",
-                "content-type": "text/xml",
-                "content-length": "1196",
-                "date": "Tue, 11 Dec 2018 15:26:44 GMT"
-            },
-            "RetryAttempts": 0
-        }
+        "ResponseMetadata": {}
     }
 }

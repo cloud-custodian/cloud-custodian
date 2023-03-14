@@ -1,0 +1,29 @@
+{
+    "status_code": 200,
+    "data": {
+        "imageDetails": [
+            {
+                "registryId": "644160558196",
+                "repositoryName": "alpine",
+                "imageDigest": "sha256:e7d88de73db3d3fd9b2d63aa7f447a10fd0220b7cbf39803c803f2af9ba256b3",
+                "imageTags": [
+                    "latest"
+                ],
+                "imageSizeInBytes": 2819884,
+                "imagePushedAt": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 12,
+                    "day": 16,
+                    "hour": 14,
+                    "minute": 10,
+                    "second": 54,
+                    "microsecond": 0
+                },
+                "imageManifestMediaType": "application/vnd.docker.distribution.manifest.v2+json",
+                "artifactMediaType": "application/vnd.docker.container.image.v1+json"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

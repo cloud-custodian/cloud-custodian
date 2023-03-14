@@ -1,0 +1,95 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "ClusterInfoList": [
+            {
+                "ClusterType": "PROVISIONED",
+                "ClusterArn": "arn:aws:kafka:ap-northeast-2:644160558196:cluster/demo-cluster-1/a4128f17-d0a5-4b03-b858-ea13108e7286-4",
+                "ClusterName": "demo-cluster-1",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 12,
+                    "day": 9,
+                    "hour": 23,
+                    "minute": 13,
+                    "second": 39,
+                    "microsecond": 670000
+                },
+                "CurrentVersion": "K3FE7AD5N5R11",
+                "State": "ACTIVE",
+                "Tags": {
+                    "App": "Custodian"
+                },
+                "Provisioned": {
+                    "BrokerNodeGroupInfo": {
+                        "BrokerAZDistribution": "DEFAULT",
+                        "ClientSubnets": [
+                            "subnet-04f91d4b",
+                            "subnet-efc87884",
+                            "subnet-2418755f"
+                        ],
+                        "InstanceType": "kafka.m5.large",
+                        "SecurityGroups": [
+                            "sg-bd0718c6"
+                        ],
+                        "StorageInfo": {
+                            "EbsStorageInfo": {
+                                "VolumeSize": 100
+                            }
+                        },
+                        "ConnectivityInfo": {
+                            "PublicAccess": {
+                                "Type": "DISABLED"
+                            }
+                        }
+                    },
+                    "CurrentBrokerSoftwareInfo": {
+                        "KafkaVersion": "2.8.1"
+                    },
+                    "ClientAuthentication": {
+                        "Sasl": {
+                            "Scram": {
+                                "Enabled": false
+                            },
+                            "Iam": {
+                                "Enabled": true
+                            }
+                        },
+                        "Tls": {
+                            "CertificateAuthorityArnList": [],
+                            "Enabled": false
+                        },
+                        "Unauthenticated": {
+                            "Enabled": false
+                        }
+                    },
+                    "EncryptionInfo": {
+                        "EncryptionAtRest": {
+                            "DataVolumeKMSKeyId": "arn:aws:kms:ap-northeast-2:644160558196:key/d0e564f4-ec4c-43bd-b379-a22f92253dbe"
+                        },
+                        "EncryptionInTransit": {
+                            "ClientBroker": "TLS",
+                            "InCluster": true
+                        }
+                    },
+                    "EnhancedMonitoring": "PER_BROKER",
+                    "OpenMonitoring": {
+                        "Prometheus": {
+                            "JmxExporter": {
+                                "EnabledInBroker": true
+                            },
+                            "NodeExporter": {
+                                "EnabledInBroker": false
+                            }
+                        }
+                    },
+                    "NumberOfBrokerNodes": 3,
+                    "ZookeeperConnectString": "z-3.democluster1.ltt504.c4.kafka.ap-northeast-2.amazonaws.com:2181,z-1.democluster1.ltt504.c4.kafka.ap-northeast-2.amazonaws.com:2181,z-2.democluster1.ltt504.c4.kafka.ap-northeast-2.amazonaws.com:2181",
+                    "ZookeeperConnectStringTls": "z-3.democluster1.ltt504.c4.kafka.ap-northeast-2.amazonaws.com:2182,z-1.democluster1.ltt504.c4.kafka.ap-northeast-2.amazonaws.com:2182,z-2.democluster1.ltt504.c4.kafka.ap-northeast-2.amazonaws.com:2182"
+                }
+            }
+        ]
+    }
+}

@@ -1,0 +1,22 @@
+{
+    "status_code": 200,
+    "data": {
+        "metricFilters": [
+            {
+                "filterName": "test-filter-name-fail",
+                "filterPattern": "{ ($.eventName = ConsoleLogin) && ($.additionalEventData.MFAUsed != Yes) }",
+                "metricTransformations": [
+                    {
+                        "metricName": "no_mfa_console_signin_metric_fail",
+                        "metricNamespace": "ImportantMetrics",
+                        "metricValue": "1",
+                        "unit": "None"
+                    }
+                ],
+                "creationTime": 1668798424833,
+                "logGroupName": "fail-cloudtrail-test-group"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

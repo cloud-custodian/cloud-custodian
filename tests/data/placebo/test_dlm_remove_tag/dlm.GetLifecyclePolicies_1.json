@@ -1,0 +1,18 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Policies": [
+            {
+                "PolicyId": "policy-0e23a047d0fdb7761",
+                "Description": "test",
+                "State": "ENABLED",
+                "Tags": {
+                    "asdf": "qwer",
+                    "foo": "bar"
+                },
+                "PolicyType": "EBS_SNAPSHOT_MANAGEMENT"
+            }
+        ]
+    }
+}

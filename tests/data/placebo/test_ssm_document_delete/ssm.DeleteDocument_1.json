@@ -1,0 +1,11 @@
+{
+    "status_code": 400,
+    "data": {
+        "Error": {
+            "Message": "Must unshare document first before delete",
+            "Code": "InvalidDocumentOperation"
+        },
+        "ResponseMetadata": {},
+        "Message": "Must unshare document first before delete"
+    }
+}

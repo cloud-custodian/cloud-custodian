@@ -25,6 +25,8 @@ class ProjectRole(QueryResourceManager):
         name = id = "name"
         default_report_fields = ['name', 'title', 'description', 'stage', 'deleted']
         asset_type = "iam.googleapis.com/Role"
+        urn_component = "project-role"
+        urn_id_segments = (-1,)  # Just use the last segment of the id in the URN
 
         @staticmethod
         def get(client, resource_info):
@@ -51,6 +53,8 @@ class ServiceAccount(QueryResourceManager):
         default_report_fields = ['name', 'displayName', 'email', 'description', 'disabled']
         asset_type = "iam.googleapis.com/ServiceAccount"
         metric_key = 'resource.labels.unique_id'
+        urn_component = 'service-account'
+        urn_id_path = 'email'
 
         @staticmethod
         def get(client, resource_info):
@@ -59,6 +63,40 @@ class ServiceAccount(QueryResourceManager):
                     'name': 'projects/{}/serviceAccounts/{}'.format(
                         resource_info['project_id'],
                         resource_info['email_id'])})
+
+        @staticmethod
+        def get_metric_resource_name(resource):
+            return resource["uniqueId"]
+
+
+@ServiceAccount.action_registry.register('delete')
+class DeleteServiceAccount(MethodAction):
+    schema = type_schema('delete')
+    method_spec = {'op': 'delete'}
+    permissions = ("iam.serviceAccounts.delete",)
+
+    def get_resource_params(self, m, r):
+        return {'name': r['name']}
+
+
+@ServiceAccount.action_registry.register('enable')
+class EnableServiceAccount(MethodAction):
+    schema = type_schema('enable')
+    method_spec = {'op': 'enable'}
+    permissions = ("iam.serviceAccounts.enable",)
+
+    def get_resource_params(self, m, r):
+        return {'name': r['name']}
+
+
+@ServiceAccount.action_registry.register('disable')
+class DisableServiceAccount(MethodAction):
+    schema = type_schema('disable')
+    method_spec = {'op': 'disable'}
+    permissions = ("iam.serviceAccounts.disable",)
+
+    def get_resource_params(self, m, r):
+        return {'name': r['name']}
 
 
 @resources.register('service-account-key')
@@ -98,6 +136,9 @@ class ServiceAccountKey(ChildResourceManager):
         asset_type = "iam.googleapis.com/ServiceAccountKey"
         scc_type = "google.iam.ServiceAccountKey"
         permissions = ("iam.serviceAccounts.list",)
+        metric_key = 'metric.labels.key_id'
+        urn_component = "service-account-key"
+        urn_id_segments = (3, 5)
 
         @staticmethod
         def get(client, resource_info):
@@ -108,6 +149,10 @@ class ServiceAccountKey(ChildResourceManager):
                 'get', {
                     'name': 'projects/{}/serviceAccounts/{}/keys/{}'.format(
                         project, sa, key)})
+
+        @staticmethod
+        def get_metric_resource_name(resource):
+            return resource["name"].split('/')[-1]
 
 
 @ServiceAccountKey.action_registry.register('delete')
@@ -135,6 +180,10 @@ class Role(QueryResourceManager):
         name = id = "name"
         default_report_fields = ['name', 'title', 'description', 'stage', 'deleted']
         asset_type = "iam.googleapis.com/Role"
+        urn_component = "role"
+        # Don't show the project ID in the URN.
+        urn_has_project = False
+        urn_id_segments = (-1,)  # Just use the last segment of the id in the URN
 
         @staticmethod
         def get(client, resource_info):
@@ -142,3 +191,21 @@ class Role(QueryResourceManager):
                 'get', {
                     'name': 'roles/{}'.format(
                         resource_info['name'])})
+
+
+@resources.register('api-key')
+class ApiKey(QueryResourceManager):
+    """GCP API Key
+    https://cloud.google.com/api-keys/docs/reference/rest/v2/projects.locations.keys#Key
+    """
+    class resource_type(TypeInfo):
+        service = 'apikeys'
+        version = 'v2'
+        component = 'projects.locations.keys'
+        enum_spec = ('list', 'keys[]', None)
+        scope = 'project'
+        scope_key = 'parent'
+        scope_template = 'projects/{}/locations/global'
+        name = id = "name"
+        default_report_fields = ['name', 'displayName', 'createTime', 'updateTime']
+        asset_type = "apikeys.googleapis.com/projects.locations.keys"

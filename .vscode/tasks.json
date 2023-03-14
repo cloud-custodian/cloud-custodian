@@ -1,16 +1,34 @@
 {
     // See https://go.microsoft.com/fwlink/?LinkId=733558
     // for the documentation about the tasks.json format
-    "version": "0.1.0",
+    "version": "2.0.0",
     "command": "make",
-    "isShellCommand": true,
     "echoCommand": true,
     "args": [],
-    "showOutput": "always",
     "tasks": [
-        {"taskName": "test",
-         "args": ["test"]},
-        {"taskName": "coverage",
-         "args": ["coverage"]}
+        {
+            "label": "test",
+            "type": "shell",
+            "command": "make",
+            "args": [
+                "test",
+                "test"
+            ],
+            "problemMatcher": [],
+            "group": {
+                "_id": "test",
+                "isDefault": false
+            }
+        },
+        {
+            "label": "coverage",
+            "type": "shell",
+            "command": "make",
+            "args": [
+                "coverage",
+                "coverage"
+            ],
+            "problemMatcher": []
+        }
     ]
 }

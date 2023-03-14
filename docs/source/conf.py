@@ -35,7 +35,7 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.viewcode',
     'c7n_sphinxext.docgen',
-    'recommonmark',
+    'myst_parser',
     'sphinx_markdown_tables'
 ]
 
@@ -82,7 +82,7 @@ author = u'Kapil Thangavelu'
 #
 # This is also used if you do content translation via gettext catalogs.
 # Usually you set "language" from the command line for these cases.
-language = None
+language = "en"
 
 # There are two options for replacing |today|: either, you set today to some
 # non-false value, then it is used:
@@ -313,6 +313,6 @@ texinfo_documents = [
 
 # This adds in our expand/collapse JS/CSS
 def setup(app):
-    app.add_javascript('js/expand.js')
-    app.add_stylesheet('css/expand.css')
+    app.add_js_file('js/expand.js')
+    app.add_css_file('css/expand.css')
     app.add_autodocumenter(DocsonlyMethodDocumenter)
