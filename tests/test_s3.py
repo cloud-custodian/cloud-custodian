@@ -1800,7 +1800,7 @@ class S3Test(BaseTest):
         - There is no public block configuration set
         - A strict bucket policy prevents Custodian from reading the public block configuration
         """
-        self.patch(s3.S3, "executor_factory", MainThreadExecutor)
+        self.patch(s3.FilterPublicBlock, "executor_factory", MainThreadExecutor)
         self.patch(s3, "S3_AUGMENT_TABLE", [])
 
         session_factory = self.replay_flight_data("test_s3_check_public_block")
@@ -1817,10 +1817,10 @@ class S3Test(BaseTest):
             session_factory=session_factory,
         )
 
-        resources = p.run()
+        resources = {bucket["Name"]: bucket for bucket in p.run()}
         self.assertEqual(len(resources), 3)
-        locked_down_bucket = next(r for r in resources if r["Name"] == "my-locked-down-bucket")
-        self.assertIn("GetPublicAccessBlock", locked_down_bucket.get("c7n:DeniedMethods", []))
+        locked_down_bucket = resources["my-locked-down-bucket"]
+        self.assertIn("GetPublicAccessBlock", locked_down_bucket["c7n:DeniedMethods"])
 
     def test_set_public_block_enable_all(self):
         bname = 'mypublicblock'
