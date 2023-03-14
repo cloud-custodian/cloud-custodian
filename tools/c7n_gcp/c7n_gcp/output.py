@@ -1,4 +1,3 @@
-# Copyright 2018-2019 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 """
@@ -19,7 +18,7 @@ except ImportError:
 try:
     from google.cloud.logging import Client as LogClient
     from google.cloud.logging.handlers import CloudLoggingHandler
-    from google.cloud.logging.resource import Resource
+    from google.cloud.logging import Resource
 except ImportError:
     LogClient = None
 

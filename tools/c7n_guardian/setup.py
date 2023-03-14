@@ -1,4 +1,3 @@
-# Copyright 2017 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
@@ -17,6 +16,7 @@ setup(
     long_description=description,
     long_description_content_type='text/markdown',
     classifiers=[
+        "License :: OSI Approved :: Apache Software License",
         "Topic :: System :: Systems Administration",
         "Topic :: System :: Distributed Computing"
     ],

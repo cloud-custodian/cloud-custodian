@@ -18,7 +18,7 @@
 
 
 
-FROM python:3.7-stretch
+FROM python:3.8-buster
 
 LABEL name="custodian tox" \
       description="Run Custodian test suite" \
@@ -30,9 +30,9 @@ RUN pip3 install tox
 
 ADD . /src
 WORKDIR /src
-RUN tox -e py37 --notest
+RUN tox -e py38 --notest
 
-ARG TOX_ENV=py37
+ARG TOX_ENV=py38
 
 # Setup for EntryPoint
 ENV LC_ALL="C.UTF-8" LANG="C.UTF-8" TOX_ENV_ENV=$TOX_ENV

@@ -1,0 +1,24 @@
+{
+    "status_code": 200,
+    "data": {
+        "Results": [
+            "{\"resourceId\":\"arn:aws:apigateway:us-east-2::/restapis/3qcpw4j8pi/stages/dev\",\"configuration\":{\"variables\":{},\"lastUpdatedDate\":\"2020-12-24T19:01:19Z\",\"stageName\":\"dev\",\"createdDate\":\"2020-12-24T18:54:52Z\",\"clientCertificateId\":\"3kxqri\",\"deploymentId\":\"fvliur\",\"cacheClusterSize\":\"0.5\",\"cacheClusterEnabled\":false,\"cacheClusterStatus\":\"NOT_AVAILABLE\",\"methodSettings\":{\"*/*\":{\"throttlingBurstLimit\":5000.0,\"throttlingRateLimit\":10000.0,\"requireAuthorizationForCacheControl\":true,\"unauthorizedCacheControlHeaderStrategy\":\"SUCCEED_WITH_RESPONSE_HEADER\",\"cachingEnabled\":false,\"cacheTtlInSeconds\":300.0}},\"tracingEnabled\":false},\"supplementaryConfiguration\":{}}",
+            "{\"resourceId\":\"arn:aws:apigateway:us-east-2::/restapis/3qcpw4j8pi/stages/prod\",\"configuration\":{\"lastUpdatedDate\":\"2020-12-24T18:55:23Z\",\"stageName\":\"prod\",\"createdDate\":\"2020-12-24T18:54:53Z\",\"deploymentId\":\"fvliur\",\"cacheClusterEnabled\":false,\"cacheClusterStatus\":\"NOT_AVAILABLE\",\"methodSettings\":{\"mytestresource/GET\":{\"throttlingBurstLimit\":-1.0,\"metricsEnabled\":true,\"throttlingRateLimit\":-1.0,\"requireAuthorizationForCacheControl\":true,\"unauthorizedCacheControlHeaderStrategy\":\"SUCCEED_WITH_RESPONSE_HEADER\",\"cacheTtlInSeconds\":300.0}},\"tracingEnabled\":false},\"supplementaryConfiguration\":{}}",
+            "{\"resourceId\":\"arn:aws:apigateway:us-east-2::/restapis/d2vdh748ta/stages/api\",\"configuration\":{\"variables\":{},\"lastUpdatedDate\":\"2020-12-24T19:02:09Z\",\"stageName\":\"api\",\"createdDate\":\"2020-12-24T19:02:09Z\",\"deploymentId\":\"rp2mlf\",\"description\":\"2d49180b2988ed5273315098420ef6f7\",\"cacheClusterEnabled\":false,\"cacheClusterStatus\":\"NOT_AVAILABLE\",\"methodSettings\":{},\"tracingEnabled\":false},\"supplementaryConfiguration\":{}}"
+        ],
+        "QueryInfo": {
+            "SelectFields": [
+                {
+                    "Name": "resourceId"
+                },
+                {
+                    "Name": "configuration"
+                },
+                {
+                    "Name": "supplementaryConfiguration"
+                }
+            ]
+        },
+        "ResponseMetadata": {}
+    }
+}

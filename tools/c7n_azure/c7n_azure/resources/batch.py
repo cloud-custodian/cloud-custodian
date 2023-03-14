@@ -1,4 +1,3 @@
-# Copyright 2018 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
@@ -32,6 +31,6 @@ class Batch(ArmResourceManager):
         doc_groups = ['Compute']
 
         service = 'azure.mgmt.batch'
-        client = 'BatchManagementClient'
+        client = 'BatchManagement'
         enum_spec = ('batch_account', 'list', None)
         resource_type = 'Microsoft.Batch/batchAccounts'

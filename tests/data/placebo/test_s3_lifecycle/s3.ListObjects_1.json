@@ -1,26 +1,12 @@
 {
-    "status_code": 200, 
+    "status_code": 200,
     "data": {
-        "MaxKeys": 1000, 
-        "Prefix": "", 
-        "Name": "custodian-lifecycle-test", 
-        "ResponseMetadata": {
-            "HTTPStatusCode": 200, 
-            "RetryAttempts": 0, 
-            "HostId": "YFsFZV1czPThuKvh9Tc0cBF60+HfSqqcxoHn0n7VZ4vE+GOZSim15AI8FpG7kDhgnXdulMuf44E=", 
-            "RequestId": "56A09287317F615C", 
-            "HTTPHeaders": {
-                "x-amz-bucket-region": "us-east-1", 
-                "x-amz-id-2": "YFsFZV1czPThuKvh9Tc0cBF60+HfSqqcxoHn0n7VZ4vE+GOZSim15AI8FpG7kDhgnXdulMuf44E=", 
-                "server": "AmazonS3", 
-                "transfer-encoding": "chunked", 
-                "x-amz-request-id": "56A09287317F615C", 
-                "date": "Fri, 27 Oct 2017 19:54:28 GMT", 
-                "content-type": "application/xml"
-            }
-        }, 
-        "Marker": "", 
-        "EncodingType": "url", 
-        "IsTruncated": false
+        "ResponseMetadata": {},
+        "IsTruncated": false,
+        "Marker": "",
+        "Name": "c7n-lifecycle-test-again3",
+        "Prefix": "",
+        "MaxKeys": 1000,
+        "EncodingType": "url"
     }
 }

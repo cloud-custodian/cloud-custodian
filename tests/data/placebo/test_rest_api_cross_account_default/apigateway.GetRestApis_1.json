@@ -1,0 +1,72 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "items": [
+            {
+                "id": "qo85yzn6qd",
+                "name": "gitter_search",
+                "createdDate": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 7,
+                    "day": 3,
+                    "hour": 11,
+                    "minute": 6,
+                    "second": 8,
+                    "microsecond": 0
+                },
+                "version": "1.0",
+                "binaryMediaTypes": [
+                    "application/octet-stream",
+                    "application/x-tar",
+                    "application/zip",
+                    "audio/basic",
+                    "audio/ogg",
+                    "audio/mp4",
+                    "audio/mpeg",
+                    "audio/wav",
+                    "audio/webm",
+                    "image/png",
+                    "image/jpg",
+                    "image/jpeg",
+                    "image/gif",
+                    "video/ogg",
+                    "video/mpeg",
+                    "video/webm"
+                ],
+                "apiKeySource": "HEADER",
+                "endpointConfiguration": {
+                    "types": [
+                        "EDGE"
+                    ]
+                },
+                "tags": {
+                    "Owner": "Kapil"
+                },
+                "disableExecuteApiEndpoint": false
+            },
+            {
+                "id": "tdnq9tsx1i",
+                "name": "oio",
+                "createdDate": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 10,
+                    "day": 23,
+                    "hour": 13,
+                    "minute": 36,
+                    "second": 27,
+                    "microsecond": 0
+                },
+                "apiKeySource": "HEADER",
+                "endpointConfiguration": {
+                    "types": [
+                        "REGIONAL"
+                    ]
+                },
+                "disableExecuteApiEndpoint": false
+            }
+        ]
+    }
+}

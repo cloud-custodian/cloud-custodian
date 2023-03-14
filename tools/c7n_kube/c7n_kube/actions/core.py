@@ -1,4 +1,3 @@
-# Copyright 2018-2019 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
@@ -15,6 +14,16 @@ log = logging.getLogger('custodian.k8s.actions')
 
 class Action(BaseAction):
     pass
+
+
+class EventAction(BaseAction):
+
+    def validate(self):
+        modes = ('k8s-admission',)
+        policy = self.manager.data
+        if policy.get('mode', {}).get('type') not in modes:
+            raise PolicyValidationError(
+                "Event Actions are only supported for k8s-admission mode policies")
 
 
 class MethodAction(Action):

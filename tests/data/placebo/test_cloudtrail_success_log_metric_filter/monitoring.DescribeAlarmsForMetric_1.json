@@ -1,0 +1,50 @@
+{
+    "status_code": 200,
+    "data": {
+        "MetricAlarms": [
+            {
+                "AlarmName": "NoMFAConsoleLoginAlarm_40313",
+                "AlarmArn": "arn:aws:cloudwatch:us-east-1:644160558196:alarm:NoMFAConsoleLoginAlarm_40313",
+                "AlarmConfigurationUpdatedTimestamp": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 11,
+                    "day": 22,
+                    "hour": 16,
+                    "minute": 57,
+                    "second": 22,
+                    "microsecond": 321000
+                },
+                "ActionsEnabled": true,
+                "OKActions": [],
+                "AlarmActions": [
+                    "arn:aws:sns:us-east-1:644160558196:mfa-notification-topic20221122165720935200000005"
+                ],
+                "InsufficientDataActions": [],
+                "StateValue": "INSUFFICIENT_DATA",
+                "StateReason": "Unchecked: Initial alarm creation",
+                "StateUpdatedTimestamp": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 11,
+                    "day": 22,
+                    "hour": 16,
+                    "minute": 57,
+                    "second": 22,
+                    "microsecond": 321000
+                },
+                "MetricName": "no_mfa_console_signin_metric_1",
+                "Namespace": "ImportantMetrics",
+                "Statistic": "Sum",
+                "Dimensions": [],
+                "Period": 60,
+                "EvaluationPeriods": 1,
+                "DatapointsToAlarm": 1,
+                "Threshold": 0.0,
+                "ComparisonOperator": "GreaterThanThreshold",
+                "TreatMissingData": "missing"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

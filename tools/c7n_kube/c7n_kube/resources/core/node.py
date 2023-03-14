@@ -1,4 +1,3 @@
-# Copyright 2019 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 #
@@ -16,3 +15,4 @@ class Node(QueryResourceManager):
         patch = 'patch_node'
         delete = 'delete_node'
         enum_spec = ('list_node', 'items', None)
+        plural = 'nodes'

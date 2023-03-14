@@ -1,174 +1,74 @@
 {
-    "status_code": 200, 
+    "status_code": 200,
     "data": {
         "LoadBalancerDescriptions": [
             {
-                "Subnets": [
-                    "subnet-0712332d", 
-                    "subnet-236b7a55", 
-                    "subnet-3738020a", 
-                    "subnet-6bf0d333"
-                ], 
-                "CanonicalHostedZoneNameID": "Z35SXDOTRQ7X7K", 
-                "VPCId": "vpc-c91196ae", 
+                "LoadBalancerName": "test-elb",
+                "DNSName": "test-elb-505592940.us-east-1.elb.amazonaws.com",
+                "CanonicalHostedZoneName": "test-elb-505592940.us-east-1.elb.amazonaws.com",
+                "CanonicalHostedZoneNameID": "Z35SXDOTRQ7X7K",
                 "ListenerDescriptions": [
                     {
                         "Listener": {
-                            "InstancePort": 443, 
-                            "SSLCertificateId": "arn:aws:acm:us-east-1:644160558196:certificate/81b1b219-86ca-4b5d-bc0b-86989f2b08bc",
-                            "LoadBalancerPort": 443, 
-                            "Protocol": "HTTPS", 
-                            "InstanceProtocol": "HTTPS"
-                        }, 
+                            "Protocol": "HTTPS",
+                            "LoadBalancerPort": 443,
+                            "InstanceProtocol": "HTTPS",
+                            "InstancePort": 443,
+                            "SSLCertificateId": "arn:aws:acm:us-east-1:644160558196:certificate/80d45f1f-e9b3-4e46-8118-8504079d27b3"
+                        },
                         "PolicyNames": [
-                            "AWSConsole-SSLNegotiationPolicy-GitPrime-ELB-1493735340856"
+                            "AWSConsole-SSLNegotiationPolicy-test-elb-1646765145761"
                         ]
-                    }, 
-                    {
-                        "Listener": {
-                            "InstancePort": 80, 
-                            "LoadBalancerPort": 80, 
-                            "Protocol": "HTTP", 
-                            "InstanceProtocol": "HTTP"
-                        }, 
-                        "PolicyNames": []
                     }
-                ], 
-                "HealthCheck": {
-                    "HealthyThreshold": 10, 
-                    "Interval": 30, 
-                    "Target": "HTTPS:443/accounts/signup-invite", 
-                    "Timeout": 5, 
-                    "UnhealthyThreshold": 2
-                }, 
-                "BackendServerDescriptions": [], 
-                "Instances": [
-                    {
-                        "InstanceId": "i-0d64152437bf5c693"
-                    }
-                ], 
-                "DNSName": "internal-GitPrime-ELB-759182024.us-east-1.elb.amazonaws.com", 
-                "SecurityGroups": [
-                    "sg-2d991c57", 
-                    "sg-9bce96e0"
-                ], 
+                ],
                 "Policies": {
-                    "LBCookieStickinessPolicies": [], 
-                    "AppCookieStickinessPolicies": [], 
+                    "AppCookieStickinessPolicies": [],
+                    "LBCookieStickinessPolicies": [],
                     "OtherPolicies": [
-                        "AWSConsole-SSLNegotiationPolicy-GitPrime-ELB-1493735340856", 
-                        "AWSConsole-SSLNegotiationPolicy-GitPrime-ELB-1493306293021", 
+                        "AWSConsole-SSLNegotiationPolicy-test-elb-1646765145761",
                         "ELBSecurityPolicy-2016-08"
                     ]
-                }, 
-                "LoadBalancerName": "GitPrime-ELB", 
-                "CreatedTime": {
-                    "hour": 15, 
-                    "__class__": "datetime", 
-                    "month": 4, 
-                    "second": 8, 
-                    "microsecond": 450000, 
-                    "year": 2017, 
-                    "day": 27, 
-                    "minute": 18
-                }, 
+                },
+                "BackendServerDescriptions": [],
                 "AvailabilityZones": [
-                    "us-east-1b", 
-                    "us-east-1c", 
-                    "us-east-1d", 
-                    "us-east-1e"
-                ], 
-                "Scheme": "internal", 
-                "SourceSecurityGroup": {
-                    "OwnerAlias": "644160558196",
-                    "GroupName": "DB-SG"
-                }
-            }, 
-            {
+                    "us-east-1c",
+                    "us-east-1b",
+                    "us-east-1a"
+                ],
                 "Subnets": [
-                    "subnet-0712332d", 
-                    "subnet-be9373e5"
-                ], 
-                "CanonicalHostedZoneNameID": "Z35SXDOTRQ7X7K", 
-                "VPCId": "vpc-c91196ae", 
-                "ListenerDescriptions": [
-                    {
-                        "Listener": {
-                            "InstancePort": 80, 
-                            "SSLCertificateId": "arn:aws:acm:us-east-1:644160558196:certificate/81b1b219-86ca-4b5d-bc0b-86989f2b08bc",
-                            "LoadBalancerPort": 443, 
-                            "Protocol": "HTTPS", 
-                            "InstanceProtocol": "HTTP"
-                        }, 
-                        "PolicyNames": [
-                            "AWSConsole-LBCookieStickinessPolicy-test-elb-1493748038333", 
-                            "testpolicy-1493768308000"
-                        ]
-                    }
-                ], 
+                    "subnet-00aa684a0a65865fb",
+                    "subnet-04c15af10f1dce5f7",
+                    "subnet-0cc0fb16a54f63d1c"
+                ],
+                "VPCId": "vpc-052db4896ba2ce07e",
+                "Instances": [],
                 "HealthCheck": {
-                    "HealthyThreshold": 10, 
-                    "Interval": 30, 
-                    "Target": "HTTP:80/index.html", 
-                    "Timeout": 5, 
-                    "UnhealthyThreshold": 2
-                }, 
-                "BackendServerDescriptions": [], 
-                "Instances": [], 
-                "DNSName": "internal-test-elb-566502660.us-east-1.elb.amazonaws.com", 
-                "SecurityGroups": [
-                    "sg-82666cfd"
-                ], 
-                "Policies": {
-                    "LBCookieStickinessPolicies": [
-                        {
-                            "PolicyName": "AWSConsole-LBCookieStickinessPolicy-test-elb-1493748038333", 
-                            "CookieExpirationPeriod": 60
-                        }
-                    ], 
-                    "AppCookieStickinessPolicies": [], 
-                    "OtherPolicies": [
-                        "AWSConsole-SSLNegotiationPolicy-test-elb-1493750072627", 
-                        "AWSConsole-SSLNegotiationPolicy-test-elb-1493749918192", 
-                        "AWSConsole-SSLNegotiationPolicy-test-elb-1493750282783", 
-                        "ELBSecurityPolicy-2016-08", 
-                        "AWSConsole-SSLNegotiationPolicy-test-elb-1493748007026", 
-                        "testpolicy-1493768308000"
-                    ]
-                }, 
-                "LoadBalancerName": "test-elb", 
-                "CreatedTime": {
-                    "hour": 18, 
-                    "__class__": "datetime", 
-                    "month": 5, 
-                    "second": 2, 
-                    "microsecond": 890000, 
-                    "year": 2017, 
-                    "day": 2, 
-                    "minute": 0
-                }, 
-                "AvailabilityZones": [
-                    "us-east-1b", 
-                    "us-east-1d"
-                ], 
-                "Scheme": "internal", 
+                    "Target": "HTTPS:443/index.html",
+                    "Interval": 30,
+                    "Timeout": 5,
+                    "UnhealthyThreshold": 2,
+                    "HealthyThreshold": 10
+                },
                 "SourceSecurityGroup": {
                     "OwnerAlias": "644160558196",
-                    "GroupName": "ElasticMapReduce-Master-Private"
-                }
+                    "GroupName": "default"
+                },
+                "SecurityGroups": [
+                    "sg-0fa58d0a1dd89f274"
+                ],
+                "CreatedTime": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 3,
+                    "day": 8,
+                    "hour": 18,
+                    "minute": 45,
+                    "second": 44,
+                    "microsecond": 350000
+                },
+                "Scheme": "internet-facing"
             }
-        ], 
-        "ResponseMetadata": {
-            "RetryAttempts": 0, 
-            "HTTPStatusCode": 200, 
-            "RequestId": "d2315ed7-2f66-11e7-8d49-adb1fbf0b38b", 
-            "HTTPHeaders": {
-                "x-amzn-requestid": "d2315ed7-2f66-11e7-8d49-adb1fbf0b38b", 
-                "vary": "Accept-Encoding", 
-                "content-length": "5990", 
-                "content-type": "text/xml", 
-                "date": "Tue, 02 May 2017 18:40:31 GMT"
-            }
-        }
+        ],
+        "ResponseMetadata": {}
     }
 }

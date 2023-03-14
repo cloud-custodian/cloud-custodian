@@ -28,7 +28,6 @@ class QLDB(QueryResourceManager):
         date = 'CreationDateTime'
         universal_taggable = object()
         cfn_type = config_type = 'AWS::QLDB::Ledger'
-        not_found_err = 'ResourceNotFoundException'
 
     source_mapping = {
         'describe': DescribeQLDB,
@@ -51,14 +50,14 @@ class Delete(Action):
                     client.update_ledger(
                         Name=r['Name'],
                         DeletionProtection=False)
-                except self.manager.resource_type.not_found_err:
+                except client.exceptions.ResourceNotFoundException:  # pragma: no cover
                     continue
             elif r.get('DeletionProtection'):
                 protected += 1
                 continue
             try:
                 client.delete_ledger(Name=r['Name'])
-            except self.manager.resource_type.not_found_err:
+            except client.exceptions.ResourceNotFoundException:  # pragma: no cover
                 continue
         if protected:
             self.log.warning((

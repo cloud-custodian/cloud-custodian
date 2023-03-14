@@ -1,0 +1,58 @@
+{
+    "status_code": 200,
+    "data": {
+        "FileSystems": [
+            {
+                "OwnerId": "644160558196",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 7,
+                    "day": 1,
+                    "hour": 10,
+                    "minute": 20,
+                    "second": 17,
+                    "microsecond": 253000
+                },
+                "FileSystemId": "fs-0b9437d1c647af085",
+                "FileSystemType": "LUSTRE",
+                "Lifecycle": "AVAILABLE",
+                "StorageCapacity": 1200,
+                "StorageType": "SSD",
+                "VpcId": "vpc-0848662b041928e4e",
+                "SubnetIds": [
+                    "subnet-034f3d20e1400bae7"
+                ],
+                "NetworkInterfaceIds": [
+                    "eni-0f83ae25a2e345d7e",
+                    "eni-03f705d0488ae4cc5"
+                ],
+                "DNSName": "fs-0b9437d1c647af085.fsx.us-west-2.amazonaws.com",
+                "KmsKeyId": "arn:aws:kms:us-west-2:644160558196:key/aa2a5523-5708-4525-a41c-57e20e821ca7",
+                "ResourceARN": "arn:aws:fsx:us-west-2:644160558196:file-system/fs-0b9437d1c647af085",
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "fsx-internal"
+                    }
+                ],
+                "LustreConfiguration": {
+                    "WeeklyMaintenanceStartTime": "1:06:00",
+                    "DeploymentType": "PERSISTENT_2",
+                    "PerUnitStorageThroughput": 125,
+                    "MountName": "4w7pvbmv",
+                    "DailyAutomaticBackupStartTime": "13:30",
+                    "AutomaticBackupRetentionDays": 7,
+                    "CopyTagsToBackups": false,
+                    "DataCompressionType": "NONE",
+                    "LogConfiguration": {
+                        "Level": "WARN_ERROR",
+                        "Destination": "arn:aws:logs:us-west-2:644160558196:log-group:/aws/fsx/lustre:log-stream:datarepo_fs-0b9437d1c647af085"
+                    }
+                },
+                "FileSystemTypeVersion": "2.12"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

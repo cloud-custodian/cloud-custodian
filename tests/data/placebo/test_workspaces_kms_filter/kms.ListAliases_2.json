@@ -1,0 +1,14 @@
+{
+    "status_code": 200,
+    "data": {
+        "Aliases": [
+            {
+                "AliasName": "alias/aws/workspaces",
+                "AliasArn": "arn:aws:kms:us-east-1:123456789012:alias/aws/workspaces",
+                "TargetKeyId": "9a428455-22a2-45ba-bc56-173cb6bae1af"
+            }
+        ],
+        "Truncated": false,
+        "ResponseMetadata": {}
+    }
+}

@@ -1,4 +1,3 @@
-# Copyright 2019 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 #
@@ -15,3 +14,4 @@ class StatefulSet(QueryResourceManager):
         patch = 'patch_namespaced_stateful_set'
         delete = 'delete_namespaced_stateful_set'
         enum_spec = ('list_stateful_set_for_all_namespaces', 'items', None)
+        plural = 'statefulsets'

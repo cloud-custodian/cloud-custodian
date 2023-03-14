@@ -1,0 +1,31 @@
+{
+    "status_code": 200,
+    "data": {
+        "repositories": [
+            {
+                "repositoryArn": "arn:aws:ecr:us-east-1:644160558196:repository/sas-log4j-test",
+                "registryId": "644160558196",
+                "repositoryName": "sas-log4j-test",
+                "repositoryUri": "644160558196.dkr.ecr.us-east-1.amazonaws.com/sas-log4j-test",
+                "createdAt": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 1,
+                    "day": 17,
+                    "hour": 10,
+                    "minute": 0,
+                    "second": 40,
+                    "microsecond": 0
+                },
+                "imageTagMutability": "MUTABLE",
+                "imageScanningConfiguration": {
+                    "scanOnPush": false
+                },
+                "encryptionConfiguration": {
+                    "encryptionType": "AES256"
+                }
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

@@ -1,4 +1,3 @@
-# Copyright 2015-2018 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 from ..azure_common import BaseTest, arm_template
@@ -51,6 +50,30 @@ class WebAppTest(BaseTest):
                     'key': 'minTlsVersion',
                     'value': '1.2',
                     'op': 'ne'
+                }
+            ]
+        })
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    @arm_template('webapp.json')
+    def test_find_by_auth_disabled(self):
+        # webapp.json deploys a webapp without authentication
+        p = self.load_policy({
+            'name': 'test-azure-webapp',
+            'resource': 'azure.webapp',
+            'filters': [
+                {
+                    'type': 'value',
+                    'key': 'name',
+                    'op': 'glob',
+                    'value_type': 'normalize',
+                    'value': 'cctestwebapp*'},
+                {
+                    'type': 'authentication',
+                    'key': 'enabled',
+                    'value': False,
+                    'op': 'eq'
                 }
             ]
         })

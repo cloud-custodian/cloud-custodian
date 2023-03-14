@@ -1,0 +1,102 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "archive_file": {
+            "lambda_package": {
+                "excludes": null,
+                "id": "68afcc90d1f53fb453427fa5f77739a0fa5abd03",
+                "output_base64sha256": "lD/UayWBQclNCPtLONanF0NsCwgfVii9QazqWgmwtIE=",
+                "output_file_mode": null,
+                "output_md5": "dbda80a51ce93cd8b7917d718b98351f",
+                "output_path": "./lambda_package.zip",
+                "output_sha": "68afcc90d1f53fb453427fa5f77739a0fa5abd03",
+                "output_size": 206,
+                "source": [
+                    {
+                        "content": "def lambda_handler(event, context):\n  print('Hello from Lambda')\n",
+                        "filename": "./handler.py"
+                    }
+                ],
+                "source_content": null,
+                "source_content_filename": null,
+                "source_dir": null,
+                "source_file": null,
+                "type": "zip"
+            }
+        },
+        "aws_iam_role": {
+            "lambda": {
+                "arn": "arn:aws:iam::644160558196:role/c7n_test_check_permissions",
+                "assume_role_policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"\",\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"lambda.amazonaws.com\"},\"Action\":\"sts:AssumeRole\"}]}",
+                "create_date": "2021-11-08T04:25:44Z",
+                "description": "",
+                "force_detach_policies": false,
+                "id": "c7n_test_check_permissions",
+                "inline_policy": [
+                    {
+                        "name": "",
+                        "policy": ""
+                    }
+                ],
+                "managed_policy_arns": [],
+                "max_session_duration": 3600,
+                "name": "c7n_test_check_permissions",
+                "name_prefix": "",
+                "path": "/",
+                "permissions_boundary": null,
+                "tags": null,
+                "tags_all": {},
+                "unique_id": "AROAY5Y4D45RPLLU2OO3I"
+            }
+        },
+        "aws_lambda_function": {
+            "test_check_permissions": {
+                "architectures": [
+                    "x86_64"
+                ],
+                "arn": "arn:aws:lambda:us-east-1:644160558196:function:c7n_test_check_permissions",
+                "code_signing_config_arn": "",
+                "dead_letter_config": [],
+                "description": "",
+                "environment": [],
+                "file_system_config": [],
+                "filename": "./lambda_package.zip",
+                "function_name": "c7n_test_check_permissions",
+                "handler": "handler.lambda_handler",
+                "id": "c7n_test_check_permissions",
+                "image_config": [],
+                "image_uri": "",
+                "invoke_arn": "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:644160558196:function:c7n_test_check_permissions/invocations",
+                "kms_key_arn": "",
+                "last_modified": "2021-11-08T04:25:52.895+0000",
+                "layers": null,
+                "memory_size": 128,
+                "package_type": "Zip",
+                "publish": false,
+                "qualified_arn": "arn:aws:lambda:us-east-1:644160558196:function:c7n_test_check_permissions:$LATEST",
+                "reserved_concurrent_executions": -1,
+                "role": "arn:aws:iam::644160558196:role/c7n_test_check_permissions",
+                "runtime": "python3.8",
+                "s3_bucket": null,
+                "s3_key": null,
+                "s3_object_version": null,
+                "signing_job_arn": "",
+                "signing_profile_version_arn": "",
+                "source_code_hash": "lD/UayWBQclNCPtLONanF0NsCwgfVii9QazqWgmwtIE=",
+                "source_code_size": 206,
+                "tags": null,
+                "tags_all": {},
+                "timeout": 3,
+                "timeouts": null,
+                "tracing_config": [
+                    {
+                        "mode": "PassThrough"
+                    }
+                ],
+                "version": "$LATEST",
+                "vpc_config": []
+            }
+        }
+    }
+}

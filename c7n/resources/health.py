@@ -1,4 +1,3 @@
-# Copyright 2017 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import itertools
@@ -16,9 +15,11 @@ class HealthEvents(QueryResourceManager):
 
     class resource_type(TypeInfo):
         service = 'health'
+        arn = 'arn'
         arn_type = 'event'
         enum_spec = ('describe_events', 'events', None)
         name = 'eventTypeCode'
+        global_resource = True
         id = 'arn'
         date = 'startTime'
 

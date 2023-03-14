@@ -1,3 +1,5 @@
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 ResourceMap = {
     "k8s.config-map": "c7n_kube.resources.core.configmap.ConfigMap",
     "k8s.custom-cluster-resource": "c7n_kube.resources.crd.CustomResourceDefinition",
@@ -15,5 +17,7 @@ ResourceMap = {
     "k8s.service-account": "c7n_kube.resources.core.serviceaccount.ServiceAccount",
     "k8s.stateful-set": "c7n_kube.resources.apps.statefulset.StatefulSet",
     "k8s.volume": "c7n_kube.resources.core.volume.PersistentVolume",
-    "k8s.volume-claim": "c7n_kube.resources.core.volume.PersistentVolumeClaim"
+    "k8s.volume-claim": "c7n_kube.resources.core.volume.PersistentVolumeClaim",
+    "k8s.cluster-role": "c7n_kube.resources.rbac.role.ClusterRole",
+    "k8s.role": "c7n_kube.resources.rbac.role.NamespacedRole",
 }

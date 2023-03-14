@@ -1,4 +1,3 @@
-# Copyright 2019 Microsoft Corporation
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
@@ -63,7 +62,9 @@ class DeleteAction(AzureBaseAction):
 
     def _process_resource(self, resource):
         if is_resource_group(resource):
-            self.client.resource_groups.delete(resource['name'])
+            self.client.resource_groups.begin_delete(resource['name'])
         else:
-            self.client.resources.delete_by_id(resource['id'],
-                                               self.session.resource_api_version(resource['id']))
+            self.client.resources.begin_delete_by_id(
+                resource['id'],
+                self.session.resource_api_version(resource['id']))
+        return "deleted"

@@ -1,4 +1,3 @@
-# Copyright 2019 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 from c7n_gcp.provider import resources
@@ -21,6 +20,8 @@ class CloudBillingAccount(QueryResourceManager):
         default_report_fields = ['id', 'displayName']
         asset_type = "cloudbilling.googleapis.com/BillingAccount"
         permissions = ('billing.accounts.list',)
+        urn_component = "account"
+        urn_id_segments = (-1,)  # Just use the last segment of the id in the URN
 
         @staticmethod
         def get(client, event):

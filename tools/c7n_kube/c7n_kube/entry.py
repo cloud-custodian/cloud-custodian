@@ -1,4 +1,3 @@
-# Copyright 2018 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
@@ -24,6 +23,8 @@ from c7n_kube.resources.apps import (
     statefulset)
 
 from c7n_kube.resources import crd
+
+import c7n_kube.policy  # noqa
 
 log = logging.getLogger('custodian.k8s')
 

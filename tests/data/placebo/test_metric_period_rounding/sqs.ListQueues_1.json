@@ -1,0 +1,10 @@
+{
+    "status_code": 200,
+    "data": {
+        "QueueUrls": [
+            "https://us-east-2.queue.amazonaws.com/644160558196/84d3d899-fbdb-ab41-fca1-419b452dc4ed",
+            "https://us-east-2.queue.amazonaws.com/644160558196/5673a565-78cb-d2f9-c58b-ab8257e72da2"
+        ],
+        "ResponseMetadata": {}
+    }
+}

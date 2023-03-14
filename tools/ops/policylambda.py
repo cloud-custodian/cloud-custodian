@@ -17,7 +17,7 @@ $ mkdir sam-deploy
 $ python policylambda.py -o sam-deploy -c policies.yml
 
 $ cd sam-deploy
-$ aws cloudformation --template-file deploy.yml --s3-bucket mybucket > cfn.yml
+$ aws cloudformation package --template-file deploy.yml --s3-bucket mybucket > cfn.yml
 $ aws cloudformation deploy cfn.yml
 ```
 

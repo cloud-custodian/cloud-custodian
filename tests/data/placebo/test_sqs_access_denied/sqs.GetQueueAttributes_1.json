@@ -1,0 +1,12 @@
+{
+    "status_code": 403,
+    "data": {
+        "Error": {
+            "Type": "Sender",
+            "Code": "AccessDenied",
+            "Message": "Access to the resource https://queue.amazonaws.com/ is denied.",
+            "Detail": null
+        },
+        "ResponseMetadata": {}
+    }
+}

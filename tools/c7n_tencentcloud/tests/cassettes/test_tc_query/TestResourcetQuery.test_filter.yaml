@@ -1,0 +1,65 @@
+interactions:
+- request:
+    body: '{}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '2'
+      Content-Type:
+      - application/json
+      Host:
+      - cvm.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - DescribeRegions
+      X-TC-Region:
+      - ap-singapore
+      X-TC-Version:
+      - '2017-03-12'
+    method: POST
+    uri: https://cvm.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response": {"TotalCount": 20, "RequestId": "794b5bf3-461d-4fe6-b29a-7d25db675c5d",
+        "RegionSet": [{"RegionState": "AVAILABLE", "Region": "ap-guangzhou", "RegionName":
+        "\u534e\u5357\u5730\u533a(\u5e7f\u5dde)"}, {"RegionState": "AVAILABLE", "Region":
+        "ap-shanghai", "RegionName": "\u534e\u4e1c\u5730\u533a(\u4e0a\u6d77)"}, {"RegionState":
+        "AVAILABLE", "Region": "ap-nanjing", "RegionName": "\u534e\u4e1c\u5730\u533a(\u5357\u4eac)"},
+        {"RegionState": "AVAILABLE", "Region": "ap-beijing", "RegionName": "\u534e\u5317\u5730\u533a(\u5317\u4eac)"},
+        {"RegionState": "AVAILABLE", "Region": "ap-chengdu", "RegionName": "\u897f\u5357\u5730\u533a(\u6210\u90fd)"},
+        {"RegionState": "AVAILABLE", "Region": "ap-chongqing", "RegionName": "\u897f\u5357\u5730\u533a(\u91cd\u5e86)"},
+        {"RegionState": "AVAILABLE", "Region": "ap-hongkong", "RegionName": "\u6e2f\u6fb3\u53f0\u5730\u533a(\u4e2d\u56fd\u9999\u6e2f)"},
+        {"RegionState": "AVAILABLE", "Region": "ap-taipei", "RegionName": "\u6e2f\u6fb3\u53f0\u5730\u533a(\u4e2d\u56fd\u53f0\u5317)"},
+        {"RegionState": "AVAILABLE", "Region": "ap-seoul", "RegionName": "\u4e9a\u592a\u4e1c\u5317(\u9996\u5c14)"},
+        {"RegionState": "AVAILABLE", "Region": "ap-tokyo", "RegionName": "\u4e9a\u592a\u4e1c\u5317(\u4e1c\u4eac)"},
+        {"RegionState": "AVAILABLE", "Region": "ap-singapore", "RegionName": "\u4e9a\u592a\u4e1c\u5357(\u65b0\u52a0\u5761)"},
+        {"RegionState": "AVAILABLE", "Region": "ap-bangkok", "RegionName": "\u4e9a\u592a\u4e1c\u5357(\u66fc\u8c37)"},
+        {"RegionState": "AVAILABLE", "Region": "ap-jakarta", "RegionName": "\u4e9a\u592a\u4e1c\u5357(\u96c5\u52a0\u8fbe)"},
+        {"RegionState": "AVAILABLE", "Region": "na-siliconvalley", "RegionName": "\u7f8e\u56fd\u897f\u90e8(\u7845\u8c37)"},
+        {"RegionState": "AVAILABLE", "Region": "eu-frankfurt", "RegionName": "\u6b27\u6d32\u5730\u533a(\u6cd5\u5170\u514b\u798f)"},
+        {"RegionState": "AVAILABLE", "Region": "eu-moscow", "RegionName": "\u6b27\u6d32\u5730\u533a(\u83ab\u65af\u79d1)"},
+        {"RegionState": "AVAILABLE", "Region": "ap-mumbai", "RegionName": "\u4e9a\u592a\u5357\u90e8(\u5b5f\u4e70)"},
+        {"RegionState": "AVAILABLE", "Region": "na-ashburn", "RegionName": "\u7f8e\u56fd\u4e1c\u90e8(\u5f17\u5409\u5c3c\u4e9a)"},
+        {"RegionState": "AVAILABLE", "Region": "sa-saopaulo", "RegionName": "\u5357\u7f8e\u5730\u533a(\u5723\u4fdd\u7f57)"},
+        {"RegionState": "AVAILABLE", "Region": "na-toronto", "RegionName": "\u5317\u7f8e\u5730\u533a(\u591a\u4f26\u591a)"}]}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '2400'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 27 Sep 2022 09:36:48 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+version: 1

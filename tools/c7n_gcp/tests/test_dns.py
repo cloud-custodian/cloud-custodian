@@ -1,4 +1,3 @@
-# Copyright 2018-2019 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
@@ -20,6 +19,12 @@ class DnsManagedZoneTest(BaseTest):
 
         managed_zone_resources = policy.run()
         self.assertEqual(managed_zone_resources[0]['name'], managed_zone_name)
+        self.assertEqual(
+            policy.resource_manager.get_urns(managed_zone_resources),
+            [
+                'gcp:dns::cloud-custodian:managed-zone/custodian'
+            ],
+        )
 
     def test_managed_zone_get(self):
         project_id = 'cloud-custodian'
@@ -40,12 +45,18 @@ class DnsManagedZoneTest(BaseTest):
         resources = exec_mode.run(event, None)
 
         self.assertEqual(resources[0]['name'], resource_name)
+        self.assertEqual(
+            policy.resource_manager.get_urns(resources),
+            [
+                'gcp:dns::cloud-custodian:managed-zone/custodian'
+            ],
+        )
 
     def test_managed_zone_delete(self):
-        project_id = "custodian"
+        project_id = "cloud-custodian"
         resource_name = "custodian-delete-test"
 
-        factory = self.replay_flight_data('dns-managed-zone-delete', project_id)
+        factory = self.replay_flight_data('dns-managed-zone-delete')
         p = self.load_policy(
             {'name': 'gcp-dns-managed-zone-delete',
              'resource': 'gcp.dns-managed-zone',
@@ -76,6 +87,12 @@ class DnsPolicyTest(BaseTest):
 
         policy_resources = policy.run()
         self.assertEqual(policy_resources[0]['name'], policy_name)
+        self.assertEqual(
+            policy.resource_manager.get_urns(policy_resources),
+            [
+                'gcp:dns::cloud-custodian:policy/custodian'
+            ],
+        )
 
     def test_policy_get(self):
         project_id = 'cloud-custodian'
@@ -96,3 +113,9 @@ class DnsPolicyTest(BaseTest):
         resources = exec_mode.run(event, None)
 
         self.assertEqual(resources[0]['name'], policy_name)
+        self.assertEqual(
+            policy.resource_manager.get_urns(resources),
+            [
+                'gcp:dns::cloud-custodian:policy/custodian'
+            ],
+        )

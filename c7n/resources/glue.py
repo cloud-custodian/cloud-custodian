@@ -1,4 +1,3 @@
-# Copyright 2016-2017 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import json
@@ -23,11 +22,14 @@ class GlueConnection(QueryResourceManager):
 
     class resource_type(TypeInfo):
         service = 'glue'
-        enum_spec = ('get_connections', 'ConnectionList', None)
+        enum_spec = ('get_connections', 'ConnectionList', {'HidePassword': True})
         id = name = 'Name'
         date = 'CreationTime'
         arn_type = "connection"
         cfn_type = 'AWS::Glue::Connection'
+        universal_taggable = object()
+
+    augment = universal_augment
 
 
 @GlueConnection.filter_registry.register('subnet')
@@ -164,6 +166,62 @@ class DeleteJob(BaseAction):
                 client.delete_job(JobName=r['Name'])
             except client.exceptions.EntityNotFoundException:
                 continue
+
+
+@GlueJob.action_registry.register('toggle-metrics')
+class GlueJobToggleMetrics(BaseAction):
+    """Enable or disable CloudWatch metrics for a Glue job
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: gluejob-enable-metrics
+            resource: glue-job
+            filters:
+              - type: value
+                key: 'DefaultArguments."--enable-metrics"'
+                value: absent
+            actions:
+              - type: toggle-metrics
+                enabled: true
+    """
+    schema = type_schema(
+        'toggle-metrics',
+        enabled={'type': 'boolean'},
+        required=['enabled'],
+    )
+    permissions = ('glue:UpdateJob',)
+
+    def prepare_params(self, r):
+        client = local_session(self.manager.session_factory).client('glue')
+        update_keys = client.meta._service_model.shape_for('JobUpdate').members
+        want_keys = set(r).intersection(update_keys) - {'AllocatedCapacity'}
+        params = {k: r[k] for k in want_keys}
+
+        # Can't specify MaxCapacity when updating/creating a job if
+        # job configuration includes WorkerType or NumberOfWorkers
+        if 'WorkerType' in params or 'NumberOfWorkers' in params:
+            del params['MaxCapacity']
+
+        if self.data.get('enabled'):
+            params["DefaultArguments"]["--enable-metrics"] = ""
+        else:
+            del params["DefaultArguments"]["--enable-metrics"]
+
+        return params
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('glue')
+
+        for r in resources:
+            try:
+                job_name = r["Name"]
+                updated_resource = self.prepare_params(r)
+                client.update_job(JobName=job_name, JobUpdate=updated_resource)
+            except Exception as e:
+                self.log.error('Error updating glue job: {}'.format(e))
 
 
 @resources.register('glue-crawler')
@@ -406,23 +464,7 @@ class GlueSecurityConfiguration(QueryResourceManager):
 
 @GlueSecurityConfiguration.filter_registry.register('kms-key')
 class KmsFilter(KmsRelatedFilter):
-    """
-    Filter a resource by its associcated kms key and optionally the alias name
-    of the kms key by using 'c7n:AliasName'
 
-    :example:
-
-    .. code-block:: yaml
-
-        policies:
-          - name: glue-security-configuration-kms-key
-            resource: glue-security-configuration
-            filters:
-              - type: kms-key
-                key: c7n:AliasName
-                value: "^(alias/aws/)"
-                op: regex
-    """
     schema = type_schema(
         'kms-key',
         rinherit=ValueFilter.schema,

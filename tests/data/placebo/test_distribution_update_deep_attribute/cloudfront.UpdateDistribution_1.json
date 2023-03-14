@@ -1,0 +1,272 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "ETag": "E33H5IXGBMSC6D",
+        "Distribution": {
+            "Id": "E1XRY7J5866V6G",
+            "ARN": "arn:aws:cloudfront::644160558196:distribution/E1XRY7J5866V6G",
+            "Status": "InProgress",
+            "LastModifiedTime": {
+                "__class__": "datetime",
+                "year": 2022,
+                "month": 6,
+                "day": 15,
+                "hour": 13,
+                "minute": 5,
+                "second": 45,
+                "microsecond": 753000
+            },
+            "InProgressInvalidationBatches": 0,
+            "DomainName": "dal78uzs60406.cloudfront.net",
+            "ActiveTrustedSigners": {
+                "Enabled": false,
+                "Quantity": 0
+            },
+            "ActiveTrustedKeyGroups": {
+                "Enabled": false,
+                "Quantity": 0
+            },
+            "DistributionConfig": {
+                "CallerReference": "terraform-20220614160821318100000001",
+                "Aliases": {
+                    "Quantity": 1,
+                    "Items": [
+                        "cftesting.ajsbx.stacklet.dev"
+                    ]
+                },
+                "DefaultRootObject": "index.html",
+                "Origins": {
+                    "Quantity": 1,
+                    "Items": [
+                        {
+                            "Id": "CloudFrontTestingOrigin",
+                            "DomainName": "cloudfront-testing20220614155949388400000001.s3.us-east-2.amazonaws.com",
+                            "OriginPath": "",
+                            "CustomHeaders": {
+                                "Quantity": 0
+                            },
+                            "S3OriginConfig": {
+                                "OriginAccessIdentity": ""
+                            },
+                            "ConnectionAttempts": 3,
+                            "ConnectionTimeout": 10,
+                            "OriginShield": {
+                                "Enabled": false
+                            }
+                        }
+                    ]
+                },
+                "OriginGroups": {
+                    "Quantity": 0
+                },
+                "DefaultCacheBehavior": {
+                    "TargetOriginId": "CloudFrontTestingOrigin",
+                    "TrustedSigners": {
+                        "Enabled": false,
+                        "Quantity": 0
+                    },
+                    "TrustedKeyGroups": {
+                        "Enabled": false,
+                        "Quantity": 0
+                    },
+                    "ViewerProtocolPolicy": "allow-all",
+                    "AllowedMethods": {
+                        "Quantity": 7,
+                        "Items": [
+                            "HEAD",
+                            "DELETE",
+                            "POST",
+                            "GET",
+                            "OPTIONS",
+                            "PUT",
+                            "PATCH"
+                        ],
+                        "CachedMethods": {
+                            "Quantity": 2,
+                            "Items": [
+                                "HEAD",
+                                "GET"
+                            ]
+                        }
+                    },
+                    "SmoothStreaming": false,
+                    "Compress": false,
+                    "LambdaFunctionAssociations": {
+                        "Quantity": 0
+                    },
+                    "FunctionAssociations": {
+                        "Quantity": 0
+                    },
+                    "FieldLevelEncryptionId": "",
+                    "ForwardedValues": {
+                        "QueryString": false,
+                        "Cookies": {
+                            "Forward": "none"
+                        },
+                        "Headers": {
+                            "Quantity": 0
+                        },
+                        "QueryStringCacheKeys": {
+                            "Quantity": 0
+                        }
+                    },
+                    "MinTTL": 0,
+                    "DefaultTTL": 3600,
+                    "MaxTTL": 86400
+                },
+                "CacheBehaviors": {
+                    "Quantity": 2,
+                    "Items": [
+                        {
+                            "PathPattern": "/content/immutable/*",
+                            "TargetOriginId": "CloudFrontTestingOrigin",
+                            "TrustedSigners": {
+                                "Enabled": false,
+                                "Quantity": 0
+                            },
+                            "TrustedKeyGroups": {
+                                "Enabled": false,
+                                "Quantity": 0
+                            },
+                            "ViewerProtocolPolicy": "redirect-to-https",
+                            "AllowedMethods": {
+                                "Quantity": 3,
+                                "Items": [
+                                    "HEAD",
+                                    "GET",
+                                    "OPTIONS"
+                                ],
+                                "CachedMethods": {
+                                    "Quantity": 3,
+                                    "Items": [
+                                        "HEAD",
+                                        "GET",
+                                        "OPTIONS"
+                                    ]
+                                }
+                            },
+                            "SmoothStreaming": false,
+                            "Compress": true,
+                            "LambdaFunctionAssociations": {
+                                "Quantity": 0
+                            },
+                            "FunctionAssociations": {
+                                "Quantity": 0
+                            },
+                            "FieldLevelEncryptionId": "",
+                            "ForwardedValues": {
+                                "QueryString": false,
+                                "Cookies": {
+                                    "Forward": "none"
+                                },
+                                "Headers": {
+                                    "Quantity": 1,
+                                    "Items": [
+                                        "Origin"
+                                    ]
+                                },
+                                "QueryStringCacheKeys": {
+                                    "Quantity": 0
+                                }
+                            },
+                            "MinTTL": 0,
+                            "DefaultTTL": 86400,
+                            "MaxTTL": 31536000
+                        },
+                        {
+                            "PathPattern": "/content/*",
+                            "TargetOriginId": "CloudFrontTestingOrigin",
+                            "TrustedSigners": {
+                                "Enabled": false,
+                                "Quantity": 0
+                            },
+                            "TrustedKeyGroups": {
+                                "Enabled": false,
+                                "Quantity": 0
+                            },
+                            "ViewerProtocolPolicy": "redirect-to-https",
+                            "AllowedMethods": {
+                                "Quantity": 3,
+                                "Items": [
+                                    "HEAD",
+                                    "GET",
+                                    "OPTIONS"
+                                ],
+                                "CachedMethods": {
+                                    "Quantity": 2,
+                                    "Items": [
+                                        "HEAD",
+                                        "GET"
+                                    ]
+                                }
+                            },
+                            "SmoothStreaming": false,
+                            "Compress": true,
+                            "LambdaFunctionAssociations": {
+                                "Quantity": 0
+                            },
+                            "FunctionAssociations": {
+                                "Quantity": 0
+                            },
+                            "FieldLevelEncryptionId": "",
+                            "ForwardedValues": {
+                                "QueryString": false,
+                                "Cookies": {
+                                    "Forward": "none"
+                                },
+                                "Headers": {
+                                    "Quantity": 0
+                                },
+                                "QueryStringCacheKeys": {
+                                    "Quantity": 0
+                                }
+                            },
+                            "MinTTL": 0,
+                            "DefaultTTL": 3600,
+                            "MaxTTL": 86400
+                        }
+                    ]
+                },
+                "CustomErrorResponses": {
+                    "Quantity": 0
+                },
+                "Comment": "",
+                "Logging": {
+                    "Enabled": false,
+                    "IncludeCookies": false,
+                    "Bucket": "",
+                    "Prefix": ""
+                },
+                "PriceClass": "PriceClass_200",
+                "Enabled": true,
+                "ViewerCertificate": {
+                    "CloudFrontDefaultCertificate": false,
+                    "ACMCertificateArn": "arn:aws:acm:us-east-1:644160558196:certificate/e72fac97-0663-46bd-9b4b-d140709955c0",
+                    "SSLSupportMethod": "sni-only",
+                    "MinimumProtocolVersion": "TLSv1.2_2018",
+                    "Certificate": "arn:aws:acm:us-east-1:644160558196:certificate/e72fac97-0663-46bd-9b4b-d140709955c0",
+                    "CertificateSource": "acm"
+                },
+                "Restrictions": {
+                    "GeoRestriction": {
+                        "RestrictionType": "whitelist",
+                        "Quantity": 1,
+                        "Items": [
+                            "US"
+                        ]
+                    }
+                },
+                "WebACLId": "",
+                "HttpVersion": "http2",
+                "IsIPV6Enabled": false
+            },
+            "AliasICPRecordals": [
+                {
+                    "CNAME": "cftesting.ajsbx.stacklet.dev",
+                    "ICPRecordalStatus": "APPROVED"
+                }
+            ]
+        }
+    }
+}

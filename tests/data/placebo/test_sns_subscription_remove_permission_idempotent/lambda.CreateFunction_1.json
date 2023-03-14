@@ -1,0 +1,30 @@
+{
+    "status_code": 201,
+    "data": {
+        "ResponseMetadata": {},
+        "FunctionName": "test-foo-bar",
+        "FunctionArn": "arn:aws:lambda:us-east-1:644160558196:function:test-foo-bar",
+        "Runtime": "python3.9",
+        "Role": "arn:aws:iam::644160558196:role/custodian-mu",
+        "Handler": "index.handler",
+        "CodeSize": 168,
+        "Description": "test",
+        "Timeout": 3,
+        "MemorySize": 128,
+        "LastModified": "2021-10-20T22:34:40.118+0000",
+        "CodeSha256": "vGPycvFY/krzGmxtrdge41pUwYXQ5jyzBfyVO53ockM=",
+        "Version": "19",
+        "VpcConfig": {
+            "SubnetIds": [],
+            "SecurityGroupIds": [],
+            "VpcId": ""
+        },
+        "TracingConfig": {
+            "Mode": "PassThrough"
+        },
+        "RevisionId": "b1aa8e7f-04ad-4541-855d-68d0f8fb2614",
+        "State": "Active",
+        "LastUpdateStatus": "Successful",
+        "PackageType": "Zip"
+    }
+}

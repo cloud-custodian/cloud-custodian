@@ -1,4 +1,3 @@
-# Copyright 2015-2018 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import logging
@@ -30,7 +29,7 @@ class FunctionAppUtilities:
         rg_name = ResourceIdParser.get_resource_group(id)
         name = ResourceIdParser.get_resource_name(id)
         client = local_session(Session).client('azure.mgmt.storage.StorageManagementClient')
-        obj = client.storage_accounts.list_keys(rg_name, name)
+        obj = client.storage_accounts.list_keys(rg_name, name, expand=None)
 
         connection_string = 'DefaultEndpointsProtocol={};AccountName={};AccountKey={}'.format(
             'https',
@@ -103,7 +102,7 @@ class FunctionAppUtilities:
 
         cls.log.info('Publishing Function application')
 
-        publish_creds = web_client.web_apps.list_publishing_credentials(
+        publish_creds = web_client.web_apps.begin_list_publishing_credentials(
             function_params.function_app['resource_group_name'],
             function_params.function_app['name']).result()
 

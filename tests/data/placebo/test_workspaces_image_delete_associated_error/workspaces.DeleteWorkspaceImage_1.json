@@ -1,0 +1,11 @@
+{
+    "status_code": 400,
+    "data": {
+        "Error": {
+            "Message": "One or more bundles are associated with the Image. Delete bundles associated with Image, and try again.",
+            "Code": "ResourceAssociatedException"
+        },
+        "ResponseMetadata": {},
+        "message": "One or more bundles are associated with the Image. Delete bundles associated with Image, and try again."
+    }
+}

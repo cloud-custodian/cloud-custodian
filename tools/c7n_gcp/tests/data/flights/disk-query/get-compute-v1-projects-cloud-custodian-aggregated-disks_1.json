@@ -1,0 +1,195 @@
+{
+  "body": {
+    "items": {
+      "zones/us-east1-b": {
+        "disks": [
+          {
+            "status": "READY", 
+            "kind": "compute#disk", 
+            "sizeGb": "10", 
+            "zone": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-east1-b", 
+            "creationTimestamp": "2017-05-01T12:34:32.960-07:00", 
+            "labelFingerprint": "42WmSpB8rSM=", 
+            "name": "custodian-dev", 
+            "sourceImageId": "6314006526179709993", 
+            "lastAttachTimestamp": "2017-05-01T12:34:33.013-07:00", 
+            "sourceImage": "https://www.googleapis.com/compute/v1/projects/ubuntu-os-cloud/global/images/ubuntu-1604-xenial-v20170330", 
+            "licenses": [
+              "https://www.googleapis.com/compute/v1/projects/ubuntu-os-cloud/global/licenses/ubuntu-1604-xenial"
+            ], 
+            "users": [
+              "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-east1-b/instances/custodian-dev"
+            ], 
+            "type": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-east1-b/diskTypes/pd-standard", 
+            "id": "1926261635889640234", 
+            "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-east1-b/disks/custodian-dev", 
+            "licenseCodes": [
+              "1000201"
+            ]
+          }
+        ]
+      }, 
+      "zones/us-east1-c": {
+        "disks": [
+          {
+            "status": "READY", 
+            "sourceSnapshot": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/snapshots/drone-upgrade", 
+            "kind": "compute#disk", 
+            "lastDetachTimestamp": "2017-11-01T03:25:07.913-07:00", 
+            "sizeGb": "32", 
+            "zone": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-east1-c", 
+            "creationTimestamp": "2017-06-06T10:38:28.664-07:00", 
+            "labelFingerprint": "42WmSpB8rSM=", 
+            "name": "drone-upgrade", 
+            "sourceSnapshotId": "613428358433954190", 
+            "lastAttachTimestamp": "2017-06-06T11:12:10.740-07:00", 
+            "licenses": [
+              "https://www.googleapis.com/compute/v1/projects/ubuntu-os-cloud/global/licenses/ubuntu-1404-trusty"
+            ], 
+            "type": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-east1-c/diskTypes/pd-standard", 
+            "id": "1094533144479749755", 
+            "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-east1-c/disks/drone-upgrade", 
+            "licenseCodes": [
+              "1000010"
+            ]
+          }
+        ]
+      }, 
+      "zones/us-east1-d": {
+        "disks": [
+          {
+            "status": "READY", 
+            "kind": "compute#disk", 
+            "sizeGb": "32", 
+            "zone": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-east1-d", 
+            "creationTimestamp": "2016-04-24T01:44:01.776-07:00", 
+            "labelFingerprint": "42WmSpB8rSM=", 
+            "name": "custodian", 
+            "sourceImageId": "3457333596235820605", 
+            "lastAttachTimestamp": "2016-04-24T01:44:01.968-07:00", 
+            "sourceImage": "https://www.googleapis.com/compute/v1/projects/ubuntu-os-cloud/global/images/ubuntu-1404-trusty-v20160406", 
+            "licenses": [
+              "https://www.googleapis.com/compute/v1/projects/ubuntu-os-cloud/global/licenses/ubuntu-1404-trusty"
+            ], 
+            "users": [
+              "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-east1-d/instances/custodian"
+            ], 
+            "type": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-east1-d/diskTypes/pd-ssd", 
+            "id": "3122444232979200446", 
+            "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-east1-d/disks/custodian", 
+            "licenseCodes": [
+              "1000010"
+            ]
+          }
+        ]
+      }, 
+      "zones/us-central1-b": {
+        "disks": [
+          {
+            "status": "READY", 
+            "sourceImageId": "6358156582333702971", 
+            "kind": "compute#disk", 
+            "sizeGb": "10", 
+            "zone": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-b", 
+            "creationTimestamp": "2018-05-19T05:15:46.031-07:00", 
+            "labelFingerprint": "42WmSpB8rSM=", 
+            "name": "c7n-jenkins", 
+            "guestOsFeatures": [
+              {
+                "type": "VIRTIO_SCSI_MULTIQUEUE"
+              }
+            ], 
+            "lastAttachTimestamp": "2018-05-19T05:15:46.034-07:00", 
+            "sourceImage": "https://www.googleapis.com/compute/v1/projects/ubuntu-os-cloud/global/images/ubuntu-1804-bionic-v20180426b", 
+            "licenses": [
+              "https://www.googleapis.com/compute/v1/projects/ubuntu-os-cloud/global/licenses/ubuntu-1804-lts"
+            ], 
+            "users": [
+              "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-b/instances/c7n-jenkins"
+            ], 
+            "type": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-b/diskTypes/pd-standard", 
+            "id": "2788076175605214111", 
+            "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-b/disks/c7n-jenkins", 
+            "licenseCodes": [
+              "5926592092274602096"
+            ]
+          }, 
+          {
+            "status": "READY", 
+            "sourceImageId": "6140086446928574013", 
+            "kind": "compute#disk", 
+            "sizeGb": "16", 
+            "zone": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-b", 
+            "creationTimestamp": "2017-11-01T03:28:50.900-07:00", 
+            "labelFingerprint": "42WmSpB8rSM=", 
+            "name": "drone", 
+            "guestOsFeatures": [
+              {
+                "type": "VIRTIO_SCSI_MULTIQUEUE"
+              }
+            ], 
+            "lastAttachTimestamp": "2017-11-01T03:28:50.905-07:00", 
+            "sourceImage": "https://www.googleapis.com/compute/v1/projects/ubuntu-os-cloud/global/images/ubuntu-1604-xenial-v20171026a", 
+            "licenses": [
+              "https://www.googleapis.com/compute/v1/projects/ubuntu-os-cloud/global/licenses/ubuntu-1604-xenial"
+            ], 
+            "users": [
+              "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-b/instances/drone"
+            ], 
+            "type": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-b/diskTypes/pd-standard", 
+            "id": "3901503733671141133", 
+            "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-b/disks/drone", 
+            "licenseCodes": [
+              "1000201"
+            ]
+          }, 
+          {
+            "status": "READY", 
+            "sourceSnapshot": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/snapshots/drone-11-1-2017", 
+            "kind": "compute#disk", 
+            "sizeGb": "32", 
+            "zone": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-b", 
+            "creationTimestamp": "2017-11-01T15:41:21.996-07:00", 
+            "labelFingerprint": "42WmSpB8rSM=", 
+            "name": "drone-11-1", 
+            "sourceSnapshotId": "8477034438227926918", 
+            "lastAttachTimestamp": "2017-11-01T15:44:11.961-07:00", 
+            "licenses": [
+              "https://www.googleapis.com/compute/v1/projects/ubuntu-os-cloud/global/licenses/ubuntu-1404-trusty"
+            ], 
+            "users": [
+              "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-b/instances/drone"
+            ], 
+            "type": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-b/diskTypes/pd-standard", 
+            "id": "1699933321994695550", 
+            "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-b/disks/drone-11-1", 
+            "licenseCodes": [
+              "1000010"
+            ]
+          }
+        ]
+      }
+    }, 
+    "kind": "compute#diskAggregatedList", 
+    "id": "projects/cloud-custodian/aggregated/disks", 
+    "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/aggregated/disks"
+  }, 
+  "headers": {
+    "status": "200", 
+    "content-length": "22751", 
+    "x-xss-protection": "1; mode=block", 
+    "content-location": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/aggregated/disks?alt=json", 
+    "x-content-type-options": "nosniff", 
+    "transfer-encoding": "chunked", 
+    "expires": "Sun, 10 Jun 2018 20:22:30 GMT", 
+    "vary": "Origin, X-Origin", 
+    "server": "GSE", 
+    "-content-encoding": "gzip", 
+    "etag": "\"yay389txgTJduYPDAjXcgfa2Zuk=/yIfuZ7QVFgm7ygo50kqi8wE78l8=\"", 
+    "cache-control": "private, max-age=0, must-revalidate, no-transform", 
+    "date": "Sun, 10 Jun 2018 20:22:30 GMT", 
+    "x-frame-options": "SAMEORIGIN", 
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"43,42,41,39,35\"", 
+    "content-type": "application/json; charset=UTF-8"
+  }
+}

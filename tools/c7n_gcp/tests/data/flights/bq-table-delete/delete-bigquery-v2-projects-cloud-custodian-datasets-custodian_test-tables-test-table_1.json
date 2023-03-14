@@ -1,0 +1,14 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Tue, 28 Feb 2023 20:28:04 GMT",
+    "server": "ESF",
+    "content-length": "0",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "status": "204"
+  },
+  "body": {}
+}

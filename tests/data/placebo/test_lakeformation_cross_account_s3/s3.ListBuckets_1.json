@@ -1,0 +1,51 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Buckets": [
+            {
+                "Name": "amazon-connect-7b72f995fb2d",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 7,
+                    "day": 29,
+                    "hour": 17,
+                    "minute": 28,
+                    "second": 9,
+                    "microsecond": 0
+                }
+            },
+            {
+                "Name": "nicnoc-logs",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 4,
+                    "day": 18,
+                    "hour": 11,
+                    "minute": 12,
+                    "second": 45,
+                    "microsecond": 0
+                }
+            },
+            {
+                "Name": "reboot-s3-bad-01",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 7,
+                    "day": 25,
+                    "hour": 18,
+                    "minute": 45,
+                    "second": 26,
+                    "microsecond": 0
+                }
+            }
+        ],
+        "Owner": {
+            "DisplayName": "mandeep.bal",
+            "ID": "e7c8bb65a5fc49cf906715eae09de9e4bb7861a96361ba79b833aa45f6833b15"
+        }
+    }
+}

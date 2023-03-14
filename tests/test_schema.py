@@ -1,4 +1,3 @@
-# Copyright 2016-2017 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import mock
@@ -73,6 +72,14 @@ class StructureParserTest(BaseTest):
                 'name': 'foo', 'resource': 'ec2', 'actions': [[]]}]})
         self.assertTrue(str(ecm.exception).startswith(
             'policy:foo action must be a mapping/dict found:list'))
+
+    def test_null_actions(self):
+        p = StructureParser()
+        p.validate({'policies': [{'name': 'foo', 'resource': 'ec2', 'actions': None}]})
+
+    def test_null_filters(self):
+        p = StructureParser()
+        p.validate({'policies': [{'name': 'foo', 'resource': 'ec2', 'filters': None}]})
 
     def test_invalid_filter(self):
         p = StructureParser()
@@ -298,7 +305,17 @@ class SchemaTest(BaseTest):
 
     def test_metadata(self):
         data = {
-            "policies": [{"name": "test", "resource": "ec2", "metadata": {"createdBy": "Totoro"}}],
+            "policies": [
+                {
+                    "name": "object_test",
+                    "resource": "ec2",
+                    "metadata": {
+                        "createdBy": "Totoro",
+                        "version": 1988,
+                        "relatedTo": ['Ghibli', 'Classic', 'Miyazaki']
+                    }
+                }
+            ],
         }
         load_resources(('aws.ec2',))
         validator = self.get_validator(data)

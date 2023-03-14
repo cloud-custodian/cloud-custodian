@@ -1,6 +1,6 @@
-# Copyright 2018 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+from azure.mgmt.compute.models import HardwareProfile, VirtualMachineUpdate
 from c7n_azure.actions.base import AzureBaseAction
 from c7n_azure.provider import resources
 from c7n_azure.resources.arm import ArmResourceManager
@@ -57,12 +57,31 @@ class VirtualMachine(ArmResourceManager):
 
     :example:
 
+    Resize specific VM by name
+
+    .. code-block:: yaml
+
+        policies:
+          - name: resize-vm
+            resource: azure.vm
+            filters:
+              - type: value
+                key: name
+                op: eq
+                value_type: normalize
+                value: fake_vm_name
+            actions:
+              - type: resize
+                vmSize: Standard_A2_v2
+
+    :example:
+
     Delete specific VM by name
 
     .. code-block:: yaml
 
         policies:
-          - name: stop-running-vms
+          - name: delete-vm
             resource: azure.vm
             filters:
               - type: value
@@ -147,7 +166,6 @@ class VirtualMachine(ArmResourceManager):
 @VirtualMachine.filter_registry.register('instance-view')
 class InstanceViewFilter(ValueFilter):
     schema = type_schema('instance-view', rinherit=ValueFilter.schema)
-    schema_alias = True
 
     def __call__(self, i):
         if 'instanceView' not in i:
@@ -160,6 +178,87 @@ class InstanceViewFilter(ValueFilter):
             i['instanceView'] = instance.serialize()
 
         return super(InstanceViewFilter, self).__call__(i['instanceView'])
+
+
+@VirtualMachine.filter_registry.register('vm-extensions')
+class VMExtensionsFilter(ValueFilter):
+    """
+        Provides a value filter targetting the virtual machine
+        extensions array.  Requires an additional API call per
+        virtual machine to retrieve the extensions.
+
+        Here is an example of the data returned:
+
+        .. code-block:: json
+
+          [{
+            "id": "/subscriptions/...",
+            "name": "CustomScript",
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "location": "centralus",
+            "properties": {
+              "publisher": "Microsoft.Azure.Extensions",
+              "type": "CustomScript",
+              "typeHandlerVersion": "2.0",
+              "autoUpgradeMinorVersion": true,
+              "settings": {
+                "fileUris": []
+              },
+              "provisioningState": "Succeeded"
+            }
+          }]
+
+        :examples:
+
+        Find VM's with Custom Script extensions
+
+        .. code-block:: yaml
+
+            policies:
+              - name: vm-with-customscript
+                description: |
+                  Find all virtual machines with a custom
+                  script extension installed.
+                resource: azure.vm
+                filters:
+                  - type: vm-extensions
+                    op: in
+                    key: "[].properties.type"
+                    value: CustomScript
+                    value_type: swap
+
+
+        Find VM's without the OMS agent installed
+
+        .. code-block:: yaml
+
+            policies:
+              - name: vm-without-oms
+                description: |
+                  Find all virtual machines without the
+                  OMS agent installed.
+                resource: azure.vm
+                filters:
+                  - type: vm-extensions
+                    op: not-in
+                    key: "[].properties.type"
+                    value: OmsAgentForLinux
+                    value_type: swap
+
+        """
+    schema = type_schema('vm-extensions', rinherit=ValueFilter.schema)
+    annotate = False  # cannot annotate arrays
+
+    def __call__(self, i):
+        if 'c7n:vm-extensions' not in i:
+            client = self.manager.get_client()
+            extensions = (
+                client.virtual_machine_extensions
+                .list(i['resourceGroup'], i['name'])
+            )
+            i['c7n:vm-extensions'] = [e.serialize(True) for e in extensions.value]
+
+        return super(VMExtensionsFilter, self).__call__(i['c7n:vm-extensions'])
 
 
 @VirtualMachine.filter_registry.register('network-interface')
@@ -180,7 +279,7 @@ class VmPowerOffAction(AzureBaseAction):
         self.client = self.manager.get_client()
 
     def _process_resource(self, resource):
-        self.client.virtual_machines.power_off(resource['resourceGroup'], resource['name'])
+        self.client.virtual_machines.begin_power_off(resource['resourceGroup'], resource['name'])
 
 
 @VirtualMachine.action_registry.register('stop')
@@ -192,7 +291,7 @@ class VmStopAction(AzureBaseAction):
         self.client = self.manager.get_client()
 
     def _process_resource(self, resource):
-        self.client.virtual_machines.deallocate(resource['resourceGroup'], resource['name'])
+        self.client.virtual_machines.begin_deallocate(resource['resourceGroup'], resource['name'])
 
 
 @VirtualMachine.action_registry.register('start')
@@ -204,7 +303,7 @@ class VmStartAction(AzureBaseAction):
         self.client = self.manager.get_client()
 
     def _process_resource(self, resource):
-        self.client.virtual_machines.start(resource['resourceGroup'], resource['name'])
+        self.client.virtual_machines.begin_start(resource['resourceGroup'], resource['name'])
 
 
 @VirtualMachine.action_registry.register('restart')
@@ -216,4 +315,53 @@ class VmRestartAction(AzureBaseAction):
         self.client = self.manager.get_client()
 
     def _process_resource(self, resource):
-        self.client.virtual_machines.restart(resource['resourceGroup'], resource['name'])
+        self.client.virtual_machines.begin_restart(resource['resourceGroup'], resource['name'])
+
+
+@VirtualMachine.action_registry.register('resize')
+class VmResizeAction(AzureBaseAction):
+
+    """Change a VM's size
+
+    :example:
+
+    Resize specific VM by name
+
+    .. code-block:: yaml
+
+        policies:
+          - name: resize-vm
+            resource: azure.vm
+            filters:
+              - type: value
+                key: name
+                op: eq
+                value_type: normalize
+                value: fake_vm_name
+            actions:
+              - type: resize
+                vmSize: Standard_A2_v2
+    """
+
+    schema = type_schema(
+        'resize',
+        required=['vmSize'],
+        **{
+            'vmSize': {'type': 'string'}
+        })
+
+    def __init__(self, data, manager=None):
+        super(VmResizeAction, self).__init__(data, manager)
+        self.vm_size = self.data['vmSize']
+
+    def _prepare_processing(self):
+        self.client = self.manager.get_client()
+
+    def _process_resource(self, resource):
+        hardware_profile = HardwareProfile(vm_size=self.vm_size)
+
+        self.client.virtual_machines.begin_update(
+            resource['resourceGroup'],
+            resource['name'],
+            VirtualMachineUpdate(hardware_profile=hardware_profile)
+        )

@@ -1,0 +1,61 @@
+{
+    "status_code": 200,
+    "data": {
+        "DBSnapshot": {
+            "DBSnapshotIdentifier": "this-one-is-manual",
+            "DBInstanceIdentifier": "c7n-test",
+            "SnapshotCreateTime": {
+                "__class__": "datetime",
+                "year": 2022,
+                "month": 10,
+                "day": 24,
+                "hour": 21,
+                "minute": 6,
+                "second": 14,
+                "microsecond": 883000
+            },
+            "Engine": "postgres",
+            "AllocatedStorage": 30,
+            "Status": "deleted",
+            "Port": 5432,
+            "AvailabilityZone": "us-east-2c",
+            "VpcId": "vpc-06fbfb0683669c546",
+            "InstanceCreateTime": {
+                "__class__": "datetime",
+                "year": 2022,
+                "month": 3,
+                "day": 12,
+                "hour": 16,
+                "minute": 11,
+                "second": 4,
+                "microsecond": 358000
+            },
+            "MasterUsername": "root",
+            "EngineVersion": "13.4",
+            "LicenseModel": "postgresql-license",
+            "SnapshotType": "manual",
+            "OptionGroupName": "default:postgres-13",
+            "PercentProgress": 100,
+            "StorageType": "gp2",
+            "Encrypted": true,
+            "KmsKeyId": "arn:aws:kms:us-east-2:644160558196:key/dd462ea7-52bc-4818-8f97-7d4cbbe95073",
+            "DBSnapshotArn": "arn:aws:rds:us-east-2:644160558196:snapshot:this-one-is-manual",
+            "IAMDatabaseAuthenticationEnabled": true,
+            "ProcessorFeatures": [],
+            "DbiResourceId": "db-GV4PVF2U7EQCCJP43MJHX4DLTY",
+            "TagList": [],
+            "OriginalSnapshotCreateTime": {
+                "__class__": "datetime",
+                "year": 2022,
+                "month": 10,
+                "day": 24,
+                "hour": 21,
+                "minute": 6,
+                "second": 14,
+                "microsecond": 883000
+            },
+            "SnapshotTarget": "region"
+        },
+        "ResponseMetadata": {}
+    }
+}

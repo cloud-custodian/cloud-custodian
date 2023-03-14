@@ -1,4 +1,3 @@
-# Copyright 2019 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 from c7n.utils import type_schema
@@ -25,6 +24,9 @@ class SpannerInstance(QueryResourceManager):
         labels = True
         labels_op = 'patch'
         asset_type = "spanner.googleapis.com/Instance"
+        metric_key = "resource.labels.instance_id"
+        urn_component = "instance"
+        urn_id_segments = (-1,)  # Just use the last segment of the id in the URN
 
         @staticmethod
         def get(client, resource_info):
@@ -141,6 +143,8 @@ class SpannerDatabaseInstance(ChildResourceManager):
         }
         default_report_fields = ["name", "state", "createTime"]
         asset_type = "spanner.googleapis.com/Database"
+        urn_component = "database"
+        urn_id_segments = (3, 5)
 
         @staticmethod
         def get(client, resource_info):

@@ -1,0 +1,31 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Tue, 11 Feb 2020 21:36:01 GMT",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"46,43\",h3-Q050=\":443\"; ma=2592000,h3-Q049=\":443\"; ma=2592000,h3-Q048=\":443\"; ma=2592000,h3-Q046=\":443\"; ma=2592000,h3-Q043=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "447",
+    "-content-encoding": "gzip",
+    "content-location": "https://logging.googleapis.com/v2/projects/cloud-custodian/sinks?alt=json"
+  },
+  "body": {
+    "sinks": [
+      {
+        "name": "test-sink",
+        "destination": "pubsub.googleapis.com/projects/cloud-custodian/topics/test-topis",
+        "filter": "resource.type=\"audited_resource\"",
+        "outputVersionFormat": "V2",
+        "writerIdentity": "serviceAccount:p816418388060-429082@gcp-sa-logging.iam.gserviceaccount.com",
+        "createTime": "2020-02-11T21:35:50.179603509Z",
+        "updateTime": "2020-02-11T21:35:50.179603509Z"
+      }
+    ]
+  }
+}

@@ -1,0 +1,10 @@
+{
+    "status_code": 400,
+    "data": {
+        "Error": {
+            "Message": "User: arn:aws:sts::644160558196:assumed-role/custodian-readonly/botocore-session-1621534440 is not authorized to perform: kms:DescribeKey on resource: arn:aws:kms:us-west-1:644160558196:key/d01ee9b3-ce85-4622-8e1c-ce85b8cdc89d",
+            "Code": "AccessDeniedException"
+        },
+        "ResponseMetadata": {}
+    }
+}

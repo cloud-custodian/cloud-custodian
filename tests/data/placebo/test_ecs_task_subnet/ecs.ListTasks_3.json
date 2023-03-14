@@ -1,0 +1,10 @@
+{
+    "status_code": 200,
+    "data": {
+        "taskArns": [
+            "arn:aws:ecs:us-east-1:644160558196:task/c7n-fargate-test/575e66d2c7814af6aab4d3ec8ab58dab",
+            "arn:aws:ecs:us-east-1:644160558196:task/c7n-fargate-test/ab3791544fcc4bd2a501edb673f037f6"
+        ],
+        "ResponseMetadata": {}
+    }
+}

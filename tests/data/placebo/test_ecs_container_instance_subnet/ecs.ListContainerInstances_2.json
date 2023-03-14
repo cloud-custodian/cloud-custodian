@@ -1,0 +1,10 @@
+{
+    "status_code": 200,
+    "data": {
+        "containerInstanceArns": [
+            "arn:aws:ecs:us-east-1:644160558196:container-instance/default-cluster/0166d24fdd304b0abb377be45b1d509e",
+            "arn:aws:ecs:us-east-1:644160558196:container-instance/default-cluster/98039d2e644c4181b686519d1d5cd8b8"
+        ],
+        "ResponseMetadata": {}
+    }
+}

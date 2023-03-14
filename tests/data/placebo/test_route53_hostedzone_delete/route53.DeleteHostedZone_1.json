@@ -1,20 +1,11 @@
 {
-    "status_code": 200,
+    "status_code": 400,
     "data": {
-        "ResponseMetadata": {},
-        "ChangeInfo": {
-            "Id": "/change/C06133283QKVQ2NAYHV9D",
-            "Status": "PENDING",
-            "SubmittedAt": {
-                "__class__": "datetime",
-                "year": 2020,
-                "month": 9,
-                "day": 16,
-                "hour": 14,
-                "minute": 7,
-                "second": 48,
-                "microsecond": 171000
-            }
-        }
+        "Error": {
+            "Message": "The specified hosted zone contains non-required resource record sets  and so cannot be deleted.",
+            "Code": "HostedZoneNotEmpty",
+            "Type": "Sender"
+        },
+        "ResponseMetadata": {}
     }
 }

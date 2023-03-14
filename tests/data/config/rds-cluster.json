@@ -1,0 +1,43 @@
+{
+    "configurationItems": [
+        {
+            "version": "1.3",
+            "accountId": "644160558196",
+            "configurationItemCaptureTime": "2020-11-02T03:28:12.399000-05:00",
+            "configurationItemStatus": "OK",
+            "configurationStateId": "1604305692399",
+            "configurationItemMD5Hash": "",
+            "arn": "arn:aws:rds:us-east-1:644160558196:cluster:database-1",
+            "resourceType": "AWS::RDS::DBCluster",
+            "resourceId": "cluster-NCSP75A6Z36KOFQRT4SDHYMS3I",
+            "resourceName": "database-1",
+            "awsRegion": "us-east-1",
+            "availabilityZone": "Multiple Availability Zones",
+            "resourceCreationTime": "2020-10-20T11:53:59.560000-04:00",
+            "tags": {
+                "ASV": "ASVMCNASTY",
+                "Owner": "Mc-Mcslice",
+                "ResourceCreator": "john-hillegass",
+                "c7n-ResourceCreatedTime": "2020-10-20 15:52:44.809783",
+                "c7n-resource-classification": "net-new"
+            },
+            "relatedEvents": [],
+            "relationships": [
+                {
+                    "resourceType": "AWS::EC2::SecurityGroup",
+                    "resourceId": "sg-6c7fa917",
+                    "relationshipName": "Is associated with "
+                },
+                {
+                    "resourceType": "AWS::RDS::DBSubnetGroup",
+                    "resourceName": "default",
+                    "relationshipName": "Is associated with "
+                }
+            ],
+            "configuration": "{\"allocatedStorage\":1,\"availabilityZones\":[\"us-east-1d\",\"us-east-1a\",\"us-east-1b\"],\"backupRetentionPeriod\":7,\"databaseName\":\"\",\"status\":\"available\",\"endpoint\":\"database-1.cluster-cz6wy8cci3uf.us-east-1.rds.amazonaws.com\",\"customEndpoints\":[],\"multiAZ\":false,\"engine\":\"aurora-postgresql\",\"engineVersion\":\"10.12\",\"port\":5432,\"masterUsername\":\"postgres\",\"preferredBackupWindow\":\"07:08-07:38\",\"preferredMaintenanceWindow\":\"wed:05:38-wed:06:08\",\"readReplicaIdentifiers\":[],\"vpcSecurityGroups\":[{\"vpcSecurityGroupId\":\"sg-6c7fa917\",\"status\":\"active\"}],\"hostedZoneId\":\"Z2R2ITUGPM61AM\",\"storageEncrypted\":true,\"kmsKeyId\":\"arn:aws:kms:us-east-1:644160558196:key/b10f842a-feb7-4318-92d5-0640a75b7688\",\"dbClusterResourceId\":\"cluster-NCSP75A6Z36KOFQRT4SDHYMS3I\",\"associatedRoles\":[],\"clusterCreateTime\":1603209239560,\"enabledCloudwatchLogsExports\":[],\"capacity\":2,\"engineMode\":\"serverless\",\"scalingConfigurationInfo\":{\"minCapacity\":2,\"maxCapacity\":2,\"autoPause\":false,\"secondsUntilAutoPause\":300,\"timeoutAction\":\"RollbackCapacityChange\"},\"deletionProtection\":false,\"httpEndpointEnabled\":false,\"activityStreamStatus\":\"stopped\",\"copyTagsToSnapshot\":true,\"crossAccountClone\":false,\"domainMemberships\":[],\"tagList\":[{\"key\":\"c7n-resource-classification\",\"value\":\"net-new\"},{\"key\":\"Owner\",\"value\":\"Mc-Mcslice\"},{\"key\":\"ASV\",\"value\":\"ASVMCNASTY\"},{\"key\":\"ResourceCreator\",\"value\":\"john-hillegass\"},{\"key\":\"c7n-ResourceCreatedTime\",\"value\":\"2020-10-20 15:52:44.809783\"}],\"dbclusterIdentifier\":\"database-1\",\"dbclusterParameterGroup\":\"default.aurora-postgresql10\",\"dbsubnetGroup\":\"default\",\"dbclusterOptionGroupMemberships\":[],\"dbclusterMembers\":[],\"dbclusterArn\":\"arn:aws:rds:us-east-1:644160558196:cluster:database-1\",\"iamdatabaseAuthenticationEnabled\":false}",
+            "supplementaryConfiguration": {
+                "Tags": "[{\"key\":\"c7n-resource-classification\",\"value\":\"net-new\"},{\"key\":\"Owner\",\"value\":\"Mc-Mcslice\"},{\"key\":\"ASV\",\"value\":\"ASVMCNASTY\"},{\"key\":\"ResourceCreator\",\"value\":\"john-hillegass\"},{\"key\":\"c7n-ResourceCreatedTime\",\"value\":\"2020-10-20 15:52:44.809783\"}]"
+            }
+        }
+    ]
+}

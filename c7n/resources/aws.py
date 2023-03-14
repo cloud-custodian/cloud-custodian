@@ -1,4 +1,3 @@
-# Copyright 2018 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
@@ -12,10 +11,14 @@ import itertools
 import logging
 import os
 import operator
+import socket
 import sys
 import time
 import threading
 import traceback
+from urllib import parse as urlparse
+from urllib.request import urlopen, Request
+from urllib.error import HTTPError, URLError
 
 import boto3
 
@@ -24,8 +27,9 @@ from boto3.s3.transfer import S3Transfer
 
 from c7n.credentials import SessionFactory
 from c7n.config import Bag
-from c7n.exceptions import PolicyValidationError
+from c7n.exceptions import InvalidOutputConfig, PolicyValidationError
 from c7n.log import CloudWatchLogHandler
+from c7n.utils import parse_url_config, backoff_delays
 
 from .resource_map import ResourceMap
 
@@ -114,6 +118,34 @@ def _default_account_id(options):
         options.account_id = None
 
 
+def _default_bucket_region(options):
+    # modify options to format s3 output urls with explicit region.
+    if not options.output_dir.startswith('s3://'):
+        return
+
+    parsed = urlparse.urlparse(options.output_dir)
+    s3_conf = parse_url_config(options.output_dir)
+    if parsed.query and s3_conf.get("region"):
+        return
+
+    # s3 clients default to us-east-1 if no region is specified, but for partition
+    # support we default to using a passed in region if given.
+    region = None
+    if options.regions:
+        region = options.regions[0]
+
+    # we're operating pre the expansion of symbolic name all into actual regions.
+    if region == "all":
+        region = None
+
+    try:
+        options.output_dir = get_bucket_url_with_region(options.output_dir, region)
+    except ValueError as err:
+        invalid_output = InvalidOutputConfig(str(err))
+        invalid_output.__suppress_context__ = True
+        raise invalid_output
+
+
 def shape_validate(params, shape_name, service):
     session = fake_session()._session
     model = session.get_service_model(service)
@@ -122,6 +154,126 @@ def shape_validate(params, shape_name, service):
     report = validator.validate(params, shape)
     if report.has_errors():
         raise PolicyValidationError(report.generate_report())
+
+
+def get_bucket_url_with_region(bucket_url, region):
+    parsed = urlparse.urlparse(bucket_url)
+    s3_conf = parse_url_config(bucket_url)
+    params = {}
+    if region:
+        params['region_name'] = region
+
+    client = boto3.client('s3', **params)
+    region = inspect_bucket_region(s3_conf.netloc, client.meta.endpoint_url)
+    if not region:
+        raise ValueError(f"could not determine region for output bucket, use explicit ?region=region_name. {s3_conf.url}")  # noqa
+    query = f"region={region}"
+    if parsed.query:
+        query = parsed.query + f"&region={region}"
+    parts = list(parsed)
+    parts[4] = query
+    return urlparse.urlunparse(parts)
+
+
+def inspect_bucket_region(bucket, s3_endpoint, allow_public=False):
+    """Attempt to determine a bucket region without a client
+
+    We can make an unauthenticated HTTP HEAD request to S3 in an attempt to find a bucket's
+    region. This avoids some issues with cross-account/cross-region uses of the
+    GetBucketLocation or HeadBucket API action. Because bucket names are unique within
+    AWS partitions, we can make requests to a single regional S3 endpoint
+    and get redirected if a bucket lives in another region within the
+    same partition.
+
+    This approach is inspired by some sample code from a Go SDK issue comment,
+    which @sean-zou mentioned in #7593:
+
+    https://github.com/aws/aws-sdk-go/issues/720#issuecomment-613038544
+
+    Return a region string, or None if we're unable to determine one.
+    """
+    region = None
+    s3_endpoint_parts = urlparse.urlparse(s3_endpoint)
+    # Use a "path-style" S3 URL here to avoid failing TLS certificate validation
+    # on buckets with a dot in the name.
+    #
+    # According to the following blog post, before deprecating path-style
+    # URLs AWS will provide a way for virtual-hosted-style URLs to handle
+    # buckets with dots in their names. Using path-style URLs here in
+    # the meantime seems reasonable, compared to alternatives like forcing
+    # HTTP or ignoring certificate validation.
+    #
+    # https://aws.amazon.com/blogs/aws/amazon-s3-path-deprecation-plan-the-rest-of-the-story/
+    bucket_endpoint = f'https://{s3_endpoint_parts.netloc}/{bucket}'
+    request = Request(bucket_endpoint, method='HEAD')
+    try:
+        # For private buckets the head request will always raise an
+        # http error, the status code and response headers provide
+        # context for where the bucket is. For public buckets we
+        # default to raising an exception as unsuitable location at
+        # least for the output use case.
+        #
+        # Dynamic use of urllib trips up static analyzers because of
+        # the potential to accidentally allow unexpected schemes like
+        # file:/. Here we're hardcoding the https scheme, so we can
+        # ignore those specific checks.
+        #
+        # nosemgrep: python.lang.security.audit.dynamic-urllib-use-detected.dynamic-urllib-use-detected # noqa
+        response = url_socket_retry(urlopen, request)  # nosec B310
+        # Successful response indicates a public accessible bucket in the same region
+        region = response.headers.get('x-amz-bucket-region')
+
+        if not allow_public:
+            raise ValueError("bucket: '{bucket}' is publicly accessible")
+    except HTTPError as err:
+        # Returns 404 'Not Found' for buckets that don't exist
+        if err.status == 404:
+            raise ValueError(f"bucket '{bucket}' does not exist")
+        # Permission errors (403) or redirects (301) for valid buckets
+        # should still contain a header we can use to determine the
+        # bucket region. Permission errors are indicative of correct
+        # region, while redirects are for cross region.
+        region = err.headers.get('x-amz-bucket-region')
+
+    return region
+
+
+def url_socket_retry(func, *args, **kw):
+    """retry a urllib operation in the event of certain errors.
+
+    we want to retry on some common issues for cases where we are
+    connecting through an intermediary proxy or where the downstream
+    is overloaded.
+
+    socket errors
+     - 104 - Connection reset by peer
+     - 110 - Connection timed out
+
+    http errors
+     - 503 - Slow Down | Service Unavailable
+    """
+    min_delay = 1
+    max_delay = 32
+    max_attempts = 4
+
+    for idx, delay in enumerate(
+            backoff_delays(min_delay, max_delay, jitter=True)):
+        try:
+            return func(*args, **kw)
+        except HTTPError as err:
+            if not (err.status == 503 and 'Slow Down' in err.reason):
+                raise
+            if idx == max_attempts - 1:
+                raise
+        except URLError as err:
+            if not isinstance(err.reason, socket.error):
+                raise
+            if err.reason.errno not in (104, 110):
+                raise
+            if idx == max_attempts - 1:
+                raise
+
+        time.sleep(delay)
 
 
 class Arn(namedtuple('_Arn', (
@@ -142,9 +294,11 @@ class Arn(namedtuple('_Arn', (
 
     @classmethod
     def parse(cls, arn):
+        if isinstance(arn, Arn):
+            return arn
         parts = arn.split(':', 5)
         # a few resources use qualifiers without specifying type
-        if parts[2] in ('s3', 'apigateway', 'execute-api'):
+        if parts[2] in ('s3', 'apigateway', 'execute-api', 'emr-serverless'):
             parts.append(None)
             parts.append(None)
         elif '/' in parts[-1]:
@@ -153,6 +307,11 @@ class Arn(namedtuple('_Arn', (
         elif ':' in parts[-1]:
             parts.extend(reversed(parts.pop(-1).split(':', 1)))
             parts.append(':')
+        elif len(parts) == 6:
+            parts.append('')
+            parts.append('')
+        # replace the literal 'arn' string with raw arn
+        parts[0] = arn
         return cls(*parts)
 
 
@@ -161,8 +320,36 @@ class ArnResolver:
     def __init__(self, manager):
         self.manager = manager
 
+    def resolve(self, arns):
+        arns = map(Arn.parse, arns)
+        a_service = operator.attrgetter('service')
+        a_resource = operator.attrgetter('resource_type')
+        kfunc = lambda a: (a_service(a), a_resource(a))  # noqa
+        arns = sorted(arns, key=kfunc)
+        results = {}
+        for (service, arn_type), arn_set in itertools.groupby(arns, key=kfunc):
+            arn_set = list(arn_set)
+            rtype = ArnResolver.resolve_type(arn_set[0])
+            rmanager = self.manager.get_resource_manager(rtype)
+            if rtype == 'sns':
+                resources = rmanager.get_resources(
+                    [rarn.arn for rarn in arn_set])
+            else:
+                resources = rmanager.get_resources(
+                    [rarn.resource for rarn in arn_set])
+            for rarn, r in zip(rmanager.get_arns(resources), resources):
+                results[rarn] = r
+
+            for rarn in arn_set:
+                if rarn.arn not in results:
+                    results[rarn.arn] = None
+        return results
+
     @staticmethod
     def resolve_type(arn):
+        arn = Arn.parse(arn)
+
+        # this would benefit from a class cache {service} -> rtypes
         for type_name, klass in AWS.resources.items():
             if type_name in ('rest-account', 'account') or klass.resource_type.arn is False:
                 continue
@@ -174,6 +361,9 @@ class ArnResolver:
                 return type_name
             elif (klass.resource_type.arn_type is not None and
                     klass.resource_type.arn_type == arn.resource_type):
+                return type_name
+            elif (klass.resource_type.arn_service == arn.service and
+                    klass.resource_type.arn_type == ""):
                 return type_name
 
 
@@ -497,9 +687,16 @@ class S3Output(BlobOutput):
 
     def __init__(self, ctx, config):
         super().__init__(ctx, config)
-        # can't use a local session as we dont want an unassumed session cached.
-        self.transfer = S3Transfer(
-            self.ctx.session_factory(assume=False).client('s3'))
+        self._transfer = None
+
+    @property
+    def transfer(self):
+        if self._transfer:
+            return self._transfer
+        bucket_region = self.config.region or None
+        self._transfer = S3Transfer(
+            self.ctx.session_factory(region=bucket_region, assume=False).client('s3'))
+        return self._transfer
 
     def upload_file(self, path, key):
         self.transfer.upload_file(
@@ -524,9 +721,10 @@ class AWS(Provider):
         """
         _default_region(options)
         _default_account_id(options)
+        _default_bucket_region(options)
+
         if options.tracer and options.tracer.startswith('xray') and HAVE_XRAY:
             XrayTracer.initialize(utils.parse_url_config(options.tracer))
-
         return options
 
     def get_session_factory(self, options):
@@ -551,7 +749,7 @@ class AWS(Provider):
         from c7n.policy import Policy, PolicyCollection
         policies = []
         service_region_map, resource_service_map = get_service_region_map(
-            options.regions, policy_collection.resource_types)
+            options.regions, policy_collection.resource_types, self.type)
         if 'all' in options.regions:
             enabled_regions = {
                 r['RegionName'] for r in
@@ -614,26 +812,25 @@ def join_output(output_dir, suffix):
 
 
 def fake_session():
-    session = boto3.Session(
+    session = boto3.Session(  # nosec nosemgrep
         region_name='us-east-1',
         aws_access_key_id='never',
         aws_secret_access_key='found')
     return session
 
 
-def get_service_region_map(regions, resource_types):
+def get_service_region_map(regions, resource_types, provider='aws'):
     # we're not interacting with the apis just using the sdk meta information.
 
     session = fake_session()
     normalized_types = []
     for r in resource_types:
-        if r.startswith('aws.'):
-            normalized_types.append(r[4:])
+        if r.startswith('%s.' % provider):
+            normalized_types.append(r[len(provider) + 1:])
         else:
             normalized_types.append(r)
-
     resource_service_map = {
-        r: clouds['aws'].resources.get(r).resource_type.service
+        r: clouds[provider].resources.get(r).resource_type.service
         for r in normalized_types if r != 'account'}
     # support for govcloud and china, we only utilize these regions if they
     # are explicitly passed in on the cli.

@@ -10,13 +10,20 @@
                 "PendingModifiedValues": {},
                 "MemberClusters": [
                     "c7n-delete-0001-001",
-                    "c7n-delete-0001-002"
+                    "c7n-delete-0001-002",
+                    "c7n-delete-0001-003",
+                    "c7n-delete-0002-001",
+                    "c7n-delete-0002-002",
+                    "c7n-delete-0002-003",
+                    "c7n-delete-0003-001",
+                    "c7n-delete-0003-002",
+                    "c7n-delete-0003-003"
                 ],
                 "NodeGroups": [
                     {
                         "NodeGroupId": "0001",
                         "Status": "available",
-                        "Slots": "0-16383",
+                        "Slots": "0-5461",
                         "NodeGroupMembers": [
                             {
                                 "CacheClusterId": "c7n-delete-0001-001",
@@ -26,24 +33,75 @@
                             {
                                 "CacheClusterId": "c7n-delete-0001-002",
                                 "CacheNodeId": "0001",
+                                "PreferredAvailabilityZone": "us-east-1a"
+                            },
+                            {
+                                "CacheClusterId": "c7n-delete-0001-003",
+                                "CacheNodeId": "0001",
                                 "PreferredAvailabilityZone": "us-east-1b"
+                            }
+                        ]
+                    },
+                    {
+                        "NodeGroupId": "0002",
+                        "Status": "available",
+                        "Slots": "5462-10922",
+                        "NodeGroupMembers": [
+                            {
+                                "CacheClusterId": "c7n-delete-0002-001",
+                                "CacheNodeId": "0001",
+                                "PreferredAvailabilityZone": "us-east-1a"
+                            },
+                            {
+                                "CacheClusterId": "c7n-delete-0002-002",
+                                "CacheNodeId": "0001",
+                                "PreferredAvailabilityZone": "us-east-1b"
+                            },
+                            {
+                                "CacheClusterId": "c7n-delete-0002-003",
+                                "CacheNodeId": "0001",
+                                "PreferredAvailabilityZone": "us-east-1d"
+                            }
+                        ]
+                    },
+                    {
+                        "NodeGroupId": "0003",
+                        "Status": "available",
+                        "Slots": "10923-16383",
+                        "NodeGroupMembers": [
+                            {
+                                "CacheClusterId": "c7n-delete-0003-001",
+                                "CacheNodeId": "0001",
+                                "PreferredAvailabilityZone": "us-east-1d"
+                            },
+                            {
+                                "CacheClusterId": "c7n-delete-0003-002",
+                                "CacheNodeId": "0001",
+                                "PreferredAvailabilityZone": "us-east-1b"
+                            },
+                            {
+                                "CacheClusterId": "c7n-delete-0003-003",
+                                "CacheNodeId": "0001",
+                                "PreferredAvailabilityZone": "us-east-1a"
                             }
                         ]
                     }
                 ],
                 "AutomaticFailover": "enabled",
-                "MultiAZ": "disabled",
+                "MultiAZ": "enabled",
                 "ConfigurationEndpoint": {
                     "Address": "c7n-delete.qgcgte.clustercfg.use1.cache.amazonaws.com",
                     "Port": 6379
                 },
-                "SnapshotRetentionLimit": 0,
-                "SnapshotWindow": "09:00-10:00",
+                "SnapshotRetentionLimit": 1,
+                "SnapshotWindow": "10:00-11:00",
                 "ClusterEnabled": true,
-                "CacheNodeType": "cache.r5.large",
+                "CacheNodeType": "cache.r6g.large",
                 "AuthTokenEnabled": false,
                 "TransitEncryptionEnabled": false,
-                "AtRestEncryptionEnabled": false
+                "AtRestEncryptionEnabled": false,
+                "ARN": "arn:aws:elasticache:us-east-1:644160558196:replicationgroup:c7n-delete",
+                "LogDeliveryConfigurations": []
             }
         ],
         "ResponseMetadata": {}

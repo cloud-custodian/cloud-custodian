@@ -1,4 +1,3 @@
-# Copyright 2017 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 from .common import BaseTest
@@ -128,7 +127,7 @@ class TestNotebookInstance(BaseTest):
             session_factory=session_factory,
         )
         resources = p.run()
-        self.assertTrue(len(resources), 1)
+        self.assertEqual(len(resources), 1)
 
         client = session_factory().client("sagemaker")
         notebook = client.describe_notebook_instance(
@@ -150,7 +149,7 @@ class TestNotebookInstance(BaseTest):
             session_factory=session_factory,
         )
         resources = p.run()
-        self.assertTrue(len(resources), 1)
+        self.assertEqual(len(resources), 1)
 
         client = session_factory().client("sagemaker")
         notebook = client.describe_notebook_instance(
@@ -172,7 +171,7 @@ class TestNotebookInstance(BaseTest):
             session_factory=session_factory,
         )
         resources = p.run()
-        self.assertTrue(len(resources), 1)
+        self.assertEqual(len(resources), 1)
 
         client = session_factory().client("sagemaker")
         notebook = client.describe_notebook_instance(
@@ -237,7 +236,7 @@ class TestNotebookInstance(BaseTest):
             session_factory=session_factory,
         )
         resources = p.run()
-        self.assertTrue(len(resources), 1)
+        self.assertEqual(len(resources), 1)
         aliases = kms.list_aliases(KeyId=resources[0]['KmsKeyId'])
         self.assertEqual(aliases['Aliases'][0]['AliasName'], 'alias/skunk/trails')
 
@@ -252,6 +251,19 @@ class TestModelInstance(BaseTest):
         )
         resources = p.run()
         self.assertGreaterEqual(len(resources), 1)
+
+    def test_filter_model(self):
+        session_factory = self.replay_flight_data("test_sagemaker_model_filter")
+        p = self.load_policy(
+            {
+                "name": "query-model",
+                "resource": "sagemaker-model",
+                "filters": [{"ExecutionRoleArn": "present"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
 
     def test_delete_model(self):
         session_factory = self.replay_flight_data("test_sagemaker_delete_model")
@@ -333,7 +345,7 @@ class TestModelInstance(BaseTest):
             session_factory=session_factory,
         )
         resources = p.run()
-        self.assertTrue(len(resources), 1)
+        self.assertEqual(len(resources), 1)
         client = session_factory(region="us-east-1").client("sagemaker")
         tags = client.list_tags(ResourceArn=resources[0]["ModelArn"])["Tags"]
         self.assertTrue(tags[0], "custodian_cleanup")
@@ -394,7 +406,7 @@ class TestSagemakerJob(BaseTest):
             session_factory=session_factory,
         )
         resources = p.run()
-        self.assertTrue(len(resources), 1)
+        self.assertEqual(len(resources), 1)
         job = client.describe_training_job(
             TrainingJobName=resources[0]["TrainingJobName"]
         )
@@ -412,7 +424,7 @@ class TestSagemakerJob(BaseTest):
             session_factory=session_factory,
         )
         resources = p.run()
-        self.assertTrue(len(resources), 1)
+        self.assertEqual(len(resources), 1)
         client = session_factory(region="us-east-1").client("sagemaker")
         tags = client.list_tags(ResourceArn=resources[0]["TrainingJobArn"])["Tags"]
         self.assertEqual([tags[0]["Key"], tags[0]["Value"]], ["JobTag", "JobTagValue"])
@@ -431,7 +443,7 @@ class TestSagemakerJob(BaseTest):
             session_factory=session_factory,
         )
         resources = p.run()
-        self.assertTrue(len(resources), 1)
+        self.assertEqual(len(resources), 1)
         client = session_factory(region="us-east-1").client("sagemaker")
         tags = client.list_tags(ResourceArn=resources[0]["TrainingJobArn"])["Tags"]
         self.assertEqual(len(tags), 0)
@@ -472,7 +484,7 @@ class TestSagemakerTransformJob(BaseTest):
             session_factory=session_factory,
         )
         resources = p.run()
-        self.assertTrue(len(resources), 1)
+        self.assertEqual(len(resources), 1)
         job = client.describe_transform_job(
             TransformJobName=resources[0]["TransformJobName"]
         )
@@ -490,7 +502,7 @@ class TestSagemakerTransformJob(BaseTest):
             session_factory=session_factory,
         )
         resources = p.run()
-        self.assertTrue(len(resources), 1)
+        self.assertEqual(len(resources), 1)
         client = session_factory(region="us-east-1").client("sagemaker")
         tags = client.list_tags(ResourceArn=resources[0]["TransformJobArn"])["Tags"]
         self.assertEqual([tags[0]["Key"], tags[0]["Value"]], ["JobTag", "JobTagValue"])
@@ -509,7 +521,7 @@ class TestSagemakerTransformJob(BaseTest):
             session_factory=session_factory,
         )
         resources = p.run()
-        self.assertTrue(len(resources), 1)
+        self.assertEqual(len(resources), 1)
         client = session_factory(region="us-east-1").client("sagemaker")
         tags = client.list_tags(ResourceArn=resources[0]["TransformJobArn"])["Tags"]
         self.assertEqual(len(tags), 0)
@@ -559,7 +571,7 @@ class TestSagemakerEndpoint(BaseTest):
             session_factory=session_factory,
         )
         resources = p.run()
-        self.assertTrue(len(resources), 1)
+        self.assertEqual(len(resources), 1)
         client = session_factory(region="us-east-1").client("sagemaker")
         tags = client.list_tags(ResourceArn=resources[0]["EndpointArn"])["Tags"]
         self.assertTrue(tags[0]["Key"], "required-tag")
@@ -577,7 +589,7 @@ class TestSagemakerEndpoint(BaseTest):
             session_factory=session_factory,
         )
         resources = p.run()
-        self.assertTrue(len(resources), 1)
+        self.assertEqual(len(resources), 1)
         client = session_factory(region="us-east-1").client("sagemaker")
         tags = client.list_tags(ResourceArn=resources[0]["EndpointArn"])["Tags"]
         self.assertEqual(len(tags), 0)
@@ -601,7 +613,7 @@ class TestSagemakerEndpoint(BaseTest):
             session_factory=session_factory,
         )
         resources = p.run()
-        self.assertTrue(len(resources), 1)
+        self.assertEqual(len(resources), 1)
         client = session_factory(region="us-east-1").client("sagemaker")
         tags = client.list_tags(ResourceArn=resources[0]["EndpointArn"])["Tags"]
         self.assertTrue(tags[0], "custodian_cleanup")
@@ -680,7 +692,7 @@ class TestSagemakerEndpointConfig(BaseTest):
             session_factory=session_factory,
         )
         resources = p.run()
-        self.assertTrue(len(resources), 1)
+        self.assertEqual(len(resources), 1)
         client = session_factory(region="us-east-1").client("sagemaker")
         tags = client.list_tags(ResourceArn=resources[0]["EndpointConfigArn"])["Tags"]
         self.assertEqual(
@@ -701,7 +713,7 @@ class TestSagemakerEndpointConfig(BaseTest):
             session_factory=session_factory,
         )
         resources = p.run()
-        self.assertTrue(len(resources), 1)
+        self.assertEqual(len(resources), 1)
         client = session_factory(region="us-east-1").client("sagemaker")
         tags = client.list_tags(ResourceArn=resources[0]["EndpointConfigArn"])["Tags"]
         self.assertEqual(len(tags), 0)
@@ -734,7 +746,7 @@ class TestSagemakerEndpointConfig(BaseTest):
             session_factory=session_factory,
         )
         resources = p.run()
-        self.assertTrue(len(resources), 1)
+        self.assertEqual(len(resources), 1)
         client = session_factory(region="us-east-1").client("sagemaker")
         tags = client.list_tags(ResourceArn=resources[0]["EndpointConfigArn"])["Tags"]
         self.assertTrue(tags[0], "custodian_cleanup")
@@ -782,6 +794,6 @@ class TestSagemakerEndpointConfig(BaseTest):
             session_factory=session_factory,
         )
         resources = p.run()
-        self.assertTrue(len(resources), 1)
+        self.assertEqual(len(resources), 1)
         aliases = kms.list_aliases(KeyId=resources[0]['KmsKeyId'])
         self.assertEqual(aliases['Aliases'][0]['AliasName'], 'alias/skunk/trails')

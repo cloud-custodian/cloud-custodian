@@ -1,4 +1,3 @@
-# Copyright 2019 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
@@ -18,6 +17,12 @@ class LogProjectSinkTest(BaseTest):
             session_factory=factory)
         resource = p.run()
         self.assertEqual(len(resource), 1)
+        self.assertEqual(
+            p.resource_manager.get_urns(resource),
+            [
+                'gcp:logging::cloud-custodian:project-sink/storage',
+            ],
+        )
 
     def test_get_project_sink(self):
         project_id = 'cloud-custodian'
@@ -36,6 +41,12 @@ class LogProjectSinkTest(BaseTest):
         event = event_data('log-create-project-sink.json')
         resource = exec_mode.run(event, None)
         self.assertEqual(resource[0]['name'], sink_name)
+        self.assertEqual(
+            p.resource_manager.get_urns(resource),
+            [
+                'gcp:logging::cloud-custodian:project-sink/testqqqqqqqqqqqqqqqqq',
+            ],
+        )
 
     def test_delete_project_sink(self):
         project_id = 'custodian-tests'
@@ -70,6 +81,12 @@ class LogProjectMetricTest(BaseTest):
             session_factory=factory)
         resource = p.run()
         self.assertEqual(len(resource), 1)
+        self.assertEqual(
+            p.resource_manager.get_urns(resource),
+            [
+                'gcp:logging::cloud-custodian:project-metric/test',
+            ],
+        )
 
     def test_get_project_metric(self):
         project_id = 'cloud-custodian'
@@ -88,6 +105,12 @@ class LogProjectMetricTest(BaseTest):
         event = event_data('log-create-project-metric.json')
         resource = exec_mode.run(event, None)
         self.assertEqual(resource[0]['name'], metric_name)
+        self.assertEqual(
+            p.resource_manager.get_urns(resource),
+            [
+                'gcp:logging::cloud-custodian:project-metric/test_name',
+            ],
+        )
 
 
 class LogExclusionTest(BaseTest):
@@ -101,6 +124,12 @@ class LogExclusionTest(BaseTest):
             session_factory=factory)
         resource = p.run()
         self.assertEqual(len(resource), 1)
+        self.assertEqual(
+            p.resource_manager.get_urns(resource),
+            [
+                'gcp:logging::cloud-custodian:exclusion/exclusions',
+            ],
+        )
 
     def test_get_project_exclusion(self):
         project_id = 'cloud-custodian'
@@ -120,3 +149,9 @@ class LogExclusionTest(BaseTest):
         event = event_data('log-create-project-exclusion.json')
         resource = exec_mode.run(event, None)
         self.assertEqual(resource[0]['name'], exclusion_name)
+        self.assertEqual(
+            p.resource_manager.get_urns(resource),
+            [
+                'gcp:logging::cloud-custodian:exclusion/qwerty',
+            ],
+        )

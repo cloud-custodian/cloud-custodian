@@ -1,0 +1,33 @@
+{
+    "status_code": 200,
+    "data": {
+        "KeyMetadata": {
+            "AWSAccountId": "123456789012",
+            "KeyId": "36812ccf-daaf-49b1-a24b-0eef254ffe41",
+            "Arn": "arn:aws:kms:us-east-1:644160558196:key/36812ccf-daaf-49b1-a24b-0eef254ffe41",
+            "CreationDate": {
+                "__class__": "datetime",
+                "year": 2016,
+                "month": 7,
+                "day": 24,
+                "hour": 4,
+                "minute": 51,
+                "second": 26,
+                "microsecond": 199000
+            },
+            "Enabled": true,
+            "Description": "Trails for the Skunk",
+            "KeyUsage": "ENCRYPT_DECRYPT",
+            "KeyState": "Enabled",
+            "Origin": "AWS_KMS",
+            "KeyManager": "CUSTOMER",
+            "CustomerMasterKeySpec": "SYMMETRIC_DEFAULT",
+            "KeySpec": "SYMMETRIC_DEFAULT",
+            "EncryptionAlgorithms": [
+                "SYMMETRIC_DEFAULT"
+            ],
+            "MultiRegion": false
+        },
+        "ResponseMetadata": {}
+    }
+}

@@ -1,4 +1,3 @@
-# Copyright 2017-2018 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
@@ -21,6 +20,7 @@ class Function(QueryResourceManager):
         scope_key = 'parent'
         scope_template = "projects/{}/locations/-"
         name = id = "name"
+        metric_key = "resource.labels.function_name"
         default_report_fields = [
             'name', 'runtime', 'eventTrigger.eventType', 'status', 'updateTime']
 
@@ -28,6 +28,7 @@ class Function(QueryResourceManager):
             'create': 'google.cloud.functions.v1.CloudFunctionsService.CreateFunction',
             'delete': 'google.cloud.functions.v1.CloudFunctionsService.DeleteFunction',
             'update': 'google.cloud.functions.v1.CloudFunctionsService.UpdateFunction'}
+        urn_component = "function"
 
         @staticmethod
         def get(client, resource_info):
@@ -36,6 +37,16 @@ class Function(QueryResourceManager):
                     'projects/{project_id}/locations/'
                     '{location_id}/functions/{function_name}').format(
                         **resource_info)})
+
+        @classmethod
+        def _get_location(cls, resource):
+            "The region is the fourth segment of the name."
+            return resource["name"].split('/')[3]
+
+        @classmethod
+        def _get_urn_id(cls, resource):
+            "The id is the last segment of the name ."
+            return resource["name"].split('/', 6)[-1]
 
 
 @Function.action_registry.register('delete')

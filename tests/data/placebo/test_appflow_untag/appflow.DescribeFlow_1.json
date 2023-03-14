@@ -1,0 +1,110 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "flowArn": "arn:aws:appflow:us-east-1:644160558196:flow/test",
+        "flowName": "test",
+        "kmsArn": "arn:aws:kms:us-east-1:644160558196:key/5a53ba7b-bcae-442d-8f6a-b2e78315d6d3",
+        "flowStatus": "Active",
+        "sourceFlowConfig": {
+            "connectorType": "S3",
+            "sourceConnectorProperties": {
+                "S3": {
+                    "bucketName": "test-bucket",
+                    "bucketPrefix": "preflow"
+                }
+            }
+        },
+        "destinationFlowConfigList": [
+            {
+                "connectorType": "S3",
+                "destinationConnectorProperties": {
+                    "S3": {
+                        "bucketName": "test-bucket",
+                        "s3OutputFormatConfig": {
+                            "fileType": "JSON",
+                            "prefixConfig": {},
+                            "aggregationConfig": {
+                                "aggregationType": "None"
+                            }
+                        }
+                    }
+                }
+            }
+        ],
+        "triggerConfig": {
+            "triggerType": "OnDemand",
+            "triggerProperties": {}
+        },
+        "tasks": [
+            {
+                "sourceFields": [
+                    "field1",
+                    "field2",
+                    "field3"
+                ],
+                "connectorOperator": {
+                    "S3": "PROJECTION"
+                },
+                "taskType": "Filter",
+                "taskProperties": {}
+            },
+            {
+                "sourceFields": [
+                    "field1"
+                ],
+                "connectorOperator": {
+                    "S3": "NO_OP"
+                },
+                "destinationField": "field1",
+                "taskType": "Map",
+                "taskProperties": {}
+            },
+            {
+                "sourceFields": [
+                    "field2"
+                ],
+                "connectorOperator": {
+                    "S3": "NO_OP"
+                },
+                "destinationField": "field2",
+                "taskType": "Map",
+                "taskProperties": {}
+            },
+            {
+                "sourceFields": [
+                    "field3"
+                ],
+                "connectorOperator": {
+                    "S3": "NO_OP"
+                },
+                "destinationField": "field3",
+                "taskType": "Map",
+                "taskProperties": {}
+            }
+        ],
+        "createdAt": {
+            "__class__": "datetime",
+            "year": 2021,
+            "month": 2,
+            "day": 19,
+            "hour": 15,
+            "minute": 28,
+            "second": 49,
+            "microsecond": 668000
+        },
+        "lastUpdatedAt": {
+            "__class__": "datetime",
+            "year": 2021,
+            "month": 2,
+            "day": 19,
+            "hour": 16,
+            "minute": 28,
+            "second": 45,
+            "microsecond": 730000
+        },
+        "tags": {
+            "lob": "overhead"
+        }
+    }
+}

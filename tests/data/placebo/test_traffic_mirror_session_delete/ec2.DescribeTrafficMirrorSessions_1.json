@@ -1,0 +1,24 @@
+{
+    "status_code": 200,
+    "data": {
+        "TrafficMirrorSessions": [
+            {
+                "TrafficMirrorSessionId": "tms-084dc356a819e99ae",
+                "TrafficMirrorTargetId": "tmt-02cc3955d41358894",
+                "TrafficMirrorFilterId": "tmf-003b318669f29b788",
+                "NetworkInterfaceId": "eni-0054f909285935030",
+                "OwnerId": "644160558196",
+                "PacketLength": 19,
+                "SessionNumber": 1,
+                "VirtualNetworkId": 5918387,
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "test-session"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

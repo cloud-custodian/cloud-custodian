@@ -1,0 +1,35 @@
+{
+    "status_code": 200,
+    "data": {
+        "EvaluationResults": [
+            {
+                "EvalActionName": "iam:ListUsers",
+                "EvalResourceName": "arn:aws:iam::644160558196:user/",
+                "EvalDecision": "allowed",
+                "MatchedStatements": [
+                    {
+                        "SourcePolicyId": "ReadOnlyAccess",
+                        "SourcePolicyType": "IAM Policy",
+                        "StartPosition": {
+                            "Line": 3,
+                            "Column": 16
+                        },
+                        "EndPosition": {
+                            "Line": 1070,
+                            "Column": 4
+                        }
+                    }
+                ],
+                "MissingContextValues": [],
+                "OrganizationsDecisionDetail": {
+                    "AllowedByOrganizations": true
+                },
+                "PermissionsBoundaryDecisionDetail": {
+                    "AllowedByPermissionsBoundary": true
+                }
+            }
+        ],
+        "IsTruncated": false,
+        "ResponseMetadata": {}
+    }
+}

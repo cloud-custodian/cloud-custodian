@@ -1,0 +1,36 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "computeEnvironments": [
+            {
+                "computeEnvironmentName": "test-compute-env",
+                "computeEnvironmentArn": "arn:aws:batch:us-east-1:644160558196:compute-environment/test-compute-env",
+                "ecsClusterArn": "arn:aws:ecs:us-east-1:644160558196:cluster/AWSBatch-test-compute-env-11111111-2222-3333-4444-555555555555",
+                "tags": {
+                },
+                "type": "MANAGED",
+                "state": "ENABLED",
+                "status": "VALID",
+                "statusReason": "ComputeEnvironment Healthy",
+                "computeResources": {
+                    "type": "FARGATE",
+                    "maxvCpus": 32,
+                    "subnets": [
+                        "subnet-8e261cb2",
+                        "subnet-8e261cb3",
+                        "subnet-8e261cb4"
+                    ],
+                    "securityGroupIds": [
+                        "sg-0f026884bba48e351"
+                    ],
+                    "tags": {},
+                    "ec2Configuration": []
+                },
+                "serviceRole": "arn:aws:iam::644160558196:role/aws-service-role/batch.amazonaws.com/AWSServiceRoleForBatch",
+                "containerOrchestrationType": "ECS",
+                "uuid": "11111111-2222-3333-4444-555555555555"
+            }
+        ]
+    }
+}

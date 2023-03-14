@@ -1,0 +1,23 @@
+{
+    "status_code": 200,
+    "data": {
+        "Rules": [
+            {
+                "Name": "aws-controltower-ConfigComplianceChangeEventRule",
+                "Arn": "arn:aws:events:us-east-1:644160558196:rule/aws-controltower-ConfigComplianceChangeEventRule",
+                "EventPattern": "{\"detail-type\":[\"Config Rules Compliance Change\"],\"source\":[\"aws.config\"]}",
+                "State": "ENABLED",
+                "Description": "CloudWatch Event Rule to send notification on Config Rule compliance changes.",
+                "EventBusName": "default"
+            },
+            {
+                "Name": "event-rule-test-with-target",
+                "Arn": "arn:aws:events:us-east-1:644160558196:rule/event-rule-test-with-target",
+                "EventPattern": "{\"source\":[\"aws.codestar\"]}",
+                "State": "ENABLED",
+                "EventBusName": "default"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

@@ -1,0 +1,15 @@
+{
+    "status_code": 200,
+    "data": {
+        "Subscriptions": [
+            {
+                "SubscriptionArn": "arn:aws:sns:us-east-1:644160558196:test-topic:cdc39d9d-8fee-407d-8330-5dad25fd937d",
+                "Owner": "644160558196",
+                "Protocol": "email-json",
+                "Endpoint": "sonny@stacklet.io",
+                "TopicArn": "arn:aws:sns:us-east-1:644160558196:test-topic"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

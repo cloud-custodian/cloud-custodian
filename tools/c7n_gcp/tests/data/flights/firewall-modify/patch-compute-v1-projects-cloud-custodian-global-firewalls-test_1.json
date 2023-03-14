@@ -1,0 +1,30 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Wed, 17 Mar 2021 19:54:42 GMT",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3-29=\":443\"; ma=2592000,h3-T051=\":443\"; ma=2592000,h3-Q050=\":443\"; ma=2592000,h3-Q046=\":443\"; ma=2592000,h3-Q043=\":443\"; ma=2592000,quic=\":443\"; ma=2592000; v=\"46,43\"",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "644",
+    "-content-encoding": "gzip"
+  },
+  "body": {
+    "id": "8915306104775237741",
+    "name": "operation-1616010881632-5bdc0da8d88e9-c6119e51-58d48670",
+    "operationType": "patch",
+    "targetLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/firewalls/test",
+    "targetId": "4853772226933023804",
+    "status": "RUNNING",
+    "progress": 0,
+    "insertTime": "2021-03-17T12:54:42.014-07:00",
+    "startTime": "2021-03-17T12:54:42.023-07:00",
+    "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/operations/operation-1616010881632-5bdc0da8d88e9-c6119e51-58d48670",
+    "kind": "compute#operation"
+  }
+}

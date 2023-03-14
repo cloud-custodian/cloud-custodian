@@ -1,4 +1,3 @@
-# Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
@@ -26,7 +25,7 @@ class StructureParser:
         if not isinstance(data, dict):
             raise PolicyValidationError((
                 "Policy file top level data structure "
-                "should be a mapping/dict, instead found:%s""") % (
+                "should be a mapping/dict, instead found:%s") % (
                     type(data).__name__))
         dkeys = set(data.keys())
 
@@ -67,7 +66,7 @@ class StructureParser:
                 'policy:%s must use a list for filters found:%s' % (
                     p['name'], type(p['filters']).__name__)))
         element_types = (dict, str)
-        for f in p.get('filters', ()):
+        for f in p.get('filters', ()) or []:
             if not isinstance(f, element_types):
                 raise PolicyValidationError((
                     'policy:%s filter must be a mapping/dict found:%s' % (
@@ -76,17 +75,26 @@ class StructureParser:
             raise PolicyValidationError((
                 'policy:%s must use a list for actions found:%s' % (
                     p.get('name', 'unknown'), type(p['actions']).__name__)))
-        for a in p.get('actions', ()):
+        for a in p.get('actions', ()) or []:
             if not isinstance(a, element_types):
                 raise PolicyValidationError((
                     'policy:%s action must be a mapping/dict found:%s' % (
                         p.get('name', 'unknown'), type(a).__name__)))
 
+        if isinstance(p.get('resource', ''), list):
+            if len({pr.split('.')[0] for pr in p['resource']}) > 1:
+                raise PolicyValidationError((
+                    "policy:%s multi resource is only allowed with a single provider" % (
+                        p.get('name', 'unknown'))))
+
     def get_resource_types(self, data):
         resources = set()
         for p in data.get('policies', []):
             rtype = p['resource']
-            if '.' not in rtype:
+            if isinstance(rtype, list):
+                resources.update(rtype)
+                continue
+            elif '.' not in rtype:
                 rtype = 'aws.%s' % rtype
             resources.add(rtype)
         return resources

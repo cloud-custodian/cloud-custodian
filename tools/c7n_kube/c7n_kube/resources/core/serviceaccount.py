@@ -1,4 +1,3 @@
-# Copyright 2019 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 #
@@ -14,3 +13,4 @@ class ServiceAccount(QueryResourceManager):
         patch = 'patch_namespaced_service_account'
         delete = 'delete_namespaced_service_account'
         enum_spec = ('list_service_account_for_all_namespaces', 'items', None)
+        plural = 'serviceaccounts'

@@ -1,0 +1,112 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "ClusterInfoList": [
+            {
+                "ClusterType": "PROVISIONED",
+                "ClusterArn": "arn:aws:kafka:us-east-1:644160558196:cluster/c7n-provisioned-44487/b0febde2-4cc6-480e-b662-11533a176872-2",
+                "ClusterName": "c7n-provisioned-44487",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 12,
+                    "day": 15,
+                    "hour": 21,
+                    "minute": 56,
+                    "second": 55,
+                    "microsecond": 585000
+                },
+                "CurrentVersion": "K1PA6795UKMFR9",
+                "State": "CREATING",
+                "Tags": {},
+                "Provisioned": {
+                    "BrokerNodeGroupInfo": {
+                        "BrokerAZDistribution": "DEFAULT",
+                        "ClientSubnets": [
+                            "subnet-08f5a2e4c12adf737",
+                            "subnet-00e4b6ccbf5f49a9e"
+                        ],
+                        "InstanceType": "kafka.m5.large",
+                        "SecurityGroups": [
+                            "sg-0e5c97dfc455dc571"
+                        ],
+                        "StorageInfo": {
+                            "EbsStorageInfo": {
+                                "VolumeSize": 100
+                            }
+                        },
+                        "ConnectivityInfo": {
+                            "PublicAccess": {
+                                "Type": "DISABLED"
+                            }
+                        }
+                    },
+                    "CurrentBrokerSoftwareInfo": {
+                        "KafkaVersion": "3.2.0"
+                    },
+                    "EncryptionInfo": {
+                        "EncryptionAtRest": {
+                            "DataVolumeKMSKeyId": "arn:aws:kms:us-east-1:644160558196:key/c6c0b5d4-506b-4d2e-8748-9a939b129b96"
+                        },
+                        "EncryptionInTransit": {
+                            "ClientBroker": "TLS",
+                            "InCluster": true
+                        }
+                    },
+                    "EnhancedMonitoring": "DEFAULT",
+                    "OpenMonitoring": {
+                        "Prometheus": {
+                            "JmxExporter": {
+                                "EnabledInBroker": false
+                            },
+                            "NodeExporter": {
+                                "EnabledInBroker": false
+                            }
+                        }
+                    },
+                    "NumberOfBrokerNodes": 2,
+                    "StorageMode": "LOCAL"
+                }
+            },
+            {
+                "ClusterType": "SERVERLESS",
+                "ClusterArn": "arn:aws:kafka:us-east-1:644160558196:cluster/c7n-serverless-44487/b8b1bcc2-0ab6-459e-a7e2-50977fa1e40b-s2",
+                "ClusterName": "c7n-serverless-44487",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 12,
+                    "day": 15,
+                    "hour": 21,
+                    "minute": 56,
+                    "second": 55,
+                    "microsecond": 381000
+                },
+                "CurrentVersion": "K2EUQ1WTGCTBG2",
+                "State": "ACTIVE",
+                "Tags": {},
+                "Serverless": {
+                    "VpcConfigs": [
+                        {
+                            "SubnetIds": [
+                                "subnet-08f5a2e4c12adf737",
+                                "subnet-00e4b6ccbf5f49a9e"
+                            ],
+                            "SecurityGroupIds": [
+                                "sg-0e5c97dfc455dc571"
+                            ]
+                        }
+                    ],
+                    "ClientAuthentication": {
+                        "Sasl": {
+                            "Iam": {
+                                "Enabled": true
+                            }
+                        }
+                    }
+                }
+            }
+        ]
+    }
+}

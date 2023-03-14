@@ -1,0 +1,8 @@
+{
+    "status_code": 200,
+    "data": {
+        "ImageId": "ami-03f9a84f3963d5028",
+        "LaunchPermissions": [],
+        "ResponseMetadata": {}
+    }
+}

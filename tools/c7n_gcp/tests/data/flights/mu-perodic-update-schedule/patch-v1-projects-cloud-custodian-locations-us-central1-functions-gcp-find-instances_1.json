@@ -1,0 +1,46 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Wed, 26 Dec 2018 15:04:22 GMT",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "1; mode=block",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"44,43,39,35\"",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "1684",
+    "-content-encoding": "gzip"
+  },
+  "body": {
+    "name": "operations/dGVzdC0yMjY1MjAvdXMtY2VudHJhbDEvZ2NwLWZpbmQtaW5zdGFuY2VzL3BhdjdieS1QcEpB",
+    "metadata": {
+      "@type": "type.googleapis.com/google.cloud.functions.v1.OperationMetadataV1",
+      "target": "projects/cloud-custodian/locations/us-central1/functions/gcp-find-instances",
+      "type": "UPDATE_FUNCTION",
+      "request": {
+        "@type": "type.googleapis.com/google.cloud.functions.v1.CloudFunction",
+        "name": "projects/cloud-custodian/locations/us-central1/functions/gcp-find-instances",
+        "httpsTrigger": {
+          "url": "https://us-central1-cloud-custodian.cloudfunctions.net/gcp-find-instances"
+        },
+        "status": "ACTIVE",
+        "entryPoint": "run",
+        "timeout": "60s",
+        "availableMemoryMb": 512,
+        "serviceAccountEmail": "cloud-custodian@appspot.gserviceaccount.com",
+        "updateTime": "2018-12-26T14:57:21Z",
+        "versionId": "8",
+        "labels": {
+          "deployment-tool": "custodian"
+        },
+        "sourceUploadUrl": "https://storage.googleapis.com/gcf-upload-us-central1-83fec15d-2d93-4ab7-89c6-f6c7a45912c0/66e080c8-9273-4cc0-8ff4-60747cc51b00.zip?GoogleAccessId=service-435820424010@gcf-admin-robot.iam.gserviceaccount.com&Expires=1545838459&Signature=NDGZVjfjM7%2F5Lc1X5r2UtDPm%2FYWg9rCiWEezFlrJf2O%2FftoiLs9UfUmF%2BpPGjnDjBARe%2BIM%2B9f284M1nlLpyrKOLXhcquugtS2KzLWA6x27nKa%2FwHAGEVbQJVIuqfW2hGXn3V0ltH3uUJO55Zv2b25Fi%2FjLvzFOC54evhG3ZefSRugWb71xucW1HOCk0F9UzQe56UVgWL06RzOu2xm3VkxBQBv3MIDwIuY393xpkZni8w6z3o7KmuYRxOMaekEUZYn%2FXYIx0tCQXzI%2FG%2F8TPf8Jqw53e0CV2pJT9PCnpzOuipbixb%2FnCSN0%2BlFFdCs1GXRtG3F1X%2FYKGXs%2BOtcs4uw%3D%3D",
+        "runtime": "python37"
+      },
+      "versionId": "9",
+      "updateTime": "2018-12-26T15:04:22Z"
+    }
+  }
+}

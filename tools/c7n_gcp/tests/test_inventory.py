@@ -1,4 +1,3 @@
-# Copyright 2020 Kapil Thangavelu
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
@@ -9,7 +8,10 @@ from gcp_common import BaseTest
 class InventoryTest(BaseTest):
 
     def test_instance_query(self):
-        factory = self.replay_flight_data('instance-asset-query')
+        factory = self.replay_flight_data(
+            'instance-asset-query',
+            project_id='cloud-custodian'
+        )
         inventory = self.load_policy(
             {'name': 'fetch',
              'source': 'inventory',

@@ -1,0 +1,18 @@
+{
+    "status_code": 200,
+    "data": {
+        "Workspaces": [
+            {
+                "WorkspaceId": "ws-5g710tsmz",
+                "DirectoryId": "d-90677cc91c",
+                "UserName": "user",
+                "State": "PENDING",
+                "BundleId": "wsb-clj85qzj1",
+                "VolumeEncryptionKey": "arn:aws:kms:us-east-1:123456789012:key/9a428455-22a2-45ba-bc56-173cb6bae1af",
+                "UserVolumeEncryptionEnabled": true,
+                "RootVolumeEncryptionEnabled": true
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

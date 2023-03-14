@@ -1,0 +1,7 @@
+{
+    "status_code": 201,
+    "data": {
+        "ResponseMetadata": {},
+        "Statement": "{\"Sid\":\"aws-lambda-test\",\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"logs.us-east-1.amazonaws.com\"},\"Action\":\"lambda:InvokeFunction\",\"Resource\":\"arn:aws:lambda:us-east-1:644160558196:function:test-foo-bar\",\"Condition\":{\"ArnLike\":{\"AWS:SourceArn\":\"arn:aws:logs:us-east-1:644160558196:log-group:/aws/lambda/test:*\"}}}"
+    }
+}

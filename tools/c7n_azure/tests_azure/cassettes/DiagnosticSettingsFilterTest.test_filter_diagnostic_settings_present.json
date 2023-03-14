@@ -1,0 +1,156 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Network/loadBalancers?api-version=2019-11-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Sun, 22 Nov 2020 23:18:13 GMT"
+                    ],
+                    "x-ms-arm-service-request-id": [
+                        "12219484-cd21-47cf-bd86-cae813b1da17"
+                    ],
+                    "content-length": [
+                        "1717"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "name": "cctestdiagnostic_loadbalancer",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_diagnostic-settings/providers/Microsoft.Network/loadBalancers/cctestdiagnostic_loadbalancer",
+                                "etag": "W/\"0f4c1922-54ba-4f25-a063-2eb21100cfb6\"",
+                                "type": "Microsoft.Network/loadBalancers",
+                                "location": "southcentralus",
+                                "properties": {
+                                    "provisioningState": "Succeeded",
+                                    "resourceGuid": "49edf901-23b7-46f2-a537-0fbde1c22863",
+                                    "frontendIPConfigurations": [
+                                        {
+                                            "name": "LoadBalancerFrontEnd",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_diagnostic-settings/providers/Microsoft.Network/loadBalancers/cctestdiagnostic_loadbalancer/frontendIPConfigurations/LoadBalancerFrontEnd",
+                                            "etag": "W/\"0f4c1922-54ba-4f25-a063-2eb21100cfb6\"",
+                                            "type": "Microsoft.Network/loadBalancers/frontendIPConfigurations",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "privateIPAllocationMethod": "Dynamic",
+                                                "publicIPAddress": {
+                                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_diagnostic-settings/providers/Microsoft.Network/publicIPAddresses/cctestdiagnostic_loadbalancer_public_ip"
+                                                },
+                                                "privateIPAddressVersion": "IPv4"
+                                            }
+                                        }
+                                    ],
+                                    "backendAddressPools": [],
+                                    "loadBalancingRules": [],
+                                    "probes": [],
+                                    "inboundNatRules": [],
+                                    "inboundNatPools": []
+                                },
+                                "sku": {
+                                    "name": "Basic"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_diagnostic-settings/providers/Microsoft.Network/loadBalancers/cctestdiagnostic_loadbalancer/providers/microsoft.insights/diagnosticSettings?api-version=2017-05-01-preview",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Sun, 22 Nov 2020 23:18:13 GMT"
+                    ],
+                    "content-length": [
+                        "1032"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/test_diagnostic-settings/providers/microsoft.network/loadbalancers/cctestdiagnostic_loadbalancer/providers/microsoft.insights/diagnosticSettings/ccdiagnosticsettingtest",
+                                "type": "Microsoft.Insights/diagnosticSettings",
+                                "name": "ccdiagnosticsettingtest",
+                                "location": null,
+                                "kind": null,
+                                "tags": null,
+                                "properties": {
+                                    "storageAccountId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_diagnostic-settings/providers/Microsoft.Storage/storageAccounts/diagnosticc129bfa71a47",
+                                    "serviceBusRuleId": null,
+                                    "workspaceId": null,
+                                    "eventHubAuthorizationRuleId": null,
+                                    "eventHubName": null,
+                                    "metrics": [
+                                        {
+                                            "category": "AllMetrics",
+                                            "enabled": false,
+                                            "retentionPolicy": {
+                                                "enabled": false,
+                                                "days": 0
+                                            }
+                                        }
+                                    ],
+                                    "logs": [
+                                        {
+                                            "category": "LoadBalancerProbeHealthStatus",
+                                            "enabled": true,
+                                            "retentionPolicy": {
+                                                "enabled": false,
+                                                "days": 0
+                                            }
+                                        },
+                                        {
+                                            "category": "LoadBalancerAlertEvent",
+                                            "enabled": false,
+                                            "retentionPolicy": {
+                                                "enabled": false,
+                                                "days": 0
+                                            }
+                                        }
+                                    ],
+                                    "logAnalyticsDestinationType": null
+                                },
+                                "identity": null
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}

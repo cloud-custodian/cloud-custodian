@@ -1,31 +1,15 @@
 {
     "status_code": 200,
     "data": {
-        "ResponseMetadata": {
-            "RequestId": "221A5C468790AE3D",
-            "HostId": "6DCXdH/3NhAyTq5DUbtz/f3B6QEYEqxe0OvBqC4dEDTsVo8U6xkixMNOcf0THx0lZ2vQYtHQyqU=",
-            "HTTPStatusCode": 200,
-            "HTTPHeaders": {
-                "x-amz-id-2": "6DCXdH/3NhAyTq5DUbtz/f3B6QEYEqxe0OvBqC4dEDTsVo8U6xkixMNOcf0THx0lZ2vQYtHQyqU=",
-                "x-amz-request-id": "221A5C468790AE3D",
-                "date": "Wed, 28 Mar 2018 10:37:10 GMT",
-                "transfer-encoding": "chunked",
-                "server": "AmazonS3"
-            },
-            "RetryAttempts": 0
-        },
+        "ResponseMetadata": {},
         "TagSet": [
             {
-                "Key": "rudolph",
-                "Value": "reindeer"
+                "Key": "original-tag",
+                "Value": "original-value"
             },
             {
-                "Key": "borrowed",
-                "Value": "new"
-            },
-            {
-                "Key": "platform",
-                "Value": "serverless"
+                "Key": "new-tag",
+                "Value": "new-value"
             }
         ]
     }

@@ -1,0 +1,53 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Mon, 01 Jul 2019 12:14:57 GMT",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"46,44,43,39\"",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "941",
+    "-content-encoding": "gzip",
+    "content-location": "https://ml.googleapis.com/v1/projects/cloud-custodian/jobs/test_job?alt=json"
+  },
+  "body": {
+    "jobId": "test_job",
+    "trainingInput": {
+      "args": [
+        "--preprocess",
+        "--training_data_path=gs://c7n-test-data/test.csv",
+        "--validation_split=0.2",
+        "--model_type=regression",
+        "--learning_rate=0.001",
+        "--batch_size=100",
+        "--eval_frequency_secs=100",
+        "--optimizer_type=ftrl"
+      ],
+      "region": "us-central1",
+      "jobDir": "gs://c7n-test-data",
+      "masterConfig": {
+        "imageUri": "gcr.io/cloud-ml-algos/linear_learner_cpu:latest"
+      }
+    },
+    "createTime": "2019-07-01T11:31:55Z",
+    "startTime": "2019-07-01T11:33:27Z",
+    "endTime": "2019-07-01T11:35:30Z",
+    "state": "CANCELLED",
+    "errorMessage": "Job is cancelled by the user.",
+    "trainingOutput": {
+      "consumedMLUnits": 0.06,
+      "isBuiltInAlgorithmJob": true,
+      "builtInAlgorithmOutput": {
+        "framework": "TENSORFLOW",
+        "runtimeVersion": "1.12",
+        "pythonVersion": "2.7"
+      }
+    },
+    "etag": "FeMDlZpO1K4="
+  }
+}

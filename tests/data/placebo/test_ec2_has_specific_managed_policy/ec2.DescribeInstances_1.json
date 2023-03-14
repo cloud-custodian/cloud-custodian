@@ -1,0 +1,297 @@
+{
+    "status_code": 200,
+    "data": {
+        "Reservations": [
+            {
+                "Groups": [],
+                "Instances": [
+                    {
+                        "AmiLaunchIndex": 0,
+                        "ImageId": "ami-0c38cb82c789f76aa",
+                        "InstanceId": "i-0601af9ef35fc5c20",
+                        "InstanceType": "t3.micro",
+                        "LaunchTime": {
+                            "__class__": "datetime",
+                            "year": 2022,
+                            "month": 10,
+                            "day": 20,
+                            "hour": 9,
+                            "minute": 5,
+                            "second": 59,
+                            "microsecond": 0
+                        },
+                        "Monitoring": {
+                            "State": "enabled"
+                        },
+                        "Placement": {
+                            "AvailabilityZone": "us-west-2c",
+                            "GroupName": "",
+                            "Tenancy": "default"
+                        },
+                        "PrivateDnsName": "",
+                        "ProductCodes": [],
+                        "PublicDnsName": "",
+                        "State": {
+                            "Code": 48,
+                            "Name": "terminated"
+                        },
+                        "StateTransitionReason": "",
+                        "SubnetId": "subnet-0b0b6b680dbc589fb",
+                        "VpcId": "vpc-0ae34168d08fbec8d",
+                        "Architecture": "x86_64",
+                        "BlockDeviceMappings": [],
+                        "ClientToken": "c3b60fd2-9196-20d2-469f-33c1b614ce67",
+                        "EbsOptimized": false,
+                        "EnaSupport": true,
+                        "Hypervisor": "xen",
+                        "NetworkInterfaces": [],
+                        "RootDeviceName": "/dev/xvda",
+                        "RootDeviceType": "ebs",
+                        "SecurityGroups": [],
+                        "Tags": [
+                            {
+                                "Key": "aws:cloudformation:logical-id",
+                                "Value": "AutoScalingGroup"
+                            },
+                            {
+                                "Key": "aws:autoscaling:groupName",
+                                "Value": "chp-bastion-AutoScalingGroup-1YH15LH1B4SX"
+                            }
+                        ],
+                        "VirtualizationType": "hvm",
+                        "CpuOptions": {
+                            "CoreCount": 1,
+                            "ThreadsPerCore": 2
+                        },
+                        "CapacityReservationSpecification": {
+                            "CapacityReservationPreference": "open"
+                        },
+                        "HibernationOptions": {
+                            "Configured": false
+                        },
+                        "MetadataOptions": {
+                            "State": "applied",
+                            "HttpTokens": "optional",
+                            "HttpPutResponseHopLimit": 1,
+                            "HttpEndpoint": "enabled",
+                            "HttpProtocolIpv6": "disabled",
+                            "InstanceMetadataTags": "disabled"
+                        },
+                        "EnclaveOptions": {
+                            "Enabled": false
+                        },
+                        "PlatformDetails": "Linux/UNIX",
+                        "UsageOperation": "RunInstances",
+                        "UsageOperationUpdateTime": {
+                            "__class__": "datetime",
+                            "year": 2022,
+                            "month": 10,
+                            "day": 20,
+                            "hour": 9,
+                            "minute": 5,
+                            "second": 59,
+                            "microsecond": 0
+                        },
+                        "MaintenanceOptions": {
+                            "AutoRecovery": "default"
+                        }
+                    }
+                ],
+                "OwnerId": "123456789012",
+                "RequesterId": "123456789012",
+                "ReservationId": "r-0c5d21bd6387e94f5"
+            },
+            {
+                "Groups": [],
+                "Instances": [
+                    {
+                        "AmiLaunchIndex": 0,
+                        "ImageId": "ami-0c38cb82c789f76aa",
+                        "InstanceId": "i-0a4021f6486f16ed6",
+                        "InstanceType": "t3.micro",
+                        "LaunchTime": {
+                            "__class__": "datetime",
+                            "year": 2022,
+                            "month": 10,
+                            "day": 20,
+                            "hour": 9,
+                            "minute": 5,
+                            "second": 59,
+                            "microsecond": 0
+                        },
+                        "Monitoring": {
+                            "State": "enabled"
+                        },
+                        "Placement": {
+                            "AvailabilityZone": "us-west-2c",
+                            "GroupName": "",
+                            "Tenancy": "default"
+                        },
+                        "PrivateDnsName": "ip-10-0-7-191.us-west-2.compute.internal",
+                        "PrivateIpAddress": "10.0.7.191",
+                        "ProductCodes": [],
+                        "PublicDnsName": "ec2-44-238-214-249.us-west-2.compute.amazonaws.com",
+                        "PublicIpAddress": "44.238.214.249",
+                        "State": {
+                            "Code": 16,
+                            "Name": "running"
+                        },
+                        "StateTransitionReason": "",
+                        "SubnetId": "subnet-0b0b6b680dbc589fb",
+                        "VpcId": "vpc-0ae34168d08fbec8d",
+                        "Architecture": "x86_64",
+                        "BlockDeviceMappings": [
+                            {
+                                "DeviceName": "/dev/xvda",
+                                "Ebs": {
+                                    "AttachTime": {
+                                        "__class__": "datetime",
+                                        "year": 2022,
+                                        "month": 10,
+                                        "day": 20,
+                                        "hour": 9,
+                                        "minute": 6,
+                                        "second": 0,
+                                        "microsecond": 0
+                                    },
+                                    "DeleteOnTermination": true,
+                                    "Status": "attached",
+                                    "VolumeId": "vol-013489943d8b5ee78"
+                                }
+                            }
+                        ],
+                        "ClientToken": "8156106e-2f21-09b8-bbda-4bbaf3ff450b",
+                        "EbsOptimized": false,
+                        "EnaSupport": true,
+                        "Hypervisor": "xen",
+                        "IamInstanceProfile": {
+                            "Arn": "arn:aws:iam::123456789012:instance-profile/chp-bastion-InstanceProfile-sLsdbzeU4K1e",
+                            "Id": "AIPA2OVK7HCLQKCY7UCFX"
+                        },
+                        "NetworkInterfaces": [
+                            {
+                                "Association": {
+                                    "IpOwnerId": "123456789012",
+                                    "PublicDnsName": "ec2-44-238-214-249.us-west-2.compute.amazonaws.com",
+                                    "PublicIp": "44.238.214.249"
+                                },
+                                "Attachment": {
+                                    "AttachTime": {
+                                        "__class__": "datetime",
+                                        "year": 2022,
+                                        "month": 10,
+                                        "day": 20,
+                                        "hour": 9,
+                                        "minute": 5,
+                                        "second": 59,
+                                        "microsecond": 0
+                                    },
+                                    "AttachmentId": "eni-attach-0d4cbf58b7096a27e",
+                                    "DeleteOnTermination": true,
+                                    "DeviceIndex": 0,
+                                    "Status": "attached",
+                                    "NetworkCardIndex": 0
+                                },
+                                "Description": "",
+                                "Groups": [
+                                    {
+                                        "GroupName": "chp-bastion-SecurityGroup-1MWH8J8VGE98J",
+                                        "GroupId": "sg-09e3a863ea430cb9d"
+                                    }
+                                ],
+                                "Ipv6Addresses": [],
+                                "MacAddress": "02:14:d4:ea:95:d9",
+                                "NetworkInterfaceId": "eni-0c27a4a057008e0f9",
+                                "OwnerId": "123456789012",
+                                "PrivateDnsName": "ip-10-0-7-191.us-west-2.compute.internal",
+                                "PrivateIpAddress": "10.0.7.191",
+                                "PrivateIpAddresses": [
+                                    {
+                                        "Association": {
+                                            "IpOwnerId": "123456789012",
+                                            "PublicDnsName": "ec2-44-238-214-249.us-west-2.compute.amazonaws.com",
+                                            "PublicIp": "44.238.214.249"
+                                        },
+                                        "Primary": true,
+                                        "PrivateDnsName": "ip-10-0-7-191.us-west-2.compute.internal",
+                                        "PrivateIpAddress": "10.0.7.191"
+                                    }
+                                ],
+                                "SourceDestCheck": true,
+                                "Status": "in-use",
+                                "SubnetId": "subnet-0b0b6b680dbc589fb",
+                                "VpcId": "vpc-0ae34168d08fbec8d",
+                                "InterfaceType": "interface"
+                            }
+                        ],
+                        "RootDeviceName": "/dev/xvda",
+                        "RootDeviceType": "ebs",
+                        "SecurityGroups": [
+                            {
+                                "GroupName": "chp-bastion-SecurityGroup-1MWH8J8VGE98J",
+                                "GroupId": "sg-09e3a863ea430cb9d"
+                            }
+                        ],
+                        "SourceDestCheck": true,
+                        "Tags": [
+                            {
+                                "Key": "aws:cloudformation:logical-id",
+                                "Value": "AutoScalingGroup"
+                            },
+                            {
+                                "Key": "aws:autoscaling:groupName",
+                                "Value": "chp-bastion-AutoScalingGroup-1YH15LH1B4SX"
+                            }
+                        ],
+                        "VirtualizationType": "hvm",
+                        "CpuOptions": {
+                            "CoreCount": 1,
+                            "ThreadsPerCore": 2
+                        },
+                        "CapacityReservationSpecification": {
+                            "CapacityReservationPreference": "open"
+                        },
+                        "HibernationOptions": {
+                            "Configured": false
+                        },
+                        "MetadataOptions": {
+                            "State": "applied",
+                            "HttpTokens": "optional",
+                            "HttpPutResponseHopLimit": 1,
+                            "HttpEndpoint": "enabled",
+                            "HttpProtocolIpv6": "disabled",
+                            "InstanceMetadataTags": "disabled"
+                        },
+                        "EnclaveOptions": {
+                            "Enabled": false
+                        },
+                        "PlatformDetails": "Linux/UNIX",
+                        "UsageOperation": "RunInstances",
+                        "UsageOperationUpdateTime": {
+                            "__class__": "datetime",
+                            "year": 2022,
+                            "month": 10,
+                            "day": 20,
+                            "hour": 9,
+                            "minute": 5,
+                            "second": 59,
+                            "microsecond": 0
+                        },
+                        "PrivateDnsNameOptions": {
+                            "HostnameType": "ip-name",
+                            "EnableResourceNameDnsARecord": false,
+                            "EnableResourceNameDnsAAAARecord": false
+                        },
+                        "MaintenanceOptions": {
+                            "AutoRecovery": "default"
+                        }
+                    }
+                ],
+                "OwnerId": "123456789012",
+                "RequesterId": "123456789012",
+                "ReservationId": "r-0f4e468ec065f8858"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

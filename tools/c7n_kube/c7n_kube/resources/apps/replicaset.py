@@ -1,4 +1,3 @@
-# Copyright 2019 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 #
@@ -15,3 +14,4 @@ class ReplicaSet(QueryResourceManager):
         patch = 'patch_namespaced_replica_set'
         delete = 'delete_namespaced_replica_set'
         enum_spec = ('list_replica_set_for_all_namespaces', 'items', None)
+        plural = 'replicasets'

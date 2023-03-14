@@ -1,0 +1,35 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Clusters": [
+            {
+                "ClusterArn": "arn:aws:route53-recovery-control::644160558196:cluster/2559d9eb-429c-45e2-89be-6fb020716f20",
+                "ClusterEndpoints": [
+                    {
+                        "Endpoint": "https://ba6e5449.route53-recovery-cluster.eu-west-1.amazonaws.com/v1",
+                        "Region": "eu-west-1"
+                    },
+                    {
+                        "Endpoint": "https://a95a6f5b.route53-recovery-cluster.ap-northeast-1.amazonaws.com/v1",
+                        "Region": "ap-northeast-1"
+                    },
+                    {
+                        "Endpoint": "https://534e088e.route53-recovery-cluster.us-west-2.amazonaws.com/v1",
+                        "Region": "us-west-2"
+                    },
+                    {
+                        "Endpoint": "https://b3cd7535.route53-recovery-cluster.us-east-1.amazonaws.com/v1",
+                        "Region": "us-east-1"
+                    },
+                    {
+                        "Endpoint": "https://6c579e4d.route53-recovery-cluster.ap-southeast-2.amazonaws.com/v1",
+                        "Region": "ap-southeast-2"
+                    }
+                ],
+                "Name": "NewCluster",
+                "Status": "DEPLOYED"
+            }
+        ]
+    }
+}

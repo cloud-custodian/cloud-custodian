@@ -1,0 +1,13 @@
+{
+    "status_code": 200,
+    "data": {
+        "DeliveryChannels": [
+            {
+                "name": "default",
+                "s3BucketName": "config-bucket-644160558196",
+                "snsTopicARN": "arn:aws:sns:us-east-1:644160558196:config-topic"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

@@ -1,0 +1,10 @@
+{
+    "status_code": 400,
+    "data": {
+        "Error": {
+            "Message": "Rule can't be deleted since it has targets.",
+            "Code": "ValidationException"
+        },
+        "ResponseMetadata": {}
+    }
+}

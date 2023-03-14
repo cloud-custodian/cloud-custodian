@@ -1,0 +1,12 @@
+{
+    "status_code": 404,
+    "data": {
+        "Error": {
+            "Message": "The resource you requested does not exist.",
+            "Code": "ResourceNotFoundException"
+        },
+        "ResponseMetadata": {},
+        "Type": "User",
+        "Message": "The resource you requested does not exist."
+    }
+}

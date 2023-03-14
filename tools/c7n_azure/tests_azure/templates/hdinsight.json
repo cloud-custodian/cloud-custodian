@@ -83,7 +83,7 @@
                             "minInstanceCount": 1,
                             "targetInstanceCount": 2,
                             "hardwareProfile": {
-                                "vmSize": "Standard_A2m_v2"
+                                "vmSize": "STANDARD_D3_V2"
                             },
                             "osProfile": {
                                 "linuxOperatingSystemProfile": {

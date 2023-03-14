@@ -1,10 +1,18 @@
-# Copyright 2016-2017 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 from .common import BaseTest
 
 
 class TestMLModel(BaseTest):
+
+    def test_ml_deprecated(self):
+        factory = self.replay_flight_data("test_ml_depecrated")
+        p = self.load_policy(
+            {"name": "get-ml-model", "resource": "ml-model"},
+            session_factory=factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
 
     def test_query_models(self):
         factory = self.replay_flight_data("test_ml_model_query")

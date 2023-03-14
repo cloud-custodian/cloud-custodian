@@ -1,4 +1,3 @@
-# Copyright 2019 Microsoft Corporation
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
@@ -30,7 +29,7 @@ class Databricks(ArmResourceManager):
     class resource_type(ArmResourceManager.resource_type):
         doc_groups = ['AI + Machine Learning']
 
-        service = 'azure.mgmt.databricks.databricks_client'
+        service = 'azure.mgmt.databricks'
         client = 'DatabricksClient'
         enum_spec = ('workspaces', 'list_by_subscription', None)
         default_report_fields = (

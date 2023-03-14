@@ -1,0 +1,103 @@
+{
+    "status_code": 200,
+    "data": {
+        "Aliases": [
+            {
+                "AliasName": "alias/aws/dynamodb",
+                "AliasArn": "arn:aws:kms:us-west-1:644160558196:alias/aws/dynamodb"
+            },
+            {
+                "AliasName": "alias/aws/ebs",
+                "AliasArn": "arn:aws:kms:us-west-1:644160558196:alias/aws/ebs"
+            },
+            {
+                "AliasName": "alias/aws/elasticfilesystem",
+                "AliasArn": "arn:aws:kms:us-west-1:644160558196:alias/aws/elasticfilesystem"
+            },
+            {
+                "AliasName": "alias/aws/es",
+                "AliasArn": "arn:aws:kms:us-west-1:644160558196:alias/aws/es"
+            },
+            {
+                "AliasName": "alias/aws/glue",
+                "AliasArn": "arn:aws:kms:us-west-1:644160558196:alias/aws/glue"
+            },
+            {
+                "AliasName": "alias/aws/kinesisvideo",
+                "AliasArn": "arn:aws:kms:us-west-1:644160558196:alias/aws/kinesisvideo"
+            },
+            {
+                "AliasName": "alias/aws/rds",
+                "AliasArn": "arn:aws:kms:us-west-1:644160558196:alias/aws/rds"
+            },
+            {
+                "AliasName": "alias/aws/redshift",
+                "AliasArn": "arn:aws:kms:us-west-1:644160558196:alias/aws/redshift"
+            },
+            {
+                "AliasName": "alias/aws/s3",
+                "AliasArn": "arn:aws:kms:us-west-1:644160558196:alias/aws/s3"
+            },
+            {
+                "AliasName": "alias/aws/ssm",
+                "AliasArn": "arn:aws:kms:us-west-1:644160558196:alias/aws/ssm"
+            },
+            {
+                "AliasName": "alias/aws/xray",
+                "AliasArn": "arn:aws:kms:us-west-1:644160558196:alias/aws/xray"
+            },
+            {
+                "AliasName": "alias/test-kms-permissive",
+                "AliasArn": "arn:aws:kms:us-west-1:644160558196:alias/test-kms-permissive",
+                "TargetKeyId": "fb019403-0594-4a97-b987-8e493fb76181",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 5,
+                    "day": 20,
+                    "hour": 13,
+                    "minute": 43,
+                    "second": 9,
+                    "microsecond": 274000
+                },
+                "LastUpdatedDate": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 5,
+                    "day": 20,
+                    "hour": 13,
+                    "minute": 43,
+                    "second": 9,
+                    "microsecond": 274000
+                }
+            },
+            {
+                "AliasName": "alias/test-kms-restrictive",
+                "AliasArn": "arn:aws:kms:us-west-1:644160558196:alias/test-kms-restrictive",
+                "TargetKeyId": "d01ee9b3-ce85-4622-8e1c-ce85b8cdc89d",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 5,
+                    "day": 20,
+                    "hour": 13,
+                    "minute": 42,
+                    "second": 23,
+                    "microsecond": 374000
+                },
+                "LastUpdatedDate": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 5,
+                    "day": 20,
+                    "hour": 13,
+                    "minute": 42,
+                    "second": 23,
+                    "microsecond": 374000
+                }
+            }
+        ],
+        "Truncated": false,
+        "ResponseMetadata": {}
+    }
+}

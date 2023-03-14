@@ -10,7 +10,7 @@ Unit tests can be run with:
 
 .. code-block:: bash
 
-   $ tox
+   $ make test
 
 Linting can be run with:
 
@@ -18,18 +18,20 @@ Linting can be run with:
 
   $ make lint
 
-To run tests directly with pytest, or to integrate into your IDE, you can reference
-``tox.ini`` for the appropriate commands and environment variable configuration.
-Testing done without ``C7N_TEST_RUN`` and ``C7N_VALIDATE`` may not match ``tox`` results.
+Individual package tests can be targeted with pytest:
+
+.. code-block:: bash
+
+   $ poetry run pytest -n auto -s tools/c7n_left
+
+Note we maintain a set of common environment variables used when running tests in `test.env`.
+Beyond dummy values for cloud providers, Of particular note is C7N_VALIDATE.
+
 
 Operating System Compatibility
 ------------------------------
 
-Tests are currently executed on both Ubuntu 1804 and Windows Server 2019
-and must pass on both operating systems.
-
-Both Windows and Linux sample dockerfiles are provided for running Tox which may help you.
-You can find these in `tools/dev`.
+Tests are currently executed on both Ubuntu 2204, Mac OS, and Windows Server and must pass across operating systems.
 
 In Docker for Windows you can run both of these containers,
 `even simultaneously <https://docs.microsoft.com/en-us/virtualization/windowscontainers/deploy-containers/linux-containers>`_.
@@ -55,6 +57,7 @@ the pytest-terraform library.
 
   - `Pytest Terraform <https://github.com/cloud-custodian/pytest-terraform>`_ a Pytest Plugin leveraging terraform to setup test environments
 
+.. _Creating Tests:
 
 Creating Cloud Resources with Terraform
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -73,13 +76,13 @@ shell's PATH.
 In addition to a working terraform installation, credentials and configuration for the target cloud will need to be completed.
 `Getting started with Terraform <https://learn.hashicorp.com/terraform>`_
 
-Pytest Terraform looks for matching modules in the ```tests/terraform`` directory.
-So for a test named ```test_file_example`` the terraform files for that test will be in ``tests/terraform/file_example``.
+Pytest Terraform looks for matching modules in the ``tests/terraform`` directory.
+So for a test named ``test_file_example`` the terraform files for that test will be in ``tests/terraform/file_example``.
 
 Here's an example terraform file for the upcoming example.
 It is placed in ``tests/terraform/file_example/main.tf``.
 
-  .. code-block:: terraform
+  ::
 
     resource "local_file" "bar" {
        content = "bar!"
@@ -153,7 +156,7 @@ Recording Custodian Interactions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Cloud Custodian tests provide a pytest fixture, ``test``, that provides access to
-common unitest methods (such as ``assertEqual``) as well as the placebo based test methods.
+common unittest methods (such as ``assertEqual``) as well as the placebo based test methods.
 In order to write a placebo enabled test two helper methods are provided:
 
   - ``record_flight_data`` - use this when creating the test
@@ -258,7 +261,7 @@ to inspect cloud entities after each test run.
 In this example we create a new SQS and a policy to delete it then assert it is
 deleted. To avoid terraform erroring on teardown `TEARDOWN_IGNORE` is used.
 
-  .. code-block:: terraform
+  ::
 
     provider "aws" {}
 
@@ -303,6 +306,7 @@ The following test uses the above `sqs_delete` terraform module:
         # Attempt to delete the queue and expect AWS API to produce an error
         pytest.raises(ClientError, client.purge_queue, QueueUrl=queue_url)
 
+.. _Converting Tests:
 
 Converting older functional tests
 ---------------------------------

@@ -1,0 +1,33 @@
+{
+  "body": {
+    "updateTime": "2019-05-21T14:55:13.026365489Z", 
+    "name": "test_name", 
+    "metricDescriptor": {
+      "name": "projects/cloud-custodian/metricDescriptors/logging.googleapis.com/user/test_name", 
+      "metricKind": "DELTA", 
+      "valueType": "INT64", 
+      "type": "logging.googleapis.com/user/test_name", 
+      "unit": "1", 
+      "description": "sinks"
+    }, 
+    "filter": "resource.type=\"gae_app\"\n", 
+    "createTime": "2019-05-21T14:55:13.026365489Z", 
+    "description": "sinks"
+  }, 
+  "headers": {
+    "status": "200", 
+    "content-length": "474", 
+    "x-xss-protection": "0", 
+    "content-location": "https://logging.googleapis.com/v2/projects/cloud-custodian/metrics/test_name?alt=json", 
+    "x-content-type-options": "nosniff", 
+    "transfer-encoding": "chunked", 
+    "vary": "Origin, X-Origin, Referer", 
+    "server": "ESF", 
+    "-content-encoding": "gzip", 
+    "cache-control": "private", 
+    "date": "Tue, 21 May 2019 15:09:14 GMT", 
+    "x-frame-options": "SAMEORIGIN", 
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"46,44,43,39\"", 
+    "content-type": "application/json; charset=UTF-8"
+  }
+}

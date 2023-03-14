@@ -1,4 +1,3 @@
-# Copyright 2017-2018 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 from c7n.actions import BaseAction
@@ -21,19 +20,19 @@ class ComputeEnvironment(QueryResourceManager):
         arn_type = "compute-environment"
         enum_spec = (
             'describe_compute_environments', 'computeEnvironments', None)
-        cfn_type = 'AWS::Batch::ComputeEnvironment'
+        cfn_type = config_type = 'AWS::Batch::ComputeEnvironment'
 
 
 @ComputeEnvironment.filter_registry.register('security-group')
 class ComputeSGFilter(SecurityGroupFilter):
 
-    RelatedIdsExpression = "computeResources.securityGroupIds"
+    RelatedIdsExpression = "computeResources.securityGroupIds[]"
 
 
 @ComputeEnvironment.filter_registry.register('subnet')
 class ComputeSubnetFilter(SubnetFilter):
 
-    RelatedIdsExpression = "computeResources.subnets"
+    RelatedIdsExpression = "computeResources.subnets[]"
 
 
 @resources.register('batch-definition')
@@ -167,3 +166,18 @@ class DefinitionDeregister(BaseAction):
             self.manager.session_factory).client('batch')
         with self.executor_factory(max_workers=2) as w:
             list(w.map(self.deregister_definition, resources))
+
+
+@resources.register('batch-queue')
+class BatchJobQueue(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'batch'
+        filter_name = 'jobQueues'
+        filter_type = 'list'
+        id = name = 'jobQueueName'
+        arn = 'jobQueueArn'
+        arn_type = 'job-queue'
+        enum_spec = (
+            'describe_job_queues', 'jobQueues', None)
+        cfn_type = config_type = 'AWS::Batch::JobQueue'

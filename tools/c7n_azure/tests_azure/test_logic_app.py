@@ -1,4 +1,3 @@
-# Copyright 2019 Microsoft Corporation
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
@@ -14,6 +13,9 @@ from c7n.utils import local_session
 
 
 class LogicAppTest(BaseTest):
+
+    def test_valid_schema(self):
+        assert 'url' not in LogicAppAction.schema['properties']
 
     def test_valid_policy(self):
         policy = {

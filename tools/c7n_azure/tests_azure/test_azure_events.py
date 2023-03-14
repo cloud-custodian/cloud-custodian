@@ -1,4 +1,3 @@
-# Copyright 2015-2018 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 from azure.mgmt.eventgrid.models import StorageQueueEventSubscriptionDestination
@@ -44,8 +43,7 @@ class AzureEventsTest(BaseTest):
         self.assertTrue('Microsoft.Compute/virtualMachines/write' in event_operations)
         self.assertTrue('Microsoft.Web/serverFarms/write' in event_operations)
 
-    @patch('azure.mgmt.eventgrid.operations.event_subscriptions_operations.'
-           'EventSubscriptionsOperations.create_or_update')
+    @patch('azure.mgmt.eventgrid.operations.''EventSubscriptionsOperations.begin_create_or_update')
     def test_create_azure_event_subscription(self, create_mock):
         sub_destination = StorageQueueEventSubscriptionDestination(resource_id="cctestid",
                                                                    queue_name="cctestevensub")

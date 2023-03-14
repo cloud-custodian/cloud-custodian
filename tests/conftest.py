@@ -26,6 +26,8 @@ except ImportError: # noqa
         pass
 
 
+pytest_plugins = ("pytest_recording",)
+
 # If we have C7N_FUNCTIONAL make sure Replay is False otherwise enable Replay
 LazyReplay.value = not strtobool(os.environ.get('C7N_FUNCTIONAL', 'no'))
 LazyPluginCacheDir.value = '../.tfcache'
@@ -38,7 +40,7 @@ class TerraformAWSRewriteHooks:
     """
     def pytest_terraform_modify_state(self, tfstate):
         """ Sanitize functional testing account data """
-        tfstate.update(re.sub(r'([0-9]+){12}', ACCOUNT_ID, str(tfstate)))
+        tfstate.update(re.sub(r'\b\d{12}\b', ACCOUNT_ID, str(tfstate)))
 
 
 class CustodianAWSTesting(PyTestUtils, PillTest):

@@ -1,0 +1,11 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "DomainConfig": {
+            "AccessPolicies": {
+                "Options": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"SpecificAllow\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::644160558196:root\"},\"Action\":\"es:*\",\"Resource\":\"arn:aws:es:us-east-1:644160558196:domain/test-es/*\"},{\"Sid\":\"CrossAccount\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":\"es:ESHttpGet\",\"Resource\":\"arn:aws:es:us-east-1:644160558196:domain/test-es/*\"}]}"
+            }
+        }
+    }
+}

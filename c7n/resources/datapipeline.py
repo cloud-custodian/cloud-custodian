@@ -1,4 +1,3 @@
-# Copyright 2017 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 """Data Pipeline
@@ -27,7 +26,7 @@ class DataPipeline(QueryResourceManager):
     class resource_type(TypeInfo):
         service = 'datapipeline'
         arn_type = 'dataPipeline'
-        id = 'id'
+        id = 'pipelineId'
         name = 'name'
         dimension = 'name'
         batch_detail_spec = (
@@ -67,6 +66,7 @@ def _datapipeline_info(pipes, session_factory, executor_factory, retry):
 
         for pipe_desc in results['pipelineDescriptionList']:
             pipe = pipe_map[pipe_desc['pipelineId']]
+            pipe['pipelineId'] = pipe_desc['pipelineId']
             pipe['Tags'] = [
                 {'Key': t['key'], 'Value': t['value']}
                 for t in pipe_desc['tags']]

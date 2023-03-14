@@ -5,6 +5,9 @@ policies:
         type: azure-event-grid
         events: ['ResourceGroupWrite']
         provision-options:
+          identity:
+            type: UserAssigned
+            id: ${identity_name}
           servicePlan:
             resourceGroupName: ${rg_name}-consumption
     filters:
@@ -21,6 +24,9 @@ policies:
         type: azure-event-grid
         events: ['ResourceGroupWrite']
         provision-options:
+          identity:
+            type: UserAssigned
+            id: ${identity_name}
           servicePlan:
             resourceGroupName: ${rg_name}-dedicated
             skuName: S2
@@ -39,6 +45,9 @@ policies:
         type: azure-periodic
         schedule: '0 */5 * * * *'
         provision-options:
+          identity:
+            type: UserAssigned
+            id: ${identity_name}
           servicePlan:
             resourceGroupName: ${rg_name}-consumption
     filters:
@@ -55,6 +64,9 @@ policies:
         type: azure-periodic
         schedule: '0 */5 * * * *'
         provision-options:
+          identity:
+            type: UserAssigned
+            id: ${identity_name}
           servicePlan:
             resourceGroupName: ${rg_name}-dedicated
             skuName: S2

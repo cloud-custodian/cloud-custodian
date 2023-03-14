@@ -1,4 +1,3 @@
-# Copyright 2016-2017 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import json
@@ -6,7 +5,7 @@ import logging
 import os
 
 
-from c7n.query import ResourceQuery, RetryPageIterator
+from c7n.query import ResourceQuery, RetryPageIterator, TypeInfo
 from c7n.resources.vpc import InternetGateway
 
 from botocore.config import Config
@@ -96,6 +95,9 @@ class ResourceQueryTest(BaseTest):
         resources = q.get(p.resource_manager, ["igw-3d9e3d56"])
         self.assertEqual(len(resources), 1)
 
+    def test_type_info(self):
+        assert repr(TypeInfo) == "<TypeInfo TypeInfo>"
+
 
 class ConfigSourceTest(BaseTest):
 
@@ -121,7 +123,7 @@ class ConfigSourceTest(BaseTest):
         # default query construction
         self.assertTrue(
             source.get_query_params(None)['expr'].startswith(
-                'select configuration, supplementaryConfiguration where resourceType'))
+                'select resourceId, configuration, supplementaryConfiguration where resourceType'))
 
         p.data['query'] = [{'clause': "configuration.imageId = 'xyz'"}]
         self.assertIn("imageId = 'xyz'", source.get_query_params(None)['expr'])

@@ -1,4 +1,3 @@
-# Copyright 2015-2017 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import datetime
@@ -321,6 +320,17 @@ class OffHoursFilterTest(BaseTest):
         self.assertTrue(off.parser.keys_are_valid(off.get_tag_value(i)))
         self.assertEqual(off.parser.raw_data(off.get_tag_value(i)), {"tz": "pt"})
 
+    def test_offhours_get_value_fallback(self):
+        sched = "off=[(S,1)];on=[(M,6)];tz=pst"
+        off = OffHour({"default_tz": "ct", "fallback-schedule": sched})
+        i = instance(Tags=[])
+        self.assertEqual(off.get_tag_value(i), sched.lower())
+        self.assertTrue(off.parser.has_resource_schedule(off.get_tag_value(i), "off"))
+        self.assertTrue(off.parser.has_resource_schedule(off.get_tag_value(i), "on"))
+        self.assertTrue(off.parser.keys_are_valid(off.get_tag_value(i)))
+        self.assertEqual(off.parser.raw_data(off.get_tag_value(i)),
+                        {'off': '[(s,1)]', 'on': '[(m,6)]', 'tz': 'pst'})
+
     def test_offhours(self):
         t = datetime.datetime(
             year=2015,
@@ -405,6 +415,12 @@ class OffHoursFilterTest(BaseTest):
             ]:
                 results.append(OnHour({})(i))
             self.assertEqual(results, [True, False])
+
+    def test_unescape_tag_restrictions(self):
+        unescaped = Time.unescape_tag_restrictions("off=u28M-Fu2c18u29u3btz=Australia/Sydney")
+        assert unescaped == "off=(M-F,18);tz=Australia/Sydney"
+        unescaped2 = Time.unescape_tag_restrictions("off=u5bu28M-Fu2c18u29u2cu28Su2c13u29u5d")
+        assert unescaped2 == "off=[(M-F,18),(S,13)]"
 
     def test_arizona_tz(self):
         t = datetime.datetime.now(tzutil.gettz("America/New_York"))

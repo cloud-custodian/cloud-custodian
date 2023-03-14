@@ -1,4 +1,3 @@
-# Copyright 2019 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
@@ -10,7 +9,7 @@ from gcp_common import BaseTest
 
 
 def test_gcp_resource_metadata_asset_type():
-    load_resources('gcp.*')
+    load_resources(('gcp.*',))
     # asset inventory doesn't support these
     whitelist = set((
         'app-engine-domain',

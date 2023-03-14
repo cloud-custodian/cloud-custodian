@@ -1,4 +1,3 @@
-# Copyright 2019 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
@@ -20,6 +19,11 @@ class CloudBillingAccountTest(BaseTest):
         billingaccount_resources = policy.run()
         self.assertEqual(billingaccount_resources[0]['name'], billingaccount_resource_name)
 
+        self.assertEqual(
+            policy.resource_manager.get_urns(billingaccount_resources),
+            ["gcp:cloudbilling::cloud-custodian:account/CU570D-1A4CU5-70D1A4"],
+        )
+
     def test_billingaccount_get(self):
         billingaccount_resource_name = 'billingAccounts/CU570D-1A4CU5-70D1A4'
         session_factory = self.replay_flight_data(
@@ -39,3 +43,8 @@ class CloudBillingAccountTest(BaseTest):
 
         resources = exec_mode.run(event, None)
         self.assertEqual(resources[0]['name'], billingaccount_resource_name)
+
+        self.assertEqual(
+            policy.resource_manager.get_urns(resources),
+            ["gcp:cloudbilling::cloud-custodian:account/CU570D-1A4CU5-70D1A4"],
+        )

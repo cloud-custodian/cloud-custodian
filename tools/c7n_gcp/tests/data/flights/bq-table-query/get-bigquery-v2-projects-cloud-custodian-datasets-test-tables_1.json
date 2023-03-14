@@ -1,37 +1,39 @@
 {
+  "headers": {
+    "etag": "bJppARBk8S5DQta2hgw11w==",
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Tue, 28 Feb 2023 19:40:05 GMT",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "474",
+    "-content-encoding": "gzip",
+    "content-location": "https://bigquery.googleapis.com/bigquery/v2/projects/cloud-custodian/datasets/test/tables?alt=json"
+  },
   "body": {
-    "totalItems": 2, 
+    "kind": "bigquery#tableList",
+    "etag": "bJppARBk8S5DQta2hgw11w==",
     "tables": [
       {
-        "creationTime": "1551972334903", 
-        "kind": "bigquery#table", 
-        "type": "TABLE", 
+        "kind": "bigquery#table",
         "id": "cloud-custodian:test.test",
         "tableReference": {
           "projectId": "cloud-custodian",
-          "tableId": "test", 
-          "datasetId": "test"
-        }
+          "datasetId": "test",
+          "tableId": "test"
+        },
+        "type": "TABLE",
+        "labels": {
+          "c7n": "c7nstack"
+        },
+        "creationTime": "1677600507108"
       }
     ],
-    "kind": "bigquery#tableList", 
-    "etag": "a3s9qSOzZm5VY/w0igSFSw=="
-  }, 
-  "headers": {
-    "status": "200", 
-    "content-length": "686", 
-    "x-xss-protection": "0", 
-    "content-location": "https://www.googleapis.com/bigquery/v2/projects/cloud-custodian/datasets/test/tables?alt=json",
-    "x-content-type-options": "nosniff", 
-    "transfer-encoding": "chunked", 
-    "vary": "Origin, X-Origin, Referer", 
-    "server": "ESF", 
-    "etag": "a3s9qSOzZm5VY/w0igSFSw==", 
-    "cache-control": "private", 
-    "date": "Wed, 24 Apr 2019 09:44:10 GMT", 
-    "x-frame-options": "SAMEORIGIN", 
-    "alt-svc": "quic=\":443\"; ma=2592000; v=\"46,44,43,39\"", 
-    "content-type": "application/json; charset=UTF-8", 
-    "-content-encoding": "gzip"
+    "totalItems": 1
   }
 }

@@ -1,40 +1,25 @@
 {
+  "headers":{},
   "body": {
     "jobs": [
       {
-        "name": "test", 
+        "id": "2021-04-27_08_34_20-8562643317148312878",
         "projectId": "cloud-custodian",
-        "createTime": "2019-03-06T15:01:50.876626Z", 
+        "name": "test",
+        "type": "JOB_TYPE_STREAMING",
+        "currentState": "JOB_STATE_RUNNING",
+        "currentStateTime": "2021-04-27T15:34:29.003405Z",
+        "createTime": "2021-04-27T15:34:21.567761Z",
+        "location": "us-central1",
         "jobMetadata": {
           "sdkVersion": {
-            "versionDisplayName": "Apache Beam SDK for Java", 
-            "version": "2.10.0", 
+            "version": "2.27.0",
+            "versionDisplayName": "Apache Beam SDK for Java",
             "sdkSupportStatus": "SUPPORTED"
           }
-        }, 
-        "currentStateTime": "2019-03-06T15:01:52.612535Z", 
-        "startTime": "2019-03-06T15:01:50.876626Z", 
-        "type": "JOB_TYPE_BATCH", 
-        "id": "2019-03-06_07_01_49-7812926814622315875", 
-        "currentState": "JOB_STATE_FAILED", 
-        "location": "us-central1"
+        },
+        "startTime": "2021-04-27T15:34:21.567761Z"
       }
     ]
-  }, 
-  "headers": {
-    "status": "200", 
-    "content-length": "614", 
-    "x-xss-protection": "1; mode=block", 
-    "content-location": "https://dataflow.googleapis.com/v1b3/projects/cloud-custodian/jobs?alt=json",
-    "x-content-type-options": "nosniff", 
-    "transfer-encoding": "chunked", 
-    "vary": "Origin, X-Origin, Referer", 
-    "server": "ESF", 
-    "-content-encoding": "gzip", 
-    "cache-control": "private", 
-    "date": "Wed, 06 Mar 2019 15:20:07 GMT", 
-    "x-frame-options": "SAMEORIGIN", 
-    "alt-svc": "quic=\":443\"; ma=2592000; v=\"44,43,39\"", 
-    "content-type": "application/json; charset=UTF-8"
   }
 }

@@ -25,8 +25,8 @@ Compute
 
   ./*compute*
 
-Databases
----------
+Storage and Databases
+---------------------
 
 .. toctree::
   :maxdepth: 2

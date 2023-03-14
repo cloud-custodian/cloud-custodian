@@ -1,0 +1,24 @@
+{
+    "status_code": 200,
+    "data": {
+        "SSHPublicKeys": [
+            {
+                "UserName": "test2",
+                "SSHPublicKeyId": "APKAY5Y4D45RNUYUHMY5",
+                "Status": "Active",
+                "UploadDate": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 12,
+                    "day": 22,
+                    "hour": 3,
+                    "minute": 9,
+                    "second": 53,
+                    "microsecond": 0
+                }
+            }
+        ],
+        "IsTruncated": false,
+        "ResponseMetadata": {}
+    }
+}

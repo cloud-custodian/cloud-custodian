@@ -1,4 +1,3 @@
-# Copyright 2018 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import copy
@@ -79,11 +78,13 @@ class FunctionPackage:
                 auth_contents = s.get_functions_auth_string(target_sub_id)
             elif identity['type'] == AUTH_TYPE_MSI:
                 auth_contents = json.dumps({
-                    'use_msi': True, 'subscription_id': target_sub_id})
+                    'use_msi': True, 'subscription_id': target_sub_id,
+                    'tenant_id': s.get_tenant_id()})
             elif identity['type'] == AUTH_TYPE_UAI:
                 auth_contents = json.dumps({
                     'use_msi': True, 'subscription_id': target_sub_id,
-                    'client_id': identity['client_id']})
+                    'client_id': identity['client_id'],
+                    'tenant_id': s.get_tenant_id()})
 
             self.pkg.add_contents(dest=name + '/auth.json', contents=auth_contents)
             self.pkg.add_file(self.function_path,
@@ -167,7 +168,7 @@ class FunctionPackage:
     def status(self, deployment_creds):
         status_url = '%s/api/deployments' % deployment_creds.scm_uri
 
-        r = requests.get(status_url, verify=self.enable_ssl_cert)
+        r = requests.get(status_url, verify=self.enable_ssl_cert, timeout=60)
         if r.status_code != 200:
             self.log.error("Application service returned an error.\n%s\n%s"
                            % (r.status_code, r.text))

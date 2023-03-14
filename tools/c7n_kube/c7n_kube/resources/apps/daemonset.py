@@ -1,4 +1,3 @@
-# Copyright 2019 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 #
@@ -14,3 +13,4 @@ class DaemonSet(QueryResourceManager):
         patch = 'patch_namespaced_daemon_set'
         delete = 'delete_namespaced_daemon_set'
         enum_spec = ('list_daemon_set_for_all_namespaces', 'items', None)
+        plural = 'daemonsets'

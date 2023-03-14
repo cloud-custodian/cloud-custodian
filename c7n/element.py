@@ -4,6 +4,7 @@
 
 import jmespath
 
+from c7n import deprecated
 from c7n.executor import ThreadPoolExecutor
 
 
@@ -52,3 +53,7 @@ class Element:
                 self.type, len(results), resource_count, key_expr,
                 (', '.join(allowed_values)))
         return results
+
+    def get_deprecations(self):
+        """Return any matching deprecations for the policy fields itself."""
+        return deprecated.check_deprecations(self, self.type + ":")

@@ -1,0 +1,142 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Reservations": [
+            {
+                "OwnerId": "644160558196", 
+                "ReservationId": "r-004a79105c91013c8", 
+                "Groups": [], 
+                "Instances": [
+                    {
+                        "Monitoring": {
+                            "State": "disabled"
+                        }, 
+                        "PublicDnsName": "ec2-35-162-52-140.us-west-2.compute.amazonaws.com", 
+                        "State": {
+                            "Code": 16, 
+                            "Name": "running"
+                        }, 
+                        "EbsOptimized": false, 
+                        "LaunchTime": {
+                            "hour": 20, 
+                            "__class__": "datetime", 
+                            "month": 10, 
+                            "second": 59, 
+                            "microsecond": 0, 
+                            "year": 2016, 
+                            "day": 29, 
+                            "minute": 45
+                        }, 
+                        "PublicIpAddress": "35.162.52.140", 
+                        "PrivateIpAddress": "172.31.26.53", 
+                        "ProductCodes": [], 
+                        "VpcId": "vpc-4a9ff72e", 
+                        "StateTransitionReason": "", 
+                        "InstanceId": "i-0a3e363a5366795dd", 
+                        "EnaSupport": true, 
+                        "ImageId": "ami-0882319d1311c34f0", 
+                        "PrivateDnsName": "ip-172-31-26-53.us-west-2.compute.internal", 
+                        "KeyName": "m", 
+                        "SecurityGroups": [
+                            {
+                                "GroupName": "default", 
+                                "GroupId": "sg-f9cc4d9f"
+                            }
+                        ], 
+                        "ClientToken": "TXGvw1477773959019", 
+                        "SubnetId": "subnet-15452171", 
+                        "InstanceType": "r3.xlarge", 
+                        "NetworkInterfaces": [
+                            {
+                                "Status": "in-use", 
+                                "MacAddress": "02:75:ee:9d:a1:49", 
+                                "SourceDestCheck": true, 
+                                "VpcId": "vpc-4a9ff72e", 
+                                "Description": "", 
+                                "Association": {
+                                    "PublicIp": "35.162.52.140", 
+                                    "PublicDnsName": "ec2-35-162-52-140.us-west-2.compute.amazonaws.com", 
+                                    "IpOwnerId": "amazon"
+                                }, 
+                                "NetworkInterfaceId": "eni-caa070b4", 
+                                "PrivateIpAddresses": [
+                                    {
+                                        "PrivateDnsName": "ip-172-31-26-53.us-west-2.compute.internal", 
+                                        "Association": {
+                                            "PublicIp": "35.162.52.140", 
+                                            "PublicDnsName": "ec2-35-162-52-140.us-west-2.compute.amazonaws.com", 
+                                            "IpOwnerId": "amazon"
+                                        }, 
+                                        "Primary": true, 
+                                        "PrivateIpAddress": "172.31.26.53"
+                                    }
+                                ], 
+                                "PrivateDnsName": "ip-172-31-26-53.us-west-2.compute.internal", 
+                                "Attachment": {
+                                    "Status": "attached", 
+                                    "DeviceIndex": 0, 
+                                    "DeleteOnTermination": true, 
+                                    "AttachmentId": "eni-attach-f453157c", 
+                                    "AttachTime": {
+                                        "hour": 20, 
+                                        "__class__": "datetime", 
+                                        "month": 10, 
+                                        "second": 59, 
+                                        "microsecond": 0, 
+                                        "year": 2016, 
+                                        "day": 29, 
+                                        "minute": 45
+                                    }
+                                }, 
+                                "Groups": [
+                                    {
+                                        "GroupName": "default", 
+                                        "GroupId": "sg-f9cc4d9f"
+                                    }
+                                ], 
+                                "SubnetId": "subnet-15452171", 
+                                "OwnerId": "644160558196", 
+                                "PrivateIpAddress": "172.31.26.53"
+                            }
+                        ], 
+                        "SourceDestCheck": true, 
+                        "Placement": {
+                            "Tenancy": "default", 
+                            "GroupName": "", 
+                            "AvailabilityZone": "us-west-2a"
+                        }, 
+                        "Hypervisor": "xen", 
+                        "BlockDeviceMappings": [], 
+                        "Architecture": "x86_64", 
+                        "RootDeviceType": "instance-store",
+                        "IamInstanceProfile": {
+                            "Id": "AIPAJO5EMJ3YEMNUF5ZWM", 
+                            "Arn": "arn:aws:iam::644160558196:instance-profile/CloudCustodianRole"
+                        }, 
+                        "RootDeviceName": "/dev/xvda", 
+                        "VirtualizationType": "hvm", 
+                        "Tags": [
+                            {
+                                "Value": "", 
+                                "Key": "Name"
+                            }
+                        ], 
+                        "AmiLaunchIndex": 0
+                    }
+                ]
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "c66549d9-cdce-473d-8ffd-d6c48c541b78", 
+            "HTTPHeaders": {
+                "transfer-encoding": "chunked", 
+                "vary": "Accept-Encoding", 
+                "server": "AmazonEC2", 
+                "content-type": "text/xml;charset=UTF-8", 
+                "date": "Thu, 17 Nov 2022 10:43:01 GMT"
+            }
+        }
+    }
+}

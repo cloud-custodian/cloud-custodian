@@ -1,4 +1,3 @@
-# Copyright 2019 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 #
@@ -15,3 +14,4 @@ class ReplicationController(QueryResourceManager):
         patch = 'patch_namespaced_replication_controller'
         delete = 'delete_namespaced_replication_controller'
         enum_spec = ('list_replication_controller_for_all_namespaces', 'items', None)
+        plural = 'replicationcontrollers'

@@ -1,10 +1,11 @@
-# Copyright 2018 Capital One Services, LLC
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import jmespath
 
+from c7n.utils import type_schema
 from c7n_gcp.query import QueryResourceManager, TypeInfo, ChildTypeInfo, ChildResourceManager
 from c7n_gcp.provider import resources
+from c7n_gcp.actions import MethodAction
 
 
 @resources.register('bq-dataset')
@@ -25,7 +26,11 @@ class DataSet(QueryResourceManager):
             id, name, "description",
             "creationTime", "lastModifiedTime"]
         asset_type = "bigquery.googleapis.com/Dataset"
+        scc_type = "google.cloud.bigquery.Dataset"
+        metric_key = "resource.labels.dataset_id"
         permissions = ('bigquery.datasets.get',)
+        urn_component = "dataset"
+        urn_id_path = "datasetReference.datasetId"
 
         @staticmethod
         def get(client, event):
@@ -67,6 +72,7 @@ class BigQueryJob(QueryResourceManager):
         scope_key = 'projectId'
         name = id = 'id'
         default_report_fields = ["id", "user_email", "status.state"]
+        urn_component = "job"
 
         @staticmethod
         def get(client, event):
@@ -76,6 +82,11 @@ class BigQueryJob(QueryResourceManager):
                     'protoPayload.metadata.tableCreation.jobName', event
                 ).rsplit('/', 1)[-1]
             })
+
+        @classmethod
+        def _get_urn_id(cls, resource):
+            jobRef = resource['jobReference']
+            return f"{jobRef['location']}/{jobRef['jobId']}"
 
 
 @resources.register('bq-table')
@@ -104,6 +115,13 @@ class BigQueryTable(ChildResourceManager):
             ]
         }
         asset_type = "bigquery.googleapis.com/Table"
+        urn_component = "table"
+        urn_id_path = "tableReference.tableId"
+
+        @classmethod
+        def _get_urn_id(cls, resource):
+            tableRef = resource['tableReference']
+            return f"{tableRef['datasetId']}/{tableRef['tableId']}"
 
         @staticmethod
         def get(client, event):
@@ -112,3 +130,27 @@ class BigQueryTable(ChildResourceManager):
                 'datasetId': event['dataset_id'],
                 'tableId': event['resourceName'].rsplit('/', 1)[-1]
             })
+
+    def augment(self, resources):
+        client = self.get_client()
+        results = []
+        for r in resources:
+            ref = r['tableReference']
+            results.append(
+                client.execute_query(
+                    'get', verb_arguments=ref))
+        return results
+
+
+@BigQueryTable.action_registry.register('delete')
+class DeleteBQTable(MethodAction):
+    schema = type_schema('delete')
+    method_spec = {'op': 'delete'}
+    permissions = ('bigquery.tables.get', 'bigquery.tables.delete')
+
+    def get_resource_params(self, model, r):
+        return {
+            'projectId': r['tableReference']['projectId'],
+            'datasetId': r['tableReference']['datasetId'],
+            'tableId': r['tableReference']['tableId']
+        }
