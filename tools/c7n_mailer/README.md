@@ -326,6 +326,7 @@ and here is a description of the options:
 |           | `redis_host`                | string  | redis host if cache_engine == redis                                                                                                                                                                |
 |           | `redis_port`                | integer | redis port, default: 6369                                                                                                                                                                          |
 |           | `ses_region`                | string  | AWS region that handles SES API calls                                                                                                                                                              |
+|           | `ses_role`                  | string  | ARN of the role to assume to send email with SES                                                                                                                                               |
 
 ### SMTP Config
 
