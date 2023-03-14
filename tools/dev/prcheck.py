@@ -4,6 +4,8 @@ import operator
 from pathlib import Path
 
 import click
+
+from fastcore.xtras import obj2dict
 from ghapi.all import GhApi
 from ghapi.all import paged
 from rich.console import Console
@@ -25,14 +27,15 @@ def download(output):
     api = GhApi(owner='cloud-custodian', repo='cloud-custodian')
 
     pr_data = []
-    for page in paged(api.pulls.list, per_page=50):
-        for pr in page:
+    for idx, page in enumerate(paged(api.pulls.list, per_page=50)):
+        for pr in track(page, description="Downloading pulls page %d" % (idx + 1)):
             pr_meta = {
                 'number': pr['number'],
                 'title': pr['title'],
                 'created_at': pr['created_at'],
                 'updated_at': pr['updated_at'],
                 'user': pr['user']['login'],
+                'labels': list(pr['labels']),
                 'files': [],
             }
             for file_page in paged(api.pulls.list_files, pull_number=pr['number']):
@@ -90,9 +93,11 @@ def tag_prs(root, prs):
     if str(root) not in DIR_LABEL_MAP:
         console.print(f'{root} not in known labels')
         return
+    label = DIR_LABEL_MAP[str(root)]
     api = GhApi(owner='cloud-custodian', repo='cloud-custodian')
     for pr in track(prs, description="Adding Labels"):
-        label = DIR_LABEL_MAP[str(root)]
+        if pr.get('labels', ()) and label in {l['name'] for l in pr['labels']}:
+            continue
         api.issues.add_labels(issue_number=pr['number'], labels=[label])
 
 
