@@ -31,7 +31,13 @@ from c7n.resources import load_resources, aws
 from c7n.tags import UniversalTag
 from c7n.utils import local_session, chunks, reset_session_cache
 
-from c7n_org.cli import WORKER_COUNT, resolve_regions, get_session, _get_env_creds, init as org_init
+from c7n_org.cli import (
+    WORKER_COUNT,
+    resolve_regions,
+    get_session,
+    _get_env_creds,
+    init as org_init,
+)
 from c7n_org.utils import environ
 
 try:
@@ -58,14 +64,14 @@ RESOURCE_SCHEMA = {
             'properties': {
                 # custodian resource-type aka resource: ec2
                 'resource': {
-                    'type': 'string', 'description': 'custodian resource type'},
+                    'type': 'string',
+                    'description': 'custodian resource type',
+                },
                 # optional
                 'shape': {'type': 'string'},
                 # create events
-                'events': {
-                    'type': 'array',
-                    'items': {'$ref': '#/definitions/event'}}
-            }
+                'events': {'type': 'array', 'items': {'$ref': '#/definitions/event'}},
+            },
         },
         # resource create event descriptor
         'event': {
@@ -74,16 +80,14 @@ RESOURCE_SCHEMA = {
             'properties': {
                 'event': {'type': 'string'},
                 'service': {'type': 'string'},
-                'ids': {'type': 'string'}}
-        }
+                'ids': {'type': 'string'},
+            },
+        },
     },
     'additionalProperties': False,
     'properties': {
-        'resources': {
-            'type': 'array',
-            'items': {'$ref': '#/definitions/resource'}
-        }
-    }
+        'resources': {'type': 'array', 'items': {'$ref': '#/definitions/resource'}}
+    },
 }
 
 
@@ -139,12 +143,10 @@ def format_bytes(size):
 
 
 def format_record(r):
-    """Format a resource creation cloud trail event for db schema
-    """
+    """Format a resource creation cloud trail event for db schema"""
     rinfos = resource_map.get((r['eventSource'], r['eventName']))
     if rinfos is None:
-        log.warning(
-            "Could not resolve rinfo %s %s", r['eventSource'], r['eventName'])
+        log.warning("Could not resolve rinfo %s %s", r['eventSource'], r['eventName'])
         return
 
     utype = r['userType']
@@ -167,7 +169,11 @@ def format_record(r):
     if rid is None:
         log.warning(
             "couldn't find rids account:%s region:%s service:%s api:%s",
-            r['accountId'], r['region'], r['eventSource'], r['eventName'])
+            r['accountId'],
+            r['region'],
+            r['eventSource'],
+            r['eventName'],
+        )
         return
 
     return (
@@ -180,12 +186,12 @@ def format_record(r):
         r['sourceIPAddress'],
         uid,
         rinfo['resource']['resource'],
-        rid)
+        rid,
+    )
 
 
 def get_stream_records(stream, delimiter, stats):
-    """Extract resource creation records from s3 select statement results stream.
-    """
+    """Extract resource creation records from s3 select statement results stream."""
 
     line_buf = ""
     for event in stream:
@@ -222,12 +228,10 @@ def get_stream_records(stream, delimiter, stats):
 
 
 def process_select_set(s3, trail_bucket, object_set):
-    """Query cloudtrail s3 objects for resource creation records.
-    """
+    """Query cloudtrail s3 objects for resource creation records."""
     global resource_map
 
-    q = TRAIL_S3_QUERY.format(
-        events="'%s'" % "', '".join({k[1] for k in resource_map}))
+    q = TRAIL_S3_QUERY.format(events="'%s'" % "', '".join({k[1] for k in resource_map}))
     stats = Counter()
     delimiter = '\n'
     resource_records = []
@@ -237,25 +241,39 @@ def process_select_set(s3, trail_bucket, object_set):
             Bucket=trail_bucket,
             Key=o['Key'],
             ExpressionType='SQL',
-            InputSerialization={'CompressionType': 'GZIP', 'JSON': {'Type': 'Document'}},
+            InputSerialization={
+                'CompressionType': 'GZIP',
+                'JSON': {'Type': 'Document'},
+            },
             OutputSerialization={'JSON': {'RecordDelimiter': delimiter}},
-            Expression=q)
-        resource_records.extend(
-            get_stream_records(result['Payload'], delimiter, stats))
+            Expression=q,
+        )
+        resource_records.extend(get_stream_records(result['Payload'], delimiter, stats))
     return {'stats': dict(stats), 'records': resource_records}
 
 
-def process_athena_query(athena, workgroup, athena_db, table, athena_output,
-                         db_path, query_id=None, account_id=None, poll_period=30,
-                         year=None, month=None, day=None):
+def process_athena_query(
+    athena,
+    workgroup,
+    athena_db,
+    table,
+    athena_output,
+    db_path,
+    query_id=None,
+    account_id=None,
+    poll_period=30,
+    year=None,
+    month=None,
+    day=None,
+):
     q = TRAIL_ATHENA_QUERY.format(
         athena_db=athena_db,
         table=table,
-        events="'%s'" % "', '".join({k[1] for k in resource_map}))
+        events="'%s'" % "', '".join({k[1] for k in resource_map}),
+    )
 
     if account_id:
-        q += "and records.recipientaccountid = '{}'".format(
-            account_id)
+        q += "and records.recipientaccountid = '{}'".format(account_id)
 
     date_format, date_value = None, None
     if year:
@@ -265,44 +283,51 @@ def process_athena_query(athena, workgroup, athena_db, table, athena_output,
     if day:
         date_format, date_value = "%Y/%m/%d", month.strftime("%Y/%m/%d")
     if date_format:
-        q = q + (" AND date_format(from_iso8601_timestamp(records.eventtime), "
-                 "'{date_format}') = '{date_value}'").format(
-            date_format=date_format,
-            date_value=date_value)
+        q = q + (
+            " AND date_format(from_iso8601_timestamp(records.eventtime), "
+            "'{date_format}') = '{date_value}'"
+        ).format(date_format=date_format, date_value=date_value)
 
     if query_id is None:
         query_id = athena.start_query_execution(
-            ResultConfiguration={'OutputLocation': athena_output,
-                                 # use workload configuration to override.
-                                 'EncryptionConfiguration': {
-                                     'EncryptionOption': 'SSE_S3'}},
+            ResultConfiguration={
+                'OutputLocation': athena_output,
+                # use workload configuration to override.
+                'EncryptionConfiguration': {'EncryptionOption': 'SSE_S3'},
+            },
             QueryString=q,
-            WorkGroup=workgroup).get('QueryExecutionId')
+            WorkGroup=workgroup,
+        ).get('QueryExecutionId')
     stats = Counter()
 
     log.info("Athena query:%s", query_id)
 
     while True:
-        qexec = athena.get_query_execution(QueryExecutionId=query_id).get('QueryExecution')
+        qexec = athena.get_query_execution(QueryExecutionId=query_id).get(
+            'QueryExecution'
+        )
         if qexec.get('Statistics'):
-            stats['QueryExecutionTime'] = qexec['Statistics'].get(
-                'EngineExecutionTimeInMillis',
+            stats['QueryExecutionTime'] = (
                 qexec['Statistics'].get(
-                    'TotalExecutionTimeInMillis',
-                    1000
+                    'EngineExecutionTimeInMillis',
+                    qexec['Statistics'].get('TotalExecutionTimeInMillis', 1000),
                 )
-            ) / 1000.0
-            stats['DataScannedInBytes'] = qexec['Statistics'].get('DataScannedInBytes', 1)
+                / 1000.0
+            )
+            stats['DataScannedInBytes'] = qexec['Statistics'].get(
+                'DataScannedInBytes', 1
+            )
             log.info(
                 "Polling athena query progress scanned:%s qexec:%0.2fs",
-                format_bytes(
-                    stats['DataScannedInBytes']), stats['QueryExecutionTime'])
+                format_bytes(stats['DataScannedInBytes']),
+                stats['QueryExecutionTime'],
+            )
         if qexec.get('Status', {}).get('State') == 'FAILED':
-            raise ValueError("Athena Query Failure: {}".format(
-                qexec['Status']['StateChangeReason']))
+            raise ValueError(
+                "Athena Query Failure: {}".format(qexec['Status']['StateChangeReason'])
+            )
         if qexec.get('Status', {}).get('State') != 'SUCCEEDED':
-            log.debug("Next query result poll in %0.2f seconds" % (
-                float(poll_period)))
+            log.debug("Next query result poll in %0.2f seconds" % (float(poll_period)))
             time.sleep(poll_period)
             continue
         break
@@ -331,7 +356,6 @@ def process_athena_query(athena, workgroup, athena_db, table, athena_output,
 
 
 class TrailDB:
-
     def __init__(self, path):
         self.path = path
         self.conn = sqlite3.connect(self.path)
@@ -365,24 +389,30 @@ class TrailDB:
             self.conn.commit()
 
     def get_type_record_stats(self, account_id, region):  # nosec
-        self.cursor.execute('''
+        self.cursor.execute(
+            '''
             select rtype, count(*) as rcount
             from events
             where account_id=:account_id
               and region=:region
             group by rtype
-        ''', dict(account_id=account_id, region=region))
+        ''',
+            dict(account_id=account_id, region=region),
+        )
         return self.cursor.fetchall()
 
     def get_resource_owners(self, resource_type, account_id, region):  # nosec
-        self.cursor.execute('''
+        self.cursor.execute(
+            '''
            select user_id, resource_ids
            from events
            where rtype=:resource_type
              and account_id=:account_id
              and region=:region
            order by event_date
-        ''', dict(resource_type=resource_type, account_id=account_id, region=region))
+        ''',
+            dict(resource_type=resource_type, account_id=account_id, region=region),
+        )
         return self.cursor.fetchall()
 
 
@@ -397,7 +427,9 @@ def process_bucket(session_factory, bucket_name, prefix, db_path):
     bsize = 100
     workers = 10
 
-    log.info("Processing workers:%d cloud-trail:%s page_size:%d", workers, prefix, bsize)
+    log.info(
+        "Processing workers:%d cloud-trail:%s page_size:%d", workers, prefix, bsize
+    )
     for page in paginator.paginate(Bucket=bucket_name, Prefix=prefix):
         objects = page.get('Contents', ())
         page_stats = Counter()
@@ -409,8 +441,9 @@ def process_bucket(session_factory, bucket_name, prefix, db_path):
         with ThreadPoolExecutor(max_workers=workers) as w:
             futures = {}
             for page_objects in chunks(objects, bsize):
-                futures[w.submit(
-                    process_select_set, s3, bucket_name, page_objects)] = page_objects
+                futures[
+                    w.submit(process_select_set, s3, bucket_name, page_objects)
+                ] = page_objects
 
             for f in as_completed(futures):
                 if f.exception():
@@ -434,7 +467,6 @@ def process_bucket(session_factory, bucket_name, prefix, db_path):
 
 
 class ResourceTagger:
-
     def __init__(self, trail_db, exec_config, creator_tag, user_suffix, dryrun, types):
         self.trail_db = trail_db
         self.config = exec_config
@@ -446,7 +478,8 @@ class ResourceTagger:
 
     def process(self):
         for rtype, rcount in self.trail_db.get_type_record_stats(
-                self.config['account_id'], self.config['region']):
+            self.config['account_id'], self.config['region']
+        ):
             if self.types and rtype not in self.types:
                 continue
             resource_map = self.get_creator_resource_map(rtype)
@@ -464,19 +497,30 @@ class ResourceTagger:
                     self.stats[rtype + '-not-found'] += 1
                     log.debug(
                         "account:%s region:%s no trail record resource:%s id:%s",
-                        self.config['account_id'], self.config['region'],
-                        rtype, r[rtype_id])
+                        self.config['account_id'],
+                        self.config['region'],
+                        rtype,
+                        r[rtype_id],
+                    )
                     continue
                 uid = resource_map[r[rtype_id]]
                 user_resources.setdefault(uid, []).append(r)
                 found += 1
 
-            log.info((
-                "account:%s region:%s tag %d %s resources users:%d "
-                "population:%d not-found:%d records:%d"),
-                self.config['account_id'], self.config['region'],
-                found, rtype, len(user_resources), len(resources),
-                self.stats[rtype + "-not-found"], rcount)
+            log.info(
+                (
+                    "account:%s region:%s tag %d %s resources users:%d "
+                    "population:%d not-found:%d records:%d"
+                ),
+                self.config['account_id'],
+                self.config['region'],
+                found,
+                rtype,
+                len(user_resources),
+                len(resources),
+                self.stats[rtype + "-not-found"],
+                rcount,
+            )
             self.stats[rtype] += found
 
             for u, resources in user_resources.items():
@@ -485,14 +529,16 @@ class ResourceTagger:
                 except ClientError as e:
                     log.exception(
                         "Error tagging account:%s region:%s resource:%s error:%s",
-                        self.config['account_id'], self.config['region'], rtype,
-                        e)
+                        self.config['account_id'],
+                        self.config['region'],
+                        rtype,
+                        e,
+                    )
                     raise
         return self.stats
 
     def tag_resources(self, resource_mgr, user_id, resources):
-        """Tag set of resources with user as creator.
-        """
+        """Tag set of resources with user as creator."""
         tagger_factory = resource_mgr.action_registry['tag']
         tagger = tagger_factory({}, resource_mgr)
         client = tagger.get_client()
@@ -505,11 +551,11 @@ class ResourceTagger:
                 tagger.process_resource_set(client, resource_set, tags)
 
     def get_creator_resource_map(self, rtype):
-        """Return a map of resource id to creator for the given resource type.
-        """
+        """Return a map of resource id to creator for the given resource type."""
         resource_map = {}
         for user_id, resource_ids in self.trail_db.get_resource_owners(
-                rtype, self.config['account_id'], self.config['region']):
+            rtype, self.config['account_id'], self.config['region']
+        ):
             if self.user_suffix and not user_id.endswith(self.user_suffix):
                 continue
             if 'AWSServiceRole' in user_id:
@@ -528,21 +574,24 @@ class ResourceTagger:
         policy_data = {
             'name': 'inventory-%s' % rtype,
             'resource': rtype,
-            'filters': [{
-                'tag:{}'.format(
-                    self.creator_tag): 'absent'}]}
+            'filters': [{'tag:{}'.format(self.creator_tag): 'absent'}],
+        }
         # Cloud Formation stacks can only be tagged in successful
         # steady state.
         if rtype == 'cfn':
-            policy_data['filters'].insert(0, {
-                'type': 'value',
-                'key': 'StackStatus',
-                'op': 'in',
-                'value': ['UPDATE_COMPLETE', 'CREATE_COMPLETE']})
+            policy_data['filters'].insert(
+                0,
+                {
+                    'type': 'value',
+                    'key': 'StackStatus',
+                    'op': 'in',
+                    'value': ['UPDATE_COMPLETE', 'CREATE_COMPLETE'],
+                },
+            )
 
         policy = list(
-            PolicyCollection.from_data(
-                {'policies': [policy_data]}, self.config)).pop()
+            PolicyCollection.from_data({'policies': [policy_data]}, self.config)
+        ).pop()
         if 'tag' not in policy.resource_manager.action_registry:
             return [], None
         resources = policy.run()
@@ -552,10 +601,17 @@ class ResourceTagger:
 def get_bucket_path(prefix, account, region, day, month, year, org_id=None):
     if org_id:
         prefix = "%(prefix)s/AWSLogs/%(org_id)s/%(account)s/CloudTrail/%(region)s/" % {
-            'prefix': prefix.strip('/'), 'org_id': org_id, 'account': account, 'region': region}
+            'prefix': prefix.strip('/'),
+            'org_id': org_id,
+            'account': account,
+            'region': region,
+        }
     else:
         prefix = "%(prefix)s/AWSLogs/%(account)s/CloudTrail/%(region)s/" % {
-            'prefix': prefix.strip('/'), 'account': account, 'region': region}
+            'prefix': prefix.strip('/'),
+            'account': account,
+            'region': region,
+        }
     prefix = prefix.lstrip('/')
     date_prefix = None
     if day:
@@ -579,9 +635,9 @@ def load_resource_map(resource_map_file):
     resource_map = {}
     for r in data.get('resources', ()):
         for e in r.get('events', []):
-            resource_map.setdefault(
-                (e['service'], e['event']), []).append(
-                    {'resource': r, 'ids': e['ids']})
+            resource_map.setdefault((e['service'], e['event']), []).append(
+                {'resource': r, 'ids': e['ids']}
+            )
 
 
 @contextlib.contextmanager
@@ -595,8 +651,7 @@ def temp_dir():
 
 @click.group()
 def cli():
-    """CloudTrail Resource Creator Tagger
-    """
+    """CloudTrail Resource Creator Tagger"""
     logging.basicConfig(level=logging.INFO)
     logging.getLogger('botocore').setLevel(logging.WARNING)
     logging.getLogger('urllib3').setLevel(logging.WARNING)
@@ -609,18 +664,33 @@ def cli():
 @click.option('--org-id', required=False, help="For organization trails")
 @click.option('--account', required=True, help="Account to process trail records for")
 @click.option('--region', required=True, help="Region to process trail records for")
-@click.option('--resource-map', required=True,
-            help="Resource map of events and id selectors", type=click.File())
+@click.option(
+    '--resource-map',
+    required=True,
+    help="Resource map of events and id selectors",
+    type=click.File(),
+)
 @click.option('--db', required=True, help="Output DB path (sqlite)")
 @click.option("--day", help="Only process trail events for the given day")
 @click.option("--month", help="Only process trail events for the given month")
 @click.option("--year", help="Only process trail events for the given year")
 @click.option("--assume", help="Assume role for trail bucket access")
 @click.option("--profile", help="AWS cli profile for trail bucket access")
-def load(bucket, prefix, account, org_id, region, resource_map, db, day, month, year,
-         assume, profile):
-    """Ingest cloudtrail events from s3 into resource owner db.
-    """
+def load(
+    bucket,
+    prefix,
+    account,
+    org_id,
+    region,
+    resource_map,
+    db,
+    day,
+    month,
+    year,
+    assume,
+    profile,
+):
+    """Ingest cloudtrail events from s3 into resource owner db."""
     load_resource_map(resource_map)
     prefix = get_bucket_path(prefix, account, region, day, month, year, org_id)
     session_factory = SessionFactory(region=region, profile=profile, assume_role=assume)
@@ -628,14 +698,24 @@ def load(bucket, prefix, account, org_id, region, resource_map, db, day, month, 
 
 
 @cli.command('load-athena')
-@click.option('--account', default=None, help=(
-    "Account to process trail records for, default"
-    " is all accounts in the trail data"))
+@click.option(
+    '--account',
+    default=None,
+    help=(
+        "Account to process trail records for, default"
+        " is all accounts in the trail data"
+    ),
+)
 @click.option('--region', required=True, help="Region to process trail records for")
-@click.option('--resource-map', required=True,
-            help="Resource map of events and id selectors", type=click.File())
-@click.option('--workgroup', default="primary",
-              help="Athena Workgroup (default: primary)")
+@click.option(
+    '--resource-map',
+    required=True,
+    help="Resource map of events and id selectors",
+    type=click.File(),
+)
+@click.option(
+    '--workgroup', default="primary", help="Athena Workgroup (default: primary)"
+)
 @click.option('--table', required=True, help="Cloud Trail Athena Table")
 @click.option('--athena-db', default="default", help="Athena DB")
 @click.option('--athena-output', help="Athena S3 Output Location")
@@ -646,9 +726,22 @@ def load(bucket, prefix, account, org_id, region, resource_map, db, day, month, 
 @click.option("--year", help="Only process trail events for the given year")
 @click.option("--assume", help="Assume role for trail bucket access")
 @click.option("--profile", help="AWS cli profile for trail bucket access")
-def load_athena(table, workgroup, athena_db, athena_output, resource_map,
-                db, query_id, day, month, year, account,
-                assume, profile, region):
+def load_athena(
+    table,
+    workgroup,
+    athena_db,
+    athena_output,
+    resource_map,
+    db,
+    query_id,
+    day,
+    month,
+    year,
+    account,
+    assume,
+    profile,
+    region,
+):
     """Ingest cloudtrail events from athena into resource owner db.
 
     The athena db/tables should be created per the schema documented here.
@@ -658,10 +751,10 @@ def load_athena(table, workgroup, athena_db, athena_output, resource_map,
     session_factory = SessionFactory(region=region, profile=profile, assume_role=assume)
     session = session_factory()
     if athena_output is None:
-        athena_account_id = session.client(
-            'sts').get_caller_identity()['Account']
+        athena_account_id = session.client('sts').get_caller_identity()['Account']
         athena_output = "s3://aws-athena-query-results-{}-{}".format(
-            athena_account_id, session.region_name)
+            athena_account_id, session.region_name
+        )
 
     process_athena_query(
         session_factory().client('athena'),
@@ -674,13 +767,20 @@ def load_athena(table, workgroup, athena_db, athena_output, resource_map,
         account_id=account,
         year=year and parse(year) or None,
         month=month and parse(month) or None,
-        day=day and parse(day) or None)
+        day=day and parse(day) or None,
+    )
 
 
 @cli.command()
-@click.option('--config', required=True, help="c7n-org Accounts config file", type=click.Path())
-@click.option('--db', required=True, help="Resource Owner DB (sqlite)", type=click.Path())
-@click.option('--creator-tag', required=True, help="Tag to utilize for resource creator")
+@click.option(
+    '--config', required=True, help="c7n-org Accounts config file", type=click.Path()
+)
+@click.option(
+    '--db', required=True, help="Resource Owner DB (sqlite)", type=click.Path()
+)
+@click.option(
+    '--creator-tag', required=True, help="Tag to utilize for resource creator"
+)
 @click.option('--user-suffix', help="Ignore users without the given suffix")
 @click.option('--dryrun', is_flag=True)
 @click.option('-a', '--accounts', multiple=True, default=None)
@@ -689,14 +789,31 @@ def load_athena(table, workgroup, athena_db, athena_output, resource_map,
 @click.option('--debug', default=False, is_flag=True)
 @click.option('-v', '--verbose', default=False, help="Verbose", is_flag=True)
 @click.option('--type', multiple=True, help="Only process resources of type")
-def tag_org(config, db, region, creator_tag, user_suffix, dryrun,
-            accounts, tags, debug, verbose, type):
-    """Tag an orgs resources
-    """
+def tag_org(
+    config,
+    db,
+    region,
+    creator_tag,
+    user_suffix,
+    dryrun,
+    accounts,
+    tags,
+    debug,
+    verbose,
+    type,
+):
+    """Tag an orgs resources"""
     accounts_config, custodian_config, executor = org_init(
-        config, use=None, debug=debug, verbose=verbose,
-        accounts=accounts or None, tags=tags, policies=None,
-        resource=None, policy_tags=None)
+        config,
+        use=None,
+        debug=debug,
+        verbose=verbose,
+        accounts=accounts or None,
+        tags=tags,
+        policies=None,
+        resource=None,
+        policy_tags=None,
+    )
 
     load_resources()
     stats = {}
@@ -707,77 +824,129 @@ def tag_org(config, db, region, creator_tag, user_suffix, dryrun,
         futures = {}
         for a in accounts_config['accounts']:
             for r in resolve_regions(region or a.get('regions', ()), a):
-                futures[w.submit(
-                    tag_org_account, a, r, db,
-                    creator_tag, user_suffix, dryrun, type)] = (a, r)
+                futures[
+                    w.submit(
+                        tag_org_account,
+                        a,
+                        r,
+                        db,
+                        creator_tag,
+                        user_suffix,
+                        dryrun,
+                        type,
+                    )
+                ] = (a, r)
         for f in as_completed(futures):
             a, region = futures[f]
             if f.exception():
-                log.warning("error account:%s id:%s region:%s error:%s" % (
-                    a['name'], a['account_id'], region, f.exception()))
+                log.warning(
+                    "error account:%s id:%s region:%s error:%s"
+                    % (a['name'], a['account_id'], region, f.exception())
+                )
                 continue
             result = f.result()
             if result:
                 stats[(a['name'], region)] = (a, result)
             print(
-                ("auto tag complete account:%s id:%s region:%s \n  %s" % (
-                    a['name'], a['account_id'], region,
-                    "\n  ".join([
-                        " {}: {}".format(k, v)
-                        for k, v in result.items()
-                        if v and not k.endswith('not-found')]))).strip())
+                (
+                    "auto tag complete account:%s id:%s region:%s \n  %s"
+                    % (
+                        a['name'],
+                        a['account_id'],
+                        region,
+                        "\n  ".join(
+                            [
+                                " {}: {}".format(k, v)
+                                for k, v in result.items()
+                                if v and not k.endswith('not-found')
+                            ]
+                        ),
+                    )
+                ).strip()
+            )
 
-            total += sum([
-                v for k, v in result.items() if not k.endswith('not-found')])
+            total += sum([v for k, v in result.items() if not k.endswith('not-found')])
 
     print("Total resources tagged: %d in %0.2f" % total, time.time() - start_exec)
     return stats
 
 
 def tag_org_account(account, region, db, creator_tag, user_suffix, dryrun, type):
-    log.info("processing account:%s id:%s region:%s",
-             account['name'], account['account_id'], region)
+    log.info(
+        "processing account:%s id:%s region:%s",
+        account['name'],
+        account['account_id'],
+        region,
+    )
     session = get_session(account, "c7n-trailcreator", region)
     env_vars = _get_env_creds(session, region)
     with environ(**env_vars):
         try:
             return tag.callback(
-                None, region, db, creator_tag, user_suffix, dryrun, summary=False, type=type)
+                None,
+                region,
+                db,
+                creator_tag,
+                user_suffix,
+                dryrun,
+                summary=False,
+                type=type,
+            )
         finally:
             reset_session_cache()
 
 
 @cli.command()
-@click.option('--db', required=True, help="Resource Owner DB (sqlite)", type=click.Path())
-@click.option('--creator-tag', required=True, help="Tag to utilize for resource creator")
+@click.option(
+    '--db', required=True, help="Resource Owner DB (sqlite)", type=click.Path()
+)
+@click.option(
+    '--creator-tag', required=True, help="Tag to utilize for resource creator"
+)
 @click.option('--region', required=True, help="Aws region to process")
 @click.option('--assume', help="Assume role for resource tagging")
 @click.option('--user-suffix', help="Ignore users without the given suffix")
 @click.option('--dryrun', is_flag=True)
 @click.option('--type', multiple=True, help="Only process resources of type")
 @click.option("--profile", help="AWS cli profile for resource tagging")
-def tag(assume, region, db, creator_tag, user_suffix, dryrun,
-        summary=True, profile=None, type=()):
-    """Tag resources with their creator.
-    """
+def tag(
+    assume,
+    region,
+    db,
+    creator_tag,
+    user_suffix,
+    dryrun,
+    summary=True,
+    profile=None,
+    type=(),
+):
+    """Tag resources with their creator."""
     trail_db = TrailDB(db)
     load_resources(resource_types=('aws.*',))
 
     with temp_dir() as output_dir:
         config = ExecConfig.empty(
-            output_dir=output_dir, assume=assume,
-            region=region, profile=profile)
+            output_dir=output_dir, assume=assume, region=region, profile=profile
+        )
         factory = aws.AWS().get_session_factory(config)
-        account_id = local_session(factory).client('sts').get_caller_identity().get('Account')
+        account_id = (
+            local_session(factory).client('sts').get_caller_identity().get('Account')
+        )
         config['account_id'] = account_id
-        tagger = ResourceTagger(trail_db, config, creator_tag, user_suffix, dryrun, type)
+        tagger = ResourceTagger(
+            trail_db, config, creator_tag, user_suffix, dryrun, type
+        )
 
         try:
             stats = tagger.process()
         except Exception:
             log.exception(
                 "error processing account:%s region:%s config:%s env:%s",
-                account_id, region, config, dict(os.environ))
+                account_id,
+                region,
+                config,
+                dict(os.environ),
+            )
             raise
 
     if not summary:
@@ -787,6 +956,7 @@ def tag(assume, region, db, creator_tag, user_suffix, dryrun,
         "auto tag summary account:%s region:%s \n%s",
         config['account_id'],
         config['region'],
-        "\n".join([" {}: {}".format(k, v) for k, v in stats.items() if v]))
+        "\n".join([" {}: {}".format(k, v) for k, v in stats.items() if v]),
+    )
     total = sum([v for k, v in stats.items() if not k.endswith('not-found')])
     log.info("Total resources tagged: %d" % total)

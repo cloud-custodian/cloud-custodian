@@ -3,7 +3,9 @@
 
 import jmespath
 from retrying import RetryError
-from tencentcloud.common.exception.tencent_cloud_sdk_exception import TencentCloudSDKException
+from tencentcloud.common.exception.tencent_cloud_sdk_exception import (
+    TencentCloudSDKException,
+)
 
 from c7n.actions import ActionRegistry
 from c7n.ctx import ExecutionContext
@@ -27,6 +29,7 @@ class TypeMeta(type):
 
 class ResourceTypeInfo(metaclass=TypeMeta):
     """ResourceTypeInfo"""
+
     # used to construct tencentcloud client
     id: str = ""  # required, the field name to get resource instance id
     endpoint: str = ""
@@ -77,10 +80,9 @@ class ResourceQuery:
         :param params: dict
         :return: A list of dictionaries.
         """
-        cli = self.session_factory.client(resource_type.endpoint,
-                                          resource_type.service,
-                                          resource_type.version,
-                                          region)
+        cli = self.session_factory.client(
+            resource_type.endpoint, resource_type.service, resource_type.version, region
+        )
         action, jsonpath, extra_params = resource_type.enum_spec
         if extra_params:
             params.update(extra_params)
@@ -97,18 +99,16 @@ class ResourceQuery:
         :param params: dict
         :return: A list of dictionaries.
         """
-        cli = self.session_factory.client(resource_type.endpoint,
-                                          resource_type.service,
-                                          resource_type.version,
-                                          region)
+        cli = self.session_factory.client(
+            resource_type.endpoint, resource_type.service, resource_type.version, region
+        )
         action, jsonpath, extra_params = resource_type.enum_spec
         if extra_params:
             params.update(extra_params)
         try:
-            resp = cli.execute_paged_query(action,
-                                           params,
-                                           jsonpath,
-                                           resource_type.paging_def)
+            resp = cli.execute_paged_query(
+                action, params, jsonpath, resource_type.paging_def
+            )
             return resp
         except (RetryError, TencentCloudSDKException) as err:
             raise PolicyExecutionError(err) from err
@@ -144,8 +144,8 @@ class DescribeSource:
     def query_helper(self):
         if self._query_helper is None:
             self._query_helper = ResourceQuery(
-                local_session(
-                    self.resource_manager.session_factory))
+                local_session(self.resource_manager.session_factory)
+            )
         return self._query_helper
 
     def resources(self, params=None):
@@ -159,13 +159,17 @@ class DescribeSource:
             params = {}
 
         if self.resource_manager.resource_type.paging_def:
-            res = self.query_helper.paged_filter(self.resource_manager.config.region,
-                                                 self.resource_manager.resource_type,
-                                                 params)
+            res = self.query_helper.paged_filter(
+                self.resource_manager.config.region,
+                self.resource_manager.resource_type,
+                params,
+            )
         else:
-            res = self.query_helper.filter(self.resource_manager.config.region,
-                                           self.resource_manager.resource_type,
-                                           params)
+            res = self.query_helper.filter(
+                self.resource_manager.config.region,
+                self.resource_manager.resource_type,
+                params,
+            )
         self.augment(res)
         return res
 
@@ -191,7 +195,8 @@ class DescribeSource:
                 if tag['Resource'] not in resource_map:
                     continue
                 resource_map[tag['Resource']]['Tags'] = [
-                    {'Key': t['TagKey'], 'Value': t['TagValue']} for t in tag['Tags']]
+                    {'Key': t['TagKey'], 'Value': t['TagValue']} for t in tag['Tags']
+                ]
         return resources
 
     def get_resource_qcs(self, resources):
@@ -203,11 +208,13 @@ class DescribeSource:
         # qcs::cvm:ap-singapore::instance/ins-ibu7wp2a
         qcs_list = []
         for r in resources:
-            qcs = self.get_qcs(self.resource_type.service,
-                               self.region,
-                               self.resource_manager.config.account_id,
-                               self.resource_type.resource_prefix,
-                               r[self.resource_type.id])
+            qcs = self.get_qcs(
+                self.resource_type.service,
+                self.region,
+                self.resource_manager.config.account_id,
+                self.resource_type.resource_prefix,
+                r[self.resource_type.id],
+            )
             qcs_list.append(qcs)
         return qcs_list
 
@@ -275,7 +282,8 @@ class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
     def get_source(self, source_type):
         factory = self.source_mapping.get(
             source_type in ("describe", DESC_SOURCE_NAME) and "describe",
-            sources.get(source_type))
+            sources.get(source_type),
+        )
         if factory is None:
             raise ValueError("Invalid source type %s" % source_type)
         return factory(self)
@@ -283,10 +291,8 @@ class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
     def get_client(self):
         type_info = self.resource_type
         return self.get_session().client(
-            type_info.endpoint,
-            type_info.service,
-            type_info.version,
-            self.config.region)
+            type_info.endpoint, type_info.service, type_info.version, self.config.region
+        )
 
     def get_session(self):
         return local_session(self.session_factory)
@@ -335,10 +341,9 @@ class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
         for s in resources:
             dimensions = []
             for item in self.resource_type.metrics_dimension_def:
-                dimensions.append({
-                    "Name": item[0],
-                    "Value": str(s[item[1]])  # force to string
-                })
+                dimensions.append(
+                    {"Name": item[0], "Value": str(s[item[1]])}  # force to string
+                )
             instances.append({"Dimensions": dimensions})
 
         return (self.resource_type.metrics_namespace, instances)

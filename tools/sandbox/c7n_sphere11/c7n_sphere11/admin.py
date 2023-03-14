@@ -25,8 +25,7 @@ def admin():
 @admin.command()
 @click.option('--config')
 def format_json(config):
-    """format config for lambda exec
-    """
+    """format config for lambda exec"""
     with open(config) as fh:
         print(json.dumps(yaml.safe_load(fh.read()), indent=2))
 
@@ -35,12 +34,16 @@ def render_metrics(header, values):
     if not values:
         return
     click.echo(
-        "".join((
-            " ",
-            header.ljust(20),
-            ("min:%0.1f" % min(values)).ljust(12),
-            ("max:%0.1f" % max(values)).ljust(12),
-            raster_metrics(values))))
+        "".join(
+            (
+                " ",
+                header.ljust(20),
+                ("min:%0.1f" % min(values)).ljust(12),
+                ("max:%0.1f" % max(values)).ljust(12),
+                raster_metrics(values),
+            )
+        )
+    )
 
 
 def raster_metrics(data):
@@ -48,16 +51,15 @@ def raster_metrics(data):
     incr = min(data)
     width = (max(data) - min(data)) / (len(BARS) - 1)
     bins = [i * width + incr for i in range(len(BARS))]
-    indexes = [i for n in data
-               for i, thres in enumerate(bins)
-               if thres <= n < thres + width]
+    indexes = [
+        i for n in data for i, thres in enumerate(bins) if thres <= n < thres + width
+    ]
     return ''.join(BARS[i] for i in indexes)
 
 
 @admin.command()
 def check():
-    """Sanity check api deployment
-    """
+    """Sanity check api deployment"""
     t = time.time()
     results = Client(BASE_URL).version()
     print("Endpoint", BASE_URL)
@@ -72,22 +74,20 @@ def check():
 @admin.command()
 @click.option('--function', help='function name', required=True)
 @click.option('--api', help='api name')
-@click.option(
-    '-s', '--start', help='relative time to start from', default="1h")
-@click.option(
-    '-p', '--period', help='metrics period', default="1m")
+@click.option('-s', '--start', help='relative time to start from', default="1h")
+@click.option('-p', '--period', help='metrics period', default="1m")
 def metrics(function, api, start, period):
     """lambda/api/db metrics"""
     from c7n.mu import LambdaManager
+
     manager = LambdaManager(boto3.Session)
     start = parse_date(start)
     period = int(abs(parse_timedelta(period).total_seconds()))
 
     print("Lambda Metrics")
     metrics = manager.metrics(
-        [{'FunctionName': function}],
-        start=start, end=datetime.utcnow(),
-        period=period)
+        [{'FunctionName': function}], start=start, end=datetime.utcnow(), period=period
+    )
     for k in ('Invocations', 'Throttles', 'Errors'):
         values = [n['Sum'] for n in metrics[0][k]]
         render_metrics(k, values)
@@ -97,7 +97,8 @@ def metrics(function, api, start, period):
 
     print("Api Metrics")
     metrics = gateway_metrics(
-        boto3.Session, api, "latest", start, datetime.utcnow(), period)
+        boto3.Session, api, "latest", start, datetime.utcnow(), period
+    )
     for k, data in metrics.items():
         if "Count" in k:
             values = [n['Sum'] for n in data]
@@ -107,8 +108,8 @@ def metrics(function, api, start, period):
 
     print("Db Metrics")
     metrics = db_metrics(
-        boto3.Session, "Sphere11.Dev.ResourceLocks",
-        start, datetime.utcnow(), period)
+        boto3.Session, "Sphere11.Dev.ResourceLocks", start, datetime.utcnow(), period
+    )
     for k, data in metrics.items():
         values = [n['Average'] for n in data]
         render_metrics(k, values)
@@ -118,35 +119,39 @@ def db_metrics(session_factory, table_name, start, end, period):
     metrics = local_session(session_factory).client('cloudwatch')
     values = {}
     for m in (
-            "ConsumedReadCapacityUnits",
-            "ConsumedWriteCapacityUnits",
-            "ThrottledRequests",
-            "ReadThrottleEvents",
-            "WriteThrottleEvents",
-            "ReturnedItemCount",
-            "SuccessfulRequestLatency"
-            #  "ReturnedRecordsCount"
+        "ConsumedReadCapacityUnits",
+        "ConsumedWriteCapacityUnits",
+        "ThrottledRequests",
+        "ReadThrottleEvents",
+        "WriteThrottleEvents",
+        "ReturnedItemCount",
+        "SuccessfulRequestLatency"
+        #  "ReturnedRecordsCount"
     ):
         values[m.replace('Capacity', '')] = metrics.get_metric_statistics(
             Namespace="AWS/DynamoDB",
-            Dimensions=[
-                {'Name': 'TableName', 'Value': table_name}
-            ],
+            Dimensions=[{'Name': 'TableName', 'Value': table_name}],
             Statistics=["Average"],
             StartTime=start,
             EndTime=end,
             Period=period,
-            MetricName=m)['Datapoints']
+            MetricName=m,
+        )['Datapoints']
     return values
 
 
 def gateway_metrics(session_factory, gateway_id, stage_name, start, end, period):
     metrics = local_session(session_factory).client('cloudwatch')
     values = {}
-    for m in ("4XXError", "5XError",
-              "CacheHitCount", "CacheMissCount",
-              "Count",
-              "IntegrationLatency", "Latency"):
+    for m in (
+        "4XXError",
+        "5XError",
+        "CacheHitCount",
+        "CacheMissCount",
+        "Count",
+        "IntegrationLatency",
+        "Latency",
+    ):
         values[m] = metrics.get_metric_statistics(
             Namespace="AWS/ApiGateway",
             Dimensions=[
@@ -157,13 +162,16 @@ def gateway_metrics(session_factory, gateway_id, stage_name, start, end, period)
             StartTime=start,
             EndTime=end,
             Period=period,
-            MetricName=m)['Datapoints']
+            MetricName=m,
+        )['Datapoints']
     return values
 
 
 def parse_timedelta(datetime_text, default=timedelta(seconds=60 * 5 * -1)):
     # from awslogs script
-    ago_regexp = r'(\d+)\s?(m|minute|minutes|h|hour|hours|d|day|days|w|weeks|weeks)(?: ago)?'
+    ago_regexp = (
+        r'(\d+)\s?(m|minute|minutes|h|hour|hours|d|day|days|w|weeks|weeks)(?: ago)?'
+    )
     ago_match = re.match(ago_regexp, datetime_text)
     if ago_match:
         amount, unit = ago_match.groups()
@@ -182,8 +190,7 @@ def parse_date(datetime_text):
 @admin.command()
 @click.option('--account-id', help='account id')
 def records(account_id):
-    """Fetch locks data
-    """
+    """Fetch locks data"""
     s = boto3.Session()
     table = s.resource('dynamodb').Table('Sphere11.Dev.ResourceLocks')
     results = table.scan()
@@ -194,22 +201,17 @@ def records(account_id):
         if 'RevisionDate' in r:
             r['RevisionDate'] = datetime.fromtimestamp(r['RevisionDate'])
 
-    print(tabulate.tabulate(
-        results['Items'],
-        headers="keys",
-        tablefmt='fancy_grid'))
+    print(tabulate.tabulate(results['Items'], headers="keys", tablefmt='fancy_grid'))
 
 
 @admin.command()
 @click.option('--function', help='function name', required=True)
 def flush_pending(function):
-    """Attempt to acquire any pending locks.
-    """
+    """Attempt to acquire any pending locks."""
     s = boto3.Session()
     client = s.client('lambda')
     results = client.invoke(
-        FunctionName=function,
-        Payload=json.dumps({'detail-type': 'Scheduled Event'})
+        FunctionName=function, Payload=json.dumps({'detail-type': 'Scheduled Event'})
     )
     content = results.pop('Payload').read()
     pprint.pprint(results)
@@ -218,23 +220,29 @@ def flush_pending(function):
 
 @admin.command()
 def config_status():
-    """ Check config status in an account.
-    """
+    """Check config status in an account."""
     s = boto3.Session()
     client = s.client('config')
-    channels = client.describe_delivery_channel_status()[
-        'DeliveryChannelsStatus']
+    channels = client.describe_delivery_channel_status()['DeliveryChannelsStatus']
     for c in channels:
-        print(yaml.safe_dump({
-            c['name']: dict(
-                snapshot=str(
-                    c['configSnapshotDeliveryInfo'].get('lastSuccessfulTime')),
-                history=str(
-                    c['configHistoryDeliveryInfo'].get('lastSuccessfulTime')),
-                stream=str(
-                    c['configStreamDeliveryInfo'].get('lastStatusChangeTime'))
-            ),
-        }, default_flow_style=False))
+        print(
+            yaml.safe_dump(
+                {
+                    c['name']: dict(
+                        snapshot=str(
+                            c['configSnapshotDeliveryInfo'].get('lastSuccessfulTime')
+                        ),
+                        history=str(
+                            c['configHistoryDeliveryInfo'].get('lastSuccessfulTime')
+                        ),
+                        stream=str(
+                            c['configStreamDeliveryInfo'].get('lastStatusChangeTime')
+                        ),
+                    ),
+                },
+                default_flow_style=False,
+            )
+        )
 
 
 @admin.command()
@@ -248,12 +256,12 @@ def delta(account_id, region):
 @click.option('--reload/--no-reload', default=True)
 @click.option('--port', default=8080)
 def local(reload, port):
-    """run local app server, assumes into the account
-    """
+    """run local app server, assumes into the account"""
     import logging
     from bottle import run
     from app import controller, app
     from c7n.resources import load_resources
+
     load_resources()
     print("Loaded resources definitions")
     logging.basicConfig(level=logging.DEBUG)

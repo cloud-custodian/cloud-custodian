@@ -15,7 +15,6 @@ from c7n_gcp.provider import resources as gcp_resources
 
 
 class BaseLabelAction(MethodAction):
-
     method_spec = {}
     method_perm = 'update'
 
@@ -103,15 +102,22 @@ class SetLabelsAction(BaseLabelAction):
 
     schema = type_schema(
         'set-labels',
-        labels={'type': 'object', "additionalProperties": Lookup.lookup_type({'type': 'string'})},
-        remove={'type': 'array', 'items': {'type': 'string'}})
+        labels={
+            'type': 'object',
+            "additionalProperties": Lookup.lookup_type({'type': 'string'}),
+        },
+        remove={'type': 'array', 'items': {'type': 'string'}},
+    )
 
     def validate(self):
         if not self.data.get('labels') and not self.data.get('remove'):
             raise FilterValidationError("Must specify one of labels or remove")
 
     def get_labels_to_add(self, resource):
-        return {k: Lookup.extract(v, resource) for k, v in self.data.get('labels', {}).items()}
+        return {
+            k: Lookup.extract(v, resource)
+            for k, v in self.data.get('labels', {}).items()
+        }
 
     def get_labels_to_delete(self, resource):
         return self.data.get('remove')
@@ -153,15 +159,14 @@ class LabelDelayedAction(BaseLabelAction):
         days={'type': 'number', 'minimum': 0, 'exclusiveMinimum': False},
         hours={'type': 'number', 'minimum': 0, 'exclusiveMinimum': False},
         tz={'type': 'string'},
-        op={'type': 'string'}
+        op={'type': 'string'},
     )
 
     default_template = 'resource_policy-{op}-{action_date}'
 
     def __init__(self, data=None, manager=None, log_dir=None):
         super(LabelDelayedAction, self).__init__(data, manager, log_dir)
-        self.tz = tzutil.gettz(
-            Time.TZ_ALIASES.get(self.data.get('tz', 'utc')))
+        self.tz = tzutil.gettz(Time.TZ_ALIASES.get(self.data.get('tz', 'utc')))
 
         msg_tmpl = self.data.get('msg', self.default_template)
 
@@ -171,29 +176,27 @@ class LabelDelayedAction(BaseLabelAction):
         action_date = self.generate_timestamp(days, hours)
 
         self.label = self.data.get('label', DEFAULT_TAG)
-        self.msg = msg_tmpl.format(
-            op=op, action_date=action_date)
+        self.msg = msg_tmpl.format(op=op, action_date=action_date)
 
     def validate(self):
         op = self.data.get('op')
         if self.manager and op not in self.manager.action_registry.keys():
             raise FilterValidationError(
-                "mark-for-op specifies invalid op:%s in %s" % (
-                    op, self.manager.data))
+                "mark-for-op specifies invalid op:%s in %s" % (op, self.manager.data)
+            )
 
-        self.tz = tzutil.gettz(
-            Time.TZ_ALIASES.get(self.data.get('tz', 'utc')))
+        self.tz = tzutil.gettz(Time.TZ_ALIASES.get(self.data.get('tz', 'utc')))
         if not self.tz:
             raise FilterValidationError(
-                "Invalid timezone specified %s in %s" % (
-                    self.tz, self.manager.data))
+                "Invalid timezone specified %s in %s" % (self.tz, self.manager.data)
+            )
 
     def generate_timestamp(self, days, hours):
         n = datetime.now(tz=self.tz)
         if days is None or hours is None:
             # maintains default value of days being 4 if nothing is provided
             days = 4
-        action_date = (n + timedelta(days=days, hours=hours))
+        action_date = n + timedelta(days=days, hours=hours)
         if hours > 0:
             action_date_string = action_date.strftime('%Y_%m_%d__%H_%M')
         else:

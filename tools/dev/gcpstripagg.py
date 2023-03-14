@@ -9,7 +9,6 @@ import os
 @click.command()
 @click.option('--path', type=click.Path())
 def main(path):
-
     for root, dirs, files in os.walk(path):
         if not files:
             continue
@@ -27,8 +26,10 @@ def main(path):
                     continue
                 flocations[k] = l
             data['body']['items'] = flocations
-            print("found aggregate result %s %d->%s" % (
-                json_path, size, len(json.dumps(data, indent=2))))
+            print(
+                "found aggregate result %s %d->%s"
+                % (json_path, size, len(json.dumps(data, indent=2)))
+            )
 
             with open(json_path, 'w') as fh:
                 fh.write(json.dumps(data, indent=2))

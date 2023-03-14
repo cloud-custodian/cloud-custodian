@@ -7,7 +7,6 @@ from tc_common import BaseTest
 
 
 class TestVpc(BaseTest):
-
     @pytest.mark.vcr
     def test_vpc_flowlogs_enabled_pull(self):
         policy = self.load_policy(
@@ -19,18 +18,19 @@ class TestVpc(BaseTest):
                     {
                         "type": "flow-logs",
                         "enabled": True,
-                        'match': [
-                            {'FlowLogId': 'fl-gjdtklll'}, {'Enable': True}],
+                        'match': [{'FlowLogId': 'fl-gjdtklll'}, {'Enable': True}],
                     }
-                ]
+                ],
             },
-            config=Config.empty(**{
-                "region": "ap-guangzhou",  # just for init, ignore the value
-                "account_id": "100000750436",
-                "output_dir": "null://",
-                "log_group": "null://",
-                "cache": False,
-            })
+            config=Config.empty(
+                **{
+                    "region": "ap-guangzhou",  # just for init, ignore the value
+                    "account_id": "100000750436",
+                    "output_dir": "null://",
+                    "log_group": "null://",
+                    "cache": False,
+                }
+            ),
         )
         resources = policy.run()
         ok = [r for r in resources if r["VpcId"] == "vpc-ha7fbuzt"]

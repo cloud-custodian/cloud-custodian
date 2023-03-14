@@ -9,13 +9,11 @@ setup(
     description="Cloud Custodian - Metrics/Resource Indexer",
     classifiers=[
         "Topic :: System :: Systems Administration",
-        "Topic :: System :: Distributed Computing"
+        "Topic :: System :: Distributed Computing",
     ],
     url="https://github.com/cloud-custodian/cloud-custodian",
     license="Apache-2.0",
     packages=find_packages(),
-    entry_points={
-        'console_scripts': [
-            'c7n-indexer = c7n_index.metrics:cli']},
+    entry_points={'console_scripts': ['c7n-indexer = c7n_index.metrics:cli']},
     install_requires=["c7n", "click", "influxdb", "elasticsearch"],
 )

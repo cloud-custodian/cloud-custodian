@@ -38,16 +38,20 @@ class PostFinding(MethodAction):
 
     Finding updates are not currently supported, due to upstream api issues.
     """
+
     schema = type_schema(
         'post-finding',
         **{
             'source': {
                 'type': 'string',
-                'description': 'qualified name of source to post to CSCC as'},
+                'description': 'qualified name of source to post to CSCC as',
+            },
             'org-domain': {'type': 'string'},
             'org-id': {'type': 'integer'},
             'category': {'type': 'string'},
-            'severity': {'type': 'string', 'enum': SEVERITIES}})
+            'severity': {'type': 'string', 'enum': SEVERITIES},
+        }
+    )
     schema_alias = True
     method_spec = {'op': 'create', 'result': 'name', 'annotation_key': 'c7n:Finding'}
 
@@ -69,14 +73,15 @@ class PostFinding(MethodAction):
         'resourcemanager.organizations.get',
         'securitycenter.assetsecuritymarks.update',
         'securitycenter.sources.update',
-        'securitycenter.sources.list'
+        'securitycenter.sources.list',
     )
 
     def validate(self):
         if not any([self.data.get(k) for k in ('source', 'org-domain', 'org-id')]):
             raise PolicyValidationError(
-                "policy:%s CSCC post-finding requires one of source, org-domain, org-id" % (
-                    self.manager.ctx.policy.name))
+                "policy:%s CSCC post-finding requires one of source, org-domain, org-id"
+                % (self.manager.ctx.policy.name)
+            )
 
     def process(self, resources):
         self.initialize_source()
@@ -84,7 +89,8 @@ class PostFinding(MethodAction):
 
     def get_client(self, session, model):
         return session.client(
-            self.Service, self.ServiceVersion, 'organizations.sources.findings')
+            self.Service, self.ServiceVersion, 'organizations.sources.findings'
+        )
 
     def get_resource_params(self, model, resource):
         return self.get_finding(resource)
@@ -106,34 +112,43 @@ class PostFinding(MethodAction):
         else:
             orgs = session.client('cloudresourcemanager', 'v1', 'organizations')
             res = orgs.execute_query(
-                'search', {'body': {
-                    'filter': 'domain:%s' % self.data['org-domain']}}).get(
-                        'organizations')
+                'search', {'body': {'filter': 'domain:%s' % self.data['org-domain']}}
+            ).get('organizations')
             if not res:
                 raise PolicyExecutionError("Could not determine organization id")
             org_id = res[0]['name'].rsplit('/', 1)[-1]
 
         # Resolve Source
-        client = session.client(self.Service, self.ServiceVersion, 'organizations.sources')
+        client = session.client(
+            self.Service, self.ServiceVersion, 'organizations.sources'
+        )
         source = None
-        res = [s for s in
-               client.execute_query(
-                   'list', {'parent': 'organizations/{}'.format(org_id)}).get('sources')
-               if s['displayName'] == self.CustodianSourceName]
+        res = [
+            s
+            for s in client.execute_query(
+                'list', {'parent': 'organizations/{}'.format(org_id)}
+            ).get('sources')
+            if s['displayName'] == self.CustodianSourceName
+        ]
         if res:
             source = res[0]['name']
 
         if source is None:
             source = client.execute_command(
                 'create',
-                {'parent': 'organizations/{}'.format(org_id),
-                 'body': {
-                     'displayName': self.CustodianSourceName,
-                     'description': 'Cloud Management Rules Engine'}}).get('name')
+                {
+                    'parent': 'organizations/{}'.format(org_id),
+                    'body': {
+                        'displayName': self.CustodianSourceName,
+                        'description': 'Cloud Management Rules Engine',
+                    },
+                },
+            ).get('name')
         self.log.info(
             "policy:%s resolved cscc source: %s, update policy with this source value",
             self.manager.ctx.policy.name,
-            source)
+            source,
+        )
         self._source = source
         return self._source
 
@@ -147,9 +162,8 @@ class PostFinding(MethodAction):
         resource_name = self.get_name(resource)
         # ideally we could be using shake, but its py3.6+ only
         finding_id = hashlib.sha256(
-            b"%s%s" % (
-                policy.name.encode('utf8'),
-                resource_name.encode('utf8'))).hexdigest()[:32]
+            b"%s%s" % (policy.name.encode('utf8'), resource_name.encode('utf8'))
+        ).hexdigest()[:32]
 
         finding = {
             'name': '{}/findings/{}'.format(self._source, finding_id),
@@ -162,14 +176,15 @@ class PostFinding(MethodAction):
                 'resource_type': self.manager.type,
                 'title': policy.data.get('title', policy.name),
                 'policy_name': policy.name,
-                'policy': json.dumps(policy.data)
-            }
+                'policy': json.dumps(policy.data),
+            },
         }
 
         request = {
             'parent': self._source,
             'findingId': finding_id[:31],
-            'body': finding}
+            'body': finding,
+        }
         return request
 
     @classmethod
@@ -190,15 +205,13 @@ class PostFinding(MethodAction):
 
 def name_compute(r):
     prefix = urlparse(r['selfLink']).path.strip('/').split('/')[2:][:-1]
-    return "//compute.googleapis.com/{}/{}".format(
-        "/".join(prefix),
-        r['id'])
+    return "//compute.googleapis.com/{}/{}".format("/".join(prefix), r['id'])
 
 
 def name_iam(r):
     return "//iam.googleapis.com/projects/{}/serviceAccounts/{}".format(
-        r['projectId'],
-        r['uniqueId'])
+        r['projectId'], r['uniqueId']
+    )
 
 
 def name_resourcemanager(r):
@@ -208,13 +221,13 @@ def name_resourcemanager(r):
     else:
         rid = r.get('organizationId')
         rtype = 'organizations'
-    return "//cloudresourcemanager.googleapis.com/{}/{}".format(
-        rtype, rid)
+    return "//cloudresourcemanager.googleapis.com/{}/{}".format(rtype, rid)
 
 
 def name_container(r):
     return "//container.googleapis.com/{}".format(
-        "/".join(urlparse(r['selfLink']).path.strip('/').split('/')[1:]))
+        "/".join(urlparse(r['selfLink']).path.strip('/').split('/')[1:])
+    )
 
 
 def name_storage(r):

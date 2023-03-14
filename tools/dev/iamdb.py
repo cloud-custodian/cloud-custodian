@@ -11,7 +11,7 @@ URL = "https://awspolicygen.s3.amazonaws.com/js/policies.js"
 
 def main():
     raw_data = requests.get(URL).text
-    data = json.loads(raw_data[raw_data.find('=') + 1:])
+    data = json.loads(raw_data[raw_data.find('=') + 1 :])
 
     perms = defaultdict(list)
     for _, svc in data['serviceMap'].items():

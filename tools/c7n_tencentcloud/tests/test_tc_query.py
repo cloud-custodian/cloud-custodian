@@ -8,6 +8,7 @@ from c7n_tencentcloud.utils import PageMethod
 
 class RegionInfo(ResourceTypeInfo):
     """RegionInfo"""
+
     id = "InstanceId"
     endpoint = "cvm.tencentcloudapi.com"
     service = "cvm"
@@ -20,6 +21,7 @@ class RegionInfo(ResourceTypeInfo):
 
 class CVMInfo(ResourceTypeInfo):
     """CVMInfo"""
+
     id = "InstanceId"
     endpoint = "cvm.tencentcloudapi.com"
     service = "cvm"
@@ -33,6 +35,7 @@ class CVMInfo(ResourceTypeInfo):
 
 class CVMInfoNoPagination(ResourceTypeInfo):
     """CVMInfoNoPagination"""
+
     id = "InstanceId"
     endpoint = "cvm.tencentcloudapi.com"
     service = "cvm"
@@ -65,7 +68,7 @@ class TestResourcetQuery:
 # (data, expected_query_params)
 data_test_cases = [
     ({}, {}),
-    ({"query": [{"Filters": [{"Key": "Value"}]}]}, {"Filters": [{"Key": "Value"}]})
+    ({"query": [{"Filters": [{"Key": "Value"}]}]}, {"Filters": [{"Key": "Value"}]}),
 ]
 
 

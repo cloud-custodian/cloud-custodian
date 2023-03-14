@@ -15,25 +15,20 @@ c7n_data = {}
 
 
 def create_html_file(config):
-    """ You can customize the automated documentation by altering
-        the code directly in this script or the associated jinja2 template
+    """You can customize the automated documentation by altering
+    the code directly in this script or the associated jinja2 template
     """
     logging.debug("Starting create_html_file")
     logging.debug(
-        "\tjinja2_template_file = {}"
-        .format(config['jinja2_template_filename']))
-    logging.debug(
-        "\ttrendered_filename = {}"
-        .format(config['rendered_filename']))
+        "\tjinja2_template_file = {}".format(config['jinja2_template_filename'])
+    )
+    logging.debug("\ttrendered_filename = {}".format(config['rendered_filename']))
 
     ts = time.time()
-    timestamp = datetime.datetime.utcfromtimestamp(ts).strftime(
-        '%Y-%m-%d %H:%M:%S')
+    timestamp = datetime.datetime.utcfromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
     script_path = os.path.dirname(os.path.abspath(__file__))
-    rendered_file_path = os.path.join(
-        script_path, config['rendered_filename'])
-    environment = jinja2.Environment(
-        loader=jinja2.FileSystemLoader(script_path))
+    rendered_file_path = os.path.join(script_path, config['rendered_filename'])
+    environment = jinja2.Environment(loader=jinja2.FileSystemLoader(script_path))
 
     environment_column = True if config['environment_tags'] else False
 
@@ -41,13 +36,15 @@ def create_html_file(config):
         "timestamp": timestamp,
         "c7n_data": c7n_data,
         "environment_column": environment_column,
-        "environment_tags": config['environment_tags']
+        "environment_tags": config['environment_tags'],
     }
 
     with open(rendered_file_path, "w") as result_file:
         result_file.write(
-            environment.get_template(config['jinja2_template_filename'])
-            .render(render_vars))
+            environment.get_template(config['jinja2_template_filename']).render(
+                render_vars
+            )
+        )
 
     logging.debug("File created: %s", rendered_file_path)
 
@@ -55,16 +52,14 @@ def create_html_file(config):
 
 
 def get_file_url(path, config):
-    """ Update this function to help build the link to your file
-    """
+    """Update this function to help build the link to your file"""
     file_url_regex = re.compile(config['file_url_regex'])
     new_path = re.sub(file_url_regex, config['file_url_base'], path)
     return new_path
 
 
 def gather_file_data(config):
-    """ Gather policy information from files
-    """
+    """Gather policy information from files"""
     file_regex = re.compile(config['file_regex'])
     category_regex = re.compile(config['category_regex'])
     policies = {}
@@ -83,10 +78,8 @@ def gather_file_data(config):
 
                         policies = yaml.load(stream)
                         for policy in policies['policies']:
-                            logging.debug(
-                                'Processing policy %s', policy['name'])
-                            policy['file_url'] = get_file_url(
-                                file_path, config)
+                            logging.debug('Processing policy %s', policy['name'])
+                            policy['file_url'] = get_file_url(file_path, config)
                             resource_type = policy['resource']
                             if category not in c7n_data:
                                 c7n_data[category] = {}
@@ -98,18 +91,18 @@ def gather_file_data(config):
 
 
 def upload_to_s3(file_path, config):
-    """ Upload html file to S3
-    """
+    """Upload html file to S3"""
     logging.info("Uploading file to S3 bucket: %s", config['s3_bucket_name'])
     s3 = boto3.resource('s3')
     s3_filename = config['s3_bucket_path'] + config['rendered_filename']
     s3.Bucket(config['s3_bucket_name']).upload_file(
-        file_path, s3_filename, ExtraArgs={
-            'ContentType': 'text/html', 'ACL': 'public-read'})
+        file_path,
+        s3_filename,
+        ExtraArgs={'ContentType': 'text/html', 'ACL': 'public-read'},
+    )
 
 
 def validate_inputs(config):
-
     CONFIG_SCHEMA = {
         'type': 'object',
         'additionalProperties': False,
@@ -118,7 +111,7 @@ def validate_inputs(config):
             'file_regex',
             'jinja2_template_filename',
             'rendered_filename',
-            'category_regex'
+            'category_regex',
         ],
         'properties': {
             'jinja2_template_filename': {'type': 'string'},
@@ -130,8 +123,8 @@ def validate_inputs(config):
             'file_url_regex': {'type': 'string'},
             's3_bucket_name': {'type': 'string'},
             's3_bucket_path': {'type': 'string'},
-            'environment_tags': {'type': 'object'}
-        }
+            'environment_tags': {'type': 'object'},
+        },
     }
 
     jsonschema.validate(config, CONFIG_SCHEMA)
@@ -139,15 +132,17 @@ def validate_inputs(config):
 
 
 def main():
-
     parser = argparse.ArgumentParser(
-        description='Automatic policy documentation for Cloud Custodian.')
+        description='Automatic policy documentation for Cloud Custodian.'
+    )
     parser.add_argument('-v', '--verbose', action='store_true')
     parser.add_argument(
-        '-c', '--config_filename',
+        '-c',
+        '--config_filename',
         required=True,
         dest='config_filename',
-        help='YAML config filename')
+        help='YAML config filename',
+    )
     args = parser.parse_args()
 
     with open(args.config_filename) as fh:

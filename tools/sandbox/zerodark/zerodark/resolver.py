@@ -23,7 +23,8 @@ class IPResolver:
     # TODO: needs region and account id in queries
     resource_query = {
         'ec2': 'select * from ec2 where instance_id = ?',
-        'elb': 'select * from elbs where name = ?'}
+        'elb': 'select * from elbs where name = ?',
+    }
 
     def __init__(self, ipdb_path, cmdb_path, aws_cidrs_path=None):
         self.ipdb = ipdb_path and sqlite3.connect(ipdb_path) or None
@@ -48,9 +49,9 @@ class IPResolver:
             ipranges = json.load(fh)
             for r in ipranges.get('prefixes', ()):
                 if r['service'] in ('S3', 'AMAZON'):
-                    self.aws_cidrs.setdefault(
-                        r['service'].lower(), []).append(
-                            ipaddress.IPv4Network(r['ip_prefix']))
+                    self.aws_cidrs.setdefault(r['service'].lower(), []).append(
+                        ipaddress.IPv4Network(r['ip_prefix'])
+                    )
 
     def resolve(self, ips, start, end):
         results = {}
@@ -67,8 +68,8 @@ class IPResolver:
                    where ip_address = ?
                      and start < ?
                      and (end > ? or end is null)''',
-                (ip, end.strftime('%Y-%m-%dT%H:%M'),
-                 start.strftime('%Y-%m-%dT%H:%M')))
+                (ip, end.strftime('%Y-%m-%dT%H:%M'), start.strftime('%Y-%m-%dT%H:%M')),
+            )
             info = list(self.ipdb_cursor)
             # TODO: assert on number of records found
             if info:

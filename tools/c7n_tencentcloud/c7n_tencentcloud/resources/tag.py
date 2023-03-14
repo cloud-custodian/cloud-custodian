@@ -10,21 +10,16 @@ class TAG(QueryResourceManager):
 
     class resource_type(ResourceTypeInfo):
         """resource_type"""
+
         endpoint = "tag.tencentcloudapi.com"
         service = "tag"
         version = "2018-08-13"
         taggable = True
-        enum_spec = ("GetResources",
-                     "Response.ResourceTagMappingList[]",
-                     {}
-                     )
+        enum_spec = ("GetResources", "Response.ResourceTagMappingList[]", {})
         paging_def = {
             "method": PageMethod.PaginationToken,
             "pagination_token_path": "Response.PaginationToken",
-            "limit": {
-                "key": "MaxResults",
-                "value": 200
-            }
+            "limit": {"key": "MaxResults", "value": 200},
         }
 
     def get_resource_query_params(self):
@@ -46,8 +41,6 @@ class TAG(QueryResourceManager):
         """
         get_simple_call_params
         """
-        params = {
-            "ResourceList": qcs_list
-        }
+        params = {"ResourceList": qcs_list}
         params.update()
         return params

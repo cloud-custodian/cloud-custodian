@@ -5,25 +5,22 @@ from tc_common import BaseTest
 
 
 class TestNatGateway(BaseTest):
-
     @pytest.mark.vcr
     def test_nat_gateway_unused(self):
         policy = self.load_policy(
             {
                 "name": "nat-gateway-unused",
                 "resource": "tencentcloud.nat-gateway",
-                "query": [{
-                        "NatGatewayIds": ["nat-lf1cl2ne"]
-                }],
+                "query": [{"NatGatewayIds": ["nat-lf1cl2ne"]}],
                 "filters": [
                     {
                         "type": "value",
                         "key": "CreatedTime",
                         "value_type": "age",
                         "op": "greater-than",
-                        "value": 0
+                        "value": 0,
                     }
-                ]
+                ],
             }
         )
         resources = policy.run()
@@ -41,7 +38,7 @@ class TestNatGateway(BaseTest):
                         "key": "CreatedTime",
                         "value_type": "age",
                         "op": "greater-than",
-                        "value": 7
+                        "value": 7,
                     },
                     {
                         "type": "metrics",
@@ -51,9 +48,9 @@ class TestNatGateway(BaseTest):
                         "value": 0,
                         "missing-value": 0,
                         "op": "equal",
-                        "period": 3600
-                    }
-                ]
+                        "period": 3600,
+                    },
+                ],
             }
         )
         resources = policy.run()

@@ -13,16 +13,39 @@ with open(schema_diff, encoding='utf-8') as f:
     exec(f.read())
 
 
-@pytest.mark.parametrize('provider, resource, category, element, expected', [
-    ('aws', 'firehose', 'filters', 'kms-key',
-     '[`kms-key`](https://cloudcustodian.io/docs/aws/resources/firehose.html#aws-firehose-filters-kms-key)'),  # noqa
-    (None, 'gcp.pubsub-topic', 'actions', 'delete',
-     '[`delete`](https://cloudcustodian.io/docs/gcp/resources/pubsub-topic.html#gcp-pubsub-topic-actions-delete)'),  # noqa
-    ('aws', 'elasticsearch', None, None,
-     '[`aws.elasticsearch`](https://cloudcustodian.io/docs/aws/resources/elasticsearch.html)'),
-    ('aws', None, 'filters', 'reduce',
-     '[`reduce`](https://cloudcustodian.io/docs/aws/resources/aws-common-filters.html#aws-common-filters-reduce)'),  # noqa
-])
+@pytest.mark.parametrize(
+    'provider, resource, category, element, expected',
+    [
+        (
+            'aws',
+            'firehose',
+            'filters',
+            'kms-key',
+            '[`kms-key`](https://cloudcustodian.io/docs/aws/resources/firehose.html#aws-firehose-filters-kms-key)',
+        ),  # noqa
+        (
+            None,
+            'gcp.pubsub-topic',
+            'actions',
+            'delete',
+            '[`delete`](https://cloudcustodian.io/docs/gcp/resources/pubsub-topic.html#gcp-pubsub-topic-actions-delete)',
+        ),  # noqa
+        (
+            'aws',
+            'elasticsearch',
+            None,
+            None,
+            '[`aws.elasticsearch`](https://cloudcustodian.io/docs/aws/resources/elasticsearch.html)',
+        ),
+        (
+            'aws',
+            None,
+            'filters',
+            'reduce',
+            '[`reduce`](https://cloudcustodian.io/docs/aws/resources/aws-common-filters.html#aws-common-filters-reduce)',
+        ),  # noqa
+    ],
+)
 def test_link(provider, resource, category, element, expected):
     got = link(  # noqa
         provider=provider,

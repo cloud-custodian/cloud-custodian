@@ -53,7 +53,7 @@ class LockAction(AzureBaseAction):
                 lock-name: productionLock
                 lock-notes: Locking all production SQL databases via Cloud Custodian
 
-     """
+    """
 
     schema = type_schema(
         'lock',
@@ -61,7 +61,7 @@ class LockAction(AzureBaseAction):
         **{
             'lock-type': {'enum': ['ReadOnly', 'CanNotDelete']},
             'lock-name': {'type': 'string', 'minLength': 1, 'maxLength': 260},
-            'lock-notes': {'type': 'string', 'minLength': 1, 'maxLength': 512}
+            'lock-notes': {'type': 'string', 'minLength': 1, 'maxLength': 512},
         }
     )
 
@@ -72,7 +72,9 @@ class LockAction(AzureBaseAction):
         self.lock_type = self.data['lock-type']
 
     def _prepare_processing(self):
-        self.client = self.manager.get_client('azure.mgmt.resource.locks.ManagementLockClient')
+        self.client = self.manager.get_client(
+            'azure.mgmt.resource.locks.ManagementLockClient'
+        )
 
     def _process_resource(self, resource):
         lock_name = self._get_lock_name(resource)
@@ -82,19 +84,21 @@ class LockAction(AzureBaseAction):
             self.client.management_locks.create_or_update_at_resource_group_level(
                 resource['name'],
                 lock_name,
-                ManagementLockObject(level=self.lock_type, notes=lock_notes)
+                ManagementLockObject(level=self.lock_type, notes=lock_notes),
             )
         else:
             self.client.management_locks.create_or_update_by_scope(
                 resource['id'],
                 lock_name,
-                ManagementLockObject(level=self.lock_type, notes=lock_notes)
+                ManagementLockObject(level=self.lock_type, notes=lock_notes),
             )
 
         return {"locked": self.lock_type}
 
     def _get_lock_name(self, resource):
-        return self.data.get('lock-name', "c7n-policy-{}".format(self.manager.data['name']))
+        return self.data.get(
+            'lock-name', "c7n-policy-{}".format(self.manager.data['name'])
+        )
 
     def _get_lock_notes(self, resource):
         return self.data.get('lock-notes')

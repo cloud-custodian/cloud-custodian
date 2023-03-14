@@ -21,6 +21,7 @@ from c7n_org.cli import CONFIG_SCHEMA
 
 try:
     from influxdb import InfluxDBClient
+
     HAVE_INFLUXDB = True
 except ImportError:
     HAVE_INFLUXDB = False
@@ -33,7 +34,6 @@ MAX_RESULT_POINTS = 1440
 
 
 class Resource:
-
     @classmethod
     def id(cls, r):
         return r[cls.mid]
@@ -50,10 +50,15 @@ class Resource:
                 and env = ?
                 and start < ?
                 and (end > ? or end is null)
-                ''' % cls.table,
-                (app, env,
-                 end.strftime('%Y-%m-%dT%H:%M'),
-                 start.strftime('%Y-%m-%dT%H:%M')))
+                '''
+                % cls.table,
+                (
+                    app,
+                    env,
+                    end.strftime('%Y-%m-%dT%H:%M'),
+                    start.strftime('%Y-%m-%dT%H:%M'),
+                ),
+            )
             keymeta = [v[0] for v in cursor.description]
             # todo - compare/use row factory ?
             return map(dict, map(lambda x: zip(keymeta, x), list(cursor)))
@@ -75,7 +80,8 @@ class EC2(Resource):
         dict(name='DiskReadOps'),
         dict(name='DiskWriteOps'),
         dict(name='DiskReadBytes'),
-        dict(name='DiskWriteBytes')]
+        dict(name='DiskWriteBytes'),
+    ]
 
     @staticmethod
     def get_dimensions(r):
@@ -84,7 +90,7 @@ class EC2(Resource):
 
 class ELB(Resource):
     mid = 'name'
-    table = 'elbs',
+    table = ('elbs',)
     namespace = 'AWS/ELB'
     type = 'LoadBalancer'
     metrics = [
@@ -98,11 +104,13 @@ class ELB(Resource):
         dict(name='Latency', statistic='Average'),
         dict(name='RequestCount', statistic='Sum'),
         dict(name='SpilloverCount', statistic='Sum'),
-        dict(name='SurgeQueueLength', statistic='Maximum')]
+        dict(name='SurgeQueueLength', statistic='Maximum'),
+    ]
 
     @staticmethod
     def get_dimensions(r):
         return [{'Name': 'LoadBalancerName', 'Value': r['name']}]
+
 
 #    @classmethod
 #    def get_resources(cls, *args, **kw):
@@ -118,7 +126,6 @@ class ELB(Resource):
 
 
 class EBS(Resource):
-
     mid = 'volume_id'
     table = 'ebs'
     namespace = 'AWS/EBS'
@@ -130,17 +137,15 @@ class EBS(Resource):
         dict(name='VolumeWriteOps'),
         dict(name='VolumeTotalReadTime'),
         dict(name='VolumeTotalWriteTime'),
-        dict(name='VolumeQueueLength')]
+        dict(name='VolumeQueueLength'),
+    ]
 
     @staticmethod
     def get_dimensions(r):
         return [{'Name': 'VolumeId', 'Value': r['volume_id']}]
 
 
-RESOURCE_INFO = {
-    'Instance': EC2,
-    'Volume': EBS,
-    'LoadBalancer': ELB}
+RESOURCE_INFO = {'Instance': EC2, 'Volume': EBS, 'LoadBalancer': ELB}
 
 
 def get_indexer(config):
@@ -153,15 +158,13 @@ def get_indexer(config):
 
 
 class DirIndexer:
-
     def __init__(self, config):
         self.config = config
         self.dir = config['indexer'].get('store-dir')
 
     def index(self, metrics_set):
         for r, rtype, m, point_set in metrics_set:
-            mdir = os.path.join(
-                self.dir, r['account_id'], rtype.id(r))
+            mdir = os.path.join(self.dir, r['account_id'], rtype.id(r))
             if not os.path.exists(mdir):
                 os.makedirs(mdir)
             with open(os.path.join(mdir, '%s.json'), 'w') as fh:
@@ -169,7 +172,6 @@ class DirIndexer:
 
 
 class SQLIndexer:
-
     #  metadata = rdb.MetaData()
     #  table = rdb.Table(
     #        'resource_metrics',
@@ -183,32 +185,33 @@ class SQLIndexer:
 
 
 class InfluxIndexer:
-
     def __init__(self, config):
         self.config = config
         self.client = InfluxDBClient(
             username=self.config['indexer']['user'],
             password=self.config['indexer']['password'],
             host=self.config['indexer']['host'],
-            database=self.config['indexer']['database'])
+            database=self.config['indexer']['database'],
+        )
 
     def first(self, resource, resource_type, metric):
-        mkey = ("%s_%s" % (
-            resource_type.namespace.split('/')[-1],
-            metric['name'])).lower()
+        mkey = (
+            "%s_%s" % (resource_type.namespace.split('/')[-1], metric['name'])
+        ).lower()
         return self.get_resource_time(resource_type.id(resource), mkey, 'desc')
 
     def last(self, resource, resource_type, metric):
-        mkey = ("%s_%s" % (
-            resource_type.namespace.split('/')[-1],
-            metric['name'])).lower()
+        mkey = (
+            "%s_%s" % (resource_type.namespace.split('/')[-1], metric['name'])
+        ).lower()
         return self.get_resource_time(resource_type.id(resource), mkey, 'desc')
 
     def get_resource_time(self, rid, mkey, direction='desc'):
         result = self.client.query(
             '''select * from %s
-               where ResourceId = '%s' order by time %s limit 1''' % (
-                mkey, rid, direction))
+               where ResourceId = '%s' order by time %s limit 1'''
+            % (mkey, rid, direction)
+        )
         if len(result) == 0:
             return None
         return parse_date(list(result)[0][0]['time'])
@@ -223,7 +226,8 @@ class InfluxIndexer:
                 'AccountId': r['account_id'],
                 'Region': r['region'],
                 'App': r['app'],
-                'Env': r['env']}
+                'Env': r['env'],
+            }
             s = m.get('statistic', 'Average')
             for p in point_set:
                 p = dict(p)
@@ -233,9 +237,9 @@ class InfluxIndexer:
                     pu = p.pop('Unit', None)
                     if pu != 'None':
                         p['fields']['Unit'] = pu
-                p['measurement'] = ("%s_%s" % (
-                    rtype.namespace.split('/')[-1],
-                    m['name'])).lower()
+                p['measurement'] = (
+                    "%s_%s" % (rtype.namespace.split('/')[-1], m['name'])
+                ).lower()
                 p['time'] = p.pop('Timestamp')
                 p['tags'] = rtags
                 points.append(p)
@@ -274,8 +278,9 @@ def get_clients(accounts_config, account_ids, regions, service='cloudwatch'):
             continue
         session = assumed_session(a['role'], 'app-metrics')
         for r in regions:
-            clients['%s-%s' % (
-                a['account_id'], r)] = session.client(service, region_name=r)
+            clients['%s-%s' % (a['account_id'], r)] = session.client(
+                service, region_name=r
+            )
     return clients
 
 
@@ -291,7 +296,7 @@ def get_date_ranges(start, end, period, r):
         end = r_end
     if r_end < start:
         return
-    date_delta = (end - start)
+    date_delta = end - start
     increments = date_delta.total_seconds() / float(period)
     if increments <= MAX_RESULT_POINTS:
         yield (start, end)
@@ -305,11 +310,7 @@ def get_date_ranges(start, end, period, r):
         yield (p_start, p_end)
 
 
-RETENTION_PERIODS = OrderedDict([
-    ((0, 15), 60),
-    ((15, 63), 300),
-    ((63, 455), 3600)
-])
+RETENTION_PERIODS = OrderedDict([((0, 15), 60), ((15, 63), 300), ((63, 455), 3600)])
 
 
 def get_metric_period(start, end):
@@ -334,8 +335,7 @@ def get_metric_tasks(indexer, resource_type, resource_set, start, end):
                 m_end = m_end.replace(tzinfo=None)
                 if m_end > start:
                     start = m_end
-            for (start_time, end_time) in get_date_ranges(
-                    start, end, period, r):
+            for start_time, end_time in get_date_ranges(start, end, period, r):
                 params = dict(
                     Namespace=resource_type.namespace,
                     MetricName=m['name'],
@@ -343,16 +343,16 @@ def get_metric_tasks(indexer, resource_type, resource_set, start, end):
                     StartTime=start_time,
                     EndTime=end_time,
                     Period=period,
-                    Dimensions=dims)
+                    Dimensions=dims,
+                )
                 tasks.append((r, resource_type.type, m, params))
     return tasks
 
 
 def collect_metrics(clients, tasks):
     metrics = []
-    for (resource, rtype, metric, params) in tasks:
-        client = clients.get('%s-%s' % (
-            resource['account_id'], resource['region']))
+    for resource, rtype, metric, params in tasks:
+        client = clients.get('%s-%s' % (resource['account_id'], resource['region']))
         points = client.get_metric_statistics(**params).get('Datapoints', [])
         # log.info("getting metrics r:%s %s %s %s points:%d",
         #          Resource.get_type(rtype).id(resource),
@@ -368,8 +368,11 @@ def collect_metrics(clients, tasks):
 @click.option('--app', required=True)
 @click.option('--env')
 @click.option(
-    '-r', '--resources', multiple=True,
-    type=click.Choice(['Instance', 'LoadBalancer', 'Volume']))
+    '-r',
+    '--resources',
+    multiple=True,
+    type=click.Choice(['Instance', 'LoadBalancer', 'Volume']),
+)
 @click.option('--cmdb', required=True, type=click.Path())
 @click.option('--config', required=True, type=click.Path())
 @click.option('--start', required=True)
@@ -377,8 +380,8 @@ def collect_metrics(clients, tasks):
 @click.option('--debug', is_flag=True)
 def cli(app, env, resources, cmdb, config, start, end, debug):
     logging.basicConfig(
-        level=logging.INFO,
-        format="%(asctime)s: %(name)s:%(levelname)s %(message)s")
+        level=logging.INFO, format="%(asctime)s: %(name)s:%(levelname)s %(message)s"
+    )
     logging.getLogger('botocore').setLevel(logging.WARNING)
     with open(config) as fh:
         accounts_config = yaml.safe_load(fh.read())
@@ -398,11 +401,11 @@ def cli(app, env, resources, cmdb, config, start, end, debug):
         clients = get_clients(
             accounts_config,
             {r['account_id'] for r in resource_set},
-            {r['region'] for r in resource_set})
+            {r['region'] for r in resource_set},
+        )
         log.info("Found %d %s resources", len(resource_set), rtype)
 
-        tasks = get_metric_tasks(
-            indexer, resource_type, resource_set, start, end)
+        tasks = get_metric_tasks(indexer, resource_type, resource_set, start, end)
         log.info("Collecting metrics across %d tasks", len(tasks))
         t = time.time()
         with executor(max_workers=6) as w:
@@ -411,14 +414,19 @@ def cli(app, env, resources, cmdb, config, start, end, debug):
                 futures.append(w.submit(collect_metrics, clients, task_set))
             for f in as_completed(futures):
                 if f.exception():
-                    log.warning(
-                        "error processing resource set %s" % f.exception())
+                    log.warning("error processing resource set %s" % f.exception())
                     continue
                 metrics_count += indexer.index(f.result())
 
         log.info(
             "time:%0.2f app:%s resource_type:%s points:%d start:%s end:%s",
-            time.time() - t, app, rtype, metrics_count, start, end)
+            time.time() - t,
+            app,
+            rtype,
+            metrics_count,
+            start,
+            end,
+        )
 
 
 if __name__ == '__main__':
@@ -426,5 +434,6 @@ if __name__ == '__main__':
         cli()
     except Exception:
         import pdb, traceback, sys
+
         traceback.print_exc()
         pdb.post_mortem(sys.exc_info()[-1])

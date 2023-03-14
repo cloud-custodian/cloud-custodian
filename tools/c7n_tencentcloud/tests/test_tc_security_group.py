@@ -5,36 +5,27 @@ from tc_common import BaseTest
 
 
 class TestSecurityGroup(BaseTest):
-
     @pytest.mark.vcr
     def test_security_group_default_restrict(self):
         policy = self.load_policy(
             {
                 "name": "test_security_group_default_restrict",
                 "resource": "tencentcloud.security-group",
-                "query": [{
-                    "SecurityGroupIds": ["sg-m5jbq9cu", "sg-1kmlb9mm"]
-                }],
+                "query": [{"SecurityGroupIds": ["sg-m5jbq9cu", "sg-1kmlb9mm"]}],
                 "filters": [
                     {
                         "or": [
-                            {
-                                "SecurityGroupName": "ccsTest"
-                            }, {
-                                "SecurityGroupName": "base-ritch"
-                            },
+                            {"SecurityGroupName": "ccsTest"},
+                            {"SecurityGroupName": "base-ritch"},
                         ]
                     },
                     {
                         "or": [
-                            {
-                                "IpPermissions": "not-null"
-                            }, {
-                                "IpPermissionsEgress": "not-null"
-                            }
+                            {"IpPermissions": "not-null"},
+                            {"IpPermissionsEgress": "not-null"},
                         ]
-                    }
-                ]
+                    },
+                ],
             }
         )
         resources = policy.run()
@@ -53,16 +44,17 @@ class TestSecurityGroup(BaseTest):
                         'CidrBlock': '192.168.0.0/16',
                         'Ipv6CidrBlock': '',
                         'SecurityGroupId': '',
-                        'Action': 'ACCEPT'
+                        'Action': 'ACCEPT',
                     }
                 ],
-                'IpPermissionsEgress': []}
+                'IpPermissionsEgress': [],
+            }
         ]
         policy = self.load_policy(
             {
                 "name": "test_ports_ingress",
                 "resource": "tencentcloud.security-group",
-                "filters": [{"type": "ingress", "Ports": [60]}]
+                "filters": [{"type": "ingress", "Ports": [60]}],
             }
         )
         manager = policy.load_resource_manager()
@@ -94,23 +86,25 @@ class TestSecurityGroup(BaseTest):
                         'CidrBlock': '192.168.0.0/16',
                         'Ipv6CidrBlock': '',
                         'SecurityGroupId': '',
-                        'Action': 'ACCEPT'
-                    }, {
+                        'Action': 'ACCEPT',
+                    },
+                    {
                         'PolicyIndex': 0,
                         'Port': '60',
                         'CidrBlock': '192.168.0.0/16',
                         'Ipv6CidrBlock': '',
                         'SecurityGroupId': '',
-                        'Action': 'ACCEPT'
-                    }
+                        'Action': 'ACCEPT',
+                    },
                 ],
-                'IpPermissionsEgress': []}
+                'IpPermissionsEgress': [],
+            }
         ]
         policy = self.load_policy(
             {
                 "name": "test_any_ports_except_ingress",
                 "resource": "tencentcloud.security-group",
-                "filters": [{"type": "ingress", "AnyPortsExcept": [60, 70]}]
+                "filters": [{"type": "ingress", "AnyPortsExcept": [60, 70]}],
             }
         )
         manager = policy.load_resource_manager()
@@ -133,11 +127,7 @@ class TestSecurityGroup(BaseTest):
             {
                 "name": "test_any_ports_except_ingress",
                 "resource": "tencentcloud.security-group",
-                "filters": [
-                    {"type": "ingress",
-                     "AnyPortsExcept": [70],
-                     "Ports": [60]
-                     }]
+                "filters": [{"type": "ingress", "AnyPortsExcept": [70], "Ports": [60]}],
             }
         )
         manager = policy.load_resource_manager()
@@ -158,27 +148,26 @@ class TestSecurityGroup(BaseTest):
                         'CidrBlock': '192.168.0.0/24',
                         'Ipv6CidrBlock': '',
                         'SecurityGroupId': '',
-                        'Action': 'ACCEPT'
+                        'Action': 'ACCEPT',
                     }
-                ]}
+                ],
+            }
         ]
         policy = self.load_policy(
             {
                 "name": "test_cidr_egress",
                 "resource": "tencentcloud.security-group",
-                "query": [{
-                    "SecurityGroupIds": ["sg-18k4jd20"]
-                }],
+                "query": [{"SecurityGroupIds": ["sg-18k4jd20"]}],
                 "filters": [
                     {
                         "type": "egress",
                         "Cidr": {
                             "value": "192.168.0.0/16",
                             "op": "in",
-                            "value_type": "cidr"
-                        }
+                            "value_type": "cidr",
+                        },
                     }
-                ]
+                ],
             }
         )
         manager = policy.load_resource_manager()
@@ -206,23 +195,26 @@ class TestSecurityGroup(BaseTest):
                         'CidrBlock': '192.168.0.0/24',
                         'Ipv6CidrBlock': '',
                         'SecurityGroupId': '',
-                        'Action': 'ACCEPT'
+                        'Action': 'ACCEPT',
                     }
                 ],
-                'IpPermissionsEgress': []}
+                'IpPermissionsEgress': [],
+            }
         ]
         policy = self.load_policy(
             {
                 "name": "test_cidr_ip_ingress",
                 "resource": "tencentcloud.security-group",
                 "filters": [
-                    {"type": "ingress",
-                     "Cidr": {
-                         "value": "192.168.1.1",
-                         "op": "in",
-                         "value_type": "cidr"
-                     }}
-                ]
+                    {
+                        "type": "ingress",
+                        "Cidr": {
+                            "value": "192.168.1.1",
+                            "op": "in",
+                            "value_type": "cidr",
+                        },
+                    }
+                ],
             }
         )
         manager = policy.load_resource_manager()
@@ -246,10 +238,11 @@ class TestSecurityGroup(BaseTest):
                         'CidrBlock': '',
                         'Ipv6CidrBlock': '::/0',
                         'SecurityGroupId': '',
-                        'Action': 'ACCEPT'
+                        'Action': 'ACCEPT',
                     }
                 ],
-                'IpPermissionsEgress': []}
+                'IpPermissionsEgress': [],
+            }
         ]
         policy = self.load_policy(
             {
@@ -258,21 +251,11 @@ class TestSecurityGroup(BaseTest):
                 "filters": [
                     {
                         "or": [
-                            {
-                                "type": "ingress",
-                                "Cidr": {
-                                    "value": "0.0.0.0/0"
-                                }
-                            },
-                            {
-                                "type": "ingress",
-                                "CidrV6": {
-                                    "value": "::/0"
-                                }
-                            }
+                            {"type": "ingress", "Cidr": {"value": "0.0.0.0/0"}},
+                            {"type": "ingress", "CidrV6": {"value": "::/0"}},
                         ]
                     }
-                ]
+                ],
             }
         )
         manager = policy.load_resource_manager()

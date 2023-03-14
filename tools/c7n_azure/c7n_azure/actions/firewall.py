@@ -11,7 +11,6 @@ from c7n.filters.core import type_schema
 
 
 class SetFirewallAction(AzureBaseAction):
-
     schema = type_schema(
         'set-firewall-rules',
         required=[],
@@ -19,7 +18,7 @@ class SetFirewallAction(AzureBaseAction):
             'append': {'type': 'boolean', 'default': True},
             'bypass-rules': {'type': 'array'},
             'ip-rules': {'type': 'array', 'items': {'type': 'string'}},
-            'virtual-network-rules': {'type': 'array', 'items': {'type': 'string'}}
+            'virtual-network-rules': {'type': 'array', 'items': {'type': 'string'}},
         }
     )
 

@@ -14,7 +14,7 @@ setup(
     description="Cloud Custodian - Automated Policy Documentation",
     classifiers=[
         "Topic :: System :: Systems Administration",
-        "Topic :: System :: Distributed Computing"
+        "Topic :: System :: Distributed Computing",
     ],
     url="https://github.com/cloud-custodian/cloud-custodian",
     long_description=description,
@@ -23,5 +23,5 @@ setup(
     author_email="ryanash@gmail.com",
     license="Apache-2.0",
     py_modules=["c7n_autodoc"],
-    install_requires=["c7n", "pyyaml>=4.2b4", "boto3", "jinja2>=2.11.3", "jsonschema"]
+    install_requires=["c7n", "pyyaml>=4.2b4", "boto3", "jinja2>=2.11.3", "jsonschema"],
 )

@@ -39,12 +39,16 @@ class CBS(QueryResourceManager):
 
     class resource_type(ResourceTypeInfo):
         """resource_type"""
+
         id = "DiskId"
         endpoint = "cbs.tencentcloudapi.com"
         service = "cbs"
         version = "2017-03-12"
         enum_spec = ("DescribeDisks", "Response.DiskSet[]", {})
-        paging_def = {"method": PageMethod.Offset, "limit": {"key": "Limit", "value": 20}}
+        paging_def = {
+            "method": PageMethod.Offset,
+            "limit": {"key": "Limit", "value": 20},
+        }
         resource_prefix = "instance"
         taggable = True
         metrics_enabled = True
@@ -78,9 +82,9 @@ class CbsCopyInstanceTagsAction(TencentCloudBaseAction):
                 tags:
                   - test_pro_18
     """
+
     schema_alias = True
-    schema = type_schema("copy-instance-tags",
-                         tags={"type": "array"})
+    schema = type_schema("copy-instance-tags", tags={"type": "array"})
 
     t_api_method_name = "ModifyResourceTags"
 
@@ -95,8 +99,10 @@ class CbsCopyInstanceTagsAction(TencentCloudBaseAction):
         get cbs tag request params,single resource operation
         https://cloud.tencent.com/document/api/651/35322
         """
-        params = {"Resource": self.manager.source.get_resource_qcs([resource])[0],
-                  "ReplaceTags": []}
+        params = {
+            "Resource": self.manager.source.get_resource_qcs([resource])[0],
+            "ReplaceTags": [],
+        }
         tags = instances_tags.get(resource["InstanceId"])
         for tag in tags:
             if tag["TagKey"] in self.data.get('tags'):
@@ -114,8 +120,12 @@ class CbsCopyInstanceTagsAction(TencentCloudBaseAction):
                 params = self._get_tag_request_params(res, instances_tags)
                 if len(params["ReplaceTags"]) > 0:
                     resp = client.execute_query(self.t_api_method_name, params)
-                    self.log.debug("%s , params: %s,resp: %s ", self.data.get('type'),
-                                   json.dumps(params), json.dumps(resp))
+                    self.log.debug(
+                        "%s , params: %s,resp: %s ",
+                        self.data.get('type'),
+                        json.dumps(params),
+                        json.dumps(resp),
+                    )
         except (RetryError, TencentCloudSDKException) as err:
             raise PolicyExecutionError(err) from err
 
@@ -124,8 +134,12 @@ class CbsCopyInstanceTagsAction(TencentCloudBaseAction):
         get instances tag
         """
         dict_tag: dir = {}
-        qcs = self.manager.get_resource_manager('tencentcloud.cvm').get_qcs_for_cbs(resources)
-        tags = self.manager.source.query_helper.get_resource_tags(self.manager.config.region, qcs)
+        qcs = self.manager.get_resource_manager('tencentcloud.cvm').get_qcs_for_cbs(
+            resources
+        )
+        tags = self.manager.source.query_helper.get_resource_tags(
+            self.manager.config.region, qcs
+        )
         for tag in tags:
             dict_tag.update({tag["Resource"].split('/')[-1]: tag["Tags"]})
         return dict_tag

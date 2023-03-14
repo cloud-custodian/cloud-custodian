@@ -37,10 +37,7 @@ class LogicAppAction(Webhook):
         required=['resource-group', 'logic-app-name'],
         rinherit=Webhook.schema,
         url=None,
-        **{
-            'resource-group': {'type': 'string'},
-            'logic-app-name': {'type': 'string'}
-        }
+        **{'resource-group': {'type': 'string'}, 'logic-app-name': {'type': 'string'}}
     )
 
     def __init__(self, data=None, manager=None, log_dir=None):
@@ -49,20 +46,18 @@ class LogicAppAction(Webhook):
 
     def process(self, resources, event=None):
         self.url = self.get_callback_url(
-            self.data.get('resource-group'),
-            self.data.get('logic-app-name'))
+            self.data.get('resource-group'), self.data.get('logic-app-name')
+        )
 
         super(LogicAppAction, self).process(resources, event)
 
     def get_callback_url(self, resource_group, workflow_name):
-        """ Gets the logic app invoke trigger with secrets using RBAC """
+        """Gets the logic app invoke trigger with secrets using RBAC"""
 
-        client = self.manager.get_client(
-            'azure.mgmt.logic.LogicManagementClient')
+        client = self.manager.get_client('azure.mgmt.logic.LogicManagementClient')
 
         callback = client.workflow_triggers.list_callback_url(
-            resource_group,
-            workflow_name,
-            'manual')
+            resource_group, workflow_name, 'manual'
+        )
 
         return callback.value

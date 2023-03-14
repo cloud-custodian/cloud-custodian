@@ -42,10 +42,8 @@ def eni_download_flows(client, bucket, prefix, start, end, eni, store_dir):
         os.makedirs(eni_path)
 
     results = client.list_objects_v2(
-        Bucket=bucket,
-        Prefix="%s/%s" % (
-            prefix.rstrip('/'),
-            "%s-all" % eni))
+        Bucket=bucket, Prefix="%s/%s" % (prefix.rstrip('/'), "%s-all" % eni)
+    )
     truncated = results['IsTruncated']
 
     for k in results.get('Contents', ()):
@@ -65,8 +63,10 @@ def eni_download_flows(client, bucket, prefix, start, end, eni, store_dir):
         yield dl_key
         count += 1
 
-    log.info("eni:%s logs-skip:%d logs-consumed:%d truncated:%s size:%s" % (
-        eni, skip, count, truncated, human_size(log_size)))
+    log.info(
+        "eni:%s logs-skip:%d logs-consumed:%d truncated:%s size:%s"
+        % (eni, skip, count, truncated, human_size(log_size))
+    )
 
 
 def eni_flow_stream(files, start, end, buffer_size=25000):
@@ -121,8 +121,7 @@ def flow_stream_stats(ips, flow_stream, period):
             pk = record.start - record.start % period
             pc = period_counters.get(pk)
             if pc is None:
-                period_counters[pk] = pc = {
-                    'inbytes': Counter(), 'outbytes': Counter()}
+                period_counters[pk] = pc = {'inbytes': Counter(), 'outbytes': Counter()}
             if record.action == REJECT:
                 stats['Rejects'] += 1
             if record.dstaddr in ips:
@@ -133,7 +132,10 @@ def flow_stream_stats(ips, flow_stream, period):
                 raise ValueError("")
     log.info(
         "flows:%d bytes:%s rejects:%s",
-        stats['Flows'], human_size(stats['Bytes']), stats['Rejects'])
+        stats['Flows'],
+        human_size(stats['Bytes']),
+        stats['Rejects'],
+    )
 
     return period_counters
 
@@ -153,11 +155,10 @@ def rollup_logical(counter, lookup, logical_keys):
 
 
 def process_eni_metrics(
-        stream_eni, myips, stream,
-        start, end, period, sample_size,
-        resolver, sink_uri):
+    stream_eni, myips, stream, start, end, period, sample_size, resolver, sink_uri
+):
     """ENI flow stream processor that rollups, enhances,
-       and indexes the stream by time period."""
+    and indexes the stream by time period."""
     stats = Counter()
     period_counters = flow_stream_stats(myips, stream, period)
     client = InfluxDBClient.from_dsn(sink_uri)
@@ -175,7 +176,7 @@ def process_eni_metrics(
             logical_counter = rollup_logical(tpc, resolved, ('app', 'env'))
             for (app, env), v in logical_counter.items():
                 p = {}
-#                rinfo = resolved.get(ip, {})
+                #                rinfo = resolved.get(ip, {})
                 p['fields'] = {'Bytes': v}
                 p['measurement'] = 'traffic_%s' % t
                 p['time'] = datetime.fromtimestamp(period)
@@ -185,7 +186,8 @@ def process_eni_metrics(
                     'App': resource['app'],
                     'Env': resource['env'],
                     'ForeignApp': app,
-                    'ForeignEnv': env}
+                    'ForeignEnv': env,
+                }
                 points.append(p)
 
         if len(points) > 2000:
@@ -195,16 +197,18 @@ def process_eni_metrics(
 
     client.write_points(points)
     stats['Points'] += len(points)
-    log.info('periods:%d resource:%s points:%d',
-             len(period_counters), resource, stats['Points'])
+    log.info(
+        'periods:%d resource:%s points:%d',
+        len(period_counters),
+        resource,
+        stats['Points'],
+    )
     return stats
 
 
-def eni_log_analyze(ips, flow_stream,
-                    start=None, end=None,
-                    reject=None, target_ips=None,
-                    ports=()):
-
+def eni_log_analyze(
+    ips, flow_stream, start=None, end=None, reject=None, target_ips=None, ports=()
+):
     # in_packets = Counter()
     in_bytes = Counter()
     in_ports = Counter()
@@ -254,7 +258,8 @@ def eni_log_analyze(ips, flow_stream,
         stats['Rejects'],
         human_size(sum(in_bytes.values())),
         human_size(sum(out_bytes.values())),
-        human_size(stats['Bytes']))
+        human_size(stats['Bytes']),
+    )
 
     return in_bytes, out_bytes, in_ports, out_ports
 
@@ -266,8 +271,17 @@ def resolve_ip_address(counter, resolver, start, end):
         i = resolved.get(k)
         if i is not None:
             v = counter.pop(k)
-            counter['%s %s' % (k, (
-                " ".join(["%s:%s" % (ik, iv) for ik, iv in i.items() if iv]).strip()))] += v
+            counter[
+                '%s %s'
+                % (
+                    k,
+                    (
+                        " ".join(
+                            ["%s:%s" % (ik, iv) for ik, iv in i.items() if iv]
+                        ).strip()
+                    ),
+                )
+            ] += v
     return counter
 
 
@@ -293,15 +307,29 @@ def cli():
 @click.option('--sample-count', default=20)
 @click.option('--period', default=300)
 @click.option(
-    '-r', '--resources', multiple=True,
-    type=click.Choice(['Instance', 'LoadBalancer', 'Volume']))
+    '-r',
+    '--resources',
+    multiple=True,
+    type=click.Choice(['Instance', 'LoadBalancer', 'Volume']),
+)
 def analyze_app(
-        app, env, account_id,
-        bucket, prefix, store_dir,
-        resources, ipdb, ipranges,
-        start, end, tz,
-        sink, period, sample_count,
-        debug):
+    app,
+    env,
+    account_id,
+    bucket,
+    prefix,
+    store_dir,
+    resources,
+    ipdb,
+    ipranges,
+    start,
+    end,
+    tz,
+    sink,
+    period,
+    sample_count,
+    debug,
+):
     """Analyze flow log records for application and generate metrics per period"""
     logging.basicConfig(level=logging.INFO)
     logging.getLogger('botocore').setLevel(logging.WARNING)
@@ -313,17 +341,19 @@ def analyze_app(
     for rtype_name in resources:
         rtype = Resource.get_type(rtype_name)
         resource_map = {
-            rtype.id(r): r for r
-            in rtype.get_resources(ipdb, start, end, app, env)}
-        log.info("App:%s Env:%s Type:%s Found:%d",
-                 app, env, rtype_name, len(resource_map))
+            rtype.id(r): r for r in rtype.get_resources(ipdb, start, end, app, env)
+        }
+        log.info(
+            "App:%s Env:%s Type:%s Found:%d", app, env, rtype_name, len(resource_map)
+        )
 
         with sqlite3.connect(ipdb) as db:
             db.row_factory = row_factory
             cursor = db.cursor()
             cursor.execute(
-                'select * from enis where resource_type in (%s)' % (
-                    ", ".join(["'%s'" % r for r in resource_map.keys()])))
+                'select * from enis where resource_type in (%s)'
+                % (", ".join(["'%s'" % r for r in resource_map.keys()]))
+            )
             enis = list(cursor)
             eni_map = {e['eni_id']: e for e in enis}
 
@@ -332,7 +362,8 @@ def analyze_app(
             prefix.rstrip('/'),
             account_id,
             start.strftime('%Y/%m/%d'),
-            "00000000-0000-0000-0000-000000000000")
+            "00000000-0000-0000-0000-000000000000",
+        )
 
         f_downloads = {}
         f_metrics = {}
@@ -345,16 +376,23 @@ def analyze_app(
                 f_downloads[
                     w.submit(
                         eni_download_flows,
-                        client, bucket,
-                        log_prefix, start, end,
-                        e['eni_id'], store_dir)] = e
+                        client,
+                        bucket,
+                        log_prefix,
+                        start,
+                        end,
+                        e['eni_id'],
+                        store_dir,
+                    )
+                ] = e
 
             for f in as_completed(f_downloads):
                 if f.exception():
                     log.warning(
                         "error processing eni %s download: %s",
                         eni_map[f_downloads[f]],
-                        f.exception())
+                        f.exception(),
+                    )
                     continue
                 e = f_downloads[f]
                 files[e['eni_id']] = f.result()
@@ -363,19 +401,28 @@ def analyze_app(
 
             for eni_id, files in files.items():
                 stream = eni_flow_stream(files, start, end)
-                f_metrics[w.submit(
-                    process_eni_metrics,
-                    eni_map[eni_id], ipset,
-                    stream,
-                    start, end, period, sample_count,
-                    resolver, sink)] = eni_id
+                f_metrics[
+                    w.submit(
+                        process_eni_metrics,
+                        eni_map[eni_id],
+                        ipset,
+                        stream,
+                        start,
+                        end,
+                        period,
+                        sample_count,
+                        resolver,
+                        sink,
+                    )
+                ] = eni_id
 
             for f in as_completed(f_metrics):
                 if f.exception():
                     log.warning(
                         "error processing eni %s download %s",
                         eni_map[f_metrics[f]],
-                        f.exception())
+                        f.exception(),
+                    )
                     continue
 
 
@@ -398,12 +445,24 @@ def analyze_app(
 @click.option('-t', '--targets', multiple=True, default=None)
 @click.option('--tz')
 def analyze_enis(
-        account_id, bucket, prefix,
-        enis, ips, start, end, store_dir,
-        ipdb=None, cmdb=None, ipranges=None,
-        region=None, reject=None, targets=None,
-        ports=None, tz=None, sample_count=20):
-
+    account_id,
+    bucket,
+    prefix,
+    enis,
+    ips,
+    start,
+    end,
+    store_dir,
+    ipdb=None,
+    cmdb=None,
+    ipranges=None,
+    region=None,
+    reject=None,
+    targets=None,
+    ports=None,
+    tz=None,
+    sample_count=20,
+):
     logging.basicConfig(level=logging.INFO)
     logging.getLogger('botocore').setLevel(logging.WARNING)
     ports = map(int, ports)
@@ -413,7 +472,8 @@ def analyze_enis(
         prefix.rstrip('/'),
         account_id,
         start.strftime('%Y/%m/%d'),
-        "00000000-0000-0000-0000-000000000000")
+        "00000000-0000-0000-0000-000000000000",
+    )
 
     resolver = IPResolver(ipdb, cmdb, ipranges)
 
@@ -424,7 +484,8 @@ def analyze_enis(
 
     for eni, ip in zip(enis, ips):
         files = eni_download_flows(
-            client, bucket, log_prefix, start, end, eni, store_dir)
+            client, bucket, log_prefix, start, end, eni, store_dir
+        )
 
         in_traffic, out_traffic, inport_traffic, outport_traffic = eni_log_analyze(
             set(ips),
@@ -433,7 +494,8 @@ def analyze_enis(
             end=end,
             reject=reject,
             target_ips=targets,
-            ports=ports)
+            ports=ports,
+        )
         agg_in_traffic.update(in_traffic)
         agg_out_traffic.update(out_traffic)
         agg_inport_traffic.update(inport_traffic)
@@ -441,12 +503,14 @@ def analyze_enis(
 
     print("Inbound %d Most Commmon" % sample_count)
     for ip, bcount in resolve_ip_address(
-            agg_in_traffic, resolver, start, end).most_common(sample_count):
+        agg_in_traffic, resolver, start, end
+    ).most_common(sample_count):
         print("%s %s" % ip, human_size(bcount))
 
     print("Outbound %d Most Common" % sample_count)
     for ip, bcount in resolve_ip_address(
-            agg_out_traffic, resolver, start, end).most_common(sample_count):
+        agg_out_traffic, resolver, start, end
+    ).most_common(sample_count):
         print("%s %s" % ip, human_size(bcount))
 
 
@@ -455,5 +519,6 @@ if __name__ == '__main__':
         cli()
     except Exception:
         import pdb, traceback, sys
+
         traceback.print_exc()
         pdb.post_mortem(sys.exc_info()[-1])

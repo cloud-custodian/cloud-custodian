@@ -103,7 +103,7 @@ def untouched(input, tree):
                 if p in dirs:
                     dirs.remove(p)
 
-    pprint.pprint(dirs)
+    print(" ".join(map(str, dirs)))
 
 
 def get_dirs(root):

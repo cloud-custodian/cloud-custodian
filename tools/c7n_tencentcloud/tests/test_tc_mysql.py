@@ -5,7 +5,6 @@ from tc_common import BaseTest
 
 
 class TestMySQL(BaseTest):
-
     @pytest.mark.vcr
     def test_mysql_engine_value(self):
         policy = self.load_policy(
@@ -17,19 +16,15 @@ class TestMySQL(BaseTest):
                         "type": "value",
                         "key": "EngineType",
                         "value": ["InnoDB", "RocksDB"],
-                        "op": "in"
-                    }, {
+                        "op": "in",
+                    },
+                    {
                         "type": "value",
                         "key": "EngineVersion",
                         "op": "in",
-                        "value": [
-                            "5.5",
-                            "5.6",
-                            "5.7",
-                            "8.0"
-                        ]
-                    }
-                ]
+                        "value": ["5.5", "5.6", "5.7", "8.0"],
+                    },
+                ],
             }
         )
         resources = policy.run()
@@ -43,12 +38,9 @@ class TestMySQL(BaseTest):
                 "name": "test_mysql_encryption_not_enabled_filter",
                 "resource": "tencentcloud.mysql",
                 "query": [{"InstanceIds": ["cdb-lbxusyi7"]}],
-                "filters": [
-                    {
-                        "type": "encryption",
-                        "value": False
-                    }]
-            })
+                "filters": [{"type": "encryption", "value": False}],
+            }
+        )
         resources = policy.run()
         assert len(resources) == 1
 
@@ -65,9 +57,11 @@ class TestMySQL(BaseTest):
                         "key": "CreateTime",
                         "value": 1,
                         "value_type": "age",
-                        "op": "gte"
-                    }]
-            })
+                        "op": "gte",
+                    }
+                ],
+            }
+        )
         resources = policy.run()
         assert len(resources) == 1
 
@@ -83,7 +77,7 @@ class TestMySQL(BaseTest):
                         "key": "CreateTime",
                         "value": 1,
                         "value_type": "age",
-                        "op": "gte"
+                        "op": "gte",
                     },
                     {
                         "type": "metrics",
@@ -93,10 +87,12 @@ class TestMySQL(BaseTest):
                         "period": 3600,
                         "days": 3,
                         "value": 0,
-                        "op": "equal"
-                    }]
+                        "op": "equal",
+                    },
+                ],
             },
-            region="ap-guangzhou")
+            region="ap-guangzhou",
+        )
         resources = policy.run()
         assert len(resources) == 1
         assert resources[0]["InstanceId"] == 'cdb-o6tjxap7'

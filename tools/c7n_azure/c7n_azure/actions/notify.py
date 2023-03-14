@@ -42,7 +42,8 @@ class Notify(BaseNotify):
         'type': 'object',
         'anyOf': [
             {'required': ['type', 'transport', 'to']},
-            {'required': ['type', 'transport', 'to_from']}],
+            {'required': ['type', 'transport', 'to_from']},
+        ],
         'properties': {
             'type': {'enum': ['notify']},
             'to': {'type': 'array', 'items': {'type': 'string'}},
@@ -56,14 +57,17 @@ class Notify(BaseNotify):
             'template': {'type': 'string'},
             'transport': {
                 'oneOf': [
-                    {'type': 'object',
-                     'required': ['type', 'queue'],
-                     'properties': {
-                         'queue': {'type': 'string'},
-                         'type': {'enum': ['asq']}
-                     }}],
+                    {
+                        'type': 'object',
+                        'required': ['type', 'queue'],
+                        'properties': {
+                            'queue': {'type': 'string'},
+                            'type': {'enum': ['asq']},
+                        },
+                    }
+                ],
             },
-        }
+        },
     }
     schema_alias = True
 
@@ -81,16 +85,23 @@ class Notify(BaseNotify):
             'account_id': subscription_id,
             'account': subscription_id,
             'region': 'all',
-            'policy': self.manager.data}
+            'policy': self.manager.data,
+        }
 
         message['action'] = self.expand_variables(message)
 
         for batch in utils.chunks(resources, self.batch_size):
             message['resources'] = batch
             receipt = self.send_data_message(message, session)
-            self.log.info("sent message:%s policy:%s template:%s count:%s" % (
-                receipt, self.manager.data['name'],
-                self.data.get('template', 'default'), len(batch)))
+            self.log.info(
+                "sent message:%s policy:%s template:%s count:%s"
+                % (
+                    receipt,
+                    self.manager.data['name'],
+                    self.data.get('template', 'default'),
+                    len(batch),
+                )
+            )
 
     def send_data_message(self, message, session):
         if self.data['transport']['type'] == 'asq':
@@ -99,15 +110,17 @@ class Notify(BaseNotify):
 
     def send_to_azure_queue(self, queue_uri, message, session):
         try:
-            queue_service, queue_name = StorageUtilities.get_queue_client_by_uri(queue_uri, session)
+            queue_service, queue_name = StorageUtilities.get_queue_client_by_uri(
+                queue_uri, session
+            )
             return StorageUtilities.put_queue_message(
-                queue_service,
-                queue_name,
-                self.pack(message)).id
+                queue_service, queue_name, self.pack(message)
+            ).id
         except AzureHttpError as e:
             if e.status_code == 403:
-                self.log.error("Access Error - Storage Queue Data Contributor Role is required "
-                               "to enqueue messages to the Azure Queue Storage.")
+                self.log.error(
+                    "Access Error - Storage Queue Data Contributor Role is required "
+                    "to enqueue messages to the Azure Queue Storage."
+                )
             else:
-                self.log.error("Error putting message to the queue.\n" +
-                               str(e))
+                self.log.error("Error putting message to the queue.\n" + str(e))

@@ -15,13 +15,17 @@ from c7n_tencentcloud.client import Session
 
 from retrying import RetryError
 from tencentcloud.common.abstract_client import AbstractClient
-from tencentcloud.common.exception.tencent_cloud_sdk_exception import TencentCloudSDKException
+from tencentcloud.common.exception.tencent_cloud_sdk_exception import (
+    TencentCloudSDKException,
+)
 
 
 class TestClient:
     @pytest.fixture
     def simple_client(self, session):
-        return session.client("region.tencentcloudapi.com", "region", "2022-06-27", "ap-shanghai")
+        return session.client(
+            "region.tencentcloudapi.com", "region", "2022-06-27", "ap-shanghai"
+        )
 
     @pytest.mark.vcr
     def test_query_simple(self, simple_client):
@@ -36,13 +40,8 @@ class TestClient:
     @pytest.fixture
     def gen_error_reponse(self):
         def _make_response(err_code):
-            return {
-                "Response": {
-                    "Error": {
-                        "Code": err_code
-                    }
-                }
-            }
+            return {"Response": {"Error": {"Code": err_code}}}
+
         return _make_response
 
     def test_retry_error(self, simple_client, gen_error_reponse, monkeypatch):
@@ -68,6 +67,7 @@ class TestClient:
             if call_counter == 3:
                 raise TencentCloudSDKException()
             raise socket.error()
+
         monkeypatch.setattr(AbstractClient, "call_json", mock_call_json)
         with pytest.raises(TencentCloudSDKException):
             simple_client.execute_query("test", {})
@@ -115,13 +115,12 @@ class TestClient:
         jsonpath = "Response.InstanceSet[]"
         paging_def = {
             "method": PageMethod.Offset,
-            "limit": {
-                "key": "Limit",
-                "value": 3
-            }
+            "limit": {"key": "Limit", "value": 3},
         }
         params = {}
-        res = client_cvm.execute_paged_query("DescribeInstances", params, jsonpath, paging_def)
+        res = client_cvm.execute_paged_query(
+            "DescribeInstances", params, jsonpath, paging_def
+        )
         assert len(res) == 6
 
     @pytest.mark.vcr
@@ -130,15 +129,12 @@ class TestClient:
         paging_def = {
             "method": PageMethod.PaginationToken,
             "pagination_token_path": "Response.PaginationToken",
-            "limit": {
-                "key": "MaxResults",
-                "value": 50
-            }
+            "limit": {"key": "MaxResults", "value": 50},
         }
-        params = {
-            "TagKeys": ["tke-lb-serviceuuid"]
-        }
-        res = client_tag.execute_paged_query("GetTagValues", params, jsonpath, paging_def)
+        params = {"TagKeys": ["tke-lb-serviceuuid"]}
+        res = client_tag.execute_paged_query(
+            "GetTagValues", params, jsonpath, paging_def
+        )
         assert len(res) == 233
 
     @patch.dict(
@@ -147,7 +143,8 @@ class TestClient:
             "TENCENTCLOUD_TOKEN": "foo",
             "TENCENTCLOUD_SECRET_KEY": "bar",
             "TENCENTCLOUD_SECRET_ID": "baz",
-        }, clear=True
+        },
+        clear=True,
     )
     def test_tc_client_token(self):
         session = Session()
@@ -160,7 +157,8 @@ class TestClient:
         {
             "TENCENTCLOUD_TOKEN": "foo",
             "TENCENTCLOUD_SECRET_ID": "baz",
-        }, clear=True
+        },
+        clear=True,
     )
     def test_tc_client_token_missing_key(self):
         found = False

@@ -35,12 +35,16 @@ class AMI(QueryResourceManager):
 
     class resource_type(ResourceTypeInfo):
         """resource_type"""
+
         id = "ImageId"
         endpoint = "cvm.tencentcloudapi.com"
         service = "cvm"
         version = "2017-03-12"
         enum_spec = ("DescribeImages", "Response.ImageSet[]", {})
-        paging_def = {"method": PageMethod.Offset, "limit": {"key": "Limit", "value": 20}}
+        paging_def = {
+            "method": PageMethod.Offset,
+            "limit": {"key": "Limit", "value": 20},
+        }
         resource_prefix = "instance"
         taggable = True
 
@@ -50,14 +54,7 @@ class AMI(QueryResourceManager):
         only query image-type = PRIVATE_IMAGE
         """
         config_query = self.data.get("query", [])
-        params = {
-            "Filters": [
-                {
-                    "Name": "image-type",
-                    "Values": ["PRIVATE_IMAGE"]
-                }
-            ]
-        }
+        params = {"Filters": [{"Name": "image-type", "Values": ["PRIVATE_IMAGE"]}]}
         for it in config_query:
             params.update(it)
 
@@ -82,12 +79,18 @@ class ImageUnusedFilter(Filter):
                   - type: unused
                     value: true
     """
+
     schema = type_schema('unused', value={'type': 'boolean'})
 
     def get_permissions(self):
-        return list(itertools.chain(*[
-            self.manager.get_resource_manager(m).get_permissions()
-            for m in ('ami', 'cvm')]))
+        return list(
+            itertools.chain(
+                *[
+                    self.manager.get_resource_manager(m).get_permissions()
+                    for m in ('ami', 'cvm')
+                ]
+            )
+        )
 
     def _pull_cvm_images(self):
         cvm_manager = self.manager.get_resource_manager('cvm')

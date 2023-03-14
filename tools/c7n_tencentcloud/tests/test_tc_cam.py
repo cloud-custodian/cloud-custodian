@@ -5,7 +5,6 @@ from tc_common import BaseTest
 
 
 class TestCAM(BaseTest):
-
     @pytest.mark.vcr
     def test_mfa_missing(self):
         policy = self.load_policy(
@@ -14,19 +13,11 @@ class TestCAM(BaseTest):
                 "resource": "tencentcloud.cam-user",
                 "description": "all Users who have console access should have an MFA assigned",
                 "filters": [
-                    {
-                        "type": "credential",
-                        "key": "ConsoleLogin",
-                        "value": 1
-                    },
-                    {
-                        "type": "credential",
-                        "key": "login_mfa_active",
-                        "value": False
-                    }
-                ]
+                    {"type": "credential", "key": "ConsoleLogin", "value": 1},
+                    {"type": "credential", "key": "login_mfa_active", "value": False},
+                ],
             },
-            account_id=100002098531
+            account_id=100002098531,
         )
         resources = policy.run()
         assert len(resources) == 1
@@ -47,15 +38,15 @@ class TestCAM(BaseTest):
                                     {
                                         "type": "credential",
                                         "key": "access_keys.Status",
-                                        "value": "Active"
+                                        "value": "Active",
                                     },
                                     {
                                         "type": "credential",
                                         "key": "access_keys.LastUsedDate",
                                         "value_type": "age",
                                         "value": 1,
-                                        "op": "gt"
-                                    }
+                                        "op": "gt",
+                                    },
                                 ]
                             },
                             {
@@ -63,22 +54,22 @@ class TestCAM(BaseTest):
                                     {
                                         "type": "credential",
                                         "key": "ConsoleLogin",
-                                        "value": 1
+                                        "value": 1,
                                     },
                                     {
                                         "type": "credential",
                                         "key": "LastLoginTime",
                                         "value_type": "age",
                                         "value": 1,
-                                        "op": "gt"
-                                    }
+                                        "op": "gt",
+                                    },
                                 ]
-                            }
+                            },
                         ]
                     }
-                ]
+                ],
             },
-            account_id=100002098531
+            account_id=100002098531,
         )
         resources = policy.run()
         assert len(resources) == 2
@@ -94,16 +85,12 @@ class TestCAM(BaseTest):
                     {
                         "type": "credential",
                         "key": "access_keys.Status",
-                        "value": "Active"
+                        "value": "Active",
                     },
-                    {
-                        "type": "value",
-                        "key": 'length("c7n:matched-keys")',
-                        "value": 2
-                    }
-                ]
+                    {"type": "value", "key": 'length("c7n:matched-keys")', "value": 2},
+                ],
             },
-            account_id=100002098531
+            account_id=100002098531,
         )
         resources = policy.run()
         assert len(resources) == 1
@@ -122,16 +109,16 @@ class TestCAM(BaseTest):
                         "key": "access_keys.CreateTime",
                         "value_type": "age",
                         "value": 3,
-                        "op": "greater-than"
+                        "op": "greater-than",
                     },
                     {
                         "type": "credential",
                         "key": "access_keys.Status",
-                        "value": "Active"
-                    }
-                ]
+                        "value": "Active",
+                    },
+                ],
             },
-            account_id=100002098531
+            account_id=100002098531,
         )
         resources = policy.run()
         assert len(resources) == 1
@@ -144,15 +131,9 @@ class TestCAM(BaseTest):
                 "name": "tencentcloud-cam-user-missing-group-permissions-pull",
                 "resource": "tencentcloud.cam-user",
                 "description": "identify CAM Users who are not a member of any CAM group",
-                "filters": [
-                    {
-                        "type": "group",
-                        "key": "GroupName",
-                        "value": None
-                    }
-                ]
+                "filters": [{"type": "group", "key": "GroupName", "value": None}],
             },
-            account_id=100002098531
+            account_id=100002098531,
         )
         resources = policy.run()
         assert len(resources) == 1
@@ -165,15 +146,9 @@ class TestCAM(BaseTest):
                 "name": "tencentcloud-cam-user-missing-group-permissions-pull",
                 "resource": "tencentcloud.cam-user",
                 "description": "identify CAM Users who are not a member of any CAM group",
-                "filters": [
-                    {
-                        "type": "group",
-                        "key": "GroupName",
-                        "value": "demo"
-                    }
-                ]
+                "filters": [{"type": "group", "key": "GroupName", "value": "demo"}],
             },
-            account_id=100002098531
+            account_id=100002098531,
         )
         resources = policy.run()
         assert len(resources) == 1
@@ -190,23 +165,19 @@ class TestCAM(BaseTest):
                     {
                         "type": "credential",
                         "key": "access_keys.Status",
-                        "value": "Active"
+                        "value": "Active",
                     },
-                    {
-                        "type": "credential",
-                        "key": "ConsoleLogin",
-                        "value": 1
-                    },
+                    {"type": "credential", "key": "ConsoleLogin", "value": 1},
                     {
                         "type": "value",
                         "key": "CreateTime",
                         "value_type": "age",
                         "value": 7000,
-                        "op": "less-than"
-                    }
-                ]
+                        "op": "less-than",
+                    },
+                ],
             },
-            account_id=100002098531
+            account_id=100002098531,
         )
         resources = policy.run()
         assert len(resources) == 1
@@ -223,21 +194,17 @@ class TestCAM(BaseTest):
                     {
                         "type": "credential",
                         "key": "access_keys.Status",
-                        "value": "Active"
+                        "value": "Active",
                     },
-                    {
-                        "type": "credential",
-                        "key": "ConsoleLogin",
-                        "value": 1
-                    },
+                    {"type": "credential", "key": "ConsoleLogin", "value": 1},
                     {
                         "type": "credential",
                         "key": "access_keys.LastUsedDate",
-                        "value": "absent"
-                    }
-                ]
+                        "value": "absent",
+                    },
+                ],
             },
-            account_id=100002098531
+            account_id=100002098531,
         )
         resources = policy.run()
         assert len(resources) == 1
@@ -254,16 +221,16 @@ class TestCAM(BaseTest):
                     {
                         "type": "credential",
                         "key": "access_keys.Status",
-                        "value": "Active"
+                        "value": "Active",
                     },
                     {
                         "type": "credential",
                         "key": "access_keys.LastUsedDate",
-                        "value": "absent"
-                    }
-                ]
+                        "value": "absent",
+                    },
+                ],
             },
-            account_id=100002098531
+            account_id=100002098531,
         )
         resources = policy.run()
         assert len(resources) == 2
@@ -279,21 +246,19 @@ class TestCAM(BaseTest):
                     {
                         "type": "credential",
                         "key": "access_keys.Status",
-                        "value": "Active"
+                        "value": "Active",
                     },
                     {
                         "type": "credential",
                         "key": "access_keys.LastUsedDate",
                         "value_type": "age",
                         "op": "gte",
-                        "value": 1
+                        "value": 1,
                     },
-                    {
-                        "tag:access-key-unused": "present"
-                    }
-                ]
+                    {"tag:access-key-unused": "present"},
+                ],
             },
-            account_id=100002098531
+            account_id=100002098531,
         )
         resources = policy.run()
         assert len(resources) == 1
@@ -309,21 +274,17 @@ class TestCAM(BaseTest):
                 "filters": [
                     {
                         "or": [
-                            {
-                                "type": "has-allow-all"
-                            },
+                            {"type": "has-allow-all"},
                             {
                                 "type": "check-permissions",
                                 "match": "allowed",
-                                "actions": [
-                                    "*:*"
-                                ]
-                            }
+                                "actions": ["*:*"],
+                            },
                         ]
                     }
-                ]
+                ],
             },
-            account_id=100002098531
+            account_id=100002098531,
         )
         resources = policy.run()
         assert len(resources) == 2
@@ -342,11 +303,11 @@ class TestCAM(BaseTest):
                         "type": "check-permissions",
                         "match": "allowed",
                         "actions": ["cos:GetBucket"],
-                        "match-operator": "or"
+                        "match-operator": "or",
                     }
-                ]
+                ],
             },
-            account_id=100002098531
+            account_id=100002098531,
         )
         resources = policy.run()
         assert len(resources) == 1
@@ -359,13 +320,9 @@ class TestCAM(BaseTest):
                 "name": "tencentcloud-cam-policy-used",
                 "resource": "tencentcloud.cam-policy",
                 "description": "Checks IAM Policies if used",
-                "filters": [
-                    {
-                        "type": "used"
-                    }
-                ]
+                "filters": [{"type": "used"}],
             },
-            account_id=100002098531
+            account_id=100002098531,
         )
         resources = policy.run()
         assert len(resources) == 1

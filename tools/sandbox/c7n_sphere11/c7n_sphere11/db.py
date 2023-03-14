@@ -8,23 +8,22 @@ log = logging.getLogger('sphere11.db')
 
 
 class LockDb:
-
     STATE_LOCKED = "locked"
     STATE_UNLOCKED = "unlocked"
     STATE_PENDING = "pending"
 
     def __init__(self, session, table_name, endpoint=None):
         self.client = session.client('dynamodb', endpoint_url=endpoint)
-        self.table = session.resource(
-            'dynamodb', endpoint_url=endpoint).Table(table_name)
+        self.table = session.resource('dynamodb', endpoint_url=endpoint).Table(
+            table_name
+        )
         self.table_name = table_name
 
     def record(self, account_id, resource_id):
         result = self.table.get_item(
-            Key={
-                'AccountId': account_id,
-                "ResourceId": resource_id},
-            ConsistentRead=True)
+            Key={'AccountId': account_id, "ResourceId": resource_id},
+            ConsistentRead=True,
+        )
         result.pop('ResponseMetadata')
         if result:
             return result['Item']
@@ -41,7 +40,8 @@ class LockDb:
         expr = conditions.Key('AccountId').eq(account_id)
         expr & conditions.Key("LockStatus").eq("pending")
         results = self.table.query(
-            IndexName='PendingLocks', KeyConditionExpression=expr)
+            IndexName='PendingLocks', KeyConditionExpression=expr
+        )
         return results.get('Items', ())
 
     def iter_resources(self, account_id, resource_type=None):
@@ -61,14 +61,15 @@ class LockDb:
         """
         resource = self.record(account_id, resource_id)
         if resource is None and not parent_id:
-            return {'ResourceId': resource_id,
-                    'LockStatus': self.STATE_UNLOCKED}
+            return {'ResourceId': resource_id, 'LockStatus': self.STATE_UNLOCKED}
         elif resource is None:
             parent = self.record(account_id, parent_id)
             if parent is None:
-                return {'ResourceId': resource_id,
-                        'ParentId': parent_id,
-                        'LockStatus': self.STATE_UNLOCKED}
+                return {
+                    'ResourceId': resource_id,
+                    'ParentId': parent_id,
+                    'LockStatus': self.STATE_UNLOCKED,
+                }
             parent['ResourceId'] = resource_id
             parent['ParentId'] = parent_id
             parent['LockType'] = 'parent'
@@ -89,53 +90,31 @@ class LockDb:
         self.client.create_table(
             TableName=self.table_name,
             KeySchema=[
-                {
-                    "AttributeName": "AccountId",
-                    "KeyType": "HASH"
-                },
-                {
-                    "AttributeName": "ResourceId",
-                    "KeyType": "RANGE"
-                }
+                {"AttributeName": "AccountId", "KeyType": "HASH"},
+                {"AttributeName": "ResourceId", "KeyType": "RANGE"},
             ],
             AttributeDefinitions=[
+                {"AttributeName": "ResourceId", "AttributeType": "S"},
+                {"AttributeName": "AccountId", "AttributeType": "S"},
+                {"AttributeName": "LockStatus", "AttributeType": "S"},
+            ],
+            LocalSecondaryIndexes=[
                 {
-                    "AttributeName": "ResourceId",
-                    "AttributeType": "S"
-                },
-                {
-                    "AttributeName": "AccountId",
-                    "AttributeType": "S"
-                },
-                {
-                    "AttributeName": "LockStatus",
-                    "AttributeType": "S"
+                    'IndexName': 'PendingLocks',
+                    'Projection': {
+                        'ProjectionType': 'INCLUDE',
+                        'NonKeyAttributes': ['LockDate'],
+                    },
+                    'KeySchema': [
+                        {'AttributeName': 'AccountId', 'KeyType': 'HASH'},
+                        {'AttributeName': 'LockStatus', 'KeyType': 'RANGE'},
+                    ],
                 }
             ],
-            LocalSecondaryIndexes=[{
-                'IndexName': 'PendingLocks',
-                'Projection': {
-                    'ProjectionType': 'INCLUDE',
-                    'NonKeyAttributes': ['LockDate'],
-                },
-                'KeySchema': [
-                    {
-                        'AttributeName': 'AccountId',
-                        'KeyType': 'HASH'
-                    },
-                    {
-                        'AttributeName': 'LockStatus',
-                        'KeyType': 'RANGE'
-                    }
-                ],
-            }],
             ProvisionedThroughput={
                 "ReadCapacityUnits": read_capacity,
-                "WriteCapacityUnits": write_capacity
+                "WriteCapacityUnits": write_capacity,
             },
-            StreamSpecification={
-                'StreamEnabled': True,
-                'StreamViewType': 'NEW_IMAGE'
-            }
+            StreamSpecification={'StreamEnabled': True, 'StreamViewType': 'NEW_IMAGE'},
         )
         return True

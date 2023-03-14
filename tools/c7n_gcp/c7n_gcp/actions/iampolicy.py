@@ -6,79 +6,93 @@ from c7n_gcp.actions import MethodAction
 
 
 class SetIamPolicy(MethodAction):
-    """ Sets IAM policy. It works with bindings only.
+    """Sets IAM policy. It works with bindings only.
 
-        The action supports two lists for modifying the existing IAM policy: `add-bindings` and
-        `remove-bindings`. The `add-bindings` records are merged with the existing bindings, hereby
-        no changes are made if all the required bindings are already present in the applicable
-        resource. The `remove-bindings` records are used to filter out the existing bindings,
-        so the action will take no effect if there are no matches. For more information,
-        please refer to the `_add_bindings` and `_remove_bindings` methods respectively.
+    The action supports two lists for modifying the existing IAM policy: `add-bindings` and
+    `remove-bindings`. The `add-bindings` records are merged with the existing bindings, hereby
+    no changes are made if all the required bindings are already present in the applicable
+    resource. The `remove-bindings` records are used to filter out the existing bindings,
+    so the action will take no effect if there are no matches. For more information,
+    please refer to the `_add_bindings` and `_remove_bindings` methods respectively.
 
-        Considering a record added both to the `add-bindings` and `remove-bindings` lists, which
-        though is not a recommended thing to do in general, the latter is designed to be a more
-        restrictive one, so the record will be removed from the existing IAM bindings in the end.
+    Considering a record added both to the `add-bindings` and `remove-bindings` lists, which
+    though is not a recommended thing to do in general, the latter is designed to be a more
+    restrictive one, so the record will be removed from the existing IAM bindings in the end.
 
-        There following member types are available to work with:
-        - allUsers,
-        - allAuthenticatedUsers,
-        - user,
-        - group,
-        - domain,
-        - serviceAccount.
+    There following member types are available to work with:
+    - allUsers,
+    - allAuthenticatedUsers,
+    - user,
+    - group,
+    - domain,
+    - serviceAccount.
 
-        Note the `resource` field in the example that could be changed to another resource that has
-        both `setIamPolicy` and `getIamPolicy` methods (such as gcp.spanner-database-instance).
+    Note the `resource` field in the example that could be changed to another resource that has
+    both `setIamPolicy` and `getIamPolicy` methods (such as gcp.spanner-database-instance).
 
-        Example:
+    Example:
 
-        .. code-block:: yaml
+    .. code-block:: yaml
 
-            policies:
-              - name: gcp-spanner-instance-set-iam-policy
-                resource: gcp.spanner-instance
-                actions:
-                  - type: set-iam-policy
-                    add-bindings:
-                      - members:
-                          - user:user1@test.com
-                          - user:user2@test.com
-                        role: roles/owner
-                      - members:
-                          - user:user3@gmail.com
-                        role: roles/viewer
-                    remove-bindings:
-                      - members:
-                          - user:user4@test.com
-                        role: roles/owner
-                      - members:
-                          - user:user5@gmail.com
-                          - user:user6@gmail.com
-                        role: roles/viewer
-        """
-    schema = type_schema('set-iam-policy',
-                         **{
-                             'minProperties': 1,
-                             'additionalProperties': False,
-                             'add-bindings': {
-                                 'type': 'array',
-                                 'minItems': 1,
-                                 'items': {'role': {'type': 'string'},
-                                           'members': {'type': 'array',
-                                                       'items': {
-                                                           'type': 'string'},
-                                                       'minItems': 1}}
-                             },
-                             'remove-bindings': {
-                                 'type': 'array',
-                                 'minItems': 1,
-                                 'items': {'role': {'type': 'string'},
-                                           'members': {'oneOf': [
-                                               {'type': 'array',
-                                                'items': {'type': 'string'},
-                                                'minItems': 1},
-                                               {'enum': ['*']}]}}},
-                         })
+        policies:
+          - name: gcp-spanner-instance-set-iam-policy
+            resource: gcp.spanner-instance
+            actions:
+              - type: set-iam-policy
+                add-bindings:
+                  - members:
+                      - user:user1@test.com
+                      - user:user2@test.com
+                    role: roles/owner
+                  - members:
+                      - user:user3@gmail.com
+                    role: roles/viewer
+                remove-bindings:
+                  - members:
+                      - user:user4@test.com
+                    role: roles/owner
+                  - members:
+                      - user:user5@gmail.com
+                      - user:user6@gmail.com
+                    role: roles/viewer
+    """
+
+    schema = type_schema(
+        'set-iam-policy',
+        **{
+            'minProperties': 1,
+            'additionalProperties': False,
+            'add-bindings': {
+                'type': 'array',
+                'minItems': 1,
+                'items': {
+                    'role': {'type': 'string'},
+                    'members': {
+                        'type': 'array',
+                        'items': {'type': 'string'},
+                        'minItems': 1,
+                    },
+                },
+            },
+            'remove-bindings': {
+                'type': 'array',
+                'minItems': 1,
+                'items': {
+                    'role': {'type': 'string'},
+                    'members': {
+                        'oneOf': [
+                            {
+                                'type': 'array',
+                                'items': {'type': 'string'},
+                                'minItems': 1,
+                            },
+                            {'enum': ['*']},
+                        ]
+                    },
+                },
+            },
+        }
+    )
     method_spec = {'op': 'setIamPolicy'}
     schema_alias = True
 
@@ -96,11 +110,14 @@ class SetIamPolicy(MethodAction):
         params = self._verb_arguments(resource)
         existing_bindings = self._get_existing_bindings(model, resource)
         add_bindings = self.data['add-bindings'] if 'add-bindings' in self.data else []
-        remove_bindings = self.data['remove-bindings'] if 'remove-bindings' in self.data else []
+        remove_bindings = (
+            self.data['remove-bindings'] if 'remove-bindings' in self.data else []
+        )
         bindings_to_set = self._add_bindings(existing_bindings, add_bindings)
         bindings_to_set = self._remove_bindings(bindings_to_set, remove_bindings)
         params['body'] = {
-            'policy': {'bindings': bindings_to_set} if len(bindings_to_set) > 0 else {}}
+            'policy': {'bindings': bindings_to_set} if len(bindings_to_set) > 0 else {}
+        }
         return params
 
     def _get_existing_bindings(self, model, resource):
@@ -111,11 +128,17 @@ class SetIamPolicy(MethodAction):
         :param model: the same as in `get_resource_params` (needed to take `component` from)
         :param resource: the same as in `get_resource_params` (passed into `_verb_arguments`)
         """
-        existing_bindings = local_session(self.manager.session_factory).client(
-            self.manager.resource_type.service,
-            self.manager.resource_type.version,
-            model.component).execute_query(
-            'getIamPolicy', verb_arguments=self._verb_arguments(resource))
+        existing_bindings = (
+            local_session(self.manager.session_factory)
+            .client(
+                self.manager.resource_type.service,
+                self.manager.resource_type.version,
+                model.component,
+            )
+            .execute_query(
+                'getIamPolicy', verb_arguments=self._verb_arguments(resource)
+            )
+        )
         return existing_bindings['bindings'] if 'bindings' in existing_bindings else []
 
     def _verb_arguments(self, resource):
@@ -155,8 +178,12 @@ class SetIamPolicy(MethodAction):
             updated_members = dict(roles_to_bindings_to_add[role])
             if role in roles_to_existing_bindings:
                 existing_members = roles_to_existing_bindings[role]['members']
-                members_to_add = list(filter(lambda member: member not in existing_members,
-                                             updated_members['members']))
+                members_to_add = list(
+                    filter(
+                        lambda member: member not in existing_members,
+                        updated_members['members'],
+                    )
+                )
                 updated_members['members'] = existing_members + members_to_add
             bindings.append(updated_members)
 
@@ -191,15 +218,22 @@ class SetIamPolicy(MethodAction):
         """
         bindings = []
         roles_to_existing_bindings = self._get_roles_to_bindings_dict(existing_bindings)
-        roles_to_bindings_to_remove = self._get_roles_to_bindings_dict(bindings_to_remove)
+        roles_to_bindings_to_remove = self._get_roles_to_bindings_dict(
+            bindings_to_remove
+        )
         for role in roles_to_bindings_to_remove:
-            if (role in roles_to_existing_bindings and
-                    roles_to_bindings_to_remove[role]['members'] != '*'):
+            if (
+                role in roles_to_existing_bindings
+                and roles_to_bindings_to_remove[role]['members'] != '*'
+            ):
                 updated_members = dict(roles_to_existing_bindings[role])
                 members_to_remove = roles_to_bindings_to_remove[role]
-                updated_members['members'] = list(filter(
-                    lambda member: member not in members_to_remove['members'],
-                    updated_members['members']))
+                updated_members['members'] = list(
+                    filter(
+                        lambda member: member not in members_to_remove['members'],
+                        updated_members['members'],
+                    )
+                )
                 if len(updated_members['members']) > 0:
                     bindings.append(updated_members)
 

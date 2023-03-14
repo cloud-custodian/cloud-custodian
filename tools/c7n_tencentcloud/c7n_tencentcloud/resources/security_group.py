@@ -31,20 +31,26 @@ class SecurityGroup(QueryResourceManager):
 
     class resource_type(ResourceTypeInfo):
         """resource_type"""
+
         id = "SecurityGroupId"
         endpoint = "vpc.tencentcloudapi.com"
         service = "vpc"
         version = "2017-03-12"
         enum_spec = ("DescribeSecurityGroups", "Response.SecurityGroupSet[]", {})
-        paging_def = {"method": PageMethod.Offset, "limit": {"key": "Limit", "value": "20"}}
+        paging_def = {
+            "method": PageMethod.Offset,
+            "limit": {"key": "Limit", "value": "20"},
+        }
         resource_prefix = "sg"
         taggable = True
 
     def augment(self, resources_param):
         cli = self.get_client()
         for resource in resources_param:
-            resp = cli.execute_query("DescribeSecurityGroupPolicies",
-                                     {"SecurityGroupId": resource["SecurityGroupId"]})
+            resp = cli.execute_query(
+                "DescribeSecurityGroupPolicies",
+                {"SecurityGroupId": resource["SecurityGroupId"]},
+            )
             policy_set = resp["Response"]["SecurityGroupPolicySet"]
             resource["IpPermissions"] = policy_set["Ingress"]
             resource["IpPermissionsEgress"] = policy_set["Egress"]
@@ -57,8 +63,9 @@ class SGPermission(Filter):
 
     def process(self, resources, event=None):
         self.ports = 'Ports' in self.data and self.data['Ports'] or ()
-        self.any_ports_except = \
-            ('AnyPortsExcept' in self.data and self.data['AnyPortsExcept'] or ())
+        self.any_ports_except = (
+            'AnyPortsExcept' in self.data and self.data['AnyPortsExcept'] or ()
+        )
         return super(SGPermission, self).process(resources, event)
 
     # Supported Tencentcloud security-group policy port schema:
@@ -133,8 +140,9 @@ class SGPermission(Filter):
             perm_matches['cidrs'] = self.process_cidrs(perm)
             """None means that the term does not exist in the filter condition,
             and the none result is ignored"""
-            perm_match_values = list(filter(
-                lambda x: x is not None, perm_matches.values()))
+            perm_match_values = list(
+                filter(lambda x: x is not None, perm_matches.values())
+            )
 
             """ if process_xxx() method returns None, it means there is no related rule config in
             security group. In Python all([]) returns True, which should be fixed in this case:
@@ -149,7 +157,9 @@ class SGPermission(Filter):
                 matched.append(perm)
 
         if matched:
-            resource.setdefault('Matched%s' % self.ip_permissions_key, []).extend(matched)
+            resource.setdefault('Matched%s' % self.ip_permissions_key, []).extend(
+                matched
+            )
             return True
 
 
@@ -172,6 +182,7 @@ class IPPermission(SGPermission):
                   CidrV6:
                     value: '::/0'
     """
+
     ip_permissions_key = "IpPermissions"
     schema = {
         'type': 'object',
@@ -181,9 +192,10 @@ class IPPermission(SGPermission):
             'Ports': {'type': 'array', 'items': {'type': 'integer'}},
             'AnyPortsExcept': {'type': 'array', 'items': {'type': 'integer'}},
             'Cidr': {},
-            'CidrV6': {}
+            'CidrV6': {},
         },
-        'required': ['type']}
+        'required': ['type'],
+    }
 
 
 @SecurityGroup.filter_registry.register('egress')
@@ -197,6 +209,7 @@ class IPPermissionEgress(SGPermission):
             'Ports': {'type': 'array', 'items': {'type': 'integer'}},
             'AnyPortsExcept': {'type': 'array', 'items': {'type': 'integer'}},
             'Cidr': {},
-            'CidrV6': {}
+            'CidrV6': {},
         },
-        'required': ['type']}
+        'required': ['type'],
+    }

@@ -5,7 +5,6 @@ from tc_common import BaseTest
 
 
 class TestClb(BaseTest):
-
     @pytest.mark.vcr
     def test_clb_filter_value(self):
         policy = self.load_policy(
@@ -13,18 +12,16 @@ class TestClb(BaseTest):
                 "name": "test_clb",
                 "resource": "tencentcloud.clb",
                 "description": "filter load balancers has not been requested for the long time",
-                "query": [{
-                    "LoadBalancerIds": ["lb-n6g4mc26"]
-                }],
+                "query": [{"LoadBalancerIds": ["lb-n6g4mc26"]}],
                 "filters": [
                     {
                         "type": "value",
                         "key": "CreateTime",
                         "value_type": "age",
                         "value": 30,
-                        "op": "gte"
+                        "op": "gte",
                     }
-                ]
+                ],
             }
         )
         resources = policy.run()
@@ -36,12 +33,8 @@ class TestClb(BaseTest):
             {
                 "name": "test_clb",
                 "resource": "tencentcloud.clb",
-                "query": [{
-                    "LoadBalancerIds": ["lb-aqsfvh8m"]
-                }],
-                "filters": [
-                    {"Instances": []}
-                ]
+                "query": [{"LoadBalancerIds": ["lb-aqsfvh8m"]}],
+                "filters": [{"Instances": []}],
             }
         )
         resources = policy.run()
@@ -59,7 +52,7 @@ class TestClb(BaseTest):
                         "key": "CreateTime",
                         "value_type": "age",
                         "value": 20,
-                        "op": "gte"
+                        "op": "gte",
                     },
                     {
                         "type": "metrics",
@@ -69,9 +62,9 @@ class TestClb(BaseTest):
                         "days": 30,
                         "value": 0,
                         "missing-value": 0,
-                        "op": "eq"
-                    }
-                ]
+                        "op": "eq",
+                    },
+                ],
             }
         )
         resources = policy.run()

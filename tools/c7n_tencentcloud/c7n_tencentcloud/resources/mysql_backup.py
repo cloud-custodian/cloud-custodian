@@ -30,12 +30,16 @@ class MySQLBackUp(QueryResourceManager):
 
     class resource_type(ResourceTypeInfo):
         """resource_type"""
+
         id = "InstanceId"
         endpoint = "cdb.tencentcloudapi.com"
         service = "cdb"
         version = "2017-03-20"
         enum_spec = ("DescribeDBInstances", "Response.Items[]", {})
-        paging_def = {"method": PageMethod.Offset, "limit": {"key": "Limit", "value": 20}}
+        paging_def = {
+            "method": PageMethod.Offset,
+            "limit": {"key": "Limit", "value": 20},
+        }
         resource_prefix = "instanceId"
         taggable = True
         datetime_fields_format = {
@@ -46,16 +50,17 @@ class MySQLBackUp(QueryResourceManager):
         backup_resources = []
         cli = self.get_client()
         for resource in resources:
-            resp = cli.execute_query("DescribeBackups",
-                                     {"InstanceId": resource["InstanceId"]})
+            resp = cli.execute_query(
+                "DescribeBackups", {"InstanceId": resource["InstanceId"]}
+            )
             items = resp["Response"]["Items"]
             field_format = self.resource_type.datetime_fields_format["Date"]
             for item in items:
                 # backups in non SUCCESS status don't have a proper date yet
                 if item["Status"] != "SUCCESS":
                     continue
-                item["Date"] = isoformat_datetime_str(item["Date"],
-                                                      field_format[0],
-                                                      field_format[1])
+                item["Date"] = isoformat_datetime_str(
+                    item["Date"], field_format[0], field_format[1]
+                )
             backup_resources += items
         return backup_resources

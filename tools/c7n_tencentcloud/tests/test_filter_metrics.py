@@ -17,19 +17,19 @@ class TestFilterMetrics(BaseTest):
             {
                 "name": "filter-metrics-average",
                 "resource": "tencentcloud.cvm",
-                "query": [{
-                    "InstanceIds": self.instance_ids
-                }],
-                "filters": [{
-                    "type": "metrics",
-                    "name": "CPUUsage",
-                    "statistics": "Average",
-                    "days": 3,
-                    "op": "less-than",
-                    "value": 1.5,
-                    "missing-value": 0,
-                    "period": 3600
-                }]
+                "query": [{"InstanceIds": self.instance_ids}],
+                "filters": [
+                    {
+                        "type": "metrics",
+                        "name": "CPUUsage",
+                        "statistics": "Average",
+                        "days": 3,
+                        "op": "less-than",
+                        "value": 1.5,
+                        "missing-value": 0,
+                        "period": 3600,
+                    }
+                ],
             }
         )
         resources = policy.run()
@@ -41,19 +41,19 @@ class TestFilterMetrics(BaseTest):
             {
                 "name": "filter-metrics-max",
                 "resource": "tencentcloud.cvm",
-                "query": [{
-                    "InstanceIds": self.instance_ids
-                }],
-                "filters": [{
-                    "type": "metrics",
-                    "name": "CvmDiskUsage",
-                    "statistics": "Maximum",
-                    "days": 1,
-                    "op": "less-than",
-                    "value": 20,
-                    "missing-value": 0,
-                    "period": 300
-                }]
+                "query": [{"InstanceIds": self.instance_ids}],
+                "filters": [
+                    {
+                        "type": "metrics",
+                        "name": "CvmDiskUsage",
+                        "statistics": "Maximum",
+                        "days": 1,
+                        "op": "less-than",
+                        "value": 20,
+                        "missing-value": 0,
+                        "period": 300,
+                    }
+                ],
             }
         )
         resources = policy.run()
@@ -83,19 +83,19 @@ class TestFilterMetrics(BaseTest):
                 {
                     "name": "filter-metrics-too-many-data-points",
                     "resource": "tencentcloud.cvm",
-                    "query": [{
-                        "InstanceIds": self.instance_ids
-                    }],
-                    "filters": [{
-                        "type": "metrics",
-                        "name": "CvmDiskUsage",
-                        "statistics": "Maximum",
-                        "days": 100,
-                        "op": "less-than",
-                        "value": 20,
-                        "missing-value": 0,
-                        "period": 300
-                    }]
+                    "query": [{"InstanceIds": self.instance_ids}],
+                    "filters": [
+                        {
+                            "type": "metrics",
+                            "name": "CvmDiskUsage",
+                            "statistics": "Maximum",
+                            "days": 100,
+                            "op": "less-than",
+                            "value": 20,
+                            "missing-value": 0,
+                            "period": 300,
+                        }
+                    ],
                 }
             )
             policy.run()

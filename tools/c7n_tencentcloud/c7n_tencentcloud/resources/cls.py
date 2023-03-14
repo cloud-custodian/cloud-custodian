@@ -2,7 +2,11 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from c7n_tencentcloud.provider import resources
-from c7n_tencentcloud.query import ResourceTypeInfo, QueryResourceManager, DescribeSource
+from c7n_tencentcloud.query import (
+    ResourceTypeInfo,
+    QueryResourceManager,
+    DescribeSource,
+)
 from c7n_tencentcloud.utils import PageMethod
 
 
@@ -38,12 +42,16 @@ class LogTopic(QueryResourceManager):
 
     class resource_type(ResourceTypeInfo):
         """resource_type"""
+
         id = "TopicId"
         endpoint = "cls.tencentcloudapi.com"
         service = "cls"
         version = "2020-10-16"
         enum_spec = ("DescribeTopics", "Response.Topics[]", {})
-        paging_def = {"method": PageMethod.Offset, "limit": {"key": "Limit", "value": 20}}
+        paging_def = {
+            "method": PageMethod.Offset,
+            "limit": {"key": "Limit", "value": 20},
+        }
         resource_prefix = "topic"
         taggable = True
         metrics_enabled = True

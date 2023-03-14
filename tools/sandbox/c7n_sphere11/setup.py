@@ -9,7 +9,7 @@ setup(
     description="Cloud Custodian - Sphere11 - Resource Locking",
     classifiers=[
         "Topic :: System :: Systems Administration",
-        "Topic :: System :: Distributed Computing"
+        "Topic :: System :: Distributed Computing",
     ],
     url="https://github.com/cloud-custodian/cloud-custodian",
     license="Apache-2.0",
@@ -17,6 +17,8 @@ setup(
     entry_points={
         'console_scripts': [
             'sphere-admin = c7n_sphere11.admin:admin',
-            'c7n-sphere11 = c7n_sphere11.cli:cli']},
+            'c7n-sphere11 = c7n_sphere11.cli:cli',
+        ]
+    },
     install_requires=["click", "tabulate"],
 )

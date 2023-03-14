@@ -5,7 +5,6 @@ from tc_common import BaseTest
 
 
 class TestElasticsearch(BaseTest):
-
     @pytest.mark.vcr
     def test_elasticsearch_key(self):
         policy = self.load_policy(
@@ -17,9 +16,9 @@ class TestElasticsearch(BaseTest):
                         "type": "value",
                         "key": "NodeInfoList[0].NodeType",
                         "op": "in",
-                        "value": ['ES.S1.MEDIUM4']
+                        "value": ['ES.S1.MEDIUM4'],
                     }
-                ]
+                ],
             }
         )
         resources = policy.run()
@@ -33,16 +32,18 @@ class TestElasticsearch(BaseTest):
             {
                 "name": "filter-metrics",
                 "resource": "tencentcloud.elasticsearch",
-                "filters": [{
-                    "type": "metrics",
-                    "name": "Status",
-                    "statistics": "Average",
-                    "days": 3,
-                    "op": "less-than",
-                    "value": 1.5,
-                    "missing-value": 0,
-                    "period": 3600
-                }]
+                "filters": [
+                    {
+                        "type": "metrics",
+                        "name": "Status",
+                        "statistics": "Average",
+                        "days": 3,
+                        "op": "less-than",
+                        "value": 1.5,
+                        "missing-value": 0,
+                        "period": 3600,
+                    }
+                ],
             }
         )
         resources = policy.run()

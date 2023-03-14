@@ -31,17 +31,15 @@ ENV_TAG = os.environ.get('ENV_TAG', 'env')
 CONTACT_TAG = os.environ.get('CONTACT_TAG', 'contact')
 
 
-def download_config(
-        client, bucket, prefix, account_id, region, day, store, rtypes=()):
+def download_config(client, bucket, prefix, account_id, region, day, store, rtypes=()):
     config_prefix = "%sAWSLogs/%s/Config/%s/%s/ConfigHistory/" % (
         prefix,
         account_id,
         region,
-        day.strftime('%Y/%-m/%-d'))
+        day.strftime('%Y/%-m/%-d'),
+    )
 
-    results = client.list_objects_v2(
-        Bucket=bucket,
-        Prefix=config_prefix)
+    results = client.list_objects_v2(Bucket=bucket, Prefix=config_prefix)
 
     if not os.path.exists(store):
         os.makedirs(store)
@@ -73,14 +71,14 @@ def download_config(
         downloads['DownloadSize'],
         downloads['Cached'],
         downloads['CacheSize'],
-        config_prefix)
+        config_prefix,
+    )
     return files, downloads
 
 
 def process_account_resources(
-        account_id, bucket, prefix, region,
-        store, start, end, resource='NetworkInterface'):
-
+    account_id, bucket, prefix, region, store, start, end, resource='NetworkInterface'
+):
     client = boto3.client('s3')
     files = []
     t = time.time()
@@ -90,8 +88,8 @@ def process_account_resources(
     for i in range(period):
         day = start + timedelta(i)
         d_files, stats = download_config(
-            client, bucket, prefix, account_id, region, day, store,
-            rtypes=(resource,))
+            client, bucket, prefix, account_id, region, day, store, rtypes=(resource,)
+        )
         files.extend(d_files)
         period_stats.update(stats)
     period_stats['FetchTime'] = int(time.time() - t)
@@ -228,23 +226,28 @@ def index_ebs_files(db, record_stream):
                 if not cfg['configuration'].get('attachments'):
                     skipped += 1
                     continue
-                rows.append((
-                    cfg['resourceId'],
-                    cfg['configuration']['attachments'][0]['instanceId'],
-                    cfg['awsAccountId'],
-                    cfg['awsRegion'],
-                    cfg['tags'].get(APP_TAG),
-                    cfg['tags'].get(ENV_TAG),
-                    cfg['tags'].get(CONTACT_TAG),
-                    cfg['resourceCreationTime'],
-                    None))
+                rows.append(
+                    (
+                        cfg['resourceId'],
+                        cfg['configuration']['attachments'][0]['instanceId'],
+                        cfg['awsAccountId'],
+                        cfg['awsRegion'],
+                        cfg['tags'].get(APP_TAG),
+                        cfg['tags'].get(ENV_TAG),
+                        cfg['tags'].get(CONTACT_TAG),
+                        cfg['resourceCreationTime'],
+                        None,
+                    )
+                )
         if rows:
             for idx, r in enumerate(rows):
                 if r[0] in deletes:
                     rows[idx] = list(r)
                     rows[idx][-1] = deletes[r[0]]
             cursor.executemany(
-                '''insert or replace into ebs values (?, ?, ?, ?, ?, ?, ?, ?, ?)''', rows)
+                '''insert or replace into ebs values (?, ?, ?, ?, ?, ?, ?, ?, ?)''',
+                rows,
+            )
             stats['RowCount'] += len(rows)
 
         log.debug("ebs stored:%d", len(rows))
@@ -282,28 +285,33 @@ def index_ec2_files(db, record_stream):
                 stats['Records'] += 1
                 stats['Record%s' % cfg['configurationItemStatus']] += 1
                 if cfg['configurationItemStatus'] in ('ResourceDeleted',):
-                    deletes.append(((
-                        cfg['configurationItemCaptureTime'], cfg['resourceId'])))
+                    deletes.append(
+                        ((cfg['configurationItemCaptureTime'], cfg['resourceId']))
+                    )
                     continue
                 if not cfg.get('tags'):
                     continue
-                rows.append((
-                    cfg['resourceId'],
-                    cfg['awsAccountId'],
-                    cfg['awsRegion'],
-                    cfg['configuration'].get('privateIpAddress', ''),
-                    cfg['tags'].get(APP_TAG),
-                    cfg['tags'].get(ENV_TAG),
-                    cfg['tags'].get(CONTACT_TAG),
-                    cfg['tags'].get('aws:autoscaling:groupName', ''),
-                    cfg['resourceCreationTime'],
-                    None))
+                rows.append(
+                    (
+                        cfg['resourceId'],
+                        cfg['awsAccountId'],
+                        cfg['awsRegion'],
+                        cfg['configuration'].get('privateIpAddress', ''),
+                        cfg['tags'].get(APP_TAG),
+                        cfg['tags'].get(ENV_TAG),
+                        cfg['tags'].get(CONTACT_TAG),
+                        cfg['tags'].get('aws:autoscaling:groupName', ''),
+                        cfg['resourceCreationTime'],
+                        None,
+                    )
+                )
 
                 if len(rows) % 1000 == 0:
                     stats['RowCount'] += len(rows)
                     cursor.executemany(
                         '''insert or replace into ec2 values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''',
-                        rows)
+                        rows,
+                    )
                     rows = []
         if deletes:
             log.info("Delete count %d", len(deletes))
@@ -313,7 +321,9 @@ def index_ec2_files(db, record_stream):
 
         if rows:
             cursor.executemany(
-                '''insert or replace into ec2 values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''', rows)
+                '''insert or replace into ec2 values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''',
+                rows,
+            )
         log.debug("ec2s stored:%d", len(rows))
 
     stats['RowCount'] += len(rows)
@@ -352,29 +362,46 @@ def index_s3_files(db, record_stream):
                     continue
                 if cfg['configurationItemStatus'] in ('ResourceDeleted'):
                     deletes[cfg['resourceId']] = cfg['configurationItemCaptureTime']
-                    rows.append((
-                        cfg['resourceId'], None, None, None, None, None, None,
-                        cfg['configurationItemCaptureTime'], None))
+                    rows.append(
+                        (
+                            cfg['resourceId'],
+                            None,
+                            None,
+                            None,
+                            None,
+                            None,
+                            None,
+                            cfg['configurationItemCaptureTime'],
+                            None,
+                        )
+                    )
                     continue
-                rows.append((
-                    cfg['resourceId'],
-                    cfg['awsAccountId'],
-                    cfg['awsRegion'],
-                    cfg['tags'].get(APP_TAG),
-                    cfg['tags'].get(ENV_TAG),
-                    cfg['tags'].get(CONTACT_TAG),
-                    cfg['resourceCreationTime'],
-                    None,
-                    json.dumps(cfg)))
+                rows.append(
+                    (
+                        cfg['resourceId'],
+                        cfg['awsAccountId'],
+                        cfg['awsRegion'],
+                        cfg['tags'].get(APP_TAG),
+                        cfg['tags'].get(ENV_TAG),
+                        cfg['tags'].get(CONTACT_TAG),
+                        cfg['resourceCreationTime'],
+                        None,
+                        json.dumps(cfg),
+                    )
+                )
 
             if len(rows) % 10000:
                 cursor.executemany(
-                    '''insert or replace into buckets values (?, ?, ?, ?, ?, ?, ?, ?, ?)''', rows)
+                    '''insert or replace into buckets values (?, ?, ?, ?, ?, ?, ?, ?, ?)''',
+                    rows,
+                )
                 stats['RowCount'] += len(rows)
 
         if rows:
             cursor.executemany(
-                '''insert or replace into buckets values (?, ?, ?, ?, ?, ?, ?, ?, ?)''', rows)
+                '''insert or replace into buckets values (?, ?, ?, ?, ?, ?, ?, ?, ?)''',
+                rows,
+            )
             stats['RowCount'] += len(rows)
 
     stats['IndexTime'] = int(time.time() - t)
@@ -409,15 +436,18 @@ def index_elb_files(db, record_stream):
                 if cfg['configurationItemStatus'] in ('ResourceDeleted',):
                     deletes[cfg['resourceId']] = cfg['configurationItemCaptureTime']
                     continue
-                rows.append((
-                    cfg['resourceName'],
-                    cfg['awsAccountId'],
-                    cfg['awsRegion'],
-                    cfg['tags'].get(APP_TAG),
-                    cfg['tags'].get(ENV_TAG),
-                    cfg['tags'].get(CONTACT_TAG),
-                    cfg['resourceCreationTime'],
-                    None))
+                rows.append(
+                    (
+                        cfg['resourceName'],
+                        cfg['awsAccountId'],
+                        cfg['awsRegion'],
+                        cfg['tags'].get(APP_TAG),
+                        cfg['tags'].get(ENV_TAG),
+                        cfg['tags'].get(CONTACT_TAG),
+                        cfg['resourceCreationTime'],
+                        None,
+                    )
+                )
 
         if rows:
             for idx, r in enumerate(rows):
@@ -425,7 +455,8 @@ def index_elb_files(db, record_stream):
                     rows[idx] = list(r)
                     rows[idx][-1] = deletes[r[0]]
             cursor.executemany(
-                '''insert or replace into elbs values (?, ?, ?, ?, ?, ?, ?, ?)''', rows)
+                '''insert or replace into elbs values (?, ?, ?, ?, ?, ?, ?, ?)''', rows
+            )
             stats['RowCount'] += len(rows)
 
         log.debug("elbs stored:%d", len(rows))
@@ -465,7 +496,10 @@ def index_eni_files(db, record_stream):
                 stats['Records'] += 1
                 stats['Record%s' % cfg['configurationItemStatus']] += 1
                 if cfg['configurationItemStatus'] not in (
-                        'ResourceDeleted', 'ResourceDiscovered', 'OK'):
+                    'ResourceDeleted',
+                    'ResourceDiscovered',
+                    'OK',
+                ):
                     raise ValueError(cfg)
                 if cfg['configurationItemStatus'] in ('ResourceDeleted',):
                     deletes[cfg['resourceId']] = cfg['configurationItemCaptureTime']
@@ -476,22 +510,31 @@ def index_eni_files(db, record_stream):
                     continue
                 rids.add(cfg['resourceId'])
                 rtype, rid = resource_info(eni)
-                rows.append((
-                    eni['networkInterfaceId'],
-                    eni['privateIpAddress'],
-                    cfg['awsAccountId'],
-                    rid,
-                    rtype,
-                    eni['subnetId'],
-                    REGION_KEY[cfg['awsRegion']],
-                    eni['attachment'].get('attachTime') or cfg['configurationItemCaptureTime'],
-                    None))
+                rows.append(
+                    (
+                        eni['networkInterfaceId'],
+                        eni['privateIpAddress'],
+                        cfg['awsAccountId'],
+                        rid,
+                        rtype,
+                        eni['subnetId'],
+                        REGION_KEY[cfg['awsRegion']],
+                        eni['attachment'].get('attachTime')
+                        or cfg['configurationItemCaptureTime'],
+                        None,
+                    )
+                )
 
         log.debug(
             "Records:%d Insert:%d Deletes:%d Skipped:%d Discovered:%d Deleted:%d Ok:%d",
-            stats['Records'], len(rows), len(deletes), skipped,
-            stats['RecordResourceDiscovered'], stats['RecordResourceDeleted'],
-            stats['RecordOK'])
+            stats['Records'],
+            len(rows),
+            len(deletes),
+            skipped,
+            stats['RecordResourceDiscovered'],
+            stats['RecordResourceDeleted'],
+            stats['RecordOK'],
+        )
 
         if rows:
             for idx, r in enumerate(rows):
@@ -501,10 +544,14 @@ def index_eni_files(db, record_stream):
                     del deletes[r[0]]
             try:
                 cursor.executemany(
-                    '''insert into enis values (?, ?, ?, ?, ?, ?, ?, ?, ?)''', rows)
+                    '''insert into enis values (?, ?, ?, ?, ?, ?, ?, ?, ?)''', rows
+                )
             except Exception:
-                log.error("Error inserting enis account:%s rows:%d",
-                          cfg['awsAccountId'], len(rows))
+                log.error(
+                    "Error inserting enis account:%s rows:%d",
+                    cfg['awsAccountId'],
+                    len(rows),
+                )
             stats['RowCount'] += len(rows)
 
     # result = cursor.execute('select count(distinct ip_address) from enis').fetchone()
@@ -530,7 +577,7 @@ RESOURCE_MAPPING = {
     'LoadBalancer': 'AWS::ElasticLoadBalancing',
     'NetworkInterface': 'AWS::EC2::NetworkInterface',
     'Volume': 'AWS::EC2::Volume',
-    'Bucket': 'AWS::S3::Bucket'
+    'Bucket': 'AWS::S3::Bucket',
 }
 
 RESOURCE_FILE_INDEXERS = {
@@ -538,7 +585,7 @@ RESOURCE_FILE_INDEXERS = {
     'NetworkInterface': index_eni_files,
     'LoadBalancer': index_elb_files,
     'Volume': index_ebs_files,
-    'Bucket': index_s3_files
+    'Bucket': index_s3_files,
 }
 
 
@@ -589,7 +636,10 @@ def get_queue(queue):
         owner_id = queue_arn_split[4]
         queue_name = queue_arn_split[5]
         queue_url = "https://sqs.%s.amazonaws.com/%s/%s" % (
-            region, owner_id, queue_name)
+            region,
+            owner_id,
+            queue_name,
+        )
     return queue_url, region
 
 
@@ -601,10 +651,12 @@ def get_queue(queue):
 @click.option('--end')
 @click.option('--tz')
 @click.option(
-    '-r', '--resources', multiple=True,
-    type=click.Choice(['Instance', 'LoadBalancer', 'Volume']))
-def list_app_resources(
-        app, env, resources, cmdb, start, end, tz):
+    '-r',
+    '--resources',
+    multiple=True,
+    type=click.Choice(['Instance', 'LoadBalancer', 'Volume']),
+)
+def list_app_resources(app, env, resources, cmdb, start, end, tz):
     """Analyze flow log records for application and generate metrics per period"""
     logging.basicConfig(level=logging.INFO)
     start, end = get_dates(start, end, tz)
@@ -626,14 +678,31 @@ def list_app_resources(
 @click.option('--assume', help="Assume role")
 @click.option('--start')
 @click.option('--end')
-@click.option('-r', '--resources', multiple=True,
-              type=click.Choice(list(RESOURCE_FILE_INDEXERS.keys())))
+@click.option(
+    '-r',
+    '--resources',
+    multiple=True,
+    type=click.Choice(list(RESOURCE_FILE_INDEXERS.keys())),
+)
 @click.option('--store', type=click.Path())
 @click.option('-f', '--db')
 @click.option('-v', '--verbose', is_flag=True)
 @click.option('--debug', is_flag=True)
-def load_resources(bucket, prefix, region, account_config, accounts,
-                   assume, start, end, resources, store, db, verbose, debug):
+def load_resources(
+    bucket,
+    prefix,
+    region,
+    account_config,
+    accounts,
+    assume,
+    start,
+    end,
+    resources,
+    store,
+    db,
+    verbose,
+    debug,
+):
     """load resources into resource database."""
     logging.basicConfig(level=(verbose and logging.DEBUG or logging.INFO))
     logging.getLogger('botocore').setLevel(logging.WARNING)
@@ -656,6 +725,7 @@ def load_resources(bucket, prefix, region, account_config, accounts,
     executor = ProcessPoolExecutor
     if debug:
         from c7n.executor import MainThreadExecutor
+
         MainThreadExecutor.c7n_async = False
         executor = MainThreadExecutor
 
@@ -665,9 +735,19 @@ def load_resources(bucket, prefix, region, account_config, accounts,
         futures = {}
         for a in account_ids:
             for r in resources:
-                futures[w.submit(
-                    process_account_resources, a, bucket, prefix,
-                    region, store, start, end, r)] = (a, r)
+                futures[
+                    w.submit(
+                        process_account_resources,
+                        a,
+                        bucket,
+                        prefix,
+                        region,
+                        store,
+                        start,
+                        end,
+                        r,
+                    )
+                ] = (a, r)
 
         indexer = RESOURCE_FILE_INDEXERS[r]
         for f in as_completed(futures):
@@ -679,16 +759,22 @@ def load_resources(bucket, prefix, region, account_config, accounts,
             idx_stats = indexer(db, resource_config_iter(files))
             log.info(
                 "loaded account:%s files:%d bytes:%s events:%d resources:%d idx-time:%d dl-time:%d",
-                account_map[a]['name'], len(files),
+                account_map[a]['name'],
+                len(files),
                 human_size(dl_stats['DownloadSize'] + dl_stats['CacheSize']),
                 idx_stats['Records'],
                 idx_stats['RowCount'],
                 idx_stats['IndexTime'],
-                dl_stats['FetchTime'])
+                dl_stats['FetchTime'],
+            )
             stats.update(dl_stats)
             stats.update(idx_stats)
-    log.info("Loaded %d resources across %d accounts in %0.2f",
-             stats['RowCount'], len(account_ids), time.time() - t)
+    log.info(
+        "Loaded %d resources across %d accounts in %0.2f",
+        stats['RowCount'],
+        len(account_ids),
+        time.time() - t,
+    )
 
 
 if __name__ == '__main__':
@@ -698,5 +784,6 @@ if __name__ == '__main__':
         import pdb
         import traceback
         import sys
+
         traceback.print_exc()
         pdb.post_mortem(sys.exc_info()[-1])

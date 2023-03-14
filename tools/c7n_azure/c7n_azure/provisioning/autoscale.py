@@ -7,7 +7,8 @@ from c7n_azure import constants
 class AutoScaleUnit(DeploymentUnit):
     def __init__(self):
         super(AutoScaleUnit, self).__init__(
-            'azure.mgmt.monitor.MonitorManagementClient')
+            'azure.mgmt.monitor.MonitorManagementClient'
+        )
         self.type = "AutoScale"
 
     def _get(self, params):
@@ -27,7 +28,7 @@ class AutoScaleUnit(DeploymentUnit):
                         "capacity": {
                             "minimum": params['min_capacity'],
                             "maximum": params['max_capacity'],
-                            "default": params['default_capacity']
+                            "default": params['default_capacity'],
                         },
                         "rules": [
                             {
@@ -35,7 +36,7 @@ class AutoScaleUnit(DeploymentUnit):
                                     "direction": "Increase",
                                     "type": "ChangeCount",
                                     "value": "1",
-                                    "cooldown": "PT5M"
+                                    "cooldown": "PT5M",
                                 },
                                 "metricTrigger": {
                                     "metricName": "MemoryPercentage",
@@ -47,15 +48,17 @@ class AutoScaleUnit(DeploymentUnit):
                                     "timeAggregation": "Average",
                                     "timeGrain": "PT1M",
                                     "timeWindow": "PT10M",
-                                    "Dimensions": []
-                                }
+                                    "Dimensions": [],
+                                },
                             }
-                        ]
+                        ],
                     }
-                ]
-            }
+                ],
+            },
         }
 
-        return self.client.autoscale_settings.create_or_update(params['resource_group_name'],
-                                                               constants.FUNCTION_AUTOSCALE_NAME,
-                                                               auto_scale_parameters)
+        return self.client.autoscale_settings.create_or_update(
+            params['resource_group_name'],
+            constants.FUNCTION_AUTOSCALE_NAME,
+            auto_scale_parameters,
+        )

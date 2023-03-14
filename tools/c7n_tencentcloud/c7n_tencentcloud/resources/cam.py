@@ -7,23 +7,30 @@ import pytz
 from c7n.exceptions import PolicyValidationError
 from c7n.utils import chunks, type_schema
 from c7n_tencentcloud.provider import resources
-from c7n_tencentcloud.query import ResourceTypeInfo, QueryResourceManager, DescribeSource
+from c7n_tencentcloud.query import (
+    ResourceTypeInfo,
+    QueryResourceManager,
+    DescribeSource,
+)
 from c7n_tencentcloud.utils import isoformat_datetime_str, PageMethod, convert_date_str
 from c7n.filters import ValueFilter, Filter
 
 
 class DescribeCAM(DescribeSource):
     """DescribeCAM"""
+
     def get_resource_qcs(self, resources):
         qcs_list = []
 
         # for CAM, there is no region in qcs
         for r in resources:
-            qcs = self.get_qcs(self.resource_type.service,
-                               "",
-                               self.resource_manager.config.account_id,
-                               self.resource_type.resource_prefix,
-                               r[self.resource_type.id])
+            qcs = self.get_qcs(
+                self.resource_type.service,
+                "",
+                self.resource_manager.config.account_id,
+                self.resource_type.resource_prefix,
+                r[self.resource_type.id],
+            )
             qcs_list.append(qcs)
         return qcs_list
 
@@ -48,10 +55,12 @@ class User(QueryResourceManager):
             value: 7000
             op: less-than
     """
+
     source_mapping = {"describe": DescribeCAM}
 
     class resource_type(ResourceTypeInfo):
         """resource_type"""
+
         id = "Uin"
         endpoint = "cam.tencentcloudapi.com"
         service = "cam"
@@ -63,8 +72,11 @@ class User(QueryResourceManager):
         datetime_fields_format = {
             "CreateTime": ("%Y-%m-%d %H:%M:%S", pytz.timezone("Asia/Shanghai")),
             "LastLoginTime": ("%Y-%m-%d %H:%M:%S", pytz.timezone("Asia/Shanghai")),
-            "access_keys.CreateTime": ("%Y-%m-%d %H:%M:%S", pytz.timezone("Asia/Shanghai")),
-            "access_keys.LastUsedDate": ("%Y-%m-%d", pytz.timezone("Asia/Shanghai"))
+            "access_keys.CreateTime": (
+                "%Y-%m-%d %H:%M:%S",
+                pytz.timezone("Asia/Shanghai"),
+            ),
+            "access_keys.LastUsedDate": ("%Y-%m-%d", pytz.timezone("Asia/Shanghai")),
         }
 
     def __init__(self, ctx, data):
@@ -82,7 +94,9 @@ class User(QueryResourceManager):
         """augment"""
         for item in resources:
             fm = self.resource_type.datetime_fields_format["CreateTime"]
-            item["CreateTime"] = isoformat_datetime_str(item["CreateTime"], fm[0], fm[1])
+            item["CreateTime"] = isoformat_datetime_str(
+                item["CreateTime"], fm[0], fm[1]
+            )
         return resources
 
 
@@ -105,6 +119,7 @@ class GroupMembership(ValueFilter):
             key: GroupName
             value:
     """
+
     schema = type_schema('group', rinherit=ValueFilter.schema)
     schema_alias = False
     permissions = ()
@@ -117,7 +132,7 @@ class GroupMembership(ValueFilter):
                 # we can only create no more than 300 groups
                 # and one sub-account can only belong to 10 user groups at most
                 "Rp": 300,
-                "SubUin": user[self.manager.resource_type.id]
+                "SubUin": user[self.manager.resource_type.id],
             }
             resp = self.manager.client.execute_query("ListGroupsForUser", params)
             user[self.group_field_name] = resp["Response"]["GroupInfo"]
@@ -127,7 +142,9 @@ class GroupMembership(ValueFilter):
         # get users' group
         with self.executor_factory(max_workers=2) as w:
             futures = []
-            for user_set in chunks([r for r in resources if self.group_field_name not in r]):
+            for user_set in chunks(
+                [r for r in resources if self.group_field_name not in r]
+            ):
                 futures.append(w.submit(self.get_user_groups, user_set))
             for f in as_completed(futures):
                 pass
@@ -178,21 +195,25 @@ class CredentialFilter(Filter):
             key: login_mfa_active
             value: false
     """
+
     schema = type_schema(
         'credential',
         value_type={'$ref': '#/definitions/filters_common/value_types'},
-        key={'type': 'string',
-             'enum': [
-                 'ConsoleLogin',
-                 'LastLoginTime',
-                 'login_mfa_active',
-                 'access_keys',
-                 'access_keys.Status',
-                 'access_keys.LastUsedDate',
-                 'access_keys.CreateTime',
-             ]},
+        key={
+            'type': 'string',
+            'enum': [
+                'ConsoleLogin',
+                'LastLoginTime',
+                'login_mfa_active',
+                'access_keys',
+                'access_keys.Status',
+                'access_keys.LastUsedDate',
+                'access_keys.CreateTime',
+            ],
+        },
         value={'$ref': '#/definitions/filters_common/value'},
-        op={'$ref': '#/definitions/filters_common/comparison_operators'})
+        op={'$ref': '#/definitions/filters_common/comparison_operators'},
+    )
 
     permissions = ()
 
@@ -221,37 +242,41 @@ class CredentialFilter(Filter):
         if access_keys:
             # get keys' last used time
             for batch in chunks(access_keys, 10):
-                params = {
-                    "SecretIdList": [it["AccessKeyId"] for it in batch]
-                }
+                params = {"SecretIdList": [it["AccessKeyId"] for it in batch]}
                 data = self.manager.client.execute_query("GetSecurityLastUsed", params)
                 for idx, v in enumerate(data["Response"]["SecretIdLastUsedRows"]):
                     if v["LastUsedDate"]:
-                        fm = self.manager.resource_type.\
-                            datetime_fields_format["access_keys.LastUsedDate"]
-                        batch[idx]["LastUsedDate"] = convert_date_str(v["LastUsedDate"],
-                                                                      fm[0], fm[1])
+                        fm = self.manager.resource_type.datetime_fields_format[
+                            "access_keys.LastUsedDate"
+                        ]
+                        batch[idx]["LastUsedDate"] = convert_date_str(
+                            v["LastUsedDate"], fm[0], fm[1]
+                        )
                     # pre-process for filter
-                    fm = self.manager.resource_type.datetime_fields_format["access_keys.CreateTime"]
-                    batch[idx]["CreateTime"] = isoformat_datetime_str(batch[idx]["CreateTime"],
-                                                                      fm[0], fm[1])
+                    fm = self.manager.resource_type.datetime_fields_format[
+                        "access_keys.CreateTime"
+                    ]
+                    batch[idx]["CreateTime"] = isoformat_datetime_str(
+                        batch[idx]["CreateTime"], fm[0], fm[1]
+                    )
         resource["c7n:access_keys"] = access_keys
 
     def set_user_last_login_time(self, resources):
         """set_user_last_login_time"""
         for batch in chunks(resources, 50):
             uins = [r[self.manager.resource_type.id] for r in batch]
-            params = {
-                "FilterSubAccountUin": uins
-            }
+            params = {"FilterSubAccountUin": uins}
             resp = self.manager.client.execute_query("DescribeSubAccounts", params)
             uin_map = {r["Uin"]: r for r in resp["Response"]["SubAccounts"]}
             for resource in batch:
                 uin = resource[self.manager.resource_type.id]
                 if uin in uin_map:
-                    fm = self.manager.resource_type.datetime_fields_format["LastLoginTime"]
-                    resource["LastLoginTime"] = \
-                        isoformat_datetime_str(uin_map[uin]["LastLoginTime"], fm[0], fm[1])
+                    fm = self.manager.resource_type.datetime_fields_format[
+                        "LastLoginTime"
+                    ]
+                    resource["LastLoginTime"] = isoformat_datetime_str(
+                        uin_map[uin]["LastLoginTime"], fm[0], fm[1]
+                    )
 
     def pre_process(self, resources):
         """pre_process"""
@@ -340,6 +365,7 @@ class CredentialFilter(Filter):
 
 class DescribePolicy(DescribeCAM):
     """DescribePolicy"""
+
     def augment(self, resources):
         """
         Policy don't have tags.
@@ -369,10 +395,12 @@ class Policy(QueryResourceManager):
               actions:
               - "*:*"
     """
+
     source_mapping = {"describe": DescribePolicy}
 
     class resource_type(ResourceTypeInfo):
         """resource_type"""
+
         id = "PolicyId"
         endpoint = "cam.tencentcloudapi.com"
         service = "cam"
@@ -434,6 +462,7 @@ class AllowAllIamPolicies(Filter):
           filters:
           - type: has-allow-all
     """
+
     schema = type_schema('has-allow-all')
     permissions = ()
 
@@ -443,10 +472,17 @@ class AllowAllIamPolicies(Filter):
 
         for s in resource["PolicyDocument"]["statement"]:
             if "condition" not in s and s["effect"] == "allow":
-                if ("action" in s and "*:*" in s["action"] and
-                        "resource" in s and
-                        (isinstance(s["resource"], str) and s["resource"] == "*" or
-                         isinstance(s["resource"], list) and "*" in s["resource"])):
+                if (
+                    "action" in s
+                    and "*:*" in s["action"]
+                    and "resource" in s
+                    and (
+                        isinstance(s["resource"], str)
+                        and s["resource"] == "*"
+                        or isinstance(s["resource"], list)
+                        and "*" in s["resource"]
+                    )
+                ):
                     return True
         return False
 
@@ -454,8 +490,8 @@ class AllowAllIamPolicies(Filter):
         """process"""
         results = [r for r in resources if self.has_allow_all_policy(r)]
         self.log.info(
-            "%d of %d cam policies have allow all.",
-            len(results), len(resources))
+            "%d of %d cam policies have allow all.", len(results), len(resources)
+        )
         return results
 
 
@@ -477,15 +513,22 @@ class CheckPermissions(Filter):
             - cos:GetBucket
             match-operator: or
     """
+
     schema = type_schema(
-        'check-permissions', **{
-            'match': {'oneOf': [
-                {'enum': ['allowed', 'denied']},
-                {'$ref': '#/definitions/filters/valuekv'},
-                {'$ref': '#/definitions/filters/value'}]},
+        'check-permissions',
+        **{
+            'match': {
+                'oneOf': [
+                    {'enum': ['allowed', 'denied']},
+                    {'$ref': '#/definitions/filters/valuekv'},
+                    {'$ref': '#/definitions/filters/value'},
+                ]
+            },
             'match-operator': {'enum': ['and', 'or']},
             'actions': {'type': 'array', 'items': {'type': 'string'}},
-            'required': ('actions', 'match')})
+            'required': ('actions', 'match'),
+        },
+    )
     schema_alias = True
     eval_annotation = 'c7n:perm-matches'
 
@@ -495,7 +538,8 @@ class CheckPermissions(Filter):
             if ':' not in action[1:-1]:
                 raise PolicyValidationError(
                     "invalid check-permissions action: '%s' must be in the form <service>:<action>"
-                    % (action,))
+                    % (action,)
+                )
         return self
 
     def get_permissions(self):
@@ -509,8 +553,7 @@ class CheckPermissions(Filter):
                 value = 'deny'
             else:
                 value = 'allow'
-            vf = ValueFilter({'type': 'value', 'key':
-                              'effect', 'value': value})
+            vf = ValueFilter({'type': 'value', 'key': 'effect', 'value': value})
         else:
             vf = ValueFilter(self.data['match'])
         vf.annotate = False
@@ -530,8 +573,7 @@ class CheckPermissions(Filter):
             matched_statements = []
             matched_flags = []
             for s in statements:
-                if (matcher(s) and
-                        actions.issubset(s["action"])):
+                if matcher(s) and actions.issubset(s["action"]):
                     # match and actions are both ok
                     matched_statements.append(s)
                     matched_flags.append(True)
@@ -557,6 +599,7 @@ class UsedIamPolicies(Filter):
           filters:
           - type: used
     """
+
     schema = type_schema('used')
     permissions = ()
 

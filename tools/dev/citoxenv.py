@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import os
+
 pyver = os.environ.get('TRAVIS_PYTHON_VERSION', '')
 if pyver == '2.7':
     print('py27')

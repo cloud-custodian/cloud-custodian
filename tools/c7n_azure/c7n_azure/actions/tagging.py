@@ -47,7 +47,7 @@ class Tag(AzureBaseAction):
         **{
             'value': Lookup.lookup_type({'type': 'string'}),
             'tag': Lookup.lookup_type({'type': 'string'}),
-            'tags': {'type': 'object'}
+            'tags': {'type': 'object'},
         }
     )
     schema_alias = True
@@ -57,13 +57,13 @@ class Tag(AzureBaseAction):
         super(Tag, self).__init__(data, manager, log_dir)
 
     def validate(self):
-        if not self.data.get('tags') and not (self.data.get('tag') and self.data.get('value')):
-            raise FilterValidationError(
-                "Must specify either tags or a tag and value")
+        if not self.data.get('tags') and not (
+            self.data.get('tag') and self.data.get('value')
+        ):
+            raise FilterValidationError("Must specify either tags or a tag and value")
 
         if self.data.get('tags') and self.data.get('tag'):
-            raise FilterValidationError(
-                "Can't specify both tags and tag, choose one")
+            raise FilterValidationError("Can't specify both tags and tag, choose one")
 
         return self
 
@@ -72,8 +72,11 @@ class Tag(AzureBaseAction):
         return TagHelper.add_tags(self, resource, new_tags)
 
     def _get_tags(self, resource):
-        return self.data.get('tags') or {Lookup.extract(
-            self.data.get('tag'), resource): Lookup.extract(self.data.get('value'), resource)}
+        return self.data.get('tags') or {
+            Lookup.extract(self.data.get('tag'), resource): Lookup.extract(
+                self.data.get('value'), resource
+            )
+        }
 
 
 class RemoveTag(AzureBaseAction):
@@ -94,9 +97,10 @@ class RemoveTag(AzureBaseAction):
                - type: untag
                  tags: ['Environment']
     """
+
     schema = utils.type_schema(
-        'untag',
-        tags={'type': 'array', 'items': {'type': 'string'}})
+        'untag', tags={'type': 'array', 'items': {'type': 'string'}}
+    )
     schema_alias = True
 
     def __init__(self, data=None, manager=None, log_dir=None):
@@ -107,7 +111,9 @@ class RemoveTag(AzureBaseAction):
             raise FilterValidationError("Must specify tags")
         return self
 
-    def _prepare_processing(self,):
+    def _prepare_processing(
+        self,
+    ):
         self.tags_to_delete = self.data.get('tags')
 
     def _process_resource(self, resource):
@@ -115,7 +121,6 @@ class RemoveTag(AzureBaseAction):
 
 
 class AutoTagBase(AzureEventAction):
-
     default_value = "Unknown"
     query_select = "eventTimestamp, operationName"
     max_query_days = 90
@@ -123,9 +128,12 @@ class AutoTagBase(AzureEventAction):
     schema = utils.type_schema(
         'auto-tag-base',
         required=['tag'],
-        **{'update': {'type': 'boolean'},
-           'tag': {'type': 'string'},
-           'days': {'type': 'integer'}})
+        **{
+            'update': {'type': 'boolean'},
+            'tag': {'type': 'string'},
+            'days': {'type': 'integer'},
+        }
+    )
     schema_alias = True
 
     def __init__(self, data=None, manager=None, log_dir=None):
@@ -140,21 +148,26 @@ class AutoTagBase(AzureEventAction):
         raise NotImplementedError()
 
     def validate(self):
-
-        if self.manager.data.get('mode', {}).get('type') == 'azure-event-grid' \
-                and self.data.get('days') is not None:
+        if (
+            self.manager.data.get('mode', {}).get('type') == 'azure-event-grid'
+            and self.data.get('days') is not None
+        ):
             raise PolicyValidationError(
-                "Auto tag actions in event mode does not use days.")
+                "Auto tag actions in event mode does not use days."
+            )
 
-        if (self.data.get('days') is not None and
-                (self.data.get('days') < 1 or self.data.get('days') > 90)):
+        if self.data.get('days') is not None and (
+            self.data.get('days') < 1 or self.data.get('days') > 90
+        ):
             raise FilterValidationError("Days must be between 1 and 90")
 
         return self
 
     def _prepare_processing(self):
         self.session = self.manager.get_session()
-        self.client = self.manager.get_client('azure.mgmt.monitor.MonitorManagementClient')
+        self.client = self.manager.get_client(
+            'azure.mgmt.monitor.MonitorManagementClient'
+        )
         self.tag_key = self.data['tag']
         self.should_update = self.data.get('update', False)
 
@@ -173,7 +186,6 @@ class AutoTagBase(AzureEventAction):
         return TagHelper.add_tags(self, resource, {self.tag_key: tag_value})
 
     def _get_first_event(self, resource):
-
         if 'c7n:first_iam_event' in resource:
             return resource['c7n:first_iam_event']
 
@@ -187,33 +199,39 @@ class AutoTagBase(AzureEventAction):
         # resource group type
         if self.manager.type == 'resourcegroup':
             resource_type = "Microsoft.Resources/subscriptions/resourcegroups"
-            query_filter = " and ".join([
-                "eventTimestamp ge '%s'" % start_time,
-                "resourceGroupName eq '%s'" % resource['name'],
-                "eventChannels eq 'Operation'",
-                "resourceType eq '%s'" % resource_type
-            ])
+            query_filter = " and ".join(
+                [
+                    "eventTimestamp ge '%s'" % start_time,
+                    "resourceGroupName eq '%s'" % resource['name'],
+                    "eventChannels eq 'Operation'",
+                    "resourceType eq '%s'" % resource_type,
+                ]
+            )
         # other Azure resources
         else:
             resource_type = resource['type']
-            query_filter = " and ".join([
-                "eventTimestamp ge '%s'" % start_time,
-                "resourceUri eq '%s'" % resource['id'],
-                "eventChannels eq 'Operation'",
-                "resourceType eq '%s'" % resource_type
-            ])
+            query_filter = " and ".join(
+                [
+                    "eventTimestamp ge '%s'" % start_time,
+                    "resourceUri eq '%s'" % resource['id'],
+                    "eventChannels eq 'Operation'",
+                    "resourceType eq '%s'" % resource_type,
+                ]
+            )
 
         # fetch activity logs
         logs = self.client.activity_logs.list(
-            filter=query_filter,
-            select=self.query_select
+            filter=query_filter, select=self.query_select
         )
 
         # get the user who issued the first operation
         operation_name = "%s/write" % resource_type
         first_event = None
         for l in logs:
-            if l.operation_name.value and l.operation_name.value.lower() == operation_name.lower():
+            if (
+                l.operation_name.value
+                and l.operation_name.value.lower() == operation_name.lower()
+            ):
                 first_event = l
 
         resource['c7n:first_iam_event'] = first_event
@@ -245,20 +263,26 @@ class AutoTagUser(AutoTagBase):
 
     """
 
-    schema = type_schema('auto-tag-user',
-                         rinherit=AutoTagBase.schema,
-                         **{
-                             'default-claim': {'enum': ['upn', 'name']}
-                         })
+    schema = type_schema(
+        'auto-tag-user',
+        rinherit=AutoTagBase.schema,
+        **{'default-claim': {'enum': ['upn', 'name']}}
+    )
     log = logging.getLogger('custodian.azure.tagging.AutoTagUser')
 
     # compiled JMES paths
-    service_admin_jmes_path = jmespath.compile(constants.EVENT_GRID_SERVICE_ADMIN_JMES_PATH)
+    service_admin_jmes_path = jmespath.compile(
+        constants.EVENT_GRID_SERVICE_ADMIN_JMES_PATH
+    )
     sp_jmes_path = jmespath.compile(constants.EVENT_GRID_SP_NAME_JMES_PATH)
     upn_jmes_path = jmespath.compile(constants.EVENT_GRID_UPN_CLAIM_JMES_PATH)
     name_jmes_path = jmespath.compile(constants.EVENT_GRID_NAME_CLAIM_JMES_PATH)
-    principal_role_jmes_path = jmespath.compile(constants.EVENT_GRID_PRINCIPAL_ROLE_JMES_PATH)
-    principal_type_jmes_path = jmespath.compile(constants.EVENT_GRID_PRINCIPAL_TYPE_JMES_PATH)
+    principal_role_jmes_path = jmespath.compile(
+        constants.EVENT_GRID_PRINCIPAL_ROLE_JMES_PATH
+    )
+    principal_type_jmes_path = jmespath.compile(
+        constants.EVENT_GRID_PRINCIPAL_TYPE_JMES_PATH
+    )
 
     def __init__(self, data=None, manager=None, log_dir=None):
         super(AutoTagUser, self).__init__(data, manager, log_dir)
@@ -277,8 +301,10 @@ class AutoTagUser(AutoTagBase):
             user = self.sp_jmes_path.search(event)
 
         if not user:
-            known_claims = {'upn': self.upn_jmes_path.search(event),
-                            'name': self.name_jmes_path.search(event)}
+            known_claims = {
+                'upn': self.upn_jmes_path.search(event),
+                'name': self.name_jmes_path.search(event),
+            }
             if known_claims[self.default_claim]:
                 user = known_claims[self.default_claim]
             elif self.default_claim == 'upn' and known_claims['name']:
@@ -343,8 +369,9 @@ class AutoTagDate(AutoTagBase):
 
     """
 
-    schema = type_schema('auto-tag-date', rinherit=AutoTagBase.schema,
-                         **{'format': {'type': 'string'}})
+    schema = type_schema(
+        'auto-tag-date', rinherit=AutoTagBase.schema, **{'format': {'type': 'string'}}
+    )
 
     event_time_path = jmespath.compile(constants.EVENT_GRID_EVENT_TIME_PATH)
     log = logging.getLogger('custodian.azure.tagging.AutoTagDate')
@@ -358,7 +385,9 @@ class AutoTagDate(AutoTagBase):
         try:
             datetime.datetime.now().strftime(self.format)
         except Exception:
-            raise FilterValidationError("'%s' string has invalid datetime format." % self.format)
+            raise FilterValidationError(
+                "'%s' string has invalid datetime format." % self.format
+            )
 
     def _get_tag_value_from_event(self, event):
         event_time = Deserializer.deserialize_iso(self.event_time_path.search(event))
@@ -415,12 +444,14 @@ class TagTrim(AzureBaseAction):
                  - custodian_status
 
     """
+
     max_tag_count = 50
 
     schema = utils.type_schema(
         'tag-trim',
         space={'type': 'integer'},
-        preserve={'type': 'array', 'items': {'type': 'string'}})
+        preserve={'type': 'array', 'items': {'type': 'string'}},
+    )
     schema_alias = True
     log = logging.getLogger('custodian.azure.tagging.TagTrim')
 
@@ -431,7 +462,9 @@ class TagTrim(AzureBaseAction):
 
     def validate(self):
         if self.space < 0 or self.space > self.max_tag_count:
-            raise FilterValidationError("Space must be between 0 and %i" % self.max_tag_count)
+            raise FilterValidationError(
+                "Space must be between 0 and %i" % self.max_tag_count
+            )
         return self
 
     def _process_resource(self, resource):
@@ -447,13 +480,15 @@ class TagTrim(AzureBaseAction):
 
         if self.space:
             # Free up slots to fit
-            remove = (len(candidates) -
-                      (self.max_tag_count - (self.space + len(tags_to_preserve))))
+            remove = len(candidates) - (
+                self.max_tag_count - (self.space + len(tags_to_preserve))
+            )
             candidates = list(sorted(candidates))[:remove]
 
         if not candidates:
             self.log.warning(
-                "Could not find any candidates to trim %s" % resource['id'])
+                "Could not find any candidates to trim %s" % resource['id']
+            )
             return
 
         return TagHelper.remove_tags(self, resource, candidates)
@@ -495,7 +530,8 @@ class TagDelayedAction(AzureBaseAction):
         days={'type': 'number', 'minimum': 0, 'exclusiveMinimum': False},
         hours={'type': 'number', 'minimum': 0, 'exclusiveMinimum': False},
         tz={'type': 'string'},
-        op={'type': 'string'})
+        op={'type': 'string'},
+    )
     schema_alias = True
     log = logging.getLogger('custodian.azure.tagging.TagDelayed')
 
@@ -503,8 +539,7 @@ class TagDelayedAction(AzureBaseAction):
 
     def __init__(self, data=None, manager=None, log_dir=None):
         super(TagDelayedAction, self).__init__(data, manager, log_dir)
-        self.tz = tzutils.gettz(
-            Time.TZ_ALIASES.get(self.data.get('tz', 'utc')))
+        self.tz = tzutils.gettz(Time.TZ_ALIASES.get(self.data.get('tz', 'utc')))
 
         msg_tmpl = self.data.get('msg', self.default_template)
 
@@ -514,31 +549,30 @@ class TagDelayedAction(AzureBaseAction):
         action_date = self.generate_timestamp(days, hours)
 
         self.tag = self.data.get('tag', DEFAULT_TAG)
-        self.msg = msg_tmpl.format(
-            op=op, action_date=action_date)
+        self.msg = msg_tmpl.format(op=op, action_date=action_date)
 
     def validate(self):
         op = self.data.get('op')
         if self.manager and op not in self.manager.action_registry.keys():
             raise FilterValidationError(
-                "mark-for-op specifies invalid op:%s in %s" % (
-                    op, self.manager.data))
+                "mark-for-op specifies invalid op:%s in %s" % (op, self.manager.data)
+            )
 
-        self.tz = tzutils.gettz(
-            Time.TZ_ALIASES.get(self.data.get('tz', 'utc')))
+        self.tz = tzutils.gettz(Time.TZ_ALIASES.get(self.data.get('tz', 'utc')))
         if not self.tz:
             raise FilterValidationError(
-                "Invalid timezone specified %s in %s" % (
-                    self.tz, self.manager.data))
+                "Invalid timezone specified %s in %s" % (self.tz, self.manager.data)
+            )
         return self
 
     def generate_timestamp(self, days, hours):
         from c7n_azure.utils import now
+
         n = now(tz=self.tz)
         if days is None or hours is None:
             # maintains default value of days being 4 if nothing is provided
             days = 4
-        action_date = (n + datetime.timedelta(days=days, hours=hours))
+        action_date = n + datetime.timedelta(days=days, hours=hours)
         if hours > 0:
             action_date_string = action_date.strftime('%Y/%m/%d %H%M %Z')
         else:
