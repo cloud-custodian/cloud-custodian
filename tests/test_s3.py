@@ -1820,7 +1820,7 @@ class S3Test(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 3)
         locked_down_bucket = next(r for r in resources if r["Name"] == "my-locked-down-bucket")
-        self.assertIn("GetPublicAccessBlock", locked_down_bucket["c7n:DeniedMethods"])
+        self.assertIn("GetPublicAccessBlock", locked_down_bucket.get("c7n:DeniedMethods", []))
 
     def test_set_public_block_enable_all(self):
         bname = 'mypublicblock'
