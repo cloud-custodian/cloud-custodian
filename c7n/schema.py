@@ -248,8 +248,9 @@ def generate(resource_types=()):
                 'tz': {'type': 'string'},
                 'start': {'format': 'date-time'},
                 'end': {'format': 'date-time'},
-
-                'resource': {'type': 'string'},
+                'resource': {'oneOf': [
+                    {'type': 'string'},
+                    {'type': 'array', 'items': {'type': 'string'}}]},
                 'max-resources': {'anyOf': [
                     {'type': 'integer', 'minimum': 1},
                     {'$ref': '#/definitions/max-resources-properties'}

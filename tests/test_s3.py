@@ -8,12 +8,14 @@ import io
 import shutil
 import tempfile
 import time  # NOQA needed for some recordings
+import mock
 
 from unittest import TestCase
 
 from contextlib import suppress
 from botocore.exceptions import ClientError
 from dateutil.tz import tzutc
+import pytest
 from pytest_terraform import terraform
 
 from c7n.exceptions import PolicyExecutionError, PolicyValidationError
@@ -32,6 +34,7 @@ from .common import (
 )
 
 
+@pytest.mark.audited
 @terraform('s3_tag')
 def test_s3_tag(test, s3_tag):
     test.patch(s3.S3, "executor_factory", MainThreadExecutor)
@@ -1040,6 +1043,16 @@ class S3ConfigSource(ConfigTest):
             },
         )
 
+    def test_config_handle_missing_attr(self):
+        # test for bug of
+        # https://github.com/cloud-custodian/cloud-custodian/issues/7808
+        event = event_data("s3-from-rule-sans-accelerator.json", "config")
+        p = self.load_policy({"name": "s3cfg", "resource": "s3"})
+        source = p.resource_manager.get_source("config")
+        resource_config = json.loads(event["invokingEvent"])["configurationItem"]
+        resource = source.load_resource(resource_config)
+        assert resource['Name'] == 'c7n-fire-logs'
+
     def test_config_normalize_lifecycle_null_predicate(self):
         event = event_data("s3-lifecycle-null-predicate.json", "config")
         p = self.load_policy({"name": "s3cfg", "resource": "s3"})
@@ -1617,6 +1630,40 @@ class S3Test(BaseTest):
                             {
                                 "Effect": "Deny",
                                 "Action": "s3:PutObject",
+                                "Principal": "*",
+                                "Resource": "arn:aws:s3:::{bucket_name}/*"
+                            }
+                        ],
+                    },
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_has_statement_policy_action_star(self):
+        self.patch(s3.S3, "executor_factory", MainThreadExecutor)
+        self.patch(
+            s3.MissingPolicyStatementFilter, "executor_factory", MainThreadExecutor
+        )
+        self.patch(
+            s3, "S3_AUGMENT_TABLE", [("get_bucket_policy", "Policy", None, "Policy")]
+        )
+        session_factory = self.replay_flight_data("test_s3_has_statement")
+        bname = "custodian-policy-test1"
+        p = self.load_policy(
+            {
+                "name": "s3-has-policy",
+                "resource": "s3",
+                "filters": [
+                    {"Name": bname},
+                    {
+                        "type": "has-statement",
+                        "statements": [
+                            {
+                                "Effect": "Deny",
+                                "Action": "*",
                                 "Principal": "*",
                                 "Resource": "arn:aws:s3:::{bucket_name}/*"
                             }
@@ -3634,6 +3681,29 @@ class S3Test(BaseTest):
         with self.assertRaises(Exception):
             client.get_bucket_encryption(Bucket=bname)
 
+    @mock.patch('c7n.actions.invoke.assumed_session')
+    def test_s3_invoke_lambda_assume_role_action(self, mock_assumed_session):
+
+        session_factory = self.replay_flight_data("test_s3_invoke_lambda_assume_role")
+
+        p = self.load_policy(
+            {
+                "name": "s3-invoke-lambda-assume-role",
+                "resource": "s3",
+                "actions": [{"type": "invoke-lambda",
+                             "function": "lambda-invoke-with-assume-role", "assume-role":
+                                 "arn:aws:iam::0123456789:role/service-role/lambda-assumed-role"}],
+            },
+            session_factory=session_factory,
+        )
+
+        p.resource_manager.actions[0].process([{
+            "FunctionName": "abc",
+            "payload": {},
+        }])
+
+        assert mock_assumed_session.call_count == 1
+
 
 class S3LifecycleTest(BaseTest):
 
@@ -3790,6 +3860,14 @@ def test_s3_encryption_audit(test, aws_s3_encryption_audit):
             "name": "s3-audit",
             "resource": "s3",
             "filters": [
+                {"type": "value",
+                 "key": "Name",
+                 "op": "in",
+                 "value": [
+                     'c7n-aws-s3-encryption-audit-test-a',
+                     'c7n-aws-s3-encryption-audit-test-b',
+                     'c7n-aws-s3-encryption-audit-test-c',
+                 ]},
                 {
                     "or": [
                         {
@@ -3827,6 +3905,7 @@ def test_s3_encryption_audit(test, aws_s3_encryption_audit):
     assert actual_names == expected_names
 
 
+@pytest.mark.audited
 @terraform('s3_ownership', scope='class')
 class TestBucketOwnership:
     def test_s3_ownership_empty(self, test, s3_ownership):
@@ -3885,9 +3964,11 @@ class TestBucketOwnership:
         assert len(resources) == 2
         assert {r["Name"] for r in resources} == bucket_names
 
-    def test_s3_access_analyzer_filter_with_no_results(self, test):
-        factory = test.replay_flight_data("test_s3_iam_analyzers")
+    def test_s3_access_analyzer_filter_with_no_results(self, test, s3_ownership):
+        test.patch(s3.S3, "executor_factory", MainThreadExecutor)
+        test.patch(s3.BucketOwnershipControls, "executor_factory", MainThreadExecutor)
         test.patch(s3, "S3_AUGMENT_TABLE", [])
+        factory = test.replay_flight_data("test_s3_iam_analyzers")
         p = test.load_policy({
             'name': 'check-s3',
             'resource': 'aws.s3',

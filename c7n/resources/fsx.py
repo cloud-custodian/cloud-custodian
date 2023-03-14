@@ -341,7 +341,9 @@ class KmsFilterFsxBackup(KmsRelatedFilter):
 class ConsecutiveBackups(Filter):
     """Returns consecutive daily FSx backups, which are equal to/or greater than n days.
     :Example:
+
     .. code-block:: yaml
+
             policies:
               - name: fsx-daily-backup-count
                 resource: fsx

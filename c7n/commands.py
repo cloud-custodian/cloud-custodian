@@ -8,6 +8,7 @@ import itertools
 import logging
 import os
 import sys
+from typing import List
 
 import yaml
 from yaml.constructor import ConstructorError
@@ -283,7 +284,7 @@ def validate(options):
 
 
 @policy_command
-def run(options, policies):
+def run(options, policies: List[Policy]) -> None:
     exit_code = 0
 
     # AWS - Sanity check that we have an assumable role before executing policies
@@ -295,7 +296,7 @@ def run(options, policies):
             log.exception("Unable to assume role %s", options.assume_role)
             sys.exit(1)
 
-    errored_policies = []
+    errored_policies: List[str] = []
     for policy in policies:
         try:
             policy()

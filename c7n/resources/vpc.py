@@ -17,10 +17,10 @@ from c7n import query, resolver
 from c7n.manager import resources
 from c7n.resources.securityhub import OtherResourcePostFinding, PostFinding
 from c7n.utils import (
-    chunks, local_session, type_schema, get_retry, parse_cidr)
+    chunks, local_session, type_schema, get_retry, parse_cidr, get_eni_resource_type)
 
 from c7n.resources.aws import shape_validate
-from c7n.resources.shield import IsShieldProtected, SetShieldProtection
+from c7n.resources.shield import IsEIPShieldProtected, SetEIPShieldProtection
 
 
 @resources.register('vpc')
@@ -729,7 +729,8 @@ class SGUsage(Filter):
         return list(itertools.chain(
             *[self.manager.get_resource_manager(m).get_permissions()
              for m in
-             ['lambda', 'eni', 'launch-config', 'security-group', 'event-rule-target']]))
+             ['lambda', 'eni', 'launch-config', 'security-group', 'event-rule-target',
+              'aws.batch-compute']]))
 
     def filter_peered_refs(self, resources):
         if not resources:
@@ -754,6 +755,7 @@ class SGUsage(Filter):
             ("launch-configs", self.get_launch_config_sgs),
             ("ecs-cwe", self.get_ecs_cwe_sgs),
             ("codebuild", self.get_codebuild_sgs),
+            ("batch", self.get_batch_sgs),
         )
 
     def scan_groups(self):
@@ -790,7 +792,8 @@ class SGUsage(Filter):
 
     def get_eni_sgs(self):
         sg_ids = set()
-        for nic in self.manager.get_resource_manager('eni').resources():
+        self.nics = self.manager.get_resource_manager('eni').resources()
+        for nic in self.nics:
             for g in nic['Groups']:
                 sg_ids.add(g['GroupId'])
         return sg_ids
@@ -820,6 +823,11 @@ class SGUsage(Filter):
             if ids:
                 sg_ids.update(ids)
         return sg_ids
+
+    def get_batch_sgs(self):
+        expr = jmespath.compile('[].computeResources.securityGroupIds[]')
+        resources = self.manager.get_resource_manager('aws.batch-compute').resources(augment=False)
+        return set(expr.search(resources) or [])
 
 
 @SecurityGroup.filter_registry.register('unused')
@@ -862,7 +870,6 @@ class UnusedSecurityGroup(SGUsage):
 @SecurityGroup.filter_registry.register('used')
 class UsedSecurityGroup(SGUsage):
     """Filter to security groups that are used.
-
     This operates as a complement to the unused filter for multi-step
     workflows.
 
@@ -875,8 +882,62 @@ class UsedSecurityGroup(SGUsage):
                 resource: security-group
                 filters:
                   - used
+
+            policies:
+              - name: security-groups-used-by-rds
+                resource: security-group
+                filters:
+                  - used
+                  - type: value
+                    key: c7n:InstanceOwnerIds
+                    op: intersect
+                    value:
+                      - amazon-rds
+
+            policies:
+              - name: security-groups-used-by-natgw
+                resource: security-group
+                filters:
+                  - used
+                  - type: value
+                    key: c7n:InterfaceTypes
+                    op: intersect
+                    value:
+                      - nat_gateway
+
+            policies:
+              - name: security-groups-used-by-alb
+                resource: security-group
+                filters:
+                  - used
+                  - type: value
+                    key: c7n:InterfaceResourceTypes
+                    op: intersect
+                    value:
+                      - elb-app
     """
     schema = type_schema('used')
+
+    instance_owner_id_key = 'c7n:InstanceOwnerIds'
+    interface_type_key = 'c7n:InterfaceTypes'
+    interface_resource_type_key = 'c7n:InterfaceResourceTypes'
+
+    def _get_eni_attributes(self):
+        enis = []
+        for nic in self.nics:
+            if nic['Status'] == 'in-use':
+                instance_owner_id = nic['Attachment']['InstanceOwnerId']
+                interface_resource_type = get_eni_resource_type(nic)
+            else:
+                instance_owner_id = ''
+                interface_resource_type = ''
+            interface_type = nic.get('InterfaceType')
+            for g in nic['Groups']:
+                enis.append({'GroupId': g['GroupId'],
+                             'InstanceOwnerId': instance_owner_id,
+                             'InterfaceType': interface_type,
+                             'InterfaceResourceType': interface_resource_type})
+        return enis
 
     def process(self, resources, event=None):
         used = self.scan_groups()
@@ -884,6 +945,19 @@ class UsedSecurityGroup(SGUsage):
             r for r in resources
             if r['GroupId'] not in used and 'VpcId' in r]
         unused = {g['GroupId'] for g in self.filter_peered_refs(unused)}
+        enis = self._get_eni_attributes()
+        for r in resources:
+            owner_ids = set()
+            interface_types = set()
+            interface_resource_types = set()
+            for eni in enis:
+                if r['GroupId'] == eni['GroupId']:
+                    owner_ids.add(eni['InstanceOwnerId'])
+                    interface_types.add(eni['InterfaceType'])
+                    interface_resource_types.add(eni['InterfaceResourceType'])
+            r[self.instance_owner_id_key] = list(filter(None, owner_ids))
+            r[self.interface_type_key] = list(filter(None, interface_types))
+            r[self.interface_resource_type_key] = list(filter(None, interface_resource_types))
         return [r for r in resources if r['GroupId'] not in unused]
 
 
@@ -1027,6 +1101,30 @@ class SGPermission(Filter):
           value_type: cidr
           op: in
           value: x.y.z
+
+    `value_type: cidr` can also filter if cidr is a subset of cidr
+    value range. In this example we are allowing any smaller cidrs within
+    allowed_cidrs.csv.
+
+    .. code-block:: yaml
+
+      - type: ingress
+        Cidr:
+          value_type: cidr
+          op: not-in
+          value_from:
+            url: s3://a-policy-data-us-west-2/allowed_cidrs.csv
+            format: csv
+
+    or value can be specified as a list.
+
+    .. code-block:: yaml
+
+      - type: ingress
+        Cidr:
+          value_type: cidr
+          op: not-in
+          value: ["10.0.0.0/8", "192.168.0.0/16"]
 
     `Cidr` can match ipv4 rules and `CidrV6` can match ipv6 rules.  In
     this example we are blocking global inbound connections to SSH or
@@ -1563,7 +1661,7 @@ class NetworkInterface(query.QueryResourceManager):
 
     class resource_type(query.TypeInfo):
         service = 'ec2'
-        arn_type = 'eni'
+        arn_type = 'network-interface'
         enum_spec = ('describe_network_interfaces', 'NetworkInterfaces', None)
         name = id = 'NetworkInterfaceId'
         filter_name = 'NetworkInterfaceIds'
@@ -1842,6 +1940,7 @@ class TransitGatewayAttachment(query.ChildResourceManager):
         name = id = 'TransitGatewayAttachmentId'
         arn = False
         cfn_type = 'AWS::EC2::TransitGatewayAttachment'
+        supports_trailevents = True
 
 
 @resources.register('peering-connection')
@@ -2028,14 +2127,14 @@ class NetworkAddress(query.QueryResourceManager):
 
     class resource_type(query.TypeInfo):
         service = 'ec2'
-        arn_type = 'eip-allocation'
+        arn_type = 'elastic-ip'
         enum_spec = ('describe_addresses', 'Addresses', None)
         name = 'PublicIp'
         id = 'AllocationId'
         id_prefix = 'eipalloc-'
         filter_name = 'AllocationIds'
         filter_type = 'list'
-        config_type = "AWS::EC2::EIP"
+        config_type = cfn_type = "AWS::EC2::EIP"
 
     source_mapping = {
         'describe': DescribeElasticIp,
@@ -2043,8 +2142,8 @@ class NetworkAddress(query.QueryResourceManager):
     }
 
 
-NetworkAddress.filter_registry.register('shield-enabled', IsShieldProtected)
-NetworkAddress.action_registry.register('set-shield', SetShieldProtection)
+NetworkAddress.filter_registry.register('shield-enabled', IsEIPShieldProtected)
+NetworkAddress.action_registry.register('set-shield', SetEIPShieldProtection)
 
 
 @NetworkAddress.action_registry.register('release')
@@ -2171,7 +2270,7 @@ class NATGateway(query.QueryResourceManager):
 
     class resource_type(query.TypeInfo):
         service = 'ec2'
-        arn_type = 'nat-gateway'
+        arn_type = 'natgateway'
         enum_spec = ('describe_nat_gateways', 'NatGateways', None)
         name = id = 'NatGatewayId'
         filter_name = 'NatGatewayIds'
@@ -2200,7 +2299,7 @@ class VPNConnection(query.QueryResourceManager):
 
     class resource_type(query.TypeInfo):
         service = 'ec2'
-        arn_type = 'vpc-connection'
+        arn_type = 'vpn-connection'
         enum_spec = ('describe_vpn_connections', 'VpnConnections', None)
         name = id = 'VpnConnectionId'
         filter_name = 'VpnConnectionIds'
@@ -2214,7 +2313,7 @@ class VPNGateway(query.QueryResourceManager):
 
     class resource_type(query.TypeInfo):
         service = 'ec2'
-        arn_type = 'vpc-gateway'
+        arn_type = 'vpn-gateway'
         enum_spec = ('describe_vpn_gateways', 'VpnGateways', None)
         name = id = 'VpnGatewayId'
         filter_name = 'VpnGatewayIds'
@@ -2710,3 +2809,93 @@ class TrafficMirrorTarget(query.QueryResourceManager):
         arn_type = 'traffic-mirror-target'
         universal_taggable = object()
         id_prefix = 'tmt-'
+
+
+@RouteTable.filter_registry.register('cross-az-nat-gateway-route')
+class CrossAZRouteTable(Filter):
+    """Filter route-tables to find those with routes which send traffic
+    from a subnet in an az to a nat gateway in a different az.
+
+    This filter is useful for cost optimization, resiliency, and
+    performance use-cases, where we don't want network traffic to
+    cross from one availability zone (AZ) to another AZ.
+
+    :Example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: cross-az-nat-gateway-traffic
+                resource: aws.route-table
+                filters:
+                    - type: cross-az-nat-gateway-route
+                actions:
+                  - notify
+
+    """
+    schema = type_schema('cross-az-nat-gateway-route')
+    permissions = ("ec2:DescribeRouteTables", "ec2:DescribeNatGateways", "ec2:DescribeSubnets")
+
+    table_annotation = "c7n:route-table"
+    mismatch_annotation = "c7n:nat-az-mismatch"
+
+    def resolve_subnets(self, resource, subnets):
+        return {s['SubnetId'] for s in subnets
+                if s[self.table_annotation] == resource['RouteTableId']}
+
+    def annotate_subnets_table(self, tables: list, subnets: dict):
+        # annotate route table associations onto their respective subnets
+        main_tables = []
+        # annotate explicit associations
+        for t in tables:
+            for association in t['Associations']:
+                if association.get('SubnetId'):
+                    subnets[association['SubnetId']][
+                        self.table_annotation] = t['RouteTableId']
+                if association.get('Main'):
+                    main_tables.append(t)
+        # annotate main tables
+        for s in subnets.values():
+            if self.table_annotation in s:
+                continue
+            for t in main_tables:
+                if t['VpcId'] == s['VpcId']:
+                    s[self.table_annotation] = t['RouteTableId']
+
+    def process_route_table(self, subnets, nat_subnets, resource):
+        matched = {}
+        found = False
+        associated_subnets = self.resolve_subnets(resource, subnets.values())
+        for route in resource['Routes']:
+            if not route.get("NatGatewayId") or route.get("State") != "active":
+                continue
+            nat_az = subnets[nat_subnets[route['NatGatewayId']]]['AvailabilityZone']
+            mismatch_subnets = {
+                s: subnets[s]['AvailabilityZone'] for s in associated_subnets
+                if subnets[s]['AvailabilityZone'] != nat_az}
+            if not mismatch_subnets:
+                continue
+            found = True
+            matched.setdefault(route['NatGatewayId'], {})['NatGatewayAz'] = nat_az
+            matched[route['NatGatewayId']].setdefault('Subnets', {}).update(mismatch_subnets)
+        if not found:
+            return
+        resource[self.mismatch_annotation] = matched
+        return resource
+
+    def process(self, resources, event=None):
+        subnets = {
+            s['SubnetId']: s for s in
+            self.manager.get_resource_manager('aws.subnet').resources()
+        }
+        nat_subnets = {
+            nat_gateway['NatGatewayId']: nat_gateway["SubnetId"]
+            for nat_gateway in self.manager.get_resource_manager('nat-gateway').resources()}
+
+        results = []
+        self.annotate_subnets_table(resources, subnets)
+        for resource in resources:
+            if self.process_route_table(subnets, nat_subnets, resource):
+                results.append(resource)
+
+        return results

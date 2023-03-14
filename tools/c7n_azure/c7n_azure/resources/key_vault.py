@@ -95,7 +95,7 @@ class KeyVault(ArmResourceManager):
 
         service = 'azure.mgmt.keyvault'
         client = 'KeyVaultManagementClient'
-        enum_spec = ('vaults', 'list', None)
+        enum_spec = ('vaults', 'list_by_subscription', None)
         resource_type = 'Microsoft.KeyVault/vaults'
 
 

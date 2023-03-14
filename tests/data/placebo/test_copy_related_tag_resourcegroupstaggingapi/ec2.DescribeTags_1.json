@@ -1,0 +1,26 @@
+{
+    "status_code": 200,
+    "data": {
+        "Tags": [
+            {
+                "Key": "Foo",
+                "ResourceId": "i-0186d79a60beee17f",
+                "ResourceType": "instance",
+                "Value": "arn:aws:ec2:us-east-1:644160558196:security-group/sg-02df69073faec3e4e"
+            },
+            {
+                "Key": "Name",
+                "ResourceId": "i-0186d79a60beee17f",
+                "ResourceType": "instance",
+                "Value": "foo"
+            },
+            {
+                "Key": "test-tag",
+                "ResourceId": "i-0186d79a60beee17f",
+                "ResourceType": "instance",
+                "Value": "asdfasdf"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

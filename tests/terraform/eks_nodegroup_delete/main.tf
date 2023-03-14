@@ -1,5 +1,9 @@
+resource "random_id" "id" {
+	  byte_length = 8
+}
+
 resource "aws_eks_cluster" "example" {
-  name     = "example"
+  name     = "example-${random_id.id.hex}"
   role_arn = aws_iam_role.cluster_example.arn
 
   vpc_config {
@@ -15,7 +19,7 @@ resource "aws_eks_cluster" "example" {
 }
 
 resource "aws_iam_role" "cluster_example" {
-  name = "eks-cluster-example"
+  name_prefix = "eks-cluster-example"
 
   assume_role_policy = <<POLICY
 {

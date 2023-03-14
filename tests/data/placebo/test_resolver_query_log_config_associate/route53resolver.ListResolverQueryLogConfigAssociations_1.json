@@ -1,0 +1,36 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {
+            "RequestId": "fae1a95b-f021-11e8-8b62-c7b4382bf2e5",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "fae1a95b-f021-11e8-8b62-c7b4382bf2e5",
+                "content-type": "text/xml",
+                "content-length": "446",
+                "date": "Sat, 24 Nov 2018 19:48:56 GMT"
+            },
+            "RetryAttempts": 0
+        },
+        "ResolverQueryLogConfigAssociations": [
+            {
+                "Id": "rqlca-30f051f5e84a43e9",
+                "ResolverQueryLogConfigId": "rqlc-fb017689395648d1",
+                "ResourceId": "vpc-011516c4325953",
+                "Status": "ACTIVE",
+                "Error": "NONE",
+                "ErrorMessage": " ",
+                "CreationTime": {
+                    "hour": 19,
+                    "__class__": "datetime",
+                    "month": 3,
+                    "second": 52,
+                    "microsecond": 776000,
+                    "year": 2022,
+                    "day": 29,
+                    "minute": 4
+                }
+            }
+        ]
+    }
+}

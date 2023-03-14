@@ -7,6 +7,7 @@ import itertools
 import logging
 import os
 import time
+from typing import List
 
 from dateutil import parser, tz as tzutil
 import jmespath
@@ -23,6 +24,8 @@ from c7n.provider import clouds, get_resource_class
 from c7n import deprecated, utils
 from c7n.version import version
 from c7n.query import RetryPageIterator
+from c7n.varfmt import VarFormat
+from c7n.utils import get_policy_provider
 
 log = logging.getLogger('c7n.policy')
 
@@ -32,8 +35,16 @@ def load(options, path, format=None, validate=True, vars=None):
     if not os.path.exists(path):
         raise IOError("Invalid path for config %r" % path)
 
-    from c7n.schema import validate, StructureParser
-    data = utils.load_file(path, format=format, vars=vars)
+    from c7n.schema import validate as schema_validate, StructureParser
+    if os.path.isdir(path):
+        from c7n.loader import DirectoryLoader
+        collection = DirectoryLoader(options).load_directory(path, validate)
+        if validate:
+            [p.validate() for p in collection]
+        return collection
+
+    if os.path.isfile(path):
+        data = utils.load_file(path, format=format, vars=vars)
 
     structure = StructureParser()
     structure.validate(data)
@@ -45,7 +56,7 @@ def load(options, path, format=None, validate=True, vars=None):
         return None
 
     if validate:
-        errors = validate(data, resource_types=rtypes)
+        errors = schema_validate(data, resource_types=rtypes)
         if errors:
             raise PolicyValidationError(
                 "Failed to validate policy %s \n %s" % (
@@ -66,12 +77,12 @@ class PolicyCollection:
 
     log = logging.getLogger('c7n.policies')
 
-    def __init__(self, policies, options):
+    def __init__(self, policies: 'List[Policy]', options):
         self.options = options
         self.policies = policies
 
     @classmethod
-    def from_data(cls, data, options, session_factory=None):
+    def from_data(cls, data: dict, options, session_factory=None):
         # session factory param introduction needs an audit and review
         # on tests.
         sf = session_factory if session_factory else cls.session_factory()
@@ -82,10 +93,11 @@ class PolicyCollection:
     def __add__(self, other):
         return self.__class__(self.policies + other.policies, self.options)
 
-    def filter(self, policy_patterns=[], resource_types=[]):
+    def filter(self, policy_patterns=(), resource_types=(), modes=()):
         results = self.policies
         results = self._filter_by_patterns(results, policy_patterns)
         results = self._filter_by_resource_types(results, resource_types)
+        results = self._filter_by_modes(results, modes)
         # next line brings the result set in the original order of self.policies
         results = [x for x in self.policies if x in results]
         return PolicyCollection(results, self.options)
@@ -150,6 +162,32 @@ class PolicyCollection:
                 'Resource type "{}" '
                 'did not match any policies.').format(resource_type))
 
+        return results
+
+    def _filter_by_modes(self, policies, modes):
+        """
+        Takes a list of policies and returns only those matching a given mode
+        """
+        if not modes:
+            return policies
+        results = []
+        for mode in modes:
+            result = self._filter_by_mode(policies, mode)
+            results.extend(x for x in result if x not in results)
+        return results
+
+    def _filter_by_mode(self, policies, mode):
+        """
+        Takes a list of policies and returns only those matching a given mode
+        """
+        results = []
+        for policy in policies:
+            if policy.get_execution_mode().type == mode:
+                results.append(policy)
+        if not results:
+            self.log.warning((
+                'Filter by modes type "{}" '
+                'did not match any policies.').format(mode))
         return results
 
     def __iter__(self):
@@ -359,6 +397,7 @@ class LambdaMode(ServerlessExecutionMode):
             'runtime': {'enum': ['python2.7', 'python3.6',
                                  'python3.7', 'python3.8', 'python3.9']},
             'role': {'type': 'string'},
+            'handler': {'type': 'string'},
             'pattern': {'type': 'object', 'minProperties': 1},
             'timeout': {'type': 'number'},
             'memory': {'type': 'number'},
@@ -855,18 +894,22 @@ class ConfigPollRuleMode(LambdaMode, PullMode):
     def run(self, event, lambda_context):
         cfg_event = json.loads(event['invokingEvent'])
         resource_type = self.policy.resource_manager.resource_type.cfn_type
-        resource_id = self.policy.resource_manager.resource_type.id
+        resource_id = self.policy.resource_manager.resource_type.config_id or \
+            self.policy.resource_manager.resource_type.id
         client = self._get_client()
         token = event.get('resultToken')
         cfg_rule_name = event['configRuleName']
         ordering_ts = cfg_event['notificationCreationTime']
+        policy_data = self.policy.data.copy()
+        policy_data.pop("filters", None)
 
         matched_resources = set()
+        unmatched_resources = set()
         for r in PullMode.run(self):
             matched_resources.add(r[resource_id])
-        unmatched_resources = set()
         for r in self.policy.resource_manager.get_resource_manager(
-                self.policy.resource_type).resources():
+                self.policy.resource_type,
+                policy_data).resources():
             if r[resource_id] not in matched_resources:
                 unmatched_resources.add(r[resource_id])
 
@@ -1100,20 +1143,16 @@ class Policy:
             self.resource_type, self.name, self.options.region)
 
     @property
-    def name(self):
+    def name(self) -> str:
         return self.data['name']
 
     @property
-    def resource_type(self):
+    def resource_type(self) -> str:
         return self.data['resource']
 
     @property
-    def provider_name(self):
-        if '.' in self.resource_type:
-            provider_name, resource_type = self.resource_type.split('.', 1)
-        else:
-            provider_name = 'aws'
-        return provider_name
+    def provider_name(self) -> str:
+        return get_policy_provider(self.data)
 
     def is_runnable(self, event=None):
         return self.conditions.evaluate(event)
@@ -1220,7 +1259,9 @@ class Policy:
         Updates the policy data in-place.
         """
         # format string values returns a copy
-        updated = utils.format_string_values(self.data, **variables)
+        var_fmt = VarFormat()
+        updated = utils.format_string_values(
+            self.data, formatter=var_fmt.format, **variables)
 
         # Several keys should only be expanded at runtime, perserve them.
         if 'member-role' in updated.get('mode', {}):
@@ -1228,6 +1269,10 @@ class Policy:
 
         # Update ourselves in place
         self.data = updated
+
+        # NOTE rebuild the policy conditions base on the new self.data
+        self.conditions = PolicyConditions(self, self.data)
+
         # Reload filters/actions using updated data, we keep a reference
         # for some compatiblity preservation work.
         m = self.resource_manager
@@ -1284,8 +1329,7 @@ class Policy:
             resources = mode.provision()
         else:
             resources = mode.run()
-        # clear out resource manager post run, to clear cache
-        self.resource_manager = self.load_resource_manager()
+
         return resources
 
     run = __call__

@@ -5,6 +5,8 @@ import time
 
 from gcp_common import BaseTest, event_data
 from googleapiclient.errors import HttpError
+from dateutil import parser
+from freezegun import freeze_time
 
 
 class SqlInstanceTest(BaseTest):
@@ -35,6 +37,12 @@ class SqlInstanceTest(BaseTest):
             session_factory=factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            p.resource_manager.get_urns(resources),
+            [
+                "gcp:sqladmin:us-central1:cloud-custodian:instance/brenttest-6",
+            ],
+        )
 
     def test_sqlinstance_get(self):
         factory = self.replay_flight_data('sqlinstance-get')
@@ -46,6 +54,34 @@ class SqlInstanceTest(BaseTest):
             {'project_id': 'cloud-custodian',
              'database_id': 'cloud-custodian:brenttest-2'})
         self.assertEqual(instance['state'], 'RUNNABLE')
+        self.assertEqual(
+            p.resource_manager.get_urns([instance]),
+            [
+                "gcp:sqladmin:us-central1:cloud-custodian:instance/brenttest-2",
+            ],
+        )
+
+    def test_sqlinstance_offhour(self):
+        project_id = "cloud-custodian"
+        factory = self.replay_flight_data("sqlinstance-offhour", project_id=project_id)
+        p = self.load_policy(
+            {
+                "name": "sql-offhour",
+                "resource": "gcp.sql-instance",
+                "filters": [
+                    {
+                        "type": "offhour",
+                        "default_tz": "utc",
+                        "offhour": 18,
+                        "tag": "custodian_offhours",
+                    }
+                ],
+            },
+            session_factory=factory,
+        )
+        with freeze_time(parser.parse("2022/09/01 02:15:00")):
+            resources = p.run()
+            self.assertEqual(len(resources), 1)
 
     def test_stop_instance(self):
         project_id = 'cloud-custodian'
@@ -160,6 +196,12 @@ class SqlUserTest(BaseTest):
 
         self.assertEqual(users[0]['name'], user_name)
         self.assertEqual(users[0][annotation_key]['name'], instance_name)
+        self.assertEqual(
+            policy.resource_manager.get_urns(users),
+            [
+                "gcp:sqladmin:us-central1:cloud-custodian:user/custodian-postgres/postgres",
+            ],
+        )
 
 
 class SqlBackupRunTest(BaseTest):
@@ -175,10 +217,17 @@ class SqlBackupRunTest(BaseTest):
              'resource': 'gcp.sql-backup-run'},
             session_factory=session_factory)
         parent_annotation_key = policy.resource_manager.resource_type.get_parent_annotation_key()
-        backup_run = policy.run()[0]
+        resources = policy.run()
+        backup_run = resources[0]
 
         self.assertEqual(backup_run['id'], backup_run_id)
         self.assertEqual(backup_run[parent_annotation_key]['name'], instance_name)
+        self.assertEqual(
+            policy.resource_manager.get_urns(resources),
+            [
+                "gcp:sqladmin:us-central1:cloud-custodian:backup-run/custodian-postgres/1555592400197",  # noqa: E501
+            ],
+        )
 
     def test_sqlbackuprun_get(self):
         backup_run_id = '1557489381417'
@@ -202,6 +251,12 @@ class SqlBackupRunTest(BaseTest):
 
         self.assertEqual(resources[0]['id'], backup_run_id)
         self.assertEqual(resources[0][parent_annotation_key]['name'], instance_name)
+        self.assertEqual(
+            policy.resource_manager.get_urns(resources),
+            [
+                "gcp:sqladmin:us-central1:cloud-custodian:backup-run/custodian-postgres/1557489381417",  # noqa: E501
+            ],
+        )
 
     def test_from_insert_time_to_id(self):
         insert_time = '2019-05-10T11:56:21.417Z'
@@ -231,10 +286,17 @@ class SqlSslCertTest(BaseTest):
              'resource': 'gcp.sql-ssl-cert'},
             session_factory=session_factory)
         parent_annotation_key = policy.resource_manager.resource_type.get_parent_annotation_key()
-        ssl_cert = policy.run()[0]
+        resources = policy.run()
+        ssl_cert = resources[0]
 
         self.assertEqual(ssl_cert['sha1Fingerprint'], ssl_cert_sha)
         self.assertEqual(ssl_cert[parent_annotation_key]['name'], instance_name)
+        self.assertEqual(
+            policy.resource_manager.get_urns(resources),
+            [
+                "gcp:sqladmin:us-central1:cloud-custodian:ssl-cert/custodian-postgres/62a43e710693b34d5fdb34911a656fd7a3b76cc7",  # noqa: E501
+            ],
+        )
 
     def test_sqlsslcet_get(self):
         ssl_cert_sha = '49a10ed7135e3171ce5e448cc785bc63b5b81e6c'
@@ -258,3 +320,9 @@ class SqlSslCertTest(BaseTest):
 
         self.assertEqual(resources[0]['sha1Fingerprint'], ssl_cert_sha)
         self.assertEqual(resources[0][parent_annotation_key]['name'], instance_name)
+        self.assertEqual(
+            policy.resource_manager.get_urns(resources),
+            [
+                "gcp:sqladmin:us-central1:cloud-custodian:ssl-cert/custodian-postgres/49a10ed7135e3171ce5e448cc785bc63b5b81e6c",  # noqa: E501
+            ],
+        )

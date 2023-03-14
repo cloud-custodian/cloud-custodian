@@ -111,7 +111,7 @@ class GCPMetricsFilter(Filter):
         self.reducer = self.data.get('reducer', 'REDUCE_NONE')
         self.group_by_fields = self.data.get('group-by-fields', [])
         self.missing_value = self.data.get('missing-value')
-        self.end = datetime.utcnow()
+        self.end = datetime.utcnow().replace(microsecond=0)
         self.start = self.end - duration
         self.period = str((self.end - self.start).total_seconds()) + 's'
         self.resource_metric_dict = {}
@@ -128,8 +128,8 @@ class GCPMetricsFilter(Filter):
         for batched_filter in self.get_batched_query_filter(resources):
             query_params = {
                 'filter': batched_filter,
-                'interval_startTime': self.start.isoformat(),
-                'interval_endTime': self.end.isoformat(),
+                'interval_startTime': self.start.isoformat() + 'Z',
+                'interval_endTime': self.end.isoformat() + 'Z',
                 'aggregation_alignmentPeriod': self.period,
                 "aggregation_perSeriesAligner": self.aligner,
                 "aggregation_crossSeriesReducer": self.reducer,

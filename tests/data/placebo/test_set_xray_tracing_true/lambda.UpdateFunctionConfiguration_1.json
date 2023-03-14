@@ -1,0 +1,33 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "FunctionName": "function1",
+        "FunctionArn": "arn:aws:lambda:us-east-1:1234567890:function:function1",
+        "Runtime": "python2.7",
+        "Role": "arn:aws:iam::124567890:role/lambdaToLogs",
+        "Handler": "lambda_function.handler",
+        "CodeSize": 648,
+        "Description": "",
+        "Timeout": 3,
+        "MemorySize": 128,
+        "LastModified": "2022-08-30T05:44:25.000+0000",
+        "CodeSha256": "bdHO4LM212345euK4MAbhonLEoXxppbY143gxzeu7alo=",
+        "Version": "$LATEST",
+        "TracingConfig": {
+            "Mode": "Active"
+        },
+        "RevisionId": "c709d6d7-12345-4445-12345-1eaa55164924",
+        "State": "Active",
+        "LastUpdateStatus": "InProgress",
+        "LastUpdateStatusReason": "The function is being created.",
+        "LastUpdateStatusReasonCode": "Creating",
+        "PackageType": "Zip",
+        "Architectures": [
+            "x86_64"
+        ],
+        "EphemeralStorage": {
+            "Size": 512
+        }
+    }
+}

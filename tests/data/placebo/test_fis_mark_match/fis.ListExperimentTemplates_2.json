@@ -1,0 +1,36 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "experimentTemplates": [
+            {
+                "id": "EXT2NuZ4Z1LDfqy2",
+                "description": "test-1",
+                "creationTime": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 8,
+                    "day": 17,
+                    "hour": 12,
+                    "minute": 53,
+                    "second": 44,
+                    "microsecond": 687000
+                },
+                "lastUpdateTime": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 8,
+                    "day": 17,
+                    "hour": 12,
+                    "minute": 53,
+                    "second": 44,
+                    "microsecond": 687000
+                },
+                "tags": {
+                    "custodian_cleanup": "Resource does not meet policy: delete@2022/08/29",
+                    "Name": "Shiney"
+                }
+            }
+        ]
+    }
+}

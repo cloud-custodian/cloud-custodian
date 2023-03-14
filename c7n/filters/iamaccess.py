@@ -72,7 +72,7 @@ class PolicyChecker:
 
     @property
     def whitelist_conditions(self):
-        return self.checker_config.get('whitelist_conditions', ())
+        return set(v.lower() for v in self.checker_config.get('whitelist_conditions', ()))
 
     @property
     def allowed_vpce(self):
@@ -209,10 +209,6 @@ class PolicyChecker:
         return s_cond
 
     # Condition handlers
-
-    # kms specific
-    def handle_kms_calleraccount(self, s, c):
-        return bool(set(map(_account, c['values'])).difference(self.allowed_accounts))
 
     # sns default policy
     def handle_aws_sourceowner(self, s, c):

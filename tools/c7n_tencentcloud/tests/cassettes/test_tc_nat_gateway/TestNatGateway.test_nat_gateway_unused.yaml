@@ -1,0 +1,103 @@
+interactions:
+- request:
+    body: '{"NatGatewayIds": ["nat-lf1cl2ne"], "Offset": 0, "Limit": 20}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '61'
+      Content-Type:
+      - application/json
+      Host:
+      - vpc.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - DescribeNatGateways
+      X-TC-Region:
+      - ap-singapore
+      X-TC-Version:
+      - '2017-03-12'
+    method: POST
+    uri: https://vpc.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: "{\n    \"Response\": {\n        \"NatGatewaySet\": [\n            {\n
+        \               \"NatGatewayId\": \"nat-lf1cl2ne\",\n                \"NatGatewayName\":
+        \"test\",\n                \"GatewayType\": \"HYPER\",\n                \"VpcId\":
+        \"vpc-7fyzh7ml\",\n                \"CreatedTime\": \"2022-09-29 23:28:28\",\n
+        \               \"State\": \"AVAILABLE\",\n                \"NetworkState\":
+        \"AVAILABLE\",\n                \"InternetMaxBandwidthOut\": 10,\n                \"MaxConcurrentConnection\":
+        1000000,\n                \"PublicIpAddressSet\": [\n                    {\n
+        \                       \"AddressId\": \"eip-m41810is\",\n                        \"PublicIpAddress\":
+        \"43.132.34.141\",\n                        \"IsBlocked\": false\n                    }\n
+        \               ],\n                \"DestinationIpPortTranslationNatRuleSet\":
+        [],\n                \"Zone\": \"ap-singapore-1\",\n                \"SourceIpTranslationNatRuleSet\":
+        [],\n                \"NatType\": \"NAT\",\n                \"NatProductVersion\":
+        1,\n                \"IsExclusive\": false,\n                \"RestrictState\":
+        \"NORMAL\",\n                \"TagSet\": [],\n                \"SharedCount\":
+        null,\n                \"DirectConnectGatewayIds\": [],\n                \"SubnetId\":
+        \"\",\n                \"SecurityGroupSet\": [],\n                \"ExclusiveGatewayBandwidth\":
+        null\n            }\n        ],\n        \"TotalCount\": 1,\n        \"RequestId\":
+        \"bea972db-0b0b-4b36-9759-9b1b899e3019\"\n    }\n}"
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '1392'
+      Content-Type:
+      - application/json
+      Date:
+      - Thu, 29 Sep 2022 07:41:53 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"ResourceList": ["qcs::vpc:ap-singapore:uin/100000750436:nat/nat-lf1cl2ne"]}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '77'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetResources
+      X-TC-Region:
+      - ap-singapore
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"","ResourceTagMappingList":[],"RequestId":"f642e023-0382-4596-9488-fd960ad43fbe"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '114'
+      Content-Type:
+      - application/json
+      Date:
+      - Thu, 29 Sep 2022 07:41:54 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+version: 1

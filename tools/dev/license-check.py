@@ -1,3 +1,5 @@
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 from importlib import metadata
 import sys
 
@@ -12,6 +14,7 @@ accept = (
     'MPL 2.0',
     'BSD-3-Clause',
     'Apache-2.0',
+    'Apache-2',
 )
 
 accept_classifiers = set(
@@ -22,6 +25,7 @@ accept_classifiers = set(
         'License :: OSI Approved :: MIT License',
         'License :: OSI Approved :: BSD License',
         'License :: OSI Approved :: Mozilla Public License 2.0 (MPL 2.0)',
+        'License :: Public Domain'
         #    'License :: OSI Approved :: GNU Library or Lesser General Public License (LGPL)'
     )
 )

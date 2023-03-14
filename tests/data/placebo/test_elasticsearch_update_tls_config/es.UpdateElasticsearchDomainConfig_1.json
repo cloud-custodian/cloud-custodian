@@ -1,0 +1,44 @@
+{
+    "status_code": 200, 
+    "data": {
+        "DomainStatus": {
+            "ElasticsearchClusterConfig": {
+                "DedicatedMasterEnabled": false, 
+                "InstanceCount": 1, 
+                "ZoneAwarenessEnabled": false, 
+                "InstanceType": "m4.large.elasticsearch"
+            }, 
+            "Endpoint": "vpc-test-es-7fwggtvvcqbcegsm5xxtdaob2a.us-east-1.es.amazonaws.com", 
+            "Created": true, 
+            "Deleted": true, 
+            "DomainName": "test-es", 
+            "EBSOptions": {
+                "VolumeSize": 20, 
+                "VolumeType": "gp2", 
+                "EBSEnabled": true
+            }, 
+            "SnapshotOptions": {
+                "AutomatedSnapshotStartHour": 0
+            }, 
+            "DomainId": "644160558196/test-es", 
+            "AccessPolicies": "", 
+            "Processing": true, 
+            "AdvancedOptions": {
+                "rest.action.multi.allow_explicit_index": "true"
+            }, 
+            "ElasticsearchVersion": "5.3", 
+            "ARN": "arn:aws:es:us-east-1:644160558196:domain/test-es"
+        }, 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "6cb8cf80-477b-11e7-afab-69ceea836cda", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "6cb8cf80-477b-11e7-afab-69ceea836cda", 
+                "date": "Fri, 02 Jun 2017 10:08:29 GMT", 
+                "content-length": "744", 
+                "content-type": "application/json"
+            }
+        }
+    }
+}

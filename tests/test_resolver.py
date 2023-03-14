@@ -11,6 +11,7 @@ from urllib.request import urlopen
 from .common import BaseTest, ACCOUNT_ID, Bag
 from .test_s3 import destroyBucket
 
+from c7n.cache import SqlKvCache
 from c7n.config import Config
 from c7n.resolver import ValuesFrom, URIResolver
 
@@ -30,6 +31,18 @@ class FakeCache:
         self.saves += 1
         self.state[pickle.dumps(key)] = data
 
+    def load(self):
+        return True
+
+    def close(self):
+        pass
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *args, **kw):
+        return
+
 
 class FakeResolver:
 
@@ -38,7 +51,7 @@ class FakeResolver:
             contents = contents.decode("utf8")
         self.contents = contents
 
-    def resolve(self, uri):
+    def resolve(self, uri, headers):
         return self.contents
 
 
@@ -63,7 +76,7 @@ class ResolverTest(BaseTest):
         cache = FakeCache()
         resolver = URIResolver(session_factory, cache)
         uri = "s3://%s/resource.json?RequestPayer=requestor" % bname
-        data = resolver.resolve(uri)
+        data = resolver.resolve(uri, {})
         self.assertEqual(content, data)
         self.assertEqual(list(cache.state.keys()), [pickle.dumps(("uri-resolver", uri))])
 
@@ -87,7 +100,19 @@ class ResolverTest(BaseTest):
             self.addCleanup(os.unlink, fh.name)
             fh.write(content)
             fh.flush()
-            self.assertEqual(resolver.resolve("file:%s" % fh.name), content)
+            self.assertEqual(resolver.resolve("file:%s" % fh.name, {'auth': 'token'}), content)
+
+
+def test_value_from_sqlkv(tmp_path):
+
+    kv = SqlKvCache(Bag(cache=tmp_path / "cache.db", cache_period=60))
+    config = Config.empty(account_id=ACCOUNT_ID)
+    mgr = Bag({"session_factory": None, "_cache": kv, "config": config})
+    values = ValuesFrom(
+        {"url": "moon", "expr": "[].bean", "format": "json"}, mgr)
+    values.resolver = FakeResolver(json.dumps([{"bean": "magic"}]))
+    assert values.get_values() == {"magic"}
+    assert values.get_values() == {"magic"}
 
 
 class UrlValueTest(BaseTest):

@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 from gcp_common import BaseTest
 from c7n_gcp.filters.metrics import GCPMetricsFilter
+from c7n.exceptions import PolicyValidationError
 
 
 class TestGCPMetricsFilter(BaseTest):
@@ -145,3 +146,58 @@ class TestSecurityComandCenterFindingsFilter(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
+
+class TestAlertsFilter(BaseTest):
+
+    def test_metric_has_alert(self):
+
+        session_factory = self.replay_flight_data("filter-alerts")
+
+        p = self.load_policy(
+            {
+                "name": "test-alerts",
+                "resource": "gcp.log-project-metric",
+                "filters": [{
+                    'type': 'value',
+                    'key': 'name',
+                    'value': 'test-metric-1'},
+                    {'type': 'alerts'}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_metric_has_no_alert(self):
+
+        session_factory = self.replay_flight_data("filter-alerts")
+
+        p = self.load_policy(
+            {
+                "name": "test-alerts",
+                "resource": "gcp.log-project-metric",
+                "filters": [{
+                    'type': 'value',
+                    'key': 'name',
+                    'value': 'test-metric-2'},
+                    {'type': 'alerts'}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
+    def test_alert_on_invalid_resource(self):
+
+        with self.assertRaises(PolicyValidationError):
+            self.load_policy(
+                {
+                    "name": "test-alerts",
+                    "resource": "gcp.bucket",
+                    "filters": [{
+                        'type': 'value',
+                        'key': 'name',
+                        'value': 'some-bucket'},
+                        {'type': 'alerts'}],
+                })

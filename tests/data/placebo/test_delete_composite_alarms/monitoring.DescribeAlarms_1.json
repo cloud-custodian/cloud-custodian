@@ -1,0 +1,53 @@
+{
+    "status_code": 200,
+    "data": {
+        "CompositeAlarms": [
+            {
+                "ActionsEnabled": true,
+                "AlarmActions": [
+                    "arn:aws:sns:us-east-1:644160558196:c7n-pratyush"
+                ],
+                "AlarmArn": "arn:aws:cloudwatch:us-east-1:644160558196:alarm:c7n-composite-alarm",
+                "AlarmConfigurationUpdatedTimestamp": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 10,
+                    "day": 31,
+                    "hour": 20,
+                    "minute": 17,
+                    "second": 1,
+                    "microsecond": 280000
+                },
+                "AlarmName": "c7n-composite-alarm",
+                "AlarmRule": "ALARM(\"c7n-test-alarm-tags-filter\")",
+                "InsufficientDataActions": [],
+                "OKActions": [],
+                "StateReason": "arn:aws:cloudwatch:us-east-1:644160558196:alarm:c7n-composite-alarm was created and its alarm rule evaluates to OK",
+                "StateReasonData": "{\"triggeringAlarms\":[{\"arn\":\"arn:aws:cloudwatch:us-east-1:644160558196:alarm:c7n-test-alarm-tags-filter\",\"state\":{\"value\":\"INSUFFICIENT_DATA\",\"timestamp\":\"2022-09-27T10:05:12.198+0000\"}}]}",
+                "StateUpdatedTimestamp": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 10,
+                    "day": 31,
+                    "hour": 20,
+                    "minute": 17,
+                    "second": 1,
+                    "microsecond": 280000
+                },
+                "StateValue": "OK",
+                "StateTransitionedTimestamp": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 10,
+                    "day": 31,
+                    "hour": 20,
+                    "minute": 17,
+                    "second": 1,
+                    "microsecond": 280000
+                }
+            }
+        ],
+        "MetricAlarms": [],
+        "ResponseMetadata": {}
+    }
+}

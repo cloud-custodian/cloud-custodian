@@ -2,26 +2,16 @@
     "status_code": 200,
     "data": {
         "Attributes": {
-            "Policy": "{\"Version\":\"2008-10-17\",\"Id\":\"__default_policy_ID\",\"Statement\":[{\"Sid\":\"__default_statement_ID\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"*\"},\"Action\":[\"SNS:GetTopicAttributes\",\"SNS:SetTopicAttributes\",\"SNS:AddPermission\",\"SNS:RemovePermission\",\"SNS:DeleteTopic\",\"SNS:Subscribe\",\"SNS:ListSubscriptionsByTopic\",\"SNS:Publish\",\"SNS:Receive\"],\"Resource\":\"arn:aws:sns:us-east-1:644160558196:c7n-pratyush\",\"Condition\":{\"StringEquals\":{\"AWS:SourceOwner\":\"644160558196\"}}}]}",
+            "Policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"InboundEvents\",\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"events.amazonaws.com\"},\"Action\":\"sns:Publish\",\"Resource\":\"arn:aws:sns:ap-northeast-2:644160558196:sandbox-relay\"}]}",
             "Owner": "644160558196",
             "SubscriptionsPending": "0",
-            "TopicArn": "arn:aws:sns:us-east-1:644160558196:c7n-pratyush",
+            "KmsMasterKeyId": "83a5b9da-e2ed-417c-b55b-894a75a8d140",
+            "TopicArn": "arn:aws:sns:ap-northeast-2:644160558196:sandbox-relay",
             "EffectiveDeliveryPolicy": "{\"http\":{\"defaultHealthyRetryPolicy\":{\"minDelayTarget\":20,\"maxDelayTarget\":20,\"numRetries\":3,\"numMaxDelayRetries\":0,\"numNoDelayRetries\":0,\"numMinDelayRetries\":0,\"backoffFunction\":\"linear\"},\"disableSubscriptionOverrides\":false}}",
-            "SubscriptionsConfirmed": "0",
+            "SubscriptionsConfirmed": "1",
             "DisplayName": "",
             "SubscriptionsDeleted": "0"
         },
-        "ResponseMetadata": {
-            "RequestId": "619a1dc2-41bd-5a22-8f16-48a828b6083d",
-            "HTTPStatusCode": 200,
-            "HTTPHeaders": {
-                "x-amzn-requestid": "619a1dc2-41bd-5a22-8f16-48a828b6083d",
-                "content-type": "text/xml",
-                "content-length": "2141",
-                "vary": "Accept-Encoding",
-                "date": "Thu, 30 May 2019 23:27:07 GMT"
-            },
-            "RetryAttempts": 0
-        }
+        "ResponseMetadata": {}
     }
 }

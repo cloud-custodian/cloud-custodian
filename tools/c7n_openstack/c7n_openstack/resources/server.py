@@ -1,3 +1,5 @@
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 from c7n_openstack.query import QueryResourceManager, TypeInfo
 from c7n_openstack.provider import resources
 from c7n.utils import local_session

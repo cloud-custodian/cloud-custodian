@@ -12,6 +12,7 @@ from urllib.parse import parse_qsl, urlparse
 import zlib
 from contextlib import closing
 
+from c7n.cache import NullCache
 from c7n.utils import format_string_values
 
 log = logging.getLogger('custodian.resolver')
@@ -25,21 +26,20 @@ class URIResolver:
         self.session_factory = session_factory
         self.cache = cache
 
-    def resolve(self, uri):
-        if self.cache:
-            contents = self.cache.get(("uri-resolver", uri))
-            if contents is not None:
-                return contents
+    def resolve(self, uri, headers):
+        contents = self.cache.get(("uri-resolver", uri))
+        if contents is not None:
+            return contents
 
         if uri.startswith('s3://'):
             contents = self.get_s3_uri(uri)
         else:
-            req = Request(uri, headers={"Accept-Encoding": "gzip"})
+            headers.update({"Accept-Encoding": "gzip"})
+            req = Request(uri, headers=headers)
             with closing(urlopen(req)) as response:  # nosec nosemgrep
                 contents = self.handle_response_encoding(response)
 
-        if self.cache:
-            self.cache.save(("uri-resolver", uri), contents)
+        self.cache.save(("uri-resolver", uri), contents)
         return contents
 
     def handle_response_encoding(self, response):
@@ -52,12 +52,13 @@ class URIResolver:
 
     def get_s3_uri(self, uri):
         parsed = urlparse(uri)
-        client = self.session_factory().client('s3')
         params = dict(
             Bucket=parsed.netloc,
             Key=parsed.path[1:])
         if parsed.query:
             params.update(dict(parse_qsl(parsed.query)))
+        region = params.pop('region', None)
+        client = self.session_factory().client('s3', region_name=region)
         result = client.get_object(**params)
         body = result['Body'].read()
         if isinstance(body, str):
@@ -90,6 +91,8 @@ class ValuesFrom:
          url: http://foobar.com/mydata
          format: json
          expr: Region."us-east-1"[].ImageId
+         headers:
+            authorization: my-token
 
       value_from:
          url: s3://bucket/abc/foo.csv
@@ -111,7 +114,13 @@ class ValuesFrom:
             'format': {'enum': ['csv', 'json', 'txt', 'csv2dict']},
             'expr': {'oneOf': [
                 {'type': 'integer'},
-                {'type': 'string'}]}
+                {'type': 'string'}]},
+            'headers': {
+                'type': 'object',
+                'patternProperties': {
+                    '': {'type': 'string'},
+                },
+            },
         }
     }
 
@@ -122,8 +131,8 @@ class ValuesFrom:
         }
         self.data = format_string_values(data, **config_args)
         self.manager = manager
-        self.cache = manager._cache
-        self.resolver = URIResolver(manager.session_factory, manager._cache)
+        self.cache = manager._cache or NullCache({})
+        self.resolver = URIResolver(manager.session_factory, self.cache)
 
     def get_contents(self):
         _, format = os.path.splitext(self.data['url'])
@@ -137,23 +146,27 @@ class ValuesFrom:
             raise ValueError(
                 "Unsupported format %s for url %s",
                 format, self.data['url'])
-        contents = str(self.resolver.resolve(self.data['url']))
+
+        params = dict(
+            uri=self.data.get('url'),
+            headers=self.data.get('headers', {})
+        )
+        
+        contents = str(self.resolver.resolve(**params))
         return contents, format
 
     def get_values(self):
-        if self.cache:
+        key = [self.data.get(i) for i in ('url', 'format', 'expr', 'headers')]
+        with self.cache:
             # use these values as a key to cache the result so if we have
             # the same filter happening across many resources, we can reuse
             # the results.
-            key = [self.data.get(i) for i in ('url', 'format', 'expr')]
             contents = self.cache.get(("value-from", key))
             if contents is not None:
                 return contents
-
-        contents = self._get_values()
-        if self.cache:
+            contents = self._get_values()
             self.cache.save(("value-from", key), contents)
-        return contents
+            return contents
 
     def _get_values(self):
         contents, format = self.get_contents()

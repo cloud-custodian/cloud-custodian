@@ -1,0 +1,57 @@
+{
+    "status_code": 200,
+    "data": {
+        "DBProxies": [
+            {
+                "DBProxyName": "test-us-east-1-db-proxy",
+                "DBProxyArn": "arn:aws:rds:us-east-1:644160558196:db-proxy:prx-09e4477de0da790ce",
+                "Status": "available",
+                "EngineFamily": "MYSQL",
+                "VpcId": "vpc-04cd95c6a2828abab",
+                "VpcSecurityGroupIds": [
+                    "sg-05af3cdf23e868cdd"
+                ],
+                "VpcSubnetIds": [
+                    "subnet-0bec06ab9e469cff3",
+                    "subnet-02d285427741ad550",
+                    "subnet-05478ee5be650ae65",
+                    "subnet-0b92796f6f53a1a91",
+                    "subnet-033242732f3f5370c"
+                ],
+                "Auth": [
+                    {
+                        "AuthScheme": "SECRETS",
+                        "SecretArn": "arn:aws:secretsmanager:us-east-1:644160558196:secret:test-ggliKp",
+                        "IAMAuth": "DISABLED"
+                    }
+                ],
+                "RoleArn": "arn:aws:iam::644160558196:role/PolicyEngineV2Role",
+                "Endpoint": "test-us-east-1-db-proxy.proxy-c8kkfdncthuv.us-east-1.rds.amazonaws.com",
+                "RequireTLS": false,
+                "IdleClientTimeout": 5400,
+                "DebugLogging": false,
+                "CreatedDate": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 10,
+                    "day": 7,
+                    "hour": 18,
+                    "minute": 22,
+                    "second": 31,
+                    "microsecond": 544000
+                },
+                "UpdatedDate": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 10,
+                    "day": 7,
+                    "hour": 18,
+                    "minute": 46,
+                    "second": 21,
+                    "microsecond": 138000
+                }
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

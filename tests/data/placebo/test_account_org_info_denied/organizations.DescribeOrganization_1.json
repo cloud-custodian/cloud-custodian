@@ -1,0 +1,11 @@
+{
+    "status_code": 403,
+    "data": {
+        "Error": {
+            "Message": "not authorized",
+            "Code": "AccessDeniedException"
+        },
+        "ResponseMetadata": {},
+        "message": "not authorized"
+    }
+}

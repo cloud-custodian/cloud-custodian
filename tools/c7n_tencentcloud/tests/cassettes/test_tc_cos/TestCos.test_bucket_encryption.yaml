@@ -1,0 +1,555 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - !!binary |
+        Y29zLXB5dGhvbi1zZGstdjUuMS45LjIx
+    method: GET
+    uri: https://service.cos.myqcloud.com/
+  response:
+    body:
+      string: "<ListAllMyBucketsResult>\n\t<Owner>\n\t\t<ID>qcs::cam::uin/100000750436:uin/100000750436</ID>\n\t\t<DisplayName>100000750436</DisplayName>\n\t</Owner>\n\t<Buckets>\n\t\t<Bucket>\n\t\t\t<Name>123123-1253831162</Name>\n\t\t\t<Location>sa-saopaulo</Location>\n\t\t\t<CreationDate>2022-01-20T23:13:19Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>234-1253831162</Name>\n\t\t\t<Location>ap-beijing</Location>\n\t\t\t<CreationDate>2019-02-27T20:55:05Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>3123123132-1253831162</Name>\n\t\t\t<Location>na-siliconvalley</Location>\n\t\t\t<CreationDate>2022-05-26T06:17:31Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>42342-1253831162</Name>\n\t\t\t<Location>ap-singapore</Location>\n\t\t\t<CreationDate>2022-07-06T01:34:32Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>9-1253831162</Name>\n\t\t\t<Location>ap-nanjing</Location>\n\t\t\t<CreationDate>2022-05-14T03:42:44Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>aaa-1253831162</Name>\n\t\t\t<Location>ap-chongqing</Location>\n\t\t\t<CreationDate>2022-05-27T05:38:57Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>aliu-roblox-migration-bucket-gz-1253831162</Name>\n\t\t\t<Location>ap-guangzhou</Location>\n\t\t\t<CreationDate>2021-03-17T23:20:04Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>aliu-roblox-useast-bucket1-1253831162</Name>\n\t\t\t<Location>na-ashburn</Location>\n\t\t\t<CreationDate>2021-03-19T16:50:54Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>ametek-qidian-1253831162</Name>\n\t\t\t<Location>ap-shanghai</Location>\n\t\t\t<CreationDate>2021-05-23T17:33:11Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>appidtest-1253831162</Name>\n\t\t\t<Location>na-siliconvalley</Location>\n\t\t\t<CreationDate>2022-06-02T17:19:43Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>artcenter-1253831162</Name>\n\t\t\t<Location>ap-shanghai</Location>\n\t\t\t<CreationDate>2020-09-03T02:51:34Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>barry-bj-1253831162</Name>\n\t\t\t<Location>ap-beijing</Location>\n\t\t\t<CreationDate>2020-08-24T05:21:41Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>barry-hk-test-1253831162</Name>\n\t\t\t<Location>ap-hongkong</Location>\n\t\t\t<CreationDate>2020-02-10T03:46:47Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>benchmark-1253831162</Name>\n\t\t\t<Location>ap-guangzhou</Location>\n\t\t\t<CreationDate>2018-07-19T23:58:41Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>billdatademo-1253831162</Name>\n\t\t\t<Location>na-siliconvalley</Location>\n\t\t\t<CreationDate>2020-07-31T23:45:54Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>bucket1-1253831162</Name>\n\t\t\t<Location>ap-beijing</Location>\n\t\t\t<CreationDate>2018-02-22T22:21:54Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>captcha-1253831162</Name>\n\t\t\t<Location>na-siliconvalley</Location>\n\t\t\t<CreationDate>2021-03-08T00:43:18Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>cgueaglegz-1253831162</Name>\n\t\t\t<Location>ap-guangzhou</Location>\n\t\t\t<CreationDate>2019-08-29T21:04:21Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>cguinput-1253831162</Name>\n\t\t\t<Location>ap-shanghai</Location>\n\t\t\t<CreationDate>2020-02-12T01:56:40Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>cguoutput-1253831162</Name>\n\t\t\t<Location>ap-shanghai</Location>\n\t\t\t<CreationDate>2020-02-12T01:57:01Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>cgusv-1253831162</Name>\n\t\t\t<Location>na-siliconvalley</Location>\n\t\t\t<CreationDate>2019-08-29T20:41:39Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>cgutest-1253831162</Name>\n\t\t\t<Location>na-siliconvalley</Location>\n\t\t\t<CreationDate>2019-12-17T17:22:38Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>cguuse-1253831162</Name>\n\t\t\t<Location>na-ashburn</Location>\n\t\t\t<CreationDate>2020-06-21T06:36:20Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>cgvsvoutput-1253831162</Name>\n\t\t\t<Location>na-siliconvalley</Location>\n\t\t\t<CreationDate>2020-02-28T00:54:08Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>cls-test-1253831162</Name>\n\t\t\t<Location>na-siliconvalley</Location>\n\t\t\t<CreationDate>2022-04-19T20:03:54Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>codm-1253831162</Name>\n\t\t\t<Location>na-siliconvalley</Location>\n\t\t\t<CreationDate>2020-08-04T07:41:33Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>cos-clb-log-sv-test-rma-1253831162</Name>\n\t\t\t<Location>na-siliconvalley</Location>\n\t\t\t<CreationDate>2021-08-28T16:42:22Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>cos-demo-1253831162</Name>\n\t\t\t<Location>eu-frankfurt</Location>\n\t\t\t<CreationDate>2019-12-18T04:35:53Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>cos-syshin-test-1253831162</Name>\n\t\t\t<Location>ap-seoul</Location>\n\t\t\t<CreationDate>2019-12-18T07:18:58Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>cos-tf-state-1253831162</Name>\n\t\t\t<Location>na-siliconvalley</Location>\n\t\t\t<CreationDate>2021-12-23T22:31:42Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>custodian-test-1253831162</Name>\n\t\t\t<Location>ap-singapore</Location>\n\t\t\t<CreationDate>2022-10-12T08:00:27Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>ddd-1253831162</Name>\n\t\t\t<Location>ap-singapore</Location>\n\t\t\t<CreationDate>2020-03-20T07:05:34Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>demo-ds-1253831162</Name>\n\t\t\t<Location>na-toronto</Location>\n\t\t\t<CreationDate>2020-03-30T17:15:55Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>demo-ds-china-1253831162</Name>\n\t\t\t<Location>ap-chengdu</Location>\n\t\t\t<CreationDate>2020-03-30T17:16:35Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>dniraula-lab-bucket1-1253831162</Name>\n\t\t\t<Location>na-siliconvalley</Location>\n\t\t\t<CreationDate>2019-09-16T21:38:49Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>dogtest-1253831162</Name>\n\t\t\t<Location>ap-shanghai</Location>\n\t\t\t<CreationDate>2018-07-16T18:07:07Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>donie-1253831162</Name>\n\t\t\t<Location>ap-shanghai</Location>\n\t\t\t<CreationDate>2019-03-08T09:30:31Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>donie-india-1253831162</Name>\n\t\t\t<Location>ap-mumbai</Location>\n\t\t\t<CreationDate>2020-03-27T15:25:34Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>donienj-1253831162</Name>\n\t\t\t<Location>ap-nanjing</Location>\n\t\t\t<CreationDate>2020-04-26T07:30:00Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>doniesa-1253831162</Name>\n\t\t\t<Location>sa-saopaulo</Location>\n\t\t\t<CreationDate>2022-04-15T01:57:39Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>doniesg-1253831162</Name>\n\t\t\t<Location>ap-singapore</Location>\n\t\t\t<CreationDate>2022-04-15T01:59:07Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>donietest-1253831162</Name>\n\t\t\t<Location>ap-shanghai</Location>\n\t\t\t<CreationDate>2020-05-12T12:40:58Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>dstwed-1253831162</Name>\n\t\t\t<Location>sa-saopaulo</Location>\n\t\t\t<CreationDate>2022-07-19T01:32:02Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>efcos-eu-1253831162</Name>\n\t\t\t<Location>eu-frankfurt</Location>\n\t\t\t<CreationDate>2019-01-14T07:41:15Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>efcos-sh-1253831162</Name>\n\t\t\t<Location>ap-shanghai</Location>\n\t\t\t<CreationDate>2019-01-14T07:40:42Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>fu-test-1253831162</Name>\n\t\t\t<Location>ap-tokyo</Location>\n\t\t\t<CreationDate>2020-02-05T07:47:03Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>futest-1253831162</Name>\n\t\t\t<Location>ap-tokyo</Location>\n\t\t\t<CreationDate>2020-03-31T04:06:55Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>guifa-flkf-bk01-1253831162</Name>\n\t\t\t<Location>eu-frankfurt</Location>\n\t\t\t<CreationDate>2022-03-10T07:18:49Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>guifa-msk-bk01-1253831162</Name>\n\t\t\t<Location>eu-moscow</Location>\n\t\t\t<CreationDate>2022-03-10T07:14:32Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>hang-1253831162</Name>\n\t\t\t<Location>na-toronto</Location>\n\t\t\t<CreationDate>2022-09-13T13:48:45Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>hangsh-1253831162</Name>\n\t\t\t<Location>ap-shanghai</Location>\n\t\t\t<CreationDate>2022-09-13T15:19:49Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>hangtest-1253831162</Name>\n\t\t\t<Location>na-toronto</Location>\n\t\t\t<CreationDate>2022-06-13T15:08:31Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>hank852-1253831162</Name>\n\t\t\t<Location>ap-hongkong</Location>\n\t\t\t<CreationDate>2022-09-28T02:30:42Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>hankjhhuang-1253831162</Name>\n\t\t\t<Location>na-siliconvalley</Location>\n\t\t\t<CreationDate>2022-09-28T01:26:02Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>hult-test-1253831162</Name>\n\t\t\t<Location>ap-shanghai</Location>\n\t\t\t<CreationDate>2021-10-14T05:26:39Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>intl-sa-1253831162</Name>\n\t\t\t<Location>na-siliconvalley</Location>\n\t\t\t<CreationDate>2019-09-26T02:18:34Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>intl-tencentcloud-1253831162</Name>\n\t\t\t<Location>na-siliconvalley</Location>\n\t\t\t<CreationDate>2020-03-29T07:10:33Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>iqi-medio-test-1253831162</Name>\n\t\t\t<Location>na-toronto</Location>\n\t\t\t<CreationDate>2022-11-14T18:13:46Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>james1-1253831162</Name>\n\t\t\t<Location>ap-beijing-1</Location>\n\t\t\t<CreationDate>2017-07-18T20:40:56Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>jenkins-test-1253831162</Name>\n\t\t\t<Location>na-siliconvalley</Location>\n\t\t\t<CreationDate>2022-01-10T18:56:44Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>jimmy-1253831162</Name>\n\t\t\t<Location>ap-tokyo</Location>\n\t\t\t<CreationDate>2020-04-23T15:24:58Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>jjohnson-1253831162</Name>\n\t\t\t<Location>na-siliconvalley</Location>\n\t\t\t<CreationDate>2019-08-14T18:23:50Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>jliao-1253831162</Name>\n\t\t\t<Location>na-siliconvalley</Location>\n\t\t\t<CreationDate>2021-08-23T14:29:17Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>jliao-eu-frankfurt-1253831162</Name>\n\t\t\t<Location>eu-frankfurt</Location>\n\t\t\t<CreationDate>2022-04-08T03:46:01Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>jliao-practice1-1253831162</Name>\n\t\t\t<Location>na-siliconvalley</Location>\n\t\t\t<CreationDate>2021-10-14T14:50:45Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>jliao-receiver-1253831162</Name>\n\t\t\t<Location>ap-guangzhou</Location>\n\t\t\t<CreationDate>2022-05-03T03:53:01Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>kensen-1253831162</Name>\n\t\t\t<Location>ap-hongkong</Location>\n\t\t\t<CreationDate>2020-03-08T08:18:52Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>kensen-th-1253831162</Name>\n\t\t\t<Location>ap-bangkok</Location>\n\t\t\t<CreationDate>2020-08-27T08:28:36Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>kr-cos-nx-1253831162</Name>\n\t\t\t<Location>ap-seoul</Location>\n\t\t\t<CreationDate>2019-12-19T06:02:42Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>lagardere-1253831162</Name>\n\t\t\t<Location>na-siliconvalley</Location>\n\t\t\t<CreationDate>2018-06-27T23:39:18Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>lagarderetest-1253831162</Name>\n\t\t\t<Location>ap-shanghai</Location>\n\t\t\t<CreationDate>2018-06-27T18:45:33Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>lukemo-1253831162</Name>\n\t\t\t<Location>eu-moscow</Location>\n\t\t\t<CreationDate>2022-03-10T03:51:50Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>master-bucket-1253831162</Name>\n\t\t\t<Location>na-siliconvalley</Location>\n\t\t\t<CreationDate>2022-06-02T23:44:33Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>migrate-test-1253831162</Name>\n\t\t\t<Location>eu-moscow</Location>\n\t\t\t<CreationDate>2022-03-09T06:43:30Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>millipore-1253831162</Name>\n\t\t\t<Location>ap-shanghai</Location>\n\t\t\t<CreationDate>2019-05-14T08:08:54Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>minzetest-1253831162</Name>\n\t\t\t<Location>sa-saopaulo</Location>\n\t\t\t<CreationDate>2022-06-21T02:52:31Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>montreal-test-1253831162</Name>\n\t\t\t<Location>na-toronto</Location>\n\t\t\t<CreationDate>2022-11-11T13:33:06Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>mps-demo-input-1253831162</Name>\n\t\t\t<Location>ap-guangzhou</Location>\n\t\t\t<CreationDate>2020-02-12T00:19:51Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>mps-demo-output-1253831162</Name>\n\t\t\t<Location>ap-guangzhou</Location>\n\t\t\t<CreationDate>2020-02-12T00:18:27Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>mps-demo-raw-1253831162</Name>\n\t\t\t<Location>na-siliconvalley</Location>\n\t\t\t<CreationDate>2020-03-04T21:44:30Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>mps-raw-1253831162</Name>\n\t\t\t<Location>ap-chengdu</Location>\n\t\t\t<CreationDate>2020-03-04T21:41:39Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>mps-source-1253831162</Name>\n\t\t\t<Location>ap-guangzhou</Location>\n\t\t\t<CreationDate>2020-02-12T07:17:58Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>mpsdemo01-1253831162</Name>\n\t\t\t<Location>na-siliconvalley</Location>\n\t\t\t<CreationDate>2021-06-28T19:37:25Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>nelsonzha-1253831162</Name>\n\t\t\t<Location>ap-shanghai</Location>\n\t\t\t<CreationDate>2020-03-30T06:56:04Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>paloalto-firewall-1253831162</Name>\n\t\t\t<Location>na-ashburn</Location>\n\t\t\t<CreationDate>2022-10-18T01:37:00Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>paloaltofwimage-1253831162</Name>\n\t\t\t<Location>na-siliconvalley</Location>\n\t\t\t<CreationDate>2022-10-25T18:00:17Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>pan-fw-vm-kvm-904-1253831162</Name>\n\t\t\t<Location>sa-saopaulo</Location>\n\t\t\t<CreationDate>2022-10-18T00:53:58Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>picsart-poc-1253831162</Name>\n\t\t\t<Location>ap-shanghai</Location>\n\t\t\t<CreationDate>2019-11-24T15:25:27Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>prometheus-prom-76jo0pw5-data-1253831162</Name>\n\t\t\t<Location>ap-shanghai</Location>\n\t\t\t<CreationDate>2021-12-13T16:37:40Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>qlab-1253831162</Name>\n\t\t\t<Location>ap-guangzhou</Location>\n\t\t\t<CreationDate>2019-07-29T21:29:23Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>qlab2-1253831162</Name>\n\t\t\t<Location>na-ashburn</Location>\n\t\t\t<CreationDate>2019-07-29T21:46:58Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>qlab3-1253831162</Name>\n\t\t\t<Location>ap-hongkong</Location>\n\t\t\t<CreationDate>2019-07-29T21:52:46Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>replica-bucket-1253831162</Name>\n\t\t\t<Location>na-toronto</Location>\n\t\t\t<CreationDate>2022-06-02T23:44:18Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>rice-1253831162</Name>\n\t\t\t<Location>ap-shanghai</Location>\n\t\t\t<CreationDate>2020-08-19T12:54:18Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>riot-test-1253831162</Name>\n\t\t\t<Location>na-siliconvalley</Location>\n\t\t\t<CreationDate>2020-08-28T05:37:48Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>roblox-demo-1253831162</Name>\n\t\t\t<Location>na-siliconvalley</Location>\n\t\t\t<CreationDate>2021-01-27T10:14:03Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>robloxdemo-1253831162</Name>\n\t\t\t<Location>ap-hongkong</Location>\n\t\t\t<CreationDate>2021-01-27T02:38:09Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>russelltest-1253831162</Name>\n\t\t\t<Location>na-ashburn</Location>\n\t\t\t<CreationDate>2018-06-26T17:23:10Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>russzen-1253831162</Name>\n\t\t\t<Location>ap-guangzhou</Location>\n\t\t\t<CreationDate>2018-05-10T18:30:07Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>russzen2-1253831162</Name>\n\t\t\t<Location>na-toronto</Location>\n\t\t\t<CreationDate>2018-05-10T19:52:17Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>russzen3-1253831162</Name>\n\t\t\t<Location>na-ashburn</Location>\n\t\t\t<CreationDate>2018-05-10T22:34:52Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>savannah-college-1253831162</Name>\n\t\t\t<Location>na-siliconvalley</Location>\n\t\t\t<CreationDate>2020-08-17T16:36:04Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>sgluke-1253831162</Name>\n\t\t\t<Location>ap-singapore</Location>\n\t\t\t<CreationDate>2022-09-13T03:59:05Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>shanghai1-1253831162</Name>\n\t\t\t<Location>ap-shanghai</Location>\n\t\t\t<CreationDate>2020-07-07T05:45:23Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>simhub-chart-repo-1253831162</Name>\n\t\t\t<Location>na-ashburn</Location>\n\t\t\t<CreationDate>2019-06-05T00:35:30Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>simhubdata-1253831162</Name>\n\t\t\t<Location>na-siliconvalley</Location>\n\t\t\t<CreationDate>2019-12-19T09:53:02Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>spinnaker-1253831162</Name>\n\t\t\t<Location>na-siliconvalley</Location>\n\t\t\t<CreationDate>2022-10-18T08:09:52Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>spinnaker-test-1253831162</Name>\n\t\t\t<Location>na-siliconvalley</Location>\n\t\t\t<CreationDate>2022-10-11T08:05:01Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>splunk-test-1253831162</Name>\n\t\t\t<Location>ap-guangzhou</Location>\n\t\t\t<CreationDate>2021-06-19T05:26:55Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>suse-image-1253831162</Name>\n\t\t\t<Location>na-siliconvalley</Location>\n\t\t\t<CreationDate>2022-03-07T21:13:27Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>sv-mps-demo-input-1253831162</Name>\n\t\t\t<Location>na-siliconvalley</Location>\n\t\t\t<CreationDate>2020-02-25T23:27:33Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>sv-mps-demo-output-1253831162</Name>\n\t\t\t<Location>na-siliconvalley</Location>\n\t\t\t<CreationDate>2020-02-25T23:28:08Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>tc-global-terraform-state-1253831162</Name>\n\t\t\t<Location>na-siliconvalley</Location>\n\t\t\t<CreationDate>2022-08-26T05:03:14Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>tc-minze-tes-1253831162</Name>\n\t\t\t<Location>ap-hongkong</Location>\n\t\t\t<CreationDate>2022-05-04T17:45:30Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>tcbillpush-1253831162</Name>\n\t\t\t<Location>na-siliconvalley</Location>\n\t\t\t<CreationDate>2020-08-14T22:32:15Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>tci-test-1253831162</Name>\n\t\t\t<Location>ap-tokyo</Location>\n\t\t\t<CreationDate>2022-11-25T06:38:59Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>tci-test-tokyo-1253831162</Name>\n\t\t\t<Location>ap-tokyo</Location>\n\t\t\t<CreationDate>2022-11-25T07:11:37Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>tcr-07ss0ipw-1253831162</Name>\n\t\t\t<Location>na-siliconvalley</Location>\n\t\t\t<CreationDate>2021-10-29T07:34:54Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>tcr-2akkg1yo-1253831162</Name>\n\t\t\t<Location>ap-singapore</Location>\n\t\t\t<CreationDate>2020-08-19T10:06:41Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>tcr-2ly9ygdv-1253831162</Name>\n\t\t\t<Location>ap-shanghai</Location>\n\t\t\t<CreationDate>2021-10-29T07:25:00Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>tcr-31zc4umg-1253831162</Name>\n\t\t\t<Location>na-siliconvalley</Location>\n\t\t\t<CreationDate>2021-11-02T16:45:07Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>tcr-3d01u72k-1253831162</Name>\n\t\t\t<Location>na-siliconvalley</Location>\n\t\t\t<CreationDate>2022-08-05T17:10:47Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>tcr-a9uugebu-1253831162</Name>\n\t\t\t<Location>na-siliconvalley</Location>\n\t\t\t<CreationDate>2021-11-02T17:39:01Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>tcr-awszy28y-1253831162</Name>\n\t\t\t<Location>na-siliconvalley</Location>\n\t\t\t<CreationDate>2021-10-29T13:24:51Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>tcr-bdviln6g-1253831162</Name>\n\t\t\t<Location>ap-hongkong</Location>\n\t\t\t<CreationDate>2020-08-19T05:15:09Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>tcr-bsp6e2c2-1253831162</Name>\n\t\t\t<Location>eu-frankfurt</Location>\n\t\t\t<CreationDate>2021-11-03T15:19:28Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>tcr-cg359xhs-1253831162</Name>\n\t\t\t<Location>ap-hongkong</Location>\n\t\t\t<CreationDate>2020-08-19T08:35:11Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>tcr-cguc6m2c-1253831162</Name>\n\t\t\t<Location>ap-singapore</Location>\n\t\t\t<CreationDate>2022-10-26T10:52:53Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>tcr-donv9x0x-1253831162</Name>\n\t\t\t<Location>ap-shanghai</Location>\n\t\t\t<CreationDate>2020-05-27T08:23:35Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>tcr-ef36t1qa-1253831162</Name>\n\t\t\t<Location>na-siliconvalley</Location>\n\t\t\t<CreationDate>2021-11-02T19:54:13Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>tcr-g6xi19ni-1253831162</Name>\n\t\t\t<Location>ap-singapore</Location>\n\t\t\t<CreationDate>2020-08-19T04:02:26Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>tcr-h20w4tj1-1253831162</Name>\n\t\t\t<Location>ap-shanghai</Location>\n\t\t\t<CreationDate>2022-10-24T09:39:47Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>tcr-hdlji2vi-1253831162</Name>\n\t\t\t<Location>na-siliconvalley</Location>\n\t\t\t<CreationDate>2022-01-09T18:42:06Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>tcr-k50ytl1w-1253831162</Name>\n\t\t\t<Location>eu-frankfurt</Location>\n\t\t\t<CreationDate>2021-10-27T11:31:23Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>tcr-n6uu428a-1253831162</Name>\n\t\t\t<Location>na-siliconvalley</Location>\n\t\t\t<CreationDate>2021-11-03T15:32:26Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>tcr-p7m58hbg-1253831162</Name>\n\t\t\t<Location>na-siliconvalley</Location>\n\t\t\t<CreationDate>2021-11-02T20:09:58Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>tcr-q1d20ypg-1253831162</Name>\n\t\t\t<Location>ap-singapore</Location>\n\t\t\t<CreationDate>2020-08-19T07:59:00Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>tcr-qe0sbr00-1253831162</Name>\n\t\t\t<Location>ap-singapore</Location>\n\t\t\t<CreationDate>2020-08-19T07:57:28Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>tcr-re0x5f46-1253831162</Name>\n\t\t\t<Location>na-siliconvalley</Location>\n\t\t\t<CreationDate>2022-08-06T15:00:13Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>tcr-rgyzhyli-1253831162</Name>\n\t\t\t<Location>na-siliconvalley</Location>\n\t\t\t<CreationDate>2022-01-11T18:07:48Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>tencentcloud-intl-1253831162</Name>\n\t\t\t<Location>ap-shanghai</Location>\n\t\t\t<CreationDate>2019-08-01T02:50:19Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>tencentcloud-weee-1253831162</Name>\n\t\t\t<Location>ap-shanghai</Location>\n\t\t\t<CreationDate>2020-05-14T03:25:30Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>tencentunited-1253831162</Name>\n\t\t\t<Location>ap-guangzhou</Location>\n\t\t\t<CreationDate>2018-05-31T17:40:19Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>test-1253831162</Name>\n\t\t\t<Location>ap-beijing</Location>\n\t\t\t<CreationDate>2018-01-15T18:42:36Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>test-audit-1253831162</Name>\n\t\t\t<Location>ap-shanghai</Location>\n\t\t\t<CreationDate>2019-08-14T20:39:52Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>test-th-1253831162</Name>\n\t\t\t<Location>ap-bangkok</Location>\n\t\t\t<CreationDate>2020-09-09T02:59:20Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>test0831-1253831162</Name>\n\t\t\t<Location>eu-moscow</Location>\n\t\t\t<CreationDate>2022-08-31T07:07:48Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>test124-1253831162</Name>\n\t\t\t<Location>sa-saopaulo</Location>\n\t\t\t<CreationDate>2022-07-18T18:49:15Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>test43456789-1253831162</Name>\n\t\t\t<Location>na-toronto</Location>\n\t\t\t<CreationDate>2022-05-04T18:11:48Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>testbucket-1253831162</Name>\n\t\t\t<Location>ap-shanghai</Location>\n\t\t\t<CreationDate>2018-07-17T07:11:19Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>testfa-1253831162</Name>\n\t\t\t<Location>eu-frankfurt</Location>\n\t\t\t<CreationDate>2022-03-10T03:52:26Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>testtest-1253831162</Name>\n\t\t\t<Location>ap-singapore</Location>\n\t\t\t<CreationDate>2022-11-01T15:16:52Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>tfbacktest-1253831162</Name>\n\t\t\t<Location>na-siliconvalley</Location>\n\t\t\t<CreationDate>2022-06-01T00:17:23Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>tfbackup-1253831162</Name>\n\t\t\t<Location>ap-guangzhou</Location>\n\t\t\t<CreationDate>2022-06-01T00:10:20Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>tiviity-tc-1253831162</Name>\n\t\t\t<Location>na-siliconvalley</Location>\n\t\t\t<CreationDate>2018-04-06T18:01:38Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>trtc-demo-ralph-1253831162</Name>\n\t\t\t<Location>na-siliconvalley</Location>\n\t\t\t<CreationDate>2021-07-01T01:39:43Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>ttram-1253831162</Name>\n\t\t\t<Location>ap-guangzhou</Location>\n\t\t\t<CreationDate>2017-11-29T21:40:28Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>umich-1253831162</Name>\n\t\t\t<Location>ap-shanghai</Location>\n\t\t\t<CreationDate>2020-08-18T08:14:52Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>vm-mig-test-1253831162</Name>\n\t\t\t<Location>ap-shanghai</Location>\n\t\t\t<CreationDate>2020-07-22T07:40:28Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>windowsimage-hk-1253831162</Name>\n\t\t\t<Location>ap-hongkong</Location>\n\t\t\t<CreationDate>2020-12-10T22:21:58Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>wp2static-1253831162</Name>\n\t\t\t<Location>na-siliconvalley</Location>\n\t\t\t<CreationDate>2022-10-31T21:20:23Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>www-1253831162</Name>\n\t\t\t<Location>ap-shanghai</Location>\n\t\t\t<CreationDate>2020-05-12T12:51:59Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>xmi-cos-1253831162</Name>\n\t\t\t<Location>ap-tokyo</Location>\n\t\t\t<CreationDate>2019-01-12T03:19:25Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>xmo-bucket-1-1253831162</Name>\n\t\t\t<Location>ap-shanghai</Location>\n\t\t\t<CreationDate>2018-11-30T09:16:47Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>xmo-cos-1253831162</Name>\n\t\t\t<Location>ap-beijing</Location>\n\t\t\t<CreationDate>2018-10-15T02:58:18Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>xmo-eu-1253831162</Name>\n\t\t\t<Location>eu-frankfurt</Location>\n\t\t\t<CreationDate>2019-12-17T14:42:01Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>xmo-hk-1253831162</Name>\n\t\t\t<Location>ap-hongkong</Location>\n\t\t\t<CreationDate>2020-07-27T07:56:54Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>yankee-1253831162</Name>\n\t\t\t<Location>ap-hongkong</Location>\n\t\t\t<CreationDate>2022-01-26T03:29:05Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>yankee-metro-test-1253831162</Name>\n\t\t\t<Location>ap-shanghai</Location>\n\t\t\t<CreationDate>2022-11-03T03:34:53Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>zha-1253831162</Name>\n\t\t\t<Location>ap-tokyo</Location>\n\t\t\t<CreationDate>2020-01-23T00:07:47Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>zhayiyong-1253831162</Name>\n\t\t\t<Location>ap-tokyo</Location>\n\t\t\t<CreationDate>2020-01-23T07:24:02Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>zyytest1-1253831162</Name>\n\t\t\t<Location>ap-tokyo</Location>\n\t\t\t<CreationDate>2020-01-14T11:45:10Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>zzhli-hk-test-1253831162</Name>\n\t\t\t<Location>ap-hongkong</Location>\n\t\t\t<CreationDate>2022-06-15T10:48:45Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>zzhli-meeting-record-1253831162</Name>\n\t\t\t<Location>ap-nanjing</Location>\n\t\t\t<CreationDate>2022-03-17T02:32:40Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>zzhli-nameeting-1253831162</Name>\n\t\t\t<Location>na-siliconvalley</Location>\n\t\t\t<CreationDate>2022-05-03T01:00:07Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>zzhli-sing-1253831162</Name>\n\t\t\t<Location>ap-singapore</Location>\n\t\t\t<CreationDate>2022-06-15T09:11:34Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t\t<Bucket>\n\t\t\t<Name>zzhli-test-bucket-1253831162</Name>\n\t\t\t<Location>ap-beijing</Location>\n\t\t\t<CreationDate>2021-12-14T03:42:06Z</CreationDate>\n\t\t\t<BucketType>cos</BucketType>\n\t\t</Bucket>\n\t</Buckets>\n</ListAllMyBucketsResult>\n\n"
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '32709'
+      Content-Type:
+      - application/xml
+      Date:
+      - Wed, 30 Nov 2022 11:31:49 GMT
+      Server:
+      - tencent-cos
+      x-cos-request-id:
+      - NjM4NzNmMjRfZDNhZDM1MGFfMWM2NDFfNDE2ZmY3ZQ==
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"ResourceList": ["qcs::cos:ap-singapore:uid/1253831162:42342-1253831162",
+      "qcs::cos:ap-singapore:uid/1253831162:custodian-test-1253831162", "qcs::cos:ap-singapore:uid/1253831162:ddd-1253831162",
+      "qcs::cos:ap-singapore:uid/1253831162:doniesg-1253831162", "qcs::cos:ap-singapore:uid/1253831162:sgluke-1253831162",
+      "qcs::cos:ap-singapore:uid/1253831162:tcr-2akkg1yo-1253831162", "qcs::cos:ap-singapore:uid/1253831162:tcr-cguc6m2c-1253831162",
+      "qcs::cos:ap-singapore:uid/1253831162:tcr-g6xi19ni-1253831162", "qcs::cos:ap-singapore:uid/1253831162:tcr-q1d20ypg-1253831162"]}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '569'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.27.1
+      X-TC-Action:
+      - GetResources
+      X-TC-Region:
+      - ap-singapore
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"","ResourceTagMappingList":[{"Resource":"qcs::cos:ap-singapore:uid\/1253831162:custodian-test-1253831162","Tags":[{"TagKey":"test_test-rfc26","TagValue":"Resource
+        does not meet policy: tag@2022-09-08T02:46:00+00:00"},{"TagKey":"test_pro_001_1","TagValue":"andyxbchen"},{"TagKey":"test_pro_00001","TagValue":"this
+        is test"}]}],"RequestId":"ce9a143d-0e40-4f7b-b9ae-51c87a07ac10"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '410'
+      Content-Type:
+      - application/json
+      Date:
+      - Wed, 30 Nov 2022 11:31:49 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"ResourceList": ["qcs::cos:ap-singapore:uid/1253831162:tcr-qe0sbr00-1253831162",
+      "qcs::cos:ap-singapore:uid/1253831162:testtest-1253831162", "qcs::cos:ap-singapore:uid/1253831162:zzhli-sing-1253831162"]}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '204'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.27.1
+      X-TC-Action:
+      - GetResources
+      X-TC-Region:
+      - ap-singapore
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"","ResourceTagMappingList":[],"RequestId":"fdb8bb45-02ef-4617-855e-c8b684319814"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '114'
+      Content-Type:
+      - application/json
+      Date:
+      - Wed, 30 Nov 2022 11:31:50 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - !!binary |
+        Y29zLXB5dGhvbi1zZGstdjUuMS45LjIx
+    method: GET
+    uri: https://42342-1253831162.cos.ap-singapore.myqcloud.com/?encryption=
+  response:
+    body:
+      string: "<?xml version='1.0' encoding='utf-8' ?>\n<Error>\n\t<Code>NoSuchEncryptionConfiguration</Code>\n\t<Message>The
+        specified bucket does not have a Encryption configuration</Message>\n\t<Resource>/</Resource>\n\t<RequestId>NjM4NzNmMjdfZmI4YzdjMWVfMjJlODFfNjJjYzM2NQ==</RequestId>\n\t<TraceId>OGVmYzZiMmQzYjA2OWNhODk0NTRkMTBiOWVmMDAxODczNTBmNjMwZmQ0MTZkMjg0NjlkNTYyNmY4ZTRkZTk0NzAyMWIzNDJjY2Y0MTI4NWQyZTNjZjk5YzE1OGRhMDZkMWQ5YjhlNjdiMmI0ODIzYjViMDBhNGQ4NjEzZmE4NTk=</TraceId>\n</Error>\n\n"
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '470'
+      Content-Type:
+      - application/xml
+      Date:
+      - Wed, 30 Nov 2022 11:31:52 GMT
+      Server:
+      - tencent-cos
+      x-cos-request-id:
+      - NjM4NzNmMjdfZmI4YzdjMWVfMjJlODFfNjJjYzM2NQ==
+      x-cos-trace-id:
+      - OGVmYzZiMmQzYjA2OWNhODk0NTRkMTBiOWVmMDAxODczNTBmNjMwZmQ0MTZkMjg0NjlkNTYyNmY4ZTRkZTk0NzAyMWIzNDJjY2Y0MTI4NWQyZTNjZjk5YzE1OGRhMDZkMWQ5YjhlNjdiMmI0ODIzYjViMDBhNGQ4NjEzZmE4NTk=
+    status:
+      code: 404
+      message: Not Found
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - !!binary |
+        Y29zLXB5dGhvbi1zZGstdjUuMS45LjIx
+    method: GET
+    uri: https://custodian-test-1253831162.cos.ap-singapore.myqcloud.com/?encryption=
+  response:
+    body:
+      string: "<ServerSideEncryptionConfiguration>\n\t<Rule>\n\t\t<ApplyServerSideEncryptionByDefault>\n\t\t\t<SSEAlgorithm>AES256</SSEAlgorithm>\n\t\t</ApplyServerSideEncryptionByDefault>\n\t</Rule>\n</ServerSideEncryptionConfiguration>\n\n"
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '209'
+      Content-Type:
+      - application/xml
+      Date:
+      - Wed, 30 Nov 2022 11:31:55 GMT
+      Server:
+      - tencent-cos
+      x-cos-request-id:
+      - NjM4NzNmMmFfODU3NWI3MDlfM2ZjOV82NDYwZTQ3
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - !!binary |
+        Y29zLXB5dGhvbi1zZGstdjUuMS45LjIx
+    method: GET
+    uri: https://ddd-1253831162.cos.ap-singapore.myqcloud.com/?encryption=
+  response:
+    body:
+      string: "<?xml version='1.0' encoding='utf-8' ?>\n<Error>\n\t<Code>NoSuchEncryptionConfiguration</Code>\n\t<Message>The
+        specified bucket does not have a Encryption configuration</Message>\n\t<Resource>/</Resource>\n\t<RequestId>NjM4NzNmMmRfZWU4YzdjMWVfMjgzYWNfNjJkNGIzYw==</RequestId>\n\t<TraceId>OGVmYzZiMmQzYjA2OWNhODk0NTRkMTBiOWVmMDAxODczNTBmNjMwZmQ0MTZkMjg0NjlkNTYyNmY4ZTRkZTk0NzAyMWIzNDJjY2Y0MTI4NWQyZTNjZjk5YzE1OGRhMDZkMWQ5YjhlNjdiMmI0ODIzYjViMDBhNGQ4NjEzZmE4NTk=</TraceId>\n</Error>\n\n"
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '470'
+      Content-Type:
+      - application/xml
+      Date:
+      - Wed, 30 Nov 2022 11:31:58 GMT
+      Server:
+      - tencent-cos
+      x-cos-request-id:
+      - NjM4NzNmMmRfZWU4YzdjMWVfMjgzYWNfNjJkNGIzYw==
+      x-cos-trace-id:
+      - OGVmYzZiMmQzYjA2OWNhODk0NTRkMTBiOWVmMDAxODczNTBmNjMwZmQ0MTZkMjg0NjlkNTYyNmY4ZTRkZTk0NzAyMWIzNDJjY2Y0MTI4NWQyZTNjZjk5YzE1OGRhMDZkMWQ5YjhlNjdiMmI0ODIzYjViMDBhNGQ4NjEzZmE4NTk=
+    status:
+      code: 404
+      message: Not Found
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - !!binary |
+        Y29zLXB5dGhvbi1zZGstdjUuMS45LjIx
+    method: GET
+    uri: https://doniesg-1253831162.cos.ap-singapore.myqcloud.com/?encryption=
+  response:
+    body:
+      string: "<?xml version='1.0' encoding='utf-8' ?>\n<Error>\n\t<Code>NoSuchEncryptionConfiguration</Code>\n\t<Message>The
+        specified bucket does not have a Encryption configuration</Message>\n\t<Resource>/</Resource>\n\t<RequestId>NjM4NzNmMzBfOTllZjc4MGJfMWFhZDJfNjNkOWExOA==</RequestId>\n\t<TraceId>OGVmYzZiMmQzYjA2OWNhODk0NTRkMTBiOWVmMDAxODczNTBmNjMwZmQ0MTZkMjg0NjlkNTYyNmY4ZTRkZTk0NzAyMWIzNDJjY2Y0MTI4NWQyZTNjZjk5YzE1OGRhMDZkMWQ5YjhlNjdiMmI0ODIzYjViMDBhNGQ4NjEzZmE4NTk=</TraceId>\n</Error>\n\n"
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '470'
+      Content-Type:
+      - application/xml
+      Date:
+      - Wed, 30 Nov 2022 11:32:01 GMT
+      Server:
+      - tencent-cos
+      x-cos-request-id:
+      - NjM4NzNmMzBfOTllZjc4MGJfMWFhZDJfNjNkOWExOA==
+      x-cos-trace-id:
+      - OGVmYzZiMmQzYjA2OWNhODk0NTRkMTBiOWVmMDAxODczNTBmNjMwZmQ0MTZkMjg0NjlkNTYyNmY4ZTRkZTk0NzAyMWIzNDJjY2Y0MTI4NWQyZTNjZjk5YzE1OGRhMDZkMWQ5YjhlNjdiMmI0ODIzYjViMDBhNGQ4NjEzZmE4NTk=
+    status:
+      code: 404
+      message: Not Found
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - !!binary |
+        Y29zLXB5dGhvbi1zZGstdjUuMS45LjIx
+    method: GET
+    uri: https://sgluke-1253831162.cos.ap-singapore.myqcloud.com/?encryption=
+  response:
+    body:
+      string: "<?xml version='1.0' encoding='utf-8' ?>\n<Error>\n\t<Code>NoSuchEncryptionConfiguration</Code>\n\t<Message>The
+        specified bucket does not have a Encryption configuration</Message>\n\t<Resource>/</Resource>\n\t<RequestId>NjM4NzNmMzNfZDc4YzdjMWVfMTM4ZWJfMjNkM2ViYQ==</RequestId>\n\t<TraceId>OGVmYzZiMmQzYjA2OWNhODk0NTRkMTBiOWVmMDAxODczNTBmNjMwZmQ0MTZkMjg0NjlkNTYyNmY4ZTRkZTk0NzAyMWIzNDJjY2Y0MTI4NWQyZTNjZjk5YzE1OGRhMDZkMWQ5YjhlNjdiMmI0ODIzYjViMDBhNGQ4NjEzZmE4NTk=</TraceId>\n</Error>\n\n"
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '470'
+      Content-Type:
+      - application/xml
+      Date:
+      - Wed, 30 Nov 2022 11:32:04 GMT
+      Server:
+      - tencent-cos
+      x-cos-request-id:
+      - NjM4NzNmMzNfZDc4YzdjMWVfMTM4ZWJfMjNkM2ViYQ==
+      x-cos-trace-id:
+      - OGVmYzZiMmQzYjA2OWNhODk0NTRkMTBiOWVmMDAxODczNTBmNjMwZmQ0MTZkMjg0NjlkNTYyNmY4ZTRkZTk0NzAyMWIzNDJjY2Y0MTI4NWQyZTNjZjk5YzE1OGRhMDZkMWQ5YjhlNjdiMmI0ODIzYjViMDBhNGQ4NjEzZmE4NTk=
+    status:
+      code: 404
+      message: Not Found
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - !!binary |
+        Y29zLXB5dGhvbi1zZGstdjUuMS45LjIx
+    method: GET
+    uri: https://tcr-2akkg1yo-1253831162.cos.ap-singapore.myqcloud.com/?encryption=
+  response:
+    body:
+      string: "<?xml version='1.0' encoding='utf-8' ?>\n<Error>\n\t<Code>NoSuchEncryptionConfiguration</Code>\n\t<Message>The
+        specified bucket does not have a Encryption configuration</Message>\n\t<Resource>/</Resource>\n\t<RequestId>NjM4NzNmMzVfZjRlZjc4MGJfMzZmOF8yMzUxNWYw</RequestId>\n\t<TraceId>OGVmYzZiMmQzYjA2OWNhODk0NTRkMTBiOWVmMDAxODczNTBmNjMwZmQ0MTZkMjg0NjlkNTYyNmY4ZTRkZTk0NzAyMWIzNDJjY2Y0MTI4NWQyZTNjZjk5YzE1OGRhMDZkMWQ5YjhlNjdiMmI0ODIzYjViMDBhNGQ4NjEzZmE4NTk=</TraceId>\n</Error>\n\n"
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '466'
+      Content-Type:
+      - application/xml
+      Date:
+      - Wed, 30 Nov 2022 11:32:05 GMT
+      Server:
+      - tencent-cos
+      x-cos-request-id:
+      - NjM4NzNmMzVfZjRlZjc4MGJfMzZmOF8yMzUxNWYw
+      x-cos-trace-id:
+      - OGVmYzZiMmQzYjA2OWNhODk0NTRkMTBiOWVmMDAxODczNTBmNjMwZmQ0MTZkMjg0NjlkNTYyNmY4ZTRkZTk0NzAyMWIzNDJjY2Y0MTI4NWQyZTNjZjk5YzE1OGRhMDZkMWQ5YjhlNjdiMmI0ODIzYjViMDBhNGQ4NjEzZmE4NTk=
+    status:
+      code: 404
+      message: Not Found
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - !!binary |
+        Y29zLXB5dGhvbi1zZGstdjUuMS45LjIx
+    method: GET
+    uri: https://tcr-cguc6m2c-1253831162.cos.ap-singapore.myqcloud.com/?encryption=
+  response:
+    body:
+      string: "<?xml version='1.0' encoding='utf-8' ?>\n<Error>\n\t<Code>NoSuchEncryptionConfiguration</Code>\n\t<Message>The
+        specified bucket does not have a Encryption configuration</Message>\n\t<Resource>/</Resource>\n\t<RequestId>NjM4NzNmMzZfOTZlZjc4MGJfMWNiNGVfNjMxMzdmYQ==</RequestId>\n\t<TraceId>OGVmYzZiMmQzYjA2OWNhODk0NTRkMTBiOWVmMDAxODczNTBmNjMwZmQ0MTZkMjg0NjlkNTYyNmY4ZTRkZTk0NzAyMWIzNDJjY2Y0MTI4NWQyZTNjZjk5YzE1OGRhMDZkMWQ5YjhlNjdiMmI0ODIzYjViMDBhNGQ4NjEzZmE4NTk=</TraceId>\n</Error>\n\n"
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '470'
+      Content-Type:
+      - application/xml
+      Date:
+      - Wed, 30 Nov 2022 11:32:07 GMT
+      Server:
+      - tencent-cos
+      x-cos-request-id:
+      - NjM4NzNmMzZfOTZlZjc4MGJfMWNiNGVfNjMxMzdmYQ==
+      x-cos-trace-id:
+      - OGVmYzZiMmQzYjA2OWNhODk0NTRkMTBiOWVmMDAxODczNTBmNjMwZmQ0MTZkMjg0NjlkNTYyNmY4ZTRkZTk0NzAyMWIzNDJjY2Y0MTI4NWQyZTNjZjk5YzE1OGRhMDZkMWQ5YjhlNjdiMmI0ODIzYjViMDBhNGQ4NjEzZmE4NTk=
+    status:
+      code: 404
+      message: Not Found
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - !!binary |
+        Y29zLXB5dGhvbi1zZGstdjUuMS45LjIx
+    method: GET
+    uri: https://tcr-g6xi19ni-1253831162.cos.ap-singapore.myqcloud.com/?encryption=
+  response:
+    body:
+      string: "<?xml version='1.0' encoding='utf-8' ?>\n<Error>\n\t<Code>NoSuchEncryptionConfiguration</Code>\n\t<Message>The
+        specified bucket does not have a Encryption configuration</Message>\n\t<Resource>/</Resource>\n\t<RequestId>NjM4NzNmMzhfYWVlZjc4MGJfMmQ0MTFfNjM0ZTg5OA==</RequestId>\n\t<TraceId>OGVmYzZiMmQzYjA2OWNhODk0NTRkMTBiOWVmMDAxODczNTBmNjMwZmQ0MTZkMjg0NjlkNTYyNmY4ZTRkZTk0NzAyMWIzNDJjY2Y0MTI4NWQyZTNjZjk5YzE1OGRhMDZkMWQ5YjhlNjdiMmI0ODIzYjViMDBhNGQ4NjEzZmE4NTk=</TraceId>\n</Error>\n\n"
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '470'
+      Content-Type:
+      - application/xml
+      Date:
+      - Wed, 30 Nov 2022 11:32:09 GMT
+      Server:
+      - tencent-cos
+      x-cos-request-id:
+      - NjM4NzNmMzhfYWVlZjc4MGJfMmQ0MTFfNjM0ZTg5OA==
+      x-cos-trace-id:
+      - OGVmYzZiMmQzYjA2OWNhODk0NTRkMTBiOWVmMDAxODczNTBmNjMwZmQ0MTZkMjg0NjlkNTYyNmY4ZTRkZTk0NzAyMWIzNDJjY2Y0MTI4NWQyZTNjZjk5YzE1OGRhMDZkMWQ5YjhlNjdiMmI0ODIzYjViMDBhNGQ4NjEzZmE4NTk=
+    status:
+      code: 404
+      message: Not Found
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - !!binary |
+        Y29zLXB5dGhvbi1zZGstdjUuMS45LjIx
+    method: GET
+    uri: https://tcr-q1d20ypg-1253831162.cos.ap-singapore.myqcloud.com/?encryption=
+  response:
+    body:
+      string: "<?xml version='1.0' encoding='utf-8' ?>\n<Error>\n\t<Code>NoSuchEncryptionConfiguration</Code>\n\t<Message>The
+        specified bucket does not have a Encryption configuration</Message>\n\t<Resource>/</Resource>\n\t<RequestId>NjM4NzNmM2FfZGMzNjEzMGJfOTliOV82MzZmMTE3</RequestId>\n\t<TraceId>OGVmYzZiMmQzYjA2OWNhODk0NTRkMTBiOWVmMDAxODczNTBmNjMwZmQ0MTZkMjg0NjlkNTYyNmY4ZTRkZTk0NzAyMWIzNDJjY2Y0MTI4NWQyZTNjZjk5YzE1OGRhMDZkMWQ5YjhlNjdiMmI0ODIzYjViMDBhNGQ4NjEzZmE4NTk=</TraceId>\n</Error>\n\n"
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '466'
+      Content-Type:
+      - application/xml
+      Date:
+      - Wed, 30 Nov 2022 11:32:11 GMT
+      Server:
+      - tencent-cos
+      x-cos-request-id:
+      - NjM4NzNmM2FfZGMzNjEzMGJfOTliOV82MzZmMTE3
+      x-cos-trace-id:
+      - OGVmYzZiMmQzYjA2OWNhODk0NTRkMTBiOWVmMDAxODczNTBmNjMwZmQ0MTZkMjg0NjlkNTYyNmY4ZTRkZTk0NzAyMWIzNDJjY2Y0MTI4NWQyZTNjZjk5YzE1OGRhMDZkMWQ5YjhlNjdiMmI0ODIzYjViMDBhNGQ4NjEzZmE4NTk=
+    status:
+      code: 404
+      message: Not Found
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - !!binary |
+        Y29zLXB5dGhvbi1zZGstdjUuMS45LjIx
+    method: GET
+    uri: https://tcr-qe0sbr00-1253831162.cos.ap-singapore.myqcloud.com/?encryption=
+  response:
+    body:
+      string: "<?xml version='1.0' encoding='utf-8' ?>\n<Error>\n\t<Code>NoSuchEncryptionConfiguration</Code>\n\t<Message>The
+        specified bucket does not have a Encryption configuration</Message>\n\t<Resource>/</Resource>\n\t<RequestId>NjM4NzNmM2NfZGVlZjc4MGJfMjY3NGNfMjM4YzZmZg==</RequestId>\n\t<TraceId>OGVmYzZiMmQzYjA2OWNhODk0NTRkMTBiOWVmMDAxODczNTBmNjMwZmQ0MTZkMjg0NjlkNTYyNmY4ZTRkZTk0NzAyMWIzNDJjY2Y0MTI4NWQyZTNjZjk5YzE1OGRhMDZkMWQ5YjhlNjdiMmI0ODIzYjViMDBhNGQ4NjEzZmE4NTk=</TraceId>\n</Error>\n\n"
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '470'
+      Content-Type:
+      - application/xml
+      Date:
+      - Wed, 30 Nov 2022 11:32:12 GMT
+      Server:
+      - tencent-cos
+      x-cos-request-id:
+      - NjM4NzNmM2NfZGVlZjc4MGJfMjY3NGNfMjM4YzZmZg==
+      x-cos-trace-id:
+      - OGVmYzZiMmQzYjA2OWNhODk0NTRkMTBiOWVmMDAxODczNTBmNjMwZmQ0MTZkMjg0NjlkNTYyNmY4ZTRkZTk0NzAyMWIzNDJjY2Y0MTI4NWQyZTNjZjk5YzE1OGRhMDZkMWQ5YjhlNjdiMmI0ODIzYjViMDBhNGQ4NjEzZmE4NTk=
+    status:
+      code: 404
+      message: Not Found
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - !!binary |
+        Y29zLXB5dGhvbi1zZGstdjUuMS45LjIx
+    method: GET
+    uri: https://testtest-1253831162.cos.ap-singapore.myqcloud.com/?encryption=
+  response:
+    body:
+      string: "<?xml version='1.0' encoding='utf-8' ?>\n<Error>\n\t<Code>NoSuchEncryptionConfiguration</Code>\n\t<Message>The
+        specified bucket does not have a Encryption configuration</Message>\n\t<Resource>/</Resource>\n\t<RequestId>NjM4NzNmM2ZfZGY4YzdjMWVfMmM4MDVfNjI5NDA1NQ==</RequestId>\n\t<TraceId>OGVmYzZiMmQzYjA2OWNhODk0NTRkMTBiOWVmMDAxODczNTBmNjMwZmQ0MTZkMjg0NjlkNTYyNmY4ZTRkZTk0NzAyMWIzNDJjY2Y0MTI4NWQyZTNjZjk5YzE1OGRhMDZkMWQ5YjhlNjdiMmI0ODIzYjViMDBhNGQ4NjEzZmE4NTk=</TraceId>\n</Error>\n\n"
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '470'
+      Content-Type:
+      - application/xml
+      Date:
+      - Wed, 30 Nov 2022 11:32:15 GMT
+      Server:
+      - tencent-cos
+      x-cos-request-id:
+      - NjM4NzNmM2ZfZGY4YzdjMWVfMmM4MDVfNjI5NDA1NQ==
+      x-cos-trace-id:
+      - OGVmYzZiMmQzYjA2OWNhODk0NTRkMTBiOWVmMDAxODczNTBmNjMwZmQ0MTZkMjg0NjlkNTYyNmY4ZTRkZTk0NzAyMWIzNDJjY2Y0MTI4NWQyZTNjZjk5YzE1OGRhMDZkMWQ5YjhlNjdiMmI0ODIzYjViMDBhNGQ4NjEzZmE4NTk=
+    status:
+      code: 404
+      message: Not Found
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - !!binary |
+        Y29zLXB5dGhvbi1zZGstdjUuMS45LjIx
+    method: GET
+    uri: https://zzhli-sing-1253831162.cos.ap-singapore.myqcloud.com/?encryption=
+  response:
+    body:
+      string: "<?xml version='1.0' encoding='utf-8' ?>\n<Error>\n\t<Code>NoSuchEncryptionConfiguration</Code>\n\t<Message>The
+        specified bucket does not have a Encryption configuration</Message>\n\t<Resource>/</Resource>\n\t<RequestId>NjM4NzNmNDFfZmRlZjc4MGJfMjFhOThfNjJlYzNkMw==</RequestId>\n\t<TraceId>OGVmYzZiMmQzYjA2OWNhODk0NTRkMTBiOWVmMDAxODczNTBmNjMwZmQ0MTZkMjg0NjlkNTYyNmY4ZTRkZTk0NzAyMWIzNDJjY2Y0MTI4NWQyZTNjZjk5YzE1OGRhMDZkMWQ5YjhlNjdiMmI0ODIzYjViMDBhNGQ4NjEzZmE4NTk=</TraceId>\n</Error>\n\n"
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '470'
+      Content-Type:
+      - application/xml
+      Date:
+      - Wed, 30 Nov 2022 11:32:17 GMT
+      Server:
+      - tencent-cos
+      x-cos-request-id:
+      - NjM4NzNmNDFfZmRlZjc4MGJfMjFhOThfNjJlYzNkMw==
+      x-cos-trace-id:
+      - OGVmYzZiMmQzYjA2OWNhODk0NTRkMTBiOWVmMDAxODczNTBmNjMwZmQ0MTZkMjg0NjlkNTYyNmY4ZTRkZTk0NzAyMWIzNDJjY2Y0MTI4NWQyZTNjZjk5YzE1OGRhMDZkMWQ5YjhlNjdiMmI0ODIzYjViMDBhNGQ4NjEzZmE4NTk=
+    status:
+      code: 404
+      message: Not Found
+version: 1

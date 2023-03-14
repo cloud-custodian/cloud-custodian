@@ -35,6 +35,12 @@ class KubernetesClusterTest(BaseTest):
         resources = p.run()
         self.assertEqual(resources[0]['status'], 'RUNNING')
         self.assertEqual(resources[0]['name'], 'standard-cluster-1')
+        self.assertEqual(
+            p.resource_manager.get_urns(resources),
+            [
+                'gcp:container:us-central1-a:cloud-custodian:cluster/standard-cluster-1'
+            ],
+        )
 
     def test_gke_cluster_tags(self):
         project_id = "cloud-custodian"
@@ -70,6 +76,12 @@ class KubernetesClusterTest(BaseTest):
         clusters = exec_mode.run(event, None)
 
         self.assertEqual(clusters[0]['name'], name)
+        self.assertEqual(
+            p.resource_manager.get_urns(clusters),
+            [
+                'gcp:container:us-central1-a:cloud-custodian:cluster/standard-cluster-1'
+            ],
+        )
 
     def test_cluster_delete(self):
         project_id = "cloud-custodian"
@@ -112,6 +124,12 @@ class KubernetesClusterNodePoolTest(BaseTest):
         resources = p.run()
         self.assertEqual(resources[0]['status'], 'RUNNING')
         self.assertEqual(resources[0]['name'], 'default-pool')
+        self.assertEqual(
+            p.resource_manager.get_urns(resources),
+            [
+                'gcp:container:us-central1-a:cloud-custodian:cluster-node-pool/default-pool'
+            ],
+        )
 
     def test_cluster_node_pools_get(self):
 
@@ -135,3 +153,9 @@ class KubernetesClusterNodePoolTest(BaseTest):
         pools = exec_mode.run(event, None)
 
         self.assertEqual(pools[0]['name'], name)
+        self.assertEqual(
+            p.resource_manager.get_urns(pools),
+            [
+                'gcp:container:us-central1-a:cloud-custodian:cluster-node-pool/pool-1'
+            ],
+        )

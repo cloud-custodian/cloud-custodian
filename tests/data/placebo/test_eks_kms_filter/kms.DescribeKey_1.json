@@ -1,0 +1,33 @@
+{
+    "status_code": 200,
+    "data": {
+        "KeyMetadata": {
+            "AWSAccountId": "644160558196",
+            "KeyId": "361001ad-9c5e-42cb-9a09-5de1e80e822f",
+            "Arn": "arn:aws:kms:us-east-1:644160558196:key/361001ad-9c5e-42cb-9a09-5de1e80e822f",
+            "CreationDate": {
+                "__class__": "datetime",
+                "year": 2022,
+                "month": 8,
+                "day": 30,
+                "hour": 16,
+                "minute": 53,
+                "second": 47,
+                "microsecond": 154000
+            },
+            "Enabled": true,
+            "Description": "customer managed key for eks secret encryption",
+            "KeyUsage": "ENCRYPT_DECRYPT",
+            "KeyState": "Enabled",
+            "Origin": "AWS_KMS",
+            "KeyManager": "CUSTOMER",
+            "CustomerMasterKeySpec": "SYMMETRIC_DEFAULT",
+            "KeySpec": "SYMMETRIC_DEFAULT",
+            "EncryptionAlgorithms": [
+                "SYMMETRIC_DEFAULT"
+            ],
+            "MultiRegion": false
+        },
+        "ResponseMetadata": {}
+    }
+}
