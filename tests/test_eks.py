@@ -208,3 +208,12 @@ class EKS(BaseTest):
 
         resources = p.run()
         self.assertEqual(len(resources), 1)
+        matched = resources.pop()
+        self.assertEqual(
+            matched["Tags"],
+            [{
+                'Key': 'NetworkLocation',
+                'Value': 'Customer'
+            }]
+        )
+
