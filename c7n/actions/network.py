@@ -46,9 +46,9 @@ class ModifyVpcSecurityGroupsAction(Action):
                     remove:
                       - launch-wizard-1
                       - launch-wizard-2
-                    add-by-tag: 
+                    add-by-tag:
                       key: environment
-                      values: 
+                      values:
                         - production
     """
     schema_alias = True
@@ -71,7 +71,16 @@ class ModifyVpcSecurityGroupsAction(Action):
                 {'type': 'string'},
                 {'type': 'array', 'items': {
                     'type': 'string'}}]},
-            'add-by-tag': {}},
+            'add-by-tag': {
+                'type': 'object',
+                'additionalProperties': False,
+                'properties': {
+                    'key': {'type': 'string'},
+                    'values': {'type': 'array', 'items': {'type': 'string'}}
+                },
+                'required': ['key', 'values']
+            }
+        },
         'anyOf': [
             {'required': ['isolation-group', 'remove', 'type']},
             {'required': ['add', 'remove', 'type']},
@@ -239,7 +248,7 @@ class ModifyVpcSecurityGroupsAction(Action):
 
         tag = self._get_array('add-by-tag')
         if tag:
-            tag_filtered_groups = self.get_groups_by_tag(tag['key'],tag['values'])
+            tag_filtered_groups = self.get_groups_by_tag(tag['key'], tag['values'])
         else:
             tag_filtered_groups = []
 
