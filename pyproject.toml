@@ -53,6 +53,7 @@ pytest-recording = "^0.12.1"
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.0.246"
 docker = "^6.0.1"
+black = "^23.1.0"
 
 [tool.black]
 skip-string-normalization = true

@@ -57,6 +57,7 @@ sphinx:
 
 lint:
 	ruff c7n tests tools
+	black --check tools/c7n_left
 
 clean:
 	make -f docs/Makefile.sphinx clean
