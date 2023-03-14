@@ -1355,7 +1355,7 @@ class FilterPublicBlock(Filter):
 
     def process(self, buckets, event=None):
         results = []
-        with self.executor_factory(max_workers=2) as w:
+        with self.executor_factory(max_workers=1) as w:
             futures = {w.submit(self.process_bucket, bucket): bucket for bucket in buckets}
             for f in as_completed(futures):
                 if f.result():
@@ -1370,7 +1370,11 @@ class FilterPublicBlock(Filter):
                 config = s3.get_public_access_block(
                     Bucket=bucket['Name'])['PublicAccessBlockConfiguration']
             except ClientError as e:
-                if e.response['Error']['Code'] != 'NoSuchPublicAccessBlockConfiguration':
+                if e.response['Error']['Code'] == 'NoSuchBucket':
+                    time.sleep(10)
+                    config = s3.get_public_access_block(
+                        Bucket=bucket['Name'])['PublicAccessBlockConfiguration']
+                elif e.response['Error']['Code'] != 'NoSuchPublicAccessBlockConfiguration':
                     raise
             bucket[self.annotation_key] = config
         return self.matches_filter(config)
