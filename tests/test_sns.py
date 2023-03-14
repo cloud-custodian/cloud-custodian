@@ -853,3 +853,23 @@ class TestSubscription(BaseTest):
         subs = client.list_subscriptions()
         for s in subs.get("Subscriptions", []):
             self.assertTrue("123456789099" == s.get("Owner"))
+
+    def test_subscription_unused(self):
+        factory = self.replay_flight_data("test_subscription_unused")
+        p = self.load_policy(
+            {
+               "name": "sns-subscription-unused",
+               "resource": "sns-subscription",
+               "filters": [
+                   {
+                     "type": "unused",
+                     "key": "TopicArn",
+                     "value": "absent"
+                   }
+               ],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+         
