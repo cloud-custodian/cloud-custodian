@@ -1789,6 +1789,39 @@ class S3Test(BaseTest):
         for rule in response['ReplicationConfiguration']['Rules']:
             self.assertEqual(rule['Status'], 'Disabled')
 
+    def test_check_public_block(self):
+        """Handle cases where public block details are missing or unavailable
+
+        The default check-public-block filter should match buckets
+        in any of the following conditions:
+
+        - There is a public block configuration, but some settings are not
+          enabled
+        - There is no public block configuration set
+        - A strict bucket policy prevents Custodian from reading the public block configuration
+        """
+        self.patch(s3.FilterPublicBlock, "executor_factory", MainThreadExecutor)
+        self.patch(s3, "S3_AUGMENT_TABLE", [])
+
+        session_factory = self.replay_flight_data("test_s3_check_public_block")
+        p = self.load_policy(
+            {
+                "name": "check-public-block",
+                "resource": "s3",
+                "filters": [
+                    {
+                        "type": "check-public-block",
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+
+        resources = {bucket["Name"]: bucket for bucket in p.run()}
+        self.assertEqual(len(resources), 3)
+        locked_down_bucket = resources["my-locked-down-bucket"]
+        self.assertIn("GetPublicAccessBlock", locked_down_bucket["c7n:DeniedMethods"])
+
     def test_set_public_block_enable_all(self):
         bname = 'mypublicblock'
 
