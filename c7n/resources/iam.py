@@ -1965,14 +1965,18 @@ class UserPolicy(ValueFilter):
     )
 
     def user_groups_policies(self, client, u):
+        if 'c7n:GroupsPolicies' not in u:
+            u['c7n:GroupsPolicies'] = []
+
         u['c7n:Groups'] = client.list_groups_for_user(
             UserName=u['UserName'])['Groups']
         for ug in u['c7n:Groups']:
             aps = client.list_attached_group_policies(
                 GroupName=ug['GroupName'])['AttachedPolicies']
             for ap in aps:
-                u['c7n:Policies'].append(
+                u['c7n:GroupsPolicies'].append(
                     client.get_policy(PolicyArn=ap['PolicyArn'])['Policy'])
+
         return u
 
     def user_policies(self, user_set):
@@ -2000,6 +2004,10 @@ class UserPolicy(ValueFilter):
             for p in r['c7n:Policies']:
                 if self.match(p) and r not in matched:
                     matched.append(r)
+            if self.data.get('include-via'):
+                for p in r['c7n:GroupsPolicies']:
+                    if self.match(p) and r not in matched:
+                        matched.append(r)
         return matched
 
 
