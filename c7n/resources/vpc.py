@@ -729,7 +729,8 @@ class SGUsage(Filter):
         return list(itertools.chain(
             *[self.manager.get_resource_manager(m).get_permissions()
              for m in
-             ['lambda', 'eni', 'launch-config', 'security-group', 'event-rule-target']]))
+             ['lambda', 'eni', 'launch-config', 'security-group', 'event-rule-target',
+              'aws.batch-compute']]))
 
     def filter_peered_refs(self, resources):
         if not resources:
@@ -754,6 +755,7 @@ class SGUsage(Filter):
             ("launch-configs", self.get_launch_config_sgs),
             ("ecs-cwe", self.get_ecs_cwe_sgs),
             ("codebuild", self.get_codebuild_sgs),
+            ("batch", self.get_batch_sgs),
         )
 
     def scan_groups(self):
@@ -822,6 +824,11 @@ class SGUsage(Filter):
                 sg_ids.update(ids)
         return sg_ids
 
+    def get_batch_sgs(self):
+        expr = jmespath.compile('[].computeResources.securityGroupIds[]')
+        resources = self.manager.get_resource_manager('aws.batch-compute').resources(augment=False)
+        return set(expr.search(resources) or [])
+
 
 @SecurityGroup.filter_registry.register('unused')
 class UnusedSecurityGroup(SGUsage):
@@ -865,8 +872,11 @@ class UsedSecurityGroup(SGUsage):
     """Filter to security groups that are used.
     This operates as a complement to the unused filter for multi-step
     workflows.
+
     :example:
+
     .. code-block:: yaml
+
             policies:
               - name: security-groups-in-use
                 resource: security-group
@@ -1106,7 +1116,9 @@ class SGPermission(Filter):
             url: s3://a-policy-data-us-west-2/allowed_cidrs.csv
             format: csv
 
-    or value can be specified as a list:
+    or value can be specified as a list.
+
+    .. code-block:: yaml
 
       - type: ingress
         Cidr:
@@ -2809,7 +2821,9 @@ class CrossAZRouteTable(Filter):
     cross from one availability zone (AZ) to another AZ.
 
     :Example:
+
     .. code-block:: yaml
+
             policies:
               - name: cross-az-nat-gateway-traffic
                 resource: aws.route-table

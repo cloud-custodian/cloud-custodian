@@ -7,7 +7,7 @@ from c7n.exceptions import PolicyValidationError
 from c7n.filters.kms import KmsRelatedFilter
 from c7n.filters import Filter
 from c7n.manager import resources
-from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter
+from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter, NetworkLocation
 from c7n.filters.policystatement import HasStatementFilter
 from c7n.query import (
     QueryResourceManager, ChildResourceManager, TypeInfo, DescribeSource, ConfigSource
@@ -100,6 +100,9 @@ class SecurityGroup(SecurityGroupFilter):
         return list(group_ids)
 
 
+@ElasticFileSystemMountTarget.filter_registry.register('network-location', NetworkLocation)
+
+
 @ElasticFileSystem.filter_registry.register('kms-key')
 class KmsFilter(KmsRelatedFilter):
 
@@ -137,7 +140,7 @@ class ConfigureLifecycle(BaseAction):
 
     :example:
 
-      .. code-block:: yaml
+    .. code-block:: yaml
 
             policies:
               - name: efs-apply-lifecycle
@@ -191,7 +194,7 @@ class LifecyclePolicy(Filter):
 
     :example:
 
-      .. code-block:: yaml
+    .. code-block:: yaml
 
             policies:
               - name: efs-filter-lifecycle

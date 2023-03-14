@@ -20,7 +20,8 @@ from .common import BaseTest
 import pytest
 from pytest_terraform import terraform
 
-
+# this one doesn't work as a functional test as it enables stop protection, which prevents
+# the terraform teardown, we would need to also remove the stop protection in the test.
 @terraform('ec2_stop_protection_enabled')
 def test_ec2_stop_protection_enabled(test, ec2_stop_protection_enabled):
     aws_region = 'us-east-1'
@@ -63,6 +64,7 @@ def test_ec2_stop_protection_enabled(test, ec2_stop_protection_enabled):
     )
 
 
+@pytest.mark.audited
 @terraform('ec2_stop_protection_disabled')
 def test_ec2_stop_protection_disabled(test, ec2_stop_protection_disabled):
     aws_region = 'us-east-1'
@@ -1024,6 +1026,25 @@ class TestTag(BaseTest):
         resources = policy.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["InstanceId"], "i-098dae2615acb5809")
+
+    def test_ec2_multiple_mark_for_op_tags(self):
+        session_factory = self.replay_flight_data("test_ec2_multiple_mark_for_op_tags")
+        policy = self.load_policy(
+            {
+                "name": "ec2-mark-for-op-tags",
+                "resource": "ec2",
+                "filters": [
+                    {
+                        "type": "marked-for-op",
+                        "tag": "c7n-tag-compliance",
+                        "op": "terminate"
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = policy.run()
+        self.assertEqual(len(resources), 3)
 
 
 class TestStop(BaseTest):

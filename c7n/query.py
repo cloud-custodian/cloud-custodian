@@ -130,7 +130,10 @@ class ChildResourceQuery(ResourceQuery):
     def filter(self, resource_manager, parent_ids=None, **params):
         """Query a set of resources."""
         m = self.resolve(resource_manager.resource_type)
-        client = local_session(self.session_factory).client(m.service)
+        if resource_manager.get_client:
+            client = resource_manager.get_client()
+        else:
+            client = local_session(self.session_factory).client(m.service)
 
         enum_op, path, extra_args = m.enum_spec
         if extra_args:
@@ -460,8 +463,8 @@ class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
 
     source_mapping = sources
 
-    def __init__(self, data, options):
-        super(QueryResourceManager, self).__init__(data, options)
+    def __init__(self, ctx, data):
+        super(QueryResourceManager, self).__init__(ctx, data)
         self.source = self.get_source(self.source_type)
 
     @property

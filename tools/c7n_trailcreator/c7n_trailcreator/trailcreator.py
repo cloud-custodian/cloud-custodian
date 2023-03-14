@@ -368,21 +368,21 @@ class TrailDB:
         self.cursor.execute('''
             select rtype, count(*) as rcount
             from events
-            where account_id="%s"
-              and region="%s"
+            where account_id=:account_id
+              and region=:region
             group by rtype
-        ''' % (account_id, region))
+        ''', dict(account_id=account_id, region=region))
         return self.cursor.fetchall()
 
     def get_resource_owners(self, resource_type, account_id, region):  # nosec
         self.cursor.execute('''
            select user_id, resource_ids
            from events
-           where rtype="%s"
-             and account_id="%s"
-             and region="%s"
+           where rtype=:resource_type
+             and account_id=:account_id
+             and region=:region
            order by event_date
-        ''' % (resource_type, account_id, region))
+        ''', dict(resource_type=resource_type, account_id=account_id, region=region))
         return self.cursor.fetchall()
 
 
