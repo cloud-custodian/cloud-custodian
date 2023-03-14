@@ -8,7 +8,7 @@ import c7n_mailer.azure_mailer.sendgrid_delivery as sendgrid
 from .ldap_lookup import LdapLookup
 from .utils import (
     decrypt, get_resource_tag_targets, get_provider,
-    get_aws_username_from_event, Providers)
+    get_aws_username_from_event, Providers, unique)
 from .utils_email import get_mimetext_message, is_email
 
 
@@ -65,7 +65,7 @@ class EmailDelivery:
                     full_email = "%s@%s" % (email, self.config['email_base_url'])
                     if is_email(full_email):
                         emails.append(full_email)
-        return emails
+        return unique(emails)
 
     def get_event_owner_email(self, targets, event):  # TODO: GCP-friendly
         if 'event-owner' in targets:
