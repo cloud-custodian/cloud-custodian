@@ -135,7 +135,7 @@ def mimic_sqs(region, policy_file, policy_name, notify_index, output_dir):
     }
 
     with open(policy_file, "r") as f:
-        data = yaml.load(f.read(), Loader=yaml.BaseLoader)
+        data = yaml.safe_load(f.read())
     policies = data['policies']
 
     # if there is only one policy, select it
