@@ -905,6 +905,33 @@ class TestCustomDomainName(BaseTest):
         result = client.get_domain_name(domainName="bad.example.com")
         self.assertEqual(result['securityPolicy'], 'TLS_1_2')
 
+    def test_arn_format(self):
+        factory = self.replay_flight_data("test_apigw_domain_name_filter_check_tls")
+        p = self.load_policy(
+            {
+                "name": "apigw-domain-name-check-tls",
+                "resource": "apigw-domain-name",
+                "filters": [
+                    {
+                        "not": [
+                            {
+                                "type": "value",
+                                "key": "securityPolicy",
+                                "value": "TLS_1_2"
+                            }
+                        ]
+                    }
+                ]
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            p.resource_manager.get_arns(resources)[0],
+            "arn:aws:apigateway:us-east-1::/domainnames/bad.example.com"
+        )
+
 
 class TestResourcePolicy(BaseTest):
     def test_rest_api_default_resource_policy(self):

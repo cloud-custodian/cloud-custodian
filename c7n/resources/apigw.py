@@ -1122,7 +1122,7 @@ class CustomDomainName(query.QueryResourceManager):
 
     class resource_type(query.TypeInfo):
         enum_spec = ('get_domain_names', 'items', None)
-        arn = False
+        arn_type = '/domainnames'
         id = name = 'domainName'
         service = 'apigateway'
         universal_taggable = True
@@ -1133,9 +1133,20 @@ class CustomDomainName(query.QueryResourceManager):
     def get_permissions(cls):
         return ('apigateway:GET',)
 
-    @classmethod
-    def has_arn(self):
-        return False
+    @property
+    def generate_arn(self):
+        """
+         Sample arn: arn:aws:apigateway:us-east-1::/restapis/rest-api-id
+         This method overrides c7n.utils.generate_arn and drops
+         account id from the generic arn.
+        """
+        if self._generate_arn is None:
+            self._generate_arn = functools.partial(
+                generate_arn,
+                self.resource_type.service,
+                region=self.config.region,
+                resource_type=self.resource_type.arn_type)
+        return self._generate_arn
 
 
 @CustomDomainName.action_registry.register('update-security')
