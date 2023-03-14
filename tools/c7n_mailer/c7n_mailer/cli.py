@@ -152,6 +152,7 @@ CONFIG_SCHEMA = {
         'ldap_bind_password': SECURED_STRING_SCHEMA,
         'cross_accounts': {'type': 'object'},
         'ses_region': {'type': 'string'},
+        'ses_role': {'type': 'string'},
         'redis_host': {'type': 'string'},
         'redis_port': {'type': 'integer'},
         'datadog_api_key': {'type': 'string'},              # TODO: encrypt with KMS?
