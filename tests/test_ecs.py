@@ -26,7 +26,7 @@ class TestEcs(BaseTest):
                 ],
             },
             session_factory=session_factory,
-            )
+        )
         resources = p.run()
         self.assertEqual(len(resources), 0)
         
@@ -47,7 +47,7 @@ class TestEcs(BaseTest):
                 ],
             },
             session_factory=session_factory,
-            )
+        )
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
