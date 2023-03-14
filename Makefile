@@ -63,6 +63,7 @@ lint:
 
 format:
 	black $(FMT_SET)
+	ruff --fix c7n tests tools
 
 clean:
 	make -f docs/Makefile.sphinx clean
