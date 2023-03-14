@@ -8,8 +8,8 @@ import c7n_mailer.azure_mailer.sendgrid_delivery as sendgrid
 from .ldap_lookup import LdapLookup
 from .utils import (
     decrypt, get_resource_tag_targets, get_provider,
-    get_aws_username_from_event, Providers)
-from .utils_email import get_mimetext_message, is_email, unique
+    get_aws_username_from_event, Providers, unique)
+from .utils_email import get_mimetext_message, is_email
 
 
 class EmailDelivery:
