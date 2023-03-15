@@ -5,6 +5,10 @@
             {
                 "PolicyName": "AdministratorAccess", 
                 "PolicyArn": "arn:aws:iam::aws:policy/AdministratorAccess"
+            },
+            {
+                "PolicyName": "AWSHealthFullAccess", 
+                "PolicyArn": "arn:aws:iam::aws:policy/AWSHealthFullAccess"                
             }
         ], 
         "IsTruncated": false, 

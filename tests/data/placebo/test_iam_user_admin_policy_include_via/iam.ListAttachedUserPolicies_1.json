@@ -1,7 +1,12 @@
 {
     "status_code": 200, 
     "data": {
-        "AttachedPolicies": [], 
+        "AttachedPolicies": [
+            {
+                "PolicyName": "AdministratorAccess", 
+                "PolicyArn": "arn:aws:iam::aws:policy/AdministratorAccess"
+            }            
+        ], 
         "IsTruncated": false, 
         "ResponseMetadata": {
             "RetryAttempts": 0, 
