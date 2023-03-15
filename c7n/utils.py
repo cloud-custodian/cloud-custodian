@@ -688,6 +688,9 @@ class FormatDate:
     def __init__(self, d=None):
         self._d = d
 
+    def __str__(self):
+        return str(self._d)
+
     @property
     def datetime(self):
         return self._d
