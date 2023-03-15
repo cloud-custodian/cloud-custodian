@@ -451,6 +451,23 @@ class LambdaTest(BaseTest):
             FunctionName=resources[0]['FunctionName'])
         self.assertEqual(response['Configuration']['TracingConfig']['Mode'], 'PassThrough')
 
+    def test_lambda_edge(self):
+        factory = self.replay_flight_data("test_aws_lambda_edge_filter")
+        p = self.load_policy(
+            {
+                "name": "lambda-edge-filter",
+                "resource": "lambda",
+                "filters": [{"type": "lambda-edge",
+                            "state": True}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
+        self.assertEqual(
+            [r["FunctionName"] for r in resources],
+            ["c7n-lambda-edge-new", "test-lambda-edge"])
+
 
 class LambdaTagTest(BaseTest):
 
