@@ -814,11 +814,7 @@ class LambdaEdgeFilter(Filter):
             policies:
                 - name: lambda-edge-filter
                   resource: lambda
-                  conditions:
-                    - type: value
-                      key: region
-                      op: eq
-                      value: us-east-1
+                  region: us-east-1
                   filters:
                     - type: lambda-edge
                       state: True
