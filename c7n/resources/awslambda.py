@@ -805,7 +805,7 @@ class LayerPostFinding(PostFinding):
 
 class LambdaEdgeFilter(Filter):
     """
-    Filter for lambda@edge functions
+    Filter for lambda@edge functions. Lambda@edge only exists in us-east-1
 
     :example:
 
@@ -814,6 +814,11 @@ class LambdaEdgeFilter(Filter):
             policies:
                 - name: lambda-edge-filter
                   resource: lambda
+                  conditions:
+                    - type: value
+                      key: region
+                      op: eq
+                      value: us-east-1
                   filters:
                     - type: lambda-edge
                       state: True
@@ -838,9 +843,11 @@ class LambdaEdgeFilter(Filter):
         return lambda_dist_map
 
     def process(self, resources, event=None):
+        results = []
+        if self.manager.config.region != 'us-east-1' and self.data.get('state'):
+            return []
         annotation_key = 'c7n:DistributionIds'
         lambda_edge_cf_map = self.get_lambda_cf_map()
-        results = []
         for r in resources:
             if (r['FunctionArn'] in lambda_edge_cf_map and self.data.get('state')):
                 r[annotation_key] = lambda_edge_cf_map.get(r['FunctionArn'])
