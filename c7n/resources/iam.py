@@ -1965,14 +1965,11 @@ class UserPolicy(ValueFilter):
         'iam:ListAttachedGroupPolicies',
     )
 
-    def find_policy_in_user_set(self, u, policy_arn):
-        keys = ['c7n:Policies', 'c7n:GroupsPolicies']
-
-        for key in keys:
-            if key in u:
-                searched = next((v for v in u[key] if v.get("Arn") == policy_arn), None)
-                if searched is not None:
-                    return searched
+    def find_policy_in_user_set(self, u, key, policy_arn):
+        if key in u:
+            searched = next((v for v in u[key] if v.get("Arn") == policy_arn), None)
+            if searched is not None:
+                return searched
 
         return None
 
@@ -1987,9 +1984,11 @@ class UserPolicy(ValueFilter):
                 GroupName=ug['GroupName'])['AttachedPolicies']
             for ap in aps:
                 policy_arn = ap['PolicyArn']
-                searched = self.find_policy_in_user_set(u, policy_arn)
-                if searched:
-                    u['c7n:GroupsPolicies'].append(searched)
+                policy_searched = self.find_policy_in_user_set(u, 'c7n:Policies', policy_arn)
+                group_policy_searched = self.find_policy_in_user_set(u, 'c7n:GroupsPolicies', policy_arn)
+
+                if policy_searched and group_policy_searched is None:
+                    u['c7n:GroupsPolicies'].append(policy_searched)
                 else:
                     u['c7n:GroupsPolicies'].append(
                         client.get_policy(PolicyArn=policy_arn)['Policy'])
