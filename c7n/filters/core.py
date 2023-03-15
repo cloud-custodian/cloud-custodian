@@ -611,8 +611,7 @@ class ValueFilter(BaseValueFilter):
         This implementation allows for the comparison of two separate lists of values
         within the same resource.
         """
-        compiled = jmespath.compile(self.data.get('value_path'))
-        return compiled.search(i)
+        return jmespath.search(self.data.get('value_path'),i)
 
     def match(self, i):
         if self.v is None and len(self.data) == 1:
