@@ -367,7 +367,9 @@ class SetRuleState(BaseAction):
     This action allows to enable/disable a rule
 
     :example:
+
     .. code-block:: yaml
+
         policies:
             - name: test-rule
               resource: aws.event-rule

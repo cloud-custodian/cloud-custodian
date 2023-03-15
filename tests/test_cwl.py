@@ -6,9 +6,11 @@ from c7n.resources.cw import LogMetricAlarmFilter
 from .common import BaseTest, functional
 from unittest.mock import MagicMock
 
+import pytest
 from pytest_terraform import terraform
 
 
+@pytest.mark.audited
 @terraform('log_delete', teardown=terraform.TEARDOWN_IGNORE)
 def test_tagged_log_group_delete(test, log_delete):
     factory = test.replay_flight_data(

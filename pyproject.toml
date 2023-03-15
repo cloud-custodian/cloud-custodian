@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "c7n"
-version = "0.9.23"
+version = "0.9.24"
 description = "Cloud Custodian - Policy Rules Engine"
 authors = ["Cloud Custodian Project"]
 readme = "README.md"
@@ -28,9 +28,9 @@ jsonschema = ">=3.0.0"
 argcomplete = ">=1.12.3"
 python-dateutil = "^2.8.2"
 pyyaml = ">=5.4.0"
-tabulate = "^0.8.6"
-importlib-metadata = ">=4.11.1"
-docutils = ">=0.14,<0.18"
+tabulate = "^0.9.0"
+importlib-metadata = "^5.1"
+docutils = ">=0.18, <0.19"
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.1.2"
@@ -67,6 +67,10 @@ exclude = ["__init__.py"]
 [tool.pytest.ini_options]
 junit_family = "xunit2"
 addopts = "--tb=native"
-markers = ["functional", "skiplive"]
+markers = ["functional", "skiplive", "audited"]
 python_files = "test_*.py"
 norecursedirs = ["data", "cassettes", "templates", "terraform"]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

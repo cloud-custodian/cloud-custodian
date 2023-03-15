@@ -1,6 +1,8 @@
 SHELL := /bin/bash
 SELF_MAKE := $(lastword $(MAKEFILE_LIST))
+
 PKG_REPO = testpypi
+PKG_INCREMENT := patch
 PKG_SET := tools/c7n_gcp tools/c7n_kube tools/c7n_openstack tools/c7n_mailer tools/c7n_logexporter tools/c7n_policystream tools/c7n_trailcreator tools/c7n_org tools/c7n_sphinxext tools/c7n_terraform tools/c7n_awscc tools/c7n_tencentcloud tools/c7n_azure
 
 PLATFORM_ARCH := $(shell python3 -c "import platform; print(platform.machine())")
@@ -59,6 +61,7 @@ lint:
 clean:
 	make -f docs/Makefile.sphinx clean
 	rm -rf .tox .Python bin include lib pip-selfcheck.json
+	@$(MAKE) -f $(SELF_MAKE) pkg-clean
 
 image:
 	docker build -f docker/$(IMAGE) -t $(IMAGE):$(IMAGE_TAG) .
@@ -72,24 +75,16 @@ gen-docker:
 pkg-rebase:
 	rm -f poetry.lock
 	for pkg in $(PKG_SET); do cd $$pkg && echo $$pkg && rm -f poetry.lock && cd ../..; done
-
-	rm -f setup.py
-	for pkg in $(PKG_SET); do cd $$pkg && echo $$pkg && rm -f setup.py && cd ../..; done
-
-	rm -f requirements.txt
-	for pkg in $(PKG_SET); do cd $$pkg && echo $$pkg && rm -f requirements.txt && cd ../..; done
-
 	@$(MAKE) -f $(SELF_MAKE) pkg-update
 	git add poetry.lock
 	for pkg in $(PKG_SET); do cd $$pkg && echo $$pkg && git add poetry.lock && cd ../..; done
 
-	@$(MAKE) -f $(SELF_MAKE) pkg-gen-setup
-	git add setup.py
-	for pkg in $(PKG_SET); do cd $$pkg && echo $$pkg && git add setup.py && cd ../..; done
+pkg-clean:
+	rm -f dist/*
+	for pkg in $(PKG_SET); do cd $$pkg && rm -f dist/* && cd ../..; done
 
-	@$(MAKE) -f $(SELF_MAKE) pkg-gen-requirements
-	git add requirements.txt
-	for pkg in $(PKG_SET); do cd $$pkg && echo $$pkg && git add requirements.txt && cd ../..; done
+	rm -Rf build/*
+	for pkg in $(PKG_SET); do cd $$pkg && rm -Rf build/* && cd ../..; done
 
 pkg-update:
 	poetry update
@@ -99,44 +94,28 @@ pkg-show-update:
 	poetry show -o
 	for pkg in $(PKG_SET); do cd $$pkg && echo $$pkg && poetry show -o && cd ../..; done
 
-pkg-freeze-setup:
-	python3 tools/dev/poetrypkg.py gen-frozensetup -p .
-	for pkg in $(PKG_SET); do python3 tools/dev/poetrypkg.py gen-frozensetup -p $$pkg; done
-
-pkg-gen-setup:
-	python3 tools/dev/poetrypkg.py gen-setup -p .
-	for pkg in $(PKG_SET); do python3 tools/dev/poetrypkg.py gen-setup -p $$pkg; done
-
-pkg-gen-requirements:
-# we have todo without hashes due to https://github.com/pypa/pip/issues/4995
-	poetry export --dev --without-hashes -f requirements.txt > requirements.txt
-	for pkg in $(PKG_SET); do cd $$pkg && poetry export --without-hashes -f requirements.txt > requirements.txt && cd ../..; done
-
 pkg-increment:
 # increment versions
-	poetry version patch
-	for pkg in $(PKG_SET); do cd $$pkg && poetry version patch && cd ../..; done
-# generate setup
-	@$(MAKE) pkg-gen-setup
+	poetry version $(PKG_INCREMENT)
+	for pkg in $(PKG_SET); do cd $$pkg && poetry version $(PKG_INCREMENT) && cd ../..; done
 	python3 tools/dev/poetrypkg.py gen-version-file -p . -f c7n/version.py
 
 pkg-build-wheel:
-# azure pin uses ancient wheel version, upgrade first
-	pip install -U wheel
-# clean up any artifacts first
-	rm -f dist/*
-	for pkg in $(PKG_SET); do cd $$pkg && rm -f dist/* && cd ../..; done
-# generate sdist
-	python setup.py bdist_wheel
-	for pkg in $(PKG_SET); do cd $$pkg && python setup.py bdist_wheel && cd ../..; done
-# check wheel
-	twine check dist/*
-	for pkg in $(PKG_SET); do cd $$pkg && twine check dist/* && cd ../..; done
+# requires plugin installation -> poetry self add poetry-plugin-freeze
+	@$(MAKE) -f $(SELF_MAKE) pkg-clean
+
+	poetry build --format wheel
+	for pkg in $(PKG_SET); do cd $$pkg && poetry build --format wheel && cd ../..; done
+
+	poetry freeze-wheel
+
+	twine check --strict dist/*
+	for pkg in $(PKG_SET); do cd $$pkg && twine check --strict dist/* && cd ../..; done
 
 pkg-publish-wheel:
 # upload to test pypi
-	twine upload -r $(PKG_REPO) dist/*
-	for pkg in $(PKG_SET); do cd $$pkg && twine upload -r $(PKG_REPO) dist/* && cd ../..; done
+	poetry publish -r $(PKG_REPO)
+	for pkg in $(PKG_SET); do cd $$pkg && poetry publish -r $(PKG_REPO) && cd ../..; done
 
 
 ###

@@ -3,6 +3,7 @@
 import json
 import jmespath
 import jmespath.parser
+import pytest
 from pytest_terraform import terraform
 from unittest import TestCase
 
@@ -19,6 +20,7 @@ class JmespathEncoder(json.JSONEncoder):
         return json.JSONEncoder.default(self, obj)
 
 
+@pytest.mark.audited
 @terraform('event_bridge_bus')
 def test_event_bus_describe(test, event_bridge_bus):
     factory = test.replay_flight_data('test_cwe_bus_xaccount')

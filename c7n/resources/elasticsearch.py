@@ -240,8 +240,10 @@ class SourceIP(Filter):
     an ElasticSearch domain allows traffic from non approved IP addresses/CIDRs.
 
     :example:
+
     Find ElasticSearch domains that allow traffic from IP addresses
     not in the approved list (string matching)
+
     .. code-block: yaml
 
       - type: source-ip
@@ -249,11 +251,14 @@ class SourceIP(Filter):
         value: ["103.15.250.0/24", "173.240.160.0/21", "206.108.40.0/21"]
 
     Same  as above but using cidr matching instead of string matching
+
     .. code-block: yaml
+
       - type: source-ip
         op: not-in
         value_type: cidr
         value: ["103.15.250.0/24", "173.240.160.0/21", "206.108.40.0/21"]
+
     """
     schema = type_schema('source-ip', rinherit=ValueFilter.schema)
     permissions = ("es:DescribeElasticsearchDomainConfig",)
@@ -512,7 +517,9 @@ class RemoveMatchedSourceIps(BaseAction):
     ElasticSearch domain.
 
     :example:
+ 
     .. code-block:: yaml
+
             policies:
               - name: es-access-revoke
                 resource: elasticsearch

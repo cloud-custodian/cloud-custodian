@@ -185,3 +185,36 @@ class EKS(BaseTest):
         kmsKeyId = resources[0]['encryptionConfig'][0]['provider']['keyArn']
         aliases = kms.list_aliases(KeyId=kmsKeyId)
         self.assertEqual(aliases['Aliases'][0]['AliasName'], 'alias/eks')
+
+
+    def test_network_location_filter(self):
+        factory = self.replay_flight_data("test_eks_network_location_filter")
+
+        p = self.load_policy(
+            {
+                "name": "test_eks_network_location_filter",
+                "resource": "eks",
+                "filters": [
+                    {
+                        "type": "network-location",
+                        "compare": ["resource", "security-group"],
+                        "key": "tag:NetworkLocation",
+                        "match": "equal"
+                    }
+                ]
+            },
+            session_factory=factory
+        )
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        matched = resources.pop()
+        self.assertEqual(
+            matched["Tags"],
+            [
+                {
+                    'Key': 'NetworkLocation',
+                    'Value': 'Customer'
+                }
+            ]
+        )
