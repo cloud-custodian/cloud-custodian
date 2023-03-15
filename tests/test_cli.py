@@ -302,6 +302,7 @@ class SchemaTest(CliTest):
                     'expr': {'oneOf': [
                         {'type': 'integer'},
                         {'type': 'string'}]},
+                    'api_key_secret': {'type': 'string'},
                     'headers': {
                         'type': 'object',
                         'patternProperties': {
@@ -320,6 +321,7 @@ class SchemaTest(CliTest):
                     'expr': {'oneOf': [
                         {'type': 'integer'},
                         {'type': 'string'}]},
+                    'api_key_secret': {'type': 'string'},
                     'headers': {
                         'type': 'object',
                         'patternProperties': {

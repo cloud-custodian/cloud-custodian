@@ -242,19 +242,12 @@ class UrlValueTest(BaseTest):
         self.assertEqual(values.get_values(), {"3"})
 
     def test_value_from_vars(self):
-        api_key_secret = "arn:aws:secretsmanager:<region>:<account>:secret:<name>"
         values = self.get_values_from(
-            {
-                "url": "{account_id}",
-                "expr": '["{region}"][]',
-                "format": "json",
-                "api_key_secret": api_key_secret
-            },
+            {"url": "{account_id}", "expr": '["{region}"][]', "format": "json"},
             json.dumps({"us-east-1": "east-resource"}),
         )
         self.assertEqual(values.get_values(), {"east-resource"})
         self.assertEqual(values.data.get("url", ""), ACCOUNT_ID)
-        self.assertEqual(values.data.get("api_key_secret", ""), api_key_secret)
 
     def test_value_from_caching(self):
         cache = FakeCache()
