@@ -137,8 +137,8 @@ class ValuesFrom:
         self.cache = manager._cache or NullCache({})
         self.resolver = URIResolver(manager.session_factory, self.cache)
 
-    def _attach_api_key(self, config, headers):
-        api_key = config.get('api_key_secret')
+    def _attach_api_key(self, headers):
+        api_key = self.data.get('api_key_secret')
         if api_key is not None:
             if api_key.startswith('arn:aws:secretsmanager'):
                 client = boto3.client('secretsmanager')
@@ -162,7 +162,7 @@ class ValuesFrom:
             uri=self.data.get('url'),
             headers=self.data.get('headers', {})
         )
-        self._attach_api_key(self.data, params['headers'])
+        self._attach_api_key(params['headers'])
         
         contents = str(self.resolver.resolve(**params))
         return contents, format
