@@ -1985,7 +1985,9 @@ class UserPolicy(ValueFilter):
             for ap in aps:
                 policy_arn = ap['PolicyArn']
                 policy_searched = self.find_policy_in_user_set(u, 'c7n:Policies', policy_arn)
-                group_policy_searched = self.find_policy_in_user_set(u, 'c7n:GroupsPolicies', policy_arn)
+                group_policy_searched = self.find_policy_in_user_set(
+                    u, 'c7n:GroupsPolicies', policy_arn
+                )
 
                 if policy_searched and group_policy_searched is None:
                     u['c7n:GroupsPolicies'].append(policy_searched)
