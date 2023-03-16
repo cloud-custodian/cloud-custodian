@@ -480,6 +480,10 @@ class UnusedSNSSubscription(RelatedResourceFilter):
               - name: sns-subscription-unused
                 resource: sns-subscription
                 filters:
+                  - type: value
+                    key: TopicArn
+                    op: glob
+                    value: "arn:aws:sns:{region}:{account_id}:*"
                   - type: unused
                     key: TopicArn
                     value: absent
