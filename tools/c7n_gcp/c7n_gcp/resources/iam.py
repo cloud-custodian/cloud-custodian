@@ -3,10 +3,10 @@
 import re
 
 from c7n.utils import type_schema
-
+from c7n_gcp.filters.iampolicy import IamPolicyFilter
 from c7n_gcp.provider import resources
 from c7n_gcp.query import QueryResourceManager, TypeInfo, ChildResourceManager, ChildTypeInfo
-from c7n_gcp.actions import MethodAction
+from c7n_gcp.actions import MethodAction, SetIamPolicy
 
 
 @resources.register('project-role')
@@ -97,6 +97,20 @@ class DisableServiceAccount(MethodAction):
 
     def get_resource_params(self, m, r):
         return {'name': r['name']}
+    
+
+@ServiceAccount.filter_registry.register('iam-policy')
+class ServiceAccountIamPolicyFilter(IamPolicyFilter):
+    """
+    Overrides the base implementation to process service account resources correctly.
+    """
+    permissions = ('resourcemanager.projects.getIamPolicy',)
+
+    def _verb_arguments(self, resource):
+        verb_arguments = SetIamPolicy._verb_arguments(self, resource)
+        verb_arguments['body'] = {}
+        return verb_arguments
+
 
 
 @resources.register('service-account-key')
