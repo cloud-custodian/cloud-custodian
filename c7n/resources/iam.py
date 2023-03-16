@@ -1965,35 +1965,38 @@ class UserPolicy(ValueFilter):
         'iam:ListAttachedGroupPolicies',
     )
 
-    def find_policy_in_user_set(self, u, key, policy_arn):
-        if key in u:
-            searched = next((v for v in u[key] if v.get("Arn") == policy_arn), None)
-            if searched is not None:
-                return searched
+    def find_in_user_set(self, user_set, search_key, arn_key, arn):
+        for u in user_set:
+            if search_key in u:
+                searched = next((v for v in u[search_key] if v.get(arn_key) == arn), None)
+                if searched is not None:
+                    return searched
 
         return None
 
-    def user_groups_policies(self, client, u):
-        if 'c7n:GroupsPolicies' not in u:
-            u['c7n:GroupsPolicies'] = []
-
+    def user_groups_policies(self, client, user_set, u):
         u['c7n:Groups'] = client.list_groups_for_user(
             UserName=u['UserName'])['Groups']
-        for ug in u['c7n:Groups']:
-            aps = client.list_attached_group_policies(
-                GroupName=ug['GroupName'])['AttachedPolicies']
-            for ap in aps:
-                policy_arn = ap['PolicyArn']
-                policy_searched = self.find_policy_in_user_set(u, 'c7n:Policies', policy_arn)
-                group_policy_searched = self.find_policy_in_user_set(
-                    u, 'c7n:GroupsPolicies', policy_arn
-                )
 
-                if policy_searched and group_policy_searched is None:
-                    u['c7n:GroupsPolicies'].append(policy_searched)
-                else:
-                    u['c7n:GroupsPolicies'].append(
-                        client.get_policy(PolicyArn=policy_arn)['Policy'])
+        for ug in u['c7n:Groups']:
+            ug_searched = self.find_in_user_set(user_set, 'c7n:Groups', 'Arn', ug['Arn'])
+            if ug_searched and ug_searched.get('AttachedPolicies'):
+                ug['AttachedPolicies'] = ug_searched['AttachedPolicies']
+            else:
+                ug['AttachedPolicies'] = client.list_attached_group_policies(
+                    GroupName=ug['GroupName'])['AttachedPolicies']
+
+            for ap in ug['AttachedPolicies']:
+                p_searched = self.find_in_user_set([u], 'c7n:Policies', 'Arn', ap['PolicyArn'])
+                if not p_searched:
+                    p_searched = self.find_in_user_set(
+                        user_set, 'c7n:Policies', 'Arn', ap['PolicyArn']
+                    )
+                    if p_searched:
+                        u['c7n:Policies'].append(p_searched)
+                    else:
+                        u['c7n:Policies'].append(
+                            client.get_policy(PolicyArn=ap['PolicyArn'])['Policy'])
 
         return u
 
@@ -2008,7 +2011,7 @@ class UserPolicy(ValueFilter):
                 u['c7n:Policies'].append(
                     client.get_policy(PolicyArn=ap['PolicyArn'])['Policy'])
             if self.data.get('include-via'):
-                u = self.user_groups_policies(client, u)
+                u = self.user_groups_policies(client, user_set, u)
 
     def process(self, resources, event=None):
         user_set = chunks(resources, size=50)
@@ -2022,10 +2025,6 @@ class UserPolicy(ValueFilter):
             for p in r['c7n:Policies']:
                 if self.match(p) and r not in matched:
                     matched.append(r)
-            if self.data.get('include-via'):
-                for p in r['c7n:GroupsPolicies']:
-                    if self.match(p) and r not in matched:
-                        matched.append(r)
         return matched
 
 

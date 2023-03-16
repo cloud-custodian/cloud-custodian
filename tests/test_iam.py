@@ -1050,8 +1050,11 @@ class IamUserTest(BaseTest):
             session_factory=session_factory,
         )
         resources = p.run()
-        self.assertEqual(resources[0]["UserName"], "alphabet_soup")
-        self.assertEqual(len(resources[0]["c7n:GroupsPolicies"]), 2)
+        self.assertEqual(len(resources), 2)
+        self.assertEqual(resources[0]["UserName"], "alphabet_soup_1")
+        self.assertEqual(len(resources[0]["c7n:Policies"]), 2)
+        self.assertEqual(resources[1]["UserName"], "alphabet_soup_2")
+        self.assertEqual(len(resources[1]["c7n:Policies"]), 2)
 
     def test_iam_user_access_key_filter(self):
         session_factory = self.replay_flight_data("test_iam_user_access_key_active")
