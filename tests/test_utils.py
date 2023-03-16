@@ -230,6 +230,7 @@ class UtilTest(BaseTest):
         self.assertEqual(json.dumps(utils.FormatDate(d),
                                     cls=utils.DateTimeEncoder, indent=2),
                          '"2018-02-02T12:00:00"')
+        self.assertEqual(str(d), '2018-02-02 12:00:00')
 
     def test_group_by(self):
         items = [{}, {"Type": "a"}, {"Type": "a"}, {"Type": "b"}]

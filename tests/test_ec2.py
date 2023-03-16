@@ -2043,6 +2043,28 @@ class TestModifySecurityGroupAction(BaseTest):
                 client.describe_instances(InstanceIds=["i-094207d64930768dc"])),
             ["launch-wizard-2"])
 
+    def test_ec2_add_by_tag(self):
+        session_factory = self.replay_flight_data("test_ec2_add_by_tag")
+        policy = self.load_policy({
+            "name": "add-remove-sg-with-name",
+            "resource": "ec2",
+            "query": [
+                {'instance-id': "i-08797f38d2e80c9d0"}],
+            "actions": [
+                {"type": "modify-security-groups",
+                 "add-by-tag": {
+                      "key": "environment",
+                      "values": ["production"]}}]},
+            session_factory=session_factory, config={'region': 'us-west-2'}
+        )
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+        client = session_factory().client('ec2')
+        self.assertEqual(
+            jmespath.search(
+                "Reservations[].Instances[].SecurityGroups[].GroupId",
+                client.describe_instances(InstanceIds=["i-08797f38d2e80c9d0"])),
+            ['sg-0cba7a01d343d5c65', 'sg-02e14ba7dd2dbe44b', 'sg-0e630ac9094eff5c5'])
 
 class TestAutoRecoverAlarmAction(BaseTest):
 

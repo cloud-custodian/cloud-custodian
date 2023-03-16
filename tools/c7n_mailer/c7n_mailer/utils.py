@@ -484,3 +484,8 @@ def get_aws_username_from_event(logger, event):
     else:
         user_id = identity['principalId']
     return user_id
+
+
+def unique(seq):
+    return list({k: None for k in seq})
+   
