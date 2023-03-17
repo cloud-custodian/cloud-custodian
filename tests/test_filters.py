@@ -286,6 +286,24 @@ class TestValueFilter(unittest.TestCase):
         self.assertRaises(TypeError, vf.match(resource))
 
 
+class TestUniqueValueCountFilter(unittest.TestCase):
+
+    def test_matches_count(self):
+        filter = filters.factory(
+            {"type": "unique-value-count", "op": "gt", "value": 1, "key": "test"}
+        )
+
+        a = {"test": "a"}
+        b = {"test": "b"}
+        c = {"test": "c"}
+
+        result = filter.process([a, b, c])
+        self.assertEqual([], result)
+
+        result = filter.process([a, a, b, c])
+        self.assertEqual([a, a], result)
+
+
 class TestAgeFilter(unittest.TestCase):
 
     def test_age_filter(self):

@@ -107,6 +107,7 @@ class FilterRegistry(PluginRegistry):
     def __init__(self, *args, **kw):
         super(FilterRegistry, self).__init__(*args, **kw)
         self.register('value', ValueFilter)
+        self.register('unique-value-count', UniqueValueCountFilter)
         self.register('or', Or)
         self.register('and', And)
         self.register('not', Not)
@@ -585,19 +586,25 @@ class ValueFilter(BaseValueFilter):
     def get_resource_value(self, k, i):
         return super(ValueFilter, self).get_resource_value(k, i, self.data.get('value_regex'))
 
+    def _initialize_content(self):
+        if hasattr(self, 'content_initialized'):
+            return
+
+        self.k = self.data.get('key')
+        self.op = self.data.get('op')
+        if 'value_from' in self.data:
+            values = ValuesFrom(self.data['value_from'], self.manager)
+            self.v = values.get_values()
+        else:
+            self.v = self.data.get('value')
+        self.content_initialized = True
+        self.vtype = self.data.get('value_type')
+
     def match(self, i):
         if self.v is None and len(self.data) == 1:
             [(self.k, self.v)] = self.data.items()
-        elif self.v is None and not hasattr(self, 'content_initialized'):
-            self.k = self.data.get('key')
-            self.op = self.data.get('op')
-            if 'value_from' in self.data:
-                values = ValuesFrom(self.data['value_from'], self.manager)
-                self.v = values.get_values()
-            else:
-                self.v = self.data.get('value')
-            self.content_initialized = True
-            self.vtype = self.data.get('value_type')
+        elif self.v is None:
+            self._initialize_content()
 
         if i is None:
             return False
@@ -701,6 +708,31 @@ class ValueFilter(BaseValueFilter):
             return s, v
 
         return sentinel, value
+
+
+class UniqueValueCountFilter(ValueFilter):
+    """Filter to all items based on the count of resources sharing the value for a given
+    key.
+    """
+    schema = type_schema('unique-value-count', rinherit=ValueFilter.schema)
+
+    def process(self, resources, event=None):
+        self._initialize_content()
+
+        op = OPERATORS[self.data.get('op')]
+        expected = self.data.get('value')
+
+        grouped = {}
+        inverse = []
+        for resource in resources:
+            value = self.get_resource_value(self.k, resource)
+
+            if value not in grouped:
+                grouped[value] = []
+            grouped[value].append(resource)
+            inverse.append((resource, grouped[value]))
+
+        return [r for r, g in inverse if op(len(g), expected)]
 
 
 class AgeFilter(Filter):
