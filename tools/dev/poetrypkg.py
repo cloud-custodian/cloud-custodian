@@ -20,7 +20,7 @@ def project_roots(root):
 @cli.command()
 @click.option('-r', '--root', type=click.Path())
 @click.option('-o', '--output', type=click.Path())
-def gen_test_requires(root, output):
+def gen_qa_requires(root, output):
     packages = []
     for root in project_roots(root):
         data = toml.loads((root / "pyproject.toml").read_text())
