@@ -466,25 +466,31 @@ class SNSSubscription(QueryResourceManager):
         )
 
 
-@SNSSubscription.filter_registry.register('unused')
-class UnusedSNSSubscription(RelatedResourceFilter):
+@SNSSubscription.filter_registry.register('topic')
+class SNSSubscriptionTopic(RelatedResourceFilter):
 
     """
-    Filters subscriptons based on invalid topic arn
-    
+    Filters subscriptons based on topic properties
+
     :example:
+
+    Identify subscriptions pointing to a topic that no longer
+    exists. Note that this policy also ensures that the topic
+    is in the same account and region. For cross-account
+    subscriptions, Custodian can't see if the topics still
+    exist.
 
     .. code-block:: yaml
 
             policies:
-              - name: sns-subscription-unused
+              - name: sns-subscription-topic
                 resource: sns-subscription
                 filters:
                   - type: value
                     key: TopicArn
                     op: glob
                     value: "arn:aws:sns:{region}:{account_id}:*"
-                  - type: unused
+                  - type: topic
                     key: TopicArn
                     value: absent
     """
@@ -494,7 +500,7 @@ class UnusedSNSSubscription(RelatedResourceFilter):
     AnnotationKey = 'Topic'
 
     schema = type_schema(
-        'unused', rinherit=ValueFilter.schema)
+        'topic', rinherit=ValueFilter.schema)
 
 
 @SNSSubscription.action_registry.register('delete')

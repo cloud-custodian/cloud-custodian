@@ -862,7 +862,7 @@ class TestSubscription(BaseTest):
                "resource": "sns-subscription",
                "filters": [
                    {
-                     "type": "unused",
+                     "type": "topic",
                      "key": "TopicArn",
                      "value": "absent"
                    }
