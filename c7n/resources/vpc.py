@@ -926,7 +926,10 @@ class UsedSecurityGroup(SGUsage):
         enis = []
         for nic in self.nics:
             if nic['Status'] == 'in-use':
-                instance_owner_id = nic['Attachment']['InstanceOwnerId']
+                if nic.get('Attachment'):
+                    instance_owner_id = nic['Attachment']['InstanceOwnerId']
+                else:
+                    instance_owner_id = ''
                 interface_resource_type = get_eni_resource_type(nic)
             else:
                 instance_owner_id = ''
