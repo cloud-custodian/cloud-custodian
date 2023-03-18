@@ -41,6 +41,7 @@ ResourceMap = {
     "aws.config-recorder": "c7n.resources.config.ConfigRecorder",
     "aws.config-rule": "c7n.resources.config.ConfigRule",
     "aws.customer-gateway": "c7n.resources.vpc.CustomerGateway",
+    "aws.recovery-control-panel": "c7n.resources.route53.ControlPanel",
     "aws.datapipeline": "c7n.resources.datapipeline.DataPipeline",
     "aws.dax": "c7n.resources.dynamodb.DynamoDbAccelerator",
     "aws.directconnect": "c7n.resources.directconnect.DirectConnect",

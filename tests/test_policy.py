@@ -203,7 +203,7 @@ class PolicyMetaLint(BaseTest):
         overrides = overrides.difference(
             {'account', 's3', 'hostedzone', 'log-group', 'rest-api', 'redshift-snapshot',
              'rest-stage', 'codedeploy-app', 'codedeploy-group', 'fis-template', 'dlm-policy',
-             'apigwv2', })
+             'apigwv2', 'apigw-domain-name'})
         if overrides:
             raise ValueError("unknown arn overrides in %s" % (", ".join(overrides)))
 
@@ -517,8 +517,11 @@ class PolicyMetaLint(BaseTest):
             # these are valid, but v1 & v2 arns get mangled into the
             # same top level prefix
             'emr-serverless-app',
+            # api gateway resources trip up these checks because they
+            # have leading slashes in the resource type section
             'rest-api',
             'rest-stage',
+            'apigw-domain-name',
             # synthetics ~ ie. c7n introduced since non exist.
             # or in some cases where it exists but not usable in iam.
             'scaling-policy',

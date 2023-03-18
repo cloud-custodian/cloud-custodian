@@ -18,6 +18,9 @@ ifneq "$(findstring $(PLATFORM_OS), Linux Darwin)" ""
   ifneq "$(findstring $(PY_VERSION), 3.10)" ""
     PKG_SET := tools/c7n_left $(PKG_SET)
   endif
+  ifneq "$(findstring $(PY_VERSION), 3.11)" ""
+    PKG_SET := tools/c7n_left $(PKG_SET)
+  endif
 endif
 
 
