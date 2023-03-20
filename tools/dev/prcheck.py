@@ -5,7 +5,6 @@ from pathlib import Path
 
 import click
 
-from fastcore.xtras import obj2dict
 from ghapi.all import GhApi
 from ghapi.all import paged
 from rich.console import Console
