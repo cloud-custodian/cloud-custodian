@@ -130,24 +130,37 @@ class SubscriptionDiagnosticSettingFilter(ValueFilter):
         rinherit=ValueFilter.schema
     )
 
+    def _get_subscription_diagnostic_settings(self, session, subscription_id):
+        client = MonitorManagementClient(
+            session.get_credentials(),
+            subscription_id=subscription_id
+        )
+
+        query = client.subscription_diagnostic_settings.list(subscription_id)
+
+        settings = query.serialize(True).get('value', [])
+
+        # put an empty item in when no diag settings so the absent operator can function
+        if not settings:
+            settings = [{}]
+
+        return settings
+
     def process(self, resources, event=None):
         session = local_session(self.manager.session_factory)
 
         matched = []
         for resource in resources:
             subscription_id = resource['subscriptionId']
-            client = MonitorManagementClient(
-                session.get_credentials(),
-                subscription_id=subscription_id
-            )
 
-            query = client.subscription_diagnostic_settings.list(subscription_id)
-
-            settings = query.serialize(True).get('value', [])
-
-            # put an empty item in when no diag settings so the absent operator can function
-            if not settings:
-                settings = [{}]
+            if self.cache_key in resource:
+                settings = resource[self.cache_key]
+            else:
+                settings = self._get_subscription_diagnostic_settings(
+                    session,
+                    subscription_id
+                )
+                resource[self.cache_key] = settings
 
             filtered_settings = super().process(settings, event=None)
 
