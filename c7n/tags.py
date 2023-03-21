@@ -430,7 +430,7 @@ class Tag(Action):
             'account_id': self.manager.config.account_id,
             'now': utils.FormatDate.utcnow(),
             'region': self.manager.config.region}
-        return tag.format(**params)
+        return str(tag).format(**params)
 
     def interpolate_values(self, tags):
         """Interpolate in a list of tags - 'old' ec2 format

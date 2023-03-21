@@ -105,15 +105,15 @@ set of dates.
       resource: ec2
       conditions:
          - type: value
-	   key: now
-	   op: greater-than
-	   value_type: date
-	   value: "2018-12-15"
-	 - type: value
-	   key: now
-	   op: less-than
-	   value_type: date
-	   value: "2018-12-31"
+           key: now
+           op: greater-than
+           value_type: date
+           value: "2018-12-15"
+         - type: value
+           key: now
+           op: less-than
+           value_type: date
+           value: "2018-12-31"
       filters:
         - "tag:holiday-off-hours": present
       actions:
@@ -126,15 +126,15 @@ set of dates.
       resource: ec2
       conditions:
         - type: value
-	  key: now
-	  value_type: date
-	  op: greater-than
-	  value: "2009-1-1"
-	- type: value
-	  key: now
-	  value_type: date
-	  op: less-than
-	  value: "2019-1-1 23:59:59"
+          key: now
+          value_type: date
+          op: greater-than
+          value: "2009-1-1"
+        - type: value
+          key: now
+          value_type: date
+          op: less-than
+          value: "2019-1-1 23:59:59"
       filters:
         - "tag:holiday-off-hours": present
       actions:
@@ -158,19 +158,17 @@ resources.
     - name: log-delete
       description: |
         This policy will delete all log groups
-	that haven't been written to in 5 days.
+        that haven't been written to in 5 days.
 
-	As a safety belt, it will stop execution
-	if the number of log groups that would
-	be affected is more than 5% of the total
+        As a safety belt, it will stop execution
+        if the number of log groups that would
+        be affected is more than 5% of the total
         log groups in the account's region.
       resource: aws.log-group
       max-resources-percent: 5
       filters:
         - type: last-write
-	  days: 5
-      actions:
-        - delete
+          days: 5
 
 
 Max resources can also be specified as an absolute number using
@@ -194,10 +192,10 @@ if you would like both a resource percent and a resource amount enforced.
 
     - name: log-delete
       description: |
-    This policy will not execute if
-    the resources affected are over 50% of
-    the total resource type amount and that
-    amount is over 20.
+        This policy will not execute if
+        the resources affected are over 50% of
+        the total resource type amount and that
+        amount is over 20.
       resource: aws.log-group
       max-resources:
         percent: 50
@@ -205,7 +203,7 @@ if you would like both a resource percent and a resource amount enforced.
         op: and
       filters:
         - type: last-write
-    days: 5
+          days: 5
       actions:
         - delete
 

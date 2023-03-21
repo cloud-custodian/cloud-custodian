@@ -12,6 +12,26 @@ def cli():
     some simple tooling to sync poetry files to setup/pip
     """
 
+def project_roots(root):
+    for config_path in Path(root).rglob("pyproject.toml"):
+        yield config_path.parent
+
+
+@cli.command()
+@click.option('-r', '--root', type=click.Path())
+@click.option('-o', '--output', type=click.Path())
+def gen_qa_requires(root, output):
+    packages = []
+    for root in project_roots(root):
+        data = toml.loads((root / "pyproject.toml").read_text())
+        poetry_data = data['tool']['poetry']
+        packages.append((poetry_data['name'], poetry_data['version']))
+
+    with open(output, 'w') as fh:
+        fh.write("\n".join(
+            [f"{name}=={version}" for name, version in packages]))
+
+
 @cli.command()
 @click.option('-p', '--package-dir', type=click.Path())
 @click.option('-f', '--version-file', type=click.Path())

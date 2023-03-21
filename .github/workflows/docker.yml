@@ -18,6 +18,7 @@ jobs:
           - c7n-org
           - mailer
           - policystream
+          - c7n-left
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
