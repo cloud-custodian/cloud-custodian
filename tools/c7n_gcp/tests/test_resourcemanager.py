@@ -464,3 +464,48 @@ class ProjectTest(BaseTest):
 
         if not perms:
             self.fail('missing permissions on \"missing\" filter')
+
+
+class TestAccessApprovalFilter(BaseTest):
+
+    def test_access_approval_enabled(self):
+        session_factory = self.replay_flight_data('filter-access-approval-enabled')
+        p = self.load_policy(
+            {'name': 'gcp-access-approval',
+             'resource': 'gcp.project',
+                "filters": [{
+                    'type': 'access-approval',
+                    'key': 'enrolledServices.cloudProduct',
+                    'value': 'all'}]},
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_access_approval_disabled(self):
+        session_factory = self.replay_flight_data('filter-access-approval-disabled')
+        p = self.load_policy(
+            {'name': 'gcp-access-approval',
+             'resource': 'gcp.project',
+                "filters": [{
+                    'type': 'access-approval',
+                    'key': 'name',
+                    'value': 'absent'}]},
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_access_approval_disabled_precon(self):
+        session_factory = self.replay_flight_data('filter-access-approval-disabled-precon')
+        p = self.load_policy(
+            {'name': 'gcp-access-approval',
+             'resource': 'gcp.project',
+                "filters": [{
+                    'type': 'access-approval',
+                    'key': 'name',
+                    'value': 'absent'}]},
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)

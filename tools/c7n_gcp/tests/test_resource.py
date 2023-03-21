@@ -13,7 +13,7 @@ from c7n_gcp.provider import resources
 ALLOWED_NOPERM = set((
     'or', 'and', 'not', 'value', 'reduce',
     'offhour', 'onhour', 'marked-for-op',
-    'event', 'webhook', 'missing'))
+    'event', 'webhook', 'missing', 'list-item'))
 
 
 class ResourceMetaTest(BaseTest):
