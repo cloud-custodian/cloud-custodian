@@ -14,7 +14,6 @@ import jmespath
 from c7n.tags import Tag, TagDelayedAction, RemoveTag, TagActionFilter
 from c7n.actions import AutoTagUser, AutoscalingBase
 import c7n.filters.vpc as net_filters
-from c7n.exceptions import PolicyValidationError
 
 
 def ecs_tag_normalize(resources):
@@ -595,68 +594,47 @@ class DeleteTaskDefinition(BaseAction):
     The definition will be marked as InActive. Currently running
     services and task can still reference, new services & tasks
     can't.
-    """
-
-    schema = type_schema('delete')
-    permissions = ('ecs:DeregisterTaskDefinition',)
-
-    def process(self, resources):
-        client = local_session(self.manager.session_factory).client('ecs')
-        retry = get_retry(('Throttling',))
-
-        for r in resources:
-            try:
-                retry(client.deregister_task_definition,
-                      taskDefinition=r['taskDefinitionArn'])
-            except ClientError as e:
-                # No error code for not found.
-                if e.response['Error'][
-                        'Message'] != 'The specified task definition does not exist.':
-                    raise
-
-@TaskDefinition.action_registry.register('delete-permanently')
-class DeleteTaskDefinitionPermanently(BaseAction):
-    '''Delete a task definition permanently
     
-    This will work in conjunction with the 'delete' action. As a task definition is deregistered, 
-    it can also be deleted
+    deregister is True by default. When given as False, the task definition will 
+    be permanently deleted.
     
     .. code-block:: yaml
 
        policies:
-         - name: delete-task-definition-permanently
+         - name: deregister-task-definition
            resource: ecs-task-definition
            filters:
              - family: test-task-def
            actions:
              - type: delete
-             - type: delete-permanently
-    
-    '''
-    schema = type_schema('delete-permanently')
-    permissions = ('ecs:DeleteTaskDefinitions',)
+         - name: delete-task-definition
+           resource: ecs-task-definition
+           filters:
+             - family: test-task-def
+           actions:
+             - type: delete
+               deregister: False
+    """
 
-    def validate(self):
-        actions = self.manager.data.get('actions', [])
-        if not any(action.get('type') == 'delete' for action in actions):
-            raise PolicyValidationError(
-                'This action requires the "delete" action to be present in the policy.')
-        return self
+    schema = type_schema('delete', deregister={'type': 'boolean'})
+    permissions = ('ecs:DeregisterTaskDefinition','ecs:DeleteTaskDefinitions',)
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('ecs')
         retry = get_retry(('Throttling',))
+        deregister = self.data.get('deregister', True)
 
-        task_definition_arns = [r['taskDefinitionArn'] for r in resources]
-
-        for chunk in chunks(task_definition_arns, size=10):
+        for r in resources:
             try:
-                retry(client.delete_task_definitions, taskDefinitions=chunk)
+                retry(client.deregister_task_definition,
+                      taskDefinition=r['taskDefinitionArn'])
+                if not deregister:
+                    retry(client.delete_task_definitions,
+                          taskDefinitions=[r['taskDefinitionArn']])
             except ClientError as e:
                 if e.response['Error'][
                     'Message'] != 'The specified task definition does not exist.':
                     raise
-
 
 @resources.register('ecs-container-instance')
 class ContainerInstance(query.ChildResourceManager):

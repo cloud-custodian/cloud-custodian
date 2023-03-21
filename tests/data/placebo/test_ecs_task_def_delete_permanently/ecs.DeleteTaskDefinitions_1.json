@@ -3,7 +3,7 @@
     "data": {
         "taskDefinitions": [
             {
-                "taskDefinitionArn": "arn:aws:ecs:us-east-1:644160558196:task-definition/test-delete-definition:1",
+                "taskDefinitionArn": "arn:aws:ecs:us-east-1:644160558196:task-definition/test-deleting-task-def:1",
                 "containerDefinitions": [
                     {
                         "name": "test",
@@ -27,14 +27,14 @@
                             "logDriver": "awslogs",
                             "options": {
                                 "awslogs-create-group": "true",
-                                "awslogs-group": "/ecs/test-delete-definition",
+                                "awslogs-group": "/ecs/test-deleting-task-def",
                                 "awslogs-region": "us-east-1",
                                 "awslogs-stream-prefix": "ecs"
                             }
                         }
                     }
                 ],
-                "family": "test-delete-definition",
+                "family": "test-deleting-task-def",
                 "executionRoleArn": "arn:aws:iam::644160558196:role/ecsTaskExecutionRole",
                 "networkMode": "awsvpc",
                 "revision": 1,
@@ -84,21 +84,21 @@
                     "__class__": "datetime",
                     "year": 2023,
                     "month": 3,
-                    "day": 16,
-                    "hour": 8,
-                    "minute": 3,
-                    "second": 31,
-                    "microsecond": 436000
+                    "day": 21,
+                    "hour": 15,
+                    "minute": 39,
+                    "second": 50,
+                    "microsecond": 215000
                 },
                 "deregisteredAt": {
                     "__class__": "datetime",
                     "year": 2023,
                     "month": 3,
-                    "day": 16,
-                    "hour": 8,
-                    "minute": 4,
-                    "second": 23,
-                    "microsecond": 661000
+                    "day": 21,
+                    "hour": 15,
+                    "minute": 40,
+                    "second": 24,
+                    "microsecond": 424000
                 },
                 "registeredBy": "arn:aws:iam::644160558196:user/timmy"
             }
