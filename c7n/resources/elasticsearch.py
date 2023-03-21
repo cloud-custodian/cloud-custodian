@@ -137,9 +137,8 @@ class ElasticSearchCrossAccountAccessFilter(CrossAccountAccessFilter):
                     DomainName=r['DomainName'],
                     ignore_err_codes=('ResourceNotFoundException',))
                 if result:
-                    r[self.policy_attribute] = json.loads(
-                        result.get('DomainConfig').get('AccessPolicies').get('Options')
-                    )
+                    options = result.get('DomainConfig').get('AccessPolicies').get('Options')
+                    r[self.policy_attribute] = options and json.loads(options) or None
         return super().process(resources)
 
 
