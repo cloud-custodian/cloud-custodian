@@ -132,7 +132,9 @@ class SlackDelivery:
                 url='https://slack.com/api/users.lookupByEmail',
                 data={'email': address},
                 headers={'Content-Type': 'application/x-www-form-urlencoded',
-                         'Authorization': 'Bearer %s' % self.config.get('slack_token')}).json()
+                         'Authorization': 'Bearer %s' % self.config.get('slack_token')},
+                timeout=60
+            ).json()
 
             if not response["ok"]:
                 if "headers" in response.keys() and "Retry-After" in response["headers"]:
@@ -170,13 +172,17 @@ class SlackDelivery:
             response = requests.post(
                 url=key,
                 data=message_payload,
-                headers={'Content-Type': 'application/json;charset=utf-8'})
+                headers={'Content-Type': 'application/json;charset=utf-8'},
+                timeout=60
+            )
         else:
             response = requests.post(
                 url='https://slack.com/api/chat.postMessage',
                 data=message_payload,
                 headers={'Content-Type': 'application/json;charset=utf-8',
-                         'Authorization': 'Bearer %s' % self.config.get('slack_token')})
+                         'Authorization': 'Bearer %s' % self.config.get('slack_token')},
+                timeout=60
+            )
 
         if response.status_code == 429 and "Retry-After" in response.headers:
             self.logger.info(

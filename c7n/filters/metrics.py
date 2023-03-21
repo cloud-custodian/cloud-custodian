@@ -150,7 +150,7 @@ class MetricsFilter(Filter):
         schedule defined here:
 
         https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/cloudwatch_concepts.html#Metric
-        """ # noqa: E501
+        """  # noqa: E501
 
         duration = timedelta(self.days)
         now = datetime.utcnow()

@@ -168,7 +168,7 @@ class FunctionPackage:
     def status(self, deployment_creds):
         status_url = '%s/api/deployments' % deployment_creds.scm_uri
 
-        r = requests.get(status_url, verify=self.enable_ssl_cert)
+        r = requests.get(status_url, verify=self.enable_ssl_cert, timeout=60)
         if r.status_code != 200:
             self.log.error("Application service returned an error.\n%s\n%s"
                            % (r.status_code, r.text))

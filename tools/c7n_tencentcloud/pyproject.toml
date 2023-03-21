@@ -1,11 +1,12 @@
 [tool.poetry]
 name = "c7n_tencentcloud"
-version = "0.1.5"
+version = "0.1.6"
 description = "Cloud Custodian - Tencent Cloud Provider"
 authors = ["Tencent Cloud"]
 license = "Apache-2.0"
 homepage = "https://cloudcustodian.io"
 documentation = "https://cloudcustodian.io/docs"
+readme = "readme.md"
 
 [tool.poetry.urls]
 "Bug Tracker" = "https://github.com/cloud-custodian/cloud-custodian/issues"
@@ -18,12 +19,7 @@ tencentcloud-sdk-python = "^3.0.783"
 cos-python-sdk-v5 = "^1.9.21"
 
 [tool.poetry.dev-dependencies]
-pytest = "^7.1.2"
-placebo = "^0.9.0"
 c7n = {path = "../..", develop = true}
-freezegun = "^1.2.2"
-pytest-cov = "^3.0.0"
-pytest-recording = "^0.12.1"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

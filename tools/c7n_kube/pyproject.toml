@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "c7n_kube"
-version = "0.2.22"
+version = "0.2.23"
 description = "Cloud Custodian - Kubernetes Provider"
 readme = "readme.md"
 homepage = "https://cloudcustodian.io"
@@ -16,7 +16,7 @@ classifiers = [
 
 [tool.poetry.dependencies]
 python = "^3.7"
-kubernetes = "^10.0.1"
+kubernetes = ">=10.0.1"
 jsonpatch = "^1.32"
 
 [tool.poetry.dev-dependencies]
@@ -25,8 +25,8 @@ pytest = "^7.1.2"
 vcrpy = "^4.0.2"
 
 [build-system]
-requires = ["poetry>=0.12", "setuptools"]
-build-backend = "poetry.masonry.api"
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.scripts]
 "c7n-kates" = "c7n_kube.cli:cli"

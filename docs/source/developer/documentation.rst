@@ -77,11 +77,11 @@ Within docstrings, ``rst`` directives allow for highlighting code examples:
 Render the Documentation
 ------------------------
 
-In general, you should use tox to build the documentation:
+To build the documentation use the make target:
 
 .. code-block::
 
-    tox -e docs
+    make sphinx
 
 This command will clean previously built files and rebuild the entire documentation tree.
 
@@ -91,12 +91,3 @@ To do so, use the following command:
 .. code-block::
 
     make -f docs/Makefile.sphinx html
-
-
-You can also build documentation via the provided tox dockerfile.  You will need to build and
-run from the root of your source enlistment each time you edit documentation files:
-
-.. code-block::
-
-    docker build -t tox_linux --build-arg TOX_ENV=docs . -f tools/dev/docker_tox_linux/Dockerfile
-    docker run -v 'pwd'/docs/build:/src/docs/build -it tox_linux

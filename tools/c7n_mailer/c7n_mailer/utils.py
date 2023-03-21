@@ -382,9 +382,10 @@ def resource_format(resource, resource_type):
             resource['InternetGatewayId'],
             len(resource['Attachments']))
     elif resource_type == 'lambda':
-        return "Name: %s  RunTime: %s  \n" % (
+        return "Name: %s  Package Type: %s  Runtime: %s  \n" % (
             resource['FunctionName'],
-            resource['Runtime'])
+            resource['PackageType'],
+            resource.get('Runtime', 'N/A'))
     elif resource_type == 'service-quota':
         try:
             return "ServiceName: %s QuotaName: %s Quota: %i Usage: %i\n" % (
@@ -483,3 +484,8 @@ def get_aws_username_from_event(logger, event):
     else:
         user_id = identity['principalId']
     return user_id
+
+
+def unique(seq):
+    return list({k: None for k in seq})
+   

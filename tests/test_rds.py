@@ -11,7 +11,6 @@ from collections import OrderedDict
 from unittest import mock
 
 import boto3
-import c7n.resources.rds
 from botocore.exceptions import ClientError
 from c7n import tags
 from c7n.exceptions import PolicyValidationError
@@ -881,7 +880,7 @@ class RDSTest(BaseTest):
             },
             session_factory=factory,
         )
-        with mock_datetime_now(parser.parse("2022-03-30T00:00:00+00:00"), c7n.resources.rds):
+        with mock_datetime_now(parser.parse("2022-03-30T00:00:00+00:00"), datetime):
             resources = p.run()
         self.assertEqual(len(resources), 1)
 

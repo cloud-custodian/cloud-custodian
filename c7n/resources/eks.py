@@ -1,5 +1,6 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+import c7n.filters.vpc as net_filters
 from c7n.actions import Action
 from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter, VpcFilter
 from c7n.manager import resources
@@ -118,6 +119,8 @@ class EKSSubnetFilter(SubnetFilter):
 class EKSSGFilter(SecurityGroupFilter):
 
     RelatedIdsExpression = "resourcesVpcConfig.securityGroupIds[]"
+
+EKS.filter_registry.register('network-location', net_filters.NetworkLocation)
 
 
 @EKS.filter_registry.register('vpc')
