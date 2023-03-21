@@ -3,7 +3,7 @@
 import json
 
 from c7n.actions import RemovePolicyBase, ModifyPolicyBase, BaseAction
-from c7n.filters import CrossAccountAccessFilter, PolicyChecker
+from c7n.filters import CrossAccountAccessFilter, PolicyChecker, ValueFilter
 from c7n.filters.kms import KmsRelatedFilter
 import c7n.filters.policystatement as polstmt_filter
 from c7n.manager import resources
@@ -11,6 +11,7 @@ from c7n.query import ConfigSource, DescribeSource, QueryResourceManager, TypeIn
 from c7n.resolver import ValuesFrom
 from c7n.utils import local_session, type_schema
 from c7n.tags import RemoveTag, Tag, TagDelayedAction, TagActionFilter, universal_augment
+from c7n.filters.related import RelatedResourceFilter
 
 from c7n.resources.securityhub import PostFinding
 
@@ -463,6 +464,43 @@ class SNSSubscription(QueryResourceManager):
             'Endpoint',
             'TopicArn'
         )
+
+
+@SNSSubscription.filter_registry.register('topic')
+class SNSSubscriptionTopic(RelatedResourceFilter):
+
+    """
+    Filters subscriptons based on topic properties
+
+    :example:
+
+    Identify subscriptions pointing to a topic that no longer
+    exists. Note that this policy also ensures that the topic
+    is in the same account and region. For cross-account
+    subscriptions, Custodian can't see if the topics still
+    exist.
+
+    .. code-block:: yaml
+
+            policies:
+              - name: sns-subscription-topic
+                resource: sns-subscription
+                filters:
+                  - type: value
+                    key: TopicArn
+                    op: glob
+                    value: "arn:aws:sns:{region}:{account_id}:*"
+                  - type: topic
+                    key: TopicArn
+                    value: absent
+    """
+
+    RelatedResource = 'c7n.resources.sns.SNS'
+    RelatedIdsExpression = 'TopicArn'
+    AnnotationKey = 'Topic'
+
+    schema = type_schema(
+        'topic', rinherit=ValueFilter.schema)
 
 
 @SNSSubscription.action_registry.register('delete')
