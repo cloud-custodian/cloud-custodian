@@ -8,6 +8,49 @@ import time
 
 from c7n.exceptions import PolicyExecutionError
 
+class TestEcs(BaseTest):
+    def test_ecs_container_insights_enabled(self):
+        session_factory = self.replay_flight_data(
+            'test_ecs_container_insights_enabled')
+        p = self.load_policy(
+            {
+                "name": "ecs-container-insights",
+                "resource": 'ecs',
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": "settings[?(name=='containerInsights')].value",
+                        "op": "contains",
+                        "value": "disabled",
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+        
+    def test_ecs_container_insights_disabled(self):
+        session_factory = self.replay_flight_data(
+            'test_ecs_container_insights_disabled')
+        p = self.load_policy(
+            {
+                "name": "ecs-container-insights",
+                "resource": 'ecs',
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": "settings[?(name=='containerInsights')].value",
+                        "op": "contains",
+                        "value": "disabled",
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
 
 class TestEcsService(BaseTest):
 

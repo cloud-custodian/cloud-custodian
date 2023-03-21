@@ -10,7 +10,7 @@ import random
 import unittest
 import os
 
-from c7n.exceptions import PolicyValidationError
+from c7n.exceptions import PolicyValidationError, PolicyExecutionError
 from c7n.executor import MainThreadExecutor
 from c7n import filters as base_filters
 from c7n.resources.ec2 import filters
@@ -285,6 +285,24 @@ class TestValueFilter(unittest.TestCase):
             "key": "ingress"})
         self.assertRaises(TypeError, vf.match(resource))
 
+    def test_value_path(self):
+        resource = {'list':[{'a':['one','two'],'b':'one'},{'a':['one'],'b':'two'}]}
+        vf = filters.factory({
+            "type": "value",
+            "key": "list[?(b=='one')].a[]",
+            "value_path": "list[?(b=='two')].a[]",
+            "op": "intersect"})
+        res = vf.match(resource)
+        self.assertEqual(res,True)
+
+        vf = filters.factory({
+            "type": "value",
+            "key": "list[?(b=='one')].a[]",
+            "value_path": "list[?(b=='three')].a[]",
+            "op": "intersect"})
+        res = vf.match(resource)
+        self.assertEqual(res,False)
+        
 
 class TestAgeFilter(unittest.TestCase):
 
@@ -1502,6 +1520,193 @@ class TestReduceFilter(BaseFilterTest):
             [r['InstanceId'] for r in rs],
             ['D', 'B', 'C', 'A']
         )
+
+
+class ListItemFilterTest(BaseFilterTest):
+
+    def get_manager(self):
+        class Manager:
+            ctx = unittest.mock.MagicMock()
+        m = Manager()
+        m.ctx.options.cache = None
+        return m
+
+    def instance(self, id_, list_):
+        return {
+            'id': id_,
+            'list_elements': list_
+        }
+
+    def resources(self, lists):
+        result = []
+        for i in range(len(lists)):
+            result.append(self.instance(i, lists[i]))
+        return result
+
+    def test_list_item_filter(self):
+        resources = self.resources(
+            [
+                [{'foo': 'bar', 'bar': '0'}],
+                [{'foo': 'bar', 'bar': '1'}],
+                [{'foo': 'bar', 'bar': '2'}]
+            ]
+        )
+        f = filters.factory(
+            {
+                'type': 'list-item',
+                'key': 'list_elements',
+                'attrs': [
+                    {'foo': 'bar'}
+                ]
+            }, manager=self.get_manager()
+        )
+        res = f.process(resources)
+        self.assertEqual(len(res), 3)
+
+    def test_list_item_filter_match_1(self):
+        resources = self.resources(
+            [
+                [{'foo': 'bar', 'bar': '0'}],
+                [{'foo': 'bar', 'bar': '1'}],
+                [{'foo': 'bar', 'bar': '2'}]
+            ]
+        )
+        f = filters.factory(
+            {
+                'type': 'list-item',
+                'key': 'list_elements',
+                'attrs': [
+                    {'foo': 'bar'},
+                    {'bar': '1'}
+                ]
+            }, manager=self.get_manager()
+        )
+        res = f.process(resources)
+        self.assertEqual(len(res), 1)
+
+    def test_list_item_filter_match_bool(self):
+        resources = self.resources(
+            [
+                [{'foo': 'bar', 'bar': '0'}],
+                [{'foo': 'bar', 'bar': '1'}],
+                [{'foo': 'bar', 'bar': '2'}]
+            ]
+        )
+        f = filters.factory(
+            {
+                'type': 'list-item',
+                'key': 'list_elements',
+                'attrs': [
+                    {'foo': 'bar'},
+                    {'or': [
+                        {'bar': '1'},
+                        {'bar': '0'}
+                    ]}
+                ]
+            }, manager=self.get_manager()
+        )
+        res = f.process(resources)
+        self.assertEqual(len(res), 2)
+
+    def test_list_item_filter_match_regex(self):
+        resources = self.resources(
+            [
+                [{'foo': 'bar', 'bar': 'c7n'}],
+                [{'foo': 'bar', 'bar': 'myregistry.com/c7n'}],
+                [{'foo': 'bar', 'bar': 'myregistry.com/c7n'}]
+            ]
+        )
+        f = filters.factory(
+            {
+                'type': 'list-item',
+                'key': 'list_elements',
+                'attrs': [
+                    {'foo': 'bar'},
+                    {
+                        'not': [
+                            {
+                                'type': 'value',
+                                'key': 'bar',
+                                'value': 'myregistry.com/.*',
+                                'op': 'regex'
+                            }
+                        ]
+                    }
+                ]
+            }, manager=self.get_manager()
+        )
+        res = f.process(resources)
+        self.assertEqual(len(res), 1)
+        self.assertEqual(res[0]['list_elements'][0]['bar'], 'c7n')
+        self.assertEqual(res[0]['c7n:ListItemMatches'], ['list_elements[0]'])
+
+    def test_list_item_filter_match_empty(self):
+        resources = self.resources(
+            [
+                [{'foo': 'bar', 'bar': 'c7n'}],
+                [{'foo': 'bar', 'bar': 'myregistry.com/c7n'}],
+                [{'foo': 'bar', 'bar': 'myregistry.com/c7n'}]
+            ]
+        )
+        f = filters.factory(
+            {
+                'type': 'list-item',
+                'key': 'baz',
+                'attrs': [
+                    {'foo': 'bar'},
+                    {
+                        'not': [
+                            {
+                                'type': 'value',
+                                'key': 'bar',
+                                'value': 'myregistry.com/.*',
+                                'op': 'regex'
+                            }
+                        ]
+                    }
+                ]
+            }, manager=self.get_manager()
+        )
+        res = f.process(resources)
+        self.assertEqual(len(res), 0)
+
+    def test_list_item_filter_match_non_list_value(self):
+        resources = self.resources(
+            [1, 2, 3]
+        )
+        f = filters.factory(
+            {
+                'type': 'list-item',
+                'key': 'id',
+                'attrs': [
+                    {'foo': 'bar'},
+                ]
+            }, manager=self.get_manager()
+        )
+        with self.assertRaises(PolicyExecutionError):
+            f.process(resources)
+
+    def test_list_item_filter_match_count(self):
+        resources = self.resources(
+            [
+                [{'foo': 'bar', 'bar': 'c7n'}, {'foo': 'bar'}, {'foo': 'bar'}, {'foo': 'bar'}],
+                [{'foo': 'bar', 'bar': 'c7n'}, {'foo': 'bar'}, {'foo': 'bar'}],
+                [{'foo': 'bar', 'bar': 'c7n'}, {'foo': 'bar'}],
+            ]
+        )
+        f = filters.factory(
+            {
+                'type': 'list-item',
+                'key': 'list_elements',
+                'count': 3,
+                'count_op': 'gt',
+                'attrs': [
+                    {'foo': 'bar'},
+                ]
+            }, manager=self.get_manager()
+        )
+        resources = f.process(resources)
+        self.assertEqual(len(resources), 1)
 
 
 class AnnotationSweeperTest(unittest.TestCase):
