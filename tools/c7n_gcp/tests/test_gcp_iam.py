@@ -4,7 +4,6 @@
 import time
 
 from gcp_common import BaseTest, event_data
-from c7n.resources.ec2 import filters
 from googleapiclient.errors import HttpError
 
 
@@ -13,7 +12,11 @@ class ProjectRoleTest(BaseTest):
         factory = self.replay_flight_data("iam-project-role")
 
         p = self.load_policy(
-            {"name": "role-get", "resource": "gcp.project-role", "mode": {"type": "gcp-audit", "methods": ["google.iam.admin.v1.CreateRole"]}},
+            {
+                "name": "role-get",
+                "resource": "gcp.project-role",
+                "mode": {"type": "gcp-audit", "methods": ["google.iam.admin.v1.CreateRole"]},
+            },
             session_factory=factory,
         )
 
@@ -33,7 +36,9 @@ class ProjectRoleTest(BaseTest):
 class ServiceAccountTest(BaseTest):
     def test_get(self):
         factory = self.replay_flight_data("iam-service-account")
-        p = self.load_policy({"name": "sa-get", "resource": "gcp.service-account"}, session_factory=factory)
+        p = self.load_policy(
+            {"name": "sa-get", "resource": "gcp.service-account"}, session_factory=factory
+        )
         resource = p.resource_manager.get_resource(
             {
                 "project_id": "cloud-custodian",
@@ -54,7 +59,10 @@ class ServiceAccountTest(BaseTest):
 
     def test_disable(self):
         factory = self.replay_flight_data("iam-service-account-disable")
-        p = self.load_policy({"name": "sa-disable", "resource": "gcp.service-account", "actions": ["disable"]}, session_factory=factory)
+        p = self.load_policy(
+            {"name": "sa-disable", "resource": "gcp.service-account", "actions": ["disable"]},
+            session_factory=factory,
+        )
         resources = p.run()
         self.assertEqual(len(resources), 1)
         if self.recording:
@@ -65,7 +73,10 @@ class ServiceAccountTest(BaseTest):
 
     def test_enable(self):
         factory = self.replay_flight_data("iam-service-account-enable")
-        p = self.load_policy({"name": "sa-enable", "resource": "gcp.service-account", "actions": ["enable"]}, session_factory=factory)
+        p = self.load_policy(
+            {"name": "sa-enable", "resource": "gcp.service-account", "actions": ["enable"]},
+            session_factory=factory,
+        )
         resources = p.run()
         self.assertEqual(len(resources), 1)
         if self.recording:
@@ -76,7 +87,10 @@ class ServiceAccountTest(BaseTest):
 
     def test_delete(self):
         factory = self.replay_flight_data("iam-service-account-delete")
-        p = self.load_policy({"name": "sa-delete", "resource": "gcp.service-account", "actions": ["delete"]}, session_factory=factory)
+        p = self.load_policy(
+            {"name": "sa-delete", "resource": "gcp.service-account", "actions": ["delete"]},
+            session_factory=factory,
+        )
         resources = p.run()
         self.assertEqual(len(resources), 1)
         if self.recording:
@@ -99,7 +113,7 @@ class ServiceAccountTest(BaseTest):
                         "type": "iam-policy",
                         "doc": {
                             "key": "bindings[?(role=='roles/iam.serviceAccountTest1')].members[]",
-                            "value_path": "bindings[?(role=='roles/iam.serviceAccountTest2')].members[]",
+                            "value_path": "bindings[?(role=='roles/iam.serviceAccountTest2')].members[]",  # noqa: E501
                             "op": "intersect",
                         },
                     }
@@ -121,7 +135,7 @@ class ServiceAccountTest(BaseTest):
                         "type": "iam-policy",
                         "doc": {
                             "key": "bindings[?(role=='roles/iam.serviceAccountTest1')].members[]",
-                            "value_path": "bindings[?(role=='roles/iam.serviceAccountTest2')].members[]",
+                            "value_path": "bindings[?(role=='roles/iam.serviceAccountTest2')].members[]",  # noqa: E501
                             "op": "intersect",
                         },
                     }
@@ -143,7 +157,7 @@ class ServiceAccountTest(BaseTest):
                         "type": "iam-policy",
                         "doc": {
                             "key": "bindings[?(role=='roles/iam.serviceAccountTest1')].members[]",
-                            "value_path": "bindings[?(role=='roles/iam.serviceAccountTest3')].members[]",
+                            "value_path": "bindings[?(role=='roles/iam.serviceAccountTest3')].members[]",  # noqa: E501
                             "op": "intersect",
                         },
                     }
@@ -161,7 +175,10 @@ class ServiceAccountKeyTest(BaseTest):
 
         session_factory = self.replay_flight_data("iam-service-account-key-query", project_id)
 
-        policy = self.load_policy({"name": "iam-service-account-key-query", "resource": "gcp.service-account-key"}, session_factory=session_factory)
+        policy = self.load_policy(
+            {"name": "iam-service-account-key-query", "resource": "gcp.service-account-key"},
+            session_factory=session_factory,
+        )
 
         resources = policy.run()
         self.assertEqual(len(resources), 2)
@@ -177,12 +194,20 @@ class ServiceAccountKeyTest(BaseTest):
 
     def test_get_service_account_key(self):
         factory = self.replay_flight_data("iam-service-account-key")
-        p = self.load_policy({"name": "sa-key-get", "resource": "gcp.service-account-key"}, session_factory=factory)
+        p = self.load_policy(
+            {"name": "sa-key-get", "resource": "gcp.service-account-key"}, session_factory=factory
+        )
         resource = p.resource_manager.get_resource(
-            {"resourceName": "//iam.googleapis.com/projects/cloud-custodian/" "serviceAccounts/111111111111111/keys/2222"}
+            {
+                "resourceName": "//iam.googleapis.com/projects/cloud-custodian/"
+                "serviceAccounts/111111111111111/keys/2222"
+            }
         )
         self.assertEqual(resource["keyType"], "USER_MANAGED")
-        self.assertEqual(resource["c7n:service-account"]["email"], "test-cutodian-scc@cloud-custodian.iam.gserviceaccount.com")
+        self.assertEqual(
+            resource["c7n:service-account"]["email"],
+            "test-cutodian-scc@cloud-custodian.iam.gserviceaccount.com",
+        )
         self.assertEqual(
             p.resource_manager.get_urns([resource]),
             [
@@ -192,7 +217,10 @@ class ServiceAccountKeyTest(BaseTest):
 
     def test_delete_service_account_key(self):
         factory = self.replay_flight_data("iam-delete-service-account-key")
-        p = self.load_policy({"name": "sa-key-delete", "resource": "gcp.service-account-key", "actions": ["delete"]}, session_factory=factory)
+        p = self.load_policy(
+            {"name": "sa-key-delete", "resource": "gcp.service-account-key", "actions": ["delete"]},
+            session_factory=factory,
+        )
         resources = p.run()
         self.assertEqual(len(resources), 1)
         if self.recording:
@@ -211,7 +239,9 @@ class IAMRoleTest(BaseTest):
 
         session_factory = self.replay_flight_data("ami-role-query", project_id)
 
-        policy = self.load_policy({"name": "ami-role-query", "resource": "gcp.iam-role"}, session_factory=session_factory)
+        policy = self.load_policy(
+            {"name": "ami-role-query", "resource": "gcp.iam-role"}, session_factory=session_factory
+        )
 
         resources = policy.run()
         self.assertEqual(len(resources), 2)
@@ -229,7 +259,10 @@ class IAMRoleTest(BaseTest):
 
         session_factory = self.replay_flight_data("ami-role-query-get", project_id)
 
-        policy = self.load_policy({"name": "ami-role-query-get", "resource": "gcp.iam-role"}, session_factory=session_factory)
+        policy = self.load_policy(
+            {"name": "ami-role-query-get", "resource": "gcp.iam-role"},
+            session_factory=session_factory,
+        )
 
         resource = policy.resource_manager.get_resource(
             {
