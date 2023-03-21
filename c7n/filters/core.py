@@ -19,7 +19,8 @@ from random import sample
 import jmespath
 
 from c7n.element import Element
-from c7n.exceptions import PolicyValidationError
+from c7n.exceptions import PolicyValidationError, PolicyExecutionError
+from c7n.manager import ResourceManager
 from c7n.registry import PluginRegistry
 from c7n.resolver import ValuesFrom
 from c7n.utils import set_annotation, type_schema, parse_cidr, parse_date
@@ -105,13 +106,14 @@ VALUE_TYPES = [
 class FilterRegistry(PluginRegistry):
 
     def __init__(self, *args, **kw):
-        super(FilterRegistry, self).__init__(*args, **kw)
+        super().__init__(*args, **kw)
         self.register('value', ValueFilter)
         self.register('or', Or)
         self.register('and', And)
         self.register('not', Not)
         self.register('event', EventFilter)
         self.register('reduce', ReduceFilter)
+        self.register('list-item', ListItemFilter)
 
     def parse(self, data, manager):
         results = []
@@ -1049,3 +1051,147 @@ class ReduceFilter(BaseValueFilter):
             return items[::-1]
         else:
             return sorted(items, key=key, reverse=(self.order == 'desc'))
+
+
+class ListItemModel:
+    id = 'c7n:_id'
+
+
+class ListItemRegistry(FilterRegistry):
+
+    def __init__(self, *args, **kw):
+        super(FilterRegistry, self).__init__(*args, **kw)
+        self.register('value', ValueFilter)
+        self.register('or', Or)
+        self.register('and', And)
+        self.register('not', Not)
+        self.register('reduce', ReduceFilter)
+
+
+class ListItemResourceManager(ResourceManager):
+    filter_registry = ListItemRegistry('filters')
+
+    def get_model(self):
+        return ListItemModel
+
+
+class ListItemFilter(Filter):
+    """
+    Perform multi attribute filtering on items within a list,
+    for example looking for security groups that have rules which
+    include 0.0.0.0/0 and port 22 open.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: security-group-with-22-open-to-world
+            resource: aws.security-group
+            filters:
+              - type: list-item
+                key: IpPermissions
+                attrs:
+                  - type: value
+                    key: IpRanges[].CidrIp
+                    value: '0.0.0.0/0'
+                    op: in
+                    value_type: swap
+                  - type: value
+                    key: FromPort
+                    value: 22
+                  - type: value
+                    key: ToPort
+                    value: 22
+          - name: find-task-def-not-using-registry
+            resource: aws.ecs-task-definition
+            filters:
+              - not:
+                - type: list-item
+                  key: containerDefinitions
+                  attrs:
+                    - not:
+                      - type: value
+                        key: image
+                        value: "${account_id}.dkr.ecr.us-east-2.amazonaws.com.*"
+                        op: regex
+    """
+
+    def _get_attr_schema():
+        base_filters = [
+            {'$ref': '#/definitions/filters/value'},
+            {'$ref': '#/definitions/filters/valuekv'},
+        ]
+        any_of = []
+        any_of.extend(base_filters)
+
+        for op in ('and', 'or', 'not',):
+            any_of.append(
+                {
+                    'additional_properties': False,
+                    'properties': {
+                        op: {
+                            'type': 'array',
+                            'items': {
+                                'anyOf': base_filters
+                            }
+                        }
+                    },
+                    'type': 'object'
+                }
+            )
+
+        schema = {
+            'items': {
+                'anyOf': any_of
+            },
+            'type': 'array',
+        }
+        return schema
+
+    schema = type_schema(
+        'list-item',
+        key={'type': 'string'},
+        attrs=_get_attr_schema(),
+        count={'type': 'number'},
+        count_op={'$ref': '#/definitions/filters_common/comparison_operators'},
+    )
+
+    schema_alias = True
+
+    def process(self, resources, event=None):
+        compiled = jmespath.compile(self.data['key'])
+        result = []
+        frm = ListItemResourceManager(self.manager.ctx, data={'filters': self.data['attrs']})
+        for r in resources:
+            list_values = compiled.search(r)
+            if not list_values:
+                continue
+            if not isinstance(list_values, list):
+                item_type = type(list_values)
+                raise PolicyExecutionError(
+                    f"list-item filter value for {self.data['key']} is a {item_type} not a list"
+                )
+            for idx, list_value in enumerate(list_values):
+                list_value['c7n:_id'] = idx
+            list_resources = frm.filter_resources(list_values, event)
+            matched_indicies = [r['c7n:_id'] for r in list_resources]
+            for idx, list_value in enumerate(list_values):
+                list_value.pop('c7n:_id')
+            if self.data.get('count'):
+                count = self.data['count']
+                op = OPERATORS[self.data.get('count_op', 'eq')]
+                if op(len(list_resources), count):
+                    result.append(r)
+            else:
+                if list_resources:
+                    annotations = [f'{self.data["key"]}[{str(i)}]' for i in matched_indicies]
+                    r.setdefault('c7n:ListItemMatches', [])
+                    r['c7n:ListItemMatches'].extend(annotations)
+                    result.append(r)
+        return result
+
+    def __call__(self, resource):
+        if self.process((resource,)):
+            return True
+        return False
