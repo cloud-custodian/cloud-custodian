@@ -80,6 +80,7 @@ class TagInterpolationTest(BaseTest):
             },
             session_factory=mock_factory,
         )
+        policy.expand_variables(policy.get_variables())
         policy.resource_manager.actions[0].process(resources)
 
         return (create_tags, tag_resources)
