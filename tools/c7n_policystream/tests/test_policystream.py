@@ -68,7 +68,7 @@ class GitRepo:
         return pygit2.Repository(os.path.join(self.repo_path, '.git'))
 
     def move(self, src, tgt):
-        self._run(['git', 'mv', src, tgt], cwd=self.repo_path)
+        self._run(['git', 'mv', src, tgt])
 
     def commit(self, msg, author=None, email=None):
         env = {}
@@ -83,7 +83,7 @@ class GitRepo:
         if create:
             args.append('-b')
         args.append(branch)
-        self._run(args, cwd=self.repo_path)
+        self._run(args)
 
 
 @pytest.mark.skipif(pygit2 is None, reason="pygit2 not installed")
