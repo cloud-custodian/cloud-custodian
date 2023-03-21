@@ -509,3 +509,54 @@ class TestAccessApprovalFilter(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
+
+
+class TestEssentialContactsFilter(BaseTest):
+
+    def test_essentialcontacts_filter_true(self):
+        session_factory = self.replay_flight_data("filter-essentialcontacts")
+        p = self.load_policy(
+            {
+                "name": "test-essentialcontacts",
+                "resource": "gcp.organization",
+                "filters": [{
+                    'type': 'essential-contacts',
+                    'attrs': [{
+                        'type': 'value',
+                        'key': 'notificationCategorySubscriptions',
+                        'value': 'TECHNICAL',
+                        'op': 'contains'
+                    }]
+                }]
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        assert resources[0]['c7n:ListItemMatches'] == [
+            {'c7n:MatchedFilters': ['notificationCategorySubscriptions'],
+             'email': 'abc@def.com',
+             'languageTag': 'en-US',
+             'name': 'organizations/999999999999/contacts/0',
+             'notificationCategorySubscriptions': ['PRODUCT_UPDATES', 'TECHNICAL'],
+             'validateTime': '2023-02-16T19:44:02.003641Z',
+             'validationState': 'VALID'},
+        ] 
+
+
+    def test_essentialcontacts_filter_false(self):
+        session_factory = self.replay_flight_data("filter-essentialcontacts")
+        p = self.load_policy(
+            {
+                "name": "test-essentialcontacts",
+                "resource": "gcp.organization",
+                "filters": [{
+                    'type': 'essential-contacts',
+                    'attrs': [{'validationState': 'INVALID'}]
+                }]
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
