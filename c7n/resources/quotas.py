@@ -92,7 +92,10 @@ class ServiceQuota(QueryResourceManager):
             return dquotas.values()
 
         results = []
-        with self.executor_factory(max_workers=self.max_workers) as w:
+        # NOTE TooManyRequestsException errors are reported in us-east-1 often
+        # when calling the ListServiceQuotas operation
+        # set the max_workers to 1 instead of self.max_workers to slow down the rate
+        with self.executor_factory(max_workers=1) as w:
             futures = {}
             for r in resources:
                 futures[w.submit(get_quotas, client, r)] = r
@@ -111,7 +114,9 @@ class UsageFilter(MetricsFilter):
     Filter service quotas by usage, only compatible with service quotas
     that return a UsageMetric attribute.
 
-    Default limit is 80%
+    Default limit is 80%.
+    Default min_period (minimal period) is 300 seconds and is automatically
+    set to 60 seconds if users try to set it to anything lower than that.
 
     .. code-block:: yaml
 
@@ -127,7 +132,7 @@ class UsageFilter(MetricsFilter):
                   limit: 19
     """
 
-    schema = type_schema('usage-metric', limit={'type': 'integer'})
+    schema = type_schema('usage-metric', limit={'type': 'integer'}, min_period={'type': 'integer'})
 
     permisisons = ('cloudwatch:GetMetricStatistics',)
 
@@ -166,21 +171,31 @@ class UsageFilter(MetricsFilter):
         start_time = end_time - timedelta(1)
 
         limit = self.data.get('limit', 80)
+        min_period = max(self.data.get('min_period', 300), 60)
 
         result = []
 
         for r in resources:
             metric = r.get('UsageMetric')
-            if not metric:
+            quota = r.get('Value')
+            if not metric or quota is None:
                 continue
             stat = metric.get('MetricStatisticRecommendation', 'Maximum')
             if stat not in self.metric_map and self.percentile_regex.match(stat) is None:
                 continue
+
             if 'Period' in r:
                 period_unit = self.time_delta_map[r['Period']['PeriodUnit']]
                 period = int(timedelta(**{period_unit: r['Period']['PeriodValue']}).total_seconds())
             else:
                 period = int(timedelta(1).total_seconds())
+
+            # Use scaling to avoid CW limit of 1440 data points
+            metric_scale = 1
+            if period < min_period and stat == "Sum":
+                metric_scale = min_period / period
+                period = min_period
+
             res = client.get_metric_statistics(
                 Namespace=metric['MetricNamespace'],
                 MetricName=metric['MetricName'],
@@ -198,18 +213,22 @@ class UsageFilter(MetricsFilter):
                     # for all statistic types, but if the service quota API will return
                     # different preferred statistics, atm we will try to match that
                     op = self.metric_map['Maximum']
+                elif stat == 'Sum':
+                    op = self.metric_map['Maximum']
                 else:
                     op = self.metric_map[stat]
-                m = op([x[stat] for x in res['Datapoints']])
-                if m > (limit / 100) * r['Value']:
+                m = op([x[stat] for x in res['Datapoints']]) / metric_scale
+                self.log.info(f'{r.get("ServiceName")} {r.get("QuotaName")} usage: {m}/{quota}')
+                if m > (limit / 100) * quota:
                     r[self.annotation_key] = {
                         'metric': m,
-                        'period': period,
+                        'period': period / metric_scale,
                         'start_time': start_time,
                         'end_time': end_time,
                         'statistic': stat,
-                        'limit': limit / 100 * r['Value'],
-                        'quota': r['Value'],
+                        'limit': limit / 100 * quota,
+                        'quota': quota,
+                        'metric_scale': metric_scale,
                     }
                     result.append(r)
         return result
