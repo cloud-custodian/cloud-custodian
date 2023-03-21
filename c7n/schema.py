@@ -144,6 +144,39 @@ def specific_error(error):
     return error
 
 
+def _get_attr_schema():
+    base_filters = [
+        {'$ref': '#/definitions/filters/value'},
+        {'$ref': '#/definitions/filters/valuekv'},
+    ]
+    any_of = []
+    any_of.extend(base_filters)
+
+    for op in ('and', 'or', 'not',):
+        any_of.append(
+            {
+                'additional_properties': False,
+                'properties': {
+                    op: {
+                        'type': 'array',
+                        'items': {
+                            'anyOf': base_filters
+                        }
+                    }
+                },
+                'type': 'object'
+            }
+        )
+
+    attr_schema = {
+        'items': {
+            'anyOf': any_of
+        },
+        'type': 'array',
+    }
+    return attr_schema
+
+
 def generate(resource_types=()):
     resource_defs = {}
     definitions = {
@@ -209,6 +242,7 @@ def generate(resource_types=()):
                 'maxProperties': 1},
         },
         'filters_common': {
+            'list_item_attrs': _get_attr_schema(),
             'comparison_operators': {
                 'enum': list(OPERATORS.keys())},
             'value_types': {'enum': VALUE_TYPES},
