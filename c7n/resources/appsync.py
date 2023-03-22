@@ -246,6 +246,4 @@ class Delete(Action):
                 if e.response['Error']['Code'] == "ResourceNotFoundException":
                     continue
                 raise
-        
-        self.log.debug("Deleted %d APIs", len(apis))
 
