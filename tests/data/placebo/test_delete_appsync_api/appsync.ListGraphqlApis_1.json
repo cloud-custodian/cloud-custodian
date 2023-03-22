@@ -7,19 +7,12 @@
                 "name": "My AppSync App",
                 "apiId": "mducg7wbsrfalecsqzacnrvwhy",
                 "authenticationType": "AWS_IAM",
-                "logConfig": {
-                    "fieldLogLevel": "ALL",
-                    "cloudWatchLogsRoleArn": "arn:aws:iam::644160558196:role/ASVENTERPRISECLOUDCONTROL/CapOne-Ipat-Appsync-role",
-                    "excludeVerboseContent": false
-                },
                 "arn": "arn:aws:appsync:us-east-1:644160558196:apis/mducg7wbsrfalecsqzacnrvwhy",
                 "uris": {
                     "REALTIME": "wss://6v2omgv735hcfadcigdp4pffpm.appsync-realtime-api.us-east-1.amazonaws.com/graphql",
                     "GRAPHQL": "https://6v2omgv735hcfadcigdp4pffpm.appsync-api.us-east-1.amazonaws.com/graphql"
                 },
                 "tags": {
-                    "ASV": "ASVENTERPRISECLOUDCONTROL",
-                    "OwnerContact": "dge997"
                 },
                 "xrayEnabled": false
             }
