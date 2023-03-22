@@ -59,7 +59,7 @@ class GitRepo:
                 fh.write(content)
 
         if not exists:
-            subprocess.check_output(['git', 'add', path])
+            self._run(['git', 'add', path])
 
     def rm(self, path):
         os.remove(os.path.join(self.repo_path, path))
