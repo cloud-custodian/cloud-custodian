@@ -24,9 +24,6 @@ jobs:
       - name: Lint Check
         run: |
           make lint
-      - name: Format Check
-        run: |
-          black --check tools/c7n_left
       - name: Check Workflows
         run: |
           bash <(curl https://raw.githubusercontent.com/rhysd/actionlint/main/scripts/download-actionlint.bash)

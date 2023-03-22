@@ -1,0 +1,66 @@
+{
+    "status_code": 200,
+    "data": {
+        "clusters": [
+            {
+                "clusterArn": "arn:aws:ecs:us-east-1:123456789012:cluster/Devtest",
+                "clusterName": "Devtest",
+                "status": "ACTIVE",
+                "registeredContainerInstancesCount": 0,
+                "runningTasksCount": 0,
+                "pendingTasksCount": 0,
+                "activeServicesCount": 0,
+                "statistics": [],
+                "tags": [
+                    {
+                        "key": "aws:cloudformation:stack-id",
+                        "value": "arn:aws:cloudformation:us-east-1:123456789012:stack/Infra-ECS-Cluster-Devtest-ad960781/c4e33bc0-c272-11ed-b92c-0ea716131c1d"
+                    },
+                    {
+                        "key": "aws:cloudformation:stack-name",
+                        "value": "Infra-ECS-Cluster-Devtest-ad960781"
+                    },
+                    {
+                        "key": "aws:cloudformation:logical-id",
+                        "value": "ECSCluster"
+                    }
+                ],
+                "settings": [
+                    {
+                        "name": "containerInsights",
+                        "value": "enabled"
+                    }
+                ],
+                "capacityProviders": [
+                    "FARGATE",
+                    "FARGATE_SPOT"
+                ],
+                "defaultCapacityProviderStrategy": [],
+                "serviceConnectDefaults": {
+                    "namespace": "arn:aws:servicediscovery:us-east-1:123456789012:namespace/ns-ep3tjzivctcuvis7"
+                }
+            },
+            {
+                "clusterArn": "arn:aws:ecs:us-east-1:123456789012:cluster/white-hart",
+                "clusterName": "white-hart",
+                "status": "ACTIVE",
+                "registeredContainerInstancesCount": 0,
+                "runningTasksCount": 0,
+                "pendingTasksCount": 0,
+                "activeServicesCount": 0,
+                "statistics": [],
+                "tags": [],
+                "settings": [
+                    {
+                        "name": "containerInsights",
+                        "value": "disabled"
+                    }
+                ],
+                "capacityProviders": [],
+                "defaultCapacityProviderStrategy": []
+            }
+        ],
+        "failures": [],
+        "ResponseMetadata": {}
+    }
+}

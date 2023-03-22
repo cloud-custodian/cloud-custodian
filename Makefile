@@ -5,6 +5,8 @@ PKG_REPO = testpypi
 PKG_INCREMENT := patch
 PKG_SET := tools/c7n_gcp tools/c7n_kube tools/c7n_openstack tools/c7n_mailer tools/c7n_logexporter tools/c7n_policystream tools/c7n_trailcreator tools/c7n_org tools/c7n_sphinxext tools/c7n_terraform tools/c7n_awscc tools/c7n_tencentcloud tools/c7n_azure
 
+FMT_SET := tools/c7n_left
+
 PLATFORM_ARCH := $(shell python3 -c "import platform; print(platform.machine())")
 PLATFORM_OS := $(shell python3 -c "import platform; print(platform.system())")
 PY_VERSION := $(shell python3 -c "import sys; print('%s.%s' % (sys.version_info.major, sys.version_info.minor))")
@@ -16,6 +18,9 @@ IMAGE_TAG := latest
 
 ifneq "$(findstring $(PLATFORM_OS), Linux Darwin)" ""
   ifneq "$(findstring $(PY_VERSION), 3.10)" ""
+    PKG_SET := tools/c7n_left $(PKG_SET)
+  endif
+  ifneq "$(findstring $(PY_VERSION), 3.11)" ""
     PKG_SET := tools/c7n_left $(PKG_SET)
   endif
 endif
@@ -57,6 +62,11 @@ sphinx:
 
 lint:
 	ruff c7n tests tools
+	black --check $(FMT_SET)
+
+format:
+	black $(FMT_SET)
+	ruff --fix c7n tests tools
 
 clean:
 	make -f docs/Makefile.sphinx clean

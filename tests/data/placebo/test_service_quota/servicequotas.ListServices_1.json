@@ -9,6 +9,10 @@
             {
                 "ServiceCode": "firehose",
                 "ServiceName": "Amazon Kinesis Data Firehose"
+            },
+            {
+                "ServiceCode": "logs",
+                "ServiceName": "Amazon CloudWatch Logs"            
             }
         ],
         "ResponseMetadata": {
