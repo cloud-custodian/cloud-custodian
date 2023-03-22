@@ -1140,7 +1140,8 @@ class ListItemFilter(Filter):
 
     def process(self, resources, event=None):
         result = []
-        frm = ListItemResourceManager(self.manager.ctx, data={'filters': self.data['attrs']})
+        frm = ListItemResourceManager(
+            self.manager.ctx, data={'filters': self.data.get('attrs', [])})
         for r in resources:
             list_values = self.get_item_values(r)
             if not list_values:
