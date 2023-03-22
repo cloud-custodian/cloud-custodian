@@ -587,3 +587,31 @@ class TestControlPanel(BaseTest):
         client = session_factory(region="us-west-2").client("route53-recovery-control-config")
         tags = client.list_tags_for_resource(ResourceArn=resources[0]["ControlPanelArn"])['Tags']
         self.assertEqual(len(tags), 0)
+
+    def test_control_panel_safety_rule_filter(self):
+        session_factory = self.replay_flight_data("test_control_panel_safety_rule_filter",)
+        p = self.load_policy(
+            {
+                "name": "control-panel-safety-rule",
+                "resource": "recovery-control-panel",
+                "filters": [{'type': 'safety-rule', 'count': 1, 'count_op': 'gte'}]
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['ControlPanelArn'], \
+            'arn:aws:route53-recovery-control::644160558196:controlpanel/fd5a6bfc73364a0dbd48d3915867a306')
+        return
+        p = self.load_policy(
+            {
+                "name": "control-panel-safety-rule",
+                "resource": "recovery-control-panel",
+                "filters": [{'type': 'safety-rule', 'count': 0}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['ControlPanelArn'], \
+             'arn:aws:route53-recovery-control::644160558196:controlpanel/7a721a1a44014ad1973539b3d83161ff')

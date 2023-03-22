@@ -588,13 +588,13 @@ class ValueFilter(BaseValueFilter):
 
     def get_resource_value(self, k, i):
         return super(ValueFilter, self).get_resource_value(k, i, self.data.get('value_regex'))
-    
+
     def get_path_value(self,i):
         """Retrieve values using JMESPath.
 
         When using a Value Filter, a ``value_path`` can be specified.
         This means the value(s) the filter will compare against are
-        calculated during the initialization of the filter. 
+        calculated during the initialization of the filter.
 
         Note that this option only pulls properties of the resource
         currently being filtered.
@@ -636,7 +636,6 @@ class ValueFilter(BaseValueFilter):
 
         # value extract
         r = self.get_resource_value(self.k, i)
-
         if self.op in ('in', 'not-in') and r is None:
             r = ()
 
@@ -1117,54 +1116,34 @@ class ListItemFilter(Filter):
                         op: regex
     """
 
-    def _get_attr_schema():
-        base_filters = [
-            {'$ref': '#/definitions/filters/value'},
-            {'$ref': '#/definitions/filters/valuekv'},
-        ]
-        any_of = []
-        any_of.extend(base_filters)
-
-        for op in ('and', 'or', 'not',):
-            any_of.append(
-                {
-                    'additional_properties': False,
-                    'properties': {
-                        op: {
-                            'type': 'array',
-                            'items': {
-                                'anyOf': base_filters
-                            }
-                        }
-                    },
-                    'type': 'object'
-                }
-            )
-
-        schema = {
-            'items': {
-                'anyOf': any_of
-            },
-            'type': 'array',
-        }
-        return schema
-
     schema = type_schema(
         'list-item',
-        key={'type': 'string'},
-        attrs=_get_attr_schema(),
-        count={'type': 'number'},
-        count_op={'$ref': '#/definitions/filters_common/comparison_operators'},
+        **{
+            'key': {'type': 'string'},
+            'attrs': {'$ref': '#/definitions/filters_common/list_item_attrs'},
+            'count': {'type': 'number'},
+            'count_op': {'$ref': '#/definitions/filters_common/comparison_operators'},
+        },
     )
 
     schema_alias = True
+    annotate_items = False
+
+    _expr = None
+
+    @property
+    def expr(self):
+        if self._expr:
+            return self._expr
+        self._expr = jmespath.compile(self.data['key'])
+        return self._expr
 
     def process(self, resources, event=None):
-        compiled = jmespath.compile(self.data['key'])
         result = []
-        frm = ListItemResourceManager(self.manager.ctx, data={'filters': self.data['attrs']})
+        frm = ListItemResourceManager(
+            self.manager.ctx, data={'filters': self.data.get('attrs', [])})
         for r in resources:
-            list_values = compiled.search(r)
+            list_values = self.get_item_values(r)
             if not list_values:
                 continue
             if not isinstance(list_values, list):
@@ -1183,13 +1162,21 @@ class ListItemFilter(Filter):
                 op = OPERATORS[self.data.get('count_op', 'eq')]
                 if op(len(list_resources), count):
                     result.append(r)
-            else:
-                if list_resources:
-                    annotations = [f'{self.data["key"]}[{str(i)}]' for i in matched_indicies]
-                    r.setdefault('c7n:ListItemMatches', [])
-                    r['c7n:ListItemMatches'].extend(annotations)
-                    result.append(r)
+            elif list_resources:
+                if not self.annotate_items:
+                    annotations = [
+                        f'{self.data.get("key", self.type)}[{str(i)}]'
+                        for i in matched_indicies
+                    ]
+                else:
+                    annotations = list_resources
+                r.setdefault('c7n:ListItemMatches', [])
+                r['c7n:ListItemMatches'].extend(annotations)
+                result.append(r)
         return result
+
+    def get_item_values(self, resource):
+        return self.expr.search(resource)
 
     def __call__(self, resource):
         if self.process((resource,)):
