@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from .common import BaseTest
+from c7n.resources.appsync import GraphQLApi
 
 
 class AppSyncWafV2(BaseTest):
@@ -137,3 +138,65 @@ class TestAppSyncApiCache(BaseTest):
 
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
+# class AppSyncDelete(BaseTest):
+#     def test_graphql_api_action_delete(self):
+#         factory = self.record_flight_data("test_graphql_api_action_wafv2")
+#         p = self.load_policy(
+#             {
+#                 "name": "action-graphql-api-wafv2",
+#                 "resource": "graphql-api",
+#                 "filters": [{"type": "wafv2-enabled", "state": False,
+#                              "web-acl": ".*FMManagedWebACLV2-?FMS-.*"}],
+#                 "actions": [{"type": "set-wafv2", "state": True,
+#                              "web-acl": ".*FMManagedWebACLV2-?FMS-.*"}]
+#             },
+#             session_factory=factory,
+#         )
+#         resources = p.run()
+#         self.assertEqual(len(resources), 2)
+
+#         p = self.load_policy(
+#             {
+#                 "name": "action-graphql-api-wafv2",
+#                 "resource": "graphql-api",
+#                 "filters": [{"type": "wafv2-enabled", "state": True,
+#                              "web-acl": ".*FMManagedWebACLV2-?FMS-.*"}],
+#                 "actions": [{"type": "set-wafv2", "state": False,
+#                              "force": True}]
+#             },
+#             session_factory=factory,
+#         )
+#         resources = p.run()
+#         self.assertEqual(len(resources), 1)
+
+#         p = self.load_policy(
+#             {
+#                 "name": "action-graphql-api-wafv2",
+#                 "resource": "graphql-api",
+#                 "filters": [{"type": "wafv2-enabled", "state": True,
+#                              "web-acl": ".*FMManagedWebACLV2-?FMS-.*"}],
+#                 "actions": [{"type": "set-wafv2", "state": True, "force": True,
+#                              "web-acl": ".*FMManagedWebACLV2-?FMS-TEST.*"}]
+#             },
+#             session_factory=factory,
+#         )
+#         resources = p.run()
+#         self.assertEqual(len(resources), 1)
+
+    def test_delete_appsync_api(self):
+        factory = self.replay_flight_data("test_delete_appsync_api")
+        p = self.load_policy(
+            {
+                "name": "appsync-delete",
+                "resource": "graphql-api",
+                "filters": [{"name": "My AppSync App"}],
+                "actions": [{"type": "delete"}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['name'], "My AppSync App")
+        client = factory().client("appsync")
+        self.assertEqual(client.list_graphql_apis()["graphqlApis"], [])
