@@ -28,6 +28,14 @@ jobs:
         run: |
           bash <(curl https://raw.githubusercontent.com/rhysd/actionlint/main/scripts/download-actionlint.bash)
           ./actionlint -color
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_wrapper: false
+      - name: Check Terraform
+        run: |
+          terraform fmt -check -recursive .
+
   Analyzer:
     runs-on: ubuntu-latest
     needs: Lint
