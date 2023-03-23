@@ -62,7 +62,7 @@ class GitRepo:
             self._run(['git', 'add', path])
 
     def rm(self, path):
-        os.remove(os.path.join(self.repo_path, path))
+        self._run(['git', 'rm', path])
 
     def repo(self):
         return pygit2.Repository(os.path.join(self.repo_path, '.git'))
