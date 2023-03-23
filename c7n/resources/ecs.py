@@ -595,7 +595,7 @@ class DeleteTaskDefinition(BaseAction):
     services and task can still reference, new services & tasks
     can't.
     
-    deregister is True by default. When given as False, the task definition will 
+    force is False by default. When given as True, the task definition will 
     be permanently deleted.
     
     .. code-block:: yaml
@@ -613,22 +613,22 @@ class DeleteTaskDefinition(BaseAction):
              - family: test-task-def
            actions:
              - type: delete
-               deregister: False
+               force: True
     """
 
-    schema = type_schema('delete', deregister={'type': 'boolean'})
+    schema = type_schema('delete', force={'type': 'boolean'})
     permissions = ('ecs:DeregisterTaskDefinition','ecs:DeleteTaskDefinitions',)
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('ecs')
         retry = get_retry(('Throttling',))
-        deregister = self.data.get('deregister', True)
+        force = self.data.get('force', False)
 
         for r in resources:
             try:
                 retry(client.deregister_task_definition,
                       taskDefinition=r['taskDefinitionArn'])
-                if not deregister:
+                if force:
                     retry(client.delete_task_definitions,
                           taskDefinitions=[r['taskDefinitionArn']])
             except ClientError as e:
