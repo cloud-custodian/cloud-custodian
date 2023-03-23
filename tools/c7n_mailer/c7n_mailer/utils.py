@@ -87,12 +87,10 @@ def get_rendered_jinja(
     # recast seconds since epoch as utc iso datestring, template
     # authors can use date_time_format helper func to convert local
     # tz. if no execution start time was passed use current time.
-    execution_start = datetime.utcfromtimestamp(
-        sqs_message.get(
-            'execution_start',
-            time.mktime(
-                datetime.utcnow().timetuple())
-        )).isoformat()
+    execution_start = sqs_message.get('execution_start')
+    if not execution_start:
+        execution_start = time.mktime(datetime.utcnow().timetuple())
+    execution_start = datetime.utcfromtimestamp(execution_start).isoformat()
 
     rendered_jinja = template.render(
         recipient=target,
@@ -384,9 +382,10 @@ def resource_format(resource, resource_type):
             resource['InternetGatewayId'],
             len(resource['Attachments']))
     elif resource_type == 'lambda':
-        return "Name: %s  RunTime: %s  \n" % (
+        return "Name: %s  Package Type: %s  Runtime: %s  \n" % (
             resource['FunctionName'],
-            resource['Runtime'])
+            resource['PackageType'],
+            resource.get('Runtime', 'N/A'))
     elif resource_type == 'service-quota':
         try:
             return "ServiceName: %s QuotaName: %s Quota: %i Usage: %i\n" % (
@@ -485,3 +484,8 @@ def get_aws_username_from_event(logger, event):
     else:
         user_id = identity['principalId']
     return user_id
+
+
+def unique(seq):
+    return list({k: None for k in seq})
+   

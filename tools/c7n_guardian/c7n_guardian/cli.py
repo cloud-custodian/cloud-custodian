@@ -362,7 +362,7 @@ def enable_region(
     log.info(f"{region}\tInviting {len(accounts_not_members)} member accounts")
     unprocessed = []
     for account_set in chunks(
-        [m for m in accounts_not_members if not m['AccountId'] in invited_ids + resigned_ids],
+        [m for m in accounts_not_members if m['AccountId'] not in invited_ids + resigned_ids],
         25
     ):
         params = {

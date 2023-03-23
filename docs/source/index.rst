@@ -82,14 +82,6 @@ Navigate below to your cloud provider and get started with Cloud Custodian!
 
 .. toctree::
    :maxdepth: 1
-   :caption: AWS Cloud Control
-
-   awscc/gettingstarted
-   awscc/resources/index
-
-
-.. toctree::
-   :maxdepth: 1
    :caption: Kubernetes
 
    kubernetes/gettingstarted
@@ -103,6 +95,8 @@ Navigate below to your cloud provider and get started with Cloud Custodian!
    tools/c7n-org
    tools/c7n-mailer
    tools/c7n-left
+   tools/c7n-kube
+   tools/cask
    tools/c7n-logexporter
    tools/c7n-trailcreator
    tools/c7n-policystream   

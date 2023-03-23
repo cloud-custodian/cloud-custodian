@@ -10,7 +10,7 @@ from concurrent.futures import as_completed
 from datetime import timedelta, datetime
 
 from c7n.actions import Action, RemovePolicyBase, ModifyVpcSecurityGroupsAction
-from c7n.filters import CrossAccountAccessFilter, ValueFilter
+from c7n.filters import CrossAccountAccessFilter, ValueFilter, Filter
 from c7n.filters.kms import KmsRelatedFilter
 import c7n.filters.vpc as net_filters
 from c7n.manager import resources
@@ -258,11 +258,14 @@ class KmsFilter(KmsRelatedFilter):
 @AWSLambda.action_registry.register('set-xray-tracing')
 class LambdaEnableXrayTracing(Action):
     """
-        This action allows for enable Xray tracing to Active
-       :example:
-       .. code-block:: yaml
-           actions:
-             - type: enable-xray-tracing
+    This action allows for enable Xray tracing to Active
+ 
+    :example:
+    
+    .. code-block:: yaml
+
+      actions:
+        - type: enable-xray-tracing
     """
 
     schema = type_schema(
@@ -796,3 +799,55 @@ class LayerPostFinding(PostFinding):
         payload.update(self.filter_empty(
             select_keys(r, ['Version', 'CreatedDate', 'CompatibleRuntimes'])))
         return envelope
+
+
+@AWSLambda.filter_registry.register('lambda-edge')
+
+class LambdaEdgeFilter(Filter):
+    """
+    Filter for lambda@edge functions. Lambda@edge only exists in us-east-1
+
+    :example:
+
+        .. code-block:: yaml
+
+            policies:
+                - name: lambda-edge-filter
+                  resource: lambda
+                  region: us-east-1
+                  filters:
+                    - type: lambda-edge
+                      state: True
+    """
+    permissions = ('cloudfront:ListDistributions',)
+
+    schema = type_schema('lambda-edge',
+        **{'state': {'type': 'boolean'}})
+
+    def get_lambda_cf_map(self):
+        cfs = self.manager.get_resource_manager('distribution').resources()
+        func_expressions = ('DefaultCacheBehavior.LambdaFunctionAssociations.Items',
+          'CacheBehaviors.LambdaFunctionAssociations.Items')
+        lambda_dist_map = {}
+        for d in cfs:
+            for exp in func_expressions:
+                if jmespath.search(exp, d):
+                    for function in jmespath.search(exp, d):
+                        # Geting rid of the version number in the arn
+                        lambda_edge_arn = ':'.join(function['LambdaFunctionARN'].split(':')[:-1])
+                        lambda_dist_map.setdefault(lambda_edge_arn, []).append(d['Id'])
+        return lambda_dist_map
+
+    def process(self, resources, event=None):
+        results = []
+        if self.manager.config.region != 'us-east-1' and self.data.get('state'):
+            return []
+        annotation_key = 'c7n:DistributionIds'
+        lambda_edge_cf_map = self.get_lambda_cf_map()
+        for r in resources:
+            if (r['FunctionArn'] in lambda_edge_cf_map and self.data.get('state')):
+                r[annotation_key] = lambda_edge_cf_map.get(r['FunctionArn'])
+                results.append(r)
+            elif (r['FunctionArn'] not in lambda_edge_cf_map and not self.data.get('state')):
+                results.append(r)
+        return results

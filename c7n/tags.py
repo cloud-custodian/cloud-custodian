@@ -271,8 +271,6 @@ class TagActionFilter(Filter):
         op={'type': 'string'})
     schema_alias = True
 
-    current_date = None
-
     def validate(self):
         op = self.data.get('op')
         if self.manager and op not in self.manager.action_registry.keys():
@@ -317,15 +315,14 @@ class TagActionFilter(Filter):
                 tag, v, i['InstanceId']))
             return False
 
-        if self.current_date is None:
-            self.current_date = datetime.now()
-
         if action_date.tzinfo:
             # if action_date is timezone aware, set to timezone provided
             action_date = action_date.astimezone(tz)
-            self.current_date = datetime.now(tz=tz)
+            current_date = datetime.now(tz=tz)
+        else:
+            current_date = datetime.now()
 
-        return self.current_date >= (
+        return current_date >= (
             action_date - timedelta(days=skew, hours=skew_hours))
 
 
@@ -433,7 +430,7 @@ class Tag(Action):
             'account_id': self.manager.config.account_id,
             'now': utils.FormatDate.utcnow(),
             'region': self.manager.config.region}
-        return tag.format(**params)
+        return str(tag).format(**params)
 
     def interpolate_values(self, tags):
         """Interpolate in a list of tags - 'old' ec2 format

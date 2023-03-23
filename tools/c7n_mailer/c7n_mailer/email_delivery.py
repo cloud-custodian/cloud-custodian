@@ -8,7 +8,7 @@ import c7n_mailer.azure_mailer.sendgrid_delivery as sendgrid
 from .ldap_lookup import LdapLookup
 from .utils import (
     decrypt, get_resource_tag_targets, get_provider,
-    get_aws_username_from_event, Providers)
+    get_aws_username_from_event, Providers, unique)
 from .utils_email import get_mimetext_message, is_email
 
 
@@ -20,9 +20,24 @@ class EmailDelivery:
         self.session = session
         self.provider = get_provider(self.config)
         if self.provider == Providers.AWS:
-            self.aws_ses = session.client('ses', region_name=config.get('ses_region'))
+            self.aws_ses = self.get_ses_session()
         self.ldap_lookup = self.get_ldap_connection()
         self.provider = get_provider(self.config)
+
+    def get_ses_session(self):
+        if self.config.get('ses_role', False):
+            creds = self.session.client('sts').assume_role(
+                RoleArn=self.config.get('ses_role'),
+                RoleSessionName='CustodianNotification')['Credentials']
+
+            return self.session.client(
+                'ses',
+                region_name=self.config.get('ses_region'),
+                aws_access_key_id=creds['AccessKeyId'],
+                aws_secret_access_key=creds['SecretAccessKey'],
+                aws_session_token=creds['SessionToken'])
+
+        return self.session.client('ses', region_name=self.config.get('ses_region'))
 
     def get_ldap_connection(self):
         if self.config.get('ldap_uri'):
@@ -50,7 +65,7 @@ class EmailDelivery:
                     full_email = "%s@%s" % (email, self.config['email_base_url'])
                     if is_email(full_email):
                         emails.append(full_email)
-        return emails
+        return unique(emails)
 
     def get_event_owner_email(self, targets, event):  # TODO: GCP-friendly
         if 'event-owner' in targets:

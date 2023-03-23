@@ -367,7 +367,9 @@ class SetRuleState(BaseAction):
     This action allows to enable/disable a rule
 
     :example:
+
     .. code-block:: yaml
+
         policies:
             - name: test-rule
               resource: aws.event-rule
@@ -945,6 +947,7 @@ class SubscriptionFilter(BaseAction):
                 filter_pattern: ip
                 destination_arn: arn:aws:logs:us-east-1:1234567890:destination:lambda
                 distribution: Random
+                role_arn: "arn:aws:iam::{account_id}:role/testCrossAccountRole"
     """
     schema = type_schema(
         'put-subscription-filter',
@@ -952,22 +955,22 @@ class SubscriptionFilter(BaseAction):
         filter_pattern={'type': 'string'},
         destination_arn={'type': 'string'},
         distribution={'enum': ['Random', 'ByLogStream']},
+        role_arn={'type': 'string'},
         required=['filter_name', 'destination_arn'])
     permissions = ('logs:PutSubscriptionFilter',)
 
     def process(self, resources):
         session = local_session(self.manager.session_factory)
         client = session.client('logs')
+        params = dict(
+            filterName=self.data.get('filter_name'),
+            filterPattern=self.data.get('filter_pattern', ''),
+            destinationArn=self.data.get('destination_arn'),
+            distribution=self.data.get('distribution', 'ByLogStream'))
 
-        filter_name = self.data.get('filter_name')
-        filter_pattern = self.data.get('filter_pattern', '')
-        destination_arn = self.data.get('destination_arn')
-        distribution = self.data.get('distribution', 'ByLogStream')
+        if self.data.get('role_arn'):
+            params['roleArn'] = self.data.get('role_arn')
 
         for r in resources:
             client.put_subscription_filter(
-                logGroupName=r['logGroupName'],
-                filterName=filter_name,
-                filterPattern=filter_pattern,
-                destinationArn=destination_arn,
-                distribution=distribution)
+                logGroupName=r['logGroupName'], **params)

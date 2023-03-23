@@ -103,8 +103,11 @@ class Traverse(Filter):
         if self._vfilters:
             return self._vfilters
         vfilters = []
+        filter_class = ValueFilter
         for v in self.data.get("attrs", []):
-            vf = ValueFilter(v)
+            if isinstance(v, dict) and v.get("type"):
+                filter_class = self.manager.filter_registry[v["type"]]
+            vf = filter_class(v, self.manager)
             vf.annotate = False
             vfilters.append(vf)
         self._vfilters = vfilters

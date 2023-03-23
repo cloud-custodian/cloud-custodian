@@ -51,7 +51,7 @@ class FakeResolver:
             contents = contents.decode("utf8")
         self.contents = contents
 
-    def resolve(self, uri):
+    def resolve(self, uri, headers):
         return self.contents
 
 
@@ -76,7 +76,7 @@ class ResolverTest(BaseTest):
         cache = FakeCache()
         resolver = URIResolver(session_factory, cache)
         uri = "s3://%s/resource.json?RequestPayer=requestor" % bname
-        data = resolver.resolve(uri)
+        data = resolver.resolve(uri, {})
         self.assertEqual(content, data)
         self.assertEqual(list(cache.state.keys()), [pickle.dumps(("uri-resolver", uri))])
 
@@ -100,7 +100,7 @@ class ResolverTest(BaseTest):
             self.addCleanup(os.unlink, fh.name)
             fh.write(content)
             fh.flush()
-            self.assertEqual(resolver.resolve("file:%s" % fh.name), content)
+            self.assertEqual(resolver.resolve("file:%s" % fh.name, {'auth': 'token'}), content)
 
 
 def test_value_from_sqlkv(tmp_path):

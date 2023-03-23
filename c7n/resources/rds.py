@@ -37,7 +37,10 @@ import logging
 import operator
 import jmespath
 import re
-from datetime import datetime, timedelta
+import datetime
+
+from datetime import timedelta
+
 from decimal import Decimal as D, ROUND_HALF_UP
 
 from distutils.version import LooseVersion
@@ -59,9 +62,10 @@ from c7n import deprecated, tags
 from c7n.tags import universal_augment
 
 from c7n.utils import (
-    local_session, type_schema, get_retry, chunks, snapshot_identifier, merge_dict_list)
+    local_session, type_schema, get_retry, chunks, snapshot_identifier,
+    merge_dict_list, filter_empty)
 from c7n.resources.kms import ResourceKmsKeyAlias
-from c7n.resources.securityhub import OtherResourcePostFinding
+from c7n.resources.securityhub import PostFinding
 
 log = logging.getLogger('custodian.rds')
 
@@ -228,7 +232,7 @@ def _get_available_engine_upgrades(client, major=False):
     for page in paginator.paginate():
         engine_versions = page['DBEngineVersions']
         for v in engine_versions:
-            if not v['Engine'] in results:
+            if v['Engine'] not in results:
                 results[v['Engine']] = {}
             if 'ValidUpgradeTarget' not in v or len(v['ValidUpgradeTarget']) == 0:
                 continue
@@ -678,12 +682,54 @@ class CopySnapshotTags(BaseAction):
             CopyTagsToSnapshot=self.data.get('enable', True))
 
 
-@RDS.action_registry.register("post-finding")
-class DbInstanceFinding(OtherResourcePostFinding):
-    fields = [
-        {'key': 'DBSubnetGroupName', 'expr': 'DBSubnetGroup.DBSubnetGroupName'},
-        {'key': 'VpcId', 'expr': 'DBSubnetGroup.VpcId'},
-    ]
+@RDS.action_registry.register('post-finding')
+class DbInstanceFinding(PostFinding):
+
+    resource_type = 'AwsRdsDbInstance'
+
+    def format_resource(self, r):
+
+        fields = [
+            'AssociatedRoles', 'CACertificateIdentifier', 'DBClusterIdentifier',
+            'DBInstanceIdentifier', 'DBInstanceClass', 'DbInstancePort', 'DbiResourceId',
+            'DBName', 'DeletionProtection', 'Endpoint', 'Engine', 'EngineVersion',
+            'IAMDatabaseAuthenticationEnabled', 'InstanceCreateTime', 'KmsKeyId',
+            'PubliclyAccessible', 'StorageEncrypted',
+            'TdeCredentialArn', 'VpcSecurityGroups', 'MultiAz', 'EnhancedMonitoringResourceArn',
+            'DbInstanceStatus', 'MasterUsername',
+            'AllocatedStorage', 'PreferredBackupWindow', 'BackupRetentionPeriod',
+            'DbSecurityGroups', 'DbParameterGroups',
+            'AvailabilityZone', 'DbSubnetGroup', 'PreferredMaintenanceWindow',
+            'PendingModifiedValues', 'LatestRestorableTime',
+            'AutoMinorVersionUpgrade', 'ReadReplicaSourceDBInstanceIdentifier',
+            'ReadReplicaDBInstanceIdentifiers',
+            'ReadReplicaDBClusterIdentifiers', 'LicenseModel', 'Iops', 'OptionGroupMemberships',
+            'CharacterSetName',
+            'SecondaryAvailabilityZone', 'StatusInfos', 'StorageType', 'DomainMemberships',
+            'CopyTagsToSnapshot',
+            'MonitoringInterval', 'MonitoringRoleArn', 'PromotionTier', 'Timezone',
+            'PerformanceInsightsEnabled',
+            'PerformanceInsightsKmsKeyId', 'PerformanceInsightsRetentionPeriod',
+            'EnabledCloudWatchLogsExports',
+            'ProcessorFeatures', 'ListenerEndpoint', 'MaxAllocatedStorage'
+        ]
+        details = {}
+        for f in fields:
+            if r.get(f):
+                value = r[f]
+                if isinstance(r[f], datetime.datetime):
+                    value = r[f].isoformat()
+                details.setdefault(f, value)
+
+        db_instance = {
+            'Type': self.resource_type,
+            'Id': r['DBInstanceArn'],
+            'Region': self.manager.config.region,
+            'Tags': {t['Key']: t['Value'] for t in r.get('Tags', [])},
+            'Details': {self.resource_type: filter_empty(details)},
+        }
+        db_instance = filter_empty(db_instance)
+        return db_instance
 
 
 @actions.register('snapshot')
@@ -1885,7 +1931,7 @@ class ConsecutiveSnapshots(Filter):
         client = local_session(self.manager.session_factory).client('rds')
         results = []
         retention = self.data.get('days')
-        utcnow = datetime.utcnow()
+        utcnow = datetime.datetime.utcnow()
         expected_dates = set()
         for days in range(1, retention + 1):
             expected_dates.add((utcnow - timedelta(days=days)).strftime('%Y-%m-%d'))

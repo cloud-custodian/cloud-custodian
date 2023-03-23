@@ -15,6 +15,7 @@ from unittest import TestCase
 from contextlib import suppress
 from botocore.exceptions import ClientError
 from dateutil.tz import tzutc
+import pytest
 from pytest_terraform import terraform
 
 from c7n.exceptions import PolicyExecutionError, PolicyValidationError
@@ -33,6 +34,7 @@ from .common import (
 )
 
 
+@pytest.mark.audited
 @terraform('s3_tag')
 def test_s3_tag(test, s3_tag):
     test.patch(s3.S3, "executor_factory", MainThreadExecutor)
@@ -1786,6 +1788,39 @@ class S3Test(BaseTest):
         response = client.get_bucket_replication(Bucket=bname)
         for rule in response['ReplicationConfiguration']['Rules']:
             self.assertEqual(rule['Status'], 'Disabled')
+
+    def test_check_public_block(self):
+        """Handle cases where public block details are missing or unavailable
+
+        The default check-public-block filter should match buckets
+        in any of the following conditions:
+
+        - There is a public block configuration, but some settings are not
+          enabled
+        - There is no public block configuration set
+        - A strict bucket policy prevents Custodian from reading the public block configuration
+        """
+        self.patch(s3.FilterPublicBlock, "executor_factory", MainThreadExecutor)
+        self.patch(s3, "S3_AUGMENT_TABLE", [])
+
+        session_factory = self.replay_flight_data("test_s3_check_public_block")
+        p = self.load_policy(
+            {
+                "name": "check-public-block",
+                "resource": "s3",
+                "filters": [
+                    {
+                        "type": "check-public-block",
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+
+        resources = {bucket["Name"]: bucket for bucket in p.run()}
+        self.assertEqual(len(resources), 3)
+        locked_down_bucket = resources["my-locked-down-bucket"]
+        self.assertIn("GetPublicAccessBlock", locked_down_bucket["c7n:DeniedMethods"])
 
     def test_set_public_block_enable_all(self):
         bname = 'mypublicblock'
@@ -3858,6 +3893,14 @@ def test_s3_encryption_audit(test, aws_s3_encryption_audit):
             "name": "s3-audit",
             "resource": "s3",
             "filters": [
+                {"type": "value",
+                 "key": "Name",
+                 "op": "in",
+                 "value": [
+                     'c7n-aws-s3-encryption-audit-test-a',
+                     'c7n-aws-s3-encryption-audit-test-b',
+                     'c7n-aws-s3-encryption-audit-test-c',
+                 ]},
                 {
                     "or": [
                         {
@@ -3895,6 +3938,7 @@ def test_s3_encryption_audit(test, aws_s3_encryption_audit):
     assert actual_names == expected_names
 
 
+@pytest.mark.audited
 @terraform('s3_ownership', scope='class')
 class TestBucketOwnership:
     def test_s3_ownership_empty(self, test, s3_ownership):

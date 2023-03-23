@@ -468,7 +468,7 @@ def backoff_delays(start, stop, factor=2.0, jitter=False):
     cur = start
     while cur <= stop:
         if jitter:
-            yield cur - (cur * random.random())
+            yield cur - (cur * random.random() / 5)
         else:
             yield cur
         cur = cur * factor
@@ -622,6 +622,32 @@ def parse_url_config(url):
     return conf
 
 
+def join_output_path(output_path, *parts):
+    # allow users to specify interpolated output paths
+    if '{' in output_path:
+        return output_path
+
+    if "://" not in output_path:
+        return os.path.join(output_path, *parts)
+
+    # handle urls with query strings
+    parsed = urlparse.urlparse(output_path)
+    updated_path = "/".join((parsed.path, *parts))
+    parts = list(parsed)
+    parts[2] = updated_path
+    return urlparse.urlunparse(parts)
+
+
+def get_policy_provider(policy_data):
+    if isinstance(policy_data['resource'], list):
+        provider_name, _ = policy_data['resource'][0].split('.', 1)
+    elif '.' in policy_data['resource']:
+        provider_name, resource_type = policy_data['resource'].split('.', 1)
+    else:
+        provider_name = 'aws'
+    return provider_name
+
+
 def get_proxy_url(url):
     proxies = getproxies()
     parsed = urlparse.urlparse(url)
@@ -661,6 +687,9 @@ class FormatDate:
 
     def __init__(self, d=None):
         self._d = d
+
+    def __str__(self):
+        return str(self._d)
 
     @property
     def datetime(self):
