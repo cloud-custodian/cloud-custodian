@@ -3,7 +3,7 @@
     "data": {
         "taskDefinitions": [
             {
-                "taskDefinitionArn": "arn:aws:ecs:us-east-1:644160558196:task-definition/test-force-delete:2",
+                "taskDefinitionArn": "arn:aws:ecs:us-east-1:644160558196:task-definition/test-force-delete:3",
                 "containerDefinitions": [
                     {
                         "name": "test",
@@ -37,7 +37,7 @@
                 "family": "test-force-delete",
                 "executionRoleArn": "arn:aws:iam::644160558196:role/ecsTaskExecutionRole",
                 "networkMode": "awsvpc",
-                "revision": 2,
+                "revision": 3,
                 "volumes": [],
                 "status": "DELETE_IN_PROGRESS",
                 "requiresAttributes": [
@@ -86,9 +86,9 @@
                     "month": 3,
                     "day": 23,
                     "hour": 15,
-                    "minute": 2,
-                    "second": 49,
-                    "microsecond": 157000
+                    "minute": 58,
+                    "second": 32,
+                    "microsecond": 948000
                 },
                 "deregisteredAt": {
                     "__class__": "datetime",
@@ -96,9 +96,9 @@
                     "month": 3,
                     "day": 23,
                     "hour": 15,
-                    "minute": 5,
-                    "second": 19,
-                    "microsecond": 209000
+                    "minute": 58,
+                    "second": 53,
+                    "microsecond": 502000
                 },
                 "registeredBy": "arn:aws:iam::644160558196:user/timmy"
             }

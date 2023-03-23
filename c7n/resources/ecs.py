@@ -637,12 +637,7 @@ class DeleteTaskDefinition(BaseAction):
 
         if force:
             for chunk in chunks(task_definitions_arns, size=10):
-                try:
-                    retry(client.delete_task_definitions, taskDefinitions=chunk)
-                except ClientError as e:
-                    self.log.exception(
-                        f"The specified task definition does not exist. Exception: {e}")
-                    continue
+                retry(client.delete_task_definitions, taskDefinitions=chunk)
 
 
 @resources.register('ecs-container-instance')
