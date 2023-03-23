@@ -2,7 +2,7 @@ from c7n_gcp.provider import resources
 from c7n_gcp.query import (QueryResourceManager, TypeInfo)
 
 
-@resources.register('gcp-secret')
+@resources.register('secret')
 class GCPSecret(QueryResourceManager):
     """GCP resource: https://cloud.google.com/secret-manager/docs/reference/rest/v1
     """

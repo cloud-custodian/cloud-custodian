@@ -7,7 +7,7 @@ class GCPSecretTest(BaseTest):
         factory = self.replay_flight_data('gcp-secret-query')
         p = self.load_policy({
             'name': 'gcp-apikeys',
-            'resource': 'gcp.gcp-secret'},
+            'resource': 'gcp.secret'},
             session_factory=factory)
         resources = p.run()
 
