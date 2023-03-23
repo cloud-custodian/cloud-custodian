@@ -63,10 +63,12 @@ sphinx:
 lint:
 	ruff c7n tests tools
 	black --check $(FMT_SET)
+	type -P terraform && terraform fmt -check -recursive .
 
 format:
 	black $(FMT_SET)
 	ruff --fix c7n tests tools
+	type -P terraform && terraform fmt -recursive .
 
 clean:
 	make -f docs/Makefile.sphinx clean
