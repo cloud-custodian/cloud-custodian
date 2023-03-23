@@ -623,18 +623,27 @@ class DeleteTaskDefinition(BaseAction):
         client = local_session(self.manager.session_factory).client('ecs')
         retry = get_retry(('Throttling',))
         force = self.data.get('force', False)
+        task_definitions_arns = []
 
         for r in resources:
             try:
                 retry(client.deregister_task_definition,
                       taskDefinition=r['taskDefinitionArn'])
-                if force:
-                    retry(client.delete_task_definitions,
-                          taskDefinitions=[r['taskDefinitionArn']])
+                task_definitions_arns.append(r['taskDefinitionArn'])
             except ClientError as e:
                 if e.response['Error'][
                     'Message'] != 'The specified task definition does not exist.':
                     raise
+
+        if force:
+            for chunk in chunks(task_definitions_arns, size=10):
+                try:
+                    retry(client.delete_task_definitions, taskDefinitions=chunk)
+                except ClientError as e:
+                    if e.response['Error'][
+                        'Message'] != 'The specified task definition does not exist.':
+                        raise
+
 
 @resources.register('ecs-container-instance')
 class ContainerInstance(query.ChildResourceManager):

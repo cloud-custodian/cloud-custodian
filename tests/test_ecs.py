@@ -392,7 +392,7 @@ class TestEcsTaskDefinition(BaseTest):
             "taskDefinitionArns"
         )
         self.assertEqual(arns, 
-                         ["arn:aws:ecs:us-east-1:644160558196:task-definition/test-force-delete:1"])
+                         ["arn:aws:ecs:us-east-1:644160558196:task-definition/test-force-delete:2"])
         
 
     def test_task_definition_get_resources(self):
