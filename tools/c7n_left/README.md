@@ -21,13 +21,13 @@ distribution](https://www.chainguard.dev/unchained/introducing-wolfi-the-first-l
 is designed to be minimal, auditable, and secure.
 
 ```shell
-docker pull c7n_left:dev
+docker pull cloudcustodian/c7n_left:dev
 ```
 
 Images signatures can be verified using [cosign](https://github.com/sigstore/cosign)
 
 ```
-set IMAGE (docker image inspect cloudcustodian/c7n-left:dev -f '{{index .RepoDigests 0}}')
+export IMAGE=$(docker image inspect cloudcustodian/c7n-left:dev -f '{{index .RepoDigests 0}}')
 cosign verify $IMAGE \
    --certificate-identity 'https://github.com/cloud-custodian/cloud-custodian/.github/workflows/docker.yml@refs/heads/main' \
    --certificate-oidc-issuer 'https://token.actions.githubusercontent.com'
