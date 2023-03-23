@@ -140,6 +140,7 @@ class ValuesFrom:
     def _add_api_key(self, headers):
         secret = self.data.get('api_key_secret')
         if secret is not None:
+          # if secret.startswith('arn:aws:ssm'):
             if secret.startswith('arn:aws:secretsmanager'):
                 client = boto3.client('secretsmanager')
                 apiKey = client.get_secret_value(SecretId=secret)['SecretString']
