@@ -235,7 +235,7 @@ class Delete(Action):
 
     """
     schema = type_schema('delete')
-    permissions = ("graphqlapi:DeleteGraphqlApi",)
+    permissions = ("appsync:DeleteGraphqlApi",)
 
     def process(self, apis):
         client = local_session(self.manager.session_factory).client('appsync')
