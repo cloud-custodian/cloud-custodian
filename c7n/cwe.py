@@ -1,5 +1,7 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+from fnmatch import fnmatch
+
 import jmespath
 
 
@@ -115,9 +117,9 @@ class CloudWatchEvents:
                 if info:
                     return info['ids'].search(event)
                 continue
-            if event_name != e.get('event'):
+            if not fnmatch(event_name, e.get('event')):
                 continue
-            if event_source != e.get('source'):
+            if not fnmatch(event_source, e.get('source')):
                 continue
 
             id_query = e.get('ids')
