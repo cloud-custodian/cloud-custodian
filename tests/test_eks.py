@@ -257,6 +257,8 @@ class EKS(BaseTest):
 
         resources = p.run()
         self.assertEqual(len(resources), 1)
+        matched = resources.pop()
+        self.assertEqual(matched['status'], 'ACTIVE')
         update_json = os.path.join(self.placebo_dir, "test_eks_associate_encryption_config", 
         "eks.AssociateEncryptionConfig_2.json")
         with open(update_json) as f:
