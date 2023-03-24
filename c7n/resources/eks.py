@@ -219,7 +219,7 @@ class AssociateEncryptionConfig(Action):
         'properties': {
             'type': {'enum': ['associate-encryption-config']},
             'encryptionConfig': {
-                'type': 'list',
+                'type': 'array',
                 'properties': {
                     'type': 'object',
                     'properties': {
@@ -230,7 +230,7 @@ class AssociateEncryptionConfig(Action):
                             }
                         },
                         'resources': {
-                            'type': 'list',
+                            'type': 'array',
                             'properties': {
                                 'enum': 'secrets'
                             }
