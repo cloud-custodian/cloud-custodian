@@ -263,10 +263,8 @@ class AssociateEncryptionConfig(Action):
                 kms_client = local_session(self.manager.session_factory).client('kms')
                 key_alias = params['encryptionConfig'][0]['provider']['keyArn']
                 try:
-                    response = kms_client.describe_key(
-                        KeyId=key_alias
-                    )
-                    params['encryptionConfig'][0]['provider']['keyArn'] = response['KeyMetadata']['Arn']
+                    key_arn = kms_client.describe_key(KeyId=key_alias)['KeyMetadata']['Arn']
+                    params['encryptionConfig'][0]['provider']['keyArn'] = key_arn
                     client.associate_encryption_config(
                         clusterName=r['name'],
                         encryptionConfig=params['encryptionConfig']
