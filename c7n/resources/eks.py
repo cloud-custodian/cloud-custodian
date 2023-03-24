@@ -211,6 +211,74 @@ class UpdateConfig(Action):
                 "Filtered %d of %d clusters due to state", state_filtered, len(resources))
 
 
+@EKS.action_registry.register('associate-encryption-config')
+class AssociateEncryptionConfig(Action):
+    schema = {
+        'type': 'object',
+        'additionalProperties': False,
+        'properties': {
+            'type': {'enum': ['associate-encryption-config']},
+            'encryptionConfig': {
+                'type': 'list',
+                'properties': {
+                    'type': 'object',
+                    'properties': {
+                        'provider': {
+                            'type': 'object',
+                            'properties': {
+                                'keyArn': {'type': 'string'}
+                            }
+                        },
+                        'resources': {
+                            'type': 'list',
+                            'properties': {
+                                'enum': 'secrets'
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    permissions = ('eks:AssociateEncryptionConfig', 'kms:DescribeKey',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('eks')
+        state_filtered = 0
+        params = dict(self.data)
+        params.pop('type')
+        for r in resources:
+            if r['status'] != 'ACTIVE':
+                state_filtered += 1
+                continue
+            try:
+                client.associate_encryption_config(
+                    clusterName=r['name'],
+                    encryptionConfig=params['encryptionConfig']
+                )
+            except client.exceptions.InvalidParameterException:
+                # associate_encryption_config does not accept kms key aliases, if provided
+                # with an alias find the key arn with kms:DescribeKey.
+                kms_client = local_session(self.manager.session_factory).client('kms')
+                key_alias = params['encryptionConfig'][0]['provider']['keyArn']
+                try:
+                    response = kms_client.describe_key(
+                        KeyId=key_alias
+                    )
+                    params['encryptionConfig'][0]['provider']['keyArn'] = response['KeyMetadata']['Arn']
+                    client.associate_encryption_config(
+                        clusterName=r['name'],
+                        encryptionConfig=params['encryptionConfig']
+                    )
+                except kms_client.exceptions.NotFoundException as error:
+                    self.log.error(error.response['Error']['Message'])
+                    break
+        if state_filtered:
+            self.log.warning(
+                "Filtered %d of %d clusters due to state", state_filtered, len(resources))
+
+
 @EKS.action_registry.register('delete')
 class Delete(Action):
 

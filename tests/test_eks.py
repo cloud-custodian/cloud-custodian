@@ -2,6 +2,8 @@
 # SPDX-License-Identifier: Apache-2.0
 import time
 import pytest
+import os
+import json
 from .common import BaseTest
 
 from pytest_terraform import terraform
@@ -218,3 +220,46 @@ class EKS(BaseTest):
                 }
             ]
         )
+
+
+    def test_associate_encryption_config(self):
+        factory = self.replay_flight_data("test_eks_associate_encryption_config")
+
+        p = self.load_policy(
+            {
+                'name': 'test-eks-associate-encryption-config',
+                'resource': 'aws.eks',
+                'filters': [
+                    {
+                        'type': 'value',
+                        'key': 'encryptionConfig[].provider.keyArn',
+                        'value': 'absent'
+                    }
+                ],
+                'actions': [
+                    {
+                        'type': 'associate-encryption-config',
+                        'encryptionConfig': [
+                            {
+                                'provider': {
+                                    'keyArn': 'alias/eks'
+                                },
+                                'resources': [
+                                    'secrets'
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            session_factory=factory
+        )
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        update_json = os.path.join(self.placebo_dir, "test_eks_associate_encryption_config", 
+        "eks.AssociateEncryptionConfig_2.json")
+        with open(update_json) as f:
+            data = json.load(f)
+        self.assertEqual(data['status_code'], 200)
+        self.assertEqual(data['data']['update']['type'], 'AssociateEncryptionConfig')
