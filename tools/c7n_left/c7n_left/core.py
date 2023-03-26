@@ -294,6 +294,15 @@ class PolicyResourceResult:
         self.resource = resource
         self.policy = policy
 
+    def as_dict(self):
+        return {
+            "policy": dict(self.policy.data),
+            "resource": dict(self.resource),
+            "file_path": str(self.resource.src_dir / self.resource.filename),
+            "file_line_start": self.resource.line_start,
+            "file_line_end": self.resource.line_end,
+        }
+
 
 class IACResourceManager(ResourceManager):
     filter_registry = FilterRegistry("iac.filters")
