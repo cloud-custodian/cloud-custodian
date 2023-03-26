@@ -1,7 +1,5 @@
-from pathlib import Path
-import sys
+import time
 
-import click
 
 from c7n.config import Config
 from c7n.data import Data as DataMatcher
@@ -10,7 +8,6 @@ from c7n.output import NullTracer
 
 from .core import CollectionRunner
 from .output import RichCli, Output
-from .utils import load_policies
 
 
 class TestRunner:
@@ -23,8 +20,12 @@ class TestRunner:
 
     def run(self) -> bool:
         policy_tests = self.get_policy_tests()
+        self.reporter.on_tests_discovered(self, policy_tests)
         for test in policy_tests:
             self.run_test(test)
+            self.reporter.on_test_result(test)
+        self.reporter.on_tests_complete()
+        return bool(self.reporter.failures)
 
     def run_test(self, test) -> bool:
         checker = TestChecker(test, self.options)
@@ -69,11 +70,9 @@ class TestRunner:
     def load_plan(self, test_dir, plan_path):
         try:
             plan = load_file(plan_path)
+            return Test(plan, test_dir)
         except Exception as e:
-            self.reporter.console.print(f"plan file {plan_path} has errors")
-            self.reporter.console.print(e)
-            raise
-        return Test(plan, test_dir)
+            self.reporter.on_test_load_error(plan_path, e)
 
 
 class Test:
@@ -89,77 +88,112 @@ class Test:
     def set_policy(self, policy):
         self.policy = policy
 
-    def check_result(self, result):
+    def check_execution_result(self, result):
         self.plan.match(result)
+
+    def get_test_result(self):
+        result = self.plan.get_test_result()
+        result["name"] = self.name
+        return result
 
 
 class TestPlan:
     def __init__(self, plan_data):
         self.data = plan_data
         self.used = set()
+        self.matchers = []
+        self.unmatched = []
         self.initialize_matchers()
+
+    def get_test_result(self):
+        return {
+            "success": len(self.used) == len(self.matchers) and not self.unmatched,
+            "stat_checks": len(self.matchers),
+            "stat_used": len(self.used),
+            "stat_unmatched": len(self.unmatched),
+            "unmatched": self.unmatched,
+            "unused": [t for idx, t in enumerate(self.data) if idx not in self.used],
+        }
 
     def initialize_matchers(self):
         cfg = Config.empty(session_factory=None, tracer=NullTracer(None), options=None)
         matchers = []
         for match_block in self.data:
-            matcher = DataMatcher(cfg, match_block)
+            matcher = DataMatcher(
+                cfg, {"filters": [{k: v} for k, v in match_block.items()]}
+            )
             for i in matcher.iter_filters():
                 i.annotate = False
             matchers.append(matcher)
         self.matchers = matchers
 
     def match(self, result):
+        found = False
         for idx, matcher in enumerate(self.matchers):
             if idx in self.used:
                 continue
-            if matcher.filter_resources([result]):
+            if matcher.filter_resources([result.as_dict()]):
                 self.used.add(idx)
+                found = True
+                break
+        if found is False:
+            self.unmatched.append(result.as_dict())
 
 
 class TestReporter(RichCli):
-    pass
+    def __init__(self, ctx, config):
+        super().__init__(ctx, config)
+        self.start_time = time.time()
+        self.failures = 0
+        self.total = 0
+
+    def on_tests_discovered(self, runner, tests):
+        header = f"Discovered {len(tests)} Tests"
+        if runner.unmatched_policies:
+            header += f" - {len(runner.unmatched_policies)}/{len(runner.policies)}"
+            header += " Policies Untested"
+        if runner.unmatched_tests:
+            header += " - [red]{len(runner.unmatched_tests)} Unused Tests"
+        self.console.print(header)
+
+    def on_tests_complete(self):
+        status = f"{self.total} "
+        status += self.total > 1 and "Tests" or "Test"
+        status += " Complete (%0.2fs)" % (time.time() - self.start_time)
+        if self.failures:
+            status += f" [red]{self.failures} "
+            status += self.failures > 1 and "Failures" or "Failure"
+            status += "[/red]"
+        self.console.print(status)
+
+    def on_test_load_error(self, test_path, error):
+        self.console.print("[yellow]test load error[yellow] {test_path} - {error}")
+
+    def on_test_result(self, test: Test):
+        self.total += 1
+        result = test.get_test_result()
+        if result["success"]:
+            status = f"[green]Success[/green] {result['name']}"
+            status += f" - {result['stat_checks']} checks"
+            self.console.print(status)
+            return
+
+        self.failures += 1
+        status = f"[red]Failure[/red] {result['name']}"
+        if result["stat_unmatched"]:
+            status += f" {result['stat_unmatched']} findings unmatched"
+        if result["unused"]:
+            status += f" {result['unused']} checks not used"
+        self.console.print(status)
+
+        for unmatched in result["unmatched"]:
+            unmatched = dict(unmatched)
+            unmatched.pop("policy")
+            self.console.print(unmatched)
+        self.console.print("")
 
 
 class TestChecker(Output):
-    def on_execution_started(self, policies, graph):
-        print("running tests %d" % len(policies))
-
-    def on_execution_ended(self):
-        print("done")
-
     def on_results(self, results):
-        print("results %s" % results)
-
-
-@click.command()
-@click.option("-p", "--policy-dir", type=click.Path(), required=True)
-def main(policy_dir):
-    policy_dir = Path(policy_dir)
-    source_dir = policy_dir / "tests"
-    config = Config.empty(
-        source_dir=source_dir,
-        policy_dir=policy_dir,
-        output_file=sys.stdout,
-        # output=output,
-        # output_file=output_file,
-        # output_query=output_query,
-        # summary=summary,
-        # filters=filters,
-    )
-
-    reporter = TestReporter(None, config)
-    policies = load_policies(policy_dir, config)
-    runner = TestRunner(policies, config, reporter)
-    runner.run()
-
-
-if __name__ == "__main__":
-    try:
-        main()
-    except Exception:
-        import pdb
-        import traceback
-
-        traceback.print_exc()
-        pdb.post_mortem(sys.exc_info()[-1])
+        for r in results:
+            self.ctx.check_execution_result(r)
