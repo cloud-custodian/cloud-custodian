@@ -10,8 +10,10 @@ from c7n_gcp.query import QueryResourceManager, TypeInfo
 
 from c7n.resolver import ValuesFrom
 from c7n.utils import type_schema, local_session
-from c7n.filters.core import ValueFilter
+from c7n.filters.core import ValueFilter, ListItemFilter
 from c7n.filters.missing import Missing
+
+from googleapiclient.errors import HttpError
 
 
 @resources.register('organization')
@@ -369,3 +371,84 @@ class ProjectPropagateLabels(HierarchyAction):
 
             if delta:
                 yield ('update', model.get_label_params(r, rlabels))
+
+
+@Organization.filter_registry.register('essential-contacts')
+class OrgContactsFilter(ListItemFilter):
+    """Filter Resources based on essential contacts configuration
+
+    .. code-block:: yaml
+
+      - name: org-essential-contacts
+        resource: gcp.organization
+        filters:
+        - type: essential-contacts
+          count: 2
+          count_op: gte
+          attrs:
+            - validationState: VALID
+            - type: value
+              key: notificationCategorySubscriptions
+              value: TECHNICAL
+              op: contains
+    """
+    schema = type_schema(
+        'essential-contacts',
+        attrs={'$ref': '#/definitions/filters_common/list_item_attrs'},
+        count={'type': 'number'},
+        count_op={'$ref': '#/definitions/filters_common/comparison_operators'}
+    )
+
+    annotate_items = True
+    permissions = ("essentialcontacts.contacts.list",)
+
+    def get_item_values(self, resource):
+        session = local_session(self.manager.session_factory)
+        client = session.client("essentialcontacts", "v1", "organizations.contacts")
+        pages = client.execute_paged_query('list', {'parent': resource['name'], 'pageSize': 100})
+        contacts = []
+        for page in pages:
+            contacts.extend(page.get('contacts', []))
+        return contacts
+
+
+@Project.filter_registry.register('access-approval')
+class AccessApprovalFilter(ValueFilter):
+    """Filter Resources based on access approval configuration
+
+    .. code-block:: yaml
+
+      - name: project-access-approval
+        resource: gcp.project
+        filters:
+        - type: access-approval
+          key: enrolledServices.cloudProduct
+          value: "all"
+    """
+    schema = type_schema('access-approval', rinherit=ValueFilter.schema)
+    permissions = ('accessapproval.settings.get',)
+
+    def process(self, resources, event=None):
+        return [r for r in resources
+                if self.match(self.get_access_approval(r))]
+
+    def get_access_approval(self, resource):
+        session = local_session(self.manager.session_factory)
+        client = session.client("accessapproval", "v1", "projects")
+        project = resource['projectId']
+
+        try:
+            access_approval = client.execute_command(
+                'getAccessApprovalSettings',
+                {'name': f"projects/{project}/accessApprovalSettings"},)
+        except HttpError as ex:
+            if (ex.status_code == 400
+                and ex.reason == "Precondition check failed.") \
+                    or (ex.status_code == 404):
+                # For above exceptions, it implies that access approval is
+                # not enabled, so we return an empty setting.
+                access_approval = {}
+            else:
+                raise ex
+
+        return access_approval
