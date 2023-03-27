@@ -16,7 +16,7 @@ class ExperimentTemplate(QueryResourceManager):
 
         name = id = 'id'
         date = 'creationTime'
-        cfn_type = "AWS::FIS::ExperimentTemplate"
+        config_type = cfn_type = "AWS::FIS::ExperimentTemplate"
         arn_type = 'experiment-template'
 
     def augment(self, resources):

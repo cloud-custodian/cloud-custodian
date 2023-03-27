@@ -321,6 +321,12 @@ class DescribeVideoStream(DescribeSource):
         return universal_augment(self.manager, super().augment(resources))
 
 
+class DescribeKinesisAppV2(DescribeSource):
+
+    def augment(self, resources):
+        return universal_augment(self.manager, super().augment(resources))
+
+
 @resources.register('kinesis-analyticsv2')
 class KinesisAnalyticsAppV2(QueryResourceManager):
 
@@ -333,13 +339,15 @@ class KinesisAnalyticsAppV2(QueryResourceManager):
         arn = id = "ApplicationARN"
         arn_type = 'application'
         universal_taggable = object()
-        cfn_type = 'AWS::KinesisAnalyticsV2::Application'
+        config_type = cfn_type = 'AWS::KinesisAnalyticsV2::Application'
         permission_prefix = "kinesisanalytics"
 
     permissions = ("kinesisanalytics:DescribeApplication",)
 
-    def augment(self, resources):
-        return universal_augment(self, super().augment(resources))
+    source_mapping = {
+        'config': ConfigSource,
+        'describe': DescribeKinesisAppV2
+    }
 
 
 @KinesisAnalyticsAppV2.action_registry.register('delete')

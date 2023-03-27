@@ -148,6 +148,7 @@ class EventBus(QueryResourceManager):
         arn_type = 'event-bus'
         arn = 'Arn'
         enum_spec = ('list_event_buses', 'EventBuses', None)
+        config_type = cfn_type = 'AWS::Events::EventBus'
         id = name = 'Name'
         universal_taggable = object()
 
@@ -185,6 +186,7 @@ class EventRuleMetrics(MetricsFilter):
 
 @EventRule.filter_registry.register('event-rule-target')
 class EventRuleTargetFilter(ChildResourceFilter):
+
     """
     Filter event rules by their targets
 

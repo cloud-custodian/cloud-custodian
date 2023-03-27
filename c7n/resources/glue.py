@@ -396,7 +396,7 @@ class GlueClassifier(QueryResourceManager):
         id = name = 'Name'
         date = 'CreationTime'
         arn_type = 'classifier'
-        cfn_type = 'AWS::Glue::Classifier'
+        config_type = cfn_type = 'AWS::Glue::Classifier'
 
 
 @GlueClassifier.action_registry.register('delete')
@@ -427,7 +427,7 @@ class GlueMLTransform(QueryResourceManager):
         id = 'TransformId'
         arn_type = 'mlTransform'
         universal_taggable = object()
-        cfn_type = 'AWS::Glue::MLTransform'
+        config_type = cfn_type = 'AWS::Glue::MLTransform'
 
     augment = universal_augment
 

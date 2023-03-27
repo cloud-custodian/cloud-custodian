@@ -644,6 +644,7 @@ class ReadinessCheck(QueryResourceManager):
         enum_spec = ('list_readiness_checks', 'ReadinessChecks', None)
         name = id = 'ReadinessCheckName'
         global_resource = True
+        config_type = cfn_type = 'AWS::Route53RecoveryReadiness::ReadinessCheck'
 
     def get_client(self):
         return local_session(self.session_factory) \
