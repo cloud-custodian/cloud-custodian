@@ -67,7 +67,7 @@ runs:
         if [ -d ".venv" ]; then
           mv .venv .venv-old
         fi
-        python -m venv .ven
+        python -m venv .venv
         make install
 
     - name: Output Poetry Version

@@ -7,6 +7,7 @@ from .core import (
     OPERATORS,
     FilterRegistry,
     Filter,
+    ListItemFilter,
     Or,
     And,
     Not,
