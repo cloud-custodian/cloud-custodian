@@ -35,8 +35,11 @@ class GitRepo:
         self.repo_path = repo_path
         self.git_config = git_config or DEFAULT_CONFIG
 
+    def _run(self, cmd, **kw):
+        return subprocess.check_call(cmd, cwd=self.repo_path, **kw)
+
     def init(self):
-        subprocess.check_output(['git', 'init', '--initial-branch', 'main'], cwd=self.repo_path)
+        self._run(['git', 'init', '--initial-branch', 'main'])
         with open(os.path.join(self.repo_path, '.git', 'config'), 'w') as fh:
             fh.write(self.git_config)
 
@@ -55,16 +58,16 @@ class GitRepo:
                 fh.write(content)
 
         if not exists:
-            subprocess.check_output(['git', 'add', path], cwd=self.repo_path)
+            self._run(['git', 'add', path])
 
     def rm(self, path):
-        os.remove(os.path.join(self.repo_path, path))
+        self._run(['git', 'rm', path])
 
     def repo(self):
         return pygit2.Repository(os.path.join(self.repo_path, '.git'))
 
     def move(self, src, tgt):
-        subprocess.check_output(['git', 'mv', src, tgt], cwd=self.repo_path)
+        self._run(['git', 'mv', src, tgt])
 
     def commit(self, msg, author=None, email=None):
         env = {}
@@ -79,7 +82,7 @@ class GitRepo:
         if create:
             args.append('-b')
         args.append(branch)
-        subprocess.check_output(args, cwd=self.repo_path)
+        self._run(args)
 
 
 @pytest.mark.skipif(pygit2 is None, reason="pygit2 not installed")
@@ -94,11 +97,13 @@ class StreamTest(TestUtils):
         git.change('example.yml', {'policies': []})
         git.commit('init')
         git.change(
-            'example.yml', {'policies': [{'name': 'codebuild-check', 'resource': 'aws.codebuild'}]}
+            'example.yml',
+            {'policies': [{'name': 'codebuild-check', 'resource': 'aws.codebuild'}]},
         )
         git.commit('add something')
         git.change(
-            'example.yml', {'policies': [{'name': 'lambda-check', 'resource': 'aws.lambda'}]}
+            'example.yml',
+            {'policies': [{'name': 'lambda-check', 'resource': 'aws.lambda'}]},
         )
         git.commit('switch')
         return git
@@ -107,7 +112,8 @@ class StreamTest(TestUtils):
         git = self.setup_basic_repo()
         runner = CliRunner()
         result = runner.invoke(
-            policystream.cli, ['diff', '-r', git.repo_path, '--source', 'HEAD^', '--target', 'main']
+            policystream.cli,
+            ['diff', '-r', git.repo_path, '--source', 'HEAD^', '--target', 'main'],
         )
         self.assertEqual(result.exit_code, 0)
         self.assertEqual(
@@ -139,7 +145,8 @@ class StreamTest(TestUtils):
     def test_diff_subdir_policies(self):
         git = self.setup_basic_repo()
         git.change(
-            'subdir/notary.yml', {'policies': [{'resource': 'azure.vm', 'name': 'ornithopter'}]}
+            'subdir/notary.yml',
+            {'policies': [{'resource': 'azure.vm', 'name': 'ornithopter'}]},
         )
         git.commit('azure example')
         repo = git.repo()
@@ -168,7 +175,11 @@ class StreamTest(TestUtils):
         self.assertEqual(len(changes), 3)
         self.assertEqual(
             [
-                (c['change'], c['policy']['data']['name'], c['commit']['message'].strip())
+                (
+                    c['change'],
+                    c['policy']['data']['name'],
+                    c['commit']['message'].strip(),
+                )
                 for c in changes
             ],
             [
@@ -191,7 +202,10 @@ class StreamTest(TestUtils):
         self.assertEqual([r['change'] for r in rows], ['add', 'remove', 'add'])
         self.assertEqual(
             rows[-1]['policy'],
-            {'data': {'name': 'lambda-check', 'resource': 'aws.lambda'}, 'file': 'example.yml'},
+            {
+                'data': {'name': 'lambda-check', 'resource': 'aws.lambda'},
+                'file': 'example.yml',
+            },
         )
 
     def test_stream_remove_file(self):
@@ -208,7 +222,11 @@ class StreamTest(TestUtils):
         ]
         self.assertEqual(
             [
-                (c['change'], c['policy']['data']['name'], c['commit']['message'].strip())
+                (
+                    c['change'],
+                    c['policy']['data']['name'],
+                    c['commit']['message'].strip(),
+                )
                 for c in changes
             ],
             [
@@ -223,7 +241,10 @@ class StreamTest(TestUtils):
         git = GitRepo(self.get_temp_dir())
         git.init()
         git.change('aws/ec2.yml', {'policies': [{'name': 'ec2-check', 'resource': 'aws.ec2'}]})
-        git.change('lambda.yml', {'policies': [{'name': 'lambda-check', 'resource': 'aws.lambda'}]})
+        git.change(
+            'lambda.yml',
+            {'policies': [{'name': 'lambda-check', 'resource': 'aws.lambda'}]},
+        )
         git.commit('init')
         git.move('lambda.yml', 'aws/lambda.yml')
         git.change(
@@ -257,7 +278,11 @@ class StreamTest(TestUtils):
         ]
         self.assertEqual(
             {
-                (c['change'], c['policy']['data']['name'], c['commit']['message'].strip())
+                (
+                    c['change'],
+                    c['policy']['data']['name'],
+                    c['commit']['message'].strip(),
+                )
                 for c in changes
             },
             {
@@ -299,7 +324,11 @@ class StreamTest(TestUtils):
         ]
         self.assertEqual(
             [
-                (c['change'], c['policy']['data']['name'], c['commit']['message'].strip())
+                (
+                    c['change'],
+                    c['policy']['data']['name'],
+                    c['commit']['message'].strip(),
+                )
                 for c in changes
             ],
             [
