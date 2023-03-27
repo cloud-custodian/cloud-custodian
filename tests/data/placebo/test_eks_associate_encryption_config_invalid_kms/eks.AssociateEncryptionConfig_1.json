@@ -6,7 +6,7 @@
             "Code": "InvalidParameterException"
         },
         "ResponseMetadata": {},
-        "clusterName": "c7n-test-eks-cluster-0",
+        "clusterName": "c7n-test-eks-cluster",
         "message": "The keyArn for encryptionConfig is invalid."
     }
 }
