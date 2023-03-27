@@ -21,6 +21,7 @@ def test_gcp_resource_metadata_asset_type():
         'build',
         'dataflow-job',
         'dm-deployment',
+        'secret',
         'function',
         'loadbalancer-ssl-policy',
         'log-exclusion',
