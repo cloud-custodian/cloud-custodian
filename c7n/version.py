@@ -1,2 +1,2 @@
 # Generated via tools/dev/poetrypkg.py
-version = "0.9.24"
+version = "0.9.25"
