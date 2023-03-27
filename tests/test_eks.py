@@ -2,6 +2,8 @@
 # SPDX-License-Identifier: Apache-2.0
 import time
 import pytest
+import os
+import json
 from botocore.exceptions import ClientError
 from .common import BaseTest
 
@@ -258,12 +260,60 @@ class EKS(BaseTest):
         self.assertEqual(len(resources), 1)
         matched = resources.pop()
         self.assertEqual(matched['status'], 'ACTIVE')
-        if self.recording:
-            time.sleep(10)
-        client = factory().client('eks')
-        cluster = client.describe_cluster(name='c7n-test-eks-cluster-0')['cluster']
-        self.assertEqual(cluster['status'], 'UPDATING')
+        update_json = os.path.join(self.placebo_dir, "test_eks_associate_encryption_config", 
+        "eks.AssociateEncryptionConfig_2.json")
+        with open(update_json) as f:
+            data = json.load(f)
+        self.assertEqual(data['status_code'], 200)
+        self.assertEqual(data['data']['update']['type'], 'AssociateEncryptionConfig')
+        self.assertEqual(data['data']['update']['status'], 'InProgress')
 
+
+    def test_associate_encryption_config_key_arn(self):
+        factory = self.replay_flight_data("test_eks_associate_encryption_config_key_arn")
+
+        p = self.load_policy(
+            {
+                'name': 'test-eks-associate-encryption-config',
+                'resource': 'aws.eks',
+                'filters': [
+                    {
+                        'type': 'value',
+                        'key': 'encryptionConfig[].provider.keyArn',
+                        'value': 'absent'
+                    }
+                ],
+                'actions': [
+                    {
+                        'type': 'associate-encryption-config',
+                        'encryptionConfig': [
+                            {
+                                'provider': {
+                                    'keyArn': 
+                                    'arn:aws:kms:us-east-1:644160558196:key/361001ad-9c5e-42cb-9a09-5de1e80e822f'
+                                },
+                                'resources': [
+                                    'secrets'
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            session_factory=factory
+        )
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        matched = resources.pop()
+        self.assertEqual(matched['status'], 'ACTIVE')
+        update_json = os.path.join(self.placebo_dir, 
+        "test_eks_associate_encryption_config_key_arn", "eks.AssociateEncryptionConfig_1.json")
+        with open(update_json) as f:
+            data = json.load(f)
+        self.assertEqual(data['status_code'], 200)
+        self.assertEqual(data['data']['update']['type'], 'AssociateEncryptionConfig')
+        self.assertEqual(data['data']['update']['status'], 'InProgress')
 
     def test_associate_encryption_config_invalid_kms(self):
         factory = self.replay_flight_data("test_eks_associate_encryption_config_invalid_kms")

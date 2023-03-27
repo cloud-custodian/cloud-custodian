@@ -1,0 +1,28 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "update": {
+            "id": "d8f3063f-ae56-4bda-99e6-aab5f2293e92",
+            "status": "InProgress",
+            "type": "AssociateEncryptionConfig",
+            "params": [
+                {
+                    "type": "EncryptionConfig",
+                    "value": "[{\"resources\":[\"secrets\"],\"provider\":{\"keyArn\":\"arn:aws:kms:us-east-1:644160558196:key/361001ad-9c5e-42cb-9a09-5de1e80e822f\"}}]"
+                }
+            ],
+            "createdAt": {
+                "__class__": "datetime",
+                "year": 2023,
+                "month": 3,
+                "day": 27,
+                "hour": 10,
+                "minute": 29,
+                "second": 22,
+                "microsecond": 787000
+            },
+            "errors": []
+        }
+    }
+}
