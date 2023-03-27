@@ -29,8 +29,7 @@ def gen_qa_requires(root, output):
         packages.append((poetry_data['name'], poetry_data['version']))
 
     with open(output, 'w') as fh:
-        fh.write("\n".join(
-            [f"{name}=={version}" for name, version in packages]))
+        fh.write("\n".join([f"{name}=={version}" for name, version in packages]))
 
 
 @cli.command()

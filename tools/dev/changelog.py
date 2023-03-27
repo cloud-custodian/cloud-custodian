@@ -179,9 +179,7 @@ def schema_diff(schema_old, schema_new):
 def get_last_release(repo):
     regex = re.compile('^refs/tags/[\d\.]+')
     versions = [
-        version.LooseVersion(t.rsplit('/', 1)[-1])
-        for t in repo.references
-        if regex.match(t)
+        version.LooseVersion(t.rsplit('/', 1)[-1]) for t in repo.references if regex.match(t)
     ]
     versions = sorted(versions)
     return versions[-1].vstring
