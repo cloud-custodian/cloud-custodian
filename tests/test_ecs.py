@@ -379,7 +379,7 @@ class TestEcsTaskDefinition(BaseTest):
             {
                 "name": "task-defs",
                 "resource": "ecs-task-definition",
-                "filters": [{"family": "test-force-delete"}],
+                "filters": [{"family": "test-delete-definition"}],
                 "actions": [{"type": "delete", "force": True}],
             },
             session_factory=session_factory,
@@ -387,12 +387,12 @@ class TestEcsTaskDefinition(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         arns = session_factory().client("ecs").list_task_definitions(
-            familyPrefix="test-force-delete", status="DELETE_IN_PROGRESS"
+            familyPrefix="test-delete-definition", status="DELETE_IN_PROGRESS"
         ).get(
             "taskDefinitionArns"
         )
         self.assertEqual(arns, 
-                         ["arn:aws:ecs:us-east-1:644160558196:task-definition/test-force-delete:3"])
+                         ["arn:aws:ecs:us-east-1:644160558196:task-definition/test-delete-definition:2"])
         
 
     def test_task_definition_get_resources(self):

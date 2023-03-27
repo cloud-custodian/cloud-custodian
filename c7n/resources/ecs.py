@@ -629,7 +629,10 @@ class DeleteTaskDefinition(BaseAction):
             try:
                 retry(client.deregister_task_definition,
                       taskDefinition=r['taskDefinitionArn'])
-                task_definitions_arns.append(r['taskDefinitionArn'])
+                
+                if force:
+                    task_definitions_arns.append(r['taskDefinitionArn'])
+
             except ClientError as e:
                 if e.response['Error'][
                     'Message'] != 'The specified task definition does not exist.':
