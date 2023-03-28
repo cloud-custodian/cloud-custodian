@@ -15,9 +15,9 @@ from c7n.filters.iamaccess import CrossAccountAccessFilter
 from c7n.filters.related import ChildResourceFilter
 from c7n.filters.kms import KmsRelatedFilter
 from c7n.query import (
-    QueryResourceManager, ChildResourceManager, TypeInfo, DescribeSource, ConfigSource)
+    QueryResourceManager, ChildResourceManager,
+    TypeInfo, DescribeSource, ConfigSource, DescribeWithResourceTags)
 from c7n.manager import resources
-from c7n.query import DescribeWithResourceTags, ConfigSource
 from c7n.resolver import ValuesFrom
 from c7n.resources import load_resources
 from c7n.resources.aws import ArnResolver

@@ -7,8 +7,7 @@ from c7n.manager import resources
 from c7n.filters.kms import KmsRelatedFilter
 from c7n.query import (
     ConfigSource,
-    DescribeWithResourceTags, QueryResourceManager, TypeInfo
-from c7n.tags import universal_augment
+    DescribeWithResourceTags, QueryResourceManager, TypeInfo)
 from c7n.filters.vpc import SubnetFilter
 from c7n.utils import local_session, type_schema, get_retry
 
