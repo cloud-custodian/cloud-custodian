@@ -1157,7 +1157,8 @@ class ListItemFilter(Filter):
             matched_indicies = [r['c7n:_id'] for r in list_resources]
             for idx, list_value in enumerate(list_values):
                 list_value.pop('c7n:_id')
-            if self.data.get('count'):
+            # "is not None" makes it possible to use count == 0
+            if self.data.get('count') is not None:
                 count = self.data['count']
                 op = OPERATORS[self.data.get('count_op', 'eq')]
                 if op(len(list_resources), count):

@@ -15,7 +15,23 @@ class DescribeRegionalWaf(DescribeSource):
 
 class DescribeWafV2(DescribeSource):
     def augment(self, resources):
-        return universal_augment(self.manager, super().augment(resources))
+        client = local_session(self.manager.session_factory).client(
+            'wafv2',
+            region_name=self.manager.region
+        )
+
+        def _detail(webacl):
+            # the resource is hardcoded to only look at REGIONAL web acls and I don't have the time
+            # to change that right now so harcoding augment to do the same
+            response = client.get_web_acl(Name=webacl['Name'], Id=webacl['Id'], Scope='REGIONAL')
+            detail = response.get('WebACL', {})
+
+            return {**webacl, **detail}
+
+        with_tags = universal_augment(self.manager, resources)
+
+        return list(map(_detail, with_tags))
+
 
     # set REGIONAL for Scope as default
     def get_query_params(self, query):
@@ -81,6 +97,7 @@ class WAFV2(QueryResourceManager):
         detail_spec = ("get_web_acl", "Id", "Id", "WebACL")
         name = "Name"
         id = "Id"
+        arn = "ARN"
         dimension = "WebACL"
         cfn_type = config_type = "AWS::WAFv2::WebACL"
         arn_type = "webacl"
