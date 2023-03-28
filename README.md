@@ -23,6 +23,9 @@ ensuring real time compliance to security policies (like encryption and
 access requirements), tag policies, and cost management via garbage
 collection of unused resources and off-hours resource management.
 
+Custodian also supports running policies on infrastructure as code assets
+to provide feedback directly on developer workstations or within CI pipelines.
+
 Custodian policies are written in simple YAML configuration files that
 enable users to specify policies on a resource type (EC2, ASG, Redshift,
 CosmosDB, PubSub Topic) and are constructed from a vocabulary of filters
@@ -41,6 +44,7 @@ Features
 
 -   Comprehensive support for public cloud services and resources with a
     rich library of actions and filters to build policies with.
+-   Run policies on infrastructure as code (terraform, etc) assets.	
 -   Supports arbitrary filtering on resources with nested boolean
     conditions.
 -   Dry run any policy to see what it would do.
@@ -241,6 +245,8 @@ tools here
 <https://github.com/cloud-custodian/cloud-custodian/tree/master/tools>:
 
 - [**_Org_:**](https://cloudcustodian.io/docs/tools/c7n-org.html) Multi-account policy execution.
+
+- [**_ShiftLeft_:**](https://cloudcustodian.io/docs/tools/c7n-left.html) Shift Left ~ run policies against Infrastructure as Code assets like terraform.
 
 - [**_PolicyStream_:**](https://cloudcustodian.io/docs/tools/c7n-policystream.html) Git history as stream of logical policy changes.
 
