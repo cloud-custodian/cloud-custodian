@@ -5,16 +5,13 @@ import jmespath
 from c7n.actions import Action
 from c7n.manager import resources
 from c7n.filters.kms import KmsRelatedFilter
-from c7n.query import ConfigSource, DescribeSource, QueryResourceManager, TypeInfo
+from c7n.query import (
+    ConfigSource,
+    DescribeWithResourceTags, QueryResourceManager, TypeInfo
 from c7n.tags import universal_augment
 from c7n.filters.vpc import SubnetFilter
 from c7n.utils import local_session, type_schema, get_retry
 
-
-class DescribeStream(DescribeSource):
-
-    def augment(self, resources):
-        return universal_augment(self.manager, super().augment(resources))
 
 
 class ConfigStream(ConfigSource):
@@ -50,7 +47,7 @@ class KinesisStream(QueryResourceManager):
         config_type = cfn_type = 'AWS::Kinesis::Stream'
 
     source_mapping = {
-        'describe': DescribeStream,
+        'describe': DescribeWithResourceTags,
         'config': ConfigStream
     }
 
@@ -135,12 +132,6 @@ class KmsFilterDataStream(KmsRelatedFilter):
     RelatedIdsExpression = 'KeyId'
 
 
-class DescribeDeliveryStream(DescribeSource):
-
-    def augment(self, resources):
-        return universal_augment(self.manager, super().augment(resources))
-
-
 @resources.register('firehose')
 class DeliveryStream(QueryResourceManager):
 
@@ -158,7 +149,7 @@ class DeliveryStream(QueryResourceManager):
         cfn_type = 'AWS::KinesisFirehose::DeliveryStream'
 
     source_mapping = {
-        'describe': DescribeDeliveryStream,
+        'describe': DescribeWithResourceTags,
         'config': ConfigSource
     }
 
@@ -274,12 +265,6 @@ class FirehoseEncryptS3Destination(Action):
                 client.update_destination(**params)
 
 
-class DescribeApp(DescribeSource):
-
-    def augment(self, resources):
-        return universal_augment(self.manager, super().augment(resources))
-
-
 @resources.register('kinesis-analytics')
 class AnalyticsApp(QueryResourceManager):
 
@@ -296,7 +281,7 @@ class AnalyticsApp(QueryResourceManager):
 
     source_mapping = {
         'config': ConfigSource,
-        'describe': DescribeApp
+        'describe': DescribeWithResourceTags
     }
 
 
@@ -313,18 +298,6 @@ class AppDelete(Action):
             client.delete_application(
                 ApplicationName=r['ApplicationName'],
                 CreateTimestamp=r['CreateTimestamp'])
-
-
-class DescribeVideoStream(DescribeSource):
-
-    def augment(self, resources):
-        return universal_augment(self.manager, super().augment(resources))
-
-
-class DescribeKinesisAppV2(DescribeSource):
-
-    def augment(self, resources):
-        return universal_augment(self.manager, super().augment(resources))
 
 
 @resources.register('kinesis-analyticsv2')
@@ -346,7 +319,7 @@ class KinesisAnalyticsAppV2(QueryResourceManager):
 
     source_mapping = {
         'config': ConfigSource,
-        'describe': DescribeKinesisAppV2
+        'describe': DescribeWithResourceTags,
     }
 
 
@@ -388,7 +361,7 @@ class KinesisVideoStream(QueryResourceManager):
         universal_taggable = True
 
     source_mapping = {
-        'describe': DescribeVideoStream,
+        'describe': DescribeWithResourceTags,
         'config': ConfigSource
     }
 

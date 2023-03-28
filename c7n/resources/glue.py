@@ -429,7 +429,8 @@ class GlueMLTransform(QueryResourceManager):
         universal_taggable = object()
         config_type = cfn_type = 'AWS::Glue::MLTransform'
 
-    augment = universal_augment
+    source_mapping = {'describe': query.DescribeWithResourceTags,
+                      'config': query.ConfigSource}
 
     def get_permissions(self):
         return ('glue:GetMLTransforms',)
