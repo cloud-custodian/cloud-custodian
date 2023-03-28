@@ -2045,6 +2045,8 @@ class RDSProxy(QueryResourceManager):
 @filters.register('db-option-groups')
 class DbOptionGroups(ValueFilter):
     """This filter describes RDS option groups for associated RDS instances.
+    Use this filter in conjunction with jmespath and value filter operators
+    to filter RDS instance based on their option groups
 
     :example:
 
@@ -2055,9 +2057,11 @@ class DbOptionGroups(ValueFilter):
             resource: aws.rds
             filters:
               - type: db-option-groups
-                key: OptionName
-                value: NATIVE_NETWORK_ENCRYPTION
-                op: eq
+                key: Options[].OptionName
+                op: intersect
+                value:
+                  - SSL
+                  - NATIVE_NETWORK_ENCRYPTION
 
     :example:
 
@@ -2069,7 +2073,7 @@ class DbOptionGroups(ValueFilter):
             filters:
               - Engine: oracle-ee
               - type: db-option-groups
-                key: OptionSettings[?Name == 'SQLNET.ENCRYPTION_SERVER'].Value
+                key: Options[].OptionSettings[?Name == 'SQLNET.ENCRYPTION_SERVER'].Value[]
                 value:
                   - REQUIRED
     """
@@ -2093,16 +2097,15 @@ class DbOptionGroups(ValueFilter):
                 if og_values is not None:
                     ogcache[og] = og_values
                     continue
-                option_list = list(itertools.chain(*[p['OptionGroupsList']
+                option_groups_list = list(itertools.chain(*[p['OptionGroupsList']
                     for p in paginator.paginate(OptionGroupName=og)]))
 
                 ogcache[og] = {}
-                for option in option_list:
-                    if option['Options']:
-                        for p in option['Options']:
-                            ogcache[og].update(p)
-                cache.save(cache_key, ogcache[og])
+                for option_group in option_groups_list:
+                    ogcache[og] = option_group
 
+                cache.save(cache_key, ogcache[og])
+    
         return ogcache
 
     def process(self, resources, event=None):
@@ -2119,7 +2122,7 @@ class DbOptionGroups(ValueFilter):
                 if self.match(og_values):
                     resource.setdefault(self.policy_annotation, []).append({
                         k: jmespath.search(k, og_values)
-                        for k in {'OptionName', self.data.get('key')}
+                        for k in {'OptionGroupName', self.data.get('key')}
                     })
                     results.append(resource)
                     break

@@ -23,6 +23,7 @@ ResourceMap = {
     "gcp.firewall": "c7n_gcp.resources.network.Firewall",
     "gcp.folder": "c7n_gcp.resources.resourcemanager.Folder",
     "gcp.function": "c7n_gcp.resources.function.Function",
+    "gcp.secret": "c7n_gcp.resources.secret.Secret",
     "gcp.gke-cluster": "c7n_gcp.resources.gke.KubernetesCluster",
     "gcp.gke-nodepool": "c7n_gcp.resources.gke.KubernetesClusterNodePool",
     "gcp.iam-role": "c7n_gcp.resources.iam.Role",

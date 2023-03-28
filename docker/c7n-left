@@ -1,0 +1,41 @@
+FROM cgr.dev/chainguard/python:3.11-dev as builder
+
+ARG POETRY_VERSION="1.4.0"
+
+WORKDIR /app
+
+RUN python -m venv "${HOME}/tools" && \
+    . "${HOME}/tools/bin/activate" && \
+    pip3 install "poetry==${POETRY_VERSION}"
+
+# install c7n deps
+COPY pyproject.toml poetry.lock /app/
+RUN ~/tools/bin/poetry export -o requirements.txt && \
+    pip3 install --user -r requirements.txt
+COPY c7n /app/c7n
+
+# install c7n-left deps
+COPY tools/c7n_left /app/
+RUN ~/tools/bin/poetry export -o requirements.txt && \
+    pip3 install --user -r requirements.txt
+
+
+FROM cgr.dev/chainguard/python:3.11
+
+LABEL name="c7n-left" \
+      repository="http://github.com/cloud-custodian/cloud-custodian"
+LABEL "org.opencontainers.image.title"="c7n-left"
+LABEL "org.opencontainers.image.description"="IaC Policy Engine"
+LABEL "org.opencontainers.image.documentation"="https://cloudcustodian.io/docs"
+
+WORKDIR /app
+
+COPY --from=builder /home/nonroot/.local/lib/python3.11/site-packages /home/nonroot/.local/lib/python3.11/site-packages
+
+COPY --from=builder /app/c7n /app/c7n
+COPY --from=builder /app/c7n_left /app/c7n_left
+
+ENV LC_ALL="C.UTF-8" LANG="C.UTF-8"
+ENV PYTHONPATH=/app:$PYTHONPATH
+
+ENTRYPOINT [ "python", "-m", "c7n_left.cli"]

@@ -12,7 +12,7 @@ from c7n.query import QueryResourceManager, ChildResourceManager, TypeInfo, Retr
 from c7n.manager import resources
 from c7n.utils import chunks, get_retry, generate_arn, local_session, type_schema
 from c7n.actions import BaseAction
-from c7n.filters import Filter
+from c7n.filters import Filter, ListItemFilter
 from c7n.resources.shield import IsShieldProtected, SetShieldProtection
 from c7n.tags import RemoveTag, Tag
 from c7n.filters.related import RelatedResourceFilter
@@ -945,3 +945,60 @@ class ControlPanelRemoveTag(RemoveTag):
             client.untag_resource(
                 ResourceArn=r['ControlPanelArn'],
                 TagKeys=keys)
+
+
+@ControlPanel.filter_registry.register('safety-rule')
+class SafeRule(ListItemFilter):
+    """Filter the safety rules (the assertion rules and gating rules)
+    that you’ve defined for the routing controls in a control panel.
+
+
+    :example:
+
+    find a recovery control panel with at least two deployed assertion safety rules
+    with a mininum of 30m wait period.
+
+    .. code-block:: yaml
+
+      policies:
+        - name: check-safety
+          resource: aws.recovery-control-panel
+          filters:
+            - type: safety-rule
+              count: 2
+              count_op: gte
+              attrs:
+               - Type: ASSERTION
+               - Status: Deployed
+               - type: value
+                 key: WaitPeriodMs
+                 op: gte
+                 value: 30
+    """
+    permissions = ('route53-recovery-control-config:ListSafetyRules',)
+    schema = type_schema(
+        'safety-rule',
+        attrs={'$ref': '#/definitions/filters_common/list_item_attrs'},
+        count={'type': 'number'},
+        count_op={'$ref': '#/definitions/filters_common/comparison_operators'}
+    )
+
+    _client = None
+
+    def get_client(self):
+        if self._client:
+            return self._client
+        self._client = self.manager.get_client()
+        return self._client
+
+    def get_item_values(self, resource):
+        paginator = self.get_client().get_paginator('list_safety_rules')
+        paginator.PAGE_ITERATOR_CLASS = RetryPageIterator
+        rules = []
+        results = paginator.paginate(
+            ControlPanelArn=resource['ControlPanelArn']).build_full_result().get('SafetyRules', [])
+        for block in results:
+            for rule_type, type_rule in block.items():
+                type_rule['Type'] = rule_type
+                rules.append(type_rule)
+        return rules
