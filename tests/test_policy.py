@@ -1336,6 +1336,23 @@ class PolicyConditionsTest(BaseTest):
         p.conditions.env_vars['account'] = {'name': 'mickey'}
         self.assertFalse(p.is_runnable())
 
+    def test_env_var_extension_with_expand_variables(self):
+        p = self.load_policy({
+            'name': 'profx',
+            'resource': 'aws.ec2',
+            'description': 'Test var extension {var1}',
+            'conditions': [{
+                'type': 'value',
+                'key': 'account.name',
+                'value': 'deputy'}]})
+        p.expand_variables({"var1":"value1"})
+        p.validate()
+        self.assertEqual("Test var extension value1", p.data["description"])
+        p.conditions.env_vars['account'] = {'name': 'deputy'}
+        self.assertTrue(p.is_runnable())
+        p.conditions.env_vars['account'] = {'name': 'mickey'}
+        self.assertFalse(p.is_runnable())
+
     def test_event_filter(self):
         p = self.load_policy({
             'name': 'profx',
