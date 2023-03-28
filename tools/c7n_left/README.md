@@ -214,7 +214,7 @@ both terraform files that would match the policy and those that should not.
 Finally you add assertions in a `left.plan[.yaml|.json]` file. The
 format of the file is an array of dictionaries. The dictionaries are
 used to match against the policy findings. The data its matching
-against is what is found by using `c7n-left run --format json`. Each
+against is what is found by using `c7n-left run --output json`. Each
 key/value pair in the dictionary is matched against the finding.
 
 So putting it all together, we've setup our tests as follows
