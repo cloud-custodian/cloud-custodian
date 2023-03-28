@@ -6,7 +6,7 @@ from c7n.utils import type_schema
 from c7n_gcp.filters.iampolicy import IamPolicyFilter
 from c7n_gcp.provider import resources
 from c7n_gcp.query import QueryResourceManager, TypeInfo, ChildResourceManager, ChildTypeInfo
-from c7n_gcp.actions import MethodAction, SetIamPolicy
+from c7n_gcp.actions import MethodAction
 
 
 @resources.register('project-role')
@@ -105,12 +105,6 @@ class ServiceAccountIamPolicyFilter(IamPolicyFilter):
     Overrides the base implementation to process service account resources correctly.
     """
     permissions = ('resourcemanager.projects.getIamPolicy',)
-
-    def _verb_arguments(self, resource):
-        verb_arguments = SetIamPolicy._verb_arguments(self, resource)
-        verb_arguments['body'] = {}
-        return verb_arguments
-
 
 
 @resources.register('service-account-key')
