@@ -131,7 +131,7 @@ class NetworkSecurityGroupFilter(Filter):
             MATCH: {'type': 'string', 'enum': ['all', 'any']},
             PORTS: {'type': 'string'},
             EXCEPT_PORTS: {'type': 'string'},
-            IP_PROTOCOL: {'type': 'string', 'enum': ['TCP', 'UDP', '*']},
+            IP_PROTOCOL: {'type': 'string', 'enum': ['ICMP', 'TCP', 'UDP', '*']},
             ACCESS: {'type': 'string', 'enum': [ALLOW_OPERATION, DENY_OPERATION]},
             SOURCE: {'type': 'string'},
             DESTINATION: {'type': 'string'},
@@ -212,7 +212,7 @@ class NetworkSecurityGroupPortsAction(BaseAction):
             'type': {'enum': []},
             PORTS: {'type': 'string'},
             EXCEPT_PORTS: {'type': 'string'},
-            IP_PROTOCOL: {'type': 'string', 'enum': ['TCP', 'UDP', '*']},
+            IP_PROTOCOL: {'type': 'string', 'enum': ['ICMP', 'TCP', 'UDP', '*']},
             DIRECTION: {'type': 'string', 'enum': ['Inbound', 'Outbound']},
             PREFIX: {'type': 'string', 'maxLength': 44}  # 80 symbols limit, guid takes 36
         },
