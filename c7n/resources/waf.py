@@ -15,7 +15,7 @@ class DescribeRegionalWaf(DescribeSource):
 
 class DescribeWafV2(DescribeSource):
     def augment(self, resources):
-        return universal_augment(self.manager, resources)
+        return universal_augment(self.manager, super().augment(resources))
 
     # set REGIONAL for Scope as default
     def get_query_params(self, query):
