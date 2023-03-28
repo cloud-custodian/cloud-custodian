@@ -1,0 +1,45 @@
+{
+    "status_code": 200,
+    "data": {
+        "WebACL": {
+            "Name": "WVvF5qejaoARvhMU",
+            "Id": "ebf41215-9625-436d-938c-c2172c665718",
+            "Description": "Example of a managed rule.",
+            "LockToken": "237b131c-16e7-4e3c-9017-6f352f654823",
+            "ARN": "arn:aws:wafv2:us-east-1:644160558196:regional/webacl/WVvF5qejaoARvhMU/ebf41215-9625-436d-938c-c2172c665718",
+            "DefaultAction": {
+                "Allow": {}
+            },
+            "Rules": [
+                {
+                    "Name": "rule-1",
+                    "Priority": 1,
+                    "Statement": {
+                        "ManagedRuleGroupStatement": {
+                            "VendorName": "AWS",
+                            "Name": "AWSManagedRulesKnownBadInputsRuleSet"
+                        }
+                    },
+                    "OverrideAction": {
+                        "None": {}
+                    },
+                    "VisibilityConfig": {
+                        "SampledRequestsEnabled": false,
+                        "CloudWatchMetricsEnabled": false,
+                        "MetricName": "WVvF5qejaoARvhMU"
+                    }
+                }
+            ],
+            "VisibilityConfig": {
+                "SampledRequestsEnabled": false,
+                "CloudWatchMetricsEnabled": false,
+                "MetricName": "WVvF5qejaoARvhMU"
+            },
+            "Capacity": 200,
+            "ManagedByFirewallManager": false,
+            "LabelNamespace": "awswaf:123456789012:webacl:WVvF5qejaoARvhMU:"
+        },
+        "LockToken": "ddcb6c85-3a5e-4f3e-87c9-e03fbeb7afe6",
+        "ResponseMetadata": {}
+    }
+}

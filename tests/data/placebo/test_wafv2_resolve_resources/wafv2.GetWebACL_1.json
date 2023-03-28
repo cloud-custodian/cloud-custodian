@@ -1,0 +1,26 @@
+{
+    "status_code": 200,
+    "data": {
+        "WebACL": {
+            "Name": "match-me",
+            "Id": "624e04d2-8b45-45ee-b4ad-e853dac6d070",
+            "Description": "",
+            "LockToken": "ad4ae4ab-aba8-4499-88e9-059d4f9a4c60",
+            "ARN": "arn:aws:wafv2:us-east-2:644160558196:regional/webacl/match-me/624e04d2-8b45-45ee-b4ad-e853dac6d070",
+            "DefaultAction": {
+                "Allow": {}
+            },
+            "Rules": [],
+            "VisibilityConfig": {
+                "SampledRequestsEnabled": false,
+                "CloudWatchMetricsEnabled": false,
+                "MetricName": "WVvF5qejaoARvhMU"
+            },
+            "Capacity": 200,
+            "ManagedByFirewallManager": false,
+            "LabelNamespace": "awswaf:123456789012:webacl:WVvF5qejaoARvhMU:"
+        },
+        "LockToken": "ddcb6c85-3a5e-4f3e-87c9-e03fbeb7afe6",
+        "ResponseMetadata": {}
+    }
+}
