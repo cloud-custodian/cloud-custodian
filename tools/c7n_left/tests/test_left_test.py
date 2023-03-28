@@ -3,14 +3,24 @@
 #
 import os
 from pathlib import Path
-import time
 import sys
+import time
 from unittest.mock import MagicMock
 
 from click.testing import CliRunner
+import pytest
+
 from c7n.config import Bag
-from c7n_left import cli
-from c7n_left import test as left_test
+
+
+try:
+    from c7n_left import cli
+    from c7n_left import test as left_test
+
+    LEFT_INSTALLED = True
+except ImportError:
+    pytest.skip(reason="c7n_left not installed", allow_module_level=True)
+    LEFT_INSTALLED = False
 
 
 data_dir = Path(os.curdir).absolute() / "data"
