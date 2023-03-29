@@ -210,6 +210,27 @@ class NetworkSecurityGroupTest(BaseTest):
 
         resources = p.run()
         self.assertEqual(len(resources), 0)
+    
+    @arm_template('networksecuritygroup.json')
+    def test_icmp_protocol(self):
+        p = self.load_policy({
+            'name': 'test-azure-nsg',
+            'resource': 'azure.networksecuritygroup',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'eq',
+                 'value_type': 'normalize',
+                 'value': 'c7n-nsg'},
+                {'type': 'ingress',
+                 'ports': '0-65535',
+                 'ipProtocol': 'ICMP',
+                 'source': '*',
+                 'access': 'Deny'}]
+        })
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
 
 
 class NetworkSecurityGroupFlowLogsFilterTest(BaseTest):
