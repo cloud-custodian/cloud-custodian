@@ -607,6 +607,7 @@ class DeleteTaskDefinition(BaseAction):
              - family: test-task-def
            actions:
              - type: delete
+
          - name: delete-task-definition
            resource: ecs-task-definition
            filters:
@@ -623,22 +624,23 @@ class DeleteTaskDefinition(BaseAction):
         client = local_session(self.manager.session_factory).client('ecs')
         retry = get_retry(('Throttling',))
         force = self.data.get('force', False)
-        task_definitions_arns = []
 
         for r in resources:
+            if r['status'] == 'INACTIVE':
+                continue
             try:
                 retry(client.deregister_task_definition,
                       taskDefinition=r['taskDefinitionArn'])
-                
-                if force:
-                    task_definitions_arns.append(r['taskDefinitionArn'])
-
             except ClientError as e:
                 if e.response['Error'][
                     'Message'] != 'The specified task definition does not exist.':
                     raise
 
         if force:
+            task_definitions_arns = [
+                r['taskDefinitionArn']
+                for r in resources
+            ]
             for chunk in chunks(task_definitions_arns, size=10):
                 retry(client.delete_task_definitions, taskDefinitions=chunk)
 
