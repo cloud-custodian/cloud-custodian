@@ -40,7 +40,7 @@ class TestRunner:
 
     def get_policy_tests(self):
         policy_map = {p.name: p for p in self.policies}
-        test_map = {t.name: t for t in self.get_tests(self.options.source_dir)}
+        test_map = {t.name: t for t in self.get_tests(self.options.source_dir) if t}
 
         self.unmatched_policies = set(policy_map).difference(test_map)
         self.unmatched_tests = set(test_map).difference(policy_map)
@@ -183,15 +183,21 @@ class TestReporter(RichCli):
         self.failures += 1
         status = f"[red]Failure[/red] {result['name']}"
         if result["stat_unmatched"]:
-            status += f" {result['stat_unmatched']} findings unmatched"
+            status += f" - {result['stat_unmatched']} findings unmatched"
         if result["unused"]:
-            status += f" {result['unused']} checks not used"
+            status += f" - {len(result['unused'])} Checks not used"
         self.console.print(status)
+        if result["unused"]:
+            self.console.print("Unused Checks")
+            for u in result["unused"]:
+                self.console.print(u)
 
-        for unmatched in result["unmatched"]:
-            unmatched = dict(unmatched)
-            unmatched.pop("policy")
-            self.console.print(unmatched)
+        if result["unmatched"]:
+            self.console.print("Unmatched Findings")
+            for unmatched in result["unmatched"]:
+                unmatched = dict(unmatched)
+                unmatched.pop("policy")
+                self.console.print(unmatched)
         self.console.print("")
 
 
