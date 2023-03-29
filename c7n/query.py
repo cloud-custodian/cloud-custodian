@@ -19,7 +19,7 @@ from c7n.exceptions import ClientError, ResourceLimitExceeded, PolicyExecutionEr
 from c7n.filters import FilterRegistry, MetricsFilter
 from c7n.manager import ResourceManager
 from c7n.registry import PluginRegistry
-from c7n.tags import register_ec2_tags, register_universal_tags
+from c7n.tags import register_ec2_tags, register_universal_tags, universal_augment
 from c7n.utils import (
     local_session, generate_arn, get_retry, chunks, camelResource)
 
@@ -271,6 +271,12 @@ class DescribeSource:
             results = list(w.map(
                 _augment, chunks(resources, self.manager.chunk_size)))
             return list(itertools.chain(*results))
+
+
+class DescribeWithResourceTags(DescribeSource):
+
+    def augment(self, resources):
+        return universal_augment(self.manager, super().augment(resources))
 
 
 @sources.register('describe-child')

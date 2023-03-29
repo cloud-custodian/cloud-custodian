@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "c7n_mailer"
-version = "0.6.23"
+version = "0.6.24"
 description = "Cloud Custodian - Reference Mailer"
 authors = ["Cloud Custodian Project"]
 license = "Apache-2.0"
@@ -43,7 +43,7 @@ c7n-azure = { version = "*", optional = true }
 fakeredis = "^1.2.0"
 pytest = "^7.1.2"
 mypy = "^0.931"
-black = "^22.1.0"
+black = "^23.1.0"
 c7n-gcp = { path = "../c7n_gcp/", develop = true, optional = true }
 c7n-azure = { path = "../c7n_azure/", develop = true, optional = true }
 

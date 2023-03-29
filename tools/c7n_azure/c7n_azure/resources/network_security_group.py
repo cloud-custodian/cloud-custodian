@@ -10,8 +10,10 @@ from azure.core.exceptions import AzureError
 
 from c7n.actions import BaseAction
 from c7n.filters import Filter, FilterValidationError
-from c7n.filters.core import PolicyValidationError
+from c7n.filters.core import PolicyValidationError, ValueFilter
 from c7n.utils import type_schema
+
+from msrestazure.tools import parse_resource_id
 
 
 @resources.register('networksecuritygroup')
@@ -131,7 +133,7 @@ class NetworkSecurityGroupFilter(Filter):
             MATCH: {'type': 'string', 'enum': ['all', 'any']},
             PORTS: {'type': 'string'},
             EXCEPT_PORTS: {'type': 'string'},
-            IP_PROTOCOL: {'type': 'string', 'enum': ['TCP', 'UDP', '*']},
+            IP_PROTOCOL: {'type': 'string', 'enum': ['ICMP', 'TCP', 'UDP', '*']},
             ACCESS: {'type': 'string', 'enum': [ALLOW_OPERATION, DENY_OPERATION]},
             SOURCE: {'type': 'string'},
             DESTINATION: {'type': 'string'},
@@ -201,6 +203,60 @@ class EgressFilter(NetworkSecurityGroupFilter):
     schema = type_schema('egress', rinherit=NetworkSecurityGroupFilter.schema)
 
 
+@NetworkSecurityGroup.filter_registry.register('flow-logs')
+class FlowLogs(ValueFilter):
+    """Filter a Network Security Group by its associated flow logs. NOTE: only one flow log
+    can be assigned to a Network Security Group, but to maintain parity with the Azure API, a list
+    of flow logs is returned to the filter.
+
+    :example:
+
+    Find all network security groups with a flow-log retention less than 90 days
+
+    .. code-block:: yaml
+
+        policies:
+          - name: flow-logs
+            resource: azure.networksecuritygroup
+            filters:
+              - or:
+                - type: flow-logs
+                  key: logs
+                  value: empty
+                - type: flow-logs
+                  key: logs[0].retentionPolicy.days
+                  op: lt
+                  value: 90
+    """
+
+    schema = type_schema('flow-logs', rinherit=ValueFilter.schema)
+
+    def _get_flow_logs(self, resource):
+        parsed_ids = [
+            parse_resource_id(log['id'])
+            for log in resource['properties'].get('flowLogs', [])
+        ]
+
+        client = self.manager.get_client()
+
+        return [
+            client.flow_logs.get(
+                resource['resourceGroup'],
+                parsed_id['name'],
+                parsed_id['resource_name']
+            ).serialize(True).get('properties')
+            for parsed_id in parsed_ids
+        ]
+
+    def __call__(self, resource):
+        key = 'c7n:flow-logs'
+
+        if key not in resource['properties']:
+            resource['properties'][key] = {'logs': self._get_flow_logs(resource)}
+
+        return super().__call__(resource['properties'][key])
+
+
 class NetworkSecurityGroupPortsAction(BaseAction):
     """
     Action to perform on Network Security Groups
@@ -212,7 +268,7 @@ class NetworkSecurityGroupPortsAction(BaseAction):
             'type': {'enum': []},
             PORTS: {'type': 'string'},
             EXCEPT_PORTS: {'type': 'string'},
-            IP_PROTOCOL: {'type': 'string', 'enum': ['TCP', 'UDP', '*']},
+            IP_PROTOCOL: {'type': 'string', 'enum': ['ICMP', 'TCP', 'UDP', '*']},
             DIRECTION: {'type': 'string', 'enum': ['Inbound', 'Outbound']},
             PREFIX: {'type': 'string', 'maxLength': 44}  # 80 symbols limit, guid takes 36
         },
