@@ -635,6 +635,17 @@ class LogConfigAssociationsFilter(Filter):
 ARC_REGION = 'us-west-2'
 
 
+class DescribeCheck(query.DescribeSource):
+
+    def augment(self, readiness_checks):
+        for r in readiness_checks:
+            Tags = self.manager.retry(
+                self.manager.get_client().list_tags_for_resources,
+                ResourceArn=r['ReadinessCheckArn'])['Tags']
+            r['Tags'] = [{'Key': k, "Value": v} for k, v in Tags.items()]
+        return readiness_checks
+
+
 @resources.register('readiness-check')
 class ReadinessCheck(QueryResourceManager):
 
@@ -644,18 +655,13 @@ class ReadinessCheck(QueryResourceManager):
         enum_spec = ('list_readiness_checks', 'ReadinessChecks', None)
         name = id = 'ReadinessCheckName'
         global_resource = True
+        config_type = cfn_type = 'AWS::Route53RecoveryReadiness::ReadinessCheck'
+
+    source_mapping = {'describe': DescribeCheck, 'config': query.ConfigSource}
 
     def get_client(self):
         return local_session(self.session_factory) \
             .client('route53-recovery-readiness', region_name=ARC_REGION)
-
-    def augment(self, readiness_checks):
-        for r in readiness_checks:
-            Tags = self.retry(
-                self.get_client().list_tags_for_resources,
-                ResourceArn=r['ReadinessCheckArn'])['Tags']
-            r['Tags'] = [{'Key': k, "Value": v} for k, v in Tags.items()]
-        return readiness_checks
 
 
 @ReadinessCheck.action_registry.register('tag')
