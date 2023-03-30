@@ -263,9 +263,13 @@ class CollectionRunner:
     def match_type(rtype, p):
         if isinstance(p.resource_type, str):
             return fnmatch.fnmatch(rtype, p.resource_type.split(".", 1)[-1])
+        found = False
         if isinstance(p.resource_type, list):
             for pr in p.resource_type:
-                return fnmatch.fnmatch(rtype, pr.split(".", 1)[-1])
+                if fnmatch.fnmatch(rtype, pr.split(".", 1)[-1]):
+                    found = True
+                    break
+        return found
 
 
 class IACSourceMode(PolicyExecutionMode):

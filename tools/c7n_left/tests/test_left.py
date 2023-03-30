@@ -265,7 +265,60 @@ def test_provider_parse():
     }
 
 
-def test_multi_resource_policy(tmp_path):
+def test_multi_resource_list_policy(tmp_path):
+    (tmp_path / "policy.json").write_text(
+        json.dumps(
+            {
+                "policies": [
+                    {
+                        "name": "check-multi",
+                        "resource": ["terraform.aws_alb", "terraform.aws_lb"],
+                    }
+                ]
+            }
+        )
+    )
+
+    (tmp_path / "tf").mkdir()
+
+    (tmp_path / "tf" / "main.tf").write_text(
+        """
+resource "aws_alb" "positive1" {
+  name               = "test-lb-tf"
+  internal           = false
+  load_balancer_type = "network"
+  subnets            = aws_subnet.public.*.id
+}
+
+resource "aws_lb" "positive3" {
+  name               = "test-lb-tf"
+  internal           = false
+  load_balancer_type = "network"
+  subnets            = aws_subnet.public.*.id
+}
+        """
+    )
+    runner = CliRunner()
+    result = runner.invoke(
+        cli.cli,
+        [
+            "run",
+            "-p",
+            str(tmp_path),
+            "-d",
+            str(tmp_path / "tf"),
+            "-o",
+            "json",
+            "--output-file",
+            str(tmp_path / "output.json"),
+        ],
+    )
+    assert result.exit_code == 1
+    data = json.loads((tmp_path / "output.json").read_text())
+    assert len(data["results"]) == 2
+
+
+def test_multi_resource_glob_policy(tmp_path):
     (tmp_path / "policy.json").write_text(
         json.dumps(
             {
