@@ -361,6 +361,25 @@ class SqlServerTest(BaseTest):
         resources = p.run()
         self.assertEqual(1, len(resources))
 
+    @cassette_name('auditing')
+    def test_auditing_filter_value(self):
+        p = self.load_policy({
+            'name': 'test-azure-sql-server',
+            'resource': 'azure.sqlserver',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'glob',
+                 'value_type': 'normalize',
+                 'value': 'cctestsqlserver*'},
+                {'type': 'auditing',
+                 'key': "auditActionsAndGroups[?@=='FAILED_DATABASE_AUTHENTICATION_GROUP']" +
+                        " | length(@)",
+                 'value': 1}],
+        }, validate=True)
+        resources = p.run()
+        self.assertEqual(1, len(resources))
+
 
 class SQLServerFirewallFilterTest(BaseTest):
 

@@ -7,12 +7,12 @@ from c7n_azure.actions.firewall import SetFirewallAction
 from c7n_azure.filters import FirewallRulesFilter, FirewallBypassFilter
 from c7n_azure.provider import resources
 from c7n_azure.resources.arm import ArmResourceManager
-from c7n_azure.utils import ThreadHelper, StringUtils
+from c7n_azure.utils import ThreadHelper
 from netaddr import IPRange, IPSet, IPNetwork, IPAddress
 
 from c7n.exceptions import PolicyValidationError
 from c7n.utils import type_schema
-from c7n.filters.core import ValueFilter, Filter
+from c7n.filters.core import ValueFilter
 
 AZURE_SERVICES = IPRange('0.0.0.0', '0.0.0.0')  # nosec
 log = logging.getLogger('custodian.azure.sql-server')
@@ -315,7 +315,7 @@ class SqlServerFirewallBypassFilter(FirewallBypassFilter):
 
 
 @SqlServer.filter_registry.register('auditing')
-class AuditingFilter(Filter):
+class AuditingFilter(ValueFilter):
     """
     Filter by the current auditing
     policy for this sql server.
@@ -335,52 +335,69 @@ class AuditingFilter(Filter):
 
     """
 
+    cache_key = 'c7n:auditing-settings'
+
     schema = type_schema(
         'auditing',
-        required=['type', 'enabled'],
-        **{
-            'enabled': {"type": "boolean"},
-        }
+        rinherit=ValueFilter.schema,
+        enabled=dict(type='boolean')
     )
 
     log = logging.getLogger('custodian.azure.sqlserver.auditing-filter')
 
     def __init__(self, data, manager=None):
-        super(AuditingFilter, self).__init__(data, manager)
-        self.enabled = self.data['enabled']
+        super().__init__(data, manager)
+
+        self.enabled = self.data.get('enabled')
+        # track if we are using the legacy behavior
+        self.is_legacy = 'enabled' in self.data
+
+    def validate(self):
+        # only allow legacy behavior or new ValueFilter behavior, not both
+        # when in "legacy" mode the only entries should be "type" (required by schema) and
+        # "enabled" (required by is_legacy)
+        if self.is_legacy:
+            if len(self.data) > 2:
+                raise PolicyValidationError(
+                    "When using 'enabled', ValueFilter properties are not allowed")
+        # only validate value filter when not in "legacy" mode
+        else:
+            super().validate()
 
     def process(self, resources, event=None):
-        resources, exceptions = ThreadHelper.execute_in_parallel(
+        _, exceptions = ThreadHelper.execute_in_parallel(
             resources=resources,
             event=event,
             execution_method=self._process_resource_set,
             executor_factory=self.executor_factory,
             log=log
         )
+
         if exceptions:
             raise exceptions[0]
-        return resources
+
+        return super().process(resources, event)
 
     def _process_resource_set(self, resources, event=None):
         client = self.manager.get_client()
-        result = []
         for resource in resources:
-            if 'auditingSettings' not in resource['properties']:
+            if self.cache_key not in resource['properties']:
                 auditing_settings = client.server_blob_auditing_policies.get(
                     resource['resourceGroup'],
                     resource['name'])
 
-                resource['properties']['auditingSettings'] = \
+                resource['properties'][self.cache_key] = \
                     auditing_settings.serialize(True).get('properties', {})
 
-            required_status = 'Enabled' if self.enabled else 'Disabled'
+    def __call__(self, resource):
+        auditing_enabled = resource['properties'][self.cache_key].get('state') == 'Enabled'
 
-            if StringUtils.equal(
-                    resource['properties']['auditingSettings'].get('state'),
-                    required_status):
-                result.append(resource)
-
-        return result
+        # Apply filter based on legacy behavior which only checks against enablement
+        if self.is_legacy:
+            return auditing_enabled == self.enabled
+        # otherwise process the auditing settings using ValueFilter logic for full flexibility
+        else:
+            return super().__call__(resource['properties'][self.cache_key])
 
 
 @SqlServer.action_registry.register('set-firewall-rules')
