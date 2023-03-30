@@ -395,7 +395,7 @@ class SQLServerFirewallFilterTest(BaseTest):
         )
 
     def _get_filter(self, rules, mode='equal', include_magic=False):
-        data = {mode: ['10.0.0.0/8', '127.0.0.1'], 'include_azure_services_rule': include_magic}
+        data = {mode: ['10.0.0.0/8', '127.0.0.1'], 'include-azure-services': include_magic}
         filter = SqlServerFirewallRulesFilter(data, Mock())
         filter.client = Mock()
         filter.client.firewall_rules.list_by_server.return_value = rules
