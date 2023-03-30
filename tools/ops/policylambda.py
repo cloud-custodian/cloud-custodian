@@ -135,6 +135,7 @@ def dispatch_render(p, sam):
         return None
     policy_lambda = mu.PolicyLambda(p)
     properties = render_func(p, policy_lambda, sam)
+    properties['Role'] = {str('Fn::Sub'): "arn:aws:iam::${AWS::AccountId}:role/%s" % policy_lambda.role}
     properties['CodeUri'] = "./%s.zip" % p.name
     sam['Resources'][resource_name(p.name)] = {
         'Type': 'AWS::Serverless::Function',
