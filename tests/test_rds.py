@@ -908,9 +908,9 @@ class RDSTest(BaseTest):
                 "filters": [
                     {
                         "type": "db-option-groups",
-                        "key": "OptionName",
-                        "op": "eq",
-                        "value": "NATIVE_NETWORK_ENCRYPTION"
+                        "key": "Options[].OptionName",
+                        "value": "NATIVE_NETWORK_ENCRYPTION",
+                        "op": "contains"
                     }
                 ],
             },

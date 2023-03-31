@@ -127,6 +127,48 @@
                         ],
                         "DBSecurityGroupMemberships": [],
                         "VpcSecurityGroupMemberships": []
+                    },
+                    {
+                        "OptionName": "SSL",
+                        "OptionDescription": "Oracle Advanced Security - Native Network Encryption",
+                        "Persistent": false,
+                        "Permanent": false,
+                        "OptionSettings": [
+                            {
+                                "Name": "SQLNET.CRYPTO_CHECKSUM_CLIENT",
+                                "Value": "REQUESTED",
+                                "DefaultValue": "REQUESTED",
+                                "Description": "Specifies the desired data integrity behavior",
+                                "ApplyType": "STATIC",
+                                "DataType": "STRING",
+                                "AllowedValues": "ACCEPTED,REJECTED,REQUESTED,REQUIRED",
+                                "IsModifiable": true,
+                                "IsCollection": false
+                            }
+                        ],
+                        "DBSecurityGroupMemberships": [],
+                        "VpcSecurityGroupMemberships": []
+                    },
+                    {
+                        "OptionName": "OPTION_NAME_123",
+                        "OptionDescription": "Oracle Advanced Security - Native Network Encryption",
+                        "Persistent": false,
+                        "Permanent": false,
+                        "OptionSettings": [
+                            {
+                                "Name": "SQLNET.CRYPTO_CHECKSUM_CLIENT",
+                                "Value": "REQUESTED",
+                                "DefaultValue": "REQUESTED",
+                                "Description": "Specifies the desired data integrity behavior",
+                                "ApplyType": "STATIC",
+                                "DataType": "STRING",
+                                "AllowedValues": "ACCEPTED,REJECTED,REQUESTED,REQUIRED",
+                                "IsModifiable": true,
+                                "IsCollection": false
+                            }
+                        ],
+                        "DBSecurityGroupMemberships": [],
+                        "VpcSecurityGroupMemberships": []
                     }
                 ],
                 "AllowsVpcAndNonVpcInstanceMemberships": false,

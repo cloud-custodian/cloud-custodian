@@ -2,11 +2,12 @@
 # SPDX-License-Identifier: Apache-2.0
 import re
 
-from c7n.actions import BaseAction
+from c7n.actions import BaseAction, Action
 from c7n.filters import Filter, ValueFilter
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, TypeInfo
 from c7n.utils import local_session, type_schema, get_retry
+from botocore.exceptions import ClientError
 
 
 @resources.register('graphql-api')
@@ -212,3 +213,36 @@ class SetWafv2(BaseAction):
             else:
                 self.retry(client.disassociate_web_acl,
                            ResourceArn=r[arn_key])
+                
+
+@GraphQLApi.action_registry.register('delete')
+class Delete(Action):
+    """Delete an AppSync GraphQL API.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: appsync-delete-unlogged-api
+                resource: graphql-api
+                filters:
+                  - type: value
+                    key: logConfig
+                    value: absent
+                actions:
+                  - delete
+
+    """
+    schema = type_schema('delete')
+    permissions = ("appsync:DeleteGraphqlApi",)
+
+    def process(self, apis):
+        client = local_session(self.manager.session_factory).client('appsync')
+        for api in apis:
+            try:
+                client.delete_graphql_api(apiId=api['apiId'])
+            except ClientError as e:
+                if e.response['Error']['Code'] == "ResourceNotFoundException":
+                    continue
+                raise

@@ -3,7 +3,6 @@
 
 from .common import BaseTest
 
-
 class AppSyncWafV2(BaseTest):
 
     def test_graphql_api_filter_wafv2(self):
@@ -137,3 +136,20 @@ class TestAppSyncApiCache(BaseTest):
 
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
+    def test_delete_appsync_api(self):
+        factory = self.replay_flight_data("test_delete_appsync_api")
+        p = self.load_policy(
+            {
+                "name": "appsync-delete",
+                "resource": "graphql-api",
+                "filters": [{"name": "My AppSync App"}],
+                "actions": [{"type": "delete"}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['name'], "My AppSync App")
+        client = factory().client("appsync")
+        self.assertEqual(client.list_graphql_apis()["graphqlApis"], [])

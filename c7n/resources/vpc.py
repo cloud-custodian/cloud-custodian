@@ -2767,7 +2767,7 @@ class TrafficMirrorSession(query.QueryResourceManager):
         service = 'ec2'
         enum_spec = ('describe_traffic_mirror_sessions', 'TrafficMirrorSessions', None)
         name = id = 'TrafficMirrorSessionId'
-        cfn_type = 'AWS::EC2::TrafficMirrorSession'
+        config_type = cfn_type = 'AWS::EC2::TrafficMirrorSession'
         arn_type = 'traffic-mirror-session'
         universal_taggable = object()
         id_prefix = 'tms-'
@@ -2808,7 +2808,7 @@ class TrafficMirrorTarget(query.QueryResourceManager):
         service = 'ec2'
         enum_spec = ('describe_traffic_mirror_targets', 'TrafficMirrorTargets', None)
         name = id = 'TrafficMirrorTargetId'
-        cfn_type = 'AWS::EC2::TrafficMirrorTarget'
+        config_type = cfn_type = 'AWS::EC2::TrafficMirrorTarget'
         arn_type = 'traffic-mirror-target'
         universal_taggable = object()
         id_prefix = 'tmt-'
