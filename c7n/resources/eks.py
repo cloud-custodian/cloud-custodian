@@ -222,6 +222,7 @@ class AssociateEncryptionConfig(Action):
     associate encryption config with the specified keyArn.
 
     .. code-block:: yaml
+
         policies:
           - name: associate-encryption-config
             resource: aws.eks
