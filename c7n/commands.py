@@ -290,8 +290,11 @@ def run(options, policies: List[Policy]) -> None:
     # AWS - Sanity check that we have an assumable role before executing policies
     # Todo - move this behind provider interface
     if options.assume_role and [p for p in policies if p.provider_name == 'aws']:
+        # the cli options we're being handed haven't been initialized by the
+        # provider, instead use one of the provider's policy options.
+        sample_aws = [p for p in policies if p.provider_name == 'aws'].pop()
         try:
-            local_session(clouds['aws']().get_session_factory(options))
+            local_session(clouds['aws']().get_session_factory(sample_aws.options))
         except ClientError:
             log.exception("Unable to assume role %s", options.assume_role)
             sys.exit(1)
