@@ -261,7 +261,7 @@ class EKS(BaseTest):
         matched = resources.pop()
         self.assertEqual(matched['status'], 'ACTIVE')
         update_json = os.path.join(self.placebo_dir, "test_eks_associate_encryption_config", 
-        "eks.AssociateEncryptionConfig_2.json")
+        "eks.AssociateEncryptionConfig_1.json")
         with open(update_json) as f:
             data = json.load(f)
         self.assertEqual(data['status_code'], 200)
@@ -315,6 +315,7 @@ class EKS(BaseTest):
         self.assertEqual(data['data']['update']['type'], 'AssociateEncryptionConfig')
         self.assertEqual(data['data']['update']['status'], 'InProgress')
 
+
     def test_associate_encryption_config_invalid_kms(self):
         factory = self.replay_flight_data("test_eks_associate_encryption_config_invalid_kms")
 
@@ -347,10 +348,45 @@ class EKS(BaseTest):
             },
             session_factory=factory
         )
-
-        resources = p.run()
-        self.assertEqual(len(resources), 1)
-        kms = factory().client('kms')
         with self.assertRaises(ClientError) as error:
-            kms.describe_key(KeyId='alias/eks_invalid_key')
+            resources = p.run()
+            self.assertEqual(len(resources), 1)
         self.assertEqual(error.exception.response['Error']['Code'], 'NotFoundException')
+
+
+    def test_associate_encryption_config_invalid_kms_key(self):
+        factory = self.replay_flight_data("test_eks_associate_encryption_config_invalid_kms_key")
+
+        p = self.load_policy(
+            {
+                'name': 'test-eks-associate-encryption-config',
+                'resource': 'aws.eks',
+                'filters': [
+                    {
+                        'type': 'value',
+                        'key': 'encryptionConfig[].provider.keyArn',
+                        'value': 'absent'
+                    }
+                ],
+                'actions': [
+                    {
+                        'type': 'associate-encryption-config',
+                        'encryptionConfig': [
+                            {
+                                'provider': {
+                                    'keyArn': 'arn:aws:kms:us-east-1:644160558196:key/123'
+                                },
+                                'resources': [
+                                    'secrets'
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            session_factory=factory
+        )
+        with self.assertRaises(ClientError) as error:
+            resources = p.run()
+            self.assertEqual(len(resources), 1)
+        self.assertEqual(error.exception.response['Error']['Code'], 'InvalidParameterException')

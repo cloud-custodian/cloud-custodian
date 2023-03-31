@@ -3,28 +3,28 @@
     "data": {
         "ResponseMetadata": {},
         "cluster": {
-            "name": "c7n-test-eks-cluster",
-            "arn": "arn:aws:eks:us-east-1:644160558196:cluster/c7n-test-eks-cluster",
+            "name": "c7n-test-eks-cluster-0",
+            "arn": "arn:aws:eks:us-east-1:644160558196:cluster/c7n-test-eks-cluster-0",
             "createdAt": {
                 "__class__": "datetime",
                 "year": 2023,
                 "month": 3,
-                "day": 24,
-                "hour": 16,
-                "minute": 52,
-                "second": 17,
-                "microsecond": 183000
+                "day": 27,
+                "hour": 9,
+                "minute": 56,
+                "second": 21,
+                "microsecond": 837000
             },
             "version": "1.25",
-            "endpoint": "https://288D51B55AFD1167F6C7B4B936B64A6B.gr7.us-east-1.eks.amazonaws.com",
+            "endpoint": "https://1DAE639118B0AD3162184E4CA3E4EA26.gr7.us-east-1.eks.amazonaws.com",
             "roleArn": "arn:aws:iam::644160558196:role/eksctl-devk8s-cluster-ServiceRole-1JNA85I5147VF",
             "resourcesVpcConfig": {
                 "subnetIds": [
-                    "subnet-914763e7",
-                    "subnet-efbcccb7"
+                    "subnet-efbcccb7",
+                    "subnet-914763e7"
                 ],
                 "securityGroupIds": [],
-                "clusterSecurityGroupId": "sg-0db2f2619a6543146",
+                "clusterSecurityGroupId": "sg-093ff9ef4b1b52393",
                 "vpcId": "vpc-d2d616b5",
                 "endpointPublicAccess": false,
                 "endpointPrivateAccess": true,
@@ -50,12 +50,12 @@
             },
             "identity": {
                 "oidc": {
-                    "issuer": "https://oidc.eks.us-east-1.amazonaws.com/id/288D51B55AFD1167F6C7B4B936B64A6B"
+                    "issuer": "https://oidc.eks.us-east-1.amazonaws.com/id/1DAE639118B0AD3162184E4CA3E4EA26"
                 }
             },
             "status": "ACTIVE",
             "certificateAuthority": {
-                "data": "LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUMvakNDQWVhZ0F3SUJBZ0lCQURBTkJna3Foa2lHOXcwQkFRc0ZBREFWTVJNd0VRWURWUVFERXdwcmRXSmwKY201bGRHVnpNQjRYRFRJek1ETXlOREl3TlRneU0xb1hEVE16TURNeU1USXdOVGd5TTFvd0ZURVRNQkVHQTFVRQpBeE1LYTNWaVpYSnVaWFJsY3pDQ0FTSXdEUVlKS29aSWh2Y05BUUVCQlFBRGdnRVBBRENDQVFvQ2dnRUJBS21UCkdDOTRTTWtpT050WGhHVWV5SnVhYlZJMzd0MU81UXkvMlA4SWo3NE1lUnJ3VmU0K2R0UEZHVDlaK0w1cmFxRDIKejJDMTdmbFF5ZEVIdnR1N2ZxQ2h1dGVmRWtwRFp2cmRVQitvWmttdXlGdWhIMklMaFBDM0VLVXJieFBqREFFTwpFU1U4SUVIdjJ6VURUK09jbFcxVURXclQ1OC9TclgyeXZnQTZsb2JSQTRGa1NxajVLS3BrTTNFVlVyeEU0ZERaCjg4UlJ5MGZXNkcya3RvRW5QRGFYSmovaWZSbmtZUFRmZUVPbVJxNXoxekRoUTFXMG5YQ1VSRWs4UXQxeC9LTi8KeVlsWDBxZVNmMldzTDBGVnZKdGJ6dkE3ak04aDVlOHAzVzhSN3Y1TkJsRHpVL3pTRVRoMXRtRW9CTlFNUGx4awowSlZpWW9kdXJWTUsxVHh2bzZjQ0F3RUFBYU5aTUZjd0RnWURWUjBQQVFIL0JBUURBZ0trTUE4R0ExVWRFd0VCCi93UUZNQU1CQWY4d0hRWURWUjBPQkJZRUZGNllqbTVaRWNaK1lwSjFTTTYvWDJaazBDUnBNQlVHQTFVZEVRUU8KTUF5Q0NtdDFZbVZ5Ym1WMFpYTXdEUVlKS29aSWh2Y05BUUVMQlFBRGdnRUJBQnZibkFEd0oxanh5b21zVUU1Rgo5QjdXV0lGeHpya0EySEhrUE4xSFRLUnNjQzdESytqUk4zdUx2V1RvZXhRZHRjN1RnaDYrRWFYbnEvTnVVZDZ2CnhTZWJVa1ZjTmcxSlpKTWFNOXBiK3pkMktrdFI2UlJhMWxRWlBiSlZYd212VzNJVDVUVytSNlNDc05tVC8rdVUKS1lyTVA2dVh1Smw5anFCZnBoajdScE56MUZuQ0lremEwSHRPb20yVlBNMjNzdFBpL3d1MkJXV0Y1TGhscDdWTAo1QVI5OVZvM3VtYTlJQ3ZneHB6bzFsUnZNMTE2K2RYY21RVjhUMmFTWElxM1cvRytYcE1sSXRIbnB4a0tvWmlKCnJ6RXRrWktMVHJRSys5TG1IMm1BbkJvY3dhWjNtTkVmYTJ6OVB0Tk1CbzNMK0QrOHVKL2VKMzRyZ1RKZkJ0TjgKSWJ3PQotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0tCg=="
+                "data": "LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUMvakNDQWVhZ0F3SUJBZ0lCQURBTkJna3Foa2lHOXcwQkFRc0ZBREFWTVJNd0VRWURWUVFERXdwcmRXSmwKY201bGRHVnpNQjRYRFRJek1ETXlOekUwTURFME5sb1hEVE16TURNeU5ERTBNREUwTmxvd0ZURVRNQkVHQTFVRQpBeE1LYTNWaVpYSnVaWFJsY3pDQ0FTSXdEUVlKS29aSWh2Y05BUUVCQlFBRGdnRVBBRENDQVFvQ2dnRUJBTUErCjVhL0kzRXMrOWlFSVFRM2JTanJSRDJ4eGUyMWozYXk2VmNlSExISVY1UmhGdm1jT25tVmxwSC9OYWttZEdzK3gKajBNVHNkeXdTUjlsOUJ2YjZxNU1hRkF3R1EvVGs2dk9LSEtQcUkxVWxpaVN5Q2FvNmdZVFJ4OGl4RGIwVzZaQgpFTy93Yzc0RTBKKy9HR3BrZTVuMlJ2K3N5dHZ5NDdtYkhrYTVVTUl3bnVjWS9ucC9taGx1elFjL0ZESzlrQ0kzClU4Ri9yczgwSnF3Y2JaaERzNHBFOWsrdkdybDVkaWFDWG9ydXJqTkFxaTVaN3A3UVBJc1ZYcjgwNWlSS2lwdS8KMDc1ay9ZZVBFbzY3U0VubzFEbisxOHdSVWw4MGI4MzBFOE4rdWhwbUFySEpCbXZCLy9BVndOVTFtVHhSZ2g3eQpwM1h1WS9uOGNUT1lIdlZGRXUwQ0F3RUFBYU5aTUZjd0RnWURWUjBQQVFIL0JBUURBZ0trTUE4R0ExVWRFd0VCCi93UUZNQU1CQWY4d0hRWURWUjBPQkJZRUZOdzBpZ1kzL3ZBanVCeGlKaEUwS1VCVTFBUUNNQlVHQTFVZEVRUU8KTUF5Q0NtdDFZbVZ5Ym1WMFpYTXdEUVlKS29aSWh2Y05BUUVMQlFBRGdnRUJBR3VybDN2UW9VczF2ZUF2akxGSQpuaGExV0Z5bkZydU9mcGNPdmorWnpVRnVSYjFrZnREbFQyUXNkMlVRay9oOTIvRko2LzlWNk1LalBUOW1zdDVpCkQwNlBESExQVjBwQ0E2MUNpZmsrVURZTnNaRXFjajR4RTBQUmVGOFozcHkwUnJSN2FIQnFvckd0ZDM2VXNNZmEKNUZUSjJ1SlRqYVo0VUlZR1V0M3R1dlBJejhMYlF3OWRkaEJZL1FFYzZVQzl5OXlDUUxBNVlDU2JSS2xob0ZobgpRYTA3TmVqbHc5aFZoQ3RaSEIwN1pzZXp5aXZIdUx0QjRMU01UZEVjQlpsQ1AxalN4bUUyS3RKdlkrZ004QzcwCkRWZEd2YjRYSmxWT2c2U0pkN1pielN0b2czYWVQR3JsOXp6Z0ZMQVBsdnRUK1dueXpUV0taVjNBTXk1VUZ4Q2cKVFF3PQotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0tCg=="
             },
             "platformVersion": "eks.1",
             "tags": {},
