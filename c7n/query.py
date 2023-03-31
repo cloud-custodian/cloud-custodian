@@ -456,11 +456,7 @@ class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
     max_workers = 3
     chunk_size = 20
 
-    permissions = ()
-
     _generate_arn = None
-
-    get_client = None
 
     retry = staticmethod(
         get_retry((
