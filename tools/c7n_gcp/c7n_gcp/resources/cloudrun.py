@@ -18,6 +18,7 @@ class CloudRunService(QueryResourceManager):
         scope_template = "projects/{}/locations/-"
         name = id = "name"
         default_report_fields = ["name", "updateTime", "uri"]
+        asset_type = "run.googleapis.com/Service"
 
 
 @resources.register("cloud-run-job")
@@ -36,3 +37,4 @@ class CloudRunJob(QueryResourceManager):
         # scope_template = "projects/{}/locations/-"
         name = id = "name"
         default_report_fields = ["name", "updateTime"]
+        asset_type = "run.googleapis.com/Job"
