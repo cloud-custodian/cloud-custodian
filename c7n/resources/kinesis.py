@@ -366,7 +366,7 @@ class KinesisVideoStream(QueryResourceManager):
     }
 
 KinesisVideoStream.action_registry.register('mark-for-op', TagDelayedAction)
-KinesisVideoStream.action_registry.register('marked-for-op', TagActionFilter)
+KinesisVideoStream.filter_registry.register('marked-for-op', TagActionFilter)
 
 @KinesisVideoStream.action_registry.register('delete')
 class DeleteVideoStream(Action):
