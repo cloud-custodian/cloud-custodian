@@ -16,19 +16,23 @@ from ldap3.core.exceptions import LDAPSocketOpenError
 
 
 class LdapLookup:
-
     def __init__(self, config, logger):
         self.log = logger
         self.connection = self.get_connection(
             config.get('ldap_uri'),
             config.get('ldap_bind_user', None),
-            config.get('ldap_bind_password', None)
+            config.get('ldap_bind_password', None),
         )
         self.base_dn = config.get('ldap_bind_dn')
         self.email_key = config.get('ldap_email_key', 'mail')
         self.manager_attr = config.get('ldap_manager_attribute', 'manager')
         self.uid_key = config.get('ldap_uid_attribute', 'sAMAccountName')
-        self.attributes = ['displayName', self.uid_key, self.email_key, self.manager_attr]
+        self.attributes = [
+            'displayName',
+            self.uid_key,
+            self.email_key,
+            self.manager_attr,
+        ]
         self.uid_regex = config.get('ldap_uid_regex', None)
         self.cache_engine = config.get('cache_engine', None)
         if self.cache_engine == 'redis':
@@ -42,7 +46,8 @@ class LdapLookup:
             # environments, where /tmp is the only writeable space and
             # is effectively isolated to this process.
             self.caching = LocalSqlite(
-                config.get('ldap_cache_file', '/var/tmp/ldap.cache'), logger)  # nosec
+                config.get('ldap_cache_file', '/var/tmp/ldap.cache'), logger  # nosec
+            )
 
     def get_redis_connection(self, redis_host, redis_port):
         return Redis(redis_host=redis_host, redis_port=redis_port, db=0)
@@ -52,7 +57,9 @@ class LdapLookup:
         # an anonymous bind will be attempted.
         try:
             return Connection(
-                ldap_uri, user=ldap_bind_user, password=ldap_bind_password,
+                ldap_uri,
+                user=ldap_bind_user,
+                password=ldap_bind_password,
                 auto_bind=True,
                 receive_timeout=30,
                 auto_referrals=False,

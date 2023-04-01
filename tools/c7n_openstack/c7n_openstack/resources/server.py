@@ -39,11 +39,13 @@ class ImageFilter(Filter):
                   - type: image
                     image_name: test-image
     """
+
     schema = type_schema(
         'image',
         image_name={'type': 'string'},
         visibility={'type': 'string'},
-        status={'type': 'string'})
+        status={'type': 'string'},
+    )
 
     def process(self, resources, event=None):
         results = []
@@ -86,6 +88,7 @@ class FlavorFilter(Filter):
                   - type: flavor
                     flavor_name: m1.tiny
     """
+
     schema = type_schema(
         'flavor',
         flavor_name={'type': 'string'},
@@ -98,8 +101,9 @@ class FlavorFilter(Filter):
         is_public={'type': 'boolean'},
     )
 
-    def server_match_flavor(self, server, flavor_name, flavor_id,
-                            vcpus, ram, disk, ephemeral, is_public):
+    def server_match_flavor(
+        self, server, flavor_name, flavor_id, vcpus, ram, disk, ephemeral, is_public
+    ):
         openstack = local_session(self.manager.session_factory).client()
         server_flavor_name = server.flavor.original_name
         flavor = openstack.get_flavor(server_flavor_name)
@@ -131,16 +135,15 @@ class FlavorFilter(Filter):
         ephemeral = self.data.get('ephemeral', None)
         is_public = self.data.get('is_public', None)
         for server in resources:
-            if self.server_match_flavor(server, flavor_name, flavor_id,
-                                        vcpus, ram, disk, ephemeral,
-                                        is_public):
+            if self.server_match_flavor(
+                server, flavor_name, flavor_id, vcpus, ram, disk, ephemeral, is_public
+            ):
                 results.append(server)
         return results
 
 
 @Server.filter_registry.register('age')
 class AgeFilter(AgeFilter):
-
     date_attribute = "launched_at"
 
     schema = type_schema(
@@ -148,7 +151,8 @@ class AgeFilter(AgeFilter):
         op={'$ref': '#/definitions/filters_common/comparison_operators'},
         days={'type': 'number'},
         hours={'type': 'number'},
-        minutes={'type': 'number'})
+        minutes={'type': 'number'},
+    )
 
     def get_resource_data(self, i):
         if i.get("launched_at"):
@@ -173,16 +177,14 @@ class TagsFilter(Filter):
                     - key: a
                       value: b
     """
+
     tags_definition = {
         'type': 'array',
         'items': {
             'type': 'object',
-            'properties': {
-                'key': {'type': 'string'},
-                'value': {'type': 'string'}
-            },
+            'properties': {'key': {'type': 'string'}, 'value': {'type': 'string'}},
             'required': ['key', 'value'],
-        }
+        },
     }
     schema = type_schema(
         'tags',
@@ -208,10 +210,7 @@ class TagsFilter(Filter):
         results = []
         tags = self.data.get('tags', [])
         op = self.data.get('op', 'all')
-        match_fn = {
-            'any': self.match_any_tags,
-            'all': self.match_all_tags
-        }
+        match_fn = {'any': self.match_any_tags, 'all': self.match_all_tags}
         for server in resources:
             if match_fn[op](server, tags):
                 results.append(server)

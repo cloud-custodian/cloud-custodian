@@ -20,12 +20,7 @@ from c7n_tencentcloud.query import ResourceTypeInfo
 log = logging.getLogger("custodian.tencentcloud.filter")
 
 
-STATISTICS_OPERATORS = {
-    "Average": mean,
-    "Sum": sum,
-    "Maximum": max,
-    "Minimum": min
-}
+STATISTICS_OPERATORS = {"Average": mean, "Sum": sum, "Maximum": max, "Minimum": min}
 
 
 class MetricsFilter(Filter):
@@ -61,6 +56,7 @@ class MetricsFilter(Filter):
                 missing-value: 0
                 op: eq
     """
+
     name = "metrics"
     schema = type_schema(
         name,
@@ -68,12 +64,15 @@ class MetricsFilter(Filter):
             "name": {"type": "string"},
             "statistics": {"type": "string", "enum": list(STATISTICS_OPERATORS.keys())},
             "days": {"type": "number"},
-            "op": {"type": "string", "enum": list(OPERATORS.keys())},  # TODO, remove unsupported op
+            "op": {
+                "type": "string",
+                "enum": list(OPERATORS.keys()),
+            },  # TODO, remove unsupported op
             "value": {"type": "number"},
             "missing-value": {"type": "number"},
             "period": {"type": "number"},
-            "required": ("value", "name")
-        }
+            "required": ("value", "name"),
+        },
     )
     schema_alias = True
     permissions = ()
@@ -116,7 +115,7 @@ class MetricsFilter(Filter):
             "Period": self.period,
             "StartTime": self.start_time,
             "EndTime": self.end_time,
-            "Instances": instances
+            "Instances": instances,
         }
 
     def validate(self):
@@ -130,15 +129,18 @@ class MetricsFilter(Filter):
         if self.days == 0:
             raise PolicyValidationError("metrics filter days value cannot be 0")
         if self.batch_size == 0:
-            raise PolicyValidationError("too many data points, "
-                                        "pls reduce the days or use large granularity")
+            raise PolicyValidationError(
+                "too many data points, " "pls reduce the days or use large granularity"
+            )
 
     def get_client(self):
         """get_client"""
-        return local_session(self.manager.session_factory).client("monitor.tencentcloudapi.com",
-                                                                  "service",
-                                                                  "2018-07-24",
-                                                                  self.manager.config.region)
+        return local_session(self.manager.session_factory).client(
+            "monitor.tencentcloudapi.com",
+            "service",
+            "2018-07-24",
+            self.manager.config.region,
+        )
 
     def process(self, resources, event=None):
         """process"""

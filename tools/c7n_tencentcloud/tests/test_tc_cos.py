@@ -6,7 +6,6 @@ from tc_common import BaseTest
 
 
 class TestCos(BaseTest):
-
     @pytest.mark.vcr
     def test_bucket_encryption(self):
         policy = self.load_policy(
@@ -15,8 +14,8 @@ class TestCos(BaseTest):
                 "resource": "tencentcloud.cos",
                 "filters": [
                     {"type": "bucket-encryption", "state": True, "crypto": "AES256"},
-                    {"Name": "custodian-test-1253831162"}
-                ]
+                    {"Name": "custodian-test-1253831162"},
+                ],
             }
         )
         resources = policy.run()
@@ -33,10 +32,10 @@ class TestCos(BaseTest):
                         "type": "bucket-logging",
                         "op": "not-equal",
                         "target_prefix": "{account_id}/{source_bucket_name}/",
-                        "target_bucket": "42342-1253831162"
+                        "target_bucket": "42342-1253831162",
                     },
-                    {"Name": "custodian-test-1253831162"}
-                ]
+                    {"Name": "custodian-test-1253831162"},
+                ],
             }
         )
         resources = policy.run()
@@ -55,11 +54,11 @@ class TestCos(BaseTest):
                             {
                                 "Effect": "Allow",
                                 "Action": "name/cos:GetObject",
-                                "Principal": "qcs::cam::anyone:anyone"
+                                "Principal": "qcs::cam::anyone:anyone",
                             }
-                        ]
+                        ],
                     },
-                    {"Name": "custodian-test-1253831162"}
+                    {"Name": "custodian-test-1253831162"},
                 ],
             }
         )
@@ -76,13 +75,13 @@ class TestCos(BaseTest):
                     {
                         "type": "bucket-lifecycle",
                         "key": "Rule[?Status==`Enabled`].AbortIncompleteMultipartUpload"
-                               ".DaysAfterInitiation",
+                        ".DaysAfterInitiation",
                         "value": "30",
                         "value_type": "swap",
-                        "op": "equal"
+                        "op": "equal",
                     },
-                    {"Name": "custodian-test-1253831162"}
-                ]
+                    {"Name": "custodian-test-1253831162"},
+                ],
             }
         )
         resources = policy.run()
@@ -95,11 +94,9 @@ class TestCos(BaseTest):
                 "name": "test_bucket_tag",
                 "resource": "tencentcloud.cos",
                 "filters": [
-                    {
-                        "tag:test_pro_00001": "this is test"
-                    },
-                    {"Name": "custodian-test-1253831162"}
-                ]
+                    {"tag:test_pro_00001": "this is test"},
+                    {"Name": "custodian-test-1253831162"},
+                ],
             }
         )
         resources = policy.run()

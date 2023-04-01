@@ -72,7 +72,8 @@ class ResourceFormat(unittest.TestCase):
     def test_efs(self):
         self.assertEqual(
             utils.resource_format(
-                {"Name": "abc", "FileSystemId": "fsid", "LifeCycleState": "available"}, "efs"
+                {"Name": "abc", "FileSystemId": "fsid", "LifeCycleState": "available"},
+                "efs",
             ),
             "name: abc  id: fsid  state: available",
         )
@@ -80,7 +81,8 @@ class ResourceFormat(unittest.TestCase):
     def test_eip(self):
         self.assertEqual(
             utils.resource_format(
-                {"PublicIp": "8.8.8.8", "Domain": "vpc", "AllocationId": "eipxyz"}, "network-addr"
+                {"PublicIp": "8.8.8.8", "Domain": "vpc", "AllocationId": "eipxyz"},
+                "network-addr",
             ),
             "ip: 8.8.8.8  id: eipxyz  scope: vpc",
         )
@@ -88,7 +90,8 @@ class ResourceFormat(unittest.TestCase):
     def test_nat(self):
         self.assertEqual(
             utils.resource_format(
-                {"NatGatewayId": "nat-xyz", "State": "available", "VpcId": "vpc-123"}, "nat-gateway"
+                {"NatGatewayId": "nat-xyz", "State": "available", "VpcId": "vpc-123"},
+                "nat-gateway",
             ),
             "id: nat-xyz  state: available  vpc: vpc-123",
         )
@@ -96,7 +99,8 @@ class ResourceFormat(unittest.TestCase):
     def test_igw(self):
         self.assertEqual(
             utils.resource_format(
-                {"InternetGatewayId": "igw-x", "Attachments": []}, "aws.internet-gateway"
+                {"InternetGatewayId": "igw-x", "Attachments": []},
+                "aws.internet-gateway",
             ),
             "id: igw-x  attachments: 0",
         )
@@ -280,10 +284,7 @@ class ProviderSelector(unittest.TestCase):
             (self.gcp_config, MailerGcpQueueProcessor),
         ]
         for mailer_config, processor in params:
-            self.assertIsInstance(
-                utils.get_processor(mailer_config, logger),
-                processor
-            )
+            self.assertIsInstance(utils.get_processor(mailer_config, logger), processor)
 
     def test_missing_deps_guidance(self):
         """Make sure we catch failed imports and provide guidance around installing

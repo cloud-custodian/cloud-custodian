@@ -27,18 +27,14 @@ def cli():
 
 @cli.command()
 @click.option("--format", default="terraform")
-@click.option(
-    "--filters", help="filter policies or resources as k=v pairs with globbing"
-)
+@click.option("--filters", help="filter policies or resources as k=v pairs with globbing")
 @click.option("-p", "--policy-dir", type=click.Path())
 @click.option("-d", "--directory", type=click.Path())
 @click.option("-o", "--output", default="cli", type=click.Choice(report_outputs.keys()))
 @click.option("--output-file", type=click.File("w"), default="-")
 @click.option("--output-query", default=None)
 @click.option("--summary", default="policy", type=click.Choice(summary_options.keys()))
-def run(
-    format, policy_dir, directory, output, output_file, output_query, summary, filters
-):
+def run(format, policy_dir, directory, output, output_file, output_query, summary, filters):
     """evaluate policies against IaC sources.
 
     c7n-left -p policy_dir -d terraform_root --filters "severity=HIGH"

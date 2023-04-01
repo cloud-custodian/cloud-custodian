@@ -9,7 +9,7 @@ setup(
     description="Cloud Custodian - Cloud Trail Tools",
     classifiers=[
         "Topic :: System :: Systems Administration",
-        "Topic :: System :: Distributed Computing"
+        "Topic :: System :: Distributed Computing",
     ],
     url="https://github.com/cloud-custodian/cloud-custodian",
     license="Apache-2.0",
@@ -19,6 +19,7 @@ setup(
             'c7n-traildb = c7n_traildb.traildb:main',
             'c7n-trailts = c7n_traildb.trailts:trailts',
             'c7n-trailes = c7n_traildb.trailes:trailes',
-        ]},
+        ]
+    },
     install_requires=["c7n", "click", "jsonschema", "influxdb"],
 )

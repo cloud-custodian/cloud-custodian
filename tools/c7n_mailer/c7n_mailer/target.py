@@ -8,7 +8,6 @@ from .utils import decrypt
 
 
 class MessageTargetMixin(object):
-
     def handle_targets(self, message, sent_timestamp, email_delivery=True, sns_delivery=False):
         # get the map of email_to_addresses to mimetext messages (with resources baked in)
         # and send any emails (to SES or SMTP) if there are email addresses found
@@ -28,14 +27,17 @@ class MessageTargetMixin(object):
             sns_delivery.deliver_sns_messages(sns_message_packages, message)
 
         # this section sends a notification to the resource owner via Slack
-        if any(e.startswith('slack') or e.startswith('https://hooks.slack.com/')
-                for e in message.get('action', {}).get('to', []) +
-                message.get('action', {}).get('owner_absent_contact', [])):
+        if any(
+            e.startswith('slack') or e.startswith('https://hooks.slack.com/')
+            for e in message.get('action', {}).get('to', [])
+            + message.get('action', {}).get('owner_absent_contact', [])
+        ):
             from .slack_delivery import SlackDelivery
 
             if self.config.get('slack_token'):
-                self.config['slack_token'] = \
-                    decrypt(self.config, self.logger, self.session, 'slack_token')
+                self.config['slack_token'] = decrypt(
+                    self.config, self.logger, self.session, 'slack_token'
+                )
 
             slack_delivery = SlackDelivery(self.config, self.logger, email_delivery)
             slack_messages = slack_delivery.get_to_addrs_slack_messages_map(message)
@@ -48,6 +50,7 @@ class MessageTargetMixin(object):
         # this section gets the map of metrics to send to datadog and delivers it
         if any(e.startswith('datadog') for e in message.get('action', ()).get('to')):
             from .datadog_delivery import DataDogDelivery
+
             datadog_delivery = DataDogDelivery(self.config, self.session, self.logger)
             datadog_message_packages = datadog_delivery.get_datadog_message_packages(message)
 
@@ -58,15 +61,11 @@ class MessageTargetMixin(object):
                 pass
 
         # this section sends the full event to a Splunk HTTP Event Collector (HEC)
-        if any(
-            e.startswith('splunkhec://')
-            for e in message.get('action', ()).get('to')
-        ):
+        if any(e.startswith('splunkhec://') for e in message.get('action', ()).get('to')):
             from .splunk_delivery import SplunkHecDelivery
+
             splunk_delivery = SplunkHecDelivery(self.config, self.session, self.logger)
-            splunk_messages = splunk_delivery.get_splunk_payloads(
-                message, sent_timestamp
-            )
+            splunk_messages = splunk_delivery.get_splunk_payloads(message, sent_timestamp)
 
             try:
                 splunk_delivery.deliver_splunk_messages(splunk_messages)

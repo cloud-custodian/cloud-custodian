@@ -8,13 +8,11 @@ setup(
     description="Cloud Custodian - Sentry",
     classifiers=[
         "Topic :: System :: Systems Administration",
-        "Topic :: System :: Distributed Computing"
+        "Topic :: System :: Distributed Computing",
     ],
     url="https://github.com/cloud-custodian/cloud-custodian",
     license="Apache-2.0",
     py_modules=['c7nsentry'],
-    entry_points={
-        'console_scripts': [
-            'c7n-sentry = c7n_sentry.c7nsentry:main']},
+    entry_points={'console_scripts': ['c7n-sentry = c7n_sentry.c7nsentry:main']},
     install_requires=["c7n"],
 )

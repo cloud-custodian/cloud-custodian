@@ -11,14 +11,10 @@ class TestDeleteAction(KubeTest):
             {
                 'name': 'delete-namespace',
                 'resource': 'k8s.namespace',
-                'filters': [
-                    {'metadata.name': 'test'}
-                ],
-                'actions': [
-                    {'type': 'delete'}
-                ]
+                'filters': [{'metadata.name': 'test'}],
+                'actions': [{'type': 'delete'}],
             },
-            session_factory=factory
+            session_factory=factory,
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
@@ -33,14 +29,10 @@ class TestDeleteAction(KubeTest):
             {
                 'name': 'delete-service',
                 'resource': 'k8s.service',
-                'filters': [
-                    {'metadata.name': 'hello-node'}
-                ],
-                'actions': [
-                    {'type': 'delete'}
-                ]
+                'filters': [{'metadata.name': 'hello-node'}],
+                'actions': [{'type': 'delete'}],
             },
-            session_factory=factory
+            session_factory=factory,
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
@@ -57,22 +49,10 @@ class TestPatchAction(KubeTest):
             {
                 'name': 'test-patch',
                 'resource': 'k8s.deployment',
-                'filters': [
-                    {'metadata.name': 'hello-node'},
-                    {'spec.replicas': 1}
-                ],
-                'actions': [
-                    {
-                        'type': 'patch',
-                        'options': {
-                            'spec': {
-                                'replicas': 2
-                            }
-                        }
-                    }
-                ]
+                'filters': [{'metadata.name': 'hello-node'}, {'spec.replicas': 1}],
+                'actions': [{'type': 'patch', 'options': {'spec': {'replicas': 2}}}],
             },
-            session_factory=factory
+            session_factory=factory,
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)

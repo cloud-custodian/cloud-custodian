@@ -9,40 +9,35 @@ from c7n_azure.utils import StringUtils
 
 
 class AppServicePlanUnit(DeploymentUnit):
-
     def __init__(self):
-        super(AppServicePlanUnit, self).__init__(
-            'azure.mgmt.web.WebSiteManagementClient')
+        super(AppServicePlanUnit, self).__init__('azure.mgmt.web.WebSiteManagementClient')
         self.type = "Application Service Plan"
 
     def _get(self, params):
-        return self.client.app_service_plans.get(params['resource_group_name'],
-                                                 params['name'])
+        return self.client.app_service_plans.get(params['resource_group_name'], params['name'])
 
     def _provision(self, params):
         rg_unit = ResourceGroupUnit()
-        rg_unit.provision_if_not_exists({'name': params['resource_group_name'],
-                                         'location': params['location']})
+        rg_unit.provision_if_not_exists(
+            {'name': params['resource_group_name'], 'location': params['location']}
+        )
 
         plan_params = AppServicePlan(
             app_service_plan_name=params['name'],
             location=params['location'],
-            sku=SkuDescription(
-                name=params['sku_name'],
-                capacity=1,
-                tier=params['sku_tier']),
+            sku=SkuDescription(name=params['sku_name'], capacity=1, tier=params['sku_tier']),
             kind='linux',
             target_worker_size_id=0,
-            reserved=True)
+            reserved=True,
+        )
 
-        plan = self.client.app_service_plans.begin_create_or_update(params['resource_group_name'],
-                                                                    params['name'],
-                                                                    plan_params).result()
+        plan = self.client.app_service_plans.begin_create_or_update(
+            params['resource_group_name'], params['name'], plan_params
+        ).result()
 
         # Deploy default autoscale rule for dedicated plans if required by the policy
         autoscale_params = copy.deepcopy(params.get('auto_scale', {}))
-        if bool(autoscale_params.get('enabled')) and \
-           not StringUtils.equal(plan.sku, 'dynamic'):
+        if bool(autoscale_params.get('enabled')) and not StringUtils.equal(plan.sku, 'dynamic'):
             autoscale_params['name'] = 'autoscale'
             autoscale_params['resource_group_name'] = params['resource_group_name']
             autoscale_params['service_plan_id'] = plan.id

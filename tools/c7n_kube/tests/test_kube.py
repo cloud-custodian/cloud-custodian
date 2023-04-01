@@ -18,7 +18,7 @@ class TestKube(KubeTest):
                 'resource': 'k8s.namespace',
             },
             session_factory=factory,
-            cache=True
+            cache=True,
         )
         resources = p.run()
         self.assertTrue(len(resources))
@@ -31,6 +31,6 @@ class TestKube(KubeTest):
 
         calls = [
             call('Using cached c7n_kube.resources.core.namespace.Namespace: 5'),
-            call('Filtered from 5 to 5 namespace')
+            call('Filtered from 5 to 5 namespace'),
         ]
         p.resource_manager.log.debug.assert_has_calls(calls)

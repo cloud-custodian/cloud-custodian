@@ -5,7 +5,6 @@ from tc_common import BaseTest
 
 
 class TestCbsSnapshot(BaseTest):
-
     @pytest.mark.vcr
     def test_cbs_old_snapshot(self):
         policy = self.load_policy(
@@ -19,9 +18,9 @@ class TestCbsSnapshot(BaseTest):
                         "key": "CreateTime",
                         "value_type": "age",
                         "op": "greater-than",
-                        "value": 90
+                        "value": 90,
                     }
-                ]
+                ],
             }
         )
         resources = policy.run()

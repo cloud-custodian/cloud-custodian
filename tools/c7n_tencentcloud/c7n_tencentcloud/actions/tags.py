@@ -73,16 +73,16 @@ class AddTagAction(TagAction):
     """
     Add tag information
     """
-    schema = type_schema("tag",
-                         key={"type": "string"},
-                         value={"type": "string"})
+
+    schema = type_schema("tag", key={"type": "string"}, value={"type": "string"})
     schema_alias = True
     t_api_method_name = "TagResources"
 
     def __init__(self, data=None, manager=None, log_dir=None):
         super().__init__(data, manager, log_dir)
-        self.tag_request_params = [{"TagKey": self.data.get("key"),
-                                    "TagValue": self.data.get("value")}]
+        self.tag_request_params = [
+            {"TagKey": self.data.get("key"), "TagValue": self.data.get("value")}
+        ]
 
     def validate(self):
         """validate"""
@@ -96,9 +96,8 @@ class RenameTagAction(TagAction):
     Rename the tag information, because Tencent Cloud API does not support direct modification,
     you need to delete it first and then add it
     """
-    schema = type_schema("rename-tag",
-                         old_key={"type": "string"},
-                         new_key={"type": "string"})
+
+    schema = type_schema("rename-tag", old_key={"type": "string"}, new_key={"type": "string"})
     schema_alias = True
     t_api_method_name = "ModifyResourceTags"
 
@@ -126,10 +125,9 @@ class RenameTagAction(TagAction):
         qcs_list = self.manager.source.get_resource_qcs([resource])
         param.update({"Resource": qcs_list[0]})
         if old_tag is not None:
-            replaceTags = {"ReplaceTags": [{
-                "TagKey": self.data.get("new_key"),
-                "TagValue": old_tag["Value"]
-            }]}
+            replaceTags = {
+                "ReplaceTags": [{"TagKey": self.data.get("new_key"), "TagValue": old_tag["Value"]}]
+            }
             param.update(replaceTags)
 
         deleteTags = {"DeleteTags": [{"TagKey": self.data.get('old_key')}]}
@@ -146,18 +144,25 @@ class RenameTagAction(TagAction):
             for resource in resources:
                 params = self._get_rename_request_params(resource)
                 resp = client.execute_query(self.t_api_method_name, params)
-                self.log.debug("%s , params: %s,resp: %s ", self.data.get('type'),
-                               json.dumps(params), json.dumps(resp))
+                self.log.debug(
+                    "%s , params: %s,resp: %s ",
+                    self.data.get('type'),
+                    json.dumps(params),
+                    json.dumps(resp),
+                )
         except (RetryError, TencentCloudSDKException) as err:
             raise PolicyExecutionError(err) from err
 
 
 class DeleteTagAction(TagAction):
     """Delete Tag"""
-    schema = type_schema("remove-tag",
-                         tag={"type": "string"},
-                         tags={"type": "array"},
-                         msg={"type": "string"})
+
+    schema = type_schema(
+        "remove-tag",
+        tag={"type": "string"},
+        tags={"type": "array"},
+        msg={"type": "string"},
+    )
     schema_alias = True
     t_api_method_name = "UnTagResources"
 
@@ -176,6 +181,7 @@ class TagDelayedAction(TagAction):
     """
     Tag resources for future action.
     """
+
     schema = type_schema(
         "mark-for-op",
         tag={"type": "string"},
@@ -185,7 +191,8 @@ class TagDelayedAction(TagAction):
         # https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
         # TZ database name
         tz={"type": "string"},
-        op={"type": "string"})
+        op={"type": "string"},
+    )
     schema_alias = True
     t_api_method_name = "TagResources"
 
@@ -230,7 +237,7 @@ class TagDelayedAction(TagAction):
             "msg": self.data.get("msg", self.default_template),
             "tz": self.data.get("tz", "utc"),
             "days": days,
-            "hours": hours
+            "hours": hours,
         }
         config["action_date"] = self.generate_timestamp(days, hours)
         return config
@@ -240,10 +247,12 @@ class TagDelayedAction(TagAction):
         cfg = self._get_config_values()
         msg = cfg["msg"].format(op=cfg["op"], action_date=cfg["action_date"])
 
-        self.log.info("Tagging %d resources for %s on %s",
-                      len(resources),
-                      cfg["op"],
-                      cfg["action_date"])
+        self.log.info(
+            "Tagging %d resources for %s on %s",
+            len(resources),
+            cfg["op"],
+            cfg["action_date"],
+        )
 
         self.tag_request_params = [{"TagKey": cfg["tag"], "TagValue": msg}]
         self.process_tag_op(resources)
@@ -251,6 +260,7 @@ class TagDelayedAction(TagAction):
 
 class TagActionFilter(Filter):
     """TagActionFilter"""
+
     schema = type_schema(
         "marked-for-op",
         tag={"type": "string"},
@@ -260,7 +270,7 @@ class TagActionFilter(Filter):
         # tz={"type": "string"},
         skew={"type": "number", "minimum": 0},
         skew_hours={"type": "number", "minimum": 0},
-        op={"type": "string"}
+        op={"type": "string"},
     )
     schema_alias = True
     current_date = None
@@ -270,8 +280,7 @@ class TagActionFilter(Filter):
         """validate"""
         op = self.data.get("op")
         if self.manager and op not in self.manager.action_registry.keys():
-            raise PolicyValidationError(
-                f"Invalid marked-for-op op:{op} in {self.manager.data}")
+            raise PolicyValidationError(f"Invalid marked-for-op op:{op} in {self.manager.data}")
         return self
 
     def process(self, resources, event=None):
@@ -304,8 +313,12 @@ class TagActionFilter(Filter):
         try:
             action_dt = parse(action_date_str)
         except Exception:
-            self.log.error("could not parse tag:%s value:%s on %s",
-                           self.tag, tag_value, resource[self.manager.resource_type.id])
+            self.log.error(
+                "could not parse tag:%s value:%s on %s",
+                self.tag,
+                tag_value,
+                resource[self.manager.resource_type.id],
+            )
             return False
 
         # current_date must match timezones with the parsed date string

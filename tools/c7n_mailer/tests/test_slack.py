@@ -173,7 +173,9 @@ class TestSlackDelivery(unittest.TestCase):
         slack.send_slack_msg(self.target_channel, result[self.target_channel])
 
         self.logger.info.assert_called_with(
-            "Error in sending Slack message status:%s response: %s", 404, "channel_not_found"
+            "Error in sending Slack message status:%s response: %s",
+            404,
+            "channel_not_found",
         )
 
     @patch("c7n_mailer.slack_delivery.requests.post")

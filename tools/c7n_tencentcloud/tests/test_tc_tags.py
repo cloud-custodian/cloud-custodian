@@ -15,24 +15,15 @@ def get_tags(policy, resource):
 
 
 class TestCvmTagAction(BaseTest):
-
     @pytest.mark.vcr
     def test_cvm_mark_op_stop(self):
         policy = self.load_policy(
             {
                 "name": "cvm-mark-for-op-stop",
                 "resource": "tencentcloud.cvm",
-                "query": [{
-                    "InstanceIds": ["ins-00lycyy6"]
-                }],
+                "query": [{"InstanceIds": ["ins-00lycyy6"]}],
                 "filters": [{"tag:maid_status": "absent"}],
-                "actions": [
-                    {
-                        "type": "mark-for-op",
-                        "op": "stop",
-                        "days": 14
-                    }
-                ]
+                "actions": [{"type": "mark-for-op", "op": "stop", "days": 14}],
             },
         )
         resources = policy.run()
@@ -47,26 +38,12 @@ class TestCvmTagAction(BaseTest):
             {
                 "name": "cvm-marked-for-op-stop",
                 "resource": "tencentcloud.cvm",
-                "query": [{
-                    "InstanceIds": ["ins-00lycyy6"]
-                }],
+                "query": [{"InstanceIds": ["ins-00lycyy6"]}],
                 "filters": [
-                    {
-                        "type": "marked-for-op",
-                        "op": "stop",
-                        "skew": 14
-                    }, {
-                        "not": [{
-                            "type": "marked-for-op",
-                            "op": "stop",
-                            "skew": 14
-                        }]
-                    }
-                ], "actions": [
-                    {
-                        "type": "stop"
-                    }
-                ]
+                    {"type": "marked-for-op", "op": "stop", "skew": 14},
+                    {"not": [{"type": "marked-for-op", "op": "stop", "skew": 14}]},
+                ],
+                "actions": [{"type": "stop"}],
             },
         )
         resources = policy.run()
@@ -80,20 +57,9 @@ class TestCvmTagAction(BaseTest):
             {
                 "name": "cvm-marked-for-op-stop",
                 "resource": "tencentcloud.cvm",
-                "query": [{
-                    "InstanceIds": ["ins-00lycyy6"]
-                }],
-                "filters": [
-                    {
-                        "type": "marked-for-op",
-                        "op": "stop",
-                        "skew": 14
-                    }
-                ], "actions": [
-                    {
-                        "type": "stop"
-                    }
-                ]
+                "query": [{"InstanceIds": ["ins-00lycyy6"]}],
+                "filters": [{"type": "marked-for-op", "op": "stop", "skew": 14}],
+                "actions": [{"type": "stop"}],
             },
         )
         resources = policy.run()
@@ -108,16 +74,10 @@ class TestCvmTagAction(BaseTest):
             {
                 "name": "cvm-mark-for-op-terminate",
                 "resource": "tencentcloud.cvm",
-                "query": [{
-                    "InstanceIds": ["ins-nhhm5ppo"]
-                }],
+                "query": [{"InstanceIds": ["ins-nhhm5ppo"]}],
                 "actions": [
-                    {
-                        "type": "mark-for-op",
-                        "op": "terminate",
-                        "days": 7
-                    },
-                ]
+                    {"type": "mark-for-op", "op": "terminate", "days": 7},
+                ],
             },
         )
         resources = policy.run()
@@ -130,17 +90,15 @@ class TestCvmTagAction(BaseTest):
             {
                 "name": "cvm-test-tag",
                 "resource": "tencentcloud.cvm",
-                "query": [{
-                    "InstanceIds": ["ins-00lycyy6", "ins-nhhm5ppo"]
-                }],
+                "query": [{"InstanceIds": ["ins-00lycyy6", "ins-nhhm5ppo"]}],
                 "filters": [{"tag:tag_add_test_key_for_test": "absent"}],
                 "actions": [
                     {
                         "type": "tag",
                         "key": "tag_add_test_key_for_test",
-                        "value": "tag_add_test_value_for_test"
+                        "value": "tag_add_test_value_for_test",
                     }
-                ]
+                ],
             },
         )
         resources = policy.run()
@@ -157,17 +115,15 @@ class TestCvmTagAction(BaseTest):
             {
                 "name": "cvm-test-rename-tag",
                 "resource": "tencentcloud.cvm",
-                "query": [{
-                    "InstanceIds": ["ins-00lycyy6", "ins-nhhm5ppo"]
-                }],
+                "query": [{"InstanceIds": ["ins-00lycyy6", "ins-nhhm5ppo"]}],
                 "filters": [{"tag:tag_add_test_key_for_test": "present"}],
                 "actions": [
                     {
                         "type": "rename-tag",
                         "old_key": "tag_add_test_key_for_test",
-                        "new_key": "tag_add_test_key_for_test_rename"
+                        "new_key": "tag_add_test_key_for_test_rename",
                     }
-                ]
+                ],
             },
         )
         resources = policy.run()
@@ -185,17 +141,9 @@ class TestCvmTagAction(BaseTest):
             {
                 "name": "cvm-test-remove-tag",
                 "resource": "tencentcloud.cvm",
-                "query": [{
-                    "InstanceIds": ["ins-00lycyy6"]
-                }],
-                "filters": [{
-                    "tag:tag_add_test_key_for_test_rename": "present"}],
-                "actions": [
-                    {
-                        "type": "remove-tag",
-                        "tags": ["tag_add_test_key_for_test_rename"]
-                    }
-                ]
+                "query": [{"InstanceIds": ["ins-00lycyy6"]}],
+                "filters": [{"tag:tag_add_test_key_for_test_rename": "present"}],
+                "actions": [{"type": "remove-tag", "tags": ["tag_add_test_key_for_test_rename"]}],
             },
         )
         resources = policy.run()

@@ -38,6 +38,7 @@ class NatGateway(QueryResourceManager):
 
     class resource_type(ResourceTypeInfo):
         """resource_type"""
+
         id = "NatGatewayId"
         endpoint = "vpc.tencentcloudapi.com"
         service = "vpc"
@@ -47,7 +48,10 @@ class NatGateway(QueryResourceManager):
         metrics_namespace = "QCE/NAT_GATEWAY"
         metrics_dimension_def = [("natId", "NatGatewayId")]
         metrics_instance_id_name = "natId"
-        paging_def = {"method": PageMethod.Offset, "limit": {"key": "Limit", "value": 20}}
+        paging_def = {
+            "method": PageMethod.Offset,
+            "limit": {"key": "Limit", "value": 20},
+        }
         resource_prefix = "nat"
         taggable = True
         datetime_fields_format = {
@@ -57,7 +61,7 @@ class NatGateway(QueryResourceManager):
     def augment(self, resources):
         for resource in resources:
             field_format = self.resource_type.datetime_fields_format["CreatedTime"]
-            resource["CreatedTime"] = isoformat_datetime_str(resource["CreatedTime"],
-                                                             field_format[0],
-                                                             field_format[1])
+            resource["CreatedTime"] = isoformat_datetime_str(
+                resource["CreatedTime"], field_format[0], field_format[1]
+            )
         return resources

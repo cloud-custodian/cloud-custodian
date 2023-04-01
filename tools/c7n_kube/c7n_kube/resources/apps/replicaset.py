@@ -7,7 +7,6 @@ from c7n_kube.provider import resources
 
 @resources.register('replica-set')
 class ReplicaSet(QueryResourceManager):
-
     class resource_type(TypeInfo):
         group = 'Apps'
         version = 'V1'

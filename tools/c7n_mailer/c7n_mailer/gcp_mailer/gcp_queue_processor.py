@@ -71,7 +71,8 @@ class MailerGcpQueueProcessor(MessageTargetMixin):
     def ack_messages(self, discard_datetime):
         """Acknowledge and Discard messages up to datetime using seek api command"""
         return self.client.execute_command(
-            "seek", {"subscription": self.subscription, "body": {"time": discard_datetime}}
+            "seek",
+            {"subscription": self.subscription, "body": {"time": discard_datetime}},
         )
 
     @staticmethod

@@ -23,7 +23,6 @@ log = logging.getLogger('sphere11.controller')
 
 
 class Controller:
-
     supported_resources = set(('security-group', 'vpc'))
 
     def __init__(self, config):
@@ -31,10 +30,7 @@ class Controller:
         self.account_sessions = {}
         self.resource_managers = {}
 
-        self.db = LockDb(
-            boto3.Session(),
-            config['db']['lock_table'],
-            config['db'].get('endpoint'))
+        self.db = LockDb(boto3.Session(), config['db']['lock_table'], config['db'].get('endpoint'))
 
     def get_session(self, account_id):
         """Get an active session in the target account."""
@@ -43,7 +39,8 @@ class Controller:
                 raise AccountNotFound("account:%s is unknown" % account_id)
 
             self.account_sessions[account_id] = s = assumed_session(
-                self.config['accounts'][account_id]['role'], "Sphere11")
+                self.config['accounts'][account_id]['role'], "Sphere11"
+            )
             s._session.user_agent_name = "Sphere11"
             s._session.user_agent_version = "0.07"
         return self.account_sessions[account_id]
@@ -53,9 +50,10 @@ class Controller:
             if region:
                 session.set_config_variable('region', region)
             return session
+
         ctx = ExecutionContext(
-            session_factory, Config({"name": "sphere11"}),
-            Config.empty(verbose=True))
+            session_factory, Config({"name": "sphere11"}), Config.empty(verbose=True)
+        )
         cls = self.get_resource_class(resource_id)
         return cls(ctx, policy and policy or {})
 
@@ -69,74 +67,90 @@ class Controller:
                 continue
             if resource_id.startswith(id_prefix):
                 return rmgr
-        raise UnknownResourceType(
-            "resource:%s not a supported resource type" % resource_id)
+        raise UnknownResourceType("resource:%s not a supported resource type" % resource_id)
 
     def get_resource_parent_id(self, resource_id, resource):
         return resource['VpcId']
 
     def get_account_delta(
-            self, account_id, region, endpoint,
-            resource_types=(('sg-', 'security-group'),)):
+        self, account_id, region, endpoint, resource_types=(('sg-', 'security-group'),)
+    ):
         session = self.get_session(account_id)
         delta = {}
         records = self.db.iter_resources(account_id)
         for rid, rtype in resource_types:
-            method = getattr(
-                self, 'get_account_%s_delta' % (rtype.replace('-', '_')))
+            method = getattr(self, 'get_account_%s_delta' % (rtype.replace('-', '_')))
             delta[rtype] = method(
-                session, region, rid,
-                records=[r for r in records
-                         if r['ResourceId'].startswith(rid)],
+                session,
+                region,
+                rid,
+                records=[r for r in records if r['ResourceId'].startswith(rid)],
                 endpoint=endpoint,
-                role=self.config['accounts'][account_id].get(
-                    'invoke-api-role'))
+                role=self.config['accounts'][account_id].get('invoke-api-role'),
+            )
         return delta
 
-    def get_account_security_group_delta(
-            self, session, region, rid, records, endpoint, role):
+    def get_account_security_group_delta(self, session, region, rid, records, endpoint, role):
         manager = self.get_resource_manager(
-            session, region, rid,
-            policy={'filters': [
-                {'or': [
-                    {'type': 'value',
-                     'key': 'GroupId',
-                     'op': 'in',
-                     'value': [g['ResourceId'] for g in records
-                               if g['ResourceId'].startswith('sg-') and
-                               g.get('LockStatus', '') == 'locked']},
-                    {'type': 'value',
-                     'key': 'VpcId',
-                     'op': 'in',
-                     'value': [g['ResourceId'] for g in records
-                               if g['ResourceId'].startswith('vpc-') and
-                               g.get('LockStatus', '') == 'locked']},
-                ]},
-                {'type': 'locked',
-                 'endpoint': endpoint,
-                 'role': role},
-                {'type': 'diff', 'selector': 'locked'}]})
+            session,
+            region,
+            rid,
+            policy={
+                'filters': [
+                    {
+                        'or': [
+                            {
+                                'type': 'value',
+                                'key': 'GroupId',
+                                'op': 'in',
+                                'value': [
+                                    g['ResourceId']
+                                    for g in records
+                                    if g['ResourceId'].startswith('sg-')
+                                    and g.get('LockStatus', '') == 'locked'
+                                ],
+                            },
+                            {
+                                'type': 'value',
+                                'key': 'VpcId',
+                                'op': 'in',
+                                'value': [
+                                    g['ResourceId']
+                                    for g in records
+                                    if g['ResourceId'].startswith('vpc-')
+                                    and g.get('LockStatus', '') == 'locked'
+                                ],
+                            },
+                        ]
+                    },
+                    {'type': 'locked', 'endpoint': endpoint, 'role': role},
+                    {'type': 'diff', 'selector': 'locked'},
+                ]
+            },
+        )
         return manager.resources()
 
     def get_resource_delta(self, account_id, resource_id, region):
         session = self.get_session(account_id)
         manager = self.get_resource_manager(
-            session, region, resource_id,
-            policy={'filters': [{'type': 'diff', 'selector': 'previous'}]})
+            session,
+            region,
+            resource_id,
+            policy={'filters': [{'type': 'diff', 'selector': 'previous'}]},
+        )
 
         results = manager.get_resources([resource_id], False)
         if not results:
             raise ResourceNotFound(
-                "account:%s resource:%s in region:%s was not found" % (
-                    account_id, resource_id, region))
+                "account:%s resource:%s in region:%s was not found"
+                % (account_id, resource_id, region)
+            )
         resource = results[0]
         filtered = manager.filter_resources([resource])
-        return resource, bool(
-            filtered or not resource.get('c7n:previous-revision'))
+        return resource, bool(filtered or not resource.get('c7n:previous-revision'))
 
     def lock(self, account_id, resource_id, region):
-        resource, delta = self.get_resource_delta(
-            account_id, resource_id, region)
+        resource, delta = self.get_resource_delta(account_id, resource_id, region)
         #  parent_id = self.get_resource_parent_id(resource_id, resource)
 
         # The most recent config revision is not current, waiting..
@@ -155,7 +169,8 @@ class Controller:
             #  ParentId=parent_id,
             #  Region=region,
             LockDate=calendar.timegm(datetime.datetime.utcnow().timetuple()),
-            LockStatus=lock_status)
+            LockStatus=lock_status,
+        )
         if not delta:
             record['RevisionDate'] = revision_date
         self.db.save(record)
@@ -163,8 +178,8 @@ class Controller:
         topic = self.config['accounts'][account_id].get('notify-locks')
         if topic:
             self.get_session(account_id).client('sns').publish(
-                TopicArn=topic,
-                Message=json.dumps(record, indent=2, cls=Encoder))
+                TopicArn=topic, Message=json.dumps(record, indent=2, cls=Encoder)
+            )
         return record
 
     def unlock(self, account_id, resource_id):
@@ -172,13 +187,14 @@ class Controller:
             AccountId=account_id,
             ResourceId=resource_id,
             LockDate=calendar.timegm(datetime.datetime.utcnow().timetuple()),
-            LockStatus=self.db.STATE_UNLOCKED)
+            LockStatus=self.db.STATE_UNLOCKED,
+        )
         self.db.save(record)
         topic = self.config['accounts'][account_id].get('notify-locks')
         if topic:
             self.get_session(account_id).client('sns').publish(
-                TopicArn=topic,
-                Message=json.dumps(record, indent=2, cls=Encoder))
+                TopicArn=topic, Message=json.dumps(record, indent=2, cls=Encoder)
+            )
         return record
 
     def info(self, account_id, resource_id, parent_id):
@@ -202,23 +218,25 @@ class Controller:
 
             for p in pending:
                 m = self.get_resource_class(p['ResourceId']).get_model()
-                n = datetime.datetime.utcfromtimestamp(p['LockDate']).replace(
-                    tzinfo=UTC)
+                n = datetime.datetime.utcfromtimestamp(p['LockDate']).replace(tzinfo=UTC)
                 config_items = config.get_resource_config_history(
                     resourceId=p['ResourceId'],
                     earlierTime=n,
                     resourceType=m.config_type,
-                    limit=1).get('configurationItems', ())
+                    limit=1,
+                ).get('configurationItems', ())
 
-                log.info("processing pending %s %s found:%d" % (
-                    p['ResourceId'], n, bool(config_items)))
+                log.info(
+                    "processing pending %s %s found:%d" % (p['ResourceId'], n, bool(config_items))
+                )
 
                 if not config_items:
                     continue
 
                 revision = config_items.pop()
                 revision_date = calendar.timegm(
-                    revision['configurationItemCaptureTime'].timetuple())
+                    revision['configurationItemCaptureTime'].timetuple()
+                )
                 p['RevisionDate'] = revision_date
                 p['LockStatus'] = 'locked'
 
@@ -228,9 +246,7 @@ class Controller:
 
                 self.db.save(p)
 
-                log.info("locked pending %s %s delay:%d" % (
-                    p['ResourceId'], n, float(delay)))
+                log.info("locked pending %s %s delay:%d" % (p['ResourceId'], n, float(delay)))
 
                 if topic:
-                    sns.publish(
-                        TopicArn=topic, Message=json.dumps(p, cls=Encoder))
+                    sns.publish(TopicArn=topic, Message=json.dumps(p, cls=Encoder))

@@ -33,6 +33,7 @@ class RoleFilter(Filter):
                     role_name: admin
                     system_scope: true
     """
+
     schema = type_schema(
         'role',
         role_name={'type': 'string'},
@@ -42,8 +43,7 @@ class RoleFilter(Filter):
         system_scope={'type': 'boolean'},
     )
 
-    def user_match_role(self, assignments, user_id,
-                        role_id, project_id, system_scope):
+    def user_match_role(self, assignments, user_id, role_id, project_id, system_scope):
         for p in assignments:
             if user_id and p.get('user', '') != user_id:
                 continue
@@ -79,7 +79,6 @@ class RoleFilter(Filter):
         assignments = openstack.list_role_assignments()
         for user in resources:
             user_id = user.id
-            if self.user_match_role(assignments, user_id, role_id,
-                                    project_id, system_scope):
+            if self.user_match_role(assignments, user_id, role_id, project_id, system_scope):
                 results.append(user)
         return results

@@ -6,23 +6,14 @@ import time
 
 
 class TestCbs(BaseTest):
-
     @pytest.mark.vcr
     def test_cbs_not_encrypt(self):
         policy = self.load_policy(
             {
                 "name": "test_cbs_not_encrypt",
                 "resource": "tencentcloud.cbs",
-                "query": [{
-                    "DiskIds": ["disk-96jhcorq"]
-                }],
-                "filters": [
-                    {
-                        "type": "value",
-                        "key": "Encrypt",
-                        "value": False
-                    }
-                ]
+                "query": [{"DiskIds": ["disk-96jhcorq"]}],
+                "filters": [{"type": "value", "key": "Encrypt", "value": False}],
             }
         )
         resources = policy.run()
@@ -35,16 +26,10 @@ class TestCbs(BaseTest):
                 "name": "test_cbs_available",
                 "resource": "tencentcloud.cbs",
                 "comment": "Identify CBS Volumes that are not attached to any instances. "
-                           "These volumes should be investigated and deleted if they are no "
-                           "longer in use.",
-                "query": [{
-                    "DiskIds": ["disk-3i2gnf0k"]
-                }],
-                "filters": [
-                    {
-                        "DiskState": "UNATTACHED"
-                    }
-                ]
+                "These volumes should be investigated and deleted if they are no "
+                "longer in use.",
+                "query": [{"DiskIds": ["disk-3i2gnf0k"]}],
+                "filters": [{"DiskState": "UNATTACHED"}],
             }
         )
         resources = policy.run()
@@ -56,29 +41,18 @@ class TestCbs(BaseTest):
             {
                 "name": "test_cbs_copy_instance_tags",
                 "resource": "tencentcloud.cbs",
-                "query": [{
-                    "DiskIds": ["disk-96jhcorq"]
-                }],
+                "query": [{"DiskIds": ["disk-96jhcorq"]}],
                 "filters": [
-                    {
-                        "DiskState": "ATTACHED"
-                    },
-                    {
-                        "type": "value",
-                        "key": "InstanceIdList[0]",
-                        "value": "not-null"
-                    }
+                    {"DiskState": "ATTACHED"},
+                    {"type": "value", "key": "InstanceIdList[0]", "value": "not-null"},
                 ],
                 "actions": [
                     {
                         "type": "copy-instance-tags",
-                        "tags": ["test_pro_25", "test_pro_26"]
+                        "tags": ["test_pro_25", "test_pro_26"],
                     },
-                    {
-                        "type": "copy-instance-tags",
-                        "tags": ["test_pro_27"]
-                    },
-                ]
+                    {"type": "copy-instance-tags", "tags": ["test_pro_27"]},
+                ],
             }
         )
         resources = policy.run()
@@ -108,16 +82,18 @@ class TestCbs(BaseTest):
             {
                 "name": "filter-metrics",
                 "resource": "tencentcloud.cbs",
-                "filters": [{
-                    "type": "metrics",
-                    "name": "DiskReadTraffic",
-                    "statistics": "Average",
-                    "days": 3,
-                    "op": "less-than",
-                    "value": 1,
-                    "missing-value": 0,
-                    "period": 3600
-                }]
+                "filters": [
+                    {
+                        "type": "metrics",
+                        "name": "DiskReadTraffic",
+                        "statistics": "Average",
+                        "days": 3,
+                        "op": "less-than",
+                        "value": 1,
+                        "missing-value": 0,
+                        "period": 3600,
+                    }
+                ],
             }
         )
         resources = policy.run()

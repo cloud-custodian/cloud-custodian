@@ -22,6 +22,7 @@ class TencentCloud(Provider):
     """
     tencent cloud provider
     """
+
     display_name = "Tencent Cloud"
     resource_prefix = "tencentcloud"
     resources: PluginRegistry = PluginRegistry(f"{resource_prefix}.resources")
@@ -42,12 +43,17 @@ class TencentCloud(Provider):
             options.region = options.regions[0]
         if not options.account_id:
             session = self.get_session_factory(options)
-            options.account_id = session().client(
-                endpoint='sts.tencentcloudapi.com',
-                service='sts',
-                version='2018-08-13',
-                region=options.region
-            ).execute_query("GetCallerIdentity", {}).get('AccountId')
+            options.account_id = (
+                session()
+                .client(
+                    endpoint='sts.tencentcloudapi.com',
+                    service='sts',
+                    version='2018-08-13',
+                    region=options.region,
+                )
+                .execute_query("GetCallerIdentity", {})
+                .get('AccountId')
+            )
         return options
 
     def initialize_policies(self, policy_collection: PolicyCollection, options: dict):

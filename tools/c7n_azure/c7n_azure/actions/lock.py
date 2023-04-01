@@ -53,7 +53,7 @@ class LockAction(AzureBaseAction):
                 lock-name: productionLock
                 lock-notes: Locking all production SQL databases via Cloud Custodian
 
-     """
+    """
 
     schema = type_schema(
         'lock',
@@ -61,7 +61,7 @@ class LockAction(AzureBaseAction):
         **{
             'lock-type': {'enum': ['ReadOnly', 'CanNotDelete']},
             'lock-name': {'type': 'string', 'minLength': 1, 'maxLength': 260},
-            'lock-notes': {'type': 'string', 'minLength': 1, 'maxLength': 512}
+            'lock-notes': {'type': 'string', 'minLength': 1, 'maxLength': 512},
         }
     )
 
@@ -82,13 +82,13 @@ class LockAction(AzureBaseAction):
             self.client.management_locks.create_or_update_at_resource_group_level(
                 resource['name'],
                 lock_name,
-                ManagementLockObject(level=self.lock_type, notes=lock_notes)
+                ManagementLockObject(level=self.lock_type, notes=lock_notes),
             )
         else:
             self.client.management_locks.create_or_update_by_scope(
                 resource['id'],
                 lock_name,
-                ManagementLockObject(level=self.lock_type, notes=lock_notes)
+                ManagementLockObject(level=self.lock_type, notes=lock_notes),
             )
 
         return {"locked": self.lock_type}

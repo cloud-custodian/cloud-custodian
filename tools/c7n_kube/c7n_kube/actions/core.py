@@ -17,13 +17,13 @@ class Action(BaseAction):
 
 
 class EventAction(BaseAction):
-
     def validate(self):
         modes = ('k8s-admission',)
         policy = self.manager.data
         if policy.get('mode', {}).get('type') not in modes:
             raise PolicyValidationError(
-                "Event Actions are only supported for k8s-admission mode policies")
+                "Event Actions are only supported for k8s-admission mode policies"
+            )
 
 
 class MethodAction(Action):
@@ -55,6 +55,7 @@ class PatchAction(MethodAction):
 
     Requires patch and namespaced attributes on the resource definition
     """
+
     def validate(self):
         if not self.manager.get_model().patch:
             raise PolicyValidationError('patch attribute not defined for resource')
@@ -91,10 +92,8 @@ class PatchResource(PatchAction):
                 spec:
                   replicas: 0
     """
-    schema = type_schema(
-        'patch',
-        **{'options': {'type': 'object'}}
-    )
+
+    schema = type_schema('patch', **{'options': {'type': 'object'}})
 
     def process_resource_set(self, client, resources):
         patch_args = {'body': self.data.get('options', {})}
@@ -113,6 +112,7 @@ class DeleteAction(MethodAction):
 
     Requires delete and namespaced attributes on the resource definition
     """
+
     def validate(self):
         if not self.manager.get_model().delete:
             raise PolicyValidationError('delete attribute not defined for resource')
@@ -145,6 +145,7 @@ class DeleteResource(DeleteAction):
           actions:
             - delete
     """
+
     schema = type_schema(
         'delete',
         grace_period_seconds={'type': 'integer'},
@@ -160,7 +161,9 @@ class DeleteResource(DeleteAction):
     @classmethod
     def register_resources(klass, registry, resource_class):
         model = resource_class.resource_type
-        if ('delete' not in resource_class.action_registry and
-            hasattr(model, 'delete') and
-                hasattr(model, 'namespaced')):
+        if (
+            'delete' not in resource_class.action_registry
+            and hasattr(model, 'delete')
+            and hasattr(model, 'namespaced')
+        ):
             resource_class.action_registry.register('delete', klass)

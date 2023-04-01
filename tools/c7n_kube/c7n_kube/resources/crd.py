@@ -21,6 +21,7 @@ class CustomNamespacedResourceDefinition(CustomResourceQueryManager):
             version: v1
             plural: crontabs
     """
+
     class resource_type(CustomTypeInfo):
         delete = "delete_namespaced_custom_object"
         patch = "patch_namespaced_custom_object"
@@ -42,6 +43,7 @@ class CustomResourceDefinition(CustomResourceQueryManager):
             version: v1
             plural: crontabs
     """
+
     class resource_type(CustomTypeInfo):
         namespaced = False
         delete = "delete_cluster_custom_object"

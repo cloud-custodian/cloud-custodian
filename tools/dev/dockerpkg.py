@@ -207,7 +207,6 @@ LABEL "org.opencontainers.image.documentation"="https://cloudcustodian.io/docs"
 
 
 class Image:
-
     defaults = dict(
         base_build_image="ubuntu:22.04",
         base_target_image="ubuntu:22.04",
@@ -314,9 +313,7 @@ def cli():
 
     slices, dices, and blends :-)
     """
-    logging.basicConfig(
-        level=logging.INFO, format="%(asctime)s:%(levelname)s %(message)s"
-    )
+    logging.basicConfig(level=logging.INFO, format="%(asctime)s:%(levelname)s %(message)s")
     logging.getLogger("docker").setLevel(logging.INFO)
     logging.getLogger("urllib3").setLevel(logging.INFO)
 
@@ -333,14 +330,10 @@ def cli():
 
 @cli.command()
 @click.option("-p", "--provider", multiple=True)
-@click.option(
-    "-r", "--registry", multiple=True, help="Registries for image repo on tag and push"
-)
+@click.option("-r", "--registry", multiple=True, help="Registries for image repo on tag and push")
 @click.option("-t", "--tag", help="Static tag for the image")
 @click.option("--push", is_flag=True, help="Push images to registries")
-@click.option(
-    "--test", help="Run lightweight functional tests with image", is_flag=True
-)
+@click.option("--test", help="Run lightweight functional tests with image", is_flag=True)
 @click.option("--scan", help="scan the image for cve with trivy", is_flag=True)
 @click.option("-q", "--quiet", is_flag=True)
 @click.option("-i", "--image", multiple=True)
@@ -536,15 +529,19 @@ def test_image(image_id, image_name, providers):
     env.update(
         {
             "TEST_DOCKER": "yes",
-            "CUSTODIAN_%s_IMAGE"
-            % image_name.upper().split("-", 1)[0]: image_id.split(":")[-1],
+            "CUSTODIAN_%s_IMAGE" % image_name.upper().split("-", 1)[0]: image_id.split(":")[-1],
         }
     )
     if providers not in (None, ()):
         env["CUSTODIAN_PROVIDERS"] = " ".join(providers)
     subprocess.check_call(
-        [Path(sys.executable).parent / "pytest", "-p",
-         "no:terraform", "-v", "tests/test_docker.py"],
+        [
+            Path(sys.executable).parent / "pytest",
+            "-p",
+            "no:terraform",
+            "-v",
+            "tests/test_docker.py",
+        ],
         env=env,
         stderr=subprocess.STDOUT,
     )
@@ -557,7 +554,7 @@ def push_image(client, image_id, image_refs):
         if result.get("Status", "") != "Login Succeeded":
             raise RuntimeError("Docker Login failed %s" % (result,))
 
-    for (repo, tag) in image_refs:
+    for repo, tag in image_refs:
         log.info(f"Pushing image {repo}:{tag}")
         for line in client.images.push(repo, tag, stream=True, decode=True):
             if "status" in line:
@@ -598,7 +595,11 @@ def build_image(client, image_name, image_def, dfile_path, build_args):
     built_image = client.images.get(built_image_id)
     log.info(
         "Built %s image Id:%s Size:%s"
-        % (image_name, built_image_id[:12], human_size(built_image.attrs["Size"]),)
+        % (
+            image_name,
+            built_image_id[:12],
+            human_size(built_image.attrs["Size"]),
+        )
     )
 
     return built_image_id[:12]

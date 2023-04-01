@@ -50,16 +50,16 @@ class SplunkHecDelivery:
         sourcetype = self.config.get('splunk_hec_sourcetype', '_json')
         for event in events:
             for index in indices:
-                payloads.append({
-                    'time': msg_timestamp,
-                    'host': 'cloud-custodian',
-                    'source': '%s-cloud-custodian' % event.get(
-                        'account', 'unknown'
-                    ),
-                    'sourcetype': sourcetype,
-                    'index': index,
-                    'event': event
-                })
+                payloads.append(
+                    {
+                        'time': msg_timestamp,
+                        'host': 'cloud-custodian',
+                        'source': '%s-cloud-custodian' % event.get('account', 'unknown'),
+                        'sourcetype': sourcetype,
+                        'index': index,
+                        'event': event,
+                    }
+                )
         return payloads
 
     def get_splunk_events(self, msg):
@@ -144,9 +144,7 @@ class SplunkHecDelivery:
         if failed != 0:
             raise RuntimeError(
                 'ERROR: {failed} of {count} Splunk HEC messages '
-                'failed to deliver.'.format(
-                    failed=failed, count=len(payloads)
-                )
+                'failed to deliver.'.format(failed=failed, count=len(payloads))
             )
 
     def _try_send(self, payload):
@@ -169,7 +167,9 @@ class SplunkHecDelivery:
             self.logger.error(
                 'ERROR: Sending %d characters to Splunk HEC; line length '
                 'limit is %d characters. Data will be truncated: %s',
-                len(p), maxlen, p
+                len(p),
+                maxlen,
+                p,
             )
         for i in range(0, max_attempts):
             try:
@@ -181,13 +181,11 @@ class SplunkHecDelivery:
             except Exception:
                 sleep_sec = uniform(1, 4)  # random float 1 to 4
                 self.logger.warning(
-                    'Caught exception sending to Splunk; '
-                    'retry in %s seconds', sleep_sec
+                    'Caught exception sending to Splunk; ' 'retry in %s seconds',
+                    sleep_sec,
                 )
                 sleep(sleep_sec)
-        self.logger.error(
-            'ERROR - Could not POST to Splunk after %d tries.', max_attempts
-        )
+        self.logger.error('ERROR - Could not POST to Splunk after %d tries.', max_attempts)
         return False
 
     def _send_splunk(self, payload):
@@ -203,25 +201,26 @@ class SplunkHecDelivery:
         try:
             r = requests.post(  # nosec
                 url,
-                headers={
-                    'Authorization': 'Splunk %s' % self.config[
-                        'splunk_hec_token'
-                    ]
-                },
+                headers={'Authorization': 'Splunk %s' % self.config['splunk_hec_token']},
                 data=payload,
             )
         except Exception:
-            self.logger.error('Exception during Splunk POST to %s of %s',
-                              url, payload, exc_info=True)
+            self.logger.error(
+                'Exception during Splunk POST to %s of %s', url, payload, exc_info=True
+            )
             raise
         self.logger.debug(
             'Splunk POST got response code %s HEADERS=%s BODY: %s',
-            r.status_code, r.headers, r.text
+            r.status_code,
+            r.headers,
+            r.text,
         )
         if r.status_code not in [200, 201, 202]:
             self.logger.error(
                 'Splunk POST returned non-20x response: %s HEADERS=%s BODY: %s',
-                r.status_code, r.headers, r.text
+                r.status_code,
+                r.headers,
+                r.text,
             )
             raise RuntimeError('POST returned %s' % r.status_code)
         try:
@@ -229,9 +228,7 @@ class SplunkHecDelivery:
         except Exception:
             j = {'text': r.text}
         if j['text'].lower() != 'success':
-            self.logger.error(
-                'Splunk POST returned non-success response: %s', j
-            )
+            self.logger.error('Splunk POST returned non-success response: %s', j)
             raise RuntimeError('POST returned non-success response: %s' % j)
 
     def tags_for_resource(self, res):
@@ -246,10 +243,7 @@ class SplunkHecDelivery:
         try:
             return {x['Key']: x['Value'] for x in res.get('Tags', [])}
         except Exception:
-            self.logger.warning(
-                'Exception building tags dict; Tags=%s',
-                res.get('Tags', None)
-            )
+            self.logger.warning('Exception building tags dict; Tags=%s', res.get('Tags', None))
             return {}
 
     @staticmethod

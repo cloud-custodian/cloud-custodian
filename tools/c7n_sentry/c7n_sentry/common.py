@@ -19,11 +19,9 @@ def get_accounts(options):
         account_data = json.load(fh)
 
     if options.accounts:
-        accounts = [v for k, v in account_data.items()
-                    if k in options.accounts]
+        accounts = [v for k, v in account_data.items() if k in options.accounts]
     elif options.env:
-        accounts = [v for k, v in account_data.items()
-                    if k.endswith(options.env)]
+        accounts = [v for k, v in account_data.items() if k.endswith(options.env)]
     else:
         accounts = account_data.values()
     return accounts

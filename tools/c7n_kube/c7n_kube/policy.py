@@ -56,15 +56,14 @@ class ValidatingControllerMode(K8sEventMode):
             'on-match': {'enum': ['allow', 'deny', 'warn']},
             'operations': {
                 'type': 'array',
-                'items': {
-                    'enum': ['CREATE', 'UPDATE', 'DELETE', 'CONNECT']
-                }
-            }
-        }
+                'items': {'enum': ['CREATE', 'UPDATE', 'DELETE', 'CONNECT']},
+            },
+        },
     )
 
     def validate(self):
         from c7n_kube.actions.core import EventAction
+
         actions = self.policy.resource_manager.actions
         errors = []
         for a in actions:
@@ -72,7 +71,8 @@ class ValidatingControllerMode(K8sEventMode):
                 errors.append(a.type)
         if errors:
             raise PolicyValidationError(
-                f"Only Event Based actions are allowed: {errors} are not compatible")
+                f"Only Event Based actions are allowed: {errors} are not compatible"
+            )
 
     def _handle_scope(self, request, value):
         if request.get('namespace') and value == 'Namespaced':
@@ -126,7 +126,10 @@ class ValidatingControllerMode(K8sEventMode):
         mode = self.policy.data['mode']
 
         # custom resources have to be treated a bit differently
-        crds = ('custom-namespaced-resource', 'custom-cluster-resource',)
+        crds = (
+            'custom-namespaced-resource',
+            'custom-cluster-resource',
+        )
         if self.policy.resource_manager.type in crds:
             query = self.policy.data['query'][0]
             version = query['version'].lower()
@@ -178,9 +181,7 @@ class ValidatingControllerMode(K8sEventMode):
             )
 
             if 'debug' in event:
-                self.policy.log.info(
-                    "Invoking actions %s", self.policy.resource_manager.actions
-                )
+                self.policy.log.info("Invoking actions %s", self.policy.resource_manager.actions)
 
             ctx.output.write_file('resources.json', dumps(resources, indent=2))
             for action in self.policy.resource_manager.actions:

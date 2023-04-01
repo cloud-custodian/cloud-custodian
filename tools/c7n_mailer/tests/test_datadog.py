@@ -106,7 +106,9 @@ class TestDataDogDelivery(unittest.TestCase):
 
         self.mock_datadog_initialize.assert_not_called()
 
-    def test_datadog_message_packages_should_return_empty_list_if_no_sqs_messages_returned(self):
+    def test_datadog_message_packages_should_return_empty_list_if_no_sqs_messages_returned(
+        self,
+    ):
         data_dog_delivery = DataDogDelivery(self.config, self.session, self.logger)
 
         assert data_dog_delivery.get_datadog_message_packages(None) == []

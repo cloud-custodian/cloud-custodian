@@ -42,7 +42,7 @@ class AzureBaseAction(BaseAction, metaclass=abc.ABCMeta):
             executor_factory=self.executor_factory,
             log=self.log,
             max_workers=self.max_workers,
-            chunk_size=self.chunk_size
+            chunk_size=self.chunk_size,
         )
 
     def _log_modified_resource(self, resource, message):
@@ -54,8 +54,10 @@ class AzureBaseAction(BaseAction, metaclass=abc.ABCMeta):
         name = resource.get('name', 'unknown')
         rg = resource.get('resourceGroup', 'unknown')
 
-        self.log.info(template.format(action=self.type, name=name, rg=rg, message=message or ''),
-                      extra=self._get_action_log_metadata(resource))
+        self.log.info(
+            template.format(action=self.type, name=name, rg=rg, message=message or ''),
+            extra=self._get_action_log_metadata(resource),
+        )
 
     def _get_action_log_metadata(self, resource):
         rid = resource.get('id')
@@ -73,25 +75,25 @@ class AzureBaseAction(BaseAction, metaclass=abc.ABCMeta):
                 if "pytest" in sys.modules:
                     raise e
                 if isinstance(e, CloudError):
-                    self.log.error("{0} failed for '{1}'. {2}".format(
-                        self.type, r['name'], e.message),
-                        extra=self._get_action_log_metadata(r))
+                    self.log.error(
+                        "{0} failed for '{1}'. {2}".format(self.type, r['name'], e.message),
+                        extra=self._get_action_log_metadata(r),
+                    )
                 else:
-                    self.log.exception("{0} failed for '{1}'.".format(
-                        self.type, r['name']),
-                        extra=self._get_action_log_metadata(r))
+                    self.log.exception(
+                        "{0} failed for '{1}'.".format(self.type, r['name']),
+                        extra=self._get_action_log_metadata(r),
+                    )
 
     def _prepare_processing(self):
         pass
 
     @abc.abstractmethod
     def _process_resource(self, resource):
-        raise NotImplementedError(
-            "Base action class does not implement this behavior")
+        raise NotImplementedError("Base action class does not implement this behavior")
 
 
 class AzureEventAction(EventAction, AzureBaseAction, metaclass=abc.ABCMeta):
-
     def _process_resources(self, resources, event):
         self._prepare_processing()
 
@@ -104,15 +106,16 @@ class AzureEventAction(EventAction, AzureBaseAction, metaclass=abc.ABCMeta):
                 if "pytest" in sys.modules:
                     raise e
                 if isinstance(e, CloudError):
-                    self.log.error("{0} failed for '{1}'. {2}".format(
-                        self.type, r['name'], e.message),
-                        extra=self._get_action_log_metadata(r))
+                    self.log.error(
+                        "{0} failed for '{1}'. {2}".format(self.type, r['name'], e.message),
+                        extra=self._get_action_log_metadata(r),
+                    )
                 else:
-                    self.log.exception("{0} failed for '{1}'.".format(
-                        self.type, r['name']),
-                        extra=self._get_action_log_metadata(r))
+                    self.log.exception(
+                        "{0} failed for '{1}'.".format(self.type, r['name']),
+                        extra=self._get_action_log_metadata(r),
+                    )
 
     @abc.abstractmethod
     def _process_resource(self, resource, event):
-        raise NotImplementedError(
-            "Base action class does not implement this behavior")
+        raise NotImplementedError("Base action class does not implement this behavior")

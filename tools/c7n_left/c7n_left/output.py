@@ -49,9 +49,7 @@ class RichCli(Output):
         self.matches = 0
 
     def on_execution_started(self, policies, graph):
-        self.console.print(
-            "Running %d policies on %d resources" % (len(policies), len(graph))
-        )
+        self.console.print("Running %d policies on %d resources" % (len(policies), len(graph)))
         self.started = time.time()
 
     def on_execution_ended(self):
@@ -59,8 +57,7 @@ class RichCli(Output):
         if self.matches:
             message = "[red]%d Failures[/red]" % self.matches
         self.console.print(
-            "Evaluation complete %0.2f seconds -> %s"
-            % (time.time() - self.started, message)
+            "Evaluation complete %0.2f seconds -> %s" % (time.time() - self.started, message)
         )
 
     def on_results(self, results):
@@ -148,9 +145,7 @@ class Summary(Output):
                 if k not in set(self.counter_policies_by_type)
             ]
         )
-        compliant = (
-            self.count_total_resources - len(self.resource_name_matches) - unevaluated
-        )
+        compliant = self.count_total_resources - len(self.resource_name_matches) - unevaluated
         msg = "%d compliant of %d total" % (compliant, self.count_total_resources)
         if self.resource_name_matches:
             msg += ", %d resources have %d policy violations" % (
@@ -234,9 +229,7 @@ class SummaryResource(Summary):
 
     def on_execution_started(self, policies, graph):
         super().on_execution_started(policies, graph)
-        self.policies = {
-            p.name: p for p in sorted(map(PolicyMetadata, policies), key=severity_key)
-        }
+        self.policies = {p.name: p for p in sorted(map(PolicyMetadata, policies), key=severity_key)}
 
     def on_results(self, results):
         super().on_results(results)
@@ -356,9 +349,7 @@ class Json(Output):
     def on_execution_ended(self):
         formatted_results = [self.format_result(r) for r in self.results]
         if self.config.output_query:
-            formatted_results = jmespath.search(
-                self.config.output_query, formatted_results
-            )
+            formatted_results = jmespath.search(self.config.output_query, formatted_results)
         self.config.output_file.write(
             json.dumps({"results": formatted_results}, cls=JSONEncoder, indent=2)
         )

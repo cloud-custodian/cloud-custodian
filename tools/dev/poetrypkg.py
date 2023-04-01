@@ -12,6 +12,7 @@ def cli():
     some simple tooling to sync poetry files to setup/pip
     """
 
+
 def project_roots(root):
     for config_path in Path(root).rglob("pyproject.toml"):
         yield config_path.parent
@@ -28,8 +29,7 @@ def gen_qa_requires(root, output):
         packages.append((poetry_data['name'], poetry_data['version']))
 
     with open(output, 'w') as fh:
-        fh.write("\n".join(
-            [f"{name}=={version}" for name, version in packages]))
+        fh.write("\n".join([f"{name}=={version}" for name, version in packages]))
 
 
 @cli.command()

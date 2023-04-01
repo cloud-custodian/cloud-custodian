@@ -16,7 +16,7 @@ setup(
     long_description=read('readme.md'),
     classifiers=[
         "Topic :: System :: Systems Administration",
-        "Topic :: System :: Distributed Computing"
+        "Topic :: System :: Distributed Computing",
     ],
     url="https://github.com/cloud-custodian/cloud-custodian",
     author="Kapil Thangavelu",
@@ -26,7 +26,9 @@ setup(
         'console_scripts': [
             'zero-metrics = zerodark.metrics:cli',
             'zero-ipdb = zerodark.ipdb:cli',
-            'zero-flow = zerodark.floweni:cli']},
+            'zero-flow = zerodark.floweni:cli',
+        ]
+    },
     install_requires=[
         "boto3>=1.4.7",
         "botocore>=1.7.37",
@@ -39,6 +41,6 @@ setup(
         "click",
         "tabulate",
         "influxdb",
-        "ipaddress"
+        "ipaddress",
     ],
 )

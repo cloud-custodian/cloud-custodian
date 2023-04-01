@@ -40,6 +40,7 @@ class MySQL(QueryResourceManager):
 
     class resource_type(ResourceTypeInfo):
         """resource_type"""
+
         id = "InstanceId"
         endpoint = "cdb.tencentcloudapi.com"
         service = "cdb"
@@ -47,10 +48,16 @@ class MySQL(QueryResourceManager):
         enum_spec = ("DescribeDBInstances", "Response.Items[]", {})
         metrics_enabled = True
         metrics_namespace = "QCE/CDB"
-        metrics_dimension_def = [("InstanceId", "InstanceId"), ("InstanceType", "InstanceType")]
+        metrics_dimension_def = [
+            ("InstanceId", "InstanceId"),
+            ("InstanceType", "InstanceType"),
+        ]
         metrics_instance_id_name = "InstanceId"
 
-        paging_def = {"method": PageMethod.Offset, "limit": {"key": "Limit", "value": 20}}
+        paging_def = {
+            "method": PageMethod.Offset,
+            "limit": {"key": "Limit", "value": 20},
+        }
         resource_prefix = "instanceId"
         taggable = True
 
@@ -61,9 +68,9 @@ class MySQL(QueryResourceManager):
     def augment(self, resources):
         for resource in resources:
             field_format = self.resource_type.datetime_fields_format["CreateTime"]
-            resource["CreateTime"] = isoformat_datetime_str(resource["CreateTime"],
-                                                            field_format[0],
-                                                            field_format[1])
+            resource["CreateTime"] = isoformat_datetime_str(
+                resource["CreateTime"], field_format[0], field_format[1]
+            )
         return resources
 
 

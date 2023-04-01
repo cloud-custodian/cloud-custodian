@@ -57,7 +57,9 @@ class DeleteAction(AzureBaseAction):
     schema = type_schema('delete')
     schema_alias = True
 
-    def _prepare_processing(self,):
+    def _prepare_processing(
+        self,
+    ):
         self.client = self.manager.get_client('azure.mgmt.resource.ResourceManagementClient')
 
     def _process_resource(self, resource):
@@ -65,6 +67,6 @@ class DeleteAction(AzureBaseAction):
             self.client.resource_groups.begin_delete(resource['name'])
         else:
             self.client.resources.begin_delete_by_id(
-                resource['id'],
-                self.session.resource_api_version(resource['id']))
+                resource['id'], self.session.resource_api_version(resource['id'])
+            )
         return "deleted"

@@ -30,10 +30,10 @@ class GcpTest(unittest.TestCase):
                 "attributes": {},
                 "messageId": "",
                 "orderingKey": "",
-                "publishTime": "a time"
+                "publishTime": "a time",
             },
             "ackId": "",
-            "deliveryAttempt": ""
+            "deliveryAttempt": "",
         }
         result = []
         for i in range(count):
@@ -47,7 +47,7 @@ class GcpTest(unittest.TestCase):
         self.assertTrue(
             processor.process_message(
                 GCP_MESSAGES["receivedMessages"][0],
-                GCP_MESSAGES['receivedMessages'][0]['message']['publishTime']
+                GCP_MESSAGES['receivedMessages'][0]['message']['publishTime'],
             )
         )
         mock_email.assert_called()
@@ -63,8 +63,8 @@ class GcpTest(unittest.TestCase):
             "pull",
             {
                 "subscription": "projects/c7n-dev/subscriptions/getnotify",
-                "body": {"returnImmediately": True, "max_messages": 1000}
-            }
+                "body": {"returnImmediately": True, "max_messages": 1000},
+            },
         )
 
     def test_ack_message(self):
@@ -77,8 +77,8 @@ class GcpTest(unittest.TestCase):
             "seek",
             {
                 "subscription": "projects/c7n-dev/subscriptions/getnotify",
-                "body": {"time": "2019-05-13T18:31:17.926Z"}
-            }
+                "body": {"time": "2019-05-13T18:31:17.926Z"},
+            },
         )
 
     @patch.object(MailerGcpQueueProcessor, "receive_messages")

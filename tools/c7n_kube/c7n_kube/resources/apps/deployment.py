@@ -7,7 +7,6 @@ from c7n_kube.provider import resources
 
 @resources.register('deployment')
 class Deployment(QueryResourceManager):
-
     class resource_type(TypeInfo):
         group = 'Apps'
         version = 'V1'

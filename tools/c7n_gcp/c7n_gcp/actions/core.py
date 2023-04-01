@@ -94,8 +94,7 @@ class MethodAction(Action):
         component = m.component
         if '.' in component:
             component = component.split('.')[-1]
-        return ("{}.{}.{}".format(
-            m.perm_service or m.service, component, method),)
+        return ("{}.{}.{}".format(m.perm_service or m.service, component, method),)
 
     def get_operation_name(self, model, resource):
         return self.method_spec['op']
@@ -104,5 +103,4 @@ class MethodAction(Action):
         raise NotImplementedError("subclass responsibility")
 
     def get_client(self, session, model):
-        return session.client(
-            model.service, model.version, model.component)
+        return session.client(model.service, model.version, model.component)

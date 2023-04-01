@@ -8,7 +8,6 @@ from c7n.testing import CustodianTestCore
 
 
 class BaseTest(CustodianTestCore):
-
     def addCleanup(self, func, *args, **kw):
         pass
 
@@ -27,13 +26,15 @@ class BaseTest(CustodianTestCore):
 
     def load_policy(self, data, *args, **kw):
         if "config" not in kw:
-            config = Config.empty(**{
-                "region": kw.pop("region", "ap-singapore"),
-                "account_id": kw.pop('account_id', "100000750436"),
-                "output_dir": "null://",
-                "log_group": "null://",
-                "cache": False,
-            })
+            config = Config.empty(
+                **{
+                    "region": kw.pop("region", "ap-singapore"),
+                    "account_id": kw.pop('account_id', "100000750436"),
+                    "output_dir": "null://",
+                    "log_group": "null://",
+                    "cache": False,
+                }
+            )
             kw['config'] = config
         if 'account_id' in kw:
             kw.pop('account_id')

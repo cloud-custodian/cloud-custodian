@@ -62,9 +62,7 @@ class PolicyMetadata:
         categories = self.policy.data.get("metadata", {}).get("category", [])
         if isinstance(categories, str):
             categories = [categories]
-        if not isinstance(categories, list) or (
-            categories and not isinstance(categories[0], str)
-        ):
+        if not isinstance(categories, list) or (categories and not isinstance(categories[0], str)):
             categories = []
         return categories
 
@@ -130,17 +128,13 @@ class ExecutionFilter:
         if filters["severity"]:
             invalid_severities = set(filters["severity"]).difference(SEVERITY_LEVELS)
         if invalid_severities:
-            raise ValueError(
-                "invalid severity for filtering %s" % (", ".join(invalid_severities))
-            )
+            raise ValueError("invalid severity for filtering %s" % (", ".join(invalid_severities)))
 
     def filter_attribute(self, filter_name, attribute, items):
         if not self.filters[filter_name] or not items:
             return items
         results = []
-        op_class = (
-            isinstance(items[0], dict) and operator.itemgetter or operator.attrgetter
-        )
+        op_class = isinstance(items[0], dict) and operator.itemgetter or operator.attrgetter
         op = op_class(attribute)
         for f in self.filters[filter_name]:
             for i in items:

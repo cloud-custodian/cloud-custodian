@@ -35,6 +35,7 @@ class FlowRecord:
     attributes match the field names in the event record. Integers are stored
     as Python int objects; timestamps are stored as Python datetime objects.
     """
+
     __slots__ = [
         'version',
         'account_id',
@@ -51,7 +52,7 @@ class FlowRecord:
         'action',
         'log_status',
         '_start_date',
-        '_end_date'
+        '_end_date',
     ]
 
     def __init__(self, line=None, EPOCH_32_MAX=2147483647, fields=None):
@@ -112,9 +113,7 @@ class FlowRecord:
 
     def __eq__(self, other):
         try:
-            return all(
-                getattr(self, x) == getattr(other, x) for x in self.__slots__[:-2]
-            )
+            return all(getattr(self, x) == getattr(other, x) for x in self.__slots__[:-2])
         except AttributeError:
             return False
 

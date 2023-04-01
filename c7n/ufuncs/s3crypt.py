@@ -31,8 +31,10 @@ def process_key_event(event, context):
     processor = EncryptExtantKeys(config)
     for record in event.get('Records', []):
         bucket = record['s3']['bucket']['name']
-        key = {'Key': unquote_plus(record['s3']['object']['key']),
-               'Size': record['s3']['object']['size']}
+        key = {
+            'Key': unquote_plus(record['s3']['object']['key']),
+            'Size': record['s3']['object']['size'],
+        }
         version = record['s3']['object'].get('versionId')
         if version is not None:
             key['VersionId'] = version
@@ -46,8 +48,7 @@ def process_key_event(event, context):
             result = retry(method, s3, key, bucket)
         except ClientError as e:
             # Ensure we know which key caused an issue
-            print("error %s:%s code:%s" % (
-                bucket, key['Key'], e.response['Error']))
+            print("error %s:%s code:%s" % (bucket, key['Key'], e.response['Error']))
             raise
         if not result:
             return
@@ -63,8 +64,7 @@ def process_event(event, context):
 
 
 def get_function(session_factory, role, buckets=None, account_id=None, tags=None):
-    from c7n.mu import (
-        LambdaFunction, custodian_archive, BucketLambdaNotification)
+    from c7n.mu import LambdaFunction, custodian_archive, BucketLambdaNotification
 
     config = dict(
         name='c7n-s3-encrypt',
@@ -74,14 +74,14 @@ def get_function(session_factory, role, buckets=None, account_id=None, tags=None
         role=role,
         tags=tags or {},
         runtime="python2.7",
-        description='Custodian S3 Key Encrypt')
+        description='Custodian S3 Key Encrypt',
+    )
 
     if buckets:
         config['events'] = [
-            BucketLambdaNotification(
-                {'account_s3': account_id},
-                session_factory, b)
-            for b in buckets]
+            BucketLambdaNotification({'account_s3': account_id}, session_factory, b)
+            for b in buckets
+        ]
 
     archive = custodian_archive()
 

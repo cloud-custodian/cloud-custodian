@@ -5,7 +5,6 @@ from tc_common import BaseTest
 
 
 class TestTCR(BaseTest):
-
     @pytest.mark.vcr
     def test_tcr(self):
         policy = self.load_policy(
@@ -13,10 +12,16 @@ class TestTCR(BaseTest):
                 "name": "tcr-lifecycle-rule",
                 "resource": "tencentcloud.tcr",
                 "query": [{"Registryids": ["tcr-cguc6m2c"]}],
-                "filters": [{"type": "lifecycle-rule",
-                             "state": True,
-                             'match': [{'NamespaceName': 'custodian-test-namespace-2'},
-                                       {'RetentionRuleList[0].Value': 4}]}]
+                "filters": [
+                    {
+                        "type": "lifecycle-rule",
+                        "state": True,
+                        'match': [
+                            {'NamespaceName': 'custodian-test-namespace-2'},
+                            {'RetentionRuleList[0].Value': 4},
+                        ],
+                    }
+                ],
             }
         )
         resources = policy.run()

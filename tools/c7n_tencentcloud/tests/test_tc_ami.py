@@ -5,7 +5,6 @@ from tc_common import BaseTest
 
 
 class TestAmi(BaseTest):
-
     @pytest.mark.vcr
     def test_ami_old_and_not_used(self):
         policy = self.load_policy(
@@ -13,17 +12,15 @@ class TestAmi(BaseTest):
                 "name": "test_ami_old_and_not_used",
                 "resource": "tencentcloud.ami",
                 "filters": [
+                    {"type": "unused", "value": True},
                     {
-                        "type": "unused",
-                        "value": True
-                    }, {
                         "type": "value",
                         "key": "CreatedTime",
                         "value_type": "date",
                         "value": "2022-06-16",
-                        "op": "lt"
-                    }
-                ]
+                        "op": "lt",
+                    },
+                ],
             }
         )
         resources = policy.run()

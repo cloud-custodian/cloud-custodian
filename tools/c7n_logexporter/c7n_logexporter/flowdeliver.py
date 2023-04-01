@@ -31,21 +31,19 @@ def handle(event, context):
         log.warning("Unknown event source %s", json.dumps(event, indent=2))
         return
     bodies = [
-        sns['Sns']['Message'] for sns in event.get('Records')
-        if sns.get('EventSource') == "aws:sns"]
+        sns['Sns']['Message'] for sns in event.get('Records') if sns.get('EventSource') == "aws:sns"
+    ]
 
     for b in bodies:
         records = json.loads(b).get('Records', ())
         log.info("Received %d Firehose Keys" % len(records))
         for r in records:
             i = r['s3']
-            log.warning(
-                "Record Processing %s", json.dumps(i, indent=2))
+            log.warning("Record Processing %s", json.dumps(i, indent=2))
             bucket = i['bucket']['name']
             key = unquote_plus(i['object']['key'])
             size = i['object']['size']
-            log.warning(
-                "Processing Bucket:%s Key:%s Size:%d", bucket, key, size)
+            log.warning("Processing Bucket:%s Key:%s Size:%d", bucket, key, size)
             process_firehose_archive(bucket, key)
             s3.delete_object(Bucket=bucket, Key=key)
 
@@ -55,8 +53,7 @@ def process_firehose_archive(bucket, key):
     data = {}
     with tempfile.NamedTemporaryFile(mode='w+b') as fh:
         s3.download_file(bucket, key, fh.name)
-        log.warning("Downloaded Key Size:%s Key:%s",
-                    sizeof_fmt(os.path.getsize(fh.name)), key)
+        log.warning("Downloaded Key Size:%s Key:%s", sizeof_fmt(os.path.getsize(fh.name)), key)
         fh.seek(0, 0)
         record_count = 0
         iteration_count = 0
@@ -66,10 +63,7 @@ def process_firehose_archive(bucket, key):
             key = '%s/%s/%s' % (r['owner'], r['logGroup'], r['logStream'])
             data.setdefault(key, []).extend(r['logEvents'])
             if record_count > EVENTS_SIZE_BUFFER:
-                log.warning(
-                    "Incremental Data Load records:%d enis:%d",
-                    record_count,
-                    len(data))
+                log.warning("Incremental Data Load records:%d enis:%d", record_count, len(data))
                 for k in data:
                     process_record_set(k, data[k])
                 data.clear()
@@ -84,8 +78,7 @@ def process_firehose_archive(bucket, key):
 
 def process_record_set(k, records):
     owner, group, stream = k.split('/')
-    records_begin = datetime.fromtimestamp(
-        records[0]['timestamp'] / 1000)
+    records_begin = datetime.fromtimestamp(records[0]['timestamp'] / 1000)
 
     records_key = str(uuid.uuid4())
     out_key = "%s/%s/%s/%s/%s/%s/%s.gz" % (
@@ -95,20 +88,19 @@ def process_record_set(k, records):
         records_begin.strftime('%Y/%m/%d'),
         '00000000-0000-0000-0000-000000000000',
         stream,
-        records_key)
+        records_key,
+    )
 
     with tempfile.NamedTemporaryFile() as out_fh:
-        with gzip.GzipFile(
-                records_key, mode='wb',
-                fileobj=open(out_fh.name, 'wb')) as records_fh:
+        with gzip.GzipFile(records_key, mode='wb', fileobj=open(out_fh.name, 'wb')) as records_fh:
             timestamp = None
             record_counter = 0
             buf = []
             for r in records:
                 record_counter += 1
-                timestamp = datetime.fromtimestamp(
-                    r['timestamp'] / 1000).strftime(
-                        '%Y-%m-%dT%H:%M:%S.%fZ')
+                timestamp = datetime.fromtimestamp(r['timestamp'] / 1000).strftime(
+                    '%Y-%m-%dT%H:%M:%S.%fZ'
+                )
                 buf.append('%s %s\n' % (timestamp, r['message']))
                 if record_counter % 100 == 0:
                     records_fh.write("".join(buf).encode('utf8'))
@@ -121,7 +113,8 @@ def process_record_set(k, records):
                 Key=out_key,
                 ACL='bucket-owner-full-control',
                 ServerSideEncryption='AES256',
-                Body=out_fh.read())
+                Body=out_fh.read(),
+            )
 
 
 def records_iter(fh, buffer_size=1024 * 1024 * 16):
@@ -148,9 +141,9 @@ def records_iter(fh, buffer_size=1024 * 1024 * 16):
                 buf = chunk
                 chunk = None
                 continue
-            record = chunk[:idx + 1]
+            record = chunk[: idx + 1]
             yield json.loads(record)
-            chunk = chunk[idx + 1:]
+            chunk = chunk[idx + 1 :]
 
 
 def sizeof_fmt(num, suffix='B'):

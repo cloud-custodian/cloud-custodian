@@ -15,7 +15,8 @@ def assert_instance_states(policy, instance, states):
     manager = policy.resource_manager
     client = manager.get_client()
     result = client.execute_query(
-        "DescribeInstances", {'InstanceIds': instance[manager.resource_type.id]})
+        "DescribeInstances", {'InstanceIds': instance[manager.resource_type.id]}
+    )
     if states is STATE_MISSING:
         assert not result['Response']['InstanceSet']
         return
@@ -24,7 +25,6 @@ def assert_instance_states(policy, instance, states):
 
 
 class TestCvmAction(BaseTest):
-
     @pytest.mark.vcr
     def test_cvm_stop(self):
         policy = self.load_policy(
@@ -32,15 +32,9 @@ class TestCvmAction(BaseTest):
                 "name": "cvm-stop-test",
                 "resource": "tencentcloud.cvm",
                 "comment": "stop cvm",
-                "query": [{
-                    "InstanceIds": ["ins-00lycyy6"]
-                }],
+                "query": [{"InstanceIds": ["ins-00lycyy6"]}],
                 "filters": [{"InstanceState": "RUNNING"}],
-                "actions": [
-                    {
-                        "type": "stop"
-                    }
-                ]
+                "actions": [{"type": "stop"}],
             },
         )
         resources = policy.run()
@@ -56,15 +50,9 @@ class TestCvmAction(BaseTest):
                 "name": "cvm-start-test",
                 "resource": "tencentcloud.cvm",
                 "comment": "start cvm",
-                "query": [{
-                    "InstanceIds": ["ins-00lycyy6"]
-                }],
+                "query": [{"InstanceIds": ["ins-00lycyy6"]}],
                 "filters": [{"InstanceState": "STOPPED"}],
-                "actions": [
-                    {
-                        "type": "start"
-                    }
-                ]
+                "actions": [{"type": "start"}],
             },
         )
         resources = policy.run()
@@ -80,14 +68,8 @@ class TestCvmAction(BaseTest):
                 "name": "cvm-terminate-test",
                 "resource": "tencentcloud.cvm",
                 "comment": "terminate cvm",
-                "query": [{
-                    "InstanceIds": ["ins-8ktxnl0g"]
-                }],
-                "actions": [
-                    {
-                        "type": "terminate"
-                    }
-                ]
+                "query": [{"InstanceIds": ["ins-8ktxnl0g"]}],
+                "actions": [{"type": "terminate"}],
             },
         )
         resources = policy.run()
@@ -100,10 +82,14 @@ class TestCvmAction(BaseTest):
     def test_cvm_exec_exception(self, monkeypatch):
         def get_params(*args):
             return {"InstanceIds": "hello"}
-        policy = self.load_policy({
-            "name": "cvm-err-test",
-            "resource": "tencentcloud.cvm",
-            "actions": ["stop"]})
+
+        policy = self.load_policy(
+            {
+                "name": "cvm-err-test",
+                "resource": "tencentcloud.cvm",
+                "actions": ["stop"],
+            }
+        )
 
         stop = policy.resource_manager.actions[0]
         monkeypatch.setattr(stop, "get_request_params", get_params)

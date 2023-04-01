@@ -12,7 +12,6 @@ load_resources()
 
 
 class SchemaDirectiveTest(unittest.TestCase):
-
     CustodianDirective.vocabulary = resource_vocabulary()
 
     def test_schema_resolver(self):

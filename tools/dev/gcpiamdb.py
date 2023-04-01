@@ -8,10 +8,8 @@ from bs4 import BeautifulSoup
 
 @click.command()
 def main():
-    """GCP IAM DataSet
-    """
-    response = requests.get(
-        'https://cloud.google.com/iam/docs/custom-roles-permissions-support')
+    """GCP IAM DataSet"""
+    response = requests.get('https://cloud.google.com/iam/docs/custom-roles-permissions-support')
     soup = BeautifulSoup(response.text, 'html.parser')
     perms = []
     for idx, row in enumerate(soup.select_one('#table-div-id').select('tr')):

@@ -47,8 +47,7 @@ def info(account_id, resource_id):
     request_data = request.query
     if resource_id.startswith('sg-') and 'parent_id' not in request_data:
         abort(400, "Missing required parameter parent_id")
-    result = controller.info(
-        account_id, resource_id, request_data.get('parent_id', resource_id))
+    result = controller.info(account_id, resource_id, request_data.get('parent_id', resource_id))
     response.content_type = "application/json"
     return json.dumps(result, indent=2, cls=Encoder)
 
@@ -61,8 +60,7 @@ def delta(account_id):
     for rp in ('region',):
         if not request_data or rp not in request_data:
             abort(400, "Missing required parameter %s" % rp)
-    result = controller.get_account_delta(
-        account_id, request_data['region'], api_url())
+    result = controller.get_account_delta(account_id, request_data['region'], api_url())
     response.content_type = "application/json"
     return json.dumps(result, indent=2, cls=Encoder)
 
@@ -95,10 +93,13 @@ def api_url():
 @app.error(500)
 def error(e):
     response.content_type = "application/json"
-    return json.dumps({
-        "status": e.status,
-        "url": repr(request.url),
-        "exception": repr(e.exception),
-        #  "traceback": e.traceback and e.traceback.split('\n') or '',
-        "body": repr(e.body)
-    }, indent=2)
+    return json.dumps(
+        {
+            "status": e.status,
+            "url": repr(request.url),
+            "exception": repr(e.exception),
+            #  "traceback": e.traceback and e.traceback.split('\n') or '',
+            "body": repr(e.body),
+        },
+        indent=2,
+    )

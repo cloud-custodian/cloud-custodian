@@ -4,13 +4,12 @@ from common_openstack import OpenStackTest
 
 
 class ServerTest(OpenStackTest):
-
     def test_server_query(self):
         factory = self.replay_flight_data()
-        p = self.load_policy({
-            'name': 'all-servers',
-            'resource': 'openstack.server'},
-            session_factory=factory)
+        p = self.load_policy(
+            {'name': 'all-servers', 'resource': 'openstack.server'},
+            session_factory=factory,
+        )
         resources = p.run()
         self.assertEqual(len(resources), 2)
 
