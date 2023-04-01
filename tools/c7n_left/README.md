@@ -198,3 +198,65 @@ policies:
        attrs:
          - Ipv4: 0.0.0.0/0
 ```
+
+
+## Policy Testing
+
+c7n-left supports writing and running tests for policies.
+
+To create a test for a policy, create a tests directory next to your policy files.
+
+Within that tests directory, create a sub directory with the policy name.
+
+Next add terraform files to this sub directory. Typically you would add 
+both terraform files that would match the policy and those that should not.
+
+Finally you add assertions in a `left.plan[.yaml|.json]` file. The
+format of the file is an array of dictionaries. The dictionaries are
+used to match against the policy findings. The data its matching
+against is what is found by using `c7n-left run --output json`. Each
+key/value pair in the dictionary is matched against the finding.
+
+So putting it all together, we've setup our tests as follows
+
+```shell
+❯ tree policy-dir-a/
+policy-dir-a/
+├── alb.yaml
+└── tests
+    └── alb-deletion-protection-disabled
+        ├── left.plan.yaml
+        ├── negative1.tf
+        └── positive1.tf
+
+3 directories, 4 files
+
+❯ cat policy-dir-a/alb.yaml 
+policies:
+  - name: alb-deletion-protection-disabled
+    resource: [terraform.aws_lb, terraform.aws_alb]
+    description: |
+      Application Load Balancer should have deletion protection enabled
+    metadata:
+      severity: low
+      category: "Insecure Configurations"
+    filters:
+      - enable_deletion_protection: empty
+
+❯ cat policy-dir-a/tests/alb-deletion-protection-disabled/left.plan.yaml 
+- "resource.__tfmeta.filename": "positive1.tf"
+
+```
+
+and now we can run a test
+
+```shell
+❯ c7n-left test -p policy-dir-a/
+Discovered 1 Tests
+Failure alb-deletion-protection-disabled [{'resource.__tfmeta.filename': 
+'positive1.tf'}] checks not used
+
+1 Test Complete (0.05s) 1 Failure
+```
+
+A test fails if either an assertion in the plan file does not match one policy finding, or if a policy finding is not matched by an assertion.
