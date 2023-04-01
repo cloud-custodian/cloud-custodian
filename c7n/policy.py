@@ -1045,8 +1045,6 @@ class PolicyConditions:
 
     def __init__(self, policy, data):
         self.policy = policy
-        self.data = data
-        self.filters = self.data.get('conditions', [])
         # for value_from usage / we use the conditions class
         # to mimic a resource manager interface. we can't use
         # the actual resource manager as we're overriding block
@@ -1058,6 +1056,11 @@ class PolicyConditions:
         self.session_factory = rm.session_factory
         # used by c7n-org to extend evaluation conditions
         self.env_vars = {}
+        self.update(data)
+
+    def update(self, data):
+        self.data = data
+        self.filters = self.data.get('conditions', [])
         self.initialized = False
 
     def validate(self):
@@ -1271,9 +1274,7 @@ class Policy:
         self.data = updated
 
         # NOTE update the policy conditions base on the new self.data
-        self.conditions.data = self.data
-        self.conditions.filters = self.conditions.data.get('conditions', [])
-        self.conditions.initialized = False
+        self.conditions.update(data)
 
         # Reload filters/actions using updated data, we keep a reference
         # for some compatiblity preservation work.
