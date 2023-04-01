@@ -1274,7 +1274,7 @@ class Policy:
         self.data = updated
 
         # NOTE update the policy conditions base on the new self.data
-        self.conditions.update(data)
+        self.conditions.update(self.data)
 
         # Reload filters/actions using updated data, we keep a reference
         # for some compatiblity preservation work.
