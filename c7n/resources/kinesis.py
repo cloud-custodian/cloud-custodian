@@ -423,7 +423,10 @@ class TagVideoStream(Tag):
     
     def process_resource_set(self, client, resource_set, tag_keys):
         for r in resource_set:
-            client.tag_resource(ResourceARN=r['StreamARN'], Tags=tag_keys)
+            try:
+                client.tag_resource(ResourceARN=r['StreamARN'], Tags=tag_keys)
+            except client.exceptions.ResourceNotFoundException:
+                continue
             
             
 @KinesisVideoStream.action_registry.register('remove-tag')
@@ -448,4 +451,7 @@ class VideoStreamRemoveTag(RemoveTag):
     
     def process_resource_set(self, client, resource_set, tag_keys):
         for r in resource_set:
-            client.untag_resource(ResourceARN=r['StreamARN'], TagKeyList=tag_keys)
+            try:
+                client.untag_resource(ResourceARN=r['StreamARN'], TagKeyList=tag_keys)
+            except client.exceptions.ResourceNotFoundException:
+                continue
