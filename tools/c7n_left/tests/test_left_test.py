@@ -32,7 +32,7 @@ def test_test_reporter_discovery(capsys):
 
     reporter.on_tests_discovered(runner, [1])
     captured = capsys.readouterr()
-    assert 'Discovered 1 Tests' in captured.out
+    assert "Discovered 1 Tests" in captured.out
 
 
 def test_test_reporter_result():
@@ -111,7 +111,7 @@ def test_cli_test_assertion_not_used(tmp_path):
     (test_case_dir / "left.plan.yaml").write_text(
         """
         - "resource.__tfmeta.path": "google_pubsub_topic.example"
-        - "resource.__tfmeta.path": "google_pubsub_topic.example2"        
+        - "resource.__tfmeta.path": "google_pubsub_topic.example2"
         """
     )
 
