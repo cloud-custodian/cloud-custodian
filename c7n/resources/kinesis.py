@@ -12,6 +12,7 @@ from c7n.filters.vpc import SubnetFilter
 from c7n.utils import local_session, type_schema, get_retry
 from c7n.tags import (
     TagDelayedAction, RemoveTag, TagActionFilter, Tag)
+from botocore.exceptions import ClientError
 
 
 
@@ -425,8 +426,12 @@ class TagVideoStream(Tag):
         for r in resource_set:
             try:
                 client.tag_resource(ResourceARN=r['StreamARN'], Tags=tag_keys)
-            except client.exceptions.ResourceNotFoundException:
-                continue
+            except ClientError as e:
+                if e.response['Error']['Code'] == 'ResourceNotFoundException':
+                    self.log.warning
+                    (f"Caught exception when tagging Kinesis Video Stream {r['StreamARN']}: {e}")
+                    continue
+                raise
             
             
 @KinesisVideoStream.action_registry.register('remove-tag')
@@ -453,5 +458,9 @@ class VideoStreamRemoveTag(RemoveTag):
         for r in resource_set:
             try:
                 client.untag_resource(ResourceARN=r['StreamARN'], TagKeyList=tag_keys)
-            except client.exceptions.ResourceNotFoundException:
-                continue
+            except ClientError as e:
+                if e.response['Error']['Code'] == 'ResourceNotFoundException':
+                    self.log.warning
+                    (f"Caught exception when tagging Kinesis Video Stream {r['StreamARN']}: {e}")
+                    continue
+                raise

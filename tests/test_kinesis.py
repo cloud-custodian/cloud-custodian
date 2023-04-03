@@ -1,6 +1,9 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 from .common import BaseTest, event_data
+from botocore.exceptions import ClientError
+import mock
+
 
 
 def test_stream_config_source(test):
@@ -297,6 +300,45 @@ class Kinesis(BaseTest):
         tags = client.list_tags_for_resource(ResourceARN=resources[0]["StreamARN"])["Tags"]
         self.assertEqual(len(tags), 1)
         self.assertEqual(tags, {'foo': 'bar'})
+        
+    def test_kinesis_video_untag_error(self):
+        client = mock.MagicMock()
+        error_response = {
+            "Error": {
+                "Message": "The resource with the specified identifier does not exist.",
+                "Code": "ResourceNotFoundException"
+            }
+        }
+        client.tag_resource.side_effect = ClientError(
+            error_response, 'TagResource')
+        
+        p = self.load_policy(
+            {
+                'name': 'test-kinesis-video-tag',
+                'resource': 'kinesis-video',
+                'filters': [
+                    {
+                        'tag:foo': 'absent', 
+                    }
+                ],
+                'actions': [
+                    {
+                        'type': 'tag',
+                        'tags': {'foo': 'bar'}
+                    }
+                ]
+            }
+        )
+
+        tagger = p.resource_manager.actions[0]
+        resource_set = [
+            {'StreamARN': 'arn:aws:kinesisvideo:us-west-2:123456789012:stream/test'}]
+
+        tagger.process_resource_set(client, resource_set, [{'Key': 'bar', 'Value': 'foo'}])
+        
+        client.tag_resource.assert_called_once()
+        
+
 
     def test_kinesis_video_remove_tag(self):
         session_factory = self.replay_flight_data('test_kinesis_video_remove_tag')
@@ -322,6 +364,43 @@ class Kinesis(BaseTest):
         client = session_factory().client('kinesisvideo')
         tags = client.list_tags_for_resource(ResourceARN=resources[0]['StreamARN'])['Tags']
         self.assertEqual(len(tags), 0)
+        
+    def test_kinesis_video_tag_error(self):
+        client = mock.MagicMock()
+        error_response = {
+            "Error": {
+                "Message": "The resource with the specified identifier does not exist.",
+                "Code": "ResourceNotFoundException"
+            }
+        }
+        client.tag_resource.side_effect = ClientError(
+            error_response, 'UntagResource')
+        
+        p = self.load_policy(
+            {
+                'name': 'test-kinesis-video-remove-tag',
+                'resource': 'kinesis-video',
+                'filters': [
+                    {
+                        'tag:foo': 'present', 
+                    }
+                ],
+                'actions': [
+                    {
+                        'type': 'remove-tag',
+                        'tags': ['foo']
+                    }
+                ]
+            }
+        )
+
+        tagger = p.resource_manager.actions[0]
+        resource_set = [
+            {'StreamARN': 'arn:aws:kinesisvideo:us-west-2:123456789012:stream/test'}]
+
+        tagger.process_resource_set(client, resource_set, [{'Key': 'bar', 'Value': 'foo'}])
+        
+        client.untag_resource.assert_called_once()
 
 
 class KinesisAnalyticsAppV2(BaseTest):
