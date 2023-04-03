@@ -24,6 +24,7 @@ ResourceMap = {
     "gcp.folder": "c7n_gcp.resources.resourcemanager.Folder",
     "gcp.function": "c7n_gcp.resources.function.Function",
     "gcp.secret": "c7n_gcp.resources.secret.Secret",
+    "gcp.gce-project": "c7n_gcp.resources.compute.Project",
     "gcp.gke-cluster": "c7n_gcp.resources.gke.KubernetesCluster",
     "gcp.gke-nodepool": "c7n_gcp.resources.gke.KubernetesClusterNodePool",
     "gcp.iam-role": "c7n_gcp.resources.iam.Role",
@@ -75,6 +76,7 @@ ResourceMap = {
     "gcp.pubsub-snapshot": "c7n_gcp.resources.pubsub.PubSubSnapshot",
     "gcp.pubsub-subscription": "c7n_gcp.resources.pubsub.PubSubSubscription",
     "gcp.pubsub-topic": "c7n_gcp.resources.pubsub.PubSubTopic",
+    "gcp.region": "c7n_gcp.resources.compute.GCPRegions",
     "gcp.route": "c7n_gcp.resources.network.Route",
     "gcp.router": "c7n_gcp.resources.network.Router",
     "gcp.service": "c7n_gcp.resources.service.Service",
@@ -89,5 +91,6 @@ ResourceMap = {
     "gcp.sql-ssl-cert": "c7n_gcp.resources.sql.SqlSslCert",
     "gcp.sql-user": "c7n_gcp.resources.sql.SqlUser",
     "gcp.subnet": "c7n_gcp.resources.network.Subnet",
-    "gcp.vpc": "c7n_gcp.resources.network.Network"
+    "gcp.vpc": "c7n_gcp.resources.network.Network",
+    "gcp.zone": "c7n_gcp.resources.compute.GCPZones"
 }

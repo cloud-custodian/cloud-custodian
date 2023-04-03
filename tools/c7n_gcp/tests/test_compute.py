@@ -537,3 +537,51 @@ class AutoscalerTest(BaseTest):
         self.assertEqual(result_policy['loadBalancingUtilization']['utilizationTarget'], 0.7)
         self.assertEqual(result_policy['minNumReplicas'], 1)
         self.assertEqual(result_policy['maxNumReplicas'], 4)
+
+
+class ProjectTest(BaseTest):
+
+    def test_projects(self):
+        project_id = 'gcp-lab-custodian'
+        session_factory = self.replay_flight_data('project-query', project_id=project_id)
+
+        policy = self.load_policy(
+            {'name': 'gcp-projects',
+             'resource': 'gcp.gce-project'},
+            session_factory=session_factory)
+        resources = policy.run()
+
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['name'], 'gcp-lab-custodian')
+
+
+class RegionsTest(BaseTest):
+
+    def test_regions(self):
+        project_id = 'gcp-lab-custodian'
+        session_factory = self.replay_flight_data('regions-query', project_id=project_id)
+
+        policy = self.load_policy(
+            {'name': 'gcp-regions',
+             'resource': 'gcp.region'},
+            session_factory=session_factory)
+        resources = policy.run()
+
+        self.assertEqual(len(resources), 37)
+        self.assertEqual(resources[0]['name'], 'asia-east1')
+
+
+class ZonesTest(BaseTest):
+
+    def test_zones(self):
+        project_id = 'gcp-lab-custodian'
+        session_factory = self.replay_flight_data('zones-query', project_id=project_id)
+
+        policy = self.load_policy(
+            {'name': 'gcp-zones',
+             'resource': 'gcp.zone'},
+            session_factory=session_factory)
+        resources = policy.run()
+
+        self.assertEqual(len(resources), 112)
+        self.assertEqual(resources[0]['name'], 'us-east1-b')

@@ -599,3 +599,51 @@ class AutoscalerSet(MethodAction):
                   }}
 
         return result
+
+
+@resources.register('gce-project')
+class Project(QueryResourceManager):
+    """GCP resource: https://cloud.google.com/compute/docs/reference/rest/v1/projects"""
+    class resource_type(TypeInfo):
+        service = 'compute'
+        version = 'v1'
+        component = 'projects'
+        enum_spec = ('get', '[@]', None)
+        name = id = 'name'
+        default_report_fields = ["name"]
+        asset_type = 'compute.googleapis.com/Project'
+
+        @staticmethod
+        def get(client, resource_info):
+            return client.execute_command(
+                'get', {'project': resource_info['project_id']})
+
+
+@resources.register('zone')
+class GCPZones(QueryResourceManager):
+    """GCP resource: https://cloud.google.com/compute/docs/reference/rest/v1/zones"""
+    class resource_type(TypeInfo):
+        service = 'compute'
+        version = 'v1'
+        component = 'zones'
+        enum_spec = ('list', 'items[]', None)
+        scope = 'project'
+        name = id = 'name'
+        default_report_fields = ['id', 'name', 'dnsName', 'creationTime', 'visibility']
+        asset_type = "compute.googleapis.com/compute"
+        scc_type = "google.cloud.dns.ManagedZone"
+
+
+@resources.register('region')
+class GCPRegions(QueryResourceManager):
+    """GCP resource: https://cloud.google.com/compute/docs/reference/rest/v1/regions"""
+    class resource_type(TypeInfo):
+        service = 'compute'
+        version = 'v1'
+        component = 'regions'
+        enum_spec = ('list', 'items[]', None)
+        scope = 'project'
+        name = id = 'name'
+        default_report_fields = ['id', 'name', 'dnsName', 'creationTime', 'visibility']
+        asset_type = "compute.googleapis.com/compute"
+        scc_type = "google.cloud.dns.ManagedZone"
