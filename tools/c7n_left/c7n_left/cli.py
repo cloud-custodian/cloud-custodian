@@ -13,7 +13,7 @@ from .entry import initialize_iac
 from .output import get_reporter, report_outputs, summary_options
 from .test import TestReporter, TestRunner
 from .utils import load_policies
-
+from .trace import ConsoleTracer  # noqa
 
 log = logging.getLogger("c7n.iac")
 
@@ -71,22 +71,30 @@ def run(
 @click.option(
     "--filters", help="filter policies or resources as k=v pairs with globbing"
 )
-def test(policy_dir, filters):
+@click.option("--debug", help="Debug output for policy execution", is_flag=True)
+def test(policy_dir, filters, debug):
     """Run policy tests."""
     policy_dir = Path(policy_dir)
     source_dir = policy_dir / "tests"
 
-    config = Config.empty(
+    params = dict(
         source_dir=source_dir,
         policy_dir=policy_dir,
         output_file=sys.stdout,
         filters=filters,
     )
+    config = Config.empty(**params)
+
+    if debug:
+        logging.getLogger().setLevel(logging.INFO)
+        config["verbose"] = 1
+        config["tracer"] = "console"
 
     reporter = TestReporter(None, config)
     exec_filter = ExecutionFilter.parse(config)
     config["exec_filter"] = exec_filter
-    policies = exec_filter.filter_policies(load_policies(policy_dir, config))
+    policies = load_policies(policy_dir, config)
+    policies = exec_filter.filter_policies(policies)
     runner = TestRunner(policies, config, reporter)
     sys.exit(int(runner.run()))
 
