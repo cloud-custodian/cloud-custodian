@@ -12,7 +12,6 @@ from c7n.filters.vpc import SubnetFilter
 from c7n.utils import local_session, type_schema, get_retry
 from c7n.tags import (
     TagDelayedAction, RemoveTag, TagActionFilter, Tag)
-from botocore.exceptions import ClientError
 
 
 
@@ -424,14 +423,14 @@ class TagVideoStream(Tag):
     
     def process_resource_set(self, client, resource_set, tag_keys):
         for r in resource_set:
-            try:
-                client.tag_resource(ResourceARN=r['StreamARN'], Tags=tag_keys)
-            except ClientError as e:
-                if e.response['Error']['Code'] == 'ResourceNotFoundException':
-                    self.log.warning
-                    (f"Caught exception when tagging Kinesis Video Stream {r['StreamARN']}: {e}")
-                    continue
-                raise
+            self.tag_resource(client, r, tag_keys)
+            
+    def tag_resource(self, client, resource, tag_keys):
+        try:
+            client.tag_resource(ResourceARN=resource['StreamARN'], Tags=tag_keys)
+        except client.exceptions.ResourceNotFoundException:
+            pass
+            
             
             
 @KinesisVideoStream.action_registry.register('remove-tag')
@@ -456,11 +455,10 @@ class VideoStreamRemoveTag(RemoveTag):
     
     def process_resource_set(self, client, resource_set, tag_keys):
         for r in resource_set:
-            try:
-                client.untag_resource(ResourceARN=r['StreamARN'], TagKeyList=tag_keys)
-            except ClientError as e:
-                if e.response['Error']['Code'] == 'ResourceNotFoundException':
-                    self.log.warning
-                    (f"Caught exception when tagging Kinesis Video Stream {r['StreamARN']}: {e}")
-                    continue
-                raise
+            self.untag_resource(client, r, tag_keys)
+
+    def untag_resource(self, client, resource, tag_keys):
+        try:
+            client.untag_resource(ResourceARN=resource['StreamARN'], TagKeyList=tag_keys)
+        except client.exceptions.ResourceNotFoundException:
+            pass
