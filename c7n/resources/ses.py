@@ -22,7 +22,6 @@ class SESConfigurationSet(QueryResourceManager):
     class resource_type(TypeInfo):
         service = 'ses'
         enum_spec = ('list_configuration_sets', 'ConfigurationSets', None)
-        cfn_type = config_type = 'AWS::SES::ConfigurationSet'
         name = id = 'Name'
         arn_type = 'configuration-set'
         universal_taggable = object()
