@@ -26,16 +26,13 @@ except ImportError:
 data_dir = Path(os.curdir).absolute() / "data"
 
 
-def test_test_reporter_discovery():
+def test_test_reporter_discovery(capsys):
     reporter = left_test.TestReporter(None, Bag(output_file=sys.stdout))
-
     runner = Bag(unmatched_policies=[1], policies=[2, 3], unmatched_tests=[1])
 
-    console = MagicMock()
-    reporter.console = console
     reporter.on_tests_discovered(runner, [1])
-
-    console.print.assert_called_once()
+    captured = capsys.readouterr()
+    assert "Discovered 1 Tests" in captured.out
 
 
 def test_test_reporter_result():
@@ -114,7 +111,7 @@ def test_cli_test_assertion_not_used(tmp_path):
     (test_case_dir / "left.plan.yaml").write_text(
         """
         - "resource.__tfmeta.path": "google_pubsub_topic.example"
-        - "resource.__tfmeta.path": "google_pubsub_topic.example2"        
+        - "resource.__tfmeta.path": "google_pubsub_topic.example2"
         """
     )
 
