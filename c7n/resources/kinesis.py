@@ -426,6 +426,8 @@ class TagVideoStream(Tag):
             try:
                 client.tag_resource(ResourceARN=r['StreamARN'], Tags=tag_keys)
             except client.exceptions.ResourceNotFoundException:
+                print('hit')
+                self.logger.info("Resource not found: %s" % r['StreamARN'])
                 continue
             
 @KinesisVideoStream.action_registry.register('remove-tag')
@@ -453,4 +455,5 @@ class VideoStreamRemoveTag(RemoveTag):
             try:
                 client.untag_resource(ResourceARN=r['StreamARN'], TagKeyList=tag_keys)
             except client.exceptions.ResourceNotFoundException:
+                self.logger.info("Resource not found: %s" % r['StreamARN'])
                 continue

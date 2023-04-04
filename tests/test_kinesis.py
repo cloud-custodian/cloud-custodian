@@ -1,6 +1,9 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 from .common import BaseTest, event_data
+import logging
+import mock
+from c7n.resources import kinesis
 
 
 
@@ -297,7 +300,31 @@ class Kinesis(BaseTest):
         client = session_factory().client('kinesisvideo')
         tags = client.list_tags_for_resource(ResourceARN=resources[0]["StreamARN"])["Tags"]
         self.assertEqual(len(tags), 1)
-        self.assertEqual(tags, {'foo': 'bar'})        
+        self.assertEqual(tags, {'foo': 'bar'})    
+
+    def test_kinesis_video_tag_error(self):
+        session_factory = self.record_flight_data('test_kinesis_video_tag_error')
+        p = self.load_policy(
+            {
+                'name': 'test-kinesis-video-tag',
+                'resource': 'kinesis-video',
+                'filters': [
+                    {
+                        'tag:foo': 'absent', 
+                    }
+                ],
+                'actions': [
+                    {
+                        'type': 'delete',
+                        'type': 'tag',
+                        'tags': {'foo': 'bar'}
+                    }
+                ]
+            }, session_factory=session_factory
+        )
+        resources = p.run()
+        log_output = self.capture_logging('custodian.actions')
+        self.assertIn("Resource not found:", log_output.getvalue())
 
 
     def test_kinesis_video_remove_tag(self):
