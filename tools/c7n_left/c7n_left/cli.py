@@ -68,22 +68,25 @@ def run(
 
 @cli.command()
 @click.option("-p", "--policy-dir", type=click.Path(), required=True)
-def test(policy_dir):
+@click.option(
+    "--filters", help="filter policies or resources as k=v pairs with globbing"
+)
+def test(policy_dir, filters):
     """Run policy tests."""
     policy_dir = Path(policy_dir)
     source_dir = policy_dir / "tests"
+
     config = Config.empty(
         source_dir=source_dir,
         policy_dir=policy_dir,
         output_file=sys.stdout,
-        # output=output,
-        # output_file=output_file,
-        # output_query=output_query,
-        # summary=summary,
-        # filters=filters,
+        filters=filters,
     )
+
     reporter = TestReporter(None, config)
-    policies = load_policies(policy_dir, config)
+    exec_filter = ExecutionFilter.parse(config)
+    config["exec_filter"] = exec_filter
+    policies = exec_filter.filter_policies(load_policies(policy_dir, config))
     runner = TestRunner(policies, config, reporter)
     sys.exit(int(runner.run()))
 
