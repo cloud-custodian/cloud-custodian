@@ -4,7 +4,7 @@
         "PaginationToken": "",
         "ResourceTagMappingList": [
             {
-                "ResourceARN": "arn:aws:kinesisvideo:us-east-1:644160558196:stream/test/1680202478363",
+                "ResourceARN": "arn:aws:kinesisvideo:us-east-1:644160558196:stream/test/1680634460327",
                 "Tags": [
                     {
                         "Key": "foo",
