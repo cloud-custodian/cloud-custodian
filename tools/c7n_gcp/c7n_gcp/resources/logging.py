@@ -64,7 +64,7 @@ class LogProjectSinkBucketFilter(ValueFilter):
     """
 
     schema = type_schema('bucket', rinherit=ValueFilter.schema)
-
+    permissions = ('storage.buckets.get',)
     cache_key = 'c7n:bucket'
 
     def __call__(self, sink):
