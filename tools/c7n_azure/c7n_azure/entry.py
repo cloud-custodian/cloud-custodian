@@ -4,7 +4,6 @@
 # register provider
 from c7n_azure.provider import Azure  # NOQA
 
-import c7n_azure.resources.aro
 
 def initialize_azure():
     # import execution modes
