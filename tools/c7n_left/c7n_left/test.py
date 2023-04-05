@@ -76,7 +76,7 @@ class TestRunner:
 
     def load_plan(self, test_dir, plan_path):
         try:
-            plan_data = load_file(plan_path)
+            plan_data = [] if self.options.update_plan == 'replace' else load_file(plan_path)
             plan = TestPlan(plan_data)
             plan.path = plan_path
             return Test(plan, test_dir)
@@ -210,7 +210,7 @@ class TestReporter(RichCli):
                 unmatched = dict(unmatched)
                 unmatched.pop("policy")
                 self.console.print(unmatched)
-        if self.config.get("update_plan"):
+        if self.config.get("update_plan", "no") != "no":
             # Preserve any plan entries that were matched this run
             new_plan = [
                 {k: v for f in m.data["filters"] for k, v in f.items()}

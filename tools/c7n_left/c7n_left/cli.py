@@ -72,9 +72,10 @@ def run(
     "--filters", help="filter policies or resources as k=v pairs with globbing"
 )
 @click.option(
-    "--update-plan/--no-update-plan",
-    help="update test plans based on current findings",
-    default=False,
+    "--update-plan",
+    help="use current findings to update or replace test plans (default: no)",
+    type=click.Choice(["no", "yes", "replace"]),
+    default="no",
 )
 def test(policy_dir, filters, update_plan):
     """Run policy tests."""
