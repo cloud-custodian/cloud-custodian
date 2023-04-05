@@ -11,7 +11,7 @@ class AROService(ArmResourceManager):
 
     :example:
 
-    Returns all aro clusters that did not provision successfully
+    Delete all aro clusters that did not provision successfully
 
     .. code-block:: yaml
 
@@ -24,6 +24,8 @@ class AROService(ArmResourceManager):
                 op: not-equal
                 value_type: normalize
                 value: succeeded
+            actions:
+              - type: delete
 
     """
 

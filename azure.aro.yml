@@ -1,0 +1,11 @@
+policies:
+  - name: broken-aro
+    resource: azure.aro
+    filters:
+      - type: value
+        key: name
+        op: equal
+        value_type: normalize
+        value: environment-64ozd
+    actions:
+      - type: delete
