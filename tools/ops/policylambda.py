@@ -27,6 +27,7 @@ import json
 import os
 import string
 import yaml
+import re
 
 from c7n.config import Config
 from c7n.loader import PolicyLoader
@@ -135,7 +136,13 @@ def dispatch_render(p, sam):
         return None
     policy_lambda = mu.PolicyLambda(p)
     properties = render_func(p, policy_lambda, sam)
-    properties['Role'] = {str('Fn::Sub'): "arn:aws:iam::${AWS::AccountId}:role/%s" % policy_lambda.role}
+    role_arn_pattern = re.compile("^arn:(aws[a-zA-Z-]*)?:iam::(\d{12}|{account_id}):role\/?[a-zA-Z_0-9+=,.@\-_\/]+$")
+    if role_arn_pattern.match(properties['Role']) and "{account_id}" in properties['Role']:
+        properties['Role'] = {str('Fn::Sub'): properties['Role'].replace("{account_id}", "${AWS::AccountId}")}
+    elif role_arn_pattern.match(properties['Role']):
+        pass
+    else:
+        properties['Role'] = {str('Fn::Sub'): "arn:aws:iam::${AWS::AccountId}:role/%s" % policy_lambda.role}
     properties['CodeUri'] = "./%s.zip" % p.name
     sam['Resources'][resource_name(p.name)] = {
         'Type': 'AWS::Serverless::Function',
