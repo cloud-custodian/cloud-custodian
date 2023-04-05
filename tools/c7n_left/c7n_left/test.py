@@ -76,7 +76,9 @@ class TestRunner:
 
     def load_plan(self, test_dir, plan_path):
         try:
-            plan_data = [] if self.options.update_plan == 'replace' else load_file(plan_path)
+            plan_data = (
+                [] if self.options.update_plan == "replace" else load_file(plan_path)
+            )
             plan = TestPlan(plan_data)
             plan.path = plan_path
             return Test(plan, test_dir)
