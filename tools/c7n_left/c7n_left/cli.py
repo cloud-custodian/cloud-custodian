@@ -71,7 +71,12 @@ def run(
 @click.option(
     "--filters", help="filter policies or resources as k=v pairs with globbing"
 )
-def test(policy_dir, filters):
+@click.option(
+    "--update-plan/--no-update-plan",
+    help="update test plans based on current findings",
+    default=False,
+)
+def test(policy_dir, filters, update_plan):
     """Run policy tests."""
     policy_dir = Path(policy_dir)
     source_dir = policy_dir / "tests"
@@ -81,6 +86,7 @@ def test(policy_dir, filters):
         policy_dir=policy_dir,
         output_file=sys.stdout,
         filters=filters,
+        update_plan=update_plan,
     )
 
     reporter = TestReporter(None, config)

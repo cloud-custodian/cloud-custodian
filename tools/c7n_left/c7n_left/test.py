@@ -4,6 +4,8 @@
 import operator
 import time
 
+import yaml
+
 from c7n.config import Config
 from c7n.data import Data as DataMatcher
 from c7n.utils import load_file
@@ -74,15 +76,17 @@ class TestRunner:
 
     def load_plan(self, test_dir, plan_path):
         try:
-            plan = load_file(plan_path)
+            plan_data = load_file(plan_path)
+            plan = TestPlan(plan_data)
+            plan.path = plan_path
             return Test(plan, test_dir)
         except Exception as e:
             self.reporter.on_test_load_error(plan_path, e)
 
 
 class Test:
-    def __init__(self, plan_data, test_dir):
-        self.plan = TestPlan(plan_data)
+    def __init__(self, plan, test_dir):
+        self.plan = plan
         self.test_dir = test_dir
         self.policy = None
 
@@ -206,6 +210,34 @@ class TestReporter(RichCli):
                 unmatched = dict(unmatched)
                 unmatched.pop("policy")
                 self.console.print(unmatched)
+        if self.config.get("update_plan"):
+            # Preserve any plan entries that were matched this run
+            new_plan = [
+                {k: v for f in m.data["filters"] for k, v in f.items()}
+                for i, m in enumerate(test.plan.matchers)
+                if i in test.plan.used
+            ]
+            # Add filename + path entries for unmatched findings
+            new_resource_findings = [
+                finding["resource"] for finding in test.plan.unmatched
+            ]
+            new_plan.extend(
+                [
+                    {
+                        "resource.__tfmeta.filename": finding["__tfmeta"]["filename"],
+                        "resource.__tfmeta.path": finding["__tfmeta"]["path"],
+                    }
+                    for finding in new_resource_findings
+                ]
+            )
+            self.console.print("updating plan based on current findings")
+            test.plan.path.write_bytes(
+                yaml.dump(
+                    sorted(new_plan, key=lambda x: tuple(x.items())),
+                    encoding="utf8",
+                    Dumper=yaml.SafeDumper,
+                )
+            )
         self.console.print("")
 
 
