@@ -115,4 +115,4 @@ class TestFIS(BaseTest):
         self.assertEqual(len(resources), 1)
         client = session_factory().client('fis')
         experiments = client.list_experiments().get('experiments')
-        self.assertEqual(experiments[0]['tags'], {'foo': 'bar'})
+        self.assertEqual(experiments[0]['tags'], {'is_test': 'true'})

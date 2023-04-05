@@ -105,6 +105,7 @@ class Experiment(QueryResourceManager):
     class resource_type(TypeInfo):
         service = 'fis'
         enum_spec = ('list_experiments', 'experiments', None)
+        detail_spec = ('get_experiment', 'id', 'id', 'experiment')
         name = id = 'id'
         date = 'creationTime'
 
