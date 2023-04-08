@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 import jmespath
 import json
+import os
 from urllib.parse import urlparse, parse_qs
 
 from botocore.exceptions import ClientError
@@ -22,6 +23,8 @@ from botocore.config import Config
 from .securityhub import PostFinding
 
 ErrAccessDenied = "AccessDeniedException"
+
+
 
 
 class DescribeLambda(query.DescribeSource):
@@ -253,6 +256,71 @@ class LambdaCrossAccountAccessFilter(CrossAccountAccessFilter):
 class KmsFilter(KmsRelatedFilter):
 
     RelatedIdsExpression = 'KMSKeyArn'
+
+
+@AWSLambda.action_registry.register('inject-layer')
+class InjectLambdaLayer(Action):
+    """
+        This action allows to inject lambda layer
+       :example:
+       .. code-block:: yaml
+           actions:
+             - type: inject-layer
+    """
+
+    schema = type_schema(
+        'inject-layer',
+        required=['lambda-layer-arn'],
+        **{'lambda-layer-arn': {
+            'type': 'string'
+            }}
+    )
+    permissions = ("lambda:UpdateFunctionConfiguration",)
+
+    def process(self, resources):
+        """
+            inject layer for the function.
+            Args:
+                resources: AWS Lambda resources
+            Returns:
+                None
+        """
+        config = Config(
+            retries={
+                'max_attempts': 8,
+                'mode': 'standard'
+            }
+        )
+
+        client = local_session(self.manager.session_factory).client('lambda', config=config)
+
+        input_arns_path = self.data.get('lambda-layer-arn')
+        if not os.path.file(input_arns_path):
+            self.log.info('File not present')
+            return
+
+        with open(input_arns_path) as file:
+            input_arns = [item['Arn'] for item in json.load(file)]
+
+        retry = get_retry(('TooManyRequestsException', 'ResourceConflictException'))
+
+        if not input_arns:
+            self.log.info('No arn provided in json')
+            return
+        for resource in resources:
+            lambda_layers = resource.get('Layers', [])
+            list_of_lambda_layer = [layers['Arn'] for layers in lambda_layers]
+            list_of_lambda_layer.extend(input_arns)
+            function_name = resource["FunctionName"]
+            try:
+                self.log.info(f"inject layer for lambda")
+                retry(
+                    client.update_function_configuration,
+                    FunctionName=function_name,
+                    Layers=list_of_lambda_layer
+                )
+            except client.exceptions.ResourceNotFoundException:
+                continue
 
 
 @AWSLambda.action_registry.register('set-xray-tracing')

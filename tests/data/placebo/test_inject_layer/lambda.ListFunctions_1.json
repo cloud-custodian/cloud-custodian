@@ -1,0 +1,33 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Functions": [
+            {
+                "FunctionName": "lambda-set-enhanced-monitoring",
+                "FunctionArn": "arn:aws:lambda:us-east-1:1234567:function:lambda-set-enhanced-monitoring",
+                "Runtime": "python3.9",
+                "Role": "arn:aws:iam::1234567:role/service-role/lambda-set-enhanced-monitoring-role-eizx9dte",
+                "Handler": "lambda_function.lambda_handler",
+                "CodeSize": 275,
+                "Description": "",
+                "Timeout": 3,
+                "MemorySize": 128,
+                "LastModified": "2022-09-21T07:15:54.000+0000",
+                "CodeSha256": "kk9JtFZ3/IrjYgIxOJ0Kqi8PYxPJszS2TISb3eZBKKY=",
+                "Version": "$LATEST",
+                "TracingConfig": {
+                    "Mode": "Active"
+                },
+                "RevisionId": "6006ef8b-5d82-4047-9fbf-5dd264095cf4",
+                "PackageType": "Zip",
+                "Architectures": [
+                    "x86_64"
+                ],
+                "EphemeralStorage": {
+                    "Size": 512
+                }
+            }
+        ]
+    }
+}
