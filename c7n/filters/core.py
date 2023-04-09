@@ -8,6 +8,7 @@ import datetime
 from datetime import timedelta
 import fnmatch
 import ipaddress
+import json
 import logging
 import operator
 import re
@@ -100,7 +101,7 @@ OPERATORS = {
 VALUE_TYPES = [
     'age', 'integer', 'expiration', 'normalize', 'size',
     'cidr', 'cidr_size', 'swap', 'resource_count', 'expr',
-    'unique_size', 'date', 'version']
+    'unique_size', 'date', 'version', 'json']
 
 
 class FilterRegistry(PluginRegistry):
@@ -730,6 +731,13 @@ class ValueFilter(BaseValueFilter):
             s = ComparableVersion(sentinel)
             v = ComparableVersion(value)
             return s, v
+
+        elif self.vtype == 'json':
+            value = json.loads(value or '{}')
+            if 'value_path' in self.data:
+                value = self.get_path_value(value)
+                sentinel = self.data.get('value')
+            return sentinel, value
 
         return sentinel, value
 

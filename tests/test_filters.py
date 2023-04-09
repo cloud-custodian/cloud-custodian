@@ -302,7 +302,45 @@ class TestValueFilter(unittest.TestCase):
             "op": "intersect"})
         res = vf.match(resource)
         self.assertEqual(res,False)
-        
+
+    def test_value_type_json(self):
+        iam_policy_json = '''
+            {
+                "Version": "2012-10-17",
+                "Statement": [
+                    {
+                        "Action": [
+                            "s3:ListAllMyBuckets"
+                        ],
+                        "Effect": "Allow",
+                        "Resource": "*"
+                    }
+                ]
+            }
+        '''
+        resource = {'iam_policy_document': iam_policy_json}
+
+        vf = filters.factory({
+            "type": "value",
+            "key": "iam_policy_document",
+            "value_type": "json",
+            "value_path": "Statement[?Resource == '*'].Action[]",
+            "value": ["s3:ListAllMyBuckets"],
+            "op": "intersect"})
+        res = vf.match(resource)
+        self.assertEqual(res,True)
+
+        vf = filters.factory({
+            "type": "value",
+            "key": "iam_policy_document",
+            "value_type": "json",
+            "value_path": "Statement[?Resource == '*'].Action[]",
+            "value": ["s3:GetObject"],
+            "op": "intersect"})
+        res = vf.match(resource)
+        self.assertEqual(res,False)
+
+
 
 class TestAgeFilter(unittest.TestCase):
 
