@@ -56,13 +56,13 @@ There are several ways to get a list of possible keys for each resource.
 Special Values
 ~~~~~~~~~~~~~~
 
-    These meta-values can be used to test whether or not a key exists on a resource, and whether or
-    not the key points to an empty value.
+    These meta-values can be used to test whether or not a resource contains a specific value, and if
+    the value is empty.
 
-    - ``absent``: matches when a key *is not* present
-    - ``present``: matches when a key *is* present
-    - ``empty``: matches when a value is empty *or* the key is not present
-    - ``not-null``: matches when a key exists *and* the value is not empty
+    - ``absent``: matches when a key *does not* exist
+    - ``present``: matches when a key *does* exist
+    - ``empty``: matches when a value is false, empty, or missing
+    - ``not-null``: matches when a value exists, and is not false or empty
 
     Consider an S3 bucket with this abbreviated set of attributes:
 
@@ -91,8 +91,8 @@ Special Values
         - "tag:Team": "absent"
         - "Versioning": "empty"
         - "Versioning": "present"
-        - "Replication": "empty"
-        - "Replication": "absent"
+        - "Versioning.Status": "empty"
+        - "Versioning.Status": "absent"
 
 
 Comparison Operators
