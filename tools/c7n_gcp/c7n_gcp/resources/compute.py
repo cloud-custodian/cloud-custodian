@@ -601,7 +601,7 @@ class AutoscalerSet(MethodAction):
         return result
 
 
-@resources.register('gce-project')
+@resources.register('compute-project')
 class Project(QueryResourceManager):
     """GCP resource: https://cloud.google.com/compute/docs/reference/rest/v1/projects"""
     class resource_type(TypeInfo):

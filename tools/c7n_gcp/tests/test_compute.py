@@ -547,7 +547,7 @@ class ProjectTest(BaseTest):
 
         policy = self.load_policy(
             {'name': 'gcp-projects',
-             'resource': 'gcp.gce-project'},
+             'resource': 'gcp.compute-project'},
             session_factory=session_factory)
         resources = policy.run()
 

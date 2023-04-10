@@ -1,5 +1,4 @@
 # Copyright The Cloud Custodian Authors.
-# SPDX-License-Identifier: Apache-2.0
 ResourceMap = {
     "gcp.api-key": "c7n_gcp.resources.iam.ApiKey",
     "gcp.app-engine": "c7n_gcp.resources.appengine.AppEngineApp",
@@ -15,6 +14,7 @@ ResourceMap = {
     "gcp.bucket": "c7n_gcp.resources.storage.Bucket",
     "gcp.build": "c7n_gcp.resources.build.CloudBuild",
     "gcp.cloudbilling-account": "c7n_gcp.resources.cloudbilling.CloudBillingAccount",
+    "gcp.compute-project": "c7n_gcp.resources.compute.Project",
     "gcp.dataflow-job": "c7n_gcp.resources.dataflow.DataflowJob",
     "gcp.disk": "c7n_gcp.resources.compute.Disk",
     "gcp.dm-deployment": "c7n_gcp.resources.deploymentmanager.DMDeployment",
@@ -24,7 +24,6 @@ ResourceMap = {
     "gcp.folder": "c7n_gcp.resources.resourcemanager.Folder",
     "gcp.function": "c7n_gcp.resources.function.Function",
     "gcp.secret": "c7n_gcp.resources.secret.Secret",
-    "gcp.gce-project": "c7n_gcp.resources.compute.Project",
     "gcp.gke-cluster": "c7n_gcp.resources.gke.KubernetesCluster",
     "gcp.gke-nodepool": "c7n_gcp.resources.gke.KubernetesClusterNodePool",
     "gcp.iam-role": "c7n_gcp.resources.iam.Role",
@@ -94,3 +93,4 @@ ResourceMap = {
     "gcp.vpc": "c7n_gcp.resources.network.Network",
     "gcp.zone": "c7n_gcp.resources.compute.GCPZones"
 }
+# SPDX-License-Identifier: Apache-2.0
