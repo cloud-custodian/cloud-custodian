@@ -1185,6 +1185,27 @@ class ListItemFilter(Filter):
         self._expr = jmespath.compile(self.data['key'])
         return self._expr
 
+    def prefix_filter_keys(self, prefix, filters):
+        """Update filter keys to account for dict-wrapped resource values
+
+        Filters expect to to operate on dicts, but it's possible for the list-item
+        filter to operate against a list that includes non-dict items. In those cases,
+        we wrap resources in a dict with a consistent key and update filter keys
+        accordingly.
+        """
+        for f in filters:
+            # Recursively handle nested filter blocks (and/or/not)
+            if getattr(f, 'filters', None):
+                self.prefix_filter_keys(prefix, f.filters)
+            key = f.data.get('key')
+            if not key:
+                continue
+            if key.startswith('@'):
+                key = f'{prefix}{key[1:]}'
+            else:
+                key = f'{prefix}.{key}'
+            f.data['key'] = key
+
     def process(self, resources, event=None):
         result = []
         frm = ListItemResourceManager(
@@ -1198,22 +1219,15 @@ class ListItemFilter(Filter):
                 raise PolicyExecutionError(
                     f"list-item filter value for {self.data['key']} is a {item_type} not a list"
                 )
-            # Filters expect to to operate on dicts - if we have any
-            # non-dict items, wrap _every_ item in a dict and adjust
-            # filter keys accordingly. This avoids type errors while
-            # tracking matched indices, or when attribute filters
-            # try to add annotations.
+            # If the list of values contains any non-dicts, wrap _every_ item in
+            # a dict under a consistent key and update filter keys accordingly.
+            #
+            # This avoids type errors while tracking matched indices, or when attribute
+            # filters try to add annotations.
             if any(not isinstance(val, dict) for val in list_values):
-                list_values = [{'list_val': val} for val in list_values]
-                for f in frm.filters:
-                    key = f.data.get('key')
-                    if not key:
-                        continue
-                    if key.startswith('@'):
-                        key = f'list_val{key[1:]}'
-                    else:
-                        key = f'list_val.{key}'
-                    f.data['key'] = key
+                wrapper_key = 'list_val'
+                list_values = [{wrapper_key: val} for val in list_values]
+                self.prefix_filter_keys(wrapper_key, frm.filters)
             for idx, list_value in enumerate(list_values):
                 list_value['c7n:_id'] = idx
             list_resources = frm.filter_resources(list_values, event)

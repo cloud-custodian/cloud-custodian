@@ -1772,10 +1772,13 @@ class ListItemFilterTest(BaseFilterTest):
                 'key': 'Policy',
                 'json_expr': 'Statement[].Action[].{Action: @}',
                 'attrs': [{
-                    'type': 'value',
-                    'key': 'Action',
-                    'op': 'regex',
-                    'value': '.*List.*',
+                # Use a top-level `or` to test handling of nested filter blocks
+                    'or': [{
+                        'type': 'value',
+                        'key': 'Action',
+                        'op': 'regex',
+                        'value': '.*List.*'
+                    }]
                 }]
             },
             manager=self.get_manager()
@@ -1785,7 +1788,7 @@ class ListItemFilterTest(BaseFilterTest):
         # Targeting a list of strings rather than a list of dicts
         # should still work and match the resource
         f.data['json_expr'] = 'Statement[].Action[]'
-        f.data['attrs'][0]['key'] = '@'
+        f.data['attrs'][0]['or'][0]['key'] = '@'
         self.assertEqual(f(resource), True)
 
         # A json_expr that returns no value should not match
