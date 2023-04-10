@@ -1122,12 +1122,51 @@ class ListItemFilter(Filter):
                         key: image
                         value: "${account_id}.dkr.ecr.us-east-2.amazonaws.com.*"
                         op: regex
+
+    :example:
+
+    If a resource has a property containing embedded JSON data, provide
+    an expression for ``key`` that points to the JSON field, then ``json_expr``
+    to provide a path to a list inside that data. To find ``*List*``
+    actions within an S3 bucket policy, for example:
+
+    .. code-block:: json
+
+        {
+            "Name": "my_bucket",
+            "Policy": "{
+                \\"Version\\": \\"2012-10-17\\",
+                \\"Statement\\": [
+                    {
+                        \\"Action\\": [
+                            \\"s3:ListAllMyBuckets\\",
+                            \\"s3:GetObject\\"
+                        ],
+                        \\"Effect\\": \\"Allow\\",
+                        \\"Resource\\": \\"*\\"
+                    }
+                ]
+            }"
+        }
+
+    .. code-block:: yaml
+
+        filters:
+          - type: list-item
+            key: Policy
+            json_expr: 'Statement[].Action[]'
+            attrs:
+              - type: value
+                key: '@'
+                op: glob
+                value: '*List*'
     """
 
     schema = type_schema(
         'list-item',
         **{
             'key': {'type': 'string'},
+            'json_expr': {'type': 'string'},
             'attrs': {'$ref': '#/definitions/filters_common/list_item_attrs'},
             'count': {'type': 'number'},
             'count_op': {'$ref': '#/definitions/filters_common/comparison_operators'},
@@ -1159,6 +1198,22 @@ class ListItemFilter(Filter):
                 raise PolicyExecutionError(
                     f"list-item filter value for {self.data['key']} is a {item_type} not a list"
                 )
+            # Filters expect to to operate on dicts - if we have any
+            # non-dict items, wrap _every_ item in a dict and adjust
+            # filter keys accordingly. This avoids type errors while
+            # tracking matched indices, or when attribute filters
+            # try to add annotations.
+            if any(not isinstance(val, dict) for val in list_values):
+                list_values = [{'list_val': val} for val in list_values]
+                for f in frm.filters:
+                    key = f.data.get('key')
+                    if not key:
+                        continue
+                    if key.startswith('@'):
+                        key = f'list_val{key[1:]}'
+                    else:
+                        key = f'list_val.{key}'
+                    f.data['key'] = key
             for idx, list_value in enumerate(list_values):
                 list_value['c7n:_id'] = idx
             list_resources = frm.filter_resources(list_values, event)
@@ -1184,7 +1239,21 @@ class ListItemFilter(Filter):
         return result
 
     def get_item_values(self, resource):
-        return self.expr.search(resource)
+        values = self.expr.search(resource)
+        json_expr = self.data.get('json_expr')
+        if not json_expr:
+            return values
+        try:
+            json_data = json.loads(values)
+            values = jmespath.search(json_expr, json_data)
+            return values
+        except json.JSONDecodeError:
+            self.log.warn(
+                'Unable to load JSON data for resource:%s, key:%s' % (
+                    resource[self.manager.get_model().id],
+                    self.data.get('key'),
+                )
+            )
 
     def __call__(self, resource):
         if self.process((resource,)):

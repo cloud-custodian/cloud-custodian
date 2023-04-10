@@ -1746,6 +1746,56 @@ class ListItemFilterTest(BaseFilterTest):
         resources = f.process(resources)
         self.assertEqual(len(resources), 1)
 
+    def test_list_item_json_expr(self):
+        resource = {
+            'Name': 'my_bucket',
+            'Policy': '''
+                {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                        {
+                            "Action": [
+                                "s3:ListAllMyBuckets",
+                                "s3:GetObject"
+                            ],
+                            "Effect": "Allow",
+                            "Resource": "*"
+                        }
+                    ]
+                }
+            '''
+        }
+
+        f = filters.factory(
+            {
+                'type': 'list-item',
+                'key': 'Policy',
+                'json_expr': 'Statement[].Action[].{Action: @}',
+                'attrs': [{
+                    'type': 'value',
+                    'key': 'Action',
+                    'op': 'regex',
+                    'value': '.*List.*',
+                }]
+            },
+            manager=self.get_manager()
+        )
+        self.assertEqual(f(resource), True)
+
+        # Targeting a list of strings rather than a list of dicts
+        # should still work and match the resource
+        f.data['json_expr'] = 'Statement[].Action[]'
+        f.data['attrs'][0]['key'] = '@'
+        self.assertEqual(f(resource), True)
+
+        # A json_expr that returns no value should not match
+        f.data['json_expr'] = 'NonExistentKey'
+        self.assertEqual(f(resource), False)
+
+        # If the specified key doesn't point to embedded JSON
+        # data, don't match the resource
+        f.data['key'] = 'Name'
+        self.assertEqual(f(resource), False)
 
 class AnnotationSweeperTest(unittest.TestCase):
     def test_annotation_sweep_jmespath(self):
