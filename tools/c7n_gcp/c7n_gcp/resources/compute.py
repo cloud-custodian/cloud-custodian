@@ -631,7 +631,7 @@ class GCPZones(QueryResourceManager):
         name = id = 'name'
         default_report_fields = ['id', 'name', 'dnsName', 'creationTime', 'visibility']
         asset_type = "compute.googleapis.com/compute"
-        scc_type = "google.cloud.dns.ManagedZone"
+        scc_type = "google.compute.Zone"
 
 
 @resources.register('region')
@@ -646,4 +646,4 @@ class GCPRegions(QueryResourceManager):
         name = id = 'name'
         default_report_fields = ['id', 'name', 'dnsName', 'creationTime', 'visibility']
         asset_type = "compute.googleapis.com/compute"
-        scc_type = "google.cloud.dns.ManagedZone"
+        scc_type = "google.compute.Region"
