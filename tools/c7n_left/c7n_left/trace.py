@@ -47,11 +47,14 @@ class ConsoleTracer:
             return SegmentType.Action
         return SegmentType.Unknown
 
-    def get_pre_message(self, name, segment_type, color):
+    def get_pre_message(self, name, segment_type, color, element, metadata):
         msg = None
-
         if segment_type == SegmentType.Policy:
-            msg = f"{self.indent} [{color}]{self.policy_name}[/{color}] begin {name}"
+            msg = f"{self.indent} [{color}]{self.policy_name}[/{color}] begin {name} on"
+            if "resource_count" in metadata:
+                msg += f" {metadata['resource_count']} {element.resource_type}"
+            else:
+                msg += f" {element.resource_type}"
         elif segment_type == SegmentType.Filter and name in self.boolean_blocks:
             msg = f"{self.indent} [{color}]{self.policy_name} [/{color}] begin {name}"
         return msg
@@ -61,7 +64,10 @@ class ConsoleTracer:
         if segment_type == SegmentType.Policy:
             msg = f"end {name}"
         if segment_type == SegmentType.Filter:
-            msg = f"filtered from {segment.metadata.get('count-before', 'na')} to {segment.metadata.get('count-after', 'na')}"
+            msg = (
+                f"filtered from {segment.metadata.get('count-before', 'na')}"
+                f" to {segment.metadata.get('count-after', 'na')}"
+            )
 
             if name in self.boolean_blocks:
                 msg = f"end {name} - {msg}"
@@ -73,7 +79,8 @@ class ConsoleTracer:
                     segment.element.data.get("key")
                     or list(segment.element.data.keys()).pop()
                 )
-                msg += f" on key {key}"
+                op = segment.element.data.get("op", "equal")
+                msg += f" on key:{key} op:{op}"
         return msg
 
     def get_color(self, name, segment_type):
@@ -87,7 +94,7 @@ class ConsoleTracer:
         self.stack.append(Bag({"name": name, "metadata": metadata, "element": element}))
         segment_type = self.get_segment_type(name)
         color = self.get_color(name, segment_type)
-        pre_msg = self.get_pre_message(name, segment_type, color)
+        pre_msg = self.get_pre_message(name, segment_type, color, element, metadata)
         if pre_msg:
             self.console.print(pre_msg)
         try:

@@ -348,7 +348,8 @@ class Or(BooleanGroupFilter):
         results = None
         for f in self.filters:
             with self.manager.ctx.tracer.subsegment('filter:%s' % f.type, f) as segment:
-                segment.metadata['count-before'] = results is not None and len(results) or len(resources)
+                segment.metadata['count-before'] = (
+                    results is not None and len(results) or len(resources))
                 if results is None:
                     results = set()
                 if compiled:
