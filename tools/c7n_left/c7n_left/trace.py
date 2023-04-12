@@ -59,7 +59,7 @@ class ConsoleTracer:
             msg = f"{self.indent} [{color}]{self.policy_name} [/{color}] begin {name}"
         return msg
 
-    def get_post_message(self, name, segment_type, color, segment):
+    def get_post_message(self, name, segment_type, color, segment, apis):
         msg = f"{name}"
         if segment_type == SegmentType.Policy:
             msg = f"end {name}"
@@ -81,6 +81,12 @@ class ConsoleTracer:
                 )
                 op = segment.element.data.get("op", "equal")
                 msg += f" on key:{key} op:{op}"
+
+        calls = list(apis.items())
+        for api_name, count in calls:
+            msg += "\n"
+            msg += f" {self.indent} - {count} {api_name}"
+
         return msg
 
     def get_color(self, name, segment_type):
@@ -97,11 +103,15 @@ class ConsoleTracer:
         pre_msg = self.get_pre_message(name, segment_type, color, element, metadata)
         if pre_msg:
             self.console.print(pre_msg)
+        self.ctx.api_stats and self.ctx.api_stats.push_snapshot()
         try:
             yield self.stack[-1]
         finally:
+            apis = self.ctx.api_stats and self.ctx.api_stats.pop_snapshot() or {}
             segment = self.stack[-1]
-            post_message = self.get_post_message(name, segment_type, color, segment)
+            post_message = self.get_post_message(
+                name, segment_type, color, segment, apis
+            )
             self.console.print(
                 f"{self.indent} [{color}]{self.policy_name}[/{color}] {post_message}"
             )

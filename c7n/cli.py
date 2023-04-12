@@ -24,6 +24,7 @@ except ImportError:
 from c7n import deprecated
 from c7n.config import Config
 
+
 DEFAULT_REGION = 'us-east-1'
 
 log = logging.getLogger('custodian.cli')

@@ -133,10 +133,13 @@ class DeltaStats:
 
     def delta(self, before, after):
         delta = {}
+        new = set(after) - set(before)
         for k in before:
             val = after[k] - before[k]
             if val:
                 delta[k] = val
+        for k in new:
+            delta[k] = after[k]
         return delta
 
 
