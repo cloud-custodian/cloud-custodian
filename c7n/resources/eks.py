@@ -273,22 +273,21 @@ class AssociateEncryptionConfig(Action):
         error = None
         params = dict(self.data)
         params.pop('type')
+        # associate_encryption_config does not accept kms key aliases, if provided
+        # with an alias find the key arn with kms:DescribeKey first.
+        key_arn = params['encryptionConfig'][0]['provider']['keyArn']
+        if 'alias' in key_arn:
+            try:
+                kms_client = local_session(self.manager.session_factory).client('kms')
+                _key_arn = kms_client.describe_key(KeyId=key_arn)['KeyMetadata']['Arn']
+                params['encryptionConfig'][0]['provider']['keyArn'] = _key_arn
+            except kms_client.exceptions.NotFoundException as e:
+                self.log.error(
+                    "The following error was received for kms:DescribeKey: " \
+                    f"{e.response['Error']['Message']}"
+                )
+                raise e
         for r in self.filter_resources(resources, 'status', ('ACTIVE',)):
-            # associate_encryption_config does not accept kms key aliases, if provided
-            # with an alias find the key arn with kms:DescribeKey first.
-            key_arn = params['encryptionConfig'][0]['provider']['keyArn']
-            if 'alias' in key_arn:
-                try:
-                    kms_client = local_session(self.manager.session_factory).client('kms')
-                    _key_arn = kms_client.describe_key(KeyId=key_arn)['KeyMetadata']['Arn']
-                    params['encryptionConfig'][0]['provider']['keyArn'] = _key_arn
-                except kms_client.exceptions.NotFoundException as e:
-                    error = e
-                    self.log.error(
-                        "The following error was received for cluster " \
-                        f"{r['name']}: {e.response['Error']['Message']}"
-                    )
-                    continue
             try:
                 client.associate_encryption_config(
                     clusterName=r['name'],
