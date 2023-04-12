@@ -93,6 +93,7 @@ class NullTracer:
     def __init__(self, ctx, config=None):
         self.ctx = ctx
         self.config = config or {}
+        self.metadata = {}
 
     @contextlib.contextmanager
     def subsegment(self, name):

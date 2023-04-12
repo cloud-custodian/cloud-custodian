@@ -1058,6 +1058,10 @@ class PolicyConditions:
         self.env_vars = {}
         self.update(data)
 
+    @property
+    def ctx(self):
+        return self.policy.ctx
+
     def update(self, data):
         self.data = data
         self.filters = self.data.get('conditions', [])
