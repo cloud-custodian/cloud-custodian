@@ -126,8 +126,8 @@ pkg-build-wheel:
 
 pkg-publish-wheel:
 # upload to test pypi
-	poetry publish -r $(PKG_REPO)
-	for pkg in $(PKG_SET); do cd $$pkg && poetry publish -r $(PKG_REPO) && cd ../..; done
+	twine upload -r $(PKG_REPO) dist/*
+	for pkg in $(PKG_SET); do cd $$pkg && twine upload -r $(PKG_REPO) dist/* && cd ../..; done
 
 
 ###

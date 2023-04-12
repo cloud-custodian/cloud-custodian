@@ -21,6 +21,7 @@ from c7n.utils import (
 
 from c7n.resources.aws import shape_validate
 from c7n.resources.shield import IsEIPShieldProtected, SetEIPShieldProtection
+from c7n.filters.policystatement import HasStatementFilter
 
 
 @resources.register('vpc')
@@ -2339,6 +2340,36 @@ class VpcEndpoint(query.QueryResourceManager):
         id_prefix = "vpce-"
         universal_taggable = object()
         cfn_type = config_type = "AWS::EC2::VPCEndpoint"
+
+
+@VpcEndpoint.filter_registry.register('has-statement')
+class EndpointPolicyStatementFilter(HasStatementFilter):
+    """Find resources with matching endpoint policy statements.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+            - name: vpc-endpoint-policy
+              resource: aws.vpc-endpoint
+              filters:
+                  - type: has-statement
+                    statements:
+                      - Action: "*"
+                        Effect: "Allow"
+    """
+
+    policy_attribute = 'PolicyDocument'
+    permissions = ('ec2:DescribeVpcEndpoints',)
+
+    def get_std_format_args(self, endpoint):
+        return {
+            'endpoint_id': endpoint['VpcEndpointId'],
+            'account_id': self.manager.config.account_id,
+            'region': self.manager.config.region
+        }
+
 
 
 @VpcEndpoint.filter_registry.register('cross-account')
