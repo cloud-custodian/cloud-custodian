@@ -1,6 +1,7 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 #
+import operator
 import time
 
 from c7n.config import Config
@@ -23,7 +24,7 @@ class TestRunner:
     def run(self) -> bool:
         policy_tests = self.get_policy_tests()
         self.reporter.on_tests_discovered(self, policy_tests)
-        for test in policy_tests:
+        for test in sorted(policy_tests, key=operator.attrgetter("name")):
             self.run_test(test)
             self.reporter.on_test_result(test)
         self.reporter.on_tests_complete()
@@ -33,7 +34,9 @@ class TestRunner:
         checker = TestChecker(test, self.options)
         runner = CollectionRunner(
             [test.policy],
-            self.options.copy(exec_filter=None, source_dir=test.test_dir),
+            self.options.copy(
+                exec_filter=self.options.get("exec_filter"), source_dir=test.test_dir
+            ),
             checker,
         )
         runner.run()
@@ -154,9 +157,14 @@ class TestReporter(RichCli):
         if runner.unmatched_policies:
             header += f" - {len(runner.unmatched_policies)}/{len(runner.policies)}"
             header += " Policies Untested"
-        if runner.unmatched_tests:
-            header += " - [red]{len(runner.unmatched_tests)} Unused Tests"
+        if runner.unmatched_tests and not self.config.get("filters"):
+            header += f" - [red]{len(runner.unmatched_tests)} Unused Tests"
         self.console.print(header)
+        if self.config.get("verbose", True) and not self.config.get("filters"):
+            for p in runner.unmatched_policies:
+                self.console.print(f"no test for {p}")
+            for t in runner.unmatched_tests:
+                self.console.print(f"no policy for {t}")
 
     def on_tests_complete(self):
         status = f"{self.total} "
@@ -169,7 +177,7 @@ class TestReporter(RichCli):
         self.console.print(status)
 
     def on_test_load_error(self, test_path, error):
-        self.console.print("[yellow]test load error[yellow] {test_path} - {error}")
+        self.console.print(f"[yellow]test load error[yellow] {test_path} - {error}")
 
     def on_test_result(self, test: Test):
         self.total += 1

@@ -313,6 +313,28 @@ class VpcTest(BaseTest):
         self.assertEqual(len(resources), 2)
         self.assertTrue("subnet-068dfbf3f275a6ae8" in resources[0]["c7n:matched-vpc-endpoint"])
 
+    def test_endpoint_policy_filter(self):
+        factory = self.replay_flight_data("test_endpoint_policy_filter")
+        p = self.load_policy(
+            {
+                "name": "endpoint-policy-filter",
+                "resource": "vpc-endpoint",
+                "filters": [
+                    {
+                        "type": "has-statement",
+                        "statements": [{
+                            "Effect": "Allow",
+                            "Action": "*"
+                        }],
+                    }
+                ],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertTrue("vpce-011d813b183878b82" in resources[0]["VpcEndpointId"])
+
 
 class NetworkLocationTest(BaseTest):
 
