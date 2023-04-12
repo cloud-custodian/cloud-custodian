@@ -347,12 +347,13 @@ class Or(BooleanGroupFilter):
             resource_map = {r[rtype_id]: r for r in resources}
         results = set()
         for f in self.filters:
-            if compiled:
-                results = results.union([
-                    compiled.search(r) for r in f.process(resources, event)])
-            else:
-                results = results.union([
-                    r[rtype_id] for r in f.process(resources, event)])
+            with self.manager.ctx.tracer.subsegment('filter:%s' % f.type):
+                if compiled:
+                    results = results.union([
+                        compiled.search(r) for r in f.process(resources, event)])
+                else:
+                    results = results.union([
+                        r[rtype_id] for r in f.process(resources, event)])
         return [resource_map[r_id] for r_id in results]
 
 
@@ -361,7 +362,8 @@ class And(BooleanGroupFilter):
     def process(self, resources, events=None):
         sweeper = AnnotationSweeper(self.get_resource_type_id(), resources)
         for f in self.filters:
-            resources = f.process(resources, events)
+            with self.manager.ctx.tracer.subsegment('filter:%s' % f.type):
+                resources = f.process(resources, events)
             if not resources:
                 break
         if resources:
@@ -385,7 +387,8 @@ class Not(BooleanGroupFilter):
         sweeper = AnnotationSweeper(rtype_id, resources)
 
         for f in self.filters:
-            resources = f.process(resources, event)
+            with self.manager.ctx.tracer.subsegment('filter:%s' % f.type):
+                resources = f.process(resources, event)
             if not resources:
                 break
 

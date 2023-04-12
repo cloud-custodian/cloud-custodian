@@ -13,6 +13,7 @@ import os
 from c7n.exceptions import PolicyValidationError, PolicyExecutionError
 from c7n.executor import MainThreadExecutor
 from c7n import filters as base_filters
+from c7n.output import NullTracer
 from c7n.resources.ec2 import filters
 from c7n.resources.elb import ELB
 from c7n.testing import mock_datetime_now
@@ -95,6 +96,8 @@ class TestFilter(unittest.TestCase):
 
 class InstanceManager:
 
+    ctx = Bag(tracer=NullTracer(None))
+
     @classmethod
     def get_model(cls):
         return cls.resource_type
@@ -150,6 +153,8 @@ class TestNotFilter(unittest.TestCase):
         f = filters.factory({"not": [{"Architecture": "amd64"}]})
 
         class Manager:
+
+            ctx = Bag(tracer=NullTracer(None))
 
             class resource_type:
                 id = 'Color'
