@@ -93,11 +93,22 @@ class TestFilter(unittest.TestCase):
         self.assertEqual(resource1, resource2)
 
 
+class InstanceManager:
+
+    @classmethod
+    def get_model(cls):
+        return cls.resource_type
+
+    class resource_type:
+        id = 'InstanceId'
+
+
 class TestOrFilter(unittest.TestCase):
 
     def test_or(self):
         f = filters.factory(
-            {"or": [{"Architecture": "x86_64"}, {"Architecture": "armv8"}]}
+            {"or": [{"Architecture": "x86_64"}, {"Architecture": "armv8"}]},
+            InstanceManager(),
         )
         results = [instance(Architecture="x86_64")]
         self.assertEqual(f.process(results), results)
@@ -107,7 +118,10 @@ class TestOrFilter(unittest.TestCase):
 class TestAndFilter(unittest.TestCase):
 
     def test_and(self):
-        f = filters.factory({"and": [{"Architecture": "x86_64"}, {"Color": "green"}]})
+        f = filters.factory(
+            {"and": [{"Architecture": "x86_64"}, {"Color": "green"}]},
+            InstanceManager()
+        )
         results = [instance(Architecture="x86_64", Color="green")]
         self.assertEqual(f.process(results), results)
         self.assertEqual(f.process([instance(Architecture="x86_64", Color="blue")]), [])
@@ -117,14 +131,16 @@ class TestAndFilter(unittest.TestCase):
 class TestNotFilter(unittest.TestCase):
 
     def test_not(self):
-
         results = [
-            instance(Architecture="x86_64", Color="green"),
-            instance(Architecture="x86_64", Color="blue"),
-            instance(Architecture="x86_64", Color="yellow"),
+            instance(InstanceId='i-1', Architecture="x86_64", Color="green"),
+            instance(InstanceId='i-2', Architecture="x86_64", Color="blue"),
+            instance(InstanceId='i-3', Architecture="x86_64", Color="yellow"),
         ]
 
-        f = filters.factory({"not": [{"Architecture": "x86_64"}, {"Color": "green"}]})
+        f = filters.factory(
+            {"not": [{"Architecture": "x86_64"}, {"Color": "green"}]},
+            InstanceManager()
+        )
         self.assertEqual(len(f.process(results)), 2)
 
     def test_not_break_empty_set(self):
