@@ -347,8 +347,8 @@ class Or(BooleanGroupFilter):
             resource_map = {r[rtype_id]: r for r in resources}
         results = None
         for f in self.filters:
-            with self.manager.ctx.tracer.subsegment('filter:%s' % f.type) as segment:
-                segment.metadata['before-count'] = results is not None and len(results) or len(resources)
+            with self.manager.ctx.tracer.subsegment('filter:%s' % f.type, f) as segment:
+                segment.metadata['count-before'] = results is not None and len(results) or len(resources)
                 if results is None:
                     results = set()
                 if compiled:
@@ -357,7 +357,7 @@ class Or(BooleanGroupFilter):
                 else:
                     results = results.union([
                         r[rtype_id] for r in f.process(resources, event)])
-                segment.metadata['after-count'] = len(results)
+                segment.metadata['count-after'] = len(results)
 
         return [resource_map[r_id] for r_id in results]
 
@@ -367,10 +367,10 @@ class And(BooleanGroupFilter):
     def process(self, resources, events=None):
         sweeper = AnnotationSweeper(self.get_resource_type_id(), resources)
         for f in self.filters:
-            with self.manager.ctx.tracer.subsegment('filter:%s' % f.type) as segment:
-                segment.metadata['before-count'] = len(resources)
+            with self.manager.ctx.tracer.subsegment('filter:%s' % f.type, f) as segment:
+                segment.metadata['count-before'] = len(resources)
                 resources = f.process(resources, events)
-                segment.metadata['after-count'] = len(resources)                
+                segment.metadata['count-after'] = len(resources)                
             if not resources:
                 break
         if resources:
@@ -394,10 +394,10 @@ class Not(BooleanGroupFilter):
         sweeper = AnnotationSweeper(rtype_id, resources)
 
         for f in self.filters:
-            with self.manager.ctx.tracer.subsegment('filter:%s' % f.type) as segment:
-                segment.metadata['before-count'] = len(resources)
+            with self.manager.ctx.tracer.subsegment('filter:%s' % f.type, f) as segment:
+                segment.metadata['count-before'] = len(resources)
                 resources = f.process(resources, event)
-                segment.metadata['after-count'] = len(resources)                
+                segment.metadata['count-after'] = len(resources)                
             if not resources:
                 break
 

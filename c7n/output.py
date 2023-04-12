@@ -96,7 +96,7 @@ class NullTracer:
         self.metadata = {}
 
     @contextlib.contextmanager
-    def subsegment(self, name):
+    def subsegment(self, name, element=None, **metadata):
         """Create a named subsegment as a context manager
         """
         yield self

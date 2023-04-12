@@ -108,7 +108,7 @@ class ResourceManager:
                 break
             rcount = len(resources)
 
-            with self.ctx.tracer.subsegment("filter:%s" % f.type) as segment:
+            with self.ctx.tracer.subsegment("filter:%s" % f.type, f) as segment:
                 segment.metadata['count-before'] = len(resources)
                 resources = f.process(resources, event)
                 segment.metadata['count-after'] = len(resources)

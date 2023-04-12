@@ -251,7 +251,8 @@ class CollectionRunner:
         event.update({"graph": graph, "resources": resources})
         if self.options.get("debug"):
             event["debug"] = True
-        with policy.ctx.tracer.subsegment("policy execution"):
+        with policy.ctx.tracer.subsegment("policy execution") as segment:
+            segment.metadata["resource-count"] = len(resources)
             return policy.push(event)
 
     def get_provider(self):
