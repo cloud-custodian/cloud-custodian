@@ -70,8 +70,7 @@ def run(
 @click.option("-p", "--policy-dir", type=click.Path(), required=True)
 @click.option(
     "--filters", help="filter policies or resources as k=v pairs with globbing"
-)
-@click.option("--debug", help="Debug output for policy execution", is_flag=True)
+)@click.option("--debug", help="Debug output for policy execution", is_flag=True)
 def test(policy_dir, filters, debug):
     """Run policy tests."""
     policy_dir = Path(policy_dir)
@@ -95,6 +94,7 @@ def test(policy_dir, filters, debug):
     config["exec_filter"] = exec_filter
     policies = load_policies(policy_dir, config)
     policies = exec_filter.filter_policies(policies)
+
     runner = TestRunner(policies, config, reporter)
     sys.exit(int(runner.run()))
 

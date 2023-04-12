@@ -15,6 +15,8 @@ ResourceMap = {
     "gcp.bucket": "c7n_gcp.resources.storage.Bucket",
     "gcp.build": "c7n_gcp.resources.build.CloudBuild",
     "gcp.cloudbilling-account": "c7n_gcp.resources.cloudbilling.CloudBillingAccount",
+    "gcp.cloud-run-service": "c7n_gcp.resources.cloudrun.CloudRunService",
+    "gcp.cloud-run-job": "c7n_gcp.resources.cloudrun.CloudRunJob",    
     "gcp.dataflow-job": "c7n_gcp.resources.dataflow.DataflowJob",
     "gcp.disk": "c7n_gcp.resources.compute.Disk",
     "gcp.dm-deployment": "c7n_gcp.resources.deploymentmanager.DMDeployment",

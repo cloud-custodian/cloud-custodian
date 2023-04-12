@@ -1,0 +1,26 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "StreamInfoList": [
+            {
+                "StreamName": "test",
+                "StreamARN": "arn:aws:kinesisvideo:us-east-1:644160558196:stream/test/1680634460327",
+                "KmsKeyId": "arn:aws:kms:us-east-1:644160558196:alias/aws/kinesisvideo",
+                "Version": "hGLPguNGoP5RmFe3oxqP",
+                "Status": "ACTIVE",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 4,
+                    "day": 4,
+                    "hour": 14,
+                    "minute": 54,
+                    "second": 20,
+                    "microsecond": 327000
+                },
+                "DataRetentionInHours": 24
+            }
+        ]
+    }
+}
