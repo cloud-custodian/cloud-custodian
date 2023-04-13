@@ -1,0 +1,38 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Tue, 04 Apr 2023 14:09:04 GMT",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "1369",
+    "-content-encoding": "gzip",
+    "content-location": "https://logging.googleapis.com/v2/projects/cloud-custodian/sinks?alt=json"
+  },
+  "body": {
+    "sinks": [
+      {
+        "name": "DDB92BD9-F4FA-49EF-88E4-E8C0838C31C7",
+        "destination": "storage.googleapis.com/cfb-gcuvtiqb",
+        "writerIdentity": "serviceAccount:cloud-logs@system.gserviceaccount.com",
+        "createTime": "2023-04-04T14:08:42.768933875Z",
+        "updateTime": "2023-04-04T14:08:42.768933875Z"
+      },
+      {
+        "name": "_Required",
+        "destination": "logging.googleapis.com/projects/cloud-custodian/locations/global/buckets/_Required",
+        "filter": "LOG_ID(\"cloudaudit.googleapis.com/activity\") OR LOG_ID(\"externalaudit.googleapis.com/activity\") OR LOG_ID(\"cloudaudit.googleapis.com/system_event\") OR LOG_ID(\"externalaudit.googleapis.com/system_event\") OR LOG_ID(\"cloudaudit.googleapis.com/access_transparency\") OR LOG_ID(\"externalaudit.googleapis.com/access_transparency\")"
+      },
+      {
+        "name": "_Default",
+        "destination": "logging.googleapis.com/projects/cloud-custodian/locations/global/buckets/_Default",
+        "filter": "NOT LOG_ID(\"cloudaudit.googleapis.com/activity\") AND NOT LOG_ID(\"externalaudit.googleapis.com/activity\") AND NOT LOG_ID(\"cloudaudit.googleapis.com/system_event\") AND NOT LOG_ID(\"externalaudit.googleapis.com/system_event\") AND NOT LOG_ID(\"cloudaudit.googleapis.com/access_transparency\") AND NOT LOG_ID(\"externalaudit.googleapis.com/access_transparency\")"
+      }
+    ]
+  }
+}

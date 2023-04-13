@@ -14,8 +14,8 @@ from c7n.filters import CrossAccountAccessFilter, ValueFilter, Filter
 from c7n.filters.kms import KmsRelatedFilter
 import c7n.filters.vpc as net_filters
 from c7n.manager import resources
-from c7n import query
-from c7n.resources.iam import CheckPermissions
+from c7n import query, utils
+from c7n.resources.iam import CheckPermissions, SpecificIamRoleManagedPolicy
 from c7n.tags import universal_augment
 from c7n.utils import local_session, type_schema, select_keys, get_human_size, parse_date, get_retry
 from botocore.config import Config
@@ -255,13 +255,55 @@ class KmsFilter(KmsRelatedFilter):
     RelatedIdsExpression = 'KMSKeyArn'
 
 
+@AWSLambda.filter_registry.register('has-specific-managed-policy')
+class HasSpecificManagedPolicy(SpecificIamRoleManagedPolicy):
+    """Filter an lambda function that has an IAM execution role that has a
+    specific managed IAM policy.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: lambda-has-admin-policy
+            resource: aws.lambda
+            filters:
+              - type: has-specific-managed-policy
+                value: admin-policy
+
+    """
+
+    permissions = ('iam:ListAttachedRolePolicies',)
+
+    def process(self, resources, event=None):
+        client = utils.local_session(self.manager.session_factory).client('iam')
+
+        results = []
+        roles = {
+            r['Role']: {
+                'RoleName': r['Role'].split('/')[-1]
+            }
+            for r in resources
+        }
+
+        for role in roles.values():
+            self.get_managed_policies(client, [role])
+        for r in resources:
+            role_arn = r['Role']
+            matched_keys = [k for k in roles[role_arn][self.annotation_key] if self.match(k)]
+            self.merge_annotation(role, self.matched_annotation_key, matched_keys)
+            if matched_keys:
+                results.append(r)
+
+        return results
+
 @AWSLambda.action_registry.register('set-xray-tracing')
 class LambdaEnableXrayTracing(Action):
     """
     This action allows for enable Xray tracing to Active
- 
+
     :example:
-    
+
     .. code-block:: yaml
 
       actions:
