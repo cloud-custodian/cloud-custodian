@@ -443,7 +443,8 @@ class RDSClusterTest(BaseTest):
         self.assertEqual(len(resources), 1)
     
     def test_rdscluster_consecutive_aws_backups_count_filter(self):
-        session_factory = self.replay_flight_data("test_rdscluster_consecutive_aws_backups_count_filter")
+        session_factory = self.replay_flight_data(
+            "test_rdscluster_consecutive_aws_backups_count_filter")
         p = self.load_policy(
             {
                 "name": "rdscluster_consecutive_aws_backups_count_filter",
