@@ -5,19 +5,19 @@ from c7n_azure.provider import resources
 from c7n_azure.resources.arm import ArmResourceManager
 
 
-@resources.register('aro')
+@resources.register('open-shift')
 class AROService(ArmResourceManager):
     """Azure Red Hat Openshift Service Resource
 
     :example:
 
-    Delete all aro clusters that did not provision successfully
+    Delete all open-shift clusters that did not provision successfully
 
     .. code-block:: yaml
 
         policies:
-          - name: broken-aro
-            resource: azure.aro
+          - name: broken-open-shift
+            resource: azure.open-shift
             filters:
               - type: value
                 key: properties.provisioningState

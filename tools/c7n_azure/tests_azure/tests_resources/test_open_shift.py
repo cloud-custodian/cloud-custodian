@@ -3,23 +3,23 @@
 from ..azure_common import BaseTest, arm_template
 
 
-class AroTest(BaseTest):
+class OpenShift(BaseTest):
     def setUp(self):
-        super(AroTest, self).setUp()
+        super(OpenShift, self).setUp()
 
-    def test_aro_schema_validate(self):
+    def test_open_shift_schema_validate(self):
         with self.sign_out_patch():
             p = self.load_policy({
-                'name': 'test-azure-aro',
-                'resource': 'azure.aro'
+                'name': 'test-azure-open-shift',
+                'resource': 'azure.open-shift'
             }, validate=True)
             self.assertTrue(p)
 
     @arm_template('cdnprofile.json')
-    def test_find_aro_by_name(self):
+    def test_find_open_shift_by_name(self):
         p = self.load_policy({
-            'name': 'test-azure-aro',
-            'resource': 'azure.aro',
+            'name': 'test-azure-open-shift',
+            'resource': 'azure.open-shift',
             'filters': [
                 {'type': 'value',
                  'key': 'name',
