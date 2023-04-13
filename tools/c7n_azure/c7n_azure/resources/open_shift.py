@@ -30,13 +30,13 @@ class OpenShiftService(ArmResourceManager):
     """
 
     class resource_type(ArmResourceManager.resource_type):
-        doc_groups = ['Containers']
+        doc_groups = ['Compute', 'Containers']
         service = 'azure.mgmt.redhatopenshift'
         client = 'AzureRedHatOpenShiftClient'
         enum_spec = ('open_shift_clusters', 'list', None)
         default_report_fields = (
             'name',
             'location',
-            'properties.version'
+            'resourceGroup'
         )
         resource_type = 'Microsoft.RedHatOpenShift/openShiftClusters'

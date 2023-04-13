@@ -3,7 +3,7 @@
 ResourceMap = {
     "azure.advisor-recommendation": "c7n_azure.resources.advisor.AdvisorRecommendation",
     "azure.aks": "c7n_azure.resources.k8s_service.KubernetesService",
-    "azure.open-shift": "c7n_azure.resources.open-shift.OpenShiftService",
+    "azure.open-shift": "c7n_azure.resources.open_shift.OpenShiftService",
     "azure.api-management": "c7n_azure.resources.apimanagement.ApiManagement",
     "azure.appserviceplan": "c7n_azure.resources.appserviceplan.AppServicePlan",
     "azure.application-gateway": "c7n_azure.resources.app_gateway.ApplicationGateway",
