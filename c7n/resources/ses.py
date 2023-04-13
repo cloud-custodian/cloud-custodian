@@ -13,7 +13,11 @@ class DescribeConfigurationSet(DescribeSource):
         for r in resources:
             details = client.describe_configuration_set(ConfigurationSetName=r['Name'], 
                 ConfigurationSetAttributeNames=['eventDestinations','trackingOptions','deliveryOptions','reputationOptions'])
-            r.update(details)
+            r.update({
+                k: details[k]
+                for k in details
+                if k not in {'ConfigurationSet', 'ResponseMetadata'}
+            })
         return universal_augment(self.manager, resources)
 
 
