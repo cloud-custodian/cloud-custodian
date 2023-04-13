@@ -6,7 +6,7 @@ from c7n_azure.resources.arm import ArmResourceManager
 
 
 @resources.register('open-shift')
-class AROService(ArmResourceManager):
+class OpenShiftService(ArmResourceManager):
     """Azure Red Hat Openshift Service Resource
 
     :example:
