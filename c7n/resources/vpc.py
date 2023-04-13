@@ -21,6 +21,7 @@ from c7n.utils import (
 
 from c7n.resources.aws import shape_validate
 from c7n.resources.shield import IsEIPShieldProtected, SetEIPShieldProtection
+from c7n.filters.policystatement import HasStatementFilter
 
 
 @resources.register('vpc')
@@ -2341,6 +2342,36 @@ class VpcEndpoint(query.QueryResourceManager):
         cfn_type = config_type = "AWS::EC2::VPCEndpoint"
 
 
+@VpcEndpoint.filter_registry.register('has-statement')
+class EndpointPolicyStatementFilter(HasStatementFilter):
+    """Find resources with matching endpoint policy statements.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+            - name: vpc-endpoint-policy
+              resource: aws.vpc-endpoint
+              filters:
+                  - type: has-statement
+                    statements:
+                      - Action: "*"
+                        Effect: "Allow"
+    """
+
+    policy_attribute = 'PolicyDocument'
+    permissions = ('ec2:DescribeVpcEndpoints',)
+
+    def get_std_format_args(self, endpoint):
+        return {
+            'endpoint_id': endpoint['VpcEndpointId'],
+            'account_id': self.manager.config.account_id,
+            'region': self.manager.config.region
+        }
+
+
+
 @VpcEndpoint.filter_registry.register('cross-account')
 class EndpointCrossAccountFilter(CrossAccountAccessFilter):
 
@@ -2767,7 +2798,7 @@ class TrafficMirrorSession(query.QueryResourceManager):
         service = 'ec2'
         enum_spec = ('describe_traffic_mirror_sessions', 'TrafficMirrorSessions', None)
         name = id = 'TrafficMirrorSessionId'
-        cfn_type = 'AWS::EC2::TrafficMirrorSession'
+        config_type = cfn_type = 'AWS::EC2::TrafficMirrorSession'
         arn_type = 'traffic-mirror-session'
         universal_taggable = object()
         id_prefix = 'tms-'
@@ -2808,7 +2839,7 @@ class TrafficMirrorTarget(query.QueryResourceManager):
         service = 'ec2'
         enum_spec = ('describe_traffic_mirror_targets', 'TrafficMirrorTargets', None)
         name = id = 'TrafficMirrorTargetId'
-        cfn_type = 'AWS::EC2::TrafficMirrorTarget'
+        config_type = cfn_type = 'AWS::EC2::TrafficMirrorTarget'
         arn_type = 'traffic-mirror-target'
         universal_taggable = object()
         id_prefix = 'tmt-'

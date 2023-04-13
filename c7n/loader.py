@@ -173,7 +173,7 @@ class SourceLocator:
 
 
 class DirectoryLoader(PolicyLoader):
-    def load_directory(self, directory, validate=True):
+    def load_directory(self, directory, validate=True, recurse=True):
         structure = StructureParser()
 
         def _validate(data):
@@ -184,6 +184,7 @@ class DirectoryLoader(PolicyLoader):
                 log.error("Configuration invalid: {}".format(data))
                 log.error("%s" % e)
                 errors.append(e)
+                return errors
             rtypes = structure.get_resource_types(data)
             load_resources(rtypes)
             schm = schema.generate(rtypes)
@@ -202,6 +203,8 @@ class DirectoryLoader(PolicyLoader):
                         if do_validate:
                             errors += _validate(data)
                         raw_policies.append(data)
+                if not recurse:
+                    return
                 for name in dirs:
                     _load(os.path.abspath(name), raw_policies, errors, do_validate)
 

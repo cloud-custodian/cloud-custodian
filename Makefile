@@ -110,7 +110,7 @@ pkg-increment:
 # increment versions
 	poetry version $(PKG_INCREMENT)
 	for pkg in $(PKG_SET); do cd $$pkg && poetry version $(PKG_INCREMENT) && cd ../..; done
-	python3 tools/dev/poetrypkg.py gen-version-file -p . -f c7n/version.py
+	poetry run python tools/dev/poetrypkg.py gen-version-file -p . -f c7n/version.py
 
 pkg-build-wheel:
 # requires plugin installation -> poetry self add poetry-plugin-freeze
@@ -126,8 +126,8 @@ pkg-build-wheel:
 
 pkg-publish-wheel:
 # upload to test pypi
-	poetry publish -r $(PKG_REPO)
-	for pkg in $(PKG_SET); do cd $$pkg && poetry publish -r $(PKG_REPO) && cd ../..; done
+	twine upload -r $(PKG_REPO) dist/*
+	for pkg in $(PKG_SET); do cd $$pkg && twine upload -r $(PKG_REPO) dist/* && cd ../..; done
 
 
 ###

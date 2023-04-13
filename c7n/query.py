@@ -19,7 +19,7 @@ from c7n.exceptions import ClientError, ResourceLimitExceeded, PolicyExecutionEr
 from c7n.filters import FilterRegistry, MetricsFilter
 from c7n.manager import ResourceManager
 from c7n.registry import PluginRegistry
-from c7n.tags import register_ec2_tags, register_universal_tags
+from c7n.tags import register_ec2_tags, register_universal_tags, universal_augment
 from c7n.utils import (
     local_session, generate_arn, get_retry, chunks, camelResource)
 
@@ -264,13 +264,24 @@ class DescribeSource:
             _augment = _batch_augment
         else:
             return resources
+        if self.manager.get_client:
+            client = self.manager.get_client()
+        else:
+            client = local_session(self.manager.session_factory).client(
+                model.service, region_name=self.manager.config.region)
         _augment = functools.partial(
-            _augment, self.manager, model, detail_spec)
+            _augment, self.manager, model, detail_spec, client)
         with self.manager.executor_factory(
                 max_workers=self.manager.max_workers) as w:
             results = list(w.map(
                 _augment, chunks(resources, self.manager.chunk_size)))
             return list(itertools.chain(*results))
+
+
+class DescribeWithResourceTags(DescribeSource):
+
+    def augment(self, resources):
+        return universal_augment(self.manager, super().augment(resources))
 
 
 @sources.register('describe-child')
@@ -445,11 +456,7 @@ class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
     max_workers = 3
     chunk_size = 20
 
-    permissions = ()
-
     _generate_arn = None
-
-    get_client = None
 
     retry = staticmethod(
         get_retry((
@@ -712,10 +719,8 @@ class ChildResourceManager(QueryResourceManager):
         return self.get_resource_manager(self.resource_type.parent_spec[0])
 
 
-def _batch_augment(manager, model, detail_spec, resource_set):
+def _batch_augment(manager, model, detail_spec, client, resource_set):
     detail_op, param_name, param_key, detail_path, detail_args = detail_spec
-    client = local_session(manager.session_factory).client(
-        model.service, region_name=manager.config.region)
     op = getattr(client, detail_op)
     if manager.retry:
         args = (op,)
@@ -729,10 +734,8 @@ def _batch_augment(manager, model, detail_spec, resource_set):
     return response[detail_path]
 
 
-def _scalar_augment(manager, model, detail_spec, resource_set):
+def _scalar_augment(manager, model, detail_spec, client, resource_set):
     detail_op, param_name, param_key, detail_path = detail_spec
-    client = local_session(manager.session_factory).client(
-        model.service, region_name=manager.config.region)
     op = getattr(client, detail_op)
     if manager.retry:
         args = (op,)

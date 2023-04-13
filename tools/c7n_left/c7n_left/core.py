@@ -263,9 +263,13 @@ class CollectionRunner:
     def match_type(rtype, p):
         if isinstance(p.resource_type, str):
             return fnmatch.fnmatch(rtype, p.resource_type.split(".", 1)[-1])
+        found = False
         if isinstance(p.resource_type, list):
             for pr in p.resource_type:
-                return fnmatch.fnmatch(rtype, pr.split(".", 1)[-1])
+                if fnmatch.fnmatch(rtype, pr.split(".", 1)[-1]):
+                    found = True
+                    break
+        return found
 
 
 class IACSourceMode(PolicyExecutionMode):
@@ -293,6 +297,15 @@ class PolicyResourceResult:
     def __init__(self, resource, policy):
         self.resource = resource
         self.policy = policy
+
+    def as_dict(self):
+        return {
+            "policy": dict(self.policy.data),
+            "resource": dict(self.resource),
+            "file_path": str(self.resource.src_dir / self.resource.filename),
+            "file_line_start": self.resource.line_start,
+            "file_line_end": self.resource.line_end,
+        }
 
 
 class IACResourceManager(ResourceManager):

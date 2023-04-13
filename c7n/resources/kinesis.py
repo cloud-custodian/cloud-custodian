@@ -5,16 +5,14 @@ import jmespath
 from c7n.actions import Action
 from c7n.manager import resources
 from c7n.filters.kms import KmsRelatedFilter
-from c7n.query import ConfigSource, DescribeSource, QueryResourceManager, TypeInfo
-from c7n.tags import universal_augment
+from c7n.query import (
+    ConfigSource,
+    DescribeWithResourceTags, QueryResourceManager, TypeInfo)
 from c7n.filters.vpc import SubnetFilter
 from c7n.utils import local_session, type_schema, get_retry
+from c7n.tags import (
+    TagDelayedAction, RemoveTag, TagActionFilter, Tag)
 
-
-class DescribeStream(DescribeSource):
-
-    def augment(self, resources):
-        return universal_augment(self.manager, super().augment(resources))
 
 
 class ConfigStream(ConfigSource):
@@ -50,7 +48,7 @@ class KinesisStream(QueryResourceManager):
         config_type = cfn_type = 'AWS::Kinesis::Stream'
 
     source_mapping = {
-        'describe': DescribeStream,
+        'describe': DescribeWithResourceTags,
         'config': ConfigStream
     }
 
@@ -135,12 +133,6 @@ class KmsFilterDataStream(KmsRelatedFilter):
     RelatedIdsExpression = 'KeyId'
 
 
-class DescribeDeliveryStream(DescribeSource):
-
-    def augment(self, resources):
-        return universal_augment(self.manager, super().augment(resources))
-
-
 @resources.register('firehose')
 class DeliveryStream(QueryResourceManager):
 
@@ -158,7 +150,7 @@ class DeliveryStream(QueryResourceManager):
         cfn_type = 'AWS::KinesisFirehose::DeliveryStream'
 
     source_mapping = {
-        'describe': DescribeDeliveryStream,
+        'describe': DescribeWithResourceTags,
         'config': ConfigSource
     }
 
@@ -274,12 +266,6 @@ class FirehoseEncryptS3Destination(Action):
                 client.update_destination(**params)
 
 
-class DescribeApp(DescribeSource):
-
-    def augment(self, resources):
-        return universal_augment(self.manager, super().augment(resources))
-
-
 @resources.register('kinesis-analytics')
 class AnalyticsApp(QueryResourceManager):
 
@@ -296,7 +282,7 @@ class AnalyticsApp(QueryResourceManager):
 
     source_mapping = {
         'config': ConfigSource,
-        'describe': DescribeApp
+        'describe': DescribeWithResourceTags
     }
 
 
@@ -315,12 +301,6 @@ class AppDelete(Action):
                 CreateTimestamp=r['CreateTimestamp'])
 
 
-class DescribeVideoStream(DescribeSource):
-
-    def augment(self, resources):
-        return universal_augment(self.manager, super().augment(resources))
-
-
 @resources.register('kinesis-analyticsv2')
 class KinesisAnalyticsAppV2(QueryResourceManager):
 
@@ -333,13 +313,15 @@ class KinesisAnalyticsAppV2(QueryResourceManager):
         arn = id = "ApplicationARN"
         arn_type = 'application'
         universal_taggable = object()
-        cfn_type = 'AWS::KinesisAnalyticsV2::Application'
+        config_type = cfn_type = 'AWS::KinesisAnalyticsV2::Application'
         permission_prefix = "kinesisanalytics"
 
     permissions = ("kinesisanalytics:DescribeApplication",)
 
-    def augment(self, resources):
-        return universal_augment(self, super().augment(resources))
+    source_mapping = {
+        'config': ConfigSource,
+        'describe': DescribeWithResourceTags,
+    }
 
 
 @KinesisAnalyticsAppV2.action_registry.register('delete')
@@ -368,7 +350,7 @@ class KinesisAnalyticsSubnetFilter(SubnetFilter):
 class KinesisVideoStream(QueryResourceManager):
     retry = staticmethod(
         get_retry((
-            'LimitExceededException',)))
+            'ClientLimitExceededException',)))
 
     class resource_type(TypeInfo):
         service = 'kinesisvideo'
@@ -377,13 +359,14 @@ class KinesisVideoStream(QueryResourceManager):
         name = id = 'StreamName'
         arn = 'StreamARN'
         dimension = 'StreamName'
-        universal_taggable = True
 
     source_mapping = {
-        'describe': DescribeVideoStream,
+        'describe': DescribeWithResourceTags,
         'config': ConfigSource
     }
 
+KinesisVideoStream.action_registry.register('mark-for-op', TagDelayedAction)
+KinesisVideoStream.filter_registry.register('marked-for-op', TagActionFilter)
 
 @KinesisVideoStream.action_registry.register('delete')
 class DeleteVideoStream(Action):
@@ -417,3 +400,60 @@ class DeleteVideoStream(Action):
 class KmsFilterVideoStream(KmsRelatedFilter):
 
     RelatedIdsExpression = 'KmsKeyId'
+
+@KinesisVideoStream.action_registry.register("tag")
+class TagVideoStream(Tag):
+    """Action to add tag/tags to Kinesis Video streams resource
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: kinesis-video-tag
+                resource: kinesis-video
+                filters:
+                  - "tag:KinesisVideoTag": absent
+                actions:
+                  - type: tag
+                    key: KinesisVideoTag
+                    value: "KinesisVideo Tag Value"
+    """
+    permissions = ('kinesisvideo:TagResource',)
+    
+    def process_resource_set(self, client, resource_set, tag_keys):
+        for r in resource_set:
+            self.manager.retry(
+                client.tag_resource, 
+                ResourceARN=r['StreamARN'], 
+                Tags=tag_keys, 
+                ignore_err_codes=("ResourceNotFoundException",))
+            
+@KinesisVideoStream.action_registry.register('remove-tag')
+class VideoStreamRemoveTag(RemoveTag):
+    """Action to remove tag/tags from a Kinesis Video streams resource
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: kinesisvideo-remove-tag
+                resource: kinesis-video
+                filters:
+                  - "tag:KinesisVideoTag": present
+                actions:
+                  - type: remove-tag
+                    tags: ["KinesisVideoTag"]
+    """
+    
+    permissions = ('kinesisvideo:UntagResource',)
+    
+    def process_resource_set(self, client, resource_set, tag_keys):
+        for r in resource_set:
+            self.manager.retry(
+                client.untag_resource, 
+                ResourceARN=r['StreamARN'], 
+                TagKeyList=tag_keys, 
+                ignore_err_codes=("ResourceNotFoundException",))
+

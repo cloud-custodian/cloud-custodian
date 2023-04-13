@@ -262,6 +262,8 @@ class PolicyMetaLint(BaseTest):
 
         whitelist = set(('AwsS3Object', 'Container'))
         todo = set((
+            # q2 2023
+            "AwsEc2RouteTable",
             # q1 2023
             'AwsWafv2RuleGroup',
             'AwsWafv2WebAcl',
@@ -356,6 +358,108 @@ class PolicyMetaLint(BaseTest):
         # of a resource.
 
         whitelist = {
+            # q2 2023
+            "AWS::AppStream::DirectoryConfig",
+            "AWS::AutoScaling::WarmPool",
+            "AWS::Connect::PhoneNumber",
+            "AWS::CustomerProfiles::Domain",
+            "AWS::EC2::DHCPOptions",
+            "AWS::EC2::IPAM",
+            "AWS::EC2::NetworkInsightsPath",
+            "AWS::EC2::TrafficMirrorFilter",
+            "AWS::Events::Rule",
+            "AWS::HealthLake::FHIRDatastore",
+            "AWS::IoTTwinMaker::Scene",
+            "AWS::KinesisVideo::SignalingChannel",
+            "AWS::LookoutVision::Project",
+            "AWS::NetworkManager::TransitGatewayRegistration",
+            "AWS::Pinpoint::ApplicationSettings",
+            "AWS::Pinpoint::Segment",
+            "AWS::RoboMaker::RobotApplication",
+            "AWS::RoboMaker::SimulationApplication",
+            "AWS::Route53RecoveryReadiness::ResourceSet",
+            "AWS::Route53RecoveryControl::RoutingControl",
+            "AWS::Route53RecoveryControl::SafetyRule",
+            # q1 2023
+            'AWS::AppConfig::ConfigurationProfile',
+            'AWS::AppConfig::Environment',
+            'AWS::Backup::ReportPlan',
+            'AWS::Budgets::BudgetsAction',
+            'AWS::Cloud9::EnvironmentEC2',
+            'AWS::CodeGuruReviewer::RepositoryAssociation',
+            'AWS::DataSync::LocationFSxWindows',
+            'AWS::DataSync::LocationHDFS',
+            'AWS::DataSync::LocationObjectStorage',
+            'AWS::DeviceFarm::TestGridProject',
+            'AWS::ECR::RegistryPolicy',
+            'AWS::EKS::Addon',
+            'AWS::EKS::IdentityProviderConfig',
+            'AWS::EventSchemas::Discoverer',
+            'AWS::EventSchemas::Registry',
+            'AWS::EventSchemas::RegistryPolicy',
+            'AWS::EventSchemas::Schema',
+            'AWS::Events::ApiDestination',
+            'AWS::Events::Archive',
+            'AWS::Events::Connection',
+            'AWS::Events::Endpoint',
+            'AWS::FraudDetector::EntityType',
+            'AWS::FraudDetector::Label',
+            'AWS::FraudDetector::Outcome',
+            'AWS::FraudDetector::Variable',
+            'AWS::GuardDuty::Filter',
+            'AWS::IVS::Channel',
+            'AWS::IVS::PlaybackKeyPair',
+            'AWS::IVS::RecordingConfiguration',
+            'AWS::ImageBuilder::ContainerRecipe',
+            'AWS::ImageBuilder::DistributionConfiguration',
+            'AWS::ImageBuilder::InfrastructureConfiguration',
+            'AWS::IoT::AccountAuditConfiguration',
+            'AWS::IoT::Authorizer',
+            'AWS::IoT::CustomMetric',
+            'AWS::IoT::Dimension',
+            'AWS::IoT::MitigationAction',
+            'AWS::IoT::Policy',
+            'AWS::IoT::RoleAlias',
+            'AWS::IoT::ScheduledAudit',
+            'AWS::IoT::SecurityProfile',
+            'AWS::IoTAnalytics::Channel',
+            'AWS::IoTAnalytics::Dataset',
+            'AWS::IoTAnalytics::Datastore',
+            'AWS::IoTAnalytics::Pipeline',
+            'AWS::IoTEvents::AlarmModel',
+            'AWS::IoTEvents::DetectorModel',
+            'AWS::IoTEvents::Input',
+            'AWS::IoTSiteWise::AssetModel',
+            'AWS::IoTSiteWise::Dashboard',
+            'AWS::IoTSiteWise::Gateway',
+            'AWS::IoTSiteWise::Portal',
+            'AWS::IoTSiteWise::Project',
+            'AWS::IoTTwinMaker::Entity',
+            'AWS::IoTTwinMaker::Workspace',
+            'AWS::Lex::Bot',
+            'AWS::Lex::BotAlias',
+            'AWS::Lightsail::Bucket',
+            'AWS::Lightsail::Certificate',
+            'AWS::Lightsail::Disk',
+            'AWS::Lightsail::StaticIp',
+            'AWS::LookoutMetrics::Alert',
+            'AWS::MediaPackage::PackagingConfiguration',
+            'AWS::MediaPackage::PackagingGroup',
+            'AWS::RDS::GlobalCluster',
+            'AWS::RUM::AppMonitor',
+            'AWS::ResilienceHub::ResiliencyPolicy',
+            'AWS::RoboMaker::RobotApplicationVersion',
+            'AWS::Route53RecoveryReadiness::Cell',
+            'AWS::Route53RecoveryReadiness::RecoveryGroup',
+            'AWS::Route53Resolver::FirewallDomainList',
+            'AWS::S3::MultiRegionAccessPoint',
+            'AWS::S3::StorageLens',
+            'AWS::SES::ReceiptFilter',
+            'AWS::SES::ReceiptRuleSet',
+            'AWS::SES::Template',
+            'AWS::ServiceDiscovery::HttpNamespace',
+            'AWS::Transfer::Workflow',      
+            # 
             'AWS::ApiGatewayV2::Stage',
             'AWS::Athena::DataCatalog',
             'AWS::Athena::WorkGroup',
@@ -468,7 +572,7 @@ class PolicyMetaLint(BaseTest):
         missing = config_types.difference(resource_config_types)
         if missing:
             raise AssertionError(
-                "Missing config types \n %s" % ('\n'.join(missing)))
+                "Missing config types \n %s" % ('\n'.join(sorted(missing))))
 
         # config service can't be bothered to update their sdk correctly
         invalid_ignore = {
@@ -1334,6 +1438,30 @@ class PolicyConditionsTest(BaseTest):
         p.conditions.env_vars['account'] = {'name': 'deputy'}
         self.assertTrue(p.is_runnable())
         p.conditions.env_vars['account'] = {'name': 'mickey'}
+        self.assertFalse(p.is_runnable())
+
+    def test_env_var_extension_with_expand_variables(self):
+        p_json = {
+            'name': 'profx',
+            'resource': 'aws.ec2',
+            'description': 'Test var extension {var1}',
+            'conditions': [{
+                'type': 'value',
+                'key': 'account.name',
+                'value': 'deputy'}]}
+
+        p = self.load_policy(p_json)
+        p.conditions.env_vars['account'] = {'name': 'deputy'}
+        p.expand_variables({"var1":"value1"})
+        p.validate()
+        self.assertEqual("Test var extension value1", p.data["description"])
+        self.assertTrue(p.is_runnable())
+
+        p = self.load_policy(p_json)
+        p.conditions.env_vars['account'] = {'name': 'mickey'}
+        p.expand_variables({"var1":"value2"})
+        p.validate()
+        self.assertEqual("Test var extension value2", p.data["description"])
         self.assertFalse(p.is_runnable())
 
     def test_event_filter(self):
