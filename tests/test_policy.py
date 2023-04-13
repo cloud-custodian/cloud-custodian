@@ -262,6 +262,8 @@ class PolicyMetaLint(BaseTest):
 
         whitelist = set(('AwsS3Object', 'Container'))
         todo = set((
+            # q2 2023
+            "AwsEc2RouteTable",
             # q1 2023
             'AwsWafv2RuleGroup',
             'AwsWafv2WebAcl',
@@ -356,6 +358,28 @@ class PolicyMetaLint(BaseTest):
         # of a resource.
 
         whitelist = {
+            # q2 2023
+            "AWS::AppStream::DirectoryConfig",
+            "AWS::AutoScaling::WarmPool",
+            "AWS::Connect::PhoneNumber",
+            "AWS::CustomerProfiles::Domain",
+            "AWS::EC2::DHCPOptions",
+            "AWS::EC2::IPAM",
+            "AWS::EC2::NetworkInsightsPath",
+            "AWS::EC2::TrafficMirrorFilter",
+            "AWS::Events::Rule",
+            "AWS::HealthLake::FHIRDatastore",
+            "AWS::IoTTwinMaker::Scene",
+            "AWS::KinesisVideo::SignalingChannel",
+            "AWS::LookoutVision::Project",
+            "AWS::NetworkManager::TransitGatewayRegistration",
+            "AWS::Pinpoint::ApplicationSettings",
+            "AWS::Pinpoint::Segment",
+            "AWS::RoboMaker::RobotApplication",
+            "AWS::RoboMaker::SimulationApplication",
+            "AWS::Route53RecoveryReadiness::ResourceSet",
+            "AWS::Route53RecoveryControl::RoutingControl",
+            "AWS::Route53RecoveryControl::SafetyRule",
             # q1 2023
             'AWS::AppConfig::ConfigurationProfile',
             'AWS::AppConfig::Environment',
@@ -548,7 +572,7 @@ class PolicyMetaLint(BaseTest):
         missing = config_types.difference(resource_config_types)
         if missing:
             raise AssertionError(
-                "Missing config types \n %s" % ('\n'.join(missing)))
+                "Missing config types \n %s" % ('\n'.join(sorted(missing))))
 
         # config service can't be bothered to update their sdk correctly
         invalid_ignore = {
