@@ -92,10 +92,7 @@ class Delete(Action):
 class ExperimentDescribe(DescribeSource):
     def augment(self, resources):
         resources = super().augment(resources)
-        # tag normalize for value filter
         for r in resources:
-            if 'tags' not in r:
-                continue
             r['Tags'] = [{'Key': k, 'Value': v} for k, v in r.pop('tags', {}).items()]
         return resources
 
@@ -108,9 +105,9 @@ class Experiment(QueryResourceManager):
         detail_spec = ('get_experiment', 'id', 'id', 'experiment')
         name = id = 'id'
         date = 'creationTime'
+        arn_type = 'experiment'
 
-    source_mapping = {'describe': ExperimentDescribe,
-                      'config': ConfigSource}
+    source_mapping = {'describe': ExperimentDescribe}
 
     def get_arns(self, resources):
         partition = get_partition(self.region)
