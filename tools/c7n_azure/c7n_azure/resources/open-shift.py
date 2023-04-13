@@ -37,8 +37,6 @@ class OpenShiftService(ArmResourceManager):
         default_report_fields = (
             'name',
             'location',
-            'properties.version',
-            'properties.masterProfile',
-            'properties.workerProfiles[][name, count]'
+            'properties.version'
         )
         resource_type = 'Microsoft.RedHatOpenShift/openShiftClusters'
