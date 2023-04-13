@@ -5,6 +5,8 @@ PKG_REPO = testpypi
 PKG_INCREMENT := patch
 PKG_SET := tools/c7n_gcp tools/c7n_kube tools/c7n_openstack tools/c7n_mailer tools/c7n_logexporter tools/c7n_policystream tools/c7n_trailcreator tools/c7n_org tools/c7n_sphinxext tools/c7n_terraform tools/c7n_awscc tools/c7n_tencentcloud tools/c7n_azure
 
+FMT_SET := tools/c7n_left
+
 PLATFORM_ARCH := $(shell python3 -c "import platform; print(platform.machine())")
 PLATFORM_OS := $(shell python3 -c "import platform; print(platform.system())")
 PY_VERSION := $(shell python3 -c "import sys; print('%s.%s' % (sys.version_info.major, sys.version_info.minor))")
@@ -60,6 +62,13 @@ sphinx:
 
 lint:
 	ruff c7n tests tools
+	black --check $(FMT_SET)
+	type -P terraform && terraform fmt -check -recursive .
+
+format:
+	black $(FMT_SET)
+	ruff --fix c7n tests tools
+	type -P terraform && terraform fmt -recursive .
 
 clean:
 	make -f docs/Makefile.sphinx clean
@@ -101,7 +110,7 @@ pkg-increment:
 # increment versions
 	poetry version $(PKG_INCREMENT)
 	for pkg in $(PKG_SET); do cd $$pkg && poetry version $(PKG_INCREMENT) && cd ../..; done
-	python3 tools/dev/poetrypkg.py gen-version-file -p . -f c7n/version.py
+	poetry run python tools/dev/poetrypkg.py gen-version-file -p . -f c7n/version.py
 
 pkg-build-wheel:
 # requires plugin installation -> poetry self add poetry-plugin-freeze
@@ -117,8 +126,8 @@ pkg-build-wheel:
 
 pkg-publish-wheel:
 # upload to test pypi
-	poetry publish -r $(PKG_REPO)
-	for pkg in $(PKG_SET); do cd $$pkg && poetry publish -r $(PKG_REPO) && cd ../..; done
+	twine upload -r $(PKG_REPO) dist/*
+	for pkg in $(PKG_SET); do cd $$pkg && twine upload -r $(PKG_REPO) dist/* && cd ../..; done
 
 
 ###

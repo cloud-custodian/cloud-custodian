@@ -8,6 +8,49 @@ import time
 
 from c7n.exceptions import PolicyExecutionError
 
+class TestEcs(BaseTest):
+    def test_ecs_container_insights_enabled(self):
+        session_factory = self.replay_flight_data(
+            'test_ecs_container_insights_enabled')
+        p = self.load_policy(
+            {
+                "name": "ecs-container-insights",
+                "resource": 'ecs',
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": "settings[?(name=='containerInsights')].value",
+                        "op": "contains",
+                        "value": "disabled",
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+        
+    def test_ecs_container_insights_disabled(self):
+        session_factory = self.replay_flight_data(
+            'test_ecs_container_insights_disabled')
+        p = self.load_policy(
+            {
+                "name": "ecs-container-insights",
+                "resource": 'ecs',
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": "settings[?(name=='containerInsights')].value",
+                        "op": "contains",
+                        "value": "disabled",
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
 
 class TestEcsService(BaseTest):
 
@@ -329,6 +372,28 @@ class TestEcsTaskDefinition(BaseTest):
             "taskDefinitionArns"
         )
         self.assertEqual(arns, [])
+        
+    def test_task_definition_delete_permanently(self):
+        session_factory = self.replay_flight_data("test_ecs_task_def_delete_permanently")
+        p = self.load_policy(
+            {
+                "name": "task-defs",
+                "resource": "ecs-task-definition",
+                "filters": [{"family": "test-delete-definition"}],
+                "actions": [{"type": "delete", "force": True}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        arns = session_factory().client("ecs").list_task_definitions(
+            familyPrefix="test-delete-definition", status="DELETE_IN_PROGRESS"
+        ).get(
+            "taskDefinitionArns"
+        )
+        self.assertEqual(arns, 
+                         ["arn:aws:ecs:us-east-1:644160558196:task-definition/test-delete-definition:2"])
+        
 
     def test_task_definition_get_resources(self):
         session_factory = self.replay_flight_data("test_ecs_task_def_query")

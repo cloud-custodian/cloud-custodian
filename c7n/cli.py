@@ -333,10 +333,10 @@ def _setup_logger(options):
     logging.getLogger('urllib3').setLevel(logging.ERROR)
 
 
-def main():
+def main(args=None):
     parser = setup_parser()
     argcomplete.autocomplete(parser)
-    options = parser.parse_args()
+    options = parser.parse_args(args=args)
     if options.subparser is None:
         parser.print_help(file=sys.stderr)
         return sys.exit(2)

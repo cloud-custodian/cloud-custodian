@@ -1,5 +1,5 @@
 
 variable "mybucket" {
-  type = string
+  type    = string
   default = "mybucket2"
 }

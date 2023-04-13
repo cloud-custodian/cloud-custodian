@@ -8,9 +8,10 @@ import sys
 import click
 from c7n.config import Config
 
+from .core import CollectionRunner, ExecutionFilter
 from .entry import initialize_iac
 from .output import get_reporter, report_outputs, summary_options
-from .core import CollectionRunner, ExecutionFilter
+from .test import TestReporter, TestRunner
 from .utils import load_policies
 
 
@@ -62,6 +63,31 @@ def run(
         sys.exit(1)
     reporter = get_reporter(config)
     runner = CollectionRunner(policies, config, reporter)
+    sys.exit(int(runner.run()))
+
+
+@cli.command()
+@click.option("-p", "--policy-dir", type=click.Path(), required=True)
+@click.option(
+    "--filters", help="filter policies or resources as k=v pairs with globbing"
+)
+def test(policy_dir, filters):
+    """Run policy tests."""
+    policy_dir = Path(policy_dir)
+    source_dir = policy_dir / "tests"
+
+    config = Config.empty(
+        source_dir=source_dir,
+        policy_dir=policy_dir,
+        output_file=sys.stdout,
+        filters=filters,
+    )
+
+    reporter = TestReporter(None, config)
+    exec_filter = ExecutionFilter.parse(config)
+    config["exec_filter"] = exec_filter
+    policies = exec_filter.filter_policies(load_policies(policy_dir, config))
+    runner = TestRunner(policies, config, reporter)
     sys.exit(int(runner.run()))
 
 

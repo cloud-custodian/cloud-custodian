@@ -275,7 +275,7 @@ class AzureFunctionMode(ServerlessExecutionMode):
             self.function_params.function_app['name'])
 
         requirements = generate_requirements('c7n-azure',
-                                             ignore=['boto3', 'botocore', 'pywin32'],
+                                             ignore=['pywin32'],
                                              exclude='c7n')
         package = FunctionPackage(self.policy_name, target_sub_ids=target_subscription_ids)
         package.build(self.policy.data,

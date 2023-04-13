@@ -9,14 +9,30 @@ source asset evaluation.
 
 ## Install
 
-We currently only support python 3.10 on mac and linux. We plan to
-expand support for additional operating systems and python versions
-over time.
-
+We currently only support python > 3.10 on mac and linux, to run on windows
+we recommend using our docker images.
 
 ```shell
 pip install c7n_left
 ```
+
+We also provide signed docker images. These images are built on top of chainguard's [wolfi linux
+distribution](https://www.chainguard.dev/unchained/introducing-wolfi-the-first-linux-un-distro) which
+is designed to be minimal, auditable, and secure.
+
+```shell
+docker pull cloudcustodian/c7n_left:dev
+```
+
+Images signatures can be verified using [cosign](https://github.com/sigstore/cosign)
+
+```
+export IMAGE=$(docker image inspect cloudcustodian/c7n-left:dev -f '{{index .RepoDigests 0}}')
+cosign verify $IMAGE \
+   --certificate-identity 'https://github.com/cloud-custodian/cloud-custodian/.github/workflows/docker.yml@refs/heads/main' \
+   --certificate-oidc-issuer 'https://token.actions.githubusercontent.com'
+```
+
 
 ## Usage
 
@@ -51,6 +67,8 @@ We'll create an empty directory with a policy in it
 policies:
   - name: test
     resource: terraform.aws_s3_bucket
+    metadata:
+      severity: medium
     filters:
       - server_side_encryption_configuration: absent
 ```
@@ -58,23 +76,47 @@ policies:
 And now we can use it to evaluate a terraform root module
 
 ```shell
-$ c7n-left run --policy-dir policies -d root_module
-DEBUG:c7n.iac:Loaded 3 resources
-Running 1 policies
-DEBUG:c7n.iac:Filtered from 3 to 1 terraformresourcemanager
+
+❯ c7n-left run -p policies -d module
+Running 1 policies on 1 resources
 test - terraform.aws_s3_bucket
   Failed
-  File: main.tf:25-28
-  25 resource "aws_s3_bucket" "example_c" {  
-  26   bucket = "c7n-aws-s3-encryption-audit-test-c"  
-  27   acl    = "private"
-  28 }
+  File: s3.tf:1-8
+  1 resource "aws_s3_bucket" "example" {                                                                                
+  2   bucket = "my-custodian-test-bucket"                                                                               
+  3   acl    = "private"                                                                                                
+  4                                                                                                                     
+  5   tags = {                                                                                                          
+  6     original-tag = "original-value"                                                                                 
+  7   }                                                                                                                 
+  8 }                                                                                                                   
 
-Execution complete 0.01 seconds
+Evaluation complete 0.00 seconds -> 1 Failures
+           Summary - By Policy           
+┏━━━━━━━━━━┳━━━━━━━━┳━━━━━━━━━━━━━━━━━━━┓
+┃ Severity ┃ Policy ┃ Result            ┃
+┡━━━━━━━━━━╇━━━━━━━━╇━━━━━━━━━━━━━━━━━━━┩
+│ medium   │ test   │ 1 failed 0 passed │
+└──────────┴────────┴───────────────────┘
+0 compliant of 1 total, 1 resource has 1 policy violation
 ```
 
+For running in docker, you'll need to use volume mounts to provide access to 
+the policy directory and terraform root module.
 
-## Filters
+```shell
+docker run -ti --rm -v $(pwd)/policies:/policies -v $(pwd)/root-module:/module \
+       cloudcustodian/c7n-left:dev run -p /policies -d /module
+```
+
+If the terraform root module has other remote module dependencies, you'll need to fetch those first using terraform
+before running c7n-left.
+
+```shell
+terraform get -update
+```
+
+## CLI Filters
 
 Which policies and which resources are evaluated can be controlled via
 command line via `--filters` option.
@@ -102,6 +144,7 @@ c7n-left run -p policy_dir -d terraform --filters="severity=medium category=cost
 policy values for severity and category are specified in its metadata section. ie
 
 ```yaml
+
 policies:
   - name: check-encryption
     resource: [aws_ebs_volume, aws_sqs_queue]
@@ -123,3 +166,97 @@ two summary displays available, the default policy summary, and a resource summa
 which can be enabled via `--summary resource`.
 
 
+## Policy Language
+
+Policies for c7n-left support a few additional capabilities beyond what's common for custodian policies.
+
+Policies can be specified against multiple resource types either as an array or glob.
+
+```yaml
+policies:
+  - name: check-encryption
+    resource: [aws_ebs_volume, aws_sqs_queue]
+```
+
+A `traverse` filter is available that allows for multi-hop graph traversal from a resource
+to any related resource.
+
+ie, here's a policy against an aws ec2 instance, that checks if any of the security
+groups attached to the instance, have a permission defined that allows access from
+0.0.0.0/0 
+
+```yaml
+policies:
+ - name: check-security-group-open-cidr
+   resource: terraform.aws_instance
+   description: "EC2 should not be open to world on ssh"
+   filters:
+     - type: traverse
+       resources:
+         - aws_security_group
+         - aws_security_ingress_permission
+       attrs:
+         - Ipv4: 0.0.0.0/0
+```
+
+
+## Policy Testing
+
+c7n-left supports writing and running tests for policies.
+
+To create a test for a policy, create a tests directory next to your policy files.
+
+Within that tests directory, create a sub directory with the policy name.
+
+Next add terraform files to this sub directory. Typically you would add 
+both terraform files that would match the policy and those that should not.
+
+Finally you add assertions in a `left.plan[.yaml|.json]` file. The
+format of the file is an array of dictionaries. The dictionaries are
+used to match against the policy findings. The data its matching
+against is what is found by using `c7n-left run --output json`. Each
+key/value pair in the dictionary is matched against the finding.
+
+So putting it all together, we've setup our tests as follows
+
+```shell
+❯ tree policy-dir-a/
+policy-dir-a/
+├── alb.yaml
+└── tests
+    └── alb-deletion-protection-disabled
+        ├── left.plan.yaml
+        ├── negative1.tf
+        └── positive1.tf
+
+3 directories, 4 files
+
+❯ cat policy-dir-a/alb.yaml 
+policies:
+  - name: alb-deletion-protection-disabled
+    resource: [terraform.aws_lb, terraform.aws_alb]
+    description: |
+      Application Load Balancer should have deletion protection enabled
+    metadata:
+      severity: low
+      category: "Insecure Configurations"
+    filters:
+      - enable_deletion_protection: empty
+
+❯ cat policy-dir-a/tests/alb-deletion-protection-disabled/left.plan.yaml 
+- "resource.__tfmeta.filename": "positive1.tf"
+
+```
+
+and now we can run a test
+
+```shell
+❯ c7n-left test -p policy-dir-a/
+Discovered 1 Tests
+Failure alb-deletion-protection-disabled [{'resource.__tfmeta.filename': 
+'positive1.tf'}] checks not used
+
+1 Test Complete (0.05s) 1 Failure
+```
+
+A test fails if either an assertion in the plan file does not match one policy finding, or if a policy finding is not matched by an assertion.
