@@ -31,35 +31,6 @@
                     "second": 23,
                     "microsecond": 0
                 }
-            },
-            {
-                "deploymentId": "62t45r",
-                "stageName": "6E96900D-20FB-4108-8EC6-B98E6C4BE375",
-                "cacheClusterEnabled": false,
-                "cacheClusterStatus": "NOT_AVAILABLE",
-                "methodSettings": {},
-                "tracingEnabled": false,
-                "webAclArn": "arn:aws:waf-regional:us-east-1:123456789012:webacl/6e96900d-20fb-4108-8ec6-b98e6c4be375",
-                "createdDate": {
-                    "__class__": "datetime",
-                    "year": 2023,
-                    "month": 3,
-                    "day": 21,
-                    "hour": 11,
-                    "minute": 34,
-                    "second": 57,
-                    "microsecond": 0
-                },
-                "lastUpdatedDate": {
-                    "__class__": "datetime",
-                    "year": 2023,
-                    "month": 3,
-                    "day": 21,
-                    "hour": 11,
-                    "minute": 35,
-                    "second": 23,
-                    "microsecond": 0
-                }
             }
         ]
     }

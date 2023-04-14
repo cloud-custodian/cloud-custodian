@@ -57,8 +57,14 @@ class DescribeWafV2(DescribeSource):
 
     def get_resources(self, ids):
         params = self.get_query_params(None)
+        scope = (params or {}).get('Scope', 'REGIONAL')
+
         resources = self.query.filter(self.manager, **params)
-        return [r for r in resources if r[self.manager.resource_type.id] in ids]
+        return [
+            { 'Scope': scope, **r }
+            for r in resources
+            if r[self.manager.resource_type.id] in ids
+        ]
 
 
 @resources.register('waf')

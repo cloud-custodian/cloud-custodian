@@ -584,7 +584,7 @@ class TestRestStage(BaseTest):
             session_factory=factory,
         )
         resources = p.run()
-        self.assertEqual(len(resources), 1)
+        self.assertEqual(len(resources), 0)
 
     def test_wafregional_value_at_least_1_rule(self):
         factory = self.replay_flight_data("test_rest_stage_waf_value")
