@@ -8,7 +8,7 @@ from c7n.manager import resources
 from c7n.query import ConfigSource, QueryResourceManager, DescribeSource, TypeInfo
 from c7n.tags import universal_augment
 from c7n.utils import local_session, merge_dict, type_schema, get_retry
-from c7n.filters import ValueFilter
+from c7n.filters import ValueFilter, WafV2FilterBase
 from .aws import shape_validate
 from c7n.exceptions import PolicyValidationError
 
@@ -229,6 +229,13 @@ class IsWafV2Enabled(Filter):
                 if not r_web_acl_id or r_web_acl_id not in target_acl_ids:
                     results.append(r)
         return results
+
+
+@Distribution.filter_registry.register('wafv2')
+class WafV2Filter(WafV2FilterBase):
+    def get_associated_web_acl(self, resource):
+        # for WAFv2 Cloudfront stores the ARN of the WebACL even though the attribute is 'WebACLId'
+        return self.get_web_acl_by_arn(resource.get('WebACLId'), scope='CLOUDFRONT')
 
 
 class BaseDistributionConfig(ValueFilter):

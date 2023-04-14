@@ -9,7 +9,9 @@ from contextlib import suppress
 
 from c7n.actions import ActionRegistry, BaseAction
 from c7n.exceptions import PolicyValidationError
-from c7n.filters import FilterRegistry, ValueFilter, MetricsFilter, Filter
+from c7n.filters import (
+    FilterRegistry, ValueFilter, MetricsFilter, Filter, WafV2FilterBase,
+    WafClassicRegionalFilterBase)
 from c7n.filters.iamaccess import CrossAccountAccessFilter
 from c7n.filters.related import RelatedResourceFilter
 from c7n.manager import resources, ResourceManager
@@ -591,6 +593,12 @@ class WafEnabled(Filter):
         return results
 
 
+@RestStage.filter_registry.register('waf')
+class WafFilter(WafClassicRegionalFilterBase):
+    def get_associated_web_acl(self, resource):
+        return self.get_web_acl_by_arn(resource.get('webAclArn'))
+
+
 @RestStage.action_registry.register('set-waf')
 class SetWaf(BaseAction):
     """Enable waf protection on API Gateway stage.
@@ -707,6 +715,12 @@ class WafV2Enabled(Filter):
                     results.append(r)
 
         return results
+
+
+@RestStage.filter_registry.register('wafv2')
+class WafV2Filter(WafV2FilterBase):
+    def get_associated_web_acl(self, resource):
+        return self.get_web_acl_by_arn(resource.get('webAclArn'))
 
 
 @RestStage.action_registry.register('set-wafv2')

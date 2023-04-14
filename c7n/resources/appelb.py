@@ -11,7 +11,14 @@ from collections import defaultdict
 from c7n.actions import ActionRegistry, BaseAction, ModifyVpcSecurityGroupsAction
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import (
-    Filter, FilterRegistry, DefaultVpcBase, MetricsFilter, ValueFilter)
+    Filter,
+    FilterRegistry,
+    DefaultVpcBase,
+    MetricsFilter,
+    ValueFilter,
+    WafV2FilterBase,
+    WafClassicRegionalFilterBase
+)
 import c7n.filters.vpc as net_filters
 from c7n import tags
 from c7n.manager import resources
@@ -252,6 +259,17 @@ class WafEnabled(Filter):
         return [r for r in resources if state_map[r[arn_key]] == state]
 
 
+@AppELB.filter_registry.register('waf')
+class WafFilter(WafClassicRegionalFilterBase):
+    # application load balancers don't hold a reference to the associated web acl
+    # so we have to look them up via the associations on the web acl directly
+    def get_associated_web_acl(self, resource):
+        return self.get_web_acl_from_associations(
+            'APPLICATION_LOAD_BALANCER',
+            resource['LoadBalancerArn']
+        )
+
+
 @AppELB.filter_registry.register('wafv2-enabled')
 class WafV2Enabled(Filter):
     """Filter Application LoadBalancer by wafv2 web-acl
@@ -339,6 +357,17 @@ class WafV2Enabled(Filter):
                 continue
             state_map[arn] = False
         return [r for r in resources if r[arn_key] in state_map and state_map[r[arn_key]] == state]
+
+
+@AppELB.filter_registry.register('wafv2')
+class WafV2Filter(WafV2FilterBase):
+    # application load balancers don't hold a reference to the associated web acl
+    # so we have to look them up via the associations on the web acl directly
+    def get_associated_web_acl(self, resource):
+        return self.get_web_acl_from_associations(
+            'APPLICATION_LOAD_BALANCER',
+            resource['LoadBalancerArn']
+        )
 
 
 @AppELB.action_registry.register('set-waf')

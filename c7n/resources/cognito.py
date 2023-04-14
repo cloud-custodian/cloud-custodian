@@ -3,6 +3,7 @@
 from botocore.exceptions import ClientError
 
 from c7n.actions import BaseAction
+from c7n.filters import WafV2FilterBase
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, TypeInfo, DescribeSource
 from c7n.tags import universal_augment
@@ -84,6 +85,7 @@ class CognitoUserPool(QueryResourceManager):
             'describe_user_pool', 'UserPoolId', 'Id', 'UserPool')
         id = 'Id'
         name = 'Name'
+        arn = 'Arn'
         arn_type = "userpool"
         cfn_type = 'AWS::Cognito::UserPool'
         universal_taggable = object()
@@ -91,6 +93,17 @@ class CognitoUserPool(QueryResourceManager):
     source_mapping = {
         'describe': DescribeUserPool,
     }
+
+
+@CognitoUserPool.filter_registry.register('wafv2')
+class WafV2Filter(WafV2FilterBase):
+    # cognito user pools don't hold a reference to the associated web acl
+    # so we have to look them up via the associations on the web acl directly
+    def get_associated_web_acl(self, resource):
+        return self.get_web_acl_from_associations(
+            'COGNITO_USER_POOL',
+            resource['Arn']
+        )
 
 
 @CognitoUserPool.action_registry.register('delete')

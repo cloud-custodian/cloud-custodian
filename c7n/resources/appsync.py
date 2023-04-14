@@ -3,7 +3,7 @@
 import re
 
 from c7n.actions import BaseAction, Action
-from c7n.filters import Filter, ValueFilter
+from c7n.filters import Filter, ValueFilter, WafV2FilterBase
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, TypeInfo
 from c7n.utils import local_session, type_schema, get_retry
@@ -78,6 +78,12 @@ class WafV2Enabled(Filter):
                 elif target_acl and r_web_acl_id not in target_acl_ids:
                     results.append(r)
         return results
+
+
+@GraphQLApi.filter_registry.register('wafv2')
+class WafV2Filter(WafV2FilterBase):
+    def get_associated_web_acl(self, resource):
+        return self.get_web_acl_by_arn(resource.get('wafWebAclArn'))
 
 
 @GraphQLApi.filter_registry.register('api-cache')
