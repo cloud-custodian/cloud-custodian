@@ -769,6 +769,17 @@ class ReadinessCheckCrossAccount(CrossAccountAccessFilter):
         return results
 
 
+
+class DescribeCluster(query.DescribeSource):
+    def augment(self, clusters):
+        for r in clusters:
+            Tags = self.manager.retry(
+                self.manager.get_client().list_tags_for_resource,
+                ResourceArn=r['ClusterArn'])['Tags']
+            r['Tags'] = [{'Key': k, "Value": v} for k, v in Tags.items()]
+        return clusters
+
+
 @resources.register('recovery-cluster')
 class RecoveryCluster(QueryResourceManager):
 
@@ -778,18 +789,17 @@ class RecoveryCluster(QueryResourceManager):
         enum_spec = ('list_clusters', 'Clusters', None)
         name = id = 'ClusterArn'
         global_resource = True
+        config_type = cfn_type = "AWS::Route53RecoveryControl::Cluster"
+
+    source_mapping = {
+        'describe': DescribeCluster,
+        'config': query.ConfigSource
+    }
 
     def get_client(self):
         return local_session(self.session_factory) \
             .client('route53-recovery-control-config', region_name=ARC_REGION)
 
-    def augment(self, clusters):
-        for r in clusters:
-            Tags = self.retry(
-                self.get_client().list_tags_for_resource,
-                ResourceArn=r['ClusterArn'])['Tags']
-            r['Tags'] = [{'Key': k, "Value": v} for k, v in Tags.items()]
-        return clusters
 
 
 @RecoveryCluster.action_registry.register('tag')
@@ -880,6 +890,7 @@ class ControlPanel(query.ChildResourceManager):
         parent_spec = ('recovery-cluster', 'ClusterArn', None)
         enum_spec = ('list_control_panels', 'ControlPanels', None)
         name = id = 'ControlPanelArn'
+        config_type = cfn_type = "AWS::Route53RecoveryControl::ControlPanel"
         global_resource = True
 
     child_source = 'describe'

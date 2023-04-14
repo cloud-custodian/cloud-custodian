@@ -211,6 +211,99 @@ class UpdateConfig(Action):
                 "Filtered %d of %d clusters due to state", state_filtered, len(resources))
 
 
+@EKS.action_registry.register('associate-encryption-config')
+class AssociateEncryptionConfig(Action):
+    """
+    Action that adds an encryption configuration to an EKS cluster.
+
+    :example:
+
+    This policy will find all EKS clusters that do not have Secrets encryption set and
+    associate encryption config with the specified keyArn.
+
+    .. code-block:: yaml
+
+        policies:
+          - name: associate-encryption-config
+            resource: aws.eks
+            filters:
+              - type: value
+                key: encryptionConfig[].provider.keyArn
+                value: absent
+            actions:
+              - type: associate-encryption-config
+                encryptionConfig:
+                  - provider:
+                      keyArn: alias/eks
+                    resources:
+                      - secrets
+    """
+    schema = {
+        'type': 'object',
+        'additionalProperties': False,
+        'properties': {
+            'type': {'enum': ['associate-encryption-config']},
+            'encryptionConfig': {
+                'type': 'array',
+                'properties': {
+                    'type': 'object',
+                    'properties': {
+                        'provider': {
+                            'type': 'object',
+                            'properties': {
+                                'keyArn': {'type': 'string'}
+                            }
+                        },
+                        'resources': {
+                            'type': 'array',
+                            'properties': {
+                                'enum': 'secrets'
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    permissions = ('eks:AssociateEncryptionConfig', 'kms:DescribeKey',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('eks')
+        error = None
+        params = dict(self.data)
+        params.pop('type')
+        # associate_encryption_config does not accept kms key aliases, if provided
+        # with an alias find the key arn with kms:DescribeKey first.
+        key_arn = params['encryptionConfig'][0]['provider']['keyArn']
+        if 'alias' in key_arn:
+            try:
+                kms_client = local_session(self.manager.session_factory).client('kms')
+                _key_arn = kms_client.describe_key(KeyId=key_arn)['KeyMetadata']['Arn']
+                params['encryptionConfig'][0]['provider']['keyArn'] = _key_arn
+            except kms_client.exceptions.NotFoundException as e:
+                self.log.error(
+                    "The following error was received for kms:DescribeKey: " \
+                    f"{e.response['Error']['Message']}"
+                )
+                raise e
+        for r in self.filter_resources(resources, 'status', ('ACTIVE',)):
+            try:
+                client.associate_encryption_config(
+                    clusterName=r['name'],
+                    encryptionConfig=params['encryptionConfig']
+                )
+            except client.exceptions.InvalidParameterException as e:
+                error = e
+                self.log.error(
+                    "The following error was received for cluster " \
+                    f"{r['name']}: {e.response['Error']['Message']}"
+                )
+                continue
+        if error:
+            raise error
+
+
 @EKS.action_registry.register('delete')
 class Delete(Action):
 

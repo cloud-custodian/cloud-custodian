@@ -53,8 +53,51 @@ There are several ways to get a list of possible keys for each resource.
     you're interested in. The available fields will be listed under the results of that api call.
 
 
+Special Values
+~~~~~~~~~~~~~~
 
-- Comparison operators:
+    These meta-values can be used to test whether or not a resource contains a specific value, and if
+    the value is empty.
+
+    - ``absent``: matches when a key *does not* exist
+    - ``present``: matches when a key *does* exist
+    - ``empty``: matches when a value is false, empty, or missing
+    - ``not-null``: matches when a value exists, and is not false or empty
+
+    Consider an S3 bucket with this abbreviated set of attributes:
+
+    .. code-block:: json
+
+      {
+        "Name": "my_bucket",
+        "Versioning": {},
+        "Tags": [{
+          "Environment": "dev",
+          "Owner": ""
+        }]
+      }
+
+    All of the following filters would match this resource:
+
+    .. code-block::
+
+      filters:
+        - "tag:Environment": "dev"
+        - "tag:Environment": "not-null"
+        - "tag:Environment": "present"
+        - "tag:Owner": "empty"
+        - "tag:Owner": "present"
+        - "tag:Team": "empty"
+        - "tag:Team": "absent"
+        - "Versioning": "empty"
+        - "Versioning": "present"
+        - "Versioning.Status": "empty"
+        - "Versioning.Status": "absent"
+
+
+Comparison Operators
+~~~~~~~~~~~~~~~~~~~~
+
     The generic value filter allows for comparison operators to be used
 
     - ``equal`` or ``eq``
@@ -63,6 +106,7 @@ There are several ways to get a list of possible keys for each resource.
     - ``gte`` or ``ge``
     - ``less-than`` or ``lt``
     - ``lte`` or ``le``
+    - ``contains``
 
   .. code-block:: yaml
 
@@ -72,22 +116,10 @@ There are several ways to get a list of possible keys for each resource.
            value: 36                      ─▶ Value that is being compared
            op: greater-than               ─▶ Comparison Operator
 
-- Other operators:
-    - ``absent``
-    - ``present``
-    - ``not-null``
-    - ``empty``
-    - ``contains``
 
-  .. code-block:: yaml
+Logical Operators
+~~~~~~~~~~~~~~~~~
 
-      filters:
-         - type: value
-           key: CpuOptions.CoreCount      ─▶ The value from the describe call
-           value: present                 ─▶ Checks if key is present
-
-
-- Logical Operators:
     - ``or`` or ``Or``
     - ``and`` or ``And``
     - ``not``
@@ -103,7 +135,9 @@ There are several ways to get a list of possible keys for each resource.
              key: CpuOptions.CoreCount      ─▶ The value from the describe call
              value: 42                      ─▶ Value that is being compared
 
-- List Operators:
+List Operators
+~~~~~~~~~~~~~~
+
     There is a collection of operators that can be used with user supplied lists. The operators
     are evaluated as ``value from key`` in (the operator) ``given value``. If you would like it
     evaluated in the opposite way  ``given value`` in (the operator) ``value from key`` then you
@@ -133,7 +167,9 @@ There are several ways to get a list of possible keys for each resource.
 
 
 
-- Special operators:
+Pattern Matching Operators
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     - ``glob`` - Provides Glob matching support
     - ``regex`` - Provides Regex matching support but ignores case (1)
     - ``regex-case`` - Provides case sensitive Regex matching support (1)
@@ -161,7 +197,9 @@ There are several ways to get a list of possible keys for each resource.
 
   __ https://docs.python.org/3/library/re.html#search-vs-match
 
-- Transformations:
+Value Type Transformations
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
   Transformations on the value can be done using the ``value_type`` keyword.  The
   following value types are supported:
 
@@ -261,7 +299,8 @@ There are several ways to get a list of possible keys for each resource.
                  - subnet-1b8474522
                  - subnet-2d2736444
 
-- Value Regex:
+Value Regex
+~~~~~~~~~~~
 
   When using a Value Filter, a ``value_regex`` can be
   specified. This will mean that the value used for comparison is the output
@@ -289,22 +328,24 @@ There are several ways to get a list of possible keys for each resource.
       op: less-than
       value: 0
 
-- Value From:
+Value From
+~~~~~~~~~~
 
   ``value_from`` allows the use of external values in the Value Filter
 
   .. autodoconly:: c7n.resolver.ValuesFrom
 
-- Value Path:
+Value Path
+~~~~~~~~~~
 
-  Retrieve values using JMESPath. 
-  
-  The filter expects that a properly formatted 'string' is passed 
+  Retrieve values using JMESPath.
+
+  The filter expects that a properly formatted 'string' is passed
   containing a valid JMESPath. (Tutorial here on `JMESPath <http://jmespath.org/tutorial.html>`_ syntax)
 
   When using a Value Filter, a ``value_path`` can be specified.
   This means the value(s) the filter will compare against are
-  calculated during the initialization of the filter. 
+  calculated during the initialization of the filter.
 
   Note that this option only pulls properties of the resource
   currently being filtered.
@@ -335,7 +376,7 @@ describe resource call as is the case in the ValueFilter
 
      - name: no-ec2-public-ips
        resource: aws.ec2
-       mode:make 
+       mode:make
          type: cloudtrail
          events:
              - RunInstances
