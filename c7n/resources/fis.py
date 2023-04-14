@@ -2,22 +2,12 @@
 # SPDX-License-Identifier: Apache-2.0
 from c7n.actions import Action
 from c7n.manager import resources
-from c7n.query import QueryResourceManager, TypeInfo
+from c7n.query import QueryResourceManager, TypeInfo, ConfigSource, DescribeSource
 from c7n.tags import Tag, RemoveTag, TagDelayedAction, TagActionFilter
 from c7n.utils import type_schema, local_session, get_partition
 
 
-@resources.register('fis-template')
-class ExperimentTemplate(QueryResourceManager):
-    class resource_type(TypeInfo):
-        service = 'fis'
-        enum_spec = ('list_experiment_templates', 'experimentTemplates', None)
-        detail_spec = ('get_experiment_template', 'id', 'id', 'experimentTemplate')
-
-        name = id = 'id'
-        date = 'creationTime'
-        cfn_type = "AWS::FIS::ExperimentTemplate"
-        arn_type = 'experiment-template'
+class ExperimentTemplateDescribe(DescribeSource):
 
     def augment(self, resources):
         resources = super().augment(resources)
@@ -27,6 +17,21 @@ class ExperimentTemplate(QueryResourceManager):
                 continue
             r['Tags'] = [{'Key': k, 'Value': v} for k, v in r.pop('tags', {}).items()]
         return resources
+
+
+@resources.register('fis-template')
+class ExperimentTemplate(QueryResourceManager):
+    class resource_type(TypeInfo):
+        service = 'fis'
+        enum_spec = ('list_experiment_templates', 'experimentTemplates', None)
+        detail_spec = ('get_experiment_template', 'id', 'id', 'experimentTemplate')
+        name = id = 'id'
+        date = 'creationTime'
+        config_type = cfn_type = "AWS::FIS::ExperimentTemplate"
+        arn_type = 'experiment-template'
+
+    source_mapping = {'describe': ExperimentTemplateDescribe,
+                      'config': ConfigSource}
 
     def get_arns(self, resources):
         partition = get_partition(self.region)

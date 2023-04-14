@@ -373,11 +373,6 @@ class Json(Output):
             line_pairs.append((index, l))
             index += 1
 
-        return {
-            "policy": dict(result.policy.data),
-            "resource": dict(resource),
-            "file_path": str(resource.src_dir / resource.filename),
-            "file_line_start": resource.line_start,
-            "file_line_end": resource.line_end,
-            "code_block": line_pairs,
-        }
+        formatted = result.as_dict()
+        formatted["code_block"] = line_pairs
+        return formatted

@@ -271,7 +271,7 @@ class SqlServerFirewallRulesFilter(FirewallRulesFilter):
 
         for r in query:
             rule = IPRange(r.start_ip_address, r.end_ip_address)
-            if rule == AZURE_SERVICES:
+            if rule == AZURE_SERVICES and not self.data.get('include-azure-services', False):
                 # Ignore 0.0.0.0 magic value representing Azure Cloud bypass
                 continue
             resource_rules.add(rule)
