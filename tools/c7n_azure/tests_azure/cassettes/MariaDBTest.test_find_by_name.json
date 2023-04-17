@@ -46,8 +46,8 @@
                                         "storageAutogrow": "Enabled"
                                     },
                                     "version": "10.2",
-                                    "sslEnforcement": "Enabled",
-                                    "minimalTlsVersion": "TLS1_2",
+                                    "sslEnforcement": "Disabled",
+                                    "minimalTlsVersion": "TLSEnforcementDisabled",
                                     "userVisibleState": "Ready",
                                     "fullyQualifiedDomainName": "mariadb-server-tls.mariadb.database.azure.com",
                                     "earliestRestoreDate": "2023-04-14T21:21:08.777+00:00",

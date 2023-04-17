@@ -11,7 +11,7 @@ class MariaDB(ArmResourceManager):
 
     :example:
 
-    Returns all MariaDB servers enabled with sslEnforcement
+    Returns all MariaDB servers sslEnforcement not equal to Enabled
 
     .. code-block:: yaml
 
@@ -21,7 +21,7 @@ class MariaDB(ArmResourceManager):
             filters:
               - type: value
                 key: properties.sslEnforcement
-                op: equal
+                op: ne
                 value: Enabled
 
     """
