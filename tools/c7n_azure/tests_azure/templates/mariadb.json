@@ -1,0 +1,69 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+
+    },
+    "variables": {
+        "suffix":"[substring(subscription().subscriptionId, 24, 12)]",
+        "name": "[concat('ccmariadb', variables('suffix'))]",
+        "databaseName": "test"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.DBforMariaDB/servers",
+            "apiVersion": "2018-06-01",
+            "name": "[variables('name')]",
+            "location": "EastUs",
+            "sku": {
+                "name": "GP_Gen5_2",
+                "tier": "GeneralPurpose",
+                "capacity": "2",
+                "size": "51200",
+                "family": "Gen5"
+            },
+            "properties": {
+                "createMode": "Default",
+                "version": "10.3",
+                "administratorLogin": "custodian",
+                "administratorLoginPassword": "Cust0dianPassw0rd",
+                "storageProfile": {
+                    "storageMB": "51200",
+                    "backupRetentionDays": 7,
+                    "geoRedundantBackup": "Disabled"
+                },
+                "sslEnforcement": "Enabled",
+                "minimalTlsVersion": "TLS1_2"
+            },
+            "resources": [
+                {
+                    "type": "firewallRules",
+                    "apiVersion": "2018-06-01",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.DBforMariaDB/servers/databases', variables('name'), variables('databaseName'))]",
+                        "[resourceId('Microsoft.DBforMariaDB/servers/', variables('name'))]"
+                    ],
+                    "location": "EastUs",
+                    "name": "AllowAzureIPs",
+                    "properties": {
+                        "startIpAddress": "0.0.0.0",
+                        "endIpAddress": "0.0.0.0"
+                    }
+                },
+                {
+                    "name": "[variables('databaseName')]",
+                    "type": "databases",
+                    "apiVersion": "2018-06-01",
+                    "properties": {
+                        "charset": "utf8mb4",
+                        "collation": "utf8mb4_unicode_520_ci"
+                    },
+                    "dependsOn": [
+                        "[resourceId('Microsoft.DBforMariaDB/servers/', variables('name'))]"
+                    ]
+                }
+            ]
+        }
+          ],
+    "outputs": {}
+}

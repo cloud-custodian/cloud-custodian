@@ -39,6 +39,7 @@ ResourceMap = {
     "azure.keyvault-keys": "c7n_azure.resources.key_vault_keys.KeyVaultKeys",
     "azure.loadbalancer": "c7n_azure.resources.load_balancer.LoadBalancer",
     "azure.logic-app-workflow": "c7n_azure.resources.logic_app.LogicAppWorkflow",
+    "azure.mariadb": "c7n_azure.resources.mariadb.MariaDB",
     "azure.mysql": "c7n_azure.resources.mysql.MySQL",
     "azure.mysql-flexibleserver": "c7n_azure.resources.mysql_flexibleserver.MySQLFlexibleServer",
     "azure.networkinterface": "c7n_azure.resources.network_interface.NetworkInterface",
