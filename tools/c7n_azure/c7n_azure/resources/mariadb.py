@@ -37,4 +37,4 @@ class MariaDB(ArmResourceManager):
             'location',
             'resourceGroup'
         )
-        resource_type = 'Microsoft.DBForMariaDB/servers'
+        resource_type = 'Microsoft.DBforMariaDB/servers'

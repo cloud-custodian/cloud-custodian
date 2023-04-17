@@ -20,7 +20,7 @@ class MySQLTest(BaseTest):
                  'key': 'name',
                  'op': 'glob',
                  'value_type': 'normalize',
-                 'value': 'ccmysql*'}],
+                 'value': 'mariadb-fail-tls'}],
         })
         resources = p.run()
         self.assertEqual(len(resources), 1)

@@ -14,17 +14,17 @@
                     "message": "OK"
                 },
                 "headers": {
+                    "date": [
+                        "Fri, 14 Apr 2023 21:51:21 GMT"
+                    ],
                     "cache-control": [
                         "no-cache"
-                    ],
-                    "date": [
-                        "Fri, 14 Apr 2023 21:18:22 GMT"
                     ],
                     "content-type": [
                         "application/json; charset=utf-8"
                     ],
                     "content-length": [
-                        "934"
+                        "929"
                     ]
                 },
                 "body": {
@@ -38,7 +38,7 @@
                                     "capacity": 2
                                 },
                                 "properties": {
-                                    "administratorLogin": "xgdqbcgb",
+                                    "administratorLogin": "dyukugua",
                                     "storageProfile": {
                                         "storageMB": 5120,
                                         "backupRetentionDays": 7,
@@ -49,8 +49,8 @@
                                     "sslEnforcement": "Disabled",
                                     "minimalTlsVersion": "TLSEnforcementDisabled",
                                     "userVisibleState": "Ready",
-                                    "fullyQualifiedDomainName": "mariadb-server-tls.mariadb.database.azure.com",
-                                    "earliestRestoreDate": "2023-04-14T21:21:08.777+00:00",
+                                    "fullyQualifiedDomainName": "mariadb-fail-tls.mariadb.database.azure.com",
+                                    "earliestRestoreDate": "2023-04-14T21:58:34.187+00:00",
                                     "replicationRole": "",
                                     "masterServerId": "",
                                     "byokEnforcement": "Disabled",
@@ -63,8 +63,8 @@
                                     "c7n": "true",
                                     "product_id": "13742"
                                 },
-                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/mariadb-tls-group/providers/Microsoft.DBforMariaDB/servers/mariadb-server-tls",
-                                "name": "mariadb-server-tls",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/mariadb-fail-group/providers/Microsoft.DBforMariaDB/servers/mariadb-fail-tls",
+                                "name": "mariadb-fail-tls",
                                 "type": "Microsoft.DBforMariaDB/servers"
                             }
                         ]
