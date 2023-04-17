@@ -108,6 +108,48 @@ class LambdaPermissions(CheckPermissions):
     def get_iam_arns(self, resources):
         return [r['Role'] for r in resources]
 
+@AWSLambda.filter_registry.register('has-wildcard-policy')  
+class LambdaPermissionsWildcard(Filter):
+    """Filters lambda function policies with wildcard in Action permissions eg "kms:*" or "athena:BatchGet*"
+ 
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name:   - name: cfb-aws-compute-ensure-lambda-has-no-policy-with-wildcard
+                resource: lambda
+                filters:
+                  - type: has-wildcard-policy
+
+    """
+    
+    annotation_key = "c7n:FunctionInfo"
+    schema = type_schema('has-wildcard-policy')
+    schema_alias = False
+
+    def check_policy(self, client, resource, log):
+        roleName = resource['Role'].split('/')[-1]
+        policies = (self.manager.retry(
+            client.list_role_policies, RoleName=resource['Role'].split('/')[-1],
+            ignore_err_codes=('NoSuchEntityException',)) or {}).get('PolicyNames', ())
+
+        for policyName in policies:
+            p = client.get_role_policy(RoleName=roleName,PolicyName=policyName)
+            for s in  p['PolicyDocument']['Statement']:
+                if "*" in s['Action']:
+                    log.debug("Lambda function: '%s' has action with wildcard: '%s' in policy '%s' for role %s", resource['FunctionName'],s['Action'], policyName, roleName )
+                    return True
+        return False
+
+    def process(self, resources, event=None):
+        c = local_session(self.manager.session_factory).client('iam')
+        results = [r for r in resources if self.check_policy(c, r, self.log)]
+        self.log.info(
+            "%d of %d Lambda policies with wildcard action",
+            len(results), len(resources))
+        return results
+   
 
 @AWSLambda.filter_registry.register('reserved-concurrency')
 class ReservedConcurrency(ValueFilter):
