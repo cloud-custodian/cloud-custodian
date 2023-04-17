@@ -11,18 +11,18 @@ class MariaDB(ArmResourceManager):
 
     :example:
 
-    Returns all MariaDB servers sslEnforcement not equal to Enabled
+    Returns all MariaDB servers
 
     .. code-block:: yaml
 
-        policies:
-          - name: mariabd-servers-enabled-with-ssl-enforcement
+         policies:
+          - name: basic-logic-app-for-mariadb
             resource: azure.mariadb
             filters:
               - type: value
-                key: properties.sslEnforcement
-                op: ne
-                value: Enabled
+                key: sku.name
+                op: equal
+                value: Basic
 
     """
 

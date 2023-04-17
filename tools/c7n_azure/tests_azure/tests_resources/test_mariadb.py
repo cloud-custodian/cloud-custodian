@@ -20,7 +20,7 @@ class MariaDBTest(BaseTest):
             'filters': [
                 {'type': 'value',
                  'key': 'name',
-                 'op': 'eq',
+                 'op': 'glob',
                  'value_type': 'normalize',
                  'value': 'ccmariadb8c5acbfeb94e'}],
         })
