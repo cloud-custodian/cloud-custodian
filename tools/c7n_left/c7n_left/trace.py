@@ -1,4 +1,5 @@
 import contextlib
+import cmd
 
 from c7n.config import Bag
 from c7n.output import tracer_outputs
@@ -11,6 +12,38 @@ class SegmentType:
     Filter = "filter:"
     Action = "action:"
     Unknown = "unknown"
+
+
+class DebugShell(cmd.Cmd):
+    prompt = "(policy-step) "
+
+    def __init__(self, console, tracer):
+        self.console = console
+        self.tracer = tracer
+        super().__init__()
+
+    def do_resource(self, arg):
+        """Show resources"""
+        pass
+
+    def do_element(self, arg):
+        """Show the current policy element"""
+        element = self.tracer.stack[-1].element
+        if element is None:
+            self.console.print("no current element")
+        else:
+            self.console.print(element.data)
+
+    def do_c(self, arg):
+        """Continue policy execution"""
+        import pdb
+
+        pdb.set_trace()
+        return True
+
+    def do_s(self, arg):
+        """Go to next policy element"""
+        return True
 
 
 @tracer_outputs.register("console")
@@ -27,8 +60,10 @@ class ConsoleTracer:
     def __init__(self, ctx, config):
         self.ctx = ctx
         self.config = config
+        self.config["step"] = True
         self.console = Console()
         self.stack = []
+        self.shell = DebugShell(self.console, self)
 
     @property
     def indent(self):
@@ -107,6 +142,9 @@ class ConsoleTracer:
         try:
             yield self.stack[-1]
         finally:
+            if "step" in self.config:
+                self.shell.cmdloop()
+
             apis = self.ctx.api_stats and self.ctx.api_stats.pop_snapshot() or {}
             segment = self.stack[-1]
             post_message = self.get_post_message(

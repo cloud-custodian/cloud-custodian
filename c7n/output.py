@@ -125,6 +125,8 @@ class DeltaStats:
         self.snapshot_stack.append(self.get_snapshot())
 
     def pop_snapshot(self):
+        if not self.snapshot_stack:
+            return {}
         return self.delta(
             self.snapshot_stack.pop(), self.get_snapshot())
 
