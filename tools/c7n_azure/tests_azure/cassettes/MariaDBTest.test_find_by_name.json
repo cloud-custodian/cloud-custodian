@@ -14,17 +14,17 @@
                     "message": "OK"
                 },
                 "headers": {
-                    "date": [
-                        "Fri, 14 Apr 2023 21:51:21 GMT"
-                    ],
                     "cache-control": [
                         "no-cache"
+                    ],
+                    "date": [
+                        "Tue, 18 Apr 2023 15:37:02 GMT"
                     ],
                     "content-type": [
                         "application/json; charset=utf-8"
                     ],
                     "content-length": [
-                        "929"
+                        "971"
                     ]
                 },
                 "body": {
@@ -32,25 +32,25 @@
                         "value": [
                             {
                                 "sku": {
-                                    "name": "B_Gen5_2",
-                                    "tier": "Basic",
+                                    "name": "GP_Gen5_2",
+                                    "tier": "GeneralPurpose",
                                     "family": "Gen5",
                                     "capacity": 2
                                 },
                                 "properties": {
-                                    "administratorLogin": "dyukugua",
+                                    "administratorLogin": "custodian",
                                     "storageProfile": {
-                                        "storageMB": 5120,
+                                        "storageMB": 51200,
                                         "backupRetentionDays": 7,
                                         "geoRedundantBackup": "Disabled",
-                                        "storageAutogrow": "Enabled"
+                                        "storageAutogrow": "Disabled"
                                     },
-                                    "version": "10.2",
-                                    "sslEnforcement": "Disabled",
-                                    "minimalTlsVersion": "TLSEnforcementDisabled",
+                                    "version": "10.3",
+                                    "sslEnforcement": "Enabled",
+                                    "minimalTlsVersion": "TLS1_2",
                                     "userVisibleState": "Ready",
-                                    "fullyQualifiedDomainName": "mariadb-fail-tls.mariadb.database.azure.com",
-                                    "earliestRestoreDate": "2023-04-14T21:58:34.187+00:00",
+                                    "fullyQualifiedDomainName": "cctestmariadbserver76cp5dtr7sta4.mariadb.database.azure.com",
+                                    "earliestRestoreDate": "2023-04-18T15:33:05.367+00:00",
                                     "replicationRole": "",
                                     "masterServerId": "",
                                     "byokEnforcement": "Disabled",
@@ -60,11 +60,10 @@
                                 },
                                 "location": "eastus",
                                 "tags": {
-                                    "c7n": "true",
                                     "product_id": "13742"
                                 },
-                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/mariadb-fail-group/providers/Microsoft.DBforMariaDB/servers/mariadb-fail-tls",
-                                "name": "mariadb-fail-tls",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_mariadb/providers/Microsoft.DBforMariaDB/servers/cctestmariadbserver76cp5dtr7sta4",
+                                "name": "cctestmariadbserver76cp5dtr7sta4",
                                 "type": "Microsoft.DBforMariaDB/servers"
                             }
                         ]

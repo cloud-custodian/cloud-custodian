@@ -2,18 +2,18 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
+        "servers_cctestmariadbserver_name": {
+            "defaultValue": "[concat('cctestmariadbserver', uniqueString(resourceGroup().id))]",
+            "type": "string"
+        }
 
     },
-    "variables": {
-        "suffix":"[substring(subscription().subscriptionId, 24, 12)]",
-        "name": "[concat('ccmariadb', variables('suffix'))]",
-        "databaseName": "test"
-    },
+    "variables": {},
     "resources": [
         {
             "type": "Microsoft.DBforMariaDB/servers",
             "apiVersion": "2018-06-01",
-            "name": "[variables('name')]",
+            "name": "[parameters('servers_cctestmariadbserver_name')]",
             "location": "EastUs",
             "sku": {
                 "name": "GP_Gen5_2",
@@ -32,16 +32,15 @@
                     "backupRetentionDays": 7,
                     "geoRedundantBackup": "Disabled"
                 },
-                "sslEnforcement": "Disabled",
-                "minimalTlsVersion": "TLSEnforcementDisabled"
+                "sslEnforcement": "Enabled",
+                "minimalTlsVersion": "TLS1_2"
             },
             "resources": [
                 {
-                    "type": "firewallRules",
+                    "type": "firewallrules",
                     "apiVersion": "2018-06-01",
                     "dependsOn": [
-                        "[resourceId('Microsoft.DBforMariaDB/servers/databases', variables('name'), variables('databaseName'))]",
-                        "[resourceId('Microsoft.DBforMariaDB/servers/', variables('name'))]"
+                        "[resourceId('Microsoft.DBforMariaDB/servers', parameters('servers_cctestmariadbserver_name'))]"
                     ],
                     "location": "EastUs",
                     "name": "AllowAzureIPs",
@@ -51,7 +50,7 @@
                     }
                 },
                 {
-                    "name": "[variables('databaseName')]",
+                    "name": "[parameters('servers_cctestmariadbserver_name')]",
                     "type": "databases",
                     "apiVersion": "2018-06-01",
                     "properties": {
@@ -59,7 +58,7 @@
                         "collation": "utf8mb4_unicode_520_ci"
                     },
                     "dependsOn": [
-                        "[resourceId('Microsoft.DBforMariaDB/servers/', variables('name'))]"
+                        "[resourceId('Microsoft.DBforMariaDB/servers/',parameters('servers_cctestmariadbserver_name'))]"
                     ]
                 }
             ]
