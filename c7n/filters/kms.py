@@ -3,7 +3,6 @@
 from .core import ValueFilter
 from .related import RelatedResourceFilter
 from c7n.utils import type_schema
-import jmespath
 
 
 class KmsRelatedFilter(RelatedResourceFilter):
