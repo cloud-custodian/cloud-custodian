@@ -1,0 +1,116 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/microsoft.insights/activityLogAlerts?api-version=2017-04-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "date": [
+                        "Fri, 14 May 2021 12:14:07 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "content-length": [
+                        "1547"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_activity_logs/providers/microsoft.insights/activityLogAlerts/rule1",
+                                "type": "Microsoft.Insights/ActivityLogAlerts",
+                                "name": "rule1",
+                                "location": "Global",
+                                "kind": null,
+                                "tags": {},
+                                "properties": {
+                                    "scopes": [
+                                        "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/test_activity_logs"
+                                    ],
+                                    "condition": {
+                                        "allOf": [
+                                            {
+                                                "field": "category",
+                                                "equals": "Administrative",
+                                                "containsAny": null,
+                                                "odata.type": null
+                                            },
+                                            {
+                                                "field": "operationName",
+                                                "equals": "84codes.CloudAMQP/servers/write",
+                                                "containsAny": null,
+                                                "odata.type": null
+                                            }
+                                        ],
+                                        "odata.type": null
+                                    },
+                                    "actions": {
+                                        "actionGroups": [
+                                            {
+                                                "actionGroupId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/test12cis/providers/microsoft.insights/actiongroups/action12",
+                                                "webhookProperties": {}
+                                            }
+                                        ]
+                                    },
+                                    "enabled": true,
+                                    "description": ""
+                                },
+                                "identity": null
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_activity_logs/providers/microsoft.insights/activityLogAlerts/rule2",
+                                "type": "Microsoft.Insights/ActivityLogAlerts",
+                                "name": "rule2",
+                                "location": "Global",
+                                "kind": null,
+                                "tags": {},
+                                "properties": {
+                                    "scopes": [
+                                        "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/test_activity_logs"
+                                    ],
+                                    "condition": {
+                                        "allOf": [
+                                            {
+                                                "field": "category",
+                                                "equals": "Administrative",
+                                                "containsAny": null,
+                                                "odata.type": null
+                                            },
+                                            {
+                                                "field": "operationName",
+                                                "equals": "LiveArena.Broadcast/services/listSecrets/action",
+                                                "containsAny": null,
+                                                "odata.type": null
+                                            }
+                                        ],
+                                        "odata.type": null
+                                    },
+                                    "actions": {
+                                        "actionGroups": []
+                                    },
+                                    "enabled": true,
+                                    "description": ""
+                                },
+                                "identity": null
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}
