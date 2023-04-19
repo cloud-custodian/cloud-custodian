@@ -89,13 +89,7 @@ class KmsRelatedFilter(RelatedResourceFilter):
     def key_alias_to_key_id(self, alias):
         # convert key alias to key id for cache lookup
         # else cache lookup returns [] even if the key exists
-        keys = self.manager.get_resource_manager('kms-key').resources()
-        found = False
-        for key in keys:
-            alias_names = jmespath.search('AliasNames', key)
-            if str(alias) in alias_names:
-                id = key.get('KeyId')
-                found = True
-                break
-        if found:
-            return str(id)
+        key_manager = self.manager.get_resource_manager('kms-key')
+        for kid, kaliases in key_manager.alias_map.items():
+            if str(alias) in kaliases:
+                return str(kid)
