@@ -3,6 +3,7 @@
 from .core import ValueFilter
 from .related import RelatedResourceFilter
 from c7n.utils import type_schema
+import jmespath
 
 
 class KmsRelatedFilter(RelatedResourceFilter):
@@ -68,6 +69,8 @@ class KmsRelatedFilter(RelatedResourceFilter):
         related_ids = super().get_related_ids(resources)
         normalized_ids = []
         for rid in related_ids:
+            if rid.startswith('alias'):
+                rid = self.key_alias_to_key_id(rid)
             if rid.startswith('arn:'):
                 normalized_ids.append(rid.rsplit('/', 1)[-1])
             else:
@@ -82,3 +85,17 @@ class KmsRelatedFilter(RelatedResourceFilter):
             # to avoid lookup errors in filters.
             r['c7n:AliasName'] = r.get('AliasNames', ('',))[0]
         return [r for r in resources if self.process_resource(r, related)]
+
+    def key_alias_to_key_id(self, alias):
+        # convert key alias to key id for cache lookup
+        # else cache lookup returns [] even if the key exists
+        keys = self.manager.get_resource_manager('kms-key').resources()
+        found = False
+        for key in keys:
+            alias_names = jmespath.search('AliasNames', key)
+            if str(alias) in alias_names:
+                id = key.get('KeyId')
+                found = True
+                break
+        if found:
+            return str(id)
