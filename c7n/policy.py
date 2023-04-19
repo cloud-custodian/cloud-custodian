@@ -395,7 +395,7 @@ class LambdaMode(ServerlessExecutionMode):
             'concurrency': {'type': 'integer'},
             # Do we really still support 2.7 and 3.6?
             'runtime': {'enum': ['python2.7', 'python3.6',
-                                 'python3.7', 'python3.8', 'python3.9']},
+                                 'python3.7', 'python3.8', 'python3.9', 'python3.10']},
             'role': {'type': 'string'},
             'handler': {'type': 'string'},
             'pattern': {'type': 'object', 'minProperties': 1},
@@ -414,10 +414,26 @@ class LambdaMode(ServerlessExecutionMode):
     def validate(self):
         super(LambdaMode, self).validate()
         prefix = self.policy.data['mode'].get('function-prefix', 'custodian-')
-        if len(prefix + self.policy.name) > 64:
+        MAX_LAMBDA_FUNCTION_NAME_LENGTH = 64
+        if len(prefix + self.policy.name) > MAX_LAMBDA_FUNCTION_NAME_LENGTH:
             raise PolicyValidationError(
-                "Custodian Lambda policies have a max length with prefix of 64"
-                " policy:%s prefix:%s" % (prefix, self.policy.name))
+                "Custodian Lambda policies have a max length with prefix of %s"
+                " policy:%s prefix:%s" % (
+                    MAX_LAMBDA_FUNCTION_NAME_LENGTH,
+                    prefix,
+                    self.policy.name
+                )
+            )
+        MAX_LAMBDA_FUNCTION_DESCRIPTION_LENGTH = 256
+        if len(self.policy.description) > MAX_LAMBDA_FUNCTION_DESCRIPTION_LENGTH:
+            raise PolicyValidationError(
+                'Custodian Lambda policies have a max description length of %s'
+                ' policy: %s description: %s' % (
+                    MAX_LAMBDA_FUNCTION_DESCRIPTION_LENGTH,
+                    self.policy.name,
+                    self.policy.description
+                )
+            )
         tags = self.policy.data['mode'].get('tags')
         if not tags:
             return
@@ -1045,8 +1061,6 @@ class PolicyConditions:
 
     def __init__(self, policy, data):
         self.policy = policy
-        self.data = data
-        self.filters = self.data.get('conditions', [])
         # for value_from usage / we use the conditions class
         # to mimic a resource manager interface. we can't use
         # the actual resource manager as we're overriding block
@@ -1058,6 +1072,11 @@ class PolicyConditions:
         self.session_factory = rm.session_factory
         # used by c7n-org to extend evaluation conditions
         self.env_vars = {}
+        self.update(data)
+
+    def update(self, data):
+        self.data = data
+        self.filters = self.data.get('conditions', [])
         self.initialized = False
 
     def validate(self):
@@ -1145,6 +1164,10 @@ class Policy:
     @property
     def name(self) -> str:
         return self.data['name']
+
+    @property
+    def description(self) -> str:
+        return self.data.get('description', '')
 
     @property
     def resource_type(self) -> str:
@@ -1270,8 +1293,8 @@ class Policy:
         # Update ourselves in place
         self.data = updated
 
-        # NOTE rebuild the policy conditions base on the new self.data
-        self.conditions = PolicyConditions(self, self.data)
+        # NOTE update the policy conditions base on the new self.data
+        self.conditions.update(self.data)
 
         # Reload filters/actions using updated data, we keep a reference
         # for some compatiblity preservation work.
