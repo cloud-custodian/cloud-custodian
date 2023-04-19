@@ -129,7 +129,7 @@ class LambdaPermissionsWildcard(Filter):
     schema = type_schema('has-wildcard-policy')
     schema_alias = False
 
-    def check_policy(self, client, resource, log):
+    def check_policy(self, client, resource):
         roleName = resource['Role'].split('/')[-1]
         policies = (self.manager.retry(
             client.list_role_policies, RoleName=resource['Role'].split('/')[-1],
@@ -144,7 +144,7 @@ class LambdaPermissionsWildcard(Filter):
 
     def process(self, resources, event=None):
         c = local_session(self.manager.session_factory).client('iam')
-        results = [r for r in resources if self.check_policy(c, r, self.log)]
+        results = [r for r in resources if self.check_policy(c, r)]
         self.log.info(
             "%d of %d Lambda policies with wildcard action",
             len(results), len(resources))

@@ -194,6 +194,24 @@ class LambdaTest(BaseTest):
         resources = p.run()
         assert len(resources) == 1
 
+    def test_lambda_has_no_policy_wildcard(self):
+        factory = self.replay_flight_data('test_lambda_has_no_policy_wildcard')
+        p = self.load_policy(
+            {
+                'name': 'lambda-check',
+                'resource': 'lambda',
+                'filters': [
+                    {'FunctionName': 'lambda-wildcard-policy-fail'},
+                    {'type': 'has-wildcard-policy'}
+                ]
+            },
+            session_factory=factory)
+        resources = p.run()
+        assert len(resources) == 1
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["FunctionName"], "lambda-wildcard-policy-fail")
+       
     def test_lambda_has_specific_managed_policy(self):
         # lots of pre-conditions, iam role with iam read only policy attached
         # and a permission boundary with deny on iam read access.
