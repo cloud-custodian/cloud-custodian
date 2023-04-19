@@ -111,7 +111,8 @@ class LambdaPermissions(CheckPermissions):
 
 @AWSLambda.filter_registry.register('has-wildcard-policy')  
 class LambdaPermissionsWildcard(Filter):
-    """Filters lambda function policies with wildcard in Action permissions eg "kms:*" or "athena:BatchGet*"
+    """Filters lambda function policies with wildcard in Action permissions
+      examples are "kms:*" or "athena:BatchGet*"
  
     :example:
 
@@ -139,7 +140,8 @@ class LambdaPermissionsWildcard(Filter):
             p = client.get_role_policy(RoleName=roleName,PolicyName=policyName)
             for s in p['PolicyDocument']['Statement']:
                 for a in s['Action']:
-                    if "*" in a: return True
+                    if "*" in a: 
+                        return True
         return False
 
     def process(self, resources, event=None):
