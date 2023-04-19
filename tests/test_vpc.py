@@ -10,6 +10,40 @@ from c7n.resources.aws import shape_validate
 from pytest_terraform import terraform
 
 
+@terraform('ec2_igw_subnet')
+def test_ec2_igw_subnet(test, ec2_igw_subnet):
+    aws_region = 'us-east-1'
+    session_factory = test.replay_flight_data('ec2_igw_subnet', region=aws_region)
+
+    p = test.load_policy(
+        {
+            'name': 'ec2_igw_subnet',
+            'resource': 'ec2',
+            'filters': [
+                {
+                    'type': 'subnet',
+                    'igw': True,
+                    'key': 'SubnetId',
+                    'value': 'present',
+                },
+            ],
+        },
+        session_factory=session_factory,
+        config={'region': aws_region},
+    )
+
+    resources = p.run()
+
+    result_instance_ids = set(i['InstanceId'] for i in resources)
+    expected_instance_ids = {
+        ec2_igw_subnet['aws_instance.public_auto_assigned.id'],
+        ec2_igw_subnet['aws_instance.public_primary_interface.id'],
+        ec2_igw_subnet['aws_instance.public_secondary_interface.id'],
+    }
+    assert len(resources) == len(expected_instance_ids)
+    assert expected_instance_ids == result_instance_ids
+
+
 def test_eni_igw_subnet(test):
     factory = test.replay_flight_data('test_eni_public_subnet')
     p = test.load_policy({

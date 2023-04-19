@@ -203,7 +203,7 @@ class PolicyMetaLint(BaseTest):
         overrides = overrides.difference(
             {'account', 's3', 'hostedzone', 'log-group', 'rest-api', 'redshift-snapshot',
              'rest-stage', 'codedeploy-app', 'codedeploy-group', 'fis-template', 'dlm-policy',
-             'apigwv2', 'apigw-domain-name'})
+             'apigwv2', 'apigw-domain-name', 'fis-experiment'})
         if overrides:
             raise ValueError("unknown arn overrides in %s" % (", ".join(overrides)))
 
@@ -1890,6 +1890,44 @@ class GuardModeTest(BaseTest):
                  "mode": {"type": "guard-duty"}},
                 validate=True)
         self.assertTrue("max length with prefix" in str(e_cm.exception))
+
+    def test_lambda_policy_validate_too_long_description_length(self):
+        for description_length in [257, 300, 340]:
+            description = 'a' * description_length
+            with self.assertRaises(PolicyValidationError) as e_cm:
+                self.load_policy(
+                    {
+                        'name': 'testing',
+                        'description': description,
+                        'resource': 'ec2',
+                        'mode': {'type': 'guard-duty'}
+                    },
+                    validate=True
+                )
+            self.assertTrue('max description length of' in str(e_cm.exception))
+
+    def test_lambda_policy_validate_correct_description_length(self):
+        for description_length in [0, 1, 128, 256]:
+            description = 'a' * description_length
+            self.load_policy(
+                {
+                    'name': 'testing',
+                    'description': description,
+                    'resource': 'ec2',
+                    'mode': {'type': 'guard-duty'}
+                },
+                validate=True
+            )
+
+    def test_lambda_policy_validate_no_description_field(self):
+        self.load_policy(
+            {
+                'name': 'testing',
+                'resource': 'ec2',
+                'mode': {'type': 'guard-duty'}
+            },
+            validate=True
+        )
 
     @mock.patch("c7n.mu.LambdaManager.publish")
     def test_ec2_guard_event_pattern(self, publish):
