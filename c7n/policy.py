@@ -1262,7 +1262,12 @@ class Policy:
             'op': '{op}',
             'action_date': '{action_date}',
             # tag action pyformat-date handling
-            'now': utils.FormatDate(datetime.utcnow()),
+            # defer expansion until runtime for serverless modes
+            'now': (
+                utils.DeferredFormatString('now')
+                if isinstance(self.get_execution_mode(), ServerlessExecutionMode)
+                else utils.FormatDate(datetime.utcnow())
+            ),
             # account increase limit action
             'service': '{service}',
             # s3 set logging action :-( see if we can revisit this one.
