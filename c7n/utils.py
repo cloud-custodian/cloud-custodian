@@ -688,7 +688,7 @@ class DeferredFormatString(UserString):
     expansion of runtime variables without losing format spec details.
     """
     def __format__(self, format_spec):
-        return "".join(("{", str(self), f":{format_spec}" if format_spec else "", "}"))
+        return "".join(("{", self.data, f":{format_spec}" if format_spec else "", "}"))
 
 
 class FormatDate:

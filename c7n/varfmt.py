@@ -1,4 +1,5 @@
 from string import Formatter
+from c7n.utils import DeferredFormatString
 
 
 class VarFormat(Formatter):
@@ -82,7 +83,7 @@ class VarFormat(Formatter):
             obj, is_literal, format_spec = result[0]
             if is_literal:
                 return obj, auto_arg_index
-            if format_spec:
+            if format_spec or isinstance(obj, DeferredFormatString):
                 return self.format_field(obj, format_spec), auto_arg_index
             else:
                 return obj, auto_arg_index

@@ -174,7 +174,7 @@ class PolicyLambdaProvision(Publish):
             'resource': 'aws.ec2',
             'mode': {
                 'type': 'cloudtrail',
-                'role': 'arn:aws:iam::613702428514:role/custodian-remediations',
+                'role': 'arn:aws:iam::644160558196:role/custodian-mu',
                 'events': ['RunInstances']},
             'actions': [{
                 'type': 'tag', 'key': 'LastMatch', 'value': '{now}'
