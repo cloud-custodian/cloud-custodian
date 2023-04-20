@@ -2,6 +2,8 @@
 # SPDX-License-Identifier: Apache-2.0
 import jmespath
 import json
+import sqlite3
+
 from urllib.parse import urlparse, parse_qs
 
 from botocore.exceptions import ClientError
@@ -22,7 +24,6 @@ from botocore.config import Config
 from .securityhub import PostFinding
 
 ErrAccessDenied = "AccessDeniedException"
-
 
 class DescribeLambda(query.DescribeSource):
 
@@ -126,27 +127,59 @@ class LambdaPermissionsWildcard(Filter):
 
     """
     
-    annotation_key = "c7n:FunctionInfo"
+    annotation_key = 'c7n:FunctionInfo'
+    policy_annotation_key = 'c7n:Policy'
     schema = type_schema('has-wildcard-policy')
     schema_alias = False
 
-    def check_policy(self, client, resource):
+    def check_managed_policy(self, client, resource):
         roleName = resource['Role'].split('/')[-1]
-        policies = (self.manager.retry(
-            client.list_role_policies, RoleName=resource['Role'].split('/')[-1],
-            ignore_err_codes=('NoSuchEntityException',)) or {}).get('PolicyNames', ())
-
-        for policyName in policies:
-            p = client.get_role_policy(RoleName=roleName,PolicyName=policyName)
-            for s in p['PolicyDocument']['Statement']:
-                for a in s['Action']:
-                    if "*" in a: 
-                        return True
+        
+        attached_policies = (self.manager.retry(
+            client.list_attached_role_policies, RoleName=roleName,
+            ignore_err_codes=('NoSuchEntityException',) or {}).get('AttachedPolicies', ()))
+        
+        for policy in attached_policies:
+            managedPolicy = (self.manager.retry(
+                client.get_policy, PolicyArn=policy['PolicyArn'],
+                ignore_err_codes=('NoSuchEntityException',) or {}).get('Policy', ()))
+            policyDocument = (self.manager.retry(
+                    client.get_policy_version, PolicyArn=policy['PolicyArn'], VersionId=managedPolicy['DefaultVersionId'],
+                    ignore_err_codes=('NoSuchEntityException',)or {}).get('PolicyVersion', ()))
+            for s in policyDocument['Document']['Statement']:
+                if "*" in s['Action']: 
+                    resource[self.policy_annotation_key] = {'Policy_Name':managedPolicy['PolicyName']}
+                    resource[self.annotation_key] = {'Function_Name':resource['FunctionName']}
+                    return True
         return False
 
+    def check_inline_policy(self, client, resource):
+        roleName = resource['Role'].split('/')[-1]
+        
+        policies = (self.manager.retry(
+            client.list_role_policies, RoleName=roleName,
+            ignore_err_codes=('NoSuchEntityException',)) or {}).get('PolicyNames', ())
+        
+        for policyName in policies:
+            p = (self.manager.retry(
+                    client.get_role_policy, RoleName=roleName, PolicyName=policyName,
+                    ignore_err_codes=('NoSuchEntityException',)or {}).get('PolicyDocument', ()))
+            for s in p['Statement']:
+                for a in s['Action']:
+                    if "*" in a: 
+                        resource[self.policy_annotation_key] = {'Policy_Name':policyName}
+                        resource[self.annotation_key] = {'Function_Name':resource['FunctionName']}
+                        return True
+        return False
+    
+    def check_role(self, client, resource):
+        if self.check_managed_policy(client, resource) or self.check_inline_policy(client, resource):
+            return True
+        return False
+    
     def process(self, resources, event=None):
         c = local_session(self.manager.session_factory).client('iam')
-        results = [r for r in resources if self.check_policy(c, r)]
+        results = [r for r in resources if self.check_role(c, r)]
         self.log.info(
             "%d of %d Lambda policies with wildcard action",
             len(results), len(resources))

@@ -2,7 +2,7 @@
     "status_code": 200,
     "data": {
         "PolicyNames": [
-            "lambda-wildcard-policy-fail"
+            "lambda-wildcard-inline-policy-fail"
         ],
         "IsTruncated": false,
         "ResponseMetadata": {}
