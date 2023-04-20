@@ -685,12 +685,8 @@ class DeferredFormatString(UserString):
     """A string that returns itself when formatted
 
     Let any format spec pass through. This lets us selectively defer
-    expansion of runtime variables, without losing format spec details
-    or passing execution context around.
+    expansion of runtime variables without losing format spec details.
     """
-    def __init__(self, data):
-        self.data = data
-
     def __format__(self, format_spec):
         return "".join(("{", str(self), f":{format_spec}" if format_spec else "", "}"))
 
