@@ -127,7 +127,7 @@ class LambdaPermissionsWildcard(Filter):
 
     """
     
-    annotation_key = 'c7n:FunctionInfo'
+    annotation_key = 'c7n:Action'
     policy_annotation_key = 'c7n:Policy'
     schema = type_schema('has-wildcard-policy')
     schema_alias = False
@@ -149,7 +149,7 @@ class LambdaPermissionsWildcard(Filter):
             for s in policyDocument['Document']['Statement']:
                 if "*" in s['Action']: 
                     resource[self.policy_annotation_key] = {'Policy_Name':managedPolicy['PolicyName']}
-                    resource[self.annotation_key] = {'Function_Name':resource['FunctionName']}
+                    resource[self.annotation_key] = {'Action':s['Action']}
                     return True
         return False
 
@@ -168,7 +168,7 @@ class LambdaPermissionsWildcard(Filter):
                 for a in s['Action']:
                     if "*" in a: 
                         resource[self.policy_annotation_key] = {'Policy_Name':policyName}
-                        resource[self.annotation_key] = {'Function_Name':resource['FunctionName']}
+                        resource[self.annotation_key] = {'Action':a}
                         return True
         return False
     
