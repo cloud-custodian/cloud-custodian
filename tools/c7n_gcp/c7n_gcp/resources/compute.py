@@ -619,21 +619,6 @@ class Project(QueryResourceManager):
                 'get', {'project': resource_info['project_id']})
 
 
-@resources.register('zone')
-class GCPZones(QueryResourceManager):
-    """GCP resource: https://cloud.google.com/compute/docs/reference/rest/v1/zones"""
-    class resource_type(TypeInfo):
-        service = 'compute'
-        version = 'v1'
-        component = 'zones'
-        enum_spec = ('list', 'items[]', None)
-        scope = 'project'
-        name = id = 'name'
-        default_report_fields = ['id', 'name', 'dnsName', 'creationTime', 'visibility']
-        asset_type = "compute.googleapis.com/compute"
-        scc_type = "google.compute.Zone"
-
-
 @resources.register('region')
 class GCPRegions(QueryResourceManager):
     """GCP resource: https://cloud.google.com/compute/docs/reference/rest/v1/regions"""
