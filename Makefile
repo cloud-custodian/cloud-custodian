@@ -136,6 +136,7 @@ data-update:
 	python tools/dev/iamdb.py -f tests/data/iam-actions.json
 # gcp data sets
 	python tools/dev/gcpiamdb.py -f tools/c7n_gcp/tests/data/iam-permissions.json
+	python tools/dev/gcpregion.py -f tools/c7n_gcp/c7n_gcp/regions.json
 
 ###
 # Static analyzers
