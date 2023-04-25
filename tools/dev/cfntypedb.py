@@ -1,13 +1,17 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
-import boto3
 import json
+
+import boto3
+import click
 import jmespath
 
 from botocore.paginate import Paginator
 
 
-def main():
+@click.command()
+@click.option('-f', '--output', default='-', type=click.File('w'))
+def main(output):
 
     client = boto3.client('cloudformation')
 
@@ -31,7 +35,8 @@ def main():
     for m in missing:
         if m not in type_names:
             type_names.append(m)
-    print(json.dumps(sorted(type_names), indent=2))
+
+    output.write(json.dumps(sorted(type_names), indent=2))
 
 
 if __name__ == '__main__':
