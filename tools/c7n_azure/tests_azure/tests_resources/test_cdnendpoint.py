@@ -3,11 +3,11 @@
 from ..azure_common import BaseTest, arm_template
 
 
-class CdnTest(BaseTest):
+class CdnEndpointTest(BaseTest):
     def setUp(self):
-        super(CdnTest, self).setUp()
+        super(CdnEndpointTest, self).setUp()
 
-    def test_cdn_schema_validate(self):
+    def test_endpoint_schema_validate(self):
         with self.sign_out_patch():
             p = self.load_policy({
                 'name': 'test-azure-cdnendpoint',
@@ -16,7 +16,7 @@ class CdnTest(BaseTest):
             self.assertTrue(p)
 
     @arm_template('cdnendpoint.json')
-    def test_find_profile_by_name(self):
+    def test_find_endpoint_by_name(self):
         p = self.load_policy({
             'name': 'test-azure-cdnendpoint',
             'resource': 'azure.cdnendpoint',

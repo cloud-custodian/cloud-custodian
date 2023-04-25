@@ -3,11 +3,11 @@
 from ..azure_common import BaseTest, arm_template
 
 
-class CdnTest(BaseTest):
+class CdnCustomDomainTest(BaseTest):
     def setUp(self):
-        super(CdnTest, self).setUp()
+        super(CdnCustomDomainTest, self).setUp()
 
-    def test_cdn_schema_validate(self):
+    def test_customdomain_schema_validate(self):
         with self.sign_out_patch():
             p = self.load_policy({
                 'name': 'test-azure-cdncustomdomain',
@@ -16,7 +16,7 @@ class CdnTest(BaseTest):
             self.assertTrue(p)
 
     @arm_template('cdncustomdomain.json')
-    def test_find_profile_by_name(self):
+    def test_find_customdomain_by_name(self):
         p = self.load_policy({
             'name': 'test-azure-cdncustomdomain',
             'resource': 'azure.cdncustomdomain',
