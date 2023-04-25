@@ -3,6 +3,7 @@
 from .common import BaseTest, event_data
 
 
+
 def test_stream_config_source(test):
     p = test.load_policy({
         'name': 'stream-config',
@@ -271,7 +272,58 @@ class Kinesis(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['KmsKeyId'],
             'arn:aws:kms:us-east-1:123456789012:key/0d543df5-915c-42a1-afa1-c9c5f1f97955')
+        
+    def test_kinesis_video_tag(self):
+        session_factory = self.replay_flight_data('test_kinesis_video_tag')
+        p = self.load_policy(
+            {
+                'name': 'test-kinesis-video-tag',
+                'resource': 'kinesis-video',
+                'filters': [
+                    {
+                        'tag:foo': 'absent', 
+                    }
+                ],
+                'actions': [
+                    {
+                        'type': 'tag',
+                        'tags': {'foo': 'bar'}
+                    }
+                ]
+            }, session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = session_factory().client('kinesisvideo')
+        tags = client.list_tags_for_resource(ResourceARN=resources[0]["StreamARN"])["Tags"]
+        self.assertEqual(len(tags), 1)
+        self.assertEqual(tags, {'foo': 'bar'})    
 
+
+    def test_kinesis_video_remove_tag(self):
+        session_factory = self.replay_flight_data('test_kinesis_video_remove_tag')
+        p = self.load_policy(
+            {
+                'name': 'test-kinesis-video-remove-tag',
+                'resource': 'kinesis-video',
+                'filters': [
+                    {
+                        'tag:foo': 'present', 
+                    }
+                ],
+                'actions': [
+                    {
+                        'type': 'remove-tag',
+                        'tags': ['foo']
+                    }
+                ]
+            }, session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = session_factory().client('kinesisvideo')
+        tags = client.list_tags_for_resource(ResourceARN=resources[0]['StreamARN'])['Tags']
+        self.assertEqual(len(tags), 0)
 
 class KinesisAnalyticsAppV2(BaseTest):
 

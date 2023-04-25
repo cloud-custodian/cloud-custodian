@@ -10,6 +10,8 @@ from c7n.query import (
     DescribeWithResourceTags, QueryResourceManager, TypeInfo)
 from c7n.filters.vpc import SubnetFilter
 from c7n.utils import local_session, type_schema, get_retry
+from c7n.tags import (
+    TagDelayedAction, RemoveTag, TagActionFilter, Tag)
 
 
 
@@ -348,7 +350,7 @@ class KinesisAnalyticsSubnetFilter(SubnetFilter):
 class KinesisVideoStream(QueryResourceManager):
     retry = staticmethod(
         get_retry((
-            'LimitExceededException',)))
+            'ClientLimitExceededException',)))
 
     class resource_type(TypeInfo):
         service = 'kinesisvideo'
@@ -357,13 +359,14 @@ class KinesisVideoStream(QueryResourceManager):
         name = id = 'StreamName'
         arn = 'StreamARN'
         dimension = 'StreamName'
-        universal_taggable = True
 
     source_mapping = {
         'describe': DescribeWithResourceTags,
         'config': ConfigSource
     }
 
+KinesisVideoStream.action_registry.register('mark-for-op', TagDelayedAction)
+KinesisVideoStream.filter_registry.register('marked-for-op', TagActionFilter)
 
 @KinesisVideoStream.action_registry.register('delete')
 class DeleteVideoStream(Action):
@@ -397,3 +400,60 @@ class DeleteVideoStream(Action):
 class KmsFilterVideoStream(KmsRelatedFilter):
 
     RelatedIdsExpression = 'KmsKeyId'
+
+@KinesisVideoStream.action_registry.register("tag")
+class TagVideoStream(Tag):
+    """Action to add tag/tags to Kinesis Video streams resource
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: kinesis-video-tag
+                resource: kinesis-video
+                filters:
+                  - "tag:KinesisVideoTag": absent
+                actions:
+                  - type: tag
+                    key: KinesisVideoTag
+                    value: "KinesisVideo Tag Value"
+    """
+    permissions = ('kinesisvideo:TagResource',)
+    
+    def process_resource_set(self, client, resource_set, tag_keys):
+        for r in resource_set:
+            self.manager.retry(
+                client.tag_resource, 
+                ResourceARN=r['StreamARN'], 
+                Tags=tag_keys, 
+                ignore_err_codes=("ResourceNotFoundException",))
+            
+@KinesisVideoStream.action_registry.register('remove-tag')
+class VideoStreamRemoveTag(RemoveTag):
+    """Action to remove tag/tags from a Kinesis Video streams resource
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: kinesisvideo-remove-tag
+                resource: kinesis-video
+                filters:
+                  - "tag:KinesisVideoTag": present
+                actions:
+                  - type: remove-tag
+                    tags: ["KinesisVideoTag"]
+    """
+    
+    permissions = ('kinesisvideo:UntagResource',)
+    
+    def process_resource_set(self, client, resource_set, tag_keys):
+        for r in resource_set:
+            self.manager.retry(
+                client.untag_resource, 
+                ResourceARN=r['StreamARN'], 
+                TagKeyList=tag_keys, 
+                ignore_err_codes=("ResourceNotFoundException",))
+

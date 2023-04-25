@@ -1,0 +1,79 @@
+{
+    "status_code": 200,
+    "data": {
+        "VpcEndpoints": [
+            {
+                "VpcEndpointId": "vpce-011d813b183878b82",
+                "VpcEndpointType": "Gateway",
+                "VpcId": "vpc-000b28ee1c5d4ef72",
+                "ServiceName": "com.amazonaws.us-east-1.s3",
+                "State": "available",
+                "PolicyDocument": "{\"Version\":\"2008-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":\"*\",\"Resource\":\"*\"}]}",
+                "RouteTableIds": [
+                    "rtb-0b042d75a545685a9",
+                    "rtb-0181a41d5fb45e141"
+                ],
+                "SubnetIds": [],
+                "Groups": [],
+                "PrivateDnsEnabled": false,
+                "RequesterManaged": false,
+                "NetworkInterfaceIds": [],
+                "DnsEntries": [],
+                "CreationTimestamp": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 5,
+                    "day": 24,
+                    "hour": 14,
+                    "minute": 20,
+                    "second": 17,
+                    "microsecond": 0
+                },
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "project-vpce-s3"
+                    }
+                ],
+                "OwnerId": "644160558196"
+            },
+            {
+                "VpcEndpointId": "vpce-098f47b594ed8c7d1",
+                "VpcEndpointType": "Gateway",
+                "VpcId": "vpc-065ccb1c81b288b14",
+                "ServiceName": "com.amazonaws.us-east-1.dynamodb",
+                "State": "available",
+                "PolicyDocument": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"*\"},\"Action\":\"dynamodb:GetItem\",\"Resource\":\"*\"}]}",
+                "RouteTableIds": [],
+                "SubnetIds": [],
+                "Groups": [],
+                "PrivateDnsEnabled": false,
+                "RequesterManaged": false,
+                "NetworkInterfaceIds": [],
+                "DnsEntries": [],
+                "CreationTimestamp": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 4,
+                    "day": 4,
+                    "hour": 17,
+                    "minute": 54,
+                    "second": 31,
+                    "microsecond": 0
+                },
+                "Tags": [
+                    {
+                        "Key": "c7n",
+                        "Value": "true"
+                    },
+                    {
+                        "Key": "test_id",
+                        "Value": "76157674-3150-46DE-AFC7-47DB31C36AA9"
+                    }
+                ],
+                "OwnerId": "644160558196"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

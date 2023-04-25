@@ -3,6 +3,7 @@
 ResourceMap = {
     "azure.advisor-recommendation": "c7n_azure.resources.advisor.AdvisorRecommendation",
     "azure.aks": "c7n_azure.resources.k8s_service.KubernetesService",
+    "azure.open-shift": "c7n_azure.resources.open_shift.OpenShiftService",
     "azure.api-management": "c7n_azure.resources.apimanagement.ApiManagement",
     "azure.appserviceplan": "c7n_azure.resources.appserviceplan.AppServicePlan",
     "azure.application-gateway": "c7n_azure.resources.app_gateway.ApplicationGateway",
@@ -39,6 +40,7 @@ ResourceMap = {
     "azure.keyvault-keys": "c7n_azure.resources.key_vault_keys.KeyVaultKeys",
     "azure.loadbalancer": "c7n_azure.resources.load_balancer.LoadBalancer",
     "azure.logic-app-workflow": "c7n_azure.resources.logic_app.LogicAppWorkflow",
+    "azure.mariadb": "c7n_azure.resources.mariadb.MariaDB",
     "azure.mysql": "c7n_azure.resources.mysql.MySQL",
     "azure.mysql-flexibleserver": "c7n_azure.resources.mysql_flexibleserver.MySQLFlexibleServer",
     "azure.networkinterface": "c7n_azure.resources.network_interface.NetworkInterface",
