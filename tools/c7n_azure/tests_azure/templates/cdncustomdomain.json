@@ -1,0 +1,42 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "profiles_cctestcdnprofile_name": {
+            "defaultValue": "cctestcdncustomdomain",
+            "type": "String"
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "comments": "Generalized from resource: '/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-urffdpkcby/providers/Microsoft.Cdn/profiles/urffdpkcbyprofile/endpoints/urffdpkcbyendpoint/customDomains/cctestcdncustomdomain'.",
+            "type": "Microsoft.Cdn/profiles/endpoints/customDomains",
+            "sku": {
+                "name": "Standard_Microsoft"
+            },
+            "name": "[parameters('domains_cctestcdncustomdomains_name')]",
+            "apiVersion": "2016-04-02",
+            "location": "CentralUs",
+            "tags": {},
+            "scale": null,
+            "properties": {
+                "hostName": "www.roromart.com",
+                "validationData": null,
+                "resourceState": "Active",
+                "customHttpsProvisioningState": "Enabled",
+                "customHttpsProvisioningSubstate": "CertificateDeployed",
+                "customHttpsParameters": {
+                    "certificateSource": "Cdn",
+                    "certificateSourceParameters": {
+                        "certificateType": "Dedicated",
+                        "@odata.type": "#Microsoft.Azure.Cdn.Models.CdnCertificateSourceParameters"
+                    },
+                    "protocolType": "ServerNameIndication",
+                    "minimumTlsVersion": "TLS12"
+                },
+                "provisioningState": "Succeeded"
+            }
+        }
+    ]
+}
