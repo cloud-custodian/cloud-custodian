@@ -25,7 +25,7 @@ class CdnEndpointTest(BaseTest):
                  'key': 'name',
                  'op': 'eq',
                  'value_type': 'normalize',
-                 'value': 'cctestcdnendpoint'}],
+                 'value': 'urffdpkcbyendpoint'}],
         })
         resources = p.run()
         self.assertEqual(len(resources), 1)

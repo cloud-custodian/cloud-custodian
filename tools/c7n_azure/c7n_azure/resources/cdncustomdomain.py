@@ -12,7 +12,7 @@ class CdnCustomDomain(ChildArmResourceManager):
 
     :example:
 
-    Returns all CDN endpoints with Https provisioning stated not-equal Enabled
+    Returns all CDN endpoints without Https provisioning
 
     .. code-block:: yaml
 
@@ -21,7 +21,7 @@ class CdnCustomDomain(ChildArmResourceManager):
             resource: azure.cdncustomDomain
             filters:
               - type: value
-                key: properties.customHttpsProvisioingState
+                key: properties.customHttpsProvisioningState
                 op: ne
                 value_: Enabled
 

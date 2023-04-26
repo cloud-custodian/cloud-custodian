@@ -25,7 +25,7 @@ class CdnCustomDomainTest(BaseTest):
                  'key': 'name',
                  'op': 'eq',
                  'value_type': 'normalize',
-                 'value': 'cctestcdncustomdomain'}],
+                 'value': 'test-custom-fmo-domain'}],
         })
         resources = p.run()
         self.assertEqual(len(resources), 1)

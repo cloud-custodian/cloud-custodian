@@ -22,7 +22,7 @@ class CdnEndpoint(ChildArmResourceManager):
                 key: sku
                 op: in
                 value_type: normalize
-                value: Standard_Verizon
+                value: standard_verizon
 
     """
 
