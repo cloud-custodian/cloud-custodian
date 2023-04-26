@@ -18,3 +18,9 @@ class PinpointApp(QueryResourceManager):
         arn = "Arn"
         permission_prefix = 'mobiletargeting'
 
+    def augment(self, resources):
+        for resource in resources:
+            tags = resource.get('tags', {})
+            formatted_tags = [{'Key': k, 'Value': v} for k, v in tags.items()]
+            resource['Tags'] = formatted_tags
+        return resources
