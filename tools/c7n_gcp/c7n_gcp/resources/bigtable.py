@@ -1,3 +1,4 @@
+from c7n_gcp.filters.iampolicy import IamPolicyFilter
 from c7n_gcp.provider import resources
 from c7n_gcp.query import (
     QueryResourceManager, TypeInfo, ChildResourceManager, ChildTypeInfo
@@ -129,7 +130,7 @@ class BigTableInstanceTable(ChildResourceManager):
         component = 'projects.instances.tables'
         enum_spec = ('list', 'tables[]', None)
         scope = 'parent'
-        name = id = 'tables'
+        name = id = 'name'
         parent_spec = {
             'resource': 'bigtable-instance',
             'child_enum_params': {
@@ -146,3 +147,11 @@ class BigTableInstanceTable(ChildResourceManager):
                 parent_instance['displayName'],
             )
         }
+
+
+@BigTableInstanceTable.filter_registry.register('iam-policy')
+class BigTableInstanceTableIamPolicyFilter(IamPolicyFilter):
+    """
+    Overrides the base implementation to process service account resources correctly.
+    """
+    permissions = ('resourcemanager.projects.getIamPolicy',)
