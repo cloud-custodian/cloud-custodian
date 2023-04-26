@@ -556,7 +556,7 @@ class SubnetIpAddressUsageFilter(ValueFilter):
 
     def augment(self, resource):
         cidr_block = parse_cidr(resource['CidrBlock'])
-        max_addresses = 2 ** (32 - cidr_block.prefixlen) - self.aws_reserved_addresses
+        max_addresses = cidr_block.num_addresses - self.aws_reserved_addresses
         resource[self.annotation_key] = dict(
             MaxAvailable=max_addresses,
             NumberUsed=max_addresses - resource['AvailableIpAddressCount'],
