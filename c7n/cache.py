@@ -80,10 +80,12 @@ class InMemoryCache(Cache):
         return True
 
     def get(self, key):
-        return self.data.get(encode(key))
+        data = self.data.get(encode(key))
+        if data:
+            return pickle.loads(data)
 
     def save(self, key, data):
-        self.data[encode(key)] = data
+        self.data[encode(key)] = encode(data)
 
     def size(self):
         return sum(map(len, self.data.values()))
