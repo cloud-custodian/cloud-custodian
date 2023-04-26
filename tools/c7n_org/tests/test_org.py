@@ -294,3 +294,47 @@ class OrgTest(TestUtils):
         accounts[0]["vars"]["default_tz"] = "Sydney/Australia"
         # NOTE allow override at account level
         accounts[1]["vars"]["default_tz"] = "UTC"
+
+    def test_cli_nothing_to_do(self):
+        run_dir = self.setup_run_dir()
+        logger = mock.MagicMock()
+        run_account = mock.MagicMock()
+        run_account.return_value = (
+            {'compute': 24, 'serverless': 12}, True)
+        self.patch(org, 'logging', logger)
+        self.patch(org, 'run_account', run_account)
+        self.change_cwd(run_dir)
+        log_output = self.capture_logging('c7n_org')
+        runner = CliRunner()
+
+        cli_args = [
+            'run', '-c', 'accounts.yml', '-u', 'policies.yml',
+            '--debug', '-s', 'output', '--cache-path', 'cache',
+            '--metrics-uri', 'aws://',
+        ]
+
+        # No policies to run
+        result = runner.invoke(
+            org.cli,
+            cli_args + ['--policytags', 'nonsense'],
+            catch_exceptions=False
+        )
+        self.assertEqual(result.exit_code, 0)
+        self.assertEqual(
+            log_output.getvalue().strip(),
+            "Targeting accounts: 2, policies: 0. Nothing to do.",
+        )
+
+        # No accounts to run against
+        log_output.truncate(0)
+        log_output.seek(0)
+        result = runner.invoke(
+            org.cli,
+            cli_args + ['--tags', 'nonsense'],
+            catch_exceptions=False
+        )
+        self.assertEqual(result.exit_code, 0)
+        self.assertEqual(
+            log_output.getvalue().strip(),
+            "Targeting accounts: 0, policies: 2. Nothing to do.",
+        )

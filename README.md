@@ -1,4 +1,4 @@
-Cloud Custodian
+Cloud Custodian (c7n)
 =================
 
 <p align="center"><img src="https://cloudcustodian.io/img/logo_capone_devex_cloud_custodian.svg" alt="Cloud Custodian Logo" width="200px" height="200px" /></p>
@@ -12,11 +12,12 @@ Cloud Custodian
 [![](https://requires.io/github/cloud-custodian/cloud-custodian/requirements.svg?branch=master)](https://requires.io/github/cloud-custodian/cloud-custodian/requirements/?branch=master)
 [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/3402/badge)](https://bestpractices.coreinfrastructure.org/projects/3402)
 
-Cloud Custodian is a rules engine for managing public cloud accounts and
-resources. It allows users to define policies to enable a well managed
-cloud infrastructure, that\'s both secure and cost optimized. It
-consolidates many of the adhoc scripts organizations have into a
-lightweight and flexible tool, with unified metrics and reporting.
+Cloud Custodian, also known as c7n, is a rules engine for managing
+public cloud accounts and resources. It allows users to define
+policies to enable a well managed cloud infrastructure, that\'s both
+secure and cost optimized. It consolidates many of the adhoc scripts
+organizations have into a lightweight and flexible tool, with unified
+metrics and reporting.
 
 Custodian can be used to manage AWS, Azure, and GCP environments by
 ensuring real time compliance to security policies (like encryption and
@@ -72,6 +73,9 @@ Links
 Quick Install
 -------------
 
+Custodian is published on pypi as a series of packages with the `c7n`
+prefix, its also available as a docker image.
+
 ```shell
 $ python3 -m venv custodian
 $ source custodian/bin/activate
@@ -82,7 +86,7 @@ $ source custodian/bin/activate
 Usage
 -----
 
-The first step to using Cloud Custodian is writing a YAML file
+The first step to using Cloud Custodian (c7n) is writing a YAML file
 containing the policies that you want to run. Each policy specifies
 the resource type that the policy will run on, a set of filters which
 control resources will be affected by this policy, actions which the policy
