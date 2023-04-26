@@ -41,3 +41,47 @@ class BigtableTimeRangeFilterTest(BaseTest):
                                                'instances/inst258/clusters/'
                                                'inst258-c1/backups/back258')
         self.assertEqual(len(resources), 1)
+
+
+class BigTableInstanceTableTest(BaseTest):
+
+    def test_bigtable_instance_table_filter_iam_query(self):
+        factory = self.replay_flight_data('bigtable-instance-table-filter-iam')
+        p = self.load_policy({
+            'name': 'bigtable-instance-table-filter-iam',
+            'resource': 'gcp.bigtable-instance-table',
+            'filters': [{
+                'type': 'iam-policy',
+                'doc': {
+                    'key': 'bindings[?(role==\'roles/owner\' || role==\'roles/editor\')]',
+                    'op': 'ne',
+                    'value': []
+                }
+            }]
+        }, session_factory=factory)
+        resources = p.run()
+
+        self.assertEqual(len(resources), 1)
+        self.assertEqual('projects/cloud-custodian/instances/custodian-test-instance/tables/custodian-table-red',
+                         resources[0]['name'])
+
+    def test_bigtable_instance_table_filter_iam_service_account_query(self):
+        factory = self.replay_flight_data('bigtable-instance-table-filter-service-account-iam')
+        p = self.load_policy({
+            'name': 'bigtable-instance-table-filter-service-account-iam',
+            'resource': 'gcp.bigtable-instance-table',
+            'filters': [{
+                'type': 'iam-policy',
+                'doc': {
+                    'key': 'bindings[*].members[?contains(@, \'serviceAccount.*\')]',
+                    'op': 'ne',
+                    'value': []}
+            }]
+        }, session_factory=factory)
+        resources = p.run()
+
+        self.assertEqual(len(resources), 2)
+        self.assertEqual('projects/cloud-custodian/instances/custodian-test-instance/tables/custodian-table-green',
+                         resources[0]['name'])
+        self.assertEqual('projects/cloud-custodian/instances/custodian-test-instance/tables/custodian-table-red',
+                         resources[1]['name'])
