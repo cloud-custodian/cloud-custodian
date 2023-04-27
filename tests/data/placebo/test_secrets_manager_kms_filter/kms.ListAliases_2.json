@@ -1,0 +1,34 @@
+{
+    "status_code": 200,
+    "data": {
+        "Aliases": [
+            {
+                "AliasName": "alias/skunk/trails",
+                "AliasArn": "arn:aws:kms:us-west-2:644160558196:alias/skunk/trails",
+                "TargetKeyId": "818043b3-6f82-41dc-baaa-fd5043660a00",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 4,
+                    "day": 27,
+                    "hour": 15,
+                    "minute": 3,
+                    "second": 42,
+                    "microsecond": 535000
+                },
+                "LastUpdatedDate": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 4,
+                    "day": 27,
+                    "hour": 15,
+                    "minute": 3,
+                    "second": 42,
+                    "microsecond": 535000
+                }
+            }
+        ],
+        "Truncated": false,
+        "ResponseMetadata": {}
+    }
+}

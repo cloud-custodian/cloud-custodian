@@ -67,10 +67,9 @@ class KmsRelatedFilter(RelatedResourceFilter):
     def get_related_ids(self, resources):
         related_ids = super().get_related_ids(resources)
         normalized_ids = []
-        alias_to_id = self.key_alias_to_key_id()
         for rid in related_ids:
             if rid.startswith('alias'):
-                rid = alias_to_id.get(rid, rid)
+                rid = self.alias_to_id.get(rid, rid)
             if rid.startswith('arn:'):
                 normalized_ids.append(rid.rsplit('/', 1)[-1])
             else:
@@ -78,6 +77,7 @@ class KmsRelatedFilter(RelatedResourceFilter):
         return normalized_ids
 
     def process(self, resources, event=None):
+        self.alias_to_id = self.key_alias_to_key_id()
         related = self.get_related(resources)
         for r in related.values():
             # `AliasNames` is set when we fetch keys, but only for keys
