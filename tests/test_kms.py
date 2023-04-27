@@ -360,6 +360,11 @@ class KMSTagging(BaseTest):
             for res in resources
         ))
 
+        # Whether a resource specifies a key by ID or alias, it should resolve
+        # to the same ID for related resource lookups.
+        related_ids = p.resource_manager.filters[0].get_related_ids(resources)
+        self.assertEqual(set(related_ids), {target_key['KeyMetadata']['KeyId']})
+
     def test_kms_post_finding(self):
         factory = self.replay_flight_data('test_kms_post_finding')
         p = self.load_policy({
