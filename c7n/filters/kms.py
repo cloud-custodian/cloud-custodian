@@ -67,9 +67,10 @@ class KmsRelatedFilter(RelatedResourceFilter):
     def get_related_ids(self, resources):
         related_ids = super().get_related_ids(resources)
         normalized_ids = []
+        alias_to_id = self.key_alias_to_key_id()
         for rid in related_ids:
             if rid.startswith('alias'):
-                rid = self.key_alias_to_key_id(rid)
+                rid = alias_to_id.get(rid, rid)
             if rid.startswith('arn:'):
                 normalized_ids.append(rid.rsplit('/', 1)[-1])
             else:
@@ -85,10 +86,11 @@ class KmsRelatedFilter(RelatedResourceFilter):
             r['c7n:AliasName'] = r.get('AliasNames', ('',))[0]
         return [r for r in resources if self.process_resource(r, related)]
 
-    def key_alias_to_key_id(self, alias):
+    def key_alias_to_key_id(self):
         # convert key alias to key id for cache lookup
         # else cache lookup returns [] even if the key exists
         key_manager = self.manager.get_resource_manager('kms-key')
+        alias_to_id = {}
         for kid, kaliases in key_manager.alias_map.items():
-            if str(alias) in kaliases:
-                return str(kid)
+            alias_to_id.update({alias: kid for alias in kaliases})
+        return alias_to_id
