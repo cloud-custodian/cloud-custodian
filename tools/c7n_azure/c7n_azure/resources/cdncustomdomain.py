@@ -59,3 +59,5 @@ class CdnCustomDomain(ChildArmResourceManager):
                 'endpoint_name': endpoint_name,
                 'profile_name': profile_name
             }
+        
+      

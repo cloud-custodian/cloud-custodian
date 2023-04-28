@@ -1,82 +1,98 @@
 {
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
-    "variables": {
-      "profileName": "cctestcdnprofile",
-      "endpointName": "cctestcdnendpoint",
-      "skuName": "Standard_Microsoft"
-    },
-    "resources": [{
-        "name": "[variables('cctestcdnprofile')]",
-        "type": "Microsoft.Cdn/profiles",
-        "location": "northcentralus",
-        "apiVersion": "2019-04-15",
-        "sku": {
-          "name": "[variables('skuName')]"
+    "parameters": {
+        "profiles_cctestmyprofile_name": {
+            "defaultValue": "cctestmyprofile",
+            "type": "string"
         },
+        "endpoints_cctestmyendpoint_name": {
+            "defaultValue": "cctestmyendpoint",
+            "type": "string"
+        },
+        "domains_cctestmydomain_name": {
+            "defaultValue": "cctestmydomain",
+            "type": "string"
+        }
+        },
+        "variables": {},
         "resources": [
-          {
-            "apiVersion": "2019-04-15",
-            "dependsOn": [
-              "[resourceId('Microsoft.Cdn/profiles', variables('cctestcdnprofile'))]"
-            ],
-            "location": "northcentralus",
-            "name": "[variables('urffdpkcbyendpoint')]",
-            "type": "endpoints",
-            "properties": {
-              "originHostHeader": "urffdpkcbyendpoint.azureedge.net",
-              "isHttpAllowed": true,
-              "isHttpsAllowed": true,
-              "queryStringCachingBehavior": "IgnoreQueryString",
-              "contentTypesToCompress": [
-                "text/plain",
-                "text/html"
-              ],
-              "isCompressionEnabled": true,
-              "origins": [
-                {
-                  "name": "origin",
-                  "properties": {
-                    "hostName": "astorageaccount.a33.web.core.windows.net"
-                  }
-                }
-              ]
-            },
-            "resources":[
-              {
-                "comments": "Generalized from resource: '/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-urffdpkcby/providers/Microsoft.Cdn/profiles/urffdpkcbyprofile/endpoints/urffdpkcbyendpoint/customDomains/cctestcdncustomdomain'.",
-                "type": "Microsoft.Cdn/profiles/endpoints/customDomains",
-                "sku": {
-                    "name": "Standard_Microsoft"
-                },
-                "name": "[concat(parameters('test-custom-fmo-domain')]",
-                "apiVersion": "2015-06-01",
-                "location": "CentralUs",
-                "tags": {},
-                "scale": null,
+            {
+                "name": "[parameters('profiles_cctestmyprofile_name')]",
+                "type": "Microsoft.Cdn/profiles",
+                "location": "eastus",
+                "apiVersion": "2019-04-15",
                 "properties": {
-                    "hostName": "www.roromart.com",
-                    "validationData": null,
-                    "resourceState": "Active",
-                    "customHttpsProvisioningState": "Enabled",
-                    "customHttpsProvisioningSubstate": "CertificateDeployed",
-                    "customHttpsParameters": {
-                        "certificateSource": "Cdn",
-                        "certificateSourceParameters": {
-                            "certificateType": "Dedicated",
-                            "@odata.type": "#Microsoft.Azure.Cdn.Models.CdnCertificateSourceParameters"
-                        },
-                        "protocolType": "ServerNameIndication",
-                        "minimumTlsVersion": "TLS12"
+                    "provisioningState": "Succeeded",
+                    "resourceState": "Active"
+                },
+                "sku": {
+                "name": "Standard_Microsoft"
+                },
+                "resources": [
+                {
+                    "apiVersion": "2019-04-15",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Cdn/profiles', parameters('profiles_cctestmyprofile_name'))]"
+                    ],
+                    "location": "eastus",
+                    "name": "parameters('endpoints_cctestmyendpoint_name')]",
+                    "type": "endpoints",
+                    "properties": {
+                        "isHttpAllowed": true,
+                        "isHttpsAllowed": true,
+                        "queryStringCachingBehavior": "IgnoreQueryString",
+                        "contentTypesToCompress": [
+                            "text/plain",
+                            "text/html"
+                        ],
+                        "isCompressionEnabled": true,
+                        "origins": [
+                            {
+                            "name": "origin",
+                            "properties": {
+                                "hostName": "astorageaccount.a33.web.core.windows.net"
+                            }
+                        }
+                    ]
                     },
-                    "provisioningState": "Succeeded"
-                }
-              }
-            ]
-          }
-        ]
-    }
-]}
-
-
-    
+                    "resources": [
+                    {
+                        "type": "Microsoft.Cdn/profiles/endpoints/customDomains",
+                        "sku": {
+                            "name": "Standard_Microsoft"
+                        },
+                        "name": "[concat(parameters('profiles_cctestmyprofile_name'), '/', parameters('endpoints_cctestmyendpoint_name'), '/', parameters('domains_cctestmydomain_name'))]",
+                        "apiVersion": "2015-06-01",
+                        "location": "EastUs",
+                        "tags": {},
+                        "scale": null,
+                        "dependsOn": [
+                            "[resourceId('Microsoft.Cdn/profiles', parameters('profiles_cctestmyprofile_name'))]",
+                            "[resourceId('Microsoft.Cdn/profiles/endpoints', parameters('profiles_cctestmyprofile_name'), parameters('endpoints_cctestmyendpoint_name'))]"
+                        ],
+                        "properties": {
+                            "hostName": "www.roromart.com",
+                            "validationData": null,
+                            "resourceState": "Active",
+                            "customHttpsProvisioningState": "Enabled",
+                            "customHttpsProvisioningSubstate": "CertificateDeployed",
+                            "customHttpsParameters": {
+                                "certificateSource": "Cdn",
+                                "certificateSourceParameters": {
+                                    "certificateType": "Dedicated",
+                                    "@odata.type": "#Microsoft.Azure.Cdn.Models.CdnCertificateSourceParameters"
+                                },
+                                "protocolType": "ServerNameIndication",
+                                "minimumTlsVersion": "TLS12"
+                            },
+                            "provisioningState": "Succeeded"
+                        }
+                    }
+               ]
+                
+            }]
+        }
+   ],
+   "outputs":{}
+ }

@@ -1,75 +1,66 @@
 {
-    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
-    "variables": {
-        "profileName": "cctestcdnprofile",
-        "endpointName": "urffdpkcbyendpoint",
-        "skuName": "Standard_Microsoft"
-         
-    },
-    "resources": [
-        {
-            "comments": "Generalized from resource: '/subscriptions/aa98974b-5d2a-4d98-a78a-382f3715d07e/resourcegroups/tabarlow/providers/Microsoft.Cdn/profiles/cctestcdnendpoint'.",
-            "type": "Microsoft.Cdn/profiles/endpoints",
-            "sku": {
-                "name": "Standard_Microsoft"
-            },
-            "name": "[parameters('urffdpkcbyendpoint')]",
-            "apiVersion": "2016-04-02",
-            "location": "CentralUs",
-            "tags": {},
-            "scale": null,
-            "properties": {
-                "hostName": "urffdpkcbyendpoint.azureedge.net",
-                "originHostHeader": null,
-                "originPath": null,
-                "contentTypesToCompress": [],
-                "isCompressionEnabled": false,
-                "isHttpAllowed": true,
-                "isHttpsAllowed": true,
-                "queryStringCachingBehavior": "IgnoreQueryString",
-                "optimizationType": null,
-                "probePath": null,
-                "origins": [
-                    {
-                        "name": "host",
-                        "properties": {
-                            "hostName": "cdnowolabi.z13.web.core.windows.net",
-                            "httpPort": 80,
-                            "httpsPort": 443,
-                            "originHostHeader": null,
-                            "priority": 1,
-                            "weight": 1000,
-                            "enabled": true,
-                            "privateLinkAlias": null,
-                            "privateLinkResourceId": null,
-                            "privateLinkLocation": null,
-                            "privateEndpointStatus": null,
-                            "privateLinkApprovalMessage": null
-                        }
-                    }
-                ],
-                "originGroups": [],
-                "defaultOriginGroup": null,
-                "customDomains": [
-                    {
-                        "name": "test-custom-fmo-domain",
-                        "properties": {
-                            "hostName": "www.roromart.com",
-                            "validationData": null
-                        }
-                    }
-                ],
-                "geoFilters": [],
-                "deliveryPolicy": {
-                    "description": "",
-                    "rules": []
-                },
-                "urlSigningKeys": null,
-                "webApplicationFirewallPolicyLink": null,
-                "resourceState": "Running",
-                "provisioningState": "Succeeded"
-            }
+    "parameters": {
+        "profiles_cctestmyprofile_name": {
+            "defaultValue": "cctestmyprofile",
+            "type": "string"
+        },
+        "endpoints_cctestcdnendpoint_name": {
+            "defaultValue": "cctestcdnendpoint",
+            "type": "string"
         }
-    ]
+        },
+        "variables":{},
+        "resources": [
+            {
+                "name": "[parameters('profiles_cctestmyprofile_name')]",
+                "type": "Microsoft.Cdn/profiles",
+                "location": "eastus",
+                "apiVersion": "2019-04-15",
+                "properties": {
+                    "provisioningState": "Succeeded",
+                    "resourceState": "Active"
+                },
+                "sku": {
+                    "name": "Standard_Microsoft"
+                },
+                "resources": [
+                    {
+                        "type": "endpoints",
+                        "sku": {
+                            "name": "Standard_Microsoft"
+                        },
+                        "name": "[parameters('endpoints_cctestcdnendpoint_name')]",
+                        "apiVersion": "2019-04-15",
+                        "dependsOn": [
+                            "[resourceId('Microsoft.Cdn/profiles', parameters('profiles_cctestmyprofile_name'))]"
+                        ],
+                        "location": "EastUs",
+                        "tags": {},
+                        "scale": null,
+                        "properties": {
+                            "hostName": "cctestcdnendpoint.azureedge.net",
+                            "isCompressionEnabled": false,
+                            "isHttpAllowed": true,
+                            "isHttpsAllowed": true,
+                            "queryStringCachingBehavior": "IgnoreQueryString",
+                            "origins": [
+                                {
+                                    "name": "host",
+                                    "properties": {
+                                        "hostName": "cdnowolabi.z13.web.core.windows.net",
+                                        "httpPort": 80,
+                                        "httpsPort": 443
+                                    }
+                                }
+                            ]
+                        }
+                    
+                    }
+                ]
+            }
+       ]
 }
+
+             
