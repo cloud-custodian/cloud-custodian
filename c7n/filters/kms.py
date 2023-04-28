@@ -55,12 +55,12 @@ class KmsRelatedFilter(RelatedResourceFilter):
             related = resource_manager.resources()
         related_map = {}
 
-        # A resource's key property may point to an explicit ID or a key alias.
-        # Be sure that a related key lookup covers both cases.
         for r in related:
+            # `AliasNames` is set when we fetch keys, but only for keys
+            # which have aliases defined. Fall back to an empty string
+            # to avoid lookup errors in filters.
+            r['c7n:AliasName'] = r.get('AliasNames', ('',))[0]
             related_map[r['KeyId']] = r
-            for alias in r.get('AliasNames', []):
-                related_map[alias] = r
 
         return related_map
 
@@ -79,11 +79,6 @@ class KmsRelatedFilter(RelatedResourceFilter):
     def process(self, resources, event=None):
         self.alias_to_id = self.key_alias_to_key_id()
         related = self.get_related(resources)
-        for r in related.values():
-            # `AliasNames` is set when we fetch keys, but only for keys
-            # which have aliases defined. Fall back to an empty string
-            # to avoid lookup errors in filters.
-            r['c7n:AliasName'] = r.get('AliasNames', ('',))[0]
         return [r for r in resources if self.process_resource(r, related)]
 
     def key_alias_to_key_id(self):
