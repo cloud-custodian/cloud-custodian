@@ -2,7 +2,6 @@
 # SPDX-License-Identifier: Apache-2.0
 import json
 from .common import BaseTest
-from c7n.config import Config
 from c7n.exceptions import PolicyValidationError
 
 
@@ -27,10 +26,7 @@ class TestSecretsManager(BaseTest):
               'Resource': '*'}])
 
     def test_secrets_manager_kms_filter(self):
-        session_factory = self.replay_flight_data(
-            'test_secrets_manager_kms_filter',
-            region='us-west-2'
-        )
+        session_factory = self.replay_flight_data('test_secrets_manager_kms_filter')
         kms = session_factory().client('kms')
         p = self.load_policy(
             {
@@ -44,18 +40,11 @@ class TestSecretsManager(BaseTest):
                     }
                 ]
             },
-            cache=True,
-            session_factory=session_factory,
-            config=Config.empty(
-                region='us-west-2',
-                cache='memory',
-                cache_period=10,
-                output_dir=self.get_temp_dir(),
-            ),
+            session_factory=session_factory
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        aliases = kms.list_aliases(KeyId=resources[0]['c7n:matched-kms-key'][0])
+        aliases = kms.list_aliases(KeyId=resources[0]['KmsKeyId'])
         self.assertEqual(aliases['Aliases'][0]['AliasName'], 'alias/skunk/trails')
 
     def test_secrets_manager_has_statement_filter(self):
