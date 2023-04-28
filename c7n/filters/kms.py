@@ -89,7 +89,7 @@ class KmsRelatedFilter(RelatedResourceFilter):
     def key_alias_to_key_id(self):
         # convert key alias to key id for cache lookup
         # else cache lookup returns [] even if the key exists
-        key_manager = self.manager.get_resource_manager('kms-key')
+        key_manager = self.get_resource_manager()
         alias_to_id = {}
         for kid, kaliases in key_manager.alias_map.items():
             alias_to_id.update({alias: kid for alias in kaliases})
