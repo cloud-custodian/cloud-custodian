@@ -1,0 +1,18 @@
+{
+  "headers": {},
+  "body": {
+    "kind": "bigquery#datasetList",
+    "etag": "az+V5BYvFao7/P7Zrra1/w==",
+    "datasets": [
+      {
+        "kind": "bigquery#dataset",
+        "id": "cloud-custodian:custodian_test",
+        "datasetReference": {
+          "datasetId": "custodian_test",
+          "projectId": "cloud-custodian"
+        },
+        "location": "us-central1"
+      }
+    ]
+  }
+}
