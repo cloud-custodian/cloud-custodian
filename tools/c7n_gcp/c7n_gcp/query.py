@@ -229,19 +229,27 @@ class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
         try:
             return self.augment(self.source.get_resources(query)) or []
         except HttpError as e:
-            error_reason, error_code, error_message = extract_errors(e)
+            error_code, error_message = extract_errors(e)
 
-            if error_reason is None and error_code is None:
+            if error_code is None and error_message is None:
                 raise
-            if error_code == 403 and 'disabled' in error_message:
-                log.warning(error_message)
-                return []
-            elif error_reason == 'accessNotConfigured':
+            elif error_code == 403 and 'disabled' in error_message:
                 log.warning(
-                    "Resource:%s not available -> Service:%s not enabled on %s",
+                    "Project:%s Resource:%s unavailable Service:%s Error:%s \n Message:%s",
+                    local_session(self.session_factory).get_default_project(),
                     self.type,
                     self.resource_type.service,
-                    local_session(self.session_factory).get_default_project())
+                    error_code,
+                    error_message)
+                return []
+            elif error_code == 404 and self.resource_type.service == "appengine":
+                log.warning(
+                    "Project:%s Resource:%s not found Service:%s Error:%s \n Message:%s",
+                    local_session(self.session_factory).get_default_project(),
+                    self.type,
+                    self.resource_type.service,
+                    error_code,
+                    error_message)
                 return []
             raise
 
@@ -470,7 +478,6 @@ class ChildTypeInfo(TypeInfo):
         return resource[cls.get_parent_annotation_key()]
 
 
-ERROR_REASON = jmespath.compile('error.errors[0].reason')
 ERROR_CODE = jmespath.compile('error.code')
 ERROR_MESSAGE = jmespath.compile('error.message')
 
@@ -479,9 +486,9 @@ def extract_errors(e):
     try:
         edata = json.loads(e.content)
     except Exception:
-        edata = None
+        edata = ""
 
-    return ERROR_REASON.search(edata), ERROR_CODE.search(edata), ERROR_MESSAGE.search(edata)
+    return ERROR_CODE.search(edata), ERROR_MESSAGE.search(edata)
 
 
 class GcpLocation:
