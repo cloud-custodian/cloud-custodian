@@ -47,6 +47,8 @@ class Snapshot(QueryResourceManager):
         arn_type = 'snapshot'
         enum_spec = (
             'describe_snapshots', 'Snapshots', None)
+        detail_spec = (
+            'describe_snapshot_attribute', 'SnapshotId', 'SnapshotId', None, {'Attribute': 'createVolumePermission'})
         id = 'SnapshotId'
         id_prefix = 'snap-'
         filter_name = 'SnapshotIds'
@@ -61,6 +63,7 @@ class Snapshot(QueryResourceManager):
             'VolumeSize',
             'StartTime',
             'State',
+            'CreateVolumePermissions'
         )
 
     def resources(self, query=None):

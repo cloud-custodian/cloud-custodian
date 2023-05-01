@@ -735,7 +735,7 @@ def _batch_augment(manager, model, detail_spec, client, resource_set):
 
 
 def _scalar_augment(manager, model, detail_spec, client, resource_set):
-    detail_op, param_name, param_key, detail_path = detail_spec
+    detail_op, param_name, param_key, detail_path, detail_args = detail_spec
     op = getattr(client, detail_op)
     if manager.retry:
         args = (op,)
@@ -745,6 +745,8 @@ def _scalar_augment(manager, model, detail_spec, client, resource_set):
     results = []
     for r in resource_set:
         kw = {param_name: param_key and r[param_key] or r}
+        if detail_args:
+            kw.update(detail_args)
         response = op(*args, **kw)
         if detail_path:
             response = response[detail_path]
