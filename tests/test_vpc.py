@@ -347,6 +347,45 @@ class VpcTest(BaseTest):
         self.assertEqual(len(resources), 2)
         self.assertTrue("subnet-068dfbf3f275a6ae8" in resources[0]["c7n:matched-vpc-endpoint"])
 
+    def test_subnet_ip_address_usage_filter(self):
+        factory = self.replay_flight_data("test_subnet_ip_address_usage_filter", region="us-east-2")
+        p = self.load_policy(
+            {
+                "name": "subnet-no-ips-used",
+                "resource": "aws.subnet",
+                "filters": [
+                    {
+                        "type": "ip-address-usage",
+                        "key": "NumberUsed",
+                        "value": 0,
+                    }
+                ],
+            },
+            session_factory=factory,
+            config={"region": "us-east-2"},
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
+
+        p = self.load_policy(
+            {
+                "name": "subnet-almost-full",
+                "resource": "aws.subnet",
+                "filters": [
+                    {
+                        "type": "ip-address-usage",
+                        "key": "PercentUsed",
+                        "op": "greater-than",
+                        "value": 90,
+                    }
+                ],
+            },
+            session_factory=factory,
+            config={"region": "us-east-2"},
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
     def test_endpoint_policy_filter(self):
         factory = self.replay_flight_data("test_endpoint_policy_filter")
         p = self.load_policy(
