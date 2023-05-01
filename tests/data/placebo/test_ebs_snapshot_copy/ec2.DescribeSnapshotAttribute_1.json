@@ -1,0 +1,8 @@
+{
+    "status_code": 200,
+    "data": {
+        "CreateVolumePermissions": [],
+        "SnapshotId": "snap-f8c07c02",
+        "ResponseMetadata": {}
+    }
+}
