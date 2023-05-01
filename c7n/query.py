@@ -735,7 +735,11 @@ def _batch_augment(manager, model, detail_spec, client, resource_set):
 
 
 def _scalar_augment(manager, model, detail_spec, client, resource_set):
-    detail_op, param_name, param_key, detail_path, detail_args = detail_spec
+    if len(detail_spec) == 5:
+        detail_op, param_name, param_key, detail_path, detail_args = detail_spec
+    else:
+        detail_op, param_name, param_key, detail_path = detail_spec
+        detail_args = None
     op = getattr(client, detail_op)
     if manager.retry:
         args = (op,)
