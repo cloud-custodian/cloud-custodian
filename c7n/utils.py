@@ -13,9 +13,9 @@ import re
 import sys
 import threading
 import time
+from jmespath import functions
 from urllib import parse as urlparse
 from urllib.request import getproxies, proxy_bypass
-
 
 from dateutil.parser import ParserError, parse
 
@@ -912,3 +912,11 @@ def get_eni_resource_type(eni):
     else:
         rtype = 'unknown'
     return rtype
+
+
+class C7NJmespathFunctions(functions.Functions):
+    @functions.signature(
+        {'types': ['string']}, {'types': ['string']}
+    )
+    def _func_split(self, sep, string):
+        return string.split(sep)
