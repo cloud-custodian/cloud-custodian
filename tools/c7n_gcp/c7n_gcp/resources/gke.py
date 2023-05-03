@@ -31,6 +31,7 @@ class KubernetesCluster(QueryResourceManager):
         scc_type = 'google.container.Cluster'
         metric_key = 'resource.labels.cluster_name'
         urn_component = 'cluster'
+        labels = True
         urn_zonal = True
 
         @staticmethod

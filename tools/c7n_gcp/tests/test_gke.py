@@ -67,6 +67,33 @@ class KubernetesClusterTest(BaseTest):
             ],
         )
 
+    def test_cluster_set_labels(self):
+        project_id = 'cloud-custodian'
+        name = "standard-cluster-1"
+        factory = self.record_flight_data('gke-cluster-label', project_id)
+        p = self.load_policy(
+            {
+                'name': 'label-gke-cluster',
+                'resource': 'gcp.gke-cluster',
+                'filters': [{'name': name}],
+                'actions': [{'type': 'set-labels',
+                            'labels': {'test_label': 'test_value'}}]},
+            session_factory=factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        if self.recording:
+            time.sleep(1)
+        client = p.resource_manager.get_client()
+        result = client.execute_query(
+            'list', {
+                        'project': project_id,
+                        'filter': [{'name': name}],
+                        'zone': resources[0]['zone'].rsplit('/', 1)[-1]
+                    })
+        self.assertEqual(result['items'][0]['resourceLabels']
+                            ['test_label'], 'test_value')
+
     def test_cluster_delete(self):
         project_id = "cloud-custodian"
         resource_name = "custodian-cluster-delete-test"
@@ -92,6 +119,7 @@ class KubernetesClusterTest(BaseTest):
                 'us-east1-b')})
 
         self.assertEqual(result['clusters'][0]['status'], 'STOPPING')
+
 
 
 class KubernetesClusterNodePoolTest(BaseTest):
