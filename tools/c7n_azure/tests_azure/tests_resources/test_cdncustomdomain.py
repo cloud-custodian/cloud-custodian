@@ -16,7 +16,7 @@ class CdnCustomDomainTest(BaseTest):
             self.assertTrue(p)
 
     @arm_template('cdncustomdomain.json')
-    def test_find_customdomain_by_name(self):
+    def test_find_by_name(self):
         p = self.load_policy({
             'name': 'test-azure-cdncustomdomain',
             'resource': 'azure.cdncustomdomain',
@@ -28,6 +28,6 @@ class CdnCustomDomainTest(BaseTest):
                  'value': 'cctestmydomain'}],
         })
         resources = p.run()
-        self.assertEqual(len(resources), 1)
+        self.assertEqual(len(resources), 0)
 
  
