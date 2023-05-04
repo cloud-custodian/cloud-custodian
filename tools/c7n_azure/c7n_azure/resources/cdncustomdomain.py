@@ -33,7 +33,7 @@ class CdnCustomDomain(ChildArmResourceManager):
 
         service = 'azure.mgmt.cdn'
         client = 'CdnManagementClient'
-        enum_spec = ('custom_domains', 'list_by_endpoints', None)
+        enum_spec = ('custom_domains', 'list_by_endpoint', None)
         parent_manager_name = 'cdnendpoint'
         default_report_fields = (
             'name',

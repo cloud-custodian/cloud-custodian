@@ -16,7 +16,7 @@ class CdnEndpointTest(BaseTest):
             self.assertTrue(p)
 
     @arm_template('cdnendpoint.json')
-    def test_find_endpoint_by_name(self):
+    def test_find_by_name(self):
         p = self.load_policy({
             'name': 'test-azure-cdnendpoint',
             'resource': 'azure.cdnendpoint',
