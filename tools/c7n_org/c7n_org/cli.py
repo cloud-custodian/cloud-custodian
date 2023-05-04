@@ -712,6 +712,13 @@ def run(config, use, output_dir, accounts, not_accounts, tags, region,
     accounts_config, custodian_config, executor = init(
         config, use, debug, verbose, accounts, tags, policy, policy_tags=policy_tags,
         not_accounts=not_accounts)
+    if not (accounts_config["accounts"] and custodian_config["policies"]):
+        log.info(
+            "Targeting accounts: %d, policies: %d. Nothing to do." %
+            (len(accounts_config["accounts"]), len(custodian_config["policies"]))
+        )
+        return
+
     policy_counts = Counter()
     success = True
 

@@ -3,7 +3,7 @@
 Cloud Custodian can run policies directly inside your cluster, reporting on 
 resources that violate those policies, or blocking them altogether.
 
-# Running the server 
+## Running the server
 
 c7n-kates can be run and installed via poetry. `poetry install && poetry run c7n-kates`.  
 
@@ -17,7 +17,7 @@ c7n-kates can be run and installed via poetry. `poetry install && poetry run c7n
 | --ca-cert      |           | Path to the CA's certificate.                                |
 | --cert-key     |           | Path to the certificate's key.                               |
 
-# Generate a MutatingWebhookConfiguration
+## Generate a MutatingWebhookConfiguration
 
 After the server is running, you'll need to configure and install the 
 MutatingWebhookConfiguration manually. To generate a webhook configuration, you
@@ -28,7 +28,7 @@ Note: some modification of the webhook configuration may be required. See the
 [documentation](https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/) 
 on webhooks for more configuration.
 
-# Development
+## Development
 
 You can use [skaffold](https://github.com/GoogleContainerTools/skaffold/) to 
 assist with testing and debugging this controller. Run `skaffold dev` in this

@@ -87,3 +87,51 @@ class Delete(Action):
         client = local_session(self.manager.session_factory).client('fis')
         for r in resources:
             self.manager.retry(client.delete_experiment_template, id=r['id'])
+
+
+class ExperimentDescribe(DescribeSource):
+    def augment(self, resources):
+        resources = super().augment(resources)
+        for r in resources:
+            r['Tags'] = [{'Key': k, 'Value': v} for k, v in r.pop('tags', {}).items()]
+        return resources
+
+
+@resources.register('fis-experiment')
+class Experiment(QueryResourceManager):
+    class resource_type(TypeInfo):
+        service = 'fis'
+        enum_spec = ('list_experiments', 'experiments', None)
+        detail_spec = ('get_experiment', 'id', 'id', 'experiment')
+        name = id = 'id'
+        date = 'creationTime'
+        arn_type = 'experiment'
+
+    source_mapping = {'describe': ExperimentDescribe}
+
+    def get_arns(self, resources):
+        partition = get_partition(self.region)
+        return [
+            "arn:%s:fis:%s:%s:experiment/%s"
+            % (partition, self.region, self.account_id, r['id'])
+            for r in resources
+        ]
+
+
+@Experiment.action_registry.register('tag')
+class TagExperiments(Tag):
+    permissions = ('fis:TagResource',)
+
+    def process_resource_set(self, client, resource_set, tags):
+        ptags = {t['Key']: t['Value'] for t in tags}
+        for arn in self.manager.get_arns(resource_set):
+            self.manager.retry(client.tag_resource, resourceArn=arn, tags=ptags)
+
+
+@Experiment.action_registry.register('remove-tag')
+class RemoveTagExperiments(RemoveTag):
+    permissions = ('fis:UntagResource',)
+
+    def process_resource_set(self, client, resource_set, tags):
+        for arn in self.manager.get_arns(resource_set):
+            self.manager.retry(client.untag_resource, resourceArn=arn, tagKeys=tags)

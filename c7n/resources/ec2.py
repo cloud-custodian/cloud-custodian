@@ -168,7 +168,7 @@ class SecurityGroupFilter(net_filters.SecurityGroupFilter):
 @filters.register('subnet')
 class SubnetFilter(net_filters.SubnetFilter):
 
-    RelatedIdsExpression = "SubnetId"
+    RelatedIdsExpression = "NetworkInterfaces[].SubnetId"
 
 
 @filters.register('vpc')
