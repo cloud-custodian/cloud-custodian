@@ -1,0 +1,22 @@
+{
+    "status_code": 200,
+    "data": {
+        "Attributes": {
+            "QueueArn": "arn:aws:sqs:us-east-1:644160558196:test-kms-cache-default-key",
+            "ApproximateNumberOfMessages": "0",
+            "ApproximateNumberOfMessagesNotVisible": "0",
+            "ApproximateNumberOfMessagesDelayed": "0",
+            "CreatedTimestamp": "1683134354",
+            "LastModifiedTimestamp": "1683134354",
+            "VisibilityTimeout": "30",
+            "MaximumMessageSize": "262144",
+            "MessageRetentionPeriod": "345600",
+            "DelaySeconds": "0",
+            "ReceiveMessageWaitTimeSeconds": "0",
+            "KmsMasterKeyId": "alias/aws/sqs",
+            "KmsDataKeyReusePeriodSeconds": "300",
+            "SqsManagedSseEnabled": "false"
+        },
+        "ResponseMetadata": {}
+    }
+}
