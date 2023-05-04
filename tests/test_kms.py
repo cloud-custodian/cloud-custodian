@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 import json
 import time
+from unittest.mock import patch
 
 
 from c7n.resources.aws import shape_validate
@@ -411,7 +412,8 @@ class KMSTagging(BaseTest):
             ),
             session_factory=session_factory,
         )
-        resources = p.run()
+        with patch('c7n.resources.sqs.SQS.executor_factory', MainThreadExecutor):
+            resources = p.run()
         self.assertEqual(len(resources), 1)
 
     def test_kms_post_finding(self):
