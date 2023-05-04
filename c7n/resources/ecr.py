@@ -22,6 +22,11 @@ class DescribeECR(DescribeSource):
             try:
                 r['Tags'] = client.list_tags_for_resource(
                     resourceArn=r['repositoryArn']).get('tags')
+                try:
+                    r['repositoryPolicy'] = json.loads(client.get_repository_policy(
+                        repositoryName=r["repositoryName"])["policyText"])
+                except client.exceptions.RepositoryPolicyNotFoundException:
+                    r['repositoryPolicy'] = {}
                 results.append(r)
             except client.exceptions.RepositoryNotFoundException:
                 continue
