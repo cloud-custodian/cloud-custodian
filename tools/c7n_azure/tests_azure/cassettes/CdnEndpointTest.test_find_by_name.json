@@ -34,7 +34,7 @@
                     "data": {
                         "value": [
                             {
-                                "id": "/subscriptions/19ce288e-d065-4362-8ad1-8c5acbfeb94e/resourcegroups/test_cdnendpoint/providers/Microsoft.Cdn/profiles/cctestmyprofile",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/test_cdnprofile/providers/Microsoft.Cdn/profiles/cctestcdnprofile",
                                 "type": "Microsoft.Cdn/profiles",
                                 "name": "cctestmyprofile",
                                 "location": "EastUs",

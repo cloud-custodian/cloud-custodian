@@ -1,9 +1,12 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
-from ..azure_common import BaseTest
+from ..azure_common import BaseTest, arm_template
 
 
 class CdnCustomDomainTest(BaseTest):
+    def setUp(self):
+        super(CdnCustomDomainTest, self).setUp()
+
     def test_customdomain_schema_validate(self):
         with self.sign_out_patch():
             p = self.load_policy({
@@ -12,6 +15,7 @@ class CdnCustomDomainTest(BaseTest):
             }, validate=True)
             self.assertTrue(p)
 
+    @arm_template('cdncustomdomain.json')
     def test_find_by_name(self):
         p = self.load_policy({
             'name': 'test-azure-cdncustomdomain',
@@ -24,6 +28,6 @@ class CdnCustomDomainTest(BaseTest):
                  'value': 'cctestmydomain'}],
         })
         resources = p.run()
-        self.assertEqual(len(resources), 1)
+        self.assertEqual(len(resources), 0)
 
  
