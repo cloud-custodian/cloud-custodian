@@ -7,7 +7,8 @@ from bs4 import BeautifulSoup
 
 
 @click.command()
-def main():
+@click.option('-f', '--output', default='-', type=click.File('w'))
+def main(output):
     """GCP IAM DataSet
     """
     response = requests.get(
@@ -19,8 +20,7 @@ def main():
             continue
         perms.append(row.td.code.text)
 
-    with open('gcp-iam-perms.json', 'w') as fh:
-        json.dump({'permissions': perms}, fp=fh, indent=2)
+    json.dump({'permissions': perms}, fp=output, indent=2)
 
 
 if __name__ == '__main__':
