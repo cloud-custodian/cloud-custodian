@@ -553,19 +553,3 @@ class ProjectTest(BaseTest):
 
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['name'], 'gcp-lab-custodian')
-
-
-class RegionsTest(BaseTest):
-
-    def test_regions(self):
-        project_id = 'gcp-lab-custodian'
-        session_factory = self.replay_flight_data('regions-query', project_id=project_id)
-
-        policy = self.load_policy(
-            {'name': 'gcp-regions',
-             'resource': 'gcp.region'},
-            session_factory=session_factory)
-        resources = policy.run()
-
-        self.assertEqual(len(resources), 37)
-        self.assertEqual(resources[0]['name'], 'asia-east1')

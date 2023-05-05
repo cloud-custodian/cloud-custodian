@@ -617,18 +617,3 @@ class Project(QueryResourceManager):
         def get(client, resource_info):
             return client.execute_command(
                 'get', {'project': resource_info['project_id']})
-
-
-@resources.register('region')
-class GCPRegions(QueryResourceManager):
-    """GCP resource: https://cloud.google.com/compute/docs/reference/rest/v1/regions"""
-    class resource_type(TypeInfo):
-        service = 'compute'
-        version = 'v1'
-        component = 'regions'
-        enum_spec = ('list', 'items[]', None)
-        scope = 'project'
-        name = id = 'name'
-        default_report_fields = ['id', 'name', 'dnsName', 'creationTime', 'visibility']
-        asset_type = "compute.googleapis.com/compute"
-        scc_type = "google.compute.Region"
