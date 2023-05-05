@@ -1,10 +1,10 @@
 from c7n.utils import local_session
 from c7n_gcp.provider import resources
-from c7n_gcp.query import GCPIamPolicyFilter, ChildResourceManager, ChildTypeInfo
+from c7n_gcp.query import RegionalResourceManager, ChildTypeInfo
 
 
 @resources.register('artifactregistry-repository')
-class ArtifactRegistryRepository(ChildResourceManager):
+class ArtifactRegistryRepository(RegionalResourceManager):
 
     class resource_type(ChildTypeInfo):
         service = 'artifactregistry'
@@ -14,7 +14,7 @@ class ArtifactRegistryRepository(ChildResourceManager):
         scope = 'parent'
         name = id = 'id'
         parent_spec = {
-            'resource': 'gcp-regions',
+            'resource': 'region',
             'child_enum_params': {
                 ('name', 'region')},
             'use_child_query': True,
@@ -31,4 +31,4 @@ class ArtifactRegistryRepository(ChildResourceManager):
         }
 
 
-ArtifactRegistryRepository.filter_registry.register('gcp-iam-policy-filter', GCPIamPolicyFilter)
+# ArtifactRegistryRepository.filter_registry.register('gcp-iam-policy-filter', GCPIamPolicyFilter)

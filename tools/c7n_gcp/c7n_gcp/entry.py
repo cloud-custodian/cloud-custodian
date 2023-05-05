@@ -19,3 +19,5 @@ def initialize_gcp():
     # load shared registered resources
     import c7n_gcp.actions
     import c7n_gcp.output # noqa
+
+    import c7n_gcp.region

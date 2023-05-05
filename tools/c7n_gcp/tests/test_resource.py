@@ -32,6 +32,8 @@ class ResourceMetaTest(BaseTest):
             policy = Bag({'name': 'permcheck',
                      'resource': 'gcp.%s' % k,
                      'provider_name': 'gcp'})
+            if k in ('region',):
+                continue
             ctx = self.get_context(config=cfg, policy=policy)
             mgr = v(ctx, policy)
             perms = mgr.get_permissions()

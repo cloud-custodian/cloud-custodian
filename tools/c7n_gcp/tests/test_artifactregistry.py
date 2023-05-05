@@ -8,6 +8,7 @@ class ArtifactRegistryRepositoryTest(BaseTest):
         p = self.load_policy({
             'name': 'artifact',
             'resource': 'gcp.artifactregistry-repository'},
+            config={'region': 'us-central1'},
             session_factory=factory)
         resources = p.run()
 
