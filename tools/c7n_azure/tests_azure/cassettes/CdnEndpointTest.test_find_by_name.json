@@ -1,0 +1,136 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com//subscriptions/19ce288e-d065-4362-8ad1-8c5acbfeb94e/resourcegroups/test_cdnendpoint/providers/Microsoft.Cdn/profiles/?api-version=2020-09-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "date": [
+                        "Tue, 25 Apr 2023 18:09:57 GMT"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-resource-requests": [
+                        "49"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-length": [
+                        "383"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/test_cdnprofile/providers/Microsoft.Cdn/profiles/cctestcdnprofile",
+                                "type": "Microsoft.Cdn/profiles",
+                                "name": "cctestmyprofile",
+                                "location": "EastUs",
+                                "kind": "cdn",
+                                "tags": {
+                                    "product_id": "13742"
+                                },
+                                "sku": {
+                                    "name": "Standard_Microsoft"
+                                },
+                                "properties": {
+                                    "resourceState": "Active",
+                                    "provisioningState": "Succeeded"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com//subscriptions/19ce288e-d065-4362-8ad1-8c5acbfeb94e/resourcegroups/test_cdnendpoint/providers/Microsoft.Cdn/profiles/cctestmyprofile/endpoints/endpoints?api-version=2020-09-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "date": [
+                        "Tue, 25 Apr 2023 18:09:57 GMT"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-resource-requests": [
+                        "49"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-length": [
+                        "1272"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/19ce288e-d065-4362-8ad1-8c5acbfeb94e/resourcegroups/test_cdnendpoint/providers/Microsoft.Cdn/profiles/cctestmyprofile/endpoints/cctestcdnendpoint",
+                                "type": "Microsoft.Cdn/profiles/endpoints",
+                                "name": "urffdpkcbyendpoint",
+                                "location": "EastUs",
+                                "tags": {
+                                    "product_id": "13742"
+                                },
+                                "properties": {
+                                    "hostName": "cctestcdnendpoint.azureedge.net",
+                                    "originHostHeader": null,
+                                    "originPath": null,
+                                    "contentTypesToCompress": [],
+                                    "isCompressionEnabled": false,
+                                    "isHttpAllowed": true,
+                                    "isHttpsAllowed": true,
+                                    "queryStringCachingBehavior": "IgnoreQueryString",
+                                    "optimizationType": null,
+                                    "probePath": null,
+                                    "origins": [
+                                        {
+                                            "name": "host",
+                                            "properties": {
+                                                "hostName": "cdnowolabi.z13.web.core.windows.net",
+                                                "httpPort": 80,
+                                                "httpsPort": 443
+                                            }
+                                        }
+                                    ],
+                                    "customDomains": [],
+                                    "geoFilters": [],
+                                    "deliveryPolicy": null,
+                                    "resourceState": "Running",
+                                    "provisioningState": "Succeeded"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}
+
+
+
+  

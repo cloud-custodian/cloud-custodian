@@ -1,0 +1,66 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "profiles_cctestmyprofile_name": {
+            "defaultValue": "cctestmyprofile",
+            "type": "string"
+        },
+        "endpoints_cctestcdnendpoint_name": {
+            "defaultValue": "cctestcdnendpoint",
+            "type": "string"
+        }
+        },
+        "variables":{},
+        "resources": [
+            {
+                "name": "[parameters('profiles_cctestmyprofile_name')]",
+                "type": "Microsoft.Cdn/profiles",
+                "location": "eastus",
+                "apiVersion": "2019-04-15",
+                "properties": {
+                    "provisioningState": "Succeeded",
+                    "resourceState": "Active"
+                },
+                "sku": {
+                    "name": "Standard_Microsoft"
+                },
+                "resources": [
+                    {
+                        "type": "endpoints",
+                        "sku": {
+                            "name": "Standard_Microsoft"
+                        },
+                        "name": "[parameters('endpoints_cctestcdnendpoint_name')]",
+                        "apiVersion": "2019-04-15",
+                        "dependsOn": [
+                            "[resourceId('Microsoft.Cdn/profiles', parameters('profiles_cctestmyprofile_name'))]"
+                        ],
+                        "location": "EastUs",
+                        "tags": {},
+                        "scale": null,
+                        "properties": {
+                            "hostName": "cctestcdnendpoint.azureedge.net",
+                            "isCompressionEnabled": false,
+                            "isHttpAllowed": true,
+                            "isHttpsAllowed": true,
+                            "queryStringCachingBehavior": "IgnoreQueryString",
+                            "origins": [
+                                {
+                                    "name": "host",
+                                    "properties": {
+                                        "hostName": "cdnowolabi.z13.web.core.windows.net",
+                                        "httpPort": 80,
+                                        "httpsPort": 443
+                                    }
+                                }
+                            ]
+                        }
+                    
+                    }
+                ]
+            }
+       ]
+}
+
+             
