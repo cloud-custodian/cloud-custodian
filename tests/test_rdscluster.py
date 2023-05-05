@@ -8,6 +8,7 @@ from c7n.executor import MainThreadExecutor
 from c7n.resources.rdscluster import RDSCluster, _run_cluster_method
 from c7n.testing import mock_datetime_now
 from dateutil import parser
+import c7n.filters.backup
 
 from .common import BaseTest, event_data
 
@@ -438,6 +439,28 @@ class RDSClusterTest(BaseTest):
             session_factory=factory,
         )
         with mock_datetime_now(parser.parse("2022-03-30T00:00:00+00:00"), c7n.resources.rdscluster):
+            resources = p.run()
+        self.assertEqual(len(resources), 1)
+    
+    def test_rdscluster_consecutive_aws_backups_count_filter(self):
+        session_factory = self.replay_flight_data(
+            "test_rdscluster_consecutive_aws_backups_count_filter")
+        p = self.load_policy(
+            {
+                "name": "rdscluster_consecutive_aws_backups_count_filter",
+                "resource": "rds-cluster",
+                "filters": [
+                    {
+                        "type": "consecutive-aws-backups",
+                        "count": 2,
+                        "period": "days",
+                        "status": "COMPLETED"
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+        with mock_datetime_now(parser.parse("2022-09-09T00:00:00+00:00"), c7n.filters.backup):
             resources = p.run()
         self.assertEqual(len(resources), 1)
 

@@ -825,6 +825,7 @@ class PolicyMetaLint(BaseTest):
                     "instance-uptime",
                     "dead-letter",
                     "list-item",
+                    "ip-address-usage",
                 ):
                     continue
                 qk = "%s.filters.%s" % (k, n)

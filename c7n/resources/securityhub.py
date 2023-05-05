@@ -329,7 +329,9 @@ class PostFinding(Action):
     https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-findings-format.html
 
     For resources that are taggable, we will tag the resource with an identifier
-    such that further findings generate updates.
+    such that further findings generate updates. The name of the tag comes from the ``title``
+    parameter of the ``post-finding`` action, or the policy name if ``title`` is empty. This
+    allows different policies to update the same finding if they specify the same ``title``.
 
     Example generate a finding for accounts that don't have shield enabled.
 
@@ -355,6 +357,7 @@ class PostFinding(Action):
                - "Software and Configuration Checks/Industry and Regulatory Standards/NIST CSF Controls (USA)"
              recommendation: "Enable shield"
              recommendation_url: "https://www.example.com/policies/AntiDDoS.html"
+             title: "shield-enabled"
              confidence: 100
              compliance_status: FAILED
 
