@@ -6,6 +6,8 @@ import os
 import tempfile
 import time
 
+import jmespath
+
 from botocore.exceptions import ClientError
 from dateutil.parser import parse as parse_date
 import mock
@@ -687,3 +689,11 @@ def test_output_path_join():
     output_dir = './local-dir'
     assert utils.join_output_path(output_dir, 'Samuel', 'us-east-1') == (
         f"./local-dir{os.sep}Samuel{os.sep}us-east-1")
+
+
+def test_jmespath_parse_split():
+    result = jmespath.search(
+        'foo.bar | split(`.`, @)',
+        {'foo': {'bar': 'abc.xyz'}}
+    )
+    assert result == ['abc', 'xyz']
