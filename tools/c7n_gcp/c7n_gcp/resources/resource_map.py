@@ -1,5 +1,4 @@
 # Copyright The Cloud Custodian Authors.
-# SPDX-License-Identifier: Apache-2.0
 ResourceMap = {
     "gcp.api-key": "c7n_gcp.resources.iam.ApiKey",
     "gcp.app-engine": "c7n_gcp.resources.appengine.AppEngineApp",
@@ -18,7 +17,8 @@ ResourceMap = {
     "gcp.build": "c7n_gcp.resources.build.CloudBuild",
     "gcp.cloudbilling-account": "c7n_gcp.resources.cloudbilling.CloudBillingAccount",
     "gcp.cloud-run-service": "c7n_gcp.resources.cloudrun.CloudRunService",
-    "gcp.cloud-run-job": "c7n_gcp.resources.cloudrun.CloudRunJob",    
+    "gcp.cloud-run-job": "c7n_gcp.resources.cloudrun.CloudRunJob",
+    "gcp.compute-project": "c7n_gcp.resources.compute.Project",
     "gcp.dataflow-job": "c7n_gcp.resources.dataflow.DataflowJob",
     "gcp.disk": "c7n_gcp.resources.compute.Disk",
     "gcp.dm-deployment": "c7n_gcp.resources.deploymentmanager.DMDeployment",
@@ -94,5 +94,6 @@ ResourceMap = {
     "gcp.sql-ssl-cert": "c7n_gcp.resources.sql.SqlSslCert",
     "gcp.sql-user": "c7n_gcp.resources.sql.SqlUser",
     "gcp.subnet": "c7n_gcp.resources.network.Subnet",
-    "gcp.vpc": "c7n_gcp.resources.network.Network"
+    "gcp.vpc": "c7n_gcp.resources.network.Network",
 }
+# SPDX-License-Identifier: Apache-2.0
