@@ -20,4 +20,5 @@ def initialize_gcp():
     import c7n_gcp.actions
     import c7n_gcp.output # noqa
 
-    import c7n_gcp.region
+    # load static resource
+    import c7n_gcp.region # noqa

@@ -7,13 +7,12 @@ import itertools
 import logging
 
 from googleapiclient.errors import HttpError
-from concurrent.futures import as_completed
 
 from c7n.actions import ActionRegistry
-from c7n.filters import FilterRegistry, ValueFilter, OPERATORS
+from c7n.filters import FilterRegistry
 from c7n.manager import ResourceManager
 from c7n.query import sources, MaxResourceLimit
-from c7n.utils import local_session, chunks, type_schema
+from c7n.utils import local_session, chunks
 
 
 log = logging.getLogger('c7n_gcp.query')
@@ -336,7 +335,7 @@ class RegionalResourceManager(ChildResourceManager):
     def get_parent_resource_query(self):
         query = None
         if self.config.regions and 'all' not in self.config.regions:
-            query = [{'name': r} for r in regions]
+            query = [{'name': r} for r in self.config.regions]
         elif self.config.region:
             query = [{'name': self.config.region}]
         return query
