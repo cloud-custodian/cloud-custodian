@@ -469,6 +469,11 @@ def test_default_bucket_region_with_explicit_region():
     assert output_dir == conf.output_dir
 
 
+def test_join_output():
+    output_dir = aws.join_output("s3://aws?region=xyz", "suffix")
+    assert output_dir == "s3://aws/suffix?region=xyz"
+
+
 @vcr.use_cassette(
     'tests/data/vcr_cassettes/test_output/default_bucket_region_public.yaml')
 def test_default_bucket_region_is_public():

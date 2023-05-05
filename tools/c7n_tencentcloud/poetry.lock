@@ -39,18 +39,18 @@ tests-no-zope = ["cloudpickle", "cloudpickle", "hypothesis", "hypothesis", "mypy
 
 [[package]]
 name = "boto3"
-version = "1.26.99"
+version = "1.26.109"
 description = "The AWS SDK for Python"
 category = "dev"
 optional = false
 python-versions = ">= 3.7"
 files = [
-    {file = "boto3-1.26.99-py3-none-any.whl", hash = "sha256:536d9e7a074f4f16cc87b426f91b3079edd5c6927541a04f7e3fa28c53293532"},
-    {file = "boto3-1.26.99.tar.gz", hash = "sha256:d9fd57d6e98fd919cdbd613428f685e05b48c71477fda1aa7fbf51867262c7d1"},
+    {file = "boto3-1.26.109-py3-none-any.whl", hash = "sha256:a1c48674c2ff25ddced599c51d14ba7a6dbe9fd51641e8d63a6887bebd9712d7"},
+    {file = "boto3-1.26.109.tar.gz", hash = "sha256:d388cb7f54f1a3056f91ffcfb5cf18b226454204e5df7a5c10774718c3fbb166"},
 ]
 
 [package.dependencies]
-botocore = ">=1.29.99,<1.30.0"
+botocore = ">=1.29.109,<1.30.0"
 jmespath = ">=0.7.1,<2.0.0"
 s3transfer = ">=0.6.0,<0.7.0"
 
@@ -59,14 +59,14 @@ crt = ["botocore[crt] (>=1.21.0,<2.0a0)"]
 
 [[package]]
 name = "botocore"
-version = "1.29.99"
+version = "1.29.109"
 description = "Low-level, data-driven core of boto 3."
 category = "dev"
 optional = false
 python-versions = ">= 3.7"
 files = [
-    {file = "botocore-1.29.99-py3-none-any.whl", hash = "sha256:15c205e4578253da1e8cc247b9d4755042f5f873f68ac6e5fed48f4bd6f008c6"},
-    {file = "botocore-1.29.99.tar.gz", hash = "sha256:d1770b4fe5531870af7a81e9897b2092d2f89e4ba8cb7abbbaf3ab952f6b8a6f"},
+    {file = "botocore-1.29.109-py3-none-any.whl", hash = "sha256:cf43dddb7e2ba5425fe19fad68b10043307b61d9103d06566f1ab6034e38b8db"},
+    {file = "botocore-1.29.109.tar.gz", hash = "sha256:2e449525f0ccedb31fdb962a77caac48b4c486c23515b84c5989a39a1823a024"},
 ]
 
 [package.dependencies]
@@ -436,14 +436,14 @@ six = ">=1.5"
 
 [[package]]
 name = "pytz"
-version = "2023.2"
+version = "2023.3"
 description = "World timezone definitions, modern and historical"
 category = "main"
 optional = false
 python-versions = "*"
 files = [
-    {file = "pytz-2023.2-py2.py3-none-any.whl", hash = "sha256:8a8baaf1e237175b02f5c751eea67168043a749c843989e2b3015aa1ad9db68b"},
-    {file = "pytz-2023.2.tar.gz", hash = "sha256:a27dcf612c05d2ebde626f7d506555f10dfc815b3eddccfaadfc7d99b11c9a07"},
+    {file = "pytz-2023.3-py2.py3-none-any.whl", hash = "sha256:a151b3abb88eda1d4e34a9814df37de2a80e301e68ba0fd856fb9b46bfbbbffb"},
+    {file = "pytz-2023.3.tar.gz", hash = "sha256:1d8ce29db189191fb55338ee6d0387d82ab59f3d00eac103412d64e0ebd0c588"},
 ]
 
 [[package]]
@@ -580,14 +580,14 @@ widechars = ["wcwidth"]
 
 [[package]]
 name = "tencentcloud-sdk-python"
-version = "3.0.860"
+version = "3.0.868"
 description = "Tencent Cloud SDK for Python"
 category = "main"
 optional = false
 python-versions = "*"
 files = [
-    {file = "tencentcloud-sdk-python-3.0.860.tar.gz", hash = "sha256:6d40aefc3f8c1b7748194087940e8e5a03debf5363f4621435f6162b87147b99"},
-    {file = "tencentcloud_sdk_python-3.0.860-py2.py3-none-any.whl", hash = "sha256:9ea256e32f4d9669ff0bd4cf9e7f3e1e6edfda98dcfee7d0b3c807ea02515d73"},
+    {file = "tencentcloud-sdk-python-3.0.868.tar.gz", hash = "sha256:c12e648f89e30935c0f7dabc8465fb3f1318070a9eb7507d22bf5333e7b9cbb9"},
+    {file = "tencentcloud_sdk_python-3.0.868-py2.py3-none-any.whl", hash = "sha256:014eae007ea2cccc49631171a89773ac70371c19bc49d689f0074534a2390901"},
 ]
 
 [package.dependencies]

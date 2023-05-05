@@ -10,6 +10,40 @@ from c7n.resources.aws import shape_validate
 from pytest_terraform import terraform
 
 
+@terraform('ec2_igw_subnet')
+def test_ec2_igw_subnet(test, ec2_igw_subnet):
+    aws_region = 'us-east-1'
+    session_factory = test.replay_flight_data('ec2_igw_subnet', region=aws_region)
+
+    p = test.load_policy(
+        {
+            'name': 'ec2_igw_subnet',
+            'resource': 'ec2',
+            'filters': [
+                {
+                    'type': 'subnet',
+                    'igw': True,
+                    'key': 'SubnetId',
+                    'value': 'present',
+                },
+            ],
+        },
+        session_factory=session_factory,
+        config={'region': aws_region},
+    )
+
+    resources = p.run()
+
+    result_instance_ids = set(i['InstanceId'] for i in resources)
+    expected_instance_ids = {
+        ec2_igw_subnet['aws_instance.public_auto_assigned.id'],
+        ec2_igw_subnet['aws_instance.public_primary_interface.id'],
+        ec2_igw_subnet['aws_instance.public_secondary_interface.id'],
+    }
+    assert len(resources) == len(expected_instance_ids)
+    assert expected_instance_ids == result_instance_ids
+
+
 def test_eni_igw_subnet(test):
     factory = test.replay_flight_data('test_eni_public_subnet')
     p = test.load_policy({
@@ -312,6 +346,67 @@ class VpcTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 2)
         self.assertTrue("subnet-068dfbf3f275a6ae8" in resources[0]["c7n:matched-vpc-endpoint"])
+
+    def test_subnet_ip_address_usage_filter(self):
+        factory = self.replay_flight_data("test_subnet_ip_address_usage_filter", region="us-east-2")
+        p = self.load_policy(
+            {
+                "name": "subnet-no-ips-used",
+                "resource": "aws.subnet",
+                "filters": [
+                    {
+                        "type": "ip-address-usage",
+                        "key": "NumberUsed",
+                        "value": 0,
+                    }
+                ],
+            },
+            session_factory=factory,
+            config={"region": "us-east-2"},
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
+
+        p = self.load_policy(
+            {
+                "name": "subnet-almost-full",
+                "resource": "aws.subnet",
+                "filters": [
+                    {
+                        "type": "ip-address-usage",
+                        "key": "PercentUsed",
+                        "op": "greater-than",
+                        "value": 90,
+                    }
+                ],
+            },
+            session_factory=factory,
+            config={"region": "us-east-2"},
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_endpoint_policy_filter(self):
+        factory = self.replay_flight_data("test_endpoint_policy_filter")
+        p = self.load_policy(
+            {
+                "name": "endpoint-policy-filter",
+                "resource": "vpc-endpoint",
+                "filters": [
+                    {
+                        "type": "has-statement",
+                        "statements": [{
+                            "Effect": "Allow",
+                            "Action": "*"
+                        }],
+                    }
+                ],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertTrue("vpce-011d813b183878b82" in resources[0]["VpcEndpointId"])
 
 
 class NetworkLocationTest(BaseTest):

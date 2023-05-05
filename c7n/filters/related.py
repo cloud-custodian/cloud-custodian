@@ -1,8 +1,8 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import importlib
-
 import jmespath
+from functools import lru_cache
 
 from .core import ValueFilter, OPERATORS
 from c7n.query import ChildResourceQuery
@@ -49,6 +49,7 @@ class RelatedResourceFilter(ValueFilter):
         return {r[model.id]: r for r in related
                 if r[model.id] in related_ids}
 
+    @lru_cache(maxsize=None)
     def get_resource_manager(self):
         mod_path, class_name = self.RelatedResource.rsplit('.', 1)
         module = importlib.import_module(mod_path)

@@ -21,6 +21,7 @@ from c7n.utils import (
 
 from c7n.resources.aws import shape_validate
 from c7n.resources.shield import IsEIPShieldProtected, SetEIPShieldProtection
+from c7n.filters.policystatement import HasStatementFilter
 
 
 @resources.register('vpc')
@@ -503,6 +504,76 @@ class SubnetVpcFilter(net_filters.VpcFilter):
 
     RelatedIdsExpression = "VpcId"
 
+@Subnet.filter_registry.register('ip-address-usage')
+class SubnetIpAddressUsageFilter(ValueFilter):
+    """Filter subnets based on available IP addresses.
+
+    :example:
+
+    Show subnets with no addresses in use.
+
+    .. code-block:: yaml
+
+            policies:
+              - name: empty-subnets
+                resource: aws.subnet
+                filters:
+                  - type: ip-address-usage
+                    key: NumberUsed
+                    value: 0
+
+    :example:
+
+    Show subnets where 90% or more addresses are in use.
+
+    .. code-block:: yaml
+
+            policies:
+              - name: almost-full-subnets
+                resource: aws.subnet
+                filters:
+                  - type: ip-address-usage
+                    key: PercentUsed
+                    op: greater-than
+                    value: 90
+
+    This filter allows ``key`` to be:
+
+    * ``MaxAvailable``: the number of addresses available based on a subnet's CIDR block size
+      (minus the 5 addresses
+      `reserved by AWS <https://docs.aws.amazon.com/vpc/latest/userguide/subnet-sizing.html>`_)
+    * ``NumberUsed``: ``MaxAvailable`` minus the subnet's ``AvailableIpAddressCount`` value
+    * ``PercentUsed``: ``NumberUsed`` divided by ``MaxAvailable``
+    """
+    annotation_key = 'c7n:IpAddressUsage'
+    aws_reserved_addresses = 5
+    schema_alias = False
+    schema = type_schema(
+        'ip-address-usage',
+        key={'enum': ['MaxAvailable', 'NumberUsed', 'PercentUsed']},
+        rinherit=ValueFilter.schema,
+    )
+
+    def augment(self, resource):
+        cidr_block = parse_cidr(resource['CidrBlock'])
+        max_addresses = cidr_block.num_addresses - self.aws_reserved_addresses
+        resource[self.annotation_key] = dict(
+            MaxAvailable=max_addresses,
+            NumberUsed=max_addresses - resource['AvailableIpAddressCount'],
+            PercentUsed=round(
+                (max_addresses - resource['AvailableIpAddressCount']) / max_addresses * 100.0,
+                2
+            ),
+        )
+
+    def process(self, resources, event=None):
+        results = []
+        for r in resources:
+            if self.annotation_key not in r:
+                self.augment(r)
+            if self.match(r[self.annotation_key]):
+                results.append(r)
+        return results
 
 class ConfigSG(query.ConfigSource):
 
@@ -2339,6 +2410,36 @@ class VpcEndpoint(query.QueryResourceManager):
         id_prefix = "vpce-"
         universal_taggable = object()
         cfn_type = config_type = "AWS::EC2::VPCEndpoint"
+
+
+@VpcEndpoint.filter_registry.register('has-statement')
+class EndpointPolicyStatementFilter(HasStatementFilter):
+    """Find resources with matching endpoint policy statements.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+            - name: vpc-endpoint-policy
+              resource: aws.vpc-endpoint
+              filters:
+                  - type: has-statement
+                    statements:
+                      - Action: "*"
+                        Effect: "Allow"
+    """
+
+    policy_attribute = 'PolicyDocument'
+    permissions = ('ec2:DescribeVpcEndpoints',)
+
+    def get_std_format_args(self, endpoint):
+        return {
+            'endpoint_id': endpoint['VpcEndpointId'],
+            'account_id': self.manager.config.account_id,
+            'region': self.manager.config.region
+        }
+
 
 
 @VpcEndpoint.filter_registry.register('cross-account')
