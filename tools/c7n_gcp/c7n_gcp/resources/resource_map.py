@@ -8,7 +8,7 @@ ResourceMap = {
     "gcp.app-engine-domain-mapping": "c7n_gcp.resources.appengine.AppEngineDomainMapping",
     "gcp.app-engine-firewall-ingress-rule": (
         "c7n_gcp.resources.appengine.AppEngineFirewallIngressRule"),
-    "gcp.artifactregistry-repository": (
+    "gcp.artifact-repository": (
         "c7n_gcp.resources.artifactregistry.ArtifactRegistryRepository"),
     "gcp.autoscaler": "c7n_gcp.resources.compute.Autoscaler",
     "gcp.bq-dataset": "c7n_gcp.resources.bigquery.DataSet",

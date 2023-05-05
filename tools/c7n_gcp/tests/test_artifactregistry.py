@@ -7,7 +7,7 @@ class ArtifactRegistryRepositoryTest(BaseTest):
         factory = self.replay_flight_data('artifactregistry-repositories-query')
         p = self.load_policy({
             'name': 'artifact',
-            'resource': 'gcp.artifactregistry-repository'},
+            'resource': 'gcp.artifact-repository'},
             config={'region': 'us-central1'},
             session_factory=factory)
         resources = p.run()

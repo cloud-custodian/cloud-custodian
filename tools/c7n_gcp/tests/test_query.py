@@ -16,7 +16,7 @@ def test_gcp_resource_metadata_asset_type():
         'app-engine-certificate',
         'app-engine-firewall-ingress-rule',
         'app-engine-domain-mapping',
-        'artifactregistry-repository',
+        'artifact-repository',
         'bq-job',
         'bq-project',
         'build',
