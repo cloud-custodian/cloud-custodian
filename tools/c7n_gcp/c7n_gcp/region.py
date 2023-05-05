@@ -18,6 +18,7 @@ class Region:
         name = id = 'name'
         scope = 'global'
         default_report_fields = ['name']
+        service = 'regions'
 
     filter_registry = {}
     action_registry = {}
