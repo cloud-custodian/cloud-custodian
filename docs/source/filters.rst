@@ -304,8 +304,8 @@ Additional JMESPath Functions
 
 Cloud Custodian supports additional custom JMESPath functions, including:
 
-- ``split(seperator, input_string)``: takes 2 arguments, the seperator token
-  as well as the input string.
+- ``split(seperator, input_string) -> list[str]``: takes 2 arguments, the seperator token
+  as well as the input string. Returns a list of strings.
 
   .. code-block:: yaml
 
