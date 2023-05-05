@@ -1105,7 +1105,6 @@ class TestPolicy(BaseTest):
             **{
                 'mode': {
                     'type': 'config-rule',
-                    'member-role': 'arn:aws:iam::{account_id}:role/BarFoo',
                     'role': 'FooBar'},
             }
         }, config=pull_mode_policy.ctx.options)
