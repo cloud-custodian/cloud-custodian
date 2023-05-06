@@ -305,8 +305,24 @@ class SchemaTest(CliTest):
                     'headers': {
                         'type': 'object',
                         'patternProperties': {
-                            '': {'type': 'string'},
-                        },
+                            '': {
+                                'oneOf': [
+                                    {'type': 'string'},
+                                    {
+                                        'type': 'object',
+                                        'required': ['value_from'],
+                                        'additionalProperties': 'False',
+                                        'properties': {
+                                            'value_from': {
+                                                'type': 'string',
+                                                'pattern':
+                                                    '^arn:aws:secretsmanager:.+:\\d+:secret:.+$'
+                                            },
+                                        },
+                                    },
+                                ]
+                            }
+                        }
                     },
                 }
             },
@@ -323,8 +339,24 @@ class SchemaTest(CliTest):
                     'headers': {
                         'type': 'object',
                         'patternProperties': {
-                            '': {'type': 'string'},
-                        },
+                            '': {
+                                'oneOf': [
+                                    {'type': 'string'},
+                                    {
+                                        'type': 'object',
+                                        'required': ['value_from'],
+                                        'additionalProperties': 'False',
+                                        'properties': {
+                                            'value_from': {
+                                                'type': 'string',
+                                                'pattern':
+                                                    '^arn:aws:secretsmanager:.+:\\d+:secret:.+$'
+                                            },
+                                        },
+                                    },
+                                ]
+                            }
+                        }
                     },
                 }
             }

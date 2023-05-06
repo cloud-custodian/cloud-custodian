@@ -15,6 +15,69 @@ from c7n.cache import SqlKvCache
 from c7n.config import Config
 from c7n.resolver import ValuesFrom, URIResolver
 
+from pytest_terraform import terraform
+
+
+def test__get_headers_from_string():
+    mgr = Bag(
+        {
+            'session_factory': None,
+            '_cache': None,
+            'config': Config.empty(account_id=ACCOUNT_ID)
+        }
+    )
+    values = ValuesFrom(
+        {
+            'url': 'example',
+            'expr': '[].bean',
+            'format': 'json',
+            'headers': {
+                'x-api-key': '1234567890',
+            }
+        },
+        mgr
+    )
+    headers = values._get_headers()
+
+    assert len(headers) == 1
+    assert headers['x-api-key'] == '1234567890'
+
+
+@terraform('get_headers_from_secretsmanager_secret')
+def test__get_headers_from_secretsmanager_secret(test, get_headers_from_secretsmanager_secret):
+    aws_region = 'us-east-1'
+    session_factory = test.replay_flight_data(
+        'get_headers_from_secretsmanager_secret',
+        region=aws_region
+    )
+
+    manager = Bag(
+        {
+            'session_factory': session_factory,
+            '_cache': None,
+            'config': Config.empty(account_id=ACCOUNT_ID)
+        }
+    )
+    values = ValuesFrom(
+        {
+            'url': 'example',
+            'expr': '[].bean',
+            'format': 'json',
+            'headers': {
+                'x-api-key': {
+                    'value_from': get_headers_from_secretsmanager_secret[
+                        'aws_secretsmanager_secret_version.this.arn']
+                },
+            }
+        },
+        manager
+    )
+    headers = values._get_headers()
+
+    assert len(headers) == 1
+    assert headers['x-api-key'] == get_headers_from_secretsmanager_secret[
+        'aws_secretsmanager_secret_version.this.secret_string']
+
 
 class FakeCache:
 

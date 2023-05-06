@@ -94,6 +94,14 @@ class ValuesFrom:
             authorization: my-token
 
       value_from:
+         url: http://foobar.com/mydata
+         format: json
+         expr: Region."us-east-1"[].ImageId
+         headers:
+            authorization:
+              value_from: 'arn:aws:secretsmanager:us-east-1:123456789012:secret:my-secret'
+
+      value_from:
          url: s3://bucket/abc/foo.csv
          format: csv2dict
          expr: key[1]
@@ -117,8 +125,23 @@ class ValuesFrom:
             'headers': {
                 'type': 'object',
                 'patternProperties': {
-                    '': {'type': 'string'},
-                },
+                    '': {
+                        'oneOf': [
+                            {'type': 'string'},
+                            {
+                                'type': 'object',
+                                'required': ['value_from'],
+                                'additionalProperties': 'False',
+                                'properties': {
+                                    'value_from': {
+                                        'type': 'string',
+                                        'pattern': '^arn:aws:secretsmanager:.+:\\d+:secret:.+$'
+                                    },
+                                },
+                            },
+                        ]
+                    }
+                }
             },
         }
     }
@@ -130,8 +153,30 @@ class ValuesFrom:
         }
         self.data = format_string_values(data, **config_args)
         self.manager = manager
+        self.session_factory = manager.session_factory
         self.cache = manager._cache or NullCache({})
-        self.resolver = URIResolver(manager.session_factory, self.cache)
+        self.resolver = URIResolver(self.session_factory, self.cache)
+
+    def _read_value_from_aws_secretsmanager(self, secret: str) -> str:
+        client = self.session_factory().client(
+            'secretsmanager',
+            region_name=self.manager.config.region
+        )
+        secret_string = client.get_secret_value(SecretId=secret)['SecretString']
+        return secret_string
+
+    def _get_headers(self) -> dict:
+        raw_headers_data = self.data.get('headers', {})
+
+        headers = {}
+        for k, v in raw_headers_data.items():
+            if isinstance(v, str):
+                headers[k] = v
+            elif isinstance(v, dict):
+                secret = v.get('value_from')
+                value = self._read_value_from_aws_secretsmanager(secret)
+                headers[k] = value
+        return headers
 
     def get_contents(self):
         _, format = os.path.splitext(self.data['url'])
@@ -148,7 +193,7 @@ class ValuesFrom:
 
         params = dict(
             uri=self.data.get('url'),
-            headers=self.data.get('headers', {})
+            headers=self._get_headers(),
         )
 
         contents = str(self.resolver.resolve(**params))
