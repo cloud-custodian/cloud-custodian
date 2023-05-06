@@ -155,6 +155,7 @@ ResourceMap = {
     "aws.opswork-stack": "c7n.resources.opsworks.OpsworkStack",
     "aws.prefix-list": "c7n.resources.vpc.PrefixList",
     "aws.peering-connection": "c7n.resources.vpc.PeeringConnection",
+    "aws.pinpoint-app": "c7n.resources.pinpoint.PinpointApp",
     'aws.qldb': 'c7n.resources.qldb.QLDB',
     "aws.r53domain": "c7n.resources.route53.Route53Domain",
     "aws.rds": "c7n.resources.rds.RDS",

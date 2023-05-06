@@ -13,6 +13,7 @@ from c7n.utils import type_schema, local_session, chunks
 from c7n.filters import Filter
 from c7n.filters.kms import KmsRelatedFilter
 from c7n.filters.vpc import SubnetFilter
+from c7n.filters.backup import ConsecutiveAwsBackupsFilter
 
 
 class DescribeFSx(DescribeSource):
@@ -444,3 +445,5 @@ class ConsecutiveBackups(Filter):
 class Subnet(SubnetFilter):
 
     RelatedIdsExpression = 'SubnetIds[]'
+
+FSx.filter_registry.register('consecutive-aws-backups', ConsecutiveAwsBackupsFilter)
