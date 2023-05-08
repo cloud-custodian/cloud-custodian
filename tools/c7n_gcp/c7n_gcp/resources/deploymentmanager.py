@@ -36,6 +36,12 @@ class DMDeployment(QueryResourceManager):
                 r['labels'] = {l['key']: l['value'] for l in r['labels']}
         return resources
 
+    def get_resource(self, resource_info):
+        resource = self.resource_type.get(self.get_client(), resource_info)
+        if resource:
+            self.augment((resource,))
+        return resource
+
 
 @DMDeployment.action_registry.register('delete')
 class DeleteInstanceGroupManager(MethodAction):
