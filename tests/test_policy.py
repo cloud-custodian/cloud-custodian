@@ -1099,6 +1099,9 @@ class TestPolicy(BaseTest):
             'actions': [
                 {'type': 'tag',
                  'value': 'bad monkey {account_id} {region} {now:+2d%Y-%m-%d}'},
+                {'type': 'tag',
+                 'key': 'escaped_braces',
+                 'value': '{{now}}'},
             ]}, config={'account_id': '12312311', 'region': 'zanzibar'})
         lambda_mode_policy = self.load_policy({
             **pull_mode_policy.data,
@@ -1131,6 +1134,11 @@ class TestPolicy(BaseTest):
         self.assertEqual(
             lambda_mode_policy.resource_manager.actions[0].data['value'],
             provision_time_value
+        )
+        # Validate historical use of {{now}} to defer interpolation
+        self.assertEqual(
+            lambda_mode_policy.resource_manager.actions[1].data['value'],
+            '{now}'
         )
 
     def test_child_resource_trail_validation(self):
