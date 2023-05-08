@@ -23,18 +23,18 @@ class DMDeployment(QueryResourceManager):
         default_report_fields = ['name', 'description', 'insertTime', 'updateTime']
         urn_component = "deployment"
 
-        def augment(self, resources):
-            # normalize labels from array to mapping like other gcp resources.
-            for r in resources:
-                if isinstance(r.get('labels'), list):
-                    r['labels'] = {l['key']: l['value'] for l in r['labels']}
-            return resources
-
         @staticmethod
         def get(client, resource_info):
             return client.execute_command(
                 'get', {'project': resource_info['project_id'],
                         'deployment': resource_info['name']})
+
+    def augment(self, resources):
+        # normalize labels from array to mapping like other gcp resources.
+        for r in resources:
+            if isinstance(r.get('labels'), list):
+                r['labels'] = {l['key']: l['value'] for l in r['labels']}
+        return resources
 
 
 @DMDeployment.action_registry.register('delete')

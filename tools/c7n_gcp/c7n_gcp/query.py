@@ -180,7 +180,10 @@ class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
                 'component': self.resource_type.component}
 
     def get_resource(self, resource_info):
-        return self.resource_type.get(self.get_client(), resource_info)
+        resource = self.resource_type.get(self.get_client(), resource_info)
+        if resource:
+            self.augment((resource,))
+        return resource
 
     @property
     def source_type(self):
