@@ -7,6 +7,7 @@ from dateutil.parser import parse as date_parse
 import c7n.resources.fsx
 from c7n.testing import mock_datetime_now
 from .common import BaseTest
+import c7n.filters.backup
 
 
 class TestFSx(BaseTest):
@@ -441,6 +442,27 @@ class TestFSx(BaseTest):
                  'igw': True}
             ]}, config={'region': 'us-west-2'}, session_factory=factory)
         resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_fsx_consecutive_aws_backups_count_filter(self):
+        session_factory = self.replay_flight_data("test_fsx_consecutive_aws_backups_count_filter")
+        p = self.load_policy(
+            {
+                "name": "fsx_consecutive_aws_backups_count_filter",
+                "resource": "fsx",
+                "filters": [
+                    {
+                        "type": "consecutive-aws-backups",
+                        "count": 2,
+                        "period": "days",
+                        "status": "COMPLETED"
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+        with mock_datetime_now(date_parse("2022-09-09T00:00:00+00:00"), c7n.filters.backup):
+            resources = p.run()
         self.assertEqual(len(resources), 1)
 
 
