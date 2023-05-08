@@ -29,8 +29,8 @@ class DMDeploymentTest(BaseTest):
         )
 
     def test_deployment_augment(self):
-        project_id = 'stacklet-kapilt'
-        session_factory = self.record_flight_data('dm-deployment-augment', project_id=project_id)
+        project_id = 'cloud-custodian'
+        session_factory = self.replay_flight_data('dm-deployment-augment', project_id=project_id)
 
         policy = self.load_policy(
             {'name': 'one-deployment', 'resource': 'gcp.dm-deployment'},
