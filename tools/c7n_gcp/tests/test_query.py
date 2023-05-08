@@ -16,6 +16,7 @@ def test_gcp_resource_metadata_asset_type():
         'app-engine-certificate',
         'app-engine-firewall-ingress-rule',
         'app-engine-domain-mapping',
+        'artifact-repository',
         'bq-job',
         'bq-project',
         'build',
@@ -31,7 +32,8 @@ def test_gcp_resource_metadata_asset_type():
         'sql-backup-run',
         'sql-ssl-cert',
         'sql-user',
-        'pubsub-snapshot'
+        'pubsub-snapshot',
+        'region'
     ))
     missing = set()
     for k, v in GoogleCloud.resources.items():
