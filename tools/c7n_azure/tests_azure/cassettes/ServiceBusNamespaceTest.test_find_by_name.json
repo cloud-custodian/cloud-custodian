@@ -1,0 +1,68 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.ServiceBus/namespaces?api-version=2021-11-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Thu, 04 May 2023 15:30:01 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-ms-inline-count": [
+                        ""
+                    ],
+                    "server-sb": [
+                        "Service-Bus-Resource-Provider/SN1"
+                    ],
+                    "content-length": [
+                        "745"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "sku": {
+                                    "name": "Standard",
+                                    "tier": "Standard"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_servicebus/providers/Microsoft.ServiceBus/namespaces/cctestservicebusnamespacejv67tef5di5hy",
+                                "name": "cctestservicebusnamespacejv67tef5di5hy",
+                                "type": "Microsoft.ServiceBus/Namespaces",
+                                "location": "East US",
+                                "tags": {
+                                    "product_id": "13742"
+                                },
+                                "properties": {
+                                    "disableLocalAuth": false,
+                                    "zoneRedundant": false,
+                                    "provisioningState": "Succeeded",
+                                    "metricId": "ea42f556-5106-4743-99b0-c129bfa71a47:cctestservicebusnamespacejv67tef5di5hy",
+                                    "createdAt": "2023-05-04T15:28:25.363Z",
+                                    "updatedAt": "2023-05-04T15:29:08.213Z",
+                                    "serviceBusEndpoint": "https://cctestservicebusnamespacejv67tef5di5hy.servicebus.windows.net:443/",
+                                    "status": "Active"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}

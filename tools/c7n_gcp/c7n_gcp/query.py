@@ -330,6 +330,17 @@ class ChildResourceManager(QueryResourceManager):
         return result
 
 
+class RegionalResourceManager(ChildResourceManager):
+
+    def get_parent_resource_query(self):
+        query = None
+        if self.config.regions and 'all' not in self.config.regions:
+            query = [{'name': r} for r in self.config.regions]
+        elif self.config.region:
+            query = [{'name': self.config.region}]
+        return query
+
+
 class TypeMeta(type):
 
     def __repr__(cls):
