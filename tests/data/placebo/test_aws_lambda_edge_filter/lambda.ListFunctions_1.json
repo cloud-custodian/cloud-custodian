@@ -1,0 +1,129 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Functions": [
+            {
+                "FunctionName": "test-pratyush",
+                "FunctionArn": "arn:aws:lambda:us-east-1:644160558196:function:test-pratyush",
+                "Runtime": "python3.9",
+                "Role": "arn:aws:iam::644160558196:role/service-role/test-pratyush-role-z8t69erp",
+                "Handler": "lambda_function.lambda_handler",
+                "CodeSize": 230,
+                "Description": "",
+                "Timeout": 3,
+                "MemorySize": 128,
+                "LastModified": "2023-02-10T16:16:05.606+0000",
+                "CodeSha256": "qyaQA4CyfLv6R5+dxMlaZ1qpDSOWxK9C5H/O3OKt+vA=",
+                "Version": "$LATEST",
+                "TracingConfig": {
+                    "Mode": "PassThrough"
+                },
+                "RevisionId": "b3cdc8b9-425c-4999-bba7-ac4ae4725150",
+                "PackageType": "Zip",
+                "Architectures": [
+                    "x86_64"
+                ],
+                "EphemeralStorage": {
+                    "Size": 512
+                },
+                "SnapStart": {
+                    "ApplyOn": "None",
+                    "OptimizationStatus": "Off"
+                }
+            },
+            {
+                "FunctionName": "c7n-lambda-edge-new",
+                "FunctionArn": "arn:aws:lambda:us-east-1:644160558196:function:c7n-lambda-edge-new",
+                "Runtime": "nodejs14.x",
+                "Role": "arn:aws:iam::644160558196:role/CloudCustodianRole",
+                "Handler": "index.handler",
+                "CodeSize": 363,
+                "Description": "Blueprint for returning HTTP redirect implemented in NodeJS.",
+                "Timeout": 1,
+                "MemorySize": 128,
+                "LastModified": "2023-03-15T02:54:09.007+0000",
+                "CodeSha256": "fCqpzRP6ghfnxzr+XQlJxD3DOQPFM6mG/oMVGus7KF8=",
+                "Version": "$LATEST",
+                "TracingConfig": {
+                    "Mode": "PassThrough"
+                },
+                "RevisionId": "601d1e93-bd8e-49a2-9e29-2dbc0f21dae7",
+                "PackageType": "Zip",
+                "Architectures": [
+                    "x86_64"
+                ],
+                "EphemeralStorage": {
+                    "Size": 512
+                },
+                "SnapStart": {
+                    "ApplyOn": "None",
+                    "OptimizationStatus": "Off"
+                }
+            },
+            {
+                "FunctionName": "test-python",
+                "FunctionArn": "arn:aws:lambda:us-east-1:644160558196:function:test-python",
+                "Runtime": "python3.8",
+                "Role": "arn:aws:iam::644160558196:role/BrentTestCustodianRole",
+                "Handler": "lambda_function.lambda_handler",
+                "CodeSize": 300,
+                "Description": "",
+                "Timeout": 3,
+                "MemorySize": 128,
+                "LastModified": "2022-11-22T19:10:35.342+0000",
+                "CodeSha256": "YILsaYMROYwZjWFweT4yJ6tPf40OwvI9jKdrfshdVuA=",
+                "Version": "$LATEST",
+                "VpcConfig": {
+                    "SubnetIds": [],
+                    "SecurityGroupIds": [],
+                    "VpcId": ""
+                },
+                "TracingConfig": {
+                    "Mode": "PassThrough"
+                },
+                "RevisionId": "f19c21cc-46ad-46d0-b5d9-38b25ade22d5",
+                "PackageType": "Zip",
+                "Architectures": [
+                    "x86_64"
+                ],
+                "EphemeralStorage": {
+                    "Size": 512
+                },
+                "SnapStart": {
+                    "ApplyOn": "None",
+                    "OptimizationStatus": "Off"
+                }
+            },
+            {
+                "FunctionName": "test-lambda-edge",
+                "FunctionArn": "arn:aws:lambda:us-east-1:644160558196:function:test-lambda-edge",
+                "Runtime": "nodejs14.x",
+                "Role": "arn:aws:iam::644160558196:role/CloudCustodianRole",
+                "Handler": "index.handler",
+                "CodeSize": 389,
+                "Description": "Blueprint for modifying CloudFront response header implemented in NodeJS.",
+                "Timeout": 1,
+                "MemorySize": 128,
+                "LastModified": "2023-03-15T01:20:54.053+0000",
+                "CodeSha256": "PRrkU1iZ2meuOdge3XCeQPebrEknjcZlEEMBbMAT70g=",
+                "Version": "$LATEST",
+                "TracingConfig": {
+                    "Mode": "PassThrough"
+                },
+                "RevisionId": "7e0c0cd4-45ec-4b9a-a33f-bf2e18d22cbc",
+                "PackageType": "Zip",
+                "Architectures": [
+                    "x86_64"
+                ],
+                "EphemeralStorage": {
+                    "Size": 512
+                },
+                "SnapStart": {
+                    "ApplyOn": "None",
+                    "OptimizationStatus": "Off"
+                }
+            }
+        ]
+    }
+}

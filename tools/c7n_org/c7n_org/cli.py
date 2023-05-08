@@ -5,12 +5,12 @@
 
 import csv
 from collections import Counter
+from datetime import timedelta, datetime
 import logging
 import os
 import time
 import subprocess  # nosec
 import sys
-from datetime import timedelta, datetime
 
 import multiprocessing
 from concurrent.futures import (
@@ -25,12 +25,14 @@ import jsonschema
 
 from c7n.credentials import assumed_session, SessionFactory
 from c7n.executor import MainThreadExecutor
+from c7n.exceptions import InvalidOutputConfig
 from c7n.config import Config
 from c7n.policy import PolicyCollection
-from c7n.provider import get_resource_class
+from c7n.provider import get_resource_class, clouds as cloud_providers
 from c7n.reports.csvout import Formatter, fs_record_set, record_set, strip_output_path
 from c7n.resources import load_available
-from c7n.utils import CONN_CACHE, dumps, filter_empty
+from c7n.utils import (
+    CONN_CACHE, dumps, filter_empty, format_string_values, get_policy_provider, join_output_path)
 
 from c7n_org.utils import environ, account_tags
 
@@ -153,7 +155,8 @@ class LogFilter:
         return 0
 
 
-def init(config, use, debug, verbose, accounts, tags, policies, resource=None, policy_tags=()):
+def init(config, use, debug, verbose, accounts, tags, policies,
+        resource=None, policy_tags=(), not_accounts=None):
     level = verbose and logging.DEBUG or logging.INFO
     logging.basicConfig(
         level=level,
@@ -188,7 +191,7 @@ def init(config, use, debug, verbose, accounts, tags, policies, resource=None, p
 
     accounts_config['accounts'] = list(accounts_iterator(accounts_config))
     filter_policies(custodian_config, policy_tags, policies, resource)
-    filter_accounts(accounts_config, tags, accounts)
+    filter_accounts(accounts_config, tags, accounts, not_accounts)
 
     load_available()
     MainThreadExecutor.c7n_async = False
@@ -261,9 +264,9 @@ def filter_accounts(accounts_config, tags, accounts, not_accounts=None):
     accounts = comma_expand(accounts)
     not_accounts = comma_expand(not_accounts)
     for a in accounts_config.get('accounts', ()):
-        if not_accounts and a['name'] in not_accounts:
-            continue
         account_id = a.get('account_id') or a.get('project_id') or a.get('subscription_id') or ''
+        if not_accounts and (a['name'] in not_accounts or account_id in not_accounts):
+            continue
         if accounts and a['name'] not in accounts and account_id not in accounts:
             continue
         if tags:
@@ -474,6 +477,10 @@ def run_account_script(account, region, output_dir, debug, script_args):
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
 
+    vars = {"account": account["name"], "account_id": account["account_id"],
+        "region": region, "output_dir": output_dir}
+    script_args = format_string_values(script_args, **vars)
+
     with open(os.path.join(output_dir, 'stdout'), 'wb') as stdout:
         with open(os.path.join(output_dir, 'stderr'), 'wb') as stderr:
             return subprocess.call(  # nosec
@@ -503,6 +510,9 @@ def run_script(config, output_dir, accounts, tags, region, echo, serial, script_
         script_args = script_args[0].split()
 
     success = True
+
+    if "://" in output_dir:
+        raise InvalidOutputConfig('run-script only supports local directory outputs')
 
     with executor(max_workers=WORKER_COUNT) as w:
         futures = {}
@@ -536,11 +546,13 @@ def run_script(config, output_dir, accounts, tags, region, echo, serial, script_
 
 
 def accounts_iterator(config):
+    org_vars = config.get("vars", {})
     for a in config.get('accounts', ()):
         if 'role' in a:
             if isinstance(a['role'], str) and not a['role'].startswith('arn'):
                 a['role'] = "arn:aws:iam::{}:role/{}".format(
                     a['account_id'], a['role'])
+        a['vars'] = _update(a.get('vars', {}), org_vars)
         yield {**a, **{'provider': 'aws'}}
     for a in config.get('subscriptions', ()):
         d = {'account_id': a['subscription_id'],
@@ -548,7 +560,7 @@ def accounts_iterator(config):
              'regions': [a.get('region', 'global')],
              'provider': 'azure',
              'tags': a.get('tags', ()),
-             'vars': a.get('vars', {})}
+             'vars': _update(a.get('vars', {}), org_vars)}
         yield d
     for a in config.get('projects', ()):
         d = {'account_id': a['project_id'],
@@ -556,8 +568,14 @@ def accounts_iterator(config):
              'regions': ['global'],
              'provider': 'gcp',
              'tags': a.get('tags', ()),
-             'vars': a.get('vars', {})}
+             'vars': _update(a.get('vars', {}), org_vars)}
         yield d
+
+
+def _update(old, new):
+    for k in new:
+        old.setdefault(k, new[k])
+    return old
 
 
 def run_account(account, region, policies_config, output_path,
@@ -569,9 +587,7 @@ def run_account(account, region, policies_config, output_path,
     CONN_CACHE.time = None
     load_available()
 
-    # allow users to specify interpolated output paths
-    if '{' not in output_path:
-        output_path = os.path.join(output_path, account['name'], region)
+    output_path = join_output_path(output_path, account['name'], region)
 
     cache_path = os.path.join(cache_path, "%s-%s.cache" % (account['account_id'], region))
 
@@ -647,11 +663,31 @@ def run_account(account, region, policies_config, output_path,
     return policy_counts, success
 
 
+def initialize_provider_output(policies_config, output_dir, regions):
+    """allow the provider an opportunity to initialize the output config.
+    """
+    # use just enough configuration to attempt to limit initialization
+    # to the output dir. we pass in dummy values for several settings
+    # that if missing would cause at least the aws or azure provider
+    # to do additional dynamic lookups that aren't meaningful in the
+    # context of c7n-org.
+    policy_config = Config.empty(
+        account_id='112233445566',
+        output_dir=output_dir,
+        region=regions and regions[0] or "us-east-1"
+    )
+    provider_name = get_policy_provider(policies_config['policies'][0])
+    provider = cloud_providers[provider_name]()
+    provider.initialize(policy_config)
+    return policy_config.output_dir
+
+
 @cli.command(name='run')
 @click.option('-c', '--config', required=True, help="Accounts config file")
 @click.option("-u", "--use", required=True)
 @click.option('-s', '--output-dir', required=True, type=click.Path())
 @click.option('-a', '--accounts', multiple=True, default=None)
+@click.option('--not-accounts', multiple=True, default=None)
 @click.option('-t', '--tags', multiple=True, default=None, help="Account tag filter")
 @click.option('-r', '--region', default=None, multiple=True)
 @click.option('-p', '--policy', multiple=True)
@@ -669,12 +705,20 @@ def run_account(account, region, policies_config, output_path,
 @click.option("--dryrun", default=False, is_flag=True)
 @click.option('--debug', default=False, is_flag=True)
 @click.option('-v', '--verbose', default=False, help="Verbose", is_flag=True)
-def run(config, use, output_dir, accounts, tags, region,
+def run(config, use, output_dir, accounts, not_accounts, tags, region,
         policy, policy_tags, cache_period, cache_path, metrics,
         dryrun, debug, verbose, metrics_uri):
     """run a custodian policy across accounts"""
     accounts_config, custodian_config, executor = init(
-        config, use, debug, verbose, accounts, tags, policy, policy_tags=policy_tags)
+        config, use, debug, verbose, accounts, tags, policy, policy_tags=policy_tags,
+        not_accounts=not_accounts)
+    if not (accounts_config["accounts"] and custodian_config["policies"]):
+        log.info(
+            "Targeting accounts: %d, policies: %d. Nothing to do." %
+            (len(accounts_config["accounts"]), len(custodian_config["policies"]))
+        )
+        return
+
     policy_counts = Counter()
     success = True
 
@@ -685,6 +729,8 @@ def run(config, use, output_dir, accounts, tags, region,
         cache_path = os.path.expanduser("~/.cache/c7n-org")
         if not os.path.exists(cache_path):
             os.makedirs(cache_path)
+
+    output_dir = initialize_provider_output(custodian_config, output_dir, region)
 
     with executor(max_workers=WORKER_COUNT) as w:
         futures = {}

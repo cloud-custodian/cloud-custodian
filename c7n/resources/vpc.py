@@ -17,10 +17,11 @@ from c7n import query, resolver
 from c7n.manager import resources
 from c7n.resources.securityhub import OtherResourcePostFinding, PostFinding
 from c7n.utils import (
-    chunks, local_session, type_schema, get_retry, parse_cidr)
+    chunks, local_session, type_schema, get_retry, parse_cidr, get_eni_resource_type)
 
 from c7n.resources.aws import shape_validate
-from c7n.resources.shield import IsShieldProtected, SetShieldProtection
+from c7n.resources.shield import IsEIPShieldProtected, SetEIPShieldProtection
+from c7n.filters.policystatement import HasStatementFilter
 
 
 @resources.register('vpc')
@@ -503,6 +504,76 @@ class SubnetVpcFilter(net_filters.VpcFilter):
 
     RelatedIdsExpression = "VpcId"
 
+@Subnet.filter_registry.register('ip-address-usage')
+class SubnetIpAddressUsageFilter(ValueFilter):
+    """Filter subnets based on available IP addresses.
+
+    :example:
+
+    Show subnets with no addresses in use.
+
+    .. code-block:: yaml
+
+            policies:
+              - name: empty-subnets
+                resource: aws.subnet
+                filters:
+                  - type: ip-address-usage
+                    key: NumberUsed
+                    value: 0
+
+    :example:
+
+    Show subnets where 90% or more addresses are in use.
+
+    .. code-block:: yaml
+
+            policies:
+              - name: almost-full-subnets
+                resource: aws.subnet
+                filters:
+                  - type: ip-address-usage
+                    key: PercentUsed
+                    op: greater-than
+                    value: 90
+
+    This filter allows ``key`` to be:
+
+    * ``MaxAvailable``: the number of addresses available based on a subnet's CIDR block size
+      (minus the 5 addresses
+      `reserved by AWS <https://docs.aws.amazon.com/vpc/latest/userguide/subnet-sizing.html>`_)
+    * ``NumberUsed``: ``MaxAvailable`` minus the subnet's ``AvailableIpAddressCount`` value
+    * ``PercentUsed``: ``NumberUsed`` divided by ``MaxAvailable``
+    """
+    annotation_key = 'c7n:IpAddressUsage'
+    aws_reserved_addresses = 5
+    schema_alias = False
+    schema = type_schema(
+        'ip-address-usage',
+        key={'enum': ['MaxAvailable', 'NumberUsed', 'PercentUsed']},
+        rinherit=ValueFilter.schema,
+    )
+
+    def augment(self, resource):
+        cidr_block = parse_cidr(resource['CidrBlock'])
+        max_addresses = cidr_block.num_addresses - self.aws_reserved_addresses
+        resource[self.annotation_key] = dict(
+            MaxAvailable=max_addresses,
+            NumberUsed=max_addresses - resource['AvailableIpAddressCount'],
+            PercentUsed=round(
+                (max_addresses - resource['AvailableIpAddressCount']) / max_addresses * 100.0,
+                2
+            ),
+        )
+
+    def process(self, resources, event=None):
+        results = []
+        for r in resources:
+            if self.annotation_key not in r:
+                self.augment(r)
+            if self.match(r[self.annotation_key]):
+                results.append(r)
+        return results
 
 class ConfigSG(query.ConfigSource):
 
@@ -729,7 +800,8 @@ class SGUsage(Filter):
         return list(itertools.chain(
             *[self.manager.get_resource_manager(m).get_permissions()
              for m in
-             ['lambda', 'eni', 'launch-config', 'security-group', 'event-rule-target']]))
+             ['lambda', 'eni', 'launch-config', 'security-group', 'event-rule-target',
+              'aws.batch-compute']]))
 
     def filter_peered_refs(self, resources):
         if not resources:
@@ -754,6 +826,7 @@ class SGUsage(Filter):
             ("launch-configs", self.get_launch_config_sgs),
             ("ecs-cwe", self.get_ecs_cwe_sgs),
             ("codebuild", self.get_codebuild_sgs),
+            ("batch", self.get_batch_sgs),
         )
 
     def scan_groups(self):
@@ -790,7 +863,8 @@ class SGUsage(Filter):
 
     def get_eni_sgs(self):
         sg_ids = set()
-        for nic in self.manager.get_resource_manager('eni').resources():
+        self.nics = self.manager.get_resource_manager('eni').resources()
+        for nic in self.nics:
             for g in nic['Groups']:
                 sg_ids.add(g['GroupId'])
         return sg_ids
@@ -820,6 +894,11 @@ class SGUsage(Filter):
             if ids:
                 sg_ids.update(ids)
         return sg_ids
+
+    def get_batch_sgs(self):
+        expr = jmespath.compile('[].computeResources.securityGroupIds[]')
+        resources = self.manager.get_resource_manager('aws.batch-compute').resources(augment=False)
+        return set(expr.search(resources) or [])
 
 
 @SecurityGroup.filter_registry.register('unused')
@@ -862,7 +941,6 @@ class UnusedSecurityGroup(SGUsage):
 @SecurityGroup.filter_registry.register('used')
 class UsedSecurityGroup(SGUsage):
     """Filter to security groups that are used.
-
     This operates as a complement to the unused filter for multi-step
     workflows.
 
@@ -875,8 +953,65 @@ class UsedSecurityGroup(SGUsage):
                 resource: security-group
                 filters:
                   - used
+
+            policies:
+              - name: security-groups-used-by-rds
+                resource: security-group
+                filters:
+                  - used
+                  - type: value
+                    key: c7n:InstanceOwnerIds
+                    op: intersect
+                    value:
+                      - amazon-rds
+
+            policies:
+              - name: security-groups-used-by-natgw
+                resource: security-group
+                filters:
+                  - used
+                  - type: value
+                    key: c7n:InterfaceTypes
+                    op: intersect
+                    value:
+                      - nat_gateway
+
+            policies:
+              - name: security-groups-used-by-alb
+                resource: security-group
+                filters:
+                  - used
+                  - type: value
+                    key: c7n:InterfaceResourceTypes
+                    op: intersect
+                    value:
+                      - elb-app
     """
     schema = type_schema('used')
+
+    instance_owner_id_key = 'c7n:InstanceOwnerIds'
+    interface_type_key = 'c7n:InterfaceTypes'
+    interface_resource_type_key = 'c7n:InterfaceResourceTypes'
+
+    def _get_eni_attributes(self):
+        enis = []
+        for nic in self.nics:
+            if nic['Status'] == 'in-use':
+                if nic.get('Attachment'):
+                    instance_owner_id = nic['Attachment']['InstanceOwnerId']
+                else:
+                    instance_owner_id = ''
+                interface_resource_type = get_eni_resource_type(nic)
+            else:
+                instance_owner_id = ''
+                interface_resource_type = ''
+            interface_type = nic.get('InterfaceType')
+            for g in nic['Groups']:
+                enis.append({'GroupId': g['GroupId'],
+                             'InstanceOwnerId': instance_owner_id,
+                             'InterfaceType': interface_type,
+                             'InterfaceResourceType': interface_resource_type})
+        return enis
 
     def process(self, resources, event=None):
         used = self.scan_groups()
@@ -884,6 +1019,19 @@ class UsedSecurityGroup(SGUsage):
             r for r in resources
             if r['GroupId'] not in used and 'VpcId' in r]
         unused = {g['GroupId'] for g in self.filter_peered_refs(unused)}
+        enis = self._get_eni_attributes()
+        for r in resources:
+            owner_ids = set()
+            interface_types = set()
+            interface_resource_types = set()
+            for eni in enis:
+                if r['GroupId'] == eni['GroupId']:
+                    owner_ids.add(eni['InstanceOwnerId'])
+                    interface_types.add(eni['InterfaceType'])
+                    interface_resource_types.add(eni['InterfaceResourceType'])
+            r[self.instance_owner_id_key] = list(filter(None, owner_ids))
+            r[self.interface_type_key] = list(filter(None, interface_types))
+            r[self.interface_resource_type_key] = list(filter(None, interface_resource_types))
         return [r for r in resources if r['GroupId'] not in unused]
 
 
@@ -1042,7 +1190,9 @@ class SGPermission(Filter):
             url: s3://a-policy-data-us-west-2/allowed_cidrs.csv
             format: csv
 
-    or value can be specified as a list:
+    or value can be specified as a list.
+
+    .. code-block:: yaml
 
       - type: ingress
         Cidr:
@@ -1585,7 +1735,7 @@ class NetworkInterface(query.QueryResourceManager):
 
     class resource_type(query.TypeInfo):
         service = 'ec2'
-        arn_type = 'eni'
+        arn_type = 'network-interface'
         enum_spec = ('describe_network_interfaces', 'NetworkInterfaces', None)
         name = id = 'NetworkInterfaceId'
         filter_name = 'NetworkInterfaceIds'
@@ -1864,6 +2014,7 @@ class TransitGatewayAttachment(query.ChildResourceManager):
         name = id = 'TransitGatewayAttachmentId'
         arn = False
         cfn_type = 'AWS::EC2::TransitGatewayAttachment'
+        supports_trailevents = True
 
 
 @resources.register('peering-connection')
@@ -2050,7 +2201,7 @@ class NetworkAddress(query.QueryResourceManager):
 
     class resource_type(query.TypeInfo):
         service = 'ec2'
-        arn_type = 'eip-allocation'
+        arn_type = 'elastic-ip'
         enum_spec = ('describe_addresses', 'Addresses', None)
         name = 'PublicIp'
         id = 'AllocationId'
@@ -2065,8 +2216,8 @@ class NetworkAddress(query.QueryResourceManager):
     }
 
 
-NetworkAddress.filter_registry.register('shield-enabled', IsShieldProtected)
-NetworkAddress.action_registry.register('set-shield', SetShieldProtection)
+NetworkAddress.filter_registry.register('shield-enabled', IsEIPShieldProtected)
+NetworkAddress.action_registry.register('set-shield', SetEIPShieldProtection)
 
 
 @NetworkAddress.action_registry.register('release')
@@ -2193,7 +2344,7 @@ class NATGateway(query.QueryResourceManager):
 
     class resource_type(query.TypeInfo):
         service = 'ec2'
-        arn_type = 'nat-gateway'
+        arn_type = 'natgateway'
         enum_spec = ('describe_nat_gateways', 'NatGateways', None)
         name = id = 'NatGatewayId'
         filter_name = 'NatGatewayIds'
@@ -2222,7 +2373,7 @@ class VPNConnection(query.QueryResourceManager):
 
     class resource_type(query.TypeInfo):
         service = 'ec2'
-        arn_type = 'vpc-connection'
+        arn_type = 'vpn-connection'
         enum_spec = ('describe_vpn_connections', 'VpnConnections', None)
         name = id = 'VpnConnectionId'
         filter_name = 'VpnConnectionIds'
@@ -2236,7 +2387,7 @@ class VPNGateway(query.QueryResourceManager):
 
     class resource_type(query.TypeInfo):
         service = 'ec2'
-        arn_type = 'vpc-gateway'
+        arn_type = 'vpn-gateway'
         enum_spec = ('describe_vpn_gateways', 'VpnGateways', None)
         name = id = 'VpnGatewayId'
         filter_name = 'VpnGatewayIds'
@@ -2259,6 +2410,36 @@ class VpcEndpoint(query.QueryResourceManager):
         id_prefix = "vpce-"
         universal_taggable = object()
         cfn_type = config_type = "AWS::EC2::VPCEndpoint"
+
+
+@VpcEndpoint.filter_registry.register('has-statement')
+class EndpointPolicyStatementFilter(HasStatementFilter):
+    """Find resources with matching endpoint policy statements.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+            - name: vpc-endpoint-policy
+              resource: aws.vpc-endpoint
+              filters:
+                  - type: has-statement
+                    statements:
+                      - Action: "*"
+                        Effect: "Allow"
+    """
+
+    policy_attribute = 'PolicyDocument'
+    permissions = ('ec2:DescribeVpcEndpoints',)
+
+    def get_std_format_args(self, endpoint):
+        return {
+            'endpoint_id': endpoint['VpcEndpointId'],
+            'account_id': self.manager.config.account_id,
+            'region': self.manager.config.region
+        }
+
 
 
 @VpcEndpoint.filter_registry.register('cross-account')
@@ -2687,7 +2868,7 @@ class TrafficMirrorSession(query.QueryResourceManager):
         service = 'ec2'
         enum_spec = ('describe_traffic_mirror_sessions', 'TrafficMirrorSessions', None)
         name = id = 'TrafficMirrorSessionId'
-        cfn_type = 'AWS::EC2::TrafficMirrorSession'
+        config_type = cfn_type = 'AWS::EC2::TrafficMirrorSession'
         arn_type = 'traffic-mirror-session'
         universal_taggable = object()
         id_prefix = 'tms-'
@@ -2728,7 +2909,7 @@ class TrafficMirrorTarget(query.QueryResourceManager):
         service = 'ec2'
         enum_spec = ('describe_traffic_mirror_targets', 'TrafficMirrorTargets', None)
         name = id = 'TrafficMirrorTargetId'
-        cfn_type = 'AWS::EC2::TrafficMirrorTarget'
+        config_type = cfn_type = 'AWS::EC2::TrafficMirrorTarget'
         arn_type = 'traffic-mirror-target'
         universal_taggable = object()
         id_prefix = 'tmt-'
@@ -2744,7 +2925,9 @@ class CrossAZRouteTable(Filter):
     cross from one availability zone (AZ) to another AZ.
 
     :Example:
+
     .. code-block:: yaml
+
             policies:
               - name: cross-az-nat-gateway-traffic
                 resource: aws.route-table

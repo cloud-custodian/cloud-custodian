@@ -97,10 +97,10 @@ class SubnetFilter(MatchResourceValidator, RelatedResourceFilter):
     def process(self, resources, event=None):
         related = self.get_related(resources)
         if self.check_igw in [True, False]:
-            self.route_tables = self.get_route_tables(related)
+            self.route_tables = self.get_route_tables()
         return [r for r in resources if self.process_resource(r, related)]
 
-    def get_route_tables(self, subnets):
+    def get_route_tables(self):
         rmanager = self.manager.get_resource_manager('aws.route-table')
         route_tables = {}
         for r in rmanager.resources():

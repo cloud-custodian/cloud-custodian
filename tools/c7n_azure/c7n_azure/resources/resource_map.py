@@ -3,6 +3,7 @@
 ResourceMap = {
     "azure.advisor-recommendation": "c7n_azure.resources.advisor.AdvisorRecommendation",
     "azure.aks": "c7n_azure.resources.k8s_service.KubernetesService",
+    "azure.open-shift": "c7n_azure.resources.open_shift.OpenShiftService",
     "azure.api-management": "c7n_azure.resources.apimanagement.ApiManagement",
     "azure.appserviceplan": "c7n_azure.resources.appserviceplan.AppServicePlan",
     "azure.application-gateway": "c7n_azure.resources.app_gateway.ApplicationGateway",
@@ -34,13 +35,17 @@ ResourceMap = {
     "azure.iothub": "c7n_azure.resources.iot_hub.IoTHub",
     "azure.keyvault": "c7n_azure.resources.key_vault.KeyVault",
     "azure.keyvault-certificate": "c7n_azure.resources.key_vault_certificate.KeyVaultCertificate",
+    "azure.keyvault-secret": "c7n_azure.resources.key_vault_secret.KeyVaultSecret",
     "azure.keyvault-key": "c7n_azure.resources.key_vault_keys.KeyVaultKeys",
     "azure.keyvault-keys": "c7n_azure.resources.key_vault_keys.KeyVaultKeys",
     "azure.loadbalancer": "c7n_azure.resources.load_balancer.LoadBalancer",
     "azure.logic-app-workflow": "c7n_azure.resources.logic_app.LogicAppWorkflow",
+    "azure.mariadb": "c7n_azure.resources.mariadb.MariaDB",
     "azure.mysql": "c7n_azure.resources.mysql.MySQL",
+    "azure.mysql-flexibleserver": "c7n_azure.resources.mysql_flexibleserver.MySQLFlexibleServer",
     "azure.networkinterface": "c7n_azure.resources.network_interface.NetworkInterface",
     "azure.networksecuritygroup": "c7n_azure.resources.network_security_group.NetworkSecurityGroup",
+    "azure.networkwatcher": "c7n_azure.resources.network_watcher.NetworkWatcher",
     "azure.policyassignments": "c7n_azure.resources.policy_assignments.PolicyAssignments",
     "azure.postgresql-database": "c7n_azure.resources.postgresql_database.PostgresqlDatabase",
     "azure.postgresql-server": "c7n_azure.resources.postgresql_server.PostgresqlServer",
@@ -65,5 +70,7 @@ ResourceMap = {
     "azure.vm": "c7n_azure.resources.vm.VirtualMachine",
     "azure.vmss": "c7n_azure.resources.vmss.VMScaleSet",
     "azure.vnet": "c7n_azure.resources.vnet.Vnet",
-    "azure.webapp": "c7n_azure.resources.web_app.WebApp"
+    "azure.webapp": "c7n_azure.resources.web_app.WebApp",
+    "azure.defender-alert": "c7n_azure.resources.defender.DefenderAlertSettings",
+    "azure.alert-logs": "c7n_azure.resources.alertlogs.AlertLogs"
 }

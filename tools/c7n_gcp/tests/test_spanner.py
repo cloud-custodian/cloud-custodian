@@ -21,6 +21,12 @@ class SpannerInstanceTest(BaseTest):
 
         resources = policy.run()
         self.assertEqual(resources[0]['displayName'], 'test-instance')
+        self.assertEqual(
+            policy.resource_manager.get_urns(resources),
+            [
+                "gcp:spanner::cloud-custodian:instance/test-instance",
+            ],
+        )
 
     def test_spanner_instance_get(self):
         session_factory = self.replay_flight_data('spanner-instance-get')
@@ -42,6 +48,12 @@ class SpannerInstanceTest(BaseTest):
                          'projects/cloud-custodian/instanceConfigs/regional-asia-east1')
         self.assertEqual(instances[0]['name'],
                          'projects/cloud-custodian/instances/custodian-spanner-1')
+        self.assertEqual(
+            policy.resource_manager.get_urns(instances),
+            [
+                "gcp:spanner::cloud-custodian:instance/custodian-spanner-1",
+            ],
+        )
 
     def test_spanner_instance_delete(self):
         project_id = 'cloud-custodian'
@@ -226,6 +238,13 @@ class SpannerDatabaseInstanceTest(BaseTest):
         self.assertEqual(resources[0]['c7n:spanner-instance']['displayName'], 'custodian-spanner')
         self.assertEqual(resources[0]['c7n:spanner-instance']['state'], 'READY')
         self.assertEqual(resources[0]['c7n:spanner-instance']['nodeCount'], 1)
+        self.assertEqual(
+            policy.resource_manager.get_urns(resources),
+            [
+                "gcp:spanner::cloud-custodian:database/custodian-spanner/custodian-database",
+                "gcp:spanner::cloud-custodian:database/custodian-spanner/custodian-favorite-database",  # noqa: E501
+            ],
+        )
 
     def test_spanner_database_instance_get(self):
         session_factory = self.replay_flight_data('spanner-database-instance-get')
@@ -247,6 +266,12 @@ class SpannerDatabaseInstanceTest(BaseTest):
         self.assertEqual(instances[0]['c7n:spanner-instance']['displayName'], 'custodian-spanner-1')
         self.assertEqual(instances[0]['c7n:spanner-instance']['name'],
                          'projects/cloud-custodian/instances/custodian-spanner-1')
+        self.assertEqual(
+            policy.resource_manager.get_urns(instances),
+            [
+                "gcp:spanner::cloud-custodian:database/custodian-spanner-1/db-1",
+            ],
+        )
 
     def test_spanner_database_instance_delete(self):
         session_factory = self.replay_flight_data('spanner-database-instance-delete')

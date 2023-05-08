@@ -58,10 +58,13 @@ class Backoff(BaseTest):
         )
 
     def test_delays_jitter(self):
-        for idx, i in enumerate(utils.backoff_delays(1, 256, jitter=True)):
-            maxv = 2 ** idx
-            self.assertTrue(i > 0)
-            self.assertTrue(i < maxv)
+        count = 0
+        while(count < 100000):
+            count += 1
+            for idx, i in enumerate(utils.backoff_delays(1, 256, jitter=True)):
+                maxv = 2 ** idx
+                self.assertTrue(i >= maxv / 5)
+                self.assertTrue(i < maxv)
 
 
 class UrlConfTest(BaseTest):
@@ -223,6 +226,11 @@ class UtilTest(BaseTest):
         self.assertEqual("{:+5d%d}".format(utils.FormatDate(d)), "07")
 
         self.assertEqual("{:+5M%M}".format(utils.FormatDate(d)), "05")
+
+        self.assertEqual(json.dumps(utils.FormatDate(d),
+                                    cls=utils.DateTimeEncoder, indent=2),
+                         '"2018-02-02T12:00:00"')
+        self.assertEqual(str(d), '2018-02-02 12:00:00')
 
     def test_group_by(self):
         items = [{}, {"Type": "a"}, {"Type": "a"}, {"Type": "b"}]
@@ -559,6 +567,104 @@ class UtilTest(BaseTest):
         res = utils.get_support_region(mock_manager)
         self.assertEqual("cn-north-1", res)
 
+    def test_get_eni_resource_type(self):
+        self.assertEqual(
+            utils.get_eni_resource_type(
+                {"Attachment": {"InstanceId": "i-0e040de7dfabbcc8c"}, "Description": ""}),
+            'ec2')
+        self.assertEqual(
+            utils.get_eni_resource_type(
+                {"Description": "ELB app/test-alb/3d20737b50b4b66e"}),
+            'elb-app')
+        self.assertEqual(
+            utils.get_eni_resource_type(
+                {"Description": "ELB net/test-nlb/c973bda47de90e99"}),
+            'elb-net')
+        self.assertEqual(
+            utils.get_eni_resource_type(
+                {"Description": "ELB gwy/test-glb/3a85ce44e6caa0af"}),
+            'elb-gwy')
+        self.assertEqual(
+            utils.get_eni_resource_type(
+                {"Description": "ELB test-elb"}),
+            'elb')
+        self.assertEqual(
+            utils.get_eni_resource_type(
+                {"Description": "ENI managed by APIGateway"}),
+            'apigw')
+        self.assertEqual(
+            utils.get_eni_resource_type(
+                {"Description": "AWS CodeStar Connections"}),
+            'codestar')
+        self.assertEqual(
+            utils.get_eni_resource_type(
+                {"Description": "DAX"}),
+            'dax')
+        self.assertEqual(
+            utils.get_eni_resource_type(
+                {"Description": "AWS created network interface for directory"}),
+            'dir')
+        self.assertEqual(
+            utils.get_eni_resource_type(
+                {"Description": "DMSNetworkInterface"}),
+            'dms')
+        self.assertEqual(
+            utils.get_eni_resource_type(
+                {"Description": "arn:aws:ecs:us-west-2:123456789012:attachment/XXXX"}),
+            'ecs')
+        self.assertEqual(
+            utils.get_eni_resource_type(
+                {"Description": "EFS mount target for fs-f9b8d350 (fsmt-b716661e)"}),
+            'fsmt')
+        self.assertEqual(
+            utils.get_eni_resource_type(
+                {"Description": "ElastiCache test-1"}),
+            'elasticache')
+        self.assertEqual(
+            utils.get_eni_resource_type(
+                {"Description": "AWS ElasticMapReduce"}),
+            'emr')
+        self.assertEqual(
+            utils.get_eni_resource_type(
+                {"Description": "CloudHSM Managed Interface"}),
+            'hsm')
+        self.assertEqual(
+            utils.get_eni_resource_type(
+                {"Description": "CloudHsm ENI"}),
+            'hsmv2')
+        self.assertEqual(
+            utils.get_eni_resource_type(
+                {"Description": "AWS Lambda VPC ENI-test-XXX"}),
+            'lambda')
+        self.assertEqual(
+            utils.get_eni_resource_type(
+                {"Description": "Interface for NAT Gateway nat-06f54d43caf44bf8d"}),
+            'nat')
+        self.assertEqual(
+            utils.get_eni_resource_type(
+                {"Description": "RDSNetworkInterface"}),
+            'rds')
+        self.assertEqual(
+            utils.get_eni_resource_type(
+                {"Description": "Network interface for DBProxy proxy-XXX-database-1"}),
+            'rds')
+        self.assertEqual(
+            utils.get_eni_resource_type(
+                {"Description": "RedshiftNetworkInterface"}),
+            'redshift')
+        self.assertEqual(
+            utils.get_eni_resource_type(
+                {"Description": "Network Interface for Transit Gateway Attachment tgw-attach-XXX"}),
+            'tgw')
+        self.assertEqual(
+            utils.get_eni_resource_type(
+                {"Description": "VPC Endpoint Interface vpce-0472c5d3fc4ce1de4"}),
+            'vpce')
+        self.assertEqual(
+            utils.get_eni_resource_type(
+                {"Description": ""}),
+            'unknown')
+
 
 def test_parse_date_floor():
     # bulk of parse date tests are actually in test_filters
@@ -566,3 +672,18 @@ def test_parse_date_floor():
     assert utils.parse_date(1) is None
     assert utils.parse_date('3000') is None
     assert utils.parse_date('30') is None
+
+
+def test_output_path_join():
+    assert utils.join_output_path(
+        's3://cross-region-c7n/iam-check?region=us-east-2',
+        'Samuel',
+        'us-east-1'
+    ) == 's3://cross-region-c7n/iam-check/Samuel/us-east-1?region=us-east-2'
+
+    output_dir = 's3://cross-region-c7n/iam-checks/{account}/{now:%Y-%m}/{uuid}'
+    assert utils.join_output_path(output_dir, 'Samuel', 'us-east-1') == output_dir
+
+    output_dir = './local-dir'
+    assert utils.join_output_path(output_dir, 'Samuel', 'us-east-1') == (
+        f"./local-dir{os.sep}Samuel{os.sep}us-east-1")

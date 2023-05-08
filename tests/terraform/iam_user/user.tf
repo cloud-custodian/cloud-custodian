@@ -1,5 +1,5 @@
 resource "random_id" "user" {
-  prefix = "testuser-"
+  prefix      = "testuser-"
   byte_length = 4
 }
 

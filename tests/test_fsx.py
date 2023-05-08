@@ -7,6 +7,7 @@ from dateutil.parser import parse as date_parse
 import c7n.resources.fsx
 from c7n.testing import mock_datetime_now
 from .common import BaseTest
+import c7n.filters.backup
 
 
 class TestFSx(BaseTest):
@@ -313,7 +314,7 @@ class TestFSx(BaseTest):
             session_factory=session_factory
         )
         resources = p.run()
-        self.assertTrue(len(resources), 1)
+        self.assertEqual(len(resources), 1)
         client = session_factory().client('fsx')
         fs = client.describe_file_systems(
             FileSystemIds=[resources[0]['FileSystemId']])['FileSystems']
@@ -359,7 +360,7 @@ class TestFSx(BaseTest):
             session_factory=session_factory
         )
         resources = p.run()
-        self.assertTrue(len(resources), 1)
+        self.assertEqual(len(resources), 1)
         client = session_factory().client('fsx')
         fs = client.describe_file_systems(
             FileSystemIds=[resources[0]['FileSystemId']])['FileSystems']
@@ -399,7 +400,7 @@ class TestFSx(BaseTest):
             session_factory=session_factory
         )
         resources = p.run()
-        self.assertTrue(len(resources), 1)
+        self.assertEqual(len(resources), 1)
         client = session_factory().client('fsx')
         fs = client.describe_file_systems(
             FileSystemIds=[resources[0]['FileSystemId']])['FileSystems']
@@ -441,6 +442,27 @@ class TestFSx(BaseTest):
                  'igw': True}
             ]}, config={'region': 'us-west-2'}, session_factory=factory)
         resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_fsx_consecutive_aws_backups_count_filter(self):
+        session_factory = self.replay_flight_data("test_fsx_consecutive_aws_backups_count_filter")
+        p = self.load_policy(
+            {
+                "name": "fsx_consecutive_aws_backups_count_filter",
+                "resource": "fsx",
+                "filters": [
+                    {
+                        "type": "consecutive-aws-backups",
+                        "count": 2,
+                        "period": "days",
+                        "status": "COMPLETED"
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+        with mock_datetime_now(date_parse("2022-09-09T00:00:00+00:00"), c7n.filters.backup):
+            resources = p.run()
         self.assertEqual(len(resources), 1)
 
 
@@ -493,7 +515,7 @@ class TestFSxBackup(BaseTest):
             session_factory=session_factory
         )
         resources = p.run()
-        self.assertTrue(len(resources), 1)
+        self.assertEqual(len(resources), 1)
         client = session_factory().client('fsx')
         backups = client.describe_backups(
             Filters=[
@@ -530,7 +552,7 @@ class TestFSxBackup(BaseTest):
             session_factory=session_factory
         )
         resources = p.run()
-        self.assertTrue(len(resources), 1)
+        self.assertEqual(len(resources), 1)
 
         client = session_factory().client('fsx')
         backups = client.describe_backups(
@@ -566,7 +588,7 @@ class TestFSxBackup(BaseTest):
             session_factory=session_factory
         )
         resources = p.run()
-        self.assertTrue(len(resources), 1)
+        self.assertEqual(len(resources), 1)
 
         client = session_factory().client('fsx')
         backups = client.describe_backups(

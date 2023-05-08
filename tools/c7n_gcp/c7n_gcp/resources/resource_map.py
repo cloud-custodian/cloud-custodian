@@ -1,12 +1,14 @@
 # Copyright The Cloud Custodian Authors.
-# SPDX-License-Identifier: Apache-2.0
 ResourceMap = {
+    "gcp.api-key": "c7n_gcp.resources.iam.ApiKey",
     "gcp.app-engine": "c7n_gcp.resources.appengine.AppEngineApp",
     "gcp.app-engine-certificate": "c7n_gcp.resources.appengine.AppEngineCertificate",
     "gcp.app-engine-domain": "c7n_gcp.resources.appengine.AppEngineDomain",
     "gcp.app-engine-domain-mapping": "c7n_gcp.resources.appengine.AppEngineDomainMapping",
     "gcp.app-engine-firewall-ingress-rule": (
         "c7n_gcp.resources.appengine.AppEngineFirewallIngressRule"),
+    "gcp.artifact-repository": (
+        "c7n_gcp.resources.artifactregistry.ArtifactRegistryRepository"),
     "gcp.autoscaler": "c7n_gcp.resources.compute.Autoscaler",
     "gcp.bq-dataset": "c7n_gcp.resources.bigquery.DataSet",
     "gcp.bq-job": "c7n_gcp.resources.bigquery.BigQueryJob",
@@ -14,6 +16,9 @@ ResourceMap = {
     "gcp.bucket": "c7n_gcp.resources.storage.Bucket",
     "gcp.build": "c7n_gcp.resources.build.CloudBuild",
     "gcp.cloudbilling-account": "c7n_gcp.resources.cloudbilling.CloudBillingAccount",
+    "gcp.cloud-run-service": "c7n_gcp.resources.cloudrun.CloudRunService",
+    "gcp.cloud-run-job": "c7n_gcp.resources.cloudrun.CloudRunJob",
+    "gcp.compute-project": "c7n_gcp.resources.compute.Project",
     "gcp.dataflow-job": "c7n_gcp.resources.dataflow.DataflowJob",
     "gcp.disk": "c7n_gcp.resources.compute.Disk",
     "gcp.dm-deployment": "c7n_gcp.resources.deploymentmanager.DMDeployment",
@@ -22,6 +27,7 @@ ResourceMap = {
     "gcp.firewall": "c7n_gcp.resources.network.Firewall",
     "gcp.folder": "c7n_gcp.resources.resourcemanager.Folder",
     "gcp.function": "c7n_gcp.resources.function.Function",
+    "gcp.secret": "c7n_gcp.resources.secret.Secret",
     "gcp.gke-cluster": "c7n_gcp.resources.gke.KubernetesCluster",
     "gcp.gke-nodepool": "c7n_gcp.resources.gke.KubernetesClusterNodePool",
     "gcp.iam-role": "c7n_gcp.resources.iam.Role",
@@ -73,6 +79,7 @@ ResourceMap = {
     "gcp.pubsub-snapshot": "c7n_gcp.resources.pubsub.PubSubSnapshot",
     "gcp.pubsub-subscription": "c7n_gcp.resources.pubsub.PubSubSubscription",
     "gcp.pubsub-topic": "c7n_gcp.resources.pubsub.PubSubTopic",
+    "gcp.region": "c7n_gcp.region.Region",
     "gcp.route": "c7n_gcp.resources.network.Route",
     "gcp.router": "c7n_gcp.resources.network.Router",
     "gcp.service": "c7n_gcp.resources.service.Service",
@@ -87,5 +94,6 @@ ResourceMap = {
     "gcp.sql-ssl-cert": "c7n_gcp.resources.sql.SqlSslCert",
     "gcp.sql-user": "c7n_gcp.resources.sql.SqlUser",
     "gcp.subnet": "c7n_gcp.resources.network.Subnet",
-    "gcp.vpc": "c7n_gcp.resources.network.Network"
+    "gcp.vpc": "c7n_gcp.resources.network.Network",
 }
+# SPDX-License-Identifier: Apache-2.0

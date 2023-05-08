@@ -21,6 +21,7 @@ import time
 from c7n.manager import resources as aws_resources
 from c7n.actions import BaseAction as Action, AutoTagUser
 from c7n.exceptions import PolicyValidationError, PolicyExecutionError
+from c7n.resources import load_resources
 from c7n.filters import Filter, OPERATORS
 from c7n.filters.offhours import Time
 from c7n import deprecated, utils
@@ -270,8 +271,6 @@ class TagActionFilter(Filter):
         op={'type': 'string'})
     schema_alias = True
 
-    current_date = None
-
     def validate(self):
         op = self.data.get('op')
         if self.manager and op not in self.manager.action_registry.keys():
@@ -316,15 +315,14 @@ class TagActionFilter(Filter):
                 tag, v, i['InstanceId']))
             return False
 
-        if self.current_date is None:
-            self.current_date = datetime.now()
-
         if action_date.tzinfo:
             # if action_date is timezone aware, set to timezone provided
             action_date = action_date.astimezone(tz)
-            self.current_date = datetime.now(tz=tz)
+            current_date = datetime.now(tz=tz)
+        else:
+            current_date = datetime.now()
 
-        return self.current_date >= (
+        return current_date >= (
             action_date - timedelta(days=skew, hours=skew_hours))
 
 
@@ -432,7 +430,7 @@ class Tag(Action):
             'account_id': self.manager.config.account_id,
             'now': utils.FormatDate.utcnow(),
             'region': self.manager.config.region}
-        return tag.format(**params)
+        return str(tag).format(**params)
 
     def interpolate_values(self, tags):
         """Interpolate in a list of tags - 'old' ec2 format
@@ -1019,6 +1017,25 @@ class CopyRelatedResourceTag(Tag):
                       skip_missing: True
                       key: VolumeId
                       tags: '*'
+
+    In the event that the resource type is not supported in Cloud Custodian but
+    is supported in the resources groups tagging api, use the resourcegroupstaggingapi
+    resource type to reference the resource. The value should be an ARN for the
+    related resource.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+                - name: copy-tags-from-unsupported-resource
+                  resource: ebs-snapshot
+                  actions:
+                    - type: copy-related-tag
+                      resource: resourcegroupstaggingapi
+                      key: tag:a-resource-tag
+                      tags: '*'
+
     """
 
     schema = utils.type_schema(
@@ -1039,7 +1056,13 @@ class CopyRelatedResourceTag(Tag):
 
     def validate(self):
         related_resource = self.data['resource']
-        if related_resource not in aws_resources.keys():
+        if '.' in self.data['resource']:
+            related_resource = self.data['resource'].split('.')[-1]
+        load_resources((f'aws.{related_resource}', ))
+        if (
+            related_resource not in aws_resources.keys() and
+            related_resource != "resourcegroupstaggingapi"
+        ):
             raise PolicyValidationError(
                 "Error: Invalid resource type selected: %s" % related_resource
             )
@@ -1053,15 +1076,27 @@ class CopyRelatedResourceTag(Tag):
 
     def process(self, resources):
         related_resources = []
-        for rrid, r in zip(jmespath.search('[].[%s]' % self.data['key'], resources),
+        if self.data['key'].startswith('tag:'):
+            tag_key = self.data['key'].split(':', 1)[-1]
+
+            search_path = "[].[Tags[?Key=='%s'].Value | [0]]" % tag_key
+        else:
+            search_path = "[].[%s]" % self.data['key']
+
+        for rrid, r in zip(jmespath.search(search_path, resources),
                            resources):
-            related_resources.append((rrid[0], r))
+            related_resources.append((rrid.pop(), r))
+
         related_ids = {r[0] for r in related_resources}
         missing = False
         if None in related_ids:
             missing = True
             related_ids.discard(None)
-        related_tag_map = self.get_resource_tag_map(self.data['resource'], related_ids)
+        related_tag_map = {}
+        if self.data['resource'] == 'resourcegroupstaggingapi':
+            related_tag_map = self.get_resource_tag_map_universal(related_ids)
+        else:
+            related_tag_map = self.get_resource_tag_map(self.data['resource'], related_ids)
 
         missing_related_tags = related_ids.difference(related_tag_map.keys())
         if not self.data.get('skip_missing', True) and (missing_related_tags or missing):
@@ -1121,6 +1156,26 @@ class CopyRelatedResourceTag(Tag):
             r[r_id]: {t['Key']: t['Value'] for t in r.get('Tags', [])}
             for r in manager.get_resources(list(ids))
         }
+
+    def get_resource_tag_map_universal(self, ids):
+        related_region = None
+        ids = list(ids)
+        if ids:
+            if ids[0].startswith('arn:aws:iam'):
+                related_region = 'us-east-1'
+        client = utils.local_session(
+            self.manager.session_factory).client(
+                'resourcegroupstaggingapi', region_name=related_region)
+        from c7n.query import RetryPageIterator
+        paginator = client.get_paginator('get_resources')
+        paginator.PAGE_ITERATOR_CLS = RetryPageIterator
+
+        resource_tag_results = client.get_resources(
+            ResourceARNList=list(ids))['ResourceTagMappingList']
+        resource_tag_map = {
+            r['ResourceARN']: {r['Key']: r['Value'] for r in r['Tags']}
+            for r in resource_tag_results}
+        return resource_tag_map
 
     @classmethod
     def register_resources(klass, registry, resource_class):

@@ -6,12 +6,13 @@ import docker
 import json
 
 from collections import defaultdict
+from distutils import version
 from datetime import datetime, timedelta
 from dateutil.tz import tzoffset, tzutc
 from dateutil.parser import parse as parse_date
 from functools import reduce
 import operator
-
+import re
 
 from c7n.resources import load_available
 from c7n.schema import resource_outline
@@ -26,6 +27,11 @@ aliases = {
     'c7n': 'core',
     'cli': 'core',
     'c7n_mailer': 'tools',
+    'c7n_tencentcloud': 'tencentcloud',
+    'c7n_kube': 'kubernetes',
+    'tools/c7n_kube': 'kubernetes',
+    'tools/c7n-left': 'shift-left',
+    'c7n-left': 'shift-left',
     'mailer': 'tools',
     'utils': 'core',
     'cask': 'tools',
@@ -172,6 +178,17 @@ def schema_diff(schema_old, schema_new):
     return "\n".join(out) + "\n"
 
 
+def get_last_release(repo):
+    regex = re.compile('^refs/tags/[\d\.]+')
+    versions = [
+        version.LooseVersion(t.rsplit('/', 1)[-1])
+        for t in repo.references
+        if regex.match(t)
+    ]
+    versions = sorted(versions)
+    return versions[-1].vstring
+
+
 @click.command()
 @click.option('--path', required=True)
 @click.option('--output', required=True)
@@ -180,6 +197,8 @@ def schema_diff(schema_old, schema_new):
 @click.option('--user', multiple=True)
 def main(path, output, since, end, user):
     repo = pygit2.Repository(path)
+    if since in ('latest', 'current', 'last'):
+        since = get_last_release(repo)
     if since:
         since_dateref = resolve_dateref(since, repo)
     if end:
@@ -197,13 +216,15 @@ def main(path, output, since, end, user):
         if user and commit.author.name not in user:
             continue
 
-        parts = commit.message.strip().split('-', 1)
+        parts = commit.message.strip().split(' ', 1)
         if not len(parts) > 1:
             print("bad commit %s %s" % (cdate, commit.message))
             category = 'other'
         else:
             category = parts[0]
         category = category.strip().lower()
+        # try to aliases before we match on prefix (like tools)
+        category = aliases.get(category, category)
         if '.' in category:
             category = category.split('.', 1)[0]
         if '/' in category:

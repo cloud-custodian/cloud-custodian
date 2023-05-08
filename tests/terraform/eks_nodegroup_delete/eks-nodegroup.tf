@@ -11,8 +11,8 @@ resource "aws_eks_node_group" "deleted_example" {
   }
 
   tags = {
-    "Name" = "deleted-example"
-    "ClusterName" =  aws_eks_cluster.example.name
+    "Name"        = "deleted-example"
+    "ClusterName" = aws_eks_cluster.example.name
   }
 
   # Ensure that IAM Role permissions are created before and deleted after EKS Node Group handling.
@@ -37,8 +37,8 @@ resource "aws_eks_node_group" "not_deleted_example" {
   }
 
   tags = {
-    "Name" = "not-deleted-example"
-    "ClusterName" =  aws_eks_cluster.example.name
+    "Name"        = "not-deleted-example"
+    "ClusterName" = aws_eks_cluster.example.name
   }
 
   # Ensure that IAM Role permissions are created before and deleted after EKS Node Group handling.

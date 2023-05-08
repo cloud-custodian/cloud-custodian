@@ -5,8 +5,8 @@
             {
                 "TableName": "Test-DDBTable-backup",
                 "TableId": "0f64ca00-386f-4b55-b403-acd215e81072",
-                "TableArn": "arn:aws:dynamodb:us-west-2:513921733657:table/crcm-dev-jgrover-run-status-result",
-                "BackupArn": "arn:aws:dynamodb:us-west-2:513921733657:table/crcm-dev-jgrover-run-status-result/backup/01661373354159-fd0bfa7d",
+                "TableArn": "arn:aws:dynamodb:us-west-2:123456789012:table/Test-DDBTable-backup",
+                "BackupArn": "arn:aws:dynamodb:us-west-2:123456789012:table/Test-DDBTable-backup/backup/01661373354159-fd0bfa7d",
                 "BackupName": "test-manual",
                 "BackupCreationDateTime": {
                     "hour": 19,
@@ -25,8 +25,8 @@
             {
                 "TableName": "Test-DDBTable-backup",
                 "TableId": "0f64ca00-386f-4b55-b403-acd215e81072",
-                "TableArn": "arn:aws:dynamodb:us-west-2:513921733657:table/Test-DDBTable-backup",
-                "BackupArn": "arn:aws:dynamodb:us-west-2:513921733657:table/Test-DDBTable-backup/backup/01661384359139-e9ca2508",
+                "TableArn": "arn:aws:dynamodb:us-west-2:123456789012:table/Test-DDBTable-backup",
+                "BackupArn": "arn:aws:dynamodb:us-west-2:123456789012:table/Test-DDBTable-backup/backup/01661384359139-e9ca2508",
                 "BackupName": "test-backup",
                 "BackupCreationDateTime": {
                     "hour": 19,
@@ -45,8 +45,8 @@
             {
                 "TableName": "Test-DDBTable-backup",
                 "TableId": "0f64ca00-386f-4b55-b403-acd215e81072",
-                "TableArn": "arn:aws:dynamodb:us-west-2:513921733657:table/Test-DDBTable-backup",
-                "BackupArn": "arn:aws:dynamodb:us-west-2:513921733657:table/Test-DDBTable-backup/backup/01661907413760-0659d0aa",
+                "TableArn": "arn:aws:dynamodb:us-west-2:123456789012:table/Test-DDBTable-backup",
+                "BackupArn": "arn:aws:dynamodb:us-west-2:123456789012:table/Test-DDBTable-backup/backup/01661907413760-0659d0aa",
                 "BackupName": "test-another",
                 "BackupCreationDateTime": {
                     "hour": 19,

@@ -25,6 +25,36 @@ class Providers:
     GCP = 2
 
 
+def session_factory(mailer_config):
+    import boto3
+    return boto3.Session(
+        region_name=mailer_config['region'],
+        profile_name=mailer_config.get('profile', None))
+
+
+def get_processor(mailer_config, logger):
+    """Find the appropriate queue processor for a given provider
+
+    Import provider-specific processor modules lazily. This way running or provisioning
+    the mailer only requires additional provider packages if they're used in the
+    mailer config.
+    """
+    provider = get_provider(mailer_config)
+
+    if provider == Providers.Azure:
+        from c7n_mailer.azure_mailer.azure_queue_processor import MailerAzureQueueProcessor
+        processor = MailerAzureQueueProcessor(mailer_config, logger)
+    elif provider == Providers.GCP:
+        from c7n_mailer.gcp_mailer.gcp_queue_processor import MailerGcpQueueProcessor
+        processor = MailerGcpQueueProcessor(mailer_config, logger)
+    elif provider == Providers.AWS:
+        from c7n_mailer.sqs_queue_processor import MailerSqsQueueProcessor
+        aws_session = session_factory(mailer_config)
+        processor = MailerSqsQueueProcessor(mailer_config, aws_session, logger)
+
+    return processor
+
+
 def get_jinja_env(template_folders):
     env = jinja2.Environment(trim_blocks=True, autoescape=False)  # nosec nosemgrep
     env.filters['yaml_safe'] = functools.partial(yaml.safe_dump, default_flow_style=False)
@@ -57,12 +87,10 @@ def get_rendered_jinja(
     # recast seconds since epoch as utc iso datestring, template
     # authors can use date_time_format helper func to convert local
     # tz. if no execution start time was passed use current time.
-    execution_start = datetime.utcfromtimestamp(
-        sqs_message.get(
-            'execution_start',
-            time.mktime(
-                datetime.utcnow().timetuple())
-        )).isoformat()
+    execution_start = sqs_message.get('execution_start')
+    if not execution_start:
+        execution_start = time.mktime(datetime.utcnow().timetuple())
+    execution_start = datetime.utcfromtimestamp(execution_start).isoformat()
 
     rendered_jinja = template.render(
         recipient=target,
@@ -354,9 +382,10 @@ def resource_format(resource, resource_type):
             resource['InternetGatewayId'],
             len(resource['Attachments']))
     elif resource_type == 'lambda':
-        return "Name: %s  RunTime: %s  \n" % (
+        return "Name: %s  Package Type: %s  Runtime: %s  \n" % (
             resource['FunctionName'],
-            resource['Runtime'])
+            resource['PackageType'],
+            resource.get('Runtime', 'N/A'))
     elif resource_type == 'service-quota':
         try:
             return "ServiceName: %s QuotaName: %s Quota: %i Usage: %i\n" % (
@@ -377,10 +406,9 @@ def resource_format(resource, resource_type):
 def get_provider(mailer_config):
     if mailer_config.get('queue_url', '').startswith('asq://'):
         return Providers.Azure
-    elif mailer_config.get('queue_url', '').startswith('projects'):
+    if mailer_config.get('queue_url', '').startswith('projects'):
         return Providers.GCP
-    else:
-        return Providers.AWS
+    return Providers.AWS
 
 
 def kms_decrypt(config, logger, session, encrypted_field):
@@ -456,3 +484,8 @@ def get_aws_username_from_event(logger, event):
     else:
         user_id = identity['principalId']
     return user_id
+
+
+def unique(seq):
+    return list({k: None for k in seq})
+   

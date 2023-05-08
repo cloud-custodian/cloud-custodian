@@ -193,8 +193,14 @@ class Formatter:
         """Only the first record for each id"""
         uniq = []
         keys = set()
+        compiled = None
+        if '.' in self._id_field:
+            compiled = jmespath.compile(self._id_field)
         for rec in records:
-            rec_id = rec[self._id_field]
+            if compiled:
+                rec_id = compiled.search(rec)
+            else:
+                rec_id = rec[self._id_field]
             if rec_id not in keys:
                 uniq.append(rec)
                 keys.add(rec_id)

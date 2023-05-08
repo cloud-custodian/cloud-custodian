@@ -5,16 +5,12 @@ import functools
 import logging
 from os import path
 
-import boto3
 import jsonschema
 import yaml
 from c7n_mailer import deploy, utils
-from c7n_mailer.sqs_queue_processor import MailerSqsQueueProcessor
-from c7n_mailer.azure_mailer.azure_queue_processor import MailerAzureQueueProcessor
-from c7n_mailer.gcp_mailer.gcp_queue_processor import MailerGcpQueueProcessor
 from c7n_mailer.azure_mailer import deploy as azure_deploy
 # from c7n_mailer.gcp_mailer import deploy as gcp_deploy
-from c7n_mailer.utils import get_provider, Providers
+from c7n_mailer.utils import session_factory, get_processor, get_provider, Providers
 
 AZURE_KV_SECRET_SCHEMA = {
     'type': 'object',
@@ -156,6 +152,7 @@ CONFIG_SCHEMA = {
         'ldap_bind_password': SECURED_STRING_SCHEMA,
         'cross_accounts': {'type': 'object'},
         'ses_region': {'type': 'string'},
+        'ses_role': {'type': 'string'},
         'redis_host': {'type': 'string'},
         'redis_port': {'type': 'integer'},
         'datadog_api_key': {'type': 'string'},              # TODO: encrypt with KMS?
@@ -183,12 +180,6 @@ CONFIG_SCHEMA = {
         'account_emails': {'type': 'object'}
     }
 }
-
-
-def session_factory(mailer_config):
-    return boto3.Session(
-        region_name=mailer_config['region'],
-        profile_name=mailer_config.get('profile', None))
 
 
 def get_logger(debug=False):
@@ -275,13 +266,7 @@ def main():
         max_num_processes = args_dict.get('max_num_processes')
 
         # Select correct processor
-        if provider == Providers.Azure:
-            processor = MailerAzureQueueProcessor(mailer_config, logger)
-        elif provider == Providers.GCP:
-            processor = MailerGcpQueueProcessor(mailer_config, logger)
-        elif provider == Providers.AWS:
-            aws_session = session_factory(mailer_config)
-            processor = MailerSqsQueueProcessor(mailer_config, aws_session, logger)
+        processor = get_processor(mailer_config, logger)
 
         # Execute
         if max_num_processes:

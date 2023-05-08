@@ -2,7 +2,9 @@
 # SPDX-License-Identifier: Apache-2.0
 # -*- coding: utf-8 -*-
 
+import builtins
 from datetime import datetime
+from importlib import reload
 import os
 from time import sleep
 import unittest
@@ -10,7 +12,11 @@ import jinja2
 import logging
 from mock import Mock, patch
 
+import c7n_mailer
 from c7n_mailer import utils
+from c7n_mailer.azure_mailer.azure_queue_processor import MailerAzureQueueProcessor
+from c7n_mailer.gcp_mailer.gcp_queue_processor import MailerGcpQueueProcessor
+from c7n_mailer.sqs_queue_processor import MailerSqsQueueProcessor
 from common import MAILER_CONFIG, SQS_MESSAGE_1, RESOURCE_1
 
 
@@ -93,6 +99,25 @@ class ResourceFormat(unittest.TestCase):
                 {"InternetGatewayId": "igw-x", "Attachments": []}, "aws.internet-gateway"
             ),
             "id: igw-x  attachments: 0",
+        )
+
+    def test_lambda(self):
+        image_func = {
+            "FunctionName": "my-image-based-function",
+            "PackageType": "Image",
+        }
+        zip_func = {
+            "FunctionName": "my-zip-based-function",
+            "Runtime": "python3.8",
+            "PackageType": "Zip",
+        }
+        self.assertEqual(
+            utils.resource_format(image_func, "aws.lambda").strip(),
+            "Name: my-image-based-function  Package Type: Image  Runtime: N/A",
+        )
+        self.assertEqual(
+            utils.resource_format(zip_func, "aws.lambda").strip(),
+            "Name: my-zip-based-function  Package Type: Zip  Runtime: python3.8",
         )
 
     def test_rds_cluster(self):
@@ -238,10 +263,43 @@ class GetAwsUsernameFromEvent(unittest.TestCase):
 
 
 class ProviderSelector(unittest.TestCase):
+    azure_config = {"queue_url": "asq://"}
+    aws_config = {"queue_url": "sqs://", "region": "us-east-1"}
+    gcp_config = {"queue_url": "projects"}
+
     def test_get_providers(self):
-        self.assertEqual(utils.get_provider({"queue_url": "asq://"}), utils.Providers.Azure)
-        self.assertEqual(utils.get_provider({"queue_url": "sqs://"}), utils.Providers.AWS)
-        self.assertEqual(utils.get_provider({"queue_url": "projects"}), utils.Providers.GCP)
+        self.assertEqual(utils.get_provider(self.azure_config), utils.Providers.Azure)
+        self.assertEqual(utils.get_provider(self.aws_config), utils.Providers.AWS)
+        self.assertEqual(utils.get_provider(self.gcp_config), utils.Providers.GCP)
+
+    def test_get_processor(self):
+        logger = logging.getLogger()
+        params = [
+            (self.azure_config, MailerAzureQueueProcessor),
+            (self.aws_config, MailerSqsQueueProcessor),
+            (self.gcp_config, MailerGcpQueueProcessor),
+        ]
+        for mailer_config, processor in params:
+            self.assertIsInstance(
+                utils.get_processor(mailer_config, logger),
+                processor
+            )
+
+    def test_missing_deps_guidance(self):
+        """Make sure we catch failed imports and provide guidance around installing
+        missing dependencies."""
+        _real_import = builtins.__import__
+
+        def fake_import_missing_deps(name, *args, **kwargs):
+            if name.startswith('c7n_gcp') or name.startswith('c7n_azure'):
+                raise ImportError()
+            return _real_import(name, *args, **kwargs)
+
+        with patch.object(builtins, '__import__', side_effect=fake_import_missing_deps):
+            with self.assertRaisesRegex(ImportError, r'pip install c7n-mailer\[azure\]'):
+                reload(c7n_mailer.azure_mailer.azure_queue_processor)
+            with self.assertRaisesRegex(ImportError, r'pip install c7n-mailer\[gcp\]'):
+                reload(c7n_mailer.gcp_mailer.gcp_queue_processor)
 
 
 class DecryptTests(unittest.TestCase):

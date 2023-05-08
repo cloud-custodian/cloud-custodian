@@ -3,19 +3,9 @@
     "data": {
         "Topics": [
             {
-                "TopicArn": "arn:aws:sns:us-west-1:644160558196:test"
+                "TopicArn": "arn:aws:sns:ap-northeast-2:644160558196:test"
             }
         ],
-        "ResponseMetadata": {
-            "RequestId": "134516c9-a5f9-50ef-94d5-43aba428967b",
-            "HTTPStatusCode": 200,
-            "HTTPHeaders": {
-                "x-amzn-requestid": "134516c9-a5f9-50ef-94d5-43aba428967b",
-                "content-type": "text/xml",
-                "content-length": "369",
-                "date": "Fri, 24 May 2019 14:28:32 GMT"
-            },
-            "RetryAttempts": 0
-        }
+        "ResponseMetadata": {}
     }
 }

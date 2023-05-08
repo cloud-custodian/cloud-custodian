@@ -17,17 +17,15 @@ try:
     from c7n_azure.storage_utils import StorageUtilities
     from c7n_azure.session import Session
 except ImportError:
-    StorageUtilities = None
-    Session = None
-    pass
+    raise ImportError(
+        "c7n-mailer is configured for Azure Queues, which requires additional packages. "
+        "Run 'pip install c7n-mailer[azure]' to install them."
+    )
 
 
 class MailerAzureQueueProcessor(MessageTargetMixin):
 
     def __init__(self, config, logger, session=None, max_num_processes=16):
-        if StorageUtilities is None:
-            raise Exception("Using Azure queue requires package c7n_azure to be installed.")
-
         self.max_num_processes = max_num_processes
         self.config = config
         self.logger = logger

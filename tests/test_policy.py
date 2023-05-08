@@ -14,7 +14,7 @@ from c7n.config import Config
 from c7n.provider import clouds
 from c7n.exceptions import ResourceLimitExceeded, PolicyValidationError
 from c7n.resources import aws, load_available
-from c7n.resources.aws import AWS, fake_session
+from c7n.resources.aws import AWS, Arn, fake_session
 from c7n.resources.ec2 import EC2
 from c7n.resources.kinesis import KinesisStream
 from c7n.policy import execution, ConfigPollRuleMode, Policy, PullMode
@@ -116,6 +116,19 @@ class PolicyMetaLint(BaseTest):
         except Exception:
             self.fail("Failed to serialize schema")
 
+    def test_detail_spec_format(self):
+
+        failed = []
+        for k, v in manager.resources.items():
+            detail_spec = getattr(v.resource_type, 'detail_spec', None)
+            if not detail_spec:
+                continue
+            if not len(detail_spec) == 4:
+                failed.append(k)
+        if failed:
+            self.fail(
+                "%s resources have invalid detail_specs" % ", ".join(failed))
+
     def test_resource_augment_universal_mask(self):
         # universal tag had a potential bad patterm of masking
         # resource augmentation, scan resources to ensure
@@ -189,7 +202,8 @@ class PolicyMetaLint(BaseTest):
 
         overrides = overrides.difference(
             {'account', 's3', 'hostedzone', 'log-group', 'rest-api', 'redshift-snapshot',
-             'rest-stage', 'codedeploy-app', 'codedeploy-group', 'fis-template', 'dlm-policy', })
+             'rest-stage', 'codedeploy-app', 'codedeploy-group', 'fis-template', 'dlm-policy',
+             'apigwv2', 'apigw-domain-name', 'fis-experiment'})
         if overrides:
             raise ValueError("unknown arn overrides in %s" % (", ".join(overrides)))
 
@@ -248,7 +262,17 @@ class PolicyMetaLint(BaseTest):
 
         whitelist = set(('AwsS3Object', 'Container'))
         todo = set((
+            # q2 2023
+            "AwsEc2RouteTable",
+            # q1 2023
+            'AwsWafv2RuleGroup',
+            'AwsWafv2WebAcl',
+            'AwsEc2LaunchTemplate',
+            'AwsSageMakerNotebookInstance',
             # q3 2022
+            'AwsBackupBackupPlan',
+            'AwsBackupBackupVault',
+            'AwsBackupRecoveryPoint',
             'AwsCloudFormationStack',
             'AwsWafRegionalRule',
             'AwsWafRule',
@@ -316,7 +340,6 @@ class PolicyMetaLint(BaseTest):
             'AwsRdsDbSnapshot',
             'AwsSecretsManagerSecret',
             # older wave
-            'AwsRdsDbInstance',
             'AwsElbv2LoadBalancer',
             'AwsEc2SecurityGroup',
             'AwsIamAccessKey',
@@ -335,8 +358,111 @@ class PolicyMetaLint(BaseTest):
         # of a resource.
 
         whitelist = {
-            'AWS::ApiGatewayV2::Api',
+            # q2 2023
+            "AWS::AppStream::DirectoryConfig",
+            "AWS::AutoScaling::WarmPool",
+            "AWS::Connect::PhoneNumber",
+            "AWS::CustomerProfiles::Domain",
+            "AWS::EC2::DHCPOptions",
+            "AWS::EC2::IPAM",
+            "AWS::EC2::NetworkInsightsPath",
+            "AWS::EC2::TrafficMirrorFilter",
+            "AWS::Events::Rule",
+            "AWS::HealthLake::FHIRDatastore",
+            "AWS::IoTTwinMaker::Scene",
+            "AWS::KinesisVideo::SignalingChannel",
+            "AWS::LookoutVision::Project",
+            "AWS::NetworkManager::TransitGatewayRegistration",
+            "AWS::Pinpoint::ApplicationSettings",
+            "AWS::Pinpoint::Segment",
+            "AWS::RoboMaker::RobotApplication",
+            "AWS::RoboMaker::SimulationApplication",
+            "AWS::Route53RecoveryReadiness::ResourceSet",
+            "AWS::Route53RecoveryControl::RoutingControl",
+            "AWS::Route53RecoveryControl::SafetyRule",
+            # q1 2023
+            'AWS::AppConfig::ConfigurationProfile',
+            'AWS::AppConfig::Environment',
+            'AWS::Backup::ReportPlan',
+            'AWS::Budgets::BudgetsAction',
+            'AWS::Cloud9::EnvironmentEC2',
+            'AWS::CodeGuruReviewer::RepositoryAssociation',
+            'AWS::DataSync::LocationFSxWindows',
+            'AWS::DataSync::LocationHDFS',
+            'AWS::DataSync::LocationObjectStorage',
+            'AWS::DeviceFarm::TestGridProject',
+            'AWS::ECR::RegistryPolicy',
+            'AWS::EKS::Addon',
+            'AWS::EKS::IdentityProviderConfig',
+            'AWS::EventSchemas::Discoverer',
+            'AWS::EventSchemas::Registry',
+            'AWS::EventSchemas::RegistryPolicy',
+            'AWS::EventSchemas::Schema',
+            'AWS::Events::ApiDestination',
+            'AWS::Events::Archive',
+            'AWS::Events::Connection',
+            'AWS::Events::Endpoint',
+            'AWS::FraudDetector::EntityType',
+            'AWS::FraudDetector::Label',
+            'AWS::FraudDetector::Outcome',
+            'AWS::FraudDetector::Variable',
+            'AWS::GuardDuty::Filter',
+            'AWS::IVS::Channel',
+            'AWS::IVS::PlaybackKeyPair',
+            'AWS::IVS::RecordingConfiguration',
+            'AWS::ImageBuilder::ContainerRecipe',
+            'AWS::ImageBuilder::DistributionConfiguration',
+            'AWS::ImageBuilder::InfrastructureConfiguration',
+            'AWS::IoT::AccountAuditConfiguration',
+            'AWS::IoT::Authorizer',
+            'AWS::IoT::CustomMetric',
+            'AWS::IoT::Dimension',
+            'AWS::IoT::MitigationAction',
+            'AWS::IoT::Policy',
+            'AWS::IoT::RoleAlias',
+            'AWS::IoT::ScheduledAudit',
+            'AWS::IoT::SecurityProfile',
+            'AWS::IoTAnalytics::Channel',
+            'AWS::IoTAnalytics::Dataset',
+            'AWS::IoTAnalytics::Datastore',
+            'AWS::IoTAnalytics::Pipeline',
+            'AWS::IoTEvents::AlarmModel',
+            'AWS::IoTEvents::DetectorModel',
+            'AWS::IoTEvents::Input',
+            'AWS::IoTSiteWise::AssetModel',
+            'AWS::IoTSiteWise::Dashboard',
+            'AWS::IoTSiteWise::Gateway',
+            'AWS::IoTSiteWise::Portal',
+            'AWS::IoTSiteWise::Project',
+            'AWS::IoTTwinMaker::Entity',
+            'AWS::IoTTwinMaker::Workspace',
+            'AWS::Lex::Bot',
+            'AWS::Lex::BotAlias',
+            'AWS::Lightsail::Bucket',
+            'AWS::Lightsail::Certificate',
+            'AWS::Lightsail::Disk',
+            'AWS::Lightsail::StaticIp',
+            'AWS::LookoutMetrics::Alert',
+            'AWS::MediaPackage::PackagingConfiguration',
+            'AWS::MediaPackage::PackagingGroup',
+            'AWS::RDS::GlobalCluster',
+            'AWS::RUM::AppMonitor',
+            'AWS::ResilienceHub::ResiliencyPolicy',
+            'AWS::RoboMaker::RobotApplicationVersion',
+            'AWS::Route53RecoveryReadiness::Cell',
+            'AWS::Route53RecoveryReadiness::RecoveryGroup',
+            'AWS::Route53Resolver::FirewallDomainList',
+            'AWS::S3::MultiRegionAccessPoint',
+            'AWS::S3::StorageLens',
+            'AWS::SES::ReceiptFilter',
+            'AWS::SES::ReceiptRuleSet',
+            'AWS::SES::Template',
+            'AWS::ServiceDiscovery::HttpNamespace',
+            'AWS::Transfer::Workflow',      
+            # 
             'AWS::ApiGatewayV2::Stage',
+            'AWS::Athena::DataCatalog',
+            'AWS::Athena::WorkGroup',
             'AWS::AutoScaling::ScalingPolicy',
             'AWS::AutoScaling::ScheduledAction',
             'AWS::Backup::BackupSelection',
@@ -344,15 +470,22 @@ class PolicyMetaLint(BaseTest):
             'AWS::CodeDeploy::DeploymentConfig',
             'AWS::Config::ConformancePackCompliance',
             'AWS::Config::ResourceCompliance',
+            'AWS::Detective::Graph',
+            'AWS::DMS::Certificate',
             'AWS::EC2::EgressOnlyInternetGateway',
             'AWS::EC2::FlowLog',
             'AWS::EC2::LaunchTemplate',
             'AWS::EC2::RegisteredHAInstance',
+            'AWS::EC2::TransitGatewayAttachment',
+            'AWS::EC2::TransitGatewayRouteTable',
             'AWS::EC2::VPCEndpointService',
             'AWS::ECR::PublicRepository',
             'AWS::EFS::AccessPoint',
             'AWS::EMR::SecurityConfiguration',
             'AWS::ElasticBeanstalk::ApplicationVersion',
+            'AWS::GlobalAccelerator::Accelerator',
+            'AWS::GlobalAccelerator::Listener',
+            'AWS::GlobalAccelerator::EndpointGroup',
             'AWS::GuardDuty::Detector',
             'AWS::Kinesis::StreamConsumer',
             'AWS::NetworkFirewall::FirewallPolicy',
@@ -402,6 +535,26 @@ class PolicyMetaLint(BaseTest):
             'AWS::DMS::Certificate',
             'AWS::Detective::Graph',
             'AWS::EC2::TransitGatewayRouteTable',
+            'AWS::AppSync::GraphQLApi',
+            'AWS::DataSync::Task',
+            'AWS::Glue::Job',
+            'AWS::SageMaker::NotebookInstanceLifecycleConfig',
+            'AWS::SES::ContactList',
+            'AWS::SageMaker::Workteam',
+            'AWS::EKS::FargateProfile',
+            'AWS::DataSync::LocationFSxLustre',
+            'AWS::AppConfig::Application',
+            'AWS::DataSync::LocationS3',
+            'AWS::ServiceDiscovery::PublicDnsNamespace',
+            'AWS::EC2::NetworkInsightsAccessScopeAnalysis',
+            'AWS::Route53::HostedZone',
+            'AWS::GuardDuty::IPSet',
+            'AWS::SES::ConfigurationSet',
+            'AWS::GuardDuty::ThreatIntelSet',
+            'AWS::DataSync::LocationNFS',
+            'AWS::DataSync::LocationEFS',
+            'AWS::ServiceDiscovery::Service',
+            'AWS::DataSync::LocationSMB',
         }
 
         resource_map = {}
@@ -419,7 +572,7 @@ class PolicyMetaLint(BaseTest):
         missing = config_types.difference(resource_config_types)
         if missing:
             raise AssertionError(
-                "Missing config types \n %s" % ('\n'.join(missing)))
+                "Missing config types \n %s" % ('\n'.join(sorted(missing))))
 
         # config service can't be bothered to update their sdk correctly
         invalid_ignore = {
@@ -454,6 +607,70 @@ class PolicyMetaLint(BaseTest):
                     empty.add(k)
         if empty:
             raise ValueError("Empty Resource Metadata %s" % (', '.join(empty)))
+
+    def test_valid_arn_type(self):
+        arn_db = load_data('arn-types.json')
+        invalid = {}
+        overrides = {'wafv2': set(('webacl',))}
+
+        # we have a few resources where we have synthetic arns
+        # or they aren't in the iam ref docs.
+        allow_list = set((
+            # bug in the arnref script or test logic below.
+            'glue-catalog',
+            # these are valid, but v1 & v2 arns get mangled into the
+            # same top level prefix
+            'emr-serverless-app',
+            # api gateway resources trip up these checks because they
+            # have leading slashes in the resource type section
+            'rest-api',
+            'rest-stage',
+            'apigw-domain-name',
+            # synthetics ~ ie. c7n introduced since non exist.
+            # or in some cases where it exists but not usable in iam.
+            'scaling-policy',
+            'glue-classifier',
+            'glue-security-configuration',
+            'event-rule-target',
+            'rrset',
+            'redshift-reserved',
+            'elasticsearch-reserved'
+        ))
+
+        for k, v in manager.resources.items():
+            if k in allow_list:
+                continue
+            svc = v.resource_type.service
+            if not v.resource_type.arn_type:
+                continue
+
+            svc_arn_map = arn_db.get(svc, {})
+            if not svc_arn_map:
+                continue
+
+            svc_arns = list(svc_arn_map.values())
+            svc_arn_types = set()
+            for sa in svc_arns:
+                sa_arn = Arn.parse(sa)
+                sa_type = sa_arn.resource_type
+                if sa_type is None:
+                    sa_type = ''
+                # wafv2
+                if sa_type.startswith('{') and sa_type.endswith('}'):
+                    sa_type = sa_arn.resource
+                if ':' in sa_type:
+                    sa_type = sa_type.split(':', 1)[0]
+                svc_arn_types.add(sa_type)
+
+            svc_arn_types = overrides.get(svc, svc_arn_types)
+            if v.resource_type.arn_type not in svc_arn_types:
+                invalid[k] = {'valid': sorted(svc_arn_types),
+                              'service': svc,
+                              'resource': v.resource_type.arn_type}
+
+        if invalid:
+            raise ValueError("%d %s have invalid arn types in metadata" % (
+                len(invalid), ", ".join(invalid)))
 
     def test_resource_legacy_type(self):
         legacy = set()
@@ -513,7 +730,7 @@ class PolicyMetaLint(BaseTest):
             'snowball-cluster', 'snowball', 'ssm-activation',
             'healthcheck', 'event-rule-target', 'log-metric',
             'support-case', 'transit-attachment', 'config-recorder',
-            'apigw-domain-name'}
+            'apigw-domain-name', 'backup-job'}
 
         missing_method = []
         for k, v in manager.resources.items():
@@ -607,6 +824,8 @@ class PolicyMetaLint(BaseTest):
                     "ephemeral",
                     "instance-uptime",
                     "dead-letter",
+                    "list-item",
+                    "ip-address-usage",
                 ):
                     continue
                 qk = "%s.filters.%s" % (k, n)
@@ -774,6 +993,34 @@ class TestPolicyCollection(BaseTest):
         self.assertEqual(iam[0].options.region, "eu-west-1")
         self.assertEqual(iam[0].options.output_dir, "/test/output/eu-west-1")
         self.assertEqual(len(collection), 3)
+
+    def test_policy_filter_mode(self):
+        cfg = Config.empty(regions=['us-east-1'])
+        original = policy.PolicyCollection.from_data(
+            {"policies": [
+                {
+                    "name": "bar",
+                    "resource": "lambda",
+                    "mode": {
+                        "type": "cloudtrail",
+                        "events": ["CreateFunction"],
+                        "role": "custodian"
+                    }
+                },
+                {
+                    "name": "two",
+                    "resource": "ec2",
+                    "mode": {
+                        "type": "periodic",
+                        "role": "cutodian",
+                        "schedule": "rate(1 day)"
+                    }
+                }
+            ]}, cfg)
+        collection = AWS().initialize_policies(original, cfg)
+        result = collection.filter(modes=['cloudtrail'])
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result.policies[0].name, 'bar')
 
 
 class TestPolicy(BaseTest):
@@ -1192,6 +1439,30 @@ class PolicyConditionsTest(BaseTest):
         p.conditions.env_vars['account'] = {'name': 'deputy'}
         self.assertTrue(p.is_runnable())
         p.conditions.env_vars['account'] = {'name': 'mickey'}
+        self.assertFalse(p.is_runnable())
+
+    def test_env_var_extension_with_expand_variables(self):
+        p_json = {
+            'name': 'profx',
+            'resource': 'aws.ec2',
+            'description': 'Test var extension {var1}',
+            'conditions': [{
+                'type': 'value',
+                'key': 'account.name',
+                'value': 'deputy'}]}
+
+        p = self.load_policy(p_json)
+        p.conditions.env_vars['account'] = {'name': 'deputy'}
+        p.expand_variables({"var1":"value1"})
+        p.validate()
+        self.assertEqual("Test var extension value1", p.data["description"])
+        self.assertTrue(p.is_runnable())
+
+        p = self.load_policy(p_json)
+        p.conditions.env_vars['account'] = {'name': 'mickey'}
+        p.expand_variables({"var1":"value2"})
+        p.validate()
+        self.assertEqual("Test var extension value2", p.data["description"])
         self.assertFalse(p.is_runnable())
 
     def test_event_filter(self):
@@ -1620,6 +1891,44 @@ class GuardModeTest(BaseTest):
                  "mode": {"type": "guard-duty"}},
                 validate=True)
         self.assertTrue("max length with prefix" in str(e_cm.exception))
+
+    def test_lambda_policy_validate_too_long_description_length(self):
+        for description_length in [257, 300, 340]:
+            description = 'a' * description_length
+            with self.assertRaises(PolicyValidationError) as e_cm:
+                self.load_policy(
+                    {
+                        'name': 'testing',
+                        'description': description,
+                        'resource': 'ec2',
+                        'mode': {'type': 'guard-duty'}
+                    },
+                    validate=True
+                )
+            self.assertTrue('max description length of' in str(e_cm.exception))
+
+    def test_lambda_policy_validate_correct_description_length(self):
+        for description_length in [0, 1, 128, 256]:
+            description = 'a' * description_length
+            self.load_policy(
+                {
+                    'name': 'testing',
+                    'description': description,
+                    'resource': 'ec2',
+                    'mode': {'type': 'guard-duty'}
+                },
+                validate=True
+            )
+
+    def test_lambda_policy_validate_no_description_field(self):
+        self.load_policy(
+            {
+                'name': 'testing',
+                'resource': 'ec2',
+                'mode': {'type': 'guard-duty'}
+            },
+            validate=True
+        )
 
     @mock.patch("c7n.mu.LambdaManager.publish")
     def test_ec2_guard_event_pattern(self, publish):

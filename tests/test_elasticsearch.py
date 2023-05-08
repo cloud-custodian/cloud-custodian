@@ -56,6 +56,20 @@ class ElasticSearch(BaseTest):
             )
         )
 
+    def test_elasticsearch_with_prequery_filter(self):
+        factory = self.replay_flight_data("test_elasticsearch_with_prequery_filter")
+        p = self.load_policy(
+            {
+                "name": "es-query-2",
+                "resource": "elasticsearch",
+                "query": [{"EngineType": "OpenSearch"}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["DomainName"], "c7n-test-opensearch")
+
     def test_metrics_domain(self):
         factory = self.replay_flight_data("test_elasticsearch_delete")
         p = self.load_policy(
@@ -294,7 +308,7 @@ class ElasticSearch(BaseTest):
             session_factory=session_factory
         )
         resources = p.run()
-        self.assertTrue(len(resources), 1)
+        self.assertEqual(len(resources), 1)
         aliases = kms.list_aliases(KeyId=resources[0]['EncryptionAtRestOptions']['KmsKeyId'])
         self.assertEqual(aliases['Aliases'][0]['AliasName'], 'alias/aws/es')
 
@@ -590,6 +604,47 @@ class ElasticSearch(BaseTest):
 
         resp = client.describe_elasticsearch_domain(DomainName=resources[0]['DomainName'])
         self.assertNotIn('10.0.0.0/24', resp['DomainStatus']['AccessPolicies'])
+
+    def test_elasticsearch_update_tls_config(self):
+        factory = self.replay_flight_data("test_elasticsearch_update_tls_config")
+        p = self.load_policy(
+            {
+                "name": "test_elasticsearch_update_tls_config",
+                "resource": "elasticsearch",
+                "filters": [{"DomainName": "test-es"}],
+                "actions": [{"type": "update-tls-config", "value": "Policy-Min-TLS-1-2-2019-07"}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["DomainName"], "test-es")
+        client = factory().client("es")
+        state = client.describe_elasticsearch_domain(DomainName="test-es")['DomainStatus'][
+            'DomainEndpointOptions']
+        self.assertEqual(state['EnforceHTTPS'], True)
+        self.assertEqual(state['TLSSecurityPolicy'], "Policy-Min-TLS-1-2-2019-07")
+
+    def test_elasticsearch_enable_auditlog(self):
+        factory = self.replay_flight_data("test_elasticsearch_enable_auditlog")
+        p = self.load_policy(
+            {
+                "name": "test_elasticsearch_enable_auditlog",
+                "resource": "elasticsearch",
+                "filters": [{"DomainName": "test-es-dom"}],
+                "actions": [{"type": "enable-auditlog", "state": True, "delay": 1}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["DomainName"], "test-es-dom")
+        client = factory().client("es")
+        state = client.describe_elasticsearch_domain(DomainName="test-es-dom")['DomainStatus'][
+            'LogPublishingOptions']
+        self.assertEqual(state['AUDIT_LOGS']['Enabled'], True)
+        self.assertEqual(state['AUDIT_LOGS']['CloudWatchLogsLogGroupArn'],
+            "arn:aws:logs:us-east-1:123456789012:log-group:/aws/domains/test-es-dom/audit-logs:*")
 
 
 class TestReservedInstances(BaseTest):

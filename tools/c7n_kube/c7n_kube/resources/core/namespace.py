@@ -14,3 +14,4 @@ class Namespace(QueryResourceManager):
         patch = 'patch_namespace'
         delete = 'delete_namespace'
         enum_spec = ('list_namespace', 'items', None)
+        plural = 'namespaces'

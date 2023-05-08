@@ -7,13 +7,15 @@ from c7n.exceptions import PolicyValidationError
 from c7n.filters.kms import KmsRelatedFilter
 from c7n.filters import Filter
 from c7n.manager import resources
-from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter
+from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter, NetworkLocation
+from c7n.filters.policystatement import HasStatementFilter
 from c7n.query import (
     QueryResourceManager, ChildResourceManager, TypeInfo, DescribeSource, ConfigSource
 )
 from c7n.tags import universal_augment
 from c7n.utils import local_session, type_schema, get_retry
 from .aws import shape_validate
+from c7n.filters.backup import ConsecutiveAwsBackupsFilter
 
 
 class EFSDescribe(DescribeSource):
@@ -38,6 +40,7 @@ class ElasticFileSystem(QueryResourceManager):
         filter_type = 'scalar'
         universal_taggable = True
         config_type = cfn_type = 'AWS::EFS::FileSystem'
+        arn = 'FileSystemArn'
 
     source_mapping = {
         'describe': EFSDescribe,
@@ -97,6 +100,9 @@ class SecurityGroup(SecurityGroupFilter):
         return list(group_ids)
 
 
+@ElasticFileSystemMountTarget.filter_registry.register('network-location', NetworkLocation)
+
+
 @ElasticFileSystem.filter_registry.register('kms-key')
 class KmsFilter(KmsRelatedFilter):
 
@@ -134,7 +140,7 @@ class ConfigureLifecycle(BaseAction):
 
     :example:
 
-      .. code-block:: yaml
+    .. code-block:: yaml
 
             policies:
               - name: efs-apply-lifecycle
@@ -188,7 +194,7 @@ class LifecyclePolicy(Filter):
 
     :example:
 
-      .. code-block:: yaml
+    .. code-block:: yaml
 
             policies:
               - name: efs-filter-lifecycle
@@ -304,3 +310,38 @@ class CheckSecureTransport(Filter):
             "%d of %d EFS policies don't enforce secure transport",
             len(results), len(resources))
         return results
+
+
+@ElasticFileSystem.filter_registry.register('has-statement')
+class EFSHasStatementFilter(HasStatementFilter):
+
+    def __init__(self, data, manager=None):
+        super().__init__(data, manager)
+        self.policy_attribute = 'c7n:Policy'
+
+    def process(self, resources, event=None):
+        resources = [self.policy_annotate(r) for r in resources]
+        return super().process(resources, event)
+
+    def policy_annotate(self, resource):
+        client = local_session(self.manager.session_factory).client('efs')
+        if self.policy_attribute in resource:
+            return resource
+        try:
+            result = client.describe_file_system_policy(
+                FileSystemId=resource['FileSystemId'])
+            resource[self.policy_attribute] = result['Policy']
+        except client.exceptions.PolicyNotFound:
+            resource[self.policy_attribute] = None
+            return resource
+        return resource
+
+    def get_std_format_args(self, fs):
+        return {
+            'fs_arn': fs['FileSystemArn'],
+            'account_id': self.manager.config.account_id,
+            'region': self.manager.config.region
+        }
+
+
+ElasticFileSystem.filter_registry.register('consecutive-aws-backups', ConsecutiveAwsBackupsFilter)

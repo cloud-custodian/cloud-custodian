@@ -1,17 +1,16 @@
 {
     "status_code": 200,
     "data": {
-        "Tags": [],
-        "ResponseMetadata": {
-            "RequestId": "37cef6d3-22ca-59e2-90cd-a3b94bc108fd",
-            "HTTPStatusCode": 200,
-            "HTTPHeaders": {
-                "x-amzn-requestid": "37cef6d3-22ca-59e2-90cd-a3b94bc108fd",
-                "content-type": "text/xml",
-                "content-length": "290",
-                "date": "Thu, 30 May 2019 23:27:07 GMT"
+        "Tags": [
+            {
+                "Key": "Tagging",
+                "Value": "added"
             },
-            "RetryAttempts": 0
-        }
+            {
+                "Key": "stacklet:app",
+                "Value": "EventRelay"
+            }
+        ],
+        "ResponseMetadata": {}
     }
 }

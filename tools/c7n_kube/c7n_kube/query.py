@@ -68,8 +68,8 @@ class QueryMeta(type):
 
 
 class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
-    def __init__(self, data, options):
-        super(QueryResourceManager, self).__init__(data, options)
+    def __init__(self, ctx, data):
+        super(QueryResourceManager, self).__init__(ctx, data)
         self.source = self.get_source(self.source_type)
 
     def get_permissions(self):
@@ -101,8 +101,17 @@ class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
     def resources(self, query=None):
         q = query or self.get_resource_query()
         key = self.get_cache_key(q)
-        resources = self.augment(self.source.get_resources(q))
-        self._cache.save(key, resources)
+        resources = None
+        if self._cache.load():
+            resources = self._cache.get(key)
+            if resources:
+                self.log.debug("Using cached %s: %d" % (
+                    "%s.%s" % (self.__class__.__module__,
+                               self.__class__.__name__),
+                    len(resources)))
+        if resources is None:
+            resources = self.augment(self.source.get_resources(q))
+            self._cache.save(key, resources)
         return self.filter_resources(resources)
 
     def augment(self, resources):
@@ -143,6 +152,8 @@ class TypeInfo(metaclass=TypeMeta):
     version = None
     enum_spec = ()
     namespaced = True
+    id = "metadata.uid"
+    name = "metadata.name"
 
 
 class CustomTypeInfo(TypeInfo, metaclass=TypeMeta):

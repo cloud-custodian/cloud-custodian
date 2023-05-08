@@ -3,6 +3,7 @@
 from freezegun import freeze_time
 import pytest
 from tc_common import BaseTest
+from c7n.exceptions import PolicyValidationError
 from c7n_tencentcloud.filters import MetricsFilter
 from c7n_tencentcloud.query import QueryResourceManager
 
@@ -75,3 +76,26 @@ class TestFilterMetrics(BaseTest):
         start_time, end_time = metrics_filter.get_metric_window()
         assert start_time == "2022-07-31T00:00:00+00:00"
         assert end_time == "2022-08-01T00:00:00+00:00"
+
+    def test_too_many_data_points(self):
+        with pytest.raises(PolicyValidationError):
+            policy = self.load_policy(
+                {
+                    "name": "filter-metrics-too-many-data-points",
+                    "resource": "tencentcloud.cvm",
+                    "query": [{
+                        "InstanceIds": self.instance_ids
+                    }],
+                    "filters": [{
+                        "type": "metrics",
+                        "name": "CvmDiskUsage",
+                        "statistics": "Maximum",
+                        "days": 100,
+                        "op": "less-than",
+                        "value": 20,
+                        "missing-value": 0,
+                        "period": 300
+                    }]
+                }
+            )
+            policy.run()

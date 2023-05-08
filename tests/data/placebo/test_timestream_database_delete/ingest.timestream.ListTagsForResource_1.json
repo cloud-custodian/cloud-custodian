@@ -1,0 +1,12 @@
+{
+    "status_code": 200,
+    "data": {
+        "Tags": [
+            {
+                "Key": "maid_status",
+                "Value": "Resource does not meet policy: tag@2023/01/13"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

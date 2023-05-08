@@ -76,7 +76,7 @@ class CloudWatchLogHandler(logging.Handler):
             logs = retry(
                 client.describe_log_groups,
                 logGroupNamePrefix=self.log_group)['logGroups']
-            if not [l for l in logs if l['logGroupName'] == self.log_group]:
+            if not [lg for lg in logs if lg['logGroupName'] == self.log_group]:
                 retry(client.create_log_group,
                       logGroupName=self.log_group)
         except ClientError as e:

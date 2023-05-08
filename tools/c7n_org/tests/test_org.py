@@ -230,8 +230,10 @@ class OrgTest(TestUtils):
 
         d = {'accounts': [
             {'name': 'dev',
+             'account_id': '123456789012',
              'tags': ['blue', 'red']},
             {'name': 'prod',
+             'account_id': '123456789013',
              'tags': ['green', 'red']}]}
 
         t1 = copy.deepcopy(d)
@@ -257,3 +259,82 @@ class OrgTest(TestUtils):
         self.assertEqual(
             [a['name'] for a in t4['accounts']],
             ['dev'])
+
+        t5 = copy.deepcopy(d)
+        org.filter_accounts(t5, [], [], ['123456789013'])
+        self.assertEqual(
+            [a['name'] for a in t5['accounts']],
+            ['dev'])
+
+        t6 = copy.deepcopy(d)
+        org.filter_accounts(t6, [], [], ['dev'])
+        self.assertEqual(
+            [a['name'] for a in t6['accounts']],
+            ['prod'])
+
+    def test_accounts_iterator(self):
+        config = {
+            "vars": {"default_tz": "Sydney/Australia"},
+            "accounts": [
+                {
+                    'name': 'dev',
+                    'account_id': '123456789012',
+                    'tags': ["environment:dev"],
+                    "vars": {"environment": "dev"},
+                },
+                {
+                    'name': 'dev2',
+                    'account_id': '123456789013',
+                    'tags': ["environment:dev"],
+                    "vars": {"environment": "dev", "default_tz": "UTC"},
+                },
+            ]
+        }
+        accounts = [a for a in org.accounts_iterator(config)]
+        accounts[0]["vars"]["default_tz"] = "Sydney/Australia"
+        # NOTE allow override at account level
+        accounts[1]["vars"]["default_tz"] = "UTC"
+
+    def test_cli_nothing_to_do(self):
+        run_dir = self.setup_run_dir()
+        logger = mock.MagicMock()
+        run_account = mock.MagicMock()
+        run_account.return_value = (
+            {'compute': 24, 'serverless': 12}, True)
+        self.patch(org, 'logging', logger)
+        self.patch(org, 'run_account', run_account)
+        self.change_cwd(run_dir)
+        log_output = self.capture_logging('c7n_org')
+        runner = CliRunner()
+
+        cli_args = [
+            'run', '-c', 'accounts.yml', '-u', 'policies.yml',
+            '--debug', '-s', 'output', '--cache-path', 'cache',
+            '--metrics-uri', 'aws://',
+        ]
+
+        # No policies to run
+        result = runner.invoke(
+            org.cli,
+            cli_args + ['--policytags', 'nonsense'],
+            catch_exceptions=False
+        )
+        self.assertEqual(result.exit_code, 0)
+        self.assertEqual(
+            log_output.getvalue().strip(),
+            "Targeting accounts: 2, policies: 0. Nothing to do.",
+        )
+
+        # No accounts to run against
+        log_output.truncate(0)
+        log_output.seek(0)
+        result = runner.invoke(
+            org.cli,
+            cli_args + ['--tags', 'nonsense'],
+            catch_exceptions=False
+        )
+        self.assertEqual(result.exit_code, 0)
+        self.assertEqual(
+            log_output.getvalue().strip(),
+            "Targeting accounts: 0, policies: 2. Nothing to do.",
+        )
