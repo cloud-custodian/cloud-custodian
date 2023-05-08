@@ -1,0 +1,123 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups?api-version=2020-10-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Mon, 08 May 2023 16:06:49 GMT"
+                    ],
+                    "content-length": [
+                        "5077"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-wpndezsj-6FF51CA6-ACB0-462A-B33E-EC6965F7E005",
+                                "name": "cfb-wpndezsj-6FF51CA6-ACB0-462A-B33E-EC6965F7E005",
+                                "type": "Microsoft.Resources/resourceGroups",
+                                "location": "centralus",
+                                "tags": {
+                                    "product_id": "13742"
+                                },
+                                "properties": {
+                                    "provisioningState": "Succeeded"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-wpndezsj-6FF51CA6-ACB0-462A-B33E-EC6965F7E005/resources?api-version=2020-10-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Mon, 08 May 2023 16:06:49 GMT"
+                    ],
+                    "content-length": [
+                        "999"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-wpndezsj-6FF51CA6-ACB0-462A-B33E-EC6965F7E005/providers/Microsoft.ContainerRegistry/registries/cfbwpndezsj",
+                                "name": "cfbwpndezsj",
+                                "type": "Microsoft.ContainerRegistry/registries",
+                                "sku": {
+                                    "name": "Standard",
+                                    "tier": "Standard"
+                                },
+                                "location": "centralus",
+                                "tags": {
+                                    "product_id": "13742"
+                                },
+                                "systemData": {
+                                    "createdBy": "foo@example.com",
+                                    "createdByType": "User",
+                                    "createdAt": "2023-05-08T16:05:32.9864579Z",
+                                    "lastModifiedBy": "foo@example.com",
+                                    "lastModifiedByType": "User",
+                                    "lastModifiedAt": "2023-05-08T16:05:32.9864579Z"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-wpndezsj-6FF51CA6-ACB0-462A-B33E-EC6965F7E005/providers/Microsoft.Storage/storageAccounts/cfbwpndezsj",
+                                "name": "cfbwpndezsj",
+                                "type": "Microsoft.Storage/storageAccounts",
+                                "sku": {
+                                    "name": "Standard_GRS",
+                                    "tier": "Standard"
+                                },
+                                "kind": "StorageV2",
+                                "location": "centralus",
+                                "identity": {
+                                    "type": "None"
+                                },
+                                "tags": {
+                                    "product_id": "13742"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}

@@ -57,6 +57,21 @@ class ResourceGroupTest(BaseTest):
 
             begin_delete_mock.assert_called()
 
+    def test_resources_filter(self):
+        p = self.load_policy({
+            'name': 'test-resources-filter',
+            'resource': 'azure.resourcegroup',
+            'filters': [{
+                'type': 'resources',
+                'key': "[?type == 'Microsoft.ContainerRegistry/registries'] | length(@)",
+                'op': 'gt',
+                'value': 0
+            }]
+        })
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['c7n:resources'][0]['name'], 'cfbwpndezsj')
+
     def _get_mgmt_client_string(self):
         client = local_session(Session) \
             .client('azure.mgmt.resource.ResourceManagementClient').resource_groups
