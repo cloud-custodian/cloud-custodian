@@ -22,32 +22,33 @@ def get_recommender_data():
 
 
 class RecommenderFilter(Filter):
-
     schema = type_schema(
-        'recommender',
-        id={'type': 'string'},
+        "recommender",
+        id={"type": "string"},
         # state={'enum': ['ACTIVE', 'CLAIMED', 'SUCCEEDED', 'FAILED', 'DISMISSED']}
         # sub_type={'enum': 'string'}
-        required=('id',)
+        required=("id",),
     )
 
     def get_permissions(self):
-        rec_id = self.data.get('id')
+        rec_id = self.data.get("id")
         if not rec_id:
             return []
-        prefix = get_recommender_data().get(rec_id, {}).get('permissions_prefix')
+        prefix = get_recommender_data().get(rec_id, {}).get("permissions_prefix")
         if not prefix:
             return []
-        return [prefix + '.get', prefix + '.list']
+        return [prefix + ".get", prefix + ".list"]
 
     def validate(self):
         rtype = "gcp.%s" % self.manager.type
-        rec_id = self.data['id']
+        rec_id = self.data["id"]
         all_recs = get_recommender_data()
 
         if rec_id not in all_recs or all_recs[rec_id] != rtype:
-            valid_ids = {r['id'] for r in all_recs if r.get('resource') == rtype}            
-            raise PolicyValidationError(f"recommendation id:{rec_id} is not valid for {rtype}, valid: {valid_ids}")
+            valid_ids = {r["id"] for r in all_recs if r.get("resource") == rtype}
+            raise PolicyValidationError(
+                f"recommendation id:{rec_id} is not valid for {rtype}, valid: {valid_ids}"
+            )
 
         self.rec_info = all_recs[rec_id]
 
@@ -57,24 +58,28 @@ class RecommenderFilter(Filter):
         return self.match_resources(recommendations, resources)
 
     def get_recommendations(self, session, resources):
-        client = session.client('recommender', 'v1', 'projects.locations.recommenders.recommendations')
+        client = session.client(
+            "recommender", "v1", "projects.locations.recommenders.recommendations"
+        )
         project = session.get_default_project()
         regions = self.get_regions(resources)
 
         recommends = []
         for r in regions:
-            parent = f"projects/{project}/locations/{r}/recommenders/{self.rec_info['id']}"
+            parent = (
+                f"projects/{project}/locations/{r}/recommenders/{self.rec_info['id']}"
+            )
             for page in client.execute_paged_query("list", {"parent": parent}):
                 recommends.extend(page)
         return recommends
 
     def match_resources(self, resources, recommends):
         results = []
-        rec_query = jmespath.compile('content.operationsGroups[].operations[].resource')
+        rec_query = jmespath.compile("content.operationsGroups[].operations[].resource")
         for r in recommends:
             rids = rec_query.search(r)
             for rid in list(rids):
-                if '$' in rid:
+                if "$" in rid:
                     rids.remove(rid)
             matched = self.match_ids(rids, resources)
             for m in matched:
@@ -83,10 +88,10 @@ class RecommenderFilter(Filter):
         return results
 
     def match_ids(self, rids, resources):
-        rids = [r.split('/', 3)[-1] for r in rids]
+        rids = [r.split("/", 3)[-1] for r in rids]
         for r in resources:
             for rid in rids:
-                if rid in r['name'] or rid in r['selfLink']:
+                if rid in r["name"] or rid in r["selfLink"]:
                     yield r
 
     def get_regions(self, resources):
@@ -97,13 +102,8 @@ class RecommenderFilter(Filter):
         data = get_recommender_data()
         rtype = "gcp.%s" % resource_class.type
         for rec in data.values():
-            if rec.get('resource') == rtype:
-                resource_class.filter_registry.register('recommends', klass)
-        
+            if rec.get("resource") == rtype:
+                resource_class.filter_registry.register("recommends", klass)
 
-        
-        
-        
-        
-        
-        
+
+gcp_resources.subscribe(RecommenderFilter.register_resources)
