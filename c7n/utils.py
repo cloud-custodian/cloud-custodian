@@ -13,13 +13,13 @@ import re
 import sys
 import threading
 import time
-from jmespath import functions
 from urllib import parse as urlparse
 from urllib.request import getproxies, proxy_bypass
 
 from dateutil.parser import ParserError, parse
 
 import jmespath
+from jmespath import functions
 from jmespath.parser import Parser, ParsedResult
 
 from c7n import config
@@ -926,8 +926,8 @@ class C7NJmespathFunctions(functions.Functions):
 
 
 class C7NJMESPathParser(Parser):
-    def _parse(self, expression):
-        result = super()._parse(expression)
+    def parse(self, expression):
+        result = super().parse(expression)
         return ParsedResultWithOptions(
             expression=result.expression,
             parsed=result.parsed
@@ -936,12 +936,10 @@ class C7NJMESPathParser(Parser):
 
 class ParsedResultWithOptions(ParsedResult):
     def search(self, value, options=None):
-        return super().search(
-            value=value,
-            options=jmespath.Options(
-                custom_functions=C7NJmespathFunctions()
-            )
-        )
+        # if options are explicitly passed in, we honor those
+        if not options:
+            options = jmespath.Options(custom_functions=C7NJmespathFunctions())
+        return super().search(value, options)
 
 
 def jmespath_search(*args, **kwargs):
@@ -953,4 +951,5 @@ def jmespath_search(*args, **kwargs):
 
 
 def jmespath_compile(expression):
-    return C7NJMESPathParser().parse(expression)
+    parsed = C7NJMESPathParser().parse(expression)
+    return parsed

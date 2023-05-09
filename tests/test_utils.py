@@ -695,3 +695,12 @@ def test_jmespath_parse_split():
         {'foo': {'bar': 'abc.xyz'}}
     )
     assert result == ['abc', 'xyz']
+
+    compiled = utils.jmespath_compile(
+        'foo.bar | split(`.`, @)',
+    )
+    assert isinstance(compiled, utils.ParsedResultWithOptions)
+    result = compiled.search(
+        {'foo': {'bar': 'abc.xyz'}}
+    )
+    assert result == ['abc', 'xyz']
