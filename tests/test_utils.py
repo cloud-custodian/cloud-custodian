@@ -6,8 +6,6 @@ import os
 import tempfile
 import time
 
-import jmespath
-
 from botocore.exceptions import ClientError
 from dateutil.parser import parse as parse_date
 import mock
@@ -692,7 +690,7 @@ def test_output_path_join():
 
 
 def test_jmespath_parse_split():
-    result = jmespath.search(
+    result = utils.jmespath_search(
         'foo.bar | split(`.`, @)',
         {'foo': {'bar': 'abc.xyz'}}
     )

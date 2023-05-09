@@ -1,6 +1,5 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
-import jmespath
 
 from c7n.actions import Action
 from c7n.manager import resources
@@ -9,7 +8,7 @@ from c7n.query import (
     ConfigSource,
     DescribeWithResourceTags, QueryResourceManager, TypeInfo)
 from c7n.filters.vpc import SubnetFilter
-from c7n.utils import local_session, type_schema, get_retry
+from c7n.utils import local_session, type_schema, get_retry, jmespath_search
 from c7n.tags import (
     TagDelayedAction, RemoveTag, TagActionFilter, Tag)
 
@@ -250,7 +249,7 @@ class FirehoseEncryptS3Destination(Action):
                 for k in dmetadata['clear']:
                     dinfo.pop(k, None)
                 if dmetadata['encrypt_path']:
-                    encrypt_info = jmespath.search(dmetadata['encrypt_path'], dinfo)
+                    encrypt_info = jmespath_search(dmetadata['encrypt_path'], dinfo)
                 else:
                     encrypt_info = dinfo
                 encrypt_info.pop('NoEncryptionConfig', None)

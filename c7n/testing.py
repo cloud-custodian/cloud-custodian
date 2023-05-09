@@ -3,7 +3,6 @@
 import datetime
 import functools
 import io
-import jmespath
 import json
 import logging
 import os
@@ -23,7 +22,7 @@ from c7n import deprecated, policy
 from c7n.exceptions import DeprecationError
 from c7n.loader import PolicyLoader
 from c7n.ctx import ExecutionContext
-from c7n.utils import reset_session_cache
+from c7n.utils import reset_session_cache, jmespath_search
 from c7n.config import Bag, Config
 
 
@@ -204,7 +203,7 @@ class CustodianTestCore:
             raise self.failureException(msg)
 
     def assertJmes(self, expr, instance, expected):
-        value = jmespath.search(expr, instance)
+        value = jmespath_search(expr, instance)
         self.assertEqual(value, expected)
 
     def assertDeprecation(self, policy, expected):

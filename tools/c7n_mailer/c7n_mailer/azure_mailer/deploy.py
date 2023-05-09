@@ -5,7 +5,6 @@ import json
 import logging
 import os
 
-import jmespath
 from c7n_mailer.deploy import CORE_DEPS
 
 try:
@@ -16,7 +15,7 @@ try:
     from c7n_azure.policy import AzureFunctionMode
     from c7n_azure.session import Session
     from c7n_azure.utils import StringUtils
-    from c7n.utils import local_session
+    from c7n.utils import local_session, jmespath_search
 except ImportError:
     FunctionPackage = None
     pass
@@ -51,7 +50,7 @@ def build_function_package(config, function_name, sub_id):
         target_sub_ids=[sub_id],
         cache_override_path=cache_override_path)
 
-    identity = jmespath.search('function_properties.identity', config)
+    identity = jmespath_search('function_properties.identity', config)
     package.build(None,
                   modules=['c7n', 'c7n_azure', 'c7n_mailer'],
                   requirements=get_mailer_requirements(),
@@ -122,7 +121,7 @@ def provision(config):
     function_app_name = FunctionAppUtilities.get_function_name(
         '-'.join([service_plan['name'], function_name]), suffix)
     FunctionAppUtilities.validate_function_name(function_app_name)
-    identity = jmespath.search('function_properties.identity', config) or {
+    identity = jmespath_search('function_properties.identity', config) or {
         'type': AUTH_TYPE_EMBED}
 
     params = FunctionAppUtilities.FunctionAppInfrastructureParameters(

@@ -9,9 +9,10 @@ import time
 import yaml
 
 import jinja2
-import jmespath
 from dateutil import parser
 from dateutil.tz import gettz, tzutc
+
+from c7n.utils import jmespath_search
 
 try:
     from botocore.exceptions import ClientError
@@ -66,7 +67,7 @@ def get_jinja_env(template_folders):
     env.globals['format_struct'] = format_struct
     env.globals['resource_tag'] = get_resource_tag_value
     env.globals['get_resource_tag_value'] = get_resource_tag_value
-    env.globals['search'] = jmespath.search
+    env.globals['search'] = jmespath_search
     env.loader = jinja2.FileSystemLoader(template_folders)
     return env
 

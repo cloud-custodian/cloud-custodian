@@ -3,7 +3,6 @@
 import itertools
 import operator
 import zlib
-import jmespath
 import re
 from c7n.actions import BaseAction, ModifyVpcSecurityGroupsAction
 from c7n.exceptions import PolicyValidationError, ClientError
@@ -17,7 +16,7 @@ from c7n import query, resolver
 from c7n.manager import resources
 from c7n.resources.securityhub import OtherResourcePostFinding, PostFinding
 from c7n.utils import (
-    chunks, local_session, type_schema, get_retry, parse_cidr, get_eni_resource_type)
+    chunks, local_session, type_schema, get_retry, parse_cidr, get_eni_resource_type, jmespath_search, jmespath_compile)
 
 from c7n.resources.aws import shape_validate
 from c7n.resources.shield import IsEIPShieldProtected, SetEIPShieldProtection
@@ -886,7 +885,7 @@ class SGUsage(Filter):
 
     def get_ecs_cwe_sgs(self):
         sg_ids = set()
-        expr = jmespath.compile(
+        expr = jmespath_compile(
             'EcsParameters.NetworkConfiguration.awsvpcConfiguration.SecurityGroups[]')
         for rule in self.manager.get_resource_manager(
                 'event-rule-target').resources(augment=False):
@@ -896,7 +895,7 @@ class SGUsage(Filter):
         return sg_ids
 
     def get_batch_sgs(self):
-        expr = jmespath.compile('[].computeResources.securityGroupIds[]')
+        expr = jmespath_compile('[].computeResources.securityGroupIds[]')
         resources = self.manager.get_resource_manager('aws.batch-compute').resources(augment=False)
         return set(expr.search(resources) or [])
 
@@ -2046,7 +2045,7 @@ class CrossAccountPeer(CrossAccountAccessFilter):
     def process(self, resources, event=None):
         results = []
         accounts = self.get_accounts()
-        owners = map(jmespath.compile, (
+        owners = map(jmespath_compile, (
             'AccepterVpcInfo.OwnerId', 'RequesterVpcInfo.OwnerId'))
 
         for r in resources:
@@ -2162,7 +2161,7 @@ class AclAwsS3Cidrs(Filter):
 
     def process(self, resources, event=None):
         ec2 = local_session(self.manager.session_factory).client('ec2')
-        cidrs = jmespath.search(
+        cidrs = jmespath_search(
             "PrefixLists[].Cidrs[]", ec2.describe_prefix_lists())
         cidrs = [parse_cidr(cidr) for cidr in cidrs]
         results = []
@@ -2561,7 +2560,7 @@ class UnusedKeyPairs(Filter):
 
     def process(self, resources, event=None):
         instances = self.manager.get_resource_manager('ec2').resources()
-        used = set(jmespath.search('[].KeyName', instances))
+        used = set(jmespath_search('[].KeyName', instances))
         if self.data.get('state', True):
             return [r for r in resources if r['KeyName'] not in used]
         else:

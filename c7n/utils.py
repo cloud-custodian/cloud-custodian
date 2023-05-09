@@ -19,6 +19,9 @@ from urllib.request import getproxies, proxy_bypass
 
 from dateutil.parser import ParserError, parse
 
+import jmespath
+from jmespath.parser import Parser, ParsedResult
+
 from c7n import config
 from c7n.exceptions import ClientError, PolicyValidationError
 
@@ -920,3 +923,34 @@ class C7NJmespathFunctions(functions.Functions):
     )
     def _func_split(self, sep, string):
         return string.split(sep)
+
+
+class C7NJMESPathParser(Parser):
+    def _parse(self, expression):
+        result = super()._parse(expression)
+        return ParsedResultWithOptions(
+            expression=result.expression,
+            parsed=result.parsed
+        )
+
+
+class ParsedResultWithOptions(ParsedResult):
+    def search(self, value, options=None):
+        return super().search(
+            value=value,
+            options=jmespath.Options(
+                custom_functions=C7NJmespathFunctions()
+            )
+        )
+
+
+def jmespath_search(*args, **kwargs):
+    return jmespath.search(
+        *args,
+        **kwargs,
+        options=jmespath.Options(custom_functions=C7NJmespathFunctions())
+    )
+
+
+def jmespath_compile(expression):
+    return C7NJMESPathParser().parse(expression)

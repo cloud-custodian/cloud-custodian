@@ -4,13 +4,12 @@ import copy
 import json
 import logging
 
-import jmespath
 from qcloud_cos import CosS3Client, CosConfig, CosServiceError
 
 from c7n.filters import Filter, ValueFilter
 from c7n_tencentcloud.provider import resources
 from c7n_tencentcloud.query import QueryResourceManager, ResourceTypeInfo, DescribeSource
-from c7n.utils import type_schema, format_string_values
+from c7n.utils import type_schema, format_string_values, jmespath_search
 
 log = logging.getLogger('custodian.cos')
 
@@ -27,7 +26,7 @@ class DescribeCos(DescribeSource):
     def resources(self, params=None):
         resp = self.get_cos_client(self.resource_manager.config.region).list_buckets()
         action, jsonpath, extra_params = self.resource_type.enum_spec
-        resources = jmespath.search(jsonpath, resp)
+        resources = jmespath_search(jsonpath, resp)
         if not resources:
             return []
         resources = [r for r in resources if r["Location"] == self.resource_manager.config.region]
@@ -352,7 +351,7 @@ class BucketLifecycle(Filter):
         v_filter = ValueFilter(matcher_config)
         v_filter.annotate = False
 
-        results = jmespath.search(self.data["key"], lifecycles)
+        results = jmespath_search(self.data["key"], lifecycles)
 
         matched = []
         for item in results:

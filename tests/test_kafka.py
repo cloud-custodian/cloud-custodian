@@ -3,8 +3,7 @@
 import time
 
 from .common import BaseTest, load_data
-import jmespath
-
+from c7n.utils import jmespath_search
 
 class KafkaTest(BaseTest):
 
@@ -146,7 +145,7 @@ class KafkaTest(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        aliases = kms.list_aliases(KeyId=(jmespath.search(expression, resources[0])))
+        aliases = kms.list_aliases(KeyId=(jmespath_search(expression, resources[0])))
         self.assertEqual(aliases['Aliases'][0]['AliasName'], 'alias/aws/kafka')
 
     def test_kafka_cluster_provisioned_and_serverless(self):

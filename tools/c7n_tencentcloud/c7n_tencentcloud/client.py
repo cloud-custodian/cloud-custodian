@@ -3,11 +3,11 @@
 
 import os
 
-import jmespath
 import socket
 from retrying import retry
 from .utils import PageMethod
 from c7n.exceptions import PolicyExecutionError
+from c7n.utils import jmespath_search
 from requests.exceptions import ConnectionError
 from tencentcloud.common import credential
 from tencentcloud.common.exception.tencent_cloud_sdk_exception import TencentCloudSDKException
@@ -100,7 +100,7 @@ class Client:
 
             result = self.execute_query(action, params)
             query_counter += 1
-            items = jmespath.search(jsonpath, result)
+            items = jmespath_search(jsonpath, result)
             if len(items) > 0:
                 results.extend(items)
                 if paging_method == PageMethod.Offset:
@@ -115,7 +115,7 @@ class Client:
                         break
                     params[paging_method.name] = int(params[paging_method.name]) + 1
                 else:
-                    token = jmespath.search(pagination_token_path, result)
+                    token = jmespath_search(pagination_token_path, result)
                     if token == "":
                         break
                     params[PageMethod.PaginationToken.name] = str(token)
