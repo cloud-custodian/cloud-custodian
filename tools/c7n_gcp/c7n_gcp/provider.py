@@ -20,6 +20,7 @@ class GoogleCloud(Provider):
 
     def initialize(self, options):
         return options
+    
 
     def initialize_policies(self, policy_collection, options):
         return policy_collection
