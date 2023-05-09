@@ -140,7 +140,9 @@ class Webhook(EventAction):
         if not self.query_params:
             return self.url
 
-        evaluated_params = {k: utils.jmespath_search(v, resource) for k, v in self.query_params.items()}
+        evaluated_params = {
+            k: utils.jmespath_search(v, resource) for k, v in self.query_params.items()
+        }
 
         url_parts = list(parse.urlparse(self.url))
         query = dict(parse.parse_qsl(url_parts[4]))

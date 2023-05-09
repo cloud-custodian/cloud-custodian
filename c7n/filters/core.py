@@ -22,7 +22,14 @@ from c7n.exceptions import PolicyValidationError, PolicyExecutionError
 from c7n.manager import ResourceManager
 from c7n.registry import PluginRegistry
 from c7n.resolver import ValuesFrom
-from c7n.utils import set_annotation, type_schema, parse_cidr, parse_date, jmespath_search, jmespath_compile
+from c7n.utils import (
+    set_annotation,
+    type_schema,
+    parse_cidr,
+    parse_date,
+    jmespath_search,
+    jmespath_compile
+)
 from c7n.manager import iter_filters
 
 

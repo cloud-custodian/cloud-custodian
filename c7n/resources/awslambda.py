@@ -16,7 +16,16 @@ from c7n.manager import resources
 from c7n import query, utils
 from c7n.resources.iam import CheckPermissions, SpecificIamRoleManagedPolicy
 from c7n.tags import universal_augment
-from c7n.utils import local_session, type_schema, select_keys, get_human_size, parse_date, get_retry, jmespath_search, jmespath_compile
+from c7n.utils import (
+    local_session,
+    type_schema,
+    select_keys,
+    get_human_size,
+    parse_date,
+    get_retry,
+    jmespath_search,
+    jmespath_compile
+)
 from botocore.config import Config
 from .securityhub import PostFinding
 

@@ -17,7 +17,14 @@ from c7n.filters import (
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, DescribeSource, TypeInfo
 from c7n.resolver import ValuesFrom
-from c7n.utils import local_session, type_schema, chunks, merge_dict_list, parse_date, jmespath_compile
+from c7n.utils import (
+    local_session,
+    type_schema,
+    chunks,
+    merge_dict_list,
+    parse_date,
+    jmespath_compile
+)
 from c7n import deprecated
 
 

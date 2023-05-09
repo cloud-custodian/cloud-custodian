@@ -16,8 +16,15 @@ from c7n import query, resolver
 from c7n.manager import resources
 from c7n.resources.securityhub import OtherResourcePostFinding, PostFinding
 from c7n.utils import (
-    chunks, local_session, type_schema, get_retry, parse_cidr, get_eni_resource_type, jmespath_search, jmespath_compile)
-
+    chunks,
+    local_session,
+    type_schema,
+    get_retry,
+    parse_cidr,
+    get_eni_resource_type,
+    jmespath_search,
+    jmespath_compile
+)
 from c7n.resources.aws import shape_validate
 from c7n.resources.shield import IsEIPShieldProtected, SetEIPShieldProtection
 from c7n.filters.policystatement import HasStatementFilter
