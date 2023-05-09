@@ -104,31 +104,31 @@ class ResourceGroupResourcesFilter(ValueFilter):
     information provided for each resource only contains high-level information as outlined
     here:
 
-    ..code-block:: json
+    .. code-block:: json
 
-        [
-            {
-                "id": "/<resourceid>",
-                "name": "cfbwpndezsj",
-                "type": "Microsoft.ContainerRegistry/registries",
-                "sku": {
-                    "name": "Standard",
-                    "tier": "Standard"
-                },
-                "location": "centralus",
-                "tags": {
-                    "product_id": "13742"
-                },
-                "systemData": {
-                    "createdBy": "foo@example.com",
-                    "createdByType": "User",
-                    "createdAt": "2023-05-08T16:05:32.9864579Z",
-                    "lastModifiedBy": "foo@example.com",
-                    "lastModifiedByType": "User",
-                    "lastModifiedAt": "2023-05-08T16:05:32.9864579Z"
-                }
-            }
-        ]
+      [
+        {
+          "id": "/<resourceid>",
+          "name": "cfbwpndezsj",
+          "type": "Microsoft.ContainerRegistry/registries",
+          "sku": {
+            "name": "Standard",
+            "tier": "Standard"
+          },
+          "location": "centralus",
+          "tags": {
+            "product_id": "13742"
+          },
+          "systemData": {
+            "createdBy": "foo@example.com",
+            "createdByType": "User",
+            "createdAt": "2023-05-08T16:05:32.9864579Z",
+            "lastModifiedBy": "foo@example.com",
+            "lastModifiedByType": "User",
+            "lastModifiedAt": "2023-05-08T16:05:32.9864579Z"
+          }
+        }
+      ]
 
     :example:
 
