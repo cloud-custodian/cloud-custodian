@@ -12,7 +12,7 @@ from c7n_gcp.actions import MethodAction
 @resources.register('gke-cluster')
 class KubernetesCluster(QueryResourceManager):
     """GCP resource:
-    https://cloud.google.com/kubernetes-engine/docs/reference/rest/v1/projects.zones.clusters
+    https://cloud.google.com/kubernetes-engine/docs/reference/rest/v1/projects.locations.clusters
     """
 
     class resource_type(TypeInfo):
@@ -42,6 +42,18 @@ class KubernetesCluster(QueryResourceManager):
                         resource_info['project_id'],
                         resource_info['location'],
                         resource_info['cluster_name'])})
+
+        @staticmethod
+        def get_label_params(resource, all_labels):
+            path_param_re = re.compile(
+                '.*?/projects/(.*?)/locations/(.*?)/clusters/(.*)')
+            project, zone, cluster_name = path_param_re.match(
+                resource['selfLink']).groups()
+            return {'project': project, 'zone': zone, 'cluster_name': cluster_name,
+                    'body': {
+                        'resourceLabels': all_labels,
+                        'labelFingerprint': resource['labelFingerprint']
+                    }}
 
     def augment(self, resources):
         if not resources:
