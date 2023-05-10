@@ -9,6 +9,7 @@ ResourceMap = {
     "azure.application-gateway": "c7n_azure.resources.app_gateway.ApplicationGateway",
     "azure.armresource": "c7n_azure.resources.generic_arm_resource.GenericArmResource",
     "azure.batch": "c7n_azure.resources.batch.Batch",
+    "azure.cdncustomdomain": "c7n_azure.resources.cdn_customdomain.CdnCustomDomain",
     "azure.cdnprofile": "c7n_azure.resources.cdn.CdnProfile",
     "azure.cognitiveservice": "c7n_azure.resources.cognitive_service.CognitiveService",
     "azure.container-group": "c7n_azure.resources.aci.ContainerGroup",
