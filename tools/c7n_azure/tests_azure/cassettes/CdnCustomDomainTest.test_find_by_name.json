@@ -55,7 +55,7 @@
         {
             "request": {
                 "method": "GET",
-                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-urffdpkcby/providers/Microsoft.Cdn/profiles/cctestcdnprofile/endpoints?api-version=2020-09-01",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_cdnprofile/providers/Microsoft.Cdn/profiles/cctestcdnprofile/endpoints?api-version=2020-09-01",
                 "body": null,
                 "headers": {}
             },
@@ -85,7 +85,7 @@
                     "data": {
                         "value": [
                             {
-                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/cfb-urffdpkcby/providers/Microsoft.Cdn/profiles/cctestcdnprofile/endpoints/urffdpkcbyendpoint",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/test_cdnprofile/providers/Microsoft.Cdn/profiles/cctestcdnprofile/endpoints/urffdpkcbyendpoint",
                                 "type": "Microsoft.Cdn/profiles/endpoints",
                                 "name": "urffdpkcbyendpoint",
                                 "location": "EastUs",
@@ -152,7 +152,7 @@
         {
             "request": {
                 "method": "GET",
-                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-urffdpkcby/providers/Microsoft.Cdn/profiles/cctestcdnprofile/endpoints/urffdpkcbyendpoint/customDomains?api-version=2020-09-01",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_cdnprofile/providers/Microsoft.Cdn/profiles/cctestcdnprofile/endpoints/urffdpkcbyendpoint/customDomains?api-version=2020-09-01",
                 "body": null,
                 "headers": {}
             },
@@ -179,9 +179,9 @@
                     "data": {
                         "value": [
                             {
-                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/cfb-urffdpkcby/providers/Microsoft.Cdn/profiles/cctestcdnprofile/endpoints/urffdpkcbyendpoint/customdomains/test-custom-fmo-domain",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/test_cdnprofile/providers/Microsoft.Cdn/profiles/cctestcdnprofile/endpoints/urffdpkcbyendpoint/customdomains/cctestmydomain",
                                 "type": "Microsoft.Cdn/profiles/endpoints/customdomains",
-                                "name": "test-custom-fmo-domain",
+                                "name": "cctestmydomain",
                                 "properties": {
                                     "hostName": "www.roromart.com",
                                     "validationData": null,

@@ -7,7 +7,7 @@ class CdnCustomDomainTest(BaseTest):
     def setUp(self):
         super(CdnCustomDomainTest, self).setUp()
 
-    def test_customdomain_schema_validate(self):
+    def test_cdn_customdomain_schema_validate(self):
         with self.sign_out_patch():
             p = self.load_policy({
                 'name': 'test-azure-cdncustomdomain',
