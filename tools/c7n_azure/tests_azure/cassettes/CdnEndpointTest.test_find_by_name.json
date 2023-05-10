@@ -4,7 +4,7 @@
         {
             "request": {
                 "method": "GET",
-                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Cdn/profiles?api-version=2017-10-12",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Cdn/profiles?api-version=2020-09-01",
                 "body": null,
                 "headers": {}
             },
@@ -18,33 +18,74 @@
                         "no-cache"
                     ],
                     "date": [
-                        "Thu, 02 May 2019 19:10:27 GMT"
+                        "Wed, 10 May 2023 22:36:14 GMT"
                     ],
                     "content-type": [
-                        "application/json; odata.metadata=minimal"
+                        "application/json; charset=utf-8"
                     ],
-                    "odata-version": [
-                        "4.0"
+                    "x-ms-ratelimit-remaining-subscription-resource-requests": [
+                        "49"
                     ],
                     "content-length": [
-                        "436"
+                        "1337"
                     ]
                 },
                 "body": {
                     "data": {
                         "value": [
                             {
-                                "name": "cctestcdnprofile",
-                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/test_cdnprofile/providers/Microsoft.Cdn/profiles/cctestcdnprofile",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/cfb-vevmhnkx/providers/Microsoft.Cdn/profiles/MyFrontDoor-Success",
                                 "type": "Microsoft.Cdn/profiles",
-                                "tags": {},
-                                "location": "CentralUs",
+                                "name": "MyFrontDoor-Success",
+                                "location": "Global",
+                                "kind": "frontdoor",
+                                "tags": {
+                                    "product_id": "13742",
+                                    "created_by": "carol_brothers@mckinsey.com"
+                                },
+                                "sku": {
+                                    "name": "Premium_AzureFrontDoor"
+                                },
+                                "properties": {
+                                    "frontDoorId": "faa236ce-e892-4c16-8115-0d2b047f718f",
+                                    "resourceState": "Active",
+                                    "provisioningState": "Succeeded"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/cfb-ymgdoysu/providers/Microsoft.Cdn/profiles/MyFrontDoor-Fail",
+                                "type": "Microsoft.Cdn/profiles",
+                                "name": "MyFrontDoor-Fail",
+                                "location": "Global",
+                                "kind": "frontdoor",
+                                "tags": {
+                                    "product_id": "13742",
+                                    "created_by": "carol_brothers@mckinsey.com"
+                                },
+                                "sku": {
+                                    "name": "Premium_AzureFrontDoor"
+                                },
+                                "properties": {
+                                    "frontDoorId": "20b0281e-d1f1-4bc1-a336-c9296324fafd",
+                                    "resourceState": "Active",
+                                    "provisioningState": "Succeeded"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/test_cdnendpoint/providers/Microsoft.Cdn/profiles/cctestcdnprofile",
+                                "type": "Microsoft.Cdn/profiles",
+                                "name": "cctestcdnprofile",
+                                "location": "EastUs",
+                                "kind": "cdn",
+                                "tags": {
+                                    "product_id": "13742"
+                                },
                                 "sku": {
                                     "name": "Standard_Microsoft"
                                 },
                                 "properties": {
-                                    "provisioningState": "Succeeded",
-                                    "resourceState": "Active"
+                                    "resourceState": "Active",
+                                    "provisioningState": "Succeeded"
                                 }
                             }
                         ]
@@ -55,7 +96,7 @@
         {
             "request": {
                 "method": "GET",
-                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_cdnprofile/providers/Microsoft.Cdn/profiles/cctestcdnprofile/endpoints/cctestcdnendpoint/customDomains?api-version=2020-09-01",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-vevmhnkx/providers/Microsoft.Cdn/profiles/MyFrontDoor-Success/endpoints?api-version=2020-09-01",
                 "body": null,
                 "headers": {}
             },
@@ -65,27 +106,99 @@
                     "message": "OK"
                 },
                 "headers": {
-                    "date": [
-                        "Tue, 25 Apr 2023 18:09:57 GMT"
+                    "cache-control": [
+                        "no-cache"
                     ],
-                    "x-ms-ratelimit-remaining-subscription-resource-requests": [
-                        "49"
+                    "date": [
+                        "Wed, 10 May 2023 22:36:14 GMT"
                     ],
                     "content-type": [
                         "application/json; charset=utf-8"
                     ],
+                    "x-ms-ratelimit-remaining-subscription-resource-requests": [
+                        "49"
+                    ],
+                    "content-length": [
+                        "12"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": []
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-ymgdoysu/providers/Microsoft.Cdn/profiles/MyFrontDoor-Fail/endpoints?api-version=2020-09-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
                     "cache-control": [
                         "no-cache"
                     ],
+                    "date": [
+                        "Wed, 10 May 2023 22:36:14 GMT"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-resource-requests": [
+                        "48"
+                    ],
                     "content-length": [
-                        "1272"
+                        "12"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": []
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_cdnendpoint/providers/Microsoft.Cdn/profiles/cctestcdnprofile/endpoints?api-version=2020-09-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Wed, 10 May 2023 22:36:15 GMT"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-resource-requests": [
+                        "47"
+                    ],
+                    "content-length": [
+                        "1145"
                     ]
                 },
                 "body": {
                     "data": {
                         "value": [
                             {
-                                "id": "/subscriptions/19ce288e-d065-4362-8ad1-8c5acbfeb94e/resourcegroups/test_cdnendpoint/providers/Microsoft.Cdn/profiles/cctestmyprofile/endpoints/cctestcdnendpoint",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/test_cdnendpoint/providers/Microsoft.Cdn/profiles/cctestcdnprofile/endpoints/cctestcdnendpoint",
                                 "type": "Microsoft.Cdn/profiles/endpoints",
                                 "name": "cctestcdnendpoint",
                                 "location": "EastUs",
@@ -109,13 +222,26 @@
                                             "properties": {
                                                 "hostName": "cdnowolabi.z13.web.core.windows.net",
                                                 "httpPort": 80,
-                                                "httpsPort": 443
+                                                "httpsPort": 443,
+                                                "originHostHeader": null,
+                                                "priority": 1,
+                                                "weight": 1000,
+                                                "enabled": true,
+                                                "privateLinkAlias": null,
+                                                "privateLinkResourceId": null,
+                                                "privateLinkLocation": null,
+                                                "privateEndpointStatus": null,
+                                                "privateLinkApprovalMessage": null
                                             }
                                         }
                                     ],
+                                    "originGroups": [],
+                                    "defaultOriginGroup": null,
                                     "customDomains": [],
                                     "geoFilters": [],
                                     "deliveryPolicy": null,
+                                    "urlSigningKeys": null,
+                                    "webApplicationFirewallPolicyLink": null,
                                     "resourceState": "Running",
                                     "provisioningState": "Succeeded"
                                 }
