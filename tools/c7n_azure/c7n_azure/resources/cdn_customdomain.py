@@ -42,7 +42,7 @@ class CdnCustomDomain(ChildArmResourceManager):
             'properties.customDomainName',
             'properties.customHttpsProvisioningState',
             'properties.customHttpaProvisioningSubstate',
-            'properties.customDomainHttpsParameters'
+            'properties.customDomainHttpsParameters',
             '"c7n:parent-id"'
         )
         resource_type = 'Microsoft.Cdn/profiles/endpoints/customDomains'
