@@ -6,9 +6,14 @@ GCP Recommender filters
 import json
 from pathlib import Path
 
+import jmespath
+
+from c7n.exceptions import PolicyValidationError
 from c7n.filters.core import Filter
-from c7n.utils import lcoal_session, type_schema
-from c7n.region import Region
+from c7n.utils import local_session, type_schema
+
+from c7n_gcp.provider import resources as gcp_resources
+
 
 RECOMMENDER_DATA_PATH = Path(__file__).parent / "recommender.json"
 _RECOMMENDER_DATA = None
@@ -19,16 +24,20 @@ def get_recommender_data():
     if _RECOMMENDER_DATA is None:
         with open(RECOMMENDER_DATA_PATH) as fh:
             _RECOMMENDER_DATA = json.load(fh)
+    return _RECOMMENDER_DATA
 
 
 class RecommenderFilter(Filter):
+
     schema = type_schema(
-        "recommender",
+        "recommend",
         id={"type": "string"},
         # state={'enum': ['ACTIVE', 'CLAIMED', 'SUCCEEDED', 'FAILED', 'DISMISSED']}
         # sub_type={'enum': 'string'}
         required=("id",),
     )
+    schema_alias = True
+    annotation_key = 'c7n:recommend'
 
     def get_permissions(self):
         rec_id = self.data.get("id")
@@ -44,8 +53,8 @@ class RecommenderFilter(Filter):
         rec_id = self.data["id"]
         all_recs = get_recommender_data()
 
-        if rec_id not in all_recs or all_recs[rec_id] != rtype:
-            valid_ids = {r["id"] for r in all_recs if r.get("resource") == rtype}
+        if rec_id not in all_recs or all_recs[rec_id].get('resource', '') != rtype:
+            valid_ids = {r["id"] for r in all_recs.values() if r.get("resource") == rtype}
             raise PolicyValidationError(
                 f"recommendation id:{rec_id} is not valid for {rtype}, valid: {valid_ids}"
             )
@@ -70,20 +79,20 @@ class RecommenderFilter(Filter):
                 f"projects/{project}/locations/{r}/recommenders/{self.rec_info['id']}"
             )
             for page in client.execute_paged_query("list", {"parent": parent}):
-                recommends.extend(page)
+                recommends.extend(page['recommendations'])
         return recommends
 
-    def match_resources(self, resources, recommends):
+    def match_resources(self, recommends, resources):
         results = []
-        rec_query = jmespath.compile("content.operationsGroups[].operations[].resource")
+        rec_query = jmespath.compile('content.operationGroups[].operations[].resource')
         for r in recommends:
             rids = rec_query.search(r)
             for rid in list(rids):
                 if "$" in rid:
                     rids.remove(rid)
-            matched = self.match_ids(rids, resources)
+            matched = list(self.match_ids(rids, resources))
             for m in matched:
-                m.setdefault(self.annotation, []).append(r)
+                m.setdefault(self.annotation_key, []).append(r)
             results.extend(matched)
         return results
 
@@ -95,7 +104,8 @@ class RecommenderFilter(Filter):
                     yield r
 
     def get_regions(self, resources):
-        return Region.get_regions()
+        locator = self.manager.resource_type._get_location
+        return list(set([locator(r) for r in resources]))
 
     @classmethod
     def register_resources(klass, registry, resource_class):
@@ -103,7 +113,7 @@ class RecommenderFilter(Filter):
         rtype = "gcp.%s" % resource_class.type
         for rec in data.values():
             if rec.get("resource") == rtype:
-                resource_class.filter_registry.register("recommends", klass)
+                resource_class.filter_registry.register("recommend", klass)
 
 
 gcp_resources.subscribe(RecommenderFilter.register_resources)
