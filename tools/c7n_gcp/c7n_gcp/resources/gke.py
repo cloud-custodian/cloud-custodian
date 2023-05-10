@@ -50,7 +50,7 @@ class KubernetesCluster(QueryResourceManager):
                 '.*?/projects/(.*?)/locations/(.*?)/clusters/(.*)')
             project, zone, cluster_name = path_param_re.match(
                 resource['selfLink']).groups()
-            return {'project': project, 'zone': zone, 'cluster_name': cluster_name,
+            return {'name': 'projects/'+project+'/locations/'+zone+'/clusters/'+cluster_name,
                     'body': {
                         'resourceLabels': all_labels,
                         'labelFingerprint': resource['labelFingerprint']
