@@ -389,6 +389,7 @@ class SnapshotSetPermissions(BaseTest):
             Attribute='createVolumePermission')['CreateVolumePermissions']
         assert perms == []
 
+
     def test_add(self):
         # For this test, we assume only 665544332211 has permissions,
         # and we test adding 112233445566 and removing 665544332211
@@ -456,6 +457,38 @@ class SnapshotSetPermissions(BaseTest):
             SnapshotId=resources[0]['SnapshotId'],
             Attribute='createVolumePermission')['CreateVolumePermissions']
         assert perms == [{"UserId": "112233445566"}]
+
+    def test_matched_everyone_only(self):
+        factory = self.replay_flight_data(
+            "test_ebs_snapshot_set_permissions_matched_everyone_only")
+        p = self.load_policy(
+            {
+                "name": "snap-copy",
+                "resource": "ebs-snapshot",
+                "filters": [
+                    {
+                        "type": "cross-account",
+                        "everyone_only": True,
+                    },
+                ],
+                "actions": [
+                    {
+                        "type": "set-permissions",
+                        "remove": "matched"
+                    }
+                ],
+            },
+            session_factory=factory,
+        )
+        p.validate()
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        assert resources[0]['SnapshotId'] == "snap-af0eb71b"
+        client = factory().client('ec2')
+        perms = client.describe_snapshot_attribute(
+            SnapshotId=resources[0]['SnapshotId'],
+            Attribute='createVolumePermission')['CreateVolumePermissions']
+        assert perms == []
 
 
 class SnapshotVolumeFilter(BaseTest):
