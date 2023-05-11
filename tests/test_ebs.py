@@ -194,7 +194,6 @@ class SnapshotAccessTest(BaseTest):
         # pre conditions, 2 snapshots one shared to a separate account, and one
         # shared publicly. 2 non matching volumes, one not shared, one shared
         # explicitly to its own account.
-        self.patch(CopySnapshot, "executor_factory", MainThreadExecutor)
         factory = self.replay_flight_data("test_ebs_cross_account")
         p = self.load_policy(
             {
