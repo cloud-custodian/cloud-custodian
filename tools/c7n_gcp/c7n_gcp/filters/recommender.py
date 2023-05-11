@@ -28,7 +28,27 @@ def get_recommender_data():
 
 
 class RecommenderFilter(Filter):
+    """Use GCP Resource Recommendations to filter resources
 
+    for a complete list and applicable resource types see
+    https://cloud.google.com/recommender/docs/recommenders
+
+    ie. find idle compute disks to snapshot and delete.
+
+    :example:
+
+    .. code-block:: yaml
+
+    policies:
+      - name: gcp-unused-disk
+        resource: gcp.disk
+        filters:
+         - type: recommend
+           id: google.compute.disk.IdleResourceRecommender    
+        actions:
+         - snapshot
+         - delete
+    """
     schema = type_schema(
         "recommend",
         id={"type": "string"},
