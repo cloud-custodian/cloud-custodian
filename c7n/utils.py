@@ -1,6 +1,7 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import copy
+from collections import UserString
 from datetime import datetime, timedelta
 from dateutil.tz import tzutc
 import json
@@ -681,6 +682,16 @@ def get_proxy_url(url):
             return proxies[key]
 
     return None
+
+
+class DeferredFormatString(UserString):
+    """A string that returns itself when formatted
+
+    Let any format spec pass through. This lets us selectively defer
+    expansion of runtime variables without losing format spec details.
+    """
+    def __format__(self, format_spec):
+        return "".join(("{", self.data, f":{format_spec}" if format_spec else "", "}"))
 
 
 class FormatDate:
