@@ -93,9 +93,10 @@ class NullTracer:
     def __init__(self, ctx, config=None):
         self.ctx = ctx
         self.config = config or {}
+        self.metadata = {}
 
     @contextlib.contextmanager
-    def subsegment(self, name):
+    def subsegment(self, name, element=None, **metadata):
         """Create a named subsegment as a context manager
         """
         yield self
@@ -124,6 +125,8 @@ class DeltaStats:
         self.snapshot_stack.append(self.get_snapshot())
 
     def pop_snapshot(self):
+        if not self.snapshot_stack:
+            return {}
         return self.delta(
             self.snapshot_stack.pop(), self.get_snapshot())
 
@@ -132,10 +135,13 @@ class DeltaStats:
 
     def delta(self, before, after):
         delta = {}
+        new = set(after) - set(before)
         for k in before:
             val = after[k] - before[k]
             if val:
                 delta[k] = val
+        for k in new:
+            delta[k] = after[k]
         return delta
 
 

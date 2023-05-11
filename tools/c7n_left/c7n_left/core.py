@@ -249,7 +249,12 @@ class CollectionRunner:
     def run_policy(self, policy, graph, resources, event):
         event = dict(event)
         event.update({"graph": graph, "resources": resources})
-        return policy.push(event)
+        if self.options.get("debug"):
+            event["debug"] = True
+        with policy.ctx.tracer.subsegment(
+            "policy execution", policy, resource_count=len(resources)
+        ):
+            return policy.push(event)
 
     def get_provider(self):
         provider_name = {p.provider_name for p in self.policies}.pop()

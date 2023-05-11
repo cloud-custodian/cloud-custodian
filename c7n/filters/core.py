@@ -335,16 +335,7 @@ class BooleanGroupFilter(Filter):
 class Or(BooleanGroupFilter):
 
     def process(self, resources, event=None):
-        if self.manager:
-            return self.process_set(resources, event)
-        return super(Or, self).process(resources, event)
-
-    def __call__(self, r):
-        """Fallback for older unit tests that don't utilize a query manager"""
-        for f in self.filters:
-            if f(r):
-                return True
-        return False
+        return self.process_set(resources, event)
 
     def process_set(self, resources, event):
         rtype_id = self.get_resource_type_id()
@@ -354,50 +345,44 @@ class Or(BooleanGroupFilter):
             resource_map = {compiled.search(r): r for r in resources}
         else:
             resource_map = {r[rtype_id]: r for r in resources}
-        results = set()
+        results = None
         for f in self.filters:
-            if compiled:
-                results = results.union([
-                    compiled.search(r) for r in f.process(resources, event)])
-            else:
-                results = results.union([
-                    r[rtype_id] for r in f.process(resources, event)])
+            with self.manager.ctx.tracer.subsegment('filter:%s' % f.type, f) as segment:
+                segment.metadata['count-before'] = (
+                    results is not None and len(results) or len(resources))
+                if results is None:
+                    results = set()
+                if compiled:
+                    results = results.union([
+                        compiled.search(r) for r in f.process(resources, event)])
+                else:
+                    results = results.union([
+                        r[rtype_id] for r in f.process(resources, event)])
+                segment.metadata['count-after'] = len(results)
+
         return [resource_map[r_id] for r_id in results]
 
 
 class And(BooleanGroupFilter):
 
     def process(self, resources, events=None):
-        if self.manager:
-            sweeper = AnnotationSweeper(self.get_resource_type_id(), resources)
-
+        sweeper = AnnotationSweeper(self.get_resource_type_id(), resources)
         for f in self.filters:
-            resources = f.process(resources, events)
+            with self.manager.ctx.tracer.subsegment('filter:%s' % f.type, f) as segment:
+                segment.metadata['count-before'] = len(resources)
+                resources = f.process(resources, events)
+                segment.metadata['count-after'] = len(resources)                
             if not resources:
                 break
-
-        if self.manager:
+        if resources:
             sweeper.sweep(resources)
-
         return resources
 
 
 class Not(BooleanGroupFilter):
 
     def process(self, resources, event=None):
-        if self.manager:
-            return self.process_set(resources, event)
-        return super(Not, self).process(resources, event)
-
-    def __call__(self, r):
-        """Fallback for older unit tests that don't utilize a query manager"""
-
-        # There is an implicit 'and' for self.filters
-        # ~(A ^ B ^ ... ^ Z) = ~A v ~B v ... v ~Z
-        for f in self.filters:
-            if not f(r):
-                return True
-        return False
+        return self.process_set(resources, event)
 
     def process_set(self, resources, event):
         rtype_id = self.get_resource_type_id()
@@ -410,7 +395,10 @@ class Not(BooleanGroupFilter):
         sweeper = AnnotationSweeper(rtype_id, resources)
 
         for f in self.filters:
-            resources = f.process(resources, event)
+            with self.manager.ctx.tracer.subsegment('filter:%s' % f.type, f) as segment:
+                segment.metadata['count-before'] = len(resources)
+                resources = f.process(resources, event)
+                segment.metadata['count-after'] = len(resources)                
             if not resources:
                 break
 
@@ -494,7 +482,7 @@ class ValueFilter(BaseValueFilter):
             'value_from': {'$ref': '#/definitions/filters_common/value_from'},
             'value': {'$ref': '#/definitions/filters_common/value'},
             'op': {'$ref': '#/definitions/filters_common/comparison_operators'},
-            'value_path': {'type':'string'}
+            'value_path': {'type': 'string'}
         }
     }
     schema_alias = True
@@ -589,7 +577,7 @@ class ValueFilter(BaseValueFilter):
     def get_resource_value(self, k, i):
         return super(ValueFilter, self).get_resource_value(k, i, self.data.get('value_regex'))
 
-    def get_path_value(self,i):
+    def get_path_value(self, i):
         """Retrieve values using JMESPath.
 
         When using a Value Filter, a ``value_path`` can be specified.
@@ -613,7 +601,7 @@ class ValueFilter(BaseValueFilter):
         This implementation allows for the comparison of two separate lists of values
         within the same resource.
         """
-        return jmespath.search(self.data.get('value_path'),i)
+        return jmespath.search(self.data.get('value_path'), i)
 
     def match(self, i):
         if self.v is None and len(self.data) == 1:

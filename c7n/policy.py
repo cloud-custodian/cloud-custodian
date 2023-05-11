@@ -1074,6 +1074,10 @@ class PolicyConditions:
         self.env_vars = {}
         self.update(data)
 
+    @property
+    def ctx(self):
+        return self.policy.ctx
+
     def update(self, data):
         self.data = data
         self.filters = self.data.get('conditions', [])
@@ -1349,16 +1353,16 @@ class Policy:
                 self.options.dryrun):
             self._trim_runtime_filters()
 
-        if self.options.dryrun:
-            resources = PullMode(self).run()
-        elif not self.is_runnable():
-            resources = []
-        elif isinstance(mode, ServerlessExecutionMode):
-            resources = mode.provision()
-        else:
-            resources = mode.run()
-
-        return resources
+        with self.ctx.tracer.subsegment('policy execution', self, mode=mode.type):
+            if self.options.dryrun:
+                resources = PullMode(self).run()
+            elif not self.is_runnable():
+                resources = []
+            elif isinstance(mode, ServerlessExecutionMode):
+                resources = mode.provision()
+            else:
+                resources = mode.run()
+            return resources
 
     run = __call__
 
