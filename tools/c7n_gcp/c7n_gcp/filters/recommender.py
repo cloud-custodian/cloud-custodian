@@ -39,15 +39,16 @@ class RecommenderFilter(Filter):
 
     .. code-block:: yaml
 
-    policies:
-      - name: gcp-unused-disk
-        resource: gcp.disk
-        filters:
-         - type: recommend
-           id: google.compute.disk.IdleResourceRecommender    
-        actions:
-         - snapshot
-         - delete
+      policies:
+        - name: gcp-unused-disk
+          resource: gcp.disk
+          filters:
+           - type: recommend
+             id: google.compute.disk.IdleResourceRecommender    
+          actions:
+           - snapshot
+           - delete
+
     """
     schema = type_schema(
         "recommend",
