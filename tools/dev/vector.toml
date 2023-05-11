@@ -1,0 +1,35 @@
+[sources.aws_csm]
+type = "socket"
+address = "0.0.0.0:31000"
+max_length = 102_400
+mode = "udp"
+
+
+[transforms.aws_api_parse]
+type = "remap"
+inputs = [ "aws_csm" ]
+source = """
+. = parse_json!(.message)
+del(.SessionToken)
+# todo: figure out parsing nano seconds for to_timestamp or equiv.
+.Timestamp = now()
+"""
+
+
+[transforms.aws_api_filter]
+type = "filter"
+inputs = ["aws_api_parse"]
+condition = '.Type != "ApiCallAttempt" && .Service != "SSO"'
+
+
+[transforms.aws_console_format]
+type = "remap"
+inputs = [ "aws_api_filter" ]
+source = """
+.message = join!(["aws -", downcase!(.ClientId), "->", join!([.Service, ".", .Api])], separator: " ")
+"""
+
+[sinks.console]
+inputs = ["aws_console_format"]
+type = "console"
+encoding = "text"
