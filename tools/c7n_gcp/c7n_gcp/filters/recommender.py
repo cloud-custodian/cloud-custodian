@@ -43,7 +43,7 @@ class RecommenderFilter(Filter):
         rec_id = self.data.get("id")
         if not rec_id:
             return []
-        prefix = get_recommender_data().get(rec_id, {}).get("permissions_prefix")
+        prefix = get_recommender_data().get(rec_id, {}).get("permission_prefix")
         if not prefix:
             return []
         return [prefix + ".get", prefix + ".list"]
@@ -88,6 +88,8 @@ class RecommenderFilter(Filter):
         for r in recommends:
             rids = rec_query.search(r)
             for rid in list(rids):
+                # some resource operations are about creating new resources, ie snapshot disk
+                # before delete, remove those to focus on extant resources.
                 if "$" in rid:
                     rids.remove(rid)
             matched = list(self.match_ids(rids, resources))

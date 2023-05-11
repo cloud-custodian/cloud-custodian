@@ -287,6 +287,24 @@ class DiskTest(BaseTest):
                      'zone': resources[0]['zone'].rsplit('/', 1)[-1]})
         self.assertEqual(result['items'][0]['labels']['test_label'], 'test_value')
 
+    def test_recommend_disk(self):
+        project_id = 'cloud-custodian'
+        factory = self.replay_flight_data('disk-recommend', project_id=project_id)
+        p = self.load_policy({
+            'name': 'disk-label',
+            'resource': 'gcp.disk',
+            'filters': [{'type': 'recommend',
+                         'id': 'google.compute.disk.IdleResourceRecommender'}]},
+            session_factory=factory)
+        assert p.get_permissions() == {
+            'compute.disks.list',
+            'recommender.computeDiskIdleResourceRecommendations.get',
+            'recommender.computeDiskIdleResourceRecommendations.list'
+        }
+        resources = p.run()
+        assert len(resources) == 2
+        assert resources[0]['c7n:recommend'][0]['recommenderSubtype'] == 'SNAPSHOT_AND_DELETE_DISK'
+
 
 class SnapshotTest(BaseTest):
 
