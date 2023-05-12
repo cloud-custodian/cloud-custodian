@@ -2948,7 +2948,7 @@ class Lifecycle(BucketActionBase):
                             'properties': {
                                 'Prefix': {'type': 'string'},
                                 'ObjectSizeGreaterThan': {'type': 'integer'},
-                                'ObjectSizeLessThan': {'type': 'integer'},                                
+                                'ObjectSizeLessThan': {'type': 'integer'},
                                 'Tag': {
                                     'type': 'object',
                                     'required': ['Key', 'Value'],
