@@ -4,7 +4,6 @@
 from collections import Counter
 from datetime import datetime
 from dateutil.tz import tzutc
-import jmespath
 import json
 import hashlib
 import logging
@@ -17,7 +16,7 @@ from c7n.exceptions import PolicyValidationError, PolicyExecutionError
 from c7n.policy import LambdaMode, execution
 from c7n.utils import (
     local_session, type_schema, get_retry,
-    chunks, dumps, filter_empty, get_partition
+    chunks, dumps, filter_empty, get_partition, jmespath_search
 )
 from c7n.version import version
 
@@ -329,7 +328,9 @@ class PostFinding(Action):
     https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-findings-format.html
 
     For resources that are taggable, we will tag the resource with an identifier
-    such that further findings generate updates.
+    such that further findings generate updates. The name of the tag comes from the ``title``
+    parameter of the ``post-finding`` action, or the policy name if ``title`` is empty. This
+    allows different policies to update the same finding if they specify the same ``title``.
 
     Example generate a finding for accounts that don't have shield enabled.
 
@@ -355,6 +356,7 @@ class PostFinding(Action):
                - "Software and Configuration Checks/Industry and Regulatory Standards/NIST CSF Controls (USA)"
              recommendation: "Enable shield"
              recommendation_url: "https://www.example.com/policies/AntiDDoS.html"
+             title: "shield-enabled"
              confidence: 100
              compliance_status: FAILED
 
@@ -634,7 +636,7 @@ class OtherResourcePostFinding(PostFinding):
             details[k] = r[k]
 
         for f in self.fields:
-            value = jmespath.search(f['expr'], r)
+            value = jmespath_search(f['expr'], r)
             if not value:
                 continue
             details[f['key']] = value

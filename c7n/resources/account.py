@@ -5,7 +5,6 @@
 import json
 import time
 import datetime
-import jmespath
 from contextlib import suppress
 from botocore.exceptions import ClientError
 from fnmatch import fnmatch
@@ -19,7 +18,7 @@ from c7n.filters.kms import KmsRelatedFilter
 from c7n.filters.multiattr import MultiAttrFilter
 from c7n.filters.missing import Missing
 from c7n.manager import ResourceManager, resources
-from c7n.utils import local_session, type_schema, generate_arn, get_support_region
+from c7n.utils import local_session, type_schema, generate_arn, get_support_region, jmespath_search
 from c7n.query import QueryResourceManager, TypeInfo
 
 from c7n.resources.iam import CredentialReport
@@ -2001,7 +2000,7 @@ class LakeformationFilter(Filter):
     def process_account(self, account):
         client = local_session(self.manager.session_factory).client('lakeformation')
         lake_buckets = {
-            Arn.parse(r).resource for r in jmespath.search(
+            Arn.parse(r).resource for r in jmespath_search(
                 'ResourceInfoList[].ResourceArn',
                 client.list_resources())
         }

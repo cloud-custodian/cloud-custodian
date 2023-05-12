@@ -1,0 +1,52 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Mon, 08 May 2023 13:15:48 GMT",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "1378",
+    "-content-encoding": "gzip",
+    "content-location": "https://deploymentmanager.googleapis.com/deploymentmanager/v2/projects/cloud-custodian/global/deployments/example-deployment5?alt=json"
+  },
+  "body": {
+    "id": "6178572056300702896",
+    "name": "example-deployment5",
+    "operation": {
+      "kind": "deploymentmanager#operation",
+      "id": "0",
+      "name": "operation-1683550815448-5fb2e3850ef79-57f6be7e-86639a53",
+      "operationType": "insert",
+      "targetLink": "https://www.googleapis.com/deploymentmanager/v2/projects/cloud-custodian/global/deployments/example-deployment5",
+      "targetId": "6178572056300702896",
+      "status": "DONE",
+      "user": "kapil@stacklet.io",
+      "progress": 100,
+      "insertTime": "1969-12-31T16:00:00.000-08:00",
+      "startTime": "2023-05-08T06:00:15.589-07:00",
+      "endTime": "2023-05-08T06:00:29.580-07:00",
+      "selfLink": "https://www.googleapis.com/deploymentmanager/v2/projects/cloud-custodian/global/operations/operation-1683550815448-5fb2e3850ef79-57f6be7e-86639a53"
+    },
+    "fingerprint": "5m6QgnZFs4zABHEjyyqNyg==",
+    "manifest": "https://www.googleapis.com/deploymentmanager/v2/projects/cloud-custodian/global/deployments/example-deployment5/manifests/manifest-1683550815513",
+    "insertTime": "2023-05-08T06:00:15.500-07:00",
+    "updateTime": "2023-05-08T06:00:29.536-07:00",
+    "labels": [
+      {
+        "key": "environment",
+        "value": "production"
+      },
+      {
+        "key": "storage",
+        "value": "media"
+      }
+    ],
+    "selfLink": "https://www.googleapis.com/deploymentmanager/v2/projects/cloud-custodian/global/deployments/example-deployment5"
+  }
+}

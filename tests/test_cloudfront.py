@@ -1,10 +1,8 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
-import jmespath
-
 from .common import BaseTest, event_data
 from c7n.resources.aws import shape_validate
-from c7n.utils import local_session
+from c7n.utils import local_session, jmespath_compile
 from unittest.mock import MagicMock
 
 
@@ -264,7 +262,7 @@ class CloudFront(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        expr = jmespath.compile(k)
+        expr = jmespath_compile(k)
         r = expr.search(resources[0])
         self.assertTrue("allow-all" in r)
 
@@ -301,7 +299,7 @@ class CloudFront(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        expr = jmespath.compile(k)
+        expr = jmespath_compile(k)
         r = expr.search(resources[0])
         self.assertTrue("TLSv1" in r)
 

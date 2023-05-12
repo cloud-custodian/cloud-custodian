@@ -57,6 +57,7 @@ ResourceMap = {
     "azure.roledefinition": "c7n_azure.resources.access_control.RoleDefinition",
     "azure.routetable": "c7n_azure.resources.route_table.RouteTable",
     "azure.search": "c7n_azure.resources.search.SearchService",
+    "azure.servicebus-namespace": "c7n_azure.resources.servicebus_namespace.ServiceBusNamespace",
     "azure.service-fabric-cluster": "c7n_azure.resources.service_fabric.ServiceFabricCluster",
     "azure.service-fabric-cluster-managed": "c7n_azure.resources.service_fabric.ServiceFabricClusterManaged",  # noqa
     "azure.sql-database": "c7n_azure.resources.sqldatabase.SqlDatabase",

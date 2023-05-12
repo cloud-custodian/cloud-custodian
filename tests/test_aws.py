@@ -521,6 +521,9 @@ def test_get_bucket_url_s3_cross_region():
     assert aws.get_bucket_url_with_region(
         "s3://slack.cloudcustodian.io",
         "us-west-2") == "s3://slack.cloudcustodian.io?region=us-east-1"
+    assert aws.get_bucket_url_with_region(
+        "s3://slack.cloudcustodian.io/",
+        "us-west-2") == "s3://slack.cloudcustodian.io?region=us-east-1"
 
 
 @vcr.use_cassette(
@@ -533,3 +536,7 @@ def test_get_bucket_url_s3_same_region():
     assert aws.get_bucket_url_with_region(
         "s3://slack.cloudcustodian.io?param=x",
         "us-east-1") == "s3://slack.cloudcustodian.io?param=x&region=us-east-1"
+
+    assert aws.get_bucket_url_with_region(
+        "s3://slack.cloudcustodian.io/logs/?param=x",
+        "us-east-1") == "s3://slack.cloudcustodian.io/logs?param=x&region=us-east-1"
