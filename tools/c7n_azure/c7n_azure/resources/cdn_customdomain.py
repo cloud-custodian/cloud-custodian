@@ -23,9 +23,8 @@ class CdnCustomDomain(ChildArmResourceManager):
               - type: value
                 key: properties.customHttpsProvisioningState
                 op: ne
-                value_: Enabled
-
-
+                value: Enabled
+                
     """
 
     class resource_type(ChildArmResourceManager.resource_type):
