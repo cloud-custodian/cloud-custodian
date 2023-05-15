@@ -222,7 +222,7 @@ def validate(options):
         except PolicyValidationError as e:
             log.error("Configuration invalid: {}".format(config_file))
             log.error("%s" % e)
-            errors.append(e)
+            all_errors[config_file] = e
             continue
 
         load_resources(structure.get_resource_types(data))
