@@ -357,6 +357,24 @@ azure-mgmt-core = ">=1.2.0,<2.0.0"
 msrest = ">=0.5.0"
 
 [[package]]
+name = "azure-mgmt-appplatform"
+version = "8.0.0"
+description = "Microsoft Azure App Platform Management Client Library for Python"
+category = "main"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "azure-mgmt-appplatform-8.0.0.zip", hash = "sha256:e2a37175084396fe2b07ae2ac52b1957a98533d042647fdacca6bc76819631cb"},
+    {file = "azure_mgmt_appplatform-8.0.0-py3-none-any.whl", hash = "sha256:2d808fbc56b55b1cff015498f1ce20c366ff75d95a25e0bd331f430073ccbc0d"},
+]
+
+[package.dependencies]
+azure-common = ">=1.1,<2.0"
+azure-mgmt-core = ">=1.3.2,<2.0.0"
+isodate = ">=0.6.1,<1.0.0"
+typing-extensions = {version = ">=4.3.0", markers = "python_version < \"3.8.0\""}
+
+[[package]]
 name = "azure-mgmt-authorization"
 version = "1.0.0"
 description = "Microsoft Azure Authorization Management Client Library for Python"
@@ -2475,4 +2493,4 @@ testing = ["big-O", "flake8 (<5)", "jaraco.functools", "jaraco.itertools", "more
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.7"
-content-hash = "abe6216f62f5904bdba2861b5cfc8f09491a87cfc5a50e591d4b8b2784429122"
+content-hash = "cafe0c98ff2b4761a904abbfde652ebb30d38973c977757fe45de4f44de77991"
