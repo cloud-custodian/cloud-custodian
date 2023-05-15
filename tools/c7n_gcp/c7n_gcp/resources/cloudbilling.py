@@ -3,8 +3,7 @@
 from c7n_gcp.provider import resources
 from c7n_gcp.query import QueryResourceManager, TypeInfo
 
-import jmespath
-
+from c7n.utils import jmespath_search
 
 @resources.register('cloudbilling-account')
 class CloudBillingAccount(QueryResourceManager):
@@ -26,5 +25,5 @@ class CloudBillingAccount(QueryResourceManager):
         @staticmethod
         def get(client, event):
             return client.execute_query(
-                'get', {'name': jmespath.search(
+                'get', {'name': jmespath_search(
                     'protoPayload.response.billingAccountInfo.billingAccountName', event)})

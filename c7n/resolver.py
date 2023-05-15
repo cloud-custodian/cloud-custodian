@@ -2,7 +2,6 @@
 # SPDX-License-Identifier: Apache-2.0
 import csv
 import io
-import jmespath
 import json
 import os.path
 import logging
@@ -13,7 +12,7 @@ import zlib
 from contextlib import closing
 
 from c7n.cache import NullCache
-from c7n.utils import format_string_values
+from c7n.utils import format_string_values, jmespath_search
 
 log = logging.getLogger('custodian.resolver')
 
@@ -199,7 +198,7 @@ class ValuesFrom:
             return set([s.strip() for s in io.StringIO(contents).readlines()])
 
     def _get_resource_values(self, data):
-        res = jmespath.search(self.data['expr'], data)
+        res = jmespath_search(self.data['expr'], data)
         if res is None:
             log.warning(f"ValueFrom filter: {self.data['expr']} key returned None")
         if isinstance(res, list):

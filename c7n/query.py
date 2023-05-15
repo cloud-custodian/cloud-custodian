@@ -11,7 +11,6 @@ import itertools
 import json
 from typing import List
 
-import jmespath
 import os
 
 from c7n.actions import ActionRegistry
@@ -21,7 +20,7 @@ from c7n.manager import ResourceManager
 from c7n.registry import PluginRegistry
 from c7n.tags import register_ec2_tags, register_universal_tags, universal_augment
 from c7n.utils import (
-    local_session, generate_arn, get_retry, chunks, camelResource)
+    local_session, generate_arn, get_retry, chunks, camelResource, jmespath_compile)
 
 
 try:
@@ -60,7 +59,7 @@ class ResourceQuery:
             data = op(**params)
 
         if path:
-            path = jmespath.compile(path)
+            path = jmespath_compile(path)
             data = path.search(data)
 
         return data

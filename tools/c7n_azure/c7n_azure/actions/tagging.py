@@ -6,7 +6,6 @@ import logging
 from abc import abstractmethod
 from email.utils import parseaddr
 
-import jmespath
 from c7n_azure import constants
 from c7n_azure.actions.base import AzureBaseAction, AzureEventAction
 from c7n_azure.tags import TagHelper
@@ -18,7 +17,7 @@ from c7n import utils
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import FilterValidationError
 from c7n.filters.offhours import Time
-from c7n.utils import type_schema
+from c7n.utils import type_schema, jmespath_compile
 from c7n.lookup import Lookup
 
 
@@ -253,12 +252,12 @@ class AutoTagUser(AutoTagBase):
     log = logging.getLogger('custodian.azure.tagging.AutoTagUser')
 
     # compiled JMES paths
-    service_admin_jmes_path = jmespath.compile(constants.EVENT_GRID_SERVICE_ADMIN_JMES_PATH)
-    sp_jmes_path = jmespath.compile(constants.EVENT_GRID_SP_NAME_JMES_PATH)
-    upn_jmes_path = jmespath.compile(constants.EVENT_GRID_UPN_CLAIM_JMES_PATH)
-    name_jmes_path = jmespath.compile(constants.EVENT_GRID_NAME_CLAIM_JMES_PATH)
-    principal_role_jmes_path = jmespath.compile(constants.EVENT_GRID_PRINCIPAL_ROLE_JMES_PATH)
-    principal_type_jmes_path = jmespath.compile(constants.EVENT_GRID_PRINCIPAL_TYPE_JMES_PATH)
+    service_admin_jmes_path = jmespath_compile(constants.EVENT_GRID_SERVICE_ADMIN_JMES_PATH)
+    sp_jmes_path = jmespath_compile(constants.EVENT_GRID_SP_NAME_JMES_PATH)
+    upn_jmes_path = jmespath_compile(constants.EVENT_GRID_UPN_CLAIM_JMES_PATH)
+    name_jmes_path = jmespath_compile(constants.EVENT_GRID_NAME_CLAIM_JMES_PATH)
+    principal_role_jmes_path = jmespath_compile(constants.EVENT_GRID_PRINCIPAL_ROLE_JMES_PATH)
+    principal_type_jmes_path = jmespath_compile(constants.EVENT_GRID_PRINCIPAL_TYPE_JMES_PATH)
 
     def __init__(self, data=None, manager=None, log_dir=None):
         super(AutoTagUser, self).__init__(data, manager, log_dir)
@@ -346,7 +345,7 @@ class AutoTagDate(AutoTagBase):
     schema = type_schema('auto-tag-date', rinherit=AutoTagBase.schema,
                          **{'format': {'type': 'string'}})
 
-    event_time_path = jmespath.compile(constants.EVENT_GRID_EVENT_TIME_PATH)
+    event_time_path = jmespath_compile(constants.EVENT_GRID_EVENT_TIME_PATH)
     log = logging.getLogger('custodian.azure.tagging.AutoTagDate')
 
     def __init__(self, data=None, manager=None, log_dir=None):

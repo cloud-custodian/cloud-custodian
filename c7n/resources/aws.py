@@ -170,8 +170,10 @@ def get_bucket_url_with_region(bucket_url, region):
     query = f"region={region}"
     if parsed.query:
         query = parsed.query + f"&region={region}"
-    parts = list(parsed)
-    parts[4] = query
+    parts = parsed._replace(
+        path=parsed.path.strip("/"),
+        query=query
+    )
     return urlparse.urlunparse(parts)
 
 
