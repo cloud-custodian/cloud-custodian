@@ -299,6 +299,33 @@ Value Type Transformations
                  - subnet-1b8474522
                  - subnet-2d2736444
 
+Additional JMESPath Functions
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Cloud Custodian supports additional custom JMESPath functions, including:
+
+- ``split(seperator, input_string) -> list[str]``: takes 2 arguments, the seperator token
+  as well as the input string. Returns a list of strings.
+
+  .. code-block:: yaml
+
+    policies:
+      - name: copy-related-tag-with-split
+        resource: aws.log-group
+        filters:
+          - type: value
+            key: logGroupName
+            value: "/aws/lambda/"
+            op: in
+            value_type: swap
+        actions:
+          - type: copy-related-tag
+            resource: aws.lambda
+            # split the log group's name to get the lambda function's name
+            key: "split(`/`, logGroupName)[-1]"
+            tags: "*"
+
+
 Value Regex
 ~~~~~~~~~~~
 

@@ -4,7 +4,6 @@
 from collections import Counter
 from datetime import datetime
 from dateutil.tz import tzutc
-import jmespath
 import json
 import hashlib
 import logging
@@ -17,7 +16,7 @@ from c7n.exceptions import PolicyValidationError, PolicyExecutionError
 from c7n.policy import LambdaMode, execution
 from c7n.utils import (
     local_session, type_schema, get_retry,
-    chunks, dumps, filter_empty, get_partition
+    chunks, dumps, filter_empty, get_partition, jmespath_search
 )
 from c7n.version import version
 
@@ -637,7 +636,7 @@ class OtherResourcePostFinding(PostFinding):
             details[k] = r[k]
 
         for f in self.fields:
-            value = jmespath.search(f['expr'], r)
+            value = jmespath_search(f['expr'], r)
             if not value:
                 continue
             details[f['key']] = value

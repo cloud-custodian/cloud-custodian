@@ -13,7 +13,6 @@ from collections import Counter
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import contextlib
 from dateutil.parser import parse
-import jmespath
 import json
 import jsonschema
 import logging
@@ -29,7 +28,7 @@ from c7n.credentials import SessionFactory
 from c7n.policy import PolicyCollection
 from c7n.resources import load_resources, aws
 from c7n.tags import UniversalTag
-from c7n.utils import local_session, chunks, reset_session_cache
+from c7n.utils import local_session, chunks, reset_session_cache, jmespath_search
 
 from c7n_org.cli import WORKER_COUNT, resolve_regions, get_session, _get_env_creds, init as org_init
 from c7n_org.utils import environ
@@ -159,7 +158,7 @@ def format_record(r):
 
     for rinfo in rinfos:
         # todo consider lite implementation
-        rid = jmespath.search(rinfo['ids'], r)
+        rid = jmespath_search(rinfo['ids'], r)
         if isinstance(rid, list):
             rid = " ,".join(rid)
         if rid:

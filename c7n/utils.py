@@ -1,6 +1,7 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import copy
+from collections import UserString
 from datetime import datetime, timedelta
 from dateutil.tz import tzutc
 import json
@@ -16,8 +17,11 @@ import time
 from urllib import parse as urlparse
 from urllib.request import getproxies, proxy_bypass
 
-
 from dateutil.parser import ParserError, parse
+
+import jmespath
+from jmespath import functions
+from jmespath.parser import Parser, ParsedResult
 
 from c7n import config
 from c7n.exceptions import ClientError, PolicyValidationError
@@ -680,6 +684,16 @@ def get_proxy_url(url):
     return None
 
 
+class DeferredFormatString(UserString):
+    """A string that returns itself when formatted
+
+    Let any format spec pass through. This lets us selectively defer
+    expansion of runtime variables without losing format spec details.
+    """
+    def __format__(self, format_spec):
+        return "".join(("{", self.data, f":{format_spec}" if format_spec else "", "}"))
+
+
 class FormatDate:
     """a datetime wrapper with extended pyformat syntax"""
 
@@ -912,3 +926,41 @@ def get_eni_resource_type(eni):
     else:
         rtype = 'unknown'
     return rtype
+
+
+class C7NJmespathFunctions(functions.Functions):
+    @functions.signature(
+        {'types': ['string']}, {'types': ['string']}
+    )
+    def _func_split(self, sep, string):
+        return string.split(sep)
+
+
+class C7NJMESPathParser(Parser):
+    def parse(self, expression):
+        result = super().parse(expression)
+        return ParsedResultWithOptions(
+            expression=result.expression,
+            parsed=result.parsed
+        )
+
+
+class ParsedResultWithOptions(ParsedResult):
+    def search(self, value, options=None):
+        # if options are explicitly passed in, we honor those
+        if not options:
+            options = jmespath.Options(custom_functions=C7NJmespathFunctions())
+        return super().search(value, options)
+
+
+def jmespath_search(*args, **kwargs):
+    return jmespath.search(
+        *args,
+        **kwargs,
+        options=jmespath.Options(custom_functions=C7NJmespathFunctions())
+    )
+
+
+def jmespath_compile(expression):
+    parsed = C7NJMESPathParser().parse(expression)
+    return parsed
