@@ -14,13 +14,21 @@ class FrontDoorTest(BaseTest):
     def test_find_by_name(self):
         p = self.load_policy({
             'name': 'test-azure-front-door',
-            'resource': 'azure.front-door',
+            'resource': 'azure.frontdoor',
             'filters': [
                 {'type': 'value',
                  'key': 'name',
                  'op': 'glob',
                  'value_type': 'normalize',
                  'value': 'ccfrontdoor*'}],
+        })
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_frontdoor_operations(self):
+        p = self.load_policy({
+            'name': 'test-azure-front-door',
+            'resource': 'azure.frontdoor-operations'
         })
         resources = p.run()
         self.assertEqual(len(resources), 1)
