@@ -1,6 +1,5 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
-import jmespath
 import json
 import time
 from collections import defaultdict
@@ -11,7 +10,7 @@ from c7n.exceptions import PolicyValidationError
 from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter, VpcFilter, Filter
 from c7n.manager import resources
 from c7n.query import ConfigSource, DescribeSource, QueryResourceManager, TypeInfo
-from c7n.utils import chunks, local_session, type_schema, merge_dict_list
+from c7n.utils import chunks, local_session, type_schema, merge_dict_list, jmespath_search
 from c7n.tags import Tag, RemoveTag, TagActionFilter, TagDelayedAction
 from c7n.filters.kms import KmsRelatedFilter
 import c7n.filters.policystatement as polstmt_filter
@@ -375,29 +374,29 @@ class ElasticSearchPostFinding(PostFinding):
             'Endpoint': r.get('Endpoint'),
             'Endpoints': r.get('Endpoints'),
             'DomainEndpointOptions': self.filter_empty({
-                'EnforceHTTPS': jmespath.search(
+                'EnforceHTTPS': jmespath_search(
                     'DomainEndpointOptions.EnforceHTTPS', r),
-                'TLSSecurityPolicy': jmespath.search(
+                'TLSSecurityPolicy': jmespath_search(
                     'DomainEndpointOptions.TLSSecurityPolicy', r)
             }),
             'ElasticsearchVersion': r['ElasticsearchVersion'],
             'EncryptionAtRestOptions': self.filter_empty({
-                'Enabled': jmespath.search(
+                'Enabled': jmespath_search(
                     'EncryptionAtRestOptions.Enabled', r),
-                'KmsKeyId': jmespath.search(
+                'KmsKeyId': jmespath_search(
                     'EncryptionAtRestOptions.KmsKeyId', r)
             }),
             'NodeToNodeEncryptionOptions': self.filter_empty({
-                'Enabled': jmespath.search(
+                'Enabled': jmespath_search(
                     'NodeToNodeEncryptionOptions.Enabled', r)
             }),
             'VPCOptions': self.filter_empty({
-                'AvailabilityZones': jmespath.search(
+                'AvailabilityZones': jmespath_search(
                     'VPCOptions.AvailabilityZones', r),
-                'SecurityGroupIds': jmespath.search(
+                'SecurityGroupIds': jmespath_search(
                     'VPCOptions.SecurityGroupIds', r),
-                'SubnetIds': jmespath.search('VPCOptions.SubnetIds', r),
-                'VPCId': jmespath.search('VPCOptions.VPCId', r)
+                'SubnetIds': jmespath_search('VPCOptions.SubnetIds', r),
+                'VPCId': jmespath_search('VPCOptions.VPCId', r)
             })
         }))
         return envelope

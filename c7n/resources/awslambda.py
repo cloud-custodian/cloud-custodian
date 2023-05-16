@@ -1,6 +1,5 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
-import jmespath
 import json
 from urllib.parse import urlparse, parse_qs
 
@@ -17,7 +16,16 @@ from c7n.manager import resources
 from c7n import query, utils
 from c7n.resources.iam import CheckPermissions, SpecificIamRoleManagedPolicy
 from c7n.tags import universal_augment
-from c7n.utils import local_session, type_schema, select_keys, get_human_size, parse_date, get_retry
+from c7n.utils import (
+    local_session,
+    type_schema,
+    select_keys,
+    get_human_size,
+    parse_date,
+    get_retry,
+    jmespath_search,
+    jmespath_compile
+)
 from botocore.config import Config
 from .securityhub import PostFinding
 
@@ -602,7 +610,7 @@ class SetConcurrency(Action):
         is_expr = self.data.get('expr', False)
         value = self.data['value']
         if is_expr:
-            value = jmespath.compile(value)
+            value = jmespath_compile(value)
 
         none_type = type(None)
 
@@ -873,8 +881,8 @@ class LambdaEdgeFilter(Filter):
         lambda_dist_map = {}
         for d in cfs:
             for exp in func_expressions:
-                if jmespath.search(exp, d):
-                    for function in jmespath.search(exp, d):
+                if jmespath_search(exp, d):
+                    for function in jmespath_search(exp, d):
                         # Geting rid of the version number in the arn
                         lambda_edge_arn = ':'.join(function['LambdaFunctionARN'].split(':')[:-1])
                         lambda_dist_map.setdefault(lambda_edge_arn, []).append(d['Id'])

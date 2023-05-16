@@ -1,7 +1,6 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
-import jmespath
 import json
 import itertools
 import logging
@@ -12,7 +11,7 @@ from c7n.actions import ActionRegistry
 from c7n.filters import FilterRegistry
 from c7n.manager import ResourceManager
 from c7n.query import sources, MaxResourceLimit
-from c7n.utils import local_session, chunks
+from c7n.utils import local_session, chunks, jmespath_search, jmespath_compile
 
 
 log = logging.getLogger('c7n_gcp.query')
@@ -53,12 +52,12 @@ class ResourceQuery:
         if client.supports_pagination(enum_op):
             results = []
             for page in client.execute_paged_query(enum_op, params):
-                page_items = jmespath.search(path, page)
+                page_items = jmespath_search(path, page)
                 if page_items:
                     results.extend(page_items)
             return results
         else:
-            return jmespath.search(path,
+            return jmespath_search(path,
                 client.execute_query(enum_op, verb_arguments=params))
 
 
@@ -325,7 +324,7 @@ class ChildResourceManager(QueryResourceManager):
         result = {}
 
         for mapping in mappings:
-            result[mapping[1]] = jmespath.search(mapping[0], source)
+            result[mapping[1]] = jmespath_search(mapping[0], source)
 
         return result
 
@@ -443,7 +442,7 @@ class TypeInfo(metaclass=TypeMeta):
         path = cls.urn_id_path
         if path is None:
             path = cls.id
-        id = jmespath.search(path, resource)
+        id = jmespath_search(path, resource)
         if cls.urn_id_segments:
             parts = id.split('/')
             id = '/'.join([parts[index] for index in cls.urn_id_segments])
@@ -481,9 +480,9 @@ class ChildTypeInfo(TypeInfo):
         return resource[cls.get_parent_annotation_key()]
 
 
-ERROR_REASON = jmespath.compile('error.errors[0].reason')
-ERROR_CODE = jmespath.compile('error.code')
-ERROR_MESSAGE = jmespath.compile('error.message')
+ERROR_REASON = jmespath_compile('error.errors[0].reason')
+ERROR_CODE = jmespath_compile('error.code')
+ERROR_MESSAGE = jmespath_compile('error.message')
 
 
 def extract_errors(e):

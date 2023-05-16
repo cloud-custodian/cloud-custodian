@@ -358,7 +358,31 @@ class PolicyMetaLint(BaseTest):
         # of a resource.
 
         whitelist = {
-            # q2 2023
+            # q2 2023 wave 2
+            "AWS::AppConfig::DeploymentStrategy",                                                                                                        
+            "AWS::AppFlow::Flow",
+            "AWS::AuditManager::Assessment",
+            "AWS::CloudWatch::MetricStream",
+            "AWS::DeviceFarm::InstanceProfile",
+            "AWS::DeviceFarm::Project",
+            "AWS::EC2::EC2Fleet",
+            "AWS::EC2::SubnetRouteTableAssociation",
+            "AWS::ECR::PullThroughCacheRule",
+            "AWS::GroundStation::Config",
+            "AWS::ImageBuilder::ImagePipeline",
+            "AWS::IoT::FleetMetric",
+            "AWS::IoTWireless::ServiceProfile",
+            "AWS::NetworkManager::Device",
+            "AWS::NetworkManager::GlobalNetwork",
+            "AWS::NetworkManager::Link",
+            "AWS::NetworkManager::Site",
+            "AWS::Panorama::Package",
+            "AWS::Pinpoint::App",
+            "AWS::Redshift::ScheduledAction",
+            "AWS::Route53Resolver::FirewallRuleGroupAssociation",
+            "AWS::SageMaker::AppImageConfig",
+            "AWS::SageMaker::Image",
+            # q2 2023 wave 1
             "AWS::AppStream::DirectoryConfig",
             "AWS::AutoScaling::WarmPool",
             "AWS::Connect::PhoneNumber",
@@ -1070,8 +1094,6 @@ class TestPolicy(BaseTest):
                 'member-role': 'arn:aws:iam::{account_id}:role/BarFoo',
                 'role': 'FooBar'},
             'actions': [
-                {'type': 'tag',
-                 'value': 'bad monkey {account_id} {region} {now:+2d%Y-%m-%d}'},
                 {'type': 'notify',
                  'to': ['me@example.com'],
                  'transport': {
@@ -1081,16 +1103,67 @@ class TestPolicy(BaseTest):
                  'subject': "S3 - Cross-Account -[custodian {{ account }} - {{ region }}]"},
             ]}, config={'account_id': '12312311', 'region': 'zanzibar'})
 
-        ivalue = 'bad monkey 12312311 zanzibar %s' % (
-            (datetime.utcnow() + timedelta(2)).strftime('%Y-%m-%d'))
         p.expand_variables(p.get_variables())
-        self.assertEqual(p.data['actions'][0]['value'], ivalue)
         self.assertEqual(
-            p.data['actions'][1]['subject'],
+            p.data['actions'][0]['subject'],
             "S3 - Cross-Account -[custodian {{ account }} - {{ region }}]")
         self.assertEqual(p.data['mode']['role'], 'arn:aws:iam::12312311:role/FooBar')
         self.assertEqual(p.data['mode']['member-role'], 'arn:aws:iam::{account_id}:role/BarFoo')
-        self.assertEqual(p.resource_manager.actions[0].data['value'], ivalue)
+
+    def test_now_interpolation(self):
+        """Test interpolation of the {now} placeholder
+
+        - Only interpolate the value at runtime, not during provisioning
+        - When deferring interpolation, pass through custom format specifiers
+        """
+
+        pull_mode_policy = self.load_policy({
+            'name': 'compute',
+            'resource': 'aws.ec2',
+            'actions': [
+                {'type': 'tag',
+                 'value': 'bad monkey {account_id} {region} {now:+2d%Y-%m-%d}'},
+                {'type': 'tag',
+                 'key': 'escaped_braces',
+                 'value': '{{now}}'},
+            ]}, config={'account_id': '12312311', 'region': 'zanzibar'})
+        lambda_mode_policy = self.load_policy({
+            **pull_mode_policy.data,
+            **{
+                'mode': {
+                    'type': 'config-rule',
+                    'role': 'FooBar'},
+            }
+        }, config=pull_mode_policy.ctx.options)
+
+        provision_time_value = 'bad monkey 12312311 zanzibar {now:+2d%Y-%m-%d}'
+        run_time_value = 'bad monkey 12312311 zanzibar %s' % (
+            (datetime.utcnow() + timedelta(2)).strftime('%Y-%m-%d'))
+
+        pull_mode_policy.expand_variables(pull_mode_policy.get_variables())
+        self.assertEqual(
+            pull_mode_policy.data['actions'][0]['value'],
+            run_time_value
+        )
+        self.assertEqual(
+            pull_mode_policy.resource_manager.actions[0].data['value'],
+            run_time_value
+        )
+
+        lambda_mode_policy.expand_variables(lambda_mode_policy.get_variables())
+        self.assertEqual(
+            lambda_mode_policy.data['actions'][0]['value'],
+            provision_time_value
+        )
+        self.assertEqual(
+            lambda_mode_policy.resource_manager.actions[0].data['value'],
+            provision_time_value
+        )
+        # Validate historical use of {{now}} to defer interpolation
+        self.assertEqual(
+            lambda_mode_policy.resource_manager.actions[1].data['value'],
+            '{now}'
+        )
 
     def test_child_resource_trail_validation(self):
         self.assertRaises(
