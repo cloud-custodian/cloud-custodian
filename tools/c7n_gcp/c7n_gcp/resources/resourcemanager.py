@@ -410,6 +410,39 @@ class OrgContactsFilter(ListItemFilter):
         for page in pages:
             contacts.extend(page.get('contacts', []))
         return contacts
+    
+@Organization.filter_registry.register('org-policy')
+class OrgPoliciesFilter(ListItemFilter):
+    """Filter Resources based on orgpolicy configuration
+
+    .. code-block:: yaml
+
+      - name: org-policy
+        resource: gcp.organization
+        filters:
+        - type: org-policy
+          attrs:
+            - type: value
+              key: constraint
+              value: constraints/iam.allowedPolicyMemberDomains
+              op: contains
+    """
+    schema = type_schema(
+        'org-policy',
+        attrs={'$ref': '#/definitions/filters_common/list_item_attrs'}
+    )
+
+    annotate_items = True
+    permissions = ("orgpolicy.policy.get",)
+
+    def get_item_values(self, resource):
+        session = local_session(self.manager.session_factory)
+        client = session.client("cloudresourcemanager", "v1", "organizations")
+        pages = client.execute_paged_query('listOrgPolicies', { 'resource': resource['name'] })
+        policies = []
+        for page in pages:
+            policies.extend(page.get('policies', []))
+        return policies
 
 
 @Project.filter_registry.register('access-approval')
