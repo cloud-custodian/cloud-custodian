@@ -1,0 +1,168 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.AppPlatform/Spring?api-version=2022-12-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Wed, 10 May 2023 22:52:48 GMT"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-resource-requests": [
+                        "11999"
+                    ],
+                    "content-length": [
+                        "921"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "properties": {
+                                    "provisioningState": "Succeeded",
+                                    "zoneRedundant": false,
+                                    "version": 3,
+                                    "serviceId": "3678cebb6e5b4b43a2c79d9a257f9009",
+                                    "networkProfile": {
+                                        "outboundIPs": {
+                                            "publicIPs": [
+                                                "20.221.83.90"
+                                            ]
+                                        },
+                                        "outboundType": "loadBalancer"
+                                    },
+                                    "powerState": "Running",
+                                    "fqdn": "test-spring-service2.azuremicroservices.io"
+                                },
+                                "type": "Microsoft.AppPlatform/Spring",
+                                "sku": {
+                                    "name": "B0",
+                                    "tier": "Basic"
+                                },
+                                "location": "centralus",
+                                "tags": {
+                                    "product_id": "13742",
+                                    "created_by": "abc@def.com"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/temp-test-spring-apps/providers/Microsoft.AppPlatform/Spring/test-spring-service2",
+                                "name": "test-spring-service2",
+                                "systemData": {
+                                    "createdBy": "abc@def.com",
+                                    "createdByType": "User",
+                                    "createdAt": "2023-05-10T21:14:40.0760641Z",
+                                    "lastModifiedBy": "5248d4c8-2530-4bc3-98d3-a01744561df5",
+                                    "lastModifiedByType": "Application",
+                                    "lastModifiedAt": "2023-05-10T22:15:18.0213302Z"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/temp-test-spring-apps/providers/Microsoft.AppPlatform/Spring/test-spring-service2/apps?api-version=2022-12-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-rp-server-mvid": [
+                        "3f0be3de-b54c-4127-959a-365fde51af69"
+                    ],
+                    "content-type": [
+                        "application/json"
+                    ],
+                    "request-context": [
+                        "appId=cid-v1:797d7e4e-8180-497e-a254-780fbd39ba4d"
+                    ],
+                    "date": [
+                        "Wed, 10 May 2023 22:52:48 GMT"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-resource-requests": [
+                        "11999"
+                    ],
+                    "content-length": [
+                        "1152"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "properties": {
+                                    "addonConfigs": {
+                                        "applicationConfigurationService": {},
+                                        "serviceRegistry": {}
+                                    },
+                                    "public": false,
+                                    "provisioningState": "Succeeded",
+                                    "fqdn": "test-spring-service2.azuremicroservices.io",
+                                    "httpsOnly": false,
+                                    "temporaryDisk": {
+                                        "sizeInGB": 5,
+                                        "mountPath": "/tmp"
+                                    },
+                                    "persistentDisk": {
+                                        "sizeInGB": 0,
+                                        "mountPath": "/persistent"
+                                    },
+                                    "enableEndToEndTLS": false,
+                                    "ingressSettings": {
+                                        "readTimeoutInSeconds": 300,
+                                        "sendTimeoutInSeconds": 60,
+                                        "sessionCookieMaxAge": 0,
+                                        "sessionAffinity": "None",
+                                        "backendProtocol": "Default"
+                                    }
+                                },
+                                "type": "Microsoft.AppPlatform/Spring/apps",
+                                "identity": {
+                                    "type": "SystemAssigned",
+                                    "principalId": "55e8d01b-e5f8-4d81-9f6d-483cc8700abd",
+                                    "tenantId": "00000000-0000-0000-0000-000000000003"
+                                },
+                                "location": "centralus",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/temp-test-spring-apps/providers/Microsoft.AppPlatform/Spring/test-spring-service2/apps/test-spring-app",
+                                "name": "test-spring-app",
+                                "systemData": {
+                                    "createdBy": "abc@def.com",
+                                    "createdByType": "User",
+                                    "createdAt": "2023-05-10T21:20:39.5498364Z",
+                                    "lastModifiedBy": "abc@def.com",
+                                    "lastModifiedByType": "User",
+                                    "lastModifiedAt": "2023-05-10T21:21:34.9400574Z"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}
