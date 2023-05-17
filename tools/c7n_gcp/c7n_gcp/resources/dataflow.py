@@ -25,6 +25,7 @@ class DataflowJob(QueryResourceManager):
         permissions = ('dataflow.jobs.list',)
         urn_component = "job"
         urn_region_key = 'location'
+        asset_type = "dataflow.googleapis.com/Job"
 
         @staticmethod
         def get(client, event):
