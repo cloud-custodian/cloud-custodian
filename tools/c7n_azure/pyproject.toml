@@ -83,6 +83,7 @@ azure-mgmt-trafficmanager = "^0.51.0"
 azure-mgmt-frontdoor = "^1.0.0"
 azure-mgmt-security = "^1.0.0"
 azure-mgmt-servicebus = "^8.2.0"
+azure-mgmt-appplatform = "^8.0.0"
 
 [tool.poetry.dev-dependencies]
 # setup custodian as a dev dependency

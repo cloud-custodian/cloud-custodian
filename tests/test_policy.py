@@ -358,7 +358,31 @@ class PolicyMetaLint(BaseTest):
         # of a resource.
 
         whitelist = {
-            # q2 2023
+            # q2 2023 wave 2
+            "AWS::AppConfig::DeploymentStrategy",                                                                                                        
+            "AWS::AppFlow::Flow",
+            "AWS::AuditManager::Assessment",
+            "AWS::CloudWatch::MetricStream",
+            "AWS::DeviceFarm::InstanceProfile",
+            "AWS::DeviceFarm::Project",
+            "AWS::EC2::EC2Fleet",
+            "AWS::EC2::SubnetRouteTableAssociation",
+            "AWS::ECR::PullThroughCacheRule",
+            "AWS::GroundStation::Config",
+            "AWS::ImageBuilder::ImagePipeline",
+            "AWS::IoT::FleetMetric",
+            "AWS::IoTWireless::ServiceProfile",
+            "AWS::NetworkManager::Device",
+            "AWS::NetworkManager::GlobalNetwork",
+            "AWS::NetworkManager::Link",
+            "AWS::NetworkManager::Site",
+            "AWS::Panorama::Package",
+            "AWS::Pinpoint::App",
+            "AWS::Redshift::ScheduledAction",
+            "AWS::Route53Resolver::FirewallRuleGroupAssociation",
+            "AWS::SageMaker::AppImageConfig",
+            "AWS::SageMaker::Image",
+            # q2 2023 wave 1
             "AWS::AppStream::DirectoryConfig",
             "AWS::AutoScaling::WarmPool",
             "AWS::Connect::PhoneNumber",
