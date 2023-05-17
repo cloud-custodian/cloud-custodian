@@ -238,12 +238,19 @@ class SnapshotCrossAccountAccess(CrossAccountAccessFilter):
 
     def process_resource_set(self, client, resource_set):
         results = []
+        everyone_only = self.data.get('everyone_only', False)
         for r in resource_set:
             attrs = self.manager.retry(
                 client.describe_snapshot_attribute,
                 SnapshotId=r['SnapshotId'],
                 Attribute='createVolumePermission')['CreateVolumePermissions']
-            shared_accounts = {
+            shared_accounts = set()
+            if everyone_only:
+                for g in attrs:
+                    if g.get('Group') == 'all':
+                        shared_accounts = {g.get('Group')}
+            else:
+                shared_accounts = {
                 g.get('Group') or g.get('UserId') for g in attrs}
             delta_accounts = shared_accounts.difference(self.accounts)
             if delta_accounts:

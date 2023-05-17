@@ -1,10 +1,10 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
-import jmespath
 from googleapiclient.errors import HttpError
 
 from c7n_gcp.provider import resources
 from c7n_gcp.query import QueryResourceManager, TypeInfo
+from c7n.utils import jmespath_search
 
 
 @resources.register('dataflow-job')
@@ -30,8 +30,8 @@ class DataflowJob(QueryResourceManager):
         def get(client, event):
             return client.execute_command(
                 'get', {
-                    'projectId': jmespath.search('resource.labels.project_id', event),
-                    'jobId': jmespath.search('protoPayload.request.job_id', event)
+                    'projectId': jmespath_search('resource.labels.project_id', event),
+                    'jobId': jmespath_search('protoPayload.request.job_id', event)
                 }
             )
 

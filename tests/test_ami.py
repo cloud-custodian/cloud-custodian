@@ -1,10 +1,9 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
-import jmespath
-
 from c7n.exceptions import ClientError, PolicyValidationError
 from c7n.resources.ami import ErrorHandler
 from c7n.query import DescribeSource
+from c7n.utils import jmespath_search
 from .common import BaseTest
 
 
@@ -337,7 +336,7 @@ class TestAMI(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 2)
         client = factory().client('ec2')
-        snap_ids = jmespath.search(
+        snap_ids = jmespath_search(
             'BlockDeviceMappings[].Ebs.SnapshotId', resources[0])
         self.assertRaises(
             ClientError, client.describe_snapshots, SnapshotIds=snap_ids, OwnerIds=['self'])

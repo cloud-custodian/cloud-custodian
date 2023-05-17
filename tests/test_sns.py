@@ -472,6 +472,68 @@ class TestSNS(BaseTest):
         self.assertTrue("RemoveMe" not in statement_ids)
         self.assertTrue("SpecificAllow" in statement_ids)
 
+    def test_sns_modify_add_policy_without_sid(self):
+        session_factory = self.replay_flight_data("test_sns_modify_add_policy_without_sid")
+        client = session_factory().client("sns")
+        name = "c7n-test-rbp-no-sid"
+        topic_arn = client.create_topic(Name=name)["TopicArn"]
+        self.addCleanup(client.delete_topic, TopicArn=topic_arn)
+
+        client.set_topic_attributes(
+            TopicArn=topic_arn,
+            AttributeName="Policy",
+            AttributeValue=json.dumps(
+                {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                        {
+                            "Effect": "Allow",
+                            "Principal": "*",
+                            "Action": ["SNS:Subscribe"],
+                            "Resource": topic_arn,
+                        }
+                    ],
+                }
+            ),
+        )
+
+        p = self.load_policy(
+            {
+                "name": "sns-modify-add-policy-without-sid",
+                "resource": "sns",
+                "filters": [{"TopicArn": topic_arn}],
+                "actions": [
+                    {
+                        "type": "modify-policy",
+                        "add-statements": [
+                            {
+                                "Sid": "AddMe",
+                                "Effect": "Allow",
+                                "Principal": "*",
+                                "Action": ["SNS:GetTopicAttributes"],
+                                "Resource": topic_arn,
+                            }
+                        ],
+                        "remove-statements": [],
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        data = json.loads(
+            client.get_topic_attributes(TopicArn=resources[0]["TopicArn"])[
+                "Attributes"
+            ][
+                "Policy"
+            ]
+        )
+        self.assertEqual(len(data.get('Statement')), 2)
+        self.assertTrue("AddMe" in [s.get("Sid") for s in data.get("Statement", ())])
+
     def test_sns_topic_encryption(self):
         session_factory = self.replay_flight_data('test_sns_kms_related_filter_test')
         kms = session_factory().client('kms', region_name='ap-northeast-2')

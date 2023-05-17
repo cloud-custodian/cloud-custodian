@@ -1,7 +1,6 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 from datetime import datetime
-import jmespath
 
 from .core import BaseAction
 from c7n.manager import resources
@@ -118,7 +117,7 @@ class PutMetric(BaseAction):
         values = []
         self.log.debug("searching for %s in %s", key_expression, resources)
         try:
-            values = jmespath.search("Resources[]." + key_expression,
+            values = utils.jmespath_search("Resources[]." + key_expression,
                                      {'Resources': resources})
             # I had to wrap resourses in a dict like this in order to not have jmespath expressions
             # start with [] in the yaml files.  It fails to parse otherwise.

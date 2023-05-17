@@ -60,6 +60,8 @@ ResourceMap = {
     "azure.servicebus-namespace": "c7n_azure.resources.servicebus_namespace.ServiceBusNamespace",
     "azure.service-fabric-cluster": "c7n_azure.resources.service_fabric.ServiceFabricCluster",
     "azure.service-fabric-cluster-managed": "c7n_azure.resources.service_fabric.ServiceFabricClusterManaged",  # noqa
+    "azure.spring-app": "c7n_azure.resources.spring.SpringApp",
+    "azure.spring-service-instance": "c7n_azure.resources.spring.SpringServiceInstance",
     "azure.sql-database": "c7n_azure.resources.sqldatabase.SqlDatabase",
     "azure.sqldatabase": "c7n_azure.resources.sqldatabase.SqlDatabase",
     "azure.sql-server": "c7n_azure.resources.sqlserver.SqlServer",

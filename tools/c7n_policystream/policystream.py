@@ -11,7 +11,6 @@ from dateutil.tz import tzoffset, tzutc
 from dateutil.parser import parse
 from fnmatch import fnmatch
 from functools import partial, reduce
-import jmespath
 import json
 import logging
 import shutil
@@ -27,7 +26,7 @@ from c7n.credentials import SessionFactory
 from c7n.policy import PolicyCollection as BaseCollection
 from c7n.policy import Policy as BasePolicy
 from c7n.resources import load_available
-from c7n.utils import get_retry
+from c7n.utils import get_retry, jmespath_search
 
 import boto3
 
@@ -669,11 +668,11 @@ def github_repos(organization, github_url, github_token):
             raise ValueError("Github api error %s" % (
                 response.content.decode('utf8'),))
 
-        repos = jmespath.search(
+        repos = jmespath_search(
             'data.organization.repositories.edges[].node', result)
         for r in repos:
             yield r
-        page_info = jmespath.search(
+        page_info = jmespath_search(
             'data.organization.repositories.pageInfo', result)
         if page_info:
             next_cursor = (page_info['hasNextPage'] and

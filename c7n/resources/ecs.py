@@ -7,10 +7,9 @@ from c7n.exceptions import PolicyExecutionError
 from c7n.filters import MetricsFilter, ValueFilter, Filter
 from c7n.filters.offhours import OffHour, OnHour
 from c7n.manager import resources
-from c7n.utils import local_session, chunks, get_retry, type_schema, group_by
+from c7n.utils import local_session, chunks, get_retry, type_schema, group_by, jmespath_compile
 from c7n import query
 from c7n.query import DescribeSource, ConfigSource
-import jmespath
 from c7n.tags import Tag, TagDelayedAction, RemoveTag, TagActionFilter
 from c7n.actions import AutoTagUser, AutoscalingBase
 import c7n.filters.vpc as net_filters
@@ -306,7 +305,7 @@ class SubnetFilter(net_filters.SubnetFilter):
     def get_related_ids(self, resources):
         subnet_ids = set()
         for exp in self.expressions:
-            cexp = jmespath.compile(exp)
+            cexp = jmespath_compile(exp)
             for r in resources:
                 ids = cexp.search(r)
                 if ids:

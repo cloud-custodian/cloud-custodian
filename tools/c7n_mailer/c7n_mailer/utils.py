@@ -8,8 +8,9 @@ import os
 import time
 import yaml
 
-import jinja2
 import jmespath
+
+import jinja2
 from dateutil import parser
 from dateutil.tz import gettz, tzutc
 
