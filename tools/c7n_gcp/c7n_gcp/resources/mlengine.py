@@ -1,9 +1,8 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
-import jmespath
-
 from c7n_gcp.provider import resources
 from c7n_gcp.query import QueryResourceManager, TypeInfo
+from c7n.utils import jmespath_search
 
 
 @resources.register('ml-model')
@@ -29,7 +28,7 @@ class MLModel(QueryResourceManager):
         @staticmethod
         def get(client, event):
             return client.execute_query(
-                'get', {'name': jmespath.search(
+                'get', {'name': jmespath_search(
                     'protoPayload.response.name', event
                 )})
 
@@ -57,5 +56,5 @@ class MLJob(QueryResourceManager):
         def get(client, event):
             return client.execute_query(
                 'get', {'name': 'projects/{}/jobs/{}'.format(
-                    jmespath.search('resource.labels.project_id', event),
-                    jmespath.search('protoPayload.response.jobId', event))})
+                    jmespath_search('resource.labels.project_id', event),
+                    jmespath_search('protoPayload.response.jobId', event))})

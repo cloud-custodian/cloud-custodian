@@ -136,6 +136,7 @@ class LoadBalancingSslPolicy(QueryResourceManager):
             "name", "description", "profile", "minTlsVersion"
         ]
         urn_component = "ssl-policy"
+        asset_type = "compute.googleapis.com/SslPolicy"
 
         @staticmethod
         def get(client, resource_info):

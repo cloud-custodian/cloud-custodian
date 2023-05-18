@@ -6,8 +6,6 @@ try:
 except ImportError:
     certifi = None
 
-import jmespath
-
 import urllib3
 from urllib import parse
 
@@ -129,7 +127,7 @@ class Webhook(EventAction):
             return urllib3.PoolManager(**pool_kwargs)
 
     def _build_headers(self, resource):
-        return {k: jmespath.search(v, resource) for k, v in self.headers.items()}
+        return {k: utils.jmespath_search(v, resource) for k, v in self.headers.items()}
 
     def _build_url(self, resource):
         """
@@ -142,7 +140,9 @@ class Webhook(EventAction):
         if not self.query_params:
             return self.url
 
-        evaluated_params = {k: jmespath.search(v, resource) for k, v in self.query_params.items()}
+        evaluated_params = {
+            k: utils.jmespath_search(v, resource) for k, v in self.query_params.items()
+        }
 
         url_parts = list(parse.urlparse(self.url))
         query = dict(parse.parse_qsl(url_parts[4]))
@@ -157,4 +157,4 @@ class Webhook(EventAction):
         if not self.body:
             return None
 
-        return utils.dumps(jmespath.search(self.body, resource)).encode('utf-8')
+        return utils.dumps(utils.jmespath_search(self.body, resource)).encode('utf-8')

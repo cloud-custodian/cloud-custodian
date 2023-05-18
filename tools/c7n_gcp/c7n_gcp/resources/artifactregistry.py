@@ -24,6 +24,7 @@ class ArtifactRegistryRepository(RegionalResourceManager):
         }
         permissions = ('artifactregistry.repositories.list',)
         default_report_fields = ['displayName', 'expireTime']
+        asset_type = "artifactregistry.googleapis.com/Repository"
 
     def _get_child_enum_args(self, parent_instance):
         return {

@@ -1,8 +1,6 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
-import jmespath
-
-from c7n.utils import type_schema
+from c7n.utils import type_schema, jmespath_search
 from c7n_gcp.query import QueryResourceManager, TypeInfo, ChildTypeInfo, ChildResourceManager
 from c7n_gcp.provider import resources
 from c7n_gcp.actions import MethodAction
@@ -41,7 +39,7 @@ class DataSet(QueryResourceManager):
                     raise RuntimeError("unknown event %s" % event)
                 expr = 'protoPayload.serviceData.dataset{}Response.resource.datasetName'.format(
                     method.capitalize())
-                ref = jmespath.search(expr, event)
+                ref = jmespath_search(expr, event)
             else:
                 ref = event
             return client.execute_query('get', verb_arguments=ref)
@@ -77,8 +75,8 @@ class BigQueryJob(QueryResourceManager):
         @staticmethod
         def get(client, event):
             return client.execute_query('get', {
-                'projectId': jmespath.search('resource.labels.project_id', event),
-                'jobId': jmespath.search(
+                'projectId': jmespath_search('resource.labels.project_id', event),
+                'jobId': jmespath_search(
                     'protoPayload.metadata.tableCreation.jobName', event
                 ).rsplit('/', 1)[-1]
             })

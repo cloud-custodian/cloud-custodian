@@ -3,7 +3,6 @@
 from datetime import datetime
 from dateutil import tz as tzutil
 
-import jmespath
 import pytest
 from pytest_terraform import terraform
 
@@ -12,6 +11,7 @@ from .common import BaseTest
 from c7n.exceptions import PolicyValidationError
 from c7n.resources.asg import LaunchInfo
 from c7n.resources.aws import shape_validate
+from c7n.utils import jmespath_search
 
 
 class LaunchConfigTest(BaseTest):
@@ -126,7 +126,7 @@ def test_asg_propagate_tag_action(test, aws_asg):
     resources = p.run()
     test.assertEqual(len(resources), 1)
     client = factory().client('ec2')
-    itags = {t['Key']: t['Value'] for t in jmespath.search(
+    itags = {t['Key']: t['Value'] for t in jmespath_search(
         'Reservations[0].Instances[0].Tags',
         client.describe_instances(
             InstanceIds=[resources[0]['Instances'][0]['InstanceId']]))}

@@ -10,7 +10,6 @@ import time
 from typing import List
 
 from dateutil import parser, tz as tzutil
-import jmespath
 
 from c7n.cwe import CloudWatchEvents
 from c7n.ctx import ExecutionContext
@@ -25,7 +24,7 @@ from c7n import deprecated, utils
 from c7n.version import version
 from c7n.query import RetryPageIterator
 from c7n.varfmt import VarFormat
-from c7n.utils import get_policy_provider
+from c7n.utils import get_policy_provider, jmespath_compile
 
 log = logging.getLogger('c7n.policy')
 
@@ -692,7 +691,7 @@ class CloudTrailMode(LambdaMode):
             if isinstance(e, str):
                 assert e in CloudWatchEvents.trail_events, "event shortcut not defined: %s" % e
             if isinstance(e, dict):
-                jmespath.compile(e['ids'])
+                jmespath_compile(e['ids'])
         if isinstance(self.policy.resource_manager, query.ChildResourceManager):
             if not getattr(self.policy.resource_manager.resource_type,
                            'supports_trailevents', False):
@@ -757,9 +756,9 @@ class GuardDutyMode(LambdaMode):
     supported_resources = ('account', 'ec2', 'iam-user')
 
     id_exprs = {
-        'account': jmespath.compile('detail.accountId'),
-        'ec2': jmespath.compile('detail.resource.instanceDetails.instanceId'),
-        'iam-user': jmespath.compile('detail.resource.accessKeyDetails.userName')}
+        'account': jmespath_compile('detail.accountId'),
+        'ec2': jmespath_compile('detail.resource.instanceDetails.instanceId'),
+        'iam-user': jmespath_compile('detail.resource.accessKeyDetails.userName')}
 
     def get_member_account_id(self, event):
         return event['detail']['accountId']
