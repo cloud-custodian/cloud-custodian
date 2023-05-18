@@ -16,7 +16,7 @@ class CdnEndpoint(ChildArmResourceManager):
 
         policies:
           - name: standard-verizon
-            resource: azure.cdnendpoint
+            resource: azure.cdn-endpoint
             filters:
               - type: value
                 key: sku
