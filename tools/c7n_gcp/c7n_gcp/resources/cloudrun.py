@@ -16,8 +16,9 @@ class CloudRunService(QueryResourceManager):
         scope = "project"
         scope_key = "parent"
         scope_template = "projects/{}/locations/-"
-        name = id = "name"
-        default_report_fields = ["name", "updateTime", "uri"]
+        name = "metadata.name"
+        id = "metadata.selfLink"
+        default_report_fields = ["metadata.name", "metadata.creationTimestamp"]
         asset_type = "run.googleapis.com/Service"
 
 
@@ -35,6 +36,7 @@ class CloudRunJob(QueryResourceManager):
         scope_key = "parent"
         scope_template = "namespaces/{}"
         # scope_template = "projects/{}/locations/-"
-        name = id = "name"
-        default_report_fields = ["name", "updateTime"]
+        name = "metadata.name"
+        id = "metadata.selfLink"
+        default_report_fields = ["metadata.name", "metadata.creationTimestamp"]
         asset_type = "run.googleapis.com/Job"

@@ -138,7 +138,7 @@ class Firewall(QueryResourceManager):
         name = id = "name"
         default_report_fields = [
             name, "description", "network", "priority", "creationTimestamp",
-            "logConfig.enabled", "disabled"]
+            "logConfig.enable", "disabled"]
         asset_type = "compute.googleapis.com/Firewall"
         scc_type = "google.compute.Firewall"
         metric_key = 'metric.labels.firewall_name'
