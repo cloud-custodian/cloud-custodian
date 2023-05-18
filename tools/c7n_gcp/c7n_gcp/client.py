@@ -179,7 +179,7 @@ class Session:
         if not credentials:
             # Only share the http object when using the default credentials.
             self._use_cached_http = True
-            default_credentials, default_project = google.auth.default(quota_project_id=project_id or
+            default_credentials, _ = google.auth.default(quota_project_id=project_id or
             get_default_project())
         if GOOGLE_IMPERSONATE_SERVICE_ACCOUNT:
             impersonated_credentials = google.auth.impersonated_credentials.Credentials(
