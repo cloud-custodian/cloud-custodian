@@ -77,12 +77,14 @@ class ApplicationGatewayWafFilter(Filter):
             if 'firewallPolicy' in resource['properties']:
                 waf_policy_name = resource['properties']['firewallPolicy']['id'].split('/')[-1]
 
-                app_gate_waf = client.web_application_firewall_policies.get(resource['resourceGroup'],waf_policy_name)
+                app_gate_waf = client.web_application_firewall_policies.\
+                    get(resource['resourceGroup'],waf_policy_name)
 
                 for rule_set in app_gate_waf.managed_rules.managed_rule_sets:
                     for group in rule_set.rule_group_overrides:
                         for rule in group.rules:
-                            if filter_override_rule == rule.rule_id and filter_state.lower() == rule.state.lower():
+                            if filter_override_rule == rule.rule_id \
+                                and filter_state.lower() == rule.state.lower():
                                 result.append(resource)
         
         return result
