@@ -11,24 +11,32 @@ class FrontDoorTest(BaseTest):
         }, validate=True)
         self.assertTrue(p)
 
-    def test_find_by_name(self):
+    def test_frontdoor_cdn(self):
         p = self.load_policy({
-            'name': 'test-azure-front-door',
-            'resource': 'azure.frontdoor',
+            'name': 'test-frontdoor-cdn',
+            'resource': 'azure.frontdoor-cdn'
+        })
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
+    
+    def test_frontdoor_waf_managed_rule_enabled(self):
+        p = self.load_policy({
+            'name': 'frontdoor-waf-managed-rule-is-enabled',
+            'resource': 'azure.frontdoor-waf',
             'filters': [
-                {'type': 'value',
-                 'key': 'name',
-                 'op': 'glob',
-                 'value_type': 'normalize',
-                 'value': 'ccfrontdoor*'}],
+                {'type': 'frontdoor-waf-managed-rule-is-enabled',
+                 'group': 'JAVA',
+                 'id': 944240}]
         })
         resources = p.run()
-        self.assertEqual(len(resources), 1)
+        self.assertEqual(len(resources), 0)
 
-    def test_frontdoor_operations(self):
+    def test_frontdoor_waf_enabled(self):
         p = self.load_policy({
-            'name': 'test-azure-front-door',
-            'resource': 'azure.frontdoor-operations'
+            'name': 'test-frontdoor-waf-is-enabled',
+            'resource': 'azure.frontdoor-cdn',
+            'filters': [
+                {'type': 'frontdoor-waf-is-enabled'}]
         })
         resources = p.run()
-        self.assertEqual(len(resources), 1)
+        self.assertEqual(len(resources), 0)

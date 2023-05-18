@@ -38,7 +38,7 @@ class FrontDoor(ArmResourceManager):
 
 @resources.register('frontdoor-cdn')
 class FrontDoorCDN(ArmResourceManager):
-    """Azure Front Door Resource
+    """Azure CDN Front Door Resource
 
     :example:
 
@@ -65,44 +65,81 @@ class FrontDoorCDN(ArmResourceManager):
         )
         resource_type = 'Microsoft.Cdn/profiles'
     
-    def _process_resource(self, resource, account_client, throughput):
-        offer = resource['c7n:offer']
-        new_offer = dict(offer)
-        new_offer.pop('c7n:MatchedFilters', None)
-        new_offer['content']['offerThroughput'] = throughput
-        account_client.ReplaceOffer(offer['_self'], new_offer)
 
-@FrontDoorCDN.filter_registry.register('frontdoor-waf-policy')
-class WebAppFirewallFilter(Filter):
-    p_annotation_key = 'c7n:WAFPolicy'
-    p_missing_key = 'c7n:WAFPolicyMissing'
+@FrontDoorCDN.filter_registry.register('frontdoor-waf-is-enabled')
+class WebAppFirewallMissingFilter(Filter):
     schema = type_schema(
-        'frontdoor-waf-policy'
+        'frontdoor-waf-is-enabled'
     )
     
     def process(self, resources, event=None):
         client = self.manager.get_client()
-        session = local_session(self.manager.session_factory)
-        frontDoor_client = session.client('azure.mgmt.frontdoor.FrontDoorManagementClient')
         results = []
         for r in resources:
-            if not r["sku"].get("name") == "Premium_AzureFrontDoor" or not r["properties"].get("resourceState") == "Active" or not r["properties"].get("provisioningState") =="Succeeded":
-                continue
+            if not r["properties"].get("resourceState") == "Active" or not r["properties"].get("provisioningState") =="Succeeded":
+                if not r["sku"].get("name") == "Premium_AzureFrontDoor" and not r["sku"].get("name") == "Standard_AzureFrontDoor" and not r["sku"].get("name") == "Classic_AzureFrontDoor":
+                    continue
             policies = list(client.security_policies.list_by_profile(r["resourceGroup"],r["name"]))
-            if not policies and self.data['key'] == 'missing':
-                r[self.p_missing_key] = {'WAFPolicyMissing':r['name']}
+            if not policies:
                 results.append(r)
-            for ruleset in policies:
-                waf_policy_id = ResourceIdParser.get_resource_name(ruleset.parameters.waf_policy.id)
-                rules = frontDoor_client.policies.get(r["resourceGroup"],waf_policy_id)
-                for managedset in rules.managed_rules.managed_rule_sets:
-                    for overrides in managedset.rule_group_overrides:
-                        if (overrides.rule_group_name == self.data['key']):
-                            for ja in overrides.rules:
-                                if ja.rule_id == str(self.data['name']) and ja.enabled_state == self.data['state']:
-                                    r[self.p_annotation_key] = {'WAFPolicy':r['name']}
-                                    results.append(r)
+        return results
 
+@resources.register('frontdoor-waf')
+class FrontDoorWAF(ArmResourceManager):
+    """Azure Front Door Web Application Firewall Resource
+
+    :example:
+
+    This policy will find all Front Door Web Application Firewalls
+
+    .. code-block:: yaml
+
+        policies:
+          - name: frontdoor-waf
+            resource: azure.frontdoor-waf
+    """
+
+    class resource_type(ArmResourceManager.resource_type):
+        doc_groups = ['Resource Group', 'Subscription']
+
+        service = 'azure.mgmt.resource'
+        client = 'ResourceManagementClient'
+        enum_spec = ('resources', 'list', None)
+
+        default_report_fields = (
+            'name',
+            'location',
+        )
+        resource_type = 'resources'
+
+@FrontDoorWAF.filter_registry.register('frontdoor-waf-managed-rule-is-enabled')
+class WebAppFirewallManagedRuleEnabledFilter(Filter):
+    resource_type_name = 'Microsoft.Network/frontdoorWebApplicationFirewallPolicies'
+    p_annotation_key = 'c7n:WAFRuleDisabled'
+    schema = type_schema(
+        'frontdoor-waf-managed-rule-is-enabled', **{
+            'group': {'type': 'string'},
+            'id': {'type': 'number'}}
+    )
+
+    def process(self, resources, event=None):
+        session = self.manager.get_session()
+        client = session.client('azure.mgmt.frontdoor.FrontDoorManagementClient')
+        results = []
+        for resource in resources:
+            if resource['type'] == self.resource_type_name:
+                if not resource["sku"].get("name") == "Premium_AzureFrontDoor" and not resource["sku"].get("name") == "Classic_AzureFrontDoor":
+                    continue
+                waf_policy_id = ResourceIdParser.get_resource_name(resource['id'])
+                policy = client.policies.get(resource['resourceGroup'],waf_policy_id)
+                for managedset in policy.managed_rules.managed_rule_sets:
+                    for overrides in managedset.rule_group_overrides:
+                        if (overrides.rule_group_name == self.data['group']):
+                            for ja in overrides.rules:
+                                if ja.rule_id == str(self.data['id']):
+                                    if ja.enabled_state == 'Disabled':
+                                        resource[self.p_annotation_key] = {'Disabled Rule Id':ja.rule_id}
+                                        results.append(resource)
         return results
     
         

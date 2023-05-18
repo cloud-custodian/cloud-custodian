@@ -1,0 +1,749 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resources?api-version=2020-10-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-length": [
+                        "11813"
+                    ],
+                    "date": [
+                        "Thu, 18 May 2023 23:48:01 GMT"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cb-test-access/providers/Microsoft.Storage/storageAccounts/cbteststorage",
+                                "name": "cbteststorage",
+                                "type": "Microsoft.Storage/storageAccounts",
+                                "sku": {
+                                    "name": "Standard_LRS",
+                                    "tier": "Standard"
+                                },
+                                "kind": "StorageV2",
+                                "location": "westus2",
+                                "tags": {
+                                    "product_id": "13742",
+                                    "created_by": "carol_brothers@mckinsey.com"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-efykiyso/providers/Microsoft.Sql/servers/c7nfail-sql-server",
+                                "name": "c7nfail-sql-server",
+                                "type": "Microsoft.Sql/servers",
+                                "kind": "v12.0",
+                                "location": "centralus",
+                                "tags": {
+                                    "environment": "dev",
+                                    "product_id": "13742",
+                                    "created_by": "hitesh_jain@mckinsey.com"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-efykiyso/providers/Microsoft.Sql/servers/c7nfail-sql-server/databases/master",
+                                "name": "c7nfail-sql-server/master",
+                                "type": "Microsoft.Sql/servers/databases",
+                                "sku": {
+                                    "name": "System",
+                                    "tier": "System",
+                                    "capacity": 0
+                                },
+                                "kind": "v12.0,system",
+                                "managedBy": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-efykiyso/providers/Microsoft.Sql/servers/c7nfail-sql-server",
+                                "location": "centralus"
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-ekeedezt/providers/Microsoft.Network/loadBalancers/c7nfail-lb",
+                                "name": "c7nfail-lb",
+                                "type": "Microsoft.Network/loadBalancers",
+                                "sku": {
+                                    "name": "Basic"
+                                },
+                                "location": "centralus",
+                                "tags": {
+                                    "product_id": "13742"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-ekeedezt/providers/Microsoft.Network/publicIPAddresses/c7nfail-publicip",
+                                "name": "c7nfail-publicip",
+                                "type": "Microsoft.Network/publicIPAddresses",
+                                "sku": {
+                                    "name": "Basic"
+                                },
+                                "location": "centralus",
+                                "tags": {
+                                    "product_id": "13742"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-mklngqrk/providers/Microsoft.Network/frontdoorWebApplicationFirewallPolicies/WAFRuleSuccessClassic",
+                                "name": "WAFRuleSuccessClassic",
+                                "type": "Microsoft.Network/frontdoorWebApplicationFirewallPolicies",
+                                "sku": {
+                                    "name": "Classic_AzureFrontDoor"
+                                },
+                                "location": "global",
+                                "tags": {
+                                    "product_id": "13742"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-mklngqrk/providers/Microsoft.Network/frontdoorWebApplicationFirewallPolicies/WAFRuleSuccessPremium",
+                                "name": "WAFRuleSuccessPremium",
+                                "type": "Microsoft.Network/frontdoorWebApplicationFirewallPolicies",
+                                "sku": {
+                                    "name": "Premium_AzureFrontDoor"
+                                },
+                                "location": "global",
+                                "tags": {
+                                    "c7n": "true",
+                                    "product_id": "13742"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-mvcrfgqh/providers/Microsoft.Storage/storageAccounts/c7nfailmintls",
+                                "name": "c7nfailmintls",
+                                "type": "Microsoft.Storage/storageAccounts",
+                                "sku": {
+                                    "name": "Standard_LRS",
+                                    "tier": "Standard"
+                                },
+                                "kind": "StorageV2",
+                                "location": "centralus",
+                                "identity": {
+                                    "type": "None"
+                                },
+                                "tags": {
+                                    "product_id": "13742"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-okjoptcn/providers/Microsoft.Storage/storageAccounts/c7nsuccessmintls",
+                                "name": "c7nsuccessmintls",
+                                "type": "Microsoft.Storage/storageAccounts",
+                                "sku": {
+                                    "name": "Standard_LRS",
+                                    "tier": "Standard"
+                                },
+                                "kind": "StorageV2",
+                                "location": "centralus",
+                                "identity": {
+                                    "type": "None"
+                                },
+                                "tags": {
+                                    "product_id": "13742"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-tlhtmkyz/providers/Microsoft.Cdn/profiles/WAFFrontDoorPremium-Success",
+                                "name": "WAFFrontDoorPremium-Success",
+                                "type": "Microsoft.Cdn/profiles",
+                                "sku": {
+                                    "name": "Premium_AzureFrontDoor"
+                                },
+                                "kind": "frontdoor",
+                                "location": "global",
+                                "tags": {
+                                    "c7n": "true",
+                                    "product_id": "13742"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-tlhtmkyz/providers/Microsoft.Cdn/profiles/WAFFrontDoorPremium-Success/afdendpoints/afd-cfb-tlhtmkyzPremium-Success",
+                                "name": "WAFFrontDoorPremium-Success/afd-cfb-tlhtmkyzPremium-Success",
+                                "type": "Microsoft.Cdn/profiles/afdendpoints",
+                                "location": "global",
+                                "tags": {
+                                    "c7n": "true",
+                                    "product_id": "13742"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-tlhtmkyz/providers/Microsoft.Cdn/profiles/WAFFrontDoorStandard-Success",
+                                "name": "WAFFrontDoorStandard-Success",
+                                "type": "Microsoft.Cdn/profiles",
+                                "sku": {
+                                    "name": "Standard_AzureFrontDoor"
+                                },
+                                "kind": "frontdoor",
+                                "location": "global",
+                                "tags": {
+                                    "c7n": "true",
+                                    "product_id": "13742",
+                                    "created_by": "carol_brothers@mckinsey.com"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-tlhtmkyz/providers/Microsoft.Cdn/profiles/WAFFrontDoorStandard-Success/afdendpoints/afd-cfb-tlhtmkyzStandard-Success",
+                                "name": "WAFFrontDoorStandard-Success/afd-cfb-tlhtmkyzStandard-Success",
+                                "type": "Microsoft.Cdn/profiles/afdendpoints",
+                                "location": "global",
+                                "tags": {
+                                    "c7n": "true",
+                                    "product_id": "13742",
+                                    "created_by": "carol_brothers@mckinsey.com"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-tlhtmkyz/providers/Microsoft.Network/frontdoorWebApplicationFirewallPolicies/WAFSuccessPremium",
+                                "name": "WAFSuccessPremium",
+                                "type": "Microsoft.Network/frontdoorWebApplicationFirewallPolicies",
+                                "sku": {
+                                    "name": "Premium_AzureFrontDoor"
+                                },
+                                "location": "global",
+                                "tags": {
+                                    "c7n": "true",
+                                    "product_id": "13742"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-tlhtmkyz/providers/Microsoft.Network/frontdoorWebApplicationFirewallPolicies/WAFSuccessStandard",
+                                "name": "WAFSuccessStandard",
+                                "type": "Microsoft.Network/frontdoorWebApplicationFirewallPolicies",
+                                "sku": {
+                                    "name": "Standard_AzureFrontDoor"
+                                },
+                                "location": "global",
+                                "tags": {
+                                    "c7n": "true",
+                                    "product_id": "13742",
+                                    "created_by": "carol_brothers@mckinsey.com"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-tlhtmkyz/providers/Microsoft.Web/serverFarms/AppServicePlanPremium-Success",
+                                "name": "AppServicePlanPremium-Success",
+                                "type": "Microsoft.Web/serverFarms",
+                                "sku": {
+                                    "name": "S1",
+                                    "tier": "Standard",
+                                    "size": "S1",
+                                    "family": "S",
+                                    "capacity": 1
+                                },
+                                "kind": "app",
+                                "location": "eastus",
+                                "tags": {
+                                    "c7n": "true",
+                                    "product_id": "13742"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-tlhtmkyz/providers/Microsoft.Web/serverFarms/AppServicePlanStandard-Success",
+                                "name": "AppServicePlanStandard-Success",
+                                "type": "Microsoft.Web/serverFarms",
+                                "sku": {
+                                    "name": "S1",
+                                    "tier": "Standard",
+                                    "size": "S1",
+                                    "family": "S",
+                                    "capacity": 1
+                                },
+                                "kind": "app",
+                                "location": "eastus",
+                                "tags": {
+                                    "c7n": "true",
+                                    "product_id": "13742"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-tlhtmkyz/providers/Microsoft.Web/sites/SuccessPremium-cfb-tlhtmkyz",
+                                "name": "SuccessPremium-cfb-tlhtmkyz",
+                                "type": "Microsoft.Web/sites",
+                                "kind": "app",
+                                "location": "eastus",
+                                "tags": {
+                                    "c7n": "true",
+                                    "product_id": "13742"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-tlhtmkyz/providers/Microsoft.Web/sites/SuccessStandard-cfb-tlhtmkyz",
+                                "name": "SuccessStandard-cfb-tlhtmkyz",
+                                "type": "Microsoft.Web/sites",
+                                "kind": "app",
+                                "location": "eastus",
+                                "tags": {
+                                    "c7n": "true",
+                                    "product_id": "13742"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-xtoqhiqs/providers/Microsoft.Network/loadBalancers/c7nsuccess-lb",
+                                "name": "c7nsuccess-lb",
+                                "type": "Microsoft.Network/loadBalancers",
+                                "sku": {
+                                    "name": "Basic"
+                                },
+                                "location": "centralus",
+                                "tags": {
+                                    "product_id": "13742",
+                                    "created_by": "hitesh_jain@mckinsey.com"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-xtoqhiqs/providers/Microsoft.Network/publicIPAddresses/c7nsuccess-publicip",
+                                "name": "c7nsuccess-publicip",
+                                "type": "Microsoft.Network/publicIPAddresses",
+                                "sku": {
+                                    "name": "Basic"
+                                },
+                                "location": "centralus",
+                                "tags": {
+                                    "product_id": "13742",
+                                    "created_by": "hitesh_jain@mckinsey.com"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-xtoqhiqs/providers/Microsoft.Storage/storageAccounts/c7nsuccesssa",
+                                "name": "c7nsuccesssa",
+                                "type": "Microsoft.Storage/storageAccounts",
+                                "sku": {
+                                    "name": "Standard_LRS",
+                                    "tier": "Standard"
+                                },
+                                "kind": "StorageV2",
+                                "location": "centralus",
+                                "identity": {
+                                    "type": "None"
+                                },
+                                "tags": {
+                                    "product_id": "13742"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-yxemqwju-test-group/providers/Microsoft.Network/applicationGateways/cfb-yxemqwju-app-gateway",
+                                "name": "cfb-yxemqwju-app-gateway",
+                                "type": "Microsoft.Network/applicationGateways",
+                                "location": "centralus",
+                                "tags": {
+                                    "c7n": "true",
+                                    "product_id": "13742",
+                                    "created_by": "bhavik_chothani@mckinsey.com"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-yxemqwju-test-group/providers/Microsoft.Network/applicationGateways/cfb-yxemqwju-app-gateway-2",
+                                "name": "cfb-yxemqwju-app-gateway-2",
+                                "type": "Microsoft.Network/applicationGateways",
+                                "location": "centralus",
+                                "tags": {
+                                    "c7n": "true",
+                                    "product_id": "13742",
+                                    "created_by": "bhavik_chothani@mckinsey.com"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-yxemqwju-test-group/providers/Microsoft.Network/applicationGatewayWebApplicationFirewallPolicies/cfb-yxemqwju-waf-policy",
+                                "name": "cfb-yxemqwju-waf-policy",
+                                "type": "Microsoft.Network/applicationGatewayWebApplicationFirewallPolicies",
+                                "location": "centralus",
+                                "tags": {
+                                    "c7n": "true",
+                                    "product_id": "13742",
+                                    "created_by": "bhavik_chothani@mckinsey.com"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-yxemqwju-test-group/providers/Microsoft.Network/publicIPAddresses/cfb-yxemqwju-pip",
+                                "name": "cfb-yxemqwju-pip",
+                                "type": "Microsoft.Network/publicIPAddresses",
+                                "sku": {
+                                    "name": "Standard"
+                                },
+                                "location": "centralus",
+                                "tags": {
+                                    "product_id": "13742",
+                                    "created_by": "bhavik_chothani@mckinsey.com"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-yxemqwju-test-group/providers/Microsoft.Network/publicIPAddresses/cfb-yxemqwju-pip-2",
+                                "name": "cfb-yxemqwju-pip-2",
+                                "type": "Microsoft.Network/publicIPAddresses",
+                                "sku": {
+                                    "name": "Standard"
+                                },
+                                "location": "centralus",
+                                "tags": {
+                                    "product_id": "13742",
+                                    "created_by": "bhavik_chothani@mckinsey.com"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-yxemqwju-test-group/providers/Microsoft.Network/virtualNetworks/cfb-yxemqwju-vnet",
+                                "name": "cfb-yxemqwju-vnet",
+                                "type": "Microsoft.Network/virtualNetworks",
+                                "location": "centralus",
+                                "tags": {
+                                    "product_id": "13742",
+                                    "created_by": "bhavik_chothani@mckinsey.com"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-yxemqwju-test-group/providers/Microsoft.Network/virtualNetworks/cfb-yxemqwju-vnet-2",
+                                "name": "cfb-yxemqwju-vnet-2",
+                                "type": "Microsoft.Network/virtualNetworks",
+                                "location": "centralus",
+                                "tags": {
+                                    "product_id": "13742",
+                                    "created_by": "bhavik_chothani@mckinsey.com"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/djs-waf-test/providers/Microsoft.Network/frontdoorWebApplicationFirewallPolicies/djstestwafpolicy",
+                                "name": "djstestwafpolicy",
+                                "type": "Microsoft.Network/frontdoorWebApplicationFirewallPolicies",
+                                "sku": {
+                                    "name": "Premium_AzureFrontDoor"
+                                },
+                                "location": "global",
+                                "tags": {
+                                    "product_id": "13742",
+                                    "created_by": "derek_slagle@mckinsey.com"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/NetworkWatcherRG/providers/Microsoft.Network/networkWatchers/NetworkWatcher_centralus",
+                                "name": "NetworkWatcher_centralus",
+                                "type": "Microsoft.Network/networkWatchers",
+                                "location": "centralus",
+                                "tags": {
+                                    "product_id": "13742",
+                                    "created_by": "2053dabb-b7b8-4bc1-ae1d-1567c82bd050"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/NetworkWatcherRG/providers/Microsoft.Network/networkWatchers/NetworkWatcher_eastus",
+                                "name": "NetworkWatcher_eastus",
+                                "type": "Microsoft.Network/networkWatchers",
+                                "location": "eastus",
+                                "tags": {
+                                    "product_id": "13742",
+                                    "created_by": "2053dabb-b7b8-4bc1-ae1d-1567c82bd050"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/sc-exports-config-do-not-delete/providers/Microsoft.Security/automations/exportToEventHub",
+                                "name": "exportToEventHub",
+                                "type": "Microsoft.Security/automations",
+                                "location": "eastus",
+                                "tags": {
+                                    "product_id": "13742"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-mklngqrk/providers/Microsoft.Network/FrontDoorWebApplicationFirewallPolicies/WAFRuleSuccessClassic?api-version=2020-11-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Thu, 18 May 2023 23:48:02 GMT"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "content-length": [
+                        "1021"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/cfb-mklngqrk/providers/Microsoft.Network/frontdoorwebapplicationfirewallpolicies/WAFRuleSuccessClassic",
+                        "type": "Microsoft.Network/frontdoorwebapplicationfirewallpolicies",
+                        "name": "WAFRuleSuccessClassic",
+                        "location": "Global",
+                        "tags": {
+                            "product_id": "13742",
+                            "created_by": "carol_brothers@mckinsey.com"
+                        },
+                        "sku": {
+                            "name": "Classic_AzureFrontDoor"
+                        },
+                        "properties": {
+                            "policySettings": {
+                                "enabledState": "Enabled",
+                                "mode": "Prevention",
+                                "redirectUrl": "https://www.contoso.com",
+                                "customBlockResponseStatusCode": 403,
+                                "customBlockResponseBody": "PGh0bWw+CjxoZWFkZXI+PHRpdGxlPkhlbGxvPC90aXRsZT48L2hlYWRlcj4KPGJvZHk+CkhlbGxvIHdvcmxkCjwvYm9keT4KPC9odG1sPg==",
+                                "requestBodyCheck": "Enabled"
+                            },
+                            "customRules": {
+                                "rules": []
+                            },
+                            "managedRules": {
+                                "managedRuleSets": [
+                                    {
+                                        "ruleSetType": "DefaultRuleSet",
+                                        "ruleSetVersion": "1.0",
+                                        "ruleSetAction": null,
+                                        "ruleGroupOverrides": [],
+                                        "exclusions": []
+                                    }
+                                ]
+                            },
+                            "frontendEndpointLinks": [],
+                            "securityPolicyLinks": [],
+                            "resourceState": "Enabled",
+                            "provisioningState": "Succeeded"
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-mklngqrk/providers/Microsoft.Network/FrontDoorWebApplicationFirewallPolicies/WAFRuleSuccessPremium?api-version=2020-11-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Thu, 18 May 2023 23:48:02 GMT"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "content-length": [
+                        "992"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/cfb-mklngqrk/providers/Microsoft.Network/frontdoorwebapplicationfirewallpolicies/WAFRuleSuccessPremium",
+                        "type": "Microsoft.Network/frontdoorwebapplicationfirewallpolicies",
+                        "name": "WAFRuleSuccessPremium",
+                        "location": "Global",
+                        "tags": {
+                            "c7n": "true",
+                            "product_id": "13742"
+                        },
+                        "sku": {
+                            "name": "Premium_AzureFrontDoor"
+                        },
+                        "properties": {
+                            "policySettings": {
+                                "enabledState": "Enabled",
+                                "mode": "Prevention",
+                                "redirectUrl": "https://www.contoso.com",
+                                "customBlockResponseStatusCode": 403,
+                                "customBlockResponseBody": "PGh0bWw+CjxoZWFkZXI+PHRpdGxlPkhlbGxvPC90aXRsZT48L2hlYWRlcj4KPGJvZHk+CkhlbGxvIHdvcmxkCjwvYm9keT4KPC9odG1sPg==",
+                                "requestBodyCheck": "Enabled"
+                            },
+                            "customRules": {
+                                "rules": []
+                            },
+                            "managedRules": {
+                                "managedRuleSets": [
+                                    {
+                                        "ruleSetType": "DefaultRuleSet",
+                                        "ruleSetVersion": "1.0",
+                                        "ruleSetAction": "Log",
+                                        "ruleGroupOverrides": [],
+                                        "exclusions": []
+                                    }
+                                ]
+                            },
+                            "frontendEndpointLinks": [],
+                            "securityPolicyLinks": [],
+                            "resourceState": "Enabled",
+                            "provisioningState": "Succeeded"
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-tlhtmkyz/providers/Microsoft.Network/FrontDoorWebApplicationFirewallPolicies/WAFSuccessPremium?api-version=2020-11-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Thu, 18 May 2023 23:48:02 GMT"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "content-length": [
+                        "1178"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/cfb-tlhtmkyz/providers/Microsoft.Network/frontdoorwebapplicationfirewallpolicies/WAFSuccessPremium",
+                        "type": "Microsoft.Network/frontdoorwebapplicationfirewallpolicies",
+                        "name": "WAFSuccessPremium",
+                        "location": "Global",
+                        "tags": {
+                            "c7n": "true",
+                            "product_id": "13742"
+                        },
+                        "sku": {
+                            "name": "Premium_AzureFrontDoor"
+                        },
+                        "properties": {
+                            "policySettings": {
+                                "enabledState": "Enabled",
+                                "mode": "Prevention",
+                                "redirectUrl": "https://www.contoso.com",
+                                "customBlockResponseStatusCode": 403,
+                                "customBlockResponseBody": "PGh0bWw+CjxoZWFkZXI+PHRpdGxlPkhlbGxvPC90aXRsZT48L2hlYWRlcj4KPGJvZHk+CkhlbGxvIHdvcmxkCjwvYm9keT4KPC9odG1sPg==",
+                                "requestBodyCheck": "Enabled"
+                            },
+                            "customRules": {
+                                "rules": []
+                            },
+                            "managedRules": {
+                                "managedRuleSets": [
+                                    {
+                                        "ruleSetType": "DefaultRuleSet",
+                                        "ruleSetVersion": "1.0",
+                                        "ruleSetAction": "Log",
+                                        "ruleGroupOverrides": [],
+                                        "exclusions": []
+                                    }
+                                ]
+                            },
+                            "frontendEndpointLinks": [],
+                            "securityPolicyLinks": [
+                                {
+                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/cfb-tlhtmkyz/providers/Microsoft.Cdn/profiles/WAFFrontDoorPremium-Success/securitypolicies/cfb-tlhtmkyzPermium-Success"
+                                }
+                            ],
+                            "resourceState": "Enabled",
+                            "provisioningState": "Succeeded"
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/djs-waf-test/providers/Microsoft.Network/FrontDoorWebApplicationFirewallPolicies/djstestwafpolicy?api-version=2020-11-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Thu, 18 May 2023 23:48:02 GMT"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "content-length": [
+                        "882"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/djs-waf-test/providers/Microsoft.Network/frontdoorwebapplicationfirewallpolicies/djstestwafpolicy",
+                        "type": "Microsoft.Network/frontdoorwebapplicationfirewallpolicies",
+                        "name": "djstestwafpolicy",
+                        "location": "Global",
+                        "tags": {
+                            "product_id": "13742",
+                            "created_by": "derek_slagle@mckinsey.com"
+                        },
+                        "sku": {
+                            "name": "Premium_AzureFrontDoor"
+                        },
+                        "properties": {
+                            "policySettings": {
+                                "enabledState": "Enabled",
+                                "mode": "Detection",
+                                "redirectUrl": null,
+                                "customBlockResponseStatusCode": 403,
+                                "customBlockResponseBody": null,
+                                "requestBodyCheck": "Disabled"
+                            },
+                            "customRules": {
+                                "rules": []
+                            },
+                            "managedRules": {
+                                "managedRuleSets": [
+                                    {
+                                        "ruleSetType": "DefaultRuleSet",
+                                        "ruleSetVersion": "1.0",
+                                        "ruleSetAction": null,
+                                        "ruleGroupOverrides": [],
+                                        "exclusions": []
+                                    }
+                                ]
+                            },
+                            "frontendEndpointLinks": [],
+                            "securityPolicyLinks": [],
+                            "resourceState": "Enabled",
+                            "provisioningState": "Succeeded"
+                        }
+                    }
+                }
+            }
+        }
+    ]
+}
