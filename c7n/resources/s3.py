@@ -2947,6 +2947,8 @@ class Lifecycle(BucketActionBase):
                             'additionalProperties': False,
                             'properties': {
                                 'Prefix': {'type': 'string'},
+                                'ObjectSizeGreaterThan': {'type': 'integer'},
+                                'ObjectSizeLessThan': {'type': 'integer'},
                                 'Tag': {
                                     'type': 'object',
                                     'required': ['Key', 'Value'],
@@ -2961,6 +2963,8 @@ class Lifecycle(BucketActionBase):
                                     'additionalProperties': False,
                                     'properties': {
                                         'Prefix': {'type': 'string'},
+                                        'ObjectSizeGreaterThan': {'type': 'integer'},
+                                        'ObjectSizeLessThan': {'type': 'integer'},
                                         'Tags': {
                                             'type': 'array',
                                             'items': {
@@ -2996,6 +3000,7 @@ class Lifecycle(BucketActionBase):
                                 'additionalProperties': False,
                                 'properties': {
                                     'NoncurrentDays': {'type': 'integer'},
+                                    'NewerNoncurrentVersions': {'type': 'integer'},
                                     'StorageClass': {'type': 'string'},
                                 },
                             },
@@ -3005,6 +3010,7 @@ class Lifecycle(BucketActionBase):
                             'additionalProperties': False,
                             'properties': {
                                 'NoncurrentDays': {'type': 'integer'},
+                                'NewerNoncurrentVersions': {'type': 'integer'}
                             },
                         },
                         'AbortIncompleteMultipartUpload': {

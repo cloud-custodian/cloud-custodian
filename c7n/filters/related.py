@@ -1,11 +1,11 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import importlib
-import jmespath
 from functools import lru_cache
 
 from .core import ValueFilter, OPERATORS
 from c7n.query import ChildResourceQuery
+from c7n.utils import jmespath_search
 
 
 class RelatedResourceFilter(ValueFilter):
@@ -35,7 +35,7 @@ class RelatedResourceFilter(ValueFilter):
         return super(RelatedResourceFilter, self).validate()
 
     def get_related_ids(self, resources):
-        return set(jmespath.search(
+        return set(jmespath_search(
             "[].%s" % self.RelatedIdsExpression, resources))
 
     def get_related(self, resources):
@@ -133,7 +133,7 @@ class RelatedResourceByIdFilter(RelatedResourceFilter):
 
     def get_related_by_ids(self, resources):
         RelatedResourceKey = self.RelatedResourceByIdExpression or self.RelatedIdsExpression
-        ids = jmespath.search("%s" % RelatedResourceKey, resources)
+        ids = jmespath_search("%s" % RelatedResourceKey, resources)
         if isinstance(ids, str):
             ids = [ids]
         return set(ids)

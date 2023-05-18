@@ -1,7 +1,6 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import itertools
-import jmespath
 
 from c7n.exceptions import PolicyExecutionError, PolicyValidationError
 from c7n import utils
@@ -105,9 +104,9 @@ class ModifyVpcSecurityGroupsAction(Action):
                 raise PolicyValidationError(self._format_error((
                     "policy:{policy} resource:{resource_type} does not support "
                     "security-group names only ids in action:{action_type}")))
-            self.vpc_expr = jmespath.compile(vpc_filter.RelatedIdsExpression)
+            self.vpc_expr = utils.jmespath_compile(vpc_filter.RelatedIdsExpression)
         if self.sg_expr is None:
-            self.sg_expr = jmespath.compile(
+            self.sg_expr = utils.jmespath_compile(
                 self.manager.filter_registry.get('security-group').RelatedIdsExpression)
         if 'all' in self._get_array('remove') and not self._get_array('isolation-group'):
             raise PolicyValidationError(self._format_error((

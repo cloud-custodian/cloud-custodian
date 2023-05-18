@@ -35,7 +35,6 @@ import functools
 import itertools
 import logging
 import operator
-import jmespath
 import re
 import datetime
 
@@ -63,7 +62,7 @@ from c7n.tags import universal_augment
 
 from c7n.utils import (
     local_session, type_schema, get_retry, chunks, snapshot_identifier,
-    merge_dict_list, filter_empty)
+    merge_dict_list, filter_empty, jmespath_search)
 from c7n.resources.kms import ResourceKmsKeyAlias
 from c7n.resources.securityhub import PostFinding
 from c7n.filters.backup import ConsecutiveAwsBackupsFilter
@@ -1638,8 +1637,8 @@ class UnusedRDSSubnetGroup(Filter):
 
     def process(self, configs, event=None):
         rds = self.manager.get_resource_manager('rds').resources()
-        self.used = set(jmespath.search('[].DBSubnetGroup.DBSubnetGroupName', rds))
-        self.used.update(set(jmespath.search('[].DBSubnetGroup.DBSubnetGroupName',
+        self.used = set(jmespath_search('[].DBSubnetGroup.DBSubnetGroupName', rds))
+        self.used.update(set(jmespath_search('[].DBSubnetGroup.DBSubnetGroupName',
             self.manager.get_resource_manager('rds-cluster').resources(augment=False))))
         return super(UnusedRDSSubnetGroup, self).process(configs)
 
@@ -1862,7 +1861,7 @@ class ModifyDb(BaseAction):
                 u['property']: u['value'] for u in self.data.get('update')
                 if r.get(
                     u['property'],
-                    jmespath.search(
+                    jmespath_search(
                         self.conversion_map.get(u['property'], 'None'), r))
                     != u['value']}
             if not param:
@@ -2125,7 +2124,7 @@ class DbOptionGroups(ValueFilter):
                 og_values = optioncache[og['OptionGroupName']]
                 if self.match(og_values):
                     resource.setdefault(self.policy_annotation, []).append({
-                        k: jmespath.search(k, og_values)
+                        k: jmespath_search(k, og_values)
                         for k in {'OptionGroupName', self.data.get('key')}
                     })
                     results.append(resource)

@@ -1,7 +1,6 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 from botocore.exceptions import ClientError
-import jmespath
 
 from c7n.actions import BaseAction
 from c7n.filters.vpc import SubnetFilter, SecurityGroupFilter, VpcFilter
@@ -9,7 +8,7 @@ from c7n.manager import resources
 from c7n.query import (
     QueryResourceManager, DescribeSource, ConfigSource, TypeInfo, ChildResourceManager)
 from c7n.tags import universal_augment
-from c7n.utils import local_session, type_schema
+from c7n.utils import local_session, type_schema, jmespath_search
 from c7n import query
 
 from .securityhub import OtherResourcePostFinding
@@ -160,9 +159,9 @@ class BuildPostFinding(OtherResourcePostFinding):
                 'Type': r['environment']['type'],
                 'Certificate': r['environment'].get('certificate'),
                 'RegistryCredential': self.filter_empty({
-                    'Credential': jmespath.search(
+                    'Credential': jmespath_search(
                         'environment.registryCredential.credential', r),
-                    'CredentialProvider': jmespath.search(
+                    'CredentialProvider': jmespath_search(
                         'environment.registryCredential.credentialProvider', r)
                 }),
                 'ImagePullCredentialsType': r['environment'].get(
@@ -170,14 +169,14 @@ class BuildPostFinding(OtherResourcePostFinding):
             }),
             'ServiceRole': r['serviceRole'],
             'VpcConfig': self.filter_empty({
-                'VpcId': jmespath.search('vpcConfig.vpcId', r),
-                'Subnets': jmespath.search('vpcConfig.subnets', r),
-                'SecurityGroupIds': jmespath.search('vpcConfig.securityGroupIds', r)
+                'VpcId': jmespath_search('vpcConfig.vpcId', r),
+                'Subnets': jmespath_search('vpcConfig.subnets', r),
+                'SecurityGroupIds': jmespath_search('vpcConfig.securityGroupIds', r)
             }),
             'Source': self.filter_empty({
-                'Type': jmespath.search('source.type', r),
-                'Location': jmespath.search('source.location', r),
-                'GitCloneDepth': jmespath.search('source.gitCloneDepth', r)
+                'Type': jmespath_search('source.type', r),
+                'Location': jmespath_search('source.location', r),
+                'GitCloneDepth': jmespath_search('source.gitCloneDepth', r)
             }),
         }))
         return envelope
