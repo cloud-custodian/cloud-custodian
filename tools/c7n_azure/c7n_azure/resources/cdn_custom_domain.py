@@ -6,7 +6,7 @@ from c7n_azure.resources.arm import ChildArmResourceManager
 from c7n_azure.utils import ResourceIdParser
 
 
-@resources.register('cdncustomdomain')
+@resources.register('cdn-custom-domain')
 class CdnCustomDomain(ChildArmResourceManager):
     """CDN Endpoint Resource
 
@@ -18,13 +18,13 @@ class CdnCustomDomain(ChildArmResourceManager):
 
         policies:
           - name: standard-verizon
-            resource: azure.cdncustomDomain
+            resource: azure.cdn-custom-domain
             filters:
               - type: value
                 key: properties.customHttpsProvisioningState
                 op: ne
                 value: Enabled
-                
+
     """
 
     class resource_type(ChildArmResourceManager.resource_type):
@@ -33,7 +33,7 @@ class CdnCustomDomain(ChildArmResourceManager):
         service = 'azure.mgmt.cdn'
         client = 'CdnManagementClient'
         enum_spec = ('custom_domains', 'list_by_endpoint', None)
-        parent_manager_name = 'cdnendpoint'
+        parent_manager_name = 'cdn-endpoint'
         default_report_fields = (
             'name',
             'location',

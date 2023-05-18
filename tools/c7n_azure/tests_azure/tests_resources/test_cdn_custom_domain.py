@@ -3,30 +3,29 @@
 from ..azure_common import BaseTest, arm_template
 
 
-class CdnEndpointTest(BaseTest):
+class CdnCustomDomainTest(BaseTest):
     def setUp(self):
-        super(CdnEndpointTest, self).setUp()
-        
+        super(CdnCustomDomainTest, self).setUp()
 
-    def test_endpoint_schema_validate(self):
+    def test_cdn_custom_domain_schema_validate(self):
         with self.sign_out_patch():
             p = self.load_policy({
-                'name': 'test-azure-cdnendpoint',
-                'resource': 'azure.cdnendpoint'
+                'name': 'test-azure-cdn-custom-domain',
+                'resource': 'azure.cdn-custom-domain'
             }, validate=True)
             self.assertTrue(p)
 
-    @arm_template('cdnendpoint.json')
+    @arm_template('cdn-custom-domain.json')
     def test_find_by_name(self):
         p = self.load_policy({
-            'name': 'test-azure-cdnendpoint',
-            'resource': 'azure.cdnendpoint',
+            'name': 'test-azure-cdn-custom-domain',
+            'resource': 'azure.cdn-custom-domain',
             'filters': [
                 {'type': 'value',
                  'key': 'name',
                  'op': 'eq',
                  'value_type': 'normalize',
-                 'value': 'cctestcdnendpoint'}],
+                 'value': 'cctestcdndomain'}],
         })
         resources = p.run()
         self.assertEqual(len(resources), 1)
