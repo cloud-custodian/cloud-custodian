@@ -687,3 +687,20 @@ def test_output_path_join():
     output_dir = './local-dir'
     assert utils.join_output_path(output_dir, 'Samuel', 'us-east-1') == (
         f"./local-dir{os.sep}Samuel{os.sep}us-east-1")
+
+
+def test_jmespath_parse_split():
+    result = utils.jmespath_search(
+        'foo.bar | split(`.`, @)',
+        {'foo': {'bar': 'abc.xyz'}}
+    )
+    assert result == ['abc', 'xyz']
+
+    compiled = utils.jmespath_compile(
+        'foo.bar | split(`.`, @)',
+    )
+    assert isinstance(compiled, utils.ParsedResultWithOptions)
+    result = compiled.search(
+        {'foo': {'bar': 'abc.xyz'}}
+    )
+    assert result == ['abc', 'xyz']

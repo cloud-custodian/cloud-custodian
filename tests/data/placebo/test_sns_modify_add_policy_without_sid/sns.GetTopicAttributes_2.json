@@ -1,0 +1,22 @@
+{
+    "status_code": 200,
+    "data": {
+        "Attributes": {
+            "Policy": "{\"Version\":\"2008-10-17\",\"Id\":\"__default_policy_ID\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"*\"},\"Action\":[\"SNS:GetTopicAttributes\",\"SNS:SetTopicAttributes\",\"SNS:AddPermission\",\"SNS:RemovePermission\",\"SNS:DeleteTopic\",\"SNS:Subscribe\",\"SNS:ListSubscriptionsByTopic\",\"SNS:Publish\"],\"Resource\":\"arn:aws:sns:us-east-1:644160558196:test123\",\"Condition\":{\"StringEquals\":{\"AWS:SourceOwner\":\"644160558196\"}}},{\"Sid\":\"AddMe\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":\"SNS:GetTopicAttributes\",\"Resource\":\"arn:aws:sns:us-east-1:644160558196:test123\"}]}",
+            "LambdaSuccessFeedbackSampleRate": "0",
+            "Owner": "644160558196",
+            "SubscriptionsPending": "0",
+            "KmsMasterKeyId": "arn:aws:kms:us-east-1:644160558196:key/082cd05f-96d1-49f6-a5ac-32093d2cfe38",
+            "TopicArn": "arn:aws:sns:us-east-1:644160558196:test123",
+            "EffectiveDeliveryPolicy": "{\"http\":{\"defaultHealthyRetryPolicy\":{\"minDelayTarget\":20,\"maxDelayTarget\":20,\"numRetries\":3,\"numMaxDelayRetries\":0,\"numNoDelayRetries\":0,\"numMinDelayRetries\":0,\"backoffFunction\":\"linear\"},\"disableSubscriptionOverrides\":false,\"defaultRequestPolicy\":{\"headerContentType\":\"text/plain; charset=UTF-8\"}}}",
+            "FirehoseSuccessFeedbackSampleRate": "0",
+            "SubscriptionsConfirmed": "0",
+            "SQSSuccessFeedbackSampleRate": "0",
+            "HTTPSuccessFeedbackSampleRate": "0",
+            "ApplicationSuccessFeedbackSampleRate": "0",
+            "DisplayName": "",
+            "SubscriptionsDeleted": "0"
+        },
+        "ResponseMetadata": {}
+    }
+}

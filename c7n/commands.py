@@ -195,11 +195,12 @@ def validate(options):
 
     used_policy_names = set()
     structure = StructureParser()
-    errors = []
+    all_errors = {}
     found_deprecations = False
     footnotes = deprecated.Footnotes()
 
     for config_file in options.configs:
+        errors = []
 
         config_file = os.path.expanduser(config_file)
         if not os.path.exists(config_file):
@@ -221,7 +222,7 @@ def validate(options):
         except PolicyValidationError as e:
             log.error("Configuration invalid: {}".format(config_file))
             log.error("%s" % e)
-            errors.append(e)
+            all_errors[config_file] = e
             continue
 
         load_resources(structure.get_resource_types(data))
@@ -270,6 +271,7 @@ def validate(options):
             log.info("Configuration valid: {}".format(config_file))
             continue
 
+        all_errors[config_file] = errors
         log.error("Configuration invalid: {}".format(config_file))
         for e in errors:
             log.error("%s" % e)
@@ -279,7 +281,7 @@ def validate(options):
             log.warning("deprecation footnotes:\n" + notes)
         if options.check_deprecations == deprecated.STRICT:
             sys.exit(1)
-    if errors:
+    if all_errors:
         sys.exit(1)
 
 

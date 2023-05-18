@@ -38,6 +38,11 @@ class FunctionTest(BaseTest):
         archive.close()
         return mu.CloudFunction(config, archive)
 
+    def test_archive_files(self):
+        archive = mu.custodian_archive()
+        archive.close()
+        assert "c7n_gcp/filters/recommender.json" in archive.get_filenames()
+
     def test_deploy_function(self):
         factory = self.replay_flight_data('mu-deploy')
         manager = mu.CloudFunctionManager(factory, 'us-central1')
