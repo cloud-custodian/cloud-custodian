@@ -3,8 +3,7 @@
 from c7n_gcp.provider import resources
 from c7n_gcp.query import QueryResourceManager, TypeInfo
 
-import jmespath
-
+from c7n.utils import jmespath_search
 
 @resources.register('cloudbilling-account')
 class CloudBillingAccount(QueryResourceManager):
@@ -17,7 +16,7 @@ class CloudBillingAccount(QueryResourceManager):
         get_requires_event = True
         scope = None
         name = id = 'name'
-        default_report_fields = ['id', 'displayName']
+        default_report_fields = ['name', 'displayName']
         asset_type = "cloudbilling.googleapis.com/BillingAccount"
         permissions = ('billing.accounts.list',)
         urn_component = "account"
@@ -26,5 +25,5 @@ class CloudBillingAccount(QueryResourceManager):
         @staticmethod
         def get(client, event):
             return client.execute_query(
-                'get', {'name': jmespath.search(
+                'get', {'name': jmespath_search(
                     'protoPayload.response.billingAccountInfo.billingAccountName', event)})
