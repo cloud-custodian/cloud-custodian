@@ -4,7 +4,7 @@
     "parameters": {
       "vaultName": {
         "type": "string",
-        "defaultValue": "[concat('cfb-ukqrkhnt-ars', uniqueString(resourceGroup().id))]",
+        "defaultValue": "[concat('cfbukqrkhntars655e53akvrc4k', uniqueString(resourceGroup().id))]",
         "metadata": {
           "description": "Name of the Vault"
         }

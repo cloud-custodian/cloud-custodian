@@ -31,41 +31,9 @@
                     "data": {
                         "value": [
                             {
-                                "location": "eastus",
-                                "name": "cfb-ukqrkhnt-ars",
-                                "etag": "W/\"datetime'2023-05-22T20%3A31%3A30.2192876Z'\"",
-                                "tags": {
-                                    "product_id": "13742"
-                                },
-                                "identity": {
-                                    "tenantId": "00000000-0000-0000-0000-000000000003",
-                                    "type": "UserAssigned",
-                                    "userAssignedIdentities": {
-                                        "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-ukqrkhnt-arg/providers/Microsoft.ManagedIdentity/userAssignedIdentities/my-assigned-user-identity": {
-                                            "clientId": "7f3cd9b1-74e8-41e0-9da5-f362a5ba6f3f",
-                                            "principalId": "eb0dcfe7-b42d-490f-9ca7-e731f96258e8"
-                                        }
-                                    }
-                                },
-                                "properties": {
-                                    "provisioningState": "Succeeded",
-                                    "publicNetworkAccess": "Enabled",
-                                    "restoreSettings": {
-                                        "crossSubscriptionRestoreSettings": {
-                                            "crossSubscriptionRestoreState": "Enabled"
-                                        }
-                                    }
-                                },
-                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-ukqrkhnt-arg/providers/Microsoft.RecoveryServices/vaults/cfb-ukqrkhnt-ars",
-                                "type": "Microsoft.RecoveryServices/vaults",
-                                "sku": {
-                                    "name": "Standard"
-                                }
-                            },
-                            {
-                                "location": "eastus",
-                                "name": "cfb-ukqrkhnt-arsv",
-                                "etag": "W/\"datetime'2023-05-22T20%3A31%3A27.4999004Z'\"",
+                                "location": "southcentralus",
+                                "name": "cfbukqrkhntars655e53akvrc4k",
+                                "etag": "W/\"datetime'2023-05-23T15%3A51%3A26.8532899Z'\"",
                                 "tags": {
                                     "product_id": "13742"
                                 },
@@ -83,7 +51,7 @@
                                         }
                                     }
                                 },
-                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-ukqrkhnt-arg/providers/Microsoft.RecoveryServices/vaults/cfb-ukqrkhnt-arsv",
+                                "id": "/subscriptions/2300cc55-8d79-47e6-99e2-027d7cf99299/resourceGroups/test_recoveryservices/providers/Microsoft.RecoveryServices/vaults/cfbukqrkhntars655e53akvrc4k",
                                 "type": "Microsoft.RecoveryServices/vaults",
                                 "sku": {
                                     "name": "Standard"
