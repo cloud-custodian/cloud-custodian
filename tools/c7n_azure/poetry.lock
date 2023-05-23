@@ -881,6 +881,23 @@ azure-mgmt-core = ">=1.2.0,<2.0.0"
 msrest = ">=0.6.21"
 
 [[package]]
+name = "azure-mgmt-recoveryservices"
+version = "2.0.0"
+description = "Microsoft Azure Recovery Services Client Library for Python"
+category = "main"
+optional = false
+python-versions = "*"
+files = [
+    {file = "azure-mgmt-recoveryservices-2.0.0.zip", hash = "sha256:a7d3137d5c460f50ac2d44061d60a70b4f2779d4ca844b77419b5725e65e09be"},
+    {file = "azure_mgmt_recoveryservices-2.0.0-py2.py3-none-any.whl", hash = "sha256:6fd8c67147e0b143ae57d457bd34898d1c31cae76ee6ac9bd622f6e5c338dd22"},
+]
+
+[package.dependencies]
+azure-common = ">=1.1,<2.0"
+azure-mgmt-core = ">=1.2.0,<2.0.0"
+msrest = ">=0.6.21"
+
+[[package]]
 name = "azure-mgmt-redhatopenshift"
 version = "1.2.0"
 description = "Microsoft Azure Red Hat Openshift Management Client Library for Python"
