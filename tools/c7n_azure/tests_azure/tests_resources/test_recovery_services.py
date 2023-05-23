@@ -1,8 +1,10 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 from ..azure_common import BaseTest, arm_template
+import pytest
 
 
+@pytest.mark.skiplive
 class RecoveryServicesTest(BaseTest):
     def setUp(self):
         super(RecoveryServicesTest, self).setUp()
@@ -15,7 +17,7 @@ class RecoveryServicesTest(BaseTest):
             }, validate=True)
             self.assertTrue(p)
 
-            
+    @pytest.mark.skiplive        
     @arm_template('recovery_services.json')
     def test_find_by_name(self):
         p = self.load_policy({
