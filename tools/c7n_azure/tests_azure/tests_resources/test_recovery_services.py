@@ -4,15 +4,19 @@ from ..azure_common import BaseTest, arm_template
 
 
 class RecoveryServicesTest(BaseTest):
+    def setUp(self):
+        super(RecoveryServicesTest, self).setUp()
+
     def test_recovery_services_schema_validate(self):
         with self.sign_out_patch():
             p = self.load_policy({
-                'name': 'test-recovery-services-schema-validate',
+                'name': 'test-recovery-services',
                 'resource': 'azure.recovery-services'
             }, validate=True)
             self.assertTrue(p)
 
-    @arm_template('recoveryservices.json')
+            
+    @arm_template('recovery_services.json')
     def test_find_by_name(self):
         p = self.load_policy({
             'name': 'test-recovery-services',
@@ -22,7 +26,7 @@ class RecoveryServicesTest(BaseTest):
                  'key': 'name',
                  'op': 'eq',
                  'value_type': 'normalize',
-                 'value': 'cfbukqrkhntar*'}],
+                 'value': 'cfbukqrkhntars655e53akvrc4k'}],
         })
         resources = p.run()
         self.assertEqual(len(resources), 1)

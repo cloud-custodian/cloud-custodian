@@ -17,14 +17,14 @@
                     "content-type": [
                         "application/json; charset=utf-8"
                     ],
+                    "date": [
+                        "Tue, 23 May 2023 17:29:39 GMT"
+                    ],
                     "cache-control": [
                         "no-cache"
                     ],
-                    "date": [
-                        "Mon, 22 May 2023 20:42:48 GMT"
-                    ],
                     "content-length": [
-                        "1611"
+                        "638"
                     ]
                 },
                 "body": {
@@ -33,14 +33,10 @@
                             {
                                 "location": "southcentralus",
                                 "name": "cfbukqrkhntars655e53akvrc4k",
-                                "etag": "W/\"datetime'2023-05-23T15%3A51%3A26.8532899Z'\"",
+                                "etag": "W/\"datetime'2023-05-23T16%3A15%3A05.9290358Z'\"",
                                 "tags": {
-                                    "product_id": "13742"
-                                },
-                                "identity": {
-                                    "tenantId": "00000000-0000-0000-0000-000000000003",
-                                    "principalId": "547a3fbb-ea69-4af4-a384-6be8c394b575",
-                                    "type": "SystemAssigned"
+                                    "product_id": "13742",
+                                    "created_by": "Femi_Olofinleye@mckinsey.com"
                                 },
                                 "properties": {
                                     "provisioningState": "Succeeded",
@@ -51,10 +47,11 @@
                                         }
                                     }
                                 },
-                                "id": "/subscriptions/2300cc55-8d79-47e6-99e2-027d7cf99299/resourceGroups/test_recoveryservices/providers/Microsoft.RecoveryServices/vaults/cfbukqrkhntars655e53akvrc4k",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_recoveryservices/providers/Microsoft.RecoveryServices/vaults/cfbukqrkhntars655e53akvrc4k",
                                 "type": "Microsoft.RecoveryServices/vaults",
                                 "sku": {
-                                    "name": "Standard"
+                                    "name": "RS0",
+                                    "tier": "Standard"
                                 }
                             }
                         ]
