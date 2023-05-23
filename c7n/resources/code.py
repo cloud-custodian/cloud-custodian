@@ -29,6 +29,16 @@ class CodeRepository(QueryResourceManager):
         cfn_type = 'AWS::CodeCommit::Repository'
         universal_taggable = object()
 
+    def augment(self, resources):
+        """Fetch tags after picking up batch details
+
+        We need ARNs to bulk-fetch tags, but don't know
+        ARNs until after the base augment fires.
+        """
+
+        resources = super().augment(resources)
+        return universal_augment(self, resources)
+
     def get_resources(self, ids, cache=True):
         return universal_augment(self, self.augment([{'repositoryName': i} for i in ids]))
 
