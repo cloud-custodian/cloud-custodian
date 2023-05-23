@@ -43,15 +43,19 @@ class CodeArtifact(BaseTest):
 class CodeCommit(BaseTest):
 
     def test_query_repos(self):
-        factory = self.replay_flight_data("test_codecommit")
+        factory = self.replay_flight_data("test_codecommit", region="us-east-2")
         p = self.load_policy(
-            {"name": "get-repos", "resource": "codecommit"}, session_factory=factory
+            {"name": "get-repos", "resource": "codecommit", "filters": [
+                {"type": "value", "key": "tag:Owner", "value": "aj@stacklet.io"},
+            ]},
+            session_factory=factory,
+            config={"region": "us-east-2"},
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(
             resources[0]["cloneUrlSsh"],
-            "ssh://git-codecommit.us-east-2.amazonaws.com/v1/repos/custodian-config-repo",
+            "ssh://git-codecommit.us-east-2.amazonaws.com/v1/repos/demo-policies",
         )
 
     def test_get_repo_resources(self):
