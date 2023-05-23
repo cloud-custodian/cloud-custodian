@@ -9,6 +9,8 @@ ResourceMap = {
     "azure.application-gateway": "c7n_azure.resources.app_gateway.ApplicationGateway",
     "azure.armresource": "c7n_azure.resources.generic_arm_resource.GenericArmResource",
     "azure.batch": "c7n_azure.resources.batch.Batch",
+    "azure.cdn-custom-domain": "c7n_azure.resources.cdn_custom_domain.CdnCustomDomain",
+    "azure.cdn-endpoint": "c7n_azure.resources.cdn_endpoint.CdnEndpoint",
     "azure.cdnprofile": "c7n_azure.resources.cdn.CdnProfile",
     "azure.cognitiveservice": "c7n_azure.resources.cognitive_service.CognitiveService",
     "azure.container-group": "c7n_azure.resources.aci.ContainerGroup",
@@ -58,6 +60,7 @@ ResourceMap = {
     "azure.routetable": "c7n_azure.resources.route_table.RouteTable",
     "azure.search": "c7n_azure.resources.search.SearchService",
     "azure.servicebus-namespace": "c7n_azure.resources.servicebus_namespace.ServiceBusNamespace",
+    "azure.servicebus-namespace-authrules": "c7n_azure.resources.servicebus_namespace_authrules.ServiceBusNamespaceAuthRules", # noqa
     "azure.service-fabric-cluster": "c7n_azure.resources.service_fabric.ServiceFabricCluster",
     "azure.service-fabric-cluster-managed": "c7n_azure.resources.service_fabric.ServiceFabricClusterManaged",  # noqa
     "azure.spring-app": "c7n_azure.resources.spring.SpringApp",

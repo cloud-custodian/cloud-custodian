@@ -21,7 +21,7 @@ class AppEngineApp(QueryResourceManager):
         id = 'id'
         name = 'name'
         default_report_fields = [
-            'id', 'locationId', 'servingStatus', 'authDomain', 'defaultHostName']
+            'id', 'locationId', 'servingStatus', 'authDomain', 'defaultHostname']
         asset_type = "appengine.googleapis.com/Application"
         permissions = ('appengine.applications.get',)
         metric_key = 'resource.labels.module_id'
