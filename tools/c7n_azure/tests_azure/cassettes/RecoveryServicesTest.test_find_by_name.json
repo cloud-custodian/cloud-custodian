@@ -1,0 +1,98 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.RecoveryServices/vaults?api-version=2023-02-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Mon, 22 May 2023 20:42:48 GMT"
+                    ],
+                    "content-length": [
+                        "1611"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "location": "eastus",
+                                "name": "cfb-ukqrkhnt-ars",
+                                "etag": "W/\"datetime'2023-05-22T20%3A31%3A30.2192876Z'\"",
+                                "tags": {
+                                    "product_id": "13742"
+                                },
+                                "identity": {
+                                    "tenantId": "00000000-0000-0000-0000-000000000003",
+                                    "type": "UserAssigned",
+                                    "userAssignedIdentities": {
+                                        "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-ukqrkhnt-arg/providers/Microsoft.ManagedIdentity/userAssignedIdentities/my-assigned-user-identity": {
+                                            "clientId": "7f3cd9b1-74e8-41e0-9da5-f362a5ba6f3f",
+                                            "principalId": "eb0dcfe7-b42d-490f-9ca7-e731f96258e8"
+                                        }
+                                    }
+                                },
+                                "properties": {
+                                    "provisioningState": "Succeeded",
+                                    "publicNetworkAccess": "Enabled",
+                                    "restoreSettings": {
+                                        "crossSubscriptionRestoreSettings": {
+                                            "crossSubscriptionRestoreState": "Enabled"
+                                        }
+                                    }
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-ukqrkhnt-arg/providers/Microsoft.RecoveryServices/vaults/cfb-ukqrkhnt-ars",
+                                "type": "Microsoft.RecoveryServices/vaults",
+                                "sku": {
+                                    "name": "Standard"
+                                }
+                            },
+                            {
+                                "location": "eastus",
+                                "name": "cfb-ukqrkhnt-arsv",
+                                "etag": "W/\"datetime'2023-05-22T20%3A31%3A27.4999004Z'\"",
+                                "tags": {
+                                    "product_id": "13742"
+                                },
+                                "identity": {
+                                    "tenantId": "00000000-0000-0000-0000-000000000003",
+                                    "principalId": "547a3fbb-ea69-4af4-a384-6be8c394b575",
+                                    "type": "SystemAssigned"
+                                },
+                                "properties": {
+                                    "provisioningState": "Succeeded",
+                                    "publicNetworkAccess": "Enabled",
+                                    "restoreSettings": {
+                                        "crossSubscriptionRestoreSettings": {
+                                            "crossSubscriptionRestoreState": "Enabled"
+                                        }
+                                    }
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-ukqrkhnt-arg/providers/Microsoft.RecoveryServices/vaults/cfb-ukqrkhnt-arsv",
+                                "type": "Microsoft.RecoveryServices/vaults",
+                                "sku": {
+                                    "name": "Standard"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}
