@@ -41,7 +41,6 @@ azure-mgmt-iothub = "^1.0.0"
 azure-mgmt-keyvault = "^8.0.0"
 azure-mgmt-managementgroups = "1.0.0b1"
 azure-mgmt-network = "^17.1.0"
-azure-mgmt-recoveryservices = "^2.4.0"
 azure-mgmt-redhatopenshift = "^1.2.0"
 azure-mgmt-resourcegraph = "^7.0.0"
 azure-mgmt-resource = "^16.0.0"
@@ -85,6 +84,7 @@ azure-mgmt-frontdoor = "^1.0.0"
 azure-mgmt-security = "^1.0.0"
 azure-mgmt-servicebus = "^8.2.0"
 azure-mgmt-appplatform = "^8.0.0"
+azure-mgmt-recoveryservices = "^2.4.0"
 
 [tool.poetry.dev-dependencies]
 # setup custodian as a dev dependency
