@@ -5,7 +5,7 @@ from c7n_azure.provider import resources
 from c7n_azure.resources.arm import ArmResourceManager
 
 
-@resources.register('recoveryservices-vault')
+@resources.register('recovery-services')
 class RecoveryServicesVault(ArmResourceManager):
     """Azure Recovery Services Vault
 
@@ -17,7 +17,7 @@ class RecoveryServicesVault(ArmResourceManager):
 
         policies:
           - name: recovery-services-vault
-            resource: azure.recoveryservices-vault
+            resource: azure.recovery-services
             filters: value
             key: sku.name
             op: equal

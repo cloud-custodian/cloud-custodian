@@ -12,16 +12,16 @@ class RecoveryServicesTest(BaseTest):
         with self.sign_out_patch():
             p = self.load_policy({
                 'name': 'test-recovery-services',
-                'resource': 'azure.recoveryservices-vault'
+                'resource': 'azure.recovery-services'
             }, validate=True)
             self.assertTrue(p)
 
          
-    @arm_template('recovery_services.json')
+    @arm_template('recoveryservices.json')
     def test_find_by_name(self):
         p = self.load_policy({
             'name': 'test-recovery-services',
-            'resource': 'azure.recoveryservices-vault',
+            'resource': 'azure.recovery-services',
             'filters': [
                 {'type': 'value',
                  'key': 'name',

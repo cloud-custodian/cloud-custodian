@@ -53,7 +53,7 @@ ResourceMap = {
     "azure.postgresql-server": "c7n_azure.resources.postgresql_server.PostgresqlServer",
     "azure.publicip": "c7n_azure.resources.public_ip.PublicIPAddress",
     "azure.recordset": "c7n_azure.resources.record_set.RecordSet",
-    'azure.recoveryservices-vault': "c7n_azure.resources.recoveryservices_vault.RecoveryServicesVault",
+    'azure.recoveryservices': "c7n_azure.resources.recovery_services.RecoveryServices",
     "azure.redis": "c7n_azure.resources.redis.Redis",
     "azure.resourcegroup": "c7n_azure.resources.resourcegroup.ResourceGroup",
     "azure.roleassignment": "c7n_azure.resources.access_control.RoleAssignment",
