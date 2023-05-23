@@ -35,8 +35,7 @@
                                 "name": "cfbukqrkhntars655e53akvrc4k",
                                 "etag": "W/\"datetime'2023-05-23T16%3A15%3A05.9290358Z'\"",
                                 "tags": {
-                                    "product_id": "13742",
-                                    "created_by": "Femi_Olofinleye@mckinsey.com"
+                                    "product_id": "13742"
                                 },
                                 "properties": {
                                     "provisioningState": "Succeeded",

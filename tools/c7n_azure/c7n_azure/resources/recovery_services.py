@@ -9,7 +9,7 @@ from c7n_azure.resources.arm import ArmResourceManager
 class RecoveryServices(ArmResourceManager):
 
     class resource_type(ArmResourceManager.resource_type):
-        doc_groups = ['Recovery Services']
+        doc_groups = ['Backup and Recovery']
 
         service = 'azure.mgmt.recoveryservices'
         client = 'RecoveryServicesClient'
