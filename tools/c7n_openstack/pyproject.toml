@@ -16,10 +16,11 @@ classifiers = [
 
 [tool.poetry.dependencies]
 python = "^3.7"
+c7n = {path = "../..", develop = true}
+
 openstacksdk = "^0.52.0"
 
 [tool.poetry.dev-dependencies]
-c7n = {path = "../..", develop = true}
 pytest = "^7.1.2"
 vcrpy = "^4.0.2"
 

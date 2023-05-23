@@ -21,8 +21,6 @@ include = ["c7n_awscc/data/*json"]
 python = "^3.7"
 click = "^8.0"
 jsonpatch = "^1.32"
-
-[tool.poetry.dev-dependencies]
 c7n = {path = "../..", develop = true}
 
 [build-system]
