@@ -14,17 +14,17 @@
                     "message": "OK"
                 },
                 "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "content-length": [
+                        "10060"
+                    ],
                     "cache-control": [
                         "no-cache"
                     ],
-                    "content-length": [
-                        "11813"
-                    ],
                     "date": [
-                        "Thu, 18 May 2023 23:48:01 GMT"
-                    ],
-                    "content-type": [
-                        "application/json; charset=utf-8"
+                        "Tue, 23 May 2023 16:24:01 GMT"
                     ]
                 },
                 "body": {
@@ -103,7 +103,8 @@
                                 },
                                 "location": "global",
                                 "tags": {
-                                    "product_id": "13742"
+                                    "product_id": "13742",
+                                    "created_by": "carol_brothers@mckinsey.com"
                                 }
                             },
                             {
@@ -332,85 +333,6 @@
                                 }
                             },
                             {
-                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-yxemqwju-test-group/providers/Microsoft.Network/applicationGateways/cfb-yxemqwju-app-gateway",
-                                "name": "cfb-yxemqwju-app-gateway",
-                                "type": "Microsoft.Network/applicationGateways",
-                                "location": "centralus",
-                                "tags": {
-                                    "c7n": "true",
-                                    "product_id": "13742",
-                                    "created_by": "bhavik_chothani@mckinsey.com"
-                                }
-                            },
-                            {
-                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-yxemqwju-test-group/providers/Microsoft.Network/applicationGateways/cfb-yxemqwju-app-gateway-2",
-                                "name": "cfb-yxemqwju-app-gateway-2",
-                                "type": "Microsoft.Network/applicationGateways",
-                                "location": "centralus",
-                                "tags": {
-                                    "c7n": "true",
-                                    "product_id": "13742",
-                                    "created_by": "bhavik_chothani@mckinsey.com"
-                                }
-                            },
-                            {
-                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-yxemqwju-test-group/providers/Microsoft.Network/applicationGatewayWebApplicationFirewallPolicies/cfb-yxemqwju-waf-policy",
-                                "name": "cfb-yxemqwju-waf-policy",
-                                "type": "Microsoft.Network/applicationGatewayWebApplicationFirewallPolicies",
-                                "location": "centralus",
-                                "tags": {
-                                    "c7n": "true",
-                                    "product_id": "13742",
-                                    "created_by": "bhavik_chothani@mckinsey.com"
-                                }
-                            },
-                            {
-                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-yxemqwju-test-group/providers/Microsoft.Network/publicIPAddresses/cfb-yxemqwju-pip",
-                                "name": "cfb-yxemqwju-pip",
-                                "type": "Microsoft.Network/publicIPAddresses",
-                                "sku": {
-                                    "name": "Standard"
-                                },
-                                "location": "centralus",
-                                "tags": {
-                                    "product_id": "13742",
-                                    "created_by": "bhavik_chothani@mckinsey.com"
-                                }
-                            },
-                            {
-                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-yxemqwju-test-group/providers/Microsoft.Network/publicIPAddresses/cfb-yxemqwju-pip-2",
-                                "name": "cfb-yxemqwju-pip-2",
-                                "type": "Microsoft.Network/publicIPAddresses",
-                                "sku": {
-                                    "name": "Standard"
-                                },
-                                "location": "centralus",
-                                "tags": {
-                                    "product_id": "13742",
-                                    "created_by": "bhavik_chothani@mckinsey.com"
-                                }
-                            },
-                            {
-                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-yxemqwju-test-group/providers/Microsoft.Network/virtualNetworks/cfb-yxemqwju-vnet",
-                                "name": "cfb-yxemqwju-vnet",
-                                "type": "Microsoft.Network/virtualNetworks",
-                                "location": "centralus",
-                                "tags": {
-                                    "product_id": "13742",
-                                    "created_by": "bhavik_chothani@mckinsey.com"
-                                }
-                            },
-                            {
-                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-yxemqwju-test-group/providers/Microsoft.Network/virtualNetworks/cfb-yxemqwju-vnet-2",
-                                "name": "cfb-yxemqwju-vnet-2",
-                                "type": "Microsoft.Network/virtualNetworks",
-                                "location": "centralus",
-                                "tags": {
-                                    "product_id": "13742",
-                                    "created_by": "bhavik_chothani@mckinsey.com"
-                                }
-                            },
-                            {
                                 "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/djs-waf-test/providers/Microsoft.Network/frontdoorWebApplicationFirewallPolicies/djstestwafpolicy",
                                 "name": "djstestwafpolicy",
                                 "type": "Microsoft.Network/frontdoorWebApplicationFirewallPolicies",
@@ -451,6 +373,34 @@
                                 "tags": {
                                     "product_id": "13742"
                                 }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/temp-test-spring-apps/providers/Microsoft.ServiceBus/namespaces/temp-delete",
+                                "name": "temp-delete",
+                                "type": "Microsoft.ServiceBus/namespaces",
+                                "sku": {
+                                    "name": "Basic",
+                                    "tier": "Basic"
+                                },
+                                "location": "centralus",
+                                "tags": {
+                                    "product_id": "13742",
+                                    "created_by": "hitesh_jain@mckinsey.com"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_recoveryservices/providers/Microsoft.RecoveryServices/vaults/cfbukqrkhntars655e53akvrc4k",
+                                "name": "cfbukqrkhntars655e53akvrc4k",
+                                "type": "Microsoft.RecoveryServices/vaults",
+                                "sku": {
+                                    "name": "RS0",
+                                    "tier": "Standard"
+                                },
+                                "location": "southcentralus",
+                                "tags": {
+                                    "product_id": "13742",
+                                    "created_by": "Femi_Olofinleye@mckinsey.com"
+                                }
                             }
                         ]
                     }
@@ -470,17 +420,17 @@
                     "message": "OK"
                 },
                 "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
                     "cache-control": [
                         "no-cache"
                     ],
                     "date": [
-                        "Thu, 18 May 2023 23:48:02 GMT"
-                    ],
-                    "content-type": [
-                        "application/json; charset=utf-8"
+                        "Tue, 23 May 2023 16:24:02 GMT"
                     ],
                     "content-length": [
-                        "1021"
+                        "1150"
                     ]
                 },
                 "body": {
@@ -514,7 +464,20 @@
                                         "ruleSetType": "DefaultRuleSet",
                                         "ruleSetVersion": "1.0",
                                         "ruleSetAction": null,
-                                        "ruleGroupOverrides": [],
+                                        "ruleGroupOverrides": [
+                                            {
+                                                "ruleGroupName": "JAVA",
+                                                "rules": [
+                                                    {
+                                                        "ruleId": "944240",
+                                                        "enabledState": "Disabled",
+                                                        "action": "Block",
+                                                        "exclusions": []
+                                                    }
+                                                ],
+                                                "exclusions": []
+                                            }
+                                        ],
                                         "exclusions": []
                                     }
                                 ]
@@ -541,14 +504,14 @@
                     "message": "OK"
                 },
                 "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
                     "cache-control": [
                         "no-cache"
                     ],
                     "date": [
-                        "Thu, 18 May 2023 23:48:02 GMT"
-                    ],
-                    "content-type": [
-                        "application/json; charset=utf-8"
+                        "Tue, 23 May 2023 16:24:02 GMT"
                     ],
                     "content-length": [
                         "992"
@@ -612,17 +575,17 @@
                     "message": "OK"
                 },
                 "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
                     "cache-control": [
                         "no-cache"
                     ],
                     "date": [
-                        "Thu, 18 May 2023 23:48:02 GMT"
-                    ],
-                    "content-type": [
-                        "application/json; charset=utf-8"
+                        "Tue, 23 May 2023 16:24:02 GMT"
                     ],
                     "content-length": [
-                        "1178"
+                        "1306"
                     ]
                 },
                 "body": {
@@ -656,7 +619,20 @@
                                         "ruleSetType": "DefaultRuleSet",
                                         "ruleSetVersion": "1.0",
                                         "ruleSetAction": "Log",
-                                        "ruleGroupOverrides": [],
+                                        "ruleGroupOverrides": [
+                                            {
+                                                "ruleGroupName": "JAVA",
+                                                "rules": [
+                                                    {
+                                                        "ruleId": "944240",
+                                                        "enabledState": "Enabled",
+                                                        "action": "Block",
+                                                        "exclusions": []
+                                                    }
+                                                ],
+                                                "exclusions": []
+                                            }
+                                        ],
                                         "exclusions": []
                                     }
                                 ]
@@ -687,14 +663,14 @@
                     "message": "OK"
                 },
                 "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
                     "cache-control": [
                         "no-cache"
                     ],
                     "date": [
-                        "Thu, 18 May 2023 23:48:02 GMT"
-                    ],
-                    "content-type": [
-                        "application/json; charset=utf-8"
+                        "Tue, 23 May 2023 16:24:02 GMT"
                     ],
                     "content-length": [
                         "882"
