@@ -18,4 +18,4 @@ class Secret(QueryResourceManager):
         scope_template = "projects/{}"
         name = id = "name"
         asset_type = "secretmanager.googleapis.com/Secret"
-        default_report_fields = ['name', 'updateTime']
+        default_report_fields = ['name', 'createTime', 'expireTime', 'ttl']

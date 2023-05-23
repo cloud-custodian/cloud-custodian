@@ -15,7 +15,7 @@ class CloudBuild(QueryResourceManager):
         scope = 'project'
         scope_key = 'projectId'
         name = id = "id"
-        default_report_fields = ["status", "startTime", "logsURL"]
+        default_report_fields = ["status", "startTime", "logUrl"]
         permissions = ('cloudbuild.builds.list',)
 
         # Lacking a test so can't confirm any URN.

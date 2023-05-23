@@ -6,7 +6,7 @@ from c7n_gcp.query import RegionalResourceManager, ChildTypeInfo
 @resources.register('artifact-repository')
 class ArtifactRegistryRepository(RegionalResourceManager):
     """Artifact Registry Repository
-
+   
     https://cloud.google.com/artifact-registry/docs/reference/rest/v1/projects.locations.repositories
     """
     class resource_type(ChildTypeInfo):
@@ -23,8 +23,7 @@ class ArtifactRegistryRepository(RegionalResourceManager):
             'use_child_query': True,
         }
         permissions = ('artifactregistry.repositories.list',)
-        default_report_fields = ['displayName', 'expireTime']
-        asset_type = "artifactregistry.googleapis.com/Repository"
+        default_report_fields = ['name', 'description', 'updateTime', 'sizeBytes']
 
     def _get_child_enum_args(self, parent_instance):
         return {
