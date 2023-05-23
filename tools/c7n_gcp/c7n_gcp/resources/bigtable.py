@@ -1,3 +1,5 @@
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 from c7n_gcp.filters.iampolicy import IamPolicyFilter
 from c7n_gcp.provider import resources
 from c7n_gcp.query import (
@@ -84,7 +86,18 @@ class BigTableInstanceClusterBackup(ChildResourceManager):
 
 @BigTableInstanceClusterBackup.filter_registry.register('time-range')
 class TimeRange(Filter):
+    """Filters bigtable instance clusters backups based on a time range
 
+    .. code-block:: yaml
+        policies:
+          - name: bigtable_backup_expiration_time_30_days
+            description: |
+              Cloud Bigtable backup expiration time is 29 days or less
+            resource: gcp.bigtable-instance-cluster-backup
+            filters:
+              - type: time-range
+                value: 29
+    """
     schema = type_schema('time-range',
                          value={'$ref': '#/definitions/filters_common/value'})
     permissions = ('bigtable.backups.list',)
@@ -151,7 +164,4 @@ class BigTableInstanceTable(ChildResourceManager):
 
 @BigTableInstanceTable.filter_registry.register('iam-policy')
 class BigTableInstanceTableIamPolicyFilter(IamPolicyFilter):
-    """
-    Overrides the base implementation to process service account resources correctly.
-    """
     permissions = ('resourcemanager.projects.getIamPolicy',)
