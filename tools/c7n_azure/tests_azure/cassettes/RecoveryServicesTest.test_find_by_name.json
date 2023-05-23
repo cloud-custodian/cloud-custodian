@@ -14,26 +14,26 @@
                     "message": "OK"
                 },
                 "headers": {
+                    "cache-control": [
+                        "no-cache"
+                    ],
                     "content-type": [
                         "application/json; charset=utf-8"
                     ],
                     "date": [
-                        "Tue, 23 May 2023 17:29:39 GMT"
-                    ],
-                    "cache-control": [
-                        "no-cache"
+                        "Tue, 23 May 2023 21:43:24 GMT"
                     ],
                     "content-length": [
-                        "638"
+                        "586"
                     ]
                 },
                 "body": {
                     "data": {
                         "value": [
                             {
-                                "location": "southcentralus",
+                                "location": "eastus",
                                 "name": "cfbukqrkhntars655e53akvrc4k",
-                                "etag": "W/\"datetime'2023-05-23T16%3A15%3A05.9290358Z'\"",
+                                "etag": "W/\"datetime'2023-05-23T21%3A04%3A52.6559493Z'\"",
                                 "tags": {
                                     "product_id": "13742"
                                 },

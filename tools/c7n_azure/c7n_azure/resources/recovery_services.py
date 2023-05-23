@@ -6,7 +6,7 @@ from c7n_azure.resources.arm import ArmResourceManager
 
 
 @resources.register('recovery-services')
-class RecoveryServicesVault(ArmResourceManager):
+class RecoveryServices(ArmResourceManager):
     """Azure Recovery Services Vault
 
     :example:
