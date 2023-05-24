@@ -71,6 +71,7 @@ ResourceMap = {
     "gcp.log-exclusion": "c7n_gcp.resources.logging.LogExclusion",
     "gcp.log-project-metric": "c7n_gcp.resources.logging.LogProjectMetric",
     "gcp.log-project-sink": "c7n_gcp.resources.logging.LogProjectSink",
+    "gcp.logging-sink": "c7n_gcp.resources.logging.LoggingSink",
     "gcp.ml-job": "c7n_gcp.resources.mlengine.MLJob",
     "gcp.ml-model": "c7n_gcp.resources.mlengine.MLModel",
     "gcp.organization": "c7n_gcp.resources.resourcemanager.Organization",

@@ -146,3 +146,23 @@ class LogExclusion(QueryResourceManager):
             return client.execute_query('get', {
                 'name': 'projects/{project_id}/exclusions/{name}'.format(
                     **resource_info)})
+
+
+@resources.register('logging-sink')
+class LoggingSink(QueryResourceManager):
+    class resource_type(TypeInfo):
+        service = 'logging'
+        version = 'v2'
+        component = 'projects.sinks'
+        enum_spec = ('list', 'sinks[]', None)
+        scope_key = 'parent'
+        scope_template = "projects/{}"
+        name = id = 'name'
+        default_report_fields = ['name', 'kind', 'items']
+        asset_type = 'logging.googleapis.com/LogSink'
+
+        @staticmethod
+        def get(client, resource_info):
+            return client.get('get', {
+                'sinkName': 'projects/{project_id}/sinks/{name}'.format(
+                    **resource_info)})

@@ -178,3 +178,20 @@ class LogExclusionTest(BaseTest):
                 'gcp:logging::cloud-custodian:exclusion/qwerty',
             ],
         )
+
+
+class LoggingSinkTest(BaseTest):
+
+    def test_query(self):
+        project_id = 'cloud-custodian'
+        sink_name = 'custodian-auto-audit-epam-gcp-188-bigquery_' \
+                    'datasets_are_not_anon_or_pub_accessible'
+        factory = self.replay_flight_data('test-logging-sink-query', project_id)
+        policy = self.load_policy({
+            'name': 'logging-sink',
+            'resource': 'gcp.logging-sink',
+        }, session_factory=factory)
+        resources = policy.run()
+
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['name'], sink_name)
