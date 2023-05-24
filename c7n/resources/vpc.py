@@ -869,7 +869,8 @@ class SGUsage(Filter):
 
     def get_eni_sgs(self):
         sg_ids = set()
-        self.nics = self.manager.get_resource_manager('eni').resources()
+        self.nics = self.filter_resources(self.manager.get_resource_manager(
+            'eni').resources(), 'OwnerId', (self.manager.config.account_id,))
         for nic in self.nics:
             for g in nic['Groups']:
                 sg_ids.add(g['GroupId'])
