@@ -1738,7 +1738,8 @@ class ConfigRule(AWSEventBase):
         eval_modes = self.get_eval_mode()
         if 'proactive' in eval_modes:
             params.pop('Scope', None)
-        if self.data.get('evaluation'):
+        if eval_modes:
+          params['EvaluationModes'] = [{'Mode': e.upper()} for e in eval_modes]
             params['EvaluationModes'] = [{'Mode': e.upper()} for e in self.get_eval_mode()]
         return params
 
