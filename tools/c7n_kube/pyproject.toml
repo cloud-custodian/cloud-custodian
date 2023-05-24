@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "c7n_kube"
-version = "0.2.25"
+version = "0.2.26"
 description = "Cloud Custodian - Kubernetes Provider"
 readme = "readme.md"
 homepage = "https://cloudcustodian.io"
@@ -16,11 +16,12 @@ classifiers = [
 
 [tool.poetry.dependencies]
 python = "^3.7"
+c7n = {path = "../..", develop = true}
+
 kubernetes = ">=10.0.1"
 jsonpatch = "^1.32"
 
 [tool.poetry.dev-dependencies]
-c7n = {path = "../..", develop = true}
 pytest = "^7.1.2"
 vcrpy = "^4.0.2"
 
