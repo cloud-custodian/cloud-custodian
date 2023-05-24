@@ -17,14 +17,14 @@
                     "content-type": [
                         "application/json; charset=utf-8"
                     ],
+                    "date": [
+                        "Wed, 24 May 2023 14:51:56 GMT"
+                    ],
                     "content-length": [
-                        "10060"
+                        "14072"
                     ],
                     "cache-control": [
                         "no-cache"
-                    ],
-                    "date": [
-                        "Tue, 23 May 2023 16:24:01 GMT"
                     ]
                 },
                 "body": {
@@ -90,6 +90,143 @@
                                     "name": "Basic"
                                 },
                                 "location": "centralus",
+                                "tags": {
+                                    "product_id": "13742"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-gjlybgjp/providers/Microsoft.Cdn/profiles/WAFFrontDoor-Fail",
+                                "name": "WAFFrontDoor-Fail",
+                                "type": "Microsoft.Cdn/profiles",
+                                "sku": {
+                                    "name": "Premium_AzureFrontDoor"
+                                },
+                                "kind": "frontdoor",
+                                "location": "global",
+                                "tags": {
+                                    "c7n": "true",
+                                    "product_id": "13742",
+                                    "created_by": "carol_brothers@mckinsey.com"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-gjlybgjp/providers/Microsoft.Cdn/profiles/WAFFrontDoor-Fail/afdendpoints/afd-cfb-gjlybgjp-Fail",
+                                "name": "WAFFrontDoor-Fail/afd-cfb-gjlybgjp-Fail",
+                                "type": "Microsoft.Cdn/profiles/afdendpoints",
+                                "location": "global",
+                                "tags": {
+                                    "c7n": "true",
+                                    "product_id": "13742",
+                                    "created_by": "carol_brothers@mckinsey.com"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-gjlybgjp/providers/Microsoft.Cdn/profiles/WAFFrontDoorStandard-Fail",
+                                "name": "WAFFrontDoorStandard-Fail",
+                                "type": "Microsoft.Cdn/profiles",
+                                "sku": {
+                                    "name": "Standard_AzureFrontDoor"
+                                },
+                                "kind": "frontdoor",
+                                "location": "global",
+                                "tags": {
+                                    "c7n": "true",
+                                    "product_id": "13742",
+                                    "created_by": "carol_brothers@mckinsey.com"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-gjlybgjp/providers/Microsoft.Cdn/profiles/WAFFrontDoorStandard-Fail/afdendpoints/afd-cfb-gjlybgjpStandard-Fail",
+                                "name": "WAFFrontDoorStandard-Fail/afd-cfb-gjlybgjpStandard-Fail",
+                                "type": "Microsoft.Cdn/profiles/afdendpoints",
+                                "location": "global",
+                                "tags": {
+                                    "c7n": "true",
+                                    "product_id": "13742",
+                                    "created_by": "carol_brothers@mckinsey.com"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-gjlybgjp/providers/Microsoft.Network/frontdoors/WAFFrontDoorClassic-Fail",
+                                "name": "WAFFrontDoorClassic-Fail",
+                                "type": "Microsoft.Network/frontdoors",
+                                "location": "global",
+                                "tags": {
+                                    "product_id": "13742",
+                                    "created_by": "carol_brothers@mckinsey.com"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-gjlybgjp/providers/Microsoft.Web/serverFarms/AppServicePlan-Fail",
+                                "name": "AppServicePlan-Fail",
+                                "type": "Microsoft.Web/serverFarms",
+                                "sku": {
+                                    "name": "S1",
+                                    "tier": "Standard",
+                                    "size": "S1",
+                                    "family": "S",
+                                    "capacity": 1
+                                },
+                                "kind": "app",
+                                "location": "eastus",
+                                "tags": {
+                                    "c7n": "true",
+                                    "product_id": "13742"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-gjlybgjp/providers/Microsoft.Web/serverFarms/AppServicePlanStandard-Fail",
+                                "name": "AppServicePlanStandard-Fail",
+                                "type": "Microsoft.Web/serverFarms",
+                                "sku": {
+                                    "name": "S1",
+                                    "tier": "Standard",
+                                    "size": "S1",
+                                    "family": "S",
+                                    "capacity": 1
+                                },
+                                "kind": "app",
+                                "location": "eastus",
+                                "tags": {
+                                    "c7n": "true",
+                                    "product_id": "13742"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-gjlybgjp/providers/Microsoft.Web/sites/Fail-cfb-gjlybgjp",
+                                "name": "Fail-cfb-gjlybgjp",
+                                "type": "Microsoft.Web/sites",
+                                "kind": "app",
+                                "location": "eastus",
+                                "tags": {
+                                    "c7n": "true",
+                                    "product_id": "13742"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-gjlybgjp/providers/Microsoft.Web/sites/FailStandard-cfb-gjlybgjp",
+                                "name": "FailStandard-cfb-gjlybgjp",
+                                "type": "Microsoft.Web/sites",
+                                "kind": "app",
+                                "location": "eastus",
+                                "tags": {
+                                    "c7n": "true",
+                                    "product_id": "13742"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-glpoffqf/providers/Microsoft.Storage/storageAccounts/c7nsuccesssa9",
+                                "name": "c7nsuccesssa9",
+                                "type": "Microsoft.Storage/storageAccounts",
+                                "sku": {
+                                    "name": "Standard_LRS",
+                                    "tier": "Standard"
+                                },
+                                "kind": "StorageV2",
+                                "location": "centralus",
+                                "identity": {
+                                    "type": "None"
+                                },
                                 "tags": {
                                     "product_id": "13742"
                                 }
@@ -189,14 +326,35 @@
                                 "location": "global",
                                 "tags": {
                                     "c7n": "true",
-                                    "product_id": "13742",
-                                    "created_by": "carol_brothers@mckinsey.com"
+                                    "product_id": "13742"
                                 }
                             },
                             {
                                 "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-tlhtmkyz/providers/Microsoft.Cdn/profiles/WAFFrontDoorStandard-Success/afdendpoints/afd-cfb-tlhtmkyzStandard-Success",
                                 "name": "WAFFrontDoorStandard-Success/afd-cfb-tlhtmkyzStandard-Success",
                                 "type": "Microsoft.Cdn/profiles/afdendpoints",
+                                "location": "global",
+                                "tags": {
+                                    "c7n": "true",
+                                    "product_id": "13742"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-tlhtmkyz/providers/Microsoft.Network/frontdoors/WAFFrontDoorClassic-Success",
+                                "name": "WAFFrontDoorClassic-Success",
+                                "type": "Microsoft.Network/frontdoors",
+                                "location": "global",
+                                "tags": {
+                                    "product_id": "13742"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-tlhtmkyz/providers/Microsoft.Network/frontdoorWebApplicationFirewallPolicies/WAFSuccessClassic",
+                                "name": "WAFSuccessClassic",
+                                "type": "Microsoft.Network/frontdoorWebApplicationFirewallPolicies",
+                                "sku": {
+                                    "name": "Classic_AzureFrontDoor"
+                                },
                                 "location": "global",
                                 "tags": {
                                     "c7n": "true",
@@ -227,8 +385,7 @@
                                 "location": "global",
                                 "tags": {
                                     "c7n": "true",
-                                    "product_id": "13742",
-                                    "created_by": "carol_brothers@mckinsey.com"
+                                    "product_id": "13742"
                                 }
                             },
                             {
@@ -396,10 +553,9 @@
                                     "name": "RS0",
                                     "tier": "Standard"
                                 },
-                                "location": "southcentralus",
+                                "location": "eastus",
                                 "tags": {
-                                    "product_id": "13742",
-                                    "created_by": "Femi_Olofinleye@mckinsey.com"
+                                    "product_id": "13742"
                                 }
                             }
                         ]
@@ -423,11 +579,11 @@
                     "content-type": [
                         "application/json; charset=utf-8"
                     ],
+                    "date": [
+                        "Wed, 24 May 2023 14:52:07 GMT"
+                    ],
                     "cache-control": [
                         "no-cache"
-                    ],
-                    "date": [
-                        "Tue, 23 May 2023 16:24:02 GMT"
                     ],
                     "content-length": [
                         "1150"
@@ -507,11 +663,11 @@
                     "content-type": [
                         "application/json; charset=utf-8"
                     ],
+                    "date": [
+                        "Wed, 24 May 2023 14:52:07 GMT"
+                    ],
                     "cache-control": [
                         "no-cache"
-                    ],
-                    "date": [
-                        "Tue, 23 May 2023 16:24:02 GMT"
                     ],
                     "content-length": [
                         "992"
@@ -565,6 +721,82 @@
         {
             "request": {
                 "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-tlhtmkyz/providers/Microsoft.Network/FrontDoorWebApplicationFirewallPolicies/WAFSuccessClassic?api-version=2020-11-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Wed, 24 May 2023 14:52:07 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-length": [
+                        "1228"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/cfb-tlhtmkyz/providers/Microsoft.Network/frontdoorwebapplicationfirewallpolicies/WAFSuccessClassic",
+                        "type": "Microsoft.Network/frontdoorwebapplicationfirewallpolicies",
+                        "name": "WAFSuccessClassic",
+                        "location": "Global",
+                        "tags": {
+                            "c7n": "true",
+                            "product_id": "13742",
+                            "created_by": "carol_brothers@mckinsey.com"
+                        },
+                        "sku": {
+                            "name": "Classic_AzureFrontDoor"
+                        },
+                        "properties": {
+                            "policySettings": {
+                                "enabledState": "Enabled",
+                                "mode": "Prevention",
+                                "redirectUrl": "https://www.contoso.com",
+                                "customBlockResponseStatusCode": 403,
+                                "customBlockResponseBody": "PGh0bWw+CjxoZWFkZXI+PHRpdGxlPkhlbGxvPC90aXRsZT48L2hlYWRlcj4KPGJvZHk+CkhlbGxvIHdvcmxkCjwvYm9keT4KPC9odG1sPg==",
+                                "requestBodyCheck": "Enabled"
+                            },
+                            "customRules": {
+                                "rules": []
+                            },
+                            "managedRules": {
+                                "managedRuleSets": [
+                                    {
+                                        "ruleSetType": "DefaultRuleSet",
+                                        "ruleSetVersion": "1.0",
+                                        "ruleSetAction": null,
+                                        "ruleGroupOverrides": [],
+                                        "exclusions": []
+                                    }
+                                ]
+                            },
+                            "frontendEndpointLinks": [
+                                {
+                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/cfb-tlhtmkyz/providers/Microsoft.Network/frontdoors/WAFFrontDoorClassic-Success/frontendendpoints/FrontEndpointClassic-Success"
+                                }
+                            ],
+                            "securityPolicyLinks": [],
+                            "resourceState": "Enabled",
+                            "provisioningState": "Succeeded"
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
                 "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-tlhtmkyz/providers/Microsoft.Network/FrontDoorWebApplicationFirewallPolicies/WAFSuccessPremium?api-version=2020-11-01",
                 "body": null,
                 "headers": {}
@@ -578,14 +810,14 @@
                     "content-type": [
                         "application/json; charset=utf-8"
                     ],
+                    "date": [
+                        "Wed, 24 May 2023 14:52:07 GMT"
+                    ],
                     "cache-control": [
                         "no-cache"
                     ],
-                    "date": [
-                        "Tue, 23 May 2023 16:24:02 GMT"
-                    ],
                     "content-length": [
-                        "1306"
+                        "1178"
                     ]
                 },
                 "body": {
@@ -619,20 +851,7 @@
                                         "ruleSetType": "DefaultRuleSet",
                                         "ruleSetVersion": "1.0",
                                         "ruleSetAction": "Log",
-                                        "ruleGroupOverrides": [
-                                            {
-                                                "ruleGroupName": "JAVA",
-                                                "rules": [
-                                                    {
-                                                        "ruleId": "944240",
-                                                        "enabledState": "Enabled",
-                                                        "action": "Block",
-                                                        "exclusions": []
-                                                    }
-                                                ],
-                                                "exclusions": []
-                                            }
-                                        ],
+                                        "ruleGroupOverrides": [],
                                         "exclusions": []
                                     }
                                 ]
@@ -666,11 +885,11 @@
                     "content-type": [
                         "application/json; charset=utf-8"
                     ],
+                    "date": [
+                        "Wed, 24 May 2023 14:52:08 GMT"
+                    ],
                     "cache-control": [
                         "no-cache"
-                    ],
-                    "date": [
-                        "Tue, 23 May 2023 16:24:02 GMT"
                     ],
                     "content-length": [
                         "882"

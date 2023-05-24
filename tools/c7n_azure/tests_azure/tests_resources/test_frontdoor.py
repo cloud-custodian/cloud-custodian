@@ -10,6 +10,21 @@ class FrontDoorTest(BaseTest):
             'resource': 'azure.front-door'
         }, validate=True)
         self.assertTrue(p)
+
+    def test_frontdoor_waf_enabled(self):
+        p = self.load_policy({
+            'name': 'frontdoor-waf-managed-rule-is-enabled',
+            'resource': 'azure.front-door',
+             'filters': [
+                {
+                    'type': 'frontdoor-waf-is-enabled',
+                },
+              
+               
+            ]
+        })
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
   
     def test_frontdoor_waf_managed_rule_enabled(self):
         p = self.load_policy({

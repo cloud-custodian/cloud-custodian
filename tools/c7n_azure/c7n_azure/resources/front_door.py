@@ -36,6 +36,34 @@ class FrontDoor(ArmResourceManager):
         )
         resource_type = 'Microsoft.Network/frontDoors'
 
+@FrontDoor.filter_registry.register('frontdoor-waf-is-enabled')
+class WebAppFirewallMissingFilter(Filter):
+    """Frontdoor check waf enabled on front door profiles
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+            name: test-frontdoor-waf-is-enabled
+            resource: azure.front-door
+            filters: [
+                - type: frontdoor-waf-is-enabled        
+            ]
+
+    """
+    schema = type_schema('frontdoor-waf-is-enabled')
+    
+    def process(self, resources, event=None):
+        client = self.manager.get_client()
+        results = []
+        for r in resources:
+            for fes in r['properties']['frontendEndpoints']:
+                fe = client.frontend_endpoints.get(r['resourceGroup'], r['name'],fes['name'])
+                if fe.web_application_firewall_policy_link is None:
+                    results.append(r)
+        return results
+    
 @resources.register('frontdoor-waf')
 class FrontDoorWAFResource(ArmResourceManager):
     """Resource Group Resource

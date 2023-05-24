@@ -35,17 +35,17 @@ class CdnTest(BaseTest):
         'name': 'cdn-waf-is-enabled',
         'resource': 'azure.cdnprofile',
         'filters': [
-            {
-                'type': 'cdn-waf-is-enabled',
-            },
-            {
+             {
                 'type': 'value',
                 'key': 'sku.name',
                 'op': 'in',
-                'value': ['Standard_AzureFrontDoor','Premium_AzureFrontDoor','Classic_AzureFrontDoor']   
+                'value': ['Standard_AzureFrontDoor','Premium_AzureFrontDoor']   
             },
-                
+            {
+                'type': 'cdn-waf-is-enabled',
+            },
+                            
             ]
         })
         resources = p.run()
-        self.assertEqual(len(resources), 0)
+        self.assertEqual(len(resources), 2)

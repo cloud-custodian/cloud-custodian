@@ -14,20 +14,20 @@
                     "message": "OK"
                 },
                 "headers": {
-                    "cache-control": [
-                        "no-cache"
-                    ],
-                    "x-ms-ratelimit-remaining-subscription-resource-requests": [
-                        "49"
-                    ],
                     "content-type": [
                         "application/json; charset=utf-8"
                     ],
                     "date": [
-                        "Tue, 23 May 2023 16:18:22 GMT"
+                        "Wed, 24 May 2023 14:46:15 GMT"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-resource-requests": [
+                        "49"
+                    ],
+                    "cache-control": [
+                        "no-cache"
                     ],
                     "content-length": [
-                        "989"
+                        "1941"
                     ]
                 },
                 "body": {
@@ -60,6 +60,45 @@
                                 "kind": "frontdoor",
                                 "tags": {
                                     "c7n": "true",
+                                    "product_id": "13742"
+                                },
+                                "sku": {
+                                    "name": "Standard_AzureFrontDoor"
+                                },
+                                "properties": {
+                                    "frontDoorId": "f0964d5a-6bb8-46fe-a318-7a2681520b8f",
+                                    "resourceState": "Active",
+                                    "provisioningState": "Succeeded"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/cfb-gjlybgjp/providers/Microsoft.Cdn/profiles/WAFFrontDoor-Fail",
+                                "type": "Microsoft.Cdn/profiles",
+                                "name": "WAFFrontDoor-Fail",
+                                "location": "Global",
+                                "kind": "frontdoor",
+                                "tags": {
+                                    "c7n": "true",
+                                    "product_id": "13742",
+                                    "created_by": "carol_brothers@mckinsey.com"
+                                },
+                                "sku": {
+                                    "name": "Premium_AzureFrontDoor"
+                                },
+                                "properties": {
+                                    "frontDoorId": "b88ae31a-91ce-45f6-860a-ef4205986bcd",
+                                    "resourceState": "Active",
+                                    "provisioningState": "Succeeded"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/cfb-gjlybgjp/providers/Microsoft.Cdn/profiles/WAFFrontDoorStandard-Fail",
+                                "type": "Microsoft.Cdn/profiles",
+                                "name": "WAFFrontDoorStandard-Fail",
+                                "location": "Global",
+                                "kind": "frontdoor",
+                                "tags": {
+                                    "c7n": "true",
                                     "product_id": "13742",
                                     "created_by": "carol_brothers@mckinsey.com"
                                 },
@@ -67,7 +106,7 @@
                                     "name": "Standard_AzureFrontDoor"
                                 },
                                 "properties": {
-                                    "frontDoorId": "f0964d5a-6bb8-46fe-a318-7a2681520b8f",
+                                    "frontDoorId": "eb3b2a3d-e863-4b93-8911-466c42a87993",
                                     "resourceState": "Active",
                                     "provisioningState": "Succeeded"
                                 }
@@ -90,14 +129,14 @@
                     "message": "OK"
                 },
                 "headers": {
-                    "cache-control": [
-                        "no-cache"
-                    ],
                     "content-type": [
                         "application/json; charset=utf-8"
                     ],
                     "date": [
-                        "Tue, 23 May 2023 16:18:22 GMT"
+                        "Wed, 24 May 2023 14:46:31 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
                     ],
                     "content-length": [
                         "872"
@@ -152,14 +191,14 @@
                     "message": "OK"
                 },
                 "headers": {
-                    "cache-control": [
-                        "no-cache"
-                    ],
                     "content-type": [
                         "application/json; charset=utf-8"
                     ],
                     "date": [
-                        "Tue, 23 May 2023 16:18:22 GMT"
+                        "Wed, 24 May 2023 14:46:31 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
                     ],
                     "content-length": [
                         "878"
@@ -197,6 +236,72 @@
                                 }
                             }
                         ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-gjlybgjp/providers/Microsoft.Cdn/profiles/WAFFrontDoor-Fail/securityPolicies?api-version=2020-09-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Wed, 24 May 2023 14:46:32 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-length": [
+                        "12"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": []
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-gjlybgjp/providers/Microsoft.Cdn/profiles/WAFFrontDoorStandard-Fail/securityPolicies?api-version=2020-09-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Wed, 24 May 2023 14:46:32 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-length": [
+                        "12"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": []
                     }
                 }
             }

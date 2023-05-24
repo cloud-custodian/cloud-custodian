@@ -45,7 +45,7 @@ class CdnProfile(ArmResourceManager):
 
 @CdnProfile.filter_registry.register('cdn-waf-is-enabled')
 class WebAppFirewallMissingFilter(Filter):
-    """CDN check waf enabled on front door profiles
+    """CDN check waf enabled on cdn profiles
 
     :example:
 
@@ -59,7 +59,7 @@ class WebAppFirewallMissingFilter(Filter):
                 - type: value
                   key: sku.name
                   op: in
-                  value: ['Standard_AzureFrontDoor','Premium_AzureFrontDoor','Classic_AzureFrontDoor']              
+                  value: ['Standard_AzureFrontDoor','Premium_AzureFrontDoor']              
             ]
 
     """
