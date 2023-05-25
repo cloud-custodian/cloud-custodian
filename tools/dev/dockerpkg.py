@@ -85,13 +85,14 @@ RUN . /usr/local/bin/activate && pip install -qU pip wheel aws-xray-sdk psutil j
 # dependency install
 RUN . /usr/local/bin/activate && poetry install --without dev --no-root
 
+# Now install the root package, we used to do this after dependencies of other providers
+# but since moving c7n to a main dependency in pyproject toml we have to do this one first.
+ADD c7n /src/c7n/
+RUN . /usr/local/bin/activate && poetry install --only-root
+
 ARG providers="{providers}"
 # Add provider packages
 {PHASE_1_PKG_INSTALL_DEP}
-
-# Now install the root package
-ADD c7n /src/c7n/
-RUN . /usr/local/bin/activate && poetry install --only-root
 
 {PHASE_2_PKG_INSTALL_ROOT}
 
