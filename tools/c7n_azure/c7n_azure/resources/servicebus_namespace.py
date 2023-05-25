@@ -7,6 +7,7 @@ from c7n_azure.resources.arm import ArmResourceManager
 
 @resources.register('servicebus-namespace')
 class ServiceBusNamespace(ArmResourceManager):
+
     """Azure Service Bus Namespace Resource
 
     :example:

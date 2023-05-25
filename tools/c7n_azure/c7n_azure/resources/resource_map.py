@@ -53,6 +53,7 @@ ResourceMap = {
     "azure.postgresql-server": "c7n_azure.resources.postgresql_server.PostgresqlServer",
     "azure.publicip": "c7n_azure.resources.public_ip.PublicIPAddress",
     "azure.recordset": "c7n_azure.resources.record_set.RecordSet",
+    "azure.recovery-services": "c7n_azure.resources.recovery_services.RecoveryServices",
     "azure.redis": "c7n_azure.resources.redis.Redis",
     "azure.resourcegroup": "c7n_azure.resources.resourcegroup.ResourceGroup",
     "azure.roleassignment": "c7n_azure.resources.access_control.RoleAssignment",
@@ -60,6 +61,7 @@ ResourceMap = {
     "azure.routetable": "c7n_azure.resources.route_table.RouteTable",
     "azure.search": "c7n_azure.resources.search.SearchService",
     "azure.servicebus-namespace": "c7n_azure.resources.servicebus_namespace.ServiceBusNamespace",
+    "azure.servicebus-namespace-networkrules": "c7n_azure.resources.servicebus_namespace_networkrules.ServiceBusNamespaceNetworkrules", # noqa
     "azure.servicebus-namespace-authrules": "c7n_azure.resources.servicebus_namespace_authrules.ServiceBusNamespaceAuthRules", # noqa
     "azure.service-fabric-cluster": "c7n_azure.resources.service_fabric.ServiceFabricCluster",
     "azure.service-fabric-cluster-managed": "c7n_azure.resources.service_fabric.ServiceFabricClusterManaged",  # noqa

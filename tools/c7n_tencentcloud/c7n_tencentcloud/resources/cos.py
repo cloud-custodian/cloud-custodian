@@ -101,7 +101,7 @@ class HasStatementFilter(BucketFilterBase):
                 - type: has-statement
                   statements:
                     - Effect: Deny
-                    - Action: name/cos:GetObject
+                      Action: name/cos:GetObject
 
     """
     schema = type_schema(
