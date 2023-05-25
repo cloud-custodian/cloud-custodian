@@ -1,7 +1,7 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import time
-from .common import BaseTest, functional, event_data
+from .common import BaseTest, functional, event_data, load_data
 from unittest.mock import MagicMock
 
 from botocore.exceptions import ClientError as BotoClientError
@@ -1418,6 +1418,16 @@ class SecurityGroupTest(BaseTest):
                 }
             ],
         )
+
+    def test_used_consumer_eni_in_producer(self):
+        p = self.load_policy(
+            {"name": "sg-used", "resource": "security-group", "filters": ["used"]},
+        )
+        used = p.resource_manager.filters[0]
+        used.nics = load_data('ram-producer-view-consumer-eni.json')['NetworkInterfaces']
+
+        group_enis = used._get_eni_attributes()
+        assert set(group_enis) == {'sg-123', 'sg-456', 'sg-789'}
 
     def test_used(self):
         factory = self.replay_flight_data("test_security_group_used")

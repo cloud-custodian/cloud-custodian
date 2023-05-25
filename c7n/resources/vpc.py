@@ -1024,9 +1024,6 @@ class UsedSecurityGroup(SGUsage):
         unused = {g['GroupId'] for g in self.filter_peered_refs(unused)}
         group_enis = self._get_eni_attributes()
         for r in resources:
-            owner_ids = set()
-            interface_types = set()
-            interface_resource_types = set()
             enis = group_enis.get(r['GroupId'], ())
             r[self.instance_owner_id_key] = list({
                 i['InstanceOwnerId'] for i in enis if i['InstanceOwnerId']})
