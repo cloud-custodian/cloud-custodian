@@ -1,0 +1,138 @@
+name: "Release"
+
+on:
+  workflow_dispatch: {}
+
+
+jobs:
+  BuildWheels:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+      checks: write    
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install Custodian
+        uses: ./.github/composites/install
+        with:
+          python-version: "3.11"
+
+      - name: Build Wheels
+        shell: bash
+        run: |
+          poetry self add poetry-plugin-freeze
+          pip install twine
+          make pkg-build-wheel
+          python tools/dev/poetrypkg --root . --output wheels-manifest.txt
+
+      - name: Build ChangeLog
+        shell: bash
+        run: |
+          python tools/dev/changelog.py --output release.md --root . --since last
+          cat release.md
+
+      - uses: aws-actions/configure-aws-credentials@v1-node16
+        with:
+          role-to-assume: ${{ secrets.AWS_FTEST_ROLE }}
+          aws-region: us-east-1
+  
+      - name: Stage Wheels
+        shell: bash
+        env:
+          AWS_DEFAULT_REGION: us-east-1
+          PKG_DOMAIN: release-staging
+          PKG_REPO: stagec7n
+        run: |
+          ./tools/dev/staging-auth
+          make pkg-publish PKG_REPO=${{ env.PKG_REPO }}
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: built-wheels
+          path: |
+            **/*.whl
+            release.md
+            wheels-manifest.txt
+
+  TestWheels:
+    runs-on: ubuntu-latest
+    needs: BuildWheels
+    permissions:
+      id-token: write
+      contents: read
+      checks: write    
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      - uses: aws-actions/configure-aws-credentials@v1-node16
+        with:
+          role-to-assume: ${{ secrets.AWS_FTEST_ROLE }}
+          aws-region: us-east-1
+
+      - uses: actions/download-artifact@v3
+        with:
+          name: built-wheels
+
+      - name: Install Staged
+        shell: bash
+        env:
+          AWS_DEFAULT_REGION: us-east-1
+          PKG_DOMAIN: release-staging
+          PKG_REPO: stagec7n
+        run: |
+          ./tools/dev/staging-auth.sh
+          pip install -r wheels-manifest.txt
+
+      - name: Smoke Test
+        shell: bash
+        run: |
+          set -euxo pipefail
+          custodian version --debug
+          custodian schema --json > schema.json
+
+  Publish:
+    runs-on: ubuntu-latest
+    needs: TestWheels
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install Custodian
+        uses: ./.github/composites/install
+        with:
+          python-version: "3.11"          
+
+      - uses: actions/download-artifact@v3
+        with:
+          name: built-wheels
+
+      - name: Get Tag
+        shell: bash
+        run: |
+          echo "release=$(poetry version -s).0" >> "$GITHUB_ENV"
+
+      - name: Create Release
+        uses: ncipollo/release-action@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          artifacts: "**/dist/*.whl"
+          token: ${{ secrets.GITHUB_TOKEN }}
+          tag: ${{ env.release_tag }}
+          commit: main
+          draft: true
+          bodyFile: release.md
+
+      - name: Configure Poetry
+        shell: bash
+        run: |
+          poetry config repositories.prodpypi https://upload.pypi.org/legacy
+          
+      - name: Publish
+        if: startsWith(github.ref, 'refs/tags/')
+        env:
+          POETRY_PYPI_TOKEN_PRODPYPI: ${{ secrets.PYPI_TOKEN }}        
+        run: |
+          make pkg-publish PKG_REPO=prodpypi
