@@ -187,7 +187,7 @@ class Session:
                 target_principal=GOOGLE_IMPERSONATE_SERVICE_ACCOUNT,
                 target_scopes=list(CLOUD_SCOPES))
         target_credentials = impersonated_credentials or credentials or default_credentials
-        if not impersonated_credentials:
+        if 'impersonated_credentials' not in dir():
             # get token with scopes if necessary
             self._credentials = with_scopes_if_required(target_credentials, list(CLOUD_SCOPES))
         else:
