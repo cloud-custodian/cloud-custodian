@@ -77,7 +77,8 @@ Follow the steps outlined in the
 `GCP documentation to configure credentials for service accounts. <https://cloud.google.com/docs/authentication/getting-started>`_
 
 If you are planning to impersonate a service account, then you may configure the environment
-variable `GOOGLE_IMPERSONATE_SERVICE_ACCOUNT` with the service account email address.
+variable `GOOGLE_IMPERSONATE_SERVICE_ACCOUNT` with the service account email address, you can also 
+pass this the service account email via `--assume` cli flag.
 
 .. code-block:: bash
 

@@ -160,6 +160,7 @@ class Session:
                  use_rate_limiter=False,
                  http=None,
                  project_id=None,
+                 impersonate_service=None,
                  **kwargs):
         """Constructor.
 
@@ -181,17 +182,19 @@ class Session:
             self._use_cached_http = True
             default_credentials, _ = google.auth.default(quota_project_id=project_id or
             get_default_project())
-        if GOOGLE_IMPERSONATE_SERVICE_ACCOUNT:
+        impersonate_credentials = None
+        if impersonate_service or GOOGLE_IMPERSONATE_SERVICE_ACCOUNT:
+            impersonate_target = impersonate_service or GOOGLE_IMPERSONATE_SERVICE_ACCOUNT
             impersonated_credentials = google.auth.impersonated_credentials.Credentials(
                 source_credentials=credentials or default_credentials,
-                target_principal=GOOGLE_IMPERSONATE_SERVICE_ACCOUNT,
+                target_principal=impersonate_target,
                 target_scopes=list(CLOUD_SCOPES))
         target_credentials = impersonated_credentials or credentials or default_credentials
-        if 'impersonated_credentials' not in dir():
+        if not impersonate_credentials:
             # get token with scopes if necessary
             self._credentials = with_scopes_if_required(target_credentials, list(CLOUD_SCOPES))
         else:
-            # impersonated_credentials requires scope to generate token (above)
+            # impersonated_credentials already have scope
             self._credentials = target_credentials
         if use_rate_limiter:
             limiter = Limiter(RequestRate(quota_max_calls, quota_period))
