@@ -192,7 +192,7 @@ class Session:
                 target_principal=impersonate_target,
                 target_scopes=list(CLOUD_SCOPES))
         target_credentials = impersonated_credentials or credentials or default_credentials
-        if not impersonate_credentials:
+        if not impersonated_credentials:
             # get token with scopes if necessary
             self._credentials = with_scopes_if_required(target_credentials, list(CLOUD_SCOPES))
         else:
