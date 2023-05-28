@@ -185,6 +185,7 @@ class Session:
         impersonate_credentials = None
         if impersonate_service or GOOGLE_IMPERSONATE_SERVICE_ACCOUNT:
             impersonate_target = impersonate_service or GOOGLE_IMPERSONATE_SERVICE_ACCOUNT
+            log.info('using impersonated service account %s', impersonate_target)
             impersonated_credentials = google.auth.impersonated_credentials.Credentials(
                 source_credentials=credentials or default_credentials,
                 target_principal=impersonate_target,
