@@ -2,9 +2,10 @@
 # SPDX-License-Identifier: Apache-2.0
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, TypeInfo
-from c7n.utils import local_session
+from c7n.utils import local_session, type_schema, chunks
 from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter, VpcFilter
 from c7n.tags import Tag, RemoveTag, universal_augment, TagDelayedAction, TagActionFilter
+from c7n.actions import BaseAction
 
 
 @resources.register('directory')
@@ -109,6 +110,33 @@ class DirectoryRemoveTag(RemoveTag):
 Directory.filter_registry.register('marked-for-op', TagActionFilter)
 Directory.action_registry.register('mark-for-op', TagDelayedAction)
 
+@Directory.action_registry.register('delete')
+class DirectoryDelete(BaseAction):
+    """Delete a directory.
+    :example:
+    .. code-block:: yaml
+            policies:
+              - name: delete-directory
+                resource: aws.directory
+                filters:
+                    - Name: test.example.com
+                actions:
+                  - delete
+    """
+
+    schema = type_schema('delete')
+    permissions = ('ds:DeleteDirectory',)
+
+    def process(self, resources):
+        client = local_session(
+            self.manager.session_factory).client('ds')
+
+        for resource_set in chunks(resources, size=100):
+            for r in resource_set:
+                self.manager.retry(
+                    client.delete_directory,
+                    DirectoryId=r['DirectoryId'])
+
 
 @resources.register('cloud-directory')
 class CloudDirectory(QueryResourceManager):
@@ -122,3 +150,50 @@ class CloudDirectory(QueryResourceManager):
         universal_taggable = object()
 
     augment = universal_augment
+
+@CloudDirectory.action_registry.register('delete')
+class CloudDirectoryDelete(BaseAction):
+    """Disable/Delete a cloud directory.
+    
+    The directory(s) will be disabled when this action is called.
+    If force is True, the directory(s) will be permanently deleted
+    
+    :example:
+    .. code-block:: yaml
+            policies:
+              - name: disable-cloud-directory
+                resource: aws.cloud-directory
+                filters:
+                  - Name: test-cloud
+                actions:
+                  - type: delete
+
+              - name: delete-cloud-directory
+                resource: aws.cloud-directory
+                filters:
+                  - Name: test-cloud
+                actions:
+                  - type: delete
+                    force: True
+    """
+
+    schema = type_schema('delete', force={'type': 'boolean'})
+    permissions = ('clouddirectory:DeleteDirectory',
+                   'clouddirectory:DisableDirectory',)
+
+    def process(self, resources):
+        client = local_session(
+            self.manager.session_factory).client('clouddirectory')
+        force = self.data.get("force", False)
+        for r in resources:
+            if r["State"] == "DISABLED": 
+                continue
+            self.manager.retry(
+                    client.disable_directory,
+                    DirectoryArn=r['DirectoryArn'])
+        
+        if force:
+            for r in resources:
+                self.manager.retry(
+                    client.delete_directory,
+                    DirectoryArn=r['DirectoryArn'])
