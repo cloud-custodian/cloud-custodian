@@ -113,8 +113,11 @@ Directory.action_registry.register('mark-for-op', TagDelayedAction)
 @Directory.action_registry.register('delete')
 class DirectoryDelete(BaseAction):
     """Delete a directory.
+
     :example:
+
     .. code-block:: yaml
+
             policies:
               - name: delete-directory
                 resource: aws.directory
