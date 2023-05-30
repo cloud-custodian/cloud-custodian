@@ -161,6 +161,36 @@ class EventBus(QueryResourceManager):
 class EventBusCrossAccountFilter(CrossAccountAccessFilter):
     # dummy permission
     permissions = ('events:ListEventBuses',)
+    
+@EventBus.action_registry.register('delete')
+class EventBusDelete(BaseAction):
+    """Delete an event bus.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: cloudwatch-delete-event-bus
+                resource: aws.event-bus
+                filters:
+                    - Name: test-event-bus
+                actions:
+                  - delete
+    """
+
+    schema = type_schema('delete')
+    permissions = ('events:DeleteEventBus',)
+
+    def process(self, resources):
+        client = local_session(
+            self.manager.session_factory).client('events')
+
+        for resource_set in chunks(resources, size=100):
+            for r in resource_set:
+                self.manager.retry(
+                    client.delete_event_bus,
+                    Name=r['Name'])
 
 
 @resources.register('event-rule')

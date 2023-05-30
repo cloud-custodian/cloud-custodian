@@ -1,0 +1,34 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Wed, 26 Apr 2023 10:30:31 GMT",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "469",
+    "-content-encoding": "gzip",
+    "content-location": "https://bigtableadmin.googleapis.com/v2/projects/cloud-custodian/instances?alt=json"
+  },
+  "body": {
+    "instances": [
+      {
+        "name": "projects/cloud-custodian/instances/custodian-test-instance",
+        "displayName": "custodian-test-instance",
+        "state": "READY",
+        "type": "PRODUCTION",
+        "createTime": "2023-04-26T01:54:37.993532Z"
+      }
+    ],
+    "failedLocations": [
+      "projects/cloud-custodian/locations/europe-west9-b",
+      "projects/cloud-custodian/locations/europe-west9-c",
+      "projects/cloud-custodian/locations/europe-west9-a"
+    ]
+  }
+}

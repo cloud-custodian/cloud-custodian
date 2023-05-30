@@ -35,6 +35,7 @@ from urllib.error import URLError
 from googleapiclient import discovery, errors  # NOQA
 from googleapiclient.http import set_user_agent
 from google.auth.credentials import with_scopes_if_required
+import google.auth.impersonated_credentials
 import google.oauth2.credentials
 import google_auth_httplib2
 
@@ -45,6 +46,7 @@ from retrying import retry
 
 
 HTTPLIB_CA_BUNDLE = os.environ.get('HTTPLIB_CA_BUNDLE')
+GOOGLE_IMPERSONATE_SERVICE_ACCOUNT = os.environ.get('GOOGLE_IMPERSONATE_SERVICE_ACCOUNT')
 
 CLOUD_SCOPES = frozenset(['https://www.googleapis.com/auth/cloud-platform'])
 
@@ -158,6 +160,7 @@ class Session:
                  use_rate_limiter=False,
                  http=None,
                  project_id=None,
+                 impersonate_service=None,
                  **kwargs):
         """Constructor.
 
@@ -177,9 +180,24 @@ class Session:
         if not credentials:
             # Only share the http object when using the default credentials.
             self._use_cached_http = True
-            credentials, _ = google.auth.default(quota_project_id=project_id or
-            get_default_project())
-        self._credentials = with_scopes_if_required(credentials, list(CLOUD_SCOPES))
+            default_credentials, _ = google.auth.default(
+                quota_project_id=project_id or get_default_project()
+            )
+        impersonated_credentials = None
+        if impersonate_service or GOOGLE_IMPERSONATE_SERVICE_ACCOUNT:
+            impersonate_target = impersonate_service or GOOGLE_IMPERSONATE_SERVICE_ACCOUNT
+            log.info('using impersonated service account %s', impersonate_target)
+            impersonated_credentials = google.auth.impersonated_credentials.Credentials(
+                source_credentials=credentials or default_credentials,
+                target_principal=impersonate_target,
+                target_scopes=list(CLOUD_SCOPES))
+        target_credentials = impersonated_credentials or credentials or default_credentials
+        if not impersonated_credentials:
+            # get token with scopes if necessary
+            self._credentials = with_scopes_if_required(target_credentials, list(CLOUD_SCOPES))
+        else:
+            # impersonated_credentials already have scope
+            self._credentials = target_credentials
         if use_rate_limiter:
             limiter = Limiter(RequestRate(quota_max_calls, quota_period))
             self._rate_limiter = limiter.ratelimit('gcp_session', delay=True)

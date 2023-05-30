@@ -10,6 +10,11 @@ ResourceMap = {
     "gcp.artifact-repository": (
         "c7n_gcp.resources.artifactregistry.ArtifactRegistryRepository"),
     "gcp.autoscaler": "c7n_gcp.resources.compute.Autoscaler",
+    "gcp.bigtable-instance": "c7n_gcp.resources.bigtable.BigTableInstance",
+    "gcp.bigtable-instance-cluster": "c7n_gcp.resources.bigtable.BigTableInstanceCluster",
+    "gcp.bigtable-instance-table": "c7n_gcp.resources.bigtable.BigTableInstanceTable",
+    "gcp.bigtable-instance-cluster-backup":
+        "c7n_gcp.resources.bigtable.BigTableInstanceClusterBackup",
     "gcp.bq-dataset": "c7n_gcp.resources.bigquery.DataSet",
     "gcp.bq-job": "c7n_gcp.resources.bigquery.BigQueryJob",
     "gcp.bq-table": "c7n_gcp.resources.bigquery.BigQueryTable",
