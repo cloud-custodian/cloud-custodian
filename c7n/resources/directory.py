@@ -156,24 +156,24 @@ class CloudDirectoryDelete(BaseAction):
     
     The directory(s) will be disabled when this action is called.
     If force is True, the directory(s) will be permanently deleted
-    
-    :example:
-    .. code-block:: yaml
-            policies:
-              - name: disable-cloud-directory
-                resource: aws.cloud-directory
-                filters:
-                  - Name: test-cloud
-                actions:
-                  - type: delete
 
-              - name: delete-cloud-directory
-                resource: aws.cloud-directory
-                filters:
-                  - Name: test-cloud
-                actions:
-                  - type: delete
-                    force: True
+    .. code-block:: yaml
+
+       policies:
+         - name: disable-cloud-directory
+           resource: aws.cloud-directory
+           filters:
+             - Name: test-cloud
+           actions:
+             - type: delete
+
+         - name: delete-cloud-directory
+           resource: aws.cloud-directory
+           filters:
+             - Name: test-cloud
+           actions:
+             - type: delete
+               force: True
     """
     schema = type_schema('delete', force={'type': 'boolean'})
     permissions = ('clouddirectory:DeleteDirectory',
