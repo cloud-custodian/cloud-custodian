@@ -7,18 +7,18 @@ WORKDIR /app
 RUN python -m venv "${HOME}/tools" && \
     . "${HOME}/tools/bin/activate" && \
     pip3 install "poetry==${POETRY_VERSION}"
+RUN ~/tools/bin/poetry self add poetry-plugin-freeze
 
-# install c7n deps
-COPY pyproject.toml poetry.lock /app/
-RUN ~/tools/bin/poetry export -o requirements.txt && \
-    pip3 install --user -r requirements.txt
-COPY c7n /app/c7n
+# build frozen c7n wheel
+WORKDIR /app/c7n
+COPY pyproject.toml poetry.lock README.md /app/c7n
+COPY c7n /app/c7n/c7n
+RUN ~/tools/bin/poetry build && ~/tools/bin/poetry freeze-wheel
 
-# install c7n-left deps
-COPY tools/c7n_left /app/
-RUN ~/tools/bin/poetry export -o requirements.txt && \
-    pip3 install --user -r requirements.txt
-
+# install c7n-left deps, including frozen c7n wheel
+WORKDIR /app/c7n/tools/c7n_left
+COPY tools/c7n_left /app/c7n/tools/c7n_left
+RUN ~/tools/bin/poetry build && ~/tools/bin/poetry freeze-wheel && pip3 install ../../dist/*.whl dist/*.whl
 
 FROM cgr.dev/chainguard/python:3.11
 
@@ -32,8 +32,8 @@ WORKDIR /app
 
 COPY --from=builder /home/nonroot/.local/lib/python3.11/site-packages /home/nonroot/.local/lib/python3.11/site-packages
 
-COPY --from=builder /app/c7n /app/c7n
-COPY --from=builder /app/c7n_left /app/c7n_left
+COPY --from=builder /app/c7n/c7n /app/c7n
+COPY --from=builder /app/c7n/tools/c7n_left /app/c7n_left
 
 ENV LC_ALL="C.UTF-8" LANG="C.UTF-8"
 ENV PYTHONPATH=/app:$PYTHONPATH
