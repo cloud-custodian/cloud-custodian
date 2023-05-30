@@ -3,7 +3,6 @@
 import logging
 import time
 import json
-import jmespath
 
 from c7n.actions import ActionRegistry, BaseAction
 from c7n.exceptions import PolicyValidationError
@@ -12,7 +11,7 @@ from c7n.manager import resources
 from c7n.query import QueryResourceManager, TypeInfo, ConfigSource, DescribeSource
 from c7n.tags import universal_augment
 from c7n.utils import (
-    local_session, type_schema, get_retry)
+    local_session, type_schema, get_retry, jmespath_search)
 from c7n.tags import (
     TagDelayedAction, RemoveTag, TagActionFilter, Tag)
 import c7n.filters.vpc as net_filters
@@ -296,7 +295,7 @@ class SecurityGroupFilter(net_filters.SecurityGroupFilter):
         sg_ids = set()
         for r in resources:
             for exp in self.expressions:
-                ids = jmespath.search(exp, r)
+                ids = jmespath_search(exp, r)
                 if isinstance(ids, list):
                     sg_ids.update(tuple(ids))
                 elif isinstance(ids, str):

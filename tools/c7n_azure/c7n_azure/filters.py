@@ -554,6 +554,26 @@ class FirewallRulesFilter(Filter, metaclass=ABCMeta):
                         include:
                             - '131.107.160.2-131.107.160.3'
                             - 10.20.20.0/24
+
+    :example:
+
+    For SQL Server and Postresql Server, Azure represents the service bypass as firewall rule
+    allowing traffic from "0.0.0.0" (this allows traffic from all other azure services). By
+    default the firewall filter for these resources ignores this rule during evaluation. To
+    include it in the evaluation set the "include-azure-services" flag to true. For example,
+    to find all Postgresql Servers where traffic is allowed from all Azure services:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: postgres-servers-open-from-azure
+            resource: azure.sqlserver
+            filters:
+              - type: firewall-rules
+                include-azure-services: true
+                equal:
+                  - '0.0.0.0'
+
     """
 
     schema = {
@@ -564,7 +584,8 @@ class FirewallRulesFilter(Filter, metaclass=ABCMeta):
             'include': {'type': 'array', 'items': {'type': 'string'}},
             'any': {'type': 'array', 'items': {'type': 'string'}},
             'only': {'type': 'array', 'items': {'type': 'string'}},
-            'equal': {'type': 'array', 'items': {'type': 'string'}}
+            'equal': {'type': 'array', 'items': {'type': 'string'}},
+            'include-azure-services': {'type': 'boolean'}
         },
         'oneOf': [
             {"required": ["type", "include"]},

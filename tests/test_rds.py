@@ -19,6 +19,7 @@ from c7n.resources import rds
 from c7n.testing import mock_datetime_now
 from dateutil import parser
 from dateutil import tz as tzutil
+import c7n.filters.backup
 
 from .common import BaseTest, event_data
 
@@ -908,9 +909,9 @@ class RDSTest(BaseTest):
                 "filters": [
                     {
                         "type": "db-option-groups",
-                        "key": "OptionName",
-                        "op": "eq",
-                        "value": "NATIVE_NETWORK_ENCRYPTION"
+                        "key": "Options[].OptionName",
+                        "value": "NATIVE_NETWORK_ENCRYPTION",
+                        "op": "contains"
                     }
                 ],
             },
@@ -1522,6 +1523,27 @@ class RDSSnapshotTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertTrue("c7n:Engine" in resources[0].keys())
+
+    def test_rds_consecutive_aws_backups_count_filter(self):
+        session_factory = self.replay_flight_data("test_rds_consecutive_aws_backups_count_filter")
+        p = self.load_policy(
+            {
+                "name": "rds_consecutive_aws_backups_count_filter",
+                "resource": "rds",
+                "filters": [
+                    {
+                        "type": "consecutive-aws-backups",
+                        "count": 2,
+                        "period": "days",
+                        "status": "COMPLETED"
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+        with mock_datetime_now(parser.parse("2022-09-09T00:00:00+00:00"), c7n.filters.backup):
+            resources = p.run()
+        self.assertEqual(len(resources), 1)
 
 
 class TestModifyVpcSecurityGroupsAction(BaseTest):

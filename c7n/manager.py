@@ -39,6 +39,7 @@ class ResourceManager:
     executor_factory = ThreadPoolExecutor
     retry = None
     permissions = ()
+    get_client = None
 
     def __init__(self, ctx, data):
         self.ctx = ctx

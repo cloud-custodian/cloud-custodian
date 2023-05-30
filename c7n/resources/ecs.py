@@ -7,10 +7,9 @@ from c7n.exceptions import PolicyExecutionError
 from c7n.filters import MetricsFilter, ValueFilter, Filter
 from c7n.filters.offhours import OffHour, OnHour
 from c7n.manager import resources
-from c7n.utils import local_session, chunks, get_retry, type_schema, group_by
+from c7n.utils import local_session, chunks, get_retry, type_schema, group_by, jmespath_compile
 from c7n import query
 from c7n.query import DescribeSource, ConfigSource
-import jmespath
 from c7n.tags import Tag, TagDelayedAction, RemoveTag, TagActionFilter
 from c7n.actions import AutoTagUser, AutoscalingBase
 import c7n.filters.vpc as net_filters
@@ -95,7 +94,7 @@ class ECSCluster(query.QueryResourceManager):
         service = 'ecs'
         enum_spec = ('list_clusters', 'clusterArns', None)
         batch_detail_spec = (
-            'describe_clusters', 'clusters', None, 'clusters', {'include': ['TAGS']})
+            'describe_clusters', 'clusters', None, 'clusters', {'include': ['TAGS', 'SETTINGS']})
         name = "clusterName"
         arn = id = "clusterArn"
         arn_type = 'cluster'
@@ -306,7 +305,7 @@ class SubnetFilter(net_filters.SubnetFilter):
     def get_related_ids(self, resources):
         subnet_ids = set()
         for exp in self.expressions:
-            cexp = jmespath.compile(exp)
+            cexp = jmespath_compile(exp)
             for r in resources:
                 ids = cexp.search(r)
                 if ids:
@@ -594,24 +593,55 @@ class DeleteTaskDefinition(BaseAction):
     The definition will be marked as InActive. Currently running
     services and task can still reference, new services & tasks
     can't.
+    
+    force is False by default. When given as True, the task definition will 
+    be permanently deleted.
+    
+    .. code-block:: yaml
+
+       policies:
+         - name: deregister-task-definition
+           resource: ecs-task-definition
+           filters:
+             - family: test-task-def
+           actions:
+             - type: delete
+
+         - name: delete-task-definition
+           resource: ecs-task-definition
+           filters:
+             - family: test-task-def
+           actions:
+             - type: delete
+               force: True
     """
 
-    schema = type_schema('delete')
-    permissions = ('ecs:DeregisterTaskDefinition',)
+    schema = type_schema('delete', force={'type': 'boolean'})
+    permissions = ('ecs:DeregisterTaskDefinition','ecs:DeleteTaskDefinitions',)
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('ecs')
         retry = get_retry(('Throttling',))
+        force = self.data.get('force', False)
 
         for r in resources:
+            if r['status'] == 'INACTIVE':
+                continue
             try:
                 retry(client.deregister_task_definition,
                       taskDefinition=r['taskDefinitionArn'])
             except ClientError as e:
-                # No error code for not found.
                 if e.response['Error'][
-                        'Message'] != 'The specified task definition does not exist.':
+                    'Message'] != 'The specified task definition does not exist.':
                     raise
+
+        if force:
+            task_definitions_arns = [
+                r['taskDefinitionArn']
+                for r in resources
+            ]
+            for chunk in chunks(task_definitions_arns, size=10):
+                retry(client.delete_task_definitions, taskDefinitions=chunk)
 
 
 @resources.register('ecs-container-instance')

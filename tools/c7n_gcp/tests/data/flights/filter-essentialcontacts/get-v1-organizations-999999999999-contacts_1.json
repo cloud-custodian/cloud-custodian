@@ -1,0 +1,33 @@
+{
+  "headers": {
+    "x-debug-tracking-id": "9993330347448260585;o=0",
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Thu, 16 Feb 2023 21:17:58 GMT",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "330",
+    "-content-encoding": "gzip",
+    "content-location": "https://essentialcontacts.googleapis.com/v1/organizations/999999999999/contacts?pageSize=1000&alt=json"
+  },
+  "body": {
+    "contacts": [
+      {
+        "name": "organizations/999999999999/contacts/0",
+        "email": "abc@def.com",
+        "notificationCategorySubscriptions": [
+          "PRODUCT_UPDATES",
+          "TECHNICAL"
+        ],
+        "languageTag": "en-US",
+        "validationState": "VALID",
+        "validateTime": "2023-02-16T19:44:02.003641Z"
+      }
+    ]
+  }
+}

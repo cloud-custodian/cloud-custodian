@@ -7,7 +7,6 @@ import os
 import time
 
 import distutils.util
-import jmespath
 import requests
 from c7n_azure.constants import (
     AUTH_TYPE_MSI,
@@ -21,7 +20,7 @@ from c7n_azure.constants import (
 from c7n_azure.session import Session
 
 from c7n.mu import PythonPackageArchive
-from c7n.utils import local_session
+from c7n.utils import local_session, jmespath_search
 
 
 class AzurePythonPackageArchive(PythonPackageArchive):
@@ -70,7 +69,7 @@ class FunctionPackage:
             name = self.name + ("_" + target_sub_id if target_sub_id else "")
             # generate and add auth if using embedded service principal
             identity = (identity
-                or jmespath.search(
+                or jmespath_search(
                     'mode."provision-options".identity', policy_data)
                 or {'type': AUTH_TYPE_EMBED})
 

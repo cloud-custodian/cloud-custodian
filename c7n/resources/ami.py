@@ -9,7 +9,6 @@ import itertools
 import logging
 
 from concurrent.futures import as_completed
-import jmespath
 
 from c7n.actions import BaseAction
 from c7n.exceptions import ClientError, PolicyValidationError
@@ -18,7 +17,14 @@ from c7n.filters import (
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, DescribeSource, TypeInfo
 from c7n.resolver import ValuesFrom
-from c7n.utils import local_session, type_schema, chunks, merge_dict_list, parse_date
+from c7n.utils import (
+    local_session,
+    type_schema,
+    chunks,
+    merge_dict_list,
+    parse_date,
+    jmespath_compile
+)
 from c7n import deprecated
 
 
@@ -112,7 +118,7 @@ class Deregister(BaseAction):
 
     schema = type_schema('deregister', **{'delete-snapshots': {'type': 'boolean'}})
     permissions = ('ec2:DeregisterImage',)
-    snap_expr = jmespath.compile('BlockDeviceMappings[].Ebs.SnapshotId')
+    snap_expr = jmespath_compile('BlockDeviceMappings[].Ebs.SnapshotId')
 
     def process(self, images):
         client = local_session(self.manager.session_factory).client('ec2')

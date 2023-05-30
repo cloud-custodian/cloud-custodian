@@ -603,12 +603,13 @@ class ImageFilter(ValueFilter):
         return super(ImageFilter, self).process(asgs, event)
 
     def __call__(self, i):
-        image = self.images.get(self.launch_info.get(i).get('ImageId', None))
+        image_id = self.launch_info.get(i).get('ImageId', None)
+        image = self.images.get(image_id)
         # Finally, if we have no image...
         if not image:
             self.log.warning(
-                "Could not locate image for instance:%s ami:%s" % (
-                    i['InstanceId'], i["ImageId"]))
+                "Could not locate image for asg:%s ami:%s" % (
+                    i['AutoScalingGroupName'], image_id ))
             # Match instead on empty skeleton?
             return False
         return self.match(image)

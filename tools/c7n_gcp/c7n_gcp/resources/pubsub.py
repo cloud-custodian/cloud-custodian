@@ -87,6 +87,7 @@ class PubSubSnapshot(QueryResourceManager):
         default_report_fields = [
             "name", "topic", "expireTime"]
         urn_component = "snapshot"
+        asset_type = "pubsub.googleapis.com/Snapshot"
 
 
 @PubSubSnapshot.action_registry.register('delete')

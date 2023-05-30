@@ -6,7 +6,6 @@ from collections import Counter
 from pathlib import Path
 import time
 
-import jmespath
 from rich.console import Console
 from rich.syntax import Syntax
 from rich.table import Table
@@ -15,6 +14,7 @@ from rich.text import Text
 from .core import CollectionRunner, PolicyMetadata
 from .utils import SEVERITY_LEVELS
 from c7n.output import OutputRegistry
+from c7n.utils import jmespath_search
 
 
 report_outputs = OutputRegistry("left")
@@ -356,7 +356,7 @@ class Json(Output):
     def on_execution_ended(self):
         formatted_results = [self.format_result(r) for r in self.results]
         if self.config.output_query:
-            formatted_results = jmespath.search(
+            formatted_results = jmespath_search(
                 self.config.output_query, formatted_results
             )
         self.config.output_file.write(
@@ -373,11 +373,6 @@ class Json(Output):
             line_pairs.append((index, l))
             index += 1
 
-        return {
-            "policy": dict(result.policy.data),
-            "resource": dict(resource),
-            "file_path": str(resource.src_dir / resource.filename),
-            "file_line_start": resource.line_start,
-            "file_line_end": resource.line_end,
-            "code_block": line_pairs,
-        }
+        formatted = result.as_dict()
+        formatted["code_block"] = line_pairs
+        return formatted

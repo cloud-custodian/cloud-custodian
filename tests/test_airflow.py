@@ -1,8 +1,7 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 from .common import BaseTest
-import jmespath
-
+from c7n.utils import jmespath_search
 
 class TestApacheAirflow(BaseTest):
     def test_airflow_environment_value_filter(self):
@@ -47,7 +46,7 @@ class TestApacheAirflow(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        aliases = kms.list_aliases(KeyId=(jmespath.search(expression, resources[0])))
+        aliases = kms.list_aliases(KeyId=(jmespath_search(expression, resources[0])))
         self.assertEqual(aliases['Aliases'][0]['AliasName'], 'alias/mwaa')
 
     def test_airflow_environment_tag(self):

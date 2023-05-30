@@ -6,7 +6,6 @@ import time
 
 import datetime
 from dateutil import tz
-import jmespath
 from mock import mock
 
 from c7n.testing import mock_datetime_now
@@ -2038,7 +2037,7 @@ class TestModifySecurityGroupAction(BaseTest):
         if self.recording:
             time.sleep(3)
         self.assertEqual(
-            jmespath.search(
+            utils.jmespath_search(
                 "Reservations[].Instances[].SecurityGroups[].GroupName",
                 client.describe_instances(InstanceIds=["i-094207d64930768dc"])),
             ["launch-wizard-2"])
@@ -2061,7 +2060,7 @@ class TestModifySecurityGroupAction(BaseTest):
         self.assertEqual(len(resources), 1)
         client = session_factory().client('ec2')
         self.assertEqual(
-            jmespath.search(
+            utils.jmespath_search(
                 "Reservations[].Instances[].SecurityGroups[].GroupId",
                 client.describe_instances(InstanceIds=["i-08797f38d2e80c9d0"])),
             ['sg-0cba7a01d343d5c65', 'sg-02e14ba7dd2dbe44b', 'sg-0e630ac9094eff5c5'])

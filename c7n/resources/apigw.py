@@ -1,7 +1,6 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import functools
-import jmespath
 import re
 from botocore.exceptions import ClientError
 
@@ -15,7 +14,7 @@ from c7n.filters.iamaccess import CrossAccountAccessFilter
 from c7n.filters.related import RelatedResourceFilter
 from c7n.manager import resources, ResourceManager
 from c7n import query, utils
-from c7n.utils import generate_arn, type_schema, get_retry
+from c7n.utils import generate_arn, type_schema, get_retry, jmespath_search
 
 
 ANNOTATION_KEY_MATCHED_METHODS = 'c7n:matched-resource-methods'
@@ -540,7 +539,7 @@ class StageClientCertificateFilter(RelatedResourceFilter):
         rid = resource[self.RelatedIdsExpression]
         with suppress(KeyError):
             resource[self.annotation_key] = {
-                self.data['key']: jmespath.search(self.data['key'], related[rid])
+                self.data['key']: jmespath_search(self.data['key'], related[rid])
             }
 
 

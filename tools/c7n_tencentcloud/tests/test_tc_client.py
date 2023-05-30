@@ -7,8 +7,9 @@ import socket
 from datetime import datetime
 from unittest.mock import patch
 
-import jmespath
 import pytest
+
+from c7n.utils import jmespath_search
 
 from c7n_tencentcloud.utils import PageMethod
 from c7n_tencentcloud.client import Session
@@ -29,7 +30,7 @@ class TestClient:
         action = "DescribeProducts"
         jsonpath = "Response.Products[]"
         resp = simple_client.execute_query(action, {})
-        data = jmespath.search(jsonpath, resp)
+        data = jmespath_search(jsonpath, resp)
         # TODO assert some value
         assert data
 
