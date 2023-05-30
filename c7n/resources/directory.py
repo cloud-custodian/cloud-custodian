@@ -123,7 +123,6 @@ class DirectoryDelete(BaseAction):
                 actions:
                   - delete
     """
-
     schema = type_schema('delete')
     permissions = ('ds:DeleteDirectory',)
 
@@ -175,9 +174,7 @@ class CloudDirectoryDelete(BaseAction):
                 actions:
                   - type: delete
                     force: True
-
     """
-
     schema = type_schema('delete', force={'type': 'boolean'})
     permissions = ('clouddirectory:DeleteDirectory',
                    'clouddirectory:DisableDirectory',)
