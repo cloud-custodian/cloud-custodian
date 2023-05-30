@@ -175,6 +175,7 @@ class CloudDirectoryDelete(BaseAction):
                 actions:
                   - type: delete
                     force: True
+
     """
 
     schema = type_schema('delete', force={'type': 'boolean'})
