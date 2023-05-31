@@ -1,0 +1,630 @@
+interactions:
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: https://identity.us-ashburn-1.oci.oraclecloud.com/20160918/users/ocid1.user.oc1..<unique_ID>
+  response:
+    body:
+      data:
+        capabilities:
+          canUseApiKeys: true
+          canUseAuthTokens: true
+          canUseConsolePassword: false
+          canUseCustomerSecretKeys: true
+          canUseDbCredentials: true
+          canUseOAuth2ClientCredentials: true
+          canUseSmtpCredentials: true
+        compartmentId: ocid1.tenancy.oc1..<unique_ID>
+        definedTags:
+          Oracle-Tags:
+            CreatedBy: scim-service
+            CreatedOn: '2023-04-25T16:55:50.497Z'
+        description: user@example.com
+        emailVerified: true
+        externalIdentifier: fcf75b1a99fd4dbe9c8f5a11dd69a50c
+        freeformTags:
+          key_old: 'true'
+        id: ocid1.user.oc1..<unique_ID>
+        identityProviderId: ocid1.saml2idp.oc1..<unique_ID>
+        isMfaActivated: false
+        lifecycleState: ACTIVE
+        name: user@example.com
+        timeCreated: '2023-04-25T16:55:50.537Z'
+        timeModified: '2023-06-01T07:07:57.250Z'
+    headers:
+      cache-control:
+      - no-cache, no-store, must-revalidate
+      content-length:
+      - '945'
+      content-type:
+      - application/json
+      date:
+      - Thu, 01 Jun 2023 13:36:05 GMT
+      etag:
+      - b03e98f10a06575a003e9bb0cb0bd1006b1a6062
+      pragma:
+      - no-cache
+      x-content-type-options:
+      - nosniff
+    status:
+      code: 200
+      message: OK
+- request:
+    body: mock_body
+    headers: {}
+    method: POST
+    uri: https://query.us-ashburn-1.oci.oraclecloud.com/20180409/resources?limit=50
+  response:
+    body:
+      data:
+        items:
+        - additionalDetails:
+            description: Custodian Test
+            domainDisplayName: null
+            domainName: null
+            domainOcid: null
+            inactiveStatus: 0
+            name: custodian-dev-group
+          availabilityDomain: null
+          compartmentId: ocid1.tenancy.oc1..<unique_ID>
+          definedTags:
+            Oracle-Tags:
+              CreatedBy: user@example.com
+              CreatedOn: '2023-06-01T13:34:56.752Z'
+          displayName: Custodian-Dev-Group
+          freeformTags:
+            Cloud_Custodian: Present
+          identifier: ocid1.group.oc1..<unique_ID>
+          identityContext: {}
+          lifecycleState: ACTIVE
+          resourceType: Group
+          searchContext: null
+          systemTags: {}
+          timeCreated: '2023-06-01T13:34:56.791Z'
+        - additionalDetails:
+            description: This dynamic group is for SMP testing
+            domainDisplayName: null
+            domainName: null
+            domainOcid: null
+            inactiveStatus: 0
+            name: psm_smp_test_001
+          availabilityDomain: null
+          compartmentId: ocid1.tenancy.oc1..<unique_ID>
+          definedTags:
+            Oracle-Tags:
+              CreatedBy: user@example.com
+              CreatedOn: '2023-05-03T18:04:26.795Z'
+          displayName: psm_smp_test_001
+          freeformTags: {}
+          identifier: ocid1.dynamicgroup.oc1..<unique_ID>
+          identityContext: {}
+          lifecycleState: ACTIVE
+          resourceType: Group
+          searchContext: null
+          systemTags: {}
+          timeCreated: '2023-05-03T18:04:26.857Z'
+        - additionalDetails:
+            description: rp
+            domainDisplayName: null
+            domainName: null
+            domainOcid: null
+            inactiveStatus: 0
+            name: rp
+          availabilityDomain: null
+          compartmentId: ocid1.tenancy.oc1..<unique_ID>
+          definedTags:
+            Oracle-Tags:
+              CreatedBy: user@example.com
+              CreatedOn: '2023-03-27T05:39:23.564Z'
+          displayName: rp
+          freeformTags: {}
+          identifier: ocid1.dynamicgroup.oc1..<unique_ID>
+          identityContext: {}
+          lifecycleState: ACTIVE
+          resourceType: Group
+          searchContext: null
+          systemTags: {}
+          timeCreated: '2023-03-27T05:39:23.628Z'
+        - additionalDetails:
+            description: Dev group for Cloud Custodian
+            domainDisplayName: null
+            domainName: null
+            domainOcid: null
+            inactiveStatus: 0
+            name: cloud-custodian-group-dev
+          availabilityDomain: null
+          compartmentId: ocid1.tenancy.oc1..<unique_ID>
+          definedTags:
+            Oracle-Tags:
+              CreatedBy: user@example.com
+              CreatedOn: '2023-02-20T21:08:31.362Z'
+          displayName: cloud-custodian-group-dev
+          freeformTags:
+            custodian_dev: 'true'
+            key_limit: '3'
+            test: 'true'
+          identifier: ocid1.group.oc1..<unique_ID>
+          identityContext: {}
+          lifecycleState: ACTIVE
+          resourceType: Group
+          searchContext: null
+          systemTags: {}
+          timeCreated: '2023-02-20T21:08:31.397Z'
+        - additionalDetails:
+            description: This group allows management agents to communicate with OCI
+              end points.
+            domainDisplayName: null
+            domainName: null
+            domainOcid: null
+            inactiveStatus: 0
+            name: jms_dynamic_group
+          availabilityDomain: null
+          compartmentId: ocid1.tenancy.oc1..<unique_ID>
+          definedTags:
+            Oracle-Tags:
+              CreatedBy: user@example.com
+              CreatedOn: '2022-11-16T05:29:59.339Z'
+          displayName: JMS_DYNAMIC_GROUP
+          freeformTags: {}
+          identifier: ocid1.dynamicgroup.oc1..<unique_ID>
+          identityContext: {}
+          lifecycleState: ACTIVE
+          resourceType: Group
+          searchContext: null
+          systemTags: {}
+          timeCreated: '2022-11-16T05:29:59.401Z'
+        - additionalDetails:
+            description: Users in this group have the ability to manage fleets.
+            domainDisplayName: null
+            domainName: null
+            domainOcid: null
+            inactiveStatus: 0
+            name: fleet_managers
+          availabilityDomain: null
+          compartmentId: ocid1.tenancy.oc1..<unique_ID>
+          definedTags:
+            Oracle-Tags:
+              CreatedBy: user@example.com
+              CreatedOn: '2022-11-16T05:29:56.925Z'
+          displayName: FLEET_MANAGERS
+          freeformTags: {}
+          identifier: ocid1.group.oc1..<unique_ID>
+          identityContext: {}
+          lifecycleState: ACTIVE
+          resourceType: Group
+          searchContext: null
+          systemTags: {}
+          timeCreated: '2022-11-16T05:29:56.990Z'
+        - additionalDetails:
+            description: psmqa-fresh-install-flock1
+            domainDisplayName: null
+            domainName: null
+            domainOcid: null
+            inactiveStatus: 0
+            name: psmqa-fresh-install-flock1_access
+          availabilityDomain: null
+          compartmentId: ocid1.tenancy.oc1..<unique_ID>
+          definedTags:
+            Oracle-Tags:
+              CreatedBy: user@example.com
+              CreatedOn: '2022-09-04T16:04:44.948Z'
+          displayName: psmqa-fresh-install-flock1_access
+          freeformTags: {}
+          identifier: ocid1.dynamicgroup.oc1..<unique_ID>
+          identityContext: {}
+          lifecycleState: ACTIVE
+          resourceType: Group
+          searchContext: null
+          systemTags: {}
+          timeCreated: '2022-09-04T16:04:45.041Z'
+        - additionalDetails:
+            description: Dynamic group created for setting the policy for accessing
+              SIV DP API
+            domainDisplayName: null
+            domainName: null
+            domainOcid: null
+            inactiveStatus: 0
+            name: secret_ds_group
+          availabilityDomain: null
+          compartmentId: ocid1.tenancy.oc1..<unique_ID>
+          definedTags:
+            Oracle-Tags:
+              CreatedBy: user@example.com
+              CreatedOn: '2022-09-02T05:47:00.161Z'
+          displayName: secret_ds_group
+          freeformTags: {}
+          identifier: ocid1.dynamicgroup.oc1..<unique_ID>
+          identityContext: {}
+          lifecycleState: ACTIVE
+          resourceType: Group
+          searchContext: null
+          systemTags: {}
+          timeCreated: '2022-09-02T05:47:00.261Z'
+        - additionalDetails:
+            description: psm-upgrade-oc1-op4-psmtorbsecrets ODO Dynamic Group
+            domainDisplayName: null
+            domainName: null
+            domainOcid: null
+            inactiveStatus: 0
+            name: psm-upgrade-oc1-op4-psmtorbsecrets_psm-odo-hosts1
+          availabilityDomain: null
+          compartmentId: ocid1.tenancy.oc1..<unique_ID>
+          definedTags:
+            Oracle-Tags:
+              CreatedBy: ocid1.flock.oc1..<unique_ID>
+              CreatedOn: '2022-08-24T07:18:46.428Z'
+          displayName: psm-upgrade-oc1-op4-psmtorbsecrets_psm-odo-hosts1
+          freeformTags: {}
+          identifier: ocid1.dynamicgroup.oc1..<unique_ID>
+          identityContext: {}
+          lifecycleState: ACTIVE
+          resourceType: Group
+          searchContext: null
+          systemTags: {}
+          timeCreated: '2022-08-24T07:18:46.515Z'
+        - additionalDetails:
+            description: psm-upgrade-oc1-op4-psmtorbsecrets SecInf Dynamic Group
+            domainDisplayName: null
+            domainName: null
+            domainOcid: null
+            inactiveStatus: 0
+            name: psm-upgrade-oc1-op4-psmtorbsecrets_access-manager
+          availabilityDomain: null
+          compartmentId: ocid1.tenancy.oc1..<unique_ID>
+          definedTags:
+            Oracle-Tags:
+              CreatedBy: ocid1.flock.oc1..<unique_ID>
+              CreatedOn: '2022-08-24T06:58:10.181Z'
+          displayName: psm-upgrade-oc1-op4-psmtorbsecrets_access-manager
+          freeformTags: {}
+          identifier: ocid1.dynamicgroup.oc1..<unique_ID>
+          identityContext: {}
+          lifecycleState: ACTIVE
+          resourceType: Group
+          searchContext: null
+          systemTags: {}
+          timeCreated: '2022-08-24T06:58:10.235Z'
+        - additionalDetails:
+            description: psm-upgrade-oc1-psmtorbsecrets ODO Dynamic Group
+            domainDisplayName: null
+            domainName: null
+            domainOcid: null
+            inactiveStatus: 0
+            name: psm-upgrade-oc1-psmtorbsecrets_psm-odo-hosts1
+          availabilityDomain: null
+          compartmentId: ocid1.tenancy.oc1..<unique_ID>
+          definedTags:
+            Oracle-Tags:
+              CreatedBy: ocid1.flock.oc1..<unique_ID>
+              CreatedOn: '2022-08-16T13:54:45.205Z'
+          displayName: psm-upgrade-oc1-psmtorbsecrets_psm-odo-hosts1
+          freeformTags: {}
+          identifier: ocid1.dynamicgroup.oc1..<unique_ID>
+          identityContext: {}
+          lifecycleState: ACTIVE
+          resourceType: Group
+          searchContext: null
+          systemTags: {}
+          timeCreated: '2022-08-16T13:54:45.318Z'
+        - additionalDetails:
+            description: psm-upgrade-oc1-psmtorbsecrets SecInf Dynamic Group
+            domainDisplayName: null
+            domainName: null
+            domainOcid: null
+            inactiveStatus: 0
+            name: psm-upgrade-oc1-psmtorbsecrets_access-manager
+          availabilityDomain: null
+          compartmentId: ocid1.tenancy.oc1..<unique_ID>
+          definedTags:
+            Oracle-Tags:
+              CreatedBy: ocid1.flock.oc1..<unique_ID>
+              CreatedOn: '2022-08-16T13:54:45.133Z'
+          displayName: psm-upgrade-oc1-psmtorbsecrets_access-manager
+          freeformTags: {}
+          identifier: ocid1.dynamicgroup.oc1..<unique_ID>
+          identityContext: {}
+          lifecycleState: ACTIVE
+          resourceType: Group
+          searchContext: null
+          systemTags: {}
+          timeCreated: '2022-08-16T13:54:45.182Z'
+        - additionalDetails:
+            description: psm-torb-idcs-psmtorbsecrets ODO Dynamic Group
+            domainDisplayName: null
+            domainName: null
+            domainOcid: null
+            inactiveStatus: 0
+            name: psm-torb-idcs-psmtorbsecrets_psm-odo-hosts1
+          availabilityDomain: null
+          compartmentId: ocid1.tenancy.oc1..<unique_ID>
+          definedTags:
+            Oracle-Tags:
+              CreatedBy: ocid1.flock.oc1..<unique_ID>
+              CreatedOn: '2022-08-16T06:21:12.356Z'
+          displayName: psm-torb-idcs-psmtorbsecrets_psm-odo-hosts1
+          freeformTags: {}
+          identifier: ocid1.dynamicgroup.oc1..<unique_ID>
+          identityContext: {}
+          lifecycleState: ACTIVE
+          resourceType: Group
+          searchContext: null
+          systemTags: {}
+          timeCreated: '2022-08-16T06:21:12.398Z'
+        - additionalDetails:
+            description: psm-torb-idcs-psmtorbsecrets SecInf Dynamic Group
+            domainDisplayName: null
+            domainName: null
+            domainOcid: null
+            inactiveStatus: 0
+            name: psm-torb-idcs-psmtorbsecrets_access-manager
+          availabilityDomain: null
+          compartmentId: ocid1.tenancy.oc1..<unique_ID>
+          definedTags:
+            Oracle-Tags:
+              CreatedBy: ocid1.flock.oc1..<unique_ID>
+              CreatedOn: '2022-08-16T06:21:11.927Z'
+          displayName: psm-torb-idcs-psmtorbsecrets_access-manager
+          freeformTags: {}
+          identifier: ocid1.dynamicgroup.oc1..<unique_ID>
+          identityContext: {}
+          lifecycleState: ACTIVE
+          resourceType: Group
+          searchContext: null
+          systemTags: {}
+          timeCreated: '2022-08-16T06:21:11.976Z'
+        - additionalDetails:
+            description: qatest6-us-psmtorbsecrets ODO Dynamic Group
+            domainDisplayName: null
+            domainName: null
+            domainOcid: null
+            inactiveStatus: 0
+            name: qatest6-us-psmtorbsecrets_psm-odo-hosts1
+          availabilityDomain: null
+          compartmentId: ocid1.tenancy.oc1..<unique_ID>
+          definedTags:
+            Oracle-Tags:
+              CreatedBy: ocid1.flock.oc1..<unique_ID>
+              CreatedOn: '2022-08-03T14:13:28.389Z'
+          displayName: qatest6-us-psmtorbsecrets_psm-odo-hosts1
+          freeformTags: {}
+          identifier: ocid1.dynamicgroup.oc1..<unique_ID>
+          identityContext: {}
+          lifecycleState: ACTIVE
+          resourceType: Group
+          searchContext: null
+          systemTags: {}
+          timeCreated: '2022-08-03T14:13:28.462Z'
+        - additionalDetails:
+            description: qatest6-us-psmtorbsecrets SecInf Dynamic Group
+            domainDisplayName: null
+            domainName: null
+            domainOcid: null
+            inactiveStatus: 0
+            name: qatest6-us-psmtorbsecrets_access-manager
+          availabilityDomain: null
+          compartmentId: ocid1.tenancy.oc1..<unique_ID>
+          definedTags:
+            Oracle-Tags:
+              CreatedBy: ocid1.flock.oc1..<unique_ID>
+              CreatedOn: '2022-08-03T14:13:28.158Z'
+          displayName: qatest6-us-psmtorbsecrets_access-manager
+          freeformTags: {}
+          identifier: ocid1.dynamicgroup.oc1..<unique_ID>
+          identityContext: {}
+          lifecycleState: ACTIVE
+          resourceType: Group
+          searchContext: null
+          systemTags: {}
+          timeCreated: '2022-08-03T14:13:28.234Z'
+        - additionalDetails:
+            description: psm-oc1-psmtorbsecrets ODO Dynamic Group
+            domainDisplayName: null
+            domainName: null
+            domainOcid: null
+            inactiveStatus: 0
+            name: psm-oc1-psmtorbsecrets_psm-odo-hosts1
+          availabilityDomain: null
+          compartmentId: ocid1.tenancy.oc1..<unique_ID>
+          definedTags:
+            Oracle-Tags:
+              CreatedBy: ocid1.flock.oc1..<unique_ID>
+              CreatedOn: '2022-07-13T07:22:42.941Z'
+          displayName: psm-oc1-psmtorbsecrets_psm-odo-hosts1
+          freeformTags: {}
+          identifier: ocid1.dynamicgroup.oc1..<unique_ID>
+          identityContext: {}
+          lifecycleState: ACTIVE
+          resourceType: Group
+          searchContext: null
+          systemTags: {}
+          timeCreated: '2022-07-13T07:22:43.023Z'
+        - additionalDetails:
+            description: psm-oc1-psmtorbsecrets SecInf Dynamic Group
+            domainDisplayName: null
+            domainName: null
+            domainOcid: null
+            inactiveStatus: 0
+            name: psm-oc1-psmtorbsecrets_access-manager
+          availabilityDomain: null
+          compartmentId: ocid1.tenancy.oc1..<unique_ID>
+          definedTags:
+            Oracle-Tags:
+              CreatedBy: ocid1.flock.oc1..<unique_ID>
+              CreatedOn: '2022-07-13T07:22:42.843Z'
+          displayName: psm-oc1-psmtorbsecrets_access-manager
+          freeformTags: {}
+          identifier: ocid1.dynamicgroup.oc1..<unique_ID>
+          identityContext: {}
+          lifecycleState: ACTIVE
+          resourceType: Group
+          searchContext: null
+          systemTags: {}
+          timeCreated: '2022-07-13T07:22:42.892Z'
+        - additionalDetails:
+            description: dev-demo-psmtorbsp ODO Dynamic Group
+            domainDisplayName: null
+            domainName: null
+            domainOcid: null
+            inactiveStatus: 0
+            name: dev-demo-psmtorbsp_psm-odo-hosts1
+          availabilityDomain: null
+          compartmentId: ocid1.tenancy.oc1..<unique_ID>
+          definedTags:
+            Oracle-Tags:
+              CreatedBy: shepherd
+              CreatedOn: '2022-06-13T08:36:44.086Z'
+          displayName: dev-demo-psmtorbsp_psm-odo-hosts1
+          freeformTags: {}
+          identifier: ocid1.dynamicgroup.oc1..<unique_ID>
+          identityContext: {}
+          lifecycleState: ACTIVE
+          resourceType: Group
+          searchContext: null
+          systemTags: {}
+          timeCreated: '2022-06-13T08:36:44.154Z'
+        - additionalDetails:
+            description: Administrators
+            domainDisplayName: null
+            domainName: null
+            domainOcid: null
+            inactiveStatus: 0
+            name: administrators
+          availabilityDomain: null
+          compartmentId: ocid1.tenancy.oc1..<unique_ID>
+          definedTags: {}
+          displayName: Administrators
+          freeformTags: {}
+          identifier: ocid1.group.oc1..<unique_ID>
+          identityContext: {}
+          lifecycleState: ACTIVE
+          resourceType: Group
+          searchContext: null
+          systemTags: {}
+          timeCreated: '2021-02-01T14:28:04.809Z'
+    headers:
+      content-type:
+      - application/json
+      date:
+      - Thu, 01 Jun 2023 13:36:06 GMT
+      transfer-encoding:
+      - chunked
+      x-content-type-options:
+      - nosniff
+    status:
+      code: 200
+      message: OK
+- request:
+    body: mock_body
+    headers: {}
+    method: PUT
+    uri: https://identity.us-ashburn-1.oci.oraclecloud.com/20160918/groups/ocid1.group.oc1..<unique_ID>
+  response:
+    body:
+      data:
+        compartmentId: ocid1.tenancy.oc1..<unique_ID>
+        definedTags:
+          Oracle-Tags:
+            CreatedBy: user@example.com
+            CreatedOn: '2023-06-01T13:34:56.752Z'
+        description: Custodian Test
+        freeformTags:
+          Cloud_Custodian: Present
+          Environment: Development
+        id: ocid1.group.oc1..<unique_ID>
+        lifecycleState: ACTIVE
+        name: Custodian-Dev-Group
+        timeCreated: '2023-06-01T13:34:56.791Z'
+    headers:
+      cache-control:
+      - no-cache, no-store, must-revalidate
+      content-length:
+      - '611'
+      content-type:
+      - application/json
+      date:
+      - Thu, 01 Jun 2023 13:36:08 GMT
+      etag:
+      - c891e3519224940663b979a62bba0e9d064942c2
+      pragma:
+      - no-cache
+      x-content-type-options:
+      - nosniff
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: https://identity.us-ashburn-1.oci.oraclecloud.com/20160918/groups?compartmentId=ocid1.tenancy.oc1..<unique_ID>&limit=50
+  response:
+    body:
+      data:
+      - compartmentId: ocid1.tenancy.oc1..<unique_ID>
+        definedTags: {}
+        description: Administrators
+        freeformTags: {}
+        id: ocid1.group.oc1..<unique_ID>
+        lifecycleState: ACTIVE
+        name: Administrators
+        timeCreated: '2021-02-01T14:28:04.809Z'
+      - compartmentId: ocid1.tenancy.oc1..<unique_ID>
+        definedTags:
+          Oracle-Tags:
+            CreatedBy: user@example.com
+            CreatedOn: '2023-02-20T21:08:31.362Z'
+        description: Dev group for Cloud Custodian
+        freeformTags:
+          custodian_dev: 'true'
+          key_limit: '3'
+          test: 'true'
+        id: ocid1.group.oc1..<unique_ID>
+        lifecycleState: ACTIVE
+        name: cloud-custodian-group-dev
+        timeCreated: '2023-02-20T21:08:31.397Z'
+      - compartmentId: ocid1.tenancy.oc1..<unique_ID>
+        definedTags:
+          Oracle-Tags:
+            CreatedBy: user@example.com
+            CreatedOn: '2023-06-01T13:34:56.752Z'
+        description: Custodian Test
+        freeformTags:
+          Cloud_Custodian: Present
+          Environment: Development
+        id: ocid1.group.oc1..<unique_ID>
+        lifecycleState: ACTIVE
+        name: Custodian-Dev-Group
+        timeCreated: '2023-06-01T13:34:56.791Z'
+      - compartmentId: ocid1.tenancy.oc1..<unique_ID>
+        definedTags:
+          Oracle-Tags:
+            CreatedBy: user@example.com
+            CreatedOn: '2022-11-16T05:29:56.925Z'
+        description: Users in this group have the ability to manage fleets.
+        freeformTags: {}
+        id: ocid1.group.oc1..<unique_ID>
+        lifecycleState: ACTIVE
+        name: FLEET_MANAGERS
+        timeCreated: '2022-11-16T05:29:56.990Z'
+    headers:
+      cache-control:
+      - no-cache, no-store, must-revalidate
+      content-encoding:
+      - gzip
+      content-length:
+      - '711'
+      content-type:
+      - application/json
+      date:
+      - Thu, 01 Jun 2023 13:36:09 GMT
+      opc-limit:
+      - '49'
+      pragma:
+      - no-cache
+      x-content-type-options:
+      - nosniff
+    status:
+      code: 200
+      message: OK
+version: 1

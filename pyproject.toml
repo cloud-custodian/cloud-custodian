@@ -62,7 +62,7 @@ skip-string-normalization = true
 line-length = 100
 
 [tool.ruff]
-line-length = 100
+line-length = 140
 # E741 - single char variables
 # E401 - multiple imports in a single line
 ignore = ["E741", "E401"]

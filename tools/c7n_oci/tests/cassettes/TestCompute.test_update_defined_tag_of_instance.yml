@@ -1,0 +1,400 @@
+interactions:
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: https://identity.us-ashburn-1.oci.oraclecloud.com/20160918/users/ocid1.user.oc1..<unique_ID>
+  response:
+    body:
+      data:
+        capabilities:
+          canUseApiKeys: true
+          canUseAuthTokens: true
+          canUseConsolePassword: false
+          canUseCustomerSecretKeys: true
+          canUseDbCredentials: true
+          canUseOAuth2ClientCredentials: true
+          canUseSmtpCredentials: true
+        compartmentId: ocid1.tenancy.oc1..<unique_ID>
+        definedTags:
+          Oracle-Tags:
+            CreatedBy: scim-service
+            CreatedOn: '2023-04-25T16:55:50.497Z'
+        description: user@example.com
+        emailVerified: true
+        externalIdentifier: fcf75b1a99fd4dbe9c8f5a11dd69a50c
+        freeformTags:
+          key_old: 'true'
+        id: ocid1.user.oc1..<unique_ID>
+        identityProviderId: ocid1.saml2idp.oc1..<unique_ID>
+        isMfaActivated: false
+        lifecycleState: ACTIVE
+        name: user@example.com
+        timeCreated: '2023-04-25T16:55:50.537Z'
+        timeModified: '2023-06-01T07:07:57.250Z'
+    headers:
+      cache-control:
+      - no-cache, no-store, must-revalidate
+      content-length:
+      - '945'
+      content-type:
+      - application/json
+      date:
+      - Thu, 01 Jun 2023 13:31:35 GMT
+      etag:
+      - b03e98f10a06575a003e9bb0cb0bd1006b1a6062
+      pragma:
+      - no-cache
+      x-content-type-options:
+      - nosniff
+    status:
+      code: 200
+      message: OK
+- request:
+    body: mock_body
+    headers: {}
+    method: POST
+    uri: https://query.us-ashburn-1.oci.oraclecloud.com/20180409/resources?limit=50
+  response:
+    body:
+      data:
+        items:
+        - additionalDetails:
+            attachedIpV6Vnics: null
+            attachedVnics:
+            - compartmentId: ocid1.compartment.oc1..<unique_ID>
+              isPrimary: true
+              privateIp: 10.1.20.73
+              publicIp: null
+            dedicatedVmHostId: null
+            imageId: ocid1.image.oc1..<unique_ID>
+            region: iad
+            shape: VM.Standard.E3.Flex
+            timeMaintenanceRebootDue: null
+          availabilityDomain: NQNU:US-ASHBURN-AD-1
+          compartmentId: ocid1.compartment.oc1..<unique_ID>
+          definedTags:
+            Oracle-Tags:
+              CreatedBy: user@example.com
+              CreatedOn: '2023-06-01T13:30:24.382Z'
+          displayName: instance20230601133024
+          freeformTags:
+            Project: CNCF
+          identifier: ocid1.instance.oc1..<unique_ID>
+          identityContext: {}
+          lifecycleState: RUNNING
+          resourceType: Instance
+          searchContext: null
+          systemTags: {}
+          timeCreated: '2023-06-01T13:30:24.934Z'
+        - additionalDetails:
+            attachedIpV6Vnics: null
+            attachedVnics: null
+            dedicatedVmHostId: null
+            imageId: ocid1.image.oc1..<unique_ID>
+            region: iad
+            shape: VM.Standard.E3.Flex
+            timeMaintenanceRebootDue: null
+          availabilityDomain: NQNU:US-ASHBURN-AD-1
+          compartmentId: ocid1.compartment.oc1..<unique_ID>
+          definedTags:
+            Oracle-Tags:
+              CreatedBy: user@example.com
+              CreatedOn: '2023-02-27T10:13:01.511Z'
+            cloud-custodian-test:
+              mark-for-resize: truex
+            cloud_custodian:
+              environment: dev
+          displayName: Instance_6
+          freeformTags:
+            action_executed: 'false'
+            need_action: 'true'
+            public_facing: 'true'
+            test-new: amazing
+            testinner: val
+          identifier: ocid1.instance.oc1..<unique_ID>
+          identityContext: {}
+          lifecycleState: TERMINATED
+          resourceType: Instance
+          searchContext: null
+          systemTags: {}
+          timeCreated: '2023-02-27T10:13:02.567Z'
+        - additionalDetails:
+            attachedIpV6Vnics: null
+            attachedVnics: null
+            dedicatedVmHostId: null
+            imageId: ocid1.image.oc1..<unique_ID>
+            region: iad
+            shape: VM.Standard2.1
+            timeMaintenanceRebootDue: null
+          availabilityDomain: NQNU:US-ASHBURN-AD-1
+          compartmentId: ocid1.compartment.oc1..<unique_ID>
+          definedTags:
+            Oracle-Tags:
+              CreatedBy: user@example.com
+              CreatedOn: '2023-02-27T09:14:50.095Z'
+            cloud_custodian:
+              environment: dev
+          displayName: Instance_5
+          freeformTags:
+            custodian-test: 'true'
+            need_action: 'true'
+            public_facing: 'true'
+          identifier: ocid1.instance.oc1..<unique_ID>
+          identityContext: {}
+          lifecycleState: TERMINATED
+          resourceType: Instance
+          searchContext: null
+          systemTags: {}
+          timeCreated: '2023-02-27T09:14:50.658Z'
+        - additionalDetails:
+            attachedIpV6Vnics: null
+            attachedVnics: null
+            dedicatedVmHostId: null
+            imageId: ocid1.image.oc1..<unique_ID>
+            region: iad
+            shape: VM.Standard.E3.Flex
+            timeMaintenanceRebootDue: null
+          availabilityDomain: NQNU:US-ASHBURN-AD-1
+          compartmentId: ocid1.compartment.oc1..<unique_ID>
+          definedTags:
+            cloud-custodian-test:
+              mark-for-resize: 'true'
+            cloud_custodian:
+              environment: dev
+          displayName: Instance_2
+          freeformTags:
+            custodian_dev: 'true'
+            mark-for-deletion: 'true'
+            need_action: 'true'
+            public_facing: 'true'
+          identifier: ocid1.instance.oc1..<unique_ID>
+          identityContext: {}
+          lifecycleState: TERMINATED
+          resourceType: Instance
+          searchContext: null
+          systemTags: {}
+          timeCreated: '2023-02-14T17:06:23.227Z'
+        - additionalDetails:
+            attachedIpV6Vnics: null
+            attachedVnics: null
+            dedicatedVmHostId: null
+            imageId: ocid1.image.oc1..<unique_ID>
+            region: iad
+            shape: VM.Standard.E3.Flex
+            timeMaintenanceRebootDue: null
+          availabilityDomain: NQNU:US-ASHBURN-AD-1
+          compartmentId: ocid1.compartment.oc1..<unique_ID>
+          definedTags:
+            cloud_custodian:
+              environment: dev
+          displayName: Instance_1
+          freeformTags:
+            action_executed: 'false'
+            ad: test
+            need_action: 'true'
+            public_facing: 'true'
+          identifier: ocid1.instance.oc1..<unique_ID>
+          identityContext: {}
+          lifecycleState: TERMINATED
+          resourceType: Instance
+          searchContext: null
+          systemTags: {}
+          timeCreated: '2023-02-14T17:03:57.046Z'
+    headers:
+      content-length:
+      - '6164'
+      content-type:
+      - application/json
+      date:
+      - Thu, 01 Jun 2023 13:31:36 GMT
+      x-content-type-options:
+      - nosniff
+    status:
+      code: 200
+      message: OK
+- request:
+    body: mock_body
+    headers: {}
+    method: PUT
+    uri: https://iaas.us-ashburn-1.oraclecloud.com/20160918/instances/ocid1.instance.oc1..<unique_ID>
+  response:
+    body:
+      data:
+        agentConfig:
+          areAllPluginsDisabled: false
+          isManagementDisabled: false
+          isMonitoringDisabled: false
+          pluginsConfig: null
+        availabilityConfig:
+          isLiveMigrationPreferred: null
+          recoveryAction: RESTORE_INSTANCE
+        availabilityDomain: NQNU:US-ASHBURN-AD-1
+        capacityReservationId: null
+        compartmentId: ocid1.compartment.oc1..<unique_ID>
+        dedicatedVmHostId: null
+        definedTags:
+          Oracle-Tags:
+            CreatedBy: user@example.com
+            CreatedOn: '2023-06-01T13:30:24.382Z'
+          cloud-custodian-test:
+            mark-for-resize: 'false'
+        displayName: instance20230601133024
+        extendedMetadata: {}
+        faultDomain: FAULT-DOMAIN-1
+        freeformTags:
+          Project: CNCF
+        id: ocid1.instance.oc1..<unique_ID>
+        imageId: ocid1.image.oc1..<unique_ID>
+        instanceConfigurationId: null
+        instanceOptions:
+          areLegacyImdsEndpointsDisabled: false
+        ipxeScript: null
+        isCrossNumaNode: false
+        launchMode: NATIVE
+        launchOptions:
+          bootVolumeType: PARAVIRTUALIZED
+          firmware: UEFI_64
+          isConsistentVolumeNamingEnabled: true
+          isPvEncryptionInTransitEnabled: false
+          networkType: PARAVIRTUALIZED
+          remoteDataVolumeType: PARAVIRTUALIZED
+        lifecycleState: RUNNING
+        metadata: {}
+        platformConfig: null
+        preemptibleInstanceConfig: null
+        preferredMaintenanceAction: null
+        region: iad
+        shape: VM.Standard.E3.Flex
+        shapeConfig:
+          baselineOcpuUtilization: null
+          gpuDescription: null
+          gpus: 0
+          localDiskDescription: null
+          localDisks: 0
+          localDisksTotalSizeInGBs: null
+          maxVnicAttachments: 2
+          memoryInGBs: 1.0
+          networkingBandwidthInGbps: 1.0
+          ocpus: 1.0
+          processorDescription: "2.25 GHz AMD EPYC\u2122 7742 (Rome)"
+          vcpus: 2
+        sourceDetails:
+          bootVolumeSizeInGBs: null
+          bootVolumeVpusPerGB: null
+          imageId: ocid1.image.oc1..<unique_ID>
+          instanceSourceImageFilterDetails: null
+          kmsKeyId: null
+          sourceType: image
+        systemTags: {}
+        timeCreated: '2023-06-01T13:30:24.934Z'
+        timeMaintenanceRebootDue: null
+        timeStopScheduled: null
+    headers:
+      content-length:
+      - '2593'
+      content-type:
+      - application/json
+      date:
+      - Thu, 01 Jun 2023 13:31:38 GMT
+      etag:
+      - 9b13a2f724728fc0c04e2c955e225f8b8131a8ad3687121c956d41aef1b0a42f
+      opc-work-request-id:
+      - ocid1.coreservicesworkrequest.oc1.iad.abuwcljrypklwo3l7ugds2aujt7eu6754aisvhftiwnroop4ggxldj2al2lq
+      x-content-type-options:
+      - nosniff
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: https://iaas.us-ashburn-1.oraclecloud.com/20160918/instances?compartmentId=ocid1.compartment.oc1..<unique_ID>&displayName=instance20230601133024&limit=50
+  response:
+    body:
+      data:
+      - agentConfig:
+          areAllPluginsDisabled: false
+          isManagementDisabled: false
+          isMonitoringDisabled: false
+          pluginsConfig: null
+        availabilityConfig:
+          isLiveMigrationPreferred: null
+          recoveryAction: RESTORE_INSTANCE
+        availabilityDomain: NQNU:US-ASHBURN-AD-1
+        capacityReservationId: null
+        compartmentId: ocid1.compartment.oc1..<unique_ID>
+        dedicatedVmHostId: null
+        definedTags:
+          Oracle-Tags:
+            CreatedBy: user@example.com
+            CreatedOn: '2023-06-01T13:30:24.382Z'
+          cloud-custodian-test:
+            mark-for-resize: 'false'
+        displayName: instance20230601133024
+        extendedMetadata: {}
+        faultDomain: FAULT-DOMAIN-1
+        freeformTags:
+          Project: CNCF
+        id: ocid1.instance.oc1..<unique_ID>
+        imageId: ocid1.image.oc1..<unique_ID>
+        instanceConfigurationId: null
+        instanceOptions:
+          areLegacyImdsEndpointsDisabled: false
+        ipxeScript: null
+        isCrossNumaNode: false
+        launchMode: NATIVE
+        launchOptions:
+          bootVolumeType: PARAVIRTUALIZED
+          firmware: UEFI_64
+          isConsistentVolumeNamingEnabled: true
+          isPvEncryptionInTransitEnabled: false
+          networkType: PARAVIRTUALIZED
+          remoteDataVolumeType: PARAVIRTUALIZED
+        lifecycleState: RUNNING
+        metadata: {}
+        platformConfig: null
+        preemptibleInstanceConfig: null
+        preferredMaintenanceAction: null
+        region: iad
+        shape: VM.Standard.E3.Flex
+        shapeConfig:
+          baselineOcpuUtilization: null
+          gpuDescription: null
+          gpus: 0
+          localDiskDescription: null
+          localDisks: 0
+          localDisksTotalSizeInGBs: null
+          maxVnicAttachments: 2
+          memoryInGBs: 1.0
+          networkingBandwidthInGbps: 1.0
+          ocpus: 1.0
+          processorDescription: "2.25 GHz AMD EPYC\u2122 7742 (Rome)"
+          vcpus: 2
+        sourceDetails:
+          bootVolumeSizeInGBs: null
+          bootVolumeVpusPerGB: null
+          imageId: ocid1.image.oc1..<unique_ID>
+          instanceSourceImageFilterDetails: null
+          kmsKeyId: null
+          sourceType: image
+        systemTags: {}
+        timeCreated: '2023-06-01T13:30:24.934Z'
+        timeMaintenanceRebootDue: null
+        timeStopScheduled: null
+    headers:
+      content-encoding:
+      - gzip
+      content-length:
+      - '1110'
+      content-type:
+      - application/json
+      date:
+      - Thu, 01 Jun 2023 13:31:39 GMT
+      x-content-type-options:
+      - nosniff
+    status:
+      code: 200
+      message: OK
+version: 1
