@@ -23,6 +23,7 @@ class BigTableInstance(QueryResourceManager):
         name = id = 'id'
         scope_template = "projects/{}"
         permissions = ('bigtable.instances.list',)
+        asset_type = "bigtableadmin.googleapis.com/Instance"
         default_report_fields = ['displayName', 'expireTime']
 
 
@@ -45,6 +46,7 @@ class BigTableInstanceCluster(ChildResourceManager):
         }
         default_report_fields = ['name', 'expireTime']
         permissions = ('bigtable.clusters.list',)
+        asset_type = "bigtableadmin.googleapis.com/Cluster"
 
     def _get_child_enum_args(self, parent_instance):
         return {
@@ -75,6 +77,7 @@ class BigTableInstanceClusterBackup(ChildResourceManager):
         }
         default_report_fields = ['name', 'expireTime']
         permissions = ('bigtable.backups.list',)
+        asset_type = "bigtableadmin.googleapis.com/Backup"
 
     def _get_child_enum_args(self, parent_instance):
         return {
@@ -153,6 +156,7 @@ class BigTableInstanceTable(ChildResourceManager):
         }
         default_report_fields = ['name']
         permissions = ('bigtable.tables.list',)
+        asset_type = "bigtableadmin.googleapis.com/Table"
 
     def _get_child_enum_args(self, parent_instance):
         return {
