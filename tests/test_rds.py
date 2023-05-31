@@ -1561,7 +1561,6 @@ class RDSSnapshotTest(BaseTest):
                         "type": "copy-related-tag",
                         "key": "DBInstanceIdentifier",
                         "resource": "rds",
-                        "skip_missing": "true",
                         "tags": ["Owner"]
                     }],
             },
