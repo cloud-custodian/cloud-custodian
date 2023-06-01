@@ -7,6 +7,8 @@ ResourceMap = {
     "gcp.app-engine-domain-mapping": "c7n_gcp.resources.appengine.AppEngineDomainMapping",
     "gcp.app-engine-firewall-ingress-rule": (
         "c7n_gcp.resources.appengine.AppEngineFirewallIngressRule"),
+    "gcp.app-engine-service": "c7n_gcp.resources.appengine.AppEngineService",
+    "gcp.app-engine-service-version": "c7n_gcp.resources.appengine.AppEngineServiceVersion",
     "gcp.artifact-repository": (
         "c7n_gcp.resources.artifactregistry.ArtifactRegistryRepository"),
     "gcp.autoscaler": "c7n_gcp.resources.compute.Autoscaler",
