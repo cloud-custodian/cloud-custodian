@@ -300,7 +300,6 @@ class Notify(BaseNotify):
         batch = []
         batch_size = 0
         for resource in resources:
-            # Make a list of tuples containing the compressed resource and size
             prepared_resource = self.prepare_resources([resource])
             packed_resource = self.pack({'resources': prepared_resource})
             resource_size = len(packed_resource.encode('utf-8'))
@@ -314,10 +313,10 @@ class Notify(BaseNotify):
                     self.data.get('template', 'default'), len(batch)))
 
                 # Start a new batch so we don't skip the current resource
-                batch = [packed_resource]
+                batch = [resource]
                 batch_size = resource_size
             else:
-                batch.append(packed_resource)
+                batch.append(resource)
                 batch_size += resource_size
 
         if batch:
