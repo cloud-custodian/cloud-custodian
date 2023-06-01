@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, TypeInfo
-from c7n.utils import local_session, type_schema, chunks
+from c7n.utils import local_session, type_schema
 from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter, VpcFilter
 from c7n.tags import Tag, RemoveTag, universal_augment, TagDelayedAction, TagActionFilter
 from c7n.actions import BaseAction
@@ -133,11 +133,10 @@ class DirectoryDelete(BaseAction):
         client = local_session(
             self.manager.session_factory).client('ds')
 
-        for resource_set in chunks(resources, size=100):
-            for r in resource_set:
-                self.manager.retry(
-                    client.delete_directory,
-                    DirectoryId=r['DirectoryId'])
+        for r in resources:
+            self.manager.retry(
+                client.delete_directory,
+                DirectoryId=r['DirectoryId'])
 
 
 @resources.register('cloud-directory')
