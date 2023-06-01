@@ -297,17 +297,14 @@ class Notify(BaseNotify):
         return result['MessageId']
     
     def process_batches(self, resources, message):
-        packed_resources = []
+        batch = []
+        batch_size = 0
         for resource in resources:
             # Make a list of tuples containing the compressed resource and size
             prepared_resource = self.prepare_resources([resource])
             packed_resource = self.pack({'resources': prepared_resource})
             resource_size = len(packed_resource.encode('utf-8'))
-            packed_resources.append((packed_resource, resource_size))
 
-        batch = []
-        batch_size = 0
-        for packed_resource, resource_size in packed_resources:
             # Check if adding this resource will push us over the size
             if batch_size + resource_size >= 256 * 1000:
                 message['resources'] = batch
