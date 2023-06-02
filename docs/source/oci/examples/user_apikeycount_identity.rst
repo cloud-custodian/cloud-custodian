@@ -13,13 +13,13 @@ The following example policy will filter and tag the users with the API keys cou
         Filter and tag users with more than 2 API keys
       resource: oci.user
       filters:
-       - type: api_keys
+       - type: api-keys
          key: api_keys
          value_type: size
          op: greater-than
          value: 2
       actions:
-       - type: update_user
+       - type: update-user
          params:
           update_user_details:
             freeform_tags:

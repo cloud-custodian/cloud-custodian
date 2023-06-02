@@ -14,17 +14,17 @@ The following example policy will filter and tag the users who have stale OAuth 
       resource: oci.user
       filters:
         - or:
-          - type: o_auth2_client_credentials
+          - type: o-auth2-client-credentials
             key: o_auth2_client_credential.lifecycle_state
             op: equal
             value: 'INACTIVE'
-          - type: o_auth2_client_credentials
+          - type: o-auth2-client-credentials
             key: o_auth2_client_credential.time_expires
             value_type: expiration
             op: greater-than
             value: 0
       actions:
-        - type: update_user
+        - type: update-user
           params:
             update_user_details:
               freeform_tags:

@@ -8,15 +8,15 @@ The following example policy will start a stopped instance
 .. code-block:: yaml
 
     policies:
-    - name: power-on-policy
-      description: |
-        Power on a compute instance
-      resource: oci.instance
-      filters:
-        - type: value
-          key: display_name
-          value: Instance_1
-      actions:
-       - type: instance_action
-         params:
-          'action' : 'START'
+        - name: power-on-policy
+          description: |
+             Power on a compute instance
+          resource: oci.instance
+          filters:
+             - type: value
+               key: display_name
+               value: Instance_1
+          actions:
+             - type: instance-action
+               params:
+                  'action' : 'START'

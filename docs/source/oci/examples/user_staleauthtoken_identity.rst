@@ -14,17 +14,17 @@ The following example policy will filter and tag the users who have stale auth t
       resource: oci.user
       filters:
         - or:
-          - type: auth_tokens
+          - type: auth-tokens
             key: auth_token.lifecycle_state
             op: equal
             value: 'INACTIVE'
-          - type: auth_tokens
+          - type: auth-tokens
             key: auth_token.time_expires
             value_type: expiration
             op: greater-than
             value: 0
       actions:
-        - type: update_user
+        - type: update-user
           params:
             update_user_details:
               freeform_tags:

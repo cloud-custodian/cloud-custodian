@@ -19,9 +19,9 @@ And resize those instances to Flex shape.
             key: freeform_tags.eligible_for_resize
             value: 'true'
         actions:
-          - type: remove_tag
+          - type: remove-tag
             freeform_tags: ['eligible_for_resize']
-          - type: update_instance
+          - type: update-instance
             params:
               update_instance_details:
                 shape: VM.Standard.E3.Flex

@@ -3,11 +3,14 @@ import time
 from enum import Enum
 
 import oci
-from c7n_oci.query import DescribeService
 
 from c7n.config import Config
 from c7n.schema import generate
 from c7n.testing import C7N_FUNCTIONAL, CustodianTestCore
+
+FILTERED_FIELDS = [
+    "metadata"
+]
 
 
 class OciBaseTest(CustodianTestCore):
@@ -38,7 +41,8 @@ class OciBaseTest(CustodianTestCore):
         }
 
     def get_defined_tag_value(self, tag_details):
-        return tag_details["cloud-custodian-test"]["mark-for-resize"]
+        if tag_details.get("cloud-custodian-test"):
+            return tag_details.get("cloud-custodian-test").get("mark-for-resize")
 
     def get_defined_tag_key(self):
         return 'defined_tags."cloud-custodian-test"."mark-for-resize"'
@@ -47,27 +51,13 @@ class OciBaseTest(CustodianTestCore):
         if C7N_FUNCTIONAL:
             time.sleep(duration)
 
-    def get_resources(self, policy, compartment_id, id=None, name=None, **kwargs):
-        params = {"compartment_id": compartment_id}
-        for key, value in kwargs.items():
-            params[key] = value
-
-        describe_service = DescribeService(policy.resource_manager)
-        resources = describe_service.get_resources(None, params)
-        if id:
-            return [
-                oci.util.to_dict(resource)
-                for resource in resources
-                if resource.id == id
-            ]
-        elif name:
-            return [
-                oci.util.to_dict(resource)
-                for resource in resources
-                if resource.name == name
-            ]
+    def fetch_validation_data(self, resource_manager, operation, resource_id):
+        func = getattr(resource_manager.get_client(), operation)
+        resources = func(resource_id)
+        if isinstance(resources, list):
+            return [oci.util.to_dict(resource.data) for resource in resources]
         else:
-            return [oci.util.to_dict(resource) for resource in resources]
+            return oci.util.to_dict(resources.data)
 
 
 ## common functions
@@ -77,6 +67,18 @@ def replace_ocid(data):
 
 def replace_email(data):
     return re.sub(r'"[^"]+@oracle\.com"', '"user@example.com"', data)
+
+
+def replace_namespace(data):
+    return re.sub(r'"namespace"\s*:\s*"[^"]*"', r'"namespace": "<namespace>"', data)
+
+
+def sanitize_response_body(data):
+    if isinstance(data, list):
+        for resource in data:
+            for field in FILTERED_FIELDS:
+                del resource[field]
+    return data
 
 
 ### ENUM ###

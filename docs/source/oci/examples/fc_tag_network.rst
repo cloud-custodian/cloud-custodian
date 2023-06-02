@@ -13,7 +13,7 @@ The following example policy will tag all the fast connect in the tenancy
         Tag all the fast connect in the tenancy
       resource: oci.cross_connect
       actions:
-       - type: update_cross_connect
+       - type: update-cross-connect
          params:
            update_cross_connect_details:
              freeform_tags:

@@ -13,13 +13,13 @@ The following example policy will filter and tag the users whose API keys age is
         Filter and tag users whose api key age is greater than one year
       resource: oci.user
       filters:
-       - type: api_keys
+       - type: api-keys
          key: api_key.time_created
-         op: less-than
+         op: greater-than
          value_type: age
          value: 365
       actions:
-       - type: update_user
+       - type: update-user
          params:
           update_user_details:
             freeform_tags:

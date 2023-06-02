@@ -24,25 +24,27 @@ interactions:
         emailVerified: true
         externalIdentifier: fcf75b1a99fd4dbe9c8f5a11dd69a50c
         freeformTags:
+          TagName: TagValue
           key_old: 'true'
+          mfa_activated: 'false'
         id: ocid1.user.oc1..<unique_ID>
         identityProviderId: ocid1.saml2idp.oc1..<unique_ID>
         isMfaActivated: false
         lifecycleState: ACTIVE
         name: user@example.com
         timeCreated: '2023-04-25T16:55:50.537Z'
-        timeModified: '2023-06-01T07:07:57.250Z'
+        timeModified: '2023-06-08T07:59:25.623Z'
     headers:
       cache-control:
       - no-cache, no-store, must-revalidate
       content-length:
-      - '945'
+      - '990'
       content-type:
       - application/json
       date:
-      - Thu, 01 Jun 2023 13:19:34 GMT
+      - Fri, 09 Jun 2023 11:10:35 GMT
       etag:
-      - b03e98f10a06575a003e9bb0cb0bd1006b1a6062
+      - e3d2cb864e2b0f74308b4ead60ac0e65f2b1d7e8
       pragma:
       - no-cache
       x-content-type-options:
@@ -51,40 +53,89 @@ interactions:
       code: 200
       message: OK
 - request:
-    body: mock_body
+    body: null
     headers: {}
-    method: POST
-    uri: https://query.us-ashburn-1.oci.oraclecloud.com/20180409/resources?limit=50
+    method: GET
+    uri: https://dns.us-ashburn-1.oci.oraclecloud.com/20180115/zones?compartmentId=ocid1.compartment.oc1..<unique_ID>&scope=PRIVATE
   response:
     body:
       data:
-        items:
-        - additionalDetails: {}
-          availabilityDomain: null
-          compartmentId: ocid1.compartment.oc1..<unique_ID>
-          definedTags:
-            Oracle-Tags:
-              CreatedBy: user@example.com
-              CreatedOn: '2023-06-01T13:18:54.035Z'
-          displayName: testzone.com
-          freeformTags:
-            Project: CNCF
-          identifier: ocid1.dns-zone.oc1..<unique_ID>
-          identityContext: {}
-          lifecycleState: ACTIVE
-          resourceType: CustomerDnsZone
-          searchContext: null
-          systemTags: {}
-          timeCreated: '2023-06-01T13:18:54.255Z'
+      - compartmentId: ocid1.compartment.oc1..<unique_ID>
+        definedTags:
+          Oracle-Tags:
+            CreatedBy: user@example.com
+            CreatedOn: '2023-06-09T11:10:11.423Z'
+          cloud-custodian-test:
+            mark-for-resize: 'false'
+        dnssecConfig: null
+        dnssecState: DISABLED
+        freeformTags:
+          Environment: Production
+          Project: CNCF
+        id: ocid1.dns-zone.oc1..<unique_ID>
+        isProtected: false
+        lifecycleState: ACTIVE
+        name: testzone.com
+        scope: PRIVATE
+        self: https://dns.us-ashburn-1.oci.oraclecloud.com/20180115/zones/ocid1.dns-zone.oc1..<unique_ID>
+        serial: 1
+        timeCreated: '2023-06-09T11:10:11.520Z'
+        version: '1'
+        viewId: ocid1.dnsview.oc1..<unique_ID>
+        zoneType: PRIMARY
+      - compartmentId: ocid1.compartment.oc1..<unique_ID>
+        definedTags:
+          Oracle-Tags:
+            CreatedBy: user@example.com
+            CreatedOn: '2023-06-08T16:44:39.077Z'
+        dnssecConfig: null
+        dnssecState: DISABLED
+        freeformTags:
+          Environment: Development
+        id: ocid1.dns-zone.oc1..<unique_ID>
+        isProtected: true
+        lifecycleState: ACTIVE
+        name: subnet06082214.vcn06082214.oraclevcn.com
+        scope: PRIVATE
+        self: https://dns.us-ashburn-1.oci.oraclecloud.com/20180115/zones/ocid1.dns-zone.oc1..<unique_ID>
+        serial: 2
+        timeCreated: '2023-06-08T16:44:40.644Z'
+        version: '2'
+        viewId: ocid1.dnsview.oc1..<unique_ID>
+        zoneType: PRIMARY
+      - compartmentId: ocid1.compartment.oc1..<unique_ID>
+        definedTags:
+          Oracle-Tags:
+            CreatedBy: user@example.com
+            CreatedOn: '2023-06-08T16:44:32.674Z'
+        dnssecConfig: null
+        dnssecState: DISABLED
+        freeformTags:
+          Environment: Development
+        id: ocid1.dns-zone.oc1..<unique_ID>
+        isProtected: true
+        lifecycleState: ACTIVE
+        name: 0.10.in-addr.arpa
+        scope: PRIVATE
+        self: https://dns.us-ashburn-1.oci.oraclecloud.com/20180115/zones/ocid1.dns-zone.oc1..<unique_ID>
+        serial: 2
+        timeCreated: '2023-06-08T16:44:36.966Z'
+        version: '2'
+        viewId: ocid1.dnsview.oc1..<unique_ID>
+        zoneType: PRIMARY
     headers:
+      content-encoding:
+      - gzip
       content-length:
-      - '782'
+      - '811'
       content-type:
       - application/json
       date:
-      - Thu, 01 Jun 2023 13:19:35 GMT
-      x-content-type-options:
-      - nosniff
+      - Fri, 09 Jun 2023 11:10:37 GMT
+      opc-total-items:
+      - '3'
+      vary:
+      - Accept-Encoding
     status:
       code: 200
       message: OK

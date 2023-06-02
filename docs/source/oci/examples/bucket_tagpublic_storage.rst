@@ -9,16 +9,15 @@ The following example policy will tag all the buckets which has public access
 
     policies:
     - name: tag-public-buckets
-      description: |
-        Tag all the public buckets in the tenancy
+      description: Tag all the public buckets in the tenancy
       resource: oci.bucket
       filters:
-       - type: value
-         key: additional_details.publicAccessType
+       - type: attributes
+         key:  public_access_type
          value: 'ObjectRead'
          op: eq
       actions:
-       - type: update_bucket
+       - type: update-bucket
          params:
            update_bucket_details:
              freeform_tags:

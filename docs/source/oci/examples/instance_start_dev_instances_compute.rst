@@ -21,6 +21,6 @@ The following example policy will start all the stopped instances that have free
             key: freeform_tags.custodian_dev
             value: 'true'
         actions:
-          - type: instance_action
+          - type: instance-action
             params:
               action: 'START'

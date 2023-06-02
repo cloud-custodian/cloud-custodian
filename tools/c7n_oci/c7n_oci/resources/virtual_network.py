@@ -2,9 +2,12 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import logging
+import re  # noqa
+import copy  # noqa
 
 import oci.core
 
+from c7n.filters import Filter, ValueFilter  # noqa
 from c7n.utils import type_schema
 from c7n_oci.actions.base import OCIBaseAction, RemoveTagBaseAction
 from c7n_oci.provider import resources
@@ -36,12 +39,12 @@ class Cross_connect(QueryResourceManager):
         enum_spec = ("list_cross_connects", "items[]", None)
         extra_params = {"compartment_id"}
         resource_type = "OCI.VirtualNetwork/Cross_connect"
-        id = "identifier"
+        id = "id"
         name = "display_name"
         search_resource_type = "crossconnect"
 
 
-@Cross_connect.action_registry.register("update_cross_connect")
+@Cross_connect.action_registry.register("update-cross-connect")
 class UpdateCrossConnect(OCIBaseAction):
     """
     Update cross connect Action
@@ -59,37 +62,30 @@ class UpdateCrossConnect(OCIBaseAction):
             - name: perform-update-cross-connect-action
               resource: oci.cross_connect
               actions:
-                - type: update_cross_connect
+                - type: update-cross-connect
 
-    """
+    """  # noqa
 
     schema = type_schema(
-        "update_cross_connect", params={"type": "object"}, rinherit=OCIBaseAction.schema
+        "update-cross-connect", params={"type": "object"}, rinherit=OCIBaseAction.schema
     )
 
     def perform_action(self, resource):
         client = self.manager.get_client()
         params_dict = {}
         params_model = {}
-        additional_details = resource.get("additional_details")
         if self.data.get("params") and self.data.get("params").get("cross_connect_id"):
-            params_dict["cross_connect_id"] = self.data.get("params").get(
-                "cross_connect_id"
-            )
+            params_dict["cross_connect_id"] = self.data.get("params").get("cross_connect_id")
         else:
-            params_dict["cross_connect_id"] = resource.get(
-                "identifier", additional_details.get("identifier")
-            )
+            params_dict["cross_connect_id"] = resource.get("id")
         if self.data.get("params").get("update_cross_connect_details"):
             update_cross_connect_details_user = self.data.get("params").get(
                 "update_cross_connect_details"
             )
-            params_model = self.update_params(
-                resource, update_cross_connect_details_user
+            params_model = self.update_params(resource, update_cross_connect_details_user)
+            params_dict["update_cross_connect_details"] = oci.core.models.UpdateCrossConnectDetails(
+                **params_model
             )
-            params_dict[
-                "update_cross_connect_details"
-            ] = oci.core.models.UpdateCrossConnectDetails(**params_model)
         response = client.update_cross_connect(
             cross_connect_id=params_dict["cross_connect_id"],
             update_cross_connect_details=params_dict["update_cross_connect_details"],
@@ -100,7 +96,7 @@ class UpdateCrossConnect(OCIBaseAction):
         return response
 
 
-@Cross_connect.action_registry.register("remove_tag")
+@Cross_connect.action_registry.register("remove-tag")
 class RemoveTagActionCross_connect(RemoveTagBaseAction):
     """
     Remove Tag Action
@@ -115,39 +111,35 @@ class RemoveTagActionCross_connect(RemoveTagBaseAction):
             - name: remove-tag
               resource: oci.cross_connect
             actions:
-              - type: remove_tag
+              - type: remove-tag
                 defined_tags: ['cloud_custodian.environment']
                 freeform_tags: ['organization', 'team']
 
-    """
+    """  # noqa
 
     def perform_action(self, resource):
         client = self.manager.get_client()
         params_dict = {}
-        additional_details = resource.get("additional_details")
-        params_dict["cross_connect_id"] = resource.get(
-            "identifier", additional_details.get("identifier")
-        )
+        params_dict["cross_connect_id"] = resource.get("id")
         original_tag_count = self.tag_count(resource)
         params_model = self.remove_tag(resource)
         updated_tag_count = self.tag_count(params_model)
-        params_dict[
-            "update_cross_connect_details"
-        ] = oci.core.models.UpdateCrossConnectDetails(**params_model)
+        params_dict["update_cross_connect_details"] = oci.core.models.UpdateCrossConnectDetails(
+            **params_model
+        )
         if self.tag_removed_from_resource(original_tag_count, updated_tag_count):
             response = client.update_cross_connect(
                 cross_connect_id=params_dict["cross_connect_id"],
-                update_cross_connect_details=params_dict[
-                    "update_cross_connect_details"
-                ],
+                update_cross_connect_details=params_dict["update_cross_connect_details"],
             )
             log.info(
-                f"Received status {response.status} for PUT:update_cross_connect:remove_tag {response.request_id}"
+                f"Received status {response.status} for PUT:update_cross_connect:remove-tag"
+                f" {response.request_id}"
             )
             return response
         else:
             log.info(
-                "No tags matched. Skipping the remove_tag action on this resource - %s",
+                "No tags matched. Skipping the remove-tag action on this resource - %s",
                 resource.get("display_name"),
             )
             return None
@@ -176,12 +168,12 @@ class Vcn(QueryResourceManager):
         enum_spec = ("list_vcns", "items[]", None)
         extra_params = {"compartment_id"}
         resource_type = "OCI.VirtualNetwork/Vcn"
-        id = "identifier"
+        id = "id"
         name = "display_name"
         search_resource_type = "vcn"
 
 
-@Vcn.action_registry.register("update_vcn")
+@Vcn.action_registry.register("update-vcn")
 class UpdateVcn(OCIBaseAction):
     """
     Update vcn Action
@@ -200,42 +192,33 @@ class UpdateVcn(OCIBaseAction):
             - name: perform-update-vcn-action
               resource: oci.vcn
               actions:
-                - type: update_vcn
+                - type: update-vcn
 
-    """
+    """  # noqa
 
-    schema = type_schema(
-        "update_vcn", params={"type": "object"}, rinherit=OCIBaseAction.schema
-    )
+    schema = type_schema("update-vcn", params={"type": "object"}, rinherit=OCIBaseAction.schema)
 
     def perform_action(self, resource):
         client = self.manager.get_client()
         params_dict = {}
         params_model = {}
-        additional_details = resource.get("additional_details")
         if self.data.get("params") and self.data.get("params").get("vcn_id"):
             params_dict["vcn_id"] = self.data.get("params").get("vcn_id")
         else:
-            params_dict["vcn_id"] = resource.get(
-                "identifier", additional_details.get("identifier")
-            )
+            params_dict["vcn_id"] = resource.get("id")
         if self.data.get("params").get("update_vcn_details"):
             update_vcn_details_user = self.data.get("params").get("update_vcn_details")
             params_model = self.update_params(resource, update_vcn_details_user)
-            params_dict["update_vcn_details"] = oci.core.models.UpdateVcnDetails(
-                **params_model
-            )
+            params_dict["update_vcn_details"] = oci.core.models.UpdateVcnDetails(**params_model)
         response = client.update_vcn(
             vcn_id=params_dict["vcn_id"],
             update_vcn_details=params_dict["update_vcn_details"],
         )
-        log.info(
-            f"Received status {response.status} for PUT:update_vcn {response.request_id}"
-        )
+        log.info(f"Received status {response.status} for PUT:update_vcn {response.request_id}")
         return response
 
 
-@Vcn.action_registry.register("remove_tag")
+@Vcn.action_registry.register("remove-tag")
 class RemoveTagActionVcn(RemoveTagBaseAction):
     """
     Remove Tag Action
@@ -250,37 +233,33 @@ class RemoveTagActionVcn(RemoveTagBaseAction):
             - name: remove-tag
               resource: oci.vcn
             actions:
-              - type: remove_tag
+              - type: remove-tag
                 defined_tags: ['cloud_custodian.environment']
                 freeform_tags: ['organization', 'team']
 
-    """
+    """  # noqa
 
     def perform_action(self, resource):
         client = self.manager.get_client()
         params_dict = {}
-        additional_details = resource.get("additional_details")
-        params_dict["vcn_id"] = resource.get(
-            "identifier", additional_details.get("identifier")
-        )
+        params_dict["vcn_id"] = resource.get("id")
         original_tag_count = self.tag_count(resource)
         params_model = self.remove_tag(resource)
         updated_tag_count = self.tag_count(params_model)
-        params_dict["update_vcn_details"] = oci.core.models.UpdateVcnDetails(
-            **params_model
-        )
+        params_dict["update_vcn_details"] = oci.core.models.UpdateVcnDetails(**params_model)
         if self.tag_removed_from_resource(original_tag_count, updated_tag_count):
             response = client.update_vcn(
                 vcn_id=params_dict["vcn_id"],
                 update_vcn_details=params_dict["update_vcn_details"],
             )
             log.info(
-                f"Received status {response.status} for PUT:update_vcn:remove_tag {response.request_id}"
+                f"Received status {response.status} for PUT:update_vcn:remove-tag"
+                f" {response.request_id}"
             )
             return response
         else:
             log.info(
-                "No tags matched. Skipping the remove_tag action on this resource - %s",
+                "No tags matched. Skipping the remove-tag action on this resource - %s",
                 resource.get("display_name"),
             )
             return None
@@ -309,12 +288,12 @@ class Subnet(QueryResourceManager):
         enum_spec = ("list_subnets", "items[]", None)
         extra_params = {"compartment_id"}
         resource_type = "OCI.VirtualNetwork/Subnet"
-        id = "identifier"
+        id = "id"
         name = "display_name"
         search_resource_type = "subnet"
 
 
-@Subnet.action_registry.register("update_subnet")
+@Subnet.action_registry.register("update-subnet")
 class UpdateSubnet(OCIBaseAction):
     """
     Update subnet Action
@@ -333,29 +312,22 @@ class UpdateSubnet(OCIBaseAction):
             - name: perform-update-subnet-action
               resource: oci.subnet
               actions:
-                - type: update_subnet
+                - type: update-subnet
 
-    """
+    """  # noqa
 
-    schema = type_schema(
-        "update_subnet", params={"type": "object"}, rinherit=OCIBaseAction.schema
-    )
+    schema = type_schema("update-subnet", params={"type": "object"}, rinherit=OCIBaseAction.schema)
 
     def perform_action(self, resource):
         client = self.manager.get_client()
         params_dict = {}
         params_model = {}
-        additional_details = resource.get("additional_details")
         if self.data.get("params") and self.data.get("params").get("subnet_id"):
             params_dict["subnet_id"] = self.data.get("params").get("subnet_id")
         else:
-            params_dict["subnet_id"] = resource.get(
-                "identifier", additional_details.get("identifier")
-            )
+            params_dict["subnet_id"] = resource.get("id")
         if self.data.get("params").get("update_subnet_details"):
-            update_subnet_details_user = self.data.get("params").get(
-                "update_subnet_details"
-            )
+            update_subnet_details_user = self.data.get("params").get("update_subnet_details")
             params_model = self.update_params(resource, update_subnet_details_user)
             params_dict["update_subnet_details"] = oci.core.models.UpdateSubnetDetails(
                 **params_model
@@ -364,13 +336,11 @@ class UpdateSubnet(OCIBaseAction):
             subnet_id=params_dict["subnet_id"],
             update_subnet_details=params_dict["update_subnet_details"],
         )
-        log.info(
-            f"Received status {response.status} for PUT:update_subnet {response.request_id}"
-        )
+        log.info(f"Received status {response.status} for PUT:update_subnet {response.request_id}")
         return response
 
 
-@Subnet.action_registry.register("remove_tag")
+@Subnet.action_registry.register("remove-tag")
 class RemoveTagActionSubnet(RemoveTagBaseAction):
     """
     Remove Tag Action
@@ -385,37 +355,33 @@ class RemoveTagActionSubnet(RemoveTagBaseAction):
             - name: remove-tag
               resource: oci.subnet
             actions:
-              - type: remove_tag
+              - type: remove-tag
                 defined_tags: ['cloud_custodian.environment']
                 freeform_tags: ['organization', 'team']
 
-    """
+    """  # noqa
 
     def perform_action(self, resource):
         client = self.manager.get_client()
         params_dict = {}
-        additional_details = resource.get("additional_details")
-        params_dict["subnet_id"] = resource.get(
-            "identifier", additional_details.get("identifier")
-        )
+        params_dict["subnet_id"] = resource.get("id")
         original_tag_count = self.tag_count(resource)
         params_model = self.remove_tag(resource)
         updated_tag_count = self.tag_count(params_model)
-        params_dict["update_subnet_details"] = oci.core.models.UpdateSubnetDetails(
-            **params_model
-        )
+        params_dict["update_subnet_details"] = oci.core.models.UpdateSubnetDetails(**params_model)
         if self.tag_removed_from_resource(original_tag_count, updated_tag_count):
             response = client.update_subnet(
                 subnet_id=params_dict["subnet_id"],
                 update_subnet_details=params_dict["update_subnet_details"],
             )
             log.info(
-                f"Received status {response.status} for PUT:update_subnet:remove_tag {response.request_id}"
+                f"Received status {response.status} for PUT:update_subnet:remove-tag"
+                f" {response.request_id}"
             )
             return response
         else:
             log.info(
-                "No tags matched. Skipping the remove_tag action on this resource - %s",
+                "No tags matched. Skipping the remove-tag action on this resource - %s",
                 resource.get("display_name"),
             )
             return None

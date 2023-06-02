@@ -78,14 +78,14 @@ Create a file named ``custodian.yml`` with the following content. Update ``displ
 
     policies:
           - name: filter-for-compute-name
-            description: Filter for compute which matches the display name
+            description: Filter for compute which matches the  name
             resource: oci.instance
             filters:
               - type: value
                 key: display_name
                 value: test
             actions:
-              - type: update_instance
+              - type: update-instance
                 params:
                   update_instance_details:
                     freeform_tags:
@@ -123,15 +123,17 @@ Update ``compute_shape`` and ``compartment_id`` to match an existing compute ins
       - name: scan-for-eligible-VMS
         description: Scan for all the VM's with standard shape
         resource: oci.instance
+        query: [
+          compartment_ids: [
+             'ocid1.compartment.oc1..<unique_ID>'
+             ]
+        ]
         filters:
-          - type: query
-            params:
-              compartment_id: 'ocid1.compartment.oc1..<unique_ID>'
           - type: value
-            key: additional_details.shape
+            key: shape
             value: VM.Standard2.4
         actions:
-          - type: update_instance
+          - type: update-instance
             params:
               update_instance_details:
                 freeform_tags:

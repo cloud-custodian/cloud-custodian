@@ -13,12 +13,12 @@ The following example policy will filter and tag the users with the INACTIVE API
         Filter and tag users with inactive api keys
       resource: oci.user
       filters:
-       - type: api_keys
+       - type: api-keys
          key: api_key.lifecycle_state
          op: equal
          value: 'INACTIVE'
       actions:
-       - type: update_user
+       - type: update-user
          params:
           update_user_details:
             freeform_tags:

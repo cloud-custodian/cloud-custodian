@@ -13,13 +13,13 @@ The following example policy will filter and tag the users who have OAuth creden
         Filter and tag users with OAuth credentials
       resource: oci.user
       filters:
-       - type: o_auth2_client_credentials
+       - type: o-auth2-client-credentials
          key: o_auth2_client_credentials
          value_type: size
          op: greater-than
          value: 0
       actions:
-       - type: update_user
+       - type: update-user
          params:
           update_user_details:
             freeform_tags:

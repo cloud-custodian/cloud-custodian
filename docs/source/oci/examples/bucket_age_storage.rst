@@ -19,7 +19,7 @@ The following example policy will filter all the buckets whose age is greater th
          op: gt
          value: 100
       actions:
-       - type: update_bucket
+       - type: update-bucket
          params:
            update_bucket_details:
              freeform_tags:

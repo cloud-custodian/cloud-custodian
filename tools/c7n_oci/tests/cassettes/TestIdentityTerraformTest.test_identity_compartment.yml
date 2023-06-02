@@ -24,25 +24,27 @@ interactions:
         emailVerified: true
         externalIdentifier: fcf75b1a99fd4dbe9c8f5a11dd69a50c
         freeformTags:
+          TagName: TagValue
           key_old: 'true'
+          mfa_activated: 'false'
         id: ocid1.user.oc1..<unique_ID>
         identityProviderId: ocid1.saml2idp.oc1..<unique_ID>
         isMfaActivated: false
         lifecycleState: ACTIVE
         name: user@example.com
         timeCreated: '2023-04-25T16:55:50.537Z'
-        timeModified: '2023-06-01T07:07:57.250Z'
+        timeModified: '2023-06-08T07:59:25.623Z'
     headers:
       cache-control:
       - no-cache, no-store, must-revalidate
       content-length:
-      - '945'
+      - '990'
       content-type:
       - application/json
       date:
-      - Thu, 01 Jun 2023 13:34:47 GMT
+      - Fri, 09 Jun 2023 05:58:46 GMT
       etag:
-      - b03e98f10a06575a003e9bb0cb0bd1006b1a6062
+      - e3d2cb864e2b0f74308b4ead60ac0e65f2b1d7e8
       pragma:
       - no-cache
       x-content-type-options:
@@ -51,43 +53,53 @@ interactions:
       code: 200
       message: OK
 - request:
-    body: mock_body
+    body: null
     headers: {}
-    method: POST
-    uri: https://query.us-ashburn-1.oci.oraclecloud.com/20180409/resources?limit=50
+    method: GET
+    uri: https://identity.us-ashburn-1.oci.oraclecloud.com/20160918/compartments?compartmentId=ocid1.compartment.oc1..<unique_ID>
   response:
     body:
       data:
-        items:
-        - additionalDetails:
-            description: Custodian Test
-            inactiveStatus: 0
-            name: custodian-test1
-          availabilityDomain: null
-          compartmentId: ocid1.compartment.oc1..<unique_ID>
-          definedTags:
-            Oracle-Tags:
-              CreatedBy: user@example.com
-              CreatedOn: '2023-05-18T13:22:10.717Z'
-          displayName: Custodian-Test1
-          freeformTags:
-            Cloud_Custodian: 'True'
-            Environment: Development
-            custodian_development: 'true'
-          identifier: ocid1.compartment.oc1..<unique_ID>
-          identityContext: {}
-          lifecycleState: ACTIVE
-          resourceType: Compartment
-          searchContext: null
-          systemTags: {}
-          timeCreated: '2023-05-18T13:22:10.950Z'
+      - compartmentId: ocid1.compartment.oc1..<unique_ID>
+        definedTags:
+          Oracle-Tags:
+            CreatedBy: user@example.com
+            CreatedOn: '2023-06-08T01:29:02.817Z'
+        description: Custodian Test
+        freeformTags:
+          Cloud_Custodian_Test: 'True'
+        id: ocid1.compartment.oc1..<unique_ID>
+        lifecycleState: ACTIVE
+        name: Cloud-Custodian-Test1
+        timeCreated: '2023-06-08T01:29:02.959Z'
+      - compartmentId: ocid1.compartment.oc1..<unique_ID>
+        definedTags:
+          Oracle-Tags:
+            CreatedBy: user@example.com
+            CreatedOn: '2023-05-18T13:22:10.717Z'
+        description: Custodian Test
+        freeformTags:
+          Cloud_Custodian: 'True'
+          Environment: Development
+        id: ocid1.compartment.oc1..<unique_ID>
+        lifecycleState: DELETED
+        name: custodian-test1.XB8vaDrv
+        timeCreated: '2023-05-18T13:22:10.950Z'
     headers:
+      cache-control:
+      - no-cache, no-store, must-revalidate
+      content-encoding:
+      - gzip
       content-length:
-      - '971'
+      - '467'
       content-type:
       - application/json
       date:
-      - Thu, 01 Jun 2023 13:34:48 GMT
+      - Fri, 09 Jun 2023 05:58:47 GMT
+      opc-limit:
+      - '99'
+      pragma:
+      - no-cache
       x-content-type-options:
       - nosniff
     status:
@@ -105,28 +117,27 @@ interactions:
         definedTags:
           Oracle-Tags:
             CreatedBy: user@example.com
-            CreatedOn: '2023-05-18T13:22:10.717Z'
+            CreatedOn: '2023-06-08T01:29:02.817Z'
         description: Custodian Test
         freeformTags:
-          Cloud_Custodian: 'True'
+          Cloud_Custodian_Test: 'True'
           Environment: Development
-          custodian_development: 'true'
         id: ocid1.compartment.oc1..<unique_ID>
         isAccessible: true
         lifecycleState: ACTIVE
-        name: Custodian-Test1
-        timeCreated: '2023-05-18T13:22:10.950Z'
+        name: Cloud-Custodian-Test1
+        timeCreated: '2023-06-08T01:29:02.959Z'
     headers:
       cache-control:
       - no-cache, no-store, must-revalidate
       content-length:
-      - '677'
+      - '651'
       content-type:
       - application/json
       date:
-      - Thu, 01 Jun 2023 13:34:49 GMT
+      - Fri, 09 Jun 2023 05:58:48 GMT
       etag:
-      - ed91564a9ebae5a149a70c0f83c9e90fbd099597
+      - 98120f468e500e56e59b6ef05f97d6a1a074cd32
       pragma:
       - no-cache
       x-content-type-options:
@@ -138,37 +149,35 @@ interactions:
     body: null
     headers: {}
     method: GET
-    uri: https://identity.us-ashburn-1.oci.oraclecloud.com/20160918/compartments?compartmentId=ocid1.compartment.oc1..<unique_ID>&limit=50
+    uri: https://identity.us-ashburn-1.oci.oraclecloud.com/20160918/compartments/ocid1.compartment.oc1..<unique_ID>
   response:
     body:
       data:
-      - compartmentId: ocid1.compartment.oc1..<unique_ID>
+        compartmentId: ocid1.compartment.oc1..<unique_ID>
         definedTags:
           Oracle-Tags:
             CreatedBy: user@example.com
-            CreatedOn: '2023-05-18T13:22:10.717Z'
+            CreatedOn: '2023-06-08T01:29:02.817Z'
         description: Custodian Test
         freeformTags:
-          Cloud_Custodian: 'True'
+          Cloud_Custodian_Test: 'True'
           Environment: Development
-          custodian_development: 'true'
         id: ocid1.compartment.oc1..<unique_ID>
+        isAccessible: true
         lifecycleState: ACTIVE
-        name: Custodian-Test1
-        timeCreated: '2023-05-18T13:22:10.950Z'
+        name: Cloud-Custodian-Test1
+        timeCreated: '2023-06-08T01:29:02.959Z'
     headers:
       cache-control:
       - no-cache, no-store, must-revalidate
-      content-encoding:
-      - gzip
       content-length:
-      - '358'
+      - '555'
       content-type:
       - application/json
       date:
-      - Thu, 01 Jun 2023 13:34:50 GMT
-      opc-limit:
-      - '50'
+      - Fri, 09 Jun 2023 05:58:49 GMT
+      etag:
+      - 98120f468e500e56e59b6ef05f97d6a1a074cd32
       pragma:
       - no-cache
       x-content-type-options:

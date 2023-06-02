@@ -13,13 +13,13 @@ The following example policy will filter and tag the users who have DB credentia
         Filter and tag users with DB credentials
       resource: oci.user
       filters:
-       - type: db_credentials
+       - type: db-credentials
          key: db_credentials
          value_type: size
          op: greater-than
          value: 0
       actions:
-       - type: update_user
+       - type: update-user
          params:
           update_user_details:
             freeform_tags:

@@ -7,7 +7,7 @@ import pytest
 from pytest_terraform import tf
 
 from c7n.testing import PyTestUtils, reset_session_cache
-from oci_common import replace_ocid, replace_email
+from oci_common import replace_ocid, replace_email, replace_namespace
 from tools.c7n_oci.tests.oci_flight_recorder import OCIFlightRecorder
 
 tf.LazyReplay.value = not strtobool(os.environ.get("C7N_FUNCTIONAL", "no"))
@@ -33,3 +33,4 @@ def pytest_xdist_auto_num_workers(config):
 def pytest_terraform_modify_state(tfstate):
     tfstate.update(replace_ocid(str(tfstate)))
     tfstate.update(replace_email(str(tfstate)))
+    tfstate.update(replace_namespace(str(tfstate)))

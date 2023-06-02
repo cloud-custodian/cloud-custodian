@@ -18,6 +18,7 @@ class OCIBaseAction(BaseAction, ABC):
     batch_processing_enabled = False
     result = {"succeeded_resources": [], "failed_resources": failed_resources}
     work_request_client = None
+    fail_on_error = True
 
     schema = {
         "properties": {
@@ -45,9 +46,7 @@ class OCIBaseAction(BaseAction, ABC):
             ## TODO: As of now setting the count value to '1'
             # count = batch_processing.get('count', 1)
             count = 1
-            self.work_request_client = (
-                self.manager.get_session().get_work_request_client()
-            )
+            self.work_request_client = self.manager.get_session().get_work_request_client()
         resource_count = 0
         responses = []
         total_count = 0
@@ -66,21 +65,22 @@ class OCIBaseAction(BaseAction, ABC):
                             )
                             if not operations_completed:
                                 log.info(
-                                    "Operations that are executed in batch are not completed. So waiting for 5 "
-                                    "seconds..."
+                                    "Operations that are executed in batch are not completed. So"
+                                    " waiting for 5 seconds..."
                                 )
                                 time.sleep(5)
                         resource_count = 0
                         responses.clear()
             except Exception as ex:
+                res = resource.get("id", resource.get("name"))
                 log.exception(
-                    f"Unable to submit action against the instance - {resource['identifier']}. Reason: {ex.message}"
+                    f"Unable to submit action against the instance - {res} Reason: {{ex.message}}"
                 )
                 self.handle_exception(resource, resources, ex)
         return self.process_result(resources)
 
-    # All the OCI actions that extends the OCIBaseAction should implement the below method to have the logic
-    # for invoking the respective client
+    # All the OCI actions that extends the OCIBaseAction should implement the below method to
+    # have the logic for invoking the respective client
     @abc.abstractmethod
     def perform_action(self, resource):
         raise NotImplementedError("Base action class does not implement this behavior")
@@ -96,9 +96,7 @@ class OCIBaseAction(BaseAction, ABC):
                 for tag_ns, tag_dict in value.items():
                     existing_ns_tags = existing_tags.get(tag_ns, {})
                     updated_tags = {
-                        k: v
-                        for k, v in tag_dict.items()
-                        if existing_ns_tags.get(k) == v
+                        k: v for k, v in tag_dict.items() if existing_ns_tags.get(k) == v
                     }
                     updated_ns_tags[tag_ns] = updated_tags or tag_dict
 
@@ -117,7 +115,7 @@ class OCIBaseAction(BaseAction, ABC):
 
 class RemoveTagBaseAction(OCIBaseAction):
     schema = type_schema(
-        "remove_tag",
+        "remove-tag",
         freeform_tags={"type": "array", "items": {"type": "string"}},
         defined_tags={"type": "array", "items": {"type": "string"}},
         rinherit=OCIBaseAction.schema,
@@ -146,9 +144,12 @@ class RemoveTagBaseAction(OCIBaseAction):
                         log.info("%s tag does not exists", splits[1])
                 else:
                     log.info(
-                        "Defined %s namespace might be wrong or does not exists in the resource - %s",
+                        (
+                            "Defined %s namespace might be wrong or does not exists in the"
+                            " resource - %s"
+                        ),
                         splits[0],
-                        resource.get("display_name"),
+                        resource.get("name"),
                     )
         params_model["freeform_tags"] = current_freeform_tags
         params_model["defined_tags"] = current_defined_tags
@@ -160,25 +161,21 @@ class RemoveTagBaseAction(OCIBaseAction):
         tag_count = {}
         tag_count["freeform_tags"] = len(freeform_tags)
 
+        namespace_tag_count = {}
         for namespace in defined_tags:
-            namespace_tag_count = {}
             namespace_tag_count[namespace] = len(defined_tags.get(namespace))
-            tag_count["defined_tags"] = namespace_tag_count
+        tag_count["defined_tags"] = namespace_tag_count
         return tag_count
 
     def tag_removed_from_resource(self, original_tag_count, modified_tag_count):
-        if original_tag_count.get("freeform_tags") != modified_tag_count.get(
-            "freeform_tags"
-        ):
+        if original_tag_count.get("freeform_tags") != modified_tag_count.get("freeform_tags"):
             return True
         else:
             original_defined_tag = original_tag_count.get("defined_tags")
             modified_defined_tag = modified_tag_count.get("defined_tags")
             if original_defined_tag:
                 for namespace in original_defined_tag:
-                    if original_defined_tag.get(namespace) != modified_defined_tag.get(
-                        namespace
-                    ):
+                    if original_defined_tag.get(namespace) != modified_defined_tag.get(namespace):
                         return True
                 return False
             else:

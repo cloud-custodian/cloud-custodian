@@ -13,13 +13,13 @@ The following example policy will filter and tag the users who have SMTP credent
         Filter and tag users with smtp credentials
       resource: oci.user
       filters:
-       - type: smtp_credentials
+       - type: smtp-credentials
          key: smtp_credentials
          value_type: size
          op: greater-than
          value: 0
       actions:
-       - type: update_user
+       - type: update-user
          params:
           update_user_details:
             freeform_tags:

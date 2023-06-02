@@ -2,13 +2,17 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import logging
+import re  # noqa
+import copy  # noqa
 
 import oci.object_storage
 
+from c7n.filters import Filter, ValueFilter  # noqa
 from c7n.utils import type_schema
 from c7n_oci.actions.base import OCIBaseAction, RemoveTagBaseAction
 from c7n_oci.provider import resources
 from c7n_oci.query import QueryResourceManager
+from c7n_oci.constants import STORAGE_NAMESPACE
 
 log = logging.getLogger("custodian.oci.resources.object_storage")
 
@@ -33,15 +37,20 @@ class Bucket(QueryResourceManager):
         doc_groups = ["ObjectStorage"]
         service = "oci.object_storage"
         client = "ObjectStorageClient"
-        enum_spec = ("list_buckets", "items[]", None)
+        enum_spec = ("list_buckets", "items[]", {"fields": ["tags"]})
         extra_params = {"compartment_id", "namespace_name"}
         resource_type = "OCI.ObjectStorage/Bucket"
-        id = "identifier"
-        name = "display_name"
+        id = "id"
+        name = "name"
         search_resource_type = "bucket"
 
+    def _get_extra_params(self):
+        kw = {}
+        kw[STORAGE_NAMESPACE] = self.get_client().get_namespace().data
+        return kw
 
-@Bucket.action_registry.register("update_bucket")
+
+@Bucket.action_registry.register("update-bucket")
 class UpdateBucket(OCIBaseAction):
     """
         Update bucket Action
@@ -64,53 +73,40 @@ class UpdateBucket(OCIBaseAction):
                 - name: perform-update-bucket-action
                   resource: oci.bucket
                   actions:
-                    - type: update_bucket
+                    - type: update-bucket
 
-    """
+    """  # noqa
 
-    schema = type_schema(
-        "update_bucket", params={"type": "object"}, rinherit=OCIBaseAction.schema
-    )
+    schema = type_schema("update-bucket", params={"type": "object"}, rinherit=OCIBaseAction.schema)
 
     def perform_action(self, resource):
         client = self.manager.get_client()
         params_dict = {}
         params_model = {}
-        additional_details = resource.get("additional_details")
         if self.data.get("params") and self.data.get("params").get("namespace_name"):
-            params_dict["namespace_name"] = self.data.get("params").get(
-                "namespace_name"
-            )
+            params_dict["namespace_name"] = self.data.get("params").get("namespace_name")
         else:
-            params_dict["namespace_name"] = resource.get(
-                "namespace", additional_details.get("namespace")
-            )
+            params_dict["namespace_name"] = resource.get("namespace")
         if self.data.get("params") and self.data.get("params").get("bucket_name"):
             params_dict["bucket_name"] = self.data.get("params").get("bucket_name")
         else:
-            params_dict["bucket_name"] = resource.get(
-                "display_name", additional_details.get("display_name")
-            )
+            params_dict["bucket_name"] = resource.get("name")
         if self.data.get("params").get("update_bucket_details"):
-            update_bucket_details_user = self.data.get("params").get(
-                "update_bucket_details"
-            )
+            update_bucket_details_user = self.data.get("params").get("update_bucket_details")
             params_model = self.update_params(resource, update_bucket_details_user)
-            params_dict[
-                "update_bucket_details"
-            ] = oci.object_storage.models.UpdateBucketDetails(**params_model)
+            params_dict["update_bucket_details"] = oci.object_storage.models.UpdateBucketDetails(
+                **params_model
+            )
         response = client.update_bucket(
             namespace_name=params_dict["namespace_name"],
             bucket_name=params_dict["bucket_name"],
             update_bucket_details=params_dict["update_bucket_details"],
         )
-        log.info(
-            f"Received status {response.status} for POST:update_bucket {response.request_id}"
-        )
+        log.info(f"Received status {response.status} for POST:update_bucket {response.request_id}")
         return response
 
 
-@Bucket.action_registry.register("remove_tag")
+@Bucket.action_registry.register("remove-tag")
 class RemoveTagActionBucket(RemoveTagBaseAction):
     """
     Remove Tag Action
@@ -125,28 +121,23 @@ class RemoveTagActionBucket(RemoveTagBaseAction):
             - name: remove-tag
               resource: oci.bucket
             actions:
-              - type: remove_tag
+              - type: remove-tag
                 defined_tags: ['cloud_custodian.environment']
                 freeform_tags: ['organization', 'team']
 
-    """
+    """  # noqa
 
     def perform_action(self, resource):
         client = self.manager.get_client()
         params_dict = {}
-        additional_details = resource.get("additional_details")
-        params_dict["namespace_name"] = resource.get(
-            "namespace", additional_details.get("namespace")
-        )
-        params_dict["bucket_name"] = resource.get(
-            "display_name", additional_details.get("display_name")
-        )
+        params_dict["namespace_name"] = resource.get("namespace")
+        params_dict["bucket_name"] = resource.get("name")
         original_tag_count = self.tag_count(resource)
         params_model = self.remove_tag(resource)
         updated_tag_count = self.tag_count(params_model)
-        params_dict[
-            "update_bucket_details"
-        ] = oci.object_storage.models.UpdateBucketDetails(**params_model)
+        params_dict["update_bucket_details"] = oci.object_storage.models.UpdateBucketDetails(
+            **params_model
+        )
         if self.tag_removed_from_resource(original_tag_count, updated_tag_count):
             response = client.update_bucket(
                 namespace_name=params_dict["namespace_name"],
@@ -154,12 +145,48 @@ class RemoveTagActionBucket(RemoveTagBaseAction):
                 update_bucket_details=params_dict["update_bucket_details"],
             )
             log.info(
-                f"Received status {response.status} for POST:update_bucket:remove_tag {response.request_id}"
+                f"Received status {response.status} for POST:update_bucket:remove-tag"
+                f" {response.request_id}"
             )
             return response
         else:
             log.info(
-                "No tags matched. Skipping the remove_tag action on this resource - %s",
-                resource.get("display_name"),
+                "No tags matched. Skipping the remove-tag action on this resource - %s",
+                resource.get("name"),
             )
             return None
+
+
+@Bucket.filter_registry.register("attributes")
+class AttributesValueFilter(ValueFilter):
+    """
+    Get all the attributes attached to this resources
+
+    :example:
+
+        Get all the attributes associated with this Bucket resource
+
+    .. code-block:: yaml
+
+        policies:
+            - name: get-bucket-attributes
+              resource: oci.bucket
+              filters:
+                - type: attributes
+                  key: attr1
+                  value: value1
+    """
+
+    schema = type_schema("attributes", rinherit=ValueFilter.schema)
+
+    def process(self, resources, event):
+        result = []
+        for resource in resources:
+            response = self.manager.get_client().get_bucket(
+                namespace_name=resource.get("namespace"),
+                bucket_name=resource.get("name"),
+            )
+            bucket = oci.util.to_dict(response.data)
+            resource = {**resource, **bucket}
+            result.append(resource)
+        return super().process(result)

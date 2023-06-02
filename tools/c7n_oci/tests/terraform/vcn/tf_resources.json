@@ -16,7 +16,7 @@
                 "default_security_list_id": "ocid1.securitylist.oc1..<unique_ID>",
                 "defined_tags": {
                     "Oracle-Tags.CreatedBy": "user@example.com",
-                    "Oracle-Tags.CreatedOn": "2023-06-01T13:10:24.478Z"
+                    "Oracle-Tags.CreatedOn": "2023-06-09T11:59:52.474Z"
                 },
                 "display_name": "TestVcn",
                 "dns_label": "testvcn",
@@ -29,7 +29,7 @@
                 "is_ipv6enabled": false,
                 "is_oracle_gua_allocation_enabled": null,
                 "state": "AVAILABLE",
-                "time_created": "2023-06-01 13:10:24.597 +0000 UTC",
+                "time_created": "2023-06-09 11:59:52.599 +0000 UTC",
                 "timeouts": null,
                 "vcn_domain_name": "testvcn.oraclevcn.com"
             }

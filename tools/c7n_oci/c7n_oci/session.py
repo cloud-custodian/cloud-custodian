@@ -89,7 +89,8 @@ class Session:
         return client
 
     def get_work_request_client(self):
-        """Creates WorkRequestClient which is used to check the status of the submitted asynchronous job
+        """Creates WorkRequestClient which is used to check the status of the submitted
+           asynchronous job
 
         Returns:
             object: WorkRequestClient object to check the status of the submitted job

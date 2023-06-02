@@ -13,13 +13,13 @@ The following example policy will filter and tag the users who have DB credentia
         Filter and tag users with DB credentials whose age is greater than 3 months
       resource: oci.user
       filters:
-       - type: db_credentials
+       - type: db-credentials
          key: db_credential.time_created
          value_type: age
          op: greater-than
          value: 90
       actions:
-       - type: update_user
+       - type: update-user
          params:
           update_user_details:
             freeform_tags:

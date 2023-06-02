@@ -15,7 +15,7 @@
                 "compartment_id": "ocid1.compartment.oc1..<unique_ID>",
                 "defined_tags": {
                     "Oracle-Tags.CreatedBy": "user@example.com",
-                    "Oracle-Tags.CreatedOn": "2023-06-01T13:30:11.651Z"
+                    "Oracle-Tags.CreatedOn": "2023-06-10T02:23:25.844Z"
                 },
                 "display_name": "DefaultRouteTable",
                 "freeform_tags": {},
@@ -32,7 +32,7 @@
                     }
                 ],
                 "state": "AVAILABLE",
-                "time_created": "2023-06-01 13:30:11.797 +0000 UTC",
+                "time_created": "2023-06-10 02:23:26.042 +0000 UTC",
                 "timeouts": null
             }
         },
@@ -64,7 +64,7 @@
                         "assign_public_ip": "false",
                         "defined_tags": {
                             "Oracle-Tags.CreatedBy": "user@example.com",
-                            "Oracle-Tags.CreatedOn": "2023-06-01T13:30:24.545Z"
+                            "Oracle-Tags.CreatedOn": "2023-06-10T02:23:34.384Z"
                         },
                         "display_name": "Primaryvnic",
                         "freeform_tags": {
@@ -72,7 +72,7 @@
                         },
                         "hostname_label": "exampleinstance0",
                         "nsg_ids": null,
-                        "private_ip": "10.1.20.73",
+                        "private_ip": "10.1.20.78",
                         "skip_source_dest_check": false,
                         "subnet_id": "ocid1.subnet.oc1..<unique_ID>",
                         "vlan_id": ""
@@ -81,9 +81,9 @@
                 "dedicated_vm_host_id": null,
                 "defined_tags": {
                     "Oracle-Tags.CreatedBy": "user@example.com",
-                    "Oracle-Tags.CreatedOn": "2023-06-01T13:30:24.382Z"
+                    "Oracle-Tags.CreatedOn": "2023-06-10T02:23:34.195Z"
                 },
-                "display_name": "instance20230601133024",
+                "display_name": "instance20230610022334",
                 "extended_metadata": null,
                 "fault_domain": "FAULT-DOMAIN-1",
                 "freeform_tags": {
@@ -115,7 +115,7 @@
                 "platform_config": [],
                 "preemptible_instance_config": [],
                 "preserve_boot_volume": null,
-                "private_ip": "10.1.20.73",
+                "private_ip": "10.1.20.78",
                 "public_ip": "",
                 "region": "iad",
                 "shape": "VM.Standard.E3.Flex",
@@ -147,7 +147,7 @@
                 "state": "RUNNING",
                 "subnet_id": "ocid1.subnet.oc1..<unique_ID>",
                 "system_tags": {},
-                "time_created": "2023-06-01 13:30:24.934 +0000 UTC",
+                "time_created": "2023-06-10 02:23:34.875 +0000 UTC",
                 "time_maintenance_reboot_due": "",
                 "timeouts": {
                     "create": "2m",
@@ -162,7 +162,7 @@
                 "compartment_id": "ocid1.compartment.oc1..<unique_ID>",
                 "defined_tags": {
                     "Oracle-Tags.CreatedBy": "user@example.com",
-                    "Oracle-Tags.CreatedOn": "2023-06-01T13:30:13.070Z"
+                    "Oracle-Tags.CreatedOn": "2023-06-10T02:23:27.167Z"
                 },
                 "display_name": "TestInternetGateway",
                 "enabled": true,
@@ -170,7 +170,7 @@
                 "id": "ocid1.internetgateway.oc1..<unique_ID>",
                 "route_table_id": null,
                 "state": "AVAILABLE",
-                "time_created": "2023-06-01 13:30:13.132 +0000 UTC",
+                "time_created": "2023-06-10 02:23:27.244 +0000 UTC",
                 "timeouts": null,
                 "vcn_id": "ocid1.vcn.oc1..<unique_ID>"
             }
@@ -182,7 +182,7 @@
                 "compartment_id": "ocid1.compartment.oc1..<unique_ID>",
                 "defined_tags": {
                     "Oracle-Tags.CreatedBy": "user@example.com",
-                    "Oracle-Tags.CreatedOn": "2023-06-01T13:30:14.069Z"
+                    "Oracle-Tags.CreatedOn": "2023-06-10T02:23:27.532Z"
                 },
                 "dhcp_options_id": "ocid1.dhcpoptions.oc1..<unique_ID>",
                 "display_name": "TestSubnet",
@@ -200,11 +200,11 @@
                 ],
                 "state": "AVAILABLE",
                 "subnet_domain_name": "testsubnet.testvcn.oraclevcn.com",
-                "time_created": "2023-06-01 13:30:14.136 +0000 UTC",
+                "time_created": "2023-06-10 02:23:27.608 +0000 UTC",
                 "timeouts": null,
                 "vcn_id": "ocid1.vcn.oc1..<unique_ID>",
                 "virtual_router_ip": "10.1.20.1",
-                "virtual_router_mac": "00:00:17:F2:22:49"
+                "virtual_router_mac": "00:00:17:8C:D4:D0"
             }
         },
         "oci_core_vcn": {
@@ -221,7 +221,7 @@
                 "default_security_list_id": "ocid1.securitylist.oc1..<unique_ID>",
                 "defined_tags": {
                     "Oracle-Tags.CreatedBy": "user@example.com",
-                    "Oracle-Tags.CreatedOn": "2023-06-01T13:30:11.651Z"
+                    "Oracle-Tags.CreatedOn": "2023-06-10T02:23:25.844Z"
                 },
                 "display_name": "TestVcn",
                 "dns_label": "testvcn",
@@ -232,7 +232,7 @@
                 "is_ipv6enabled": false,
                 "is_oracle_gua_allocation_enabled": null,
                 "state": "AVAILABLE",
-                "time_created": "2023-06-01 13:30:11.797 +0000 UTC",
+                "time_created": "2023-06-10 02:23:26.042 +0000 UTC",
                 "timeouts": null,
                 "vcn_domain_name": "testvcn.oraclevcn.com"
             }

@@ -1,6 +1,6 @@
 .. _zonefilternetwork:
 
-Zone - Filter all the VCNs based on a tag
+Zone - Filter all the zone based on a tag
 =========================================
 
 The following example policy will filter all the zones in the tenancy based on a specified tag

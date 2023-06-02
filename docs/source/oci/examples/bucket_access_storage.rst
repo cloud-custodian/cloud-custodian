@@ -9,8 +9,7 @@ The following example policy will filter all the buckets based on a tag and sets
 
     policies:
     - name: set-private-bucket
-      description: |
-        Filter the buckets and set the visibility to private
+      description: Filter the buckets and set the visibility to private
       resource: oci.bucket
       filters:
        - type: value
@@ -18,7 +17,7 @@ The following example policy will filter all the buckets based on a tag and sets
          value: 'true'
          op: eq
       actions:
-       - type: update_bucket
+       - type: update-bucket
          params:
            update_bucket_details:
              public_access_type: 'NoPublicAccess'

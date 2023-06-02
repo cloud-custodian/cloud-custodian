@@ -2,10 +2,12 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import logging
+import re  # noqa
+import copy  # noqa
 
 import oci.core
 
-from c7n.filters import Filter
+from c7n.filters import Filter, ValueFilter  # noqa
 from c7n.utils import type_schema
 from c7n_oci.actions.base import OCIBaseAction, RemoveTagBaseAction
 from c7n_oci.provider import resources
@@ -37,7 +39,7 @@ class Instance(QueryResourceManager):
         enum_spec = ("list_instances", "items[]", None)
         extra_params = {"compartment_id", "instance_id"}
         resource_type = "OCI.Compute/Instance"
-        id = "identifier"
+        id = "id"
         name = "display_name"
         search_resource_type = "instance"
 
@@ -64,7 +66,7 @@ class InstanceMonitoring(Filter):
                 - type: monitoring
                   query: 'CpuUtilization[30d].mean() < 6'
 
-    """
+    """  # noqa
 
     schema = type_schema("monitoring", query={"type": "string"}, required=["query"])
 
@@ -82,7 +84,8 @@ class InstanceMonitoring(Filter):
                 comp_resources.get(comp_id).append(resource)
             else:
                 comp_resources[comp_id] = [resource]
-        # Query the MonitoringClient with the query against each compartment and perform the filtering
+        # Query the MonitoringClient with the query against each compartment and perform
+        # the filtering
         for compartment_id in comp_resources.keys():
             metric_response = monitoring_client.summarize_metrics_data(
                 compartment_id=compartment_id,
@@ -91,12 +94,12 @@ class InstanceMonitoring(Filter):
             for metric_data in metric_response.data:
                 resource_id = metric_data.dimensions["resourceId"]
                 for resource in comp_resources.get(compartment_id):
-                    if resource.get("identifier") == resource_id:
+                    if resource.get("id") == resource_id:
                         result.append(resource)
         return result
 
 
-@Instance.action_registry.register("instance_action")
+@Instance.action_registry.register("instance-action")
 class InstanceAction(OCIBaseAction):
     """
         Instance action Action
@@ -155,45 +158,36 @@ class InstanceAction(OCIBaseAction):
                 - name: perform-instance-action-action
                   resource: oci.instance
                   actions:
-                    - type: instance_action
+                    - type: instance-action
 
-    """
+    """  # noqa
 
     schema = type_schema(
-        "instance_action", params={"type": "object"}, rinherit=OCIBaseAction.schema
+        "instance-action", params={"type": "object"}, rinherit=OCIBaseAction.schema
     )
 
     def perform_action(self, resource):
         client = self.manager.get_client()
         params_dict = {}
         params_model = {}
-        additional_details = resource.get("additional_details")
         if self.data.get("params") and self.data.get("params").get("instance_id"):
             params_dict["instance_id"] = self.data.get("params").get("instance_id")
         else:
-            params_dict["instance_id"] = resource.get(
-                "identifier", additional_details.get("identifier")
-            )
+            params_dict["instance_id"] = resource.get("id")
         if self.data.get("params") and self.data.get("params").get("action"):
             params_dict["action"] = self.data.get("params").get("action")
         else:
-            params_dict["action"] = resource.get(
-                "action", additional_details.get("action")
-            )
+            params_dict["action"] = resource.get("action")
         if self.data.get("params").get("instance_power_action_details"):
             instance_power_action_details_user = self.data.get("params").get(
                 "instance_power_action_details"
             )
             if instance_power_action_details_user.get("action_type"):
-                params_dict["action_type"] = instance_power_action_details_user.get(
-                    "action_type"
-                )
-            params_model = self.update_params(
-                resource, instance_power_action_details_user
+                params_dict["action_type"] = instance_power_action_details_user.get("action_type")
+            params_model = self.update_params(resource, instance_power_action_details_user)
+            params_dict["instance_power_action_details"] = (
+                oci.core.models.InstancePowerActionDetails(**params_model)
             )
-            params_dict[
-                "instance_power_action_details"
-            ] = oci.core.models.InstancePowerActionDetails(**params_model)
         response = client.instance_action(
             instance_id=params_dict["instance_id"],
             action=params_dict["action"],
@@ -204,7 +198,7 @@ class InstanceAction(OCIBaseAction):
         return response
 
 
-@Instance.action_registry.register("update_instance")
+@Instance.action_registry.register("update-instance")
 class UpdateInstance(OCIBaseAction):
     """
         Update instance Action
@@ -229,44 +223,37 @@ class UpdateInstance(OCIBaseAction):
                 - name: perform-update-instance-action
                   resource: oci.instance
                   actions:
-                    - type: update_instance
+                    - type: update-instance
 
-    """
+    """  # noqa
 
     schema = type_schema(
-        "update_instance", params={"type": "object"}, rinherit=OCIBaseAction.schema
+        "update-instance", params={"type": "object"}, rinherit=OCIBaseAction.schema
     )
 
     def perform_action(self, resource):
         client = self.manager.get_client()
         params_dict = {}
         params_model = {}
-        additional_details = resource.get("additional_details")
         if self.data.get("params") and self.data.get("params").get("instance_id"):
             params_dict["instance_id"] = self.data.get("params").get("instance_id")
         else:
-            params_dict["instance_id"] = resource.get(
-                "identifier", additional_details.get("identifier")
-            )
+            params_dict["instance_id"] = resource.get("id")
         if self.data.get("params").get("update_instance_details"):
-            update_instance_details_user = self.data.get("params").get(
-                "update_instance_details"
-            )
+            update_instance_details_user = self.data.get("params").get("update_instance_details")
             params_model = self.update_params(resource, update_instance_details_user)
-            params_dict[
-                "update_instance_details"
-            ] = oci.core.models.UpdateInstanceDetails(**params_model)
+            params_dict["update_instance_details"] = oci.core.models.UpdateInstanceDetails(
+                **params_model
+            )
         response = client.update_instance(
             instance_id=params_dict["instance_id"],
             update_instance_details=params_dict["update_instance_details"],
         )
-        log.info(
-            f"Received status {response.status} for PUT:update_instance {response.request_id}"
-        )
+        log.info(f"Received status {response.status} for PUT:update_instance {response.request_id}")
         return response
 
 
-@Instance.action_registry.register("remove_tag")
+@Instance.action_registry.register("remove-tag")
 class RemoveTagActionInstance(RemoveTagBaseAction):
     """
     Remove Tag Action
@@ -281,19 +268,16 @@ class RemoveTagActionInstance(RemoveTagBaseAction):
             - name: remove-tag
               resource: oci.instance
             actions:
-              - type: remove_tag
+              - type: remove-tag
                 defined_tags: ['cloud_custodian.environment']
                 freeform_tags: ['organization', 'team']
 
-    """
+    """  # noqa
 
     def perform_action(self, resource):
         client = self.manager.get_client()
         params_dict = {}
-        additional_details = resource.get("additional_details")
-        params_dict["instance_id"] = resource.get(
-            "identifier", additional_details.get("identifier")
-        )
+        params_dict["instance_id"] = resource.get("id")
         original_tag_count = self.tag_count(resource)
         params_model = self.remove_tag(resource)
         updated_tag_count = self.tag_count(params_model)
@@ -306,12 +290,13 @@ class RemoveTagActionInstance(RemoveTagBaseAction):
                 update_instance_details=params_dict["update_instance_details"],
             )
             log.info(
-                f"Received status {response.status} for PUT:update_instance:remove_tag {response.request_id}"
+                f"Received status {response.status} for PUT:update_instance:remove-tag"
+                f" {response.request_id}"
             )
             return response
         else:
             log.info(
-                "No tags matched. Skipping the remove_tag action on this resource - %s",
+                "No tags matched. Skipping the remove-tag action on this resource - %s",
                 resource.get("display_name"),
             )
             return None

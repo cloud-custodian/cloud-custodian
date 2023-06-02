@@ -1,5 +1,6 @@
 import inspect
 
+from c7n_oci.constants import COMPARTMENT_IDS
 from oci_common import OciBaseTest, Resource, Scope, Module
 from pytest_terraform import terraform
 
@@ -8,21 +9,17 @@ class TestSubnet(OciBaseTest):
     def _get_subnet_details(self, subnet):
         compartment_id = subnet["oci_core_subnet.test_subnet.compartment_id"]
         ocid = subnet["oci_core_subnet.test_subnet.id"]
-        name = subnet["oci_core_subnet.test_subnet.display_name"]
-        vcn_id = subnet["oci_core_vcn.test_vcn.id"]
-        return compartment_id, ocid, name, vcn_id
+        return compartment_id, ocid
 
-    def _get_subnet_params(self, name, vcn_id):
-        return {"display_name": name, "vcn_id": vcn_id}
+    def _fetch_instance_validation_data(self, resource_manager, subnet_id):
+        return self.fetch_validation_data(resource_manager, "get_subnet", subnet_id)
 
     @terraform(Module.SUBNET.value, scope=Scope.CLASS.value)
     def test_add_defined_tag_to_subnet(self, test, subnet):
         """
         test adding defined_tags tag to subnet
         """
-        compartment_id, subnet_ocid, subnet_name, vcn_id = self._get_subnet_details(
-            subnet
-        )
+        compartment_id, subnet_ocid = self._get_subnet_details(subnet)
         session_factory = test.oci_session_factory(
             self.__class__.__name__, inspect.currentframe().f_code.co_name
         )
@@ -30,13 +27,13 @@ class TestSubnet(OciBaseTest):
             {
                 "name": "add-defined-tag-to-subnet",
                 "resource": Resource.SUBNET.value,
-                "query": [{"compartment_id": compartment_id}],
+                "query": [{COMPARTMENT_IDS: [compartment_id]}],
                 "filters": [
-                    {"type": "value", "key": "identifier", "value": subnet_ocid},
+                    {"type": "value", "key": "id", "value": subnet_ocid},
                 ],
                 "actions": [
                     {
-                        "type": "update_subnet",
+                        "type": "update-subnet",
                         "params": {
                             "update_subnet_details": {
                                 "defined_tags": self.get_defined_tag("add_tag")
@@ -47,28 +44,17 @@ class TestSubnet(OciBaseTest):
             },
             session_factory=session_factory,
         )
-        self.wait_for_resource_search_sync()
         policy.run()
-        resources = self.get_resources(
-            policy,
-            compartment_id,
-            id=subnet_ocid,
-            **self._get_subnet_params(subnet_name, vcn_id)
-        )
-        test.assertEqual(len(resources), 1)
-        test.assertEqual(resources[0]["id"], subnet_ocid)
-        test.assertEqual(
-            self.get_defined_tag_value(resources[0]["defined_tags"]), "true"
-        )
+        resource = self._fetch_instance_validation_data(policy.resource_manager, subnet_ocid)
+        test.assertEqual(resource["id"], subnet_ocid)
+        test.assertEqual(self.get_defined_tag_value(resource["defined_tags"]), "true")
 
     @terraform(Module.SUBNET.value, scope=Scope.CLASS.value)
     def test_update_defined_tag_of_subnet(self, test, subnet):
         """
         test update defined_tags tag on subnet
         """
-        compartment_id, subnet_ocid, subnet_name, vcn_id = self._get_subnet_details(
-            subnet
-        )
+        compartment_id, subnet_ocid = self._get_subnet_details(subnet)
         session_factory = test.oci_session_factory(
             self.__class__.__name__, inspect.currentframe().f_code.co_name
         )
@@ -76,13 +62,13 @@ class TestSubnet(OciBaseTest):
             {
                 "name": "update-defined-tag-of-subnet",
                 "resource": Resource.SUBNET.value,
-                "query": [{"compartment_id": compartment_id}],
+                "query": [{COMPARTMENT_IDS: [compartment_id]}],
                 "filters": [
-                    {"type": "value", "key": "identifier", "value": subnet_ocid},
+                    {"type": "value", "key": "id", "value": subnet_ocid},
                 ],
                 "actions": [
                     {
-                        "type": "update_subnet",
+                        "type": "update-subnet",
                         "params": {
                             "update_subnet_details": {
                                 "defined_tags": self.get_defined_tag("update_tag")
@@ -94,26 +80,16 @@ class TestSubnet(OciBaseTest):
             session_factory=session_factory,
         )
         policy.run()
-        resources = self.get_resources(
-            policy,
-            compartment_id,
-            id=subnet_ocid,
-            **self._get_subnet_params(subnet_name, vcn_id)
-        )
-        test.assertEqual(len(resources), 1)
-        test.assertEqual(resources[0]["id"], subnet_ocid)
-        test.assertEqual(
-            self.get_defined_tag_value(resources[0]["defined_tags"]), "false"
-        )
+        resource = self._fetch_instance_validation_data(policy.resource_manager, subnet_ocid)
+        test.assertEqual(resource["id"], subnet_ocid)
+        test.assertEqual(self.get_defined_tag_value(resource["defined_tags"]), "false")
 
     @terraform(Module.SUBNET.value, scope=Scope.CLASS.value)
     def test_add_freeform_tag_to_subnet(self, test, subnet):
         """
         test adding freeform tag to subnet
         """
-        compartment_id, subnet_ocid, subnet_name, vcn_id = self._get_subnet_details(
-            subnet
-        )
+        compartment_id, subnet_ocid = self._get_subnet_details(subnet)
         session_factory = test.oci_session_factory(
             self.__class__.__name__, inspect.currentframe().f_code.co_name
         )
@@ -121,13 +97,13 @@ class TestSubnet(OciBaseTest):
             {
                 "name": "add-tag-freeform-to-subnet",
                 "resource": Resource.SUBNET.value,
-                "query": [{"compartment_id": compartment_id}],
+                "query": [{COMPARTMENT_IDS: [compartment_id]}],
                 "filters": [
-                    {"type": "value", "key": "identifier", "value": subnet_ocid},
+                    {"type": "value", "key": "id", "value": subnet_ocid},
                 ],
                 "actions": [
                     {
-                        "type": "update_subnet",
+                        "type": "update-subnet",
                         "params": {
                             "update_subnet_details": {
                                 "freeform_tags": {"Environment": "Development"}
@@ -139,24 +115,16 @@ class TestSubnet(OciBaseTest):
             session_factory=session_factory,
         )
         policy.run()
-        resources = self.get_resources(
-            policy,
-            compartment_id,
-            id=subnet_ocid,
-            **self._get_subnet_params(subnet_name, vcn_id)
-        )
-        test.assertEqual(len(resources), 1)
-        test.assertEqual(resources[0]["id"], subnet_ocid)
-        test.assertEqual(resources[0]["freeform_tags"]["Environment"], "Development")
+        resource = self._fetch_instance_validation_data(policy.resource_manager, subnet_ocid)
+        test.assertEqual(resource["id"], subnet_ocid)
+        test.assertEqual(resource["freeform_tags"]["Environment"], "Development")
 
     @terraform(Module.SUBNET.value, scope=Scope.CLASS.value)
     def test_update_freeform_tag_of_subnet(self, test, subnet):
         """
         test update freeform tag of subnet
         """
-        compartment_id, subnet_ocid, subnet_name, vcn_id = self._get_subnet_details(
-            subnet
-        )
+        compartment_id, subnet_ocid = self._get_subnet_details(subnet)
         session_factory = test.oci_session_factory(
             self.__class__.__name__, inspect.currentframe().f_code.co_name
         )
@@ -164,13 +132,13 @@ class TestSubnet(OciBaseTest):
             {
                 "name": "update-freeform-tag-of-subnet",
                 "resource": Resource.SUBNET.value,
-                "query": [{"compartment_id": compartment_id}],
+                "query": [{COMPARTMENT_IDS: [compartment_id]}],
                 "filters": [
-                    {"type": "value", "key": "identifier", "value": subnet_ocid},
+                    {"type": "value", "key": "id", "value": subnet_ocid},
                 ],
                 "actions": [
                     {
-                        "type": "update_subnet",
+                        "type": "update-subnet",
                         "params": {
                             "update_subnet_details": {
                                 "freeform_tags": {"Environment": "Production"}
@@ -182,22 +150,16 @@ class TestSubnet(OciBaseTest):
             session_factory=session_factory,
         )
         policy.run()
-        resources = self.get_resources(
-            policy,
-            compartment_id,
-            id=subnet_ocid,
-            **self._get_subnet_params(subnet_name, vcn_id)
-        )
-        test.assertEqual(len(resources), 1)
-        test.assertEqual(resources[0]["id"], subnet_ocid)
-        test.assertEqual(resources[0]["freeform_tags"]["Environment"], "Production")
+        resource = self._fetch_instance_validation_data(policy.resource_manager, subnet_ocid)
+        test.assertEqual(resource["id"], subnet_ocid)
+        test.assertEqual(resource["freeform_tags"]["Environment"], "Production")
 
     @terraform(Module.SUBNET.value, scope=Scope.CLASS.value)
     def test_get_freeform_tagged_subnet(self, test, subnet):
         """
         test get freeform tagged subnet
         """
-        compartment_id, subnet_ocid, _, _ = self._get_subnet_details(subnet)
+        compartment_id, subnet_ocid = self._get_subnet_details(subnet)
         session_factory = test.oci_session_factory(
             self.__class__.__name__, inspect.currentframe().f_code.co_name
         )
@@ -205,7 +167,7 @@ class TestSubnet(OciBaseTest):
             {
                 "name": "get-freeform-tagged-subnet",
                 "resource": Resource.SUBNET.value,
-                "query": [{"compartment_id": compartment_id}],
+                "query": [{COMPARTMENT_IDS: [compartment_id]}],
                 "filters": [
                     {"type": "value", "key": "freeform_tags.Project", "value": "CNCF"},
                 ],
@@ -214,5 +176,64 @@ class TestSubnet(OciBaseTest):
         )
         resources = policy.run()
         test.assertEqual(len(resources), 1)
-        test.assertEqual(resources[0]["identifier"], subnet_ocid)
+        test.assertEqual(resources[0]["id"], subnet_ocid)
         test.assertEqual(resources[0]["freeform_tags"]["Project"], "CNCF")
+
+    @terraform(Module.SUBNET.value, scope=Scope.CLASS.value)
+    def test_remove_freeform_tag(self, test, subnet):
+        """
+        test remove freeform tag
+        """
+        compartment_id, subnet_ocid = self._get_subnet_details(subnet)
+        session_factory = test.oci_session_factory(
+            self.__class__.__name__, inspect.currentframe().f_code.co_name
+        )
+        policy = test.load_policy(
+            {
+                "name": "subnet-remove-tag",
+                "resource": Resource.SUBNET.value,
+                "query": [{"compartment_id": compartment_id}],
+                "filters": [
+                    {"type": "value", "key": "id", "value": subnet_ocid},
+                ],
+                "actions": [
+                    {"type": "remove-tag", "freeform_tags": ["Project"]},
+                ],
+            },
+            session_factory=session_factory,
+        )
+        policy.run()
+        resource = self._fetch_instance_validation_data(policy.resource_manager, subnet_ocid)
+        test.assertEqual(resource["id"], subnet_ocid)
+        test.assertEqual(resource["freeform_tags"].get("Project"), None)
+
+    @terraform(Module.SUBNET.value, scope=Scope.CLASS.value)
+    def test_remove_defined_tag(self, test, subnet):
+        """
+        test remove defined tag
+        """
+        compartment_id, subnet_ocid = self._get_subnet_details(subnet)
+        session_factory = test.oci_session_factory(
+            self.__class__.__name__, inspect.currentframe().f_code.co_name
+        )
+        policy = test.load_policy(
+            {
+                "name": "subnet-remove-tag",
+                "resource": Resource.SUBNET.value,
+                "query": [{"compartment_id": compartment_id}],
+                "filters": [
+                    {"type": "value", "key": "id", "value": subnet_ocid},
+                ],
+                "actions": [
+                    {
+                        "type": "remove-tag",
+                        "defined_tags": ["cloud-custodian-test.mark-for-resize"],
+                    },
+                ],
+            },
+            session_factory=session_factory,
+        )
+        policy.run()
+        resource = self._fetch_instance_validation_data(policy.resource_manager, subnet_ocid)
+        test.assertEqual(resource["id"], subnet_ocid)
+        test.assertEqual(self.get_defined_tag_value(resource["defined_tags"]), None)

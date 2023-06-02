@@ -2,9 +2,12 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import logging
+import re  # noqa
+import copy  # noqa
 
 import oci.dns
 
+from c7n.filters import Filter, ValueFilter  # noqa
 from c7n.utils import type_schema
 from c7n_oci.actions.base import OCIBaseAction, RemoveTagBaseAction
 from c7n_oci.provider import resources
@@ -36,12 +39,12 @@ class Zone(QueryResourceManager):
         enum_spec = ("list_zones", "items[]", None)
         extra_params = {"compartment_id"}
         resource_type = "OCI.Dns/Zone"
-        id = "identifier"
-        name = "display_name"
+        id = "id"
+        name = "name"
         search_resource_type = "customerdnszone"
 
 
-@Zone.action_registry.register("update_zone")
+@Zone.action_registry.register("update-zone")
 class UpdateZone(OCIBaseAction):
     """
         Update zone Action
@@ -65,54 +68,39 @@ class UpdateZone(OCIBaseAction):
                 - name: perform-update-zone-action
                   resource: oci.zone
                   actions:
-                    - type: update_zone
+                    - type: update-zone
 
-    """
+    """  # noqa
 
-    schema = type_schema(
-        "update_zone", params={"type": "object"}, rinherit=OCIBaseAction.schema
-    )
+    schema = type_schema("update-zone", params={"type": "object"}, rinherit=OCIBaseAction.schema)
 
     def perform_action(self, resource):
         client = self.manager.get_client()
         params_dict = {}
         params_model = {}
-        additional_details = resource.get("additional_details")
         if self.data.get("params") and self.data.get("params").get("zone_name_or_id"):
-            params_dict["zone_name_or_id"] = self.data.get("params").get(
-                "zone_name_or_id"
-            )
+            params_dict["zone_name_or_id"] = self.data.get("params").get("zone_name_or_id")
         else:
-            params_dict["zone_name_or_id"] = resource.get(
-                "identifier", additional_details.get("identifier")
-            )
+            params_dict["zone_name_or_id"] = resource.get("id")
         if self.data.get("params").get("update_zone_details"):
-            update_zone_details_user = self.data.get("params").get(
-                "update_zone_details"
-            )
+            update_zone_details_user = self.data.get("params").get("update_zone_details")
             params_model = self.update_params(resource, update_zone_details_user)
-            params_dict["update_zone_details"] = oci.dns.models.UpdateZoneDetails(
-                **params_model
-            )
+            params_dict["update_zone_details"] = oci.dns.models.UpdateZoneDetails(**params_model)
         if self.data.get("params") and self.data.get("params").get("scope"):
             params_dict["scope"] = self.data.get("params").get("scope")
         if self.data.get("params") and self.data.get("params").get("view_id"):
             params_dict["view_id"] = self.data.get("params").get("view_id")
         if self.data.get("params") and self.data.get("params").get("compartment_id"):
-            params_dict["compartment_id"] = self.data.get("params").get(
-                "compartment_id"
-            )
+            params_dict["compartment_id"] = self.data.get("params").get("compartment_id")
         response = client.update_zone(
             zone_name_or_id=params_dict["zone_name_or_id"],
             update_zone_details=params_dict["update_zone_details"],
         )
-        log.info(
-            f"Received status {response.status} for PUT:update_zone {response.request_id}"
-        )
+        log.info(f"Received status {response.status} for PUT:update_zone {response.request_id}")
         return response
 
 
-@Zone.action_registry.register("remove_tag")
+@Zone.action_registry.register("remove-tag")
 class RemoveTagActionZone(RemoveTagBaseAction):
     """
     Remove Tag Action
@@ -127,37 +115,33 @@ class RemoveTagActionZone(RemoveTagBaseAction):
             - name: remove-tag
               resource: oci.zone
             actions:
-              - type: remove_tag
+              - type: remove-tag
                 defined_tags: ['cloud_custodian.environment']
                 freeform_tags: ['organization', 'team']
 
-    """
+    """  # noqa
 
     def perform_action(self, resource):
         client = self.manager.get_client()
         params_dict = {}
-        additional_details = resource.get("additional_details")
-        params_dict["zone_name_or_id"] = resource.get(
-            "identifier", additional_details.get("identifier")
-        )
+        params_dict["zone_name_or_id"] = resource.get("id")
         original_tag_count = self.tag_count(resource)
         params_model = self.remove_tag(resource)
         updated_tag_count = self.tag_count(params_model)
-        params_dict["update_zone_details"] = oci.dns.models.UpdateZoneDetails(
-            **params_model
-        )
+        params_dict["update_zone_details"] = oci.dns.models.UpdateZoneDetails(**params_model)
         if self.tag_removed_from_resource(original_tag_count, updated_tag_count):
             response = client.update_zone(
                 zone_name_or_id=params_dict["zone_name_or_id"],
                 update_zone_details=params_dict["update_zone_details"],
             )
             log.info(
-                f"Received status {response.status} for PUT:update_zone:remove_tag {response.request_id}"
+                f"Received status {response.status} for PUT:update_zone:remove-tag"
+                f" {response.request_id}"
             )
             return response
         else:
             log.info(
-                "No tags matched. Skipping the remove_tag action on this resource - %s",
-                resource.get("display_name"),
+                "No tags matched. Skipping the remove-tag action on this resource - %s",
+                resource.get("name"),
             )
             return None

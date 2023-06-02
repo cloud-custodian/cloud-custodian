@@ -13,13 +13,13 @@ The following example policy will filter and tag the users who have auth tokens
         Filter and tag users who have auth tokens
       resource: oci.user
       filters:
-       - type: auth_tokens
+       - type: auth-tokens
          key: auth_tokens
          value_type: size
          op: greater-than
          value: 0
       actions:
-       - type: update_user
+       - type: update-user
          params:
           update_user_details:
             freeform_tags:

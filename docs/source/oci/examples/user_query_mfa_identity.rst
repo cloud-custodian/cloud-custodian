@@ -14,10 +14,10 @@ The following example policy will filter and tag the users whose multi-factor au
       resource: oci.user
       filters:
        - type: attributes
-         key: user.is_mfa_activated
+         key: is_mfa_activated
          value: false
       actions:
-       - type: update_user
+       - type: update-user
          params:
           update_user_details:
             freeform_tags:

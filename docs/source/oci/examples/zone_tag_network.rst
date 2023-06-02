@@ -1,6 +1,6 @@
 .. _zonetagnetwork:
 
-Zone - Tag all the Zones in the tenancy
+Zone - Tag all the zones in the tenancy
 =======================================
 
 The following example policy will tag all the zones in the tenancy
@@ -10,10 +10,10 @@ The following example policy will tag all the zones in the tenancy
     policies:
     - name: tag-zone
       description: |
-        Tag all the Zones in the tenancy
+        Tag all the zones in the tenancy
       resource: oci.zone
       actions:
-       - type: update_zone
+       - type: update-zone
          params:
            update_zone_details:
              freeform_tags:

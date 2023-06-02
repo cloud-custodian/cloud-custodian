@@ -24,25 +24,27 @@ interactions:
         emailVerified: true
         externalIdentifier: fcf75b1a99fd4dbe9c8f5a11dd69a50c
         freeformTags:
+          TagName: TagValue
           key_old: 'true'
+          mfa_activated: 'false'
         id: ocid1.user.oc1..<unique_ID>
         identityProviderId: ocid1.saml2idp.oc1..<unique_ID>
         isMfaActivated: false
         lifecycleState: ACTIVE
         name: user@example.com
         timeCreated: '2023-04-25T16:55:50.537Z'
-        timeModified: '2023-06-01T07:07:57.250Z'
+        timeModified: '2023-06-08T07:59:25.623Z'
     headers:
       cache-control:
       - no-cache, no-store, must-revalidate
       content-length:
-      - '945'
+      - '990'
       content-type:
       - application/json
       date:
-      - Thu, 01 Jun 2023 13:19:17 GMT
+      - Fri, 09 Jun 2023 11:10:19 GMT
       etag:
-      - b03e98f10a06575a003e9bb0cb0bd1006b1a6062
+      - e3d2cb864e2b0f74308b4ead60ac0e65f2b1d7e8
       pragma:
       - no-cache
       x-content-type-options:
@@ -51,40 +53,88 @@ interactions:
       code: 200
       message: OK
 - request:
-    body: mock_body
+    body: null
     headers: {}
-    method: POST
-    uri: https://query.us-ashburn-1.oci.oraclecloud.com/20180409/resources?limit=50
+    method: GET
+    uri: https://dns.us-ashburn-1.oci.oraclecloud.com/20180115/zones?compartmentId=ocid1.compartment.oc1..<unique_ID>&scope=PRIVATE
   response:
     body:
       data:
-        items:
-        - additionalDetails: {}
-          availabilityDomain: null
-          compartmentId: ocid1.compartment.oc1..<unique_ID>
-          definedTags:
-            Oracle-Tags:
-              CreatedBy: user@example.com
-              CreatedOn: '2023-06-01T13:18:54.035Z'
-          displayName: testzone.com
-          freeformTags:
-            Project: CNCF
-          identifier: ocid1.dns-zone.oc1..<unique_ID>
-          identityContext: {}
-          lifecycleState: ACTIVE
-          resourceType: CustomerDnsZone
-          searchContext: null
-          systemTags: {}
-          timeCreated: '2023-06-01T13:18:54.255Z'
+      - compartmentId: ocid1.compartment.oc1..<unique_ID>
+        definedTags:
+          Oracle-Tags:
+            CreatedBy: user@example.com
+            CreatedOn: '2023-06-09T11:10:11.423Z'
+          cloud-custodian-test:
+            mark-for-resize: 'true'
+        dnssecConfig: null
+        dnssecState: DISABLED
+        freeformTags:
+          Project: CNCF
+        id: ocid1.dns-zone.oc1..<unique_ID>
+        isProtected: false
+        lifecycleState: ACTIVE
+        name: testzone.com
+        scope: PRIVATE
+        self: https://dns.us-ashburn-1.oci.oraclecloud.com/20180115/zones/ocid1.dns-zone.oc1..<unique_ID>
+        serial: 1
+        timeCreated: '2023-06-09T11:10:11.520Z'
+        version: '1'
+        viewId: ocid1.dnsview.oc1..<unique_ID>
+        zoneType: PRIMARY
+      - compartmentId: ocid1.compartment.oc1..<unique_ID>
+        definedTags:
+          Oracle-Tags:
+            CreatedBy: user@example.com
+            CreatedOn: '2023-06-08T16:44:39.077Z'
+        dnssecConfig: null
+        dnssecState: DISABLED
+        freeformTags:
+          Environment: Development
+        id: ocid1.dns-zone.oc1..<unique_ID>
+        isProtected: true
+        lifecycleState: ACTIVE
+        name: subnet06082214.vcn06082214.oraclevcn.com
+        scope: PRIVATE
+        self: https://dns.us-ashburn-1.oci.oraclecloud.com/20180115/zones/ocid1.dns-zone.oc1..<unique_ID>
+        serial: 2
+        timeCreated: '2023-06-08T16:44:40.644Z'
+        version: '2'
+        viewId: ocid1.dnsview.oc1..<unique_ID>
+        zoneType: PRIMARY
+      - compartmentId: ocid1.compartment.oc1..<unique_ID>
+        definedTags:
+          Oracle-Tags:
+            CreatedBy: user@example.com
+            CreatedOn: '2023-06-08T16:44:32.674Z'
+        dnssecConfig: null
+        dnssecState: DISABLED
+        freeformTags:
+          Environment: Development
+        id: ocid1.dns-zone.oc1..<unique_ID>
+        isProtected: true
+        lifecycleState: ACTIVE
+        name: 0.10.in-addr.arpa
+        scope: PRIVATE
+        self: https://dns.us-ashburn-1.oci.oraclecloud.com/20180115/zones/ocid1.dns-zone.oc1..<unique_ID>
+        serial: 2
+        timeCreated: '2023-06-08T16:44:36.966Z'
+        version: '2'
+        viewId: ocid1.dnsview.oc1..<unique_ID>
+        zoneType: PRIMARY
     headers:
+      content-encoding:
+      - gzip
       content-length:
-      - '782'
+      - '800'
       content-type:
       - application/json
       date:
-      - Thu, 01 Jun 2023 13:19:18 GMT
-      x-content-type-options:
-      - nosniff
+      - Fri, 09 Jun 2023 11:10:20 GMT
+      opc-total-items:
+      - '3'
+      vary:
+      - Accept-Encoding
     status:
       code: 200
       message: OK
@@ -100,7 +150,7 @@ interactions:
         definedTags:
           Oracle-Tags:
             CreatedBy: user@example.com
-            CreatedOn: '2023-06-01T13:18:54.035Z'
+            CreatedOn: '2023-06-09T11:10:11.423Z'
           cloud-custodian-test:
             mark-for-resize: 'false'
         dnssecConfig: null
@@ -118,7 +168,7 @@ interactions:
         scope: PRIVATE
         self: https://dns.us-ashburn-1.oci.oraclecloud.com/20180115/zones/ocid1.dns-zone.oc1..<unique_ID>
         serial: 1
-        timeCreated: '2023-06-01T13:18:54.255Z'
+        timeCreated: '2023-06-09T11:10:11.520Z'
         version: '1'
         viewId: ocid1.dnsview.oc1..<unique_ID>
         zoneTransferServers: []
@@ -129,11 +179,11 @@ interactions:
       content-type:
       - application/json
       date:
-      - Thu, 01 Jun 2023 13:19:20 GMT
+      - Fri, 09 Jun 2023 11:10:22 GMT
       etag:
-      - '"1ocid1.dns-zone.oc1.iad.aaaaaaaatam6mtruwakb5j7ra6liak5c2pddmdaipah5yumgqiz57k5atukac74b1d7f676b56b99a24523fdbf48d85#application/json"'
+      - '"1ocid1.dns-zone.oc1.iad.aaaaaaaajxh3q3mbj25tk3phx2xl4amzxion3ftdqgsx3h25b5vmdvsco4va929e36cff4323206c5d85278d7c9e27a#application/json"'
       opc-work-request-id:
-      - ocid1.coreservicesworkrequest.oc1.iad.abuwcljtoqkhm2hdstez2if3kbu7pqdoehctksjnzk6muoymndlv25z5te4q
+      - ocid1.coreservicesworkrequest.oc1.iad.abuwcljstnw5geeqg6m4q23wyjlftqsnwsqn2eubo63rjgrykhf6efqafpia
     status:
       code: 200
       message: OK
@@ -141,43 +191,48 @@ interactions:
     body: null
     headers: {}
     method: GET
-    uri: https://dns.us-ashburn-1.oci.oraclecloud.com/20180115/zones?limit=50&compartmentId=ocid1.compartment.oc1..<unique_ID>&scope=PRIVATE
+    uri: https://dns.us-ashburn-1.oci.oraclecloud.com/20180115/zones/ocid1.dns-zone.oc1..<unique_ID>
   response:
     body:
       data:
-      - compartmentId: ocid1.compartment.oc1..<unique_ID>
+        compartmentId: ocid1.compartment.oc1..<unique_ID>
         definedTags:
           Oracle-Tags:
             CreatedBy: user@example.com
-            CreatedOn: '2023-06-01T13:18:54.035Z'
+            CreatedOn: '2023-06-09T11:10:11.423Z'
           cloud-custodian-test:
             mark-for-resize: 'false'
         dnssecConfig: null
         dnssecState: DISABLED
+        externalDownstreams: []
+        externalMasters: []
         freeformTags:
           Project: CNCF
         id: ocid1.dns-zone.oc1..<unique_ID>
         isProtected: false
         lifecycleState: ACTIVE
         name: testzone.com
+        nameservers:
+        - hostname: vcn-dns.oraclevcn.com.
         scope: PRIVATE
         self: https://dns.us-ashburn-1.oci.oraclecloud.com/20180115/zones/ocid1.dns-zone.oc1..<unique_ID>
         serial: 1
-        timeCreated: '2023-06-01T13:18:54.255Z'
+        timeCreated: '2023-06-09T11:10:11.520Z'
         version: '1'
         viewId: ocid1.dnsview.oc1..<unique_ID>
+        zoneTransferServers: []
         zoneType: PRIMARY
     headers:
       content-encoding:
       - gzip
       content-length:
-      - '528'
+      - '592'
       content-type:
       - application/json
       date:
-      - Thu, 01 Jun 2023 13:19:21 GMT
-      opc-total-items:
-      - '1'
+      - Fri, 09 Jun 2023 11:10:24 GMT
+      etag:
+      - '"1ocid1.dns-zone.oc1.iad.aaaaaaaajxh3q3mbj25tk3phx2xl4amzxion3ftdqgsx3h25b5vmdvsco4va929e36cff4323206c5d85278d7c9e27a#application/json--gzip"'
       vary:
       - Accept-Encoding
     status:

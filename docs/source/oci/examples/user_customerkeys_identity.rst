@@ -13,13 +13,13 @@ The following example policy will filter and tag the users with the Customer sec
         Filter and tag users with customer secret keys
       resource: oci.user
       filters:
-       - type: customer_secret_keys
+       - type: customer-secret-keys
          key: customer_secret_keys
          value_type: size
          op: greater-than
          value: 0
       actions:
-       - type: update_user
+       - type: update-user
          params:
           update_user_details:
             freeform_tags:

@@ -13,10 +13,12 @@ specified freeform tag
         description: Filter and add tag on the child compartment
         resource: oci.compartment
         query: [
-          'compartment_id': 'ocid1.test.oc1..<unique_ID>EXAMPLE-compartmentId-Value'
+          'compartment_ids': [
+                        'ocid1.test.oc1..<unique_ID>EXAMPLE-compartmentId-Value'
+                    ]
           ]
         actions:
-          - type: update_compartment
+          - type: update-compartment
             params:
               update_compartment_details:
                 freeform_tags:

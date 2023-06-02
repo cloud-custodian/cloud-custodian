@@ -8,15 +8,15 @@ The following example policy will shut down a running instance
 .. code-block:: yaml
 
     policies:
-    - name: power-off-policy
-      description: |
-        Power off a compute instance
-      resource: oci.instance
-      filters:
-        - type: value
-          key: display_name
-          value: Instance_1
-      actions:
-       - type: instance_action
-         params:
-          'action' : 'STOP'
+       - name: power-off-policy
+         description: |
+            Power off a compute instance
+         resource: oci.instance
+         filters:
+           - type: value
+             key: display_name
+             value: Instance_1
+         actions:
+           - type: instance-action
+             params:
+               'action' : 'STOP'

@@ -13,13 +13,13 @@ The following example policy will filter and tag the users with the expired cust
         Filter and tag users with expired customer secret keys
       resource: oci.user
       filters:
-       - type: customer_secret_keys
+       - type: customer-secret-keys
          key: customer_secret_key.time_expires
          value_type: age
          op: greater-than
          value: 0
       actions:
-       - type: update_user
+       - type: update-user
          params:
           update_user_details:
             freeform_tags:
