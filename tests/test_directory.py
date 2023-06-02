@@ -56,7 +56,7 @@ class CloudDirectoryTest(BaseTest):
                 "name": "disable-cloud-directory",
                 "resource": "cloud-directory",
                 "filters": [{"Name": "test-cloud"}],
-                "actions": [{"type": "delete"}],
+                "actions": [{"type": "disable"}],
             },
             session_factory=factory,
         )
@@ -79,7 +79,7 @@ class CloudDirectoryTest(BaseTest):
                 "name": "delete-cloud-directory",
                 "resource": "cloud-directory",
                 "filters": [{"Name": "test-cloud"}],
-                "actions": [{"type": "delete", "force": True}],            
+                "actions": [{"type": "delete"}],            
             },
             session_factory=factory,
         )

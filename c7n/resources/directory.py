@@ -154,10 +154,37 @@ class CloudDirectory(QueryResourceManager):
 
 @CloudDirectory.action_registry.register('delete')
 class CloudDirectoryDelete(BaseAction):
-    """Disable/Delete a cloud directory.
-    
-    The directory(s) will be disabled when this action is called.
-    If force is True, the directory(s) will be permanently deleted
+    """Delete a cloud directory.
+
+    .. code-block:: yaml
+
+       policies:
+         - name: delete-cloud-directory
+           resource: aws.cloud-directory
+           filters:
+             - Name: test-cloud
+           actions:
+             - type: delete
+    """
+    schema = type_schema('delete')
+    permissions = ('clouddirectory:DeleteDirectory',
+                   'clouddirectory:DisableDirectory',)
+
+    def process(self, resources):
+        client = local_session(
+            self.manager.session_factory).client('clouddirectory')
+        for r in resources:
+            self.manager.retry(
+                    client.disable_directory,
+                    DirectoryArn=r['DirectoryArn'])
+
+            self.manager.retry(
+                client.delete_directory,
+                DirectoryArn=r['DirectoryArn'])
+
+@CloudDirectory.action_registry.register('disable')
+class CloudDirectoryDisable(BaseAction):
+    """Disable a cloud directory.
 
     .. code-block:: yaml
 
@@ -168,32 +195,14 @@ class CloudDirectoryDelete(BaseAction):
              - Name: test-cloud
            actions:
              - type: delete
-
-         - name: delete-cloud-directory
-           resource: aws.cloud-directory
-           filters:
-             - Name: test-cloud
-           actions:
-             - type: delete
-               force: True
     """
-    schema = type_schema('delete', force={'type': 'boolean'})
-    permissions = ('clouddirectory:DeleteDirectory',
-                   'clouddirectory:DisableDirectory',)
+    schema = type_schema('disable')
+    permissions = ('clouddirectory:DisableDirectory',)
 
     def process(self, resources):
         client = local_session(
             self.manager.session_factory).client('clouddirectory')
-        force = self.data.get("force", False)
         for r in resources:
-            if r["State"] == "DISABLED": 
-                continue
             self.manager.retry(
                     client.disable_directory,
-                    DirectoryArn=r['DirectoryArn'])
-        
-        if force:
-            for r in resources:
-                self.manager.retry(
-                    client.delete_directory,
                     DirectoryArn=r['DirectoryArn'])
