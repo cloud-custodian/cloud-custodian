@@ -12,20 +12,20 @@ from c7n_oci.resources.resource_map import ResourceMap
 
 import logging
 
-log = logging.getLogger('custodian.provider')
+log = logging.getLogger("custodian.provider")
 
 
-@clouds.register('oci')
+@clouds.register("oci")
 class OCI(Provider):
-    display_name = 'Oracle Cloud Infrastructure'
-    resource_prefix = 'oci'
-    resources = PluginRegistry('%s.resources' % resource_prefix)
+    display_name = "Oracle Cloud Infrastructure"
+    resource_prefix = "oci"
+    resources = PluginRegistry("%s.resources" % resource_prefix)
     resource_map = ResourceMap
 
     def initialize(self, options):
         session = local_session(self.get_session_factory(options))
         session.initialize_session()
-        options['oci_config'] = session.get_oci_config()
+        options["oci_config"] = session.get_oci_config()
         return options
 
     def initialize_policies(self, policy_collection, options):

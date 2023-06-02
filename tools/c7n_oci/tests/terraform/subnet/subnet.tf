@@ -2,12 +2,12 @@
 
 variable "OCI_COMPARTMENT_ID" {}
 
- data "oci_identity_availability_domain" "ad" {
+data "oci_identity_availability_domain" "ad" {
   compartment_id = var.OCI_COMPARTMENT_ID
   ad_number      = 1
 }
 
-  resource "oci_core_vcn" "test_vcn" {
+resource "oci_core_vcn" "test_vcn" {
   cidr_block     = "10.1.0.0/16"
   compartment_id = var.OCI_COMPARTMENT_ID
   display_name   = "TestVcn"
@@ -41,5 +41,5 @@ resource "oci_core_subnet" "test_subnet" {
   vcn_id              = oci_core_vcn.test_vcn.id
   route_table_id      = oci_core_vcn.test_vcn.default_route_table_id
   dhcp_options_id     = oci_core_vcn.test_vcn.default_dhcp_options_id
-  freeform_tags       = {"Project"= "CNCF"}
+  freeform_tags       = { "Project" = "CNCF" }
 }

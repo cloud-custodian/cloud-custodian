@@ -7,9 +7,16 @@ import os
 
 import oci
 
-from c7n_oci.constants import ENV_FINGERPRINT, ENV_USER, ENV_KEY_FILE, ENV_REGION, ENV_TENANCY, DEFAULT_PROFILE
+from c7n_oci.constants import (
+    ENV_FINGERPRINT,
+    ENV_USER,
+    ENV_KEY_FILE,
+    ENV_REGION,
+    ENV_TENANCY,
+    DEFAULT_PROFILE,
+)
 
-log = logging.getLogger('custodian.oci.session')
+log = logging.getLogger("custodian.oci.session")
 
 
 class Session:
@@ -24,11 +31,11 @@ class Session:
             return
         if os.environ.get(ENV_FINGERPRINT) is not None:
             self.config = {
-                'fingerprint': os.environ.get(ENV_FINGERPRINT),
-                'key_file': os.environ.get(ENV_KEY_FILE),
-                'region': os.environ.get(ENV_REGION),
-                'tenancy': os.environ.get(ENV_TENANCY),
-                'user': os.environ.get(ENV_USER)
+                "fingerprint": os.environ.get(ENV_FINGERPRINT),
+                "key_file": os.environ.get(ENV_KEY_FILE),
+                "region": os.environ.get(ENV_REGION),
+                "tenancy": os.environ.get(ENV_TENANCY),
+                "user": os.environ.get(ENV_USER),
             }
         elif self.profile_name is not None and self.config_file_path is None:
             self.config = oci.config.from_file(profile_name=self.profile_name)
@@ -39,32 +46,32 @@ class Session:
         else:
             self.config = oci.config.from_file()
 
-        self.config['additional_user_agent'] = f'Oracle-CloudCustodian {self.config["additional_user_agent"]}' \
-            if self.config.get('additional_user_agent') else 'Oracle-CloudCustodian'
+        self.config["additional_user_agent"] = (
+            f'Oracle-CloudCustodian {self.config["additional_user_agent"]}'
+            if self.config.get("additional_user_agent")
+            else "Oracle-CloudCustodian"
+        )
 
-        
         # The next statements are just to verify that the config is working
         try:
             identity_client = oci.identity.IdentityClient(self.config)
-            
-            response = identity_client.get_user(self.config.get('user'))
+
+            response = identity_client.get_user(self.config.get("user"))
             self.authenticated = True
             log.info(f"Successfully authenticated user [{response.data.name}]")
         except Exception as e:
-            log.error('Failed to authenticate.\nMessage: {}'.format(e))
+            log.error("Failed to authenticate.\nMessage: {}".format(e))
 
     def get_oci_config(self):
         return self.config
 
     def client(self, client):
         self.initialize_session()
-        service_name, client_name = client.rsplit('.', 1)
+        service_name, client_name = client.rsplit(".", 1)
         svc_module = importlib.import_module(service_name)
         klass = getattr(svc_module, client_name)
 
-        client_args = {
-            'config': self.config
-        }
+        client_args = {"config": self.config}
         client = klass(**client_args)
         return client
 
@@ -75,11 +82,9 @@ class Session:
               object: MonitoringClient object to make call to Monitoring service
         """
         self.initialize_session()
-        svc_module = importlib.import_module('oci.monitoring')
-        klass = getattr(svc_module, 'MonitoringClient')
-        client_args = {
-            'config': self.config
-        }
+        svc_module = importlib.import_module("oci.monitoring")
+        klass = getattr(svc_module, "MonitoringClient")
+        client_args = {"config": self.config}
         client = klass(**client_args)
         return client
 
@@ -90,10 +95,8 @@ class Session:
             object: WorkRequestClient object to check the status of the submitted job
         """
         self.initialize_session()
-        svc_module = importlib.import_module('oci.work_requests')
-        klass = getattr(svc_module, 'WorkRequestClient')
-        client_args = {
-            'config': self.config
-        }
+        svc_module = importlib.import_module("oci.work_requests")
+        klass = getattr(svc_module, "WorkRequestClient")
+        client_args = {"config": self.config}
         client = klass(**client_args)
         return client

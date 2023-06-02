@@ -10,5 +10,5 @@ ResourceMap = {
     "oci.zone": "c7n_oci.resources.dns.Zone",
     "oci.compartment": "c7n_oci.resources.identity.Compartment",
     "oci.group": "c7n_oci.resources.identity.Group",
-    "oci.user": "c7n_oci.resources.identity.User"
+    "oci.user": "c7n_oci.resources.identity.User",
 }

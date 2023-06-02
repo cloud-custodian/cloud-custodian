@@ -12,10 +12,10 @@ from c7n.manager import ResourceManager
 from c7n.query import sources, MaxResourceLimit, TypeInfo
 from c7n.utils import local_session
 
-log = logging.getLogger('custodian.oci.query')
+log = logging.getLogger("custodian.oci.query")
+
 
 class ResourceQuery:
-
     def __init__(self, session_factory):
         self.session_factory = session_factory
         self.record_limit = 100
@@ -25,64 +25,70 @@ class ResourceQuery:
         client = session.client(client_name)
 
         return self._invoke_client_enum(client, operation, params)
-    
-   
 
     def _invoke_client_enum(self, client, operation, params):
         method = getattr(client, operation)
-        response = oci.pagination.list_call_get_up_to_limit(method, **params, record_limit=self.record_limit,
-                                                            page_size=50)
+        response = oci.pagination.list_call_get_up_to_limit(
+            method, **params, record_limit=self.record_limit, page_size=50
+        )
         return response.data
 
-@sources.register('describe-oci')
-class DescribeSource:
 
+@sources.register("describe-oci")
+class DescribeSource:
     def __init__(self, manager):
         self.manager = manager
         self.query = ResourceQuery(manager.session_factory)
-    
+
     def _get_search_details_model(self):
-        query_filter = next((f for f in self.manager.filters if isinstance(f, QueryFilter)), None)
+        query_filter = next(
+            (f for f in self.manager.filters if isinstance(f, QueryFilter)), None
+        )
         query = f"query {self.manager.resource_type.search_resource_type} resources return alladditionalfields"
-        if query_filter and query_filter.data.get('params').get('compartment_id'):
-            compartment_id = query_filter.data['params']['compartment_id']
+        if query_filter and query_filter.data.get("params").get("compartment_id"):
+            compartment_id = query_filter.data["params"]["compartment_id"]
             query += f" where compartmentId = '{compartment_id}'"
-        return oci.resource_search.models.StructuredSearchDetails(type="Structured", query=query)
+        return oci.resource_search.models.StructuredSearchDetails(
+            type="Structured", query=query
+        )
 
     def get_resources(self, query):
-        params = {'search_details': self._get_search_details_model()}
-        client_name = 'oci.resource_search.ResourceSearchClient'
-        operation = 'search_resources'
-        return self.query.filter(self.manager, client_name, operation,  params)
+        params = {"search_details": self._get_search_details_model()}
+        client_name = "oci.resource_search.ResourceSearchClient"
+        operation = "search_resources"
+        return self.query.filter(self.manager, client_name, operation, params)
 
     def augment(self, resources):
         return resources
 
+
 class DescribeService(DescribeSource):
-    def get_resources(self, query, params = {}):
-        client_name = f'{self.manager.resource_type.service}.{self.manager.resource_type.client}'
+    def get_resources(self, query, params={}):
+        client_name = (
+            f"{self.manager.resource_type.service}.{self.manager.resource_type.client}"
+        )
         operation, return_type, extra_args = self.manager.resource_type.enum_spec
         if self.manager.resource_type.enum_spec[-1]:
             params.update(self.manager.resource_type.enum_spec[-1])
 
-        return self.query.filter(self.manager, client_name, operation,  params)
+        return self.query.filter(self.manager, client_name, operation, params)
+
 
 class QueryMeta(type):
     """metaclass to have consistent action/filter registry for new resources."""
+
     def __new__(cls, name, parents, attrs):
-        if 'filter_registry' not in attrs:
-            attrs['filter_registry'] = FilterRegistry(
-                '%s.filters' % name.lower())
-        if 'action_registry' not in attrs:
-            attrs['action_registry'] = ActionRegistry(
-                '%s.actions' % name.lower())
+        if "filter_registry" not in attrs:
+            attrs["filter_registry"] = FilterRegistry("%s.filters" % name.lower())
+        if "action_registry" not in attrs:
+            attrs["action_registry"] = ActionRegistry("%s.actions" % name.lower())
 
         return super(QueryMeta, cls).__new__(cls, name, parents, attrs)
 
 
 class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
     type: str
-    resource_type: 'TypeInfo'
+    resource_type: "TypeInfo"
 
     source_mapping = sources
 
@@ -98,7 +104,9 @@ class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
         raise KeyError("Invalid Source %s" % source_type)
 
     def get_client(self):
-        return local_session(self.session_factory).client(f'{self.resource_type.service}.{self.resource_type.client}')
+        return local_session(self.session_factory).client(
+            f"{self.resource_type.service}.{self.resource_type.client}"
+        )
 
     def get_model(self):
         return self.resource_type
@@ -108,23 +116,25 @@ class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
 
     @property
     def source_type(self):
-        return self.data.get('source', 'describe-oci')
+        return self.data.get("source", "describe-oci")
 
     def get_resource_query(self):
-        if 'query' in self.data:
-            return {'filter': self.data.get('query')}
+        if "query" in self.data:
+            return {"filter": self.data.get("query")}
 
     def resources(self, query=None):
         q = query or self.get_resource_query()
         resources = None
         result_resources = None
         if resources is None:
-            with self.ctx.tracer.subsegment('resource-fetch'):
+            with self.ctx.tracer.subsegment("resource-fetch"):
                 result_resources = self._fetch_resources(q)
-                resources = [oci.util.to_dict(resource) for resource in result_resources]
+                resources = [
+                    oci.util.to_dict(resource) for resource in result_resources
+                ]
 
         resource_count = len(resources)
-        with self.ctx.tracer.subsegment('filter'):
+        with self.ctx.tracer.subsegment("filter"):
             resources = self.filter_resources(resources)
 
         # Check resource limits if we're the current policy execution.
@@ -142,7 +152,6 @@ class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
 
     def _fetch_resources(self, query):
         return self.augment(self.source.get_resources(query)) or []
-
 
     def augment(self, resources):
         return resources

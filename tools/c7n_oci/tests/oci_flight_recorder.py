@@ -14,26 +14,26 @@ from c7n.testing import C7N_FUNCTIONAL, CustodianTestCore
 from c7n.utils import reset_session_cache
 from oci_common import replace_ocid, replace_email
 
-FILTERED_HEADERS = ['authorization',
-                        'opc-request-id',
-                        'opc-client-info',
-                        'opc-request-id',
-                        'x-content-sha256'
-                        'accept-encoding',
-                        'client-request-id',
-                        'opc-client-retries'
-                        'retry-after',
-                        'strict-transport-security',
-                        'opc-client-info'
-                        'server',
-                        'user-Agent',
-                        'accept-language',
-                        'connection',
-                        'expires',
-                        'content-location']
+FILTERED_HEADERS = [
+    "authorization",
+    "opc-request-id",
+    "opc-client-info",
+    "opc-request-id",
+    "x-content-sha256" "accept-encoding",
+    "client-request-id",
+    "opc-client-retries" "retry-after",
+    "strict-transport-security",
+    "opc-client-info" "server",
+    "user-Agent",
+    "accept-language",
+    "connection",
+    "expires",
+    "content-location",
+]
+
 
 class OCIFlightRecorder(CustodianTestCore):
-    cassette_dir = Path(__file__).parent.parent / 'tests' / 'cassettes'
+    cassette_dir = Path(__file__).parent.parent / "tests" / "cassettes"
 
     def cleanUp(self):
         threading.local().http = None
@@ -45,10 +45,14 @@ class OCIFlightRecorder(CustodianTestCore):
         if not os.path.exists(self.cassette_dir):
             os.makedirs(self.cassette_dir)
 
-        self.myvcr = config.VCR(custom_patches=self._get_mock_triples(), record_mode='all', before_record_request=self._request_callback,
-            before_record_response=self._response_callback)
-        self.myvcr.register_matcher('oci-matcher', self._oci_matcher)
-        self.myvcr.match_on = ['oci-matcher', 'method']
+        self.myvcr = config.VCR(
+            custom_patches=self._get_mock_triples(),
+            record_mode="all",
+            before_record_request=self._request_callback,
+            before_record_response=self._response_callback,
+        )
+        self.myvcr.register_matcher("oci-matcher", self._oci_matcher)
+        self.myvcr.match_on = ["oci-matcher", "method"]
         cassette = self._get_cassette_name(test_class, test_case)
         if os.path.exists(cassette):
             os.remove(cassette)
@@ -58,12 +62,16 @@ class OCIFlightRecorder(CustodianTestCore):
         return functools.partial(Session)
 
     def replay_flight_data(self, test_class, test_case):
-        self.myvcr = config.VCR(custom_patches=self._get_mock_triples(), record_mode='once', before_record_request=self._request_callback,
-            before_record_response=self._response_callback)
-        self.myvcr.register_matcher('oci-matcher', self._oci_matcher)
-        self.myvcr.match_on = ['oci-matcher', 'method']
-        cm = self.myvcr.use_cassette(self._get_cassette_name(test_class, test_case)
-        , allow_playback_repeats=True
+        self.myvcr = config.VCR(
+            custom_patches=self._get_mock_triples(),
+            record_mode="once",
+            before_record_request=self._request_callback,
+            before_record_response=self._response_callback,
+        )
+        self.myvcr.register_matcher("oci-matcher", self._oci_matcher)
+        self.myvcr.match_on = ["oci-matcher", "method"]
+        cm = self.myvcr.use_cassette(
+            self._get_cassette_name(test_class, test_case), allow_playback_repeats=True
         )
         cm.__enter__()
         self.addCleanup(cm.__exit__, None, None, None)
@@ -86,65 +94,74 @@ class OCIFlightRecorder(CustodianTestCore):
 
     def _get_mock_triples(self):
         import oci.base_client as ocibase
+
         mock_triples = (
             (ocibase, "OCIConnectionPool", requests_stubs.VCROCIConnectionPool),
-            (ocibase.OCIConnectionPool, "ConnectionCls", requests_stubs.VCROCIConnection)
+            (
+                ocibase.OCIConnectionPool,
+                "ConnectionCls",
+                requests_stubs.VCROCIConnection,
+            ),
         )
         return mock_triples
-    
+
     def _request_callback(self, request):
         """Modify requests before saving"""
         request.uri = self._replace_ocid_in_uri(request.uri)
         if request.body:
-            request.body = b'mock_body'
+            request.body = b"mock_body"
 
         request.headers = None
         return request
 
     def _replace_ocid_in_uri(self, uri):
-        parts = uri.split('/')
+        parts = uri.split("/")
         for index, part in enumerate(parts):
-            if '?' in part:
-                query_params = part.split('&')
+            if "?" in part:
+                query_params = part.split("&")
                 for i, param in enumerate(query_params):
-                    query_params[i] = re.sub(r'\.oc1\..*$', '.oc1..<unique_ID>', param)
+                    query_params[i] = re.sub(r"\.oc1\..*$", ".oc1..<unique_ID>", param)
                 parts[index] = "&".join(query_params)
-            elif part.startswith('ocid1.'):
-                parts[index] = re.sub(r'\.oc1\..*$', '.oc1..<unique_ID>', part)
+            elif part.startswith("ocid1."):
+                parts[index] = re.sub(r"\.oc1\..*$", ".oc1..<unique_ID>", part)
         return "/".join(parts)
-    
+
     def _response_callback(self, response):
         if not C7N_FUNCTIONAL:
-            if 'data' in response['body']:
-                body = json.dumps(response['body']['data'])
-                if response['headers'].get('content-encoding', (None,))[0] == "gzip":
-                    response['body']['string'] = gzip.compress(body.encode('utf-8'))
-                    response['headers']['content-length'] = [str(len(response['body']['string']))]
+            if "data" in response["body"]:
+                body = json.dumps(response["body"]["data"])
+                if response["headers"].get("content-encoding", (None,))[0] == "gzip":
+                    response["body"]["string"] = gzip.compress(body.encode("utf-8"))
+                    response["headers"]["content-length"] = [
+                        str(len(response["body"]["string"]))
+                    ]
                 else:
-                    response['body']['string'] = body.encode('utf-8')
-                    response['headers']['content-length'] = [str(len(body))]
+                    response["body"]["string"] = body.encode("utf-8")
+                    response["headers"]["content-length"] = [str(len(body))]
 
             return response
 
-        response['headers'] = {k.lower(): v for (k, v) in
-                               response['headers'].items()
-                               if k.lower() not in FILTERED_HEADERS}
+        response["headers"] = {
+            k.lower(): v
+            for (k, v) in response["headers"].items()
+            if k.lower() not in FILTERED_HEADERS
+        }
 
-        content_type = response['headers'].get('content-type', (None,))[0]
-        if not content_type or 'application/json' not in content_type:
+        content_type = response["headers"].get("content-type", (None,))[0]
+        if not content_type or "application/json" not in content_type:
             return response
 
-        if response['headers'].get('content-encoding', (None,))[0] == "gzip":
-            body = str(gzip.decompress(response['body'].pop('string')), 'utf-8')
+        if response["headers"].get("content-encoding", (None,))[0] == "gzip":
+            body = str(gzip.decompress(response["body"].pop("string")), "utf-8")
         else:
-            body = response['body'].pop('string').decode('utf-8')
+            body = response["body"].pop("string").decode("utf-8")
 
         body = replace_ocid(body)
         body = replace_email(body)
-        response['body']['data'] = json.loads(body)
+        response["body"]["data"] = json.loads(body)
 
         return response
-    
+
     def _oci_matcher(self, r1, r2):
         r1_path = self._replace_ocid_in_uri(r1.path)
         r2_path = self._replace_ocid_in_uri(r2.path)

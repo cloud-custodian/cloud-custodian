@@ -27,7 +27,7 @@ data "oci_identity_availability_domain" "ad" {
   ad_number      = 1
 }
 
-  resource "oci_core_vcn" "test_vcn" {
+resource "oci_core_vcn" "test_vcn" {
   cidr_block     = "10.1.0.0/16"
   compartment_id = var.OCI_COMPARTMENT_ID
   display_name   = "TestVcn"
@@ -68,9 +68,9 @@ resource "oci_core_instance" "test_instance" {
   availability_domain = data.oci_identity_availability_domain.ad.name
   compartment_id      = var.OCI_COMPARTMENT_ID
   shape               = "VM.Standard.E3.Flex"
-  freeform_tags = {"Project"= "CNCF"}
+  freeform_tags       = { "Project" = "CNCF" }
   shape_config {
-    ocpus = var.instance_ocpus
+    ocpus         = var.instance_ocpus
     memory_in_gbs = var.instance_shape_config_memory_in_gbs
   }
 
@@ -84,7 +84,7 @@ resource "oci_core_instance" "test_instance" {
 
   source_details {
     source_type = "image"
-    source_id = var.OCI_COMPUTE_IMAGE_ID
+    source_id   = var.OCI_COMPUTE_IMAGE_ID
   }
   timeouts {
     create = "2m"

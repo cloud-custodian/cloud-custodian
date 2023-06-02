@@ -5,8 +5,9 @@ from c7n.utils import type_schema
 from c7n.filters.core import Filter
 from c7n_oci.provider import resources
 
+
 class QueryFilter(Filter):
-    '''
+    """
     QueryFilter that queries the resources from the OCI. This query filter is applicable to all the OCI
     resources and it fetches the resources based on the params that are passed to this filter
 
@@ -26,16 +27,20 @@ class QueryFilter(Filter):
                   params:
                      compartment_id: 'ocid1.test.oc1..<unique_ID>EXAMPLE-compartmentId-Value'
 
-    '''
-    schema = type_schema('query',
-                         params={'type': 'object', "additionalProperties": {'type': 'string'}},
-                         required=['params'])
+    """
+
+    schema = type_schema(
+        "query",
+        params={"type": "object", "additionalProperties": {"type": "string"}},
+        required=["params"],
+    )
 
     def process(self, resources, event):
         return resources
 
     @classmethod
     def register_resources(cls, registry, resource_class):
-        resource_class.filter_registry.register('query', QueryFilter)
+        resource_class.filter_registry.register("query", QueryFilter)
+
 
 resources.subscribe(QueryFilter.register_resources)
