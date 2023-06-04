@@ -264,7 +264,9 @@ class VpcTest(BaseTest):
                 "name": "dns-hostnames-and-support-enabled",
                 "resource": "vpc",
                 "filters": [
-                    {"type": "vpc-attributes", "dnshostnames": True, "dnssupport": True}
+                    {"type": "vpc-attributes",
+                     "dnshostnames": True,
+                     "dnssupport": True}
                 ],
             },
             session_factory=self.session_factory,

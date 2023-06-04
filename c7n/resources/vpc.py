@@ -366,12 +366,14 @@ class AttributesFilter(Filter):
         ('dnssupport', 'enableDnsSupport'),
         ('addressmetrics', 'enableNetworkAddressUsageMetrics')
     )
+    annotation_key = 'c7n:attributes'
 
     def process(self, resources, event=None):
         results = []
         client = local_session(self.manager.session_factory).client('ec2')
 
         for r in resources:
+            found = True
             for policy_key, vpc_attr in self.key_params:
                 if policy_key not in self.data:
                     continue
@@ -380,9 +382,14 @@ class AttributesFilter(Filter):
                 value = client.describe_vpc_attribute(
                     VpcId=r['VpcId'],
                     Attribute=vpc_attr
-                )[response_attr]['Value']
-                if policy_value == value:
-                    results.append(r)
+                )
+                value = value[response_attr]['Value']
+                r.setdefault(self.annotation_key, {})[policy_key] = value                
+                if policy_value != value:
+                    found = False
+                    break
+            if found:
+                results.append(r)
         return results
 
 
