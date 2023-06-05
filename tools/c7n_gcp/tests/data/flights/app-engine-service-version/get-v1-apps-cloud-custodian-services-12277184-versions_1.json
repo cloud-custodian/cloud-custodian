@@ -1,0 +1,44 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Wed, 24 Apr 2019 17:48:40 GMT",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"46,44,43,39\"",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "4091",
+    "-content-encoding": "gzip",
+    "content-location": "https://appengine.googleapis.com/v1/apps/cloud-custodian/authorizedCertificates?alt=json"
+  },
+  "body": {
+    "versions": [
+      {
+        "name": "apps/cloud-custodian/services/12277184/versions/v3",
+        "id": "v3",
+        "instanceClass": "F1",
+        "network": {},
+        "runtime": "python39",
+        "threadsafe": true,
+        "env": "standard",
+        "servingStatus": "STOPPED",
+        "apiConfig" : {
+          "authFailAction": "AUTH_FAIL_ACTION_UNSPECIFIED",
+          "login": "LOGIN_UNSPECIFIED",
+          "script": "/",
+          "securityLevel": "SECURE_ALWAYS",
+          "url": "xyz"
+        },
+        "createTime": "2022-06-22T15:16:53Z",
+        "diskUsageBytes": "13155585",
+        "versionUrl": "https://v3-dot-cloud-custodian.appspot.com",
+        "runtimeChannel": "default",
+        "serviceAccount": "abc@def.com"
+      }
+    ]
+  }
+}
