@@ -281,9 +281,15 @@ class TestIdentityTerraformTest(OciBaseTest):
 class IdentityUnitTest(unittest.TestCase, OciBaseTest):
     @staticmethod
     def get_policy(resource, filters=None, actions=None):
-        policy = {"name": "test-identity",
-                  "query": [{"compartment_id": "ocid1.test.oc1..<unique_ID>EXAMPLE-compartmentId-Value"}],
-                  "resource": "oci.{0}".format(resource)}
+        policy = {
+            "name": "test-identity",
+            "query": [
+                {
+                    "compartment_id": "ocid1.test.oc1..<unique_ID>EXAMPLE-compartmentId-Value"
+                }
+            ],
+            "resource": "oci.{0}".format(resource),
+        }
         if filters:
             policy["filters"] = filters
         if actions:
@@ -373,7 +379,7 @@ class IdentityUnitTest(unittest.TestCase, OciBaseTest):
         self.assertTrue(
             self.load_policy(
                 self.get_policy(
-                    "group", filters=None,actions= self.get_action("group")
+                    "group", filters=None, actions=self.get_action("group")
                 ),
                 validate=True,
             )
@@ -382,9 +388,7 @@ class IdentityUnitTest(unittest.TestCase, OciBaseTest):
     def test_identity_user_schema(self):
         self.assertTrue(
             self.load_policy(
-                self.get_policy(
-                    "user", filters=None, actions= self.get_action("user")
-                ),
+                self.get_policy("user", filters=None, actions=self.get_action("user")),
                 validate=True,
             )
         )
@@ -392,11 +396,7 @@ class IdentityUnitTest(unittest.TestCase, OciBaseTest):
     def test_identity_api_key_schema(self):
         self.assertTrue(
             self.load_policy(
-                self.get_policy(
-                    "user",
-                    filters=None,
-                    actions=None
-                ),
+                self.get_policy("user", filters=None, actions=None),
                 validate=True,
             )
         )

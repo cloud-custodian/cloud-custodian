@@ -47,7 +47,7 @@ class DescribeSource:
     def _get_param(self, param_name, query):
         if query is None:
             return None
-        params = query.get('filter')
+        params = query.get("filter")
         for index in range(len(params)):
             param = params[index]
             if param_name in param:
@@ -59,17 +59,20 @@ class DescribeSource:
         if query is None:
             return {}
         selected_params = {}
-        params = query.get('filter')
-        for index in range(len(query.get('filter'))):
+        params = query.get("filter")
+        for index in range(len(query.get("filter"))):
             param = params[index]
-            if 'compartment_id' not in param:
-                selected_params = { **selected_params, **param}
+            if "compartment_id" not in param:
+                selected_params = {**selected_params, **param}
         return selected_params
 
-
     def get_resources(self, query):
-        params = {"search_details": self._get_search_details_model(self._get_param('compartment_id', query))}
-        params = { **params, **self._get_query_params(query)}
+        params = {
+            "search_details": self._get_search_details_model(
+                self._get_param("compartment_id", query)
+            )
+        }
+        params = {**params, **self._get_query_params(query)}
         client_name = "oci.resource_search.ResourceSearchClient"
         operation = "search_resources"
         return self.query.filter(self.manager, client_name, operation, params)
