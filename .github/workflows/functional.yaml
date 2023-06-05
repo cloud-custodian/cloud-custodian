@@ -37,7 +37,7 @@ jobs:
           key: tf-${{ runner.os }}-${{ hashFiles('**/*.tf') }}
 
       - name: Install Azure CLI
-        script: |
+        run: |
           set -ex
           curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
 
