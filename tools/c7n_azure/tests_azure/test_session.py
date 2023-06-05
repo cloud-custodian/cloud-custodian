@@ -9,7 +9,7 @@ from adal import AdalError
 from azure.core.credentials import AccessToken
 from azure.identity import (ClientSecretCredential, ManagedIdentityCredential)
 from c7n_azure import constants
-from c7n_azure.session import Session
+from c7n_azure.session import Session, _run_command
 from mock import patch
 from msrest.exceptions import AuthenticationError
 from msrestazure.azure_cloud import (AZURE_CHINA_CLOUD, AZURE_US_GOV_CLOUD)
@@ -86,6 +86,10 @@ class SessionTest(BaseTest):
             s = Session()
             self.assertEqual(s.get_subscription_id(), DEFAULT_SUBSCRIPTION_ID)
             self.assertEqual(s.get_tenant_id(), DEFAULT_TENANT_ID)
+
+    def test_run_command(self):
+        """Catch signature changes in the internal method we use for CLI auth"""
+        _run_command('az version', timeout=10)
 
     @patch('azure.identity.ClientSecretCredential.get_token')
     @patch('c7n_azure.session.log.error')
