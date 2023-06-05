@@ -4,7 +4,6 @@
 import logging
 
 import oci.config
-from c7n_oci.filters.list import QueryFilter
 
 from c7n.actions import ActionRegistry
 from c7n.filters import FilterRegistry
@@ -18,7 +17,6 @@ log = logging.getLogger("custodian.oci.query")
 class ResourceQuery:
     def __init__(self, session_factory):
         self.session_factory = session_factory
-        self.record_limit = 100
 
     def filter(self, resource_manager, client_name, operation, params):
         session = local_session(self.session_factory)
@@ -28,9 +26,7 @@ class ResourceQuery:
 
     def _invoke_client_enum(self, client, operation, params):
         method = getattr(client, operation)
-        response = oci.pagination.list_call_get_up_to_limit(
-            method, **params, record_limit=self.record_limit, page_size=50
-        )
+        response = oci.pagination.list_call_get_all_results(method, **params)
         return response.data
 
 
@@ -40,20 +36,40 @@ class DescribeSource:
         self.manager = manager
         self.query = ResourceQuery(manager.session_factory)
 
-    def _get_search_details_model(self):
-        query_filter = next(
-            (f for f in self.manager.filters if isinstance(f, QueryFilter)), None
-        )
+    def _get_search_details_model(self, compartment_id):
         query = f"query {self.manager.resource_type.search_resource_type} resources return alladditionalfields"
-        if query_filter and query_filter.data.get("params").get("compartment_id"):
-            compartment_id = query_filter.data["params"]["compartment_id"]
+        if compartment_id is not None:
             query += f" where compartmentId = '{compartment_id}'"
         return oci.resource_search.models.StructuredSearchDetails(
             type="Structured", query=query
         )
 
+    def _get_param(self, param_name, query):
+        if query is None:
+            return None
+        params = query.get('filter')
+        for index in range(len(params)):
+            param = params[index]
+            if param_name in param:
+                return param.get(param_name)
+        return None
+
+    # Contruct the query params by skipping the compartment_id as it used for building the search model
+    def _get_query_params(self, query):
+        if query is None:
+            return {}
+        selected_params = {}
+        params = query.get('filter')
+        for index in range(len(query.get('filter'))):
+            param = params[index]
+            if 'compartment_id' not in param:
+                selected_params = { **selected_params, **param}
+        return selected_params
+
+
     def get_resources(self, query):
-        params = {"search_details": self._get_search_details_model()}
+        params = {"search_details": self._get_search_details_model(self._get_param('compartment_id', query))}
+        params = { **params, **self._get_query_params(query)}
         client_name = "oci.resource_search.ResourceSearchClient"
         operation = "search_resources"
         return self.query.filter(self.manager, client_name, operation, params)
@@ -107,6 +123,9 @@ class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
         return local_session(self.session_factory).client(
             f"{self.resource_type.service}.{self.resource_type.client}"
         )
+
+    def get_session(self):
+        return local_session(self.session_factory)
 
     def get_model(self):
         return self.resource_type

@@ -10,11 +10,11 @@ And resize those instances to Flex shape.
 
     policies:
       - name: perform-resize-on-compute
-        description: Perform resize on the VM's only if the VM is tagged and it's CPU utilization is less than 50%
+        description: Perform resize on the VM's only if the VM is tagged and it's maximum CPU utilization is less than 50%
         resource: oci.instance
         filters:
           - type: monitoring
-            query: 'CpuUtilization[1d].mean() < 5'
+            query: 'CpuUtilization[1d].max() < 50'
           - type: value
             key: freeform_tags.eligible_for_resize
             value: 'true'

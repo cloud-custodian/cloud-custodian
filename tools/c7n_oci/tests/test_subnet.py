@@ -30,13 +30,8 @@ class TestSubnet(OciBaseTest):
             {
                 "name": "add-defined-tag-to-subnet",
                 "resource": Resource.SUBNET.value,
+                "query": [{"compartment_id": compartment_id}],
                 "filters": [
-                    {
-                        "type": "query",
-                        "params": {
-                            "compartment_id": compartment_id,
-                        },
-                    },
                     {"type": "value", "key": "identifier", "value": subnet_ocid},
                 ],
                 "actions": [
@@ -81,8 +76,8 @@ class TestSubnet(OciBaseTest):
             {
                 "name": "update-defined-tag-of-subnet",
                 "resource": Resource.SUBNET.value,
+                "query": [{"compartment_id": compartment_id}],
                 "filters": [
-                    {"type": "query", "params": {"compartment_id": compartment_id}},
                     {"type": "value", "key": "identifier", "value": subnet_ocid},
                 ],
                 "actions": [
@@ -126,8 +121,8 @@ class TestSubnet(OciBaseTest):
             {
                 "name": "add-tag-freeform-to-subnet",
                 "resource": Resource.SUBNET.value,
+                "query": [{"compartment_id": compartment_id}],
                 "filters": [
-                    {"type": "query", "params": {"compartment_id": compartment_id}},
                     {"type": "value", "key": "identifier", "value": subnet_ocid},
                 ],
                 "actions": [
@@ -169,8 +164,8 @@ class TestSubnet(OciBaseTest):
             {
                 "name": "update-freeform-tag-of-subnet",
                 "resource": Resource.SUBNET.value,
+                "query": [{"compartment_id": compartment_id}],
                 "filters": [
-                    {"type": "query", "params": {"compartment_id": compartment_id}},
                     {"type": "value", "key": "identifier", "value": subnet_ocid},
                 ],
                 "actions": [
@@ -210,8 +205,8 @@ class TestSubnet(OciBaseTest):
             {
                 "name": "get-freeform-tagged-subnet",
                 "resource": Resource.SUBNET.value,
+                "query": [{"compartment_id": compartment_id}],
                 "filters": [
-                    {"type": "query", "params": {"compartment_id": compartment_id}},
                     {"type": "value", "key": "freeform_tags.Project", "value": "CNCF"},
                 ],
             },

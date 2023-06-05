@@ -13,10 +13,9 @@ The following example policy lists all the instances in the specified compartmen
        description: |
          Lists and tag all the instances in the compartment
        resource: oci.instance
-       filters:
-        - type: query
-          params:
-            compartment_id: 'ocid1.test.oc1..<unique_ID>EXAMPLE-compartmentId-Value'
+       query: [
+          'compartment_id': 'ocid1.test.oc1..<unique_ID>EXAMPLE-compartmentId-Value'
+          ]
        actions:
         - type: update_instance
           params:

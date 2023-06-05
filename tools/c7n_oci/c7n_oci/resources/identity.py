@@ -42,16 +42,6 @@ class Compartment(QueryResourceManager):
         name = "display_name"
         search_resource_type = "compartment"
 
-    def _construct_query_params(self):
-        default_filters = super().get_default_filters()
-        """ Only return the params that are eligible to be passed to the api, as defined in extra_params """
-        default_filters = dict(
-            (k, v)
-            for k, v in default_filters.items()
-            if k in self.resource_type.extra_params
-        )
-        return default_filters
-
 
 @Compartment.action_registry.register("update_compartment")
 class UpdateCompartment(OCIBaseAction):
@@ -188,16 +178,6 @@ class Group(QueryResourceManager):
         name = "display_name"
         search_resource_type = "group"
 
-    def _construct_query_params(self):
-        default_filters = super().get_default_filters()
-        """ Only return the params that are eligible to be passed to the api, as defined in extra_params """
-        default_filters = dict(
-            (k, v)
-            for k, v in default_filters.items()
-            if k in self.resource_type.extra_params
-        )
-        return default_filters
-
 
 @Group.action_registry.register("update_group")
 class UpdateGroup(OCIBaseAction):
@@ -332,16 +312,6 @@ class User(QueryResourceManager):
         name = "display_name"
         search_resource_type = "user"
 
-    def _construct_query_params(self):
-        default_filters = super().get_default_filters()
-        """ Only return the params that are eligible to be passed to the api, as defined in extra_params """
-        default_filters = dict(
-            (k, v)
-            for k, v in default_filters.items()
-            if k in self.resource_type.extra_params
-        )
-        return default_filters
-
 
 @User.action_registry.register("update_user")
 class UpdateUser(OCIBaseAction):
@@ -456,17 +426,17 @@ class AttributesValueFilter(ValueFilter):
 
     :example:
 
-        Get all the attributes associated with this User resource
+    Get all the attributes associated with this User resource
 
     .. code-block:: yaml
 
-        policies:
-            - name: get-user-attributes
-              resource: oci.user
-              filters:
-                - type: attributes
-                  key: user.attr1
-                  value: value1
+    policies:
+        - name: get-user-attributes
+          resource: oci.user
+          filters:
+            - type: attributes
+              key: user.attr1
+              value: value1
 
     """
 

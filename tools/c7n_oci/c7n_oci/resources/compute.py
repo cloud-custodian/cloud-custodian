@@ -41,58 +41,6 @@ class Instance(QueryResourceManager):
         name = "display_name"
         search_resource_type = "instance"
 
-    def _construct_query_params(self):
-        default_filters = super().get_default_filters()
-        """ Only return the params that are eligible to be passed to the api, as defined in extra_params """
-        default_filters = dict(
-            (k, v)
-            for k, v in default_filters.items()
-            if k in self.resource_type.extra_params
-        )
-        return default_filters
-
-    def get_resources(self, params, enum_spec):
-        monitoring_filter = list(
-            filter(lambda x: x.data.get("type") == "monitoring", self.filters)
-        )
-        if self.compartment_id and len(monitoring_filter) > 0:
-            monitoring_client = self.get_session().get_monitoring_client()
-            if (
-                monitoring_filter[0].data
-                and monitoring_filter[0].data["params"][
-                    "summarize_metrics_data_details"
-                ]
-            ):
-                metrics_data = monitoring_filter[0].data["params"][
-                    "summarize_metrics_data_details"
-                ]
-                summarize_metrics = oci.monitoring.models.SummarizeMetricsDataDetails(
-                    query=metrics_data["query"],
-                    namespace=metrics_data["namespace"],
-                )
-            metric_response = monitoring_client.summarize_metrics_data(
-                compartment_id=self.compartment_id,
-                summarize_metrics_data_details=summarize_metrics,
-            )
-            resources = []
-            resource_set = set()
-            client = self.get_client()
-            for metric_data in metric_response.data:
-                resource_id = metric_data.dimensions["resourceId"]
-                if (
-                    resource_id not in resource_set
-                    and len(resource_set) <= self.record_limit
-                ):
-                    try:
-                        resource_response = client.get_instance(instance_id=resource_id)
-                        resources.append(resource_response.data)
-                        resource_set.add(resource_id)
-                    except Exception:
-                        pass
-            return resources
-        else:
-            return super().get_resources(params, enum_spec)
-
 
 @Instance.filter_registry.register("monitoring")
 class InstanceMonitoring(Filter):
@@ -121,7 +69,31 @@ class InstanceMonitoring(Filter):
     schema = type_schema("monitoring", query={"type": "string"}, required=["query"])
 
     def process(self, resources, event):
-        return resources
+        summarize_metrics = oci.monitoring.models.SummarizeMetricsDataDetails(
+            query=self.data.get("query"),
+            namespace="oci_computeagent",
+        )
+        monitoring_client = self.manager.get_session().get_monitoring_client()
+        comp_resources = {}
+        result = []
+        for resource in resources:
+            comp_id = resource.get("compartment_id")
+            if comp_id in comp_resources:
+                comp_resources.get(comp_id).append(resource)
+            else:
+                comp_resources[comp_id] = [resource]
+        # Query the MonitoringClient with the query against each compartment and perform the filtering
+        for compartment_id in comp_resources.keys():
+            metric_response = monitoring_client.summarize_metrics_data(
+                compartment_id=compartment_id,
+                summarize_metrics_data_details=summarize_metrics,
+            )
+            for metric_data in metric_response.data:
+                resource_id = metric_data.dimensions["resourceId"]
+                for resource in comp_resources.get(compartment_id):
+                    if resource.get("identifier") == resource_id:
+                        result.append(resource)
+        return result
 
 
 @Instance.action_registry.register("instance_action")
@@ -295,7 +267,7 @@ class UpdateInstance(OCIBaseAction):
 
 
 @Instance.action_registry.register("remove_tag")
-class RemoveTagAction(RemoveTagBaseAction):
+class RemoveTagActionInstance(RemoveTagBaseAction):
     """
     Remove Tag Action
 

@@ -27,13 +27,8 @@ class TestVcn(OciBaseTest):
             {
                 "name": "add-defined-tag-to-vcn",
                 "resource": Resource.VCN.value,
+                "query": [{"compartment_id": compartment_id}],
                 "filters": [
-                    {
-                        "type": "query",
-                        "params": {
-                            "compartment_id": compartment_id,
-                        },
-                    },
                     {"type": "value", "key": "identifier", "value": vcn_ocid},
                 ],
                 "actions": [
@@ -73,8 +68,8 @@ class TestVcn(OciBaseTest):
             {
                 "name": "update-defined-tag-of-vcn",
                 "resource": Resource.VCN.value,
+                "query": [{"compartment_id": compartment_id}],
                 "filters": [
-                    {"type": "query", "params": {"compartment_id": compartment_id}},
                     {"type": "value", "key": "identifier", "value": vcn_ocid},
                 ],
                 "actions": [
@@ -113,8 +108,8 @@ class TestVcn(OciBaseTest):
             {
                 "name": "add-tag-freeform-to-vcn",
                 "resource": Resource.VCN.value,
+                "query": [{"compartment_id": compartment_id}],
                 "filters": [
-                    {"type": "query", "params": {"compartment_id": compartment_id}},
                     {"type": "value", "key": "identifier", "value": vcn_ocid},
                 ],
                 "actions": [
@@ -151,8 +146,8 @@ class TestVcn(OciBaseTest):
             {
                 "name": "update-freeform-tag-of-vcn",
                 "resource": Resource.VCN.value,
+                "query": [{"compartment_id": compartment_id}],
                 "filters": [
-                    {"type": "query", "params": {"compartment_id": compartment_id}},
                     {"type": "value", "key": "identifier", "value": vcn_ocid},
                 ],
                 "actions": [
@@ -189,8 +184,8 @@ class TestVcn(OciBaseTest):
             {
                 "name": "get-freeform-tagged-vcn",
                 "resource": Resource.VCN.value,
+                "query": [{"compartment_id": compartment_id}],
                 "filters": [
-                    {"type": "query", "params": {"compartment_id": compartment_id}},
                     {"type": "value", "key": "freeform_tags.Project", "value": "CNCF"},
                 ],
             },

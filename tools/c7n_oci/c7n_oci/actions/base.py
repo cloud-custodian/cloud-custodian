@@ -14,71 +14,7 @@ log = logging.getLogger("custodian.oci.actions.base")
 
 
 class OCIBaseAction(BaseAction, ABC):
-    # OCIBaseAction handles the basic implementation of the OCI operation features
-    #
-    # Each action implementation can extends this class to get the basic OCI operation implementation
-    # like fail_on_error, block_until_completion, etc
-    #
-    # fail_on_error : If any of the resource action execution is failed and if the fail_on_error is set to true, then
-    # the execution of the policy will stop immediately with the error. If the fail_on_error is set to 'false', then
-    # the policy execution will continue with the other resources by skipping the failed resource action. The resources.json
-    # in the output directory will have the information about the lists of succeeded and failed resources.
-    #
-    # :example:
-    #
-    # Action that has the 'fail_on_error' set to false
-    #
-    # .. code-block:: yaml
-    #
-    #      policies:
-    #         - name: tag-vm-policy
-    #         description: |
-    #             Adds a tag to a virtual machines
-    #         resource: oci.compute
-    #         filters:
-    #             - type: query
-    #               params:
-    #                  compartment_id: 'ocid1.test.oc1..<unique_ID>EXAMPLE-compartmentId-Value'
-    #         actions:
-    #             - type: update_instance
-    #               params:
-    #                  freeform-tags:
-    #                     "Environment": "Test"
-    #               fail_on_error: False
-    #
-    # batch_processing :  If the OCI resource operation invoked by the Policy action execution is Asynchronous in nature,
-    # then setting the 'batch_processing' with true will run the jobs sequentially and waits until the submitted operation
-    # reaches it's final state.
-    #
-    # :example:
-    #
-    # Action with the batch_processing on
-    #
-    # .. code-block:: yaml
-    #
-    #      policies:
-    #         - name: scan-for-eligible-VMS
-    #         description: Scan for all the VM's with standard shape
-    #         resource: oci.compute
-    #         filters:
-    #            - type: query
-    #              params:
-    #                 compartment_id: 'ocid1.test.oc1..<unique_ID>EXAMPLE-compartmentId-Value'
-    #            - type: value
-    #              key: shape
-    #              value: VM.Standard2.4
-    #         actions:
-    #            - type: update_instance
-    #            params:
-    #               update_instance_details:
-    #                  shape: VM.Standard.E3.Flex
-    #                  shape_config:
-    #                      ocpus: 1
-    #            block_until_completion: True  # Run the action and wait untill the submitted operation gets completed
-
-    # List that maintains the failed resources
     failed_resources = []
-    fail_on_error = False
     batch_processing_enabled = False
     result = {"succeeded_resources": [], "failed_resources": failed_resources}
     work_request_client = None
@@ -89,10 +25,6 @@ class OCIBaseAction(BaseAction, ABC):
             "block_until_completion": {"type": "boolean"},
         }
     }
-
-    def validate(self):
-        if self.data.get("fail_on_error"):
-            self.fail_on_error = self.data.get("fail_on_error")
 
     def handle_exception(self, resource, resources, exception):
         if self.fail_on_error:

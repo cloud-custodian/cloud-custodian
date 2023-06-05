@@ -40,16 +40,6 @@ class Cross_connect(QueryResourceManager):
         name = "display_name"
         search_resource_type = "crossconnect"
 
-    def _construct_query_params(self):
-        default_filters = super().get_default_filters()
-        """ Only return the params that are eligible to be passed to the api, as defined in extra_params """
-        default_filters = dict(
-            (k, v)
-            for k, v in default_filters.items()
-            if k in self.resource_type.extra_params
-        )
-        return default_filters
-
 
 @Cross_connect.action_registry.register("update_cross_connect")
 class UpdateCrossConnect(OCIBaseAction):
@@ -111,7 +101,7 @@ class UpdateCrossConnect(OCIBaseAction):
 
 
 @Cross_connect.action_registry.register("remove_tag")
-class RemoveTagActionCrossConnect(RemoveTagBaseAction):
+class RemoveTagActionCross_connect(RemoveTagBaseAction):
     """
     Remove Tag Action
 
@@ -189,16 +179,6 @@ class Vcn(QueryResourceManager):
         id = "identifier"
         name = "display_name"
         search_resource_type = "vcn"
-
-    def _construct_query_params(self):
-        default_filters = super().get_default_filters()
-        """ Only return the params that are eligible to be passed to the api, as defined in extra_params """
-        default_filters = dict(
-            (k, v)
-            for k, v in default_filters.items()
-            if k in self.resource_type.extra_params
-        )
-        return default_filters
 
 
 @Vcn.action_registry.register("update_vcn")
@@ -333,16 +313,6 @@ class Subnet(QueryResourceManager):
         name = "display_name"
         search_resource_type = "subnet"
 
-    def _construct_query_params(self):
-        default_filters = super().get_default_filters()
-        """ Only return the params that are eligible to be passed to the api, as defined in extra_params """
-        default_filters = dict(
-            (k, v)
-            for k, v in default_filters.items()
-            if k in self.resource_type.extra_params
-        )
-        return default_filters
-
 
 @Subnet.action_registry.register("update_subnet")
 class UpdateSubnet(OCIBaseAction):
@@ -401,7 +371,7 @@ class UpdateSubnet(OCIBaseAction):
 
 
 @Subnet.action_registry.register("remove_tag")
-class RemoveTagAction(RemoveTagBaseAction):
+class RemoveTagActionSubnet(RemoveTagBaseAction):
     """
     Remove Tag Action
 

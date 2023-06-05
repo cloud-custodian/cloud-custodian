@@ -31,8 +31,8 @@ class TestObjectStorage(OciBaseTest):
             {
                 "name": "add-defined-tag-to-bucket",
                 "resource": Resource.BUCKET.value,
+                "query": [{"compartment_id": compartment_id}],
                 "filters": [
-                    {"type": "query", "params": {"compartment_id": compartment_id}},
                     {"type": "value", "key": "display_name", "value": bucket_name},
                 ],
                 "actions": [
@@ -77,8 +77,8 @@ class TestObjectStorage(OciBaseTest):
             {
                 "name": "update-defined-tag-to-bucket",
                 "resource": Resource.BUCKET.value,
+                "query": [{"compartment_id": compartment_id}],
                 "filters": [
-                    {"type": "query", "params": {"compartment_id": compartment_id}},
                     {"type": "value", "key": "display_name", "value": bucket_name},
                 ],
                 "actions": [
@@ -122,8 +122,8 @@ class TestObjectStorage(OciBaseTest):
             {
                 "name": "add-tag-to-bucket",
                 "resource": Resource.BUCKET.value,
+                "query": [{"compartment_id": compartment_id}],
                 "filters": [
-                    {"type": "query", "params": {"compartment_id": compartment_id}},
                     {"type": "value", "key": "display_name", "value": bucket_name},
                 ],
                 "actions": [
@@ -165,8 +165,8 @@ class TestObjectStorage(OciBaseTest):
             {
                 "name": "update-freeform-tag-of-bucket",
                 "resource": Resource.BUCKET.value,
+                "query": [{"compartment_id": compartment_id}],
                 "filters": [
-                    {"type": "query", "params": {"compartment_id": compartment_id}},
                     {"type": "value", "key": "display_name", "value": bucket_name},
                 ],
                 "actions": [
@@ -206,13 +206,8 @@ class TestObjectStorage(OciBaseTest):
             {
                 "name": "get-freeform-tagged-instance",
                 "resource": Resource.BUCKET.value,
+                "query": [{"compartment_id": compartment_id}],
                 "filters": [
-                    {
-                        "type": "query",
-                        "params": {
-                            "compartment_id": compartment_id,
-                        },
-                    },
                     {"type": "value", "key": "freeform_tags.Project", "value": "CNCF"},
                 ],
             },
@@ -238,8 +233,8 @@ class TestObjectStorage(OciBaseTest):
             {
                 "name": "change-public-bucket-to-private",
                 "resource": Resource.BUCKET.value,
+                "query": [{"compartment_id": compartment_id}],
                 "filters": [
-                    {"type": "query", "params": {"compartment_id": compartment_id}},
                     {"type": "value", "key": "display_name", "value": bucket_name},
                 ],
                 "actions": [

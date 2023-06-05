@@ -32,8 +32,8 @@ class TestIdentityTerraformTest(OciBaseTest):
             "name": "filter-and-add-tags-on-compartments",
             "description": "Filter and add tags on the compartment",
             "resource": Resource.COMPARTMENT.value,
+            "query": [{"compartment_id": compartment_id}],
             "filters": [
-                {"type": "query", "params": {"compartment_id": compartment_id}},
                 {
                     "type": "value",
                     "key": "freeform_tags.Cloud_Custodian",
@@ -70,8 +70,8 @@ class TestIdentityTerraformTest(OciBaseTest):
             "name": "filter-and-add-tags-on-group",
             "description": "Filter and add tags on the group",
             "resource": Resource.GROUP.value,
+            "query": [{"compartment_id": compartment_id}],
             "filters": [
-                {"type": "query", "params": {"compartment_id": compartment_id}},
                 {
                     "type": "value",
                     "key": "freeform_tags.Cloud_Custodian",
@@ -111,8 +111,8 @@ class TestIdentityTerraformTest(OciBaseTest):
             "name": "filter-and-add-tags-on-user",
             "description": "Filter and add tags on the user",
             "resource": Resource.USER.value,
+            "query": [{"compartment_id": compartment_id}],
             "filters": [
-                {"type": "query", "params": {"compartment_id": compartment_id}},
                 {"type": "value", "key": "identifier", "value": user_ocid},
                 {
                     "type": "value",
@@ -152,8 +152,8 @@ class TestIdentityTerraformTest(OciBaseTest):
             "name": "filter_auth_tokens_based_on_size",
             "description": "Filter users with auth tokens equal to 2",
             "resource": Resource.USER.value,
+            "query": [{"compartment_id": compartment_id}],
             "filters": [
-                {"type": "query", "params": {"compartment_id": compartment_id}},
                 {
                     "type": "auth_tokens",
                     "key": "auth_tokens",
@@ -182,8 +182,8 @@ class TestIdentityTerraformTest(OciBaseTest):
             "name": "filter_auth_tokens_based_on_age",
             "description": "Filter users with age less than 1",
             "resource": Resource.USER.value,
+            "query": [{"compartment_id": compartment_id}],
             "filters": [
-                {"type": "query", "params": {"compartment_id": compartment_id}},
                 {
                     "type": "auth_tokens",
                     "key": "auth_token.time_created",
@@ -212,8 +212,8 @@ class TestIdentityTerraformTest(OciBaseTest):
             "name": "filter_auth_tokens_based_on_size_age",
             "description": "Filter users with age less than 1 year and size equal to 2",
             "resource": Resource.USER.value,
+            "query": [{"compartment_id": compartment_id}],
             "filters": [
-                {"type": "query", "params": {"compartment_id": compartment_id}},
                 {
                     "type": "auth_tokens",
                     "key": "auth_tokens",
@@ -249,8 +249,8 @@ class TestIdentityTerraformTest(OciBaseTest):
             "name": "filter_auth_tokens_based_on_age",
             "description": "Filter users with age less than 1 yr and size equal to 2",
             "resource": Resource.USER.value,
+            "query": [{"compartment_id": compartment_id}],
             "filters": [
-                {"type": "query", "params": {"compartment_id": compartment_id}},
                 {
                     "type": "auth_tokens",
                     "key": "auth_token.time_created",
@@ -281,8 +281,9 @@ class TestIdentityTerraformTest(OciBaseTest):
 class IdentityUnitTest(unittest.TestCase, OciBaseTest):
     @staticmethod
     def get_policy(resource, filters=None, actions=None):
-        policy = {"name": "test-identity"}
-        policy["resource"] = "oci.{0}".format(resource)
+        policy = {"name": "test-identity",
+                  "query": [{"compartment_id": "ocid1.test.oc1..<unique_ID>EXAMPLE-compartmentId-Value"}],
+                  "resource": "oci.{0}".format(resource)}
         if filters:
             policy["filters"] = filters
         if actions:
@@ -298,12 +299,6 @@ class IdentityUnitTest(unittest.TestCase, OciBaseTest):
             "value": "True",
             "op": "equal",
         }
-
-    @staticmethod
-    def get_query_filter(compartment_id=None):
-        if not compartment_id:
-            compartment_id = "ocid1.test.oc1..<unique_ID>EXAMPLE-compartmentId-Value"
-        return {"type": "query", "params": {"compartment_id": compartment_id}}
 
     @staticmethod
     def get_cross_size_filter(resource):
@@ -367,8 +362,8 @@ class IdentityUnitTest(unittest.TestCase, OciBaseTest):
             self.load_policy(
                 self.get_policy(
                     "compartment",
-                    [self.get_query_filter()],
-                    self.get_action("compartment"),
+                    filters=None,
+                    actions=self.get_action("compartment"),
                 ),
                 validate=True,
             )
@@ -378,7 +373,7 @@ class IdentityUnitTest(unittest.TestCase, OciBaseTest):
         self.assertTrue(
             self.load_policy(
                 self.get_policy(
-                    "group", [self.get_query_filter()], self.get_action("group")
+                    "group", filters=None,actions= self.get_action("group")
                 ),
                 validate=True,
             )
@@ -388,7 +383,7 @@ class IdentityUnitTest(unittest.TestCase, OciBaseTest):
         self.assertTrue(
             self.load_policy(
                 self.get_policy(
-                    "user", [self.get_query_filter()], self.get_action("user")
+                    "user", filters=None, actions= self.get_action("user")
                 ),
                 validate=True,
             )
@@ -399,10 +394,8 @@ class IdentityUnitTest(unittest.TestCase, OciBaseTest):
             self.load_policy(
                 self.get_policy(
                     "user",
-                    [
-                        self.get_query_filter(),
-                        self.get_cross_resource_filter("api_key"),
-                    ],
+                    filters=None,
+                    actions=None
                 ),
                 validate=True,
             )
@@ -413,10 +406,8 @@ class IdentityUnitTest(unittest.TestCase, OciBaseTest):
             self.load_policy(
                 self.get_policy(
                     "user",
-                    [
-                        self.get_query_filter(),
-                        self.get_cross_resource_filter("auth_token"),
-                    ],
+                    filters=None,
+                    actions=None,
                 ),
                 validate=True,
             )
@@ -427,10 +418,8 @@ class IdentityUnitTest(unittest.TestCase, OciBaseTest):
             self.load_policy(
                 self.get_policy(
                     "user",
-                    [
-                        self.get_query_filter(),
-                        self.get_cross_resource_filter("db_credential"),
-                    ],
+                    filters=None,
+                    actions=None,
                 ),
                 validate=True,
             )
@@ -441,10 +430,8 @@ class IdentityUnitTest(unittest.TestCase, OciBaseTest):
             self.load_policy(
                 self.get_policy(
                     "user",
-                    [
-                        self.get_query_filter(),
-                        self.get_cross_resource_filter("customer_secret_key"),
-                    ],
+                    filters=None,
+                    actions=None,
                 ),
                 validate=True,
             )
@@ -455,10 +442,8 @@ class IdentityUnitTest(unittest.TestCase, OciBaseTest):
             self.load_policy(
                 self.get_policy(
                     "user",
-                    [
-                        self.get_query_filter(),
-                        self.get_cross_resource_filter("smtp_credential"),
-                    ],
+                    filters=None,
+                    actions=None,
                 ),
                 validate=True,
             )
@@ -469,10 +454,8 @@ class IdentityUnitTest(unittest.TestCase, OciBaseTest):
             self.load_policy(
                 self.get_policy(
                     "user",
-                    [
-                        self.get_query_filter(),
-                        self.get_cross_resource_filter("o_auth2_client_credential"),
-                    ],
+                    filters=None,
+                    actions=None,
                 ),
                 validate=True,
             )

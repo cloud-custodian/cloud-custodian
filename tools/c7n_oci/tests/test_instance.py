@@ -27,8 +27,8 @@ class TestCompute(OciBaseTest):
             {
                 "name": "add-defined-tag-to-instance",
                 "resource": Resource.COMPUTE.value,
+                "query": [{"compartment_id": compartment_id}],
                 "filters": [
-                    {"type": "query", "params": {"compartment_id": compartment_id}},
                     {"type": "value", "key": "identifier", "value": ocid},
                 ],
                 "actions": [
@@ -71,8 +71,8 @@ class TestCompute(OciBaseTest):
             {
                 "name": "update-defined-tag-from-instance",
                 "resource": Resource.COMPUTE.value,
+                "query": [{"compartment_id": compartment_id}],
                 "filters": [
-                    {"type": "query", "params": {"compartment_id": compartment_id}},
                     {"type": "value", "key": "identifier", "value": ocid},
                 ],
                 "actions": [
@@ -111,8 +111,8 @@ class TestCompute(OciBaseTest):
             {
                 "name": "add-freeform-tag-to-instance",
                 "resource": Resource.COMPUTE.value,
+                "query": [{"compartment_id": compartment_id}],
                 "filters": [
-                    {"type": "query", "params": {"compartment_id": compartment_id}},
                     {"type": "value", "key": "identifier", "value": ocid},
                 ],
                 "actions": [
@@ -149,8 +149,8 @@ class TestCompute(OciBaseTest):
             {
                 "name": "update-freeform-tag-from-instance",
                 "resource": Resource.COMPUTE.value,
+                "query": [{"compartment_id": compartment_id}],
                 "filters": [
-                    {"type": "query", "params": {"compartment_id": compartment_id}},
                     {"type": "value", "key": "identifier", "value": ocid},
                 ],
                 "actions": [
@@ -187,8 +187,8 @@ class TestCompute(OciBaseTest):
             {
                 "name": "get-tagged-instance",
                 "resource": Resource.COMPUTE.value,
+                "query": [{"compartment_id": compartment_id}],
                 "filters": [
-                    {"type": "query", "params": {"compartment_id": compartment_id}},
                     {"type": "value", "key": "freeform_tags.Project", "value": "CNCF"},
                     {"type": "value", "key": "identifier", "value": ocid},
                 ],

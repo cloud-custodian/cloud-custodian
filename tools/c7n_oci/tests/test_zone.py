@@ -28,13 +28,8 @@ class TestZone(OciBaseTest):
             {
                 "name": "add-defined-tag-to-zone",
                 "resource": Resource.ZONE.value,
+                "query": [{"compartment_id": compartment_id}],
                 "filters": [
-                    {
-                        "type": "query",
-                        "params": {
-                            "compartment_id": compartment_id,
-                        },
-                    },
                     {"type": "value", "key": "identifier", "value": zone_ocid},
                 ],
                 "actions": [
@@ -75,8 +70,8 @@ class TestZone(OciBaseTest):
             {
                 "name": "update-defined-tag-of-zone",
                 "resource": Resource.ZONE.value,
+                "query": [{"compartment_id": compartment_id}],
                 "filters": [
-                    {"type": "query", "params": {"compartment_id": compartment_id}},
                     {"type": "value", "key": "identifier", "value": zone_ocid},
                 ],
                 "actions": [
@@ -116,8 +111,8 @@ class TestZone(OciBaseTest):
             {
                 "name": "add-tag-freeform-to-zone",
                 "resource": Resource.ZONE.value,
+                "query": [{"compartment_id": compartment_id}],
                 "filters": [
-                    {"type": "query", "params": {"compartment_id": compartment_id}},
                     {"type": "value", "key": "identifier", "value": zone_ocid},
                 ],
                 "actions": [
@@ -155,8 +150,8 @@ class TestZone(OciBaseTest):
             {
                 "name": "update-freeform-tag-of-zone",
                 "resource": Resource.ZONE.value,
+                "query": [{"compartment_id": compartment_id}],
                 "filters": [
-                    {"type": "query", "params": {"compartment_id": compartment_id}},
                     {"type": "value", "key": "identifier", "value": zone_ocid},
                 ],
                 "actions": [
@@ -194,8 +189,8 @@ class TestZone(OciBaseTest):
             {
                 "name": "get-freeform-tagged-zone",
                 "resource": Resource.ZONE.value,
+                "query": [{"compartment_id": compartment_id}],
                 "filters": [
-                    {"type": "query", "params": {"compartment_id": compartment_id}},
                     {"type": "value", "key": "freeform_tags.Project", "value": "CNCF"},
                 ],
             },

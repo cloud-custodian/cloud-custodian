@@ -40,16 +40,6 @@ class Bucket(QueryResourceManager):
         name = "display_name"
         search_resource_type = "bucket"
 
-    def _construct_query_params(self):
-        default_filters = super().get_default_filters()
-        """ Only return the params that are eligible to be passed to the api, as defined in extra_params """
-        default_filters = dict(
-            (k, v)
-            for k, v in default_filters.items()
-            if k in self.resource_type.extra_params
-        )
-        return default_filters
-
 
 @Bucket.action_registry.register("update_bucket")
 class UpdateBucket(OCIBaseAction):
@@ -121,7 +111,7 @@ class UpdateBucket(OCIBaseAction):
 
 
 @Bucket.action_registry.register("remove_tag")
-class RemoveTagAction(RemoveTagBaseAction):
+class RemoveTagActionBucket(RemoveTagBaseAction):
     """
     Remove Tag Action
 
