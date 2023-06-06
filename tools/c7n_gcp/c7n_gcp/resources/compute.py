@@ -245,7 +245,7 @@ class Image(QueryResourceManager):
         name = id = 'name'
         default_report_fields = [
             "name", "description", "sourceType", "status", "creationTimestamp",
-            "storageLocation", "diskSizeGb", "family"]
+            "diskSizeGb", "family"]
         asset_type = "compute.googleapis.com/Image"
         urn_component = "image"
 

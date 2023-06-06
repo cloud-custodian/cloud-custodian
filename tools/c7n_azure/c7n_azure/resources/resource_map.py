@@ -9,6 +9,8 @@ ResourceMap = {
     "azure.application-gateway": "c7n_azure.resources.app_gateway.ApplicationGateway",
     "azure.armresource": "c7n_azure.resources.generic_arm_resource.GenericArmResource",
     "azure.batch": "c7n_azure.resources.batch.Batch",
+    "azure.cdn-custom-domain": "c7n_azure.resources.cdn_custom_domain.CdnCustomDomain",
+    "azure.cdn-endpoint": "c7n_azure.resources.cdn_endpoint.CdnEndpoint",
     "azure.cdnprofile": "c7n_azure.resources.cdn.CdnProfile",
     "azure.cognitiveservice": "c7n_azure.resources.cognitive_service.CognitiveService",
     "azure.container-group": "c7n_azure.resources.aci.ContainerGroup",
@@ -41,6 +43,7 @@ ResourceMap = {
     "azure.loadbalancer": "c7n_azure.resources.load_balancer.LoadBalancer",
     "azure.logic-app-workflow": "c7n_azure.resources.logic_app.LogicAppWorkflow",
     "azure.mariadb": "c7n_azure.resources.mariadb.MariaDB",
+    "azure.monitor-log-profile": "c7n_azure.resources.monitor_logprofile.MonitorLogprofile",
     "azure.mysql": "c7n_azure.resources.mysql.MySQL",
     "azure.mysql-flexibleserver": "c7n_azure.resources.mysql_flexibleserver.MySQLFlexibleServer",
     "azure.networkinterface": "c7n_azure.resources.network_interface.NetworkInterface",
@@ -51,6 +54,7 @@ ResourceMap = {
     "azure.postgresql-server": "c7n_azure.resources.postgresql_server.PostgresqlServer",
     "azure.publicip": "c7n_azure.resources.public_ip.PublicIPAddress",
     "azure.recordset": "c7n_azure.resources.record_set.RecordSet",
+    "azure.recovery-services": "c7n_azure.resources.recovery_services.RecoveryServices",
     "azure.redis": "c7n_azure.resources.redis.Redis",
     "azure.resourcegroup": "c7n_azure.resources.resourcegroup.ResourceGroup",
     "azure.roleassignment": "c7n_azure.resources.access_control.RoleAssignment",
@@ -58,6 +62,8 @@ ResourceMap = {
     "azure.routetable": "c7n_azure.resources.route_table.RouteTable",
     "azure.search": "c7n_azure.resources.search.SearchService",
     "azure.servicebus-namespace": "c7n_azure.resources.servicebus_namespace.ServiceBusNamespace",
+    "azure.servicebus-namespace-networkrules": "c7n_azure.resources.servicebus_namespace_networkrules.ServiceBusNamespaceNetworkrules", # noqa
+    "azure.servicebus-namespace-authrules": "c7n_azure.resources.servicebus_namespace_authrules.ServiceBusNamespaceAuthRules", # noqa
     "azure.service-fabric-cluster": "c7n_azure.resources.service_fabric.ServiceFabricCluster",
     "azure.service-fabric-cluster-managed": "c7n_azure.resources.service_fabric.ServiceFabricClusterManaged",  # noqa
     "azure.spring-app": "c7n_azure.resources.spring.SpringApp",

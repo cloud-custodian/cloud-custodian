@@ -1,0 +1,45 @@
+{
+    "NetworkInterfaces": [
+        {
+            "Attachment": {
+                "Status": "attached"
+            },
+            "AvailabilityZone": "us-east-1b",
+            "Description": "AWS Lambda VPC",
+            "Groups": [
+                {
+                    "GroupName": "test-1",
+                    "GroupId": "sg-123"
+                },
+                {
+                    "GroupName": "test-2",
+                    "GroupId": "sg-456"
+                },
+                {
+                    "GroupName": "test-2",
+                    "GroupId": "sg-789"
+                }
+            ],
+            "InterfaceType": "lambda",
+            "Ipv6Addresses": [],
+            "MacAddress": "XX:XX:XX:XX:XX:XX",
+            "NetworkInterfaceId": "eni-0XXXXXXXXXXXXXXX",
+            "OwnerId": "012345678910",
+            "PrivateDnsName": "ip-X-X-X-X.ec2.internal",
+            "PrivateIpAddress": "X.X.X.X",
+            "PrivateIpAddresses": [
+                {
+                    "Primary": true,
+                    "PrivateDnsName": "ip-X-X-X-X.ec2.internal",
+                    "PrivateIpAddress": "X.X.X.X"
+                }
+            ],
+            "RequesterManaged": false,
+            "SourceDestCheck": true,
+            "Status": "in-use",
+            "SubnetId": "subnet-0xxxxxxxxxxxde4c0",
+            "TagSet": [],
+            "VpcId": "vpc-xxxxxx"
+        }
+    ]
+}

@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "c7n"
-version = "0.9.26"
+version = "0.9.27"
 description = "Cloud Custodian - Policy Rules Engine"
 authors = ["Cloud Custodian Project"]
 readme = "README.md"
@@ -37,7 +37,7 @@ importlib-metadata = "^5.1"
 docutils = ">=0.18, <0.19"
 
 [tool.poetry.group.dev.dependencies]
-ruff = "^0.0.246"
+ruff = "~0.0.246"
 docker = "^6.0.1"
 black = "^23.1.0"
 pytest = "^7.1.2"

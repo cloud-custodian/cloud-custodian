@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "c7n_azure"
-version = "0.7.25"
+version = "0.7.26"
 description = "Cloud Custodian - Azure Support"
 readme = "readme.md"
 homepage="https://cloudcustodian.io"
@@ -16,6 +16,7 @@ classifiers=[
 
 [tool.poetry.dependencies]
 python = "^3.7"
+c7n = {path = "../..", develop = true}
 
 azure-mgmt-authorization = "^1.0.0"
 azure-mgmt-advisor = "^9.0.0"
@@ -84,10 +85,10 @@ azure-mgmt-frontdoor = "^1.0.0"
 azure-mgmt-security = "^1.0.0"
 azure-mgmt-servicebus = "^8.2.0"
 azure-mgmt-appplatform = "^8.0.0"
+azure-mgmt-recoveryservices = "^2.4.0"
 
 [tool.poetry.dev-dependencies]
 # setup custodian as a dev dependency
-c7n = {path = "../..", develop = true}
 vcrpy-unittest = "^0.1.7"
 parameterized = "^0.7.1"
 

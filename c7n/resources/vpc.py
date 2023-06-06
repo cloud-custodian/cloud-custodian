@@ -1000,24 +1000,21 @@ class UsedSecurityGroup(SGUsage):
     interface_resource_type_key = 'c7n:InterfaceResourceTypes'
 
     def _get_eni_attributes(self):
-        enis = []
+        group_enis = {}
         for nic in self.nics:
+            instance_owner_id, interface_resource_type = '', ''
             if nic['Status'] == 'in-use':
-                if nic.get('Attachment'):
+                if nic.get('Attachment') and 'InstanceOwnerId' in nic['Attachment']:
                     instance_owner_id = nic['Attachment']['InstanceOwnerId']
-                else:
-                    instance_owner_id = ''
                 interface_resource_type = get_eni_resource_type(nic)
-            else:
-                instance_owner_id = ''
-                interface_resource_type = ''
             interface_type = nic.get('InterfaceType')
             for g in nic['Groups']:
-                enis.append({'GroupId': g['GroupId'],
-                             'InstanceOwnerId': instance_owner_id,
-                             'InterfaceType': interface_type,
-                             'InterfaceResourceType': interface_resource_type})
-        return enis
+                group_enis.setdefault(g['GroupId'], []).append({
+                    'InstanceOwnerId': instance_owner_id,
+                    'InterfaceType': interface_type,
+                    'InterfaceResourceType': interface_resource_type
+                })
+        return group_enis
 
     def process(self, resources, event=None):
         used = self.scan_groups()
@@ -1025,19 +1022,15 @@ class UsedSecurityGroup(SGUsage):
             r for r in resources
             if r['GroupId'] not in used and 'VpcId' in r]
         unused = {g['GroupId'] for g in self.filter_peered_refs(unused)}
-        enis = self._get_eni_attributes()
+        group_enis = self._get_eni_attributes()
         for r in resources:
-            owner_ids = set()
-            interface_types = set()
-            interface_resource_types = set()
-            for eni in enis:
-                if r['GroupId'] == eni['GroupId']:
-                    owner_ids.add(eni['InstanceOwnerId'])
-                    interface_types.add(eni['InterfaceType'])
-                    interface_resource_types.add(eni['InterfaceResourceType'])
-            r[self.instance_owner_id_key] = list(filter(None, owner_ids))
-            r[self.interface_type_key] = list(filter(None, interface_types))
-            r[self.interface_resource_type_key] = list(filter(None, interface_resource_types))
+            enis = group_enis.get(r['GroupId'], ())
+            r[self.instance_owner_id_key] = list({
+                i['InstanceOwnerId'] for i in enis if i['InstanceOwnerId']})
+            r[self.interface_type_key] = list({
+                i['InterfaceType'] for i in enis if i['InterfaceType']})
+            r[self.interface_resource_type_key] = list({
+                i['InterfaceResourceType'] for i in enis if i['InterfaceResourceType']})
         return [r for r in resources if r['GroupId'] not in unused]
 
 
