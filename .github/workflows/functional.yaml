@@ -34,12 +34,7 @@ jobs:
         id: tfcache
         with:
           path: .tfcache
-          key: tf-${{ runner.os }}-${{ hashFiles('**/*.tf') }}
-
-      - name: Install Azure CLI
-        run: |
-          set -ex
-          curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+          key: tf-${{ runner.os }}-${{ hashFiles('**/*.tf') }}            
 
       - name: Functional Tests
         run: |
