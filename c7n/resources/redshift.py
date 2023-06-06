@@ -15,13 +15,23 @@ from c7n.filters.kms import KmsRelatedFilter
 from c7n.filters.offhours import OffHour, OnHour
 from c7n.manager import resources
 from c7n.resolver import ValuesFrom
-from c7n.query import QueryResourceManager, TypeInfo, RetryPageIterator
+from c7n.query import (
+    QueryResourceManager, TypeInfo, RetryPageIterator, DescribeSource, ConfigSource)
 from c7n import tags
 from c7n.utils import (
     type_schema, local_session, chunks, snapshot_identifier, jmespath_search)
 from .aws import shape_validate
 from datetime import datetime, timedelta
 from c7n.filters.backup import ConsecutiveAwsBackupsFilter
+
+
+class DescribeRedshift(DescribeSource):
+
+    def get_resources(self, ids, cache=True):
+        resources = self.manager.get_resource_manager('redshift').resources()
+        rid_existing = set([jmespath_search('ClusterIdentifier', r) for r in resources])
+        super_get = super().get_resources
+        return list(itertools.chain(*[super_get((i,)) for i in ids if i in rid_existing]))
 
 
 @resources.register('redshift')
@@ -38,6 +48,11 @@ class Redshift(QueryResourceManager):
         date = 'ClusterCreateTime'
         dimension = 'ClusterIdentifier'
         cfn_type = config_type = "AWS::Redshift::Cluster"
+
+    source_mapping = {
+        'config': ConfigSource,
+        'describe': DescribeRedshift
+    }
 
 
 Redshift.filter_registry.register('marked-for-op', tags.TagActionFilter)
@@ -794,6 +809,13 @@ class RedshiftSubnetGroup(QueryResourceManager):
         universal_taggable = object()
 
 
+class DescribeRedshiftClusterSnapshot(DescribeSource):
+
+    def get_resources(self, ids, cache=True):
+        super_get = super().get_resources
+        return list(itertools.chain(*[super_get((i,)) for i in ids]))
+
+
 @resources.register('redshift-snapshot')
 class RedshiftSnapshot(QueryResourceManager):
     """Resource manager for Redshift snapshots.
@@ -814,6 +836,11 @@ class RedshiftSnapshot(QueryResourceManager):
         for r in resources:
             arns.append(self.generate_arn(r['ClusterIdentifier'] + '/' + r[self.get_model().id]))
         return arns
+
+    source_mapping = {
+        'config': ConfigSource,
+        'describe': DescribeRedshiftClusterSnapshot
+    }
 
 
 @RedshiftSnapshot.filter_registry.register('age')
