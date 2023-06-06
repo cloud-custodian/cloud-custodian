@@ -3,14 +3,15 @@
 import json
 import os
 import re
+from inspect import signature
 
 import pytest
 from adal import AdalError
 from azure.core.credentials import AccessToken
 from azure.identity import (ClientSecretCredential, ManagedIdentityCredential)
+from azure.identity._credentials import azure_cli
 from c7n_azure import constants
-from c7n_azure.session import Session, _run_command
-from c7n.testing import functional
+from c7n_azure.session import Session
 from mock import patch
 from msrest.exceptions import AuthenticationError
 from msrestazure.azure_cloud import (AZURE_CHINA_CLOUD, AZURE_US_GOV_CLOUD)
@@ -88,10 +89,28 @@ class SessionTest(BaseTest):
             self.assertEqual(s.get_subscription_id(), DEFAULT_SUBSCRIPTION_ID)
             self.assertEqual(s.get_tenant_id(), DEFAULT_TENANT_ID)
 
-    @functional
-    def test_run_command(self):
-        """Catch signature changes in the internal method we use for CLI auth"""
-        _run_command('az version', timeout=10)
+    def test_run_command_signature(self):
+        """Catch signature changes in the internal method we use for CLI authentication
+
+        We use _run_command() to fetch default subscription information. This information
+        was previously accessible via azure-common but has been deprecated in favor
+        of azure-identity:
+
+        https://github.com/Azure/azure-sdk-for-python/blob/main/sdk/identity/azure-identity/migration_guide.md
+
+        It's not clear how to reliably get the CLI's default subscription purely from
+        azure-identity (avoiding an explicit azure-cli dependency). Azure CLI docs suggest
+        that while we can _usually_ pull default subscription info out of ~/.azure/azureProfile,
+        it might be elsewhere:
+
+        https://github.com/Azure/azure-cli/blob/813da51a0a6ac2d427e496f1dffc01c96af24d78/src/azure-cli-core/azure/cli/core/_profile.py#L20-L24
+
+        So continuing to rely on _run_command() may be more reliable, as long as we
+        catch signature changes to avoid accidental breakage.
+        """
+        expected_parameters = {"command", "timeout"}
+        actual_parameters = set(signature(azure_cli._run_command).parameters.keys())
+        self.assertSetEqual(expected_parameters, actual_parameters)
 
     @patch('azure.identity.ClientSecretCredential.get_token')
     @patch('c7n_azure.session.log.error')
