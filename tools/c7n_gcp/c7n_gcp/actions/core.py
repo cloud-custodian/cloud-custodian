@@ -73,15 +73,23 @@ class MethodAction(Action):
             try:
                 result = self.invoke_api(client, op_name, params)
             except HttpError as e:
-                if 'Labels could not be set due to fingerprint mismatch; try again with the proper fingerprint' in e.reason:
+                if 'fingerprint' in e.reason:
                     if model.component == 'projects.locations.clusters':
                         project_id = resource['selfLink'].split("/")[5]
                         resource = model.get(client,{
                             'project_id': project_id,
                             'location': resource['zone'],
                             'cluster_name': resource['name']})
-                        params['body']['labelFingerprint'] = resource['labelFingerprint']
-                        result = self.invoke_api(client, op_name, params)
+                    elif model.component == 'instances':
+                        resource = model.get(client,{
+                            'project_id': params['project'],
+                            'zone': params['zone'],
+                            'resourceName': params['instance']
+                        })
+                    else:
+                        raise
+                    params['body']['labelFingerprint'] = resource['labelFingerprint']
+                    result = self.invoke_api(client, op_name, params)
                 else:
                     raise
             if result_key and annotation_key:
