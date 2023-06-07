@@ -15,8 +15,7 @@ from c7n.filters.kms import KmsRelatedFilter
 from c7n.filters.offhours import OffHour, OnHour
 from c7n.manager import resources
 from c7n.resolver import ValuesFrom
-from c7n.query import (
-    QueryResourceManager, TypeInfo, RetryPageIterator, DescribeSource, ConfigSource)
+from c7n.query import QueryResourceManager, TypeInfo, RetryPageIterator
 from c7n import tags
 from c7n.utils import (
     type_schema, local_session, chunks, snapshot_identifier, jmespath_search)
@@ -815,11 +814,6 @@ class RedshiftSnapshot(QueryResourceManager):
         for r in resources:
             arns.append(self.generate_arn(r['ClusterIdentifier'] + '/' + r[self.get_model().id]))
         return arns
-
-    source_mapping = {
-        'config': ConfigSource,
-        'describe': DescribeRedshiftClusterSnapshot
-    }
 
 
 @RedshiftSnapshot.filter_registry.register('age')

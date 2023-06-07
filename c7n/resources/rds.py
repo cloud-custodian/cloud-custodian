@@ -134,6 +134,11 @@ class RDS(QueryResourceManager):
             query = {}
         return super(RDS, self).resources(query=query)
 
+    source_mapping = {
+        'describe': DescribeRDS,
+        'config': ConfigRDS
+    }
+
 
 def _db_instance_eligible_for_backup(resource):
     db_instance_id = resource['DBInstanceIdentifier']
