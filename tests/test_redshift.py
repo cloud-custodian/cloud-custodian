@@ -639,10 +639,7 @@ class TestRedshiftSnapshot(BaseTest):
             {
                 "name": "rds-snapshot-copy-related-tags",
                 "resource": "redshift-snapshot",
-                "filters": [
-                    {"tag:Owner": "absent"},
-                    {"SnapshotIdentifier": "snap-2"}
-                    ],
+                "filters": [{"tag:Owner": "absent"}],
                 "actions": [
                     {
                         "type": "copy-related-tag",
@@ -655,13 +652,14 @@ class TestRedshiftSnapshot(BaseTest):
         )
         output = self.capture_logging("custodian.actions", level=logging.INFO)
         resources = p.run()
-        self.assertEqual(len(resources), 1)
+        self.assertEqual(len(resources), 2)
         log_output = output.getvalue()
-        self.assertIn("Tagged 1 resources from related", log_output)
-        arn = p.resource_manager.get_arns(resources)
-        tags = client.describe_tags(ResourceName=arn[0])["TaggedResources"]
-        tag_map = {t["Tag"]["Key"] for t in tags}
-        self.assertTrue("Owner" in tag_map)
+        self.assertIn("Tagged 2 resources from related", log_output)
+        arns = p.resource_manager.get_arns(resources)
+        for arn in arns:
+            tags = client.describe_tags(ResourceName=arn)["TaggedResources"]
+            tag_map = {t["Tag"]["Key"] for t in tags}
+            self.assertTrue("Owner" in tag_map)
 
 
 class TestModifyVpcSecurityGroupsAction(BaseTest):

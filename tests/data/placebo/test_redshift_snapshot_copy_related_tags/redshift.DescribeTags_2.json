@@ -7,7 +7,7 @@
                     "Key": "Owner",
                     "Value": "c7n"
                 },
-                "ResourceName": "arn:aws:redshift:us-east-1:644160558196:snapshot:redshift-cluster-3/snap-3",
+                "ResourceName": "arn:aws:redshift:us-east-1:644160558196:snapshot:redshift-cluster-2/snap-2",
                 "ResourceType": "snapshot"
             }
         ],

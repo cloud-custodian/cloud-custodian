@@ -1552,10 +1552,7 @@ class RDSSnapshotTest(BaseTest):
             {
                 "name": "rds-snapshot-copy-related-tags",
                 "resource": "rds-snapshot",
-                "filters": [
-                    {"tag:Owner": "absent"},
-                    {"DBSnapshotIdentifier": "rds:database-1-2023-05-31-15-53"}
-                    ],
+                "filters": [{"tag:Owner": "absent"}],
                 "actions": [
                     {
                         "type": "copy-related-tag",
@@ -1568,13 +1565,14 @@ class RDSSnapshotTest(BaseTest):
         )
         output = self.capture_logging("custodian.actions", level=logging.INFO)
         resources = p.run()
-        self.assertEqual(len(resources), 1)
+        self.assertEqual(len(resources), 2)
         log_output = output.getvalue()
-        self.assertIn("Tagged 1 resources from related", log_output)
-        arn = p.resource_manager.generate_arn(resources[0]["DBSnapshotIdentifier"])
-        tags = client.list_tags_for_resource(ResourceName=arn)
-        tag_map = {t["Key"]: t["Value"] for t in tags["TagList"]}
-        self.assertTrue("Owner" in tag_map)
+        self.assertIn("Tagged 2 resources from related", log_output)
+        for resource in resources:
+            arn = p.resource_manager.generate_arn(resource["DBSnapshotIdentifier"])
+            tags = client.list_tags_for_resource(ResourceName=arn)
+            tag_map = {t["Key"]: t["Value"] for t in tags["TagList"]}
+            self.assertTrue("Owner" in tag_map)
 
 
 class TestModifyVpcSecurityGroupsAction(BaseTest):
