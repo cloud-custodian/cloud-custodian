@@ -75,12 +75,6 @@ actions = ActionRegistry('rds.actions')
 
 class DescribeRDS(DescribeSource):
 
-    def get_resources(self, ids, cache=True):
-        resources = self.manager.get_resource_manager('rds').resources()
-        rid_existing = set([jmespath_search('DBInstanceIdentifier', r) for r in resources])
-        super_get = super().get_resources
-        return list(itertools.chain(*[super_get((i,)) for i in ids if i in rid_existing]))
-
     def augment(self, dbs):
         for d in dbs:
             d['Tags'] = d.pop('TagList', ())

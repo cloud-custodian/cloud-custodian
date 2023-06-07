@@ -25,15 +25,6 @@ from datetime import datetime, timedelta
 from c7n.filters.backup import ConsecutiveAwsBackupsFilter
 
 
-class DescribeRedshift(DescribeSource):
-
-    def get_resources(self, ids, cache=True):
-        resources = self.manager.get_resource_manager('redshift').resources()
-        rid_existing = set([jmespath_search('ClusterIdentifier', r) for r in resources])
-        super_get = super().get_resources
-        return list(itertools.chain(*[super_get((i,)) for i in ids if i in rid_existing]))
-
-
 @resources.register('redshift')
 class Redshift(QueryResourceManager):
 
@@ -807,13 +798,6 @@ class RedshiftSubnetGroup(QueryResourceManager):
         filter_type = 'scalar'
         cfn_type = config_type = "AWS::Redshift::ClusterSubnetGroup"
         universal_taggable = object()
-
-
-class DescribeRedshiftClusterSnapshot(DescribeSource):
-
-    def get_resources(self, ids, cache=True):
-        super_get = super().get_resources
-        return list(itertools.chain(*[super_get((i,)) for i in ids]))
 
 
 @resources.register('redshift-snapshot')
