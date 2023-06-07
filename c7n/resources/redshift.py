@@ -40,11 +40,6 @@ class Redshift(QueryResourceManager):
         dimension = 'ClusterIdentifier'
         cfn_type = config_type = "AWS::Redshift::Cluster"
 
-    source_mapping = {
-        'config': ConfigSource,
-        'describe': DescribeRedshift
-    }
-
 
 Redshift.filter_registry.register('marked-for-op', tags.TagActionFilter)
 Redshift.filter_registry.register('network-location', net_filters.NetworkLocation)
