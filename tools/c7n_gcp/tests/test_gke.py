@@ -73,11 +73,11 @@ class KubernetesClusterTest(BaseTest):
             ],
         )
 
-    @pytest.mark.skip(reason="Need to sort out perms")
+    @pytest.mark.skip(reason="Need test data for this")
     def test_cluster_set_labels(self):
         project_id = 'cloud-custodian'
         name = "standard-cluster-1"
-        factory = self.record_flight_data('gke-cluster-label', project_id)
+        factory = self.replay_flight_data('gke-cluster-label', project_id)
         p = self.load_policy(
             {
                 'name': 'label-gke-cluster',
@@ -100,11 +100,11 @@ class KubernetesClusterTest(BaseTest):
                     })
         self.assertEqual(result['items'][0]['resourceLabels']
                             ['test_label'], 'test_value')
-    @pytest.mark.skip(reason="Need to sort out perms")
+    @pytest.mark.skip(reason="Need test data for this")
     def test_cluster_remove_labels(self):
         project_id = 'cloud-custodian'
         name = "standard-cluster-1"
-        factory = self.record_flight_data('gke-cluster-label', project_id)
+        factory = self.replay_flight_data('gke-cluster-label', project_id)
         p = self.load_policy(
             {
                 'name': 'label-gke-cluster',
