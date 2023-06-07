@@ -4,21 +4,24 @@ ARG POETRY_VERSION="1.4.0"
 
 WORKDIR /app
 
+# Install Poetry in its own virtual environment
 RUN python -m venv "${HOME}/tools" && \
     . "${HOME}/tools/bin/activate" && \
     pip3 install "poetry==${POETRY_VERSION}"
-RUN ~/tools/bin/poetry self add poetry-plugin-freeze
 
-# build frozen c7n wheel
+# Copy enough of the c7n source that poetry can
+# use it when installing c7n-left
 WORKDIR /app/c7n
 COPY pyproject.toml poetry.lock README.md /app/c7n
 COPY c7n /app/c7n/c7n
-RUN ~/tools/bin/poetry build && ~/tools/bin/poetry freeze-wheel
 
-# install c7n-left deps, including frozen c7n wheel
+# Install c7n-left, which comes with a path-based dependency
+# on c7n
 WORKDIR /app/c7n/tools/c7n_left
 COPY tools/c7n_left /app/c7n/tools/c7n_left
-RUN ~/tools/bin/poetry build && ~/tools/bin/poetry freeze-wheel && pip3 install ../../dist/*.whl dist/*.whl
+RUN python -m venv "${HOME}/venv" && \
+    . "${HOME}/venv/bin/activate" && \
+    ~/tools/bin/poetry install --no-dev
 
 FROM cgr.dev/chainguard/python:3.11
 
@@ -30,10 +33,10 @@ LABEL "org.opencontainers.image.documentation"="https://cloudcustodian.io/docs"
 
 WORKDIR /app
 
-COPY --from=builder /home/nonroot/.local/lib/python3.11/site-packages /home/nonroot/.local/lib/python3.11/site-packages
+COPY --from=builder /home/nonroot/venv/lib/python3.11/site-packages /home/nonroot/.local/lib/python3.11/site-packages
 
 COPY --from=builder /app/c7n/c7n /app/c7n
-COPY --from=builder /app/c7n/tools/c7n_left /app/c7n_left
+COPY --from=builder /app/c7n/tools/c7n_left /app/c7n/tools/c7n_left
 
 ENV LC_ALL="C.UTF-8" LANG="C.UTF-8"
 ENV PYTHONPATH=/app:$PYTHONPATH
