@@ -48,7 +48,7 @@ class MLJob(QueryResourceManager):
         scope_template = 'projects/{}'
         name = id = 'jobId'
         default_report_fields = [
-            "jobId", "status", "createTime", "endTime"]
+            "jobId", "state", "createTime", "endTime"]
         get_requires_event = True
         urn_component = "job"
 

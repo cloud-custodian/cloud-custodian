@@ -16,7 +16,7 @@ class CloudBillingAccount(QueryResourceManager):
         get_requires_event = True
         scope = None
         name = id = 'name'
-        default_report_fields = ['id', 'displayName']
+        default_report_fields = ['name', 'displayName']
         asset_type = "cloudbilling.googleapis.com/BillingAccount"
         permissions = ('billing.accounts.list',)
         urn_component = "account"

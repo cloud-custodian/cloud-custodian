@@ -47,7 +47,7 @@ def _default_options(p, exclude=[]):
         "--profile",
         help="AWS Account Config File Profile to utilize")
     provider.add_argument("--assume", default=None, dest="assume_role",
-                          help="Role to assume")
+                          help="Role or Service Account to assume")
     provider.add_argument("--external-id", default=None, dest="external_id",
                           help="External Id to provide when assuming a role")
 
