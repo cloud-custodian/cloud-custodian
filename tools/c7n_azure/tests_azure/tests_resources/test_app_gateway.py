@@ -30,7 +30,7 @@ class ApplicationGatewayTest(BaseTest):
             'name': 'test-app-gateway',
             'resource': 'azure.application-gateway',
             'filters': [
-                {'type': 'web-application-firewall',
+                {'type': 'waf',
                  'override_rule': "944240",
                  'state': 'disabled'}],
         })

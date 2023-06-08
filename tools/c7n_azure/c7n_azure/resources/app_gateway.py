@@ -38,7 +38,7 @@ class ApplicationGateway(ArmResourceManager):
         resource_type = 'Microsoft.Network/applicationGateways'
 
 
-@ApplicationGateway.filter_registry.register('web-application-firewall')
+@ApplicationGateway.filter_registry.register('waf')
 class ApplicationGatewayWafFilter(Filter):
     """
     Filter Application Gateways using WAF rule configuration
@@ -53,13 +53,13 @@ class ApplicationGatewayWafFilter(Filter):
           - name: test-app-gateway
             resource: azure.application-gateway
             filters:
-              - type: web-application-firewall
+              - type: waf
                 override_rule: 944240
                 state: disabled
     """
 
     schema = type_schema(
-        'web-application-firewall',
+        'waf',
         required=['override_rule', 'state'],
         override_rule = {'type': 'number'},
         state =  {'type': 'string', 'enum': ['disabled']}
