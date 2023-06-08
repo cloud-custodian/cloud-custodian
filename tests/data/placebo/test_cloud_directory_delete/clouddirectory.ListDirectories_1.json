@@ -5,17 +5,17 @@
         "Directories": [
             {
                 "Name": "test-cloud",
-                "DirectoryArn": "arn:aws:clouddirectory:us-east-1:644160558196:directory/AaIcPLUlJULhlFxCfQDn7Jw",
+                "DirectoryArn": "arn:aws:clouddirectory:us-east-1:644160558196:directory/AUKFj1_XM0XJj_KO1fgmlug",
                 "State": "ENABLED",
                 "CreationDateTime": {
                     "__class__": "datetime",
                     "year": 2023,
                     "month": 6,
-                    "day": 2,
-                    "hour": 11,
-                    "minute": 1,
-                    "second": 36,
-                    "microsecond": 424000
+                    "day": 7,
+                    "hour": 21,
+                    "minute": 44,
+                    "second": 54,
+                    "microsecond": 278000
                 }
             }
         ]

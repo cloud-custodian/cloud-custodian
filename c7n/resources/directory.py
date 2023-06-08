@@ -178,6 +178,7 @@ class CloudDirectoryDelete(BaseAction):
                     client.disable_directory,
                     DirectoryArn=r['DirectoryArn'])
 
+        for r in resources:
             self.manager.retry(
                 client.delete_directory,
                 DirectoryArn=r['DirectoryArn'])
@@ -194,7 +195,7 @@ class CloudDirectoryDisable(BaseAction):
            filters:
              - Name: test-cloud
            actions:
-             - type: delete
+             - type: disable
     """
     schema = type_schema('disable')
     permissions = ('clouddirectory:DisableDirectory',)
