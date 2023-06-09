@@ -91,6 +91,11 @@ pass this the service account email via `--assume` cli flag.
 
     export GOOGLE_IMPERSONATE_SERVICE_ACCOUNT="impersonated-account@_project_.iam.gserviceaccount.com"
 
+If running on gcp compute some of these values can be obtained automatically from metadata server, see
+https://cloud.google.com/python/docs/reference/google-cloud-core/latest/config for precedence and availability
+of different options.
+
+
 .. _gcp_write-policy:
 
 Write Your First Policy
