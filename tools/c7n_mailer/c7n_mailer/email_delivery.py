@@ -152,7 +152,7 @@ class EmailDelivery:
             account_email_mapping = self.config.get('account_emails', {})
             self.logger.debug(
                 'get_account_emails account_email_mapping: %s.', account_email_mapping)
-            email_list = account_email_mapping.get(account_id, [])
+            email_list.append(account_email_mapping.get(account_id, []))
             self.logger.debug('get_account_emails email_list: %s.', email_list)
 
         return self.get_valid_emails_from_list(email_list)
