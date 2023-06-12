@@ -1,22 +1,22 @@
 .. _compartmenttagidentity:
 
-Compartment - Tag all the compartments
-======================================
+Compartment - Tag all the child compartments
+============================================
 
-The following example policy will tag all the child compartments under the specified compartment with a
-specified freeform tag
+Set the `OCI_COMPARTMENTS` environment variable with the parent compartment OCID like below.
+
+.. code-block:: yaml
+
+    export OCI_COMPARTMENTS=ocid1.test.oc1..<unique_ID>EXAMPLE1-compartmentId-Value
+
+The following example policy will tag all the child compartments under the specified parent compartment with a specified freeform tag
 
 .. code-block:: yaml
 
     policies:
       - name: filter-and-add-tag-on-child-compartment
-        description: Filter and add tag on the child compartment
+        description: Filter and add tag on the child compartments
         resource: oci.compartment
-        query: [
-          'compartment_ids': [
-                        'ocid1.test.oc1..<unique_ID>EXAMPLE-compartmentId-Value'
-                    ]
-          ]
         actions:
           - type: update-compartment
             params:

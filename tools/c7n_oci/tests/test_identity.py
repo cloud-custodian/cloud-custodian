@@ -5,11 +5,10 @@ import inspect
 import unittest
 
 import pytest
-from c7n_oci.constants import COMPARTMENT_IDS
-from oci_common import Module, OciBaseTest, Resource, Scope
 from pytest_terraform import terraform
 
 from c7n.testing import C7N_FUNCTIONAL
+from oci_common import Module, OciBaseTest, Resource, Scope
 
 
 class TestIdentityTerraformTest(OciBaseTest):
@@ -32,7 +31,6 @@ class TestIdentityTerraformTest(OciBaseTest):
             "name": "filter-and-add-tags-on-compartments",
             "description": "Filter and add tags on the compartment",
             "resource": Resource.COMPARTMENT.value,
-            "query": [{COMPARTMENT_IDS: [compartment_id]}],
             "filters": [
                 {
                     "type": "value",
@@ -62,13 +60,11 @@ class TestIdentityTerraformTest(OciBaseTest):
 
     @terraform(Module.IDENTITY_GROUP.value, scope=Scope.CLASS.value)
     def test_identity_group(self, identity_group, test):
-        compartment_id = identity_group["oci_identity_group.test_group.compartment_id"]
         group_id = identity_group["oci_identity_group.test_group.id"]
         policy_str = {
             "name": "filter-and-add-tags-on-group",
             "description": "Filter and add tags on the group",
             "resource": Resource.GROUP.value,
-            "query": [{COMPARTMENT_IDS: [compartment_id]}],
             "filters": [
                 {
                     "type": "value",
@@ -108,7 +104,6 @@ class TestIdentityTerraformTest(OciBaseTest):
             "name": "filter-and-add-tags-on-user",
             "description": "Filter and add tags on the user",
             "resource": Resource.USER.value,
-            "query": [{COMPARTMENT_IDS: [compartment_id]}],
             "filters": [
                 {"type": "value", "key": "id", "value": user_ocid},
                 {
@@ -144,7 +139,6 @@ class TestIdentityTerraformTest(OciBaseTest):
             "name": "filter_auth_tokens_based_on_size",
             "description": "Filter users with auth tokens equal to 2",
             "resource": Resource.USER.value,
-            "query": [{COMPARTMENT_IDS: [compartment_id]}],
             "filters": [
                 {
                     "type": "auth-tokens",
@@ -181,7 +175,6 @@ class TestIdentityTerraformTest(OciBaseTest):
             "name": "filter_auth_tokens_based_on_age",
             "description": "Filter users with age less than 1 year",
             "resource": Resource.USER.value,
-            "query": [{COMPARTMENT_IDS: [compartment_id]}],
             "filters": [
                 {
                     "type": "auth-tokens",
@@ -215,7 +208,6 @@ class TestIdentityTerraformTest(OciBaseTest):
             "name": "filter_auth_tokens_based_on_size_age",
             "description": "Filter users with age less than 1 year and size equal to 2",
             "resource": Resource.USER.value,
-            "query": [{COMPARTMENT_IDS: [compartment_id]}],
             "filters": [
                 {
                     "type": "auth-tokens",
@@ -256,7 +248,6 @@ class TestIdentityTerraformTest(OciBaseTest):
             "name": "filter_auth_tokens_based_on_age",
             "description": "Filter users with age less than 1 yr and size equal to 2",
             "resource": Resource.USER.value,
-            "query": [{COMPARTMENT_IDS: [compartment_id]}],
             "filters": [
                 {
                     "type": "auth-tokens",
@@ -292,7 +283,6 @@ class IdentityUnitTest(unittest.TestCase, OciBaseTest):
     def get_policy(resource, filters=None, actions=None):
         policy = {
             "name": "test-identity",
-            "query": [{"compartment_id": "ocid1.test.oc1..<unique_ID>EXAMPLE-compartmentId-Value"}],
             "resource": "oci.{0}".format(resource),
         }
         if filters:

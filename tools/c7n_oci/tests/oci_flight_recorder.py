@@ -195,7 +195,7 @@ class OCIFlightRecorder(CustodianTestCore):
         When a repeated request is fetched for the first time in the execution of a test it is initialized to 1 and True is returned
         When the repeated request is queried again and the multi_requests_history already has a record of that request, running_req_count is initialized to 1
         The running_req_count is incremented on each call until it passes the multi_requests_history in value, indicating that the required records have been skipped
-        """ # noqa
+        """  # noqa
         if req in self.multi_requests_map:
             if self.multi_requests_history.get(req, 0) > 0:
                 self.running_req_count[req] = self.running_req_count.get(req, 0) + 1

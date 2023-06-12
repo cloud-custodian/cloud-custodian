@@ -1,9 +1,9 @@
 import inspect
 
 import oci
-from c7n_oci.constants import COMPARTMENT_IDS
-from oci_common import Module, OciBaseTest, Resource, Scope
 from pytest_terraform import terraform
+
+from oci_common import Module, OciBaseTest, Resource, Scope
 
 
 class TestZone(OciBaseTest):
@@ -31,7 +31,7 @@ class TestZone(OciBaseTest):
             {
                 "name": "add-defined-tag-to-zone",
                 "resource": Resource.ZONE.value,
-                "query": [{COMPARTMENT_IDS: [compartment_id]}, {"scope": "PRIVATE"}],
+                "query": [{"scope": "PRIVATE"}],
                 "filters": [
                     {"type": "value", "key": "id", "value": zone_ocid},
                 ],
@@ -65,7 +65,7 @@ class TestZone(OciBaseTest):
             {
                 "name": "update-defined-tag-of-zone",
                 "resource": Resource.ZONE.value,
-                "query": [{COMPARTMENT_IDS: [compartment_id]}, {"scope": "PRIVATE"}],
+                "query": [{"scope": "PRIVATE"}],
                 "filters": [
                     {"type": "value", "key": "freeform_tags.Project", "value": "CNCF"},
                 ],
@@ -101,7 +101,7 @@ class TestZone(OciBaseTest):
             {
                 "name": "add-tag-freeform-to-zone",
                 "resource": Resource.ZONE.value,
-                "query": [{COMPARTMENT_IDS: [compartment_id]}, {"scope": "PRIVATE"}],
+                "query": [{"scope": "PRIVATE"}],
                 "filters": [
                     {
                         "type": "value",
@@ -140,7 +140,7 @@ class TestZone(OciBaseTest):
             {
                 "name": "update-freeform-tag-of-zone",
                 "resource": Resource.ZONE.value,
-                "query": [{COMPARTMENT_IDS: [compartment_id]}, {"scope": "PRIVATE"}],
+                "query": [{"scope": "PRIVATE"}],
                 "filters": [
                     {"type": "value", "key": "freeform_tags.Project", "value": "CNCF"},
                 ],
@@ -174,7 +174,7 @@ class TestZone(OciBaseTest):
             {
                 "name": "get-freeform-tagged-zone",
                 "resource": Resource.ZONE.value,
-                "query": [{COMPARTMENT_IDS: [compartment_id]}, {"scope": "PRIVATE"}],
+                "query": [{"scope": "PRIVATE"}],
                 "filters": [
                     {"type": "value", "key": "freeform_tags.Project", "value": "CNCF"},
                 ],
@@ -199,7 +199,7 @@ class TestZone(OciBaseTest):
             {
                 "name": "zone-remove-tag",
                 "resource": Resource.ZONE.value,
-                "query": [{COMPARTMENT_IDS: [compartment_id]}, {"scope": "PRIVATE"}],
+                "query": [{"scope": "PRIVATE"}],
                 "filters": [
                     {"type": "value", "key": "id", "value": zone_ocid},
                 ],
@@ -226,7 +226,7 @@ class TestZone(OciBaseTest):
             {
                 "name": "zone-remove-tag",
                 "resource": Resource.ZONE.value,
-                "query": [{COMPARTMENT_IDS: [compartment_id]}, {"scope": "PRIVATE"}],
+                "query": [{"scope": "PRIVATE"}],
                 "filters": [
                     {"type": "value", "key": "id", "value": zone_ocid},
                 ],

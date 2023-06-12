@@ -1,8 +1,8 @@
 import inspect
 
-from c7n_oci.constants import COMPARTMENT_IDS
-from oci_common import OciBaseTest, Resource, Scope, Module
 from pytest_terraform import terraform
+
+from oci_common import OciBaseTest, Resource, Scope, Module
 
 
 class TestVcn(OciBaseTest):
@@ -27,7 +27,6 @@ class TestVcn(OciBaseTest):
             {
                 "name": "add-defined-tag-to-vcn",
                 "resource": Resource.VCN.value,
-                "query": [{COMPARTMENT_IDS: [compartment_id]}],
                 "filters": [
                     {"type": "value", "key": "id", "value": vcn_ocid},
                 ],
@@ -60,7 +59,6 @@ class TestVcn(OciBaseTest):
             {
                 "name": "update-defined-tag-of-vcn",
                 "resource": Resource.VCN.value,
-                "query": [{COMPARTMENT_IDS: [compartment_id]}],
                 "filters": [
                     {"type": "value", "key": "id", "value": vcn_ocid},
                 ],
@@ -95,7 +93,6 @@ class TestVcn(OciBaseTest):
             {
                 "name": "add-tag-freeform-to-vcn",
                 "resource": Resource.VCN.value,
-                "query": [{COMPARTMENT_IDS: [compartment_id]}],
                 "filters": [
                     {"type": "value", "key": "id", "value": vcn_ocid},
                 ],
@@ -128,7 +125,6 @@ class TestVcn(OciBaseTest):
             {
                 "name": "update-freeform-tag-of-vcn",
                 "resource": Resource.VCN.value,
-                "query": [{COMPARTMENT_IDS: [compartment_id]}],
                 "filters": [
                     {"type": "value", "key": "id", "value": vcn_ocid},
                 ],
@@ -161,7 +157,6 @@ class TestVcn(OciBaseTest):
             {
                 "name": "get-freeform-tagged-vcn",
                 "resource": Resource.VCN.value,
-                "query": [{COMPARTMENT_IDS: [compartment_id]}],
                 "filters": [
                     {"type": "value", "key": "freeform_tags.Project", "value": "CNCF"},
                 ],
@@ -186,7 +181,6 @@ class TestVcn(OciBaseTest):
             {
                 "name": "vcn-remove-tag",
                 "resource": Resource.VCN.value,
-                "query": [{"compartment_id": [compartment_id]}],
                 "filters": [
                     {"type": "value", "key": "id", "value": vcn_ocid},
                 ],
@@ -214,7 +208,6 @@ class TestVcn(OciBaseTest):
             {
                 "name": "vcn-remove-tag",
                 "resource": Resource.VCN.value,
-                "query": [{"compartment_id": [compartment_id]}],
                 "filters": [
                     {"type": "value", "key": "id", "value": vcn_ocid},
                 ],

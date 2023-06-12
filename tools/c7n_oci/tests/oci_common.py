@@ -8,9 +8,7 @@ from c7n.config import Config
 from c7n.schema import generate
 from c7n.testing import C7N_FUNCTIONAL, CustodianTestCore
 
-FILTERED_FIELDS = [
-    "metadata"
-]
+FILTERED_FIELDS = ["metadata"]
 
 
 class OciBaseTest(CustodianTestCore):

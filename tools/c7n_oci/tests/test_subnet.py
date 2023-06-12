@@ -1,8 +1,8 @@
 import inspect
 
-from c7n_oci.constants import COMPARTMENT_IDS
-from oci_common import OciBaseTest, Resource, Scope, Module
 from pytest_terraform import terraform
+
+from oci_common import OciBaseTest, Resource, Scope, Module
 
 
 class TestSubnet(OciBaseTest):
@@ -27,7 +27,6 @@ class TestSubnet(OciBaseTest):
             {
                 "name": "add-defined-tag-to-subnet",
                 "resource": Resource.SUBNET.value,
-                "query": [{COMPARTMENT_IDS: [compartment_id]}],
                 "filters": [
                     {"type": "value", "key": "id", "value": subnet_ocid},
                 ],
@@ -62,7 +61,6 @@ class TestSubnet(OciBaseTest):
             {
                 "name": "update-defined-tag-of-subnet",
                 "resource": Resource.SUBNET.value,
-                "query": [{COMPARTMENT_IDS: [compartment_id]}],
                 "filters": [
                     {"type": "value", "key": "id", "value": subnet_ocid},
                 ],
@@ -97,7 +95,6 @@ class TestSubnet(OciBaseTest):
             {
                 "name": "add-tag-freeform-to-subnet",
                 "resource": Resource.SUBNET.value,
-                "query": [{COMPARTMENT_IDS: [compartment_id]}],
                 "filters": [
                     {"type": "value", "key": "id", "value": subnet_ocid},
                 ],
@@ -132,7 +129,6 @@ class TestSubnet(OciBaseTest):
             {
                 "name": "update-freeform-tag-of-subnet",
                 "resource": Resource.SUBNET.value,
-                "query": [{COMPARTMENT_IDS: [compartment_id]}],
                 "filters": [
                     {"type": "value", "key": "id", "value": subnet_ocid},
                 ],
@@ -167,7 +163,6 @@ class TestSubnet(OciBaseTest):
             {
                 "name": "get-freeform-tagged-subnet",
                 "resource": Resource.SUBNET.value,
-                "query": [{COMPARTMENT_IDS: [compartment_id]}],
                 "filters": [
                     {"type": "value", "key": "freeform_tags.Project", "value": "CNCF"},
                 ],
@@ -192,7 +187,6 @@ class TestSubnet(OciBaseTest):
             {
                 "name": "subnet-remove-tag",
                 "resource": Resource.SUBNET.value,
-                "query": [{"compartment_id": compartment_id}],
                 "filters": [
                     {"type": "value", "key": "id", "value": subnet_ocid},
                 ],
@@ -220,7 +214,6 @@ class TestSubnet(OciBaseTest):
             {
                 "name": "subnet-remove-tag",
                 "resource": Resource.SUBNET.value,
-                "query": [{"compartment_id": compartment_id}],
                 "filters": [
                     {"type": "value", "key": "id", "value": subnet_ocid},
                 ],

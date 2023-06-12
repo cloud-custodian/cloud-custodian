@@ -1,9 +1,9 @@
 import inspect
 
 import oci
-from c7n_oci.constants import COMPARTMENT_IDS
-from oci_common import Module, OciBaseTest, Resource, Scope
 from pytest_terraform import terraform
+
+from oci_common import Module, OciBaseTest, Resource, Scope
 
 
 class TestObjectStorage(OciBaseTest):
@@ -32,7 +32,6 @@ class TestObjectStorage(OciBaseTest):
                 "name": "add-defined-tag-to-bucket",
                 "resource": Resource.BUCKET.value,
                 "query": [
-                    {COMPARTMENT_IDS: [compartment_id]},
                     {"namespace_name": namespace_name},
                 ],
                 "filters": [
@@ -72,7 +71,6 @@ class TestObjectStorage(OciBaseTest):
                 "name": "update-defined-tag-to-bucket",
                 "resource": Resource.BUCKET.value,
                 "query": [
-                    {COMPARTMENT_IDS: [compartment_id]},
                     {"namespace_name": namespace_name},
                 ],
                 "filters": [
@@ -112,7 +110,6 @@ class TestObjectStorage(OciBaseTest):
                 "name": "add-tag-to-bucket",
                 "resource": Resource.BUCKET.value,
                 "query": [
-                    {COMPARTMENT_IDS: [compartment_id]},
                     {"namespace_name": namespace_name},
                 ],
                 "filters": [
@@ -152,7 +149,6 @@ class TestObjectStorage(OciBaseTest):
                 "name": "update-freeform-tag-of-bucket",
                 "resource": Resource.BUCKET.value,
                 "query": [
-                    {COMPARTMENT_IDS: [compartment_id]},
                     {"namespace_name": namespace_name},
                 ],
                 "filters": [
@@ -192,7 +188,6 @@ class TestObjectStorage(OciBaseTest):
                 "name": "get-freeform-tagged-instance",
                 "resource": Resource.BUCKET.value,
                 "query": [
-                    {COMPARTMENT_IDS: [compartment_id]},
                     {"namespace_name": namespace_name},
                 ],
                 "filters": [
@@ -220,7 +215,6 @@ class TestObjectStorage(OciBaseTest):
                 "name": "change-public-bucket-to-private",
                 "resource": Resource.BUCKET.value,
                 "query": [
-                    {COMPARTMENT_IDS: [compartment_id]},
                     {"namespace_name": namespace_name},
                 ],
                 "filters": [
@@ -258,7 +252,6 @@ class TestObjectStorage(OciBaseTest):
                 "name": "bucket-remove-tag",
                 "resource": Resource.BUCKET.value,
                 "query": [
-                    {COMPARTMENT_IDS: [compartment_id]},
                     {"namespace_name": namespace_name},
                 ],
                 "filters": [
@@ -290,10 +283,6 @@ class TestObjectStorage(OciBaseTest):
             {
                 "name": "bucket-remove-tag",
                 "resource": Resource.BUCKET.value,
-                "query": [
-                    {COMPARTMENT_IDS: [compartment_id]},
-                    {"namespace_name": namespace_name},
-                ],
                 "filters": [
                     {"type": "value", "key": "name", "value": bucket_name},
                 ],

@@ -1,8 +1,8 @@
 import inspect
 
-from c7n_oci.constants import COMPARTMENT_IDS
-from oci_common import Module, OciBaseTest, Resource, Scope
 from pytest_terraform import terraform
+
+from oci_common import Module, OciBaseTest, Resource, Scope
 
 
 class TestInstance(OciBaseTest):
@@ -27,7 +27,6 @@ class TestInstance(OciBaseTest):
             {
                 "name": "add-defined-tag-to-instance",
                 "resource": Resource.COMPUTE.value,
-                "query": [{COMPARTMENT_IDS: [compartment_id]}],
                 "filters": [
                     {"type": "value", "key": "id", "value": ocid},
                 ],
@@ -58,14 +57,12 @@ class TestInstance(OciBaseTest):
         session_factory = test.oci_session_factory(
             self.__class__.__name__, inspect.currentframe().f_code.co_name
         )
-        compartment_id = compute["oci_core_instance.test_instance.compartment_id"]
         ocid = compute["oci_core_instance.test_instance.id"]
 
         policy = test.load_policy(
             {
                 "name": "update-defined-tag-from-instance",
                 "resource": Resource.COMPUTE.value,
-                "query": [{COMPARTMENT_IDS: [compartment_id]}],
                 "filters": [
                     {"type": "value", "key": "id", "value": ocid},
                 ],
@@ -100,7 +97,6 @@ class TestInstance(OciBaseTest):
             {
                 "name": "add-freeform-tag-to-instance",
                 "resource": Resource.COMPUTE.value,
-                "query": [{COMPARTMENT_IDS: [compartment_id]}],
                 "filters": [
                     {"type": "value", "key": "id", "value": ocid},
                 ],
@@ -135,7 +131,6 @@ class TestInstance(OciBaseTest):
             {
                 "name": "update-freeform-tag-from-instance",
                 "resource": Resource.COMPUTE.value,
-                "query": [{COMPARTMENT_IDS: [compartment_id]}],
                 "filters": [
                     {"type": "value", "key": "id", "value": ocid},
                 ],
@@ -171,7 +166,6 @@ class TestInstance(OciBaseTest):
                 "name": "get-tagged-instance",
                 "resource": Resource.COMPUTE.value,
                 "query": [
-                    {COMPARTMENT_IDS: [compartment_id]},
                     {"lifecycle_state": "RUNNING"},
                 ],
                 "filters": [{"type": "value", "key": "freeform_tags.Project", "value": "CNCF"}],

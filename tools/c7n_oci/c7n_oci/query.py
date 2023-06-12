@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import logging
+import os
 
 import oci.config
 
@@ -39,13 +40,15 @@ class DescribeSource:
 
     def get_resources(self, query):
         resources = None
-        if "query" in self.manager.data and COMPARTMENT_IDS in list(
-            map(lambda x: list(x.keys())[0], self.manager.data.get("query"))
-        ):
-            resources = self._get_resources_for_list_of_compartment_ids(
-                self._get_list_of_compartment_ids_from_query(),
-                self._construct_list_func_ref(),
-            )
+        compartment_ids = self._get_list_of_compartment_ids()
+        log.info(
+            f"List of compartment IDs fetched using the environment variable ${COMPARTMENT_IDS}:"
+            f" {compartment_ids}"
+        )
+        resources = self._get_resources_for_list_of_compartment_ids(
+            compartment_ids,
+            self._construct_list_func_ref(),
+        )
         return resources
 
     def _get_resources_for_list_of_compartment_ids(self, compartment_ids, list_func_ref):
@@ -56,23 +59,17 @@ class DescribeSource:
                 resources.append(oci.util.to_dict(result))
         return resources
 
-    def _get_list_of_compartment_ids_from_query(self):
-        if "query" in self.manager.data:
-            compartment_ids = []
-            for query_dict in self.manager.data.get("query"):
-                for k, v in query_dict.items():
-                    if k == COMPARTMENT_IDS:
-                        for compartment_id in v:
-                            compartment_ids.append(compartment_id)
-            return compartment_ids
-        return None
+    @staticmethod
+    def _get_list_of_compartment_ids():
+        comps_env_var = os.environ.get(COMPARTMENT_IDS).split(",")
+        return [comp.strip() for comp in comps_env_var if comp and comp.strip()]
 
     def _construct_list_func_ref(self):
         operation, return_type, extra_args = self.manager.resource_type.enum_spec
         return getattr(self.manager.get_client(), operation)
 
     def _get_resources_with_compartment_and_params(self, compartment_id, list_func_ref):
-        kw = self._get_fields_from_query_except_compartment()
+        kw = self._get_fields_from_query()
         if (
             self.manager._get_extra_params().get(STORAGE_NAMESPACE) is not None
             and kw.get(STORAGE_NAMESPACE) is None
@@ -81,17 +78,16 @@ class DescribeSource:
         kw["compartment_id"] = compartment_id
         return oci.pagination.list_call_get_all_results(list_func_ref, **kw).data
 
-    def _get_fields_from_query_except_compartment(self):
+    def _get_fields_from_query(self):
         kw = {}
         if self.manager.resource_type.enum_spec[2] is not None:
             kw = {**self.manager.resource_type.enum_spec[2]}
         if "query" in self.manager.data:
             for query_dict in self.manager.data.get("query"):
                 for k, v in query_dict.items():
-                    if not k == COMPARTMENT_IDS:
-                        kw[k] = v
+                    kw[k] = v
             return kw
-        return {}
+        return kw
 
     def augment(self, resources):
         return resources
@@ -104,49 +100,30 @@ class DescribeSearch(DescribeSource):
         self.query = ResourceQuery(manager.session_factory)
 
     def get_resources(self, query):
-        params = {
-            "search_details": self._get_search_details_model(
-                self._get_param("compartment_id", query)
-            )
-        }
-        # params = {**params, **self._get_query_params(query)}
+        params = {"search_details": self._get_search_details_model()}
         client_name = "oci.resource_search.ResourceSearchClient"
         operation = "search_resources"
         resources = self.query.filter(self.manager, client_name, operation, params)
         compartment_ids = set()
         for resource in resources:
             compartment_ids.add(resource.compartment_id)
+        log.info(
+            f"List of compartment IDs fetched using the ResourceSearchClient: {compartment_ids}"
+        )
         fetched_resources = self._get_resources_for_list_of_compartment_ids(
             compartment_ids, self._construct_list_func_ref()
         )
         return fetched_resources
 
-    def _get_search_details_model(self, compartment_id):
+    def _get_search_details_model(self):
         query = f"query {self.manager.resource_type.search_resource_type} resources"
         return oci.resource_search.models.StructuredSearchDetails(type="Structured", query=query)
 
-    def _get_param(self, param_name, query):
-        if query is None:
-            return None
-        params = query.get("filter")
-        for index in range(len(params)):
-            param = params[index]
-            if param_name in param:
-                return param.get(param_name)
-        return None
-
-    # Contruct the query params by skipping the compartment_id as it used for building
-    # the search model
+    # Contruct the query params as it used for building the search model
     def _get_query_params(self, query):
-        if query is None:
+        if query is None or query.get("filter") is None:
             return {}
-        selected_params = {}
-        params = query.get("filter")
-        for index in range(len(query.get("filter"))):
-            param = params[index]
-            if "compartment_ids" not in param:
-                selected_params = {**selected_params, **param}
-        return selected_params
+        return {**query.get("filter")}
 
     def augment(self, resources):
         return resources
@@ -200,9 +177,7 @@ class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
 
     @property
     def source_type(self):
-        if "query" in self.data and COMPARTMENT_IDS in list(
-            map(lambda x: list(x.keys())[0], self.data.get("query"))
-        ):
+        if os.environ.get(COMPARTMENT_IDS) is not None:
             return "describe-native"
         else:
             return "describe-search"
@@ -227,7 +202,7 @@ class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
 
     def check_resource_limit(self, selection_count, population_count):
         """
-        Check if policy's execution affects more resources then its limit.
+        Check if policy's execution affects more resources than its limit.
         """
         p = self.ctx.policy
         max_resource_limits = MaxResourceLimit(p, selection_count, population_count)
