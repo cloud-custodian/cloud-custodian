@@ -1,0 +1,25 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Wed, 14 Jun 2023 19:20:05 GMT",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "504",
+    "-content-encoding": "gzip"
+  },
+  "body": {
+    "name": "operation-1686770405771-2f3a28dd-524b-4355-9625-ae0e11c96c77",
+    "zone": "us-central1",
+    "operationType": "UPDATE_CLUSTER",
+    "status": "RUNNING",
+    "selfLink": "https://container.googleapis.com/v1/projects/cloud-custodian/locations/us-central1/operations/operation-1686770405771-2f3a28dd-524b-4355-9625-ae0e11c96c77",
+    "targetLink": "https://container.googleapis.com/v1/projects/cloud-custodian/locations/us-central1/clusters/standard-cluster-1",
+    "startTime": "2023-06-14T19:20:05.77179888Z"
+  }
+}
