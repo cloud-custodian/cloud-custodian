@@ -280,10 +280,7 @@ class ProviderSelector(unittest.TestCase):
             (self.gcp_config, MailerGcpQueueProcessor),
         ]
         for mailer_config, processor in params:
-            self.assertIsInstance(
-                utils.get_processor(mailer_config, logger),
-                processor
-            )
+            self.assertIsInstance(utils.get_processor(mailer_config, logger), processor)
 
     def test_missing_deps_guidance(self):
         """Make sure we catch failed imports and provide guidance around installing
@@ -291,14 +288,14 @@ class ProviderSelector(unittest.TestCase):
         _real_import = builtins.__import__
 
         def fake_import_missing_deps(name, *args, **kwargs):
-            if name.startswith('c7n_gcp') or name.startswith('c7n_azure'):
+            if name.startswith("c7n_gcp") or name.startswith("c7n_azure"):
                 raise ImportError()
             return _real_import(name, *args, **kwargs)
 
-        with patch.object(builtins, '__import__', side_effect=fake_import_missing_deps):
-            with self.assertRaisesRegex(ImportError, r'pip install c7n-mailer\[azure\]'):
+        with patch.object(builtins, "__import__", side_effect=fake_import_missing_deps):
+            with self.assertRaisesRegex(ImportError, r"pip install c7n-mailer\[azure\]"):
                 reload(c7n_mailer.azure_mailer.azure_queue_processor)
-            with self.assertRaisesRegex(ImportError, r'pip install c7n-mailer\[gcp\]'):
+            with self.assertRaisesRegex(ImportError, r"pip install c7n-mailer\[gcp\]"):
                 reload(c7n_mailer.gcp_mailer.gcp_queue_processor)
 
 
