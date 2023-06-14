@@ -196,6 +196,7 @@ ResourceMap = {
     "aws.secrets-manager": "c7n.resources.secretsmanager.SecretsManager",
     "aws.security-group": "c7n.resources.vpc.SecurityGroup",
     "aws.ses-configuration-set": "c7n.resources.ses.SESConfigurationSet",
+    "aws.ses-email-identity": "c7n.resources.ses.SESEmailIdentity",
     "aws.serverless-app": "c7n.resources.sar.ServerlessApp",
     "aws.service-quota-request": "c7n.resources.quotas.ServiceQuotaRequest",
     "aws.service-quota": "c7n.resources.quotas.ServiceQuota",
