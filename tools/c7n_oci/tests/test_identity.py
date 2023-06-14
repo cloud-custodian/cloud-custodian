@@ -5,9 +5,18 @@ import inspect
 import unittest
 
 import pytest
+from mock import patch, Mock
+from oci.response import Response
 from pytest_terraform import terraform
 
 from c7n.testing import C7N_FUNCTIONAL
+from c7n_oci.resources.identity import (
+    UserOAuth2ClientCredentialsValueFilter,
+    UserApiKeysValueFilter,
+    UserDbCredentialsValueFilter,
+    UserCustomerSecretKeysValueFilter,
+    UserSmtpCredentialsValueFilter,
+)
 from oci_common import Module, OciBaseTest, Resource, Scope
 
 
@@ -58,6 +67,56 @@ class TestIdentityTerraformTest(OciBaseTest):
         assert resource is not None
         test.assertEqual(resource["freeform_tags"]["Environment"], "Development")
 
+    @terraform(Module.IDENTITY_COMPARTMENT.value, scope=Scope.CLASS.value)
+    def test_remove_tag_compartment(self, identity_compartment, test):
+        compartment_id, new_compartment_id = self._get_identity_compartment_details(
+            identity_compartment
+        )
+        session_factory = test.oci_session_factory(
+            self.__class__.__name__, inspect.currentframe().f_code.co_name
+        )
+        policy_str = {
+            "name": "remove-tag-from-compartment",
+            "description": "Remove tag from the compartment",
+            "resource": Resource.COMPARTMENT.value,
+            "filters": [
+                {"type": "value", "key": "id", "value": new_compartment_id},
+            ],
+            "actions": [{"type": "remove-tag", "freeform_tags": ["Cloud_Custodian_Test"]}],
+        }
+        policy = test.load_policy(policy_str, session_factory=session_factory)
+        policy.run()
+        resource = self.fetch_validation_data(
+            policy.resource_manager, "get_compartment", new_compartment_id
+        )
+        assert resource is not None
+        test.assertEqual(resource["freeform_tags"].get("Cloud_Custodian_Test"), None)
+
+    @terraform(Module.IDENTITY_COMPARTMENT.value, scope=Scope.CLASS.value)
+    def test_remove_invalidtag_compartment(self, identity_compartment, test):
+        compartment_id, new_compartment_id = self._get_identity_compartment_details(
+            identity_compartment
+        )
+        session_factory = test.oci_session_factory(
+            self.__class__.__name__, inspect.currentframe().f_code.co_name
+        )
+        policy_str = {
+            "name": "remove-invalidtag-from-compartment",
+            "description": "Remove tag from the compartment that doesn't exists",
+            "resource": Resource.COMPARTMENT.value,
+            "filters": [
+                {"type": "value", "key": "id", "value": new_compartment_id},
+            ],
+            "actions": [{"type": "remove-tag", "freeform_tags": ["Cloud_Custodian_Test1"]}],
+        }
+        policy = test.load_policy(policy_str, session_factory=session_factory)
+        policy.run()
+        resource = self.fetch_validation_data(
+            policy.resource_manager, "get_compartment", new_compartment_id
+        )
+        assert resource is not None
+        test.assertEqual(resource["freeform_tags"].get("Cloud_Custodian_Test1"), None)
+
     @terraform(Module.IDENTITY_GROUP.value, scope=Scope.CLASS.value)
     def test_identity_group(self, identity_group, test):
         group_id = identity_group["oci_identity_group.test_group.id"]
@@ -91,6 +150,56 @@ class TestIdentityTerraformTest(OciBaseTest):
         assert resource is not None
         test.assertEqual(resource["name"], "Custodian-Dev-Group")
         test.assertEqual(resource["freeform_tags"]["Environment"], "Development")
+
+    @terraform(Module.IDENTITY_GROUP.value, scope=Scope.CLASS.value)
+    def test_remove_tag_group(self, identity_group, test):
+        group_id = identity_group["oci_identity_group.test_group.id"]
+        policy_str = {
+            "name": "remove-tag-on-group",
+            "description": "Remove tag from the group",
+            "resource": Resource.GROUP.value,
+            "filters": [
+                {
+                    "type": "value",
+                    "key": "id",
+                    "value": group_id,
+                },
+            ],
+            "actions": [{"type": "remove-tag", "freeform_tags": ["Cloud_Custodian"]}],
+        }
+        session_factory = test.oci_session_factory(
+            self.__class__.__name__, inspect.currentframe().f_code.co_name
+        )
+        policy = test.load_policy(policy_str, session_factory=session_factory)
+        policy.run()
+        resource = self.fetch_validation_data(policy.resource_manager, "get_group", group_id)
+        assert resource is not None
+        test.assertEqual(resource["freeform_tags"].get("Cloud_Custodian"), None)
+
+    @terraform(Module.IDENTITY_GROUP.value, scope=Scope.CLASS.value)
+    def test_remove_invalidtag_group(self, identity_group, test):
+        group_id = identity_group["oci_identity_group.test_group.id"]
+        policy_str = {
+            "name": "remove-invalid-tag-on-group",
+            "description": "Remove tag from the group that doesn't exists",
+            "resource": Resource.GROUP.value,
+            "filters": [
+                {
+                    "type": "value",
+                    "key": "id",
+                    "value": group_id,
+                },
+            ],
+            "actions": [{"type": "remove-tag", "freeform_tags": ["Cloud_Custodian1"]}],
+        }
+        session_factory = test.oci_session_factory(
+            self.__class__.__name__, inspect.currentframe().f_code.co_name
+        )
+        policy = test.load_policy(policy_str, session_factory=session_factory)
+        policy.run()
+        resource = self.fetch_validation_data(policy.resource_manager, "get_group", group_id)
+        assert resource is not None
+        test.assertEqual(resource["freeform_tags"].get("Cloud_Custodian1"), None)
 
     def _get_user_details(self, identity_user):
         compartment_id = identity_user["oci_identity_user.test_user.compartment_id"]
@@ -128,6 +237,61 @@ class TestIdentityTerraformTest(OciBaseTest):
         resource = self.fetch_validation_data(policy.resource_manager, "get_user", user_ocid)
         assert resource is not None
         test.assertEqual(resource["freeform_tags"]["key_limit"], "2")
+
+    @terraform(Module.IDENTITY_USER.value, scope=Scope.CLASS.value)
+    def test_remove_tag_user(self, identity_user, test):
+        compartment_id, user_ocid = self._get_user_details(identity_user)
+        policy_str = {
+            "name": "remove-tag-from-user",
+            "description": "Remove tag from the user",
+            "resource": Resource.USER.value,
+            "filters": [{"type": "value", "key": "id", "value": user_ocid}],
+            "actions": [{"type": "remove-tag", "freeform_tags": ["Cloud_Custodian"]}],
+        }
+        session_factory = test.oci_session_factory(
+            self.__class__.__name__, inspect.currentframe().f_code.co_name
+        )
+        policy = test.load_policy(policy_str, session_factory=session_factory)
+        policy.run()
+        resource = self.fetch_validation_data(policy.resource_manager, "get_user", user_ocid)
+        assert resource is not None
+        test.assertEqual(resource["freeform_tags"].get("Cloud_Custodian"), None)
+
+    @terraform(Module.IDENTITY_USER.value, scope=Scope.CLASS.value)
+    def test_remove_invalidtag_user(self, identity_user, test):
+        compartment_id, user_ocid = self._get_user_details(identity_user)
+        policy_str = {
+            "name": "remove-invalid-tag-from-user",
+            "description": "Remove tag from the user that doesn't exists",
+            "resource": Resource.USER.value,
+            "filters": [{"type": "value", "key": "id", "value": user_ocid}],
+            "actions": [{"type": "remove-tag", "freeform_tags": ["Cloud_Custodian_test"]}],
+        }
+        session_factory = test.oci_session_factory(
+            self.__class__.__name__, inspect.currentframe().f_code.co_name
+        )
+        policy = test.load_policy(policy_str, session_factory=session_factory)
+        policy.run()
+        resource = self.fetch_validation_data(policy.resource_manager, "get_user", user_ocid)
+        assert resource is not None
+        test.assertEqual(resource["freeform_tags"].get("Cloud_Custodian_test"), None)
+
+    @terraform(Module.IDENTITY_USER.value, scope=Scope.CLASS.value)
+    def test_attributes_user(self, identity_user, test):
+        compartment_id, user_ocid = self._get_user_details(identity_user)
+        policy_str = {
+            "name": "fetch-attributes-from-user",
+            "description": "Fetch all attributes from the user",
+            "resource": Resource.USER.value,
+            "filters": [{"type": "attributes", "key": "id", "value": user_ocid}],
+        }
+        session_factory = test.oci_session_factory(
+            self.__class__.__name__, inspect.currentframe().f_code.co_name
+        )
+        policy = test.load_policy(policy_str, session_factory=session_factory)
+        resource = policy.run()
+        assert resource[0] is not None
+        assert resource[0]["is_mfa_activated"] is not None
 
     @terraform(Module.IDENTITY_USER.value, scope=Scope.CLASS.value)
     def test_identity_user_cross_filter_size(self, identity_user, test):
@@ -339,7 +503,9 @@ class IdentityUnitTest(unittest.TestCase, OciBaseTest):
         return [
             {
                 "type": method_name,
-                "params": {method_param: {"freeform_tags": {"Environment": "Cloud-Custodian-Dev"}}},
+                "params": {
+                    method_param: {"freeform_tags": {"Environment": "Cloud-Custodian-Dev"}}
+                },
             }
         ]
 
@@ -449,3 +615,319 @@ class IdentityUnitTest(unittest.TestCase, OciBaseTest):
                 validate=True,
             )
         )
+
+    @patch("c7n_oci.resources.identity.User")
+    def test_oauth_size_identity(self, user_mock):
+        policy_str = {
+            "type": "o-auth2-client-credentials",
+            "key": "o_auth2_client_credentials",
+            "value": 1,
+            "op": "eq",
+            "value_type": "size",
+        }
+        identity_client = Mock()
+        response = Response(200, None, [{"display_name": "cloud_custodian_oauth"}], None)
+        identity_client.list_o_auth_client_credentials.return_value = response
+        user_mock.get_client.return_value = identity_client
+        resources = [{"id": "ocid1.user.oc1..<unique_ID>", "description": "Cloud Custodian"}]
+        filter = UserOAuth2ClientCredentialsValueFilter(policy_str)
+        filter.manager = user_mock
+        filtered_resources = filter.process(resources, None)
+        self.assertEqual(len(filtered_resources), 1)
+
+    @patch("c7n_oci.resources.identity.User")
+    def test_oauth_exists_identity(self, user_mock):
+        policy_str = {
+            "type": "o-auth2-client-credentials",
+            "key": "o_auth2_client_credentials",
+            "value": 1,
+            "op": "eq",
+            "value_type": "size",
+        }
+        identity_client = Mock()
+        oauth_data = [{"display_name": "cloud_custodian_oauth"}]
+        response = Response(200, None, oauth_data, None)
+        identity_client.list_o_auth_client_credentials.return_value = response
+        user_mock.get_client.return_value = identity_client
+        resources = [
+            {
+                "id": "ocid1.user.oc1..<unique_ID>",
+                "description": "Cloud Custodian",
+                "o_auth2_client_credentials": oauth_data,
+            }
+        ]
+        filter = UserOAuth2ClientCredentialsValueFilter(policy_str)
+        filter.manager = user_mock
+        filtered_resources = filter.process(resources, None)
+        self.assertEqual(len(filtered_resources), 1)
+
+    @patch("c7n_oci.resources.identity.User")
+    def test_oauth_filter_identity(self, user_mock):
+        policy_str = {
+            "type": "o-auth2-client-credentials",
+            "key": "o_auth2_client_credential.lifecycle_state",
+            "value": "ACTIVE",
+            "op": "eq",
+        }
+        identity_client = Mock()
+        data = [{"display_name": "cloud_custodian_oauth", "lifecycle_state": "ACTIVE"}]
+        response = Response(200, None, data, None)
+        identity_client.list_o_auth_client_credentials.return_value = response
+        user_mock.get_client.return_value = identity_client
+        resources = [{"id": "ocid1.user.oc1..<unique_ID>", "description": "Cloud Custodian"}]
+        filter = UserOAuth2ClientCredentialsValueFilter(policy_str)
+        filter.manager = user_mock
+        filtered_resources = filter.process(resources, None)
+        self.assertEqual(len(filtered_resources), 1)
+
+    @patch("c7n_oci.resources.identity.User")
+    def test_apikeys_size_identity(self, user_mock):
+        policy_str = {
+            "type": "api-keys",
+            "key": "api_keys",
+            "value": 1,
+            "op": "eq",
+            "value_type": "size",
+        }
+        identity_client = Mock()
+        response = Response(200, None, [{"lifecycle_state": "ACTIVE"}], None)
+        identity_client.list_api_keys.return_value = response
+        user_mock.get_client.return_value = identity_client
+        resources = [{"id": "ocid1.user.oc1..<unique_ID>", "description": "Cloud Custodian"}]
+        filter = UserApiKeysValueFilter(policy_str)
+        filter.manager = user_mock
+        filtered_resources = filter.process(resources, None)
+        self.assertEqual(len(filtered_resources), 1)
+
+    @patch("c7n_oci.resources.identity.User")
+    def test_apikeys_exists_identity(self, user_mock):
+        policy_str = {
+            "type": "api-keys",
+            "key": "api_keys",
+            "value": 1,
+            "op": "eq",
+            "value_type": "size",
+        }
+        identity_client = Mock()
+        api_data = [{"lifecycle_state": "ACTIVE"}]
+        response = Response(200, None, api_data, None)
+        identity_client.list_api_keys.return_value = response
+        user_mock.get_client.return_value = identity_client
+        resources = [
+            {
+                "id": "ocid1.user.oc1..<unique_ID>",
+                "description": "Cloud Custodian",
+                "api_keys": api_data,
+            }
+        ]
+        filter = UserApiKeysValueFilter(policy_str)
+        filter.manager = user_mock
+        filtered_resources = filter.process(resources, None)
+        self.assertEqual(len(filtered_resources), 1)
+
+    @patch("c7n_oci.resources.identity.User")
+    def test_apikeys_filter_identity(self, user_mock):
+        policy_str = {
+            "type": "api-keys",
+            "key": "api_key.lifecycle_state",
+            "value": "ACTIVE",
+            "op": "eq",
+        }
+        identity_client = Mock()
+        response = Response(200, None, [{"lifecycle_state": "ACTIVE"}], None)
+        identity_client.list_api_keys.return_value = response
+        user_mock.get_client.return_value = identity_client
+        resources = [{"id": "ocid1.user.oc1..<unique_ID>", "description": "Cloud Custodian"}]
+        filter = UserApiKeysValueFilter(policy_str)
+        filter.manager = user_mock
+        filtered_resources = filter.process(resources, None)
+        self.assertEqual(len(filtered_resources), 1)
+
+    @patch("c7n_oci.resources.identity.User")
+    def test_dbcred_size_identity(self, user_mock):
+        policy_str = {
+            "type": "db-credentials",
+            "key": "db_credentials",
+            "value": 1,
+            "op": "eq",
+            "value_type": "size",
+        }
+        identity_client = Mock()
+        response = Response(200, None, [{"lifecycle_state": "ACTIVE"}], None)
+        identity_client.list_db_credentials.return_value = response
+        user_mock.get_client.return_value = identity_client
+        resources = [{"id": "ocid1.user.oc1..<unique_ID>", "description": "Cloud Custodian"}]
+        filter = UserDbCredentialsValueFilter(policy_str)
+        filter.manager = user_mock
+        filtered_resources = filter.process(resources, None)
+        self.assertEqual(len(filtered_resources), 1)
+
+    @patch("c7n_oci.resources.identity.User")
+    def test_dbcred_exists_identity(self, user_mock):
+        policy_str = {
+            "type": "db-credentials",
+            "key": "db_credentials",
+            "value": 1,
+            "op": "eq",
+            "value_type": "size",
+        }
+        identity_client = Mock()
+        dbcred_data = [{"lifecycle_state": "ACTIVE"}]
+        response = Response(200, None, dbcred_data, None)
+        identity_client.list_db_credentials.return_value = response
+        user_mock.get_client.return_value = identity_client
+        resources = [
+            {
+                "id": "ocid1.user.oc1..<unique_ID>",
+                "description": "Cloud Custodian",
+                "db_credentials": dbcred_data,
+            }
+        ]
+        filter = UserDbCredentialsValueFilter(policy_str)
+        filter.manager = user_mock
+        filtered_resources = filter.process(resources, None)
+        self.assertEqual(len(filtered_resources), 1)
+
+    @patch("c7n_oci.resources.identity.User")
+    def test_dbcred_filter_identity(self, user_mock):
+        policy_str = {
+            "type": "db-credentials",
+            "key": "db_credential.lifecycle_state",
+            "value": "ACTIVE",
+            "op": "eq",
+        }
+        identity_client = Mock()
+        response = Response(200, None, [{"lifecycle_state": "ACTIVE"}], None)
+        identity_client.list_db_credentials.return_value = response
+        user_mock.get_client.return_value = identity_client
+        resources = [{"id": "ocid1.user.oc1..<unique_ID>", "description": "Cloud Custodian"}]
+        filter = UserDbCredentialsValueFilter(policy_str)
+        filter.manager = user_mock
+        filtered_resources = filter.process(resources, None)
+        self.assertEqual(len(filtered_resources), 1)
+
+    @patch("c7n_oci.resources.identity.User")
+    def test_cuskey_size_identity(self, user_mock):
+        policy_str = {
+            "type": "customer-secret-keys",
+            "key": "customer_secret_keys",
+            "value": 1,
+            "op": "eq",
+            "value_type": "size",
+        }
+        identity_client = Mock()
+        response = Response(200, None, [{"lifecycle_state": "ACTIVE"}], None)
+        identity_client.list_customer_secret_keys.return_value = response
+        user_mock.get_client.return_value = identity_client
+        resources = [{"id": "ocid1.user.oc1..<unique_ID>", "description": "Cloud Custodian"}]
+        filter = UserCustomerSecretKeysValueFilter(policy_str)
+        filter.manager = user_mock
+        filtered_resources = filter.process(resources, None)
+        self.assertEqual(len(filtered_resources), 1)
+
+    @patch("c7n_oci.resources.identity.User")
+    def test_cuskey_exists_identity(self, user_mock):
+        policy_str = {
+            "type": "customer-secret-keys",
+            "key": "customer_secret_keys",
+            "value": 1,
+            "op": "eq",
+            "value_type": "size",
+        }
+        identity_client = Mock()
+        cus_data = ([{"lifecycle_state": "ACTIVE"}],)
+        response = Response(200, None, cus_data, None)
+        identity_client.list_customer_secret_keys.return_value = response
+        user_mock.get_client.return_value = identity_client
+        resources = [
+            {
+                "id": "ocid1.user.oc1..<unique_ID>",
+                "description": "Cloud Custodian",
+                "customer_secret_keys": cus_data,
+            }
+        ]
+        filter = UserCustomerSecretKeysValueFilter(policy_str)
+        filter.manager = user_mock
+        filtered_resources = filter.process(resources, None)
+        self.assertEqual(len(filtered_resources), 1)
+
+    @patch("c7n_oci.resources.identity.User")
+    def test_cuskey_filter_identity(self, user_mock):
+        policy_str = {
+            "type": "customer-secret-keys",
+            "key": "customer_secret_key.lifecycle_state",
+            "value": "ACTIVE",
+            "op": "eq",
+        }
+        identity_client = Mock()
+        response = Response(200, None, [{"lifecycle_state": "ACTIVE"}], None)
+        identity_client.list_customer_secret_keys.return_value = response
+        user_mock.get_client.return_value = identity_client
+        resources = [{"id": "ocid1.user.oc1..<unique_ID>", "description": "Cloud Custodian"}]
+        filter = UserCustomerSecretKeysValueFilter(policy_str)
+        filter.manager = user_mock
+        filtered_resources = filter.process(resources, None)
+        self.assertEqual(len(filtered_resources), 1)
+
+    @patch("c7n_oci.resources.identity.User")
+    def test_smtpcred_size_identity(self, user_mock):
+        policy_str = {
+            "type": "smtp-credentials",
+            "key": "smtp_credentials",
+            "value": 1,
+            "op": "eq",
+            "value_type": "size",
+        }
+        identity_client = Mock()
+        response = Response(200, None, [{"lifecycle_state": "ACTIVE"}], None)
+        identity_client.list_smtp_credentials.return_value = response
+        user_mock.get_client.return_value = identity_client
+        resources = [{"id": "ocid1.user.oc1..<unique_ID>", "description": "Cloud Custodian"}]
+        filter = UserSmtpCredentialsValueFilter(policy_str)
+        filter.manager = user_mock
+        filtered_resources = filter.process(resources, None)
+        self.assertEqual(len(filtered_resources), 1)
+
+    @patch("c7n_oci.resources.identity.User")
+    def test_smtpcred_exists_identity(self, user_mock):
+        policy_str = {
+            "type": "smtp-credentials",
+            "key": "smtp_credentials",
+            "value": 1,
+            "op": "eq",
+            "value_type": "size",
+        }
+        identity_client = Mock()
+        smtp_data = [{"lifecycle_state": "ACTIVE"}]
+        response = Response(200, None, smtp_data, None)
+        identity_client.list_smtp_credentials.return_value = response
+        user_mock.get_client.return_value = identity_client
+        resources = [
+            {
+                "id": "ocid1.user.oc1..<unique_ID>",
+                "description": "Cloud Custodian",
+                "smtp_credentials": smtp_data,
+            }
+        ]
+        filter = UserSmtpCredentialsValueFilter(policy_str)
+        filter.manager = user_mock
+        filtered_resources = filter.process(resources, None)
+        self.assertEqual(len(filtered_resources), 1)
+
+    @patch("c7n_oci.resources.identity.User")
+    def test_smtpcred_filter_identity(self, user_mock):
+        policy_str = {
+            "type": "smtp-credentials",
+            "key": "smtp_credential.lifecycle_state",
+            "value": "ACTIVE",
+            "op": "eq",
+        }
+        identity_client = Mock()
+        response = Response(200, None, [{"lifecycle_state": "ACTIVE"}], None)
+        identity_client.list_smtp_credentials.return_value = response
+        user_mock.get_client.return_value = identity_client
+        resources = [{"id": "ocid1.user.oc1..<unique_ID>", "description": "Cloud Custodian"}]
+        filter = UserSmtpCredentialsValueFilter(policy_str)
+        filter.manager = user_mock
+        filtered_resources = filter.process(resources, None)
+        self.assertEqual(len(filtered_resources), 1)

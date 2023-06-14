@@ -45,7 +45,7 @@ class OciBaseTest(CustodianTestCore):
     def get_defined_tag_key(self):
         return 'defined_tags."cloud-custodian-test"."mark-for-resize"'
 
-    def wait_for_resource_search_sync(self, duration=15):
+    def wait(self, duration=15):
         if C7N_FUNCTIONAL:
             time.sleep(duration)
 
@@ -75,7 +75,8 @@ def sanitize_response_body(data):
     if isinstance(data, list):
         for resource in data:
             for field in FILTERED_FIELDS:
-                del resource[field]
+                if field in resource:
+                    del resource[field]
     return data
 
 
@@ -98,7 +99,7 @@ class Module(Enum):
 
 
 class Resource(Enum):
-    COMPUTE = "oci.instance"
+    INSTANCE = "oci.instance"
     BUCKET = "oci.bucket"
     VCN = "oci.vcn"
     ZONE = "oci.zone"

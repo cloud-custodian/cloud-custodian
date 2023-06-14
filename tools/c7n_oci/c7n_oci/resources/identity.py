@@ -74,10 +74,7 @@ class UpdateCompartment(OCIBaseAction):
         client = self.manager.get_client()
         params_dict = {}
         params_model = {}
-        if self.data.get("params") and self.data.get("params").get("compartment_id"):
-            params_dict["compartment_id"] = self.data.get("params").get("compartment_id")
-        else:
-            params_dict["compartment_id"] = resource.get("id")
+        params_dict["compartment_id"] = resource.get("id")
         if self.data.get("params").get("update_compartment_details"):
             update_compartment_details_user = self.data.get("params").get(
                 "update_compartment_details"
@@ -201,10 +198,7 @@ class UpdateGroup(OCIBaseAction):
         client = self.manager.get_client()
         params_dict = {}
         params_model = {}
-        if self.data.get("params") and self.data.get("params").get("group_id"):
-            params_dict["group_id"] = self.data.get("params").get("group_id")
-        else:
-            params_dict["group_id"] = resource.get("id")
+        params_dict["group_id"] = resource.get("id")
         if self.data.get("params").get("update_group_details"):
             update_group_details_user = self.data.get("params").get("update_group_details")
             params_model = self.update_params(resource, update_group_details_user)
@@ -322,10 +316,7 @@ class UpdateUser(OCIBaseAction):
         client = self.manager.get_client()
         params_dict = {}
         params_model = {}
-        if self.data.get("params") and self.data.get("params").get("user_id"):
-            params_dict["user_id"] = self.data.get("params").get("user_id")
-        else:
-            params_dict["user_id"] = resource.get("id")
+        params_dict["user_id"] = resource.get("id")
         if self.data.get("params").get("update_user_details"):
             update_user_details_user = self.data.get("params").get("update_user_details")
             params_model = self.update_params(resource, update_user_details_user)

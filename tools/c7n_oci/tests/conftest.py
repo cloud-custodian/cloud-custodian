@@ -25,6 +25,17 @@ def test(request):
     return test_utils
 
 
+@pytest.fixture(params=["WithCompartment", "WithoutCompartment"])
+def with_or_without_compartment(request, monkeypatch):
+    compartments = None
+    if request.param == "WithoutCompartment":
+        compartments = os.getenv("OCI_COMPARTMENTS")
+        monkeypatch.delenv("OCI_COMPARTMENTS", raising=False)
+    yield
+    if request.param == "WithoutCompartment":
+        monkeypatch.setenv("OCI_COMPARTMENTS", compartments)
+
+
 @pytest.hookimpl(tryfirst=True)
 def pytest_xdist_auto_num_workers(config):
     return 1

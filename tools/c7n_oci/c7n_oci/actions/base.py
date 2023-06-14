@@ -1,14 +1,12 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
-import logging
-import time
-from abc import ABC
 import abc
+import logging
+from abc import ABC
 
-from c7n.utils import type_schema
 from c7n.actions import BaseAction
-from c7n_oci.actions.utils import all_operation_completed
+from c7n.utils import type_schema
 
 log = logging.getLogger("custodian.oci.actions.base")
 
@@ -41,36 +39,10 @@ class OCIBaseAction(BaseAction, ABC):
     def process(self, resources):
         batch_processing = self.data.get("block_until_completion")
         if batch_processing:
-            self.batch_processing_enabled = True
-        if self.batch_processing_enabled:
-            ## TODO: As of now setting the count value to '1'
-            # count = batch_processing.get('count', 1)
-            count = 1
-            self.work_request_client = self.manager.get_session().get_work_request_client()
-        resource_count = 0
-        responses = []
-        total_count = 0
+            self.batch_processing_enabled = False
         for resource in resources:
             try:
-                response = self.perform_action(resource)
-                if self.batch_processing_enabled:
-                    responses.append(response)
-                    resource_count = resource_count + 1
-                    operations_completed = False
-                    total_count = total_count + 1
-                    if resource_count == count or total_count == len(resources):
-                        while not operations_completed:
-                            operations_completed = all_operation_completed(
-                                self.work_request_client, responses
-                            )
-                            if not operations_completed:
-                                log.info(
-                                    "Operations that are executed in batch are not completed. So"
-                                    " waiting for 5 seconds..."
-                                )
-                                time.sleep(5)
-                        resource_count = 0
-                        responses.clear()
+                self.perform_action(resource)
             except Exception as ex:
                 res = resource.get("id", resource.get("name"))
                 log.exception(

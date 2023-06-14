@@ -8,9 +8,8 @@ from oci_common import Module, OciBaseTest, Resource, Scope
 
 class TestZone(OciBaseTest):
     def _get_zone_details(self, zone):
-        compartment_id = zone["oci_dns_zone.test_zone.compartment_id"]
         ocid = zone["oci_dns_zone.test_zone.id"]
-        return compartment_id, ocid
+        return ocid
 
     def _fetch_zone_validation_data(self, resource_manager, zone_id):
         client = resource_manager.get_client()
@@ -18,11 +17,11 @@ class TestZone(OciBaseTest):
         return oci.util.to_dict(resource.data)
 
     @terraform(Module.ZONE.value, scope=Scope.CLASS.value)
-    def test_add_defined_tag_to_zone(self, test, zone):
+    def test_add_defined_tag_to_zone(self, test, zone, with_or_without_compartment):
         """
         test adding defined_tags tag to zone
         """
-        compartment_id, zone_ocid = self._get_zone_details(zone)
+        zone_ocid = self._get_zone_details(zone)
         session_factory = test.oci_session_factory(
             self.__class__.__name__, inspect.currentframe().f_code.co_name
         )
@@ -39,7 +38,9 @@ class TestZone(OciBaseTest):
                     {
                         "type": "update-zone",
                         "params": {
-                            "update_zone_details": {"defined_tags": self.get_defined_tag("add_tag")}
+                            "update_zone_details": {
+                                "defined_tags": self.get_defined_tag("add_tag")
+                            }
                         },
                     }
                 ],
@@ -56,7 +57,7 @@ class TestZone(OciBaseTest):
         """
         test update defined_tags tag on zone
         """
-        compartment_id, zone_ocid = self._get_zone_details(zone)
+        zone_ocid = self._get_zone_details(zone)
         session_factory = test.oci_session_factory(
             self.__class__.__name__, inspect.currentframe().f_code.co_name
         )
@@ -92,7 +93,7 @@ class TestZone(OciBaseTest):
         """
         test adding freeform tag to zone
         """
-        compartment_id, zone_ocid = self._get_zone_details(zone)
+        zone_ocid = self._get_zone_details(zone)
         session_factory = test.oci_session_factory(
             self.__class__.__name__, inspect.currentframe().f_code.co_name
         )
@@ -114,7 +115,9 @@ class TestZone(OciBaseTest):
                     {
                         "type": "update-zone",
                         "params": {
-                            "update_zone_details": {"freeform_tags": {"Environment": "Development"}}
+                            "update_zone_details": {
+                                "freeform_tags": {"Environment": "Development"}
+                            }
                         },
                     }
                 ],
@@ -131,7 +134,7 @@ class TestZone(OciBaseTest):
         """
         test update freeform tag of zone
         """
-        compartment_id, zone_ocid = self._get_zone_details(zone)
+        zone_ocid = self._get_zone_details(zone)
         session_factory = test.oci_session_factory(
             self.__class__.__name__, inspect.currentframe().f_code.co_name
         )
@@ -148,7 +151,9 @@ class TestZone(OciBaseTest):
                     {
                         "type": "update-zone",
                         "params": {
-                            "update_zone_details": {"freeform_tags": {"Environment": "Production"}}
+                            "update_zone_details": {
+                                "freeform_tags": {"Environment": "Production"}
+                            }
                         },
                     }
                 ],
@@ -165,7 +170,7 @@ class TestZone(OciBaseTest):
         """
         test get freeform tagged zone
         """
-        compartment_id, zone_ocid = self._get_zone_details(zone)
+        zone_ocid = self._get_zone_details(zone)
         session_factory = test.oci_session_factory(
             self.__class__.__name__, inspect.currentframe().f_code.co_name
         )
@@ -191,7 +196,7 @@ class TestZone(OciBaseTest):
         """
         test remove freeform tag
         """
-        compartment_id, zone_ocid = self._get_zone_details(zone)
+        zone_ocid = self._get_zone_details(zone)
         session_factory = test.oci_session_factory(
             self.__class__.__name__, inspect.currentframe().f_code.co_name
         )
@@ -218,7 +223,7 @@ class TestZone(OciBaseTest):
         """
         test remove defined tag
         """
-        compartment_id, zone_ocid = self._get_zone_details(zone)
+        zone_ocid = self._get_zone_details(zone)
         session_factory = test.oci_session_factory(
             self.__class__.__name__, inspect.currentframe().f_code.co_name
         )

@@ -15,7 +15,7 @@ class TestSubnet(OciBaseTest):
         return self.fetch_validation_data(resource_manager, "get_subnet", subnet_id)
 
     @terraform(Module.SUBNET.value, scope=Scope.CLASS.value)
-    def test_add_defined_tag_to_subnet(self, test, subnet):
+    def test_add_defined_tag_to_subnet(self, test, subnet, with_or_without_compartment):
         """
         test adding defined_tags tag to subnet
         """
@@ -44,7 +44,9 @@ class TestSubnet(OciBaseTest):
             session_factory=session_factory,
         )
         policy.run()
-        resource = self._fetch_instance_validation_data(policy.resource_manager, subnet_ocid)
+        resource = self._fetch_instance_validation_data(
+            policy.resource_manager, subnet_ocid
+        )
         test.assertEqual(resource["id"], subnet_ocid)
         test.assertEqual(self.get_defined_tag_value(resource["defined_tags"]), "true")
 
@@ -78,7 +80,9 @@ class TestSubnet(OciBaseTest):
             session_factory=session_factory,
         )
         policy.run()
-        resource = self._fetch_instance_validation_data(policy.resource_manager, subnet_ocid)
+        resource = self._fetch_instance_validation_data(
+            policy.resource_manager, subnet_ocid
+        )
         test.assertEqual(resource["id"], subnet_ocid)
         test.assertEqual(self.get_defined_tag_value(resource["defined_tags"]), "false")
 
@@ -112,7 +116,9 @@ class TestSubnet(OciBaseTest):
             session_factory=session_factory,
         )
         policy.run()
-        resource = self._fetch_instance_validation_data(policy.resource_manager, subnet_ocid)
+        resource = self._fetch_instance_validation_data(
+            policy.resource_manager, subnet_ocid
+        )
         test.assertEqual(resource["id"], subnet_ocid)
         test.assertEqual(resource["freeform_tags"]["Environment"], "Development")
 
@@ -146,7 +152,9 @@ class TestSubnet(OciBaseTest):
             session_factory=session_factory,
         )
         policy.run()
-        resource = self._fetch_instance_validation_data(policy.resource_manager, subnet_ocid)
+        resource = self._fetch_instance_validation_data(
+            policy.resource_manager, subnet_ocid
+        )
         test.assertEqual(resource["id"], subnet_ocid)
         test.assertEqual(resource["freeform_tags"]["Environment"], "Production")
 
@@ -197,7 +205,9 @@ class TestSubnet(OciBaseTest):
             session_factory=session_factory,
         )
         policy.run()
-        resource = self._fetch_instance_validation_data(policy.resource_manager, subnet_ocid)
+        resource = self._fetch_instance_validation_data(
+            policy.resource_manager, subnet_ocid
+        )
         test.assertEqual(resource["id"], subnet_ocid)
         test.assertEqual(resource["freeform_tags"].get("Project"), None)
 
@@ -227,6 +237,8 @@ class TestSubnet(OciBaseTest):
             session_factory=session_factory,
         )
         policy.run()
-        resource = self._fetch_instance_validation_data(policy.resource_manager, subnet_ocid)
+        resource = self._fetch_instance_validation_data(
+            policy.resource_manager, subnet_ocid
+        )
         test.assertEqual(resource["id"], subnet_ocid)
         test.assertEqual(self.get_defined_tag_value(resource["defined_tags"]), None)

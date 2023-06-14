@@ -3,7 +3,7 @@ interactions:
     body: null
     headers: {}
     method: GET
-    uri: https://identity.us-ashburn-1.oci.oraclecloud.com/20160918/users/ocid1.user.oc1..<unique_ID>
+    uri: https://www-proxy.us.oracle.com:80/20160918/users/ocid1.user.oc1..<unique_ID>
   response:
     body:
       data:
@@ -16,14 +16,17 @@ interactions:
           canUseOAuth2ClientCredentials: true
           canUseSmtpCredentials: true
         compartmentId: ocid1.tenancy.oc1..<unique_ID>
+        dbUserName: user@example.com
         definedTags:
           Oracle-Tags:
-            CreatedBy: scim-service
-            CreatedOn: '2023-04-25T16:55:50.497Z'
+            CreatedBy: Some
+          OracleInternalReserved:
+            Phonebook: '9800'
         description: user@example.com
         emailVerified: true
-        externalIdentifier: fcf75b1a99fd4dbe9c8f5a11dd69a50c
+        externalIdentifier: c5571b54909a443685e610af14bcf73b
         freeformTags:
+          Contractor: 'True'
           TagName: TagValue
           key_old: 'true'
           mfa_activated: 'false'
@@ -32,19 +35,19 @@ interactions:
         isMfaActivated: false
         lifecycleState: ACTIVE
         name: user@example.com
-        timeCreated: '2023-04-25T16:55:50.537Z'
-        timeModified: '2023-06-08T07:59:25.623Z'
+        timeCreated: '2022-07-15T08:25:13.055Z'
+        timeModified: '2023-06-15T07:46:35.168Z'
     headers:
       cache-control:
       - no-cache, no-store, must-revalidate
       content-length:
-      - '990'
+      - '1090'
       content-type:
       - application/json
       date:
-      - Fri, 09 Jun 2023 06:00:58 GMT
+      - Thu, 15 Jun 2023 17:59:48 GMT
       etag:
-      - e3d2cb864e2b0f74308b4ead60ac0e65f2b1d7e8
+      - 393ccea2d8aaf3fad414458040327337b4599133
       pragma:
       - no-cache
       x-content-type-options:
@@ -56,7 +59,7 @@ interactions:
     body: null
     headers: {}
     method: GET
-    uri: https://identity.us-ashburn-1.oci.oraclecloud.com/20160918/users?compartmentId=ocid1.tenancy.oc1..<unique_ID>
+    uri: https://www-proxy.us.oracle.com:80/20160918/users?compartmentId=ocid1.tenancy.oc1..<unique_ID>
   response:
     body:
       data:
@@ -72,21 +75,20 @@ interactions:
         definedTags:
           Oracle-Tags:
             CreatedBy: user@example.com
-            CreatedOn: '2023-06-09T05:59:13.677Z'
+            CreatedOn: '2023-06-15T17:57:53.775Z'
         description: Test User1
         email: test@custodian.com
         emailVerified: false
         externalIdentifier: null
         freeformTags:
-          Cloud_Custodian: 'True'
           key_limit: '2'
         id: ocid1.user.oc1..<unique_ID>
         identityProviderId: null
         isMfaActivated: false
         lifecycleState: ACTIVE
         name: Custodian_User
-        timeCreated: '2023-06-09T05:59:13.775Z'
-        timeModified: '2023-06-09T05:59:19.016Z'
+        timeCreated: '2023-06-15T17:57:53.881Z'
+        timeModified: '2023-06-15T17:58:02.555Z'
       - capabilities:
           canUseApiKeys: true
           canUseAuthTokens: true
@@ -801,7 +803,6 @@ interactions:
         freeformTags:
           TagName: TagValue
           ff_api_key_limit: nox
-          key_limit: Exceeded
           key_limit_exceeded: 'true'
           key_old: 'true'
           mfa_activated: 'false'
@@ -811,7 +812,7 @@ interactions:
         lifecycleState: ACTIVE
         name: user@example.com
         timeCreated: '2021-08-11T15:12:36.720Z'
-        timeModified: '2023-06-08T16:37:08.043Z'
+        timeModified: '2023-06-12T10:03:05.259Z'
       - capabilities:
           canUseApiKeys: true
           canUseAuthTokens: true
@@ -941,7 +942,6 @@ interactions:
         freeformTags:
           Contractor: 'True'
           TagName: TagValue
-          key_limit: '2'
           key_old: 'true'
           mfa_activated: 'false'
         id: ocid1.user.oc1..<unique_ID>
@@ -950,7 +950,7 @@ interactions:
         lifecycleState: ACTIVE
         name: user@example.com
         timeCreated: '2022-07-15T08:25:13.055Z'
-        timeModified: '2023-06-08T16:37:09.118Z'
+        timeModified: '2023-06-15T07:46:35.168Z'
       - capabilities:
           canUseApiKeys: true
           canUseAuthTokens: true
@@ -1015,13 +1015,13 @@ interactions:
       content-encoding:
       - gzip
       content-length:
-      - '4482'
+      - '4471'
       content-type:
       - application/json
       date:
-      - Fri, 09 Jun 2023 06:00:59 GMT
+      - Thu, 15 Jun 2023 17:59:49 GMT
       opc-limit:
-      - '100'
+      - '98'
       pragma:
       - no-cache
       x-content-type-options:
@@ -1033,7 +1033,7 @@ interactions:
     body: null
     headers: {}
     method: GET
-    uri: https://identity.us-ashburn-1.oci.oraclecloud.com/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
+    uri: https://www-proxy.us.oracle.com:80/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
   response:
     body:
       data:
@@ -1041,13 +1041,13 @@ interactions:
         description: Test user auth token
         id: ocid1.credential.oc1..<unique_ID>
         lifecycleState: ACTIVE
-        timeCreated: '2023-06-09T05:59:14.708Z'
+        timeCreated: '2023-06-15T17:57:55.030Z'
         userId: ocid1.user.oc1..<unique_ID>
       - compartmentId: ocid1.tenancy.oc1..<unique_ID>
         description: Test user auth token
         id: ocid1.credential.oc1..<unique_ID>
         lifecycleState: ACTIVE
-        timeCreated: '2023-06-09T05:59:15.233Z'
+        timeCreated: '2023-06-15T17:57:54.593Z'
         userId: ocid1.user.oc1..<unique_ID>
     headers:
       cache-control:
@@ -1055,11 +1055,11 @@ interactions:
       content-encoding:
       - gzip
       content-length:
-      - '347'
+      - '344'
       content-type:
       - application/json
       date:
-      - Fri, 09 Jun 2023 06:01:00 GMT
+      - Thu, 15 Jun 2023 17:59:50 GMT
       pragma:
       - no-cache
       x-content-type-options:
@@ -1071,7 +1071,7 @@ interactions:
     body: null
     headers: {}
     method: GET
-    uri: https://identity.us-ashburn-1.oci.oraclecloud.com/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
+    uri: https://www-proxy.us.oracle.com:80/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
   response:
     body:
       data: []
@@ -1085,7 +1085,7 @@ interactions:
       content-type:
       - application/json
       date:
-      - Fri, 09 Jun 2023 06:01:01 GMT
+      - Thu, 15 Jun 2023 17:59:51 GMT
       pragma:
       - no-cache
       x-content-type-options:
@@ -1097,7 +1097,7 @@ interactions:
     body: null
     headers: {}
     method: GET
-    uri: https://identity.us-ashburn-1.oci.oraclecloud.com/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
+    uri: https://www-proxy.us.oracle.com:80/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
   response:
     body:
       data: []
@@ -1111,7 +1111,7 @@ interactions:
       content-type:
       - application/json
       date:
-      - Fri, 09 Jun 2023 06:01:02 GMT
+      - Thu, 15 Jun 2023 17:59:52 GMT
       pragma:
       - no-cache
       x-content-type-options:
@@ -1123,7 +1123,7 @@ interactions:
     body: null
     headers: {}
     method: GET
-    uri: https://identity.us-ashburn-1.oci.oraclecloud.com/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
+    uri: https://www-proxy.us.oracle.com:80/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
   response:
     body:
       data: []
@@ -1137,7 +1137,7 @@ interactions:
       content-type:
       - application/json
       date:
-      - Fri, 09 Jun 2023 06:01:03 GMT
+      - Thu, 15 Jun 2023 17:59:53 GMT
       pragma:
       - no-cache
       x-content-type-options:
@@ -1149,7 +1149,7 @@ interactions:
     body: null
     headers: {}
     method: GET
-    uri: https://identity.us-ashburn-1.oci.oraclecloud.com/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
+    uri: https://www-proxy.us.oracle.com:80/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
   response:
     body:
       data: []
@@ -1163,7 +1163,7 @@ interactions:
       content-type:
       - application/json
       date:
-      - Fri, 09 Jun 2023 06:01:05 GMT
+      - Thu, 15 Jun 2023 17:59:54 GMT
       pragma:
       - no-cache
       x-content-type-options:
@@ -1175,7 +1175,7 @@ interactions:
     body: null
     headers: {}
     method: GET
-    uri: https://identity.us-ashburn-1.oci.oraclecloud.com/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
+    uri: https://www-proxy.us.oracle.com:80/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
   response:
     body:
       data: []
@@ -1189,7 +1189,7 @@ interactions:
       content-type:
       - application/json
       date:
-      - Fri, 09 Jun 2023 06:01:06 GMT
+      - Thu, 15 Jun 2023 17:59:55 GMT
       pragma:
       - no-cache
       x-content-type-options:
@@ -1201,7 +1201,7 @@ interactions:
     body: null
     headers: {}
     method: GET
-    uri: https://identity.us-ashburn-1.oci.oraclecloud.com/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
+    uri: https://www-proxy.us.oracle.com:80/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
   response:
     body:
       data: []
@@ -1215,7 +1215,7 @@ interactions:
       content-type:
       - application/json
       date:
-      - Fri, 09 Jun 2023 06:01:07 GMT
+      - Thu, 15 Jun 2023 17:59:56 GMT
       pragma:
       - no-cache
       x-content-type-options:
@@ -1227,7 +1227,7 @@ interactions:
     body: null
     headers: {}
     method: GET
-    uri: https://identity.us-ashburn-1.oci.oraclecloud.com/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
+    uri: https://www-proxy.us.oracle.com:80/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
   response:
     body:
       data: []
@@ -1241,7 +1241,7 @@ interactions:
       content-type:
       - application/json
       date:
-      - Fri, 09 Jun 2023 06:01:08 GMT
+      - Thu, 15 Jun 2023 17:59:56 GMT
       pragma:
       - no-cache
       x-content-type-options:
@@ -1253,7 +1253,7 @@ interactions:
     body: null
     headers: {}
     method: GET
-    uri: https://identity.us-ashburn-1.oci.oraclecloud.com/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
+    uri: https://www-proxy.us.oracle.com:80/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
   response:
     body:
       data: []
@@ -1267,7 +1267,7 @@ interactions:
       content-type:
       - application/json
       date:
-      - Fri, 09 Jun 2023 06:01:09 GMT
+      - Thu, 15 Jun 2023 17:59:57 GMT
       pragma:
       - no-cache
       x-content-type-options:
@@ -1279,7 +1279,7 @@ interactions:
     body: null
     headers: {}
     method: GET
-    uri: https://identity.us-ashburn-1.oci.oraclecloud.com/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
+    uri: https://www-proxy.us.oracle.com:80/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
   response:
     body:
       data:
@@ -1299,7 +1299,7 @@ interactions:
       content-type:
       - application/json
       date:
-      - Fri, 09 Jun 2023 06:01:10 GMT
+      - Thu, 15 Jun 2023 17:59:58 GMT
       pragma:
       - no-cache
       x-content-type-options:
@@ -1311,7 +1311,7 @@ interactions:
     body: null
     headers: {}
     method: GET
-    uri: https://identity.us-ashburn-1.oci.oraclecloud.com/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
+    uri: https://www-proxy.us.oracle.com:80/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
   response:
     body:
       data: []
@@ -1325,7 +1325,7 @@ interactions:
       content-type:
       - application/json
       date:
-      - Fri, 09 Jun 2023 06:01:12 GMT
+      - Thu, 15 Jun 2023 17:59:59 GMT
       pragma:
       - no-cache
       x-content-type-options:
@@ -1337,7 +1337,7 @@ interactions:
     body: null
     headers: {}
     method: GET
-    uri: https://identity.us-ashburn-1.oci.oraclecloud.com/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
+    uri: https://www-proxy.us.oracle.com:80/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
   response:
     body:
       data: []
@@ -1351,7 +1351,7 @@ interactions:
       content-type:
       - application/json
       date:
-      - Fri, 09 Jun 2023 06:01:13 GMT
+      - Thu, 15 Jun 2023 18:00:00 GMT
       pragma:
       - no-cache
       x-content-type-options:
@@ -1363,7 +1363,7 @@ interactions:
     body: null
     headers: {}
     method: GET
-    uri: https://identity.us-ashburn-1.oci.oraclecloud.com/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
+    uri: https://www-proxy.us.oracle.com:80/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
   response:
     body:
       data: []
@@ -1377,7 +1377,7 @@ interactions:
       content-type:
       - application/json
       date:
-      - Fri, 09 Jun 2023 06:01:14 GMT
+      - Thu, 15 Jun 2023 18:00:02 GMT
       pragma:
       - no-cache
       x-content-type-options:
@@ -1389,7 +1389,7 @@ interactions:
     body: null
     headers: {}
     method: GET
-    uri: https://identity.us-ashburn-1.oci.oraclecloud.com/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
+    uri: https://www-proxy.us.oracle.com:80/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
   response:
     body:
       data: []
@@ -1403,7 +1403,7 @@ interactions:
       content-type:
       - application/json
       date:
-      - Fri, 09 Jun 2023 06:01:15 GMT
+      - Thu, 15 Jun 2023 18:00:03 GMT
       pragma:
       - no-cache
       x-content-type-options:
@@ -1415,7 +1415,7 @@ interactions:
     body: null
     headers: {}
     method: GET
-    uri: https://identity.us-ashburn-1.oci.oraclecloud.com/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
+    uri: https://www-proxy.us.oracle.com:80/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
   response:
     body:
       data: []
@@ -1429,7 +1429,7 @@ interactions:
       content-type:
       - application/json
       date:
-      - Fri, 09 Jun 2023 06:01:16 GMT
+      - Thu, 15 Jun 2023 18:00:04 GMT
       pragma:
       - no-cache
       x-content-type-options:
@@ -1441,7 +1441,7 @@ interactions:
     body: null
     headers: {}
     method: GET
-    uri: https://identity.us-ashburn-1.oci.oraclecloud.com/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
+    uri: https://www-proxy.us.oracle.com:80/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
   response:
     body:
       data: []
@@ -1455,7 +1455,7 @@ interactions:
       content-type:
       - application/json
       date:
-      - Fri, 09 Jun 2023 06:01:17 GMT
+      - Thu, 15 Jun 2023 18:00:05 GMT
       pragma:
       - no-cache
       x-content-type-options:
@@ -1467,7 +1467,7 @@ interactions:
     body: null
     headers: {}
     method: GET
-    uri: https://identity.us-ashburn-1.oci.oraclecloud.com/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
+    uri: https://www-proxy.us.oracle.com:80/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
   response:
     body:
       data: []
@@ -1481,7 +1481,7 @@ interactions:
       content-type:
       - application/json
       date:
-      - Fri, 09 Jun 2023 06:01:19 GMT
+      - Thu, 15 Jun 2023 18:00:06 GMT
       pragma:
       - no-cache
       x-content-type-options:
@@ -1493,7 +1493,7 @@ interactions:
     body: null
     headers: {}
     method: GET
-    uri: https://identity.us-ashburn-1.oci.oraclecloud.com/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
+    uri: https://www-proxy.us.oracle.com:80/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
   response:
     body:
       data: []
@@ -1507,7 +1507,7 @@ interactions:
       content-type:
       - application/json
       date:
-      - Fri, 09 Jun 2023 06:01:20 GMT
+      - Thu, 15 Jun 2023 18:00:07 GMT
       pragma:
       - no-cache
       x-content-type-options:
@@ -1519,7 +1519,7 @@ interactions:
     body: null
     headers: {}
     method: GET
-    uri: https://identity.us-ashburn-1.oci.oraclecloud.com/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
+    uri: https://www-proxy.us.oracle.com:80/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
   response:
     body:
       data: []
@@ -1533,7 +1533,7 @@ interactions:
       content-type:
       - application/json
       date:
-      - Fri, 09 Jun 2023 06:01:21 GMT
+      - Thu, 15 Jun 2023 18:00:08 GMT
       pragma:
       - no-cache
       x-content-type-options:
@@ -1545,7 +1545,7 @@ interactions:
     body: null
     headers: {}
     method: GET
-    uri: https://identity.us-ashburn-1.oci.oraclecloud.com/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
+    uri: https://www-proxy.us.oracle.com:80/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
   response:
     body:
       data: []
@@ -1559,7 +1559,7 @@ interactions:
       content-type:
       - application/json
       date:
-      - Fri, 09 Jun 2023 06:01:22 GMT
+      - Thu, 15 Jun 2023 18:00:09 GMT
       pragma:
       - no-cache
       x-content-type-options:
@@ -1571,7 +1571,7 @@ interactions:
     body: null
     headers: {}
     method: GET
-    uri: https://identity.us-ashburn-1.oci.oraclecloud.com/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
+    uri: https://www-proxy.us.oracle.com:80/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
   response:
     body:
       data: []
@@ -1585,7 +1585,7 @@ interactions:
       content-type:
       - application/json
       date:
-      - Fri, 09 Jun 2023 06:01:23 GMT
+      - Thu, 15 Jun 2023 18:00:10 GMT
       pragma:
       - no-cache
       x-content-type-options:
@@ -1597,7 +1597,7 @@ interactions:
     body: null
     headers: {}
     method: GET
-    uri: https://identity.us-ashburn-1.oci.oraclecloud.com/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
+    uri: https://www-proxy.us.oracle.com:80/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
   response:
     body:
       data:
@@ -1623,7 +1623,7 @@ interactions:
       content-type:
       - application/json
       date:
-      - Fri, 09 Jun 2023 06:01:25 GMT
+      - Thu, 15 Jun 2023 18:00:11 GMT
       pragma:
       - no-cache
       x-content-type-options:
@@ -1635,7 +1635,7 @@ interactions:
     body: null
     headers: {}
     method: GET
-    uri: https://identity.us-ashburn-1.oci.oraclecloud.com/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
+    uri: https://www-proxy.us.oracle.com:80/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
   response:
     body:
       data: []
@@ -1649,7 +1649,7 @@ interactions:
       content-type:
       - application/json
       date:
-      - Fri, 09 Jun 2023 06:01:26 GMT
+      - Thu, 15 Jun 2023 18:00:12 GMT
       pragma:
       - no-cache
       x-content-type-options:
@@ -1661,7 +1661,7 @@ interactions:
     body: null
     headers: {}
     method: GET
-    uri: https://identity.us-ashburn-1.oci.oraclecloud.com/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
+    uri: https://www-proxy.us.oracle.com:80/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
   response:
     body:
       data: []
@@ -1675,7 +1675,7 @@ interactions:
       content-type:
       - application/json
       date:
-      - Fri, 09 Jun 2023 06:01:27 GMT
+      - Thu, 15 Jun 2023 18:00:13 GMT
       pragma:
       - no-cache
       x-content-type-options:
@@ -1687,7 +1687,7 @@ interactions:
     body: null
     headers: {}
     method: GET
-    uri: https://identity.us-ashburn-1.oci.oraclecloud.com/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
+    uri: https://www-proxy.us.oracle.com:80/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
   response:
     body:
       data:
@@ -1707,7 +1707,7 @@ interactions:
       content-type:
       - application/json
       date:
-      - Fri, 09 Jun 2023 06:01:29 GMT
+      - Thu, 15 Jun 2023 18:00:14 GMT
       pragma:
       - no-cache
       x-content-type-options:
@@ -1719,7 +1719,7 @@ interactions:
     body: null
     headers: {}
     method: GET
-    uri: https://identity.us-ashburn-1.oci.oraclecloud.com/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
+    uri: https://www-proxy.us.oracle.com:80/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
   response:
     body:
       data: []
@@ -1733,7 +1733,7 @@ interactions:
       content-type:
       - application/json
       date:
-      - Fri, 09 Jun 2023 06:01:31 GMT
+      - Thu, 15 Jun 2023 18:00:15 GMT
       pragma:
       - no-cache
       x-content-type-options:
@@ -1745,7 +1745,7 @@ interactions:
     body: null
     headers: {}
     method: GET
-    uri: https://identity.us-ashburn-1.oci.oraclecloud.com/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
+    uri: https://www-proxy.us.oracle.com:80/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
   response:
     body:
       data: []
@@ -1759,7 +1759,7 @@ interactions:
       content-type:
       - application/json
       date:
-      - Fri, 09 Jun 2023 06:01:32 GMT
+      - Thu, 15 Jun 2023 18:00:16 GMT
       pragma:
       - no-cache
       x-content-type-options:
@@ -1771,7 +1771,7 @@ interactions:
     body: null
     headers: {}
     method: GET
-    uri: https://identity.us-ashburn-1.oci.oraclecloud.com/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
+    uri: https://www-proxy.us.oracle.com:80/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
   response:
     body:
       data: []
@@ -1785,7 +1785,7 @@ interactions:
       content-type:
       - application/json
       date:
-      - Fri, 09 Jun 2023 06:01:33 GMT
+      - Thu, 15 Jun 2023 18:00:17 GMT
       pragma:
       - no-cache
       x-content-type-options:
@@ -1797,7 +1797,7 @@ interactions:
     body: null
     headers: {}
     method: GET
-    uri: https://identity.us-ashburn-1.oci.oraclecloud.com/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
+    uri: https://www-proxy.us.oracle.com:80/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
   response:
     body:
       data: []
@@ -1811,7 +1811,7 @@ interactions:
       content-type:
       - application/json
       date:
-      - Fri, 09 Jun 2023 06:01:34 GMT
+      - Thu, 15 Jun 2023 18:00:18 GMT
       pragma:
       - no-cache
       x-content-type-options:
@@ -1823,7 +1823,7 @@ interactions:
     body: null
     headers: {}
     method: GET
-    uri: https://identity.us-ashburn-1.oci.oraclecloud.com/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
+    uri: https://www-proxy.us.oracle.com:80/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
   response:
     body:
       data: []
@@ -1837,7 +1837,7 @@ interactions:
       content-type:
       - application/json
       date:
-      - Fri, 09 Jun 2023 06:01:35 GMT
+      - Thu, 15 Jun 2023 18:00:19 GMT
       pragma:
       - no-cache
       x-content-type-options:
@@ -1849,7 +1849,7 @@ interactions:
     body: null
     headers: {}
     method: GET
-    uri: https://identity.us-ashburn-1.oci.oraclecloud.com/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
+    uri: https://www-proxy.us.oracle.com:80/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
   response:
     body:
       data: []
@@ -1863,7 +1863,7 @@ interactions:
       content-type:
       - application/json
       date:
-      - Fri, 09 Jun 2023 06:01:36 GMT
+      - Thu, 15 Jun 2023 18:00:20 GMT
       pragma:
       - no-cache
       x-content-type-options:
@@ -1875,7 +1875,7 @@ interactions:
     body: null
     headers: {}
     method: GET
-    uri: https://identity.us-ashburn-1.oci.oraclecloud.com/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
+    uri: https://www-proxy.us.oracle.com:80/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
   response:
     body:
       data:
@@ -1901,7 +1901,7 @@ interactions:
       content-type:
       - application/json
       date:
-      - Fri, 09 Jun 2023 06:01:37 GMT
+      - Thu, 15 Jun 2023 18:00:21 GMT
       pragma:
       - no-cache
       x-content-type-options:
@@ -1913,7 +1913,7 @@ interactions:
     body: null
     headers: {}
     method: GET
-    uri: https://identity.us-ashburn-1.oci.oraclecloud.com/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
+    uri: https://www-proxy.us.oracle.com:80/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
   response:
     body:
       data: []
@@ -1927,7 +1927,7 @@ interactions:
       content-type:
       - application/json
       date:
-      - Fri, 09 Jun 2023 06:01:39 GMT
+      - Thu, 15 Jun 2023 18:00:22 GMT
       pragma:
       - no-cache
       x-content-type-options:
@@ -1939,7 +1939,7 @@ interactions:
     body: null
     headers: {}
     method: GET
-    uri: https://identity.us-ashburn-1.oci.oraclecloud.com/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
+    uri: https://www-proxy.us.oracle.com:80/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
   response:
     body:
       data:
@@ -1959,7 +1959,7 @@ interactions:
       content-type:
       - application/json
       date:
-      - Fri, 09 Jun 2023 06:01:40 GMT
+      - Thu, 15 Jun 2023 18:00:23 GMT
       pragma:
       - no-cache
       x-content-type-options:
@@ -1971,7 +1971,7 @@ interactions:
     body: null
     headers: {}
     method: GET
-    uri: https://identity.us-ashburn-1.oci.oraclecloud.com/20160918/users?compartmentId=ocid1.tenancy.oc1..<unique_ID>
+    uri: https://www-proxy.us.oracle.com:80/20160918/users?compartmentId=ocid1.tenancy.oc1..<unique_ID>
   response:
     body:
       data:
@@ -1987,21 +1987,20 @@ interactions:
         definedTags:
           Oracle-Tags:
             CreatedBy: user@example.com
-            CreatedOn: '2023-06-09T05:59:13.677Z'
+            CreatedOn: '2023-06-15T17:57:53.775Z'
         description: Test User1
         email: test@custodian.com
         emailVerified: false
         externalIdentifier: null
         freeformTags:
-          Cloud_Custodian: 'True'
           key_limit: '2'
         id: ocid1.user.oc1..<unique_ID>
         identityProviderId: null
         isMfaActivated: false
         lifecycleState: ACTIVE
         name: Custodian_User
-        timeCreated: '2023-06-09T05:59:13.775Z'
-        timeModified: '2023-06-09T05:59:19.016Z'
+        timeCreated: '2023-06-15T17:57:53.881Z'
+        timeModified: '2023-06-15T17:58:02.555Z'
       - capabilities:
           canUseApiKeys: true
           canUseAuthTokens: true
@@ -2716,7 +2715,6 @@ interactions:
         freeformTags:
           TagName: TagValue
           ff_api_key_limit: nox
-          key_limit: Exceeded
           key_limit_exceeded: 'true'
           key_old: 'true'
           mfa_activated: 'false'
@@ -2726,7 +2724,7 @@ interactions:
         lifecycleState: ACTIVE
         name: user@example.com
         timeCreated: '2021-08-11T15:12:36.720Z'
-        timeModified: '2023-06-08T16:37:08.043Z'
+        timeModified: '2023-06-12T10:03:05.259Z'
       - capabilities:
           canUseApiKeys: true
           canUseAuthTokens: true
@@ -2856,7 +2854,6 @@ interactions:
         freeformTags:
           Contractor: 'True'
           TagName: TagValue
-          key_limit: '2'
           key_old: 'true'
           mfa_activated: 'false'
         id: ocid1.user.oc1..<unique_ID>
@@ -2865,7 +2862,7 @@ interactions:
         lifecycleState: ACTIVE
         name: user@example.com
         timeCreated: '2022-07-15T08:25:13.055Z'
-        timeModified: '2023-06-08T16:37:09.118Z'
+        timeModified: '2023-06-15T07:46:35.168Z'
       - capabilities:
           canUseApiKeys: true
           canUseAuthTokens: true
@@ -2930,13 +2927,13 @@ interactions:
       content-encoding:
       - gzip
       content-length:
-      - '4482'
+      - '4471'
       content-type:
       - application/json
       date:
-      - Fri, 09 Jun 2023 06:01:41 GMT
+      - Thu, 15 Jun 2023 18:00:24 GMT
       opc-limit:
-      - '100'
+      - '98'
       pragma:
       - no-cache
       x-content-type-options:
@@ -2948,7 +2945,7 @@ interactions:
     body: null
     headers: {}
     method: GET
-    uri: https://identity.us-ashburn-1.oci.oraclecloud.com/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
+    uri: https://www-proxy.us.oracle.com:80/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
   response:
     body:
       data:
@@ -2956,13 +2953,13 @@ interactions:
         description: Test user auth token
         id: ocid1.credential.oc1..<unique_ID>
         lifecycleState: ACTIVE
-        timeCreated: '2023-06-09T05:59:14.708Z'
+        timeCreated: '2023-06-15T17:57:55.030Z'
         userId: ocid1.user.oc1..<unique_ID>
       - compartmentId: ocid1.tenancy.oc1..<unique_ID>
         description: Test user auth token
         id: ocid1.credential.oc1..<unique_ID>
         lifecycleState: ACTIVE
-        timeCreated: '2023-06-09T05:59:15.233Z'
+        timeCreated: '2023-06-15T17:57:54.593Z'
         userId: ocid1.user.oc1..<unique_ID>
     headers:
       cache-control:
@@ -2970,11 +2967,11 @@ interactions:
       content-encoding:
       - gzip
       content-length:
-      - '347'
+      - '344'
       content-type:
       - application/json
       date:
-      - Fri, 09 Jun 2023 06:01:42 GMT
+      - Thu, 15 Jun 2023 18:00:25 GMT
       pragma:
       - no-cache
       x-content-type-options:
@@ -2986,7 +2983,7 @@ interactions:
     body: null
     headers: {}
     method: GET
-    uri: https://identity.us-ashburn-1.oci.oraclecloud.com/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
+    uri: https://www-proxy.us.oracle.com:80/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
   response:
     body:
       data: []
@@ -3000,7 +2997,7 @@ interactions:
       content-type:
       - application/json
       date:
-      - Fri, 09 Jun 2023 06:01:44 GMT
+      - Thu, 15 Jun 2023 18:00:26 GMT
       pragma:
       - no-cache
       x-content-type-options:
@@ -3012,7 +3009,7 @@ interactions:
     body: null
     headers: {}
     method: GET
-    uri: https://identity.us-ashburn-1.oci.oraclecloud.com/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
+    uri: https://www-proxy.us.oracle.com:80/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
   response:
     body:
       data: []
@@ -3026,7 +3023,7 @@ interactions:
       content-type:
       - application/json
       date:
-      - Fri, 09 Jun 2023 06:01:45 GMT
+      - Thu, 15 Jun 2023 18:00:27 GMT
       pragma:
       - no-cache
       x-content-type-options:
@@ -3038,7 +3035,7 @@ interactions:
     body: null
     headers: {}
     method: GET
-    uri: https://identity.us-ashburn-1.oci.oraclecloud.com/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
+    uri: https://www-proxy.us.oracle.com:80/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
   response:
     body:
       data: []
@@ -3052,7 +3049,7 @@ interactions:
       content-type:
       - application/json
       date:
-      - Fri, 09 Jun 2023 06:01:46 GMT
+      - Thu, 15 Jun 2023 18:00:28 GMT
       pragma:
       - no-cache
       x-content-type-options:
@@ -3064,7 +3061,7 @@ interactions:
     body: null
     headers: {}
     method: GET
-    uri: https://identity.us-ashburn-1.oci.oraclecloud.com/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
+    uri: https://www-proxy.us.oracle.com:80/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
   response:
     body:
       data: []
@@ -3078,7 +3075,7 @@ interactions:
       content-type:
       - application/json
       date:
-      - Fri, 09 Jun 2023 06:01:47 GMT
+      - Thu, 15 Jun 2023 18:00:29 GMT
       pragma:
       - no-cache
       x-content-type-options:
@@ -3090,7 +3087,7 @@ interactions:
     body: null
     headers: {}
     method: GET
-    uri: https://identity.us-ashburn-1.oci.oraclecloud.com/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
+    uri: https://www-proxy.us.oracle.com:80/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
   response:
     body:
       data: []
@@ -3104,7 +3101,7 @@ interactions:
       content-type:
       - application/json
       date:
-      - Fri, 09 Jun 2023 06:01:48 GMT
+      - Thu, 15 Jun 2023 18:00:30 GMT
       pragma:
       - no-cache
       x-content-type-options:
@@ -3116,7 +3113,7 @@ interactions:
     body: null
     headers: {}
     method: GET
-    uri: https://identity.us-ashburn-1.oci.oraclecloud.com/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
+    uri: https://www-proxy.us.oracle.com:80/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
   response:
     body:
       data: []
@@ -3130,7 +3127,7 @@ interactions:
       content-type:
       - application/json
       date:
-      - Fri, 09 Jun 2023 06:01:50 GMT
+      - Thu, 15 Jun 2023 18:00:31 GMT
       pragma:
       - no-cache
       x-content-type-options:
@@ -3142,7 +3139,7 @@ interactions:
     body: null
     headers: {}
     method: GET
-    uri: https://identity.us-ashburn-1.oci.oraclecloud.com/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
+    uri: https://www-proxy.us.oracle.com:80/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
   response:
     body:
       data: []
@@ -3156,7 +3153,7 @@ interactions:
       content-type:
       - application/json
       date:
-      - Fri, 09 Jun 2023 06:01:51 GMT
+      - Thu, 15 Jun 2023 18:00:32 GMT
       pragma:
       - no-cache
       x-content-type-options:
@@ -3168,7 +3165,7 @@ interactions:
     body: null
     headers: {}
     method: GET
-    uri: https://identity.us-ashburn-1.oci.oraclecloud.com/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
+    uri: https://www-proxy.us.oracle.com:80/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
   response:
     body:
       data: []
@@ -3182,7 +3179,7 @@ interactions:
       content-type:
       - application/json
       date:
-      - Fri, 09 Jun 2023 06:01:52 GMT
+      - Thu, 15 Jun 2023 18:00:34 GMT
       pragma:
       - no-cache
       x-content-type-options:
@@ -3194,7 +3191,7 @@ interactions:
     body: null
     headers: {}
     method: GET
-    uri: https://identity.us-ashburn-1.oci.oraclecloud.com/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
+    uri: https://www-proxy.us.oracle.com:80/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
   response:
     body:
       data:
@@ -3214,7 +3211,7 @@ interactions:
       content-type:
       - application/json
       date:
-      - Fri, 09 Jun 2023 06:01:53 GMT
+      - Thu, 15 Jun 2023 18:00:35 GMT
       pragma:
       - no-cache
       x-content-type-options:
@@ -3226,7 +3223,7 @@ interactions:
     body: null
     headers: {}
     method: GET
-    uri: https://identity.us-ashburn-1.oci.oraclecloud.com/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
+    uri: https://www-proxy.us.oracle.com:80/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
   response:
     body:
       data: []
@@ -3240,7 +3237,7 @@ interactions:
       content-type:
       - application/json
       date:
-      - Fri, 09 Jun 2023 06:01:54 GMT
+      - Thu, 15 Jun 2023 18:00:36 GMT
       pragma:
       - no-cache
       x-content-type-options:
@@ -3252,7 +3249,7 @@ interactions:
     body: null
     headers: {}
     method: GET
-    uri: https://identity.us-ashburn-1.oci.oraclecloud.com/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
+    uri: https://www-proxy.us.oracle.com:80/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
   response:
     body:
       data: []
@@ -3266,7 +3263,7 @@ interactions:
       content-type:
       - application/json
       date:
-      - Fri, 09 Jun 2023 06:01:56 GMT
+      - Thu, 15 Jun 2023 18:00:37 GMT
       pragma:
       - no-cache
       x-content-type-options:
@@ -3278,7 +3275,7 @@ interactions:
     body: null
     headers: {}
     method: GET
-    uri: https://identity.us-ashburn-1.oci.oraclecloud.com/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
+    uri: https://www-proxy.us.oracle.com:80/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
   response:
     body:
       data: []
@@ -3292,7 +3289,7 @@ interactions:
       content-type:
       - application/json
       date:
-      - Fri, 09 Jun 2023 06:01:57 GMT
+      - Thu, 15 Jun 2023 18:00:38 GMT
       pragma:
       - no-cache
       x-content-type-options:
@@ -3304,7 +3301,7 @@ interactions:
     body: null
     headers: {}
     method: GET
-    uri: https://identity.us-ashburn-1.oci.oraclecloud.com/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
+    uri: https://www-proxy.us.oracle.com:80/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
   response:
     body:
       data: []
@@ -3318,7 +3315,7 @@ interactions:
       content-type:
       - application/json
       date:
-      - Fri, 09 Jun 2023 06:01:58 GMT
+      - Thu, 15 Jun 2023 18:00:39 GMT
       pragma:
       - no-cache
       x-content-type-options:
@@ -3330,7 +3327,7 @@ interactions:
     body: null
     headers: {}
     method: GET
-    uri: https://identity.us-ashburn-1.oci.oraclecloud.com/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
+    uri: https://www-proxy.us.oracle.com:80/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
   response:
     body:
       data: []
@@ -3344,7 +3341,7 @@ interactions:
       content-type:
       - application/json
       date:
-      - Fri, 09 Jun 2023 06:01:59 GMT
+      - Thu, 15 Jun 2023 18:00:40 GMT
       pragma:
       - no-cache
       x-content-type-options:
@@ -3356,7 +3353,7 @@ interactions:
     body: null
     headers: {}
     method: GET
-    uri: https://identity.us-ashburn-1.oci.oraclecloud.com/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
+    uri: https://www-proxy.us.oracle.com:80/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
   response:
     body:
       data: []
@@ -3370,7 +3367,7 @@ interactions:
       content-type:
       - application/json
       date:
-      - Fri, 09 Jun 2023 06:02:00 GMT
+      - Thu, 15 Jun 2023 18:00:41 GMT
       pragma:
       - no-cache
       x-content-type-options:
@@ -3382,7 +3379,7 @@ interactions:
     body: null
     headers: {}
     method: GET
-    uri: https://identity.us-ashburn-1.oci.oraclecloud.com/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
+    uri: https://www-proxy.us.oracle.com:80/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
   response:
     body:
       data: []
@@ -3396,7 +3393,7 @@ interactions:
       content-type:
       - application/json
       date:
-      - Fri, 09 Jun 2023 06:02:01 GMT
+      - Thu, 15 Jun 2023 18:00:42 GMT
       pragma:
       - no-cache
       x-content-type-options:
@@ -3408,7 +3405,7 @@ interactions:
     body: null
     headers: {}
     method: GET
-    uri: https://identity.us-ashburn-1.oci.oraclecloud.com/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
+    uri: https://www-proxy.us.oracle.com:80/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
   response:
     body:
       data: []
@@ -3422,7 +3419,7 @@ interactions:
       content-type:
       - application/json
       date:
-      - Fri, 09 Jun 2023 06:02:03 GMT
+      - Thu, 15 Jun 2023 18:00:43 GMT
       pragma:
       - no-cache
       x-content-type-options:
@@ -3434,7 +3431,7 @@ interactions:
     body: null
     headers: {}
     method: GET
-    uri: https://identity.us-ashburn-1.oci.oraclecloud.com/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
+    uri: https://www-proxy.us.oracle.com:80/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
   response:
     body:
       data: []
@@ -3448,7 +3445,7 @@ interactions:
       content-type:
       - application/json
       date:
-      - Fri, 09 Jun 2023 06:02:04 GMT
+      - Thu, 15 Jun 2023 18:00:44 GMT
       pragma:
       - no-cache
       x-content-type-options:
@@ -3460,7 +3457,7 @@ interactions:
     body: null
     headers: {}
     method: GET
-    uri: https://identity.us-ashburn-1.oci.oraclecloud.com/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
+    uri: https://www-proxy.us.oracle.com:80/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
   response:
     body:
       data: []
@@ -3474,7 +3471,7 @@ interactions:
       content-type:
       - application/json
       date:
-      - Fri, 09 Jun 2023 06:02:05 GMT
+      - Thu, 15 Jun 2023 18:00:45 GMT
       pragma:
       - no-cache
       x-content-type-options:
@@ -3486,7 +3483,7 @@ interactions:
     body: null
     headers: {}
     method: GET
-    uri: https://identity.us-ashburn-1.oci.oraclecloud.com/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
+    uri: https://www-proxy.us.oracle.com:80/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
   response:
     body:
       data: []
@@ -3500,7 +3497,7 @@ interactions:
       content-type:
       - application/json
       date:
-      - Fri, 09 Jun 2023 06:02:06 GMT
+      - Thu, 15 Jun 2023 18:00:46 GMT
       pragma:
       - no-cache
       x-content-type-options:
@@ -3512,7 +3509,7 @@ interactions:
     body: null
     headers: {}
     method: GET
-    uri: https://identity.us-ashburn-1.oci.oraclecloud.com/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
+    uri: https://www-proxy.us.oracle.com:80/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
   response:
     body:
       data:
@@ -3538,7 +3535,7 @@ interactions:
       content-type:
       - application/json
       date:
-      - Fri, 09 Jun 2023 06:02:07 GMT
+      - Thu, 15 Jun 2023 18:00:47 GMT
       pragma:
       - no-cache
       x-content-type-options:
@@ -3550,7 +3547,7 @@ interactions:
     body: null
     headers: {}
     method: GET
-    uri: https://identity.us-ashburn-1.oci.oraclecloud.com/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
+    uri: https://www-proxy.us.oracle.com:80/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
   response:
     body:
       data: []
@@ -3564,7 +3561,7 @@ interactions:
       content-type:
       - application/json
       date:
-      - Fri, 09 Jun 2023 06:02:09 GMT
+      - Thu, 15 Jun 2023 18:00:48 GMT
       pragma:
       - no-cache
       x-content-type-options:
@@ -3576,7 +3573,7 @@ interactions:
     body: null
     headers: {}
     method: GET
-    uri: https://identity.us-ashburn-1.oci.oraclecloud.com/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
+    uri: https://www-proxy.us.oracle.com:80/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
   response:
     body:
       data: []
@@ -3590,7 +3587,7 @@ interactions:
       content-type:
       - application/json
       date:
-      - Fri, 09 Jun 2023 06:02:10 GMT
+      - Thu, 15 Jun 2023 18:00:49 GMT
       pragma:
       - no-cache
       x-content-type-options:
@@ -3602,7 +3599,7 @@ interactions:
     body: null
     headers: {}
     method: GET
-    uri: https://identity.us-ashburn-1.oci.oraclecloud.com/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
+    uri: https://www-proxy.us.oracle.com:80/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
   response:
     body:
       data:
@@ -3622,7 +3619,7 @@ interactions:
       content-type:
       - application/json
       date:
-      - Fri, 09 Jun 2023 06:02:11 GMT
+      - Thu, 15 Jun 2023 18:00:50 GMT
       pragma:
       - no-cache
       x-content-type-options:
@@ -3634,7 +3631,7 @@ interactions:
     body: null
     headers: {}
     method: GET
-    uri: https://identity.us-ashburn-1.oci.oraclecloud.com/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
+    uri: https://www-proxy.us.oracle.com:80/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
   response:
     body:
       data: []
@@ -3648,7 +3645,7 @@ interactions:
       content-type:
       - application/json
       date:
-      - Fri, 09 Jun 2023 06:02:12 GMT
+      - Thu, 15 Jun 2023 18:00:51 GMT
       pragma:
       - no-cache
       x-content-type-options:
@@ -3660,7 +3657,7 @@ interactions:
     body: null
     headers: {}
     method: GET
-    uri: https://identity.us-ashburn-1.oci.oraclecloud.com/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
+    uri: https://www-proxy.us.oracle.com:80/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
   response:
     body:
       data: []
@@ -3674,7 +3671,7 @@ interactions:
       content-type:
       - application/json
       date:
-      - Fri, 09 Jun 2023 06:02:13 GMT
+      - Thu, 15 Jun 2023 18:00:52 GMT
       pragma:
       - no-cache
       x-content-type-options:
@@ -3686,7 +3683,7 @@ interactions:
     body: null
     headers: {}
     method: GET
-    uri: https://identity.us-ashburn-1.oci.oraclecloud.com/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
+    uri: https://www-proxy.us.oracle.com:80/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
   response:
     body:
       data: []
@@ -3700,7 +3697,7 @@ interactions:
       content-type:
       - application/json
       date:
-      - Fri, 09 Jun 2023 06:02:15 GMT
+      - Thu, 15 Jun 2023 18:00:53 GMT
       pragma:
       - no-cache
       x-content-type-options:
@@ -3712,7 +3709,7 @@ interactions:
     body: null
     headers: {}
     method: GET
-    uri: https://identity.us-ashburn-1.oci.oraclecloud.com/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
+    uri: https://www-proxy.us.oracle.com:80/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
   response:
     body:
       data: []
@@ -3726,7 +3723,7 @@ interactions:
       content-type:
       - application/json
       date:
-      - Fri, 09 Jun 2023 06:02:16 GMT
+      - Thu, 15 Jun 2023 18:00:54 GMT
       pragma:
       - no-cache
       x-content-type-options:
@@ -3738,7 +3735,7 @@ interactions:
     body: null
     headers: {}
     method: GET
-    uri: https://identity.us-ashburn-1.oci.oraclecloud.com/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
+    uri: https://www-proxy.us.oracle.com:80/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
   response:
     body:
       data: []
@@ -3752,7 +3749,7 @@ interactions:
       content-type:
       - application/json
       date:
-      - Fri, 09 Jun 2023 06:02:17 GMT
+      - Thu, 15 Jun 2023 18:00:55 GMT
       pragma:
       - no-cache
       x-content-type-options:
@@ -3764,7 +3761,7 @@ interactions:
     body: null
     headers: {}
     method: GET
-    uri: https://identity.us-ashburn-1.oci.oraclecloud.com/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
+    uri: https://www-proxy.us.oracle.com:80/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
   response:
     body:
       data: []
@@ -3778,7 +3775,7 @@ interactions:
       content-type:
       - application/json
       date:
-      - Fri, 09 Jun 2023 06:02:18 GMT
+      - Thu, 15 Jun 2023 18:00:56 GMT
       pragma:
       - no-cache
       x-content-type-options:
@@ -3790,7 +3787,7 @@ interactions:
     body: null
     headers: {}
     method: GET
-    uri: https://identity.us-ashburn-1.oci.oraclecloud.com/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
+    uri: https://www-proxy.us.oracle.com:80/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
   response:
     body:
       data:
@@ -3816,7 +3813,7 @@ interactions:
       content-type:
       - application/json
       date:
-      - Fri, 09 Jun 2023 06:02:19 GMT
+      - Thu, 15 Jun 2023 18:00:57 GMT
       pragma:
       - no-cache
       x-content-type-options:
@@ -3828,7 +3825,7 @@ interactions:
     body: null
     headers: {}
     method: GET
-    uri: https://identity.us-ashburn-1.oci.oraclecloud.com/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
+    uri: https://www-proxy.us.oracle.com:80/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
   response:
     body:
       data: []
@@ -3842,7 +3839,7 @@ interactions:
       content-type:
       - application/json
       date:
-      - Fri, 09 Jun 2023 06:02:20 GMT
+      - Thu, 15 Jun 2023 18:00:58 GMT
       pragma:
       - no-cache
       x-content-type-options:
@@ -3854,7 +3851,7 @@ interactions:
     body: null
     headers: {}
     method: GET
-    uri: https://identity.us-ashburn-1.oci.oraclecloud.com/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
+    uri: https://www-proxy.us.oracle.com:80/20160918/users/ocid1.user.oc1..<unique_ID>/authTokens
   response:
     body:
       data:
@@ -3874,7 +3871,7 @@ interactions:
       content-type:
       - application/json
       date:
-      - Fri, 09 Jun 2023 06:02:22 GMT
+      - Thu, 15 Jun 2023 18:00:59 GMT
       pragma:
       - no-cache
       x-content-type-options:

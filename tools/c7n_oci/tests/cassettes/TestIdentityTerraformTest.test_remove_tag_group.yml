@@ -45,7 +45,7 @@ interactions:
       content-type:
       - application/json
       date:
-      - Thu, 15 Jun 2023 17:57:28 GMT
+      - Thu, 15 Jun 2023 17:57:32 GMT
       etag:
       - 393ccea2d8aaf3fad414458040327337b4599133
       pragma:
@@ -93,6 +93,7 @@ interactions:
         description: Custodian Test
         freeformTags:
           Cloud_Custodian: Present
+          Environment: Development
         id: ocid1.group.oc1..<unique_ID>
         lifecycleState: ACTIVE
         name: Custodian-Dev-Group
@@ -114,13 +115,13 @@ interactions:
       content-encoding:
       - gzip
       content-length:
-      - '686'
+      - '703'
       content-type:
       - application/json
       date:
-      - Thu, 15 Jun 2023 17:57:29 GMT
+      - Thu, 15 Jun 2023 17:57:32 GMT
       opc-limit:
-      - '100'
+      - '98'
       pragma:
       - no-cache
       x-content-type-options:
@@ -143,7 +144,6 @@ interactions:
             CreatedOn: '2023-06-15T17:57:25.020Z'
         description: Custodian Test
         freeformTags:
-          Cloud_Custodian: Present
           Environment: Development
         id: ocid1.group.oc1..<unique_ID>
         lifecycleState: ACTIVE
@@ -153,13 +153,13 @@ interactions:
       cache-control:
       - no-cache, no-store, must-revalidate
       content-length:
-      - '616'
+      - '581'
       content-type:
       - application/json
       date:
-      - Thu, 15 Jun 2023 17:57:30 GMT
+      - Thu, 15 Jun 2023 17:57:33 GMT
       etag:
-      - 5698b49a235222231d99e33fc3be3082ab1d30e8
+      - 54fcc986e542bfb6127f703b2a95c01219f3fdc5
       pragma:
       - no-cache
       x-content-type-options:
@@ -182,7 +182,6 @@ interactions:
             CreatedOn: '2023-06-15T17:57:25.020Z'
         description: Custodian Test
         freeformTags:
-          Cloud_Custodian: Present
           Environment: Development
         id: ocid1.group.oc1..<unique_ID>
         lifecycleState: ACTIVE
@@ -192,13 +191,13 @@ interactions:
       cache-control:
       - no-cache, no-store, must-revalidate
       content-length:
-      - '525'
+      - '497'
       content-type:
       - application/json
       date:
-      - Thu, 15 Jun 2023 17:57:31 GMT
+      - Thu, 15 Jun 2023 17:57:34 GMT
       etag:
-      - 5698b49a235222231d99e33fc3be3082ab1d30e8
+      - 54fcc986e542bfb6127f703b2a95c01219f3fdc5
       pragma:
       - no-cache
       x-content-type-options:

@@ -7,19 +7,18 @@ from oci_common import OciBaseTest, Resource, Scope, Module
 
 class TestVcn(OciBaseTest):
     def _get_vcn_details(self, vcn):
-        compartment_id = vcn["oci_core_vcn.test_virtual_network_vcn.compartment_id"]
         ocid = vcn["oci_core_vcn.test_virtual_network_vcn.id"]
-        return compartment_id, ocid
+        return ocid
 
     def _fetch_instance_validation_data(self, resource_manager, vcn_id):
         return self.fetch_validation_data(resource_manager, "get_vcn", vcn_id)
 
     @terraform(Module.VCN.value, scope=Scope.CLASS.value)
-    def test_add_defined_tag_to_vcn(self, test, vcn):
+    def test_add_defined_tag_to_vcn(self, test, vcn, with_or_without_compartment):
         """
         test adding defined_tags tag to vcn
         """
-        compartment_id, vcn_ocid = self._get_vcn_details(vcn)
+        vcn_ocid = self._get_vcn_details(vcn)
         session_factory = test.oci_session_factory(
             self.__class__.__name__, inspect.currentframe().f_code.co_name
         )
@@ -34,7 +33,9 @@ class TestVcn(OciBaseTest):
                     {
                         "type": "update-vcn",
                         "params": {
-                            "update_vcn_details": {"defined_tags": self.get_defined_tag("add_tag")}
+                            "update_vcn_details": {
+                                "defined_tags": self.get_defined_tag("add_tag")
+                            }
                         },
                     }
                 ],
@@ -42,7 +43,9 @@ class TestVcn(OciBaseTest):
             session_factory=session_factory,
         )
         policy.run()
-        resource = self._fetch_instance_validation_data(policy.resource_manager, vcn_ocid)
+        resource = self._fetch_instance_validation_data(
+            policy.resource_manager, vcn_ocid
+        )
         test.assertEqual(resource["id"], vcn_ocid)
         test.assertEqual(self.get_defined_tag_value(resource["defined_tags"]), "true")
 
@@ -51,7 +54,7 @@ class TestVcn(OciBaseTest):
         """
         test update defined_tags tag on vcn
         """
-        compartment_id, vcn_ocid = self._get_vcn_details(vcn)
+        vcn_ocid = self._get_vcn_details(vcn)
         session_factory = test.oci_session_factory(
             self.__class__.__name__, inspect.currentframe().f_code.co_name
         )
@@ -76,7 +79,9 @@ class TestVcn(OciBaseTest):
             session_factory=session_factory,
         )
         policy.run()
-        resource = self._fetch_instance_validation_data(policy.resource_manager, vcn_ocid)
+        resource = self._fetch_instance_validation_data(
+            policy.resource_manager, vcn_ocid
+        )
         test.assertEqual(resource["id"], vcn_ocid)
         test.assertEqual(self.get_defined_tag_value(resource["defined_tags"]), "false")
 
@@ -85,7 +90,7 @@ class TestVcn(OciBaseTest):
         """
         test adding freeform tag to vcn
         """
-        compartment_id, vcn_ocid = self._get_vcn_details(vcn)
+        vcn_ocid = self._get_vcn_details(vcn)
         session_factory = test.oci_session_factory(
             self.__class__.__name__, inspect.currentframe().f_code.co_name
         )
@@ -100,7 +105,9 @@ class TestVcn(OciBaseTest):
                     {
                         "type": "update-vcn",
                         "params": {
-                            "update_vcn_details": {"freeform_tags": {"Environment": "Development"}}
+                            "update_vcn_details": {
+                                "freeform_tags": {"Environment": "Development"}
+                            }
                         },
                     }
                 ],
@@ -108,7 +115,9 @@ class TestVcn(OciBaseTest):
             session_factory=session_factory,
         )
         policy.run()
-        resource = self._fetch_instance_validation_data(policy.resource_manager, vcn_ocid)
+        resource = self._fetch_instance_validation_data(
+            policy.resource_manager, vcn_ocid
+        )
         test.assertEqual(resource["id"], vcn_ocid)
         test.assertEqual(resource["freeform_tags"]["Environment"], "Development")
 
@@ -117,7 +126,7 @@ class TestVcn(OciBaseTest):
         """
         test update freeform tag of vcn
         """
-        compartment_id, vcn_ocid = self._get_vcn_details(vcn)
+        vcn_ocid = self._get_vcn_details(vcn)
         session_factory = test.oci_session_factory(
             self.__class__.__name__, inspect.currentframe().f_code.co_name
         )
@@ -132,7 +141,9 @@ class TestVcn(OciBaseTest):
                     {
                         "type": "update-vcn",
                         "params": {
-                            "update_vcn_details": {"freeform_tags": {"Environment": "Production"}}
+                            "update_vcn_details": {
+                                "freeform_tags": {"Environment": "Production"}
+                            }
                         },
                     }
                 ],
@@ -140,7 +151,9 @@ class TestVcn(OciBaseTest):
             session_factory=session_factory,
         )
         policy.run()
-        resource = self._fetch_instance_validation_data(policy.resource_manager, vcn_ocid)
+        resource = self._fetch_instance_validation_data(
+            policy.resource_manager, vcn_ocid
+        )
         test.assertEqual(resource["id"], vcn_ocid)
         test.assertEqual(resource["freeform_tags"]["Environment"], "Production")
 
@@ -149,7 +162,7 @@ class TestVcn(OciBaseTest):
         """
         test get freeform tagged vcn
         """
-        compartment_id, vcn_ocid = self._get_vcn_details(vcn)
+        vcn_ocid = self._get_vcn_details(vcn)
         session_factory = test.oci_session_factory(
             self.__class__.__name__, inspect.currentframe().f_code.co_name
         )
@@ -173,7 +186,7 @@ class TestVcn(OciBaseTest):
         """
         test remove freeform tag
         """
-        compartment_id, vcn_ocid = self._get_vcn_details(vcn)
+        vcn_ocid = self._get_vcn_details(vcn)
         session_factory = test.oci_session_factory(
             self.__class__.__name__, inspect.currentframe().f_code.co_name
         )
@@ -191,7 +204,9 @@ class TestVcn(OciBaseTest):
             session_factory=session_factory,
         )
         policy.run()
-        resource = self._fetch_instance_validation_data(policy.resource_manager, vcn_ocid)
+        resource = self._fetch_instance_validation_data(
+            policy.resource_manager, vcn_ocid
+        )
         test.assertEqual(resource["id"], vcn_ocid)
         test.assertEqual(resource["freeform_tags"].get("Project"), None)
 
@@ -200,7 +215,7 @@ class TestVcn(OciBaseTest):
         """
         test remove defined tag
         """
-        compartment_id, vcn_ocid = self._get_vcn_details(vcn)
+        vcn_ocid = self._get_vcn_details(vcn)
         session_factory = test.oci_session_factory(
             self.__class__.__name__, inspect.currentframe().f_code.co_name
         )
@@ -221,6 +236,8 @@ class TestVcn(OciBaseTest):
             session_factory=session_factory,
         )
         policy.run()
-        resource = self._fetch_instance_validation_data(policy.resource_manager, vcn_ocid)
+        resource = self._fetch_instance_validation_data(
+            policy.resource_manager, vcn_ocid
+        )
         test.assertEqual(resource["id"], vcn_ocid)
         test.assertEqual(self.get_defined_tag_value(resource["defined_tags"]), None)

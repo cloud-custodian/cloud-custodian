@@ -45,7 +45,7 @@ interactions:
       content-type:
       - application/json
       date:
-      - Thu, 15 Jun 2023 17:57:03 GMT
+      - Thu, 15 Jun 2023 17:57:09 GMT
       etag:
       - 393ccea2d8aaf3fad414458040327337b4599133
       pragma:
@@ -94,7 +94,7 @@ interactions:
             CreatedOn: '2023-06-15T17:56:54.292Z'
         description: Custodian Test
         freeformTags:
-          Cloud_Custodian_Test: 'True'
+          Environment: Development
         id: ocid1.compartment.oc1..<unique_ID>
         lifecycleState: ACTIVE
         name: Cloud-Custodian-Test1
@@ -447,53 +447,13 @@ interactions:
       content-encoding:
       - gzip
       content-length:
-      - '3420'
+      - '3412'
       content-type:
       - application/json
       date:
-      - Thu, 15 Jun 2023 17:57:03 GMT
+      - Thu, 15 Jun 2023 17:57:10 GMT
       opc-limit:
-      - '100'
-      pragma:
-      - no-cache
-      x-content-type-options:
-      - nosniff
-    status:
-      code: 200
-      message: OK
-- request:
-    body: mock_body
-    headers: {}
-    method: PUT
-    uri: https://www-proxy.us.oracle.com:80/20160918/compartments/ocid1.compartment.oc1..<unique_ID>
-  response:
-    body:
-      data:
-        compartmentId: ocid1.tenancy.oc1..<unique_ID>
-        definedTags:
-          Oracle-Tags:
-            CreatedBy: user@example.com
-            CreatedOn: '2023-06-15T17:56:54.292Z'
-        description: Custodian Test
-        freeformTags:
-          Cloud_Custodian_Test: 'True'
-          Environment: Development
-        id: ocid1.compartment.oc1..<unique_ID>
-        isAccessible: true
-        lifecycleState: ACTIVE
-        name: Cloud-Custodian-Test1
-        timeCreated: '2023-06-15T17:56:54.422Z'
-    headers:
-      cache-control:
-      - no-cache, no-store, must-revalidate
-      content-length:
-      - '651'
-      content-type:
-      - application/json
-      date:
-      - Thu, 15 Jun 2023 17:57:04 GMT
-      etag:
-      - 6184b529db923a0524cf77a1886a2e41cec1f137
+      - '98'
       pragma:
       - no-cache
       x-content-type-options:
@@ -516,7 +476,6 @@ interactions:
             CreatedOn: '2023-06-15T17:56:54.292Z'
         description: Custodian Test
         freeformTags:
-          Cloud_Custodian_Test: 'True'
           Environment: Development
         id: ocid1.compartment.oc1..<unique_ID>
         isAccessible: true
@@ -527,13 +486,13 @@ interactions:
       cache-control:
       - no-cache, no-store, must-revalidate
       content-length:
-      - '555'
+      - '525'
       content-type:
       - application/json
       date:
-      - Thu, 15 Jun 2023 17:57:05 GMT
+      - Thu, 15 Jun 2023 17:57:11 GMT
       etag:
-      - 6184b529db923a0524cf77a1886a2e41cec1f137
+      - d270457d25b5f11302afa90fe824a0c95d56762e
       pragma:
       - no-cache
       x-content-type-options:

@@ -77,7 +77,7 @@ resource "oci_core_instance" "test_instance" {
   create_vnic_details {
     subnet_id                 = oci_core_subnet.test_subnet.id
     display_name              = "Primaryvnic"
-    assign_public_ip          = false
+    assign_public_ip          = true
     assign_private_dns_record = true
     hostname_label            = "exampleinstance${count.index}"
   }
