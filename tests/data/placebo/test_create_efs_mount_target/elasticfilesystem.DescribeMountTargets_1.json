@@ -1,0 +1,44 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "MountTargets": [
+            {
+                "OwnerId": "644160558196",
+                "MountTargetId": "fsmt-0362a17d4dc9b3eeb",
+                "FileSystemId": "fs-028d2a86fa813320a",
+                "SubnetId": "subnet-efbcccb7",
+                "LifeCycleState": "available",
+                "IpAddress": "172.31.16.47",
+                "NetworkInterfaceId": "eni-0287b005915dca553",
+                "AvailabilityZoneId": "use1-az6",
+                "AvailabilityZoneName": "us-east-1b",
+                "VpcId": "vpc-d2d616b5"
+            },
+            {
+                "OwnerId": "644160558196",
+                "MountTargetId": "fsmt-07e238762319765b9",
+                "FileSystemId": "fs-028d2a86fa813320a",
+                "SubnetId": "subnet-914763e7",
+                "LifeCycleState": "available",
+                "IpAddress": "172.31.7.53",
+                "NetworkInterfaceId": "eni-06a7f784c86ba0f34",
+                "AvailabilityZoneId": "use1-az4",
+                "AvailabilityZoneName": "us-east-1a",
+                "VpcId": "vpc-d2d616b5"
+            },
+            {
+                "OwnerId": "644160558196",
+                "MountTargetId": "fsmt-0c95009f8ad978bea",
+                "FileSystemId": "fs-028d2a86fa813320a",
+                "SubnetId": "subnet-e3b194de",
+                "LifeCycleState": "available",
+                "IpAddress": "172.31.42.135",
+                "NetworkInterfaceId": "eni-0c37098fca7653d4c",
+                "AvailabilityZoneId": "use1-az3",
+                "AvailabilityZoneName": "us-east-1e",
+                "VpcId": "vpc-d2d616b5"
+            }
+        ]
+    }
+}

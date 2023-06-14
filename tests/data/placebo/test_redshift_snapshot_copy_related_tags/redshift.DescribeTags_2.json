@@ -1,0 +1,16 @@
+{
+    "status_code": 200,
+    "data": {
+        "TaggedResources": [
+            {
+                "Tag": {
+                    "Key": "Owner",
+                    "Value": "c7n"
+                },
+                "ResourceName": "arn:aws:redshift:us-east-1:644160558196:snapshot:redshift-cluster-2/snap-2",
+                "ResourceType": "snapshot"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

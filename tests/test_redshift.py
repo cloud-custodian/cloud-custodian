@@ -4,6 +4,7 @@ from .common import BaseTest
 from unittest.mock import MagicMock
 import time
 import datetime
+import logging
 from c7n.testing import mock_datetime_now
 from dateutil import parser
 import c7n.resources.redshift
@@ -630,6 +631,35 @@ class TestRedshiftSnapshot(BaseTest):
             "Snapshots"
         ]
         self.assertFalse(ss[0].get("AccountsWithRestoreAccess"))
+
+    def test_redshift_snapshot_copy_related_tags(self):
+        factory = self.replay_flight_data("test_redshift_snapshot_copy_related_tags")
+        client = factory().client("redshift")
+        p = self.load_policy(
+            {
+                "name": "rds-snapshot-copy-related-tags",
+                "resource": "redshift-snapshot",
+                "filters": [{"tag:Owner": "absent"}],
+                "actions": [
+                    {
+                        "type": "copy-related-tag",
+                        "key": "ClusterIdentifier",
+                        "resource": "redshift",
+                        "tags": ["Owner"]
+                    }],
+            },
+            session_factory=factory,
+        )
+        output = self.capture_logging("custodian.actions", level=logging.INFO)
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
+        log_output = output.getvalue()
+        self.assertIn("Tagged 2 resources from related", log_output)
+        arns = p.resource_manager.get_arns(resources)
+        for arn in arns:
+            tags = client.describe_tags(ResourceName=arn)["TaggedResources"]
+            tag_map = {t["Tag"]["Key"] for t in tags}
+            self.assertTrue("Owner" in tag_map)
 
 
 class TestModifyVpcSecurityGroupsAction(BaseTest):
