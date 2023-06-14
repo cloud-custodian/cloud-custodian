@@ -1,0 +1,199 @@
+{
+    "status_code": 200,
+    "data": {
+        "Snapshots": [
+            {
+                "SnapshotIdentifier": "snap-1",
+                "ClusterIdentifier": "redshift-cluster-1",
+                "SnapshotCreateTime": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 6,
+                    "day": 7,
+                    "hour": 20,
+                    "minute": 12,
+                    "second": 27,
+                    "microsecond": 906000
+                },
+                "Status": "available",
+                "Port": 5439,
+                "AvailabilityZone": "us-east-1a",
+                "ClusterCreateTime": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 6,
+                    "day": 7,
+                    "hour": 19,
+                    "minute": 57,
+                    "second": 14,
+                    "microsecond": 656000
+                },
+                "MasterUsername": "awsuser",
+                "ClusterVersion": "1.0",
+                "EngineFullVersion": "1.0.51304",
+                "SnapshotType": "manual",
+                "NodeType": "dc2.large",
+                "NumberOfNodes": 1,
+                "DBName": "dev",
+                "VpcId": "vpc-d2d616b5",
+                "Encrypted": false,
+                "EncryptedWithHSM": false,
+                "OwnerAccount": "644160558196",
+                "TotalBackupSizeInMegaBytes": 31.0,
+                "ActualIncrementalBackupSizeInMegaBytes": 9.0,
+                "BackupProgressInMegaBytes": 9.0,
+                "CurrentBackupRateInMegaBytesPerSecond": 7.4319,
+                "EstimatedSecondsToCompletion": 0,
+                "ElapsedTimeInSeconds": 1,
+                "Tags": [
+                    {
+                        "Key": "Owner",
+                        "Value": "manual"
+                    }
+                ],
+                "RestorableNodeTypes": [
+                    "dc2.large"
+                ],
+                "EnhancedVpcRouting": false,
+                "MaintenanceTrackName": "current",
+                "ManualSnapshotRetentionPeriod": 1,
+                "ManualSnapshotRemainingDays": 0,
+                "SnapshotRetentionStartTime": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 6,
+                    "day": 7,
+                    "hour": 20,
+                    "minute": 12,
+                    "second": 29,
+                    "microsecond": 117000
+                }
+            },
+            {
+                "SnapshotIdentifier": "snap-3",
+                "ClusterIdentifier": "redshift-cluster-3",
+                "SnapshotCreateTime": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 6,
+                    "day": 7,
+                    "hour": 19,
+                    "minute": 42,
+                    "second": 38,
+                    "microsecond": 864000
+                },
+                "Status": "available",
+                "Port": 5439,
+                "AvailabilityZone": "us-east-1e",
+                "ClusterCreateTime": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 6,
+                    "day": 7,
+                    "hour": 19,
+                    "minute": 38,
+                    "second": 18,
+                    "microsecond": 122000
+                },
+                "MasterUsername": "awsuser",
+                "ClusterVersion": "1.0",
+                "EngineFullVersion": "1.0.51304",
+                "SnapshotType": "manual",
+                "NodeType": "dc2.large",
+                "NumberOfNodes": 1,
+                "DBName": "dev",
+                "VpcId": "vpc-d2d616b5",
+                "Encrypted": false,
+                "EncryptedWithHSM": false,
+                "OwnerAccount": "644160558196",
+                "TotalBackupSizeInMegaBytes": 31.0,
+                "ActualIncrementalBackupSizeInMegaBytes": 9.0,
+                "BackupProgressInMegaBytes": 9.0,
+                "CurrentBackupRateInMegaBytesPerSecond": 8.1967,
+                "EstimatedSecondsToCompletion": 0,
+                "ElapsedTimeInSeconds": 1,
+                "Tags": [],
+                "RestorableNodeTypes": [
+                    "dc2.large"
+                ],
+                "EnhancedVpcRouting": false,
+                "MaintenanceTrackName": "current",
+                "ManualSnapshotRetentionPeriod": 1,
+                "ManualSnapshotRemainingDays": 0,
+                "SnapshotRetentionStartTime": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 6,
+                    "day": 7,
+                    "hour": 19,
+                    "minute": 42,
+                    "second": 39,
+                    "microsecond": 962000
+                }
+            },
+            {
+                "SnapshotIdentifier": "snap-2",
+                "ClusterIdentifier": "redshift-cluster-2",
+                "SnapshotCreateTime": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 6,
+                    "day": 7,
+                    "hour": 19,
+                    "minute": 39,
+                    "second": 27,
+                    "microsecond": 61000
+                },
+                "Status": "available",
+                "Port": 5439,
+                "AvailabilityZone": "us-east-1e",
+                "ClusterCreateTime": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 6,
+                    "day": 7,
+                    "hour": 19,
+                    "minute": 38,
+                    "second": 45,
+                    "microsecond": 527000
+                },
+                "MasterUsername": "awsuser",
+                "ClusterVersion": "1.0",
+                "EngineFullVersion": "1.0.51304",
+                "SnapshotType": "manual",
+                "NodeType": "dc2.large",
+                "NumberOfNodes": 1,
+                "DBName": "dev",
+                "VpcId": "vpc-d2d616b5",
+                "Encrypted": false,
+                "EncryptedWithHSM": false,
+                "OwnerAccount": "644160558196",
+                "TotalBackupSizeInMegaBytes": 31.0,
+                "ActualIncrementalBackupSizeInMegaBytes": 9.0,
+                "BackupProgressInMegaBytes": 9.0,
+                "CurrentBackupRateInMegaBytesPerSecond": 8.0071,
+                "EstimatedSecondsToCompletion": 0,
+                "ElapsedTimeInSeconds": 1,
+                "Tags": [],
+                "RestorableNodeTypes": [
+                    "dc2.large"
+                ],
+                "EnhancedVpcRouting": false,
+                "MaintenanceTrackName": "current",
+                "ManualSnapshotRetentionPeriod": 1,
+                "ManualSnapshotRemainingDays": 0,
+                "SnapshotRetentionStartTime": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 6,
+                    "day": 7,
+                    "hour": 19,
+                    "minute": 39,
+                    "second": 28,
+                    "microsecond": 185000
+                }
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

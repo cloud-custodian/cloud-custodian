@@ -1253,7 +1253,7 @@ class PropagateTags(Action):
                 k: v for k, v in tag_map.items()
                 if k in self.data['tags']}
 
-        if not tag_map and not self.get('trim', False):
+        if not tag_map and not self.data.get('trim', False):
             self.log.error(
                 'No tags found to propagate on asg:{} tags configured:{}'.format(
                     asg['AutoScalingGroupName'], self.data.get('tags')))

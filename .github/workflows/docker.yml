@@ -1,6 +1,7 @@
 name: "Docker Build"
 on:
-  # build a daily dev image  
+  workflow_dispatch: {}
+  # build a daily dev image
   schedule:
     - cron: "42 6 * * *"
   push:
