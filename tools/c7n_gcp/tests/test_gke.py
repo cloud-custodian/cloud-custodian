@@ -2,7 +2,6 @@
 # SPDX-License-Identifier: Apache-2.0
 import time
 
-import pytest
 from gcp_common import BaseTest, event_data
 
 
@@ -73,11 +72,10 @@ class KubernetesClusterTest(BaseTest):
             ],
         )
 
-    @pytest.mark.skip(reason="Need test data for this")
     def test_cluster_set_labels(self):
         project_id = 'cloud-custodian'
         name = "standard-cluster-1"
-        factory = self.replay_flight_data('gke-cluster-label', project_id)
+        factory = self.replay_flight_data('gke-cluster-set-label', project_id)
         p = self.load_policy(
             {
                 'name': 'label-gke-cluster',
@@ -94,20 +92,19 @@ class KubernetesClusterTest(BaseTest):
         client = p.resource_manager.get_client()
         result = client.execute_query(
             'list', {
-                        'project': project_id,
-                        'filter': [{'name': name}],
-                        'zone': resources[0]['zone'].rsplit('/', 1)[-1]
-                    })
-        self.assertEqual(result['items'][0]['resourceLabels']
-                            ['test_label'], 'test_value')
-    @pytest.mark.skip(reason="Need test data for this")
+                        'parent': 'projects/{}/locations/{}'.format(
+                            project_id,
+                            resources[0]['zone'])
+                    }),
+        self.assertEqual(result[0]['clusters'][0]['resourceLabels']['test_label'], 'test_value')
+
     def test_cluster_remove_labels(self):
         project_id = 'cloud-custodian'
         name = "standard-cluster-1"
-        factory = self.replay_flight_data('gke-cluster-label', project_id)
+        factory = self.replay_flight_data('gke-cluster-remove-label', project_id)
         p = self.load_policy(
             {
-                'name': 'label-gke-cluster',
+                'name': 'unlabel-gke-cluster',
                 'resource': 'gcp.gke-cluster',
                 'filters': [{'name': name}],
                 'actions': [{'type': 'set-labels',
@@ -121,12 +118,11 @@ class KubernetesClusterTest(BaseTest):
         client = p.resource_manager.get_client()
         result = client.execute_query(
             'list', {
-                        'project': project_id,
-                        'filter': [{'name': name}],
-                        'zone': resources[0]['zone'].rsplit('/', 1)[-1]
+                        'parent': 'projects/{}/locations/{}'.format(
+                            project_id,
+                            resources[0]['zone'])
                     })
-        self.assertEqual(result['items'][0]['resourceLabels']
-                            ['test_label'], None)
+        self.assertEqual(result['clusters'][0]['resourceLabels'].get('test_label'), None)
 
     def test_cluster_delete(self):
         project_id = "cloud-custodian"
