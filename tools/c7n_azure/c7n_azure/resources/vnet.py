@@ -41,7 +41,7 @@ class Vnet(ArmResourceManager):
         )
         resource_type = 'Microsoft.Network/virtualNetworks'
 
-@Vnet.filter_registry.register('gateway-configured-with-cryptographic-algorithm')
+@Vnet.filter_registry.register('gw-without-ipsec-policies')
 class IPSecAlgorithmFilter(ValueFilter):
     """Virtual Networks Gateway Resource IPSec configured
 

@@ -19,10 +19,10 @@ class VNetTest(BaseTest):
     
     def test_vpn_ipsec_filter(self):
         p = self.load_policy({
-            'name': 'gateway-configured-with-cryptographic-algorithm',
+            'name': 'gw-without-ipsec-policies',
             'resource': 'azure.vnet',
             'filters': [
-                {'type': 'gateway-configured-with-cryptographic-algorithm'}          
+                {'type': 'gw-without-ipsec-policies'}          
             ]
         })
         resources = p.run()
