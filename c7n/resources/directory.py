@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, TypeInfo
-from c7n.utils import local_session, type_schema
+from c7n.utils import local_session, type_schema, QueryParser
 from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter, VpcFilter
 from c7n.tags import Tag, RemoveTag, universal_augment, TagDelayedAction, TagActionFilter
 from c7n.actions import BaseAction
@@ -152,6 +152,13 @@ class CloudDirectory(QueryResourceManager):
 
     augment = universal_augment
 
+    def resources(self, query=None):
+        query_filters = CloudDirectoryQueryParser.parse(self.data.get('query', []))
+        query = query or {}
+        if query_filters:
+            query['Filters'] = query_filters
+        return super(CloudDirectory, self).resources(query=query)
+
 @CloudDirectory.action_registry.register('delete')
 class CloudDirectoryDelete(BaseAction):
     """Delete a cloud directory.
@@ -207,3 +214,12 @@ class CloudDirectoryDisable(BaseAction):
             self.manager.retry(
                     client.disable_directory,
                     DirectoryArn=r['DirectoryArn'])
+            
+class CloudDirectoryQueryParser(QueryParser):
+    QuerySchema = {
+        'name': str,
+        'directoryArn': str,
+        'state': str,
+    }
+
+    type_name = 'CloudDirectory'

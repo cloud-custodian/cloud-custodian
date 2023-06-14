@@ -3,6 +3,8 @@
 import json
 
 from .common import BaseTest, load_data
+from c7n.resources.directory import CloudDirectoryQueryParser
+from c7n.exceptions import PolicyValidationError
 
 
 class CloudDirectoryTest(BaseTest):
@@ -156,3 +158,29 @@ class DirectoryTests(BaseTest):
         remainder = client.describe_directories()["DirectoryDescriptions"]
         self.assertEqual(len(remainder), 2)
         self.assertEqual(remainder[1]["Stage"], "Deleting")
+
+class CloudDirectoryQueryParse(BaseTest):
+
+    def test_query(self):
+        query_filters = [
+            {'Name': 'tag:Name', 'Values': ['Test']},
+            {'Name': 'state', 'Values': ['DISABLED']}]
+        self.assertEqual(query_filters, CloudDirectoryQueryParser.parse(query_filters))
+
+    def test_invalid_query(self):
+        self.assertRaises(
+            PolicyValidationError, CloudDirectoryQueryParser.parse, {})
+
+        self.assertRaises(
+            PolicyValidationError, CloudDirectoryQueryParser.parse, [None])
+
+        self.assertRaises(
+            PolicyValidationError, CloudDirectoryQueryParser.parse, [{'X': 1}])
+
+        self.assertRaises(
+            PolicyValidationError, CloudDirectoryQueryParser.parse, [
+                {'name': 'state', 'Values': 'disabled'}])
+
+        self.assertRaises(
+            PolicyValidationError, CloudDirectoryQueryParser.parse, [
+                {'name': 'state', 'Values': ['disabled']}])
