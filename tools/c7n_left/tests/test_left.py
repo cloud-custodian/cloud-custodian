@@ -48,12 +48,8 @@ class ResultsReporter:
 
 
 def run_policy(policy, terraform_dir, tmp_path):
-    (tmp_path / "policies.json").write_text(
-        json.dumps({"policies": [policy]}, indent=2)
-    )
-    config = Config.empty(
-        policy_dir=tmp_path, source_dir=terraform_dir, exec_filter=None
-    )
+    (tmp_path / "policies.json").write_text(json.dumps({"policies": [policy]}, indent=2))
+    config = Config.empty(policy_dir=tmp_path, source_dir=terraform_dir, exec_filter=None)
     policies = utils.load_policies(tmp_path, config)
     reporter = ResultsReporter()
     core.CollectionRunner(policies, config, reporter).run()
@@ -90,12 +86,8 @@ def policy_env(tmp_path):
 
 
 def test_load_policy(test):
-    test.load_policy(
-        {"name": "check1", "resource": "terraform.aws_s3_bucket"}, validate=True
-    )
-    test.load_policy(
-        {"name": "check2", "resource": ["terraform.aws_s3_bucket"]}, validate=True
-    )
+    test.load_policy({"name": "check1", "resource": "terraform.aws_s3_bucket"}, validate=True)
+    test.load_policy({"name": "check2", "resource": ["terraform.aws_s3_bucket"]}, validate=True)
     test.load_policy({"name": "check3", "resource": ["terraform.aws_*"]}, validate=True)
 
 
@@ -609,13 +601,8 @@ def test_policy_metadata(policy_env):
     md = core.PolicyMetadata(policies[0])
     assert md.provider == "terraform"
     assert md.display_category == "network"
-    assert (
-        md.title
-        == "terraform.aws_security_group - policy:test-a category:network severity:high"
-    )
-    assert (
-        repr(md) == "<PolicyMetadata name:test-a resource:terraform.aws_security_group>"
-    )
+    assert md.title == "terraform.aws_security_group - policy:test-a category:network severity:high"
+    assert repr(md) == "<PolicyMetadata name:test-a resource:terraform.aws_security_group>"
 
 
 def test_selection_parse(policy_env):
