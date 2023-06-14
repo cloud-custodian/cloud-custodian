@@ -803,6 +803,7 @@
   "AWS::SES::ConfigurationSet",
   "AWS::SES::ConfigurationSetEventDestination",
   "AWS::SES::ContactList",
+  "AWS::SES::EmailIdentity",
   "AWS::SES::ReceiptFilter",
   "AWS::SES::ReceiptRule",
   "AWS::SES::ReceiptRuleSet",
