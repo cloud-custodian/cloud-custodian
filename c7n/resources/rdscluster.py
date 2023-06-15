@@ -20,6 +20,7 @@ from c7n.utils import (
     type_schema, local_session, snapshot_identifier, chunks)
 
 from c7n.resources.rds import ParameterFilter
+from c7n.filters.backup import ConsecutiveAwsBackupsFilter
 
 log = logging.getLogger('custodian.rds-cluster')
 
@@ -604,6 +605,9 @@ class RDSClusterSnapshotDelete(BaseAction):
             except (client.exceptions.DBSnapshotNotFoundFault,
                     client.exceptions.InvalidDBSnapshotStateFault):
                 continue
+
+
+RDSCluster.filter_registry.register('consecutive-aws-backups', ConsecutiveAwsBackupsFilter)
 
 
 @RDSCluster.filter_registry.register('consecutive-snapshots')

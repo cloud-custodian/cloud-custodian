@@ -88,9 +88,7 @@ class Traverse(Filter):
         for r in resources:
             working_set = (r,)
             for target_type in self.type_chain:
-                working_set = self.resolve_refs(
-                    target_type, working_set, event["graph"]
-                )
+                working_set = self.resolve_refs(target_type, working_set, event["graph"])
             matched = self.match_attrs(working_set)
             if not self.match_cardinality(matched):
                 continue

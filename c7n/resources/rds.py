@@ -35,7 +35,6 @@ import functools
 import itertools
 import logging
 import operator
-import jmespath
 import re
 import datetime
 
@@ -63,9 +62,10 @@ from c7n.tags import universal_augment
 
 from c7n.utils import (
     local_session, type_schema, get_retry, chunks, snapshot_identifier,
-    merge_dict_list, filter_empty)
+    merge_dict_list, filter_empty, jmespath_search)
 from c7n.resources.kms import ResourceKmsKeyAlias
 from c7n.resources.securityhub import PostFinding
+from c7n.filters.backup import ConsecutiveAwsBackupsFilter
 
 log = logging.getLogger('custodian.rds')
 
@@ -1637,8 +1637,8 @@ class UnusedRDSSubnetGroup(Filter):
 
     def process(self, configs, event=None):
         rds = self.manager.get_resource_manager('rds').resources()
-        self.used = set(jmespath.search('[].DBSubnetGroup.DBSubnetGroupName', rds))
-        self.used.update(set(jmespath.search('[].DBSubnetGroup.DBSubnetGroupName',
+        self.used = set(jmespath_search('[].DBSubnetGroup.DBSubnetGroupName', rds))
+        self.used.update(set(jmespath_search('[].DBSubnetGroup.DBSubnetGroupName',
             self.manager.get_resource_manager('rds-cluster').resources(augment=False))))
         return super(UnusedRDSSubnetGroup, self).process(configs)
 
@@ -1861,7 +1861,7 @@ class ModifyDb(BaseAction):
                 u['property']: u['value'] for u in self.data.get('update')
                 if r.get(
                     u['property'],
-                    jmespath.search(
+                    jmespath_search(
                         self.conversion_map.get(u['property'], 'None'), r))
                     != u['value']}
             if not param:
@@ -1891,6 +1891,9 @@ class ReservedRDS(QueryResourceManager):
         universal_taggable = object()
 
     augment = universal_augment
+
+
+RDS.filter_registry.register('consecutive-aws-backups', ConsecutiveAwsBackupsFilter)
 
 
 @filters.register('consecutive-snapshots')
@@ -1931,7 +1934,7 @@ class ConsecutiveSnapshots(Filter):
         client = local_session(self.manager.session_factory).client('rds')
         results = []
         retention = self.data.get('days')
-        utcnow = datetime.utcnow()
+        utcnow = datetime.datetime.utcnow()
         expected_dates = set()
         for days in range(1, retention + 1):
             expected_dates.add((utcnow - timedelta(days=days)).strftime('%Y-%m-%d'))
@@ -2045,6 +2048,8 @@ class RDSProxy(QueryResourceManager):
 @filters.register('db-option-groups')
 class DbOptionGroups(ValueFilter):
     """This filter describes RDS option groups for associated RDS instances.
+    Use this filter in conjunction with jmespath and value filter operators
+    to filter RDS instance based on their option groups
 
     :example:
 
@@ -2055,9 +2060,11 @@ class DbOptionGroups(ValueFilter):
             resource: aws.rds
             filters:
               - type: db-option-groups
-                key: OptionName
-                value: NATIVE_NETWORK_ENCRYPTION
-                op: eq
+                key: Options[].OptionName
+                op: intersect
+                value:
+                  - SSL
+                  - NATIVE_NETWORK_ENCRYPTION
 
     :example:
 
@@ -2069,7 +2076,7 @@ class DbOptionGroups(ValueFilter):
             filters:
               - Engine: oracle-ee
               - type: db-option-groups
-                key: OptionSettings[?Name == 'SQLNET.ENCRYPTION_SERVER'].Value
+                key: Options[].OptionSettings[?Name == 'SQLNET.ENCRYPTION_SERVER'].Value[]
                 value:
                   - REQUIRED
     """
@@ -2093,16 +2100,15 @@ class DbOptionGroups(ValueFilter):
                 if og_values is not None:
                     ogcache[og] = og_values
                     continue
-                option_list = list(itertools.chain(*[p['OptionGroupsList']
+                option_groups_list = list(itertools.chain(*[p['OptionGroupsList']
                     for p in paginator.paginate(OptionGroupName=og)]))
 
                 ogcache[og] = {}
-                for option in option_list:
-                    if option['Options']:
-                        for p in option['Options']:
-                            ogcache[og].update(p)
-                cache.save(cache_key, ogcache[og])
+                for option_group in option_groups_list:
+                    ogcache[og] = option_group
 
+                cache.save(cache_key, ogcache[og])
+    
         return ogcache
 
     def process(self, resources, event=None):
@@ -2118,8 +2124,8 @@ class DbOptionGroups(ValueFilter):
                 og_values = optioncache[og['OptionGroupName']]
                 if self.match(og_values):
                     resource.setdefault(self.policy_annotation, []).append({
-                        k: jmespath.search(k, og_values)
-                        for k in {'OptionName', self.data.get('key')}
+                        k: jmespath_search(k, og_values)
+                        for k in {'OptionGroupName', self.data.get('key')}
                     })
                     results.append(resource)
                     break

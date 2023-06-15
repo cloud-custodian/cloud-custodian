@@ -1,0 +1,11 @@
+{
+    "status_code": 200,
+    "data": {
+        "QueueUrls": [
+            "https://sqs.us-east-1.amazonaws.com/644160558196/test-kms-cache-custom-key",
+            "https://sqs.us-east-1.amazonaws.com/644160558196/test-kms-cache-default-key",
+            "https://sqs.us-east-1.amazonaws.com/644160558196/test-kms-cache-unencrypted"
+        ],
+        "ResponseMetadata": {}
+    }
+}

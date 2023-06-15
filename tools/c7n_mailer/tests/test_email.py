@@ -249,8 +249,8 @@ class EmailTest(unittest.TestCase):
 
     def test_no_mapping_if_no_valid_emails(self):
         SQS_MESSAGE = copy.deepcopy(SQS_MESSAGE_1)
-        SQS_MESSAGE['action'].get('to', []).remove('ldap_uid_tags')
-        SQS_MESSAGE['resources'][0].pop('Tags', None)
+        SQS_MESSAGE["action"].get("to", []).remove("ldap_uid_tags")
+        SQS_MESSAGE["resources"][0].pop("Tags", None)
         emails_to_resources_map = self.email_delivery.get_email_to_addrs_to_resources_map(
             SQS_MESSAGE
         )
@@ -356,19 +356,15 @@ class EmailTest(unittest.TestCase):
     def test_get_ldap_connection(self):
         with patch("c7n_mailer.email_delivery.decrypt") as patched:
             patched.return_value = "a password"
-            delivery = EmailDelivery(
-                {"ldap_uri": "foo"},
-                self.aws_session,
-                MagicMock()
-            )
+            delivery = EmailDelivery({"ldap_uri": "foo"}, self.aws_session, MagicMock())
             patched.assert_called()
-            self.assertEqual(delivery.config['ldap_bind_password'], "a password")
+            self.assertEqual(delivery.config["ldap_bind_password"], "a password")
 
     def test_get_valid_emails_from_list_gcp(self):
         delivery = EmailDelivery(
-            {'ldap_uri': 'foo', 'email_base_url': 'example.com'},
-            self.aws_session, MagicMock())
-        result = delivery.get_valid_emails_from_list(['resource-owner', 'foo:bar'])
+            {"ldap_uri": "foo", "email_base_url": "example.com"}, self.aws_session, MagicMock()
+        )
+        result = delivery.get_valid_emails_from_list(["resource-owner", "foo:bar"])
         self.assertEqual(len(result), 2)
-        self.assertTrue('foo@example.com' in result)
-        self.assertTrue('bar@example.com' in result)
+        self.assertTrue("foo@example.com" in result)
+        self.assertTrue("bar@example.com" in result)

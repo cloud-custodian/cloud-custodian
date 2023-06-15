@@ -117,6 +117,7 @@ class Route53HostedZoneTest(BaseTest):
         self.assertTrue("abc" in tags["ResourceTagSet"]["Tags"][0].values())
 
 
+@pytest.mark.audited
 @terraform('route53_hostedzone_delete', teardown=terraform.TEARDOWN_IGNORE)
 def test_route53_hostedzone_delete(test, route53_hostedzone_delete):
     session_factory = test.replay_flight_data("test_route53_hostedzone_delete")
@@ -537,3 +538,80 @@ class Route53RecoveryClusterTest(BaseTest):
         client = session_factory(region="us-west-2").client("route53-recovery-control-config")
         tags = client.list_tags_for_resource(ResourceArn=resources[0]["ClusterArn"])['Tags']
         self.assertEqual(len(tags), 0)
+
+
+class TestControlPanel(BaseTest):
+
+    def test_control_panel_resource(self):
+        session_factory = self.replay_flight_data("test_control_panel")
+        p = self.load_policy(
+            {
+                "name": "all-control-panels",
+                "resource": "recovery-control-panel",
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_control_panel_add_tag(self):
+        session_factory = self.replay_flight_data("test_control_panel_add_tag",)
+        p = self.load_policy(
+            {
+                "name": "control-panel-add-tag",
+                "resource": "recovery-control-panel",
+                "filters": [{"tag:TestTag": "absent"}],
+                "actions": [{"type": "tag", "key": "TestTag", "value": "TestValue"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = session_factory(region="us-west-2").client("route53-recovery-control-config")
+        tags = client.list_tags_for_resource(ResourceArn=resources[0]["ControlPanelArn"])['Tags']
+        self.assertEqual(tags, {"TestTag": "TestValue"})
+
+    def test_control_panel_remove_tag(self):
+        session_factory = self.replay_flight_data("test_control_panel_remove_tag",)
+        p = self.load_policy(
+            {
+                "name": "control-panel-remove-tag",
+                "resource": "recovery-control-panel",
+                "filters": [{"tag:TestTag": "present"}],
+                "actions": [{"type": "remove-tag", "tags": ["TestTag"]}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = session_factory(region="us-west-2").client("route53-recovery-control-config")
+        tags = client.list_tags_for_resource(ResourceArn=resources[0]["ControlPanelArn"])['Tags']
+        self.assertEqual(len(tags), 0)
+
+    def test_control_panel_safety_rule_filter(self):
+        session_factory = self.replay_flight_data("test_control_panel_safety_rule_filter",)
+        p = self.load_policy(
+            {
+                "name": "control-panel-safety-rule",
+                "resource": "recovery-control-panel",
+                "filters": [{'type': 'safety-rule', 'count': 1, 'count_op': 'gte'}]
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['ControlPanelArn'], \
+            'arn:aws:route53-recovery-control::644160558196:controlpanel/fd5a6bfc73364a0dbd48d3915867a306')
+        return
+        p = self.load_policy(
+            {
+                "name": "control-panel-safety-rule",
+                "resource": "recovery-control-panel",
+                "filters": [{'type': 'safety-rule', 'count': 0}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['ControlPanelArn'], \
+             'arn:aws:route53-recovery-control::644160558196:controlpanel/7a721a1a44014ad1973539b3d83161ff')

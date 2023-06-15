@@ -15,7 +15,6 @@ from datetime import datetime, timedelta
 from dateutil import tz as tzutil
 from dateutil.parser import parse
 
-import jmespath
 import time
 
 from c7n.manager import resources as aws_resources
@@ -430,7 +429,7 @@ class Tag(Action):
             'account_id': self.manager.config.account_id,
             'now': utils.FormatDate.utcnow(),
             'region': self.manager.config.region}
-        return tag.format(**params)
+        return str(tag).format(**params)
 
     def interpolate_values(self, tags):
         """Interpolate in a list of tags - 'old' ec2 format
@@ -1083,7 +1082,7 @@ class CopyRelatedResourceTag(Tag):
         else:
             search_path = "[].[%s]" % self.data['key']
 
-        for rrid, r in zip(jmespath.search(search_path, resources),
+        for rrid, r in zip(utils.jmespath_search(search_path, resources),
                            resources):
             related_resources.append((rrid.pop(), r))
 

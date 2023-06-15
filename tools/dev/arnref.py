@@ -59,7 +59,7 @@ def header_matches(string, table):
 
 @click.command()
 @click.option("--docs-dir", type=click.Path())
-@click.option("--output", type=click.File("wb"), default="-")
+@click.option("-f", "--output", type=click.File("wb"), default="-")
 def main(docs_dir, output):
     docs_dir = Path(docs_dir)
 

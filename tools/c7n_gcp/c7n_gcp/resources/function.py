@@ -29,6 +29,7 @@ class Function(QueryResourceManager):
             'delete': 'google.cloud.functions.v1.CloudFunctionsService.DeleteFunction',
             'update': 'google.cloud.functions.v1.CloudFunctionsService.UpdateFunction'}
         urn_component = "function"
+        asset_type = "cloudfunctions.googleapis.com/CloudFunction"
 
         @staticmethod
         def get(client, resource_info):

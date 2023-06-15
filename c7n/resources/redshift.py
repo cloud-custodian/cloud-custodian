@@ -2,7 +2,6 @@
 # SPDX-License-Identifier: Apache-2.0
 import json
 import itertools
-import jmespath
 
 from botocore.exceptions import ClientError
 from concurrent.futures import as_completed
@@ -19,7 +18,7 @@ from c7n.resolver import ValuesFrom
 from c7n.query import QueryResourceManager, TypeInfo, RetryPageIterator
 from c7n import tags
 from c7n.utils import (
-    type_schema, local_session, chunks, snapshot_identifier)
+    type_schema, local_session, chunks, snapshot_identifier, jmespath_search)
 from .aws import shape_validate
 from datetime import datetime, timedelta
 from c7n.filters.backup import ConsecutiveAwsBackupsFilter
@@ -625,7 +624,7 @@ class RedshiftSetAttributes(BaseAction):
             modify = {}
             for k, v in config.items():
                 if ((k in self.cluster_mapping and
-                v != jmespath.search(self.cluster_mapping[k], cluster)) or
+                v != jmespath_search(self.cluster_mapping[k], cluster)) or
                 v != cluster.get('PendingModifiedValues', {}).get(k, cluster.get(k))):
                     modify[k] = v
             if not modify:

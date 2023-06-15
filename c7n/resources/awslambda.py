@@ -1,6 +1,5 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
-import jmespath
 import json
 from urllib.parse import urlparse, parse_qs
 
@@ -10,14 +9,23 @@ from concurrent.futures import as_completed
 from datetime import timedelta, datetime
 
 from c7n.actions import Action, RemovePolicyBase, ModifyVpcSecurityGroupsAction
-from c7n.filters import CrossAccountAccessFilter, ValueFilter
+from c7n.filters import CrossAccountAccessFilter, ValueFilter, Filter
 from c7n.filters.kms import KmsRelatedFilter
 import c7n.filters.vpc as net_filters
 from c7n.manager import resources
-from c7n import query
-from c7n.resources.iam import CheckPermissions
+from c7n import query, utils
+from c7n.resources.iam import CheckPermissions, SpecificIamRoleManagedPolicy
 from c7n.tags import universal_augment
-from c7n.utils import local_session, type_schema, select_keys, get_human_size, parse_date, get_retry
+from c7n.utils import (
+    local_session,
+    type_schema,
+    select_keys,
+    get_human_size,
+    parse_date,
+    get_retry,
+    jmespath_search,
+    jmespath_compile
+)
 from botocore.config import Config
 from .securityhub import PostFinding
 
@@ -255,13 +263,55 @@ class KmsFilter(KmsRelatedFilter):
     RelatedIdsExpression = 'KMSKeyArn'
 
 
+@AWSLambda.filter_registry.register('has-specific-managed-policy')
+class HasSpecificManagedPolicy(SpecificIamRoleManagedPolicy):
+    """Filter an lambda function that has an IAM execution role that has a
+    specific managed IAM policy.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: lambda-has-admin-policy
+            resource: aws.lambda
+            filters:
+              - type: has-specific-managed-policy
+                value: admin-policy
+
+    """
+
+    permissions = ('iam:ListAttachedRolePolicies',)
+
+    def process(self, resources, event=None):
+        client = utils.local_session(self.manager.session_factory).client('iam')
+
+        results = []
+        roles = {
+            r['Role']: {
+                'RoleName': r['Role'].split('/')[-1]
+            }
+            for r in resources
+        }
+
+        for role in roles.values():
+            self.get_managed_policies(client, [role])
+        for r in resources:
+            role_arn = r['Role']
+            matched_keys = [k for k in roles[role_arn][self.annotation_key] if self.match(k)]
+            self.merge_annotation(role, self.matched_annotation_key, matched_keys)
+            if matched_keys:
+                results.append(r)
+
+        return results
+
 @AWSLambda.action_registry.register('set-xray-tracing')
 class LambdaEnableXrayTracing(Action):
     """
     This action allows for enable Xray tracing to Active
- 
+
     :example:
-    
+
     .. code-block:: yaml
 
       actions:
@@ -560,7 +610,7 @@ class SetConcurrency(Action):
         is_expr = self.data.get('expr', False)
         value = self.data['value']
         if is_expr:
-            value = jmespath.compile(value)
+            value = jmespath_compile(value)
 
         none_type = type(None)
 
@@ -799,3 +849,55 @@ class LayerPostFinding(PostFinding):
         payload.update(self.filter_empty(
             select_keys(r, ['Version', 'CreatedDate', 'CompatibleRuntimes'])))
         return envelope
+
+
+@AWSLambda.filter_registry.register('lambda-edge')
+
+class LambdaEdgeFilter(Filter):
+    """
+    Filter for lambda@edge functions. Lambda@edge only exists in us-east-1
+
+    :example:
+
+        .. code-block:: yaml
+
+            policies:
+                - name: lambda-edge-filter
+                  resource: lambda
+                  region: us-east-1
+                  filters:
+                    - type: lambda-edge
+                      state: True
+    """
+    permissions = ('cloudfront:ListDistributions',)
+
+    schema = type_schema('lambda-edge',
+        **{'state': {'type': 'boolean'}})
+
+    def get_lambda_cf_map(self):
+        cfs = self.manager.get_resource_manager('distribution').resources()
+        func_expressions = ('DefaultCacheBehavior.LambdaFunctionAssociations.Items',
+          'CacheBehaviors.LambdaFunctionAssociations.Items')
+        lambda_dist_map = {}
+        for d in cfs:
+            for exp in func_expressions:
+                if jmespath_search(exp, d):
+                    for function in jmespath_search(exp, d):
+                        # Geting rid of the version number in the arn
+                        lambda_edge_arn = ':'.join(function['LambdaFunctionARN'].split(':')[:-1])
+                        lambda_dist_map.setdefault(lambda_edge_arn, []).append(d['Id'])
+        return lambda_dist_map
+
+    def process(self, resources, event=None):
+        results = []
+        if self.manager.config.region != 'us-east-1' and self.data.get('state'):
+            return []
+        annotation_key = 'c7n:DistributionIds'
+        lambda_edge_cf_map = self.get_lambda_cf_map()
+        for r in resources:
+            if (r['FunctionArn'] in lambda_edge_cf_map and self.data.get('state')):
+                r[annotation_key] = lambda_edge_cf_map.get(r['FunctionArn'])
+                results.append(r)
+            elif (r['FunctionArn'] not in lambda_edge_cf_map and not self.data.get('state')):
+                results.append(r)
+        return results

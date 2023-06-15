@@ -62,9 +62,7 @@ class PolicyMetadata:
         categories = self.policy.data.get("metadata", {}).get("category", [])
         if isinstance(categories, str):
             categories = [categories]
-        if not isinstance(categories, list) or (
-            categories and not isinstance(categories[0], str)
-        ):
+        if not isinstance(categories, list) or (categories and not isinstance(categories[0], str)):
             categories = []
         return categories
 
@@ -130,17 +128,13 @@ class ExecutionFilter:
         if filters["severity"]:
             invalid_severities = set(filters["severity"]).difference(SEVERITY_LEVELS)
         if invalid_severities:
-            raise ValueError(
-                "invalid severity for filtering %s" % (", ".join(invalid_severities))
-            )
+            raise ValueError("invalid severity for filtering %s" % (", ".join(invalid_severities)))
 
     def filter_attribute(self, filter_name, attribute, items):
         if not self.filters[filter_name] or not items:
             return items
         results = []
-        op_class = (
-            isinstance(items[0], dict) and operator.itemgetter or operator.attrgetter
-        )
+        op_class = isinstance(items[0], dict) and operator.itemgetter or operator.attrgetter
         op = op_class(attribute)
         for f in self.filters[filter_name]:
             for i in items:
@@ -263,9 +257,13 @@ class CollectionRunner:
     def match_type(rtype, p):
         if isinstance(p.resource_type, str):
             return fnmatch.fnmatch(rtype, p.resource_type.split(".", 1)[-1])
+        found = False
         if isinstance(p.resource_type, list):
             for pr in p.resource_type:
-                return fnmatch.fnmatch(rtype, pr.split(".", 1)[-1])
+                if fnmatch.fnmatch(rtype, pr.split(".", 1)[-1]):
+                    found = True
+                    break
+        return found
 
 
 class IACSourceMode(PolicyExecutionMode):
@@ -293,6 +291,15 @@ class PolicyResourceResult:
     def __init__(self, resource, policy):
         self.resource = resource
         self.policy = policy
+
+    def as_dict(self):
+        return {
+            "policy": dict(self.policy.data),
+            "resource": dict(self.resource),
+            "file_path": str(self.resource.src_dir / self.resource.filename),
+            "file_line_start": self.resource.line_start,
+            "file_line_end": self.resource.line_end,
+        }
 
 
 class IACResourceManager(ResourceManager):

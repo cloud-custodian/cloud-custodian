@@ -170,8 +170,10 @@ def get_bucket_url_with_region(bucket_url, region):
     query = f"region={region}"
     if parsed.query:
         query = parsed.query + f"&region={region}"
-    parts = list(parsed)
-    parts[4] = query
+    parts = parsed._replace(
+        path=parsed.path.strip("/"),
+        query=query
+    )
     return urlparse.urlunparse(parts)
 
 
@@ -808,7 +810,14 @@ def join_output(output_dir, suffix):
         return output_dir.rstrip('/')
     if output_dir.endswith('://'):
         return output_dir + suffix
-    return output_dir.rstrip('/') + '/%s' % suffix
+    output_url_parts = urlparse.urlparse(output_dir)
+    # for output urls, the end of the url may be a
+    # query string. make sure we add a suffix to
+    # the path component.
+    output_url_parts = output_url_parts._replace(
+        path = output_url_parts.path.rstrip('/') + '/%s' % suffix
+    )
+    return urlparse.urlunparse(output_url_parts)
 
 
 def fake_session():

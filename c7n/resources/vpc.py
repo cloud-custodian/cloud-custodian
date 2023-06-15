@@ -3,7 +3,6 @@
 import itertools
 import operator
 import zlib
-import jmespath
 import re
 from c7n.actions import BaseAction, ModifyVpcSecurityGroupsAction
 from c7n.exceptions import PolicyValidationError, ClientError
@@ -17,10 +16,18 @@ from c7n import query, resolver
 from c7n.manager import resources
 from c7n.resources.securityhub import OtherResourcePostFinding, PostFinding
 from c7n.utils import (
-    chunks, local_session, type_schema, get_retry, parse_cidr, get_eni_resource_type)
-
+    chunks,
+    local_session,
+    type_schema,
+    get_retry,
+    parse_cidr,
+    get_eni_resource_type,
+    jmespath_search,
+    jmespath_compile
+)
 from c7n.resources.aws import shape_validate
 from c7n.resources.shield import IsEIPShieldProtected, SetEIPShieldProtection
+from c7n.filters.policystatement import HasStatementFilter
 
 
 @resources.register('vpc')
@@ -503,6 +510,76 @@ class SubnetVpcFilter(net_filters.VpcFilter):
 
     RelatedIdsExpression = "VpcId"
 
+@Subnet.filter_registry.register('ip-address-usage')
+class SubnetIpAddressUsageFilter(ValueFilter):
+    """Filter subnets based on available IP addresses.
+
+    :example:
+
+    Show subnets with no addresses in use.
+
+    .. code-block:: yaml
+
+            policies:
+              - name: empty-subnets
+                resource: aws.subnet
+                filters:
+                  - type: ip-address-usage
+                    key: NumberUsed
+                    value: 0
+
+    :example:
+
+    Show subnets where 90% or more addresses are in use.
+
+    .. code-block:: yaml
+
+            policies:
+              - name: almost-full-subnets
+                resource: aws.subnet
+                filters:
+                  - type: ip-address-usage
+                    key: PercentUsed
+                    op: greater-than
+                    value: 90
+
+    This filter allows ``key`` to be:
+
+    * ``MaxAvailable``: the number of addresses available based on a subnet's CIDR block size
+      (minus the 5 addresses
+      `reserved by AWS <https://docs.aws.amazon.com/vpc/latest/userguide/subnet-sizing.html>`_)
+    * ``NumberUsed``: ``MaxAvailable`` minus the subnet's ``AvailableIpAddressCount`` value
+    * ``PercentUsed``: ``NumberUsed`` divided by ``MaxAvailable``
+    """
+    annotation_key = 'c7n:IpAddressUsage'
+    aws_reserved_addresses = 5
+    schema_alias = False
+    schema = type_schema(
+        'ip-address-usage',
+        key={'enum': ['MaxAvailable', 'NumberUsed', 'PercentUsed']},
+        rinherit=ValueFilter.schema,
+    )
+
+    def augment(self, resource):
+        cidr_block = parse_cidr(resource['CidrBlock'])
+        max_addresses = cidr_block.num_addresses - self.aws_reserved_addresses
+        resource[self.annotation_key] = dict(
+            MaxAvailable=max_addresses,
+            NumberUsed=max_addresses - resource['AvailableIpAddressCount'],
+            PercentUsed=round(
+                (max_addresses - resource['AvailableIpAddressCount']) / max_addresses * 100.0,
+                2
+            ),
+        )
+
+    def process(self, resources, event=None):
+        results = []
+        for r in resources:
+            if self.annotation_key not in r:
+                self.augment(r)
+            if self.match(r[self.annotation_key]):
+                results.append(r)
+        return results
 
 class ConfigSG(query.ConfigSource):
 
@@ -815,7 +892,7 @@ class SGUsage(Filter):
 
     def get_ecs_cwe_sgs(self):
         sg_ids = set()
-        expr = jmespath.compile(
+        expr = jmespath_compile(
             'EcsParameters.NetworkConfiguration.awsvpcConfiguration.SecurityGroups[]')
         for rule in self.manager.get_resource_manager(
                 'event-rule-target').resources(augment=False):
@@ -825,7 +902,7 @@ class SGUsage(Filter):
         return sg_ids
 
     def get_batch_sgs(self):
-        expr = jmespath.compile('[].computeResources.securityGroupIds[]')
+        expr = jmespath_compile('[].computeResources.securityGroupIds[]')
         resources = self.manager.get_resource_manager('aws.batch-compute').resources(augment=False)
         return set(expr.search(resources) or [])
 
@@ -923,21 +1000,21 @@ class UsedSecurityGroup(SGUsage):
     interface_resource_type_key = 'c7n:InterfaceResourceTypes'
 
     def _get_eni_attributes(self):
-        enis = []
+        group_enis = {}
         for nic in self.nics:
+            instance_owner_id, interface_resource_type = '', ''
             if nic['Status'] == 'in-use':
-                instance_owner_id = nic['Attachment']['InstanceOwnerId']
+                if nic.get('Attachment') and 'InstanceOwnerId' in nic['Attachment']:
+                    instance_owner_id = nic['Attachment']['InstanceOwnerId']
                 interface_resource_type = get_eni_resource_type(nic)
-            else:
-                instance_owner_id = ''
-                interface_resource_type = ''
             interface_type = nic.get('InterfaceType')
             for g in nic['Groups']:
-                enis.append({'GroupId': g['GroupId'],
-                             'InstanceOwnerId': instance_owner_id,
-                             'InterfaceType': interface_type,
-                             'InterfaceResourceType': interface_resource_type})
-        return enis
+                group_enis.setdefault(g['GroupId'], []).append({
+                    'InstanceOwnerId': instance_owner_id,
+                    'InterfaceType': interface_type,
+                    'InterfaceResourceType': interface_resource_type
+                })
+        return group_enis
 
     def process(self, resources, event=None):
         used = self.scan_groups()
@@ -945,19 +1022,15 @@ class UsedSecurityGroup(SGUsage):
             r for r in resources
             if r['GroupId'] not in used and 'VpcId' in r]
         unused = {g['GroupId'] for g in self.filter_peered_refs(unused)}
-        enis = self._get_eni_attributes()
+        group_enis = self._get_eni_attributes()
         for r in resources:
-            owner_ids = set()
-            interface_types = set()
-            interface_resource_types = set()
-            for eni in enis:
-                if r['GroupId'] == eni['GroupId']:
-                    owner_ids.add(eni['InstanceOwnerId'])
-                    interface_types.add(eni['InterfaceType'])
-                    interface_resource_types.add(eni['InterfaceResourceType'])
-            r[self.instance_owner_id_key] = list(filter(None, owner_ids))
-            r[self.interface_type_key] = list(filter(None, interface_types))
-            r[self.interface_resource_type_key] = list(filter(None, interface_resource_types))
+            enis = group_enis.get(r['GroupId'], ())
+            r[self.instance_owner_id_key] = list({
+                i['InstanceOwnerId'] for i in enis if i['InstanceOwnerId']})
+            r[self.interface_type_key] = list({
+                i['InterfaceType'] for i in enis if i['InterfaceType']})
+            r[self.interface_resource_type_key] = list({
+                i['InterfaceResourceType'] for i in enis if i['InterfaceResourceType']})
         return [r for r in resources if r['GroupId'] not in unused]
 
 
@@ -1972,7 +2045,7 @@ class CrossAccountPeer(CrossAccountAccessFilter):
     def process(self, resources, event=None):
         results = []
         accounts = self.get_accounts()
-        owners = map(jmespath.compile, (
+        owners = map(jmespath_compile, (
             'AccepterVpcInfo.OwnerId', 'RequesterVpcInfo.OwnerId'))
 
         for r in resources:
@@ -2088,7 +2161,7 @@ class AclAwsS3Cidrs(Filter):
 
     def process(self, resources, event=None):
         ec2 = local_session(self.manager.session_factory).client('ec2')
-        cidrs = jmespath.search(
+        cidrs = jmespath_search(
             "PrefixLists[].Cidrs[]", ec2.describe_prefix_lists())
         cidrs = [parse_cidr(cidr) for cidr in cidrs]
         results = []
@@ -2338,6 +2411,36 @@ class VpcEndpoint(query.QueryResourceManager):
         cfn_type = config_type = "AWS::EC2::VPCEndpoint"
 
 
+@VpcEndpoint.filter_registry.register('has-statement')
+class EndpointPolicyStatementFilter(HasStatementFilter):
+    """Find resources with matching endpoint policy statements.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+            - name: vpc-endpoint-policy
+              resource: aws.vpc-endpoint
+              filters:
+                  - type: has-statement
+                    statements:
+                      - Action: "*"
+                        Effect: "Allow"
+    """
+
+    policy_attribute = 'PolicyDocument'
+    permissions = ('ec2:DescribeVpcEndpoints',)
+
+    def get_std_format_args(self, endpoint):
+        return {
+            'endpoint_id': endpoint['VpcEndpointId'],
+            'account_id': self.manager.config.account_id,
+            'region': self.manager.config.region
+        }
+
+
+
 @VpcEndpoint.filter_registry.register('cross-account')
 class EndpointCrossAccountFilter(CrossAccountAccessFilter):
 
@@ -2457,7 +2560,7 @@ class UnusedKeyPairs(Filter):
 
     def process(self, resources, event=None):
         instances = self.manager.get_resource_manager('ec2').resources()
-        used = set(jmespath.search('[].KeyName', instances))
+        used = set(jmespath_search('[].KeyName', instances))
         if self.data.get('state', True):
             return [r for r in resources if r['KeyName'] not in used]
         else:
@@ -2764,7 +2867,7 @@ class TrafficMirrorSession(query.QueryResourceManager):
         service = 'ec2'
         enum_spec = ('describe_traffic_mirror_sessions', 'TrafficMirrorSessions', None)
         name = id = 'TrafficMirrorSessionId'
-        cfn_type = 'AWS::EC2::TrafficMirrorSession'
+        config_type = cfn_type = 'AWS::EC2::TrafficMirrorSession'
         arn_type = 'traffic-mirror-session'
         universal_taggable = object()
         id_prefix = 'tms-'
@@ -2805,7 +2908,7 @@ class TrafficMirrorTarget(query.QueryResourceManager):
         service = 'ec2'
         enum_spec = ('describe_traffic_mirror_targets', 'TrafficMirrorTargets', None)
         name = id = 'TrafficMirrorTargetId'
-        cfn_type = 'AWS::EC2::TrafficMirrorTarget'
+        config_type = cfn_type = 'AWS::EC2::TrafficMirrorTarget'
         arn_type = 'traffic-mirror-target'
         universal_taggable = object()
         id_prefix = 'tmt-'

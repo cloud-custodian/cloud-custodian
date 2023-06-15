@@ -1,6 +1,7 @@
 name: "Docker Build"
 on:
-  # build a daily dev image  
+  workflow_dispatch: {}
+  # build a daily dev image
   schedule:
     - cron: "42 6 * * *"
   push:
@@ -18,6 +19,7 @@ jobs:
           - c7n-org
           - mailer
           - policystream
+          - c7n-left
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -30,3 +32,15 @@ jobs:
           name: ${{ matrix.image }}
           push: true
           platforms: linux/arm64,linux/amd64
+
+      - name: Notify Slack
+        uses: ravsamhq/notify-slack-action@v2
+        if: always()
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_CI_HOOK }}
+        with:
+          status: ${{ job.status }}
+          notification_title: "{workflow}:{job} has {status_message}"
+          message_format: "{emoji} *{workflow}:{job}* {status_message} in <{repo_url}|{repo}>"
+          footer: "Logs <{run_url}|{job}>"
+          notify_when: "failure,success"

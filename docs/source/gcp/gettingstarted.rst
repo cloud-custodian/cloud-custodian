@@ -70,11 +70,31 @@ your credentials. For more information on this command,
 
 Environment Variables
 """""""""""""""""""""
-If you are planning to run Custodian using a service account, then configure your credentials
-using environment variables.
 
-Follow the steps outlined in the 
-`GCP documentation to configure credentials for service accounts. <https://cloud.google.com/docs/authentication/getting-started>`_
+`GOOGLE_CLOUD_PROJECT` should be set to the target project to act on.
+
+If you are planning to run Custodian using a service account, or workload identity federation then
+configure your credentials using environment variables.
+
+`GOOGLE_APPLICATION_CREDENTIALS` should be set to a valid service account file or client config for
+workload federation.
+
+For service account configuration see additional docs `here <https://cloud.google.com/iam/docs/service-account-overview>`
+
+For workload configuration see additional docs `here <https://cloud.google.com/iam/docs/workload-identity-federation-with-other-clouds>`
+
+If you are planning to impersonate a service account, then you may configure the environment
+variable `GOOGLE_IMPERSONATE_SERVICE_ACCOUNT` with the service account email address, you can also 
+pass this the service account email via `--assume` cli flag.
+
+.. code-block:: bash
+
+    export GOOGLE_IMPERSONATE_SERVICE_ACCOUNT="impersonated-account@_project_.iam.gserviceaccount.com"
+
+If running on gcp compute some of these values can be obtained automatically from metadata server, see
+https://cloud.google.com/python/docs/reference/google-cloud-core/latest/config for precedence and availability
+of different options.
+
 
 .. _gcp_write-policy:
 

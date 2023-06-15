@@ -1,0 +1,12 @@
+{
+    "status_code": 400,
+    "data": {
+        "Error": {
+            "Message": "The keyArn for encryptionConfig is invalid.",
+            "Code": "InvalidParameterException"
+        },
+        "ResponseMetadata": {},
+        "clusterName": "c7n-test-eks-cluster",
+        "message": "The keyArn for encryptionConfig is invalid."
+    }
+}

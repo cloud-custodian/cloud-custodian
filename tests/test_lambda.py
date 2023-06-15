@@ -194,6 +194,27 @@ class LambdaTest(BaseTest):
         resources = p.run()
         assert len(resources) == 1
 
+    def test_lambda_has_specific_managed_policy(self):
+        # lots of pre-conditions, iam role with iam read only policy attached
+        # and a permission boundary with deny on iam read access.
+        factory = self.replay_flight_data('test_lambda_has_specific_managed_policy')
+        p = self.load_policy(
+            {
+                'name': 'lambda-check',
+                'resource': 'lambda',
+                'filters': [
+                    {'FunctionName': 'cfb-ygaovtob-fail'},
+                    {'type': 'has-specific-managed-policy',
+                     'value': 'AdministratorAccess'}]
+            },
+            session_factory=factory)
+        resources = p.run()
+        assert len(resources) == 1
+
+        # Re-run, without respecting permission boundaries
+        p.data['filters'][1]['boundaries'] = False
+        resources = p.run()
+        assert len(resources) == 1
     def test_lambda_config_source(self):
         factory = self.replay_flight_data("test_aws_lambda_config_source")
         p = self.load_policy(
@@ -450,6 +471,23 @@ class LambdaTest(BaseTest):
         response = client.get_function(
             FunctionName=resources[0]['FunctionName'])
         self.assertEqual(response['Configuration']['TracingConfig']['Mode'], 'PassThrough')
+
+    def test_lambda_edge(self):
+        factory = self.replay_flight_data("test_aws_lambda_edge_filter")
+        p = self.load_policy(
+            {
+                "name": "lambda-edge-filter",
+                "resource": "lambda",
+                "filters": [{"type": "lambda-edge",
+                            "state": True}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
+        self.assertEqual(
+            [r["FunctionName"] for r in resources],
+            ["c7n-lambda-edge-new", "test-lambda-edge"])
 
 
 class LambdaTagTest(BaseTest):

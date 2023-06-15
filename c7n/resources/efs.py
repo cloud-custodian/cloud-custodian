@@ -7,7 +7,7 @@ from c7n.exceptions import PolicyValidationError
 from c7n.filters.kms import KmsRelatedFilter
 from c7n.filters import Filter
 from c7n.manager import resources
-from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter
+from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter, NetworkLocation
 from c7n.filters.policystatement import HasStatementFilter
 from c7n.query import (
     QueryResourceManager, ChildResourceManager, TypeInfo, DescribeSource, ConfigSource
@@ -57,11 +57,10 @@ class ElasticFileSystemMountTarget(ChildResourceManager):
         enum_spec = ('describe_mount_targets', 'MountTargets', None)
         permission_prefix = 'elasticfilesystem'
         name = id = 'MountTargetId'
-        filter_name = 'MountTargetId'
-        filter_type = 'scalar'
         arn = False
         cfn_type = 'AWS::EFS::MountTarget'
-
+        supports_trailevents = True
+    
 
 @ElasticFileSystemMountTarget.filter_registry.register('subnet')
 class Subnet(SubnetFilter):
@@ -98,6 +97,9 @@ class SecurityGroup(SecurityGroupFilter):
 
         self.efs_group_cache = groups
         return list(group_ids)
+
+
+@ElasticFileSystemMountTarget.filter_registry.register('network-location', NetworkLocation)
 
 
 @ElasticFileSystem.filter_registry.register('kms-key')

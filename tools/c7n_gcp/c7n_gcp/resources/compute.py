@@ -245,7 +245,7 @@ class Image(QueryResourceManager):
         name = id = 'name'
         default_report_fields = [
             "name", "description", "sourceType", "status", "creationTimestamp",
-            "storageLocation", "diskSizeGb", "family"]
+            "diskSizeGb", "family"]
         asset_type = "compute.googleapis.com/Image"
         urn_component = "image"
 
@@ -599,3 +599,21 @@ class AutoscalerSet(MethodAction):
                   }}
 
         return result
+
+
+@resources.register('compute-project')
+class Project(QueryResourceManager):
+    """GCP resource: https://cloud.google.com/compute/docs/reference/rest/v1/projects"""
+    class resource_type(TypeInfo):
+        service = 'compute'
+        version = 'v1'
+        component = 'projects'
+        enum_spec = ('get', '[@]', None)
+        name = id = 'name'
+        default_report_fields = ["name"]
+        asset_type = 'compute.googleapis.com/Project'
+
+        @staticmethod
+        def get(client, resource_info):
+            return client.execute_command(
+                'get', {'project': resource_info['project_id']})

@@ -361,6 +361,25 @@ class SqlServerTest(BaseTest):
         resources = p.run()
         self.assertEqual(1, len(resources))
 
+    @cassette_name('auditing')
+    def test_auditing_filter_value(self):
+        p = self.load_policy({
+            'name': 'test-azure-sql-server',
+            'resource': 'azure.sqlserver',
+            'filters': [
+                {'type': 'value',
+                 'key': 'name',
+                 'op': 'glob',
+                 'value_type': 'normalize',
+                 'value': 'cctestsqlserver*'},
+                {'type': 'auditing',
+                 'key': "auditActionsAndGroups[?@=='FAILED_DATABASE_AUTHENTICATION_GROUP']" +
+                        " | length(@)",
+                 'value': 1}],
+        }, validate=True)
+        resources = p.run()
+        self.assertEqual(1, len(resources))
+
 
 class SQLServerFirewallFilterTest(BaseTest):
 
@@ -384,8 +403,18 @@ class SQLServerFirewallFilterTest(BaseTest):
         expected = IPSet(['8.8.8.8', '10.0.0.0/16'])
         self.assertEqual(expected, self._get_filter(rules)._query_rules(self.resource))
 
-    def _get_filter(self, rules, mode='equal'):
-        data = {mode: ['10.0.0.0/8', '127.0.0.1']}
+    def test_query_regular_rules_include_magic(self):
+        rules = [IpRange(start_ip_address='10.0.0.0', end_ip_address='10.0.255.255'),
+                 IpRange(start_ip_address='8.8.8.8', end_ip_address='8.8.8.8'),
+                 IpRange(start_ip_address='0.0.0.0', end_ip_address='0.0.0.0')]
+        expected = IPSet(['8.8.8.8', '10.0.0.0/16', '0.0.0.0'])
+        self.assertEqual(
+            expected,
+            self._get_filter(rules, include_magic=True)._query_rules(self.resource)
+        )
+
+    def _get_filter(self, rules, mode='equal', include_magic=False):
+        data = {mode: ['10.0.0.0/8', '127.0.0.1'], 'include-azure-services': include_magic}
         filter = SqlServerFirewallRulesFilter(data, Mock())
         filter.client = Mock()
         filter.client.firewall_rules.list_by_server.return_value = rules

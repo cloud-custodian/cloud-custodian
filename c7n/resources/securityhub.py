@@ -4,10 +4,10 @@
 from collections import Counter
 from datetime import datetime
 from dateutil.tz import tzutc
-import jmespath
 import json
 import hashlib
 import logging
+import sys
 
 from c7n import deprecated
 from c7n.actions import Action
@@ -16,7 +16,7 @@ from c7n.exceptions import PolicyValidationError, PolicyExecutionError
 from c7n.policy import LambdaMode, execution
 from c7n.utils import (
     local_session, type_schema, get_retry,
-    chunks, dumps, filter_empty, get_partition
+    chunks, dumps, filter_empty, get_partition, jmespath_search
 )
 from c7n.version import version
 
@@ -328,7 +328,9 @@ class PostFinding(Action):
     https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-findings-format.html
 
     For resources that are taggable, we will tag the resource with an identifier
-    such that further findings generate updates.
+    such that further findings generate updates. The name of the tag comes from the ``title``
+    parameter of the ``post-finding`` action, or the policy name if ``title`` is empty. This
+    allows different policies to update the same finding if they specify the same ``title``.
 
     Example generate a finding for accounts that don't have shield enabled.
 
@@ -354,6 +356,7 @@ class PostFinding(Action):
                - "Software and Configuration Checks/Industry and Regulatory Standards/NIST CSF Controls (USA)"
              recommendation: "Enable shield"
              recommendation_url: "https://www.example.com/policies/AntiDDoS.html"
+             title: "shield-enabled"
              confidence: 100
              compliance_status: FAILED
 
@@ -508,14 +511,21 @@ class PostFinding(Action):
         if existing_finding_id:
             finding_id = existing_finding_id
         else:
-            finding_id = '{}/{}/{}/{}'.format(  # nosec
+            # for fips compliance we need to explicit pass the usage param but it doesn't
+            # exist on python 3.8, directly pass when we drop 3.8 support.
+            params = (sys.version_info.major > 3 and sys.version_info.minor > 8) and {
+                'usedforsecurity': False} or {}
+            finding_id = '{}/{}/{}/{}'.format(
                 self.manager.config.region,
                 self.manager.config.account_id,
-                hashlib.md5(json.dumps(  # nosemgrep
-                    policy.data).encode('utf8')).hexdigest(),
-                hashlib.md5(json.dumps(list(sorted(  # nosemgrep
-                    [r[model.id] for r in resources]))).encode(
-                        'utf8')).hexdigest())
+                # we use md5 for id, equiv to using crc32
+                hashlib.md5( # nosec nosemgrep
+                    json.dumps(policy.data).encode('utf8'),
+                    **params).hexdigest(),
+                hashlib.md5( # nosec nosemgrep
+                    json.dumps(list(sorted([r[model.id] for r in resources]))).encode('utf8'),
+                    **params).hexdigest()
+            )
         finding = {
             "SchemaVersion": self.FindingVersion,
             "ProductArn": "arn:{}:securityhub:{}::product/cloud-custodian/cloud-custodian".format(
@@ -626,7 +636,7 @@ class OtherResourcePostFinding(PostFinding):
             details[k] = r[k]
 
         for f in self.fields:
-            value = jmespath.search(f['expr'], r)
+            value = jmespath_search(f['expr'], r)
             if not value:
                 continue
             details[f['key']] = value
