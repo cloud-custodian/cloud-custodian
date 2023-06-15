@@ -116,9 +116,7 @@ def test_cli_test_assertion_not_used(tmp_path):
     )
 
     runner = CliRunner()
-    result = runner.invoke(
-        cli.cli, ["test", "-p", str(tmp_path)], catch_exceptions=False
-    )
+    result = runner.invoke(cli.cli, ["test", "-p", str(tmp_path)], catch_exceptions=False)
     assert result.exit_code == 1
     assert "Unused Checks" in result.output
     assert "example2" in result.output
@@ -153,9 +151,7 @@ def test_cli_test_finding_not_asserted(tmp_path):
     )
 
     runner = CliRunner()
-    result = runner.invoke(
-        cli.cli, ["test", "-p", str(tmp_path)], catch_exceptions=False
-    )
+    result = runner.invoke(cli.cli, ["test", "-p", str(tmp_path)], catch_exceptions=False)
     assert result.exit_code == 1
     assert "1 findings unmatched" in result.output
     assert "google_pubsub_topic.example" in result.output
@@ -201,9 +197,7 @@ def test_cli_test_success(tmp_path):
     )
 
     runner = CliRunner()
-    result = runner.invoke(
-        cli.cli, ["test", "-p", str(tmp_path)], catch_exceptions=False
-    )
+    result = runner.invoke(cli.cli, ["test", "-p", str(tmp_path)], catch_exceptions=False)
     assert result.exit_code == 0
     assert "Discovered 1 Tests" in result.output
     assert "Success check-wild - 1 checks" in result.output
