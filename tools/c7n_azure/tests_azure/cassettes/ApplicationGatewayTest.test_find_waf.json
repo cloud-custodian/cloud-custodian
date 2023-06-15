@@ -1,0 +1,593 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Network/applicationGateways?api-version=2020-08-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "date": [
+                        "Thu, 18 May 2023 16:37:47 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-ms-arm-service-request-id": [
+                        "40fa217c-1ca9-45d6-96b0-69eff271a52a"
+                    ],
+                    "content-length": [
+                        "20476"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "name": "cfb-yxemqwju-app-gateway",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-yxemqwju-test-group/providers/Microsoft.Network/applicationGateways/cfb-yxemqwju-app-gateway",
+                                "etag": "W/\"0f02a14c-4b0d-4d20-b3e3-faa923c0086c\"",
+                                "type": "Microsoft.Network/applicationGateways",
+                                "location": "centralus",
+                                "tags": {
+                                    "c7n": "true",
+                                    "product_id": "13742",
+                                    "created_by": "abc@def.com"
+                                },
+                                "properties": {
+                                    "provisioningState": "Succeeded",
+                                    "resourceGuid": "98fdc5cd-6040-4e03-9a70-7790a4589156",
+                                    "sku": {
+                                        "name": "WAF_v2",
+                                        "tier": "WAF_v2",
+                                        "capacity": 2
+                                    },
+                                    "operationalState": "Running",
+                                    "gatewayIPConfigurations": [
+                                        {
+                                            "name": "my-gateway-ip-configuration",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-yxemqwju-test-group/providers/Microsoft.Network/applicationGateways/cfb-yxemqwju-app-gateway/gatewayIPConfigurations/my-gateway-ip-configuration",
+                                            "etag": "W/\"0f02a14c-4b0d-4d20-b3e3-faa923c0086c\"",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "subnet": {
+                                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-yxemqwju-test-group/providers/Microsoft.Network/virtualNetworks/cfb-yxemqwju-vnet/subnets/cfb-yxemqwju-frontend"
+                                                }
+                                            },
+                                            "type": "Microsoft.Network/applicationGateways/gatewayIPConfigurations"
+                                        }
+                                    ],
+                                    "sslCertificates": [],
+                                    "trustedRootCertificates": [],
+                                    "trustedClientCertificates": [],
+                                    "sslProfiles": [],
+                                    "frontendIPConfigurations": [
+                                        {
+                                            "name": "cfb-yxemqwju-vnet-feip",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-yxemqwju-test-group/providers/Microsoft.Network/applicationGateways/cfb-yxemqwju-app-gateway/frontendIPConfigurations/cfb-yxemqwju-vnet-feip",
+                                            "etag": "W/\"0f02a14c-4b0d-4d20-b3e3-faa923c0086c\"",
+                                            "type": "Microsoft.Network/applicationGateways/frontendIPConfigurations",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "privateIPAllocationMethod": "Dynamic",
+                                                "publicIPAddress": {
+                                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-yxemqwju-test-group/providers/Microsoft.Network/publicIPAddresses/cfb-yxemqwju-pip"
+                                                },
+                                                "httpListeners": [
+                                                    {
+                                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-yxemqwju-test-group/providers/Microsoft.Network/applicationGateways/cfb-yxemqwju-app-gateway/httpListeners/cfb-yxemqwju-vnet-httplstn"
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ],
+                                    "frontendPorts": [
+                                        {
+                                            "name": "cfb-yxemqwju-vnet-feport",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-yxemqwju-test-group/providers/Microsoft.Network/applicationGateways/cfb-yxemqwju-app-gateway/frontendPorts/cfb-yxemqwju-vnet-feport",
+                                            "etag": "W/\"0f02a14c-4b0d-4d20-b3e3-faa923c0086c\"",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "port": 80,
+                                                "httpListeners": [
+                                                    {
+                                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-yxemqwju-test-group/providers/Microsoft.Network/applicationGateways/cfb-yxemqwju-app-gateway/httpListeners/cfb-yxemqwju-vnet-httplstn"
+                                                    }
+                                                ]
+                                            },
+                                            "type": "Microsoft.Network/applicationGateways/frontendPorts"
+                                        }
+                                    ],
+                                    "backendAddressPools": [
+                                        {
+                                            "name": "cfb-yxemqwju-vnet-beap",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-yxemqwju-test-group/providers/Microsoft.Network/applicationGateways/cfb-yxemqwju-app-gateway/backendAddressPools/cfb-yxemqwju-vnet-beap",
+                                            "etag": "W/\"0f02a14c-4b0d-4d20-b3e3-faa923c0086c\"",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "backendAddresses": [],
+                                                "requestRoutingRules": [
+                                                    {
+                                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-yxemqwju-test-group/providers/Microsoft.Network/applicationGateways/cfb-yxemqwju-app-gateway/requestRoutingRules/cfb-yxemqwju-vnet-rqrt"
+                                                    }
+                                                ]
+                                            },
+                                            "type": "Microsoft.Network/applicationGateways/backendAddressPools"
+                                        }
+                                    ],
+                                    "loadDistributionPolicies": [],
+                                    "backendHttpSettingsCollection": [
+                                        {
+                                            "name": "cfb-yxemqwju-vnet-be-htst",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-yxemqwju-test-group/providers/Microsoft.Network/applicationGateways/cfb-yxemqwju-app-gateway/backendHttpSettingsCollection/cfb-yxemqwju-vnet-be-htst",
+                                            "etag": "W/\"0f02a14c-4b0d-4d20-b3e3-faa923c0086c\"",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "port": 80,
+                                                "protocol": "Http",
+                                                "cookieBasedAffinity": "Disabled",
+                                                "pickHostNameFromBackendAddress": false,
+                                                "path": "/path1/",
+                                                "requestTimeout": 60,
+                                                "requestRoutingRules": [
+                                                    {
+                                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-yxemqwju-test-group/providers/Microsoft.Network/applicationGateways/cfb-yxemqwju-app-gateway/requestRoutingRules/cfb-yxemqwju-vnet-rqrt"
+                                                    }
+                                                ]
+                                            },
+                                            "type": "Microsoft.Network/applicationGateways/backendHttpSettingsCollection"
+                                        }
+                                    ],
+                                    "httpListeners": [
+                                        {
+                                            "name": "cfb-yxemqwju-vnet-httplstn",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-yxemqwju-test-group/providers/Microsoft.Network/applicationGateways/cfb-yxemqwju-app-gateway/httpListeners/cfb-yxemqwju-vnet-httplstn",
+                                            "etag": "W/\"0f02a14c-4b0d-4d20-b3e3-faa923c0086c\"",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "frontendIPConfiguration": {
+                                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-yxemqwju-test-group/providers/Microsoft.Network/applicationGateways/cfb-yxemqwju-app-gateway/frontendIPConfigurations/cfb-yxemqwju-vnet-feip"
+                                                },
+                                                "frontendPort": {
+                                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-yxemqwju-test-group/providers/Microsoft.Network/applicationGateways/cfb-yxemqwju-app-gateway/frontendPorts/cfb-yxemqwju-vnet-feport"
+                                                },
+                                                "protocol": "Http",
+                                                "hostNames": [],
+                                                "requireServerNameIndication": false,
+                                                "customErrorConfigurations": [],
+                                                "requestRoutingRules": [
+                                                    {
+                                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-yxemqwju-test-group/providers/Microsoft.Network/applicationGateways/cfb-yxemqwju-app-gateway/requestRoutingRules/cfb-yxemqwju-vnet-rqrt"
+                                                    }
+                                                ]
+                                            },
+                                            "type": "Microsoft.Network/applicationGateways/httpListeners"
+                                        }
+                                    ],
+                                    "urlPathMaps": [],
+                                    "requestRoutingRules": [
+                                        {
+                                            "name": "cfb-yxemqwju-vnet-rqrt",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-yxemqwju-test-group/providers/Microsoft.Network/applicationGateways/cfb-yxemqwju-app-gateway/requestRoutingRules/cfb-yxemqwju-vnet-rqrt",
+                                            "etag": "W/\"0f02a14c-4b0d-4d20-b3e3-faa923c0086c\"",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "ruleType": "Basic",
+                                                "priority": 100,
+                                                "httpListener": {
+                                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-yxemqwju-test-group/providers/Microsoft.Network/applicationGateways/cfb-yxemqwju-app-gateway/httpListeners/cfb-yxemqwju-vnet-httplstn"
+                                                },
+                                                "backendAddressPool": {
+                                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-yxemqwju-test-group/providers/Microsoft.Network/applicationGateways/cfb-yxemqwju-app-gateway/backendAddressPools/cfb-yxemqwju-vnet-beap"
+                                                },
+                                                "backendHttpSettings": {
+                                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-yxemqwju-test-group/providers/Microsoft.Network/applicationGateways/cfb-yxemqwju-app-gateway/backendHttpSettingsCollection/cfb-yxemqwju-vnet-be-htst"
+                                                }
+                                            },
+                                            "type": "Microsoft.Network/applicationGateways/requestRoutingRules"
+                                        }
+                                    ],
+                                    "probes": [],
+                                    "rewriteRuleSets": [],
+                                    "redirectConfigurations": [],
+                                    "privateLinkConfigurations": [],
+                                    "privateEndpointConnections": [],
+                                    "sslPolicy": {
+                                        "policyType": "Predefined",
+                                        "policyName": "AppGwSslPolicy20150501"
+                                    },
+                                    "webApplicationFirewallConfiguration": {
+                                        "enabled": true,
+                                        "firewallMode": "Detection",
+                                        "ruleSetType": "OWASP",
+                                        "ruleSetVersion": "3.2",
+                                        "disabledRuleGroups": [
+                                            {
+                                                "ruleGroupName": "REQUEST-944-APPLICATION-ATTACK-JAVA",
+                                                "rules": [
+                                                    944240
+                                                ]
+                                            }
+                                        ],
+                                        "requestBodyCheck": true,
+                                        "maxRequestBodySizeInKb": 128,
+                                        "fileUploadLimitInMb": 100
+                                    },
+                                    "enableHttp2": false,
+                                    "customErrorConfigurations": []
+                                }
+                            },
+                            {
+                                "name": "cfb-yxemqwju-app-gateway-2",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-yxemqwju-test-group/providers/Microsoft.Network/applicationGateways/cfb-yxemqwju-app-gateway-2",
+                                "etag": "W/\"03abb21b-a577-4adf-b00e-f8c89bb75916\"",
+                                "type": "Microsoft.Network/applicationGateways",
+                                "location": "centralus",
+                                "tags": {
+                                    "c7n": "true",
+                                    "product_id": "13742",
+                                    "created_by": "abc@def.com"
+                                },
+                                "properties": {
+                                    "provisioningState": "Succeeded",
+                                    "resourceGuid": "bcdb37a8-5aae-4634-88c5-2bc8820dcca1",
+                                    "sku": {
+                                        "name": "WAF_v2",
+                                        "tier": "WAF_v2",
+                                        "capacity": 2
+                                    },
+                                    "operationalState": "Running",
+                                    "gatewayIPConfigurations": [
+                                        {
+                                            "name": "my-gateway-ip-configuration",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-yxemqwju-test-group/providers/Microsoft.Network/applicationGateways/cfb-yxemqwju-app-gateway-2/gatewayIPConfigurations/my-gateway-ip-configuration",
+                                            "etag": "W/\"03abb21b-a577-4adf-b00e-f8c89bb75916\"",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "subnet": {
+                                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-yxemqwju-test-group/providers/Microsoft.Network/virtualNetworks/cfb-yxemqwju-vnet-2/subnets/cfb-yxemqwju-frontend-2"
+                                                }
+                                            },
+                                            "type": "Microsoft.Network/applicationGateways/gatewayIPConfigurations"
+                                        }
+                                    ],
+                                    "sslCertificates": [],
+                                    "trustedRootCertificates": [],
+                                    "trustedClientCertificates": [],
+                                    "sslProfiles": [],
+                                    "frontendIPConfigurations": [
+                                        {
+                                            "name": "cfb-yxemqwju-vnet-2-feip-2",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-yxemqwju-test-group/providers/Microsoft.Network/applicationGateways/cfb-yxemqwju-app-gateway-2/frontendIPConfigurations/cfb-yxemqwju-vnet-2-feip-2",
+                                            "etag": "W/\"03abb21b-a577-4adf-b00e-f8c89bb75916\"",
+                                            "type": "Microsoft.Network/applicationGateways/frontendIPConfigurations",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "privateIPAllocationMethod": "Dynamic",
+                                                "publicIPAddress": {
+                                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-yxemqwju-test-group/providers/Microsoft.Network/publicIPAddresses/cfb-yxemqwju-pip-2"
+                                                },
+                                                "httpListeners": [
+                                                    {
+                                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-yxemqwju-test-group/providers/Microsoft.Network/applicationGateways/cfb-yxemqwju-app-gateway-2/httpListeners/cfb-yxemqwju-vnet-2-httplstn-2"
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ],
+                                    "frontendPorts": [
+                                        {
+                                            "name": "cfb-yxemqwju-vnet-2-feport-2",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-yxemqwju-test-group/providers/Microsoft.Network/applicationGateways/cfb-yxemqwju-app-gateway-2/frontendPorts/cfb-yxemqwju-vnet-2-feport-2",
+                                            "etag": "W/\"03abb21b-a577-4adf-b00e-f8c89bb75916\"",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "port": 80,
+                                                "httpListeners": [
+                                                    {
+                                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-yxemqwju-test-group/providers/Microsoft.Network/applicationGateways/cfb-yxemqwju-app-gateway-2/httpListeners/cfb-yxemqwju-vnet-2-httplstn-2"
+                                                    }
+                                                ]
+                                            },
+                                            "type": "Microsoft.Network/applicationGateways/frontendPorts"
+                                        }
+                                    ],
+                                    "backendAddressPools": [
+                                        {
+                                            "name": "cfb-yxemqwju-vnet-2-beap-2",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-yxemqwju-test-group/providers/Microsoft.Network/applicationGateways/cfb-yxemqwju-app-gateway-2/backendAddressPools/cfb-yxemqwju-vnet-2-beap-2",
+                                            "etag": "W/\"03abb21b-a577-4adf-b00e-f8c89bb75916\"",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "backendAddresses": [],
+                                                "requestRoutingRules": [
+                                                    {
+                                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-yxemqwju-test-group/providers/Microsoft.Network/applicationGateways/cfb-yxemqwju-app-gateway-2/requestRoutingRules/cfb-yxemqwju-vnet-2-rqrt-2"
+                                                    }
+                                                ]
+                                            },
+                                            "type": "Microsoft.Network/applicationGateways/backendAddressPools"
+                                        }
+                                    ],
+                                    "loadDistributionPolicies": [],
+                                    "backendHttpSettingsCollection": [
+                                        {
+                                            "name": "cfb-yxemqwju-vnet-2-be-htst-2",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-yxemqwju-test-group/providers/Microsoft.Network/applicationGateways/cfb-yxemqwju-app-gateway-2/backendHttpSettingsCollection/cfb-yxemqwju-vnet-2-be-htst-2",
+                                            "etag": "W/\"03abb21b-a577-4adf-b00e-f8c89bb75916\"",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "port": 80,
+                                                "protocol": "Http",
+                                                "cookieBasedAffinity": "Disabled",
+                                                "pickHostNameFromBackendAddress": false,
+                                                "path": "/path1/",
+                                                "requestTimeout": 60,
+                                                "requestRoutingRules": [
+                                                    {
+                                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-yxemqwju-test-group/providers/Microsoft.Network/applicationGateways/cfb-yxemqwju-app-gateway-2/requestRoutingRules/cfb-yxemqwju-vnet-2-rqrt-2"
+                                                    }
+                                                ]
+                                            },
+                                            "type": "Microsoft.Network/applicationGateways/backendHttpSettingsCollection"
+                                        }
+                                    ],
+                                    "httpListeners": [
+                                        {
+                                            "name": "cfb-yxemqwju-vnet-2-httplstn-2",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-yxemqwju-test-group/providers/Microsoft.Network/applicationGateways/cfb-yxemqwju-app-gateway-2/httpListeners/cfb-yxemqwju-vnet-2-httplstn-2",
+                                            "etag": "W/\"03abb21b-a577-4adf-b00e-f8c89bb75916\"",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "frontendIPConfiguration": {
+                                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-yxemqwju-test-group/providers/Microsoft.Network/applicationGateways/cfb-yxemqwju-app-gateway-2/frontendIPConfigurations/cfb-yxemqwju-vnet-2-feip-2"
+                                                },
+                                                "frontendPort": {
+                                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-yxemqwju-test-group/providers/Microsoft.Network/applicationGateways/cfb-yxemqwju-app-gateway-2/frontendPorts/cfb-yxemqwju-vnet-2-feport-2"
+                                                },
+                                                "protocol": "Http",
+                                                "hostNames": [],
+                                                "requireServerNameIndication": false,
+                                                "customErrorConfigurations": [],
+                                                "requestRoutingRules": [
+                                                    {
+                                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-yxemqwju-test-group/providers/Microsoft.Network/applicationGateways/cfb-yxemqwju-app-gateway-2/requestRoutingRules/cfb-yxemqwju-vnet-2-rqrt-2"
+                                                    }
+                                                ]
+                                            },
+                                            "type": "Microsoft.Network/applicationGateways/httpListeners"
+                                        }
+                                    ],
+                                    "urlPathMaps": [],
+                                    "requestRoutingRules": [
+                                        {
+                                            "name": "cfb-yxemqwju-vnet-2-rqrt-2",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-yxemqwju-test-group/providers/Microsoft.Network/applicationGateways/cfb-yxemqwju-app-gateway-2/requestRoutingRules/cfb-yxemqwju-vnet-2-rqrt-2",
+                                            "etag": "W/\"03abb21b-a577-4adf-b00e-f8c89bb75916\"",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "ruleType": "Basic",
+                                                "priority": 100,
+                                                "httpListener": {
+                                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-yxemqwju-test-group/providers/Microsoft.Network/applicationGateways/cfb-yxemqwju-app-gateway-2/httpListeners/cfb-yxemqwju-vnet-2-httplstn-2"
+                                                },
+                                                "backendAddressPool": {
+                                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-yxemqwju-test-group/providers/Microsoft.Network/applicationGateways/cfb-yxemqwju-app-gateway-2/backendAddressPools/cfb-yxemqwju-vnet-2-beap-2"
+                                                },
+                                                "backendHttpSettings": {
+                                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-yxemqwju-test-group/providers/Microsoft.Network/applicationGateways/cfb-yxemqwju-app-gateway-2/backendHttpSettingsCollection/cfb-yxemqwju-vnet-2-be-htst-2"
+                                                }
+                                            },
+                                            "type": "Microsoft.Network/applicationGateways/requestRoutingRules"
+                                        }
+                                    ],
+                                    "probes": [],
+                                    "rewriteRuleSets": [],
+                                    "redirectConfigurations": [],
+                                    "privateLinkConfigurations": [],
+                                    "privateEndpointConnections": [],
+                                    "sslPolicy": {
+                                        "policyType": "Predefined",
+                                        "policyName": "AppGwSslPolicy20150501"
+                                    },
+                                    "enableHttp2": false,
+                                    "forceFirewallPolicyAssociation": true,
+                                    "customErrorConfigurations": [],
+                                    "firewallPolicy": {
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-yxemqwju-test-group/providers/Microsoft.Network/ApplicationGatewayWebApplicationFirewallPolicies/cfb-yxemqwju-waf-policy"
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-yxemqwju-test-group/providers/Microsoft.Network/ApplicationGatewayWebApplicationFirewallPolicies/cfb-yxemqwju-waf-policy?api-version=2020-08-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "date": [
+                        "Thu, 18 May 2023 16:38:04 GMT"
+                    ],
+                    "etag": [
+                        "W/\"15f1f8cb-6ff9-4ffd-879f-75fe2aba82df\""
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-ms-arm-service-request-id": [
+                        "ce4a2916-709b-4e41-ac32-5c1e3d0d0644"
+                    ],
+                    "content-length": [
+                        "1659"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "name": "cfb-yxemqwju-waf-policy",
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-yxemqwju-test-group/providers/Microsoft.Network/ApplicationGatewayWebApplicationFirewallPolicies/cfb-yxemqwju-waf-policy",
+                        "etag": "W/\"15f1f8cb-6ff9-4ffd-879f-75fe2aba82df\"",
+                        "type": "Microsoft.Network/ApplicationGatewayWebApplicationFirewallPolicies",
+                        "location": "centralus",
+                        "tags": {
+                            "c7n": "true",
+                            "product_id": "13742",
+                            "created_by": "abc@def.com"
+                        },
+                        "properties": {
+                            "provisioningState": "Succeeded",
+                            "customRules": [],
+                            "policySettings": {
+                                "requestBodyCheck": true,
+                                "maxRequestBodySizeInKb": 128,
+                                "fileUploadLimitInMb": 100,
+                                "state": "Disabled",
+                                "mode": "Detection"
+                            },
+                            "managedRules": {
+                                "managedRuleSets": [
+                                    {
+                                        "ruleSetType": "OWASP",
+                                        "ruleSetVersion": "3.2",
+                                        "ruleGroupOverrides": [
+                                            {
+                                                "ruleGroupName": "REQUEST-944-APPLICATION-ATTACK-JAVA",
+                                                "rules": [
+                                                    {
+                                                        "ruleId": "944240",
+                                                        "state": "Disabled"
+                                                    },
+                                                    {
+                                                        "ruleId": "944130",
+                                                        "state": "Disabled"
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                ],
+                                "exclusions": []
+                            },
+                            "applicationGateways": [
+                                {
+                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-yxemqwju-test-group/providers/Microsoft.Network/applicationGateways/cfb-yxemqwju-app-gateway-2"
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-yxemqwju-test-group/providers/Microsoft.Network/ApplicationGatewayWebApplicationFirewallPolicies/cfb-yxemqwju-waf-policy?api-version=2020-08-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "date": [
+                        "Thu, 18 May 2023 16:38:23 GMT"
+                    ],
+                    "etag": [
+                        "W/\"15f1f8cb-6ff9-4ffd-879f-75fe2aba82df\""
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-ms-arm-service-request-id": [
+                        "6788a913-92f0-42e1-8418-de7dac089a9c"
+                    ],
+                    "content-length": [
+                        "1659"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "name": "cfb-yxemqwju-waf-policy",
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-yxemqwju-test-group/providers/Microsoft.Network/ApplicationGatewayWebApplicationFirewallPolicies/cfb-yxemqwju-waf-policy",
+                        "etag": "W/\"15f1f8cb-6ff9-4ffd-879f-75fe2aba82df\"",
+                        "type": "Microsoft.Network/ApplicationGatewayWebApplicationFirewallPolicies",
+                        "location": "centralus",
+                        "tags": {
+                            "c7n": "true",
+                            "product_id": "13742",
+                            "created_by": "abc@def.com"
+                        },
+                        "properties": {
+                            "provisioningState": "Succeeded",
+                            "customRules": [],
+                            "policySettings": {
+                                "requestBodyCheck": true,
+                                "maxRequestBodySizeInKb": 128,
+                                "fileUploadLimitInMb": 100,
+                                "state": "Disabled",
+                                "mode": "Detection"
+                            },
+                            "managedRules": {
+                                "managedRuleSets": [
+                                    {
+                                        "ruleSetType": "OWASP",
+                                        "ruleSetVersion": "3.2",
+                                        "ruleGroupOverrides": [
+                                            {
+                                                "ruleGroupName": "REQUEST-944-APPLICATION-ATTACK-JAVA",
+                                                "rules": [
+                                                    {
+                                                        "ruleId": "944240",
+                                                        "state": "Disabled"
+                                                    },
+                                                    {
+                                                        "ruleId": "944130",
+                                                        "state": "Disabled"
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                ],
+                                "exclusions": []
+                            },
+                            "applicationGateways": [
+                                {
+                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-yxemqwju-test-group/providers/Microsoft.Network/applicationGateways/cfb-yxemqwju-app-gateway-2"
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        }
+    ]
+}

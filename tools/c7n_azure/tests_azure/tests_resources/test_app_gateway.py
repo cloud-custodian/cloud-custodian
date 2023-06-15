@@ -24,3 +24,15 @@ class ApplicationGatewayTest(BaseTest):
         })
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
+    def test_find_waf(self):
+        p = self.load_policy({
+            'name': 'test-app-gateway',
+            'resource': 'azure.application-gateway',
+            'filters': [
+                {'type': 'waf',
+                 'override_rule': 944240,
+                 'state': 'disabled'}],
+        })
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
