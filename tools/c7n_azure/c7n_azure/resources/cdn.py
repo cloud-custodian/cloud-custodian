@@ -3,6 +3,8 @@
 
 from c7n_azure.provider import resources
 from c7n_azure.resources.arm import ArmResourceManager
+from c7n.filters import ValueFilter
+from c7n.utils import type_schema
 
 
 @resources.register('cdnprofile')
@@ -40,3 +42,34 @@ class CdnProfile(ArmResourceManager):
             'sku.name'
         )
         resource_type = 'Microsoft.Cdn/profiles'
+
+@CdnProfile.filter_registry.register('waf-not-enabled')
+class WebAppFirewallMissingFilter(ValueFilter):
+      """Check waf not enabled on cdn frontdoor profiles
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+            name: test-waf-not-enabled
+            resource: azure.cdnprofile
+            filters: [
+                - type: waf-not-enabled
+                - type: value
+                  key: sku.name
+                  op: in
+                  value: ['Standard_AzureFrontDoor','Premium_AzureFrontDoor']              
+            ]
+
+    """
+      schema = type_schema('waf-not-enabled', rinherit=ValueFilter.schema)
+    
+      def process(self, resources, event=None):
+          client = self.manager.get_client()
+          results = []
+          for profiles in resources:
+            policies = list(client.security_policies.list_by_profile(profiles["resourceGroup"],profiles["name"]))
+            if not policies:
+                results.append(profiles)
+          return results
