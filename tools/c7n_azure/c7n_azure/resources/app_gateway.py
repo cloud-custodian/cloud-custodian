@@ -61,7 +61,7 @@ class ApplicationGatewayWafFilter(Filter):
     schema = type_schema(
         'waf',
         required=['override_rule', 'state'],
-        override_rule = {'type': 'number'},
+        override_rule = {'type': 'string'},
         state =  {'type': 'string', 'enum': ['disabled']}
     )
 
