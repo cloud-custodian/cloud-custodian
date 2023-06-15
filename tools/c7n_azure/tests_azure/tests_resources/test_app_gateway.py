@@ -31,7 +31,7 @@ class ApplicationGatewayTest(BaseTest):
             'resource': 'azure.application-gateway',
             'filters': [
                 {'type': 'waf',
-                 'override_rule': "944240",
+                 'override_rule': '944240',
                  'state': 'disabled'}],
         })
         resources = p.run()
