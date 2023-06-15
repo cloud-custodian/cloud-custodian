@@ -4,6 +4,9 @@
 from c7n_azure.resources.arm import ArmResourceManager
 from c7n_azure.provider import resources
 
+from c7n.filters import Filter
+from c7n.utils import type_schema
+
 
 @resources.register('application-gateway')
 class ApplicationGateway(ArmResourceManager):
@@ -33,3 +36,55 @@ class ApplicationGateway(ArmResourceManager):
             'resourceGroup'
         )
         resource_type = 'Microsoft.Network/applicationGateways'
+
+
+@ApplicationGateway.filter_registry.register('waf')
+class ApplicationGatewayWafFilter(Filter):
+    """
+    Filter Application Gateways using WAF rule configuration
+
+    :example:
+
+    Return all the App Gateways which have rule '944240' disabled.
+
+    .. code-block:: yaml
+
+        policies:
+          - name: test-app-gateway
+            resource: azure.application-gateway
+            filters:
+              - type: waf
+                override_rule: 944240
+                state: disabled
+    """
+
+    schema = type_schema(
+        'waf',
+        required=['override_rule', 'state'],
+        override_rule = {'type': 'string'},
+        state =  {'type': 'string', 'enum': ['disabled']}
+    )
+
+    def process(self, resources, event=None):
+
+        filter_override_rule = self.data.get('override_rule')
+        filter_state = self.data.get('state')
+
+        client = self.manager.get_client()
+        result = []
+
+        for resource in resources:
+            if 'firewallPolicy' in resource['properties']:
+                waf_policy_name = resource['properties']['firewallPolicy']['id'].split('/')[-1]
+
+                app_gate_waf = client.web_application_firewall_policies.\
+                    get(resource['resourceGroup'],waf_policy_name)
+
+                for rule_set in app_gate_waf.managed_rules.managed_rule_sets:
+                    for group in rule_set.rule_group_overrides:
+                        for rule in group.rules:
+                            if filter_override_rule == rule.rule_id \
+                                and filter_state.lower() == rule.state.lower():
+                                result.append(resource)
+        
+        return result
