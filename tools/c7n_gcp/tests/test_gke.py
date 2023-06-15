@@ -108,7 +108,7 @@ class KubernetesClusterTest(BaseTest):
                 'resource': 'gcp.gke-cluster',
                 'filters': [{'name': name}],
                 'actions': [{'type': 'set-labels',
-                            'remove': {'test_label'}}]},
+                            'remove': ['test_label']}]},
             session_factory=factory
         )
         resources = p.run()
