@@ -14,6 +14,8 @@ from contextlib import closing
 from c7n.cache import NullCache
 from c7n.utils import format_string_values, jmespath_search
 
+import boto3
+
 log = logging.getLogger('custodian.resolver')
 
 ZIP_OR_GZIP_HEADER_DETECT = zlib.MAX_WBITS | 32
@@ -114,6 +116,7 @@ class ValuesFrom:
             'expr': {'oneOf': [
                 {'type': 'integer'},
                 {'type': 'string'}]},
+            'api_key_secret': {'type': 'string'},
             'headers': {
                 'type': 'object',
                 'patternProperties': {
@@ -133,6 +136,15 @@ class ValuesFrom:
         self.cache = manager._cache or NullCache({})
         self.resolver = URIResolver(manager.session_factory, self.cache)
 
+    def _add_api_key(self, headers):
+        secret = self.data.get('api_key_secret')
+        if secret is not None:
+          # if secret.startswith('arn:aws:ssm'):
+            if secret.startswith('arn:aws:secretsmanager'):
+                client = boto3.client('secretsmanager')
+                apiKey = client.get_secret_value(SecretId=secret)['SecretString']
+                headers.update({'x-api-key': apiKey})
+
     def get_contents(self):
         _, format = os.path.splitext(self.data['url'])
 
@@ -150,6 +162,7 @@ class ValuesFrom:
             uri=self.data.get('url'),
             headers=self.data.get('headers', {})
         )
+        self._add_api_key(params['headers'])
         
         contents = str(self.resolver.resolve(**params))
         return contents, format
