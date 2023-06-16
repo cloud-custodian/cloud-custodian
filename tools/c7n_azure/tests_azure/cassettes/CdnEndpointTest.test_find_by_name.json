@@ -41,7 +41,7 @@
                                 "kind": "frontdoor",
                                 "tags": {
                                     "product_id": "13742",
-                                    "created_by": "carol_brothers@mckinsey.com"
+                                    "created_by": "test@test.com"
                                 },
                                 "sku": {
                                     "name": "Premium_AzureFrontDoor"
@@ -60,7 +60,7 @@
                                 "kind": "frontdoor",
                                 "tags": {
                                     "product_id": "13742",
-                                    "created_by": "carol_brothers@mckinsey.com"
+                                    "created_by": "test@test.com"
                                 },
                                 "sku": {
                                     "name": "Premium_AzureFrontDoor"
