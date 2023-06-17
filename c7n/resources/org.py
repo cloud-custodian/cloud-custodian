@@ -19,9 +19,39 @@ log = logging.getLogger("custodian.org-accounts")
 ORG_ACCOUNT_SESSION_NAME = "CustodianOrgAccount"
 
 
+@AWS.resources.register("org-policy")
+class OrgPolicy(QueryResourceManager):
+
+    policy_types = (
+        'SERVICE_CONTROL_POLICY', 'TAG_POLICY', 'BACKUP_POLICY', 'AISERVICES_OPT_OUT_POLICY'
+    )
+
+    class resource_type(TypeInfo):
+        service = "organizations"
+        id = "Id"
+        name = "Name"
+        arn = "Arn"
+        arn_type = "policy"
+        enum_spec = ("list_policies", "Policies", None)
+
+    def resources(self, query=None):
+        q = self.resource_query()
+        if query is not None:
+            q.update(query)
+        return super().resources(query=query)
+
+    def parse_query(self, query=None):
+        params = {}
+        for q in self.data.get('query', ()):
+            if isinstance(q, dict) and 'filter' in q:
+                params['Filter'] = q['filter']
+        if not params:
+            param['Filter'] = "SERVICE_CONTROL_POLICY"
+        return params
+
+
 @AWS.resources.register("org-account")
 class OrgAccount(QueryResourceManager):
-
     executor_factory = MainThreadExecutor
 
     class resource_type(TypeInfo):
@@ -37,9 +67,7 @@ class OrgAccount(QueryResourceManager):
     def augment(self, resources):
         client = local_session(self.session_factory).client("organizations")
         for r in resources:
-            r["Tags"] = client.list_tags_for_resource(ResourceId=r["Id"]).get(
-                "Tags", []
-            )
+            r["Tags"] = client.list_tags_for_resource(ResourceId=r["Id"]).get("Tags", [])
         return resources
 
     def get_org_session(self):
@@ -52,8 +80,7 @@ class OrgAccount(QueryResourceManager):
         if self.org_session:
             return self.org_session
         if self.account_config.get("org-access-role") and not (
-            "LAMBDA_TASK_ROOT" in os.environ
-            and self.data.get("mode", {}).get("member-role")
+            "LAMBDA_TASK_ROOT" in os.environ and self.data.get("mode", {}).get("member-role")
         ):
             self.org_session = assumed_session(
                 role_arn=self.account_config["org-access-role"],
@@ -74,9 +101,7 @@ class OrgAccount(QueryResourceManager):
         for q in self.data.get("query", ()):
             params.update(q)
         self.account_config = {
-            k: v
-            for k, v in params.items()
-            if k in ("org-access-role", "org-account-role")
+            k: v for k, v in params.items() if k in ("org-access-role", "org-account-role")
         }
         if "org-account-role" not in self.account_config:
             # Default Organizations Role
@@ -195,7 +220,6 @@ class ProcessAccountSet:
 
 @OrgAccount.filter_registry.register("cfn-stack")
 class StackFilter(Filter, ProcessAccountSet):
-
     schema = type_schema(
         "cfn-stack",
         stack_names={"type": "array", "elements": {"type": "string"}},
