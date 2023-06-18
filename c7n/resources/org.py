@@ -21,9 +21,11 @@ ORG_ACCOUNT_SESSION_NAME = "CustodianOrgAccount"
 
 @AWS.resources.register("org-policy")
 class OrgPolicy(QueryResourceManager):
-
     policy_types = (
-        'SERVICE_CONTROL_POLICY', 'TAG_POLICY', 'BACKUP_POLICY', 'AISERVICES_OPT_OUT_POLICY'
+        'SERVICE_CONTROL_POLICY',
+        'TAG_POLICY',
+        'BACKUP_POLICY',
+        'AISERVICES_OPT_OUT_POLICY',
     )
 
     class resource_type(TypeInfo):
@@ -154,7 +156,7 @@ class OrganizationUnit(Filter, AccountHierarchy):
 
 class ProcessAccountSet:
     def resolve_regions(self, account, session):
-        return self.data.get("regions", ("us-east-1"))
+        return self.data.get("regions", ("us-east-1",))
 
     def process_account_region(self, account, region, session):
         raise NotImplementedError()
@@ -186,7 +188,7 @@ class ProcessAccountSet:
         account_results = {}
         org_session = self.manager.get_org_session()
 
-        with self.executor_factory(max_workers=8) as w:
+        with self.manager.executor_factory(max_workers=8) as w:
             futures = {}
             for a in resources:
                 try:
