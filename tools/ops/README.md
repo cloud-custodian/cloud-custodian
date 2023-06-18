@@ -68,6 +68,8 @@ optional arguments:
                         The policy must match the regex
   -p POLICY_FILTER, --policies POLICY_FILTER
                         Only use named/matched policies
+  -l POLICY_TAGS_FILTER, --policytags POLICY_TAGS_FILTER
+                        Filter policies based on policy tags.
   --assume ASSUME_ROLE  Role to assume
   -v                    toggle verbose logging
 
