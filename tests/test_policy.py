@@ -359,7 +359,7 @@ class PolicyMetaLint(BaseTest):
 
         whitelist = {
             # q2 2023 wave 2
-            "AWS::AppConfig::DeploymentStrategy",                                                                                                        
+            "AWS::AppConfig::DeploymentStrategy",
             "AWS::AppFlow::Flow",
             "AWS::AuditManager::Assessment",
             "AWS::CloudWatch::MetricStream",
@@ -482,8 +482,8 @@ class PolicyMetaLint(BaseTest):
             'AWS::SES::ReceiptRuleSet',
             'AWS::SES::Template',
             'AWS::ServiceDiscovery::HttpNamespace',
-            'AWS::Transfer::Workflow',      
-            # 
+            'AWS::Transfer::Workflow',
+            #
             'AWS::ApiGatewayV2::Stage',
             'AWS::Athena::DataCatalog',
             'AWS::Athena::WorkGroup',
