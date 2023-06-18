@@ -46,7 +46,7 @@ class OrgPolicy(QueryResourceManager):
             if isinstance(q, dict) and 'filter' in q:
                 params['Filter'] = q['filter']
         if not params:
-            param['Filter'] = "SERVICE_CONTROL_POLICY"
+            params['Filter'] = "SERVICE_CONTROL_POLICY"
         return params
 
 

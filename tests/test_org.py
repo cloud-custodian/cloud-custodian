@@ -152,3 +152,11 @@ def test_org_account_filter_cfn_present(test):
         {"Id": "123", "Name": "test-account"}, "us-east-1", s
     )
     assert result is False
+
+def test_org_account_get_org_session(test):
+    test.change_environment(LAMBDA_TASK_ROOT="/app")
+    p = test.load_policy(
+        {"name": "org-cfn-check", "resource": "aws.org-account"}
+    )
+    rm = p.resource_manager
+    assert rm.get_org_session()
