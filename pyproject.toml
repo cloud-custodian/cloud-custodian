@@ -57,6 +57,8 @@ click = "^8.0"
 freezegun = "^1.2.2"
 pytest-recording = "^0.12.1"
 moto = "^4.1.11"
+# used for moto apigateway, which gets imported when using cloudformation :/
+openapi-spec-validator = "^0.5.7" 
 
 [tool.black]
 skip-string-normalization = true
