@@ -177,8 +177,11 @@ def test_org_account_account_role(test):
 
 class TestAccountSetProcess(org_module.ProcessAccountSet):
 
+    return_value = True
     def process_account_region(self, account, region, session):
-        return True
+        if isinstance(self.return_value, Exception):
+            raise self.return_value
+        return self.return_value
 
 
 @patch("c7n.resources.org.account_session")
