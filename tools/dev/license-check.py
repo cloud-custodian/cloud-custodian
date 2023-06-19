@@ -7,6 +7,7 @@ accept = (
     'MIT',
     'BSD',
     'Apache License 2.0',
+    'Apache License, Version 2.0',
     'Apache 2.0',
     'MIT License',
     'Apache 2',
@@ -72,6 +73,7 @@ def main():
         delta = set(classifiers).difference(accept_classifiers)
         if (delta or not classifiers) and dname not in whitelist_packages:
             found = True
+            import pdb; pdb.set_trace()
             print(f"{dname}: {d.metadata['License']} {classifiers}")
 
         seen.add(dname)
