@@ -237,11 +237,11 @@ def test_account_session(assumed_session):
     org_session = mock.MagicMock()
     assumed_session.return_value = 42
     s = org_module.account_session(org_session, {"Id": "112233"}, "role-name")
-    assert s is 42
+    assert s == 42
     s = org_module.account_session(
         org_session, {"Id": "112233"}, "arn:aws:iam::112233:role/role-name"
     )
-    assert s is 42
+    assert s == 42
 
 
 @pytest.fixture()
