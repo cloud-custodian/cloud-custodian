@@ -1,3 +1,6 @@
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
+
 from concurrent.futures import as_completed
 import logging
 import os
