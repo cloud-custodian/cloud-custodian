@@ -37,9 +37,11 @@ class OrgPolicy(QueryResourceManager):
         enum_spec = ("list_policies", "Policies", None)
 
     def resources(self, query=None):
-        q = self.resource_query()
+        q = self.parse_query()        
         if query is not None:
             q.update(query)
+        else:
+            query = q
         return super().resources(query=query)
 
     def parse_query(self, query=None):

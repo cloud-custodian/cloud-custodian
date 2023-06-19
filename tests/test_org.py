@@ -242,3 +242,46 @@ def test_account_session(assumed_session):
         org_session, {"Id": "112233"}, "arn:aws:iam::112233:role/role-name"
     )
     assert s is 42
+
+
+@pytest.fixture()
+def policy_org(org_tree):
+    client = boto3.client("organizations")
+    result = client.create_policy(
+        Name="ec2-diet",
+        Description="crash course dieting",
+        Type='SERVICE_CONTROL_POLICY',
+        Tags=[
+            {'Key': 'Env', 'Value': 'ProdB'}
+        ],        
+        Content=json.dumps(
+            {
+                "Version": "2012-10-17",
+                "Statement": [
+                    {
+                        "Sid": "RequireMicroInstanceType",
+                        "Effect": "Deny",
+                        "Action": "ec2:RunInstances",
+                        "Resource": ["arn:aws:ec2:*:*:instance/*"],
+                        "Condition": {"StringNotEquals": {"ec2:InstanceType": "t2.micro"}},
+                    }
+                ],
+            }
+        ),
+    )
+    pid = result['Policy']['PolicySummary']['Id']
+    client.attach_policy(
+        PolicyId=pid,
+        TargetId=org_tree['dept_b']['Id'],
+    )
+
+    org_tree.update({'policy_ec2': pid})
+    yield org_tree
+
+
+def test_policy_query(policy_org, test):
+    p = test.load_policy({"name": "org-cfn-check", "resource": "aws.org-policy"})
+    assert p.resource_manager.parse_query() == {'Filter': 'SERVICE_CONTROL_POLICY'}
+    resources = p.run()
+    assert {r['Name'] for r in resources} == {'FullAWSAccess', 'ec2-diet'}
+
