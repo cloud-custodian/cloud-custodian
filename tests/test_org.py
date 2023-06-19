@@ -1,9 +1,11 @@
 import json
-from unittest.mock import patch
+from unittest import mock
 
 import boto3
 import moto
 import pytest
+
+from botocore.exceptions import ClientError
 
 from c7n.executor import MainThreadExecutor
 from c7n.resources import org as org_module
@@ -133,6 +135,27 @@ def test_org_account_filter_cfn_absent(test):
     assert result is True
 
 
+@mock.patch("c7n.resources.org.account_session")
+def test_org_account_filter_cfn_process(account_session, test):
+    p = test.load_policy(
+        {
+            "name": "org-cfn-check",
+            "resource": "aws.org-account",
+            "filters": [
+                {
+                    "type": "cfn-stack",
+                    "status": ["CREATE_COMPLETE", "UPDATE_COMPLETE"],
+                    "stack_names": ["bob"],
+                }
+            ],
+        }
+    )
+    cfn_stack = p.resource_manager.filters[0]
+    cfn_stack.process_account_region = lambda *k: True
+    result = cfn_stack.process([{"Id": "123", "Name": "test-account"}])
+    assert result == [{'Id': '123', 'Name': 'test-account', 'c7n:cfn-stack': {'us-east-1': True}}]
+
+
 @moto.mock_cloudformation
 def test_org_account_filter_cfn_present(test):
     p = test.load_policy(
@@ -176,17 +199,18 @@ def test_org_account_account_role(test):
 
 
 class TestAccountSetProcess(org_module.ProcessAccountSet):
-
     return_value = True
+
     def process_account_region(self, account, region, session):
         if isinstance(self.return_value, Exception):
             raise self.return_value
         return self.return_value
 
 
-@patch("c7n.resources.org.account_session")
+@mock.patch("c7n.resources.org.account_session")
 def test_process_account_set(account_session, test):
     p = test.load_policy({"name": "org-cfn-check", "resource": "aws.org-account"})
+
     processor = TestAccountSetProcess()
     processor.data = {}
     processor.type = "test-process"
@@ -196,3 +220,25 @@ def test_process_account_set(account_session, test):
     results = processor.process_account_set([{'Name': 'abc', 'Id': 'arn:1122'}])
     assert results == {'arn:1122': {'us-east-1': True}}
 
+    processor.return_value = AttributeError()
+
+    results = processor.process_account_set([{'Name': 'abc', 'Id': 'arn:1122'}])
+    assert results == {'arn:1122': {'us-east-1': False}}
+
+    account_session.side_effect = ClientError({}, "AssumeRole")
+    processor.return_value = True
+
+    results = processor.process_account_set([{'Name': 'abc', 'Id': 'arn:1122'}])
+    assert not results
+
+
+@mock.patch("c7n.resources.org.assumed_session")
+def test_account_session(assumed_session):
+    org_session = mock.MagicMock()
+    assumed_session.return_value = 42
+    s = org_module.account_session(org_session, {"Id": "112233"}, "role-name")
+    assert s is 42
+    s = org_module.account_session(
+        org_session, {"Id": "112233"}, "arn:aws:iam::112233:role/role-name"
+    )
+    assert s is 42
