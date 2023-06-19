@@ -251,9 +251,7 @@ def policy_org(org_tree):
         Name="ec2-diet",
         Description="crash course dieting",
         Type='SERVICE_CONTROL_POLICY',
-        Tags=[
-            {'Key': 'Env', 'Value': 'ProdB'}
-        ],        
+        Tags=[{'Key': 'Env', 'Value': 'ProdB'}],
         Content=json.dumps(
             {
                 "Version": "2012-10-17",
@@ -284,4 +282,3 @@ def test_policy_query(policy_org, test):
     assert p.resource_manager.parse_query() == {'Filter': 'SERVICE_CONTROL_POLICY'}
     resources = p.run()
     assert {r['Name'] for r in resources} == {'FullAWSAccess', 'ec2-diet'}
-
