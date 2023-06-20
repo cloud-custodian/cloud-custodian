@@ -68,6 +68,7 @@ class OrgAccount(QueryResourceManager):
         arn = "Arn"
         arn_type = "account"
         enum_spec = ("list_accounts", "Accounts", None)
+        global_resource = True
 
     org_session = None
 
