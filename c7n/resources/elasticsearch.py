@@ -515,7 +515,7 @@ class RemoveMatchedSourceIps(BaseAction):
     ElasticSearch domain.
 
     :example:
- 
+
     .. code-block:: yaml
 
             policies:

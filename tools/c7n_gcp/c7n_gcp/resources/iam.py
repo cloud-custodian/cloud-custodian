@@ -97,7 +97,7 @@ class DisableServiceAccount(MethodAction):
 
     def get_resource_params(self, m, r):
         return {'name': r['name']}
-    
+
 
 @ServiceAccount.filter_registry.register('iam-policy')
 class ServiceAccountIamPolicyFilter(IamPolicyFilter):
