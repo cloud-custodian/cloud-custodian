@@ -12,7 +12,7 @@ class DescribeConfigurationSet(DescribeSource):
     def augment(self, resources):
         client = local_session(self.manager.session_factory).client('ses')
         for r in resources:
-            details = client.describe_configuration_set(ConfigurationSetName=r['Name'], 
+            details = client.describe_configuration_set(ConfigurationSetName=r['Name'],
                 ConfigurationSetAttributeNames=['eventDestinations','trackingOptions','deliveryOptions','reputationOptions'])
             r.update({
                 k: details[k]

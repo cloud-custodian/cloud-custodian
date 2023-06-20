@@ -4,8 +4,6 @@ from ..azure_common import BaseTest, arm_template
 
 
 class RecoveryServicesTest(BaseTest):
-    def setUp(self):
-        super(RecoveryServicesTest, self).setUp()
 
     def test_recovery_services_schema_validate(self):
         with self.sign_out_patch():
@@ -15,7 +13,6 @@ class RecoveryServicesTest(BaseTest):
             }, validate=True)
             self.assertTrue(p)
 
-         
     @arm_template('recoveryservices.json')
     def test_find_by_name(self):
         p = self.load_policy({
