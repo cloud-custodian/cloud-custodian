@@ -74,10 +74,7 @@ class UpdateCrossConnect(OCIBaseAction):
         client = self.manager.get_client()
         params_dict = {}
         params_model = {}
-        if self.data.get("params") and self.data.get("params").get("cross_connect_id"):
-            params_dict["cross_connect_id"] = self.data.get("params").get("cross_connect_id")
-        else:
-            params_dict["cross_connect_id"] = resource.get("id")
+        params_dict["cross_connect_id"] = resource.get("id")
         if self.data.get("params").get("update_cross_connect_details"):
             update_cross_connect_details_user = self.data.get("params").get(
                 "update_cross_connect_details"
@@ -132,13 +129,13 @@ class RemoveTagActionCross_connect(RemoveTagBaseAction):
                 cross_connect_id=params_dict["cross_connect_id"],
                 update_cross_connect_details=params_dict["update_cross_connect_details"],
             )
-            log.info(
+            log.debug(
                 f"Received status {response.status} for PUT:update_cross_connect:remove-tag"
                 f" {response.request_id}"
             )
             return response
         else:
-            log.info(
+            log.debug(
                 "No tags matched. Skipping the remove-tag action on this resource - %s",
                 resource.get("display_name"),
             )
@@ -202,10 +199,7 @@ class UpdateVcn(OCIBaseAction):
         client = self.manager.get_client()
         params_dict = {}
         params_model = {}
-        if self.data.get("params") and self.data.get("params").get("vcn_id"):
-            params_dict["vcn_id"] = self.data.get("params").get("vcn_id")
-        else:
-            params_dict["vcn_id"] = resource.get("id")
+        params_dict["vcn_id"] = resource.get("id")
         if self.data.get("params").get("update_vcn_details"):
             update_vcn_details_user = self.data.get("params").get("update_vcn_details")
             params_model = self.update_params(resource, update_vcn_details_user)
@@ -252,13 +246,13 @@ class RemoveTagActionVcn(RemoveTagBaseAction):
                 vcn_id=params_dict["vcn_id"],
                 update_vcn_details=params_dict["update_vcn_details"],
             )
-            log.info(
+            log.debug(
                 f"Received status {response.status} for PUT:update_vcn:remove-tag"
                 f" {response.request_id}"
             )
             return response
         else:
-            log.info(
+            log.debug(
                 "No tags matched. Skipping the remove-tag action on this resource - %s",
                 resource.get("display_name"),
             )
@@ -322,10 +316,7 @@ class UpdateSubnet(OCIBaseAction):
         client = self.manager.get_client()
         params_dict = {}
         params_model = {}
-        if self.data.get("params") and self.data.get("params").get("subnet_id"):
-            params_dict["subnet_id"] = self.data.get("params").get("subnet_id")
-        else:
-            params_dict["subnet_id"] = resource.get("id")
+        params_dict["subnet_id"] = resource.get("id")
         if self.data.get("params").get("update_subnet_details"):
             update_subnet_details_user = self.data.get("params").get("update_subnet_details")
             params_model = self.update_params(resource, update_subnet_details_user)
@@ -374,13 +365,13 @@ class RemoveTagActionSubnet(RemoveTagBaseAction):
                 subnet_id=params_dict["subnet_id"],
                 update_subnet_details=params_dict["update_subnet_details"],
             )
-            log.info(
+            log.debug(
                 f"Received status {response.status} for PUT:update_subnet:remove-tag"
                 f" {response.request_id}"
             )
             return response
         else:
-            log.info(
+            log.debug(
                 "No tags matched. Skipping the remove-tag action on this resource - %s",
                 resource.get("display_name"),
             )

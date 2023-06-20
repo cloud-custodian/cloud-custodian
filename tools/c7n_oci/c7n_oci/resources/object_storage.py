@@ -83,10 +83,7 @@ class UpdateBucket(OCIBaseAction):
         client = self.manager.get_client()
         params_dict = {}
         params_model = {}
-        if self.data.get("params") and self.data.get("params").get("namespace_name"):
-            params_dict["namespace_name"] = self.data.get("params").get("namespace_name")
-        else:
-            params_dict["namespace_name"] = resource.get("namespace")
+        params_dict["namespace_name"] = resource.get("namespace")
         if self.data.get("params") and self.data.get("params").get("bucket_name"):
             params_dict["bucket_name"] = self.data.get("params").get("bucket_name")
         else:
@@ -144,13 +141,13 @@ class RemoveTagActionBucket(RemoveTagBaseAction):
                 bucket_name=params_dict["bucket_name"],
                 update_bucket_details=params_dict["update_bucket_details"],
             )
-            log.info(
+            log.debug(
                 f"Received status {response.status} for POST:update_bucket:remove-tag"
                 f" {response.request_id}"
             )
             return response
         else:
-            log.info(
+            log.debug(
                 "No tags matched. Skipping the remove-tag action on this resource - %s",
                 resource.get("name"),
             )

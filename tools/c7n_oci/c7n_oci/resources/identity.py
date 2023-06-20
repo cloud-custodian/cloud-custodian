@@ -129,13 +129,13 @@ class RemoveTagActionCompartment(RemoveTagBaseAction):
                 compartment_id=params_dict["compartment_id"],
                 update_compartment_details=params_dict["update_compartment_details"],
             )
-            log.info(
+            log.debug(
                 f"Received status {response.status} for PUT:update_compartment:remove-tag"
                 f" {response.request_id}"
             )
             return response
         else:
-            log.info(
+            log.debug(
                 "No tags matched. Skipping the remove-tag action on this resource - %s",
                 resource.get("name"),
             )
@@ -247,13 +247,13 @@ class RemoveTagActionGroup(RemoveTagBaseAction):
                 group_id=params_dict["group_id"],
                 update_group_details=params_dict["update_group_details"],
             )
-            log.info(
+            log.debug(
                 f"Received status {response.status} for PUT:update_group:remove-tag"
                 f" {response.request_id}"
             )
             return response
         else:
-            log.info(
+            log.debug(
                 "No tags matched. Skipping the remove-tag action on this resource - %s",
                 resource.get("name"),
             )
@@ -365,13 +365,13 @@ class RemoveTagActionUser(RemoveTagBaseAction):
                 user_id=params_dict["user_id"],
                 update_user_details=params_dict["update_user_details"],
             )
-            log.info(
+            log.debug(
                 f"Received status {response.status} for PUT:update_user:remove-tag"
                 f" {response.request_id}"
             )
             return response
         else:
-            log.info(
+            log.debug(
                 "No tags matched. Skipping the remove-tag action on this resource - %s",
                 resource.get("name"),
             )

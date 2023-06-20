@@ -150,10 +150,7 @@ class InstanceAction(OCIBaseAction):
         client = self.manager.get_client()
         params_dict = {}
         params_model = {}
-        if self.data.get("params") and self.data.get("params").get("instance_id"):
-            params_dict["instance_id"] = self.data.get("params").get("instance_id")
-        else:
-            params_dict["instance_id"] = resource.get("id")
+        params_dict["instance_id"] = resource.get("id")
         if self.data.get("params") and self.data.get("params").get("action"):
             params_dict["action"] = self.data.get("params").get("action")
         else:
@@ -213,10 +210,7 @@ class UpdateInstance(OCIBaseAction):
         client = self.manager.get_client()
         params_dict = {}
         params_model = {}
-        if self.data.get("params") and self.data.get("params").get("instance_id"):
-            params_dict["instance_id"] = self.data.get("params").get("instance_id")
-        else:
-            params_dict["instance_id"] = resource.get("id")
+        params_dict["instance_id"] = resource.get("id")
         if self.data.get("params").get("update_instance_details"):
             update_instance_details_user = self.data.get("params").get("update_instance_details")
             params_model = self.update_params(resource, update_instance_details_user)
@@ -267,13 +261,13 @@ class RemoveTagActionInstance(RemoveTagBaseAction):
                 instance_id=params_dict["instance_id"],
                 update_instance_details=params_dict["update_instance_details"],
             )
-            log.info(
+            log.debug(
                 f"Received status {response.status} for PUT:update_instance:remove-tag"
                 f" {response.request_id}"
             )
             return response
         else:
-            log.info(
+            log.debug(
                 "No tags matched. Skipping the remove-tag action on this resource - %s",
                 resource.get("display_name"),
             )

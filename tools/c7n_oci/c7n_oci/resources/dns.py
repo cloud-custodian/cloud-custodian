@@ -78,10 +78,7 @@ class UpdateZone(OCIBaseAction):
         client = self.manager.get_client()
         params_dict = {}
         params_model = {}
-        if self.data.get("params") and self.data.get("params").get("zone_name_or_id"):
-            params_dict["zone_name_or_id"] = self.data.get("params").get("zone_name_or_id")
-        else:
-            params_dict["zone_name_or_id"] = resource.get("id")
+        params_dict["zone_name_or_id"] = resource.get("id")
         if self.data.get("params").get("update_zone_details"):
             update_zone_details_user = self.data.get("params").get("update_zone_details")
             params_model = self.update_params(resource, update_zone_details_user)
@@ -134,13 +131,13 @@ class RemoveTagActionZone(RemoveTagBaseAction):
                 zone_name_or_id=params_dict["zone_name_or_id"],
                 update_zone_details=params_dict["update_zone_details"],
             )
-            log.info(
+            log.debug(
                 f"Received status {response.status} for PUT:update_zone:remove-tag"
                 f" {response.request_id}"
             )
             return response
         else:
-            log.info(
+            log.debug(
                 "No tags matched. Skipping the remove-tag action on this resource - %s",
                 resource.get("name"),
             )

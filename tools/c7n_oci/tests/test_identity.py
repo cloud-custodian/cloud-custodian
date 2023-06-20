@@ -40,6 +40,9 @@ class TestIdentityTerraformTest(OciBaseTest):
             "name": "filter-and-add-tags-on-compartments",
             "description": "Filter and add tags on the compartment",
             "resource": Resource.COMPARTMENT.value,
+            "query": [
+                {"lifecycle_state": "ACTIVE"},
+            ],
             "filters": [
                 {
                     "type": "value",

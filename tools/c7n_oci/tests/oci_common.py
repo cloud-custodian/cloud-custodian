@@ -12,9 +12,6 @@ FILTERED_FIELDS = ["metadata"]
 
 
 class OciBaseTest(CustodianTestCore):
-    def addCleanup(self, func, *args, **kw):
-        pass
-
     custodian_schema = generate()
 
     def load_policy(self, data, *args, **kw):
