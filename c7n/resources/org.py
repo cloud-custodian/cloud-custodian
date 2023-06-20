@@ -38,6 +38,7 @@ class OrgPolicy(QueryResourceManager):
         arn = "Arn"
         arn_type = "policy"
         enum_spec = ("list_policies", "Policies", None)
+        global_resource = True
 
     def resources(self, query=None):
         q = self.parse_query()
