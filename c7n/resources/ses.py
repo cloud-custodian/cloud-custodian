@@ -96,6 +96,10 @@ class SESEmailIdentity(QueryResourceManager):
 @SESEmailIdentity.filter_registry.register('has-statement')
 class HasStatementFilter(polstmt_filter.HasStatementFilter):
 
+    def __init__(self, data, manager=None):
+        super().__init__(data, manager)
+        self.policy_attribute = 'Policies'
+
     def get_std_format_args(self, email_identity):
         return {
             'account_id': self.manager.config.account_id,
@@ -104,8 +108,7 @@ class HasStatementFilter(polstmt_filter.HasStatementFilter):
         }
 
     def process_resource(self, email_identity):
-        policies_attribute = getattr(self, 'policy_attribute', 'Policies')
-        policies = email_identity.get(policies_attribute)
+        policies = email_identity.get(self.policy_attribute)
         if not policies:
             return None
 
