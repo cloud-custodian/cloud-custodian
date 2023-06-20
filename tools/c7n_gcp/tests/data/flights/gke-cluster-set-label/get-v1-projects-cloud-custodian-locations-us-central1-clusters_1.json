@@ -2,15 +2,16 @@
   "headers": {
     "content-type": "application/json; charset=UTF-8",
     "vary": "Origin, X-Origin, Referer",
-    "date": "Wed, 14 Jun 2023 19:20:07 GMT",
+    "date": "Tue, 20 Jun 2023 17:06:12 GMT",
     "server": "ESF",
     "cache-control": "private",
     "x-xss-protection": "0",
     "x-frame-options": "SAMEORIGIN",
     "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
     "transfer-encoding": "chunked",
     "status": "200",
-    "content-length": "30684",
+    "content-length": "30614",
     "-content-encoding": "gzip",
     "content-location": "https://container.googleapis.com/v1/projects/cloud-custodian/locations/us-central1/clusters?alt=json"
   },
@@ -500,14 +501,13 @@
           "us-central1-f"
         ],
         "resourceLabels": {
-          "custodian_status": "resource_policy-delete-2023_09_15__0_0",
+          "test_label": "test_value",
           "org": "platform",
           "division": "engineering",
           "team": "capacity",
-          "project": "c7n-test",
-          "test_label": "test_value"
+          "project": "c7n-test"
         },
-        "labelFingerprint": "124aea6e",
+        "labelFingerprint": "fb7c61df",
         "legacyAbac": {},
         "ipAllocationPolicy": {
           "useIpAliases": true,
@@ -601,7 +601,7 @@
           "channel": "REGULAR"
         },
         "workloadIdentityConfig": {
-          "workloadPool": "cloud-capacity.svc.id.goog"
+          "workloadPool": "cloud-custodian.svc.id.goog"
         },
         "notificationConfig": {
           "pubsub": {}
@@ -676,7 +676,7 @@
           }
         },
         "nodePoolAutoConfig": {},
-        "etag": "10f59f7e-1828-4013-8b43-2050a630c02c",
+        "etag": "49c0a5f3-c6e5-4115-b6aa-872f2ceb4bc4",
         "securityPostureConfig": {
           "mode": "MODE_UNSPECIFIED",
           "vulnerabilityMode": "VULNERABILITY_MODE_UNSPECIFIED"

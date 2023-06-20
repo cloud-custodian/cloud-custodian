@@ -3,7 +3,7 @@
 import time
 
 from gcp_common import BaseTest, event_data
-
+from c7n.config import Config
 
 class KubernetesClusterTest(BaseTest):
 
@@ -73,9 +73,26 @@ class KubernetesClusterTest(BaseTest):
         )
 
     def test_cluster_set_labels(self):
-        project_id = 'cloud-custodian'
+        project_id = 'elastic-platform-capacity'
         name = "standard-cluster-1"
         factory = self.replay_flight_data('gke-cluster-set-label', project_id)
+        p = self.load_policy(
+            {
+                'name': 'label-gke-cluster-cache',
+                'resource': 'gcp.gke-cluster',
+                'filters': [{'name': name}],
+                'actions': [{'type': 'set-labels',
+                            'labels': {'test_label': 'new_value'}}]},
+            cache=True,
+            config=Config.empty(
+                cache='memory',
+                cache_period=10,
+                output_dir=self.get_temp_dir(),
+            ),
+            session_factory=factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
         p = self.load_policy(
             {
                 'name': 'label-gke-cluster',
@@ -83,6 +100,12 @@ class KubernetesClusterTest(BaseTest):
                 'filters': [{'name': name}],
                 'actions': [{'type': 'set-labels',
                             'labels': {'test_label': 'test_value'}}]},
+            cache=True,
+            config=Config.empty(
+                cache='memory',
+                cache_period=10,
+                output_dir=self.get_temp_dir(),
+            ),
             session_factory=factory
         )
         resources = p.run()
