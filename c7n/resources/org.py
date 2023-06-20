@@ -10,10 +10,11 @@ from botocore.exceptions import ClientError
 
 from c7n.credentials import assumed_session
 from c7n.executor import MainThreadExecutor
-from c7n.filters import Filter
+from c7n.filters import Filter, HasStatementFilter
 from c7n.query import QueryResourceManager, TypeInfo
 from c7n.resources.aws import AWS
 from c7n.utils import local_session, type_schema
+
 
 
 log = logging.getLogger("custodian.org-accounts")
@@ -22,8 +23,46 @@ log = logging.getLogger("custodian.org-accounts")
 ORG_ACCOUNT_SESSION_NAME = "CustodianOrgAccount"
 
 
+class OrgAccess:
+
+    org_session = None
+
+    def parse_access_role(self):
+        params = {}
+        for q in self.data.get("query", ()):
+            params.update(q)        
+        org_access = {
+            k: v for k, v in params.items() if k in ("org-access-role",)
+        }
+        return org_access.get('org-access-role')
+
+    def get_org_session(self):
+        # so we have to do a three way dance
+        # cli role -> (optional org access role) -> target account role
+        #
+        # in lambda though if we have a member-role we're effectively
+        # already in the org root on the event.
+        #
+        if self.org_session:
+            return self.org_session
+        org_access_role = self.parse_access_role()
+        if org_access_role and not (
+            "LAMBDA_TASK_ROOT" in os.environ and self.data.get("mode", {}).get("member-role")
+        ):
+            self.org_session = assumed_session(
+                role_arn=org_access_role,
+                session_name=ORG_ACCOUNT_SESSION_NAME,
+                region=self.session_factory.region,
+                session=local_session(self.session_factory),
+            )
+        else:
+            self.org_session = local_session(self.session_factory)
+        return self.org_session
+
+
+
 @AWS.resources.register("org-policy")
-class OrgPolicy(QueryResourceManager):
+class OrgPolicy(QueryResourceManager, OrgAccess):
     policy_types = (
         'SERVICE_CONTROL_POLICY',
         'TAG_POLICY',
@@ -58,6 +97,29 @@ class OrgPolicy(QueryResourceManager):
         return params
 
 
+class PolicyTarget(Filter):
+
+    schema = type_schema(
+        'target',
+        targets={'type': 'array', 'items': {'type': 'string'}}
+    )
+
+    def process(self, resources, event=None):
+        client = self.manager.get_org_session().client('organizations')
+        resources = []
+        for r in resources:
+            pass
+
+@OrgPolicy.filter_registry.register('scp-contents')
+class ControlPolicyContents(Filter):
+
+    schema = type_schema(
+        'target'
+    )
+
+
+
+
 @AWS.resources.register("org-account")
 class OrgAccount(QueryResourceManager):
     executor_factory = MainThreadExecutor
@@ -78,28 +140,6 @@ class OrgAccount(QueryResourceManager):
         for r in resources:
             r["Tags"] = client.list_tags_for_resource(ResourceId=r["Id"]).get("Tags", [])
         return resources
-
-    def get_org_session(self):
-        # so we have to do a three way dance
-        # cli role -> (optional org access role) -> target account role
-        #
-        # in lambda though if we have a member-role we're effectively
-        # already in the org root on the event.
-        #
-        if self.org_session:
-            return self.org_session
-        if self.account_config.get("org-access-role") and not (
-            "LAMBDA_TASK_ROOT" in os.environ and self.data.get("mode", {}).get("member-role")
-        ):
-            self.org_session = assumed_session(
-                role_arn=self.account_config["org-access-role"],
-                session_name=ORG_ACCOUNT_SESSION_NAME,
-                region=self.session_factory.region,
-                session=local_session(self.session_factory),
-            )
-        else:
-            self.org_session = local_session(self.session_factory)
-        return self.org_session
 
     def validate(self):
         self.parse_query()
