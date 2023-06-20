@@ -26,6 +26,8 @@ jobs:
         with:
           terraform_wrapper: false          
       - name: Lint Check
+        env:
+          RUFF_FORMAT: github
         run: |
           make lint
       - name: Check Workflows

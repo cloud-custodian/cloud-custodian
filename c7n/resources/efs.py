@@ -60,7 +60,7 @@ class ElasticFileSystemMountTarget(ChildResourceManager):
         arn = False
         cfn_type = 'AWS::EFS::MountTarget'
         supports_trailevents = True
-    
+
 
 @ElasticFileSystemMountTarget.filter_registry.register('subnet')
 class Subnet(SubnetFilter):
