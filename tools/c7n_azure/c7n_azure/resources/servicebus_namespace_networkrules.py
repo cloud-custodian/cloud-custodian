@@ -17,7 +17,7 @@ class ServiceBusNamespaceNetworkrules(ChildResourceManager):
     Returns Service Bus Namespace Network Ruleset resources
 
     .. code-block:: yaml
-    
+
          policies:
           - name: basic-servicebus-namespace-networkrule
             resource: azure.servicebus-namespace-networkrules
@@ -40,6 +40,7 @@ class ServiceBusNamespaceNetworkrules(ChildResourceManager):
 
         @classmethod
         def extra_args(cls, parent_resource):
-            return {'resource_group_name': 
-                    ResourceIdParser.get_resource_group(parent_resource['id']),
-                    'namespace_name': parent_resource['name']}
+            return {
+                'resource_group_name': ResourceIdParser.get_resource_group(parent_resource['id']),
+                'namespace_name': parent_resource['name']
+            }
