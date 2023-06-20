@@ -92,7 +92,7 @@ class SqlServerTest(BaseTest):
         })
         resources = p.run()
         self.assertEqual(len(resources), 1)
-    
+
     def test_data_encryption_filter(self):
         p = self.load_policy({
             'name': 'test-azure-sql-server-tde',
