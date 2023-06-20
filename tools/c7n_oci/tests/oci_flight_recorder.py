@@ -12,7 +12,12 @@ import requests_stubs
 from c7n.testing import C7N_FUNCTIONAL, CustodianTestCore
 from c7n.utils import reset_session_cache
 from c7n_oci.session import Session
-from oci_common import replace_ocid, replace_email, replace_namespace, sanitize_response_body
+from oci_common import (
+    replace_ocid,
+    replace_email,
+    replace_namespace,
+    sanitize_response_body,
+)
 
 FILTERED_HEADERS = [
     "authorization",
@@ -143,7 +148,9 @@ class OCIFlightRecorder(CustodianTestCore):
                 body = json.dumps(response["body"]["data"])
                 if response["headers"].get("content-encoding", (None,))[0] == "gzip":
                     response["body"]["string"] = gzip.compress(body.encode("utf-8"))
-                    response["headers"]["content-length"] = [str(len(response["body"]["string"]))]
+                    response["headers"]["content-length"] = [
+                        str(len(response["body"]["string"]))
+                    ]
                 else:
                     response["body"]["string"] = body.encode("utf-8")
                     response["headers"]["content-length"] = [str(len(body))]
@@ -199,10 +206,16 @@ class OCIFlightRecorder(CustodianTestCore):
         if req in self.multi_requests_map:
             if self.multi_requests_history.get(req, 0) > 0:
                 self.running_req_count[req] = self.running_req_count.get(req, 0) + 1
-                if self.running_req_count.get(req) > self.multi_requests_history.get(req):
+                if self.running_req_count.get(req) > self.multi_requests_history.get(
+                    req
+                ):
                     self.running_req_count = {}
-                    self.multi_requests_history[req] = self.multi_requests_history.get(req) + 1
-                    if self.multi_requests_history.get(req) == self.multi_requests_map.get(req, 0):
+                    self.multi_requests_history[req] = (
+                        self.multi_requests_history.get(req) + 1
+                    )
+                    if self.multi_requests_history.get(
+                        req
+                    ) == self.multi_requests_map.get(req, 0):
                         self.multi_requests_history[req] = 0
                     return True
                 else:

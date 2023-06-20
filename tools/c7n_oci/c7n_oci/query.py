@@ -51,10 +51,14 @@ class DescribeSource:
         )
         return resources
 
-    def _get_resources_for_list_of_compartment_ids(self, compartment_ids, list_func_ref):
+    def _get_resources_for_list_of_compartment_ids(
+        self, compartment_ids, list_func_ref
+    ):
         resources = []
         for compartment_id in compartment_ids:
-            results = self._get_resources_with_compartment_and_params(compartment_id, list_func_ref)
+            results = self._get_resources_with_compartment_and_params(
+                compartment_id, list_func_ref
+            )
             for result in results:
                 resources.append(oci.util.to_dict(result))
         return resources
@@ -117,7 +121,9 @@ class DescribeSearch(DescribeSource):
 
     def _get_search_details_model(self):
         query = f"query {self.manager.resource_type.search_resource_type} resources"
-        return oci.resource_search.models.StructuredSearchDetails(type="Structured", query=query)
+        return oci.resource_search.models.StructuredSearchDetails(
+            type="Structured", query=query
+        )
 
     # Contruct the query params as it used for building the search model
     def _get_query_params(self, query):

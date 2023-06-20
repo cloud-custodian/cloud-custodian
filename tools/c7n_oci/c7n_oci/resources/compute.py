@@ -185,27 +185,27 @@ class InstanceAction(OCIBaseAction):
 @Instance.action_registry.register("update-instance")
 class UpdateInstance(OCIBaseAction):
     """
-        Update instance Action
+    Update instance Action
 
-        :example:
+    :example:
 
-        Updates certain fields on the specified instance. Fields that are not provided in the request will not be updated. Avoid entering confidential information.
+    Updates certain fields on the specified instance. Fields that are not provided in the request will not be updated. Avoid entering confidential information.
 
-        Changes to metadata fields will be reflected in the instance metadata service (this may take up to a minute).
+    Changes to metadata fields will be reflected in the instance metadata service (this may take up to a minute).
 
-        The OCID of the instance remains the same.
+    The OCID of the instance remains the same.
 
 
-        Please refer to the Oracle Cloud Infrastructure Python SDK documentation for parameter details to this action
-        https://docs.oracle.com/en-us/iaas/tools/python/latest/api/core/client/oci.core.ComputeClient.html#oci.core.ComputeClient.update_instance
+    Please refer to the Oracle Cloud Infrastructure Python SDK documentation for parameter details to this action
+    https://docs.oracle.com/en-us/iaas/tools/python/latest/api/core/client/oci.core.ComputeClient.html#oci.core.ComputeClient.update_instance
 
-        .. code-block:: yaml
+    .. code-block:: yaml
 
-            policies:
-                - name: perform-update-instance-action
-                  resource: oci.instance
-                  actions:
-                    - type: update-instance
+        policies:
+            - name: perform-update-instance-action
+              resource: oci.instance
+              actions:
+                - type: update-instance
 
     """  # noqa
 

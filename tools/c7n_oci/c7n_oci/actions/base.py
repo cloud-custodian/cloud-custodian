@@ -68,7 +68,9 @@ class OCIBaseAction(BaseAction, ABC):
                 for tag_ns, tag_dict in value.items():
                     existing_ns_tags = existing_tags.get(tag_ns, {})
                     updated_tags = {
-                        k: v for k, v in tag_dict.items() if existing_ns_tags.get(k) == v
+                        k: v
+                        for k, v in tag_dict.items()
+                        if existing_ns_tags.get(k) == v
                     }
                     updated_ns_tags[tag_ns] = updated_tags or tag_dict
 
@@ -140,14 +142,18 @@ class RemoveTagBaseAction(OCIBaseAction):
         return tag_count
 
     def tag_removed_from_resource(self, original_tag_count, modified_tag_count):
-        if original_tag_count.get("freeform_tags") != modified_tag_count.get("freeform_tags"):
+        if original_tag_count.get("freeform_tags") != modified_tag_count.get(
+            "freeform_tags"
+        ):
             return True
         else:
             original_defined_tag = original_tag_count.get("defined_tags")
             modified_defined_tag = modified_tag_count.get("defined_tags")
             if original_defined_tag:
                 for namespace in original_defined_tag:
-                    if original_defined_tag.get(namespace) != modified_defined_tag.get(namespace):
+                    if original_defined_tag.get(namespace) != modified_defined_tag.get(
+                        namespace
+                    ):
                         return True
                 return False
             else:
