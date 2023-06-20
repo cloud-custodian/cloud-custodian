@@ -72,43 +72,31 @@ class UpdateZone(OCIBaseAction):
 
     """  # noqa
 
-    schema = type_schema(
-        "update-zone", params={"type": "object"}, rinherit=OCIBaseAction.schema
-    )
+    schema = type_schema("update-zone", params={"type": "object"}, rinherit=OCIBaseAction.schema)
 
     def perform_action(self, resource):
         client = self.manager.get_client()
         params_dict = {}
         params_model = {}
         if self.data.get("params") and self.data.get("params").get("zone_name_or_id"):
-            params_dict["zone_name_or_id"] = self.data.get("params").get(
-                "zone_name_or_id"
-            )
+            params_dict["zone_name_or_id"] = self.data.get("params").get("zone_name_or_id")
         else:
             params_dict["zone_name_or_id"] = resource.get("id")
         if self.data.get("params").get("update_zone_details"):
-            update_zone_details_user = self.data.get("params").get(
-                "update_zone_details"
-            )
+            update_zone_details_user = self.data.get("params").get("update_zone_details")
             params_model = self.update_params(resource, update_zone_details_user)
-            params_dict["update_zone_details"] = oci.dns.models.UpdateZoneDetails(
-                **params_model
-            )
+            params_dict["update_zone_details"] = oci.dns.models.UpdateZoneDetails(**params_model)
         if self.data.get("params") and self.data.get("params").get("scope"):
             params_dict["scope"] = self.data.get("params").get("scope")
         if self.data.get("params") and self.data.get("params").get("view_id"):
             params_dict["view_id"] = self.data.get("params").get("view_id")
         if self.data.get("params") and self.data.get("params").get("compartment_id"):
-            params_dict["compartment_id"] = self.data.get("params").get(
-                "compartment_id"
-            )
+            params_dict["compartment_id"] = self.data.get("params").get("compartment_id")
         response = client.update_zone(
             zone_name_or_id=params_dict["zone_name_or_id"],
             update_zone_details=params_dict["update_zone_details"],
         )
-        log.info(
-            f"Received status {response.status} for PUT:update_zone {response.request_id}"
-        )
+        log.info(f"Received status {response.status} for PUT:update_zone {response.request_id}")
         return response
 
 
@@ -140,9 +128,7 @@ class RemoveTagActionZone(RemoveTagBaseAction):
         original_tag_count = self.tag_count(resource)
         params_model = self.remove_tag(resource)
         updated_tag_count = self.tag_count(params_model)
-        params_dict["update_zone_details"] = oci.dns.models.UpdateZoneDetails(
-            **params_model
-        )
+        params_dict["update_zone_details"] = oci.dns.models.UpdateZoneDetails(**params_model)
         if self.tag_removed_from_resource(original_tag_count, updated_tag_count):
             response = client.update_zone(
                 zone_name_or_id=params_dict["zone_name_or_id"],

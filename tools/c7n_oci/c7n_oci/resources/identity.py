@@ -121,9 +121,9 @@ class RemoveTagActionCompartment(RemoveTagBaseAction):
         original_tag_count = self.tag_count(resource)
         params_model = self.remove_tag(resource)
         updated_tag_count = self.tag_count(params_model)
-        params_dict[
-            "update_compartment_details"
-        ] = oci.identity.models.UpdateCompartmentDetails(**params_model)
+        params_dict["update_compartment_details"] = oci.identity.models.UpdateCompartmentDetails(
+            **params_model
+        )
         if self.tag_removed_from_resource(original_tag_count, updated_tag_count):
             response = client.update_compartment(
                 compartment_id=params_dict["compartment_id"],
@@ -192,9 +192,7 @@ class UpdateGroup(OCIBaseAction):
 
     """  # noqa
 
-    schema = type_schema(
-        "update-group", params={"type": "object"}, rinherit=OCIBaseAction.schema
-    )
+    schema = type_schema("update-group", params={"type": "object"}, rinherit=OCIBaseAction.schema)
 
     def perform_action(self, resource):
         client = self.manager.get_client()
@@ -202,20 +200,16 @@ class UpdateGroup(OCIBaseAction):
         params_model = {}
         params_dict["group_id"] = resource.get("id")
         if self.data.get("params").get("update_group_details"):
-            update_group_details_user = self.data.get("params").get(
-                "update_group_details"
-            )
+            update_group_details_user = self.data.get("params").get("update_group_details")
             params_model = self.update_params(resource, update_group_details_user)
-            params_dict[
-                "update_group_details"
-            ] = oci.identity.models.UpdateGroupDetails(**params_model)
+            params_dict["update_group_details"] = oci.identity.models.UpdateGroupDetails(
+                **params_model
+            )
         response = client.update_group(
             group_id=params_dict["group_id"],
             update_group_details=params_dict["update_group_details"],
         )
-        log.info(
-            f"Received status {response.status} for PUT:update_group {response.request_id}"
-        )
+        log.info(f"Received status {response.status} for PUT:update_group {response.request_id}")
         return response
 
 
@@ -247,9 +241,7 @@ class RemoveTagActionGroup(RemoveTagBaseAction):
         original_tag_count = self.tag_count(resource)
         params_model = self.remove_tag(resource)
         updated_tag_count = self.tag_count(params_model)
-        params_dict["update_group_details"] = oci.identity.models.UpdateGroupDetails(
-            **params_model
-        )
+        params_dict["update_group_details"] = oci.identity.models.UpdateGroupDetails(**params_model)
         if self.tag_removed_from_resource(original_tag_count, updated_tag_count):
             response = client.update_group(
                 group_id=params_dict["group_id"],
@@ -318,9 +310,7 @@ class UpdateUser(OCIBaseAction):
 
     """  # noqa
 
-    schema = type_schema(
-        "update-user", params={"type": "object"}, rinherit=OCIBaseAction.schema
-    )
+    schema = type_schema("update-user", params={"type": "object"}, rinherit=OCIBaseAction.schema)
 
     def perform_action(self, resource):
         client = self.manager.get_client()
@@ -328,9 +318,7 @@ class UpdateUser(OCIBaseAction):
         params_model = {}
         params_dict["user_id"] = resource.get("id")
         if self.data.get("params").get("update_user_details"):
-            update_user_details_user = self.data.get("params").get(
-                "update_user_details"
-            )
+            update_user_details_user = self.data.get("params").get("update_user_details")
             params_model = self.update_params(resource, update_user_details_user)
             params_dict["update_user_details"] = oci.identity.models.UpdateUserDetails(
                 **params_model
@@ -339,9 +327,7 @@ class UpdateUser(OCIBaseAction):
             user_id=params_dict["user_id"],
             update_user_details=params_dict["update_user_details"],
         )
-        log.info(
-            f"Received status {response.status} for PUT:update_user {response.request_id}"
-        )
+        log.info(f"Received status {response.status} for PUT:update_user {response.request_id}")
         return response
 
 
@@ -373,9 +359,7 @@ class RemoveTagActionUser(RemoveTagBaseAction):
         original_tag_count = self.tag_count(resource)
         params_model = self.remove_tag(resource)
         updated_tag_count = self.tag_count(params_model)
-        params_dict["update_user_details"] = oci.identity.models.UpdateUserDetails(
-            **params_model
-        )
+        params_dict["update_user_details"] = oci.identity.models.UpdateUserDetails(**params_model)
         if self.tag_removed_from_resource(original_tag_count, updated_tag_count):
             response = client.update_user(
                 user_id=params_dict["user_id"],
@@ -633,9 +617,7 @@ class UserCustomerSecretKeysValueFilter(ValueFilter):
                     )
                     customer_secret_keys = response.data
                     if customer_secret_keys:
-                        res["customer_secret_keys"] = oci.util.to_dict(
-                            customer_secret_keys
-                        )
+                        res["customer_secret_keys"] = oci.util.to_dict(customer_secret_keys)
                         result.append(res)
             return super().process(result)
         else:
@@ -650,9 +632,7 @@ class UserCustomerSecretKeysValueFilter(ValueFilter):
                 customer_secret_keys = response.data
                 if customer_secret_keys:
                     for customer_secret_key in customer_secret_keys:
-                        res["customer_secret_key"] = oci.util.to_dict(
-                            customer_secret_key
-                        )
+                        res["customer_secret_key"] = oci.util.to_dict(customer_secret_key)
                         result.append(res)
             filtered_resources = super().process(result)
             deserialized_resources = []

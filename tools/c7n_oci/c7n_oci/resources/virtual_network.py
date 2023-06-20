@@ -75,21 +75,17 @@ class UpdateCrossConnect(OCIBaseAction):
         params_dict = {}
         params_model = {}
         if self.data.get("params") and self.data.get("params").get("cross_connect_id"):
-            params_dict["cross_connect_id"] = self.data.get("params").get(
-                "cross_connect_id"
-            )
+            params_dict["cross_connect_id"] = self.data.get("params").get("cross_connect_id")
         else:
             params_dict["cross_connect_id"] = resource.get("id")
         if self.data.get("params").get("update_cross_connect_details"):
             update_cross_connect_details_user = self.data.get("params").get(
                 "update_cross_connect_details"
             )
-            params_model = self.update_params(
-                resource, update_cross_connect_details_user
+            params_model = self.update_params(resource, update_cross_connect_details_user)
+            params_dict["update_cross_connect_details"] = oci.core.models.UpdateCrossConnectDetails(
+                **params_model
             )
-            params_dict[
-                "update_cross_connect_details"
-            ] = oci.core.models.UpdateCrossConnectDetails(**params_model)
         response = client.update_cross_connect(
             cross_connect_id=params_dict["cross_connect_id"],
             update_cross_connect_details=params_dict["update_cross_connect_details"],
@@ -128,15 +124,13 @@ class RemoveTagActionCross_connect(RemoveTagBaseAction):
         original_tag_count = self.tag_count(resource)
         params_model = self.remove_tag(resource)
         updated_tag_count = self.tag_count(params_model)
-        params_dict[
-            "update_cross_connect_details"
-        ] = oci.core.models.UpdateCrossConnectDetails(**params_model)
+        params_dict["update_cross_connect_details"] = oci.core.models.UpdateCrossConnectDetails(
+            **params_model
+        )
         if self.tag_removed_from_resource(original_tag_count, updated_tag_count):
             response = client.update_cross_connect(
                 cross_connect_id=params_dict["cross_connect_id"],
-                update_cross_connect_details=params_dict[
-                    "update_cross_connect_details"
-                ],
+                update_cross_connect_details=params_dict["update_cross_connect_details"],
             )
             log.info(
                 f"Received status {response.status} for PUT:update_cross_connect:remove-tag"
@@ -202,9 +196,7 @@ class UpdateVcn(OCIBaseAction):
 
     """  # noqa
 
-    schema = type_schema(
-        "update-vcn", params={"type": "object"}, rinherit=OCIBaseAction.schema
-    )
+    schema = type_schema("update-vcn", params={"type": "object"}, rinherit=OCIBaseAction.schema)
 
     def perform_action(self, resource):
         client = self.manager.get_client()
@@ -217,16 +209,12 @@ class UpdateVcn(OCIBaseAction):
         if self.data.get("params").get("update_vcn_details"):
             update_vcn_details_user = self.data.get("params").get("update_vcn_details")
             params_model = self.update_params(resource, update_vcn_details_user)
-            params_dict["update_vcn_details"] = oci.core.models.UpdateVcnDetails(
-                **params_model
-            )
+            params_dict["update_vcn_details"] = oci.core.models.UpdateVcnDetails(**params_model)
         response = client.update_vcn(
             vcn_id=params_dict["vcn_id"],
             update_vcn_details=params_dict["update_vcn_details"],
         )
-        log.info(
-            f"Received status {response.status} for PUT:update_vcn {response.request_id}"
-        )
+        log.info(f"Received status {response.status} for PUT:update_vcn {response.request_id}")
         return response
 
 
@@ -258,9 +246,7 @@ class RemoveTagActionVcn(RemoveTagBaseAction):
         original_tag_count = self.tag_count(resource)
         params_model = self.remove_tag(resource)
         updated_tag_count = self.tag_count(params_model)
-        params_dict["update_vcn_details"] = oci.core.models.UpdateVcnDetails(
-            **params_model
-        )
+        params_dict["update_vcn_details"] = oci.core.models.UpdateVcnDetails(**params_model)
         if self.tag_removed_from_resource(original_tag_count, updated_tag_count):
             response = client.update_vcn(
                 vcn_id=params_dict["vcn_id"],
@@ -330,9 +316,7 @@ class UpdateSubnet(OCIBaseAction):
 
     """  # noqa
 
-    schema = type_schema(
-        "update-subnet", params={"type": "object"}, rinherit=OCIBaseAction.schema
-    )
+    schema = type_schema("update-subnet", params={"type": "object"}, rinherit=OCIBaseAction.schema)
 
     def perform_action(self, resource):
         client = self.manager.get_client()
@@ -343,9 +327,7 @@ class UpdateSubnet(OCIBaseAction):
         else:
             params_dict["subnet_id"] = resource.get("id")
         if self.data.get("params").get("update_subnet_details"):
-            update_subnet_details_user = self.data.get("params").get(
-                "update_subnet_details"
-            )
+            update_subnet_details_user = self.data.get("params").get("update_subnet_details")
             params_model = self.update_params(resource, update_subnet_details_user)
             params_dict["update_subnet_details"] = oci.core.models.UpdateSubnetDetails(
                 **params_model
@@ -354,9 +336,7 @@ class UpdateSubnet(OCIBaseAction):
             subnet_id=params_dict["subnet_id"],
             update_subnet_details=params_dict["update_subnet_details"],
         )
-        log.info(
-            f"Received status {response.status} for PUT:update_subnet {response.request_id}"
-        )
+        log.info(f"Received status {response.status} for PUT:update_subnet {response.request_id}")
         return response
 
 
@@ -388,9 +368,7 @@ class RemoveTagActionSubnet(RemoveTagBaseAction):
         original_tag_count = self.tag_count(resource)
         params_model = self.remove_tag(resource)
         updated_tag_count = self.tag_count(params_model)
-        params_dict["update_subnet_details"] = oci.core.models.UpdateSubnetDetails(
-            **params_model
-        )
+        params_dict["update_subnet_details"] = oci.core.models.UpdateSubnetDetails(**params_model)
         if self.tag_removed_from_resource(original_tag_count, updated_tag_count):
             response = client.update_subnet(
                 subnet_id=params_dict["subnet_id"],

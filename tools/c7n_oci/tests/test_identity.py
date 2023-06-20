@@ -25,9 +25,7 @@ class TestIdentityTerraformTest(OciBaseTest):
         compartment_id = identity_compartment[
             "oci_identity_compartment.test_compartment.compartment_id"
         ]
-        new_compartment_id = identity_compartment[
-            "oci_identity_compartment.test_compartment.id"
-        ]
+        new_compartment_id = identity_compartment["oci_identity_compartment.test_compartment.id"]
         return compartment_id, new_compartment_id
 
     @terraform(Module.IDENTITY_COMPARTMENT.value, scope=Scope.CLASS.value)
@@ -84,9 +82,7 @@ class TestIdentityTerraformTest(OciBaseTest):
             "filters": [
                 {"type": "value", "key": "id", "value": new_compartment_id},
             ],
-            "actions": [
-                {"type": "remove-tag", "freeform_tags": ["Cloud_Custodian_Test"]}
-            ],
+            "actions": [{"type": "remove-tag", "freeform_tags": ["Cloud_Custodian_Test"]}],
         }
         policy = test.load_policy(policy_str, session_factory=session_factory)
         policy.run()
@@ -111,9 +107,7 @@ class TestIdentityTerraformTest(OciBaseTest):
             "filters": [
                 {"type": "value", "key": "id", "value": new_compartment_id},
             ],
-            "actions": [
-                {"type": "remove-tag", "freeform_tags": ["Cloud_Custodian_Test1"]}
-            ],
+            "actions": [{"type": "remove-tag", "freeform_tags": ["Cloud_Custodian_Test1"]}],
         }
         policy = test.load_policy(policy_str, session_factory=session_factory)
         policy.run()
@@ -142,9 +136,7 @@ class TestIdentityTerraformTest(OciBaseTest):
                 {
                     "type": "update-group",
                     "params": {
-                        "update_group_details": {
-                            "freeform_tags": {"Environment": "Development"}
-                        }
+                        "update_group_details": {"freeform_tags": {"Environment": "Development"}}
                     },
                 }
             ],
@@ -154,9 +146,7 @@ class TestIdentityTerraformTest(OciBaseTest):
         )
         policy = test.load_policy(policy_str, session_factory=session_factory)
         policy.run()
-        resource = self.fetch_validation_data(
-            policy.resource_manager, "get_group", group_id
-        )
+        resource = self.fetch_validation_data(policy.resource_manager, "get_group", group_id)
         assert resource is not None
         test.assertEqual(resource["name"], "Custodian-Dev-Group")
         test.assertEqual(resource["freeform_tags"]["Environment"], "Development")
@@ -182,9 +172,7 @@ class TestIdentityTerraformTest(OciBaseTest):
         )
         policy = test.load_policy(policy_str, session_factory=session_factory)
         policy.run()
-        resource = self.fetch_validation_data(
-            policy.resource_manager, "get_group", group_id
-        )
+        resource = self.fetch_validation_data(policy.resource_manager, "get_group", group_id)
         assert resource is not None
         test.assertEqual(resource["freeform_tags"].get("Cloud_Custodian"), None)
 
@@ -209,9 +197,7 @@ class TestIdentityTerraformTest(OciBaseTest):
         )
         policy = test.load_policy(policy_str, session_factory=session_factory)
         policy.run()
-        resource = self.fetch_validation_data(
-            policy.resource_manager, "get_group", group_id
-        )
+        resource = self.fetch_validation_data(policy.resource_manager, "get_group", group_id)
         assert resource is not None
         test.assertEqual(resource["freeform_tags"].get("Cloud_Custodian1"), None)
 
@@ -239,9 +225,7 @@ class TestIdentityTerraformTest(OciBaseTest):
             "actions": [
                 {
                     "type": "update-user",
-                    "params": {
-                        "update_user_details": {"freeform_tags": {"key_limit": "2"}}
-                    },
+                    "params": {"update_user_details": {"freeform_tags": {"key_limit": "2"}}},
                 }
             ],
         }
@@ -250,9 +234,7 @@ class TestIdentityTerraformTest(OciBaseTest):
         )
         policy = test.load_policy(policy_str, session_factory=session_factory)
         policy.run()
-        resource = self.fetch_validation_data(
-            policy.resource_manager, "get_user", user_ocid
-        )
+        resource = self.fetch_validation_data(policy.resource_manager, "get_user", user_ocid)
         assert resource is not None
         test.assertEqual(resource["freeform_tags"]["key_limit"], "2")
 
@@ -271,9 +253,7 @@ class TestIdentityTerraformTest(OciBaseTest):
         )
         policy = test.load_policy(policy_str, session_factory=session_factory)
         policy.run()
-        resource = self.fetch_validation_data(
-            policy.resource_manager, "get_user", user_ocid
-        )
+        resource = self.fetch_validation_data(policy.resource_manager, "get_user", user_ocid)
         assert resource is not None
         test.assertEqual(resource["freeform_tags"].get("Cloud_Custodian"), None)
 
@@ -285,18 +265,14 @@ class TestIdentityTerraformTest(OciBaseTest):
             "description": "Remove tag from the user that doesn't exists",
             "resource": Resource.USER.value,
             "filters": [{"type": "value", "key": "id", "value": user_ocid}],
-            "actions": [
-                {"type": "remove-tag", "freeform_tags": ["Cloud_Custodian_test"]}
-            ],
+            "actions": [{"type": "remove-tag", "freeform_tags": ["Cloud_Custodian_test"]}],
         }
         session_factory = test.oci_session_factory(
             self.__class__.__name__, inspect.currentframe().f_code.co_name
         )
         policy = test.load_policy(policy_str, session_factory=session_factory)
         policy.run()
-        resource = self.fetch_validation_data(
-            policy.resource_manager, "get_user", user_ocid
-        )
+        resource = self.fetch_validation_data(policy.resource_manager, "get_user", user_ocid)
         assert resource is not None
         test.assertEqual(resource["freeform_tags"].get("Cloud_Custodian_test"), None)
 
@@ -527,11 +503,7 @@ class IdentityUnitTest(unittest.TestCase, OciBaseTest):
         return [
             {
                 "type": method_name,
-                "params": {
-                    method_param: {
-                        "freeform_tags": {"Environment": "Cloud-Custodian-Dev"}
-                    }
-                },
+                "params": {method_param: {"freeform_tags": {"Environment": "Cloud-Custodian-Dev"}}},
             }
         ]
 
@@ -561,9 +533,7 @@ class IdentityUnitTest(unittest.TestCase, OciBaseTest):
     def test_identity_group_schema(self):
         self.assertTrue(
             self.load_policy(
-                self.get_policy(
-                    "group", filters=None, actions=self.get_action("group")
-                ),
+                self.get_policy("group", filters=None, actions=self.get_action("group")),
                 validate=True,
             )
         )
@@ -654,14 +624,10 @@ class IdentityUnitTest(unittest.TestCase, OciBaseTest):
             "value_type": "size",
         }
         identity_client = Mock()
-        response = Response(
-            200, None, [{"display_name": "cloud_custodian_oauth"}], None
-        )
+        response = Response(200, None, [{"display_name": "cloud_custodian_oauth"}], None)
         identity_client.list_o_auth_client_credentials.return_value = response
         user_mock.get_client.return_value = identity_client
-        resources = [
-            {"id": "ocid1.user.oc1..<unique_ID>", "description": "Cloud Custodian"}
-        ]
+        resources = [{"id": "ocid1.user.oc1..<unique_ID>", "description": "Cloud Custodian"}]
         filter = UserOAuth2ClientCredentialsValueFilter(policy_str)
         filter.manager = user_mock
         filtered_resources = filter.process(resources, None)
@@ -706,9 +672,7 @@ class IdentityUnitTest(unittest.TestCase, OciBaseTest):
         response = Response(200, None, data, None)
         identity_client.list_o_auth_client_credentials.return_value = response
         user_mock.get_client.return_value = identity_client
-        resources = [
-            {"id": "ocid1.user.oc1..<unique_ID>", "description": "Cloud Custodian"}
-        ]
+        resources = [{"id": "ocid1.user.oc1..<unique_ID>", "description": "Cloud Custodian"}]
         filter = UserOAuth2ClientCredentialsValueFilter(policy_str)
         filter.manager = user_mock
         filtered_resources = filter.process(resources, None)
@@ -727,9 +691,7 @@ class IdentityUnitTest(unittest.TestCase, OciBaseTest):
         response = Response(200, None, [{"lifecycle_state": "ACTIVE"}], None)
         identity_client.list_api_keys.return_value = response
         user_mock.get_client.return_value = identity_client
-        resources = [
-            {"id": "ocid1.user.oc1..<unique_ID>", "description": "Cloud Custodian"}
-        ]
+        resources = [{"id": "ocid1.user.oc1..<unique_ID>", "description": "Cloud Custodian"}]
         filter = UserApiKeysValueFilter(policy_str)
         filter.manager = user_mock
         filtered_resources = filter.process(resources, None)
@@ -773,9 +735,7 @@ class IdentityUnitTest(unittest.TestCase, OciBaseTest):
         response = Response(200, None, [{"lifecycle_state": "ACTIVE"}], None)
         identity_client.list_api_keys.return_value = response
         user_mock.get_client.return_value = identity_client
-        resources = [
-            {"id": "ocid1.user.oc1..<unique_ID>", "description": "Cloud Custodian"}
-        ]
+        resources = [{"id": "ocid1.user.oc1..<unique_ID>", "description": "Cloud Custodian"}]
         filter = UserApiKeysValueFilter(policy_str)
         filter.manager = user_mock
         filtered_resources = filter.process(resources, None)
@@ -794,9 +754,7 @@ class IdentityUnitTest(unittest.TestCase, OciBaseTest):
         response = Response(200, None, [{"lifecycle_state": "ACTIVE"}], None)
         identity_client.list_db_credentials.return_value = response
         user_mock.get_client.return_value = identity_client
-        resources = [
-            {"id": "ocid1.user.oc1..<unique_ID>", "description": "Cloud Custodian"}
-        ]
+        resources = [{"id": "ocid1.user.oc1..<unique_ID>", "description": "Cloud Custodian"}]
         filter = UserDbCredentialsValueFilter(policy_str)
         filter.manager = user_mock
         filtered_resources = filter.process(resources, None)
@@ -840,9 +798,7 @@ class IdentityUnitTest(unittest.TestCase, OciBaseTest):
         response = Response(200, None, [{"lifecycle_state": "ACTIVE"}], None)
         identity_client.list_db_credentials.return_value = response
         user_mock.get_client.return_value = identity_client
-        resources = [
-            {"id": "ocid1.user.oc1..<unique_ID>", "description": "Cloud Custodian"}
-        ]
+        resources = [{"id": "ocid1.user.oc1..<unique_ID>", "description": "Cloud Custodian"}]
         filter = UserDbCredentialsValueFilter(policy_str)
         filter.manager = user_mock
         filtered_resources = filter.process(resources, None)
@@ -861,9 +817,7 @@ class IdentityUnitTest(unittest.TestCase, OciBaseTest):
         response = Response(200, None, [{"lifecycle_state": "ACTIVE"}], None)
         identity_client.list_customer_secret_keys.return_value = response
         user_mock.get_client.return_value = identity_client
-        resources = [
-            {"id": "ocid1.user.oc1..<unique_ID>", "description": "Cloud Custodian"}
-        ]
+        resources = [{"id": "ocid1.user.oc1..<unique_ID>", "description": "Cloud Custodian"}]
         filter = UserCustomerSecretKeysValueFilter(policy_str)
         filter.manager = user_mock
         filtered_resources = filter.process(resources, None)
@@ -907,9 +861,7 @@ class IdentityUnitTest(unittest.TestCase, OciBaseTest):
         response = Response(200, None, [{"lifecycle_state": "ACTIVE"}], None)
         identity_client.list_customer_secret_keys.return_value = response
         user_mock.get_client.return_value = identity_client
-        resources = [
-            {"id": "ocid1.user.oc1..<unique_ID>", "description": "Cloud Custodian"}
-        ]
+        resources = [{"id": "ocid1.user.oc1..<unique_ID>", "description": "Cloud Custodian"}]
         filter = UserCustomerSecretKeysValueFilter(policy_str)
         filter.manager = user_mock
         filtered_resources = filter.process(resources, None)
@@ -928,9 +880,7 @@ class IdentityUnitTest(unittest.TestCase, OciBaseTest):
         response = Response(200, None, [{"lifecycle_state": "ACTIVE"}], None)
         identity_client.list_smtp_credentials.return_value = response
         user_mock.get_client.return_value = identity_client
-        resources = [
-            {"id": "ocid1.user.oc1..<unique_ID>", "description": "Cloud Custodian"}
-        ]
+        resources = [{"id": "ocid1.user.oc1..<unique_ID>", "description": "Cloud Custodian"}]
         filter = UserSmtpCredentialsValueFilter(policy_str)
         filter.manager = user_mock
         filtered_resources = filter.process(resources, None)
@@ -974,9 +924,7 @@ class IdentityUnitTest(unittest.TestCase, OciBaseTest):
         response = Response(200, None, [{"lifecycle_state": "ACTIVE"}], None)
         identity_client.list_smtp_credentials.return_value = response
         user_mock.get_client.return_value = identity_client
-        resources = [
-            {"id": "ocid1.user.oc1..<unique_ID>", "description": "Cloud Custodian"}
-        ]
+        resources = [{"id": "ocid1.user.oc1..<unique_ID>", "description": "Cloud Custodian"}]
         filter = UserSmtpCredentialsValueFilter(policy_str)
         filter.manager = user_mock
         filtered_resources = filter.process(resources, None)

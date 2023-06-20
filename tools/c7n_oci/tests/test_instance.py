@@ -14,9 +14,7 @@ class TestInstance(OciBaseTest):
         return self.fetch_validation_data(resource_manager, "get_instance", instance_id)
 
     @terraform(Module.COMPUTE.value, scope=Scope.CLASS.value)
-    def test_add_defined_tag_to_instance(
-        self, test, compute, with_or_without_compartment
-    ):
+    def test_add_defined_tag_to_instance(self, test, compute, with_or_without_compartment):
         """
         test adding defined_tags tag on compute instance
         """
@@ -169,9 +167,7 @@ class TestInstance(OciBaseTest):
                 "query": [
                     {"lifecycle_state": "RUNNING"},
                 ],
-                "filters": [
-                    {"type": "value", "key": "freeform_tags.Project", "value": "CNCF"}
-                ],
+                "filters": [{"type": "value", "key": "freeform_tags.Project", "value": "CNCF"}],
             },
             session_factory=session_factory,
         )

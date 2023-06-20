@@ -12,17 +12,13 @@ class TestObjectStorage(OciBaseTest):
         name = object_storage["oci_objectstorage_bucket.test_bucket.name"]
         return namespace, name
 
-    def _fetch_bucket_validation_data(
-        self, resource_manager, namespace_name, bucket_name
-    ):
+    def _fetch_bucket_validation_data(self, resource_manager, namespace_name, bucket_name):
         client = resource_manager.get_client()
         resource = client.get_bucket(namespace_name, bucket_name)
         return oci.util.to_dict(resource.data)
 
     @terraform(Module.OBJECT_STORAGE.value, scope=Scope.CLASS.value)
-    def test_add_defined_tag_to_bucket(
-        self, test, object_storage, with_or_without_compartment
-    ):
+    def test_add_defined_tag_to_bucket(self, test, object_storage, with_or_without_compartment):
         """
         test adding defined_tags tag on compute instance
         """
@@ -232,9 +228,7 @@ class TestObjectStorage(OciBaseTest):
                     {
                         "type": "update-bucket",
                         "params": {
-                            "update_bucket_details": {
-                                "freeform_tags": {"public_access": "true"}
-                            }
+                            "update_bucket_details": {"freeform_tags": {"public_access": "true"}}
                         },
                     }
                 ],
@@ -271,9 +265,7 @@ class TestObjectStorage(OciBaseTest):
                     {
                         "type": "update-bucket",
                         "params": {
-                            "update_bucket_details": {
-                                "public_access_type": "NoPublicAccess"
-                            }
+                            "update_bucket_details": {"public_access_type": "NoPublicAccess"}
                         },
                     }
                 ],

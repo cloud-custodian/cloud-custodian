@@ -77,18 +77,14 @@ class UpdateBucket(OCIBaseAction):
 
     """  # noqa
 
-    schema = type_schema(
-        "update-bucket", params={"type": "object"}, rinherit=OCIBaseAction.schema
-    )
+    schema = type_schema("update-bucket", params={"type": "object"}, rinherit=OCIBaseAction.schema)
 
     def perform_action(self, resource):
         client = self.manager.get_client()
         params_dict = {}
         params_model = {}
         if self.data.get("params") and self.data.get("params").get("namespace_name"):
-            params_dict["namespace_name"] = self.data.get("params").get(
-                "namespace_name"
-            )
+            params_dict["namespace_name"] = self.data.get("params").get("namespace_name")
         else:
             params_dict["namespace_name"] = resource.get("namespace")
         if self.data.get("params") and self.data.get("params").get("bucket_name"):
@@ -96,21 +92,17 @@ class UpdateBucket(OCIBaseAction):
         else:
             params_dict["bucket_name"] = resource.get("name")
         if self.data.get("params").get("update_bucket_details"):
-            update_bucket_details_user = self.data.get("params").get(
-                "update_bucket_details"
-            )
+            update_bucket_details_user = self.data.get("params").get("update_bucket_details")
             params_model = self.update_params(resource, update_bucket_details_user)
-            params_dict[
-                "update_bucket_details"
-            ] = oci.object_storage.models.UpdateBucketDetails(**params_model)
+            params_dict["update_bucket_details"] = oci.object_storage.models.UpdateBucketDetails(
+                **params_model
+            )
         response = client.update_bucket(
             namespace_name=params_dict["namespace_name"],
             bucket_name=params_dict["bucket_name"],
             update_bucket_details=params_dict["update_bucket_details"],
         )
-        log.info(
-            f"Received status {response.status} for POST:update_bucket {response.request_id}"
-        )
+        log.info(f"Received status {response.status} for POST:update_bucket {response.request_id}")
         return response
 
 
@@ -143,9 +135,9 @@ class RemoveTagActionBucket(RemoveTagBaseAction):
         original_tag_count = self.tag_count(resource)
         params_model = self.remove_tag(resource)
         updated_tag_count = self.tag_count(params_model)
-        params_dict[
-            "update_bucket_details"
-        ] = oci.object_storage.models.UpdateBucketDetails(**params_model)
+        params_dict["update_bucket_details"] = oci.object_storage.models.UpdateBucketDetails(
+            **params_model
+        )
         if self.tag_removed_from_resource(original_tag_count, updated_tag_count):
             response = client.update_bucket(
                 namespace_name=params_dict["namespace_name"],

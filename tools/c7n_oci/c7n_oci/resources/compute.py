@@ -163,12 +163,8 @@ class InstanceAction(OCIBaseAction):
                 "instance_power_action_details"
             )
             if instance_power_action_details_user.get("action_type"):
-                params_dict["action_type"] = instance_power_action_details_user.get(
-                    "action_type"
-                )
-            params_model = self.update_params(
-                resource, instance_power_action_details_user
-            )
+                params_dict["action_type"] = instance_power_action_details_user.get("action_type")
+            params_model = self.update_params(resource, instance_power_action_details_user)
             params_dict[
                 "instance_power_action_details"
             ] = oci.core.models.InstancePowerActionDetails(**params_model)
@@ -222,20 +218,16 @@ class UpdateInstance(OCIBaseAction):
         else:
             params_dict["instance_id"] = resource.get("id")
         if self.data.get("params").get("update_instance_details"):
-            update_instance_details_user = self.data.get("params").get(
-                "update_instance_details"
-            )
+            update_instance_details_user = self.data.get("params").get("update_instance_details")
             params_model = self.update_params(resource, update_instance_details_user)
-            params_dict[
-                "update_instance_details"
-            ] = oci.core.models.UpdateInstanceDetails(**params_model)
+            params_dict["update_instance_details"] = oci.core.models.UpdateInstanceDetails(
+                **params_model
+            )
         response = client.update_instance(
             instance_id=params_dict["instance_id"],
             update_instance_details=params_dict["update_instance_details"],
         )
-        log.info(
-            f"Received status {response.status} for PUT:update_instance {response.request_id}"
-        )
+        log.info(f"Received status {response.status} for PUT:update_instance {response.request_id}")
         return response
 
 

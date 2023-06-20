@@ -38,9 +38,7 @@ class TestZone(OciBaseTest):
                     {
                         "type": "update-zone",
                         "params": {
-                            "update_zone_details": {
-                                "defined_tags": self.get_defined_tag("add_tag")
-                            }
+                            "update_zone_details": {"defined_tags": self.get_defined_tag("add_tag")}
                         },
                     }
                 ],
@@ -115,9 +113,7 @@ class TestZone(OciBaseTest):
                     {
                         "type": "update-zone",
                         "params": {
-                            "update_zone_details": {
-                                "freeform_tags": {"Environment": "Development"}
-                            }
+                            "update_zone_details": {"freeform_tags": {"Environment": "Development"}}
                         },
                     }
                 ],
@@ -151,9 +147,7 @@ class TestZone(OciBaseTest):
                     {
                         "type": "update-zone",
                         "params": {
-                            "update_zone_details": {
-                                "freeform_tags": {"Environment": "Production"}
-                            }
+                            "update_zone_details": {"freeform_tags": {"Environment": "Production"}}
                         },
                     }
                 ],

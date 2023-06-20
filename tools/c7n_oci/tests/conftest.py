@@ -36,11 +36,6 @@ def with_or_without_compartment(request, monkeypatch):
         monkeypatch.setenv("OCI_COMPARTMENTS", compartments)
 
 
-@pytest.hookimpl(tryfirst=True)
-def pytest_xdist_auto_num_workers(config):
-    return 1
-
-
 def pytest_terraform_modify_state(tfstate):
     tfstate.update(replace_ocid(str(tfstate)))
     tfstate.update(replace_email(str(tfstate)))
