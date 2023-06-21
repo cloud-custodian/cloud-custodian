@@ -75,7 +75,7 @@ class ElasticFileSystem(BaseTest):
         self.assertEqual(len(resources), 3)
         resources = sorted(resources, key=itemgetter("MountTargetId"))
         self.assertEqual(resources[0]["MountTargetId"], "fsmt-a47385dd")
-    
+
     def test_create_efs_mount_target(self):
         factory = self.replay_flight_data("test_create_efs_mount_target")
         policy = self.load_policy(

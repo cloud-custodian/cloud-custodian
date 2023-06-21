@@ -4,9 +4,6 @@ from ..azure_common import BaseTest, arm_template
 
 
 class CdnEndpointTest(BaseTest):
-    def setUp(self):
-        super(CdnEndpointTest, self).setUp()
-        
 
     def test_cdn_endpoint_schema_validate(self):
         with self.sign_out_patch():

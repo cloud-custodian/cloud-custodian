@@ -441,7 +441,7 @@ class RDSClusterTest(BaseTest):
         with mock_datetime_now(parser.parse("2022-03-30T00:00:00+00:00"), c7n.resources.rdscluster):
             resources = p.run()
         self.assertEqual(len(resources), 1)
-    
+
     def test_rdscluster_consecutive_aws_backups_count_filter(self):
         session_factory = self.replay_flight_data(
             "test_rdscluster_consecutive_aws_backups_count_filter")
