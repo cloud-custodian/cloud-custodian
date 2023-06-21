@@ -3,11 +3,12 @@
 
 import inspect
 import unittest
+import os
 
 import pytest
+from pytest_terraform import terraform
 from mock import patch, Mock
 from oci.response import Response
-from pytest_terraform import terraform
 
 from c7n.testing import C7N_FUNCTIONAL
 from c7n_oci.resources.identity import (
@@ -21,6 +22,14 @@ from oci_common import Module, OciBaseTest, Resource, Scope
 
 
 class TestIdentityTerraformTest(OciBaseTest):
+    @pytest.fixture
+    def setCompartmentIdToTenancyOcid(self):
+        compartment_ids = os.getenv("OCI_COMPARTMENTS")
+        tenancy_ocid = os.getenv("TF_VAR_OCI_TENANCY_ID")
+        os.environ["OCI_COMPARTMENTS"] = tenancy_ocid
+        yield
+        os.environ["OCI_COMPARTMENTS"] = compartment_ids
+
     def _get_identity_compartment_details(self, identity_compartment):
         compartment_id = identity_compartment[
             "oci_identity_compartment.test_compartment.compartment_id"
@@ -121,6 +130,7 @@ class TestIdentityTerraformTest(OciBaseTest):
         test.assertEqual(resource["freeform_tags"].get("Cloud_Custodian_Test1"), None)
 
     @terraform(Module.IDENTITY_GROUP.value, scope=Scope.CLASS.value)
+    @pytest.mark.usefixtures("setCompartmentIdToTenancyOcid")
     def test_identity_group(self, identity_group, test):
         group_id = identity_group["oci_identity_group.test_group.id"]
         policy_str = {
@@ -155,6 +165,7 @@ class TestIdentityTerraformTest(OciBaseTest):
         test.assertEqual(resource["freeform_tags"]["Environment"], "Development")
 
     @terraform(Module.IDENTITY_GROUP.value, scope=Scope.CLASS.value)
+    @pytest.mark.usefixtures("setCompartmentIdToTenancyOcid")
     def test_remove_tag_group(self, identity_group, test):
         group_id = identity_group["oci_identity_group.test_group.id"]
         policy_str = {
@@ -180,6 +191,7 @@ class TestIdentityTerraformTest(OciBaseTest):
         test.assertEqual(resource["freeform_tags"].get("Cloud_Custodian"), None)
 
     @terraform(Module.IDENTITY_GROUP.value, scope=Scope.CLASS.value)
+    @pytest.mark.usefixtures("setCompartmentIdToTenancyOcid")
     def test_remove_invalidtag_group(self, identity_group, test):
         group_id = identity_group["oci_identity_group.test_group.id"]
         policy_str = {
@@ -210,6 +222,7 @@ class TestIdentityTerraformTest(OciBaseTest):
         return compartment_id, user_ocid
 
     @terraform(Module.IDENTITY_USER.value, scope=Scope.CLASS.value)
+    @pytest.mark.usefixtures("setCompartmentIdToTenancyOcid")
     def test_identity_user_tag(self, identity_user, test):
         compartment_id, user_ocid = self._get_user_details(identity_user)
         policy_str = {
@@ -242,6 +255,7 @@ class TestIdentityTerraformTest(OciBaseTest):
         test.assertEqual(resource["freeform_tags"]["key_limit"], "2")
 
     @terraform(Module.IDENTITY_USER.value, scope=Scope.CLASS.value)
+    @pytest.mark.usefixtures("setCompartmentIdToTenancyOcid")
     def test_remove_tag_user(self, identity_user, test):
         compartment_id, user_ocid = self._get_user_details(identity_user)
         policy_str = {
@@ -261,6 +275,7 @@ class TestIdentityTerraformTest(OciBaseTest):
         test.assertEqual(resource["freeform_tags"].get("Cloud_Custodian"), None)
 
     @terraform(Module.IDENTITY_USER.value, scope=Scope.CLASS.value)
+    @pytest.mark.usefixtures("setCompartmentIdToTenancyOcid")
     def test_remove_invalidtag_user(self, identity_user, test):
         compartment_id, user_ocid = self._get_user_details(identity_user)
         policy_str = {
@@ -280,6 +295,7 @@ class TestIdentityTerraformTest(OciBaseTest):
         test.assertEqual(resource["freeform_tags"].get("Cloud_Custodian_test"), None)
 
     @terraform(Module.IDENTITY_USER.value, scope=Scope.CLASS.value)
+    @pytest.mark.usefixtures("setCompartmentIdToTenancyOcid")
     def test_attributes_user(self, identity_user, test):
         compartment_id, user_ocid = self._get_user_details(identity_user)
         policy_str = {
@@ -297,6 +313,7 @@ class TestIdentityTerraformTest(OciBaseTest):
         assert resource[0]["is_mfa_activated"] is not None
 
     @terraform(Module.IDENTITY_USER.value, scope=Scope.CLASS.value)
+    @pytest.mark.usefixtures("setCompartmentIdToTenancyOcid")
     def test_identity_user_cross_filter_size(self, identity_user, test):
         """
         Cross filter size policy testcase
@@ -333,6 +350,7 @@ class TestIdentityTerraformTest(OciBaseTest):
         assert test_user_found
 
     @terraform(Module.IDENTITY_USER.value, scope=Scope.CLASS.value)
+    @pytest.mark.usefixtures("setCompartmentIdToTenancyOcid")
     def test_identity_user_cross_filter_age(self, identity_user, test):
         """
         Cross filter query filter based on the created time usecase
@@ -366,6 +384,7 @@ class TestIdentityTerraformTest(OciBaseTest):
         assert test_user_found
 
     @terraform(Module.IDENTITY_USER.value, scope=Scope.CLASS.value)
+    @pytest.mark.usefixtures("setCompartmentIdToTenancyOcid")
     def test_identity_user_cross_size_age(self, identity_user, test):
         """
         Cross filter query filter with size & age filter
@@ -406,6 +425,7 @@ class TestIdentityTerraformTest(OciBaseTest):
 
     @pytest.mark.skipif((not C7N_FUNCTIONAL), reason="Functional test")
     @terraform(Module.IDENTITY_USER.value, scope=Scope.CLASS.value)
+    @pytest.mark.usefixtures("setCompartmentIdToTenancyOcid")
     def test_identity_user_cross_age_size(self, identity_user, test):
         """
         Cross filter query filter with age & size filter
