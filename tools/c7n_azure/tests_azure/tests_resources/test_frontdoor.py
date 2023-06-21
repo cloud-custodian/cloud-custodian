@@ -27,11 +27,12 @@ class FrontDoorTest(BaseTest):
 
     def test_waf_not_enabled(self):
         p = self.load_policy({
-            'name': 'waf-not-enabled',
+            'name': 'waf',
             'resource': 'azure.front-door',
              'filters': [
                 {
-                    'type': 'waf-not-enabled',
+                    'type': 'waf',
+                    'value': 'None'
                 },
             ]
         })

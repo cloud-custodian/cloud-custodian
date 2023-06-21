@@ -34,8 +34,8 @@ class FrontDoor(ArmResourceManager):
         )
         resource_type = 'Microsoft.Network/frontDoors'
 
-@FrontDoor.filter_registry.register('waf-not-enabled')
-class WebAppFirewallMissingFilter(Filter):
+@FrontDoor.filter_registry.register('waf')
+class WebAppFirewallFilter(Filter):
     """Frontdoor check waf enabled on front door profiles for Classic_AzureFrontDoor
 
     :example:
@@ -43,22 +43,25 @@ class WebAppFirewallMissingFilter(Filter):
     .. code-block:: yaml
 
         policies:
-            name: test-frontdoor-waf-is-enabled
+            name: test-frontdoor-waf
             resource: azure.front-door
-            filters: [
-                - type: frontdoor-waf-is-enabled
-            ]
+            filters: 
+              - type: waf
+                link: None
+            
 
     """
-    schema = type_schema('waf-not-enabled')
+    schema = type_schema('waf',required=['value'],
+            value={'type': 'string', 'enum': ['None', 'not None']})
+    
 
     def process(self, resources, event=None):
         client = self.manager.get_client()
-        results = []
+        matched = []
         for frontDoors in resources:
-            for frontendpoints in frontDoors['properties']['frontendEndpoints']:
-                frontendpoint = client.frontend_endpoints.get(
-                        frontDoors['resourceGroup'], frontDoors['name'],frontendpoints['name'])
-                if frontendpoint.web_application_firewall_policy_link is None:
-                    results.append(frontDoors)
-        return results
+            for frontEndpoints in frontDoors['properties']['frontendEndpoints']:
+                frontEndpoint = client.frontend_endpoints.get(
+                    frontDoors['resourceGroup'], frontDoors['name'],frontEndpoints['name'])
+                if frontEndpoint.web_application_firewall_policy_link is self.data.get('value'):
+                    matched.append(frontDoors)
+        return matched
