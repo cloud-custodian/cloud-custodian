@@ -46,12 +46,12 @@ class WebAppFirewallMissingFilter(Filter):
             name: test-frontdoor-waf-is-enabled
             resource: azure.front-door
             filters: [
-                - type: frontdoor-waf-is-enabled        
+                - type: frontdoor-waf-is-enabled
             ]
 
     """
     schema = type_schema('waf-not-enabled')
-    
+
     def process(self, resources, event=None):
         client = self.manager.get_client()
         results = []
