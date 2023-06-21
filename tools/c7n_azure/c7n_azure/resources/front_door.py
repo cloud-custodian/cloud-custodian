@@ -57,7 +57,8 @@ class WebAppFirewallMissingFilter(Filter):
         results = []
         for frontDoors in resources:
             for frontendpoints in frontDoors['properties']['frontendEndpoints']:
-                frontendpoint = client.frontend_endpoints.get(frontDoors['resourceGroup'], frontDoors['name'],frontendpoints['name'])
+                frontendpoint = client.frontend_endpoints.get(
+                        frontDoors['resourceGroup'], frontDoors['name'],frontendpoints['name'])
                 if frontendpoint.web_application_firewall_policy_link is None:
                     results.append(frontDoors)
         return results

@@ -45,7 +45,7 @@ class CdnProfile(ArmResourceManager):
 
 @CdnProfile.filter_registry.register('waf-not-enabled')
 class WebAppFirewallMissingFilter(ValueFilter):
-      """Check waf not enabled on cdn frontdoor profiles
+    """Check waf not enabled on cdn frontdoor profiles
 
     :example:
 
@@ -63,13 +63,14 @@ class WebAppFirewallMissingFilter(ValueFilter):
             ]
 
     """
-      schema = type_schema('waf-not-enabled', rinherit=ValueFilter.schema)
+    schema = type_schema('waf-not-enabled', rinherit=ValueFilter.schema)
     
-      def process(self, resources, event=None):
-          client = self.manager.get_client()
-          results = []
-          for profiles in resources:
-            policies = list(client.security_policies.list_by_profile(profiles["resourceGroup"],profiles["name"]))
-            if not policies:
-                results.append(profiles)
-          return results
+    def process(self, resources, event=None):
+      client = self.manager.get_client()
+      results = []
+      for profiles in resources:
+        policies = list(client.security_policies.list_by_profile(
+                      profiles["resourceGroup"],profiles["name"]))
+        if not policies:
+            results.append(profiles)
+      return results
