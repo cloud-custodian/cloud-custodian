@@ -56,12 +56,10 @@ class IPSecAlgorithmFilter(ValueFilter):
           - name: gateway-configured-with-cryptographic-algorithm
             resource: azure.vnet
             filters: 
-              -type: configured-with-cryptographic-algorithm,
+              - type: configured-with-cryptographic-algorithm,
     """
-    schema = type_schema('virtual_networks', rinherit=ValueFilter.schema)
+    schema = type_schema('virtual_gateway', rinherit=ValueFilter.schema)
     schema_alias = False
-    AnnotationKey = "c7n:matched-vpn"
-    AnnotationKeyConn = "c7n:matched-conn"
       
     def process(self, resources, event=None):
       client = self.manager.get_client()
@@ -77,8 +75,6 @@ class IPSecAlgorithmFilter(ValueFilter):
                 )
                 for connection in connections:
                   if not connection.ipsec_policies:
-                      resource[self.AnnotationKey] = vpn.name
-                      resource[self.AnnotationKeyConn] = connection.name
                       matched.append(resource)
       return matched
 
