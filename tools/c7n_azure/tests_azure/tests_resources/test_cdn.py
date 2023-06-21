@@ -29,17 +29,14 @@ class CdnTest(BaseTest):
         })
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        
+
     def test_cdn_waf(self):
         p = self.load_policy({
             'name': 'test-waf-not-enabled',
             'resource': 'azure.cdnprofile',
             'filters': [
-                {'type': 'waf-not-enabled',
-                'type': 'value',
-                'key': 'sku.name',
-                'op': 'in',
-                'value': ['Standard_AzureFrontDoor','Premium_AzureFrontDoor']}]
+                {'type': 'waf-not-enabled'}
+            ]
         })
         resources = p.run()
         self.assertEqual(len(resources), 2)
