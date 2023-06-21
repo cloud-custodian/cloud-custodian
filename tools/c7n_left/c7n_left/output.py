@@ -6,14 +6,15 @@ from collections import Counter
 from pathlib import Path
 import time
 
-import jmespath
 from rich.console import Console
 from rich.syntax import Syntax
 from rich.table import Table
 from rich.text import Text
 
-from .core import CollectionRunner
+from .core import CollectionRunner, PolicyMetadata
+from .utils import SEVERITY_LEVELS
 from c7n.output import OutputRegistry
+from c7n.utils import jmespath_search
 
 
 report_outputs = OutputRegistry("left")
@@ -23,47 +24,6 @@ def get_reporter(config):
     for k, v in report_outputs.items():
         if k == config.output:
             return v(None, config)
-
-
-class PolicyMetadata:
-    def __init__(self, policy):
-        self.policy = policy
-
-    @property
-    def resource_type(self):
-        return self.policy.resource_type
-
-    @property
-    def provider(self):
-        return self.policy.provider_name
-
-    @property
-    def name(self):
-        return self.policy.name
-
-    @property
-    def description(self):
-        return self.policy.data.get("description")
-
-    @property
-    def category(self):
-        return " ".join(self.policy.data.get("metadata", {}).get("category", []))
-
-    @property
-    def severity(self):
-        return self.policy.data.get("metadata", {}).get("severity", "")
-
-    @property
-    def title(self):
-        title = self.policy.data.get("metadata", {}).get("title", "")
-        if title:
-            return title
-        title = f"{self.resource_type} - policy:{self.name}"
-        if self.category:
-            title += f"category:{self.category}"
-        if self.severity:
-            title += f"severity:{self.severity}"
-        return title
 
 
 class Output:
@@ -89,9 +49,7 @@ class RichCli(Output):
         self.matches = 0
 
     def on_execution_started(self, policies, graph):
-        self.console.print(
-            "Running %d policies on %d resources" % (len(policies), len(graph))
-        )
+        self.console.print("Running %d policies on %d resources" % (len(policies), len(graph)))
         self.started = time.time()
 
     def on_execution_ended(self):
@@ -99,8 +57,7 @@ class RichCli(Output):
         if self.matches:
             message = "[red]%d Failures[/red]" % self.matches
         self.console.print(
-            "Evaluation complete %0.2f seconds -> %s"
-            % (time.time() - self.started, message)
+            "Evaluation complete %0.2f seconds -> %s" % (time.time() - self.started, message)
         )
 
     def on_results(self, results):
@@ -152,9 +109,14 @@ class Summary(Output):
         type_policies = Counter()
 
         resource_count = 0
+
         for rtype, resources in graph.get_resources_by_type():
+            resources = self.config.exec_filter.filter_resources(rtype, resources)
             if "_" not in rtype:
                 continue
+            if not resources:
+                continue
+
             resource_count += len(resources)
             type_counts[rtype] = len(resources)
             for p in policies:
@@ -163,6 +125,7 @@ class Summary(Output):
                 else:
                     type_policies[rtype] += 1
                     policy_resources[p.name] = len(resources)
+
         self.counter_unevaluated_by_type = unevaluated
         self.counter_resources_by_type = type_counts
         self.counter_resources_by_policy = policy_resources
@@ -175,11 +138,14 @@ class Summary(Output):
             self.resource_name_matches.add(r.resource.name)
 
     def on_execution_ended(self):
-        unevaluated = sum(self.counter_unevaluated_by_type.values())
-        compliant = (
-            self.count_total_resources - len(self.resource_name_matches) - unevaluated
+        unevaluated = sum(
+            [
+                v
+                for k, v in self.counter_unevaluated_by_type.items()
+                if k not in set(self.counter_policies_by_type)
+            ]
         )
-
+        compliant = self.count_total_resources - len(self.resource_name_matches) - unevaluated
         msg = "%d compliant of %d total" % (compliant, self.count_total_resources)
         if self.resource_name_matches:
             msg += ", %d resources have %d policy violations" % (
@@ -192,8 +158,6 @@ class Summary(Output):
         self.console.print(msg)
 
 
-severity_levels = {"critical": 0, "high": 10, "medium": 20, "low": 30, "unknown": 40}
-
 severity_colors = {
     "critical": "red",
     "high": "yellow",
@@ -204,7 +168,7 @@ severity_colors = {
 
 
 def severity_key(a):
-    return severity_levels.get(a.severity.lower(), severity_levels["unknown"])
+    return SEVERITY_LEVELS.get(a.severity.lower(), SEVERITY_LEVELS["unknown"])
 
 
 def get_severity_color(policy):
@@ -265,9 +229,7 @@ class SummaryResource(Summary):
 
     def on_execution_started(self, policies, graph):
         super().on_execution_started(policies, graph)
-        self.policies = {
-            p.name: p for p in sorted(map(PolicyMetadata, policies), key=severity_key)
-        }
+        self.policies = {p.name: p for p in sorted(map(PolicyMetadata, policies), key=severity_key)}
 
     def on_results(self, results):
         super().on_results(results)
@@ -335,7 +297,6 @@ class MultiOutput:
 
 
 class GithubFormat(Output):
-
     # https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#setting-an-error-message
 
     def on_results(self, results):
@@ -388,9 +349,7 @@ class Json(Output):
     def on_execution_ended(self):
         formatted_results = [self.format_result(r) for r in self.results]
         if self.config.output_query:
-            formatted_results = jmespath.search(
-                self.config.output_query, formatted_results
-            )
+            formatted_results = jmespath_search(self.config.output_query, formatted_results)
         self.config.output_file.write(
             json.dumps({"results": formatted_results}, cls=JSONEncoder, indent=2)
         )
@@ -405,11 +364,6 @@ class Json(Output):
             line_pairs.append((index, l))
             index += 1
 
-        return {
-            "policy": dict(result.policy.data),
-            "resource": dict(resource),
-            "file_path": str(resource.src_dir / resource.filename),
-            "file_line_start": resource.line_start,
-            "file_line_end": resource.line_end,
-            "code_block": line_pairs,
-        }
+        formatted = result.as_dict()
+        formatted["code_block"] = line_pairs
+        return formatted

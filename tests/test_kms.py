@@ -2,11 +2,13 @@
 # SPDX-License-Identifier: Apache-2.0
 import json
 import time
+from unittest.mock import patch
 
 
 from c7n.resources.aws import shape_validate
 from .common import BaseTest, functional
 
+from c7n.config import Config
 from c7n.executor import MainThreadExecutor
 from c7n.filters.iamaccess import CrossAccountAccessFilter
 
@@ -359,6 +361,60 @@ class KMSTagging(BaseTest):
             res['KmsMasterKeyId'] in (key_alias, target_key['KeyMetadata']['Arn'])
             for res in resources
         ))
+
+        # Whether a resource specifies a key by ID or alias, it should resolve
+        # to the same ID for related resource lookups.
+        related_ids = p.resource_manager.filters[0].get_related_ids(resources)
+        self.assertEqual(set(related_ids), {target_key['KeyMetadata']['KeyId']})
+
+    def test_kms_key_related_cache_lookup(self):
+        """Validate that the kms-key filter can perform alias lookups
+        against cached keys.
+
+        See https://github.com/cloud-custodian/cloud-custodian/issues/8504
+        """
+        session_factory = self.replay_flight_data("test_kms_key_related_cache_lookup")
+        key_alias = "alias/kms-cache-check"
+        p = self.load_policy(
+            {
+                "name": "load-keys-into-cache",
+                "resource": "aws.kms-key",
+            },
+            cache=True,
+            config=Config.empty(
+                cache='memory',
+                cache_period=10,
+                output_dir=self.get_temp_dir(),
+            ),
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertGreater(len(resources), 0)
+
+        p = self.load_policy(
+            {
+                "name": "sqs-kms-key-related-from-cache",
+                "resource": "aws.sqs",
+                "filters": [
+                    {
+                        "type": "kms-key",
+                        "key": "c7n:AliasName",
+                        "value": key_alias,
+                        "op": "eq"
+                    }
+                ]
+            },
+            cache=True,
+            config=Config.empty(
+                cache='memory',
+                cache_period=10,
+                output_dir=self.get_temp_dir(),
+            ),
+            session_factory=session_factory,
+        )
+        with patch('c7n.resources.sqs.SQS.executor_factory', MainThreadExecutor):
+            resources = p.run()
+        self.assertEqual(len(resources), 1)
 
     def test_kms_post_finding(self):
         factory = self.replay_flight_data('test_kms_post_finding')

@@ -1,0 +1,27 @@
+{
+    "status_code": 200, 
+    "data": {
+        "AttachedPolicies": [
+            {
+                "PolicyName": "AdministratorAccess", 
+                "PolicyArn": "arn:aws:iam::aws:policy/AdministratorAccess"
+            },
+            {
+                "PolicyName": "AWSHealthFullAccess", 
+                "PolicyArn": "arn:aws:iam::aws:policy/AWSHealthFullAccess"                
+            }
+        ], 
+        "IsTruncated": false, 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "137c0ac8-d69b-11e6-ba70-050a502ea607", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "137c0ac8-d69b-11e6-ba70-050a502ea607", 
+                "date": "Mon, 09 Jan 2017 18:40:23 GMT", 
+                "content-length": "542", 
+                "content-type": "text/xml"
+            }
+        }
+    }
+}

@@ -1,50 +1,51 @@
 {
+  "headers": {
+    "etag": "tswAw22dIyeZhWATgcfCwQ==",
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Tue, 28 Feb 2023 19:40:05 GMT",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "816",
+    "-content-encoding": "gzip",
+    "content-location": "https://bigquery.googleapis.com/bigquery/v2/projects/cloud-custodian/datasets/test?alt=json"
+  },
   "body": {
-    "kind": "bigquery#dataset", 
+    "kind": "bigquery#dataset",
+    "etag": "tswAw22dIyeZhWATgcfCwQ==",
+    "id": "cloud-custodian:test",
+    "selfLink": "https://bigquery.googleapis.com/bigquery/v2/projects/cloud-custodian/datasets/test",
     "datasetReference": {
-      "projectId": "cloud-custodian",
-      "datasetId": "test"
-    }, 
-    "creationTime": "1551972311354", 
+      "datasetId": "test",
+      "projectId": "cloud-custodian"
+    },
+    "friendlyName": "test",
     "access": [
       {
-        "specialGroup": "projectWriters", 
-        "role": "WRITER"
-      }, 
+        "role": "WRITER",
+        "specialGroup": "projectWriters"
+      },
       {
-        "specialGroup": "projectOwners", 
-        "role": "OWNER"
-      }, 
+        "role": "OWNER",
+        "specialGroup": "projectOwners"
+      },
       {
-        "role": "OWNER", 
-        "userByEmail": "dkhanas@gmail.com"
-      }, 
+        "role": "OWNER",
+        "userByEmail": "virendra_agarwal@gcp.matter.mckinsey.cloud"
+      },
       {
-        "specialGroup": "projectReaders", 
-        "role": "READER"
+        "role": "READER",
+        "specialGroup": "projectReaders"
       }
-    ], 
-    "etag": "kivSEtLTJVcIS1RPnGAcYA==", 
-    "location": "US", 
-    "lastModifiedTime": "1551972311354", 
-    "id": "cloud-custodian:test",
-    "selfLink": "https://www.googleapis.com/bigquery/v2/projects/cloud-custodian/datasets/test"
-  }, 
-  "headers": {
-    "status": "200", 
-    "content-length": "714", 
-    "x-xss-protection": "0", 
-    "content-location": "https://www.googleapis.com/bigquery/v2/projects/cloud-custodian/datasets/test?alt=json",
-    "x-content-type-options": "nosniff", 
-    "transfer-encoding": "chunked", 
-    "vary": "Origin, X-Origin, Referer", 
-    "server": "ESF", 
-    "etag": "kivSEtLTJVcIS1RPnGAcYA==", 
-    "cache-control": "private", 
-    "date": "Wed, 24 Apr 2019 09:43:58 GMT", 
-    "x-frame-options": "SAMEORIGIN", 
-    "alt-svc": "quic=\":443\"; ma=2592000; v=\"46,44,43,39\"", 
-    "content-type": "application/json; charset=UTF-8", 
-    "-content-encoding": "gzip"
+    ],
+    "creationTime": "1677600419448",
+    "lastModifiedTime": "1677600419448",
+    "location": "US",
+    "type": "DEFAULT"
   }
 }

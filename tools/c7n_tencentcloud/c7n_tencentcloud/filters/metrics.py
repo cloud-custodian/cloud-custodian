@@ -4,7 +4,6 @@
 """
 Monitoring Metrics filters suppport for resources
 """
-import jmespath
 import logging
 import math
 from statistics import mean
@@ -12,7 +11,7 @@ from datetime import datetime, timedelta, timezone
 from c7n.exceptions import PolicyValidationError, PolicyExecutionError
 from c7n.manager import ResourceManager
 from c7n.filters.core import Filter, OPERATORS
-from c7n.utils import type_schema, chunks, local_session
+from c7n.utils import type_schema, chunks, local_session, jmespath_search
 from c7n_tencentcloud.provider import resources as provider_resources
 from c7n_tencentcloud.query import ResourceTypeInfo
 
@@ -178,7 +177,7 @@ class MetricsFilter(Filter):
         for batch in chunks(resources, self.batch_size):
             params = self._get_request_params(batch)
             resp = cli.execute_query("GetMonitorData", params)
-            data_points = jmespath.search("Response.DataPoints[]", resp)
+            data_points = jmespath_search("Response.DataPoints[]", resp)
             for point in data_points:
                 yield point
 

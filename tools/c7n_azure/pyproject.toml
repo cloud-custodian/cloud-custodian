@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "c7n_azure"
-version = "0.7.21"
+version = "0.7.26"
 description = "Cloud Custodian - Azure Support"
 readme = "readme.md"
 homepage="https://cloudcustodian.io"
@@ -16,6 +16,7 @@ classifiers=[
 
 [tool.poetry.dependencies]
 python = "^3.7"
+c7n = {path = "../..", develop = true}
 
 azure-mgmt-authorization = "^1.0.0"
 azure-mgmt-advisor = "^9.0.0"
@@ -41,6 +42,7 @@ azure-mgmt-iothub = "^1.0.0"
 azure-mgmt-keyvault = "^8.0.0"
 azure-mgmt-managementgroups = "1.0.0b1"
 azure-mgmt-network = "^17.1.0"
+azure-mgmt-redhatopenshift = "^1.2.0"
 azure-mgmt-resourcegraph = "^7.0.0"
 azure-mgmt-resource = "^16.0.0"
 azure-mgmt-rdbms = "^8.1.0"
@@ -81,13 +83,15 @@ azure-mgmt-servicefabric = "^1.0.0"
 azure-mgmt-trafficmanager = "^0.51.0"
 azure-mgmt-frontdoor = "^1.0.0"
 azure-mgmt-security = "^1.0.0"
+azure-mgmt-servicebus = "^8.2.0"
+azure-mgmt-appplatform = "^8.0.0"
+azure-mgmt-recoveryservices = "^2.4.0"
 
 [tool.poetry.dev-dependencies]
 # setup custodian as a dev dependency
-c7n = {path = "../..", develop = true}
 vcrpy-unittest = "^0.1.7"
 parameterized = "^0.7.1"
 
 [build-system]
-requires = ["poetry>=0.12", "setuptools"]
-build-backend = "poetry.masonry.api"
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

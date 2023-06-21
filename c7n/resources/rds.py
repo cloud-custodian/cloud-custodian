@@ -35,9 +35,11 @@ import functools
 import itertools
 import logging
 import operator
-import jmespath
 import re
-from datetime import datetime, timedelta
+import datetime
+
+from datetime import timedelta
+
 from decimal import Decimal as D, ROUND_HALF_UP
 
 from distutils.version import LooseVersion
@@ -59,9 +61,11 @@ from c7n import deprecated, tags
 from c7n.tags import universal_augment
 
 from c7n.utils import (
-    local_session, type_schema, get_retry, chunks, snapshot_identifier, merge_dict_list)
+    local_session, type_schema, get_retry, chunks, snapshot_identifier,
+    merge_dict_list, filter_empty, jmespath_search)
 from c7n.resources.kms import ResourceKmsKeyAlias
-from c7n.resources.securityhub import OtherResourcePostFinding
+from c7n.resources.securityhub import PostFinding
+from c7n.filters.backup import ConsecutiveAwsBackupsFilter
 
 log = logging.getLogger('custodian.rds')
 
@@ -228,7 +232,7 @@ def _get_available_engine_upgrades(client, major=False):
     for page in paginator.paginate():
         engine_versions = page['DBEngineVersions']
         for v in engine_versions:
-            if not v['Engine'] in results:
+            if v['Engine'] not in results:
                 results[v['Engine']] = {}
             if 'ValidUpgradeTarget' not in v or len(v['ValidUpgradeTarget']) == 0:
                 continue
@@ -678,12 +682,54 @@ class CopySnapshotTags(BaseAction):
             CopyTagsToSnapshot=self.data.get('enable', True))
 
 
-@RDS.action_registry.register("post-finding")
-class DbInstanceFinding(OtherResourcePostFinding):
-    fields = [
-        {'key': 'DBSubnetGroupName', 'expr': 'DBSubnetGroup.DBSubnetGroupName'},
-        {'key': 'VpcId', 'expr': 'DBSubnetGroup.VpcId'},
-    ]
+@RDS.action_registry.register('post-finding')
+class DbInstanceFinding(PostFinding):
+
+    resource_type = 'AwsRdsDbInstance'
+
+    def format_resource(self, r):
+
+        fields = [
+            'AssociatedRoles', 'CACertificateIdentifier', 'DBClusterIdentifier',
+            'DBInstanceIdentifier', 'DBInstanceClass', 'DbInstancePort', 'DbiResourceId',
+            'DBName', 'DeletionProtection', 'Endpoint', 'Engine', 'EngineVersion',
+            'IAMDatabaseAuthenticationEnabled', 'InstanceCreateTime', 'KmsKeyId',
+            'PubliclyAccessible', 'StorageEncrypted',
+            'TdeCredentialArn', 'VpcSecurityGroups', 'MultiAz', 'EnhancedMonitoringResourceArn',
+            'DbInstanceStatus', 'MasterUsername',
+            'AllocatedStorage', 'PreferredBackupWindow', 'BackupRetentionPeriod',
+            'DbSecurityGroups', 'DbParameterGroups',
+            'AvailabilityZone', 'DbSubnetGroup', 'PreferredMaintenanceWindow',
+            'PendingModifiedValues', 'LatestRestorableTime',
+            'AutoMinorVersionUpgrade', 'ReadReplicaSourceDBInstanceIdentifier',
+            'ReadReplicaDBInstanceIdentifiers',
+            'ReadReplicaDBClusterIdentifiers', 'LicenseModel', 'Iops', 'OptionGroupMemberships',
+            'CharacterSetName',
+            'SecondaryAvailabilityZone', 'StatusInfos', 'StorageType', 'DomainMemberships',
+            'CopyTagsToSnapshot',
+            'MonitoringInterval', 'MonitoringRoleArn', 'PromotionTier', 'Timezone',
+            'PerformanceInsightsEnabled',
+            'PerformanceInsightsKmsKeyId', 'PerformanceInsightsRetentionPeriod',
+            'EnabledCloudWatchLogsExports',
+            'ProcessorFeatures', 'ListenerEndpoint', 'MaxAllocatedStorage'
+        ]
+        details = {}
+        for f in fields:
+            if r.get(f):
+                value = r[f]
+                if isinstance(r[f], datetime.datetime):
+                    value = r[f].isoformat()
+                details.setdefault(f, value)
+
+        db_instance = {
+            'Type': self.resource_type,
+            'Id': r['DBInstanceArn'],
+            'Region': self.manager.config.region,
+            'Tags': {t['Key']: t['Value'] for t in r.get('Tags', [])},
+            'Details': {self.resource_type: filter_empty(details)},
+        }
+        db_instance = filter_empty(db_instance)
+        return db_instance
 
 
 @actions.register('snapshot')
@@ -1591,8 +1637,8 @@ class UnusedRDSSubnetGroup(Filter):
 
     def process(self, configs, event=None):
         rds = self.manager.get_resource_manager('rds').resources()
-        self.used = set(jmespath.search('[].DBSubnetGroup.DBSubnetGroupName', rds))
-        self.used.update(set(jmespath.search('[].DBSubnetGroup.DBSubnetGroupName',
+        self.used = set(jmespath_search('[].DBSubnetGroup.DBSubnetGroupName', rds))
+        self.used.update(set(jmespath_search('[].DBSubnetGroup.DBSubnetGroupName',
             self.manager.get_resource_manager('rds-cluster').resources(augment=False))))
         return super(UnusedRDSSubnetGroup, self).process(configs)
 
@@ -1815,7 +1861,7 @@ class ModifyDb(BaseAction):
                 u['property']: u['value'] for u in self.data.get('update')
                 if r.get(
                     u['property'],
-                    jmespath.search(
+                    jmespath_search(
                         self.conversion_map.get(u['property'], 'None'), r))
                     != u['value']}
             if not param:
@@ -1845,6 +1891,9 @@ class ReservedRDS(QueryResourceManager):
         universal_taggable = object()
 
     augment = universal_augment
+
+
+RDS.filter_registry.register('consecutive-aws-backups', ConsecutiveAwsBackupsFilter)
 
 
 @filters.register('consecutive-snapshots')
@@ -1885,7 +1934,7 @@ class ConsecutiveSnapshots(Filter):
         client = local_session(self.manager.session_factory).client('rds')
         results = []
         retention = self.data.get('days')
-        utcnow = datetime.utcnow()
+        utcnow = datetime.datetime.utcnow()
         expected_dates = set()
         for days in range(1, retention + 1):
             expected_dates.add((utcnow - timedelta(days=days)).strftime('%Y-%m-%d'))
@@ -1999,6 +2048,8 @@ class RDSProxy(QueryResourceManager):
 @filters.register('db-option-groups')
 class DbOptionGroups(ValueFilter):
     """This filter describes RDS option groups for associated RDS instances.
+    Use this filter in conjunction with jmespath and value filter operators
+    to filter RDS instance based on their option groups
 
     :example:
 
@@ -2009,9 +2060,25 @@ class DbOptionGroups(ValueFilter):
             resource: aws.rds
             filters:
               - type: db-option-groups
-                key: OptionName
-                value: NATIVE_NETWORK_ENCRYPTION
-                op: eq
+                key: Options[].OptionName
+                op: intersect
+                value:
+                  - SSL
+                  - NATIVE_NETWORK_ENCRYPTION
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: rds-oracle-encryption-in-transit
+            resource: aws.rds
+            filters:
+              - Engine: oracle-ee
+              - type: db-option-groups
+                key: Options[].OptionSettings[?Name == 'SQLNET.ENCRYPTION_SERVER'].Value[]
+                value:
+                  - REQUIRED
     """
 
     schema = type_schema('db-option-groups', rinherit=ValueFilter.schema)
@@ -2020,30 +2087,29 @@ class DbOptionGroups(ValueFilter):
     policy_annotation = 'c7n:MatchedDBOptionGroups'
 
     def handle_optiongroup_cache(self, client, paginator, option_groups):
-        pgcache = {}
+        ogcache = {}
         cache = self.manager._cache
 
         with cache:
-            for pg in option_groups:
+            for og in option_groups:
                 cache_key = {
                     'region': self.manager.config.region,
                     'account_id': self.manager.config.account_id,
-                    'rds-pg': pg}
-                pg_values = cache.get(cache_key)
-                if pg_values is not None:
-                    pgcache[pg] = pg_values
+                    'rds-pg': og}
+                og_values = cache.get(cache_key)
+                if og_values is not None:
+                    ogcache[og] = og_values
                     continue
-                option_list = list(itertools.chain(*[p['OptionGroupsList']
-                    for p in paginator.paginate(OptionGroupName=pg)]))
+                option_groups_list = list(itertools.chain(*[p['OptionGroupsList']
+                    for p in paginator.paginate(OptionGroupName=og)]))
 
-                pgcache[pg] = {}
-                for option in option_list:
-                    if option['Options']:
-                        for p in option['Options']:
-                            pgcache[pg].update({'OptionName': p['OptionName']})
-                cache.save(cache_key, pgcache[pg])
+                ogcache[og] = {}
+                for option_group in option_groups_list:
+                    ogcache[og] = option_group
 
-        return pgcache
+                cache.save(cache_key, ogcache[og])
+
+        return ogcache
 
     def process(self, resources, event=None):
         results = []
@@ -2054,11 +2120,13 @@ class DbOptionGroups(ValueFilter):
         optioncache = self.handle_optiongroup_cache(client, paginator, option_groups)
 
         for resource in resources:
-            for pg in resource['OptionGroupMemberships']:
-                pg_values = optioncache[pg['OptionGroupName']]
-                if self.match(pg_values):
+            for og in resource['OptionGroupMemberships']:
+                og_values = optioncache[og['OptionGroupName']]
+                if self.match(og_values):
                     resource.setdefault(self.policy_annotation, []).append({
-                        self.data.get('key'): self.data.get('value')})
+                        k: jmespath_search(k, og_values)
+                        for k in {'OptionGroupName', self.data.get('key')}
+                    })
                     results.append(resource)
                     break
 

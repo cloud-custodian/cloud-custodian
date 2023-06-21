@@ -419,7 +419,7 @@ class LambdaManager:
         for k in new_config:
             # Layers need special handling as they have extra info on describe.
             if k == 'Layers' and k in old_config and new_config[k]:
-                if sorted(new_config[k]) != sorted([l['Arn'] for l in old_config[k]]):
+                if sorted(new_config[k]) != sorted([lyr['Arn'] for lyr in old_config[k]]):
                     changed.append(k)
             # Vpc needs special handling as a dict with lists
             elif k == 'VpcConfig' and k in old_config and new_config[k]:

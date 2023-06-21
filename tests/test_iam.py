@@ -718,6 +718,55 @@ class IamUserTest(BaseTest):
         client = factory().client('iam')
         assert client.get_user(UserName='devbot')['User'].get('PermissionsBoundary', {}) == {}
 
+    def test_iam_user_set_policy(self):
+        session_factory = self.replay_flight_data("test_iam_user_set_policy")
+        client = session_factory().client("iam")
+
+        p = self.load_policy(
+            {
+                "name": "iam-user-set-policy",
+                "resource": "aws.iam-user",
+                "actions": [
+                    {
+                        "type": "set-policy",
+                        "state": "attached",
+                        "arn": "arn:aws:iam::123456789012:policy/my-iam-policy"
+                    }
+                ]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+
+        self.assertEqual(len(resources), 1)
+        self.assertIn('test', resources[0]['UserName'])
+
+        policies = client.list_attached_user_policies(UserName="test")
+        self.assertEqual(len(policies['AttachedPolicies']), 1)
+        self.assertEqual(policies['AttachedPolicies'][0]["PolicyName"], "my-iam-policy")
+
+        p = self.load_policy(
+            {
+                "name": "iam-user-set-policy",
+                "resource": "aws.iam-user",
+                "actions": [
+                    {
+                        "type": "set-policy",
+                        "state": "detached",
+                        "arn": "*"
+                    }
+                ]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+
+        self.assertEqual(len(resources), 1)
+        self.assertIn('test', resources[0]['UserName'])
+
+        policies = client.list_attached_user_policies(UserName="test")
+        self.assertEqual(len(policies['AttachedPolicies']), 0)
+
     def test_iam_user_usage_no_such_entity(self):
         p = self.load_policy({
             'name': 'usage-check',
@@ -981,6 +1030,31 @@ class IamUserTest(BaseTest):
         )
         resources = p.run()
         self.assertEqual(resources[0]["UserName"], "alphabet_soup")
+
+    def test_iam_user_policy_include_via(self):
+        session_factory = self.replay_flight_data("test_iam_user_admin_policy_include_via")
+        self.patch(UserPolicy, "executor_factory", MainThreadExecutor)
+        p = self.load_policy(
+            {
+                "name": "iam-user-policy",
+                "resource": "iam-user",
+                "filters": [
+                    {
+                        "type": "policy",
+                        "key": "PolicyName",
+                        "value": "AdministratorAccess",
+                        "include-via": True,
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
+        self.assertEqual(resources[0]["UserName"], "alphabet_soup_1")
+        self.assertEqual(len(resources[0]["c7n:Policies"]), 2)
+        self.assertEqual(resources[1]["UserName"], "alphabet_soup_2")
+        self.assertEqual(len(resources[1]["c7n:Policies"]), 2)
 
     def test_iam_user_access_key_filter(self):
         session_factory = self.replay_flight_data("test_iam_user_access_key_active")

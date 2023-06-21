@@ -287,6 +287,24 @@ class DiskTest(BaseTest):
                      'zone': resources[0]['zone'].rsplit('/', 1)[-1]})
         self.assertEqual(result['items'][0]['labels']['test_label'], 'test_value')
 
+    def test_recommend_disk(self):
+        project_id = 'cloud-custodian'
+        factory = self.replay_flight_data('disk-recommend', project_id=project_id)
+        p = self.load_policy({
+            'name': 'disk-label',
+            'resource': 'gcp.disk',
+            'filters': [{'type': 'recommend',
+                         'id': 'google.compute.disk.IdleResourceRecommender'}]},
+            session_factory=factory)
+        assert p.get_permissions() == {
+            'compute.disks.list',
+            'recommender.computeDiskIdleResourceRecommendations.get',
+            'recommender.computeDiskIdleResourceRecommendations.list'
+        }
+        resources = p.run()
+        assert len(resources) == 2
+        assert resources[0]['c7n:recommend'][0]['recommenderSubtype'] == 'SNAPSHOT_AND_DELETE_DISK'
+
 
 class SnapshotTest(BaseTest):
 
@@ -537,3 +555,19 @@ class AutoscalerTest(BaseTest):
         self.assertEqual(result_policy['loadBalancingUtilization']['utilizationTarget'], 0.7)
         self.assertEqual(result_policy['minNumReplicas'], 1)
         self.assertEqual(result_policy['maxNumReplicas'], 4)
+
+
+class ProjectTest(BaseTest):
+
+    def test_projects(self):
+        project_id = 'gcp-lab-custodian'
+        session_factory = self.replay_flight_data('project-query', project_id=project_id)
+
+        policy = self.load_policy(
+            {'name': 'gcp-projects',
+             'resource': 'gcp.compute-project'},
+            session_factory=session_factory)
+        resources = policy.run()
+
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['name'], 'gcp-lab-custodian')

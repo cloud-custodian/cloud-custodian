@@ -1370,7 +1370,19 @@ class FilterPublicBlock(Filter):
                 config = s3.get_public_access_block(
                     Bucket=bucket['Name'])['PublicAccessBlockConfiguration']
             except ClientError as e:
-                if e.response['Error']['Code'] != 'NoSuchPublicAccessBlockConfiguration':
+                error_code = e.response['Error']['Code']
+                if error_code == 'NoSuchPublicAccessBlockConfiguration':
+                    pass
+                elif error_code == 'AccessDenied':
+                    # Follow the same logic as `assemble_bucket` - log and continue on access
+                    # denied errors rather than halting a policy altogether
+                    method = 'GetPublicAccessBlock'
+                    log.warning(
+                        "Bucket:%s unable to invoke method:%s error:%s ",
+                        bucket['Name'], method, e.response['Error']['Message']
+                    )
+                    bucket.setdefault('c7n:DeniedMethods', []).append(method)
+                else:
                     raise
             bucket[self.annotation_key] = config
         return self.matches_filter(config)
@@ -2935,6 +2947,8 @@ class Lifecycle(BucketActionBase):
                             'additionalProperties': False,
                             'properties': {
                                 'Prefix': {'type': 'string'},
+                                'ObjectSizeGreaterThan': {'type': 'integer'},
+                                'ObjectSizeLessThan': {'type': 'integer'},
                                 'Tag': {
                                     'type': 'object',
                                     'required': ['Key', 'Value'],
@@ -2949,6 +2963,8 @@ class Lifecycle(BucketActionBase):
                                     'additionalProperties': False,
                                     'properties': {
                                         'Prefix': {'type': 'string'},
+                                        'ObjectSizeGreaterThan': {'type': 'integer'},
+                                        'ObjectSizeLessThan': {'type': 'integer'},
                                         'Tags': {
                                             'type': 'array',
                                             'items': {
@@ -2984,6 +3000,7 @@ class Lifecycle(BucketActionBase):
                                 'additionalProperties': False,
                                 'properties': {
                                     'NoncurrentDays': {'type': 'integer'},
+                                    'NewerNoncurrentVersions': {'type': 'integer'},
                                     'StorageClass': {'type': 'string'},
                                 },
                             },
@@ -2993,6 +3010,7 @@ class Lifecycle(BucketActionBase):
                             'additionalProperties': False,
                             'properties': {
                                 'NoncurrentDays': {'type': 'integer'},
+                                'NewerNoncurrentVersions': {'type': 'integer'}
                             },
                         },
                         'AbortIncompleteMultipartUpload': {

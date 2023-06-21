@@ -1,0 +1,16 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "ControlPanels": [
+            {
+                "ClusterArn": "arn:aws:route53-recovery-control::644160558196:cluster/55734b11-cbff-4607-9e5c-bbc025658614",
+                "ControlPanelArn": "arn:aws:route53-recovery-control::644160558196:controlpanel/99e868ad16894953b58bcaea6331222a",
+                "DefaultControlPanel": true,
+                "Name": "DefaultControlPanel",
+                "RoutingControlCount": 0,
+                "Status": "DEPLOYED"
+            }
+        ]
+    }
+}

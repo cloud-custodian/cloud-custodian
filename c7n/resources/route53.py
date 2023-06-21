@@ -12,11 +12,13 @@ from c7n.query import QueryResourceManager, ChildResourceManager, TypeInfo, Retr
 from c7n.manager import resources
 from c7n.utils import chunks, get_retry, generate_arn, local_session, type_schema
 from c7n.actions import BaseAction
-from c7n.filters import Filter
+from c7n.filters import Filter, ListItemFilter
 from c7n.resources.shield import IsShieldProtected, SetShieldProtection
 from c7n.tags import RemoveTag, Tag
 from c7n.filters.related import RelatedResourceFilter
-from c7n import tags
+from c7n import tags, query
+from c7n.filters.iamaccess import CrossAccountAccessFilter
+from c7n.resolver import ValuesFrom
 
 
 class Route53Base:
@@ -79,6 +81,7 @@ class HostedZone(Route53Base, QueryResourceManager):
         # detail_spec = ('get_hosted_zone', 'Id', 'Id', None)
         id = 'Id'
         name = 'Name'
+        config_id = 'c7n:ConfigHostedZoneId'
         universal_taggable = True
         # Denotes this resource type exists across regions
         global_resource = True
@@ -90,6 +93,14 @@ class HostedZone(Route53Base, QueryResourceManager):
             _id = r[self.get_model().id].split("/")[-1]
             arns.append(self.generate_arn(_id))
         return arns
+
+    def augment(self, resources):
+        annotation_key = 'c7n:ConfigHostedZoneId'
+        resources = super(HostedZone, self).augment(resources)
+        for r in resources:
+            config_hzone_id = r['Id'].split("/")[-1]
+            r[annotation_key] = config_hzone_id
+        return resources
 
 
 HostedZone.filter_registry.register('shield-enabled', IsShieldProtected)
@@ -586,6 +597,7 @@ class LogConfigAssociationsFilter(Filter):
     :example:
 
     .. code-block:: yaml
+
             policies:
                 - name: r53-resolver-query-log-config-associations
                   resource: resolver-logs
@@ -616,6 +628,24 @@ class LogConfigAssociationsFilter(Filter):
         return results
 
 
+# Readiness check in Amazon Route53 ARC is global feature. However,
+# US West (N. California) Region must be specified in Route53 ARC readiness check api call.
+# Please reference this AWS document:
+# https://docs.aws.amazon.com/r53recovery/latest/dg/introduction-regions.html
+ARC_REGION = 'us-west-2'
+
+
+class DescribeCheck(query.DescribeSource):
+
+    def augment(self, readiness_checks):
+        for r in readiness_checks:
+            Tags = self.manager.retry(
+                self.manager.get_client().list_tags_for_resources,
+                ResourceArn=r['ReadinessCheckArn'])['Tags']
+            r['Tags'] = [{'Key': k, "Value": v} for k, v in Tags.items()]
+        return readiness_checks
+
+
 @resources.register('readiness-check')
 class ReadinessCheck(QueryResourceManager):
 
@@ -625,15 +655,13 @@ class ReadinessCheck(QueryResourceManager):
         enum_spec = ('list_readiness_checks', 'ReadinessChecks', None)
         name = id = 'ReadinessCheckName'
         global_resource = True
+        config_type = cfn_type = 'AWS::Route53RecoveryReadiness::ReadinessCheck'
 
-    def augment(self, readiness_checks):
-        client = local_session(self.session_factory).client('route53-recovery-readiness')
-        for r in readiness_checks:
-            Tags = self.retry(
-                client.list_tags_for_resources,
-                ResourceArn=r['ReadinessCheckArn'])['Tags']
-            r['Tags'] = [{'Key': k, "Value": v} for k, v in Tags.items()]
-        return readiness_checks
+    source_mapping = {'describe': DescribeCheck, 'config': query.ConfigSource}
+
+    def get_client(self):
+        return local_session(self.session_factory) \
+            .client('route53-recovery-readiness', region_name=ARC_REGION)
 
 
 @ReadinessCheck.action_registry.register('tag')
@@ -655,6 +683,9 @@ class ReadinessAddTag(Tag):
                 value: DesiredValue
     """
     permissions = ('route53-recovery-readiness:TagResource',)
+
+    def get_client(self):
+        return self.manager.get_client()
 
     def process_resource_set(self, client, readiness_checks, tags):
         Tags = {r['Key']: r['Value'] for r in tags}
@@ -683,6 +714,9 @@ class ReadinessCheckRemoveTag(RemoveTag):
     """
     permissions = ('route53-recovery-readiness:UntagResource',)
 
+    def get_client(self):
+        return self.manager.get_client()
+
     def process_resource_set(self, client, readiness_checks, keys):
         for r in readiness_checks:
             client.untag_resource(
@@ -690,5 +724,298 @@ class ReadinessCheckRemoveTag(RemoveTag):
                 TagKeys=keys)
 
 
-ReadinessCheck.action_registry.register('mark-for-op', tags.TagDelayedAction)
-ReadinessCheck.filter_registry.register('marked-for-op', tags.TagActionFilter)
+@ReadinessCheck.action_registry.register('mark-for-op')
+class MarkForOpReadinessCheck(tags.TagDelayedAction):
+
+    def get_client(self):
+        return self.manager.get_client()
+
+
+@ReadinessCheck.filter_registry.register('marked-for-op')
+class MarkedForOpReadinessCheck(tags.TagActionFilter):
+
+    def get_client(self):
+        return self.manager.get_client()
+
+
+@ReadinessCheck.filter_registry.register('cross-account')
+class ReadinessCheckCrossAccount(CrossAccountAccessFilter):
+
+    schema = type_schema(
+        'cross-account',
+        # white list accounts
+        whitelist_from=ValuesFrom.schema,
+        whitelist={'type': 'array', 'items': {'type': 'string'}})
+    permissions = ('route53-recovery-readiness:ListCrossAccountAuthorizations',)
+
+    def process(self, resources, event=None):
+        allowed_accounts = set(self.get_accounts())
+        results, account_ids, found = [], [], False
+
+        paginator = self.manager.get_client().get_paginator('list_cross_account_authorizations')
+        paginator.PAGE_ITERATOR_CLASS = RetryPageIterator
+        arns = paginator.paginate().build_full_result()["CrossAccountAuthorizations"]
+
+        for arn in arns:
+            account_id = arn.split(':', 5)[4]
+            if account_id not in allowed_accounts:
+                account_ids.append(account_id)
+                found = True
+        if (found):
+            for r in resources:
+                r['c7n:CrossAccountViolations'] = account_ids
+                results.append(r)
+
+        return results
+
+
+
+class DescribeCluster(query.DescribeSource):
+    def augment(self, clusters):
+        for r in clusters:
+            Tags = self.manager.retry(
+                self.manager.get_client().list_tags_for_resource,
+                ResourceArn=r['ClusterArn'])['Tags']
+            r['Tags'] = [{'Key': k, "Value": v} for k, v in Tags.items()]
+        return clusters
+
+
+@resources.register('recovery-cluster')
+class RecoveryCluster(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'route53-recovery-control-config'
+        arn_type = 'cluster'
+        enum_spec = ('list_clusters', 'Clusters', None)
+        name = id = 'ClusterArn'
+        global_resource = True
+        config_type = cfn_type = "AWS::Route53RecoveryControl::Cluster"
+
+    source_mapping = {
+        'describe': DescribeCluster,
+        'config': query.ConfigSource
+    }
+
+    def get_client(self):
+        return local_session(self.session_factory) \
+            .client('route53-recovery-control-config', region_name=ARC_REGION)
+
+
+
+@RecoveryCluster.action_registry.register('tag')
+class RecoveryClusterAddTag(Tag):
+    """Adds tags to a cluster
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: recovery-cluster-tag
+            resource: recovery-cluster
+            filters:
+              - "tag:DesiredTag": absent
+            actions:
+              - type: tag
+                key: DesiredTag
+                value: DesiredValue
+    """
+    permissions = ('route53-recovery-control-config:TagResource',)
+
+    def get_client(self):
+        return self.manager.get_client()
+
+    def process_resource_set(self, client, clusters, tags):
+        Tags = {r['Key']: r['Value'] for r in tags}
+        for r in clusters:
+            client.tag_resource(
+                ResourceArn=r['ClusterArn'],
+                Tags=Tags)
+
+
+@RecoveryCluster.action_registry.register('remove-tag')
+class RecoveryClusterRemoveTag(RemoveTag):
+    """Remove tags from a cluster
+
+    :example:
+
+
+
+    .. code-block:: yaml
+
+        policies:
+          - name: recovery-cluster-remove-tag
+            resource: recovery-cluster
+            filters:
+              - "tag:ExpiredTag": present
+            actions:
+              - type: remove-tag
+                tags: ['ExpiredTag']
+    """
+    permissions = ('route53-recovery-control-config:UntagResource',)
+
+    def get_client(self):
+        return self.manager.get_client()
+
+    def process_resource_set(self, client, clusters, keys):
+        for r in clusters:
+            client.untag_resource(
+                ResourceArn=r['ClusterArn'],
+                TagKeys=keys)
+
+
+@query.sources.register('describe-control-panel')
+class DescribeControlPanel(query.ChildDescribeSource):
+
+    def __init__(self, manager):
+        self.manager = manager
+        self.query = query.ChildResourceQuery(
+            self.manager.session_factory, self.manager)
+
+    def augment(self, controlpanels):
+        for r in controlpanels:
+            Tags = self.manager.retry(
+                self.manager.get_client().list_tags_for_resource,
+                ResourceArn=r['ControlPanelArn'])['Tags']
+            r['Tags'] = [{'Key': k, "Value": v} for k, v in Tags.items()]
+        return controlpanels
+
+
+@resources.register('recovery-control-panel')
+class ControlPanel(query.ChildResourceManager):
+
+    class resource_type(query.TypeInfo):
+        service = 'route53-recovery-control-config'
+        arn_type = 'controlpanel'
+        parent_spec = ('recovery-cluster', 'ClusterArn', None)
+        enum_spec = ('list_control_panels', 'ControlPanels', None)
+        name = id = 'ControlPanelArn'
+        config_type = cfn_type = "AWS::Route53RecoveryControl::ControlPanel"
+        global_resource = True
+
+    child_source = 'describe'
+    source_mapping = {
+        'describe': DescribeControlPanel,
+        'config': query.ConfigSource
+    }
+
+    def get_client(self):
+        return local_session(self.session_factory) \
+            .client('route53-recovery-control-config', region_name=ARC_REGION)
+
+
+@ControlPanel.action_registry.register('tag')
+class ControlPanelAddTag(Tag):
+    """Adds tags to a control panel
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: control-panel-tag
+            resource: recovery-control-panel
+            filters:
+              - "tag:DesiredTag": absent
+            actions:
+              - type: tag
+                key: DesiredTag
+                value: DesiredValue
+    """
+    permissions = ('route53-recovery-control-config:TagResource',)
+
+    def get_client(self):
+        return self.manager.get_client()
+
+    def process_resource_set(self, client, controlpanels, tags):
+        Tags = {r['Key']: r['Value'] for r in tags}
+        for r in controlpanels:
+            client.tag_resource(
+                ResourceArn=r['ControlPanelArn'],
+                Tags=Tags)
+
+
+@ControlPanel.action_registry.register('remove-tag')
+class ControlPanelRemoveTag(RemoveTag):
+    """Remove tags from a control panel
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: control-panel-remove-tag
+            resource: recovery-control-panel
+            filters:
+              - "tag:ExpiredTag": present
+            actions:
+              - type: remove-tag
+                tags: ['ExpiredTag']
+    """
+    permissions = ('route53-recovery-control-config:UntagResource',)
+
+    def get_client(self):
+        return self.manager.get_client()
+
+    def process_resource_set(self, client, control_panels, keys):
+        for r in control_panels:
+            client.untag_resource(
+                ResourceArn=r['ControlPanelArn'],
+                TagKeys=keys)
+
+
+@ControlPanel.filter_registry.register('safety-rule')
+class SafeRule(ListItemFilter):
+    """Filter the safety rules (the assertion rules and gating rules)
+    that you’ve defined for the routing controls in a control panel.
+
+
+    :example:
+
+    find a recovery control panel with at least two deployed assertion safety rules
+    with a mininum of 30m wait period.
+
+    .. code-block:: yaml
+
+      policies:
+        - name: check-safety
+          resource: aws.recovery-control-panel
+          filters:
+            - type: safety-rule
+              count: 2
+              count_op: gte
+              attrs:
+               - Type: ASSERTION
+               - Status: Deployed
+               - type: value
+                 key: WaitPeriodMs
+                 op: gte
+                 value: 30
+    """
+    permissions = ('route53-recovery-control-config:ListSafetyRules',)
+    schema = type_schema(
+        'safety-rule',
+        attrs={'$ref': '#/definitions/filters_common/list_item_attrs'},
+        count={'type': 'number'},
+        count_op={'$ref': '#/definitions/filters_common/comparison_operators'}
+    )
+
+    _client = None
+
+    def get_client(self):
+        if self._client:
+            return self._client
+        self._client = self.manager.get_client()
+        return self._client
+
+    def get_item_values(self, resource):
+        paginator = self.get_client().get_paginator('list_safety_rules')
+        paginator.PAGE_ITERATOR_CLASS = RetryPageIterator
+        rules = []
+        results = paginator.paginate(
+            ControlPanelArn=resource['ControlPanelArn']).build_full_result().get('SafetyRules', [])
+        for block in results:
+            for rule_type, type_rule in block.items():
+                type_rule['Type'] = rule_type
+                rules.append(type_rule)
+        return rules

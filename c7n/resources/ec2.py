@@ -13,7 +13,6 @@ import botocore
 from botocore.exceptions import ClientError
 from dateutil.parser import parse
 from concurrent.futures import as_completed
-import jmespath
 
 from c7n.actions import (
     ActionRegistry, BaseAction, ModifyVpcSecurityGroupsAction, AutoscalingBase
@@ -29,7 +28,7 @@ import c7n.filters.vpc as net_filters
 from c7n.manager import resources
 from c7n import query, utils
 from c7n.tags import coalesce_copy_user_tags
-from c7n.utils import type_schema, filter_empty
+from c7n.utils import type_schema, filter_empty, jmespath_search, jmespath_compile
 
 from c7n.resources.iam import CheckPermissions, SpecificIamProfileManagedPolicy
 from c7n.resources.securityhub import PostFinding
@@ -168,7 +167,7 @@ class SecurityGroupFilter(net_filters.SecurityGroupFilter):
 @filters.register('subnet')
 class SubnetFilter(net_filters.SubnetFilter):
 
-    RelatedIdsExpression = "SubnetId"
+    RelatedIdsExpression = "NetworkInterfaces[].SubnetId"
 
 
 @filters.register('vpc')
@@ -1204,7 +1203,7 @@ class InstanceFinding(PostFinding):
     resource_type = 'AwsEc2Instance'
 
     def format_resource(self, r):
-        ip_addresses = jmespath.search(
+        ip_addresses = jmespath_search(
             "NetworkInterfaces[].PrivateIpAddresses[].PrivateIpAddress", r)
 
         # limit to max 10 ip addresses, per security hub service limits
@@ -1444,7 +1443,7 @@ class Stop(BaseAction):
         },
     )
 
-    has_hibernate = jmespath.compile('[].HibernationOptions.Configured')
+    has_hibernate = jmespath_compile('[].HibernationOptions.Configured')
 
     def get_permissions(self):
         perms = ('ec2:StopInstances',)
@@ -1791,7 +1790,7 @@ class EC2ModifyVpcSecurityGroups(ModifyVpcSecurityGroupsAction):
     """Modify security groups on an instance."""
 
     permissions = ("ec2:ModifyNetworkInterfaceAttribute",)
-    sg_expr = jmespath.compile("Groups[].GroupId")
+    sg_expr = jmespath_compile("Groups[].GroupId")
 
     def process(self, instances):
         if not len(instances):

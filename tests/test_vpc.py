@@ -1,13 +1,47 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import time
-from .common import BaseTest, functional, event_data
+from .common import BaseTest, functional, event_data, load_data
 from unittest.mock import MagicMock
 
 from botocore.exceptions import ClientError as BotoClientError
 from c7n.exceptions import PolicyValidationError
 from c7n.resources.aws import shape_validate
 from pytest_terraform import terraform
+
+
+@terraform('ec2_igw_subnet')
+def test_ec2_igw_subnet(test, ec2_igw_subnet):
+    aws_region = 'us-east-1'
+    session_factory = test.replay_flight_data('ec2_igw_subnet', region=aws_region)
+
+    p = test.load_policy(
+        {
+            'name': 'ec2_igw_subnet',
+            'resource': 'ec2',
+            'filters': [
+                {
+                    'type': 'subnet',
+                    'igw': True,
+                    'key': 'SubnetId',
+                    'value': 'present',
+                },
+            ],
+        },
+        session_factory=session_factory,
+        config={'region': aws_region},
+    )
+
+    resources = p.run()
+
+    result_instance_ids = set(i['InstanceId'] for i in resources)
+    expected_instance_ids = {
+        ec2_igw_subnet['aws_instance.public_auto_assigned.id'],
+        ec2_igw_subnet['aws_instance.public_primary_interface.id'],
+        ec2_igw_subnet['aws_instance.public_secondary_interface.id'],
+    }
+    assert len(resources) == len(expected_instance_ids)
+    assert expected_instance_ids == result_instance_ids
 
 
 def test_eni_igw_subnet(test):
@@ -312,6 +346,67 @@ class VpcTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 2)
         self.assertTrue("subnet-068dfbf3f275a6ae8" in resources[0]["c7n:matched-vpc-endpoint"])
+
+    def test_subnet_ip_address_usage_filter(self):
+        factory = self.replay_flight_data("test_subnet_ip_address_usage_filter", region="us-east-2")
+        p = self.load_policy(
+            {
+                "name": "subnet-no-ips-used",
+                "resource": "aws.subnet",
+                "filters": [
+                    {
+                        "type": "ip-address-usage",
+                        "key": "NumberUsed",
+                        "value": 0,
+                    }
+                ],
+            },
+            session_factory=factory,
+            config={"region": "us-east-2"},
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
+
+        p = self.load_policy(
+            {
+                "name": "subnet-almost-full",
+                "resource": "aws.subnet",
+                "filters": [
+                    {
+                        "type": "ip-address-usage",
+                        "key": "PercentUsed",
+                        "op": "greater-than",
+                        "value": 90,
+                    }
+                ],
+            },
+            session_factory=factory,
+            config={"region": "us-east-2"},
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_endpoint_policy_filter(self):
+        factory = self.replay_flight_data("test_endpoint_policy_filter")
+        p = self.load_policy(
+            {
+                "name": "endpoint-policy-filter",
+                "resource": "vpc-endpoint",
+                "filters": [
+                    {
+                        "type": "has-statement",
+                        "statements": [{
+                            "Effect": "Allow",
+                            "Action": "*"
+                        }],
+                    }
+                ],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertTrue("vpce-011d813b183878b82" in resources[0]["VpcEndpointId"])
 
 
 class NetworkLocationTest(BaseTest):
@@ -1043,6 +1138,22 @@ class NetworkAddrTest(BaseTest):
 
         self.assert_policy_release_failed(factory, ec2, network_addrs["Addresses"][0])
 
+    def test_eip_shield(self):
+        session_factory = self.replay_flight_data("test_eip_shield")
+        p = self.load_policy(
+            {
+                "name": "eip-shield",
+                "resource": "network-addr",
+                "filters": [
+                    {"type": "shield-enabled", "state": False},
+                ],
+                "actions": ["set-shield"],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
 
 class RouteTableTest(BaseTest):
 
@@ -1308,6 +1419,16 @@ class SecurityGroupTest(BaseTest):
             ],
         )
 
+    def test_used_consumer_eni_in_producer(self):
+        p = self.load_policy(
+            {"name": "sg-used", "resource": "security-group", "filters": ["used"]},
+        )
+        used = p.resource_manager.filters[0]
+        used.nics = load_data('ram-producer-view-consumer-eni.json')['NetworkInterfaces']
+
+        group_enis = used._get_eni_attributes()
+        assert set(group_enis) == {'sg-123', 'sg-456', 'sg-789'}
+
     def test_used(self):
         factory = self.replay_flight_data("test_security_group_used")
         p = self.load_policy(
@@ -1341,6 +1462,26 @@ class SecurityGroupTest(BaseTest):
             lambda: (('ecs-cwe', unused.get_ecs_cwe_sgs),))
         resources = p.run()
         assert resources == []
+
+    def test_unused_batch(self):
+        factory = self.replay_flight_data("test_security_group_batch_unused")
+        # 2 security groups in this flight data:
+        # * sg-0f026884bba48e351 (used by the compute environment)
+        # * sg-e2842c8b (not used -> should be returned as such)
+        p = self.load_policy(
+            {'name': 'sg-xyz',
+             'resource': 'security-group',
+             'filters': ['unused']},
+            session_factory=factory)
+        unused = p.resource_manager.filters[0]
+        self.patch(
+            unused,
+            'get_scanners',
+            lambda: (('batch', unused.get_batch_sgs),))
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertNotEqual(resources[0]["GroupId"], "sg-0f026884bba48e351") # used
+        self.assertEqual(resources[0]["GroupId"], "sg-e2842c8b")             # not used
 
     def test_unused(self):
         factory = self.replay_flight_data("test_security_group_unused")

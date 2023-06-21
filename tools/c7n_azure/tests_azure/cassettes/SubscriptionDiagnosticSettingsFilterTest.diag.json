@@ -1,0 +1,123 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47?api-version=2019-11-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "date": [
+                        "Fri, 17 Mar 2023 14:33:41 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-length": [
+                        "630"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47",
+                        "authorizationSource": "RoleBased",
+                        "managedByTenants": [
+                            {
+                                "tenantId": "00000000-0000-0000-0000-000000000003"
+                            }
+                        ],
+                        "tags": {
+                            "avm:subscription-object-name": "cbm-matter-npn/matter-compliance-dev-new",
+                            "avm:subscription-object-uid": "24338e43-e895-48aa-a450-ba219b0b49bf",
+                            "product_id": "13742"
+                        },
+                        "subscriptionId": "ea42f556-5106-4743-99b0-c129bfa71a47",
+                        "tenantId": "00000000-0000-0000-0000-000000000003",
+                        "displayName": "matter-compliance-dev-new",
+                        "state": "Enabled",
+                        "subscriptionPolicies": {
+                            "locationPlacementId": "Public_2014-09-01",
+                            "quotaId": "MSDNDevTest_2014-09-01",
+                            "spendingLimit": "Off"
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/microsoft.insights/diagnosticSettings?api-version=2017-05-01-preview",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "date": [
+                        "Fri, 17 Mar 2023 14:33:48 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "content-length": [
+                        "4191"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/microsoft.insights/diagnosticSettings/D5F8F41A-5AA9-49ED-8DE3-37A097699C3E-fail-all",
+                                "type": "Microsoft.Insights/diagnosticSettings",
+                                "name": "D5F8F41A-5AA9-49ED-8DE3-37A097699C3E-fail-all",
+                                "location": "global",
+                                "properties": {
+                                    "storageAccountId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-tjmypwym/providers/Microsoft.Storage/storageAccounts/cfbtjmypwym",
+                                    "logs": [
+                                        {
+                                            "category": "Security",
+                                            "enabled": true,
+                                            "categoryGroup": null
+                                        },
+                                        {
+                                            "category": "Administrative",
+                                            "enabled": true,
+                                            "categoryGroup": null
+                                        },
+                                        {
+                                            "category": "Policy",
+                                            "enabled": true,
+                                            "categoryGroup": null
+                                        },
+                                        {
+                                            "category": "Alert",
+                                            "enabled": false,
+                                            "categoryGroup": null
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}
