@@ -1,0 +1,24 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "IdentityType": "EMAIL_ADDRESS",
+        "FeedbackForwardingStatus": true,
+        "VerifiedForSendingStatus": false,
+        "DkimAttributes": {
+            "SigningEnabled": false,
+            "Status": "NOT_STARTED",
+            "SigningAttributesOrigin": "AWS_SES",
+            "NextSigningKeyLength": "RSA_1024_BIT"
+        },
+        "MailFromAttributes": {
+            "BehaviorOnMxFailure": "USE_DEFAULT_VALUE"
+        },
+        "Policies": {
+            "Policy2": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"AllowStatement\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":\"ses:GetEmailIdentity\",\"Resource\":\"arn:aws:ses:us-west-2:644160558196:identity/c7n@t.com\",\"Condition\":{}}]}",
+            "PolicyTestHasStatement": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"stmt1686693628910\",\"Effect\":\"Deny\",\"Principal\":{\"AWS\":\"*\"},\"Action\":\"ses:SendEmail\",\"Resource\":\"arn:aws:ses:us-west-2:644160558196:identity/c7n@t.com\",\"Condition\":{\"StringNotEquals\":{\"ses:FromAddress\":\"*test*\"}}},{\"Sid\":\"DenyStatement\",\"Effect\":\"Deny\",\"Principal\":\"*\",\"Action\":\"ses:SendEmail\",\"Resource\":\"arn:aws:ses:us-west-2:644160558196:identity/c7n@t.com\",\"Condition\":{\"StringNotLike\":{\"ses:FromAddress\":\"*test*\"}}}]}"
+        },
+        "Tags": [],
+        "VerificationStatus": "PENDING"
+    }
+}
