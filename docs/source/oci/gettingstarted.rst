@@ -7,6 +7,9 @@ The Oracle Cloud Infrastructure (OCI) provider (Alpha) is an optional package. w
 writing policies which interact with OCI related resources.
 
 
+Alpha providers will potentially have non backwards compatible syntax changes to exposed policy language.
+
+
 .. _oci_install-custodian:
 
 Install the OCI plugin
