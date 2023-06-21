@@ -593,10 +593,10 @@ class DeleteTaskDefinition(BaseAction):
     The definition will be marked as InActive. Currently running
     services and task can still reference, new services & tasks
     can't.
-    
-    force is False by default. When given as True, the task definition will 
+
+    force is False by default. When given as True, the task definition will
     be permanently deleted.
-    
+
     .. code-block:: yaml
 
        policies:

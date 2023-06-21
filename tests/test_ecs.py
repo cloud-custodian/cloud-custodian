@@ -29,7 +29,7 @@ class TestEcs(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 0)
-        
+
     def test_ecs_container_insights_disabled(self):
         session_factory = self.replay_flight_data(
             'test_ecs_container_insights_disabled')
@@ -372,7 +372,7 @@ class TestEcsTaskDefinition(BaseTest):
             "taskDefinitionArns"
         )
         self.assertEqual(arns, [])
-        
+
     def test_task_definition_delete_permanently(self):
         session_factory = self.replay_flight_data("test_ecs_task_def_delete_permanently")
         p = self.load_policy(
@@ -391,9 +391,8 @@ class TestEcsTaskDefinition(BaseTest):
         ).get(
             "taskDefinitionArns"
         )
-        self.assertEqual(arns, 
+        self.assertEqual(arns,
                          ["arn:aws:ecs:us-east-1:644160558196:task-definition/test-delete-definition:2"])
-        
 
     def test_task_definition_get_resources(self):
         session_factory = self.replay_flight_data("test_ecs_task_def_query")
