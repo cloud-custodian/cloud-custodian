@@ -2108,7 +2108,7 @@ class DbOptionGroups(ValueFilter):
                     ogcache[og] = option_group
 
                 cache.save(cache_key, ogcache[og])
-    
+
         return ogcache
 
     def process(self, resources, event=None):

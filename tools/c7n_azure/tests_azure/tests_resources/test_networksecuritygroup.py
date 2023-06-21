@@ -6,8 +6,6 @@ from ..azure_common import BaseTest, arm_template
 
 
 class NetworkSecurityGroupTest(BaseTest):
-    def setUp(self):
-        super(NetworkSecurityGroupTest, self).setUp()
 
     def test_network_security_group_schema_validate(self):
         with self.sign_out_patch():
@@ -210,7 +208,7 @@ class NetworkSecurityGroupTest(BaseTest):
 
         resources = p.run()
         self.assertEqual(len(resources), 0)
-    
+
     @arm_template('networksecuritygroup.json')
     def test_icmp_protocol(self):
         p = self.load_policy({

@@ -44,7 +44,7 @@ class RecommenderFilter(Filter):
           resource: gcp.disk
           filters:
            - type: recommend
-             id: google.compute.disk.IdleResourceRecommender    
+             id: google.compute.disk.IdleResourceRecommender
           actions:
            - snapshot
            - delete
