@@ -59,12 +59,12 @@ class WebAppFirewallMissingFilter(ValueFilter):
                 - type: value
                   key: sku.name
                   op: in
-                  value: ['Standard_AzureFrontDoor','Premium_AzureFrontDoor']              
+                  value: ['Standard_AzureFrontDoor','Premium_AzureFrontDoor']
             ]
 
     """
     schema = type_schema('waf-not-enabled', rinherit=ValueFilter.schema)
-    
+
     def process(self, resources, event=None):
       client = self.manager.get_client()
       results = []
