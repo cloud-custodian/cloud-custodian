@@ -378,7 +378,7 @@ class PolicyMetaLint(BaseTest):
             "AWS::SageMaker::Domain",
             "AWS::Signer::SigningProfile",
             "AWS::Transfer::Agreement",
-            "AWS::Transfer::Connector",            
+            "AWS::Transfer::Connector",
             # q2 2023 wave 2
             "AWS::AppConfig::DeploymentStrategy",
             "AWS::AppFlow::Flow",
