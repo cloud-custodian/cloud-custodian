@@ -37,7 +37,7 @@ class MessageTargetMixin(object):
             if self.config.get("slack_token"):
                 self.config["slack_token"] = decrypt(
                     self.config, self.logger, self.session, "slack_token"
-                )
+                ).strip()
 
             slack_delivery = SlackDelivery(self.config, self.logger, email_delivery)
             slack_messages = slack_delivery.get_to_addrs_slack_messages_map(message)

@@ -39,9 +39,10 @@ class SpringApp(ChildResourceManager):
 
         @classmethod
         def extra_args(cls, parent_resource):
-            return {'resource_group_name': 
-                    ResourceIdParser.get_resource_group(parent_resource['id']),
-                    'service_name': parent_resource['name']}
+            return {
+                'resource_group_name': ResourceIdParser.get_resource_group(parent_resource['id']),
+                'service_name': parent_resource['name']
+            }
 
 
 @resources.register('spring-service-instance')
