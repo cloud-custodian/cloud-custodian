@@ -263,6 +263,11 @@ class PolicyMetaLint(BaseTest):
         whitelist = set(('AwsS3Object', 'Container'))
         todo = set((
             # q2 2023
+            'AwsStepFunctionStateMachine',
+            'AwsGuardDutyDetector',
+            'AwsAmazonMqBroker',
+            'AwsAppSyncGraphQlApi',
+            'AwsEventSchemasRegistry',
             "AwsEc2RouteTable",
             # q1 2023
             'AwsWafv2RuleGroup',
