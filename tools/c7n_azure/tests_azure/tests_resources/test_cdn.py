@@ -35,7 +35,8 @@ class CdnTest(BaseTest):
             'name': 'test-waf-not-enabled',
             'resource': 'azure.cdnprofile',
             'filters': [
-                {'type': 'waf-not-enabled'}
+                {'type': 'waf',
+                 'state': 'disabled'}
             ]
         })
         resources = p.run()

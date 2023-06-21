@@ -3,7 +3,7 @@
 
 from c7n_azure.provider import resources
 from c7n_azure.resources.arm import ArmResourceManager
-from c7n.filters import ValueFilter
+from c7n.filters import Filter
 from c7n.utils import type_schema
 
 
@@ -43,9 +43,9 @@ class CdnProfile(ArmResourceManager):
         )
         resource_type = 'Microsoft.Cdn/profiles'
 
-@CdnProfile.filter_registry.register('waf-not-enabled')
-class WebAppFirewallMissingFilter(ValueFilter):
-    """Check waf not enabled on cdn frontdoor profiles
+@CdnProfile.filter_registry.register('waf')
+class WebAppFirewallFilter(Filter):
+    """Check waf enabled/disabled on cdn profiles
 
     :example:
 
@@ -55,22 +55,20 @@ class WebAppFirewallMissingFilter(ValueFilter):
             name: test-waf-not-enabled
             resource: azure.cdnprofile
             filters: [
-                - type: waf-not-enabled
-                - type: value
-                  key: sku.name
-                  op: in
-                  value: ['Standard_AzureFrontDoor','Premium_AzureFrontDoor']
+                - type: waf
+                  state: disabled
             ]
 
     """
-    schema = type_schema('waf-not-enabled', rinherit=ValueFilter.schema)
+    schema = type_schema('waf',required=['state'],
+              state={'type': 'string', 'enum': ['enabled', 'disabled']})
 
     def process(self, resources, event=None):
       client = self.manager.get_client()
-      results = []
+      matched = []
       for profiles in resources:
         policies = list(client.security_policies.list_by_profile(
                       profiles["resourceGroup"],profiles["name"]))
-        if not policies:
-            results.append(profiles)
-      return results
+        if (self.data.get('state') == 'disabled' and not policies) or (self.data.get('state') == 'enabled' and policies):
+            matched.append(profiles)
+      return matched

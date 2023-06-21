@@ -14,17 +14,17 @@
                     "message": "OK"
                 },
                 "headers": {
-                    "content-type": [
-                        "application/json; charset=utf-8"
+                    "cache-control": [
+                        "no-cache"
                     ],
                     "x-ms-ratelimit-remaining-subscription-resource-requests": [
                         "49"
                     ],
-                    "cache-control": [
-                        "no-cache"
+                    "content-type": [
+                        "application/json; charset=utf-8"
                     ],
                     "date": [
-                        "Thu, 15 Jun 2023 16:01:32 GMT"
+                        "Wed, 21 Jun 2023 23:10:52 GMT"
                     ],
                     "content-length": [
                         "920"
@@ -33,25 +33,6 @@
                 "body": {
                     "data": {
                         "value": [
-                            {
-                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/cfb-rgscfqtn/providers/Microsoft.Cdn/profiles/WAFFrontDoorStandard-Fail",
-                                "type": "Microsoft.Cdn/profiles",
-                                "name": "WAFFrontDoorStandard-Fail",
-                                "location": "Global",
-                                "kind": "frontdoor",
-                                "tags": {
-                                    "c7n": "true",
-                                    "product_id": "13742"
-                                },
-                                "sku": {
-                                    "name": "Standard_AzureFrontDoor"
-                                },
-                                "properties": {
-                                    "frontDoorId": "dfa1e713-ad22-4976-8514-b0ba2d1a9891",
-                                    "resourceState": "Active",
-                                    "provisioningState": "Succeeded"
-                                }
-                            },
                             {
                                 "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/cfb-rgscfqtn/providers/Microsoft.Cdn/profiles/WAFFrontDoor-Fail",
                                 "type": "Microsoft.Cdn/profiles",
@@ -66,12 +47,97 @@
                                     "name": "Premium_AzureFrontDoor"
                                 },
                                 "properties": {
-                                    "frontDoorId": "a8568e7a-4afd-43e2-b185-c6304b85fcbd",
+                                    "frontDoorId": "7baec38b-fd79-4f41-b1cc-48820d8322c9",
+                                    "resourceState": "Active",
+                                    "provisioningState": "Succeeded"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/cfb-rgscfqtn/providers/Microsoft.Cdn/profiles/WAFFrontDoorStandard-Fail",
+                                "type": "Microsoft.Cdn/profiles",
+                                "name": "WAFFrontDoorStandard-Fail",
+                                "location": "Global",
+                                "kind": "frontdoor",
+                                "tags": {
+                                    "c7n": "true",
+                                    "product_id": "13742"
+                                },
+                                "sku": {
+                                    "name": "Standard_AzureFrontDoor"
+                                },
+                                "properties": {
+                                    "frontDoorId": "09c49216-19aa-4a5c-baf5-d1cb5704cf53",
                                     "resourceState": "Active",
                                     "provisioningState": "Succeeded"
                                 }
                             }
                         ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-rgscfqtn/providers/Microsoft.Cdn/profiles/WAFFrontDoor-Fail/securityPolicies?api-version=2020-09-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Wed, 21 Jun 2023 23:10:59 GMT"
+                    ],
+                    "content-length": [
+                        "12"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": []
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-rgscfqtn/providers/Microsoft.Cdn/profiles/WAFFrontDoorStandard-Fail/securityPolicies?api-version=2020-09-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Wed, 21 Jun 2023 23:11:05 GMT"
+                    ],
+                    "content-length": [
+                        "12"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": []
                     }
                 }
             }
