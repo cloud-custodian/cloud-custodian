@@ -55,12 +55,12 @@ class IPSecAlgorithmFilter(ValueFilter):
         policies:
           - name: gateway-configured-with-cryptographic-algorithm
             resource: azure.vnet
-            filters: 
-              - type: configured-with-cryptographic-algorithm,
+            filters:
+              - type: configured-with-cryptographic-algorithm
     """
     schema = type_schema('virtual_gateway', rinherit=ValueFilter.schema)
     schema_alias = False
-      
+
     def process(self, resources, event=None):
       client = self.manager.get_client()
       matched = []
