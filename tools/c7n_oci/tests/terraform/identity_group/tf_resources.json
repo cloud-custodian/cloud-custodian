@@ -1,0 +1,25 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "oci_identity_group": {
+            "test_group": {
+                "compartment_id": "ocid1.tenancy.oc1..<unique_ID>",
+                "defined_tags": {
+                    "Oracle-Tags.CreatedBy": "user@example.com",
+                    "Oracle-Tags.CreatedOn": "2023-06-15T17:57:25.020Z"
+                },
+                "description": "Custodian Test",
+                "freeform_tags": {
+                    "Cloud_Custodian": "Present"
+                },
+                "id": "ocid1.group.oc1..<unique_ID>",
+                "inactive_state": null,
+                "name": "Custodian-Dev-Group",
+                "state": "ACTIVE",
+                "time_created": "2023-06-15 17:57:25.052 +0000 UTC",
+                "timeouts": null
+            }
+        }
+    }
+}

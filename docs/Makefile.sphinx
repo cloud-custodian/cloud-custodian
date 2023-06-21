@@ -62,6 +62,7 @@ clean:
 	rm -f $(SRCDIR)/aws/resources/*
 	rm -f $(SRCDIR)/gcp/resources/*
 	rm -f $(SRCDIR)/azure/resources/*
+	rm -f $(SRCDIR)/oci/resources/*
 #	rm -f $(SRCDIR)/awscc/resources/*
 	rm -f $(SRCDIR)/tools/*.md
 
@@ -95,6 +96,8 @@ html:
 	mkdir -p $(SRCDIR)/tencentcloud/resources
 	cp -p tools/c7n_tencentcloud/readme.md $(SRCDIR)/tencentcloud/gettingstarted.md
 	c7n-sphinxext --provider tencentcloud --output-dir $(SRCDIR)/tencentcloud/resources --group-by=resource_type.service
+	mkdir -p $(SRCDIR)/oci/resources
+	c7n-sphinxext --provider oci --output-dir $(SRCDIR)/oci/resources --group-by=resource_type.doc_groups
 
 	$(SPHINXBUILD) -W --keep-going -v -j auto -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
 
