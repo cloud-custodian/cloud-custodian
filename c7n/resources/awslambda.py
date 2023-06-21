@@ -117,11 +117,11 @@ class LambdaPermissions(CheckPermissions):
         return [r['Role'] for r in resources]
 
 
-@AWSLambda.filter_registry.register('has-wildcard-policy')  
+@AWSLambda.filter_registry.register('has-wildcard-policy')
 class LambdaPermissionsWildcard(Filter):
     """Filters lambda function policies with wildcard in Action permissions
       examples are "kms:*" or "athena:BatchGet*"
- 
+
     :example:
 
     .. code-block:: yaml
@@ -133,7 +133,7 @@ class LambdaPermissionsWildcard(Filter):
                   - type: has-wildcard-policy
 
     """
-    
+
     annotation_key = 'c7n:Action'
     p_annotation_key = 'c7n:Policy'
     schema = type_schema('has-wildcard-policy')
@@ -141,22 +141,22 @@ class LambdaPermissionsWildcard(Filter):
 
     def check_manage_policy(self, client, resource):
         roleName = resource['Role'].split('/')[-1]
-        
+
         attached_policies = (self.manager.retry(
             client.list_attached_role_policies, RoleName=roleName,
             ignore_err_codes=('NoSuchEntityException',) or {}).get('AttachedPolicies', ()))
-        
+
         for policy in attached_policies:
             managedPolicy = (self.manager.retry(
                 client.get_policy, PolicyArn=policy['PolicyArn'],
                 ignore_err_codes=('NoSuchEntityException',) or {}).get('Policy', ()))
             policyDocument = (self.manager.retry(
-                    client.get_policy_version, 
-                        PolicyArn=policy['PolicyArn'], 
+                    client.get_policy_version,
+                        PolicyArn=policy['PolicyArn'],
                         VersionId=managedPolicy['DefaultVersionId'],
                     ignore_err_codes=('NoSuchEntityException',)or {}).get('PolicyVersion', ()))
             for s in policyDocument['Document']['Statement']:
-                if "*" in s['Action']: 
+                if "*" in s['Action']:
                     resource[self.p_annotation_key] = {'Policy_Name':managedPolicy['PolicyName']}
                     resource[self.annotation_key] = {'Action':s['Action']}
                     return True
@@ -164,28 +164,28 @@ class LambdaPermissionsWildcard(Filter):
 
     def check_inline_policy(self, client, resource):
         roleName = resource['Role'].split('/')[-1]
-        
+
         policies = (self.manager.retry(
             client.list_role_policies, RoleName=roleName,
             ignore_err_codes=('NoSuchEntityException',)) or {}).get('PolicyNames', ())
-        
+
         for policyName in policies:
             p = (self.manager.retry(
                     client.get_role_policy, RoleName=roleName, PolicyName=policyName,
                     ignore_err_codes=('NoSuchEntityException',)or {}).get('PolicyDocument', ()))
             for s in p['Statement']:
                 for a in s['Action']:
-                    if "*" in a: 
+                    if "*" in a:
                         resource[self.p_annotation_key] = {'Policy_Name':policyName}
                         resource[self.annotation_key] = {'Action':a}
                         return True
         return False
-    
+
     def check_role(self, client, resource):
         if self.check_manage_policy(client, resource) or self.check_inline_policy(client, resource):
             return True
         return False
-    
+
     def process(self, resources, event=None):
         c = local_session(self.manager.session_factory).client('iam')
         results = [r for r in resources if self.check_role(c, r)]
@@ -193,7 +193,7 @@ class LambdaPermissionsWildcard(Filter):
             "%d of %d Lambda policies with wildcard action",
             len(results), len(resources))
         return results
-   
+
 
 @AWSLambda.filter_registry.register('reserved-concurrency')
 class ReservedConcurrency(ValueFilter):
