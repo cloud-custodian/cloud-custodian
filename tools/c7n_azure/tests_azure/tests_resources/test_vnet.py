@@ -16,13 +16,13 @@ class VNetTest(BaseTest):
             }, validate=True)
 
             self.assertTrue(p)
-    
+
     def test_vpn_ipsec_filter(self):
         p = self.load_policy({
             'name': 'gw-without-ipsec-policies',
             'resource': 'azure.vnet',
             'filters': [
-                {'type': 'gw-without-ipsec-policies'}          
+                {'type': 'gw-without-ipsec-policies'}
             ]
         })
         resources = p.run()
