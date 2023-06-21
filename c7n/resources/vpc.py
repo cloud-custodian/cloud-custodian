@@ -2765,6 +2765,7 @@ class PrefixList(query.QueryResourceManager):
         service = 'ec2'
         arn_type = 'prefix-list'
         enum_spec = ('describe_managed_prefix_lists', 'PrefixLists', None)
+        config_type = cfn_type = "AWS::EC2::PrefixList"
         name = 'PrefixListName'
         id = 'PrefixListId'
         id_prefix = 'pl-'

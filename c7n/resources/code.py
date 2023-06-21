@@ -26,7 +26,7 @@ class CodeRepository(QueryResourceManager):
         name = id = 'repositoryName'
         arn = "Arn"
         date = 'creationDate'
-        cfn_type = 'AWS::CodeCommit::Repository'
+        config_type = cfn_type = 'AWS::CodeCommit::Repository'
         universal_taggable = object()
 
     def augment(self, resources):
