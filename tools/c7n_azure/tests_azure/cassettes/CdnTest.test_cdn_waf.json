@@ -1,0 +1,80 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Cdn/profiles?api-version=2020-09-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-resource-requests": [
+                        "49"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Thu, 15 Jun 2023 16:01:32 GMT"
+                    ],
+                    "content-length": [
+                        "920"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/cfb-rgscfqtn/providers/Microsoft.Cdn/profiles/WAFFrontDoorStandard-Fail",
+                                "type": "Microsoft.Cdn/profiles",
+                                "name": "WAFFrontDoorStandard-Fail",
+                                "location": "Global",
+                                "kind": "frontdoor",
+                                "tags": {
+                                    "c7n": "true",
+                                    "product_id": "13742"
+                                },
+                                "sku": {
+                                    "name": "Standard_AzureFrontDoor"
+                                },
+                                "properties": {
+                                    "frontDoorId": "dfa1e713-ad22-4976-8514-b0ba2d1a9891",
+                                    "resourceState": "Active",
+                                    "provisioningState": "Succeeded"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/cfb-rgscfqtn/providers/Microsoft.Cdn/profiles/WAFFrontDoor-Fail",
+                                "type": "Microsoft.Cdn/profiles",
+                                "name": "WAFFrontDoor-Fail",
+                                "location": "Global",
+                                "kind": "frontdoor",
+                                "tags": {
+                                    "c7n": "true",
+                                    "product_id": "13742"
+                                },
+                                "sku": {
+                                    "name": "Premium_AzureFrontDoor"
+                                },
+                                "properties": {
+                                    "frontDoorId": "a8568e7a-4afd-43e2-b185-c6304b85fcbd",
+                                    "resourceState": "Active",
+                                    "provisioningState": "Succeeded"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}
