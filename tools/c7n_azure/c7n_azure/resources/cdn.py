@@ -69,6 +69,7 @@ class WebAppFirewallFilter(Filter):
       for profiles in resources:
         policies = list(client.security_policies.list_by_profile(
                       profiles["resourceGroup"],profiles["name"]))
-        if (self.data.get('state') == 'disabled' and not policies) or (self.data.get('state') == 'enabled' and policies):
+        if (self.data.get('state') == 'disabled' and not policies) or (self.data.get('state')
+                                                                      == 'enabled' and policies):
             matched.append(profiles)
       return matched
