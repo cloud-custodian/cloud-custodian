@@ -213,7 +213,7 @@ class SetWafv2(BaseAction):
             else:
                 self.retry(client.disassociate_web_acl,
                            ResourceArn=r[arn_key])
-                
+
 
 @GraphQLApi.action_registry.register('delete')
 class Delete(Action):

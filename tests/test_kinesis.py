@@ -3,7 +3,6 @@
 from .common import BaseTest, event_data
 
 
-
 def test_stream_config_source(test):
     p = test.load_policy({
         'name': 'stream-config',
@@ -272,7 +271,7 @@ class Kinesis(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['KmsKeyId'],
             'arn:aws:kms:us-east-1:123456789012:key/0d543df5-915c-42a1-afa1-c9c5f1f97955')
-        
+
     def test_kinesis_video_tag(self):
         session_factory = self.replay_flight_data('test_kinesis_video_tag')
         p = self.load_policy(
@@ -281,7 +280,7 @@ class Kinesis(BaseTest):
                 'resource': 'kinesis-video',
                 'filters': [
                     {
-                        'tag:foo': 'absent', 
+                        'tag:foo': 'absent',
                     }
                 ],
                 'actions': [
@@ -297,8 +296,7 @@ class Kinesis(BaseTest):
         client = session_factory().client('kinesisvideo')
         tags = client.list_tags_for_resource(ResourceARN=resources[0]["StreamARN"])["Tags"]
         self.assertEqual(len(tags), 1)
-        self.assertEqual(tags, {'foo': 'bar'})    
-
+        self.assertEqual(tags, {'foo': 'bar'})
 
     def test_kinesis_video_remove_tag(self):
         session_factory = self.replay_flight_data('test_kinesis_video_remove_tag')
@@ -308,7 +306,7 @@ class Kinesis(BaseTest):
                 'resource': 'kinesis-video',
                 'filters': [
                     {
-                        'tag:foo': 'present', 
+                        'tag:foo': 'present',
                     }
                 ],
                 'actions': [

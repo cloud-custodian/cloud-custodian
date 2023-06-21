@@ -62,6 +62,7 @@ skip-string-normalization = true
 line-length = 100
 
 [tool.ruff]
+select = ["E", "F", "W"]
 line-length = 100
 # E741 - single char variables
 # E401 - multiple imports in a single line
