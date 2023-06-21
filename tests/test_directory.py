@@ -50,7 +50,7 @@ class CloudDirectoryTest(BaseTest):
 
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        
+
     def test_cloud_directory_disable(self):
         factory = self.replay_flight_data("test_cloud_directory_disable")
         p = self.load_policy(
@@ -72,8 +72,8 @@ class CloudDirectoryTest(BaseTest):
         client = factory().client("clouddirectory")
         remainder = client.list_directories()["Directories"]
         self.assertEqual(len(remainder), 1)
-        self.assertEqual(remainder[0]["State"], "DISABLED")    
-    
+        self.assertEqual(remainder[0]["State"], "DISABLED")
+
     def test_cloud_directory_delete(self):
         factory = self.replay_flight_data("test_cloud_directory_delete")
         p = self.load_policy(
@@ -81,7 +81,7 @@ class CloudDirectoryTest(BaseTest):
                 "name": "delete-cloud-directory",
                 "resource": "cloud-directory",
                 "filters": [{"Name": "test-cloud"}],
-                "actions": [{"type": "delete"}],            
+                "actions": [{"type": "delete"}],
             },
             session_factory=factory,
         )
@@ -135,7 +135,7 @@ class DirectoryTests(BaseTest):
         self.assertEqual(resources[0]["DirectoryId"], "d-90672a7419")
         tags = client.list_tags_for_resource(ResourceId="d-90672a7419")["Tags"]
         self.assertEqual(len(tags), 0)
-        
+
     def test_directory_delete(self):
         factory = self.replay_flight_data("test_directory_delete")
         p = self.load_policy(

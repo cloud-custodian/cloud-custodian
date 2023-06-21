@@ -214,7 +214,7 @@ class CloudDirectoryDisable(BaseAction):
             self.manager.retry(
                     client.disable_directory,
                     DirectoryArn=r['DirectoryArn'])
-            
+
 class CloudDirectoryQueryParser(QueryParser):
     QuerySchema = {
         'name': str,
