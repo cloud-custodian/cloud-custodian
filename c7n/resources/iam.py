@@ -1956,7 +1956,7 @@ class UserPolicy(ValueFilter):
                 include-via: true
     """
 
-    schema = type_schema('policy', rinherit=ValueFilter.schema, 
+    schema = type_schema('policy', rinherit=ValueFilter.schema,
         **{'include-via': {'type': 'boolean'}})
     schema_alias = False
     permissions = (

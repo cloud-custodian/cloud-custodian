@@ -1,9 +1,12 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+import json
+
 from c7n.actions import BaseAction
+import c7n.filters.policystatement as polstmt_filter
 from c7n.manager import resources
 from c7n.query import DescribeSource, QueryResourceManager, TypeInfo
-from c7n.utils import local_session, type_schema
+from c7n.utils import local_session, type_schema, format_string_values
 from c7n.tags import universal_augment
 
 
@@ -12,7 +15,7 @@ class DescribeConfigurationSet(DescribeSource):
     def augment(self, resources):
         client = local_session(self.manager.session_factory).client('ses')
         for r in resources:
-            details = client.describe_configuration_set(ConfigurationSetName=r['Name'], 
+            details = client.describe_configuration_set(ConfigurationSetName=r['Name'],
                 ConfigurationSetAttributeNames=['eventDestinations','trackingOptions','deliveryOptions','reputationOptions'])
             r.update({
                 k: details[k]
@@ -88,3 +91,54 @@ class SESEmailIdentity(QueryResourceManager):
         permission_prefix = 'ses'
         arn_service = 'ses'
         cfn_type = 'AWS::SES::EmailIdentity'
+
+
+@SESEmailIdentity.filter_registry.register('has-statement')
+class HasStatementFilter(polstmt_filter.HasStatementFilter):
+
+    def __init__(self, data, manager=None):
+        super().__init__(data, manager)
+        self.policy_attribute = 'Policies'
+
+    def get_std_format_args(self, email_identity):
+        return {
+            'account_id': self.manager.config.account_id,
+            'region': self.manager.config.region,
+            'email_identity_name': email_identity['IdentityName'],
+        }
+
+    def process_resource(self, email_identity):
+        policies = email_identity.get(self.policy_attribute)
+        if not policies:
+            return None
+
+        for policy in policies.values():
+            p = json.loads(policy)
+
+            required = list(self.data.get('statement_ids', []))
+            statements = p.get('Statement', [])
+            for s in list(statements):
+                if s.get('Sid') in required:
+                    required.remove(s['Sid'])
+
+            required_statements = format_string_values(list(self.data.get('statements', [])),
+                                                       **self.get_std_format_args(email_identity))
+
+            for required_statement in required_statements:
+                for statement in statements:
+                    found = 0
+                    for key, value in required_statement.items():
+                        if key in ['Action', 'NotAction']:
+                            if key in statement and self.action_resource_case_insensitive(value) \
+                               == self.action_resource_case_insensitive(statement[key]):
+                                found += 1
+                        else:
+                            if key in statement and value == statement[key]:
+                                found += 1
+                    if found and found == len(required_statement):
+                        required_statements.remove(required_statement)
+                        break
+
+            if (self.data.get('statement_ids', []) and not required) or \
+               (self.data.get('statements', []) and not required_statements):
+                return email_identity

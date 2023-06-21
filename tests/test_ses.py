@@ -56,3 +56,78 @@ class SESV2Test(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
+    def test_ses_email_identity_has_statement_definition(self):
+        session_factory = self.replay_flight_data("test_ses_email_identity_has_statement")
+        p = self.load_policy(
+            {
+                "name": "test_ses_email_identity_has_statement_definition",
+                "resource": "ses-email-identity",
+                "filters": [
+                    {
+                        "type": "has-statement",
+                        "statements": [
+                            {
+                                "Effect": "Deny",
+                                "Action": "ses:SendEmail",
+                                "Principal": {"AWS": "*"},
+                                "Condition":
+                                    {"StringNotEquals": {"ses:FromAddress": "*test*"}},
+                                "Resource": "arn:aws:ses:us-west-2:644160558196:identity/c7n@t.com"
+                            }
+                        ]
+                    }
+                ],
+            }, session_factory=session_factory,
+            config={'region': 'us-west-2'},
+        )
+        resources = p.run()
+        self.assertEqual(1, len(resources))
+        self.assertEqual(resources[0]["IdentityName"], "c7n@t.com")
+
+    def test_ses_email_identity_has_statement_star_definition(self):
+        session_factory = self.replay_flight_data("test_ses_email_identity_has_statement")
+        p = self.load_policy(
+            {
+                "name": "test_ses_email_identity_has_statement_star_definition",
+                "resource": "ses-email-identity",
+                "filters": [
+                    {
+                        "type": "has-statement",
+                        "statements": [
+                            {
+                                "Effect": "Deny",
+                                "Action": "ses:SendEmail",
+                                "Principal": "*",
+                                "Condition":
+                                    {"StringNotLike": {"ses:FromAddress": "*test*"}},
+                                "Resource": "arn:aws:ses:us-west-2:644160558196:identity/c7n@t.com"
+                            }
+                        ]
+                    }
+                ],
+            }, session_factory=session_factory,
+            config={'region': 'us-west-2'},
+        )
+        resources = p.run()
+        self.assertEqual(1, len(resources))
+        self.assertEqual(resources[0]["IdentityName"], "c7n@t.com")
+
+    def test_ses_email_identity_has_statement_id(self):
+        session_factory = self.replay_flight_data("test_ses_email_identity_has_statement")
+        p = self.load_policy(
+            {
+                "name": "test_ses_email_identity_has_statement_id",
+                "resource": "ses-email-identity",
+                "filters": [
+                    {
+                        "type": "has-statement",
+                        "statement_ids": ["AllowStatement"]
+                    }
+                ],
+            }, session_factory=session_factory,
+            config={'region': 'us-west-2'},
+        )
+        resources = p.run()
+        self.assertEqual(1, len(resources))
+        self.assertEqual(resources[0]["IdentityName"], "c7n@t.com")
