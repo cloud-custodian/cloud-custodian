@@ -54,6 +54,18 @@ class Instance(QueryResourceManager):
                         'labelFingerprint': resource['labelFingerprint']
                     }}
 
+        @staticmethod
+        def checkFingerprintError(params, client, model, resource):
+            try:
+                resource = model.get(client,{
+                    'project_id': params['project'],
+                    'zone': params['zone'],
+                    'resourceName': params['instance']
+                })
+                return resource
+            except:
+                raise
+
 
 Instance.filter_registry.register('offhour', OffHour)
 Instance.filter_registry.register('onhour', OnHour)

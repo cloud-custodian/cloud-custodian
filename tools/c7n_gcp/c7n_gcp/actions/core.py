@@ -74,23 +74,20 @@ class MethodAction(Action):
                 result = self.invoke_api(client, op_name, params)
             except HttpError as e:
                 if 'fingerprint' in e.reason:
-                    if model.component == 'projects.locations.clusters':
-                        project_id = resource['selfLink'].split("/")[5]
-                        resource = model.get(client,{
-                            'project_id': project_id,
-                            'location': resource['zone'],
-                            'cluster_name': resource['name']})
-                    elif model.component == 'instances':
-                        resource = model.get(client,{
-                            'project_id': params['project'],
-                            'zone': params['zone'],
-                            'resourceName': params['instance']
-                        })
-                    else:
+                    try:
+                        if not model.refetchFingerprint:
+                            raise NotImplemented("Cannot re-fetch labels for ")
+                        else:
+                            resource = model.refetchFingerprint(params, client, model, resource)
+                            params['body']['labelFingerprint'] = resource['labelFingerprint']
+                            result = self.invoke_api(client, op_name, params)
+                    except HttpError as e:
+                        if e.resp.status in self.ignore_error_codes:
+                            return e
                         raise
-                    params['body']['labelFingerprint'] = resource['labelFingerprint']
-                    result = self.invoke_api(client, op_name, params)
                 else:
+                    if e.resp.status in self.ignore_error_codes:
+                        return e
                     raise
             if result_key and annotation_key:
                 resource[annotation_key] = result.get(result_key)
