@@ -45,29 +45,29 @@ class WebAppFirewallFilter(Filter):
         policies:
             name: test-frontdoor-waf
             resource: azure.front-door
-            filters: 
+            filters:
               - type: waf
                 state: disabled
-            
+
 
     """
     schema = type_schema('waf',required=['state'],
             state={'type': 'string', 'enum': ['None', 'not None']})
-    
+
     def check_state(self, link):
         if self.data.get('state') == 'disabled' and link is None:
             return True
         if self.data.get('state') == 'enabled' and link is not None:
             return True
-        return False 
+        return False
 
     def process(self, resources, event=None):
         client = self.manager.get_client()
         matched = []
-        for frontDoors in resources:
-            for frontEndpoints in frontDoors['properties']['frontendEndpoints']:
-                frontEndpoint = client.frontend_endpoints.get(
-                    frontDoors['resourceGroup'], frontDoors['name'],frontEndpoints['name'])
-                if self.check_state(frontEndpoint.web_application_firewall_policy_link):
-                    matched.append(frontDoors)
+        for front_door in resources:
+            for front_endpoints in front_door['properties']['frontendEndpoints']:
+                front_endpoint = client.frontend_endpoints.get(
+                    front_door['resourceGroup'], front_door['name'],front_endpoints['name'])
+                if self.check_state(front_endpoint.web_application_firewall_policy_link):
+                    matched.append(front_door)
         return matched
