@@ -152,7 +152,6 @@ class SESReceiptRuleSet(QueryResourceManager):
         detail_spec = ('describe_receipt_rule_set', 'RuleSetName', 'Name', None)
         name = id = 'Name'
         arn_type = 'receipt-rule-set'
-    
 
 @SESReceiptRuleSet.action_registry.register('delete')
 class Delete(Action):
