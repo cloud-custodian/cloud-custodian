@@ -55,7 +55,7 @@ class Instance(QueryResourceManager):
                     }}
 
         @staticmethod
-        def checkFingerprintError(params, client, model, resource):
+        def refetchFingerprint(params, client, model, resource):
             try:
                 resource = model.get(client,{
                     'project_id': params['project'],
