@@ -150,7 +150,7 @@ class ValuesFrom:
             uri=self.data.get('url'),
             headers=self.data.get('headers', {})
         )
-        
+
         contents = str(self.resolver.resolve(**params))
         return contents, format
 

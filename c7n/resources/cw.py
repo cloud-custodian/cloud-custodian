@@ -161,7 +161,8 @@ class EventBus(QueryResourceManager):
 class EventBusCrossAccountFilter(CrossAccountAccessFilter):
     # dummy permission
     permissions = ('events:ListEventBuses',)
-    
+
+
 @EventBus.action_registry.register('delete')
 class EventBusDelete(BaseAction):
     """Delete an event bus.

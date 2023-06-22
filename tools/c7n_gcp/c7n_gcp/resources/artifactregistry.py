@@ -6,7 +6,7 @@ from c7n_gcp.query import RegionalResourceManager, ChildTypeInfo
 @resources.register('artifact-repository')
 class ArtifactRegistryRepository(RegionalResourceManager):
     """Artifact Registry Repository
-   
+
     https://cloud.google.com/artifact-registry/docs/reference/rest/v1/projects.locations.repositories
     """
     class resource_type(ChildTypeInfo):
