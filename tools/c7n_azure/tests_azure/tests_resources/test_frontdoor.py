@@ -24,3 +24,22 @@ class FrontDoorTest(BaseTest):
         })
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
+    def test_wa_managed_rule(self):
+        p = self.load_policy({
+            'name': 'test-managed-rule',
+            'resource': 'azure.front-door',
+            'filters': [
+                {'and': [
+                    {'type': 'waf',
+                      'state': 'Enabled'},
+                    {'type': 'waf-managed-rule',
+                      'group': 'JAVA',
+                      'id': 944240,
+                      'state': 'Disabled'},
+
+
+                ]}]
+        })
+        resources = p.run()
+        self.assertEqual(len(resources), 1)

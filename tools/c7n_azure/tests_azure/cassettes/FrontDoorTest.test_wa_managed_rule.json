@@ -1,0 +1,357 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Network/frontDoors?api-version=2021-06-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Thu, 22 Jun 2023 17:11:03 GMT"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "content-length": [
+                        "4586"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/cfb-pujwtnal/providers/Microsoft.Network/frontdoors/frontdoorName-afdSuccess",
+                                "type": "Microsoft.Network/frontdoors",
+                                "name": "frontdoorName-afdSuccess",
+                                "location": "Global",
+                                "tags": {
+                                    "product_id": "13742"
+                                },
+                                "properties": {
+                                    "routingRules": [
+                                        {
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/cfb-pujwtnal/providers/Microsoft.Network/Frontdoors/frontdoorName-afdSuccess/RoutingRules/routingRule-afdSuccess",
+                                            "name": "routingRule-afdSuccess",
+                                            "type": "Microsoft.Network/Frontdoors/RoutingRules",
+                                            "properties": {
+                                                "routeConfiguration": {
+                                                    "customForwardingPath": null,
+                                                    "forwardingProtocol": "MatchRequest",
+                                                    "cacheConfiguration": null,
+                                                    "backendPool": {
+                                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-pujwtnal/providers/Microsoft.Network/frontDoors/frontdoorName-afdSuccess/backendPools/backendPool-afdSuccess"
+                                                    },
+                                                    "@odata.type": "#Microsoft.Azure.FrontDoor.Models.FrontdoorForwardingConfiguration"
+                                                },
+                                                "rulesEngine": null,
+                                                "resourceState": "Enabled",
+                                                "frontendEndpoints": [
+                                                    {
+                                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-pujwtnal/providers/Microsoft.Network/frontDoors/frontdoorName-afdSuccess/frontendEndpoints/frontEndEndpoint-afdSuccess"
+                                                    }
+                                                ],
+                                                "acceptedProtocols": [
+                                                    "Http",
+                                                    "Https"
+                                                ],
+                                                "patternsToMatch": [
+                                                    "/*"
+                                                ],
+                                                "enabledState": "Enabled",
+                                                "webApplicationFirewallPolicyLink": null
+                                            }
+                                        }
+                                    ],
+                                    "rulesEngines": [],
+                                    "frontdoorId": "6bb8f807-1382-41f0-b448-e0db28db7561",
+                                    "extendedProperties": {},
+                                    "resourceState": "Enabled",
+                                    "loadBalancingSettings": [
+                                        {
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/cfb-pujwtnal/providers/Microsoft.Network/Frontdoors/frontdoorName-afdSuccess/LoadBalancingSettings/loadBalancingSettings-afdSuccess",
+                                            "name": "loadBalancingSettings-afdSuccess",
+                                            "type": "Microsoft.Network/Frontdoors/LoadBalancingSettings",
+                                            "properties": {
+                                                "resourceState": "Enabled",
+                                                "sampleSize": 4,
+                                                "successfulSamplesRequired": 2,
+                                                "additionalLatencyMilliseconds": 0
+                                            }
+                                        }
+                                    ],
+                                    "healthProbeSettings": [
+                                        {
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/cfb-pujwtnal/providers/Microsoft.Network/Frontdoors/frontdoorName-afdSuccess/HealthProbeSettings/healthProbeSettings-afdSuccess",
+                                            "name": "healthProbeSettings-afdSuccess",
+                                            "type": "Microsoft.Network/Frontdoors/HealthProbeSettings",
+                                            "properties": {
+                                                "resourceState": "Enabled",
+                                                "path": "/",
+                                                "protocol": "Http",
+                                                "intervalInSeconds": 120,
+                                                "enabledState": "Enabled",
+                                                "healthProbeMethod": "Get"
+                                            }
+                                        }
+                                    ],
+                                    "backendPools": [
+                                        {
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/cfb-pujwtnal/providers/Microsoft.Network/Frontdoors/frontdoorName-afdSuccess/BackendPools/backendPool-afdSuccess",
+                                            "name": "backendPool-afdSuccess",
+                                            "type": "Microsoft.Network/Frontdoors/BackendPools",
+                                            "properties": {
+                                                "backends": [
+                                                    {
+                                                        "address": "frontdoorName-afdSuccess.azurefd.net",
+                                                        "httpPort": 80,
+                                                        "httpsPort": 443,
+                                                        "priority": 1,
+                                                        "weight": 50,
+                                                        "backendHostHeader": "frontdoorName-afdSuccess.azurefd.net",
+                                                        "enabledState": "Enabled",
+                                                        "privateLinkAlias": null,
+                                                        "privateLinkResourceId": null,
+                                                        "privateLinkLocation": null,
+                                                        "privateEndpointStatus": null,
+                                                        "privateLinkApprovalMessage": null
+                                                    }
+                                                ],
+                                                "resourceState": "Enabled",
+                                                "loadBalancingSettings": {
+                                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-pujwtnal/providers/Microsoft.Network/frontDoors/frontdoorName-afdSuccess/loadBalancingSettings/loadBalancingSettings-afdSuccess"
+                                                },
+                                                "healthProbeSettings": {
+                                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-pujwtnal/providers/Microsoft.Network/frontDoors/frontdoorName-afdSuccess/healthProbeSettings/healthProbeSettings-afdSuccess"
+                                                }
+                                            }
+                                        }
+                                    ],
+                                    "frontendEndpoints": [
+                                        {
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/cfb-pujwtnal/providers/Microsoft.Network/Frontdoors/frontdoorName-afdSuccess/FrontendEndpoints/frontEndEndpoint-afdSuccess",
+                                            "name": "frontEndEndpoint-afdSuccess",
+                                            "type": "Microsoft.Network/Frontdoors/FrontendEndpoints",
+                                            "properties": {
+                                                "resourceState": "Enabled",
+                                                "hostName": "frontdoorName-afdSuccess.azurefd.net",
+                                                "sessionAffinityEnabledState": "Disabled",
+                                                "sessionAffinityTtlSeconds": 0,
+                                                "webApplicationFirewallPolicyLink": {
+                                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-pujwtnal/providers/Microsoft.Network/frontDoorWebApplicationFirewallPolicies/frontdoorClassic"
+                                                },
+                                                "customHttpsProvisioningState": null,
+                                                "customHttpsProvisioningSubstate": null,
+                                                "customHttpsConfiguration": null
+                                            }
+                                        }
+                                    ],
+                                    "backendPoolsSettings": {
+                                        "enforceCertificateNameCheck": "Disabled",
+                                        "sendRecvTimeoutSeconds": 0
+                                    },
+                                    "enabledState": "Enabled",
+                                    "cName": "frontdoorName-afdSuccess.azurefd.net",
+                                    "friendlyName": "",
+                                    "provisioningState": "Succeeded"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-pujwtnal/providers/Microsoft.Network/frontDoors/frontdoorName-afdSuccess/frontendEndpoints/frontEndEndpoint-afdSuccess?api-version=2021-06-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Thu, 22 Jun 2023 17:11:03 GMT"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "content-length": [
+                        "777"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/cfb-pujwtnal/providers/Microsoft.Network/frontdoors/frontdoorName-afdSuccess/frontendendpoints/frontEndEndpoint-afdSuccess",
+                        "type": "Microsoft.Network/frontdoors/frontendendpoints",
+                        "name": "frontEndEndpoint-afdSuccess",
+                        "properties": {
+                            "resourceState": "Enabled",
+                            "hostName": "frontdoorName-afdSuccess.azurefd.net",
+                            "sessionAffinityEnabledState": "Disabled",
+                            "sessionAffinityTtlSeconds": 0,
+                            "webApplicationFirewallPolicyLink": {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-pujwtnal/providers/Microsoft.Network/frontDoorWebApplicationFirewallPolicies/frontdoorClassic"
+                            },
+                            "customHttpsProvisioningState": "Disabled",
+                            "customHttpsProvisioningSubstate": "None",
+                            "customHttpsConfiguration": null
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-pujwtnal/providers/Microsoft.Network/frontDoors/frontdoorName-afdSuccess/frontendEndpoints/frontEndEndpoint-afdSuccess?api-version=2021-06-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Thu, 22 Jun 2023 17:11:03 GMT"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "content-length": [
+                        "777"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/cfb-pujwtnal/providers/Microsoft.Network/frontdoors/frontdoorName-afdSuccess/frontendendpoints/frontEndEndpoint-afdSuccess",
+                        "type": "Microsoft.Network/frontdoors/frontendendpoints",
+                        "name": "frontEndEndpoint-afdSuccess",
+                        "properties": {
+                            "resourceState": "Enabled",
+                            "hostName": "frontdoorName-afdSuccess.azurefd.net",
+                            "sessionAffinityEnabledState": "Disabled",
+                            "sessionAffinityTtlSeconds": 0,
+                            "webApplicationFirewallPolicyLink": {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-pujwtnal/providers/Microsoft.Network/frontDoorWebApplicationFirewallPolicies/frontdoorClassic"
+                            },
+                            "customHttpsProvisioningState": "Disabled",
+                            "customHttpsProvisioningSubstate": "None",
+                            "customHttpsConfiguration": null
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-pujwtnal/providers/Microsoft.Network/FrontDoorWebApplicationFirewallPolicies/frontdoorClassic?api-version=2022-05-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Thu, 22 Jun 2023 17:11:09 GMT"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "content-length": [
+                        "1308"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/cfb-pujwtnal/providers/Microsoft.Network/frontdoorwebapplicationfirewallpolicies/frontdoorClassic",
+                        "type": "Microsoft.Network/frontdoorwebapplicationfirewallpolicies",
+                        "name": "frontdoorClassic",
+                        "location": "Global",
+                        "tags": {
+                            "c7n": "true",
+                            "product_id": "13742"
+                        },
+                        "sku": {
+                            "name": "Classic_AzureFrontDoor"
+                        },
+                        "properties": {
+                            "policySettings": {
+                                "enabledState": "Enabled",
+                                "mode": "Prevention",
+                                "redirectUrl": "https://www.contoso.com",
+                                "customBlockResponseStatusCode": 403,
+                                "customBlockResponseBody": "PGh0bWw+CjxoZWFkZXI+PHRpdGxlPkhlbGxvPC90aXRsZT48L2hlYWRlcj4KPGJvZHk+CkhlbGxvIHdvcmxkCjwvYm9keT4KPC9odG1sPg==",
+                                "requestBodyCheck": "Enabled"
+                            },
+                            "customRules": {
+                                "rules": []
+                            },
+                            "managedRules": {
+                                "managedRuleSets": [
+                                    {
+                                        "ruleSetType": "DefaultRuleSet",
+                                        "ruleSetVersion": "1.0",
+                                        "ruleSetAction": null,
+                                        "ruleGroupOverrides": [
+                                            {
+                                                "ruleGroupName": "JAVA",
+                                                "rules": [
+                                                    {
+                                                        "ruleId": "944240",
+                                                        "enabledState": "Disabled",
+                                                        "action": "Block",
+                                                        "exclusions": []
+                                                    }
+                                                ],
+                                                "exclusions": []
+                                            }
+                                        ],
+                                        "exclusions": []
+                                    }
+                                ]
+                            },
+                            "frontendEndpointLinks": [
+                                {
+                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/cfb-pujwtnal/providers/Microsoft.Network/frontdoors/frontdoorName-afdSuccess/frontendendpoints/frontEndEndpoint-afdSuccess"
+                                }
+                            ],
+                            "securityPolicyLinks": [],
+                            "resourceState": "Enabled",
+                            "provisioningState": "Succeeded"
+                        }
+                    }
+                }
+            }
+        }
+    ]
+}
