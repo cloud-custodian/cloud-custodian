@@ -14,7 +14,7 @@ class SecurityPolicyTest(BaseTest):
         self.assertEqual(resources[0]['id'], '2550272938411777319')
         self.assertEqual(len(resources), 1)
 
-    def test_security_policy_query(self):
+    def test_security_policy_adaptive_protection_enabled(self):
         factory = self.replay_flight_data('test_security_policy')
         p = self.load_policy({
             'name': 'security-policy-adaptive-protection-enabled',
