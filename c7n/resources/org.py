@@ -10,7 +10,7 @@ from botocore.exceptions import ClientError
 
 from c7n.credentials import assumed_session
 from c7n.executor import MainThreadExecutor
-from c7n.filters import Filter, HasStatementFilter
+from c7n.filters import Filter
 from c7n.query import QueryResourceManager, TypeInfo
 from c7n.resources.aws import AWS
 from c7n.utils import local_session, type_schema
@@ -23,7 +23,7 @@ ORG_ACCOUNT_SESSION_NAME = "CustodianOrgAccount"
 
 
 def org_augment_tags(manager, resources):
-    orgs = local_session(manager.session_factory).client('organizations')
+    client = local_session(manager.session_factory).client('organizations')
     for r in resources:
         r["Tags"] = client.list_tags_for_resource(
             ResourceId=r["Id"]).get("Tags", [])
@@ -37,7 +37,7 @@ class OrgAccess:
     def parse_access_role(self):
         params = {}
         for q in self.data.get("query", ()):
-            params.update(q)        
+            params.update(q)
         org_access = {
             k: v for k, v in params.items() if k in ("org-access-role",)
         }
@@ -121,7 +121,7 @@ class OrgAccount(QueryResourceManager):
         global_resource = True
         permissions_augment = ("organizations:ListTagsForResource",)
 
-    executor_factory = MainThreadExecutor        
+    executor_factory = MainThreadExecutor
     org_session = None
 
     def augment(self, resources):
