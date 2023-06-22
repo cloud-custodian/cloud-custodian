@@ -144,30 +144,15 @@ class HasStatementFilter(polstmt_filter.HasStatementFilter):
                 return email_identity
 
 
-class DescribeRuleSet(DescribeSource):
-
-    def augment(self, resources):
-        client = local_session(self.manager.session_factory).client('ses')
-        for r in resources:
-            details = client.describe_receipt_rule_set(RuleSetName=r['Name'])
-            r.update({
-                k: details[k]
-                for k in details
-                if k not in {'RuleSets', 'ResponseMetadata'}
-            })
-        return universal_augment(self.manager, resources)
-
 @resources.register('ses-receipt-rule-set')
 class SESReceiptRuleSet(QueryResourceManager):
     class resource_type(TypeInfo):
         service = 'ses'
         enum_spec = ('list_receipt_rule_sets', 'RuleSets', None)
+        detail_spec = ('describe_receipt_rule_set', 'RuleSetName', 'Name', None)
         name = id = 'Name'
         arn_type = 'receipt-rule-set'
-
-    source_mapping = {
-        'describe': DescribeRuleSet
-    }
+    
 
 @SESReceiptRuleSet.action_registry.register('delete')
 class Delete(Action):
