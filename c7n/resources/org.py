@@ -122,7 +122,6 @@ class ControlPolicyContents(Filter):
 
 @AWS.resources.register("org-account")
 class OrgAccount(QueryResourceManager):
-    executor_factory = MainThreadExecutor
 
     class resource_type(TypeInfo):
         service = "organizations"
@@ -132,7 +131,9 @@ class OrgAccount(QueryResourceManager):
         arn_type = "account"
         enum_spec = ("list_accounts", "Accounts", None)
         global_resource = True
+        permissions_augment = ("organizations:ListTagsForResource",)
 
+    executor_factory = MainThreadExecutor        
     org_session = None
 
     def augment(self, resources):
