@@ -454,6 +454,7 @@ class ServerCertificate(QueryResourceManager):
                      'ServerCertificateMetadataList',
                      None)
         name = id = 'ServerCertificateName'
+        config_type = "AWS::IAM::ServerCertificate"
         name = 'ServerCertificateName'
         date = 'Expiration'
         # Denotes this resource type exists across regions
@@ -2955,6 +2956,7 @@ class SamlProvider(QueryResourceManager):
         detail_spec = ('get_saml_provider', 'SAMLProviderArn', 'Arn', None)
         arn = 'Arn'
         arn_type = 'saml-provider'
+        config_type = "AWS::IAM::SAMLProvider"
         global_resource = True
 
     source_mapping = {'describe': SamlProviderDescribe}
