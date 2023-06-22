@@ -47,7 +47,7 @@ class WebAppFirewallFilter(Filter):
             resource: azure.front-door
             filters:
               - type: waf
-                state: disabled
+                state: Disabled
 
 
     """
