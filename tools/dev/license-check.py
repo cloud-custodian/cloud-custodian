@@ -66,6 +66,10 @@ def main():
             continue
         if d.metadata['License'] in accept:
             continue
+        if d.metadata['License'] is not None and ' or ' in d.metadata['License']:
+            licenses = str(d.metadata['License']).split(' or ')
+            if any(i in licenses for i in accept):
+                continue
 
         classifiers = d.metadata.get_all('Classifier') or ()
         classifiers = [c for c in classifiers if c.startswith('License')]
