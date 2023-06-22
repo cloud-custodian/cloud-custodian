@@ -32,7 +32,7 @@ class FrontDoorTest(BaseTest):
              'filters': [
                 {
                     'type': 'waf',
-                    'state': 'disabled'
+                    'state': 'Disabled'
                 },
             ]
         })

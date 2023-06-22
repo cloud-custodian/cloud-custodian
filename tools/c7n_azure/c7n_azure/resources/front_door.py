@@ -52,12 +52,12 @@ class WebAppFirewallFilter(Filter):
 
     """
     schema = type_schema('waf',required=['state'],
-            state={'type': 'string', 'enum': ['None', 'not None']})
+            state={'type': 'string', 'enum': ['Enabled', 'Disabled']})
 
     def check_state(self, link):
-        if self.data.get('state') == 'disabled' and link is None:
+        if self.data.get('state') == 'Disabled' and link is None:
             return True
-        if self.data.get('state') == 'enabled' and link is not None:
+        if self.data.get('state') == 'Enabled' and link is not None:
             return True
         return False
 
