@@ -76,7 +76,7 @@ class MethodAction(Action):
                 if 'fingerprint' in e.reason:
                     try:
                         if not model.refetchFingerprint:
-                            raise NotImplemented("Cannot re-fetch labels for ")
+                            raise NotImplemented("Cannot re-fetch labels for for this class")
                         else:
                             resource = model.refetchFingerprint(params, client, model, resource)
                             params['body']['labelFingerprint'] = resource['labelFingerprint']
