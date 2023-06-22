@@ -75,12 +75,12 @@ class MethodAction(Action):
             except HttpError as e:
                 if 'fingerprint' in e.reason:
                     try:
-                        if not model.refetchFingerprint:
-                            raise NotImplemented("Cannot re-fetch labels for for this class")
-                        else:
+                        if model.refetchFingerprint:
                             resource = model.refetchFingerprint(params, client, model, resource)
                             params['body']['labelFingerprint'] = resource['labelFingerprint']
                             result = self.invoke_api(client, op_name, params)
+                        else:
+                            raise
                     except HttpError as e:
                         if e.resp.status in self.ignore_error_codes:
                             return e
