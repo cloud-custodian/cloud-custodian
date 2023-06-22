@@ -16,11 +16,18 @@ from c7n.resources.aws import AWS
 from c7n.utils import local_session, type_schema
 
 
-
 log = logging.getLogger("custodian.org-accounts")
 
 
 ORG_ACCOUNT_SESSION_NAME = "CustodianOrgAccount"
+
+
+def org_augment_tags(manager, resources):
+    orgs = local_session(manager.session_factory).client('organizations')
+    for r in resources:
+        r["Tags"] = client.list_tags_for_resource(
+            ResourceId=r["Id"]).get("Tags", [])
+    return resources
 
 
 class OrgAccess:
@@ -78,6 +85,7 @@ class OrgPolicy(QueryResourceManager, OrgAccess):
         arn_type = "policy"
         enum_spec = ("list_policies", "Policies", None)
         global_resource = True
+        permissions_augment = ("organizations:ListTagsForResource",)
 
     def resources(self, query=None):
         q = self.parse_query()
@@ -87,6 +95,9 @@ class OrgPolicy(QueryResourceManager, OrgAccess):
             query = q
         return super().resources(query=query)
 
+    def augment(self, resources):
+        return org_augment_tags(self, resources)
+
     def parse_query(self, query=None):
         params = {}
         for q in self.data.get('query', ()):
@@ -95,29 +106,6 @@ class OrgPolicy(QueryResourceManager, OrgAccess):
         if not params:
             params['Filter'] = "SERVICE_CONTROL_POLICY"
         return params
-
-
-class PolicyTarget(Filter):
-
-    schema = type_schema(
-        'target',
-        targets={'type': 'array', 'items': {'type': 'string'}}
-    )
-
-    def process(self, resources, event=None):
-        client = self.manager.get_org_session().client('organizations')
-        resources = []
-        for r in resources:
-            pass
-
-@OrgPolicy.filter_registry.register('scp-contents')
-class ControlPolicyContents(Filter):
-
-    schema = type_schema(
-        'target'
-    )
-
-
 
 
 @AWS.resources.register("org-account")
@@ -137,10 +125,7 @@ class OrgAccount(QueryResourceManager):
     org_session = None
 
     def augment(self, resources):
-        client = local_session(self.session_factory).client("organizations")
-        for r in resources:
-            r["Tags"] = client.list_tags_for_resource(ResourceId=r["Id"]).get("Tags", [])
-        return resources
+        return org_augment_tags(self, resources)
 
     def validate(self):
         self.parse_query()
