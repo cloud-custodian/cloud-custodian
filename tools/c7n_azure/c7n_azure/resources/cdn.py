@@ -56,10 +56,10 @@ class WebAppFirewallFilter(Filter):
             resource: azure.cdnprofile
             filters: 
                 - type: waf
-                  state: disabled
+                  state: Disabled
     """
     schema = type_schema('waf',required=['state'],
-              state={'type': 'string', 'enum': ['enabled', 'disabled']})
+              state={'type': 'string', 'enum': ['Enabled', 'Disabled']})
 
     def process(self, resources, event=None):
       client = self.manager.get_client()
@@ -67,7 +67,7 @@ class WebAppFirewallFilter(Filter):
       for profiles in resources:
         policies = list(client.security_policies.list_by_profile(
                       profiles["resourceGroup"],profiles["name"]))
-        if (self.data.get('state') == 'disabled' and not policies) or (self.data.get('state')
-                                                                      == 'enabled' and policies):
+        if (self.data.get('state') == 'Disabled' and not policies) or (self.data.get('state')
+                                                                      == 'Enabled' and policies):
             matched.append(profiles)
       return matched
