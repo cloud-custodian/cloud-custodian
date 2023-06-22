@@ -54,11 +54,9 @@ class WebAppFirewallFilter(Filter):
         policies:
             name: test-waf-not-enabled
             resource: azure.cdnprofile
-            filters: [
+            filters: 
                 - type: waf
                   state: disabled
-            ]
-
     """
     schema = type_schema('waf',required=['state'],
               state={'type': 'string', 'enum': ['enabled', 'disabled']})
