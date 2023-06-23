@@ -7,11 +7,12 @@ from c7n_azure.actions.firewall import SetFirewallAction
 from c7n_azure.filters import FirewallRulesFilter, FirewallBypassFilter
 from c7n_azure.provider import resources
 from c7n_azure.resources.arm import ArmResourceManager
-from c7n_azure.utils import ThreadHelper
+from c7n_azure.utils import ThreadHelper, StringUtils
 from netaddr import IPRange, IPSet, IPNetwork, IPAddress
 
 from c7n.exceptions import PolicyValidationError
 from c7n.utils import type_schema
+from c7n.filters import Filter
 from c7n.filters.core import ValueFilter
 
 AZURE_SERVICES = IPRange('0.0.0.0', '0.0.0.0')  # nosec
@@ -83,6 +84,79 @@ class SqlServer(ArmResourceManager):
             'resourceGroup',
             'kind'
         )
+
+
+@SqlServer.filter_registry.register('transparent-data-encryption')
+class TransparentDataEncryptionFilter(Filter):
+    """
+    Filter by the current Transparent Data Encryption
+    configuration for this server.
+
+    :example:
+
+    Find SQL Server with TDE details
+
+    .. code-block:: yaml
+
+        policies:
+          - name: sql-server-tde
+            resource: azure.sql-server
+            filters:
+              - type: transparent-data-encryption
+                key_type: CustomerManaged
+
+    """
+
+    schema = type_schema(
+        'transparent-data-encryption',
+        required=['type', 'key_type'],
+        **{
+            'key_type': {'type': 'string', 'enum': ['ServiceManaged', 'CustomerManaged']}
+        }
+    )
+
+    log = logging.getLogger('custodian.azure.sqlserver.transparent-data-encryption-filter')
+
+    def __init__(self, data, manager=None):
+        super(TransparentDataEncryptionFilter, self).__init__(data, manager)
+        self.key_type = self.data['key_type']
+
+    def process(self, resources, event=None):
+        resources, exceptions = ThreadHelper.execute_in_parallel(
+            resources=resources,
+            event=event,
+            execution_method=self._process_resource_set,
+            executor_factory=self.executor_factory,
+            log=log
+        )
+        if exceptions:
+            raise exceptions[0]
+        return resources
+
+    def _process_resource_set(self, resources, event=None):
+        client = self.manager.get_client()
+        result = []
+        for resource in resources:
+
+            encryption_protector = client.encryption_protectors.get(
+                resource['resourceGroup'],
+                resource['name'],
+                "current")
+
+            resource['properties']['transparentDataEncryption'] = \
+                encryption_protector.serialize(True).get('properties', {})
+
+            if self.key_type == 'CustomerManaged':
+                encryption_type = 'AzureKeyVault'
+            elif self.key_type == 'ServiceManaged':
+                encryption_type = 'ServiceManaged'
+
+            if StringUtils.equal(
+                    resource['properties']['transparentDataEncryption'].get('serverKeyType'),
+                    encryption_type):
+                result.append(resource)
+
+        return result
 
 
 @SqlServer.filter_registry.register('azure-ad-administrators')
