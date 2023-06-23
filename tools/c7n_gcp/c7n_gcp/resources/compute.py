@@ -260,12 +260,38 @@ class Image(QueryResourceManager):
             "diskSizeGb", "family"]
         asset_type = "compute.googleapis.com/Image"
         urn_component = "image"
+        labels = True
 
         @staticmethod
         def get(client, resource_info):
             return client.execute_command(
                 'get', {'project': resource_info['project_id'],
                         'resourceId': resource_info['image_id']})
+
+        @staticmethod
+        def get_label_params(resource, all_labels):
+            path_param_re = re.compile('.*?/projects/(.*?)/global/images/(.*)')
+            project, resourceId = path_param_re.match(
+                resource['selfLink']).groups()
+            return {'project': project, 'resource': resourceId,
+                    'body': {
+                        'labels': all_labels,
+                        'labelFingerprint': resource['labelFingerprint']
+                    }}
+
+        @staticmethod
+        def refetchFingerprint(params, client, model, resource):
+            try:
+                path_param_re = re.compile('.*?/projects/(.*?)/global/images/(.*)')
+                project_id, resourceId = path_param_re.match(
+                    resource['selfLink']).groups()
+                resource = model.get(client,{
+                    'project_id': project_id,
+                    'image_id': resourceId
+                    })
+                return resource
+            except:
+                raise
 
 
 @Image.action_registry.register('delete')

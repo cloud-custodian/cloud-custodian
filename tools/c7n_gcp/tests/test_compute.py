@@ -384,6 +384,47 @@ class ImageTest(BaseTest):
             ],
         )
 
+    def test_label_image(self):
+        project_id = 'cloud-custodian'
+        image_name = 'image-1'
+        factory = self.replay_flight_data(
+            'image-set-label', project_id)
+        p = self.load_policy(
+            {'name': 'label-image',
+            'resource': 'gcp.image',
+            'filters': [
+                {'name': image_name}],
+            'actions': [{'type': 'set-labels',
+                        'labels': {'test_label': 'test_value'}}]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = p.resource_manager.get_client()
+        result = client.execute_query(
+            'list', {'project': project_id,
+                     'filter': 'name = image-1'})
+        self.assertEqual(result['items'][0]['labels']['test_label'], 'test_value')
+
+    def test_unlabel_image(self):
+        project_id = 'cloud-custodian'
+        image_name = 'image-1'
+        factory = self.replay_flight_data(
+            'image-remove-label', project_id)
+        p = self.load_policy(
+            {'name': 'label-image',
+            'resource': 'gcp.image',
+            'filters': [
+                {'name': image_name}],
+            'actions': [{'type': 'set-labels',
+                        'remove': ['test_label']}]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = p.resource_manager.get_client()
+        result = client.execute_query(
+            'list', {'project': project_id,
+                     'filter': 'name = image-1'})
+        self.assertEqual(result['items'][0]['labels'].get('test_label'), None)
 
 class InstanceTemplateTest(BaseTest):
 
