@@ -16,6 +16,8 @@ from c7n.version import version
 
 class BaseNotify(EventAction):
 
+    default_message_size_threshold = 262144
+
     def expand_variables(self, message):
         """expand any variables in the action to_from/cc_from fields.
         """
@@ -39,6 +41,22 @@ class BaseNotify(EventAction):
         compressed = zlib.compress(dumped.encode('utf8'))
         b64encoded = base64.b64encode(compressed)
         return b64encoded.decode('ascii')
+
+    def get_size(self, message):
+        return len(self.pack(message).encode('utf8'))
+
+    def dynamic_resource_batch(self, message, resources):
+        message.setdefault('resources', [])
+        message_size = self.get_size(message)
+        resource_batch = []
+        for r in resources:
+            resource_batch.append(r)
+            if self.get_size(resource_batch) > (self.default_message_size_threshold - message_size):
+                resource_batch.pop()
+                yield resource_batch
+                resource_batch = [r]
+        if resource_batch:
+            yield resource_batch
 
 
 class Notify(BaseNotify):
@@ -174,8 +192,13 @@ class Notify(BaseNotify):
             'execution_start': self.manager.ctx.start_time,
             'policy': self.manager.data}
         message['action'] = self.expand_variables(message)
-        
-        self.process_batches(resources, message)
+
+        for batch in self.dynamic_resource_batch(message, resources):
+            message['resources'] = self.prepare_resources(batch)
+            receipt = self.send_data_message(message)
+            self.log.info("sent message:%s policy:%s template:%s count:%s" % (
+                receipt, self.manager.data['name'],
+                self.data.get('template', 'default'), len(batch)))
 
     def prepare_resources(self, resources):
         """Resources preparation for transport.
@@ -295,38 +318,6 @@ class Notify(BaseNotify):
             MessageBody=self.pack(message),
             MessageAttributes=attrs)
         return result['MessageId']
-    
-    def process_batches(self, resources, message):
-        batch = []
-        batch_size = 0
-        for resource in resources:
-            prepared_resource = self.prepare_resources([resource])
-            packed_resource = self.pack({'resources': prepared_resource})
-            resource_size = len(packed_resource.encode('utf-8'))
-
-            # Check if adding this resource will push us over the size
-            if batch_size + resource_size >= 256 * 1000:
-                message['resources'] = batch
-                receipt = self.send_data_message(message)
-                self.log.info("sent message:%s policy:%s template:%s count:%s" % (
-                    receipt, self.manager.data['name'],
-                    self.data.get('template', 'default'), len(batch)))
-
-                # Start a new batch so we don't skip the current resource
-                batch = [resource]
-                batch_size = resource_size
-            else:
-                batch.append(resource)
-                batch_size += resource_size
-
-        if batch:
-            # Send the remaining resources
-            message['resources'] = batch
-            receipt = self.send_data_message(message)
-            self.log.info("sent message:%s policy:%s template:%s count:%s" % (
-                receipt, self.manager.data['name'],
-                self.data.get('template', 'default'), len(batch)))
-            
 
     @classmethod
     def register_resource(cls, registry, resource_class):
