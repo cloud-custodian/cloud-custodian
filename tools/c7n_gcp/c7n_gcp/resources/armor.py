@@ -6,8 +6,8 @@ from c7n_gcp.query import QueryResourceManager, TypeInfo
 
 @resources.register('security-policy')
 class SecurityPolicy(QueryResourceManager):
-    """GC resource:
-        https://cloud.google.com/bigtable/docs/reference/admin/rest/v2/projects.instances"""
+
+    """GC resource: https://cloud.google.com/compute/docs/reference/rest/v1/securityPolicies"""
     class resource_type(TypeInfo):
         service = 'compute'
         version = 'v1'

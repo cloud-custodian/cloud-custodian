@@ -89,7 +89,7 @@ ResourceMap = {
     "gcp.region": "c7n_gcp.region.Region",
     "gcp.route": "c7n_gcp.resources.network.Route",
     "gcp.router": "c7n_gcp.resources.network.Router",
-    "gcp.security-policy": "c7n_gcp.resources.securitypolicy.SecurityPolicy",
+    "gcp.security-policy": "c7n_gcp.resources.armor.SecurityPolicy",
     "gcp.service": "c7n_gcp.resources.service.Service",
     "gcp.service-account": "c7n_gcp.resources.iam.ServiceAccount",
     "gcp.service-account-key": "c7n_gcp.resources.iam.ServiceAccountKey",
