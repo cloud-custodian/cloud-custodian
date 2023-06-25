@@ -17,3 +17,7 @@ class DatafusionInstanceTest(BaseTest):
         self.assertEqual(resources[0]['name'], 'projects/cloud-custodian/'
                                                'locations/us-central1/'
                                                'instances/instance-311-green')
+
+        assert p.resource_manager.get_urns(resources) == [
+            "gcp:datafusion:us-central1:cloud-custodian:instances/instance-311-green"
+        ]

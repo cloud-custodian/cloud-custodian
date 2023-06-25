@@ -21,5 +21,6 @@ class DatafusionInstance(QueryResourceManager):
         urn_component = "instances"
         urn_id_segments = (-1,)
 
+        @classmethod
         def _get_location(cls, resource):
-            resource['name'].split('/')[3]
+            return resource['name'].split('/')[3]
