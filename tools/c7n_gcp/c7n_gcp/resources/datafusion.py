@@ -17,3 +17,9 @@ class DatafusionInstance(QueryResourceManager):
         scope_template = "projects/{}/locations/-"
         name = id = "name"
         default_report_fields = ['name', 'updateTime']
+        asset_type = "datafusion.googleapis.com/Instance"
+        urn_component = "instances"
+        urn_id_segments = (-1,)
+
+        def _get_location(cls, resource):
+            resource['name'].split('/')[3]
