@@ -27,6 +27,7 @@ ResourceMap = {
     "gcp.cloud-run-job": "c7n_gcp.resources.cloudrun.CloudRunJob",
     "gcp.compute-project": "c7n_gcp.resources.compute.Project",
     "gcp.dataflow-job": "c7n_gcp.resources.dataflow.DataflowJob",
+    "gcp.dataproc-clusters": "c7n_gcp.resources.compute.DataprocClusters",
     "gcp.disk": "c7n_gcp.resources.compute.Disk",
     "gcp.dm-deployment": "c7n_gcp.resources.deploymentmanager.DMDeployment",
     "gcp.dns-managed-zone": "c7n_gcp.resources.dns.DnsManagedZone",
