@@ -15,7 +15,7 @@ class NotebookInstance(QueryResourceManager):
     .. yaml:
 
      policies:
-      - name: epam-gcp-304-vertex-ai-workbench-does-not-have-public-ips
+      - name: epam-gcp-vertex-ai-workbench-does-not-have-public-ips
         description: |
           GCP Vertex AI Workbench has public IPs
         resource: gcp.notebook-instance
