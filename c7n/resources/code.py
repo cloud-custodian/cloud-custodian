@@ -14,6 +14,15 @@ from c7n import query
 from .securityhub import OtherResourcePostFinding
 
 
+class DescribeRepo(DescribeSource):
+
+    def augment(self, resources):
+        return universal_augment(
+            self.manager,
+            super().augment(resources)
+        )
+
+
 @resources.register('codecommit')
 class CodeRepository(QueryResourceManager):
 
@@ -29,17 +38,12 @@ class CodeRepository(QueryResourceManager):
         cfn_type = 'AWS::CodeCommit::Repository'
         universal_taggable = object()
 
-    def augment(self, resources):
-        """Fetch tags after picking up batch details
+    source_mapping = {
+        'describe': DescribeRepo,
+        'config': ConfigSource
+    }
 
-        We need ARNs to bulk-fetch tags, but don't know
-        ARNs until after the base augment fires.
-        """
-
-        resources = super().augment(resources)
-        return universal_augment(self, resources)
-
-    def get_resources(self, ids, cache=True):
+    def get_resources(self, ids, cache=True, augment=True):
         return universal_augment(self, self.augment([{'repositoryName': i} for i in ids]))
 
 

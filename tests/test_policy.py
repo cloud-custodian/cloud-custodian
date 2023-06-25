@@ -263,6 +263,11 @@ class PolicyMetaLint(BaseTest):
         whitelist = set(('AwsS3Object', 'Container'))
         todo = set((
             # q2 2023
+            'AwsStepFunctionStateMachine',
+            'AwsGuardDutyDetector',
+            'AwsAmazonMqBroker',
+            'AwsAppSyncGraphQlApi',
+            'AwsEventSchemasRegistry',
             "AwsEc2RouteTable",
             # q1 2023
             'AwsWafv2RuleGroup',
@@ -358,6 +363,22 @@ class PolicyMetaLint(BaseTest):
         # of a resource.
 
         whitelist = {
+            # q2 2023 wave 3
+            "AWS::Amplify::App",
+            "AWS::AppMesh::VirtualNode",
+            "AWS::AppMesh::VirtualService",
+            "AWS::AppRunner::VpcConnector",
+            "AWS::AppStream::Application",
+            "AWS::Cassandra::Keyspace",
+            "AWS::ECS::TaskSet",
+            "AWS::Evidently::Project",
+            "AWS::Forecast::Dataset",
+            "AWS::Pinpoint::Campaign",
+            "AWS::Pinpoint::InAppTemplate",
+            "AWS::SageMaker::Domain",
+            "AWS::Signer::SigningProfile",
+            "AWS::Transfer::Agreement",
+            "AWS::Transfer::Connector",
             # q2 2023 wave 2
             "AWS::AppConfig::DeploymentStrategy",
             "AWS::AppFlow::Flow",
