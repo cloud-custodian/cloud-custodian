@@ -843,6 +843,29 @@ class TransitGatewayTest(BaseTest):
         self.assertEqual(len(resources), 1)
 
 
+def test_tgw_attachment_metrics_filter(test):
+    factory = test.replay_flight_data("test_tgw_attachment_metrics_filter")
+    p = test.load_policy(
+        {
+            "name": "tgw_attachment-idle",
+            "resource": "aws.transit-attachment",
+            "filters": [
+                {
+                    "type": "metrics",
+                    "name": "BytesIn",
+                    "op": "le",
+                    "value": 0,
+                    "statistics": "Sum",
+                    "days": 1
+                }
+            ],
+        },
+        session_factory=factory,
+    )
+    resources = p.run()
+    test.assertEqual(len(resources), 1)
+
+
 class NetworkInterfaceTest(BaseTest):
 
     def test_and_or_nest(self):
@@ -3024,6 +3047,29 @@ class EndpointTest(BaseTest):
             ('ec2:AuthorizeSecurityGroupIngress',
              'ec2:RevokeSecurityGroupIngress',
              'ec2:RevokeSecurityGroupEgress'))
+
+
+def test_endpoint_metrics_filter(test):
+    factory = test.replay_flight_data("test_vpc_endpoint_metrics_filter")
+    p = test.load_policy(
+        {
+            "name": "vpc_endpoint-idle",
+            "resource": "aws.vpc-endpoint",
+            "filters": [
+                {
+                    "type": "metrics",
+                    "name": "ActiveConnections",
+                    "op": "le",
+                    "value": 0,
+                    "statistics": "Sum",
+                    "days": 1
+                }
+            ],
+        },
+        session_factory=factory,
+    )
+    resources = p.run()
+    test.assertEqual(len(resources), 0)
 
 
 class InternetGatewayTest(BaseTest):
