@@ -54,7 +54,7 @@ class WebAppFirewallFilter(Filter):
         policies:
             name: test-waf-not-enabled
             resource: azure.cdnprofile
-            filters: 
+            filters:
                 - type: waf
                   state: Disabled
     """
