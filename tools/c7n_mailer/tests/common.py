@@ -11,6 +11,7 @@ from ldap3 import MOCK_SYNC, Connection, Server
 from ldap3.strategy import mockBase
 
 from c7n_mailer.ldap_lookup import LdapLookup, Redis
+from c7n_mailer.email_delivery import EmailDelivery
 
 logger = logging.getLogger("custodian.mailer")
 
@@ -662,6 +663,22 @@ PUBSUB_MESSAGE_DATADOG = """{
         "c7n:MatchedFilters": ["name"],
         "name": "projects/c7n-dev/topics/c7n_notify"}]}"""
 
+
+# note principalId is very org/domain specific for federated?, it would be good to get
+# confirmation from capone on this event / test.
+CLOUDTRAIL_EVENT = {
+    "detail": {
+        "userIdentity": {
+            "type": "IAMUser",
+            "principalId": "AIDAJ45Q7YFFAREXAMPLE",
+            "arn": "arn:aws:iam::123456789012:user/michael_bolton",
+            "accountId": "123456789012",
+            "accessKeyId": "AKIAIOSFODNN7EXAMPLE",
+            "userName": "michael_bolton",
+        }
+    }
+}
+
 # Monkey-patch ldap3 to work around a bytes/text handling bug.
 
 _safe_rdn = mockBase.safe_rdn
@@ -734,3 +751,8 @@ class MockLdapLookup(LdapLookup):
 class MockRedisLookup(Redis):
     def __init__(self):
         self.connection = fakeredis.FakeStrictRedis()
+
+
+class MockEmailDelivery(EmailDelivery):
+    def get_ldap_connection(self):
+        return get_ldap_lookup(cache_engine="redis")

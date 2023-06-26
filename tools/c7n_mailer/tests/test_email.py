@@ -9,37 +9,18 @@ import unittest
 from c7n_mailer.email_delivery import EmailDelivery
 from common import (
     logger,
-    get_ldap_lookup,
+    MockEmailDelivery,
     GCP_SMTP_MESSAGE,
     MAILER_CONFIG,
     MAILER_CONFIG_GCP,
     RESOURCE_1,
     SQS_MESSAGE_1,
     SQS_MESSAGE_4,
+    CLOUDTRAIL_EVENT
 )
 from mock import patch, call, MagicMock
 
 from c7n_mailer.utils_email import is_email, priority_header_is_valid, get_mimetext_message
-
-# note principalId is very org/domain specific for federated?, it would be good to get
-# confirmation from capone on this event / test.
-CLOUDTRAIL_EVENT = {
-    "detail": {
-        "userIdentity": {
-            "type": "IAMUser",
-            "principalId": "AIDAJ45Q7YFFAREXAMPLE",
-            "arn": "arn:aws:iam::123456789012:user/michael_bolton",
-            "accountId": "123456789012",
-            "accessKeyId": "AKIAIOSFODNN7EXAMPLE",
-            "userName": "michael_bolton",
-        }
-    }
-}
-
-
-class MockEmailDelivery(EmailDelivery):
-    def get_ldap_connection(self):
-        return get_ldap_lookup(cache_engine="redis")
 
 
 class EmailTest(unittest.TestCase):

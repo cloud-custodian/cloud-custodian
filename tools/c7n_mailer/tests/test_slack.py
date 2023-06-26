@@ -6,30 +6,37 @@ import json
 import os
 from mock import patch, MagicMock
 
-from common import RESOURCE_3, SQS_MESSAGE_5
+from common import RESOURCE_3, SQS_MESSAGE_5, MockEmailDelivery, CLOUDTRAIL_EVENT, MAILER_CONFIG
 
 from c7n_mailer.slack_delivery import SlackDelivery
-from c7n_mailer.email_delivery import EmailDelivery
 
 SLACK_TOKEN = "slack-token"
 SLACK_POST_MESSAGE_API = "https://slack.com/api/chat.postMessage"
 
+class MockSlackDelivery(SlackDelivery):
+    def retrieve_user_im(self, email_addresses):
+        return {
+            email_address: f"slack-{email_address}"
+            for email_address in email_addresses
+        }
+
 
 class TestSlackDelivery(unittest.TestCase):
     def setUp(self):
-        self.config = {
+        self.config = copy.deepcopy(MAILER_CONFIG)
+        self.config.update({
             "slack_token": SLACK_TOKEN,
             "templates_folders": [
                 os.path.abspath(os.path.dirname(__file__)),
                 os.path.abspath("/"),
                 os.path.join(os.path.abspath(os.path.dirname(__file__)), "test-templates/"),
             ],
-        }
+        })
 
         self.session = MagicMock()
         self.logger = MagicMock()
 
-        self.email_delivery = EmailDelivery(self.config, self.session, self.logger)
+        self.email_delivery = MockEmailDelivery(self.config, self.session, self.logger)
         self.message = copy.deepcopy(SQS_MESSAGE_5)
         self.resource = copy.deepcopy(RESOURCE_3)
         self.message["resources"] = [self.resource]
@@ -41,6 +48,23 @@ class TestSlackDelivery(unittest.TestCase):
 
         assert self.target_channel in result
         assert json.loads(result[self.target_channel])["channel"] == self.target_channel
+
+    def test_map_sending_to_event_owner(self):
+        slack = MockSlackDelivery(self.config, self.logger, self.email_delivery)
+        message_destination = ["slack://event-owner"]
+
+        self.message["action"]["to"] = message_destination
+        self.message["policy"]["actions"][1]["to"] = message_destination
+        self.message['event'] = CLOUDTRAIL_EVENT
+
+        result = slack.get_to_addrs_slack_messages_map(self.message)
+
+        self.target_channel = "michael_bolton@initech.com"
+        assert "michael_bolton@initech.com" in result
+        assert json.loads(result[self.target_channel])["channel"] == "slack-michael_bolton@initech.com"
+        self.logger.debug.assert_called_with(
+            "Generating messages for event-owner Slack target."
+        )
 
     def test_map_sending_to_tag_channel_with_hash(self):
         self.target_channel = "#tag-channel"

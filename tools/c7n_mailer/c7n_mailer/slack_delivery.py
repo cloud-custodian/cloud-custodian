@@ -33,7 +33,27 @@ class SlackDelivery:
 
         # Check for Slack targets in 'to' action and render appropriate template.
         for target in sqs_message.get("action", ()).get("to", []):
-            if target == "slack://owners":
+            if target == "slack://event-owner":
+                event_owner_email = self.email_handler.get_event_owner_email(
+                    ["event-owner"], sqs_message["event"]
+                )
+                resolved_addrs = self.retrieve_user_im(event_owner_email)
+                if not resolved_addrs:
+                    continue
+                for address, slack_target in resolved_addrs.items():
+                    slack_messages[address] = get_rendered_jinja(
+                        slack_target,
+                        sqs_message,
+                        resource_list,
+                        self.logger,
+                        "slack_template",
+                        "slack_default",
+                        self.config["templates_folders"],
+                    )
+                self.logger.debug(
+                    "Generating messages for event-owner Slack target."
+                )
+            elif target == "slack://owners":
                 to_addrs_to_resources_map = self.email_handler.get_email_to_addrs_to_resources_map(
                     sqs_message
                 )

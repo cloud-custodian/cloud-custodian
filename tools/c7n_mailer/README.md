@@ -148,6 +148,7 @@ policies:
         slack_msg_color: danger
         to:
           - slack://owners
+          - slack://event-owner
           - slack://foo@bar.com
           - slack://#custodian-test
           - slack://webhook/#c7n-webhook-test
@@ -178,6 +179,7 @@ Slack integration for the mailer supports several flavors of messaging, listed b
 |:---------------------------:|:--------------------------------------------------------------------------------|:-------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------|
 |             No              | `https://hooks.slack.com/services/T00000000/B00000000/XXXXXXXXXXXXXXXXXXXXXXXX` | string | **(PREFERRED)** Send to an [incoming webhook](https://api.slack.com/incoming-webhooks) (the channel is defined in the webhook)                                  |
 |             Yes             | `slack://owners`                                                                | string | Send to the recipient list generated within email delivery logic                                                                                                |
+|             Yes             | `slack://event-owner`                                                                | string | For push-based/realtime policies, send to the user that was responsible for the underlying event.      |
 |             Yes             | `slack://foo@bar.com`                                                           | string | Send to the recipient specified by email address foo@bar.com                                                                                                    |
 |             Yes             | `slack://#custodian-test`                                                       | string | Send to the Slack channel indicated in string, i.e. #custodian-test                                                                                             |
 |             No              | `slack://webhook/#c7n-webhook-test`                                             | string | **(DEPRECATED)** Send to a Slack webhook; appended with the target channel. **IMPORTANT**: *This requires a `slack_webhook` value defined in the `mailer.yml`.* |
