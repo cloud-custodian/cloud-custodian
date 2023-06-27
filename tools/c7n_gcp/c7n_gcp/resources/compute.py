@@ -56,15 +56,12 @@ class Instance(QueryResourceManager):
 
         @staticmethod
         def refetchFingerprint(params, client, model, resource):
-            try:
-                resource = model.get(client,{
-                    'project_id': params['project'],
-                    'zone': params['zone'],
-                    'resourceName': params['instance']
-                })
-                return resource
-            except:
-                raise
+            resource = model.get(client,{
+                'project_id': params['project'],
+                'zone': params['zone'],
+                'resourceName': params['instance']
+            })
+            return resource
 
 
 Instance.filter_registry.register('offhour', OffHour)
@@ -281,17 +278,14 @@ class Image(QueryResourceManager):
 
         @staticmethod
         def refetchFingerprint(params, client, model, resource):
-            try:
-                path_param_re = re.compile('.*?/projects/(.*?)/global/images/(.*)')
-                project_id, resourceId = path_param_re.match(
-                    resource['selfLink']).groups()
-                resource = model.get(client,{
-                    'project_id': project_id,
-                    'image_id': resourceId
-                    })
-                return resource
-            except:
-                raise
+            path_param_re = re.compile('.*?/projects/(.*?)/global/images/(.*)')
+            project_id, resourceId = path_param_re.match(
+                resource['selfLink']).groups()
+            resource = model.get(client,{
+                'project_id': project_id,
+                'image_id': resourceId
+                })
+            return resource
 
 
 @Image.action_registry.register('delete')

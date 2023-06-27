@@ -58,15 +58,12 @@ class KubernetesCluster(QueryResourceManager):
 
         @staticmethod
         def refetchFingerprint(params, client, model, resource):
-            try:
-                project_id = resource['selfLink'].split("/")[5]
-                resource = model.get(client,{
-                    'project_id': project_id,
-                    'location': resource['zone'],
-                    'cluster_name': resource['name']})
-                return resource
-            except:
-                raise
+            project_id = resource['selfLink'].split("/")[5]
+            resource = model.get(client,{
+                'project_id': project_id,
+                'location': resource['zone'],
+                'cluster_name': resource['name']})
+            return resource
 
 
     def augment(self, resources):
