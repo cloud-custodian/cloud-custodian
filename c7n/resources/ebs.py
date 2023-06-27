@@ -1204,7 +1204,11 @@ class EncryptInstanceVolumes(BaseAction):
         return False
 
     def create_encrypted_volume(self, ec2, v, key_id, instance_id):
-        unencrypted_volume_tags = v['Tags']
+        # check if the ebs volume had tags to be copied over
+        if 'Tags' in v:
+            unencrypted_volume_tags = v['Tags']
+        else:
+            unencrypted_volume_tags = []
         # Create a current snapshot
         results = ec2.create_snapshot(
             VolumeId=v['VolumeId'],
