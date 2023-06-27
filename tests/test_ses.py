@@ -44,7 +44,7 @@ class SESTest(BaseTest):
             self.assertEqual(tls_policy, "Require")
 
     def test_ses_receipt_rule_set_query(self):
-        session_factory = self.record_flight_data("test_ses_rule_set_query")
+        session_factory = self.replay_flight_data("test_ses_rule_set_query")
         p = self.load_policy(
             {
                 "name": "ses-receipt-rule-set-query-test",
@@ -60,7 +60,7 @@ class SESTest(BaseTest):
         self.assertEqual(len(resources), 1)
 
     def test_ses_receipt_rule_set_delete(self):
-        session_factory = self.record_flight_data("test_ses_rule_set_delete")
+        session_factory = self.replay_flight_data("test_ses_rule_set_delete")
         p = self.load_policy(
             {
                 "name": "ses-receipt-rule_set-delete-test",
