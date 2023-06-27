@@ -18,16 +18,17 @@
                         "no-cache"
                     ],
                     "date": [
-                        "Mon, 26 Jun 2023 20:58:35 GMT"
+                        "Tue, 27 Jun 2023 16:46:40 GMT"
                     ],
                     "content-type": [
                         "application/json; charset=utf-8"
                     ],
-                    "x-ms-arm-service-request-id": [
-                        "4c9edd69-ca91-4be3-90c0-15b2c425db79"
+                    "x-ms-original-request-ids": [
+                        "cd7be1ea-f925-41da-bbf8-7b2021d7dd87",
+                        "a9d4b24e-dd42-46df-a783-5198ddf45576"
                     ],
                     "content-length": [
-                        "2216"
+                        "7364"
                     ]
                 },
                 "body": {
@@ -83,6 +84,183 @@
                                     ],
                                     "enableDdosProtection": false
                                 }
+                            },
+                            {
+                                "name": "cfb-nobfthvf-vnet",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-nobfthvf-test-group/providers/Microsoft.Network/virtualNetworks/cfb-nobfthvf-vnet",
+                                "etag": "W/\"902ca986-46cd-4944-9e31-0d7c2cdab78d\"",
+                                "type": "Microsoft.Network/virtualNetworks",
+                                "location": "centralus",
+                                "tags": {
+                                    "product_id": "13742"
+                                },
+                                "properties": {
+                                    "provisioningState": "Succeeded",
+                                    "resourceGuid": "5b49d835-a69e-4209-ac67-8bbd6091c578",
+                                    "addressSpace": {
+                                        "addressPrefixes": [
+                                            "10.254.0.0/16"
+                                        ]
+                                    },
+                                    "dhcpOptions": {
+                                        "dnsServers": []
+                                    },
+                                    "subnets": [
+                                        {
+                                            "name": "cfb-nobfthvf-frontend",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-nobfthvf-test-group/providers/Microsoft.Network/virtualNetworks/cfb-nobfthvf-vnet/subnets/cfb-nobfthvf-frontend",
+                                            "etag": "W/\"902ca986-46cd-4944-9e31-0d7c2cdab78d\"",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "addressPrefix": "10.254.0.0/24",
+                                                "applicationGatewayIPConfigurations": [
+                                                    {
+                                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-nobfthvf-test-group/providers/Microsoft.Network/applicationGateways/cfb-nobfthvf-app-gateway/gatewayIPConfigurations/my-gateway-ip-configuration"
+                                                    }
+                                                ],
+                                                "serviceEndpoints": [],
+                                                "delegations": [],
+                                                "privateEndpointNetworkPolicies": "Enabled",
+                                                "privateLinkServiceNetworkPolicies": "Enabled"
+                                            },
+                                            "type": "Microsoft.Network/virtualNetworks/subnets"
+                                        },
+                                        {
+                                            "name": "cfb-nobfthvf-backend",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-nobfthvf-test-group/providers/Microsoft.Network/virtualNetworks/cfb-nobfthvf-vnet/subnets/cfb-nobfthvf-backend",
+                                            "etag": "W/\"902ca986-46cd-4944-9e31-0d7c2cdab78d\"",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "addressPrefix": "10.254.2.0/24",
+                                                "serviceEndpoints": [],
+                                                "delegations": [],
+                                                "privateEndpointNetworkPolicies": "Enabled",
+                                                "privateLinkServiceNetworkPolicies": "Enabled"
+                                            },
+                                            "type": "Microsoft.Network/virtualNetworks/subnets"
+                                        }
+                                    ],
+                                    "virtualNetworkPeerings": [],
+                                    "enableDdosProtection": false
+                                }
+                            },
+                            {
+                                "name": "cfb-nobfthvf-vnet-2",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-nobfthvf-test-group/providers/Microsoft.Network/virtualNetworks/cfb-nobfthvf-vnet-2",
+                                "etag": "W/\"dd801865-091c-415b-b637-9656bd83f75d\"",
+                                "type": "Microsoft.Network/virtualNetworks",
+                                "location": "centralus",
+                                "tags": {
+                                    "product_id": "13742"
+                                },
+                                "properties": {
+                                    "provisioningState": "Succeeded",
+                                    "resourceGuid": "a4dee7ef-ef19-4fb7-9177-cf314aef9832",
+                                    "addressSpace": {
+                                        "addressPrefixes": [
+                                            "10.255.0.0/16"
+                                        ]
+                                    },
+                                    "dhcpOptions": {
+                                        "dnsServers": []
+                                    },
+                                    "subnets": [
+                                        {
+                                            "name": "cfb-nobfthvf-frontend-2",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-nobfthvf-test-group/providers/Microsoft.Network/virtualNetworks/cfb-nobfthvf-vnet-2/subnets/cfb-nobfthvf-frontend-2",
+                                            "etag": "W/\"dd801865-091c-415b-b637-9656bd83f75d\"",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "addressPrefix": "10.255.0.0/24",
+                                                "applicationGatewayIPConfigurations": [
+                                                    {
+                                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-nobfthvf-test-group/providers/Microsoft.Network/applicationGateways/cfb-nobfthvf-app-gateway-2/gatewayIPConfigurations/my-gateway-ip-configuration"
+                                                    }
+                                                ],
+                                                "serviceEndpoints": [],
+                                                "delegations": [],
+                                                "privateEndpointNetworkPolicies": "Enabled",
+                                                "privateLinkServiceNetworkPolicies": "Enabled"
+                                            },
+                                            "type": "Microsoft.Network/virtualNetworks/subnets"
+                                        },
+                                        {
+                                            "name": "cfb-nobfthvf-backend-2",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-nobfthvf-test-group/providers/Microsoft.Network/virtualNetworks/cfb-nobfthvf-vnet-2/subnets/cfb-nobfthvf-backend-2",
+                                            "etag": "W/\"dd801865-091c-415b-b637-9656bd83f75d\"",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "addressPrefix": "10.255.2.0/24",
+                                                "serviceEndpoints": [],
+                                                "delegations": [],
+                                                "privateEndpointNetworkPolicies": "Enabled",
+                                                "privateLinkServiceNetworkPolicies": "Enabled"
+                                            },
+                                            "type": "Microsoft.Network/virtualNetworks/subnets"
+                                        }
+                                    ],
+                                    "virtualNetworkPeerings": [],
+                                    "enableDdosProtection": false
+                                }
+                            },
+                            {
+                                "name": "cfb-nobfthvf-vnet-3",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-nobfthvf-test-group/providers/Microsoft.Network/virtualNetworks/cfb-nobfthvf-vnet-3",
+                                "etag": "W/\"79180970-a419-4481-86fd-657771821998\"",
+                                "type": "Microsoft.Network/virtualNetworks",
+                                "location": "centralus",
+                                "tags": {
+                                    "product_id": "13742"
+                                },
+                                "properties": {
+                                    "provisioningState": "Succeeded",
+                                    "resourceGuid": "892af3d3-ef4a-4eda-b76d-c53004df2d03",
+                                    "addressSpace": {
+                                        "addressPrefixes": [
+                                            "10.253.0.0/16"
+                                        ]
+                                    },
+                                    "dhcpOptions": {
+                                        "dnsServers": []
+                                    },
+                                    "subnets": [
+                                        {
+                                            "name": "cfb-nobfthvf-backend-3",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-nobfthvf-test-group/providers/Microsoft.Network/virtualNetworks/cfb-nobfthvf-vnet-3/subnets/cfb-nobfthvf-backend-3",
+                                            "etag": "W/\"79180970-a419-4481-86fd-657771821998\"",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "addressPrefix": "10.253.2.0/24",
+                                                "serviceEndpoints": [],
+                                                "delegations": [],
+                                                "privateEndpointNetworkPolicies": "Enabled",
+                                                "privateLinkServiceNetworkPolicies": "Enabled"
+                                            },
+                                            "type": "Microsoft.Network/virtualNetworks/subnets"
+                                        },
+                                        {
+                                            "name": "cfb-nobfthvf-frontend-3",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-nobfthvf-test-group/providers/Microsoft.Network/virtualNetworks/cfb-nobfthvf-vnet-3/subnets/cfb-nobfthvf-frontend-3",
+                                            "etag": "W/\"79180970-a419-4481-86fd-657771821998\"",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "addressPrefix": "10.253.0.0/24",
+                                                "applicationGatewayIPConfigurations": [
+                                                    {
+                                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-nobfthvf-test-group/providers/Microsoft.Network/applicationGateways/cfb-nobfthvf-app-gateway-3/gatewayIPConfigurations/my-gateway-ip-configuration"
+                                                    }
+                                                ],
+                                                "serviceEndpoints": [],
+                                                "delegations": [],
+                                                "privateEndpointNetworkPolicies": "Enabled",
+                                                "privateLinkServiceNetworkPolicies": "Enabled"
+                                            },
+                                            "type": "Microsoft.Network/virtualNetworks/subnets"
+                                        }
+                                    ],
+                                    "virtualNetworkPeerings": [],
+                                    "enableDdosProtection": false
+                                }
                             }
                         ]
                     }
@@ -106,13 +284,13 @@
                         "no-cache"
                     ],
                     "date": [
-                        "Mon, 26 Jun 2023 20:58:35 GMT"
+                        "Tue, 27 Jun 2023 16:46:41 GMT"
                     ],
                     "content-type": [
                         "application/json; charset=utf-8"
                     ],
                     "x-ms-arm-service-request-id": [
-                        "f771b38e-e1b2-4625-9677-66307f4e009b"
+                        "77964408-5733-4395-a0af-9a07b7e73df8"
                     ],
                     "content-length": [
                         "6099"
@@ -239,6 +417,105 @@
         {
             "request": {
                 "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-nobfthvf-test-group/providers/Microsoft.Network/virtualNetworkGateways?api-version=2020-08-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Tue, 27 Jun 2023 16:46:41 GMT"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "content-length": [
+                        "12"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": []
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-nobfthvf-test-group/providers/Microsoft.Network/virtualNetworkGateways?api-version=2020-08-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Tue, 27 Jun 2023 16:46:41 GMT"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "content-length": [
+                        "12"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": []
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-nobfthvf-test-group/providers/Microsoft.Network/virtualNetworkGateways?api-version=2020-08-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Tue, 27 Jun 2023 16:46:41 GMT"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "content-length": [
+                        "12"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": []
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
                 "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-xzwmynow/providers/Microsoft.Network/connections?api-version=2020-08-01",
                 "body": null,
                 "headers": {}
@@ -253,16 +530,16 @@
                         "no-cache"
                     ],
                     "date": [
-                        "Mon, 26 Jun 2023 20:58:39 GMT"
+                        "Tue, 27 Jun 2023 16:46:47 GMT"
                     ],
                     "content-type": [
                         "application/json; charset=utf-8"
                     ],
                     "x-ms-arm-service-request-id": [
-                        "f380b43c-946d-46bf-be90-78fe3b989020"
+                        "94688e9a-e6fb-4b95-8f42-47855d668261"
                     ],
                     "content-length": [
-                        "1540"
+                        "1541"
                     ]
                 },
                 "body": {
@@ -271,7 +548,7 @@
                             {
                                 "name": "vpnconn-cbfail",
                                 "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-xzwmynow/providers/Microsoft.Network/connections/vpnconn-cbfail",
-                                "etag": "W/\"9f153eff-4c5a-45d7-8ab2-4178be113149\"",
+                                "etag": "W/\"d0037fc0-08df-434b-9952-7dcaeeac33fe\"",
                                 "type": "Microsoft.Network/connections",
                                 "location": "eastus",
                                 "tags": {
@@ -299,7 +576,7 @@
                                     "ingressBytesTransferred": 0,
                                     "egressBytesTransferred": 0,
                                     "expressRouteGatewayBypass": false,
-                                    "dpdTimeoutSeconds": 0,
+                                    "dpdTimeoutSeconds": 45,
                                     "connectionMode": "Default"
                                 }
                             }

@@ -19,11 +19,13 @@ class VPNTest(BaseTest):
 
     def test_vpn_ipsec_filter(self):
         p = self.load_policy({
-            'name': 'gw-without-ipsec-policies',
+            'name': 'vpn-connections-ipsec-not-custom',
             'resource': 'azure.vpn',
             'filters': [
-                {'type': 'gw-without-ipsec-policies',
-                 'state': 'Disabled'}
+                {'type': 'vpn-connections',
+                 'key': 'ipsecPolicies',
+                 'value': 'default'
+                 }
             ]
         })
         resources = p.run()

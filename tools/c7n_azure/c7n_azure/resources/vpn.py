@@ -6,29 +6,22 @@ from c7n_azure.query import ChildTypeInfo
 from c7n_azure.resources.arm import ChildArmResourceManager
 from c7n_azure.utils import ResourceIdParser
 from msrestazure.tools import parse_resource_id
-from c7n.filters import Filter
+from c7n.filters import ValueFilter
 from c7n.utils import type_schema
 
 @resources.register('vpn')
 class VPN(ChildArmResourceManager):
-    """VPN Gateway
+    """Virtual Network Gateways Resource
 
     :example:
 
-    Finds all vpn configured without custon ipsec
+    This policy will find all the Virtual Network Gateways
 
     .. code-block:: yaml
 
         policies:
-          - name: vpn
-            description: |
-              Find all containers with public access enabled
-            resource: azure.storage-container
-            filters:
-              - type: value
-                key: properties.publicAccess
-                op: not-equal
-                value: None   # Possible values: Blob, Container, None
+          - name: get-vpns
+            resource: azure.vpn
     """
 
     class resource_type(ChildTypeInfo):
@@ -61,33 +54,35 @@ class VPN(ChildArmResourceManager):
         parsed = parse_resource_id(resource_id)
         return client.virtual_network_gateways.list(parsed.get('resource_group'))
 
-
-@VPN.filter_registry.register('gw-without-ipsec-policies')
-class IPSecAlgorithmFilter(Filter):
-    """Virtual Networks Gateway Resource IPSec configured
+@VPN.filter_registry.register('vpn-connections')
+class IPSecAlgorithmFilter(ValueFilter):
+    """Virtual Networks Gateway Resource Filter
 
     :example:
 
-    This set of policies will find all Virtual Networks that are not
+    This filter will find all Virtual Network Gateways that are not
       configured with a cryptygraphic algorithm.
 
     .. code-block:: yaml
 
         policies:
-          - name: gateway-configured-with-cryptographic-algorithm
-            resource: azure.vnet
+          - name: vpn-connections
+            resource: azure.vpn
             filters:
-              - type: configured-with-cryptographic-algorithm
+              - type: vpn-connections
+                key: ipsecPolicies
+                value: default
     """
 
-    schema = type_schema('virtual_gateway',required=['state'],
-              state={'type': 'string', 'enum': ['Enabled', 'Disabled']})
+    schema = type_schema('vpn-connections', rinherit=ValueFilter.schema,
+                         value={'type': 'string', 'enum': ['custom', 'default']},
+                         key={'type': 'string', 'enum': ['ipsecPolicies']})
     schema_alias = False
 
     def check_state(self, ipsec_policies):
-        if self.data.get('state') == 'Disabled' and not ipsec_policies:
+        if self.data.get('value') == 'default' and not ipsec_policies:
             return True
-        if self.data.get('state') == 'Enabled' and ipsec_policies:
+        if self.data.get('value') == 'custom' and ipsec_policies:
             return True
         return False
 
@@ -95,10 +90,11 @@ class IPSecAlgorithmFilter(Filter):
       client = self.manager.get_client()
       matched = []
       for vpn in resources:
-        if vpn['properties']['gatewayType'] != "ExpressRoute":
-          vpnrg = ResourceIdParser.get_resource_group(vpn['id'])
-          connections = client.virtual_network_gateway_connections.list(vpnrg)
-          for connection in connections:
-            if self.check_state(connection.ipsec_policies):
-              matched.append(vpn)
+        if self.data.get('key') == 'ipsecPolicies':
+          if vpn['properties']['gatewayType'] != "ExpressRoute":
+            vpnrg = ResourceIdParser.get_resource_group(vpn['id'])
+            connections = client.virtual_network_gateway_connections.list(vpnrg)
+            for connection in connections:
+              if self.check_state(connection.ipsec_policies):
+                matched.append(vpn)
       return matched
