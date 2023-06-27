@@ -11,10 +11,13 @@ class NotebookInstanceTest(BaseTest):
                                           project_id=project_id)
         p = self.load_policy(
             {'name': 'notebook-instance-query',
-             'resource': 'gcp.notebook-instance'},
+             'resource': 'gcp.notebook'},
             session_factory=factory)
         resources = p.run()
 
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['name'], 'projects/cloud-custodian/'
                                                'locations/us-central1-a/instances/instancetest')
+        assert p.resource_manager.get_urns(resources) == [
+            "gcp:notebooks:us-central1-a:gcp-lab-custodian:instances/instancetest"
+        ]

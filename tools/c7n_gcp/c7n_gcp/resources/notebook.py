@@ -4,7 +4,7 @@ from c7n_gcp.provider import resources
 from c7n_gcp.query import QueryResourceManager, TypeInfo
 
 
-@resources.register('notebook-instance')
+@resources.register('notebook')
 class NotebookInstance(QueryResourceManager):
     """ GC resource: https://cloud.google.com/vertex-ai/docs/workbench/reference/rest
 
@@ -15,14 +15,13 @@ class NotebookInstance(QueryResourceManager):
     .. yaml:
 
      policies:
-      - name: epam-gcp-vertex-ai-workbench-does-not-have-public-ips
+      - name: gcp-vertex-ai-workbench-with-public-ips
         description: |
           GCP Vertex AI Workbench has public IPs
-        resource: gcp.notebook-instance
+        resource: gcp.notebook
         filters:
           - type: value
             key: noPublicIp
-            op: ne
             value: true
     """
     class resource_type(TypeInfo):
@@ -31,7 +30,13 @@ class NotebookInstance(QueryResourceManager):
         component = 'projects.locations.instances'
         enum_spec = ('list', 'instances[]', None)
         scope_key = 'parent'
-        name = id = 'id'
+        name = id = 'name'
         scope_template = "projects/{}/locations/-"
         permissions = ('notebooks.instances.list',)
-        default_report_fields = ['displayName', 'expireTime']
+        default_report_fields = ['name', 'createTime', 'state']
+        urn_id_segments = (-1,)
+        urn_component = "instances"
+
+        @classmethod
+        def _get_location(cls, resource):
+            return resource['name'].split('/')[3]
