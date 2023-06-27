@@ -2,13 +2,12 @@
 # SPDX-License-Identifier: Apache-2.0
 import json
 
-from c7n.actions import BaseAction
+from c7n.actions import BaseAction, Action
 import c7n.filters.policystatement as polstmt_filter
 from c7n.manager import resources
 from c7n.query import DescribeSource, QueryResourceManager, TypeInfo
 from c7n.utils import local_session, type_schema, format_string_values
 from c7n.tags import universal_augment
-
 
 class DescribeConfigurationSet(DescribeSource):
 
@@ -142,3 +141,45 @@ class HasStatementFilter(polstmt_filter.HasStatementFilter):
             if (self.data.get('statement_ids', []) and not required) or \
                (self.data.get('statements', []) and not required_statements):
                 return email_identity
+
+
+@resources.register('ses-receipt-rule-set')
+class SESReceiptRuleSet(QueryResourceManager):
+    class resource_type(TypeInfo):
+        service = 'ses'
+        enum_spec = ('list_receipt_rule_sets', 'RuleSets', None)
+        detail_spec = ('describe_receipt_rule_set', 'RuleSetName', 'Name', None)
+        name = id = 'Name'
+        arn_type = 'receipt-rule-set'
+
+@SESReceiptRuleSet.action_registry.register('delete')
+class Delete(Action):
+    """Delete an SES Receipt Rule Set resource.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: ses-delete-rule-set
+                resource: aws.ses-receipt-rule-set
+                filters:
+                  - type: value
+                    key: Rules[0].Enabled
+                    op: eq
+                    value: true
+                actions:
+                    - delete
+
+    """
+    schema = type_schema('delete')
+    permissions = ("ses:DeleteReceiptRuleSet",)
+
+    def process(self, rulesets):
+        client = local_session(self.manager.session_factory).client('ses')
+        for ruleset in rulesets:
+            self.manager.retry(
+                client.delete_receipt_rule_set,
+                RuleSetName = ruleset["Metadata"]['Name'],
+                ignore_err_codes = ("CannotDeleteException",)
+            )
