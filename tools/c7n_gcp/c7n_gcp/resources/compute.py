@@ -55,8 +55,8 @@ class Instance(QueryResourceManager):
                     }}
 
         @staticmethod
-        def refetchFingerprint(params, client, model, resource):
-            resource = model.get(client,{
+        def refetch_fingerprint(params, client, model, resource):
+            return model.get(client, {
                 'project_id': params['project'],
                 'zone': params['zone'],
                 'resourceName': params['instance']
@@ -277,14 +277,14 @@ class Image(QueryResourceManager):
                     }}
 
         @staticmethod
-        def refetchFingerprint(params, client, model, resource):
+        def refetch_fingerprint(params, client, model, resource):
             path_param_re = re.compile('.*?/projects/(.*?)/global/images/(.*)')
             project_id, resourceId = path_param_re.match(
                 resource['selfLink']).groups()
-            resource = model.get(client,{
+            return model.get(client, {
                 'project_id': project_id,
                 'image_id': resourceId
-                })
+            })
             return resource
 
 

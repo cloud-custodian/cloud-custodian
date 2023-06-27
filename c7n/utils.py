@@ -219,8 +219,6 @@ class DateTimeEncoder(json.JSONEncoder):
             return obj.isoformat()
         if isinstance(obj, FormatDate):
             return obj.datetime.isoformat()
-        if isinstance(obj, set):
-            return list(obj)
         return json.JSONEncoder.default(self, obj)
 
 
