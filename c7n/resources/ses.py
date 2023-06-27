@@ -8,7 +8,6 @@ from c7n.manager import resources
 from c7n.query import DescribeSource, QueryResourceManager, TypeInfo
 from c7n.utils import local_session, type_schema, format_string_values
 from c7n.tags import universal_augment
-from botocore.exceptions import ClientError
 
 class DescribeConfigurationSet(DescribeSource):
 
@@ -179,9 +178,8 @@ class Delete(Action):
     def process(self, rulesets):
         client = local_session(self.manager.session_factory).client('ses')
         for ruleset in rulesets:
-            try:
-                client.delete_receipt_rule_set(RuleSetName = ruleset["Metadata"]['Name'])
-            except ClientError as e:
-                if e.response['Error']['Code'] == "CannotDeleteException":
-                    continue
-                raise
+            self.manager.retry(
+                client.delete_receipt_rule_set,
+                RuleSetName = ruleset["Metadata"]['Name'],
+                ignore_err_codes = ("CannotDeleteException",)
+            )
