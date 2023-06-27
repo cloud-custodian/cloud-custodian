@@ -35,4 +35,4 @@ class ApplicationGatewayTest(BaseTest):
                  'state': 'disabled'}],
         })
         resources = p.run()
-        self.assertEqual(len(resources), 1)
+        self.assertEqual(len(resources), 2)

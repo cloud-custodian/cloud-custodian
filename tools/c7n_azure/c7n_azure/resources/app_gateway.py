@@ -57,7 +57,7 @@ class ApplicationGatewayWafFilter(Filter):
                 override_rule: 944240
                 state: disabled
     """
-    
+
     schema = type_schema(
         'waf',
         required=['override_rule', 'state'],
@@ -72,20 +72,24 @@ class ApplicationGatewayWafFilter(Filter):
         filter_state = self.data.get('state')
 
         client = self.manager.get_client()
+        app_gate_wafs = list(client.web_application_firewall_policies.list_all())
         result = []
 
         for resource in resources:
-            if 'firewallPolicy' in resource['properties']:
-                waf_policy_name = resource['properties']['firewallPolicy']['id'].split('/')[-1]
+            if 'firewallPolicy' not in resource['properties']:
+                continue
 
-                app_gate_waf = client.web_application_firewall_policies.\
-                    get(resource['resourceGroup'],waf_policy_name)
+            waf_policy_name = resource['properties']['firewallPolicy']['id']
+            for app_gate_waf in app_gate_wafs:
+                if app_gate_waf.id != waf_policy_name:
+                    continue
 
-                for rule_set in app_gate_waf.managed_rules.managed_rule_sets:
-                    for group in rule_set.rule_group_overrides:
-                        for rule in group.rules:
-                            if filter_override_rule == int(rule.rule_id) \
-                                and filter_state.lower() == rule.state.lower():
+                app_gate_waf = app_gate_waf.serialize(True).get('properties', {})
+                for rule_set in app_gate_waf.get('managedRules').get('managedRuleSets'):
+                    for group in rule_set.get('ruleGroupOverrides'):
+                        for rule in group.get('rules'):
+                            if filter_override_rule == int(rule.get('ruleId')) \
+                                and filter_state.lower() == rule.get('state').lower():
                                 result.append(resource)
-        
+
         return result
