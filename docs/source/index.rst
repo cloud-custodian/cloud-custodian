@@ -75,6 +75,15 @@ Navigate below to your cloud provider and get started with Cloud Custodian!
 
 .. toctree::
    :maxdepth: 1
+   :caption: Oracle Cloud Infrastructure (OCI)
+
+   oci/gettingstarted
+   oci/examples/index
+   oci/testing
+   oci/resources/index
+
+.. toctree::
+   :maxdepth: 1
    :caption: Tencent Cloud
 
    tencentcloud/gettingstarted
