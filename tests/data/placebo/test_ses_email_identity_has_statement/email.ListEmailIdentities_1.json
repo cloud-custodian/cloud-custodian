@@ -1,0 +1,14 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "EmailIdentities": [
+            {
+                "IdentityType": "EMAIL_ADDRESS",
+                "IdentityName": "c7n@t.com",
+                "SendingEnabled": false,
+                "VerificationStatus": "PENDING"
+            }
+        ]
+    }
+}

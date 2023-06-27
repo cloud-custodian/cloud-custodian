@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "c7n_terraform"
-version = "0.1.17"
+version = "0.1.18"
 readme = "readme.md"
 description = "Cloud Custodian Provider for evaluating Terraform"
 repository = "https://github.com/cloud-custodian/cloud-custodian"

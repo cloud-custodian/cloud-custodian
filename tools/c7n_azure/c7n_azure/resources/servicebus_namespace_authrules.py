@@ -43,6 +43,7 @@ class ServiceBusNamespaceAuthRules(ChildResourceManager):
 
         @classmethod
         def extra_args(cls, parent_resource):
-            return {'resource_group_name': 
-                    ResourceIdParser.get_resource_group(parent_resource['id']),
-                    'namespace_name': parent_resource['name']}
+            return {
+                'resource_group_name': ResourceIdParser.get_resource_group(parent_resource['id']),
+                'namespace_name': parent_resource['name']
+            }

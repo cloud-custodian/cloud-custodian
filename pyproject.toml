@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "c7n"
-version = "0.9.27"
+version = "0.9.28"
 description = "Cloud Custodian - Policy Rules Engine"
 authors = ["Cloud Custodian Project"]
 readme = "README.md"
@@ -62,6 +62,7 @@ skip-string-normalization = true
 line-length = 100
 
 [tool.ruff]
+select = ["E", "F", "W"]
 line-length = 100
 # E741 - single char variables
 # E401 - multiple imports in a single line
