@@ -114,6 +114,13 @@ RESOURCE_3 = {
     "State": "in-use",
 }
 
+RESOURCE_4 = {
+    "AvailabilityZone": "us-east-1a",
+    "Attachments": [],
+    "Tags": [{"Value": "someone@example.com", "Key": "SupportEmail"}],
+    "VolumeId": "vol-01a0e6ea6b89f0098",
+}
+
 SQS_MESSAGE_1 = {
     "account": "core-services-dev",
     "account_id": "000000000000",

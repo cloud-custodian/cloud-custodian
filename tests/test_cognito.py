@@ -15,6 +15,9 @@ class UserPool(BaseTest):
             sorted([n["Name"] for n in resources]),
             ["c7nusers", "origin_userpool_MOBILEHUB_1667653900"],
         )
+        # Confirm that our augment pass has tag information and detail
+        # from describe_user_pool
+        self.assertLessEqual({"Id", "Tags", "SchemaAttributes"}, set(resources[0]))
 
     def test_delete_user_pool(self):
         factory = self.replay_flight_data("test_cognito-user-pool_delete")
