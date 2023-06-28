@@ -679,7 +679,8 @@ class PolicyMetaLint(BaseTest):
             'event-rule-target',
             'rrset',
             'redshift-reserved',
-            'elasticsearch-reserved'
+            'elasticsearch-reserved',
+            'ses-receipt-rule-set'
         ))
 
         for k, v in manager.resources.items():
