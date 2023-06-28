@@ -73,21 +73,15 @@ class MethodAction(Action):
             try:
                 result = self.invoke_api(client, op_name, params)
             except HttpError as e:
-                if 'fingerprint' in e.reason:
-                    try:
-                        if model.refetch_fingerprint:
-                            resource = model.refetch_fingerprint(params, client, model, resource)
-                            params['body']['labelFingerprint'] = resource['labelFingerprint']
-                            result = self.invoke_api(client, op_name, params)
-                        else:
-                            raise
-                    except HttpError as e:
-                        if e.resp.status in self.ignore_error_codes:
-                            return e
-                        raise
+                result = self.handle_resource_error(
+                    client, model, resource, op_name, params, e
+                )
+                # if the error handler recovered it returns a result
+                if result:
+                    pass
+                elif e.resp.status in self.ignore_error_codes:
+                    return e
                 else:
-                    if e.resp.status in self.ignore_error_codes:  # noqa
-                        return e  # noqa
                     raise
             if result_key and annotation_key:
                 resource[annotation_key] = result.get(result_key)
@@ -99,6 +93,9 @@ class MethodAction(Action):
             if e.resp.status in self.ignore_error_codes:
                 return e
             raise
+
+    def handle_resource_error(self, client, model, resource, op_name, params, error):
+        return
 
     def get_permissions(self):
         if self.permissions:

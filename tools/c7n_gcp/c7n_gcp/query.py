@@ -408,8 +408,8 @@ class TypeInfo(metaclass=TypeMeta):
     # The location element is a zone, not a region.
     urn_zonal = False
 
-    # label retry
-    refetch_fingerprint = None
+    # If the type supports refreshing an individual resource
+    refresh = None
 
     @classmethod
     def get_metric_resource_name(cls, resource):

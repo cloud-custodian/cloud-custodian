@@ -45,8 +45,8 @@ class Instance(QueryResourceManager):
 
         @staticmethod
         def get_label_params(resource, all_labels):
-            path_param_re = re.compile('.*?/projects/(.*?)/zones/(.*?)/instances/(.*)')
-            project, zone, instance = path_param_re.match(
+            project, zone, instance = re.match(
+                '.*?/projects/(.*?)/zones/(.*?)/instances/(.*)',
                 resource['selfLink']).groups()
             return {'project': project, 'zone': zone, 'instance': instance,
                     'body': {
@@ -54,14 +54,20 @@ class Instance(QueryResourceManager):
                         'labelFingerprint': resource['labelFingerprint']
                     }}
 
-        @staticmethod
-        def refetch_fingerprint(params, client, model, resource):
-            return model.get(client, {
-                'project_id': params['project'],
-                'zone': params['zone'],
-                'resourceName': params['instance']
-            })
-            return resource
+        @classmethod
+        def refresh(cls, client, resource):
+            project_id, zone, name = re.match(
+                '.*?/projects/(.*?)/zones/(.*?)/instances/(.*)',
+                resource['selfLink']).groups()
+            return cls.get(
+                client,
+                {
+                    'project_id': project_id,
+                    'zone': zone,
+                    'resourceName': name
+                }
+            )
+
 
 
 Instance.filter_registry.register('offhour', OffHour)
@@ -267,8 +273,8 @@ class Image(QueryResourceManager):
 
         @staticmethod
         def get_label_params(resource, all_labels):
-            path_param_re = re.compile('.*?/projects/(.*?)/global/images/(.*)')
-            project, resourceId = path_param_re.match(
+            project, resourceId = re.match(
+                '.*?/projects/(.*?)/global/images/(.*)',
                 resource['selfLink']).groups()
             return {'project': project, 'resource': resourceId,
                     'body': {
@@ -276,16 +282,18 @@ class Image(QueryResourceManager):
                         'labelFingerprint': resource['labelFingerprint']
                     }}
 
-        @staticmethod
-        def refetch_fingerprint(params, client, model, resource):
-            path_param_re = re.compile('.*?/projects/(.*?)/global/images/(.*)')
-            project_id, resourceId = path_param_re.match(
+        @classmethod
+        def refresh(cls, client, resource):
+            project_id, resourceId = re.match(
+                '.*?/projects/(.*?)/global/images/(.*)',
                 resource['selfLink']).groups()
-            return model.get(client, {
-                'project_id': project_id,
-                'image_id': resourceId
-            })
-            return resource
+            return cls.get(
+                client,
+                {
+                    'project_id': project_id,
+                    'image_id': resourceId
+                }
+            )
 
 
 @Image.action_registry.register('delete')

@@ -18,7 +18,6 @@ class InstanceTest(BaseTest):
             session_factory=factory)
         resources = p.run()
         self.assertEqual(len(resources), 4)
-
         self.assertEqual(
             p.resource_manager.get_urns(resources),
             [
