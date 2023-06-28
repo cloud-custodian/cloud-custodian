@@ -16,6 +16,7 @@ class DescribeIdentityPool(DescribeSource):
 
 class DescribeUserPool(DescribeSource):
     def augment(self, resources):
+        resources = super().augment(resources)
         return universal_augment(self.manager, resources)
 
 

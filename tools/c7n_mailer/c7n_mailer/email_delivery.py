@@ -2,16 +2,16 @@
 # SPDX-License-Identifier: Apache-2.0
 from itertools import chain
 
+from c7n_mailer.azure_mailer.sendgrid_delivery import SendGridDelivery
 from c7n_mailer.smtp_delivery import SmtpDelivery
-import c7n_mailer.azure_mailer.sendgrid_delivery as sendgrid
 
 from .ldap_lookup import LdapLookup
 from .utils import (
-    decrypt,
-    get_resource_tag_targets,
-    get_provider,
-    get_aws_username_from_event,
     Providers,
+    decrypt,
+    get_aws_username_from_event,
+    get_provider,
+    get_resource_tag_targets,
     unique,
 )
 from .utils_email import get_mimetext_message, is_email
@@ -169,11 +169,11 @@ class EmailDelivery:
     # this function returns a dictionary with a tuple of emails as the key
     # and the list of resources as the value. This helps ensure minimal emails
     # are sent, while only ever sending emails to the respective parties.
-    def get_email_to_addrs_to_resources_map(self, sqs_message):
+    def get_emails_to_resources_map(self, sqs_message):
         # policy_to_emails always get sent to any email msg that goes out
         # these were manually set by the policy writer in notify to section
         # or it's an email from an aws event username from an ldap_lookup
-        email_to_addrs_to_resources_map = {}
+        emails_to_resources_map = {}
         targets = sqs_message["action"].get("to", []) + (
             sqs_message["action"]["cc"] if "cc" in sqs_message["action"] else []
         )
@@ -211,43 +211,41 @@ class EmailDelivery:
             resource_emails = tuple(sorted(set(resource_emails)))
             # only if there are valid emails available, add it to the map
             if resource_emails:
-                email_to_addrs_to_resources_map.setdefault(resource_emails, []).append(resource)
-        if email_to_addrs_to_resources_map == {}:
+                emails_to_resources_map.setdefault(resource_emails, []).append(resource)
+        if emails_to_resources_map == {}:
             self.logger.debug("Found no email addresses, sending no emails.")
         # eg: { ('milton@initech.com', 'peter@initech.com'): [resource1, resource2, etc] }
-        return email_to_addrs_to_resources_map
+        return emails_to_resources_map
 
-    def get_to_addrs_email_messages_map(self, sqs_message):
-        to_addrs_to_resources_map = self.get_email_to_addrs_to_resources_map(sqs_message)
-        to_addrs_to_mimetext_map = {}
-        for to_addrs, resources in to_addrs_to_resources_map.items():
-            to_addrs_to_mimetext_map[to_addrs] = get_mimetext_message(
+    def get_emails_to_mimetext_map(self, sqs_message):
+        emails_to_resources_map = self.get_emails_to_resources_map(sqs_message)
+        emails_to_mimetext_map = {}
+        for to_addrs, resources in emails_to_resources_map.items():
+            emails_to_mimetext_map[to_addrs] = get_mimetext_message(
                 self.config, self.logger, sqs_message, resources, list(to_addrs)
             )
         # eg: { ('milton@initech.com', 'peter@initech.com'): mimetext_message }
-        return to_addrs_to_mimetext_map
+        return emails_to_mimetext_map
 
-    def send_c7n_email(self, sqs_message, email_to_addrs, mimetext_msg):
+    def send_c7n_email(self, sqs_message):
+        emails_to_mimetext_map = self.get_emails_to_mimetext_map(sqs_message)
+        email_to_addrs = list(emails_to_mimetext_map.keys())
         try:
             # if smtp_server is set in mailer.yml, send through smtp
             if "smtp_server" in self.config:
-                smtp_delivery = SmtpDelivery(
-                    config=self.config, session=self.session, logger=self.logger
-                )
-                smtp_delivery.send_message(message=mimetext_msg, to_addrs=email_to_addrs)
+                delivery = SmtpDelivery(self.config, self.session, self.logger)
+                for emails, mimetext_msg in emails_to_mimetext_map.items():
+                    delivery.send_message(message=mimetext_msg, to_addrs=list(emails))
             elif "sendgrid_api_key" in self.config:
-                sendgrid_delivery = sendgrid.SendGridDelivery(
-                    config=self.config, session=self.session, logger=self.logger
-                )
-                sendgrid_delivery.sendgrid_handler(
-                    sqs_message, self.get_to_addrs_email_messages_map(sqs_message)
-                )
+                delivery = SendGridDelivery(self.config, self.session, self.logger)
+                delivery.sendgrid_handler(sqs_message, emails_to_mimetext_map)
             # if smtp_server or sendgrid_api_key isn't set in mailer.yml, use aws ses normally.
             else:
-                self.aws_ses.send_raw_email(RawMessage={"Data": mimetext_msg.as_string()})
+                for emails, mimetext_msg in emails_to_mimetext_map.items():
+                    self.aws_ses.send_raw_email(RawMessage={"Data": mimetext_msg.as_string()})
         except Exception as error:
-            self.logger.warning(
-                "Error policy:%s account:%s sending to:%s \n\n error: %s\n\n mailer.yml: %s"
+            self.logger.error(
+                "policy:%s account:%s sending to:%s \n\n error: %s\n\n mailer.yml: %s"
                 % (
                     sqs_message["policy"],
                     sqs_message.get("account", ""),
@@ -256,8 +254,10 @@ class EmailDelivery:
                     self.config,
                 )
             )
+            # TODO shall we raise the exception and interrupt the entire notify process?
+            return
         self.logger.info(
-            "Sending account:%s policy:%s %s:%s email:%s to %s"
+            "Sent account:%s policy:%s %s:%s email:%s to %s"
             % (
                 sqs_message.get("account", ""),
                 sqs_message["policy"]["name"],
