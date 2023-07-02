@@ -12,6 +12,7 @@ from c7n.utils import type_schema
 from c7n_oci.actions.base import OCIBaseAction, RemoveTagBaseAction
 from c7n_oci.provider import resources
 from c7n_oci.query import QueryResourceManager
+from c7n_oci.constants import Service, Client
 
 log = logging.getLogger("custodian.oci.resources.dns")
 
@@ -34,8 +35,8 @@ class Zone(QueryResourceManager):
 
     class resource_type:
         doc_groups = ["DNS"]
-        service = "oci.dns"
-        client = "DnsClient"
+        service = Service.DNS.value
+        client = Client.DNS.value
         enum_spec = ("list_zones", "items[]", None)
         extra_params = {"compartment_id"}
         resource_type = "OCI.Dns/Zone"
