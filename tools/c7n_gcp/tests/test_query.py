@@ -33,7 +33,6 @@ def test_gcp_resource_metadata_asset_type():
         'log-exclusion',
         'ml-job',
         'ml-model',
-        'redis-instance',
         'sourcerepo',
         'sql-backup-run',
         'sql-ssl-cert',
