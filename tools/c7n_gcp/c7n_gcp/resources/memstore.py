@@ -4,7 +4,7 @@ from c7n_gcp.provider import resources
 from c7n_gcp.query import QueryResourceManager, TypeInfo
 
 
-@resources.register('redis-instance')
+@resources.register("redis")
 class RedisInstance(QueryResourceManager):
     """GC resource: https://cloud.google.com/memorystore/docs/redis/reference/rest
 
@@ -13,23 +13,31 @@ class RedisInstance(QueryResourceManager):
     .. code-block:: yaml
 
             policies:
-              - name: epam-gcp-memorystore_for_redis_auth
+              - name: gcp-memorystore_for_redis_auth
                 description: |
                   GCP Memorystore for Redis has AUTH disabled
-                resource: gcp.redis-instance
+                resource: gcp.redis
                 filters:
                   - type: value
                     key: authEnabled
                     op: ne
                     value: true
     """
+
     class resource_type(TypeInfo):
-        service = 'redis'
-        version = 'v1'
-        component = 'projects.locations.instances'
-        enum_spec = ('list', 'instances[]', None)
-        scope_key = 'parent'
-        name = id = 'id'
+        service = "redis"
+        version = "v1"
+        component = "projects.locations.instances"
+        enum_spec = ("list", "instances[]", None)
+        scope_key = "parent"
+        name = id = "name"
         scope_template = "projects/{}/locations/-"
-        permissions = ('bigtable.instances.list',)
-        default_report_fields = ['displayName', 'expireTime']
+        permissions = ("bigtable.instances.list",)
+        default_report_fields = ["displayName", "expireTime"]
+        asset_type = "redis.googleapis.com/Instance"
+        urn_component = "instance"
+        urn_id_segments = (-1,)
+
+        @classmethod
+        def _get_location(cls, resource):
+            return resource["name"].split("/")[3]
