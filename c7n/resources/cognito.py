@@ -11,6 +11,7 @@ from c7n.utils import local_session, type_schema
 
 class DescribeIdentityPool(DescribeSource):
     def augment(self, resources):
+        resources = super().augment(resources)
         return universal_augment(self.manager, resources)
 
 

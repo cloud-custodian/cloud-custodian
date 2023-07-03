@@ -88,6 +88,7 @@ ResourceMap = {
     "gcp.pubsub-snapshot": "c7n_gcp.resources.pubsub.PubSubSnapshot",
     "gcp.pubsub-subscription": "c7n_gcp.resources.pubsub.PubSubSubscription",
     "gcp.pubsub-topic": "c7n_gcp.resources.pubsub.PubSubTopic",
+    "gcp.redis": "c7n_gcp.resources.memstore.RedisInstance",
     "gcp.region": "c7n_gcp.region.Region",
     "gcp.route": "c7n_gcp.resources.network.Route",
     "gcp.router": "c7n_gcp.resources.network.Router",

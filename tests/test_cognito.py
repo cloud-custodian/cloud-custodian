@@ -51,6 +51,12 @@ class IdentityPool(BaseTest):
             sorted([n["IdentityPoolName"] for n in resources]),
             ["origin_MOBILEHUB_1667653900", "test_delete_id_pool"],
         )
+        # Confirm that our augment pass has tag information and detail
+        # from describe_identity_pool
+        self.assertLessEqual(
+            {"IdentityPoolId", "Tags", "CognitoIdentityProviders"},
+            set(resources[0])
+        )
 
     def test_delete_identity_pool(self):
         factory = self.replay_flight_data("test_cognito-identity-pool_delete")
