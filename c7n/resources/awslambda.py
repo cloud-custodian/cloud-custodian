@@ -127,7 +127,7 @@ class LambdaPermissionsWildcard(Filter):
     .. code-block:: yaml
 
             policies:
-              - name:   - name: cfb-aws-compute-ensure-lambda-has-no-policy-with-wildcard
+              - name: cfb-aws-compute-ensure-lambda-has-no-policy-with-wildcard
                 resource: lambda
                 filters:
                   - type: has-wildcard-policy
