@@ -158,6 +158,11 @@ CONFIG_SCHEMA = {
         "splunk_max_attempts": {"type": "integer"},
         "splunk_hec_max_length": {"type": "integer"},
         "splunk_hec_sourcetype": {"type": "string"},
+        # MS Graph API config
+        "graph_token_endpoint": {"type": "string"},
+        "graph_sendmail_endpoint": {"type": "string"},
+        "graph_client_id": {"type": "string"},
+        "graph_client_secret": SECURED_STRING_SCHEMA,
         # SDK Config
         "profile": {"type": "string"},
         "http_proxy": {"type": "string"},
