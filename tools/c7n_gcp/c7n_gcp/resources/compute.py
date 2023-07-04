@@ -9,7 +9,7 @@ from c7n.utils import local_session, type_schema
 
 from c7n_gcp.actions import MethodAction
 from c7n_gcp.provider import resources
-from c7n_gcp.query import QueryResourceManager, TypeInfo, ChildResourceManager, ChildTypeInfo
+from c7n_gcp.query import QueryResourceManager, TypeInfo
 
 from c7n.filters.core import ValueFilter
 from c7n.filters.offhours import OffHour, OnHour
@@ -617,23 +617,3 @@ class Project(QueryResourceManager):
         def get(client, resource_info):
             return client.execute_command(
                 'get', {'project': resource_info['project_id']})
-
-
-@resources.register('dataproc-clusters')
-class DataprocClusters(ChildResourceManager):
-
-    class resource_type(ChildTypeInfo):
-        service = 'dataproc'
-        version = 'v1'
-        component = 'projects.regions.clusters'
-        enum_spec = ('list', 'clusters[]', None)
-        scope_key = 'projectId'
-        name = id = 'name'
-        parent_spec = {
-            'resource': 'region',
-            'child_enum_params': {
-                ('name', 'region')},
-            'use_child_query': True,
-        }
-        default_report_fields = ['id', 'name', 'dnsName', 'creationTime', 'visibility']
-
