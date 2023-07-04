@@ -1,0 +1,23 @@
+{
+    "status_code": 200,
+    "data": {
+        "Label": "BytesIn",
+        "Datapoints": [
+            {
+                "Timestamp": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 6,
+                    "day": 24,
+                    "hour": 6,
+                    "minute": 9,
+                    "second": 0,
+                    "microsecond": 0
+                },
+                "Sum": 0.0,
+                "Unit": "None"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

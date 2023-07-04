@@ -1204,7 +1204,7 @@ class EncryptInstanceVolumes(BaseAction):
         return False
 
     def create_encrypted_volume(self, ec2, v, key_id, instance_id):
-        unencrypted_volume_tags = v['Tags']
+        unencrypted_volume_tags = v.get('Tags', [])
         # Create a current snapshot
         results = ec2.create_snapshot(
             VolumeId=v['VolumeId'],

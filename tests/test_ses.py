@@ -43,6 +43,55 @@ class SESTest(BaseTest):
             tls_policy = response['DeliveryOptions']['TlsPolicy']
             self.assertEqual(tls_policy, "Require")
 
+    def test_ses_receipt_rule_set_query(self):
+        session_factory = self.replay_flight_data("test_ses_rule_set_query")
+        p = self.load_policy(
+            {
+                "name": "ses-receipt-rule-set-query-test",
+                "resource": "ses-receipt-rule-set",
+                "filters": [{"type": "value",
+                             "key": "Rules[0].Enabled",
+                             "op": "eq",
+                             "value": True}
+                            ]
+            }, session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_ses_receipt_rule_set_delete(self):
+        session_factory = self.replay_flight_data("test_ses_rule_set_delete")
+        p = self.load_policy(
+            {
+                "name": "ses-receipt-rule_set-delete-test",
+                "resource": "ses-receipt-rule-set",
+                "filters": [{"type": "value",
+                             "key": "Rules[:].Enabled",
+                             "op": "in",
+                             "value": True,
+                             "value_type": "swap"}
+                            ],
+                "actions": [{"type": "delete"}],
+            }, session_factory=session_factory
+        )
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        p = self.load_policy(
+            {
+                "name": "ses-receipt-rule-delete-test",
+                "resource": "ses-receipt-rule-set",
+                "filters": [{"type": "value",
+                             "key": "Rules[:].Enabled",
+                             "op": "in",
+                             "value": True,
+                             "value_type": "swap"}
+                            ]
+            }, session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
 
 class SESV2Test(BaseTest):
 
