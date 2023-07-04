@@ -22,3 +22,6 @@ class DataprocClusters(ChildResourceManager):
             'use_child_query': True,
         }
         default_report_fields = ['id', 'name', 'dnsName', 'creationTime', 'visibility']
+        asset_type = "dataproc.googleapis.com/Dataproc"
+        urn_component = "dataproc"
+        urn_id_segments = (-1,)
