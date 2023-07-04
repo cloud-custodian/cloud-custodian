@@ -40,3 +40,21 @@ class CloudRunJob(QueryResourceManager):
         id = "metadata.selfLink"
         default_report_fields = ["metadata.name", "metadata.creationTimestamp"]
         asset_type = "run.googleapis.com/Job"
+
+
+@resources.register("cloud-run-revision")
+class CloudRunRevision(QueryResourceManager):
+    """GCP resource: https://cloud.google.com/run/docs/reference/rest/v2/projects.locations.services.revisions"""
+
+    class resource_type(TypeInfo):
+        service = "run"
+        version = "v1"
+        component = "namespaces.revisions"
+        enum_spec = ("list", "items[]", None)
+        scope_key = "parent"
+        scope_template = "namespaces/{}"
+        name = id = 'id'
+        default_report_fields = ['displayName', 'expireTime']
+        asset_type = "run.googleapis.com/Revision"
+        urn_component = "revision"
+        urn_id_segments = (-1,)
