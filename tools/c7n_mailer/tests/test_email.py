@@ -349,6 +349,39 @@ class EmailTest(unittest.TestCase):
             # ensure send 4 times instead of 8 as there are only 4 addrs
             assert mock_send.call_count == 4
 
+    def test_ms_graph(self):
+        config = copy.deepcopy(MAILER_CONFIG)
+        logger_mock = MagicMock()
+
+        del config["smtp_server"]
+        config.update(
+            {
+                "graph_sendmail_endpoint": "my_graph_sendmail_endpoint",
+                "graph_token_endpoint": "my_graph_token_endpoint",
+                "graph_client_id": "graph_client_id",
+                "graph_client_secret": "graph_client_secret",
+            }
+        )
+
+        delivery = MockEmailDelivery(config, self.aws_session, logger_mock)
+
+        with patch("requests.post") as req:
+            with patch("c7n_mailer.utils.kms_decrypt") as mock_decrypt:
+                mock_decrypt.return_value = "xyz"
+                delivery.send_c7n_email(SQS_MESSAGE_1)
+                mock_decrypt.assert_called_once()
+
+            assert req.call_count == 2
+            token_req = req.call_args_list[0]
+            assert token_req[0][0] == "my_graph_token_endpoint"
+            assert token_req[1]["data"]["client_secret"] == "xyz"
+            sendmail_req = req.call_args_list[1]
+            assert sendmail_req[0][0] == "my_graph_sendmail_endpoint"
+            assert sendmail_req[1]["data"].startswith(
+                '{"message": {"subject": "core-services-dev AWS EBS Volumes'
+                ' will be DELETED in 15 DAYS!"'
+            )
+
     def test_ses_send_raw_email(self):
         config = copy.deepcopy(MAILER_CONFIG)
         logger_mock = MagicMock()
