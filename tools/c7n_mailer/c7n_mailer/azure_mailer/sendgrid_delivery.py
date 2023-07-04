@@ -20,7 +20,7 @@ class SendGridDelivery:
 
     def get_to_addrs_sendgrid_messages_map(self, queue_message):
         # eg: { ('milton@initech.com', 'peter@initech.com'): [resource1, resource2, etc] }
-        to_addrs_to_resources_map = self.get_email_to_addrs_to_resources_map(queue_message)
+        to_addrs_to_resources_map = self.get_emails_to_resources_map(queue_message)
 
         to_addrs_to_content_map = {}
         for to_addrs, resources in to_addrs_to_resources_map.items():
@@ -33,7 +33,7 @@ class SendGridDelivery:
     # this function returns a dictionary with a tuple of emails as the key
     # and the list of resources as the value. This helps ensure minimal emails
     # are sent, while only ever sending emails to the respective parties.
-    def get_email_to_addrs_to_resources_map(self, queue_message):
+    def get_emails_to_resources_map(self, queue_message):
         email_to_addrs_to_resources_map = {}
         targets = queue_message["action"].get("to", [])
 
@@ -60,7 +60,7 @@ class SendGridDelivery:
         # eg: { ('milton@initech.com', 'peter@initech.com'): [resource1, resource2, etc] }
         return email_to_addrs_to_resources_map
 
-    def sendgrid_handler(self, queue_message, to_addrs_to_email_messages_map):
+    def sendgrid_handler(self, queue_message, emails_to_mimetext_map):
         self.logger.info(
             "Sending account:%s policy:%s %s:%s email:%s to %s"
             % (
@@ -69,14 +69,14 @@ class SendGridDelivery:
                 queue_message["policy"]["resource"],
                 str(len(queue_message["resources"])),
                 queue_message["action"].get("template", "default"),
-                to_addrs_to_email_messages_map,
+                emails_to_mimetext_map,
             )
         )
 
-        for email_to_addrs, message in to_addrs_to_email_messages_map.items():
+        for email_to_addrs, mimetext in emails_to_mimetext_map.items():
             for to_address in email_to_addrs:
                 try:
-                    mail = SendGridDelivery._sendgrid_mail_from_email_message(message, to_address)
+                    mail = SendGridDelivery._construct_mail_from_mimetext(mimetext, to_address)
                     self.sendgrid_client.send(mail)
                 except (exceptions.UnauthorizedError, exceptions.BadRequestsError) as e:
                     self.logger.warning(
@@ -95,7 +95,7 @@ class SendGridDelivery:
         return True
 
     @staticmethod
-    def _sendgrid_mail_from_email_message(message, to_address):
+    def _construct_mail_from_mimetext(message, to_address) -> Mail:
         """
         Create a Mail object from an instance of email.message.EmailMessage.
 

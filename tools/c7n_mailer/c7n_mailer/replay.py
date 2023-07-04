@@ -74,7 +74,7 @@ class MailerTester:
                 sd.send_slack_msg(to_addrs, body)
         else:
             emd = EmailDelivery(self.config, self.session, logger)
-            addrs_to_msgs = emd.get_to_addrs_email_messages_map(self.data)
+            addrs_to_msgs = emd.get_emails_to_mimetext_map(self.data)
             logger.info("Would send to: %s", addrs_to_msgs.keys())
 
             if print_only:
@@ -90,9 +90,8 @@ class MailerTester:
                     print(mimetext_msg.get_payload(None, True).decode("utf-8"))
                 return
             # else actually send the message...
-            for to_addrs, mimetext_msg in addrs_to_msgs.items():
-                logger.info("Actually sending to: %s", to_addrs)
-                emd.send_c7n_email(self.data, list(to_addrs), mimetext_msg)
+            logger.info("Actually sending to: %s", addrs_to_msgs.keys())
+            emd.send_c7n_email(self.data)
 
 
 def setup_parser():
