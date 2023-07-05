@@ -52,7 +52,7 @@ class WebAppFirewallFilter(Filter):
     .. code-block:: yaml
 
         policies:
-            name: test-waf-not-enabled
+          - name: test-waf-not-enabled
             resource: azure.cdnprofile
             filters:
                 - type: waf
