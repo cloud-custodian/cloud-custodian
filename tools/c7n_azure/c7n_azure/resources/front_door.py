@@ -6,6 +6,7 @@ from c7n_azure.provider import resources
 from c7n.filters import Filter
 from c7n.utils import type_schema
 
+
 @resources.register('front-door')
 class FrontDoor(ArmResourceManager):
     """Azure Front Door Resource
@@ -34,6 +35,7 @@ class FrontDoor(ArmResourceManager):
         )
         resource_type = 'Microsoft.Network/frontDoors'
 
+
 @FrontDoor.filter_registry.register('waf')
 class WebAppFirewallFilter(Filter):
     """Frontdoor check waf enabled on front door profiles for Classic_AzureFrontDoor
@@ -43,7 +45,7 @@ class WebAppFirewallFilter(Filter):
     .. code-block:: yaml
 
         policies:
-            name: test-frontdoor-waf
+          - name: test-frontdoor-waf
             resource: azure.front-door
             filters:
               - type: waf
