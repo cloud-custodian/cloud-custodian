@@ -4,6 +4,7 @@ from c7n.utils import type_schema, local_session
 from c7n_gcp.actions import MethodAction, SetIamPolicy
 from c7n_gcp.provider import resources
 from c7n_gcp.query import QueryResourceManager, TypeInfo, ChildTypeInfo, ChildResourceManager
+from c7n_gcp.resources.bigtable import TimeRange
 
 
 @resources.register('spanner-instance')
@@ -70,6 +71,9 @@ class SpannerInstanceBackup(ChildResourceManager):
                 parent_instance['displayName'],
             )
         }
+
+
+SpannerInstanceBackup.filter_registry.register('time-range', TimeRange)
 
 
 @SpannerInstance.action_registry.register('delete')
