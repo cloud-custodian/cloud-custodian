@@ -61,7 +61,6 @@ class WebAppFirewallFilter(Filter):
             return True
         if self.data.get('state') == 'Enabled' and link is not None:
             return True
-        return False
 
     def process(self, resources, event=None):
         client = self.manager.get_client()
