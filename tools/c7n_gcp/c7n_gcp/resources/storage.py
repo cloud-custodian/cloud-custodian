@@ -30,6 +30,7 @@ class Bucket(QueryResourceManager):
             return client.execute_command(
                 'get', {'bucket': resource_info['bucket_name']})
         
+        
 @Bucket.filter_registry.register('self-logging-bucket')
 class SelfLoggingBucketFilter(ValueFilter):
     schema = type_schema('self-logging-bucket', rinherit=ValueFilter.schema)
