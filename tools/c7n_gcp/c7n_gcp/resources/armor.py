@@ -17,3 +17,4 @@ class SecurityPolicy(QueryResourceManager):
         scope_template = '{}'
         permissions = ('compute.securityPolicies.list',)
         default_report_fields = ['displayName', 'expireTime']
+        asset_type = 'compute.googleapis.com/SecurityPolicy'
