@@ -51,6 +51,26 @@ class TestEcs(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
+    def test_ecs_cluster_storage(self):
+        session_factory = self.replay_flight_data("test_ecs_cluster_storage")
+        p = self.load_policy(
+            {
+                "name": "ecs-cluster-storage",
+                "resource": "ecs",
+                "filters": [
+                    {
+                        "type": "ebs-storage",
+                        "key": "Encrypted",
+                        "op": "eq",
+                        "value": True
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
 
 class TestEcsService(BaseTest):
 
