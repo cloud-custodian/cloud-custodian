@@ -34,6 +34,7 @@ class Bucket(QueryResourceManager):
 @Bucket.filter_registry.register('self-logging-bucket')
 class SelfLoggingBucketFilter(ValueFilter):
     schema = type_schema('self-logging-bucket', rinherit=ValueFilter.schema)
+    permissions = ('storage.buckets.get',)
 
     def __init__(self, data, manager=None):
         super(SelfLoggingBucketFilter, self).__init__(data, manager)
