@@ -47,7 +47,7 @@ class SelfLoggingBucketFilter(ValueFilter):
                 if log_bucket_name and log_bucket_name == bucket_name:
                     matched_resources.append(resource)
         return matched_resources
-    
+
 
 @Bucket.filter_registry.register('iam-policy')
 class BucketIamPolicyFilter(IamPolicyFilter):
