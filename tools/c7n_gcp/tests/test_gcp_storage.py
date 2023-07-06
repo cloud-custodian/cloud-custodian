@@ -48,7 +48,7 @@ class BucketTest(BaseTest):
                 "gcp:storage::cloud-custodian:bucket/staging.cloud-custodian.appspot.com",
             ],
         )
-    
+
     def test_self_logging_bucket(self):
         factory = self.replay_flight_data(
             'self-logging-bucket-filter'
@@ -62,7 +62,7 @@ class BucketTest(BaseTest):
                     'name': 'bucket-logging',
                     'type': 'self-logging-bucket'
                 }
-            ]    
+            ]
         }
 
         policy = self.load_policy(policy_data, session_factory=factory)
