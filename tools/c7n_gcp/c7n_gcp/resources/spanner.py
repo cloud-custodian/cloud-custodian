@@ -63,6 +63,7 @@ class SpannerInstanceBackup(ChildResourceManager):
         }
         default_report_fields = ['name', 'expireTime']
         permissions = ('spanner.backups.list',)
+        asset_type = 'spanner.googleapis.com/Backup'
 
     def _get_child_enum_args(self, parent_instance):
         return {
