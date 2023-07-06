@@ -1,0 +1,95 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Thu, 14 Jul 2022 07:55:19 GMT",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000,h3-Q050=\":443\"; ma=2592000,h3-Q046=\":443\"; ma=2592000,h3-Q043=\":443\"; ma=2592000,quic=\":443\"; ma=2592000; v=\"46,43\"",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "3231",
+    "-content-encoding": "gzip",
+    "content-location": "https://notebooks.googleapis.com/v1/projects/cloud-custodian/locations/-/instances?alt=json"
+  },
+  "body": {
+    "instances": [
+      {
+        "name": "projects/cloud-custodian/locations/us-central1-a/instances/instancetest",
+        "proxyUri": "283ed5736dc76283-dot-us-central1.notebooks.googleusercontent.com",
+        "serviceAccount": "443732426401-compute@developer.gserviceaccount.com",
+        "machineType": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-a/machineTypes/n1-standard-1",
+        "state": "ACTIVE",
+        "network": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/networks/default",
+        "subnet": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-central1/subnetworks/default",
+        "labels": {
+          "goog-caip-notebook": ""
+        },
+        "metadata": {
+          "proxy-mode": "service_account",
+          "shutdown-script": "/opt/deeplearning/bin/shutdown_script.sh",
+          "enable-guest-attributes": "TRUE",
+          "version": "94",
+          "restriction": "",
+          "report-system-health": "true",
+          "framework": "NumPy/SciPy/scikit-learn",
+          "proxy-url": "283ed5736dc76283-dot-us-central1.notebooks.googleusercontent.com",
+          "title": "Base.CPU",
+          "notebooks-api": "PROD"
+        },
+        "createTime": "2022-07-14T07:54:28.028128572Z",
+        "updateTime": "2022-07-14T07:55:16.886988097Z",
+        "disks": [
+          {
+            "autoDelete": true,
+            "boot": true,
+            "deviceName": "boot",
+            "diskSizeGb": "100",
+            "guestOsFeatures": [
+              {
+                "type": "VIRTIO_SCSI_MULTIQUEUE"
+              },
+              {
+                "type": "UEFI_COMPATIBLE"
+              },
+              {
+                "type": "GVNIC"
+              }
+            ],
+            "interface": "SCSI",
+            "kind": "compute#attachedDisk",
+            "licenses": [
+              "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/licenses/c2d-tensorflow",
+              "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/licenses/c2d-dl-platform-gvnic",
+              "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/licenses/c2d-dl-platform-cpu-common",
+              "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/licenses/c2d-dl-platform-debian-10",
+              "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/licenses/c2d-dl-platform-notebooks"
+            ],
+            "mode": "READ_WRITE",
+            "source": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-a/disks/instancetest-boot",
+            "type": "PERSISTENT"
+          },
+          {
+            "autoDelete": true,
+            "deviceName": "data",
+            "diskSizeGb": "100",
+            "index": "1",
+            "interface": "SCSI",
+            "kind": "compute#attachedDisk",
+            "mode": "READ_WRITE",
+            "source": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-a/disks/instancetest-data",
+            "type": "PERSISTENT"
+          }
+        ],
+        "shieldedInstanceConfig": {
+          "enableVtpm": true,
+          "enableIntegrityMonitoring": true
+        },
+        "creator": "gcp.lab.cust1@epmcseclab.com"
+      }
+    ]
+  }
+}

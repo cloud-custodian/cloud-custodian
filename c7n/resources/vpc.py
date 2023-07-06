@@ -7,7 +7,7 @@ import re
 from c7n.actions import BaseAction, ModifyVpcSecurityGroupsAction
 from c7n.exceptions import PolicyValidationError, ClientError
 from c7n.filters import (
-    DefaultVpcBase, Filter, ValueFilter)
+    DefaultVpcBase, Filter, ValueFilter, MetricsFilter)
 import c7n.filters.vpc as net_filters
 from c7n.filters.iamaccess import CrossAccountAccessFilter
 from c7n.filters.related import RelatedResourceFilter, RelatedResourceByIdFilter
@@ -2011,9 +2011,20 @@ class TransitGatewayAttachment(query.ChildResourceManager):
         parent_spec = ('transit-gateway', 'transit-gateway-id', None)
         id_prefix = 'tgw-attach-'
         name = id = 'TransitGatewayAttachmentId'
+        metrics_namespace = 'AWS/TransitGateway'
         arn = False
         cfn_type = 'AWS::EC2::TransitGatewayAttachment'
         supports_trailevents = True
+
+
+@TransitGatewayAttachment.filter_registry.register('metrics')
+class TransitGatewayAttachmentMetricsFilter(MetricsFilter):
+
+    def get_dimensions(self, resource):
+        return [
+            {'Name': 'TransitGateway', 'Value': resource['TransitGatewayId']},
+            {'Name': 'TransitGatewayAttachment', 'Value': resource['TransitGatewayAttachmentId']}
+        ]
 
 
 @resources.register('peering-connection')
@@ -2403,12 +2414,25 @@ class VpcEndpoint(query.QueryResourceManager):
         arn_type = 'vpc-endpoint'
         enum_spec = ('describe_vpc_endpoints', 'VpcEndpoints', None)
         name = id = 'VpcEndpointId'
+        metrics_namespace = "AWS/PrivateLinkEndpoints"
         date = 'CreationTimestamp'
         filter_name = 'VpcEndpointIds'
         filter_type = 'list'
         id_prefix = "vpce-"
         universal_taggable = object()
         cfn_type = config_type = "AWS::EC2::VPCEndpoint"
+
+
+@VpcEndpoint.filter_registry.register('metrics')
+class VpcEndpointMetricsFilter(MetricsFilter):
+
+    def get_dimensions(self, resource):
+        return [
+            {'Name': 'Endpoint Type', 'Value': resource['VpcEndpointType']},
+            {'Name': 'Service Name', 'Value': resource['ServiceName']},
+            {'Name': 'VPC Endpoint Id', 'Value': resource['VpcEndpointId']},
+            {'Name': 'VPC Id', 'Value': resource['VpcId']},
+        ]
 
 
 @VpcEndpoint.filter_registry.register('has-statement')
