@@ -48,6 +48,27 @@ class BucketTest(BaseTest):
                 "gcp:storage::cloud-custodian:bucket/staging.cloud-custodian.appspot.com",
             ],
         )
+    
+    def test_self_logging_bucket(self):
+        factory = self.replay_flight_data(
+            'self-logging-bucket-filter'
+            'cloud-custodian'
+        )
+        policy_data = {
+            'name': 'bucket-self-logging-filter',
+            'resource': 'gcp.bucket',
+            'filters': [
+                {
+                    'name': 'bucket-logging',
+                    'type': 'self-logging-bucket'
+                }
+            ]    
+        }
+
+        policy = self.load_policy(policy_data, session_factory=factory)
+        resources = policy.run()
+
+        self.assertEqual(len(resources), 1)
 
     def test_enable_uniform_bucket_level_access(self):
         project_id = 'custodian-1291'
