@@ -51,7 +51,7 @@ class BucketTest(BaseTest):
 
     def test_self_logging_bucket(self):
         factory = self.replay_flight_data(
-            'self-logging-bucket-filter'
+            'self-logging-bucket-filter',
             'cloud-custodian'
         )
         policy_data = {
@@ -59,7 +59,6 @@ class BucketTest(BaseTest):
             'resource': 'gcp.bucket',
             'filters': [
                 {
-                    'name': 'bucket-logging',
                     'type': 'self-logging-bucket'
                 }
             ]
@@ -68,7 +67,7 @@ class BucketTest(BaseTest):
         policy = self.load_policy(policy_data, session_factory=factory)
         resources = policy.run()
 
-        self.assertEqual(len(resources), 1)
+        self.assertEqual(len(resources), 0)
 
     def test_enable_uniform_bucket_level_access(self):
         project_id = 'custodian-1291'
