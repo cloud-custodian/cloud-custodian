@@ -56,4 +56,4 @@ class RevisionServiceTest(BaseTest):
         }, session_factory=factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        self.assertEqual(resources[0]["metadata"]["name"], 'hello-00001-nvq')
+        self.assertEqual(resources[0]['metadata']['name'], 'hello-00001-nvq')
