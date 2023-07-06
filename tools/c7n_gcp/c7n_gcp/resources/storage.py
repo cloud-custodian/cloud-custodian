@@ -5,7 +5,7 @@ from c7n_gcp.actions import MethodAction
 from c7n_gcp.provider import resources
 from c7n_gcp.query import QueryResourceManager, TypeInfo
 from c7n_gcp.filters import IamPolicyFilter
-from c7n.filters.core import ValueFilter
+from c7n.filters import ValueFilter
 
 
 @resources.register('bucket')
@@ -29,7 +29,7 @@ class Bucket(QueryResourceManager):
         def get(client, resource_info):
             return client.execute_command(
                 'get', {'bucket': resource_info['bucket_name']})
-        
+
 
 @Bucket.filter_registry.register('self-logging-bucket')
 class SelfLoggingBucketFilter(ValueFilter):
@@ -46,10 +46,9 @@ class SelfLoggingBucketFilter(ValueFilter):
                 log_bucket_name = resource['logging'].get('logBucket')
                 if log_bucket_name and log_bucket_name == bucket_name:
                     matched_resources.append(resource)
-    
         return matched_resources
-
-
+    
+    
 @Bucket.filter_registry.register('iam-policy')
 class BucketIamPolicyFilter(IamPolicyFilter):
     """
