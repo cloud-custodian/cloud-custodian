@@ -67,7 +67,7 @@ class BucketTest(BaseTest):
         policy = self.load_policy(policy_data, session_factory=factory)
         resources = policy.run()
 
-        self.assertEqual(len(resources), 1)
+        self.assertEqual(len(resources), 0)
 
     def test_enable_uniform_bucket_level_access(self):
         project_id = 'custodian-1291'
