@@ -16,3 +16,4 @@ class PatchDeployment(QueryResourceManager):
         name = id = 'id'
         scope_template = 'projects/{}'
         default_report_fields = ['displayName', 'expireTime']
+        asset_type = 'osconfig.googleapis.com/PatchDeployment'
