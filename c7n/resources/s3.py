@@ -2797,7 +2797,7 @@ class IntelligentTiering(ListItemFilter):
         count={'type': 'number'},
         count_op={'$ref': '#/definitions/filters_common/comparison_operators'}
     )
-    permissions = ('s3:ListBucketIntelligentTieringConfigurations',)
+    permissions = ('s3:GetIntelligentTieringConfiguration',)
     annotation_key = "c7n:IntelligentTiering"
     annotate_items = True
 
@@ -2977,8 +2977,7 @@ class ConfigureIntelligentTiering(BucketActionBase):
         },
     }
 
-    permissions = ('s3:DeleteBucketIntelligentTieringConfiguration',
-                    's3:PutBucketIntelligentTieringConfiguration',)
+    permissions = ('s3:PutIntelligentTieringConfiguration',)
 
     def validate(self):
         # You can have up to 1,000 S3 Intelligent-Tiering configurations per bucket.
