@@ -2776,7 +2776,7 @@ class IntelligentTiering(ListItemFilter):
             policies:
               - name: s3-intelligent-tiering-configuration
                 resource: s3
-                actions:
+                filters:
                   - type: intelligent-tiering
                     attrs:
                       - Status: Enabled
