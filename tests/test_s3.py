@@ -4112,6 +4112,8 @@ class IntelligentTieringConfiguration(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
+        self.assertTrue("c7n:IntelligentTiering" in resources[0])
+        self.assertEqual(len(resources[0].get("c7n:ListItemMatches")), 1)
         self.assertEqual(resources[0].get("c7n:ListItemMatches")[0].get("Id"), "test-config")
         check_config = client.list_bucket_intelligent_tiering_configurations(Bucket=bname)
         self.assertFalse(filtered_config in check_config.get('IntelligentTieringConfigurationList'))

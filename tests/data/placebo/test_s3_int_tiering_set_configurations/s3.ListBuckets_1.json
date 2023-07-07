@@ -4,6 +4,45 @@
         "ResponseMetadata": {},
         "Buckets": [
             {
+                "Name": "c7n-s3-orgid",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2018,
+                    "month": 9,
+                    "day": 5,
+                    "hour": 16,
+                    "minute": 34,
+                    "second": 8,
+                    "microsecond": 0
+                }
+            },
+            {
+                "Name": "c7n-ssm",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2018,
+                    "month": 3,
+                    "day": 30,
+                    "hour": 10,
+                    "minute": 21,
+                    "second": 42,
+                    "microsecond": 0
+                }
+            },
+            {
+                "Name": "c7n-ssm-build",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2018,
+                    "month": 4,
+                    "day": 20,
+                    "hour": 13,
+                    "minute": 47,
+                    "second": 24,
+                    "microsecond": 0
+                }
+            },
+            {
                 "Name": "c7n-test-1",
                 "CreationDate": {
                     "__class__": "datetime",
@@ -17,6 +56,45 @@
                 }
             },
             {
+                "Name": "c7n-test-glue",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 3,
+                    "day": 23,
+                    "hour": 15,
+                    "minute": 59,
+                    "second": 5,
+                    "microsecond": 0
+                }
+            },
+            {
+                "Name": "c7n-vpc-flow-logs",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2018,
+                    "month": 10,
+                    "day": 30,
+                    "hour": 18,
+                    "minute": 20,
+                    "second": 39,
+                    "microsecond": 0
+                }
+            },
+            {
+                "Name": "cdk-hnb659fds-assets-644160558196-us-east-1",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 4,
+                    "day": 7,
+                    "hour": 13,
+                    "minute": 51,
+                    "second": 0,
+                    "microsecond": 0
+                }
+            },
+            {
                 "Name": "cof-c7n-serverless",
                 "CreationDate": {
                     "__class__": "datetime",
@@ -26,6 +104,19 @@
                     "hour": 14,
                     "minute": 4,
                     "second": 47,
+                    "microsecond": 0
+                }
+            },
+            {
+                "Name": "config-bucket-644160558196",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2017,
+                    "month": 9,
+                    "day": 5,
+                    "hour": 17,
+                    "minute": 26,
+                    "second": 39,
                     "microsecond": 0
                 }
             },
