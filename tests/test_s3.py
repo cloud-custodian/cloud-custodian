@@ -23,7 +23,7 @@ from c7n.executor import MainThreadExecutor
 from c7n.resources import s3
 from c7n.mu import LambdaManager
 from c7n.ufuncs import s3crypt
-from c7n.utils import get_account_alias_from_sts
+from c7n.utils import get_account_alias_from_sts, jmespath_search
 
 from .common import (
     BaseTest,
@@ -4014,3 +4014,149 @@ class TestBucketOwnership:
             ]
         }, session_factory=factory)
         test.assertRaises(PolicyExecutionError, p.run)
+
+
+class IntelligentTieringConfiguration(BaseTest):
+
+    def test_set_intelligent_configuration_validation_error(self):
+        self.assertRaises(
+            PolicyValidationError,
+            self.load_policy,
+            {
+                "name": "s3-set-int-tier-config",
+                "resource": "aws.s3",
+                "filters": [{"Name": "example-abc-123"}],
+                "actions": [{"type": "set-intelligent-tiering", "Id": "xyz", "Status": "delete"}],
+            }
+        )
+
+    def test_s3_int_tiering_set_configurations(self):
+        self.patch(s3.S3, "executor_factory", MainThreadExecutor)
+        self.patch(s3, "S3_AUGMENT_TABLE", [])
+        bname = "example-abc-123"
+        session_factory = self.replay_flight_data("test_s3_int_tiering_set_configurations")
+        session = session_factory()
+        client = session.client("s3")
+        configs = client.list_bucket_intelligent_tiering_configurations(Bucket=bname)
+        filtered_config =  {
+            'Id': 'test-config',
+            'Filter': {'And': {'Prefix': 'test', 'Tags': [{'Key': 'Owner', 'Value': 'c7n'}]}},
+            'Status': 'Enabled',
+            'Tierings': [
+                {'Days': 100, 'AccessTier': 'ARCHIVE_ACCESS'}
+            ]
+        }
+        applied_config = {
+            'Id': 'c7n-default',
+            'Filter': {
+                'And': {
+                    'Prefix': 'test',
+                    'Tags': [
+                        {'Key': 'Owner', 'Value': 'c7n'},
+                        {"Key": "AnotherOnwer", "Value": "Enterprise"}]}},
+            'Status': 'Enabled',
+            'Tierings': [
+                {'Days': 150, 'AccessTier': 'ARCHIVE_ACCESS'},
+                {'Days': 200, 'AccessTier': 'DEEP_ARCHIVE_ACCESS'}
+            ]
+        }
+        self.assertTrue(filtered_config in configs.get('IntelligentTieringConfigurationList'))
+        p = self.load_policy(
+            {
+                "name": "s3-filter-configs-and-apply",
+                "resource": "s3",
+                "filters": [
+                    {"Name": bname},
+                    {
+                        "type": "intelligent-tiering",
+                        "attrs": [
+                          {"Status": "Enabled"},
+                          {"Filter": {
+                              "And": {
+                                  "Prefix": "test", "Tags": [{"Key": "Owner", "Value": "c7n"}]}}},
+                          {"Tierings": [{"Days": 100, "AccessTier": "ARCHIVE_ACCESS"}]}]
+                    }
+                ],
+                "actions": [
+                    {
+                        "type": "set-intelligent-tiering",
+                        "Status": "delete",
+                        "Id": "matched",
+                    },
+                    {
+                        "type": "set-intelligent-tiering",
+                        "Id": "c7n-default",
+                        "IntelligentTieringConfiguration": {
+                            "Id": "c7n-default",
+                            "Status": "Enabled",
+                            "Filter": {
+                                "And": {
+                                    "Prefix": "test",
+                                    "Tags": [
+                                        {"Key": "Owner", "Value": "c7n"},
+                                        {"Key": "AnotherOnwer", "Value": "Enterprise"}]}},
+                            "Tierings": [
+                                {
+                                    "Days": 150,
+                                    "AccessTier": "ARCHIVE_ACCESS"
+                                },
+                                {
+                                    "Days": 200,
+                                    "AccessTier": "DEEP_ARCHIVE_ACCESS"
+                                }
+                            ]
+                        }
+                    }],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0].get("c7n:ListItemMatches")[0].get("Id"), "test-config")
+        check_config = client.list_bucket_intelligent_tiering_configurations(Bucket=bname)
+        self.assertFalse(filtered_config in check_config.get('IntelligentTieringConfigurationList'))
+        self.assertTrue(applied_config in check_config.get('IntelligentTieringConfigurationList'))
+
+    def test_s3_int_tiering_delete_configurations_id(self):
+        self.patch(s3.S3, "executor_factory", MainThreadExecutor)
+        self.patch(s3, "S3_AUGMENT_TABLE", [])
+        bname = "example-abc-123"
+        session_factory = self.replay_flight_data("test_s3_int_tiering_delete_configurations_id")
+        session = session_factory()
+        client = session.client("s3")
+        ids = []
+        configs = client.list_bucket_intelligent_tiering_configurations(
+            Bucket=bname).get('IntelligentTieringConfigurationList')
+        self.assertEquals(len(configs), 2)
+        for config in configs:
+            ids.append(jmespath_search("Id", config))
+        self.assertTrue("c7n-default" in ids)
+        p = self.load_policy(
+            {
+                "name": "s3-filter-configs-and-apply",
+                "resource": "s3",
+                "filters": [
+                    {"Name": bname},
+                    {
+                        "type": "intelligent-tiering",
+                        "attrs": [
+                          {"Status": "Enabled"},
+                          {"Id": "c7n-default"}]
+                    }
+                ],
+                "actions": [
+                    {
+                        "type": "set-intelligent-tiering",
+                        "Status": "delete",
+                        "Id": "c7n-default",
+                    }],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0].get("c7n:ListItemMatches")[0].get("Id"), "c7n-default")
+        check_config = client.list_bucket_intelligent_tiering_configurations(
+            Bucket=bname).get('IntelligentTieringConfigurationList')
+        self.assertEquals(len(check_config), 1)
+        self.assertFalse('c7n-default' in check_config[0].get('Id'))
