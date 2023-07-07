@@ -224,7 +224,7 @@ class CloudFunction:
 
     @property
     def runtime(self):
-        return self.func_data.get('runtime', 'python37')
+        return self.func_data.get('runtime', 'python311')
 
     @property
     def labels(self):
@@ -290,13 +290,12 @@ from flask import Request, Response
 
 
 def run(event, context=None):
-    logging.info("starting function execution")
-
     trigger_type = os.environ.get('FUNCTION_TRIGGER_TYPE', '')
 
     if isinstance(event, Request):
         event = event.json
 
+    logging.info("starting function execution trigger:%s", trigger_type)
     if trigger_type in ('HTTP_TRIGGER', 'http',):
         event = {'request': event}
     else:
