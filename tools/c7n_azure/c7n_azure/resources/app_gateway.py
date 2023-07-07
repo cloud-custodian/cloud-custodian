@@ -63,7 +63,7 @@ class ApplicationGatewayWafFilter(Filter):
         required=['override_rule', 'state'],
         **{
             'override_rule': {'type': 'number'},
-            'state': {'type': 'string', 'enum': ['disabled']}}
+            'state': {'type': 'string', 'enum': ['enabled', 'disabled']}}
     )
 
     def process(self, resources, event=None):
@@ -76,20 +76,35 @@ class ApplicationGatewayWafFilter(Filter):
         result = []
 
         for resource in resources:
-            if 'firewallPolicy' not in resource['properties']:
-                continue
+            if 'webApplicationFirewallConfiguration' in resource['properties']:
+                # If WAF configuration is part of the Application
+                # Gateway resource.
+                for disabled_rule_Group in resource['properties']\
+                    ['webApplicationFirewallConfiguration']['disabledRuleGroups']:
+                    if filter_override_rule in disabled_rule_Group['rules'] \
+                        and filter_state == 'disabled':
+                        result.append(resource)
+                    elif filter_override_rule not in disabled_rule_Group['rules'] \
+                        and filter_state == 'enabled':
+                        result.append(resource)
+            elif 'firewallPolicy' in resource['properties']:
+                # If WAF is configured as a separate resource and
+                # associated with the Application Gateway.
+                waf_policy_name = resource['properties']['firewallPolicy']['id']
+                for app_gate_waf in app_gate_wafs:
+                    if app_gate_waf.id != waf_policy_name:
+                        continue
 
-            waf_policy_name = resource['properties']['firewallPolicy']['id']
-            for app_gate_waf in app_gate_wafs:
-                if app_gate_waf.id != waf_policy_name:
-                    continue
-
-                app_gate_waf = app_gate_waf.serialize(True).get('properties', {})
-                for rule_set in app_gate_waf.get('managedRules').get('managedRuleSets'):
-                    for group in rule_set.get('ruleGroupOverrides'):
-                        for rule in group.get('rules'):
-                            if filter_override_rule == int(rule.get('ruleId')) \
-                                and filter_state.lower() == rule.get('state').lower():
-                                result.append(resource)
+                    app_gate_waf = app_gate_waf.serialize(True).get('properties', {})
+                    for rule_set in app_gate_waf.get('managedRules').get('managedRuleSets'):
+                        for group in rule_set.get('ruleGroupOverrides'):
+                            for rule in group.get('rules'):
+                                if filter_override_rule == int(rule.get('ruleId')) \
+                                    and filter_state.lower() == rule.get('state').lower():
+                                    result.append(resource)
+            else:
+                # Application Gateway without any WAF configured
+                if filter_state == 'disabled':
+                    result.append(resource)
 
         return result

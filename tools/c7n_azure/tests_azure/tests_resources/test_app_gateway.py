@@ -1,6 +1,6 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
-from ..azure_common import BaseTest
+from ..azure_common import BaseTest, cassette_name
 
 
 class ApplicationGatewayTest(BaseTest):
@@ -25,7 +25,9 @@ class ApplicationGatewayTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
-    def test_find_waf(self):
+    # @arm_template('vm.json')
+    @cassette_name('test_find_waf')
+    def test_find_waf_disabled_rule(self):
         p = self.load_policy({
             'name': 'test-app-gateway',
             'resource': 'azure.application-gateway',
@@ -35,4 +37,17 @@ class ApplicationGatewayTest(BaseTest):
                  'state': 'disabled'}],
         })
         resources = p.run()
-        self.assertEqual(len(resources), 2)
+        self.assertEqual(len(resources), 4)
+
+    @cassette_name('test_find_waf')
+    def test_find_waf_enabled_rule(self):
+        p = self.load_policy({
+            'name': 'test-app-gateway',
+            'resource': 'azure.application-gateway',
+            'filters': [
+                {'type': 'waf',
+                 'override_rule': 944200,
+                 'state': 'enabled'}],
+        })
+        resources = p.run()
+        self.assertEqual(len(resources), 3)
