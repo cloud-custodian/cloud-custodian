@@ -713,9 +713,12 @@ class AppELBDeleteAction(BaseAction):
                 client.delete_load_balancer, LoadBalancerArn=alb['LoadBalancerArn'])
         except client.exceptions.LoadBalancerNotFoundException:
             pass
-        except client.exceptions.OperationNotPermittedException as e:
+        except (
+            client.exceptions.OperationNotPermittedException,
+            client.exceptions.ResourceInUseException
+        ) as e:
             self.log.warning(
-                "Exception trying to delete ALB: %s error: %s",
+                "Exception trying to delete load balancer: %s error: %s",
                 alb['LoadBalancerArn'], e)
 
 
