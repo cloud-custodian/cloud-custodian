@@ -7,6 +7,7 @@ from pytest_terraform.tf import LazyPluginCacheDir, LazyReplay
 
 from c7n.testing import PyTestUtils, reset_session_cache, C7N_FUNCTIONAL
 from c7n_gcp.client import get_default_project
+from c7n_gcp.region import Region
 
 from gcp_common import GoogleFlightRecorder, PROJECT_ID
 from recorder import sanitize_project_name
@@ -25,6 +26,14 @@ class CustodianGCPTesting(PyTestUtils, GoogleFlightRecorder):
             raise RuntimeError('project_id not available until after '
                                'replay or record flight data is invoked')
         return get_default_project()
+
+
+@pytest.fixture(scope='function')
+def test_regions(request):
+    try:
+        yield Region
+    except Exception:
+        Region.set_regions(None)
 
 
 @pytest.fixture(scope='function')
