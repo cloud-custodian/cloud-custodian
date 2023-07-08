@@ -297,7 +297,7 @@ from flask import Request, Response
 
 log = logging.getLogger('custodian.gcp')
 
-# get log messages to cloud logging, we need structured log puts
+# get messages to cloud logging in structured format so we can filter on severity.
 
 class CloudLoggingFormatter(logging.Formatter):
     '''Produces messages compatible with google cloud logging'''
