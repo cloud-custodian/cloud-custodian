@@ -6,6 +6,7 @@ import pytest
 from pytest_terraform.tf import LazyPluginCacheDir, LazyReplay
 
 from c7n.testing import PyTestUtils, reset_session_cache, C7N_FUNCTIONAL
+from c7n.utils import jmespath_search
 from c7n_gcp.client import get_default_project
 from c7n_gcp.region import Region
 
@@ -34,6 +35,20 @@ def test_regions(request):
         yield Region
     except Exception:
         Region.set_regions(None)
+
+
+class FieldChecker:
+
+    @staticmethod
+    def report_fields(policy, resources):
+        for f in policy.resource_manager.resource_type.default_report_fields:
+            for r in resources:
+                assert jmespath_search(f, r) is not None, f"Invalid Report Field {f}"
+
+
+@pytest.fixture()
+def check_fields(request):
+    yield FieldChecker
 
 
 @pytest.fixture(scope='function')
