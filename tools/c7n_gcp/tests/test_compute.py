@@ -344,6 +344,21 @@ class SnapshotTest(BaseTest):
         )
 
 
+def test_image_refresh(test):
+    factory = test.replay_flight_data('image-refresh', project_id='cloud-custodian')
+    p = test.load_policy(
+        {'name': 'all-images', 'resource': 'gcp.image'},
+        session_factory=factory
+    )
+    client = p.resource_manager.get_client()
+    resource = p.resource_manager.resource_type.refresh(
+        client,
+        {'selfLink': 'https://www.googleapis.com/compute/v1/projects/stacklet-kapilt/global/images/image-1-dev'}
+    )
+    assert resource['labels'] == {'env': 'dev'}
+    assert resource['labelFingerprint'] == "GHZ1Un204L0="
+
+
 class ImageTest(BaseTest):
 
     def test_image_query(self):

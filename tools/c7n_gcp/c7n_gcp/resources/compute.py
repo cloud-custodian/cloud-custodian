@@ -69,7 +69,6 @@ class Instance(QueryResourceManager):
             )
 
 
-
 Instance.filter_registry.register('offhour', OffHour)
 Instance.filter_registry.register('onhour', OnHour)
 
@@ -269,14 +268,14 @@ class Image(QueryResourceManager):
         def get(client, resource_info):
             return client.execute_command(
                 'get', {'project': resource_info['project_id'],
-                        'resourceId': resource_info['image_id']})
+                        'image': resource_info['image_id']})
 
         @staticmethod
         def get_label_params(resource, all_labels):
-            project, resourceId = re.match(
+            project, resource_id = re.match(
                 '.*?/projects/(.*?)/global/images/(.*)',
                 resource['selfLink']).groups()
-            return {'project': project, 'resource': resourceId,
+            return {'project': project, 'resource': resource_id,
                     'body': {
                         'labels': all_labels,
                         'labelFingerprint': resource['labelFingerprint']
@@ -284,14 +283,14 @@ class Image(QueryResourceManager):
 
         @classmethod
         def refresh(cls, client, resource):
-            project_id, resourceId = re.match(
+            project, resource_id = re.match(
                 '.*?/projects/(.*?)/global/images/(.*)',
                 resource['selfLink']).groups()
             return cls.get(
                 client,
                 {
-                    'project_id': project_id,
-                    'image_id': resourceId
+                    'project_id': project,
+                    'image_id': resource_id
                 }
             )
 
