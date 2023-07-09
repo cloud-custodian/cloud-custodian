@@ -195,6 +195,21 @@ class InstanceTest(BaseTest):
         self.assertEqual(len(resources), 1)
 
 
+def test_instance_refresh(test):
+    factory = test.replay_flight_data('instance-refresh', project_id='cloud-custodian')
+    p = test.load_policy(
+        {'name': 'all-instances', 'resource': 'gcp.instance'},
+        session_factory=factory
+    )
+    client = p.resource_manager.get_client()
+    resource = p.resource_manager.resource_type.refresh(
+        client,
+        {'selfLink': "https://www.googleapis.com/compute/v1/projects/stacklet-kapilt/zones/us-central1-a/instances/instance-1"}
+    )
+    assert resource['labels'] == {'env': 'dev'}
+    assert resource['labelFingerprint'] == "GHZ1Un204L0="
+
+
 class DiskTest(BaseTest):
 
     def test_disk_query(self):

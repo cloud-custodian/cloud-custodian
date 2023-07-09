@@ -56,13 +56,13 @@ class Instance(QueryResourceManager):
 
         @classmethod
         def refresh(cls, client, resource):
-            project_id, zone, name = re.match(
+            project, zone, name = re.match(
                 '.*?/projects/(.*?)/zones/(.*?)/instances/(.*)',
                 resource['selfLink']).groups()
             return cls.get(
                 client,
                 {
-                    'project_id': project_id,
+                    'project_id': project,
                     'zone': zone,
                     'resourceName': name
                 }
