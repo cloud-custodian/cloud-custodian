@@ -77,13 +77,9 @@ class MethodAction(Action):
                     client, model, resource, op_name, params, e
                 )
                 # if the error handler recovered it returns a result
-                if result:
-                    pass
-                elif e.resp.status in self.ignore_error_codes:
-                    return e
-                else:
+                if not result:
                     raise
-            if result_key and annotation_key:
+            if result and result_key and annotation_key:
                 resource[annotation_key] = result.get(result_key)
 
     def invoke_api(self, client, op_name, params):
@@ -95,7 +91,8 @@ class MethodAction(Action):
             raise
 
     def handle_resource_error(self, client, model, resource, op_name, params, error):
-        return
+        """ subclasses implement specific error handling 
+        """
 
     def get_permissions(self):
         if self.permissions:
