@@ -590,6 +590,11 @@ class Delete(BaseAction):
             except ClientError as e:
                 if e.response['Error']['Code'] == "InvalidDBInstanceState":
                     continue
+                if e.response['Error']['Code'] == "InvalidParameterValue":
+                    self.log.warning(
+                        "Delete failed, DBInstance %s has invalid parameter value",
+                        db['DBInstanceIdentifier'])
+                    continue
                 raise
 
         return dbs
