@@ -91,7 +91,7 @@ class MethodAction(Action):
             raise
 
     def handle_resource_error(self, client, model, resource, op_name, params, error):
-        """ subclasses implement specific error handling 
+        """ subclasses implement specific error handling
         """
 
     def get_permissions(self):
