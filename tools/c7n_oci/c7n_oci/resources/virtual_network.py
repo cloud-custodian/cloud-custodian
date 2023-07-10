@@ -12,7 +12,6 @@ from c7n.utils import type_schema
 from c7n_oci.actions.base import OCIBaseAction, RemoveTagBaseAction
 from c7n_oci.provider import resources
 from c7n_oci.query import QueryResourceManager
-from c7n_oci.constants import Service, Client
 
 log = logging.getLogger("custodian.oci.resources.virtual_network")
 
@@ -35,8 +34,8 @@ class Cross_connect(QueryResourceManager):
 
     class resource_type:
         doc_groups = ["Network"]
-        service = Service.CORE.value
-        client = Client.VIRTUAL_NETWORK.value
+        service = "oci.core"
+        client = "VirtualNetworkClient"
         enum_spec = ("list_cross_connects", "items[]", None)
         extra_params = {"compartment_id"}
         resource_type = "OCI.VirtualNetwork/Cross_connect"
@@ -161,8 +160,8 @@ class Vcn(QueryResourceManager):
 
     class resource_type:
         doc_groups = ["Network"]
-        service = Service.CORE.value
-        client = Client.VIRTUAL_NETWORK.value
+        service = "oci.core"
+        client = "VirtualNetworkClient"
         enum_spec = ("list_vcns", "items[]", None)
         extra_params = {"compartment_id"}
         resource_type = "OCI.VirtualNetwork/Vcn"
@@ -278,8 +277,8 @@ class Subnet(QueryResourceManager):
 
     class resource_type:
         doc_groups = ["Network"]
-        service = Service.CORE.value
-        client = Client.VIRTUAL_NETWORK.value
+        service = "oci.core"
+        client = "VirtualNetworkClient"
         enum_spec = ("list_subnets", "items[]", None)
         extra_params = {"compartment_id"}
         resource_type = "OCI.VirtualNetwork/Subnet"

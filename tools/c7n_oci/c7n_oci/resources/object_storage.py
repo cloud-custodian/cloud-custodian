@@ -13,7 +13,6 @@ from c7n_oci.actions.base import OCIBaseAction, RemoveTagBaseAction
 from c7n_oci.provider import resources
 from c7n_oci.query import QueryResourceManager
 from c7n_oci.constants import STORAGE_NAMESPACE
-from c7n_oci.constants import Service, Client
 
 log = logging.getLogger("custodian.oci.resources.object_storage")
 
@@ -36,8 +35,8 @@ class Bucket(QueryResourceManager):
 
     class resource_type:
         doc_groups = ["ObjectStorage"]
-        service = Service.OBJECT_STORAGE.value
-        client = Client.OBJECT_STORAGE.value
+        service = "oci.object_storage"
+        client = "ObjectStorageClient"
         enum_spec = ("list_buckets", "items[]", {"fields": ["tags"]})
         extra_params = {"compartment_id", "namespace_name"}
         resource_type = "OCI.ObjectStorage/Bucket"

@@ -12,7 +12,6 @@ from c7n.utils import type_schema
 from c7n_oci.actions.base import OCIBaseAction, RemoveTagBaseAction
 from c7n_oci.provider import resources
 from c7n_oci.query import QueryResourceManager
-from c7n_oci.constants import Service, Client
 
 log = logging.getLogger("custodian.oci.resources.compute")
 
@@ -35,8 +34,8 @@ class Instance(QueryResourceManager):
 
     class resource_type:
         doc_groups = ["Compute"]
-        service = Service.CORE.value
-        client = Client.COMPUTE.value
+        service = "oci.core"
+        client = "ComputeClient"
         enum_spec = ("list_instances", "items[]", None)
         extra_params = {"compartment_id", "instance_id"}
         resource_type = "OCI.Compute/Instance"
@@ -76,9 +75,7 @@ class InstanceMonitoring(Filter):
             query=self.data.get("query"),
             namespace="oci_computeagent",
         )
-        monitoring_client = self.manager.get_session().client(
-            f"{Service.MONITORING.value}.{Client.MONITORING.value}"
-        )
+        monitoring_client = self.manager.get_session().client("oci.monitoring.MonitoringClient")
         comp_resources = {}
         result = []
         for resource in resources:

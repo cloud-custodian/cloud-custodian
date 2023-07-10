@@ -12,7 +12,6 @@ from c7n.utils import type_schema
 from c7n_oci.actions.base import OCIBaseAction, RemoveTagBaseAction
 from c7n_oci.provider import resources
 from c7n_oci.query import QueryResourceManager
-from c7n_oci.constants import Service, Client
 
 log = logging.getLogger("custodian.oci.resources.identity")
 
@@ -35,8 +34,8 @@ class Compartment(QueryResourceManager):
 
     class resource_type:
         doc_groups = ["Identity"]
-        service = Service.IDENTITY.value
-        client = Client.IDENTITY.value
+        service = "oci.identity"
+        client = "IdentityClient"
         enum_spec = ("list_compartments", "items[]", None)
         extra_params = {"compartment_id"}
         resource_type = "OCI.Identity/Compartment"
@@ -161,8 +160,8 @@ class Group(QueryResourceManager):
 
     class resource_type:
         doc_groups = ["Identity"]
-        service = Service.IDENTITY.value
-        client = Client.IDENTITY.value
+        service = "oci.identity"
+        client = "IdentityClient"
         enum_spec = ("list_groups", "items[]", None)
         extra_params = {"compartment_id"}
         resource_type = "OCI.Identity/Group"
@@ -279,8 +278,8 @@ class User(QueryResourceManager):
 
     class resource_type:
         doc_groups = ["Identity"]
-        service = Service.IDENTITY.value
-        client = Client.IDENTITY.value
+        service = "oci.identity"
+        client = "IdentityClient"
         enum_spec = ("list_users", "items[]", None)
         extra_params = {"compartment_id"}
         resource_type = "OCI.Identity/User"

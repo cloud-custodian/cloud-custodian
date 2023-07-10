@@ -4,7 +4,7 @@ import os
 from distutils.util import strtobool
 
 import pytest
-from oci_common import Scope, replace_email, replace_namespace, replace_ocid
+from oci_common import replace_email, replace_namespace, replace_ocid
 from pytest_terraform import tf
 
 from c7n.config import Config
@@ -20,13 +20,13 @@ class CustodianOCITesting(PyTestUtils, OCIFlightRecorder):
     """Pytest OCI Testing Fixture"""
 
 
-@pytest.fixture(scope=Scope.FUNCTION.value)
+@pytest.fixture(scope="function")
 def test(request):
     test_utils = CustodianOCITesting(request)
     return test_utils
 
 
-@pytest.fixture(scope=Scope.SESSION.value, autouse=True)
+@pytest.fixture(scope="session", autouse=True)
 def setup(request):
     oci_provider = OCI()
     oci_provider.initialize(Config.empty())
