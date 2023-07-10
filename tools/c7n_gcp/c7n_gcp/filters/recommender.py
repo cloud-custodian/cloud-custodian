@@ -100,8 +100,7 @@ class RecommenderFilter(Filter):
                 f"projects/{project}/locations/{r}/recommenders/{self.rec_info['id']}"
             )
             for page in client.execute_paged_query("list", {"parent": parent}):
-                if (len(page) > 0):
-                    recommends.extend(page['recommendations'])
+                recommends.extend(page.get('recommendations', []))
         return recommends
 
     def match_resources(self, recommends, resources):
