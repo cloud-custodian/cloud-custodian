@@ -26,7 +26,7 @@ def test(request):
     return test_utils
 
 
-@pytest.fixture(scope="session", autouse=True)
+@pytest.fixture(scope="module")
 def setup(request):
     try:
         oci_provider = OCI()
