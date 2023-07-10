@@ -75,6 +75,10 @@ addopts = "--tb=native"
 markers = ["functional", "skiplive", "audited"]
 python_files = "test_*.py"
 norecursedirs = ["data", "cassettes", "templates", "terraform"]
+filterwarnings = [
+    "ignore::DeprecationWarning",
+    "ignore::PendingDeprecationWarning"
+]
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
