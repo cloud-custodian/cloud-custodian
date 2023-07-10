@@ -28,10 +28,12 @@ def test(request):
 
 @pytest.fixture(scope="session", autouse=True)
 def setup(request):
-    oci_provider = OCI()
-    oci_provider.initialize(Config.empty())
-    yield
-    reset_session_cache()
+    try:
+        oci_provider = OCI()
+        oci_provider.initialize(Config.empty())
+        yield
+    finally:
+        reset_session_cache()
 
 
 @pytest.fixture(params=["WithCompartment", "WithoutCompartment"])
