@@ -2886,7 +2886,7 @@ class ConfigureIntelligentTiering(BucketActionBase):
                 actions:
                   - type: set-intelligent-tiering
                     Id: test-config
-                    Status: delete
+                    State: delete
 
               - name: s3-delete-intelligent-tiering-matched-configs
                 resource: aws.s3
@@ -2898,7 +2898,7 @@ class ConfigureIntelligentTiering(BucketActionBase):
                 actions:
                   - type: set-intelligent-tiering
                     Id: matched
-                    Status: delete
+                    State: delete
 
     """
 
