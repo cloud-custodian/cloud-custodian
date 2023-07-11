@@ -13,7 +13,12 @@ class PatchDeployment(QueryResourceManager):
         component = 'projects.patchDeployments'
         enum_spec = ('list', 'patchDeployments[]', None)
         scope_key = 'parent'
-        name = id = 'id'
+        name = id = 'name'
         scope_template = 'projects/{}'
-        default_report_fields = ['displayName', 'expireTime']
+        default_report_fields = ['name', 'description', 'createTime', 'state', 'rollout.mode']
         asset_type = 'osconfig.googleapis.com/PatchDeployment'
+        urn_component = "patchDeployment"
+        urn_id_path = "name"
+        urn_id_segments = (-1,)
+
+

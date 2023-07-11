@@ -15,3 +15,8 @@ class PatchDeploymentTest(BaseTest):
 
         self.assertTrue(len(resources), 1)
         self.assertEqual(resources[0]['name'], 'projects/cloud-custodian/patchDeployments/test')
+
+        assert p.resource_manager.get_urns(resources) == [
+            "gcp:osconfig::cloud-custodian:patchDeployment/test"
+        ]
+
