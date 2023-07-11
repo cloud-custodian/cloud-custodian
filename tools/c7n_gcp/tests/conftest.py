@@ -29,26 +29,15 @@ class CustodianGCPTesting(PyTestUtils, GoogleFlightRecorder):
         return get_default_project()
 
 
-@pytest.fixture(scope='function')
-def test_regions(request):
-    try:
-        yield Region
-    except Exception:
-        Region.set_regions(None)
-
-
-class FieldChecker:
-
     @staticmethod
-    def report_fields(policy, resources):
+    def check_report_fields(policy, resources):
         for f in policy.resource_manager.resource_type.default_report_fields:
             for r in resources:
                 assert jmespath_search(f, r) is not None, f"Invalid Report Field {f}"
 
-
-@pytest.fixture()
-def check_fields(request):
-    yield FieldChecker
+    def set_regions(self, regions):
+        Region.set_regions(regions)
+        self.addCleanup(Region.set_regions, None)
 
 
 @pytest.fixture(scope='function')
