@@ -47,6 +47,7 @@ docs/source/*/resources
 docs/source/tools/assets/
 .tfcache
 .env
+.venv
 .python-version
 # files generated during "make test"
 label-pod
