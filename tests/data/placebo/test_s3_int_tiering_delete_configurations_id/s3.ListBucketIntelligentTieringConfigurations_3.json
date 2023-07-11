@@ -9,7 +9,7 @@
                 "Status": "Enabled",
                 "Tierings": [
                     {
-                        "Days": 149,
+                        "Days": 105,
                         "AccessTier": "ARCHIVE_ACCESS"
                     }
                 ]

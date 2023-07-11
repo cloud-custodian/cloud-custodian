@@ -54,6 +54,7 @@ from c7n.exceptions import PolicyValidationError, PolicyExecutionError
 from c7n.filters import (
     FilterRegistry, Filter, CrossAccountAccessFilter, MetricsFilter,
     ValueFilter, ListItemFilter)
+from .aws import shape_validate
 import c7n.filters.policystatement as polstmt_filter
 from c7n.manager import resources
 from c7n.output import NullBlobOutput
@@ -2902,78 +2903,19 @@ class ConfigureIntelligentTiering(BucketActionBase):
     """
 
     annotation_key = 'c7n:ListItemMatches'
+    shape = 'PutBucketIntelligentTieringConfigurationRequest'
     schema = {
         'type': 'object',
         'additionalProperties': False,
         'oneOf': [
             {'required': ['type', 'Id', 'IntelligentTieringConfiguration']},
-            {'required': ['type', 'Id', 'Status']}],
+            {'required': ['type', 'Id', 'State']}],
         'properties': {
             'type': {'enum': ['set-intelligent-tiering']},
             'Id': {'type': 'string'},
-            # delete intelligent tier configurations via status: delete
-            'Status': {'type': 'string', 'enum': ['delete']},
-            'IntelligentTieringConfiguration': {
-                'type': 'object',
-                'items': {
-                    'type': 'object',
-                    'required': ['ID', 'Status', 'Tierings'],
-                    'additionalProperties': False,
-                    'properties': {
-                        'Id': {'type': 'string'},
-                        'Status': {'enum': ['Enabled', 'Disabled']},
-                        'Filter': {
-                            'type': 'object',
-                            'minProperties': 1,
-                            'maxProperties': 1,
-                            'additionalProperties': False,
-                            'properties': {
-                                'Prefix': {'type': 'string'},
-                                'Tag': {
-                                    'type': 'object',
-                                    'required': ['Key', 'Value'],
-                                    'additionalProperties': False,
-                                    'properties': {
-                                        'Key': {'type': 'string'},
-                                        'Value': {'type': 'string'},
-                                    },
-                                },
-                                'And': {
-                                    'type': 'object',
-                                    'additionalProperties': False,
-                                    'properties': {
-                                        'Prefix': {'type': 'string'},
-                                        'Tags': {
-                                            'type': 'array',
-                                            'items': {
-                                                'type': 'object',
-                                                'required': ['Key', 'Value'],
-                                                'additionalProperties': False,
-                                                'properties': {
-                                                    'Key': {'type': 'string'},
-                                                    'Value': {'type': 'string'},
-                                                },
-                                            },
-                                        },
-                                    },
-                                },
-                            },
-                        },
-                        'Tierings': {
-                            'type': 'array',
-                            'items': {
-                                'type': 'object',
-                                'additionalProperties': False,
-                                'properties': {
-                                    'Days': {'type': 'integer'},
-                                    'AccessTier': {'type': 'string', 'enum': [
-                                        'ARCHIVE_ACCESS', 'DEEP_ARCHIVE_ACCESS']},
-                                },
-                            },
-                        },
-                    },
-                },
-            },
+            # delete intelligent tier configurations via state: delete
+            'State': {'type': 'string', 'enum': ['delete']},
+            'IntelligentTieringConfiguration': {'type': 'object'}
         },
     }
 
@@ -2982,17 +2924,25 @@ class ConfigureIntelligentTiering(BucketActionBase):
     def validate(self):
         # You can have up to 1,000 S3 Intelligent-Tiering configurations per bucket.
         # Hence, always use it with a filter
+        found = False
         for f in self.manager.iter_filters():
             if isinstance(f, IntelligentTiering):
-                return self
-        raise PolicyValidationError(
-            '`set-intelligent-tiering` may only be used in '
-            'conjunction with `intelligent-tiering` filter on %s' % (self.manager.data,))
+                found = True
+                break
+        if not found:
+            raise PolicyValidationError(
+                '`set-intelligent-tiering` may only be used in '
+                'conjunction with `intelligent-tiering` filter on %s' % (self.manager.data,))
+        cfg = dict(self.data)
+        if 'IntelligentTieringConfiguration' in cfg:
+            cfg['Bucket'] = 'bucket'
+            cfg.pop('type')
+            return shape_validate(
+                cfg, self.shape, self.manager.resource_type.service)
 
     def process(self, buckets):
         with self.executor_factory(max_workers=3) as w:
             futures = {}
-            results = []
 
             for b in buckets:
                 futures[w.submit(self.process_bucket, b)] = b
@@ -3000,11 +2950,10 @@ class ConfigureIntelligentTiering(BucketActionBase):
             for future in as_completed(futures):
                 if future.exception():
                     bucket = futures[future]
-                    self.log.error('error modifying bucket lifecycle: %s\n%s',
-                                   bucket['Name'], future.exception())
-                results += filter(None, [future.result()])
-
-            return results
+                    self.log.error(
+                      'error modifying bucket intelligent tiering configuration: %s\n%s',
+                        bucket['Name'], future.exception())
+                    continue
 
     def process_bucket(self, bucket):
         s3 = bucket_client(local_session(self.manager.session_factory), bucket)
@@ -3023,12 +2972,15 @@ class ConfigureIntelligentTiering(BucketActionBase):
                         'IntelligentTieringConfiguration'))
             except ClientError as e:
                 if e.response['Error']['Code'] == 'AccessDenied':
-                    log.warning("Access Denied Bucket:%s while applying lifecycle" % bucket['Name'])
-        if self.data.get('Status'):
+                    log.warning(
+                        "Access Denied Bucket:%s while applying intelligent tiering configuration"
+                          % bucket['Name'])
+        if self.data.get('State'):
             if self.data.get('Id') == 'matched':
                 for config in bucket.get(self.annotation_key):
                     self.delete_intelligent_tiering_configurations(s3, config.get('Id'), bucket)
-            self.delete_intelligent_tiering_configurations(s3, self.data.get('Id'), bucket)
+            else:
+                self.delete_intelligent_tiering_configurations(s3, self.data.get('Id'), bucket)
 
     def delete_intelligent_tiering_configurations(self, s3_client, id, bucket):
         try:
@@ -3036,11 +2988,11 @@ class ConfigureIntelligentTiering(BucketActionBase):
         except ClientError as e:
             if e.response['Error']['Code'] == 'AccessDenied':
                 log.warning(
-                    "Access Denied Bucket:%s while applying intelligent tiering configurations"
+                    "Access Denied Bucket:%s while applying intelligent tiering configuration"
                       % bucket['Name'])
             elif e.response['Error']['Code'] == 'NoSuchConfiguration':
                 log.warning(
-                  "No such configuration found:%s while deleting intelligent tiering configurations"
+                  "No such configuration found:%s while deleting intelligent tiering configuration"
                     % bucket['Name'])
 
 

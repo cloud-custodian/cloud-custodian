@@ -4080,7 +4080,7 @@ class IntelligentTieringConfiguration(BaseTest):
                 "actions": [
                     {
                         "type": "set-intelligent-tiering",
-                        "Status": "delete",
+                        "State": "delete",
                         "Id": "matched",
                     },
                     {
@@ -4149,7 +4149,7 @@ class IntelligentTieringConfiguration(BaseTest):
                 "actions": [
                     {
                         "type": "set-intelligent-tiering",
-                        "Status": "delete",
+                        "State": "delete",
                         "Id": "c7n-default",
                     }],
             },
