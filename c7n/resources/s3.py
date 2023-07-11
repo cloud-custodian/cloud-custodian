@@ -2825,12 +2825,11 @@ class IntelligentTiering(ListItemFilter):
                 b[self.annotation_key] = int_tier_config.get(
                     'IntelligentTieringConfigurationList', [])
             except ClientError as e:
-                if e.response['Error']['Code'] != 'AccessDenied':
-                    method = 'list_bucket_intelligent_tiering_configuration'
+                if e.response['Error']['Code'] == 'AccessDenied':
+                    method = 'list_bucket_intelligent_tiering_configurations'
                     log.warning(
                         "Bucket:%s unable to invoke method:%s error:%s ",
-                        b['Name'], method, e.response['Error']['Message']
-                    )
+                          b['Name'], method, e.response['Error']['Message'])
                     b.setdefault('c7n:DeniedMethods', []).append(method)
         return b.get(self.annotation_key)
 
