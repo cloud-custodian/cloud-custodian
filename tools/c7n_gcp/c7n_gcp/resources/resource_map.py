@@ -1,6 +1,7 @@
 # Copyright The Cloud Custodian Authors.
 ResourceMap = {
     "gcp.api-key": "c7n_gcp.resources.iam.ApiKey",
+    "gcp.armor-policy": "c7n_gcp.resources.armor.SecurityPolicy",    
     "gcp.app-engine": "c7n_gcp.resources.appengine.AppEngineApp",
     "gcp.app-engine-certificate": "c7n_gcp.resources.appengine.AppEngineCertificate",
     "gcp.app-engine-domain": "c7n_gcp.resources.appengine.AppEngineDomain",
@@ -92,7 +93,6 @@ ResourceMap = {
     "gcp.region": "c7n_gcp.region.Region",
     "gcp.route": "c7n_gcp.resources.network.Route",
     "gcp.router": "c7n_gcp.resources.network.Router",
-    "gcp.security-policy": "c7n_gcp.resources.armor.SecurityPolicy",
     "gcp.service": "c7n_gcp.resources.service.Service",
     "gcp.service-account": "c7n_gcp.resources.iam.ServiceAccount",
     "gcp.service-account-key": "c7n_gcp.resources.iam.ServiceAccountKey",
