@@ -1,6 +1,7 @@
 # Copyright The Cloud Custodian Authors.
 ResourceMap = {
     "gcp.api-key": "c7n_gcp.resources.iam.ApiKey",
+    "gcp.armor-policy": "c7n_gcp.resources.armor.SecurityPolicy",
     "gcp.app-engine": "c7n_gcp.resources.appengine.AppEngineApp",
     "gcp.app-engine-certificate": "c7n_gcp.resources.appengine.AppEngineCertificate",
     "gcp.app-engine-domain": "c7n_gcp.resources.appengine.AppEngineDomain",
@@ -28,6 +29,7 @@ ResourceMap = {
     "gcp.compute-project": "c7n_gcp.resources.compute.Project",
     "gcp.dataflow-job": "c7n_gcp.resources.dataflow.DataflowJob",
     "gcp.datafusion-instance": "c7n_gcp.resources.datafusion.DatafusionInstance",
+    "gcp.dataproc-clusters": "c7n_gcp.resources.dataproc.DataprocClusters",
     "gcp.disk": "c7n_gcp.resources.compute.Disk",
     "gcp.dm-deployment": "c7n_gcp.resources.deploymentmanager.DMDeployment",
     "gcp.dns-managed-zone": "c7n_gcp.resources.dns.DnsManagedZone",

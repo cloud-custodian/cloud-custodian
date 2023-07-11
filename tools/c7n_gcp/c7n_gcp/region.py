@@ -23,14 +23,27 @@ class Region:
     filter_registry = {}
     action_registry = {}
 
+    # allow tests to statically set to known regions
+    _static_regions = None
+
     def __init__(self, ctx=None, data=()):
         self.ctx = ctx
         self.data = data
+        if self._static_regions:
+            self.regions = list(self._static_regions)
+            return
         with open(REGION_DATA_PATH) as fh:
             self.regions = json.load(fh)
 
     def get_permissions(self):
         return ()
+
+    @classmethod
+    def set_regions(cls, regions):
+        # test helper
+        if isinstance(regions, str):
+            regions = (regions,)
+        cls._static_regions = regions
 
     def resources(self, resource_ids=()):
         if resource_ids:
