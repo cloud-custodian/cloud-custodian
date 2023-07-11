@@ -2812,8 +2812,7 @@ class IntelligentTiering(ListItemFilter):
             for future in as_completed(futures):
                 b = futures[future]
                 if future.exception():
-                    self.log.error("Message: %s Bucket: %s", future.exception(),
-                                   b['Name'])
+                    self.log.error("Message: %s Bucket: %s", future.exception(), b['Name'])
                     continue
         return super().process(buckets, event)
 
