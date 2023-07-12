@@ -196,6 +196,7 @@ class FunctionTest(BaseTest):
             'resource': 'gcp.instance',
             'mode': {
                 'type': 'gcp-periodic',
+                'environment': {'Env': 'Dev'},
                 'schedule': 'every 2 hours',
                 'service-account': 'foo'}},
             session_factory=factory)
