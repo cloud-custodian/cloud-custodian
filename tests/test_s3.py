@@ -4320,7 +4320,8 @@ class IntelligentTieringConfiguration(BaseTest):
               e.exception))
 
     def test_s3_list_tiering_config_denied_method(self):
-        b = {'Name': 'example-abc-123', 'c7n:DeniedMethods': ['list_bucket_intelligent_tiering_configurations']}
+        b = {'Name': 'example-abc-123',
+            'c7n:DeniedMethods': ['list_bucket_intelligent_tiering_configurations']}
         log_output = self.capture_logging('custodian.s3', level=logging.WARNING)
         p = self.load_policy({'name': 's3-apply-int-tier-config-filter',
                 'resource': 'aws.s3',
