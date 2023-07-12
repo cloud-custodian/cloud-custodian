@@ -4320,15 +4320,16 @@ class IntelligentTieringConfiguration(BaseTest):
               e.exception))
 
     def test_s3_list_tiering_config_denied_method(self):
-        b = {'Name': 'example-abc-123'}
+        b = {'Name': 'example-abc-123', 'c7n:DeniedMethods': ['list_bucket_intelligent_tiering_configurations']}
+        log_output = self.capture_logging('custodian.s3', level=logging.WARNING)
         p = self.load_policy({'name': 's3-apply-int-tier-config-filter',
                 'resource': 'aws.s3',
-                'filters': [{'type': 'intelligent-tiering'}]
+                'filters': [{'type': 'intelligent-tiering'}],
+                'actions': [{'type': 'set-intelligent-tiering', 'Id': 'test', 'State': 'delete'}]
             },
         )
-        filter_config = p.resource_manager.filters[0]
-        filter_config.get_item_values(b)
-        bucket = b.copy()
-        self.assertTrue('c7n:DeniedMethods' in bucket)
-        self.assertEqual(['list_bucket_intelligent_tiering_configurations'], bucket.get(
-            'c7n:DeniedMethods'))
+        action_set_config = p.resource_manager.actions[0]
+        self.assertEqual(action_set_config.process_bucket(b), None)
+        self.assertIn(
+          'Access Denied Bucket:example-abc-123 while reading intelligent tiering configurations',
+            log_output.getvalue())
