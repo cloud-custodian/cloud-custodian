@@ -4238,6 +4238,40 @@ class IntelligentTieringConfiguration(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertIn(
+          'Access Denied Bucket:example-abc-123 while deleting intelligent tiering configuration',
+            log_output.getvalue())
+
+        p1 = self.load_policy(
+            {
+                "name": "s3-filter-configs-and-apply",
+                "resource": "s3",
+                "filters": [
+                    {"Name": bname},
+                    {"type": "intelligent-tiering"}],
+                "actions": [
+                    {
+                        "type": "set-intelligent-tiering",
+                        "Id": "not-present",
+                        "IntelligentTieringConfiguration": {
+                        "Id": "not-present",
+                        "Status": "Enabled",
+                        "Filter": {
+                            "And": {
+                                "Prefix": "test",
+                                "Tags": [
+                                    {"Key": "Owner", "Value": "c7n"}]}},
+                            "Tierings": [{
+                                    "Days": 150,
+                                    "AccessTier": "ARCHIVE_ACCESS"
+                                }],
+                        }
+                    }],
+            },
+            session_factory=session_factory,
+        )
+        resources = p1.run()
+        self.assertEqual(len(resources), 1)
+        self.assertIn(
           'Access Denied Bucket:example-abc-123 while applying intelligent tiering configuration',
             log_output.getvalue())
 
@@ -4264,3 +4298,23 @@ class IntelligentTieringConfiguration(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(len(resources[0]["c7n:IntelligentTiering"]), 2)
+
+    def test_set_intelligent_configuration_schema_validation(self):
+        with self.assertRaises(PolicyValidationError) as e:
+            self.load_policy({
+                'name': 's3-apply-int-tier-config',
+                'resource': 'aws.s3',
+                'filters': [{'type': 'intelligent-tiering'}],
+                'actions': [
+                    {
+                        'type': 'set-intelligent-tiering',
+                        'Id': 'xyz',
+                        'IntelligentTieringConfiguration': {
+                          'Id': 'xyz',
+                          'Status': 'Enabled'}
+                    }
+                ]
+            })
+        self.assertIn(
+            'Missing required parameter in IntelligentTieringConfiguration: "Tierings"', str(
+              e.exception))

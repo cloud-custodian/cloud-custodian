@@ -2986,7 +2986,7 @@ class ConfigureIntelligentTiering(BucketActionBase):
         except ClientError as e:
             if e.response['Error']['Code'] == 'AccessDenied':
                 log.warning(
-                    "Access Denied Bucket:%s while applying intelligent tiering configuration"
+                    "Access Denied Bucket:%s while deleting intelligent tiering configuration"
                       % bucket['Name'])
             elif e.response['Error']['Code'] == 'NoSuchConfiguration':
                 log.warning(
