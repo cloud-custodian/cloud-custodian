@@ -4318,3 +4318,16 @@ class IntelligentTieringConfiguration(BaseTest):
         self.assertIn(
             'Missing required parameter in IntelligentTieringConfiguration: "Tierings"', str(
               e.exception))
+
+    def test_s3_list_tiering_config_denied_method(self):
+        b = {'Name': 'example-abc-123'}
+        p = self.load_policy({'name': 's3-apply-int-tier-config-filter',
+                'resource': 'aws.s3',
+                'filters': [{'type': 'intelligent-tiering'}]
+            },
+        )
+        filter_config = p.resource_manager.filters[0]
+        filter_config.get_item_values(b)
+        self.assertTrue('c7n:DeniedMethods' in b)
+        self.assertEqual(['list_bucket_intelligent_tiering_configurations'], b.get(
+            'c7n:DeniedMethods'))
