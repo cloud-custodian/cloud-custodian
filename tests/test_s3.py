@@ -3,6 +3,7 @@
 import datetime
 import functools
 import json
+import logging
 import os
 import io
 import shutil
@@ -4201,3 +4202,31 @@ class IntelligentTieringConfiguration(BaseTest):
             Bucket=bname).get('IntelligentTieringConfigurationList')
         self.assertEquals(len(check_config), 1)
         self.assertTrue('present' in check_config[0].get('Id'))
+
+    def test_s3_intel_tier_config_access_denied(self):
+        self.patch(s3.S3, "executor_factory", MainThreadExecutor)
+        self.patch(s3, "S3_AUGMENT_TABLE", [])
+        bname = "example-abc-123"
+        session_factory = self.replay_flight_data("test_s3_intel_tier_config_access_denied")
+        log_output = self.capture_logging('custodian.s3', level=logging.WARNING)
+        p = self.load_policy(
+            {
+                "name": "s3-filter-configs-and-apply",
+                "resource": "s3",
+                "filters": [
+                    {"Name": bname},
+                    {"type": "intelligent-tiering"}],
+                "actions": [
+                    {
+                        "type": "set-intelligent-tiering",
+                        "State": "delete",
+                        "Id": "not-present",
+                    }],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertIn(
+          'Access Denied Bucket:example-abc-123 while applying intelligent tiering configuration',
+            log_output.getvalue())
