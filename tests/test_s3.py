@@ -4204,7 +4204,8 @@ class IntelligentTieringConfiguration(BaseTest):
         self.assertEquals(len(check_config), 1)
         self.assertTrue('present' in check_config[0].get('Id'))
         self.assertIn(
-          'No such configuration found:example-abc-123 while deleting intelligent tiering configuration',
+          'No such configuration found:example-abc-123 while deleting '
+          'intelligent tiering configuration',
             log_output.getvalue())
 
     def test_s3_intel_tier_config_access_denied(self):
