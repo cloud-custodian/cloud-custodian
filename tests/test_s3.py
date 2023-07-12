@@ -4328,6 +4328,7 @@ class IntelligentTieringConfiguration(BaseTest):
         )
         filter_config = p.resource_manager.filters[0]
         filter_config.get_item_values(b)
-        self.assertTrue('c7n:DeniedMethods' in b)
-        self.assertEqual(['list_bucket_intelligent_tiering_configurations'], b.get(
+        bucket = b.copy()
+        self.assertTrue('c7n:DeniedMethods' in bucket)
+        self.assertEqual(['list_bucket_intelligent_tiering_configurations'], bucket.get(
             'c7n:DeniedMethods'))
