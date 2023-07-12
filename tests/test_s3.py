@@ -4020,16 +4020,14 @@ class TestBucketOwnership:
 class IntelligentTieringConfiguration(BaseTest):
 
     def test_set_intelligent_configuration_validation_error(self):
-        self.assertRaises(
-            PolicyValidationError,
-            self.load_policy,
-            {
-                "name": "s3-set-int-tier-config",
-                "resource": "aws.s3",
-                "filters": [{"Name": "example-abc-123"}],
-                "actions": [{"type": "set-intelligent-tiering", "Id": "xyz", "Status": "delete"}],
-            }
-        )
+        with self.assertRaises(PolicyValidationError) as e:
+            self.load_policy({
+                'name': 's3-apply-int-tier-config',
+                'resource': 'aws.s3',
+                'actions': [{'type': 'set-intelligent-tiering'}]})
+        self.assertIn(
+            "may only be used in conjunction with `intelligent-tiering`", str(e.exception))
+
 
     def test_s3_int_tiering_set_configurations(self):
         self.patch(s3.S3, "executor_factory", MainThreadExecutor)
@@ -4235,3 +4233,27 @@ class IntelligentTieringConfiguration(BaseTest):
         self.assertIn(
           'Access Denied Bucket:example-abc-123 while applying intelligent tiering configuration',
             log_output.getvalue())
+
+    def test_s3_intel_tier_config_filter_count(self):
+        self.patch(s3.S3, "executor_factory", MainThreadExecutor)
+        self.patch(s3, "S3_AUGMENT_TABLE", [])
+        bname = "example-abc-123"
+        session_factory = self.replay_flight_data("test_s3_intel_tier_config_filter_count")
+        p = self.load_policy(
+            {
+                "name": "s3-filter-configs-and-apply",
+                "resource": "s3",
+                "filters": [
+                    {"Name": bname},
+                    {
+                        "type": "intelligent-tiering",
+                        "count": 2,
+                        "count_op": "eq"
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(len(resources[0]["c7n:IntelligentTiering"]), 2)
