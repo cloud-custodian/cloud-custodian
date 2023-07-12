@@ -4176,6 +4176,7 @@ class IntelligentTieringConfiguration(BaseTest):
         self.assertEquals(len(config), 1)
         id = config[0].get('Id')
         self.assertTrue("present" in id)
+        log_output = self.capture_logging('custodian.s3', level=logging.WARNING)
         p = self.load_policy(
             {
                 "name": "s3-filter-configs-and-apply",
@@ -4202,6 +4203,9 @@ class IntelligentTieringConfiguration(BaseTest):
             Bucket=bname).get('IntelligentTieringConfigurationList')
         self.assertEquals(len(check_config), 1)
         self.assertTrue('present' in check_config[0].get('Id'))
+        self.assertIn(
+          'No such configuration found:example-abc-123 while deleting intelligent tiering configuration',
+            log_output.getvalue())
 
     def test_s3_intel_tier_config_access_denied(self):
         self.patch(s3.S3, "executor_factory", MainThreadExecutor)
