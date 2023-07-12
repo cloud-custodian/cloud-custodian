@@ -4024,7 +4024,14 @@ class IntelligentTieringConfiguration(BaseTest):
             self.load_policy({
                 'name': 's3-apply-int-tier-config',
                 'resource': 'aws.s3',
-                'actions': [{'type': 'set-intelligent-tiering'}]})
+                'actions': [
+                    {
+                        'type': 'set-intelligent-tiering',
+                        'Id': 'xyz',
+                        'State': 'delete'
+                    }
+                ]
+            })
         self.assertIn(
             "may only be used in conjunction with `intelligent-tiering`", str(e.exception))
 
