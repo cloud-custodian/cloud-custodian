@@ -2218,7 +2218,7 @@ class LaunchTemplate(query.QueryResourceManager):
         filter_name = 'LaunchTemplateIds'
         filter_type = 'list'
         arn_type = "launch-template"
-        cfn_type = config_type = "AWS::EC2::LaunchTemplate"
+        cfn_type = "AWS::EC2::LaunchTemplate"
 
     def augment(self, resources):
         client = utils.local_session(
