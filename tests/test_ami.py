@@ -398,12 +398,10 @@ class TestAMI(BaseTest):
             {
                 "name": "test-cancel-launch-permissions",
                 "resource": "ami",
-		"actions": [{"type": "cancel-launch-permissions",}]},
+                "actions": [{"type": "cancel-launch-permissions",}]},
                 session_factory=factory
         )
-        print(p)
         resources = p.run()
-        print(resources)
         self.assertEqual(len(resources), 1)
 
     def test_cancel_launch_permissions_false(self):
@@ -416,9 +414,7 @@ class TestAMI(BaseTest):
 		"actions": [{"type": "cancel-launch-permissions", "value": False}]},
                 session_factory=factory
         )
-        print(p)
         resources = p.run()
-        print(resources)
         self.assertEqual(len(resources), 1)
 
     def test_unused_ami_true(self):
