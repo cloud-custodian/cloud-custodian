@@ -295,6 +295,40 @@ class RemoveLaunchPermissions(BaseAction):
             LaunchPermission={'Remove': remove},
             OperationType='remove')
 
+@AMI.action_registry.register('cancel-launch-permissions')
+class CancelLaunchPermissions(BaseAction):
+    """Action to cancel the shared AMI to your account
+
+    AWS account and you no longer want it shared with your account,
+    you can remove your account from the AMI's launch permissions
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: ami-cancel-share-to-me-old
+                resource: ami
+                query:
+                  - ExecutableUsers: [self]
+                  - Owners: []
+                actions:
+                  - type: cancel-launch-permissions
+
+    """
+    schema = type_schema('cancel-launch-permissions', value={'type': 'boolean'})
+
+    permissions = ('ec2:CancelImageLaunchPermission',)
+
+    def process(self, images):
+        client = local_session(self.manager.session_factory).client('ec2')
+        for i in images:
+            self.process_image(client, i)
+
+    def process_image(self, client, image):
+        client.cancel_image_launch_permission(
+            ImageId=image['ImageId'],
+            DryRun=self.data.get('value', True))
 
 @AMI.action_registry.register('set-permissions')
 class SetPermissions(BaseAction):
