@@ -393,7 +393,6 @@ class TestAMI(BaseTest):
 
     def test_cancel_launch_permissions_true(self):
         factory = self.replay_flight_data("test_cancel_launch_permissions")
-        print(factory)
         p = self.load_policy(
             {
                 "name": "test-cancel-launch-permissions",
@@ -406,12 +405,11 @@ class TestAMI(BaseTest):
 
     def test_cancel_launch_permissions_false(self):
         factory = self.replay_flight_data("test_cancel_launch_permissions")
-        print(factory)
         p = self.load_policy(
             {
                 "name": "test-cancel-launch-permissions",
                 "resource": "ami",
-		"actions": [{"type": "cancel-launch-permissions", "value": False}]},
+                "actions": [{"type": "cancel-launch-permissions", "value": False}]},
                 session_factory=factory
         )
         resources = p.run()
