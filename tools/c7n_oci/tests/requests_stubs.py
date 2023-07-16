@@ -1,3 +1,6 @@
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
+
 """Stubs for oci urllib3"""
 
 from oci._vendor.urllib3.connectionpool import HTTPConnection, VerifiedHTTPSConnection

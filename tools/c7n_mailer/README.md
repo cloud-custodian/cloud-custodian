@@ -362,6 +362,16 @@ These fields are not necessary if c7n_mailer is run in a instance/lambda/etc wit
 |           | `sendgrid_api_key` | secured string | SendGrid API token |
 
 
+### Microsoft Graph Config
+
+| Required? | Key                       | Type           | Notes                    |
+|:---------:|:--------------------------|:---------------|:-------------------------|
+|           | `graph_token_endpoint`    | string         | Graph token endpoint     |
+|           | `graph_sendmail_endpoint` | string         | Graph sendmail endpoint  |
+|           | `graph_client_id`         | string         | Client ID                |
+|           | `graph_client_secret`     | secured string | Client secret            |
+
+
 ### Splunk HEC Config
 
 The following configuration items are *all* optional. The ones marked "Required for Splunk" are only required if you're sending notifications to ``splunkhec://`` destinations.

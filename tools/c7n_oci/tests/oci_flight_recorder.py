@@ -1,4 +1,5 @@
-import functools
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import gzip
 import json
 import os
@@ -11,7 +12,7 @@ from vcr import config
 import requests_stubs
 from c7n.testing import C7N_FUNCTIONAL, CustodianTestCore
 from c7n.utils import reset_session_cache
-from c7n_oci.session import Session
+from c7n_oci.session import SessionFactory
 from oci_common import (
     replace_ocid,
     replace_email,
@@ -69,7 +70,7 @@ class OCIFlightRecorder(CustodianTestCore):
         cm = self.myvcr.use_cassette(cassette)
         cm.__enter__()
         self.addCleanup(cm.__exit__, None, None, None)
-        return functools.partial(Session)
+        return SessionFactory()
 
     def replay_flight_data(self, test_class, test_case):
         self.myvcr = config.VCR(
@@ -87,7 +88,7 @@ class OCIFlightRecorder(CustodianTestCore):
         self.cassette_name = self._get_cassette_name(test_class, test_case)
         cm.__enter__()
         self.addCleanup(cm.__exit__, None, None, None)
-        return functools.partial(Session)
+        return SessionFactory()
 
     def oci_session_factory(self, test_class, test_case):
         if not C7N_FUNCTIONAL and self._cassette_file_exists(test_class, test_case):

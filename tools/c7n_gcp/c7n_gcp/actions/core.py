@@ -70,8 +70,16 @@ class MethodAction(Action):
         for resource in resources:
             op_name = self.get_operation_name(model, resource)
             params = self.get_resource_params(model, resource)
-            result = self.invoke_api(client, op_name, params)
-            if result_key and annotation_key:
+            try:
+                result = self.invoke_api(client, op_name, params)
+            except HttpError as e:
+                result = self.handle_resource_error(
+                    client, model, resource, op_name, params, e
+                )
+                # if the error handler recovered it returns a result
+                if not result:
+                    raise
+            if result and result_key and annotation_key:
                 resource[annotation_key] = result.get(result_key)
 
     def invoke_api(self, client, op_name, params):
@@ -81,6 +89,10 @@ class MethodAction(Action):
             if e.resp.status in self.ignore_error_codes:
                 return e
             raise
+
+    def handle_resource_error(self, client, model, resource, op_name, params, error):
+        """ subclasses implement specific error handling
+        """
 
     def get_permissions(self):
         if self.permissions:

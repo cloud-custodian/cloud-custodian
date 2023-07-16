@@ -75,7 +75,7 @@ class InstanceMonitoring(Filter):
             query=self.data.get("query"),
             namespace="oci_computeagent",
         )
-        monitoring_client = self.manager.get_session().get_monitoring_client()
+        monitoring_client = self.manager.get_session().client("oci.monitoring.MonitoringClient")
         comp_resources = {}
         result = []
         for resource in resources:

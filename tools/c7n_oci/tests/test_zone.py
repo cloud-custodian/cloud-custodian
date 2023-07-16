@@ -1,9 +1,12 @@
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
+
 import inspect
 
 import oci
 from pytest_terraform import terraform
 
-from oci_common import Module, OciBaseTest, Resource, Scope
+from oci_common import OciBaseTest
 
 
 class TestZone(OciBaseTest):
@@ -16,7 +19,7 @@ class TestZone(OciBaseTest):
         resource = client.get_zone(zone_id, scope="PRIVATE")
         return oci.util.to_dict(resource.data)
 
-    @terraform(Module.ZONE.value, scope=Scope.CLASS.value)
+    @terraform("zone", scope="class")
     def test_add_defined_tag_to_zone(self, test, zone, with_or_without_compartment):
         """
         test adding defined_tags tag to zone
@@ -29,7 +32,7 @@ class TestZone(OciBaseTest):
         policy = test.load_policy(
             {
                 "name": "add-defined-tag-to-zone",
-                "resource": Resource.ZONE.value,
+                "resource": "oci.zone",
                 "query": [{"scope": "PRIVATE"}],
                 "filters": [
                     {"type": "value", "key": "id", "value": zone_ocid},
@@ -50,7 +53,7 @@ class TestZone(OciBaseTest):
         test.assertEqual(resource["id"], zone_ocid)
         test.assertEqual(self.get_defined_tag_value(resource["defined_tags"]), "true")
 
-    @terraform(Module.ZONE.value, scope=Scope.CLASS.value)
+    @terraform("zone", scope="class")
     def test_update_defined_tag_of_zone(self, test, zone):
         """
         test update defined_tags tag on zone
@@ -63,7 +66,7 @@ class TestZone(OciBaseTest):
         policy = test.load_policy(
             {
                 "name": "update-defined-tag-of-zone",
-                "resource": Resource.ZONE.value,
+                "resource": "oci.zone",
                 "query": [{"scope": "PRIVATE"}],
                 "filters": [
                     {"type": "value", "key": "freeform_tags.Project", "value": "CNCF"},
@@ -86,7 +89,7 @@ class TestZone(OciBaseTest):
         test.assertEqual(resource["id"], zone_ocid)
         test.assertEqual(self.get_defined_tag_value(resource["defined_tags"]), "false")
 
-    @terraform(Module.ZONE.value, scope=Scope.CLASS.value)
+    @terraform("zone", scope="class")
     def test_add_freeform_tag_to_zone(self, test, zone):
         """
         test adding freeform tag to zone
@@ -99,7 +102,7 @@ class TestZone(OciBaseTest):
         policy = test.load_policy(
             {
                 "name": "add-tag-freeform-to-zone",
-                "resource": Resource.ZONE.value,
+                "resource": "oci.zone",
                 "query": [{"scope": "PRIVATE"}],
                 "filters": [
                     {
@@ -125,7 +128,7 @@ class TestZone(OciBaseTest):
         test.assertEqual(resource["id"], zone_ocid)
         test.assertEqual(resource["freeform_tags"]["Environment"], "Development")
 
-    @terraform(Module.ZONE.value, scope=Scope.CLASS.value)
+    @terraform("zone", scope="class")
     def test_update_freeform_tag_of_zone(self, test, zone):
         """
         test update freeform tag of zone
@@ -138,7 +141,7 @@ class TestZone(OciBaseTest):
         policy = test.load_policy(
             {
                 "name": "update-freeform-tag-of-zone",
-                "resource": Resource.ZONE.value,
+                "resource": "oci.zone",
                 "query": [{"scope": "PRIVATE"}],
                 "filters": [
                     {"type": "value", "key": "freeform_tags.Project", "value": "CNCF"},
@@ -159,7 +162,7 @@ class TestZone(OciBaseTest):
         test.assertEqual(resource["id"], zone_ocid)
         test.assertEqual(resource["freeform_tags"]["Environment"], "Production")
 
-    @terraform(Module.ZONE.value, scope=Scope.CLASS.value)
+    @terraform("zone", scope="class")
     def test_get_freeform_tagged_zone(self, test, zone):
         """
         test get freeform tagged zone
@@ -172,7 +175,7 @@ class TestZone(OciBaseTest):
         policy = test.load_policy(
             {
                 "name": "get-freeform-tagged-zone",
-                "resource": Resource.ZONE.value,
+                "resource": "oci.zone",
                 "query": [{"scope": "PRIVATE"}],
                 "filters": [
                     {"type": "value", "key": "freeform_tags.Project", "value": "CNCF"},
@@ -185,7 +188,7 @@ class TestZone(OciBaseTest):
         test.assertEqual(resources[0]["id"], zone_ocid)
         test.assertEqual(resources[0]["freeform_tags"]["Project"], "CNCF")
 
-    @terraform(Module.ZONE.value, scope=Scope.CLASS.value)
+    @terraform("zone", scope="class")
     def test_remove_freeform_tag(self, test, zone):
         """
         test remove freeform tag
@@ -197,7 +200,7 @@ class TestZone(OciBaseTest):
         policy = test.load_policy(
             {
                 "name": "zone-remove-tag",
-                "resource": Resource.ZONE.value,
+                "resource": "oci.zone",
                 "query": [{"scope": "PRIVATE"}],
                 "filters": [
                     {"type": "value", "key": "id", "value": zone_ocid},
@@ -212,7 +215,7 @@ class TestZone(OciBaseTest):
         resource = self._fetch_zone_validation_data(policy.resource_manager, zone_ocid)
         test.assertEqual(resource["freeform_tags"].get("Project"), None)
 
-    @terraform(Module.ZONE.value, scope=Scope.CLASS.value)
+    @terraform("zone", scope="class")
     def test_remove_defined_tag(self, test, zone):
         """
         test remove defined tag
@@ -224,7 +227,7 @@ class TestZone(OciBaseTest):
         policy = test.load_policy(
             {
                 "name": "zone-remove-tag",
-                "resource": Resource.ZONE.value,
+                "resource": "oci.zone",
                 "query": [{"scope": "PRIVATE"}],
                 "filters": [
                     {"type": "value", "key": "id", "value": zone_ocid},

@@ -95,7 +95,7 @@ class CloudFunctionManager:
         if not func_info or self._delta_source(archive, func_name):
             source_url = self._upload(archive, self.region)
 
-        config = func.get_config()
+        config = func.get_config(self.session)
         config['name'] = func_name
         if source_url:
             config['sourceUploadUrl'] = source_url
@@ -224,7 +224,7 @@ class CloudFunction:
 
     @property
     def runtime(self):
-        return self.func_data.get('runtime', 'python37')
+        return self.func_data.get('runtime', 'python311')
 
     @property
     def labels(self):
@@ -249,7 +249,7 @@ class CloudFunction:
     def get_archive(self):
         return self.archive
 
-    def get_config(self):
+    def get_config(self, session):
         labels = self.labels
         labels['deployment-tool'] = 'custodian'
         conf = {
@@ -260,8 +260,14 @@ class CloudFunction:
             'labels': labels,
             'availableMemoryMb': self.memory_size}
 
+        # This value used to be available by default but its been removed
+        # on newer runtimes, explicitly set the value to ensure presence.
+        conf['environmentVariables'] = {
+            'GOOGLE_CLOUD_PROJECT': session.get_default_project()
+        }
+
         if self.environment:
-            conf['environmentVariables'] = self.environment
+            conf['environmentVariables'].update(self.environment)
 
         if self.network:
             conf['network'] = self.network
@@ -285,29 +291,62 @@ import traceback
 import os
 import logging
 import sys
+import pprint
 
 from flask import Request, Response
 
+log = logging.getLogger('custodian.gcp')
+
+# get messages to cloud logging in structured format so we can filter on severity.
+
+class CloudLoggingFormatter(logging.Formatter):
+    '''Produces messages compatible with google cloud logging'''
+    def format(self, record: logging.LogRecord) -> str:
+        s = super().format(record)
+        return json.dumps(
+            {
+                "message": s,
+                "severity": record.levelname,
+                "timestamp": {"seconds": int(record.created), "nanos": 0},
+            }
+        )
+
+
+def init():
+    root = logging.getLogger()
+    handler = logging.StreamHandler(sys.stdout)
+    formatter = CloudLoggingFormatter(fmt="[%(name)s] %(message)s")
+    handler.setFormatter(formatter)
+    root.addHandler(handler)
+    root.setLevel(logging.DEBUG)
+
+
+init()
+
 
 def run(event, context=None):
-    logging.info("starting function execution")
 
-    trigger_type = os.environ.get('FUNCTION_TRIGGER_TYPE', '')
+    # gcp likes to change values incompatibily, SIGNATURE is current value.
+    # per documentation python3.7 runtimes is supposed to use the TRIGGER, but
+    # it seems like that is not the case. newer runtimes all use SIGNATURE
+    trigger_type = os.environ.get(
+        'FUNCTION_TRIGGER_TYPE',
+        os.environ.get('FUNCTION_SIGNATURE_TYPE', '')
+    )
 
     if isinstance(event, Request):
         event = event.json
 
+    log.info("starting function execution trigger:%s event:%s", trigger_type, event)
     if trigger_type in ('HTTP_TRIGGER', 'http',):
         event = {'request': event}
     else:
         event = json.loads(base64.b64decode(event['data']).decode('utf-8'))
-    print("Event: %s" % (event,))
 
     try:
         from c7n_gcp.handler import run
         result = run(event, context)
-        print(result)
-        logging.info("function execution complete")
+        log.info("function execution complete")
         if trigger_type in ('HTTP_TRIGGER', 'http',):
             return json.dumps(result), 200, (('Content-Type', 'application/json'),)
         return result
@@ -361,8 +400,8 @@ class PolicyFunction(CloudFunction):
         self.archive.close()
         return self.archive
 
-    def get_config(self):
-        config = super(PolicyFunction, self).get_config()
+    def get_config(self, session):
+        config = super(PolicyFunction, self).get_config(session)
         config['entryPoint'] = 'run'
         return config
 
