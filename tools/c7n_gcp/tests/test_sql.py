@@ -164,6 +164,64 @@ class SqlInstanceTest(BaseTest):
             self.fail('found deleted instance: %s' % result)
         except HttpError as e:
             self.assertTrue("does not exist" in str(e))
+    
+    def test_enable_deletion_instance(self):
+        project_id = 'cloud-custodian'
+        instance_name = 'custodiantestsql'
+        factory = self.replay_flight_data('sqlinstance-enable-deletion', project_id=project_id)
+        p = self.load_policy(
+            {
+                'name': 'enable-deletion',
+                'resource': 'gcp.sql-instance',
+                'filters': [
+                    {
+                        'name': 'custodiantestsql'
+                    },
+                    {
+                        'type': 'value',
+                        'key': 'settings.deletionProtectionEnabled',
+                        'op': 'equal',
+                        'value': False
+                    }
+                ],
+                'actions': [{"type": 'enable-deletion', "value": 'true'}]
+            },
+            session_factory=factory)
+        resources = p.run()
+        if self.recording:
+            time.sleep(1)
+        client = p.resource_manager.get_client()
+        result = client.execute_query(
+            'get', {'project': project_id,
+                    'instance': instance_name})
+        self.assertEqual(result['settings']['deletionProtectionEnabled'], True)
+        p = self.load_policy(
+            {
+                'name': 'enable-deletion',
+                'resource': 'gcp.sql-instance',
+                'filters': [
+                    {
+                        'name': 'custodiantestsql'
+                    },
+                    {
+                        'type': 'value',
+                        'key': 'settings.deletionProtectionEnabled',
+                        'op': 'equal',
+                        'value': True
+                    }
+                ],
+                'actions': [{"type": 'enable-deletion', "value": 'false'}]
+            },
+            session_factory=factory)
+        resources = p.run()
+        
+        if self.recording:
+            time.sleep(1)
+        client = p.resource_manager.get_client()
+        result = client.execute_query(
+            'get', {'project': project_id,
+                    'instance': instance_name})
+        self.assertEqual(result['settings']['deletionProtectionEnabled'], False)
 
 
 class SqlUserTest(BaseTest):

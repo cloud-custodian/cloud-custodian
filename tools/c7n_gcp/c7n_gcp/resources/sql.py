@@ -118,6 +118,24 @@ class SqlInstanceStart(MethodAction):
                 'body': {'settings': {'activationPolicy': 'ALWAYS'}}}
 
 
+@SqlInstance.action_registry.register('enable-deletion')
+class SqlInstanceEnableDeletion(MethodAction):
+
+    schema = type_schema(
+        'enable-deletion',
+        value={'type': 'string'})
+    method_spec = {'op': 'patch'}
+    path_param_re = re.compile('.*?/projects/(.*?)/instances/(.*)')
+    method_perm = 'enable-deletion'
+    
+    def get_resource_params(self, model, resource):
+        project, instance = self.path_param_re.match(
+            resource['selfLink']).groups()
+        return {'project': project,
+                'instance': instance,
+                'body': {'settings': {'deletionProtectionEnabled': self.data['value']}}}
+
+
 class SQLInstanceChildTypeInfo(ChildTypeInfo):
     service = 'sqladmin'
     version = 'v1beta4'
