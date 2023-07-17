@@ -1,6 +1,8 @@
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
+
 import re
 import time
-from enum import Enum
 
 import oci
 
@@ -75,32 +77,3 @@ def sanitize_response_body(data):
                 if field in resource:
                     del resource[field]
     return data
-
-
-### ENUM ###
-class Scope(Enum):
-    CLASS = "class"
-    SESSION = "session"
-    FUNCTION = "function"
-
-
-class Module(Enum):
-    COMPUTE = "compute"
-    OBJECT_STORAGE = "object_storage"
-    VCN = "vcn"
-    ZONE = "zone"
-    SUBNET = "subnet"
-    IDENTITY_GROUP = "identity_group"
-    IDENTITY_COMPARTMENT = "identity_compartment"
-    IDENTITY_USER = "identity_user"
-
-
-class Resource(Enum):
-    INSTANCE = "oci.instance"
-    BUCKET = "oci.bucket"
-    VCN = "oci.vcn"
-    ZONE = "oci.zone"
-    SUBNET = "oci.subnet"
-    COMPARTMENT = "oci.compartment"
-    GROUP = "oci.group"
-    USER = "oci.user"

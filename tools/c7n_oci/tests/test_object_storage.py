@@ -1,9 +1,12 @@
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
+
 import inspect
 
 import oci
 from pytest_terraform import terraform
 
-from oci_common import Module, OciBaseTest, Resource, Scope
+from oci_common import OciBaseTest
 
 
 class TestObjectStorage(OciBaseTest):
@@ -17,7 +20,7 @@ class TestObjectStorage(OciBaseTest):
         resource = client.get_bucket(namespace_name, bucket_name)
         return oci.util.to_dict(resource.data)
 
-    @terraform(Module.OBJECT_STORAGE.value, scope=Scope.CLASS.value)
+    @terraform("object_storage", scope="class")
     def test_add_defined_tag_to_bucket(self, test, object_storage, with_or_without_compartment):
         """
         test adding defined_tags tag on compute instance
@@ -29,7 +32,7 @@ class TestObjectStorage(OciBaseTest):
         policy = test.load_policy(
             {
                 "name": "add-defined-tag-to-bucket",
-                "resource": Resource.BUCKET.value,
+                "resource": "oci.bucket",
                 "query": [
                     {"namespace_name": namespace_name},
                 ],
@@ -56,7 +59,7 @@ class TestObjectStorage(OciBaseTest):
         test.assertEqual(resource["name"], bucket_name)
         test.assertEqual(self.get_defined_tag_value(resource["defined_tags"]), "true")
 
-    @terraform(Module.OBJECT_STORAGE.value, scope=Scope.CLASS.value)
+    @terraform("object_storage", scope="class")
     def test_update_defined_tag_of_bucket(self, test, object_storage):
         """
         test update defined_tags tag on bucket
@@ -68,7 +71,7 @@ class TestObjectStorage(OciBaseTest):
         policy = test.load_policy(
             {
                 "name": "update-defined-tag-to-bucket",
-                "resource": Resource.BUCKET.value,
+                "resource": "oci.bucket",
                 "query": [
                     {"namespace_name": namespace_name},
                 ],
@@ -95,7 +98,7 @@ class TestObjectStorage(OciBaseTest):
         test.assertEqual(resource["name"], bucket_name)
         test.assertEqual(self.get_defined_tag_value(resource["defined_tags"]), "false")
 
-    @terraform(Module.OBJECT_STORAGE.value, scope=Scope.CLASS.value)
+    @terraform("object_storage", scope="class")
     def test_add_freeform_tag_to_bucket(self, test, object_storage):
         """
         test adding freeform tag to bucket
@@ -107,7 +110,7 @@ class TestObjectStorage(OciBaseTest):
         policy = test.load_policy(
             {
                 "name": "add-tag-to-bucket",
-                "resource": Resource.BUCKET.value,
+                "resource": "oci.bucket",
                 "query": [
                     {"namespace_name": namespace_name},
                 ],
@@ -134,7 +137,7 @@ class TestObjectStorage(OciBaseTest):
         test.assertEqual(resource["name"], bucket_name)
         test.assertEqual(resource["freeform_tags"]["Environment"], "Development")
 
-    @terraform(Module.OBJECT_STORAGE.value, scope=Scope.CLASS.value)
+    @terraform("object_storage", scope="class")
     def test_update_freeform_tag_of_bucket(self, test, object_storage):
         """
         test update freeform tag of bucket
@@ -146,7 +149,7 @@ class TestObjectStorage(OciBaseTest):
         policy = test.load_policy(
             {
                 "name": "update-freeform-tag-of-bucket",
-                "resource": Resource.BUCKET.value,
+                "resource": "oci.bucket",
                 "query": [
                     {"namespace_name": namespace_name},
                 ],
@@ -173,7 +176,7 @@ class TestObjectStorage(OciBaseTest):
         test.assertEqual(resource["name"], bucket_name)
         test.assertEqual(resource["freeform_tags"]["Environment"], "Production")
 
-    @terraform(Module.OBJECT_STORAGE.value, scope=Scope.CLASS.value)
+    @terraform("object_storage", scope="class")
     def test_get_freeform_tagged_bucket(self, test, object_storage):
         """
         test get freeform tagged compute instances
@@ -185,7 +188,7 @@ class TestObjectStorage(OciBaseTest):
         policy = test.load_policy(
             {
                 "name": "get-freeform-tagged-instance",
-                "resource": Resource.BUCKET.value,
+                "resource": "oci.bucket",
                 "query": [
                     {"namespace_name": namespace_name},
                 ],
@@ -200,7 +203,7 @@ class TestObjectStorage(OciBaseTest):
         test.assertEqual(resources[0]["name"], bucket_name)
         test.assertEqual(resources[0]["freeform_tags"]["Project"], "CNCF")
 
-    @terraform(Module.OBJECT_STORAGE.value, scope=Scope.CLASS.value)
+    @terraform("object_storage", scope="class")
     def test_tag_public_bucket(self, test, object_storage):
         """
         test get freeform tagged compute instances
@@ -212,7 +215,7 @@ class TestObjectStorage(OciBaseTest):
         policy = test.load_policy(
             {
                 "name": "tag-public-buckets",
-                "resource": Resource.BUCKET.value,
+                "resource": "oci.bucket",
                 "query": [
                     {"namespace_name": namespace_name},
                 ],
@@ -242,7 +245,7 @@ class TestObjectStorage(OciBaseTest):
         test.assertEqual(resource["name"], bucket_name)
         test.assertEqual(resource["freeform_tags"]["public_access"], "true")
 
-    @terraform(Module.OBJECT_STORAGE.value, scope=Scope.CLASS.value)
+    @terraform("object_storage", scope="class")
     def test_change_public_bucket_to_private(self, test, object_storage):
         """
         test get freeform tagged compute instances
@@ -254,7 +257,7 @@ class TestObjectStorage(OciBaseTest):
         policy = test.load_policy(
             {
                 "name": "change-public-bucket-to-private",
-                "resource": Resource.BUCKET.value,
+                "resource": "oci.bucket",
                 "query": [
                     {"namespace_name": namespace_name},
                 ],
@@ -279,7 +282,7 @@ class TestObjectStorage(OciBaseTest):
         test.assertEqual(resource["name"], bucket_name)
         test.assertEqual(resource["public_access_type"], "NoPublicAccess")
 
-    @terraform(Module.OBJECT_STORAGE.value, scope=Scope.CLASS.value)
+    @terraform("object_storage", scope="class")
     def test_remove_freeform_tag(self, test, object_storage):
         """
         test remove freeform tag
@@ -291,7 +294,7 @@ class TestObjectStorage(OciBaseTest):
         policy = test.load_policy(
             {
                 "name": "bucket-remove-tag",
-                "resource": Resource.BUCKET.value,
+                "resource": "oci.bucket",
                 "query": [
                     {"namespace_name": namespace_name},
                 ],
@@ -311,7 +314,7 @@ class TestObjectStorage(OciBaseTest):
         test.assertEqual(resource["name"], bucket_name)
         test.assertEqual(resource["freeform_tags"].get("Project"), None)
 
-    @terraform(Module.OBJECT_STORAGE.value, scope=Scope.CLASS.value)
+    @terraform("object_storage", scope="class")
     def test_remove_defined_tag(self, test, object_storage):
         """
         test remove defined tag
@@ -323,7 +326,7 @@ class TestObjectStorage(OciBaseTest):
         policy = test.load_policy(
             {
                 "name": "bucket-remove-tag",
-                "resource": Resource.BUCKET.value,
+                "resource": "oci.bucket",
                 "filters": [
                     {"type": "value", "key": "name", "value": bucket_name},
                 ],
