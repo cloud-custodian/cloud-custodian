@@ -563,6 +563,8 @@ class Delete(BaseAction):
 
     def process(self, dbs):
         skip = self.data.get('skip-snapshot', False)
+        # Can't delete an instance in an aurora cluster, use a policy on the cluster
+        dbs = self.filter_resources(dbs, "DBClusterIdentifier", [None])
 
         # Concurrency feels like overkill here.
         client = local_session(self.manager.session_factory).client('rds')
@@ -589,11 +591,6 @@ class Delete(BaseAction):
                 client.delete_db_instance(**params)
             except ClientError as e:
                 if e.response['Error']['Code'] == "InvalidDBInstanceState":
-                    continue
-                if e.response['Error']['Code'] == "InvalidParameterValue":
-                    self.log.warning(
-                        "Delete failed, DBInstance %s has invalid parameter value",
-                        db['DBInstanceIdentifier'])
                     continue
                 raise
 
