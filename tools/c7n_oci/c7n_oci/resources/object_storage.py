@@ -103,6 +103,62 @@ class UpdateBucket(OCIBaseAction):
         return response
 
 
+@Bucket.action_registry.register("update")
+class UpdateBucketAction(OCIBaseAction):
+    """
+        Update bucket Action
+
+        :example:
+
+        Performs a partial or full update of a bucket's user-defined metadata.
+
+    Use UpdateBucket to move a bucket from one compartment to another within the same tenancy. Supply the compartmentID
+    of the compartment that you want to move the bucket to. For more information about moving resources between compartments,
+    see [Moving Resources to a Different Compartment](/iaas/Content/Identity/Tasks/managingcompartments.htm#moveRes).
+
+
+        Please refer to the Oracle Cloud Infrastructure Python SDK documentation for parameter details to this action
+        https://docs.oracle.com/en-us/iaas/tools/python/latest/api/object_storage/client/oci.object_storage.ObjectStorageClient.html#oci.object_storage.ObjectStorageClient.update_bucket
+
+        .. code-block:: yaml
+
+            policies:
+                - name: perform-update-bucket-action
+                  resource: oci.bucket
+                  actions:
+                    - type: update
+                      defined_tags:
+                         Cloud_Custodian: True
+                      freeform_tags:
+                         Environment: development
+                      public_access_type: "NoPublicAccess"
+
+
+    """  # noqa
+
+    schema = type_schema(
+        "update",
+        **{
+            "freeform_tags": {"type": "object"},
+            "defined_tags": {"type": "object"},
+            "public_access_type": {"type": "string"},
+        },
+    )
+
+    def perform_action(self, resource):
+        client = self.manager.get_client()
+        update_bucket_details_user = self.extract_params(self.data)
+        params_model = self.update_params(resource, update_bucket_details_user)
+        update_bucket_details = oci.object_storage.models.UpdateBucketDetails(**params_model)
+        response = client.update_bucket(
+            namespace_name=resource.get("namespace"),
+            bucket_name=resource.get("name"),
+            update_bucket_details=update_bucket_details,
+        )
+        log.info(f"Received status {response.status} for POST:update_bucket {response.request_id}")
+        return response
+
+
 @Bucket.action_registry.register("remove-tag")
 class RemoveTagActionBucket(RemoveTagBaseAction):
     """

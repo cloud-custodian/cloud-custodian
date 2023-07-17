@@ -52,6 +52,31 @@ class TestSubnet(OciBaseTest):
         test.assertEqual(self.get_defined_tag_value(resource["defined_tags"]), "true")
 
     @terraform("subnet", scope="class")
+    def test_update_subnet(self, test, subnet, with_or_without_compartment):
+        """
+        test adding defined_tags tag to subnet
+        """
+        compartment_id, subnet_ocid = self._get_subnet_details(subnet)
+        session_factory = test.oci_session_factory(
+            self.__class__.__name__, inspect.currentframe().f_code.co_name
+        )
+        policy = test.load_policy(
+            {
+                "name": "add-defined-tag-to-subnet",
+                "resource": "oci.subnet",
+                "filters": [
+                    {"type": "value", "key": "id", "value": subnet_ocid},
+                ],
+                "actions": [{"type": "update", "defined_tags": self.get_defined_tag("add_tag")}],
+            },
+            session_factory=session_factory,
+        )
+        policy.run()
+        resource = self._fetch_instance_validation_data(policy.resource_manager, subnet_ocid)
+        test.assertEqual(resource["id"], subnet_ocid)
+        test.assertEqual(self.get_defined_tag_value(resource["defined_tags"]), "true")
+
+    @terraform("subnet", scope="class")
     def test_update_defined_tag_of_subnet(self, test, subnet):
         """
         test update defined_tags tag on subnet

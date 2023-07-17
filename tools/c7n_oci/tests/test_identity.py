@@ -80,6 +80,39 @@ class TestIdentityTerraformTest(OciBaseTest):
         test.assertEqual(resource["freeform_tags"]["Environment"], "Development")
 
     @terraform("identity_compartment", scope="class")
+    def test_identity_update_compartment(self, identity_compartment, test):
+        compartment_id, new_compartment_id = self._get_identity_compartment_details(
+            identity_compartment
+        )
+        session_factory = test.oci_session_factory(
+            self.__class__.__name__, inspect.currentframe().f_code.co_name
+        )
+        policy_str = {
+            "name": "filter-and-add-tags-on-compartments",
+            "description": "Filter and add tags on the compartment",
+            "resource": "oci.compartment",
+            "query": [
+                {"lifecycle_state": "ACTIVE"},
+            ],
+            "filters": [
+                {
+                    "type": "value",
+                    "key": "freeform_tags.Cloud_Custodian_Test",
+                    "value": "True",
+                    "op": "eq",
+                },
+            ],
+            "actions": [{"type": "update", "freeform_tags": {"Environment": "Development"}}],
+        }
+        policy = test.load_policy(policy_str, session_factory=session_factory)
+        policy.run()
+        resource = self.fetch_validation_data(
+            policy.resource_manager, "get_compartment", new_compartment_id
+        )
+        assert resource is not None
+        test.assertEqual(resource["freeform_tags"]["Environment"], "Development")
+
+    @terraform("identity_compartment", scope="class")
     def test_remove_tag_compartment(self, identity_compartment, test):
         compartment_id, new_compartment_id = self._get_identity_compartment_details(
             identity_compartment
@@ -153,6 +186,34 @@ class TestIdentityTerraformTest(OciBaseTest):
                     },
                 }
             ],
+        }
+        session_factory = test.oci_session_factory(
+            self.__class__.__name__, inspect.currentframe().f_code.co_name
+        )
+        policy = test.load_policy(policy_str, session_factory=session_factory)
+        policy.run()
+        resource = self.fetch_validation_data(policy.resource_manager, "get_group", group_id)
+        assert resource is not None
+        test.assertEqual(resource["name"], "Custodian-Dev-Group")
+        test.assertEqual(resource["freeform_tags"]["Environment"], "Development")
+
+    @terraform("identity_group", scope="class")
+    @pytest.mark.usefixtures("setCompartmentIdToTenancyOcid")
+    def test_identity_update_group(self, identity_group, test):
+        group_id = identity_group["oci_identity_group.test_group.id"]
+        policy_str = {
+            "name": "filter-and-add-tags-on-group",
+            "description": "Filter and add tags on the group",
+            "resource": "oci.group",
+            "filters": [
+                {
+                    "type": "value",
+                    "key": "freeform_tags.Cloud_Custodian",
+                    "value": "Present",
+                    "op": "eq",
+                },
+            ],
+            "actions": [{"type": "update", "freeform_tags": {"Environment": "Development"}}],
         }
         session_factory = test.oci_session_factory(
             self.__class__.__name__, inspect.currentframe().f_code.co_name
@@ -242,6 +303,39 @@ class TestIdentityTerraformTest(OciBaseTest):
                 {
                     "type": "update-user",
                     "params": {"update_user_details": {"freeform_tags": {"key_limit": "2"}}},
+                }
+            ],
+        }
+        session_factory = test.oci_session_factory(
+            self.__class__.__name__, inspect.currentframe().f_code.co_name
+        )
+        policy = test.load_policy(policy_str, session_factory=session_factory)
+        policy.run()
+        resource = self.fetch_validation_data(policy.resource_manager, "get_user", user_ocid)
+        assert resource is not None
+        test.assertEqual(resource["freeform_tags"]["key_limit"], "2")
+
+    @terraform("identity_user", scope="class")
+    @pytest.mark.usefixtures("setCompartmentIdToTenancyOcid")
+    def test_identity_update_user_tag(self, identity_user, test):
+        compartment_id, user_ocid = self._get_user_details(identity_user)
+        policy_str = {
+            "name": "filter-and-add-tags-on-user",
+            "description": "Filter and add tags on the user",
+            "resource": "oci.user",
+            "filters": [
+                {"type": "value", "key": "id", "value": user_ocid},
+                {
+                    "type": "value",
+                    "key": "freeform_tags.Cloud_Custodian",
+                    "value": "True",
+                    "op": "eq",
+                },
+            ],
+            "actions": [
+                {
+                    "type": "update",
+                    "freeform_tags": {"key_limit": "2"},
                 }
             ],
         }

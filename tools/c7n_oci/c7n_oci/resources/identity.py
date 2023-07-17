@@ -93,6 +93,50 @@ class UpdateCompartment(OCIBaseAction):
         return response
 
 
+@Compartment.action_registry.register("update")
+class UpdateCompartmentAction(OCIBaseAction):
+    """
+    Update compartment Action
+
+    :example:
+
+    Updates the specified compartment's description or name. You can't update the root compartment.
+
+    Please refer to the Oracle Cloud Infrastructure Python SDK documentation for parameter details to this action
+    https://docs.oracle.com/en-us/iaas/tools/python/latest/api/identity/client/oci.identity.IdentityClient.html#oci.identity.IdentityClient.update_compartment
+
+    .. code-block:: yaml
+
+        policies:
+            - name: perform-update-compartment-action
+              resource: oci.compartment
+              actions:
+                - type: update
+                  defined_tags:
+                     Cloud_Custodian: True
+                  freeform_tags:
+                     Environment: development
+
+    """  # noqa
+
+    schema = type_schema(
+        "update", **{"freeform_tags": {"type": "object"}, "defined_tags": {"type": "object"}}
+    )
+
+    def perform_action(self, resource):
+        client = self.manager.get_client()
+        update_compartment_details_user = self.extract_params(self.data)
+        params_model = self.update_params(resource, update_compartment_details_user)
+        update_compartment_details = oci.identity.models.UpdateCompartmentDetails(**params_model)
+        response = client.update_compartment(
+            compartment_id=resource.get("id"), update_compartment_details=update_compartment_details
+        )
+        log.info(
+            f"Received status {response.status} for PUT:update_compartment {response.request_id}"
+        )
+        return response
+
+
 @Compartment.action_registry.register("remove-tag")
 class RemoveTagActionCompartment(RemoveTagBaseAction):
     """
@@ -213,6 +257,48 @@ class UpdateGroup(OCIBaseAction):
         return response
 
 
+@Group.action_registry.register("update")
+class UpdateGroupAction(OCIBaseAction):
+    """
+    Update group Action
+
+    :example:
+
+    Updates the specified group.
+
+    Please refer to the Oracle Cloud Infrastructure Python SDK documentation for parameter details to this action
+    https://docs.oracle.com/en-us/iaas/tools/python/latest/api/identity/client/oci.identity.IdentityClient.html#oci.identity.IdentityClient.update_group
+
+    .. code-block:: yaml
+
+        policies:
+            - name: perform-update-group-action
+              resource: oci.group
+              actions:
+                - type: update
+                  defined_tags:
+                     Cloud_Custodian: True
+                  freeform_tags:
+                     Environment: development
+
+    """  # noqa
+
+    schema = type_schema(
+        "update", **{"freeform_tags": {"type": "object"}, "defined_tags": {"type": "object"}}
+    )
+
+    def perform_action(self, resource):
+        client = self.manager.get_client()
+        update_group_details_user = self.extract_params(self.data)
+        params_model = self.update_params(resource, update_group_details_user)
+        update_group_details = oci.identity.models.UpdateGroupDetails(**params_model)
+        response = client.update_group(
+            group_id=resource.get("id"), update_group_details=update_group_details
+        )
+        log.info(f"Received status {response.status} for PUT:update_group {response.request_id}")
+        return response
+
+
 @Group.action_registry.register("remove-tag")
 class RemoveTagActionGroup(RemoveTagBaseAction):
     """
@@ -326,6 +412,49 @@ class UpdateUser(OCIBaseAction):
         response = client.update_user(
             user_id=params_dict["user_id"],
             update_user_details=params_dict["update_user_details"],
+        )
+        log.info(f"Received status {response.status} for PUT:update_user {response.request_id}")
+        return response
+
+
+@User.action_registry.register("update")
+class UpdateUserAction(OCIBaseAction):
+    """
+    Update user Action
+
+    :example:
+
+    Updates the description of the specified user.
+
+    Please refer to the Oracle Cloud Infrastructure Python SDK documentation for parameter details to this action
+    https://docs.oracle.com/en-us/iaas/tools/python/latest/api/identity/client/oci.identity.IdentityClient.html#oci.identity.IdentityClient.update_user
+
+    .. code-block:: yaml
+
+        policies:
+            - name: perform-update-user-action
+              resource: oci.user
+              actions:
+                - type: update
+                  defined_tags:
+                     Cloud_Custodian: True
+                  freeform_tags:
+                     Environment: development
+
+
+    """  # noqa
+
+    schema = type_schema(
+        "update", **{"freeform_tags": {"type": "object"}, "defined_tags": {"type": "object"}}
+    )
+
+    def perform_action(self, resource):
+        client = self.manager.get_client()
+        update_user_details_user = self.extract_params(self.data)
+        params_model = self.update_params(resource, update_user_details_user)
+        update_user_details = oci.identity.models.UpdateUserDetails(**params_model)
+        response = client.update_user(
+            user_id=resource.get("id"), update_user_details=update_user_details
         )
         log.info(f"Received status {response.status} for PUT:update_user {response.request_id}")
         return response

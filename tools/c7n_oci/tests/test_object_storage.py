@@ -60,6 +60,36 @@ class TestObjectStorage(OciBaseTest):
         test.assertEqual(self.get_defined_tag_value(resource["defined_tags"]), "true")
 
     @terraform("object_storage", scope="class")
+    def test_update_bucket(self, test, object_storage, with_or_without_compartment):
+        """
+        test adding defined_tags tag on compute instance
+        """
+        namespace_name, bucket_name = self._get_bucket_details(object_storage)
+        session_factory = test.oci_session_factory(
+            self.__class__.__name__, inspect.currentframe().f_code.co_name
+        )
+        policy = test.load_policy(
+            {
+                "name": "add-defined-tag-to-bucket",
+                "resource": "oci.bucket",
+                "query": [
+                    {"namespace_name": namespace_name},
+                ],
+                "filters": [
+                    {"type": "value", "key": "name", "value": bucket_name},
+                ],
+                "actions": [{"type": "update", "defined_tags": self.get_defined_tag("add_tag")}],
+            },
+            session_factory=session_factory,
+        )
+        policy.run()
+        resource = self._fetch_bucket_validation_data(
+            policy.resource_manager, namespace_name, bucket_name
+        )
+        test.assertEqual(resource["name"], bucket_name)
+        test.assertEqual(self.get_defined_tag_value(resource["defined_tags"]), "true")
+
+    @terraform("object_storage", scope="class")
     def test_update_defined_tag_of_bucket(self, test, object_storage):
         """
         test update defined_tags tag on bucket
@@ -272,6 +302,36 @@ class TestObjectStorage(OciBaseTest):
                         },
                     }
                 ],
+            },
+            session_factory=session_factory,
+        )
+        policy.run()
+        resource = self._fetch_bucket_validation_data(
+            policy.resource_manager, namespace_name, bucket_name
+        )
+        test.assertEqual(resource["name"], bucket_name)
+        test.assertEqual(resource["public_access_type"], "NoPublicAccess")
+
+    @terraform("object_storage", scope="class")
+    def test_update_public_bucket_to_private(self, test, object_storage):
+        """
+        test get freeform tagged compute instances
+        """
+        namespace_name, bucket_name = self._get_bucket_details(object_storage)
+        session_factory = test.oci_session_factory(
+            self.__class__.__name__, inspect.currentframe().f_code.co_name
+        )
+        policy = test.load_policy(
+            {
+                "name": "change-public-bucket-to-private",
+                "resource": "oci.bucket",
+                "query": [
+                    {"namespace_name": namespace_name},
+                ],
+                "filters": [
+                    {"type": "value", "key": "name", "value": bucket_name},
+                ],
+                "actions": [{"type": "update", "public_access_type": "NoPublicAccess"}],
             },
             session_factory=session_factory,
         )

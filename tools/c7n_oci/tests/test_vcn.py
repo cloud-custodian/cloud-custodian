@@ -115,6 +115,31 @@ class TestVcn(OciBaseTest):
         test.assertEqual(resource["freeform_tags"]["Environment"], "Development")
 
     @terraform("vcn", scope="class")
+    def test_update_vcn(self, test, vcn):
+        """
+        test adding freeform tag to vcn
+        """
+        vcn_ocid = self._get_vcn_details(vcn)
+        session_factory = test.oci_session_factory(
+            self.__class__.__name__, inspect.currentframe().f_code.co_name
+        )
+        policy = test.load_policy(
+            {
+                "name": "add-tag-freeform-to-vcn",
+                "resource": "oci.vcn",
+                "filters": [
+                    {"type": "value", "key": "id", "value": vcn_ocid},
+                ],
+                "actions": [{"type": "update", "freeform_tags": {"Environment": "Development"}}],
+            },
+            session_factory=session_factory,
+        )
+        policy.run()
+        resource = self._fetch_instance_validation_data(policy.resource_manager, vcn_ocid)
+        test.assertEqual(resource["id"], vcn_ocid)
+        test.assertEqual(resource["freeform_tags"]["Environment"], "Development")
+
+    @terraform("vcn", scope="class")
     def test_update_freeform_tag_of_vcn(self, test, vcn):
         """
         test update freeform tag of vcn

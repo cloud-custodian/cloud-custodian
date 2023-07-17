@@ -97,6 +97,55 @@ class UpdateZone(OCIBaseAction):
         return response
 
 
+@Zone.action_registry.register("update")
+class UpdateZoneAction(OCIBaseAction):
+    """
+        Update zone Action
+
+        :example:
+
+        Updates the zone with the specified information.
+
+    Global secondary zones may have their external masters updated. For more information about secondary
+    zones, see [Manage DNS Service Zone](/iaas/Content/DNS/Tasks/managingdnszones.htm). When the zone name
+    is provided as a path parameter and `PRIVATE` is used for the scope query parameter then the viewId
+    query parameter is required.
+
+
+        Please refer to the Oracle Cloud Infrastructure Python SDK documentation for parameter details to this action
+        https://docs.oracle.com/en-us/iaas/tools/python/latest/api/dns/client/oci.dns.DnsClient.html#oci.dns.DnsClient.update_zone
+
+        .. code-block:: yaml
+
+            policies:
+                - name: perform-update-zone-action
+                  resource: oci.zone
+                  actions:
+                    - type: update
+                      defined_tags:
+                        Cloud_Custodian: True
+                      freeform_tags:
+                        Environment: development
+
+    """  # noqa
+
+    schema = type_schema(
+        "update", **{"freeform_tags": {"type": "object"}, "defined_tags": {"type": "object"}}
+    )
+
+    def perform_action(self, resource):
+        client = self.manager.get_client()
+        update_zone_details_user = self.extract_params(self.data)
+        params_model = self.update_params(resource, update_zone_details_user)
+        update_zone_details = oci.dns.models.UpdateZoneDetails(**params_model)
+        response = client.update_zone(
+            zone_name_or_id=resource.get("id"),
+            update_zone_details=update_zone_details,
+        )
+        log.info(f"Received status {response.status} for PUT:update_zone {response.request_id}")
+        return response
+
+
 @Zone.action_registry.register("remove-tag")
 class RemoveTagActionZone(RemoveTagBaseAction):
     """
