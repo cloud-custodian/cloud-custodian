@@ -3,7 +3,7 @@ interactions:
     body: null
     headers: {}
     method: GET
-    uri: https://www-proxy.us.oracle.com:80/20160918/users/ocid1.user.oc1..<unique_ID>
+    uri: https://identity.us-ashburn-1.oci.oraclecloud.com/20160918/users/ocid1.user.oc1..<unique_ID>
   response:
     body:
       data:
@@ -16,17 +16,14 @@ interactions:
           canUseOAuth2ClientCredentials: true
           canUseSmtpCredentials: true
         compartmentId: ocid1.tenancy.oc1..<unique_ID>
-        dbUserName: user@example.com
         definedTags:
           Oracle-Tags:
-            CreatedBy: Some
-          OracleInternalReserved:
-            Phonebook: '9800'
+            CreatedBy: scim-service
+            CreatedOn: '2023-04-25T16:55:50.497Z'
         description: user@example.com
         emailVerified: true
-        externalIdentifier: c5571b54909a443685e610af14bcf73b
+        externalIdentifier: fcf75b1a99fd4dbe9c8f5a11dd69a50c
         freeformTags:
-          Contractor: 'True'
           TagName: TagValue
           key_old: 'true'
           mfa_activated: 'false'
@@ -35,19 +32,19 @@ interactions:
         isMfaActivated: false
         lifecycleState: ACTIVE
         name: user@example.com
-        timeCreated: '2022-07-15T08:25:13.055Z'
-        timeModified: '2023-06-21T09:20:37.521Z'
+        timeCreated: '2023-04-25T16:55:50.537Z'
+        timeModified: '2023-07-13T05:13:34.017Z'
     headers:
       cache-control:
       - no-cache, no-store, must-revalidate
       content-length:
-      - '1090'
+      - '990'
       content-type:
       - application/json
       date:
-      - Fri, 14 Jul 2023 05:38:50 GMT
+      - Tue, 18 Jul 2023 07:18:23 GMT
       etag:
-      - 31ff068d7314192e8d5de6e0397f28186f61005e
+      - 9076e6d0fcfa55fbf818f62ac74aa30b4566f02b
       pragma:
       - no-cache
       x-content-type-options:
@@ -59,7 +56,7 @@ interactions:
     body: null
     headers: {}
     method: GET
-    uri: https://www-proxy.us.oracle.com:80/20160918/users?compartmentId=ocid1.tenancy.oc1..<unique_ID>
+    uri: https://identity.us-ashburn-1.oci.oraclecloud.com/20160918/users?compartmentId=ocid1.tenancy.oc1..<unique_ID>
   response:
     body:
       data:
@@ -75,7 +72,7 @@ interactions:
         definedTags:
           Oracle-Tags:
             CreatedBy: user@example.com
-            CreatedOn: '2023-07-14T05:38:47.971Z'
+            CreatedOn: '2023-07-18T07:18:20.110Z'
         description: Test User1
         email: test@custodian.com
         emailVerified: false
@@ -87,8 +84,8 @@ interactions:
         isMfaActivated: false
         lifecycleState: ACTIVE
         name: Custodian_User
-        timeCreated: '2023-07-14T05:38:48.079Z'
-        timeModified: '2023-07-14T05:38:49.514Z'
+        timeCreated: '2023-07-18T07:18:20.208Z'
+        timeModified: '2023-07-18T07:18:21.790Z'
       - capabilities:
           canUseApiKeys: true
           canUseAuthTokens: true
@@ -1015,13 +1012,13 @@ interactions:
       content-encoding:
       - gzip
       content-length:
-      - '4474'
+      - '4477'
       content-type:
       - application/json
       date:
-      - Fri, 14 Jul 2023 05:38:50 GMT
+      - Tue, 18 Jul 2023 07:18:24 GMT
       opc-limit:
-      - '98'
+      - '99'
       pragma:
       - no-cache
       x-content-type-options:
@@ -1033,7 +1030,7 @@ interactions:
     body: mock_body
     headers: {}
     method: PUT
-    uri: https://www-proxy.us.oracle.com:80/20160918/users/ocid1.user.oc1..<unique_ID>
+    uri: https://identity.us-ashburn-1.oci.oraclecloud.com/20160918/users/ocid1.user.oc1..<unique_ID>
   response:
     body:
       data:
@@ -1049,7 +1046,7 @@ interactions:
         definedTags:
           Oracle-Tags:
             CreatedBy: user@example.com
-            CreatedOn: '2023-07-14T05:38:47.971Z'
+            CreatedOn: '2023-07-18T07:18:20.110Z'
         description: Test User1
         email: test@custodian.com
         emailVerified: false
@@ -1062,19 +1059,19 @@ interactions:
         isMfaActivated: false
         lifecycleState: ACTIVE
         name: Custodian_User
-        timeCreated: '2023-07-14T05:38:48.079Z'
-        timeModified: '2023-07-14T05:38:51.586Z'
+        timeCreated: '2023-07-18T07:18:20.208Z'
+        timeModified: '2023-07-18T07:18:26.025Z'
     headers:
       cache-control:
       - no-cache, no-store, must-revalidate
       content-length:
-      - '1062'
+      - '1057'
       content-type:
       - application/json
       date:
-      - Fri, 14 Jul 2023 05:38:51 GMT
+      - Tue, 18 Jul 2023 07:18:25 GMT
       etag:
-      - 093c57d5245ede9ee7e0f85b21159620de350f60
+      - 31c9846ef66dd2c0d4b0ce44c500fb7e7c729ddd
       pragma:
       - no-cache
       x-content-type-options:
@@ -1086,7 +1083,7 @@ interactions:
     body: null
     headers: {}
     method: GET
-    uri: https://www-proxy.us.oracle.com:80/20160918/users/ocid1.user.oc1..<unique_ID>
+    uri: https://identity.us-ashburn-1.oci.oraclecloud.com/20160918/users/ocid1.user.oc1..<unique_ID>
   response:
     body:
       data:
@@ -1102,7 +1099,7 @@ interactions:
         definedTags:
           Oracle-Tags:
             CreatedBy: user@example.com
-            CreatedOn: '2023-07-14T05:38:47.971Z'
+            CreatedOn: '2023-07-18T07:18:20.110Z'
         description: Test User1
         email: test@custodian.com
         emailVerified: false
@@ -1115,19 +1112,19 @@ interactions:
         isMfaActivated: false
         lifecycleState: ACTIVE
         name: Custodian_User
-        timeCreated: '2023-07-14T05:38:48.079Z'
-        timeModified: '2023-07-14T05:38:51.586Z'
+        timeCreated: '2023-07-18T07:18:20.208Z'
+        timeModified: '2023-07-18T07:18:26.025Z'
     headers:
       cache-control:
       - no-cache, no-store, must-revalidate
       content-length:
-      - '884'
+      - '879'
       content-type:
       - application/json
       date:
-      - Fri, 14 Jul 2023 05:38:52 GMT
+      - Tue, 18 Jul 2023 07:18:27 GMT
       etag:
-      - 093c57d5245ede9ee7e0f85b21159620de350f60
+      - 31c9846ef66dd2c0d4b0ce44c500fb7e7c729ddd
       pragma:
       - no-cache
       x-content-type-options:
