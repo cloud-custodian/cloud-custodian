@@ -18,11 +18,6 @@ runs:
         role-to-assume: ${{ inputs.aws-role }}
         aws-region: ${{ inputs.aws-region }}
 
-    - name: Install Deps
-      shell: bash
-      run: |
-        pip install -U awscli
-
     - name: Publish
       shell: bash
       run: |
