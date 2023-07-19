@@ -43,7 +43,7 @@ RUN if [[ " ${{providers[*]}} " =~ "{pkg}" ]]; then \
 fi
 """
 
-default_providers = ["gcp", "azure", "kube", "openstack", "tencentcloud"]
+default_providers = ["gcp", "azure", "kube", "openstack", "tencentcloud", "oci"]
 
 PHASE_1_PKG_INSTALL_DEP = """\
 # We include `pyproject.toml` and `poetry.lock` first to allow
