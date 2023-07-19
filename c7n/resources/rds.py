@@ -2016,7 +2016,7 @@ class DbOptionGroups(ValueFilter):
 
     schema = type_schema('db-option-groups', rinherit=ValueFilter.schema)
     schema_alias = False
-    permissions = ('rds:DescribeDBInstances', 'rds:DescribeOptionGroups',)
+    permissions = ('rds:DescribeDBInstances', 'rds:DescribeOptionGroups', )
     policy_annotation = 'c7n:MatchedDBOptionGroups'
 
     def handle_optiongroup_cache(self, client, paginator, option_groups):
