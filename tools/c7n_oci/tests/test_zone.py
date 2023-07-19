@@ -37,14 +37,7 @@ class TestZone(OciBaseTest):
                 "filters": [
                     {"type": "value", "key": "id", "value": zone_ocid},
                 ],
-                "actions": [
-                    {
-                        "type": "update-zone",
-                        "params": {
-                            "update_zone_details": {"defined_tags": self.get_defined_tag("add_tag")}
-                        },
-                    }
-                ],
+                "actions": [{"type": "update", "defined_tags": self.get_defined_tag("add_tag")}],
             },
             session_factory=session_factory,
         )
@@ -98,16 +91,7 @@ class TestZone(OciBaseTest):
                 "filters": [
                     {"type": "value", "key": "freeform_tags.Project", "value": "CNCF"},
                 ],
-                "actions": [
-                    {
-                        "type": "update-zone",
-                        "params": {
-                            "update_zone_details": {
-                                "defined_tags": self.get_defined_tag("update_tag")
-                            }
-                        },
-                    }
-                ],
+                "actions": [{"type": "update", "defined_tags": self.get_defined_tag("update_tag")}],
             },
             session_factory=session_factory,
         )
@@ -139,14 +123,7 @@ class TestZone(OciBaseTest):
                         "op": "eq",
                     },
                 ],
-                "actions": [
-                    {
-                        "type": "update-zone",
-                        "params": {
-                            "update_zone_details": {"freeform_tags": {"Environment": "Development"}}
-                        },
-                    }
-                ],
+                "actions": [{"type": "update", "freeform_tags": {"Environment": "Development"}}],
             },
             session_factory=session_factory,
         )
@@ -173,14 +150,7 @@ class TestZone(OciBaseTest):
                 "filters": [
                     {"type": "value", "key": "freeform_tags.Project", "value": "CNCF"},
                 ],
-                "actions": [
-                    {
-                        "type": "update-zone",
-                        "params": {
-                            "update_zone_details": {"freeform_tags": {"Environment": "Production"}}
-                        },
-                    }
-                ],
+                "actions": [{"type": "update", "freeform_tags": {"Environment": "Production"}}],
             },
             session_factory=session_factory,
         )

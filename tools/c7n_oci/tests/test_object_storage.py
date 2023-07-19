@@ -39,16 +39,7 @@ class TestObjectStorage(OciBaseTest):
                 "filters": [
                     {"type": "value", "key": "name", "value": bucket_name},
                 ],
-                "actions": [
-                    {
-                        "type": "update-bucket",
-                        "params": {
-                            "update_bucket_details": {
-                                "defined_tags": self.get_defined_tag("add_tag")
-                            }
-                        },
-                    }
-                ],
+                "actions": [{"type": "update", "defined_tags": self.get_defined_tag("add_tag")}],
             },
             session_factory=session_factory,
         )
@@ -108,16 +99,7 @@ class TestObjectStorage(OciBaseTest):
                 "filters": [
                     {"type": "value", "key": "name", "value": bucket_name},
                 ],
-                "actions": [
-                    {
-                        "type": "update-bucket",
-                        "params": {
-                            "update_bucket_details": {
-                                "defined_tags": self.get_defined_tag("update_tag")
-                            }
-                        },
-                    }
-                ],
+                "actions": [{"type": "update", "defined_tags": self.get_defined_tag("update_tag")}],
             },
             session_factory=session_factory,
         )
@@ -147,16 +129,7 @@ class TestObjectStorage(OciBaseTest):
                 "filters": [
                     {"type": "value", "key": "name", "value": bucket_name},
                 ],
-                "actions": [
-                    {
-                        "type": "update-bucket",
-                        "params": {
-                            "update_bucket_details": {
-                                "freeform_tags": {"Environment": "Development"}
-                            }
-                        },
-                    }
-                ],
+                "actions": [{"type": "update", "freeform_tags": {"Environment": "Development"}}],
             },
             session_factory=session_factory,
         )
@@ -186,16 +159,7 @@ class TestObjectStorage(OciBaseTest):
                 "filters": [
                     {"type": "value", "key": "name", "value": bucket_name},
                 ],
-                "actions": [
-                    {
-                        "type": "update-bucket",
-                        "params": {
-                            "update_bucket_details": {
-                                "freeform_tags": {"Environment": "Production"}
-                            }
-                        },
-                    }
-                ],
+                "actions": [{"type": "update", "freeform_tags": {"Environment": "Production"}}],
             },
             session_factory=session_factory,
         )
@@ -257,14 +221,7 @@ class TestObjectStorage(OciBaseTest):
                         "op": "eq",
                     },
                 ],
-                "actions": [
-                    {
-                        "type": "update-bucket",
-                        "params": {
-                            "update_bucket_details": {"freeform_tags": {"public_access": "true"}}
-                        },
-                    }
-                ],
+                "actions": [{"type": "update", "freeform_tags": {"public_access": "true"}}],
             },
             session_factory=session_factory,
         )
@@ -294,14 +251,7 @@ class TestObjectStorage(OciBaseTest):
                 "filters": [
                     {"type": "value", "key": "name", "value": bucket_name},
                 ],
-                "actions": [
-                    {
-                        "type": "update-bucket",
-                        "params": {
-                            "update_bucket_details": {"public_access_type": "NoPublicAccess"}
-                        },
-                    }
-                ],
+                "actions": [{"type": "update", "public_access_type": "NoPublicAccess"}],
             },
             session_factory=session_factory,
         )

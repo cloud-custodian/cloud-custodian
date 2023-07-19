@@ -33,16 +33,7 @@ class TestSubnet(OciBaseTest):
                 "filters": [
                     {"type": "value", "key": "id", "value": subnet_ocid},
                 ],
-                "actions": [
-                    {
-                        "type": "update-subnet",
-                        "params": {
-                            "update_subnet_details": {
-                                "defined_tags": self.get_defined_tag("add_tag")
-                            }
-                        },
-                    }
-                ],
+                "actions": [{"type": "update", "defined_tags": self.get_defined_tag("add_tag")}],
             },
             session_factory=session_factory,
         )
@@ -92,16 +83,7 @@ class TestSubnet(OciBaseTest):
                 "filters": [
                     {"type": "value", "key": "id", "value": subnet_ocid},
                 ],
-                "actions": [
-                    {
-                        "type": "update-subnet",
-                        "params": {
-                            "update_subnet_details": {
-                                "defined_tags": self.get_defined_tag("update_tag")
-                            }
-                        },
-                    }
-                ],
+                "actions": [{"type": "update", "defined_tags": self.get_defined_tag("update_tag")}],
             },
             session_factory=session_factory,
         )
@@ -126,16 +108,7 @@ class TestSubnet(OciBaseTest):
                 "filters": [
                     {"type": "value", "key": "id", "value": subnet_ocid},
                 ],
-                "actions": [
-                    {
-                        "type": "update-subnet",
-                        "params": {
-                            "update_subnet_details": {
-                                "freeform_tags": {"Environment": "Development"}
-                            }
-                        },
-                    }
-                ],
+                "actions": [{"type": "update", "freeform_tags": {"Environment": "Development"}}],
             },
             session_factory=session_factory,
         )
@@ -160,16 +133,7 @@ class TestSubnet(OciBaseTest):
                 "filters": [
                     {"type": "value", "key": "id", "value": subnet_ocid},
                 ],
-                "actions": [
-                    {
-                        "type": "update-subnet",
-                        "params": {
-                            "update_subnet_details": {
-                                "freeform_tags": {"Environment": "Production"}
-                            }
-                        },
-                    }
-                ],
+                "actions": [{"type": "update", "freeform_tags": {"Environment": "Production"}}],
             },
             session_factory=session_factory,
         )

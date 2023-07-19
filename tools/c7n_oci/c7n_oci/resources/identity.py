@@ -44,55 +44,6 @@ class Compartment(QueryResourceManager):
         search_resource_type = "compartment"
 
 
-@Compartment.action_registry.register("update-compartment")
-class UpdateCompartment(OCIBaseAction):
-    """
-    Update compartment Action
-
-    :example:
-
-    Updates the specified compartment's description or name. You can't update the root compartment.
-
-    Please refer to the Oracle Cloud Infrastructure Python SDK documentation for parameter details to this action
-    https://docs.oracle.com/en-us/iaas/tools/python/latest/api/identity/client/oci.identity.IdentityClient.html#oci.identity.IdentityClient.update_compartment
-
-    .. code-block:: yaml
-
-        policies:
-            - name: perform-update-compartment-action
-              resource: oci.compartment
-              actions:
-                - type: update-compartment
-
-    """  # noqa
-
-    schema = type_schema(
-        "update-compartment", params={"type": "object"}, rinherit=OCIBaseAction.schema
-    )
-
-    def perform_action(self, resource):
-        client = self.manager.get_client()
-        params_dict = {}
-        params_model = {}
-        params_dict["compartment_id"] = resource.get("id")
-        if self.data.get("params").get("update_compartment_details"):
-            update_compartment_details_user = self.data.get("params").get(
-                "update_compartment_details"
-            )
-            params_model = self.update_params(resource, update_compartment_details_user)
-            params_dict[
-                "update_compartment_details"
-            ] = oci.identity.models.UpdateCompartmentDetails(**params_model)
-        response = client.update_compartment(
-            compartment_id=params_dict["compartment_id"],
-            update_compartment_details=params_dict["update_compartment_details"],
-        )
-        log.info(
-            f"Received status {response.status} for PUT:update_compartment {response.request_id}"
-        )
-        return response
-
-
 @Compartment.action_registry.register("update")
 class UpdateCompartmentAction(OCIBaseAction):
     """
@@ -214,49 +165,6 @@ class Group(QueryResourceManager):
         search_resource_type = "group"
 
 
-@Group.action_registry.register("update-group")
-class UpdateGroup(OCIBaseAction):
-    """
-    Update group Action
-
-    :example:
-
-    Updates the specified group.
-
-    Please refer to the Oracle Cloud Infrastructure Python SDK documentation for parameter details to this action
-    https://docs.oracle.com/en-us/iaas/tools/python/latest/api/identity/client/oci.identity.IdentityClient.html#oci.identity.IdentityClient.update_group
-
-    .. code-block:: yaml
-
-        policies:
-            - name: perform-update-group-action
-              resource: oci.group
-              actions:
-                - type: update-group
-
-    """  # noqa
-
-    schema = type_schema("update-group", params={"type": "object"}, rinherit=OCIBaseAction.schema)
-
-    def perform_action(self, resource):
-        client = self.manager.get_client()
-        params_dict = {}
-        params_model = {}
-        params_dict["group_id"] = resource.get("id")
-        if self.data.get("params").get("update_group_details"):
-            update_group_details_user = self.data.get("params").get("update_group_details")
-            params_model = self.update_params(resource, update_group_details_user)
-            params_dict["update_group_details"] = oci.identity.models.UpdateGroupDetails(
-                **params_model
-            )
-        response = client.update_group(
-            group_id=params_dict["group_id"],
-            update_group_details=params_dict["update_group_details"],
-        )
-        log.info(f"Received status {response.status} for PUT:update_group {response.request_id}")
-        return response
-
-
 @Group.action_registry.register("update")
 class UpdateGroupAction(OCIBaseAction):
     """
@@ -372,49 +280,6 @@ class User(QueryResourceManager):
         id = "id"
         name = "name"
         search_resource_type = "user"
-
-
-@User.action_registry.register("update-user")
-class UpdateUser(OCIBaseAction):
-    """
-    Update user Action
-
-    :example:
-
-    Updates the description of the specified user.
-
-    Please refer to the Oracle Cloud Infrastructure Python SDK documentation for parameter details to this action
-    https://docs.oracle.com/en-us/iaas/tools/python/latest/api/identity/client/oci.identity.IdentityClient.html#oci.identity.IdentityClient.update_user
-
-    .. code-block:: yaml
-
-        policies:
-            - name: perform-update-user-action
-              resource: oci.user
-              actions:
-                - type: update-user
-
-    """  # noqa
-
-    schema = type_schema("update-user", params={"type": "object"}, rinherit=OCIBaseAction.schema)
-
-    def perform_action(self, resource):
-        client = self.manager.get_client()
-        params_dict = {}
-        params_model = {}
-        params_dict["user_id"] = resource.get("id")
-        if self.data.get("params").get("update_user_details"):
-            update_user_details_user = self.data.get("params").get("update_user_details")
-            params_model = self.update_params(resource, update_user_details_user)
-            params_dict["update_user_details"] = oci.identity.models.UpdateUserDetails(
-                **params_model
-            )
-        response = client.update_user(
-            user_id=params_dict["user_id"],
-            update_user_details=params_dict["update_user_details"],
-        )
-        log.info(f"Received status {response.status} for PUT:update_user {response.request_id}")
-        return response
 
 
 @User.action_registry.register("update")

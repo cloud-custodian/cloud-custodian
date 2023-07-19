@@ -44,59 +44,6 @@ class Zone(QueryResourceManager):
         search_resource_type = "customerdnszone"
 
 
-@Zone.action_registry.register("update-zone")
-class UpdateZone(OCIBaseAction):
-    """
-        Update zone Action
-
-        :example:
-
-        Updates the zone with the specified information.
-
-    Global secondary zones may have their external masters updated. For more information about secondary
-    zones, see [Manage DNS Service Zone](/iaas/Content/DNS/Tasks/managingdnszones.htm). When the zone name
-    is provided as a path parameter and `PRIVATE` is used for the scope query parameter then the viewId
-    query parameter is required.
-
-
-        Please refer to the Oracle Cloud Infrastructure Python SDK documentation for parameter details to this action
-        https://docs.oracle.com/en-us/iaas/tools/python/latest/api/dns/client/oci.dns.DnsClient.html#oci.dns.DnsClient.update_zone
-
-        .. code-block:: yaml
-
-            policies:
-                - name: perform-update-zone-action
-                  resource: oci.zone
-                  actions:
-                    - type: update-zone
-
-    """  # noqa
-
-    schema = type_schema("update-zone", params={"type": "object"}, rinherit=OCIBaseAction.schema)
-
-    def perform_action(self, resource):
-        client = self.manager.get_client()
-        params_dict = {}
-        params_model = {}
-        params_dict["zone_name_or_id"] = resource.get("id")
-        if self.data.get("params").get("update_zone_details"):
-            update_zone_details_user = self.data.get("params").get("update_zone_details")
-            params_model = self.update_params(resource, update_zone_details_user)
-            params_dict["update_zone_details"] = oci.dns.models.UpdateZoneDetails(**params_model)
-        if self.data.get("params") and self.data.get("params").get("scope"):
-            params_dict["scope"] = self.data.get("params").get("scope")
-        if self.data.get("params") and self.data.get("params").get("view_id"):
-            params_dict["view_id"] = self.data.get("params").get("view_id")
-        if self.data.get("params") and self.data.get("params").get("compartment_id"):
-            params_dict["compartment_id"] = self.data.get("params").get("compartment_id")
-        response = client.update_zone(
-            zone_name_or_id=params_dict["zone_name_or_id"],
-            update_zone_details=params_dict["update_zone_details"],
-        )
-        log.info(f"Received status {response.status} for PUT:update_zone {response.request_id}")
-        return response
-
-
 @Zone.action_registry.register("update")
 class UpdateZoneAction(OCIBaseAction):
     """

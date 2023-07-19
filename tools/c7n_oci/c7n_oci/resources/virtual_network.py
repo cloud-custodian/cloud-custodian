@@ -44,56 +44,9 @@ class Cross_connect(QueryResourceManager):
         search_resource_type = "crossconnect"
 
 
-@Cross_connect.action_registry.register("update-cross-connect")
-class UpdateCrossConnect(OCIBaseAction):
-    """
-    Update cross connect Action
-
-    :example:
-
-    Updates the specified cross-connect.
-
-    Please refer to the Oracle Cloud Infrastructure Python SDK documentation for parameter details to this action
-    https://docs.oracle.com/en-us/iaas/tools/python/latest/api/core/client/oci.core.VirtualNetworkClient.html#oci.core.VirtualNetworkClient.update_cross_connect
-
-    .. code-block:: yaml
-
-        policies:
-            - name: perform-update-cross-connect-action
-              resource: oci.cross_connect
-              actions:
-                - type: update-cross-connect
-
-    """  # noqa
-
-    schema = type_schema(
-        "update-cross-connect", params={"type": "object"}, rinherit=OCIBaseAction.schema
-    )
-
-    def perform_action(self, resource):
-        client = self.manager.get_client()
-        params_dict = {}
-        params_model = {}
-        params_dict["cross_connect_id"] = resource.get("id")
-        if self.data.get("params").get("update_cross_connect_details"):
-            update_cross_connect_details_user = self.data.get("params").get(
-                "update_cross_connect_details"
-            )
-            params_model = self.update_params(resource, update_cross_connect_details_user)
-            params_dict["update_cross_connect_details"] = oci.core.models.UpdateCrossConnectDetails(
-                **params_model
-            )
-        response = client.update_cross_connect(
-            cross_connect_id=params_dict["cross_connect_id"],
-            update_cross_connect_details=params_dict["update_cross_connect_details"],
-        )
-        log.info(
-            f"Received status {response.status} for PUT:update_cross_connect {response.request_id}"
-        )
-        return response
+Cross_connect.action_registry.register("update")
 
 
-@Cross_connect.action_registry.register("update")
 class UpdateCrossConnectAction(OCIBaseAction):
     """
     Update cross connect Action
@@ -215,48 +168,6 @@ class Vcn(QueryResourceManager):
         search_resource_type = "vcn"
 
 
-@Vcn.action_registry.register("update-vcn")
-class UpdateVcn(OCIBaseAction):
-    """
-    Update vcn Action
-
-    :example:
-
-    Updates the specified VCN.
-
-
-    Please refer to the Oracle Cloud Infrastructure Python SDK documentation for parameter details to this action
-    https://docs.oracle.com/en-us/iaas/tools/python/latest/api/core/client/oci.core.VirtualNetworkClient.html#oci.core.VirtualNetworkClient.update_vcn
-
-    .. code-block:: yaml
-
-        policies:
-            - name: perform-update-vcn-action
-              resource: oci.vcn
-              actions:
-                - type: update-vcn
-
-    """  # noqa
-
-    schema = type_schema("update-vcn", params={"type": "object"}, rinherit=OCIBaseAction.schema)
-
-    def perform_action(self, resource):
-        client = self.manager.get_client()
-        params_dict = {}
-        params_model = {}
-        params_dict["vcn_id"] = resource.get("id")
-        if self.data.get("params").get("update_vcn_details"):
-            update_vcn_details_user = self.data.get("params").get("update_vcn_details")
-            params_model = self.update_params(resource, update_vcn_details_user)
-            params_dict["update_vcn_details"] = oci.core.models.UpdateVcnDetails(**params_model)
-        response = client.update_vcn(
-            vcn_id=params_dict["vcn_id"],
-            update_vcn_details=params_dict["update_vcn_details"],
-        )
-        log.info(f"Received status {response.status} for PUT:update_vcn {response.request_id}")
-        return response
-
-
 @Vcn.action_registry.register("update")
 class UpdateVcnAction(OCIBaseAction):
     """
@@ -373,50 +284,6 @@ class Subnet(QueryResourceManager):
         id = "id"
         name = "display_name"
         search_resource_type = "subnet"
-
-
-@Subnet.action_registry.register("update-subnet")
-class UpdateSubnet(OCIBaseAction):
-    """
-    Update subnet Action
-
-    :example:
-
-    Updates the specified subnet.
-
-
-    Please refer to the Oracle Cloud Infrastructure Python SDK documentation for parameter details to this action
-    https://docs.oracle.com/en-us/iaas/tools/python/latest/api/core/client/oci.core.VirtualNetworkClient.html#oci.core.VirtualNetworkClient.update_subnet
-
-    .. code-block:: yaml
-
-        policies:
-            - name: perform-update-subnet-action
-              resource: oci.subnet
-              actions:
-                - type: update-subnet
-
-    """  # noqa
-
-    schema = type_schema("update-subnet", params={"type": "object"}, rinherit=OCIBaseAction.schema)
-
-    def perform_action(self, resource):
-        client = self.manager.get_client()
-        params_dict = {}
-        params_model = {}
-        params_dict["subnet_id"] = resource.get("id")
-        if self.data.get("params").get("update_subnet_details"):
-            update_subnet_details_user = self.data.get("params").get("update_subnet_details")
-            params_model = self.update_params(resource, update_subnet_details_user)
-            params_dict["update_subnet_details"] = oci.core.models.UpdateSubnetDetails(
-                **params_model
-            )
-        response = client.update_subnet(
-            subnet_id=params_dict["subnet_id"],
-            update_subnet_details=params_dict["update_subnet_details"],
-        )
-        log.info(f"Received status {response.status} for PUT:update_subnet {response.request_id}")
-        return response
 
 
 @Subnet.action_registry.register("update")

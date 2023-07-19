@@ -60,16 +60,7 @@ class TestIdentityTerraformTest(OciBaseTest):
                     "op": "eq",
                 },
             ],
-            "actions": [
-                {
-                    "type": "update-compartment",
-                    "params": {
-                        "update_compartment_details": {
-                            "freeform_tags": {"Environment": "Development"}
-                        }
-                    },
-                }
-            ],
+            "actions": [{"type": "update", "freeform_tags": {"Environment": "Development"}}],
         }
         policy = test.load_policy(policy_str, session_factory=session_factory)
         policy.run()
@@ -178,14 +169,7 @@ class TestIdentityTerraformTest(OciBaseTest):
                     "op": "eq",
                 },
             ],
-            "actions": [
-                {
-                    "type": "update-group",
-                    "params": {
-                        "update_group_details": {"freeform_tags": {"Environment": "Development"}}
-                    },
-                }
-            ],
+            "actions": [{"type": "update", "freeform_tags": {"Environment": "Development"}}],
         }
         session_factory = test.oci_session_factory(
             self.__class__.__name__, inspect.currentframe().f_code.co_name
@@ -299,12 +283,7 @@ class TestIdentityTerraformTest(OciBaseTest):
                     "op": "eq",
                 },
             ],
-            "actions": [
-                {
-                    "type": "update-user",
-                    "params": {"update_user_details": {"freeform_tags": {"key_limit": "2"}}},
-                }
-            ],
+            "actions": [{"type": "update", "freeform_tags": {"key_limit": "2"}}],
         }
         session_factory = test.oci_session_factory(
             self.__class__.__name__, inspect.currentframe().f_code.co_name
@@ -615,12 +594,11 @@ class IdentityUnitTest(unittest.TestCase, OciBaseTest):
 
     @staticmethod
     def get_action(resource):
-        method_name = "update-{0}".format(resource)
-        method_param = "update_{0}_details".format(resource)
+        method_name = "update"
         return [
             {
                 "type": method_name,
-                "params": {method_param: {"freeform_tags": {"Environment": "Cloud-Custodian-Dev"}}},
+                "freeform_tags": {"Environment": "Cloud-Custodian-Dev"},
             }
         ]
 

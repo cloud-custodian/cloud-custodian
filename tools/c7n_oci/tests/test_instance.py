@@ -32,16 +32,7 @@ class TestInstance(OciBaseTest):
                 "filters": [
                     {"type": "value", "key": "id", "value": ocid},
                 ],
-                "actions": [
-                    {
-                        "type": "update-instance",
-                        "params": {
-                            "update_instance_details": {
-                                "defined_tags": self.get_defined_tag("add_tag")
-                            }
-                        },
-                    }
-                ],
+                "actions": [{"type": "update", "defined_tags": self.get_defined_tag("add_tag")}],
             },
             session_factory=session_factory,
         )
@@ -68,16 +59,7 @@ class TestInstance(OciBaseTest):
                 "filters": [
                     {"type": "value", "key": "id", "value": ocid},
                 ],
-                "actions": [
-                    {
-                        "type": "update-instance",
-                        "params": {
-                            "update_instance_details": {
-                                "defined_tags": self.get_defined_tag("update_tag")
-                            }
-                        },
-                    }
-                ],
+                "actions": [{"type": "update", "defined_tags": self.get_defined_tag("update_tag")}],
             },
             session_factory=session_factory,
         )
@@ -102,16 +84,7 @@ class TestInstance(OciBaseTest):
                 "filters": [
                     {"type": "value", "key": "id", "value": ocid},
                 ],
-                "actions": [
-                    {
-                        "type": "update-instance",
-                        "params": {
-                            "update_instance_details": {
-                                "freeform_tags": {"Environment": "Development"}
-                            }
-                        },
-                    }
-                ],
+                "actions": [{"type": "update", "freeform_tags": {"Environment": "Development"}}],
             },
             session_factory=session_factory,
         )
@@ -136,16 +109,7 @@ class TestInstance(OciBaseTest):
                 "filters": [
                     {"type": "value", "key": "id", "value": ocid},
                 ],
-                "actions": [
-                    {
-                        "type": "update-instance",
-                        "params": {
-                            "update_instance_details": {
-                                "freeform_tags": {"Environment": "Production"}
-                            }
-                        },
-                    }
-                ],
+                "actions": [{"type": "update", "freeform_tags": {"Environment": "Production"}}],
             },
             session_factory=session_factory,
         )
@@ -250,7 +214,7 @@ class TestInstance(OciBaseTest):
                 "name": "instance-with-low-cpu-utilization",
                 "resource": "oci.instance",
                 "filters": [
-                    {"type": "monitoring", "query": "CpuUtilization[1m].max() < 100"},
+                    {"type": "metrics", "query": "CpuUtilization[1m].max() < 100"},
                 ],
             },
             session_factory=session_factory,
@@ -281,10 +245,7 @@ class TestInstance(OciBaseTest):
                     {"type": "value", "key": "id", "value": ocid},
                 ],
                 "actions": [
-                    {
-                        "type": "instance-action",
-                        "params": {"action": "STOP"},
-                    },
+                    {"type": "stop"},
                 ],
             },
             session_factory=session_factory,

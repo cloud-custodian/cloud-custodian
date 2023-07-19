@@ -50,59 +50,6 @@ class Bucket(QueryResourceManager):
         return kw
 
 
-@Bucket.action_registry.register("update-bucket")
-class UpdateBucket(OCIBaseAction):
-    """
-        Update bucket Action
-
-        :example:
-
-        Performs a partial or full update of a bucket's user-defined metadata.
-
-    Use UpdateBucket to move a bucket from one compartment to another within the same tenancy. Supply the compartmentID
-    of the compartment that you want to move the bucket to. For more information about moving resources between compartments,
-    see [Moving Resources to a Different Compartment](/iaas/Content/Identity/Tasks/managingcompartments.htm#moveRes).
-
-
-        Please refer to the Oracle Cloud Infrastructure Python SDK documentation for parameter details to this action
-        https://docs.oracle.com/en-us/iaas/tools/python/latest/api/object_storage/client/oci.object_storage.ObjectStorageClient.html#oci.object_storage.ObjectStorageClient.update_bucket
-
-        .. code-block:: yaml
-
-            policies:
-                - name: perform-update-bucket-action
-                  resource: oci.bucket
-                  actions:
-                    - type: update-bucket
-
-    """  # noqa
-
-    schema = type_schema("update-bucket", params={"type": "object"}, rinherit=OCIBaseAction.schema)
-
-    def perform_action(self, resource):
-        client = self.manager.get_client()
-        params_dict = {}
-        params_model = {}
-        params_dict["namespace_name"] = resource.get("namespace")
-        if self.data.get("params") and self.data.get("params").get("bucket_name"):
-            params_dict["bucket_name"] = self.data.get("params").get("bucket_name")
-        else:
-            params_dict["bucket_name"] = resource.get("name")
-        if self.data.get("params").get("update_bucket_details"):
-            update_bucket_details_user = self.data.get("params").get("update_bucket_details")
-            params_model = self.update_params(resource, update_bucket_details_user)
-            params_dict["update_bucket_details"] = oci.object_storage.models.UpdateBucketDetails(
-                **params_model
-            )
-        response = client.update_bucket(
-            namespace_name=params_dict["namespace_name"],
-            bucket_name=params_dict["bucket_name"],
-            update_bucket_details=params_dict["update_bucket_details"],
-        )
-        log.info(f"Received status {response.status} for POST:update_bucket {response.request_id}")
-        return response
-
-
 @Bucket.action_registry.register("update")
 class UpdateBucketAction(OCIBaseAction):
     """
