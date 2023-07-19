@@ -2016,7 +2016,7 @@ class DbOptionGroups(ValueFilter):
 
     schema = type_schema('db-option-groups', rinherit=ValueFilter.schema)
     schema_alias = False
-    permissions = ('rds:DescribeDBInstances', 'rds:DescribeOptionGroups', )
+    permissions = ('rds:DescribeDBInstances', 'rds:DescribeOptionGroups',)
     policy_annotation = 'c7n:MatchedDBOptionGroups'
 
     def handle_optiongroup_cache(self, client, paginator, option_groups):
@@ -2061,5 +2061,36 @@ class DbOptionGroups(ValueFilter):
                         self.data.get('key'): self.data.get('value')})
                     results.append(resource)
                     break
+
+        return results
+
+
+@filters.register('has-pending-maintenance')
+class HasPendingMaintenance(Filter):
+    """ Scan DB instances for those with pending maintenance
+    :example:
+    .. code-block:: yaml
+            policies:
+              - name: rds-pending-maintenance
+                resource: rds
+                filters:
+                  - has-pending-maintenance
+    """
+
+    schema = type_schema('has-pending-maintenance')
+    permissions = ('rds:DescribePendingMaintenanceActions',)
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('rds')
+
+        results = []
+        response = client.describe_pending_maintenance_actions()
+        rds_pending_maintenance_list = [x['ResourceIdentifier']
+                                        for x in response.get('PendingMaintenanceActions')]
+
+        for r in resources:
+            for rds in rds_pending_maintenance_list:
+                if r['DBInstanceArn'] == rds:
+                    results.append(r)
 
         return results
