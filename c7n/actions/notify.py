@@ -14,8 +14,67 @@ from c7n.resolver import ValuesFrom
 from c7n.version import version
 
 
+class ResourceMessageBuffer:
+
+    buffer_max_size = 262144
+    # ratio calculated over all extant json test data files, most
+    # resources have many common repeated keys re compress down well.
+    #
+    # base64 increases size, but the compression reduces versus raw to mask overhead.
+    # https://lemire.me/blog/2019/01/30/what-is-the-space-overhead-of-base64-encoding/
+    #
+    # script to caculate ratio
+    # https://gist.github.com/kapilt/8c3558a7db0d178cb1c4e91d47dacc77
+    #
+    b64_zlib_ratio = 0.6
+
+    def __init__(self, envelope):
+        envelope['resources'] = []
+        self.envelope = utils.dumps(envelope)
+        self.resource_parts = []
+        self.raw_size = len(self.envelope)
+
+    def add(self, resource):
+        self.resource_parts.append(utils.dumps(resource))
+        self.raw_size += len(self.resource_parts)
+
+    def __len__(self):
+        return len(self.resource_parts)
+
+    @property
+    def full(self):
+        """ heuristic to calculate size of payload
+        """
+        if self.raw_size * self.b64_zlib_ratio > self.buffer_max_size:
+            return True
+        return False
+
+    def consume(self):
+        rbegin_idx = self.envelope.rfind('[')
+        rend_idx = self.envelope.rfind(']')
+
+        payload = self.envelope
+        payload = "%s%s%s" % (
+            payload[:rbegin_idx+1],
+            ",".join(self.resource_parts),
+            payload[rend_idx:]
+        )
+        self.resource_parts = []
+        self.raw_size = 0
+
+        serialized_payload =  base64.b64encode(
+            zlib.compress(
+                payload.encode('utf8')
+            )
+        ).decode('ascii')
+
+        assert len(serialized_payload) < self.buffer_max_size, "payload over max size"
+        return serialized_payload
+
+
 class BaseNotify(EventAction):
 
+    message_buffer_class = ResourceMessageBuffer
     batch_size = 250
 
     def expand_variables(self, message):
@@ -177,12 +236,22 @@ class Notify(BaseNotify):
             'policy': self.manager.data}
         message['action'] = self.expand_variables(message)
 
-        for batch in utils.chunks(resources, self.batch_size):
-            message['resources'] = self.prepare_resources(batch)
-            receipt = self.send_data_message(message)
-            self.log.info("sent message:%s policy:%s template:%s count:%s" % (
-                receipt, self.manager.data['name'],
-                self.data.get('template', 'default'), len(batch)))
+        rbuffer = self.message_buffer_class(message)
+        for r in self.prepare_resources(resources):
+            rbuffer.add(r)
+            if rbuffer.full:
+                self.consume_buffer(message, rbuffer)
+
+        if len(rbuffer):
+            self.consume_buffer(message, rbuffer)
+
+    def consume_buffer(self, message, rbuffer):
+        rcount = len(rbuffer)
+        payload = rbuffer.consume()
+        receipt = self.send_data_message(message, payload)
+        self.log.info("sent message:%s policy:%s template:%s count:%s" % (
+            receipt, self.manager.data['name'],
+            self.data.get('template', 'default'), rcount))
 
     def prepare_resources(self, resources):
         """Resources preparation for transport.
@@ -228,13 +297,13 @@ class Notify(BaseNotify):
                 r.pop('IDPSSODescriptor')
         return resources
 
-    def send_data_message(self, message):
+    def send_data_message(self, message, payload):
         if self.data['transport']['type'] == 'sqs':
-            return self.send_sqs(message)
+            return self.send_sqs(message, payload)
         elif self.data['transport']['type'] == 'sns':
-            return self.send_sns(message)
+            return self.send_sns(message, payload)
 
-    def send_sns(self, message):
+    def send_sns(self, message, payload):
         topic = self.data['transport']['topic'].format(**message)
         user_attributes = self.data['transport'].get('attributes')
         if topic.startswith('arn:'):
@@ -260,12 +329,12 @@ class Notify(BaseNotify):
                     attrs[k] = {'DataType': 'String', 'StringValue': v}
         result = client.publish(
             TopicArn=topic_arn,
-            Message=self.pack(message),
+            Message=payload,
             MessageAttributes=attrs
         )
         return result['MessageId']
 
-    def send_sqs(self, message):
+    def send_sqs(self, message, payload):
         queue = self.data['transport']['queue'].format(**message)
         if queue.startswith('https://queue.amazonaws.com'):
             region = 'us-east-1'
@@ -299,7 +368,7 @@ class Notify(BaseNotify):
         }
         result = client.send_message(
             QueueUrl=queue_url,
-            MessageBody=self.pack(message),
+            MessageBody=payload,
             MessageAttributes=attrs)
         return result['MessageId']
 
