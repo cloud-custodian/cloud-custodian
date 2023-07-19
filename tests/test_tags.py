@@ -12,9 +12,12 @@ from c7n.exceptions import PolicyExecutionError, PolicyValidationError
 from c7n.utils import yaml_load
 
 from .common import BaseTest
+
+import pytest
 from pytest_terraform import terraform
 
 
+@pytest.mark.audited
 @terraform('tag_action_filter_call')
 def test_tag_action_filter_call(test, tag_action_filter_call):
     aws_region = 'us-east-1'
@@ -77,6 +80,7 @@ class TagInterpolationTest(BaseTest):
             },
             session_factory=mock_factory,
         )
+        policy.expand_variables(policy.get_variables())
         policy.resource_manager.actions[0].process(resources)
 
         return (create_tags, tag_resources)
@@ -566,3 +570,34 @@ class CopyRelatedResourceTag(BaseTest):
             if t['Key'] == 'test-tag':
                 found = True
         self.assertTrue(found)
+
+    def test_copy_related_tag_validate_aws_prefix(self):
+        policy = {
+            'name': 'copy-related-tag-aws-prefix',
+            'resource': 'ami',
+            'actions': [
+                {
+                    'type': 'copy-related-tag',
+                    'resource': 'aws.ebs-snapshot',
+                    'key': '',
+                    'tags': '*',
+                }
+            ]
+        }
+        # policy will validate on load
+        policy = self.load_policy(policy)
+
+    def test_copy_related_tag_validate_aws_prefix_fake_resource(self):
+        policy = {
+            'name': 'copy-related-tag-aws-prefix',
+            'resource': 'ami',
+            'actions': [
+                {
+                    'type': 'copy-related-tag',
+                    'resource': 'aws.not-real',
+                    'key': '',
+                    'tags': '*',
+                }
+            ]
+        }
+        self.assertRaises(PolicyValidationError, self.load_policy, policy)

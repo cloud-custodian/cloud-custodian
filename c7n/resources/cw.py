@@ -15,7 +15,8 @@ from c7n.filters.iamaccess import CrossAccountAccessFilter
 from c7n.filters.related import ChildResourceFilter
 from c7n.filters.kms import KmsRelatedFilter
 from c7n.query import (
-    QueryResourceManager, ChildResourceManager, TypeInfo, DescribeSource, ConfigSource)
+    QueryResourceManager, ChildResourceManager,
+    TypeInfo, DescribeSource, ConfigSource, DescribeWithResourceTags)
 from c7n.manager import resources
 from c7n.resolver import ValuesFrom
 from c7n.resources import load_resources
@@ -148,16 +149,49 @@ class EventBus(QueryResourceManager):
         arn_type = 'event-bus'
         arn = 'Arn'
         enum_spec = ('list_event_buses', 'EventBuses', None)
+        config_type = cfn_type = 'AWS::Events::EventBus'
         id = name = 'Name'
         universal_taggable = object()
 
-    augment = universal_augment
+    source_mapping = {'describe': DescribeWithResourceTags,
+                      'config': ConfigSource}
 
 
 @EventBus.filter_registry.register('cross-account')
 class EventBusCrossAccountFilter(CrossAccountAccessFilter):
     # dummy permission
     permissions = ('events:ListEventBuses',)
+
+
+@EventBus.action_registry.register('delete')
+class EventBusDelete(BaseAction):
+    """Delete an event bus.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: cloudwatch-delete-event-bus
+                resource: aws.event-bus
+                filters:
+                    - Name: test-event-bus
+                actions:
+                  - delete
+    """
+
+    schema = type_schema('delete')
+    permissions = ('events:DeleteEventBus',)
+
+    def process(self, resources):
+        client = local_session(
+            self.manager.session_factory).client('events')
+
+        for resource_set in chunks(resources, size=100):
+            for r in resource_set:
+                self.manager.retry(
+                    client.delete_event_bus,
+                    Name=r['Name'])
 
 
 @resources.register('event-rule')
@@ -185,6 +219,7 @@ class EventRuleMetrics(MetricsFilter):
 
 @EventRule.filter_registry.register('event-rule-target')
 class EventRuleTargetFilter(ChildResourceFilter):
+
     """
     Filter event rules by their targets
 
@@ -367,7 +402,9 @@ class SetRuleState(BaseAction):
     This action allows to enable/disable a rule
 
     :example:
+
     .. code-block:: yaml
+
         policies:
             - name: test-rule
               resource: aws.event-rule
@@ -945,6 +982,7 @@ class SubscriptionFilter(BaseAction):
                 filter_pattern: ip
                 destination_arn: arn:aws:logs:us-east-1:1234567890:destination:lambda
                 distribution: Random
+                role_arn: "arn:aws:iam::{account_id}:role/testCrossAccountRole"
     """
     schema = type_schema(
         'put-subscription-filter',
@@ -952,22 +990,22 @@ class SubscriptionFilter(BaseAction):
         filter_pattern={'type': 'string'},
         destination_arn={'type': 'string'},
         distribution={'enum': ['Random', 'ByLogStream']},
+        role_arn={'type': 'string'},
         required=['filter_name', 'destination_arn'])
     permissions = ('logs:PutSubscriptionFilter',)
 
     def process(self, resources):
         session = local_session(self.manager.session_factory)
         client = session.client('logs')
+        params = dict(
+            filterName=self.data.get('filter_name'),
+            filterPattern=self.data.get('filter_pattern', ''),
+            destinationArn=self.data.get('destination_arn'),
+            distribution=self.data.get('distribution', 'ByLogStream'))
 
-        filter_name = self.data.get('filter_name')
-        filter_pattern = self.data.get('filter_pattern', '')
-        destination_arn = self.data.get('destination_arn')
-        distribution = self.data.get('distribution', 'ByLogStream')
+        if self.data.get('role_arn'):
+            params['roleArn'] = self.data.get('role_arn')
 
         for r in resources:
             client.put_subscription_filter(
-                logGroupName=r['logGroupName'],
-                filterName=filter_name,
-                filterPattern=filter_pattern,
-                destinationArn=destination_arn,
-                distribution=distribution)
+                logGroupName=r['logGroupName'], **params)

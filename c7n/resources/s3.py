@@ -53,7 +53,8 @@ from c7n.actions import (
 from c7n.exceptions import PolicyValidationError, PolicyExecutionError
 from c7n.filters import (
     FilterRegistry, Filter, CrossAccountAccessFilter, MetricsFilter,
-    ValueFilter)
+    ValueFilter, ListItemFilter)
+from .aws import shape_validate
 import c7n.filters.policystatement as polstmt_filter
 from c7n.manager import resources
 from c7n.output import NullBlobOutput
@@ -1370,7 +1371,19 @@ class FilterPublicBlock(Filter):
                 config = s3.get_public_access_block(
                     Bucket=bucket['Name'])['PublicAccessBlockConfiguration']
             except ClientError as e:
-                if e.response['Error']['Code'] != 'NoSuchPublicAccessBlockConfiguration':
+                error_code = e.response['Error']['Code']
+                if error_code == 'NoSuchPublicAccessBlockConfiguration':
+                    pass
+                elif error_code == 'AccessDenied':
+                    # Follow the same logic as `assemble_bucket` - log and continue on access
+                    # denied errors rather than halting a policy altogether
+                    method = 'GetPublicAccessBlock'
+                    log.warning(
+                        "Bucket:%s unable to invoke method:%s error:%s ",
+                        bucket['Name'], method, e.response['Error']['Message']
+                    )
+                    bucket.setdefault('c7n:DeniedMethods', []).append(method)
+                else:
                     raise
             bucket[self.annotation_key] = config
         return self.matches_filter(config)
@@ -2750,6 +2763,237 @@ class SetInventory(BucketActionBase):
         return found
 
 
+@filters.register('intelligent-tiering')
+class IntelligentTiering(ListItemFilter):
+    """Filter for S3 buckets to look at intelligent tiering configurations
+
+    The schema to supply to the attrs follows the schema here:
+     https://botocore.amazonaws.com/v1/documentation/api/latest/reference/services/s3/client/list_bucket_intelligent_tiering_configurations.html
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: s3-intelligent-tiering-configuration
+                resource: s3
+                filters:
+                  - type: intelligent-tiering
+                    attrs:
+                      - Status: Enabled
+                      - Filter:
+                          And:
+                            Prefix: test
+                            Tags:
+                              - Key: Owner
+                                Value: c7n
+                      - Tierings:
+                          - Days: 100
+                          - AccessTier: ARCHIVE_ACCESS
+
+    """
+    schema = type_schema(
+        'intelligent-tiering',
+        attrs={'$ref': '#/definitions/filters_common/list_item_attrs'},
+        count={'type': 'number'},
+        count_op={'$ref': '#/definitions/filters_common/comparison_operators'}
+    )
+    permissions = ('s3:GetIntelligentTieringConfiguration',)
+    annotation_key = "c7n:IntelligentTiering"
+    annotate_items = True
+
+    def __init__(self, data, manager=None):
+        super().__init__(data, manager)
+        self.data['key'] = self.annotation_key
+
+    def process(self, buckets, event=None):
+        with self.executor_factory(max_workers=2) as w:
+            futures = {w.submit(self.get_item_values, b): b for b in buckets}
+            for future in as_completed(futures):
+                b = futures[future]
+                if future.exception():
+                    self.log.error("Message: %s Bucket: %s", future.exception(), b['Name'])
+                    continue
+        return super().process(buckets, event)
+
+    def get_item_values(self, b):
+        if self.annotation_key not in b:
+            client = bucket_client(local_session(self.manager.session_factory), b)
+            try:
+                int_tier_config = client.list_bucket_intelligent_tiering_configurations(
+                    Bucket=b['Name'])
+                b[self.annotation_key] = int_tier_config.get(
+                    'IntelligentTieringConfigurationList', [])
+            except ClientError as e:
+                if e.response['Error']['Code'] == 'AccessDenied':
+                    method = 'list_bucket_intelligent_tiering_configurations'
+                    log.warning(
+                        "Bucket:%s unable to invoke method:%s error:%s ",
+                          b['Name'], method, e.response['Error']['Message'])
+                    b.setdefault('c7n:DeniedMethods', []).append(method)
+        return b.get(self.annotation_key)
+
+
+@actions.register('set-intelligent-tiering')
+class ConfigureIntelligentTiering(BucketActionBase):
+    """Action applies an intelligent tiering configuration to a S3 bucket
+
+    The schema to supply to the configuration follows the schema here:
+     https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/s3/client/put_bucket_intelligent_tiering_configuration.html
+
+    To delete a configuration, supply Status=delete with the either the Id or Id: matched
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: s3-apply-intelligent-tiering-config
+                resource: aws.s3
+                filters:
+                  - not:
+                    - type: intelligent-tiering
+                      attrs:
+                        - Status: Enabled
+                        - Filter:
+                            And:
+                              Prefix: helloworld
+                              Tags:
+                                - Key: Hello
+                                  Value: World
+                        - Tierings:
+                          - Days: 123
+                            AccessTier: ARCHIVE_ACCESS
+                actions:
+                  - type: set-intelligent-tiering
+                    Id: c7n-default
+                    IntelligentTieringConfiguration:
+                      Id: c7n-default
+                      Status: Enabled
+                      Tierings:
+                        - Days: 149
+                          AccessTier: ARCHIVE_ACCESS
+
+              - name: s3-delete-intelligent-tiering-configuration
+                resource: aws.s3
+                filters:
+                  - type: intelligent-tiering
+                    attrs:
+                      - Status: Enabled
+                      - Id: test-config
+                actions:
+                  - type: set-intelligent-tiering
+                    Id: test-config
+                    State: delete
+
+              - name: s3-delete-intelligent-tiering-matched-configs
+                resource: aws.s3
+                filters:
+                  - type: intelligent-tiering
+                    attrs:
+                      - Status: Enabled
+                      - Id: test-config
+                actions:
+                  - type: set-intelligent-tiering
+                    Id: matched
+                    State: delete
+
+    """
+
+    annotation_key = 'c7n:ListItemMatches'
+    shape = 'PutBucketIntelligentTieringConfigurationRequest'
+    schema = {
+        'type': 'object',
+        'additionalProperties': False,
+        'oneOf': [
+            {'required': ['type', 'Id', 'IntelligentTieringConfiguration']},
+            {'required': ['type', 'Id', 'State']}],
+        'properties': {
+            'type': {'enum': ['set-intelligent-tiering']},
+            'Id': {'type': 'string'},
+            # delete intelligent tier configurations via state: delete
+            'State': {'type': 'string', 'enum': ['delete']},
+            'IntelligentTieringConfiguration': {'type': 'object'}
+        },
+    }
+
+    permissions = ('s3:PutIntelligentTieringConfiguration',)
+
+    def validate(self):
+        # You can have up to 1,000 S3 Intelligent-Tiering configurations per bucket.
+        # Hence, always use it with a filter
+        found = False
+        for f in self.manager.iter_filters():
+            if isinstance(f, IntelligentTiering):
+                found = True
+                break
+        if not found:
+            raise PolicyValidationError(
+                '`set-intelligent-tiering` may only be used in '
+                'conjunction with `intelligent-tiering` filter on %s' % (self.manager.data,))
+        cfg = dict(self.data)
+        if 'IntelligentTieringConfiguration' in cfg:
+            cfg['Bucket'] = 'bucket'
+            cfg.pop('type')
+            return shape_validate(
+                cfg, self.shape, self.manager.resource_type.service)
+
+    def process(self, buckets):
+        with self.executor_factory(max_workers=3) as w:
+            futures = {}
+
+            for b in buckets:
+                futures[w.submit(self.process_bucket, b)] = b
+
+            for future in as_completed(futures):
+                if future.exception():
+                    bucket = futures[future]
+                    self.log.error(
+                      'error modifying bucket intelligent tiering configuration: %s\n%s',
+                        bucket['Name'], future.exception())
+                    continue
+
+    def process_bucket(self, bucket):
+        s3 = bucket_client(local_session(self.manager.session_factory), bucket)
+
+        if 'list_bucket_intelligent_tiering_configurations' in bucket.get(
+            'c7n:DeniedMethods', []):
+            log.warning("Access Denied Bucket:%s while reading intelligent tiering configurations"
+                        % bucket['Name'])
+            return
+
+        if self.data.get('Id') and self.data.get('IntelligentTieringConfiguration'):
+            try:
+                s3.put_bucket_intelligent_tiering_configuration(
+                    Bucket=bucket['Name'], Id=self.data.get(
+                      'Id'), IntelligentTieringConfiguration=self.data.get(
+                        'IntelligentTieringConfiguration'))
+            except ClientError as e:
+                if e.response['Error']['Code'] == 'AccessDenied':
+                    log.warning(
+                        "Access Denied Bucket:%s while applying intelligent tiering configuration"
+                          % bucket['Name'])
+        if self.data.get('State'):
+            if self.data.get('Id') == 'matched':
+                for config in bucket.get(self.annotation_key):
+                    self.delete_intelligent_tiering_configurations(s3, config.get('Id'), bucket)
+            else:
+                self.delete_intelligent_tiering_configurations(s3, self.data.get('Id'), bucket)
+
+    def delete_intelligent_tiering_configurations(self, s3_client, id, bucket):
+        try:
+            s3_client.delete_bucket_intelligent_tiering_configuration(Bucket=bucket['Name'], Id=id)
+        except ClientError as e:
+            if e.response['Error']['Code'] == 'AccessDenied':
+                log.warning(
+                    "Access Denied Bucket:%s while deleting intelligent tiering configuration"
+                      % bucket['Name'])
+            elif e.response['Error']['Code'] == 'NoSuchConfiguration':
+                log.warning(
+                  "No such configuration found:%s while deleting intelligent tiering configuration"
+                    % bucket['Name'])
+
+
 @actions.register('delete')
 class DeleteBucket(ScanBucket):
     """Action deletes a S3 bucket
@@ -2935,6 +3179,8 @@ class Lifecycle(BucketActionBase):
                             'additionalProperties': False,
                             'properties': {
                                 'Prefix': {'type': 'string'},
+                                'ObjectSizeGreaterThan': {'type': 'integer'},
+                                'ObjectSizeLessThan': {'type': 'integer'},
                                 'Tag': {
                                     'type': 'object',
                                     'required': ['Key', 'Value'],
@@ -2949,6 +3195,8 @@ class Lifecycle(BucketActionBase):
                                     'additionalProperties': False,
                                     'properties': {
                                         'Prefix': {'type': 'string'},
+                                        'ObjectSizeGreaterThan': {'type': 'integer'},
+                                        'ObjectSizeLessThan': {'type': 'integer'},
                                         'Tags': {
                                             'type': 'array',
                                             'items': {
@@ -2984,6 +3232,7 @@ class Lifecycle(BucketActionBase):
                                 'additionalProperties': False,
                                 'properties': {
                                     'NoncurrentDays': {'type': 'integer'},
+                                    'NewerNoncurrentVersions': {'type': 'integer'},
                                     'StorageClass': {'type': 'string'},
                                 },
                             },
@@ -2993,6 +3242,7 @@ class Lifecycle(BucketActionBase):
                             'additionalProperties': False,
                             'properties': {
                                 'NoncurrentDays': {'type': 'integer'},
+                                'NewerNoncurrentVersions': {'type': 'integer'}
                             },
                         },
                         'AbortIncompleteMultipartUpload': {

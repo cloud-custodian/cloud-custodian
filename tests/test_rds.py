@@ -11,7 +11,6 @@ from collections import OrderedDict
 from unittest import mock
 
 import boto3
-import c7n.resources.rds
 from botocore.exceptions import ClientError
 from c7n import tags
 from c7n.exceptions import PolicyValidationError
@@ -20,6 +19,7 @@ from c7n.resources import rds
 from c7n.testing import mock_datetime_now
 from dateutil import parser
 from dateutil import tz as tzutil
+import c7n.filters.backup
 
 from .common import BaseTest, event_data
 
@@ -881,7 +881,7 @@ class RDSTest(BaseTest):
             },
             session_factory=factory,
         )
-        with mock_datetime_now(parser.parse("2022-03-30T00:00:00+00:00"), c7n.resources.rds):
+        with mock_datetime_now(parser.parse("2022-03-30T00:00:00+00:00"), datetime):
             resources = p.run()
         self.assertEqual(len(resources), 1)
 
@@ -909,9 +909,9 @@ class RDSTest(BaseTest):
                 "filters": [
                     {
                         "type": "db-option-groups",
-                        "key": "OptionName",
-                        "op": "eq",
-                        "value": "NATIVE_NETWORK_ENCRYPTION"
+                        "key": "Options[].OptionName",
+                        "value": "NATIVE_NETWORK_ENCRYPTION",
+                        "op": "contains"
                     }
                 ],
             },
@@ -1547,6 +1547,56 @@ class RDSSnapshotTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertTrue("c7n:Engine" in resources[0].keys())
+
+    def test_rds_consecutive_aws_backups_count_filter(self):
+        session_factory = self.replay_flight_data("test_rds_consecutive_aws_backups_count_filter")
+        p = self.load_policy(
+            {
+                "name": "rds_consecutive_aws_backups_count_filter",
+                "resource": "rds",
+                "filters": [
+                    {
+                        "type": "consecutive-aws-backups",
+                        "count": 2,
+                        "period": "days",
+                        "status": "COMPLETED"
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+        with mock_datetime_now(parser.parse("2022-09-09T00:00:00+00:00"), c7n.filters.backup):
+            resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_rds_snapshot_copy_related_tags(self):
+        factory = self.replay_flight_data("test_rds_snapshot_copy_related_tags")
+        client = factory().client("rds")
+        p = self.load_policy(
+            {
+                "name": "rds-snapshot-copy-related-tags",
+                "resource": "rds-snapshot",
+                "filters": [{"tag:Owner": "absent"}],
+                "actions": [
+                    {
+                        "type": "copy-related-tag",
+                        "key": "DBInstanceIdentifier",
+                        "resource": "rds",
+                        "tags": ["Owner"]
+                    }],
+            },
+            session_factory=factory,
+        )
+        output = self.capture_logging("custodian.actions", level=logging.INFO)
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
+        log_output = output.getvalue()
+        self.assertIn("Tagged 2 resources from related", log_output)
+        for resource in resources:
+            arn = p.resource_manager.generate_arn(resource["DBSnapshotIdentifier"])
+            tags = client.list_tags_for_resource(ResourceName=arn)
+            tag_map = {t["Key"]: t["Value"] for t in tags["TagList"]}
+            self.assertTrue("Owner" in tag_map)
 
 
 class TestModifyVpcSecurityGroupsAction(BaseTest):

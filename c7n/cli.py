@@ -47,7 +47,7 @@ def _default_options(p, exclude=[]):
         "--profile",
         help="AWS Account Config File Profile to utilize")
     provider.add_argument("--assume", default=None, dest="assume_role",
-                          help="Role to assume")
+                          help="Role or Service Account to assume")
     provider.add_argument("--external-id", default=None, dest="external_id",
                           help="External Id to provide when assuming a role")
 
@@ -333,10 +333,10 @@ def _setup_logger(options):
     logging.getLogger('urllib3').setLevel(logging.ERROR)
 
 
-def main():
+def main(args=None):
     parser = setup_parser()
     argcomplete.autocomplete(parser)
-    options = parser.parse_args()
+    options = parser.parse_args(args=args)
     if options.subparser is None:
         parser.print_help(file=sys.stderr)
         return sys.exit(2)

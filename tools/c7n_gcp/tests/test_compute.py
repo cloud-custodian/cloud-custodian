@@ -18,7 +18,6 @@ class InstanceTest(BaseTest):
             session_factory=factory)
         resources = p.run()
         self.assertEqual(len(resources), 4)
-
         self.assertEqual(
             p.resource_manager.get_urns(resources),
             [
@@ -196,6 +195,21 @@ class InstanceTest(BaseTest):
         self.assertEqual(len(resources), 1)
 
 
+def test_instance_refresh(test):
+    factory = test.replay_flight_data('instance-refresh', project_id='cloud-custodian')
+    p = test.load_policy(
+        {'name': 'all-instances', 'resource': 'gcp.instance'},
+        session_factory=factory
+    )
+    client = p.resource_manager.get_client()
+    resource = p.resource_manager.resource_type.refresh(
+        client,
+        {'selfLink': "https://www.googleapis.com/compute/v1/projects/stacklet-kapilt/zones/us-central1-a/instances/instance-1"}
+    )
+    assert resource['labels'] == {'env': 'dev'}
+    assert resource['labelFingerprint'] == "GHZ1Un204L0="
+
+
 class DiskTest(BaseTest):
 
     def test_disk_query(self):
@@ -287,6 +301,24 @@ class DiskTest(BaseTest):
                      'zone': resources[0]['zone'].rsplit('/', 1)[-1]})
         self.assertEqual(result['items'][0]['labels']['test_label'], 'test_value')
 
+    def test_recommend_disk(self):
+        project_id = 'cloud-custodian'
+        factory = self.replay_flight_data('disk-recommend', project_id=project_id)
+        p = self.load_policy({
+            'name': 'disk-label',
+            'resource': 'gcp.disk',
+            'filters': [{'type': 'recommend',
+                         'id': 'google.compute.disk.IdleResourceRecommender'}]},
+            session_factory=factory)
+        assert p.get_permissions() == {
+            'compute.disks.list',
+            'recommender.computeDiskIdleResourceRecommendations.get',
+            'recommender.computeDiskIdleResourceRecommendations.list'
+        }
+        resources = p.run()
+        assert len(resources) == 2
+        assert resources[0]['c7n:recommend'][0]['recommenderSubtype'] == 'SNAPSHOT_AND_DELETE_DISK'
+
 
 class SnapshotTest(BaseTest):
 
@@ -325,6 +357,21 @@ class SnapshotTest(BaseTest):
                 'gcp:compute::cloud-custodian:snapshot/snapshot-1'
             ],
         )
+
+
+def test_image_refresh(test):
+    factory = test.replay_flight_data('image-refresh', project_id='cloud-custodian')
+    p = test.load_policy(
+        {'name': 'all-images', 'resource': 'gcp.image'},
+        session_factory=factory
+    )
+    client = p.resource_manager.get_client()
+    resource = p.resource_manager.resource_type.refresh(
+        client,
+        {'selfLink': 'https://www.googleapis.com/compute/v1/projects/stacklet-kapilt/global/images/image-1-dev'}
+    )
+    assert resource['labels'] == {'env': 'dev'}
+    assert resource['labelFingerprint'] == "GHZ1Un204L0="
 
 
 class ImageTest(BaseTest):
@@ -366,6 +413,47 @@ class ImageTest(BaseTest):
             ],
         )
 
+    def test_label_image(self):
+        project_id = 'cloud-custodian'
+        image_name = 'image-1'
+        factory = self.replay_flight_data(
+            'image-set-label', project_id)
+        p = self.load_policy(
+            {'name': 'label-image',
+            'resource': 'gcp.image',
+            'filters': [
+                {'name': image_name}],
+            'actions': [{'type': 'set-labels',
+                        'labels': {'test_label': 'test_value'}}]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = p.resource_manager.get_client()
+        result = client.execute_query(
+            'list', {'project': project_id,
+                     'filter': 'name = image-1'})
+        self.assertEqual(result['items'][0]['labels']['test_label'], 'test_value')
+
+    def test_unlabel_image(self):
+        project_id = 'cloud-custodian'
+        image_name = 'image-1'
+        factory = self.replay_flight_data(
+            'image-remove-label', project_id)
+        p = self.load_policy(
+            {'name': 'label-image',
+            'resource': 'gcp.image',
+            'filters': [
+                {'name': image_name}],
+            'actions': [{'type': 'set-labels',
+                        'remove': ['test_label']}]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = p.resource_manager.get_client()
+        result = client.execute_query(
+            'list', {'project': project_id,
+                     'filter': 'name = image-1'})
+        self.assertEqual(result['items'][0]['labels'].get('test_label'), None)
 
 class InstanceTemplateTest(BaseTest):
 
@@ -537,3 +625,19 @@ class AutoscalerTest(BaseTest):
         self.assertEqual(result_policy['loadBalancingUtilization']['utilizationTarget'], 0.7)
         self.assertEqual(result_policy['minNumReplicas'], 1)
         self.assertEqual(result_policy['maxNumReplicas'], 4)
+
+
+class ProjectTest(BaseTest):
+
+    def test_projects(self):
+        project_id = 'gcp-lab-custodian'
+        session_factory = self.replay_flight_data('project-query', project_id=project_id)
+
+        policy = self.load_policy(
+            {'name': 'gcp-projects',
+             'resource': 'gcp.compute-project'},
+            session_factory=session_factory)
+        resources = policy.run()
+
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['name'], 'gcp-lab-custodian')

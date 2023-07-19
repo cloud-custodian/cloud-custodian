@@ -45,14 +45,28 @@ class Instance(QueryResourceManager):
 
         @staticmethod
         def get_label_params(resource, all_labels):
-            path_param_re = re.compile('.*?/projects/(.*?)/zones/(.*?)/instances/(.*)')
-            project, zone, instance = path_param_re.match(
+            project, zone, instance = re.match(
+                '.*?/projects/(.*?)/zones/(.*?)/instances/(.*)',
                 resource['selfLink']).groups()
             return {'project': project, 'zone': zone, 'instance': instance,
                     'body': {
                         'labels': all_labels,
                         'labelFingerprint': resource['labelFingerprint']
                     }}
+
+        @classmethod
+        def refresh(cls, client, resource):
+            project, zone, name = re.match(
+                '.*?/projects/(.*?)/zones/(.*?)/instances/(.*)',
+                resource['selfLink']).groups()
+            return cls.get(
+                client,
+                {
+                    'project_id': project,
+                    'zone': zone,
+                    'resourceName': name
+                }
+            )
 
 
 Instance.filter_registry.register('offhour', OffHour)
@@ -245,15 +259,40 @@ class Image(QueryResourceManager):
         name = id = 'name'
         default_report_fields = [
             "name", "description", "sourceType", "status", "creationTimestamp",
-            "storageLocation", "diskSizeGb", "family"]
+            "diskSizeGb", "family"]
         asset_type = "compute.googleapis.com/Image"
         urn_component = "image"
+        labels = True
 
         @staticmethod
         def get(client, resource_info):
             return client.execute_command(
                 'get', {'project': resource_info['project_id'],
-                        'resourceId': resource_info['image_id']})
+                        'image': resource_info['image_id']})
+
+        @staticmethod
+        def get_label_params(resource, all_labels):
+            project, resource_id = re.match(
+                '.*?/projects/(.*?)/global/images/(.*)',
+                resource['selfLink']).groups()
+            return {'project': project, 'resource': resource_id,
+                    'body': {
+                        'labels': all_labels,
+                        'labelFingerprint': resource['labelFingerprint']
+                    }}
+
+        @classmethod
+        def refresh(cls, client, resource):
+            project, resource_id = re.match(
+                '.*?/projects/(.*?)/global/images/(.*)',
+                resource['selfLink']).groups()
+            return cls.get(
+                client,
+                {
+                    'project_id': project,
+                    'image_id': resource_id
+                }
+            )
 
 
 @Image.action_registry.register('delete')
@@ -599,3 +638,21 @@ class AutoscalerSet(MethodAction):
                   }}
 
         return result
+
+
+@resources.register('compute-project')
+class Project(QueryResourceManager):
+    """GCP resource: https://cloud.google.com/compute/docs/reference/rest/v1/projects"""
+    class resource_type(TypeInfo):
+        service = 'compute'
+        version = 'v1'
+        component = 'projects'
+        enum_spec = ('get', '[@]', None)
+        name = id = 'name'
+        default_report_fields = ["name"]
+        asset_type = 'compute.googleapis.com/Project'
+
+        @staticmethod
+        def get(client, resource_info):
+            return client.execute_command(
+                'get', {'project': resource_info['project_id']})

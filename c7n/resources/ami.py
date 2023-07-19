@@ -9,7 +9,6 @@ import itertools
 import logging
 
 from concurrent.futures import as_completed
-import jmespath
 
 from c7n.actions import BaseAction
 from c7n.exceptions import ClientError, PolicyValidationError
@@ -18,7 +17,14 @@ from c7n.filters import (
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, DescribeSource, TypeInfo
 from c7n.resolver import ValuesFrom
-from c7n.utils import local_session, type_schema, chunks, merge_dict_list, parse_date
+from c7n.utils import (
+    local_session,
+    type_schema,
+    chunks,
+    merge_dict_list,
+    parse_date,
+    jmespath_compile
+)
 from c7n import deprecated
 
 
@@ -112,7 +118,7 @@ class Deregister(BaseAction):
 
     schema = type_schema('deregister', **{'delete-snapshots': {'type': 'boolean'}})
     permissions = ('ec2:DeregisterImage',)
-    snap_expr = jmespath.compile('BlockDeviceMappings[].Ebs.SnapshotId')
+    snap_expr = jmespath_compile('BlockDeviceMappings[].Ebs.SnapshotId')
 
     def process(self, images):
         client = local_session(self.manager.session_factory).client('ec2')
@@ -381,8 +387,8 @@ class SetPermissions(BaseAction):
         remove = []
         add = []
         account_regex = re.compile('\\d{12}')
-        org_regex = re.compile('arn:[a-zA-Z-]+:organizations::\\d{12}:organization/o-.*')
-        ou_regex = re.compile('arn:[a-zA-Z-]+:organizations::\\d{12}:ou/o-.*/ou-.*')
+        org_regex = re.compile('arn:[a-zA-Z-]+:organizations:\\d{12}:organization/o-.*')
+        ou_regex = re.compile('arn:[a-zA-Z-]+:organizations:\\d{12}:ou/o-.*/ou-.*')
         if to_remove:
             if 'all' in to_remove:
                 remove.append({'Group': 'all'})
@@ -415,16 +421,17 @@ class SetPermissions(BaseAction):
                 if principals:
                     add.extend([{'OrganizationalUnitArn': a} for a in principals])
 
-        if not remove and not add:
-            return
-        self.manager.retry(client.modify_image_attribute,
-            ImageId=image['ImageId'],
-            LaunchPermission={'Remove': remove},
-            OperationType='remove')
-        self.manager.retry(client.modify_image_attribute,
-            ImageId=image['ImageId'],
-            LaunchPermission={'Add': add},
-            OperationType='add')
+        if remove:
+            self.manager.retry(client.modify_image_attribute,
+                ImageId=image['ImageId'],
+                LaunchPermission={'Remove': remove},
+                OperationType='remove')
+
+        if add:
+            self.manager.retry(client.modify_image_attribute,
+                ImageId=image['ImageId'],
+                LaunchPermission={'Add': add},
+                OperationType='add')
 
 
 @AMI.action_registry.register('copy')

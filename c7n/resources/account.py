@@ -5,7 +5,6 @@
 import json
 import time
 import datetime
-import jmespath
 from contextlib import suppress
 from botocore.exceptions import ClientError
 from fnmatch import fnmatch
@@ -19,7 +18,7 @@ from c7n.filters.kms import KmsRelatedFilter
 from c7n.filters.multiattr import MultiAttrFilter
 from c7n.filters.missing import Missing
 from c7n.manager import ResourceManager, resources
-from c7n.utils import local_session, type_schema, generate_arn, get_support_region
+from c7n.utils import local_session, type_schema, generate_arn, get_support_region, jmespath_search
 from c7n.query import QueryResourceManager, TypeInfo
 
 from c7n.resources.iam import CredentialReport
@@ -253,7 +252,7 @@ class CloudTrailEnabled(Filter):
 
     permissions = ('cloudtrail:DescribeTrails', 'cloudtrail:GetTrailStatus',
                    'cloudtrail:GetEventSelectors', 'cloudwatch:DescribeAlarmsForMetric',
-                   'logs:DescribeMetricFilters', 'sns:ListSubscriptions')
+                   'logs:DescribeMetricFilters', 'sns:ListSubscriptionsByTopic')
 
     def process(self, resources, event=None):
         session = local_session(self.manager.session_factory)
@@ -299,7 +298,7 @@ class CloudTrailEnabled(Filter):
         if self.data.get('log-metric-filter-pattern'):
             client_logs = session.client('logs')
             client_cw = session.client('cloudwatch')
-            sns_manager = self.manager.get_resource_manager('sns-subscription')
+            client_sns = session.client('sns')
             matched = []
             for t in list(trails):
                 if 'CloudWatchLogsLogGroupArn' not in t.keys():
@@ -330,10 +329,15 @@ class CloudTrailEnabled(Filter):
                 if not alarm_actions:
                     continue
                 alarm_actions = set(alarm_actions)
-                sns_subscriptions = sns_manager.resources()
-                for s in sns_subscriptions:
-                    if s['TopicArn'] in alarm_actions:
-                        matched.append(t)
+                for a in alarm_actions:
+                    try:
+                        subs = client_sns.list_subscriptions_by_topic(TopicArn=a)
+                        if len(subs['Subscriptions']) > 0:
+                            matched.append(t)
+                    except client_sns.exceptions.InvalidParameterValueException:
+                        # we can ignore any exception here, the alarm action might
+                        # not be an sns topic for instance
+                        continue
             trails = matched
         if trails:
             return []
@@ -1996,7 +2000,7 @@ class LakeformationFilter(Filter):
     def process_account(self, account):
         client = local_session(self.manager.session_factory).client('lakeformation')
         lake_buckets = {
-            Arn.parse(r).resource for r in jmespath.search(
+            Arn.parse(r).resource for r in jmespath_search(
                 'ResourceInfoList[].ResourceArn',
                 client.list_resources())
         }

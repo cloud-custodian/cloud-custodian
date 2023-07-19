@@ -238,12 +238,19 @@ class SnapshotCrossAccountAccess(CrossAccountAccessFilter):
 
     def process_resource_set(self, client, resource_set):
         results = []
+        everyone_only = self.data.get('everyone_only', False)
         for r in resource_set:
             attrs = self.manager.retry(
                 client.describe_snapshot_attribute,
                 SnapshotId=r['SnapshotId'],
                 Attribute='createVolumePermission')['CreateVolumePermissions']
-            shared_accounts = {
+            shared_accounts = set()
+            if everyone_only:
+                for g in attrs:
+                    if g.get('Group') == 'all':
+                        shared_accounts = {g.get('Group')}
+            else:
+                shared_accounts = {
                 g.get('Group') or g.get('UserId') for g in attrs}
             delta_accounts = shared_accounts.difference(self.accounts)
             if delta_accounts:
@@ -996,7 +1003,7 @@ class CopyInstanceTags(BaseAction):
             (t['Key'], t['Value']) for t in volume.get('Tags', [])])
 
         for t in instance.get('Tags', ()):
-            if only_tags and not t['Key'] in only_tags:
+            if only_tags and t['Key'] not in only_tags:
                 continue
             if t['Key'] in extant_tags and t['Value'] == extant_tags[t['Key']]:
                 continue
@@ -1197,7 +1204,7 @@ class EncryptInstanceVolumes(BaseAction):
         return False
 
     def create_encrypted_volume(self, ec2, v, key_id, instance_id):
-        unencrypted_volume_tags = v['Tags']
+        unencrypted_volume_tags = v.get('Tags', [])
         # Create a current snapshot
         results = ec2.create_snapshot(
             VolumeId=v['VolumeId'],
@@ -1575,9 +1582,9 @@ class ModifyVolume(BaseAction):
                  volume-type: gp2
 
     `iops-percent` and `size-percent` can be used to modify
-    respectively iops on io1 volumes and volume size.
+    respectively iops on io1/io2 volumes and volume size.
 
-    When converting to io1, `iops-percent` is used to set the iops
+    When converting to io1/io2, `iops-percent` is used to set the iops
     allocation for the new volume against the extant value for the old
     volume.
 
@@ -1607,7 +1614,7 @@ class ModifyVolume(BaseAction):
 
     schema = type_schema(
         'modify',
-        **{'volume-type': {'enum': ['io1', 'gp2', 'gp3', 'st1', 'sc1']},
+        **{'volume-type': {'enum': ['io1', 'io2', 'gp2', 'gp3', 'st1', 'sc1']},
            'shrink': False,
            'size-percent': {'type': 'number'},
            'iops-percent': {'type': 'number'}})
@@ -1637,7 +1644,8 @@ class ModifyVolume(BaseAction):
 
         for r in resource_set:
             params = {'VolumeId': r['VolumeId']}
-            if piops and ('io1' in (vtype, r['VolumeType'])):
+            if piops and ('io1' in (vtype, r['VolumeType']) or
+                          'io2' in (vtype, r['VolumeType'])):
                 # default here if we're changing to io1
                 params['Iops'] = max(int(r.get('Iops', 10) * piops / 100.0), 100)
             if psize:

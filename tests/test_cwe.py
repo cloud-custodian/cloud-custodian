@@ -3,6 +3,7 @@
 import json
 import jmespath
 import jmespath.parser
+import pytest
 from pytest_terraform import terraform
 from unittest import TestCase
 
@@ -19,6 +20,7 @@ class JmespathEncoder(json.JSONEncoder):
         return json.JSONEncoder.default(self, obj)
 
 
+@pytest.mark.audited
 @terraform('event_bridge_bus')
 def test_event_bus_describe(test, event_bridge_bus):
     factory = test.replay_flight_data('test_cwe_bus_xaccount')
@@ -334,3 +336,26 @@ class CloudWatchEventsFacadeTest(TestCase):
             json.dumps(matched_event, sort_keys=True, cls=JmespathEncoder),
             json.dumps(expected_event, sort_keys=True, cls=JmespathEncoder),
         )
+
+class EventBusTest(BaseTest):
+    def test_event_bus_delete(self):
+        factory = self.replay_flight_data("test_event_bus_delete")
+        p = self.load_policy(
+            {
+                "name": "delete-event-bus",
+                "resource": "event-bus",
+                "filters": [{"Name": "test-event-bus"}],
+                "actions": ["delete"],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            sorted([r["Name"] for r in resources]),
+            ["test-event-bus"],
+        )
+        client = factory().client("events")
+        remainder = client.list_event_buses()["EventBuses"]
+        self.assertEqual(len(remainder), 1)
+        self.assertNotEqual(remainder[0]["Name"], "test-event-bus")

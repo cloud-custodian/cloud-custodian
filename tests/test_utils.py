@@ -58,10 +58,13 @@ class Backoff(BaseTest):
         )
 
     def test_delays_jitter(self):
-        for idx, i in enumerate(utils.backoff_delays(1, 256, jitter=True)):
-            maxv = 2 ** idx
-            self.assertTrue(i > 0)
-            self.assertTrue(i < maxv)
+        count = 0
+        while(count < 100000):
+            count += 1
+            for idx, i in enumerate(utils.backoff_delays(1, 256, jitter=True)):
+                maxv = 2 ** idx
+                self.assertTrue(i >= maxv / 5)
+                self.assertTrue(i < maxv)
 
 
 class UrlConfTest(BaseTest):
@@ -227,6 +230,7 @@ class UtilTest(BaseTest):
         self.assertEqual(json.dumps(utils.FormatDate(d),
                                     cls=utils.DateTimeEncoder, indent=2),
                          '"2018-02-02T12:00:00"')
+        self.assertEqual(str(d), '2018-02-02 12:00:00')
 
     def test_group_by(self):
         items = [{}, {"Type": "a"}, {"Type": "a"}, {"Type": "b"}]
@@ -668,3 +672,35 @@ def test_parse_date_floor():
     assert utils.parse_date(1) is None
     assert utils.parse_date('3000') is None
     assert utils.parse_date('30') is None
+
+
+def test_output_path_join():
+    assert utils.join_output_path(
+        's3://cross-region-c7n/iam-check?region=us-east-2',
+        'Samuel',
+        'us-east-1'
+    ) == 's3://cross-region-c7n/iam-check/Samuel/us-east-1?region=us-east-2'
+
+    output_dir = 's3://cross-region-c7n/iam-checks/{account}/{now:%Y-%m}/{uuid}'
+    assert utils.join_output_path(output_dir, 'Samuel', 'us-east-1') == output_dir
+
+    output_dir = './local-dir'
+    assert utils.join_output_path(output_dir, 'Samuel', 'us-east-1') == (
+        f"./local-dir{os.sep}Samuel{os.sep}us-east-1")
+
+
+def test_jmespath_parse_split():
+    result = utils.jmespath_search(
+        'foo.bar | split(`.`, @)',
+        {'foo': {'bar': 'abc.xyz'}}
+    )
+    assert result == ['abc', 'xyz']
+
+    compiled = utils.jmespath_compile(
+        'foo.bar | split(`.`, @)',
+    )
+    assert isinstance(compiled, utils.ParsedResultWithOptions)
+    result = compiled.search(
+        {'foo': {'bar': 'abc.xyz'}}
+    )
+    assert result == ['abc', 'xyz']

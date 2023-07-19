@@ -6,12 +6,12 @@
 {{element_type|title}}
 
 {% for e, resource in elements %}
-   - :ref:`{{ename(e)}} <{{provider_name}}.common.{{element_type}}.{{ename(e)}}>`
+   - :ref:`{{ename(e)}} <{{provider_type}}.common.{{element_type}}.{{ename(e)}}>`
 
 {% endfor %}
 
 {% for e, resource in elements %}
-.. _{{provider_name}}.common.{{element_type}}.{{ename(e)}}:
+.. _{{provider_type}}.common.{{element_type}}.{{ename(e)}}:
 
 {{ename(e)}}
 {{underline(ename(e), '+')}}

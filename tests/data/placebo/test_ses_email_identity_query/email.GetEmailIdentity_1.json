@@ -1,0 +1,21 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "IdentityType": "DOMAIN",
+        "FeedbackForwardingStatus": true,
+        "VerifiedForSendingStatus": false,
+        "DkimAttributes": {
+            "SigningEnabled": false,
+            "Status": "NOT_STARTED",
+            "SigningAttributesOrigin": "AWS_SES",
+            "NextSigningKeyLength": "RSA_1024_BIT"
+        },
+        "MailFromAttributes": {
+            "BehaviorOnMxFailure": "USE_DEFAULT_VALUE"
+        },
+        "Policies": {},
+        "Tags": [],
+        "VerificationStatus": "FAILED"
+    }
+}

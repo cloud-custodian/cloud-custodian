@@ -48,12 +48,8 @@ class ResultsReporter:
 
 
 def run_policy(policy, terraform_dir, tmp_path):
-    (tmp_path / "policies.json").write_text(
-        json.dumps({"policies": [policy]}, indent=2)
-    )
-    config = Config.empty(
-        policy_dir=tmp_path, source_dir=terraform_dir, exec_filter=None
-    )
+    (tmp_path / "policies.json").write_text(json.dumps({"policies": [policy]}, indent=2))
+    config = Config.empty(policy_dir=tmp_path, source_dir=terraform_dir, exec_filter=None)
     policies = utils.load_policies(tmp_path, config)
     reporter = ResultsReporter()
     core.CollectionRunner(policies, config, reporter).run()
@@ -90,12 +86,8 @@ def policy_env(tmp_path):
 
 
 def test_load_policy(test):
-    test.load_policy(
-        {"name": "check1", "resource": "terraform.aws_s3_bucket"}, validate=True
-    )
-    test.load_policy(
-        {"name": "check2", "resource": ["terraform.aws_s3_bucket"]}, validate=True
-    )
+    test.load_policy({"name": "check1", "resource": "terraform.aws_s3_bucket"}, validate=True)
+    test.load_policy({"name": "check2", "resource": ["terraform.aws_s3_bucket"]}, validate=True)
     test.load_policy({"name": "check3", "resource": ["terraform.aws_*"]}, validate=True)
 
 
@@ -130,6 +122,14 @@ def test_graph_resolver_inner_block_ref():
     assert {r["__tfmeta"]["label"] for r in resolver.resolve_refs(project)} == set(
         ("aws_vpc", "aws_security_group", "aws_iam_role", "aws_subnet")
     )
+
+
+def test_graph_resolver_local_modules():
+    graph = TerraformProvider().parse(terraform_dir / "local_modules/root")
+    queues = list(graph.get_resources_by_type("aws_sqs_queue"))
+    # prove that we got the parent module resources.
+    assert len(queues[0][1]) == 2
+    assert queues[0][1][1]["name"] == "parent_queue"
 
 
 def test_graph_resolver_id():
@@ -257,7 +257,60 @@ def test_provider_parse():
     }
 
 
-def test_multi_resource_policy(tmp_path):
+def test_multi_resource_list_policy(tmp_path):
+    (tmp_path / "policy.json").write_text(
+        json.dumps(
+            {
+                "policies": [
+                    {
+                        "name": "check-multi",
+                        "resource": ["terraform.aws_alb", "terraform.aws_lb"],
+                    }
+                ]
+            }
+        )
+    )
+
+    (tmp_path / "tf").mkdir()
+
+    (tmp_path / "tf" / "main.tf").write_text(
+        """
+resource "aws_alb" "positive1" {
+  name               = "test-lb-tf"
+  internal           = false
+  load_balancer_type = "network"
+  subnets            = aws_subnet.public.*.id
+}
+
+resource "aws_lb" "positive3" {
+  name               = "test-lb-tf"
+  internal           = false
+  load_balancer_type = "network"
+  subnets            = aws_subnet.public.*.id
+}
+        """
+    )
+    runner = CliRunner()
+    result = runner.invoke(
+        cli.cli,
+        [
+            "run",
+            "-p",
+            str(tmp_path),
+            "-d",
+            str(tmp_path / "tf"),
+            "-o",
+            "json",
+            "--output-file",
+            str(tmp_path / "output.json"),
+        ],
+    )
+    assert result.exit_code == 1
+    data = json.loads((tmp_path / "output.json").read_text())
+    assert len(data["results"]) == 2
+
+
+def test_multi_resource_glob_policy(tmp_path):
     (tmp_path / "policy.json").write_text(
         json.dumps(
             {
@@ -548,13 +601,8 @@ def test_policy_metadata(policy_env):
     md = core.PolicyMetadata(policies[0])
     assert md.provider == "terraform"
     assert md.display_category == "network"
-    assert (
-        md.title
-        == "terraform.aws_security_group - policy:test-a category:network severity:high"
-    )
-    assert (
-        repr(md) == "<PolicyMetadata name:test-a resource:terraform.aws_security_group>"
-    )
+    assert md.title == "terraform.aws_security_group - policy:test-a category:network severity:high"
+    assert repr(md) == "<PolicyMetadata name:test-a resource:terraform.aws_security_group>"
 
 
 def test_selection_parse(policy_env):

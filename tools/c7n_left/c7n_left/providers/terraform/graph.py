@@ -7,7 +7,6 @@ from .resource import TerraformResource
 
 
 class TerraformGraph(ResourceGraph):
-
     resolver = None
 
     def __len__(self):

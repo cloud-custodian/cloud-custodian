@@ -3,16 +3,15 @@
 import logging
 import time
 import json
-import jmespath
 
 from c7n.actions import ActionRegistry, BaseAction
 from c7n.exceptions import PolicyValidationError
-from c7n.filters import FilterRegistry, MetricsFilter
+from c7n.filters import FilterRegistry, MetricsFilter, ValueFilter
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, TypeInfo, ConfigSource, DescribeSource
 from c7n.tags import universal_augment
 from c7n.utils import (
-    local_session, type_schema, get_retry)
+    local_session, type_schema, get_retry, jmespath_search)
 from c7n.tags import (
     TagDelayedAction, RemoveTag, TagActionFilter, Tag)
 import c7n.filters.vpc as net_filters
@@ -296,7 +295,7 @@ class SecurityGroupFilter(net_filters.SecurityGroupFilter):
         sg_ids = set()
         for r in resources:
             for exp in self.expressions:
-                ids = jmespath.search(exp, r)
+                ids = jmespath_search(exp, r)
                 if isinstance(ids, list):
                     sg_ids.update(tuple(ids))
                 elif isinstance(ids, str):
@@ -305,6 +304,45 @@ class SecurityGroupFilter(net_filters.SecurityGroupFilter):
 
 
 filters.register('network-location', net_filters.NetworkLocation)
+
+
+@filters.register('security-configuration')
+class EMRSecurityConfigurationFilter(ValueFilter):
+    """Filter for annotate security configuration and
+       filter based on its attributes.
+
+    :example:
+
+    .. code-block:: yaml
+
+      policies:
+        - name: emr-security-configuration
+          resource: emr
+          filters:
+            - type: security-configuration
+              key: EnableAtRestEncryption
+              value: true
+
+    """
+    annotation_key = 'c7n:SecurityConfiguration'
+    permissions = ("elasticmapreduce:ListSecurityConfigurations",
+                   "elasticmapreduce:DescribeSecurityConfiguration",)
+    schema = type_schema('security-configuration', rinherit=ValueFilter.schema)
+    schema_alias = False
+
+    def process(self, resources, event=None):
+        results = []
+        emr_sec_cfgs = {
+            cfg['Name']: cfg for cfg in self.manager.get_resource_manager(
+                'emr-security-configuration').resources()}
+        for r in resources:
+            if 'SecurityConfiguration' not in r:
+                continue
+            cfg = emr_sec_cfgs.get(r['SecurityConfiguration'], {}).get('SecurityConfiguration', {})
+            if self.match(cfg):
+                r[self.annotation_key] = cfg
+                results.append(r)
+        return results
 
 
 @resources.register('emr-security-configuration')

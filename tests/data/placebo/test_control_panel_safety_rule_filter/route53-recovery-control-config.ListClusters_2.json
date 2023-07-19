@@ -1,0 +1,35 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Clusters": [
+            {
+                "ClusterArn": "arn:aws:route53-recovery-control::644160558196:cluster/a9724724-2ac9-4ec0-a405-9208dd74b835",
+                "ClusterEndpoints": [
+                    {
+                        "Endpoint": "https://1235e68d.route53-recovery-cluster.us-west-2.amazonaws.com/v1",
+                        "Region": "us-west-2"
+                    },
+                    {
+                        "Endpoint": "https://cd49e01c.route53-recovery-cluster.eu-west-1.amazonaws.com/v1",
+                        "Region": "eu-west-1"
+                    },
+                    {
+                        "Endpoint": "https://adccd75e.route53-recovery-cluster.us-east-1.amazonaws.com/v1",
+                        "Region": "us-east-1"
+                    },
+                    {
+                        "Endpoint": "https://07f4723f.route53-recovery-cluster.ap-northeast-1.amazonaws.com/v1",
+                        "Region": "ap-northeast-1"
+                    },
+                    {
+                        "Endpoint": "https://107975d9.route53-recovery-cluster.ap-southeast-2.amazonaws.com/v1",
+                        "Region": "ap-southeast-2"
+                    }
+                ],
+                "Name": "test-cluster",
+                "Status": "DEPLOYED"
+            }
+        ]
+    }
+}

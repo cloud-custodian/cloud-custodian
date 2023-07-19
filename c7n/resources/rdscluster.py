@@ -20,6 +20,7 @@ from c7n.utils import (
     type_schema, local_session, snapshot_identifier, chunks)
 
 from c7n.resources.rds import ParameterFilter
+from c7n.filters.backup import ConsecutiveAwsBackupsFilter
 
 log = logging.getLogger('custodian.rds-cluster')
 
@@ -67,6 +68,7 @@ class RDSCluster(QueryResourceManager):
         arn_separator = ":"
         enum_spec = ('describe_db_clusters', 'DBClusters', None)
         name = id = 'DBClusterIdentifier'
+        config_id = 'DbClusterResourceId'
         dimension = 'DBClusterIdentifier'
         universal_taggable = True
         permissions_enum = ('rds:DescribeDBClusters',)
@@ -605,6 +607,9 @@ class RDSClusterSnapshotDelete(BaseAction):
                 continue
 
 
+RDSCluster.filter_registry.register('consecutive-aws-backups', ConsecutiveAwsBackupsFilter)
+
+
 @RDSCluster.filter_registry.register('consecutive-snapshots')
 class ConsecutiveSnapshots(Filter):
     """Returns RDS clusters where number of consective daily snapshots is equal to/or greater
@@ -666,8 +671,11 @@ class ConsecutiveSnapshots(Filter):
 class ClusterParameterFilter(ParameterFilter):
     """
     Applies value type filter on set db cluster parameter values.
+
     :example:
+
     .. code-block:: yaml
+
             policies:
               - name: rdscluster-pg
                 resource: rds-cluster
