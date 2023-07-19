@@ -36,6 +36,8 @@ from c7n.utils import (
 
 from c7n_org.utils import environ, account_tags
 
+from c7n_oci.constants import COMPARTMENT_IDS
+
 log = logging.getLogger('c7n_org')
 
 # Workaround OSX issue, note this exists for py2 but there
@@ -103,14 +105,27 @@ CONFIG_SCHEMA = {
                 'vars': {'type': 'object'},
             }
         },
-    },
+        'tenancy': {
+            'type': 'object',
+            'additionalProperties': True,
+            'required': ['profile'],
+            'properties': {
+                'name': {'type': 'string'},
+                'profile': {'type': 'string', 'minLength': 2},
+                'tags': {'type': 'array', 'items': {'type': 'string'}},
+                'regions': {'type': 'array', 'items': {'type': 'string'}},
+                'vars': {'type': 'object'},
+                }
+            }
+        },
     'type': 'object',
     'additionalProperties': False,
     'oneOf': [
         {'required': ['accounts']},
         {'required': ['projects']},
-        {'required': ['subscriptions']}
-    ],
+        {'required': ['subscriptions']},
+        {'required': ['tenancies']}
+        ],
     'properties': {
         'vars': {'type': 'object'},
         'accounts': {
@@ -124,8 +139,12 @@ CONFIG_SCHEMA = {
         'projects': {
             'type': 'array',
             'items': {'$ref': '#/definitions/project'}
+        },
+        'tenancies': {
+            'type': 'array',
+            'items': {'$ref': '#/definitions/tenancy'}
+            }
         }
-    }
 }
 
 
@@ -570,6 +589,16 @@ def accounts_iterator(config):
              'tags': a.get('tags', ()),
              'vars': _update(a.get('vars', {}), org_vars)}
         yield d
+    for a in config.get("tenancies", ()):
+        d = {"account_id": a["profile"],
+             "name": a.get("name", a["profile"]),
+             "regions": a.get("regions", ["global"]),
+             "provider": "oci",
+             "profile": a["profile"],
+             "tags": a.get("tags", ()),
+             "oci_compartments": a.get("vars").get("oci_compartments") if a.get("vars") else None,
+             "vars": _update(a.get("vars", {}), org_vars)}
+        yield d
 
 
 def _update(old, new):
@@ -609,6 +638,9 @@ def run_account(account, region, policies_config, output_path,
 
     elif account.get('profile'):
         config['profile'] = account['profile']
+
+    if account.get("oci_compartments"):
+        os.environ[COMPARTMENT_IDS] = account.get("oci_compartments")
 
     policies = PolicyCollection.from_data(policies_config, config)
     policy_counts = {}
