@@ -16,36 +16,55 @@ from c7n.version import version
 
 class ResourceMessageBuffer:
 
-    buffer_max_size = 262144
-    # ratio calculated over all extant json test data files, most
-    # resources have many common repeated keys re compress down well.
+    # conservative ratio calculated over all extant json test data
+    # files, most resources have many common repeated keys and values
+    # re compress down well.
     #
-    # base64 increases size, but the compression reduces versus raw to mask overhead.
+    # base64 increases size, but the compression still reduces total size versus raw.
     # https://lemire.me/blog/2019/01/30/what-is-the-space-overhead-of-base64-encoding/
     #
     # script to caculate ratio
     # https://gist.github.com/kapilt/8c3558a7db0d178cb1c4e91d47dacc77
     #
+    # we use this conservative value as a seed and adapt based on observed data
     b64_zlib_ratio = 0.6
 
-    def __init__(self, envelope):
+    def __init__(self, envelope, buffer_max_size):
+        self.buffer_max_size = buffer_max_size
+        self.resource_parts = []
+
         envelope['resources'] = []
         self.envelope = utils.dumps(envelope)
-        self.resource_parts = []
-        self.raw_size = len(self.envelope)
+        self.raw_size = float(len(self.envelope))
+        self.observed_ratio = 0
 
     def add(self, resource):
         self.resource_parts.append(utils.dumps(resource))
-        self.raw_size += len(self.resource_parts)
+        self.raw_size += len(self.resource_parts[0])
 
     def __len__(self):
         return len(self.resource_parts)
 
     @property
+    def estimated_size(self):
+        return self.raw_size * self.compress_ratio
+
+    @property
+    def compress_ratio(self):
+        return self.observed_ratio or self.b64_zlib_ratio
+
+    @property
+    def average_rsize(self):
+        rcount = len(self)
+        if not rcount:
+            return 0
+        return (self.raw_size - len(self.envelope)) / float(rcount)
+
+    @property
     def full(self):
         """ heuristic to calculate size of payload
         """
-        if self.raw_size * self.b64_zlib_ratio > self.buffer_max_size:
+        if (self.raw_size + self.average_rsize) * self.compress_ratio > self.buffer_max_size:
             return True
         return False
 
@@ -59,8 +78,6 @@ class ResourceMessageBuffer:
             ",".join(self.resource_parts),
             payload[rend_idx:]
         )
-        self.resource_parts = []
-        self.raw_size = 0
 
         serialized_payload =  base64.b64encode(
             zlib.compress(
@@ -68,14 +85,19 @@ class ResourceMessageBuffer:
             )
         ).decode('ascii')
 
+        # adapative ratio based on payload contents, with a static
+        # increment for headroom on resource variance.
+        self.observed_ratio = (len(serialized_payload) / float(self.raw_size)) + 0.1
         assert len(serialized_payload) < self.buffer_max_size, "payload over max size"
+        self.resource_parts = []
+        self.raw_size = float(len(self.envelope))
         return serialized_payload
 
 
 class BaseNotify(EventAction):
 
     message_buffer_class = ResourceMessageBuffer
-    batch_size = 250
+    buffer_max_size = 262144
 
     def expand_variables(self, message):
         """expand any variables in the action to_from/cc_from fields.
@@ -236,7 +258,7 @@ class Notify(BaseNotify):
             'policy': self.manager.data}
         message['action'] = self.expand_variables(message)
 
-        rbuffer = self.message_buffer_class(message)
+        rbuffer = self.message_buffer_class(message, self.buffer_max_size)
         for r in self.prepare_resources(resources):
             rbuffer.add(r)
             if rbuffer.full:

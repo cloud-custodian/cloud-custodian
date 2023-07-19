@@ -11,6 +11,41 @@ import zlib
 
 from c7n.exceptions import PolicyValidationError
 
+from c7n.actions.notify import ResourceMessageBuffer
+
+
+
+def test_msg_buffer():
+    buf_size = 1024
+    mbuffer = ResourceMessageBuffer({'env': 'dev', 'region': 'us-east-2'}, buf_size)
+    assert mbuffer.full is False
+
+    for i in range(0, 50):
+        mbuffer.add({'id': 'x%s' % i, 'a': 1, 'b': 2 + i, 'c': 5 * i})
+        if mbuffer.full:
+            break
+
+    assert len(mbuffer) == 43
+    assert mbuffer.estimated_size == 1014.0
+    payload = mbuffer.consume()
+    assert len(payload) == 500
+    assert mbuffer.observed_ratio > 0.39
+    assert 'resources' in json.loads(zlib.decompress(base64.b64decode(payload)))
+
+    assert len(mbuffer) == 0
+    # raw size reverts back to envelope
+    assert mbuffer.raw_size == 56
+
+    # repeat, but with observed dynamic ratio now
+    for i in range(0, 100):
+        mbuffer.add({'id': 'x%s' % i, 'a': 1, 'b': 2 + i, 'c': 5 * i})
+        if mbuffer.full:
+            break
+
+    assert len(mbuffer) == 66
+    payload = mbuffer.consume()
+    assert len(payload) < buf_size
+
 
 class NotifyTest(BaseTest):
 
