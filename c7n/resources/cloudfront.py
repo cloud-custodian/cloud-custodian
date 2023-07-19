@@ -167,72 +167,7 @@ class IsWafEnabled(Filter):
 
 
 @Distribution.filter_registry.register('wafv2-enabled')
-class IsWafV2Enabled(Filter):
-    """Filter CloudFront distribution by wafv2 web-acl
-
-    :example:
-
-    .. code-block:: yaml
-
-            policies:
-              - name: filter-distribution-wafv2
-                description: |
-                  match resources that are NOT associated with any wafV2 web-acls
-                resource: distribution
-                filters:
-                  - type: wafv2-enabled
-                    state: false
-
-              - name: filter-distribution-wafv2-specific-acl
-                description: |
-                  match resources that are NOT associated with wafV2's testv2 web-acl
-                resource: distribution
-                filters:
-                  - type: wafv2-enabled
-                    state: false
-                    web-acl: testv2
-
-              - name: filter-distribution-wafv2-regex
-                description: |
-                  match resources that are NOT associated with specified
-                  wafV2 web-acl regex
-                resource: distribution
-                filters:
-                  - type: wafv2-enabled
-                    state: false
-                    web-acl: .*FMManagedWebACLV2-?FMS-.*
-    """
-
-    schema = type_schema(
-        'wafv2-enabled', **{
-            'web-acl': {'type': 'string'},
-            'state': {'type': 'boolean'}})
-
-    permissions = ('wafv2:ListWebACLs',)
-
-    def process(self, resources, event=None):
-        query = {'Scope': 'CLOUDFRONT'}
-        wafs = self.manager.get_resource_manager('wafv2').resources(query, augment=False)
-        waf_name_id_map = {w['Name']: w['ARN'] for w in wafs}
-
-        target_acl = self.data.get('web-acl', '')
-        state = self.data.get('state', False)
-        target_acl_ids = [v for k, v in waf_name_id_map.items() if
-                          re.match(target_acl, k)]
-        results = []
-        for r in resources:
-            r_web_acl_id = r.get('WebACLId')
-            if state:
-                if r_web_acl_id and r_web_acl_id in target_acl_ids:
-                    results.append(r)
-            else:
-                if not r_web_acl_id or r_web_acl_id not in target_acl_ids:
-                    results.append(r)
-        return results
-
-
-@Distribution.filter_registry.register('wafv2')
-class WafV2Filter(WafV2FilterBase):
+class IsWafV2Enabled(WafV2FilterBase):
     def get_associated_web_acl(self, resource):
         # for WAFv2 Cloudfront stores the ARN of the WebACL even though the attribute is 'WebACLId'
         return self.get_web_acl_by_arn(resource.get('WebACLId'), scope='CLOUDFRONT')

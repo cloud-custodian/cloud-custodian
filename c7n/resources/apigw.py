@@ -10,7 +10,7 @@ from contextlib import suppress
 from c7n.actions import ActionRegistry, BaseAction
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import (
-    FilterRegistry, ValueFilter, MetricsFilter, Filter, WafV2FilterBase,
+    FilterRegistry, ValueFilter, MetricsFilter, WafV2FilterBase,
     WafClassicRegionalFilterBase)
 from c7n.filters.iamaccess import CrossAccountAccessFilter
 from c7n.filters.related import RelatedResourceFilter
@@ -546,55 +546,7 @@ class StageClientCertificateFilter(RelatedResourceFilter):
 
 
 @RestStage.filter_registry.register('waf-enabled')
-class WafEnabled(Filter):
-    """Filter API Gateway stage by waf-regional web-acl
-
-    :example:
-
-    .. code-block:: yaml
-
-            policies:
-              - name: filter-apigw-waf-regional
-                resource: rest-stage
-                filters:
-                  - type: waf-enabled
-                    state: false
-                    web-acl: test
-    """
-    schema = type_schema(
-        'waf-enabled', **{
-            'web-acl': {'type': 'string'},
-            'state': {'type': 'boolean'}})
-
-    permissions = ('waf:ListWebACLs', 'waf:GetWebACL')
-
-    def process(self, resources, event=None):
-        target_acl = self.data.get('web-acl')
-        state = self.data.get('state', False)
-
-        results = []
-        wafs = self.manager.get_resource_manager('waf-regional').resources()
-        waf_name_arn_map = {w['Name']: w['WebACLArn'] for w in wafs}
-        target_acl_arn = waf_name_arn_map.get(target_acl, target_acl)
-        for r in resources:
-            r_web_acl_arn = r.get('webAclArn')
-            if state:
-                if target_acl_arn is None and r_web_acl_arn and \
-                        r_web_acl_arn in waf_name_arn_map.values():
-                    results.append(r)
-                elif target_acl_arn and r_web_acl_arn == target_acl_arn:
-                    results.append(r)
-            else:
-                if target_acl_arn is None and (not r_web_acl_arn or
-                     r_web_acl_arn and r_web_acl_arn not in waf_name_arn_map.values()):
-                    results.append(r)
-                elif target_acl_arn and r_web_acl_arn != target_acl_arn:
-                    results.append(r)
-        return results
-
-
-@RestStage.filter_registry.register('waf')
-class WafFilter(WafClassicRegionalFilterBase):
+class WafEnabled(WafClassicRegionalFilterBase):
     def get_associated_web_acl(self, resource):
         return self.get_web_acl_by_arn(resource.get('webAclArn'))
 
@@ -672,53 +624,7 @@ class SetWaf(BaseAction):
 
 
 @RestStage.filter_registry.register('wafv2-enabled')
-class WafV2Enabled(Filter):
-    """Filter API Gateway stage by wafv2 web-acl
-
-    :example:
-
-    .. code-block:: yaml
-
-            policies:
-              - name: filter-wafv2-apigw
-                resource: rest-stage
-                filters:
-                  - type: wafv2-enabled
-                    state: false
-                    web-acl: testv2
-    """
-
-    schema = type_schema(
-        'wafv2-enabled', **{
-            'web-acl': {'type': 'string'},
-            'state': {'type': 'boolean'}})
-
-    permissions = ('wafv2:ListWebACLs',)
-
-    def process(self, resources, event=None):
-        target_acl = self.data.get('web-acl', '')
-        state = self.data.get('state', False)
-        results = []
-
-        wafs = self.manager.get_resource_manager('wafv2').resources(augment=False)
-        waf_name_arn_map = {w['Name']: w['ARN'] for w in wafs}
-
-        target_acl_ids = [v for k, v in waf_name_arn_map.items() if
-                          re.match(target_acl, k)]
-        for r in resources:
-            r_web_acl_arn = r.get('webAclArn')
-            if state:
-                if r_web_acl_arn and r_web_acl_arn in target_acl_ids:
-                    results.append(r)
-            else:
-                if not r_web_acl_arn or r_web_acl_arn not in target_acl_ids:
-                    results.append(r)
-
-        return results
-
-
-@RestStage.filter_registry.register('wafv2')
-class WafV2Filter(WafV2FilterBase):
+class WafV2Enabled(WafV2FilterBase):
     def get_associated_web_acl(self, resource):
         return self.get_web_acl_by_arn(resource.get('webAclArn'))
 

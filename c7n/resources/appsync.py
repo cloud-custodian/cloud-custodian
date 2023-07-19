@@ -3,7 +3,7 @@
 import re
 
 from c7n.actions import BaseAction, Action
-from c7n.filters import Filter, ValueFilter, WafV2FilterBase
+from c7n.filters import ValueFilter, WafV2FilterBase
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, TypeInfo
 from c7n.utils import local_session, type_schema, get_retry
@@ -25,63 +25,63 @@ class GraphQLApi(QueryResourceManager):
         universal_taggable = True
 
 
+# @GraphQLApi.filter_registry.register('wafv2-enabled')
+# class WafV2Enabled(Filter):
+#     """Filter AppSync GraphQLApi by wafv2 web-acl
+
+#     :example:
+
+#     .. code-block:: yaml
+
+#             policies:
+#               - name: filter-graphql-api-wafv2
+#                 resource: graphql-api
+#                 filters:
+#                   - type: wafv2-enabled
+#                     state: false
+#                     web-acl: test-waf-v2
+#               - name: filter-graphql-api-wafv2-regex
+#                 resource: graphql-api
+#                 filters:
+#                   - type: wafv2-enabled
+#                     state: false
+#                     web-acl: .*FMManagedWebACLV2-?FMS-.*
+#     """
+
+#     schema = type_schema(
+#         'wafv2-enabled', **{
+#             'web-acl': {'type': 'string'},
+#             'state': {'type': 'boolean'}})
+
+#     permissions = ('wafv2:ListWebACLs',)
+
+#     def process(self, resources, event=None):
+#         wafs = self.manager.get_resource_manager('wafv2').resources(augment=False)
+#         waf_name_id_map = {w['Name']: w['ARN'] for w in wafs}
+
+#         target_acl = self.data.get('web-acl', '')
+#         state = self.data.get('state', False)
+#         target_acl_ids = [v for k, v in waf_name_id_map.items() if
+#                           re.match(target_acl, k)]
+
+#         results = []
+#         for r in resources:
+#             r_web_acl_id = r.get('wafWebAclArn')
+#             if state:
+#                 if not target_acl and r_web_acl_id:
+#                     results.append(r)
+#                 elif target_acl and r_web_acl_id in target_acl_ids:
+#                     results.append(r)
+#             else:
+#                 if not target_acl and not r_web_acl_id:
+#                     results.append(r)
+#                 elif target_acl and r_web_acl_id not in target_acl_ids:
+#                     results.append(r)
+#         return results
+
+
 @GraphQLApi.filter_registry.register('wafv2-enabled')
-class WafV2Enabled(Filter):
-    """Filter AppSync GraphQLApi by wafv2 web-acl
-
-    :example:
-
-    .. code-block:: yaml
-
-            policies:
-              - name: filter-graphql-api-wafv2
-                resource: graphql-api
-                filters:
-                  - type: wafv2-enabled
-                    state: false
-                    web-acl: test-waf-v2
-              - name: filter-graphql-api-wafv2-regex
-                resource: graphql-api
-                filters:
-                  - type: wafv2-enabled
-                    state: false
-                    web-acl: .*FMManagedWebACLV2-?FMS-.*
-    """
-
-    schema = type_schema(
-        'wafv2-enabled', **{
-            'web-acl': {'type': 'string'},
-            'state': {'type': 'boolean'}})
-
-    permissions = ('wafv2:ListWebACLs',)
-
-    def process(self, resources, event=None):
-        wafs = self.manager.get_resource_manager('wafv2').resources(augment=False)
-        waf_name_id_map = {w['Name']: w['ARN'] for w in wafs}
-
-        target_acl = self.data.get('web-acl', '')
-        state = self.data.get('state', False)
-        target_acl_ids = [v for k, v in waf_name_id_map.items() if
-                          re.match(target_acl, k)]
-
-        results = []
-        for r in resources:
-            r_web_acl_id = r.get('wafWebAclArn')
-            if state:
-                if not target_acl and r_web_acl_id:
-                    results.append(r)
-                elif target_acl and r_web_acl_id in target_acl_ids:
-                    results.append(r)
-            else:
-                if not target_acl and not r_web_acl_id:
-                    results.append(r)
-                elif target_acl and r_web_acl_id not in target_acl_ids:
-                    results.append(r)
-        return results
-
-
-@GraphQLApi.filter_registry.register('wafv2')
-class WafV2Filter(WafV2FilterBase):
+class WafV2Enabled(WafV2FilterBase):
     def get_associated_web_acl(self, resource):
         return self.get_web_acl_by_arn(resource.get('wafWebAclArn'))
 

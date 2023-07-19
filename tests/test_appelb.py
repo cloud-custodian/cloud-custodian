@@ -433,6 +433,7 @@ class AppELBTest(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
         p = self.load_policy(
             {
                 "name": "appelb-waf",
@@ -456,7 +457,7 @@ class AppELBTest(BaseTest):
                 "name": "appelb-waf",
                 "resource": "app-elb",
                 "filters": [
-                    {"type": "waf", "key": "Rules", "value": "empty"}
+                    {"type": "waf-enabled", "key": "Rules", "value": "empty"}
                 ]
             },
             session_factory=factory,
@@ -470,7 +471,7 @@ class AppELBTest(BaseTest):
                 "name": "appelb-waf",
                 "resource": "app-elb",
                 "filters": [
-                    {"type": "waf", "key": "length(Rules[?Type == 'REGULAR'])", "value": 1}
+                    {"type": "waf-enabled", "key": "length(Rules[?Type == 'REGULAR'])", "value": 1}
                 ]
             },
             session_factory=factory,
@@ -547,7 +548,7 @@ class AppELBTest(BaseTest):
             {
                 "name": "appelb-waf",
                 "resource": "app-elb",
-                "filters": [{"type": "wafv2", "key": "Rules", "value": "empty"}]
+                "filters": [{"type": "wafv2-enabled", "key": "Rules", "value": "empty"}]
             },
             session_factory=factory,
         )
@@ -560,7 +561,7 @@ class AppELBTest(BaseTest):
                 "name": "appelb-waf",
                 "resource": "app-elb",
                 "filters": [{
-                    "type": "wafv2",
+                    "type": "wafv2-enabled",
                     "key": "length(Rules[?contains(keys(Statement), 'RateBasedStatement')])",
                     "op": "gte",
                     "value": 1

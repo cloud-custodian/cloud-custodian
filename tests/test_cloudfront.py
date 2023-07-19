@@ -880,7 +880,12 @@ class CloudFrontWafV2(BaseTest):
             {
                 "name": "wafv2-value-cfront",
                 "resource": "distribution",
-                "filters": [{"type": "wafv2", "key": "length(Rules)", "op": "gte", "value": 1}]
+                "filters": [{
+                    "type": "wafv2-enabled",
+                    "key": "length(Rules)",
+                    "op": "gte",
+                    "value": 1
+                }]
             },
             session_factory=factory,
         )

@@ -579,7 +579,7 @@ class TestRestStage(BaseTest):
             {
                 "name": "waf-apigw",
                 "resource": "rest-stage",
-                "filters": [{"type": "waf", "key": "Rules", "value": "empty"}]
+                "filters": [{"type": "waf-enabled", "key": "Rules", "value": "empty"}]
             },
             session_factory=factory,
         )
@@ -592,7 +592,12 @@ class TestRestStage(BaseTest):
             {
                 "name": "waf-apigw",
                 "resource": "rest-stage",
-                "filters": [{"type": "waf", "key": "length(Rules)", "op": "gte", "value": 1}]
+                "filters": [{
+                    "type": "waf-enabled",
+                    "key": "length(Rules)",
+                    "op": "gte",
+                    "value": 1
+                }]
             },
             session_factory=factory,
         )
@@ -619,7 +624,7 @@ class TestRestStage(BaseTest):
             {
                 "name": "waf-apigw",
                 "resource": "rest-stage",
-                "filters": [{"type": "wafv2", "key": "Rules", "value": "empty"}]
+                "filters": [{"type": "wafv2-enabled", "key": "Rules", "value": "empty"}]
             },
             session_factory=factory,
         )
@@ -632,7 +637,12 @@ class TestRestStage(BaseTest):
             {
                 "name": "waf-apigw",
                 "resource": "rest-stage",
-                "filters": [{"type": "wafv2", "key": "length(Rules)", "op": "gte", "value": 1}]
+                "filters": [{
+                    "type": "wafv2-enabled",
+                    "key": "length(Rules)",
+                    "op": "gte",
+                    "value": 1
+                }]
             },
             session_factory=factory,
         )

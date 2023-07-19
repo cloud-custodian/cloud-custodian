@@ -60,7 +60,7 @@ class AppSyncWafV2(BaseTest):
             {
                 "name": "filter-graphql-api-wafv2",
                 "resource": "graphql-api",
-                "filters": [{"type": "wafv2", "key": "Rules", "value": "empty"}]
+                "filters": [{"type": "wafv2-enabled", "key": "Rules", "value": "empty"}]
             },
             session_factory=factory,
         )
@@ -73,7 +73,7 @@ class AppSyncWafV2(BaseTest):
                 "name": "filter-graphql-api-wafv2",
                 "resource": "graphql-api",
                 "filters": [{
-                    "type": "wafv2",
+                    "type": "wafv2-enabled",
                     "key": "length(Rules[?contains(keys(Statement), 'RateBasedStatement')])",
                     "op": "gte",
                     "value": 1
