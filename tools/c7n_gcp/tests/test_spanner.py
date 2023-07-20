@@ -377,4 +377,5 @@ class TestSpannerInstanceBackup(BaseTest):
         resources = policy.run()
 
         self.assertEqual(len(resources), 1)
-        self.assertEqual(resources[0]['name'], 'projects/cloud-custodian/instances/spanner-instance-0/backups/backup-1')
+        self.assertEqual(resources[0]['name'],
+                         'projects/cloud-custodian/instances/spanner-instance-0/backups/backup-1')
