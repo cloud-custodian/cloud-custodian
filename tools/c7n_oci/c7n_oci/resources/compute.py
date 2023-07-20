@@ -12,6 +12,7 @@ from c7n.utils import type_schema
 from c7n_oci.actions.base import OCIBaseAction, RemoveTagBaseAction
 from c7n_oci.provider import resources
 from c7n_oci.query import QueryResourceManager
+from c7n_oci.constants import MONITORING_QUERY_RESOURCE_SIZE
 
 log = logging.getLogger("custodian.oci.resources.compute")
 
@@ -271,13 +272,7 @@ class InstanceMetrics(Filter):
     schema = type_schema("metrics", query={"type": "string"}, required=["query"])
 
     def process(self, resources, event):
-        summarize_metrics = oci.monitoring.models.SummarizeMetricsDataDetails(
-            query=self.data.get("query"),
-            namespace="oci_computeagent",
-        )
-        monitoring_client = self.manager.get_session().client("oci.monitoring.MonitoringClient")
         comp_resources = {}
-        result = []
         for resource in resources:
             comp_id = resource.get("compartment_id")
             if comp_id in comp_resources:
@@ -286,14 +281,47 @@ class InstanceMetrics(Filter):
                 comp_resources[comp_id] = [resource]
         # Query the MonitoringClient with the query against each compartment and perform
         # the filtering
+        monitoring_client = self.manager.get_session().client("oci.monitoring.MonitoringClient")
+        result = []
         for compartment_id in comp_resources.keys():
+            query = self.data.get("query")
+            filter_resources = comp_resources.get(comp_id)
+            query = InstanceMetrics.get_metrics_resource_query(
+                query, filter_resources
+            )
+            log.debug(
+                f"Monitoring client will execute query :{query} for resources in the compartment"
+            )
+            summarize_metrics = oci.monitoring.models.SummarizeMetricsDataDetails(
+                query=query,
+                namespace="oci_computeagent",
+            )
             metric_response = monitoring_client.summarize_metrics_data(
                 compartment_id=compartment_id,
                 summarize_metrics_data_details=summarize_metrics,
             )
-            for metric_data in metric_response.data:
+            metric_resources = metric_response.data
+            for metric_data in metric_resources:
                 resource_id = metric_data.dimensions["resourceId"]
-                for resource in comp_resources.get(compartment_id):
+                for resource in filter_resources:
                     if resource.get("id") == resource_id:
                         result.append(resource)
+
         return result
+
+    @staticmethod
+    def get_metrics_resource_query(query, filter_resources):
+        if "resourceId" not in query:
+            if len(filter_resources) <= MONITORING_QUERY_RESOURCE_SIZE:
+                resource_query = 'resourceId=~"{}"'.format(
+                    "|".join(resource["id"] for resource in filter_resources)
+                )
+                if "}" in query:
+                    if "=" in query:
+                        resource_query = f",{resource_query}}}"
+                    query = query.replace("}", resource_query, 1)
+                else:
+                    if "]" in query:
+                        query = query.replace("]", f"]{{{resource_query}}}", 1)
+
+        return query

@@ -2,10 +2,11 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import inspect
+import pytest
 
 from pytest_terraform import terraform
-
 from oci_common import OciBaseTest
+from c7n_oci.resources.compute import InstanceMetrics
 
 
 class TestInstance(OciBaseTest):
@@ -227,6 +228,53 @@ class TestInstance(OciBaseTest):
                 test_instance_found = True
                 break
         assert test_instance_found
+
+    @terraform("compute", scope="class")
+    @pytest.mark.parametrize("limit", [1, 10, 25])
+    def test_instance_metrics_by_chunks(self, test, compute, limit):
+        """
+        test instance metrics by chunks
+        """
+        ocid = self._get_instance_details(compute)
+        resource = {"id": ocid}
+        filter_resources = [resource] * limit
+        resource_query = resource_query = 'resourceId=~"{}"'.format(
+            "|".join(resource["id"] for resource in filter_resources)
+        )
+        query = f"CpuUtilization[1m]{{{resource_query}}}.max() < 100"
+        session_factory = test.oci_session_factory(
+            self.__class__.__name__, inspect.currentframe().f_code.co_name
+        )
+        policy = test.load_policy(
+            {
+                "name": "instance-with-low-cpu-utilization",
+                "resource": "oci.instance",
+                "filters": [
+                    {"type": "metrics", "query": query},
+                ],
+            },
+            session_factory=session_factory,
+        )
+        self.wait(180)
+        resources = policy.run()
+        test_instance_found = False
+        for resource in resources:
+            if resource["id"] == ocid:
+                test_instance_found = True
+                break
+        assert test_instance_found
+
+    @pytest.mark.parametrize("data_size,expected", [(1, True), (10, True), (25, False)])
+    def test_instance_metrics_query(self, data_size, expected):
+        query = "CpuUtilization[1m].max() < 100"
+        ocid = "ocid1.instance.oc1..<unique_ID>"
+        resource = {"id": ocid}
+        filter_resources = [resource] * data_size
+        query = InstanceMetrics.get_metrics_resource_query(
+            query, filter_resources
+        )
+        result = "resourceId" in query
+        assert result == expected
 
     @terraform("compute", scope="class")
     def test_instance_power_off(self, test, compute):
