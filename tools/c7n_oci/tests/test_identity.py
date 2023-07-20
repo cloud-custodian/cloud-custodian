@@ -293,7 +293,6 @@ class TestIdentityTerraformTest(OciBaseTest):
         resource = self.fetch_validation_data(policy.resource_manager, "get_user", user_ocid)
         assert resource is not None
         test.assertEqual(resource["freeform_tags"]["key_limit"], "2")
-        
 
     @terraform("identity_user", scope="class")
     @pytest.mark.usefixtures("setCompartmentIdToTenancyOcid")
