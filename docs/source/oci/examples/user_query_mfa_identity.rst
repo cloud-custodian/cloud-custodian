@@ -17,8 +17,6 @@ The following example policy will filter and tag the users whose multi-factor au
          key: is_mfa_activated
          value: false
       actions:
-       - type: update-user
-         params:
-          update_user_details:
-            freeform_tags:
-                'mfa_activated' : 'false'
+       - type: update
+         freeform_tags:
+            'mfa_activated' : 'false'

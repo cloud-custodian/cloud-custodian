@@ -13,8 +13,6 @@ The following example policy will tag all the zones in the tenancy
         Tag all the zones in the tenancy
       resource: oci.zone
       actions:
-       - type: update-zone
-         params:
-           update_zone_details:
-             freeform_tags:
-               TagName: TagValue
+       - type: update
+         freeform_tags:
+            TagName: TagValue

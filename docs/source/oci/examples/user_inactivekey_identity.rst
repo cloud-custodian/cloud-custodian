@@ -18,8 +18,6 @@ The following example policy will filter and tag the users with the INACTIVE API
          op: equal
          value: 'INACTIVE'
       actions:
-       - type: update-user
-         params:
-          update_user_details:
-            freeform_tags:
-                TagName : TagValue
+       - type: update
+         freeform_tags:
+            TagName : TagValue

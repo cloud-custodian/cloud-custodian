@@ -20,9 +20,7 @@ The following example policy lists all the instances in the specified compartmen
          Lists and tag all the instances in the compartment
        resource: oci.instance
        actions:
-        - type: update-instance
-          params:
-           update_instance_details:
-             defined_tags:
-                cloud_custodian:
-                    'environment': 'dev'
+        - type: update
+          defined_tags:
+             cloud_custodian:
+                'environment': 'dev'
