@@ -188,6 +188,21 @@ class VpcFilter(net_filters.VpcFilter):
 
 @AppELB.filter_registry.register('waf-enabled')
 class WafEnabled(WafClassicRegionalFilterBase):
+    """Filter Application LoadBalancer by waf-regional web-acl
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: filter-elb-waf-regional
+                resource: app-elb
+                filters:
+                  - type: waf-enabled
+                    state: false
+                    web-acl: test
+    """
+
     # application load balancers don't hold a reference to the associated web acl
     # so we have to look them up via the associations on the web acl directly
     def get_associated_web_acl(self, resource):
@@ -199,6 +214,32 @@ class WafEnabled(WafClassicRegionalFilterBase):
 
 @AppELB.filter_registry.register('wafv2-enabled')
 class WafV2Enabled(WafV2FilterBase):
+    """Filter Application LoadBalancer by wafv2 web-acl
+
+    Supports regex expression for web-acl.
+    Firewall Manager pushed WebACL's name varies by account and region.
+    Regex expression can support both local and Firewall Managed WebACL.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: filter-wafv2-elb
+                resource: app-elb
+                filters:
+                  - type: wafv2-enabled
+                    state: false
+                    web-acl: testv2
+
+              - name: filter-wafv2-elb-regex
+                resource: app-elb
+                filters:
+                  - type: wafv2-enabled
+                    state: false
+                    web-acl: .*FMManagedWebACLV2-?FMS-.*
+    """
+
     # application load balancers don't hold a reference to the associated web acl
     # so we have to look them up via the associations on the web acl directly
     def get_associated_web_acl(self, resource):

@@ -95,8 +95,28 @@ class CognitoUserPool(QueryResourceManager):
     }
 
 
-@CognitoUserPool.filter_registry.register('wafv2')
+@CognitoUserPool.filter_registry.register('wafv2-enabled')
 class WafV2Filter(WafV2FilterBase):
+    """Filter Cognito UserPool by wafv2 web-acl
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: filter-userpool-wafv2
+                resource: user-pool
+                filters:
+                  - type: wafv2-enabled
+                    state: false
+              - name: filter-userpool-wafv2-regex
+                resource: user-pool
+                filters:
+                  - type: wafv2-enabled
+                    state: false
+                    web-acl: .*FMManagedWebACLV2-?FMS-.*
+    """
+
     # cognito user pools don't hold a reference to the associated web acl
     # so we have to look them up via the associations on the web acl directly
     def get_associated_web_acl(self, resource):

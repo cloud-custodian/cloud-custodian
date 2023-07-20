@@ -547,6 +547,21 @@ class StageClientCertificateFilter(RelatedResourceFilter):
 
 @RestStage.filter_registry.register('waf-enabled')
 class WafEnabled(WafClassicRegionalFilterBase):
+    """Filter API Gateway stage by waf-regional web-acl
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: filter-apigw-waf-regional
+                resource: rest-stage
+                filters:
+                  - type: waf-enabled
+                    state: false
+                    web-acl: test
+    """
+
     def get_associated_web_acl(self, resource):
         return self.get_web_acl_by_arn(resource.get('webAclArn'))
 
@@ -625,6 +640,21 @@ class SetWaf(BaseAction):
 
 @RestStage.filter_registry.register('wafv2-enabled')
 class WafV2Enabled(WafV2FilterBase):
+    """Filter API Gateway stage by wafv2 web-acl
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: filter-wafv2-apigw
+                resource: rest-stage
+                filters:
+                  - type: wafv2-enabled
+                    state: false
+                    web-acl: testv2
+    """
+
     def get_associated_web_acl(self, resource):
         return self.get_web_acl_by_arn(resource.get('webAclArn'))
 

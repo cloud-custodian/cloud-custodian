@@ -168,6 +168,21 @@ class IsWafEnabled(Filter):
 
 @Distribution.filter_registry.register('wafv2-enabled')
 class IsWafV2Enabled(WafV2FilterBase):
+    """Filter CloudFront distribution by waf-regional web-acl
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: filter-distribution-waf
+                resource: distribution
+                filters:
+                  - type: waf-enabled
+                    state: false
+                    web-acl: test
+    """
+
     def get_associated_web_acl(self, resource):
         # for WAFv2 Cloudfront stores the ARN of the WebACL even though the attribute is 'WebACLId'
         return self.get_web_acl_by_arn(resource.get('WebACLId'), scope='CLOUDFRONT')

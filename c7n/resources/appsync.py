@@ -82,6 +82,27 @@ class GraphQLApi(QueryResourceManager):
 
 @GraphQLApi.filter_registry.register('wafv2-enabled')
 class WafV2Enabled(WafV2FilterBase):
+    """Filter AppSync GraphQLApi by wafv2 web-acl
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: filter-graphql-api-wafv2
+                resource: graphql-api
+                filters:
+                  - type: wafv2-enabled
+                    state: false
+                    web-acl: test-waf-v2
+              - name: filter-graphql-api-wafv2-regex
+                resource: graphql-api
+                filters:
+                  - type: wafv2-enabled
+                    state: false
+                    web-acl: .*FMManagedWebACLV2-?FMS-.*
+    """
+
     def get_associated_web_acl(self, resource):
         return self.get_web_acl_by_arn(resource.get('wafWebAclArn'))
 

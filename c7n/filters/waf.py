@@ -22,7 +22,7 @@ class WafClassicRegionalFilterBase(ValueFilter, metaclass=ABCMeta):
               - name: filter-waf-value
                 resource: aws.rest-stage
                 filters:
-                  - type: waf
+                  - type: waf-enabled
                     key: Rules
                     value: empty
 
@@ -163,7 +163,7 @@ class WafV2FilterBase(ValueFilter, metaclass=ABCMeta):
               - name: filter-wafv2-value
                 resource: aws.rest-stage
                 filters:
-                  - type: wafv2
+                  - type: wafv2-enabled
                     key: Rules
                     value: empty
 
