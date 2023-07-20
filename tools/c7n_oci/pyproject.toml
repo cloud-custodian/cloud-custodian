@@ -16,7 +16,7 @@ classifiers=[
 
 [tool.poetry.dependencies]
 python = "^3.7"
-oci = "^2.104"
+oci = "^2.106"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
