@@ -172,7 +172,14 @@ class WafV2FilterBase(ValueFilter, metaclass=ABCMeta):
     cache_key = 'c7n:WebACL'
     associated_cache_key = 'c7n:AssociatedResources'
 
-    schema = type_schema('wafv2', rinherit=ValueFilter.schema)
+    schema = type_schema(
+        'wafv2-enabled',
+        rinherit=ValueFilter.schema,
+        **{
+            'web-acl': {'type': 'string'},
+            'state': {'type': 'boolean'}
+        }
+    )
 
     permissions = (
         'wafv2:ListWebACLs',

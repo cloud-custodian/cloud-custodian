@@ -168,19 +168,39 @@ class IsWafEnabled(Filter):
 
 @Distribution.filter_registry.register('wafv2-enabled')
 class IsWafV2Enabled(WafV2FilterBase):
-    """Filter CloudFront distribution by waf-regional web-acl
+    """Filter CloudFront distribution by wafv2 web-acl
 
     :example:
 
     .. code-block:: yaml
 
             policies:
-              - name: filter-distribution-waf
+              - name: filter-distribution-wafv2
+                description: |
+                  match resources that are NOT associated with any wafV2 web-acls
                 resource: distribution
                 filters:
-                  - type: waf-enabled
+                  - type: wafv2-enabled
                     state: false
-                    web-acl: test
+
+              - name: filter-distribution-wafv2-specific-acl
+                description: |
+                  match resources that are NOT associated with wafV2's testv2 web-acl
+                resource: distribution
+                filters:
+                  - type: wafv2-enabled
+                    state: false
+                    web-acl: testv2
+
+              - name: filter-distribution-wafv2-regex
+                description: |
+                  match resources that are NOT associated with specified
+                  wafV2 web-acl regex
+                resource: distribution
+                filters:
+                  - type: wafv2-enabled
+                    state: false
+                    web-acl: .*FMManagedWebACLV2-?FMS-.*
     """
 
     def get_associated_web_acl(self, resource):
