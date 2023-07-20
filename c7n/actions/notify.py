@@ -64,7 +64,7 @@ class ResourceMessageBuffer:
     def full(self):
         """ heuristic to calculate size of payload
         """
-        if (self.raw_size + self.average_rsize) * self.compress_ratio > self.buffer_max_size:
+        if (self.raw_size + self.average_rsize * 3) * self.compress_ratio > self.buffer_max_size:
             return True
         return False
 
