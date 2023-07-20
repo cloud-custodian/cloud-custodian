@@ -1723,10 +1723,10 @@ class ConfigRule(AWSEventBase):
             params['Scope']['ComplianceResourceTypes'] = self.data.get(
                 'resource-types', ())
         if self.data.get('schedule'):
-            params['Source']['SourceDetails'] = [{
+            params['Source']['SourceDetails'].append({
                 'EventSource': 'aws.config',
                 'MessageType': 'ScheduledNotification'
-            }]
+            })
             params['MaximumExecutionFrequency'] = self.data['schedule']
         return params
 
