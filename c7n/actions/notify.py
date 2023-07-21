@@ -37,6 +37,7 @@ class ResourceMessageBuffer:
         self.envelope = utils.dumps(envelope)
         self.raw_size = float(len(self.envelope))
         self.observed_ratio = 0
+        self.fill_sizes = []
 
     def add(self, resource):
         self.resource_parts.append(utils.dumps(resource))
@@ -47,7 +48,13 @@ class ResourceMessageBuffer:
 
     def __repr__(self):
         return (f"<ResourceBuffer count:{len(self)} esize:{self.estimated_size:.1f}"
-                f" ratio:{self.compress_ratio:.2f} avg_rsize:{self.average_rsize:.1f}>")
+                f" ratio:{self.compress_ratio:.2f} avg_rsize:{self.average_rsize:.1f}"
+                f" fill:{self.fill_ratio:.2f}>")
+
+    @property
+    def fill_ratio(self):
+        cardinality = float(len(self.fill_sizes) or 1)
+        return sum(self.fill_sizes) / (self.buffer_max_size * cardinality)
 
     @property
     def estimated_size(self):
@@ -68,7 +75,7 @@ class ResourceMessageBuffer:
     def full(self):
         """ heuristic to calculate size of payload
         """
-        if (self.raw_size + self.average_rsize * 3) * self.compress_ratio > self.buffer_max_size:
+        if (self.raw_size + self.average_rsize * 4) * self.compress_ratio > self.buffer_max_size:
             return True
         return False
 
@@ -93,10 +100,15 @@ class ResourceMessageBuffer:
             raise AssertionError(
                 f"{self} payload over max size:{len(serialized_payload)}"
             )
+
+        self.fill_sizes.append(len(serialized_payload))
         self.resource_parts = []
         # adapative ratio based on payload contents, with a static
         # increment for headroom on resource variance.
-        self.observed_ratio = (len(serialized_payload) / float(self.raw_size)) + 0.1
+        self.observed_ratio = min(
+            (len(serialized_payload) / float(self.raw_size)) + 0.2,
+            self.seed_b64_zlib_ratio
+        )
         self.raw_size = float(len(self.envelope))
         return serialized_payload
 
