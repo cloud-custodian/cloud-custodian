@@ -27,7 +27,7 @@ class ResourceMessageBuffer:
     # https://gist.github.com/kapilt/8c3558a7db0d178cb1c4e91d47dacc77
     #
     # we use this conservative value as a seed and adapt based on observed data
-    seed_b64_zlib_ratio = 0.6
+    seed_b64_zlib_ratio = 0.5
 
     def __init__(self, envelope, buffer_max_size):
         self.buffer_max_size = buffer_max_size
