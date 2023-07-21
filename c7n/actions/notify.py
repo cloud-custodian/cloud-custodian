@@ -27,7 +27,7 @@ class ResourceMessageBuffer:
     # https://gist.github.com/kapilt/8c3558a7db0d178cb1c4e91d47dacc77
     #
     # we use this conservative value as a seed and adapt based on observed data
-    b64_zlib_ratio = 0.6
+    seed_b64_zlib_ratio = 0.6
 
     def __init__(self, envelope, buffer_max_size):
         self.buffer_max_size = buffer_max_size
@@ -45,7 +45,7 @@ class ResourceMessageBuffer:
     def __len__(self):
         return len(self.resource_parts)
 
-    def __str__(self):
+    def __repr__(self):
         return (f"<ResourceBuffer count:{len(self)} esize:{self.estimated_size:.1f}"
                 f" ratio:{self.compress_ratio:.2f} avg_rsize:{self.average_rsize:.1f}>")
 
@@ -55,7 +55,7 @@ class ResourceMessageBuffer:
 
     @property
     def compress_ratio(self):
-        return self.observed_ratio or self.b64_zlib_ratio
+        return self.observed_ratio or self.seed_b64_zlib_ratio
 
     @property
     def average_rsize(self):
