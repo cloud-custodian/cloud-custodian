@@ -202,9 +202,36 @@ class TestInstance(OciBaseTest):
         test.assertEqual(self.get_defined_tag_value(resource["defined_tags"]), None)
 
     @terraform("compute", scope="class")
-    def test_instance_monitoring(self, test, compute):
+    def test_instance_power_off(self, test, compute):
         """
-        test instance monitoring
+        test instance power off
+        """
+        ocid = self._get_instance_details(compute)
+        session_factory = test.oci_session_factory(
+            self.__class__.__name__, inspect.currentframe().f_code.co_name
+        )
+        policy = test.load_policy(
+            {
+                "name": "instance-power-off",
+                "resource": "oci.instance",
+                "filters": [
+                    {"type": "value", "key": "id", "value": ocid},
+                ],
+                "actions": [
+                    {"type": "stop"},
+                ],
+            },
+            session_factory=session_factory,
+        )
+        policy.run()
+        resource = self._fetch_instance_validation_data(policy.resource_manager, ocid)
+        test.assertEqual(resource["id"], ocid)
+        assert resource["lifecycle_state"] in ["STOPPING", "STOPPED"]
+
+    @terraform("compute", scope="class")
+    def test_instance_metrics(self, test, compute):
+        """
+        test instance metrics
         """
         ocid = self._get_instance_details(compute)
         session_factory = test.oci_session_factory(
@@ -275,61 +302,6 @@ class TestInstance(OciBaseTest):
         )
         result = "resourceId" in query
         assert result == expected
-
-    @terraform("compute", scope="class")
-    def test_instance_power_off(self, test, compute):
-        """
-        test instance power off
-        """
-        ocid = self._get_instance_details(compute)
-        session_factory = test.oci_session_factory(
-            self.__class__.__name__, inspect.currentframe().f_code.co_name
-        )
-        policy = test.load_policy(
-            {
-                "name": "instance-power-off",
-                "resource": "oci.instance",
-                "filters": [
-                    {"type": "value", "key": "id", "value": ocid},
-                ],
-                "actions": [
-                    {"type": "stop"},
-                ],
-            },
-            session_factory=session_factory,
-        )
-        policy.run()
-        resource = self._fetch_instance_validation_data(policy.resource_manager, ocid)
-        test.assertEqual(resource["id"], ocid)
-        assert resource["lifecycle_state"] in ["STOPPING", "STOPPED"]
-
-    @terraform("compute", scope="class")
-    def test_instance_metrics(self, test, compute):
-        """
-        test instance metrics
-        """
-        ocid = self._get_instance_details(compute)
-        session_factory = test.oci_session_factory(
-            self.__class__.__name__, inspect.currentframe().f_code.co_name
-        )
-        policy = test.load_policy(
-            {
-                "name": "instance-with-low-cpu-utilization",
-                "resource": "oci.instance",
-                "filters": [
-                    {"type": "metrics", "query": "CpuUtilization[1m].max() < 100"},
-                ],
-            },
-            session_factory=session_factory,
-        )
-        self.wait(180)
-        resources = policy.run()
-        test_instance_found = False
-        for resource in resources:
-            if resource["id"] == ocid:
-                test_instance_found = True
-                break
-        assert test_instance_found
 
     @terraform("compute", scope="class")
     def test_instance_start(self, test, compute):
