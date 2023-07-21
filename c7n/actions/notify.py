@@ -313,6 +313,11 @@ class Notify(BaseNotify):
             return resources
         return handler(resources)
 
+    def prepare_ecs_service(self, resources):
+        for r in resources:
+            r.pop('events', None)
+        return resources
+
     def prepare_launch_config(self, resources):
         for r in resources:
             r.pop('UserData', None)
