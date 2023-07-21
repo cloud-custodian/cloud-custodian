@@ -41,7 +41,7 @@ class ResourceMessageBuffer:
 
     def add(self, resource):
         self.resource_parts.append(utils.dumps(resource))
-        self.raw_size += len(self.resource_parts[0])
+        self.raw_size += len(self.resource_parts[-1])
 
     def __len__(self):
         return len(self.resource_parts)
