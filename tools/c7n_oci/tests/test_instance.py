@@ -32,16 +32,7 @@ class TestInstance(OciBaseTest):
                 "filters": [
                     {"type": "value", "key": "id", "value": ocid},
                 ],
-                "actions": [
-                    {
-                        "type": "update-instance",
-                        "params": {
-                            "update_instance_details": {
-                                "defined_tags": self.get_defined_tag("add_tag")
-                            }
-                        },
-                    }
-                ],
+                "actions": [{"type": "update", "defined_tags": self.get_defined_tag("add_tag")}],
             },
             session_factory=session_factory,
         )
@@ -68,16 +59,7 @@ class TestInstance(OciBaseTest):
                 "filters": [
                     {"type": "value", "key": "id", "value": ocid},
                 ],
-                "actions": [
-                    {
-                        "type": "update-instance",
-                        "params": {
-                            "update_instance_details": {
-                                "defined_tags": self.get_defined_tag("update_tag")
-                            }
-                        },
-                    }
-                ],
+                "actions": [{"type": "update", "defined_tags": self.get_defined_tag("update_tag")}],
             },
             session_factory=session_factory,
         )
@@ -102,16 +84,7 @@ class TestInstance(OciBaseTest):
                 "filters": [
                     {"type": "value", "key": "id", "value": ocid},
                 ],
-                "actions": [
-                    {
-                        "type": "update-instance",
-                        "params": {
-                            "update_instance_details": {
-                                "freeform_tags": {"Environment": "Development"}
-                            }
-                        },
-                    }
-                ],
+                "actions": [{"type": "update", "freeform_tags": {"Environment": "Development"}}],
             },
             session_factory=session_factory,
         )
@@ -136,16 +109,7 @@ class TestInstance(OciBaseTest):
                 "filters": [
                     {"type": "value", "key": "id", "value": ocid},
                 ],
-                "actions": [
-                    {
-                        "type": "update-instance",
-                        "params": {
-                            "update_instance_details": {
-                                "freeform_tags": {"Environment": "Production"}
-                            }
-                        },
-                    }
-                ],
+                "actions": [{"type": "update", "freeform_tags": {"Environment": "Production"}}],
             },
             session_factory=session_factory,
         )
@@ -250,7 +214,7 @@ class TestInstance(OciBaseTest):
                 "name": "instance-with-low-cpu-utilization",
                 "resource": "oci.instance",
                 "filters": [
-                    {"type": "monitoring", "query": "CpuUtilization[1m].max() < 100"},
+                    {"type": "metrics", "query": "CpuUtilization[1m].max() < 100"},
                 ],
             },
             session_factory=session_factory,
@@ -281,10 +245,7 @@ class TestInstance(OciBaseTest):
                     {"type": "value", "key": "id", "value": ocid},
                 ],
                 "actions": [
-                    {
-                        "type": "instance-action",
-                        "params": {"action": "STOP"},
-                    },
+                    {"type": "stop"},
                 ],
             },
             session_factory=session_factory,
@@ -293,3 +254,181 @@ class TestInstance(OciBaseTest):
         resource = self._fetch_instance_validation_data(policy.resource_manager, ocid)
         test.assertEqual(resource["id"], ocid)
         assert resource["lifecycle_state"] in ["STOPPING", "STOPPED"]
+
+    @terraform("compute", scope="class")
+    def test_instance_metrics(self, test, compute):
+        """
+        test instance metrics
+        """
+        ocid = self._get_instance_details(compute)
+        session_factory = test.oci_session_factory(
+            self.__class__.__name__, inspect.currentframe().f_code.co_name
+        )
+        policy = test.load_policy(
+            {
+                "name": "instance-with-low-cpu-utilization",
+                "resource": "oci.instance",
+                "filters": [
+                    {"type": "metrics", "query": "CpuUtilization[1m].max() < 100"},
+                ],
+            },
+            session_factory=session_factory,
+        )
+        self.wait(180)
+        resources = policy.run()
+        test_instance_found = False
+        for resource in resources:
+            if resource["id"] == ocid:
+                test_instance_found = True
+                break
+        assert test_instance_found
+
+    @terraform("compute", scope="class")
+    def test_instance_start(self, test, compute):
+        """
+        test instance start
+        """
+        ocid = self._get_instance_details(compute)
+        session_factory = test.oci_session_factory(
+            self.__class__.__name__, inspect.currentframe().f_code.co_name
+        )
+        policy = test.load_policy(
+            {
+                "name": "instance-start",
+                "resource": "oci.instance",
+                "filters": [
+                    {"type": "value", "key": "id", "value": ocid},
+                ],
+                "actions": [{"type": "start"}],
+            },
+            session_factory=session_factory,
+        )
+        policy.run()
+        resource = self._fetch_instance_validation_data(policy.resource_manager, ocid)
+        test.assertEqual(resource["id"], ocid)
+        assert resource["lifecycle_state"] in ["STARTING", "RUNNING"]
+
+    @terraform("compute", scope="class")
+    def test_instance_stop(self, test, compute):
+        """
+        test instance stop
+        """
+        ocid = self._get_instance_details(compute)
+        session_factory = test.oci_session_factory(
+            self.__class__.__name__, inspect.currentframe().f_code.co_name
+        )
+        policy = test.load_policy(
+            {
+                "name": "instance-stop",
+                "resource": "oci.instance",
+                "filters": [
+                    {"type": "value", "key": "id", "value": ocid},
+                ],
+                "actions": [{"type": "stop"}],
+            },
+            session_factory=session_factory,
+        )
+        policy.run()
+        resource = self._fetch_instance_validation_data(policy.resource_manager, ocid)
+        test.assertEqual(resource["id"], ocid)
+        assert resource["lifecycle_state"] in ["STOPPING", "STOPPED"]
+
+    @terraform("compute", scope="class")
+    def test_instance_stop_force(self, test, compute):
+        """
+        test instance stop
+        """
+        ocid = self._get_instance_details(compute)
+        session_factory = test.oci_session_factory(
+            self.__class__.__name__, inspect.currentframe().f_code.co_name
+        )
+        policy = test.load_policy(
+            {
+                "name": "instance-stop",
+                "resource": "oci.instance",
+                "filters": [
+                    {"type": "value", "key": "id", "value": ocid},
+                ],
+                "actions": [{"type": "stop", "force": True}],
+            },
+            session_factory=session_factory,
+        )
+        policy.run()
+        resource = self._fetch_instance_validation_data(policy.resource_manager, ocid)
+        test.assertEqual(resource["id"], ocid)
+        assert resource["lifecycle_state"] in ["STOPPING", "STOPPED"]
+
+    @terraform("compute", scope="class")
+    def test_instance_reboot(self, test, compute):
+        """
+        test instance reboot
+        """
+        ocid = self._get_instance_details(compute)
+        session_factory = test.oci_session_factory(
+            self.__class__.__name__, inspect.currentframe().f_code.co_name
+        )
+        policy = test.load_policy(
+            {
+                "name": "instance-reboot",
+                "resource": "oci.instance",
+                "filters": [
+                    {"type": "value", "key": "id", "value": ocid},
+                ],
+                "actions": [{"type": "reboot"}],
+            },
+            session_factory=session_factory,
+        )
+        policy.run()
+        resource = self._fetch_instance_validation_data(policy.resource_manager, ocid)
+        test.assertEqual(resource["id"], ocid)
+        assert resource["lifecycle_state"] in ["STOPPING", "STOPPED", "STARTING", "RUNNING"]
+
+    @terraform("compute", scope="class")
+    def test_instance_reboot_force(self, test, compute):
+        """
+        test instance reboot
+        """
+        ocid = self._get_instance_details(compute)
+        session_factory = test.oci_session_factory(
+            self.__class__.__name__, inspect.currentframe().f_code.co_name
+        )
+        policy = test.load_policy(
+            {
+                "name": "instance-reboot",
+                "resource": "oci.instance",
+                "filters": [
+                    {"type": "value", "key": "id", "value": ocid},
+                ],
+                "actions": [{"type": "reboot", "force": True}],
+            },
+            session_factory=session_factory,
+        )
+        policy.run()
+        resource = self._fetch_instance_validation_data(policy.resource_manager, ocid)
+        test.assertEqual(resource["id"], ocid)
+        assert resource["lifecycle_state"] in ["STOPPING", "STOPPED", "STARTING", "RUNNING"]
+
+    @terraform("compute", scope="class")
+    def test_add_defined_tag_to_instance_new(self, test, compute, with_or_without_compartment):
+        """
+        test adding defined_tags tag on compute instance
+        """
+        ocid = self._get_instance_details(compute)
+        session_factory = test.oci_session_factory(
+            self.__class__.__name__, inspect.currentframe().f_code.co_name
+        )
+        policy = test.load_policy(
+            {
+                "name": "add-defined-tag-to-instance",
+                "resource": "oci.instance",
+                "filters": [
+                    {"type": "value", "key": "id", "value": ocid},
+                ],
+                "actions": [{"type": "update", "defined_tags": self.get_defined_tag("add_tag")}],
+            },
+            session_factory=session_factory,
+        )
+        policy.run()
+        resource = self._fetch_instance_validation_data(policy.resource_manager, ocid)
+        test.assertEqual(resource["id"], ocid)
+        test.assertEqual(self.get_defined_tag_value(resource["defined_tags"]), "true")

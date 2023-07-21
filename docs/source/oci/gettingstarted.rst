@@ -80,19 +80,17 @@ Create a file named ``custodian.yml`` with the following content. Update ``displ
 .. code-block:: yaml
 
     policies:
-          - name: filter-for-compute-name
-            description: Filter for compute which matches the  name
-            resource: oci.instance
-            filters:
-              - type: value
-                key: display_name
-                value: test
-            actions:
-              - type: update-instance
-                params:
-                  update_instance_details:
-                    freeform_tags:
-                      mark-for-deletion: 'true'
+      - name: filter-for-compute-name
+        description: Filter for compute which matches the  name
+        resource: oci.instance
+        filters:
+          - type: value
+            key: display_name
+            value: test
+        actions:
+          - type: update
+            freeform_tags:
+              mark-for-deletion: 'true'
 
 
 Run the following from the command line:
@@ -137,20 +135,16 @@ Update ``compute_shape`` and set  ``OCI_COMPARTMENTS`` environment variable to m
         description: Scan for all the VM's with standard shape
         resource: oci.instance
         query: [
-          'lifecycle_state': [
-             'RUNNING'
-             ]
+          'lifecycle_state': 'RUNNING'
         ]
         filters:
           - type: value
             key: shape
             value: VM.Standard2.4
         actions:
-          - type: update-instance
-            params:
-              update_instance_details:
-                freeform_tags:
-                  eligible_for_resize: 'true'
+          - type: update
+            freeform_tags:
+              eligible_for_resize: 'true'
 
 Run the following from the command line:
 
