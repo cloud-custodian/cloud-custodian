@@ -75,7 +75,7 @@ class ResourceMessageBuffer:
     def full(self):
         """ heuristic to calculate size of payload
         """
-        if (self.raw_size + self.average_rsize * 4) * self.compress_ratio > self.buffer_max_size:
+        if (self.raw_size + self.average_rsize * 2) * self.compress_ratio > self.buffer_max_size:
             return True
         return False
 
@@ -106,7 +106,7 @@ class ResourceMessageBuffer:
         # adapative ratio based on payload contents, with a static
         # increment for headroom on resource variance.
         self.observed_ratio = min(
-            (len(serialized_payload) / float(self.raw_size)) + 0.2,
+            (len(serialized_payload) / float(self.raw_size)) + 0.1,
             self.seed_b64_zlib_ratio
         )
         self.raw_size = float(len(self.envelope))

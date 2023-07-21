@@ -25,11 +25,11 @@ def test_msg_buffer():
         if mbuffer.full:
             break
 
-    assert len(mbuffer) == 45
-    assert int(mbuffer.estimated_size) == 953
+    assert len(mbuffer) == 47
+    assert int(mbuffer.estimated_size) == 995
     payload = mbuffer.consume()
-    assert len(payload) == 516
-    assert mbuffer.observed_ratio > 0.38 and mbuffer.observed_ratio < 0.5
+    assert len(payload) == 532
+    assert mbuffer.observed_ratio > 0.36 and mbuffer.observed_ratio < 0.5
     assert 'resources' in json.loads(zlib.decompress(base64.b64decode(payload)))
 
     assert len(mbuffer) == 0
@@ -42,9 +42,9 @@ def test_msg_buffer():
         if mbuffer.full:
             break
 
-    assert len(mbuffer) == 48
+    assert len(mbuffer) == 65
     payload = mbuffer.consume()
-    assert len(payload) == 540
+    assert len(payload) == 680
 
 
 def test_msg_buffer_exceed():
