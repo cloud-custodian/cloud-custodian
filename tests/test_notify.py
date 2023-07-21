@@ -10,9 +10,9 @@ import tempfile
 import zlib
 
 from c7n.exceptions import PolicyValidationError
-
 from c7n.actions.notify import ResourceMessageBuffer
 
+import pytest
 
 
 def test_msg_buffer():
@@ -25,10 +25,10 @@ def test_msg_buffer():
         if mbuffer.full:
             break
 
-    assert len(mbuffer) == 43
-    assert mbuffer.estimated_size == 1014.0
+    assert len(mbuffer) == 41
+    assert mbuffer.estimated_size == 968.4
     payload = mbuffer.consume()
-    assert len(payload) == 500
+    assert len(payload) == 480
     assert mbuffer.observed_ratio > 0.39
     assert 'resources' in json.loads(zlib.decompress(base64.b64decode(payload)))
 
@@ -42,9 +42,19 @@ def test_msg_buffer():
         if mbuffer.full:
             break
 
-    assert len(mbuffer) == 66
+    assert len(mbuffer) == 64
     payload = mbuffer.consume()
     assert len(payload) < buf_size
+    assert len(payload) > 480
+
+
+def test_msg_buffer_exceed():
+    mbuffer = ResourceMessageBuffer({'env': 'dev', 'region': 'us-west-2'}, 100)
+    assert mbuffer.full is False
+    mbuffer.add({'id': 'x', 'values': list(range(100))})
+    with pytest.raises(AssertionError) as e_info:
+        mbuffer.consume()
+    assert str(mbuffer) in str(e_info.value)
 
 
 class NotifyTest(BaseTest):

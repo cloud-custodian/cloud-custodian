@@ -45,6 +45,10 @@ class ResourceMessageBuffer:
     def __len__(self):
         return len(self.resource_parts)
 
+    def __str__(self):
+        return (f"<ResourceBuffer count:{len(self)} esize:{self.estimated_size:.1f}"
+                f" ratio:{self.compress_ratio:.2f} avg_rsize:{self.average_rsize:.1f}>")
+
     @property
     def estimated_size(self):
         return self.raw_size * self.compress_ratio
@@ -79,17 +83,20 @@ class ResourceMessageBuffer:
             payload[rend_idx:]
         )
 
-        serialized_payload =  base64.b64encode(
+        serialized_payload = base64.b64encode(
             zlib.compress(
                 payload.encode('utf8')
             )
         ).decode('ascii')
 
+        if len(serialized_payload) > self.buffer_max_size:
+            raise AssertionError(
+                f"{self} payload over max size:{len(serialized_payload)}"
+            )
+        self.resource_parts = []
         # adapative ratio based on payload contents, with a static
         # increment for headroom on resource variance.
         self.observed_ratio = (len(serialized_payload) / float(self.raw_size)) + 0.1
-        assert len(serialized_payload) < self.buffer_max_size, "payload over max size"
-        self.resource_parts = []
         self.raw_size = float(len(self.envelope))
         return serialized_payload
 
