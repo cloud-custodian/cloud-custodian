@@ -5,6 +5,7 @@ import operator
 import zlib
 import re
 from c7n.actions import BaseAction, ModifyVpcSecurityGroupsAction
+from c7n.deprecated import DeprecatedField
 from c7n.exceptions import PolicyValidationError, ClientError
 from c7n.filters import (
     DefaultVpcBase, Filter, ValueFilter, MetricsFilter, ListItemFilter)
@@ -51,7 +52,7 @@ class DescribeFlow(query.DescribeSource):
         return self.query.filter(self.resource_manager, **params)
 
 
-@resources.register('flog-log')
+@resources.register('flow-log')
 class FlowLog(query.QueryResourceManager):
 
     class resource_type(query.TypeInfo):
@@ -69,36 +70,126 @@ class FlowLog(query.QueryResourceManager):
     }
 
 
-
-
-@Vpc.filter_registry.register('flow-logs-v2')
+@Vpc.filter_registry.register('flow-logs')
 class FlowLogv2Filter(ListItemFilter):
+
+    legacy_schema = {
+        'enabled': {'type': 'boolean', 'default': False},
+        'op': {'enum': ['equal', 'not-equal'], 'default': 'equal'},
+        'set-op': {'enum': ['or', 'and'], 'default': 'or'},
+        'status': {'enum': ['active']},
+        'deliver-status': {'enum': ['success', 'failure']},
+        'destination': {'type': 'string'},
+        'destination-type': {'enum': ['s3', 'cloud-watch-logs']},
+        'traffic-type': {'enum': ['accept', 'reject', 'all']},
+        'log-format': {'type': 'string'},
+        'log-group': {'type': 'string'}
+    }
 
     schema = type_schema(
         'flow-logs-v2',
         attrs={'$ref': '#/definitions/filters_common/list_item_attrs'},
         count={'type': 'number'},
-        count_op={'$ref': '#/definitions/filters_common/comparison_operators'}
+        count_op={'$ref': '#/definitions/filters_common/comparison_operators'},
+        **legacy_schema
     )
     schema_alias = True
     annotate_items = True
     permissions = ('ec2:DescribeFlowLogs',)
+
     flow_log_map = None
 
+    compat_conversion = {
+        'status': {
+            'key': 'FlowLogStatus',
+            'values': {'active': 'ACTIVE'},
+        },
+        'deliver-status': {
+            'key': 'DeliverLogsStatus',
+            'values': {'success': 'SUCCESS',
+                       'failure': 'FAILED'}
+        },
+        'destination': {
+            'key': 'LogDestination',
+        },
+        'destination-type': {
+            'key': 'LogDestinationType',
+            # values ?
+        },
+        'traffic-type': {
+            'key': 'TrafficType',
+            'values': {'all': 'ALL',
+                       'reject': 'REJECT',
+                       'accept': 'ACCEPT'},
+        },
+        'log-format': {
+            'key': 'LogFormat',
+        },
+        'log-group': {
+            'key': 'LogGroupName'
+        }
+    }
+
+    def get_deprecations(self):
+        return [
+            DeprecatedField(f"{k} is deprecated", "use list-item style attrs and set operators")
+            for k in self.legacy_schema
+        ]
+
     def validate(self):
+        keys = set(self.data)
+        if 'attrs' in keys and keys.intersection(self.compat_conversion):
+            raise PolicyValidationError(
+                "flow-log filter doesn't allow combining legacy keys with list-item attrs")
         return super().validate()
 
+    def convert(self):
+        # no mixing of legacy and list-item style
+        if 'attrs' in self.data:
+            return
+        data = {}
+        if self.data.get('enabled', False):
+            data['count_op'] = 'gte'
+            data['count'] = 1
+        else:
+            data['count'] = 0
+        attrs = []
+        for k in self.compat_conversion:
+            if k not in self.data:
+                continue
+            afilter = {}
+            cinfo = self.compat_conversion[k]
+            ak = cinfo['key']
+            av = self.data[k]
+            if 'values' in cinfo:
+                av = cinfo['values'][av]
+            if 'op' in self.data and self.data['op'] == 'not-equal':
+                av = {'value': av, 'op': 'not-equal'}
+            afilter[ak] = av
+            attrs.append(afilter)
+        if attrs and self.data.get('set-op', 'or') == 'or':
+            attrs = [{'or': attrs}]
+        if attrs:
+            data['attrs'] = attrs
+        data['type'] = self.type
+        self.source_data = self.data
+        self.data = data
+
     def get_item_values(self, resource):
-        return self.flow_log_map.get(resource[self.manager.resource_type.id], ())
+        flogs = self.flow_log_map.get(resource[self.manager.resource_type.id], ())
+        # compatibility with v1 filter, we also add list-item annotation
+        # for matched flow logs
+        resource['c7n:flow-logs'] = flogs
+        return flogs
 
     def process(self, resources, event=None):
         self.convert()
-        self.flow_log_map = {
-            r['ResourceId']: r for r in self.manager.get_resource_manager('flow-log').resources()}
+        self.flow_log_map = {}
+        for r in self.manager.get_resource_manager('flow-log').resources():
+            self.flow_log_map.setdefault(r['ResourceId'], []).append(r)
         return super().process(resources, event)
 
 
-@Vpc.filter_registry.register('flow-logs')
 class FlowLogFilter(Filter):
     """Are flow logs enabled on the resource.
 
@@ -556,8 +647,8 @@ class Subnet(query.QueryResourceManager):
         'config': query.ConfigSource}
 
 
-Subnet.filter_registry.register('flow-logs', FlowLogFilter)
-Subnet.filter_registry.register('flow-logs-v2', FlowLogv2Filter)
+#Subnet.filter_registry.register('flow-logs', FlowLogFilter)
+Subnet.filter_registry.register('flow-logs', FlowLogv2Filter)
 
 
 @Subnet.filter_registry.register('vpc')
@@ -1803,8 +1894,8 @@ class NetworkInterface(query.QueryResourceManager):
     }
 
 
-NetworkInterface.filter_registry.register('flow-logs', FlowLogFilter)
-NetworkInterface.filter_registry.register('flow-logs-v2', FlowLogv2Filter)
+#NetworkInterface.filter_registry.register('flow-logs', FlowLogFilter)
+NetworkInterface.filter_registry.register('flow-logs', FlowLogv2Filter)
 NetworkInterface.filter_registry.register(
     'network-location', net_filters.NetworkLocation)
 

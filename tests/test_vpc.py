@@ -212,7 +212,6 @@ class VpcTest(BaseTest):
         factory = self.replay_flight_data("test_vpc_flow_logs_misconfigured")
 
         vpc_id1 = "vpc-4a9ff72e"
-
         traffic_type = "all"
         log_group = "/aws/lambda/myIOTFunction"
         status = "active"
@@ -228,7 +227,7 @@ class VpcTest(BaseTest):
                                 "type": "flow-logs",
                                 "enabled": True,
                                 "op": "equal",
-                                "set-op": "or",
+                                "set-op": "and",
                                 "status": status,
                                 "traffic-type": traffic_type,
                                 "log-group": log_group,
@@ -241,7 +240,7 @@ class VpcTest(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        self.assertEqual(resources[0]["VpcId"], vpc_id1)
+        self.assertEqual(resources[0]['VpcId'], vpc_id1)
 
     def test_eni_vpc_filter(self):
         self.session_factory = self.replay_flight_data("test_eni_vpc_filter")
