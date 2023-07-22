@@ -7,7 +7,7 @@ import re
 from c7n.actions import BaseAction, ModifyVpcSecurityGroupsAction
 from c7n.exceptions import PolicyValidationError, ClientError
 from c7n.filters import (
-    DefaultVpcBase, Filter, ValueFilter, MetricsFilter)
+    DefaultVpcBase, Filter, ValueFilter, MetricsFilter, ListItemFilter)
 import c7n.filters.vpc as net_filters
 from c7n.filters.iamaccess import CrossAccountAccessFilter
 from c7n.filters.related import RelatedResourceFilter, RelatedResourceByIdFilter
@@ -42,6 +42,60 @@ class Vpc(query.QueryResourceManager):
         filter_type = 'list'
         cfn_type = config_type = 'AWS::EC2::VPC'
         id_prefix = "vpc-"
+
+
+class DescribeFlow(query.DescribeSource):
+
+    def get_resources(self, ids, cache=True):
+        params = {'Filters': [{'Name': 'flow-log-id', 'Values': ids}]}
+        return self.query.filter(self.resource_manager, **params)
+
+
+@resources.register('flog-log')
+class FlowLog(query.QueryResourceManager):
+
+    class resource_type(query.TypeInfo):
+
+        service = 'ec2'
+        arn_type = 'vpc-flow-log'
+        enum_spec = ('describe_flow_logs', 'FlowLogs', None)
+        name = id = 'FlowLogId'
+        cfn_type = config_type = 'AWS::EC2::FlowLog'
+        id_prefix = 'fl-'
+
+    source_mapping = {
+        'describe': 'DescribeFlow',
+        'config': query.ConfigSource
+    }
+
+
+
+
+@Vpc.filter_registry.register('flow-logs-v2')
+class FlowLogv2Filter(ListItemFilter):
+
+    schema = type_schema(
+        'flow-logs-v2',
+        attrs={'$ref': '#/definitions/filters_common/list_item_attrs'},
+        count={'type': 'number'},
+        count_op={'$ref': '#/definitions/filters_common/comparison_operators'}
+    )
+    schema_alias = True
+    annotate_items = True
+    permissions = ('ec2:DescribeFlowLogs',)
+    flow_log_map = None
+
+    def validate(self):
+        return super().validate()
+
+    def get_item_values(self, resource):
+        return self.flow_log_map.get(resource[self.manager.resource_type.id], ())
+
+    def process(self, resources, event=None):
+        self.convert()
+        self.flow_log_map = {
+            r['ResourceId']: r for r in self.manager.get_resource_manager('flow-log').resources()}
+        return super().process(resources, event)
 
 
 @Vpc.filter_registry.register('flow-logs')
@@ -503,6 +557,7 @@ class Subnet(query.QueryResourceManager):
 
 
 Subnet.filter_registry.register('flow-logs', FlowLogFilter)
+Subnet.filter_registry.register('flow-logs-v2', FlowLogv2Filter)
 
 
 @Subnet.filter_registry.register('vpc')
@@ -1749,6 +1804,7 @@ class NetworkInterface(query.QueryResourceManager):
 
 
 NetworkInterface.filter_registry.register('flow-logs', FlowLogFilter)
+NetworkInterface.filter_registry.register('flow-logs-v2', FlowLogv2Filter)
 NetworkInterface.filter_registry.register(
     'network-location', net_filters.NetworkLocation)
 
@@ -2633,6 +2689,68 @@ class DeleteUnusedKeyPairs(BaseAction):
 @Vpc.action_registry.register('set-flow-log')
 @Subnet.action_registry.register('set-flow-log')
 @NetworkInterface.action_registry.register('set-flow-log')
+class SetFlowLogs(BaseAction):
+
+    schema = type_schema(
+        'set-flow-log-v2',
+        state={'type': 'boolean'},
+        attrs={'type': 'object'}
+    )
+    shape = 'CreateFlowLogsRequest'
+    permissions = ('ec2:CreateFlowLogs', 'logs:CreateLogGroup',)
+
+    RESOURCE_ALIAS = {
+        'vpc': 'VPC',
+        'subnet': 'Subnet',
+        'eni': 'NetworkInterface'
+    }
+
+    def validate(self):
+        self.convert()
+        attrs = dict(self.data['attrs'])
+        model = self.manager.get_model()
+        attrs['ResourceType'] = self.RESOURCE_ALIAS[model.arn_type]
+        attrs['ResourcesIds'] = [model.id_prefix + '123']
+        return shape_validate(self.data['attrs'], self.shape, 'ec2')
+
+    def convert(self):
+        pass
+
+    def delete_flow_logs(self, client, rids):
+        flow_logs = [
+            r for r in self.manager.get_resource_manager('flow-log').resources()
+            if r['ResourceId'] in rids]
+        try:
+            results = client.delete_flow_logs(
+                FlowLogIds=[f['FlowLogId'] for f in flow_logs])
+            for r in results['Unsuccessful']:
+                self.log.exception(
+                    'Exception: delete flow-log for %s: %s on %s',
+                    r['ResourceId'], r['Error']['Message'])
+        except ClientError as e:
+            if e.response['Error']['Code'] == 'InvalidParameterValue':
+                self.log.exception(
+                    'delete flow-log: %s', e.response['Error']['Message'])
+            else:
+                raise
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('ec2')
+        enabled = self.data.get('state', True)
+        model = self.manager.get_model()
+        params = {'ResourceIds': [r[model.id] for r in resources]}
+
+        if not enabled:
+            self.delete_flow_logs(client, resources)
+
+        params['ResourceType'] = self.RESOURCE_ALIAS[model.arn_type]
+        params.update(self.data['attrs'])
+        client.create_flow_logs(**params)
+
+
+@Vpc.action_registry.register('set-flow-log')
+@Subnet.action_registry.register('set-flow-log')
+@NetworkInterface.action_registry.register('set-flow-log')
 class CreateFlowLogs(BaseAction):
     """Create flow logs for a network resource
 
@@ -2655,6 +2773,7 @@ class CreateFlowLogs(BaseAction):
     schema = {
         'type': 'object',
         'additionalProperties': False,
+        'required': ['type'],
         'properties': {
             'type': {'enum': ['set-flow-log']},
             'state': {'type': 'boolean'},
