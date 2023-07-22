@@ -64,7 +64,7 @@ class FlowLog(query.QueryResourceManager):
         id_prefix = 'fl-'
 
     source_mapping = {
-        'describe': 'DescribeFlow',
+        'describe': DescribeFlow,
         'config': query.ConfigSource
     }
 
