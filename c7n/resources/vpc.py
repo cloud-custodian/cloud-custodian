@@ -1,7 +1,6 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import itertools
-import operator
 import zlib
 import re
 from c7n.actions import BaseAction, ModifyVpcSecurityGroupsAction
@@ -106,7 +105,7 @@ class FlowLogv2Filter(ListItemFilter):
                       attrs:
                         - TrafficType: ALL
                         - FlowLogStatus: ACTIVE
-                        - LogGroupName: vpc-logs    
+                        - LogGroupName: vpc-logs
     """
 
     legacy_schema = {
@@ -2044,6 +2043,9 @@ class TransitGateway(query.QueryResourceManager):
         config_type = cfn_type = 'AWS::EC2::TransitGateway'
 
 
+TransitGateway.filter_registry.register('flow-logs', FlowLogv2Filter)
+
+
 class TransitGatewayAttachmentQuery(query.ChildResourceQuery):
 
     def get_parent_parameters(self, params, parent_id, parent_key):
@@ -2692,70 +2694,10 @@ class DeleteUnusedKeyPairs(BaseAction):
 @Vpc.action_registry.register('set-flow-log')
 @Subnet.action_registry.register('set-flow-log')
 @NetworkInterface.action_registry.register('set-flow-log')
+@TransitGateway.action_registry.register('set-flow-log')
+@TransitGatewayAttachment.action_registry.register('set-flow-log')
 class SetFlowLogs(BaseAction):
-
-    schema = type_schema(
-        'set-flow-log-v2',
-        state={'type': 'boolean'},
-        attrs={'type': 'object'}
-    )
-    shape = 'CreateFlowLogsRequest'
-    permissions = ('ec2:CreateFlowLogs', 'logs:CreateLogGroup',)
-
-    RESOURCE_ALIAS = {
-        'vpc': 'VPC',
-        'subnet': 'Subnet',
-        'eni': 'NetworkInterface'
-    }
-
-    def validate(self):
-        self.convert()
-        attrs = dict(self.data['attrs'])
-        model = self.manager.get_model()
-        attrs['ResourceType'] = self.RESOURCE_ALIAS[model.arn_type]
-        attrs['ResourcesIds'] = [model.id_prefix + '123']
-        return shape_validate(self.data['attrs'], self.shape, 'ec2')
-
-    def convert(self):
-        pass
-
-    def delete_flow_logs(self, client, rids):
-        flow_logs = [
-            r for r in self.manager.get_resource_manager('flow-log').resources()
-            if r['ResourceId'] in rids]
-        try:
-            results = client.delete_flow_logs(
-                FlowLogIds=[f['FlowLogId'] for f in flow_logs])
-            for r in results['Unsuccessful']:
-                self.log.exception(
-                    'Exception: delete flow-log for %s: %s on %s',
-                    r['ResourceId'], r['Error']['Message'])
-        except ClientError as e:
-            if e.response['Error']['Code'] == 'InvalidParameterValue':
-                self.log.exception(
-                    'delete flow-log: %s', e.response['Error']['Message'])
-            else:
-                raise
-
-    def process(self, resources):
-        client = local_session(self.manager.session_factory).client('ec2')
-        enabled = self.data.get('state', True)
-        model = self.manager.get_model()
-        params = {'ResourceIds': [r[model.id] for r in resources]}
-
-        if not enabled:
-            self.delete_flow_logs(client, resources)
-
-        params['ResourceType'] = self.RESOURCE_ALIAS[model.arn_type]
-        params.update(self.data['attrs'])
-        client.create_flow_logs(**params)
-
-
-@Vpc.action_registry.register('set-flow-log')
-@Subnet.action_registry.register('set-flow-log')
-@NetworkInterface.action_registry.register('set-flow-log')
-class CreateFlowLogs(BaseAction):
-    """Create flow logs for a network resource
+    """Set flow logs for a network resource
 
     :example:
 
@@ -2769,130 +2711,115 @@ class CreateFlowLogs(BaseAction):
                 enabled: false
             actions:
               - type: set-flow-log
-                DeliverLogsPermissionArn: arn:iam:role
-                LogGroupName: /custodian/vpc/flowlogs/
-    """
-    permissions = ('ec2:CreateFlowLogs', 'logs:CreateLogGroup',)
-    schema = {
-        'type': 'object',
-        'additionalProperties': False,
-        'required': ['type'],
-        'properties': {
-            'type': {'enum': ['set-flow-log']},
-            'state': {'type': 'boolean'},
-            'DeliverLogsPermissionArn': {'type': 'string'},
-            'LogGroupName': {'type': 'string'},
-            'LogDestination': {'type': 'string'},
-            'LogFormat': {'type': 'string'},
-            'MaxAggregationInterval': {'type': 'integer'},
-            'LogDestinationType': {'enum': ['s3', 'cloud-watch-logs']},
-            'TrafficType': {
-                'type': 'string',
-                'enum': ['ACCEPT', 'REJECT', 'ALL']
-            }
+                attrs:
+                  DeliverLogsPermissionArn: arn:iam:role
+                  LogGroupName: /custodian/vpc/flowlogs/
+
+    `attrs` are passed through to create_flow_log and are per the api
+    documentation
+
+    https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/ec2/client/create_flow_logs.html
+    """  # noqa
+
+    legacy_schema = {
+        'DeliverLogsPermissionArn': {'type': 'string'},
+        'LogGroupName': {'type': 'string'},
+        'LogDestination': {'type': 'string'},
+        'LogFormat': {'type': 'string'},
+        'MaxAggregationInterval': {'type': 'integer'},
+        'LogDestinationType': {'enum': ['s3', 'cloud-watch-logs']},
+        'TrafficType': {
+            'type': 'string',
+            'enum': ['ACCEPT', 'REJECT', 'ALL']
         }
     }
+
+    schema = type_schema(
+        'set-flow-log',
+        state={'type': 'boolean'},
+        attrs={'type': 'object'},
+        **legacy_schema
+    )
+    shape = 'CreateFlowLogsRequest'
+    permissions = ('ec2:CreateFlowLogs', 'logs:CreateLogGroup',)
 
     RESOURCE_ALIAS = {
         'vpc': 'VPC',
         'subnet': 'Subnet',
-        'eni': 'NetworkInterface'
+        'eni': 'NetworkInterface',
+        'transit-gateway': 'TransitGateway',
+        'transit-attachment': 'TransitGatewayAttachment'
     }
 
-    SchemaValidation = {
-        's3': {
-            'required': ['LogDestination'],
-            'absent': ['LogGroupName', 'DeliverLogsPermissionArn']
-        },
-        'cloud-watch-logs': {
-            'required': ['DeliverLogsPermissionArn'],
-            'one-of': ['LogGroupName', 'LogDestination'],
-        }
-    }
+    def get_deprecations(self):
+        return [
+            DeprecatedField(f"{k} is deprecated", f"set {k} under attrs: block")
+            for k in self.legacy_schema
+        ]
 
     def validate(self):
-        self.state = self.data.get('state', True)
-        if not self.state:
-            return
-        destination_type = self.data.get(
-            'LogDestinationType', 'cloud-watch-logs')
-        dvalidation = self.SchemaValidation[destination_type]
-        for r in dvalidation.get('required', ()):
-            if not self.data.get(r):
-                raise PolicyValidationError(
-                    'Required %s missing for destination-type:%s' % (
-                        r, destination_type))
-        for r in dvalidation.get('absent', ()):
-            if r in self.data:
-                raise PolicyValidationError(
-                    '%s is prohibited for destination-type:%s' % (
-                        r, destination_type))
-        if ('one-of' in dvalidation and
-                sum([1 for k in dvalidation['one-of'] if k in self.data]) != 1):
-            raise PolicyValidationError(
-                "Destination:%s Exactly one of %s required" % (
-                    destination_type, ", ".join(dvalidation['one-of'])))
-        return self
-
-    def delete_flow_logs(self, client, rids):
-        flow_logs = client.describe_flow_logs(
-            Filters=[{'Name': 'resource-id', 'Values': rids}])['FlowLogs']
-        try:
-            results = client.delete_flow_logs(
-                FlowLogIds=[f['FlowLogId'] for f in flow_logs])
-
-            for r in results['Unsuccessful']:
-                self.log.exception(
-                    'Exception: delete flow-log for %s: %s on %s',
-                    r['ResourceId'], r['Error']['Message'])
-        except ClientError as e:
-            if e.response['Error']['Code'] == 'InvalidParameterValue':
-                self.log.exception(
-                    'delete flow-log: %s', e.response['Error']['Message'])
-            else:
-                raise
-
-    def process(self, resources):
-        client = local_session(self.manager.session_factory).client('ec2')
-        params = dict(self.data)
-        params.pop('type')
-
-        if self.data.get('state'):
-            params.pop('state')
-
+        self.convert()
+        attrs = dict(self.data['attrs'])
         model = self.manager.get_model()
-        params['ResourceIds'] = [r[model.id] for r in resources]
+        attrs['ResourceType'] = self.RESOURCE_ALIAS[model.arn_type]
+        attrs['ResourceIds'] = [model.id_prefix + '123']
+        return shape_validate(attrs, self.shape, 'ec2')
 
-        if not self.state:
-            self.delete_flow_logs(client, params['ResourceIds'])
-            return
+    def convert(self):
+        data = dict(self.data)
+        attrs = {}
+        for k in set(self.legacy_schema).intersection(data):
+            attrs[k] = data.pop(k)
+        self.source_data = self.data
+        self.data['attrs'] = attrs
 
-        params['ResourceType'] = self.RESOURCE_ALIAS[model.arn_type]
-        params['TrafficType'] = self.data.get('TrafficType', 'ALL').upper()
-        params['MaxAggregationInterval'] = self.data.get('MaxAggregationInterval', 600)
-        if self.data.get('LogDestinationType', 'cloud-watch-logs') == 'cloud-watch-logs':
-            self.process_log_group(self.data.get('LogGroupName'))
+    def run_client_op(self, op, params, log_err_codes=()):
         try:
-            results = client.create_flow_logs(**params)
-
+            results = op(**params)
             for r in results['Unsuccessful']:
                 self.log.exception(
-                    'Exception: create flow-log for %s: %s',
-                    r['ResourceId'], r['Error']['Message'])
+                    'Exception: %s for %s: %s',
+                    op.__name__, r['ResourceId'], r['Error']['Message'])
         except ClientError as e:
-            if e.response['Error']['Code'] == 'FlowLogAlreadyExists':
+            if e.response['Error']['Code'] in log_err_codes:
                 self.log.exception(
-                    'Exception: create flow-log: %s',
-                    e.response['Error']['Message'])
+                    'Exception: %s: %s',
+                    op.response['Error']['Message'])
             else:
                 raise
 
-    def process_log_group(self, logroup):
+    def ensure_log_group(self, logroup):
         client = local_session(self.manager.session_factory).client('logs')
         try:
             client.create_log_group(logGroupName=logroup)
         except client.exceptions.ResourceAlreadyExistsException:
             pass
+
+    def delete_flow_logs(self, client, rids):
+        flow_logs = [
+            r for r in self.manager.get_resource_manager('flow-log').resources()
+            if r['ResourceId'] in rids]
+        self.run_client_op(
+            client.delete_flow_logs,
+            {'FlowLogIds': [f['FlowLogId'] for f in flow_logs]},
+            ('InvalidParameterValue',)
+        )
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('ec2')
+        enabled = self.data.get('state', True)
+
+        if not enabled:
+            return self.delete_flow_logs(client, resources)
+
+        model = self.manager.get_model()
+        params = {'ResourceIds': [r[model.id] for r in resources]}
+        params['ResourceType'] = self.RESOURCE_ALIAS[model.arn_type]
+        params.update(self.data['attrs'])
+        if params.get('LogDestinationType', 'cloud-watch-logs') == 'cloud-watch-logs':
+            self.ensure_log_group(params['LogGroupName'])
+        self.run_client_op(
+            client.create_flow_logs, params, ('FlowLogAlreadyExists',))
 
 
 class PrefixListDescribe(query.DescribeSource):
