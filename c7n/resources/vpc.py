@@ -72,6 +72,42 @@ class FlowLog(query.QueryResourceManager):
 
 @Vpc.filter_registry.register('flow-logs')
 class FlowLogv2Filter(ListItemFilter):
+    """Are flow logs enabled on the resource.
+
+    This filter reuses `list-item` filter for arbitrary filtering
+    on the flow log attibutes, it also  maintains compatiblity
+    with the legacy flow-log filter.
+
+    ie to find all vpcs with flows logs disabled we can do this
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: flow-logs-enabled
+                resource: vpc
+                filters:
+                  - flow-logs
+
+    or to find all vpcs with flow logs but that don't match a
+    particular configuration.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: flow-mis-configured
+                resource: vpc
+                filters:
+                  - not:
+                    - type: flow-logs
+                      attrs:
+                        - TrafficType: ALL
+                        - FlowLogStatus: ACTIVE
+                        - LogGroupName: vpc-logs    
+    """
 
     legacy_schema = {
         'enabled': {'type': 'boolean', 'default': False},
@@ -87,7 +123,7 @@ class FlowLogv2Filter(ListItemFilter):
     }
 
     schema = type_schema(
-        'flow-logs-v2',
+        'flow-logs',
         attrs={'$ref': '#/definitions/filters_common/list_item_attrs'},
         count={'type': 'number'},
         count_op={'$ref': '#/definitions/filters_common/comparison_operators'},
@@ -96,8 +132,6 @@ class FlowLogv2Filter(ListItemFilter):
     schema_alias = True
     annotate_items = True
     permissions = ('ec2:DescribeFlowLogs',)
-
-    flow_log_map = None
 
     compat_conversion = {
         'status': {
@@ -129,6 +163,8 @@ class FlowLogv2Filter(ListItemFilter):
             'key': 'LogGroupName'
         }
     }
+
+    flow_log_map = None
 
     def get_deprecations(self):
         return [
@@ -167,8 +203,6 @@ class FlowLogv2Filter(ListItemFilter):
                 av = {'value': av, 'op': 'not-equal'}
             afilter[ak] = av
             attrs.append(afilter)
-        if attrs and self.data.get('set-op', 'or') == 'or':
-            attrs = [{'or': attrs}]
         if attrs:
             data['attrs'] = attrs
         data['type'] = self.type
@@ -180,6 +214,11 @@ class FlowLogv2Filter(ListItemFilter):
         # compatibility with v1 filter, we also add list-item annotation
         # for matched flow logs
         resource['c7n:flow-logs'] = flogs
+
+        # set operators are a little odd, but for list-item do require
+        # some runtime modification to ensure compatiblity.
+        if self.source_data.get('set-op', 'or') == 'and':
+            self.data['count'] = len(flogs)
         return flogs
 
     def process(self, resources, event=None):
@@ -188,131 +227,6 @@ class FlowLogv2Filter(ListItemFilter):
         for r in self.manager.get_resource_manager('flow-log').resources():
             self.flow_log_map.setdefault(r['ResourceId'], []).append(r)
         return super().process(resources, event)
-
-
-class FlowLogFilter(Filter):
-    """Are flow logs enabled on the resource.
-
-    ie to find all vpcs with flows logs disabled we can do this
-
-    :example:
-
-    .. code-block:: yaml
-
-            policies:
-              - name: flow-logs-enabled
-                resource: vpc
-                filters:
-                  - flow-logs
-
-    or to find all vpcs with flow logs but that don't match a
-    particular configuration.
-
-    :example:
-
-    .. code-block:: yaml
-
-            policies:
-              - name: flow-mis-configured
-                resource: vpc
-                filters:
-                  - not:
-                    - type: flow-logs
-                      enabled: true
-                      set-op: or
-                      op: equal
-                      # equality operator applies to following keys
-                      traffic-type: all
-                      status: active
-                      log-group: vpc-logs
-
-    """
-
-    schema = type_schema(
-        'flow-logs',
-        **{'enabled': {'type': 'boolean', 'default': False},
-           'op': {'enum': ['equal', 'not-equal'], 'default': 'equal'},
-           'set-op': {'enum': ['or', 'and'], 'default': 'or'},
-           'status': {'enum': ['active']},
-           'deliver-status': {'enum': ['success', 'failure']},
-           'destination': {'type': 'string'},
-           'destination-type': {'enum': ['s3', 'cloud-watch-logs']},
-           'traffic-type': {'enum': ['accept', 'reject', 'all']},
-           'log-format': {'type': 'string'},
-           'log-group': {'type': 'string'}})
-
-    permissions = ('ec2:DescribeFlowLogs',)
-
-    def process(self, resources, event=None):
-        client = local_session(self.manager.session_factory).client('ec2')
-
-        # TODO given subnet/nic level logs, we should paginate, but we'll
-        # need to add/update botocore pagination support.
-        logs = client.describe_flow_logs().get('FlowLogs', ())
-
-        m = self.manager.get_model()
-        resource_map = {}
-
-        for fl in logs:
-            resource_map.setdefault(fl['ResourceId'], []).append(fl)
-
-        enabled = self.data.get('enabled', False)
-        log_group = self.data.get('log-group')
-        log_format = self.data.get('log-format')
-        traffic_type = self.data.get('traffic-type')
-        destination_type = self.data.get('destination-type')
-        destination = self.data.get('destination')
-        status = self.data.get('status')
-        delivery_status = self.data.get('deliver-status')
-        op = self.data.get('op', 'equal') == 'equal' and operator.eq or operator.ne
-        set_op = self.data.get('set-op', 'or')
-
-        results = []
-        # looping over vpc resources
-        for r in resources:
-            if r[m.id] not in resource_map:
-                # we didn't find a flow log for this vpc
-                if enabled:
-                    # vpc flow logs not enabled so exclude this vpc from results
-                    continue
-                results.append(r)
-                continue
-            flogs = resource_map[r[m.id]]
-            r['c7n:flow-logs'] = flogs
-
-            # config comparisons are pointless if we only want vpcs with no flow logs
-            if enabled:
-                fl_matches = []
-                for fl in flogs:
-                    dest_type_match = (destination_type is None) or op(
-                        fl['LogDestinationType'], destination_type)
-                    if 'LogDestination' not in fl:
-                        fl['LogDestination'] = ''
-                    dest_match = (destination is None) or op(
-                        fl['LogDestination'], destination)
-                    status_match = (status is None) or op(fl['FlowLogStatus'], status.upper())
-                    delivery_status_match = (delivery_status is None) or op(
-                        fl['DeliverLogsStatus'], delivery_status.upper())
-                    traffic_type_match = (
-                        traffic_type is None) or op(
-                        fl['TrafficType'],
-                        traffic_type.upper())
-                    log_group_match = (log_group is None) or op(fl.get('LogGroupName'), log_group)
-                    log_format_match = (log_format is None) or op(fl.get('LogFormat'), log_format)
-                    # combine all conditions to check if flow log matches the spec
-                    fl_match = (status_match and traffic_type_match and dest_match and
-                                log_format_match and log_group_match and
-                                dest_type_match and delivery_status_match)
-                    fl_matches.append(fl_match)
-
-                if set_op == 'or':
-                    if any(fl_matches):
-                        results.append(r)
-                elif set_op == 'and':
-                    if all(fl_matches):
-                        results.append(r)
-
-        return results
 
 
 @Vpc.filter_registry.register('security-group')
@@ -647,7 +561,6 @@ class Subnet(query.QueryResourceManager):
         'config': query.ConfigSource}
 
 
-#Subnet.filter_registry.register('flow-logs', FlowLogFilter)
 Subnet.filter_registry.register('flow-logs', FlowLogv2Filter)
 
 
@@ -1894,7 +1807,6 @@ class NetworkInterface(query.QueryResourceManager):
     }
 
 
-#NetworkInterface.filter_registry.register('flow-logs', FlowLogFilter)
 NetworkInterface.filter_registry.register('flow-logs', FlowLogv2Filter)
 NetworkInterface.filter_registry.register(
     'network-location', net_filters.NetworkLocation)

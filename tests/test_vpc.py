@@ -227,7 +227,7 @@ class VpcTest(BaseTest):
                                 "type": "flow-logs",
                                 "enabled": True,
                                 "op": "equal",
-                                "set-op": "and",
+                                "set-op": "or",
                                 "status": status,
                                 "traffic-type": traffic_type,
                                 "log-group": log_group,
