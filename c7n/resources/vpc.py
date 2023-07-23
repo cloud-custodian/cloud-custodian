@@ -51,15 +51,15 @@ class ModifyVpc(BaseAction):
 
     schema = type_schema(
         'modify',
-        **{'dns-hostnames': {'type': 'boolean'},
-           'dns-support': {'type': 'boolean'},
-           'address-metrics': {'type': 'boolean'}}
+        **{'dnshostnames': {'type': 'boolean'},
+           'dnssupport': {'type': 'boolean'},
+           'addressusage': {'type': 'boolean'}}
     )
 
     key_params = (
-        ('dns-hostnames', 'EnableDnsHostnames'),
-        ('dns-support', 'EnableDnsSupport'),
-        ('address-metrics', 'EnableNetworkAddressUsageMetrics')
+        ('dnshostnames', 'EnableDnsHostnames'),
+        ('dnssupport', 'EnableDnsSupport'),
+        ('addressusage', 'EnableNetworkAddressUsageMetrics')
     )
 
     permissions = ('ec2:ModifyVpcAttribute',)
@@ -359,12 +359,13 @@ class AttributesFilter(Filter):
         dnshostnames={'type': 'boolean'},
         addressusage={'type': 'boolean'},
         dnssupport={'type': 'boolean'})
+
     permissions = ('ec2:DescribeVpcAttribute',)
 
     key_params = (
         ('dnshostnames', 'enableDnsHostnames'),
         ('dnssupport', 'enableDnsSupport'),
-        ('addressmetrics', 'enableNetworkAddressUsageMetrics')
+        ('addressusage', 'enableNetworkAddressUsageMetrics')
     )
     annotation_key = 'c7n:attributes'
 
@@ -384,7 +385,7 @@ class AttributesFilter(Filter):
                     Attribute=vpc_attr
                 )
                 value = value[response_attr]['Value']
-                r.setdefault(self.annotation_key, {})[policy_key] = value                
+                r.setdefault(self.annotation_key, {})[policy_key] = value
                 if policy_value != value:
                     found = False
                     break
