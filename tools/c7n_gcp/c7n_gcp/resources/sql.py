@@ -127,7 +127,7 @@ class SqlInstanceEnableDeletion(MethodAction):
     method_spec = {'op': 'patch'}
     path_param_re = re.compile('.*?/projects/(.*?)/instances/(.*)')
     method_perm = 'enable-deletion'
-    
+
     def get_resource_params(self, model, resource):
         project, instance = self.path_param_re.match(
             resource['selfLink']).groups()

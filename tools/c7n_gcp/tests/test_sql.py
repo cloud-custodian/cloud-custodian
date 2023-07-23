@@ -188,6 +188,7 @@ class SqlInstanceTest(BaseTest):
             },
             session_factory=factory)
         resources = p.run()
+        self.assertEqual(len(resources), 1)
         if self.recording:
             time.sleep(1)
         client = p.resource_manager.get_client()
@@ -214,7 +215,7 @@ class SqlInstanceTest(BaseTest):
             },
             session_factory=factory)
         resources = p.run()
-        
+        self.assertEqual(len(resources), 1)
         if self.recording:
             time.sleep(1)
         client = p.resource_manager.get_client()
