@@ -44,6 +44,14 @@ class Vpc(query.QueryResourceManager):
         id_prefix = "vpc-"
 
 
+@Vpc.filter_registry.register('metrics')
+class VpcMetrics(MetricsFilter):
+
+    def get_dimensions(self, resource):
+        return [{"Name": "Per-VPC Metrics",
+                 "Value": resource["VpcId"]}]
+
+
 @Vpc.action_registry.register('modify')
 class ModifyVpc(BaseAction):
     """Modify vpc settings
