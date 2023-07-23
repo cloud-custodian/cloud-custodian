@@ -73,7 +73,7 @@ class ModifyVpc(BaseAction):
     permissions = ('ec2:ModifyVpcAttribute',)
 
     def process(self, resources):
-        client = local_session(self.manager).client('ec2')
+        client = local_session(self.manager.session_factory).client('ec2')
 
         for policy_key, param_name in self.key_params:
             if policy_key not in self.data:
