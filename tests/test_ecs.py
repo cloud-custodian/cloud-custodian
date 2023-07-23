@@ -29,7 +29,7 @@ class TestEcs(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 0)
-        
+
     def test_ecs_container_insights_disabled(self):
         session_factory = self.replay_flight_data(
             'test_ecs_container_insights_disabled')
@@ -43,6 +43,26 @@ class TestEcs(BaseTest):
                         "key": "settings[?(name=='containerInsights')].value",
                         "op": "contains",
                         "value": "disabled",
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_ecs_cluster_storage(self):
+        session_factory = self.replay_flight_data("test_ecs_cluster_storage")
+        p = self.load_policy(
+            {
+                "name": "ecs-cluster-storage",
+                "resource": "ecs",
+                "filters": [
+                    {
+                        "type": "ebs-storage",
+                        "key": "Encrypted",
+                        "op": "eq",
+                        "value": True
                     }
                 ],
             },
@@ -372,7 +392,7 @@ class TestEcsTaskDefinition(BaseTest):
             "taskDefinitionArns"
         )
         self.assertEqual(arns, [])
-        
+
     def test_task_definition_delete_permanently(self):
         session_factory = self.replay_flight_data("test_ecs_task_def_delete_permanently")
         p = self.load_policy(
@@ -391,9 +411,8 @@ class TestEcsTaskDefinition(BaseTest):
         ).get(
             "taskDefinitionArns"
         )
-        self.assertEqual(arns, 
+        self.assertEqual(arns,
                          ["arn:aws:ecs:us-east-1:644160558196:task-definition/test-delete-definition:2"])
-        
 
     def test_task_definition_get_resources(self):
         session_factory = self.replay_flight_data("test_ecs_task_def_query")

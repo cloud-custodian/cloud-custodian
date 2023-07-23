@@ -1,0 +1,24 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Directories": [
+            {
+                "Name": "test-cloud",
+                "DirectoryArn": "arn:aws:clouddirectory:us-east-1:644160558196:directory/AZcvaFTzgUYLl7vFDgr8FJU",
+                "State": "DELETED",
+                "CreationDateTime": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 6,
+                    "day": 14,
+                    "hour": 7,
+                    "minute": 30,
+                    "second": 0,
+                    "microsecond": 149000
+                }
+            }
+        ],
+        "NextToken": "CAISgAIIARLZAQgDEtQBANoI+qsZoF5aDF3J64ghqBoVowqpcCiuVBbEqm6v4ujBeyJAbiI6IlBhZ2luYXRpb25Db250aW51YXRpb25EVE8iLCJuZXh0S2V5IjoiQUFBQUFBQUFDV1BoQVFFQkk1b1dEUE5pU2pHRWl4V1hZZk42eDNSNXhqbEJQMG14cEN6T3hKc09HU2RsY0dZN1FXWjFablJ3Y0dGMGEwTm5hVlowZERsb2QxTkdWMDA3IiwicHJldmlvdXNSZXF1ZXN0VGltZSI6MTY4Njc0MjMzODM1M30aILiWcolauOHhQa3D4zd0CkY1cFXgMrbhtD3vota31FW0"
+    }
+}

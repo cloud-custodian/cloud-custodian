@@ -2045,6 +2045,23 @@ class RDSProxy(QueryResourceManager):
     }
 
 
+@RDSProxy.filter_registry.register('subnet')
+class RDSProxySubnetFilter(net_filters.SubnetFilter):
+
+    RelatedIdsExpression = "VpcSubnetIds[]"
+
+
+@RDSProxy.filter_registry.register('security-group')
+class RDSProxySecurityGroupFilter(net_filters.SecurityGroupFilter):
+
+    RelatedIdsExpression = "VpcSecurityGroupIds[]"
+
+@RDSProxy.filter_registry.register('vpc')
+class RDSProxyVpcFilter(net_filters.VpcFilter):
+
+    RelatedIdsExpression = "VpcId"
+
+
 @filters.register('db-option-groups')
 class DbOptionGroups(ValueFilter):
     """This filter describes RDS option groups for associated RDS instances.
@@ -2108,7 +2125,7 @@ class DbOptionGroups(ValueFilter):
                     ogcache[og] = option_group
 
                 cache.save(cache_key, ogcache[og])
-    
+
         return ogcache
 
     def process(self, resources, event=None):

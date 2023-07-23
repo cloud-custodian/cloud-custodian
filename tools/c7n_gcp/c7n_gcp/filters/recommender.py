@@ -44,7 +44,7 @@ class RecommenderFilter(Filter):
           resource: gcp.disk
           filters:
            - type: recommend
-             id: google.compute.disk.IdleResourceRecommender    
+             id: google.compute.disk.IdleResourceRecommender
           actions:
            - snapshot
            - delete
@@ -100,7 +100,7 @@ class RecommenderFilter(Filter):
                 f"projects/{project}/locations/{r}/recommenders/{self.rec_info['id']}"
             )
             for page in client.execute_paged_query("list", {"parent": parent}):
-                recommends.extend(page['recommendations'])
+                recommends.extend(page.get('recommendations', []))
         return recommends
 
     def match_resources(self, recommends, resources):

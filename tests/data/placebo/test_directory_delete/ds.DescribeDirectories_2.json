@@ -1,0 +1,105 @@
+{
+    "status_code": 200,
+    "data": {
+        "DirectoryDescriptions": [
+            {
+                "DirectoryId": "d-90677cc91c",
+                "Name": "corp.amazonworkspaces.com",
+                "ShortName": "corp",
+                "Size": "Small",
+                "Alias": "d-90677cc91c",
+                "AccessUrl": "d-90677cc91c.awsapps.com",
+                "DnsIpAddrs": [
+                    "172.16.1.157",
+                    "172.16.0.18"
+                ],
+                "Stage": "Active",
+                "LaunchTime": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 7,
+                    "day": 9,
+                    "hour": 18,
+                    "minute": 29,
+                    "second": 14,
+                    "microsecond": 188000
+                },
+                "StageLastUpdatedDateTime": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 5,
+                    "day": 26,
+                    "hour": 13,
+                    "minute": 12,
+                    "second": 38,
+                    "microsecond": 219000
+                },
+                "Type": "SimpleAD",
+                "VpcSettings": {
+                    "VpcId": "vpc-0598080981e0332f9",
+                    "SubnetIds": [
+                        "subnet-083ab4dd1a8b6eaa6",
+                        "subnet-0544e30702e2e1ad4"
+                    ],
+                    "SecurityGroupId": "sg-08f62b8c3dd4669bc",
+                    "AvailabilityZones": [
+                        "us-east-1b",
+                        "us-east-1a"
+                    ]
+                },
+                "SsoEnabled": false,
+                "DesiredNumberOfDomainControllers": 0
+            },
+            {
+                "DirectoryId": "d-90679603dd",
+                "Name": "test.example.com",
+                "ShortName": "test",
+                "Size": "Small",
+                "Alias": "d-90679603dd",
+                "AccessUrl": "d-90679603dd.awsapps.com",
+                "DnsIpAddrs": [
+                    "10.0.0.177",
+                    "10.0.1.42"
+                ],
+                "Stage": "Deleting",
+                "LaunchTime": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 5,
+                    "day": 30,
+                    "hour": 8,
+                    "minute": 45,
+                    "second": 10,
+                    "microsecond": 986000
+                },
+                "StageLastUpdatedDateTime": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 5,
+                    "day": 30,
+                    "hour": 8,
+                    "minute": 49,
+                    "second": 26,
+                    "microsecond": 451000
+                },
+                "Type": "SimpleAD",
+                "VpcSettings": {
+                    "VpcId": "vpc-0d4f819d13b730139",
+                    "SubnetIds": [
+                        "subnet-0707ce1b2a6305995",
+                        "subnet-0472841b16adf7476"
+                    ],
+                    "SecurityGroupId": "sg-0ec7770651852c408",
+                    "AvailabilityZones": [
+                        "us-east-1a",
+                        "us-east-1b"
+                    ]
+                },
+                "StageReason": "User initiated directory deletion.",
+                "SsoEnabled": false,
+                "DesiredNumberOfDomainControllers": 0
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

@@ -1,0 +1,50 @@
+{
+    "status_code": 200,
+    "data": {
+        "VpcEndpoints": [
+            {
+                "VpcEndpointId": "vpce-r15s142b9",
+                "VpcEndpointType": "Interface",
+                "VpcId": "vpc-r15s142b9",
+                "ServiceName": "com.amazonaws.ap-southeast-2.ec2messages",
+                "State": "available",
+                "PolicyDocument": "{...}",
+                "RouteTableIds": [],
+                "SubnetIds": [
+                    "subnet-r15s142b90",
+                    "subnet-r15s142b91"
+                ],
+                "Groups": [
+                    {
+                        "GroupId": "sg-r15s142b9",
+                        "GroupName": "vpc_endpoint"
+                    }
+                ],
+                "IpAddressType": "ipv4",
+                "DnsOptions": {
+                    "DnsRecordIpType": "ipv4"
+                },
+                "PrivateDnsEnabled": true,
+                "RequesterManaged": false,
+                "NetworkInterfaceIds": [
+                    "eni-r15s142b91",
+                    "eni-r15s142b92"
+                ],
+                "DnsEntries": [],
+                "CreationTimestamp": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 5,
+                    "day": 25,
+                    "hour": 23,
+                    "minute": 52,
+                    "second": 57,
+                    "microsecond": 4000
+                },
+                "Tags": [],
+                "OwnerId": "123456789012"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

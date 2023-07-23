@@ -2,8 +2,9 @@
 # SPDX-License-Identifier: Apache-2.0
 from .common import BaseTest
 
+
 class PinpointApp(BaseTest):
-    
+
     def test_pinpoint_app_tag(self):
         session_factory = self.replay_flight_data('test_pinpoint_app_tag')
         p = self.load_policy(
@@ -12,7 +13,7 @@ class PinpointApp(BaseTest):
                 'resource': 'pinpoint-app',
                 'filters': [
                     {
-                        'tag:foo': 'absent', 
+                        'tag:foo': 'absent',
                     }
                 ],
                 'actions': [
@@ -39,7 +40,7 @@ class PinpointApp(BaseTest):
                 'resource': 'pinpoint-app',
                 'filters': [
                     {
-                        'tag:foo': 'present', 
+                        'tag:foo': 'present',
                     }
                 ],
                 'actions': [
