@@ -164,7 +164,7 @@ class SqlInstanceTest(BaseTest):
             self.fail('found deleted instance: %s' % result)
         except HttpError as e:
             self.assertTrue("does not exist" in str(e))
-    
+
     def test_enable_deletion_instance(self):
         project_id = 'cloud-custodian'
         instance_name = 'custodiantestsql'
