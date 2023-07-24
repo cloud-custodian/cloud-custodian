@@ -33,16 +33,32 @@ class TestSubnet(OciBaseTest):
                 "filters": [
                     {"type": "value", "key": "id", "value": subnet_ocid},
                 ],
-                "actions": [
-                    {
-                        "type": "update-subnet",
-                        "params": {
-                            "update_subnet_details": {
-                                "defined_tags": self.get_defined_tag("add_tag")
-                            }
-                        },
-                    }
+                "actions": [{"type": "update", "defined_tags": self.get_defined_tag("add_tag")}],
+            },
+            session_factory=session_factory,
+        )
+        policy.run()
+        resource = self._fetch_instance_validation_data(policy.resource_manager, subnet_ocid)
+        test.assertEqual(resource["id"], subnet_ocid)
+        test.assertEqual(self.get_defined_tag_value(resource["defined_tags"]), "true")
+
+    @terraform("subnet", scope="class")
+    def test_update_subnet(self, test, subnet, with_or_without_compartment):
+        """
+        test adding defined_tags tag to subnet
+        """
+        compartment_id, subnet_ocid = self._get_subnet_details(subnet)
+        session_factory = test.oci_session_factory(
+            self.__class__.__name__, inspect.currentframe().f_code.co_name
+        )
+        policy = test.load_policy(
+            {
+                "name": "add-defined-tag-to-subnet",
+                "resource": "oci.subnet",
+                "filters": [
+                    {"type": "value", "key": "id", "value": subnet_ocid},
                 ],
+                "actions": [{"type": "update", "defined_tags": self.get_defined_tag("add_tag")}],
             },
             session_factory=session_factory,
         )
@@ -67,16 +83,7 @@ class TestSubnet(OciBaseTest):
                 "filters": [
                     {"type": "value", "key": "id", "value": subnet_ocid},
                 ],
-                "actions": [
-                    {
-                        "type": "update-subnet",
-                        "params": {
-                            "update_subnet_details": {
-                                "defined_tags": self.get_defined_tag("update_tag")
-                            }
-                        },
-                    }
-                ],
+                "actions": [{"type": "update", "defined_tags": self.get_defined_tag("update_tag")}],
             },
             session_factory=session_factory,
         )
@@ -101,16 +108,7 @@ class TestSubnet(OciBaseTest):
                 "filters": [
                     {"type": "value", "key": "id", "value": subnet_ocid},
                 ],
-                "actions": [
-                    {
-                        "type": "update-subnet",
-                        "params": {
-                            "update_subnet_details": {
-                                "freeform_tags": {"Environment": "Development"}
-                            }
-                        },
-                    }
-                ],
+                "actions": [{"type": "update", "freeform_tags": {"Environment": "Development"}}],
             },
             session_factory=session_factory,
         )
@@ -135,16 +133,7 @@ class TestSubnet(OciBaseTest):
                 "filters": [
                     {"type": "value", "key": "id", "value": subnet_ocid},
                 ],
-                "actions": [
-                    {
-                        "type": "update-subnet",
-                        "params": {
-                            "update_subnet_details": {
-                                "freeform_tags": {"Environment": "Production"}
-                            }
-                        },
-                    }
-                ],
+                "actions": [{"type": "update", "freeform_tags": {"Environment": "Production"}}],
             },
             session_factory=session_factory,
         )

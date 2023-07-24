@@ -32,14 +32,7 @@ class TestVcn(OciBaseTest):
                 "filters": [
                     {"type": "value", "key": "id", "value": vcn_ocid},
                 ],
-                "actions": [
-                    {
-                        "type": "update-vcn",
-                        "params": {
-                            "update_vcn_details": {"defined_tags": self.get_defined_tag("add_tag")}
-                        },
-                    }
-                ],
+                "actions": [{"type": "update", "defined_tags": self.get_defined_tag("add_tag")}],
             },
             session_factory=session_factory,
         )
@@ -64,16 +57,7 @@ class TestVcn(OciBaseTest):
                 "filters": [
                     {"type": "value", "key": "id", "value": vcn_ocid},
                 ],
-                "actions": [
-                    {
-                        "type": "update-vcn",
-                        "params": {
-                            "update_vcn_details": {
-                                "defined_tags": self.get_defined_tag("update_tag")
-                            }
-                        },
-                    }
-                ],
+                "actions": [{"type": "update", "defined_tags": self.get_defined_tag("update_tag")}],
             },
             session_factory=session_factory,
         )
@@ -98,14 +82,32 @@ class TestVcn(OciBaseTest):
                 "filters": [
                     {"type": "value", "key": "id", "value": vcn_ocid},
                 ],
-                "actions": [
-                    {
-                        "type": "update-vcn",
-                        "params": {
-                            "update_vcn_details": {"freeform_tags": {"Environment": "Development"}}
-                        },
-                    }
+                "actions": [{"type": "update", "freeform_tags": {"Environment": "Development"}}],
+            },
+            session_factory=session_factory,
+        )
+        policy.run()
+        resource = self._fetch_instance_validation_data(policy.resource_manager, vcn_ocid)
+        test.assertEqual(resource["id"], vcn_ocid)
+        test.assertEqual(resource["freeform_tags"]["Environment"], "Development")
+
+    @terraform("vcn", scope="class")
+    def test_update_vcn(self, test, vcn):
+        """
+        test adding freeform tag to vcn
+        """
+        vcn_ocid = self._get_vcn_details(vcn)
+        session_factory = test.oci_session_factory(
+            self.__class__.__name__, inspect.currentframe().f_code.co_name
+        )
+        policy = test.load_policy(
+            {
+                "name": "add-tag-freeform-to-vcn",
+                "resource": "oci.vcn",
+                "filters": [
+                    {"type": "value", "key": "id", "value": vcn_ocid},
                 ],
+                "actions": [{"type": "update", "freeform_tags": {"Environment": "Development"}}],
             },
             session_factory=session_factory,
         )
@@ -130,14 +132,7 @@ class TestVcn(OciBaseTest):
                 "filters": [
                     {"type": "value", "key": "id", "value": vcn_ocid},
                 ],
-                "actions": [
-                    {
-                        "type": "update-vcn",
-                        "params": {
-                            "update_vcn_details": {"freeform_tags": {"Environment": "Production"}}
-                        },
-                    }
-                ],
+                "actions": [{"type": "update", "freeform_tags": {"Environment": "Production"}}],
             },
             session_factory=session_factory,
         )
