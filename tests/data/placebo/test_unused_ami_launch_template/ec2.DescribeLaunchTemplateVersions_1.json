@@ -29,7 +29,6 @@
                         }
                     ],
                     "ImageId": "ami-0ac019f4fcb7cb7e6",
-                    "KeyName": "dummy-key-pair",
                     "InstanceType": "t2.small",
                     "TagSpecifications": [
                         {
@@ -83,7 +82,6 @@
                         }
                     ],
                     "ImageId": "ami-0ac019f4fcb7cb7e6",
-                    "KeyName": "dummy-key-pair-01",
                     "InstanceType": "t2.small",
                     "TagSpecifications": [
                         {
@@ -137,7 +135,6 @@
                         }
                     ],
                     "ImageId": "ami-0ac019f4fcb7cb7e6",
-                    "KeyName": "dummy-key-pair-02",
                     "InstanceType": "t2.small",
                     "TagSpecifications": [
                         {
