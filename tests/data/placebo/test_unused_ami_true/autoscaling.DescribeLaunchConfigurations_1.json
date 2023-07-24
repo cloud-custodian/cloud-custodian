@@ -39,6 +39,7 @@
                 "KernelId": "", 
                 "RamdiskId": "", 
                 "ImageId": "ami-c481fad3", 
+                "KeyName": "dummy-key-pair",
                 "InstanceType": "t2.micro"
             }, 
             {
@@ -78,6 +79,7 @@
                 "KernelId": "", 
                 "RamdiskId": "", 
                 "ImageId": "ami-e0fba8f7", 
+                "KeyName": "dummy-key-pair",
                 "InstanceType": "t2.micro", 
                 "AssociatePublicIpAddress": false
             }

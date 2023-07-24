@@ -39,6 +39,7 @@
                 "KernelId": "", 
                 "RamdiskId": "", 
                 "ImageId": "ami-c481fad3", 
+                "KeyName": "dummy-key-pair",
                 "InstanceType": "t2.micro"
             }, 
             {
@@ -78,6 +79,7 @@
                 "KernelId": "", 
                 "RamdiskId": "", 
                 "ImageId": "ami-e0fba8f7", 
+                "KeyName": "dummy-key-pair",
                 "InstanceType": "t2.micro", 
                 "AssociatePublicIpAddress": false
             }
@@ -85,13 +87,13 @@
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "cd68befe-97b4-11e6-87ba-853f619ec559", 
+            "RequestId": "ce26dec6-97b4-11e6-9cf5-b94607544e94", 
             "HTTPHeaders": {
-                "x-amzn-requestid": "cd68befe-97b4-11e6-87ba-853f619ec559", 
+                "x-amzn-requestid": "ce26dec6-97b4-11e6-9cf5-b94607544e94", 
                 "vary": "Accept-Encoding", 
                 "content-length": "2816", 
                 "content-type": "text/xml", 
-                "date": "Fri, 21 Oct 2016 17:35:47 GMT"
+                "date": "Fri, 21 Oct 2016 17:35:48 GMT"
             }
         }
     }
