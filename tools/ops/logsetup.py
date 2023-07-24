@@ -86,7 +86,7 @@ def main():
     try:
         manager.publish(func)
     except Exception:
-        import traceback, pdb, sys
+        import traceback, pdb
         traceback.print_exc()
         pdb.post_mortem(sys.exc_info()[-1])
 
