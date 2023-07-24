@@ -1404,15 +1404,18 @@ class RenameTag(Action):
              'Key': destination_tag,
              'Value': source['Value']}])
         if propagate:
-            self.propagate_instance_tag(source, destination_tag, asg)
+            instances = [i['InstanceId'] for i in asg['Instances']]
+            self.propagate_instance_tag(source, destination_tag, instances)
 
-    def propagate_instance_tag(self, source, destination_tag, asg):
+    def propagate_instance_tag(self, source, destination_tag, instances):
+        if not instances:
+            return
         client = local_session(self.manager.session_factory).client('ec2')
         client.delete_tags(
-            Resources=[i['InstanceId'] for i in asg['Instances']],
+            Resources=instances,
             Tags=[{"Key": source['Key']}])
         client.create_tags(
-            Resources=[i['InstanceId'] for i in asg['Instances']],
+            Resources=instances,
             Tags=[{'Key': destination_tag, 'Value': source['Value']}])
 
 
