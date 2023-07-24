@@ -44,6 +44,47 @@ def test_ec2_igw_subnet(test, ec2_igw_subnet):
     assert expected_instance_ids == result_instance_ids
 
 
+def test_vpc_usage(test):
+    factory = test.replay_flight_data(
+        'test_vpc_usage_detect_set', region='us-west-1')
+    p = test.load_policy({
+        'name': 'vpc-usage',
+        'resource': 'aws.vpc',
+        'filters': [
+            {'type': 'vpc-attributes',
+             'addressusage': False}],
+        'actions': [
+            {'type': 'modify',
+             'addressusage': True}],
+        }, session_factory=factory)
+    resources = p.run()
+    assert len(resources) == 1
+    client = factory().client('ec2')
+    result = client.describe_vpc_attribute(
+        VpcId=resources[0]['VpcId'],
+        Attribute='enableNetworkAddressUsageMetrics')
+    assert result['EnableNetworkAddressUsageMetrics']['Value'] is True
+
+
+def test_vpc_usage_metric(test):
+    factory = test.replay_flight_data(
+        'test_vpc_usage_metrics', region='us-west-1')
+    p = test.load_policy({
+        'name': 'vpc-usage',
+        'resource': 'aws.vpc',
+        'filters': [
+            {'type': 'metrics',
+             'statistics': 'Maximum',
+             'value': 0,
+             'op': 'gte',
+             'missing-value': 0,
+             'days': 2,
+             'name': 'NetworkAddressUsage'}
+        ]}, session_factory=factory)
+    resources = p.run()
+    assert resources[0]['VpcId'] == 'vpc-6d20940b'
+
+
 def test_eni_igw_subnet(test):
     factory = test.replay_flight_data('test_eni_public_subnet')
     p = test.load_policy({
@@ -264,7 +305,9 @@ class VpcTest(BaseTest):
                 "name": "dns-hostnames-and-support-enabled",
                 "resource": "vpc",
                 "filters": [
-                    {"type": "vpc-attributes", "dnshostnames": True, "dnssupport": True}
+                    {"type": "vpc-attributes",
+                     "dnshostnames": True,
+                     "dnssupport": True}
                 ],
             },
             session_factory=self.session_factory,
