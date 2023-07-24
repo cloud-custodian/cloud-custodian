@@ -3513,8 +3513,8 @@ class TestUnusedKeys(BaseTest):
             session_factory=factory,
         )
         resources = p.run()
-        self.assertEqual(len(resources), 2)
-        #self.assertEqual(resources[0]['KeyName'], 'dummy-key-pair')
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['KeyName'], 'delete')
 
     def test_unused_keypair_true(self):
         factory = self.replay_flight_data("test_unused_keypair_true")
@@ -3523,7 +3523,7 @@ class TestUnusedKeys(BaseTest):
             session_factory=factory,
         )
         resources = p.run()
-        self.assertEqual(len(resources), 2)
+        self.assertEqual(len(resources), 1)
 
     def test_unused_keypair_false(self):
         factory = self.replay_flight_data("test_unused_keypair_false")
@@ -3531,12 +3531,12 @@ class TestUnusedKeys(BaseTest):
             {
                 "name": "test-unused-keypairs",
                 "resource": "key-pair",
-                "filters": [{"type": "unused", "value": False}],
+                "filters": [{"type": "unused", "state": False}],
             },
             session_factory=factory,
         )
         resources = p.run()
-        self.assertEqual(len(resources), 2)
+        self.assertEqual(len(resources), 1)
 
 
     def test_vpc_unused_key_not_filtered_error(self):
