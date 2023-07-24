@@ -44,6 +44,47 @@ class Vpc(query.QueryResourceManager):
         id_prefix = "vpc-"
 
 
+@Vpc.filter_registry.register('metrics')
+class VpcMetrics(MetricsFilter):
+
+    def get_dimensions(self, resource):
+        return [{"Name": "Per-VPC Metrics",
+                 "Value": resource["VpcId"]}]
+
+
+@Vpc.action_registry.register('modify')
+class ModifyVpc(BaseAction):
+    """Modify vpc settings
+    """
+
+    schema = type_schema(
+        'modify',
+        **{'dnshostnames': {'type': 'boolean'},
+           'dnssupport': {'type': 'boolean'},
+           'addressusage': {'type': 'boolean'}}
+    )
+
+    key_params = (
+        ('dnshostnames', 'EnableDnsHostnames'),
+        ('dnssupport', 'EnableDnsSupport'),
+        ('addressusage', 'EnableNetworkAddressUsageMetrics')
+    )
+
+    permissions = ('ec2:ModifyVpcAttribute',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('ec2')
+
+        for policy_key, param_name in self.key_params:
+            if policy_key not in self.data:
+                continue
+            params = {param_name: {'Value': self.data[policy_key]}}
+            # can only modify one attribute per request
+            for r in resources:
+                params['VpcId'] = r['VpcId']
+                client.modify_vpc_attribute(**params)
+
+
 @Vpc.filter_registry.register('flow-logs')
 class FlowLogFilter(Filter):
     """Are flow logs enabled on the resource.
@@ -324,35 +365,40 @@ class AttributesFilter(Filter):
     schema = type_schema(
         'vpc-attributes',
         dnshostnames={'type': 'boolean'},
+        addressusage={'type': 'boolean'},
         dnssupport={'type': 'boolean'})
+
     permissions = ('ec2:DescribeVpcAttribute',)
+
+    key_params = (
+        ('dnshostnames', 'enableDnsHostnames'),
+        ('dnssupport', 'enableDnsSupport'),
+        ('addressusage', 'enableNetworkAddressUsageMetrics')
+    )
+    annotation_key = 'c7n:attributes'
 
     def process(self, resources, event=None):
         results = []
         client = local_session(self.manager.session_factory).client('ec2')
-        dns_hostname = self.data.get('dnshostnames', None)
-        dns_support = self.data.get('dnssupport', None)
 
         for r in resources:
-            if dns_hostname is not None:
-                hostname = client.describe_vpc_attribute(
+            found = True
+            for policy_key, vpc_attr in self.key_params:
+                if policy_key not in self.data:
+                    continue
+                policy_value = self.data[policy_key]
+                response_attr = "%s%s" % (vpc_attr[0].upper(), vpc_attr[1:])
+                value = client.describe_vpc_attribute(
                     VpcId=r['VpcId'],
-                    Attribute='enableDnsHostnames'
-                )['EnableDnsHostnames']['Value']
-            if dns_support is not None:
-                support = client.describe_vpc_attribute(
-                    VpcId=r['VpcId'],
-                    Attribute='enableDnsSupport'
-                )['EnableDnsSupport']['Value']
-            if dns_hostname is not None and dns_support is not None:
-                if dns_hostname == hostname and dns_support == support:
-                    results.append(r)
-            elif dns_hostname is not None and dns_support is None:
-                if dns_hostname == hostname:
-                    results.append(r)
-            elif dns_support is not None and dns_hostname is None:
-                if dns_support == support:
-                    results.append(r)
+                    Attribute=vpc_attr
+                )
+                value = value[response_attr]['Value']
+                r.setdefault(self.annotation_key, {})[policy_key] = value
+                if policy_value != value:
+                    found = False
+                    break
+            if found:
+                results.append(r)
         return results
 
 
@@ -509,6 +555,7 @@ Subnet.filter_registry.register('flow-logs', FlowLogFilter)
 class SubnetVpcFilter(net_filters.VpcFilter):
 
     RelatedIdsExpression = "VpcId"
+
 
 @Subnet.filter_registry.register('ip-address-usage')
 class SubnetIpAddressUsageFilter(ValueFilter):
