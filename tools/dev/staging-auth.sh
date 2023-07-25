@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # PKG_DOMAIN, PKG_REPO, and valid aws creds and region as pre-reqs
-set -euo pipefail
+set -euxo pipefail
 export CODEARTIFACT_OWNER=`aws sts get-caller-identity --query Account --output text`
 export CODEARTIFACT_REPOSITORY_URL=`aws codeartifact get-repository-endpoint --domain $PKG_DOMAIN --domain-owner $CODEARTIFACT_OWNER --repository $PKG_REPO --format pypi --query repositoryEndpoint --output text`
 export CODEARTIFACT_AUTH_TOKEN=`aws codeartifact get-authorization-token --domain $PKG_DOMAIN --domain-owner $CODEARTIFACT_OWNER --query authorizationToken --output text`

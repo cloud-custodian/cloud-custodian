@@ -38,6 +38,15 @@ jobs:
         with:
           role-to-assume: ${{ secrets.AWS_FTEST_ROLE }}
           aws-region: us-east-1
+
+      - name: Auth Staging Repository
+        shell: bash
+        env:
+          AWS_DEFAULT_REGION: us-east-1
+          PKG_DOMAIN: release-staging
+          PKG_REPO: stagec7n
+        run: |
+          ./tools/dev/staging-auth.sh >> /dev/null
   
       - name: Stage Wheels
         shell: bash
@@ -46,9 +55,7 @@ jobs:
           PKG_DOMAIN: release-staging
           PKG_REPO: stagec7n
         run: |
-          ./tools/dev/staging-auth.sh >> /dev/null
           set -euxo pipefail
-          env
           python tools/dev/staging-clean.py
           python tools/dev/poetrypkg.py gen-qa-requires -r . --output wheels-manifest.txt
           make pkg-publish-wheel PKG_REPO=${{ env.PKG_REPO }}
@@ -75,16 +82,17 @@ jobs:
         with:
           python-version: "3.11"
 
-      - uses: aws-actions/configure-aws-credentials@v1-node16
-        with:
-          role-to-assume: ${{ secrets.AWS_FTEST_ROLE }}
-          aws-region: us-east-1
-
       - uses: actions/download-artifact@v3
         with:
           name: built-wheels
 
-      - name: Install Staged
+      - uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: ${{ secrets.AWS_FTEST_ROLE }}
+          aws-region: us-east-1
+
+
+      - name: Auth Staging Repository
         shell: bash
         env:
           AWS_DEFAULT_REGION: us-east-1
@@ -92,8 +100,11 @@ jobs:
           PKG_REPO: stagec7n
         run: |
           ./tools/dev/staging-auth.sh >> /dev/null
+
+      - name: Install Staged
+        shell: bash
+        run: |
           set -euxo pipefail
-          env          
           pip install -r wheels-manifest.txt  --index-url ${{ env.STAGE_INDEX_URL }} --extra-index-url https://pypi.org/simple/
 
       - name: Smoke Test
