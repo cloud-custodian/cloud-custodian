@@ -27,8 +27,7 @@ def main():
 
     package_versions = {}
     package_manifests = [Path('.') / 'pyproject.toml']
-    package_manifests.extend([
-        Path(f'{pkg}/pyproject.toml') for pkg in package_set])
+    package_manifests.extend([Path(f'{pkg}/pyproject.toml') for pkg in package_set])
 
     for p in package_manifests:
         content = tomllib.loads(p.read_text())
@@ -46,15 +45,12 @@ def main():
             repository=pkg_repo,
             package=pkg,
             versions=[version],
-            format='pypi',            
+            format='pypi',
         )
-
 
     print('Cleaned out package versions from staging repo')
     pprint.pprint(package_versions)
 
+
 if __name__ == '__main__':
     main()
-    
-    
-    
