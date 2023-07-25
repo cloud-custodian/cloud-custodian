@@ -16,6 +16,11 @@ python3 -m pip config --site set global.index-url "$CODEARTIFACT_REPOSITORY_URL"
 
 
 cat <<EOF >> $HOME/.pypirc
+[distutils]
+index-servers = 
+        pypi
+        stagec7n
+
 [stagec7n]
 repository = $CODEARTIFACT_REPOSITORY_URL
 username = $CODEARTIFACT_USER
