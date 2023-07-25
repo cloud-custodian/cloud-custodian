@@ -24,7 +24,6 @@ jobs:
           poetry self add poetry-plugin-freeze
           pip install twine
           make pkg-build-wheel
-          python tools/dev/poetrypkg --root . --output wheels-manifest.txt
 
       - name: Build ChangeLog
         shell: bash
@@ -53,7 +52,6 @@ jobs:
           path: |
             **/*.whl
             release.md
-            wheels-manifest.txt
 
   TestWheels:
     runs-on: ubuntu-latest
