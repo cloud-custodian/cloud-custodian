@@ -28,7 +28,7 @@ jobs:
       - name: Build ChangeLog
         shell: bash
         run: |
-          python tools/dev/changelog.py --output release.md --root . --since last
+          python tools/dev/changelog.py --output release.md --path . --since last
           cat release.md
 
       - uses: aws-actions/configure-aws-credentials@v1-node16
