@@ -938,6 +938,7 @@ def test_rds_snapshot_instance(test):
     assert len(resources) == 1
     resources[0]['DBSnapshotIdentifier'] == 'manual-testx'
 
+
 class RDSSnapshotTest(BaseTest):
 
     def test_rds_snapshot_copy_tags_enable(self):

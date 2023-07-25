@@ -1,7 +1,6 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import importlib
-from functools import lru_cache
 
 from .core import ValueFilter, OPERATORS
 from c7n.query import ChildResourceQuery
