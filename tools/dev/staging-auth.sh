@@ -11,5 +11,13 @@ echo TWINE_PASSWORD=$CODEARTIFACT_AUTH_TOKEN >> $GITHUB_ENV
 
 # Note: `aws codeartifact login --tool pip` updates user-level pip settings. As a finer-grained alternative, we can
 # build a PyPI index URL and use it only inside our virtual environment.
-export PYPI_INDEX_URL="${CODEARTIFACT_REPOSITORY_URL#*//}simple/"
-python3 -m pip config --site set global.index-url "$PYPI_INDEX_URL"
+
+python3 -m pip config --site set global.index-url "$CODEARTIFACT_REPOSITORY_URL"
+
+
+cat <<EOF >> $HOME/.pypirc
+[stagec7n]
+repository = $CODEARTIFACT_REPOSITORY_URL
+username = $CODEARTIFACT_USER
+password = $CODEARTIFACT_AUTH_TOKEN
+EOF
