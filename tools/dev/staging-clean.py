@@ -13,7 +13,6 @@ import boto3
 import os
 import tomllib
 from pathlib import Path
-import pprint
 
 
 def main():
