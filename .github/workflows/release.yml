@@ -13,7 +13,9 @@ jobs:
       checks: write    
     steps:
       - uses: actions/checkout@v3
-      - name: Install Custodian
+      - name: Get tags
+        run: git fetch --tags origin        
+      - name: Install Custodian        
         uses: ./.github/composites/install
         with:
           python-version: "3.11"
