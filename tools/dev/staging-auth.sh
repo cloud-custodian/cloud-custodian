@@ -1,4 +1,4 @@
-#!/usr/bin/env bash\
+#!/usr/bin/env bash
 # PKG_DOMAIN, PKG_REPO, and valid aws creds and region as pre-reqs
 set -euxo pipefail
 export CODEARTIFACT_OWNER=`aws sts get-caller-identity --query Account --output text`
