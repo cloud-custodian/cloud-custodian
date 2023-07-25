@@ -48,6 +48,7 @@ jobs:
         run: |
           ./tools/dev/staging-auth.sh >> /dev/null | true
           python tools/dev/staging-clean.py
+          python tools/dev/poetrypkg.py gen-qa-requires -r . --output wheels-manifest.txt
           make pkg-publish-wheel PKG_REPO=${{ env.PKG_REPO }}
 
       - uses: actions/upload-artifact@v3
@@ -56,6 +57,7 @@ jobs:
           path: |
             **/*.whl
             release.md
+            wheels-manifest.txt
 
   TestWheels:
     runs-on: ubuntu-latest
