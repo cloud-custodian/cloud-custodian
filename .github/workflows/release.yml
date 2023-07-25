@@ -90,7 +90,7 @@ jobs:
           PKG_REPO: stagec7n
         run: |
           ./tools/dev/staging-auth.sh
-          pip install -r wheels-manifest.txt
+          pip install -r wheels-manifest.txt  --index-url $STAGE_INDEX_URL
 
       - name: Smoke Test
         shell: bash

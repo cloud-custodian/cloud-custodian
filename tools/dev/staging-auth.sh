@@ -8,6 +8,7 @@ export CODEARTIFACT_USER=aws
 
 echo TWINE_USERNAME=$CODEARTIFACT_USER >> $GITHUB_ENV
 echo TWINE_PASSWORD=$CODEARTIFACT_AUTH_TOKEN >> $GITHUB_ENV
+echo STAGE_INDEX_URL="https://${CODEARTIFACT_USER}:${CODEARTIFACT_AUTH_TOKEN}@${CODEARTIFACT_REPOSITORY_URL#*//}simple/" >> $GITHUB_ENV
 
 # Note: `aws codeartifact login --tool pip` updates user-level pip settings. As a finer-grained alternative, we can
 # build a PyPI index URL and use it only inside our virtual environment.
