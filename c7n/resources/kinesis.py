@@ -146,7 +146,7 @@ class DeliveryStream(QueryResourceManager):
         date = 'CreateTimestamp'
         dimension = 'DeliveryStreamName'
         universal_taggable = object()
-        cfn_type = 'AWS::KinesisFirehose::DeliveryStream'
+        config_type = cfn_type = 'AWS::KinesisFirehose::DeliveryStream'
 
     source_mapping = {
         'describe': DescribeWithResourceTags,

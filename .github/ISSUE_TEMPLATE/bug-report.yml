@@ -34,6 +34,8 @@ body:
         - Amazon Web Services (AWS)
         - Microsoft Azure
         - Google Cloud (GCP)
+        - Oracle Cloud (OCI)
+        - Tencent Cloud (TC)
         - Kubernetes (Alpha)
         - OpenStack (Alpha)
     validations:

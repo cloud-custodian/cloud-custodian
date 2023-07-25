@@ -2218,6 +2218,7 @@ class LaunchTemplate(query.QueryResourceManager):
         filter_name = 'LaunchTemplateIds'
         filter_type = 'list'
         arn_type = "launch-template"
+        cfn_type = "AWS::EC2::LaunchTemplate"
 
     def augment(self, resources):
         client = utils.local_session(
@@ -2345,7 +2346,7 @@ class SpotFleetRequest(query.QueryResourceManager):
         filter_type = 'list'
         date = 'CreateTime'
         arn_type = 'spot-fleet-request'
-        cfn_type = 'AWS::EC2::SpotFleet'
+        config_type = cfn_type = 'AWS::EC2::SpotFleet'
         permissions_enum = ('ec2:DescribeSpotFleetRequests',)
 
 

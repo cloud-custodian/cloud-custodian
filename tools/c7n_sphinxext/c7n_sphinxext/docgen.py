@@ -66,6 +66,8 @@ def eperm(provider, el, r=None):
             r = Bag({'type': 'logs_loggroup'})
         elif provider == 'tencentcloud':
             r = Bag({'type': 'ami'})
+        elif provider == 'oci':
+            r = Bag({'type': 'instance'})
 
     # print(f'policy construction lookup {r.type}.{element_type}.{el.type}')
 
