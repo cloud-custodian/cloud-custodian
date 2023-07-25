@@ -924,6 +924,21 @@ class RDSTest(BaseTest):
         self.assertEqual(resources[0]["DBInstanceIdentifier"], "database-2")
 
 
+def test_rds_snapshot_instance(test):
+    factory = test.replay_flight_data('test_rds_snapshot_instance')
+    p = test.load_policy(
+        {'name': 'check-instance',
+         'resource': 'aws.rds-snapshot',
+         'filters': [
+             {'type': 'instance',
+              'key': 'DeletionProtection',
+              'value': False}]},
+        session_factory=factory)
+    resources = p.run()
+    assert len(resources) == 1
+    resources[0]['DBSnapshotIdentifier'] == 'manual-testx'
+
+
 class RDSSnapshotTest(BaseTest):
 
     def test_rds_snapshot_copy_tags_enable(self):
