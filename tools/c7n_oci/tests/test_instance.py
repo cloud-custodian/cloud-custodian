@@ -297,9 +297,7 @@ class TestInstance(OciBaseTest):
         ocid = "ocid1.instance.oc1..<unique_ID>"
         resource = {"id": ocid}
         filter_resources = [resource] * data_size
-        query = InstanceMetrics.get_metrics_resource_query(
-            query, filter_resources
-        )
+        query = InstanceMetrics.get_metrics_resource_query(query, filter_resources)
         result = "resourceId" in query
         assert result == expected
 

@@ -286,9 +286,7 @@ class InstanceMetrics(Filter):
         for compartment_id in comp_resources.keys():
             query = self.data.get("query")
             filter_resources = comp_resources.get(comp_id)
-            query = InstanceMetrics.get_metrics_resource_query(
-                query, filter_resources
-            )
+            query = InstanceMetrics.get_metrics_resource_query(query, filter_resources)
             log.debug(
                 f"Monitoring client will execute query :{query} for resources in the compartment"
             )
