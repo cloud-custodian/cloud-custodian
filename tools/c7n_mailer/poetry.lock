@@ -1264,7 +1264,7 @@ crt = ["awscrt (==0.16.26)"]
 
 [[package]]
 name = "c7n"
-version = "0.9.29"
+version = "0.9.30"
 description = "Cloud Custodian - Policy Rules Engine"
 optional = true
 python-versions = "^3.8"
@@ -1288,7 +1288,7 @@ url = "../.."
 
 [[package]]
 name = "c7n-azure"
-version = "0.7.28"
+version = "0.7.29"
 description = "Cloud Custodian - Azure Support"
 optional = true
 python-versions = "^3.8"
@@ -1372,7 +1372,7 @@ url = "../c7n_azure"
 
 [[package]]
 name = "c7n-gcp"
-version = "0.4.28"
+version = "0.4.29"
 description = "Cloud Custodian - Google Cloud Provider"
 optional = true
 python-versions = "^3.8"
