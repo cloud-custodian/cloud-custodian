@@ -3284,6 +3284,7 @@
     "CancelCapacityReservation",
     "CancelConversionTask",
     "CancelExportTask",
+    "CancelImageLaunchPermission",
     "CancelImportTask",
     "CancelReservedInstancesListing",
     "CancelSpotFleetRequests",
