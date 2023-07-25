@@ -108,6 +108,18 @@ class LambdaPermissionTest(BaseTest):
         self.assertRaises(ClientError, client.get_policy, FunctionName=name)
 
 
+
+def test_function_url(test):
+    factory = test.replay_flight_data('test_aws_lambda_function_url', region='us-west-2')
+    p = test.load_policy({
+        'name': 'lambda-function-url',
+        'resource': 'aws.lambda',
+        'filters': [{'type': 'url-config', 'key': 'FunctionUrl', 'value': 'absent'}],
+        }, session_factory=factory)
+    resources = p.run()
+    assert len(resources) == 1
+
+
 class LambdaLayerTest(BaseTest):
 
     def test_lambda_layer_cross_account(self):
