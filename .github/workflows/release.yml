@@ -46,7 +46,7 @@ jobs:
           PKG_DOMAIN: release-staging
           PKG_REPO: stagec7n
         run: |
-          ./tools/dev/staging-auth
+          ./tools/dev/staging-auth.sh
           make pkg-publish PKG_REPO=${{ env.PKG_REPO }}
 
       - uses: actions/upload-artifact@v3
