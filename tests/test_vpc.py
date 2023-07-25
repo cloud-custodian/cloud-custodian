@@ -3517,7 +3517,7 @@ class TestUnusedKeys(BaseTest):
         self.assertEqual(resources[0]['KeyName'], 'delete')
 
     def test_unused_keypair_true(self):
-        factory = self.replay_flight_data("test_unused_keypair_true")
+        factory = self.replay_flight_data("test_unused_keypair")
         p = self.load_policy(
             {"name": "test-unused-keypairs", "resource": "key-pair", "filters": ["unused"]},
             session_factory=factory,
@@ -3526,7 +3526,7 @@ class TestUnusedKeys(BaseTest):
         self.assertEqual(len(resources), 1)
 
     def test_unused_keypair_false(self):
-        factory = self.replay_flight_data("test_unused_keypair_false")
+        factory = self.replay_flight_data("test_unused_keypair")
         p = self.load_policy(
             {
                 "name": "test-unused-keypairs",
