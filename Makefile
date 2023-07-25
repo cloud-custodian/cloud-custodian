@@ -129,6 +129,7 @@ pkg-build-wheel:
 
 pkg-publish-wheel:
 # upload to test pypi
+	set -e
 	twine upload -r $(PKG_REPO) dist/*
 	for pkg in $(PKG_SET); do cd $$pkg && twine upload -r $(PKG_REPO) dist/* && cd ../..; done
 

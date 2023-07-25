@@ -26,7 +26,10 @@ def main():
             break
 
     package_versions = {}
-    package_manifests = [Path('.') / 'pyproject.toml']
+    package_manifests = [
+        Path('.') / 'pyproject.toml',
+        Path('.') / "tools" / "c7n_left" / "pyproject.toml"
+    ]
     package_manifests.extend([Path(f'{pkg}/pyproject.toml') for pkg in package_set])
 
     for p in package_manifests:
@@ -39,7 +42,10 @@ def main():
     pkg_domain = os.environ['PKG_DOMAIN']
     pkg_repo = os.environ['PKG_REPO']
 
+    print('Cleaning out package versions from staging repo')
+
     for pkg, version in package_versions.items():
+        print(f'remove {pkg} {version}')
         client.delete_package_versions(
             domain=pkg_domain,
             repository=pkg_repo,
@@ -47,9 +53,6 @@ def main():
             versions=[version],
             format='pypi',
         )
-
-    print('Cleaned out package versions from staging repo')
-    pprint.pprint(package_versions)
 
 
 if __name__ == '__main__':
