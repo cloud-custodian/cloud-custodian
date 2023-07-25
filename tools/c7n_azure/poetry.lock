@@ -1800,13 +1800,13 @@ signedtoken = ["cryptography (>=3.0.0)", "pyjwt (>=2.0.0,<3)"]
 
 [[package]]
 name = "parameterized"
-version = "0.7.5"
+version = "0.9.0"
 description = "Parameterized testing with any Python test framework"
 optional = false
-python-versions = "*"
+python-versions = ">=3.7"
 files = [
-    {file = "parameterized-0.7.5-py2.py3-none-any.whl", hash = "sha256:b36f709fcfd9e8c144c1374b16a40fc0b5984efe93e41d53e6d228ae2a1540c5"},
-    {file = "parameterized-0.7.5.tar.gz", hash = "sha256:b5e6af67b9e49485e30125b1c8f031ffa81a265ca08bfa73f31551bf03cf68c4"},
+    {file = "parameterized-0.9.0-py2.py3-none-any.whl", hash = "sha256:4e0758e3d41bea3bbd05ec14fc2c24736723f243b28d702081aef438c9372b1b"},
+    {file = "parameterized-0.9.0.tar.gz", hash = "sha256:7fc905272cefa4f364c1a3429cbbe9c0f98b793988efb5bf90aac80f08db09b1"},
 ]
 
 [package.extras]
@@ -2465,4 +2465,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "391c08d643d1244b2626c0746e69769c2d24beffa8a304098a62938ce2d966e8"
+content-hash = "7d57f0988333d77b4683bef2650925a5f7612a13e59753b18429571601f8c969"

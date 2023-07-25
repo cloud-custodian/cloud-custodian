@@ -4,10 +4,10 @@ from copy import deepcopy
 from datetime import datetime, timedelta
 import json
 import logging
-import mock
 import os
 import shutil
 import tempfile
+from unittest import mock
 
 from c7n import policy, manager
 from c7n.config import Config
@@ -263,6 +263,7 @@ class PolicyMetaLint(BaseTest):
         whitelist = set(('AwsS3Object', 'Container'))
         todo = set((
             # q2 2023
+            'AwsAthenaWorkGroup',
             'AwsStepFunctionStateMachine',
             'AwsGuardDutyDetector',
             'AwsAmazonMqBroker',
