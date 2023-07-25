@@ -53,6 +53,7 @@ from c7n.exceptions import PolicyValidationError
 from c7n.filters import (
     CrossAccountAccessFilter, FilterRegistry, Filter, ValueFilter, AgeFilter)
 from c7n.filters.offhours import OffHour, OnHour
+from c7n.filters import related
 import c7n.filters.vpc as net_filters
 from c7n.manager import resources
 from c7n.query import (
@@ -1059,6 +1060,33 @@ class RDSSnapshot(QueryResourceManager):
 @RDSSnapshot.filter_registry.register('onhour')
 class RDSSnapshotOnHour(OnHour):
     """Scheduled action on rds snapshot."""
+
+
+@RDSSnapshot.filter_registry.register('instance')
+class SnapshotInstance(related.RelatedResourceFilter):
+    """Filter snapshots by their database attributes.
+
+    :example:
+
+      Find snapshots without an extant database
+
+    .. code-block:: yaml
+
+       policies:
+         - name: rds-snapshot-orphan
+           resource: aws.rds-snapshot
+           filters:
+            - type: instance
+              value: 0
+              value_type: resource_count
+    """
+    schema = type_schema(
+        'instance', rinherit=ValueFilter.schema
+    )
+
+    RelatedResource = "c7n.resources.rds.RDS"
+    RelatedIdsExpression = "DBInstanceIdentifier"
+    FetchThreshold = 5
 
 
 @RDSSnapshot.filter_registry.register('latest')

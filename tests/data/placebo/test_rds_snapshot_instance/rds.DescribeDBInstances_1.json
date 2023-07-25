@@ -1,0 +1,137 @@
+{
+    "status_code": 200,
+    "data": {
+        "DBInstances": [
+            {
+                "DBInstanceIdentifier": "kapilt-testx-testx",
+                "DBInstanceClass": "db.m6g.large",
+                "Engine": "postgres",
+                "DBInstanceStatus": "available",
+                "MasterUsername": "testx",
+                "DBName": "testx",
+                "Endpoint": {
+                    "Address": "kapilt-testx-testx.cnj6v9152dmz.us-east-1.rds.amazonaws.com",
+                    "Port": 5432,
+                    "HostedZoneId": "Z2R2ITUGPM61AM"
+                },
+                "AllocatedStorage": 30,
+                "InstanceCreateTime": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 5,
+                    "day": 17,
+                    "hour": 18,
+                    "minute": 26,
+                    "second": 31,
+                    "microsecond": 598000
+                },
+                "PreferredBackupWindow": "09:52-10:22",
+                "BackupRetentionPeriod": 0,
+                "DBSecurityGroups": [],
+                "VpcSecurityGroups": [
+                    {
+                        "VpcSecurityGroupId": "sg-05943f46e0435babd",
+                        "Status": "active"
+                    }
+                ],
+                "DBParameterGroups": [
+                    {
+                        "DBParameterGroupName": "default.postgres14",
+                        "ParameterApplyStatus": "in-sync"
+                    }
+                ],
+                "AvailabilityZone": "us-east-1d",
+                "DBSubnetGroup": {
+                    "DBSubnetGroupName": "kapilt-testx-db",
+                    "DBSubnetGroupDescription": "Managed by Terraform",
+                    "VpcId": "vpc-029654b93830acd5a",
+                    "SubnetGroupStatus": "Complete",
+                    "Subnets": [
+                        {
+                            "SubnetIdentifier": "subnet-0867db2dcb1462488",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-east-1f"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        },
+                        {
+                            "SubnetIdentifier": "subnet-0395f575be6823738",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-east-1e"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        },
+                        {
+                            "SubnetIdentifier": "subnet-0ba582f1e2af5d98a",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-east-1d"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        }
+                    ]
+                },
+                "PreferredMaintenanceWindow": "tue:07:32-tue:08:02",
+                "PendingModifiedValues": {},
+                "MultiAZ": false,
+                "EngineVersion": "14.7",
+                "AutoMinorVersionUpgrade": true,
+                "ReadReplicaDBInstanceIdentifiers": [],
+                "LicenseModel": "postgresql-license",
+                "OptionGroupMemberships": [
+                    {
+                        "OptionGroupName": "default:postgres-14",
+                        "Status": "in-sync"
+                    }
+                ],
+                "PubliclyAccessible": true,
+                "StorageType": "gp2",
+                "DbInstancePort": 0,
+                "StorageEncrypted": true,
+                "KmsKeyId": "arn:aws:kms:us-east-1:644160558196:key/e426740f-3b07-4d07-ad22-3cb504d65620",
+                "DbiResourceId": "db-CR3ECGHYRFFMW4ACZACV4Y7FUU",
+                "CACertificateIdentifier": "rds-ca-2019",
+                "DomainMemberships": [],
+                "CopyTagsToSnapshot": true,
+                "MonitoringInterval": 0,
+                "DBInstanceArn": "arn:aws:rds:us-east-1:644160558196:db:kapilt-testx-testx",
+                "IAMDatabaseAuthenticationEnabled": true,
+                "PerformanceInsightsEnabled": false,
+                "DeletionProtection": false,
+                "AssociatedRoles": [],
+                "MaxAllocatedStorage": 100,
+                "TagList": [
+                    {
+                        "Key": "App",
+                        "Value": "Testx"
+                    },
+                    {
+                        "Key": "Env",
+                        "Value": "Dev"
+                    }
+                ],
+                "CustomerOwnedIpEnabled": false,
+                "ActivityStreamStatus": "stopped",
+                "BackupTarget": "region",
+                "NetworkType": "IPV4",
+                "StorageThroughput": 0,
+                "CertificateDetails": {
+                    "CAIdentifier": "rds-ca-2019",
+                    "ValidTill": {
+                        "__class__": "datetime",
+                        "year": 2024,
+                        "month": 8,
+                        "day": 22,
+                        "hour": 17,
+                        "minute": 8,
+                        "second": 50,
+                        "microsecond": 0
+                    }
+                }
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
