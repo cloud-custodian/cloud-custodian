@@ -12,7 +12,7 @@ readme = "readme.md"
 "Bug Tracker" = "https://github.com/cloud-custodian/cloud-custodian/issues"
 
 [tool.poetry.dependencies]
-python = "^3.7"
+python = "^3.8"
 c7n = {path = "../..", develop = true}
 
 pytz = ">=2022.1"
