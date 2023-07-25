@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "c7n"
-version = "0.9.28"
+version = "0.9.29"
 description = "Cloud Custodian - Policy Rules Engine"
 authors = ["Cloud Custodian Project"]
 readme = "README.md"
@@ -75,6 +75,10 @@ addopts = "--tb=native"
 markers = ["functional", "skiplive", "audited"]
 python_files = "test_*.py"
 norecursedirs = ["data", "cassettes", "templates", "terraform"]
+filterwarnings = [
+    "ignore::DeprecationWarning",
+    "ignore::PendingDeprecationWarning"
+]
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

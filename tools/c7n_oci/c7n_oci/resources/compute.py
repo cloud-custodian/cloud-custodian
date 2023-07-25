@@ -44,14 +44,214 @@ class Instance(QueryResourceManager):
         search_resource_type = "instance"
 
 
-@Instance.filter_registry.register("monitoring")
-class InstanceMonitoring(Filter):
+@Instance.action_registry.register("remove-tag")
+class RemoveTagActionInstance(RemoveTagBaseAction):
     """
-    Instance Monitoring Filter
+    Remove Tag Action
 
     :example:
 
-    This filter returns the resources with the aggregated data that match the criteria specified in the request.
+        Remove the specified tags from the resource. Defined tag needs to be referred as
+        'namespace.tagName' as below in the policy file.
+
+    .. code-block:: yaml
+
+        policies:
+            - name: remove-tag
+              resource: oci.instance
+            actions:
+              - type: remove-tag
+                defined_tags: ['cloud_custodian.environment']
+                freeform_tags: ['organization', 'team']
+
+    """  # noqa
+
+    def perform_action(self, resource):
+        client = self.manager.get_client()
+        original_tag_count = self.tag_count(resource)
+        params_model = self.remove_tag(resource)
+        updated_tag_count = self.tag_count(params_model)
+        update_instance_details = oci.core.models.UpdateInstanceDetails(**params_model)
+        if self.tag_removed_from_resource(original_tag_count, updated_tag_count):
+            response = client.update_instance(
+                instance_id=resource.get("id"),
+                update_instance_details=update_instance_details,
+            )
+            log.debug(
+                f"Received status {response.status} for PUT:update_instance:remove-tag"
+                f" {response.request_id}"
+            )
+            return response
+        else:
+            log.debug(
+                "No tags matched. Skipping the remove-tag action on this resource - %s",
+                resource.get("display_name"),
+            )
+            return None
+
+
+@Instance.action_registry.register("start")
+class InstanceStart(OCIBaseAction):
+    """Starts a stopped compute instance.
+
+    :Example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: start-compute-instance
+            resource: oci.instance
+            actions:
+              - start
+
+    https://docs.oracle.com/en-us/iaas/Content/Compute/Tasks/restartinginstance.htm
+    """
+
+    schema = type_schema("start", rinherit=OCIBaseAction.schema)
+
+    def perform_action(self, resource):
+        client = self.manager.get_client()
+        response = client.instance_action(
+            instance_id=resource["id"],
+            action="START",
+        )
+        log.info(f"Received status {response.status} for POST:START {response.request_id}")
+        return response
+
+
+@Instance.action_registry.register("stop")
+class InstanceStop(OCIBaseAction):
+    """Stops a running compute instance.
+
+    :Example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: stop-compute-instance
+            resource: oci.instance
+            actions:
+              - stop
+
+          - name: force-stop-compute-instance
+            resource: oci.instance
+            actions:
+              - type: stop
+                force: true
+
+    If 'force' option is passed, then a compute instance will be stopped immediately.
+
+    https://docs.oracle.com/en-us/iaas/Content/Compute/Tasks/restartinginstance.htm
+    """
+
+    schema = type_schema("stop", force={"type": "boolean"})
+
+    def perform_action(self, resource):
+        client = self.manager.get_client()
+        action = "STOP" if self.data.get("force") else "SOFTSTOP"
+        response = client.instance_action(instance_id=resource["id"], action=action)
+        log.info(f"Received status {response.status} for POST:{action} {response.request_id}")
+        response = None
+        return response
+
+
+@Instance.action_registry.register("reboot")
+class InstanceReboot(OCIBaseAction):
+    """Restarts a compute instance.
+
+    :Example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: reboot-compute-instance
+            resource: oci.instance
+            actions:
+              - reboot
+
+          - name: force-reboot-compute-instance
+            resource: oci.instance
+            actions:
+              - type: reboot
+                force: true
+
+    If 'force' option is passed, then a compute instance will be rebooted immediately.
+
+    https://docs.oracle.com/en-us/iaas/Content/Compute/Tasks/restartinginstance.htm
+    """
+
+    schema = type_schema("reboot", force={"type": "boolean"})
+
+    def perform_action(self, resource):
+        client = self.manager.get_client()
+        action = "RESET" if self.data.get("force") else "SOFTRESET"
+        response = client.instance_action(instance_id=resource["id"], action=action)
+        log.info(f"Received status {response.status} for POST:{action} {response.request_id}")
+        return response
+
+
+@Instance.action_registry.register("update")
+class UpdateInstance(OCIBaseAction):
+    """
+    Update a compute instace
+
+    :example:
+
+    Updates certain fields on the specified instance. Fields that are not provided in the request will not be updated.
+
+    Changes to metadata fields will be reflected in the instance metadata service (this may take up to a minute).
+
+    The OCID of the instance remains the same.
+
+    .. code-block:: yaml
+
+        policies:
+            - name: update-compute-instance
+              resource: oci.instance
+              actions:
+                - type: update
+                  shape: VM.Standard.E3.Flex
+
+    https://docs.oracle.com/en-us/iaas/Content/Compute/Tasks/edit-instance.htm
+    """  # noqa
+
+    schema = type_schema(
+        "update",
+        **{
+            "shape": {"type": "string"},
+            "shape_config": {
+                "type": "object",
+                "properties": {
+                    "memory_in_gbs": {"type": "number"},
+                    "ocpus": {"type": "number"},
+                    "nvmes": {"type": "integer"},
+                },
+            },
+            "freeform_tags": {"type": "object"},
+            "defined_tags": {"type": "object"},
+        },
+    )
+
+    def perform_action(self, resource):
+        client = self.manager.get_client()
+        update_instance_details_user = self.extract_params(self.data)
+        params_model = self.update_params(resource, update_instance_details_user)
+        update_instance_details = oci.core.models.UpdateInstanceDetails(**params_model)
+        response = client.update_instance(
+            instance_id=resource.get("id"), update_instance_details=update_instance_details
+        )
+        log.info(f"Received status {response.status} for PUT:update_instance {response.request_id}")
+        return response
+
+
+@Instance.filter_registry.register("metrics")
+class InstanceMetrics(Filter):
+    """
+    Instance Metrics Filter
+
+    :example:
+
+    This filter returns the resources with the aggregated metrics data that match the criteria specified in the request.
     Compartment OCID required. For information on metric queries, see `Building Metric Queries
     <https://docs.oracle.com/en-us/iaas/Content/Monitoring/Tasks/buildingqueries.htm>`_.
 
@@ -63,19 +263,19 @@ class InstanceMonitoring(Filter):
                 Return the instances with the low CPU utilization
             resource: oci.instance
             filters:
-                - type: monitoring
+                - type: metrics
                   query: 'CpuUtilization[30d].mean() < 6'
 
     """  # noqa
 
-    schema = type_schema("monitoring", query={"type": "string"}, required=["query"])
+    schema = type_schema("metrics", query={"type": "string"}, required=["query"])
 
     def process(self, resources, event):
         summarize_metrics = oci.monitoring.models.SummarizeMetricsDataDetails(
             query=self.data.get("query"),
             namespace="oci_computeagent",
         )
-        monitoring_client = self.manager.get_session().get_monitoring_client()
+        monitoring_client = self.manager.get_session().client("oci.monitoring.MonitoringClient")
         comp_resources = {}
         result = []
         for resource in resources:
@@ -97,178 +297,3 @@ class InstanceMonitoring(Filter):
                     if resource.get("id") == resource_id:
                         result.append(resource)
         return result
-
-
-@Instance.action_registry.register("instance-action")
-class InstanceAction(OCIBaseAction):
-    """
-        Instance action Action
-
-        :example:
-
-        Performs one of the following power actions on the specified instance:
-
-    - **START** - Powers on the instance.
-
-    - **STOP** - Powers off the instance.
-
-    - **RESET** - Powers off the instance and then powers it back on.
-
-    - **SOFTSTOP** - Gracefully shuts down the instance by sending a shutdown command to the operating system. After waiting 15 minutes for the OS to shut down, the instance is powered off. If the applications that run on the instance take more than 15 minutes to shut down, they could be improperly stopped, resulting in data corruption. To avoid this, manually shut down the instance using the commands available in the OS before you softstop the instance.
-
-    - **SOFTRESET** - Gracefully reboots the instance by sending a shutdown command to the operating system.After waiting 15 minutes for the OS to shut down, the instance is powered off and then powered back on.
-
-    - **SENDDIAGNOSTICINTERRUPT** - For advanced users. **Caution: Sending a diagnostic interrupt to a live system can cause data corruption or system failure.** Sends a diagnostic interrupt that causes the instance's OS to crash and then reboot. Before you send a diagnostic interrupt, you must configure the instance to generate a crash dump file when it crashes. The crash dump captures information about the state of the OS at the time of the crash. After the OS restarts, you can analyze the crash dump to diagnose the issue. For more information, see [Sending a Diagnostic Interrupt](/iaas/Content/Compute/Tasks/sendingdiagnosticinterrupt.htm).
-
-    - **DIAGNOSTICREBOOT** - Powers off the instance, rebuilds it, and then powers it back on. Before you send a diagnostic reboot, restart the instance's OS, confirm that the instance and networking settings are configured correctly, and try other [troubleshooting steps](/iaas/Content/Compute/References/troubleshooting-compute-instances.htm). Use diagnostic reboot as a final attempt to troubleshoot an unreachable instance. For virtual machine (VM) instances only. For more information, see [Performing a Diagnostic Reboot](/iaas/Content/Compute/Tasks/diagnostic-reboot.htm).
-
-    - **REBOOTMIGRATE** - Powers off the instance, moves it to new hardware, and then powers it back on. For more information, see [Infrastructure Maintenance](/iaas/Content/Compute/References/infrastructure-maintenance.htm).
-
-
-    For more information about managing instance lifecycle states, see
-    [Stopping and Starting an Instance](/iaas/Content/Compute/Tasks/restartinginstance.htm).
-
-
-        Please refer to the Oracle Cloud Infrastructure Python SDK documentation for parameter details to this action
-        https://docs.oracle.com/en-us/iaas/tools/python/latest/api/core/client/oci.core.ComputeClient.html#oci.core.ComputeClient.instance_action
-
-        .. code-block:: yaml
-
-            policies:
-                - name: perform-instance-action-action
-                  resource: oci.instance
-                  actions:
-                    - type: instance-action
-
-    """  # noqa
-
-    schema = type_schema(
-        "instance-action", params={"type": "object"}, rinherit=OCIBaseAction.schema
-    )
-
-    def perform_action(self, resource):
-        client = self.manager.get_client()
-        params_dict = {}
-        params_model = {}
-        params_dict["instance_id"] = resource.get("id")
-        if self.data.get("params") and self.data.get("params").get("action"):
-            params_dict["action"] = self.data.get("params").get("action")
-        else:
-            params_dict["action"] = resource.get("action")
-        if self.data.get("params").get("instance_power_action_details"):
-            instance_power_action_details_user = self.data.get("params").get(
-                "instance_power_action_details"
-            )
-            if instance_power_action_details_user.get("action_type"):
-                params_dict["action_type"] = instance_power_action_details_user.get("action_type")
-            params_model = self.update_params(resource, instance_power_action_details_user)
-            params_dict[
-                "instance_power_action_details"
-            ] = oci.core.models.InstancePowerActionDetails(**params_model)
-        response = client.instance_action(
-            instance_id=params_dict["instance_id"],
-            action=params_dict["action"],
-        )
-        log.info(
-            f"Received status {response.status} for POST:instance_action {response.request_id}"
-        )
-        return response
-
-
-@Instance.action_registry.register("update-instance")
-class UpdateInstance(OCIBaseAction):
-    """
-    Update instance Action
-
-    :example:
-
-    Updates certain fields on the specified instance. Fields that are not provided in the request will not be updated. Avoid entering confidential information.
-
-    Changes to metadata fields will be reflected in the instance metadata service (this may take up to a minute).
-
-    The OCID of the instance remains the same.
-
-
-    Please refer to the Oracle Cloud Infrastructure Python SDK documentation for parameter details to this action
-    https://docs.oracle.com/en-us/iaas/tools/python/latest/api/core/client/oci.core.ComputeClient.html#oci.core.ComputeClient.update_instance
-
-    .. code-block:: yaml
-
-        policies:
-            - name: perform-update-instance-action
-              resource: oci.instance
-              actions:
-                - type: update-instance
-
-    """  # noqa
-
-    schema = type_schema(
-        "update-instance", params={"type": "object"}, rinherit=OCIBaseAction.schema
-    )
-
-    def perform_action(self, resource):
-        client = self.manager.get_client()
-        params_dict = {}
-        params_model = {}
-        params_dict["instance_id"] = resource.get("id")
-        if self.data.get("params").get("update_instance_details"):
-            update_instance_details_user = self.data.get("params").get("update_instance_details")
-            params_model = self.update_params(resource, update_instance_details_user)
-            params_dict["update_instance_details"] = oci.core.models.UpdateInstanceDetails(
-                **params_model
-            )
-        response = client.update_instance(
-            instance_id=params_dict["instance_id"],
-            update_instance_details=params_dict["update_instance_details"],
-        )
-        log.info(f"Received status {response.status} for PUT:update_instance {response.request_id}")
-        return response
-
-
-@Instance.action_registry.register("remove-tag")
-class RemoveTagActionInstance(RemoveTagBaseAction):
-    """
-    Remove Tag Action
-
-    :example:
-
-        Remove the specified tags from the resource. Defined tag needs to be referred as 'namespace.tagName' as below in the policy file.
-
-    .. code-block:: yaml
-
-        policies:
-            - name: remove-tag
-              resource: oci.instance
-            actions:
-              - type: remove-tag
-                defined_tags: ['cloud_custodian.environment']
-                freeform_tags: ['organization', 'team']
-
-    """  # noqa
-
-    def perform_action(self, resource):
-        client = self.manager.get_client()
-        params_dict = {}
-        params_dict["instance_id"] = resource.get("id")
-        original_tag_count = self.tag_count(resource)
-        params_model = self.remove_tag(resource)
-        updated_tag_count = self.tag_count(params_model)
-        params_dict["update_instance_details"] = oci.core.models.UpdateInstanceDetails(
-            **params_model
-        )
-        if self.tag_removed_from_resource(original_tag_count, updated_tag_count):
-            response = client.update_instance(
-                instance_id=params_dict["instance_id"],
-                update_instance_details=params_dict["update_instance_details"],
-            )
-            log.debug(
-                f"Received status {response.status} for PUT:update_instance:remove-tag"
-                f" {response.request_id}"
-            )
-            return response
-        else:
-            log.debug(
-                "No tags matched. Skipping the remove-tag action on this resource - %s",
-                resource.get("display_name"),
-            )
-            return None
