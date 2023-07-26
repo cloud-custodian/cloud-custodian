@@ -1,9 +1,10 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import base64
+import http.server
 import json
 import os
-import http.server
+import tempfile
 
 from c7n.config import Config
 from c7n.loader import DirectoryLoader
@@ -25,7 +26,8 @@ class AdmissionControllerServer(http.server.HTTPServer):
     def __init__(self, policy_dir, on_exception='warn', *args, **kwargs):
         self.policy_dir = policy_dir
         self.on_exception = on_exception
-        self.directory_loader = DirectoryLoader(Config.empty())
+        temp_dir = tempfile.TemporaryDirectory()
+        self.directory_loader = DirectoryLoader(Config.empty(output_dir=temp_dir.name))
         policy_collection = self.directory_loader.load_directory(
             os.path.abspath(self.policy_dir))
         self.policy_collection = policy_collection.filter(modes=['k8s-admission'])
