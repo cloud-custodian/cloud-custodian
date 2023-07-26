@@ -26,7 +26,7 @@ google-cloud-monitoring = "^2.5.0"
 google-cloud-storage = "^2.7"
 pyrate-limiter = "^2.8.4"
 
-[tool.poetry.dev-dependencies]
+[tool.poetry.group.dev.dependencies]
 freezegun = "^1.2.2"
 pytest = "^7.1.2"
 pytest-terraform = "^0.6.0"

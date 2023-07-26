@@ -20,7 +20,7 @@ c7n = {path = "../..", develop = true}
 
 openstacksdk = "^0.52.0"
 
-[tool.poetry.dev-dependencies]
+[tool.poetry.group.dev.dependencies]
 pytest = "^7.1.2"
 vcrpy = ">=4.0.2"
 
