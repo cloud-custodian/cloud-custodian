@@ -220,6 +220,7 @@ class FlowLogv2Filter(ListItemFilter):
         return super().validate()
 
     def convert(self):
+        self.source_data = {}
         # no mixing of legacy and list-item style
         if 'attrs' in self.data:
             return
