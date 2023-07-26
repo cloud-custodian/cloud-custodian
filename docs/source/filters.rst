@@ -106,6 +106,8 @@ Comparison Operators
     - ``gte`` or ``ge``
     - ``less-than`` or ``lt``
     - ``lte`` or ``le``
+    - ``in``
+    - ``not-in`` or ``ni``
     - ``contains``
 
   .. code-block:: yaml
@@ -145,6 +147,7 @@ List Operators
 
     - ``in``
     - ``not-in`` or ``ni``
+    - ``contains``
     - ``intersect`` - Provides comparison between 2 lists
 
 
