@@ -125,6 +125,7 @@ class ConnectCampaign(QueryResourceManager):
         arn_type = 'campaign'
         name = "name"
         id = "id"
+        permission_prefix = "connect-campaigns"
 
     permissions = ('connect-campaigns:ListCampaigns', 'connect-campaigns:GetConnectInstanceConfig',)
 
