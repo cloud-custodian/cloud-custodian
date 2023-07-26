@@ -93,7 +93,7 @@ class SqlInstanceDelete(SqlInstanceAction):
     def disable_protection(self, resources):
         deletion_protected = [
             r for r in resources if r['settings'].get('deletionProtectionEnabled')]
-        disable_protection = SqlInstanceEnableDeletion(self.manager, {})
+        disable_protection = SqlInstanceEnableDeletion({}, self.manager)
         disable_protection.process(deletion_protected)
 
 
@@ -129,11 +129,12 @@ class SqlInstanceStart(MethodAction):
                 'body': {'settings': {'activationPolicy': 'ALWAYS'}}}
 
 
+@SqlInstance.action_registry.register('set-deletion-protection')
 class SqlInstanceEnableDeletion(MethodAction):
 
     schema = type_schema(
-        'enable-deletion',
-        value={'type': 'string'})
+        'set-deletion-protection',
+        value={'type': 'boolean'})
     method_spec = {'op': 'patch'}
     path_param_re = re.compile('.*?/projects/(.*?)/instances/(.*)')
     method_perm = 'enable-deletion'
@@ -141,9 +142,15 @@ class SqlInstanceEnableDeletion(MethodAction):
     def get_resource_params(self, model, resource):
         project, instance = self.path_param_re.match(
             resource['selfLink']).groups()
-        return {'project': project,
-                'instance': instance,
-                'body': {'settings': {'deletionProtectionEnabled': self.data['value']}}}
+        return {
+            'project': project,
+            'instance': instance,
+            'body': {
+                'settings': {
+                    'deletionProtectionEnabled': str(self.data.get('value', True)).lower()
+                }
+            }
+        }
 
 
 class SQLInstanceChildTypeInfo(ChildTypeInfo):

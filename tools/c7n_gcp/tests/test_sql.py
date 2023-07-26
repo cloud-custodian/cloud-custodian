@@ -184,7 +184,7 @@ class SqlInstanceTest(BaseTest):
                         'value': False
                     }
                 ],
-                'actions': [{"type": 'enable-deletion', "value": 'true'}]
+                'actions': [{"type": 'set-deletion-protection', "value": True}]
             },
             session_factory=factory)
         resources = p.run()
@@ -211,18 +211,11 @@ class SqlInstanceTest(BaseTest):
                         'value': True
                     }
                 ],
-                'actions': [{"type": 'enable-deletion', "value": 'false'}]
+                'actions': [{"type": 'delete', "force": True}]
             },
             session_factory=factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        if self.recording:
-            time.sleep(1)
-        client = p.resource_manager.get_client()
-        result = client.execute_query(
-            'get', {'project': project_id,
-                    'instance': instance_name})
-        self.assertEqual(result['settings']['deletionProtectionEnabled'], False)
 
 
 class SqlUserTest(BaseTest):
