@@ -31,7 +31,8 @@ jobs:
       - name: Build ChangeLog
         shell: bash
         run: |
-          python tools/dev/changelog.py --output release.md --path . --since last
+          python tools/dev/changelog.py --output release.md \
+             --path . --since last --sans-provider awscc
           cat release.md
 
       - uses: aws-actions/configure-aws-credentials@v2
@@ -133,25 +134,18 @@ jobs:
         run: |
           echo "release=$(poetry version -s).0" >> "$GITHUB_ENV"
 
-      - name: Create Release
-        uses: ncipollo/release-action@v1
-        if: startsWith(github.ref, 'refs/tags/')
-        with:
-          artifacts: "**/dist/*.whl"
-          token: ${{ secrets.GITHUB_TOKEN }}
-          tag: ${{ env.release_tag }}
-          commit: main
-          draft: true
-          bodyFile: release.md
+#      - name: Create Release
+#        uses: ncipollo/release-action@v1
+#        if: startsWith(github.ref, 'refs/tags/')
+#        with:
+#          artifacts: "**/dist/*.whl"
+#          token: ${{ secrets.GITHUB_TOKEN }}
+#          tag: ${{ env.release_tag }}
+#          commit: main
+#          draft: true
+#          bodyFile: release.md
 
-      - name: Configure Poetry
-        shell: bash
-        run: |
-          poetry config repositories.prodpypi https://upload.pypi.org/legacy
-          
-      - name: Publish
-        if: startsWith(github.ref, 'refs/tags/')
-        env:
-          POETRY_PYPI_TOKEN_PRODPYPI: ${{ secrets.PYPI_TOKEN }}        
-        run: |
-          make pkg-publish PKG_REPO=prodpypi
+#      - name: Publish
+#        if: startsWith(github.ref, 'refs/tags/')
+#        run: |
+#          make pkg-publish PKG_REPO=pypi
