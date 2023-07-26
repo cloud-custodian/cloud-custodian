@@ -30,7 +30,7 @@ class TestServer(KubeTest):
         return port
 
     @contextmanager
-    def _server(self, policies, on_exception="warn"):
+    def _server(self, policies, on_exception="warn", lifetime=1):
         port = self.find_port()
         with tempfile.TemporaryDirectory() as temp_dir:
             with open(f"{temp_dir}/policy.yaml", "w+") as f:
@@ -44,7 +44,7 @@ class TestServer(KubeTest):
             )
             server_thread = threading.Thread(target=server.serve_forever)
             server_thread.start()
-            time.sleep(1)
+            time.sleep(lifetime)
         try:
             yield server, port
         finally:
