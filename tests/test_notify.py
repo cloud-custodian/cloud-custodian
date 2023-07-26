@@ -10,6 +10,50 @@ import tempfile
 import zlib
 
 from c7n.exceptions import PolicyValidationError
+from c7n.actions.notify import ResourceMessageBuffer
+
+import pytest
+
+
+def test_msg_buffer():
+    buf_size = 1024
+    mbuffer = ResourceMessageBuffer({'env': 'dev', 'region': 'us-east-2'}, buf_size)
+    assert mbuffer.full is False
+
+    for i in range(0, 50):
+        mbuffer.add({'id': 'x%s' % i, 'a': 1, 'b': 2 + i, 'c': 5 * i})
+        if mbuffer.full:
+            break
+
+    assert len(mbuffer) == 47
+    assert int(mbuffer.estimated_size) == 995
+    payload = mbuffer.consume()
+    assert len(payload) == 532
+    assert mbuffer.observed_ratio > 0.36 and mbuffer.observed_ratio < 0.5
+    assert 'resources' in json.loads(zlib.decompress(base64.b64decode(payload)))
+
+    assert len(mbuffer) == 0
+    # raw size reverts back to envelope
+    assert mbuffer.raw_size == 56
+
+    # repeat, but with observed dynamic ratio now
+    for i in range(0, 100):
+        mbuffer.add({'id': 'x%s' % i, 'a': 1, 'b': 2 + i, 'c': 5 * i})
+        if mbuffer.full:
+            break
+
+    assert len(mbuffer) == 65
+    payload = mbuffer.consume()
+    assert len(payload) == 680
+
+
+def test_msg_buffer_exceed():
+    mbuffer = ResourceMessageBuffer({'env': 'dev', 'region': 'us-west-2'}, 100)
+    assert mbuffer.full is False
+    mbuffer.add({'id': 'x', 'values': list(range(100))})
+    with pytest.raises(AssertionError) as e_info:
+        mbuffer.consume()
+    assert str(mbuffer) in str(e_info.value)
 
 
 class NotifyTest(BaseTest):
