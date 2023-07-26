@@ -3506,6 +3506,39 @@ class TestUnusedKeys(BaseTest):
         self.assertNotEqual(unused_key, keys)
         self.assertEqual(used_key, keys)
 
+    def test_unused_keypair_with_asg_launch_templates(self):
+        factory = self.replay_flight_data('test_unused_keypair_launch_template')
+        p = self.load_policy(
+            {"name": "test-unused-keypairs", "resource": "key-pair", "filters": ["unused"]},
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['KeyName'], 'delete')
+
+    def test_unused_keypair_true(self):
+        factory = self.replay_flight_data("test_unused_keypair")
+        p = self.load_policy(
+            {"name": "test-unused-keypairs", "resource": "key-pair", "filters": ["unused"]},
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_unused_keypair_false(self):
+        factory = self.replay_flight_data("test_unused_keypair")
+        p = self.load_policy(
+            {
+                "name": "test-unused-keypairs",
+                "resource": "key-pair",
+                "filters": [{"type": "unused", "state": False}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+
     def test_vpc_unused_key_not_filtered_error(self):
         with self.assertRaises(PolicyValidationError):
             self.load_policy(

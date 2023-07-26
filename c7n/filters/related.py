@@ -75,17 +75,18 @@ class RelatedResourceFilter(ValueFilter):
         for rid in related_ids:
             robj = related.get(rid, None)
             if robj is None:
-                self.log.warning(
-                    "Resource %s:%s references non existant %s: %s",
-                    self.manager.type,
-                    resource[model.id],
-                    self.RelatedResource.rsplit('.', 1)[-1],
-                    rid)
                 # in the event that the filter is looking specifically for absent values, we can
                 # safely assume that the non-existant related resource will have an absent value at
                 # any given key
                 if self.data['value'] == 'absent':
                     found.append(rid)
+                else:
+                    self.log.warning(
+                        "Resource %s:%s references non existant %s: %s",
+                        self.manager.type,
+                        resource[model.id],
+                        self.RelatedResource.rsplit('.', 1)[-1],
+                        rid)
                 continue
             if self.match(robj):
                 found.append(rid)
