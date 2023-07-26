@@ -126,7 +126,7 @@ class ConnectCampaign(QueryResourceManager):
         name = "name"
         id = "id"
 
-    permissions = ('connectcampaigns:ListCampaigns', 'connectcampaigns:GetConnectInstanceConfig',)
+    permissions = ('connect-campaigns:ListCampaigns', 'connect-campaigns:GetConnectInstanceConfig',)
 
 
 @ConnectCampaign.filter_registry.register('kms-key')
