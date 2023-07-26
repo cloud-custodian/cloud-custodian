@@ -80,10 +80,21 @@ class SqlInstanceAction(MethodAction):
 @SqlInstance.action_registry.register('delete')
 class SqlInstanceDelete(SqlInstanceAction):
 
-    schema = type_schema('delete')
+    schema = type_schema('delete', force={'type': 'boolean'})
     method_spec = {'op': 'delete'}
     path_param_re = re.compile(
         '.*?/projects/(.*?)/instances/(.*)')
+
+    def process(self, resources):
+        if self.data.get('force'):
+            self.disable_protection(resources)
+        super().process(resources)
+
+    def disable_protection(self, resources):
+        deletion_protected = [
+            r for r in resources if r['settings'].get('deletionProtectionEnabled')]
+        disable_protection = SqlInstanceEnableDeletion(self.manager, {})
+        disable_protection.process(deletion_protected)
 
 
 @SqlInstance.action_registry.register('stop')
@@ -118,7 +129,6 @@ class SqlInstanceStart(MethodAction):
                 'body': {'settings': {'activationPolicy': 'ALWAYS'}}}
 
 
-@SqlInstance.action_registry.register('enable-deletion')
 class SqlInstanceEnableDeletion(MethodAction):
 
     schema = type_schema(
