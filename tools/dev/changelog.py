@@ -105,7 +105,7 @@ def link(provider='aws', resource=None, category=None, element=None):
         raise ValueError()
 
 
-def schema_diff(schema_old, schema_new, sans_provider):
+def schema_diff(schema_old, schema_new, sans_provider=()):
     def listify(items, bt=True):
         if bt:
             return ", ".join([f'`{i}`' for i in items])
