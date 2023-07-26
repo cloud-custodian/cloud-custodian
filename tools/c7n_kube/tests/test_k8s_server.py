@@ -2,7 +2,6 @@
 # SPDX-License-Identifier: Apache-2.0
 import json
 import socket
-import sys
 import tempfile
 import threading
 import time
