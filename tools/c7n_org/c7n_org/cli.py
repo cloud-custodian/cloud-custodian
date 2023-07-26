@@ -36,8 +36,6 @@ from c7n.utils import (
 
 from c7n_org.utils import environ, account_tags
 
-from c7n_oci.constants import COMPARTMENT_IDS
-
 log = logging.getLogger('c7n_org')
 
 # Workaround OSX issue, note this exists for py2 but there
@@ -596,7 +594,7 @@ def accounts_iterator(config):
              "provider": "oci",
              "profile": a["profile"],
              "tags": a.get("tags", ()),
-             "oci_compartments": a.get("vars").get("oci_compartments") if a.get("vars") else None,
+             "oci_compartments": a.get("vars", {}).get("oci_compartments"),
              "vars": _update(a.get("vars", {}), org_vars)}
         yield d
 
@@ -640,7 +638,7 @@ def run_account(account, region, policies_config, output_path,
         config['profile'] = account['profile']
 
     if account.get("oci_compartments"):
-        os.environ[COMPARTMENT_IDS] = account.get("oci_compartments")
+        os.environ["OCI_COMPARTMENTS"] = account.get("oci_compartments")
 
     policies = PolicyCollection.from_data(policies_config, config)
     policy_counts = {}

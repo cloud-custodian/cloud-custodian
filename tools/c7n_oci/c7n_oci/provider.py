@@ -5,11 +5,11 @@ import logging
 
 from c7n_oci.resources.resource_map import ResourceMap
 import copy
-from urllib import parse as urlparse
 
 from c7n.provider import Provider, clouds
 from c7n.registry import PluginRegistry
 
+from c7n_oci.utils import join_output
 from .session import SessionFactory
 
 log = logging.getLogger("custodian.oci.provider")
@@ -55,21 +55,6 @@ class OCI(Provider):
             self._oci_profile_session = self.get_session_factory(options)()
         return self._oci_profile_session
 
-    @staticmethod
-    def _join_output(output_dir, suffix):
-        if "{region}" in output_dir:
-            return output_dir.rstrip("/")
-        if output_dir.endswith("://"):
-            return output_dir + suffix
-        output_url_parts = urlparse.urlparse(output_dir)
-        # for output urls, the end of the url may be a
-        # query string. make sure we add a suffix to
-        # the path component.
-        output_url_parts = output_url_parts._replace(
-            path=output_url_parts.path.rstrip("/") + "/%s" % suffix
-        )
-        return urlparse.urlunparse(output_url_parts)
-
     def initialize_policies(self, policy_collection, options):
         from c7n.policy import Policy, PolicyCollection
 
@@ -92,12 +77,12 @@ class OCI(Provider):
                     or "all" in options.regions
                     and getattr(options, "output_dir", None)
                 ):
-                    options_copy.output_dir = self._join_output(options.output_dir, region)
+                    options_copy.output_dir = join_output(options.output_dir, region)
                 policies.append(
                     Policy(
                         p.data,
                         options_copy,
-                        session_factory=policy_collection.session_factory(),
+                        session_factory=self.get_session_factory(options_copy),
                     )
                 )
         return PolicyCollection(policies, options)
