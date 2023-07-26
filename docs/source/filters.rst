@@ -148,7 +148,8 @@ List Operators
     - ``in``
     - ``not-in`` or ``ni``
     - ``contains``
-    - ``intersect`` - Provides comparison between 2 lists
+    - ``intersect`` - Match if two lists share any elements
+    - ``difference`` - Match if the first list has any values not in the second list
 
 
   .. code-block:: yaml
@@ -168,6 +169,15 @@ List Operators
            value: ID-321                  ─▶ Values to be compared against
            value_type: swap               ─▶ Switches list comparison order
 
+  The above filter can also be written as:
+
+  .. code-block:: yaml
+
+      filters:
+         - type: value
+           key: ImageId.List              ─▶ A list of values from the describe call
+           op: contains                   ─▶ List operator
+           value: ID-321                  ─▶ Single value to check
 
 
 Pattern Matching Operators
