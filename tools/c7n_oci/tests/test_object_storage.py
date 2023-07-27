@@ -15,13 +15,17 @@ class TestObjectStorage(OciBaseTest):
         name = object_storage["oci_objectstorage_bucket.test_bucket.name"]
         return namespace, name
 
-    def _fetch_bucket_validation_data(self, resource_manager, namespace_name, bucket_name):
+    def _fetch_bucket_validation_data(
+        self, resource_manager, namespace_name, bucket_name
+    ):
         client = resource_manager.get_client()
         resource = client.get_bucket(namespace_name, bucket_name)
         return oci.util.to_dict(resource.data)
 
     @terraform("object_storage", scope="class")
-    def test_add_defined_tag_to_bucket(self, test, object_storage, with_or_without_compartment):
+    def test_add_defined_tag_to_bucket(
+        self, test, object_storage, with_or_without_compartment
+    ):
         """
         test adding defined_tags tag on compute instance
         """
@@ -39,7 +43,9 @@ class TestObjectStorage(OciBaseTest):
                 "filters": [
                     {"type": "value", "key": "name", "value": bucket_name},
                 ],
-                "actions": [{"type": "update", "defined_tags": self.get_defined_tag("add_tag")}],
+                "actions": [
+                    {"type": "update", "defined_tags": self.get_defined_tag("add_tag")}
+                ],
             },
             session_factory=session_factory,
         )
@@ -69,7 +75,9 @@ class TestObjectStorage(OciBaseTest):
                 "filters": [
                     {"type": "value", "key": "name", "value": bucket_name},
                 ],
-                "actions": [{"type": "update", "defined_tags": self.get_defined_tag("add_tag")}],
+                "actions": [
+                    {"type": "update", "defined_tags": self.get_defined_tag("add_tag")}
+                ],
             },
             session_factory=session_factory,
         )
@@ -99,7 +107,12 @@ class TestObjectStorage(OciBaseTest):
                 "filters": [
                     {"type": "value", "key": "name", "value": bucket_name},
                 ],
-                "actions": [{"type": "update", "defined_tags": self.get_defined_tag("update_tag")}],
+                "actions": [
+                    {
+                        "type": "update",
+                        "defined_tags": self.get_defined_tag("update_tag"),
+                    }
+                ],
             },
             session_factory=session_factory,
         )
@@ -129,7 +142,9 @@ class TestObjectStorage(OciBaseTest):
                 "filters": [
                     {"type": "value", "key": "name", "value": bucket_name},
                 ],
-                "actions": [{"type": "update", "freeform_tags": {"Environment": "Development"}}],
+                "actions": [
+                    {"type": "update", "freeform_tags": {"Environment": "Development"}}
+                ],
             },
             session_factory=session_factory,
         )
@@ -159,7 +174,9 @@ class TestObjectStorage(OciBaseTest):
                 "filters": [
                     {"type": "value", "key": "name", "value": bucket_name},
                 ],
-                "actions": [{"type": "update", "freeform_tags": {"Environment": "Production"}}],
+                "actions": [
+                    {"type": "update", "freeform_tags": {"Environment": "Production"}}
+                ],
             },
             session_factory=session_factory,
         )
@@ -221,7 +238,9 @@ class TestObjectStorage(OciBaseTest):
                         "op": "eq",
                     },
                 ],
-                "actions": [{"type": "update", "freeform_tags": {"public_access": "true"}}],
+                "actions": [
+                    {"type": "update", "freeform_tags": {"public_access": "true"}}
+                ],
             },
             session_factory=session_factory,
         )
