@@ -105,7 +105,7 @@ def link(provider='aws', resource=None, category=None, element=None):
         raise ValueError()
 
 
-def schema_diff(schema_old, schema_new, sans_provider=()):
+def schema_diff(schema_old, schema_new, skip_provider=()):
     def listify(items, bt=True):
         if bt:
             return ", ".join([f'`{i}`' for i in items])
@@ -115,7 +115,7 @@ def schema_diff(schema_old, schema_new, sans_provider=()):
     out = []
     resources_map = defaultdict(dict)
     for provider in schema_new:
-        if provider in sans_provider:
+        if provider in skip_provider:
             continue
         resources_old = schema_old.get(provider, [])
         resources_new = schema_new[provider]
@@ -196,9 +196,9 @@ def get_last_release(repo):
 @click.option('--output', required=True)
 @click.option('--since')
 @click.option('--end')
-@click.option('--sans-provider', multiple=True)
+@click.option('--skip-provider', multiple=True)
 @click.option('--user', multiple=True)
-def main(path, output, since, end, user, sans_provider):
+def main(path, output, since, end, user, skip_provider):
     repo = pygit2.Repository(path)
     if since in ('latest', 'current', 'last'):
         since = get_last_release(repo)
@@ -260,7 +260,7 @@ def main(path, output, since, end, user, sans_provider):
         schema_old = schema_outline_from_docker(since)
         load_available()
         schema_new = resource_outline()
-        diff_md = schema_diff(schema_old, schema_new, sans_provider)
+        diff_md = schema_diff(schema_old, schema_new, skip_provider)
 
     with open(output, 'w') as fh:
         for k in sorted(groups):
