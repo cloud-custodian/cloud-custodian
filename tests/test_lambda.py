@@ -109,12 +109,12 @@ class LambdaPermissionTest(BaseTest):
 
 
 
-def test_function_url(test):
+def test_function_url_absent(test):
     factory = test.replay_flight_data('test_aws_lambda_function_url', region='us-west-2')
     p = test.load_policy({
         'name': 'lambda-function-url',
         'resource': 'aws.lambda',
-        'filters': [{'type': 'url-config', 'key': 'FunctionUrl', 'value': 'absent'}],
+        'filters': [{'type': 'url-config', 'key': 'FunctionUrl', 'value': 'present'}],
         }, session_factory=factory)
     resources = p.run()
     assert len(resources) == 1
