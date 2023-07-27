@@ -1,3 +1,5 @@
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 SHELL := /bin/bash
 SELF_MAKE := $(lastword $(MAKEFILE_LIST))
 
@@ -127,6 +129,7 @@ pkg-build-wheel:
 
 pkg-publish-wheel:
 # upload to test pypi
+	set -e
 	twine upload -r $(PKG_REPO) dist/*
 	for pkg in $(PKG_SET); do cd $$pkg && twine upload -r $(PKG_REPO) dist/* && cd ../..; done
 

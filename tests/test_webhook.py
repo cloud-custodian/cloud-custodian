@@ -3,7 +3,7 @@
 
 import datetime
 import json
-import mock
+from unittest import mock
 
 from c7n.actions.webhook import Webhook
 from c7n.exceptions import PolicyValidationError

@@ -1,0 +1,31 @@
+{
+  "headers": {
+    "cache-control": "no-cache, no-store, max-age=0, must-revalidate",
+    "pragma": "no-cache",
+    "expires": "Mon, 01 Jan 1990 00:00:00 GMT",
+    "date": "Mon, 26 Nov 2018 16:46:34 GMT",
+    "vary": "Origin, X-Origin",
+    "content-type": "application/json; charset=UTF-8",
+    "x-content-type-options": "nosniff",
+    "x-frame-options": "SAMEORIGIN",
+    "x-xss-protection": "1; mode=block",
+    "server": "GSE",
+    "alt-svc": "quic=\":443\"; ma=2592000; v=\"44,43,39,35\"",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "505",
+    "-content-encoding": "gzip"
+  },
+  "body": {
+    "kind": "sql#operation",
+    "selfLink": "https://www.googleapis.com/sql/v1beta4/projects/cloud-custodian/operations/df8bbc8f-e722-4f8c-a245-b0d8758b8d90",
+    "targetProject": "cloud-custodian",
+    "targetId": "brenttest-5",
+    "targetLink": "https://www.googleapis.com/sql/v1beta4/projects/cloud-custodian/instances/brenttest-5",
+    "name": "df8bbc8f-e722-4f8c-a245-b0d8758b8d90",
+    "operationType": "DELETE",
+    "status": "PENDING",
+    "user": "brent.clements@gmail.com",
+    "insertTime": "2018-11-26T16:46:34.259Z"
+  }
+}

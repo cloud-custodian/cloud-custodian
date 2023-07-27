@@ -129,10 +129,11 @@ class SqlKvCache(Cache):
         self.conn = sqlite3.connect(self.cache_path)
         self.conn.execute(self.create_table)
         with self.conn as cursor:
-            log.debug('expiring stale cache entries')
-            cursor.execute(
+            result = cursor.execute(
                 'delete from c7n_cache where create_date < ?',
                 [datetime.utcnow() - timedelta(minutes=self.cache_period)])
+            if result.rowcount:
+                log.debug('expired %d stale cache entries', result.rowcount)
 
     def load(self):
         if not self.conn:

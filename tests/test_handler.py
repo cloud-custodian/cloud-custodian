@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 import json
 import logging
-import mock
+from unittest import mock
 import os
 
 from .common import BaseTest

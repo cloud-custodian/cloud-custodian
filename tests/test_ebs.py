@@ -1,9 +1,9 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import logging
+from unittest import mock
 
 from botocore.exceptions import ClientError
-import mock
 
 from c7n.exceptions import PolicyValidationError
 from c7n.executor import MainThreadExecutor

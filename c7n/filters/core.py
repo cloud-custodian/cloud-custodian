@@ -1144,6 +1144,14 @@ class ListItemFilter(Filter):
         self._expr = jmespath_compile(self.data['key'])
         return self._expr
 
+    def check_count(self, rcount):
+        if 'count' not in self.data:
+            return False
+        count = self.data['count']
+        op = OPERATORS[self.data.get('count_op', 'eq')]
+        if op(rcount, count):
+            return True
+
     def process(self, resources, event=None):
         result = []
         frm = ListItemResourceManager(
@@ -1151,6 +1159,8 @@ class ListItemFilter(Filter):
         for r in resources:
             list_values = self.get_item_values(r)
             if not list_values:
+                if self.check_count(0):
+                    result.append(r)
                 continue
             if not isinstance(list_values, list):
                 item_type = type(list_values)
@@ -1163,10 +1173,8 @@ class ListItemFilter(Filter):
             matched_indicies = [r['c7n:_id'] for r in list_resources]
             for idx, list_value in enumerate(list_values):
                 list_value.pop('c7n:_id')
-            if self.data.get('count'):
-                count = self.data['count']
-                op = OPERATORS[self.data.get('count_op', 'eq')]
-                if op(len(list_resources), count):
+            if 'count' in self.data:
+                if self.check_count(len(list_resources)):
                     result.append(r)
             elif list_resources:
                 if not self.annotate_items:
