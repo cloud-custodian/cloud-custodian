@@ -1,6 +1,7 @@
 import re
 from abc import abstractmethod, ABCMeta
 
+from c7n.deprecated import DeprecatedField
 from c7n.filters.core import ValueFilter, type_schema
 
 
@@ -97,6 +98,12 @@ class WafClassicRegionalFilterBase(ValueFilter, metaclass=ABCMeta):
         web_acl[cache_key] = resource_arns
 
         return resource_arns
+
+    def get_deprecations(self):
+        return [
+            DeprecatedField(f"{k} is deprecated", "Use the value filter attributes instead")
+            for k in ['web-acl', 'state']
+        ]
 
     def get_web_acl_from_associations(self, resource_type, resource_arn):
         for web_acl in self._get_web_acls():
@@ -257,6 +264,12 @@ class WafV2FilterBase(ValueFilter, metaclass=ABCMeta):
             resource[self.cache_key] = self.get_associated_web_acl(resource)
 
         return resource[self.cache_key]
+
+    def get_deprecations(self):
+        return [
+            DeprecatedField(f"{k} is deprecated", "Use the value filter attributes instead")
+            for k in ['web-acl', 'state']
+        ]
 
     # only needed for REGIONAL resources so no scope used as regional is default
     def get_web_acl_from_associations(self, resource_type, resource_arn):
