@@ -168,19 +168,19 @@ class TestServer(KubeTest):
             event = self.get_event("create_pod")
             res = requests.post(f"http://localhost:{port}", json=event)
             self.assertEqual(res.status_code, 200)
-        self.assertEqual(
-            {
-                "apiVersion": "admission.k8s.io/v1",
-                "kind": "AdmissionReview",
-                "response": {
-                    "allowed": True,
-                    "uid": "662c3df2-ade6-4165-b395-770857bc17b7",
-                    "warnings": [],
-                    "status": {"code": 200, "message": "OK"},
+            self.assertEqual(
+                {
+                    "apiVersion": "admission.k8s.io/v1",
+                    "kind": "AdmissionReview",
+                    "response": {
+                        "allowed": True,
+                        "uid": "662c3df2-ade6-4165-b395-770857bc17b7",
+                        "warnings": [],
+                        "status": {"code": 200, "message": "OK"},
+                    },
                 },
-            },
-            res.json(),
-        )
+                res.json(),
+            )
 
     def test_server_handle_post_policies_deny_on_match(self):
         policies = {

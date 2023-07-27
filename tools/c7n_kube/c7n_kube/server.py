@@ -58,9 +58,7 @@ class AdmissionControllerHandler(http.server.BaseHTTPRequestHandler):
                 else:
                     verb = "denying"
 
-                log.info(
-                    f"{verb} admission because on-match:{action}, matched:{len(resources)}"
-                )
+                log.info(f"{verb} admission because on-match:{action}, matched:{len(resources)}")
             except (
                 PolicyNotRunnableException,
                 EventNotMatchedException,

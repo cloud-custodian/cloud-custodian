@@ -85,6 +85,7 @@ ResourceMap = {
     "aws.event-bus": "c7n.resources.cw.EventBus",
     "aws.event-rule": "c7n.resources.cw.EventRule",
     "aws.event-rule-target": "c7n.resources.cw.EventRuleTarget",
+    "aws.flow-log": "c7n.resources.vpc.FlowLog",
     "aws.firewall": "c7n.resources.firewall.NetworkFirewall",
     "aws.firehose": "c7n.resources.kinesis.DeliveryStream",
     "aws.fis-template": "c7n.resources.fis.ExperimentTemplate",

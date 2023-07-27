@@ -1,0 +1,93 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Mon, 28 Jun 2021 19:54:02 GMT",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000,h3-T051=\":443\"; ma=2592000,h3-Q050=\":443\"; ma=2592000,h3-Q046=\":443\"; ma=2592000,h3-Q043=\":443\"; ma=2592000,quic=\":443\"; ma=2592000; v=\"46,43\"",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "3767",
+    "-content-encoding": "gzip",
+    "content-location": "https://sqladmin.googleapis.com/sql/v1beta4/projects/cloud-custodian/instances?alt=json"
+  },
+  "body": {
+    "items": [
+      {
+        "kind": "sql#instance",
+        "state": "RUNNABLE",
+        "databaseVersion": "MYSQL_5_7",
+        "settings": {
+          "authorizedGaeApplications": [],
+          "tier": "db-custom-1-3840",
+          "kind": "sql#settings",
+          "availabilityType": "ZONAL",
+          "pricingPlan": "PER_USE",
+          "replicationType": "SYNCHRONOUS",
+          "activationPolicy": "NEVER",
+          "ipConfiguration": {
+            "authorizedNetworks": [],
+            "ipv4Enabled": true
+          },
+          "locationPreference": {
+            "zone": "us-central1-f",
+            "kind": "sql#locationPreference"
+          },
+          "dataDiskType": "PD_HDD",
+          "maintenanceWindow": {
+            "kind": "sql#maintenanceWindow",
+            "hour": 0,
+            "day": 0
+          },
+          "backupConfiguration": {
+            "startTime": "21:00",
+            "kind": "sql#backupConfiguration",
+            "location": "us",
+            "backupRetentionSettings": {
+              "retentionUnit": "COUNT",
+              "retainedBackups": 7
+            },
+            "enabled": true,
+            "binaryLogEnabled": true,
+            "transactionLogRetentionDays": 7
+          },
+          "settingsVersion": "8",
+          "storageAutoResizeLimit": "0",
+          "storageAutoResize": true,
+          "dataDiskSizeGb": "10",
+          "deletionProtectionEnabled": false
+        },
+        "etag": "a9597cb42d33916141bac009eb0dc291c6998599ca1de5f9993a63de12144832",
+        "ipAddresses": [
+          {
+            "type": "PRIMARY",
+            "ipAddress": "34.135.49.186"
+          }
+        ],
+        "serverCaCert": {
+          "kind": "sql#sslCert",
+          "certSerialNumber": "0",
+          "cert": "-----BEGIN CERTIFICATE-----\nMIIDfzCCAmegAwIBAgIBADANBgkqhkiG9w0BAQsFADB3MS0wKwYDVQQuEyRkODIw\nOTRmYy05NTExLTRjN2YtODNjMy01ZTAwZWYwYzhjNmExIzAhBgNVBAMTGkdvb2ds\nZSBDbG91ZCBTUUwgU2VydmVyIENBMRQwEgYDVQQKEwtHb29nbGUsIEluYzELMAkG\nA1UEBhMCVVMwHhcNMjEwNjI4MTk0MTU5WhcNMzEwNjI2MTk0MjU5WjB3MS0wKwYD\nVQQuEyRkODIwOTRmYy05NTExLTRjN2YtODNjMy01ZTAwZWYwYzhjNmExIzAhBgNV\nBAMTGkdvb2dsZSBDbG91ZCBTUUwgU2VydmVyIENBMRQwEgYDVQQKEwtHb29nbGUs\nIEluYzELMAkGA1UEBhMCVVMwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIB\nAQCATGLf91uhnKUyKVZS8zpzhzEq5eikm9W8pkd2A8TS0etydaKeW1lCQ9G29O7K\nDwpHdhBTSm0w3R2V52lxzZP8trZ6NYz0d33Fp+F3z5GBhSCUYfU8sIyLtLRKfi/d\nian6eSSCk65FSEgQF92X1TjXhga7mC3QqbQeQM2WZRcSXO5n+hIoruzeENp6I0fN\nPWJWOc0r56sYL+w8zMcVycaHzCOtOHHLGHNeY8vZ9i7Al7e4TDv3GfPwE8LpTi7y\nK7GUPJn91ev2qeZThlK16lDOE/aWFivoSYTetpPt6uXMTxPeRK/qJkbDiTGcEleu\nPyGqccdR9iyOTIss/eGjvSsxAgMBAAGjFjAUMBIGA1UdEwEB/wQIMAYBAf8CAQAw\nDQYJKoZIhvcNAQELBQADggEBADEfQ5laouEuyZijBvTeSzMJ1SbH4S79ZqnaJfrS\nYkBsu3GRNgHLcBZdD5wQwconKBWWsil1s0SQYtSC0iLKzYwwtI36pRJaQfZROM6o\nl9hJDCRvDW9Ehy+aSvsHdmMcHTutEFOtILfDPcJ5eArfPCBKpFDN2FYwLeDeN6yf\nXwloflI/qQYLkGf3ExpxdbgWG/ljpeq82SQvwJImT7m2TEHMx2iERkpD5fu1Jjs5\nyHvwD2vgs+Hu5LDUVkmTNyIEL/ye5z2ltUu3TUkprPXfqGcgMdaNqI7Qe0FybijV\ni5dCcEjfrhQJmgXgTHzRsPA//WtSqT2zKtZ2s44IOrDRokE=\n-----END CERTIFICATE-----",
+          "commonName": "C=US,O=Google\\, Inc,CN=Google Cloud SQL Server CA,dnQualifier=d82094fc-9511-4c7f-83c3-5e00ef0c8c6a",
+          "sha1Fingerprint": "b889d05c28d530e43d032263db1d0aaf53a69a40",
+          "instance": "custodiantestsql",
+          "createTime": "2021-06-28T19:41:59.193Z",
+          "expirationTime": "2031-06-26T19:42:59.193Z"
+        },
+        "instanceType": "CLOUD_SQL_INSTANCE",
+        "project": "cloud-custodian",
+        "serviceAccountEmailAddress": "p886572771369-0cceok@gcp-sa-cloud-sql.iam.gserviceaccount.com",
+        "backendType": "SECOND_GEN",
+        "selfLink": "https://sqladmin.googleapis.com/sql/v1beta4/projects/cloud-custodian/instances/custodiantestsql",
+        "connectionName": "cloud-custodian:us-central1:custodiantestsql",
+        "name": "custodiantestsql",
+        "region": "us-central1",
+        "gceZone": "us-central1-f"
+      }
+    ]
+  }
+}

@@ -13,8 +13,8 @@ from pytest_terraform import terraform
 import datetime
 from dateutil import parser, tz
 import json
-import mock
 import time
+from unittest import mock
 
 from .common import functional
 
