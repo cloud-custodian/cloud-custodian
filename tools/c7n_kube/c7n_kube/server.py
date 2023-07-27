@@ -28,9 +28,7 @@ class AdmissionControllerServer(http.server.HTTPServer):
         self.on_exception = on_exception
         temp_dir = tempfile.TemporaryDirectory()
         self.directory_loader = DirectoryLoader(Config.empty(output_dir=temp_dir.name))
-        policy_collection = self.directory_loader.load_directory(
-            os.path.abspath(self.policy_dir)
-        )
+        policy_collection = self.directory_loader.load_directory(os.path.abspath(self.policy_dir))
         self.policy_collection = policy_collection.filter(modes=["k8s-admission"])
         log.info(f"Loaded {len(self.policy_collection)} policies")
         super().__init__(*args, **kwargs)
