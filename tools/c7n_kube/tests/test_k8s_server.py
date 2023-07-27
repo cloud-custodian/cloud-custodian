@@ -17,7 +17,7 @@ from c7n_kube.server import AdmissionControllerServer, AdmissionControllerHandle
 from common_kube import KubeTest
 
 
-class TestAdmissionControllerServer(AdmissionControllerServer):
+class MockAdmissionControllerServer(AdmissionControllerServer):
     def __init__(self, bind_and_activate=False, *args, **kwargs):
         super().__init__(bind_and_activate=bind_and_activate, *args, **kwargs)
 
@@ -30,12 +30,12 @@ class TestServer(KubeTest):
         return port
 
     @contextmanager
-    def _server(self, policies, on_exception="warn", lifetime=1):
+    def _server(self, policies, on_exception="warn", timeout=1):
         port = self.find_port()
         with tempfile.TemporaryDirectory() as temp_dir:
             with open(f"{temp_dir}/policy.yaml", "w+") as f:
                 json.dump(policies, f)
-            server = TestAdmissionControllerServer(
+            server = MockAdmissionControllerServer(
                 server_address=("localhost", port),
                 RequestHandlerClass=AdmissionControllerHandler,
                 policy_dir=temp_dir,
@@ -44,11 +44,12 @@ class TestServer(KubeTest):
             )
             server_thread = threading.Thread(target=server.serve_forever)
             server_thread.start()
-            time.sleep(lifetime)
+            time.sleep(timeout)
         try:
             yield server, port
         finally:
             server.shutdown()
+            server_thread.join(timeout=timeout)
 
     def test_server_load_non_k8s_policies(self):
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -58,7 +59,7 @@ class TestServer(KubeTest):
                 json.dump({"policies": [{"name": "test2", "resource": "ec2"}]}, f)
             with open(f"{temp_dir}/policy3.yaml", "w+") as f:
                 json.dump({"policies": [{"name": "test3", "resource": "ebs"}]}, f)
-            server = TestAdmissionControllerServer(
+            server = MockAdmissionControllerServer(
                 server_address=("localhost", 8080),
                 RequestHandlerClass=AdmissionControllerHandler,
                 policy_dir=temp_dir,
@@ -78,7 +79,7 @@ class TestServer(KubeTest):
                 json.dump(
                     {"policies": [{"name": "test3", "resource": "k8s.service"}]}, f
                 )
-            server = TestAdmissionControllerServer(
+            server = MockAdmissionControllerServer(
                 server_address=("localhost", 8082),
                 RequestHandlerClass=AdmissionControllerHandler,
                 policy_dir=temp_dir,
@@ -124,7 +125,7 @@ class TestServer(KubeTest):
                 json.dump(
                     {"policies": [{"name": "test3", "resource": "k8s.service"}]}, f
                 )
-            server = TestAdmissionControllerServer(
+            server = MockAdmissionControllerServer(
                 server_address=("localhost", 8080),
                 RequestHandlerClass=AdmissionControllerHandler,
                 policy_dir=temp_dir,
