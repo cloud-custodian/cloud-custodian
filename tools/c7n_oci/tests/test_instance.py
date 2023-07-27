@@ -17,9 +17,7 @@ class TestInstance(OciBaseTest):
         return self.fetch_validation_data(resource_manager, "get_instance", instance_id)
 
     @terraform("compute", scope="class")
-    def test_add_defined_tag_to_instance(
-        self, test, compute, with_or_without_compartment
-    ):
+    def test_add_defined_tag_to_instance(self, test, compute, with_or_without_compartment):
         """
         test adding defined_tags tag on compute instance
         """
@@ -34,9 +32,7 @@ class TestInstance(OciBaseTest):
                 "filters": [
                     {"type": "value", "key": "id", "value": ocid},
                 ],
-                "actions": [
-                    {"type": "update", "defined_tags": self.get_defined_tag("add_tag")}
-                ],
+                "actions": [{"type": "update", "defined_tags": self.get_defined_tag("add_tag")}],
             },
             session_factory=session_factory,
         )
@@ -93,9 +89,7 @@ class TestInstance(OciBaseTest):
                 "filters": [
                     {"type": "value", "key": "id", "value": ocid},
                 ],
-                "actions": [
-                    {"type": "update", "freeform_tags": {"Environment": "Development"}}
-                ],
+                "actions": [{"type": "update", "freeform_tags": {"Environment": "Development"}}],
             },
             session_factory=session_factory,
         )
@@ -120,9 +114,7 @@ class TestInstance(OciBaseTest):
                 "filters": [
                     {"type": "value", "key": "id", "value": ocid},
                 ],
-                "actions": [
-                    {"type": "update", "freeform_tags": {"Environment": "Production"}}
-                ],
+                "actions": [{"type": "update", "freeform_tags": {"Environment": "Production"}}],
             },
             session_factory=session_factory,
         )
@@ -147,9 +139,7 @@ class TestInstance(OciBaseTest):
                 "query": [
                     {"lifecycle_state": "RUNNING"},
                 ],
-                "filters": [
-                    {"type": "value", "key": "freeform_tags.Project", "value": "CNCF"}
-                ],
+                "filters": [{"type": "value", "key": "freeform_tags.Project", "value": "CNCF"}],
             },
             session_factory=session_factory,
         )
@@ -434,9 +424,7 @@ class TestInstance(OciBaseTest):
         ]
 
     @terraform("compute", scope="class")
-    def test_add_defined_tag_to_instance_new(
-        self, test, compute, with_or_without_compartment
-    ):
+    def test_add_defined_tag_to_instance_new(self, test, compute, with_or_without_compartment):
         """
         test adding defined_tags tag on compute instance
         """
@@ -451,9 +439,7 @@ class TestInstance(OciBaseTest):
                 "filters": [
                     {"type": "value", "key": "id", "value": ocid},
                 ],
-                "actions": [
-                    {"type": "update", "defined_tags": self.get_defined_tag("add_tag")}
-                ],
+                "actions": [{"type": "update", "defined_tags": self.get_defined_tag("add_tag")}],
             },
             session_factory=session_factory,
         )
