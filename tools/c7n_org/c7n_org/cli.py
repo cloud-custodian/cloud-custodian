@@ -638,7 +638,7 @@ def run_account(account, region, policies_config, output_path,
         config['profile'] = account['profile']
 
     if account.get("oci_compartments"):
-        os.environ["OCI_COMPARTMENTS"] = account.get("oci_compartments")
+        env_vars.update({"OCI_COMPARTMENTS": account.get("oci_compartments")})
 
     policies = PolicyCollection.from_data(policies_config, config)
     policy_counts = {}

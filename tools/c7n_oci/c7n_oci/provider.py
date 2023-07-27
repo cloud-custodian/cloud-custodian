@@ -63,6 +63,8 @@ class OCI(Provider):
         policies = []
         subscribed_regions = self._get_subscribed_regions(options)
         if "all" in options.regions:
+            # TODO: Check whether the service used in the policy is supported in
+            # the subscribed regions to avoid the failures during the execution
             regions = subscribed_regions
         else:
             regions = [
