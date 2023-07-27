@@ -2624,19 +2624,40 @@ class UnusedKeyPairs(Filter):
             - type: unused
               state: false
     """
-    annotation_key = 'c7n:unused_keys'
-    permissions = ('ec2:DescribeKeyPairs',)
     schema = type_schema('unused',
         state={'type': 'boolean'})
 
-    def process(self, resources, event=None):
-        instances = self.manager.get_resource_manager('ec2').resources()
-        used = set(jmespath_search('[].KeyName', instances))
-        if self.data.get('state', True):
-            return [r for r in resources if r['KeyName'] not in used]
-        else:
-            return [r for r in resources if r['KeyName'] in used]
+    def get_permissions(self):
+        return list(itertools.chain(*[
+            self.manager.get_resource_manager(m).get_permissions()
+            for m in ('asg', 'launch-config', 'ec2')]))
 
+    def _pull_asg_keynames(self):
+        asgs = self.manager.get_resource_manager('asg').resources()
+        key_names = set()
+        lcfgs = set(a['LaunchConfigurationName'] for a in asgs if 'LaunchConfigurationName' in a)
+        lcfg_mgr = self.manager.get_resource_manager('launch-config')
+
+        if lcfgs:
+            key_names.update([
+                lcfg['KeyName'] for lcfg in lcfg_mgr.resources()
+                if lcfg['LaunchConfigurationName'] in lcfgs])
+
+        tmpl_mgr = self.manager.get_resource_manager('launch-template-version')
+        for tversion in tmpl_mgr.get_resources(
+                list(tmpl_mgr.get_asg_templates(asgs).keys())):
+            key_names.add(tversion['LaunchTemplateData'].get('KeyName'))
+        return key_names
+
+    def _pull_ec2_keynames(self):
+        ec2_manager = self.manager.get_resource_manager('ec2')
+        return {i.get('KeyName',None) for i in ec2_manager.resources()}
+
+    def process(self, resources, event=None):
+        keynames = self._pull_ec2_keynames().union(self._pull_asg_keynames())
+        if self.data.get('state', True):
+            return [r for r in resources if r['KeyName'] not in keynames]
+        return [r for r in resources if r['KeyName'] in keynames]
 
 @KeyPair.action_registry.register('delete')
 class DeleteUnusedKeyPairs(BaseAction):

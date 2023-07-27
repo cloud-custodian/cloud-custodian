@@ -564,6 +564,8 @@ class Delete(BaseAction):
 
     def process(self, dbs):
         skip = self.data.get('skip-snapshot', False)
+        # Can't delete an instance in an aurora cluster, use a policy on the cluster
+        dbs = self.filter_resources(dbs, "DBClusterIdentifier", [None])
 
         # Concurrency feels like overkill here.
         client = local_session(self.manager.session_factory).client('rds')

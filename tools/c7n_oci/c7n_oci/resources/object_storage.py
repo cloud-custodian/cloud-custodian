@@ -40,8 +40,7 @@ class Bucket(QueryResourceManager):
         enum_spec = ("list_buckets", "items[]", {"fields": ["tags"]})
         extra_params = {"compartment_id", "namespace_name"}
         resource_type = "OCI.ObjectStorage/Bucket"
-        id = "id"
-        name = "name"
+        id = name = "name"
         search_resource_type = "bucket"
 
     def _get_extra_params(self):
