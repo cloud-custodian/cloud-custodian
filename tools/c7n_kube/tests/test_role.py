@@ -21,9 +21,7 @@ class ClusterRoleTest(KubeTest):
 class RoleTest(KubeTest):
     def test_cluster_role_query(self):
         factory = self.replay_flight_data()
-        p = self.load_policy(
-            {"name": "role", "resource": "k8s.role"}, session_factory=factory
-        )
+        p = self.load_policy({"name": "role", "resource": "k8s.role"}, session_factory=factory)
         resources = p.run()
         self.assertEqual(len(resources), 14)
         sorted_resources = sorted([r["metadata"]["name"] for r in resources])

@@ -38,9 +38,7 @@ class TestDeleteAction(KubeTest):
         self.assertEqual(len(resources), 1)
         client = factory().client("Core", "V1")
         namespaces = client.list_service_for_all_namespaces().to_dict()["items"]
-        hello_node_service = [
-            n for n in namespaces if n["metadata"]["name"] == "hello-node"
-        ]
+        hello_node_service = [n for n in namespaces if n["metadata"]["name"] == "hello-node"]
         self.assertFalse(hello_node_service)
 
 
@@ -60,7 +58,5 @@ class TestPatchAction(KubeTest):
         self.assertEqual(len(resources), 1)
         client = factory().client("Apps", "V1")
         deployments = client.list_deployment_for_all_namespaces().to_dict()["items"]
-        hello_node_deployment = [
-            d for d in deployments if d["metadata"]["name"] == "hello-node"
-        ][0]
+        hello_node_deployment = [d for d in deployments if d["metadata"]["name"] == "hello-node"][0]
         self.assertEqual(hello_node_deployment["spec"]["replicas"], 2)

@@ -64,9 +64,7 @@ class TestKubeEventLabelAction(KubeTest):
                     "on-match": "warn",
                     "operations": ["CREATE"],
                 },
-                "filters": [
-                    {"type": "value", "key": "metadata.labels", "value": "absent"}
-                ],
+                "filters": [{"type": "value", "key": "metadata.labels", "value": "absent"}],
                 "actions": [{"type": "event-label", "labels": {"foo": "bar"}}],
             },
             session_factory=factory,

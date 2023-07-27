@@ -28,9 +28,7 @@ TEMPLATE = {
         "labels": {
             "app.kubernetes.io/name": "c7n-kates",
             "app.kubernetes.io/instance": "c7n-kates",
-            "app.kubernetes.io/version": pkg_resources.get_distribution(
-                "c7n_kube"
-            ).version,
+            "app.kubernetes.io/version": pkg_resources.get_distribution("c7n_kube").version,
             "app.kubernetes.io/component": "AdmissionController",
             "app.kubernetes.io/part-of": "c7n_kube",
             "app.kubernetes.io/managed-by": "c7n",
@@ -60,12 +58,8 @@ TEMPLATE = {
 def _parser():
     parser = argparse.ArgumentParser(description="Cloud Custodian Admission Controller")
     parser.add_argument("--host", type=str, help="Listen host", default="127.0.0.1")
-    parser.add_argument(
-        "--port", type=int, help="Listen port", nargs="?", default="8800"
-    )
-    parser.add_argument(
-        "--policy-dir", type=str, required=True, help="policy directory"
-    )
+    parser.add_argument("--port", type=int, help="Listen port", nargs="?", default="8800")
+    parser.add_argument("--policy-dir", type=str, required=True, help="policy directory")
     parser.add_argument(
         "--on-exception",
         type=str.lower,
@@ -99,9 +93,7 @@ def cli():
     args = parser.parse_args()
     if args.generate:
         directory_loader = DirectoryLoader(Config.empty())
-        policy_collection = directory_loader.load_directory(
-            os.path.abspath(args.policy_dir)
-        )
+        policy_collection = directory_loader.load_directory(os.path.abspath(args.policy_dir))
         operations = []
         groups = []
         api_versions = []
@@ -123,13 +115,9 @@ def cli():
             api_versions.append(mvals["apiVersions"])
             resources.extend(mvals["resources"])
 
-        TEMPLATE["webhooks"][0]["rules"][0]["operations"] = sorted(
-            list(set(operations))
-        )
+        TEMPLATE["webhooks"][0]["rules"][0]["operations"] = sorted(list(set(operations)))
         TEMPLATE["webhooks"][0]["rules"][0]["apiGroups"] = sorted(list(set(groups)))
-        TEMPLATE["webhooks"][0]["rules"][0]["apiVersions"] = sorted(
-            list(set(api_versions))
-        )
+        TEMPLATE["webhooks"][0]["rules"][0]["apiVersions"] = sorted(list(set(api_versions)))
         TEMPLATE["webhooks"][0]["rules"][0]["resources"] = sorted(list(set(resources)))
 
         if args.endpoint:

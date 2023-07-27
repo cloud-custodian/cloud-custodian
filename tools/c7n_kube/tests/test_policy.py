@@ -25,9 +25,7 @@ class TestAdmissionControllerMode(KubeTest):
             "resources": [policy.resource_manager.get_model().plural.lower()],
             "group": "",
             "apiVersions": policy.resource_manager.get_model().version.lower(),
-            "scope": "Namespaced"
-            if policy.resource_manager.get_model().namespaced
-            else "Cluster",
+            "scope": "Namespaced" if policy.resource_manager.get_model().namespaced else "Cluster",
         }
         match_values = policy.get_execution_mode().get_match_values()
         self.assertEqual(expected, match_values)
