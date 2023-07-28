@@ -9,7 +9,7 @@ import io
 import shutil
 import tempfile
 import time  # NOQA needed for some recordings
-import mock
+from unittest import mock
 
 from unittest import TestCase
 
