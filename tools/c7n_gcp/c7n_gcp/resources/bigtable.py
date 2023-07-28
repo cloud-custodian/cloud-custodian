@@ -6,7 +6,6 @@ from c7n_gcp.query import (
     QueryResourceManager, TypeInfo, ChildResourceManager, ChildTypeInfo
 )
 from c7n.utils import local_session
-from c7n.filters import Filter
 from filters.timerange import TimeRangeFilter
 
 
