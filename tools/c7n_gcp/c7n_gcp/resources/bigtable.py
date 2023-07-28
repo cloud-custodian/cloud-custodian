@@ -88,7 +88,7 @@ class BigTableInstanceClusterBackup(ChildResourceManager):
 
 
 @BigTableInstanceClusterBackup.filter_registry.register('time-range')
-class TimeRange(Filter):
+class TimeRange(TimeRangeFilter):
     """Filters bigtable instance clusters backups based on a time range
 
     .. code-block:: yaml

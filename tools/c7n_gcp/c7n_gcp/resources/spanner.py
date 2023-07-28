@@ -1,7 +1,5 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
-import datetime
-from c7n.filters import Filter
 from c7n.utils import type_schema, local_session
 from c7n_gcp.actions import MethodAction, SetIamPolicy
 from c7n_gcp.provider import resources
