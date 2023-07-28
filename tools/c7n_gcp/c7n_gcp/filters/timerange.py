@@ -10,19 +10,7 @@ GC Filter to find resources based on time range
 
 
 class TimeRangeFilter(Filter):
-    """Filters spanner instance backups based on a time range
 
-    .. code-block:: yaml
-
-        policies:
-          - name: spanner_backup_expiration_time_30_days_or_more
-            description: |
-              Cloud Spanner backup is created with an expiration date of 29 days or less
-            resource: gcp.spanner-backup
-            filters:
-              - type: time-range
-                value: 29
-    """
     schema = type_schema('time-range',
                          value={'$ref': '#/definitions/filters_common/value'})
 
