@@ -151,6 +151,7 @@ List Operators
     - ``intersect`` - Match if two lists share any elements
     - ``difference`` - Match if the first list has any values not in the second list
 
+  This filter only matches resources whose ``ImageId`` property appears in a predefined list:
 
   .. code-block:: yaml
 
@@ -160,25 +161,56 @@ List Operators
            op: in                         ─▶ List operator
            value: [ID-123, ID-321]        ─▶ List of Values to be compared against
 
+  Some resource properties are lists themselves. For example, EC2 instances can have
+  multiple security groups. For the next few examples, assume the filters are evaluating
+  three instances:
+
+  =========  ===============================================
+  Instance   Security Group Names
+  =========  ===============================================
+  instance1  default, common, custom
+  instance2  common, custom, extra
+  instance3  common
+  =========  ===============================================
+
+  This filter matches ``instance1``, whose security group list contains the ``default`` group:
+
   .. code-block:: yaml
 
       filters:
          - type: value
-           key: ImageId.List              ─▶ The value from the describe call
-           op: in                         ─▶ List operator
-           value: ID-321                  ─▶ Values to be compared against
-           value_type: swap               ─▶ Switches list comparison order
+           key: SecurityGroups[].GroupName
+           op: contains
+           value: default
 
-  The above filter can also be written as:
+  The ``difference`` operator can find instances with security groups that don't appear in
+  a predefined list. This filter matches ``instance1`` and ``instance2``, because ``default``
+  and ``extra`` aren't in the list of expected security groups:
 
   .. code-block:: yaml
 
       filters:
          - type: value
-           key: ImageId.List              ─▶ A list of values from the describe call
-           op: contains                   ─▶ List operator
-           value: ID-321                  ─▶ Single value to check
+           key: SecurityGroups[].GroupName
+           op: difference
+           value:
+             - common
+             - custom
 
+  ``value_type: swap`` can invert that logic, checking to see if the predefined list has
+  any values that don't appear on an instance. This filter matches ``instance3``, because
+  it is missing the ``custom`` security group:
+
+  .. code-block:: yaml
+
+      filters:
+         - type: value
+           key: SecurityGroups[].GroupName
+           op: difference
+           value:
+             - common
+             - custom
+           value_type: swap
 
 Pattern Matching Operators
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
