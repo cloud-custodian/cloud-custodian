@@ -12,7 +12,6 @@ from c7n.utils import type_schema
 from c7n_oci.actions.base import OCIBaseAction, RemoveTagBaseAction
 from c7n_oci.provider import resources
 from c7n_oci.query import QueryResourceManager
-from c7n_oci.constants import MONITORING_QUERY_RESOURCE_SIZE
 
 log = logging.getLogger("custodian.oci.resources.compute")
 
@@ -254,7 +253,8 @@ class InstanceMetrics(Filter):
 
     This filter returns the resources with the aggregated metrics data that match the criteria specified in the request.
     Compartment OCID required. For information on metric queries, see `Building Metric Queries
-    <https://docs.oracle.com/en-us/iaas/Content/Monitoring/Tasks/buildingqueries.htm>`_.
+    <https://docs.oracle.com/en-us/iaas/Content/Monitoring/Tasks/buildingqueries.htm>`_ and
+    `Monitoring Query Language <https://docs.oracle.com/en-us/iaas/Content/Monitoring/Reference/mql.htm>`_.
 
     .. code-block:: yaml
 
@@ -267,6 +267,14 @@ class InstanceMetrics(Filter):
                 - type: metrics
                   query: 'CpuUtilization[30d].mean() < 6'
 
+        policies:
+            - name: instance-with-low-cpu-utilization
+            description: Return the instances with the low CPU utilization is less than 50%
+            resource: oci.instance
+            filters:
+                - type: metrics
+                  query: 'CpuUtilization[10d]{region="us-ashburn-1"}.max() < 50'
+
     """  # noqa
 
     schema = type_schema("metrics", query={"type": "string"}, required=["query"])
@@ -276,9 +284,9 @@ class InstanceMetrics(Filter):
         for resource in resources:
             comp_id = resource.get("compartment_id")
             if comp_id in comp_resources:
-                comp_resources.get(comp_id).append(resource)
+                comp_resources.get(comp_id)[resource["id"]] = resource
             else:
-                comp_resources[comp_id] = [resource]
+                comp_resources[comp_id] = {resource["id"]: resource}
         # Query the MonitoringClient with the query against each compartment and perform
         # the filtering
         monitoring_client = self.manager.get_session().client("oci.monitoring.MonitoringClient")
@@ -286,7 +294,7 @@ class InstanceMetrics(Filter):
         for compartment_id in comp_resources.keys():
             query = self.data.get("query")
             filter_resources = comp_resources.get(comp_id)
-            query = InstanceMetrics.get_metrics_resource_query(query, filter_resources)
+            query = self.get_metrics_resource_query(query, filter_resources.keys())
             log.debug(
                 f"Monitoring client will execute query :{query} for resources in the compartment"
             )
@@ -301,25 +309,26 @@ class InstanceMetrics(Filter):
             metric_resources = metric_response.data
             for metric_data in metric_resources:
                 resource_id = metric_data.dimensions["resourceId"]
-                for resource in filter_resources:
-                    if resource.get("id") == resource_id:
-                        result.append(resource)
-
+                resource = filter_resources.get(resource_id)
+                if resource is not None:
+                    result.append(resource)
         return result
 
     @staticmethod
-    def get_metrics_resource_query(query, filter_resources):
-        if "resourceId" not in query:
-            if len(filter_resources) <= MONITORING_QUERY_RESOURCE_SIZE:
-                resource_query = 'resourceId=~"{}"'.format(
-                    "|".join(resource["id"] for resource in filter_resources)
-                )
-                if "}" in query:
-                    if "=" in query:
-                        resource_query = f",{resource_query}}}"
-                    query = query.replace("}", resource_query, 1)
-                else:
-                    if "]" in query:
-                        query = query.replace("]", f"]{{{resource_query}}}", 1)
+    def get_metrics_resource_query(query, resource_ids):
+        if "resourceId" in query:
+            return query
+        # check for chunk size less than or equal to 10
+        if len(resource_ids) <= 10:
+            resource_query = 'resourceId=~"{}"'.format(
+                "|".join(resource_id for resource_id in resource_ids)
+            )
+            if "}" in query:
+                if "=" in query:
+                    resource_query = f",{resource_query}}}"
+                query = query.replace("}", resource_query, 1)
+            else:
+                if "]" in query:
+                    query = query.replace("]", f"]{{{resource_query}}}", 1)
 
         return query

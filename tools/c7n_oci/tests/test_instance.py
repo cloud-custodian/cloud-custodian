@@ -247,6 +247,7 @@ class TestInstance(OciBaseTest):
             },
             session_factory=session_factory,
         )
+        # if test.recording:
         self.wait(180)
         resources = policy.run()
         test_instance_found = False
@@ -282,6 +283,7 @@ class TestInstance(OciBaseTest):
             },
             session_factory=session_factory,
         )
+        # if test.recording:
         self.wait(180)
         resources = policy.run()
         test_instance_found = False
@@ -295,8 +297,16 @@ class TestInstance(OciBaseTest):
     def test_instance_metrics_query(self, data_size, expected):
         query = "CpuUtilization[1m].max() < 100"
         ocid = "ocid1.instance.oc1..<unique_ID>"
-        resource = {"id": ocid}
-        filter_resources = [resource] * data_size
+        filter_resources = [ocid] * data_size
+        query = InstanceMetrics.get_metrics_resource_query(query, filter_resources)
+        result = "resourceId" in query
+        assert result == expected
+
+    @pytest.mark.parametrize("data_size,expected", [(1, True), (10, True), (25, False)])
+    def test_instance_metrics_query_region(self, data_size, expected):
+        query = "CpuUtilization[1m]{region='us-ashburn-1'}.max() < 100"
+        ocid = "ocid1.instance.oc1..<unique_ID>"
+        filter_resources = [ocid] * data_size
         query = InstanceMetrics.get_metrics_resource_query(query, filter_resources)
         result = "resourceId" in query
         assert result == expected
