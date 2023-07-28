@@ -77,22 +77,22 @@ class SpannerInstanceBackup(ChildResourceManager):
 
 @SpannerInstanceBackup.filter_registry.register('time-range')
 class SpannerInstanceBackupTimeRangeFilter(Filter):
-    """Filters bigtable instance clusters backups based on a time range
+    """Filters spanner instance backups based on a time range
 
     .. code-block:: yaml
 
         policies:
-          - name: bigtable_backup_expiration_time_30_days
+          - name: spanner_backup_expiration_time_30_days_or_more
             description: |
-              Cloud Bigtable backup expiration time is 29 days or less
-            resource: gcp.bigtable-instance-cluster-backup
+              Cloud Spanner backup is created with an expiration date of 29 days or less
+            resource: gcp.spanner-backup
             filters:
               - type: time-range
                 value: 29
     """
     schema = type_schema('time-range',
                          value={'$ref': '#/definitions/filters_common/value'})
-    permissions = ('bigtable.backups.list',)
+    permissions = ('spanner.backups.list',)
 
     datetime1_pattern = "%Y-%m-%dT%H:%M:%S.%fZ"
     datetime2_pattern = "%Y-%m-%dT%H:%M:%S"
