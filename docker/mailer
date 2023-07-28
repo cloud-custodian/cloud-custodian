@@ -2,7 +2,7 @@
 
 FROM ubuntu:22.04 as build-env
 
-ARG POETRY_VERSION="1.4.0"
+ARG POETRY_VERSION="1.5.1"
 SHELL ["/bin/bash", "-c"]
 
 # pre-requisite distro deps, and build env setup
@@ -27,7 +27,7 @@ RUN . /usr/local/bin/activate && poetry install --without dev --no-root
 ADD c7n /src/c7n/
 RUN . /usr/local/bin/activate && poetry install --only-root
 
-ARG providers="gcp azure kube openstack tencentcloud"
+ARG providers="gcp azure kube openstack tencentcloud oci"
 # Add provider packages
 # We include `pyproject.toml` and `poetry.lock` first to allow
 # cache of dependency installs.
@@ -52,6 +52,10 @@ ADD tools/c7n_tencentcloud/pyproject.toml tools/c7n_tencentcloud/poetry.lock /sr
 RUN if [[ " ${providers[*]} " =~ "tencentcloud" ]]; then     . /usr/local/bin/activate &&     cd tools/c7n_tencentcloud &&     poetry install --without dev --no-root; fi
 
 
+ADD tools/c7n_oci/pyproject.toml tools/c7n_oci/poetry.lock /src/tools/c7n_oci/
+RUN if [[ " ${providers[*]} " =~ "oci" ]]; then     . /usr/local/bin/activate &&     cd tools/c7n_oci &&     poetry install --without dev --no-root; fi
+
+
 # Now install the root of each provider
 
 ADD tools/c7n_gcp /src/tools/c7n_gcp
@@ -72,6 +76,10 @@ RUN if [[ " ${providers[*]} " =~ "openstack" ]]; then     . /usr/local/bin/activ
 
 ADD tools/c7n_tencentcloud /src/tools/c7n_tencentcloud
 RUN if [[ " ${providers[*]} " =~ "tencentcloud" ]]; then     . /usr/local/bin/activate &&     cd tools/c7n_tencentcloud &&     poetry install --only-root; fi
+
+
+ADD tools/c7n_oci /src/tools/c7n_oci
+RUN if [[ " ${providers[*]} " =~ "oci" ]]; then     . /usr/local/bin/activate &&     cd tools/c7n_oci &&     poetry install --only-root; fi
 
 
 RUN mkdir /output

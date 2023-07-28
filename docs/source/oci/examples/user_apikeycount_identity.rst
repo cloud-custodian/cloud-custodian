@@ -19,8 +19,6 @@ The following example policy will filter and tag the users with the API keys cou
          op: greater-than
          value: 2
       actions:
-       - type: update-user
-         params:
-          update_user_details:
-            freeform_tags:
-                TagName : TagValue
+       - type: update
+         freeform_tags:
+            TagName : TagValue

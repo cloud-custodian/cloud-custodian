@@ -17,8 +17,6 @@ The following example policy will tag all the buckets which has public access
          value: 'ObjectRead'
          op: eq
       actions:
-       - type: update-bucket
-         params:
-           update_bucket_details:
-             freeform_tags:
-               'public_access': 'true'
+       - type: update
+         freeform_tags:
+           'public_access': 'true'

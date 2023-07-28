@@ -13,8 +13,6 @@ The following example policy will tag all the subnets in the tenancy
         Tag all the subnets in the tenancy
       resource: oci.subnet
       actions:
-       - type: update-subnet
-         params:
-           update_subnet_details:
-             freeform_tags:
-               TagName: TagValue
+       - type: update
+         freeform_tags:
+            TagName: TagValue

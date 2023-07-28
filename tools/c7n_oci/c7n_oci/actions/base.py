@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import abc
+import copy
 import logging
 from abc import ABC
 
@@ -56,6 +57,11 @@ class OCIBaseAction(BaseAction, ABC):
     @abc.abstractmethod
     def perform_action(self, resource):
         raise NotImplementedError("Base action class does not implement this behavior")
+
+    def extract_params(self, params):
+        op_params = copy.deepcopy(params)
+        del op_params["type"]
+        return op_params
 
     def update_params(self, resource, updated_resource_details):
         updated_params = {}

@@ -2,11 +2,11 @@
 # SPDX-License-Identifier: Apache-2.0
 import json
 import os
-import mock
 import tempfile
 import time
-
+from unittest import mock
 from unittest import TestCase
+
 from .common import load_data, BaseTest, functional
 
 import freezegun

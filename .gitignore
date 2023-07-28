@@ -47,10 +47,7 @@ docs/source/*/resources
 docs/source/tools/assets/
 .tfcache
 .env
+.venv
 .python-version
 # files generated during "make test"
-label-pod
-test-admission
-test-admission-2
-test-admission-pod
 tests/data/vcr_cassettes/test_output/default_bucket_region_public.yaml

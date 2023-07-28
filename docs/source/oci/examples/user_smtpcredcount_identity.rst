@@ -19,8 +19,6 @@ The following example policy will filter and tag the users who have SMTP credent
          op: greater-than
          value: 0
       actions:
-       - type: update-user
-         params:
-          update_user_details:
-            freeform_tags:
-                TagName : TagValue
+       - type: update
+         freeform_tags:
+            TagName : TagValue
