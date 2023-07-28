@@ -367,7 +367,7 @@ class TestSpannerInstanceBackup(BaseTest):
                                                   project_id=project_id)
         policy = self.load_policy(
             {'name': 'spanner-instance-backup',
-             'resource': 'gcp.spanner-instance-backup',
+             'resource': 'gcp.spanner-backup',
              'filters': [{
                  'type': 'time-range',
                  'value': 29

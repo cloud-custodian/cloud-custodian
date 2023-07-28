@@ -46,7 +46,7 @@ class SpannerInstance(QueryResourceManager):
                         'field_mask': ', '.join(['labels'])}}
 
 
-@resources.register('spanner-instance-backup')
+@resources.register('spanner-backup')
 class SpannerInstanceBackup(ChildResourceManager):
     """GC resource: https://cloud.google.com/spanner/docs/reference/rest/v1/projects.instances.backups"""
     class resource_type(ChildTypeInfo):
