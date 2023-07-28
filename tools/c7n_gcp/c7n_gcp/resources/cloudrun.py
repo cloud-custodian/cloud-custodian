@@ -30,12 +30,10 @@ class CloudRunJob(QueryResourceManager):
         service = "run"
         version = "v1"
         component = "namespaces.jobs"
-        # component = 'projects.locations.jobs'
         enum_spec = ("list", "items[]", None)
         scope = "project"
         scope_key = "parent"
         scope_template = "namespaces/{}"
-        # scope_template = "projects/{}/locations/-"
         name = "metadata.name"
         id = "metadata.selfLink"
         default_report_fields = ["metadata.name", "metadata.creationTimestamp"]
@@ -53,8 +51,9 @@ class CloudRunRevision(QueryResourceManager):
         enum_spec = ("list", "items[]", None)
         scope_key = "parent"
         scope_template = "namespaces/{}"
-        name = id = 'id'
-        default_report_fields = ['displayName', 'expireTime']
+        name = "metadata.name"
+        id = "metadata.selfLink"
+        default_report_fields = ["metadata.name", "metadata.creationTimestamp"]
         asset_type = "run.googleapis.com/Revision"
         urn_component = "revision"
         urn_id_segments = (-1,)
