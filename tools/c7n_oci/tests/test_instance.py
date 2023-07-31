@@ -247,8 +247,8 @@ class TestInstance(OciBaseTest):
             },
             session_factory=session_factory,
         )
-        # if test.recording:
-        self.wait(180)
+        if test.recording:
+            self.wait(180)
         resources = policy.run()
         test_instance_found = False
         for resource in resources:
@@ -283,8 +283,8 @@ class TestInstance(OciBaseTest):
             },
             session_factory=session_factory,
         )
-        # if test.recording:
-        self.wait(180)
+        if test.recording:
+            self.wait(180)
         resources = policy.run()
         test_instance_found = False
         for resource in resources:
