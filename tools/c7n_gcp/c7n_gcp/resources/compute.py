@@ -8,6 +8,7 @@ from datetime import datetime
 from c7n.utils import local_session, type_schema
 
 from c7n_gcp.actions import MethodAction
+from c7n_gcp.filters import IamPolicyFilter
 from c7n_gcp.provider import resources
 from c7n_gcp.query import QueryResourceManager, TypeInfo
 
@@ -293,6 +294,14 @@ class Image(QueryResourceManager):
                     'image_id': resource_id
                 }
             )
+
+
+@Image.filter_registry.register('iam-policy')
+class ImageIamPolicyFilter(IamPolicyFilter):
+    """
+    Overrides the base implementation to process images resources correctly.
+    """
+    permissions = ('compute.images.getIamPolicy',)
 
 
 @Image.action_registry.register('delete')

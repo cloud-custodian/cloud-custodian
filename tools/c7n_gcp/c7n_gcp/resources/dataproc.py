@@ -1,6 +1,7 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
+from c7n_gcp.filters import IamPolicyFilter
 from c7n_gcp.query import ChildResourceManager, ChildTypeInfo
 from c7n_gcp.provider import resources
 
@@ -29,3 +30,11 @@ class DataprocClusters(ChildResourceManager):
         @classmethod
         def _get_location(cls, resource):
             return resource['labels']['goog-dataproc-location']
+
+
+@DataprocClusters.filter_registry.register('iam-policy')
+class DataprocClustersIamPolicyFilter(IamPolicyFilter):
+    """
+    Overrides the base implementation to process dataproc cluster resources correctly.
+    """
+    permissions = ('dataproc.clusters.getIamPolicy',)
