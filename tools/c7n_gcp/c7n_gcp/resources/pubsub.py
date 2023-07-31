@@ -41,7 +41,7 @@ class PubSubTopic(QueryResourceManager):
 @PubSubTopic.filter_registry.register('iam-policy')
 class PubSubTopicIamPolicyFilter(IamPolicyFilter):
     """
-    Overrides the base implementation to process kms key ring resources correctly.
+    Overrides the base implementation to process pubsub topic resources correctly.
     """
     permissions = ('pubsub.topics.getIamPolicy',)
 
