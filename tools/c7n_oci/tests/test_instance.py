@@ -59,7 +59,12 @@ class TestInstance(OciBaseTest):
                 "filters": [
                     {"type": "value", "key": "id", "value": ocid},
                 ],
-                "actions": [{"type": "update", "defined_tags": self.get_defined_tag("update_tag")}],
+                "actions": [
+                    {
+                        "type": "update",
+                        "defined_tags": self.get_defined_tag("update_tag"),
+                    }
+                ],
             },
             session_factory=session_factory,
         )
@@ -381,7 +386,12 @@ class TestInstance(OciBaseTest):
         policy.run()
         resource = self._fetch_instance_validation_data(policy.resource_manager, ocid)
         test.assertEqual(resource["id"], ocid)
-        assert resource["lifecycle_state"] in ["STOPPING", "STOPPED", "STARTING", "RUNNING"]
+        assert resource["lifecycle_state"] in [
+            "STOPPING",
+            "STOPPED",
+            "STARTING",
+            "RUNNING",
+        ]
 
     @terraform("compute", scope="class")
     def test_instance_reboot_force(self, test, compute):
@@ -406,7 +416,12 @@ class TestInstance(OciBaseTest):
         policy.run()
         resource = self._fetch_instance_validation_data(policy.resource_manager, ocid)
         test.assertEqual(resource["id"], ocid)
-        assert resource["lifecycle_state"] in ["STOPPING", "STOPPED", "STARTING", "RUNNING"]
+        assert resource["lifecycle_state"] in [
+            "STOPPING",
+            "STOPPED",
+            "STARTING",
+            "RUNNING",
+        ]
 
     @terraform("compute", scope="class")
     def test_add_defined_tag_to_instance_new(self, test, compute, with_or_without_compartment):

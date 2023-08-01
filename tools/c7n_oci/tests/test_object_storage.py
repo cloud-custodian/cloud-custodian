@@ -99,7 +99,12 @@ class TestObjectStorage(OciBaseTest):
                 "filters": [
                     {"type": "value", "key": "name", "value": bucket_name},
                 ],
-                "actions": [{"type": "update", "defined_tags": self.get_defined_tag("update_tag")}],
+                "actions": [
+                    {
+                        "type": "update",
+                        "defined_tags": self.get_defined_tag("update_tag"),
+                    }
+                ],
             },
             session_factory=session_factory,
         )
