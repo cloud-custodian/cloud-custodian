@@ -2224,6 +2224,7 @@ class PendingMaintenance(Filter):
                 resource: rds
                 filters:
                   - pending-maintenance
+                  
     """
 
     schema = type_schema('pending-maintenance')
