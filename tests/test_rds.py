@@ -923,7 +923,7 @@ class RDSTest(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["DBInstanceIdentifier"], "database-2")
 
-    def test_rds_has_pending_maintenance(self):
+    def test_rds_pending_maintenance(self):
         session_factory = self.replay_flight_data("test_rds_has_pending_maintenance")
         p = self.load_policy(
             {
@@ -936,7 +936,7 @@ class RDSTest(BaseTest):
                         "value": "qbopp011"
                     },
                     {
-                        "type": "has-pending-maintenance"
+                        "type": "pending-maintenance"
                     }
                 ],
             },
