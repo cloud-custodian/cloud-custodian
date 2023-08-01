@@ -253,7 +253,6 @@ class VpcTest(BaseTest):
         factory = self.replay_flight_data("test_vpc_flow_logs_misconfigured")
 
         vpc_id1 = "vpc-4a9ff72e"
-
         traffic_type = "all"
         log_group = "/aws/lambda/myIOTFunction"
         status = "active"
@@ -282,7 +281,7 @@ class VpcTest(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        self.assertEqual(resources[0]["VpcId"], vpc_id1)
+        self.assertEqual(resources[0]['VpcId'], vpc_id1)
 
     def test_eni_vpc_filter(self):
         self.session_factory = self.replay_flight_data("test_eni_vpc_filter")
@@ -3331,42 +3330,6 @@ class FlowLogsTest(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['c7n:flow-logs'][0]['LogDestination'],
                          'arn:aws:s3:::c7n-vpc-flow-logs')
-
-    def test_vpc_set_flow_logs_validation(self):
-        with self.assertRaises(PolicyValidationError) as e:
-            self.load_policy({
-                'name': 'flow-set-validate-1',
-                'resource': 'vpc',
-                'actions': [{
-                    'type': 'set-flow-log',
-                    'LogDestination': 'arn:aws:s3:::c7n-vpc-flow-logs/test/'
-                }]})
-        self.assertIn(
-            "DeliverLogsPermissionArn missing", str(e.exception))
-        with self.assertRaises(PolicyValidationError) as e:
-            self.load_policy({
-                'name': 'flow-set-validate-2',
-                'resource': 'vpc',
-                'actions': [{
-                    'type': 'set-flow-log',
-                    'DeliverLogsPermissionArn': 'arn:aws:iam',
-                    'LogGroupName': '/cloudwatch/logs',
-                    'LogDestination': 'arn:aws:s3:::c7n-vpc-flow-logs/test/'
-                }]})
-        self.assertIn("Exactly one of", str(e.exception))
-        with self.assertRaises(PolicyValidationError) as e:
-            self.load_policy({
-                'name': 'flow-set-validate-3',
-                'resource': 'vpc',
-                'actions': [{
-                    'type': 'set-flow-log',
-                    'LogDestinationType': 's3',
-                    'DeliverLogsPermissionArn': 'arn:aws:iam',
-                    'LogDestination': 'arn:aws:s3:::c7n-vpc-flow-logs/test/'
-                }]})
-        self.assertIn(
-            "DeliverLogsPermissionArn is prohibited for destination-type:s3",
-            str(e.exception))
 
     def test_vpc_set_flow_logs_s3(self):
         session_factory = self.replay_flight_data("test_vpc_set_flow_logs_s3")

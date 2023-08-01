@@ -519,7 +519,6 @@ class PolicyMetaLint(BaseTest):
             'AWS::Detective::Graph',
             'AWS::DMS::Certificate',
             'AWS::EC2::EgressOnlyInternetGateway',
-            'AWS::EC2::FlowLog',
             'AWS::EC2::LaunchTemplate',
             'AWS::EC2::RegisteredHAInstance',
             'AWS::EC2::TransitGatewayAttachment',
