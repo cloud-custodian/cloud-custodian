@@ -1,7 +1,6 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-id: Apache-2.0
 
-import inspect
 import unittest
 import os
 
@@ -42,9 +41,7 @@ class TestIdentityTerraformTest(OciBaseTest):
         compartment_id, new_compartment_id = self._get_identity_compartment_details(
             identity_compartment
         )
-        session_factory = test.oci_session_factory(
-            self.__class__.__name__, inspect.currentframe().f_code.co_name
-        )
+        session_factory = test.oci_session_factory()
         policy_str = {
             "name": "filter-and-add-tags-on-compartments",
             "description": "Filter and add tags on the compartment",
@@ -63,7 +60,8 @@ class TestIdentityTerraformTest(OciBaseTest):
             "actions": [{"type": "update", "freeform_tags": {"Environment": "Development"}}],
         }
         policy = test.load_policy(policy_str, session_factory=session_factory)
-        policy.run()
+        resources = policy.run()
+        assert len(resources) == 1
         resource = self.fetch_validation_data(
             policy.resource_manager, "get_compartment", new_compartment_id
         )
@@ -75,9 +73,7 @@ class TestIdentityTerraformTest(OciBaseTest):
         compartment_id, new_compartment_id = self._get_identity_compartment_details(
             identity_compartment
         )
-        session_factory = test.oci_session_factory(
-            self.__class__.__name__, inspect.currentframe().f_code.co_name
-        )
+        session_factory = test.oci_session_factory()
         policy_str = {
             "name": "filter-and-add-tags-on-compartments",
             "description": "Filter and add tags on the compartment",
@@ -108,9 +104,7 @@ class TestIdentityTerraformTest(OciBaseTest):
         compartment_id, new_compartment_id = self._get_identity_compartment_details(
             identity_compartment
         )
-        session_factory = test.oci_session_factory(
-            self.__class__.__name__, inspect.currentframe().f_code.co_name
-        )
+        session_factory = test.oci_session_factory()
         policy_str = {
             "name": "remove-tag-from-compartment",
             "description": "Remove tag from the compartment",
@@ -133,9 +127,7 @@ class TestIdentityTerraformTest(OciBaseTest):
         compartment_id, new_compartment_id = self._get_identity_compartment_details(
             identity_compartment
         )
-        session_factory = test.oci_session_factory(
-            self.__class__.__name__, inspect.currentframe().f_code.co_name
-        )
+        session_factory = test.oci_session_factory()
         policy_str = {
             "name": "remove-invalidtag-from-compartment",
             "description": "Remove tag from the compartment that doesn't exists",
@@ -171,9 +163,7 @@ class TestIdentityTerraformTest(OciBaseTest):
             ],
             "actions": [{"type": "update", "freeform_tags": {"Environment": "Development"}}],
         }
-        session_factory = test.oci_session_factory(
-            self.__class__.__name__, inspect.currentframe().f_code.co_name
-        )
+        session_factory = test.oci_session_factory()
         policy = test.load_policy(policy_str, session_factory=session_factory)
         policy.run()
         resource = self.fetch_validation_data(policy.resource_manager, "get_group", group_id)
@@ -199,9 +189,7 @@ class TestIdentityTerraformTest(OciBaseTest):
             ],
             "actions": [{"type": "update", "freeform_tags": {"Environment": "Development"}}],
         }
-        session_factory = test.oci_session_factory(
-            self.__class__.__name__, inspect.currentframe().f_code.co_name
-        )
+        session_factory = test.oci_session_factory()
         policy = test.load_policy(policy_str, session_factory=session_factory)
         policy.run()
         resource = self.fetch_validation_data(policy.resource_manager, "get_group", group_id)
@@ -226,9 +214,7 @@ class TestIdentityTerraformTest(OciBaseTest):
             ],
             "actions": [{"type": "remove-tag", "freeform_tags": ["Cloud_Custodian"]}],
         }
-        session_factory = test.oci_session_factory(
-            self.__class__.__name__, inspect.currentframe().f_code.co_name
-        )
+        session_factory = test.oci_session_factory()
         policy = test.load_policy(policy_str, session_factory=session_factory)
         policy.run()
         resource = self.fetch_validation_data(policy.resource_manager, "get_group", group_id)
@@ -252,9 +238,7 @@ class TestIdentityTerraformTest(OciBaseTest):
             ],
             "actions": [{"type": "remove-tag", "freeform_tags": ["Cloud_Custodian1"]}],
         }
-        session_factory = test.oci_session_factory(
-            self.__class__.__name__, inspect.currentframe().f_code.co_name
-        )
+        session_factory = test.oci_session_factory()
         policy = test.load_policy(policy_str, session_factory=session_factory)
         policy.run()
         resource = self.fetch_validation_data(policy.resource_manager, "get_group", group_id)
@@ -285,9 +269,7 @@ class TestIdentityTerraformTest(OciBaseTest):
             ],
             "actions": [{"type": "update", "freeform_tags": {"key_limit": "2"}}],
         }
-        session_factory = test.oci_session_factory(
-            self.__class__.__name__, inspect.currentframe().f_code.co_name
-        )
+        session_factory = test.oci_session_factory()
         policy = test.load_policy(policy_str, session_factory=session_factory)
         policy.run()
         resource = self.fetch_validation_data(policy.resource_manager, "get_user", user_ocid)
@@ -318,9 +300,7 @@ class TestIdentityTerraformTest(OciBaseTest):
                 }
             ],
         }
-        session_factory = test.oci_session_factory(
-            self.__class__.__name__, inspect.currentframe().f_code.co_name
-        )
+        session_factory = test.oci_session_factory()
         policy = test.load_policy(policy_str, session_factory=session_factory)
         policy.run()
         resource = self.fetch_validation_data(policy.resource_manager, "get_user", user_ocid)
@@ -338,9 +318,7 @@ class TestIdentityTerraformTest(OciBaseTest):
             "filters": [{"type": "value", "key": "id", "value": user_ocid}],
             "actions": [{"type": "remove-tag", "freeform_tags": ["Cloud_Custodian"]}],
         }
-        session_factory = test.oci_session_factory(
-            self.__class__.__name__, inspect.currentframe().f_code.co_name
-        )
+        session_factory = test.oci_session_factory()
         policy = test.load_policy(policy_str, session_factory=session_factory)
         policy.run()
         resource = self.fetch_validation_data(policy.resource_manager, "get_user", user_ocid)
@@ -358,9 +336,7 @@ class TestIdentityTerraformTest(OciBaseTest):
             "filters": [{"type": "value", "key": "id", "value": user_ocid}],
             "actions": [{"type": "remove-tag", "freeform_tags": ["Cloud_Custodian_test"]}],
         }
-        session_factory = test.oci_session_factory(
-            self.__class__.__name__, inspect.currentframe().f_code.co_name
-        )
+        session_factory = test.oci_session_factory()
         policy = test.load_policy(policy_str, session_factory=session_factory)
         policy.run()
         resource = self.fetch_validation_data(policy.resource_manager, "get_user", user_ocid)
@@ -377,9 +353,7 @@ class TestIdentityTerraformTest(OciBaseTest):
             "resource": "oci.user",
             "filters": [{"type": "attributes", "key": "id", "value": user_ocid}],
         }
-        session_factory = test.oci_session_factory(
-            self.__class__.__name__, inspect.currentframe().f_code.co_name
-        )
+        session_factory = test.oci_session_factory()
         policy = test.load_policy(policy_str, session_factory=session_factory)
         resource = policy.run()
         assert resource[0] is not None
@@ -406,11 +380,8 @@ class TestIdentityTerraformTest(OciBaseTest):
                 },
             ],
         }
-        session_factory = test.oci_session_factory(
-            self.__class__.__name__, inspect.currentframe().f_code.co_name
-        )
+        session_factory = test.oci_session_factory()
         policy = test.load_policy(policy_str, session_factory=session_factory)
-        policy.run()
         resources = self.fetch_validation_data(
             policy.resource_manager, "list_auth_tokens", user_ocid
         )
@@ -443,11 +414,8 @@ class TestIdentityTerraformTest(OciBaseTest):
                 },
             ],
         }
-        session_factory = test.oci_session_factory(
-            self.__class__.__name__, inspect.currentframe().f_code.co_name
-        )
+        session_factory = test.oci_session_factory()
         policy = test.load_policy(policy_str, session_factory=session_factory)
-        policy.run()
         resources = policy.run()
         test_user_found = False
         for resource in resources:
@@ -484,9 +452,7 @@ class TestIdentityTerraformTest(OciBaseTest):
                 },
             ],
         }
-        session_factory = test.oci_session_factory(
-            self.__class__.__name__, inspect.currentframe().f_code.co_name
-        )
+        session_factory = test.oci_session_factory()
         policy = test.load_policy(policy_str, session_factory=session_factory)
         resources = policy.run()
         test_user_found = False
@@ -525,9 +491,7 @@ class TestIdentityTerraformTest(OciBaseTest):
                 },
             ],
         }
-        session_factory = test.oci_session_factory(
-            self.__class__.__name__, inspect.currentframe().f_code.co_name
-        )
+        session_factory = test.oci_session_factory()
         policy = test.load_policy(policy_str, session_factory=session_factory)
         resources = policy.run()
         test_user_found = False

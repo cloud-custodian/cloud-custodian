@@ -1,6 +1,7 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import gzip
+import inspect
 import json
 import os
 import re
@@ -90,7 +91,13 @@ class OCIFlightRecorder(CustodianTestCore):
         self.addCleanup(cm.__exit__, None, None, None)
         return SessionFactory()
 
-    def oci_session_factory(self, test_class, test_case):
+    def _extract_caller(self):
+        caller = inspect.currentframe().f_back.f_back
+        return (caller.f_locals["self"].__class__.__name__, caller.f_code.co_name)
+
+    def oci_session_factory(self, test_class=None, test_case=None):
+        if not test_class or not test_case:
+            test_class, test_case = self._extract_caller()
         if not C7N_FUNCTIONAL and self._cassette_file_exists(test_class, test_case):
             return self.replay_flight_data(test_class, test_case)
         else:
