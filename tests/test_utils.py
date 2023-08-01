@@ -5,10 +5,10 @@ import ipaddress
 import os
 import tempfile
 import time
+from unittest import mock
 
 from botocore.exceptions import ClientError
 from dateutil.parser import parse as parse_date
-import mock
 
 from c7n import utils
 from c7n.config import Config

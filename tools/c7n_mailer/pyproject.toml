@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "c7n_mailer"
-version = "0.6.28"
+version = "0.6.29"
 description = "Cloud Custodian - Reference Mailer"
 authors = ["Cloud Custodian Project"]
 license = "Apache-2.0"
@@ -19,10 +19,10 @@ c7n-mailer = 'c7n_mailer.cli:main'
 c7n-mailer-replay = 'c7n_mailer.replay:main'
 
 [tool.poetry.dependencies]
-python = "^3.7"
+python = "^3.8"
 Jinja2 = "^3.0"
 boto3 = ">=1.11.12"
-jsonschema = ">=3.2.0"
+jsonschema = ">=4.18"
 python-dateutil = "^2.8.1"
 pyyaml = ">=5.4.0"
 sendgrid = "^6.1.1"

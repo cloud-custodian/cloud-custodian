@@ -4,9 +4,9 @@ import io
 import json
 import os
 import tempfile
-import mock
 from urllib.parse import quote_plus
 
+from unittest import mock
 from unittest import TestCase
 
 from c7n.resources import s3
