@@ -2217,13 +2217,16 @@ class DbOptionGroups(ValueFilter):
 @filters.register('pending-maintenance')
 class PendingMaintenance(Filter):
     """ Scan DB instances for those with pending maintenance
+
     :example:
+
     .. code-block:: yaml
-            policies:
-              - name: rds-pending-maintenance
-                resource: rds
-                filters:
-                  - pending-maintenance
+
+        policies:
+          - name: rds-pending-maintenance
+            resource: aws.rds
+            filters:
+              - pending-maintenance
     """
 
     schema = type_schema('pending-maintenance')
