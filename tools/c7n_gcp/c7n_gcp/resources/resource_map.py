@@ -26,6 +26,7 @@ ResourceMap = {
     "gcp.cloudbilling-account": "c7n_gcp.resources.cloudbilling.CloudBillingAccount",
     "gcp.cloud-run-service": "c7n_gcp.resources.cloudrun.CloudRunService",
     "gcp.cloud-run-job": "c7n_gcp.resources.cloudrun.CloudRunJob",
+    "gcp.cloud-run-revision": "c7n_gcp.resources.cloudrun.CloudRunRevision",
     "gcp.compute-project": "c7n_gcp.resources.compute.Project",
     "gcp.dataflow-job": "c7n_gcp.resources.dataflow.DataflowJob",
     "gcp.datafusion-instance": "c7n_gcp.resources.datafusion.DatafusionInstance",

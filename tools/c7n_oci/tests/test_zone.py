@@ -91,7 +91,12 @@ class TestZone(OciBaseTest):
                 "filters": [
                     {"type": "value", "key": "freeform_tags.Project", "value": "CNCF"},
                 ],
-                "actions": [{"type": "update", "defined_tags": self.get_defined_tag("update_tag")}],
+                "actions": [
+                    {
+                        "type": "update",
+                        "defined_tags": self.get_defined_tag("update_tag"),
+                    }
+                ],
             },
             session_factory=session_factory,
         )
