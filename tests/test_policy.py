@@ -560,7 +560,7 @@ class PolicyMetaLint(BaseTest):
             'AWS::WAFv2::ManagedRuleSet',
             'AWS::WAFv2::RegexPatternSet',
             'AWS::WAFv2::RuleGroup',
-            'AWS::WAFv2::WebACL',
+            # 'AWS::WAFv2::WebACL',
             'AWS::XRay::EncryptionConfig',
             'AWS::ElasticLoadBalancingV2::Listener',
             'AWS::AccessAnalyzer::Analyzer',
@@ -613,6 +613,11 @@ class PolicyMetaLint(BaseTest):
         model = session.get_service_model('config')
         shape = model.shape_for('ResourceType')
 
+        present = resource_config_types.intersection(whitelist)
+        if present:
+            raise AssertionError(
+                "Supported config types \n %s" % ('\n'.join(sorted(present))))
+
         config_types = set(shape.enum).difference(whitelist)
         missing = config_types.difference(resource_config_types)
         if missing:
@@ -624,7 +629,7 @@ class PolicyMetaLint(BaseTest):
             'AWS::ECS::Service',
             'AWS::ECS::TaskDefinition',
             'AWS::NetworkFirewall::Firewall',
-            'AWS::WAFv2::WebACL'
+            'AWS::DMS::ReplicationTask',
         }
         bad_types = resource_config_types.difference(config_types)
         bad_types = bad_types.difference(invalid_ignore)
@@ -770,6 +775,8 @@ class PolicyMetaLint(BaseTest):
             'rest-stage', 'rest-resource', 'rest-vpclink', 'rest-client-certificate'}
         explicit = []
         whitelist_explicit = {
+            'log-export', 'securityhub-finding', 'ssm-patch-group',
+            'cognito-pool-role',
             'rest-account', 'shield-protection', 'shield-attack',
             'dlm-policy', 'efs', 'efs-mount-target', 'gamelift-build',
             'glue-connection', 'glue-dev-endpoint', 'cloudhsm-cluster',

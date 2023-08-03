@@ -1009,3 +1009,33 @@ class SubscriptionFilter(BaseAction):
         for r in resources:
             client.put_subscription_filter(
                 logGroupName=r['logGroupName'], **params)
+
+
+
+@resources.register("cloudwatch-dashboard")
+class CloudWatchDashboard(QueryResourceManager):
+    class resource_type(TypeInfo):
+        service = "cloudwatch"
+        enum_spec = ('list_dashboards', 'DashboardEntries', None)
+        arn_type = "dashboard"
+        arn = "DashboardArn"
+        id = "DashboardName"
+        name = "DashboardName"
+        cfn_type = "AWS::CloudWatch::Dashboard"
+        universal_taggable = object()
+
+    source_mapping = {
+       "describe": DescribeWithResourceTags,
+    }
+
+
+
+@resources.register("log-export")
+class LogExport(QueryResourceManager):
+    class resource_type(TypeInfo):
+        service = "logs"
+        enum_spec = ('describe_export_tasks', 'exportTasks', None)
+        arn = False
+        id = "taskId"
+        name = "taskName"
+

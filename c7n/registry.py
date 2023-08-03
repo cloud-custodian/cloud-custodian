@@ -48,6 +48,9 @@ class PluginRegistry:
     def register(self, name, klass=None, condition=True,
                  condition_message="Missing dependency for {}",
                  aliases=None):
+
+        if '.' in name:
+            name = name.split('.', 1)[-1]
         if not condition and klass:
             return klass
         # invoked as function

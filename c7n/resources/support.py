@@ -22,3 +22,16 @@ class SupportCase(QueryResourceManager):
     def get_client(self):
         region = get_support_region(self)
         return local_session(self.session_factory).client('support', region_name=region)
+
+
+
+@resources.register("aws.advisor-check")
+class AdvisorCheck(QueryResourceManager):
+    class resource_type(TypeInfo):
+        service = "support"
+        enum_spec = ('describe_trusted_advisor_checks', 'checks', None)
+        detail_spec = ('describe_trusted_advisor_check_result', 'checkId', 'id', 'result')
+        arn_type = "checks"
+        arn_service = "trustedadvisor"
+        name = id = "checkId"
+

@@ -10,6 +10,7 @@ from c7n.exceptions import PolicyValidationError
 from c7n.filters import Filter, CrossAccountAccessFilter
 from c7n.filters.kms import KmsRelatedFilter
 from c7n.query import QueryResourceManager, TypeInfo
+from c7n import query
 from c7n.manager import resources
 from c7n.tags import universal_augment
 from c7n.utils import chunks, get_retry, local_session, type_schema, filter_empty
@@ -830,3 +831,15 @@ class DeleteDataSync(Action):
                 client.delete_resource_data_sync(SyncName=r['SyncName'])
             except client.exceptions.ResourceDataSyncNotFoundException:
                 continue
+
+
+
+@resources.register("aws.ssm-patch-group")
+class SsmPatchGroup(query.QueryResourceManager):
+    class resource_type(query.TypeInfo):
+        service = "ssm"
+        enum_spec = ('describe_patch_groups', 'Mappings', None)
+        arn = False
+        id = "PatchGroup"
+        name = "PatchGroup"
+
