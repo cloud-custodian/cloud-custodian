@@ -929,6 +929,11 @@ class RDSTest(BaseTest):
             {
                 "name": "rds-pending-maintenance",
                 "resource": "rds",
+                "query": [
+                    {
+                        "DBInstanceIdentifier": "pspvd1pt"
+                    }
+                ],
                 "filters": [
                     {
                         "type": "value",
