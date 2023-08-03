@@ -28,9 +28,12 @@ class GuarddutyFinding(query.QueryResourceManager):
         service = "guardduty"
         enum_spec = ('list_findings', 'FindingIds', None)
         detail_spec = ('get_findings', 'FindingIds', None, 'Findings')
+        # guard duty is actually compound type ala ecs so format has
+        # /detector/{d_id}/finding/{f_id}
         arn_type = "finding"
         arn = "Arn"
-        id = "AccountId"
+        id = "Id"
+        name = "Description"
 
     source_mapping = {
        "describe": DescribeGuarddutyFinding,

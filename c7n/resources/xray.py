@@ -26,9 +26,11 @@ class XRayGroup(query.QueryResourceManager):
 class XRaySamplingRule(query.QueryResourceManager):
     class resource_type(query.TypeInfo):
         service = "xray"
-        enum_spec = ('get_sampling_rules', 'SamplingRuleRecords', None)
+        enum_spec = ('get_sampling_rules', 'SamplingRuleRecords.SamplingRule', None)
         arn_type = "sampling-rule"
         cfn_type = "AWS::XRay::SamplingRule"
+        name = id = "RuleName"
+        arn = "RuleARN"
         universal_taggable = object()
 
     source_mapping = {

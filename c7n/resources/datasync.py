@@ -4,24 +4,6 @@ from c7n.manager import resources
 from c7n import query
 
 
-@resources.register("aws.datasync-location")
-class DataSyncLocation(query.QueryResourceManager):
-    class resource_type(query.TypeInfo):
-        service = "datasync"
-        enum_spec = ('list_locations', 'Locations', None)
-        arn_type = "location"
-        arn = "LocationArn"
-        cfn_type = "AWS::DataSync::LocationS3"
-        config_type = "AWS::DataSync::LocationS3"
-        universal_taggable = object()
-
-    source_mapping = {
-       "describe": query.DescribeWithResourceTags,
-       "config": query.ConfigSource
-    }
-
-
-
 @resources.register("aws.datasync-agent")
 class DataSyncAgent(query.QueryResourceManager):
     class resource_type(query.TypeInfo):

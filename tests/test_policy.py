@@ -386,7 +386,6 @@ class PolicyMetaLint(BaseTest):
             "AWS::AuditManager::Assessment",
             "AWS::CloudWatch::MetricStream",
             "AWS::DeviceFarm::InstanceProfile",
-            "AWS::DeviceFarm::Project",
             "AWS::EC2::EC2Fleet",
             "AWS::EC2::SubnetRouteTableAssociation",
             "AWS::ECR::PullThroughCacheRule",
@@ -482,7 +481,6 @@ class PolicyMetaLint(BaseTest):
             'AWS::IoTSiteWise::Project',
             'AWS::IoTTwinMaker::Entity',
             'AWS::IoTTwinMaker::Workspace',
-            'AWS::Lex::Bot',
             'AWS::Lex::BotAlias',
             'AWS::Lightsail::Bucket',
             'AWS::Lightsail::Certificate',
@@ -506,7 +504,7 @@ class PolicyMetaLint(BaseTest):
             'AWS::ServiceDiscovery::HttpNamespace',
             'AWS::Transfer::Workflow',
             #
-            'AWS::ApiGatewayV2::Stage',
+            # 'AWS::ApiGatewayV2::Stage',
             'AWS::Athena::DataCatalog',
             'AWS::Athena::WorkGroup',
             'AWS::AutoScaling::ScalingPolicy',
@@ -581,7 +579,6 @@ class PolicyMetaLint(BaseTest):
             'AWS::Detective::Graph',
             'AWS::EC2::TransitGatewayRouteTable',
             'AWS::AppSync::GraphQLApi',
-            'AWS::DataSync::Task',
             'AWS::Glue::Job',
             'AWS::SageMaker::NotebookInstanceLifecycleConfig',
             'AWS::SES::ContactList',
@@ -676,6 +673,8 @@ class PolicyMetaLint(BaseTest):
             'rest-api',
             'rest-stage',
             'apigw-domain-name',
+            # our check doesn't handle nested resource types in the arn
+            'guardduty-finding',
             # synthetics ~ ie. c7n introduced since non exist.
             # or in some cases where it exists but not usable in iam.
             'scaling-policy',
@@ -776,7 +775,8 @@ class PolicyMetaLint(BaseTest):
         explicit = []
         whitelist_explicit = {
             'log-export', 'securityhub-finding', 'ssm-patch-group',
-            'cognito-pool-role',
+            'cognito-pool-role', 'appdiscovery-agent', 'appdiscovery',
+            'athena-named-query',
             'rest-account', 'shield-protection', 'shield-attack',
             'dlm-policy', 'efs', 'efs-mount-target', 'gamelift-build',
             'glue-connection', 'glue-dev-endpoint', 'cloudhsm-cluster',
