@@ -122,7 +122,6 @@ DESTINATION = 'destination'
 
 CIDR = 'Cidr'
 
-
 class NetworkSecurityGroupFilter(Filter):
     """
     Filter Network Security Groups using opened/closed ports configuration
@@ -154,7 +153,6 @@ class NetworkSecurityGroupFilter(Filter):
         if EXCEPT_PORTS in self.data:
             if not PortsRangeHelper.validate_ports_string(self.data[EXCEPT_PORTS]):
                 raise FilterValidationError("exceptPorts string has wrong format.")
-
         return True
 
     def process(self, network_security_groups, event=None):
