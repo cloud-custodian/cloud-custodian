@@ -182,18 +182,14 @@ class NetworkSecurityGroupFilter(Filter):
 
             permissions_to_expand = []
             for security_rule in nsg['properties']['securityRules']:
-                if security_rule['properties']['direction'] == self.direction_key:
+                if security_rule['properties']['direction'] == self.direction_key: # TODO How to filter only for allow / deny rules?
                     permissions_to_expand.append(security_rule['properties'])
             for perm in self.expand_permissions(permissions_to_expand):
-                perm_matches = self._process_cidrs(perm)
-                if perm_matches:
+                if self._process_cidrs(perm):
                     matching_nsg['check_cidr'] = True
-            # for perm in nsg['properties']['securityRules']:
-            #     if self._process_cidrs(nsg):
-            #         matching_nsg['check_cidr'] = True
             matching_nsg_values = list(filter(
                     lambda x: x is not None, matching_nsg.values()))
-                        # account for one python behavior any([]) == False, all([]) == True
+
             if match_op == all and not matching_nsg_values:
                 continue
 
@@ -203,7 +199,7 @@ class NetworkSecurityGroupFilter(Filter):
         return matched
 
     def expand_permissions(self, permissions):
-        """Expand each list of cidr, prefix list, user id group pair
+        """TODO Expand each list of cidr, prefix list, user id group pair
         by port/protocol as an individual rule.
 
         The console ux automatically expands them out as addition/removal is
