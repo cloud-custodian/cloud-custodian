@@ -166,8 +166,9 @@ class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
         operation, return_type, extra_args = self.resource_type.enum_spec
         return getattr(self.get_client(), operation)
 
+    # Get the session object for the respective region
     def get_session(self):
-        return local_session(self.session_factory)
+        return local_session(self.session_factory, self.config.get("region"))
 
     def get_model(self):
         return self.resource_type
