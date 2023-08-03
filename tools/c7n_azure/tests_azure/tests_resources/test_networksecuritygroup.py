@@ -238,11 +238,11 @@ class NetworkSecurityGroupTest(BaseTest):
             'filters': [
                 {'type': 'ingress',
                  'match': 'any',
+                 'access': 'deny',
                  'Cidr': {
                     'value_type': 'cidr',
                     'op': 'in',
-                    'value': ['10.0.0.0/8'],
-                    'access': 'deny'
+                    'value': ['10.0.0.0/8']
         }}]
         })
 
@@ -257,11 +257,11 @@ class NetworkSecurityGroupTest(BaseTest):
             'filters': [
                 {'type': 'ingress',
                  'match': 'any',
+                 'access': 'deny',
                  'Cidr': {
                     'value_type': 'cidr',
                     'op': 'in',
-                    'value': ['10.0.0.0/8'],
-                    'access': 'deny'
+                    'value': ['10.0.0.0/8']
         }}]
         })
 
@@ -280,12 +280,11 @@ class NetworkSecurityGroupTest(BaseTest):
                     'value_type': 'cidr',
                     'op': 'in',
                     'value': ['10.0.0.0/8'],
-                    'access': 'deny'
                 },
-                'ports': '88-90',
+                'ports': '22',
                 'ipProtocol': 'TCP',
-                'source': '*',
-                'access': 'Allow'}]
+                'access': 'Deny'
+                }]
         })
 
         resources = p.run()
@@ -302,8 +301,7 @@ class NetworkSecurityGroupTest(BaseTest):
                  'Cidr': {
                     'value_type': 'cidr',
                     'op': 'in',
-                    'value': ['10.0.0.0/8'],
-                    'access': 'deny'
+                    'value': ['10.0.0.0/8']
                 },
                 'ports': '10000',
                 'ipProtocol': 'TCP',
