@@ -230,6 +230,91 @@ class NetworkSecurityGroupTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
+    @arm_template('networksecuritygroup.json')
+    def test_cidr_only_match(self):
+        p = self.load_policy({
+            'name': 'test-azure-nsg',
+            'resource': 'azure.networksecuritygroup',
+            'filters': [
+                {'type': 'ingress',
+                 'match': 'any',
+                 'Cidr': {
+                    'value_type': 'cidr',
+                    'op': 'in',
+                    'value': ['10.0.0.0/8'],
+                    'access': 'deny'
+        }}]
+        })
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    @arm_template('networksecuritygroup.json')
+    def test_cidr_only_no_match(self):
+        p = self.load_policy({
+            'name': 'test-azure-nsg',
+            'resource': 'azure.networksecuritygroup',
+            'filters': [
+                {'type': 'ingress',
+                 'match': 'any',
+                 'Cidr': {
+                    'value_type': 'cidr',
+                    'op': 'in',
+                    'value': ['10.0.0.0/8'],
+                    'access': 'deny'
+        }}]
+        })
+
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
+    @arm_template('networksecuritygroup.json')
+    def test_cidr_and_ingress_match(self):
+        p = self.load_policy({
+            'name': 'test-azure-nsg',
+            'resource': 'azure.networksecuritygroup',
+            'filters': [
+                {'type': 'ingress',
+                 'match': 'all',
+                 'Cidr': {
+                    'value_type': 'cidr',
+                    'op': 'in',
+                    'value': ['10.0.0.0/8'],
+                    'access': 'deny'
+                },
+                'ports': '88-90',
+                'ipProtocol': 'TCP',
+                'source': '*',
+                'access': 'Allow'}]
+        })
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    @arm_template('networksecuritygroup.json')
+    def test_cidr_and_ingress_no_match(self):
+        p = self.load_policy({
+            'name': 'test-azure-nsg',
+            'resource': 'azure.networksecuritygroup',
+            'filters': [
+                {'type': 'ingress',
+                 'match': 'all',
+                 'Cidr': {
+                    'value_type': 'cidr',
+                    'op': 'in',
+                    'value': ['10.0.0.0/8'],
+                    'access': 'deny'
+                },
+                'ports': '10000',
+                'ipProtocol': 'TCP',
+                'source': '*',
+                'access': 'Allow'}]
+        })
+
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
+
 
 class NetworkSecurityGroupFlowLogsFilterTest(BaseTest):
     def test_flow_log_filter_all(self):

@@ -156,6 +156,13 @@ class NetworkSecurityGroupFilter(Filter):
         if EXCEPT_PORTS in self.data:
             if not PortsRangeHelper.validate_ports_string(self.data[EXCEPT_PORTS]):
                 raise FilterValidationError("exceptPorts string has wrong format.")
+
+        for subrule in [CIDR, CIDR6]:
+            if subrule in self.data:
+                if not self.data[subrule].get(ACCESS):
+                    raise FilterValidationError(f"Access type to filter for must be added for CIDR rules")
+                if self.data[subrule].get(ACCESS) not in ['allow', 'deny', 'any']:
+                    raise FilterValidationError(f"Access type to filter for, in CIDR rules, must be one of the following: 'allow', 'deny', 'any'")
         return True
 
     def process(self, network_security_groups, event=None):
@@ -179,12 +186,15 @@ class NetworkSecurityGroupFilter(Filter):
         matching_nsg = {}
         for nsg in network_security_groups:
             matching_nsg['check_nsg'] = self._check_nsg(nsg)
+            matching_nsg['check_cidr'] = False
 
             permissions_to_expand = []
             for security_rule in nsg['properties']['securityRules']:
                 if security_rule['properties']['direction'] == self.direction_key: # TODO How to filter only for allow / deny rules?
                     permissions_to_expand.append(security_rule['properties'])
             for perm in self.expand_permissions(permissions_to_expand):
+                # if self._process_cidrs(access_type, perm):
+                test = self._process_cidrs(perm)
                 if self._process_cidrs(perm):
                     matching_nsg['check_cidr'] = True
             matching_nsg_values = list(filter(
@@ -223,8 +233,15 @@ class NetworkSecurityGroupFilter(Filter):
 
     def _process_cidr(self, cidr_key, cidr_type, range_type, perm):
         found = None
+        access_perms = self.data[cidr_key].get(ACCESS)
+        if perm['access'].lower() != access_perms:
+            return False
+
         ip_perms = perm.get(range_type, [])
         if not ip_perms:
+            return False
+        
+        if ip_perms.lower() == "internet":
             return False
 
         match_range = self.data[cidr_key]
@@ -237,12 +254,7 @@ class NetworkSecurityGroupFilter(Filter):
         vf = ValueFilter(match_range, self.manager)
         vf.annotate = False
 
-        for ip_range in ip_perms:
-            found = vf(ip_range)
-            if found:
-                break
-            else:
-                found = False
+        found = vf({cidr_type: ip_perms})
         return found
 
     def _process_cidrs(self, perm):
