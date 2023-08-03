@@ -210,7 +210,7 @@ class NetworkSecurityGroupFilter(Filter):
         ip_perms = perm.get(range_type, [])
         if not ip_perms:
             return False
-        
+
         if ip_perms.lower() == "internet":
             return False
 
@@ -230,7 +230,11 @@ class NetworkSecurityGroupFilter(Filter):
     def _process_cidrs(self, perm):
         found_v4 = False
         if 'Cidr' in self.data:
-            found_v4 = self._process_cidr('Cidr', 'CidrIp', f"{self.data['Cidr']['ipType'].lower()}AddressPrefix", perm)
+            found_v4 = self._process_cidr(
+                'Cidr',
+                'CidrIp',
+                f"{self.data['Cidr']['ipType'].lower()}AddressPrefix",
+                perm)
         return found_v4
 
     def _check_nsg(self, nsg):
