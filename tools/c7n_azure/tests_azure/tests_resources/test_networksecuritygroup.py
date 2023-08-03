@@ -237,7 +237,7 @@ class NetworkSecurityGroupTest(BaseTest):
             'resource': 'azure.networksecuritygroup',
             'filters': [
                 {'type': 'ingress',
-                 'match': 'any',
+                 'match': 'all',
                  'access': 'Deny',
                  'Cidr': {
                     'value_type': 'cidr',
@@ -257,7 +257,7 @@ class NetworkSecurityGroupTest(BaseTest):
             'resource': 'azure.networksecuritygroup',
             'filters': [
                 {'type': 'ingress',
-                 'match': 'any',
+                 'match': 'all',
                  'access': 'Deny',
                  'Cidr': {
                     'value_type': 'cidr',
