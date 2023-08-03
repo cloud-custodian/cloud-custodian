@@ -238,7 +238,7 @@ class NetworkSecurityGroupTest(BaseTest):
             'filters': [
                 {'type': 'ingress',
                  'match': 'any',
-                 'access': 'deny',
+                 'access': 'Deny',
                  'Cidr': {
                     'value_type': 'cidr',
                     'op': 'in',
@@ -258,7 +258,7 @@ class NetworkSecurityGroupTest(BaseTest):
             'filters': [
                 {'type': 'ingress',
                  'match': 'any',
-                 'access': 'deny',
+                 'access': 'Deny',
                  'Cidr': {
                     'value_type': 'cidr',
                     'op': 'in',
