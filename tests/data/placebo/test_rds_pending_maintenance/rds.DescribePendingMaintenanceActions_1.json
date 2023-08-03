@@ -1,0 +1,224 @@
+{
+    "status_code": 200,
+    "data": {
+        "PendingMaintenanceActions": [
+            {
+                "ResourceIdentifier": "arn:aws:rds:us-west-2:644160558196:cluster:ppsp-prod-pituwt90",
+                "PendingMaintenanceActionDetails": [
+                    {
+                        "Action": "system-update",
+                        "Description": "Upgrade to Aurora PostgreSQL 14.3.5"
+                    }
+                ]
+            },
+            {
+                "ResourceIdentifier": "arn:aws:rds:us-west-2:644160558196:cluster:psp-prod-arc",
+                "PendingMaintenanceActionDetails": [
+                    {
+                        "Action": "system-update",
+                        "Description": "Upgrade to Aurora PostgreSQL 13.4.6"
+                    }
+                ]
+            },
+            {
+                "ResourceIdentifier": "arn:aws:rds:us-west-2:644160558196:cluster:psp-prod-ibob",
+                "PendingMaintenanceActionDetails": [
+                    {
+                        "Action": "system-update",
+                        "Description": "Upgrade to Aurora PostgreSQL 14.3.5"
+                    }
+                ]
+            },
+            {
+                "ResourceIdentifier": "arn:aws:rds:us-west-2:644160558196:db:ppsp-prod-pituwt901",
+                "PendingMaintenanceActionDetails": [
+                    {
+                        "Action": "system-update",
+                        "Description": "New Operating System update is available"
+                    }
+                ]
+            },
+            {
+                "ResourceIdentifier": "arn:aws:rds:us-west-2:644160558196:db:psp-par-aud1-old",
+                "PendingMaintenanceActionDetails": [
+                    {
+                        "Action": "system-update",
+                        "Description": "New Operating System patch is available"
+                    }
+                ]
+            },
+            {
+                "ResourceIdentifier": "arn:aws:rds:us-west-2:644160558196:db:psp-prod-arc1",
+                "PendingMaintenanceActionDetails": [
+                    {
+                        "Action": "system-update",
+                        "Description": "New Operating System update is available"
+                    }
+                ]
+            },
+            {
+                "ResourceIdentifier": "arn:aws:rds:us-west-2:644160558196:db:psp-prod-ibob1",
+                "PendingMaintenanceActionDetails": [
+                    {
+                        "Action": "system-update",
+                        "Description": "New Operating System patch is available"
+                    }
+                ]
+            },
+            {
+                "ResourceIdentifier": "arn:aws:rds:us-west-2:644160558196:db:psp-prod-ibob2",
+                "PendingMaintenanceActionDetails": [
+                    {
+                        "Action": "system-update",
+                        "Description": "New Operating System patch is available"
+                    }
+                ]
+            },
+            {
+                "ResourceIdentifier": "arn:aws:rds:us-west-2:644160558196:db:psp-prod-mon1",
+                "PendingMaintenanceActionDetails": [
+                    {
+                        "Action": "system-update",
+                        "Description": "New Operating System patch is available"
+                    }
+                ]
+            },
+            {
+                "ResourceIdentifier": "arn:aws:rds:us-west-2:644160558196:db:psp-prod-mon2",
+                "PendingMaintenanceActionDetails": [
+                    {
+                        "Action": "system-update",
+                        "Description": "New Operating System patch is available"
+                    }
+                ]
+            },
+            {
+                "ResourceIdentifier": "arn:aws:rds:us-west-2:644160558196:db:psp-prod-uw02",
+                "PendingMaintenanceActionDetails": [
+                    {
+                        "Action": "system-update",
+                        "Description": "New Operating System patch is available"
+                    }
+                ]
+            },
+            {
+                "ResourceIdentifier": "arn:aws:rds:us-west-2:644160558196:db:psp-prod-uw022",
+                "PendingMaintenanceActionDetails": [
+                    {
+                        "Action": "system-update",
+                        "Description": "New Operating System patch is available"
+                    }
+                ]
+            },
+            {
+                "ResourceIdentifier": "arn:aws:rds:us-west-2:644160558196:db:pspadg01",
+                "PendingMaintenanceActionDetails": [
+                    {
+                        "Action": "system-update",
+                        "Description": "New Operating System update is available"
+                    }
+                ]
+            },
+            {
+                "ResourceIdentifier": "arn:aws:rds:us-west-2:644160558196:db:pspadg02",
+                "PendingMaintenanceActionDetails": [
+                    {
+                        "Action": "system-update",
+                        "Description": "New Operating System update is available"
+                    }
+                ]
+            },
+            {
+                "ResourceIdentifier": "arn:aws:rds:us-west-2:644160558196:db:psphdg02",
+                "PendingMaintenanceActionDetails": [
+                    {
+                        "Action": "system-update",
+                        "Description": "New Operating System update is available"
+                    }
+                ]
+            },
+            {
+                "ResourceIdentifier": "arn:aws:rds:us-west-2:644160558196:db:psphpp02",
+                "PendingMaintenanceActionDetails": [
+                    {
+                        "Action": "system-update",
+                        "Description": "New Operating System update is available"
+                    }
+                ]
+            },
+            {
+                "ResourceIdentifier": "arn:aws:rds:us-west-2:644160558196:db:psphpp05",
+                "PendingMaintenanceActionDetails": [
+                    {
+                        "Action": "system-update",
+                        "Description": "New Operating System update is available"
+                    }
+                ]
+            },
+            {
+                "ResourceIdentifier": "arn:aws:rds:us-west-2:644160558196:db:psppardg-old",
+                "PendingMaintenanceActionDetails": [
+                    {
+                        "Action": "system-update",
+                        "Description": "New Operating System update is available"
+                    }
+                ]
+            },
+            {
+                "ResourceIdentifier": "arn:aws:rds:us-west-2:644160558196:db:pspparhdg-old",
+                "PendingMaintenanceActionDetails": [
+                    {
+                        "Action": "system-update",
+                        "Description": "New Operating System update is available"
+                    }
+                ]
+            },
+            {
+                "ResourceIdentifier": "arn:aws:rds:us-west-2:644160558196:db:pspparhs-old",
+                "PendingMaintenanceActionDetails": [
+                    {
+                        "Action": "system-update",
+                        "Description": "New Operating System update is available"
+                    }
+                ]
+            },
+            {
+                "ResourceIdentifier": "arn:aws:rds:us-west-2:644160558196:db:pspparmo-old",
+                "PendingMaintenanceActionDetails": [
+                    {
+                        "Action": "system-update",
+                        "Description": "New Operating System update is available"
+                    }
+                ]
+            },
+            {
+                "ResourceIdentifier": "arn:aws:rds:us-west-2:644160558196:db:psprpp01",
+                "PendingMaintenanceActionDetails": [
+                    {
+                        "Action": "system-update",
+                        "Description": "New Operating System update is available"
+                    }
+                ]
+            },
+            {
+                "ResourceIdentifier": "arn:aws:rds:us-west-2:644160558196:db:pspuwp01",
+                "PendingMaintenanceActionDetails": [
+                    {
+                        "Action": "system-update",
+                        "Description": "New Operating System update is available"
+                    }
+                ]
+            },
+            {
+                "ResourceIdentifier": "arn:aws:rds:us-west-2:644160558196:db:pspvd1pt",
+                "PendingMaintenanceActionDetails": [
+                    {
+                        "Action": "system-update",
+                        "Description": "New Operating System update is available"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

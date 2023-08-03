@@ -1,0 +1,4467 @@
+{
+    "status_code": 200,
+    "data": {
+        "DBInstances": [
+            {
+                "DBInstanceIdentifier": "ppsp-prod-pituwt901",
+                "DBInstanceClass": "db.r6g.16xlarge",
+                "Engine": "aurora-postgresql",
+                "DBInstanceStatus": "available",
+                "MasterUsername": "postgres",
+                "DBName": "pituwt90",
+                "Endpoint": {
+                    "Address": "ppsp-prod-pituwt901.cjls0bohfgpq.us-west-2.rds.amazonaws.com",
+                    "Port": 6543,
+                    "HostedZoneId": "Z1PVIF0B656C1W"
+                },
+                "AllocatedStorage": 1,
+                "InstanceCreateTime": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 10,
+                    "day": 7,
+                    "hour": 7,
+                    "minute": 50,
+                    "second": 33,
+                    "microsecond": 227000
+                },
+                "PreferredBackupWindow": "05:00-05:30",
+                "BackupRetentionPeriod": 1,
+                "DBSecurityGroups": [],
+                "VpcSecurityGroups": [
+                    {
+                        "VpcSecurityGroupId": "sg-0a53caebfef2942dd",
+                        "Status": "active"
+                    },
+                    {
+                        "VpcSecurityGroupId": "sg-0bd586b3cdc89d7b9",
+                        "Status": "active"
+                    }
+                ],
+                "DBParameterGroups": [
+                    {
+                        "DBParameterGroupName": "ppsp-shared-pitmonpg14instanceb816049c-z68zcagrs3db",
+                        "ParameterApplyStatus": "in-sync"
+                    }
+                ],
+                "AvailabilityZone": "us-west-2b",
+                "DBSubnetGroup": {
+                    "DBSubnetGroupName": "ppsp-shared-pitmondbsubnet-dz3rmo2zqiws",
+                    "DBSubnetGroupDescription": "pitmon-db-subnet",
+                    "VpcId": "vpc-0d8f1534aaab54ac6",
+                    "SubnetGroupStatus": "Complete",
+                    "Subnets": [
+                        {
+                            "SubnetIdentifier": "subnet-0f7ef67760fa393c1",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2c"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        },
+                        {
+                            "SubnetIdentifier": "subnet-0a5dc411a66975e04",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2a"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        },
+                        {
+                            "SubnetIdentifier": "subnet-08cc9c29050b7fc94",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2b"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        }
+                    ]
+                },
+                "PreferredMaintenanceWindow": "tue:12:26-tue:12:56",
+                "PendingModifiedValues": {},
+                "MultiAZ": false,
+                "EngineVersion": "14.3",
+                "AutoMinorVersionUpgrade": false,
+                "ReadReplicaDBInstanceIdentifiers": [],
+                "LicenseModel": "postgresql-license",
+                "OptionGroupMemberships": [
+                    {
+                        "OptionGroupName": "default:aurora-postgresql-14",
+                        "Status": "in-sync"
+                    }
+                ],
+                "PubliclyAccessible": false,
+                "StorageType": "aurora",
+                "DbInstancePort": 0,
+                "DBClusterIdentifier": "ppsp-prod-pituwt90",
+                "StorageEncrypted": true,
+                "KmsKeyId": "arn:aws:kms:us-west-2:644160558196:key/f2ec78eb-cd5a-4960-88ec-8541edefac04",
+                "DbiResourceId": "db-QATQ7HSSWKITOVJMPVA7P244PQ",
+                "CACertificateIdentifier": "rds-ca-2019",
+                "DomainMemberships": [],
+                "CopyTagsToSnapshot": false,
+                "MonitoringInterval": 60,
+                "EnhancedMonitoringResourceArn": "arn:aws:logs:us-west-2:644160558196:log-group:RDSOSMetrics:log-stream:db-QATQ7HSSWKITOVJMPVA7P244PQ",
+                "MonitoringRoleArn": "arn:aws:iam::644160558196:role/ppsp-prod-pituwt90-ppspprodpituwt90MonitoringRole2-3YEXJL1DWKYN",
+                "PromotionTier": 1,
+                "DBInstanceArn": "arn:aws:rds:us-west-2:644160558196:db:ppsp-prod-pituwt901",
+                "IAMDatabaseAuthenticationEnabled": false,
+                "PerformanceInsightsEnabled": true,
+                "PerformanceInsightsKMSKeyId": "arn:aws:kms:us-west-2:644160558196:key/c150232e-7ee9-49b2-9efc-b5af383ff458",
+                "PerformanceInsightsRetentionPeriod": 7,
+                "EnabledCloudwatchLogsExports": [
+                    "postgresql"
+                ],
+                "DeletionProtection": false,
+                "AssociatedRoles": [],
+                "TagList": [
+                    {
+                        "Key": "aws:cloudformation:stack-name",
+                        "Value": "ppsp-prod-pituwt90"
+                    },
+                    {
+                        "Key": "ipsauroracdk_ver",
+                        "Value": "0.6.14"
+                    },
+                    {
+                        "Key": "intuit:asset_id",
+                        "Value": "6847740825712235356"
+                    },
+                    {
+                        "Key": "aws:cloudformation:stack-id",
+                        "Value": "arn:aws:cloudformation:us-west-2:644160558196:stack/ppsp-prod-pituwt90/586d1460-4613-11ed-9659-025e3f5f6931"
+                    },
+                    {
+                        "Key": "intuit:billing:component",
+                        "Value": "PSP"
+                    },
+                    {
+                        "Key": "intuit:billing:service_assetid",
+                        "Value": "6847740825712235356"
+                    },
+                    {
+                        "Key": "dbClusterIdentifier",
+                        "Value": "ppsp-prod-pituwt90"
+                    },
+                    {
+                        "Key": "intuit:billing:bu",
+                        "Value": "SBSEG"
+                    },
+                    {
+                        "Key": "dbname",
+                        "Value": "pituwt90"
+                    },
+                    {
+                        "Key": "ipsauroramonitoring_ver",
+                        "Value": "0.0.1.5"
+                    },
+                    {
+                        "Key": "intuit:billing:appenv",
+                        "Value": "prod"
+                    },
+                    {
+                        "Key": "aws:cloudformation:logical-id",
+                        "Value": "ppspprodpituwt90Instance15A239A3B"
+                    },
+                    {
+                        "Key": "intuit:billing:fp",
+                        "Value": "PSP"
+                    },
+                    {
+                        "Key": "ipsauroratemplate_ver",
+                        "Value": "null"
+                    }
+                ],
+                "CustomerOwnedIpEnabled": false,
+                "BackupTarget": "region",
+                "NetworkType": "IPV4",
+                "StorageThroughput": 0,
+                "CertificateDetails": {
+                    "CAIdentifier": "rds-ca-2019",
+                    "ValidTill": {
+                        "__class__": "datetime",
+                        "year": 2024,
+                        "month": 8,
+                        "day": 22,
+                        "hour": 17,
+                        "minute": 8,
+                        "second": 50,
+                        "microsecond": 0
+                    }
+                }
+            },
+            {
+                "DBInstanceIdentifier": "ppsp-stg-pitparmo1",
+                "DBInstanceClass": "db.r7g.16xlarge",
+                "Engine": "aurora-postgresql",
+                "DBInstanceStatus": "available",
+                "MasterUsername": "postgres",
+                "DBName": "psppp001",
+                "Endpoint": {
+                    "Address": "ppsp-stg-pitparmo1.cjls0bohfgpq.us-west-2.rds.amazonaws.com",
+                    "Port": 6543,
+                    "HostedZoneId": "Z1PVIF0B656C1W"
+                },
+                "AllocatedStorage": 1,
+                "InstanceCreateTime": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 7,
+                    "day": 30,
+                    "hour": 7,
+                    "minute": 25,
+                    "second": 52,
+                    "microsecond": 796000
+                },
+                "PreferredBackupWindow": "05:00-05:30",
+                "BackupRetentionPeriod": 1,
+                "DBSecurityGroups": [],
+                "VpcSecurityGroups": [
+                    {
+                        "VpcSecurityGroupId": "sg-074b4dd587ff9746e",
+                        "Status": "active"
+                    },
+                    {
+                        "VpcSecurityGroupId": "sg-09222de1989dd123f",
+                        "Status": "active"
+                    },
+                    {
+                        "VpcSecurityGroupId": "sg-07efd9c9745ed5d51",
+                        "Status": "active"
+                    }
+                ],
+                "DBParameterGroups": [
+                    {
+                        "DBParameterGroupName": "ppsp-shared-pitmonpg15instance5ac2aafa-ljnyjboc0jjh",
+                        "ParameterApplyStatus": "in-sync"
+                    }
+                ],
+                "AvailabilityZone": "us-west-2a",
+                "DBSubnetGroup": {
+                    "DBSubnetGroupName": "prod-clusterdb-vpc-2",
+                    "DBSubnetGroupDescription": "prod-clusterdb-vpc-2 subnet group",
+                    "VpcId": "vpc-0d8f1534aaab54ac6",
+                    "SubnetGroupStatus": "Complete",
+                    "Subnets": [
+                        {
+                            "SubnetIdentifier": "subnet-0f7ef67760fa393c1",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2c"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        },
+                        {
+                            "SubnetIdentifier": "subnet-0a5dc411a66975e04",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2a"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        },
+                        {
+                            "SubnetIdentifier": "subnet-08cc9c29050b7fc94",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2b"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        }
+                    ]
+                },
+                "PreferredMaintenanceWindow": "fri:13:00-fri:13:30",
+                "PendingModifiedValues": {},
+                "MultiAZ": false,
+                "EngineVersion": "15.3",
+                "AutoMinorVersionUpgrade": false,
+                "ReadReplicaDBInstanceIdentifiers": [],
+                "LicenseModel": "postgresql-license",
+                "OptionGroupMemberships": [
+                    {
+                        "OptionGroupName": "default:aurora-postgresql-15",
+                        "Status": "in-sync"
+                    }
+                ],
+                "PubliclyAccessible": false,
+                "StorageType": "aurora",
+                "DbInstancePort": 0,
+                "DBClusterIdentifier": "ppsp-stg-pitparmo",
+                "StorageEncrypted": true,
+                "KmsKeyId": "arn:aws:kms:us-west-2:644160558196:key/f3f43bd6-7fd1-4e48-ae0c-4fa5ebac4cff",
+                "DbiResourceId": "db-ULL7ZRVY73Y4JCCJAI7MYDEZPQ",
+                "CACertificateIdentifier": "rds-ca-2019",
+                "DomainMemberships": [],
+                "CopyTagsToSnapshot": false,
+                "MonitoringInterval": 0,
+                "PromotionTier": 1,
+                "DBInstanceArn": "arn:aws:rds:us-west-2:644160558196:db:ppsp-stg-pitparmo1",
+                "IAMDatabaseAuthenticationEnabled": false,
+                "PerformanceInsightsEnabled": true,
+                "PerformanceInsightsKMSKeyId": "arn:aws:kms:us-west-2:644160558196:key/c150232e-7ee9-49b2-9efc-b5af383ff458",
+                "PerformanceInsightsRetentionPeriod": 7,
+                "EnabledCloudwatchLogsExports": [
+                    "postgresql"
+                ],
+                "DeletionProtection": false,
+                "AssociatedRoles": [],
+                "TagList": [],
+                "CustomerOwnedIpEnabled": false,
+                "BackupTarget": "region",
+                "NetworkType": "IPV4",
+                "StorageThroughput": 0,
+                "CertificateDetails": {
+                    "CAIdentifier": "rds-ca-2019",
+                    "ValidTill": {
+                        "__class__": "datetime",
+                        "year": 2024,
+                        "month": 8,
+                        "day": 22,
+                        "hour": 17,
+                        "minute": 8,
+                        "second": 50,
+                        "microsecond": 0
+                    }
+                }
+            },
+            {
+                "DBInstanceIdentifier": "ppsp-stg-pitparmo1-old",
+                "DBInstanceClass": "db.r7g.16xlarge",
+                "Engine": "aurora-postgresql",
+                "DBInstanceStatus": "available",
+                "MasterUsername": "postgres",
+                "DBName": "pspmondb",
+                "Endpoint": {
+                    "Address": "ppsp-stg-pitparmo1-old.cjls0bohfgpq.us-west-2.rds.amazonaws.com",
+                    "Port": 6543,
+                    "HostedZoneId": "Z1PVIF0B656C1W"
+                },
+                "AllocatedStorage": 1,
+                "InstanceCreateTime": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 7,
+                    "day": 15,
+                    "hour": 17,
+                    "minute": 18,
+                    "second": 12,
+                    "microsecond": 401000
+                },
+                "PreferredBackupWindow": "05:00-05:30",
+                "BackupRetentionPeriod": 1,
+                "DBSecurityGroups": [],
+                "VpcSecurityGroups": [
+                    {
+                        "VpcSecurityGroupId": "sg-09222de1989dd123f",
+                        "Status": "active"
+                    },
+                    {
+                        "VpcSecurityGroupId": "sg-07efd9c9745ed5d51",
+                        "Status": "active"
+                    },
+                    {
+                        "VpcSecurityGroupId": "sg-074b4dd587ff9746e",
+                        "Status": "active"
+                    }
+                ],
+                "DBParameterGroups": [
+                    {
+                        "DBParameterGroupName": "ppsp-shared-pitmonpg15instance5ac2aafa-ljnyjboc0jjh",
+                        "ParameterApplyStatus": "in-sync"
+                    }
+                ],
+                "AvailabilityZone": "us-west-2a",
+                "DBSubnetGroup": {
+                    "DBSubnetGroupName": "prod-clusterdb-vpc-2",
+                    "DBSubnetGroupDescription": "prod-clusterdb-vpc-2 subnet group",
+                    "VpcId": "vpc-0d8f1534aaab54ac6",
+                    "SubnetGroupStatus": "Complete",
+                    "Subnets": [
+                        {
+                            "SubnetIdentifier": "subnet-0f7ef67760fa393c1",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2c"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        },
+                        {
+                            "SubnetIdentifier": "subnet-0a5dc411a66975e04",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2a"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        },
+                        {
+                            "SubnetIdentifier": "subnet-08cc9c29050b7fc94",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2b"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        }
+                    ]
+                },
+                "PreferredMaintenanceWindow": "tue:11:26-tue:11:56",
+                "PendingModifiedValues": {},
+                "MultiAZ": false,
+                "EngineVersion": "15.3",
+                "AutoMinorVersionUpgrade": false,
+                "ReadReplicaDBInstanceIdentifiers": [],
+                "LicenseModel": "postgresql-license",
+                "OptionGroupMemberships": [
+                    {
+                        "OptionGroupName": "default:aurora-postgresql-15",
+                        "Status": "in-sync"
+                    }
+                ],
+                "PubliclyAccessible": false,
+                "StorageType": "aurora",
+                "DbInstancePort": 0,
+                "DBClusterIdentifier": "ppsp-stg-pitparmo-old",
+                "StorageEncrypted": true,
+                "KmsKeyId": "arn:aws:kms:us-west-2:644160558196:key/c150232e-7ee9-49b2-9efc-b5af383ff458",
+                "DbiResourceId": "db-OVBBIY24HZJHPS4QJX4LDVDES4",
+                "CACertificateIdentifier": "rds-ca-2019",
+                "DomainMemberships": [],
+                "CopyTagsToSnapshot": false,
+                "MonitoringInterval": 60,
+                "EnhancedMonitoringResourceArn": "arn:aws:logs:us-west-2:644160558196:log-group:RDSOSMetrics:log-stream:db-OVBBIY24HZJHPS4QJX4LDVDES4",
+                "MonitoringRoleArn": "arn:aws:iam::644160558196:role/rds-monitoring-role",
+                "PromotionTier": 1,
+                "DBInstanceArn": "arn:aws:rds:us-west-2:644160558196:db:ppsp-stg-pitparmo1-old",
+                "IAMDatabaseAuthenticationEnabled": false,
+                "PerformanceInsightsEnabled": true,
+                "PerformanceInsightsKMSKeyId": "arn:aws:kms:us-west-2:644160558196:key/c150232e-7ee9-49b2-9efc-b5af383ff458",
+                "PerformanceInsightsRetentionPeriod": 7,
+                "EnabledCloudwatchLogsExports": [
+                    "postgresql"
+                ],
+                "DeletionProtection": false,
+                "AssociatedRoles": [],
+                "TagList": [],
+                "CustomerOwnedIpEnabled": false,
+                "BackupTarget": "region",
+                "NetworkType": "IPV4",
+                "StorageThroughput": 0,
+                "CertificateDetails": {
+                    "CAIdentifier": "rds-ca-2019",
+                    "ValidTill": {
+                        "__class__": "datetime",
+                        "year": 2024,
+                        "month": 8,
+                        "day": 22,
+                        "hour": 17,
+                        "minute": 8,
+                        "second": 50,
+                        "microsecond": 0
+                    }
+                }
+            },
+            {
+                "DBInstanceIdentifier": "pspadg01",
+                "DBInstanceClass": "db.r5.24xlarge",
+                "Engine": "oracle-ee",
+                "DBInstanceStatus": "available",
+                "MasterUsername": "intuadmin",
+                "DBName": "PSPUWP01",
+                "Endpoint": {
+                    "Address": "pspadg01.cjls0bohfgpq.us-west-2.rds.amazonaws.com",
+                    "Port": 1521,
+                    "HostedZoneId": "Z1PVIF0B656C1W"
+                },
+                "AllocatedStorage": 47300,
+                "InstanceCreateTime": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 9,
+                    "day": 29,
+                    "hour": 10,
+                    "minute": 23,
+                    "second": 19,
+                    "microsecond": 460000
+                },
+                "PreferredBackupWindow": "05:00-05:30",
+                "BackupRetentionPeriod": 0,
+                "DBSecurityGroups": [],
+                "VpcSecurityGroups": [
+                    {
+                        "VpcSecurityGroupId": "sg-0f3c88c0016a399e9",
+                        "Status": "active"
+                    },
+                    {
+                        "VpcSecurityGroupId": "sg-005617ab918388f2b",
+                        "Status": "active"
+                    },
+                    {
+                        "VpcSecurityGroupId": "sg-01133f66122682f0b",
+                        "Status": "active"
+                    }
+                ],
+                "DBParameterGroups": [
+                    {
+                        "DBParameterGroupName": "oracle-ee-19-psp-prod-clusterdb-vpc-2",
+                        "ParameterApplyStatus": "in-sync"
+                    }
+                ],
+                "AvailabilityZone": "us-west-2c",
+                "DBSubnetGroup": {
+                    "DBSubnetGroupName": "prod-clusterdb-vpc-2",
+                    "DBSubnetGroupDescription": "prod-clusterdb-vpc-2 subnet group",
+                    "VpcId": "vpc-0d8f1534aaab54ac6",
+                    "SubnetGroupStatus": "Complete",
+                    "Subnets": [
+                        {
+                            "SubnetIdentifier": "subnet-0f7ef67760fa393c1",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2c"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        },
+                        {
+                            "SubnetIdentifier": "subnet-0a5dc411a66975e04",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2a"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        },
+                        {
+                            "SubnetIdentifier": "subnet-08cc9c29050b7fc94",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2b"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        }
+                    ]
+                },
+                "PreferredMaintenanceWindow": "mon:06:00-mon:06:30",
+                "PendingModifiedValues": {},
+                "MultiAZ": true,
+                "EngineVersion": "19.0.0.0.ru-2020-04.rur-2020-04.r1",
+                "AutoMinorVersionUpgrade": false,
+                "ReadReplicaSourceDBInstanceIdentifier": "pspuwp01",
+                "ReadReplicaDBInstanceIdentifiers": [],
+                "ReplicaMode": "open-read-only",
+                "LicenseModel": "bring-your-own-license",
+                "Iops": 23650,
+                "OptionGroupMemberships": [
+                    {
+                        "OptionGroupName": "oracle-ee-19-prod-clusterdb-vpc-2",
+                        "Status": "in-sync"
+                    }
+                ],
+                "CharacterSetName": "AL32UTF8",
+                "NcharCharacterSetName": "AL16UTF16",
+                "SecondaryAvailabilityZone": "us-west-2b",
+                "PubliclyAccessible": false,
+                "StatusInfos": [
+                    {
+                        "StatusType": "read replication",
+                        "Normal": true,
+                        "Status": "replicating"
+                    }
+                ],
+                "StorageType": "io1",
+                "DbInstancePort": 0,
+                "StorageEncrypted": true,
+                "KmsKeyId": "arn:aws:kms:us-west-2:644160558196:key/d8e5eb49-fe55-44e4-9fb4-7911b9fc1328",
+                "DbiResourceId": "db-3SYYPUSP6T2LGITI6E4SFLNRRA",
+                "CACertificateIdentifier": "rds-ca-2019",
+                "DomainMemberships": [],
+                "CopyTagsToSnapshot": false,
+                "MonitoringInterval": 1,
+                "EnhancedMonitoringResourceArn": "arn:aws:logs:us-west-2:644160558196:log-group:RDSOSMetrics:log-stream:db-3SYYPUSP6T2LGITI6E4SFLNRRA",
+                "MonitoringRoleArn": "arn:aws:iam::644160558196:role/rds-monitoring-role",
+                "DBInstanceArn": "arn:aws:rds:us-west-2:644160558196:db:pspadg01",
+                "IAMDatabaseAuthenticationEnabled": false,
+                "PerformanceInsightsEnabled": false,
+                "EnabledCloudwatchLogsExports": [
+                    "alert"
+                ],
+                "DeletionProtection": true,
+                "AssociatedRoles": [],
+                "TagList": [],
+                "CustomerOwnedIpEnabled": false,
+                "ActivityStreamStatus": "stopped",
+                "BackupTarget": "region",
+                "NetworkType": "IPV4",
+                "CertificateDetails": {
+                    "CAIdentifier": "rds-ca-2019",
+                    "ValidTill": {
+                        "__class__": "datetime",
+                        "year": 2024,
+                        "month": 8,
+                        "day": 22,
+                        "hour": 17,
+                        "minute": 8,
+                        "second": 50,
+                        "microsecond": 0
+                    }
+                }
+            },
+            {
+                "DBInstanceIdentifier": "pspadg02",
+                "DBInstanceClass": "db.r5.16xlarge",
+                "Engine": "oracle-ee",
+                "DBInstanceStatus": "available",
+                "MasterUsername": "intuadmin",
+                "DBName": "PSPUWP01",
+                "Endpoint": {
+                    "Address": "pspadg02.cjls0bohfgpq.us-west-2.rds.amazonaws.com",
+                    "Port": 1521,
+                    "HostedZoneId": "Z1PVIF0B656C1W"
+                },
+                "AllocatedStorage": 47300,
+                "InstanceCreateTime": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 6,
+                    "day": 24,
+                    "hour": 5,
+                    "minute": 21,
+                    "second": 41,
+                    "microsecond": 182000
+                },
+                "PreferredBackupWindow": "02:00-02:30",
+                "BackupRetentionPeriod": 0,
+                "DBSecurityGroups": [],
+                "VpcSecurityGroups": [
+                    {
+                        "VpcSecurityGroupId": "sg-0f3c88c0016a399e9",
+                        "Status": "active"
+                    },
+                    {
+                        "VpcSecurityGroupId": "sg-005617ab918388f2b",
+                        "Status": "active"
+                    },
+                    {
+                        "VpcSecurityGroupId": "sg-01133f66122682f0b",
+                        "Status": "active"
+                    }
+                ],
+                "DBParameterGroups": [
+                    {
+                        "DBParameterGroupName": "oracle-ee-19-psp-prod-clusterdb-vpc-2",
+                        "ParameterApplyStatus": "in-sync"
+                    }
+                ],
+                "AvailabilityZone": "us-west-2a",
+                "DBSubnetGroup": {
+                    "DBSubnetGroupName": "prod-clusterdb-vpc-2",
+                    "DBSubnetGroupDescription": "prod-clusterdb-vpc-2 subnet group",
+                    "VpcId": "vpc-0d8f1534aaab54ac6",
+                    "SubnetGroupStatus": "Complete",
+                    "Subnets": [
+                        {
+                            "SubnetIdentifier": "subnet-0f7ef67760fa393c1",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2c"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        },
+                        {
+                            "SubnetIdentifier": "subnet-0a5dc411a66975e04",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2a"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        },
+                        {
+                            "SubnetIdentifier": "subnet-08cc9c29050b7fc94",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2b"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        }
+                    ]
+                },
+                "PreferredMaintenanceWindow": "mon:06:00-mon:06:30",
+                "PendingModifiedValues": {},
+                "MultiAZ": false,
+                "EngineVersion": "19.0.0.0.ru-2020-04.rur-2020-04.r1",
+                "AutoMinorVersionUpgrade": false,
+                "ReadReplicaSourceDBInstanceIdentifier": "pspuwp01",
+                "ReadReplicaDBInstanceIdentifiers": [],
+                "ReplicaMode": "open-read-only",
+                "LicenseModel": "bring-your-own-license",
+                "Iops": 50000,
+                "OptionGroupMemberships": [
+                    {
+                        "OptionGroupName": "oracle-ee-19-prod-clusterdb-vpc-2",
+                        "Status": "in-sync"
+                    }
+                ],
+                "CharacterSetName": "AL32UTF8",
+                "NcharCharacterSetName": "AL16UTF16",
+                "PubliclyAccessible": false,
+                "StatusInfos": [
+                    {
+                        "StatusType": "read replication",
+                        "Normal": true,
+                        "Status": "replicating"
+                    }
+                ],
+                "StorageType": "io1",
+                "DbInstancePort": 0,
+                "StorageEncrypted": true,
+                "KmsKeyId": "arn:aws:kms:us-west-2:644160558196:key/d8e5eb49-fe55-44e4-9fb4-7911b9fc1328",
+                "DbiResourceId": "db-4IOWW47G4N3Y2DJ3BIVOVZPXOM",
+                "CACertificateIdentifier": "rds-ca-2019",
+                "DomainMemberships": [],
+                "CopyTagsToSnapshot": false,
+                "MonitoringInterval": 60,
+                "EnhancedMonitoringResourceArn": "arn:aws:logs:us-west-2:644160558196:log-group:RDSOSMetrics:log-stream:db-4IOWW47G4N3Y2DJ3BIVOVZPXOM",
+                "MonitoringRoleArn": "arn:aws:iam::644160558196:role/rds-monitoring-role",
+                "DBInstanceArn": "arn:aws:rds:us-west-2:644160558196:db:pspadg02",
+                "IAMDatabaseAuthenticationEnabled": false,
+                "PerformanceInsightsEnabled": true,
+                "PerformanceInsightsKMSKeyId": "arn:aws:kms:us-west-2:644160558196:key/d8e5eb49-fe55-44e4-9fb4-7911b9fc1328",
+                "PerformanceInsightsRetentionPeriod": 7,
+                "EnabledCloudwatchLogsExports": [
+                    "alert"
+                ],
+                "DeletionProtection": true,
+                "AssociatedRoles": [],
+                "TagList": [],
+                "CustomerOwnedIpEnabled": false,
+                "ActivityStreamStatus": "stopped",
+                "BackupTarget": "region",
+                "NetworkType": "IPV4",
+                "CertificateDetails": {
+                    "CAIdentifier": "rds-ca-2019",
+                    "ValidTill": {
+                        "__class__": "datetime",
+                        "year": 2024,
+                        "month": 8,
+                        "day": 22,
+                        "hour": 17,
+                        "minute": 8,
+                        "second": 50,
+                        "microsecond": 0
+                    }
+                }
+            },
+            {
+                "DBInstanceIdentifier": "psphdg02",
+                "DBInstanceClass": "db.r5.16xlarge",
+                "Engine": "oracle-ee",
+                "DBInstanceStatus": "available",
+                "MasterUsername": "intuadmin",
+                "DBName": "PSPHPP02",
+                "Endpoint": {
+                    "Address": "psphdg02.cjls0bohfgpq.us-west-2.rds.amazonaws.com",
+                    "Port": 1521,
+                    "HostedZoneId": "Z1PVIF0B656C1W"
+                },
+                "AllocatedStorage": 55500,
+                "InstanceCreateTime": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 7,
+                    "day": 11,
+                    "hour": 12,
+                    "minute": 39,
+                    "second": 28,
+                    "microsecond": 675000
+                },
+                "PreferredBackupWindow": "05:00-05:30",
+                "BackupRetentionPeriod": 0,
+                "DBSecurityGroups": [],
+                "VpcSecurityGroups": [
+                    {
+                        "VpcSecurityGroupId": "sg-03b55c3225c7af3d4",
+                        "Status": "active"
+                    },
+                    {
+                        "VpcSecurityGroupId": "sg-01133f66122682f0b",
+                        "Status": "active"
+                    }
+                ],
+                "DBParameterGroups": [
+                    {
+                        "DBParameterGroupName": "oracle-ee-19-psp-prod-clusterdb-vpc-2-hash",
+                        "ParameterApplyStatus": "in-sync"
+                    }
+                ],
+                "AvailabilityZone": "us-west-2a",
+                "DBSubnetGroup": {
+                    "DBSubnetGroupName": "prod-clusterdb-vpc-2",
+                    "DBSubnetGroupDescription": "prod-clusterdb-vpc-2 subnet group",
+                    "VpcId": "vpc-0d8f1534aaab54ac6",
+                    "SubnetGroupStatus": "Complete",
+                    "Subnets": [
+                        {
+                            "SubnetIdentifier": "subnet-0f7ef67760fa393c1",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2c"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        },
+                        {
+                            "SubnetIdentifier": "subnet-0a5dc411a66975e04",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2a"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        },
+                        {
+                            "SubnetIdentifier": "subnet-08cc9c29050b7fc94",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2b"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        }
+                    ]
+                },
+                "PreferredMaintenanceWindow": "mon:06:00-mon:06:30",
+                "PendingModifiedValues": {},
+                "MultiAZ": false,
+                "EngineVersion": "19.0.0.0.ru-2023-01.rur-2023-01.r2",
+                "AutoMinorVersionUpgrade": false,
+                "ReadReplicaSourceDBInstanceIdentifier": "psphpp02",
+                "ReadReplicaDBInstanceIdentifiers": [],
+                "ReplicaMode": "open-read-only",
+                "LicenseModel": "bring-your-own-license",
+                "Iops": 50000,
+                "OptionGroupMemberships": [
+                    {
+                        "OptionGroupName": "oracle-ee-19-prod-clusterdb-vpc-2",
+                        "Status": "in-sync"
+                    }
+                ],
+                "CharacterSetName": "AL32UTF8",
+                "NcharCharacterSetName": "AL16UTF16",
+                "PubliclyAccessible": false,
+                "StatusInfos": [
+                    {
+                        "StatusType": "read replication",
+                        "Normal": true,
+                        "Status": "replicating"
+                    }
+                ],
+                "StorageType": "io1",
+                "DbInstancePort": 0,
+                "StorageEncrypted": true,
+                "KmsKeyId": "arn:aws:kms:us-west-2:644160558196:key/f70d6396-d818-401e-985b-8fb2258d98f0",
+                "DbiResourceId": "db-IBJGXVKZJAAJFZH4AA2U37P23Y",
+                "CACertificateIdentifier": "rds-ca-2019",
+                "DomainMemberships": [],
+                "CopyTagsToSnapshot": false,
+                "MonitoringInterval": 0,
+                "DBInstanceArn": "arn:aws:rds:us-west-2:644160558196:db:psphdg02",
+                "IAMDatabaseAuthenticationEnabled": false,
+                "PerformanceInsightsEnabled": true,
+                "PerformanceInsightsKMSKeyId": "arn:aws:kms:us-west-2:644160558196:key/c150232e-7ee9-49b2-9efc-b5af383ff458",
+                "PerformanceInsightsRetentionPeriod": 7,
+                "EnabledCloudwatchLogsExports": [
+                    "alert"
+                ],
+                "DeletionProtection": true,
+                "AssociatedRoles": [],
+                "TagList": [],
+                "CustomerOwnedIpEnabled": false,
+                "ActivityStreamStatus": "stopped",
+                "BackupTarget": "region",
+                "NetworkType": "IPV4",
+                "StorageThroughput": 0,
+                "CertificateDetails": {
+                    "CAIdentifier": "rds-ca-2019",
+                    "ValidTill": {
+                        "__class__": "datetime",
+                        "year": 2024,
+                        "month": 8,
+                        "day": 22,
+                        "hour": 17,
+                        "minute": 8,
+                        "second": 50,
+                        "microsecond": 0
+                    }
+                }
+            },
+            {
+                "DBInstanceIdentifier": "psphpp02",
+                "DBInstanceClass": "db.r5.16xlarge",
+                "Engine": "oracle-ee",
+                "DBInstanceStatus": "available",
+                "MasterUsername": "intuadmin",
+                "DBName": "PSPHPP02",
+                "Endpoint": {
+                    "Address": "psphpp02.cjls0bohfgpq.us-west-2.rds.amazonaws.com",
+                    "Port": 1521,
+                    "HostedZoneId": "Z1PVIF0B656C1W"
+                },
+                "AllocatedStorage": 55500,
+                "InstanceCreateTime": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 4,
+                    "day": 8,
+                    "hour": 7,
+                    "minute": 34,
+                    "second": 23,
+                    "microsecond": 285000
+                },
+                "PreferredBackupWindow": "05:00-05:30",
+                "BackupRetentionPeriod": 35,
+                "DBSecurityGroups": [],
+                "VpcSecurityGroups": [
+                    {
+                        "VpcSecurityGroupId": "sg-03b55c3225c7af3d4",
+                        "Status": "active"
+                    },
+                    {
+                        "VpcSecurityGroupId": "sg-01133f66122682f0b",
+                        "Status": "active"
+                    }
+                ],
+                "DBParameterGroups": [
+                    {
+                        "DBParameterGroupName": "oracle-ee-19-psp-prod-clusterdb-vpc-2-hash",
+                        "ParameterApplyStatus": "in-sync"
+                    }
+                ],
+                "AvailabilityZone": "us-west-2b",
+                "DBSubnetGroup": {
+                    "DBSubnetGroupName": "prod-clusterdb-vpc-2",
+                    "DBSubnetGroupDescription": "prod-clusterdb-vpc-2 subnet group",
+                    "VpcId": "vpc-0d8f1534aaab54ac6",
+                    "SubnetGroupStatus": "Complete",
+                    "Subnets": [
+                        {
+                            "SubnetIdentifier": "subnet-0f7ef67760fa393c1",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2c"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        },
+                        {
+                            "SubnetIdentifier": "subnet-0a5dc411a66975e04",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2a"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        },
+                        {
+                            "SubnetIdentifier": "subnet-08cc9c29050b7fc94",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2b"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        }
+                    ]
+                },
+                "PreferredMaintenanceWindow": "mon:06:00-mon:06:30",
+                "PendingModifiedValues": {},
+                "LatestRestorableTime": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 8,
+                    "day": 3,
+                    "hour": 10,
+                    "minute": 28,
+                    "second": 11,
+                    "microsecond": 0
+                },
+                "MultiAZ": false,
+                "EngineVersion": "19.0.0.0.ru-2023-01.rur-2023-01.r2",
+                "AutoMinorVersionUpgrade": false,
+                "ReadReplicaDBInstanceIdentifiers": [
+                    "psphdg02"
+                ],
+                "LicenseModel": "bring-your-own-license",
+                "Iops": 50000,
+                "OptionGroupMemberships": [
+                    {
+                        "OptionGroupName": "oracle-ee-19-prod-clusterdb-vpc-2",
+                        "Status": "in-sync"
+                    }
+                ],
+                "CharacterSetName": "AL32UTF8",
+                "NcharCharacterSetName": "AL16UTF16",
+                "PubliclyAccessible": false,
+                "StorageType": "io1",
+                "DbInstancePort": 0,
+                "StorageEncrypted": true,
+                "KmsKeyId": "arn:aws:kms:us-west-2:644160558196:key/f70d6396-d818-401e-985b-8fb2258d98f0",
+                "DbiResourceId": "db-EER5IAPK357GBGZMB2UJELWVTA",
+                "CACertificateIdentifier": "rds-ca-2019",
+                "DomainMemberships": [],
+                "CopyTagsToSnapshot": true,
+                "MonitoringInterval": 60,
+                "EnhancedMonitoringResourceArn": "arn:aws:logs:us-west-2:644160558196:log-group:RDSOSMetrics:log-stream:db-EER5IAPK357GBGZMB2UJELWVTA",
+                "MonitoringRoleArn": "arn:aws:iam::644160558196:role/rds-monitoring-role",
+                "DBInstanceArn": "arn:aws:rds:us-west-2:644160558196:db:psphpp02",
+                "IAMDatabaseAuthenticationEnabled": false,
+                "PerformanceInsightsEnabled": false,
+                "EnabledCloudwatchLogsExports": [
+                    "alert"
+                ],
+                "DeletionProtection": true,
+                "AssociatedRoles": [],
+                "TagList": [
+                    {
+                        "Key": "aws:cloudformation:stack-name",
+                        "Value": "rds-psphpp02-20230408T125133"
+                    },
+                    {
+                        "Key": "cluster",
+                        "Value": ""
+                    },
+                    {
+                        "Key": "aws:cloudformation:logical-id",
+                        "Value": "DBInstance"
+                    },
+                    {
+                        "Key": "aws:cloudformation:stack-id",
+                        "Value": "arn:aws:cloudformation:us-west-2:644160558196:stack/rds-psphpp02-20230408T125133/fefb1570-d5dd-11ed-a34f-02624115e995"
+                    },
+                    {
+                        "Key": "env",
+                        "Value": "prd"
+                    }
+                ],
+                "CustomerOwnedIpEnabled": false,
+                "ActivityStreamStatus": "stopped",
+                "BackupTarget": "region",
+                "NetworkType": "IPV4",
+                "CertificateDetails": {
+                    "CAIdentifier": "rds-ca-2019",
+                    "ValidTill": {
+                        "__class__": "datetime",
+                        "year": 2024,
+                        "month": 8,
+                        "day": 22,
+                        "hour": 17,
+                        "minute": 8,
+                        "second": 50,
+                        "microsecond": 0
+                    }
+                }
+            },
+            {
+                "DBInstanceIdentifier": "psphpp05",
+                "DBInstanceClass": "db.r5.16xlarge",
+                "Engine": "oracle-ee",
+                "DBInstanceStatus": "available",
+                "MasterUsername": "intuadmin",
+                "DBName": "PSPHPP05",
+                "Endpoint": {
+                    "Address": "psphpp05.cjls0bohfgpq.us-west-2.rds.amazonaws.com",
+                    "Port": 1521,
+                    "HostedZoneId": "Z1PVIF0B656C1W"
+                },
+                "AllocatedStorage": 55500,
+                "InstanceCreateTime": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 7,
+                    "day": 12,
+                    "hour": 1,
+                    "minute": 36,
+                    "second": 18,
+                    "microsecond": 329000
+                },
+                "PreferredBackupWindow": "05:00-05:30",
+                "BackupRetentionPeriod": 35,
+                "DBSecurityGroups": [],
+                "VpcSecurityGroups": [
+                    {
+                        "VpcSecurityGroupId": "sg-03b55c3225c7af3d4",
+                        "Status": "active"
+                    },
+                    {
+                        "VpcSecurityGroupId": "sg-01133f66122682f0b",
+                        "Status": "active"
+                    }
+                ],
+                "DBParameterGroups": [
+                    {
+                        "DBParameterGroupName": "oracle-ee-19-psp-prod-clusterdb-vpc-2-hash",
+                        "ParameterApplyStatus": "in-sync"
+                    }
+                ],
+                "AvailabilityZone": "us-west-2b",
+                "DBSubnetGroup": {
+                    "DBSubnetGroupName": "prod-clusterdb-vpc-2",
+                    "DBSubnetGroupDescription": "prod-clusterdb-vpc-2 subnet group",
+                    "VpcId": "vpc-0d8f1534aaab54ac6",
+                    "SubnetGroupStatus": "Complete",
+                    "Subnets": [
+                        {
+                            "SubnetIdentifier": "subnet-0f7ef67760fa393c1",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2c"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        },
+                        {
+                            "SubnetIdentifier": "subnet-0a5dc411a66975e04",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2a"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        },
+                        {
+                            "SubnetIdentifier": "subnet-08cc9c29050b7fc94",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2b"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        }
+                    ]
+                },
+                "PreferredMaintenanceWindow": "mon:06:00-mon:06:30",
+                "PendingModifiedValues": {},
+                "LatestRestorableTime": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 8,
+                    "day": 3,
+                    "hour": 10,
+                    "minute": 28,
+                    "second": 24,
+                    "microsecond": 0
+                },
+                "MultiAZ": false,
+                "EngineVersion": "19.0.0.0.ru-2023-01.rur-2023-01.r2",
+                "AutoMinorVersionUpgrade": false,
+                "ReadReplicaDBInstanceIdentifiers": [],
+                "LicenseModel": "bring-your-own-license",
+                "Iops": 50000,
+                "OptionGroupMemberships": [
+                    {
+                        "OptionGroupName": "oracle-ee-19-prod-clusterdb-vpc-2",
+                        "Status": "in-sync"
+                    }
+                ],
+                "CharacterSetName": "AL32UTF8",
+                "NcharCharacterSetName": "AL16UTF16",
+                "PubliclyAccessible": false,
+                "StorageType": "io1",
+                "DbInstancePort": 0,
+                "StorageEncrypted": true,
+                "KmsKeyId": "arn:aws:kms:us-west-2:644160558196:key/f70d6396-d818-401e-985b-8fb2258d98f0",
+                "DbiResourceId": "db-JIJJFX5W5MB7FTHRXX3OXVJVIY",
+                "CACertificateIdentifier": "rds-ca-2019",
+                "DomainMemberships": [],
+                "CopyTagsToSnapshot": false,
+                "MonitoringInterval": 0,
+                "DBInstanceArn": "arn:aws:rds:us-west-2:644160558196:db:psphpp05",
+                "IAMDatabaseAuthenticationEnabled": false,
+                "PerformanceInsightsEnabled": false,
+                "EnabledCloudwatchLogsExports": [
+                    "alert"
+                ],
+                "DeletionProtection": true,
+                "AssociatedRoles": [],
+                "TagList": [
+                    {
+                        "Key": "env",
+                        "Value": "prd"
+                    },
+                    {
+                        "Key": "cluster",
+                        "Value": ""
+                    }
+                ],
+                "CustomerOwnedIpEnabled": false,
+                "ActivityStreamStatus": "stopped",
+                "BackupTarget": "region",
+                "NetworkType": "IPV4",
+                "StorageThroughput": 0,
+                "CertificateDetails": {
+                    "CAIdentifier": "rds-ca-2019",
+                    "ValidTill": {
+                        "__class__": "datetime",
+                        "year": 2024,
+                        "month": 8,
+                        "day": 22,
+                        "hour": 17,
+                        "minute": 8,
+                        "second": 50,
+                        "microsecond": 0
+                    }
+                }
+            },
+            {
+                "DBInstanceIdentifier": "psphpp06",
+                "DBInstanceClass": "db.r5.16xlarge",
+                "Engine": "oracle-ee",
+                "DBInstanceStatus": "available",
+                "MasterUsername": "intuadmin",
+                "DBName": "PSPHPP06",
+                "Endpoint": {
+                    "Address": "psphpp06.cjls0bohfgpq.us-west-2.rds.amazonaws.com",
+                    "Port": 1521,
+                    "HostedZoneId": "Z1PVIF0B656C1W"
+                },
+                "AllocatedStorage": 55500,
+                "InstanceCreateTime": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 7,
+                    "day": 26,
+                    "hour": 15,
+                    "minute": 40,
+                    "second": 19,
+                    "microsecond": 977000
+                },
+                "PreferredBackupWindow": "05:00-05:30",
+                "BackupRetentionPeriod": 35,
+                "DBSecurityGroups": [],
+                "VpcSecurityGroups": [
+                    {
+                        "VpcSecurityGroupId": "sg-03b55c3225c7af3d4",
+                        "Status": "active"
+                    },
+                    {
+                        "VpcSecurityGroupId": "sg-01133f66122682f0b",
+                        "Status": "active"
+                    }
+                ],
+                "DBParameterGroups": [
+                    {
+                        "DBParameterGroupName": "oracle-ee-19-psp-prod-clusterdb-vpc-2-hash",
+                        "ParameterApplyStatus": "in-sync"
+                    }
+                ],
+                "AvailabilityZone": "us-west-2a",
+                "DBSubnetGroup": {
+                    "DBSubnetGroupName": "prod-clusterdb-vpc-2",
+                    "DBSubnetGroupDescription": "prod-clusterdb-vpc-2 subnet group",
+                    "VpcId": "vpc-0d8f1534aaab54ac6",
+                    "SubnetGroupStatus": "Complete",
+                    "Subnets": [
+                        {
+                            "SubnetIdentifier": "subnet-0f7ef67760fa393c1",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2c"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        },
+                        {
+                            "SubnetIdentifier": "subnet-0a5dc411a66975e04",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2a"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        },
+                        {
+                            "SubnetIdentifier": "subnet-08cc9c29050b7fc94",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2b"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        }
+                    ]
+                },
+                "PreferredMaintenanceWindow": "mon:06:00-mon:06:30",
+                "PendingModifiedValues": {},
+                "LatestRestorableTime": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 8,
+                    "day": 3,
+                    "hour": 10,
+                    "minute": 26,
+                    "second": 59,
+                    "microsecond": 0
+                },
+                "MultiAZ": false,
+                "EngineVersion": "19.0.0.0.ru-2023-01.rur-2023-01.r2",
+                "AutoMinorVersionUpgrade": false,
+                "ReadReplicaDBInstanceIdentifiers": [],
+                "LicenseModel": "bring-your-own-license",
+                "Iops": 50000,
+                "OptionGroupMemberships": [
+                    {
+                        "OptionGroupName": "oracle-ee-19-prod-clusterdb-vpc-2",
+                        "Status": "in-sync"
+                    }
+                ],
+                "CharacterSetName": "AL32UTF8",
+                "NcharCharacterSetName": "AL16UTF16",
+                "PubliclyAccessible": false,
+                "StorageType": "io1",
+                "DbInstancePort": 0,
+                "StorageEncrypted": true,
+                "KmsKeyId": "arn:aws:kms:us-west-2:644160558196:key/f70d6396-d818-401e-985b-8fb2258d98f0",
+                "DbiResourceId": "db-44FOV4WZ2QBQSLN5WCPQZ7NPPM",
+                "CACertificateIdentifier": "rds-ca-2019",
+                "DomainMemberships": [],
+                "CopyTagsToSnapshot": true,
+                "MonitoringInterval": 0,
+                "DBInstanceArn": "arn:aws:rds:us-west-2:644160558196:db:psphpp06",
+                "IAMDatabaseAuthenticationEnabled": false,
+                "PerformanceInsightsEnabled": false,
+                "EnabledCloudwatchLogsExports": [
+                    "alert"
+                ],
+                "DeletionProtection": true,
+                "AssociatedRoles": [],
+                "TagList": [
+                    {
+                        "Key": "env",
+                        "Value": "prd"
+                    },
+                    {
+                        "Key": "cluster",
+                        "Value": ""
+                    }
+                ],
+                "CustomerOwnedIpEnabled": false,
+                "ActivityStreamStatus": "stopped",
+                "BackupTarget": "region",
+                "NetworkType": "IPV4",
+                "StorageThroughput": 0,
+                "CertificateDetails": {
+                    "CAIdentifier": "rds-ca-2019",
+                    "ValidTill": {
+                        "__class__": "datetime",
+                        "year": 2024,
+                        "month": 8,
+                        "day": 22,
+                        "hour": 17,
+                        "minute": 8,
+                        "second": 50,
+                        "microsecond": 0
+                    }
+                }
+            },
+            {
+                "DBInstanceIdentifier": "psp-par-aud1",
+                "DBInstanceClass": "db.r6g.16xlarge",
+                "Engine": "aurora-postgresql",
+                "DBInstanceStatus": "available",
+                "MasterUsername": "postgres",
+                "DBName": "prodapgib",
+                "Endpoint": {
+                    "Address": "psp-par-aud1.cjls0bohfgpq.us-west-2.rds.amazonaws.com",
+                    "Port": 6543,
+                    "HostedZoneId": "Z1PVIF0B656C1W"
+                },
+                "AllocatedStorage": 1,
+                "InstanceCreateTime": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 7,
+                    "day": 29,
+                    "hour": 11,
+                    "minute": 1,
+                    "second": 4,
+                    "microsecond": 371000
+                },
+                "PreferredBackupWindow": "05:00-05:30",
+                "BackupRetentionPeriod": 35,
+                "DBSecurityGroups": [],
+                "VpcSecurityGroups": [
+                    {
+                        "VpcSecurityGroupId": "sg-09222de1989dd123f",
+                        "Status": "active"
+                    },
+                    {
+                        "VpcSecurityGroupId": "sg-07efd9c9745ed5d51",
+                        "Status": "active"
+                    },
+                    {
+                        "VpcSecurityGroupId": "sg-074b4dd587ff9746e",
+                        "Status": "active"
+                    }
+                ],
+                "DBParameterGroups": [
+                    {
+                        "DBParameterGroupName": "psp-shared-ibobpg14instancea854b0ef-ey9i1itmbz2v",
+                        "ParameterApplyStatus": "in-sync"
+                    }
+                ],
+                "AvailabilityZone": "us-west-2b",
+                "DBSubnetGroup": {
+                    "DBSubnetGroupName": "prod-clusterdb-vpc-2",
+                    "DBSubnetGroupDescription": "prod-clusterdb-vpc-2 subnet group",
+                    "VpcId": "vpc-0d8f1534aaab54ac6",
+                    "SubnetGroupStatus": "Complete",
+                    "Subnets": [
+                        {
+                            "SubnetIdentifier": "subnet-0f7ef67760fa393c1",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2c"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        },
+                        {
+                            "SubnetIdentifier": "subnet-0a5dc411a66975e04",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2a"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        },
+                        {
+                            "SubnetIdentifier": "subnet-08cc9c29050b7fc94",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2b"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        }
+                    ]
+                },
+                "PreferredMaintenanceWindow": "mon:12:54-mon:13:24",
+                "PendingModifiedValues": {},
+                "MultiAZ": false,
+                "EngineVersion": "14.3",
+                "AutoMinorVersionUpgrade": false,
+                "ReadReplicaDBInstanceIdentifiers": [],
+                "LicenseModel": "postgresql-license",
+                "OptionGroupMemberships": [
+                    {
+                        "OptionGroupName": "default:aurora-postgresql-14",
+                        "Status": "in-sync"
+                    }
+                ],
+                "PubliclyAccessible": false,
+                "StorageType": "aurora",
+                "DbInstancePort": 0,
+                "DBClusterIdentifier": "psp-par-aud",
+                "StorageEncrypted": true,
+                "KmsKeyId": "arn:aws:kms:us-west-2:644160558196:key/fa954df1-35f8-4f47-98c7-1f1a4d304560",
+                "DbiResourceId": "db-NJS2L2OLP2XLD45FE5XV7NNV2Y",
+                "CACertificateIdentifier": "rds-ca-2019",
+                "DomainMemberships": [],
+                "CopyTagsToSnapshot": false,
+                "MonitoringInterval": 0,
+                "PromotionTier": 1,
+                "DBInstanceArn": "arn:aws:rds:us-west-2:644160558196:db:psp-par-aud1",
+                "IAMDatabaseAuthenticationEnabled": false,
+                "PerformanceInsightsEnabled": false,
+                "EnabledCloudwatchLogsExports": [
+                    "postgresql"
+                ],
+                "DeletionProtection": false,
+                "AssociatedRoles": [],
+                "TagList": [],
+                "CustomerOwnedIpEnabled": false,
+                "BackupTarget": "region",
+                "NetworkType": "IPV4",
+                "StorageThroughput": 0,
+                "CertificateDetails": {
+                    "CAIdentifier": "rds-ca-2019",
+                    "ValidTill": {
+                        "__class__": "datetime",
+                        "year": 2024,
+                        "month": 8,
+                        "day": 22,
+                        "hour": 17,
+                        "minute": 8,
+                        "second": 50,
+                        "microsecond": 0
+                    }
+                }
+            },
+            {
+                "DBInstanceIdentifier": "psp-par-aud1-old",
+                "DBInstanceClass": "db.r6g.16xlarge",
+                "Engine": "aurora-postgresql",
+                "DBInstanceStatus": "available",
+                "MasterUsername": "postgres",
+                "DBName": "prodapgib",
+                "Endpoint": {
+                    "Address": "psp-par-aud1-old.cjls0bohfgpq.us-west-2.rds.amazonaws.com",
+                    "Port": 6543,
+                    "HostedZoneId": "Z1PVIF0B656C1W"
+                },
+                "AllocatedStorage": 1,
+                "InstanceCreateTime": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 7,
+                    "day": 15,
+                    "hour": 17,
+                    "minute": 0,
+                    "second": 33,
+                    "microsecond": 570000
+                },
+                "PreferredBackupWindow": "05:00-05:30",
+                "BackupRetentionPeriod": 35,
+                "DBSecurityGroups": [],
+                "VpcSecurityGroups": [
+                    {
+                        "VpcSecurityGroupId": "sg-09222de1989dd123f",
+                        "Status": "active"
+                    },
+                    {
+                        "VpcSecurityGroupId": "sg-07efd9c9745ed5d51",
+                        "Status": "active"
+                    },
+                    {
+                        "VpcSecurityGroupId": "sg-074b4dd587ff9746e",
+                        "Status": "active"
+                    }
+                ],
+                "DBParameterGroups": [
+                    {
+                        "DBParameterGroupName": "psp-shared-ibobpg14instancea854b0ef-ey9i1itmbz2v",
+                        "ParameterApplyStatus": "in-sync"
+                    }
+                ],
+                "AvailabilityZone": "us-west-2a",
+                "DBSubnetGroup": {
+                    "DBSubnetGroupName": "prod-clusterdb-vpc-2",
+                    "DBSubnetGroupDescription": "prod-clusterdb-vpc-2 subnet group",
+                    "VpcId": "vpc-0d8f1534aaab54ac6",
+                    "SubnetGroupStatus": "Complete",
+                    "Subnets": [
+                        {
+                            "SubnetIdentifier": "subnet-0f7ef67760fa393c1",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2c"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        },
+                        {
+                            "SubnetIdentifier": "subnet-0a5dc411a66975e04",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2a"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        },
+                        {
+                            "SubnetIdentifier": "subnet-08cc9c29050b7fc94",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2b"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        }
+                    ]
+                },
+                "PreferredMaintenanceWindow": "mon:11:15-mon:11:45",
+                "PendingModifiedValues": {},
+                "MultiAZ": false,
+                "EngineVersion": "14.3",
+                "AutoMinorVersionUpgrade": false,
+                "ReadReplicaDBInstanceIdentifiers": [],
+                "LicenseModel": "postgresql-license",
+                "OptionGroupMemberships": [
+                    {
+                        "OptionGroupName": "default:aurora-postgresql-14",
+                        "Status": "in-sync"
+                    }
+                ],
+                "PubliclyAccessible": false,
+                "StorageType": "aurora",
+                "DbInstancePort": 0,
+                "DBClusterIdentifier": "psp-par-aud-old",
+                "StorageEncrypted": true,
+                "KmsKeyId": "arn:aws:kms:us-west-2:644160558196:key/fa954df1-35f8-4f47-98c7-1f1a4d304560",
+                "DbiResourceId": "db-GMKRCJC5HEVCQN2MXDHJAVXKN4",
+                "CACertificateIdentifier": "rds-ca-2019",
+                "DomainMemberships": [],
+                "CopyTagsToSnapshot": false,
+                "MonitoringInterval": 0,
+                "PromotionTier": 1,
+                "DBInstanceArn": "arn:aws:rds:us-west-2:644160558196:db:psp-par-aud1-old",
+                "IAMDatabaseAuthenticationEnabled": false,
+                "PerformanceInsightsEnabled": false,
+                "EnabledCloudwatchLogsExports": [
+                    "postgresql"
+                ],
+                "DeletionProtection": false,
+                "AssociatedRoles": [],
+                "TagList": [],
+                "CustomerOwnedIpEnabled": false,
+                "BackupTarget": "region",
+                "NetworkType": "IPV4",
+                "StorageThroughput": 0,
+                "CertificateDetails": {
+                    "CAIdentifier": "rds-ca-2019",
+                    "ValidTill": {
+                        "__class__": "datetime",
+                        "year": 2024,
+                        "month": 8,
+                        "day": 22,
+                        "hour": 17,
+                        "minute": 8,
+                        "second": 50,
+                        "microsecond": 0
+                    }
+                }
+            },
+            {
+                "DBInstanceIdentifier": "psppardg",
+                "DBInstanceClass": "db.r5.16xlarge",
+                "Engine": "oracle-ee",
+                "DBInstanceStatus": "available",
+                "MasterUsername": "intuadmin",
+                "DBName": "PSPPARMO",
+                "Endpoint": {
+                    "Address": "psppardg.cjls0bohfgpq.us-west-2.rds.amazonaws.com",
+                    "Port": 2632,
+                    "HostedZoneId": "Z1PVIF0B656C1W"
+                },
+                "AllocatedStorage": 55000,
+                "InstanceCreateTime": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 7,
+                    "day": 30,
+                    "hour": 6,
+                    "minute": 48,
+                    "second": 43,
+                    "microsecond": 580000
+                },
+                "PreferredBackupWindow": "05:00-05:30",
+                "BackupRetentionPeriod": 0,
+                "DBSecurityGroups": [],
+                "VpcSecurityGroups": [
+                    {
+                        "VpcSecurityGroupId": "sg-074b4dd587ff9746e",
+                        "Status": "active"
+                    },
+                    {
+                        "VpcSecurityGroupId": "sg-09222de1989dd123f",
+                        "Status": "active"
+                    },
+                    {
+                        "VpcSecurityGroupId": "sg-07efd9c9745ed5d51",
+                        "Status": "active"
+                    }
+                ],
+                "DBParameterGroups": [
+                    {
+                        "DBParameterGroupName": "oracle-ee-19-psp-prod-clusterdb-vpc-2",
+                        "ParameterApplyStatus": "in-sync"
+                    }
+                ],
+                "AvailabilityZone": "us-west-2b",
+                "DBSubnetGroup": {
+                    "DBSubnetGroupName": "prod-clusterdb-vpc-2",
+                    "DBSubnetGroupDescription": "prod-clusterdb-vpc-2 subnet group",
+                    "VpcId": "vpc-0d8f1534aaab54ac6",
+                    "SubnetGroupStatus": "Complete",
+                    "Subnets": [
+                        {
+                            "SubnetIdentifier": "subnet-0f7ef67760fa393c1",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2c"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        },
+                        {
+                            "SubnetIdentifier": "subnet-0a5dc411a66975e04",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2a"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        },
+                        {
+                            "SubnetIdentifier": "subnet-08cc9c29050b7fc94",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2b"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        }
+                    ]
+                },
+                "PreferredMaintenanceWindow": "mon:06:00-mon:06:30",
+                "PendingModifiedValues": {},
+                "MultiAZ": false,
+                "EngineVersion": "19.0.0.0.ru-2020-04.rur-2020-04.r1",
+                "AutoMinorVersionUpgrade": false,
+                "ReadReplicaSourceDBInstanceIdentifier": "pspparmo",
+                "ReadReplicaDBInstanceIdentifiers": [],
+                "ReplicaMode": "open-read-only",
+                "LicenseModel": "bring-your-own-license",
+                "Iops": 35000,
+                "OptionGroupMemberships": [
+                    {
+                        "OptionGroupName": "oracle-ee-19-prod-clusterdb-vpc-2",
+                        "Status": "in-sync"
+                    }
+                ],
+                "CharacterSetName": "AL32UTF8",
+                "NcharCharacterSetName": "AL16UTF16",
+                "PubliclyAccessible": false,
+                "StatusInfos": [
+                    {
+                        "StatusType": "read replication",
+                        "Normal": true,
+                        "Status": "replicating"
+                    }
+                ],
+                "StorageType": "io1",
+                "DbInstancePort": 0,
+                "StorageEncrypted": true,
+                "KmsKeyId": "arn:aws:kms:us-west-2:644160558196:key/d8e5eb49-fe55-44e4-9fb4-7911b9fc1328",
+                "DbiResourceId": "db-RM7STADLH4VDGIUH2COZWKL6CU",
+                "CACertificateIdentifier": "rds-ca-2019",
+                "DomainMemberships": [],
+                "CopyTagsToSnapshot": false,
+                "MonitoringInterval": 0,
+                "DBInstanceArn": "arn:aws:rds:us-west-2:644160558196:db:psppardg",
+                "IAMDatabaseAuthenticationEnabled": false,
+                "PerformanceInsightsEnabled": true,
+                "PerformanceInsightsKMSKeyId": "arn:aws:kms:us-west-2:644160558196:key/c150232e-7ee9-49b2-9efc-b5af383ff458",
+                "PerformanceInsightsRetentionPeriod": 7,
+                "DeletionProtection": true,
+                "AssociatedRoles": [],
+                "TagList": [],
+                "CustomerOwnedIpEnabled": false,
+                "ActivityStreamStatus": "stopped",
+                "BackupTarget": "region",
+                "NetworkType": "IPV4",
+                "StorageThroughput": 0,
+                "CertificateDetails": {
+                    "CAIdentifier": "rds-ca-2019",
+                    "ValidTill": {
+                        "__class__": "datetime",
+                        "year": 2024,
+                        "month": 8,
+                        "day": 22,
+                        "hour": 17,
+                        "minute": 8,
+                        "second": 50,
+                        "microsecond": 0
+                    }
+                }
+            },
+            {
+                "DBInstanceIdentifier": "psppardg-old",
+                "DBInstanceClass": "db.r5.16xlarge",
+                "Engine": "oracle-ee",
+                "DBInstanceStatus": "available",
+                "MasterUsername": "intuadmin",
+                "DBName": "PSPPARMO",
+                "Endpoint": {
+                    "Address": "psppardg-old.cjls0bohfgpq.us-west-2.rds.amazonaws.com",
+                    "Port": 2632,
+                    "HostedZoneId": "Z1PVIF0B656C1W"
+                },
+                "AllocatedStorage": 47500,
+                "InstanceCreateTime": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 7,
+                    "day": 15,
+                    "hour": 17,
+                    "minute": 47,
+                    "second": 44,
+                    "microsecond": 443000
+                },
+                "PreferredBackupWindow": "05:00-05:30",
+                "BackupRetentionPeriod": 0,
+                "DBSecurityGroups": [],
+                "VpcSecurityGroups": [
+                    {
+                        "VpcSecurityGroupId": "sg-09222de1989dd123f",
+                        "Status": "active"
+                    },
+                    {
+                        "VpcSecurityGroupId": "sg-07efd9c9745ed5d51",
+                        "Status": "active"
+                    },
+                    {
+                        "VpcSecurityGroupId": "sg-074b4dd587ff9746e",
+                        "Status": "active"
+                    }
+                ],
+                "DBParameterGroups": [
+                    {
+                        "DBParameterGroupName": "oracle-ee-19-psp-prod-clusterdb-vpc-2",
+                        "ParameterApplyStatus": "in-sync"
+                    }
+                ],
+                "AvailabilityZone": "us-west-2a",
+                "DBSubnetGroup": {
+                    "DBSubnetGroupName": "prod-clusterdb-vpc-2",
+                    "DBSubnetGroupDescription": "prod-clusterdb-vpc-2 subnet group",
+                    "VpcId": "vpc-0d8f1534aaab54ac6",
+                    "SubnetGroupStatus": "Complete",
+                    "Subnets": [
+                        {
+                            "SubnetIdentifier": "subnet-0f7ef67760fa393c1",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2c"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        },
+                        {
+                            "SubnetIdentifier": "subnet-0a5dc411a66975e04",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2a"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        },
+                        {
+                            "SubnetIdentifier": "subnet-08cc9c29050b7fc94",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2b"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        }
+                    ]
+                },
+                "PreferredMaintenanceWindow": "mon:06:00-mon:06:30",
+                "PendingModifiedValues": {},
+                "MultiAZ": false,
+                "EngineVersion": "19.0.0.0.ru-2020-04.rur-2020-04.r1",
+                "AutoMinorVersionUpgrade": false,
+                "ReadReplicaSourceDBInstanceIdentifier": "pspparmo-old",
+                "ReadReplicaDBInstanceIdentifiers": [],
+                "ReplicaMode": "open-read-only",
+                "LicenseModel": "bring-your-own-license",
+                "Iops": 35000,
+                "OptionGroupMemberships": [
+                    {
+                        "OptionGroupName": "oracle-ee-19-prod-clusterdb-vpc-2",
+                        "Status": "in-sync"
+                    }
+                ],
+                "CharacterSetName": "AL32UTF8",
+                "NcharCharacterSetName": "AL16UTF16",
+                "PubliclyAccessible": false,
+                "StatusInfos": [
+                    {
+                        "StatusType": "read replication",
+                        "Normal": true,
+                        "Status": "replicating"
+                    }
+                ],
+                "StorageType": "io1",
+                "DbInstancePort": 0,
+                "StorageEncrypted": true,
+                "KmsKeyId": "arn:aws:kms:us-west-2:644160558196:key/d8e5eb49-fe55-44e4-9fb4-7911b9fc1328",
+                "DbiResourceId": "db-CQPDJUZAX2QPCMC3P4ISQ5JDKI",
+                "CACertificateIdentifier": "rds-ca-2019",
+                "DomainMemberships": [],
+                "CopyTagsToSnapshot": false,
+                "MonitoringInterval": 0,
+                "DBInstanceArn": "arn:aws:rds:us-west-2:644160558196:db:psppardg-old",
+                "IAMDatabaseAuthenticationEnabled": false,
+                "PerformanceInsightsEnabled": true,
+                "PerformanceInsightsKMSKeyId": "arn:aws:kms:us-west-2:644160558196:key/c150232e-7ee9-49b2-9efc-b5af383ff458",
+                "PerformanceInsightsRetentionPeriod": 7,
+                "EnabledCloudwatchLogsExports": [
+                    "alert"
+                ],
+                "DeletionProtection": true,
+                "AssociatedRoles": [],
+                "TagList": [],
+                "CustomerOwnedIpEnabled": false,
+                "ActivityStreamStatus": "stopped",
+                "BackupTarget": "region",
+                "NetworkType": "IPV4",
+                "StorageThroughput": 0,
+                "CertificateDetails": {
+                    "CAIdentifier": "rds-ca-2019",
+                    "ValidTill": {
+                        "__class__": "datetime",
+                        "year": 2024,
+                        "month": 8,
+                        "day": 22,
+                        "hour": 17,
+                        "minute": 8,
+                        "second": 50,
+                        "microsecond": 0
+                    }
+                }
+            },
+            {
+                "DBInstanceIdentifier": "pspparhdg",
+                "DBInstanceClass": "db.r5.16xlarge",
+                "Engine": "oracle-ee",
+                "DBInstanceStatus": "available",
+                "MasterUsername": "intuadmin",
+                "DBName": "PSPPARHS",
+                "Endpoint": {
+                    "Address": "pspparhdg.cjls0bohfgpq.us-west-2.rds.amazonaws.com",
+                    "Port": 2632,
+                    "HostedZoneId": "Z1PVIF0B656C1W"
+                },
+                "AllocatedStorage": 55500,
+                "InstanceCreateTime": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 7,
+                    "day": 29,
+                    "hour": 15,
+                    "minute": 19,
+                    "second": 47,
+                    "microsecond": 425000
+                },
+                "PreferredBackupWindow": "05:00-05:30",
+                "BackupRetentionPeriod": 0,
+                "DBSecurityGroups": [],
+                "VpcSecurityGroups": [
+                    {
+                        "VpcSecurityGroupId": "sg-09222de1989dd123f",
+                        "Status": "active"
+                    },
+                    {
+                        "VpcSecurityGroupId": "sg-07efd9c9745ed5d51",
+                        "Status": "active"
+                    },
+                    {
+                        "VpcSecurityGroupId": "sg-074b4dd587ff9746e",
+                        "Status": "active"
+                    }
+                ],
+                "DBParameterGroups": [
+                    {
+                        "DBParameterGroupName": "oracle-ee-19-psp-prod-clusterdb-vpc-2",
+                        "ParameterApplyStatus": "in-sync"
+                    }
+                ],
+                "AvailabilityZone": "us-west-2a",
+                "DBSubnetGroup": {
+                    "DBSubnetGroupName": "prod-clusterdb-vpc-2",
+                    "DBSubnetGroupDescription": "prod-clusterdb-vpc-2 subnet group",
+                    "VpcId": "vpc-0d8f1534aaab54ac6",
+                    "SubnetGroupStatus": "Complete",
+                    "Subnets": [
+                        {
+                            "SubnetIdentifier": "subnet-0f7ef67760fa393c1",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2c"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        },
+                        {
+                            "SubnetIdentifier": "subnet-0a5dc411a66975e04",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2a"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        },
+                        {
+                            "SubnetIdentifier": "subnet-08cc9c29050b7fc94",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2b"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        }
+                    ]
+                },
+                "PreferredMaintenanceWindow": "mon:06:00-mon:06:30",
+                "PendingModifiedValues": {},
+                "MultiAZ": false,
+                "EngineVersion": "19.0.0.0.ru-2023-01.rur-2023-01.r2",
+                "AutoMinorVersionUpgrade": false,
+                "ReadReplicaSourceDBInstanceIdentifier": "pspparhs",
+                "ReadReplicaDBInstanceIdentifiers": [],
+                "ReplicaMode": "open-read-only",
+                "LicenseModel": "bring-your-own-license",
+                "Iops": 50000,
+                "OptionGroupMemberships": [
+                    {
+                        "OptionGroupName": "oracle-ee-19-prod-clusterdb-vpc-2",
+                        "Status": "in-sync"
+                    }
+                ],
+                "CharacterSetName": "AL32UTF8",
+                "NcharCharacterSetName": "AL16UTF16",
+                "PubliclyAccessible": false,
+                "StatusInfos": [
+                    {
+                        "StatusType": "read replication",
+                        "Normal": true,
+                        "Status": "replicating"
+                    }
+                ],
+                "StorageType": "io1",
+                "DbInstancePort": 0,
+                "StorageEncrypted": true,
+                "KmsKeyId": "arn:aws:kms:us-west-2:644160558196:key/f70d6396-d818-401e-985b-8fb2258d98f0",
+                "DbiResourceId": "db-SW5CCWABYIWA2LSCRDB24X3BEQ",
+                "CACertificateIdentifier": "rds-ca-2019",
+                "DomainMemberships": [],
+                "CopyTagsToSnapshot": false,
+                "MonitoringInterval": 0,
+                "DBInstanceArn": "arn:aws:rds:us-west-2:644160558196:db:pspparhdg",
+                "IAMDatabaseAuthenticationEnabled": false,
+                "PerformanceInsightsEnabled": true,
+                "PerformanceInsightsKMSKeyId": "arn:aws:kms:us-west-2:644160558196:key/c150232e-7ee9-49b2-9efc-b5af383ff458",
+                "PerformanceInsightsRetentionPeriod": 7,
+                "EnabledCloudwatchLogsExports": [
+                    "alert"
+                ],
+                "DeletionProtection": true,
+                "AssociatedRoles": [],
+                "TagList": [],
+                "CustomerOwnedIpEnabled": false,
+                "ActivityStreamStatus": "stopped",
+                "BackupTarget": "region",
+                "NetworkType": "IPV4",
+                "StorageThroughput": 0,
+                "CertificateDetails": {
+                    "CAIdentifier": "rds-ca-2019",
+                    "ValidTill": {
+                        "__class__": "datetime",
+                        "year": 2024,
+                        "month": 8,
+                        "day": 22,
+                        "hour": 17,
+                        "minute": 8,
+                        "second": 50,
+                        "microsecond": 0
+                    }
+                }
+            },
+            {
+                "DBInstanceIdentifier": "pspparhdg-old",
+                "DBInstanceClass": "db.r5.16xlarge",
+                "Engine": "oracle-ee",
+                "DBInstanceStatus": "available",
+                "MasterUsername": "intuadmin",
+                "DBName": "PSPPARHS",
+                "Endpoint": {
+                    "Address": "pspparhdg-old.cjls0bohfgpq.us-west-2.rds.amazonaws.com",
+                    "Port": 2632,
+                    "HostedZoneId": "Z1PVIF0B656C1W"
+                },
+                "AllocatedStorage": 55500,
+                "InstanceCreateTime": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 7,
+                    "day": 17,
+                    "hour": 17,
+                    "minute": 4,
+                    "second": 45,
+                    "microsecond": 837000
+                },
+                "PreferredBackupWindow": "05:00-05:30",
+                "BackupRetentionPeriod": 0,
+                "DBSecurityGroups": [],
+                "VpcSecurityGroups": [
+                    {
+                        "VpcSecurityGroupId": "sg-09222de1989dd123f",
+                        "Status": "active"
+                    },
+                    {
+                        "VpcSecurityGroupId": "sg-07efd9c9745ed5d51",
+                        "Status": "active"
+                    }
+                ],
+                "DBParameterGroups": [
+                    {
+                        "DBParameterGroupName": "oracle-ee-19-psp-prod-clusterdb-vpc-2",
+                        "ParameterApplyStatus": "in-sync"
+                    }
+                ],
+                "AvailabilityZone": "us-west-2a",
+                "DBSubnetGroup": {
+                    "DBSubnetGroupName": "prod-clusterdb-vpc-2",
+                    "DBSubnetGroupDescription": "prod-clusterdb-vpc-2 subnet group",
+                    "VpcId": "vpc-0d8f1534aaab54ac6",
+                    "SubnetGroupStatus": "Complete",
+                    "Subnets": [
+                        {
+                            "SubnetIdentifier": "subnet-0f7ef67760fa393c1",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2c"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        },
+                        {
+                            "SubnetIdentifier": "subnet-0a5dc411a66975e04",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2a"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        },
+                        {
+                            "SubnetIdentifier": "subnet-08cc9c29050b7fc94",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2b"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        }
+                    ]
+                },
+                "PreferredMaintenanceWindow": "mon:06:00-mon:06:30",
+                "PendingModifiedValues": {},
+                "MultiAZ": false,
+                "EngineVersion": "19.0.0.0.ru-2023-01.rur-2023-01.r2",
+                "AutoMinorVersionUpgrade": false,
+                "ReadReplicaSourceDBInstanceIdentifier": "pspparhs-old",
+                "ReadReplicaDBInstanceIdentifiers": [],
+                "ReplicaMode": "open-read-only",
+                "LicenseModel": "bring-your-own-license",
+                "Iops": 50000,
+                "OptionGroupMemberships": [
+                    {
+                        "OptionGroupName": "oracle-ee-19-prod-clusterdb-vpc-2",
+                        "Status": "in-sync"
+                    }
+                ],
+                "CharacterSetName": "AL32UTF8",
+                "NcharCharacterSetName": "AL16UTF16",
+                "PubliclyAccessible": false,
+                "StatusInfos": [
+                    {
+                        "StatusType": "read replication",
+                        "Normal": true,
+                        "Status": "replicating"
+                    }
+                ],
+                "StorageType": "io1",
+                "DbInstancePort": 0,
+                "StorageEncrypted": true,
+                "KmsKeyId": "arn:aws:kms:us-west-2:644160558196:key/f70d6396-d818-401e-985b-8fb2258d98f0",
+                "DbiResourceId": "db-Q4RQ2GC45WISLMIKQ4ECYBZVQE",
+                "CACertificateIdentifier": "rds-ca-2019",
+                "DomainMemberships": [],
+                "CopyTagsToSnapshot": false,
+                "MonitoringInterval": 0,
+                "DBInstanceArn": "arn:aws:rds:us-west-2:644160558196:db:pspparhdg-old",
+                "IAMDatabaseAuthenticationEnabled": false,
+                "PerformanceInsightsEnabled": true,
+                "PerformanceInsightsKMSKeyId": "arn:aws:kms:us-west-2:644160558196:key/c150232e-7ee9-49b2-9efc-b5af383ff458",
+                "PerformanceInsightsRetentionPeriod": 7,
+                "EnabledCloudwatchLogsExports": [
+                    "alert"
+                ],
+                "DeletionProtection": true,
+                "AssociatedRoles": [],
+                "TagList": [],
+                "CustomerOwnedIpEnabled": false,
+                "ActivityStreamStatus": "stopped",
+                "BackupTarget": "region",
+                "NetworkType": "IPV4",
+                "StorageThroughput": 0,
+                "CertificateDetails": {
+                    "CAIdentifier": "rds-ca-2019",
+                    "ValidTill": {
+                        "__class__": "datetime",
+                        "year": 2024,
+                        "month": 8,
+                        "day": 22,
+                        "hour": 17,
+                        "minute": 8,
+                        "second": 50,
+                        "microsecond": 0
+                    }
+                }
+            },
+            {
+                "DBInstanceIdentifier": "pspparhs",
+                "DBInstanceClass": "db.r5.16xlarge",
+                "Engine": "oracle-ee",
+                "DBInstanceStatus": "available",
+                "MasterUsername": "intuadmin",
+                "DBName": "PSPPARHS",
+                "Endpoint": {
+                    "Address": "pspparhs.cjls0bohfgpq.us-west-2.rds.amazonaws.com",
+                    "Port": 2632,
+                    "HostedZoneId": "Z1PVIF0B656C1W"
+                },
+                "AllocatedStorage": 55500,
+                "InstanceCreateTime": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 7,
+                    "day": 29,
+                    "hour": 11,
+                    "minute": 59,
+                    "second": 16,
+                    "microsecond": 994000
+                },
+                "PreferredBackupWindow": "05:00-05:30",
+                "BackupRetentionPeriod": 1,
+                "DBSecurityGroups": [],
+                "VpcSecurityGroups": [
+                    {
+                        "VpcSecurityGroupId": "sg-074b4dd587ff9746e",
+                        "Status": "active"
+                    },
+                    {
+                        "VpcSecurityGroupId": "sg-09222de1989dd123f",
+                        "Status": "active"
+                    },
+                    {
+                        "VpcSecurityGroupId": "sg-07efd9c9745ed5d51",
+                        "Status": "active"
+                    }
+                ],
+                "DBParameterGroups": [
+                    {
+                        "DBParameterGroupName": "oracle-ee-19-psp-prod-clusterdb-vpc-2",
+                        "ParameterApplyStatus": "in-sync"
+                    }
+                ],
+                "AvailabilityZone": "us-west-2a",
+                "DBSubnetGroup": {
+                    "DBSubnetGroupName": "prod-clusterdb-vpc-2",
+                    "DBSubnetGroupDescription": "prod-clusterdb-vpc-2 subnet group",
+                    "VpcId": "vpc-0d8f1534aaab54ac6",
+                    "SubnetGroupStatus": "Complete",
+                    "Subnets": [
+                        {
+                            "SubnetIdentifier": "subnet-0f7ef67760fa393c1",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2c"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        },
+                        {
+                            "SubnetIdentifier": "subnet-0a5dc411a66975e04",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2a"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        },
+                        {
+                            "SubnetIdentifier": "subnet-08cc9c29050b7fc94",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2b"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        }
+                    ]
+                },
+                "PreferredMaintenanceWindow": "mon:06:00-mon:06:30",
+                "PendingModifiedValues": {},
+                "LatestRestorableTime": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 8,
+                    "day": 3,
+                    "hour": 10,
+                    "minute": 29,
+                    "second": 33,
+                    "microsecond": 0
+                },
+                "MultiAZ": false,
+                "EngineVersion": "19.0.0.0.ru-2023-01.rur-2023-01.r2",
+                "AutoMinorVersionUpgrade": false,
+                "ReadReplicaDBInstanceIdentifiers": [
+                    "pspparhdg"
+                ],
+                "LicenseModel": "bring-your-own-license",
+                "Iops": 50000,
+                "OptionGroupMemberships": [
+                    {
+                        "OptionGroupName": "oracle-ee-19-prod-clusterdb-vpc-2",
+                        "Status": "in-sync"
+                    }
+                ],
+                "CharacterSetName": "AL32UTF8",
+                "NcharCharacterSetName": "AL16UTF16",
+                "PubliclyAccessible": false,
+                "StorageType": "io1",
+                "DbInstancePort": 0,
+                "StorageEncrypted": true,
+                "KmsKeyId": "arn:aws:kms:us-west-2:644160558196:key/f70d6396-d818-401e-985b-8fb2258d98f0",
+                "DbiResourceId": "db-O7BBTELPBBBDKT7EX3WB2DYX6Q",
+                "CACertificateIdentifier": "rds-ca-2019",
+                "DomainMemberships": [],
+                "CopyTagsToSnapshot": true,
+                "MonitoringInterval": 0,
+                "DBInstanceArn": "arn:aws:rds:us-west-2:644160558196:db:pspparhs",
+                "IAMDatabaseAuthenticationEnabled": false,
+                "PerformanceInsightsEnabled": true,
+                "PerformanceInsightsKMSKeyId": "arn:aws:kms:us-west-2:644160558196:key/c150232e-7ee9-49b2-9efc-b5af383ff458",
+                "PerformanceInsightsRetentionPeriod": 7,
+                "EnabledCloudwatchLogsExports": [
+                    "alert"
+                ],
+                "DeletionProtection": true,
+                "AssociatedRoles": [],
+                "TagList": [
+                    {
+                        "Key": "env",
+                        "Value": "prd"
+                    },
+                    {
+                        "Key": "cluster",
+                        "Value": ""
+                    }
+                ],
+                "CustomerOwnedIpEnabled": false,
+                "ActivityStreamStatus": "stopped",
+                "BackupTarget": "region",
+                "NetworkType": "IPV4",
+                "StorageThroughput": 0,
+                "CertificateDetails": {
+                    "CAIdentifier": "rds-ca-2019",
+                    "ValidTill": {
+                        "__class__": "datetime",
+                        "year": 2024,
+                        "month": 8,
+                        "day": 22,
+                        "hour": 17,
+                        "minute": 8,
+                        "second": 50,
+                        "microsecond": 0
+                    }
+                }
+            },
+            {
+                "DBInstanceIdentifier": "pspparhs-old",
+                "DBInstanceClass": "db.r5.16xlarge",
+                "Engine": "oracle-ee",
+                "DBInstanceStatus": "available",
+                "MasterUsername": "intuadmin",
+                "DBName": "PSPPARHS",
+                "Endpoint": {
+                    "Address": "pspparhs-old.cjls0bohfgpq.us-west-2.rds.amazonaws.com",
+                    "Port": 2632,
+                    "HostedZoneId": "Z1PVIF0B656C1W"
+                },
+                "AllocatedStorage": 55500,
+                "InstanceCreateTime": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 7,
+                    "day": 15,
+                    "hour": 17,
+                    "minute": 26,
+                    "second": 11,
+                    "microsecond": 316000
+                },
+                "PreferredBackupWindow": "05:00-05:30",
+                "BackupRetentionPeriod": 1,
+                "DBSecurityGroups": [],
+                "VpcSecurityGroups": [
+                    {
+                        "VpcSecurityGroupId": "sg-09222de1989dd123f",
+                        "Status": "active"
+                    },
+                    {
+                        "VpcSecurityGroupId": "sg-07efd9c9745ed5d51",
+                        "Status": "active"
+                    },
+                    {
+                        "VpcSecurityGroupId": "sg-074b4dd587ff9746e",
+                        "Status": "active"
+                    }
+                ],
+                "DBParameterGroups": [
+                    {
+                        "DBParameterGroupName": "oracle-ee-19-psp-prod-clusterdb-vpc-2",
+                        "ParameterApplyStatus": "in-sync"
+                    }
+                ],
+                "AvailabilityZone": "us-west-2a",
+                "DBSubnetGroup": {
+                    "DBSubnetGroupName": "prod-clusterdb-vpc-2",
+                    "DBSubnetGroupDescription": "prod-clusterdb-vpc-2 subnet group",
+                    "VpcId": "vpc-0d8f1534aaab54ac6",
+                    "SubnetGroupStatus": "Complete",
+                    "Subnets": [
+                        {
+                            "SubnetIdentifier": "subnet-0f7ef67760fa393c1",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2c"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        },
+                        {
+                            "SubnetIdentifier": "subnet-0a5dc411a66975e04",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2a"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        },
+                        {
+                            "SubnetIdentifier": "subnet-08cc9c29050b7fc94",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2b"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        }
+                    ]
+                },
+                "PreferredMaintenanceWindow": "mon:06:00-mon:06:30",
+                "PendingModifiedValues": {},
+                "LatestRestorableTime": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 8,
+                    "day": 3,
+                    "hour": 10,
+                    "minute": 27,
+                    "second": 47,
+                    "microsecond": 0
+                },
+                "MultiAZ": false,
+                "EngineVersion": "19.0.0.0.ru-2023-01.rur-2023-01.r2",
+                "AutoMinorVersionUpgrade": false,
+                "ReadReplicaDBInstanceIdentifiers": [
+                    "pspparhdg-old"
+                ],
+                "LicenseModel": "bring-your-own-license",
+                "Iops": 50000,
+                "OptionGroupMemberships": [
+                    {
+                        "OptionGroupName": "oracle-ee-19-prod-clusterdb-vpc-2",
+                        "Status": "in-sync"
+                    }
+                ],
+                "CharacterSetName": "AL32UTF8",
+                "NcharCharacterSetName": "AL16UTF16",
+                "PubliclyAccessible": false,
+                "StorageType": "io1",
+                "DbInstancePort": 0,
+                "StorageEncrypted": true,
+                "KmsKeyId": "arn:aws:kms:us-west-2:644160558196:key/f70d6396-d818-401e-985b-8fb2258d98f0",
+                "DbiResourceId": "db-C25NMFYW22VA5IMKFJEJTAN6OI",
+                "CACertificateIdentifier": "rds-ca-2019",
+                "DomainMemberships": [],
+                "CopyTagsToSnapshot": true,
+                "MonitoringInterval": 0,
+                "DBInstanceArn": "arn:aws:rds:us-west-2:644160558196:db:pspparhs-old",
+                "IAMDatabaseAuthenticationEnabled": false,
+                "PerformanceInsightsEnabled": true,
+                "PerformanceInsightsKMSKeyId": "arn:aws:kms:us-west-2:644160558196:key/c150232e-7ee9-49b2-9efc-b5af383ff458",
+                "PerformanceInsightsRetentionPeriod": 7,
+                "EnabledCloudwatchLogsExports": [
+                    "alert"
+                ],
+                "DeletionProtection": true,
+                "AssociatedRoles": [],
+                "TagList": [
+                    {
+                        "Key": "env",
+                        "Value": "prd"
+                    },
+                    {
+                        "Key": "cluster",
+                        "Value": ""
+                    }
+                ],
+                "CustomerOwnedIpEnabled": false,
+                "ActivityStreamStatus": "stopped",
+                "BackupTarget": "region",
+                "NetworkType": "IPV4",
+                "StorageThroughput": 0,
+                "CertificateDetails": {
+                    "CAIdentifier": "rds-ca-2019",
+                    "ValidTill": {
+                        "__class__": "datetime",
+                        "year": 2024,
+                        "month": 8,
+                        "day": 22,
+                        "hour": 17,
+                        "minute": 8,
+                        "second": 50,
+                        "microsecond": 0
+                    }
+                }
+            },
+            {
+                "DBInstanceIdentifier": "pspparmo",
+                "DBInstanceClass": "db.r5.16xlarge",
+                "Engine": "oracle-ee",
+                "DBInstanceStatus": "available",
+                "MasterUsername": "intuadmin",
+                "DBName": "PSPPARMO",
+                "Endpoint": {
+                    "Address": "pspparmo.cjls0bohfgpq.us-west-2.rds.amazonaws.com",
+                    "Port": 2632,
+                    "HostedZoneId": "Z1PVIF0B656C1W"
+                },
+                "AllocatedStorage": 55000,
+                "InstanceCreateTime": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 7,
+                    "day": 29,
+                    "hour": 15,
+                    "minute": 28,
+                    "second": 32,
+                    "microsecond": 795000
+                },
+                "PreferredBackupWindow": "05:00-05:30",
+                "BackupRetentionPeriod": 1,
+                "DBSecurityGroups": [],
+                "VpcSecurityGroups": [
+                    {
+                        "VpcSecurityGroupId": "sg-09222de1989dd123f",
+                        "Status": "active"
+                    },
+                    {
+                        "VpcSecurityGroupId": "sg-07efd9c9745ed5d51",
+                        "Status": "active"
+                    },
+                    {
+                        "VpcSecurityGroupId": "sg-074b4dd587ff9746e",
+                        "Status": "active"
+                    }
+                ],
+                "DBParameterGroups": [
+                    {
+                        "DBParameterGroupName": "oracle-ee-19-psp-prod-clusterdb-vpc-2",
+                        "ParameterApplyStatus": "in-sync"
+                    }
+                ],
+                "AvailabilityZone": "us-west-2a",
+                "DBSubnetGroup": {
+                    "DBSubnetGroupName": "prod-clusterdb-vpc-2",
+                    "DBSubnetGroupDescription": "prod-clusterdb-vpc-2 subnet group",
+                    "VpcId": "vpc-0d8f1534aaab54ac6",
+                    "SubnetGroupStatus": "Complete",
+                    "Subnets": [
+                        {
+                            "SubnetIdentifier": "subnet-0f7ef67760fa393c1",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2c"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        },
+                        {
+                            "SubnetIdentifier": "subnet-0a5dc411a66975e04",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2a"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        },
+                        {
+                            "SubnetIdentifier": "subnet-08cc9c29050b7fc94",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2b"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        }
+                    ]
+                },
+                "PreferredMaintenanceWindow": "mon:06:00-mon:06:30",
+                "PendingModifiedValues": {},
+                "LatestRestorableTime": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 8,
+                    "day": 3,
+                    "hour": 10,
+                    "minute": 27,
+                    "second": 42,
+                    "microsecond": 0
+                },
+                "MultiAZ": false,
+                "EngineVersion": "19.0.0.0.ru-2020-04.rur-2020-04.r1",
+                "AutoMinorVersionUpgrade": false,
+                "ReadReplicaDBInstanceIdentifiers": [
+                    "psppardg"
+                ],
+                "LicenseModel": "bring-your-own-license",
+                "Iops": 35000,
+                "OptionGroupMemberships": [
+                    {
+                        "OptionGroupName": "oracle-ee-19-prod-clusterdb-vpc-2",
+                        "Status": "in-sync"
+                    }
+                ],
+                "CharacterSetName": "AL32UTF8",
+                "NcharCharacterSetName": "AL16UTF16",
+                "PubliclyAccessible": false,
+                "StorageType": "io1",
+                "DbInstancePort": 0,
+                "StorageEncrypted": true,
+                "KmsKeyId": "arn:aws:kms:us-west-2:644160558196:key/d8e5eb49-fe55-44e4-9fb4-7911b9fc1328",
+                "DbiResourceId": "db-W2TAHWBQL5BPWBI7ULFSTA6PJI",
+                "CACertificateIdentifier": "rds-ca-2019",
+                "DomainMemberships": [],
+                "CopyTagsToSnapshot": true,
+                "MonitoringInterval": 0,
+                "DBInstanceArn": "arn:aws:rds:us-west-2:644160558196:db:pspparmo",
+                "IAMDatabaseAuthenticationEnabled": false,
+                "PerformanceInsightsEnabled": true,
+                "PerformanceInsightsKMSKeyId": "arn:aws:kms:us-west-2:644160558196:key/c150232e-7ee9-49b2-9efc-b5af383ff458",
+                "PerformanceInsightsRetentionPeriod": 7,
+                "EnabledCloudwatchLogsExports": [
+                    "alert"
+                ],
+                "DeletionProtection": true,
+                "AssociatedRoles": [],
+                "TagList": [
+                    {
+                        "Key": "env",
+                        "Value": "prd"
+                    },
+                    {
+                        "Key": "cluster",
+                        "Value": ""
+                    }
+                ],
+                "CustomerOwnedIpEnabled": false,
+                "ActivityStreamStatus": "stopped",
+                "BackupTarget": "region",
+                "NetworkType": "IPV4",
+                "StorageThroughput": 0,
+                "CertificateDetails": {
+                    "CAIdentifier": "rds-ca-2019",
+                    "ValidTill": {
+                        "__class__": "datetime",
+                        "year": 2024,
+                        "month": 8,
+                        "day": 22,
+                        "hour": 17,
+                        "minute": 8,
+                        "second": 50,
+                        "microsecond": 0
+                    }
+                }
+            },
+            {
+                "DBInstanceIdentifier": "pspparmo-old",
+                "DBInstanceClass": "db.r5.16xlarge",
+                "Engine": "oracle-ee",
+                "DBInstanceStatus": "available",
+                "MasterUsername": "intuadmin",
+                "DBName": "PSPPARMO",
+                "Endpoint": {
+                    "Address": "pspparmo-old.cjls0bohfgpq.us-west-2.rds.amazonaws.com",
+                    "Port": 2632,
+                    "HostedZoneId": "Z1PVIF0B656C1W"
+                },
+                "AllocatedStorage": 47500,
+                "InstanceCreateTime": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 7,
+                    "day": 15,
+                    "hour": 16,
+                    "minute": 45,
+                    "second": 28,
+                    "microsecond": 346000
+                },
+                "PreferredBackupWindow": "05:00-05:30",
+                "BackupRetentionPeriod": 1,
+                "DBSecurityGroups": [],
+                "VpcSecurityGroups": [
+                    {
+                        "VpcSecurityGroupId": "sg-09222de1989dd123f",
+                        "Status": "active"
+                    },
+                    {
+                        "VpcSecurityGroupId": "sg-07efd9c9745ed5d51",
+                        "Status": "active"
+                    },
+                    {
+                        "VpcSecurityGroupId": "sg-074b4dd587ff9746e",
+                        "Status": "active"
+                    }
+                ],
+                "DBParameterGroups": [
+                    {
+                        "DBParameterGroupName": "oracle-ee-19-psp-prod-clusterdb-vpc-2",
+                        "ParameterApplyStatus": "in-sync"
+                    }
+                ],
+                "AvailabilityZone": "us-west-2b",
+                "DBSubnetGroup": {
+                    "DBSubnetGroupName": "prod-clusterdb-vpc-2",
+                    "DBSubnetGroupDescription": "prod-clusterdb-vpc-2 subnet group",
+                    "VpcId": "vpc-0d8f1534aaab54ac6",
+                    "SubnetGroupStatus": "Complete",
+                    "Subnets": [
+                        {
+                            "SubnetIdentifier": "subnet-0f7ef67760fa393c1",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2c"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        },
+                        {
+                            "SubnetIdentifier": "subnet-0a5dc411a66975e04",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2a"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        },
+                        {
+                            "SubnetIdentifier": "subnet-08cc9c29050b7fc94",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2b"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        }
+                    ]
+                },
+                "PreferredMaintenanceWindow": "mon:06:00-mon:06:30",
+                "PendingModifiedValues": {},
+                "LatestRestorableTime": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 8,
+                    "day": 3,
+                    "hour": 10,
+                    "minute": 26,
+                    "second": 26,
+                    "microsecond": 0
+                },
+                "MultiAZ": false,
+                "EngineVersion": "19.0.0.0.ru-2020-04.rur-2020-04.r1",
+                "AutoMinorVersionUpgrade": false,
+                "ReadReplicaDBInstanceIdentifiers": [
+                    "psppardg-old"
+                ],
+                "LicenseModel": "bring-your-own-license",
+                "Iops": 35000,
+                "OptionGroupMemberships": [
+                    {
+                        "OptionGroupName": "oracle-ee-19-prod-clusterdb-vpc-2",
+                        "Status": "in-sync"
+                    }
+                ],
+                "CharacterSetName": "AL32UTF8",
+                "NcharCharacterSetName": "AL16UTF16",
+                "PubliclyAccessible": false,
+                "StorageType": "io1",
+                "DbInstancePort": 0,
+                "StorageEncrypted": true,
+                "KmsKeyId": "arn:aws:kms:us-west-2:644160558196:key/d8e5eb49-fe55-44e4-9fb4-7911b9fc1328",
+                "DbiResourceId": "db-BH7TTKMFM7VEWBLL3INFR5WXZE",
+                "CACertificateIdentifier": "rds-ca-2019",
+                "DomainMemberships": [],
+                "CopyTagsToSnapshot": true,
+                "MonitoringInterval": 0,
+                "DBInstanceArn": "arn:aws:rds:us-west-2:644160558196:db:pspparmo-old",
+                "IAMDatabaseAuthenticationEnabled": false,
+                "PerformanceInsightsEnabled": false,
+                "EnabledCloudwatchLogsExports": [
+                    "alert"
+                ],
+                "DeletionProtection": true,
+                "AssociatedRoles": [],
+                "TagList": [
+                    {
+                        "Key": "env",
+                        "Value": "prd"
+                    },
+                    {
+                        "Key": "cluster",
+                        "Value": ""
+                    }
+                ],
+                "CustomerOwnedIpEnabled": false,
+                "ActivityStreamStatus": "stopped",
+                "BackupTarget": "region",
+                "NetworkType": "IPV4",
+                "StorageThroughput": 0,
+                "CertificateDetails": {
+                    "CAIdentifier": "rds-ca-2019",
+                    "ValidTill": {
+                        "__class__": "datetime",
+                        "year": 2024,
+                        "month": 8,
+                        "day": 22,
+                        "hour": 17,
+                        "minute": 8,
+                        "second": 50,
+                        "microsecond": 0
+                    }
+                }
+            },
+            {
+                "DBInstanceIdentifier": "psp-prod-arc1",
+                "DBInstanceClass": "db.r6g.xlarge",
+                "Engine": "aurora-postgresql",
+                "DBInstanceStatus": "available",
+                "MasterUsername": "postgres",
+                "DBName": "prodarcdb",
+                "Endpoint": {
+                    "Address": "psp-prod-arc1.cjls0bohfgpq.us-west-2.rds.amazonaws.com",
+                    "Port": 6543,
+                    "HostedZoneId": "Z1PVIF0B656C1W"
+                },
+                "AllocatedStorage": 1,
+                "InstanceCreateTime": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 6,
+                    "day": 30,
+                    "hour": 11,
+                    "minute": 17,
+                    "second": 9,
+                    "microsecond": 955000
+                },
+                "PreferredBackupWindow": "05:00-05:30",
+                "BackupRetentionPeriod": 7,
+                "DBSecurityGroups": [],
+                "VpcSecurityGroups": [
+                    {
+                        "VpcSecurityGroupId": "sg-01133f66122682f0b",
+                        "Status": "active"
+                    },
+                    {
+                        "VpcSecurityGroupId": "sg-0273c8d29c502e87e",
+                        "Status": "active"
+                    },
+                    {
+                        "VpcSecurityGroupId": "sg-0a53caebfef2942dd",
+                        "Status": "active"
+                    }
+                ],
+                "DBParameterGroups": [
+                    {
+                        "DBParameterGroupName": "psp-shared-arcpg13instanced2015230-kiyxnnemze0f",
+                        "ParameterApplyStatus": "pending-reboot"
+                    }
+                ],
+                "AvailabilityZone": "us-west-2a",
+                "DBSubnetGroup": {
+                    "DBSubnetGroupName": "psp-shared-arcdbsubnet-gvdnzxpdj52e",
+                    "DBSubnetGroupDescription": "arcdb-subnet",
+                    "VpcId": "vpc-0d8f1534aaab54ac6",
+                    "SubnetGroupStatus": "Complete",
+                    "Subnets": [
+                        {
+                            "SubnetIdentifier": "subnet-0f7ef67760fa393c1",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2c"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        },
+                        {
+                            "SubnetIdentifier": "subnet-0a5dc411a66975e04",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2a"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        },
+                        {
+                            "SubnetIdentifier": "subnet-08cc9c29050b7fc94",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2b"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        }
+                    ]
+                },
+                "PreferredMaintenanceWindow": "fri:06:37-fri:07:07",
+                "PendingModifiedValues": {},
+                "MultiAZ": false,
+                "EngineVersion": "13.4",
+                "AutoMinorVersionUpgrade": false,
+                "ReadReplicaDBInstanceIdentifiers": [],
+                "LicenseModel": "postgresql-license",
+                "OptionGroupMemberships": [
+                    {
+                        "OptionGroupName": "default:aurora-postgresql-13",
+                        "Status": "in-sync"
+                    }
+                ],
+                "PubliclyAccessible": false,
+                "StorageType": "aurora",
+                "DbInstancePort": 0,
+                "DBClusterIdentifier": "psp-prod-arc",
+                "StorageEncrypted": true,
+                "KmsKeyId": "arn:aws:kms:us-west-2:644160558196:key/65b32c21-a941-4211-9002-7c23a951bb5c",
+                "DbiResourceId": "db-L2HLZL5NUUAESG4WZ5DLZRDJH4",
+                "CACertificateIdentifier": "rds-ca-2019",
+                "DomainMemberships": [],
+                "CopyTagsToSnapshot": false,
+                "MonitoringInterval": 60,
+                "EnhancedMonitoringResourceArn": "arn:aws:logs:us-west-2:644160558196:log-group:RDSOSMetrics:log-stream:db-L2HLZL5NUUAESG4WZ5DLZRDJH4",
+                "MonitoringRoleArn": "arn:aws:iam::644160558196:role/psp-prod-arc-pspprodarcMonitoringRole3FA0CFCA-BT7J2VWIXK3S",
+                "PromotionTier": 1,
+                "DBInstanceArn": "arn:aws:rds:us-west-2:644160558196:db:psp-prod-arc1",
+                "IAMDatabaseAuthenticationEnabled": false,
+                "PerformanceInsightsEnabled": true,
+                "PerformanceInsightsKMSKeyId": "arn:aws:kms:us-west-2:644160558196:key/c150232e-7ee9-49b2-9efc-b5af383ff458",
+                "PerformanceInsightsRetentionPeriod": 7,
+                "EnabledCloudwatchLogsExports": [
+                    "postgresql"
+                ],
+                "DeletionProtection": false,
+                "AssociatedRoles": [],
+                "TagList": [
+                    {
+                        "Key": "aws:cloudformation:stack-name",
+                        "Value": "psp-prod-arc"
+                    },
+                    {
+                        "Key": "ipsauroracdk_ver",
+                        "Value": "0.6.9"
+                    },
+                    {
+                        "Key": "intuit:asset_id",
+                        "Value": "6847740825712235356"
+                    },
+                    {
+                        "Key": "aws:cloudformation:stack-id",
+                        "Value": "arn:aws:cloudformation:us-west-2:644160558196:stack/psp-prod-arc/d15e9ee0-f864-11ec-ad71-06305ef04965"
+                    },
+                    {
+                        "Key": "intuit:billing:component",
+                        "Value": "PSP"
+                    },
+                    {
+                        "Key": "intuit:billing:service_assetid",
+                        "Value": "6847740825712235356"
+                    },
+                    {
+                        "Key": "dbClusterIdentifier",
+                        "Value": "psp-prod-arc"
+                    },
+                    {
+                        "Key": "intuit:billing:bu",
+                        "Value": "SBSEG"
+                    },
+                    {
+                        "Key": "dbname",
+                        "Value": "prodarcdb"
+                    },
+                    {
+                        "Key": "ipsauroramonitoring_ver",
+                        "Value": "0.0.1.5"
+                    },
+                    {
+                        "Key": "intuit:billing:appenv",
+                        "Value": "prod"
+                    },
+                    {
+                        "Key": "aws:cloudformation:logical-id",
+                        "Value": "pspprodarcInstance11051BE87"
+                    },
+                    {
+                        "Key": "intuit:billing:fp",
+                        "Value": "PSP"
+                    },
+                    {
+                        "Key": "ipsauroratemplate_ver",
+                        "Value": "null"
+                    }
+                ],
+                "CustomerOwnedIpEnabled": false,
+                "BackupTarget": "region",
+                "NetworkType": "IPV4",
+                "StorageThroughput": 0,
+                "CertificateDetails": {
+                    "CAIdentifier": "rds-ca-2019",
+                    "ValidTill": {
+                        "__class__": "datetime",
+                        "year": 2024,
+                        "month": 8,
+                        "day": 22,
+                        "hour": 17,
+                        "minute": 8,
+                        "second": 50,
+                        "microsecond": 0
+                    }
+                }
+            },
+            {
+                "DBInstanceIdentifier": "psp-prod-ibob1",
+                "DBInstanceClass": "db.r6g.16xlarge",
+                "Engine": "aurora-postgresql",
+                "DBInstanceStatus": "available",
+                "MasterUsername": "postgres",
+                "DBName": "prodapgib",
+                "Endpoint": {
+                    "Address": "psp-prod-ibob1.cjls0bohfgpq.us-west-2.rds.amazonaws.com",
+                    "Port": 5432,
+                    "HostedZoneId": "Z1PVIF0B656C1W"
+                },
+                "AllocatedStorage": 1,
+                "InstanceCreateTime": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 2,
+                    "day": 15,
+                    "hour": 20,
+                    "minute": 49,
+                    "second": 12,
+                    "microsecond": 916000
+                },
+                "PreferredBackupWindow": "05:00-05:30",
+                "BackupRetentionPeriod": 35,
+                "DBSecurityGroups": [],
+                "VpcSecurityGroups": [
+                    {
+                        "VpcSecurityGroupId": "sg-0fc235d4670b80c5b",
+                        "Status": "active"
+                    },
+                    {
+                        "VpcSecurityGroupId": "sg-0ff070dea3fcf9f9b",
+                        "Status": "active"
+                    }
+                ],
+                "DBParameterGroups": [
+                    {
+                        "DBParameterGroupName": "psp-shared-ibobpg14instancea854b0ef-ey9i1itmbz2v",
+                        "ParameterApplyStatus": "in-sync"
+                    }
+                ],
+                "AvailabilityZone": "us-west-2b",
+                "DBSubnetGroup": {
+                    "DBSubnetGroupName": "psp-shared-proddbsubnetgrp-fjjf5rt1kmpn",
+                    "DBSubnetGroupDescription": "proddbsubnetgrp",
+                    "VpcId": "vpc-0d8f1534aaab54ac6",
+                    "SubnetGroupStatus": "Complete",
+                    "Subnets": [
+                        {
+                            "SubnetIdentifier": "subnet-0f7ef67760fa393c1",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2c"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        },
+                        {
+                            "SubnetIdentifier": "subnet-0a5dc411a66975e04",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2a"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        },
+                        {
+                            "SubnetIdentifier": "subnet-08cc9c29050b7fc94",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2b"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        }
+                    ]
+                },
+                "PreferredMaintenanceWindow": "fri:06:01-fri:06:31",
+                "PendingModifiedValues": {},
+                "MultiAZ": false,
+                "EngineVersion": "14.3",
+                "AutoMinorVersionUpgrade": false,
+                "ReadReplicaDBInstanceIdentifiers": [],
+                "LicenseModel": "postgresql-license",
+                "OptionGroupMemberships": [
+                    {
+                        "OptionGroupName": "default:aurora-postgresql-14",
+                        "Status": "in-sync"
+                    }
+                ],
+                "PubliclyAccessible": false,
+                "StorageType": "aurora",
+                "DbInstancePort": 0,
+                "DBClusterIdentifier": "psp-prod-ibob",
+                "StorageEncrypted": true,
+                "KmsKeyId": "arn:aws:kms:us-west-2:644160558196:key/fa954df1-35f8-4f47-98c7-1f1a4d304560",
+                "DbiResourceId": "db-VKTE2F2HBHQRKNQH4KPIBEQ6J4",
+                "CACertificateIdentifier": "rds-ca-2019",
+                "DomainMemberships": [],
+                "CopyTagsToSnapshot": false,
+                "MonitoringInterval": 60,
+                "EnhancedMonitoringResourceArn": "arn:aws:logs:us-west-2:644160558196:log-group:RDSOSMetrics:log-stream:db-VKTE2F2HBHQRKNQH4KPIBEQ6J4",
+                "MonitoringRoleArn": "arn:aws:iam::644160558196:role/psp-prod-ibob-pspprodibobMonitoringRoleA79C2306-1JZT4C5O2LDY2",
+                "PromotionTier": 1,
+                "DBInstanceArn": "arn:aws:rds:us-west-2:644160558196:db:psp-prod-ibob1",
+                "IAMDatabaseAuthenticationEnabled": false,
+                "PerformanceInsightsEnabled": true,
+                "PerformanceInsightsKMSKeyId": "arn:aws:kms:us-west-2:644160558196:key/c150232e-7ee9-49b2-9efc-b5af383ff458",
+                "PerformanceInsightsRetentionPeriod": 31,
+                "EnabledCloudwatchLogsExports": [
+                    "postgresql"
+                ],
+                "DeletionProtection": false,
+                "AssociatedRoles": [],
+                "TagList": [
+                    {
+                        "Key": "aws:cloudformation:stack-name",
+                        "Value": "psp-prod-ibob"
+                    },
+                    {
+                        "Key": "ipsauroracdk_ver",
+                        "Value": "0.8.10"
+                    },
+                    {
+                        "Key": "intuit:asset_id",
+                        "Value": "6847740825712235356"
+                    },
+                    {
+                        "Key": "aws:cloudformation:stack-id",
+                        "Value": "arn:aws:cloudformation:us-west-2:644160558196:stack/psp-prod-ibob/62ad46b0-8e9f-11ec-b2ff-062ec729c37f"
+                    },
+                    {
+                        "Key": "intuit:billing:component",
+                        "Value": "PSP"
+                    },
+                    {
+                        "Key": "intuit:billing:service_assetid",
+                        "Value": "6847740825712235356"
+                    },
+                    {
+                        "Key": "dbClusterIdentifier",
+                        "Value": "psp-prod-ibob"
+                    },
+                    {
+                        "Key": "intuit:billing:bu",
+                        "Value": "SBSEG"
+                    },
+                    {
+                        "Key": "dbname",
+                        "Value": "prodapgib"
+                    },
+                    {
+                        "Key": "ipsauroramonitoring_ver",
+                        "Value": "0.0.1.5"
+                    },
+                    {
+                        "Key": "intuit:billing:appenv",
+                        "Value": "prod"
+                    },
+                    {
+                        "Key": "aws:cloudformation:logical-id",
+                        "Value": "pspprodibobInstance1418CDF7B"
+                    },
+                    {
+                        "Key": "intuit:billing:fp",
+                        "Value": "PSP"
+                    },
+                    {
+                        "Key": "ipsauroratemplate_ver",
+                        "Value": "null"
+                    }
+                ],
+                "CustomerOwnedIpEnabled": false,
+                "BackupTarget": "region",
+                "NetworkType": "IPV4",
+                "StorageThroughput": 0,
+                "CertificateDetails": {
+                    "CAIdentifier": "rds-ca-2019",
+                    "ValidTill": {
+                        "__class__": "datetime",
+                        "year": 2024,
+                        "month": 8,
+                        "day": 22,
+                        "hour": 17,
+                        "minute": 8,
+                        "second": 50,
+                        "microsecond": 0
+                    }
+                }
+            },
+            {
+                "DBInstanceIdentifier": "psp-prod-ibob2",
+                "DBInstanceClass": "db.r6g.16xlarge",
+                "Engine": "aurora-postgresql",
+                "DBInstanceStatus": "available",
+                "MasterUsername": "postgres",
+                "DBName": "prodapgib",
+                "Endpoint": {
+                    "Address": "psp-prod-ibob2.cjls0bohfgpq.us-west-2.rds.amazonaws.com",
+                    "Port": 5432,
+                    "HostedZoneId": "Z1PVIF0B656C1W"
+                },
+                "AllocatedStorage": 1,
+                "InstanceCreateTime": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 9,
+                    "day": 11,
+                    "hour": 4,
+                    "minute": 20,
+                    "second": 5,
+                    "microsecond": 872000
+                },
+                "PreferredBackupWindow": "05:00-05:30",
+                "BackupRetentionPeriod": 35,
+                "DBSecurityGroups": [],
+                "VpcSecurityGroups": [
+                    {
+                        "VpcSecurityGroupId": "sg-0ff070dea3fcf9f9b",
+                        "Status": "active"
+                    },
+                    {
+                        "VpcSecurityGroupId": "sg-0fc235d4670b80c5b",
+                        "Status": "active"
+                    }
+                ],
+                "DBParameterGroups": [
+                    {
+                        "DBParameterGroupName": "psp-shared-ibobpg14reader49fa30b7-eah21nz6ao5r",
+                        "ParameterApplyStatus": "in-sync"
+                    }
+                ],
+                "AvailabilityZone": "us-west-2c",
+                "DBSubnetGroup": {
+                    "DBSubnetGroupName": "psp-shared-proddbsubnetgrp-fjjf5rt1kmpn",
+                    "DBSubnetGroupDescription": "proddbsubnetgrp",
+                    "VpcId": "vpc-0d8f1534aaab54ac6",
+                    "SubnetGroupStatus": "Complete",
+                    "Subnets": [
+                        {
+                            "SubnetIdentifier": "subnet-0f7ef67760fa393c1",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2c"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        },
+                        {
+                            "SubnetIdentifier": "subnet-0a5dc411a66975e04",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2a"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        },
+                        {
+                            "SubnetIdentifier": "subnet-08cc9c29050b7fc94",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2b"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        }
+                    ]
+                },
+                "PreferredMaintenanceWindow": "fri:09:00-fri:09:30",
+                "PendingModifiedValues": {},
+                "MultiAZ": false,
+                "EngineVersion": "14.3",
+                "AutoMinorVersionUpgrade": false,
+                "ReadReplicaDBInstanceIdentifiers": [],
+                "LicenseModel": "postgresql-license",
+                "OptionGroupMemberships": [
+                    {
+                        "OptionGroupName": "default:aurora-postgresql-14",
+                        "Status": "in-sync"
+                    }
+                ],
+                "PubliclyAccessible": false,
+                "StorageType": "aurora",
+                "DbInstancePort": 0,
+                "DBClusterIdentifier": "psp-prod-ibob",
+                "StorageEncrypted": true,
+                "KmsKeyId": "arn:aws:kms:us-west-2:644160558196:key/fa954df1-35f8-4f47-98c7-1f1a4d304560",
+                "DbiResourceId": "db-PZDN56FSMCEEKEHNSAFY63VPAE",
+                "CACertificateIdentifier": "rds-ca-2019",
+                "DomainMemberships": [],
+                "CopyTagsToSnapshot": false,
+                "MonitoringInterval": 60,
+                "EnhancedMonitoringResourceArn": "arn:aws:logs:us-west-2:644160558196:log-group:RDSOSMetrics:log-stream:db-PZDN56FSMCEEKEHNSAFY63VPAE",
+                "MonitoringRoleArn": "arn:aws:iam::644160558196:role/psp-prod-ibob-pspprodibobMonitoringRoleA79C2306-1JZT4C5O2LDY2",
+                "PromotionTier": 1,
+                "DBInstanceArn": "arn:aws:rds:us-west-2:644160558196:db:psp-prod-ibob2",
+                "IAMDatabaseAuthenticationEnabled": false,
+                "PerformanceInsightsEnabled": true,
+                "PerformanceInsightsKMSKeyId": "arn:aws:kms:us-west-2:644160558196:key/c150232e-7ee9-49b2-9efc-b5af383ff458",
+                "PerformanceInsightsRetentionPeriod": 31,
+                "EnabledCloudwatchLogsExports": [
+                    "postgresql"
+                ],
+                "DeletionProtection": false,
+                "AssociatedRoles": [],
+                "TagList": [
+                    {
+                        "Key": "aws:cloudformation:stack-name",
+                        "Value": "psp-prod-ibob"
+                    },
+                    {
+                        "Key": "ipsauroracdk_ver",
+                        "Value": "0.8.10"
+                    },
+                    {
+                        "Key": "intuit:asset_id",
+                        "Value": "6847740825712235356"
+                    },
+                    {
+                        "Key": "aws:cloudformation:stack-id",
+                        "Value": "arn:aws:cloudformation:us-west-2:644160558196:stack/psp-prod-ibob/62ad46b0-8e9f-11ec-b2ff-062ec729c37f"
+                    },
+                    {
+                        "Key": "intuit:billing:component",
+                        "Value": "PSP"
+                    },
+                    {
+                        "Key": "intuit:billing:service_assetid",
+                        "Value": "6847740825712235356"
+                    },
+                    {
+                        "Key": "dbClusterIdentifier",
+                        "Value": "psp-prod-ibob"
+                    },
+                    {
+                        "Key": "intuit:billing:bu",
+                        "Value": "SBSEG"
+                    },
+                    {
+                        "Key": "dbname",
+                        "Value": "prodapgib"
+                    },
+                    {
+                        "Key": "ipsauroramonitoring_ver",
+                        "Value": "0.0.1.5"
+                    },
+                    {
+                        "Key": "intuit:billing:appenv",
+                        "Value": "prod"
+                    },
+                    {
+                        "Key": "aws:cloudformation:logical-id",
+                        "Value": "pspprodibob2"
+                    },
+                    {
+                        "Key": "intuit:billing:fp",
+                        "Value": "PSP"
+                    },
+                    {
+                        "Key": "ipsauroratemplate_ver",
+                        "Value": "null"
+                    }
+                ],
+                "CustomerOwnedIpEnabled": false,
+                "BackupTarget": "region",
+                "NetworkType": "IPV4",
+                "StorageThroughput": 0,
+                "CertificateDetails": {
+                    "CAIdentifier": "rds-ca-2019",
+                    "ValidTill": {
+                        "__class__": "datetime",
+                        "year": 2024,
+                        "month": 8,
+                        "day": 22,
+                        "hour": 17,
+                        "minute": 8,
+                        "second": 50,
+                        "microsecond": 0
+                    }
+                }
+            },
+            {
+                "DBInstanceIdentifier": "psp-prod-mon1",
+                "DBInstanceClass": "db.r7g.16xlarge",
+                "Engine": "aurora-postgresql",
+                "DBInstanceStatus": "available",
+                "MasterUsername": "postgres",
+                "DBName": "psppp01",
+                "Endpoint": {
+                    "Address": "psp-prod-mon1.cjls0bohfgpq.us-west-2.rds.amazonaws.com",
+                    "Port": 5432,
+                    "HostedZoneId": "Z1PVIF0B656C1W"
+                },
+                "AllocatedStorage": 1,
+                "InstanceCreateTime": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 6,
+                    "day": 23,
+                    "hour": 13,
+                    "minute": 11,
+                    "second": 52,
+                    "microsecond": 955000
+                },
+                "PreferredBackupWindow": "05:00-05:30",
+                "BackupRetentionPeriod": 7,
+                "DBSecurityGroups": [],
+                "VpcSecurityGroups": [
+                    {
+                        "VpcSecurityGroupId": "sg-07eeef54cb52dc5c6",
+                        "Status": "active"
+                    },
+                    {
+                        "VpcSecurityGroupId": "sg-0fc235d4670b80c5b",
+                        "Status": "active"
+                    }
+                ],
+                "DBParameterGroups": [
+                    {
+                        "DBParameterGroupName": "ipsrds-us-west-2-monolithpg15instancec7b0bb7f-0bxzek9z9ri3",
+                        "ParameterApplyStatus": "in-sync"
+                    }
+                ],
+                "AvailabilityZone": "us-west-2c",
+                "DBSubnetGroup": {
+                    "DBSubnetGroupName": "psp-shared-prodmondbsubnetgrp-sfqafgxgo9qm",
+                    "DBSubnetGroupDescription": "prodmondbsubnetgrp",
+                    "VpcId": "vpc-0d8f1534aaab54ac6",
+                    "SubnetGroupStatus": "Complete",
+                    "Subnets": [
+                        {
+                            "SubnetIdentifier": "subnet-0f7ef67760fa393c1",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2c"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        },
+                        {
+                            "SubnetIdentifier": "subnet-0a5dc411a66975e04",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2a"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        },
+                        {
+                            "SubnetIdentifier": "subnet-08cc9c29050b7fc94",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2b"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        }
+                    ]
+                },
+                "PreferredMaintenanceWindow": "thu:07:55-thu:08:25",
+                "PendingModifiedValues": {},
+                "MultiAZ": false,
+                "EngineVersion": "15.3",
+                "AutoMinorVersionUpgrade": false,
+                "ReadReplicaDBInstanceIdentifiers": [],
+                "LicenseModel": "postgresql-license",
+                "OptionGroupMemberships": [
+                    {
+                        "OptionGroupName": "default:aurora-postgresql-15",
+                        "Status": "in-sync"
+                    }
+                ],
+                "PubliclyAccessible": false,
+                "StorageType": "aurora",
+                "DbInstancePort": 0,
+                "DBClusterIdentifier": "psp-prod-mon",
+                "StorageEncrypted": true,
+                "KmsKeyId": "arn:aws:kms:us-west-2:644160558196:key/f073af1c-ff07-4f2c-b29b-44c35cef7224",
+                "DbiResourceId": "db-IG2E6QEGQ4WVHI7PHF7HIIKIZM",
+                "CACertificateIdentifier": "rds-ca-2019",
+                "DomainMemberships": [],
+                "CopyTagsToSnapshot": false,
+                "MonitoringInterval": 60,
+                "EnhancedMonitoringResourceArn": "arn:aws:logs:us-west-2:644160558196:log-group:RDSOSMetrics:log-stream:db-IG2E6QEGQ4WVHI7PHF7HIIKIZM",
+                "MonitoringRoleArn": "arn:aws:iam::644160558196:role/psp-prod-mon-pspprodmonMonitoringRole2BF2452D-1IRL2RQ0OJU7L",
+                "PromotionTier": 1,
+                "DBInstanceArn": "arn:aws:rds:us-west-2:644160558196:db:psp-prod-mon1",
+                "IAMDatabaseAuthenticationEnabled": false,
+                "PerformanceInsightsEnabled": true,
+                "PerformanceInsightsKMSKeyId": "arn:aws:kms:us-west-2:644160558196:key/c150232e-7ee9-49b2-9efc-b5af383ff458",
+                "PerformanceInsightsRetentionPeriod": 7,
+                "EnabledCloudwatchLogsExports": [
+                    "postgresql"
+                ],
+                "DeletionProtection": false,
+                "AssociatedRoles": [],
+                "TagList": [
+                    {
+                        "Key": "aws:cloudformation:stack-name",
+                        "Value": "psp-prod-mon"
+                    },
+                    {
+                        "Key": "ipsauroracdk_ver",
+                        "Value": "0.8.10"
+                    },
+                    {
+                        "Key": "intuit:asset_id",
+                        "Value": "6847740825712235356"
+                    },
+                    {
+                        "Key": "aws:cloudformation:stack-id",
+                        "Value": "arn:aws:cloudformation:us-west-2:644160558196:stack/psp-prod-mon/2d6ab9f0-11c6-11ee-b21a-0233e37b3291"
+                    },
+                    {
+                        "Key": "intuit:billing:component",
+                        "Value": "PSP"
+                    },
+                    {
+                        "Key": "intuit:billing:service_assetid",
+                        "Value": "6847740825712235356"
+                    },
+                    {
+                        "Key": "dbClusterIdentifier",
+                        "Value": "psp-prod-mon"
+                    },
+                    {
+                        "Key": "intuit:billing:bu",
+                        "Value": "SBSEG"
+                    },
+                    {
+                        "Key": "dbname",
+                        "Value": "psppp01"
+                    },
+                    {
+                        "Key": "ipsauroramonitoring_ver",
+                        "Value": "0.0.1.5"
+                    },
+                    {
+                        "Key": "intuit:billing:appenv",
+                        "Value": "prod"
+                    },
+                    {
+                        "Key": "aws:cloudformation:logical-id",
+                        "Value": "pspprodmonInstance1285B5B24"
+                    },
+                    {
+                        "Key": "intuit:billing:fp",
+                        "Value": "PSP"
+                    },
+                    {
+                        "Key": "ipsauroratemplate_ver",
+                        "Value": "null"
+                    }
+                ],
+                "CustomerOwnedIpEnabled": false,
+                "BackupTarget": "region",
+                "NetworkType": "IPV4",
+                "StorageThroughput": 0,
+                "CertificateDetails": {
+                    "CAIdentifier": "rds-ca-2019",
+                    "ValidTill": {
+                        "__class__": "datetime",
+                        "year": 2024,
+                        "month": 8,
+                        "day": 22,
+                        "hour": 17,
+                        "minute": 8,
+                        "second": 50,
+                        "microsecond": 0
+                    }
+                }
+            },
+            {
+                "DBInstanceIdentifier": "psp-prod-mon2",
+                "DBInstanceClass": "db.r7g.16xlarge",
+                "Engine": "aurora-postgresql",
+                "DBInstanceStatus": "available",
+                "MasterUsername": "postgres",
+                "DBName": "psppp01",
+                "Endpoint": {
+                    "Address": "psp-prod-mon2.cjls0bohfgpq.us-west-2.rds.amazonaws.com",
+                    "Port": 5432,
+                    "HostedZoneId": "Z1PVIF0B656C1W"
+                },
+                "AllocatedStorage": 1,
+                "InstanceCreateTime": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 7,
+                    "day": 21,
+                    "hour": 7,
+                    "minute": 28,
+                    "second": 48,
+                    "microsecond": 451000
+                },
+                "PreferredBackupWindow": "05:00-05:30",
+                "BackupRetentionPeriod": 7,
+                "DBSecurityGroups": [],
+                "VpcSecurityGroups": [
+                    {
+                        "VpcSecurityGroupId": "sg-07eeef54cb52dc5c6",
+                        "Status": "active"
+                    },
+                    {
+                        "VpcSecurityGroupId": "sg-0fc235d4670b80c5b",
+                        "Status": "active"
+                    }
+                ],
+                "DBParameterGroups": [
+                    {
+                        "DBParameterGroupName": "ipsrds-us-west-2-monolithpg15reader017b2326-1sieaz7xnjog",
+                        "ParameterApplyStatus": "in-sync"
+                    }
+                ],
+                "AvailabilityZone": "us-west-2c",
+                "DBSubnetGroup": {
+                    "DBSubnetGroupName": "psp-shared-prodmondbsubnetgrp-sfqafgxgo9qm",
+                    "DBSubnetGroupDescription": "prodmondbsubnetgrp",
+                    "VpcId": "vpc-0d8f1534aaab54ac6",
+                    "SubnetGroupStatus": "Complete",
+                    "Subnets": [
+                        {
+                            "SubnetIdentifier": "subnet-0f7ef67760fa393c1",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2c"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        },
+                        {
+                            "SubnetIdentifier": "subnet-0a5dc411a66975e04",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2a"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        },
+                        {
+                            "SubnetIdentifier": "subnet-08cc9c29050b7fc94",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2b"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        }
+                    ]
+                },
+                "PreferredMaintenanceWindow": "sun:08:48-sun:09:18",
+                "PendingModifiedValues": {},
+                "MultiAZ": false,
+                "EngineVersion": "15.3",
+                "AutoMinorVersionUpgrade": false,
+                "ReadReplicaDBInstanceIdentifiers": [],
+                "LicenseModel": "postgresql-license",
+                "OptionGroupMemberships": [
+                    {
+                        "OptionGroupName": "default:aurora-postgresql-15",
+                        "Status": "in-sync"
+                    }
+                ],
+                "PubliclyAccessible": false,
+                "StorageType": "aurora",
+                "DbInstancePort": 0,
+                "DBClusterIdentifier": "psp-prod-mon",
+                "StorageEncrypted": true,
+                "KmsKeyId": "arn:aws:kms:us-west-2:644160558196:key/f073af1c-ff07-4f2c-b29b-44c35cef7224",
+                "DbiResourceId": "db-ANU2SLFDY4SIJKOXHLP7ZVYD3M",
+                "CACertificateIdentifier": "rds-ca-2019",
+                "DomainMemberships": [],
+                "CopyTagsToSnapshot": false,
+                "MonitoringInterval": 60,
+                "EnhancedMonitoringResourceArn": "arn:aws:logs:us-west-2:644160558196:log-group:RDSOSMetrics:log-stream:db-ANU2SLFDY4SIJKOXHLP7ZVYD3M",
+                "MonitoringRoleArn": "arn:aws:iam::644160558196:role/psp-prod-mon-pspprodmonMonitoringRole2BF2452D-1IRL2RQ0OJU7L",
+                "PromotionTier": 1,
+                "DBInstanceArn": "arn:aws:rds:us-west-2:644160558196:db:psp-prod-mon2",
+                "IAMDatabaseAuthenticationEnabled": false,
+                "PerformanceInsightsEnabled": true,
+                "PerformanceInsightsKMSKeyId": "arn:aws:kms:us-west-2:644160558196:key/c150232e-7ee9-49b2-9efc-b5af383ff458",
+                "PerformanceInsightsRetentionPeriod": 7,
+                "EnabledCloudwatchLogsExports": [
+                    "postgresql"
+                ],
+                "DeletionProtection": false,
+                "AssociatedRoles": [],
+                "TagList": [
+                    {
+                        "Key": "aws:cloudformation:stack-name",
+                        "Value": "psp-prod-mon"
+                    },
+                    {
+                        "Key": "ipsauroracdk_ver",
+                        "Value": "0.8.10"
+                    },
+                    {
+                        "Key": "intuit:asset_id",
+                        "Value": "6847740825712235356"
+                    },
+                    {
+                        "Key": "aws:cloudformation:stack-id",
+                        "Value": "arn:aws:cloudformation:us-west-2:644160558196:stack/psp-prod-mon/2d6ab9f0-11c6-11ee-b21a-0233e37b3291"
+                    },
+                    {
+                        "Key": "intuit:billing:component",
+                        "Value": "PSP"
+                    },
+                    {
+                        "Key": "intuit:billing:service_assetid",
+                        "Value": "6847740825712235356"
+                    },
+                    {
+                        "Key": "dbClusterIdentifier",
+                        "Value": "psp-prod-mon"
+                    },
+                    {
+                        "Key": "intuit:billing:bu",
+                        "Value": "SBSEG"
+                    },
+                    {
+                        "Key": "dbname",
+                        "Value": "psppp01"
+                    },
+                    {
+                        "Key": "ipsauroramonitoring_ver",
+                        "Value": "0.0.1.5"
+                    },
+                    {
+                        "Key": "intuit:billing:appenv",
+                        "Value": "prod"
+                    },
+                    {
+                        "Key": "aws:cloudformation:logical-id",
+                        "Value": "pspprodmon2"
+                    },
+                    {
+                        "Key": "intuit:billing:fp",
+                        "Value": "PSP"
+                    },
+                    {
+                        "Key": "ipsauroratemplate_ver",
+                        "Value": "null"
+                    }
+                ],
+                "CustomerOwnedIpEnabled": false,
+                "BackupTarget": "region",
+                "NetworkType": "IPV4",
+                "StorageThroughput": 0,
+                "CertificateDetails": {
+                    "CAIdentifier": "rds-ca-2019",
+                    "ValidTill": {
+                        "__class__": "datetime",
+                        "year": 2024,
+                        "month": 8,
+                        "day": 22,
+                        "hour": 17,
+                        "minute": 8,
+                        "second": 50,
+                        "microsecond": 0
+                    }
+                }
+            },
+            {
+                "DBInstanceIdentifier": "psp-prod-uw02",
+                "DBInstanceClass": "db.r7g.16xlarge",
+                "Engine": "aurora-postgresql",
+                "DBInstanceStatus": "available",
+                "MasterUsername": "postgres",
+                "DBName": "psppp001",
+                "Endpoint": {
+                    "Address": "psp-prod-uw02.cjls0bohfgpq.us-west-2.rds.amazonaws.com",
+                    "Port": 5432,
+                    "HostedZoneId": "Z1PVIF0B656C1W"
+                },
+                "AllocatedStorage": 1,
+                "InstanceCreateTime": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 7,
+                    "day": 25,
+                    "hour": 9,
+                    "minute": 17,
+                    "second": 22,
+                    "microsecond": 648000
+                },
+                "PreferredBackupWindow": "05:00-05:30",
+                "BackupRetentionPeriod": 7,
+                "DBSecurityGroups": [],
+                "VpcSecurityGroups": [
+                    {
+                        "VpcSecurityGroupId": "sg-0fc235d4670b80c5b",
+                        "Status": "active"
+                    },
+                    {
+                        "VpcSecurityGroupId": "sg-08542b62eaa96bbe3",
+                        "Status": "active"
+                    }
+                ],
+                "DBParameterGroups": [
+                    {
+                        "DBParameterGroupName": "ipsrds-us-west-2-pspuw01pg15instanceae140a41-thqk5004yyu2",
+                        "ParameterApplyStatus": "in-sync"
+                    }
+                ],
+                "AvailabilityZone": "us-west-2a",
+                "DBSubnetGroup": {
+                    "DBSubnetGroupName": "ipsrds-vpc-0d8f1534aaab54ac6-produw01dbsubnetgrp-mfa6mztodptm",
+                    "DBSubnetGroupDescription": "produw01dbsubnetgrp",
+                    "VpcId": "vpc-0d8f1534aaab54ac6",
+                    "SubnetGroupStatus": "Complete",
+                    "Subnets": [
+                        {
+                            "SubnetIdentifier": "subnet-0f7ef67760fa393c1",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2c"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        },
+                        {
+                            "SubnetIdentifier": "subnet-0a5dc411a66975e04",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2a"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        },
+                        {
+                            "SubnetIdentifier": "subnet-08cc9c29050b7fc94",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2b"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        }
+                    ]
+                },
+                "PreferredMaintenanceWindow": "fri:08:25-fri:08:55",
+                "PendingModifiedValues": {},
+                "MultiAZ": false,
+                "EngineVersion": "15.3",
+                "AutoMinorVersionUpgrade": false,
+                "ReadReplicaDBInstanceIdentifiers": [],
+                "LicenseModel": "postgresql-license",
+                "OptionGroupMemberships": [
+                    {
+                        "OptionGroupName": "default:aurora-postgresql-15",
+                        "Status": "in-sync"
+                    }
+                ],
+                "PubliclyAccessible": false,
+                "StorageType": "aurora",
+                "DbInstancePort": 0,
+                "DBClusterIdentifier": "psp-prod-uw02",
+                "StorageEncrypted": true,
+                "KmsKeyId": "arn:aws:kms:us-west-2:644160558196:key/f3f43bd6-7fd1-4e48-ae0c-4fa5ebac4cff",
+                "DbiResourceId": "db-7V7D2J655JCQM22GCSSIF7H5XI",
+                "CACertificateIdentifier": "rds-ca-2019",
+                "DomainMemberships": [],
+                "CopyTagsToSnapshot": false,
+                "MonitoringInterval": 0,
+                "PromotionTier": 1,
+                "DBInstanceArn": "arn:aws:rds:us-west-2:644160558196:db:psp-prod-uw02",
+                "IAMDatabaseAuthenticationEnabled": false,
+                "PerformanceInsightsEnabled": false,
+                "EnabledCloudwatchLogsExports": [
+                    "postgresql"
+                ],
+                "DeletionProtection": false,
+                "AssociatedRoles": [],
+                "TagList": [],
+                "CustomerOwnedIpEnabled": false,
+                "BackupTarget": "region",
+                "NetworkType": "IPV4",
+                "StorageThroughput": 0,
+                "CertificateDetails": {
+                    "CAIdentifier": "rds-ca-2019",
+                    "ValidTill": {
+                        "__class__": "datetime",
+                        "year": 2024,
+                        "month": 8,
+                        "day": 22,
+                        "hour": 17,
+                        "minute": 8,
+                        "second": 50,
+                        "microsecond": 0
+                    }
+                }
+            },
+            {
+                "DBInstanceIdentifier": "psp-prod-uw022",
+                "DBInstanceClass": "db.r7g.16xlarge",
+                "Engine": "aurora-postgresql",
+                "DBInstanceStatus": "available",
+                "MasterUsername": "postgres",
+                "DBName": "psppp001",
+                "Endpoint": {
+                    "Address": "psp-prod-uw022.cjls0bohfgpq.us-west-2.rds.amazonaws.com",
+                    "Port": 5432,
+                    "HostedZoneId": "Z1PVIF0B656C1W"
+                },
+                "AllocatedStorage": 1,
+                "InstanceCreateTime": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 7,
+                    "day": 29,
+                    "hour": 14,
+                    "minute": 16,
+                    "second": 22,
+                    "microsecond": 440000
+                },
+                "PreferredBackupWindow": "05:00-05:30",
+                "BackupRetentionPeriod": 7,
+                "DBSecurityGroups": [],
+                "VpcSecurityGroups": [
+                    {
+                        "VpcSecurityGroupId": "sg-0fc235d4670b80c5b",
+                        "Status": "active"
+                    },
+                    {
+                        "VpcSecurityGroupId": "sg-08542b62eaa96bbe3",
+                        "Status": "active"
+                    }
+                ],
+                "DBParameterGroups": [
+                    {
+                        "DBParameterGroupName": "ipsrds-us-west-2-pspuw01pg15instanceae140a41-thqk5004yyu2",
+                        "ParameterApplyStatus": "in-sync"
+                    }
+                ],
+                "AvailabilityZone": "us-west-2c",
+                "DBSubnetGroup": {
+                    "DBSubnetGroupName": "ipsrds-vpc-0d8f1534aaab54ac6-produw01dbsubnetgrp-mfa6mztodptm",
+                    "DBSubnetGroupDescription": "produw01dbsubnetgrp",
+                    "VpcId": "vpc-0d8f1534aaab54ac6",
+                    "SubnetGroupStatus": "Complete",
+                    "Subnets": [
+                        {
+                            "SubnetIdentifier": "subnet-0f7ef67760fa393c1",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2c"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        },
+                        {
+                            "SubnetIdentifier": "subnet-0a5dc411a66975e04",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2a"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        },
+                        {
+                            "SubnetIdentifier": "subnet-08cc9c29050b7fc94",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2b"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        }
+                    ]
+                },
+                "PreferredMaintenanceWindow": "fri:08:25-fri:08:55",
+                "PendingModifiedValues": {},
+                "MultiAZ": false,
+                "EngineVersion": "15.3",
+                "AutoMinorVersionUpgrade": false,
+                "ReadReplicaDBInstanceIdentifiers": [],
+                "LicenseModel": "postgresql-license",
+                "OptionGroupMemberships": [
+                    {
+                        "OptionGroupName": "default:aurora-postgresql-15",
+                        "Status": "in-sync"
+                    }
+                ],
+                "PubliclyAccessible": false,
+                "StorageType": "aurora",
+                "DbInstancePort": 0,
+                "DBClusterIdentifier": "psp-prod-uw02",
+                "StorageEncrypted": true,
+                "KmsKeyId": "arn:aws:kms:us-west-2:644160558196:key/f3f43bd6-7fd1-4e48-ae0c-4fa5ebac4cff",
+                "DbiResourceId": "db-LM2MM3WN7BKKELTCK2VIAJZIPI",
+                "CACertificateIdentifier": "rds-ca-2019",
+                "DomainMemberships": [],
+                "CopyTagsToSnapshot": false,
+                "MonitoringInterval": 0,
+                "PromotionTier": 1,
+                "DBInstanceArn": "arn:aws:rds:us-west-2:644160558196:db:psp-prod-uw022",
+                "IAMDatabaseAuthenticationEnabled": false,
+                "PerformanceInsightsEnabled": true,
+                "PerformanceInsightsKMSKeyId": "arn:aws:kms:us-west-2:644160558196:key/c150232e-7ee9-49b2-9efc-b5af383ff458",
+                "PerformanceInsightsRetentionPeriod": 7,
+                "EnabledCloudwatchLogsExports": [
+                    "postgresql"
+                ],
+                "DeletionProtection": false,
+                "AssociatedRoles": [],
+                "TagList": [],
+                "CustomerOwnedIpEnabled": false,
+                "BackupTarget": "region",
+                "NetworkType": "IPV4",
+                "StorageThroughput": 0,
+                "CertificateDetails": {
+                    "CAIdentifier": "rds-ca-2019",
+                    "ValidTill": {
+                        "__class__": "datetime",
+                        "year": 2024,
+                        "month": 8,
+                        "day": 22,
+                        "hour": 17,
+                        "minute": 8,
+                        "second": 50,
+                        "microsecond": 0
+                    }
+                }
+            },
+            {
+                "DBInstanceIdentifier": "psprpp01",
+                "DBInstanceClass": "db.r5.16xlarge",
+                "Engine": "oracle-ee",
+                "DBInstanceStatus": "available",
+                "MasterUsername": "intuadmin",
+                "DBName": "PSPRPP01",
+                "Endpoint": {
+                    "Address": "psprpp01.cjls0bohfgpq.us-west-2.rds.amazonaws.com",
+                    "Port": 1521,
+                    "HostedZoneId": "Z1PVIF0B656C1W"
+                },
+                "AllocatedStorage": 43000,
+                "InstanceCreateTime": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 5,
+                    "day": 21,
+                    "hour": 8,
+                    "minute": 17,
+                    "second": 25,
+                    "microsecond": 194000
+                },
+                "PreferredBackupWindow": "02:00-02:30",
+                "BackupRetentionPeriod": 35,
+                "DBSecurityGroups": [],
+                "VpcSecurityGroups": [
+                    {
+                        "VpcSecurityGroupId": "sg-03b55c3225c7af3d4",
+                        "Status": "active"
+                    },
+                    {
+                        "VpcSecurityGroupId": "sg-01133f66122682f0b",
+                        "Status": "active"
+                    }
+                ],
+                "DBParameterGroups": [
+                    {
+                        "DBParameterGroupName": "oracle-ee-19-psp-prod-clusterdb-vpc-2",
+                        "ParameterApplyStatus": "in-sync"
+                    }
+                ],
+                "AvailabilityZone": "us-west-2c",
+                "DBSubnetGroup": {
+                    "DBSubnetGroupName": "prod-clusterdb-vpc-2",
+                    "DBSubnetGroupDescription": "prod-clusterdb-vpc-2 subnet group",
+                    "VpcId": "vpc-0d8f1534aaab54ac6",
+                    "SubnetGroupStatus": "Complete",
+                    "Subnets": [
+                        {
+                            "SubnetIdentifier": "subnet-0f7ef67760fa393c1",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2c"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        },
+                        {
+                            "SubnetIdentifier": "subnet-0a5dc411a66975e04",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2a"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        },
+                        {
+                            "SubnetIdentifier": "subnet-08cc9c29050b7fc94",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2b"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        }
+                    ]
+                },
+                "PreferredMaintenanceWindow": "mon:06:00-mon:06:30",
+                "PendingModifiedValues": {},
+                "LatestRestorableTime": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 8,
+                    "day": 3,
+                    "hour": 10,
+                    "minute": 27,
+                    "second": 4,
+                    "microsecond": 0
+                },
+                "MultiAZ": false,
+                "EngineVersion": "19.0.0.0.ru-2020-04.rur-2020-04.r1",
+                "AutoMinorVersionUpgrade": false,
+                "ReadReplicaDBInstanceIdentifiers": [],
+                "LicenseModel": "bring-your-own-license",
+                "Iops": 50000,
+                "OptionGroupMemberships": [
+                    {
+                        "OptionGroupName": "oracle-ee-19-prod-clusterdb-vpc-2",
+                        "Status": "in-sync"
+                    }
+                ],
+                "CharacterSetName": "AL32UTF8",
+                "NcharCharacterSetName": "AL16UTF16",
+                "PubliclyAccessible": false,
+                "StorageType": "io1",
+                "DbInstancePort": 0,
+                "StorageEncrypted": true,
+                "KmsKeyId": "arn:aws:kms:us-west-2:644160558196:key/d8e5eb49-fe55-44e4-9fb4-7911b9fc1328",
+                "DbiResourceId": "db-MCHBMSGGZBVNMDIB7TFVY3WICA",
+                "CACertificateIdentifier": "rds-ca-2019",
+                "DomainMemberships": [],
+                "CopyTagsToSnapshot": true,
+                "MonitoringInterval": 0,
+                "DBInstanceArn": "arn:aws:rds:us-west-2:644160558196:db:psprpp01",
+                "IAMDatabaseAuthenticationEnabled": false,
+                "PerformanceInsightsEnabled": false,
+                "EnabledCloudwatchLogsExports": [
+                    "alert"
+                ],
+                "DeletionProtection": true,
+                "AssociatedRoles": [],
+                "TagList": [
+                    {
+                        "Key": "env",
+                        "Value": "prd"
+                    },
+                    {
+                        "Key": "cluster",
+                        "Value": ""
+                    }
+                ],
+                "CustomerOwnedIpEnabled": false,
+                "ActivityStreamStatus": "stopped",
+                "BackupTarget": "region",
+                "NetworkType": "IPV4",
+                "StorageThroughput": 0,
+                "CertificateDetails": {
+                    "CAIdentifier": "rds-ca-2019",
+                    "ValidTill": {
+                        "__class__": "datetime",
+                        "year": 2024,
+                        "month": 8,
+                        "day": 22,
+                        "hour": 17,
+                        "minute": 8,
+                        "second": 50,
+                        "microsecond": 0
+                    }
+                }
+            },
+            {
+                "DBInstanceIdentifier": "pspuwp01",
+                "DBInstanceClass": "db.r5.16xlarge",
+                "Engine": "oracle-ee",
+                "DBInstanceStatus": "available",
+                "MasterUsername": "intuadmin",
+                "DBName": "PSPUWP01",
+                "Endpoint": {
+                    "Address": "pspuwp01.cjls0bohfgpq.us-west-2.rds.amazonaws.com",
+                    "Port": 1521,
+                    "HostedZoneId": "Z1PVIF0B656C1W"
+                },
+                "AllocatedStorage": 47300,
+                "InstanceCreateTime": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 8,
+                    "day": 14,
+                    "hour": 16,
+                    "minute": 45,
+                    "second": 55,
+                    "microsecond": 676000
+                },
+                "PreferredBackupWindow": "05:00-05:30",
+                "BackupRetentionPeriod": 35,
+                "DBSecurityGroups": [],
+                "VpcSecurityGroups": [
+                    {
+                        "VpcSecurityGroupId": "sg-005617ab918388f2b",
+                        "Status": "active"
+                    },
+                    {
+                        "VpcSecurityGroupId": "sg-03b55c3225c7af3d4",
+                        "Status": "active"
+                    },
+                    {
+                        "VpcSecurityGroupId": "sg-01133f66122682f0b",
+                        "Status": "active"
+                    }
+                ],
+                "DBParameterGroups": [
+                    {
+                        "DBParameterGroupName": "oracle-ee-19-psp-prod-clusterdb-vpc-2",
+                        "ParameterApplyStatus": "in-sync"
+                    }
+                ],
+                "AvailabilityZone": "us-west-2b",
+                "DBSubnetGroup": {
+                    "DBSubnetGroupName": "prod-clusterdb-vpc-2",
+                    "DBSubnetGroupDescription": "prod-clusterdb-vpc-2 subnet group",
+                    "VpcId": "vpc-0d8f1534aaab54ac6",
+                    "SubnetGroupStatus": "Complete",
+                    "Subnets": [
+                        {
+                            "SubnetIdentifier": "subnet-0f7ef67760fa393c1",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2c"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        },
+                        {
+                            "SubnetIdentifier": "subnet-0a5dc411a66975e04",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2a"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        },
+                        {
+                            "SubnetIdentifier": "subnet-08cc9c29050b7fc94",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2b"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        }
+                    ]
+                },
+                "PreferredMaintenanceWindow": "mon:06:00-mon:06:30",
+                "PendingModifiedValues": {},
+                "LatestRestorableTime": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 8,
+                    "day": 3,
+                    "hour": 10,
+                    "minute": 25,
+                    "second": 40,
+                    "microsecond": 0
+                },
+                "MultiAZ": true,
+                "EngineVersion": "19.0.0.0.ru-2020-04.rur-2020-04.r1",
+                "AutoMinorVersionUpgrade": false,
+                "ReadReplicaDBInstanceIdentifiers": [
+                    "pspadg01",
+                    "pspadg02"
+                ],
+                "LicenseModel": "bring-your-own-license",
+                "Iops": 50000,
+                "OptionGroupMemberships": [
+                    {
+                        "OptionGroupName": "oracle-ee-19-prod-clusterdb-vpc-2",
+                        "Status": "in-sync"
+                    }
+                ],
+                "CharacterSetName": "AL32UTF8",
+                "NcharCharacterSetName": "AL16UTF16",
+                "SecondaryAvailabilityZone": "us-west-2c",
+                "PubliclyAccessible": false,
+                "StorageType": "io1",
+                "DbInstancePort": 0,
+                "StorageEncrypted": true,
+                "KmsKeyId": "arn:aws:kms:us-west-2:644160558196:key/d8e5eb49-fe55-44e4-9fb4-7911b9fc1328",
+                "DbiResourceId": "db-JOD54UQSLLOM6GNJNLWC7PPJHY",
+                "CACertificateIdentifier": "rds-ca-2019",
+                "DomainMemberships": [],
+                "CopyTagsToSnapshot": false,
+                "MonitoringInterval": 0,
+                "DBInstanceArn": "arn:aws:rds:us-west-2:644160558196:db:pspuwp01",
+                "IAMDatabaseAuthenticationEnabled": false,
+                "PerformanceInsightsEnabled": true,
+                "PerformanceInsightsKMSKeyId": "arn:aws:kms:us-west-2:644160558196:key/c150232e-7ee9-49b2-9efc-b5af383ff458",
+                "PerformanceInsightsRetentionPeriod": 7,
+                "EnabledCloudwatchLogsExports": [
+                    "alert"
+                ],
+                "DeletionProtection": true,
+                "AssociatedRoles": [],
+                "TagList": [
+                    {
+                        "Key": "env",
+                        "Value": "prd"
+                    },
+                    {
+                        "Key": "cluster",
+                        "Value": ""
+                    }
+                ],
+                "CustomerOwnedIpEnabled": false,
+                "ActivityStreamStatus": "stopped",
+                "BackupTarget": "region",
+                "NetworkType": "IPV4",
+                "CertificateDetails": {
+                    "CAIdentifier": "rds-ca-2019",
+                    "ValidTill": {
+                        "__class__": "datetime",
+                        "year": 2024,
+                        "month": 8,
+                        "day": 22,
+                        "hour": 17,
+                        "minute": 8,
+                        "second": 50,
+                        "microsecond": 0
+                    }
+                }
+            },
+            {
+                "DBInstanceIdentifier": "pspvd1pt",
+                "DBInstanceClass": "db.r5.2xlarge",
+                "Engine": "oracle-ee",
+                "DBInstanceStatus": "available",
+                "MasterUsername": "intuadmin",
+                "DBName": "PSPVD1PT",
+                "Endpoint": {
+                    "Address": "pspvd1pt.cjls0bohfgpq.us-west-2.rds.amazonaws.com",
+                    "Port": 1521,
+                    "HostedZoneId": "Z1PVIF0B656C1W"
+                },
+                "AllocatedStorage": 200,
+                "InstanceCreateTime": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 9,
+                    "day": 5,
+                    "hour": 14,
+                    "minute": 15,
+                    "second": 11,
+                    "microsecond": 160000
+                },
+                "PreferredBackupWindow": "05:00-05:30",
+                "BackupRetentionPeriod": 35,
+                "DBSecurityGroups": [],
+                "VpcSecurityGroups": [
+                    {
+                        "VpcSecurityGroupId": "sg-01133f66122682f0b",
+                        "Status": "active"
+                    },
+                    {
+                        "VpcSecurityGroupId": "sg-03b55c3225c7af3d4",
+                        "Status": "active"
+                    }
+                ],
+                "DBParameterGroups": [
+                    {
+                        "DBParameterGroupName": "oracle-ee-19-psp-prod-clusterdb-vpc-2",
+                        "ParameterApplyStatus": "in-sync"
+                    }
+                ],
+                "AvailabilityZone": "us-west-2b",
+                "DBSubnetGroup": {
+                    "DBSubnetGroupName": "prod-clusterdb-vpc-2",
+                    "DBSubnetGroupDescription": "prod-clusterdb-vpc-2 subnet group",
+                    "VpcId": "vpc-0d8f1534aaab54ac6",
+                    "SubnetGroupStatus": "Complete",
+                    "Subnets": [
+                        {
+                            "SubnetIdentifier": "subnet-0f7ef67760fa393c1",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2c"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        },
+                        {
+                            "SubnetIdentifier": "subnet-0a5dc411a66975e04",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2a"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        },
+                        {
+                            "SubnetIdentifier": "subnet-08cc9c29050b7fc94",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2b"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        }
+                    ]
+                },
+                "PreferredMaintenanceWindow": "mon:06:00-mon:06:30",
+                "PendingModifiedValues": {},
+                "LatestRestorableTime": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 8,
+                    "day": 3,
+                    "hour": 10,
+                    "minute": 27,
+                    "second": 31,
+                    "microsecond": 0
+                },
+                "MultiAZ": false,
+                "EngineVersion": "19.0.0.0.ru-2020-04.rur-2020-04.r1",
+                "AutoMinorVersionUpgrade": false,
+                "ReadReplicaDBInstanceIdentifiers": [],
+                "LicenseModel": "bring-your-own-license",
+                "Iops": 1000,
+                "OptionGroupMemberships": [
+                    {
+                        "OptionGroupName": "oracle-ee-19-prod-clusterdb-vpc-2",
+                        "Status": "in-sync"
+                    }
+                ],
+                "CharacterSetName": "AL32UTF8",
+                "NcharCharacterSetName": "AL16UTF16",
+                "PubliclyAccessible": false,
+                "StorageType": "io1",
+                "DbInstancePort": 0,
+                "StorageEncrypted": true,
+                "KmsKeyId": "arn:aws:kms:us-west-2:644160558196:key/84487890-57a6-4993-96b1-743fe46bd89f",
+                "DbiResourceId": "db-ZUDCLLQTF3GKNPK5ELHTEBFPHM",
+                "CACertificateIdentifier": "rds-ca-2019",
+                "DomainMemberships": [],
+                "CopyTagsToSnapshot": false,
+                "MonitoringInterval": 0,
+                "MonitoringRoleArn": "",
+                "DBInstanceArn": "arn:aws:rds:us-west-2:644160558196:db:pspvd1pt",
+                "IAMDatabaseAuthenticationEnabled": false,
+                "PerformanceInsightsEnabled": false,
+                "DeletionProtection": true,
+                "AssociatedRoles": [],
+                "TagList": [
+                    {
+                        "Key": "aws:cloudformation:stack-name",
+                        "Value": "rds-pspvd1pt-20190905T192622"
+                    },
+                    {
+                        "Key": "cluster",
+                        "Value": ""
+                    },
+                    {
+                        "Key": "aws:cloudformation:logical-id",
+                        "Value": "DBInstance"
+                    },
+                    {
+                        "Key": "aws:cloudformation:stack-id",
+                        "Value": "arn:aws:cloudformation:us-west-2:644160558196:stack/rds-pspvd1pt-20190905T192622/f3764ba0-cfe4-11e9-9f3d-0284c9f60df0"
+                    },
+                    {
+                        "Key": "env",
+                        "Value": "prd"
+                    }
+                ],
+                "CustomerOwnedIpEnabled": false,
+                "ActivityStreamStatus": "stopped",
+                "BackupTarget": "region",
+                "NetworkType": "IPV4",
+                "CertificateDetails": {
+                    "CAIdentifier": "rds-ca-2019",
+                    "ValidTill": {
+                        "__class__": "datetime",
+                        "year": 2024,
+                        "month": 8,
+                        "day": 22,
+                        "hour": 17,
+                        "minute": 8,
+                        "second": 50,
+                        "microsecond": 0
+                    }
+                }
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
