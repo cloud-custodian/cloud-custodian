@@ -242,7 +242,8 @@ class NetworkSecurityGroupTest(BaseTest):
                  'Cidr': {
                     'value_type': 'cidr',
                     'op': 'in',
-                    'value': ['10.0.0.0/8']
+                    'value': ['10.0.0.0/8'],
+                    'ipType': 'destination'
         }}]
         })
 
@@ -261,7 +262,8 @@ class NetworkSecurityGroupTest(BaseTest):
                  'Cidr': {
                     'value_type': 'cidr',
                     'op': 'in',
-                    'value': ['10.0.0.0/8']
+                    'value': ['10.0.0.0/8'],
+                    'ipType': 'source'
         }}]
         })
 
@@ -280,6 +282,7 @@ class NetworkSecurityGroupTest(BaseTest):
                     'value_type': 'cidr',
                     'op': 'in',
                     'value': ['10.0.0.0/8'],
+                    'ipType': 'source'
                 },
                 'ports': '22',
                 'ipProtocol': 'TCP',
@@ -301,7 +304,8 @@ class NetworkSecurityGroupTest(BaseTest):
                  'Cidr': {
                     'value_type': 'cidr',
                     'op': 'in',
-                    'value': ['10.0.0.0/8']
+                    'value': ['10.0.0.0/8'],
+                    'ipType': 'source'
                 },
                 'ports': '10000',
                 'ipProtocol': 'TCP',

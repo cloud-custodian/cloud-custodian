@@ -121,7 +121,6 @@ SOURCE = 'source'
 DESTINATION = 'destination'
 
 CIDR = 'Cidr'
-CIDR6 = 'CidrV6'
 
 
 class NetworkSecurityGroupFilter(Filter):
@@ -140,8 +139,7 @@ class NetworkSecurityGroupFilter(Filter):
             ACCESS: {'type': 'string', 'enum': [ALLOW_OPERATION, DENY_OPERATION]},
             SOURCE: {'type': 'string'},
             DESTINATION: {'type': 'string'},
-            CIDR: {},
-            CIDR6: {}
+            CIDR: {}
         },
         'required': ['type', ACCESS]
     }
@@ -202,27 +200,8 @@ class NetworkSecurityGroupFilter(Filter):
         return matched
 
     def expand_permissions(self, permissions):
-        """TODO Expand each list of cidr, prefix list, user id group pair
-        by port/protocol as an individual rule.
-
-        The console ux automatically expands them out as addition/removal is
-        per this expansion, the describe calls automatically group them.
-        """
         for p in permissions:
-            np = dict(p)
-            values = {}
-            for k in (u'sourceAddressPrefix', # TODO - what values can it take?
-                      u'sourceAddressPrefixes', # TODO - what values can it take?
-                      u'destinationAddressPrefix', # TODO - what values can it take?
-                      u'destinationAddressPrefixes'): # TODO - what values can it take?
-                values[k] = np.pop(k, ())
-                np[k] = []
-            for k, v in values.items():
-                if not v:
-                    continue
-                ep = dict(np)
-                ep[k] = v
-                yield ep
+            yield dict(p)
 
     def _process_cidr(self, cidr_key, cidr_type, range_type, perm):
         found = None
@@ -251,16 +230,10 @@ class NetworkSecurityGroupFilter(Filter):
         return found
 
     def _process_cidrs(self, perm):
-        found_v6 = found_v4 = None
-        if 'CidrV6' in self.data:
-            found_v6 = self._process_cidr('CidrV6', 'CidrIpv6', 'Ipv6Ranges', perm) # TODO IPv6
+        found_v4 = False
         if 'Cidr' in self.data:
-            found_v4 = self._process_cidr('Cidr', 'CidrIp', 'sourceAddressPrefix', perm) # TODO - how to chose automatically sourceAddressPrefix
-        match_op = self.data.get('match-operator', 'and') == 'and' and all or any
-        cidr_match = [k for k in (found_v6, found_v4) if k is not None]
-        if not cidr_match:
-            return None
-        return match_op(cidr_match)
+            found_v4 = self._process_cidr('Cidr', 'CidrIp', f"{self.data['Cidr']['ipType'].lower()}AddressPrefix", perm)
+        return found_v4
 
     def _check_nsg(self, nsg):
         nsg_ports = PortsRangeHelper.build_ports_dict(nsg, self.direction_key, self.ip_protocol,
