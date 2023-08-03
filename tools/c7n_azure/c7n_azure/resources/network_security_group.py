@@ -120,6 +120,9 @@ PRIORITY_STEP = 10
 SOURCE = 'source'
 DESTINATION = 'destination'
 
+CIDR = 'Cidr'
+CIDR6 = 'CidrV6'
+
 
 class NetworkSecurityGroupFilter(Filter):
     """
@@ -137,6 +140,8 @@ class NetworkSecurityGroupFilter(Filter):
             ACCESS: {'type': 'string', 'enum': [ALLOW_OPERATION, DENY_OPERATION]},
             SOURCE: {'type': 'string'},
             DESTINATION: {'type': 'string'},
+            CIDR: {},
+            CIDR6: {}
         },
         'required': ['type', ACCESS]
     }
@@ -154,6 +159,8 @@ class NetworkSecurityGroupFilter(Filter):
         return True
 
     def process(self, network_security_groups, event=None):
+        # List of NSG matching the policies, to return
+        matched = []
         # Get variables
         self.ip_protocol = self.data.get(IP_PROTOCOL, '*')
         self.IsAllowed = StringUtils.equal(self.data.get(ACCESS), ALLOW_OPERATION)
@@ -168,8 +175,91 @@ class NetworkSecurityGroupFilter(Filter):
         self.source_address = self.data.get(SOURCE, None)
         self.destination_address = self.data.get(DESTINATION, None)
 
-        nsgs = [nsg for nsg in network_security_groups if self._check_nsg(nsg)]
-        return nsgs
+        match_op = self.data.get('match-operator', 'and') == 'and' and all or any
+        matching_nsg = {}
+        for nsg in network_security_groups:
+            matching_nsg['check_nsg'] = self._check_nsg(nsg)
+
+            permissions_to_expand = []
+            for security_rule in nsg['properties']['securityRules']:
+                if security_rule['properties']['direction'] == self.direction_key:
+                    permissions_to_expand.append(security_rule['properties'])
+            for perm in self.expand_permissions(permissions_to_expand):
+                perm_matches = self._process_cidrs(perm)
+                if perm_matches:
+                    matching_nsg['check_cidr'] = True
+            # for perm in nsg['properties']['securityRules']:
+            #     if self._process_cidrs(nsg):
+            #         matching_nsg['check_cidr'] = True
+            matching_nsg_values = list(filter(
+                    lambda x: x is not None, matching_nsg.values()))
+                        # account for one python behavior any([]) == False, all([]) == True
+            if match_op == all and not matching_nsg_values:
+                continue
+
+            match = match_op(matching_nsg_values)
+            if match:
+                matched.append(nsg)
+        return matched
+
+    def expand_permissions(self, permissions):
+        """Expand each list of cidr, prefix list, user id group pair
+        by port/protocol as an individual rule.
+
+        The console ux automatically expands them out as addition/removal is
+        per this expansion, the describe calls automatically group them.
+        """
+        for p in permissions:
+            np = dict(p)
+            values = {}
+            for k in (u'sourceAddressPrefix', # TODO - what values can it take?
+                      u'sourceAddressPrefixes', # TODO - what values can it take?
+                      u'destinationAddressPrefix', # TODO - what values can it take?
+                      u'destinationAddressPrefixes'): # TODO - what values can it take?
+                values[k] = np.pop(k, ())
+                np[k] = []
+            for k, v in values.items():
+                if not v:
+                    continue
+                ep = dict(np)
+                ep[k] = v
+                yield ep
+
+    def _process_cidr(self, cidr_key, cidr_type, range_type, perm):
+        found = None
+        ip_perms = perm.get(range_type, [])
+        if not ip_perms:
+            return False
+
+        match_range = self.data[cidr_key]
+
+        if isinstance(match_range, dict):
+            match_range['key'] = cidr_type
+        else:
+            match_range = {cidr_type: match_range}
+
+        vf = ValueFilter(match_range, self.manager)
+        vf.annotate = False
+
+        for ip_range in ip_perms:
+            found = vf(ip_range)
+            if found:
+                break
+            else:
+                found = False
+        return found
+
+    def _process_cidrs(self, perm):
+        found_v6 = found_v4 = None
+        if 'CidrV6' in self.data:
+            found_v6 = self._process_cidr('CidrV6', 'CidrIpv6', 'Ipv6Ranges', perm) # TODO IPv6
+        if 'Cidr' in self.data:
+            found_v4 = self._process_cidr('Cidr', 'CidrIp', 'sourceAddressPrefix', perm) # TODO - how to chose automatically sourceAddressPrefix
+        match_op = self.data.get('match-operator', 'and') == 'and' and all or any
+        cidr_match = [k for k in (found_v6, found_v4) if k is not None]
+        if not cidr_match:
+            return None
+        return match_op(cidr_match)
 
     def _check_nsg(self, nsg):
         nsg_ports = PortsRangeHelper.build_ports_dict(nsg, self.direction_key, self.ip_protocol,
