@@ -1016,7 +1016,7 @@ class SGUsage(Filter):
         return set(expr.search(resources) or [])
 
     def is_pristine_default_sg(self, account_id, sg):
-        # handling security groups that exactly match the shape of a automatically generated security group with no changes whatsoever
+        # handling security groups that exactly match the shape of an automatically generated security group with no changes whatsoever
         # see: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/default-custom-security-groups.html#default-security-group
         sg_group_name = sg["GroupName"]
         if sg_group_name != "default":
