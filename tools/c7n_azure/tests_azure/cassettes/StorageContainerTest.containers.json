@@ -313,6 +313,61 @@
         {
             "request": {
                 "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_storage/providers/Microsoft.Storage/storageAccounts/cctstoragey6akyqpagdt3o/blobServices/default/containers/containerone?api-version=2019-04-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-length": [
+                        "9066"
+                    ],
+                    "date": [
+                        "Thu, 29 Aug 2019 20:30:08 GMT"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "etag": [
+                        "\"0x8D8BE1D525A6958\""
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_storage/providers/Microsoft.Storage/storageAccounts/cctstoragey6akyqpagdt3o/blobServices/default/containers/containerone",
+                        "name": "containerone",
+                        "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
+                        "etag": "\"0x8D8BE1D525A6958\"",
+                        "properties": {
+                            "deleted": false,
+                            "remainingRetentionDays": 0,
+                            "defaultEncryptionScope": "$account-encryption-key",
+                            "denyEncryptionScopeOverride": false,
+                            "publicAccess": "Container",
+                            "leaseStatus": "Unlocked",
+                            "leaseState": "Available",
+                            "lastModifiedTime": "2021-01-21T15:00:41.0000000Z",
+                            "legalHold": {
+                                "hasLegalHold": false,
+                                "tags": []
+                            },
+                            "hasImmutabilityPolicy": false,
+                            "hasLegalHold": false
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
                 "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Storage/storageAccounts?api-version=2019-04-01",
                 "body": null,
                 "headers": {}
