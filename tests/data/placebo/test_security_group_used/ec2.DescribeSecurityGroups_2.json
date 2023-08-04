@@ -11,6 +11,7 @@
                                 "CidrIp": "0.0.0.0/0"
                             }
                         ], 
+                        "Ipv6Ranges": [],
                         "UserIdGroupPairs": [], 
                         "PrefixListIds": []
                     }
@@ -19,7 +20,8 @@
                 "IpPermissions": [
                     {
                         "IpProtocol": "-1", 
-                        "IpRanges": [], 
+                        "IpRanges": [],
+                        "Ipv6Ranges": [],
                         "UserIdGroupPairs": [
                             {
                                 "UserId": "644160558196", 

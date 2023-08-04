@@ -990,6 +990,9 @@ class SGUsage(Filter):
     def get_sg_refs(self):
         sg_ids = set()
         for sg in self.manager.get_resource_manager('security-group').resources():
+            if self.is_pristine_default_sg(self.manager.account_id, sg):
+                continue
+
             for perm_type in ('IpPermissions', 'IpPermissionsEgress'):
                 for p in sg.get(perm_type, []):
                     for g in p.get('UserIdGroupPairs', ()):
@@ -1011,6 +1014,60 @@ class SGUsage(Filter):
         expr = jmespath_compile('[].computeResources.securityGroupIds[]')
         resources = self.manager.get_resource_manager('aws.batch-compute').resources(augment=False)
         return set(expr.search(resources) or [])
+
+    def is_pristine_default_sg(self, account_id, sg):
+        # handling security groups that exactly match the shape of a automatically generated security group with no changes whatsoever
+        # see: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/default-custom-security-groups.html#default-security-group
+        sg_group_name = sg["GroupName"]
+        if sg_group_name != "default":
+            return False
+
+        sg_group_id = sg["GroupId"]
+        expected_default_ingress_rule = {
+            "IpProtocol": "-1",
+            "IpRanges": [],
+            "Ipv6Ranges": [],
+            "PrefixListIds": [],
+            "UserIdGroupPairs": [
+                {
+                    "GroupId": sg_group_id,
+                    "UserId": account_id,
+                }
+            ]
+        }
+
+        expected_default_egress_rule = {
+            "IpProtocol": "-1",
+            "IpRanges": [
+                {
+                    "CidrIp": "0.0.0.0/0",
+                },
+            ],
+            "Ipv6Ranges": [],
+            "PrefixListIds": [],
+            "UserIdGroupPairs": [],
+        }
+
+        ip_permissions = sg["IpPermissions"]
+        if len(ip_permissions) > 1 or len(ip_permissions) == 0:
+            self.log.debug("sg_group_id [%s] does not have expected IpPermissions count", sg_group_id)
+            return False
+
+        if expected_default_ingress_rule != ip_permissions[0]:
+            self.log.debug("sg_group_id [%s] does not have expected IpPermissions rule", sg_group_id)
+            return False
+
+        ip_permissions_egress = sg["IpPermissionsEgress"]
+        if len(ip_permissions_egress) > 1 or len(ip_permissions_egress) == 0:
+            self.log.debug("sg_group_id [%s] does not have expected IpPermissionsEgress count", sg_group_id)
+            return False
+
+        if expected_default_egress_rule != ip_permissions_egress[0]:
+            self.log.debug("sg_group_id [%s] does not have expected IpPermissionsEgress rule", sg_group_id)
+            return False
+
+        return True
+
 
 
 @SecurityGroup.filter_registry.register('unused')
