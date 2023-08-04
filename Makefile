@@ -39,7 +39,7 @@ install:
 .PHONY: test
 
 test:
-	. $(PWD)/test.env && poetry run pytest -n auto tests tools/c7n_gcp $(ARGS)
+	. $(PWD)/test.env && poetry run pytest -n auto tests tools $(ARGS)
 
 test-coverage:
 	. $(PWD)/test.env && poetry run pytest -n auto \
