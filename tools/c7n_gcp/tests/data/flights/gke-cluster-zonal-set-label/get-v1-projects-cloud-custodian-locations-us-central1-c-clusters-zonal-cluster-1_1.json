@@ -2,7 +2,7 @@
   "headers": {
     "content-type": "application/json; charset=UTF-8",
     "vary": "Origin, X-Origin, Referer",
-    "date": "Fri, 04 Aug 2023 16:39:53 GMT",
+    "date": "Fri, 04 Aug 2023 16:52:29 GMT",
     "server": "ESF",
     "cache-control": "private",
     "x-xss-protection": "0",
@@ -224,7 +224,7 @@
       }
     },
     "nodePoolAutoConfig": {},
-    "etag": "a906d999-054f-42d4-95cb-c00509f1b748",
+    "etag": "d3a216df-bb0c-4700-83f0-4f2c52691abd",
     "securityPostureConfig": {
       "mode": "BASIC",
       "vulnerabilityMode": "VULNERABILITY_DISABLED"

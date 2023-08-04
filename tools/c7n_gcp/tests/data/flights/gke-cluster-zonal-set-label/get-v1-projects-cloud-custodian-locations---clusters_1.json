@@ -2,7 +2,7 @@
   "headers": {
     "content-type": "application/json; charset=UTF-8",
     "vary": "Origin, X-Origin, Referer",
-    "date": "Fri, 04 Aug 2023 16:39:40 GMT",
+    "date": "Fri, 04 Aug 2023 16:52:28 GMT",
     "server": "ESF",
     "cache-control": "private",
     "x-xss-protection": "0",
@@ -223,7 +223,7 @@
           }
         },
         "nodePoolAutoConfig": {},
-        "etag": "f78d185e-82e9-4877-b15b-4b5bd95b91d4",
+        "etag": "ce2c87c9-ca80-4e56-a650-3d7332c18616",
         "securityPostureConfig": {
           "mode": "BASIC",
           "vulnerabilityMode": "VULNERABILITY_DISABLED"
@@ -808,7 +808,7 @@
           "channel": "REGULAR"
         },
         "workloadIdentityConfig": {
-          "workloadPool": "elastic-platform-capacity.svc.id.goog"
+          "workloadPool": "cloud-custodian.svc.id.goog"
         },
         "notificationConfig": {
           "pubsub": {}

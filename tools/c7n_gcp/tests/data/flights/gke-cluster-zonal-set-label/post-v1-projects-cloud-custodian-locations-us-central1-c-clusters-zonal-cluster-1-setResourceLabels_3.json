@@ -2,7 +2,7 @@
   "headers": {
     "content-type": "application/json; charset=UTF-8",
     "vary": "Origin, X-Origin, Referer",
-    "date": "Fri, 04 Aug 2023 16:39:54 GMT",
+    "date": "Fri, 04 Aug 2023 16:52:30 GMT",
     "server": "ESF",
     "cache-control": "private",
     "x-xss-protection": "0",
@@ -15,12 +15,12 @@
     "-content-encoding": "gzip"
   },
   "body": {
-    "name": "operation-1691167194835-e1a4536a-29ff-47e1-8f30-e48753348d6a",
+    "name": "operation-1691167950413-1855472d-ce4d-45c7-8609-027698340acd",
     "zone": "us-central1-c",
     "operationType": "UPDATE_CLUSTER",
     "status": "RUNNING",
-    "selfLink": "https://container.googleapis.com/v1/projects/cloud-custodian/zones/us-central1-c/operations/operation-1691167194835-e1a4536a-29ff-47e1-8f30-e48753348d6a",
+    "selfLink": "https://container.googleapis.com/v1/projects/cloud-custodian/zones/us-central1-c/operations/operation-1691167950413-1855472d-ce4d-45c7-8609-027698340acd",
     "targetLink": "https://container.googleapis.com/v1/projects/cloud-custodian/zones/us-central1-c/clusters/zonal-cluster-1",
-    "startTime": "2023-08-04T16:39:54.83517042Z"
+    "startTime": "2023-08-04T16:52:30.41324838Z"
   }
 }

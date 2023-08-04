@@ -122,12 +122,12 @@ class KubernetesClusterTest(BaseTest):
         self.assertEqual(result[0]['clusters'][0]['resourceLabels']['test_label'], 'test_value')
 
     def test_cluster_zonal_set_labels(self):
-        project_id = 'cloud-custodian'
+        project_id = 'elastic-platform-capacity'
         name = "zonal-cluster-1"
         factory = self.replay_flight_data('gke-cluster-zonal-set-label', project_id)
         p = self.load_policy(
             {
-                'name': 'label-gke-cluster-cache',
+                'name': 'label-gke-zonal-cluster-cache',
                 'resource': 'gcp.gke-cluster',
                 'filters': [{'name': name}],
                 'actions': [{'type': 'set-labels',
@@ -144,7 +144,7 @@ class KubernetesClusterTest(BaseTest):
         self.assertEqual(len(resources), 1)
         p = self.load_policy(
             {
-                'name': 'label-gke-cluster',
+                'name': 'label-gke-zonal-cluster',
                 'resource': 'gcp.gke-cluster',
                 'filters': [{'name': name}],
                 'actions': [{'type': 'set-labels',
