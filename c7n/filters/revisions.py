@@ -5,13 +5,16 @@ Custodian support for diffing and patching across multiple versions
 of a resource.
 """
 
+import json
+
 from dateutil.parser import parse as parse_date
 from dateutil.tz import tzlocal, tzutc
+from functools import partial
 
 from c7n.exceptions import PolicyValidationError, ClientError
 from c7n.filters import Filter
 from c7n.manager import resources
-from c7n.utils import local_session, type_schema
+from c7n.utils import local_session, type_schema, DateTimeEncoder
 
 try:
     import jsonpatch
@@ -81,7 +84,7 @@ class Diff(Filter):
         results = []
         for r in resources:
             revisions = self.get_revisions(config, r)
-            r['c7n:previous-revision'] = rev = self.select_revision(revisions)
+            r['c7n:previous-revision'] = rev = self.select_revision(revisions[1:])
             if not rev:
                 continue
             delta = self.diff(rev['resource'], r)
@@ -91,9 +94,13 @@ class Diff(Filter):
         return results
 
     def get_revisions(self, config, resource):
+        # For some resource types (notably IAM resources), the AWS Config resourceId
+        # field doesn't match the `id` parameter of the Custodian resource. In those
+        # cases, a Custodian resource can define the `config_id` parameter.
+        config_id = self.model.config_id or self.model.id
         params = dict(
             resourceType=self.model.config_type,
-            resourceId=resource[self.model.id])
+            resourceId=resource[config_id])
         params.update(self.get_selector_params(resource))
         try:
             revisions = config.get_resource_config_history(
@@ -104,7 +111,7 @@ class Diff(Filter):
             if e.response['Error']['Code'] != ErrNotFound:
                 self.log.debug(
                     "config - resource %s:%s not found" % (
-                        self.model.config_type, resource[self.model.id]))
+                        self.model.config_type, resource[config_id]))
                 revisions = []
             raise
         return revisions
@@ -158,7 +165,8 @@ class JsonDiff(Diff):
     def diff(self, source, target):
         source, target = (
             self.sanitize_revision(source), self.sanitize_revision(target))
-        patch = jsonpatch.JsonPatch.from_diff(source, target)
+        dumper = partial(json.dumps, cls=DateTimeEncoder)
+        patch = jsonpatch.JsonPatch.from_diff(source, target, dumps=dumper)
         return list(patch)
 
     def sanitize_revision(self, rev):

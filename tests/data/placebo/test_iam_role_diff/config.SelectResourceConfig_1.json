@@ -1,0 +1,22 @@
+{
+    "status_code": 200,
+    "data": {
+        "Results": [
+            "{\"resourceId\":\"AROAY5Y4D45RLATRHIRGV\",\"configuration\":{\"path\":\"/\",\"assumeRolePolicyDocument\":\"%7B%22Version%22%3A%222012-10-17%22%2C%22Statement%22%3A%5B%7B%22Effect%22%3A%22Allow%22%2C%22Principal%22%3A%7B%22Service%22%3A%22ec2.amazonaws.com%22%7D%2C%22Action%22%3A%22sts%3AAssumeRole%22%7D%5D%7D\",\"instanceProfileList\":[{\"path\":\"/\",\"instanceProfileName\":\"c7n-json-diff-test\",\"roles\":[{\"path\":\"/\",\"assumeRolePolicyDocument\":\"%7B%22Version%22%3A%222012-10-17%22%2C%22Statement%22%3A%5B%7B%22Effect%22%3A%22Allow%22%2C%22Principal%22%3A%7B%22Service%22%3A%22ec2.amazonaws.com%22%7D%2C%22Action%22%3A%22sts%3AAssumeRole%22%7D%5D%7D\",\"roleId\":\"AROAY5Y4D45RLATRHIRGV\",\"roleName\":\"c7n-json-diff-test\",\"arn\":\"arn:aws:iam::644160558196:role/c7n-json-diff-test\",\"createDate\":\"2022-06-06T13:42:44.000Z\",\"tags\":[]}],\"instanceProfileId\":\"AIPAY5Y4D45RLLFUSCRL2\",\"arn\":\"arn:aws:iam::644160558196:instance-profile/c7n-json-diff-test\",\"createDate\":\"2022-06-06T13:42:45.000Z\",\"tags\":[]}],\"roleId\":\"AROAY5Y4D45RLATRHIRGV\",\"attachedManagedPolicies\":[{\"policyArn\":\"arn:aws:iam::aws:policy/AdministratorAccess\",\"policyName\":\"AdministratorAccess\"},{\"policyArn\":\"arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore\",\"policyName\":\"AmazonSSMManagedInstanceCore\"},{\"policyArn\":\"arn:aws:iam::aws:policy/PowerUserAccess\",\"policyName\":\"PowerUserAccess\"}],\"roleName\":\"c7n-json-diff-test\",\"arn\":\"arn:aws:iam::644160558196:role/c7n-json-diff-test\",\"createDate\":\"2022-06-06T13:42:44.000Z\",\"rolePolicyList\":[],\"tags\":[]},\"supplementaryConfiguration\":{}}"
+        ],
+        "QueryInfo": {
+            "SelectFields": [
+                {
+                    "Name": "resourceId"
+                },
+                {
+                    "Name": "configuration"
+                },
+                {
+                    "Name": "supplementaryConfiguration"
+                }
+            ]
+        },
+        "ResponseMetadata": {}
+    }
+}
