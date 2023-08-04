@@ -2,7 +2,7 @@
   "headers": {
     "content-type": "application/json; charset=UTF-8",
     "vary": "Origin, X-Origin, Referer",
-    "date": "Fri, 04 Aug 2023 16:52:28 GMT",
+    "date": "Fri, 04 Aug 2023 20:54:51 GMT",
     "server": "ESF",
     "cache-control": "private",
     "x-xss-protection": "0",
@@ -11,7 +11,7 @@
     "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
     "transfer-encoding": "chunked",
     "status": "200",
-    "content-length": "39768",
+    "content-length": "39925",
     "-content-encoding": "gzip",
     "content-location": "https://container.googleapis.com/v1/projects/cloud-custodian/locations/-/clusters?alt=json"
   },
@@ -123,7 +123,13 @@
         "locations": [
           "us-central1-c"
         ],
-        "labelFingerprint": "a9dc16a7",
+        "resourceLabels": {
+          "project": "cloud-custodian",
+          "division": "engineering",
+          "org": "sre",
+          "team": "capacity"
+        },
+        "labelFingerprint": "adaf5474",
         "legacyAbac": {},
         "ipAllocationPolicy": {
           "useIpAliases": true,
@@ -223,7 +229,7 @@
           }
         },
         "nodePoolAutoConfig": {},
-        "etag": "ce2c87c9-ca80-4e56-a650-3d7332c18616",
+        "etag": "fac7cb11-333c-4177-a4de-882e1d061172",
         "securityPostureConfig": {
           "mode": "BASIC",
           "vulnerabilityMode": "VULNERABILITY_DISABLED"
@@ -808,7 +814,7 @@
           "channel": "REGULAR"
         },
         "workloadIdentityConfig": {
-          "workloadPool": "cloud-custodian.svc.id.goog"
+          "workloadPool": "elastic-platform-capacity.svc.id.goog"
         },
         "notificationConfig": {
           "pubsub": {}
