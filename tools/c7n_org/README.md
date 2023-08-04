@@ -5,7 +5,7 @@
 % [comment]: # (Only edit the original document at ./tools/c7n_org/README.md)
 
 c7n-org is a tool to run custodian against multiple AWS accounts,
-Azure subscriptions, or GCP projects in parallel.
+Azure subscriptions, GCP projects, or OCI tenancies in parallel.
 
 ## Installation
 
@@ -25,7 +25,7 @@ Options:
 
 Commands:
   report      report on an AWS cross account policy execution
-  run         run a custodian policy across accounts (AWS, Azure, GCP)
+  run         run a custodian policy across accounts (AWS, Azure, GCP, OCI)
   run-script  run a script across AWS accounts
 ```
 
@@ -78,6 +78,23 @@ projects:
 
 ```
 
+Example OCI Config File:
+
+```yaml
+tenancies:
+- name: dev-tenancy
+  profile: DEVTENANCY
+  regions:
+    - us-ashburn-1
+    - us-phoenix-1
+  vars:
+    environment: dev
+  tags:  
+    - type:test
+...
+
+```
+
 ### Config File Generation
 
 We also distribute scripts to generate the necessary config file in the `scripts` folder.
@@ -98,6 +115,11 @@ be looking to incorporate them into a new c7n-org subcommand.
 - For **GCP**, the script `gcpprojects.py` generates a config file from
   the GCP Resource Management API
 
+- For **OCI**, the script `ocitenancies.py` generates a config file
+  using OCI Configuration file and OCI Organizations API
+  
+    - Please refer to the 'Additional OCI Instructions' for additional information
+
 
 ```shell
 python orgaccounts.py -f accounts.yml
@@ -108,13 +130,16 @@ python azuresubs.py -f subscriptions.yml
 ```shell
 python gcpprojects.py -f projects.yml
 ```
+```shell
+python ocitenancies.py -f tenancies.yml
+```
 
 ## Running a Policy with c7n-org
 
 To run a policy, the following arguments must be passed in:
 
 ```shell
--c | accounts|projects|subscriptions config file
+-c | accounts|projects|subscriptions|tenancies config file
 -s | output directory
 -u | policy
 ```
@@ -233,3 +258,40 @@ subscriptions.
 For instructions on creating a service principal and granting access
 across subscriptions, visit the [Azure authentication docs
 page](https://cloudcustodian.io/docs/azure/authentication.html).
+
+## Additional OCI Instructions
+
+The script 'ocitenancies.py' accepts an optional argument '--add-child-tenancies'
+which adds all the child tenancies associated with the 'DEFAULT' profile's tenancy 
+in the generated c7n-org configuration file. If the profile for child tenancy is not available in 
+the OCI configuration file, then either user can add the profile for the child tenancy to the
+OCI configuration file and replace <ADD_PROFILE> entry in the c7n-org configuration with the
+corresponding profile name or the user can delete the child tenancy entry from the
+c7n-org configuration file. For more info about config file, refer to this [page](https://docs.oracle.com/en-us/iaas/Content/API/Concepts/sdkconfig.htm).
+
+If user wants to query for the resources in the specific compartments in c7n-org, then user
+can pass the compartment OCID's to the 'oci_compartments' under 'vars' section like below. If the 
+'oci_comparments' is not passed under vars, then the resources will be fetched from the tenancy level.
+
+```yaml
+tenancies:
+- name: dev-tenancy
+  profile: DEVTENANCY
+  regions:
+    - us-ashburn-1
+    - us-phoenix-1
+  vars:
+    oci_compartments: ocid1.test.oc1..<unique_ID>EXAMPLE-compartmentId-2-Value,ocid1.test.oc1..<unique_ID>EXAMPLE-compartmentId-3-Value
+    environment: dev
+- name: test-tenancy
+  profile: TESTTENANCY
+  regions:
+    - us-ashburn-1
+  vars:
+    environment: test
+
+```
+
+
+
+
