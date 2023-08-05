@@ -924,21 +924,21 @@ class RDSTest(BaseTest):
         self.assertEqual(resources[0]["DBInstanceIdentifier"], "database-2")
 
     def test_rds_pending_maintenance(self):
-        session_factory = self.record_flight_data("test_rds_pending_maintenance")
+        session_factory = self.replay_flight_data("test_rds_pending_maintenance")
         p = self.load_policy(
             {
                 "name": "rds-pending-maintenance",
                 "resource": "rds",
                 "query": [
                     {
-                        "DBInstanceIdentifier": "pspvd1pt"
+                        "DBInstanceIdentifier": "qbopp011"
                     }
                 ],
                 "filters": [
                     {
                         "type": "value",
                         "key": "DBInstanceIdentifier",
-                        "value": "pspvd1pt"
+                        "value": "qbopp011"
                     },
                     {
                         "type": "pending-maintenance"
