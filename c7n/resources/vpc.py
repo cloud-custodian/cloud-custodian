@@ -1016,8 +1016,10 @@ class SGUsage(Filter):
         return set(expr.search(resources) or [])
 
     def is_pristine_default_sg(self, account_id, sg):
-        # handling security groups that exactly match the shape of an automatically generated security group with no changes whatsoever
-        # see: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/default-custom-security-groups.html#default-security-group
+        # handling security groups that exactly match the shape
+        # of an automatically generated security group with no changes whatsoever
+        # see: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/
+        # default-custom-security-groups.html#default-security-group
         sg_group_name = sg["GroupName"]
         if sg_group_name != "default":
             return False
@@ -1050,20 +1052,50 @@ class SGUsage(Filter):
 
         ip_permissions = sg["IpPermissions"]
         if len(ip_permissions) > 1 or len(ip_permissions) == 0:
-            self.log.debug("sg_group_id [%s] does not have expected IpPermissions count", sg_group_id)
+            self.log.debug(
+                (
+                    "sg_group_id [%s] "
+                    "does not have expected "
+                    "the IpPermissions count"
+                ),
+                sg_group_id
+            )
             return False
 
         if expected_default_ingress_rule != ip_permissions[0]:
-            self.log.debug("sg_group_id [%s] does not have expected IpPermissions rule", sg_group_id)
+            self.log.debug(
+                (
+                    "sg_group_id [%s] "
+                    "does not have "
+                    "the expected IpPermissions rule"
+                ),
+                sg_group_id
+            )
             return False
 
         ip_permissions_egress = sg["IpPermissionsEgress"]
         if len(ip_permissions_egress) > 1 or len(ip_permissions_egress) == 0:
-            self.log.debug("sg_group_id [%s] does not have expected IpPermissionsEgress count", sg_group_id)
+            self.log.debug(
+                (
+                    "sg_group_id [%s] "
+                    "does not have "
+                    "expected IpPermissionsEgress "
+                    "count"
+                ),
+                sg_group_id,
+            )
             return False
 
         if expected_default_egress_rule != ip_permissions_egress[0]:
-            self.log.debug("sg_group_id [%s] does not have expected IpPermissionsEgress rule", sg_group_id)
+            self.log.debug(
+                (
+                    "sg_group_id [%s] "
+                    "does not have "
+                    "expected IpPermissionsEgress "
+                    "rule"
+                ),
+                sg_group_id,
+            )
             return False
 
         return True
