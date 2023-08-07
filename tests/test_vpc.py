@@ -1556,7 +1556,21 @@ class SecurityGroupTest(BaseTest):
             session_factory=factory,
         )
         resources = p.run()
-        self.assertEqual(len(resources), 1)
+        self.assertEqual(len(resources), 2)
+
+        expected_sg_group_ids = set(
+            [
+                "sg-f6a42890",
+                "sg-13de8f75",
+            ],
+        )
+
+        actual_sg_group_ids = set()
+        for r in resources:
+            actual_sg_group_id = r["GroupId"]
+            actual_sg_group_ids.add(actual_sg_group_id)
+
+        self.assertEqual(expected_sg_group_ids, actual_sg_group_ids)
 
     def test_match_resource_validator(self):
 

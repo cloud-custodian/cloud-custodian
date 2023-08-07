@@ -11,6 +11,7 @@
                                 "CidrIp": "0.0.0.0/0"
                             }
                         ], 
+                        "Ipv6Ranges": [],
                         "UserIdGroupPairs": [], 
                         "PrefixListIds": []
                     }
@@ -26,6 +27,7 @@
                                 "GroupId": "sg-13de8f75"
                             }
                         ], 
+                        "Ipv6Ranges": [],
                         "PrefixListIds": []
                     }
                 ], 
@@ -43,6 +45,7 @@
                                 "CidrIp": "0.0.0.0/0"
                             }
                         ], 
+                        "Ipv6Ranges": [],
                         "UserIdGroupPairs": [], 
                         "PrefixListIds": []
                     }
@@ -52,6 +55,7 @@
                     {
                         "IpProtocol": "-1", 
                         "IpRanges": [], 
+                        "Ipv6Ranges": [],
                         "UserIdGroupPairs": [
                             {
                                 "UserId": "644160558196", 
