@@ -41,6 +41,7 @@ class MySQL(ArmResourceManager):
         )
         resource_type = 'Microsoft.DBForMySQL/servers'
 
+
 @MySQL.filter_registry.register('server-parameter')
 class ServeParametersFilter(ValueFilter):
     """Filter by server parameter for this MySql server
@@ -106,4 +107,3 @@ class ServeParametersFilter(ValueFilter):
             resource['properties'][key] = query.serialize(True).get('properties')
 
         return super().__call__(resource['properties'][key])
-    
