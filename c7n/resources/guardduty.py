@@ -18,7 +18,7 @@ class DescribeGuarddutyFinding(query.DescribeSource):
 
     def get_detector_id(self):
         client = local_session(self.manager.session_factory).client('guardduty')
-        ids = client.list_detector_ids().get('DetectorIds')
+        ids = client.list_detectors().get('DetectorIds')
         return ids and ids[0] or ids
 
 
