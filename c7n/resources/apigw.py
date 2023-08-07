@@ -1238,8 +1238,7 @@ class ApiGatewayV2Stage(query.ChildResourceManager):
         enum_spec = ('get_stages', 'Items', None)
         parent_spec = ('aws.apigwv2', 'ApiId', True)
         arn_type = "/apis"
-        id = "ClientCertificateId"
-        name = "StageName"
+        id = name = "StageName"
         cfn_type = config_type = "AWS::ApiGatewayV2::Stage"
         universal_taggable = object()
 
