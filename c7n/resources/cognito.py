@@ -4,7 +4,7 @@ from botocore.exceptions import ClientError
 
 from c7n.actions import BaseAction
 from c7n.manager import resources
-from c7n.query import QueryResourceManager, TypeInfo, DescribeSource, ChildResourceManager
+from c7n.query import QueryResourceManager, TypeInfo, DescribeSource
 from c7n.tags import universal_augment
 from c7n.utils import local_session, type_schema
 
@@ -125,15 +125,3 @@ class DeleteUserPool(BaseAction):
         except ClientError as e:
             self.log.exception(
                 "Exception deleting user pool:\n %s" % e)
-
-
-
-@resources.register("aws.cognito-pool-role")
-class CognitoIdentityPoolRoleAttachment(ChildResourceManager):
-    class resource_type(TypeInfo):
-        service = "cognito-identity"
-        enum_spec = ('get_identity_pool_roles', 'IdentityPoolId', None)
-        parent_spec = ('aws.identity-pool', 'IdentityPoolId', True)
-        arn = False
-        cfn_type = "AWS::Cognito::IdentityPoolRoleAttachment"
-        name = id = "IdentityPoolId"

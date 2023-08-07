@@ -9,11 +9,10 @@ import hashlib
 import logging
 import sys
 
-from c7n import deprecated, query
+from c7n import deprecated
 from c7n.actions import Action
 from c7n.filters import Filter
 from c7n.exceptions import PolicyValidationError, PolicyExecutionError
-from c7n.manager import resources
 from c7n.policy import LambdaMode, execution
 from c7n.utils import (
     local_session, type_schema, get_retry,
@@ -674,15 +673,3 @@ class OtherResourcePostFinding(PostFinding):
 
 AWS.resources.subscribe(OtherResourcePostFinding.register_resource)
 AWS.resources.subscribe(SecurityHubFindingFilter.register_resources)
-
-
-
-@resources.register("aws.securityhub-finding")
-class SecurityhubFinding(query.QueryResourceManager):
-    class resource_type(query.TypeInfo):
-        service = "securityhub"
-        enum_spec = ('get_findings', 'Findings', None)
-        arn = False
-        id = "Id"
-        name = "ProductName"
-
