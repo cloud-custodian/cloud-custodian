@@ -33,7 +33,7 @@ class MySQLTest(BaseTest):
             'resource': 'azure.mysql',
             'filters': [
                 {
-                    'type': 'server-parameter',
+                    'type': 'server-configuration',
                     'name': 'audit_log_enabled',
                     'key': 'value',
                     'op': 'ne',

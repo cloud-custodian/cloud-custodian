@@ -42,8 +42,8 @@ class MySQL(ArmResourceManager):
         resource_type = 'Microsoft.DBForMySQL/servers'
 
 
-@MySQL.filter_registry.register('server-parameter')
-class ServeParametersFilter(ValueFilter):
+@MySQL.filter_registry.register('server-configuration')
+class ServerConfigurationsFilter(ValueFilter):
     """Filter by server parameter for this MySql server
 
     Configurations are made available to the filter as a map with each
@@ -79,7 +79,7 @@ class ServeParametersFilter(ValueFilter):
           - name: mysql-server-audit-log-enabled
             resource: azure.mysql
             filters:
-              - type: server-parameter
+              - type: server-configuration
                 name: audit_not_enabled
                 key: value
                 op: ne
@@ -88,7 +88,7 @@ class ServeParametersFilter(ValueFilter):
     """
 
     schema = type_schema(
-        'server-parameter',
+        'server-configuration',
         required=['type', 'name'],
         rinherit=ValueFilter.schema,
         name=dict(type='string')
