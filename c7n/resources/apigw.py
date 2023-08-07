@@ -1229,3 +1229,21 @@ class ApiGwV2(query.QueryResourceManager):
             )
 
         return self._generate_arn
+
+
+@resources.register("apigwv2-stage")
+class ApiGatewayV2Stage(query.ChildResourceManager):
+    class resource_type(query.TypeInfo):
+        service = "apigatewayv2"
+        enum_spec = ('get_stages', 'Items', None)
+        parent_spec = ('aws.apigwv2', 'ApiId', True)
+        arn_type = "/apis"
+        id = "ClientCertificateId"
+        name = "StageName"
+        cfn_type = config_type = "AWS::ApiGatewayV2::Stage"
+        universal_taggable = object()
+
+    source_mapping = {
+       "describe": query.DescribeWithResourceTags,
+       "config": query.ConfigSource
+    }
