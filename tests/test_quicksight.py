@@ -9,7 +9,7 @@ def test_quicksight_group_query(test, quicksight_group):
     factory = test.replay_flight_data("test_quicksight_group_query")
 
     policy = test.load_policy({
-      "name": "test-aws.quicksight-group",
+      "name": "test-aws-quicksight-group",
       "resource": "aws.quicksight-group"
     }, session_factory=factory, config={'account_id': '490065885863'})
 
