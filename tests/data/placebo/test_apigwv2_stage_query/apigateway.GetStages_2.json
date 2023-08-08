@@ -1,0 +1,40 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Items": [
+            {
+                "AutoDeploy": false,
+                "CreatedDate": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 8,
+                    "day": 8,
+                    "hour": 14,
+                    "minute": 48,
+                    "second": 14,
+                    "microsecond": 0
+                },
+                "DefaultRouteSettings": {
+                    "DataTraceEnabled": false,
+                    "DetailedMetricsEnabled": false,
+                    "LoggingLevel": "OFF"
+                },
+                "LastUpdatedDate": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 8,
+                    "day": 8,
+                    "hour": 14,
+                    "minute": 48,
+                    "second": 14,
+                    "microsecond": 0
+                },
+                "RouteSettings": {},
+                "StageName": "example-api-true-serval",
+                "StageVariables": {},
+                "Tags": {}
+            }
+        ]
+    }
+}
