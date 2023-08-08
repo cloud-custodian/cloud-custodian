@@ -2,8 +2,10 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from c7n_gcp.filters import IamPolicyFilter
+from c7n_gcp.filters.iampolicy import IamPolicyValueFilter
 from c7n_gcp.query import ChildResourceManager, ChildTypeInfo
 from c7n_gcp.provider import resources
+from c7n.utils import local_session
 
 
 @resources.register('dataproc-clusters')
@@ -38,3 +40,14 @@ class DataprocClustersIamPolicyFilter(IamPolicyFilter):
     Overrides the base implementation to process dataproc cluster resources correctly.
     """
     permissions = ('dataproc.clusters.getIamPolicy',)
+
+    def _verb_arguments(self, resource):
+        return {'resource': 'projects/{}/regions/{}/clusters/{}'.format(
+            resource['projectId'],
+            resource['c7n:region']['name'],
+            resource['clusterName'])}
+
+    def process_resources(self, resources):
+        value_filter = IamPolicyValueFilter(self.data['doc'], self.manager)
+        value_filter._verb_arguments = self._verb_arguments
+        return value_filter.process(resources)
