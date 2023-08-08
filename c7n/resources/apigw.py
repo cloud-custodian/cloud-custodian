@@ -14,7 +14,7 @@ from c7n.filters.iamaccess import CrossAccountAccessFilter
 from c7n.filters.related import RelatedResourceFilter
 from c7n.manager import resources, ResourceManager
 from c7n import query, utils
-from c7n.utils import generate_arn, type_schema, get_retry, jmespath_search
+from c7n.utils import generate_arn, type_schema, get_retry, jmespath_search, get_partition
 
 
 ANNOTATION_KEY_MATCHED_METHODS = 'c7n:matched-resource-methods'
@@ -1258,3 +1258,13 @@ class ApiGatewayV2Stage(query.ChildResourceManager):
         "describe-child": StageDescribe,
         "config": query.ConfigSource
     }
+
+    def get_arns(self, resources):
+        partition = get_partition(self.config.region)
+        return [
+            "arn:{}:apigateway:{}::/apis/{}/stages/{}".format(
+                partition, self.config.region, r['c7n:parent-id'], r['StageName']
+            )
+            for r in resources]
+
+

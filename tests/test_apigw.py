@@ -18,10 +18,17 @@ def test_apigwv2_stage_query(test, apigatewayv2_stage):
     }, session_factory=factory)
 
     resources = policy.run()
+
     assert len(resources) > 0
     assert resources[1]['StageName'] == apigatewayv2_stage[
         'aws_apigatewayv2_stage.example.name']
     assert resources[1]['Tags'] == [{'Key': 'Env', 'Value': 'Dev'}]
+
+    assert policy.resource_manager.get_arns(resources) == [
+        'arn:aws:apigateway:us-east-1::/apis/0mt9yx690a/stages/production',
+        'arn:aws:apigateway:us-east-1::/apis/zzc87ypck1/stages/example-api-allowed-sheepdog'
+    ]
+
 
 class TestRestAccount(BaseTest):
 
