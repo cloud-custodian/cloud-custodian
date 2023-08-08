@@ -46,6 +46,7 @@ class OCIFlightRecorder(CustodianTestCore):
     multi_requests_map = {}
     multi_requests_history = {}
     running_req_count = {}
+    recording = False
 
     def cleanUp(self):
         threading.local().http = None
