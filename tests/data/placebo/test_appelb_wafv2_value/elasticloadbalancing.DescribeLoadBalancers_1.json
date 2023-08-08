@@ -1,0 +1,46 @@
+{
+    "status_code": 200,
+    "data": {
+        "LoadBalancers": [
+            {
+                "LoadBalancerArn": "arn:aws:elasticloadbalancing:us-east-1:123456789012:loadbalancer/app/cfb-mxaqrwbd/560445e4830a79c6",
+                "DNSName": "cfb-mxaqrwbd-1145866427.us-east-1.elb.amazonaws.com",
+                "CanonicalHostedZoneId": "Z35SXDOTRQ7X7K",
+                "CreatedTime": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 4,
+                    "day": 13,
+                    "hour": 18,
+                    "minute": 26,
+                    "second": 43,
+                    "microsecond": 660000
+                },
+                "LoadBalancerName": "cfb-mxaqrwbd",
+                "Scheme": "internet-facing",
+                "VpcId": "vpc-0e432b2b7c1bb85e7",
+                "State": {
+                    "Code": "active"
+                },
+                "Type": "application",
+                "AvailabilityZones": [
+                    {
+                        "ZoneName": "us-east-1b",
+                        "SubnetId": "subnet-0bb404655eaa65daa",
+                        "LoadBalancerAddresses": []
+                    },
+                    {
+                        "ZoneName": "us-east-1a",
+                        "SubnetId": "subnet-0cdc01d023da3165d",
+                        "LoadBalancerAddresses": []
+                    }
+                ],
+                "SecurityGroups": [
+                    "sg-0458f2da9268cd7c9"
+                ],
+                "IpAddressType": "ipv4"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
