@@ -4,13 +4,13 @@ resource "random_pet" "bucket" {
 }
 
 resource "random_pet" "db" {
-  prefix = "tf_test"
-  length = 2
+  prefix    = "tf_test"
+  length    = 2
   separator = "_"
 }
 
 resource "aws_s3_bucket" "hoge" {
-  bucket = random_pet.bucket.id
+  bucket        = random_pet.bucket.id
   force_destroy = true
 }
 
@@ -25,7 +25,7 @@ resource "aws_athena_database" "hoge" {
 }
 
 resource "aws_athena_named_query" "foo" {
-  name      = "bar"
-  database  = aws_athena_database.hoge.name
-  query     = "SELECT * FROM ${aws_athena_database.hoge.name} limit 10;"
+  name     = "bar"
+  database = aws_athena_database.hoge.name
+  query    = "SELECT * FROM ${aws_athena_database.hoge.name} limit 10;"
 }
