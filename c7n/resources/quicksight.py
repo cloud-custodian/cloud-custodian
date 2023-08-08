@@ -4,9 +4,13 @@ from c7n.manager import resources
 from c7n import query
 
 
-class DescribeQuicksightUser(query.DescribeSource):
+class DescribeQuicksight(query.DescribeSource):
+
     def resources(self, query):
-        required = {"Namespace": "default", "AwsAccountId": self.manager.config.account_id}
+        required = {
+            "Namespace": "default",
+            "AwsAccountId": self.manager.config.account_id
+        }
         return super().resources(required)
 
 
@@ -21,14 +25,8 @@ class QuicksightUser(query.QueryResourceManager):
         name = "UserName"
 
     source_mapping = {
-        "describe": DescribeQuicksightUser,
+        "describe": DescribeQuicksight,
     }
-
-
-class DescribeQuicksightGroup(query.DescribeSource):
-    def resources(self, query):
-        required = {"Namespace": "default", "AwsAccountId": self.manager.config.account_id}
-        return super().resources(required)
 
 
 @resources.register("quicksight-group")
@@ -42,5 +40,5 @@ class QuicksightGroup(query.QueryResourceManager):
         name = "GroupName"
 
     source_mapping = {
-        "describe": DescribeQuicksightGroup,
+        "describe": DescribeQuicksight,
     }
