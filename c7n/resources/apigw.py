@@ -1242,7 +1242,7 @@ class ApiGatewayV2Stage(query.ChildResourceManager):
         cfn_type = config_type = "AWS::ApiGatewayV2::Stage"
         universal_taggable = object()
         permission_prefix = 'apigateway'
-        permissions_enum = ('apigateway:GET',)        
+        permissions_enum = ('apigateway:GET',)
 
     source_mapping = {
        "describe": query.DescribeWithResourceTags,

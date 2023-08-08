@@ -774,9 +774,8 @@ class PolicyMetaLint(BaseTest):
             'rest-stage', 'rest-resource', 'rest-vpclink', 'rest-client-certificate'}
         explicit = []
         whitelist_explicit = {
-            'log-export', 'securityhub-finding', 'ssm-patch-group',
-            'cognito-pool-role', 'appdiscovery-agent', 'appdiscovery',
-            'athena-named-query',
+            'securityhub-finding', 'ssm-patch-group',
+            'appdiscovery', 'athena-named-query',
             'rest-account', 'shield-protection', 'shield-attack',
             'dlm-policy', 'efs', 'efs-mount-target', 'gamelift-build',
             'glue-connection', 'glue-dev-endpoint', 'cloudhsm-cluster',
