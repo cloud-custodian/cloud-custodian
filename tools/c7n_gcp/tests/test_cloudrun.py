@@ -45,3 +45,15 @@ class JobServiceTest(BaseTest):
         resources = p.run()
         assert len(resources) == 1
         assert resources[0]["metadata"]["name"] == "job"
+
+
+class RevisionServiceTest(BaseTest):
+    def test_query(self):
+        factory = self.replay_flight_data('gcp-cloud-run-revision')
+        p = self.load_policy({
+            'name': 'cloud-run-job',
+            'resource': 'gcp.cloud-run-revision'
+        }, session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['metadata']['name'], 'hello-00001-nvq')
