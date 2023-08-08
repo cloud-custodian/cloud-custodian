@@ -26,21 +26,21 @@
                 }
             },
             {
-                "ApiEndpoint": "wss://3ezdlfbppb.execute-api.us-east-1.amazonaws.com",
-                "ApiId": "3ezdlfbppb",
+                "ApiEndpoint": "wss://zzc87ypck1.execute-api.us-east-1.amazonaws.com",
+                "ApiId": "zzc87ypck1",
                 "ApiKeySelectionExpression": "$request.header.x-api-key",
                 "CreatedDate": {
                     "__class__": "datetime",
                     "year": 2023,
                     "month": 8,
                     "day": 8,
-                    "hour": 14,
-                    "minute": 48,
-                    "second": 13,
+                    "hour": 17,
+                    "minute": 9,
+                    "second": 54,
                     "microsecond": 0
                 },
                 "DisableExecuteApiEndpoint": false,
-                "Name": "example-api-true-serval",
+                "Name": "example-api-allowed-sheepdog",
                 "ProtocolType": "WEBSOCKET",
                 "RouteSelectionExpression": "$request.body.action",
                 "Tags": {}

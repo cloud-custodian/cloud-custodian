@@ -11,4 +11,8 @@ resource "aws_apigatewayv2_api" "example" {
 resource "aws_apigatewayv2_stage" "example" {
   api_id = aws_apigatewayv2_api.example.id
   name   = random_pet.api.id
+
+  tags = {
+    Env = "Dev"
+  }
 }

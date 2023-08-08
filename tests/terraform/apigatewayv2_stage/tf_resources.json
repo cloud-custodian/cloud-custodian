@@ -4,18 +4,18 @@
     "resources": {
         "aws_apigatewayv2_api": {
             "example": {
-                "api_endpoint": "wss://3ezdlfbppb.execute-api.us-east-1.amazonaws.com",
+                "api_endpoint": "wss://zzc87ypck1.execute-api.us-east-1.amazonaws.com",
                 "api_key_selection_expression": "$request.header.x-api-key",
-                "arn": "arn:aws:apigateway:us-east-1::/apis/3ezdlfbppb",
+                "arn": "arn:aws:apigateway:us-east-1::/apis/zzc87ypck1",
                 "body": null,
                 "cors_configuration": [],
                 "credentials_arn": null,
                 "description": "",
                 "disable_execute_api_endpoint": false,
-                "execution_arn": "arn:aws:execute-api:us-east-1:644160558196:3ezdlfbppb",
+                "execution_arn": "arn:aws:execute-api:us-east-1:644160558196:zzc87ypck1",
                 "fail_on_warnings": null,
-                "id": "3ezdlfbppb",
-                "name": "example-api-true-serval",
+                "id": "zzc87ypck1",
+                "name": "example-api-allowed-sheepdog",
                 "protocol_type": "WEBSOCKET",
                 "route_key": null,
                 "route_selection_expression": "$request.body.action",
@@ -28,8 +28,8 @@
         "aws_apigatewayv2_stage": {
             "example": {
                 "access_log_settings": [],
-                "api_id": "3ezdlfbppb",
-                "arn": "arn:aws:apigateway:us-east-1::/apis/3ezdlfbppb/stages/example-api-true-serval",
+                "api_id": "zzc87ypck1",
+                "arn": "arn:aws:apigateway:us-east-1::/apis/zzc87ypck1/stages/example-api-allowed-sheepdog",
                 "auto_deploy": false,
                 "client_certificate_id": "",
                 "default_route_settings": [
@@ -43,19 +43,23 @@
                 ],
                 "deployment_id": "",
                 "description": "",
-                "execution_arn": "arn:aws:execute-api:us-east-1:644160558196:3ezdlfbppb/example-api-true-serval",
-                "id": "example-api-true-serval",
-                "invoke_url": "wss://3ezdlfbppb.execute-api.us-east-1.amazonaws.com/example-api-true-serval",
-                "name": "example-api-true-serval",
+                "execution_arn": "arn:aws:execute-api:us-east-1:644160558196:zzc87ypck1/example-api-allowed-sheepdog",
+                "id": "example-api-allowed-sheepdog",
+                "invoke_url": "wss://zzc87ypck1.execute-api.us-east-1.amazonaws.com/example-api-allowed-sheepdog",
+                "name": "example-api-allowed-sheepdog",
                 "route_settings": [],
                 "stage_variables": null,
-                "tags": null,
-                "tags_all": {}
+                "tags": {
+                    "Env": "Dev"
+                },
+                "tags_all": {
+                    "Env": "Dev"
+                }
             }
         },
         "random_pet": {
             "api": {
-                "id": "example-api-true-serval",
+                "id": "example-api-allowed-sheepdog",
                 "keepers": null,
                 "length": 2,
                 "prefix": "example-api",

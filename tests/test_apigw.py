@@ -21,7 +21,7 @@ def test_apigwv2_stage_query(test, apigatewayv2_stage):
     assert len(resources) > 0
     assert resources[1]['StageName'] == apigatewayv2_stage[
         'aws_apigatewayv2_stage.example.name']
-
+    assert resources[1]['Tags'] == [{'Key': 'Env', 'Value': 'Dev'}]
 
 class TestRestAccount(BaseTest):
 

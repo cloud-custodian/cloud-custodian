@@ -1231,6 +1231,16 @@ class ApiGwV2(query.QueryResourceManager):
         return self._generate_arn
 
 
+class StageDescribe(query.ChildDescribeSource):
+
+    def augment(self, resources):
+        # convert tags from {'Key': 'Value'} to standard aws format
+        for r in resources:
+            r['Tags'] = [
+                {'Key': k, 'Value': v} for k, v in r.pop('Tags', {}).items()]
+        return resources
+
+
 @resources.register("apigwv2-stage")
 class ApiGatewayV2Stage(query.ChildResourceManager):
     class resource_type(query.TypeInfo):
@@ -1245,6 +1255,6 @@ class ApiGatewayV2Stage(query.ChildResourceManager):
         permissions_enum = ('apigateway:GET',)
 
     source_mapping = {
-       "describe": query.DescribeWithResourceTags,
-       "config": query.ConfigSource
+        "describe-child": StageDescribe,
+        "config": query.ConfigSource
     }
