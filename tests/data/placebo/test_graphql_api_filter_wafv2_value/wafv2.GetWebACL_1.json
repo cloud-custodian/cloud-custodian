@@ -1,0 +1,52 @@
+{
+    "status_code": 200,
+    "data": {
+        "WebACL": {
+            "Name": "cfb-mxaqrwbd",
+            "Id": "4b8ae8d6-778b-4c2d-ae0c-f6aef1a9cfd4",
+            "ARN": "arn:aws:wafv2:us-east-1:123456789012:regional/webacl/cfb-ojcthdwu/6a83b788-d0fd-4300-a7e0-cf5f305a9a20",
+            "DefaultAction": {
+                "Allow": {}
+            },
+            "Description": "",
+            "Rules": [
+                {
+                    "Name": "rule-1",
+                    "Priority": 1,
+                    "Statement": {
+                        "RateBasedStatement": {
+                            "Limit": 10000,
+                            "AggregateKeyType": "IP",
+                            "ScopeDownStatement": {
+                                "GeoMatchStatement": {
+                                    "CountryCodes": [
+                                        "US",
+                                        "NL"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "Action": {
+                        "Block": {}
+                    },
+                    "VisibilityConfig": {
+                        "SampledRequestsEnabled": false,
+                        "CloudWatchMetricsEnabled": false,
+                        "MetricName": "cfb-mxaqrwbd"
+                    }
+                }
+            ],
+            "VisibilityConfig": {
+                "SampledRequestsEnabled": false,
+                "CloudWatchMetricsEnabled": false,
+                "MetricName": "cfb-mxaqrwbd"
+            },
+            "Capacity": 3,
+            "ManagedByFirewallManager": false,
+            "LabelNamespace": "awswaf:123456789012:webacl:cfb-mxaqrwbd:"
+        },
+        "LockToken": "61d49499-78ec-440b-ac8e-7b02fe637aff",
+        "ResponseMetadata": {}
+    }
+}

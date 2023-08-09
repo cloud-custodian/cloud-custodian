@@ -48,6 +48,13 @@ ACCOUNTS_GCP = {
     }],
 }
 
+ACCOUNTS_OCI = {
+    "tenancies": [{
+        "name": "DEFAULT",
+        "profile": "DEFAULT",
+        }]
+}
+
 
 POLICIES_AWS_DEFAULT = yaml.safe_dump({
     'policies': [
@@ -338,3 +345,25 @@ class OrgTest(TestUtils):
             log_output.getvalue().strip(),
             "Targeting accounts: 0, policies: 2. Nothing to do.",
         )
+
+    def test_validate_oci_provider(self):
+        run_dir = self.setup_run_dir(
+            accounts=ACCOUNTS_OCI,
+            policies={"policies": [{
+                "name": "instances",
+                "resource": "oci.instance"}]
+                })
+        logger = mock.MagicMock()
+        run_account = mock.MagicMock()
+        run_account.return_value = ({}, True)
+        self.patch(org, "logging", logger)
+        self.patch(org, "run_account", run_account)
+        self.change_cwd(run_dir)
+        runner = CliRunner()
+        result = runner.invoke(
+            org.cli,
+            ["run", "-c", "accounts.yml", "-u", "policies.yml",
+             "--debug", "-s", "output", "--cache-path", "cache"],
+            catch_exceptions=False)
+        self.assertEqual(result.exit_code, 0)
+
