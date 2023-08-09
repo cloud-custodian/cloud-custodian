@@ -573,6 +573,37 @@ class TestRestStage(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
+    def test_wafregional_value_no_rules(self):
+        factory = self.replay_flight_data("test_rest_stage_waf_value")
+        p = self.load_policy(
+            {
+                "name": "waf-apigw",
+                "resource": "rest-stage",
+                "filters": [{"type": "waf-enabled", "key": "Rules", "value": "empty"}]
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
+    def test_wafregional_value_at_least_1_rule(self):
+        factory = self.replay_flight_data("test_rest_stage_waf_value")
+        p = self.load_policy(
+            {
+                "name": "waf-apigw",
+                "resource": "rest-stage",
+                "filters": [{
+                    "type": "waf-enabled",
+                    "key": "length(Rules)",
+                    "op": "gte",
+                    "value": 1
+                }]
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
     def test_wafv2_to_wafregional(self):
         factory = self.replay_flight_data("test_rest_stage_wafv2")
         p = self.load_policy(
@@ -586,6 +617,37 @@ class TestRestStage(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 2)
+
+    def test_wafv2_value_no_rules(self):
+        factory = self.replay_flight_data("test_rest_stage_wafv2_value")
+        p = self.load_policy(
+            {
+                "name": "waf-apigw",
+                "resource": "rest-stage",
+                "filters": [{"type": "wafv2-enabled", "key": "Rules", "value": "empty"}]
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_wafv2_value_at_least_1_rule(self):
+        factory = self.replay_flight_data("test_rest_stage_wafv2_value")
+        p = self.load_policy(
+            {
+                "name": "waf-apigw",
+                "resource": "rest-stage",
+                "filters": [{
+                    "type": "wafv2-enabled",
+                    "key": "length(Rules)",
+                    "op": "gte",
+                    "value": 1
+                }]
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
 
     def test_reststage_action_wafv2_not_found(self):
         self.assertRaises(
