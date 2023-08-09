@@ -1,0 +1,143 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Wed, 09 Aug 2023 22:01:58 GMT",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "4777",
+    "-content-encoding": "gzip",
+    "content-location": "https://cloudkms.googleapis.com/v1/projects/cloud-custodian/locations/global/keyRings?alt=json"
+  },
+  "body": {
+    "keyRings": [
+      {
+        "name": "projects/cloud-custodian/locations/global/keyRings/gcs-key",
+        "createTime": "2021-02-12T10:34:11.227374188Z"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/global/keyRings/key-ring-2f370c54-286-green",
+        "createTime": "2023-01-20T11:17:25.636823639Z"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/global/keyRings/key-ring-58825a12-286-green",
+        "createTime": "2023-07-06T07:14:26.719213419Z"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/global/keyRings/keyring-008-red",
+        "createTime": "2022-05-04T08:00:00.183413856Z"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/global/keyRings/keyring-068",
+        "createTime": "2021-03-19T12:41:45.829272404Z"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/global/keyRings/keyring-169",
+        "createTime": "2021-04-09T12:11:13.341548605Z"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/global/keyRings/keyring-286-green",
+        "createTime": "2023-01-16T13:25:08.358669915Z"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/global/keyRings/keyring-286-this",
+        "createTime": "2021-12-14T16:32:09.515971781Z"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/global/keyRings/keyring-286-this1",
+        "createTime": "2021-12-15T14:31:19.148105429Z"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/global/keyRings/keyring-286-this2",
+        "createTime": "2021-12-15T16:34:15.947161333Z"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/global/keyRings/keyring-286-this3",
+        "createTime": "2021-12-15T16:36:59.945665029Z"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/global/keyRings/keyring-286-this4",
+        "createTime": "2021-12-15T16:44:12.988439556Z"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/global/keyRings/keyring-429-green",
+        "createTime": "2023-05-19T10:51:51.324759732Z"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/global/keyRings/keyring-429-green1",
+        "createTime": "2023-05-19T10:57:26.242449748Z"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/global/keyRings/keyring-4be305b2-008-red",
+        "createTime": "2022-09-12T23:22:18.878040578Z"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/global/keyRings/keyring-9e64d9bb-008-red",
+        "createTime": "2023-06-30T09:08:35.513149953Z"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/global/keyRings/keyring-a598609b-291-red",
+        "createTime": "2023-01-18T08:07:22.012070733Z"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/global/keyRings/keyring-d6be0dc0-008-red",
+        "createTime": "2022-05-04T08:04:23.719298626Z"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/global/keyRings/keyring-key-19867334-261-green",
+        "createTime": "2022-08-29T07:01:56.078884457Z"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/global/keyRings/keyring-key-279d53f2-008-green",
+        "createTime": "2022-09-12T23:21:14.924390864Z"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/global/keyRings/keyring-key-59b38a80-261-green",
+        "createTime": "2022-06-06T08:47:33.447267334Z"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/global/keyRings/keyring-key-6e942274-261-green",
+        "createTime": "2022-08-29T07:28:12.936062954Z"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/global/keyRings/keyring-key-8284c771-261-green",
+        "createTime": "2022-08-29T08:56:25.218482594Z"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/global/keyRings/keyring-key-abfc9f0c-008-green",
+        "createTime": "2022-05-04T08:05:29.073124525Z"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/global/keyRings/keyring-key-b9547b5e-008-green",
+        "createTime": "2022-10-11T14:39:59.606023206Z"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/global/keyRings/keyring-key-c130655d-261-green",
+        "createTime": "2022-06-08T09:15:30.169002045Z"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/global/keyRings/keyring-key-d0f954b2-008-green",
+        "createTime": "2023-06-30T09:07:37.324839137Z"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/global/keyRings/kms-key123",
+        "createTime": "2021-07-12T11:54:13.681532538Z"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/global/keyRings/new_key",
+        "createTime": "2021-04-29T16:34:59.432581824Z"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/global/keyRings/testkey1",
+        "createTime": "2019-10-16T14:17:02.529052792Z"
+      }
+    ],
+    "totalSize": 30
+  }
+}

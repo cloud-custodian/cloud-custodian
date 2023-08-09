@@ -195,7 +195,7 @@ class InstanceTest(BaseTest):
         self.assertEqual(len(resources), 1)
 
     def test_image_filter_iam_query(self):
-        project_id = 'gcp-lab-custodian'
+        project_id = 'cloud-custodian'
         factory = self.replay_flight_data('image-filter-iam', project_id=project_id)
         p = self.load_policy({
             'name': 'image-filter-iam',

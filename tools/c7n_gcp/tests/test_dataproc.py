@@ -7,7 +7,7 @@ from gcp_common import BaseTest
 class DataprocTest(BaseTest):
 
     def test_dataproc_clusters_filter_iam_query(self):
-        project_id = 'gcp-lab-custodian'
+        project_id = 'cloud-custodian'
         factory = self.replay_flight_data('dataproc-clusters-filter-iam', project_id=project_id)
         p = self.load_policy({
             'name': 'dataproc-filter-iam',

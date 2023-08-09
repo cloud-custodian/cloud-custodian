@@ -223,6 +223,26 @@ class SpannerInstanceTest(BaseTest):
                           {'members': ['user:dkhanas@gmail.com'],
                            'role': 'roles/viewer'}])
 
+    def test_spanner_instance_filter_iam_query(self):
+        project_id = 'gcp-lab-custodian'
+        factory = self.replay_flight_data('spanner-instance-filter-iam', project_id=project_id)
+        p = self.load_policy({
+            'name': 'spanner-instance-filter-iam',
+            'resource': 'gcp.spanner-instance',
+            'filters': [{
+                'type': 'iam-policy',
+                'doc': {
+                    'key': "bindings[?(role=='roles\editor' || role=='roles\owner')]",
+                    'op': 'ne',
+                    'value': []
+                }
+            }]
+        }, session_factory=factory)
+        resources = p.run()
+
+        self.assertEqual(1, len(resources))
+        self.assertEqual('projects/cloud-custodian/instances/spanner-instance-2', resources[0]['name'])
+
 
 class SpannerDatabaseInstanceTest(BaseTest):
 
@@ -357,3 +377,23 @@ class SpannerDatabaseInstanceTest(BaseTest):
                               'members': ['user:dkhanas@gmail.com']}]
 
         self.assertEqual(test_method(existing_bindings, bindings_to_remove), expected_bindings)
+
+    def test_spanner_database_instance_filter_iam_query(self):
+        project_id = 'gcp-lab-custodian'
+        factory = self.record_flight_data('spanner-database-instance-filter-iam', project_id=project_id)
+        p = self.load_policy({
+            'name': 'spanner-instance-filter-iam',
+            'resource': 'gcp.spanner-instance',
+            'filters': [{
+                'type': 'iam-policy',
+                'doc': {
+                    'key': 'bindings[?(role==\'roles/admin\')].members[]',
+                    'op': 'ne',
+                    'value': []
+                }
+            }]
+        }, session_factory=factory)
+        resources = p.run()
+
+        self.assertEqual(len(resources), 1)
+        self.assertEqual('', resources[0]['name'])
