@@ -3,9 +3,6 @@
 
 from c7n_azure.resources.arm import ArmResourceManager
 from c7n_azure.provider import resources
-from c7n.filters import Filter
-from c7n.utils import type_schema
-
 
 @resources.register('front-door-policy')
 class FrontDoorPolicy(ArmResourceManager):

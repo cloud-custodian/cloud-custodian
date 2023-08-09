@@ -18,28 +18,28 @@ class FrontDoorPolicyTest(BaseTest):
         })
         resources = p.run()
         self.assertEqual(len(resources), 2)
- 
+
     def test_front_door_policy_schema1(self):
         p = self.load_policy({
-            'name': 'test-front-door-policy-schema',
-            'resource': 'azure.front-door-policy',
-            'filters': [
-
-                {
-                    'type': 'value', 
-                    'key': 'properties.managedRules.managedRuleSets[].ruleGroupOverrides[].rules[].ruleId',
-                    'value_type': 'swap',
-                    'op': 'in',
-                    'value': '944240'
-                },
-                {
-                    'type': 'value', 
-                    'key': 'properties.managedRules.managedRuleSets[].ruleGroupOverrides[].rules[].enabledState',
-                    'value_type': 'swap',
-                    'op': 'in',
-                    'value': 'Disabled'
-                }
-            ]
-        })
+        'name': 'test-front-door-policy-schema',
+        'resource': 'azure.front-door-policy',
+        'filters': [
+            {
+                'type': 'value',
+                'key':
+        'properties.managedRules.managedRuleSets[].ruleGroupOverrides[].rules[].ruleId',
+                'value_type': 'swap',
+                'op': 'in',
+                'value': '944240'
+            },
+            {
+                'type': 'value',
+                'key':
+        'properties.managedRules.managedRuleSets[].ruleGroupOverrides[].rules[].enabledState',
+                'value_type': 'swap',
+                'op': 'in',
+                'value': 'Disabled'
+            }
+        ]})
         resources = p.run()
         self.assertEqual(len(resources), 1)
