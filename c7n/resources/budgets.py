@@ -20,6 +20,7 @@ class Budget(query.QueryResourceManager):
         id = "BudgetName"
         name = "BudgetName"
         cfn_type = "AWS::Budgets::Budget"
+        permissions_enum = ["budgets:ViewBudget"]
 
     source_mapping = {
         "describe": DescribeBudget,

@@ -203,7 +203,7 @@ class PolicyMetaLint(BaseTest):
         overrides = overrides.difference(
             {'account', 's3', 'hostedzone', 'log-group', 'rest-api', 'redshift-snapshot',
              'rest-stage', 'codedeploy-app', 'codedeploy-group', 'fis-template', 'dlm-policy',
-             'apigwv2', 'apigw-domain-name', 'fis-experiment'})
+             'apigwv2', 'apigwv2-stage', 'apigw-domain-name', 'fis-experiment'})
         if overrides:
             raise ValueError("unknown arn overrides in %s" % (", ".join(overrides)))
 
@@ -775,7 +775,7 @@ class PolicyMetaLint(BaseTest):
         explicit = []
         whitelist_explicit = {
             'securityhub-finding', 'ssm-patch-group',
-            'appdiscovery', 'athena-named-query',
+            'appdiscovery-agent', 'athena-named-query',
             'rest-account', 'shield-protection', 'shield-attack',
             'dlm-policy', 'efs', 'efs-mount-target', 'gamelift-build',
             'glue-connection', 'glue-dev-endpoint', 'cloudhsm-cluster',
