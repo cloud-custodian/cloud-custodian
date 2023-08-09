@@ -5,7 +5,6 @@ from c7n_gcp.filters import IamPolicyFilter
 from c7n_gcp.filters.iampolicy import IamPolicyValueFilter
 from c7n_gcp.query import ChildResourceManager, ChildTypeInfo
 from c7n_gcp.provider import resources
-from c7n.utils import local_session
 
 
 @resources.register('dataproc-clusters')

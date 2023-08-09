@@ -16,22 +16,6 @@
     "content-location": "https://cloudkms.googleapis.com/v1/projects/cloud-custodian/locations/global/keyRings/gcs-key:getIamPolicy?alt=json"
   },
   "body": {
-    "version": 1,
-    "etag": "BwXBvgzbBYc=",
-    "bindings": [
-      {
-        "role": "roles/cloudkms.cryptoKeyDecrypter",
-        "members": [
-          "user:anna_andronnikova@epam.com",
-          "user:oleksii_shaina@epam.com"
-        ]
-      },
-      {
-        "role": "roles/cloudkms.publicKeyViewer",
-        "members": [
-          "user:oleksandr_shulhin@epam.com"
-        ]
-      }
-    ]
+    "etag": "ACAB"
   }
 }

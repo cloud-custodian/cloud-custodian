@@ -15,7 +15,7 @@ class FunctionTest(BaseTest):
             'filters': [{
                 'type': 'iam-policy',
                 'doc': {
-                    'key': "bindings[?(role=='roles\editor' || role=='roles\owner')]",
+                    'key': "bindings[?(role=='roles\\editor' || role=='roles\\owner')]",
                     'op': 'ne',
                     'value': []
                 }
