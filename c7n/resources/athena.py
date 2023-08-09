@@ -6,6 +6,7 @@ from c7n import query
 
 @resources.register("athena-named-query")
 class AthenaNamedQuery(query.QueryResourceManager):
+
     class resource_type(query.TypeInfo):
         service = "athena"
         enum_spec = ('list_named_queries', 'NamedQueryIds', None)
