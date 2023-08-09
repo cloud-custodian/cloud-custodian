@@ -6,14 +6,14 @@ from c7n.utils import local_session
 
 
 class DescribeGuarddutyFinding(query.DescribeSource):
-
     def resources(self, query):
         detector_id = self.get_detector_id()
         if not detector_id:
-           return ()
+            return ()
         if not query:
-           query = {}
+            query = {}
         query['DetectorId'] = detector_id
+        self.manager.resource_type.batch_detail_spec[-1] = {'DetectorId': detector_id}
         return super().resources(query)
 
     def get_detector_id(self):
@@ -27,12 +27,12 @@ class GuarddutyFinding(query.QueryResourceManager):
     class resource_type(query.TypeInfo):
         service = "guardduty"
         enum_spec = ('list_findings', 'FindingIds', None)
-        detail_spec = ('get_findings', 'FindingIds', None, 'Findings')
+        batch_detail_spec = ['get_findings', 'FindingIds', None, 'Findings', None]
         arn_type = "finding"
         arn = "Arn"
         id = "AccountId"
         name = "Description"
 
     source_mapping = {
-       "describe": DescribeGuarddutyFinding,
+        "describe": DescribeGuarddutyFinding,
     }
