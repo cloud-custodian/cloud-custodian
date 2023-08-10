@@ -451,7 +451,7 @@ class RouteTest(BaseTest):
             'resource': 'gcp.route',
             'mode': {
                 'type': 'gcp-audit',
-                'methods': ['v1.compute.networks.insert', 'v1.compute.networks.addPeering']}},
+                'methods': ['v1.compute.routes.insert']}},
             session_factory=factory)
 
         exec_mode = p.get_execution_mode()

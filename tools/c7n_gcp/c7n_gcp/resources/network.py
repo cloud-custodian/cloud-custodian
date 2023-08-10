@@ -76,12 +76,6 @@ class VPCDNSPolicyFilter(ValueFilter):
                     return True
         return False
 
-        @staticmethod
-        def get(client, resource_info):
-            return client.execute_command(
-                'get', {'project': resource_info['project_id'],
-                        'network': resource_info['resourceName'].rsplit('/', 1)[-1]})
-
 
 @Network.filter_registry.register('vpc-dns-policy-filter')
 class VPCDNSPolicyFilter(ValueFilter):
