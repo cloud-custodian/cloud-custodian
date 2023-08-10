@@ -79,22 +79,9 @@ class IPSecAlgorithmFilter(ValueFilter):
                          key={'type': 'string', 'enum': ['ipsecPolicies']})
     schema_alias = False
 
-    def check_state(self, ipsec_policies):
-        if self.data.get('value') == 'default' and not ipsec_policies:
-            return True
-        if self.data.get('value') == 'custom' and ipsec_policies:
-            return True
-        return False
-
     def process(self, resources, event=None):
       client = self.manager.get_client()
       matched = []
       for vpn in resources:
-        if self.data.get('key') == 'ipsecPolicies':
-          if vpn['properties']['gatewayType'] != "ExpressRoute":
-            vpnrg = ResourceIdParser.get_resource_group(vpn['id'])
-            connections = client.virtual_network_gateway_connections.list(vpnrg)
-            for connection in connections:
-              if self.check_state(connection.ipsec_policies):
-                matched.append(vpn)
-      return matched
+        vpnrg = ResourceIdParser.get_resource_group(vpn['id'])
+        return client.virtual_network_gateway_connections.list(vpnrg)
