@@ -74,9 +74,7 @@ class IPSecAlgorithmFilter(ValueFilter):
                 value: null
     """
 
-    schema = type_schema('vpn-connections', rinherit=ValueFilter.schema,
-                         value={'type': 'string', 'enum': ['custom', 'default']},
-                         key={'type': 'string', 'enum': ['ipsecPolicies']})
+    schema = type_schema('vpn-connections', rinherit=ValueFilter.schema)
     schema_alias = False
 
     def process(self, resources, event=None):
