@@ -924,6 +924,21 @@ class RDSTest(BaseTest):
         self.assertEqual(resources[0]["DBInstanceIdentifier"], "database-2")
 
 
+def test_rds_snapshot_instance(test):
+    factory = test.replay_flight_data('test_rds_snapshot_instance')
+    p = test.load_policy(
+        {'name': 'check-instance',
+         'resource': 'aws.rds-snapshot',
+         'filters': [
+             {'type': 'instance',
+              'key': 'DeletionProtection',
+              'value': False}]},
+        session_factory=factory)
+    resources = p.run()
+    assert len(resources) == 1
+    resources[0]['DBSnapshotIdentifier'] == 'manual-testx'
+
+
 class RDSSnapshotTest(BaseTest):
 
     def test_rds_snapshot_copy_tags_enable(self):
@@ -2046,3 +2061,93 @@ class RDSProxy(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['DBProxyName'], 'test-us-east-1-db-proxy')
         self.assertEqual(resources[0]['RequireTLS'], False)
+
+    def test_rds_proxy_delete(self):
+        session_factory = self.replay_flight_data('test_rds_proxy_delete')
+        p = self.load_policy(
+            {
+                'name': 'delete-rds-proxy',
+                'resource': 'aws.rds-proxy',
+                'filters': [
+                    {
+                        'type': 'value',
+                        'key': 'DBProxyName',
+                        'value': 'proxy-test-1'
+                    }
+                ],
+                'actions': [
+                    {
+                        'type': 'delete'
+                    }
+                ],
+            },
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = session_factory().client('rds')
+        resources = client.describe_db_proxies()
+        self.assertEqual(resources['DBProxies'][0]['DBProxyName'], 'proxy-test-1')
+        self.assertEqual(resources['DBProxies'][0]['Status'], 'deleting')
+
+    def test_rds_proxy_subnet_filter(self):
+        session_factory = self.replay_flight_data("test_rds_proxy_subnet_filter")
+        p = self.load_policy(
+            {
+                "name": "rds-proxy-subnet-filter",
+                "resource": "rds-proxy",
+                "filters": [
+                    {
+                        "type": "subnet",
+                        "key": "DefaultForAz",
+                        "op": "eq",
+                        "value": False,
+                    }
+                ],
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["DBProxyName"], "proxy-test-1")
+
+    def test_rds_proxy_security_group_filter(self):
+        session_factory = self.replay_flight_data("test_rds_proxy_security_group_filter")
+        p = self.load_policy(
+            {
+                "name": "rds-proxy-security-group-filter",
+                "resource": "rds-proxy",
+                "filters": [
+                    {
+                        "type": "security-group",
+                        "key": "tag:ASV",
+                        "op": "eq",
+                        "value": "PolicyTest",
+                    }
+                ],
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["DBProxyName"], "proxy-test-1")
+
+    def test_rds_proxy_vpc_filter(self):
+        session_factory = self.replay_flight_data("test_rds_proxy_vpc_filter")
+        p = self.load_policy(
+            {
+                "name": "rds-proxy-vpc-filter",
+                "resource": "rds-proxy",
+                "filters": [
+                    {
+                        "type": "vpc",
+                        "key": "tag:Name",
+                        "op": "eq",
+                        "value": "DemoVPC",
+                    }
+                ],
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["DBProxyName"], "proxy-test-1")

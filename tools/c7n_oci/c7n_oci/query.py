@@ -21,7 +21,7 @@ class ResourceQuery:
         self.session_factory = session_factory
 
     def filter(self, resource_manager, client_name, operation, params):
-        session = local_session(self.session_factory)
+        session = resource_manager.get_session()
         client = session.client(client_name)
 
         return self._invoke_client_enum(client, operation, params)
@@ -158,7 +158,7 @@ class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
         raise KeyError("Invalid Source %s" % source_type)
 
     def get_client(self):
-        return local_session(self.session_factory).client(
+        return self.get_session().client(
             f"{self.resource_type.service}.{self.resource_type.client}"
         )
 
@@ -166,8 +166,9 @@ class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
         operation, return_type, extra_args = self.resource_type.enum_spec
         return getattr(self.get_client(), operation)
 
+    # Get the session object for the respective region
     def get_session(self):
-        return local_session(self.session_factory)
+        return local_session(self.session_factory, self.config.get("region"))
 
     def get_model(self):
         return self.resource_type

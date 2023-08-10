@@ -2,8 +2,8 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import re
+from unittest import mock
 
-import mock
 from .azure_common import BaseTest, arm_template
 from c7n_azure.actions.logic_app import LogicAppAction
 from c7n_azure.session import Session

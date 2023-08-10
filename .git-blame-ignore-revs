@@ -1,0 +1,11 @@
+# .git-blame-ignore-revs
+# 
+# Configuration for github to ignore formatting commits for purposes of its blame view
+# https://docs.github.com/en/repositories/working-with-files/using-files/viewing-a-file#ignore-commits-in-the-blame-view
+#
+# For local configuration you can use `git blame --ignore-revs-file .git-blame-ignore-revs`
+# or `git config blame.ignoreRevsFile .git-blame-ignore-revs`
+
+ 
+# mailer format w/ black (#8636)
+0861541554b9afef3702ab2161fb3530e690513b 

@@ -34,6 +34,7 @@ def test_gcp_resource_metadata_asset_type():
         'ml-job',
         'ml-model',
         'notebook',
+        'patch-deployment',
         'sourcerepo',
         'sql-backup-run',
         'sql-ssl-cert',
