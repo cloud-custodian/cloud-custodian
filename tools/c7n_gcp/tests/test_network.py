@@ -94,6 +94,12 @@ class NetworkTest(BaseTest):
                 "global/networks/default"})
         self.assertEqual(network['name'], 'default')
         self.assertEqual(network['autoCreateSubnetworks'], True)
+        self.assertEqual(
+            p.resource_manager.get_urns([network]),
+            [
+                'gcp:compute::cloud-custodian:vpc/default',
+            ],
+        )
 
     def test_firewall_port_range_filter(self):
         project_id = 'cloud-custodian'

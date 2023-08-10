@@ -1,0 +1,277 @@
+{
+  "headers": {
+    "etag": "LfHO5eU8OiKQu2CitvXVOn9xWcM=/hIfJgmb38yTCnSP8NVNkIZRdh-w=",
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Tue, 16 Feb 2021 16:11:56 GMT",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3-29=\":443\"; ma=2592000,h3-T051=\":443\"; ma=2592000,h3-Q050=\":443\"; ma=2592000,h3-Q046=\":443\"; ma=2592000,h3-Q043=\":443\"; ma=2592000,quic=\":443\"; ma=2592000; v=\"46,43\"",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "7690",
+    "-content-encoding": "gzip",
+    "content-location": "https://compute.googleapis.com/compute/v1/projects/cloud-custodian/global/firewalls?alt=json"
+  },
+  "body": {
+    "id": "projects/cloud-custodian/global/firewalls",
+    "items": [
+      {
+        "id": "1900985375288934167",
+        "creationTimestamp": "2020-12-22T15:32:09.000-08:00",
+        "name": "default-allow-http",
+        "description": "",
+        "network": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/networks/default",
+        "priority": 1000,
+        "sourceRanges": [
+          "0.0.0.0/0"
+        ],
+        "targetTags": [
+          "http-server"
+        ],
+        "allowed": [
+          {
+            "IPProtocol": "tcp",
+            "ports": [
+              "80"
+            ]
+          }
+        ],
+        "direction": "INGRESS",
+        "logConfig": {
+          "enable": false
+        },
+        "disabled": false,
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/firewalls/default-allow-http",
+        "kind": "compute#firewall"
+      },
+      {
+        "id": "4577907833688551016",
+        "creationTimestamp": "2020-12-13T09:33:59.286-08:00",
+        "name": "default-allow-icmp",
+        "description": "Allow ICMP from anywhere",
+        "network": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/networks/default",
+        "priority": 65534,
+        "sourceRanges": [
+          "0.0.0.0/0"
+        ],
+        "allowed": [
+          {
+            "IPProtocol": "icmp"
+          }
+        ],
+        "direction": "INGRESS",
+        "logConfig": {
+          "enable": false
+        },
+        "disabled": false,
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/firewalls/default-allow-icmp",
+        "kind": "compute#firewall"
+      },
+      {
+        "id": "8537946347221544552",
+        "creationTimestamp": "2020-12-13T09:33:59.218-08:00",
+        "name": "default-allow-internal",
+        "description": "Allow internal traffic on the default network",
+        "network": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/networks/default",
+        "priority": 65534,
+        "sourceRanges": [
+          "10.128.0.0/9"
+        ],
+        "allowed": [
+          {
+            "IPProtocol": "tcp",
+            "ports": [
+              "0-65535"
+            ]
+          },
+          {
+            "IPProtocol": "udp",
+            "ports": [
+              "0-65535"
+            ]
+          },
+          {
+            "IPProtocol": "icmp"
+          }
+        ],
+        "direction": "INGRESS",
+        "logConfig": {
+          "enable": false
+        },
+        "disabled": false,
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/firewalls/default-allow-internal",
+        "kind": "compute#firewall"
+      },
+      {
+        "id": "9195947092294233704",
+        "creationTimestamp": "2020-12-13T09:33:59.263-08:00",
+        "name": "default-allow-rdp",
+        "description": "Allow RDP from anywhere",
+        "network": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/networks/default",
+        "priority": 65534,
+        "sourceRanges": [
+          "0.0.0.0/0"
+        ],
+        "allowed": [
+          {
+            "IPProtocol": "tcp",
+            "ports": [
+              "3389"
+            ]
+          }
+        ],
+        "direction": "INGRESS",
+        "logConfig": {
+          "enable": false
+        },
+        "disabled": false,
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/firewalls/default-allow-rdp",
+        "kind": "compute#firewall"
+      },
+      {
+        "id": "2320244680974659176",
+        "creationTimestamp": "2020-12-13T09:33:59.241-08:00",
+        "name": "default-allow-ssh",
+        "description": "Allow SSH from anywhere",
+        "network": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/networks/default",
+        "priority": 65534,
+        "sourceRanges": [
+          "0.0.0.0/0"
+        ],
+        "allowed": [
+          {
+            "IPProtocol": "tcp",
+            "ports": [
+              "22"
+            ]
+          }
+        ],
+        "direction": "INGRESS",
+        "logConfig": {
+          "enable": false
+        },
+        "disabled": false,
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/firewalls/default-allow-ssh",
+        "kind": "compute#firewall"
+      },
+      {
+        "id": "5079800305420756016",
+        "creationTimestamp": "2021-02-16T06:46:55.577-08:00",
+        "name": "example518-1",
+        "description": "",
+        "network": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/networks/default",
+        "priority": 1000,
+        "sourceServiceAccounts": [
+          "custodian-execute@cloud-custodian.iam.gserviceaccount.com"
+        ],
+        "allowed": [
+          {
+            "IPProtocol": "tcp",
+            "ports": [
+              "20",
+              "50-60"
+            ]
+          }
+        ],
+        "direction": "INGRESS",
+        "logConfig": {
+          "enable": false
+        },
+        "disabled": false,
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/firewalls/example518-1",
+        "kind": "compute#firewall"
+      },
+      {
+        "id": "3413133337060337137",
+        "creationTimestamp": "2021-02-16T06:47:58.661-08:00",
+        "name": "example518-2",
+        "description": "",
+        "network": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/networks/default",
+        "priority": 1000,
+        "sourceServiceAccounts": [
+          "custodian-execute@cloud-custodian.iam.gserviceaccount.com"
+        ],
+        "allowed": [
+          {
+            "IPProtocol": "tcp",
+            "ports": [
+              "20",
+              "56-78",
+              "87",
+              "90-110"
+            ]
+          }
+        ],
+        "direction": "INGRESS",
+        "logConfig": {
+          "enable": false
+        },
+        "disabled": false,
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/firewalls/example518-2",
+        "kind": "compute#firewall"
+      },
+      {
+        "id": "2887867542658246064",
+        "creationTimestamp": "2021-02-16T06:49:03.981-08:00",
+        "name": "example518-3",
+        "description": "",
+        "network": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/networks/default",
+        "priority": 1000,
+        "sourceServiceAccounts": [
+          "custodian-execute@cloud-custodian.iam.gserviceaccount.com"
+        ],
+        "allowed": [
+          {
+            "IPProtocol": "tcp",
+            "ports": [
+              "3045",
+              "7000-8420",
+              "20-31",
+              "50",
+              "110-155"
+            ]
+          }
+        ],
+        "direction": "INGRESS",
+        "logConfig": {
+          "enable": false
+        },
+        "disabled": false,
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/firewalls/example518-3",
+        "kind": "compute#firewall"
+      },
+      {
+        "id": "5457475720563811739",
+        "creationTimestamp": "2021-02-16T06:49:24.075-08:00",
+        "name": "example518-4",
+        "description": "",
+        "network": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/networks/default",
+        "priority": 1000,
+        "sourceServiceAccounts": [
+          "custodian-execute@cloud-custodian.iam.gserviceaccount.com"
+        ],
+        "allowed": [
+          {
+            "IPProtocol": "tcp",
+            "ports": [
+              "21"
+            ]
+          }
+        ],
+        "direction": "INGRESS",
+        "logConfig": {
+          "enable": false
+        },
+        "disabled": false,
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/firewalls/example518-4",
+        "kind": "compute#firewall"
+      }
+    ],
+    "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/firewalls",
+    "kind": "compute#firewallList"
+  }
+}
