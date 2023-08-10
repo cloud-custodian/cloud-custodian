@@ -23,8 +23,8 @@ class VPNTest(BaseTest):
             'resource': 'azure.vpn',
             'filters': [
                 {'type': 'vpn-connections',
-                 'key': 'ipsecPolicies',
-                 'value': 'default'
+                 'key': 'properties.ipsec_policies',
+                 'value': 'null'
                  }
             ]
         })

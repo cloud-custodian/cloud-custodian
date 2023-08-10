@@ -70,8 +70,8 @@ class IPSecAlgorithmFilter(ValueFilter):
             resource: azure.vpn
             filters:
               - type: vpn-connections
-                key: ipsecPolicies
-                value: default
+                key: properties.ipsec_policies
+                value: null
     """
 
     schema = type_schema('vpn-connections', rinherit=ValueFilter.schema,
@@ -84,4 +84,8 @@ class IPSecAlgorithmFilter(ValueFilter):
       matched = []
       for vpn in resources:
         vpnrg = ResourceIdParser.get_resource_group(vpn['id'])
-        return client.virtual_network_gateway_connections.list(vpnrg)
+        conns = [conns.serialize(True)
+                 for conns in client.virtual_network_gateway_connections.list(vpnrg)]
+        for conn in conns:
+           matched.append(conn)
+        return matched
