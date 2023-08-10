@@ -24,9 +24,16 @@ class SupportCase(QueryResourceManager):
         return local_session(self.session_factory).client('support', region_name=region)
 
 
+class DescribeAdvisorCheck(DescribeSource):
+    def resources(self, query):
+        if not query:
+            query = {'language': 'en'}
+        return super().resources(query)
+
 
 @resources.register("advisor-check")
 class AdvisorCheck(QueryResourceManager):
+
     class resource_type(TypeInfo):
         service = "support"
         enum_spec = ('describe_trusted_advisor_checks', 'checks', None)
@@ -35,3 +42,7 @@ class AdvisorCheck(QueryResourceManager):
         arn_service = "trustedadvisor"
         name = id = "checkId"
         universal_taggable = object()
+
+    source_mapping = {
+        "describe": DescribeAdvisorCheck,
+    }
