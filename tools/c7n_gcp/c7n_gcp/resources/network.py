@@ -44,43 +44,6 @@ class Network(QueryResourceManager):
 class VPCDNSPolicyFilter(ValueFilter):
     schema = type_schema('vpc-dns-policy-filter',
                          rinherit=ValueFilter.schema,)
-    permissions = ("vpcaccess.locations.list",)
-
-    def _perform_op(self, a, b):
-        op = OPERATORS[self.data.get('op', 'eq')]
-        return op(a, b)
-
-    def process(self, resources, event=None):
-        session = local_session(self.manager.session_factory)
-        client = session.client(service_name='dns', version='v1beta2', component='policies')
-        # Getting project_id from client
-        accepted_resources = []
-        project = session.get_default_project()
-        dns_policies = client.execute_query('list', {'project': project})
-        if not dns_policies:
-            return accepted_resources
-
-        for resource in resources:
-            if self._is_valid_vpc(vpc=resource['name'],
-                                  dns_policies=dns_policies):
-                accepted_resources.append(resource)
-
-        return accepted_resources
-
-    def _is_valid_vpc(self, vpc, dns_policies):
-        for policy in dns_policies['policies']:
-            for network in policy['networks']:
-                key = jmespath.search(self.data['key'], policy)
-                if network['networkUrl'].endswith(vpc) and \
-                        self._perform_op(key, self.data['value']):
-                    return True
-        return False
-
-
-@Network.filter_registry.register('vpc-dns-policy-filter')
-class VPCDNSPolicyFilter(ValueFilter):
-    schema = type_schema('vpc-dns-policy-filter',
-                         rinherit=ValueFilter.schema,)
 
     def _perform_op(self, a, b):
         op = OPERATORS[self.data.get('op', 'eq')]
