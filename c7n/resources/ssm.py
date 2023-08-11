@@ -830,3 +830,15 @@ class DeleteDataSync(Action):
                 client.delete_resource_data_sync(SyncName=r['SyncName'])
             except client.exceptions.ResourceDataSyncNotFoundException:
                 continue
+
+
+
+@resources.register("ssm-patch-group")
+class SsmPatchGroup(QueryResourceManager):
+    class resource_type(TypeInfo):
+        service = "ssm"
+        enum_spec = ('describe_patch_groups', 'Mappings', None)
+        arn = False
+        id = "PatchGroup"
+        name = "PatchGroup"
+

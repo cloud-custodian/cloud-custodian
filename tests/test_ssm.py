@@ -4,6 +4,7 @@ import json
 import time
 
 from c7n.exceptions import PolicyValidationError
+from pytest_terraform import terraform
 
 from .common import BaseTest, functional
 
@@ -500,3 +501,17 @@ class TestSSM(BaseTest):
 
         data_syncs = p.run()
         self.assertEqual(len(data_syncs), 3)
+
+
+@terraform("ssm_patch_group")
+def test_ssm_patch_group_query(test, ssm_patch_group):
+    factory = test.replay_flight_data("test_ssm_patch_group_query")
+
+    policy = test.load_policy({
+      "name": "test-aws-ssm-patch-group",
+      "resource": "aws.ssm-patch-group"
+    }, session_factory=factory)
+
+    resources = policy.run()
+    assert len(resources) > 0
+    assert resources[0]['PatchGroup'] == 'patch-group-name'
