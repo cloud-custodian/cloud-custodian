@@ -47,6 +47,15 @@ MAILER_CONFIG = {
     "role": "arn:aws:iam::xxxx:role/cloudcustodian-mailer",
     "ldap_uid_tags": ["CreatorName", "Owner"],
     "templates_folders": [os.path.abspath(os.path.dirname(__file__)), os.path.abspath("/"), ""],
+    # Jira config
+    "jira_url": "https://your-org.atlassian.net/",
+    "jira_username": "YOUR_JIRA_USERNAME",
+    "jira_token": "YOUR_JIRA_TOKEN",
+    "jira_custom_fields": {
+        "DEFAULT": {"priority": {"name": "Medium"}},
+        "MY_PROJECT": {"customfield_10059": "value_for_the_field"},
+        "MY_ANOTHER_PROJECT": {"priority": "cannot-be-set"},
+    },
 }
 MAILER_CONFIG_AZURE = {
     "queue_url": "asq://storageaccount.queue.core.windows.net/queuename",

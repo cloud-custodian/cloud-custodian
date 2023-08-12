@@ -163,6 +163,11 @@ CONFIG_SCHEMA = {
         "graph_sendmail_endpoint": {"type": "string"},
         "graph_client_id": {"type": "string"},
         "graph_client_secret": SECURED_STRING_SCHEMA,
+        # Jira config
+        "jira_url": {"type": "string"},
+        "jira_username": {"type": "string"},
+        "jira_token": SECURED_STRING_SCHEMA,
+        "jira_custom_fields": {"type": "object"},
         # SDK Config
         "profile": {"type": "string"},
         "http_proxy": {"type": "string"},
