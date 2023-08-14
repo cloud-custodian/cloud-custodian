@@ -2212,3 +2212,39 @@ class DbOptionGroups(ValueFilter):
                     break
 
         return results
+
+
+@filters.register('pending-maintenance')
+class PendingMaintenance(Filter):
+    """ Scan DB instances for those with pending maintenance
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: rds-pending-maintenance
+            resource: aws.rds
+            filters:
+              - pending-maintenance
+    """
+
+    schema = type_schema('pending-maintenance')
+    permissions = ('rds:DescribePendingMaintenanceActions',)
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('rds')
+
+        results = []
+        pending_maintenance = set()
+        paginator = client.get_paginator('describe_pending_maintenance_actions')
+        for page in paginator.paginate():
+            pending_maintenance.update(
+                {action['ResourceIdentifier'] for action in page['PendingMaintenanceActions']}
+            )
+
+        for r in resources:
+            if r['DBInstanceArn'] in pending_maintenance:
+                results.append(r)
+
+        return results

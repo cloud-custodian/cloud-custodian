@@ -1,0 +1,70 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Wed, 09 Aug 2023 22:12:33 GMT",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "2149",
+    "-content-encoding": "gzip",
+    "content-location": "https://cloudfunctions.googleapis.com/v1/projects/cloud-custodian/locations/-/functions?alt=json"
+  },
+  "body": {
+    "functions": [
+      {
+        "name": "projects/cloud-custodian/locations/us-central1/functions/function-3",
+        "httpsTrigger": {
+          "url": "https://us-central1-gcp-lab-custodian.cloudfunctions.net/function-3",
+          "securityLevel": "SECURE_OPTIONAL"
+        },
+        "status": "ACTIVE",
+        "entryPoint": "helloWorld",
+        "timeout": "60s",
+        "availableMemoryMb": 256,
+        "serviceAccountEmail": "gcp-lab-custodian@appspot.gserviceaccount.com",
+        "updateTime": "2023-08-09T00:19:19.608Z",
+        "versionId": "1",
+        "labels": {
+          "deployment-tool": "console-cloud"
+        },
+        "sourceUploadUrl": "https://storage.googleapis.com/uploads-756213598863.us-central1.cloudfunctions.appspot.com/bb317da1-46a0-429e-a03b-878a7826b3a0.zip",
+        "runtime": "nodejs20",
+        "maxInstances": 2,
+        "ingressSettings": "ALLOW_ALL",
+        "buildId": "de88c891-2bbb-4c7c-a24d-033e2e9aca3c",
+        "buildName": "projects/cloud-custodian/locations/us-central1/builds/de88c891-2bbb-4c7c-a24d-033e2e9aca3c",
+        "dockerRegistry": "CONTAINER_REGISTRY"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/us-central1/functions/function-4",
+        "httpsTrigger": {
+          "url": "https://us-central1-gcp-lab-custodian.cloudfunctions.net/function-4",
+          "securityLevel": "SECURE_ALWAYS"
+        },
+        "status": "ACTIVE",
+        "entryPoint": "helloWorld",
+        "timeout": "60s",
+        "availableMemoryMb": 256,
+        "serviceAccountEmail": "gcp-lab-custodian@appspot.gserviceaccount.com",
+        "updateTime": "2023-08-09T00:20:55.404Z",
+        "versionId": "1",
+        "labels": {
+          "deployment-tool": "console-cloud"
+        },
+        "sourceUploadUrl": "https://storage.googleapis.com/uploads-756213598863.us-central1.cloudfunctions.appspot.com/973de633-7d28-469a-8d18-379a71a321d3.zip",
+        "runtime": "nodejs20",
+        "maxInstances": 3000,
+        "ingressSettings": "ALLOW_ALL",
+        "buildId": "851ecb38-4a84-4549-83ba-8fe529576bf1",
+        "buildName": "projects/cloud-custodian/locations/us-central1/builds/851ecb38-4a84-4549-83ba-8fe529576bf1",
+        "dockerRegistry": "CONTAINER_REGISTRY"
+      }
+    ]
+  }
+}

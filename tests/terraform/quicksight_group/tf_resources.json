@@ -1,0 +1,16 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "aws_quicksight_group": {
+            "example": {
+                "arn": "arn:aws:quicksight:us-east-1:644160558196:group/default/tf-example",
+                "aws_account_id": "644160558196",
+                "description": "",
+                "group_name": "tf-example",
+                "id": "644160558196/default/tf-example",
+                "namespace": "default"
+            }
+        }
+    }
+}
