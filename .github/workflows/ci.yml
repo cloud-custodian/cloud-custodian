@@ -23,6 +23,7 @@ jobs:
           python-version: ${{ env.DEFAULT_PY_VERSION }}
       - name: Install Linter
         run: |
+          pipx install poetry==${{ env.POETRY_VERSION }}
           python -m venv .venv
           echo "$PWD/.venv/bin" >> $GITHUB_PATH
           echo "VIRTUAL_ENV=$PWD/.venv" >> $GITHUB_ENV          
