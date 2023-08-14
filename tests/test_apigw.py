@@ -5,6 +5,30 @@ from botocore.exceptions import ClientError
 from .common import BaseTest, event_data
 from c7n.exceptions import PolicyValidationError
 
+from pytest_terraform import terraform
+
+
+@terraform("apigatewayv2_stage")
+def test_apigwv2_stage_query(test, apigatewayv2_stage):
+    factory = test.replay_flight_data("test_apigwv2_stage_query")
+
+    policy = test.load_policy({
+      "name": "test-aws-apigwv2-stage",
+      "resource": "aws.apigwv2-stage"
+    }, session_factory=factory)
+
+    resources = policy.run()
+
+    assert len(resources) > 0
+    assert resources[1]['StageName'] == apigatewayv2_stage[
+        'aws_apigatewayv2_stage.example.name']
+    assert resources[1]['Tags'] == [{'Key': 'Env', 'Value': 'Dev'}]
+
+    assert policy.resource_manager.get_arns(resources) == [
+        'arn:aws:apigateway:us-east-1::/apis/0mt9yx690a/stages/production',
+        'arn:aws:apigateway:us-east-1::/apis/zzc87ypck1/stages/example-api-allowed-sheepdog'
+    ]
+
 
 class TestRestAccount(BaseTest):
 
