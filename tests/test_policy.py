@@ -364,6 +364,32 @@ class PolicyMetaLint(BaseTest):
         # of a resource.
 
         whitelist = {
+            # q3 2023
+            "AWS::DMS::Endpoint",
+            "AWS::EC2::CapacityReservation",
+            "AWS::EC2::ClientVpnEndpoint",
+            "AWS::EC2::IPAMScope",
+            "AWS::Evidently::Launch",
+            "AWS::Forecast::DatasetGroup",
+            "AWS::GreengrassV2::ComponentVersion",
+            "AWS::GroundStation::MissionProfile",
+            "AWS::Kendra::Index",
+            "AWS::KinesisVideo::Stream",
+            "AWS::Logs::Destination",
+            "AWS::MSK::Configuration",
+            "AWS::MediaConnect::FlowEntitlement",
+            "AWS::MediaConnect::FlowVpcInterface",
+            "AWS::MediaTailor::PlaybackConfiguration",
+            "AWS::NetworkManager::CustomerGatewayAssociation",
+            "AWS::NetworkManager::LinkAssociation",
+            "AWS::Personalize::Dataset",
+            "AWS::Personalize::Schema",
+            "AWS::Personalize::Solution",
+            "AWS::Pinpoint::EmailChannel",
+            "AWS::Pinpoint::EmailTemplate",
+            "AWS::Pinpoint::EventStream",
+            "AWS::ResilienceHub::App",
+            "AWS::S3::AccessPoint",
             # q2 2023 wave 3
             "AWS::Amplify::App",
             "AWS::AppMesh::VirtualNode",
