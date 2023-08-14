@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
+#
 # Copyright 2019 Duo Security
 # BSD 3 Clause, full text below.
 #
-# modifications to produce only the data of interest (resource arns)
+# Modifications to produce only the data of interest (resource arns)
 # original source
 # https://github.com/duo-labs/parliament/blob/main/utils/update_iam_data.py
 
@@ -42,12 +43,13 @@ from pathlib import Path
 
 from bs4 import BeautifulSoup
 
-# Code for get_links_from_base_actions_resources_conditions_page and update_html_docs_directory borrowed from https://github.com/salesforce/policy_sentry/blob/1126f174f49050b95bddf7549aedaf11fa51a50b/policy_sentry/scraping/awsdocs.py#L31
+# Code for get_links_from_base_actions_resources_conditions_page and update_html_docs_directory borrowed from https://github.com/salesforce/policy_sentry/blob/1126f174f49050b95bddf7549aedaf11fa51a50b/policy_sentry/scraping/awsdocs.py#L31   # noqa
 BASE_DOCUMENTATION_URL = "https://docs.aws.amazon.com/service-authorization/latest/reference/reference_policies_actions-resources-contextkeys.html"
 
 
 def get_links_from_base_actions_resources_conditions_page():
-    """Gets the links from the actions, resources, and conditions keys page, and returns their filenames."""
+    """Gets the links from the actions, resources, and conditions keys
+    page, and returns their filenames."""
     html = requests.get(BASE_DOCUMENTATION_URL)
     soup = BeautifulSoup(html.content, "html.parser")
     html_filenames = []
@@ -78,7 +80,7 @@ def update_html_docs_directory(html_docs_destination):
         <link href='href="https://docs.aws.amazon.com/css/awsdocs.css?v=20181221"' rel="stylesheet" type="text/css"/>
         <link href='href="https://docs.aws.amazon.com/assets/marketing/css/marketing-target.css"' rel="stylesheet" type="text/css"/>
         list_amazonkendra.html downloaded
-        """
+        """  # noqa
         soup = BeautifulSoup(response.content, "html.parser")
         for link in soup.find_all("link"):
             if link.get("href").startswith("/"):
@@ -197,7 +199,8 @@ for filename in [f for f in listdir(mypath) if isfile(join(mypath, f))]:
                     continue
 
                 if len(cells) != 6:
-                    # Sometimes the privilege contains Scenarios, and I don't know how to handle this
+                    # Sometimes the privilege contains Scenarios, and
+                    # I don't know how to handle this
                     break
                     # raise Exception("Unexpected format in {}: {}".format(prefix, row))
 
