@@ -862,7 +862,8 @@ class SSMSessionManager(QueryResourceManager):
         if query is None:
             query = {}
         if 'State' not in query:
-            query['State'] = 'Active'  # Default to Active if not specified
+            # Default to Active if not given
+            query['State'] = 'Active'
         return super(SSMSessionManager, self).resources(query=query)
 
 @SSMSessionManager.action_registry.register('terminate')
