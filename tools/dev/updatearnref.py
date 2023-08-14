@@ -62,12 +62,8 @@ def update_html_docs_directory(html_docs_destination):
     (i.e., this repository, or (2) the config directory
     :return:
     """
-    link_url_prefix = (
-        "https://docs.aws.amazon.com/service-authorization/latest/reference/"
-    )
-    initial_html_filenames_list = (
-        get_links_from_base_actions_resources_conditions_page()
-    )
+    link_url_prefix = "https://docs.aws.amazon.com/service-authorization/latest/reference/"
+    initial_html_filenames_list = get_links_from_base_actions_resources_conditions_page()
     # Remove the relative path so we can download it
     html_filenames = [sub.replace("./", "") for sub in initial_html_filenames_list]
 
@@ -117,9 +113,7 @@ def chomp(string):
     """This chomp cleans up all white-space, not just at the ends"""
     string = str(string)
     response = string.replace("\n", " ")  # Convert line ends to spaces
-    response = re.sub(
-        " [ ]*", " ", response
-    )  # Truncate multiple spaces to single space
+    response = re.sub(" [ ]*", " ", response)  # Truncate multiple spaces to single space
     response = re.sub("^[ ]*", "", response)  # Clean start
     return re.sub("[ ]*$", "", response)  # Clean end
 
@@ -188,9 +182,7 @@ for filename in [f for f in listdir(mypath) if isfile(join(mypath, f))]:
         for table in tables:
             # There can be 3 tables, the actions table, an ARN table, and a condition key table
             # Example: https://docs.aws.amazon.com/IAM/latest/UserGuide/list_awssecuritytokenservice.html
-            if not header_matches("actions", table) or not header_matches(
-                "description", table
-            ):
+            if not header_matches("actions", table) or not header_matches("description", table):
                 continue
 
             rows = table.find_all("tr")
@@ -248,9 +240,7 @@ for filename in [f for f in listdir(mypath) if isfile(join(mypath, f))]:
                         dependent_actions_element = cells[resource_cell + 2]
                         dependent_actions = []
                         if dependent_actions_element.text != "":
-                            for action_element in dependent_actions_element.find_all(
-                                "p"
-                            ):
+                            for action_element in dependent_actions_element.find_all("p"):
                                 dependent_actions.append(chomp(action_element.text))
                         resource_types.append(
                             {
@@ -281,9 +271,7 @@ for filename in [f for f in listdir(mypath) if isfile(join(mypath, f))]:
 
         # Get resource table
         for table in tables:
-            if not header_matches("resource types", table) or not header_matches(
-                "arn", table
-            ):
+            if not header_matches("resource types", table) or not header_matches("arn", table):
                 continue
 
             rows = table.find_all("tr")
@@ -295,9 +283,7 @@ for filename in [f for f in listdir(mypath) if isfile(join(mypath, f))]:
 
                 if len(cells) != 3:
                     raise Exception(
-                        "Unexpected number of resource cells {} in {}".format(
-                            len(cells), filename
-                        )
+                        "Unexpected number of resource cells {} in {}".format(len(cells), filename)
                     )
 
                 resource = chomp(cells[0].text)
@@ -329,9 +315,7 @@ for filename in [f for f in listdir(mypath) if isfile(join(mypath, f))]:
 
                 if len(cells) != 3:
                     raise Exception(
-                        "Unexpected number of condition cells {} in {}".format(
-                            len(cells), filename
-                        )
+                        "Unexpected number of condition cells {} in {}".format(len(cells), filename)
                     )
 
                 condition = no_white_space(cells[0].text)
@@ -354,7 +338,6 @@ arn_ref = {}
 for s in schema:
     if not s.get('resources'):
         continue
-    arn_ref[s['prefix']] = {
-        r['resource']: r['arn'] for r in s['resources']} 
+    arn_ref[s['prefix']] = {r['resource']: r['arn'] for r in s['resources']}
 
 print(json.dumps(arn_ref, indent=2, sort_keys=True))
