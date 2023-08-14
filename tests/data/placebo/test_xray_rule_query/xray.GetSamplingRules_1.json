@@ -1,0 +1,84 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "SamplingRuleRecords": [
+            {
+                "SamplingRule": {
+                    "RuleName": "example",
+                    "RuleARN": "arn:aws:xray:us-east-1:644160558196:sampling-rule/example",
+                    "ResourceARN": "*",
+                    "Priority": 9999,
+                    "FixedRate": 0.05,
+                    "ReservoirSize": 1,
+                    "ServiceName": "*",
+                    "ServiceType": "*",
+                    "Host": "*",
+                    "HTTPMethod": "*",
+                    "URLPath": "*",
+                    "Version": 1,
+                    "Attributes": {
+                        "Hello": "Tris"
+                    }
+                },
+                "CreatedAt": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 8,
+                    "day": 8,
+                    "hour": 9,
+                    "minute": 53,
+                    "second": 8,
+                    "microsecond": 0
+                },
+                "ModifiedAt": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 8,
+                    "day": 8,
+                    "hour": 9,
+                    "minute": 53,
+                    "second": 8,
+                    "microsecond": 0
+                }
+            },
+            {
+                "SamplingRule": {
+                    "RuleName": "Default",
+                    "RuleARN": "arn:aws:xray:us-east-1:644160558196:sampling-rule/Default",
+                    "ResourceARN": "*",
+                    "Priority": 10000,
+                    "FixedRate": 0.05,
+                    "ReservoirSize": 1,
+                    "ServiceName": "*",
+                    "ServiceType": "*",
+                    "Host": "*",
+                    "HTTPMethod": "*",
+                    "URLPath": "*",
+                    "Version": 1,
+                    "Attributes": {}
+                },
+                "CreatedAt": {
+                    "__class__": "datetime",
+                    "year": 1969,
+                    "month": 12,
+                    "day": 31,
+                    "hour": 16,
+                    "minute": 0,
+                    "second": 0,
+                    "microsecond": 0
+                },
+                "ModifiedAt": {
+                    "__class__": "datetime",
+                    "year": 1969,
+                    "month": 12,
+                    "day": 31,
+                    "hour": 16,
+                    "minute": 0,
+                    "second": 0,
+                    "microsecond": 0
+                }
+            }
+        ]
+    }
+}

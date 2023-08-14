@@ -203,7 +203,7 @@ class PolicyMetaLint(BaseTest):
         overrides = overrides.difference(
             {'account', 's3', 'hostedzone', 'log-group', 'rest-api', 'redshift-snapshot',
              'rest-stage', 'codedeploy-app', 'codedeploy-group', 'fis-template', 'dlm-policy',
-             'apigwv2', 'apigw-domain-name', 'fis-experiment'})
+             'apigwv2', 'apigwv2-stage', 'apigw-domain-name', 'fis-experiment'})
         if overrides:
             raise ValueError("unknown arn overrides in %s" % (", ".join(overrides)))
 
@@ -422,7 +422,6 @@ class PolicyMetaLint(BaseTest):
             "AWS::AuditManager::Assessment",
             "AWS::CloudWatch::MetricStream",
             "AWS::DeviceFarm::InstanceProfile",
-            "AWS::DeviceFarm::Project",
             "AWS::EC2::EC2Fleet",
             "AWS::EC2::SubnetRouteTableAssociation",
             "AWS::ECR::PullThroughCacheRule",
@@ -518,7 +517,6 @@ class PolicyMetaLint(BaseTest):
             'AWS::IoTSiteWise::Project',
             'AWS::IoTTwinMaker::Entity',
             'AWS::IoTTwinMaker::Workspace',
-            'AWS::Lex::Bot',
             'AWS::Lex::BotAlias',
             'AWS::Lightsail::Bucket',
             'AWS::Lightsail::Certificate',
@@ -542,7 +540,7 @@ class PolicyMetaLint(BaseTest):
             'AWS::ServiceDiscovery::HttpNamespace',
             'AWS::Transfer::Workflow',
             #
-            'AWS::ApiGatewayV2::Stage',
+            # 'AWS::ApiGatewayV2::Stage',
             'AWS::Athena::DataCatalog',
             'AWS::Athena::WorkGroup',
             'AWS::AutoScaling::ScalingPolicy',
@@ -596,7 +594,7 @@ class PolicyMetaLint(BaseTest):
             'AWS::WAFv2::ManagedRuleSet',
             'AWS::WAFv2::RegexPatternSet',
             'AWS::WAFv2::RuleGroup',
-            'AWS::WAFv2::WebACL',
+            # 'AWS::WAFv2::WebACL',
             'AWS::XRay::EncryptionConfig',
             'AWS::ElasticLoadBalancingV2::Listener',
             'AWS::AccessAnalyzer::Analyzer',
@@ -617,7 +615,6 @@ class PolicyMetaLint(BaseTest):
             'AWS::Detective::Graph',
             'AWS::EC2::TransitGatewayRouteTable',
             'AWS::AppSync::GraphQLApi',
-            'AWS::DataSync::Task',
             'AWS::Glue::Job',
             'AWS::SageMaker::NotebookInstanceLifecycleConfig',
             'AWS::SES::ContactList',
@@ -649,6 +646,11 @@ class PolicyMetaLint(BaseTest):
         model = session.get_service_model('config')
         shape = model.shape_for('ResourceType')
 
+        present = resource_config_types.intersection(whitelist)
+        if present:
+            raise AssertionError(
+                "Supported config types \n %s" % ('\n'.join(sorted(present))))
+
         config_types = set(shape.enum).difference(whitelist)
         missing = config_types.difference(resource_config_types)
         if missing:
@@ -660,7 +662,7 @@ class PolicyMetaLint(BaseTest):
             'AWS::ECS::Service',
             'AWS::ECS::TaskDefinition',
             'AWS::NetworkFirewall::Firewall',
-            'AWS::WAFv2::WebACL'
+            'AWS::DMS::ReplicationTask',
         }
         bad_types = resource_config_types.difference(config_types)
         bad_types = bad_types.difference(invalid_ignore)
@@ -707,6 +709,8 @@ class PolicyMetaLint(BaseTest):
             'rest-api',
             'rest-stage',
             'apigw-domain-name',
+            # our check doesn't handle nested resource types in the arn
+            'guardduty-finding',
             # synthetics ~ ie. c7n introduced since non exist.
             # or in some cases where it exists but not usable in iam.
             'scaling-policy',
@@ -806,6 +810,8 @@ class PolicyMetaLint(BaseTest):
             'rest-stage', 'rest-resource', 'rest-vpclink', 'rest-client-certificate'}
         explicit = []
         whitelist_explicit = {
+            'securityhub-finding', 'ssm-patch-group',
+            'appdiscovery-agent', 'athena-named-query',
             'rest-account', 'shield-protection', 'shield-attack',
             'dlm-policy', 'efs', 'efs-mount-target', 'gamelift-build',
             'glue-connection', 'glue-dev-endpoint', 'cloudhsm-cluster',
