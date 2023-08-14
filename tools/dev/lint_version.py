@@ -7,7 +7,7 @@ also can install fast.
 
 # only use stdlib
 
-import toml
+import tomllib
 import argparse
 from pathlib import Path
 
@@ -17,7 +17,7 @@ def main():
     parser.add_argument('package')
     parser.add_argument('lock_file')
     args = parser.parse_args()
-    lock_data = toml.loads(Path(args.lock_file).read_text())
+    lock_data = tomllib.loads(Path(args.lock_file).read_text())
     for pkg in lock_data['package']:
         if pkg['name'] == args.package:
             print(pkg['version'], end='')
