@@ -365,6 +365,16 @@ class PolicyMetaLint(BaseTest):
 
         whitelist = {
             # q3 2023
+            "AWS::ACMPCA::CertificateAuthority",
+            "AWS::Amplify::Branch",
+            "AWS::AppConfig::HostedConfigurationVersion",
+            "AWS::AppIntegrations::EventIntegration",
+            "AWS::AppMesh::Route",
+            "AWS::AppMesh::VirtualGateway",
+            "AWS::AppMesh::VirtualRouter",
+            "AWS::AppRunner::Service",
+            "AWS::Athena::PreparedStatement",
+            "AWS::CustomerProfiles::ObjectType",    
             "AWS::DMS::Endpoint",
             "AWS::EC2::CapacityReservation",
             "AWS::EC2::ClientVpnEndpoint",
