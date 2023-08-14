@@ -136,7 +136,7 @@ pkg-publish-wheel:
 data-update:
 # aws data sets
 	python tools/dev/cfntypedb.py -f tests/data/cfn-types.json
-	python tools/dev/arnref.py -f tests/data/arn-types.json
+	python tools/dev/updatearnref > tests/data/arn-types.json
 	python tools/dev/iamdb.py -f tests/data/iam-actions.json
 # gcp data sets
 	python tools/dev/gcpiamdb.py -f tools/c7n_gcp/tests/data/iam-permissions.json

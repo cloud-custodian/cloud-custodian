@@ -1,41 +1,125 @@
 [
-  "asia-east1",
-  "asia-east2",
-  "asia-northeast1",
-  "asia-northeast2",
-  "asia-northeast3",
-  "asia-south1",
-  "asia-south2",
-  "asia-southeast1",
-  "asia-southeast2",
-  "australia-southeast1",
-  "australia-southeast2",
-  "europe-central2",
-  "europe-north1",
-  "europe-southwest1",
-  "europe-west1",
-  "europe-west12",
-  "europe-west2",
-  "europe-west3",
-  "europe-west4",
-  "europe-west6",
-  "europe-west8",
-  "europe-west9",
-  "me-central1",
-  "me-west1",
-  "northamerica-northeast1",
-  "northamerica-northeast2",
-  "southamerica-east1",
-  "southamerica-west1",
-  "us-central1",
-  "us-central2",
-  "us-east1",
-  "us-east4",
-  "us-east5",
-  "us-east7",
-  "us-south1",
-  "us-west1",
-  "us-west2",
-  "us-west3",
-  "us-west4"
+  {
+    "id": "asia-east1"
+  },
+  {
+    "id": "asia-east2"
+  },
+  {
+    "id": "asia-northeast1"
+  },
+  {
+    "id": "asia-northeast2"
+  },
+  {
+    "id": "asia-northeast3"
+  },
+  {
+    "id": "asia-south1"
+  },
+  {
+    "id": "asia-south2"
+  },
+  {
+    "id": "asia-southeast1"
+  },
+  {
+    "id": "asia-southeast2"
+  },
+  {
+    "id": "australia-southeast1"
+  },
+  {
+    "id": "australia-southeast2"
+  },
+  {
+    "id": "europe-central2"
+  },
+  {
+    "id": "europe-north1"
+  },
+  {
+    "id": "europe-southwest1"
+  },
+  {
+    "id": "europe-west1"
+  },
+  {
+    "id": "europe-west10"
+  },
+  {
+    "id": "europe-west12"
+  },
+  {
+    "id": "europe-west2"
+  },
+  {
+    "id": "europe-west3"
+  },
+  {
+    "id": "europe-west4"
+  },
+  {
+    "id": "europe-west6"
+  },
+  {
+    "id": "europe-west8"
+  },
+  {
+    "id": "europe-west9"
+  },
+  {
+    "id": "me-central1"
+  },
+  {
+    "id": "me-central2"
+  },
+  {
+    "id": "me-west1"
+  },
+  {
+    "id": "northamerica-northeast1"
+  },
+  {
+    "id": "northamerica-northeast2"
+  },
+  {
+    "id": "southamerica-east1"
+  },
+  {
+    "id": "southamerica-west1"
+  },
+  {
+    "id": "us-central1"
+  },
+  {
+    "id": "us-central2"
+  },
+  {
+    "id": "us-east1"
+  },
+  {
+    "id": "us-east4"
+  },
+  {
+    "id": "us-east5"
+  },
+  {
+    "id": "us-east7"
+  },
+  {
+    "id": "us-south1"
+  },
+  {
+    "id": "us-west1"
+  },
+  {
+    "id": "us-west2"
+  },
+  {
+    "id": "us-west3"
+  },
+  {
+    "id": "us-west4"
+  }
 ]
