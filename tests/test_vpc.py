@@ -11,6 +11,7 @@ from pytest_terraform import terraform
 
 import pytest
 
+
 @pytest.mark.audited
 @terraform('sg_used_cross_ref')
 def test_sg_used_cross_ref(test, sg_used_cross_ref):
