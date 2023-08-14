@@ -993,7 +993,9 @@ class SGUsage(Filter):
             for perm_type in ('IpPermissions', 'IpPermissionsEgress'):
                 for p in sg.get(perm_type, []):
                     for g in p.get('UserIdGroupPairs', ()):
-                        sg_ids.add(g['GroupId'])
+                        # self references aren't usage.
+                        if g['GroupId'] != sg['GroupId']:
+                            sg_ids.add(g['GroupId'])
         return sg_ids
 
     def get_ecs_cwe_sgs(self):
