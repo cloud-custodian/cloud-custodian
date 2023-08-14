@@ -9,6 +9,29 @@ from c7n.exceptions import PolicyValidationError
 from c7n.resources.aws import shape_validate
 from pytest_terraform import terraform
 
+import pytest
+
+@pytest.mark.audited
+@terraform('sg_used_cross_ref')
+def test_sg_used_cross_ref(test, sg_used_cross_ref):
+    aws_region = 'us-west-2'
+    factory = test.replay_flight_data('sg_used_cross_ref', region=aws_region)
+    p = test.load_policy({
+        'name': 'sg_used_cross_ref',
+        'resource': 'security-group',
+        'filters': ['unused']
+    }, session_factory=factory)
+    unused = p.resource_manager.filters[0]
+    test.patch(
+        unused,
+        'get_scanners',
+        lambda: (("sg-perm-refs", unused.get_sg_refs),)
+    )
+    resources = p.run()
+    assert len(resources) == 1
+    assert resources[0]['GroupName'] == sg_used_cross_ref[
+        'aws_security_group.n1.name']
+
 
 @terraform('ec2_igw_subnet')
 def test_ec2_igw_subnet(test, ec2_igw_subnet):
