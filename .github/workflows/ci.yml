@@ -23,11 +23,8 @@ jobs:
           python-version: ${{ env.DEFAULT_PY_VERSION }}
       - name: Install Linter
         run: |
-          pipx install poetry==${{ env.POETRY_VERSION }}
-          python -m venv .venv
-          echo "$PWD/.venv/bin" >> $GITHUB_PATH
-          echo "VIRTUAL_ENV=$PWD/.venv" >> $GITHUB_ENV          
-          poetry install --no-root --with dev
+          python -m pip install --upgrade pip
+          pip install ruff black
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v2
         with:
