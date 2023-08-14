@@ -374,7 +374,7 @@ class PolicyMetaLint(BaseTest):
             "AWS::AppMesh::VirtualRouter",
             "AWS::AppRunner::Service",
             "AWS::Athena::PreparedStatement",
-            "AWS::CustomerProfiles::ObjectType",    
+            "AWS::CustomerProfiles::ObjectType",
             "AWS::DMS::Endpoint",
             "AWS::EC2::CapacityReservation",
             "AWS::EC2::ClientVpnEndpoint",
