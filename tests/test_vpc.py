@@ -15,7 +15,7 @@ import pytest
 @terraform('sg_used_cross_ref')
 def test_sg_used_cross_ref(test, sg_used_cross_ref):
     aws_region = 'us-west-2'
-    factory = test.record_flight_data('sg_used_cross_ref', region=aws_region)
+    factory = test.replay_flight_data('sg_used_cross_ref', region=aws_region)
     p = test.load_policy({
         'name': 'sg_used_cross_ref',
         'resource': 'security-group',

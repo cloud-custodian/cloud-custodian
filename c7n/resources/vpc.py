@@ -908,6 +908,8 @@ class SecurityGroupPatch:
 
 class SGUsage(Filter):
 
+    nics = ()
+
     def get_permissions(self):
         return list(itertools.chain(
             *[self.manager.get_resource_manager(m).get_permissions()
