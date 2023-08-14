@@ -85,5 +85,6 @@ class IPSecAlgorithmFilter(ValueFilter):
         conns = [conns.serialize(True)
                  for conns in client.virtual_network_gateway_connections.list(vpnrg)]
         for conn in conns:
-           matched.append(conn)
+            if self.match(conn):
+              matched.append(conn)
         return matched

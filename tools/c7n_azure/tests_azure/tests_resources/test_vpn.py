@@ -24,7 +24,7 @@ class VPNTest(BaseTest):
             'filters': [
                 {'type': 'vpn-connections',
                  'key': 'properties.ipsec_policies',
-                 'value': 'null'
+                 'value': 'empty'
                  }
             ]
         })
