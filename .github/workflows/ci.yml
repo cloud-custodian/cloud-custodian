@@ -23,7 +23,7 @@ jobs:
           python-version: ${{ env.DEFAULT_PY_VERSION }}
       - name: Install Linter
         run: |
-          RUFF_VERSION="$(python tools/dev/lint_verson.py ruff poetry.lock)"
+          RUFF_VERSION="$(python tools/dev/lint_version.py ruff poetry.lock)"
           BLACK_VERSION="$(python tools/dev/lint_version.py black poetry.lock)"
           pip install ruff=="$RUFF_VERSION" black=="$BLACK_VERSION"
       - name: Set up Terraform
