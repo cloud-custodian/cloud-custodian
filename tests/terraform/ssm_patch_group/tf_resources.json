@@ -1,0 +1,34 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "aws_ssm_patch_baseline": {
+            "production": {
+                "approval_rule": [],
+                "approved_patches": [
+                    "KB123456"
+                ],
+                "approved_patches_compliance_level": "UNSPECIFIED",
+                "approved_patches_enable_non_security": false,
+                "arn": "arn:aws:ssm:us-east-1:644160558196:patchbaseline/pb-09e9aa0a7a22ace5c",
+                "description": "",
+                "global_filter": [],
+                "id": "pb-09e9aa0a7a22ace5c",
+                "name": "patch-baseline",
+                "operating_system": "WINDOWS",
+                "rejected_patches": null,
+                "rejected_patches_action": "ALLOW_AS_DEPENDENCY",
+                "source": [],
+                "tags": null,
+                "tags_all": {}
+            }
+        },
+        "aws_ssm_patch_group": {
+            "patchgroup": {
+                "baseline_id": "pb-09e9aa0a7a22ace5c",
+                "id": "patch-group-name,pb-09e9aa0a7a22ace5c",
+                "patch_group": "patch-group-name"
+            }
+        }
+    }
+}

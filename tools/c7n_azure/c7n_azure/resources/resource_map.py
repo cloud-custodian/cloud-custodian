@@ -32,6 +32,7 @@ ResourceMap = {
     "azure.eventhub": "c7n_azure.resources.event_hub.EventHub",
     "azure.eventsubscription": "c7n_azure.resources.event_subscription.EventSubscription",
     "azure.front-door": "c7n_azure.resources.front_door.FrontDoor",
+    "azure.front-door-policy": "c7n_azure.resources.front_door_policy.FrontDoorPolicy",
     "azure.hdinsight": "c7n_azure.resources.hdinsight.Hdinsight",
     "azure.image": "c7n_azure.resources.image.Image",
     "azure.iothub": "c7n_azure.resources.iot_hub.IoTHub",
