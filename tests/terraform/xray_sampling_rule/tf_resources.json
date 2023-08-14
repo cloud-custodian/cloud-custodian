@@ -1,0 +1,32 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "aws_xray_sampling_rule": {
+            "example": {
+                "arn": "arn:aws:xray:us-east-1:644160558196:sampling-rule/example",
+                "attributes": {
+                    "Hello": "Tris"
+                },
+                "fixed_rate": 0.05,
+                "host": "*",
+                "http_method": "*",
+                "id": "example",
+                "priority": 9999,
+                "reservoir_size": 1,
+                "resource_arn": "*",
+                "rule_name": "example",
+                "service_name": "*",
+                "service_type": "*",
+                "tags": {
+                    "Env": "Dev"
+                },
+                "tags_all": {
+                    "Env": "Dev"
+                },
+                "url_path": "*",
+                "version": 1
+            }
+        }
+    }
+}
