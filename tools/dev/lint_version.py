@@ -20,7 +20,7 @@ def main():
     lock_data = toml.loads(Path(args.lock_file).read_text())
     for pkg in lock_data['package']:
         if pkg['name'] == args.package:
-            print(pkg['version'])
+            print(pkg['version'], end='')
 
 
 if __name__ == '__main__':
