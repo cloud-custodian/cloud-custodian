@@ -665,7 +665,8 @@ class TestInstanceGroupManager(BaseTest):
 
     def test_query(self):
         project_id = 'cloud-custodian'
-        factory = self.replay_flight_data('test_instance_group_manager_query', project_id=project_id)
+        factory = self.replay_flight_data(
+            'test_instance_group_manager_query', project_id=project_id)
         p = self.load_policy(
             {'name': 'gcp-instance-group-manager',
              'resource': 'gcp.instance-group-manager'},
