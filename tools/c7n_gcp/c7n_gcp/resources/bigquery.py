@@ -4,9 +4,6 @@ from c7n.utils import type_schema, jmespath_search
 from c7n_gcp.actions import MethodAction
 from c7n_gcp.query import QueryResourceManager, TypeInfo, ChildTypeInfo, ChildResourceManager
 from c7n_gcp.provider import resources
-from c7n.utils import local_session, type_schema
-from c7n.filters.core import OPERATORS
-from c7n.filters import ValueFilter
 
 
 @resources.register('bq-dataset')
