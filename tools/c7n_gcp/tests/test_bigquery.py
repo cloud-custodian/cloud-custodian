@@ -132,7 +132,6 @@ class BigQueryTableTest(BaseTest):
             time.sleep(1)
         self.assertEqual(len(resources), 1)
 
-
     def test_encryption_configuration_bigquery_filter(self):
         project_id = 'cloud-custodian'
         factory = self.replay_flight_data(
@@ -141,7 +140,7 @@ class BigQueryTableTest(BaseTest):
             'name': 'bq-table-get',
             'resource': 'gcp.bq-table',
             'filters': [{
-                'type': 'encryption-configuration-bigquery-filter',
+                'type': 'value',
                 'key': 'encryptionConfiguration.kmsKeyName',
                 'value': 'present'
             }]
