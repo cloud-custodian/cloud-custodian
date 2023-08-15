@@ -16,7 +16,7 @@ from c7n.filters.iamaccess import CrossAccountAccessFilter
 from c7n.filters.related import RelatedResourceFilter
 from c7n.manager import resources, ResourceManager
 from c7n import query, utils
-from c7n.utils import generate_arn, type_schema, get_retry, jmespath_search
+from c7n.utils import generate_arn, type_schema, get_retry, jmespath_search, get_partition
 
 
 ANNOTATION_KEY_MATCHED_METHODS = 'c7n:matched-resource-methods'
@@ -1179,3 +1179,42 @@ class ApiGwV2(query.QueryResourceManager):
             )
 
         return self._generate_arn
+
+
+class StageDescribe(query.ChildDescribeSource):
+
+    def augment(self, resources):
+        # convert tags from {'Key': 'Value'} to standard aws format
+        for r in resources:
+            r['Tags'] = [
+                {'Key': k, 'Value': v} for k, v in r.pop('Tags', {}).items()]
+        return resources
+
+
+@resources.register("apigwv2-stage")
+class ApiGatewayV2Stage(query.ChildResourceManager):
+    class resource_type(query.TypeInfo):
+        service = "apigatewayv2"
+        enum_spec = ('get_stages', 'Items', None)
+        parent_spec = ('aws.apigwv2', 'ApiId', True)
+        arn_type = "/apis"
+        id = name = "StageName"
+        cfn_type = config_type = "AWS::ApiGatewayV2::Stage"
+        universal_taggable = object()
+        permission_prefix = 'apigateway'
+        permissions_enum = ('apigateway:GET',)
+
+    source_mapping = {
+        "describe-child": StageDescribe,
+        "config": query.ConfigSource
+    }
+
+    def get_arns(self, resources):
+        partition = get_partition(self.config.region)
+        return [
+            "arn:{}:apigateway:{}::/apis/{}/stages/{}".format(
+                partition, self.config.region, r['c7n:parent-id'], r['StageName']
+            )
+            for r in resources]
+
+

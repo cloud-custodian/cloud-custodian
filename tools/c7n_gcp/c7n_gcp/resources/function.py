@@ -4,6 +4,7 @@
 from c7n.utils import type_schema
 
 from c7n_gcp.actions import MethodAction
+from c7n_gcp.filters import IamPolicyFilter
 from c7n_gcp.provider import resources
 from c7n_gcp.query import QueryResourceManager, TypeInfo
 
@@ -48,6 +49,14 @@ class Function(QueryResourceManager):
         def _get_urn_id(cls, resource):
             "The id is the last segment of the name ."
             return resource["name"].split('/', 6)[-1]
+
+
+@Function.filter_registry.register('iam-policy')
+class FunctionIamPolicyFilter(IamPolicyFilter):
+    """
+    Overrides the base implementation to process function resources correctly.
+    """
+    permissions = ('cloudfunctions.functions.getIamPolicy',)
 
 
 @Function.action_registry.register('delete')

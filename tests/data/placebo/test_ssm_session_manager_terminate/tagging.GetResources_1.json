@@ -1,0 +1,22 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:ssm:us-east-1:644160558196:session/timmy-01cd54a0c8322733a",
+                "Tags": [
+                    {
+                        "Key": "aws:ssmmessages:session-id",
+                        "Value": "AIDAZL6XWCR2FXBVQTGH4"
+                    },
+                    {
+                        "Key": "aws:ssmmessages:target-id",
+                        "Value": "i-04ddf14c18a4d4995"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
