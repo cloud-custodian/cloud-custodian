@@ -655,5 +655,5 @@ class TestInstanceGroupManager(BaseTest):
 
         resources = p.run()
 
-        self.assertEqual(len(resources), 1)
-        self.assertEqual(resources[0]['name'], 'instance-group-2')
+        self.assertEqual(1, len(resources))
+        self.assertEqual('instance-group-2', resources[0]['name'])

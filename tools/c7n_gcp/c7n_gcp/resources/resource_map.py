@@ -110,5 +110,6 @@ ResourceMap = {
     "gcp.sql-user": "c7n_gcp.resources.sql.SqlUser",
     "gcp.subnet": "c7n_gcp.resources.network.Subnet",
     "gcp.vpc": "c7n_gcp.resources.network.Network",
+    "gcp.zone": "c7n_gcp.resources.compute.Zone",
 }
 # SPDX-License-Identifier: Apache-2.0
