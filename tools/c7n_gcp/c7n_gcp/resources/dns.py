@@ -5,6 +5,7 @@ from c7n_gcp.query import QueryResourceManager, TypeInfo
 from c7n_gcp.actions import MethodAction
 from c7n.utils import type_schema, local_session, jmespath_search
 from c7n.filters import ValueFilter
+from c7n.filters.core import OPERATORS
 
 
 @resources.register('dns-managed-zone')
@@ -65,6 +66,7 @@ class DNSZoneRecordsSetsFilter(ValueFilter):
         session = local_session(self.manager.session_factory)
         client = session.client(service_name='dns', version='v1', component='resourceRecordSets')
         resulted = []
+        op = OPERATORS[self.data.get('op')]
         project = session.get_default_project()
 
         for resource in resources:

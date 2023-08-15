@@ -121,7 +121,6 @@ class DnsPolicyTest(BaseTest):
         )
 
 
-
 class TestDnsResourceRecordsFilter(BaseTest):
 
     def test_query(self):
