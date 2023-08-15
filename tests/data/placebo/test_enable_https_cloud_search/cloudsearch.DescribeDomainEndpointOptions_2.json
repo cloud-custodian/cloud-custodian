@@ -1,0 +1,47 @@
+{
+    "status_code": 200,
+    "data": {
+        "DomainEndpointOptions": {
+            "Options": {
+                "EnforceHTTPS": true,
+                "TLSSecurityPolicy": "Policy-Min-TLS-1-0-2019-07"
+            },
+            "Status": {
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 6,
+                    "day": 6,
+                    "hour": 8,
+                    "minute": 6,
+                    "second": 54,
+                    "microsecond": 586000
+                },
+                "UpdateDate": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 6,
+                    "day": 6,
+                    "hour": 8,
+                    "minute": 9,
+                    "second": 14,
+                    "microsecond": 485000
+                },
+                "UpdateVersion": 102,
+                "State": "Processing",
+                "PendingDeletion": false
+            }
+        },
+        "ResponseMetadata": {
+            "RequestId": "333f8b57-901e-4cb2-xxxxxx17e9cc479",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "x-amzn-requestid": "333f8b57-90xxxxx-f8717e9cc479",
+                "content-type": "text/xml",
+                "content-length": "809",
+                "date": "Mon, 06 Jun 2022 08:09:14 GMT"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

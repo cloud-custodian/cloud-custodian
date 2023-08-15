@@ -8,6 +8,8 @@ from datetime import datetime
 from c7n.utils import local_session, type_schema
 
 from c7n_gcp.actions import MethodAction
+from c7n_gcp.filters import IamPolicyFilter
+from c7n_gcp.filters.iampolicy import IamPolicyValueFilter
 from c7n_gcp.provider import resources
 from c7n_gcp.query import QueryResourceManager, TypeInfo
 
@@ -30,6 +32,8 @@ class Instance(QueryResourceManager):
         asset_type = "compute.googleapis.com/Instance"
         scc_type = "google.compute.Instance"
         metric_key = 'metric.labels.instance_name'
+        urn_component = "instance"
+        urn_zonal = True
 
         @staticmethod
         def get(client, resource_info):
@@ -43,8 +47,8 @@ class Instance(QueryResourceManager):
 
         @staticmethod
         def get_label_params(resource, all_labels):
-            path_param_re = re.compile('.*?/projects/(.*?)/zones/(.*?)/instances/(.*)')
-            project, zone, instance = path_param_re.match(
+            project, zone, instance = re.match(
+                '.*?/projects/(.*?)/zones/(.*?)/instances/(.*)',
                 resource['selfLink']).groups()
             return {'project': project, 'zone': zone, 'instance': instance,
                     'body': {
@@ -52,19 +56,23 @@ class Instance(QueryResourceManager):
                         'labelFingerprint': resource['labelFingerprint']
                     }}
 
+        @classmethod
+        def refresh(cls, client, resource):
+            project, zone, name = re.match(
+                '.*?/projects/(.*?)/zones/(.*?)/instances/(.*)',
+                resource['selfLink']).groups()
+            return cls.get(
+                client,
+                {
+                    'project_id': project,
+                    'zone': zone,
+                    'resourceName': name
+                }
+            )
 
-@Instance.filter_registry.register('offhour')
-class InstanceOffHour(OffHour):
 
-    def get_tag_value(self, instance):
-        return instance.get('labels', {}).get(self.tag_key, False)
-
-
-@Instance.filter_registry.register('onhour')
-class InstanceOnHour(OnHour):
-
-    def get_tag_value(self, instance):
-        return instance.get('labels', {}).get(self.tag_key, False)
+Instance.filter_registry.register('offhour', OffHour)
+Instance.filter_registry.register('onhour', OnHour)
 
 
 @Instance.filter_registry.register('effective-firewall')
@@ -253,14 +261,60 @@ class Image(QueryResourceManager):
         name = id = 'name'
         default_report_fields = [
             "name", "description", "sourceType", "status", "creationTimestamp",
-            "storageLocation", "diskSizeGb", "family"]
+            "diskSizeGb", "family"]
         asset_type = "compute.googleapis.com/Image"
+        urn_component = "image"
+        labels = True
 
         @staticmethod
         def get(client, resource_info):
             return client.execute_command(
                 'get', {'project': resource_info['project_id'],
-                        'resourceId': resource_info['image_id']})
+                        'image': resource_info['image_id']})
+
+        @staticmethod
+        def get_label_params(resource, all_labels):
+            project, resource_id = re.match(
+                '.*?/projects/(.*?)/global/images/(.*)',
+                resource['selfLink']).groups()
+            return {'project': project, 'resource': resource_id,
+                    'body': {
+                        'labels': all_labels,
+                        'labelFingerprint': resource['labelFingerprint']
+                    }}
+
+        @classmethod
+        def refresh(cls, client, resource):
+            project, resource_id = re.match(
+                '.*?/projects/(.*?)/global/images/(.*)',
+                resource['selfLink']).groups()
+            return cls.get(
+                client,
+                {
+                    'project_id': project,
+                    'image_id': resource_id
+                }
+            )
+
+
+@Image.filter_registry.register('iam-policy')
+class ImageIamPolicyFilter(IamPolicyFilter):
+    """
+    Overrides the base implementation to process images resources correctly.
+    """
+    permissions = ('compute.images.getIamPolicy',)
+
+    def _verb_arguments(self, resource):
+        project, _ = re.match(
+            '.*?/projects/(.*?)/global/images/(.*)',
+            resource['selfLink']).groups()
+        verb_arguments = {'resource': resource[self.manager.resource_type.id], 'project': project}
+        return verb_arguments
+
+    def process_resources(self, resources):
+        value_filter = IamPolicyValueFilter(self.data['doc'], self.manager)
+        value_filter._verb_arguments = self._verb_arguments
+        return value_filter.process(resources)
 
 
 @Image.action_registry.register('delete')
@@ -289,6 +343,8 @@ class Disk(QueryResourceManager):
         labels = True
         default_report_fields = ["name", "sizeGb", "status", "zone"]
         asset_type = "compute.googleapis.com/Disk"
+        urn_component = "disk"
+        urn_zonal = True
 
         @staticmethod
         def get(client, resource_info):
@@ -389,6 +445,7 @@ class Snapshot(QueryResourceManager):
         name = id = 'name'
         default_report_fields = ["name", "status", "diskSizeGb", "creationTimestamp"]
         asset_type = "compute.googleapis.com/Snapshot"
+        urn_component = "snapshot"
 
         @staticmethod
         def get(client, resource_info):
@@ -426,6 +483,7 @@ class InstanceTemplate(QueryResourceManager):
             name, "description", "creationTimestamp",
             "properties.machineType", "properties.description"]
         asset_type = "compute.googleapis.com/InstanceTemplate"
+        urn_component = "instance-template"
 
         @staticmethod
         def get(client, resource_info):
@@ -477,6 +535,8 @@ class Autoscaler(QueryResourceManager):
             "name", "description", "status", "target", "recommendedSize"]
         asset_type = "compute.googleapis.com/Autoscaler"
         metric_key = "resource.labels.autoscaler_name"
+        urn_component = "autoscaler"
+        urn_zonal = True
 
         @staticmethod
         def get(client, resource_info):
@@ -600,3 +660,21 @@ class AutoscalerSet(MethodAction):
                   }}
 
         return result
+
+
+@resources.register('compute-project')
+class Project(QueryResourceManager):
+    """GCP resource: https://cloud.google.com/compute/docs/reference/rest/v1/projects"""
+    class resource_type(TypeInfo):
+        service = 'compute'
+        version = 'v1'
+        component = 'projects'
+        enum_spec = ('get', '[@]', None)
+        name = id = 'name'
+        default_report_fields = ["name"]
+        asset_type = 'compute.googleapis.com/Project'
+
+        @staticmethod
+        def get(client, resource_info):
+            return client.execute_command(
+                'get', {'project': resource_info['project_id']})

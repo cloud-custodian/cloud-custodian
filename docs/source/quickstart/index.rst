@@ -19,7 +19,19 @@ Install Cloud Custodian
 
 These instructions will install Cloud Custodian. Cloud Custodian is a Python
 application that supports Python 3 on Linux, MacOS and Windows. We recommend
-using Python 3.6 or higher.
+using at least the minimum supported version of Python.
+
+If ``python3 --version`` shows a Python version that is not `actively
+supported <https://devguide.python.org/#status-of-python-branches>`_ and the
+steps above don't apply to your environment, you can still install a current
+release of Python manually. `This guide
+<https://realpython.com/installing-python/>`_ may be a useful reference.
+
+NOTE: Some Enterprise/Long Term Support Linux distributions may support Python
+longer than the upstream support period. If you are in this situation it might
+be prudent to contact your vendor to see if there are other supported ways to
+use a more recent version. In some cases using the Docker container might be
+an appropriate solution.
 
 NOTE: Ensure you install the correct follow-on package depending on the cloud
 you are deploying to, otherwise you won't have the right modules for that

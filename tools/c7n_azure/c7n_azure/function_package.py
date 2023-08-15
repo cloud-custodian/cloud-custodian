@@ -7,7 +7,6 @@ import os
 import time
 
 import distutils.util
-import jmespath
 import requests
 from c7n_azure.constants import (
     AUTH_TYPE_MSI,
@@ -21,7 +20,7 @@ from c7n_azure.constants import (
 from c7n_azure.session import Session
 
 from c7n.mu import PythonPackageArchive
-from c7n.utils import local_session
+from c7n.utils import local_session, jmespath_search
 
 
 class AzurePythonPackageArchive(PythonPackageArchive):
@@ -70,7 +69,7 @@ class FunctionPackage:
             name = self.name + ("_" + target_sub_id if target_sub_id else "")
             # generate and add auth if using embedded service principal
             identity = (identity
-                or jmespath.search(
+                or jmespath_search(
                     'mode."provision-options".identity', policy_data)
                 or {'type': AUTH_TYPE_EMBED})
 
@@ -168,7 +167,7 @@ class FunctionPackage:
     def status(self, deployment_creds):
         status_url = '%s/api/deployments' % deployment_creds.scm_uri
 
-        r = requests.get(status_url, verify=self.enable_ssl_cert)
+        r = requests.get(status_url, verify=self.enable_ssl_cert, timeout=60)
         if r.status_code != 200:
             self.log.error("Application service returned an error.\n%s\n%s"
                            % (r.status_code, r.text))

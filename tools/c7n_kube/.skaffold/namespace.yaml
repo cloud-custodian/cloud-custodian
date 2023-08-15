@@ -1,0 +1,6 @@
+kind: Namespace
+apiVersion: v1
+metadata:
+  name: c7n-system
+  labels:
+    c7n-monitor: "false"

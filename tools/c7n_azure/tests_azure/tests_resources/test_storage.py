@@ -650,6 +650,24 @@ class StorageTest(BaseTest):
             .client('azure.mgmt.storage.StorageManagementClient')\
             .DEFAULT_API_VERSION.replace("-", "_")
 
+    def test_storage_blob_services(self):
+        p = self.load_policy({
+            'name': 'test-azure-blob-services',
+            'resource': 'azure.storage',
+            'filters': [
+                {'type': 'value',
+                'key': 'name',
+                'op': 'glob',
+                'value_type': 'normalize',
+                'value': 'cctstorage*'},
+                {'type': 'blob-services',
+                 'key': 'deleteRetentionPolicy.enabled',
+                 'value': True}],
+        }, validate=True)
+
+        resources = p.run()
+        self.assertEqual(1, len(resources))
+
 
 class StorageFirewallFilterTest(BaseTest):
 

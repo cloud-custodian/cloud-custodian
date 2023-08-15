@@ -1,0 +1,158 @@
+interactions:
+- request:
+    body: '{"DiskIds": ["disk-96jhcorq"], "Offset": 0, "Limit": 20}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '56'
+      Content-Type:
+      - application/json
+      Host:
+      - cbs.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - DescribeDisks
+      X-TC-Region:
+      - ap-singapore
+      X-TC-Version:
+      - '2017-03-12'
+    method: POST
+    uri: https://cbs.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response": {"TotalCount": 1, "RequestId": "fa467f89-486f-4502-bce0-b75638cf6b26",
+        "DiskSet": [{"DeleteWithInstance": true, "RenewFlag": "", "LatestOperationState":
+        "", "DiskType": "CLOUD_BSSD", "DiskBackupQuota": 0, "DiskState": "ATTACHED",
+        "SnapshotCount": 0, "DiskBackupCount": 0, "AutoRenewFlagError": false, "Rollbacking":
+        false, "InstanceIdList": ["ins-a4vgayks"], "Encrypt": false, "Tags": [{"Value":
+        "test", "Key": "test"}, {"Value": "Augury", "Key": "JJ-Test"}, {"Value": "this
+        is test1", "Key": "test_pro_test122"}, {"Value": "this is test", "Key": "test_pro_2"},
+        {"Value": "this is test", "Key": "test_pro_4"}, {"Value": "this is test",
+        "Key": "test_pro_1"}, {"Value": "this is test", "Key": "test_pro_3"}, {"Value":
+        "this is test", "Key": "test_pro_5"}], "DiskName": "ins-riot-cvmtest_SYSTEM_DISK",
+        "BackupDisk": false, "DeleteSnapshot": 0, "InstanceId": "ins-a4vgayks", "DifferDaysOfDeadline":
+        null, "ThroughputPerformance": 0, "Migrating": false, "InstanceType": "CVM",
+        "DiskId": "disk-96jhcorq", "LastAttachInsId": "ins-a4vgayks", "SnapshotSize":
+        0, "Placement": {"CageId": "", "CdcId": "", "Zone": "ap-singapore-4", "ProjectName":
+        "Default Project", "ProjectId": 0, "CdcName": "", "DedicatedClusterId": null},
+        "IsReturnable": false, "DeadlineTime": "", "Attached": true, "ReturnFailCode":
+        10, "DiskSize": 50, "MigratePercent": 0, "DiskUsage": "SYSTEM_DISK", "ErrorPrompt":
+        "", "Portable": false, "DiskChargeType": "POSTPAID_BY_HOUR", "SnapshotAbility":
+        true, "DeadlineError": false, "LatestOperationRequestId": "", "RollbackPercent":
+        0, "AutoSnapshotPolicyIds": null, "LatestOperation": "", "Shareable": false,
+        "CreateTime": "2022-08-30 14:24:09"}]}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '1667'
+      Content-Type:
+      - application/json
+      Date:
+      - Wed, 28 Sep 2022 08:22:18 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"DiskIds": ["disk-96jhcorq"], "Offset": 20, "Limit": 20}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '57'
+      Content-Type:
+      - application/json
+      Host:
+      - cbs.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - DescribeDisks
+      X-TC-Region:
+      - ap-singapore
+      X-TC-Version:
+      - '2017-03-12'
+    method: POST
+    uri: https://cbs.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response": {"TotalCount": 1, "RequestId": "e34109df-5456-47b0-9606-fb130af60072",
+        "DiskSet": []}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '99'
+      Content-Type:
+      - application/json
+      Date:
+      - Wed, 28 Sep 2022 08:22:18 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"ResourceList": ["qcs::cbs:ap-singapore:uin/100000750436:instance/disk-96jhcorq"]}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '83'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.28.1
+      X-TC-Action:
+      - GetResources
+      X-TC-Region:
+      - ap-singapore
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"","ResourceTagMappingList":[{"Resource":"qcs::cbs:ap-singapore:uin\/100000750436:instance\/disk-96jhcorq","Tags":[{"TagKey":"test_pro_21","TagValue":"test_pro_21"},{"TagKey":"test_pro_19","TagValue":"test_pro_19"},{"TagKey":"test_pro_20","TagValue":"test_pro_20"},{"TagKey":"test_pro_test1","TagValue":"this
+        is test1"},{"TagKey":"test_pro_18","TagValue":"test_pro_18"},{"TagKey":"test_pro_17","TagValue":"test_pro_17"},{"TagKey":"test_pro_16","TagValue":"test_pro_16"},{"TagKey":"test_pro_15","TagValue":"this
+        is test"},{"TagKey":"test_pro_14","TagValue":"this is test"},{"TagKey":"test_pro_13","TagValue":"this
+        is test"},{"TagKey":"test_pro_12","TagValue":"this is test"},{"TagKey":"test_pro_11","TagValue":"this
+        is test"},{"TagKey":"test_pro_10","TagValue":"this is test"},{"TagKey":"test_pro_9","TagValue":"this
+        is test"},{"TagKey":"test_pro_7","TagValue":"this is test"},{"TagKey":"test_pro_6","TagValue":"this
+        is test"},{"TagKey":"test_pro_5","TagValue":"this is test"},{"TagKey":"test_pro_4","TagValue":"this
+        is test"},{"TagKey":"test_pro_3","TagValue":"this is test"},{"TagKey":"test_pro_2","TagValue":"this
+        is test"},{"TagKey":"test_pro_1","TagValue":"this is test"},{"TagKey":"test_pro","TagValue":"this
+        is test"},{"TagKey":"test_pro_00122","TagValue":"andyxbchen"},{"TagKey":"test_pro_001_2","TagValue":"andyxbchen"}]}],"RequestId":"de4f8419-728f-4d58-a414-fac34d241cdd"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '1414'
+      Content-Type:
+      - application/json
+      Date:
+      - Wed, 28 Sep 2022 08:22:19 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+version: 1

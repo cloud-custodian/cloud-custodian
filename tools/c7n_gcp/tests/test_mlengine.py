@@ -21,6 +21,12 @@ class MLModelTest(BaseTest):
 
         resources = policy.run()
         self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            policy.resource_manager.get_urns(resources),
+            [
+                'gcp:ml::cloud-custodian:model/test_model',
+            ],
+        )
 
     def test_models_get(self):
         project_id = 'cloud-custodian'
@@ -39,6 +45,12 @@ class MLModelTest(BaseTest):
         event = event_data('ml-model-create.json')
         models = exec_mode.run(event, None)
         self.assertIn(name, models[0]['name'])
+        self.assertEqual(
+            p.resource_manager.get_urns(models),
+            [
+                'gcp:ml::cloud-custodian:model/test_model',
+            ],
+        )
 
 
 class MLJobTest(BaseTest):
@@ -58,6 +70,12 @@ class MLJobTest(BaseTest):
 
         resources = policy.run()
         self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            policy.resource_manager.get_urns(resources),
+            [
+                'gcp:ml::cloud-custodian:job/test_job',
+            ],
+        )
 
     def test_jobs_get(self):
         project_id = 'cloud-custodian'
@@ -76,3 +94,9 @@ class MLJobTest(BaseTest):
         event = event_data('ml-job-create.json')
         jobs = exec_mode.run(event, None)
         self.assertIn(name, jobs[0]['jobId'])
+        self.assertEqual(
+            p.resource_manager.get_urns(jobs),
+            [
+                'gcp:ml::cloud-custodian:job/test_job',
+            ],
+        )

@@ -1,0 +1,200 @@
+{
+  "pytest-terraform": 1,
+  "outputs": {},
+  "resources": {
+    "aws_elasticsearch_domain": {
+      "inbound_connection": {
+        "access_policies": null,
+        "advanced_options": {},
+        "advanced_security_options": [
+          {
+            "enabled": true,
+            "internal_user_database_enabled": true,
+            "master_user_options": [
+              {
+                "master_user_arn": "",
+                "master_user_name": "test",
+                "master_user_password": "Test!1234"
+              }
+            ]
+          }
+        ],
+        "arn": "arn:aws:es:us-east-1:644160558196:domain/default-inbound",
+        "auto_tune_options": [
+          {
+            "desired_state": "ENABLED",
+            "maintenance_schedule": [],
+            "rollback_on_disable": "NO_ROLLBACK"
+          }
+        ],
+        "cluster_config": [
+          {
+            "cold_storage_options": [
+              {
+                "enabled": false
+              }
+            ],
+            "dedicated_master_count": 0,
+            "dedicated_master_enabled": false,
+            "dedicated_master_type": "",
+            "instance_count": 1,
+            "instance_type": "m4.large.elasticsearch",
+            "warm_count": 0,
+            "warm_enabled": false,
+            "warm_type": "",
+            "zone_awareness_config": [],
+            "zone_awareness_enabled": false
+          }
+        ],
+        "cognito_options": [
+          {
+            "enabled": false,
+            "identity_pool_id": "",
+            "role_arn": "",
+            "user_pool_id": ""
+          }
+        ],
+        "domain_endpoint_options": [
+          {
+            "custom_endpoint": "",
+            "custom_endpoint_certificate_arn": "",
+            "custom_endpoint_enabled": false,
+            "enforce_https": true,
+            "tls_security_policy": "Policy-Min-TLS-1-2-2019-07"
+          }
+        ],
+        "domain_id": "644160558196/default-inbound",
+        "domain_name": "default-inbound",
+        "ebs_options": [
+          {
+            "ebs_enabled": true,
+            "iops": 0,
+            "volume_size": 10,
+            "volume_type": "gp2"
+          }
+        ],
+        "elasticsearch_version": "7.10",
+        "encrypt_at_rest": [
+          {
+            "enabled": true,
+            "kms_key_id": "arn:aws:kms:us-east-1:644160558196:key/6917a312-adce-4bbc-8202-958f2db490fa"
+          }
+        ],
+        "endpoint": "search-default-inbound-i34326irggwdt5ovbywdbd4xme.us-east-1.es.amazonaws.com",
+        "id": "arn:aws:es:us-east-1:644160558196:domain/default-inbound",
+        "kibana_endpoint": "search-default-inbound-i34326irggwdt5ovbywdbd4xme.us-east-1.es.amazonaws.com/_plugin/kibana/",
+        "log_publishing_options": [],
+        "node_to_node_encryption": [
+          {
+            "enabled": true
+          }
+        ],
+        "snapshot_options": [
+          {
+            "automated_snapshot_start_hour": 0
+          }
+        ],
+        "tags": null,
+        "tags_all": {},
+        "timeouts": null,
+        "vpc_options": []
+      },
+      "outbound_connection": {
+        "access_policies": null,
+        "advanced_options": {},
+        "advanced_security_options": [
+          {
+            "enabled": true,
+            "internal_user_database_enabled": true,
+            "master_user_options": [
+              {
+                "master_user_arn": "",
+                "master_user_name": "test",
+                "master_user_password": "Test!1234"
+              }
+            ]
+          }
+        ],
+        "arn": "arn:aws:es:us-east-1:644160558196:domain/default-outbound",
+        "auto_tune_options": [
+          {
+            "desired_state": "ENABLED",
+            "maintenance_schedule": [],
+            "rollback_on_disable": "NO_ROLLBACK"
+          }
+        ],
+        "cluster_config": [
+          {
+            "cold_storage_options": [
+              {
+                "enabled": false
+              }
+            ],
+            "dedicated_master_count": 0,
+            "dedicated_master_enabled": false,
+            "dedicated_master_type": "",
+            "instance_count": 1,
+            "instance_type": "m4.large.elasticsearch",
+            "warm_count": 0,
+            "warm_enabled": false,
+            "warm_type": "",
+            "zone_awareness_config": [],
+            "zone_awareness_enabled": false
+          }
+        ],
+        "cognito_options": [
+          {
+            "enabled": false,
+            "identity_pool_id": "",
+            "role_arn": "",
+            "user_pool_id": ""
+          }
+        ],
+        "domain_endpoint_options": [
+          {
+            "custom_endpoint": "",
+            "custom_endpoint_certificate_arn": "",
+            "custom_endpoint_enabled": false,
+            "enforce_https": true,
+            "tls_security_policy": "Policy-Min-TLS-1-2-2019-07"
+          }
+        ],
+        "domain_id": "644160558196/default-outbound",
+        "domain_name": "default-outbound",
+        "ebs_options": [
+          {
+            "ebs_enabled": true,
+            "iops": 0,
+            "volume_size": 10,
+            "volume_type": "gp2"
+          }
+        ],
+        "elasticsearch_version": "7.10",
+        "encrypt_at_rest": [
+          {
+            "enabled": true,
+            "kms_key_id": "arn:aws:kms:us-east-1:644160558196:key/6917a312-adce-4bbc-8202-958f2db490fa"
+          }
+        ],
+        "endpoint": "search-default-outbound-tvf5alftlpxekueo4r7ncecsby.us-east-1.es.amazonaws.com",
+        "id": "arn:aws:es:us-east-1:644160558196:domain/default-outbound",
+        "kibana_endpoint": "search-default-outbound-tvf5alftlpxekueo4r7ncecsby.us-east-1.es.amazonaws.com/_plugin/kibana/",
+        "log_publishing_options": [],
+        "node_to_node_encryption": [
+          {
+            "enabled": true
+          }
+        ],
+        "snapshot_options": [
+          {
+            "automated_snapshot_start_hour": 0
+          }
+        ],
+        "tags": null,
+        "tags_all": {},
+        "timeouts": null,
+        "vpc_options": []
+      }
+    }
+  }
+}

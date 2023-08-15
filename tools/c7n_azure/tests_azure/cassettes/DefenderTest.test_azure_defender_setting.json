@@ -1,0 +1,63 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/settings?api-version=2019-01-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "date": [
+                        "Wed, 23 Feb 2022 05:32:41 GMT"
+                    ],
+                    "api-supported-versions": [
+                        "1.0"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-resource-requests": [
+                        "749"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-length": [
+                        "439"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/settings/MCAS",
+                                "name": "MCAS",
+                                "type": "Microsoft.Security/settings",
+                                "kind": "DataExportSettings",
+                                "properties": {
+                                    "enabled": true
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/settings/WDATP",
+                                "name": "WDATP",
+                                "type": "Microsoft.Security/settings",
+                                "kind": "DataExportSettings",
+                                "properties": {
+                                    "enabled": true
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}

@@ -109,7 +109,8 @@ A custodian policy file needs to be created in YAML format, as an example
       Checks S3 for buckets with cross-account access and
       removes the cross-account access.
     resource: s3
-    region: us-east-1
+    conditions:
+      - region: us-east-1
     filters:
       - type: cross-account
     actions:

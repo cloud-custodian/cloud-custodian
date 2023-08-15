@@ -1,0 +1,109 @@
+[
+  {
+    "Id": "Cross-Account-Trust-Policy-Only-Service-Principal",
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Action": [
+          "sts:AssumeRole"
+        ],
+        "Effect": "Allow",
+	"Principal": {
+	  "Service": "lambda.amazonaws.com"
+	}
+      }
+    ]
+  },
+  {
+    "Id": "Cross-Account-Trust-Policy-Service-Principal-And-More",
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Action": [
+          "sts:AssumeRole"
+        ],
+        "Effect": "Allow",
+	"Principal": {
+	  "Service": "lambda.amazonaws.com",
+	  "AWS": [ "123456789012", "098765432109" ]
+	}
+      }
+    ]
+  },
+  {
+    "Id": "Cross-Account-Trust-Policy-Service-AWS-Federated",
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Action": [
+          "sts:AssumeRole",
+          "sts:AssumeRoleWithSAML"
+        ],
+        "Effect": "Allow",
+        "Principal": {
+          "Service": "lambda.amazonaws.com",
+          "AWS": [ "111111111111" ],
+          "Federated": [
+            "arn:aws:iam::234567890123:saml-provider/my-provider",
+            "cognito-identity.amazonaws.com"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "Id": "Cross-Account-Trust-Policy-Service-Federated",
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Action": [
+          "sts:AssumeRole",
+          "sts:AssumeRoleWithSAML"
+        ],
+        "Effect": "Allow",
+        "Principal": {
+          "Service": "lambda.amazonaws.com",
+          "Federated": [
+            "cognito-identity.amazonaws.com"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "Id": "Cross-Account-Trust-Policy-Service-SourceAccount-Positive",
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Action": [
+          "sns:Publish"
+        ],
+        "Effect": "Allow",
+        "Principal": {
+          "Service": "*"
+        },
+        "Condition": {
+          "StringEquals": {"AWS:SourceAccount": "111111111111"}
+        }
+      }
+    ]
+  },
+  {
+    "Id": "Cross-Account-Trust-Policy-Service-SourceAccount-Negative",
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Action": [
+          "sns:Publish"
+        ],
+        "Effect": "Allow",
+        "Principal": {
+          "AWS": "*"
+        },
+        "Condition": {
+          "StringEquals": {"AWS:SourceAccount": "111111111112"}
+        }
+      }
+    ]
+  }
+]

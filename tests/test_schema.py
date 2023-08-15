@@ -1,6 +1,6 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
-import mock
+from unittest import mock
 from jsonschema.exceptions import best_match
 
 from c7n.exceptions import PolicyValidationError
@@ -72,6 +72,14 @@ class StructureParserTest(BaseTest):
                 'name': 'foo', 'resource': 'ec2', 'actions': [[]]}]})
         self.assertTrue(str(ecm.exception).startswith(
             'policy:foo action must be a mapping/dict found:list'))
+
+    def test_null_actions(self):
+        p = StructureParser()
+        p.validate({'policies': [{'name': 'foo', 'resource': 'ec2', 'actions': None}]})
+
+    def test_null_filters(self):
+        p = StructureParser()
+        p.validate({'policies': [{'name': 'foo', 'resource': 'ec2', 'filters': None}]})
 
     def test_invalid_filter(self):
         p = StructureParser()

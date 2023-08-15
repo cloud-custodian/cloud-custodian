@@ -4,27 +4,66 @@
         "Clusters": [
             {
                 "BackupPolicy": "DEFAULT",
-                "ClusterId": "cluster-remd5qbjj6l",
+                "BackupRetentionPolicy": {
+                    "Type": "DAYS",
+                    "Value": "90"
+                },
+                "ClusterId": "cluster-jz56hthw75g",
                 "CreateTimestamp": {
                     "__class__": "datetime",
-                    "year": 2020,
-                    "month": 9,
-                    "day": 7,
-                    "hour": 16,
-                    "minute": 36,
-                    "second": 28,
-                    "microsecond": 179000
+                    "year": 2022,
+                    "month": 11,
+                    "day": 15,
+                    "hour": 10,
+                    "minute": 20,
+                    "second": 17,
+                    "microsecond": 344000
                 },
                 "Hsms": [],
                 "HsmType": "hsm1.medium",
-                "SecurityGroup": "sg-08e64d28891c7b9c9",
+                "SecurityGroup": "sg-0aa06bb977e3b2661",
                 "State": "UNINITIALIZED",
                 "SubnetMapping": {
-                    "us-east-1a": "subnet-914763e7"
+                    "us-east-1a": "subnet-083ab4dd1a8b6eaa6",
+                    "us-east-1b": "subnet-0544e30702e2e1ad4"
+                },
+                "VpcId": "vpc-0598080981e0332f9",
+                "Certificates": {},
+                "TagList": []
+            },
+            {
+                "BackupPolicy": "DEFAULT",
+                "BackupRetentionPolicy": {
+                    "Type": "DAYS",
+                    "Value": "90"
+                },
+                "ClusterId": "cluster-psujwvuqolq",
+                "CreateTimestamp": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 11,
+                    "day": 15,
+                    "hour": 10,
+                    "minute": 19,
+                    "second": 59,
+                    "microsecond": 437000
+                },
+                "Hsms": [],
+                "HsmType": "hsm1.medium",
+                "SecurityGroup": "sg-0e644358d811186c4",
+                "State": "UNINITIALIZED",
+                "SubnetMapping": {
+                    "us-east-1a": "subnet-914763e7",
+                    "us-east-1b": "subnet-efbcccb7"
                 },
                 "VpcId": "vpc-d2d616b5",
                 "Certificates": {},
-                "TagList": []
+                "TagList": [
+                    {
+                        "Key": "c7n",
+                        "Value": "tag"
+                    }
+                ]
             }
         ],
         "ResponseMetadata": {}

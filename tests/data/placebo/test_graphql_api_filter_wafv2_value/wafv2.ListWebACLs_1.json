@@ -1,0 +1,16 @@
+{
+    "status_code": 200,
+    "data": {
+        "NextMarker": "cfb-pojqfvgl",
+        "WebACLs": [
+            {
+                "Name": "cfb-mxaqrwbd",
+                "Id": "6a83b788-d0fd-4300-a7e0-cf5f305a9a20",
+                "Description": "",
+                "LockToken": "61d49499-78ec-440b-ac8e-7b02fe637aff",
+                "ARN": "arn:aws:wafv2:us-east-1:123456789012:regional/webacl/cfb-ojcthdwu/6a83b788-d0fd-4300-a7e0-cf5f305a9a20"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

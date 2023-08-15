@@ -1,12 +1,16 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+import sys
+
+import c7n.resources.rdscluster
+import pytest
 from c7n.executor import MainThreadExecutor
 from c7n.resources.rdscluster import RDSCluster, _run_cluster_method
+from c7n.testing import mock_datetime_now
+from dateutil import parser
+import c7n.filters.backup
 
 from .common import BaseTest, event_data
-
-import pytest
-import sys
 
 
 class RDSClusterTest(BaseTest):
@@ -235,6 +239,49 @@ class RDSClusterTest(BaseTest):
             DBClusterIdentifier='mytest')
         self.assertFalse(cluster['DBClusters'][0]['DeletionProtection'])
 
+
+    def test_modify_rds_cluster_provisoned(self):
+        session_factory = self.replay_flight_data("test_modify_rds_cluster_provisoned")
+        p = self.load_policy(
+            {
+                "name": "modify-db-cluster",
+                "resource": "rds-cluster",
+                "filters": [
+                    {"type": "value", "key": "DBClusterIdentifier", "value": "database-1"}
+                ],
+                "actions": [{"type": "retention", "days": 7}],
+            },
+            session_factory=session_factory, config={'account_id': '644160558196'}
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0].get("DBClusterIdentifier", 0), "database-1")
+        client = session_factory().client("rds")
+        cluster = client.describe_db_clusters(
+            DBClusterIdentifier="database-1")
+        self.assertEqual(cluster['DBClusters'][0]['BackupRetentionPeriod'], 7)
+
+    def test_modify_rds_cluster_serverless_v2(self):
+        session_factory = self.replay_flight_data("test_modify_rds_cluster_serverless_v2")
+        p = self.load_policy(
+            {
+                "name": "modify-db-cluster",
+                "resource": "rds-cluster",
+                "filters": [
+                    {"type": "value", "key": "DBClusterIdentifier", "value": "database-2"}
+                ],
+                "actions": [{"type": "retention", "days": 8}],
+            },
+            session_factory=session_factory, config={'account_id': '644160558196'}
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0].get("DBClusterIdentifier", 0), "database-2")
+        client = session_factory().client("rds")
+        cluster = client.describe_db_clusters(
+            DBClusterIdentifier="database-2")
+        self.assertEqual(cluster['DBClusters'][0]['BackupRetentionPeriod'],8)
+
     def test_rdscluster_tag_augment(self):
         session_factory = self.replay_flight_data("test_rdscluster_tag_augment")
         p = self.load_policy(
@@ -423,6 +470,42 @@ class RDSClusterTest(BaseTest):
         cluster = client.describe_db_clusters(
             DBClusterIdentifier='mytest').get('DBClusters')[0]
         self.assertEqual(cluster['Status'], 'starting')
+
+    def test_rdscluster_snapshot_count_filter(self):
+        factory = self.replay_flight_data("test_rdscluster_snapshot_count_filter")
+        p = self.load_policy(
+            {
+                "name": "rdscluster-snapshot-count-filter",
+                "resource": "rds-cluster",
+                "filters": [{"type": "consecutive-snapshots", "days": 2}],
+            },
+            session_factory=factory,
+        )
+        with mock_datetime_now(parser.parse("2022-03-30T00:00:00+00:00"), c7n.resources.rdscluster):
+            resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_rdscluster_consecutive_aws_backups_count_filter(self):
+        session_factory = self.replay_flight_data(
+            "test_rdscluster_consecutive_aws_backups_count_filter")
+        p = self.load_policy(
+            {
+                "name": "rdscluster_consecutive_aws_backups_count_filter",
+                "resource": "rds-cluster",
+                "filters": [
+                    {
+                        "type": "consecutive-aws-backups",
+                        "count": 2,
+                        "period": "days",
+                        "status": "COMPLETED"
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+        with mock_datetime_now(parser.parse("2022-09-09T00:00:00+00:00"), c7n.filters.backup):
+            resources = p.run()
+        self.assertEqual(len(resources), 1)
 
 
 class RDSClusterSnapshotTest(BaseTest):
@@ -652,3 +735,26 @@ class RDSClusterSnapshotTest(BaseTest):
             resources[0]["DBClusterSnapshotIdentifier"]
         )
         self.assertEqual(len(restore_permissions_after), 0)
+
+
+class TestRDSClusterParameterGroupFilter(BaseTest):
+
+    def test_param_value_cases(self):
+        session_factory = self.replay_flight_data('test_rdsclusterparamgroup_filter')
+        policy = self.load_policy(
+            {
+                "name": "rds-aurora-paramter-group-check",
+                "resource": "rds-cluster",
+                "filters": [
+                    {
+                        "type": "db-cluster-parameter",
+                        "key": "tls_version",
+                        "op": "ne",
+                        "value": "TLSv1.2"
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+        resources = policy.resource_manager.resources()
+        self.assertEqual(len(resources), 2)

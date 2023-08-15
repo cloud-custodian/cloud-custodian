@@ -1,0 +1,64 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {
+            "RequestId": "89f97cde-eb7e-4d02-abbb-b9a179d5d03b",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "date": "Wed, 10 Aug 2022 10:22:41 GMT",
+                "content-type": "application/json",
+                "content-length": "2510",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "89f97cde-eb7e-4d02-abbb-b9a179d5d03b",
+                "x-amz-apigw-id": "WpIFzIWtjoEEbDA="
+            },
+            "RetryAttempts": 0
+        },
+        "items": [
+            {
+                "id": "6l7usy5kjh",
+                "name": "good-api-gw",
+                "createdDate": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 8,
+                    "day": 10,
+                    "hour": 12,
+                    "minute": 19,
+                    "second": 14,
+                    "microsecond": 0
+                },
+                "apiKeySource": "HEADER",
+                "endpointConfiguration": {
+                    "types": [
+                        "PRIVATE"
+                    ]
+                },
+                "policy": "{\\\"Version\\\":\\\"2012-10-17\\\",\\\"Statement\\\":[{\\\"Effect\\\":\\\"Allow\\\",\\\"Principal\\\":\\\"*\\\",\\\"Action\\\":\\\"execute-api:Invoke\\\",\\\"Resource\\\":\\\"arn:aws:execute-api:eu-west-1:123456654321:6l7usy5kjh\\/*\\/*\\/*\\\",\\\"Condition\\\":{\\\"StringEquals\\\":{\\\"aws:sourceVpc\\\":\\\"vpc-011b11111fb2a6b11\\\"}}}]}",
+                "disableExecuteApiEndpoint": false
+            },
+            {
+                "id": "kjh6l7usy5",
+                "name": "bad-api-gw",
+                "createdDate": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 8,
+                    "day": 10,
+                    "hour": 12,
+                    "minute": 19,
+                    "second": 14,
+                    "microsecond": 0
+                },
+                "apiKeySource": "HEADER",
+                "endpointConfiguration": {
+                    "types": [
+                        "PRIVATE"
+                    ]
+                },
+                "policy": "{\\\"Version\\\":\\\"2012-10-17\\\",\\\"Statement\\\":[{\\\"Effect\\\":\\\"Allow\\\",\\\"Principal\\\":\\\"*\\\",\\\"Action\\\":\\\"execute-api:Invoke\\\",\\\"Resource\\\":\\\"arn:aws:execute-api:eu-west-1:123456654321:kjh6l7usy5\\/*\\/*\\/*\\\",\\\"Condition\\\":{\\\"StringEquals\\\":{\\\"aws:sourceVpc\\\":\\\"vpc-022b22222fb2a6b22\\\"}}}]}",
+                "disableExecuteApiEndpoint": false
+            }
+        ]
+    }
+}

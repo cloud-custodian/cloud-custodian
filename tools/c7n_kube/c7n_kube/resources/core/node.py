@@ -5,13 +5,13 @@ from c7n_kube.query import QueryResourceManager, TypeInfo
 from c7n_kube.provider import resources
 
 
-@resources.register('node')
+@resources.register("node")
 class Node(QueryResourceManager):
-
     class resource_type(TypeInfo):
-        group = 'Core'
-        version = 'V1'
+        group = "Core"
+        version = "V1"
         namespaced = False
-        patch = 'patch_node'
-        delete = 'delete_node'
-        enum_spec = ('list_node', 'items', None)
+        patch = "patch_node"
+        delete = "delete_node"
+        enum_spec = ("list_node", "items", None)
+        plural = "nodes"

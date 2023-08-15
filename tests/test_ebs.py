@@ -1,9 +1,9 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import logging
+from unittest import mock
 
 from botocore.exceptions import ClientError
-import mock
 
 from c7n.exceptions import PolicyValidationError
 from c7n.executor import MainThreadExecutor
@@ -190,6 +190,31 @@ class SnapshotAccessTest(BaseTest):
             {"snap-7f9496cf": ["619193117841"], "snap-af0eb71b": ["all"]},
         )
 
+    def test_snapshot_access_everyone_only(self):
+        # pre conditions, 2 snapshots one shared to a separate account, and one
+        # shared publicly. 2 non matching volumes, one not shared, one shared
+        # explicitly to its own account.
+        factory = self.replay_flight_data("test_ebs_cross_account")
+        p = self.load_policy(
+            {
+                "name": "snap-copy",
+                "resource": "ebs-snapshot",
+                "filters": [
+                    {
+                        "type": "cross-account",
+                        "everyone_only": True,
+                    },
+                ]
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            {r["SnapshotId"]: r["c7n:CrossAccountViolations"] for r in resources},
+            {"snap-af0eb71b": ["all"]},
+        )
+
 
 class SnapshotDetachTest(BaseTest):
 
@@ -363,6 +388,7 @@ class SnapshotSetPermissions(BaseTest):
             Attribute='createVolumePermission')['CreateVolumePermissions']
         assert perms == []
 
+
     def test_add(self):
         # For this test, we assume only 665544332211 has permissions,
         # and we test adding 112233445566 and removing 665544332211
@@ -430,6 +456,38 @@ class SnapshotSetPermissions(BaseTest):
             SnapshotId=resources[0]['SnapshotId'],
             Attribute='createVolumePermission')['CreateVolumePermissions']
         assert perms == [{"UserId": "112233445566"}]
+
+    def test_matched_everyone_only(self):
+        factory = self.replay_flight_data(
+            "test_ebs_snapshot_set_permissions_matched_everyone_only")
+        p = self.load_policy(
+            {
+                "name": "snap-copy",
+                "resource": "ebs-snapshot",
+                "filters": [
+                    {
+                        "type": "cross-account",
+                        "everyone_only": True,
+                    },
+                ],
+                "actions": [
+                    {
+                        "type": "set-permissions",
+                        "remove": "matched"
+                    }
+                ],
+            },
+            session_factory=factory,
+        )
+        p.validate()
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        assert resources[0]['SnapshotId'] == "snap-af0eb71b"
+        client = factory().client('ec2')
+        perms = client.describe_snapshot_attribute(
+            SnapshotId=resources[0]['SnapshotId'],
+            Attribute='createVolumePermission')['CreateVolumePermissions']
+        assert perms == []
 
 
 class SnapshotVolumeFilter(BaseTest):
@@ -658,6 +716,45 @@ class VolumeSnapshotTest(BaseTest):
         for s in snapshot_data['Snapshots']:
             self.assertEqual({'test-tag': 'custodian'}, {t['Key']: t['Value'] for t in s['Tags']})
 
+    def test_volume_snapshot_description(self):
+        factory = self.replay_flight_data("test_ebs_snapshot_description")
+        policy = self.load_policy(
+            {
+                "name": "ebs-test-snapshot",
+                "resource": "ebs",
+                "filters": [{"VolumeId": "vol-0cc137cb158adbc32"}],
+                "actions": [{"type": "snapshot",
+                             "description": "snapshot description"}]
+            },
+            session_factory=factory,
+        )
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+        snapshot_data = factory().client("ec2").describe_snapshots(
+            Filters=[{"Name": "volume-id", "Values": ["vol-0cc137cb158adbc32"]}]
+        )
+        for s in snapshot_data['Snapshots']:
+            self.assertEqual('snapshot description', s['Description'])
+
+    def test_volume_snapshot_default_description(self):
+        factory = self.replay_flight_data("test_ebs_snapshot_default_description")
+        policy = self.load_policy(
+            {
+                "name": "ebs-test-snapshot",
+                "resource": "ebs",
+                "filters": [{"VolumeId": "vol-0cc137cb158adbc32"}],
+                "actions": [{"type": "snapshot"}]
+            },
+            session_factory=factory,
+        )
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+        snapshot_data = factory().client("ec2").describe_snapshots(
+            Filters=[{"Name": "volume-id", "Values": ["vol-0cc137cb158adbc32"]}]
+        )
+        for s in snapshot_data['Snapshots']:
+            self.assertEqual('Automated snapshot by c7n - ebs-test-snapshot', s['Description'])
+
 
 class VolumeDeleteTest(BaseTest):
 
@@ -731,6 +828,8 @@ class EncryptExtantVolumesTest(BaseTest):
                     self.assertNotIn(
                         "maid-instance-device", [i["Key"] for i in v["Tags"]]
                     )
+                if (v["Attachments"][0]["InstanceId"] == r["Attachments"][0]["InstanceId"]):
+                    self.assertEqual(v["Tags"], r["Tags"])
 
 
 class TestKmsAlias(BaseTest):
@@ -791,6 +890,29 @@ class EbsFaultToleranceTest(BaseTest):
 
 
 class PiopsMetricsFilterTest(BaseTest):
+
+    def test_metrics_validation(self):
+        policy = self.load_policy(
+            {
+                "name": "ebs-metrics-test",
+                "resource": "ebs",
+                "filters": [{
+                    "type": "metrics",
+                    "name": "VOlumeConsumedReadWriteOps",
+                    "value": 50,
+                    "op": "gt"}]})
+        metrics = policy.resource_manager.filters[0]
+        metrics.data['statistics'] = 'p99'
+        metrics.validate()
+        metrics.data['statistics'] = 'p99.5'
+        metrics.validate()
+        metrics.data['statistics'] = 'pabc'
+        try:
+            metrics.validate()
+        except PolicyValidationError:
+            pass
+        else:
+            self.fail()
 
     def test_ebs_metrics_percent_filter(self):
         session = self.replay_flight_data("test_ebs_metrics_percent_filter")

@@ -35,7 +35,6 @@ from datetime import datetime
 import gzip
 import io
 import json
-import jmespath
 import logging
 import os
 from tabulate import tabulate
@@ -44,7 +43,7 @@ from botocore.compat import OrderedDict
 from dateutil.parser import parse as date_parse
 
 from c7n.executor import ThreadPoolExecutor
-from c7n.utils import local_session, dumps
+from c7n.utils import local_session, dumps, jmespath_search, jmespath_compile
 
 log = logging.getLogger('custodian.reports')
 
@@ -123,20 +122,20 @@ def _get_values(record, field_list, tag_map):
             value = tag_map.get(tag_field, '')
         elif field.startswith(list_prefix):
             list_field = field.replace(list_prefix, '', 1)
-            value = jmespath.search(list_field, record)
+            value = jmespath_search(list_field, record)
             if value is None:
                 value = ''
             else:
                 value = ', '.join([str(v) for v in value])
         elif field.startswith(count_prefix):
             count_field = field.replace(count_prefix, '', 1)
-            value = jmespath.search(count_field, record)
+            value = jmespath_search(count_field, record)
             if value is None:
                 value = ''
             else:
                 value = str(len(value))
         else:
-            value = jmespath.search(field, record)
+            value = jmespath_search(field, record)
             if value is None:
                 value = ''
             if not isinstance(value, str):
@@ -193,8 +192,14 @@ class Formatter:
         """Only the first record for each id"""
         uniq = []
         keys = set()
+        compiled = None
+        if '.' in self._id_field:
+            compiled = jmespath_compile(self._id_field)
         for rec in records:
-            rec_id = rec[self._id_field]
+            if compiled:
+                rec_id = compiled.search(rec)
+            else:
+                rec_id = rec[self._id_field]
             if rec_id not in keys:
                 uniq.append(rec)
                 keys.add(rec_id)

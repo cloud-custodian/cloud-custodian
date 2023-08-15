@@ -62,6 +62,7 @@ CONFIG_SCHEMA = {
             'required': ['role', 'groups'],
             'properties': {
                 'name': {'type': 'string'},
+                'subscription-role': {'type': 'string'},
                 'role': {'oneOf': [
                     {'type': 'array', 'items': {'type': 'string'}},
                     {'type': 'string'}]},
@@ -130,7 +131,7 @@ def validate(config):
     return data
 
 
-def _process_subscribe_group(client, group_name, subscription, distribution):
+def _process_subscribe_group(client, group_name, subscription, distribution, role_arn):
     sub_name = subscription.get('name', 'FlowLogStream')
     filters = client.describe_subscription_filters(
         logGroupName=group_name).get('subscriptionFilters', ())
@@ -143,12 +144,15 @@ def _process_subscribe_group(client, group_name, subscription, distribution):
         else:
             client.delete_subscription_filter(
                 logGroupName=group_name, filterName=sub_name)
-    client.put_subscription_filter(
-        logGroupName=group_name,
-        destinationArn=subscription['destination-arn'],
-        filterName=sub_name,
-        filterPattern="",
-        distribution=distribution)
+    kwargs = {
+        'logGroupName': group_name,
+        'destinationArn': subscription['destination-arn'],
+        'filterName': sub_name,
+        'filterPattern': "",
+        'distribution': distribution,
+        'roleArn': role_arn
+    }
+    client.put_subscription_filter(**{k: v for k, v in kwargs.items() if v is not None})
 
 
 @cli.command()
@@ -204,6 +208,7 @@ def subscribe(config, accounts, region, merge, debug):
         session = get_session(t_account['role'], region)
         client = session.client('logs')
         distribution = subscription.get('distribution', 'ByLogStream')
+        role_arn = account.get('subscription-role')
 
         for g in account.get('groups'):
             if (g.endswith('*')):
@@ -212,9 +217,9 @@ def subscribe(config, accounts, region, merge, debug):
                 allLogGroups = paginator.paginate(logGroupNamePrefix=g).build_full_result()
                 for l in allLogGroups['logGroups']:
                     _process_subscribe_group(
-                        client, l['logGroupName'], subscription, distribution)
+                        client, l['logGroupName'], subscription, distribution, role_arn)
             else:
-                _process_subscribe_group(client, g, subscription, distribution)
+                _process_subscribe_group(client, g, subscription, distribution, role_arn)
 
     if subscription.get('managed-policy'):
         if subscription.get('destination-role'):

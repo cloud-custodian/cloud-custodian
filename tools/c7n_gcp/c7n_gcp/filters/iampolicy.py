@@ -1,3 +1,5 @@
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import copy
 from c7n.filters.core import Filter, ValueFilter
 
@@ -35,8 +37,7 @@ class IamPolicyFilter(Filter):
     def process(self, resources, event=None):
         if 'doc' in self.data:
             try:
-                valueFilter = IamPolicyValueFilter(self.data['doc'], self.manager)
-                resources = valueFilter.process(resources)
+                resources = self.process_resources(resources)
             except TypeError:
                 valueFilter = IamPolicyValueFilter(self.data['doc'], self.manager, "bucket")
                 resources = valueFilter.process(resources)
@@ -50,6 +51,11 @@ class IamPolicyFilter(Filter):
             'op': op, 'value_type': value_type}, self.manager)
             resources = userRolePairFilter.process(resources)
 
+        return resources
+
+    def process_resources(self, resources):
+        valueFilter = IamPolicyValueFilter(self.data['doc'], self.manager)
+        resources = valueFilter.process(resources)
         return resources
 
 

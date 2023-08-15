@@ -1,20 +1,32 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
-import jmespath
 
 from c7n.actions import Action
 from c7n.manager import resources
 from c7n.filters.kms import KmsRelatedFilter
-from c7n.query import ConfigSource, DescribeSource, QueryResourceManager, TypeInfo
-from c7n.tags import universal_augment
+from c7n.query import (
+    ConfigSource,
+    DescribeWithResourceTags, QueryResourceManager, TypeInfo)
 from c7n.filters.vpc import SubnetFilter
-from c7n.utils import local_session, type_schema, get_retry
+from c7n.utils import local_session, type_schema, get_retry, jmespath_search
+from c7n.tags import (
+    TagDelayedAction, RemoveTag, TagActionFilter, Tag)
 
 
-class DescribeStream(DescribeSource):
 
-    def augment(self, resources):
-        return universal_augment(self.manager, super().augment(resources))
+class ConfigStream(ConfigSource):
+
+    def load_resource(self, item):
+        resource = super().load_resource(item)
+        for ck, dk in {
+                'Arn': 'StreamARN',
+                'Name': 'StreamName'}.items():
+            resource[dk] = resource.pop(ck, None)
+        if 'StreamEncryption' in resource:
+            encrypt = resource.pop('StreamEncryption')
+            resource['EncryptionType'] = encrypt['EncryptionType']
+            resource['KeyId'] = encrypt['KeyId']
+        return resource
 
 
 @resources.register('kinesis')
@@ -35,8 +47,8 @@ class KinesisStream(QueryResourceManager):
         config_type = cfn_type = 'AWS::Kinesis::Stream'
 
     source_mapping = {
-        'describe': DescribeStream,
-        'config': ConfigSource
+        'describe': DescribeWithResourceTags,
+        'config': ConfigStream
     }
 
 
@@ -69,9 +81,35 @@ class Encrypt(Action):
 
 @KinesisStream.action_registry.register('delete')
 class Delete(Action):
+    """ Delete a set of kinesis streams.
 
-    schema = type_schema('delete')
-    permissions = ("kinesis:DeleteStream",)
+    Additionally, if we're configured with 'force', we will remove
+    all existing consumers before deleting the stream itself. For
+    'force' to work, we would require the
+    `kinesis:DeregisterStreamConsumer` permission as well.
+
+    :Example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: kinesis-stream-deletion
+            resource: kinesis
+            filters:
+              - type: marked-for-op
+                op: delete
+            actions:
+              - type: delete
+                force: true
+    """
+
+    schema = type_schema('delete', force={'type': 'boolean'})
+
+    def get_permissions(self):
+        permissions = ("kinesis:DeleteStream",)
+        if self.data.get('force'):
+            permissions += ('kinesis:DeregisterStreamConsumer',)
+        return permissions
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('kinesis')
@@ -84,19 +122,14 @@ class Delete(Action):
             if not r['StreamStatus'] == 'ACTIVE':
                 continue
             client.delete_stream(
-                StreamName=r['StreamName'])
+                StreamName=r['StreamName'],
+                EnforceConsumerDeletion=self.data.get('force', False))
 
 
 @KinesisStream.filter_registry.register('kms-key')
 class KmsFilterDataStream(KmsRelatedFilter):
 
     RelatedIdsExpression = 'KeyId'
-
-
-class DescribeDeliveryStream(DescribeSource):
-
-    def augment(self, resources):
-        return universal_augment(self.manager, super().augment(resources))
 
 
 @resources.register('firehose')
@@ -113,10 +146,10 @@ class DeliveryStream(QueryResourceManager):
         date = 'CreateTimestamp'
         dimension = 'DeliveryStreamName'
         universal_taggable = object()
-        cfn_type = 'AWS::KinesisFirehose::DeliveryStream'
+        config_type = cfn_type = 'AWS::KinesisFirehose::DeliveryStream'
 
     source_mapping = {
-        'describe': DescribeDeliveryStream,
+        'describe': DescribeWithResourceTags,
         'config': ConfigSource
     }
 
@@ -216,7 +249,7 @@ class FirehoseEncryptS3Destination(Action):
                 for k in dmetadata['clear']:
                     dinfo.pop(k, None)
                 if dmetadata['encrypt_path']:
-                    encrypt_info = jmespath.search(dmetadata['encrypt_path'], dinfo)
+                    encrypt_info = jmespath_search(dmetadata['encrypt_path'], dinfo)
                 else:
                     encrypt_info = dinfo
                 encrypt_info.pop('NoEncryptionConfig', None)
@@ -230,12 +263,6 @@ class FirehoseEncryptS3Destination(Action):
                               CurrentDeliveryStreamVersionId=version)
                 params[dmetadata['update']] = dinfo
                 client.update_destination(**params)
-
-
-class DescribeApp(DescribeSource):
-
-    def augment(self, resources):
-        return universal_augment(self.manager, super().augment(resources))
 
 
 @resources.register('kinesis-analytics')
@@ -254,7 +281,7 @@ class AnalyticsApp(QueryResourceManager):
 
     source_mapping = {
         'config': ConfigSource,
-        'describe': DescribeApp
+        'describe': DescribeWithResourceTags
     }
 
 
@@ -273,12 +300,6 @@ class AppDelete(Action):
                 CreateTimestamp=r['CreateTimestamp'])
 
 
-class DescribeVideoStream(DescribeSource):
-
-    def augment(self, resources):
-        return universal_augment(self.manager, super().augment(resources))
-
-
 @resources.register('kinesis-analyticsv2')
 class KinesisAnalyticsAppV2(QueryResourceManager):
 
@@ -291,13 +312,15 @@ class KinesisAnalyticsAppV2(QueryResourceManager):
         arn = id = "ApplicationARN"
         arn_type = 'application'
         universal_taggable = object()
-        cfn_type = 'AWS::KinesisAnalyticsV2::Application'
+        config_type = cfn_type = 'AWS::KinesisAnalyticsV2::Application'
         permission_prefix = "kinesisanalytics"
 
     permissions = ("kinesisanalytics:DescribeApplication",)
 
-    def augment(self, resources):
-        return universal_augment(self, super().augment(resources))
+    source_mapping = {
+        'config': ConfigSource,
+        'describe': DescribeWithResourceTags,
+    }
 
 
 @KinesisAnalyticsAppV2.action_registry.register('delete')
@@ -326,7 +349,7 @@ class KinesisAnalyticsSubnetFilter(SubnetFilter):
 class KinesisVideoStream(QueryResourceManager):
     retry = staticmethod(
         get_retry((
-            'LimitExceededException',)))
+            'ClientLimitExceededException',)))
 
     class resource_type(TypeInfo):
         service = 'kinesisvideo'
@@ -335,13 +358,14 @@ class KinesisVideoStream(QueryResourceManager):
         name = id = 'StreamName'
         arn = 'StreamARN'
         dimension = 'StreamName'
-        universal_taggable = True
 
     source_mapping = {
-        'describe': DescribeVideoStream,
+        'describe': DescribeWithResourceTags,
         'config': ConfigSource
     }
 
+KinesisVideoStream.action_registry.register('mark-for-op', TagDelayedAction)
+KinesisVideoStream.filter_registry.register('marked-for-op', TagActionFilter)
 
 @KinesisVideoStream.action_registry.register('delete')
 class DeleteVideoStream(Action):
@@ -375,3 +399,62 @@ class DeleteVideoStream(Action):
 class KmsFilterVideoStream(KmsRelatedFilter):
 
     RelatedIdsExpression = 'KmsKeyId'
+
+
+@KinesisVideoStream.action_registry.register("tag")
+class TagVideoStream(Tag):
+    """Action to add tag/tags to Kinesis Video streams resource
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: kinesis-video-tag
+                resource: kinesis-video
+                filters:
+                  - "tag:KinesisVideoTag": absent
+                actions:
+                  - type: tag
+                    key: KinesisVideoTag
+                    value: "KinesisVideo Tag Value"
+    """
+    permissions = ('kinesisvideo:TagResource',)
+
+    def process_resource_set(self, client, resource_set, tag_keys):
+        for r in resource_set:
+            self.manager.retry(
+                client.tag_resource,
+                ResourceARN=r['StreamARN'],
+                Tags=tag_keys,
+                ignore_err_codes=("ResourceNotFoundException",))
+
+
+@KinesisVideoStream.action_registry.register('remove-tag')
+class VideoStreamRemoveTag(RemoveTag):
+    """Action to remove tag/tags from a Kinesis Video streams resource
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: kinesisvideo-remove-tag
+                resource: kinesis-video
+                filters:
+                  - "tag:KinesisVideoTag": present
+                actions:
+                  - type: remove-tag
+                    tags: ["KinesisVideoTag"]
+    """
+
+    permissions = ('kinesisvideo:UntagResource',)
+
+    def process_resource_set(self, client, resource_set, tag_keys):
+        for r in resource_set:
+            self.manager.retry(
+                client.untag_resource,
+                ResourceARN=r['StreamARN'],
+                TagKeyList=tag_keys,
+                ignore_err_codes=("ResourceNotFoundException",))
+

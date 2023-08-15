@@ -32,6 +32,7 @@ from c7n.utils import (
     set_annotation,
     type_schema,
     QueryParser,
+    get_support_region
 )
 from c7n.resources.ami import AMI
 
@@ -237,12 +238,19 @@ class SnapshotCrossAccountAccess(CrossAccountAccessFilter):
 
     def process_resource_set(self, client, resource_set):
         results = []
+        everyone_only = self.data.get('everyone_only', False)
         for r in resource_set:
             attrs = self.manager.retry(
                 client.describe_snapshot_attribute,
                 SnapshotId=r['SnapshotId'],
                 Attribute='createVolumePermission')['CreateVolumePermissions']
-            shared_accounts = {
+            shared_accounts = set()
+            if everyone_only:
+                for g in attrs:
+                    if g.get('Group') == 'all':
+                        shared_accounts = {g.get('Group')}
+            else:
+                shared_accounts = {
                 g.get('Group') or g.get('UserId') for g in attrs}
             delta_accounts = shared_accounts.difference(self.accounts)
             if delta_accounts:
@@ -807,7 +815,9 @@ class FaultTolerantSnapshots(Filter):
 
     def pull_check_results(self):
         result = set()
-        client = local_session(self.manager.session_factory).client('support')
+        support_region = get_support_region(self.manager)
+        client = local_session(self.manager.session_factory).client(
+            'support', region_name=support_region)
         client.refresh_trusted_advisor_check(checkId=self.check_id)
         results = client.describe_trusted_advisor_check_result(
             checkId=self.check_id, language='en')['result']
@@ -993,7 +1003,7 @@ class CopyInstanceTags(BaseAction):
             (t['Key'], t['Value']) for t in volume.get('Tags', [])])
 
         for t in instance.get('Tags', ()):
-            if only_tags and not t['Key'] in only_tags:
+            if only_tags and t['Key'] not in only_tags:
                 continue
             if t['Key'] in extant_tags and t['Value'] == extant_tags[t['Key']]:
                 continue
@@ -1194,6 +1204,7 @@ class EncryptInstanceVolumes(BaseAction):
         return False
 
     def create_encrypted_volume(self, ec2, v, key_id, instance_id):
+        unencrypted_volume_tags = v.get('Tags', [])
         # Create a current snapshot
         results = ec2.create_snapshot(
             VolumeId=v['VolumeId'],
@@ -1233,7 +1244,7 @@ class EncryptInstanceVolumes(BaseAction):
                 {'Key': 'maid-crypt-remediation', 'Value': instance_id},
                 {'Key': 'maid-origin-volume', 'Value': v['VolumeId']},
                 {'Key': 'maid-instance-device',
-                 'Value': v['Attachments'][0]['Device']}])
+                 'Value': v['Attachments'][0]['Device']}] + unencrypted_volume_tags)
 
         # Wait on encrypted volume creation
         self.wait_on_resource(ec2, volume_id=results['VolumeId'])
@@ -1332,7 +1343,8 @@ class CreateSnapshot(BaseAction):
         'snapshot',
         **{'copy-tags': {'type': 'array', 'items': {'type': 'string'}},
            'copy-volume-tags': {'type': 'boolean'},
-           'tags': {'type': 'object'}})
+           'tags': {'type': 'object'},
+           'description': {'type': 'string'}})
     permissions = ('ec2:CreateSnapshot', 'ec2:CreateTags',)
 
     def validate(self):
@@ -1352,8 +1364,16 @@ class CreateSnapshot(BaseAction):
             retry(self.process_volume, client=client, volume=vol_id, tags=tags)
 
     def process_volume(self, client, volume, tags):
+        description = self.data.get('description')
+        if not description:
+            description = "Automated snapshot by c7n - %s" % (self.manager.ctx.policy.name)
+
         try:
-            client.create_snapshot(VolumeId=volume, TagSpecifications=tags)
+            client.create_snapshot(
+                VolumeId=volume,
+                Description=description,
+                TagSpecifications=tags
+            )
         except ClientError as e:
             if e.response['Error']['Code'] == 'InvalidVolume.NotFound':
                 return
@@ -1545,7 +1565,7 @@ class ModifyVolume(BaseAction):
               resource: ebs
               filters:
                - type: value
-                 key: CreateDate
+                 key: CreateTime
                  value_type: age
                  value: 7
                  op: greater-than
@@ -1562,9 +1582,9 @@ class ModifyVolume(BaseAction):
                  volume-type: gp2
 
     `iops-percent` and `size-percent` can be used to modify
-    respectively iops on io1 volumes and volume size.
+    respectively iops on io1/io2 volumes and volume size.
 
-    When converting to io1, `iops-percent` is used to set the iops
+    When converting to io1/io2, `iops-percent` is used to set the iops
     allocation for the new volume against the extant value for the old
     volume.
 
@@ -1594,7 +1614,7 @@ class ModifyVolume(BaseAction):
 
     schema = type_schema(
         'modify',
-        **{'volume-type': {'enum': ['io1', 'gp2', 'gp3', 'st1', 'sc1']},
+        **{'volume-type': {'enum': ['io1', 'io2', 'gp2', 'gp3', 'st1', 'sc1']},
            'shrink': False,
            'size-percent': {'type': 'number'},
            'iops-percent': {'type': 'number'}})
@@ -1624,7 +1644,8 @@ class ModifyVolume(BaseAction):
 
         for r in resource_set:
             params = {'VolumeId': r['VolumeId']}
-            if piops and ('io1' in (vtype, r['VolumeType'])):
+            if piops and ('io1' in (vtype, r['VolumeType']) or
+                          'io2' in (vtype, r['VolumeType'])):
                 # default here if we're changing to io1
                 params['Iops'] = max(int(r.get('Iops', 10) * piops / 100.0), 100)
             if psize:

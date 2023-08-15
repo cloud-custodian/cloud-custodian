@@ -1,0 +1,25 @@
+# execute smoke tests against skaffold
+skaffold-tests:
+    #!/usr/bin/env bash
+
+    # clean up before the test
+    testfile=".skaffold/tests/invalid.yaml"
+    kubectl delete --wait --filename "$testfile" 2>&1 /dev/null || true
+
+    echo "creating invalid resource ..."
+    if kubectl apply --filename "$testfile"; then
+        echo "!! invalid resource was created"
+    else
+        echo "  test passed"
+    fi
+
+    # clean up before the test
+    testfile=".skaffold/tests/valid.yaml"
+    kubectl delete -f "$testfile" 2>1 > /dev/null || true
+
+    echo "creating valid resource ..."
+    if ! kubectl apply -f "$testfile"; then
+        echo "!! failed to created valid resource"
+    else
+        echo "  test passed"
+    fi

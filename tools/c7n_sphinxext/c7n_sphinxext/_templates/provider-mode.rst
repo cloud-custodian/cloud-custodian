@@ -3,7 +3,7 @@
 .. _{{provider_name}}_modes:
 
 {{provider_name}} Execution Modes
----------------------------------
+-------------------------------------------
 
 {% for m in modes %}
 

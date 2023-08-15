@@ -1,0 +1,54 @@
+{
+    "status_code": 200,
+    "data": {
+        "Table": {
+            "AttributeDefinitions": [
+                {
+                    "AttributeName": "ArtistId",
+                    "AttributeType": "S"
+                }
+            ],
+            "TableName": "Test-DDBTable-backup",
+            "KeySchema": [
+                {
+                    "AttributeName": "ArtistId",
+                    "KeyType": "HASH"
+                }
+            ],
+            "TableStatus": "ACTIVE",
+            "CreationDateTime": {
+                "__class__": "datetime",
+                "year": 2022,
+                "month": 8,
+                "day": 29,
+                "hour": 13,
+                "minute": 39,
+                "second": 48,
+                "microsecond": 333000
+            },
+            "ProvisionedThroughput": {
+                "NumberOfDecreasesToday": 0,
+                "ReadCapacityUnits": 0,
+                "WriteCapacityUnits": 0
+            },
+            "TableSizeBytes": 0,
+            "ItemCount": 0,
+            "TableArn": "arn:aws:dynamodb:us-west-2:123456789012:table/Test-DDBTable-backup",
+            "TableId": "0f64ca00-386f-4b55-b403-acd215e81072",
+            "BillingModeSummary": {
+                "BillingMode": "PAY_PER_REQUEST",
+                "LastUpdateToPayPerRequestDateTime": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 8,
+                    "day": 29,
+                    "hour": 13,
+                    "minute": 39,
+                    "second": 48,
+                    "microsecond": 333000
+                }
+            }
+        },
+        "ResponseMetadata": {}
+    }
+}

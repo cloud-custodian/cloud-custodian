@@ -1,0 +1,12 @@
+{
+    "status_code": 200,
+    "data": {
+        "QueueUrls": [
+            "https://us-east-1.queue.amazonaws.com/644160558196/bar",
+            "https://us-east-1.queue.amazonaws.com/644160558196/bar_dlq",
+            "https://us-east-1.queue.amazonaws.com/644160558196/test",
+            "https://us-east-1.queue.amazonaws.com/644160558196/test-dlq"
+        ],
+        "ResponseMetadata": {}
+    }
+}

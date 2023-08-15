@@ -1,0 +1,164 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "DomainStatusList": [
+            {
+                "DomainId": "644160558196/ddaotest2",
+                "DomainName": "ddaotest2",
+                "ARN": "arn:aws:es:us-east-1:644160558196:domain/ddaotest2",
+                "Created": true,
+                "Deleted": false,
+                "Endpoint": "search-ddaotest2-lu2dt65rj332cs6tlihhmmgvcm.us-east-1.es.amazonaws.com",
+                "Processing": false,
+                "UpgradeProcessing": false,
+                "ElasticsearchVersion": "OpenSearch_1.3",
+                "ElasticsearchClusterConfig": {
+                    "InstanceType": "t3.small.elasticsearch",
+                    "InstanceCount": 1,
+                    "DedicatedMasterEnabled": false,
+                    "ZoneAwarenessEnabled": false,
+                    "WarmEnabled": false,
+                    "ColdStorageOptions": {
+                        "Enabled": false
+                    }
+                },
+                "EBSOptions": {
+                    "EBSEnabled": true,
+                    "VolumeType": "gp3",
+                    "VolumeSize": 10,
+                    "Iops": 3000,
+                    "Throughput": 125
+                },
+                "AccessPolicies": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Deny\",\"Principal\":{\"AWS\":\"*\"},\"Action\":\"es:*\",\"Resource\":\"arn:aws:es:us-east-1:644160558196:domain/ddaotest2/*\"},{\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"*\"},\"Action\":\"es:*\",\"Resource\":\"arn:aws:es:us-east-1:644160558196:domain/ddaotest2/*\",\"Condition\":{\"IpAddress\":{\"aws:SourceIp\":\"103.15.250.2\"}}}]}",
+                "SnapshotOptions": {},
+                "CognitoOptions": {
+                    "Enabled": false
+                },
+                "EncryptionAtRestOptions": {
+                    "Enabled": true,
+                    "KmsKeyId": "arn:aws:kms:us-east-1:644160558196:key/59f9f646-4f41-40f3-9637-a0537a22a67c"
+                },
+                "NodeToNodeEncryptionOptions": {
+                    "Enabled": true
+                },
+                "AdvancedOptions": {
+                    "indices.fielddata.cache.size": "20",
+                    "indices.query.bool.max_clause_count": "1024",
+                    "override_main_response_version": "false",
+                    "rest.action.multi.allow_explicit_index": "true"
+                },
+                "ServiceSoftwareOptions": {
+                    "CurrentVersion": "R20220323-P6",
+                    "NewVersion": "",
+                    "UpdateAvailable": false,
+                    "Cancellable": false,
+                    "UpdateStatus": "COMPLETED",
+                    "Description": "There is no software update available for this domain.",
+                    "AutomatedUpdateDate": {
+                        "__class__": "datetime",
+                        "year": 1969,
+                        "month": 12,
+                        "day": 31,
+                        "hour": 16,
+                        "minute": 0,
+                        "second": 0,
+                        "microsecond": 0
+                    },
+                    "OptionalDeployment": true
+                },
+                "DomainEndpointOptions": {
+                    "EnforceHTTPS": true,
+                    "TLSSecurityPolicy": "Policy-Min-TLS-1-0-2019-07",
+                    "CustomEndpointEnabled": false
+                },
+                "AdvancedSecurityOptions": {
+                    "Enabled": true,
+                    "InternalUserDatabaseEnabled": true,
+                    "AnonymousAuthEnabled": false
+                },
+                "AutoTuneOptions": {
+                    "State": "ENABLE_IN_PROGRESS"
+                }
+            },
+            {
+                "DomainId": "644160558196/ddaotest",
+                "DomainName": "ddaotest",
+                "ARN": "arn:aws:es:us-east-1:644160558196:domain/ddaotest",
+                "Created": true,
+                "Deleted": false,
+                "Endpoint": "search-ddaotest-e34rjob4numse2xbbkfng3mzs4.us-east-1.es.amazonaws.com",
+                "Processing": false,
+                "UpgradeProcessing": false,
+                "ElasticsearchVersion": "OpenSearch_1.3",
+                "ElasticsearchClusterConfig": {
+                    "InstanceType": "t3.small.elasticsearch",
+                    "InstanceCount": 1,
+                    "DedicatedMasterEnabled": false,
+                    "ZoneAwarenessEnabled": false,
+                    "WarmEnabled": false,
+                    "ColdStorageOptions": {
+                        "Enabled": false
+                    }
+                },
+                "EBSOptions": {
+                    "EBSEnabled": true,
+                    "VolumeType": "gp3",
+                    "VolumeSize": 10,
+                    "Iops": 3000,
+                    "Throughput": 125
+                },
+                "AccessPolicies": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Deny\",\"Principal\":{\"AWS\":\"*\"},\"Action\":\"es:*\",\"Resource\":\"arn:aws:es:us-east-1:644160558196:domain/ddaotest/*\"},{\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"*\"},\"Action\":\"es:*\",\"Resource\":\"arn:aws:es:us-east-1:644160558196:domain/ddaotest/*\",\"Condition\":{\"IpAddress\":{\"aws:SourceIp\":[\"103.15.250.2\",\"10.0.0.0/24\"]}}}]}",
+                "SnapshotOptions": {},
+                "CognitoOptions": {
+                    "Enabled": false
+                },
+                "EncryptionAtRestOptions": {
+                    "Enabled": true,
+                    "KmsKeyId": "arn:aws:kms:us-east-1:644160558196:key/59f9f646-4f41-40f3-9637-a0537a22a67c"
+                },
+                "NodeToNodeEncryptionOptions": {
+                    "Enabled": true
+                },
+                "AdvancedOptions": {
+                    "indices.fielddata.cache.size": "20",
+                    "indices.query.bool.max_clause_count": "1024",
+                    "override_main_response_version": "false",
+                    "rest.action.multi.allow_explicit_index": "true"
+                },
+                "ServiceSoftwareOptions": {
+                    "CurrentVersion": "R20220323-P6",
+                    "NewVersion": "",
+                    "UpdateAvailable": false,
+                    "Cancellable": false,
+                    "UpdateStatus": "COMPLETED",
+                    "Description": "There is no software update available for this domain.",
+                    "AutomatedUpdateDate": {
+                        "__class__": "datetime",
+                        "year": 1969,
+                        "month": 12,
+                        "day": 31,
+                        "hour": 16,
+                        "minute": 0,
+                        "second": 0,
+                        "microsecond": 0
+                    },
+                    "OptionalDeployment": true
+                },
+                "DomainEndpointOptions": {
+                    "EnforceHTTPS": true,
+                    "TLSSecurityPolicy": "Policy-Min-TLS-1-0-2019-07",
+                    "CustomEndpointEnabled": false
+                },
+                "AdvancedSecurityOptions": {
+                    "Enabled": true,
+                    "InternalUserDatabaseEnabled": true,
+                    "AnonymousAuthEnabled": false
+                },
+                "AutoTuneOptions": {
+                    "State": "ENABLE_IN_PROGRESS"
+                }
+            }
+        ]
+    }
+}

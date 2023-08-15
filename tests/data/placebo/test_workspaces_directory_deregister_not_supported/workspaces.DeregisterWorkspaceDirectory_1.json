@@ -1,0 +1,11 @@
+{
+    "status_code": 400,
+    "data": {
+        "Error": {
+            "Message": "There are WorkSpaces assigned to this directory. You must remove the WorkSpaces before you deregister the directory.",
+            "Code": "OperationNotSupportedException"
+        },
+        "ResponseMetadata": {},
+        "message": "There are WorkSpaces assigned to this directory. You must remove the WorkSpaces before you deregister the directory."
+    }
+}

@@ -6,9 +6,11 @@ from c7n.resources.cw import LogMetricAlarmFilter
 from .common import BaseTest, functional
 from unittest.mock import MagicMock
 
+import pytest
 from pytest_terraform import terraform
 
 
+@pytest.mark.audited
 @terraform('log_delete', teardown=terraform.TEARDOWN_IGNORE)
 def test_tagged_log_group_delete(test, log_delete):
     factory = test.replay_flight_data(
@@ -66,7 +68,7 @@ class LogGroupTest(BaseTest):
             session_factory=session_factory
         )
         resources = p.run()
-        self.assertTrue(len(resources), 1)
+        self.assertEqual(len(resources), 1)
         aliases = kms.list_aliases(KeyId=resources[0]['kmsKeyId'])
         self.assertEqual(aliases['Aliases'][0]['AliasName'], 'alias/cw')
 
@@ -84,6 +86,71 @@ class LogGroupTest(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["c7n:SubscriptionFilters"][0]["destinationArn"],
             "arn:aws:lambda:us-east-2:1111111111111:function:CloudCustodian")
+
+    def test_put_subscription_filter(self):
+        factory = self.replay_flight_data("test_log_group_put_subscription_filter")
+        log_group = "c7n-test-a"
+        filter_name = "log-susbscription-filter-a"
+        filter_pattern = "id"
+        destination_arn = "arn:aws:logs:us-east-1:644160558196:destination:lambda"
+        distribution = "ByLogStream"
+        role_arn = "arn:aws:iam::123456789012:role/testCrossAccountRole"
+        client = factory().client("logs")
+        p = self.load_policy(
+            {
+                "name": "put-subscription-filter",
+                "resource": "log-group",
+                "filters": [{"logGroupName": log_group}],
+                "actions": [{"type": "put-subscription-filter",
+                "filter_name": filter_name,
+                "filter_pattern": filter_pattern,
+                "destination_arn": destination_arn,
+                "distribution": distribution,
+                "role_arn": role_arn}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        subscription_filter = client.describe_subscription_filters(logGroupName=log_group,
+            filterNamePrefix=filter_name,
+            limit=1)["subscriptionFilters"][0]
+        self.assertEqual(subscription_filter["logGroupName"], log_group)
+        self.assertEqual(subscription_filter["filterName"], filter_name)
+        self.assertEqual(subscription_filter["destinationArn"], destination_arn)
+        self.assertEqual(subscription_filter["distribution"], distribution)
+        self.assertEqual(subscription_filter["roleArn"], role_arn)
+
+    def test_put_subscription_filter_without_role(self):
+        factory = self.replay_flight_data("test_log_group_put_subscription_filter_without_role")
+        log_group = "c7n-test-a"
+        filter_name = "log-susbscription-filter-a"
+        filter_pattern = "id"
+        destination_arn = "arn:aws:logs:us-east-1:644160558196:destination:lambda"
+        distribution = "ByLogStream"
+        client = factory().client("logs")
+        p = self.load_policy(
+            {
+                "name": "put-subscription-filter",
+                "resource": "log-group",
+                "filters": [{"logGroupName": log_group}],
+                "actions": [{"type": "put-subscription-filter",
+                "filter_name": filter_name,
+                "filter_pattern": filter_pattern,
+                "destination_arn": destination_arn,
+                "distribution": distribution}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        subscription_filter = client.describe_subscription_filters(logGroupName=log_group,
+            filterNamePrefix=filter_name,
+            limit=1)["subscriptionFilters"][0]
+        self.assertEqual(subscription_filter["logGroupName"], log_group)
+        self.assertEqual(subscription_filter["filterName"], filter_name)
+        self.assertEqual(subscription_filter["destinationArn"], destination_arn)
+        self.assertEqual(subscription_filter["distribution"], distribution)
 
     def test_age_normalize(self):
         factory = self.replay_flight_data("test_log_group_age_normalize")

@@ -433,6 +433,7 @@ class AppELBTest(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
         p = self.load_policy(
             {
                 "name": "appelb-waf",
@@ -447,6 +448,271 @@ class AppELBTest(BaseTest):
         self.assertEqual(
             resources[0]["LoadBalancerArn"], post_resources[0]["LoadBalancerArn"]
         )
+
+    def test_appelb_waf_value(self):
+        factory = self.replay_flight_data("test_appelb_waf_value")
+
+        p = self.load_policy(
+            {
+                "name": "appelb-waf",
+                "resource": "app-elb",
+                "filters": [
+                    {"type": "waf-enabled", "key": "Rules", "value": "empty"}
+                ]
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        # mock data contains one rule and will not match
+        self.assertEqual(len(resources), 0)
+
+        p = self.load_policy(
+            {
+                "name": "appelb-waf",
+                "resource": "app-elb",
+                "filters": [
+                    {"type": "waf-enabled", "key": "length(Rules[?Type == 'REGULAR'])", "value": 1}
+                ]
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        # mock data contains one "REGULAR" rule
+        self.assertEqual(len(resources), 1)
+
+    def test_appelb_wafv2_any(self):
+        factory = self.replay_flight_data("test_appelb_wafv2")
+        p = self.load_policy({
+            "name": "appelb-wafv2",
+            "resource": "app-elb",
+            "filters": [
+                {"type": "wafv2-enabled", "state": False}]},
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['LoadBalancerName'], 'test')
+
+    def test_appelb_wafv2(self):
+        factory = self.replay_flight_data("test_appelb_wafv2")
+
+        p = self.load_policy(
+            {
+                "name": "appelb-wafv2",
+                "resource": "app-elb",
+                "filters": [
+                    {"type": "wafv2-enabled", "web-acl": "testv2", "state": False}
+                ],
+                "actions": [{"type": "set-wafv2", "web-acl": "testv2"}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        p = self.load_policy(
+            {
+                "name": "appelb-wafv2",
+                "resource": "app-elb",
+                "filters": [
+                    {"type": "wafv2-enabled", "web-acl": "testv2", "state": True}
+                ],
+            },
+            session_factory=factory,
+        )
+        post_resources = p.run()
+        self.assertEqual(
+            resources[0]["LoadBalancerArn"], post_resources[0]["LoadBalancerArn"]
+        )
+
+    def test_appelb_wafv2_to_waf(self):
+        factory = self.replay_flight_data("test_appelb_wafv2")
+
+        p = self.load_policy(
+            {
+                "name": "appelb-wafv2-waf",
+                "resource": "app-elb",
+                "filters": [
+                    {"type": "wafv2-enabled", "web-acl": "testv2", "state": False}
+                ],
+                "actions": [{"type": "set-waf", "web-acl": "test"}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_appelb_wafv2_value(self):
+        factory = self.replay_flight_data("test_appelb_wafv2_value")
+
+        p = self.load_policy(
+            {
+                "name": "appelb-waf",
+                "resource": "app-elb",
+                "filters": [{"type": "wafv2-enabled", "key": "Rules", "value": "empty"}]
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        # mock data contains one rule and will not match
+        self.assertEqual(len(resources), 0)
+
+        p = self.load_policy(
+            {
+                "name": "appelb-waf",
+                "resource": "app-elb",
+                "filters": [{
+                    "type": "wafv2-enabled",
+                    "key": "length(Rules[?contains(keys(Statement), 'RateBasedStatement')])",
+                    "op": "gte",
+                    "value": 1
+                }]
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        # mock WAF rule has single RateBasedStatement
+        self.assertEqual(len(resources), 1)
+
+    def test_appelb_waf_to_wafv2(self):
+        factory = self.replay_flight_data("test_appelb_waf")
+
+        p = self.load_policy(
+            {
+                "name": "appelb-waf-wafv2",
+                "resource": "app-elb",
+                "filters": [
+                    {"type": "waf-enabled", "web-acl": "test", "state": False}
+                ],
+                "actions": [{"type": "set-wafv2", "web-acl": "testv2"}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_appelb_filter_wafv2_regex(self):
+        factory = self.replay_flight_data("test_appelb_wafv2_regex")
+
+        p = self.load_policy(
+            {
+                "name": "appelb-waf-wafv2",
+                "resource": "app-elb",
+                "filters": [
+                    {"type": "wafv2-enabled", "state": False}
+                ]
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
+        p = self.load_policy(
+            {
+                "name": "appelb-waf-wafv2",
+                "resource": "app-elb",
+                "filters": [
+                    {"type": "wafv2-enabled",
+                     "web-acl": "FMManagedWebACLV2-FMS-.*",
+                     "state": True}
+                ]
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        p = self.load_policy(
+            {
+                "name": "appelb-waf-wafv2",
+                "resource": "app-elb",
+                "filters": [
+                    {"type": "wafv2-enabled", "web-acl": "testv3",
+                     "state": False}
+                ]
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_appelb_action_wafv2_not_found(self):
+        self.assertRaises(
+            PolicyValidationError,
+            self.load_policy,
+            {
+                "name": "appelb-waf-wafv2",
+                "resource": "app-elb",
+                "filters": [
+                    {"state": False}
+                ],
+                "actions": [
+                    {"type": "set-wafv2", "web-acl": "FMManagedWebACLV2-FMS-T.*"}
+                ],
+            },
+        )
+
+    def test_appelb_action_wafv2_regex_multiple_webacl_match(self):
+        factory = self.replay_flight_data(
+            "test_appelb_wafv2_regex_multiple_webacl_match")
+
+        p = self.load_policy(
+            {
+                "name": "appelb-waf-wafv2",
+                "resource": "app-elb",
+                "filters": [
+                    {"type": "wafv2-enabled", "state": True}
+                ],
+                "actions": [
+                    {"type": "set-wafv2", "web-acl": "FMManagedWebACLV2-FMS-T.*"}
+                ],
+            },
+            session_factory=factory,
+        )
+        with self.assertRaises(ValueError) as ctx:
+            p.run()
+            self.assertTrue('matching to none or multiple webacls' in str(
+                ctx.exception))
+
+    def test_appelb_action_wafv2_regex_disassociate_webacl(self):
+        factory = self.replay_flight_data(
+            "test_appelb_wafv2_regex")
+
+        p = self.load_policy(
+            {
+                "name": "appelb-waf-wafv2",
+                "resource": "app-elb",
+                "filters": [
+                    {"type": "wafv2-enabled",
+                     "web-acl": "FMManagedWebACLV2-FMS-T.*", "state": True}
+                ],
+                "actions": [
+                    {"type": "set-wafv2", "state": False}
+                ],
+            },
+            session_factory=factory,
+        )
+        response = p.run()
+        self.assertEqual(response[0]['LoadBalancerName'], 'test')
+
+    def test_set_wafv2_active_response(self):
+        factory = self.replay_flight_data("test_appelb_wafv2")
+        policy = self.load_policy(
+            {
+                "name": "waf-appelb-active-response",
+                "resource": "app-elb",
+                "mode": {"type": "cloudtrail", "events": [{
+                    "source": "elasticloadbalancing.amazonaws.com",
+                    "ids": "requestParameters.resourceArns[0]",
+                    "event": "AddTags"
+                }]},
+                "filters": [{"type": "wafv2-enabled", "state": False}, {"tag:WAF": "Internal"}],
+                "actions": [{"type": "set-wafv2", "state": True, "web-acl": "testv2"}],
+            },
+            session_factory=factory,
+        )
+
+        resources = policy.push(event_data("event-cloud-trail-appelb-add-tags.json"))
+        self.assertEqual(len(resources), 1)
 
     def test_appelb_net_metrics(self):
         factory = self.replay_flight_data('test_netelb_metrics')
@@ -467,7 +733,7 @@ class AppELBTest(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['LoadBalancerName'], 'nicnoc')
         self.assertTrue(
-            'AWS/NetworkELB.TCP_ELB_Reset_Count.Sum' in resources[
+            'AWS/NetworkELB.TCP_ELB_Reset_Count.Sum.0.25' in resources[
                 0]['c7n.metrics'])
 
 
@@ -564,6 +830,41 @@ class AppELBTargetGroupTest(BaseTest):
         resources = policy.run()
 
         self.assertGreater(len(resources), 0, "Test should delete app elb target group")
+
+    def test_target_group_modify_attributes(self):
+        session_factory = self.replay_flight_data(
+            "test_target_group_attributes_filter_action")
+        client = session_factory().client("elbv2")
+        p = self.load_policy(
+            {
+                "name": "target-group-enable-preserve-client-ip",
+                "resource": "app-elb-target-group",
+                "filters": [
+                    {
+                        "type": "attributes",
+                        "key": "preserve_client_ip.enabled",
+                        "value": False,
+                    },
+                ],
+                "actions": [
+                    {
+                        "type": "modify-attributes",
+                        "attributes": {
+                            "preserve_client_ip.enabled": "true",
+                        },
+                    },
+                ],
+            },
+            config={'region': 'us-west-2'},
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        arn = resources[0]["TargetGroupArn"]
+        attrs = client.describe_target_group_attributes(
+            TargetGroupArn=arn)["Attributes"]
+        attrs = {obj['Key']: obj['Value'] for obj in attrs}
+        assert attrs['preserve_client_ip.enabled'] == 'true'
 
 
 class TestAppElbLogging(BaseTest):
@@ -665,6 +966,49 @@ class TestAppElbIsLoggingFilter(BaseTest):
 
         self.assertGreater(
             len(resources), 0, "Test should find appelbs logging " "to elbv2logtest"
+        )
+
+
+class TestHealthEventsFilter(BaseTest):
+
+    def test_rds_health_events_filter(self):
+        session_factory = self.replay_flight_data("test_appelb_health_events_filter")
+        policy = self.load_policy(
+            {
+                "name": "appelb-health-events-filter",
+                "resource": "app-elb",
+                "filters": [{"type": "health-event", "statuses": ["open", "upcoming", "closed"]}],
+            },
+            session_factory=session_factory,
+        )
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+
+
+class TestAppElbIsNotLoggingFilter(BaseTest):
+    """ replicate
+        - name: appelb-is-not-logging-to-bucket-test
+          resource: app-elb
+          filters:
+            - type: is-not-logging
+            bucket: elbv2logtest
+    """
+
+    def test_is_logging_to_bucket(self):
+        session_factory = self.replay_flight_data("test_appelb_is_logging_filter")
+        policy = self.load_policy(
+            {
+                "name": "appelb-is-logging-to-bucket-test",
+                "resource": "app-elb",
+                "filters": [{"type": "is-not-logging", "bucket": "otherbucket"}],
+            },
+            session_factory=session_factory,
+        )
+
+        resources = policy.run()
+
+        self.assertGreater(
+            len(resources), 0, "Test should find appelbs not" "logging to otherbucket"
         )
 
 
@@ -803,49 +1147,6 @@ class TestAppElbAttributesFilter(BaseTest):
         )
 
 
-class TestAppElbIsNotLoggingFilter(BaseTest):
-    """ replicate
-        - name: appelb-is-not-logging-to-bucket-test
-          resource: app-elb
-          filters:
-            - type: is-not-logging
-            bucket: elbv2logtest
-    """
-
-    def test_is_logging_to_bucket(self):
-        session_factory = self.replay_flight_data("test_appelb_is_logging_filter")
-        policy = self.load_policy(
-            {
-                "name": "appelb-is-logging-to-bucket-test",
-                "resource": "app-elb",
-                "filters": [{"type": "is-not-logging", "bucket": "otherbucket"}],
-            },
-            session_factory=session_factory,
-        )
-
-        resources = policy.run()
-
-        self.assertGreater(
-            len(resources), 0, "Test should find appelbs not" "logging to otherbucket"
-        )
-
-
-class TestHealthEventsFilter(BaseTest):
-
-    def test_rds_health_events_filter(self):
-        session_factory = self.replay_flight_data("test_appelb_health_events_filter")
-        policy = self.load_policy(
-            {
-                "name": "appelb-health-events-filter",
-                "resource": "app-elb",
-                "filters": [{"type": "health-event", "statuses": ["open", "upcoming", "closed"]}],
-            },
-            session_factory=session_factory,
-        )
-        resources = policy.run()
-        self.assertEqual(len(resources), 1)
-
-
 class TestModifyVpcSecurityGroupsAction(BaseTest):
 
     def test_appelb_remove_matched_security_groups(self):
@@ -941,3 +1242,106 @@ class TestModifyVpcSecurityGroupsAction(BaseTest):
         # check SG was added
         self.assertEqual(len(clean_resources[0]["SecurityGroups"]), 2)
         self.assertIn("sg-c573e6b3", clean_resources[0]["SecurityGroups"])
+
+
+class TestTargetGroupAttributesFilter(BaseTest):
+    def test_is_not_preserve_client_ip_target_group(self):
+        session_factory = self.replay_flight_data("test_target_group_attributes_filter_action")
+        policy = self.load_policy(
+            {
+                "name": "target-group-is-not-preserve-client-ip",
+                "resource": "app-elb-target-group",
+                "filters": [
+                        {
+                            "type": "attributes",
+                            "key": "preserve_client_ip.enabled",
+                            "value": False,
+                            "op": "eq",
+                        }
+                ],
+            },
+            config={'region': 'us-west-2'},
+            session_factory=session_factory,
+        )
+
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_is_preserve_client_ip_target_group(self):
+        session_factory = self.replay_flight_data("test_target_group_attributes_filter_action")
+        policy = self.load_policy(
+            {
+                "name": "target-group-is-preserve-client-ip",
+                "resource": "app-elb-target-group",
+                "filters": [
+                        {
+                            "type": "attributes",
+                            "key": "preserve_client_ip.enabled",
+                            "value": True,
+                            "op": "eq",
+                        }
+                ],
+            },
+            config={'region': 'us-west-2'},
+            session_factory=session_factory,
+        )
+
+        resources = policy.run()
+        self.assertEqual(len(resources), 0)
+
+    def test_target_group_stickiness_type_check(self):
+        session_factory = self.replay_flight_data("test_target_group_attributes_filter_action")
+        policy = self.load_policy(
+            {
+                "name": "target-group-stickiness-is-source_ip",
+                "resource": "app-elb-target-group",
+                "filters": [
+                        {
+                            "type": "attributes",
+                            "key": "stickiness.type",
+                            "value": "source_ip",
+                            "op": "eq"
+                        }
+                ],
+            },
+            session_factory=session_factory,
+        )
+
+        resources = policy.run()
+
+        self.assertEqual(
+            len(resources), 1,
+            "Test should find 1 target group with stickiness with source_ip enabled"
+        )
+
+        self.assertEqual(
+            resources[0]['c7n:TargetGroupAttributes']['stickiness.type'], "source_ip"
+        )
+
+    def test_tg_deregistration_delay_timeout_equal_300(self):
+        session_factory = self.replay_flight_data("test_target_group_attributes_filter_action")
+        policy = self.load_policy(
+            {
+                "name": "target-group-idle-timeout-is-equal-300",
+                "resource": "app-elb-target-group",
+                "filters": [
+                        {
+                            "type": "attributes",
+                            "key": "deregistration_delay.timeout_seconds",
+                            "value": 300,
+                            "op": "eq"
+                        }
+                ],
+            },
+            session_factory=session_factory,
+        )
+
+        resources = policy.run()
+
+        self.assertEqual(
+            len(resources), 1, "Test should find 1 target group with idle timeout == 300s"
+        )
+
+        self.assertEqual(
+            resources[0]['c7n:TargetGroupAttributes']['deregistration_delay.timeout_seconds'], 300
+        )

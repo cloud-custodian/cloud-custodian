@@ -71,7 +71,8 @@ class StorageContainerTest(BaseTest):
             args, kwargs = update_container_mock.call_args_list[0]
             self.assertEqual('test_storage', args[0])
             self.assertTrue(args[1].startswith('cctstorage'))
-            self.assertEqual('None', kwargs['public_access'])
+            self.assertEqual('containerone', args[2])
+            self.assertEqual('None', args[3].public_access)
 
     @arm_template('storage.json')
     def test_event(self):

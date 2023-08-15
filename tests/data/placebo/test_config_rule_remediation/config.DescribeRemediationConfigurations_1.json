@@ -1,0 +1,31 @@
+{
+    "status_code": 200,
+    "data": {
+        "RemediationConfigurations": [
+            {
+                "ConfigRuleName": "custodian-config-managed-s3-bucket-public-write-remediate-event",
+                "TargetType": "SSM_DOCUMENT",
+                "TargetId": "AWS-DisableS3BucketPublicReadWrite",
+                "Parameters": {
+                    "AutomationAssumeRole": {
+                        "StaticValue": {
+                            "Values": [
+                                "arn:aws:iam::644160558196:role/myrole"
+                            ]
+                        }
+                    },
+                    "S3BucketName": {
+                        "ResourceValue": {
+                            "Value": "RESOURCE_ID"
+                        }
+                    }
+                },
+                "Automatic": true,
+                "MaximumAutomaticAttempts": 5,
+                "RetryAttemptSeconds": 211,
+                "Arn": "arn:aws:config:us-east-1:644160558196:remediation-configuration/custodian-config-managed-s3-bucket-public-write-remediate-event/cadfb035-9d35-44c6-973c-091740093a59"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

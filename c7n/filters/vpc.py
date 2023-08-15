@@ -28,15 +28,106 @@ class SecurityGroupFilter(MatchResourceValidator, RelatedResourceFilter):
 
 
 class SubnetFilter(MatchResourceValidator, RelatedResourceFilter):
-    """Filter a resource by its associated subnets."""
+    """Filter a resource by its associated subnets attributes.
+
+    This filter is generally available for network attached resources.
+
+    ie. to find lambda functions that are vpc attached to subnets with
+    a tag key Location and value Database.
+
+    :example:
+
+    .. code-block:: yaml
+
+      policies:
+        - name: lambda
+          resource: aws.lambda
+          filters:
+            - type: subnet
+              key: tag:Location
+              value: Database
+
+    It also supports finding resources on public or private subnets
+    via route table introspection to determine if the subnet is
+    associated to an internet gateway.
+
+    :example:
+
+    .. code-block:: yaml
+
+      policies:
+         - name: public-ec2
+           resource: aws.ec2
+           filters:
+             - type: subnet
+               igw: True
+               key: SubnetId
+               value: present
+
+    """
+
     schema = type_schema(
         'subnet', rinherit=ValueFilter.schema,
         **{'match-resource': {'type': 'boolean'},
-           'operator': {'enum': ['and', 'or']}})
-    schema_alias = True
+           'operator': {'enum': ['and', 'or']},
+           'igw': {'enum': [True, False]},
+           })
 
+    schema_alias = True
     RelatedResource = "c7n.resources.vpc.Subnet"
     AnnotationKey = "matched-subnets"
+
+    def get_permissions(self):
+        perms = super().get_permissions()
+        if self.data.get('igw') in (True, False):
+            perms += self.manager.get_resource_manager(
+                'aws.route-table').get_permissions()
+        return perms
+
+    def validate(self):
+        super().validate()
+        self.check_igw = self.data.get('igw')
+
+    def match(self, related):
+        if self.check_igw in [True, False]:
+            if not self.match_igw(related):
+                return False
+        return super().match(related)
+
+    def process(self, resources, event=None):
+        related = self.get_related(resources)
+        if self.check_igw in [True, False]:
+            self.route_tables = self.get_route_tables()
+        return [r for r in resources if self.process_resource(r, related)]
+
+    def get_route_tables(self):
+        rmanager = self.manager.get_resource_manager('aws.route-table')
+        route_tables = {}
+        for r in rmanager.resources():
+            for a in r['Associations']:
+                if a['Main']:
+                    route_tables[r['VpcId']] = r
+                elif 'SubnetId' in a:
+                    route_tables[a['SubnetId']] = r
+        return route_tables
+
+    def match_igw(self, subnet):
+        rtable = self.route_tables.get(
+            subnet['SubnetId'],
+            self.route_tables.get(subnet['VpcId']))
+        if rtable is None:
+            self.log.debug('route table for %s not found', subnet['SubnetId'])
+            return
+        found_igw = False
+        for route in rtable['Routes']:
+            if route.get('GatewayId') and route['GatewayId'].startswith('igw-'):
+                found_igw = True
+                break
+        if self.check_igw and found_igw:
+            return True
+        elif not self.check_igw and not found_igw:
+            return True
+        return False
 
 
 class VpcFilter(MatchResourceValidator, RelatedResourceFilter):

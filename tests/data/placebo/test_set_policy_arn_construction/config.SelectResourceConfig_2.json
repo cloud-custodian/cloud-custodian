@@ -1,0 +1,22 @@
+{
+    "status_code": 200,
+    "data": {
+        "Results": [
+            "{\"resourceId\":\"AROAY5Y4D45RMKKKBXNQ3\",\"configuration\":{\"path\":\"/\",\"assumeRolePolicyDocument\":\"%7B%22Version%22%3A%222012-10-17%22%2C%22Statement%22%3A%5B%7B%22Effect%22%3A%22Allow%22%2C%22Principal%22%3A%7B%22Service%22%3A%22lambda.amazonaws.com%22%7D%2C%22Action%22%3A%22sts%3AAssumeRole%22%7D%5D%7D\",\"instanceProfileList\":[],\"roleId\":\"AROAY5Y4D45RMKKKBXNQ3\",\"attachedManagedPolicies\":[{\"policyArn\":\"arn:aws:iam::644160558196:policy/DeleteMe\",\"policyName\":\"DeleteMe\"}],\"roleName\":\"custodian-testing\",\"arn\":\"arn:aws:iam::644160558196:role/custodian-testing\",\"createDate\":\"2021-12-16T18:06:50.000Z\",\"rolePolicyList\":[],\"tags\":[]},\"supplementaryConfiguration\":{}}"
+        ],
+        "QueryInfo": {
+            "SelectFields": [
+                {
+                    "Name": "resourceId"
+                },
+                {
+                    "Name": "configuration"
+                },
+                {
+                    "Name": "supplementaryConfiguration"
+                }
+            ]
+        },
+        "ResponseMetadata": {}
+    }
+}
