@@ -41,6 +41,7 @@ class OCIObjectStorageOutputTest(unittest.TestCase, OciBaseTest):
         with open(os.path.join(output.root_dir, "foo.txt"), "w") as fh:
             fh.write("abc")
         output.upload()
+        output.upload()
 
     @patch('c7n_oci.session.Session')
     @patch('c7n_oci.session.oci')
@@ -55,19 +56,40 @@ class OCIObjectStorageOutputTest(unittest.TestCase, OciBaseTest):
         client.head_bucket = Mock(
             side_effect=ServiceError(status=404, code=None, headers=HEADERS, message="Test 404")
         )
-        client.create_bucket.return_value = response
         session_mock_return.client.return_value = client
         session_mock.return_value = session_mock_return
         output = self.get_oci_output_no_existing_bucket()
         with open(os.path.join(output.root_dir, "foo.txt"), "w") as fh:
             fh.write("abc")
-        output.upload()
+        with pytest.raises(ValueError, match=r'The bucket [^\s]+ does not exist.'):
+            output.upload()
+
+    @patch('c7n_oci.session.Session')
+    @patch('c7n_oci.session.oci')
+    @patch('c7n_oci.session.os')
+    def test_upload_file_no_bucket_other_err(self, os_mock, oci_mock, session_mock):
+        oci_mock.identity.IdentityClient.return_value = Mock()
+        os_mock.environ.get.return_value = Mock()
+        session_mock_return = Mock()
+        client = Mock()
+        response = Response(status=200, headers=HEADERS, data=None, request=None)
+        client.put_object.return_value = response
+        client.head_bucket = Mock(
+            side_effect=ServiceError(status=401, code=None, headers=HEADERS, message="Test 401")
+        )
+        session_mock_return.client.return_value = client
+        session_mock.return_value = session_mock_return
+        output = self.get_oci_output_no_existing_bucket()
+        with open(os.path.join(output.root_dir, "foo.txt"), "w") as fh:
+            fh.write("abc")
+        with pytest.raises(ValueError, match=r'Unable to connect to the bucket [^\s]+'):
+            output.upload()
 
     @patch('c7n_oci.log.oci')
     @patch('c7n_oci.session.Session')
     @patch('c7n_oci.session.oci')
     @patch('c7n_oci.session.os')
-    @patch('c7n_oci.log.os')
+    @patch('c7n_oci.output.os')
     def test_log_output(self, os_log_mock, os_session_mock, oci_mock, session_mock, log_oci_mock):
         oci_mock.identity.IdentityClient.return_value = Mock()
         os_session_mock.environ.get.return_value = Mock()
@@ -121,7 +143,7 @@ class OCIObjectStorageOutputTest(unittest.TestCase, OciBaseTest):
     @patch('c7n_oci.session.Session')
     @patch('c7n_oci.session.oci')
     @patch('c7n_oci.session.os')
-    @patch('c7n_oci.log.os')
+    @patch('c7n_oci.output.os')
     def test_log_output_already_existing_log(
         self, os_log_mock, os_session_mock, oci_mock, session_mock
     ):
@@ -167,13 +189,24 @@ class OCIObjectStorageOutputTest(unittest.TestCase, OciBaseTest):
                 lineno=0,
             )
         )
+        logging_handler.emit(
+            LogRecord(
+                name="Custodian",
+                msg="Test2",
+                args=None,
+                level=DEBUG,
+                pathname="/tmp",
+                exc_info=None,
+                lineno=10,
+            )
+        )
         logging_handler.flush()
         logging_handler.close()
 
     @patch('c7n_oci.session.Session')
     @patch('c7n_oci.session.oci')
     @patch('c7n_oci.session.os')
-    @patch('c7n_oci.log.os')
+    @patch('c7n_oci.output.os')
     def test_log_output_inactive_group(self, os_log_mock, os_session_mock, oci_mock, session_mock):
         oci_mock.identity.IdentityClient.return_value = Mock()
         os_session_mock.environ.get.return_value = Mock()
@@ -196,12 +229,23 @@ class OCIObjectStorageOutputTest(unittest.TestCase, OciBaseTest):
         session_mock_return.client.return_value = log_clients_mock
         log_output = self.get_oci_log_output()
         with pytest.raises(ValueError, match=r'Log group [^\s]+ is not ACTIVE'):
-            log_output.get_handler()
+            handler = log_output.get_handler()
+            handler.emit(
+                LogRecord(
+                    name="Custodian",
+                    msg="Test",
+                    args=None,
+                    level=DEBUG,
+                    pathname="/tmp",
+                    exc_info=None,
+                    lineno=0,
+                )
+            )
 
     @patch('c7n_oci.session.Session')
     @patch('c7n_oci.session.oci')
     @patch('c7n_oci.session.os')
-    @patch('c7n_oci.log.os')
+    @patch('c7n_oci.output.os')
     def test_log_output_inactive_log(self, os_log_mock, os_session_mock, oci_mock, session_mock):
         oci_mock.identity.IdentityClient.return_value = Mock()
         os_session_mock.environ.get.return_value = Mock()
@@ -224,7 +268,18 @@ class OCIObjectStorageOutputTest(unittest.TestCase, OciBaseTest):
         session_mock_return.client.return_value = log_clients_mock
         log_output = self.get_oci_log_output()
         with pytest.raises(ValueError, match=r'Log stream [^\s]+ is not ACTIVE'):
-            log_output.get_handler()
+            handler = log_output.get_handler()
+            handler.emit(
+                LogRecord(
+                    name="Custodian",
+                    msg="Test",
+                    args=None,
+                    level=DEBUG,
+                    pathname="/tmp",
+                    exc_info=None,
+                    lineno=0,
+                )
+            )
 
     def get_oci_output(self):
         output_dir = "oci://TEST/custodian"
@@ -242,9 +297,6 @@ class OCIObjectStorageOutputTest(unittest.TestCase, OciBaseTest):
         client = Mock()
         response = Response(status=200, headers=HEADERS, data=None, request=None)
         client.put_object.return_value = response
-        client.head_bucket = Mock(
-            side_effect=ServiceError(status=404, code=None, headers=HEADERS, message="Test 404")
-        )
         client.create_bucket.return_value = response
         session_mock_return.client.return_value = client
         session_factory = Mock()

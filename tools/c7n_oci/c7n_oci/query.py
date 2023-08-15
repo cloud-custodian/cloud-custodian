@@ -11,7 +11,7 @@ from c7n.filters import FilterRegistry
 from c7n.manager import ResourceManager
 from c7n.query import sources, MaxResourceLimit, TypeInfo
 from c7n.utils import local_session
-from c7n_oci.constants import COMPARTMENT_IDS, STORAGE_NAMESPACE, OCI_LOG_COMPARTMENT_ID
+from c7n_oci.constants import COMPARTMENT_IDS, STORAGE_NAMESPACE
 
 log = logging.getLogger("custodian.oci.query")
 
@@ -58,17 +58,6 @@ class DescribeSource:
             for result in results:
                 resources.append(oci.util.to_dict(result))
         return resources
-
-    def validate(self):
-        if (
-            'log_group' in self.manager.config.keys()
-            and self.manager.config['log_group'] is not None
-            and os.environ.get(OCI_LOG_COMPARTMENT_ID) is None
-        ):
-            raise ValueError(
-                f"When using oci logging service the '{OCI_LOG_COMPARTMENT_ID}' "
-                "environment variable must be set. "
-            )
 
     @staticmethod
     def _get_list_of_compartment_ids():
@@ -228,6 +217,3 @@ class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
 
     def _get_extra_params(self):
         return {}
-
-    def validate(self):
-        self.source.validate()

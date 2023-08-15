@@ -1,7 +1,6 @@
 import logging
 import os
 
-import oci
 from oci.exceptions import ServiceError
 
 from c7n.output import blob_outputs, BlobOutput, log_outputs, LogOutput
@@ -45,9 +44,10 @@ class OCIObjectStorageOutput(BlobOutput):
                     raise ValueError(f"The bucket {self.bucket} does not exist.")
                 else:
                     self.log.error(f"Unable to connect to the bucket {self.bucket} : {se.message}")
-                    raise ValueError(f"Unable to connect to the bucket {self.bucket} : {se.message}")
+                    raise ValueError(
+                        f"Unable to connect to the bucket {self.bucket} : {se.message}"
+                    )
             self.bucket_exist = True
-
 
 
 @log_outputs.register("oci")
@@ -60,18 +60,25 @@ class OCILogOutput(LogOutput):
             self.log_group = self.config['netloc']
         else:
             self.log_group = 'DEFAULT'
-        if PROFILE in self.config.keys():
-            self.session_factory = SessionFactory(profile=self.config.profile)
-        else:
-            self.session_factory = SessionFactory()
+        self.session_factory = SessionFactory(profile=self.config.get(PROFILE))
         try:
             self.log_stream = ctx.policy.data['name']
         except Exception:
             self.log_stream = 'DEFAULT'
 
     def get_handler(self):
+        if self.config.get(OCI_LOG_COMPARTMENT_ID):
+            log_compartment_id = self.config.get(OCI_LOG_COMPARTMENT_ID)
+        else:
+            log_compartment_id = os.environ.get(OCI_LOG_COMPARTMENT_ID)
+        if not log_compartment_id:
+            raise ValueError(
+                f"{OCI_LOG_COMPARTMENT_ID} must be provided as a query param or "
+                f"environment variable in order to use the OCI Logging services."
+            )
         return OCILogHandler(
             log_group=self.log_group,
             session_factory=self.session_factory,
             log_stream=self.log_stream,
+            log_compartment_id=log_compartment_id,
         )
