@@ -56,7 +56,7 @@
               "maxLength": 1024
             }
           },
-          "minItems": 1,
+          "minProperties": 1,
           "additionalProperties": false
         }
       },
@@ -82,6 +82,9 @@
       "$ref": "#/definitions/LoggingConfiguration"
     }
   },
+  "tagging": {
+    "taggable": false
+  },
   "required": [
     "FirewallArn",
     "LoggingConfiguration"
@@ -106,7 +109,8 @@
         "logs:DescribeLogGroups",
         "iam:CreateServiceLinkedRole",
         "firehose:TagDeliveryStream",
-        "network-firewall:UpdateLoggingConfiguration"
+        "network-firewall:UpdateLoggingConfiguration",
+        "network-firewall:DescribeLoggingConfiguration"
       ]
     },
     "read": {
@@ -130,7 +134,8 @@
         "logs:DescribeLogGroups",
         "iam:CreateServiceLinkedRole",
         "firehose:TagDeliveryStream",
-        "network-firewall:UpdateLoggingConfiguration"
+        "network-firewall:UpdateLoggingConfiguration",
+        "network-firewall:DescribeLoggingConfiguration"
       ]
     },
     "delete": {
@@ -138,7 +143,8 @@
         "logs:DeleteLogDelivery",
         "logs:ListLogDeliveries",
         "logs:GetLogDelivery",
-        "network-firewall:UpdateLoggingConfiguration"
+        "network-firewall:UpdateLoggingConfiguration",
+        "network-firewall:DescribeLoggingConfiguration"
       ]
     },
     "list": {

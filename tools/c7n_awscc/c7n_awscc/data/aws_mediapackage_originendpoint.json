@@ -130,7 +130,9 @@
           "type": "string",
           "enum": [
             "NONE",
-            "HBBTV_1_5"
+            "HBBTV_1_5",
+            "HYBRIDCAST",
+            "DVB_DASH_2014"
           ]
         },
         "MinUpdatePeriodSeconds": {
@@ -154,6 +156,10 @@
               "ADS"
             ]
           }
+        },
+        "IncludeIframeOnlyStream": {
+          "description": "When enabled, an I-Frame only stream will be included in the output.",
+          "type": "boolean"
         },
         "ManifestLayout": {
           "description": "Determines the position of some tags in the Media Presentation Description (MPD).  When set to FULL, elements like SegmentTemplate and ContentProtection are included in each Representation.  When set to COMPACT, duplicate elements are combined and presented at the AdaptationSet level.",
@@ -202,13 +208,14 @@
           "description": "Determines the type of UTCTiming included in the Media Presentation Description (MPD)",
           "type": "string",
           "enum": [
+            "HTTP-XSDATE",
             "HTTP-ISO",
             "HTTP-HEAD",
             "NONE"
           ]
         },
         "UtcTimingUri": {
-          "description": "Specifies the value attribute of the UTCTiming field when utcTiming is set to HTTP-ISO or HTTP-HEAD",
+          "description": "Specifies the value attribute of the UTCTiming field when utcTiming is set to HTTP-ISO, HTTP-HEAD or HTTP-XSDATE",
           "type": "string"
         }
       }
@@ -313,6 +320,10 @@
           "description": "When enabled, audio streams will be placed in rendition groups in the output.",
           "type": "boolean"
         },
+        "IncludeDvbSubtitles": {
+          "description": "When enabled, MediaPackage passes through digital video broadcasting (DVB) subtitles into the output.",
+          "type": "boolean"
+        },
         "Encryption": {
           "$ref": "#/definitions/HlsEncryption"
         },
@@ -403,6 +414,14 @@
           "pattern": "\\A[0-9a-fA-F]+\\Z",
           "minLength": 32,
           "maxLength": 32
+        },
+        "EncryptionMethod": {
+          "description": "The encryption method used",
+          "type": "string",
+          "enum": [
+            "SAMPLE_AES",
+            "AES_CTR"
+          ]
         }
       }
     },
@@ -536,6 +555,47 @@
         "CertificateArn": {
           "description": "An Amazon Resource Name (ARN) of a Certificate Manager certificate that MediaPackage will use for enforcing secure end-to-end data transfer with the key provider service.",
           "type": "string"
+        },
+        "EncryptionContractConfiguration": {
+          "$ref": "#/definitions/EncryptionContractConfiguration"
+        }
+      }
+    },
+    "EncryptionContractConfiguration": {
+      "description": "The configuration to use for encrypting one or more content tracks separately for endpoints that use SPEKE 2.0.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "PresetSpeke20Audio",
+        "PresetSpeke20Video"
+      ],
+      "properties": {
+        "PresetSpeke20Audio": {
+          "description": "A collection of audio encryption presets.",
+          "type": "string",
+          "enum": [
+            "PRESET-AUDIO-1",
+            "PRESET-AUDIO-2",
+            "PRESET-AUDIO-3",
+            "SHARED",
+            "UNENCRYPTED"
+          ]
+        },
+        "PresetSpeke20Video": {
+          "description": "A collection of video encryption presets.",
+          "type": "string",
+          "enum": [
+            "PRESET-VIDEO-1",
+            "PRESET-VIDEO-2",
+            "PRESET-VIDEO-3",
+            "PRESET-VIDEO-4",
+            "PRESET-VIDEO-5",
+            "PRESET-VIDEO-6",
+            "PRESET-VIDEO-7",
+            "PRESET-VIDEO-8",
+            "SHARED",
+            "UNENCRYPTED"
+          ]
         }
       }
     },
@@ -571,6 +631,28 @@
     "Id",
     "ChannelId"
   ],
+  "oneOf": [
+    {
+      "required": [
+        "HlsPackage"
+      ]
+    },
+    {
+      "required": [
+        "DashPackage"
+      ]
+    },
+    {
+      "required": [
+        "MssPackage"
+      ]
+    },
+    {
+      "required": [
+        "CmafPackage"
+      ]
+    }
+  ],
   "readOnlyProperties": [
     "/properties/Arn",
     "/properties/Url"
@@ -581,13 +663,22 @@
   "createOnlyProperties": [
     "/properties/Id"
   ],
+  "deprecatedProperties": [
+    "/properties/HlsPackage/Encryption/SpekeKeyProvider/EncryptionContractConfiguration/PresetSpeke20Audio",
+    "/properties/HlsPackage/Encryption/SpekeKeyProvider/EncryptionContractConfiguration/PresetSpeke20Video",
+    "/properties/MssPackage/Encryption/SpekeKeyProvider/EncryptionContractConfiguration/PresetSpeke20Audio",
+    "/properties/MssPackage/Encryption/SpekeKeyProvider/EncryptionContractConfiguration/PresetSpeke20Video",
+    "/properties/CmafPackage/HlsManifests/*/Url"
+  ],
   "handlers": {
     "create": {
       "permissions": [
         "mediapackage:CreateOriginEndpoint",
+        "mediapackage:DescribeOriginEndpoint",
         "mediapackage:DescribeChannel",
         "mediapackage:TagResource",
-        "iam:PassRole"
+        "iam:PassRole",
+        "acm:DescribeCertificate"
       ]
     },
     "read": {

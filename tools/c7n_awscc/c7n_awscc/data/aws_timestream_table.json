@@ -19,6 +19,56 @@
         }
       },
       "additionalProperties": false
+    },
+    "PartitionKeyList": {
+      "description": "A list of partition keys defining the attributes used to partition the table data. The order of the list determines the partition hierarchy. The name and type of each partition key as well as the partition key order cannot be changed after the table is created. However, the enforcement level of each partition key can be changed.",
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/definitions/PartitionKey"
+      },
+      "insertionOrder": true
+    },
+    "PartitionKey": {
+      "description": "An attribute used in partitioning data in a table. There are two types of partition keys: dimension keys and measure keys. A dimension key partitions data on a dimension name, while a measure key partitions data on the measure name.",
+      "type": "object",
+      "properties": {
+        "Type": {
+          "$ref": "#/definitions/PartitionKeyType"
+        },
+        "Name": {
+          "$ref": "#/definitions/SchemaName"
+        },
+        "EnforcementInRecord": {
+          "$ref": "#/definitions/PartitionKeyEnforcementLevel"
+        }
+      },
+      "required": [
+        "Type"
+      ],
+      "additionalProperties": false
+    },
+    "PartitionKeyType": {
+      "description": "The type of the partition key. Options are DIMENSION (dimension key) and MEASURE (measure key).",
+      "type": "string",
+      "enum": [
+        "DIMENSION",
+        "MEASURE"
+      ]
+    },
+    "SchemaName": {
+      "description": "The name of the attribute used for a dimension key.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 2048
+    },
+    "PartitionKeyEnforcementLevel": {
+      "description": "The level of enforcement for the specification of a dimension key in ingested records. Options are REQUIRED (dimension key must be specified) and OPTIONAL (dimension key does not have to be specified).",
+      "type": "string",
+      "enum": [
+        "REQUIRED",
+        "OPTIONAL"
+      ]
     }
   },
   "properties": {
@@ -32,12 +82,12 @@
     "DatabaseName": {
       "description": "The name for the database which the table to be created belongs to.",
       "type": "string",
-      "pattern": "^[a-zA-Z0-9_.-]{3,64}$"
+      "pattern": "^[a-zA-Z0-9_.-]{3,256}$"
     },
     "TableName": {
       "description": "The name for the table. If you don't specify a name, AWS CloudFormation generates a unique physical ID and uses that ID for the table name.",
       "type": "string",
-      "pattern": "^[a-zA-Z0-9_.-]{3,64}$"
+      "pattern": "^[a-zA-Z0-9_.-]{3,256}$"
     },
     "RetentionProperties": {
       "description": "The retention duration of the memory store and the magnetic store.",
@@ -52,6 +102,64 @@
           "type": "string"
         }
       },
+      "additionalProperties": false
+    },
+    "Schema": {
+      "description": "A Schema specifies the expected data model of the table.",
+      "type": "object",
+      "properties": {
+        "CompositePartitionKey": {
+          "$ref": "#/definitions/PartitionKeyList"
+        }
+      },
+      "additionalProperties": false
+    },
+    "MagneticStoreWriteProperties": {
+      "description": "The properties that determine whether magnetic store writes are enabled.",
+      "type": "object",
+      "properties": {
+        "EnableMagneticStoreWrites": {
+          "description": "Boolean flag indicating whether magnetic store writes are enabled.",
+          "type": "boolean"
+        },
+        "MagneticStoreRejectedDataLocation": {
+          "description": "Location to store information about records that were asynchronously rejected during magnetic store writes.",
+          "type": "object",
+          "properties": {
+            "S3Configuration": {
+              "description": "S3 configuration for location to store rejections from magnetic store writes",
+              "type": "object",
+              "properties": {
+                "BucketName": {
+                  "description": "The bucket name used to store the data.",
+                  "type": "string"
+                },
+                "ObjectKeyPrefix": {
+                  "description": "String used to prefix all data in the bucket.",
+                  "type": "string"
+                },
+                "EncryptionOption": {
+                  "description": "Either SSE_KMS or SSE_S3.",
+                  "type": "string"
+                },
+                "KmsKeyId": {
+                  "description": "Must be provided if SSE_KMS is specified as the encryption option",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "EncryptionOption",
+                "BucketName"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "EnableMagneticStoreWrites"
+      ],
       "additionalProperties": false
     },
     "Tags": {
@@ -84,7 +192,14 @@
     "create": {
       "permissions": [
         "timestream:CreateTable",
-        "timestream:DescribeEndpoints"
+        "timestream:DescribeEndpoints",
+        "timestream:TagResource",
+        "s3:PutObject",
+        "s3:GetObject",
+        "s3:GetBucketAcl",
+        "kms:GenerateDataKey*",
+        "kms:DescribeKey",
+        "kms:Encrypt"
       ]
     },
     "read": {
@@ -99,13 +214,20 @@
         "timestream:UpdateTable",
         "timestream:DescribeEndpoints",
         "timestream:TagResource",
-        "timestream:UntagResource"
+        "timestream:UntagResource",
+        "s3:PutObject",
+        "s3:GetObject",
+        "s3:GetBucketAcl",
+        "kms:GenerateDataKey*",
+        "kms:DescribeKey",
+        "kms:Encrypt"
       ]
     },
     "delete": {
       "permissions": [
         "timestream:DeleteTable",
-        "timestream:DescribeEndpoints"
+        "timestream:DescribeEndpoints",
+        "timestream:DescribeTable"
       ]
     },
     "list": {

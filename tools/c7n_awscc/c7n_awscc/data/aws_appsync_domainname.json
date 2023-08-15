@@ -37,7 +37,6 @@
   ],
   "readOnlyProperties": [
     "/properties/AppSyncDomainName",
-    "/properties/DomainName",
     "/properties/HostedZoneId"
   ],
   "createOnlyProperties": [
@@ -66,6 +65,11 @@
     "read": {
       "permissions": [
         "appsync:GetDomainName"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "appsync:ListDomainNames"
       ]
     }
   }

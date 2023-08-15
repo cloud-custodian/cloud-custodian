@@ -76,6 +76,17 @@
       },
       "additionalProperties": false
     },
+    "ServiceConnectDefaults": {
+      "description": "Service Connect Configuration default for all services or tasks within this cluster",
+      "type": "object",
+      "properties": {
+        "Namespace": {
+          "description": "Service Connect Namespace Name or ARN default for all services or tasks within this cluster",
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
     "CapacityProviderStrategyItem": {
       "description": "A capacity provider strategy consists of one or more capacity providers along with the `base` and `weight` to assign to them. A capacity provider must be associated with the cluster to be used in a capacity provider strategy. The PutClusterCapacityProviders API is used to associate a capacity provider with a cluster. Only capacity providers with an `ACTIVE` or `UPDATING` status can be used.",
       "type": "object",
@@ -124,6 +135,9 @@
       "items": {
         "$ref": "#/definitions/CapacityProviderStrategyItem"
       }
+    },
+    "ServiceConnectDefaults": {
+      "$ref": "#/definitions/ServiceConnectDefaults"
     },
     "Arn": {
       "description": "The Amazon Resource Name (ARN) of the Amazon ECS cluster, such as arn:aws:ecs:us-east-2:123456789012:cluster/MyECSCluster.",
@@ -177,6 +191,9 @@
   ],
   "createOnlyProperties": [
     "/properties/ClusterName"
+  ],
+  "writeOnlyProperties": [
+    "/properties/ServiceConnectDefaults"
   ],
   "additionalProperties": false
 }

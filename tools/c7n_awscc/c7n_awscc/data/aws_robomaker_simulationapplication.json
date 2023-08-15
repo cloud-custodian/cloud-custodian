@@ -1,6 +1,6 @@
 {
   "typeName": "AWS::RoboMaker::SimulationApplication",
-  "description": "An example resource schema demonstrating some basic constructs and validation rules.",
+  "description": "This schema is for testing purpose only.",
   "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git",
   "definitions": {
     "Arn": {
@@ -44,20 +44,21 @@
       "additionalProperties": false
     },
     "RobotSoftwareSuite": {
-      "description": "Information about a robot software suite (ROS distribution).",
+      "description": "Information about a robot software suite.",
       "type": "object",
       "properties": {
         "Name": {
           "type": "string",
-          "description": "The name of the robot software suite (ROS distribution).",
+          "description": "The name of the robot software suite.",
           "enum": [
             "ROS",
-            "ROS2"
+            "ROS2",
+            "General"
           ]
         },
         "Version": {
           "type": "string",
-          "description": "The version of the robot software suite (ROS distribution).",
+          "description": "The version of the robot software suite.",
           "enum": [
             "Kinetic",
             "Melodic",
@@ -67,8 +68,7 @@
         }
       },
       "required": [
-        "Name",
-        "Version"
+        "Name"
       ],
       "additionalProperties": false
     },
@@ -113,7 +113,8 @@
           "description": "The name of the simulation software suite.",
           "enum": [
             "Gazebo",
-            "RosbagPlay"
+            "RosbagPlay",
+            "SimulationRuntime"
           ]
         },
         "Version": {
@@ -131,8 +132,7 @@
         }
       },
       "required": [
-        "Name",
-        "Version"
+        "Name"
       ],
       "additionalProperties": false
     }
@@ -157,7 +157,7 @@
       "$ref": "#/definitions/RenderingEngine"
     },
     "RobotSoftwareSuite": {
-      "description": "The robot software suite (ROS distribution) used by the simulation application.",
+      "description": "The robot software suite used by the simulation application.",
       "$ref": "#/definitions/RobotSoftwareSuite"
     },
     "SimulationSoftwareSuite": {
@@ -187,6 +187,12 @@
   ],
   "readOnlyProperties": [
     "/properties/Arn"
+  ],
+  "writeOnlyProperties": [
+    "/properties/RenderingEngine",
+    "/properties/RobotSoftwareSuite/Version",
+    "/properties/Sources",
+    "/properties/SimulationSoftwareSuite/Version"
   ],
   "createOnlyProperties": [
     "/properties/Name"

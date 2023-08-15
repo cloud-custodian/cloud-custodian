@@ -1,0 +1,190 @@
+{
+  "typeName": "AWS::Wisdom::KnowledgeBase",
+  "description": "Definition of AWS::Wisdom::KnowledgeBase Resource Type",
+  "definitions": {
+    "AppIntegrationsConfiguration": {
+      "type": "object",
+      "properties": {
+        "ObjectFields": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "maxLength": 4096,
+            "minLength": 1
+          },
+          "insertionOrder": false,
+          "maxItems": 100,
+          "minItems": 1
+        },
+        "AppIntegrationArn": {
+          "type": "string",
+          "maxLength": 2048,
+          "minLength": 1,
+          "pattern": "^arn:[a-z-]+?:[a-z-]+?:[a-z0-9-]*?:([0-9]{12})?:[a-zA-Z0-9-:/]+$"
+        }
+      },
+      "required": [
+        "AppIntegrationArn"
+      ],
+      "additionalProperties": false
+    },
+    "KnowledgeBaseType": {
+      "type": "string",
+      "enum": [
+        "EXTERNAL",
+        "CUSTOM"
+      ]
+    },
+    "RenderingConfiguration": {
+      "type": "object",
+      "properties": {
+        "TemplateUri": {
+          "type": "string",
+          "maxLength": 4096,
+          "minLength": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "ServerSideEncryptionConfiguration": {
+      "type": "object",
+      "properties": {
+        "KmsKeyId": {
+          "type": "string",
+          "maxLength": 4096,
+          "minLength": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "SourceConfiguration": {
+      "type": "object",
+      "properties": {
+        "AppIntegrations": {
+          "$ref": "#/definitions/AppIntegrationsConfiguration"
+        }
+      },
+      "oneOf": [
+        {
+          "required": [
+            "AppIntegrations"
+          ]
+        }
+      ],
+      "additionalProperties": false
+    },
+    "Tag": {
+      "additionalProperties": false,
+      "properties": {
+        "Key": {
+          "maxLength": 128,
+          "minLength": 1,
+          "pattern": "^(?!aws:)[a-zA-Z+-=._:/]+$",
+          "type": "string"
+        },
+        "Value": {
+          "maxLength": 256,
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "Key",
+        "Value"
+      ],
+      "type": "object"
+    }
+  },
+  "properties": {
+    "Description": {
+      "type": "string",
+      "maxLength": 255,
+      "minLength": 1
+    },
+    "KnowledgeBaseArn": {
+      "type": "string",
+      "pattern": "^arn:[a-z-]*?:wisdom:[a-z0-9-]*?:[0-9]{12}:[a-z-]*?/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}(?:/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})?$"
+    },
+    "KnowledgeBaseId": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$"
+    },
+    "KnowledgeBaseType": {
+      "$ref": "#/definitions/KnowledgeBaseType"
+    },
+    "Name": {
+      "type": "string",
+      "maxLength": 255,
+      "minLength": 1
+    },
+    "RenderingConfiguration": {
+      "$ref": "#/definitions/RenderingConfiguration"
+    },
+    "ServerSideEncryptionConfiguration": {
+      "$ref": "#/definitions/ServerSideEncryptionConfiguration"
+    },
+    "SourceConfiguration": {
+      "$ref": "#/definitions/SourceConfiguration"
+    },
+    "Tags": {
+      "insertionOrder": false,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/definitions/Tag"
+      },
+      "type": "array"
+    }
+  },
+  "required": [
+    "KnowledgeBaseType",
+    "Name"
+  ],
+  "readOnlyProperties": [
+    "/properties/KnowledgeBaseId",
+    "/properties/KnowledgeBaseArn"
+  ],
+  "createOnlyProperties": [
+    "/properties/Description",
+    "/properties/KnowledgeBaseType",
+    "/properties/Name",
+    "/properties/ServerSideEncryptionConfiguration",
+    "/properties/SourceConfiguration",
+    "/properties/Tags"
+  ],
+  "primaryIdentifier": [
+    "/properties/KnowledgeBaseId"
+  ],
+  "additionalIdentifiers": [
+    [
+      "/properties/KnowledgeBaseArn"
+    ]
+  ],
+  "additionalProperties": false,
+  "taggable": false,
+  "replacementStrategy": "delete_then_create",
+  "handlers": {
+    "create": {
+      "permissions": [
+        "wisdom:CreateKnowledgeBase"
+      ]
+    },
+    "update": {
+      "permissions": []
+    },
+    "delete": {
+      "permissions": [
+        "wisdom:DeleteKnowledgeBase"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "wisdom:ListKnowledgeBases"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "wisdom:GetKnowledgeBase"
+      ]
+    }
+  }
+}

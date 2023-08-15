@@ -29,7 +29,8 @@
       "type": "string"
     },
     "AmazonSideAsn": {
-      "type": "integer"
+      "type": "integer",
+      "format": "int64"
     },
     "TransitGatewayCidrBlocks": {
       "type": "array",

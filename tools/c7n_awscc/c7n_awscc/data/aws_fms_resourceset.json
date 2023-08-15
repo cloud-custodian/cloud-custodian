@@ -1,0 +1,147 @@
+{
+  "typeName": "AWS::FMS::ResourceSet",
+  "description": "Creates an AWS Firewall Manager resource set.",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-fms.git",
+  "definitions": {
+    "ResourceType": {
+      "description": "An AWS resource type",
+      "type": "string",
+      "pattern": "^([^\\s]*)$",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "Base62Id": {
+      "description": "A Base62 ID",
+      "type": "string",
+      "pattern": "^([a-z0-9A-Z]*)$",
+      "minLength": 22,
+      "maxLength": 22
+    },
+    "Tag": {
+      "description": "A tag.",
+      "type": "object",
+      "properties": {
+        "Key": {
+          "type": "string",
+          "pattern": "^([^\\s]*)$",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "Value": {
+          "type": "string",
+          "pattern": "^([^\\s]*)$",
+          "maxLength": 256
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "Key",
+        "Value"
+      ]
+    },
+    "Resource": {
+      "description": "A resource ARN or URI.",
+      "type": "string",
+      "pattern": "^([^\\s]*)$",
+      "minLength": 1,
+      "maxLength": 1024
+    }
+  },
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": true,
+    "tagProperty": "/properties/Tags"
+  },
+  "properties": {
+    "Id": {
+      "$ref": "#/definitions/Base62Id"
+    },
+    "Name": {
+      "type": "string",
+      "pattern": "^([a-zA-Z0-9_.:/=+\\-@\\s]+)$",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "Description": {
+      "type": "string",
+      "pattern": "^([a-zA-Z0-9_.:/=+\\-@\\s]*)$",
+      "maxLength": 256
+    },
+    "ResourceTypeList": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/ResourceType"
+      },
+      "insertionOrder": true,
+      "uniqueItems": true
+    },
+    "Resources": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Resource"
+      },
+      "insertionOrder": false,
+      "uniqueItems": true
+    },
+    "Tags": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Tag"
+      },
+      "insertionOrder": true,
+      "uniqueItems": true
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "Name",
+    "ResourceTypeList"
+  ],
+  "readOnlyProperties": [
+    "/properties/Id"
+  ],
+  "primaryIdentifier": [
+    "/properties/Id"
+  ],
+  "handlers": {
+    "create": {
+      "permissions": [
+        "fms:PutResourceSet",
+        "fms:BatchAssociateResource",
+        "fms:ListResourceSetResources",
+        "fms:TagResource"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "fms:PutResourceSet",
+        "fms:BatchAssociateResource",
+        "fms:BatchDisassociateResource",
+        "fms:GetResourceSet",
+        "fms:ListResourceSetResources",
+        "fms:TagResource",
+        "fms:UntagResource",
+        "fms:ListTagsForResource"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "fms:GetResourceSet",
+        "fms:ListResourceSetResources",
+        "fms:ListTagsForResource"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "fms:DeleteResourceSet"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "fms:ListResourceSets"
+      ]
+    }
+  }
+}

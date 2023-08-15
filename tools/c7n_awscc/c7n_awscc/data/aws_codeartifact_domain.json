@@ -92,6 +92,7 @@
     "create": {
       "permissions": [
         "codeartifact:CreateDomain",
+        "codeartifact:DescribeDomain",
         "codeartifact:PutDomainPermissionsPolicy",
         "codeartifact:GetDomainPermissionsPolicy",
         "codeartifact:TagResource"

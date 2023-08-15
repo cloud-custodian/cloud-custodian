@@ -162,6 +162,10 @@
           "description": ""
         }
       },
+      "required": [
+        "Destination",
+        "Enabled"
+      ],
       "additionalProperties": false
     },
     "AudioLogDestination": {
@@ -172,6 +176,9 @@
           "$ref": "#/definitions/S3BucketLogDestination"
         }
       },
+      "required": [
+        "S3Bucket"
+      ],
       "additionalProperties": false
     },
     "TextLogDestination": {
@@ -182,19 +189,22 @@
           "$ref": "#/definitions/CloudWatchLogGroupLogDestination"
         }
       },
+      "required": [
+        "CloudWatch"
+      ],
       "additionalProperties": false
     },
     "CloudWatchLogGroupLogDestination": {
       "type": "object",
       "properties": {
         "CloudWatchLogGroupArn": {
-          "description": "A string used to identify this tag",
+          "description": "A string used to identify the groupArn for the Cloudwatch Log Group",
           "type": "string",
           "minLength": 1,
           "maxLength": 2048
         },
         "LogPrefix": {
-          "description": "A string containing the value for the tag",
+          "description": "A string containing the value for the Log Prefix",
           "type": "string",
           "minLength": 0,
           "maxLength": 1024

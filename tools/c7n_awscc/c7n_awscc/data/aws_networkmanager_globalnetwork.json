@@ -56,6 +56,7 @@
       "permissions": [
         "networkmanager:CreateGlobalNetwork",
         "networkmanager:DescribeGlobalNetworks",
+        "networkmanager:TagResource",
         "iam:CreateServiceLinkedRole"
       ]
     },

@@ -1,0 +1,196 @@
+{
+  "typeName": "AWS::MediaTailor::SourceLocation",
+  "description": "Definition of AWS::MediaTailor::SourceLocation Resource Type",
+  "definitions": {
+    "AccessConfiguration": {
+      "type": "object",
+      "description": "<p>Access configuration parameters.</p>",
+      "properties": {
+        "AccessType": {
+          "$ref": "#/definitions/AccessType"
+        },
+        "SecretsManagerAccessTokenConfiguration": {
+          "$ref": "#/definitions/SecretsManagerAccessTokenConfiguration"
+        }
+      },
+      "additionalProperties": false
+    },
+    "AccessType": {
+      "type": "string",
+      "enum": [
+        "S3_SIGV4",
+        "SECRETS_MANAGER_ACCESS_TOKEN"
+      ]
+    },
+    "DefaultSegmentDeliveryConfiguration": {
+      "type": "object",
+      "description": "<p>The optional configuration for a server that serves segments. Use this if you want the segment delivery server to be different from the source location server. For example, you can configure your source location server to be an origination server, such as MediaPackage, and the segment delivery server to be a content delivery network (CDN), such as CloudFront. If you don't specify a segment delivery server, then the source location server is used.</p>",
+      "properties": {
+        "BaseUrl": {
+          "type": "string",
+          "description": "<p>The hostname of the server that will be used to serve segments. This string must include the protocol, such as <b>https://</b>.</p>"
+        }
+      },
+      "additionalProperties": false
+    },
+    "HttpConfiguration": {
+      "type": "object",
+      "description": "<p>The HTTP configuration for the source location.</p>",
+      "properties": {
+        "BaseUrl": {
+          "type": "string",
+          "description": "<p>The base URL for the source location host server. This string must include the protocol, such as <b>https://</b>.</p>"
+        }
+      },
+      "required": [
+        "BaseUrl"
+      ],
+      "additionalProperties": false
+    },
+    "SecretsManagerAccessTokenConfiguration": {
+      "type": "object",
+      "description": "<p>AWS Secrets Manager access token configuration parameters. For information about Secrets Manager access token authentication, see <a href=\"https://docs.aws.amazon.com/mediatailor/latest/ug/channel-assembly-access-configuration-access-token.html\">Working with AWS Secrets Manager access token authentication</a>.</p>",
+      "properties": {
+        "HeaderName": {
+          "type": "string",
+          "description": "<p>The name of the HTTP header used to supply the access token in requests to the source location.</p>"
+        },
+        "SecretArn": {
+          "type": "string",
+          "description": "<p>The Amazon Resource Name (ARN) of the AWS Secrets Manager secret that contains the access token.</p>"
+        },
+        "SecretStringKey": {
+          "type": "string",
+          "description": "<p>The AWS Secrets Manager <a href=\"https://docs.aws.amazon.com/secretsmanager/latest/apireference/API_CreateSecret.html#SecretsManager-CreateSecret-request-SecretString.html\">SecretString</a> key associated with the access token. MediaTailor uses the key to look up SecretString key and value pair containing the access token.</p>"
+        }
+      },
+      "additionalProperties": false
+    },
+    "SegmentDeliveryConfiguration": {
+      "type": "object",
+      "description": "<p>The segment delivery configuration settings.</p>",
+      "properties": {
+        "BaseUrl": {
+          "type": "string",
+          "description": "<p>The base URL of the host or path of the segment delivery server that you're using to serve segments. This is typically a content delivery network (CDN). The URL can be absolute or relative. To use an absolute URL include the protocol, such as <code>https://example.com/some/path</code>. To use a relative URL specify the relative path, such as <code>/some/path*</code>.</p>"
+        },
+        "Name": {
+          "type": "string",
+          "description": "<p>A unique identifier used to distinguish between multiple segment delivery configurations in a source location.</p>"
+        }
+      },
+      "additionalProperties": false
+    },
+    "Tag": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Key": {
+          "type": "string"
+        },
+        "Value": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "Value",
+        "Key"
+      ]
+    }
+  },
+  "properties": {
+    "AccessConfiguration": {
+      "$ref": "#/definitions/AccessConfiguration"
+    },
+    "Arn": {
+      "type": "string",
+      "description": "<p>The ARN of the source location.</p>"
+    },
+    "DefaultSegmentDeliveryConfiguration": {
+      "$ref": "#/definitions/DefaultSegmentDeliveryConfiguration"
+    },
+    "HttpConfiguration": {
+      "$ref": "#/definitions/HttpConfiguration"
+    },
+    "SegmentDeliveryConfigurations": {
+      "type": "array",
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/SegmentDeliveryConfiguration"
+      },
+      "description": "<p>A list of the segment delivery configurations associated with this resource.</p>"
+    },
+    "SourceLocationName": {
+      "type": "string"
+    },
+    "Tags": {
+      "description": "The tags to assign to the source location.",
+      "type": "array",
+      "uniqueItems": true,
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/Tag"
+      }
+    }
+  },
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": false,
+    "tagProperty": "/properties/Tags"
+  },
+  "required": [
+    "HttpConfiguration",
+    "SourceLocationName"
+  ],
+  "readOnlyProperties": [
+    "/properties/Arn"
+  ],
+  "createOnlyProperties": [
+    "/properties/SourceLocationName"
+  ],
+  "primaryIdentifier": [
+    "/properties/SourceLocationName"
+  ],
+  "handlers": {
+    "create": {
+      "permissions": [
+        "mediatailor:CreateSourceLocation",
+        "mediatailor:DescribeSourceLocation",
+        "mediatailor:TagResource",
+        "secretsmanager:DescribeSecret",
+        "secretsmanager:GetSecretValue",
+        "kms:CreateGrant"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "mediatailor:DescribeSourceLocation"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "mediatailor:DescribeSourceLocation",
+        "mediatailor:TagResource",
+        "mediatailor:UntagResource",
+        "mediatailor:UpdateSourceLocation",
+        "secretsmanager:DescribeSecret",
+        "secretsmanager:GetSecretValue",
+        "kms:CreateGrant"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "mediatailor:DeleteSourceLocation",
+        "mediatailor:DescribeSourceLocation"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "mediatailor:ListSourceLocations"
+      ]
+    }
+  },
+  "additionalProperties": false
+}

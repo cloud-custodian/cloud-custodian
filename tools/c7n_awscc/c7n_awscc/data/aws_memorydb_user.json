@@ -10,22 +10,21 @@
       "additionalProperties": false,
       "properties": {
         "Key": {
-          "description": "The key name of the tag. You can specify a value that is 1 to 128 Unicode characters in length and cannot be prefixed with aws: or memorydb:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.",
+          "description": "The key name of the tag. You can specify a value that is 1 to 128 Unicode characters in length and cannot be prefixed with 'aws:'. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.",
           "type": "string",
-          "pattern": "^(?!aws:)(?!memorydb:)[a-zA-Z0-9 _\\.\\/=+:\\-@]{1,128}$",
+          "pattern": "^(?!aws:)[a-zA-Z0-9 _\\.\\/=+:\\-@]*$",
           "minLength": 1,
           "maxLength": 128
         },
         "Value": {
-          "description": "The value for the tag. You can specify a value that is 1 to 256 Unicode characters in length and cannot be prefixed with aws: or memorydb:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.",
+          "description": "The value for the tag. You can specify a value that is 0 to 256 Unicode characters in length. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.",
           "type": "string",
-          "pattern": "^(?!aws:)(?!memorydb:)[a-zA-Z0-9 _\\.\\/=+:\\-@]{1,256}$",
-          "minLength": 1,
+          "pattern": "^[a-zA-Z0-9 _\\.\\/=+:\\-@]*$",
+          "minLength": 0,
           "maxLength": 256
         }
       },
       "required": [
-        "Value",
         "Key"
       ]
     }
@@ -51,7 +50,8 @@
           "type": "string",
           "description": "Type of authentication strategy for this user.",
           "enum": [
-            "password"
+            "password",
+            "iam"
           ]
         },
         "Passwords": {
@@ -86,9 +86,7 @@
   },
   "additionalProperties": false,
   "required": [
-    "UserName",
-    "AccessString",
-    "AuthenticationMode"
+    "UserName"
   ],
   "readOnlyProperties": [
     "/properties/Status",
@@ -109,6 +107,7 @@
       "permissions": [
         "memorydb:CreateUser",
         "memorydb:DescribeUsers",
+        "memorydb:TagResource",
         "memorydb:ListTags"
       ]
     },

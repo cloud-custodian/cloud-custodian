@@ -18,22 +18,30 @@
           "type": "string"
         },
         "IAMAuth": {
-          "description": "Whether to require or disallow AWS Identity and Access Management (IAM) authentication for connections to the proxy. ",
+          "description": "Whether to require or disallow Amazon Web Services Identity and Access Management (IAM) authentication for connections to the proxy. The ENABLED value is valid only for proxies with RDS for Microsoft SQL Server.",
           "type": "string",
           "enum": [
             "DISABLED",
-            "REQUIRED"
+            "REQUIRED",
+            "ENABLED"
           ]
         },
         "SecretArn": {
           "description": "The Amazon Resource Name (ARN) representing the secret that the proxy uses to authenticate to the RDS DB instance or Aurora DB cluster. These secrets are stored within Amazon Secrets Manager. ",
           "type": "string"
         },
-        "UserName": {
-          "description": "The name of the database user to which the proxy connects.",
-          "type": "string"
+        "ClientPasswordAuthType": {
+          "description": "The type of authentication the proxy uses for connections from clients.",
+          "type": "string",
+          "enum": [
+            "MYSQL_NATIVE_PASSWORD",
+            "POSTGRES_SCRAM_SHA_256",
+            "POSTGRES_MD5",
+            "SQL_SERVER_AUTHENTICATION"
+          ]
         }
-      }
+      },
+      "additionalProperties": false
     },
     "TagFormat": {
       "type": "object",
@@ -48,13 +56,15 @@
           "pattern": "(\\w|\\d|\\s|\\\\|-|\\.:=+-)*",
           "maxLength": 128
         }
-      }
+      },
+      "additionalProperties": false
     }
   },
   "properties": {
     "Auth": {
       "description": "The authorization mechanism that the proxy uses.",
       "type": "array",
+      "insertionOrder": false,
       "minItems": 1,
       "items": {
         "$ref": "#/definitions/AuthFormat"
@@ -83,7 +93,8 @@
       "type": "string",
       "enum": [
         "MYSQL",
-        "POSTGRESQL"
+        "POSTGRESQL",
+        "SQLSERVER"
       ]
     },
     "IdleClientTimeout": {
@@ -101,13 +112,19 @@
     "Tags": {
       "description": "An optional set of key-value pairs to associate arbitrary data of your choosing with the proxy.",
       "type": "array",
+      "insertionOrder": false,
       "items": {
         "$ref": "#/definitions/TagFormat"
       }
     },
+    "VpcId": {
+      "description": "VPC ID to associate with the new DB proxy.",
+      "type": "string"
+    },
     "VpcSecurityGroupIds": {
       "description": "VPC security group IDs to associate with the new proxy.",
       "type": "array",
+      "insertionOrder": false,
       "minItems": 1,
       "items": {
         "type": "string"
@@ -116,6 +133,7 @@
     "VpcSubnetIds": {
       "description": "VPC subnet IDs to associate with the new proxy.",
       "type": "array",
+      "insertionOrder": false,
       "minItems": 2,
       "items": {
         "type": "string"
@@ -132,7 +150,8 @@
   ],
   "readOnlyProperties": [
     "/properties/DBProxyArn",
-    "/properties/Endpoint"
+    "/properties/Endpoint",
+    "/properties/VpcId"
   ],
   "createOnlyProperties": [
     "/properties/DBProxyName",

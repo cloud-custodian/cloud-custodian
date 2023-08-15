@@ -29,7 +29,8 @@
       "required": [
         "Filter",
         "RuleName"
-      ]
+      ],
+      "additionalProperties": false
     },
     "Filter": {
       "type": "object",
@@ -64,7 +65,8 @@
       },
       "required": [
         "Property"
-      ]
+      ],
+      "additionalProperties": false
     },
     "Tag": {
       "description": "A key-value pair to associate with a resource.",
@@ -86,7 +88,8 @@
       "required": [
         "Key",
         "Value"
-      ]
+      ],
+      "additionalProperties": false
     }
   },
   "properties": {

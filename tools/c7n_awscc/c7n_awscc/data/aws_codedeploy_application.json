@@ -1,0 +1,88 @@
+{
+  "typeName": "AWS::CodeDeploy::Application",
+  "description": "The AWS::CodeDeploy::Application resource creates an AWS CodeDeploy application",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git",
+  "properties": {
+    "ApplicationName": {
+      "description": "A name for the application. If you don't specify a name, AWS CloudFormation generates a unique physical ID and uses that ID for the application name.",
+      "type": "string"
+    },
+    "ComputePlatform": {
+      "description": "The compute platform that CodeDeploy deploys the application to.",
+      "type": "string"
+    },
+    "Tags": {
+      "description": "The metadata that you apply to CodeDeploy applications to help you organize and categorize them. Each tag consists of a key and an optional value, both of which you define. ",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Tag"
+      },
+      "insertionOrder": false,
+      "uniqueItems": false
+    }
+  },
+  "definitions": {
+    "Tag": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Value": {
+          "type": "string"
+        },
+        "Key": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "Value",
+        "Key"
+      ]
+    }
+  },
+  "additionalProperties": false,
+  "createOnlyProperties": [
+    "/properties/ApplicationName",
+    "/properties/ComputePlatform"
+  ],
+  "primaryIdentifier": [
+    "/properties/ApplicationName"
+  ],
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": false,
+    "tagProperty": "/properties/Tags"
+  },
+  "handlers": {
+    "create": {
+      "permissions": [
+        "codedeploy:CreateApplication",
+        "codedeploy:TagResource"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "codedeploy:GetApplication",
+        "codedeploy:ListTagsForResource"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "codedeploy:GetApplication",
+        "codedeploy:DeleteApplication"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "codedeploy:TagResource",
+        "codedeploy:UntagResource"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "codedeploy:ListApplications"
+      ]
+    }
+  }
+}

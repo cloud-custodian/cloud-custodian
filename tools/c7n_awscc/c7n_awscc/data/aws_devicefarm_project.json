@@ -1,0 +1,146 @@
+{
+  "typeName": "AWS::DeviceFarm::Project",
+  "description": "AWS::DeviceFarm::Project creates a new Device Farm Project",
+  "properties": {
+    "DefaultJobTimeoutMinutes": {
+      "type": "integer",
+      "minimum": 5,
+      "maximum": 150
+    },
+    "Name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "Arn": {
+      "type": "string",
+      "minLength": 32,
+      "maxLength": 1011,
+      "pattern": "^arn:.+"
+    },
+    "VpcConfig": {
+      "$ref": "#/definitions/VpcConfig"
+    },
+    "Tags": {
+      "type": "array",
+      "uniqueItems": false,
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/Tag"
+      }
+    }
+  },
+  "definitions": {
+    "VpcConfig": {
+      "description": "The VPC security groups and subnets that are attached to a project",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "SecurityGroupIds": {
+          "type": "array",
+          "description": "An array of security group Ids in your Amazon VPC",
+          "insertionOrder": false,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4096,
+            "pattern": "^sg-[0-9a-fA-F]{8,}$"
+          },
+          "minItems": 1,
+          "maxItems": 5
+        },
+        "SubnetIds": {
+          "type": "array",
+          "description": "A array of subnet IDs in your Amazon VPC.",
+          "insertionOrder": false,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4096,
+            "pattern": "^subnet-[0-9a-fA-F]{8,}$"
+          },
+          "minItems": 1,
+          "maxItems": 8
+        },
+        "VpcId": {
+          "type": "string",
+          "description": "The ID of the Amazon VPC",
+          "minLength": 1,
+          "maxLength": 4096,
+          "pattern": ".*\\S.*"
+        }
+      },
+      "required": [
+        "SecurityGroupIds",
+        "SubnetIds",
+        "VpcId"
+      ]
+    },
+    "Tag": {
+      "type": "object",
+      "additionalProperties": false,
+      "insertionOrder": false,
+      "properties": {
+        "Key": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "Value": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        }
+      },
+      "required": [
+        "Key",
+        "Value"
+      ]
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "Name"
+  ],
+  "primaryIdentifier": [
+    "/properties/Arn"
+  ],
+  "readOnlyProperties": [
+    "/properties/Arn"
+  ],
+  "tagging": {
+    "taggable": true
+  },
+  "handlers": {
+    "create": {
+      "permissions": [
+        "devicefarm:CreateProject",
+        "devicefarm:TagResource"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "devicefarm:GetProject",
+        "devicefarm:ListTagsForResource"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "devicefarm:UpdateProject",
+        "devicefarm:TagResource",
+        "devicefarm:UntagResource",
+        "devicefarm:ListTagsForResource"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "devicefarm:DeleteProject"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "devicefarm:ListProjects"
+      ]
+    }
+  }
+}

@@ -196,17 +196,23 @@
       "permissions": [
         "route53-recovery-control-config:CreateSafetyRule",
         "route53-recovery-control-config:DescribeControlPanel",
-        "route53-recovery-control-config:DescribeRoutingControl"
+        "route53-recovery-control-config:DescribeRoutingControl",
+        "route53-recovery-control-config:ListTagsForResource",
+        "route53-recovery-control-config:TagResource"
       ]
     },
     "read": {
       "permissions": [
-        "route53-recovery-control-config:DescribeSafetyRule"
+        "route53-recovery-control-config:DescribeSafetyRule",
+        "route53-recovery-control-config:ListTagsForResource"
       ]
     },
     "update": {
       "permissions": [
-        "route53-recovery-control-config:UpdateSafetyRule"
+        "route53-recovery-control-config:UpdateSafetyRule",
+        "route53-recovery-control-config:ListTagsForResource",
+        "route53-recovery-control-config:TagResource",
+        "route53-recovery-control-config:UntagResource"
       ]
     },
     "delete": {

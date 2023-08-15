@@ -1,0 +1,129 @@
+{
+  "typeName": "AWS::ApiGatewayV2::Route",
+  "description": "Resource Type definition for AWS::ApiGatewayV2::Route",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-apigatewayv2",
+  "additionalProperties": false,
+  "properties": {
+    "RouteId": {
+      "type": "string"
+    },
+    "RouteResponseSelectionExpression": {
+      "type": "string"
+    },
+    "RequestModels": {
+      "type": "object"
+    },
+    "OperationName": {
+      "type": "string"
+    },
+    "AuthorizationScopes": {
+      "type": "array",
+      "uniqueItems": false,
+      "items": {
+        "type": "string"
+      }
+    },
+    "ApiKeyRequired": {
+      "type": "boolean"
+    },
+    "RouteKey": {
+      "type": "string"
+    },
+    "AuthorizationType": {
+      "type": "string"
+    },
+    "ModelSelectionExpression": {
+      "type": "string"
+    },
+    "ApiId": {
+      "type": "string"
+    },
+    "RequestParameters": {
+      "type": "object",
+      "items": {
+        "$ref": "#/definitions/ParameterConstraints"
+      }
+    },
+    "Target": {
+      "type": "string"
+    },
+    "AuthorizerId": {
+      "type": "string"
+    }
+  },
+  "definitions": {
+    "ParameterConstraints": {
+      "type": "object",
+      "properties": {
+        "Required": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "Required"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "RouteKey",
+    "ApiId"
+  ],
+  "createOnlyProperties": [
+    "/properties/ApiId"
+  ],
+  "primaryIdentifier": [
+    "/properties/ApiId",
+    "/properties/RouteId"
+  ],
+  "readOnlyProperties": [
+    "/properties/RouteId"
+  ],
+  "writeOnlyProperties": [
+    "/properties/AuthorizerId",
+    "/properties/RequestParameters"
+  ],
+  "tagging": {
+    "taggable": false
+  },
+  "handlers": {
+    "create": {
+      "permissions": [
+        "apigateway:POST"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "apigateway:PATCH",
+        "apigateway:GET",
+        "apigateway:PUT"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "apigateway:GET"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "apigateway:GET",
+        "apigateway:DELETE"
+      ]
+    },
+    "list": {
+      "handlerSchema": {
+        "properties": {
+          "ApiId": {
+            "$ref": "resource-schema.json#/properties/ApiId"
+          }
+        },
+        "required": [
+          "ApiId"
+        ]
+      },
+      "permissions": [
+        "apigateway:GET"
+      ]
+    }
+  }
+}

@@ -181,8 +181,10 @@
     },
     "update": {
       "permissions": [
+        "ecr:DescribeRepositories",
         "ecr:PutLifecyclePolicy",
         "ecr:SetRepositoryPolicy",
+        "ecr:ListTagsForResource",
         "ecr:TagResource",
         "ecr:UntagResource",
         "ecr:DeleteLifecyclePolicy",

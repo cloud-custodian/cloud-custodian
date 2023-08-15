@@ -1,0 +1,227 @@
+{
+  "typeName": "AWS::NetworkManager::VpcAttachment",
+  "description": "AWS::NetworkManager::VpcAttachment Resoruce Type",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-networkmanager/aws-networkmanager-vpcattachment",
+  "properties": {
+    "CoreNetworkId": {
+      "description": "The ID of a core network for the VPC attachment.",
+      "type": "string"
+    },
+    "CoreNetworkArn": {
+      "description": "The ARN of a core network for the VPC attachment.",
+      "type": "string"
+    },
+    "AttachmentId": {
+      "description": "Id of the attachment.",
+      "type": "string"
+    },
+    "OwnerAccountId": {
+      "description": "Owner account of the attachment.",
+      "type": "string"
+    },
+    "AttachmentType": {
+      "description": "Attachment type.",
+      "type": "string"
+    },
+    "State": {
+      "description": "State of the attachment.",
+      "type": "string"
+    },
+    "EdgeLocation": {
+      "description": "The Region where the edge is located.",
+      "type": "string"
+    },
+    "VpcArn": {
+      "description": "The ARN of the VPC.",
+      "type": "string"
+    },
+    "ResourceArn": {
+      "description": "The ARN of the Resource.",
+      "type": "string"
+    },
+    "AttachmentPolicyRuleNumber": {
+      "description": "The policy rule number associated with the attachment.",
+      "type": "integer"
+    },
+    "SegmentName": {
+      "description": "The name of the segment attachment..",
+      "type": "string"
+    },
+    "ProposedSegmentChange": {
+      "description": "The attachment to move from one segment to another.",
+      "$ref": "#/definitions/ProposedSegmentChange"
+    },
+    "Tags": {
+      "description": "Tags for the attachment.",
+      "type": "array",
+      "uniqueItems": true,
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/Tag"
+      }
+    },
+    "CreatedAt": {
+      "description": "Creation time of the attachment.",
+      "type": "string"
+    },
+    "UpdatedAt": {
+      "description": "Last update time of the attachment.",
+      "type": "string"
+    },
+    "SubnetArns": {
+      "description": "Subnet Arn list",
+      "type": "array",
+      "insertionOrder": false,
+      "items": {
+        "type": "string"
+      }
+    },
+    "Options": {
+      "description": "Vpc options of the attachment.",
+      "$ref": "#/definitions/VpcOptions"
+    }
+  },
+  "definitions": {
+    "VpcOptions": {
+      "description": "Vpc options of the attachment.",
+      "type": "object",
+      "properties": {
+        "Ipv6Support": {
+          "description": "Indicates whether to enable Ipv6 Support for Vpc Attachment. Valid Values: enable | disable",
+          "type": "boolean",
+          "default": false
+        },
+        "ApplianceModeSupport": {
+          "description": "Indicates whether to enable ApplianceModeSupport Support for Vpc Attachment. Valid Values: true | false",
+          "type": "boolean",
+          "default": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "Tag": {
+      "description": "A key-value pair to associate with a resource.",
+      "type": "object",
+      "properties": {
+        "Key": {
+          "type": "string",
+          "description": "The key name of the tag. You can specify a value that is 1 to 128 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -."
+        },
+        "Value": {
+          "type": "string",
+          "description": "The value for the tag. You can specify a value that is 0 to 256 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -."
+        }
+      },
+      "required": [
+        "Key",
+        "Value"
+      ],
+      "additionalProperties": false
+    },
+    "ProposedSegmentChange": {
+      "description": "The attachment to move from one segment to another.",
+      "type": "object",
+      "properties": {
+        "Tags": {
+          "description": "The key-value tags that changed for the segment.",
+          "type": "array",
+          "uniqueItems": true,
+          "insertionOrder": false,
+          "items": {
+            "$ref": "#/definitions/Tag"
+          }
+        },
+        "AttachmentPolicyRuleNumber": {
+          "description": "The rule number in the policy document that applies to this change.",
+          "type": "integer"
+        },
+        "SegmentName": {
+          "description": "The name of the segment to change.",
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": false,
+    "tagProperty": "/properties/Tags"
+  },
+  "additionalProperties": false,
+  "required": [
+    "CoreNetworkId",
+    "VpcArn",
+    "SubnetArns"
+  ],
+  "createOnlyProperties": [
+    "/properties/CoreNetworkId",
+    "/properties/VpcArn"
+  ],
+  "readOnlyProperties": [
+    "/properties/CoreNetworkArn",
+    "/properties/CreatedAt",
+    "/properties/UpdatedAt",
+    "/properties/AttachmentType",
+    "/properties/State",
+    "/properties/AttachmentId",
+    "/properties/OwnerAccountId",
+    "/properties/EdgeLocation",
+    "/properties/AttachmentPolicyRuleNumber",
+    "/properties/SegmentName",
+    "/properties/ResourceArn"
+  ],
+  "primaryIdentifier": [
+    "/properties/AttachmentId"
+  ],
+  "additionalIdentifiers": [
+    [
+      "/properties/CoreNetworkId",
+      "/properties/VpcArn"
+    ]
+  ],
+  "handlers": {
+    "create": {
+      "permissions": [
+        "networkmanager:CreateVpcAttachment",
+        "networkmanager:GetVpcAttachment",
+        "networkmanager:TagResource",
+        "ec2:DescribeRegions",
+        "iam:CreateServiceLinkedRole"
+      ],
+      "timeoutInMinutes": 60
+    },
+    "read": {
+      "permissions": [
+        "networkmanager:GetVpcAttachment"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "networkmanager:UpdateVpcAttachment",
+        "networkmanager:GetVpcAttachment",
+        "networkmanager:ListTagsForResource",
+        "networkmanager:TagResource",
+        "networkmanager:UntagResource",
+        "ec2:DescribeRegions"
+      ],
+      "timeoutInMinutes": 60
+    },
+    "delete": {
+      "permissions": [
+        "networkmanager:DeleteAttachment",
+        "networkmanager:GetVpcAttachment",
+        "networkmanager:UntagResource",
+        "ec2:DescribeRegions"
+      ],
+      "timeoutInMinutes": 60
+    },
+    "list": {
+      "permissions": [
+        "networkmanager:ListAttachments"
+      ]
+    }
+  }
+}

@@ -1,0 +1,177 @@
+{
+  "typeName": "AWS::Organizations::Policy",
+  "description": "Policies in AWS Organizations enable you to manage different features of the AWS accounts in your organization.  You can use policies when all features are enabled in your organization.",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-organizations",
+  "properties": {
+    "Name": {
+      "description": "Name of the Policy",
+      "type": "string",
+      "pattern": "[\\s\\S]*",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "Type": {
+      "description": "The type of policy to create. You can specify one of the following values: AISERVICES_OPT_OUT_POLICY, BACKUP_POLICY, SERVICE_CONTROL_POLICY, TAG_POLICY",
+      "type": "string",
+      "enum": [
+        "SERVICE_CONTROL_POLICY",
+        "AISERVICES_OPT_OUT_POLICY",
+        "BACKUP_POLICY",
+        "TAG_POLICY"
+      ]
+    },
+    "Content": {
+      "description": "The Policy text content. For AWS CloudFormation templates formatted in YAML, you can provide the policy in JSON or YAML format. AWS CloudFormation always converts a YAML policy to JSON format before submitting it.",
+      "type": [
+        "object",
+        "string"
+      ],
+      "pattern": "[\\s\\S]*",
+      "minLength": 1,
+      "maxLength": 1000000
+    },
+    "Description": {
+      "description": "Human readable description of the policy",
+      "pattern": "[\\s\\S]*",
+      "type": "string",
+      "maxLength": 512
+    },
+    "TargetIds": {
+      "description": "List of unique identifiers (IDs) of the root, OU, or account that you want to attach the policy to",
+      "type": "array",
+      "insertionOrder": false,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^(r-[0-9a-z]{4,32})|(\\d{12})|(ou-[0-9a-z]{4,32}-[a-z0-9]{8,32})$"
+      }
+    },
+    "Tags": {
+      "description": "A list of tags that you want to attach to the newly created policy. For each tag in the list, you must specify both a tag key and a value. You can set the value to an empty string, but you can't set it to null.",
+      "type": "array",
+      "uniqueItems": true,
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/Tag"
+      }
+    },
+    "Id": {
+      "description": "Id of the Policy",
+      "type": "string",
+      "pattern": "^p-[0-9a-zA-Z_]{8,128}$",
+      "maxLength": 130
+    },
+    "Arn": {
+      "description": "ARN of the Policy",
+      "type": "string",
+      "pattern": "^arn:aws.*:organizations::[0-9]{12}:policy/o-[a-z0-9]{10}/(service_control|tag|backup|aiservices_opt_out)_policy/p-[a-z0-9]{8}"
+    },
+    "AwsManaged": {
+      "description": "A boolean value that indicates whether the specified policy is an AWS managed policy. If true, then you can attach the policy to roots, OUs, or accounts, but you cannot edit it.",
+      "type": "boolean"
+    }
+  },
+  "definitions": {
+    "Tag": {
+      "description": "A custom key-value pair associated with a resource within your organization.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Key": {
+          "description": "The key identifier, or name, of the tag.",
+          "type": "string",
+          "pattern": "[\\s\\S]*",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "Value": {
+          "description": "The string value that's associated with the key of the tag. You can set the value of a tag to an empty string, but you can't set the value of a tag to null.",
+          "type": "string",
+          "pattern": "[\\s\\S]*",
+          "minLength": 0,
+          "maxLength": 256
+        }
+      },
+      "required": [
+        "Value",
+        "Key"
+      ]
+    }
+  },
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": false,
+    "tagProperty": "/properties/Tags"
+  },
+  "required": [
+    "Name",
+    "Type",
+    "Content"
+  ],
+  "primaryIdentifier": [
+    "/properties/Id"
+  ],
+  "readOnlyProperties": [
+    "/properties/Id",
+    "/properties/Arn",
+    "/properties/AwsManaged"
+  ],
+  "createOnlyProperties": [
+    "/properties/Type"
+  ],
+  "additionalProperties": false,
+  "handlers": {
+    "create": {
+      "permissions": [
+        "organizations:CreatePolicy",
+        "organizations:DescribePolicy",
+        "organizations:AttachPolicy",
+        "organizations:ListTagsForResource",
+        "organizations:ListTargetsForPolicy",
+        "organizations:TagResource"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "organizations:DescribePolicy",
+        "organizations:ListTargetsForPolicy",
+        "organizations:ListTagsForResource"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "organizations:AttachPolicy",
+        "organizations:DetachPolicy",
+        "organizations:UpdatePolicy",
+        "organizations:ListTagsForResource",
+        "organizations:ListTargetsForPolicy",
+        "organizations:TagResource",
+        "organizations:UntagResource",
+        "organizations:DescribePolicy"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "organizations:DetachPolicy",
+        "organizations:DeletePolicy"
+      ]
+    },
+    "list": {
+      "handlerSchema": {
+        "properties": {
+          "Type": {
+            "$ref": "resource-schema.json#/properties/Type"
+          }
+        },
+        "required": [
+          "Type"
+        ]
+      },
+      "permissions": [
+        "organizations:ListPolicies"
+      ]
+    }
+  }
+}

@@ -9,6 +9,12 @@
       "pattern": "arn:aws:appflow:.*:[0-9]+:.*",
       "maxLength": 512
     },
+    "ConnectorLabel": {
+      "description": "The label of the connector. The label is unique for each ConnectorRegistration in your AWS account. Only needed if calling for CUSTOMCONNECTOR connector type/.",
+      "type": "string",
+      "pattern": "[\\w!@#.-]+",
+      "maxLength": 256
+    },
     "ConnectorProfileName": {
       "description": "The maximum number of items to retrieve in a single batch.",
       "type": "string",
@@ -50,6 +56,7 @@
       "type": "string",
       "enum": [
         "Salesforce",
+        "Pardot",
         "Singular",
         "Slack",
         "Redshift",
@@ -64,15 +71,13 @@
         "Dynatrace",
         "Infornexus",
         "Amplitude",
-        "Veeva"
+        "Veeva",
+        "CustomConnector"
       ]
     },
     "ConnectorProfileConfig": {
       "description": "Connector specific configurations needed to create connector profile",
       "type": "object",
-      "required": [
-        "ConnectorProfileCredentials"
-      ],
       "properties": {
         "ConnectorProfileProperties": {
           "$ref": "#/definitions/ConnectorProfileProperties"
@@ -107,6 +112,9 @@
         "Salesforce": {
           "$ref": "#/definitions/SalesforceConnectorProfileProperties"
         },
+        "Pardot": {
+          "$ref": "#/definitions/PardotConnectorProfileProperties"
+        },
         "ServiceNow": {
           "$ref": "#/definitions/ServiceNowConnectorProfileProperties"
         },
@@ -121,6 +129,9 @@
         },
         "Zendesk": {
           "$ref": "#/definitions/ZendeskConnectorProfileProperties"
+        },
+        "CustomConnector": {
+          "$ref": "#/definitions/CustomConnectorProfileProperties"
         }
       }
     },
@@ -155,6 +166,9 @@
         "Salesforce": {
           "$ref": "#/definitions/SalesforceConnectorProfileCredentials"
         },
+        "Pardot": {
+          "$ref": "#/definitions/PardotConnectorProfileCredentials"
+        },
         "ServiceNow": {
           "$ref": "#/definitions/ServiceNowConnectorProfileCredentials"
         },
@@ -175,6 +189,9 @@
         },
         "Zendesk": {
           "$ref": "#/definitions/ZendeskConnectorProfileCredentials"
+        },
+        "CustomConnector": {
+          "$ref": "#/definitions/CustomConnectorProfileCredentials"
         }
       }
     },
@@ -354,10 +371,6 @@
     },
     "RedshiftConnectorProfileCredentials": {
       "type": "object",
-      "required": [
-        "Username",
-        "Password"
-      ],
       "properties": {
         "Username": {
           "description": "The name of the user.",
@@ -372,7 +385,6 @@
     "RedshiftConnectorProfileProperties": {
       "type": "object",
       "required": [
-        "DatabaseUrl",
         "BucketName",
         "RoleArn"
       ],
@@ -392,6 +404,26 @@
         "RoleArn": {
           "description": "The Amazon Resource Name (ARN) of the IAM role.",
           "$ref": "#/definitions/RoleArn"
+        },
+        "IsRedshiftServerless": {
+          "description": "If Amazon AppFlow will connect to Amazon Redshift Serverless or Amazon Redshift cluster.",
+          "type": "boolean"
+        },
+        "DataApiRoleArn": {
+          "description": "The Amazon Resource Name (ARN) of the IAM role that grants Amazon AppFlow access to the data through the Amazon Redshift Data API.",
+          "$ref": "#/definitions/DataApiRoleArn"
+        },
+        "ClusterIdentifier": {
+          "description": "The unique identifier of the Amazon Redshift cluster.",
+          "$ref": "#/definitions/ClusterIdentifier"
+        },
+        "WorkgroupName": {
+          "description": "The name of the Amazon Redshift serverless workgroup",
+          "$ref": "#/definitions/WorkgroupName"
+        },
+        "DatabaseName": {
+          "description": "The name of the Amazon Redshift database that will store the transferred data.",
+          "$ref": "#/definitions/DatabaseName"
         }
       }
     },
@@ -399,17 +431,7 @@
       "type": "object",
       "properties": {
         "BasicAuthCredentials": {
-          "type": "object",
-          "properties": {
-            "Username": {
-              "description": "The name of the user.",
-              "$ref": "#/definitions/Username"
-            },
-            "Password": {
-              "description": "The password that corresponds to the username.",
-              "$ref": "#/definitions/Password"
-            }
-          }
+          "$ref": "#/definitions/BasicAuthCredentials"
         },
         "OAuthCredentials": {
           "type": "object",
@@ -456,6 +478,10 @@
         },
         "OAuthProperties": {
           "$ref": "#/definitions/OAuthProperties"
+        },
+        "DisableSSO": {
+          "description": "If you set this parameter to true, Amazon AppFlow bypasses the single sign-on (SSO) settings in your SAP account when it accesses your SAP OData instance.",
+          "type": "boolean"
         }
       }
     },
@@ -477,6 +503,14 @@
         "ClientCredentialsArn": {
           "description": "The client credentials to fetch access token and refresh token.",
           "$ref": "#/definitions/ClientCredentialsArn"
+        },
+        "OAuth2GrantType": {
+          "description": "The grant types to fetch an access token",
+          "$ref": "#/definitions/OAuth2GrantType"
+        },
+        "JwtToken": {
+          "description": "The credentials used to access your Salesforce records",
+          "$ref": "#/definitions/JwtToken"
         }
       }
     },
@@ -488,7 +522,53 @@
           "$ref": "#/definitions/InstanceUrl"
         },
         "isSandboxEnvironment": {
+          "description": "Indicates whether the connector profile applies to a sandbox or production environment",
           "type": "boolean"
+        },
+        "usePrivateLinkForMetadataAndAuthorization": {
+          "description": "Indicates whether to make Metadata And Authorization calls over Pivate Network",
+          "type": "boolean"
+        }
+      }
+    },
+    "PardotConnectorProfileProperties": {
+      "type": "object",
+      "required": [
+        "BusinessUnitId"
+      ],
+      "properties": {
+        "InstanceUrl": {
+          "description": "The location of the Salesforce Pardot resource",
+          "$ref": "#/definitions/InstanceUrl"
+        },
+        "IsSandboxEnvironment": {
+          "description": "Indicates whether the connector profile applies to a demo or production environment",
+          "type": "boolean"
+        },
+        "BusinessUnitId": {
+          "description": "The Business unit id of Salesforce Pardot instance to be connected",
+          "$ref": "#/definitions/BusinessUnitId"
+        }
+      }
+    },
+    "PardotConnectorProfileCredentials": {
+      "type": "object",
+      "properties": {
+        "AccessToken": {
+          "description": "The credentials used to access protected resources.",
+          "$ref": "#/definitions/AccessToken"
+        },
+        "RefreshToken": {
+          "description": "The credentials used to acquire new access tokens.",
+          "$ref": "#/definitions/RefreshToken"
+        },
+        "ConnectorOAuthRequest": {
+          "description": "The oauth needed to request security tokens from the connector endpoint.",
+          "$ref": "#/definitions/ConnectorOAuthRequest"
+        },
+        "ClientCredentialsArn": {
+          "description": "The client credentials to fetch access token and refresh token.",
+          "$ref": "#/definitions/ClientCredentialsArn"
         }
       }
     },
@@ -703,6 +783,194 @@
         }
       }
     },
+    "CustomConnectorProfileCredentials": {
+      "type": "object",
+      "required": [
+        "AuthenticationType"
+      ],
+      "properties": {
+        "AuthenticationType": {
+          "$ref": "#/definitions/AuthenticationType"
+        },
+        "Basic": {
+          "$ref": "#/definitions/BasicAuthCredentials"
+        },
+        "Oauth2": {
+          "$ref": "#/definitions/OAuth2Credentials"
+        },
+        "ApiKey": {
+          "$ref": "#/definitions/ApiKeyCredentials"
+        },
+        "Custom": {
+          "$ref": "#/definitions/CustomAuthCredentials"
+        }
+      },
+      "additionalProperties": false
+    },
+    "CustomConnectorProfileProperties": {
+      "type": "object",
+      "properties": {
+        "ProfileProperties": {
+          "$ref": "#/definitions/ProfileProperties"
+        },
+        "OAuth2Properties": {
+          "$ref": "#/definitions/OAuth2Properties"
+        }
+      },
+      "additionalProperties": false
+    },
+    "ApiKeyCredentials": {
+      "type": "object",
+      "required": [
+        "ApiKey"
+      ],
+      "properties": {
+        "ApiKey": {
+          "$ref": "#/definitions/ApiKey"
+        },
+        "ApiSecretKey": {
+          "$ref": "#/definitions/ApiSecretKey"
+        }
+      },
+      "additionalProperties": false
+    },
+    "CustomAuthCredentials": {
+      "type": "object",
+      "required": [
+        "CustomAuthenticationType"
+      ],
+      "properties": {
+        "CustomAuthenticationType": {
+          "$ref": "#/definitions/CustomAuthenticationType"
+        },
+        "CredentialsMap": {
+          "$ref": "#/definitions/CredentialsMap"
+        }
+      },
+      "additionalProperties": false
+    },
+    "CredentialsMap": {
+      "description": "A map for properties for custom authentication.",
+      "type": "object",
+      "patternProperties": {
+        "^[\\w]{1,128}$": {
+          "description": "A string containing the value for the property",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2048,
+          "pattern": "\\S+"
+        }
+      },
+      "required": [],
+      "additionalProperties": false
+    },
+    "OAuth2Credentials": {
+      "type": "object",
+      "properties": {
+        "ClientId": {
+          "$ref": "#/definitions/ClientId"
+        },
+        "ClientSecret": {
+          "$ref": "#/definitions/ClientSecret"
+        },
+        "AccessToken": {
+          "$ref": "#/definitions/AccessToken"
+        },
+        "RefreshToken": {
+          "$ref": "#/definitions/RefreshToken"
+        },
+        "OAuthRequest": {
+          "$ref": "#/definitions/ConnectorOAuthRequest"
+        }
+      },
+      "additionalProperties": false
+    },
+    "BasicAuthCredentials": {
+      "type": "object",
+      "required": [
+        "Username",
+        "Password"
+      ],
+      "properties": {
+        "Username": {
+          "$ref": "#/definitions/Username"
+        },
+        "Password": {
+          "$ref": "#/definitions/Password"
+        }
+      },
+      "additionalProperties": false
+    },
+    "AuthenticationType": {
+      "type": "string",
+      "enum": [
+        "OAUTH2",
+        "APIKEY",
+        "BASIC",
+        "CUSTOM"
+      ]
+    },
+    "OAuth2Properties": {
+      "type": "object",
+      "properties": {
+        "TokenUrl": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 256,
+          "pattern": "^(https?)://[-a-zA-Z0-9+&amp;@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&amp;@#/%=~_|]"
+        },
+        "OAuth2GrantType": {
+          "$ref": "#/definitions/OAuth2GrantType"
+        },
+        "TokenUrlCustomProperties": {
+          "$ref": "#/definitions/TokenUrlCustomProperties"
+        }
+      },
+      "additionalProperties": false
+    },
+    "ProfileProperties": {
+      "description": "A map for properties for custom connector.",
+      "type": "object",
+      "patternProperties": {
+        "^[\\w]{1,256}$": {
+          "description": "A string containing the value for the property",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2048,
+          "pattern": "\\S+"
+        }
+      },
+      "required": [],
+      "additionalProperties": false
+    },
+    "OAuth2GrantType": {
+      "type": "string",
+      "enum": [
+        "CLIENT_CREDENTIALS",
+        "AUTHORIZATION_CODE",
+        "JWT_BEARER"
+      ]
+    },
+    "TokenUrlCustomProperties": {
+      "description": "A map for properties for custom connector Token Url.",
+      "type": "object",
+      "patternProperties": {
+        "^[\\w]{1,128}$": {
+          "description": "A string containing the value for the property",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2048,
+          "pattern": "\\S+"
+        }
+      },
+      "required": [],
+      "additionalProperties": false
+    },
+    "CustomAuthenticationType": {
+      "type": "string",
+      "pattern": "\\S+",
+      "maxLength": 256
+    },
     "ClientId": {
       "type": "string",
       "pattern": "\\S+",
@@ -721,7 +989,7 @@
     "AccessToken": {
       "type": "string",
       "pattern": "\\S+",
-      "maxLength": 512
+      "maxLength": 4096
     },
     "ApiKey": {
       "type": "string",
@@ -746,7 +1014,7 @@
     "AuthCode": {
       "type": "string",
       "pattern": "\\S+",
-      "maxLength": 512
+      "maxLength": 4096
     },
     "BucketName": {
       "type": "string",
@@ -773,6 +1041,26 @@
       "pattern": "arn:aws:iam:.*:[0-9]+:.*",
       "maxLength": 512
     },
+    "DataApiRoleArn": {
+      "type": "string",
+      "pattern": "arn:aws:iam:.*:[0-9]+:.*",
+      "maxLength": 512
+    },
+    "ClusterIdentifier": {
+      "type": "string",
+      "pattern": "\\S+",
+      "maxLength": 512
+    },
+    "WorkgroupName": {
+      "type": "string",
+      "pattern": "\\S+",
+      "maxLength": 512
+    },
+    "DatabaseName": {
+      "type": "string",
+      "pattern": "\\S+",
+      "maxLength": 512
+    },
     "Warehouse": {
       "type": "string",
       "pattern": "[\\s\\w/!@#+=.-]*",
@@ -781,7 +1069,7 @@
     "Stage": {
       "type": "string",
       "pattern": "\\S+",
-      "maxLength": 16
+      "maxLength": 512
     },
     "PrivateLinkServiceName": {
       "type": "string",
@@ -793,10 +1081,15 @@
       "pattern": "\\S+",
       "maxLength": 512
     },
+    "JwtToken": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9-_=]+\\.[A-Za-z0-9-_=]+\\.[A-Za-z0-9-_.+/=]*$",
+      "maxLength": 8000
+    },
     "RefreshToken": {
       "type": "string",
       "pattern": "\\S+",
-      "maxLength": 512
+      "maxLength": 4096
     },
     "Region": {
       "type": "string",
@@ -822,6 +1115,11 @@
       "type": "string",
       "pattern": "\\S+",
       "maxLength": 512
+    },
+    "BusinessUnitId": {
+      "type": "string",
+      "pattern": "\\S+",
+      "maxLength": 18
     },
     "ConnectorOAuthRequest": {
       "type": "object",
@@ -899,15 +1197,16 @@
   ],
   "createOnlyProperties": [
     "/properties/ConnectorProfileName",
-    "/properties/KMSArn",
-    "/properties/ConnectorType"
+    "/properties/ConnectorType",
+    "/properties/ConnectorLabel"
   ],
   "readOnlyProperties": [
     "/properties/ConnectorProfileArn",
     "/properties/CredentialsArn"
   ],
   "writeOnlyProperties": [
-    "/properties/ConnectorProfileConfig"
+    "/properties/ConnectorProfileConfig",
+    "/properties/KMSArn"
   ],
   "primaryIdentifier": [
     "/properties/ConnectorProfileName"
@@ -956,5 +1255,11 @@
         "secretsmanager:PutResourcePolicy"
       ]
     }
+  },
+  "tagging": {
+    "taggable": false,
+    "tagOnCreate": false,
+    "tagUpdatable": false,
+    "cloudFormationSystemTags": false
   }
 }

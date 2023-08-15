@@ -1,0 +1,153 @@
+{
+  "typeName": "AWS::IoT::ThingGroup",
+  "description": "Resource Type definition for AWS::IoT::ThingGroup",
+  "additionalProperties": false,
+  "properties": {
+    "Id": {
+      "type": "string"
+    },
+    "Arn": {
+      "type": "string"
+    },
+    "ThingGroupName": {
+      "type": "string",
+      "pattern": "[a-zA-Z0-9:_-]+",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "ParentGroupName": {
+      "type": "string",
+      "pattern": "[a-zA-Z0-9:_-]+",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "QueryString": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1000
+    },
+    "ThingGroupProperties": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "AttributePayload": {
+          "$ref": "#/definitions/AttributePayload"
+        },
+        "ThingGroupDescription": {
+          "type": "string",
+          "pattern": "[\\p{Graph}\\x20]*",
+          "maxLength": 2028
+        }
+      }
+    },
+    "Tags": {
+      "description": "An array of key-value pairs to apply to this resource.",
+      "type": "array",
+      "maxItems": 50,
+      "uniqueItems": true,
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/Tag"
+      }
+    }
+  },
+  "definitions": {
+    "AttributePayload": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Attributes": {
+          "type": "object",
+          "patternProperties": {
+            "[a-zA-Z0-9_.,@/:#-]+": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        }
+      }
+    },
+    "Tag": {
+      "description": "A key-value pair to associate with a resource.",
+      "type": "object",
+      "properties": {
+        "Key": {
+          "type": "string",
+          "description": "The key name of the tag. You can specify a value that is 1 to 128 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -. ",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^([\\p{L}\\p{Z}\\p{N}_.:/=+\\-@]*)$"
+        },
+        "Value": {
+          "type": "string",
+          "description": "The value for the tag. You can specify a value that is 1 to 256 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -. ",
+          "minLength": 1,
+          "maxLength": 256
+        }
+      },
+      "required": [
+        "Key",
+        "Value"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": true,
+    "tagProperty": "/properties/Tags"
+  },
+  "readOnlyProperties": [
+    "/properties/Arn",
+    "/properties/Id"
+  ],
+  "createOnlyProperties": [
+    "/properties/ThingGroupName",
+    "/properties/ParentGroupName"
+  ],
+  "primaryIdentifier": [
+    "/properties/ThingGroupName"
+  ],
+  "handlers": {
+    "create": {
+      "permissions": [
+        "iot:DescribeThingGroup",
+        "iot:ListTagsForResource",
+        "iot:CreateThingGroup",
+        "iot:CreateDynamicThingGroup",
+        "iot:TagResource"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "iot:DescribeThingGroup",
+        "iot:DeleteThingGroup",
+        "iot:DeleteDynamicThingGroup"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "iot:ListThingGroups",
+        "iot:ListTagsForResource"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "iot:DescribeThingGroup",
+        "iot:ListTagsForResource"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "iot:ListTagsForResource",
+        "iot:DescribeThingGroup",
+        "iot:UpdateThingGroup",
+        "iot:UpdateDynamicThingGroup",
+        "iot:TagResource",
+        "iot:UntagResource"
+      ]
+    }
+  }
+}

@@ -1,0 +1,90 @@
+{
+  "typeName": "AWS::LakeFormation::Tag",
+  "description": "A resource schema representing a Lake Formation Tag.",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git",
+  "definitions": {
+    "CatalogIdString": {
+      "type": "string",
+      "minLength": 12,
+      "maxLength": 12
+    },
+    "LFTagKey": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^([{a-zA-Z}{\\s}{0-9}_.:\\/=+\\-@%]*)$"
+    },
+    "LFTagValue": {
+      "type": "string",
+      "minLength": 0,
+      "maxLength": 256,
+      "pattern": "^([{a-zA-Z}{\\s}{0-9}_.:\\*\\/=+\\-@%]*)$"
+    },
+    "TagValueList": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/LFTagValue"
+      },
+      "insertionOrder": false,
+      "minItems": 1,
+      "maxItems": 50
+    }
+  },
+  "properties": {
+    "CatalogId": {
+      "description": "The identifier for the Data Catalog. By default, the account ID. The Data Catalog is the persistent metadata store. It contains database definitions, table definitions, and other control information to manage your Lake Formation environment.",
+      "$ref": "#/definitions/CatalogIdString"
+    },
+    "TagKey": {
+      "description": "The key-name for the LF-tag.",
+      "$ref": "#/definitions/LFTagKey"
+    },
+    "TagValues": {
+      "description": "A list of possible values an attribute can take.",
+      "$ref": "#/definitions/TagValueList"
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "TagKey",
+    "TagValues"
+  ],
+  "createOnlyProperties": [
+    "/properties/CatalogId",
+    "/properties/TagKey"
+  ],
+  "replacementStrategy": "delete_then_create",
+  "tagging": {
+    "taggable": false
+  },
+  "primaryIdentifier": [
+    "/properties/TagKey"
+  ],
+  "handlers": {
+    "create": {
+      "permissions": [
+        "lakeformation:CreateLFTag"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "lakeformation:GetLFTag"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "lakeformation:UpdateLFTag"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "lakeformation:DeleteLFTag"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "lakeformation:ListLFTags"
+      ]
+    }
+  }
+}

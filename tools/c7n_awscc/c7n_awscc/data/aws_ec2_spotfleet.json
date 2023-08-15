@@ -21,8 +21,12 @@
             "capacityOptimized",
             "capacityOptimizedPrioritized",
             "diversified",
-            "lowestPrice"
+            "lowestPrice",
+            "priceCapacityOptimized"
           ]
+        },
+        "Context": {
+          "type": "string"
         },
         "ExcessCapacityTerminationPolicy": {
           "type": "string",
@@ -104,8 +108,12 @@
         "ValidUntil": {
           "type": "string"
         },
-        "Context": {
-          "type": "string"
+        "TagSpecifications": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/definitions/SpotFleetTagSpecification"
+          }
         },
         "TargetCapacityUnitType": {
           "type": "string",
@@ -398,6 +406,9 @@
         },
         "InstanceRequirements": {
           "$ref": "#/definitions/InstanceRequirementsRequest"
+        },
+        "Priority": {
+          "type": "number"
         }
       }
     },
@@ -644,6 +655,16 @@
         "MemoryGiBPerVCpu": {
           "$ref": "#/definitions/MemoryGiBPerVCpuRequest"
         },
+        "AllowedInstanceTypes": {
+          "type": "array",
+          "uniqueItems": false,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 30,
+            "pattern": "[a-zA-Z0-9\\.\\*]+"
+          }
+        },
         "ExcludedInstanceTypes": {
           "type": "array",
           "uniqueItems": false,
@@ -689,6 +710,9 @@
         },
         "RequireHibernateSupport": {
           "type": "boolean"
+        },
+        "NetworkBandwidthGbps": {
+          "$ref": "#/definitions/NetworkBandwidthGbpsRequest"
         },
         "NetworkInterfaceCount": {
           "$ref": "#/definitions/NetworkInterfaceCountRequest"
@@ -805,6 +829,18 @@
         }
       }
     },
+    "NetworkBandwidthGbpsRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Min": {
+          "type": "number"
+        },
+        "Max": {
+          "type": "number"
+        }
+      }
+    },
     "NetworkInterfaceCountRequest": {
       "type": "object",
       "additionalProperties": false,
@@ -884,6 +920,7 @@
     "/properties/SpotFleetRequestConfigData/SpotMaintenanceStrategies",
     "/properties/SpotFleetRequestConfigData/SpotMaxTotalPrice",
     "/properties/SpotFleetRequestConfigData/SpotPrice",
+    "/properties/SpotFleetRequestConfigData/TagSpecifications",
     "/properties/SpotFleetRequestConfigData/TerminateInstancesWithExpiration",
     "/properties/SpotFleetRequestConfigData/Type",
     "/properties/SpotFleetRequestConfigData/ValidFrom",
@@ -892,14 +929,21 @@
   "readOnlyProperties": [
     "/properties/Id"
   ],
+  "writeOnlyProperties": [
+    "/properties/SpotFleetRequestConfigData/TagSpecifications",
+    "/properties/SpotFleetRequestConfigData/LaunchSpecifications/*/NetworkInterfaces/*/Groups"
+  ],
   "primaryIdentifier": [
     "/properties/Id"
   ],
   "handlers": {
     "create": {
       "permissions": [
+        "iam:PassRole",
+        "ec2:CreateTags",
         "ec2:RequestSpotFleet",
-        "ec2:DescribeSpotFleetRequests"
+        "ec2:DescribeSpotFleetRequests",
+        "ec2:RunInstances"
       ]
     },
     "delete": {

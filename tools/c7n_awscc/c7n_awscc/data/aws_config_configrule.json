@@ -1,0 +1,227 @@
+{
+  "typeName": "AWS::Config::ConfigRule",
+  "description": "Schema for AWS Config ConfigRule",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-config.git",
+  "definitions": {
+    "Scope": {
+      "type": "object",
+      "description": "Scope to constrain which resources can trigger the rule",
+      "additionalProperties": false,
+      "properties": {
+        "TagKey": {
+          "type": "string",
+          "description": "Tag key applied only to resources which we want to trigger the rule"
+        },
+        "ComplianceResourceTypes": {
+          "type": "array",
+          "description": "Resource types of resources which we want to trigger the rule",
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          }
+        },
+        "TagValue": {
+          "type": "string",
+          "description": "Tag value applied only to resources which we want to trigger the rule"
+        },
+        "ComplianceResourceId": {
+          "type": "string",
+          "description": "ID of the only one resource which we want to trigger the rule"
+        }
+      }
+    },
+    "CustomPolicyDetails": {
+      "type": "object",
+      "description": "Custom policy details when rule is custom owned",
+      "additionalProperties": false,
+      "properties": {
+        "EnableDebugLogDelivery": {
+          "type": "boolean",
+          "description": "Logging toggle for custom policy rule"
+        },
+        "PolicyText": {
+          "type": "string",
+          "description": "Policy definition containing logic for custom policy rule"
+        },
+        "PolicyRuntime": {
+          "type": "string",
+          "description": "Runtime system for custom policy rule"
+        }
+      }
+    },
+    "SourceDetail": {
+      "type": "object",
+      "description": "Source and message type that can trigger the rule",
+      "additionalProperties": false,
+      "properties": {
+        "EventSource": {
+          "type": "string",
+          "description": "Source of event that can trigger the rule"
+        },
+        "MaximumExecutionFrequency": {
+          "type": "string",
+          "description": "Frequency at which the rule has to be evaluated"
+        },
+        "MessageType": {
+          "type": "string",
+          "description": "Notification type that can trigger the rule"
+        }
+      },
+      "required": [
+        "EventSource",
+        "MessageType"
+      ]
+    },
+    "Source": {
+      "type": "object",
+      "description": "Source of events for the config rule",
+      "additionalProperties": false,
+      "properties": {
+        "CustomPolicyDetails": {
+          "description": "Custom policy details when rule is custom owned",
+          "$ref": "#/definitions/CustomPolicyDetails"
+        },
+        "SourceIdentifier": {
+          "type": "string",
+          "description": "Identifier for the source of events"
+        },
+        "Owner": {
+          "type": "string",
+          "description": "Owner of the config rule"
+        },
+        "SourceDetails": {
+          "type": "array",
+          "description": "List of message types that can trigger the rule",
+          "uniqueItems": true,
+          "items": {
+            "description": "Source and message type that can trigger the rule",
+            "$ref": "#/definitions/SourceDetail"
+          }
+        }
+      },
+      "required": [
+        "Owner"
+      ]
+    },
+    "EvaluationModeConfiguration": {
+      "type": "object",
+      "description": "Evaluation mode for the AWS Config rule",
+      "additionalProperties": false,
+      "properties": {
+        "Mode": {
+          "type": "string",
+          "description": "Mode of evaluation of AWS Config rule"
+        }
+      }
+    }
+  },
+  "properties": {
+    "ConfigRuleId": {
+      "type": "string",
+      "description": "ID of the config rule"
+    },
+    "Description": {
+      "type": "string",
+      "description": "Description provided for the AWS Config rule"
+    },
+    "Scope": {
+      "description": "Scope to constrain which resources can trigger the AWS Config rule",
+      "$ref": "#/definitions/Scope"
+    },
+    "ConfigRuleName": {
+      "type": "string",
+      "description": "Name for the AWS Config rule"
+    },
+    "Arn": {
+      "type": "string",
+      "description": "ARN generated for the AWS Config rule "
+    },
+    "Compliance": {
+      "type": "object",
+      "description": "Compliance details of the Config rule",
+      "additionalProperties": false,
+      "properties": {
+        "Type": {
+          "type": "string",
+          "description": "Compliance type determined by the Config rule"
+        }
+      }
+    },
+    "MaximumExecutionFrequency": {
+      "type": "string",
+      "description": "Maximum frequency at which the rule has to be evaluated"
+    },
+    "Source": {
+      "description": "Source of events for the AWS Config rule",
+      "$ref": "#/definitions/Source"
+    },
+    "InputParameters": {
+      "type": [
+        "string",
+        "object"
+      ],
+      "description": "JSON string passed the Lambda function"
+    },
+    "EvaluationModes": {
+      "type": "array",
+      "description": "List of EvaluationModeConfiguration objects",
+      "uniqueItems": false,
+      "items": {
+        "description": "Mode of evaluation of AWS Config rule",
+        "$ref": "#/definitions/EvaluationModeConfiguration"
+      }
+    }
+  },
+  "tagging": {
+    "taggable": false
+  },
+  "additionalProperties": false,
+  "required": [
+    "Source"
+  ],
+  "createOnlyProperties": [
+    "/properties/ConfigRuleName"
+  ],
+  "primaryIdentifier": [
+    "/properties/ConfigRuleName"
+  ],
+  "readOnlyProperties": [
+    "/properties/ConfigRuleId",
+    "/properties/Compliance/Type",
+    "/properties/Arn"
+  ],
+  "writeOnlyProperties": [
+    "/properties/Source/CustomPolicyDetails/PolicyText"
+  ],
+  "handlers": {
+    "create": {
+      "permissions": [
+        "config:PutConfigRule",
+        "config:DescribeConfigRules"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "config:DescribeConfigRules",
+        "config:DescribeComplianceByConfigRule"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "config:DeleteConfigRule",
+        "config:DescribeConfigRules"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "config:DescribeConfigRules"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "config:PutConfigRule",
+        "config:DescribeConfigRules"
+      ]
+    }
+  }
+}

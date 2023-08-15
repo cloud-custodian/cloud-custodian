@@ -111,14 +111,28 @@
     "/properties/PerformanceMode",
     "/properties/AvailabilityZoneName"
   ],
+  "propertyTransform": {
+    "/properties/KmsKeyId": "\"arn:aws[-a-z]*:kms:[a-z0-9-]+:[0-9]{12}:key/[a-zA-Z0-9-]+\""
+  },
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": false,
+    "tagProperty": "/properties/FileSystemTags"
+  },
   "handlers": {
     "create": {
       "permissions": [
         "elasticfilesystem:CreateFileSystem",
+        "elasticfilesystem:TagResource",
         "elasticfilesystem:DescribeFileSystems",
         "elasticfilesystem:PutBackupPolicy",
         "elasticfilesystem:PutFileSystemPolicy",
-        "elasticfilesystem:PutLifecycleConfiguration"
+        "elasticfilesystem:PutLifecycleConfiguration",
+        "kms:DescribeKey",
+        "kms:GenerateDataKeyWithoutPlaintext",
+        "kms:CreateGrant"
       ]
     },
     "read": {
@@ -143,7 +157,10 @@
         "elasticfilesystem:PutLifecycleConfiguration",
         "elasticfilesystem:TagResource",
         "elasticfilesystem:UntagResource",
-        "elasticfilesystem:UpdateFileSystem"
+        "elasticfilesystem:UpdateFileSystem",
+        "kms:DescribeKey",
+        "kms:GenerateDataKeyWithoutPlaintext",
+        "kms:CreateGrant"
       ]
     },
     "delete": {

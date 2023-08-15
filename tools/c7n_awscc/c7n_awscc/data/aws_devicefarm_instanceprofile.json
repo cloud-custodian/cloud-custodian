@@ -1,0 +1,113 @@
+{
+  "typeName": "AWS::DeviceFarm::InstanceProfile",
+  "description": "AWS::DeviceFarm::InstanceProfile creates a new Device Farm Instance Profile",
+  "properties": {
+    "Description": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 16384
+    },
+    "ExcludeAppPackagesFromCleanup": {
+      "type": "array",
+      "insertionOrder": false,
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 256
+      }
+    },
+    "Name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "PackageCleanup": {
+      "type": "boolean"
+    },
+    "RebootAfterUse": {
+      "type": "boolean"
+    },
+    "Arn": {
+      "type": "string",
+      "minLength": 32,
+      "maxLength": 1011,
+      "pattern": "^arn:.+"
+    },
+    "Tags": {
+      "type": "array",
+      "uniqueItems": false,
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/Tag"
+      }
+    }
+  },
+  "definitions": {
+    "Tag": {
+      "type": "object",
+      "additionalProperties": false,
+      "insertionOrder": false,
+      "properties": {
+        "Key": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "Value": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        }
+      },
+      "required": [
+        "Key",
+        "Value"
+      ]
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "Name"
+  ],
+  "primaryIdentifier": [
+    "/properties/Arn"
+  ],
+  "readOnlyProperties": [
+    "/properties/Arn"
+  ],
+  "tagging": {
+    "taggable": true
+  },
+  "handlers": {
+    "create": {
+      "permissions": [
+        "devicefarm:CreateInstanceProfile",
+        "devicefarm:TagResource"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "devicefarm:GetInstanceProfile",
+        "devicefarm:ListTagsForResource"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "devicefarm:UpdateInstanceProfile",
+        "devicefarm:TagResource",
+        "devicefarm:UntagResource",
+        "devicefarm:ListTagsForResource"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "devicefarm:DeleteInstanceProfile"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "devicefarm:ListInstanceProfiles"
+      ]
+    }
+  }
+}

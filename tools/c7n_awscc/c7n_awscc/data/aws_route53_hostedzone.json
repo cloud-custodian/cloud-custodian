@@ -166,7 +166,8 @@
         "route53:GetHostedZone",
         "route53:ListHostedZones",
         "route53:ListHostedZonesByName",
-        "route53:ListQueryLoggingConfigs"
+        "route53:ListQueryLoggingConfigs",
+        "route53:ListTagsForResource"
       ]
     }
   }

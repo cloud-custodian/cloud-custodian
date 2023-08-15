@@ -12,12 +12,7 @@
           "type": "string"
         },
         "Value": {
-          "type": "array",
-          "items": {
-            "type": "string",
-            "maxItems": 50
-          },
-          "insertionOrder": false
+          "type": "string"
         }
       },
       "required": [
@@ -56,9 +51,6 @@
       "insertionOrder": false
     }
   },
-  "required": [
-    "ReadinessCheckName"
-  ],
   "additionalProperties": false,
   "createOnlyProperties": [
     "/properties/ReadinessCheckName"
@@ -74,19 +66,25 @@
       "permissions": [
         "route53-recovery-readiness:CreateReadinessCheck",
         "route53-recovery-readiness:GetResourceSet",
-        "route53-recovery-readiness:GetReadinessCheck"
+        "route53-recovery-readiness:GetReadinessCheck",
+        "route53-recovery-readiness:ListTagsForResources",
+        "route53-recovery-readiness:TagResource"
       ]
     },
     "read": {
       "permissions": [
-        "route53-recovery-readiness:GetReadinessCheck"
+        "route53-recovery-readiness:GetReadinessCheck",
+        "route53-recovery-readiness:ListTagsForResources"
       ]
     },
     "update": {
       "permissions": [
         "route53-recovery-readiness:UpdateReadinessCheck",
         "route53-recovery-readiness:GetResourceSet",
-        "route53-recovery-readiness:GetReadinessCheck"
+        "route53-recovery-readiness:GetReadinessCheck",
+        "route53-recovery-readiness:ListTagsForResources",
+        "route53-recovery-readiness:TagResource",
+        "route53-recovery-readiness:UntagResource"
       ]
     },
     "delete": {

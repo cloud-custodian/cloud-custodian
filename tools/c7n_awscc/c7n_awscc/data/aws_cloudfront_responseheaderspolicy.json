@@ -198,6 +198,35 @@
       ],
       "type": "object"
     },
+    "RemoveHeader": {
+      "additionalProperties": false,
+      "properties": {
+        "Header": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "Header"
+      ],
+      "type": "object"
+    },
+    "RemoveHeadersConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "Items": {
+          "insertionOrder": false,
+          "items": {
+            "$ref": "#/definitions/RemoveHeader"
+          },
+          "type": "array",
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "Items"
+      ],
+      "type": "object"
+    },
     "ResponseHeadersPolicyConfig": {
       "additionalProperties": false,
       "properties": {
@@ -213,8 +242,14 @@
         "Name": {
           "type": "string"
         },
+        "RemoveHeadersConfig": {
+          "$ref": "#/definitions/RemoveHeadersConfig"
+        },
         "SecurityHeadersConfig": {
           "$ref": "#/definitions/SecurityHeadersConfig"
+        },
+        "ServerTimingHeadersConfig": {
+          "$ref": "#/definitions/ServerTimingHeadersConfig"
         }
       },
       "required": [
@@ -245,6 +280,24 @@
         }
       },
       "required": [],
+      "type": "object"
+    },
+    "ServerTimingHeadersConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "Enabled": {
+          "type": "boolean"
+        },
+        "SamplingRate": {
+          "maximum": 100,
+          "minimum": 0,
+          "multipleOf": 0.0001,
+          "type": "number"
+        }
+      },
+      "required": [
+        "Enabled"
+      ],
       "type": "object"
     },
     "StrictTransportSecurity": {

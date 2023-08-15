@@ -1,0 +1,114 @@
+{
+  "typeName": "AWS::Omics::RunGroup",
+  "description": "Definition of AWS::Omics::RunGroup Resource Type",
+  "definitions": {
+    "TagMap": {
+      "type": "object",
+      "description": "A map of resource tags",
+      "patternProperties": {
+        ".+": {
+          "type": "string",
+          "maxLength": 256,
+          "minLength": 0,
+          "description": "Resource tag value"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "properties": {
+    "Arn": {
+      "type": "string",
+      "maxLength": 128,
+      "minLength": 1,
+      "pattern": "^arn:.+$"
+    },
+    "CreationTime": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "Id": {
+      "type": "string",
+      "maxLength": 18,
+      "minLength": 1,
+      "pattern": "^[0-9]+$"
+    },
+    "MaxCpus": {
+      "type": "number",
+      "maximum": 100000,
+      "minimum": 1
+    },
+    "MaxGpus": {
+      "type": "number",
+      "maximum": 100000,
+      "minimum": 1
+    },
+    "MaxDuration": {
+      "type": "number",
+      "maximum": 100000,
+      "minimum": 1
+    },
+    "MaxRuns": {
+      "type": "number",
+      "maximum": 100000,
+      "minimum": 1
+    },
+    "Name": {
+      "type": "string",
+      "maxLength": 128,
+      "minLength": 1,
+      "pattern": "^[\\p{L}||\\p{M}||\\p{Z}||\\p{S}||\\p{N}||\\p{P}]+$"
+    },
+    "Tags": {
+      "$ref": "#/definitions/TagMap"
+    }
+  },
+  "readOnlyProperties": [
+    "/properties/Arn",
+    "/properties/CreationTime",
+    "/properties/Id"
+  ],
+  "primaryIdentifier": [
+    "/properties/Id"
+  ],
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": false
+  },
+  "handlers": {
+    "create": {
+      "permissions": [
+        "omics:CreateRunGroup",
+        "omics:TagResource"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "omics:GetRunGroup"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "omics:UpdateRunGroup",
+        "omics:TagResource",
+        "omics:GetRunGroup",
+        "omics:ListTagsForResource",
+        "omics:UntagResource"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "omics:DeleteRunGroup",
+        "omics:GetRunGroup"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "omics:ListRunGroups"
+      ]
+    }
+  },
+  "additionalProperties": false
+}

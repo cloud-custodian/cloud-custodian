@@ -1,0 +1,74 @@
+{
+  "typeName": "AWS::EC2::VPCEndpointServicePermissions",
+  "description": "Resource Type definition for AWS::EC2::VPCEndpointServicePermissions",
+  "additionalProperties": false,
+  "properties": {
+    "AllowedPrincipals": {
+      "type": "array",
+      "uniqueItems": false,
+      "items": {
+        "type": "string"
+      }
+    },
+    "ServiceId": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "ServiceId"
+  ],
+  "createOnlyProperties": [
+    "/properties/ServiceId"
+  ],
+  "primaryIdentifier": [
+    "/properties/ServiceId"
+  ],
+  "tagging": {
+    "taggable": false,
+    "tagOnCreate": false,
+    "tagUpdatable": false,
+    "cloudFormationSystemTags": false
+  },
+  "handlers": {
+    "create": {
+      "permissions": [
+        "ec2:CreateVpcEndpointServicePermissions",
+        "ec2:ModifyVpcEndpointServicePermissions",
+        "ec2:DeleteVpcEndpointServicePermissions",
+        "ec2:DescribeVpcEndpointServicePermissions"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "ec2:CreateVpcEndpointServicePermissions",
+        "ec2:ModifyVpcEndpointServicePermissions",
+        "ec2:DeleteVpcEndpointServicePermissions",
+        "ec2:DescribeVpcEndpointServicePermissions"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "ec2:CreateVpcEndpointServicePermissions",
+        "ec2:ModifyVpcEndpointServicePermissions",
+        "ec2:DeleteVpcEndpointServicePermissions",
+        "ec2:DescribeVpcEndpointServicePermissions"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "ec2:CreateVpcEndpointServicePermissions",
+        "ec2:ModifyVpcEndpointServicePermissions",
+        "ec2:DeleteVpcEndpointServicePermissions",
+        "ec2:DescribeVpcEndpointServicePermissions"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "ec2:CreateVpcEndpointServicePermissions",
+        "ec2:ModifyVpcEndpointServicePermissions",
+        "ec2:DeleteVpcEndpointServicePermissions",
+        "ec2:DescribeVpcEndpointServicePermissions"
+      ]
+    }
+  }
+}

@@ -1,0 +1,231 @@
+{
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "tagProperty": "/properties/Tags",
+    "cloudFormationSystemTags": false
+  },
+  "typeName": "AWS::NetworkManager::ConnectPeer",
+  "readOnlyProperties": [
+    "/properties/ConnectPeerId",
+    "/properties/State",
+    "/properties/CreatedAt",
+    "/properties/Configuration",
+    "/properties/CoreNetworkId",
+    "/properties/EdgeLocation"
+  ],
+  "description": "AWS::NetworkManager::ConnectPeer Resource Type Definition.",
+  "createOnlyProperties": [
+    "/properties/PeerAddress",
+    "/properties/CoreNetworkAddress",
+    "/properties/BgpOptions",
+    "/properties/InsideCidrBlocks",
+    "/properties/ConnectAttachmentId"
+  ],
+  "primaryIdentifier": [
+    "/properties/ConnectPeerId"
+  ],
+  "required": [
+    "ConnectAttachmentId",
+    "PeerAddress"
+  ],
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-networkmanager/aws-networkmanager-connectpeer",
+  "handlers": {
+    "read": {
+      "permissions": [
+        "networkmanager:GetConnectPeer"
+      ]
+    },
+    "create": {
+      "permissions": [
+        "networkmanager:GetConnectPeer",
+        "networkmanager:CreateConnectPeer",
+        "networkmanager:TagResource",
+        "ec2:DescribeRegions"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "networkmanager:GetConnectPeer",
+        "networkmanager:ListTagsForResource",
+        "networkmanager:TagResource",
+        "networkmanager:UntagResource",
+        "ec2:DescribeRegions"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "networkmanager:ListConnectPeers"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "networkmanager:GetConnectPeer",
+        "networkmanager:DeleteConnectPeer",
+        "ec2:DescribeRegions"
+      ]
+    }
+  },
+  "writeOnlyProperties": [
+    "/properties/CoreNetworkAddress",
+    "/properties/BgpOptions"
+  ],
+  "additionalIdentifiers": [
+    [
+      "/properties/ConnectAttachmentId",
+      "/properties/CoreNetworkAddress",
+      "/properties/InsideCidrBlocks"
+    ]
+  ],
+  "additionalProperties": false,
+  "definitions": {
+    "ConnectPeerConfiguration": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "BgpConfigurations": {
+          "insertionOrder": false,
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ConnectPeerBgpConfiguration"
+          }
+        },
+        "PeerAddress": {
+          "description": "The IP address of the Connect peer.",
+          "type": "string"
+        },
+        "CoreNetworkAddress": {
+          "description": "The IP address of a core network.",
+          "type": "string"
+        },
+        "InsideCidrBlocks": {
+          "description": "The inside IP addresses used for a Connect peer configuration.",
+          "insertionOrder": false,
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "Protocol": {
+          "$ref": "#/definitions/TunnelProtocol"
+        }
+      }
+    },
+    "ConnectPeerBgpConfiguration": {
+      "description": "Bgp configuration for connect peer",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "PeerAddress": {
+          "description": "The address of a core network Connect peer.",
+          "type": "string"
+        },
+        "CoreNetworkAddress": {
+          "description": "The address of a core network.",
+          "type": "string"
+        },
+        "PeerAsn": {
+          "description": "The ASN of the Connect peer.",
+          "type": "number"
+        },
+        "CoreNetworkAsn": {
+          "description": "The ASN of the Coret Network.",
+          "type": "number"
+        }
+      }
+    },
+    "BgpOptions": {
+      "description": "Bgp options",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "PeerAsn": {
+          "type": "number"
+        }
+      }
+    },
+    "Tag": {
+      "description": "A key-value pair to associate with a resource.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "Value": {
+          "description": "The value for the tag. You can specify a value that is 0 to 256 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.",
+          "type": "string"
+        },
+        "Key": {
+          "description": "The key name of the tag. You can specify a value that is 1 to 128 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "Key",
+        "Value"
+      ]
+    },
+    "TunnelProtocol": {
+      "description": "Tunnel protocol type (Only support GRE for now)",
+      "type": "string"
+    }
+  },
+  "properties": {
+    "ConnectAttachmentId": {
+      "description": "The ID of the attachment to connect.",
+      "type": "string"
+    },
+    "CoreNetworkId": {
+      "description": "The ID of the core network.",
+      "type": "string"
+    },
+    "Configuration": {
+      "description": "Configuration of the connect peer.",
+      "$ref": "#/definitions/ConnectPeerConfiguration"
+    },
+    "CreatedAt": {
+      "description": "Connect peer creation time.",
+      "type": "string"
+    },
+    "CoreNetworkAddress": {
+      "description": "The IP address of a core network.",
+      "type": "string"
+    },
+    "BgpOptions": {
+      "description": "Bgp options for connect peer.",
+      "$ref": "#/definitions/BgpOptions"
+    },
+    "ConnectPeerId": {
+      "description": "The ID of the Connect peer.",
+      "type": "string"
+    },
+    "PeerAddress": {
+      "description": "The IP address of the Connect peer.",
+      "type": "string"
+    },
+    "State": {
+      "description": "State of the connect peer.",
+      "type": "string"
+    },
+    "InsideCidrBlocks": {
+      "description": "The inside IP addresses used for a Connect peer configuration.",
+      "insertionOrder": false,
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "Tags": {
+      "uniqueItems": true,
+      "description": "An array of key-value pairs to apply to this resource.",
+      "insertionOrder": false,
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Tag"
+      }
+    },
+    "EdgeLocation": {
+      "description": "The Connect peer Regions where edges are located.",
+      "type": "string"
+    }
+  }
+}

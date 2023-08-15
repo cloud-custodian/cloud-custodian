@@ -146,6 +146,13 @@
             "$ref": "#/definitions/Account"
           }
         },
+        "AccountsUrl": {
+          "description": "Returns the value of the AccountsUrl property.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 5120,
+          "pattern": "(s3://|http(s?)://).+"
+        },
         "OrganizationalUnitIds": {
           "description": "The organization root ID or organizational unit (OU) IDs to which StackSets deploys.",
           "type": "array",
@@ -155,6 +162,16 @@
           "items": {
             "$ref": "#/definitions/OrganizationalUnitId"
           }
+        },
+        "AccountFilterType": {
+          "description": "The filter type you want to apply on organizational units and accounts.",
+          "type": "string",
+          "enum": [
+            "NONE",
+            "UNION",
+            "INTERSECTION",
+            "DIFFERENCE"
+          ]
         }
       },
       "additionalProperties": false
@@ -284,7 +301,7 @@
       "description": "Location of file containing the template body. The URL must point to a template (max size: 460,800 bytes) that is located in an Amazon S3 bucket.",
       "type": "string",
       "minLength": 1,
-      "maxLength": 1024
+      "maxLength": 5120
     },
     "CallAs": {
       "description": "Specifies the AWS account that you are acting from. By default, SELF is specified. For self-managed permissions, specify SELF; for service-managed permissions, if you are signed in to the organization's management account, specify SELF. If you are signed in to a delegated administrator account, specify DELEGATED_ADMIN.",
@@ -329,6 +346,7 @@
   "writeOnlyProperties": [
     "/properties/TemplateURL",
     "/properties/OperationPreferences",
+    "/properties/StackInstancesGroup",
     "/properties/CallAs"
   ],
   "readOnlyProperties": [
@@ -344,9 +362,11 @@
         "cloudformation:CreateStackSet",
         "cloudformation:CreateStackInstances",
         "cloudformation:DescribeStackSetOperation",
-        "cloudformation:TagResource"
+        "cloudformation:ListStackSetOperationResults",
+        "cloudformation:TagResource",
+        "iam:PassRole"
       ],
-      "timeoutInMinutes": 720
+      "timeoutInMinutes": 2160
     },
     "read": {
       "permissions": [
@@ -362,20 +382,25 @@
         "cloudformation:CreateStackInstances",
         "cloudformation:DeleteStackInstances",
         "cloudformation:UpdateStackInstances",
+        "cloudformation:DescribeStackSet",
         "cloudformation:DescribeStackSetOperation",
+        "cloudformation:ListStackSetOperationResults",
         "cloudformation:TagResource",
-        "cloudformation:UntagResource"
+        "cloudformation:UntagResource",
+        "iam:PassRole"
       ],
-      "timeoutInMinutes": 720
+      "timeoutInMinutes": 2160
     },
     "delete": {
       "permissions": [
         "cloudformation:DeleteStackSet",
         "cloudformation:DeleteStackInstances",
+        "cloudformation:DescribeStackSet",
         "cloudformation:DescribeStackSetOperation",
+        "cloudformation:ListStackSetOperationResults",
         "cloudformation:UntagResource"
       ],
-      "timeoutInMinutes": 720
+      "timeoutInMinutes": 2160
     },
     "list": {
       "permissions": [

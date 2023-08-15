@@ -1,0 +1,141 @@
+{
+  "typeName": "AWS::EC2::IPAMResourceDiscoveryAssociation",
+  "description": "Resource Schema of AWS::EC2::IPAMResourceDiscoveryAssociation Type",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-ipam.git",
+  "definitions": {
+    "Tag": {
+      "description": "A key-value pair to associate with a resource.",
+      "type": "object",
+      "properties": {
+        "Key": {
+          "type": "string",
+          "description": "The key name of the tag. You can specify a value that is 1 to 128 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "Value": {
+          "type": "string",
+          "description": "The value for the tag. You can specify a value that is 0 to 256 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.",
+          "minLength": 0,
+          "maxLength": 256
+        }
+      },
+      "required": [
+        "Key",
+        "Value"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "properties": {
+    "IpamArn": {
+      "description": "Arn of the IPAM.",
+      "type": "string"
+    },
+    "IpamRegion": {
+      "description": "The home region of the IPAM.",
+      "type": "string"
+    },
+    "IpamResourceDiscoveryAssociationId": {
+      "description": "Id of the IPAM Resource Discovery Association.",
+      "type": "string"
+    },
+    "IpamResourceDiscoveryId": {
+      "description": "The Amazon Resource Name (ARN) of the IPAM Resource Discovery Association.",
+      "type": "string"
+    },
+    "IpamId": {
+      "description": "The Id of the IPAM this Resource Discovery is associated to.",
+      "type": "string"
+    },
+    "IpamResourceDiscoveryAssociationArn": {
+      "description": "The Amazon Resource Name (ARN) of the resource discovery association is a part of.",
+      "type": "string"
+    },
+    "IsDefault": {
+      "description": "If the Resource Discovery Association exists due as part of CreateIpam.",
+      "type": "boolean"
+    },
+    "OwnerId": {
+      "description": "The AWS Account ID for the account where the shared IPAM exists.",
+      "type": "string"
+    },
+    "State": {
+      "description": "The operational state of the Resource Discovery Association. Related to Create/Delete activities.",
+      "type": "string"
+    },
+    "ResourceDiscoveryStatus": {
+      "description": "The status of the resource discovery.",
+      "type": "string"
+    },
+    "Tags": {
+      "description": "An array of key-value pairs to apply to this resource.",
+      "type": "array",
+      "uniqueItems": true,
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/Tag"
+      }
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "IpamId",
+    "IpamResourceDiscoveryId"
+  ],
+  "primaryIdentifier": [
+    "/properties/IpamResourceDiscoveryAssociationId"
+  ],
+  "readOnlyProperties": [
+    "/properties/IpamArn",
+    "/properties/IpamRegion",
+    "/properties/IpamResourceDiscoveryAssociationId",
+    "/properties/IpamResourceDiscoveryAssociationArn",
+    "/properties/IsDefault",
+    "/properties/ResourceDiscoveryStatus",
+    "/properties/State",
+    "/properties/OwnerId"
+  ],
+  "createOnlyProperties": [
+    "/properties/IpamId",
+    "/properties/IpamResourceDiscoveryId"
+  ],
+  "handlers": {
+    "create": {
+      "permissions": [
+        "ec2:AssociateIpamResourceDiscovery",
+        "ec2:CreateTags"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "ec2:DescribeIpamResourceDiscoveryAssociations"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "ec2:DescribeIpamResourceDiscoveryAssociations",
+        "ec2:CreateTags",
+        "ec2:DeleteTags"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "ec2:DisassociateIpamResourceDiscovery",
+        "ec2:DeleteTags"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "ec2:DescribeIpamResourceDiscoveryAssociations"
+      ]
+    }
+  },
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": false,
+    "tagProperty": "/properties/Tags"
+  }
+}

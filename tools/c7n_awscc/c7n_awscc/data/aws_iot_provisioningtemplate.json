@@ -54,24 +54,39 @@
     "TemplateBody": {
       "type": "string"
     },
+    "TemplateType": {
+      "type": "string",
+      "enum": [
+        "FLEET_PROVISIONING",
+        "JITP"
+      ]
+    },
     "PreProvisioningHook": {
       "$ref": "#/definitions/ProvisioningHook"
     },
     "Tags": {
       "type": "array",
+      "insertionOrder": true,
       "items": {
         "$ref": "#/definitions/Tag"
       }
     }
   },
-  "taggable": true,
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": true,
+    "tagProperty": "/properties/Tags"
+  },
   "additionalProperties": false,
   "required": [
     "ProvisioningRoleArn",
     "TemplateBody"
   ],
   "createOnlyProperties": [
-    "/properties/TemplateName"
+    "/properties/TemplateName",
+    "/properties/TemplateType"
   ],
   "readOnlyProperties": [
     "/properties/TemplateArn"
@@ -84,12 +99,16 @@
       "permissions": [
         "iam:GetRole",
         "iam:PassRole",
-        "iot:CreateProvisioningTemplate"
+        "iot:CreateProvisioningTemplate",
+        "iot:DescribeProvisioningTemplate",
+        "iot:TagResource",
+        "iot:ListTagsForResource"
       ]
     },
     "read": {
       "permissions": [
-        "iot:DescribeProvisioningTemplate"
+        "iot:DescribeProvisioningTemplate",
+        "iot:ListTagsForResource"
       ]
     },
     "update": {
@@ -99,7 +118,11 @@
         "iot:UpdateProvisioningTemplate",
         "iot:CreateProvisioningTemplateVersion",
         "iot:ListProvisioningTemplateVersions",
-        "iot:DeleteProvisioningTemplateVersion"
+        "iot:DeleteProvisioningTemplateVersion",
+        "iot:DescribeProvisioningTemplate",
+        "iot:TagResource",
+        "iot:UntagResource",
+        "iot:ListTagsForResource"
       ]
     },
     "delete": {

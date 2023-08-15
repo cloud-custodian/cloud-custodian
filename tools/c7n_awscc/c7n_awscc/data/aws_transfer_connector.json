@@ -1,0 +1,237 @@
+{
+  "typeName": "AWS::Transfer::Connector",
+  "description": "Resource Type definition for AWS::Transfer::Connector",
+  "definitions": {
+    "Tag": {
+      "description": "Creates a key-value pair for a specific resource.",
+      "type": "object",
+      "properties": {
+        "Key": {
+          "type": "string",
+          "description": "The name assigned to the tag that you create.",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "Value": {
+          "type": "string",
+          "description": "Contains one or more values that you assigned to the key name you create.",
+          "minLength": 0,
+          "maxLength": 256
+        }
+      },
+      "required": [
+        "Key",
+        "Value"
+      ],
+      "additionalProperties": false
+    },
+    "SftpConnectorTrustedHostKey": {
+      "description": "The public host key for the external server to which you are connecting.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 2048
+    }
+  },
+  "properties": {
+    "AccessRole": {
+      "description": "Specifies the access role for the connector.",
+      "type": "string",
+      "pattern": "arn:.*role/.*",
+      "minLength": 20,
+      "maxLength": 2048
+    },
+    "As2Config": {
+      "description": "Configuration for an AS2 connector.",
+      "type": "object",
+      "properties": {
+        "LocalProfileId": {
+          "type": "string",
+          "description": "A unique identifier for the local profile.",
+          "pattern": "^p-([0-9a-f]{17})$",
+          "minLength": 19,
+          "maxLength": 19
+        },
+        "PartnerProfileId": {
+          "type": "string",
+          "description": "A unique identifier for the partner profile.",
+          "pattern": "^p-([0-9a-f]{17})$",
+          "minLength": 19,
+          "maxLength": 19
+        },
+        "MessageSubject": {
+          "type": "string",
+          "description": "The message subject for this AS2 connector configuration.",
+          "pattern": "^[\\p{Print}\\p{Blank}]+",
+          "minLength": 1,
+          "maxLength": 1024
+        },
+        "Compression": {
+          "type": "string",
+          "description": "Compression setting for this AS2 connector configuration.",
+          "enum": [
+            "ZLIB",
+            "DISABLED"
+          ]
+        },
+        "EncryptionAlgorithm": {
+          "type": "string",
+          "description": "Encryption algorithm for this AS2 connector configuration.",
+          "enum": [
+            "AES128_CBC",
+            "AES192_CBC",
+            "AES256_CBC",
+            "NONE"
+          ]
+        },
+        "SigningAlgorithm": {
+          "type": "string",
+          "description": "Signing algorithm for this AS2 connector configuration.",
+          "enum": [
+            "SHA256",
+            "SHA384",
+            "SHA512",
+            "SHA1",
+            "NONE"
+          ]
+        },
+        "MdnSigningAlgorithm": {
+          "type": "string",
+          "description": "MDN Signing algorithm for this AS2 connector configuration.",
+          "enum": [
+            "SHA256",
+            "SHA384",
+            "SHA512",
+            "SHA1",
+            "NONE",
+            "DEFAULT"
+          ]
+        },
+        "MdnResponse": {
+          "type": "string",
+          "description": "MDN Response setting for this AS2 connector configuration.",
+          "enum": [
+            "SYNC",
+            "NONE"
+          ]
+        },
+        "BasicAuthSecretId": {
+          "type": "string",
+          "description": "ARN or name of the secret in AWS Secrets Manager which contains the credentials for Basic authentication. If empty, Basic authentication is disabled for the AS2 connector",
+          "minLength": 0,
+          "maxLength": 2048
+        }
+      },
+      "additionalProperties": false
+    },
+    "SftpConfig": {
+      "description": "Configuration for an SFTP connector.",
+      "type": "object",
+      "properties": {
+        "UserSecretId": {
+          "type": "string",
+          "description": "ARN or name of the secret in AWS Secrets Manager which contains the SFTP user's private keys or passwords.",
+          "minLength": 1,
+          "maxLength": 2048
+        },
+        "TrustedHostKeys": {
+          "description": "List of public host keys, for the external server to which you are connecting.",
+          "type": "array",
+          "maxItems": 10,
+          "uniqueItems": false,
+          "insertionOrder": false,
+          "items": {
+            "$ref": "#/definitions/SftpConnectorTrustedHostKey"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "Arn": {
+      "description": "Specifies the unique Amazon Resource Name (ARN) for the connector.",
+      "type": "string",
+      "pattern": "arn:.*",
+      "minLength": 20,
+      "maxLength": 1600
+    },
+    "ConnectorId": {
+      "description": "A unique identifier for the connector.",
+      "type": "string",
+      "pattern": "^c-([0-9a-f]{17})$",
+      "minLength": 19,
+      "maxLength": 19
+    },
+    "LoggingRole": {
+      "description": "Specifies the logging role for the connector.",
+      "type": "string",
+      "pattern": "arn:.*role/.*",
+      "minLength": 20,
+      "maxLength": 2048
+    },
+    "Tags": {
+      "description": "Key-value pairs that can be used to group and search for connectors. Tags are metadata attached to connectors for any purpose.",
+      "type": "array",
+      "maxItems": 50,
+      "uniqueItems": true,
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/Tag"
+      }
+    },
+    "Url": {
+      "description": "URL for Connector",
+      "type": "string",
+      "maxLength": 255
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "AccessRole",
+    "Url"
+  ],
+  "readOnlyProperties": [
+    "/properties/Arn",
+    "/properties/ConnectorId"
+  ],
+  "primaryIdentifier": [
+    "/properties/ConnectorId"
+  ],
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": true,
+    "tagProperty": "/properties/Tags"
+  },
+  "handlers": {
+    "create": {
+      "permissions": [
+        "transfer:CreateConnector",
+        "transfer:TagResource",
+        "iam:PassRole"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "transfer:DescribeConnector"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "transfer:UpdateConnector",
+        "transfer:UnTagResource",
+        "transfer:TagResource",
+        "iam:PassRole"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "transfer:DeleteConnector"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "transfer:ListConnectors"
+      ]
+    }
+  }
+}

@@ -55,7 +55,8 @@
   ],
   "writeOnlyProperties": [
     "/properties/Principals",
-    "/properties/AllowedOperations"
+    "/properties/AllowedOperations",
+    "/properties/Status"
   ],
   "primaryIdentifier": [
     "/properties/GrantArn"

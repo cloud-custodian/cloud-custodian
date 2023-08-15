@@ -1,0 +1,293 @@
+{
+  "typeName": "AWS::Omics::AnnotationStore",
+  "description": "Definition of AWS::Omics::AnnotationStore Resource Type",
+  "definitions": {
+    "AnnotationType": {
+      "type": "string",
+      "enum": [
+        "GENERIC",
+        "CHR_POS",
+        "CHR_POS_REF_ALT",
+        "CHR_START_END_ONE_BASE",
+        "CHR_START_END_REF_ALT_ONE_BASE",
+        "CHR_START_END_ZERO_BASE",
+        "CHR_START_END_REF_ALT_ZERO_BASE"
+      ]
+    },
+    "EncryptionType": {
+      "type": "string",
+      "enum": [
+        "KMS"
+      ]
+    },
+    "FormatToHeader": {
+      "type": "object",
+      "patternProperties": {
+        ".+": {
+          "type": "string",
+          "maxLength": 1000,
+          "minLength": 0
+        }
+      },
+      "additionalProperties": false
+    },
+    "FormatToHeaderKey": {
+      "type": "string",
+      "enum": [
+        "CHR",
+        "START",
+        "END",
+        "REF",
+        "ALT",
+        "POS"
+      ]
+    },
+    "ReferenceItem": {
+      "type": "object",
+      "properties": {
+        "ReferenceArn": {
+          "type": "string",
+          "maxLength": 127,
+          "minLength": 1,
+          "pattern": "^arn:.+$"
+        }
+      },
+      "required": [
+        "ReferenceArn"
+      ],
+      "additionalProperties": false
+    },
+    "SchemaItem": {
+      "type": "object",
+      "maxProperties": 1,
+      "minProperties": 1,
+      "patternProperties": {
+        "^[a-z0-9_]{1,255}$": {
+          "$ref": "#/definitions/SchemaValueType"
+        }
+      },
+      "additionalProperties": false
+    },
+    "SchemaValueType": {
+      "type": "string",
+      "enum": [
+        "LONG",
+        "INT",
+        "STRING",
+        "FLOAT",
+        "DOUBLE",
+        "BOOLEAN"
+      ]
+    },
+    "SseConfig": {
+      "type": "object",
+      "properties": {
+        "Type": {
+          "$ref": "#/definitions/EncryptionType"
+        },
+        "KeyArn": {
+          "type": "string",
+          "maxLength": 2048,
+          "minLength": 20,
+          "pattern": "arn:([^:\n]*):([^:\n]*):([^:\n]*):([0-9]{12}):([^:\n]*)"
+        }
+      },
+      "required": [
+        "Type"
+      ],
+      "additionalProperties": false
+    },
+    "StoreFormat": {
+      "type": "string",
+      "enum": [
+        "GFF",
+        "TSV",
+        "VCF"
+      ]
+    },
+    "StoreOptions": {
+      "oneOf": [
+        {
+          "type": "object",
+          "title": "TsvStoreOptions",
+          "properties": {
+            "TsvStoreOptions": {
+              "$ref": "#/definitions/TsvStoreOptions"
+            }
+          },
+          "required": [
+            "TsvStoreOptions"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "StoreStatus": {
+      "type": "string",
+      "enum": [
+        "CREATING",
+        "UPDATING",
+        "DELETING",
+        "ACTIVE",
+        "FAILED"
+      ]
+    },
+    "TagMap": {
+      "type": "object",
+      "patternProperties": {
+        ".+": {
+          "type": "string",
+          "maxLength": 256,
+          "minLength": 0
+        }
+      },
+      "additionalProperties": false
+    },
+    "TsvStoreOptions": {
+      "type": "object",
+      "properties": {
+        "AnnotationType": {
+          "$ref": "#/definitions/AnnotationType"
+        },
+        "FormatToHeader": {
+          "$ref": "#/definitions/FormatToHeader"
+        },
+        "Schema": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/SchemaItem"
+          },
+          "maxItems": 5000,
+          "minItems": 1,
+          "insertionOrder": false
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "properties": {
+    "CreationTime": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "Description": {
+      "type": "string",
+      "maxLength": 500,
+      "minLength": 0
+    },
+    "Id": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{12}$"
+    },
+    "Name": {
+      "type": "string",
+      "pattern": "^([a-z]){1}([a-z0-9_]){2,254}"
+    },
+    "Reference": {
+      "$ref": "#/definitions/ReferenceItem"
+    },
+    "SseConfig": {
+      "$ref": "#/definitions/SseConfig"
+    },
+    "Status": {
+      "$ref": "#/definitions/StoreStatus"
+    },
+    "StatusMessage": {
+      "type": "string",
+      "maxLength": 1000,
+      "minLength": 0
+    },
+    "StoreArn": {
+      "type": "string",
+      "maxLength": 2048,
+      "minLength": 20,
+      "pattern": "^arn:([^:\n]*):([^:\n]*):([^:\n]*):([0-9]{12}):([^:\n]*)$"
+    },
+    "StoreFormat": {
+      "$ref": "#/definitions/StoreFormat"
+    },
+    "StoreOptions": {
+      "$ref": "#/definitions/StoreOptions"
+    },
+    "StoreSizeBytes": {
+      "type": "number"
+    },
+    "Tags": {
+      "$ref": "#/definitions/TagMap"
+    },
+    "UpdateTime": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "Name",
+    "StoreFormat"
+  ],
+  "readOnlyProperties": [
+    "/properties/CreationTime",
+    "/properties/Id",
+    "/properties/Status",
+    "/properties/StatusMessage",
+    "/properties/StoreArn",
+    "/properties/StoreSizeBytes",
+    "/properties/UpdateTime"
+  ],
+  "createOnlyProperties": [
+    "/properties/Name",
+    "/properties/Reference",
+    "/properties/SseConfig",
+    "/properties/StoreFormat",
+    "/properties/StoreOptions",
+    "/properties/Tags"
+  ],
+  "primaryIdentifier": [
+    "/properties/Name"
+  ],
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": true
+  },
+  "handlers": {
+    "create": {
+      "permissions": [
+        "omics:CreateAnnotationStore",
+        "omics:TagResource",
+        "kms:DescribeKey",
+        "kms:GenerateDataKey",
+        "kms:CreateGrant",
+        "ram:AcceptResourceShareInvitation",
+        "ram:GetResourceShareInvitations",
+        "omics:GetAnnotationStore"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "omics:GetAnnotationStore"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "omics:UpdateAnnotationStore",
+        "omics:TagResource",
+        "omics:UntagResource",
+        "omics:GetAnnotationStore",
+        "omics:ListTagsForResource"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "omics:DeleteAnnotationStore",
+        "omics:ListAnnotationStores"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "omics:ListAnnotationStores"
+      ]
+    }
+  },
+  "additionalProperties": false
+}

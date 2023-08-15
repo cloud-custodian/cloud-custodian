@@ -26,6 +26,127 @@
         "Type"
       ]
     },
+    "AdvancedFieldSelector": {
+      "description": "A single selector statement in an advanced event selector.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Field": {
+          "description": "A field in an event record on which to filter events to be logged. Supported fields include readOnly, eventCategory, eventSource (for management events), eventName, resources.type, and resources.ARN.",
+          "type": "string",
+          "pattern": "([\\w|\\d|\\.|_]+)",
+          "minLength": 1,
+          "maxLength": 1000
+        },
+        "Equals": {
+          "description": "An operator that includes events that match the exact value of the event record field specified as the value of Field. This is the only valid operator that you can use with the readOnly, eventCategory, and resources.type fields.",
+          "type": "array",
+          "uniqueItems": true,
+          "insertionOrder": false,
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "pattern": "(.+)",
+            "minLength": 1,
+            "maxLength": 2048
+          }
+        },
+        "StartsWith": {
+          "description": "An operator that includes events that match the first few characters of the event record field specified as the value of Field.",
+          "type": "array",
+          "uniqueItems": true,
+          "insertionOrder": false,
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "pattern": "(.+)",
+            "minLength": 1,
+            "maxLength": 2048
+          }
+        },
+        "EndsWith": {
+          "description": "An operator that includes events that match the last few characters of the event record field specified as the value of Field.",
+          "type": "array",
+          "uniqueItems": true,
+          "insertionOrder": false,
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "pattern": "(.+)",
+            "minLength": 1,
+            "maxLength": 2048
+          }
+        },
+        "NotEquals": {
+          "description": "An operator that excludes events that match the exact value of the event record field specified as the value of Field.",
+          "type": "array",
+          "uniqueItems": true,
+          "insertionOrder": false,
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "pattern": "(.+)",
+            "minLength": 1,
+            "maxLength": 2048
+          }
+        },
+        "NotStartsWith": {
+          "description": "An operator that excludes events that match the first few characters of the event record field specified as the value of Field.",
+          "type": "array",
+          "uniqueItems": true,
+          "insertionOrder": false,
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "pattern": "(.+)",
+            "minLength": 1,
+            "maxLength": 2048
+          }
+        },
+        "NotEndsWith": {
+          "description": "An operator that excludes events that match the last few characters of the event record field specified as the value of Field.",
+          "type": "array",
+          "uniqueItems": true,
+          "insertionOrder": false,
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "pattern": "(.+)",
+            "minLength": 1,
+            "maxLength": 2048
+          }
+        }
+      },
+      "required": [
+        "Field"
+      ]
+    },
+    "AdvancedEventSelector": {
+      "description": "Advanced event selectors let you create fine-grained selectors for the following AWS CloudTrail event record ?elds. They help you control costs by logging only those events that are important to you.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Name": {
+          "description": "An optional, descriptive name for an advanced event selector, such as \"Log data events for only two S3 buckets\".",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1000
+        },
+        "FieldSelectors": {
+          "description": "Contains all selector statements in an advanced event selector.",
+          "type": "array",
+          "uniqueItems": true,
+          "insertionOrder": false,
+          "minItems": 1,
+          "items": {
+            "$ref": "#/definitions/AdvancedFieldSelector"
+          }
+        }
+      },
+      "required": [
+        "FieldSelectors"
+      ]
+    },
     "EventSelector": {
       "description": "The type of email sending events to publish to the event destination.",
       "type": "object",
@@ -106,6 +227,15 @@
     "EnableLogFileValidation": {
       "description": "Specifies whether log file validation is enabled. The default is false.",
       "type": "boolean"
+    },
+    "AdvancedEventSelectors": {
+      "description": "The advanced event selectors that were used to select events for the data store.",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/AdvancedEventSelector"
+      },
+      "uniqueItems": true,
+      "insertionOrder": false
     },
     "EventSelectors": {
       "description": "Use event selectors to further specify the management and data event settings for your trail. By default, trails created without specific event selectors will be configured to log all read and write management events, and no data events. When an event occurs in your account, CloudTrail evaluates the event selector for all trails. For each trail, if the event matches any event selector, the trail processes and logs the event. If the event doesn't match any event selector, the trail doesn't log the event. You can configure up to five event selectors for a trail.",
@@ -258,5 +388,11 @@
       ]
     }
   },
-  "additionalProperties": false
+  "additionalProperties": false,
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": false
+  }
 }

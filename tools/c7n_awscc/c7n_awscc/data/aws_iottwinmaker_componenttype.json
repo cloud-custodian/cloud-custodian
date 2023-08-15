@@ -1,0 +1,534 @@
+{
+  "typeName": "AWS::IoTTwinMaker::ComponentType",
+  "description": "Resource schema for AWS::IoTTwinMaker::ComponentType",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-iottwinmaker",
+  "definitions": {
+    "DateTimeFormat": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "ParentComponentType": {
+      "type": "string",
+      "pattern": "[a-zA-Z_\\.\\-0-9:]+"
+    },
+    "PropertyName": {
+      "type": "string",
+      "pattern": "[a-zA-Z_\\-0-9]+"
+    },
+    "RequiredProperty": {
+      "type": "string",
+      "pattern": "[a-zA-Z_\\-0-9]+"
+    },
+    "LambdaFunction": {
+      "type": "object",
+      "properties": {
+        "Arn": {
+          "type": "string",
+          "pattern": "arn:((aws)|(aws-cn)|(aws-us-gov)):lambda:[a-z0-9-]+:[0-9]{12}:function:[\\/a-zA-Z0-9_-]+",
+          "minLength": 1,
+          "maxLength": 128
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "Arn"
+      ]
+    },
+    "DataConnector": {
+      "description": "The data connector.",
+      "type": "object",
+      "properties": {
+        "IsNative": {
+          "description": "A Boolean value that specifies whether the data connector is native to IoT TwinMaker.",
+          "type": "boolean"
+        },
+        "Lambda": {
+          "description": "The Lambda function associated with this data connector.",
+          "$ref": "#/definitions/LambdaFunction"
+        }
+      },
+      "additionalProperties": false
+    },
+    "Function": {
+      "description": "The function of component type.",
+      "type": "object",
+      "properties": {
+        "ImplementedBy": {
+          "description": "The data connector.",
+          "$ref": "#/definitions/DataConnector"
+        },
+        "RequiredProperties": {
+          "description": "The required properties of the function.",
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 256,
+          "uniqueItems": true,
+          "insertionOrder": false,
+          "items": {
+            "$ref": "#/definitions/RequiredProperty"
+          }
+        },
+        "Scope": {
+          "description": "The scope of the function.",
+          "type": "string",
+          "enum": [
+            "ENTITY",
+            "WORKSPACE"
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "DataValue": {
+      "description": "An object that specifies a value for a property.",
+      "type": "object",
+      "properties": {
+        "BooleanValue": {
+          "description": "A Boolean value.",
+          "type": "boolean"
+        },
+        "DoubleValue": {
+          "description": "A double value.",
+          "type": "number"
+        },
+        "Expression": {
+          "description": "An expression that produces the value.",
+          "type": "string",
+          "pattern": "(^\\$\\{Parameters\\.[a-zA-z]+([a-zA-z_0-9]*)}$)",
+          "minLength": 1,
+          "maxLength": 316
+        },
+        "IntegerValue": {
+          "description": "An integer value.",
+          "type": "integer"
+        },
+        "ListValue": {
+          "description": "A list of multiple values.",
+          "type": "array",
+          "minItems": 0,
+          "maxItems": 50,
+          "uniqueItems": false,
+          "insertionOrder": false,
+          "items": {
+            "$ref": "#/definitions/DataValue"
+          }
+        },
+        "LongValue": {
+          "description": "A long value.",
+          "type": "number"
+        },
+        "StringValue": {
+          "description": "A string value.",
+          "type": "string",
+          "pattern": ".*",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "MapValue": {
+          "description": "An object that maps strings to multiple DataValue objects. \n\n",
+          "type": "object",
+          "patternProperties": {
+            "[a-zA-Z_\\-0-9]+": {
+              "$ref": "#/definitions/DataValue"
+            }
+          },
+          "additionalProperties": false
+        },
+        "RelationshipValue": {
+          "description": "A value that relates a component to another component.",
+          "type": "object",
+          "properties": {
+            "TargetComponentName": {
+              "type": "string",
+              "pattern": "[a-zA-Z_\\-0-9]+",
+              "minLength": 1,
+              "maxLength": 256
+            },
+            "TargetEntityId": {
+              "type": "string",
+              "pattern": "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|^[a-zA-Z0-9][a-zA-Z_\\-0-9.:]*[a-zA-Z0-9]+",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "Relationship": {
+      "description": "The type of the relationship.",
+      "type": "object",
+      "properties": {
+        "RelationshipType": {
+          "description": "The type of the relationship.",
+          "type": "string",
+          "pattern": ".*",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "TargetComponentTypeId": {
+          "description": "The ID of the target component type associated with this relationship.",
+          "type": "string",
+          "pattern": "[a-zA-Z_\\.\\-0-9:]+",
+          "minLength": 1,
+          "maxLength": 256
+        }
+      },
+      "additionalProperties": false
+    },
+    "DataType": {
+      "description": "An object that specifies the data type of a property.",
+      "type": "object",
+      "properties": {
+        "AllowedValues": {
+          "description": "The allowed values for this data type.",
+          "type": "array",
+          "minItems": 0,
+          "maxItems": 50,
+          "uniqueItems": false,
+          "insertionOrder": false,
+          "items": {
+            "$ref": "#/definitions/DataValue"
+          }
+        },
+        "NestedType": {
+          "description": "The nested type in the data type.",
+          "$ref": "#/definitions/DataType"
+        },
+        "Relationship": {
+          "description": "A relationship that associates a component with another component.",
+          "$ref": "#/definitions/Relationship"
+        },
+        "Type": {
+          "description": "The underlying type of the data type.",
+          "type": "string",
+          "enum": [
+            "RELATIONSHIP",
+            "STRING",
+            "LONG",
+            "BOOLEAN",
+            "INTEGER",
+            "DOUBLE",
+            "LIST",
+            "MAP"
+          ]
+        },
+        "UnitOfMeasure": {
+          "description": "The unit of measure used in this data type.",
+          "type": "string",
+          "pattern": ".*",
+          "minLength": 1,
+          "maxLength": 256
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "Type"
+      ]
+    },
+    "PropertyDefinition": {
+      "description": "An object that sets information about a property.",
+      "type": "object",
+      "properties": {
+        "Configurations": {
+          "description": "An object that specifies information about a property.",
+          "type": "object",
+          "patternProperties": {
+            "[a-zA-Z_\\-0-9]+": {
+              "type": "string",
+              "pattern": "[a-zA-Z_\\-0-9]+",
+              "minLength": 1,
+              "maxLength": 256
+            }
+          },
+          "additionalProperties": false
+        },
+        "DataType": {
+          "description": "An object that contains information about the data type.",
+          "$ref": "#/definitions/DataType"
+        },
+        "DefaultValue": {
+          "description": "An object that contains the default value.",
+          "$ref": "#/definitions/DataValue"
+        },
+        "IsExternalId": {
+          "description": "A Boolean value that specifies whether the property ID comes from an external data store.",
+          "type": "boolean"
+        },
+        "IsRequiredInEntity": {
+          "description": "A Boolean value that specifies whether the property is required.",
+          "type": "boolean"
+        },
+        "IsStoredExternally": {
+          "description": "A Boolean value that specifies whether the property is stored externally.",
+          "type": "boolean"
+        },
+        "IsTimeSeries": {
+          "description": "A Boolean value that specifies whether the property consists of time series data.",
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
+    },
+    "PropertyGroup": {
+      "description": "An object that sets information about a property group.",
+      "type": "object",
+      "properties": {
+        "GroupType": {
+          "description": "The type of property group.",
+          "type": "string",
+          "enum": [
+            "TABULAR"
+          ]
+        },
+        "PropertyNames": {
+          "description": "The list of property names in the property group.",
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 256,
+          "uniqueItems": true,
+          "insertionOrder": false,
+          "items": {
+            "$ref": "#/definitions/PropertyName"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "Status": {
+      "type": "object",
+      "properties": {
+        "State": {
+          "type": "string",
+          "enum": [
+            "CREATING",
+            "UPDATING",
+            "DELETING",
+            "ACTIVE",
+            "ERROR"
+          ]
+        },
+        "Error": {
+          "type": "object",
+          "anyOf": [
+            {
+              "description": "Empty Error object.",
+              "type": "object",
+              "additionalProperties": false
+            },
+            {
+              "description": "Error object with Message and Code.",
+              "type": "object",
+              "properties": {
+                "Message": {
+                  "type": "string",
+                  "minLength": 0,
+                  "maxLength": 2048
+                },
+                "Code": {
+                  "type": "string",
+                  "enum": [
+                    "VALIDATION_ERROR",
+                    "INTERNAL_FAILURE"
+                  ]
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "properties": {
+    "WorkspaceId": {
+      "description": "The ID of the workspace that contains the component type.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "[a-zA-Z_0-9][a-zA-Z_\\-0-9]*[a-zA-Z0-9]+"
+    },
+    "ComponentTypeId": {
+      "description": "The ID of the component type.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256,
+      "pattern": "[a-zA-Z_\\.\\-0-9:]+"
+    },
+    "Description": {
+      "description": "The description of the component type.",
+      "type": "string",
+      "minLength": 0,
+      "maxLength": 512
+    },
+    "ExtendsFrom": {
+      "description": "Specifies the parent component type to extend.",
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 256,
+      "uniqueItems": true,
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/ParentComponentType"
+      }
+    },
+    "Functions": {
+      "description": "a Map of functions in the component type. Each function's key must be unique to this map.",
+      "type": "object",
+      "additionalProperties": false,
+      "patternProperties": {
+        "[a-zA-Z_\\-0-9]+": {
+          "$ref": "#/definitions/Function"
+        }
+      }
+    },
+    "IsSingleton": {
+      "description": "A Boolean value that specifies whether an entity can have more than one component of this type.",
+      "type": "boolean"
+    },
+    "PropertyDefinitions": {
+      "description": "An map of the property definitions in the component type. Each property definition's key must be unique to this map.",
+      "type": "object",
+      "patternProperties": {
+        "[a-zA-Z_\\-0-9]+": {
+          "$ref": "#/definitions/PropertyDefinition"
+        }
+      },
+      "additionalProperties": false
+    },
+    "PropertyGroups": {
+      "description": "An map of the property groups in the component type. Each property group's key must be unique to this map.",
+      "type": "object",
+      "patternProperties": {
+        "[a-zA-Z_\\-0-9]+": {
+          "$ref": "#/definitions/PropertyGroup"
+        }
+      },
+      "additionalProperties": false
+    },
+    "Arn": {
+      "description": "The ARN of the component type.",
+      "type": "string",
+      "minLength": 20,
+      "maxLength": 2048,
+      "pattern": "arn:((aws)|(aws-cn)|(aws-us-gov)):iottwinmaker:[a-z0-9-]+:[0-9]{12}:[\\/a-zA-Z0-9_\\-\\.:]+"
+    },
+    "CreationDateTime": {
+      "description": "The date and time when the component type was created.",
+      "$ref": "#/definitions/DateTimeFormat"
+    },
+    "UpdateDateTime": {
+      "description": "The last date and time when the component type was updated.",
+      "$ref": "#/definitions/DateTimeFormat"
+    },
+    "Status": {
+      "description": "The current status of the component type.",
+      "$ref": "#/definitions/Status"
+    },
+    "IsAbstract": {
+      "description": "A Boolean value that specifies whether the component type is abstract.",
+      "type": "boolean"
+    },
+    "IsSchemaInitialized": {
+      "description": "A Boolean value that specifies whether the component type has a schema initializer and that the schema initializer has run.",
+      "type": "boolean"
+    },
+    "Tags": {
+      "type": "object",
+      "description": "A map of key-value pairs to associate with a resource.",
+      "patternProperties": {
+        "^([\\p{L}\\p{Z}\\p{N}_.:/=+\\-@]*)$": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        }
+      },
+      "maxProperties": 50,
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false,
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": true,
+    "tagProperty": "/properties/Tags"
+  },
+  "required": [
+    "WorkspaceId",
+    "ComponentTypeId"
+  ],
+  "readOnlyProperties": [
+    "/properties/Arn",
+    "/properties/CreationDateTime",
+    "/properties/UpdateDateTime",
+    "/properties/Status",
+    "/properties/IsAbstract",
+    "/properties/IsSchemaInitialized"
+  ],
+  "createOnlyProperties": [
+    "/properties/WorkspaceId",
+    "/properties/ComponentTypeId"
+  ],
+  "primaryIdentifier": [
+    "/properties/WorkspaceId",
+    "/properties/ComponentTypeId"
+  ],
+  "handlers": {
+    "create": {
+      "permissions": [
+        "iottwinmaker:CreateComponentType",
+        "iottwinmaker:GetComponentType",
+        "iottwinmaker:GetWorkspace",
+        "iottwinmaker:ListTagsForResource",
+        "iottwinmaker:TagResource"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "iottwinmaker:GetComponentType",
+        "iottwinmaker:GetWorkspace",
+        "iottwinmaker:ListTagsForResource"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "iottwinmaker:GetComponentType",
+        "iottwinmaker:GetWorkspace",
+        "iottwinmaker:ListTagsForResource",
+        "iottwinmaker:TagResource",
+        "iottwinmaker:UntagResource",
+        "iottwinmaker:UpdateComponentType"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "iottwinmaker:DeleteComponentType",
+        "iottwinmaker:GetComponentType",
+        "iottwinmaker:GetWorkspace"
+      ]
+    },
+    "list": {
+      "handlerSchema": {
+        "properties": {
+          "WorkspaceId": {
+            "type": "string",
+            "$ref": "resource-schema.json#/properties/WorkspaceId"
+          }
+        },
+        "required": [
+          "WorkspaceId"
+        ]
+      },
+      "permissions": [
+        "iottwinmaker:GetComponentType",
+        "iottwinmaker:GetWorkspace",
+        "iottwinmaker:ListComponentTypes",
+        "iottwinmaker:ListTagsForResource"
+      ]
+    }
+  }
+}

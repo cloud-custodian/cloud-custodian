@@ -20,7 +20,7 @@
       "minLength": 1,
       "maxLength": 255
     },
-    "CreatedTime": {
+    "Timestamp": {
       "type": "integer"
     },
     "StorageLocation": {
@@ -89,7 +89,7 @@
       "$ref": "#/definitions/StorageLocation"
     },
     "CreatedTime": {
-      "$ref": "#/definitions/CreatedTime"
+      "$ref": "#/definitions/Timestamp"
     },
     "Tags": {
       "$ref": "#/definitions/TagList"
@@ -104,7 +104,6 @@
     "/properties/PackageId",
     "/properties/Arn",
     "/properties/CreatedTime",
-    "/properties/StorageLocation",
     "/properties/StorageLocation/Bucket",
     "/properties/StorageLocation/RepoPrefixLocation",
     "/properties/StorageLocation/GeneratedPrefixLocation",
@@ -122,13 +121,21 @@
       "permissions": [
         "panorama:CreatePackage",
         "panorama:ListTagsForResource",
-        "panorama:TagResource"
+        "panorama:TagResource",
+        "panorama:DescribePackage",
+        "s3:ListBucket",
+        "s3:PutObject",
+        "s3:GetObject",
+        "s3:GetObjectVersion"
       ]
     },
     "read": {
       "permissions": [
         "panorama:DescribePackage",
-        "panorama:ListTagsForResource"
+        "panorama:ListTagsForResource",
+        "s3:ListBucket",
+        "s3:GetObject",
+        "s3:GetObjectVersion"
       ]
     },
     "update": {
@@ -136,17 +143,33 @@
         "panorama:DescribePackage",
         "panorama:ListTagsForResource",
         "panorama:TagResource",
-        "panorama:UntagResource"
+        "panorama:UntagResource",
+        "s3:PutObject",
+        "s3:ListBucket",
+        "s3:GetObject",
+        "s3:GetObjectVersion"
       ]
     },
     "list": {
       "permissions": [
-        "panorama:ListPackages"
+        "panorama:ListPackages",
+        "s3:ListBucket",
+        "s3:GetObject",
+        "s3:GetObjectVersion"
       ]
     },
     "delete": {
       "permissions": [
-        "panorama:DeletePackage"
+        "panorama:DeletePackage",
+        "panorama:DescribePackage",
+        "s3:DeleteObject",
+        "s3:DeleteObjectVersion",
+        "s3:DeleteObjectVersionTagging",
+        "s3:ListObjects",
+        "s3:ListObjectsV2",
+        "s3:ListBucket",
+        "s3:GetObject",
+        "s3:GetObjectVersion"
       ]
     }
   }

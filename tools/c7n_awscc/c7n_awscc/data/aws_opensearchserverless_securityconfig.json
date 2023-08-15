@@ -1,0 +1,139 @@
+{
+  "typeName": "AWS::OpenSearchServerless::SecurityConfig",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-opensearchserverless",
+  "description": "Amazon OpenSearchServerless security config resource",
+  "tagging": {
+    "taggable": false,
+    "tagOnCreate": false,
+    "tagUpdatable": false,
+    "cloudFormationSystemTags": false
+  },
+  "definitions": {
+    "SamlConfigOptions": {
+      "type": "object",
+      "description": "Describes saml options in form of key value map",
+      "properties": {
+        "Metadata": {
+          "type": "string",
+          "description": "The XML saml provider metadata document that you want to use",
+          "maxLength": 51200,
+          "minLength": 1,
+          "pattern": "[\\u0009\\u000A\\u000D\\u0020-\\u007E\\u00A1-\\u00FF]+"
+        },
+        "UserAttribute": {
+          "type": "string",
+          "description": "Custom attribute for this saml integration",
+          "maxLength": 2048,
+          "minLength": 1,
+          "pattern": "[\\w+=,.@-]+"
+        },
+        "GroupAttribute": {
+          "type": "string",
+          "description": "Group attribute for this saml integration",
+          "maxLength": 2048,
+          "minLength": 1,
+          "pattern": "[\\w+=,.@-]+"
+        },
+        "SessionTimeout": {
+          "type": "integer",
+          "description": "Defines the session timeout in minutes"
+        }
+      },
+      "required": [
+        "Metadata"
+      ],
+      "additionalProperties": false
+    },
+    "SecurityConfigType": {
+      "type": "string",
+      "description": "Config type for security config",
+      "enum": [
+        "saml"
+      ]
+    }
+  },
+  "properties": {
+    "Description": {
+      "type": "string",
+      "maxLength": 1000,
+      "minLength": 1,
+      "description": "Security config description"
+    },
+    "Id": {
+      "type": "string",
+      "maxLength": 100,
+      "minLength": 1,
+      "description": "The identifier of the security config"
+    },
+    "Name": {
+      "type": "string",
+      "maxLength": 32,
+      "minLength": 3,
+      "pattern": "^[a-z][a-z0-9-]{2,31}$",
+      "description": "The friendly name of the security config"
+    },
+    "SamlOptions": {
+      "$ref": "#/definitions/SamlConfigOptions"
+    },
+    "Type": {
+      "$ref": "#/definitions/SecurityConfigType"
+    }
+  },
+  "readOnlyProperties": [
+    "/properties/Id"
+  ],
+  "writeOnlyProperties": [
+    "/properties/Name"
+  ],
+  "createOnlyProperties": [
+    "/properties/Type",
+    "/properties/Name"
+  ],
+  "primaryIdentifier": [
+    "/properties/Id"
+  ],
+  "additionalIdentifiers": [
+    [
+      "/properties/Name"
+    ]
+  ],
+  "handlers": {
+    "create": {
+      "permissions": [
+        "aoss:CreateSecurityConfig"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "aoss:GetSecurityConfig"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "aoss:GetSecurityConfig",
+        "aoss:UpdateSecurityConfig"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "aoss:DeleteSecurityConfig"
+      ]
+    },
+    "list": {
+      "handlerSchema": {
+        "properties": {
+          "Type": {
+            "$ref": "resource-schema.json#/properties/Type"
+          }
+        },
+        "required": [
+          "Type"
+        ]
+      },
+      "permissions": [
+        "aoss:ListSecurityConfigs"
+      ]
+    }
+  },
+  "additionalProperties": false
+}

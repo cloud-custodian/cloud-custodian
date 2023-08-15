@@ -32,9 +32,7 @@
           "$ref": "#/definitions/S3DestinationConfiguration"
         }
       },
-      "required": [
-        "S3"
-      ]
+      "required": []
     },
     "S3DestinationConfiguration": {
       "description": "Recording S3 Destination Configuration.",
@@ -51,6 +49,90 @@
       "required": [
         "BucketName"
       ]
+    },
+    "ThumbnailConfiguration": {
+      "description": "Recording Thumbnail Configuration.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "RecordingMode": {
+          "description": "Thumbnail Recording Mode, which determines whether thumbnails are recorded at an interval or are disabled.",
+          "type": "string",
+          "enum": [
+            "INTERVAL",
+            "DISABLED"
+          ],
+          "default": "INTERVAL"
+        },
+        "TargetIntervalSeconds": {
+          "description": "Target Interval Seconds defines the interval at which thumbnails are recorded. This field is required if RecordingMode is INTERVAL.",
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 60,
+          "default": 60
+        },
+        "Resolution": {
+          "description": "Resolution indicates the desired resolution of recorded thumbnails.",
+          "type": "string",
+          "enum": [
+            "FULL_HD",
+            "HD",
+            "SD",
+            "LOWEST_RESOLUTION"
+          ]
+        },
+        "Storage": {
+          "description": "Storage indicates the format in which thumbnails are recorded.",
+          "type": "array",
+          "uniqueItems": true,
+          "insertionOrder": false,
+          "minItems": 0,
+          "maxItems": 2,
+          "items": {
+            "type": "string",
+            "enum": [
+              "SEQUENTIAL",
+              "LATEST"
+            ]
+          }
+        }
+      },
+      "required": []
+    },
+    "RenditionConfiguration": {
+      "description": "Rendition Configuration describes which renditions should be recorded for a stream.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "RenditionSelection": {
+          "description": "Resolution Selection indicates which set of renditions are recorded for a stream.",
+          "type": "string",
+          "enum": [
+            "ALL",
+            "NONE",
+            "CUSTOM"
+          ],
+          "default": "ALL"
+        },
+        "Renditions": {
+          "description": "Renditions indicates which renditions are recorded for a stream.",
+          "type": "array",
+          "uniqueItems": true,
+          "insertionOrder": false,
+          "minItems": 0,
+          "maxItems": 4,
+          "items": {
+            "type": "string",
+            "enum": [
+              "FULL_HD",
+              "HD",
+              "SD",
+              "LOWEST_RESOLUTION"
+            ]
+          }
+        }
+      },
+      "required": []
     }
   },
   "properties": {
@@ -58,7 +140,7 @@
       "description": "Recording Configuration ARN is automatically generated on creation and assigned as the unique identifier.",
       "type": "string",
       "pattern": "^arn:aws[-a-z]*:ivs:[a-z0-9-]+:[0-9]+:recording-configuration/[a-zA-Z0-9-]+$",
-      "minLength": 1,
+      "minLength": 0,
       "maxLength": 128
     },
     "Name": {
@@ -77,6 +159,13 @@
         "ACTIVE"
       ]
     },
+    "RecordingReconnectWindowSeconds": {
+      "description": "Recording Reconnect Window Seconds. (0 means disabled)",
+      "type": "integer",
+      "default": 0,
+      "minimum": 0,
+      "maximum": 300
+    },
     "DestinationConfiguration": {
       "$ref": "#/definitions/DestinationConfiguration"
     },
@@ -89,6 +178,12 @@
       "items": {
         "$ref": "#/definitions/Tag"
       }
+    },
+    "ThumbnailConfiguration": {
+      "$ref": "#/definitions/ThumbnailConfiguration"
+    },
+    "RenditionConfiguration": {
+      "$ref": "#/definitions/RenditionConfiguration"
     }
   },
   "additionalProperties": false,
@@ -106,12 +201,23 @@
     "/properties/Name",
     "/properties/DestinationConfiguration",
     "/properties/DestinationConfiguration/S3",
-    "/properties/DestinationConfiguration/S3/BucketName"
+    "/properties/DestinationConfiguration/S3/BucketName",
+    "/properties/RecordingReconnectWindowSeconds",
+    "/properties/ThumbnailConfiguration",
+    "/properties/ThumbnailConfiguration/RecordingMode",
+    "/properties/ThumbnailConfiguration/TargetIntervalSeconds",
+    "/properties/ThumbnailConfiguration/Storage",
+    "/properties/ThumbnailConfiguration/Resolution",
+    "/properties/RenditionConfiguration",
+    "/properties/RenditionConfiguration/RenditionSelection",
+    "/properties/RenditionConfiguration/Renditions"
   ],
   "handlers": {
     "create": {
       "permissions": [
         "ivs:CreateRecordingConfiguration",
+        "ivs:GetRecordingConfiguration",
+        "ivs:TagResource",
         "iam:CreateServiceLinkedRole",
         "iam:PutRolePolicy",
         "iam:AttachRolePolicy",
@@ -122,13 +228,19 @@
     },
     "read": {
       "permissions": [
-        "ivs:GetRecordingConfiguration"
+        "ivs:GetRecordingConfiguration",
+        "s3:GetBucketLocation",
+        "ivs:ListTagsForResource"
       ]
     },
     "update": {
       "permissions": [
+        "ivs:GetRecordingConfiguration",
         "sts:AssumeRole",
         "iam:CreateServiceLinkedRole",
+        "iam:PutRolePolicy",
+        "iam:AttachRolePolicy",
+        "s3:ListBucket",
         "ivs:TagResource",
         "ivs:UntagResource",
         "ivs:ListTagsForResource"
@@ -137,12 +249,15 @@
     "delete": {
       "permissions": [
         "ivs:DeleteRecordingConfiguration",
+        "ivs:UntagResource",
         "iam:CreateServiceLinkedRole"
       ]
     },
     "list": {
       "permissions": [
-        "ivs:ListRecordingConfigurations"
+        "ivs:ListRecordingConfigurations",
+        "s3:GetBucketLocation",
+        "ivs:ListTagsForResource"
       ]
     }
   }

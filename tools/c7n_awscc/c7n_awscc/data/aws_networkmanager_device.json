@@ -8,12 +8,18 @@
       "type": "object",
       "properties": {
         "Key": {
-          "type": "string"
+          "type": "string",
+          "description": "The key name of the tag. You can specify a value that is 1 to 128 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -."
         },
         "Value": {
-          "type": "string"
+          "type": "string",
+          "description": "The value for the tag. You can specify a value that is 0 to 256 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -."
         }
       },
+      "required": [
+        "Key",
+        "Value"
+      ],
       "additionalProperties": false
     },
     "Location": {
@@ -30,6 +36,21 @@
         },
         "Longitude": {
           "description": "The longitude.",
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "AWSLocation": {
+      "description": "The Amazon Web Services location of the device, if applicable.",
+      "type": "object",
+      "properties": {
+        "Zone": {
+          "description": "The Zone that the device is located in. Specify the ID of an Availability Zone, Local Zone, Wavelength Zone, or an Outpost.",
+          "type": "string"
+        },
+        "SubnetArn": {
+          "description": "The Amazon Resource Name (ARN) of the subnet that the device is located in.",
           "type": "string"
         }
       },
@@ -52,6 +73,8 @@
     "Tags": {
       "description": "The tags for the device.",
       "type": "array",
+      "uniqueItems": true,
+      "insertionOrder": false,
       "items": {
         "$ref": "#/definitions/Tag"
       }
@@ -59,6 +82,10 @@
     "GlobalNetworkId": {
       "description": "The ID of the global network.",
       "type": "string"
+    },
+    "AWSLocation": {
+      "description": "The Amazon Web Services location of the device, if applicable.",
+      "$ref": "#/definitions/AWSLocation"
     },
     "Location": {
       "description": "The site location.",
@@ -83,7 +110,18 @@
     "Vendor": {
       "description": "The device vendor.",
       "type": "string"
+    },
+    "CreatedAt": {
+      "description": "The date and time that the device was created.",
+      "type": "string"
     }
+  },
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": false,
+    "tagProperty": "/properties/Tags"
   },
   "additionalProperties": false,
   "required": [
@@ -91,7 +129,8 @@
   ],
   "readOnlyProperties": [
     "/properties/DeviceId",
-    "/properties/DeviceArn"
+    "/properties/DeviceArn",
+    "/properties/CreatedAt"
   ],
   "createOnlyProperties": [
     "/properties/GlobalNetworkId"
@@ -108,7 +147,9 @@
   "handlers": {
     "create": {
       "permissions": [
-        "networkmanager:CreateDevice"
+        "networkmanager:CreateDevice",
+        "networkmanager:GetDevices",
+        "networkmanager:TagResource"
       ]
     },
     "read": {
@@ -120,6 +161,7 @@
       "permissions": [
         "networkmanager:UpdateDevice",
         "networkmanager:ListTagsForResource",
+        "networkmanager:GetDevices",
         "networkmanager:TagResource",
         "networkmanager:UntagResource"
       ]
@@ -130,6 +172,16 @@
       ]
     },
     "list": {
+      "handlerSchema": {
+        "properties": {
+          "GlobalNetworkId": {
+            "$ref": "resource-schema.json#/properties/GlobalNetworkId"
+          }
+        },
+        "required": [
+          "GlobalNetworkId"
+        ]
+      },
       "permissions": [
         "networkmanager:GetDevices"
       ]

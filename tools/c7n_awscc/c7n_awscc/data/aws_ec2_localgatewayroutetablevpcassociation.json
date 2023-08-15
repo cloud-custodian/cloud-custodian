@@ -72,7 +72,12 @@
   "primaryIdentifier": [
     "/properties/LocalGatewayRouteTableVpcAssociationId"
   ],
-  "taggable": true,
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": false
+  },
   "handlers": {
     "create": {
       "permissions": [
@@ -96,7 +101,8 @@
     "delete": {
       "permissions": [
         "ec2:DeleteLocalGatewayRouteTableVpcAssociation",
-        "ec2:DescribeLocalGatewayRouteTableVpcAssociations"
+        "ec2:DescribeLocalGatewayRouteTableVpcAssociations",
+        "ec2:DeleteTags"
       ]
     },
     "list": {

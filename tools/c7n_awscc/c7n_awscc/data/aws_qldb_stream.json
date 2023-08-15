@@ -106,6 +106,7 @@
   "handlers": {
     "create": {
       "permissions": [
+        "iam:PassRole",
         "qldb:StreamJournalToKinesis",
         "qldb:DescribeJournalKinesisStream"
       ]
@@ -118,7 +119,8 @@
     },
     "read": {
       "permissions": [
-        "qldb:DescribeJournalKinesisStream"
+        "qldb:DescribeJournalKinesisStream",
+        "qldb:ListTagsForResource"
       ]
     },
     "update": {

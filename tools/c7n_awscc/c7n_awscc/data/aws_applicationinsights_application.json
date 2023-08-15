@@ -68,6 +68,13 @@
       },
       "minItems": 1,
       "insertionOrder": true
+    },
+    "GroupingType": {
+      "description": "The grouping type of the application",
+      "type": "string",
+      "enum": [
+        "ACCOUNT_BASED"
+      ]
     }
   },
   "definitions": {
@@ -298,6 +305,14 @@
         "JMXPrometheusExporter": {
           "description": "The JMX Prometheus Exporter settings.",
           "$ref": "#/definitions/JMXPrometheusExporter"
+        },
+        "HANAPrometheusExporter": {
+          "description": "The HANA DB Prometheus Exporter settings.",
+          "$ref": "#/definitions/HANAPrometheusExporter"
+        },
+        "HAClusterPrometheusExporter": {
+          "description": "The HA cluster Prometheus Exporter settings.",
+          "$ref": "#/definitions/HAClusterPrometheusExporter"
         }
       },
       "additionalProperties": false
@@ -346,7 +361,51 @@
           "type": "string"
         },
         "PrometheusPort": {
-          "description": "Prometheus exporter port",
+          "description": "Prometheus exporter port.",
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "HANAPrometheusExporter": {
+      "description": "The HANA DB Prometheus Exporter settings.",
+      "type": "object",
+      "properties": {
+        "HANASID": {
+          "description": "HANA DB SID.",
+          "type": "string"
+        },
+        "HANAPort": {
+          "description": "The HANA DB port.",
+          "type": "string"
+        },
+        "HANASecretName": {
+          "description": "The secret name which manages the HANA DB credentials e.g. {\n  \"username\": \"<>\",\n  \"password\": \"<>\"\n}.",
+          "type": "string"
+        },
+        "AgreeToInstallHANADBClient": {
+          "description": "A flag which indicates agreeing to install SAP HANA DB client.",
+          "type": "boolean"
+        },
+        "PrometheusPort": {
+          "description": "Prometheus exporter port.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "HANASID",
+        "HANAPort",
+        "HANASecretName",
+        "AgreeToInstallHANADBClient"
+      ],
+      "additionalProperties": false
+    },
+    "HAClusterPrometheusExporter": {
+      "description": "The HA cluster Prometheus Exporter settings.",
+      "type": "object",
+      "properties": {
+        "PrometheusPort": {
+          "description": "Prometheus exporter port.",
           "type": "string"
         }
       },
@@ -427,7 +486,7 @@
           "type": "string",
           "minLength": 1,
           "maxLength": 260,
-          "pattern": "^[a-zA-Z0-9_ \\\\/-]$"
+          "pattern": "^[a-zA-Z0-9_ \\\\/-]+$"
         },
         "EventLevels": {
           "description": "The levels of event to log. ",
@@ -523,73 +582,43 @@
   "readOnlyProperties": [
     "/properties/ApplicationARN"
   ],
+  "writeOnlyProperties": [
+    "/properties/ComponentMonitoringSettings",
+    "/properties/LogPatternSets",
+    "/properties/CustomComponents",
+    "/properties/GroupingType",
+    "/properties/OpsItemSNSTopicArn"
+  ],
   "createOnlyProperties": [
-    "/properties/ResourceGroupName"
+    "/properties/ResourceGroupName",
+    "/properties/GroupingType"
   ],
   "handlers": {
     "create": {
       "permissions": [
-        "applicationinsights:CreateApplication",
-        "applicationinsights:DescribeApplication",
-        "applicationinsights:CreateComponent",
-        "applicationinsights:DescribeComponent",
-        "applicationinsights:CreateLogPattern",
-        "applicationinsights:DescribeLogPattern",
-        "applicationinsights:DescribeComponentConfigurationRecommendation",
-        "applicationinsights:UpdateComponentConfiguration",
-        "applicationinsights:ListComponents"
-      ]
+        "*"
+      ],
+      "timeoutInMinutes": 600
     },
     "read": {
       "permissions": [
-        "applicationinsights:DescribeApplication",
-        "applicationinsights:ListTagsForResource",
-        "applicationinsights:DescribeComponent",
-        "applicationinsights:ListComponents",
-        "applicationinsights:DescribeLogPattern",
-        "applicationinsights:ListLogPatterns",
-        "applicationinsights:ListLogPatternSets"
+        "*"
       ]
     },
     "update": {
       "permissions": [
-        "applicationinsights:CreateApplication",
-        "applicationinsights:DescribeApplication",
-        "applicationinsights:UpdateApplication",
-        "applicationinsights:TagResource",
-        "applicationinsights:UntagResource",
-        "applicationinsights:ListTagsForResource",
-        "applicationinsights:CreateComponent",
-        "applicationinsights:DescribeComponent",
-        "applicationinsights:DeleteComponent",
-        "applicationinsights:ListComponents",
-        "applicationinsights:CreateLogPattern",
-        "applicationinsights:DeleteLogPattern",
-        "applicationinsights:DescribeLogPattern",
-        "applicationinsights:ListLogPatterns",
-        "applicationinsights:ListLogPatternSets",
-        "applicationinsights:UpdateLogPattern",
-        "applicationinsights:DescribeComponentConfiguration",
-        "applicationinsights:DescribeComponentConfigurationRecommendation",
-        "applicationinsights:UpdateComponentConfiguration"
-      ]
+        "*"
+      ],
+      "timeoutInMinutes": 600
     },
     "delete": {
       "permissions": [
-        "applicationinsights:DeleteApplication",
-        "applicationinsights:DescribeApplication"
+        "*"
       ]
     },
     "list": {
       "permissions": [
-        "applicationinsights:ListApplications",
-        "applicationinsights:DescribeApplication",
-        "applicationinsights:ListTagsForResource",
-        "applicationinsights:DescribeComponent",
-        "applicationinsights:ListComponents",
-        "applicationinsights:DescribeLogPattern",
-        "applicationinsights:ListLogPatterns",
-        "applicationinsights:ListLogPatternSets"
+        "*"
       ]
     }
   },

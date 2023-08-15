@@ -87,6 +87,14 @@
       "maxLength": 1000,
       "pattern": "(?s).*"
     },
+    "Platform": {
+      "type": "string",
+      "enum": [
+        "WEB",
+        "WEB_DYNAMIC",
+        "WEB_COMPUTE"
+      ]
+    },
     "Repository": {
       "type": "string",
       "pattern": "(?s).*"
@@ -139,6 +147,11 @@
           "items": {
             "$ref": "#/definitions/EnvironmentVariable"
           }
+        },
+        "Framework": {
+          "type": "string",
+          "maxLength": 255,
+          "pattern": "(?s).*"
         },
         "PullRequestEnvironmentName": {
           "type": "string",
@@ -274,6 +287,7 @@
   "handlers": {
     "create": {
       "permissions": [
+        "amplify:GetApp",
         "amplify:CreateApp",
         "amplify:TagResource",
         "codecommit:GetRepository",
@@ -286,15 +300,18 @@
     },
     "delete": {
       "permissions": [
+        "amplify:GetApp",
         "amplify:DeleteApp",
         "codecommit:GetRepository",
         "codecommit:GetRepositoryTriggers",
+        "codecommit:PutRepositoryTriggers",
         "sns:Unsubscribe",
         "iam:PassRole"
       ]
     },
     "list": {
       "permissions": [
+        "amplify:GetApp",
         "amplify:ListApps",
         "amplify:ListTagsForResource",
         "iam:PassRole"
@@ -311,6 +328,7 @@
     },
     "update": {
       "permissions": [
+        "amplify:GetApp",
         "amplify:UpdateApp",
         "amplify:ListTagsForResource",
         "amplify:TagResource",

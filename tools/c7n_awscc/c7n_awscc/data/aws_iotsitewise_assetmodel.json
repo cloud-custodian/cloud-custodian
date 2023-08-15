@@ -351,6 +351,12 @@
   "required": [
     "AssetModelName"
   ],
+  "writeOnlyProperties": [
+    "/properties/AssetModelProperties/*/DataTypeSpec",
+    "/properties/AssetModelProperties/*/Type/Transform/Variables/*/Value/HierarchyLogicalId",
+    "/properties/AssetModelCompositeModels/*/CompositeModelProperties/*/Type/Transform",
+    "/properties/AssetModelCompositeModels/*/CompositeModelProperties/*/Type/Metric"
+  ],
   "readOnlyProperties": [
     "/properties/AssetModelArn",
     "/properties/AssetModelId"

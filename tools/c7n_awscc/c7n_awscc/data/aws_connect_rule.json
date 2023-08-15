@@ -1,0 +1,376 @@
+{
+  "typeName": "AWS::Connect::Rule",
+  "description": "Resource Type definition for AWS:Connect::Rule",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-connect",
+  "definitions": {
+    "UserArn": {
+      "description": "The Amazon Resource Name (ARN) of the user.",
+      "type": "string",
+      "pattern": "^$|arn:aws[-a-z0-9]*:connect:[-a-z0-9]*:[0-9]{12}:instance/[-a-zA-Z0-9]*/agent/[-a-zA-Z0-9]*$"
+    },
+    "NotificationRecipientType": {
+      "description": "The type of notification recipient.",
+      "type": "object",
+      "properties": {
+        "UserTags": {
+          "description": "The collection of recipients who are identified by user tags",
+          "patternProperties": {
+            "^(?=.{1,128}$).+$": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        },
+        "UserArns": {
+          "description": "The list of recipients by user arns.",
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 5,
+          "uniqueItems": true,
+          "insertionOrder": false,
+          "items": {
+            "$ref": "#/definitions/UserArn"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "Reference": {
+      "description": "A contact reference.",
+      "type": "object",
+      "properties": {
+        "Value": {
+          "type": "string",
+          "pattern": "^(/|https:)"
+        },
+        "Type": {
+          "type": "string",
+          "enum": [
+            "URL",
+            "ATTACHMENT",
+            "NUMBER",
+            "STRING",
+            "DATE",
+            "EMAIL"
+          ]
+        }
+      },
+      "required": [
+        "Value",
+        "Type"
+      ],
+      "additionalProperties": false
+    },
+    "TaskAction": {
+      "description": "The definition of task action.",
+      "type": "object",
+      "properties": {
+        "Name": {
+          "description": "The name which appears in the agent's Contact Control Panel (CCP).",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "Description": {
+          "description": "The description which appears in the agent's Contact Control Panel (CCP).",
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 4096
+        },
+        "ContactFlowArn": {
+          "description": "The Amazon Resource Name (ARN) of the contact flow.",
+          "type": "string",
+          "pattern": "^$|arn:aws[-a-z0-9]*:connect:[-a-z0-9]*:[0-9]{12}:instance/[-a-zA-Z0-9]*/contact-flow/[-a-zA-Z0-9]*$"
+        },
+        "References": {
+          "description": "A formatted URL that is shown to an agent in the Contact Control Panel (CCP).",
+          "patternProperties": {
+            "^(?=.{1,4096}$).+$": {
+              "$ref": "#/definitions/Reference"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "Name",
+        "ContactFlowArn"
+      ],
+      "additionalProperties": false
+    },
+    "EventBridgeAction": {
+      "description": "The definition for event bridge action.",
+      "type": "object",
+      "properties": {
+        "Name": {
+          "description": "The name of the event bridge action.",
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9._-]{1,100}$"
+        }
+      },
+      "required": [
+        "Name"
+      ],
+      "additionalProperties": false
+    },
+    "AssignContactCategoryAction": {
+      "description": "The definition for assigning contact category action.",
+      "type": "object"
+    },
+    "SendNotificationAction": {
+      "description": "The definition for sending notification action.",
+      "type": "object",
+      "properties": {
+        "DeliveryMethod": {
+          "description": "The means of delivery.",
+          "type": "string",
+          "enum": [
+            "EMAIL"
+          ]
+        },
+        "Subject": {
+          "description": "The subject of notification.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "Content": {
+          "description": "The content of notification.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1024
+        },
+        "ContentType": {
+          "description": "The type of content.",
+          "type": "string",
+          "enum": [
+            "PLAIN_TEXT"
+          ]
+        },
+        "Recipient": {
+          "$ref": "#/definitions/NotificationRecipientType"
+        }
+      },
+      "required": [
+        "DeliveryMethod",
+        "Content",
+        "Recipient",
+        "ContentType"
+      ],
+      "additionalProperties": false
+    },
+    "AssignContactCategoryActions": {
+      "description": "This action will assign contact category when a rule is triggered.",
+      "type": "array",
+      "insertionOrder": false,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/definitions/AssignContactCategoryAction"
+      },
+      "minItems": 1,
+      "maxItems": 1
+    },
+    "EventBridgeActions": {
+      "description": "This action will send event bridge notification when a rule is triggered.",
+      "type": "array",
+      "insertionOrder": false,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/definitions/EventBridgeAction"
+      },
+      "minItems": 1,
+      "maxItems": 1
+    },
+    "RuleTriggerEventSource": {
+      "description": "The event source that will trigger the rule.",
+      "type": "object",
+      "properties": {
+        "EventSourceName": {
+          "description": "The name of event source.",
+          "type": "string",
+          "enum": [
+            "OnContactEvaluationSubmit",
+            "OnPostCallAnalysisAvailable",
+            "OnRealTimeCallAnalysisAvailable",
+            "OnPostChatAnalysisAvailable",
+            "OnZendeskTicketCreate",
+            "OnZendeskTicketStatusUpdate",
+            "OnSalesforceCaseCreate"
+          ]
+        },
+        "IntegrationAssociationArn": {
+          "description": "The Amazon Resource Name (ARN) for the AppIntegration association.",
+          "type": "string",
+          "pattern": "^$|arn:aws[-a-z0-9]*:connect:[-a-z0-9]*:[0-9]{12}:instance/[-a-zA-Z0-9]*/integration-association/[-a-zA-Z0-9]*$"
+        }
+      },
+      "required": [
+        "EventSourceName"
+      ],
+      "additionalProperties": false
+    },
+    "TaskActions": {
+      "description": "This action will generate a task when a rule is triggered.",
+      "type": "array",
+      "insertionOrder": false,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/definitions/TaskAction"
+      },
+      "minItems": 1,
+      "maxItems": 1
+    },
+    "SendNotificationActions": {
+      "description": "The action will send notification when a rule is triggered.",
+      "type": "array",
+      "insertionOrder": false,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/definitions/SendNotificationAction"
+      },
+      "minItems": 1,
+      "maxItems": 1
+    },
+    "Actions": {
+      "description": "The list of actions that will be executed when a rule is triggered.",
+      "type": "object",
+      "properties": {
+        "AssignContactCategoryActions": {
+          "$ref": "#/definitions/AssignContactCategoryActions"
+        },
+        "EventBridgeActions": {
+          "$ref": "#/definitions/EventBridgeActions"
+        },
+        "TaskActions": {
+          "$ref": "#/definitions/TaskActions"
+        },
+        "SendNotificationActions": {
+          "$ref": "#/definitions/SendNotificationActions"
+        }
+      },
+      "additionalProperties": false
+    },
+    "Tag": {
+      "description": "A key-value pair to associate with a resource.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Key": {
+          "type": "string",
+          "description": "The key name of the tag. You can specify a value that is 1 to 128 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -. ",
+          "pattern": "^(?!aws:)[a-zA-Z+-=._:/]+$",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "Value": {
+          "type": "string",
+          "description": "The value for the tag. You can specify a value that's 1 to 256 characters in length.",
+          "maxLength": 256
+        }
+      },
+      "required": [
+        "Key",
+        "Value"
+      ]
+    }
+  },
+  "properties": {
+    "Name": {
+      "description": "The name of the rule.",
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9._-]{1,200}$"
+    },
+    "RuleArn": {
+      "description": "The Amazon Resource Name (ARN) of the rule.",
+      "type": "string",
+      "pattern": "^arn:aws[-a-z0-9]*:connect:[-a-z0-9]*:[0-9]{12}:instance/[-a-zA-Z0-9]*/rule/[-a-zA-Z0-9]*$"
+    },
+    "InstanceArn": {
+      "description": "The Amazon Resource Name (ARN) of the instance.",
+      "type": "string",
+      "pattern": "^arn:aws[-a-z0-9]*:connect:[-a-z0-9]*:[0-9]{12}:instance/[-a-zA-Z0-9]*$"
+    },
+    "TriggerEventSource": {
+      "description": "The event source that triggers the rule.",
+      "$ref": "#/definitions/RuleTriggerEventSource"
+    },
+    "Function": {
+      "description": "The conditions of a rule.",
+      "type": "string"
+    },
+    "Actions": {
+      "description": "The list of actions that will be executed when a rule is triggered.",
+      "$ref": "#/definitions/Actions"
+    },
+    "PublishStatus": {
+      "description": "The publish status of a rule, either draft or published.",
+      "type": "string",
+      "enum": [
+        "DRAFT",
+        "PUBLISHED"
+      ]
+    },
+    "Tags": {
+      "description": "One or more tags.",
+      "type": "array",
+      "maxItems": 50,
+      "uniqueItems": true,
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/Tag"
+      }
+    }
+  },
+  "required": [
+    "Name",
+    "InstanceArn",
+    "TriggerEventSource",
+    "Function",
+    "Actions",
+    "PublishStatus"
+  ],
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": false,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": true,
+    "tagProperty": "/properties/Tags"
+  },
+  "handlers": {
+    "create": {
+      "permissions": [
+        "connect:CreateRule"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "connect:DescribeRule"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "connect:DeleteRule",
+        "connect:UntagResource"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "connect:UpdateRule",
+        "connect:TagResource",
+        "connect:UntagResource"
+      ]
+    }
+  },
+  "additionalProperties": false,
+  "primaryIdentifier": [
+    "/properties/RuleArn"
+  ],
+  "readOnlyProperties": [
+    "/properties/RuleArn"
+  ],
+  "createOnlyProperties": [
+    "/properties/TriggerEventSource",
+    "/properties/InstanceArn"
+  ],
+  "replacementStrategy": "delete_then_create"
+}

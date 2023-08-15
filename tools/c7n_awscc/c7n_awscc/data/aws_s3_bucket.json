@@ -318,14 +318,15 @@
       "type": "object",
       "properties": {
         "KMSMasterKeyID": {
-          "description": "\"KMSMasterKeyID\" can only be used when you set the value of SSEAlgorithm as aws:kms.",
+          "description": "\"KMSMasterKeyID\" can only be used when you set the value of SSEAlgorithm as aws:kms or aws:kms:dsse.",
           "type": "string"
         },
         "SSEAlgorithm": {
           "type": "string",
           "enum": [
             "aws:kms",
-            "AES256"
+            "AES256",
+            "aws:kms:dsse"
           ]
         }
       },
@@ -592,6 +593,9 @@
         "NoncurrentVersionExpirationInDays": {
           "type": "integer"
         },
+        "NoncurrentVersionExpiration": {
+          "$ref": "#/definitions/NoncurrentVersionExpiration"
+        },
         "NoncurrentVersionTransition": {
           "$ref": "#/definitions/NoncurrentVersionTransition"
         },
@@ -620,6 +624,16 @@
           "items": {
             "$ref": "#/definitions/TagFilter"
           }
+        },
+        "ObjectSizeGreaterThan": {
+          "type": "string",
+          "maxLength": 20,
+          "pattern": "[0-9]+"
+        },
+        "ObjectSizeLessThan": {
+          "type": "string",
+          "maxLength": 20,
+          "pattern": "[0-9]+"
         },
         "Transition": {
           "$ref": "#/definitions/Transition"
@@ -657,6 +671,24 @@
       "type": "string",
       "pattern": "^([0-2]\\d{3})-(0[0-9]|1[0-2])-([0-2]\\d|3[01])T([01]\\d|2[0-4]):([0-5]\\d):([0-6]\\d)((\\.\\d{3})?)Z$"
     },
+    "NoncurrentVersionExpiration": {
+      "type": "object",
+      "description": "Container for the expiration rule that describes when noncurrent objects are expired. If your bucket is versioning-enabled (or versioning is suspended), you can set this action to request that Amazon S3 expire noncurrent object versions at a specific period in the object's lifetime",
+      "additionalProperties": false,
+      "properties": {
+        "NoncurrentDays": {
+          "description": "Specified the number of days an object is noncurrent before Amazon S3 can perform the associated action",
+          "type": "integer"
+        },
+        "NewerNoncurrentVersions": {
+          "description": "Specified the number of newer noncurrent and current versions that must exists before performing the associated action",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "NoncurrentDays"
+      ]
+    },
     "NoncurrentVersionTransition": {
       "type": "object",
       "description": "Container for the transition rule that describes when noncurrent objects transition to the STANDARD_IA, ONEZONE_IA, INTELLIGENT_TIERING, GLACIER_IR, GLACIER, or DEEP_ARCHIVE storage class. If your bucket is versioning-enabled (or versioning is suspended), you can set this action to request that Amazon S3 transition noncurrent object versions to the STANDARD_IA, ONEZONE_IA, INTELLIGENT_TIERING, GLACIER_IR, GLACIER, or DEEP_ARCHIVE storage class at a specific period in the object's lifetime.",
@@ -677,6 +709,10 @@
         },
         "TransitionInDays": {
           "description": "Specifies the number of days an object is noncurrent before Amazon S3 can perform the associated action.",
+          "type": "integer"
+        },
+        "NewerNoncurrentVersions": {
+          "description": "Specified the number of newer noncurrent and current versions that must exists before performing the associated action",
           "type": "integer"
         }
       },
@@ -757,6 +793,9 @@
       "type": "object",
       "additionalProperties": false,
       "properties": {
+        "EventBridgeConfiguration": {
+          "$ref": "#/definitions/EventBridgeConfiguration"
+        },
         "LambdaConfigurations": {
           "type": "array",
           "uniqueItems": true,
@@ -782,6 +821,21 @@
           }
         }
       }
+    },
+    "EventBridgeConfiguration": {
+      "type": "object",
+      "description": "Describes the Amazon EventBridge notification configuration for an Amazon S3 bucket.",
+      "additionalProperties": false,
+      "properties": {
+        "EventBridgeEnabled": {
+          "description": "Specifies whether to send notifications to Amazon EventBridge when events occur in an Amazon S3 bucket.",
+          "type": "boolean",
+          "default": "true"
+        }
+      },
+      "required": [
+        "EventBridgeEnabled"
+      ]
     },
     "LambdaConfiguration": {
       "type": "object",
@@ -970,7 +1024,8 @@
           "type": "string",
           "enum": [
             "ObjectWriter",
-            "BucketOwnerPreferred"
+            "BucketOwnerPreferred",
+            "BucketOwnerEnforced"
           ]
         }
       }
@@ -1291,14 +1346,12 @@
         "Key": {
           "type": "string",
           "minLength": 1,
-          "maxLength": 127,
-          "pattern": "^(?!aws:.*)[a-zA-Z0-9\\s\\_\\.\\/\\=\\+\\-]+$"
+          "maxLength": 128
         },
         "Value": {
           "type": "string",
           "minLength": 1,
-          "maxLength": 255,
-          "pattern": "^(?!aws:.*)[a-zA-Z0-9\\s\\_\\.\\/\\=\\+\\-]+$"
+          "maxLength": 256
         }
       },
       "required": [
@@ -1440,6 +1493,13 @@
       "type": "string"
     }
   },
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": true,
+    "tagProperty": "/properties/Tags"
+  },
   "createOnlyProperties": [
     "/properties/BucketName",
     "/properties/ObjectLockEnabled"
@@ -1453,6 +1513,9 @@
     "/properties/DualStackDomainName",
     "/properties/RegionalDomainName",
     "/properties/WebsiteURL"
+  ],
+  "writeOnlyProperties": [
+    "/properties/AccessControl"
   ],
   "handlers": {
     "create": {
@@ -1481,7 +1544,7 @@
         "s3:PutBucketVersioning",
         "s3:PutObjectLockConfiguration",
         "s3:PutBucketOwnershipControls",
-        "s3:PutBucketIntelligentTieringConfiguration"
+        "s3:PutIntelligentTieringConfiguration"
       ]
     },
     "read": {
@@ -1524,7 +1587,7 @@
         "s3:PutBucketPublicAccessBlock",
         "s3:PutReplicationConfiguration",
         "s3:PutBucketOwnershipControls",
-        "s3:PutBucketIntelligentTieringConfiguration",
+        "s3:PutIntelligentTieringConfiguration",
         "s3:DeleteBucketWebsite",
         "s3:PutBucketLogging",
         "s3:PutBucketVersioning",
@@ -1535,17 +1598,19 @@
         "s3:DeleteBucketEncryption",
         "s3:DeleteBucketLifecycle",
         "s3:DeleteBucketReplication",
-        "iam:PassRole"
+        "iam:PassRole",
+        "s3:ListBucket"
       ]
     },
     "delete": {
       "permissions": [
-        "s3:DeleteBucket"
+        "s3:DeleteBucket",
+        "s3:ListBucket"
       ]
     },
     "list": {
       "permissions": [
-        "s3:ListBuckets"
+        "s3:ListAllMyBuckets"
       ]
     }
   }

@@ -1,0 +1,330 @@
+{
+  "typeName": "AWS::Neptune::DBCluster",
+  "description": "The AWS::Neptune::DBCluster resource creates an Amazon Neptune DB cluster.",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-neptune",
+  "properties": {
+    "Endpoint": {
+      "description": "The connection endpoint for the DB cluster. For example: `mystack-mydbcluster-1apw1j4phylrk.cg034hpkmmjt.us-east-2.rds.amazonaws.com`",
+      "type": "string"
+    },
+    "ReadEndpoint": {
+      "description": "The reader endpoint for the DB cluster. For example: `mystack-mydbcluster-ro-1apw1j4phylrk.cg034hpkmmjt.us-east-2.rds.amazonaws.com`",
+      "type": "string"
+    },
+    "ClusterResourceId": {
+      "description": "The resource id for the DB cluster. For example: `cluster-ABCD1234EFGH5678IJKL90MNOP`. The cluster ID uniquely identifies the cluster and is used in things like IAM authentication policies.",
+      "type": "string"
+    },
+    "AssociatedRoles": {
+      "description": "Provides a list of the AWS Identity and Access Management (IAM) roles that are associated with the DB cluster. IAM roles that are associated with a DB cluster grant permission for the DB cluster to access other AWS services on your behalf.",
+      "type": "array",
+      "uniqueItems": true,
+      "insertionOrder": true,
+      "items": {
+        "$ref": "#/definitions/DBClusterRole"
+      }
+    },
+    "AvailabilityZones": {
+      "description": "Provides the list of EC2 Availability Zones that instances in the DB cluster can be created in.",
+      "type": "array",
+      "uniqueItems": true,
+      "insertionOrder": true,
+      "items": {
+        "type": "string"
+      }
+    },
+    "BackupRetentionPeriod": {
+      "description": "Specifies the number of days for which automatic DB snapshots are retained.",
+      "default": 1,
+      "minimum": 1,
+      "type": "integer"
+    },
+    "CopyTagsToSnapshot": {
+      "description": "A value that indicates whether to copy all tags from the DB cluster to snapshots of the DB cluster. The default behaviour is not to copy them.",
+      "type": "boolean"
+    },
+    "DBClusterIdentifier": {
+      "description": "The DB cluster identifier. Contains a user-supplied DB cluster identifier. This identifier is the unique key that identifies a DB cluster stored as a lowercase string.",
+      "type": "string",
+      "pattern": "^[a-zA-Z]{1}(?:-?[a-zA-Z0-9]){0,62}$",
+      "minLength": 1,
+      "maxLength": 63
+    },
+    "DBClusterParameterGroupName": {
+      "description": "Provides the name of the DB cluster parameter group.",
+      "type": "string"
+    },
+    "DBInstanceParameterGroupName": {
+      "description": "The name of the DB parameter group to apply to all instances of the DB cluster. Used only in case of a major EngineVersion upgrade request.",
+      "type": "string"
+    },
+    "DBPort": {
+      "description": "The port number on which the DB instances in the DB cluster accept connections. \n\nIf not specified, the default port used is `8182`. \n\nNote: `Port` property will soon be deprecated from this resource. Please update existing templates to rename it with new property `DBPort` having same functionalities.",
+      "type": "integer"
+    },
+    "DBSubnetGroupName": {
+      "description": "Specifies information on the subnet group associated with the DB cluster, including the name, description, and subnets in the subnet group.",
+      "type": "string"
+    },
+    "DeletionProtection": {
+      "description": "Indicates whether or not the DB cluster has deletion protection enabled. The database can't be deleted when deletion protection is enabled.",
+      "type": "boolean"
+    },
+    "EnableCloudwatchLogsExports": {
+      "description": "Specifies a list of log types that are enabled for export to CloudWatch Logs.",
+      "type": "array",
+      "uniqueItems": true,
+      "insertionOrder": true,
+      "items": {
+        "type": "string"
+      }
+    },
+    "EngineVersion": {
+      "description": "Indicates the database engine version.",
+      "type": "string"
+    },
+    "IamAuthEnabled": {
+      "description": "True if mapping of Amazon Identity and Access Management (IAM) accounts to database accounts is enabled, and otherwise false.",
+      "type": "boolean"
+    },
+    "KmsKeyId": {
+      "description": "If `StorageEncrypted` is true, the Amazon KMS key identifier for the encrypted DB cluster.",
+      "type": "string"
+    },
+    "Port": {
+      "description": "The port number on which the DB cluster accepts connections. For example: `8182`.",
+      "type": "string"
+    },
+    "PreferredBackupWindow": {
+      "description": "Specifies the daily time range during which automated backups are created if automated backups are enabled, as determined by the BackupRetentionPeriod.",
+      "type": "string"
+    },
+    "PreferredMaintenanceWindow": {
+      "description": "Specifies the weekly time range during which system maintenance can occur, in Universal Coordinated Time (UTC).",
+      "type": "string"
+    },
+    "RestoreToTime": {
+      "description": "Creates a new DB cluster from a DB snapshot or DB cluster snapshot.\n\nIf a DB snapshot is specified, the target DB cluster is created from the source DB snapshot with a default configuration and default security group.\n\nIf a DB cluster snapshot is specified, the target DB cluster is created from the source DB cluster restore point with the same configuration as the original source DB cluster, except that the new DB cluster is created with the default security group.",
+      "type": "string"
+    },
+    "RestoreType": {
+      "description": "Creates a new DB cluster from a DB snapshot or DB cluster snapshot.\n\nIf a DB snapshot is specified, the target DB cluster is created from the source DB snapshot with a default configuration and default security group.\n\nIf a DB cluster snapshot is specified, the target DB cluster is created from the source DB cluster restore point with the same configuration as the original source DB cluster, except that the new DB cluster is created with the default security group.",
+      "type": "string",
+      "default": "full-copy"
+    },
+    "ServerlessScalingConfiguration": {
+      "description": "Contains the scaling configuration used by the Neptune Serverless Instances within this DB cluster.",
+      "$ref": "#/definitions/ServerlessScalingConfiguration"
+    },
+    "SnapshotIdentifier": {
+      "description": "Specifies the identifier for a DB cluster snapshot. Must match the identifier of an existing snapshot.\n\nAfter you restore a DB cluster using a SnapshotIdentifier, you must specify the same SnapshotIdentifier for any future updates to the DB cluster. When you specify this property for an update, the DB cluster is not restored from the snapshot again, and the data in the database is not changed.\n\nHowever, if you don't specify the SnapshotIdentifier, an empty DB cluster is created, and the original DB cluster is deleted. If you specify a property that is different from the previous snapshot restore property, the DB cluster is restored from the snapshot specified by the SnapshotIdentifier, and the original DB cluster is deleted.",
+      "type": "string"
+    },
+    "SourceDBClusterIdentifier": {
+      "description": "Creates a new DB cluster from a DB snapshot or DB cluster snapshot.\n\nIf a DB snapshot is specified, the target DB cluster is created from the source DB snapshot with a default configuration and default security group.\n\nIf a DB cluster snapshot is specified, the target DB cluster is created from the source DB cluster restore point with the same configuration as the original source DB cluster, except that the new DB cluster is created with the default security group.",
+      "type": "string"
+    },
+    "StorageEncrypted": {
+      "description": "Indicates whether the DB cluster is encrypted.\n\nIf you specify the `DBClusterIdentifier`, `DBSnapshotIdentifier`, or `SourceDBInstanceIdentifier` property, don't specify this property. The value is inherited from the cluster, snapshot, or source DB instance. If you specify the KmsKeyId property, you must enable encryption.\n\nIf you specify the KmsKeyId, you must enable encryption by setting StorageEncrypted to true.",
+      "type": "boolean"
+    },
+    "Tags": {
+      "type": "array",
+      "maxItems": 50,
+      "uniqueItems": true,
+      "insertionOrder": false,
+      "description": "The tags assigned to this cluster.",
+      "items": {
+        "$ref": "#/definitions/Tag"
+      }
+    },
+    "UseLatestRestorableTime": {
+      "description": "Creates a new DB cluster from a DB snapshot or DB cluster snapshot.\n\nIf a DB snapshot is specified, the target DB cluster is created from the source DB snapshot with a default configuration and default security group.\n\nIf a DB cluster snapshot is specified, the target DB cluster is created from the source DB cluster restore point with the same configuration as the original source DB cluster, except that the new DB cluster is created with the default security group.",
+      "type": "boolean"
+    },
+    "VpcSecurityGroupIds": {
+      "description": "Provides a list of VPC security groups that the DB cluster belongs to.",
+      "uniqueItems": true,
+      "insertionOrder": true,
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    }
+  },
+  "definitions": {
+    "DBClusterRole": {
+      "description": "Describes an AWS Identity and Access Management (IAM) role that is associated with a DB cluster.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "FeatureName": {
+          "description": "The name of the feature associated with the AWS Identity and Access Management (IAM) role. For the list of supported feature names, see DBEngineVersion in the Amazon Neptune API Reference.",
+          "type": "string"
+        },
+        "RoleArn": {
+          "description": "The Amazon Resource Name (ARN) of the IAM role that is associated with the DB cluster.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "RoleArn"
+      ]
+    },
+    "ServerlessScalingConfiguration": {
+      "description": "Contains the scaling configuration of an Neptune Serverless DB cluster.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "MinCapacity": {
+          "description": "The minimum number of Neptune capacity units (NCUs) for a DB instance in an Neptune Serverless cluster. You can specify NCU values in half-step increments, such as 8, 8.5, 9, and so on. The smallest value you can use is 1, whereas the largest is 128.",
+          "type": "number",
+          "minimum": 1,
+          "maximum": 128
+        },
+        "MaxCapacity": {
+          "description": "The maximum number of Neptune capacity units (NCUs) for a DB instance in an Neptune Serverless cluster. You can specify NCU values in half-step increments, such as 40, 40.5, 41, and so on. The smallest value you can use is 2.5, whereas the largest is 128.",
+          "type": "number",
+          "minimum": 2.5,
+          "maximum": 128
+        }
+      },
+      "required": [
+        "MinCapacity",
+        "MaxCapacity"
+      ]
+    },
+    "Tag": {
+      "description": "A key-value pair to associate with a resource.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Key": {
+          "type": "string",
+          "description": "The key name of the tag. You can specify a value that is 1 to 128 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -. ",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "Value": {
+          "type": "string",
+          "description": "The value for the tag. You can specify a value that is 0 to 256 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -. ",
+          "minLength": 0,
+          "maxLength": 256
+        }
+      },
+      "required": [
+        "Key"
+      ]
+    }
+  },
+  "additionalProperties": false,
+  "propertyTransform": {
+    "/properties/DBClusterIdentifier": "$lowercase(DBClusterIdentifier)",
+    "/properties/DBClusterParameterGroupName": "$lowercase(DBClusterParameterGroupName)",
+    "/properties/DBSubnetGroupName": "$lowercase(DBSubnetGroupName)",
+    "/properties/SnapshotIdentifier": "$lowercase(SnapshotIdentifier)",
+    "/properties/SourceDBClusterIdentifier": "$lowercase(SourceDBClusterIdentifier)"
+  },
+  "readOnlyProperties": [
+    "/properties/Endpoint",
+    "/properties/ClusterResourceId",
+    "/properties/Port",
+    "/properties/ReadEndpoint"
+  ],
+  "createOnlyProperties": [
+    "/properties/AvailabilityZones",
+    "/properties/DBClusterIdentifier",
+    "/properties/DBSubnetGroupName",
+    "/properties/KmsKeyId",
+    "/properties/RestoreToTime",
+    "/properties/RestoreType",
+    "/properties/SnapshotIdentifier",
+    "/properties/SourceDBClusterIdentifier",
+    "/properties/StorageEncrypted",
+    "/properties/UseLatestRestorableTime"
+  ],
+  "primaryIdentifier": [
+    "/properties/DBClusterIdentifier"
+  ],
+  "writeOnlyProperties": [
+    "/properties/DBInstanceParameterGroupName",
+    "/properties/RestoreToTime",
+    "/properties/RestoreType",
+    "/properties/SnapshotIdentifier",
+    "/properties/SourceDBClusterIdentifier",
+    "/properties/UseLatestRestorableTime"
+  ],
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": true,
+    "tagProperty": "/properties/Tags"
+  },
+  "handlers": {
+    "create": {
+      "permissions": [
+        "iam:PassRole",
+        "rds:AddRoleToDBCluster",
+        "rds:AddTagsToResource",
+        "rds:CreateDBCluster",
+        "rds:CreateDBInstance",
+        "rds:DescribeDBClusters",
+        "rds:ListTagsForResource",
+        "rds:ModifyDBCluster",
+        "rds:RestoreDBClusterFromSnapshot",
+        "rds:RestoreDBClusterToPointInTime",
+        "kms:*"
+      ],
+      "timeoutInMinutes": 2160
+    },
+    "read": {
+      "permissions": [
+        "rds:DescribeDBClusters",
+        "rds:ListTagsForResource",
+        "kms:*"
+      ],
+      "timeoutInMinutes": 2160
+    },
+    "update": {
+      "permissions": [
+        "ec2:DescribeSecurityGroups",
+        "iam:PassRole",
+        "rds:AddRoleToDBCluster",
+        "rds:AddTagsToResource",
+        "rds:DescribeDBClusters",
+        "rds:DescribeDBInstances",
+        "rds:DescribeDBSubnetGroups",
+        "rds:DescribeGlobalClusters",
+        "rds:ListTagsForResource",
+        "rds:ModifyDBCluster",
+        "rds:ModifyDBInstance",
+        "rds:RemoveFromGlobalCluster",
+        "rds:RemoveRoleFromDBCluster",
+        "rds:RemoveTagsFromResource",
+        "kms:*"
+      ],
+      "timeoutInMinutes": 2160
+    },
+    "delete": {
+      "permissions": [
+        "rds:DeleteDBCluster",
+        "rds:DeleteDBInstance",
+        "rds:DescribeDBClusters",
+        "rds:DescribeGlobalClusters",
+        "rds:ListTagsForResource",
+        "rds:RemoveFromGlobalCluster",
+        "kms:*"
+      ],
+      "timeoutInMinutes": 2160
+    },
+    "list": {
+      "permissions": [
+        "rds:DescribeDBClusters",
+        "rds:ListTagsForResource",
+        "kms:*"
+      ],
+      "timeoutInMinutes": 2160
+    }
+  }
+}

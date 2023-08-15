@@ -1,0 +1,111 @@
+{
+  "typeName": "AWS::DeviceFarm::VPCEConfiguration",
+  "description": "AWS::DeviceFarm::VPCEConfiguration creates a new Device Farm VPCE Configuration",
+  "properties": {
+    "ServiceDnsName": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 2048
+    },
+    "VpceConfigurationDescription": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 2048
+    },
+    "VpceConfigurationName": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1024
+    },
+    "VpceServiceName": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 2048
+    },
+    "Arn": {
+      "type": "string",
+      "minLength": 32,
+      "maxLength": 1011,
+      "pattern": "^arn:.+"
+    },
+    "Tags": {
+      "type": "array",
+      "uniqueItems": false,
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/Tag"
+      }
+    }
+  },
+  "definitions": {
+    "Tag": {
+      "type": "object",
+      "additionalProperties": false,
+      "insertionOrder": false,
+      "properties": {
+        "Key": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "Value": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        }
+      },
+      "required": [
+        "Key",
+        "Value"
+      ]
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "ServiceDnsName",
+    "VpceConfigurationName",
+    "VpceServiceName"
+  ],
+  "primaryIdentifier": [
+    "/properties/Arn"
+  ],
+  "readOnlyProperties": [
+    "/properties/Arn"
+  ],
+  "tagging": {
+    "taggable": true
+  },
+  "handlers": {
+    "create": {
+      "permissions": [
+        "devicefarm:CreateVPCEConfiguration",
+        "devicefarm:TagResource"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "devicefarm:GetVPCEConfiguration",
+        "devicefarm:ListTagsForResource"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "devicefarm:UpdateVPCEConfiguration",
+        "devicefarm:TagResource",
+        "devicefarm:UntagResource",
+        "devicefarm:ListTagsForResource"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "devicefarm:DeleteVPCEConfiguration",
+        "devicefarm:UntagResource"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "devicefarm:ListVPCEConfigurations"
+      ]
+    }
+  }
+}

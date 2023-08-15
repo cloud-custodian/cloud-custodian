@@ -1,0 +1,170 @@
+{
+  "typeName": "AWS::CleanRooms::Membership",
+  "description": "Represents an AWS account that is a part of a collaboration",
+  "definitions": {
+    "MembershipQueryLogStatus": {
+      "type": "string",
+      "enum": [
+        "ENABLED",
+        "DISABLED"
+      ]
+    },
+    "MembershipStatus": {
+      "type": "string",
+      "enum": [
+        "ACTIVE",
+        "REMOVED",
+        "COLLABORATION_DELETED"
+      ]
+    },
+    "Tag": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Key": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "Value": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        }
+      },
+      "required": [
+        "Value",
+        "Key"
+      ]
+    }
+  },
+  "properties": {
+    "Arn": {
+      "type": "string",
+      "maxLength": 100
+    },
+    "Tags": {
+      "description": "An arbitrary set of tags (key-value pairs) for this cleanrooms membership.",
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/Tag"
+      },
+      "uniqueItems": true,
+      "type": "array"
+    },
+    "CollaborationArn": {
+      "type": "string",
+      "maxLength": 100
+    },
+    "CollaborationCreatorAccountId": {
+      "type": "string",
+      "maxLength": 12,
+      "minLength": 12,
+      "pattern": "^\\d+$"
+    },
+    "CollaborationIdentifier": {
+      "type": "string",
+      "maxLength": 36,
+      "minLength": 36,
+      "pattern": "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"
+    },
+    "MembershipIdentifier": {
+      "type": "string",
+      "maxLength": 36,
+      "minLength": 36,
+      "pattern": "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"
+    },
+    "QueryLogStatus": {
+      "$ref": "#/definitions/MembershipQueryLogStatus"
+    }
+  },
+  "required": [
+    "CollaborationIdentifier",
+    "QueryLogStatus"
+  ],
+  "readOnlyProperties": [
+    "/properties/Arn",
+    "/properties/CollaborationArn",
+    "/properties/CollaborationCreatorAccountId",
+    "/properties/MembershipIdentifier"
+  ],
+  "createOnlyProperties": [
+    "/properties/CollaborationIdentifier"
+  ],
+  "primaryIdentifier": [
+    "/properties/MembershipIdentifier"
+  ],
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": true,
+    "tagProperty": "/properties/Tags"
+  },
+  "handlers": {
+    "create": {
+      "permissions": [
+        "cleanrooms:CreateMembership",
+        "logs:CreateLogDelivery",
+        "logs:GetLogDelivery",
+        "logs:UpdateLogDelivery",
+        "logs:DeleteLogDelivery",
+        "logs:ListLogDeliveries",
+        "logs:DescribeLogGroups",
+        "logs:DescribeResourcePolicies",
+        "logs:PutResourcePolicy",
+        "logs:CreateLogGroup",
+        "cleanrooms:GetMembership",
+        "cleanrooms:ListTagsForResource",
+        "cleanrooms:TagResource",
+        "cleanrooms:ListMemberships"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "cleanrooms:GetMembership",
+        "cleanrooms:ListTagsForResource",
+        "logs:ListLogDeliveries",
+        "logs:DescribeLogGroups",
+        "logs:DescribeResourcePolicies",
+        "logs:GetLogDelivery"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "cleanrooms:UpdateMembership",
+        "cleanrooms:GetMembership",
+        "logs:CreateLogDelivery",
+        "logs:GetLogDelivery",
+        "logs:UpdateLogDelivery",
+        "logs:DeleteLogDelivery",
+        "logs:ListLogDeliveries",
+        "logs:DescribeLogGroups",
+        "logs:DescribeResourcePolicies",
+        "logs:PutResourcePolicy",
+        "logs:CreateLogGroup",
+        "cleanrooms:ListTagsForResource",
+        "cleanrooms:TagResource",
+        "cleanrooms:UntagResource"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "cleanrooms:DeleteMembership",
+        "cleanrooms:GetMembership",
+        "cleanrooms:ListMemberships",
+        "cleanrooms:ListTagsForResource",
+        "logs:ListLogDeliveries",
+        "logs:DescribeLogGroups",
+        "logs:DescribeResourcePolicies",
+        "logs:GetLogDelivery"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "cleanrooms:ListMemberships"
+      ]
+    }
+  },
+  "additionalProperties": false
+}

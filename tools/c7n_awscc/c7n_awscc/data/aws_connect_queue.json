@@ -1,0 +1,219 @@
+{
+  "typeName": "AWS::Connect::Queue",
+  "description": "Resource Type definition for AWS::Connect::Queue",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-connect",
+  "definitions": {
+    "OutboundCallerIdName": {
+      "description": "The caller ID name.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255
+    },
+    "OutboundCallerIdNumberArn": {
+      "description": "The caller ID number.",
+      "type": "string",
+      "pattern": "^arn:aws[-a-z0-9]*:connect:[-a-z0-9]*:[0-9]{12}:phone-number/[-a-zA-Z0-9]*$"
+    },
+    "OutboundFlowArn": {
+      "description": "The outbound whisper flow to be used during an outbound call.",
+      "type": "string",
+      "pattern": "^arn:aws[-a-z0-9]*:connect:[-a-z0-9]*:[0-9]{12}:instance/[-a-zA-Z0-9]*/contact-flow/[-a-zA-Z0-9]*$",
+      "minLength": 1,
+      "maxLength": 500
+    },
+    "Tag": {
+      "description": "A key-value pair to associate with a resource.",
+      "type": "object",
+      "properties": {
+        "Key": {
+          "$ref": "#/definitions/Key"
+        },
+        "Value": {
+          "$ref": "#/definitions/Value"
+        }
+      },
+      "required": [
+        "Key",
+        "Value"
+      ],
+      "additionalProperties": false
+    },
+    "Key": {
+      "type": "string",
+      "description": "The key name of the tag. You can specify a value that is 1 to 128 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^(?!aws:)[a-zA-Z+-=._:/]+$"
+    },
+    "Value": {
+      "type": "string",
+      "description": "The value for the tag. You can specify a value that is 0 to 256 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.",
+      "minLength": 0,
+      "maxLength": 256
+    },
+    "OutboundCallerConfig": {
+      "description": "The outbound caller ID name, number, and outbound whisper flow.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "OutboundCallerIdName": {
+          "$ref": "#/definitions/OutboundCallerIdName"
+        },
+        "OutboundCallerIdNumberArn": {
+          "$ref": "#/definitions/OutboundCallerIdNumberArn"
+        },
+        "OutboundFlowArn": {
+          "$ref": "#/definitions/OutboundFlowArn"
+        }
+      }
+    },
+    "QuickConnectArn": {
+      "description": "The Amazon Resource Name (ARN) for the quick connect.",
+      "type": "string",
+      "pattern": "^arn:aws[-a-z0-9]*:connect:[-a-z0-9]*:[0-9]{12}:instance/[-a-zA-Z0-9]*/transfer-destination/[-a-zA-Z0-9]*$"
+    }
+  },
+  "properties": {
+    "InstanceArn": {
+      "description": "The identifier of the Amazon Connect instance.",
+      "type": "string",
+      "pattern": "^arn:aws[-a-z0-9]*:connect:[-a-z0-9]*:[0-9]{12}:instance/[-a-zA-Z0-9]*$"
+    },
+    "Description": {
+      "description": "The description of the queue.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 250
+    },
+    "HoursOfOperationArn": {
+      "description": "The identifier for the hours of operation.",
+      "type": "string",
+      "pattern": "^arn:aws[-a-z0-9]*:connect:[-a-z0-9]*:[0-9]{12}:instance/[-a-zA-Z0-9]*/operating-hours/[-a-zA-Z0-9]*$"
+    },
+    "MaxContacts": {
+      "description": "The maximum number of contacts that can be in the queue before it is considered full.",
+      "type": "integer",
+      "minimum": 0
+    },
+    "Name": {
+      "description": "The name of the queue.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 127
+    },
+    "OutboundCallerConfig": {
+      "description": "The outbound caller ID name, number, and outbound whisper flow.",
+      "$ref": "#/definitions/OutboundCallerConfig"
+    },
+    "QueueArn": {
+      "description": "The Amazon Resource Name (ARN) for the queue.",
+      "type": "string",
+      "pattern": "^arn:aws[-a-z0-9]*:connect:[-a-z0-9]*:[0-9]{12}:instance/[-a-zA-Z0-9]*/queue/[-a-zA-Z0-9]*$"
+    },
+    "Status": {
+      "description": "The status of the queue.",
+      "type": "string",
+      "enum": [
+        "ENABLED",
+        "DISABLED"
+      ]
+    },
+    "QuickConnectArns": {
+      "description": "The quick connects available to agents who are working the queue.",
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 50,
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/QuickConnectArn"
+      }
+    },
+    "Tags": {
+      "type": "array",
+      "maxItems": 50,
+      "uniqueItems": true,
+      "insertionOrder": false,
+      "description": "An array of key-value pairs to apply to this resource.",
+      "items": {
+        "$ref": "#/definitions/Tag"
+      }
+    },
+    "Type": {
+      "type": "string",
+      "description": "The type of queue.",
+      "enum": [
+        "STANDARD",
+        "AGENT"
+      ]
+    }
+  },
+  "handlers": {
+    "create": {
+      "permissions": [
+        "connect:CreateQueue",
+        "connect:TagResource"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "connect:DescribeQueue",
+        "connect:ListQueueQuickConnects"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "connect:DeleteQueue",
+        "connect:UntagResource"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "connect:UpdateQueueHoursOfOperation",
+        "connect:UpdateQueueMaxContacts",
+        "connect:UpdateQueueName",
+        "connect:UpdateQueueOutboundCallerConfig",
+        "connect:UpdateQueueStatus",
+        "connect:AssociateQueueQuickConnects",
+        "connect:DisassociateQueueQuickConnects",
+        "connect:TagResource",
+        "connect:UntagResource"
+      ]
+    },
+    "list": {
+      "handlerSchema": {
+        "properties": {
+          "InstanceArn": {
+            "$ref": "resource-schema.json#/properties/InstanceArn"
+          }
+        },
+        "required": [
+          "InstanceArn"
+        ]
+      },
+      "permissions": [
+        "connect:ListQueues",
+        "connect:ListQueueQuickConnects"
+      ]
+    }
+  },
+  "additionalProperties": false,
+  "primaryIdentifier": [
+    "/properties/QueueArn"
+  ],
+  "readOnlyProperties": [
+    "/properties/QueueArn",
+    "/properties/Type"
+  ],
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": true,
+    "tagProperty": "/properties/Tags"
+  },
+  "required": [
+    "InstanceArn",
+    "HoursOfOperationArn",
+    "Name"
+  ]
+}

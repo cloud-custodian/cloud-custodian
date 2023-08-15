@@ -73,6 +73,13 @@
   "required": [
     "DomainName"
   ],
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": true,
+    "tagProperty": "/properties/Tags"
+  },
   "readOnlyProperties": [
     "/properties/LastUpdatedAt",
     "/properties/CreatedAt"
@@ -86,7 +93,8 @@
   "handlers": {
     "create": {
       "permissions": [
-        "profile:CreateDomain"
+        "profile:CreateDomain",
+        "profile:TagResource"
       ]
     },
     "read": {
@@ -96,6 +104,7 @@
     },
     "update": {
       "permissions": [
+        "profile:GetDomain",
         "profile:UpdateDomain",
         "profile:UntagResource",
         "profile:TagResource"
@@ -107,6 +116,16 @@
       ]
     },
     "list": {
+      "handlerSchema": {
+        "properties": {
+          "DomainName": {
+            "$ref": "resource-schema.json#/properties/DomainName"
+          }
+        },
+        "required": [
+          "DomainName"
+        ]
+      },
       "permissions": [
         "profile:ListDomains"
       ]

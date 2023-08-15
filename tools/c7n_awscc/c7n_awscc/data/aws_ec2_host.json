@@ -5,7 +5,7 @@
   "additionalProperties": false,
   "properties": {
     "HostId": {
-      "description": "Id of the host created.",
+      "description": "ID of the host created.",
       "type": "string"
     },
     "AutoPlacement": {
@@ -23,15 +23,33 @@
     "InstanceType": {
       "description": "Specifies the instance type to be supported by the Dedicated Hosts. If you specify an instance type, the Dedicated Hosts support instances of the specified instance type only.",
       "type": "string"
+    },
+    "InstanceFamily": {
+      "description": "Specifies the instance family to be supported by the Dedicated Hosts. If you specify an instance family, the Dedicated Hosts support multiple instance types within that instance family.",
+      "type": "string"
+    },
+    "OutpostArn": {
+      "description": "The Amazon Resource Name (ARN) of the Amazon Web Services Outpost on which to allocate the Dedicated Host.",
+      "type": "string"
+    },
+    "HostMaintenance": {
+      "description": "Automatically allocates a new dedicated host and moves your instances on to it if a degradation is detected on your current host.",
+      "type": "string"
+    },
+    "AssetId": {
+      "description": "The ID of the Outpost hardware asset.",
+      "type": "string"
     }
   },
   "required": [
-    "InstanceType",
     "AvailabilityZone"
   ],
   "createOnlyProperties": [
     "/properties/AvailabilityZone",
-    "/properties/InstanceType"
+    "/properties/InstanceType",
+    "/properties/InstanceFamily",
+    "/properties/OutpostArn",
+    "/properties/AssetId"
   ],
   "primaryIdentifier": [
     "/properties/HostId"

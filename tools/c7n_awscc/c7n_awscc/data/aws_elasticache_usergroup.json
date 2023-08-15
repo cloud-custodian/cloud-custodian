@@ -2,6 +2,32 @@
   "typeName": "AWS::ElastiCache::UserGroup",
   "description": "Resource Type definition for AWS::ElastiCache::UserGroup",
   "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-elasticache",
+  "definitions": {
+    "Tag": {
+      "description": "A key-value pair to associate with a resource.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Key": {
+          "description": "The key name of the tag. You can specify a value that is 1 to 128 Unicode characters in length and cannot be prefixed with 'aws:'. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.",
+          "type": "string",
+          "pattern": "^(?!aws:)[a-zA-Z0-9 _\\.\\/=+:\\-@]*$",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "Value": {
+          "description": "The value for the tag. You can specify a value that is 0 to 256 Unicode characters in length. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.",
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9 _\\.\\/=+:\\-@]*$",
+          "minLength": 0,
+          "maxLength": 256
+        }
+      },
+      "required": [
+        "Key"
+      ]
+    }
+  },
   "properties": {
     "Status": {
       "description": "Indicates user group status. Can be \"creating\", \"active\", \"modifying\", \"deleting\".",
@@ -23,7 +49,7 @@
       "type": "array",
       "$comment": "List of users.",
       "uniqueItems": true,
-      "insertionOrder": true,
+      "insertionOrder": false,
       "items": {
         "type": "string"
       },
@@ -32,12 +58,23 @@
     "Arn": {
       "description": "The Amazon Resource Name (ARN) of the user account.",
       "type": "string"
+    },
+    "Tags": {
+      "description": "An array of key-value pairs to apply to this user.",
+      "type": "array",
+      "maxItems": 50,
+      "uniqueItems": true,
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/Tag"
+      }
     }
   },
   "additionalProperties": false,
   "required": [
     "UserGroupId",
-    "Engine"
+    "Engine",
+    "UserIds"
   ],
   "readOnlyProperties": [
     "/properties/Status",
@@ -50,34 +87,48 @@
   "primaryIdentifier": [
     "/properties/UserGroupId"
   ],
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": false,
+    "tagProperty": "/properties/Tags"
+  },
   "handlers": {
     "create": {
       "permissions": [
         "elasticache:CreateUserGroup",
-        "elasticache:DescribeUserGroups"
+        "elasticache:DescribeUserGroups",
+        "elasticache:ListTagsForResource"
       ]
     },
     "read": {
       "permissions": [
-        "elasticache:DescribeUserGroups"
+        "elasticache:DescribeUserGroups",
+        "elasticache:ListTagsForResource"
       ]
     },
     "update": {
       "permissions": [
         "elasticache:ModifyUserGroup",
-        "elasticache:DescribeUserGroups"
+        "elasticache:DescribeUserGroups",
+        "elasticache:ListTagsForResource",
+        "elasticache:AddTagsToResource",
+        "elasticache:RemoveTagsFromResource"
       ]
     },
     "delete": {
       "permissions": [
         "elasticache:ModifyReplicationGroup",
         "elasticache:DeleteUserGroup",
-        "elasticache:DescribeUserGroups"
+        "elasticache:DescribeUserGroups",
+        "elasticache:ListTagsForResource"
       ]
     },
     "list": {
       "permissions": [
-        "elasticache:DescribeUserGroups"
+        "elasticache:DescribeUserGroups",
+        "elasticache:ListTagsForResource"
       ]
     }
   }

@@ -117,6 +117,7 @@
     },
     "update": {
       "permissions": [
+        "mediapackage-vod:DescribePackagingGroup",
         "mediapackage-vod:UpdatePackagingGroup",
         "mediapackage-vod:ConfigureLogs",
         "mediapackage-vod:TagResource",

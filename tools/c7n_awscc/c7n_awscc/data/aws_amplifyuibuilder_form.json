@@ -1,0 +1,546 @@
+{
+  "typeName": "AWS::AmplifyUIBuilder::Form",
+  "description": "Definition of AWS::AmplifyUIBuilder::Form Resource Type",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-amplifyuibuilder",
+  "definitions": {
+    "FieldConfig": {
+      "type": "object",
+      "properties": {
+        "Label": {
+          "type": "string"
+        },
+        "Position": {
+          "$ref": "#/definitions/FieldPosition"
+        },
+        "Excluded": {
+          "type": "boolean"
+        },
+        "InputType": {
+          "$ref": "#/definitions/FieldInputConfig"
+        },
+        "Validations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FieldValidationConfiguration"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "FieldInputConfig": {
+      "type": "object",
+      "properties": {
+        "Type": {
+          "type": "string"
+        },
+        "Required": {
+          "type": "boolean"
+        },
+        "ReadOnly": {
+          "type": "boolean"
+        },
+        "Placeholder": {
+          "type": "string"
+        },
+        "DefaultValue": {
+          "type": "string"
+        },
+        "DescriptiveText": {
+          "type": "string"
+        },
+        "DefaultChecked": {
+          "type": "boolean"
+        },
+        "DefaultCountryCode": {
+          "type": "string"
+        },
+        "ValueMappings": {
+          "$ref": "#/definitions/ValueMappings"
+        },
+        "Name": {
+          "type": "string"
+        },
+        "MinValue": {
+          "type": "number"
+        },
+        "MaxValue": {
+          "type": "number"
+        },
+        "Step": {
+          "type": "number"
+        },
+        "Value": {
+          "type": "string"
+        },
+        "IsArray": {
+          "type": "boolean"
+        },
+        "FileUploaderConfig": {
+          "$ref": "#/definitions/FileUploaderFieldConfig"
+        }
+      },
+      "required": [
+        "Type"
+      ],
+      "additionalProperties": false
+    },
+    "FieldPosition": {
+      "oneOf": [
+        {
+          "type": "object",
+          "title": "Fixed",
+          "properties": {
+            "Fixed": {
+              "$ref": "#/definitions/FixedPosition"
+            }
+          },
+          "required": [
+            "Fixed"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "title": "RightOf",
+          "properties": {
+            "RightOf": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "RightOf"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "title": "Below",
+          "properties": {
+            "Below": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "Below"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "FieldValidationConfiguration": {
+      "type": "object",
+      "properties": {
+        "Type": {
+          "type": "string"
+        },
+        "StrValues": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "NumValues": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          }
+        },
+        "ValidationMessage": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "Type"
+      ],
+      "additionalProperties": false
+    },
+    "FieldsMap": {
+      "type": "object",
+      "patternProperties": {
+        ".+": {
+          "$ref": "#/definitions/FieldConfig"
+        }
+      },
+      "additionalProperties": false
+    },
+    "FileUploaderFieldConfig": {
+      "type": "object",
+      "properties": {
+        "AccessLevel": {
+          "$ref": "#/definitions/StorageAccessLevel"
+        },
+        "AcceptedFileTypes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "ShowThumbnails": {
+          "type": "boolean"
+        },
+        "IsResumable": {
+          "type": "boolean"
+        },
+        "MaxFileCount": {
+          "type": "number"
+        },
+        "MaxSize": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "AcceptedFileTypes",
+        "AccessLevel"
+      ],
+      "additionalProperties": false
+    },
+    "FixedPosition": {
+      "type": "string",
+      "enum": [
+        "first"
+      ]
+    },
+    "FormActionType": {
+      "type": "string",
+      "enum": [
+        "create",
+        "update"
+      ]
+    },
+    "FormButton": {
+      "type": "object",
+      "properties": {
+        "Excluded": {
+          "type": "boolean"
+        },
+        "Children": {
+          "type": "string"
+        },
+        "Position": {
+          "$ref": "#/definitions/FieldPosition"
+        }
+      },
+      "additionalProperties": false
+    },
+    "FormButtonsPosition": {
+      "type": "string",
+      "enum": [
+        "top",
+        "bottom",
+        "top_and_bottom"
+      ]
+    },
+    "FormCTA": {
+      "type": "object",
+      "properties": {
+        "Position": {
+          "$ref": "#/definitions/FormButtonsPosition"
+        },
+        "Clear": {
+          "$ref": "#/definitions/FormButton"
+        },
+        "Cancel": {
+          "$ref": "#/definitions/FormButton"
+        },
+        "Submit": {
+          "$ref": "#/definitions/FormButton"
+        }
+      },
+      "additionalProperties": false
+    },
+    "FormDataSourceType": {
+      "type": "string",
+      "enum": [
+        "DataStore",
+        "Custom"
+      ]
+    },
+    "FormDataTypeConfig": {
+      "type": "object",
+      "properties": {
+        "DataSourceType": {
+          "$ref": "#/definitions/FormDataSourceType"
+        },
+        "DataTypeName": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "DataSourceType",
+        "DataTypeName"
+      ],
+      "additionalProperties": false
+    },
+    "FormInputValueProperty": {
+      "type": "object",
+      "properties": {
+        "Value": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "FormStyle": {
+      "type": "object",
+      "properties": {
+        "HorizontalGap": {
+          "$ref": "#/definitions/FormStyleConfig"
+        },
+        "VerticalGap": {
+          "$ref": "#/definitions/FormStyleConfig"
+        },
+        "OuterPadding": {
+          "$ref": "#/definitions/FormStyleConfig"
+        }
+      },
+      "additionalProperties": false
+    },
+    "FormStyleConfig": {
+      "oneOf": [
+        {
+          "type": "object",
+          "title": "TokenReference",
+          "properties": {
+            "TokenReference": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "TokenReference"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "title": "Value",
+          "properties": {
+            "Value": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "Value"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "LabelDecorator": {
+      "type": "string",
+      "enum": [
+        "required",
+        "optional",
+        "none"
+      ]
+    },
+    "SectionalElement": {
+      "type": "object",
+      "properties": {
+        "Type": {
+          "type": "string"
+        },
+        "Position": {
+          "$ref": "#/definitions/FieldPosition"
+        },
+        "Text": {
+          "type": "string"
+        },
+        "Level": {
+          "type": "number"
+        },
+        "Orientation": {
+          "type": "string"
+        },
+        "Excluded": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "Type"
+      ],
+      "additionalProperties": false
+    },
+    "SectionalElementMap": {
+      "type": "object",
+      "patternProperties": {
+        ".+": {
+          "$ref": "#/definitions/SectionalElement"
+        }
+      },
+      "additionalProperties": false
+    },
+    "StorageAccessLevel": {
+      "type": "string",
+      "enum": [
+        "public",
+        "protected",
+        "private"
+      ]
+    },
+    "Tags": {
+      "type": "object",
+      "patternProperties": {
+        "^(?!aws:)[a-zA-Z+-=._:/]+$": {
+          "type": "string",
+          "maxLength": 256,
+          "minLength": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "ValueMapping": {
+      "type": "object",
+      "properties": {
+        "DisplayValue": {
+          "$ref": "#/definitions/FormInputValueProperty"
+        },
+        "Value": {
+          "$ref": "#/definitions/FormInputValueProperty"
+        }
+      },
+      "required": [
+        "Value"
+      ],
+      "additionalProperties": false
+    },
+    "ValueMappings": {
+      "type": "object",
+      "properties": {
+        "Values": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ValueMapping"
+          }
+        }
+      },
+      "required": [
+        "Values"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "properties": {
+    "AppId": {
+      "type": "string"
+    },
+    "Cta": {
+      "$ref": "#/definitions/FormCTA"
+    },
+    "DataType": {
+      "$ref": "#/definitions/FormDataTypeConfig"
+    },
+    "EnvironmentName": {
+      "type": "string"
+    },
+    "Fields": {
+      "$ref": "#/definitions/FieldsMap"
+    },
+    "FormActionType": {
+      "$ref": "#/definitions/FormActionType"
+    },
+    "Id": {
+      "type": "string"
+    },
+    "LabelDecorator": {
+      "$ref": "#/definitions/LabelDecorator"
+    },
+    "Name": {
+      "type": "string",
+      "maxLength": 255,
+      "minLength": 1
+    },
+    "SchemaVersion": {
+      "type": "string"
+    },
+    "SectionalElements": {
+      "$ref": "#/definitions/SectionalElementMap"
+    },
+    "Style": {
+      "$ref": "#/definitions/FormStyle"
+    },
+    "Tags": {
+      "$ref": "#/definitions/Tags"
+    }
+  },
+  "required": [
+    "DataType",
+    "Fields",
+    "FormActionType",
+    "Name",
+    "SchemaVersion",
+    "SectionalElements",
+    "Style"
+  ],
+  "readOnlyProperties": [
+    "/properties/Id"
+  ],
+  "createOnlyProperties": [
+    "/properties/Tags"
+  ],
+  "primaryIdentifier": [
+    "/properties/AppId",
+    "/properties/EnvironmentName",
+    "/properties/Id"
+  ],
+  "handlers": {
+    "create": {
+      "permissions": [
+        "amplify:GetApp",
+        "amplifyuibuilder:GetForm",
+        "amplifyuibuilder:CreateForm",
+        "amplifyuibuilder:TagResource"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "amplify:GetApp",
+        "amplifyuibuilder:GetForm"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "amplify:GetApp",
+        "amplifyuibuilder:GetForm",
+        "amplifyuibuilder:UpdateForm",
+        "amplifyuibuilder:TagResource"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "amplify:GetApp",
+        "amplifyuibuilder:GetForm",
+        "amplifyuibuilder:DeleteForm",
+        "amplifyuibuilder:UntagResource"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "amplify:GetApp",
+        "amplifyuibuilder:GetForm",
+        "amplifyuibuilder:ListForms"
+      ],
+      "handlerSchema": {
+        "properties": {
+          "AppId": {
+            "$ref": "resource-schema.json#/properties/AppId"
+          },
+          "EnvironmentName": {
+            "$ref": "resource-schema.json#/properties/EnvironmentName"
+          }
+        },
+        "required": [
+          "AppId",
+          "EnvironmentName"
+        ]
+      }
+    }
+  },
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": false,
+    "cloudFormationSystemTags": false,
+    "tagProperty": "#/properties/Tags"
+  },
+  "additionalProperties": false
+}

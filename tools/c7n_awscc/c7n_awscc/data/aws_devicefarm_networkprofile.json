@@ -1,0 +1,160 @@
+{
+  "typeName": "AWS::DeviceFarm::NetworkProfile",
+  "description": "AWS::DeviceFarm::NetworkProfile creates a new DF Network Profile",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-device-farm",
+  "properties": {
+    "Arn": {
+      "type": "string",
+      "minLength": 32,
+      "maxLength": 1011,
+      "pattern": "^arn:.+"
+    },
+    "ProjectArn": {
+      "type": "string",
+      "minLength": 32,
+      "maxLength": 1011,
+      "pattern": "^arn:.+"
+    },
+    "Description": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 16384
+    },
+    "DownlinkBandwidthBits": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 104857600
+    },
+    "DownlinkDelayMs": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 2000
+    },
+    "DownlinkJitterMs": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 2000
+    },
+    "DownlinkLossPercent": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100
+    },
+    "Name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "UplinkBandwidthBits": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 104857600
+    },
+    "UplinkDelayMs": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 2000
+    },
+    "UplinkJitterMs": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 2000
+    },
+    "UplinkLossPercent": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100
+    },
+    "Tags": {
+      "type": "array",
+      "uniqueItems": false,
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/Tag"
+      }
+    }
+  },
+  "definitions": {
+    "Tag": {
+      "type": "object",
+      "additionalProperties": false,
+      "insertionOrder": false,
+      "properties": {
+        "Key": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "Value": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        }
+      },
+      "required": [
+        "Key",
+        "Value"
+      ]
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "Name",
+    "ProjectArn"
+  ],
+  "primaryIdentifier": [
+    "/properties/Arn"
+  ],
+  "readOnlyProperties": [
+    "/properties/Arn"
+  ],
+  "createOnlyProperties": [
+    "/properties/ProjectArn"
+  ],
+  "tagging": {
+    "taggable": true
+  },
+  "handlers": {
+    "create": {
+      "permissions": [
+        "devicefarm:CreateNetworkProfile",
+        "devicefarm:TagResource"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "devicefarm:GetNetworkProfile",
+        "devicefarm:ListTagsForResource"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "devicefarm:UpdateNetworkProfile",
+        "devicefarm:TagResource",
+        "devicefarm:UntagResource",
+        "devicefarm:ListTagsForResource"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "devicefarm:DeleteNetworkProfile",
+        "devicefarm:UntagResource"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "devicefarm:ListNetworkProfiles"
+      ],
+      "handlerSchema": {
+        "properties": {
+          "ProjectArn": {
+            "$ref": "resource-schema.json#/properties/ProjectArn"
+          }
+        },
+        "required": [
+          "ProjectArn"
+        ]
+      }
+    }
+  }
+}

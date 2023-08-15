@@ -38,60 +38,78 @@
       "properties": {
         "StatelessDefaultActions": {
           "type": "array",
-          "insertionOrder": false,
-          "uniqueItems": true,
+          "insertionOrder": true,
+          "uniqueItems": false,
           "items": {
             "type": "string"
           }
         },
         "StatelessFragmentDefaultActions": {
           "type": "array",
-          "insertionOrder": false,
-          "uniqueItems": true,
+          "insertionOrder": true,
+          "uniqueItems": false,
           "items": {
             "type": "string"
           }
         },
         "StatelessCustomActions": {
           "type": "array",
-          "insertionOrder": false,
-          "uniqueItems": true,
+          "insertionOrder": true,
+          "uniqueItems": false,
           "items": {
             "$ref": "#/definitions/CustomAction"
           }
         },
         "StatelessRuleGroupReferences": {
           "type": "array",
-          "insertionOrder": false,
-          "uniqueItems": true,
+          "insertionOrder": true,
+          "uniqueItems": false,
           "items": {
             "$ref": "#/definitions/StatelessRuleGroupReference"
           }
         },
         "StatefulRuleGroupReferences": {
           "type": "array",
-          "insertionOrder": false,
-          "uniqueItems": true,
+          "insertionOrder": true,
+          "uniqueItems": false,
           "items": {
             "$ref": "#/definitions/StatefulRuleGroupReference"
           }
         },
         "StatefulDefaultActions": {
           "type": "array",
-          "insertionOrder": false,
-          "uniqueItems": true,
+          "insertionOrder": true,
+          "uniqueItems": false,
           "items": {
             "type": "string"
           }
         },
         "StatefulEngineOptions": {
           "$ref": "#/definitions/StatefulEngineOptions"
+        },
+        "PolicyVariables": {
+          "type": "object",
+          "properties": {
+            "RuleVariables": {
+              "$ref": "#/definitions/RuleVariables"
+            }
+          },
+          "additionalProperties": false
         }
       },
       "required": [
         "StatelessDefaultActions",
         "StatelessFragmentDefaultActions"
       ],
+      "additionalProperties": false
+    },
+    "RuleVariables": {
+      "type": "object",
+      "patternProperties": {
+        "^[A-Za-z0-9_]{1,32}$": {
+          "$ref": "#/definitions/IPSet"
+        }
+      },
       "additionalProperties": false
     },
     "CustomAction": {
@@ -127,8 +145,8 @@
       "properties": {
         "Dimensions": {
           "type": "array",
-          "insertionOrder": false,
-          "uniqueItems": true,
+          "insertionOrder": true,
+          "uniqueItems": false,
           "items": {
             "$ref": "#/definitions/Dimension"
           }
@@ -162,6 +180,9 @@
         },
         "Priority": {
           "$ref": "#/definitions/Priority"
+        },
+        "Override": {
+          "$ref": "#/definitions/StatefulRuleGroupOverride"
         }
       },
       "required": [
@@ -190,11 +211,48 @@
       "minimum": 1,
       "maximum": 65535
     },
+    "VariableDefinition": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^.*$"
+    },
+    "IPSet": {
+      "type": "object",
+      "properties": {
+        "Definition": {
+          "type": "array",
+          "insertionOrder": true,
+          "uniqueItems": false,
+          "items": {
+            "$ref": "#/definitions/VariableDefinition"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "StatefulRuleGroupOverride": {
+      "type": "object",
+      "properties": {
+        "Action": {
+          "$ref": "#/definitions/OverrideAction"
+        }
+      },
+      "additionalProperties": false
+    },
+    "OverrideAction": {
+      "type": "string",
+      "enum": [
+        "DROP_TO_ALERT"
+      ]
+    },
     "StatefulEngineOptions": {
       "type": "object",
       "properties": {
         "RuleOrder": {
           "$ref": "#/definitions/RuleOrder"
+        },
+        "StreamExceptionPolicy": {
+          "$ref": "#/definitions/StreamExceptionPolicy"
         }
       },
       "additionalProperties": false
@@ -204,6 +262,14 @@
       "enum": [
         "DEFAULT_ACTION_ORDER",
         "STRICT_ORDER"
+      ]
+    },
+    "StreamExceptionPolicy": {
+      "type": "string",
+      "enum": [
+        "DROP",
+        "CONTINUE",
+        "REJECT"
       ]
     }
   },
@@ -241,6 +307,9 @@
       }
     }
   },
+  "tagging": {
+    "taggable": true
+  },
   "required": [
     "FirewallPolicyName",
     "FirewallPolicy"
@@ -260,7 +329,8 @@
       "permissions": [
         "network-firewall:CreateFirewallPolicy",
         "network-firewall:DescribeFirewallPolicy",
-        "network-firewall:TagResource"
+        "network-firewall:TagResource",
+        "network-firewall:ListRuleGroups"
       ]
     },
     "read": {
@@ -274,7 +344,8 @@
         "network-firewall:UpdateFirewallPolicy",
         "network-firewall:DescribeFirewallPolicy",
         "network-firewall:TagResource",
-        "network-firewall:UntagResource"
+        "network-firewall:UntagResource",
+        "network-firewall:ListRuleGroups"
       ]
     },
     "delete": {

@@ -1,0 +1,199 @@
+{
+  "typeName": "AWS::VpcLattice::AccessLogSubscription",
+  "description": "Enables access logs to be sent to Amazon CloudWatch, Amazon S3, and Amazon Kinesis Data Firehose. The service network owner can use the access logs to audit the services in the network. The service network owner will only see access logs from clients and services that are associated with their service network. Access log entries represent traffic originated from VPCs associated with that network.",
+  "additionalProperties": false,
+  "definitions": {
+    "Tag": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Key": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "Value": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        }
+      },
+      "required": [
+        "Key",
+        "Value"
+      ]
+    }
+  },
+  "properties": {
+    "Arn": {
+      "type": "string",
+      "maxLength": 2048,
+      "minLength": 20,
+      "pattern": "^arn:[a-z0-9\\-]+:vpc-lattice:[a-zA-Z0-9\\-]+:\\d{12}:accesslogsubscription/als-[0-9a-z]{17}$"
+    },
+    "DestinationArn": {
+      "type": "string",
+      "maxLength": 2048,
+      "minLength": 20,
+      "pattern": "^arn(:[a-z0-9]+([.-][a-z0-9]+)*){2}(:([a-z0-9]+([.-][a-z0-9]+)*)?){2}:([^/].*)?$"
+    },
+    "Id": {
+      "type": "string",
+      "maxLength": 21,
+      "minLength": 21,
+      "pattern": "^als-[0-9a-z]{17}$"
+    },
+    "ResourceArn": {
+      "type": "string",
+      "maxLength": 2048,
+      "minLength": 20,
+      "pattern": "^arn(:[a-z0-9]+([.-][a-z0-9]+)*){2}(:([a-z0-9]+([.-][a-z0-9]+)*)?){2}:((servicenetwork/sn)|(service/svc))-[0-9a-z]{17}$"
+    },
+    "ResourceId": {
+      "type": "string",
+      "maxLength": 2048,
+      "minLength": 20,
+      "pattern": "^((sn)|(svc))-[0-9a-z]{17}$"
+    },
+    "ResourceIdentifier": {
+      "type": "string",
+      "maxLength": 2048,
+      "minLength": 20,
+      "pattern": "^((((sn)|(svc))-[0-9a-z]{17})|(arn(:[a-z0-9]+([.-][a-z0-9]+)*){2}(:([a-z0-9]+([.-][a-z0-9]+)*)?){2}:((servicenetwork/sn)|(service/svc))-[0-9a-z]{17}))$"
+    },
+    "Tags": {
+      "type": "array",
+      "insertionOrder": false,
+      "uniqueItems": true,
+      "minItems": 0,
+      "maxItems": 50,
+      "items": {
+        "$ref": "#/definitions/Tag"
+      }
+    }
+  },
+  "required": [
+    "DestinationArn"
+  ],
+  "readOnlyProperties": [
+    "/properties/Arn",
+    "/properties/Id",
+    "/properties/ResourceArn",
+    "/properties/ResourceId"
+  ],
+  "writeOnlyProperties": [
+    "/properties/ResourceIdentifier"
+  ],
+  "createOnlyProperties": [
+    "/properties/ResourceIdentifier"
+  ],
+  "primaryIdentifier": [
+    "/properties/Arn"
+  ],
+  "additionalIdentifiers": [
+    [
+      "/properties/Id"
+    ],
+    [
+      "/properties/ResourceIdentifier"
+    ]
+  ],
+  "handlers": {
+    "create": {
+      "permissions": [
+        "vpc-lattice:CreateAccessLogSubscription",
+        "vpc-lattice:TagResource",
+        "vpc-lattice:GetAccessLogSubscription",
+        "vpc-lattice:ListTagsForResource",
+        "logs:CreateLogDelivery",
+        "logs:CreateLogStream",
+        "logs:PutDestination",
+        "logs:PutDestinationPolicy",
+        "logs:PutResourcePolicy",
+        "logs:DescribeResourcePolicies",
+        "logs:DescribeLogGroups",
+        "logs:GetLogDelivery",
+        "s3:PutBucketLogging",
+        "s3:GetBucketLogging",
+        "s3:GetBucketPolicy",
+        "s3:PutBucketPolicy",
+        "firehose:TagDeliveryStream",
+        "firehose:CreateDeliveryStream",
+        "firehose:DescribeDeliveryStream",
+        "iam:CreateServiceLinkedRole"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "vpc-lattice:GetAccessLogSubscription",
+        "vpc-lattice:ListTagsForResource",
+        "logs:GetLogDelivery"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "vpc-lattice:GetAccessLogSubscription",
+        "vpc-lattice:UpdateAccessLogSubscription",
+        "vpc-lattice:TagResource",
+        "vpc-lattice:UntagResource",
+        "logs:UpdateLogDelivery",
+        "firehose:UpdateDestination",
+        "logs:CreateLogDelivery",
+        "logs:CreateLogStream",
+        "logs:PutDestination",
+        "logs:PutDestinationPolicy",
+        "logs:PutResourcePolicy",
+        "logs:DescribeResourcePolicies",
+        "logs:DescribeLogGroups",
+        "logs:GetLogDelivery",
+        "s3:PutBucketLogging",
+        "s3:GetBucketLogging",
+        "s3:GetBucketPolicy",
+        "s3:PutBucketPolicy",
+        "firehose:TagDeliveryStream",
+        "firehose:CreateDeliveryStream",
+        "firehose:DescribeDeliveryStream"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "vpc-lattice:DeleteAccessLogSubscription",
+        "vpc-lattice:UntagResource",
+        "logs:DeleteLogDelivery",
+        "logs:DeleteLogStream",
+        "logs:GetLogDelivery",
+        "logs:DeleteDestination",
+        "s3:PutBucketLogging",
+        "iam:GetServiceLinkedRoleDeletionStatus",
+        "iam:DeleteServiceLinkedRole",
+        "firehose:DeleteDeliveryStream",
+        "firehose:UntagDeliveryStream"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "vpc-lattice:ListAccessLogSubscriptions"
+      ],
+      "handlerSchema": {
+        "properties": {
+          "ResourceIdentifier": {
+            "type": "string",
+            "maxLength": 2048,
+            "minLength": 20,
+            "pattern": "^((((sn)|(svc))-[0-9a-z]{17})|(arn(:[a-z0-9]+([.-][a-z0-9]+)*){2}(:([a-z0-9]+([.-][a-z0-9]+)*)?){2}:((servicenetwork/sn)|(service/svc))-[0-9a-z]{17}))$"
+          }
+        },
+        "required": [
+          "ResourceIdentifier"
+        ]
+      }
+    }
+  },
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": false,
+    "tagProperty": "/properties/Tags"
+  }
+}

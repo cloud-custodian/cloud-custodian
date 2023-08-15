@@ -284,13 +284,18 @@
     "/properties/ResourceId",
     "/properties/HttpMethod"
   ],
-  "replacementStrategy": "delete_then_create",
-  "taggable": false,
+  "tagging": {
+    "taggable": false,
+    "tagOnCreate": false,
+    "tagUpdatable": false,
+    "cloudFormationSystemTags": false
+  },
   "handlers": {
     "create": {
       "permissions": [
         "apigateway:PUT",
-        "apigateway:GET"
+        "apigateway:GET",
+        "iam:PassRole"
       ]
     },
     "read": {
@@ -302,7 +307,8 @@
       "permissions": [
         "apigateway:GET",
         "apigateway:DELETE",
-        "apigateway:PUT"
+        "apigateway:PUT",
+        "iam:PassRole"
       ]
     },
     "delete": {

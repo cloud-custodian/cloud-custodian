@@ -233,6 +233,9 @@
         "SessionCookieName": {
           "type": "string"
         },
+        "UseExistingClientSecret": {
+          "type": "boolean"
+        },
         "AuthenticationRequestExtraParams": {
           "type": "object",
           "patternProperties": {
@@ -245,7 +248,6 @@
       "required": [
         "TokenEndpoint",
         "Issuer",
-        "ClientSecret",
         "UserInfoEndpoint",
         "ClientId",
         "AuthorizationEndpoint"
@@ -275,24 +277,50 @@
     "/properties/ListenerArn"
   ],
   "writeOnlyProperties": [
-    "/properties/DefaultActions/*/AuthenticateOidcConfig/ClientSecret",
-    "/properties/DefaultActions/*/ForwardConfig",
-    "/properties/DefaultActions/*/TargetGroupArn"
+    "/properties/DefaultActions/*/AuthenticateOidcConfig/ClientSecret"
   ],
   "taggable": false,
   "handlers": {
     "create": {
       "permissions": [
         "elasticloadbalancing:CreateListener",
-        "elasticloadbalancing:DescribeListeners"
+        "elasticloadbalancing:DescribeListeners",
+        "cognito-idp:DescribeUserPoolClient"
       ]
     },
     "delete": {
       "permissions": [
-        "elasticloadbalancing:DeleteListener"
+        "elasticloadbalancing:DeleteListener",
+        "elasticloadbalancing:DescribeListeners"
       ]
     },
     "list": {
+      "handlerSchema": {
+        "properties": {
+          "LoadBalancerArn": {
+            "$ref": "resource-schema.json#/properties/LoadBalancerArn"
+          },
+          "ListenerArns": {
+            "type": "array",
+            "uniqueItems": false,
+            "items": {
+              "$ref": "resource-schema.json#/properties/ListenerArn"
+            }
+          }
+        },
+        "oneOf": [
+          {
+            "required": [
+              "LoadBalancerArn"
+            ]
+          },
+          {
+            "required": [
+              "ListenerArns"
+            ]
+          }
+        ]
+      },
       "permissions": [
         "elasticloadbalancing:DescribeListeners"
       ]
@@ -304,7 +332,9 @@
     },
     "update": {
       "permissions": [
-        "elasticloadbalancing:ModifyListener"
+        "elasticloadbalancing:ModifyListener",
+        "elasticloadbalancing:DescribeListeners",
+        "cognito-idp:DescribeUserPoolClient"
       ]
     }
   }

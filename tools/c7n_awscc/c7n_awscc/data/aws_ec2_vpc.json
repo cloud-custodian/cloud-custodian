@@ -51,6 +51,14 @@
       "type": "string",
       "description": "The allowed tenancy of instances launched into the VPC.\n\n\"default\": An instance launched into the VPC runs on shared hardware by default, unless you explicitly specify a different tenancy during instance launch.\n\n\"dedicated\": An instance launched into the VPC is a Dedicated Instance by default, unless you explicitly specify a tenancy of host during instance launch. You cannot specify a tenancy of default during instance launch.\n\nUpdating InstanceTenancy requires no replacement only if you are updating its value from \"dedicated\" to \"default\". Updating InstanceTenancy from \"default\" to \"dedicated\" requires replacement."
     },
+    "Ipv4IpamPoolId": {
+      "type": "string",
+      "description": "The ID of an IPv4 IPAM pool you want to use for allocating this VPC's CIDR"
+    },
+    "Ipv4NetmaskLength": {
+      "type": "integer",
+      "description": "The netmask length of the IPv4 CIDR you want to allocate to this VPC from an Amazon VPC IP Address Manager (IPAM) pool"
+    },
     "Tags": {
       "type": "array",
       "description": "The tags for the VPC.",
@@ -79,34 +87,41 @@
       ]
     }
   },
-  "taggable": true,
-  "required": [
-    "CidrBlock"
-  ],
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": true,
+    "tagProperty": "/properties/Tags"
+  },
   "createOnlyProperties": [
-    "/properties/CidrBlock"
+    "/properties/CidrBlock",
+    "/properties/Ipv4IpamPoolId",
+    "/properties/Ipv4NetmaskLength"
   ],
   "conditionalCreateOnlyProperties": [
     "/properties/InstanceTenancy"
   ],
   "readOnlyProperties": [
-    "/properties/VpcId",
-    "/properties/DefaultSecurityGroup",
     "/properties/CidrBlockAssociations",
     "/properties/DefaultNetworkAcl",
-    "/properties/Ipv6CidrBlocks"
+    "/properties/DefaultSecurityGroup",
+    "/properties/Ipv6CidrBlocks",
+    "/properties/VpcId"
   ],
   "primaryIdentifier": [
     "/properties/VpcId"
+  ],
+  "writeOnlyProperties": [
+    "/properties/Ipv4IpamPoolId",
+    "/properties/Ipv4NetmaskLength"
   ],
   "handlers": {
     "create": {
       "permissions": [
         "ec2:CreateVpc",
-        "ec2:CreateTags",
-        "ec2:ModifyVpcAttribute",
         "ec2:DescribeVpcs",
-        "ec2:DescribeVpcAttribute"
+        "ec2:ModifyVpcAttribute"
       ]
     },
     "read": {
@@ -121,17 +136,14 @@
       "permissions": [
         "ec2:CreateTags",
         "ec2:ModifyVpcAttribute",
-        "ec2:DescribeVpcs",
         "ec2:DeleteTags",
-        "ec2:ModifyVpcTenancy",
-        "ec2:DescribeVpcAttribute"
+        "ec2:ModifyVpcTenancy"
       ]
     },
     "delete": {
       "permissions": [
         "ec2:DeleteVpc",
-        "ec2:DescribeVpcs",
-        "ec2:DeleteTags"
+        "ec2:DescribeVpcs"
       ]
     },
     "list": {

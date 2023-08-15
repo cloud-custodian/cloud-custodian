@@ -1,0 +1,175 @@
+{
+  "typeName": "AWS::DeviceFarm::DevicePool",
+  "description": "AWS::DeviceFarm::DevicePool creates a new Device Pool for a given DF Project",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-device-farm",
+  "properties": {
+    "Description": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 16384
+    },
+    "MaxDevices": {
+      "type": "integer"
+    },
+    "Name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "ProjectArn": {
+      "type": "string",
+      "minLength": 32,
+      "maxLength": 1011,
+      "pattern": "^arn:.+"
+    },
+    "Arn": {
+      "type": "string",
+      "minLength": 32,
+      "maxLength": 1011,
+      "pattern": "^arn:.+"
+    },
+    "Rules": {
+      "type": "array",
+      "uniqueItems": false,
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/Rule"
+      }
+    },
+    "Tags": {
+      "type": "array",
+      "uniqueItems": false,
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/Tag"
+      }
+    }
+  },
+  "definitions": {
+    "Rule": {
+      "description": "Represents a condition for a device pool.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Attribute": {
+          "type": "string",
+          "description": "The rule's stringified attribute.",
+          "enum": [
+            "ARN",
+            "PLATFORM",
+            "FORM_FACTOR",
+            "MANUFACTURER",
+            "REMOTE_ACCESS_ENABLED",
+            "REMOTE_DEBUG_ENABLED",
+            "APPIUM_VERSION",
+            "INSTANCE_ARN",
+            "INSTANCE_LABELS",
+            "FLEET_TYPE",
+            "OS_VERSION",
+            "MODEL",
+            "AVAILABILITY"
+          ]
+        },
+        "Operator": {
+          "type": "string",
+          "description": "Specifies how Device Farm compares the rule's attribute to the value.",
+          "enum": [
+            "EQUALS",
+            "LESS_THAN",
+            "LESS_THAN_OR_EQUALS",
+            "GREATER_THAN",
+            "GREATER_THAN_OR_EQUALS",
+            "IN",
+            "NOT_IN",
+            "CONTAINS"
+          ]
+        },
+        "Value": {
+          "type": "string",
+          "description": "The rule's value."
+        }
+      }
+    },
+    "Tag": {
+      "type": "object",
+      "additionalProperties": false,
+      "insertionOrder": false,
+      "properties": {
+        "Key": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "Value": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        }
+      },
+      "required": [
+        "Key",
+        "Value"
+      ]
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "Name",
+    "Rules",
+    "ProjectArn"
+  ],
+  "primaryIdentifier": [
+    "/properties/Arn"
+  ],
+  "readOnlyProperties": [
+    "/properties/Arn"
+  ],
+  "createOnlyProperties": [
+    "/properties/ProjectArn"
+  ],
+  "tagging": {
+    "taggable": true
+  },
+  "handlers": {
+    "create": {
+      "permissions": [
+        "devicefarm:CreateDevicePool",
+        "devicefarm:TagResource"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "devicefarm:GetDevicePool",
+        "devicefarm:ListTagsForResource"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "devicefarm:UpdateDevicePool",
+        "devicefarm:TagResource",
+        "devicefarm:UntagResource",
+        "devicefarm:ListTagsForResource"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "devicefarm:DeleteDevicePool"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "devicefarm:ListDevicePools"
+      ],
+      "handlerSchema": {
+        "properties": {
+          "ProjectArn": {
+            "$ref": "resource-schema.json#/properties/ProjectArn"
+          }
+        },
+        "required": [
+          "ProjectArn"
+        ]
+      }
+    }
+  }
+}

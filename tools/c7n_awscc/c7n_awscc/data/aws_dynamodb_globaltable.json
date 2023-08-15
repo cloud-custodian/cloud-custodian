@@ -87,6 +87,18 @@
         "StreamViewType"
       ]
     },
+    "KinesisStreamSpecification": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "StreamArn": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "StreamArn"
+      ]
+    },
     "KeySchema": {
       "type": "object",
       "additionalProperties": false,
@@ -135,6 +147,12 @@
         "PointInTimeRecoverySpecification": {
           "$ref": "#/definitions/PointInTimeRecoverySpecification"
         },
+        "TableClass": {
+          "type": "string"
+        },
+        "DeletionProtectionEnabled": {
+          "type": "boolean"
+        },
         "SSESpecification": {
           "$ref": "#/definitions/ReplicaSSESpecification"
         },
@@ -148,6 +166,9 @@
         },
         "ReadProvisionedThroughputSettings": {
           "$ref": "#/definitions/ReadProvisionedThroughputSettings"
+        },
+        "KinesisStreamSpecification": {
+          "$ref": "#/definitions/KinesisStreamSpecification"
         }
       },
       "required": [
@@ -437,6 +458,12 @@
       "/properties/StreamArn"
     ]
   ],
+  "writeOnlyProperties": [
+    "/properties/Replicas/*/ReadProvisionedThroughputSettings/ReadCapacityAutoScalingSettings/SeedCapacity",
+    "/properties/Replicas/*/GlobalSecondaryIndexes/*/ReadProvisionedThroughputSettings/ReadCapacityAutoScalingSettings/SeedCapacity",
+    "/properties/WriteProvisionedThroughputSettings/WriteCapacityAutoScalingSettings/SeedCapacity",
+    "/properties/GlobalSecondaryIndexes/*/WriteProvisionedThroughputSettings/WriteCapacityAutoScalingSettings/SeedCapacity"
+  ],
   "handlers": {
     "create": {
       "permissions": [
@@ -457,6 +484,7 @@
         "dynamodb:TagResource",
         "dynamodb:EnableKinesisStreamingDestination",
         "dynamodb:DisableKinesisStreamingDestination",
+        "dynamodb:DescribeKinesisStreamingDestination",
         "dynamodb:DescribeTableReplicaAutoScaling",
         "dynamodb:UpdateTableReplicaAutoScaling",
         "dynamodb:TagResource",
@@ -467,19 +495,26 @@
         "application-autoscaling:PutScalingPolicy",
         "application-autoscaling:PutScheduledAction",
         "application-autoscaling:RegisterScalableTarget",
+        "kinesis:ListStreams",
+        "kinesis:DescribeStream",
+        "kinesis:PutRecords",
         "kms:CreateGrant",
         "kms:Describe*",
         "kms:Get*",
         "kms:List*",
+        "kms:Decrypt",
         "kms:RevokeGrant",
-        "cloudwatch:PutMetricData"
+        "cloudwatch:PutMetricData",
+        "iam:CreateServiceLinkedRole"
       ]
     },
     "read": {
       "permissions": [
         "dynamodb:Describe*",
         "application-autoscaling:Describe*",
-        "cloudwatch:PutMetricData"
+        "cloudwatch:PutMetricData",
+        "dynamodb:ListTagsOfResource",
+        "kms:Describe*"
       ]
     },
     "update": {
@@ -505,6 +540,7 @@
         "dynamodb:UntagResource",
         "dynamodb:EnableKinesisStreamingDestination",
         "dynamodb:DisableKinesisStreamingDestination",
+        "dynamodb:DescribeKinesisStreamingDestination",
         "dynamodb:DescribeTableReplicaAutoScaling",
         "dynamodb:UpdateTableReplicaAutoScaling",
         "application-autoscaling:DeleteScalingPolicy",
@@ -514,6 +550,9 @@
         "application-autoscaling:PutScalingPolicy",
         "application-autoscaling:PutScheduledAction",
         "application-autoscaling:RegisterScalableTarget",
+        "kinesis:ListStreams",
+        "kinesis:DescribeStream",
+        "kinesis:PutRecords",
         "kms:CreateGrant",
         "kms:Describe*",
         "kms:Get*",
@@ -521,11 +560,12 @@
         "kms:RevokeGrant",
         "cloudwatch:PutMetricData"
       ],
-      "timeoutInMinutes": 360
+      "timeoutInMinutes": 1200
     },
     "delete": {
       "permissions": [
         "dynamodb:Describe*",
+        "dynamodb:DeleteTable",
         "application-autoscaling:DeleteScalingPolicy",
         "application-autoscaling:DeleteScheduledAction",
         "application-autoscaling:DeregisterScalableTarget",

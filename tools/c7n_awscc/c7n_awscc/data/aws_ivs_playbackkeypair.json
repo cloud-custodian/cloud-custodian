@@ -59,12 +59,19 @@
     }
   },
   "additionalProperties": false,
-  "required": [
-    "PublicKeyMaterial"
-  ],
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": false,
+    "tagProperty": "/properties/Tags"
+  },
   "readOnlyProperties": [
     "/properties/Arn",
     "/properties/Fingerprint"
+  ],
+  "writeOnlyProperties": [
+    "/properties/PublicKeyMaterial"
   ],
   "createOnlyProperties": [
     "/properties/PublicKeyMaterial",
@@ -76,7 +83,8 @@
   "handlers": {
     "create": {
       "permissions": [
-        "ivs:ImportPlaybackKeyPair"
+        "ivs:ImportPlaybackKeyPair",
+        "ivs:TagResource"
       ]
     },
     "read": {
@@ -86,6 +94,7 @@
     },
     "update": {
       "permissions": [
+        "ivs:GetPlaybackKeyPair",
         "ivs:ListTagsForResource",
         "ivs:UntagResource",
         "ivs:TagResource"
@@ -93,12 +102,14 @@
     },
     "delete": {
       "permissions": [
-        "ivs:DeletePlaybackKeyPair"
+        "ivs:DeletePlaybackKeyPair",
+        "ivs:UntagResource"
       ]
     },
     "list": {
       "permissions": [
-        "ivs:ListPlaybackKeyPairs"
+        "ivs:ListPlaybackKeyPairs",
+        "ivs:ListTagsForResource"
       ]
     }
   }

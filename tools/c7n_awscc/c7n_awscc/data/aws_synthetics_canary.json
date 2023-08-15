@@ -71,6 +71,10 @@
     "VisualReference": {
       "description": "Visual reference configuration for visual testing",
       "$ref": "#/definitions/VisualReference"
+    },
+    "DeleteLambdaResourcesOnCanaryDeletion": {
+      "description": "Deletes associated lambda resources created by Synthetics if set to True. Default is False",
+      "type": "boolean"
     }
   },
   "definitions": {
@@ -106,6 +110,9 @@
           "type": "string"
         },
         "Handler": {
+          "type": "string"
+        },
+        "SourceLocationArn": {
           "type": "string"
         }
       },
@@ -273,8 +280,7 @@
     "ArtifactS3Location",
     "ExecutionRoleArn",
     "Schedule",
-    "RuntimeVersion",
-    "StartCanaryAfterCreation"
+    "RuntimeVersion"
   ],
   "handlers": {
     "create": {
@@ -347,6 +353,13 @@
     "/properties/Code/S3Bucket",
     "/properties/Code/S3Key",
     "/properties/Code/S3ObjectVersion",
-    "/properties/Code/Script"
+    "/properties/Code/Script",
+    "/properties/DeleteLambdaResourcesOnCanaryDeletion",
+    "/properties/StartCanaryAfterCreation",
+    "/properties/RunConfig/EnvironmentVariables",
+    "/properties/VisualReference"
+  ],
+  "deprecatedProperties": [
+    "/properties/DeleteLambdaResourcesOnCanaryDeletion"
   ]
 }

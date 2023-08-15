@@ -1,6 +1,10 @@
 {
   "typeName": "AWS::SSO::InstanceAccessControlAttributeConfiguration",
-  "taggable": false,
+  "tagging": {
+    "taggable": false,
+    "tagOnCreate": false,
+    "tagUpdatable": false
+  },
   "description": "Resource Type definition for SSO InstanceAccessControlAttributeConfiguration",
   "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-sso/aws-sso-instanceaccesscontrolattributeconfiguration",
   "definitions": {

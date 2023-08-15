@@ -1,7 +1,7 @@
 {
   "typeName": "AWS::ApiGateway::Model",
   "description": "Resource Type definition for AWS::ApiGateway::Model",
-  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-apigateway.git",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-apigateway",
   "additionalProperties": false,
   "properties": {
     "ContentType": {
@@ -65,6 +65,16 @@
       ]
     },
     "list": {
+      "handlerSchema": {
+        "properties": {
+          "RestApiId": {
+            "$ref": "resource-schema.json#/properties/RestApiId"
+          }
+        },
+        "required": [
+          "RestApiId"
+        ]
+      },
       "permissions": [
         "apigateway:GET"
       ]

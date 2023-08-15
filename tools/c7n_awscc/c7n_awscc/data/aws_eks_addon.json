@@ -43,17 +43,27 @@
       "type": "string",
       "minLength": 1
     },
+    "PreserveOnDelete": {
+      "description": "PreserveOnDelete parameter value",
+      "type": "boolean"
+    },
     "ResolveConflicts": {
       "description": "Resolve parameter value conflicts",
       "type": "string",
       "minLength": 1,
       "enum": [
         "NONE",
-        "OVERWRITE"
+        "OVERWRITE",
+        "PRESERVE"
       ]
     },
     "ServiceAccountRoleArn": {
       "description": "IAM role to bind to the add-on's service account",
+      "type": "string",
+      "minLength": 1
+    },
+    "ConfigurationValues": {
+      "description": "The configuration values to use with the add-on",
       "type": "string",
       "minLength": 1
     },
@@ -70,6 +80,13 @@
         "$ref": "#/definitions/Tag"
       }
     }
+  },
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": false,
+    "tagProperty": "/properties/Tags"
   },
   "additionalProperties": false,
   "required": [
@@ -88,7 +105,8 @@
     "/properties/Arn"
   ],
   "writeOnlyProperties": [
-    "/properties/ResolveConflicts"
+    "/properties/ResolveConflicts",
+    "/properties/PreserveOnDelete"
   ],
   "handlers": {
     "create": {

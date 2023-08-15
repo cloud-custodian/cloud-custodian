@@ -1,7 +1,41 @@
 {
   "typeName": "AWS::AmplifyUIBuilder::Component",
   "description": "Definition of AWS::AmplifyUIBuilder::Component Resource Type",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-amplifyuibuilder",
   "definitions": {
+    "ActionParameters": {
+      "type": "object",
+      "properties": {
+        "Type": {
+          "$ref": "#/definitions/ComponentProperty"
+        },
+        "Url": {
+          "$ref": "#/definitions/ComponentProperty"
+        },
+        "Anchor": {
+          "$ref": "#/definitions/ComponentProperty"
+        },
+        "Target": {
+          "$ref": "#/definitions/ComponentProperty"
+        },
+        "Global": {
+          "$ref": "#/definitions/ComponentProperty"
+        },
+        "Model": {
+          "type": "string"
+        },
+        "Id": {
+          "$ref": "#/definitions/ComponentProperty"
+        },
+        "Fields": {
+          "$ref": "#/definitions/ComponentProperties"
+        },
+        "State": {
+          "$ref": "#/definitions/MutationActionSetStateParameter"
+        }
+      },
+      "additionalProperties": false
+    },
     "ComponentBindingProperties": {
       "type": "object",
       "patternProperties": {
@@ -14,14 +48,14 @@
     "ComponentBindingPropertiesValue": {
       "type": "object",
       "properties": {
-        "DefaultValue": {
-          "type": "string"
-        },
         "Type": {
           "type": "string"
         },
         "BindingProperties": {
           "$ref": "#/definitions/ComponentBindingPropertiesValueProperties"
+        },
+        "DefaultValue": {
+          "type": "string"
         }
       },
       "additionalProperties": false
@@ -29,29 +63,28 @@
     "ComponentBindingPropertiesValueProperties": {
       "type": "object",
       "properties": {
-        "Field": {
-          "type": "string"
-        },
-        "DefaultValue": {
-          "type": "string"
-        },
-        "Bucket": {
-          "type": "string"
-        },
-        "UserAttribute": {
-          "type": "string"
-        },
         "Model": {
           "type": "string"
         },
+        "Field": {
+          "type": "string"
+        },
         "Predicates": {
-          "insertionOrder": false,
           "type": "array",
           "items": {
             "$ref": "#/definitions/Predicate"
           }
         },
+        "UserAttribute": {
+          "type": "string"
+        },
+        "Bucket": {
+          "type": "string"
+        },
         "Key": {
+          "type": "string"
+        },
+        "DefaultValue": {
           "type": "string"
         }
       },
@@ -63,18 +96,20 @@
         "ComponentType": {
           "type": "string"
         },
+        "Name": {
+          "type": "string"
+        },
+        "Properties": {
+          "$ref": "#/definitions/ComponentProperties"
+        },
         "Children": {
-          "insertionOrder": false,
           "type": "array",
           "items": {
             "$ref": "#/definitions/ComponentChild"
           }
         },
-        "Properties": {
-          "$ref": "#/definitions/ComponentProperties"
-        },
-        "Name": {
-          "type": "string"
+        "Events": {
+          "$ref": "#/definitions/ComponentEvents"
         }
       },
       "required": [
@@ -96,22 +131,25 @@
     "ComponentConditionProperty": {
       "type": "object",
       "properties": {
-        "Operator": {
+        "Property": {
           "type": "string"
         },
         "Field": {
           "type": "string"
         },
-        "Operand": {
+        "Operator": {
           "type": "string"
         },
-        "Else": {
-          "$ref": "#/definitions/ComponentProperty"
+        "Operand": {
+          "type": "string"
         },
         "Then": {
           "$ref": "#/definitions/ComponentProperty"
         },
-        "Property": {
+        "Else": {
+          "$ref": "#/definitions/ComponentProperty"
+        },
+        "OperandType": {
           "type": "string"
         }
       },
@@ -124,26 +162,45 @@
           "type": "string"
         },
         "Sort": {
-          "insertionOrder": false,
           "type": "array",
           "items": {
             "$ref": "#/definitions/SortProperty"
           }
         },
+        "Predicate": {
+          "$ref": "#/definitions/Predicate"
+        },
         "Identifiers": {
-          "insertionOrder": false,
           "type": "array",
           "items": {
             "type": "string"
           }
-        },
-        "Predicate": {
-          "$ref": "#/definitions/Predicate"
         }
       },
       "required": [
         "Model"
       ],
+      "additionalProperties": false
+    },
+    "ComponentEvent": {
+      "type": "object",
+      "properties": {
+        "Action": {
+          "type": "string"
+        },
+        "Parameters": {
+          "$ref": "#/definitions/ActionParameters"
+        }
+      },
+      "additionalProperties": false
+    },
+    "ComponentEvents": {
+      "type": "object",
+      "patternProperties": {
+        ".+": {
+          "$ref": "#/definitions/ComponentEvent"
+        }
+      },
       "additionalProperties": false
     },
     "ComponentOverrides": {
@@ -176,47 +233,52 @@
     "ComponentProperty": {
       "type": "object",
       "properties": {
-        "Condition": {
-          "$ref": "#/definitions/ComponentConditionProperty"
-        },
-        "UserAttribute": {
-          "type": "string"
-        },
-        "ImportedValue": {
+        "Value": {
           "type": "string"
         },
         "BindingProperties": {
           "$ref": "#/definitions/ComponentPropertyBindingProperties"
         },
-        "Bindings": {
-          "$ref": "#/definitions/FormBindings"
-        },
-        "Configured": {
-          "type": "boolean"
-        },
-        "Concat": {
-          "insertionOrder": false,
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/ComponentProperty"
-          }
+        "CollectionBindingProperties": {
+          "$ref": "#/definitions/ComponentPropertyBindingProperties"
         },
         "DefaultValue": {
-          "type": "string"
-        },
-        "Type": {
-          "type": "string"
-        },
-        "Value": {
           "type": "string"
         },
         "Model": {
           "type": "string"
         },
-        "CollectionBindingProperties": {
-          "$ref": "#/definitions/ComponentPropertyBindingProperties"
+        "Bindings": {
+          "$ref": "#/definitions/FormBindings"
         },
         "Event": {
+          "type": "string"
+        },
+        "UserAttribute": {
+          "type": "string"
+        },
+        "Concat": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ComponentProperty"
+          }
+        },
+        "Condition": {
+          "$ref": "#/definitions/ComponentConditionProperty"
+        },
+        "Configured": {
+          "type": "boolean"
+        },
+        "Type": {
+          "type": "string"
+        },
+        "ImportedValue": {
+          "type": "string"
+        },
+        "ComponentName": {
+          "type": "string"
+        },
+        "Property": {
           "type": "string"
         }
       },
@@ -225,10 +287,10 @@
     "ComponentPropertyBindingProperties": {
       "type": "object",
       "properties": {
-        "Field": {
+        "Property": {
           "type": "string"
         },
-        "Property": {
+        "Field": {
           "type": "string"
         }
       },
@@ -283,28 +345,46 @@
       },
       "additionalProperties": false
     },
+    "MutationActionSetStateParameter": {
+      "type": "object",
+      "properties": {
+        "ComponentName": {
+          "type": "string"
+        },
+        "Property": {
+          "type": "string"
+        },
+        "Set": {
+          "$ref": "#/definitions/ComponentProperty"
+        }
+      },
+      "required": [
+        "ComponentName",
+        "Property",
+        "Set"
+      ],
+      "additionalProperties": false
+    },
     "Predicate": {
       "type": "object",
       "properties": {
-        "Operator": {
-          "type": "string"
-        },
-        "Field": {
-          "type": "string"
-        },
         "Or": {
-          "insertionOrder": false,
           "type": "array",
           "items": {
             "$ref": "#/definitions/Predicate"
           }
         },
         "And": {
-          "insertionOrder": false,
           "type": "array",
           "items": {
             "$ref": "#/definitions/Predicate"
           }
+        },
+        "Field": {
+          "type": "string"
+        },
+        "Operator": {
+          "type": "string"
         },
         "Operand": {
           "type": "string"
@@ -355,7 +435,6 @@
       "$ref": "#/definitions/ComponentBindingProperties"
     },
     "Children": {
-      "insertionOrder": false,
       "type": "array",
       "items": {
         "$ref": "#/definitions/ComponentChild"
@@ -369,19 +448,14 @@
       "maxLength": 255,
       "minLength": 1
     },
-    "CreatedAt": {
-      "type": "string",
-      "format": "date-time"
-    },
     "EnvironmentName": {
       "type": "string"
     },
+    "Events": {
+      "$ref": "#/definitions/ComponentEvents"
+    },
     "Id": {
       "type": "string"
-    },
-    "ModifiedAt": {
-      "type": "string",
-      "format": "date-time"
     },
     "Name": {
       "type": "string",
@@ -394,6 +468,9 @@
     "Properties": {
       "$ref": "#/definitions/ComponentProperties"
     },
+    "SchemaVersion": {
+      "type": "string"
+    },
     "SourceId": {
       "type": "string"
     },
@@ -401,19 +478,22 @@
       "$ref": "#/definitions/Tags"
     },
     "Variants": {
-      "insertionOrder": false,
       "type": "array",
       "items": {
         "$ref": "#/definitions/ComponentVariant"
       }
     }
   },
+  "required": [
+    "BindingProperties",
+    "ComponentType",
+    "Name",
+    "Overrides",
+    "Properties",
+    "Variants"
+  ],
   "readOnlyProperties": [
-    "/properties/AppId",
-    "/properties/CreatedAt",
-    "/properties/EnvironmentName",
-    "/properties/Id",
-    "/properties/ModifiedAt"
+    "/properties/Id"
   ],
   "createOnlyProperties": [
     "/properties/Tags"
@@ -423,37 +503,65 @@
     "/properties/EnvironmentName",
     "/properties/Id"
   ],
-  "additionalProperties": false,
   "handlers": {
     "create": {
       "permissions": [
+        "amplify:GetApp",
+        "amplifyuibuilder:GetComponent",
         "amplifyuibuilder:CreateComponent",
-        "amplify:GetApp"
-      ]
-    },
-    "delete": {
-      "permissions": [
-        "amplifyuibuilder:DeleteComponent",
-        "amplify:GetApp"
+        "amplifyuibuilder:TagResource"
       ]
     },
     "read": {
       "permissions": [
-        "amplifyuibuilder:GetComponent",
-        "amplify:GetApp"
-      ]
-    },
-    "list": {
-      "permissions": [
-        "amplifyuibuilder:ListComponents",
-        "amplify:GetApp"
+        "amplify:GetApp",
+        "amplifyuibuilder:GetComponent"
       ]
     },
     "update": {
       "permissions": [
+        "amplify:GetApp",
+        "amplifyuibuilder:GetComponent",
         "amplifyuibuilder:UpdateComponent",
-        "amplify:GetApp"
+        "amplifyuibuilder:TagResource"
       ]
+    },
+    "delete": {
+      "permissions": [
+        "amplify:GetApp",
+        "amplifyuibuilder:GetComponent",
+        "amplifyuibuilder:DeleteComponent",
+        "amplifyuibuilder:UntagResource"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "amplify:GetApp",
+        "amplifyuibuilder:GetComponent",
+        "amplifyuibuilder:ListComponents"
+      ],
+      "handlerSchema": {
+        "properties": {
+          "AppId": {
+            "$ref": "resource-schema.json#/properties/AppId"
+          },
+          "EnvironmentName": {
+            "$ref": "resource-schema.json#/properties/EnvironmentName"
+          }
+        },
+        "required": [
+          "AppId",
+          "EnvironmentName"
+        ]
+      }
     }
-  }
+  },
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": false,
+    "cloudFormationSystemTags": false,
+    "tagProperty": "#/properties/Tags"
+  },
+  "additionalProperties": false
 }

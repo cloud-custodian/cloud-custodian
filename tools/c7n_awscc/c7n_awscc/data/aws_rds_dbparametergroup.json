@@ -1,0 +1,117 @@
+{
+  "typeName": "AWS::RDS::DBParameterGroup",
+  "description": "The AWS::RDS::DBParameterGroup resource creates a custom parameter group for an RDS database family",
+  "additionalProperties": false,
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-rds",
+  "definitions": {
+    "Tag": {
+      "description": "A key-value pair to associate with a resource.",
+      "type": "object",
+      "properties": {
+        "Key": {
+          "type": "string",
+          "description": "The key name of the tag. You can specify a value that is 1 to 128 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "Value": {
+          "type": "string",
+          "description": "The value for the tag. You can specify a value that is 0 to 256 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.",
+          "minLength": 0,
+          "maxLength": 256
+        }
+      },
+      "required": [
+        "Key"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "properties": {
+    "DBParameterGroupName": {
+      "description": "Specifies the name of the DB parameter group",
+      "type": "string",
+      "pattern": "^[a-zA-Z]{1}(?:-?[a-zA-Z0-9])*$"
+    },
+    "Description": {
+      "description": "Provides the customer-specified description for this DB parameter group.",
+      "type": "string"
+    },
+    "Family": {
+      "description": "The DB parameter group family name.",
+      "type": "string"
+    },
+    "Parameters": {
+      "description": "An array of parameter names and values for the parameter update.",
+      "type": "object"
+    },
+    "Tags": {
+      "description": "An array of key-value pairs to apply to this resource.",
+      "type": "array",
+      "maxItems": 50,
+      "uniqueItems": false,
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/Tag"
+      }
+    }
+  },
+  "propertyTransform": {
+    "/properties/DBParameterGroupName": "$lowercase(DBParameterGroupName)"
+  },
+  "required": [
+    "Family",
+    "Description"
+  ],
+  "primaryIdentifier": [
+    "/properties/DBParameterGroupName"
+  ],
+  "createOnlyProperties": [
+    "/properties/DBParameterGroupName",
+    "/properties/Description",
+    "/properties/Family"
+  ],
+  "handlers": {
+    "create": {
+      "permissions": [
+        "rds:AddTagsToResource",
+        "rds:CreateDBParameterGroup",
+        "rds:DescribeDBParameterGroups",
+        "rds:DescribeDBParameters",
+        "rds:DescribeEngineDefaultParameters",
+        "rds:ListTagsForResource",
+        "rds:ModifyDBParameterGroup"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "rds:DescribeDBParameterGroups",
+        "rds:DescribeDBParameters",
+        "rds:DescribeEngineDefaultParameters",
+        "rds:ListTagsForResource"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "rds:AddTagsToResource",
+        "rds:DescribeDBParameterGroups",
+        "rds:DescribeDBParameters",
+        "rds:DescribeEngineDefaultParameters",
+        "rds:ListTagsForResource",
+        "rds:ModifyDBParameterGroup",
+        "rds:ResetDBParameterGroup",
+        "rds:RemoveTagsFromResource"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "rds:DeleteDBParameterGroup"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "rds:DescribeDBParameterGroups"
+      ]
+    }
+  }
+}

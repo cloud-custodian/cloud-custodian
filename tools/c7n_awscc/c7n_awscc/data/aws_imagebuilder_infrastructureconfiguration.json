@@ -18,6 +18,7 @@
     "InstanceTypes": {
       "description": "The instance types of the infrastructure configuration.",
       "type": "array",
+      "insertionOrder": true,
       "items": {
         "type": "string"
       }
@@ -25,6 +26,7 @@
     "SecurityGroupIds": {
       "description": "The security group IDs of the infrastructure configuration.",
       "type": "array",
+      "insertionOrder": false,
       "items": {
         "type": "string"
       }
@@ -156,6 +158,9 @@
   "createOnlyProperties": [
     "/properties/Name"
   ],
+  "tagging": {
+    "taggable": false
+  },
   "handlers": {
     "create": {
       "permissions": [
@@ -171,6 +176,8 @@
     },
     "update": {
       "permissions": [
+        "iam:PassRole",
+        "sns:Publish",
         "imagebuilder:GetInfrastructureConfiguration",
         "imagebuilder:UpdateInfrastructureConfiguration"
       ]

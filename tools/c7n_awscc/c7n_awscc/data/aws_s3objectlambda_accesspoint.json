@@ -115,6 +115,36 @@
     },
     "Action": {
       "type": "string"
+    },
+    "Alias": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Status": {
+          "type": "string",
+          "description": "The status of the Object Lambda alias.",
+          "pattern": "^[A-Z]*$"
+        },
+        "Value": {
+          "type": "string",
+          "description": "The value of the Object Lambda alias.",
+          "pattern": "^[a-z0-9\\-]*$"
+        }
+      },
+      "required": [
+        "Status",
+        "Value"
+      ]
+    },
+    "PolicyStatus": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "IsPublic": {
+          "type": "boolean",
+          "description": "Specifies whether the Object lambda Access Point Policy is Public or not. Object lambda Access Points are private by default."
+        }
+      }
     }
   },
   "properties": {
@@ -124,6 +154,9 @@
       "pattern": "^[a-z0-9]([a-z0-9\\-]*[a-z0-9])?$",
       "minLength": 3,
       "maxLength": 45
+    },
+    "Alias": {
+      "$ref": "#/definitions/Alias"
     },
     "Arn": {
       "type": "string",
@@ -138,14 +171,7 @@
       "$ref": "#/definitions/PublicAccessBlockConfiguration"
     },
     "PolicyStatus": {
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "IsPublic": {
-          "type": "boolean",
-          "description": "Specifies whether the Object lambda Access Point Policy is Public or not. Object lambda Access Points are private by default."
-        }
-      }
+      "$ref": "#/definitions/PolicyStatus"
     },
     "ObjectLambdaConfiguration": {
       "description": "The Object lambda Access Point Configuration that configures transformations to be applied on the objects on specified S3 Actions",
@@ -161,8 +187,12 @@
   ],
   "readOnlyProperties": [
     "/properties/Arn",
+    "/properties/Alias",
+    "/properties/Alias/Value",
+    "/properties/Alias/Status",
     "/properties/CreationDate",
     "/properties/PolicyStatus",
+    "/properties/PolicyStatus/IsPublic",
     "/properties/PublicAccessBlockConfiguration"
   ],
   "primaryIdentifier": [

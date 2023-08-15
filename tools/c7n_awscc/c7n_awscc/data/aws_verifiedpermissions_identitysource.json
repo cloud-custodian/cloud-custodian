@@ -1,0 +1,200 @@
+{
+  "typeName": "AWS::VerifiedPermissions::IdentitySource",
+  "description": "Definition of AWS::VerifiedPermissions::IdentitySource Resource Type",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-avp",
+  "definitions": {
+    "CognitoUserPoolConfiguration": {
+      "type": "object",
+      "properties": {
+        "UserPoolArn": {
+          "type": "string",
+          "maxLength": 255,
+          "minLength": 1,
+          "pattern": "^arn:[a-zA-Z0-9-]+:cognito-idp:(([a-zA-Z0-9-]+:\\d{12}:userpool/[\\w-]+_[0-9a-zA-Z]+))$"
+        },
+        "ClientIds": {
+          "type": "array",
+          "insertionOrder": false,
+          "items": {
+            "type": "string",
+            "maxLength": 255,
+            "minLength": 1,
+            "pattern": "^.*$"
+          },
+          "maxItems": 1000,
+          "minItems": 0
+        }
+      },
+      "required": [
+        "UserPoolArn"
+      ],
+      "additionalProperties": false
+    },
+    "IdentitySourceConfiguration": {
+      "type": "object",
+      "title": "CognitoUserPoolConfiguration",
+      "properties": {
+        "CognitoUserPoolConfiguration": {
+          "$ref": "#/definitions/CognitoUserPoolConfiguration"
+        }
+      },
+      "required": [
+        "CognitoUserPoolConfiguration"
+      ],
+      "additionalProperties": false
+    },
+    "IdentitySourceDetails": {
+      "type": "object",
+      "properties": {
+        "ClientIds": {
+          "type": "array",
+          "insertionOrder": false,
+          "items": {
+            "type": "string",
+            "maxLength": 255,
+            "minLength": 1,
+            "pattern": "^.*$"
+          },
+          "maxItems": 1000,
+          "minItems": 0
+        },
+        "UserPoolArn": {
+          "type": "string",
+          "maxLength": 255,
+          "minLength": 1,
+          "pattern": "^arn:[a-zA-Z0-9-]+:cognito-idp:(([a-zA-Z0-9-]+:\\d{12}:userpool/[\\w-]+_[0-9a-zA-Z]+))$"
+        },
+        "DiscoveryUrl": {
+          "type": "string",
+          "maxLength": 2048,
+          "minLength": 1,
+          "pattern": "^https://.*$"
+        },
+        "OpenIdIssuer": {
+          "$ref": "#/definitions/OpenIdIssuer"
+        }
+      },
+      "additionalProperties": false
+    },
+    "OpenIdIssuer": {
+      "type": "string",
+      "enum": [
+        "COGNITO"
+      ]
+    }
+  },
+  "properties": {
+    "Configuration": {
+      "$ref": "#/definitions/IdentitySourceConfiguration"
+    },
+    "Details": {
+      "$ref": "#/definitions/IdentitySourceDetails"
+    },
+    "IdentitySourceId": {
+      "type": "string",
+      "maxLength": 200,
+      "minLength": 1,
+      "pattern": "^[a-zA-Z0-9-]*$"
+    },
+    "PolicyStoreId": {
+      "type": "string",
+      "maxLength": 200,
+      "minLength": 1,
+      "pattern": "^[a-zA-Z0-9-]*$"
+    },
+    "PrincipalEntityType": {
+      "type": "string",
+      "maxLength": 200,
+      "minLength": 1,
+      "pattern": "^.*$"
+    }
+  },
+  "required": [
+    "Configuration"
+  ],
+  "readOnlyProperties": [
+    "/properties/Details",
+    "/properties/IdentitySourceId"
+  ],
+  "createOnlyProperties": [
+    "/properties/PolicyStoreId"
+  ],
+  "primaryIdentifier": [
+    "/properties/IdentitySourceId",
+    "/properties/PolicyStoreId"
+  ],
+  "tagging": {
+    "taggable": false,
+    "tagOnCreate": false,
+    "tagUpdatable": false,
+    "cloudFormationSystemTags": false
+  },
+  "handlers": {
+    "create": {
+      "permissions": [
+        "verifiedpermissions:CreateIdentitySource",
+        "verifiedpermissions:GetIdentitySource",
+        "verifiedpermissions:UpdateIdentitySource",
+        "verifiedpermissions:DeleteIdentitySource",
+        "verifiedpermissions:ListIdentitySources",
+        "cognito-idp:DescribeUserPool",
+        "cognito-idp:ListUserPoolClients"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "verifiedpermissions:CreateIdentitySource",
+        "verifiedpermissions:GetIdentitySource",
+        "verifiedpermissions:UpdateIdentitySource",
+        "verifiedpermissions:DeleteIdentitySource",
+        "verifiedpermissions:ListIdentitySources",
+        "cognito-idp:DescribeUserPool",
+        "cognito-idp:ListUserPoolClients"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "verifiedpermissions:CreateIdentitySource",
+        "verifiedpermissions:GetIdentitySource",
+        "verifiedpermissions:UpdateIdentitySource",
+        "verifiedpermissions:DeleteIdentitySource",
+        "verifiedpermissions:ListIdentitySources",
+        "cognito-idp:DescribeUserPool",
+        "cognito-idp:ListUserPoolClients"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "verifiedpermissions:CreateIdentitySource",
+        "verifiedpermissions:GetIdentitySource",
+        "verifiedpermissions:UpdateIdentitySource",
+        "verifiedpermissions:DeleteIdentitySource",
+        "verifiedpermissions:ListIdentitySources",
+        "cognito-idp:DescribeUserPool",
+        "cognito-idp:ListUserPoolClients"
+      ]
+    },
+    "list": {
+      "handlerSchema": {
+        "properties": {
+          "PolicyStoreId": {
+            "$ref": "resource-schema.json#/properties/PolicyStoreId"
+          }
+        },
+        "required": [
+          "PolicyStoreId"
+        ]
+      },
+      "permissions": [
+        "verifiedpermissions:CreateIdentitySource",
+        "verifiedpermissions:GetIdentitySource",
+        "verifiedpermissions:UpdateIdentitySource",
+        "verifiedpermissions:DeleteIdentitySource",
+        "verifiedpermissions:ListIdentitySources",
+        "cognito-idp:DescribeUserPool",
+        "cognito-idp:ListUserPoolClients"
+      ]
+    }
+  },
+  "additionalProperties": false
+}

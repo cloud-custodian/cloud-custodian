@@ -81,7 +81,8 @@
       "permissions": [
         "frauddetector:GetLabels",
         "frauddetector:PutLabel",
-        "frauddetector:ListTagsForResource"
+        "frauddetector:ListTagsForResource",
+        "frauddetector:TagResource"
       ]
     },
     "read": {

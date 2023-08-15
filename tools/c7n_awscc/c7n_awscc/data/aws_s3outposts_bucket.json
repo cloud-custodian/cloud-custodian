@@ -261,22 +261,21 @@
       "permissions": [
         "s3-outposts:CreateBucket",
         "s3-outposts:PutBucketTagging",
-        "s3-outposts:PutBucketLifecycleConfiguration"
+        "s3-outposts:PutLifecycleConfiguration"
       ]
     },
     "read": {
       "permissions": [
         "s3-outposts:GetBucket",
         "s3-outposts:GetBucketTagging",
-        "s3-outposts:GetBucketLifecycleConfiguration"
+        "s3-outposts:GetLifecycleConfiguration"
       ]
     },
     "update": {
       "permissions": [
         "s3-outposts:PutBucketTagging",
         "s3-outposts:DeleteBucketTagging",
-        "s3-outposts:PutBucketLifecycleConfiguration",
-        "s3-outposts:DeleteBucketLifecycleConfiguration"
+        "s3-outposts:PutLifecycleConfiguration"
       ]
     },
     "delete": {

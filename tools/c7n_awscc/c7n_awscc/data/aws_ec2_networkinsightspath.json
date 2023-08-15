@@ -37,6 +37,36 @@
     },
     "Port": {
       "type": "integer"
+    },
+    "FilterPortRange": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "FromPort": {
+          "type": "integer"
+        },
+        "ToPort": {
+          "type": "integer"
+        }
+      }
+    },
+    "PathFilter": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "SourceAddress": {
+          "$ref": "#/definitions/IpAddress"
+        },
+        "SourcePortRange": {
+          "$ref": "#/definitions/FilterPortRange"
+        },
+        "DestinationAddress": {
+          "$ref": "#/definitions/IpAddress"
+        },
+        "DestinationPortRange": {
+          "$ref": "#/definitions/FilterPortRange"
+        }
+      }
     }
   },
   "properties": {
@@ -52,6 +82,12 @@
     "SourceIp": {
       "$ref": "#/definitions/IpAddress"
     },
+    "FilterAtSource": {
+      "$ref": "#/definitions/PathFilter"
+    },
+    "FilterAtDestination": {
+      "$ref": "#/definitions/PathFilter"
+    },
     "DestinationIp": {
       "$ref": "#/definitions/IpAddress"
     },
@@ -59,6 +95,12 @@
       "type": "string"
     },
     "Destination": {
+      "type": "string"
+    },
+    "SourceArn": {
+      "type": "string"
+    },
+    "DestinationArn": {
       "type": "string"
     },
     "Protocol": {
@@ -78,13 +120,14 @@
   "additionalProperties": false,
   "required": [
     "Protocol",
-    "Source",
-    "Destination"
+    "Source"
   ],
   "readOnlyProperties": [
     "/properties/NetworkInsightsPathId",
     "/properties/NetworkInsightsPathArn",
-    "/properties/CreatedDate"
+    "/properties/CreatedDate",
+    "/properties/SourceArn",
+    "/properties/DestinationArn"
   ],
   "primaryIdentifier": [
     "/properties/NetworkInsightsPathId"
@@ -95,7 +138,9 @@
     "/properties/Source",
     "/properties/Destination",
     "/properties/Protocol",
-    "/properties/DestinationPort"
+    "/properties/DestinationPort",
+    "/properties/FilterAtSource",
+    "/properties/FilterAtDestination"
   ],
   "additionalIdentifiers": [
     [
@@ -105,12 +150,14 @@
   "handlers": {
     "create": {
       "permissions": [
-        "ec2:CreateNetworkInsightsPath"
+        "ec2:CreateNetworkInsightsPath",
+        "ec2:CreateTags"
       ]
     },
     "delete": {
       "permissions": [
-        "ec2:DeleteNetworkInsightsPath"
+        "ec2:DeleteNetworkInsightsPath",
+        "ec2:DeleteTags"
       ]
     },
     "read": {

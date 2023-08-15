@@ -1,6 +1,7 @@
 {
   "typeName": "AWS::ApiGateway::RequestValidator",
   "description": "Resource Type definition for AWS::ApiGateway::RequestValidator",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-apigateway",
   "additionalProperties": false,
   "properties": {
     "RequestValidatorId": {
@@ -61,6 +62,16 @@
       ]
     },
     "list": {
+      "handlerSchema": {
+        "properties": {
+          "RestApiId": {
+            "$ref": "resource-schema.json#/properties/RestApiId"
+          }
+        },
+        "required": [
+          "RestApiId"
+        ]
+      },
       "permissions": [
         "apigateway:GET"
       ]

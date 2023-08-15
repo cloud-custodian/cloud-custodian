@@ -143,10 +143,19 @@
     "/properties/AccessPointId",
     "/properties/Arn"
   ],
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": false,
+    "tagProperty": "/properties/AccessPointTags"
+  },
   "handlers": {
     "create": {
       "permissions": [
-        "elasticfilesystem:CreateAccessPoint"
+        "elasticfilesystem:CreateAccessPoint",
+        "elasticfilesystem:TagResource",
+        "elasticfilesystem:DescribeAccessPoints"
       ]
     },
     "read": {
@@ -156,7 +165,8 @@
     },
     "delete": {
       "permissions": [
-        "elasticfilesystem:DeleteAccessPoint"
+        "elasticfilesystem:DeleteAccessPoint",
+        "elasticfilesystem:DescribeAccessPoints"
       ]
     },
     "list": {

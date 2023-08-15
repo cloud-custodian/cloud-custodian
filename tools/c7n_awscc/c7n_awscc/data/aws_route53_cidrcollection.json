@@ -1,0 +1,107 @@
+{
+  "typeName": "AWS::Route53::CidrCollection",
+  "description": "Resource schema for AWS::Route53::CidrCollection.",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-route53.git",
+  "definitions": {
+    "Location": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "LocationName": {
+          "description": "The name of the location that is associated with the CIDR collection.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 16
+        },
+        "CidrList": {
+          "description": "A list of CIDR blocks.",
+          "type": "array",
+          "uniqueItems": true,
+          "insertionOrder": false,
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "LocationName",
+        "CidrList"
+      ]
+    }
+  },
+  "properties": {
+    "Id": {
+      "description": "UUID of the CIDR collection.",
+      "type": "string"
+    },
+    "Name": {
+      "description": "A unique name for the CIDR collection.",
+      "type": "string",
+      "pattern": "^[0-9A-Za-z_\\-]+$",
+      "minLength": 1,
+      "maxLength": 64
+    },
+    "Arn": {
+      "description": "The Amazon resource name (ARN) to uniquely identify the AWS resource.",
+      "type": "string"
+    },
+    "Locations": {
+      "description": "A complex type that contains information about the list of CIDR locations.",
+      "type": "array",
+      "uniqueItems": true,
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/Location"
+      }
+    }
+  },
+  "additionalProperties": false,
+  "createOnlyProperties": [
+    "/properties/Name"
+  ],
+  "readOnlyProperties": [
+    "/properties/Id",
+    "/properties/Arn"
+  ],
+  "required": [
+    "Name"
+  ],
+  "primaryIdentifier": [
+    "/properties/Id"
+  ],
+  "handlers": {
+    "create": {
+      "permissions": [
+        "route53:CreateCidrCollection",
+        "route53:ChangeCidrCollection"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "route53:ListCidrCollections",
+        "route53:ListCidrBlocks"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "route53:ChangeCidrCollection"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "route53:DeleteCidrCollection",
+        "route53:ChangeCidrCollection"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "route53:ListCidrCollections",
+        "route53:ListCidrBlocks"
+      ]
+    }
+  },
+  "tagging": {
+    "taggable": false,
+    "tagUpdatable": false
+  }
+}

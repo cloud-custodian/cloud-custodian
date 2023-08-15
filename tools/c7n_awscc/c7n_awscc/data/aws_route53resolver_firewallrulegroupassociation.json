@@ -154,6 +154,13 @@
         "route53resolver:ListTagsForResource"
       ]
     },
+    "list": {
+      "permissions": [
+        "route53resolver:ListFirewallRuleGroupAssocations",
+        "route53resolver:GetFirewallRuleGroupAssociation",
+        "route53resolver:ListTagsForResource"
+      ]
+    },
     "delete": {
       "permissions": [
         "route53resolver:DisassociateFirewallRuleGroup",

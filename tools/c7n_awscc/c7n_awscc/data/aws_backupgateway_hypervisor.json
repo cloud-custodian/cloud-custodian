@@ -1,0 +1,162 @@
+{
+  "typeName": "AWS::BackupGateway::Hypervisor",
+  "description": "Definition of AWS::BackupGateway::Hypervisor Resource Type",
+  "definitions": {
+    "HypervisorState": {
+      "type": "string",
+      "enum": [
+        "PENDING",
+        "ONLINE",
+        "OFFLINE",
+        "ERROR"
+      ]
+    },
+    "SyncMetadataStatus": {
+      "type": "string",
+      "enum": [
+        "PENDING",
+        "IN_PROGRESS",
+        "FAILED",
+        "SUCCEEDED"
+      ]
+    },
+    "Tag": {
+      "type": "object",
+      "properties": {
+        "Key": {
+          "type": "string",
+          "maxLength": 128,
+          "minLength": 1,
+          "pattern": "^([\\p{L}\\p{Z}\\p{N}_.:/=+\\-@]*)$"
+        },
+        "Value": {
+          "type": "string",
+          "maxLength": 256,
+          "minLength": 0,
+          "pattern": "^[^\\x00]*$"
+        }
+      },
+      "required": [
+        "Key",
+        "Value"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "properties": {
+    "Host": {
+      "type": "string",
+      "maxLength": 128,
+      "minLength": 3,
+      "pattern": "^.+$"
+    },
+    "HypervisorArn": {
+      "type": "string",
+      "maxLength": 500,
+      "minLength": 50,
+      "pattern": "^arn:(aws|aws-cn|aws-us-gov):backup-gateway(:[a-zA-Z-0-9]+){3}\\/[a-zA-Z-0-9]+$"
+    },
+    "KmsKeyArn": {
+      "type": "string",
+      "maxLength": 500,
+      "minLength": 50,
+      "pattern": "^(^arn:(aws|aws-cn|aws-us-gov):kms:([a-zA-Z0-9-]+):([0-9]+):(key|alias)/(\\S+)$)|(^alias/(\\S+)$)$"
+    },
+    "LogGroupArn": {
+      "type": "string",
+      "maxLength": 2048,
+      "minLength": 0,
+      "pattern": "^$|^arn:(aws|aws-cn|aws-us-gov):logs:([a-zA-Z0-9-]+):([0-9]+):log-group:[a-zA-Z0-9_\\-\\/\\.]+:\\*$"
+    },
+    "Name": {
+      "type": "string",
+      "maxLength": 100,
+      "minLength": 1,
+      "pattern": "^[a-zA-Z0-9-]*$"
+    },
+    "Password": {
+      "type": "string",
+      "maxLength": 100,
+      "minLength": 1,
+      "pattern": "^[ -~]+$"
+    },
+    "Tags": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Tag"
+      }
+    },
+    "Username": {
+      "type": "string",
+      "maxLength": 100,
+      "minLength": 1,
+      "pattern": "^[ -\\.0-\\[\\]-~]*[!-\\.0-\\[\\]-~][ -\\.0-\\[\\]-~]*$"
+    }
+  },
+  "readOnlyProperties": [
+    "/properties/HypervisorArn"
+  ],
+  "writeOnlyProperties": [
+    "/properties/KmsKeyArn",
+    "/properties/LogGroupArn",
+    "/properties/Name",
+    "/properties/Password",
+    "/properties/Tags",
+    "/properties/Username"
+  ],
+  "createOnlyProperties": [
+    "/properties/KmsKeyArn",
+    "/properties/Tags"
+  ],
+  "primaryIdentifier": [
+    "/properties/HypervisorArn"
+  ],
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": false,
+    "cloudFormationSystemTags": true,
+    "tagProperty": "/properties/Tags"
+  },
+  "handlers": {
+    "create": {
+      "permissions": [
+        "backup-gateway:ImportHypervisorConfiguration",
+        "backup-gateway:GetHypervisor",
+        "backup-gateway:ListHypervisors",
+        "backup-gateway:TagResource",
+        "kms:CreateGrant",
+        "kms:Encrypt",
+        "kms:Decrypt"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "backup-gateway:GetHypervisor",
+        "backup-gateway:ListHypervisors"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "backup-gateway:UpdateHypervisor",
+        "backup-gateway:GetHypervisor",
+        "backup-gateway:ListHypervisors",
+        "backup-gateway:ImportHypervisorConfiguration",
+        "backup-gateway:DeleteHypervisor"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "backup-gateway:DeleteHypervisor",
+        "backup-gateway:GetHypervisor",
+        "backup-gateway:ListHypervisors"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "backup-gateway:ListHypervisors"
+      ]
+    }
+  },
+  "additionalProperties": false
+}

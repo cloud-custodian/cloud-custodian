@@ -1,7 +1,7 @@
 {
   "typeName": "AWS::ApiGateway::DocumentationVersion",
   "description": "A snapshot of the documentation of an API.",
-  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-apigateway.git",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-apigateway",
   "definitions": {},
   "properties": {
     "Description": {
@@ -56,6 +56,16 @@
       ]
     },
     "list": {
+      "handlerSchema": {
+        "properties": {
+          "RestApiId": {
+            "$ref": "resource-schema.json#/properties/RestApiId"
+          }
+        },
+        "required": [
+          "RestApiId"
+        ]
+      },
       "permissions": [
         "apigateway:GET"
       ]

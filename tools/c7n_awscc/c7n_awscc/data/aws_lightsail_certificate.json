@@ -1,0 +1,113 @@
+{
+  "typeName": "AWS::Lightsail::Certificate",
+  "description": "An example resource schema demonstrating some basic constructs and validation rules.",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git",
+  "definitions": {
+    "Tag": {
+      "description": "A key-value pair to associate with a resource.",
+      "type": "object",
+      "properties": {
+        "Key": {
+          "type": "string",
+          "description": "The key name of the tag. You can specify a value that is 1 to 128 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "Value": {
+          "type": "string",
+          "description": "The value for the tag. You can specify a value that is 0 to 256 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.",
+          "minLength": 0,
+          "maxLength": 256
+        }
+      },
+      "required": [
+        "Key"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "properties": {
+    "CertificateName": {
+      "description": "The name for the certificate.",
+      "type": "string"
+    },
+    "DomainName": {
+      "description": "The domain name (e.g., example.com ) for the certificate.",
+      "type": "string"
+    },
+    "SubjectAlternativeNames": {
+      "description": "An array of strings that specify the alternate domains (e.g., example2.com) and subdomains (e.g., blog.example.com) for the certificate.",
+      "type": "array",
+      "uniqueItems": true,
+      "insertionOrder": false,
+      "items": {
+        "type": "string"
+      }
+    },
+    "CertificateArn": {
+      "type": "string"
+    },
+    "Status": {
+      "description": "The validation status of the certificate.",
+      "type": "string"
+    },
+    "Tags": {
+      "description": "An array of key-value pairs to apply to this resource.",
+      "type": "array",
+      "uniqueItems": true,
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/Tag"
+      }
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "CertificateName",
+    "DomainName"
+  ],
+  "readOnlyProperties": [
+    "/properties/CertificateArn",
+    "/properties/Status"
+  ],
+  "taggable": true,
+  "primaryIdentifier": [
+    "/properties/CertificateName"
+  ],
+  "createOnlyProperties": [
+    "/properties/CertificateName",
+    "/properties/DomainName",
+    "/properties/SubjectAlternativeNames"
+  ],
+  "handlers": {
+    "create": {
+      "permissions": [
+        "lightsail:CreateCertificate",
+        "lightsail:GetCertificates"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "lightsail:GetCertificates"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "lightsail:GetCertificates",
+        "lightsail:TagResource",
+        "lightsail:UntagResource"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "lightsail:DeleteCertificate",
+        "lightsail:GetCertificates"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "lightsail:GetCertificates"
+      ]
+    }
+  }
+}

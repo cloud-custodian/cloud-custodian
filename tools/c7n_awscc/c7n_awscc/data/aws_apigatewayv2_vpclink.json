@@ -1,0 +1,102 @@
+{
+  "typeName": "AWS::ApiGatewayV2::VpcLink",
+  "description": "Resource Type definition for AWS::ApiGatewayV2::VpcLink",
+  "additionalProperties": false,
+  "properties": {
+    "VpcLinkId": {
+      "type": "string"
+    },
+    "SubnetIds": {
+      "type": "array",
+      "uniqueItems": false,
+      "items": {
+        "type": "string"
+      }
+    },
+    "SecurityGroupIds": {
+      "type": "array",
+      "uniqueItems": false,
+      "items": {
+        "type": "string"
+      }
+    },
+    "Tags": {
+      "type": "object",
+      "description": "This resource type use map for Tags, suggest to use List of Tag",
+      "additionalProperties": false,
+      "patternProperties": {
+        ".*": {
+          "type": "string"
+        }
+      }
+    },
+    "Name": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "SubnetIds",
+    "Name"
+  ],
+  "createOnlyProperties": [
+    "/properties/SecurityGroupIds",
+    "/properties/SubnetIds"
+  ],
+  "primaryIdentifier": [
+    "/properties/VpcLinkId"
+  ],
+  "readOnlyProperties": [
+    "/properties/VpcLinkId"
+  ],
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": true,
+    "tagProperty": "/properties/Tags"
+  },
+  "handlers": {
+    "create": {
+      "permissions": [
+        "apigateway:POST",
+        "iam:CreateServiceLinkedRole",
+        "iam:DeleteServiceLinkedRole",
+        "iam:GetServiceLinkedRoleDeletionStatus"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "apigateway:PATCH",
+        "apigateway:GET",
+        "iam:CreateServiceLinkedRole",
+        "iam:DeleteServiceLinkedRole",
+        "iam:GetServiceLinkedRoleDeletionStatus"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "apigateway:GET",
+        "iam:CreateServiceLinkedRole",
+        "iam:DeleteServiceLinkedRole",
+        "iam:GetServiceLinkedRoleDeletionStatus"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "apigateway:GET",
+        "apigateway:DELETE",
+        "iam:CreateServiceLinkedRole",
+        "iam:DeleteServiceLinkedRole",
+        "iam:GetServiceLinkedRoleDeletionStatus"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "apigateway:GET",
+        "iam:CreateServiceLinkedRole",
+        "iam:DeleteServiceLinkedRole",
+        "iam:GetServiceLinkedRoleDeletionStatus"
+      ]
+    }
+  }
+}

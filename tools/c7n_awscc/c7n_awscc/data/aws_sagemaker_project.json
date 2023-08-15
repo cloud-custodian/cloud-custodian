@@ -186,7 +186,6 @@
     "/properties/ProjectArn",
     "/properties/CreationTime",
     "/properties/ProjectId",
-    "/properties/ServiceCatalogProvisionedProductDetails",
     "/properties/ProjectStatus"
   ],
   "createOnlyProperties": [
@@ -201,8 +200,10 @@
   "handlers": {
     "create": {
       "permissions": [
+        "sagemaker:AddTags",
         "sagemaker:CreateProject",
         "sagemaker:DescribeProject",
+        "sagemaker:ListTags",
         "servicecatalog:DescribeProduct",
         "servicecatalog:DescribeProvisioningArtifact",
         "servicecatalog:ProvisionProduct",
@@ -226,7 +227,10 @@
     },
     "delete": {
       "permissions": [
-        "sagemaker:DeleteProject"
+        "sagemaker:DeleteProject",
+        "sagemaker:DescribeProject",
+        "servicecatalog:TerminateProvisionedProduct",
+        "servicecatalog:DescribeRecord"
       ]
     },
     "list": {

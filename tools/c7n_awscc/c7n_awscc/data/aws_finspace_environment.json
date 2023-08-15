@@ -33,14 +33,34 @@
         },
         "FederationURN": {
           "description": "SAML metadata URL to link with the Environment",
-          "type": "string",
-          "pattern": "^[A-Za-z0-9._\\-:\\/#\\+]+{1,255}$"
+          "type": "string"
         },
         "AttributeMap": {
           "description": "Attribute map for SAML configuration",
-          "type": "object"
+          "type": "array",
+          "uniqueItems": false,
+          "insertionOrder": false,
+          "items": {
+            "type": "object",
+            "properties": {
+              "Key": {
+                "type": "string",
+                "description": "The key name of the tag. You can specify a value that is 1 to 128 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.",
+                "minLength": 1,
+                "maxLength": 128
+              },
+              "Value": {
+                "type": "string",
+                "description": "The value for the tag. You can specify a value that is 0 to 256 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.",
+                "minLength": 0,
+                "maxLength": 256
+              }
+            },
+            "additionalProperties": false
+          }
         }
-      }
+      },
+      "additionalProperties": false
     },
     "SuperuserParameters": {
       "description": "Parameters of the first Superuser for the FinSpace Environment",
@@ -67,11 +87,35 @@
           "minLength": 1,
           "maxLength": 128
         }
-      }
+      },
+      "additionalProperties": false
     },
     "DataBundleArn": {
       "type": "string",
       "pattern": "^arn:aws:finspace:[A-Za-z0-9_/.-]{0,63}:\\d*:data-bundle/[0-9A-Za-z_-]{1,128}$"
+    },
+    "Tag": {
+      "description": "A list of all tags for a resource.",
+      "type": "object",
+      "properties": {
+        "Key": {
+          "type": "string",
+          "description": "The key name of the tag. You can specify a value that is 1 to 128 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "Value": {
+          "type": "string",
+          "description": "The value for the tag. You can specify a value that is 0 to 256 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.",
+          "minLength": 0,
+          "maxLength": 256
+        }
+      },
+      "required": [
+        "Key",
+        "Value"
+      ],
+      "additionalProperties": false
     }
   },
   "properties": {
@@ -157,6 +201,15 @@
       "items": {
         "$ref": "#/definitions/DataBundleArn"
       }
+    },
+    "Tags": {
+      "description": "An array of key-value pairs to apply to this resource.",
+      "type": "array",
+      "uniqueItems": false,
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/Tag"
+      }
     }
   },
   "additionalProperties": false,
@@ -172,13 +225,30 @@
     "/properties/AwsAccountId",
     "/properties/DedicatedServiceAccountId"
   ],
+  "writeOnlyProperties": [
+    "/properties/SuperuserParameters",
+    "/properties/FederationParameters/AttributeMap",
+    "/properties/Tags"
+  ],
   "createOnlyProperties": [
     "/properties/KmsKeyId",
     "/properties/SuperuserParameters",
-    "/properties/DataBundles"
+    "/properties/FederationParameters",
+    "/properties/DataBundles",
+    "/properties/Tags"
   ],
   "primaryIdentifier": [
     "/properties/EnvironmentId"
+  ],
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": false,
+    "cloudFormationSystemTags": false,
+    "tagProperty": "/properties/Tags"
+  },
+  "deprecatedProperties": [
+    "/properties/DataBundles"
   ],
   "handlers": {
     "create": {

@@ -1,0 +1,220 @@
+{
+  "typeName": "AWS::Omics::Workflow",
+  "description": "Definition of AWS::Omics::Workflow Resource Type",
+  "definitions": {
+    "TagMap": {
+      "type": "object",
+      "description": "A map of resource tags",
+      "patternProperties": {
+        ".+": {
+          "type": "string",
+          "maxLength": 256,
+          "minLength": 0,
+          "description": "Resource tag value"
+        }
+      },
+      "additionalProperties": false
+    },
+    "WorkflowEngine": {
+      "type": "string",
+      "maxLength": 64,
+      "minLength": 1,
+      "enum": [
+        "WDL",
+        "NEXTFLOW",
+        "CWL"
+      ]
+    },
+    "Accelerators": {
+      "type": "string",
+      "maxLength": 64,
+      "minLength": 1,
+      "enum": [
+        "GPU"
+      ]
+    },
+    "WorkflowParameter": {
+      "type": "object",
+      "properties": {
+        "Description": {
+          "type": "string",
+          "maxLength": 256,
+          "minLength": 0,
+          "pattern": "^[\\p{L}||\\p{M}||\\p{Z}||\\p{S}||\\p{N}||\\p{P}]+$"
+        },
+        "Optional": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
+    },
+    "WorkflowParameterTemplate": {
+      "type": "object",
+      "maxProperties": 1000,
+      "minProperties": 1,
+      "patternProperties": {
+        "^[\\p{L}||\\p{M}||\\p{Z}||\\p{S}||\\p{N}||\\p{P}]+$": {
+          "$ref": "#/definitions/WorkflowParameter"
+        }
+      },
+      "additionalProperties": false
+    },
+    "WorkflowStatus": {
+      "type": "string",
+      "maxLength": 64,
+      "minLength": 1,
+      "enum": [
+        "CREATING",
+        "ACTIVE",
+        "UPDATING",
+        "DELETED",
+        "FAILED"
+      ]
+    },
+    "WorkflowType": {
+      "type": "string",
+      "maxLength": 64,
+      "minLength": 1,
+      "enum": [
+        "PRIVATE"
+      ]
+    }
+  },
+  "properties": {
+    "Arn": {
+      "type": "string",
+      "maxLength": 128,
+      "minLength": 1,
+      "pattern": "^arn:.+$"
+    },
+    "CreationTime": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "DefinitionUri": {
+      "type": "string",
+      "maxLength": 256,
+      "minLength": 1,
+      "pattern": "^[\\p{L}||\\p{M}||\\p{Z}||\\p{S}||\\p{N}||\\p{P}]+$"
+    },
+    "Description": {
+      "type": "string",
+      "maxLength": 256,
+      "minLength": 1,
+      "pattern": "^[\\p{L}||\\p{M}||\\p{Z}||\\p{S}||\\p{N}||\\p{P}]+$"
+    },
+    "Engine": {
+      "$ref": "#/definitions/WorkflowEngine"
+    },
+    "Id": {
+      "type": "string",
+      "maxLength": 18,
+      "minLength": 1,
+      "pattern": "^[0-9]+$"
+    },
+    "Main": {
+      "type": "string",
+      "maxLength": 128,
+      "minLength": 1,
+      "pattern": "^[\\p{L}||\\p{M}||\\p{Z}||\\p{S}||\\p{N}||\\p{P}]+$"
+    },
+    "Name": {
+      "type": "string",
+      "maxLength": 128,
+      "minLength": 1,
+      "pattern": "^[\\p{L}||\\p{M}||\\p{Z}||\\p{S}||\\p{N}||\\p{P}]+$"
+    },
+    "ParameterTemplate": {
+      "$ref": "#/definitions/WorkflowParameterTemplate"
+    },
+    "Status": {
+      "$ref": "#/definitions/WorkflowStatus"
+    },
+    "Accelerators": {
+      "$ref": "#/definitions/Accelerators"
+    },
+    "StorageCapacity": {
+      "type": "number",
+      "maximum": 100000,
+      "minimum": 0
+    },
+    "Tags": {
+      "$ref": "#/definitions/TagMap"
+    },
+    "Type": {
+      "$ref": "#/definitions/WorkflowType"
+    }
+  },
+  "readOnlyProperties": [
+    "/properties/Arn",
+    "/properties/CreationTime",
+    "/properties/Id",
+    "/properties/Status",
+    "/properties/Type"
+  ],
+  "writeOnlyProperties": [
+    "/properties/DefinitionUri"
+  ],
+  "createOnlyProperties": [
+    "/properties/DefinitionUri",
+    "/properties/Engine",
+    "/properties/Main",
+    "/properties/ParameterTemplate",
+    "/properties/StorageCapacity",
+    "/properties/Accelerators"
+  ],
+  "primaryIdentifier": [
+    "/properties/Id"
+  ],
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": false
+  },
+  "handlers": {
+    "create": {
+      "permissions": [
+        "omics:CreateWorkflow",
+        "omics:GetWorkflow",
+        "omics:TagResource",
+        "s3:PutObject",
+        "s3:GetObject",
+        "s3:GetObjectAttributes",
+        "s3:HeadObject",
+        "s3:GetEncryptionConfiguration",
+        "kms:Decrypt",
+        "kms:GenerateDataKey",
+        "kms:GenerateDataKeyPair",
+        "kms:GenerateDataKeyPairWithoutPlaintext",
+        "kms:GenerateDataKeyWithoutPlaintext"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "omics:GetWorkflow"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "omics:UpdateWorkflow",
+        "omics:GetWorkflow",
+        "omics:TagResource",
+        "omics:ListTagsForResource",
+        "omics:UntagResource"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "omics:DeleteWorkflow",
+        "omics:GetWorkflow"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "omics:ListWorkflows"
+      ]
+    }
+  },
+  "additionalProperties": false
+}

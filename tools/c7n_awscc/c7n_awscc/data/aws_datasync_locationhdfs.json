@@ -138,11 +138,13 @@
     },
     "KerberosKeytab": {
       "description": "The Base64 string representation of the Keytab file.",
-      "type": "string"
+      "type": "string",
+      "maxLength": 87384
     },
     "KerberosKrb5Conf": {
       "description": "The string representation of the Krb5Conf file, or the presigned URL to access the Krb5.conf file within an S3 bucket.",
-      "type": "string"
+      "type": "string",
+      "maxLength": 174764
     },
     "Tags": {
       "description": "An array of key-value pairs to apply to this resource.",
@@ -185,25 +187,18 @@
       "maxLength": 4356
     }
   },
-  "taggable": true,
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": true,
+    "tagProperty": "/properties/Tags"
+  },
   "additionalProperties": false,
-  "oneOf": [
-    {
-      "required": [
-        "NameNodes",
-        "AuthenticationType",
-        "AgentArns",
-        "SimpleUser"
-      ]
-    },
-    {
-      "required": [
-        "NameNodes",
-        "AuthenticationType",
-        "AgentArns",
-        "KerberosPrincipal"
-      ]
-    }
+  "required": [
+    "NameNodes",
+    "AuthenticationType",
+    "AgentArns"
   ],
   "readOnlyProperties": [
     "/properties/LocationArn",
@@ -222,6 +217,7 @@
       "permissions": [
         "datasync:CreateLocationHdfs",
         "datasync:DescribeLocationHdfs",
+        "datasync:TagResource",
         "datasync:ListTagsForResource"
       ]
     },

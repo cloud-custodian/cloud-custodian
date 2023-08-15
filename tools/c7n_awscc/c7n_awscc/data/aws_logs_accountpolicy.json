@@ -1,0 +1,115 @@
+{
+  "typeName": "AWS::Logs::AccountPolicy",
+  "description": "The AWS::Logs::AccountPolicy resource specifies a CloudWatch Logs AccountPolicy.",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-logs.git",
+  "tagging": {
+    "taggable": false,
+    "tagOnCreate": false,
+    "tagUpdatable": false,
+    "cloudFormationSystemTags": false
+  },
+  "replacementStrategy": "delete_then_create",
+  "properties": {
+    "AccountId": {
+      "description": "User account id",
+      "type": "string",
+      "pattern": "^\\d{12}$"
+    },
+    "PolicyName": {
+      "description": "The name of the account policy",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256,
+      "pattern": "^[^:*]{1,256}$"
+    },
+    "PolicyDocument": {
+      "description": "The body of the policy document you want to use for this topic.\n\nYou can only add one policy per PolicyType.\n\nThe policy must be in JSON string format.\n\nLength Constraints: Maximum length of 30720",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 30720
+    },
+    "PolicyType": {
+      "description": "Type of the policy.",
+      "type": "string",
+      "enum": [
+        "DATA_PROTECTION_POLICY"
+      ]
+    },
+    "Scope": {
+      "description": "Scope for policy application",
+      "type": "string",
+      "enum": [
+        "ALL"
+      ]
+    }
+  },
+  "handlers": {
+    "create": {
+      "permissions": [
+        "logs:PutAccountPolicy",
+        "logs:PutDataProtectionPolicy",
+        "logs:DescribeAccountPolicies",
+        "logs:CreateLogDelivery",
+        "s3:REST.PUT.OBJECT",
+        "firehose:TagDeliveryStream"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "logs:DescribeAccountPolicies"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "logs:PutAccountPolicy",
+        "logs:PutDataProtectionPolicy",
+        "logs:DescribeAccountPolicies",
+        "logs:DeleteAccountPolicy",
+        "logs:DeleteDataProtectionPolicy",
+        "logs:CreateLogDelivery",
+        "s3:REST.PUT.OBJECT",
+        "firehose:TagDeliveryStream"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "logs:DeleteAccountPolicy",
+        "logs:DeleteDataProtectionPolicy",
+        "logs:DescribeAccountPolicies"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "logs:DescribeAccountPolicies"
+      ],
+      "handlerSchema": {
+        "properties": {
+          "PolicyType": {
+            "$ref": "resource-schema.json#/properties/PolicyType"
+          }
+        },
+        "required": [
+          "PolicyType"
+        ]
+      }
+    }
+  },
+  "required": [
+    "PolicyName",
+    "PolicyType",
+    "PolicyDocument"
+  ],
+  "createOnlyProperties": [
+    "/properties/PolicyName",
+    "/properties/PolicyType"
+  ],
+  "readOnlyProperties": [
+    "/properties/AccountId"
+  ],
+  "primaryIdentifier": [
+    "/properties/AccountId",
+    "/properties/PolicyType",
+    "/properties/PolicyName"
+  ],
+  "additionalProperties": false
+}

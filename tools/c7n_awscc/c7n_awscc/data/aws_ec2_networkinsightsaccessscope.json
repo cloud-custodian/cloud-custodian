@@ -203,24 +203,28 @@
     "create": {
       "permissions": [
         "ec2:CreateNetworkInsightsAccessScope",
+        "ec2:CreateTags",
         "tiros:CreateQuery"
       ]
     },
     "read": {
       "permissions": [
-        "ec2:DescribeNetworkInsightsAccessScopes"
+        "ec2:DescribeNetworkInsightsAccessScopes",
+        "ec2:GetNetworkInsightsAccessScopeContent"
       ]
     },
     "update": {
       "permissions": [
         "ec2:DescribeNetworkInsightsAccessScopes",
+        "ec2:GetNetworkInsightsAccessScopeContent",
         "ec2:CreateTags",
         "ec2:DeleteTags"
       ]
     },
     "delete": {
       "permissions": [
-        "ec2:DeleteNetworkInsightsAccessScope"
+        "ec2:DeleteNetworkInsightsAccessScope",
+        "ec2:DeleteTags"
       ]
     },
     "list": {

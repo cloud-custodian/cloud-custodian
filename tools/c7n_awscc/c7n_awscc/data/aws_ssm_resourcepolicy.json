@@ -1,0 +1,72 @@
+{
+  "typeName": "AWS::SSM::ResourcePolicy",
+  "description": "Resource Type definition for AWS::SSM::ResourcePolicy",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git",
+  "properties": {
+    "ResourceArn": {
+      "type": "string",
+      "description": "Arn of OpsItemGroup etc."
+    },
+    "Policy": {
+      "type": [
+        "object",
+        "string"
+      ],
+      "description": "Actual policy statement."
+    },
+    "PolicyId": {
+      "type": "string",
+      "description": "An unique identifier within the policies of a resource. "
+    },
+    "PolicyHash": {
+      "type": "string",
+      "description": "A snapshot identifier for the policy over time."
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "ResourceArn",
+    "Policy"
+  ],
+  "tagging": {
+    "taggable": false
+  },
+  "createOnlyProperties": [
+    "/properties/ResourceArn"
+  ],
+  "readOnlyProperties": [
+    "/properties/PolicyId",
+    "/properties/PolicyHash"
+  ],
+  "primaryIdentifier": [
+    "/properties/PolicyId",
+    "/properties/ResourceArn"
+  ],
+  "handlers": {
+    "create": {
+      "permissions": [
+        "ssm:PutResourcePolicy"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "ssm:GetResourcePolicies"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "ssm:PutResourcePolicy"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "ssm:DeleteResourcePolicy"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "ssm:GetResourcePolicies"
+      ]
+    }
+  }
+}

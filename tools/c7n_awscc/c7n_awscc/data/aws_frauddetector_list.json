@@ -1,0 +1,155 @@
+{
+  "typeName": "AWS::FraudDetector::List",
+  "description": "A resource schema for a List in Amazon Fraud Detector.",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git",
+  "definitions": {
+    "Tag": {
+      "description": "A key-value pair to associate with a resource.",
+      "type": "object",
+      "properties": {
+        "Key": {
+          "type": "string",
+          "description": "The key name of the tag. You can specify a value that is 1 to 128 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "Value": {
+          "type": "string",
+          "description": "The value for the tag. You can specify a value that is 0 to 256 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.",
+          "minLength": 0,
+          "maxLength": 256
+        }
+      },
+      "required": [
+        "Key",
+        "Value"
+      ],
+      "additionalProperties": false
+    },
+    "Element": {
+      "description": "An element in a list.",
+      "type": "string",
+      "pattern": "^\\S+( +\\S+)*$",
+      "minLength": 1,
+      "maxLength": 64
+    }
+  },
+  "properties": {
+    "Arn": {
+      "description": "The list ARN.",
+      "type": "string"
+    },
+    "Name": {
+      "description": "The name of the list.",
+      "type": "string",
+      "pattern": "^[0-9a-z_]+$",
+      "minLength": 1,
+      "maxLength": 64
+    },
+    "Description": {
+      "description": "The description of the list.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "VariableType": {
+      "description": "The variable type of the list.",
+      "type": "string",
+      "pattern": "^[A-Z_]{1,64}$",
+      "minLength": 1,
+      "maxLength": 64
+    },
+    "CreatedTime": {
+      "description": "The time when the list was created.",
+      "type": "string"
+    },
+    "LastUpdatedTime": {
+      "description": "The time when the list was last updated.",
+      "type": "string"
+    },
+    "Tags": {
+      "description": "Tags associated with this list.",
+      "type": "array",
+      "uniqueItems": false,
+      "insertionOrder": false,
+      "maxItems": 200,
+      "items": {
+        "$ref": "#/definitions/Tag"
+      }
+    },
+    "Elements": {
+      "description": "The elements in this list.",
+      "type": "array",
+      "insertionOrder": false,
+      "minItems": 0,
+      "maxItems": 100000,
+      "items": {
+        "$ref": "#/definitions/Element"
+      }
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "Name"
+  ],
+  "primaryIdentifier": [
+    "/properties/Arn"
+  ],
+  "readOnlyProperties": [
+    "/properties/Arn",
+    "/properties/CreatedTime",
+    "/properties/LastUpdatedTime"
+  ],
+  "createOnlyProperties": [
+    "/properties/Name"
+  ],
+  "handlers": {
+    "create": {
+      "permissions": [
+        "frauddetector:CreateList",
+        "frauddetector:GetListElements",
+        "frauddetector:GetListsMetadata",
+        "frauddetector:ListTagsForResource",
+        "frauddetector:TagResource",
+        "frauddetector:UpdateList"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "frauddetector:GetListElements",
+        "frauddetector:GetListsMetadata",
+        "frauddetector:ListTagsForResource"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "frauddetector:GetListElements",
+        "frauddetector:GetListsMetadata",
+        "frauddetector:ListTagsForResource",
+        "frauddetector:UntagResource",
+        "frauddetector:UpdateList",
+        "frauddetector:TagResource"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "frauddetector:DeleteList",
+        "frauddetector:GetListsMetadata"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "frauddetector:GetListElements",
+        "frauddetector:GetListsMetadata",
+        "frauddetector:ListTagsForResource"
+      ]
+    }
+  },
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": false,
+    "tagProperty": "/properties/Tags"
+  }
+}

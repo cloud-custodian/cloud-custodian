@@ -1,0 +1,240 @@
+{
+  "typeName": "AWS::CleanRooms::Collaboration",
+  "description": "Represents a collaboration between AWS accounts that allows for secure data collaboration",
+  "documentationUrl": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-cleanrooms-collaboration.html",
+  "definitions": {
+    "CollaborationQueryLogStatus": {
+      "type": "string",
+      "enum": [
+        "ENABLED",
+        "DISABLED"
+      ]
+    },
+    "DataEncryptionMetadata": {
+      "type": "object",
+      "properties": {
+        "AllowCleartext": {
+          "type": "boolean"
+        },
+        "AllowDuplicates": {
+          "type": "boolean"
+        },
+        "AllowJoinsOnColumnsWithDifferentNames": {
+          "type": "boolean"
+        },
+        "PreserveNulls": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "AllowCleartext",
+        "AllowDuplicates",
+        "AllowJoinsOnColumnsWithDifferentNames",
+        "PreserveNulls"
+      ],
+      "additionalProperties": false
+    },
+    "MemberAbility": {
+      "type": "string",
+      "enum": [
+        "CAN_QUERY",
+        "CAN_RECEIVE_RESULTS"
+      ]
+    },
+    "MemberAbilities": {
+      "type": "array",
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/MemberAbility"
+      },
+      "uniqueItems": true
+    },
+    "MemberSpecification": {
+      "type": "object",
+      "properties": {
+        "AccountId": {
+          "type": "string",
+          "maxLength": 12,
+          "minLength": 12,
+          "pattern": "^\\d+$"
+        },
+        "MemberAbilities": {
+          "$ref": "#/definitions/MemberAbilities"
+        },
+        "DisplayName": {
+          "$ref": "#/definitions/Name"
+        }
+      },
+      "required": [
+        "AccountId",
+        "DisplayName",
+        "MemberAbilities"
+      ],
+      "additionalProperties": false
+    },
+    "MemberStatus": {
+      "type": "string",
+      "enum": [
+        "INVITED",
+        "ACTIVE",
+        "LEFT",
+        "REMOVED"
+      ]
+    },
+    "Tag": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Key": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "Value": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        }
+      },
+      "required": [
+        "Value",
+        "Key"
+      ]
+    },
+    "Name": {
+      "type": "string",
+      "maxLength": 100,
+      "minLength": 1,
+      "pattern": "^(?!\\s*$)[\\u0020-\\uD7FF\\uE000-\\uFFFD\\uD800\\uDBFF-\\uDC00\\uDFFF\\t]*$"
+    }
+  },
+  "properties": {
+    "Arn": {
+      "type": "string",
+      "maxLength": 100
+    },
+    "Tags": {
+      "description": "An arbitrary set of tags (key-value pairs) for this cleanrooms collaboration.",
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/Tag"
+      },
+      "uniqueItems": true,
+      "type": "array"
+    },
+    "CollaborationIdentifier": {
+      "type": "string",
+      "maxLength": 36,
+      "minLength": 36,
+      "pattern": "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"
+    },
+    "CreatorDisplayName": {
+      "$ref": "#/definitions/Name"
+    },
+    "CreatorMemberAbilities": {
+      "$ref": "#/definitions/MemberAbilities"
+    },
+    "DataEncryptionMetadata": {
+      "$ref": "#/definitions/DataEncryptionMetadata"
+    },
+    "Description": {
+      "type": "string",
+      "maxLength": 255,
+      "minLength": 1,
+      "pattern": "^(?!\\s*$)[\\u0020-\\uD7FF\\uE000-\\uFFFD\\uD800\\uDBFF-\\uDC00\\uDFFF\\t\\r\\n]*$"
+    },
+    "Members": {
+      "type": "array",
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/MemberSpecification"
+      },
+      "maxItems": 9,
+      "minItems": 0
+    },
+    "Name": {
+      "type": "string",
+      "maxLength": 100,
+      "minLength": 1,
+      "pattern": "^(?!\\s*$)[\\u0020-\\uD7FF\\uE000-\\uFFFD\\uD800\\uDBFF-\\uDC00\\uDFFF\\t]*$"
+    },
+    "QueryLogStatus": {
+      "$ref": "#/definitions/CollaborationQueryLogStatus"
+    }
+  },
+  "required": [
+    "CreatorDisplayName",
+    "CreatorMemberAbilities",
+    "Members",
+    "Name",
+    "Description",
+    "QueryLogStatus"
+  ],
+  "readOnlyProperties": [
+    "/properties/Arn",
+    "/properties/CollaborationIdentifier"
+  ],
+  "createOnlyProperties": [
+    "/properties/CreatorDisplayName",
+    "/properties/CreatorMemberAbilities",
+    "/properties/DataEncryptionMetadata",
+    "/properties/QueryLogStatus",
+    "/properties/Members"
+  ],
+  "primaryIdentifier": [
+    "/properties/CollaborationIdentifier"
+  ],
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": true,
+    "tagProperty": "/properties/Tags"
+  },
+  "handlers": {
+    "create": {
+      "permissions": [
+        "cleanrooms:CreateCollaboration",
+        "cleanrooms:GetCollaboration",
+        "cleanrooms:ListMembers",
+        "cleanrooms:ListTagsForResource",
+        "cleanrooms:TagResource",
+        "cleanrooms:GetCollaboration",
+        "cleanrooms:ListCollaborations"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "cleanrooms:GetCollaboration",
+        "cleanrooms:ListMembers",
+        "cleanrooms:ListTagsForResource"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "cleanrooms:UpdateCollaboration",
+        "cleanrooms:GetCollaboration",
+        "cleanrooms:ListMembers",
+        "cleanrooms:ListTagsForResource",
+        "cleanrooms:TagResource",
+        "cleanrooms:UntagResource"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "cleanrooms:DeleteCollaboration",
+        "cleanrooms:GetCollaboration",
+        "cleanrooms:ListTagsForResource",
+        "cleanrooms:UntagResource",
+        "cleanrooms:ListMembers",
+        "cleanrooms:ListCollaborations"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "cleanrooms:ListCollaborations"
+      ]
+    }
+  },
+  "additionalProperties": false
+}

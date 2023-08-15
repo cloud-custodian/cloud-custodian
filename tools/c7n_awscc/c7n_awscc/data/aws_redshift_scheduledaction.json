@@ -56,18 +56,32 @@
     },
     "ScheduledActionType": {
       "type": "object",
-      "properties": {
-        "ResizeCluster": {
-          "$ref": "#/definitions/ResizeClusterMessage"
+      "oneOf": [
+        {
+          "properties": {
+            "ResizeCluster": {
+              "$ref": "#/definitions/ResizeClusterMessage"
+            }
+          },
+          "additionalProperties": false
         },
-        "PauseCluster": {
-          "$ref": "#/definitions/PauseClusterMessage"
+        {
+          "properties": {
+            "PauseCluster": {
+              "$ref": "#/definitions/PauseClusterMessage"
+            }
+          },
+          "additionalProperties": false
         },
-        "ResumeCluster": {
-          "$ref": "#/definitions/ResumeClusterMessage"
+        {
+          "properties": {
+            "ResumeCluster": {
+              "$ref": "#/definitions/ResumeClusterMessage"
+            }
+          },
+          "additionalProperties": false
         }
-      },
-      "additionalProperties": false
+      ]
     },
     "timestamp": {
       "type": "string"
@@ -125,7 +139,9 @@
       }
     }
   },
-  "taggable": false,
+  "tagging": {
+    "taggable": false
+  },
   "additionalProperties": false,
   "required": [
     "ScheduledActionName"

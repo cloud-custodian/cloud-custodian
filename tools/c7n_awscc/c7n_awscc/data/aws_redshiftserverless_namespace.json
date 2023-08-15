@@ -1,0 +1,267 @@
+{
+  "typeName": "AWS::RedshiftServerless::Namespace",
+  "description": "Definition of AWS::RedshiftServerless::Namespace Resource Type",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-redshift-serverless",
+  "definitions": {
+    "LogExport": {
+      "type": "string",
+      "enum": [
+        "useractivitylog",
+        "userlog",
+        "connectionlog"
+      ]
+    },
+    "Namespace": {
+      "type": "object",
+      "properties": {
+        "NamespaceArn": {
+          "type": "string"
+        },
+        "NamespaceId": {
+          "type": "string"
+        },
+        "NamespaceName": {
+          "type": "string",
+          "maxLength": 64,
+          "minLength": 3,
+          "pattern": "^[a-z0-9-]+$"
+        },
+        "AdminUsername": {
+          "type": "string"
+        },
+        "DbName": {
+          "type": "string",
+          "pattern": "[a-zA-Z][a-zA-Z_0-9+.@-]*"
+        },
+        "KmsKeyId": {
+          "type": "string"
+        },
+        "DefaultIamRoleArn": {
+          "type": "string"
+        },
+        "IamRoles": {
+          "type": "array",
+          "insertionOrder": false,
+          "items": {
+            "type": "string",
+            "maxLength": 512,
+            "minLength": 0
+          }
+        },
+        "LogExports": {
+          "type": "array",
+          "insertionOrder": false,
+          "items": {
+            "$ref": "#/definitions/LogExport"
+          },
+          "maxItems": 16,
+          "minItems": 0
+        },
+        "Status": {
+          "$ref": "#/definitions/NamespaceStatus"
+        },
+        "CreationDate": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "NamespaceStatus": {
+      "type": "string",
+      "enum": [
+        "AVAILABLE",
+        "MODIFYING",
+        "DELETING"
+      ]
+    },
+    "Tag": {
+      "type": "object",
+      "properties": {
+        "Key": {
+          "type": "string",
+          "maxLength": 128,
+          "minLength": 1
+        },
+        "Value": {
+          "type": "string",
+          "maxLength": 256,
+          "minLength": 0
+        }
+      },
+      "required": [
+        "Key",
+        "Value"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "properties": {
+    "AdminUserPassword": {
+      "description": "The password associated with the admin user for the namespace that is being created. Password must be at least 8 characters in length, should be any printable ASCII character. Must contain at least one lowercase letter, one uppercase letter and one decimal digit.",
+      "type": "string",
+      "maxLength": 64,
+      "minLength": 8,
+      "pattern": "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[^\\x00-\\x20\\x22\\x27\\x2f\\x40\\x5c\\x7f-\\uffff]+"
+    },
+    "AdminUsername": {
+      "description": "The user name associated with the admin user for the namespace that is being created. Only alphanumeric characters and underscores are allowed. It should start with an alphabet.",
+      "type": "string",
+      "pattern": "[a-zA-Z][a-zA-Z_0-9+.@-]*"
+    },
+    "DbName": {
+      "description": "The database name associated for the namespace that is being created. Only alphanumeric characters and underscores are allowed. It should start with an alphabet.",
+      "type": "string",
+      "pattern": "[a-zA-Z][a-zA-Z_0-9+.@-]*",
+      "maxLength": 127
+    },
+    "DefaultIamRoleArn": {
+      "description": "The default IAM role ARN for the namespace that is being created.",
+      "type": "string"
+    },
+    "IamRoles": {
+      "description": "A list of AWS Identity and Access Management (IAM) roles that can be used by the namespace to access other AWS services. You must supply the IAM roles in their Amazon Resource Name (ARN) format. The Default role limit for each request is 10.",
+      "type": "array",
+      "insertionOrder": false,
+      "items": {
+        "type": "string",
+        "maxLength": 512,
+        "minLength": 0
+      }
+    },
+    "KmsKeyId": {
+      "description": "The AWS Key Management Service (KMS) key ID of the encryption key that you want to use to encrypt data in the namespace.",
+      "type": "string"
+    },
+    "LogExports": {
+      "description": "The collection of log types to be exported provided by the customer. Should only be one of the three supported log types: userlog, useractivitylog and connectionlog",
+      "type": "array",
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/LogExport"
+      },
+      "maxItems": 16,
+      "minItems": 0
+    },
+    "Namespace": {
+      "$ref": "#/definitions/Namespace"
+    },
+    "NamespaceName": {
+      "description": "A unique identifier for the namespace. You use this identifier to refer to the namespace for any subsequent namespace operations such as deleting or modifying. All alphabetical characters must be lower case. Namespace name should be unique for all namespaces within an AWS account.",
+      "type": "string",
+      "maxLength": 64,
+      "minLength": 3,
+      "pattern": "^[a-z0-9-]+$"
+    },
+    "Tags": {
+      "description": "The list of tags for the namespace.",
+      "type": "array",
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/Tag"
+      },
+      "maxItems": 200,
+      "minItems": 0
+    },
+    "FinalSnapshotName": {
+      "description": "The name of the namespace the source snapshot was created from. Please specify the name if needed before deleting namespace",
+      "type": "string",
+      "pattern": "[a-z][a-z0-9]*(-[a-z0-9]+)*",
+      "maxLength": 255
+    },
+    "FinalSnapshotRetentionPeriod": {
+      "description": "The number of days to retain automated snapshot in the destination region after they are copied from the source region. If the value is -1, the manual snapshot is retained indefinitely. The value must be either -1 or an integer between 1 and 3,653.",
+      "type": "integer"
+    }
+  },
+  "tagging": {
+    "taggable": false
+  },
+  "required": [
+    "NamespaceName"
+  ],
+  "readOnlyProperties": [
+    "/properties/Namespace",
+    "/properties/Namespace/NamespaceArn",
+    "/properties/Namespace/NamespaceId",
+    "/properties/Namespace/NamespaceName",
+    "/properties/Namespace/AdminUsername",
+    "/properties/Namespace/DbName",
+    "/properties/Namespace/KmsKeyId",
+    "/properties/Namespace/DefaultIamRoleArn",
+    "/properties/Namespace/IamRoles",
+    "/properties/Namespace/LogExports",
+    "/properties/Namespace/Status",
+    "/properties/Namespace/CreationDate"
+  ],
+  "writeOnlyProperties": [
+    "/properties/AdminUserPassword",
+    "/properties/FinalSnapshotName",
+    "/properties/FinalSnapshotRetentionPeriod",
+    "/properties/Tags",
+    "/properties/Tags/*/Key",
+    "/properties/Tags/*/Value"
+  ],
+  "createOnlyProperties": [
+    "/properties/NamespaceName",
+    "/properties/Tags"
+  ],
+  "primaryIdentifier": [
+    "/properties/NamespaceName"
+  ],
+  "handlers": {
+    "create": {
+      "permissions": [
+        "iam:PassRole",
+        "kms:TagResource",
+        "kms:UntagResource",
+        "kms:ScheduleKeyDeletion",
+        "kms:CancelKeyDeletion",
+        "kms:Encrypt",
+        "kms:Decrypt",
+        "kms:DescribeKey",
+        "kms:CreateGrant",
+        "kms:ListGrants",
+        "kms:RevokeGrant",
+        "redshift-serverless:CreateNamespace",
+        "redshift-serverless:GetNamespace"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "iam:PassRole",
+        "redshift-serverless:GetNamespace"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "iam:PassRole",
+        "kms:TagResource",
+        "kms:UntagResource",
+        "kms:ScheduleKeyDeletion",
+        "kms:CancelKeyDeletion",
+        "kms:Encrypt",
+        "kms:Decrypt",
+        "kms:DescribeKey",
+        "kms:CreateGrant",
+        "kms:ListGrants",
+        "kms:RevokeGrant",
+        "redshift-serverless:UpdateNamespace",
+        "redshift-serverless:GetNamespace"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "iam:PassRole",
+        "redshift-serverless:DeleteNamespace",
+        "redshift-serverless:GetNamespace"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "iam:PassRole",
+        "redshift-serverless:ListNamespaces"
+      ]
+    }
+  },
+  "additionalProperties": false
+}

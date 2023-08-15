@@ -385,6 +385,9 @@
     "/properties/UserName",
     "/properties/Networking/MonthlyTransfer/GbPerMonthAllocated"
   ],
+  "writeOnlyProperties": [
+    "/properties/UserData"
+  ],
   "taggable": true,
   "primaryIdentifier": [
     "/properties/InstanceName"

@@ -1,0 +1,199 @@
+{
+  "typeName": "AWS::EKS::IdentityProviderConfig",
+  "description": "An object representing an Amazon EKS IdentityProviderConfig.",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-eks.git",
+  "definitions": {
+    "Tag": {
+      "description": "A key-value pair to associate with a resource.",
+      "type": "object",
+      "properties": {
+        "Key": {
+          "type": "string",
+          "description": "The key name of the tag. You can specify a value that is 1 to 128 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "Value": {
+          "type": "string",
+          "description": "The value for the tag. You can specify a value that is 0 to 256 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.",
+          "minLength": 0,
+          "maxLength": 256
+        }
+      },
+      "required": [
+        "Key",
+        "Value"
+      ],
+      "additionalProperties": false
+    },
+    "RequiredClaim": {
+      "description": "The key value pairs that describe required claims in the identity token. If set, each claim is verified to be present in the token with a matching value.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Key": {
+          "type": "string",
+          "description": "The key of the requiredClaims.",
+          "minLength": 1,
+          "maxLength": 63
+        },
+        "Value": {
+          "type": "string",
+          "description": "The value for the requiredClaims.",
+          "minLength": 1,
+          "maxLength": 253
+        }
+      },
+      "required": [
+        "Key",
+        "Value"
+      ]
+    },
+    "OidcIdentityProviderConfig": {
+      "description": "An object representing an OpenID Connect (OIDC) configuration.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "ClientId": {
+          "description": "This is also known as audience. The ID for the client application that makes authentication requests to the OpenID identity provider.",
+          "type": "string"
+        },
+        "GroupsClaim": {
+          "description": "The JWT claim that the provider uses to return your groups.",
+          "type": "string"
+        },
+        "GroupsPrefix": {
+          "description": "The prefix that is prepended to group claims to prevent clashes with existing names (such as system: groups).",
+          "type": "string"
+        },
+        "IssuerUrl": {
+          "description": "The URL of the OpenID identity provider that allows the API server to discover public signing keys for verifying tokens.",
+          "type": "string"
+        },
+        "RequiredClaims": {
+          "type": "array",
+          "uniqueItems": true,
+          "insertionOrder": false,
+          "items": {
+            "$ref": "#/definitions/RequiredClaim"
+          }
+        },
+        "UsernameClaim": {
+          "description": "The JSON Web Token (JWT) claim to use as the username. The default is sub, which is expected to be a unique identifier of the end user. You can choose other claims, such as email or name, depending on the OpenID identity provider. Claims other than email are prefixed with the issuer URL to prevent naming clashes with other plug-ins.",
+          "type": "string"
+        },
+        "UsernamePrefix": {
+          "description": "The prefix that is prepended to username claims to prevent clashes with existing names. If you do not provide this field, and username is a value other than email, the prefix defaults to issuerurl#. You can use the value - to disable all prefixing.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "ClientId",
+        "IssuerUrl"
+      ]
+    }
+  },
+  "properties": {
+    "ClusterName": {
+      "description": "The name of the identity provider configuration.",
+      "type": "string"
+    },
+    "Type": {
+      "description": "The type of the identity provider configuration.",
+      "type": "string",
+      "enum": [
+        "oidc"
+      ]
+    },
+    "IdentityProviderConfigName": {
+      "description": "The name of the OIDC provider configuration.",
+      "type": "string"
+    },
+    "Oidc": {
+      "$ref": "#/definitions/OidcIdentityProviderConfig"
+    },
+    "Tags": {
+      "description": "An array of key-value pairs to apply to this resource.",
+      "type": "array",
+      "uniqueItems": true,
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/Tag"
+      }
+    },
+    "IdentityProviderConfigArn": {
+      "description": "The ARN of the configuration.",
+      "type": "string"
+    }
+  },
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": true,
+    "tagProperty": "/properties/Tags"
+  },
+  "additionalProperties": false,
+  "required": [
+    "Type",
+    "ClusterName"
+  ],
+  "primaryIdentifier": [
+    "/properties/IdentityProviderConfigName",
+    "/properties/ClusterName",
+    "/properties/Type"
+  ],
+  "createOnlyProperties": [
+    "/properties/Oidc",
+    "/properties/Type",
+    "/properties/IdentityProviderConfigName",
+    "/properties/ClusterName"
+  ],
+  "readOnlyProperties": [
+    "/properties/IdentityProviderConfigArn"
+  ],
+  "replacementStrategy": "delete_then_create",
+  "handlers": {
+    "create": {
+      "permissions": [
+        "eks:DescribeUpdate",
+        "eks:AssociateIdentityProviderConfig",
+        "eks:DescribeIdentityProviderConfig",
+        "eks:TagResource"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "eks:DescribeIdentityProviderConfig"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "eks:DescribeIdentityProviderConfig",
+        "eks:TagResource",
+        "eks:UntagResource"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "eks:DisassociateIdentityProviderConfig",
+        "eks:DescribeIdentityProviderConfig"
+      ]
+    },
+    "list": {
+      "handlerSchema": {
+        "properties": {
+          "ClusterName": {
+            "$ref": "resource-schema.json#/properties/ClusterName"
+          }
+        },
+        "required": [
+          "ClusterName"
+        ]
+      },
+      "permissions": [
+        "eks:ListIdentityProviderConfigs"
+      ]
+    }
+  }
+}

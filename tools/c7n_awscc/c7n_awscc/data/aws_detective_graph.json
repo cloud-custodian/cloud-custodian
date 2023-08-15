@@ -33,6 +33,11 @@
       "items": {
         "$ref": "#/definitions/Tag"
       }
+    },
+    "AutoEnableMembers": {
+      "type": "boolean",
+      "default": false,
+      "description": "Indicates whether to automatically enable new organization accounts as member accounts in the organization behavior graph."
     }
   },
   "additionalProperties": false,
@@ -45,20 +50,26 @@
   "handlers": {
     "create": {
       "permissions": [
-        "detective:CreateGraph"
+        "detective:CreateGraph",
+        "detective:UpdateOrganizationConfiguration",
+        "organizations:DescribeOrganization"
       ]
     },
     "update": {
       "permissions": [
         "detective:UntagResource",
         "detective:TagResource",
-        "detective:ListTagsForResource"
+        "detective:ListTagsForResource",
+        "detective:UpdateOrganizationConfiguration",
+        "organizations:DescribeOrganization"
       ]
     },
     "read": {
       "permissions": [
         "detective:ListGraphs",
-        "detective:ListTagsForResource"
+        "detective:ListTagsForResource",
+        "detective:DescribeOrganizationConfiguration",
+        "organizations:DescribeOrganization"
       ]
     },
     "delete": {
@@ -69,7 +80,9 @@
     "list": {
       "permissions": [
         "detective:ListGraphs",
-        "detective:ListTagsForResource"
+        "detective:ListTagsForResource",
+        "detective:DescribeOrganizationConfiguration",
+        "organizations:DescribeOrganization"
       ]
     }
   }

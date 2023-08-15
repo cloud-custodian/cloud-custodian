@@ -73,7 +73,13 @@
     }
   },
   "additionalProperties": false,
-  "taggable": true,
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": false,
+    "cloudFormationSystemTags": false,
+    "tagProperty": "/properties/Tags"
+  },
   "primaryIdentifier": [
     "/properties/Arn"
   ],
@@ -105,12 +111,14 @@
     },
     "delete": {
       "permissions": [
+        "Batch:DescribeSchedulingPolicies",
         "Batch:DeleteSchedulingPolicy"
       ]
     },
     "list": {
       "permissions": [
-        "Batch:ListSchedulingPolicies"
+        "Batch:ListSchedulingPolicies",
+        "Batch:DescribeSchedulingPolicies"
       ]
     }
   }

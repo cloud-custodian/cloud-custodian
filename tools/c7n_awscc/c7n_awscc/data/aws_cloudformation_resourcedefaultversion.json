@@ -43,6 +43,11 @@
   "primaryIdentifier": [
     "/properties/Arn"
   ],
+  "additionalIdentifiers": [
+    [
+      "/properties/TypeName"
+    ]
+  ],
   "handlers": {
     "create": {
       "permissions": [

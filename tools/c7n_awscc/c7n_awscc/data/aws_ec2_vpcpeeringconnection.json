@@ -1,0 +1,121 @@
+{
+  "typeName": "AWS::EC2::VPCPeeringConnection",
+  "description": "Resource Type definition for AWS::EC2::VPCPeeringConnection",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-ec2-vpcpeering.git",
+  "additionalProperties": false,
+  "properties": {
+    "Id": {
+      "type": "string"
+    },
+    "PeerOwnerId": {
+      "description": "The AWS account ID of the owner of the accepter VPC.",
+      "type": "string"
+    },
+    "PeerRegion": {
+      "description": "The Region code for the accepter VPC, if the accepter VPC is located in a Region other than the Region in which you make the request.",
+      "type": "string"
+    },
+    "PeerRoleArn": {
+      "description": "The Amazon Resource Name (ARN) of the VPC peer role for the peering connection in another AWS account.",
+      "type": "string"
+    },
+    "PeerVpcId": {
+      "description": "The ID of the VPC with which you are creating the VPC peering connection. You must specify this parameter in the request.",
+      "type": "string"
+    },
+    "VpcId": {
+      "description": "The ID of the VPC.",
+      "type": "string"
+    },
+    "Tags": {
+      "type": "array",
+      "uniqueItems": false,
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/Tag"
+      }
+    }
+  },
+  "definitions": {
+    "Tag": {
+      "description": "A key-value pair to associate with a resource.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Key": {
+          "type": "string",
+          "description": "The key name of the tag. You can specify a value that is 1 to 128 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -."
+        },
+        "Value": {
+          "type": "string",
+          "description": "The value for the tag. You can specify a value that is 0 to 256 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -."
+        }
+      },
+      "required": [
+        "Key",
+        "Value"
+      ]
+    }
+  },
+  "required": [
+    "VpcId",
+    "PeerVpcId"
+  ],
+  "createOnlyProperties": [
+    "/properties/PeerRegion",
+    "/properties/PeerOwnerId",
+    "/properties/PeerVpcId",
+    "/properties/PeerRoleArn",
+    "/properties/VpcId"
+  ],
+  "readOnlyProperties": [
+    "/properties/Id"
+  ],
+  "writeOnlyProperties": [
+    "/properties/PeerRoleArn"
+  ],
+  "primaryIdentifier": [
+    "/properties/Id"
+  ],
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": true,
+    "tagProperty": "/properties/Tags"
+  },
+  "handlers": {
+    "create": {
+      "permissions": [
+        "ec2:CreateVpcPeeringConnection",
+        "ec2:DescribeVpcPeeringConnections",
+        "ec2:AcceptVpcPeeringConnection",
+        "ec2:CreateTags",
+        "sts:AssumeRole"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "ec2:DescribeVpcPeeringConnections"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "ec2:CreateTags",
+        "ec2:DeleteTags",
+        "ec2:DescribeVpcPeeringConnections"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "ec2:DeleteVpcPeeringConnection",
+        "ec2:DescribeVpcPeeringConnections"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "ec2:DescribeVpcPeeringConnections"
+      ]
+    }
+  }
+}

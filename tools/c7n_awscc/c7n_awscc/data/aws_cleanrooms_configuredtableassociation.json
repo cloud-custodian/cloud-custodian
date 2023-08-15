@@ -1,0 +1,153 @@
+{
+  "typeName": "AWS::CleanRooms::ConfiguredTableAssociation",
+  "description": "Represents a table that can be queried within a collaboration",
+  "definitions": {
+    "Tag": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Key": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "Value": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        }
+      },
+      "required": [
+        "Value",
+        "Key"
+      ]
+    }
+  },
+  "properties": {
+    "Arn": {
+      "type": "string",
+      "maxLength": 100
+    },
+    "Tags": {
+      "description": "An arbitrary set of tags (key-value pairs) for this cleanrooms collaboration.",
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/Tag"
+      },
+      "type": "array"
+    },
+    "ConfiguredTableAssociationIdentifier": {
+      "type": "string",
+      "maxLength": 36,
+      "minLength": 36,
+      "pattern": "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"
+    },
+    "ConfiguredTableIdentifier": {
+      "type": "string",
+      "maxLength": 36,
+      "minLength": 36,
+      "pattern": "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"
+    },
+    "Description": {
+      "type": "string",
+      "maxLength": 255,
+      "pattern": "^[\\u0020-\\uD7FF\\uE000-\\uFFFD\\uD800\\uDBFF-\\uDC00\\uDFFF\\t\\r\\n]*$"
+    },
+    "MembershipIdentifier": {
+      "type": "string",
+      "maxLength": 36,
+      "minLength": 36,
+      "pattern": "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"
+    },
+    "Name": {
+      "type": "string",
+      "maxLength": 128,
+      "pattern": "^[a-zA-Z0-9_](([a-zA-Z0-9_ ]+-)*([a-zA-Z0-9_ ]+))?$"
+    },
+    "RoleArn": {
+      "type": "string",
+      "maxLength": 512,
+      "minLength": 32
+    }
+  },
+  "required": [
+    "ConfiguredTableIdentifier",
+    "Name",
+    "RoleArn",
+    "MembershipIdentifier"
+  ],
+  "readOnlyProperties": [
+    "/properties/ConfiguredTableAssociationIdentifier",
+    "/properties/Arn"
+  ],
+  "createOnlyProperties": [
+    "/properties/ConfiguredTableIdentifier",
+    "/properties/Name",
+    "/properties/MembershipIdentifier"
+  ],
+  "primaryIdentifier": [
+    "/properties/ConfiguredTableAssociationIdentifier",
+    "/properties/MembershipIdentifier"
+  ],
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": true,
+    "tagProperty": "/properties/Tags"
+  },
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-cleanrooms",
+  "handlers": {
+    "create": {
+      "permissions": [
+        "cleanrooms:CreateConfiguredTableAssociation",
+        "iam:PassRole",
+        "cleanrooms:ListTagsForResource",
+        "cleanrooms:TagResource",
+        "cleanrooms:GetConfiguredTableAssociation",
+        "cleanrooms:ListConfiguredTableAssociations"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "cleanrooms:GetConfiguredTableAssociation",
+        "cleanrooms:ListTagsForResource"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "cleanrooms:UpdateConfiguredTableAssociation",
+        "cleanrooms:GetConfiguredTableAssociation",
+        "iam:PassRole",
+        "cleanrooms:ListTagsForResource",
+        "cleanrooms:TagResource",
+        "cleanrooms:UntagResource"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "cleanrooms:DeleteConfiguredTableAssociation",
+        "cleanrooms:GetConfiguredTableAssociation",
+        "cleanrooms:ListConfiguredTableAssociations",
+        "cleanrooms:ListTagsForResource",
+        "cleanrooms:UntagResource"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "cleanrooms:ListConfiguredTableAssociations"
+      ],
+      "handlerSchema": {
+        "properties": {
+          "MembershipIdentifier": {
+            "$ref": "resource-schema.json#/properties/MembershipIdentifier"
+          }
+        },
+        "required": [
+          "MembershipIdentifier"
+        ]
+      }
+    }
+  },
+  "additionalProperties": false
+}

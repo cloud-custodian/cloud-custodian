@@ -68,9 +68,34 @@
       "items": {
         "$ref": "#/definitions/Tag"
       }
+    },
+    "ExecutionStatus": {
+      "description": "Start or Stop Launch Launch. Default is not started.",
+      "$ref": "#/definitions/ExecutionStatusObject"
     }
   },
   "definitions": {
+    "ExecutionStatusObject": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Status": {
+          "description": "Provide START or STOP action to apply on a launch",
+          "type": "string"
+        },
+        "DesiredState": {
+          "description": "Provide CANCELLED or COMPLETED as the launch desired state. Defaults to Completed if not provided.",
+          "type": "string"
+        },
+        "Reason": {
+          "description": "Provide a reason for stopping the launch. Defaults to empty if not provided.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "Status"
+      ]
+    },
     "LaunchGroupObject": {
       "type": "object",
       "properties": {
@@ -118,6 +143,34 @@
         "SplitWeight"
       ]
     },
+    "SegmentOverride": {
+      "type": "object",
+      "properties": {
+        "Segment": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2048,
+          "pattern": "([-a-zA-Z0-9._]*)|(arn:[^:]*:[^:]*:[^:]*:[^:]*:segment/[-a-zA-Z0-9._]*)"
+        },
+        "EvaluationOrder": {
+          "type": "integer"
+        },
+        "Weights": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/GroupToWeight"
+          },
+          "uniqueItems": true,
+          "insertionOrder": false
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "Segment",
+        "EvaluationOrder",
+        "Weights"
+      ]
+    },
     "StepConfig": {
       "type": "object",
       "properties": {
@@ -128,6 +181,14 @@
           "type": "array",
           "items": {
             "$ref": "#/definitions/GroupToWeight"
+          },
+          "uniqueItems": true,
+          "insertionOrder": false
+        },
+        "SegmentOverrides": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/SegmentOverride"
           },
           "uniqueItems": true,
           "insertionOrder": false
@@ -170,8 +231,7 @@
       "required": [
         "MetricName",
         "EntityIdKey",
-        "ValueKey",
-        "EventPattern"
+        "ValueKey"
       ],
       "additionalProperties": false
     },
@@ -221,7 +281,9 @@
     "create": {
       "permissions": [
         "evidently:CreateLaunch",
-        "evidently:TagResource"
+        "evidently:TagResource",
+        "evidently:GetLaunch",
+        "evidently:StartLaunch"
       ]
     },
     "read": {
@@ -235,13 +297,17 @@
         "evidently:UpdateLaunch",
         "evidently:ListTagsForResource",
         "evidently:TagResource",
-        "evidently:UntagResource"
+        "evidently:UntagResource",
+        "evidently:GetLaunch",
+        "evidently:StartLaunch",
+        "evidently:StopLaunch"
       ]
     },
     "delete": {
       "permissions": [
         "evidently:DeleteLaunch",
-        "evidently:UntagResource"
+        "evidently:UntagResource",
+        "evidently:GetLaunch"
       ]
     }
   },

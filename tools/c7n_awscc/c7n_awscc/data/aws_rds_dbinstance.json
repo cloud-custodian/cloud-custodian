@@ -1,0 +1,621 @@
+{
+  "typeName": "AWS::RDS::DBInstance",
+  "description": "The AWS::RDS::DBInstance resource creates an Amazon RDS DB instance.",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git",
+  "definitions": {
+    "CertificateDetails": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "CAIdentifier": {
+          "type": "string",
+          "description": "The CA identifier of the CA certificate used for the DB instance's server certificate."
+        },
+        "ValidTill": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The expiration date of the DB instance\u2019s server certificate."
+        }
+      }
+    },
+    "Endpoint": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Address": {
+          "type": "string",
+          "description": "Specifies the DNS address of the DB instance."
+        },
+        "Port": {
+          "type": "string",
+          "description": "Specifies the port that the database engine is listening on."
+        },
+        "HostedZoneId": {
+          "type": "string",
+          "description": "Specifies the ID that Amazon Route 53 assigns when you create a hosted zone."
+        }
+      }
+    },
+    "DBInstanceRole": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "FeatureName": {
+          "type": "string",
+          "description": "The name of the feature associated with the AWS Identity and Access Management (IAM) role. IAM roles that are associated with a DB instance grant permission for the DB instance to access other AWS services on your behalf."
+        },
+        "RoleArn": {
+          "type": "string",
+          "description": "The Amazon Resource Name (ARN) of the IAM role that is associated with the DB instance."
+        }
+      },
+      "required": [
+        "FeatureName",
+        "RoleArn"
+      ]
+    },
+    "ProcessorFeature": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Name": {
+          "type": "string",
+          "enum": [
+            "coreCount",
+            "threadsPerCore"
+          ],
+          "description": "The name of the processor feature. Valid names are coreCount and threadsPerCore."
+        },
+        "Value": {
+          "type": "string",
+          "description": "The value of a processor feature name."
+        }
+      }
+    },
+    "Tag": {
+      "description": "A key-value pair to associate with a resource.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Key": {
+          "type": "string",
+          "description": "The key name of the tag. You can specify a value that is 1 to 128 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -. ",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "Value": {
+          "type": "string",
+          "description": "The value for the tag. You can specify a value that is 0 to 256 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -. ",
+          "minLength": 0,
+          "maxLength": 256
+        }
+      },
+      "required": [
+        "Key"
+      ]
+    },
+    "MasterUserSecret": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "SecretArn": {
+          "type": "string",
+          "description": "The Amazon Resource Name (ARN) of the secret."
+        },
+        "KmsKeyId": {
+          "type": "string",
+          "description": "The AWS KMS key identifier that is used to encrypt the secret."
+        }
+      }
+    }
+  },
+  "properties": {
+    "AllocatedStorage": {
+      "type": "string",
+      "description": "The amount of storage (in gigabytes) to be initially allocated for the database instance.",
+      "pattern": "^[0-9]*$"
+    },
+    "AllowMajorVersionUpgrade": {
+      "type": "boolean",
+      "description": "A value that indicates whether major version upgrades are allowed. Changing this parameter doesn't result in an outage and the change is asynchronously applied as soon as possible."
+    },
+    "AssociatedRoles": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/DBInstanceRole"
+      },
+      "description": "The AWS Identity and Access Management (IAM) roles associated with the DB instance."
+    },
+    "AutoMinorVersionUpgrade": {
+      "type": "boolean",
+      "description": "A value that indicates whether minor engine upgrades are applied automatically to the DB instance during the maintenance window. By default, minor engine upgrades are applied automatically."
+    },
+    "AvailabilityZone": {
+      "type": "string",
+      "description": "The Availability Zone (AZ) where the database will be created. For information on AWS Regions and Availability Zones."
+    },
+    "BackupRetentionPeriod": {
+      "type": "integer",
+      "minimum": 0,
+      "default": 1,
+      "description": "The number of days for which automated backups are retained. Setting this parameter to a positive number enables backups. Setting this parameter to 0 disables automated backups."
+    },
+    "CACertificateIdentifier": {
+      "type": "string",
+      "description": "The identifier of the CA certificate for this DB instance."
+    },
+    "CertificateDetails": {
+      "$ref": "#/definitions/CertificateDetails",
+      "description": "Returns the details of the DB instance's server certificate."
+    },
+    "CertificateRotationRestart": {
+      "type": "boolean",
+      "description": "A value that indicates whether the DB instance is restarted when you rotate your SSL/TLS certificate.\nBy default, the DB instance is restarted when you rotate your SSL/TLS certificate. The certificate is not updated until the DB instance is restarted.\nIf you are using SSL/TLS to connect to the DB instance, follow the appropriate instructions for your DB engine to rotate your SSL/TLS certificate\nThis setting doesn't apply to RDS Custom."
+    },
+    "CharacterSetName": {
+      "type": "string",
+      "description": "For supported engines, indicates that the DB instance should be associated with the specified character set."
+    },
+    "CopyTagsToSnapshot": {
+      "type": "boolean",
+      "description": "A value that indicates whether to copy tags from the DB instance to snapshots of the DB instance. By default, tags are not copied."
+    },
+    "CustomIAMInstanceProfile": {
+      "type": "string",
+      "description": "The instance profile associated with the underlying Amazon EC2 instance of an RDS Custom DB instance. The instance profile must meet the following requirements:\n * The profile must exist in your account.\n * The profile must have an IAM role that Amazon EC2 has permissions to assume.\n * The instance profile name and the associated IAM role name must start with the prefix AWSRDSCustom .\nFor the list of permissions required for the IAM role, see Configure IAM and your VPC in the Amazon RDS User Guide .\n\nThis setting is required for RDS Custom."
+    },
+    "DBClusterIdentifier": {
+      "type": "string",
+      "description": "The identifier of the DB cluster that the instance will belong to."
+    },
+    "DBClusterSnapshotIdentifier": {
+      "type": "string",
+      "description": "The identifier for the RDS for MySQL Multi-AZ DB cluster snapshot to restore from. For more information on Multi-AZ DB clusters, see Multi-AZ deployments with two readable standby DB instances in the Amazon RDS User Guide .\n\nConstraints:\n * Must match the identifier of an existing Multi-AZ DB cluster snapshot.\n * Can't be specified when DBSnapshotIdentifier is specified.\n * Must be specified when DBSnapshotIdentifier isn't specified.\n * If you are restoring from a shared manual Multi-AZ DB cluster snapshot, the DBClusterSnapshotIdentifier must be the ARN of the shared snapshot.\n * Can't be the identifier of an Aurora DB cluster snapshot.\n * Can't be the identifier of an RDS for PostgreSQL Multi-AZ DB cluster snapshot."
+    },
+    "DBInstanceArn": {
+      "type": "string",
+      "description": "The Amazon Resource Name (ARN) for the DB instance."
+    },
+    "DBInstanceClass": {
+      "type": "string",
+      "description": "The compute and memory capacity of the DB instance, for example, db.m4.large. Not all DB instance classes are available in all AWS Regions, or for all database engines."
+    },
+    "DBInstanceIdentifier": {
+      "type": "string",
+      "pattern": "^$|^[a-zA-Z]{1}(?:-?[a-zA-Z0-9]){0,62}$",
+      "minLength": 1,
+      "maxLength": 63,
+      "description": "A name for the DB instance. If you specify a name, AWS CloudFormation converts it to lowercase. If you don't specify a name, AWS CloudFormation generates a unique physical ID and uses that ID for the DB instance."
+    },
+    "DbiResourceId": {
+      "type": "string",
+      "description": "The AWS Region-unique, immutable identifier for the DB instance. This identifier is found in AWS CloudTrail log entries whenever the AWS KMS key for the DB instance is accessed."
+    },
+    "DBName": {
+      "type": "string",
+      "pattern": "^$|^[_a-zA-Z][a-zA-Z0-9_]{0,63}$",
+      "description": "The meaning of this parameter differs according to the database engine you use."
+    },
+    "DBParameterGroupName": {
+      "type": "string",
+      "description": "The name of an existing DB parameter group or a reference to an AWS::RDS::DBParameterGroup resource created in the template."
+    },
+    "DBSecurityGroups": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string"
+      },
+      "description": "A list of the DB security groups to assign to the DB instance. The list can include both the name of existing DB security groups or references to AWS::RDS::DBSecurityGroup resources created in the template."
+    },
+    "DBSnapshotIdentifier": {
+      "type": "string",
+      "description": "The name or Amazon Resource Name (ARN) of the DB snapshot that's used to restore the DB instance. If you're restoring from a shared manual DB snapshot, you must specify the ARN of the snapshot."
+    },
+    "DBSubnetGroupName": {
+      "type": "string",
+      "description": "A DB subnet group to associate with the DB instance. If you update this value, the new subnet group must be a subnet group in a new VPC."
+    },
+    "DBSystemId": {
+      "type": "string",
+      "description": "The Oracle system ID (Oracle SID) for a container database (CDB). The Oracle SID is also the name of the CDB. This setting is valid for RDS Custom only."
+    },
+    "DeleteAutomatedBackups": {
+      "type": "boolean",
+      "description": "A value that indicates whether to remove automated backups immediately after the DB instance is deleted. This parameter isn't case-sensitive. The default is to remove automated backups immediately after the DB instance is deleted."
+    },
+    "DeletionProtection": {
+      "type": "boolean",
+      "description": "A value that indicates whether the DB instance has deletion protection enabled. The database can't be deleted when deletion protection is enabled. By default, deletion protection is disabled."
+    },
+    "Domain": {
+      "type": "string",
+      "description": "The Active Directory directory ID to create the DB instance in. Currently, only MySQL, Microsoft SQL Server, Oracle, and PostgreSQL DB instances can be created in an Active Directory Domain."
+    },
+    "DomainIAMRoleName": {
+      "type": "string",
+      "description": "Specify the name of the IAM role to be used when making API calls to the Directory Service."
+    },
+    "EnableCloudwatchLogsExports": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "The list of log types that need to be enabled for exporting to CloudWatch Logs. The values in the list depend on the DB engine being used."
+    },
+    "EnableIAMDatabaseAuthentication": {
+      "type": "boolean",
+      "description": "A value that indicates whether to enable mapping of AWS Identity and Access Management (IAM) accounts to database accounts. By default, mapping is disabled."
+    },
+    "EnablePerformanceInsights": {
+      "type": "boolean",
+      "description": "A value that indicates whether to enable Performance Insights for the DB instance."
+    },
+    "Endpoint": {
+      "$ref": "#/definitions/Endpoint",
+      "description": "Specifies the connection endpoint."
+    },
+    "Engine": {
+      "type": "string",
+      "description": "The name of the database engine that you want to use for this DB instance."
+    },
+    "EngineVersion": {
+      "type": "string",
+      "description": "The version number of the database engine to use."
+    },
+    "ManageMasterUserPassword": {
+      "type": "boolean",
+      "description": "A value that indicates whether to manage the master user password with AWS Secrets Manager."
+    },
+    "Iops": {
+      "type": "integer",
+      "description": "The number of I/O operations per second (IOPS) that the database provisions."
+    },
+    "KmsKeyId": {
+      "type": "string",
+      "description": "The ARN of the AWS Key Management Service (AWS KMS) master key that's used to encrypt the DB instance."
+    },
+    "LicenseModel": {
+      "type": "string",
+      "description": "License model information for this DB instance."
+    },
+    "MasterUsername": {
+      "type": "string",
+      "pattern": "^[a-zA-Z][a-zA-Z0-9_]{0,127}$",
+      "description": "The master user name for the DB instance.",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "MasterUserPassword": {
+      "type": "string",
+      "description": "The password for the master user."
+    },
+    "MasterUserSecret": {
+      "$ref": "#/definitions/MasterUserSecret",
+      "description": "Contains the secret managed by RDS in AWS Secrets Manager for the master user password."
+    },
+    "MaxAllocatedStorage": {
+      "type": "integer",
+      "description": "The upper limit to which Amazon RDS can automatically scale the storage of the DB instance."
+    },
+    "MonitoringInterval": {
+      "type": "integer",
+      "default": 0,
+      "description": "The interval, in seconds, between points when Enhanced Monitoring metrics are collected for the DB instance. To disable collecting Enhanced Monitoring metrics, specify 0. The default is 0."
+    },
+    "MonitoringRoleArn": {
+      "type": "string",
+      "description": "The ARN for the IAM role that permits RDS to send enhanced monitoring metrics to Amazon CloudWatch Logs."
+    },
+    "MultiAZ": {
+      "type": "boolean",
+      "description": "Specifies whether the database instance is a multiple Availability Zone deployment."
+    },
+    "NcharCharacterSetName": {
+      "type": "string",
+      "description": "The name of the NCHAR character set for the Oracle DB instance. This parameter doesn't apply to RDS Custom."
+    },
+    "NetworkType": {
+      "description": "The network type of the DB cluster.",
+      "type": "string"
+    },
+    "OptionGroupName": {
+      "type": "string",
+      "description": "Indicates that the DB instance should be associated with the specified option group."
+    },
+    "PerformanceInsightsKMSKeyId": {
+      "type": "string",
+      "description": "The AWS KMS key identifier for encryption of Performance Insights data. The KMS key ID is the Amazon Resource Name (ARN), KMS key identifier, or the KMS key alias for the KMS encryption key."
+    },
+    "PerformanceInsightsRetentionPeriod": {
+      "type": "integer",
+      "description": "The amount of time, in days, to retain Performance Insights data. Valid values are 7 or 731 (2 years)."
+    },
+    "Port": {
+      "type": "string",
+      "description": "The port number on which the database accepts connections.",
+      "pattern": "^\\d*$"
+    },
+    "PreferredBackupWindow": {
+      "type": "string",
+      "description": "The daily time range during which automated backups are created if automated backups are enabled, using the BackupRetentionPeriod parameter."
+    },
+    "PreferredMaintenanceWindow": {
+      "type": "string",
+      "description": "he weekly time range during which system maintenance can occur, in Universal Coordinated Time (UTC)."
+    },
+    "ProcessorFeatures": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/ProcessorFeature"
+      },
+      "description": "The number of CPU cores and the number of threads per core for the DB instance class of the DB instance."
+    },
+    "PromotionTier": {
+      "type": "integer",
+      "minimum": 0,
+      "default": 1,
+      "description": "A value that specifies the order in which an Aurora Replica is promoted to the primary instance after a failure of the existing primary instance."
+    },
+    "PubliclyAccessible": {
+      "type": "boolean",
+      "description": "Indicates whether the DB instance is an internet-facing instance. If you specify true, AWS CloudFormation creates an instance with a publicly resolvable DNS name, which resolves to a public IP address. If you specify false, AWS CloudFormation creates an internal instance with a DNS name that resolves to a private IP address."
+    },
+    "ReplicaMode": {
+      "description": "The open mode of an Oracle read replica. The default is open-read-only.",
+      "type": "string"
+    },
+    "RestoreTime": {
+      "description": "The date and time to restore from.",
+      "type": "string",
+      "format": "date-time"
+    },
+    "SourceDBClusterIdentifier": {
+      "description": "The identifier of the Multi-AZ DB cluster that will act as the source for the read replica. Each DB cluster can have up to 15 read replicas.",
+      "type": "string"
+    },
+    "SourceDbiResourceId": {
+      "type": "string",
+      "description": "The resource ID of the source DB instance from which to restore."
+    },
+    "SourceDBInstanceAutomatedBackupsArn": {
+      "type": "string",
+      "description": "The Amazon Resource Name (ARN) of the replicated automated backups from which to restore."
+    },
+    "SourceDBInstanceIdentifier": {
+      "type": "string",
+      "description": "If you want to create a Read Replica DB instance, specify the ID of the source DB instance. Each DB instance can have a limited number of Read Replicas."
+    },
+    "SourceRegion": {
+      "type": "string",
+      "description": "The ID of the region that contains the source DB instance for the Read Replica."
+    },
+    "StorageEncrypted": {
+      "type": "boolean",
+      "description": "A value that indicates whether the DB instance is encrypted. By default, it isn't encrypted."
+    },
+    "StorageType": {
+      "type": "string",
+      "description": "Specifies the storage type to be associated with the DB instance."
+    },
+    "StorageThroughput": {
+      "type": "integer",
+      "description": "Specifies the storage throughput for the DB instance."
+    },
+    "Tags": {
+      "type": "array",
+      "insertionOrder": false,
+      "uniqueItems": false,
+      "items": {
+        "$ref": "#/definitions/Tag"
+      },
+      "description": "Tags to assign to the DB instance."
+    },
+    "TdeCredentialArn": {
+      "type": "string",
+      "description": "The ARN from the key store with which to associate the instance for TDE encryption."
+    },
+    "TdeCredentialPassword": {
+      "type": "string",
+      "description": "The password for the given ARN from the key store in order to access the device."
+    },
+    "Timezone": {
+      "type": "string",
+      "description": "The time zone of the DB instance. The time zone parameter is currently supported only by Microsoft SQL Server."
+    },
+    "UseDefaultProcessorFeatures": {
+      "type": "boolean",
+      "description": "A value that indicates whether the DB instance class of the DB instance uses its default processor features."
+    },
+    "UseLatestRestorableTime": {
+      "type": "boolean",
+      "description": "A value that indicates whether the DB instance is restored from the latest backup time. By default, the DB instance isn't restored from the latest backup time."
+    },
+    "VPCSecurityGroups": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string"
+      },
+      "description": "A list of the VPC security group IDs to assign to the DB instance. The list can include both the physical IDs of existing VPC security groups and references to AWS::EC2::SecurityGroup resources created in the template."
+    }
+  },
+  "additionalProperties": false,
+  "propertyTransform": {
+    "/properties/DBClusterIdentifier": "$lowercase(DBClusterIdentifier)",
+    "/properties/DBClusterSnapshotIdentifier": "$lowercase(DBClusterSnapshotIdentifier)",
+    "/properties/DBInstanceIdentifier": "$lowercase(DBInstanceIdentifier)",
+    "/properties/DBName": "$lowercase(DBName) $OR $uppercase(DBName)",
+    "/properties/DBParameterGroupName": "$lowercase(DBParameterGroupName)",
+    "/properties/DBSnapshotIdentifier": "$lowercase(DBSnapshotIdentifier)",
+    "/properties/DBSubnetGroupName": "$lowercase(DBSubnetGroupName)",
+    "/properties/Engine": "$lowercase(Engine)",
+    "/properties/EngineVersion": "$join([$string(EngineVersion), \".*\"])",
+    "/properties/KmsKeyId": "$join([\"arn:(aws)[-]{0,1}[a-z]{0,2}[-]{0,1}[a-z]{0,3}:kms:[a-z]{2}[-]{1}[a-z]{3,10}[-]{0,1}[a-z]{0,10}[-]{1}[1-3]{1}:[0-9]{12}[:]{1}key\\/\", KmsKeyId])",
+    "/properties/MasterUserSecret/KmsKeyId": "$join([\"arn:(aws)[-]{0,1}[a-z]{0,2}[-]{0,1}[a-z]{0,3}:kms:[a-z]{2}[-]{1}[a-z]{3,10}[-]{0,1}[a-z]{0,10}[-]{1}[1-3]{1}:[0-9]{12}[:]{1}key\\/\", MasterUserSecret.KmsKeyId])",
+    "/properties/NetworkType": "$lowercase(NetworkType)",
+    "/properties/OptionGroupName": "$lowercase(OptionGroupName)",
+    "/properties/PerformanceInsightsKMSKeyId": "$join([\"arn:(aws)[-]{0,1}[a-z]{0,2}[-]{0,1}[a-z]{0,3}:kms:[a-z]{2}[-]{1}[a-z]{3,10}[-]{0,1}[a-z]{0,10}[-]{1}[1-3]{1}:[0-9]{12}[:]{1}key\\/\", PerformanceInsightsKMSKeyId])",
+    "/properties/PreferredMaintenanceWindow": "$lowercase(PreferredMaintenanceWindow)",
+    "/properties/SourceDBInstanceAutomatedBackupsArn": "$lowercase(SourceDBInstanceAutomatedBackupsArn)",
+    "/properties/SourceDBInstanceIdentifier": "$lowercase(SourceDBInstanceIdentifier)",
+    "/properties/StorageType": "$lowercase(StorageType)"
+  },
+  "createOnlyProperties": [
+    "/properties/CharacterSetName",
+    "/properties/CustomIAMInstanceProfile",
+    "/properties/DBClusterIdentifier",
+    "/properties/DBInstanceIdentifier",
+    "/properties/DBName",
+    "/properties/DBSubnetGroupName",
+    "/properties/KmsKeyId",
+    "/properties/MasterUsername",
+    "/properties/NcharCharacterSetName",
+    "/properties/Port",
+    "/properties/SourceRegion",
+    "/properties/StorageEncrypted",
+    "/properties/Timezone"
+  ],
+  "conditionalCreateOnlyProperties": [
+    "/properties/AutoMinorVersionUpgrade",
+    "/properties/AvailabilityZone",
+    "/properties/BackupRetentionPeriod",
+    "/properties/DBClusterSnapshotIdentifier",
+    "/properties/DBParameterGroupName",
+    "/properties/DBSnapshotIdentifier",
+    "/properties/Engine",
+    "/properties/MultiAZ",
+    "/properties/PerformanceInsightsKMSKeyId",
+    "/properties/PreferredMaintenanceWindow",
+    "/properties/RestoreTime",
+    "/properties/SourceDBClusterIdentifier",
+    "/properties/SourceDBInstanceAutomatedBackupsArn",
+    "/properties/SourceDBInstanceIdentifier",
+    "/properties/SourceDbiResourceId",
+    "/properties/StorageType",
+    "/properties/UseLatestRestorableTime"
+  ],
+  "deprecatedProperties": [
+    "/properties/TdeCredentialArn",
+    "/properties/TdeCredentialPassword"
+  ],
+  "writeOnlyProperties": [
+    "/properties/AllowMajorVersionUpgrade",
+    "/properties/CertificateRotationRestart",
+    "/properties/DBSnapshotIdentifier",
+    "/properties/DeleteAutomatedBackups",
+    "/properties/MasterUserPassword",
+    "/properties/Port",
+    "/properties/RestoreTime",
+    "/properties/SourceDBInstanceAutomatedBackupsArn",
+    "/properties/SourceDBInstanceIdentifier",
+    "/properties/SourceDbiResourceId",
+    "/properties/SourceRegion",
+    "/properties/TdeCredentialPassword",
+    "/properties/UseDefaultProcessorFeatures",
+    "/properties/UseLatestRestorableTime"
+  ],
+  "readOnlyProperties": [
+    "/properties/Endpoint/Address",
+    "/properties/Endpoint/Port",
+    "/properties/Endpoint/HostedZoneId",
+    "/properties/DbiResourceId",
+    "/properties/DBInstanceArn",
+    "/properties/DBSystemId",
+    "/properties/MasterUserSecret/SecretArn",
+    "/properties/CertificateDetails/CAIdentifier",
+    "/properties/CertificateDetails/ValidTill"
+  ],
+  "primaryIdentifier": [
+    "/properties/DBInstanceIdentifier"
+  ],
+  "handlers": {
+    "create": {
+      "permissions": [
+        "ec2:DescribeAccountAttributes",
+        "ec2:DescribeAvailabilityZones",
+        "ec2:DescribeInternetGateways",
+        "ec2:DescribeSecurityGroups",
+        "ec2:DescribeSubnets",
+        "ec2:DescribeVpcAttribute",
+        "ec2:DescribeVpcs",
+        "iam:CreateServiceLinkedRole",
+        "iam:GetRole",
+        "iam:ListRoles",
+        "iam:PassRole",
+        "kms:CreateGrant",
+        "kms:DescribeKey",
+        "rds:AddRoleToDBInstance",
+        "rds:AddTagsToResource",
+        "rds:CreateDBInstance",
+        "rds:CreateDBInstanceReadReplica",
+        "rds:DescribeDBInstances",
+        "rds:DescribeDBSnapshots",
+        "rds:DescribeEvents",
+        "rds:ModifyDBInstance",
+        "rds:RebootDBInstance",
+        "rds:RestoreDBInstanceFromDBSnapshot",
+        "rds:RestoreDBInstanceToPointInTime",
+        "secretsmanager:CreateSecret",
+        "secretsmanager:TagResource"
+      ],
+      "timeoutInMinutes": 2160
+    },
+    "read": {
+      "permissions": [
+        "ec2:DescribeAccountAttributes",
+        "ec2:DescribeAvailabilityZones",
+        "ec2:DescribeInternetGateways",
+        "ec2:DescribeSecurityGroups",
+        "ec2:DescribeSubnets",
+        "ec2:DescribeVpcAttribute",
+        "ec2:DescribeVpcs",
+        "rds:DescribeDBInstances"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "ec2:DescribeAccountAttributes",
+        "ec2:DescribeAvailabilityZones",
+        "ec2:DescribeInternetGateways",
+        "ec2:DescribeSecurityGroups",
+        "ec2:DescribeSubnets",
+        "ec2:DescribeVpcAttribute",
+        "ec2:DescribeVpcs",
+        "iam:CreateServiceLinkedRole",
+        "iam:GetRole",
+        "iam:ListRoles",
+        "iam:PassRole",
+        "kms:CreateGrant",
+        "kms:DescribeKey",
+        "rds:AddRoleToDBInstance",
+        "rds:AddTagsToResource",
+        "rds:DescribeDBClusters",
+        "rds:DescribeDBEngineVersions",
+        "rds:DescribeDBInstances",
+        "rds:DescribeDBParameterGroups",
+        "rds:DescribeEvents",
+        "rds:ModifyDBInstance",
+        "rds:PromoteReadReplica",
+        "rds:RebootDBInstance",
+        "rds:RemoveRoleFromDBInstance",
+        "rds:RemoveTagsFromResource",
+        "secretsmanager:CreateSecret",
+        "secretsmanager:TagResource"
+      ],
+      "timeoutInMinutes": 2160
+    },
+    "delete": {
+      "permissions": [
+        "rds:DeleteDBInstance",
+        "rds:DescribeDBInstances"
+      ],
+      "timeoutInMinutes": 2160
+    },
+    "list": {
+      "permissions": [
+        "rds:DescribeDBInstances"
+      ]
+    }
+  }
+}

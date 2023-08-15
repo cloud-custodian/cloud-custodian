@@ -363,6 +363,12 @@
     "RequirementsS3ObjectVersion": {
       "$ref": "#/definitions/S3ObjectVersion"
     },
+    "StartupScriptS3Path": {
+      "$ref": "#/definitions/RelativePath"
+    },
+    "StartupScriptS3ObjectVersion": {
+      "$ref": "#/definitions/S3ObjectVersion"
+    },
     "AirflowConfigurationOptions": {
       "type": "object",
       "description": "Key/value pairs representing Airflow configuration variables.\n    Keys are prefixed by their section:\n\n    [core]\n    dags_folder={AIRFLOW_HOME}/dags\n\n    Would be represented as\n\n    \"core.dags_folder\": \"{AIRFLOW_HOME}/dags\""

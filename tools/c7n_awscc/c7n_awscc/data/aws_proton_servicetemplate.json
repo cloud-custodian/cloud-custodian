@@ -1,0 +1,148 @@
+{
+  "typeName": "AWS::Proton::ServiceTemplate",
+  "description": "Definition of AWS::Proton::ServiceTemplate Resource Type",
+  "definitions": {
+    "Provisioning": {
+      "type": "string",
+      "enum": [
+        "CUSTOMER_MANAGED"
+      ]
+    },
+    "Tag": {
+      "type": "object",
+      "description": "<p>A description of a resource tag.</p>",
+      "properties": {
+        "Key": {
+          "type": "string",
+          "maxLength": 128,
+          "minLength": 1,
+          "description": "<p>The key of the resource tag.</p>"
+        },
+        "Value": {
+          "type": "string",
+          "maxLength": 256,
+          "minLength": 0,
+          "description": "<p>The value of the resource tag.</p>"
+        }
+      },
+      "required": [
+        "Key",
+        "Value"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "properties": {
+    "Arn": {
+      "type": "string",
+      "maxLength": 200,
+      "minLength": 1,
+      "pattern": "^arn:(aws|aws-cn|aws-us-gov):[a-zA-Z0-9-]+:[a-zA-Z0-9-]*:\\d{12}:([\\w+=,.@-]+[/:])*[\\w+=,.@-]+$",
+      "description": "<p>The Amazon Resource Name (ARN) of the service template.</p>"
+    },
+    "Description": {
+      "type": "string",
+      "maxLength": 500,
+      "minLength": 0,
+      "description": "<p>A description of the service template.</p>"
+    },
+    "DisplayName": {
+      "type": "string",
+      "maxLength": 100,
+      "minLength": 1,
+      "description": "<p>The name of the service template as displayed in the developer interface.</p>"
+    },
+    "EncryptionKey": {
+      "type": "string",
+      "maxLength": 200,
+      "minLength": 1,
+      "pattern": "^arn:(aws|aws-cn|aws-us-gov):[a-zA-Z0-9-]+:[a-zA-Z0-9-]*:\\d{12}:([\\w+=,.@-]+[/:])*[\\w+=,.@-]+$",
+      "description": "<p>A customer provided encryption key that's used to encrypt data.</p>"
+    },
+    "Name": {
+      "type": "string",
+      "maxLength": 100,
+      "minLength": 1,
+      "pattern": "^[0-9A-Za-z]+[0-9A-Za-z_\\-]*$"
+    },
+    "PipelineProvisioning": {
+      "$ref": "#/definitions/Provisioning"
+    },
+    "Tags": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Tag"
+      },
+      "maxItems": 50,
+      "minItems": 0,
+      "uniqueItems": true,
+      "description": "<p>An optional list of metadata items that you can associate with the Proton service template. A tag is a key-value pair.</p>\n         <p>For more information, see <a href=\"https://docs.aws.amazon.com/proton/latest/userguide/resources.html\">Proton resources and tagging</a> in the\n        <i>Proton User Guide</i>.</p>"
+    }
+  },
+  "readOnlyProperties": [
+    "/properties/Arn"
+  ],
+  "createOnlyProperties": [
+    "/properties/EncryptionKey",
+    "/properties/Name",
+    "/properties/PipelineProvisioning"
+  ],
+  "primaryIdentifier": [
+    "/properties/Arn"
+  ],
+  "additionalIdentifiers": [
+    [
+      "/properties/Name"
+    ]
+  ],
+  "handlers": {
+    "create": {
+      "permissions": [
+        "proton:CreateServiceTemplate",
+        "proton:TagResource",
+        "kms:*",
+        "proton:GetServiceTemplate"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "proton:GetServiceTemplate",
+        "proton:ListTagsForResource",
+        "kms:*"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "proton:GetServiceTemplate",
+        "proton:CreateServiceTemplate",
+        "proton:ListTagsForResource",
+        "proton:TagResource",
+        "proton:UntagResource",
+        "proton:UpdateServiceTemplate",
+        "kms:*"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "proton:DeleteServiceTemplate",
+        "proton:UntagResource",
+        "kms:*",
+        "proton:GetServiceTemplate"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "proton:ListServiceTemplates"
+      ]
+    }
+  },
+  "additionalProperties": false,
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": true,
+    "tagProperty": "/properties/Tags"
+  },
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-proton"
+}

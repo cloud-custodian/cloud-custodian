@@ -354,7 +354,6 @@
       "required": [
         "TokenEndpoint",
         "Issuer",
-        "ClientSecret",
         "UserInfoEndpoint",
         "ClientId",
         "AuthorizationEndpoint"
@@ -375,7 +374,6 @@
     }
   },
   "required": [
-    "ListenerArn",
     "Actions",
     "Priority",
     "Conditions"
@@ -392,8 +390,7 @@
   ],
   "writeOnlyProperties": [
     "/properties/Actions/*/AuthenticateOidcConfig/ClientSecret",
-    "/properties/Actions/*/ForwardConfig",
-    "/properties/Actions/*/TargetGroupArn"
+    "/properties/ListenerArn"
   ],
   "taggable": false,
   "handlers": {

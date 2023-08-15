@@ -1,0 +1,165 @@
+{
+  "typeName": "AWS::Proton::EnvironmentAccountConnection",
+  "description": "Resource Schema describing various properties for AWS Proton Environment Account Connections resources.",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-proton",
+  "definitions": {
+    "Status": {
+      "type": "string",
+      "enum": [
+        "PENDING",
+        "CONNECTED",
+        "REJECTED"
+      ]
+    },
+    "Tag": {
+      "type": "object",
+      "description": "<p>A description of a resource tag.</p>",
+      "properties": {
+        "Key": {
+          "type": "string",
+          "maxLength": 128,
+          "minLength": 1,
+          "description": "<p>The key of the resource tag.</p>"
+        },
+        "Value": {
+          "type": "string",
+          "maxLength": 256,
+          "minLength": 0,
+          "description": "<p>The value of the resource tag.</p>"
+        }
+      },
+      "required": [
+        "Key",
+        "Value"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "properties": {
+    "Arn": {
+      "description": "The Amazon Resource Name (ARN) of the environment account connection.",
+      "type": "string"
+    },
+    "CodebuildRoleArn": {
+      "description": "The Amazon Resource Name (ARN) of an IAM service role in the environment account. AWS Proton uses this role to provision infrastructure resources using CodeBuild-based provisioning in the associated environment account.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200,
+      "pattern": "^arn:(aws|aws-cn|aws-us-gov):iam::\\d{12}:role/([\\w+=,.@-]{1,512}[/:])*([\\w+=,.@-]{1,64})$"
+    },
+    "ComponentRoleArn": {
+      "description": "The Amazon Resource Name (ARN) of the IAM service role that AWS Proton uses when provisioning directly defined components in the associated environment account. It determines the scope of infrastructure that a component can provision in the account.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200,
+      "pattern": "^arn:(aws|aws-cn|aws-us-gov):iam::\\d{12}:role/([\\w+=,.@-]{1,512}[/:])*([\\w+=,.@-]{1,64})$"
+    },
+    "EnvironmentAccountId": {
+      "description": "The environment account that's connected to the environment account connection.",
+      "type": "string",
+      "pattern": "^\\d{12}$"
+    },
+    "EnvironmentName": {
+      "description": "The name of the AWS Proton environment that's created in the associated management account.",
+      "type": "string",
+      "pattern": "^[0-9A-Za-z]+[0-9A-Za-z_\\-]*$",
+      "minLength": 1,
+      "maxLength": 100
+    },
+    "Id": {
+      "description": "The ID of the environment account connection.",
+      "type": "string",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+    },
+    "ManagementAccountId": {
+      "description": "The ID of the management account that accepts or rejects the environment account connection. You create an manage the AWS Proton environment in this account. If the management account accepts the environment account connection, AWS Proton can use the associated IAM role to provision environment infrastructure resources in the associated environment account.",
+      "type": "string",
+      "pattern": "^\\d{12}$"
+    },
+    "RoleArn": {
+      "description": "The Amazon Resource Name (ARN) of the IAM service role that's created in the environment account. AWS Proton uses this role to provision infrastructure resources in the associated environment account.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200,
+      "pattern": "^arn:(aws|aws-cn|aws-us-gov):iam::\\d{12}:role/([\\w+=,.@-]{1,512}[/:])*([\\w+=,.@-]{1,64})$"
+    },
+    "Status": {
+      "description": "The status of the environment account connection.",
+      "$ref": "#/definitions/Status"
+    },
+    "Tags": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Tag"
+      },
+      "uniqueItems": true,
+      "insertionOrder": false,
+      "description": "<p>An optional list of metadata items that you can associate with the Proton environment account connection. A tag is a key-value pair.</p>\n         <p>For more information, see <a href=\"https://docs.aws.amazon.com/proton/latest/userguide/resources.html\">Proton resources and tagging</a> in the\n        <i>Proton User Guide</i>.</p>"
+    }
+  },
+  "readOnlyProperties": [
+    "/properties/Arn",
+    "/properties/Id",
+    "/properties/Status"
+  ],
+  "primaryIdentifier": [
+    "/properties/Arn"
+  ],
+  "additionalIdentifiers": [
+    [
+      "/properties/Id"
+    ]
+  ],
+  "handlers": {
+    "create": {
+      "permissions": [
+        "proton:CreateEnvironmentAccountConnection",
+        "proton:TagResource",
+        "iam:PassRole",
+        "proton:ListTagsForResource",
+        "proton:GetEnvironmentAccountConnection"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "proton:GetEnvironmentAccountConnection",
+        "proton:ListTagsForResource",
+        "iam:PassRole",
+        "proton:GetEnvironmentAccountConnection"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "proton:CreateEnvironmentAccountConnection",
+        "proton:ListTagsForResource",
+        "proton:TagResource",
+        "proton:UntagResource",
+        "proton:UpdateEnvironmentAccountConnection",
+        "iam:PassRole",
+        "proton:GetEnvironmentAccountConnection"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "proton:DeleteEnvironmentAccountConnection",
+        "proton:UntagResource",
+        "iam:PassRole",
+        "proton:ListTagsForResource",
+        "proton:GetEnvironmentAccountConnection"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "proton:ListEnvironmentAccountConnections"
+      ]
+    }
+  },
+  "additionalProperties": false,
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": true,
+    "tagProperty": "/properties/Tags"
+  }
+}

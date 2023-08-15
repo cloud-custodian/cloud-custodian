@@ -1,0 +1,120 @@
+{
+  "typeName": "AWS::IoT::BillingGroup",
+  "description": "Resource Type definition for AWS::IoT::BillingGroup",
+  "additionalProperties": false,
+  "properties": {
+    "Id": {
+      "type": "string"
+    },
+    "Arn": {
+      "type": "string"
+    },
+    "BillingGroupName": {
+      "type": "string",
+      "pattern": "[a-zA-Z0-9:_-]+",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "Tags": {
+      "description": "An array of key-value pairs to apply to this resource.",
+      "type": "array",
+      "maxItems": 50,
+      "uniqueItems": true,
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/Tag"
+      }
+    },
+    "BillingGroupProperties": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "BillingGroupDescription": {
+          "type": "string",
+          "maxLength": 2028,
+          "pattern": "[\\p{Graph}\\x20]*"
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Tag": {
+      "description": "A key-value pair to associate with a resource.",
+      "type": "object",
+      "properties": {
+        "Key": {
+          "type": "string",
+          "description": "The key name of the tag. You can specify a value that is 1 to 128 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -. ",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^([\\p{L}\\p{Z}\\p{N}_.:/=+\\-@]*)$"
+        },
+        "Value": {
+          "type": "string",
+          "description": "The value for the tag. You can specify a value that is 1 to 256 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -. ",
+          "minLength": 1,
+          "maxLength": 256
+        }
+      },
+      "required": [
+        "Key",
+        "Value"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": true,
+    "tagProperty": "/properties/Tags"
+  },
+  "readOnlyProperties": [
+    "/properties/Arn",
+    "/properties/Id"
+  ],
+  "createOnlyProperties": [
+    "/properties/BillingGroupName"
+  ],
+  "primaryIdentifier": [
+    "/properties/BillingGroupName"
+  ],
+  "handlers": {
+    "create": {
+      "permissions": [
+        "iot:DescribeBillingGroup",
+        "iot:ListTagsForResource",
+        "iot:CreateBillingGroup",
+        "iot:TagResource"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "iot:DescribeBillingGroup",
+        "iot:DeleteBillingGroup"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "iot:ListBillingGroups",
+        "iot:ListTagsForResource"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "iot:DescribeBillingGroup",
+        "iot:ListTagsForResource"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "iot:DescribeBillingGroup",
+        "iot:UpdateBillingGroup",
+        "iot:ListTagsForResource",
+        "iot:TagResource",
+        "iot:UntagResource"
+      ]
+    }
+  }
+}

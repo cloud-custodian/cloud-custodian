@@ -15,6 +15,9 @@
       },
       "minItems": 0,
       "maxItems": 50
+    },
+    "ReplicationSpecification": {
+      "$ref": "#/definitions/ReplicationSpecification"
     }
   },
   "definitions": {
@@ -37,11 +40,69 @@
         "Value",
         "Key"
       ]
+    },
+    "ReplicationSpecification": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "ReplicationStrategy": {
+          "type": "string",
+          "enum": [
+            "SINGLE_REGION",
+            "MULTI_REGION"
+          ]
+        },
+        "RegionList": {
+          "$ref": "#/definitions/RegionList"
+        }
+      },
+      "default": {
+        "properties": {
+          "ReplicationStrategy": {
+            "type": "string",
+            "const": "SINGLE_REGION"
+          }
+        }
+      },
+      "dependencies": {
+        "RegionList": [
+          "ReplicationStrategy"
+        ]
+      }
+    },
+    "RegionList": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "ap-northeast-1",
+          "ap-northeast-2",
+          "ap-south-1",
+          "ap-southeast-1",
+          "ap-southeast-2",
+          "ca-central-1",
+          "eu-central-1",
+          "eu-north-1",
+          "eu-west-1",
+          "eu-west-2",
+          "eu-west-3",
+          "sa-east-1",
+          "us-east-1",
+          "us-east-2",
+          "us-west-1",
+          "us-west-2"
+        ]
+      },
+      "uniqueItems": true,
+      "insertionOrder": false,
+      "minItems": 2,
+      "maxItems": 6
     }
   },
   "additionalProperties": false,
   "required": [],
   "createOnlyProperties": [
+    "/properties/ReplicationSpecification",
     "/properties/KeyspaceName"
   ],
   "primaryIdentifier": [
@@ -51,32 +112,44 @@
     "create": {
       "permissions": [
         "cassandra:Create",
+        "cassandra:CreateMultiRegionResource",
         "cassandra:Select",
-        "cassandra:TagResource"
+        "cassandra:SelectMultiRegionResource",
+        "cassandra:TagResource",
+        "cassandra:TagMultiRegionResource",
+        "iam:CreateServiceLinkedRole"
       ]
     },
     "read": {
       "permissions": [
-        "cassandra:Select"
+        "cassandra:Select",
+        "cassandra:SelectMultiRegionResource"
       ]
     },
     "update": {
       "permissions": [
         "cassandra:Alter",
+        "cassandra:AlterMultiRegionResource",
         "cassandra:Select",
+        "cassandra:SelectMultiRegionResource",
         "cassandra:TagResource",
-        "cassandra:UntagResource"
+        "cassandra:TagMultiRegionResource",
+        "cassandra:UntagResource",
+        "cassandra:UntagMultiRegionResource"
       ]
     },
     "delete": {
       "permissions": [
         "cassandra:Drop",
-        "cassandra:Select"
+        "cassandra:DropMultiRegionResource",
+        "cassandra:Select",
+        "cassandra:SelectMultiRegionResource"
       ]
     },
     "list": {
       "permissions": [
-        "cassandra:Select"
+        "cassandra:Select",
+        "cassandra:SelectMultiRegionResource"
       ]
     }
   }

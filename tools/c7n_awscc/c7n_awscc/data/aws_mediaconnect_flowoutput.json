@@ -104,7 +104,9 @@
         "rtp",
         "zixi-pull",
         "rist",
-        "srt-listener"
+        "fujitsu-qos",
+        "srt-listener",
+        "srt-caller"
       ],
       "description": "The protocol that is used by the source or output."
     },

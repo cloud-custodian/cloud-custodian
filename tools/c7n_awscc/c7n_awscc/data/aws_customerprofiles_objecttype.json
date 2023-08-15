@@ -202,6 +202,13 @@
   "required": [
     "DomainName"
   ],
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": true,
+    "tagProperty": "/properties/Tags"
+  },
   "createOnlyProperties": [
     "/properties/DomainName",
     "/properties/ObjectTypeName"
@@ -218,7 +225,8 @@
     "create": {
       "permissions": [
         "profile:GetProfileObjectType",
-        "profile:PutProfileObjectType"
+        "profile:PutProfileObjectType",
+        "profile:TagResource"
       ]
     },
     "read": {
@@ -240,6 +248,16 @@
       ]
     },
     "list": {
+      "handlerSchema": {
+        "properties": {
+          "DomainName": {
+            "$ref": "resource-schema.json#/properties/DomainName"
+          }
+        },
+        "required": [
+          "DomainName"
+        ]
+      },
       "permissions": [
         "profile:ListProfileObjectTypes"
       ]

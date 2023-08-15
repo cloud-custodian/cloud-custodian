@@ -30,7 +30,7 @@
     "Arn": {
       "description": "Amazon Resource Name for the created Registry.",
       "type": "string",
-      "pattern": "arn:(aws|aws-us-gov|aws-cn):glue:.*"
+      "pattern": "arn:aws(-(cn|us-gov|iso(-[bef])?))?:glue:.*"
     },
     "Name": {
       "description": "Name of the registry to be created of max length of 255, and may only contain letters, numbers, hyphen, underscore, dollar sign, or hash mark.  No whitespace.",

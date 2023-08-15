@@ -1,0 +1,63 @@
+{
+  "typeName": "AWS::IAM::RolePolicy",
+  "description": "Schema for IAM Role Policy",
+  "additionalProperties": false,
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-iam.git",
+  "properties": {
+    "PolicyDocument": {
+      "description": "The policy document.",
+      "type": "object"
+    },
+    "PolicyName": {
+      "description": "The friendly name (not ARN) identifying the policy.",
+      "type": "string"
+    },
+    "RoleName": {
+      "description": "The name of the policy document.",
+      "type": "string"
+    }
+  },
+  "required": [
+    "PolicyName",
+    "RoleName"
+  ],
+  "primaryIdentifier": [
+    "/properties/PolicyName",
+    "/properties/RoleName"
+  ],
+  "createOnlyProperties": [
+    "/properties/PolicyName",
+    "/properties/RoleName"
+  ],
+  "tagging": {
+    "taggable": false,
+    "tagOnCreate": false,
+    "tagUpdatable": false,
+    "cloudFormationSystemTags": false
+  },
+  "handlers": {
+    "create": {
+      "permissions": [
+        "iam:PutRolePolicy",
+        "iam:GetRolePolicy"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "iam:GetRolePolicy"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "iam:PutRolePolicy",
+        "iam:GetRolePolicy"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "iam:DeleteRolePolicy",
+        "iam:GetRolePolicy"
+      ]
+    }
+  }
+}

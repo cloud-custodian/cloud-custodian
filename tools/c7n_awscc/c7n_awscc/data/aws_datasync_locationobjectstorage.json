@@ -33,7 +33,7 @@
     "AccessKey": {
       "description": "Optional. The access key is used if credentials are required to access the self-managed object storage server.",
       "type": "string",
-      "minLength": 8,
+      "minLength": 1,
       "maxLength": 200,
       "pattern": "^.+$"
     },
@@ -62,6 +62,11 @@
       "minLength": 8,
       "maxLength": 200,
       "pattern": "^.+$"
+    },
+    "ServerCertificate": {
+      "description": "X.509 PEM content containing a certificate authority or chain to trust.",
+      "type": "string",
+      "maxLength": 32768
     },
     "ServerHostname": {
       "description": "The name of the self-managed object storage server. This value is the IP address or Domain Name Service (DNS) name of the object storage server.",
@@ -112,12 +117,16 @@
       "maxLength": 4356
     }
   },
-  "taggable": true,
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": true,
+    "tagProperty": "/properties/Tags"
+  },
   "additionalProperties": false,
   "required": [
-    "AgentArns",
-    "BucketName",
-    "ServerHostname"
+    "AgentArns"
   ],
   "readOnlyProperties": [
     "/properties/LocationArn",
@@ -141,7 +150,8 @@
       "permissions": [
         "datasync:CreateLocationObjectStorage",
         "datasync:DescribeLocationObjectStorage",
-        "datasync:ListTagsForResource"
+        "datasync:ListTagsForResource",
+        "datasync:TagResource"
       ]
     },
     "read": {

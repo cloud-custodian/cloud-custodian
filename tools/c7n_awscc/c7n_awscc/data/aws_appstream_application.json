@@ -26,20 +26,40 @@
       "type": "string"
     },
     "Tag": {
-      "type": "object",
-      "properties": {
-        "TagKey": {
-          "type": "string"
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "Key": {
+              "type": "string"
+            },
+            "Value": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "Key",
+            "Value"
+          ],
+          "additionalProperties": false
         },
-        "TagValue": {
-          "type": "string"
+        {
+          "type": "object",
+          "properties": {
+            "TagKey": {
+              "type": "string"
+            },
+            "TagValue": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "TagKey",
+            "TagValue"
+          ],
+          "additionalProperties": false
         }
-      },
-      "required": [
-        "TagKey",
-        "TagValue"
-      ],
-      "additionalProperties": false
+      ]
     },
     "ApplicationAttribute": {
       "type": "string"
@@ -128,7 +148,12 @@
     "/properties/CreatedTime"
   ],
   "writeOnlyProperties": [
-    "/properties/Tags"
+    "/properties/Tags",
+    "/properties/AttributesToDelete"
+  ],
+  "deprecatedProperties": [
+    "/properties/Tags/TagKey",
+    "/properties/Tags/TagValue"
   ],
   "primaryIdentifier": [
     "/properties/Arn"
@@ -137,7 +162,8 @@
     "create": {
       "permissions": [
         "s3:GetObject",
-        "appstream:CreateApplication"
+        "appstream:CreateApplication",
+        "appstream:TagResource"
       ]
     },
     "read": {
@@ -147,7 +173,8 @@
     },
     "update": {
       "permissions": [
-        "appstream:UpdateApplication"
+        "appstream:UpdateApplication",
+        "s3:GetObject"
       ]
     },
     "delete": {

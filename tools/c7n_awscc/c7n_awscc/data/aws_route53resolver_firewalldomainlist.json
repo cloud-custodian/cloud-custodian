@@ -152,6 +152,12 @@
         "route53resolver:TagResource"
       ]
     },
+    "list": {
+      "permissions": [
+        "route53resolver:ListFirewallDomainLists",
+        "route53resolver:ListTagsForResource"
+      ]
+    },
     "read": {
       "permissions": [
         "route53resolver:GetFirewallDomainList",

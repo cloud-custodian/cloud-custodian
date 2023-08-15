@@ -32,6 +32,7 @@
   "handlers": {
     "create": {
       "permissions": [
+        "ecr:GetRegistryPolicy",
         "ecr:PutRegistryPolicy"
       ]
     },
@@ -47,6 +48,7 @@
     },
     "update": {
       "permissions": [
+        "ecr:GetRegistryPolicy",
         "ecr:PutRegistryPolicy"
       ]
     },

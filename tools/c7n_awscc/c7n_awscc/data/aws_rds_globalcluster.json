@@ -55,12 +55,14 @@
     }
   ],
   "additionalProperties": false,
+  "propertyTransform": {
+    "/properties/GlobalClusterIdentifier": "$lowercase(GlobalClusterIdentifier)"
+  },
   "createOnlyProperties": [
     "/properties/GlobalClusterIdentifier",
     "/properties/SourceDBClusterIdentifier",
     "/properties/StorageEncrypted",
-    "/properties/Engine",
-    "/properties/EngineVersion"
+    "/properties/Engine"
   ],
   "primaryIdentifier": [
     "/properties/GlobalClusterIdentifier"

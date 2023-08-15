@@ -51,6 +51,11 @@
         "macie2:GetMacieSession"
       ]
     },
+    "list": {
+      "permissions": [
+        "macie2:GetMacieSession"
+      ]
+    },
     "update": {
       "permissions": [
         "macie2:GetMacieSession",

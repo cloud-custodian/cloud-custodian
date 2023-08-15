@@ -1,0 +1,1050 @@
+{
+  "tagging": {
+    "taggable": false,
+    "tagOnCreate": false,
+    "tagUpdatable": false,
+    "cloudFormationSystemTags": false
+  },
+  "handlers": {
+    "read": {
+      "permissions": [
+        "ec2:DescribeLaunchTemplates"
+      ]
+    },
+    "create": {
+      "permissions": [
+        "ec2:CreateLaunchTemplate",
+        "ec2:CreateTags"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "ec2:CreateLaunchTemplateVersion"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "ec2:DescribeLaunchTemplates"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "ec2:DeleteLaunchTemplate",
+        "ec2:DeleteTags",
+        "ec2:DescribeLaunchTemplates"
+      ]
+    }
+  },
+  "typeName": "AWS::EC2::LaunchTemplate",
+  "readOnlyProperties": [
+    "/properties/DefaultVersionNumber",
+    "/properties/LaunchTemplateId",
+    "/properties/LatestVersionNumber"
+  ],
+  "description": "Resource Type definition for AWS::EC2::LaunchTemplate",
+  "writeOnlyProperties": [
+    "/properties/LaunchTemplateData",
+    "/properties/VersionDescription",
+    "/properties/TagSpecifications"
+  ],
+  "createOnlyProperties": [
+    "/properties/LaunchTemplateName"
+  ],
+  "additionalProperties": false,
+  "primaryIdentifier": [
+    "/properties/LaunchTemplateId"
+  ],
+  "definitions": {
+    "LaunchTemplateData": {
+      "description": "The information for the launch template.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "SecurityGroups": {
+          "uniqueItems": false,
+          "description": "One or more security group names.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "TagSpecifications": {
+          "uniqueItems": false,
+          "description": "The tags to apply to the resources that are created during instance launch.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/TagSpecification"
+          }
+        },
+        "UserData": {
+          "description": "The user data to make available to the instance.",
+          "type": "string"
+        },
+        "BlockDeviceMappings": {
+          "uniqueItems": false,
+          "description": "The block device mapping.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/BlockDeviceMapping"
+          }
+        },
+        "MaintenanceOptions": {
+          "$ref": "#/definitions/MaintenanceOptions"
+        },
+        "IamInstanceProfile": {
+          "$ref": "#/definitions/IamInstanceProfile"
+        },
+        "KernelId": {
+          "description": "The ID of the kernel.",
+          "type": "string"
+        },
+        "EbsOptimized": {
+          "description": "Indicates whether the instance is optimized for Amazon EBS I/O.",
+          "type": "boolean"
+        },
+        "ElasticGpuSpecifications": {
+          "uniqueItems": false,
+          "description": "An elastic GPU to associate with the instance.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ElasticGpuSpecification"
+          }
+        },
+        "ElasticInferenceAccelerators": {
+          "uniqueItems": false,
+          "description": "The elastic inference accelerator for the instance.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/LaunchTemplateElasticInferenceAccelerator"
+          }
+        },
+        "Placement": {
+          "$ref": "#/definitions/Placement"
+        },
+        "NetworkInterfaces": {
+          "uniqueItems": false,
+          "description": "If you specify a network interface, you must specify any security groups and subnets as part of the network interface.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/NetworkInterface"
+          }
+        },
+        "EnclaveOptions": {
+          "$ref": "#/definitions/EnclaveOptions"
+        },
+        "ImageId": {
+          "description": "The ID of the AMI. Alternatively, you can specify a Systems Manager parameter, which will resolve to an AMI ID on launch.",
+          "type": "string"
+        },
+        "InstanceType": {
+          "type": "string"
+        },
+        "Monitoring": {
+          "$ref": "#/definitions/Monitoring"
+        },
+        "HibernationOptions": {
+          "$ref": "#/definitions/HibernationOptions"
+        },
+        "MetadataOptions": {
+          "$ref": "#/definitions/MetadataOptions"
+        },
+        "LicenseSpecifications": {
+          "uniqueItems": false,
+          "description": "The license configurations.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/LicenseSpecification"
+          }
+        },
+        "InstanceInitiatedShutdownBehavior": {
+          "description": "Indicates whether an instance stops or terminates when you initiate shutdown from the instance (using the operating system command for system shutdown).",
+          "type": "string"
+        },
+        "DisableApiStop": {
+          "description": "Indicates whether to enable the instance for stop protection.",
+          "type": "boolean"
+        },
+        "CpuOptions": {
+          "$ref": "#/definitions/CpuOptions"
+        },
+        "PrivateDnsNameOptions": {
+          "$ref": "#/definitions/PrivateDnsNameOptions"
+        },
+        "SecurityGroupIds": {
+          "uniqueItems": false,
+          "description": "One or more security group IDs. ",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "KeyName": {
+          "description": "The name of the EC2 key pair",
+          "type": "string"
+        },
+        "DisableApiTermination": {
+          "description": "If you set this parameter to true, you can't terminate the instance using the Amazon EC2 console, CLI, or API.",
+          "type": "boolean"
+        },
+        "InstanceMarketOptions": {
+          "$ref": "#/definitions/InstanceMarketOptions"
+        },
+        "InstanceRequirements": {
+          "$ref": "#/definitions/InstanceRequirements"
+        },
+        "RamDiskId": {
+          "type": "string"
+        },
+        "CapacityReservationSpecification": {
+          "$ref": "#/definitions/CapacityReservationSpecification"
+        },
+        "CreditSpecification": {
+          "$ref": "#/definitions/CreditSpecification"
+        }
+      }
+    },
+    "Ipv6Add": {
+      "description": "Specifies an IPv6 address.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "Ipv6Address": {
+          "type": "string"
+        }
+      }
+    },
+    "LicenseSpecification": {
+      "description": "Specifies a license configuration for an instance.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "LicenseConfigurationArn": {
+          "description": "The Amazon Resource Name (ARN) of the license configuration.",
+          "type": "string"
+        }
+      }
+    },
+    "MaintenanceOptions": {
+      "description": "The maintenance options of your instance.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "AutoRecovery": {
+          "description": "Disables the automatic recovery behavior of your instance or sets it to default.",
+          "type": "string"
+        }
+      }
+    },
+    "ElasticGpuSpecification": {
+      "description": "Specifies a specification for an Elastic GPU for launch template.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "Type": {
+          "description": "The type of Elastic Graphics accelerator.",
+          "type": "string"
+        }
+      }
+    },
+    "IamInstanceProfile": {
+      "description": "Specifies an IAM instance profile, which is a container for an IAM role for your instance.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "Arn": {
+          "description": "The Amazon Resource Name (ARN) of the instance profile.",
+          "type": "string"
+        },
+        "Name": {
+          "description": "The name of the instance profile.",
+          "type": "string"
+        }
+      }
+    },
+    "MemoryGiBPerVCpu": {
+      "description": "The minimum and maximum amount of memory per vCPU, in GiB.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "Min": {
+          "description": "TThe minimum amount of memory per vCPU, in GiB.",
+          "type": "number"
+        },
+        "Max": {
+          "description": "The maximum amount of memory per vCPU, in GiB.",
+          "type": "number"
+        }
+      }
+    },
+    "VCpuCount": {
+      "description": "The minimum and maximum number of vCPUs.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "Min": {
+          "description": "The minimum number of vCPUs.",
+          "type": "integer"
+        },
+        "Max": {
+          "description": "The maximum number of vCPUs.",
+          "type": "integer"
+        }
+      }
+    },
+    "Ipv4PrefixSpecification": {
+      "description": "Specifies an IPv4 prefix for a network interface.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "Ipv4Prefix": {
+          "description": "The IPv4 prefix.",
+          "type": "string"
+        }
+      }
+    },
+    "Placement": {
+      "description": "Specifies the placement of an instance.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "GroupName": {
+          "description": "The name of the placement group for the instance.",
+          "type": "string"
+        },
+        "Tenancy": {
+          "description": "The tenancy of the instance (if the instance is running in a VPC). An instance with a tenancy of dedicated runs on single-tenant hardware.",
+          "type": "string"
+        },
+        "SpreadDomain": {
+          "description": "Reserved for future use.",
+          "type": "string"
+        },
+        "PartitionNumber": {
+          "description": "The number of the partition the instance should launch in. Valid only if the placement group strategy is set to partition.",
+          "type": "integer"
+        },
+        "AvailabilityZone": {
+          "description": "The Availability Zone for the instance.",
+          "type": "string"
+        },
+        "Affinity": {
+          "description": "The affinity setting for an instance on a Dedicated Host.",
+          "type": "string"
+        },
+        "HostId": {
+          "description": "The ID of the Dedicated Host for the instance.",
+          "type": "string"
+        },
+        "HostResourceGroupArn": {
+          "description": "The ARN of the host resource group in which to launch the instances. If you specify a host resource group ARN, omit the Tenancy parameter or set it to host.",
+          "type": "string"
+        },
+        "GroupId": {
+          "description": "The Group Id of a placement group. You must specify the Placement Group Group Id to launch an instance in a shared placement group.",
+          "type": "string"
+        }
+      }
+    },
+    "EnclaveOptions": {
+      "description": "Indicates whether the instance is enabled for AWS Nitro Enclaves.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "Enabled": {
+          "description": "If this parameter is set to true, the instance is enabled for AWS Nitro Enclaves; otherwise, it is not enabled for AWS Nitro Enclaves.",
+          "type": "boolean"
+        }
+      }
+    },
+    "Ebs": {
+      "description": "Parameters for a block device for an EBS volume in an Amazon EC2 launch template.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "SnapshotId": {
+          "description": "The ID of the snapshot.",
+          "type": "string"
+        },
+        "VolumeType": {
+          "description": "The volume type.",
+          "type": "string"
+        },
+        "KmsKeyId": {
+          "description": "The ARN of the symmetric AWS Key Management Service (AWS KMS) CMK used for encryption.",
+          "type": "string"
+        },
+        "Encrypted": {
+          "description": "Indicates whether the EBS volume is encrypted. Encrypted volumes can only be attached to instances that support Amazon EBS encryption. If you are creating a volume from a snapshot, you can't specify an encryption value.",
+          "type": "boolean"
+        },
+        "Throughput": {
+          "description": "The throughput to provision for a gp3 volume, with a maximum of 1,000 MiB/s.",
+          "type": "integer"
+        },
+        "Iops": {
+          "description": "The number of I/O operations per second (IOPS).",
+          "type": "integer"
+        },
+        "VolumeSize": {
+          "description": "The size of the volume, in GiBs. You must specify either a snapshot ID or a volume size.",
+          "type": "integer"
+        },
+        "DeleteOnTermination": {
+          "description": "Indicates whether the EBS volume is deleted on instance termination.",
+          "type": "boolean"
+        }
+      }
+    },
+    "BlockDeviceMapping": {
+      "description": "Information about a block device mapping for an Amazon EC2 launch template.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "Ebs": {
+          "$ref": "#/definitions/Ebs"
+        },
+        "NoDevice": {
+          "description": "To omit the device from the block device mapping, specify an empty string.",
+          "type": "string"
+        },
+        "VirtualName": {
+          "description": "The virtual device name (ephemeralN).",
+          "type": "string"
+        },
+        "DeviceName": {
+          "description": "The user data to make available to the instance.",
+          "type": "string"
+        }
+      }
+    },
+    "Monitoring": {
+      "description": "Specifies whether detailed monitoring is enabled for an instance.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "Enabled": {
+          "description": "Specify true to enable detailed monitoring.",
+          "type": "boolean"
+        }
+      }
+    },
+    "MemoryMiB": {
+      "description": "The minimum and maximum amount of memory, in MiB.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "Min": {
+          "description": "The minimum amount of memory, in MiB.",
+          "type": "integer"
+        },
+        "Max": {
+          "description": "The maximum amount of memory, in MiB.",
+          "type": "integer"
+        }
+      }
+    },
+    "HibernationOptions": {
+      "description": "Specifies whether your instance is configured for hibernation.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "Configured": {
+          "description": "TIf you set this parameter to true, the instance is enabled for hibernation.",
+          "type": "boolean"
+        }
+      }
+    },
+    "MetadataOptions": {
+      "description": "The metadata options for the instance.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "HttpPutResponseHopLimit": {
+          "description": "The desired HTTP PUT response hop limit for instance metadata requests. The larger the number, the further instance metadata requests can travel.",
+          "type": "integer"
+        },
+        "HttpTokens": {
+          "description": "IMDSv2 uses token-backed sessions.",
+          "type": "string"
+        },
+        "HttpProtocolIpv6": {
+          "description": "Enables or disables the IPv6 endpoint for the instance metadata service.",
+          "type": "string"
+        },
+        "InstanceMetadataTags": {
+          "description": "Set to enabled to allow access to instance tags from the instance metadata.",
+          "type": "string"
+        },
+        "HttpEndpoint": {
+          "description": "Enables or disables the HTTP metadata endpoint on your instances. If the parameter is not specified, the default state is enabled.",
+          "type": "string"
+        }
+      }
+    },
+    "NetworkInterfaceCount": {
+      "description": "TThe minimum and maximum number of network interfaces.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "Min": {
+          "type": "integer"
+        },
+        "Max": {
+          "type": "integer"
+        }
+      }
+    },
+    "CpuOptions": {
+      "description": "specifies the CPU options for an instance.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "ThreadsPerCore": {
+          "description": "The number of threads per CPU core. To disable multithreading for the instance, specify a value of 1. Otherwise, specify the default value of 2.",
+          "type": "integer"
+        },
+        "AmdSevSnp": {
+          "description": "Indicates whether to enable the instance for AMD SEV-SNP. AMD SEV-SNP is supported with M6a, R6a, and C6a instance types only.",
+          "type": "string",
+          "enum": [
+            "enabled",
+            "disabled"
+          ]
+        },
+        "CoreCount": {
+          "description": "The number of CPU cores for the instance.",
+          "type": "integer"
+        }
+      }
+    },
+    "SpotOptions": {
+      "description": "Specifies options for Spot Instances.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "SpotInstanceType": {
+          "description": "The Spot Instance request type.",
+          "type": "string"
+        },
+        "InstanceInterruptionBehavior": {
+          "description": "The behavior when a Spot Instance is interrupted. The default is terminate.",
+          "type": "string"
+        },
+        "MaxPrice": {
+          "description": "The maximum hourly price you're willing to pay for the Spot Instances.",
+          "type": "string"
+        },
+        "BlockDurationMinutes": {
+          "description": "Deprecated",
+          "type": "integer"
+        },
+        "ValidUntil": {
+          "description": "The end date of the request, in UTC format (YYYY-MM-DDTHH:MM:SSZ). Supported only for persistent requests.",
+          "type": "string"
+        }
+      }
+    },
+    "NetworkInterface": {
+      "description": "Specifies the parameters for a network interface.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "Description": {
+          "description": "A description for the network interface.",
+          "type": "string"
+        },
+        "PrivateIpAddress": {
+          "description": "The primary private IPv4 address of the network interface.",
+          "type": "string"
+        },
+        "PrivateIpAddresses": {
+          "uniqueItems": false,
+          "description": "One or more private IPv4 addresses.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/PrivateIpAdd"
+          }
+        },
+        "SecondaryPrivateIpAddressCount": {
+          "description": "The number of secondary private IPv4 addresses to assign to a network interface.",
+          "type": "integer"
+        },
+        "Ipv6PrefixCount": {
+          "description": "The number of IPv6 prefixes to be automatically assigned to the network interface.",
+          "type": "integer"
+        },
+        "Ipv4Prefixes": {
+          "uniqueItems": false,
+          "description": "One or more IPv4 prefixes to be assigned to the network interface.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Ipv4PrefixSpecification"
+          }
+        },
+        "DeviceIndex": {
+          "description": "The device index for the network interface attachment.",
+          "type": "integer"
+        },
+        "Ipv4PrefixCount": {
+          "description": "The number of IPv4 prefixes to be automatically assigned to the network interface.",
+          "type": "integer"
+        },
+        "Ipv6Prefixes": {
+          "uniqueItems": false,
+          "description": "One or more IPv6 prefixes to be assigned to the network interface.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Ipv6PrefixSpecification"
+          }
+        },
+        "SubnetId": {
+          "description": "The ID of the subnet for the network interface.",
+          "type": "string"
+        },
+        "Ipv6Addresses": {
+          "uniqueItems": false,
+          "description": "One or more specific IPv6 addresses from the IPv6 CIDR block range of your subnet.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Ipv6Add"
+          }
+        },
+        "AssociatePublicIpAddress": {
+          "description": "Associates a public IPv4 address with eth0 for a new network interface.",
+          "type": "boolean"
+        },
+        "NetworkInterfaceId": {
+          "description": "The ID of the network interface.",
+          "type": "string"
+        },
+        "NetworkCardIndex": {
+          "description": "The index of the network card.",
+          "type": "integer"
+        },
+        "InterfaceType": {
+          "description": "The type of network interface.",
+          "type": "string"
+        },
+        "AssociateCarrierIpAddress": {
+          "description": "Indicates whether to associate a Carrier IP address with eth0 for a new network interface.",
+          "type": "boolean"
+        },
+        "Ipv6AddressCount": {
+          "description": "The number of IPv6 addresses to assign to a network interface.",
+          "type": "integer"
+        },
+        "Groups": {
+          "uniqueItems": false,
+          "description": "The IDs of one or more security groups.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "DeleteOnTermination": {
+          "description": "Indicates whether the network interface is deleted when the instance is terminated.",
+          "type": "boolean"
+        }
+      }
+    },
+    "PrivateDnsNameOptions": {
+      "description": "Describes the options for instance hostnames.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "EnableResourceNameDnsARecord": {
+          "description": "Indicates whether to respond to DNS queries for instance hostnames with DNS A records.",
+          "type": "boolean"
+        },
+        "HostnameType": {
+          "description": "The type of hostname for EC2 instances.",
+          "type": "string"
+        },
+        "EnableResourceNameDnsAAAARecord": {
+          "description": "Indicates whether to respond to DNS queries for instance hostnames with DNS AAAA records.",
+          "type": "boolean"
+        }
+      }
+    },
+    "PrivateIpAdd": {
+      "description": "Specifies a secondary private IPv4 address for a network interface.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "PrivateIpAddress": {
+          "description": "The private IPv4 address.",
+          "type": "string"
+        },
+        "Primary": {
+          "description": "Indicates whether the private IPv4 address is the primary private IPv4 address. Only one IPv4 address can be designated as primary.",
+          "type": "boolean"
+        }
+      }
+    },
+    "Ipv6PrefixSpecification": {
+      "description": "Specifies an IPv6 prefix for a network interface.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "Ipv6Prefix": {
+          "type": "string"
+        }
+      }
+    },
+    "LaunchTemplateTagSpecification": {
+      "description": "Specifies the tags to apply to the launch template during creation.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "ResourceType": {
+          "description": "The type of resource to tag.",
+          "type": "string"
+        },
+        "Tags": {
+          "uniqueItems": false,
+          "description": "The tags for the resource.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Tag"
+          }
+        }
+      }
+    },
+    "TagSpecification": {
+      "description": "Specifies the tags to apply to a resource when the resource is created for the launch template.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "ResourceType": {
+          "description": "The type of resource to tag.",
+          "type": "string"
+        },
+        "Tags": {
+          "uniqueItems": false,
+          "description": "The tags for the resource.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Tag"
+          }
+        }
+      }
+    },
+    "NetworkBandwidthGbps": {
+      "description": "The minimum and maximum amount of network bandwidth, in gigabits per second (Gbps).",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "Min": {
+          "description": "The minimum amount of network bandwidth, in Gbps.",
+          "type": "number"
+        },
+        "Max": {
+          "description": "The maximum amount of network bandwidth, in Gbps.",
+          "type": "number"
+        }
+      }
+    },
+    "AcceleratorCount": {
+      "description": "The minimum and maximum number of accelerators (GPUs, FPGAs, or AWS Inferential chips) on an instance.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "Min": {
+          "description": "The minimum number of accelerators.",
+          "type": "integer"
+        },
+        "Max": {
+          "description": "The maximum number of accelerators.",
+          "type": "integer"
+        }
+      }
+    },
+    "InstanceMarketOptions": {
+      "description": "The market (purchasing) option for the instances.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "SpotOptions": {
+          "$ref": "#/definitions/SpotOptions"
+        },
+        "MarketType": {
+          "description": "The market type.",
+          "type": "string"
+        }
+      }
+    },
+    "LaunchTemplateElasticInferenceAccelerator": {
+      "description": "Specifies an elastic inference accelerator.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "Type": {
+          "description": "The type of elastic inference accelerator.",
+          "type": "string"
+        },
+        "Count": {
+          "description": "The number of elastic inference accelerators to attach to the instance.",
+          "type": "integer"
+        }
+      }
+    },
+    "BaselineEbsBandwidthMbps": {
+      "description": "The minimum and maximum baseline bandwidth to Amazon EBS, in Mbps.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "Min": {
+          "description": "The minimum baseline bandwidth, in Mbps.",
+          "type": "integer"
+        },
+        "Max": {
+          "description": "The maximum baseline bandwidth, in Mbps.",
+          "type": "integer"
+        }
+      }
+    },
+    "InstanceRequirements": {
+      "description": "The attributes for the instance types.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "LocalStorageTypes": {
+          "uniqueItems": false,
+          "description": "The type of local storage that is required.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "InstanceGenerations": {
+          "uniqueItems": false,
+          "description": "Indicates whether current or previous generation instance types are included.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "NetworkInterfaceCount": {
+          "$ref": "#/definitions/NetworkInterfaceCount"
+        },
+        "MemoryGiBPerVCpu": {
+          "$ref": "#/definitions/MemoryGiBPerVCpu"
+        },
+        "AcceleratorTypes": {
+          "uniqueItems": false,
+          "description": "The accelerator types that must be on the instance type.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "VCpuCount": {
+          "$ref": "#/definitions/VCpuCount"
+        },
+        "ExcludedInstanceTypes": {
+          "uniqueItems": false,
+          "description": "The instance types to exclude.",
+          "type": "array",
+          "items": {
+            "description": "The user data to make available to the instance.",
+            "type": "string"
+          }
+        },
+        "AcceleratorManufacturers": {
+          "uniqueItems": false,
+          "description": "Indicates whether instance types must have accelerators by specific manufacturers.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "AllowedInstanceTypes": {
+          "uniqueItems": false,
+          "description": "The instance types to apply your specified attributes against.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "LocalStorage": {
+          "description": "The user data to make available to the instance.",
+          "type": "string"
+        },
+        "CpuManufacturers": {
+          "uniqueItems": false,
+          "description": "The CPU manufacturers to include.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "AcceleratorCount": {
+          "$ref": "#/definitions/AcceleratorCount"
+        },
+        "NetworkBandwidthGbps": {
+          "$ref": "#/definitions/NetworkBandwidthGbps"
+        },
+        "BareMetal": {
+          "description": "Indicates whether bare metal instance types must be included, excluded, or required.",
+          "type": "string"
+        },
+        "RequireHibernateSupport": {
+          "description": "Indicates whether instance types must support hibernation for On-Demand Instances.",
+          "type": "boolean"
+        },
+        "SpotMaxPricePercentageOverLowestPrice": {
+          "description": "The price protection threshold for Spot Instances.",
+          "type": "integer"
+        },
+        "BaselineEbsBandwidthMbps": {
+          "$ref": "#/definitions/BaselineEbsBandwidthMbps"
+        },
+        "OnDemandMaxPricePercentageOverLowestPrice": {
+          "description": "The price protection threshold for On-Demand Instances.",
+          "type": "integer"
+        },
+        "AcceleratorNames": {
+          "uniqueItems": false,
+          "description": "The accelerators that must be on the instance type.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "AcceleratorTotalMemoryMiB": {
+          "$ref": "#/definitions/AcceleratorTotalMemoryMiB"
+        },
+        "BurstablePerformance": {
+          "type": "string"
+        },
+        "MemoryMiB": {
+          "$ref": "#/definitions/MemoryMiB"
+        },
+        "TotalLocalStorageGB": {
+          "$ref": "#/definitions/TotalLocalStorageGB"
+        }
+      }
+    },
+    "Tag": {
+      "description": "The user data to make available to the instance.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "Value": {
+          "type": "string"
+        },
+        "Key": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "Value",
+        "Key"
+      ]
+    },
+    "AcceleratorTotalMemoryMiB": {
+      "description": "The minimum and maximum amount of total accelerator memory, in MiB.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "Min": {
+          "description": "The minimum amount of accelerator memory, in MiB.",
+          "type": "integer"
+        },
+        "Max": {
+          "description": "The maximum amount of accelerator memory, in MiB.",
+          "type": "integer"
+        }
+      }
+    },
+    "CapacityReservationTarget": {
+      "description": "Specifies a target Capacity Reservation.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "CapacityReservationResourceGroupArn": {
+          "description": "The ARN of the Capacity Reservation resource group in which to run the instance.",
+          "type": "string"
+        },
+        "CapacityReservationId": {
+          "description": "The ID of the Capacity Reservation in which to run the instance.",
+          "type": "string"
+        }
+      }
+    },
+    "CapacityReservationSpecification": {
+      "description": "Specifies an instance's Capacity Reservation targeting option.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "CapacityReservationPreference": {
+          "description": "Indicates the instance's Capacity Reservation preferences.",
+          "type": "string"
+        },
+        "CapacityReservationTarget": {
+          "$ref": "#/definitions/CapacityReservationTarget"
+        }
+      }
+    },
+    "CreditSpecification": {
+      "description": "The user data to make available to the instance.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "CpuCredits": {
+          "description": "The user data to make available to the instance.",
+          "type": "string"
+        }
+      }
+    },
+    "TotalLocalStorageGB": {
+      "description": "The minimum and maximum amount of total local storage, in GB.",
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "Min": {
+          "type": "number"
+        },
+        "Max": {
+          "type": "number"
+        }
+      }
+    }
+  },
+  "required": [
+    "LaunchTemplateData"
+  ],
+  "properties": {
+    "LaunchTemplateName": {
+      "description": "A name for the launch template.",
+      "type": "string"
+    },
+    "LaunchTemplateData": {
+      "$ref": "#/definitions/LaunchTemplateData"
+    },
+    "VersionDescription": {
+      "description": "A description for the first version of the launch template.",
+      "type": "string"
+    },
+    "TagSpecifications": {
+      "uniqueItems": false,
+      "description": "The tags to apply to the launch template on creation.",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/LaunchTemplateTagSpecification"
+      }
+    },
+    "LatestVersionNumber": {
+      "description": "The latest version of the launch template",
+      "type": "string"
+    },
+    "LaunchTemplateId": {
+      "description": "LaunchTemplate ID generated by service",
+      "type": "string"
+    },
+    "DefaultVersionNumber": {
+      "description": "The default version of the launch template",
+      "type": "string"
+    }
+  }
+}

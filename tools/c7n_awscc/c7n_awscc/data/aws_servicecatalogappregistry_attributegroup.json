@@ -7,7 +7,7 @@
     "Tags": {
       "type": "object",
       "patternProperties": {
-        "^(?!aws:)[a-zA-Z+-=._:/]+$": {
+        "^[a-zA-Z+-=._:/]+$": {
           "type": "string",
           "maxLength": 256
         }
@@ -61,7 +61,12 @@
       "/properties/Name"
     ]
   ],
-  "taggable": true,
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": false
+  },
   "handlers": {
     "create": {
       "permissions": [
@@ -76,6 +81,7 @@
     },
     "update": {
       "permissions": [
+        "servicecatalog:GetAttributeGroup",
         "servicecatalog:UpdateAttributeGroup",
         "servicecatalog:ListTagsForResource",
         "servicecatalog:TagResource",

@@ -1,5 +1,6 @@
 {
   "typeName": "AWS::IAM::Role",
+  "$schema": "https://raw.githubusercontent.com/aws-cloudformation/cloudformation-resource-schema/master/src/main/resources/schema/provider.definition.schema.v1.json",
   "description": "Resource Type definition for AWS::IAM::Role",
   "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-iam.git",
   "definitions": {
@@ -17,9 +18,7 @@
         },
         "PolicyName": {
           "description": "The friendly name (not ARN) identifying the policy.",
-          "type": "string",
-          "minLength": 1,
-          "maxLength": 128
+          "type": "string"
         }
       },
       "required": [
@@ -33,15 +32,11 @@
       "properties": {
         "Key": {
           "type": "string",
-          "description": "The key name of the tag. You can specify a value that is 1 to 128 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.",
-          "minLength": 1,
-          "maxLength": 128
+          "description": "The key name of the tag. You can specify a value that is 1 to 128 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -."
         },
         "Value": {
           "type": "string",
-          "description": "The value for the tag. You can specify a value that is 0 to 256 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.",
-          "minLength": 0,
-          "maxLength": 256
+          "description": "The value for the tag. You can specify a value that is 0 to 256 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -."
         }
       },
       "required": [
@@ -65,8 +60,7 @@
     },
     "Description": {
       "description": "A description of the role that you provide.",
-      "type": "string",
-      "maxLength": 1000
+      "type": "string"
     },
     "ManagedPolicyArns": {
       "description": "A list of Amazon Resource Names (ARNs) of the IAM managed policies that you want to attach to the role. ",
@@ -79,9 +73,7 @@
     },
     "MaxSessionDuration": {
       "description": "The maximum session duration (in seconds) that you want to set for the specified role. If you do not specify a value for this setting, the default maximum of one hour is applied. This setting can have a value from 1 hour to 12 hours. ",
-      "type": "integer",
-      "minimum": 3600,
-      "maximum": 43200
+      "type": "integer"
     },
     "Path": {
       "description": "The path to the role.",
@@ -106,8 +98,7 @@
     },
     "RoleName": {
       "description": "A name for the IAM role, up to 64 characters in length.",
-      "type": "string",
-      "maxLength": 64
+      "type": "string"
     },
     "Tags": {
       "description": "A list of tags that are attached to the role.",
@@ -134,17 +125,22 @@
   "primaryIdentifier": [
     "/properties/RoleName"
   ],
-  "taggable": true,
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": false,
+    "tagProperty": "/properties/Tags"
+  },
   "handlers": {
     "create": {
       "permissions": [
         "iam:CreateRole",
         "iam:PutRolePolicy",
         "iam:AttachRolePolicy",
-        "iam:GetRole",
-        "iam:ListAttachedRolePolicies",
-        "iam:ListRolePolicies",
-        "iam:GetRolePolicy"
+        "iam:GetRolePolicy",
+        "iam:TagRole",
+        "iam:UntagRole"
       ]
     },
     "read": {
@@ -167,11 +163,7 @@
         "iam:DeleteRolePolicy",
         "iam:PutRolePolicy",
         "iam:TagRole",
-        "iam:UntagRole",
-        "iam:GetRole",
-        "iam:ListAttachedRolePolicies",
-        "iam:ListRolePolicies",
-        "iam:GetRolePolicy"
+        "iam:UntagRole"
       ]
     },
     "delete": {
@@ -179,7 +171,11 @@
         "iam:DeleteRole",
         "iam:DetachRolePolicy",
         "iam:DeleteRolePolicy",
-        "iam:GetRole"
+        "iam:GetRole",
+        "iam:ListAttachedRolePolicies",
+        "iam:ListRolePolicies",
+        "iam:TagRole",
+        "iam:UntagRole"
       ]
     },
     "list": {

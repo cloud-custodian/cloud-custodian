@@ -1,0 +1,199 @@
+{
+  "typeName": "AWS::VerifiedPermissions::Policy",
+  "description": "Definition of AWS::VerifiedPermissions::Policy Resource Type",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-avp",
+  "definitions": {
+    "EntityIdentifier": {
+      "type": "object",
+      "properties": {
+        "EntityType": {
+          "type": "string",
+          "maxLength": 200,
+          "minLength": 1,
+          "pattern": "^.*$"
+        },
+        "EntityId": {
+          "type": "string",
+          "maxLength": 200,
+          "minLength": 1,
+          "pattern": "^.*$"
+        }
+      },
+      "required": [
+        "EntityId",
+        "EntityType"
+      ],
+      "additionalProperties": false
+    },
+    "PolicyDefinition": {
+      "oneOf": [
+        {
+          "type": "object",
+          "title": "Static",
+          "properties": {
+            "Static": {
+              "$ref": "#/definitions/StaticPolicyDefinition"
+            }
+          },
+          "required": [
+            "Static"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "title": "TemplateLinked",
+          "properties": {
+            "TemplateLinked": {
+              "$ref": "#/definitions/TemplateLinkedPolicyDefinition"
+            }
+          },
+          "required": [
+            "TemplateLinked"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "PolicyType": {
+      "type": "string",
+      "enum": [
+        "STATIC",
+        "TEMPLATE_LINKED"
+      ]
+    },
+    "StaticPolicyDefinition": {
+      "type": "object",
+      "properties": {
+        "Description": {
+          "type": "string",
+          "maxLength": 150,
+          "minLength": 0
+        },
+        "Statement": {
+          "type": "string",
+          "maxLength": 10000,
+          "minLength": 1
+        }
+      },
+      "required": [
+        "Statement"
+      ],
+      "additionalProperties": false
+    },
+    "TemplateLinkedPolicyDefinition": {
+      "type": "object",
+      "properties": {
+        "PolicyTemplateId": {
+          "type": "string",
+          "maxLength": 200,
+          "minLength": 1,
+          "pattern": "^[a-zA-Z0-9-]*$"
+        },
+        "Principal": {
+          "$ref": "#/definitions/EntityIdentifier"
+        },
+        "Resource": {
+          "$ref": "#/definitions/EntityIdentifier"
+        }
+      },
+      "required": [
+        "PolicyTemplateId"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "properties": {
+    "Definition": {
+      "$ref": "#/definitions/PolicyDefinition"
+    },
+    "PolicyId": {
+      "type": "string",
+      "maxLength": 200,
+      "minLength": 1,
+      "pattern": "^[a-zA-Z0-9-]*$"
+    },
+    "PolicyStoreId": {
+      "type": "string",
+      "maxLength": 200,
+      "minLength": 1,
+      "pattern": "^[a-zA-Z0-9-]*$"
+    },
+    "PolicyType": {
+      "$ref": "#/definitions/PolicyType"
+    }
+  },
+  "required": [
+    "Definition"
+  ],
+  "readOnlyProperties": [
+    "/properties/PolicyId",
+    "/properties/PolicyType"
+  ],
+  "createOnlyProperties": [
+    "/properties/PolicyStoreId"
+  ],
+  "primaryIdentifier": [
+    "/properties/PolicyId",
+    "/properties/PolicyStoreId"
+  ],
+  "tagging": {
+    "taggable": false,
+    "tagOnCreate": false,
+    "tagUpdatable": false,
+    "cloudFormationSystemTags": false
+  },
+  "handlers": {
+    "create": {
+      "permissions": [
+        "verifiedpermissions:CreatePolicy",
+        "verifiedpermissions:GetPolicy",
+        "verifiedpermissions:UpdatePolicy",
+        "verifiedpermissions:DeletePolicy"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "verifiedpermissions:CreatePolicy",
+        "verifiedpermissions:GetPolicy",
+        "verifiedpermissions:UpdatePolicy",
+        "verifiedpermissions:DeletePolicy"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "verifiedpermissions:CreatePolicy",
+        "verifiedpermissions:GetPolicy",
+        "verifiedpermissions:UpdatePolicy",
+        "verifiedpermissions:DeletePolicy"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "verifiedpermissions:CreatePolicy",
+        "verifiedpermissions:GetPolicy",
+        "verifiedpermissions:UpdatePolicy",
+        "verifiedpermissions:DeletePolicy"
+      ]
+    },
+    "list": {
+      "handlerSchema": {
+        "properties": {
+          "PolicyStoreId": {
+            "$ref": "resource-schema.json#/properties/PolicyStoreId"
+          }
+        },
+        "required": [
+          "PolicyStoreId"
+        ]
+      },
+      "permissions": [
+        "verifiedpermissions:CreatePolicy",
+        "verifiedpermissions:GetPolicy",
+        "verifiedpermissions:UpdatePolicy",
+        "verifiedpermissions:DeletePolicy"
+      ]
+    }
+  },
+  "additionalProperties": false
+}

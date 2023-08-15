@@ -50,7 +50,8 @@
     "create": {
       "permissions": [
         "ec2:CreateInternetGateway",
-        "ec2:CreateTags"
+        "ec2:CreateTags",
+        "ec2:DescribeInternetGateways"
       ]
     },
     "read": {
@@ -60,13 +61,15 @@
     },
     "delete": {
       "permissions": [
-        "ec2:DeleteInternetGateway"
+        "ec2:DeleteInternetGateway",
+        "ec2:DescribeInternetGateways"
       ]
     },
     "update": {
       "permissions": [
         "ec2:DeleteTags",
-        "ec2:CreateTags"
+        "ec2:CreateTags",
+        "ec2:DescribeInternetGateways"
       ]
     },
     "list": {

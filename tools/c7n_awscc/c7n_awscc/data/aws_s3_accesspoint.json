@@ -62,6 +62,12 @@
       "minLength": 3,
       "maxLength": 255
     },
+    "BucketAccountId": {
+      "description": "The AWS account ID associated with the S3 bucket associated with this access point.",
+      "type": "string",
+      "pattern": "^\\d{12}$",
+      "maxLength": 64
+    },
     "VpcConfiguration": {
       "description": "If you include this field, Amazon S3 restricts access to this Access Point to requests from the specified Virtual Private Cloud (VPC).",
       "$ref": "#/definitions/VpcConfiguration"
@@ -73,19 +79,6 @@
     "Policy": {
       "description": "The Access Point Policy you want to apply to this access point.",
       "type": "object"
-    },
-    "PolicyStatus": {
-      "type": "object",
-      "properties": {
-        "IsPublic": {
-          "type": "string",
-          "description": "Specifies whether the policy is public or not.",
-          "enum": [
-            "true",
-            "false"
-          ]
-        }
-      }
     },
     "NetworkOrigin": {
       "description": "Indicates whether this Access Point allows access from the public Internet. If VpcConfiguration is specified for this Access Point, then NetworkOrigin is VPC, and the Access Point doesn't allow access from the public Internet. Otherwise, NetworkOrigin is Internet, and the Access Point allows access from the public Internet, subject to the Access Point and bucket access policies.",
@@ -109,11 +102,10 @@
   "createOnlyProperties": [
     "/properties/Name",
     "/properties/Bucket",
-    "/properties/VpcConfiguration",
-    "/properties/PublicAccessBlockConfiguration"
+    "/properties/BucketAccountId",
+    "/properties/VpcConfiguration"
   ],
   "readOnlyProperties": [
-    "/properties/Name",
     "/properties/Alias",
     "/properties/NetworkOrigin",
     "/properties/Arn"
@@ -132,8 +124,7 @@
     "read": {
       "permissions": [
         "s3:GetAccessPoint",
-        "s3:GetAccessPointPolicy",
-        "s3:GetAccessPointPolicyStatus"
+        "s3:GetAccessPointPolicy"
       ]
     },
     "update": {

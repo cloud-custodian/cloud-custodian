@@ -96,7 +96,18 @@
           "type": "integer",
           "minimum": 1
         }
-      }
+      },
+      "required": [
+        "FixedRate",
+        "Host",
+        "HTTPMethod",
+        "Priority",
+        "ReservoirSize",
+        "ResourceARN",
+        "ServiceName",
+        "ServiceType",
+        "URLPath"
+      ]
     },
     "SamplingRuleRecord": {
       "type": "object",
@@ -195,23 +206,30 @@
       "description": "The ARN of the sampling rule. Specify a rule by either name or ARN, but not both.",
       "type": "string"
     },
+    "Tag": {
+      "type": "object",
+      "properties": {
+        "Key": {
+          "type": "string",
+          "description": "The key name of the tag."
+        },
+        "Value": {
+          "type": "string",
+          "description": "The value for the tag."
+        }
+      },
+      "required": [
+        "Key",
+        "Value"
+      ],
+      "additionalProperties": false
+    },
     "Tags": {
       "type": "array",
+      "insertionOrder": false,
+      "description": "An array of key-value pairs to apply to this resource.",
       "items": {
-        "type": "object",
-        "required": [
-          "Key",
-          "Value"
-        ],
-        "properties": {
-          "Key": {
-            "type": "string"
-          },
-          "Value": {
-            "type": "string"
-          }
-        },
-        "additionalProperties": false
+        "$ref": "#/definitions/Tag"
       }
     }
   },
@@ -224,17 +242,27 @@
     },
     "read": {
       "permissions": [
-        "xray:GetSamplingRules"
+        "xray:GetSamplingRules",
+        "xray:ListTagsForResource"
       ]
     },
     "update": {
       "permissions": [
-        "xray:UpdateSamplingRule"
+        "xray:UpdateSamplingRule",
+        "xray:TagResource",
+        "xray:UntagResource",
+        "xray:ListTagsForResource"
       ]
     },
     "delete": {
       "permissions": [
         "xray:DeleteSamplingRule"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "xray:GetSamplingRules",
+        "xray:ListTagsForResource"
       ]
     }
   },
@@ -242,7 +270,15 @@
   "primaryIdentifier": [
     "/properties/RuleARN"
   ],
+  "createOnlyProperties": [
+    "/properties/SamplingRule/Version"
+  ],
   "readOnlyProperties": [
     "/properties/RuleARN"
+  ],
+  "deprecatedProperties": [
+    "/properties/RuleName",
+    "/properties/SamplingRuleRecord",
+    "/properties/SamplingRuleUpdate"
   ]
 }

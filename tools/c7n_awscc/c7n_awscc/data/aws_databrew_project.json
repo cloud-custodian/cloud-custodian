@@ -110,7 +110,7 @@
     },
     "read": {
       "permissions": [
-        "databrew:ReadProject",
+        "databrew:DescribeProject",
         "databrew:ListTagsForResource",
         "iam:ListRoles"
       ]

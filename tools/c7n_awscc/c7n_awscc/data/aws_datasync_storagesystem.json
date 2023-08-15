@@ -1,0 +1,214 @@
+{
+  "typeName": "AWS::DataSync::StorageSystem",
+  "description": "Resource schema for AWS::DataSync::StorageSystem.",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-datasync.git",
+  "definitions": {
+    "ServerConfiguration": {
+      "additionalProperties": false,
+      "description": "The server name and network port required to connect with the management interface of the on-premises storage system.",
+      "type": "object",
+      "properties": {
+        "ServerHostname": {
+          "type": "string",
+          "description": "The domain name or IP address of the storage system's management interface.",
+          "pattern": "^(([a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9\\-]*[A-Za-z0-9])$",
+          "maxLength": 255
+        },
+        "ServerPort": {
+          "type": "integer",
+          "description": "The network port needed to access the system's management interface",
+          "minimum": 1,
+          "maximum": 65535
+        }
+      },
+      "required": [
+        "ServerHostname"
+      ]
+    },
+    "ServerCredentials": {
+      "additionalProperties": false,
+      "description": "The username and password for accessing your on-premises storage system's management interface.",
+      "type": "object",
+      "properties": {
+        "Username": {
+          "type": "string",
+          "description": "The username for your storage system's management interface.",
+          "maxLength": 1024
+        },
+        "Password": {
+          "type": "string",
+          "description": "The password for your storage system's management interface",
+          "maxLength": 1024
+        }
+      },
+      "required": [
+        "Username",
+        "Password"
+      ]
+    },
+    "Tag": {
+      "additionalProperties": false,
+      "description": "A key-value pair to associate with a resource.",
+      "type": "object",
+      "properties": {
+        "Key": {
+          "type": "string",
+          "description": "The key for an AWS resource tag.",
+          "pattern": "^[a-zA-Z0-9\\s+=._:/-]+$",
+          "maxLength": 256,
+          "minLength": 1
+        },
+        "Value": {
+          "type": "string",
+          "description": "The value for an AWS resource tag.",
+          "pattern": "^[a-zA-Z0-9\\s+=._:@/-]+$",
+          "maxLength": 256,
+          "minLength": 1
+        }
+      },
+      "required": [
+        "Key",
+        "Value"
+      ]
+    }
+  },
+  "properties": {
+    "ServerConfiguration": {
+      "$ref": "#/definitions/ServerConfiguration"
+    },
+    "ServerCredentials": {
+      "$ref": "#/definitions/ServerCredentials"
+    },
+    "SecretsManagerArn": {
+      "description": "The ARN of a secret stored by AWS Secrets Manager.",
+      "type": "string",
+      "pattern": "^arn:(aws|aws-cn|aws-us-gov|aws-iso|aws-iso-b):secretsmanager:[a-z\\-0-9]+:[0-9]{12}:secret:.*",
+      "maxLength": 2048
+    },
+    "SystemType": {
+      "description": "The type of on-premises storage system that DataSync Discovery will analyze.",
+      "type": "string",
+      "enum": [
+        "NetAppONTAP"
+      ]
+    },
+    "AgentArns": {
+      "description": "The ARN of the DataSync agent that connects to and reads from the on-premises storage system's management interface.",
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^arn:(aws|aws-cn|aws-us-gov|aws-iso|aws-iso-b):datasync:[a-z\\-0-9]+:[0-9]{12}:agent/agent-[0-9a-z]{17}$",
+        "maxLength": 128
+      },
+      "minItems": 1,
+      "maxItems": 1,
+      "insertionOrder": false
+    },
+    "CloudWatchLogGroupArn": {
+      "description": "The ARN of the Amazon CloudWatch log group used to monitor and log discovery job events.",
+      "type": "string",
+      "pattern": "^arn:(aws|aws-cn|aws-us-gov|aws-iso|aws-iso-b):logs:[a-z\\-0-9]+:[0-9]{12}:log-group:([^:\\*]*)(:\\*)?$",
+      "maxLength": 562
+    },
+    "Name": {
+      "description": "A familiar name for the on-premises storage system.",
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9\\s+=._:@/-]+$",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "Tags": {
+      "description": "An array of key-value pairs to apply to this resource.",
+      "type": "array",
+      "maxItems": 50,
+      "uniqueItems": true,
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/Tag"
+      }
+    },
+    "StorageSystemArn": {
+      "description": "The ARN of the on-premises storage system added to DataSync Discovery.",
+      "type": "string",
+      "pattern": "^arn:(aws|aws-cn|aws-us-gov|aws-iso|aws-iso-b):datasync:[a-z\\-0-9]+:[0-9]{12}:system/storage-system-[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$",
+      "maxLength": 128
+    },
+    "ConnectivityStatus": {
+      "description": "Indicates whether the DataSync agent can access the on-premises storage system.",
+      "type": "string",
+      "enum": [
+        "PASS",
+        "FAIL",
+        "UNKNOWN"
+      ]
+    }
+  },
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": true,
+    "tagProperty": "/properties/Tags"
+  },
+  "additionalProperties": false,
+  "required": [
+    "ServerConfiguration",
+    "SystemType",
+    "AgentArns"
+  ],
+  "primaryIdentifier": [
+    "/properties/StorageSystemArn"
+  ],
+  "writeOnlyProperties": [
+    "/properties/ServerCredentials"
+  ],
+  "readOnlyProperties": [
+    "/properties/StorageSystemArn",
+    "/properties/ConnectivityStatus",
+    "/properties/SecretsManagerArn"
+  ],
+  "handlers": {
+    "create": {
+      "permissions": [
+        "datasync:AddStorageSystem",
+        "datasync:DescribeStorageSystem",
+        "datasync:ListTagsForResource",
+        "datasync:TagResource",
+        "secretsmanager:CreateSecret",
+        "secretsmanager:DescribeSecret",
+        "iam:CreateServiceLinkedRole"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "datasync:DescribeStorageSystem",
+        "datasync:ListTagsForResource",
+        "secretsmanager:DescribeSecret"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "datasync:UpdateStorageSystem",
+        "datasync:DescribeStorageSystem",
+        "datasync:ListTagsForResource",
+        "datasync:TagResource",
+        "datasync:UntagResource",
+        "secretsmanager:DescribeSecret",
+        "secretsmanager:PutSecretValue"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "datasync:DescribeStorageSystem",
+        "datasync:RemoveStorageSystem",
+        "secretsmanager:DescribeSecret",
+        "secretsmanager:DeleteSecret"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "datasync:ListStorageSystems"
+      ]
+    }
+  }
+}

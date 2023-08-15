@@ -1,0 +1,379 @@
+{
+  "typeName": "AWS::EC2::VerifiedAccessEndpoint",
+  "description": "The AWS::EC2::VerifiedAccessEndpoint resource creates an AWS EC2 Verified Access Endpoint.",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-ec2-verified-access.aws-ec2-verifiedaccessendpoint",
+  "properties": {
+    "VerifiedAccessEndpointId": {
+      "description": "The ID of the AWS Verified Access endpoint.",
+      "type": "string"
+    },
+    "VerifiedAccessGroupId": {
+      "description": "The ID of the AWS Verified Access group.",
+      "type": "string"
+    },
+    "VerifiedAccessInstanceId": {
+      "description": "The ID of the AWS Verified Access instance.",
+      "type": "string"
+    },
+    "Status": {
+      "description": "The endpoint status.",
+      "type": "string"
+    },
+    "SecurityGroupIds": {
+      "description": "The IDs of the security groups for the endpoint.",
+      "type": "array",
+      "uniqueItems": true,
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/SecurityGroupId"
+      }
+    },
+    "NetworkInterfaceOptions": {
+      "description": "The options for network-interface type endpoint.",
+      "$ref": "#/definitions/NetworkInterfaceOptions"
+    },
+    "LoadBalancerOptions": {
+      "description": "The load balancer details if creating the AWS Verified Access endpoint as load-balancer type.",
+      "$ref": "#/definitions/LoadBalancerOptions"
+    },
+    "EndpointType": {
+      "description": "The type of AWS Verified Access endpoint. Incoming application requests will be sent to an IP address, load balancer or a network interface depending on the endpoint type specified.The type of AWS Verified Access endpoint. Incoming application requests will be sent to an IP address, load balancer or a network interface depending on the endpoint type specified.",
+      "type": "string"
+    },
+    "EndpointDomain": {
+      "description": "A DNS name that is generated for the endpoint.",
+      "type": "string"
+    },
+    "EndpointDomainPrefix": {
+      "description": "A custom identifier that gets prepended to a DNS name that is generated for the endpoint.",
+      "type": "string"
+    },
+    "DeviceValidationDomain": {
+      "description": "Returned if endpoint has a device trust provider attached.",
+      "type": "string"
+    },
+    "DomainCertificateArn": {
+      "description": "The ARN of a public TLS/SSL certificate imported into or created with ACM.",
+      "type": "string"
+    },
+    "AttachmentType": {
+      "description": "The type of attachment used to provide connectivity between the AWS Verified Access endpoint and the application.",
+      "type": "string"
+    },
+    "ApplicationDomain": {
+      "description": "The DNS name for users to reach your application.",
+      "type": "string"
+    },
+    "CreationTime": {
+      "description": "The creation time.",
+      "type": "string"
+    },
+    "LastUpdatedTime": {
+      "description": "The last updated time.",
+      "type": "string"
+    },
+    "Description": {
+      "description": "A description for the AWS Verified Access endpoint.",
+      "type": "string"
+    },
+    "PolicyDocument": {
+      "description": "The AWS Verified Access policy document.",
+      "type": "string"
+    },
+    "PolicyEnabled": {
+      "description": "The status of the Verified Access policy.",
+      "type": "boolean"
+    },
+    "Tags": {
+      "description": "An array of key-value pairs to apply to this resource.",
+      "type": "array",
+      "uniqueItems": true,
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/Tag"
+      }
+    }
+  },
+  "definitions": {
+    "SecurityGroupId": {
+      "description": "The ID of a security group for the endpoint.",
+      "type": "string"
+    },
+    "NetworkInterfaceOptions": {
+      "description": "The options for network-interface type endpoint.",
+      "type": "object",
+      "properties": {
+        "NetworkInterfaceId": {
+          "description": "The ID of the network interface.",
+          "type": "string"
+        },
+        "Port": {
+          "description": "The IP port number.",
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 65535
+        },
+        "Protocol": {
+          "description": "The IP protocol.",
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "LoadBalancerOptions": {
+      "description": "The load balancer details if creating the AWS Verified Access endpoint as load-balancertype.",
+      "type": "object",
+      "properties": {
+        "LoadBalancerArn": {
+          "description": "The ARN of the load balancer.",
+          "type": "string"
+        },
+        "Port": {
+          "description": "The IP port number.",
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 65535
+        },
+        "Protocol": {
+          "description": "The IP protocol.",
+          "type": "string"
+        },
+        "SubnetIds": {
+          "description": "The IDs of the subnets.",
+          "type": "array",
+          "uniqueItems": true,
+          "insertionOrder": false,
+          "items": {
+            "$ref": "#/definitions/SubnetId"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "SubnetId": {
+      "description": "The IDs of the subnet.",
+      "type": "string"
+    },
+    "Tag": {
+      "description": "A key-value pair to associate with a resource.",
+      "type": "object",
+      "properties": {
+        "Key": {
+          "type": "string",
+          "description": "The key name of the tag. You can specify a value that is 1 to 128 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "Value": {
+          "type": "string",
+          "description": "The value for the tag. You can specify a value that is 0 to 256 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.",
+          "minLength": 0,
+          "maxLength": 256
+        }
+      },
+      "required": [
+        "Key",
+        "Value"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "ApplicationDomain",
+    "AttachmentType",
+    "DomainCertificateArn",
+    "EndpointType",
+    "VerifiedAccessGroupId",
+    "EndpointDomainPrefix"
+  ],
+  "readOnlyProperties": [
+    "/properties/VerifiedAccessEndpointId",
+    "/properties/EndpointDomain",
+    "/properties/CreationTime",
+    "/properties/LastUpdatedTime",
+    "/properties/Status",
+    "/properties/DeviceValidationDomain",
+    "/properties/VerifiedAccessInstanceId"
+  ],
+  "createOnlyProperties": [
+    "/properties/ApplicationDomain",
+    "/properties/AttachmentType",
+    "/properties/DomainCertificateArn",
+    "/properties/EndpointDomainPrefix",
+    "/properties/EndpointType",
+    "/properties/SecurityGroupIds",
+    "/properties/NetworkInterfaceOptions/NetworkInterfaceId",
+    "/properties/LoadBalancerOptions/LoadBalancerArn"
+  ],
+  "primaryIdentifier": [
+    "/properties/VerifiedAccessEndpointId"
+  ],
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": false,
+    "tagProperty": "/properties/Tags"
+  },
+  "handlers": {
+    "create": {
+      "permissions": [
+        "ec2:CreateVerifiedAccessEndpoint",
+        "ec2:DescribeVerifiedAccessEndpoints",
+        "ec2:CreateTags",
+        "ec2:DescribeTags",
+        "iam:CreateServiceLinkedRole",
+        "iam:ListRoles",
+        "acm:GetCertificateWithPK",
+        "acm:DescribeCertificate",
+        "acm:CreateCertificateRelation",
+        "sso:GetManagedApplicationInstance",
+        "sso:GetPeregrineStatus",
+        "sso:GetSharedSsoConfiguration",
+        "sso:CreateManagedApplicationInstance",
+        "ec2:DescribeSubnets",
+        "ec2:DescribeSecurityGroups",
+        "ec2:DescribeNetworkInterfaces",
+        "ec2:DescribeAccountAttributes",
+        "elasticloadbalancing:DescribeLoadBalancers",
+        "elasticloadbalancing:DescribeListeners",
+        "elasticloadbalancing:DescribeListenerCertificates",
+        "acm:DeleteCertificateRelation",
+        "ec2:DeleteTags",
+        "ec2:DeleteVerifiedAccessEndpoint",
+        "ec2:GetVerifiedAccessEndpointPolicy",
+        "ec2:ModifyVerifiedAccessEndpoint",
+        "ec2:ModifyVerifiedAccessEndpointPolicy",
+        "sso:DeleteManagedApplicationInstance"
+      ],
+      "timeoutInMinutes": 60
+    },
+    "read": {
+      "permissions": [
+        "ec2:DescribeVerifiedAccessEndpoints",
+        "ec2:GetVerifiedAccessEndpointPolicy",
+        "ec2:DescribeTags",
+        "acm:CreateCertificateRelation",
+        "acm:DeleteCertificateRelation",
+        "acm:DescribeCertificate",
+        "acm:GetCertificateWithPK",
+        "ec2:CreateTags",
+        "ec2:CreateVerifiedAccessEndpoint",
+        "ec2:DeleteTags",
+        "ec2:DeleteVerifiedAccessEndpoint",
+        "ec2:DescribeAccountAttributes",
+        "ec2:DescribeNetworkInterfaces",
+        "ec2:DescribeSecurityGroups",
+        "ec2:DescribeSubnets",
+        "ec2:ModifyVerifiedAccessEndpoint",
+        "ec2:ModifyVerifiedAccessEndpointPolicy",
+        "elasticloadbalancing:DescribeListenerCertificates",
+        "elasticloadbalancing:DescribeListeners",
+        "elasticloadbalancing:DescribeLoadBalancers",
+        "iam:CreateServiceLinkedRole",
+        "iam:ListRoles",
+        "sso:CreateManagedApplicationInstance",
+        "sso:DeleteManagedApplicationInstance",
+        "sso:GetManagedApplicationInstance",
+        "sso:GetPeregrineStatus",
+        "sso:GetSharedSsoConfiguration"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "ec2:ModifyVerifiedAccessEndpoint",
+        "ec2:ModifyVerifiedAccessEndpointPolicy",
+        "ec2:DescribeVerifiedAccessEndpoints",
+        "ec2:GetVerifiedAccessEndpointPolicy",
+        "ec2:DescribeTags",
+        "ec2:DeleteTags",
+        "ec2:CreateTags",
+        "acm:GetCertificateWithPK",
+        "acm:DescribeCertificate",
+        "acm:CreateCertificateRelation",
+        "acm:DeleteCertificateRelation",
+        "sso:GetManagedApplicationInstance",
+        "sso:GetPeregrineStatus",
+        "sso:GetSharedSsoConfiguration",
+        "sso:CreateManagedApplicationInstance",
+        "sso:DeleteManagedApplicationInstance",
+        "ec2:DescribeSubnets",
+        "ec2:DescribeSecurityGroups",
+        "ec2:DescribeNetworkInterfaces",
+        "ec2:DescribeAccountAttributes",
+        "elasticloadbalancing:DescribeLoadBalancers",
+        "elasticloadbalancing:DescribeListeners",
+        "elasticloadbalancing:DescribeListenerCertificates",
+        "ec2:CreateVerifiedAccessEndpoint",
+        "ec2:DeleteVerifiedAccessEndpoint",
+        "iam:CreateServiceLinkedRole",
+        "iam:ListRoles"
+      ],
+      "timeoutInMinutes": 60
+    },
+    "delete": {
+      "permissions": [
+        "ec2:DescribeVerifiedAccessEndpoints",
+        "ec2:DescribeTags",
+        "ec2:DeleteVerifiedAccessEndpoint",
+        "ec2:DeleteTags",
+        "sso:DeleteManagedApplicationInstance",
+        "acm:DeleteCertificateRelation",
+        "acm:DescribeCertificate",
+        "acm:CreateCertificateRelation",
+        "acm:GetCertificateWithPK",
+        "ec2:CreateTags",
+        "ec2:CreateVerifiedAccessEndpoint",
+        "ec2:DescribeAccountAttributes",
+        "ec2:DescribeNetworkInterfaces",
+        "ec2:DescribeSecurityGroups",
+        "ec2:DescribeSubnets",
+        "ec2:GetVerifiedAccessEndpointPolicy",
+        "ec2:ModifyVerifiedAccessEndpoint",
+        "ec2:ModifyVerifiedAccessEndpointPolicy",
+        "elasticloadbalancing:DescribeListenerCertificates",
+        "elasticloadbalancing:DescribeListeners",
+        "elasticloadbalancing:DescribeLoadBalancers",
+        "iam:CreateServiceLinkedRole",
+        "iam:ListRoles",
+        "sso:CreateManagedApplicationInstance",
+        "sso:GetManagedApplicationInstance",
+        "sso:GetPeregrineStatus",
+        "sso:GetSharedSsoConfiguration"
+      ],
+      "timeoutInMinutes": 60
+    },
+    "list": {
+      "permissions": [
+        "ec2:DescribeVerifiedAccessEndpoints",
+        "ec2:DescribeTags",
+        "acm:CreateCertificateRelation",
+        "acm:DeleteCertificateRelation",
+        "acm:DescribeCertificate",
+        "acm:GetCertificateWithPK",
+        "ec2:CreateTags",
+        "ec2:CreateVerifiedAccessEndpoint",
+        "ec2:DeleteTags",
+        "ec2:DeleteVerifiedAccessEndpoint",
+        "ec2:DescribeAccountAttributes",
+        "ec2:DescribeNetworkInterfaces",
+        "ec2:DescribeSecurityGroups",
+        "ec2:DescribeSubnets",
+        "ec2:GetVerifiedAccessEndpointPolicy",
+        "ec2:ModifyVerifiedAccessEndpoint",
+        "ec2:ModifyVerifiedAccessEndpointPolicy",
+        "elasticloadbalancing:DescribeListenerCertificates",
+        "elasticloadbalancing:DescribeListeners",
+        "elasticloadbalancing:DescribeLoadBalancers",
+        "iam:CreateServiceLinkedRole",
+        "iam:ListRoles",
+        "sso:CreateManagedApplicationInstance",
+        "sso:DeleteManagedApplicationInstance",
+        "sso:GetManagedApplicationInstance",
+        "sso:GetPeregrineStatus",
+        "sso:GetSharedSsoConfiguration"
+      ]
+    }
+  }
+}

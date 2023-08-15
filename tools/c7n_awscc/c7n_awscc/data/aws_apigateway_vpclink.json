@@ -1,0 +1,128 @@
+{
+  "typeName": "AWS::ApiGateway::VpcLink",
+  "description": "Schema for AWS ApiGateway VpcLink",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git",
+  "properties": {
+    "Name": {
+      "description": "A name for the VPC link.",
+      "type": "string"
+    },
+    "Description": {
+      "description": "A description of the VPC link.",
+      "type": "string"
+    },
+    "Tags": {
+      "description": "An array of arbitrary tags (key-value pairs) to associate with the stage.",
+      "insertionOrder": false,
+      "uniqueItems": true,
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Tag"
+      }
+    },
+    "TargetArns": {
+      "description": "The ARN of network load balancer of the VPC targeted by the VPC link. The network load balancer must be owned by the same AWS account of the API owner.",
+      "type": "array",
+      "uniqueItems": false,
+      "insertionOrder": false,
+      "items": {
+        "type": "string"
+      }
+    },
+    "VpcLinkId": {
+      "description": "The ID of the instance that backs VPC link.",
+      "type": "string"
+    }
+  },
+  "definitions": {
+    "Tag": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Value": {
+          "type": "string"
+        },
+        "Key": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "Value",
+        "Key"
+      ]
+    }
+  },
+  "required": [
+    "Name",
+    "TargetArns"
+  ],
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": false,
+    "tagProperty": "/properties/Tags"
+  },
+  "handlers": {
+    "create": {
+      "permissions": [
+        "apigateway:POST",
+        "apigateway:PUT",
+        "ec2:CreateVpcEndpointServiceConfiguration",
+        "ec2:DeleteVpcEndpointServiceConfigurations",
+        "ec2:DescribeVpcEndpointServiceConfigurations",
+        "ec2:ModifyVpcEndpointServicePermissions"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "apigateway:PATCH",
+        "apigateway:GET",
+        "apigateway:PUT",
+        "ec2:CreateVpcEndpointServiceConfiguration",
+        "ec2:DeleteVpcEndpointServiceConfigurations",
+        "ec2:DescribeVpcEndpointServiceConfigurations",
+        "ec2:ModifyVpcEndpointServicePermissions"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "apigateway:GET",
+        "ec2:CreateVpcEndpointServiceConfiguration",
+        "ec2:DeleteVpcEndpointServiceConfigurations",
+        "ec2:DescribeVpcEndpointServiceConfigurations",
+        "ec2:ModifyVpcEndpointServicePermissions"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "apigateway:GET",
+        "ec2:CreateVpcEndpointServiceConfiguration",
+        "ec2:DeleteVpcEndpointServiceConfigurations",
+        "ec2:DescribeVpcEndpointServiceConfigurations",
+        "ec2:ModifyVpcEndpointServicePermissions"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "apigateway:GET",
+        "apigateway:DELETE",
+        "apigateway:PUT",
+        "ec2:CreateVpcEndpointServiceConfiguration",
+        "ec2:DeleteVpcEndpointServiceConfigurations",
+        "ec2:DescribeVpcEndpointServiceConfigurations",
+        "ec2:ModifyVpcEndpointServicePermissions"
+      ]
+    }
+  },
+  "createOnlyProperties": [
+    "/properties/TargetArns"
+  ],
+  "additionalProperties": false,
+  "primaryIdentifier": [
+    "/properties/VpcLinkId"
+  ],
+  "readOnlyProperties": [
+    "/properties/VpcLinkId"
+  ]
+}

@@ -12,12 +12,7 @@
           "type": "string"
         },
         "Value": {
-          "type": "array",
-          "items": {
-            "type": "string",
-            "maxItems": 50
-          },
-          "insertionOrder": false
+          "type": "string"
         }
       },
       "required": [
@@ -67,9 +62,6 @@
     }
   },
   "additionalProperties": false,
-  "required": [
-    "CellName"
-  ],
   "readOnlyProperties": [
     "/properties/CellArn",
     "/properties/ParentReadinessScopes"
@@ -84,18 +76,24 @@
     "create": {
       "permissions": [
         "route53-recovery-readiness:CreateCell",
-        "route53-recovery-readiness:GetCell"
+        "route53-recovery-readiness:GetCell",
+        "route53-recovery-readiness:ListTagsForResources",
+        "route53-recovery-readiness:TagResource"
       ]
     },
     "read": {
       "permissions": [
-        "route53-recovery-readiness:GetCell"
+        "route53-recovery-readiness:GetCell",
+        "route53-recovery-readiness:ListTagsForResources"
       ]
     },
     "update": {
       "permissions": [
-        "route53-recovery-readiness:UpdateCell",
-        "route53-recovery-readiness:GetCell"
+        "route53-recovery-readiness:GetCell",
+        "route53-recovery-readiness:ListTagsForResources",
+        "route53-recovery-readiness:TagResource",
+        "route53-recovery-readiness:UntagResource",
+        "route53-recovery-readiness:UpdateCell"
       ]
     },
     "delete": {

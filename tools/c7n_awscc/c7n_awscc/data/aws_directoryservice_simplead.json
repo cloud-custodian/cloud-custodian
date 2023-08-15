@@ -1,0 +1,163 @@
+{
+  "typeName": "AWS::DirectoryService::SimpleAD",
+  "description": "Resource Type definition for AWS::DirectoryService::SimpleAD",
+  "documentationUrl": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-directoryservice-simplead.html",
+  "additionalProperties": false,
+  "definitions": {
+    "VpcSettings": {
+      "$comment": "Contains VPC information",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "SubnetIds": {
+          "description": "The identifiers of the subnets for the directory servers. The two subnets must be in different Availability Zones. AWS Directory Service specifies a directory server and a DNS server in each of these subnets.",
+          "type": "array",
+          "uniqueItems": true,
+          "insertionOrder": false,
+          "items": {
+            "type": "string"
+          }
+        },
+        "VpcId": {
+          "description": "The identifier of the VPC in which to create the directory.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "VpcId",
+        "SubnetIds"
+      ]
+    }
+  },
+  "properties": {
+    "DirectoryId": {
+      "description": "The unique identifier for a directory.",
+      "type": "string"
+    },
+    "Alias": {
+      "description": "The alias for a directory.",
+      "type": "string"
+    },
+    "DnsIpAddresses": {
+      "description": "The IP addresses of the DNS servers for the directory, such as [ \"172.31.3.154\", \"172.31.63.203\" ].",
+      "type": "array",
+      "uniqueItems": false,
+      "insertionOrder": false,
+      "items": {
+        "type": "string"
+      }
+    },
+    "CreateAlias": {
+      "description": "The name of the configuration set.",
+      "type": "boolean"
+    },
+    "Description": {
+      "description": "Description for the directory.",
+      "type": "string"
+    },
+    "EnableSso": {
+      "description": "Whether to enable single sign-on for a Simple Active Directory in AWS.",
+      "type": "boolean"
+    },
+    "Name": {
+      "description": "The fully qualified domain name for the AWS Managed Simple AD directory.",
+      "type": "string"
+    },
+    "Password": {
+      "description": "The password for the default administrative user named Admin.",
+      "type": "string"
+    },
+    "ShortName": {
+      "description": "The NetBIOS name for your domain.",
+      "type": "string"
+    },
+    "Size": {
+      "description": "The size of the directory.",
+      "type": "string"
+    },
+    "VpcSettings": {
+      "description": "VPC settings of the Simple AD directory server in AWS.",
+      "$ref": "#/definitions/VpcSettings"
+    }
+  },
+  "required": [
+    "VpcSettings",
+    "Size",
+    "Name"
+  ],
+  "tagging": {
+    "taggable": false,
+    "tagOnCreate": false,
+    "tagUpdatable": false,
+    "cloudFormationSystemTags": false
+  },
+  "readOnlyProperties": [
+    "/properties/Alias",
+    "/properties/DnsIpAddresses",
+    "/properties/DirectoryId"
+  ],
+  "createOnlyProperties": [
+    "/properties/Size",
+    "/properties/VpcSettings",
+    "/properties/Name",
+    "/properties/Password",
+    "/properties/ShortName",
+    "/properties/Description",
+    "/properties/CreateAlias"
+  ],
+  "writeOnlyProperties": [
+    "/properties/Password"
+  ],
+  "primaryIdentifier": [
+    "/properties/DirectoryId"
+  ],
+  "handlers": {
+    "create": {
+      "permissions": [
+        "ds:CreateDirectory",
+        "ds:CreateAlias",
+        "ds:EnableSso",
+        "ds:DescribeDirectories",
+        "ec2:DescribeSubnets",
+        "ec2:DescribeVpcs",
+        "ec2:CreateSecurityGroup",
+        "ec2:CreateNetworkInterface",
+        "ec2:DescribeNetworkInterfaces",
+        "ec2:AuthorizeSecurityGroupIngress",
+        "ec2:AuthorizeSecurityGroupEgress",
+        "ec2:CreateTags"
+      ],
+      "timeoutInMinutes": 60
+    },
+    "read": {
+      "permissions": [
+        "ds:DescribeDirectories"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "ds:EnableSso",
+        "ds:DisableSso",
+        "ds:DescribeDirectories"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "ds:DeleteDirectory",
+        "ds:DescribeDirectories",
+        "ec2:DescribeNetworkInterfaces",
+        "ec2:DeleteSecurityGroup",
+        "ec2:DeleteNetworkInterface",
+        "ec2:RevokeSecurityGroupIngress",
+        "ec2:RevokeSecurityGroupEgress",
+        "ec2:DeleteTags"
+      ],
+      "timeoutInMinutes": 100
+    },
+    "list": {
+      "permissions": [
+        "ds:DescribeDirectories"
+      ]
+    }
+  }
+}

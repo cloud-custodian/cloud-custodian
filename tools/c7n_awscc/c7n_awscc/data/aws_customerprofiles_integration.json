@@ -535,6 +535,27 @@
         "SourceFlowConfig"
       ],
       "additionalProperties": false
+    },
+    "ObjectTypeMapping": {
+      "type": "object",
+      "properties": {
+        "Key": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 255
+        },
+        "Value": {
+          "type": "string",
+          "pattern": "^[a-zA-Z_][a-zA-Z_0-9-]*$",
+          "minLength": 1,
+          "maxLength": 255
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "Key",
+        "Value"
+      ]
     }
   },
   "properties": {
@@ -577,18 +598,38 @@
       },
       "minItems": 0,
       "maxItems": 50
+    },
+    "ObjectTypeNames": {
+      "description": "The mapping between 3rd party event types and ObjectType names",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/ObjectTypeMapping"
+      }
     }
   },
   "required": [
-    "DomainName",
-    "ObjectTypeName"
+    "DomainName"
   ],
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": true,
+    "tagProperty": "/properties/Tags"
+  },
   "handlers": {
     "create": {
       "permissions": [
         "profile:GetIntegration",
         "profile:PutIntegration",
-        "appflow:CreateFlow"
+        "appflow:CreateFlow",
+        "app-integrations:CreateEventIntegrationAssociation",
+        "app-integrations:GetEventIntegration",
+        "events:ListTargetsByRule",
+        "events:PutRule",
+        "events:PutTargets",
+        "events:PutEvents",
+        "profile:TagResource"
       ]
     },
     "read": {
@@ -599,18 +640,44 @@
     "delete": {
       "permissions": [
         "profile:DeleteIntegration",
-        "appflow:DeleteFlow"
+        "appflow:DeleteFlow",
+        "app-integrations:ListEventIntegrationAssociations",
+        "app-integrations:DeleteEventIntegrationAssociation",
+        "events:RemoveTargets",
+        "events:ListTargetsByRule",
+        "events:DeleteRule"
       ]
     },
     "update": {
       "permissions": [
         "profile:PutIntegration",
         "profile:GetIntegration",
+        "appflow:CreateFlow",
+        "app-integrations:GetEventIntegration",
+        "app-integrations:CreateEventIntegrationAssociation",
+        "app-integrations:ListEventIntegrationAssociations",
+        "app-integrations:DeleteEventIntegrationAssociation",
+        "events:ListTargetsByRule",
+        "events:RemoveTargets",
+        "events:DeleteRule",
+        "events:PutRule",
+        "events:PutTargets",
+        "events:PutEvents",
         "profile:UntagResource",
         "profile:TagResource"
       ]
     },
     "list": {
+      "handlerSchema": {
+        "properties": {
+          "DomainName": {
+            "$ref": "resource-schema.json#/properties/DomainName"
+          }
+        },
+        "required": [
+          "DomainName"
+        ]
+      },
       "permissions": [
         "profile:ListIntegrations"
       ]

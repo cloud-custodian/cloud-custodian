@@ -1,0 +1,125 @@
+{
+  "typeName": "AWS::VerifiedPermissions::PolicyStore",
+  "description": "Definition of AWS::VerifiedPermissions::PolicyStore Resource Type",
+  "definitions": {
+    "ValidationMode": {
+      "type": "string",
+      "enum": [
+        "OFF",
+        "STRICT"
+      ]
+    },
+    "ValidationSettings": {
+      "type": "object",
+      "properties": {
+        "Mode": {
+          "$ref": "#/definitions/ValidationMode"
+        }
+      },
+      "required": [
+        "Mode"
+      ],
+      "additionalProperties": false
+    },
+    "SchemaJson": {
+      "type": "string"
+    },
+    "SchemaDefinition": {
+      "type": "object",
+      "properties": {
+        "CedarJson": {
+          "$ref": "#/definitions/SchemaJson"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "properties": {
+    "Arn": {
+      "type": "string",
+      "maxLength": 2500,
+      "minLength": 1,
+      "pattern": "^arn:[^:]*:[^:]*:[^:]*:[^:]*:.*$"
+    },
+    "PolicyStoreId": {
+      "type": "string",
+      "maxLength": 200,
+      "minLength": 1,
+      "pattern": "^[a-zA-Z0-9-]*$"
+    },
+    "ValidationSettings": {
+      "$ref": "#/definitions/ValidationSettings"
+    },
+    "Schema": {
+      "$ref": "#/definitions/SchemaDefinition"
+    }
+  },
+  "required": [
+    "ValidationSettings"
+  ],
+  "readOnlyProperties": [
+    "/properties/Arn",
+    "/properties/PolicyStoreId"
+  ],
+  "primaryIdentifier": [
+    "/properties/PolicyStoreId"
+  ],
+  "propertyTransform": {
+    "/properties/Schema/CedarJson": "$join([CedarJson, \"{}\"])"
+  },
+  "tagging": {
+    "taggable": false,
+    "tagOnCreate": false,
+    "tagUpdatable": false,
+    "cloudFormationSystemTags": false
+  },
+  "handlers": {
+    "create": {
+      "permissions": [
+        "verifiedpermissions:CreatePolicyStore",
+        "verifiedpermissions:GetPolicyStore",
+        "verifiedpermissions:UpdatePolicyStore",
+        "verifiedpermissions:DeletePolicyStore",
+        "verifiedpermissions:PutSchema"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "verifiedpermissions:CreatePolicyStore",
+        "verifiedpermissions:GetPolicyStore",
+        "verifiedpermissions:UpdatePolicyStore",
+        "verifiedpermissions:DeletePolicyStore",
+        "verifiedpermissions:GetSchema"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "verifiedpermissions:CreatePolicyStore",
+        "verifiedpermissions:GetPolicyStore",
+        "verifiedpermissions:UpdatePolicyStore",
+        "verifiedpermissions:DeletePolicyStore",
+        "verifiedpermissions:GetSchema",
+        "verifiedpermissions:PutSchema"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "verifiedpermissions:CreatePolicyStore",
+        "verifiedpermissions:GetPolicyStore",
+        "verifiedpermissions:UpdatePolicyStore",
+        "verifiedpermissions:DeletePolicyStore"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "verifiedpermissions:CreatePolicyStore",
+        "verifiedpermissions:GetPolicyStore",
+        "verifiedpermissions:UpdatePolicyStore",
+        "verifiedpermissions:DeletePolicyStore",
+        "verifiedpermissions:ListPolicyStores",
+        "verifiedpermissions:GetSchema"
+      ]
+    }
+  },
+  "additionalProperties": false
+}

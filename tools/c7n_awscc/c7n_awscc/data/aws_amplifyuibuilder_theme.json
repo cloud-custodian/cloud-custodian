@@ -1,6 +1,7 @@
 {
   "typeName": "AWS::AmplifyUIBuilder::Theme",
   "description": "Definition of AWS::AmplifyUIBuilder::Theme Resource Type",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-amplifyuibuilder",
   "definitions": {
     "Tags": {
       "type": "object",
@@ -46,19 +47,11 @@
     "AppId": {
       "type": "string"
     },
-    "CreatedAt": {
-      "type": "string",
-      "format": "date-time"
-    },
     "EnvironmentName": {
       "type": "string"
     },
     "Id": {
       "type": "string"
-    },
-    "ModifiedAt": {
-      "type": "string",
-      "format": "date-time"
     },
     "Name": {
       "type": "string",
@@ -88,11 +81,7 @@
     "Values"
   ],
   "readOnlyProperties": [
-    "/properties/AppId",
-    "/properties/CreatedAt",
-    "/properties/EnvironmentName",
-    "/properties/Id",
-    "/properties/ModifiedAt"
+    "/properties/Id"
   ],
   "createOnlyProperties": [
     "/properties/Tags"
@@ -105,33 +94,54 @@
   "handlers": {
     "create": {
       "permissions": [
+        "amplify:GetApp",
+        "amplifyuibuilder:GetTheme",
         "amplifyuibuilder:CreateTheme",
-        "amplify:GetApp"
+        "amplifyuibuilder:TagResource"
       ]
     },
     "read": {
       "permissions": [
-        "amplifyuibuilder:GetTheme",
-        "amplify:GetApp"
+        "amplify:GetApp",
+        "amplifyuibuilder:GetTheme"
       ]
     },
     "update": {
       "permissions": [
+        "amplify:GetApp",
+        "amplifyuibuilder:GetTheme",
         "amplifyuibuilder:UpdateTheme",
-        "amplify:GetApp"
+        "amplifyuibuilder:TagResource"
       ]
     },
     "delete": {
       "permissions": [
+        "amplify:GetApp",
+        "amplifyuibuilder:GetTheme",
         "amplifyuibuilder:DeleteTheme",
-        "amplify:GetApp"
+        "amplifyuibuilder:UntagResource"
       ]
     },
     "list": {
       "permissions": [
-        "amplifyuibuilder:ListThemes",
-        "amplify:GetApp"
-      ]
+        "amplify:GetApp",
+        "amplifyuibuilder:GetTheme",
+        "amplifyuibuilder:ListThemes"
+      ],
+      "handlerSchema": {
+        "properties": {
+          "AppId": {
+            "$ref": "resource-schema.json#/properties/AppId"
+          },
+          "EnvironmentName": {
+            "$ref": "resource-schema.json#/properties/EnvironmentName"
+          }
+        },
+        "required": [
+          "AppId",
+          "EnvironmentName"
+        ]
+      }
     }
   },
   "additionalProperties": false,

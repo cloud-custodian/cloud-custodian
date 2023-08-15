@@ -98,13 +98,19 @@
   "primaryIdentifier": [
     "/properties/Id"
   ],
-  "taggable": false,
+  "tagging": {
+    "taggable": false,
+    "tagOnCreate": false,
+    "tagUpdatable": false,
+    "cloudFormationSystemTags": false
+  },
   "handlers": {
     "create": {
       "permissions": [
         "ec2:CreateVpcEndpoint",
         "ec2:DescribeVpcEndpoints"
-      ]
+      ],
+      "timeoutInMinutes": 210
     },
     "read": {
       "permissions": [
@@ -115,12 +121,15 @@
       "permissions": [
         "ec2:ModifyVpcEndpoint",
         "ec2:DescribeVpcEndpoints"
-      ]
+      ],
+      "timeoutInMinutes": 210
     },
     "delete": {
       "permissions": [
-        "ec2:DeleteVpcEndpoints"
-      ]
+        "ec2:DeleteVpcEndpoints",
+        "ec2:DescribeVpcEndpoints"
+      ],
+      "timeoutInMinutes": 210
     },
     "list": {
       "permissions": [

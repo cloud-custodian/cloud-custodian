@@ -89,11 +89,12 @@
     "/properties/Stage"
   ],
   "required": [
-    "Name"
+    "Name",
+    "FunctionConfig",
+    "FunctionCode"
   ],
   "typeName": "AWS::CloudFront::Function",
   "writeOnlyProperties": [
-    "/properties/AutoPublish",
-    "/properties/FunctionCode"
+    "/properties/AutoPublish"
   ]
 }

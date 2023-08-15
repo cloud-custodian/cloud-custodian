@@ -1,0 +1,106 @@
+{
+  "typeName": "AWS::SecurityHub::Standard",
+  "description": "The AWS::SecurityHub::Standard resource represents the implementation of an individual AWS Security Hub Standard in your account. It requires you have SecurityHub enabled before you can enable the Standard.",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-securityhub",
+  "definitions": {
+    "StandardsControl": {
+      "description": "An individual StandardsControl within the Standard.",
+      "type": "object",
+      "properties": {
+        "StandardsControlArn": {
+          "type": "string",
+          "description": "the Arn for the standard control.",
+          "pattern": "arn:aws\\S*:securityhub:\\S*"
+        },
+        "Reason": {
+          "type": "string",
+          "description": "the reason the standard control is disabled"
+        }
+      },
+      "required": [
+        "StandardsControlArn"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "properties": {
+    "StandardsSubscriptionArn": {
+      "description": "The ARN of the StandardsSubscription for the account ID, region, and Standard.",
+      "type": "string",
+      "pattern": "arn:aws\\S*:securityhub:\\S*"
+    },
+    "StandardsArn": {
+      "description": "The ARN of the Standard being enabled",
+      "type": "string",
+      "pattern": "arn:aws\\S*:securityhub:\\S"
+    },
+    "DisabledStandardsControls": {
+      "description": "StandardsControls to disable from this Standard.",
+      "type": "array",
+      "minItems": 0,
+      "maxItems": 100,
+      "items": {
+        "$ref": "#/definitions/StandardsControl"
+      },
+      "insertionOrder": true,
+      "uniqueItems": true
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "StandardsArn"
+  ],
+  "createOnlyProperties": [
+    "/properties/StandardsArn"
+  ],
+  "readOnlyProperties": [
+    "/properties/StandardsSubscriptionArn"
+  ],
+  "primaryIdentifier": [
+    "/properties/StandardsSubscriptionArn"
+  ],
+  "additionalIdentifiers": [
+    [
+      "/properties/StandardsArn"
+    ]
+  ],
+  "tagging": {
+    "taggable": false,
+    "tagOnCreate": false,
+    "tagUpdatable": false,
+    "cloudFormationSystemTags": false,
+    "tagProperty": "/properties/Tags"
+  },
+  "handlers": {
+    "create": {
+      "permissions": [
+        "securityhub:GetEnabledStandards",
+        "securityhub:BatchEnableStandards",
+        "securityhub:UpdateStandardsControl"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "securityhub:GetEnabledStandards",
+        "securityhub:DescribeStandardsControls"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "securityhub:GetEnabledStandards",
+        "securityhub:UpdateStandardsControl"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "securityhub:GetEnabledStandards",
+        "securityhub:BatchDisableStandards"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "securityhub:GetEnabledStandards"
+      ]
+    }
+  }
+}

@@ -3,6 +3,27 @@
   "description": "Represents a launch profile which delegates access to a collection of studio components to studio users",
   "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-nimblestudio",
   "definitions": {
+    "AutomaticTerminationMode": {
+      "type": "string",
+      "enum": [
+        "DEACTIVATED",
+        "ACTIVATED"
+      ]
+    },
+    "SessionBackupMode": {
+      "type": "string",
+      "enum": [
+        "AUTOMATIC",
+        "DEACTIVATED"
+      ]
+    },
+    "SessionPersistenceMode": {
+      "type": "string",
+      "enum": [
+        "DEACTIVATED",
+        "ACTIVATED"
+      ]
+    },
     "StreamConfiguration": {
       "type": "object",
       "description": "<p>A configuration for a streaming session.</p>",
@@ -21,6 +42,7 @@
         },
         "MaxSessionLengthInMinutes": {
           "type": "number",
+          "default": 690,
           "maximum": 43200,
           "minimum": 1,
           "description": "<p>The length of time, in minutes, that a streaming session can be active before it is\n            stopped or terminated. After this point, Nimble Studio automatically terminates or\n            stops the session. The default length of time is 690 minutes, and the maximum length of\n            time is 30 days.</p>"
@@ -39,12 +61,25 @@
         },
         "MaxStoppedSessionLengthInMinutes": {
           "type": "number",
+          "default": 0,
           "maximum": 5760,
           "minimum": 0,
-          "description": "<p>Integer that determines if you can start and stop your sessions and how long a session\n            can stay in the STOPPED state. The default value is 0. The maximum value is 5760.</p>\n        <p>If the value is missing or set to 0, your sessions can?t be stopped. If you then call\n            StopStreamingSession, the session fails. If the time that a session stays in the READY\n            state exceeds the maxSessionLengthInMinutes value, the session will automatically be\n            terminated by AWS (instead of stopped).</p>\n        <p>If the value is set to a positive number, the session can be stopped. You can call\n            StopStreamingSession to stop sessions in the READY state. If the time that a session\n            stays in the READY state exceeds the maxSessionLengthInMinutes value, the session will\n            automatically be stopped by AWS (instead of terminated).</p>"
+          "description": "<p>Integer that determines if you can start and stop your sessions and how long a session\n            can stay in the <code>STOPPED</code> state. The default value is 0. The maximum value is\n            5760.</p>\n         <p>This field is allowed only when <code>sessionPersistenceMode</code> is\n                <code>ACTIVATED</code> and <code>automaticTerminationMode</code> is\n                <code>ACTIVATED</code>.</p>\n         <p>If the value is set to 0, your sessions can?t be <code>STOPPED</code>. If you then\n            call <code>StopStreamingSession</code>, the session fails. If the time that a session\n            stays in the <code>READY</code> state exceeds the <code>maxSessionLengthInMinutes</code>\n            value, the session will automatically be terminated (instead of\n            <code>STOPPED</code>).</p>\n         <p>If the value is set to a positive number, the session can be stopped. You can call\n                <code>StopStreamingSession</code> to stop sessions in the <code>READY</code> state.\n            If the time that a session stays in the <code>READY</code> state exceeds the\n                <code>maxSessionLengthInMinutes</code> value, the session will automatically be\n            stopped (instead of terminated).</p>"
         },
         "SessionStorage": {
           "$ref": "#/definitions/StreamConfigurationSessionStorage"
+        },
+        "SessionBackup": {
+          "$ref": "#/definitions/StreamConfigurationSessionBackup"
+        },
+        "SessionPersistenceMode": {
+          "$ref": "#/definitions/SessionPersistenceMode"
+        },
+        "VolumeConfiguration": {
+          "$ref": "#/definitions/VolumeConfiguration"
+        },
+        "AutomaticTerminationMode": {
+          "$ref": "#/definitions/AutomaticTerminationMode"
         }
       },
       "required": [
@@ -52,6 +87,23 @@
         "Ec2InstanceTypes",
         "StreamingImageIds"
       ],
+      "additionalProperties": false
+    },
+    "StreamConfigurationSessionBackup": {
+      "type": "object",
+      "description": "<p>Configures how streaming sessions are backed up when launched from this launch\n            profile.</p>",
+      "properties": {
+        "Mode": {
+          "$ref": "#/definitions/SessionBackupMode"
+        },
+        "MaxBackupsToRetain": {
+          "type": "number",
+          "default": 0,
+          "maximum": 10,
+          "minimum": 0,
+          "description": "<p>The maximum number of backups that each streaming session created from this launch\n            profile can have.</p>"
+        }
+      },
       "additionalProperties": false
     },
     "StreamConfigurationSessionStorage": {
@@ -70,6 +122,9 @@
           "description": "<p>Allows artists to upload files to their workstations. The only valid option is\n                <code>UPLOAD</code>.</p>"
         }
       },
+      "required": [
+        "Mode"
+      ],
       "additionalProperties": false
     },
     "StreamingClipboardMode": {
@@ -87,7 +142,14 @@
         "g4dn.4xlarge",
         "g4dn.8xlarge",
         "g4dn.12xlarge",
-        "g4dn.16xlarge"
+        "g4dn.16xlarge",
+        "g3.4xlarge",
+        "g3s.xlarge",
+        "g5.xlarge",
+        "g5.2xlarge",
+        "g5.4xlarge",
+        "g5.8xlarge",
+        "g5.16xlarge"
       ]
     },
     "StreamingSessionStorageMode": {
@@ -104,7 +166,7 @@
           "type": "string",
           "maxLength": 128,
           "minLength": 1,
-          "pattern": "^(/?|(\\$HOME)?(/[^\\$/\\n\\s\\\\]+)*)$",
+          "pattern": "^(\\$HOME|/)[/]?([A-Za-z0-9-_]+/)*([A-Za-z0-9_-]+)$",
           "description": "<p>The folder path in Linux workstations where files are uploaded.</p>"
         },
         "Windows": {
@@ -122,6 +184,34 @@
       "patternProperties": {
         ".+": {
           "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "VolumeConfiguration": {
+      "type": "object",
+      "description": "<p>Custom volume configuration for the root volumes that are attached to streaming\n            sessions.</p>\n         <p>This parameter is only allowed when <code>sessionPersistenceMode</code> is\n                <code>ACTIVATED</code>.</p>",
+      "properties": {
+        "Size": {
+          "type": "number",
+          "default": 500,
+          "maximum": 16000,
+          "minimum": 100,
+          "description": "<p>The size of the root volume that is attached to the streaming session. The root volume\n            size is measured in GiBs.</p>"
+        },
+        "Throughput": {
+          "type": "number",
+          "default": 125,
+          "maximum": 1000,
+          "minimum": 125,
+          "description": "<p>The throughput to provision for the root volume that is attached to the streaming\n            session. The throughput is measured in MiB/s.</p>"
+        },
+        "Iops": {
+          "type": "number",
+          "default": 3000,
+          "maximum": 16000,
+          "minimum": 3000,
+          "description": "<p>The number of I/O operations per second for the root volume that is attached to\n            streaming session.</p>"
         }
       },
       "additionalProperties": false
@@ -207,6 +297,7 @@
     "create": {
       "permissions": [
         "nimble:CreateLaunchProfile",
+        "nimble:GetLaunchProfile",
         "nimble:TagResource",
         "ec2:CreateNetworkInterface",
         "ec2:CreateNetworkInterfacePermission",
@@ -221,16 +312,32 @@
     },
     "update": {
       "permissions": [
-        "nimble:UpdateLaunchProfile"
+        "nimble:UpdateLaunchProfile",
+        "nimble:GetLaunchProfile",
+        "ec2:CreateNetworkInterface",
+        "ec2:CreateNetworkInterfacePermission",
+        "ec2:DescribeSubnets",
+        "ec2:RunInstances"
       ]
     },
     "delete": {
       "permissions": [
         "nimble:DeleteLaunchProfile",
+        "nimble:GetLaunchProfile",
         "nimble:UntagResource"
       ]
     },
     "list": {
+      "handlerSchema": {
+        "properties": {
+          "StudioId": {
+            "$ref": "resource-schema.json#/properties/StudioId"
+          }
+        },
+        "required": [
+          "StudioId"
+        ]
+      },
       "permissions": [
         "nimble:ListLaunchProfiles"
       ]

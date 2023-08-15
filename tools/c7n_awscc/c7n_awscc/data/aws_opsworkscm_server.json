@@ -99,10 +99,6 @@
       "type": "integer",
       "minLength": 1
     },
-    "Id": {
-      "type": "string",
-      "maxLength": 10000
-    },
     "Arn": {
       "type": "string",
       "maxLength": 10000
@@ -189,13 +185,19 @@
     "/properties/ServerName"
   ],
   "readOnlyProperties": [
-    "/properties/Id",
+    "/properties/ServerName",
     "/properties/Endpoint",
     "/properties/Arn"
   ],
   "writeOnlyProperties": [
+    "/properties/BackupId",
+    "/properties/CustomCertificate",
+    "/properties/CustomDomain",
     "/properties/CustomPrivateKey",
-    "/properties/EngineAttributes"
+    "/properties/EngineAttributes",
+    "/properties/EngineVersion",
+    "/properties/KeyPair",
+    "/properties/Tags"
   ],
   "handlers": {
     "create": {

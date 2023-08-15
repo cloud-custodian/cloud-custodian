@@ -1,0 +1,138 @@
+{
+  "typeName": "AWS::EC2::VPNConnection",
+  "$schema": "https://raw.githubusercontent.com/aws-cloudformation/cloudformation-resource-schema/blob/master/src/main/resources/schema/provider.definition.schema.v1.json",
+  "description": "Resource Type definition for AWS::EC2::VPNConnection",
+  "additionalProperties": false,
+  "properties": {
+    "VpnConnectionId": {
+      "description": "The provider-assigned unique ID for this managed resource",
+      "type": "string"
+    },
+    "CustomerGatewayId": {
+      "description": "The ID of the customer gateway at your end of the VPN connection.",
+      "type": "string"
+    },
+    "StaticRoutesOnly": {
+      "description": "Indicates whether the VPN connection uses static routes only.",
+      "type": "boolean"
+    },
+    "Tags": {
+      "description": "Any tags assigned to the VPN connection.",
+      "type": "array",
+      "uniqueItems": false,
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/Tag"
+      }
+    },
+    "TransitGatewayId": {
+      "description": "The ID of the transit gateway associated with the VPN connection.",
+      "type": "string"
+    },
+    "Type": {
+      "description": "The type of VPN connection.",
+      "type": "string"
+    },
+    "VpnGatewayId": {
+      "description": "The ID of the virtual private gateway at the AWS side of the VPN connection.",
+      "type": "string"
+    },
+    "VpnTunnelOptionsSpecifications": {
+      "description": "The tunnel options for the VPN connection.",
+      "type": "array",
+      "uniqueItems": false,
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/VpnTunnelOptionsSpecification"
+      }
+    }
+  },
+  "definitions": {
+    "VpnTunnelOptionsSpecification": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "PreSharedKey": {
+          "type": "string"
+        },
+        "TunnelInsideCidr": {
+          "type": "string"
+        }
+      }
+    },
+    "Tag": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Key": {
+          "type": "string"
+        },
+        "Value": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "Value",
+        "Key"
+      ]
+    }
+  },
+  "required": [
+    "Type",
+    "CustomerGatewayId"
+  ],
+  "createOnlyProperties": [
+    "/properties/Type",
+    "/properties/CustomerGatewayId",
+    "/properties/VpnGatewayId",
+    "/properties/TransitGatewayId",
+    "/properties/VpnTunnelOptionsSpecifications",
+    "/properties/StaticRoutesOnly"
+  ],
+  "readOnlyProperties": [
+    "/properties/VpnConnectionId"
+  ],
+  "primaryIdentifier": [
+    "/properties/VpnConnectionId"
+  ],
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": false,
+    "tagProperty": "/properties/Tags"
+  },
+  "handlers": {
+    "create": {
+      "permissions": [
+        "ec2:DescribeVpnConnections",
+        "ec2:CreateVpnConnection",
+        "ec2:CreateTags"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "ec2:DescribeVpnConnections",
+        "ec2:DeleteVpnConnection",
+        "ec2:DeleteTags"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "ec2:DescribeVpnConnections",
+        "ec2:CreateTags",
+        "ec2:DeleteTags"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "ec2:DescribeVpnConnections"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "ec2:DescribeVpnConnections"
+      ]
+    }
+  }
+}

@@ -64,8 +64,35 @@
         },
         "GenerationQualifier": {
           "type": "string"
+        },
+        "CustomAttributes": {
+          "$ref": "#/definitions/CustomAttributeList"
         }
       }
+    },
+    "CustomAttributeList": {
+      "description": "Array of X.500 attribute type and value. CustomAttributes cannot be used along with pre-defined attributes.",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/CustomAttribute"
+      }
+    },
+    "CustomAttribute": {
+      "description": "Structure that contains X.500 attribute type and value.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "ObjectIdentifier": {
+          "$ref": "#/definitions/CustomObjectIdentifier"
+        },
+        "Value": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "ObjectIdentifier",
+        "Value"
+      ]
     },
     "CrlConfiguration": {
       "description": "Your certificate authority can create and maintain a certificate revocation list (CRL). A CRL contains information about certificates that have been revoked.",
@@ -340,6 +367,10 @@
     "KeyStorageSecurityStandard": {
       "description": "KeyStorageSecurityStadard defines a cryptographic key management compliance standard used for handling CA keys.",
       "type": "string"
+    },
+    "UsageMode": {
+      "description": "Usage mode of the ceritificate authority.",
+      "type": "string"
     }
   },
   "additionalProperties": false,
@@ -362,7 +393,8 @@
     "/properties/SigningAlgorithm",
     "/properties/Subject",
     "/properties/CsrExtensions",
-    "/properties/KeyStorageSecurityStandard"
+    "/properties/KeyStorageSecurityStandard",
+    "/properties/UsageMode"
   ],
   "primaryIdentifier": [
     "/properties/Arn"

@@ -116,6 +116,39 @@
       ],
       "additionalProperties": false
     },
+    "IdentityProviderConfiguration": {
+      "description": "The identity provider configuration for the datastore",
+      "type": "object",
+      "properties": {
+        "AuthorizationStrategy": {
+          "description": "Type of Authorization Strategy. The two types of supported Authorization strategies are SMART_ON_FHIR_V1 and AWS_AUTH.",
+          "type": "string",
+          "enum": [
+            "SMART_ON_FHIR_V1",
+            "AWS_AUTH"
+          ]
+        },
+        "FineGrainedAuthorizationEnabled": {
+          "description": "Flag to indicate if fine-grained authorization will be enabled for the datastore",
+          "type": "boolean"
+        },
+        "Metadata": {
+          "description": "The JSON metadata elements for identity provider configuration.",
+          "type": "string"
+        },
+        "IdpLambdaArn": {
+          "description": "The Amazon Resource Name (ARN) of the Lambda function that will be used to decode the access token created by the authorization server.",
+          "type": "string",
+          "minLength": 49,
+          "maxLength": 256,
+          "pattern": "arn:aws[-a-z]*:lambda:[a-z]{2}-[a-z]+-\\d{1}:\\d{12}:function:[a-zA-Z0-9\\-_\\.]+(:(\\$LATEST|[a-zA-Z0-9\\-_]+))?"
+        }
+      },
+      "required": [
+        "AuthorizationStrategy"
+      ],
+      "additionalProperties": false
+    },
     "Tag": {
       "description": "A key-value pair. A tag consists of a tag key and a tag value. Tag keys and tag values are both required, but tag values can be empty (null) strings.",
       "type": "object",
@@ -168,6 +201,9 @@
     "SseConfiguration": {
       "$ref": "#/definitions/SseConfiguration"
     },
+    "IdentityProviderConfiguration": {
+      "$ref": "#/definitions/IdentityProviderConfiguration"
+    },
     "Tags": {
       "type": "array",
       "insertionOrder": false,
@@ -196,7 +232,8 @@
     "/properties/DatastoreTypeVersion",
     "/properties/PreloadDataConfig",
     "/properties/SseConfiguration",
-    "/properties/KmsEncryptionConfig"
+    "/properties/KmsEncryptionConfig",
+    "/properties/IdentityProviderConfiguration"
   ],
   "handlers": {
     "create": {
@@ -209,7 +246,15 @@
         "kms:GenerateDataKey",
         "kms:Decrypt",
         "iam:GetRole",
-        "iam:CreateServiceLinkedRole"
+        "iam:CreateServiceLinkedRole",
+        "ram:GetResourceShareInvitations",
+        "ram:AcceptResourceShareInvitation",
+        "glue:CreateDatabase",
+        "glue:DeleteDatabase",
+        "lambda:InvokeFunction",
+        "healthlake:TagResource",
+        "healthlake:UntagResource",
+        "healthlake:ListTagsForResource"
       ]
     },
     "read": {
@@ -223,6 +268,7 @@
         "healthlake:TagResource",
         "healthlake:UntagResource",
         "healthlake:ListTagsForResource",
+        "healthlake:DescribeFHIRDatastore",
         "iam:PassRole",
         "iam:GetRole",
         "iam:CreateServiceLinkedRole"
@@ -234,7 +280,11 @@
         "healthlake:DescribeFHIRDatastore",
         "iam:PassRole",
         "iam:GetRole",
-        "iam:CreateServiceLinkedRole"
+        "iam:CreateServiceLinkedRole",
+        "ram:GetResourceShareInvitations",
+        "ram:AcceptResourceShareInvitation",
+        "glue:CreateDatabase",
+        "glue:DeleteDatabase"
       ]
     },
     "list": {

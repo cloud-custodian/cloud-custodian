@@ -1,0 +1,238 @@
+{
+  "typeName": "AWS::MediaTailor::Channel",
+  "description": "Definition of AWS::MediaTailor::Channel Resource Type",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-mediatailor.git",
+  "definitions": {
+    "DashPlaylistSettings": {
+      "type": "object",
+      "description": "<p>Dash manifest configuration parameters.</p>",
+      "properties": {
+        "ManifestWindowSeconds": {
+          "type": "number",
+          "default": 0,
+          "description": "<p>The total duration (in seconds) of each manifest. Minimum value: <code>30</code> seconds. Maximum value: <code>3600</code> seconds.</p>"
+        },
+        "MinBufferTimeSeconds": {
+          "type": "number",
+          "default": 0,
+          "description": "<p>Minimum amount of content (measured in seconds) that a player must keep available in the buffer. Minimum value: <code>2</code> seconds. Maximum value: <code>60</code> seconds.</p>"
+        },
+        "MinUpdatePeriodSeconds": {
+          "type": "number",
+          "default": 0,
+          "description": "<p>Minimum amount of time (in seconds) that the player should wait before requesting updates to the manifest. Minimum value: <code>2</code> seconds. Maximum value: <code>60</code> seconds.</p>"
+        },
+        "SuggestedPresentationDelaySeconds": {
+          "type": "number",
+          "default": 0,
+          "description": "<p>Amount of time (in seconds) that the player should be from the live point at the end of the manifest. Minimum value: <code>2</code> seconds. Maximum value: <code>60</code> seconds.</p>"
+        }
+      },
+      "additionalProperties": false
+    },
+    "HlsPlaylistSettings": {
+      "type": "object",
+      "description": "<p>HLS playlist configuration parameters.</p>",
+      "properties": {
+        "ManifestWindowSeconds": {
+          "type": "number",
+          "default": 0,
+          "description": "<p>The total duration (in seconds) of each manifest. Minimum value: <code>30</code> seconds. Maximum value: <code>3600</code> seconds.</p>"
+        }
+      },
+      "additionalProperties": false
+    },
+    "LogConfigurationForChannel": {
+      "type": "object",
+      "description": "<p>The log configuration for the channel.</p>",
+      "properties": {
+        "LogTypes": {
+          "type": "array",
+          "insertionOrder": false,
+          "items": {
+            "$ref": "#/definitions/LogType"
+          },
+          "description": "<p>The log types.</p>"
+        }
+      },
+      "additionalProperties": false
+    },
+    "LogType": {
+      "type": "string",
+      "enum": [
+        "AS_RUN"
+      ]
+    },
+    "PlaybackMode": {
+      "type": "string",
+      "enum": [
+        "LOOP",
+        "LINEAR"
+      ]
+    },
+    "RequestOutputItem": {
+      "type": "object",
+      "description": "<p>The output configuration for this channel.</p>",
+      "properties": {
+        "DashPlaylistSettings": {
+          "$ref": "#/definitions/DashPlaylistSettings"
+        },
+        "HlsPlaylistSettings": {
+          "$ref": "#/definitions/HlsPlaylistSettings"
+        },
+        "ManifestName": {
+          "type": "string",
+          "description": "<p>The name of the manifest for the channel. The name appears in the <code>PlaybackUrl</code>.</p>"
+        },
+        "SourceGroup": {
+          "type": "string",
+          "description": "<p>A string used to match which <code>HttpPackageConfiguration</code> is used for each <code>VodSource</code>.</p>"
+        }
+      },
+      "required": [
+        "ManifestName",
+        "SourceGroup"
+      ],
+      "additionalProperties": false
+    },
+    "SlateSource": {
+      "type": "object",
+      "description": "<p>Slate VOD source configuration.</p>",
+      "properties": {
+        "SourceLocationName": {
+          "type": "string",
+          "description": "<p>The name of the source location where the slate VOD source is stored.</p>"
+        },
+        "VodSourceName": {
+          "type": "string",
+          "description": "<p>The slate VOD source name. The VOD source must already exist in a source location before it can be used for slate.</p>"
+        }
+      },
+      "additionalProperties": false
+    },
+    "Tag": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Key": {
+          "type": "string"
+        },
+        "Value": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "Value",
+        "Key"
+      ]
+    },
+    "Tier": {
+      "type": "string",
+      "enum": [
+        "BASIC",
+        "STANDARD"
+      ]
+    }
+  },
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": false,
+    "tagProperty": "/properties/Tags"
+  },
+  "properties": {
+    "Arn": {
+      "type": "string",
+      "description": "<p>The ARN of the channel.</p>"
+    },
+    "ChannelName": {
+      "type": "string"
+    },
+    "FillerSlate": {
+      "$ref": "#/definitions/SlateSource"
+    },
+    "LogConfiguration": {
+      "$ref": "#/definitions/LogConfigurationForChannel"
+    },
+    "Outputs": {
+      "type": "array",
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/RequestOutputItem"
+      },
+      "description": "<p>The channel's output properties.</p>"
+    },
+    "PlaybackMode": {
+      "$ref": "#/definitions/PlaybackMode"
+    },
+    "Tags": {
+      "description": "The tags to assign to the channel.",
+      "type": "array",
+      "uniqueItems": true,
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/Tag"
+      }
+    },
+    "Tier": {
+      "$ref": "#/definitions/Tier"
+    }
+  },
+  "required": [
+    "ChannelName",
+    "Outputs",
+    "PlaybackMode"
+  ],
+  "readOnlyProperties": [
+    "/properties/Arn"
+  ],
+  "writeOnlyProperties": [
+    "/properties/Outputs"
+  ],
+  "createOnlyProperties": [
+    "/properties/ChannelName",
+    "/properties/Tier"
+  ],
+  "primaryIdentifier": [
+    "/properties/ChannelName"
+  ],
+  "handlers": {
+    "create": {
+      "permissions": [
+        "mediatailor:CreateChannel",
+        "mediatailor:TagResource",
+        "mediatailor:ConfigureLogsForChannel",
+        "iam:CreateServiceLinkedRole",
+        "mediatailor:DescribeChannel"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "mediatailor:DescribeChannel"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "mediatailor:UpdateChannel",
+        "mediatailor:TagResource",
+        "mediatailor:UntagResource",
+        "iam:CreateServiceLinkedRole",
+        "mediatailor:ConfigureLogsForChannel",
+        "mediatailor:DescribeChannel"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "mediatailor:DeleteChannel",
+        "mediatailor:DescribeChannel"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "mediatailor:ListChannels"
+      ]
+    }
+  },
+  "additionalProperties": false
+}

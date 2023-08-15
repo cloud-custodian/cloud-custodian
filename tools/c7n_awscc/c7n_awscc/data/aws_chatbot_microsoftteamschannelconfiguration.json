@@ -1,0 +1,126 @@
+{
+  "typeName": "AWS::Chatbot::MicrosoftTeamsChannelConfiguration",
+  "description": "Resource schema for AWS::Chatbot::MicrosoftTeamsChannelConfiguration.",
+  "sourceUrl": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-chatbot-microsoftteamschannelconfiguration.html",
+  "properties": {
+    "TeamId": {
+      "description": "The id of the Microsoft Teams team",
+      "type": "string",
+      "pattern": "^[0-9A-Fa-f]{8}(?:-[0-9A-Fa-f]{4}){3}-[0-9A-Fa-f]{12}$",
+      "minLength": 36,
+      "maxLength": 36
+    },
+    "TeamsChannelId": {
+      "description": "The id of the Microsoft Teams channel",
+      "type": "string",
+      "pattern": "^([a-zA-Z0-9-_=+/.,])*%3a([a-zA-Z0-9-_=+/.,])*%40([a-zA-Z0-9-_=+/.,])*$",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "TeamsTenantId": {
+      "description": "The id of the Microsoft Teams tenant",
+      "type": "string",
+      "pattern": "^[0-9A-Fa-f]{8}(?:-[0-9A-Fa-f]{4}){3}-[0-9A-Fa-f]{12}$",
+      "minLength": 36,
+      "maxLength": 36
+    },
+    "ConfigurationName": {
+      "description": "The name of the configuration",
+      "type": "string",
+      "pattern": "^[A-Za-z0-9-_]+$",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "IamRoleArn": {
+      "description": "The ARN of the IAM role that defines the permissions for AWS Chatbot",
+      "type": "string",
+      "pattern": "^arn:(aws[a-zA-Z-]*)?:[A-Za-z0-9][A-Za-z0-9_/.-]{0,62}:[A-Za-z0-9_/.-]{0,63}:[A-Za-z0-9_/.-]{0,63}:[A-Za-z0-9][A-Za-z0-9:_/+=,@.-]{0,1023}$"
+    },
+    "SnsTopicArns": {
+      "description": "ARNs of SNS topics which delivers notifications to AWS Chatbot, for example CloudWatch alarm notifications.",
+      "type": "array",
+      "insertionOrder": false,
+      "items": {
+        "type": "string",
+        "pattern": "^arn:(aws[a-zA-Z-]*)?:[A-Za-z0-9][A-Za-z0-9_/.-]{0,62}:[A-Za-z0-9_/.-]{0,63}:[A-Za-z0-9_/.-]{0,63}:[A-Za-z0-9][A-Za-z0-9:_/+=,@.-]{0,1023}$"
+      }
+    },
+    "LoggingLevel": {
+      "description": "Specifies the logging level for this configuration:ERROR,INFO or NONE. This property affects the log entries pushed to Amazon CloudWatch logs",
+      "type": "string",
+      "pattern": "^(ERROR|INFO|NONE)$",
+      "default": "NONE"
+    },
+    "Arn": {
+      "description": "Amazon Resource Name (ARN) of the configuration",
+      "type": "string",
+      "pattern": "^arn:(aws[a-zA-Z-]*)?:chatbot:[A-Za-z0-9_/.-]{0,63}:[A-Za-z0-9_/.-]{0,63}:[A-Za-z0-9][A-Za-z0-9:_/+=,@.-]{0,1023}$"
+    },
+    "GuardrailPolicies": {
+      "description": "The list of IAM policy ARNs that are applied as channel guardrails. The AWS managed 'AdministratorAccess' policy is applied as a default if this is not set.",
+      "type": "array",
+      "insertionOrder": false,
+      "items": {
+        "type": "string",
+        "pattern": "^(^$|arn:aws:iam:[A-Za-z0-9_\\/.-]{0,63}:[A-Za-z0-9_\\/.-]{0,63}:[A-Za-z0-9][A-Za-z0-9:_\\/+=,@.-]{0,1023})$"
+      }
+    },
+    "UserRoleRequired": {
+      "description": "Enables use of a user role requirement in your chat configuration",
+      "type": "boolean",
+      "default": false
+    }
+  },
+  "required": [
+    "TeamId",
+    "TeamsChannelId",
+    "TeamsTenantId",
+    "ConfigurationName",
+    "IamRoleArn"
+  ],
+  "createOnlyProperties": [
+    "/properties/TeamId",
+    "/properties/TeamsTenantId",
+    "/properties/ConfigurationName"
+  ],
+  "readOnlyProperties": [
+    "/properties/Arn"
+  ],
+  "primaryIdentifier": [
+    "/properties/Arn"
+  ],
+  "additionalProperties": false,
+  "handlers": {
+    "create": {
+      "permissions": [
+        "chatbot:CreateMicrosoftTeamsChannelConfiguration",
+        "iam:PassRole",
+        "iam:CreateServiceLinkedRole"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "chatbot:GetMicrosoftTeamsChannelConfiguration"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "chatbot:UpdateMicrosoftTeamsChannelConfiguration",
+        "iam:PassRole"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "chatbot:DeleteMicrosoftTeamsChannelConfiguration"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "chatbot:ListMicrosoftTeamsChannelConfigurations"
+      ]
+    }
+  },
+  "tagging": {
+    "taggable": false
+  }
+}

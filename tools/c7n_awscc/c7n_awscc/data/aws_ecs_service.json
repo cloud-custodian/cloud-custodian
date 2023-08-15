@@ -42,6 +42,29 @@
       },
       "additionalProperties": false
     },
+    "DeploymentAlarms": {
+      "type": "object",
+      "properties": {
+        "AlarmNames": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "Rollback": {
+          "type": "boolean"
+        },
+        "Enable": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "AlarmNames",
+        "Rollback",
+        "Enable"
+      ],
+      "additionalProperties": false
+    },
     "DeploymentCircuitBreaker": {
       "type": "object",
       "properties": {
@@ -69,6 +92,9 @@
         },
         "MinimumHealthyPercent": {
           "type": "integer"
+        },
+        "Alarms": {
+          "$ref": "#/definitions/DeploymentAlarms"
         }
       },
       "additionalProperties": false
@@ -101,6 +127,31 @@
         },
         "TargetGroupArn": {
           "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "LogConfiguration": {
+      "type": "object",
+      "properties": {
+        "LogDriver": {
+          "type": "string"
+        },
+        "Options": {
+          "type": "object",
+          "patternProperties": {
+            ".{1,}": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        },
+        "SecretOptions": {
+          "type": "array",
+          "insertionOrder": false,
+          "items": {
+            "$ref": "#/definitions/Secret"
+          }
         }
       },
       "additionalProperties": false
@@ -150,6 +201,85 @@
       },
       "required": [
         "Type"
+      ],
+      "additionalProperties": false
+    },
+    "Secret": {
+      "type": "object",
+      "required": [
+        "Name",
+        "ValueFrom"
+      ],
+      "properties": {
+        "Name": {
+          "type": "string"
+        },
+        "ValueFrom": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "ServiceConnectClientAlias": {
+      "type": "object",
+      "properties": {
+        "Port": {
+          "type": "integer"
+        },
+        "DnsName": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "Port"
+      ],
+      "additionalProperties": false
+    },
+    "ServiceConnectConfiguration": {
+      "type": "object",
+      "properties": {
+        "Enabled": {
+          "type": "boolean"
+        },
+        "Namespace": {
+          "type": "string"
+        },
+        "Services": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ServiceConnectService"
+          }
+        },
+        "LogConfiguration": {
+          "$ref": "#/definitions/LogConfiguration"
+        }
+      },
+      "required": [
+        "Enabled"
+      ],
+      "additionalProperties": false
+    },
+    "ServiceConnectService": {
+      "type": "object",
+      "properties": {
+        "PortName": {
+          "type": "string"
+        },
+        "DiscoveryName": {
+          "type": "string"
+        },
+        "ClientAliases": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ServiceConnectClientAlias"
+          }
+        },
+        "IngressPortOverride": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "PortName"
       ],
       "additionalProperties": false
     },
@@ -268,6 +398,9 @@
         "REPLICA"
       ]
     },
+    "ServiceConnectConfiguration": {
+      "$ref": "#/definitions/ServiceConnectConfiguration"
+    },
     "ServiceName": {
       "type": "string"
     },
@@ -337,16 +470,13 @@
   "createOnlyProperties": [
     "/properties/Cluster",
     "/properties/DeploymentController",
-    "/properties/EnableECSManagedTags",
     "/properties/LaunchType",
-    "/properties/LoadBalancers",
-    "/properties/PlacementConstraints",
-    "/properties/PlacementStrategies",
-    "/properties/PropagateTags",
     "/properties/Role",
     "/properties/SchedulingStrategy",
-    "/properties/ServiceName",
-    "/properties/ServiceRegistries"
+    "/properties/ServiceName"
+  ],
+  "writeOnlyProperties": [
+    "/properties/ServiceConnectConfiguration"
   ],
   "additionalProperties": false
 }

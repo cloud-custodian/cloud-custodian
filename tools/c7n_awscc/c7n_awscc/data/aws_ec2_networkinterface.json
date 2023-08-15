@@ -1,9 +1,137 @@
 {
-  "typeName": "AWS::EC2::NetworkInterface",
   "$schema": "https://raw.githubusercontent.com/aws-cloudformation/cloudformation-resource-schema/master/src/main/resources/schema/provider.definition.schema.v1.json",
-  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-ec2/networkinterface",
+  "taggable": true,
+  "typeName": "AWS::EC2::NetworkInterface",
+  "readOnlyProperties": [
+    "/properties/Id",
+    "/properties/SecondaryPrivateIpAddresses",
+    "/properties/PrimaryPrivateIpAddress"
+  ],
   "description": "The AWS::EC2::NetworkInterface resource creates network interface",
+  "createOnlyProperties": [
+    "/properties/PrivateIpAddress",
+    "/properties/InterfaceType",
+    "/properties/SubnetId"
+  ],
+  "primaryIdentifier": [
+    "/properties/Id"
+  ],
+  "required": [
+    "SubnetId"
+  ],
+  "conditionalCreateOnlyProperties": [
+    "/properties/PrivateIpAddresses"
+  ],
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-ec2/networkinterface",
+  "handlers": {
+    "read": {
+      "permissions": [
+        "ec2:DescribeNetworkInterfaces"
+      ]
+    },
+    "create": {
+      "permissions": [
+        "ec2:CreateNetworkInterface",
+        "ec2:DescribeNetworkInterfaces",
+        "ec2:CreateTags",
+        "ec2:ModifyNetworkInterfaceAttribute"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "ec2:DescribeNetworkInterfaces",
+        "ec2:ModifyNetworkInterfaceAttribute",
+        "ec2:UnassignIpv6Addresses",
+        "ec2:AssignIpv6Addresses",
+        "ec2:DeleteTags",
+        "ec2:CreateTags",
+        "ec2:UnassignPrivateIpAddresses",
+        "ec2:AssignPrivateIpAddresses"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "ec2:DescribeNetworkInterfaces"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "ec2:DescribeNetworkInterfaces",
+        "ec2:DeleteNetworkInterface"
+      ]
+    }
+  },
   "additionalProperties": false,
+  "definitions": {
+    "PrivateIpAddressSpecification": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "PrivateIpAddress": {
+          "type": "string"
+        },
+        "Primary": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "PrivateIpAddress",
+        "Primary"
+      ]
+    },
+    "Ipv4PrefixSpecification": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "Ipv4Prefix": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "Ipv4Prefix"
+      ]
+    },
+    "InstanceIpv6Address": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "Ipv6Address": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "Ipv6Address"
+      ]
+    },
+    "Ipv6PrefixSpecification": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "Ipv6Prefix": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "Ipv6Prefix"
+      ]
+    },
+    "Tag": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "Value": {
+          "type": "string"
+        },
+        "Key": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "Value",
+        "Key"
+      ]
+    }
+  },
   "properties": {
     "Description": {
       "description": "A description for the network interface.",
@@ -14,10 +142,10 @@
       "type": "string"
     },
     "PrivateIpAddresses": {
-      "description": "Assigns a list of private IP addresses to the network interface. You can specify a primary private IP address by setting the value of the Primary property to true in the PrivateIpAddressSpecification property. If you want EC2 to automatically assign private IP addresses, use the SecondaryPrivateIpAddressCount property and do not specify this property.",
-      "type": "array",
       "uniqueItems": false,
+      "description": "Assigns a list of private IP addresses to the network interface. You can specify a primary private IP address by setting the value of the Primary property to true in the PrivateIpAddressSpecification property. If you want EC2 to automatically assign private IP addresses, use the SecondaryPrivateIpAddressCount property and do not specify this property.",
       "insertionOrder": false,
+      "type": "array",
       "items": {
         "$ref": "#/definitions/PrivateIpAddressSpecification"
       }
@@ -26,26 +154,52 @@
       "description": "The number of secondary private IPv4 addresses to assign to a network interface. When you specify a number of secondary IPv4 addresses, Amazon EC2 selects these IP addresses within the subnet's IPv4 CIDR range. You can't specify this option and specify more than one private IP address using privateIpAddresses",
       "type": "integer"
     },
+    "Ipv6PrefixCount": {
+      "description": "The number of IPv6 prefixes to assign to a network interface. When you specify a number of IPv6 prefixes, Amazon EC2 selects these prefixes from your existing subnet CIDR reservations, if available, or from free spaces in the subnet. By default, these will be /80 prefixes. You can't specify a count of IPv6 prefixes if you've specified one of the following: specific IPv6 prefixes, specific IPv6 addresses, or a count of IPv6 addresses.",
+      "type": "integer"
+    },
     "PrimaryPrivateIpAddress": {
       "description": "Returns the primary private IP address of the network interface.",
       "type": "string"
     },
-    "GroupSet": {
-      "description": "A list of security group IDs associated with this network interface.",
-      "type": "array",
+    "Ipv4Prefixes": {
       "uniqueItems": false,
+      "description": "Assigns a list of IPv4 prefixes to the network interface. If you want EC2 to automatically assign IPv4 prefixes, use the Ipv4PrefixCount property and do not specify this property. Presently, only /28 prefixes are supported. You can't specify IPv4 prefixes if you've specified one of the following: a count of IPv4 prefixes, specific private IPv4 addresses, or a count of private IPv4 addresses.",
       "insertionOrder": false,
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Ipv4PrefixSpecification"
+      }
+    },
+    "Ipv4PrefixCount": {
+      "description": "The number of IPv4 prefixes to assign to a network interface. When you specify a number of IPv4 prefixes, Amazon EC2 selects these prefixes from your existing subnet CIDR reservations, if available, or from free spaces in the subnet. By default, these will be /28 prefixes. You can't specify a count of IPv4 prefixes if you've specified one of the following: specific IPv4 prefixes, specific private IPv4 addresses, or a count of private IPv4 addresses.",
+      "type": "integer"
+    },
+    "GroupSet": {
+      "uniqueItems": false,
+      "description": "A list of security group IDs associated with this network interface.",
+      "insertionOrder": false,
+      "type": "array",
       "items": {
         "type": "string"
       }
     },
     "Ipv6Addresses": {
-      "description": "One or more specific IPv6 addresses from the IPv6 CIDR block range of your subnet to associate with the network interface. If you're specifying a number of IPv6 addresses, use the Ipv6AddressCount property and don't specify this property.",
-      "type": "array",
       "uniqueItems": true,
+      "description": "One or more specific IPv6 addresses from the IPv6 CIDR block range of your subnet to associate with the network interface. If you're specifying a number of IPv6 addresses, use the Ipv6AddressCount property and don't specify this property.",
       "insertionOrder": false,
+      "type": "array",
       "items": {
         "$ref": "#/definitions/InstanceIpv6Address"
+      }
+    },
+    "Ipv6Prefixes": {
+      "uniqueItems": false,
+      "description": "Assigns a list of IPv6 prefixes to the network interface. If you want EC2 to automatically assign IPv6 prefixes, use the Ipv6PrefixCount property and do not specify this property. Presently, only /80 prefixes are supported. You can't specify IPv6 prefixes if you've specified one of the following: a count of IPv6 prefixes, specific IPv6 addresses, or a count of IPv6 addresses.",
+      "insertionOrder": false,
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Ipv6PrefixSpecification"
       }
     },
     "SubnetId": {
@@ -61,10 +215,10 @@
       "type": "string"
     },
     "SecondaryPrivateIpAddresses": {
-      "description": "Returns the secondary private IP addresses of the network interface.",
-      "type": "array",
       "uniqueItems": false,
+      "description": "Returns the secondary private IP addresses of the network interface.",
       "insertionOrder": false,
+      "type": "array",
       "items": {
         "type": "string"
       }
@@ -78,117 +232,13 @@
       "type": "string"
     },
     "Tags": {
-      "description": "An arbitrary set of tags (key-value pairs) for this network interface.",
-      "type": "array",
       "uniqueItems": false,
+      "description": "An arbitrary set of tags (key-value pairs) for this network interface.",
       "insertionOrder": false,
+      "type": "array",
       "items": {
         "$ref": "#/definitions/Tag"
       }
-    }
-  },
-  "definitions": {
-    "PrivateIpAddressSpecification": {
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "PrivateIpAddress": {
-          "type": "string"
-        },
-        "Primary": {
-          "type": "boolean"
-        }
-      },
-      "required": [
-        "PrivateIpAddress",
-        "Primary"
-      ]
-    },
-    "InstanceIpv6Address": {
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "Ipv6Address": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "Ipv6Address"
-      ]
-    },
-    "Tag": {
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "Value": {
-          "type": "string"
-        },
-        "Key": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "Value",
-        "Key"
-      ]
-    }
-  },
-  "required": [
-    "SubnetId"
-  ],
-  "createOnlyProperties": [
-    "/properties/PrivateIpAddress",
-    "/properties/InterfaceType",
-    "/properties/SubnetId"
-  ],
-  "primaryIdentifier": [
-    "/properties/Id"
-  ],
-  "readOnlyProperties": [
-    "/properties/Id",
-    "/properties/SecondaryPrivateIpAddresses",
-    "/properties/PrimaryPrivateIpAddress"
-  ],
-  "conditionalCreateOnlyProperties": [
-    "/properties/PrivateIpAddresses"
-  ],
-  "taggable": true,
-  "handlers": {
-    "create": {
-      "permissions": [
-        "ec2:CreateNetworkInterface",
-        "ec2:DescribeNetworkInterfaces",
-        "ec2:CreateTags",
-        "ec2:ModifyNetworkInterfaceAttribute"
-      ]
-    },
-    "delete": {
-      "permissions": [
-        "ec2:DescribeNetworkInterfaces",
-        "ec2:DeleteNetworkInterface"
-      ]
-    },
-    "list": {
-      "permissions": [
-        "ec2:DescribeNetworkInterfaces"
-      ]
-    },
-    "read": {
-      "permissions": [
-        "ec2:DescribeNetworkInterfaces"
-      ]
-    },
-    "update": {
-      "permissions": [
-        "ec2:DescribeNetworkInterfaces",
-        "ec2:ModifyNetworkInterfaceAttribute",
-        "ec2:UnassignIpv6Addresses",
-        "ec2:AssignIpv6Addresses",
-        "ec2:DeleteTags",
-        "ec2:CreateTags",
-        "ec2:UnassignPrivateIpAddresses",
-        "ec2:AssignPrivateIpAddresses"
-      ]
     }
   }
 }

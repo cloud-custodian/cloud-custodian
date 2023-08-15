@@ -1,0 +1,254 @@
+{
+  "typeName": "AWS::ElasticLoadBalancingV2::TargetGroup",
+  "description": "Resource Type definition for AWS::ElasticLoadBalancingV2::TargetGroup",
+  "additionalProperties": false,
+  "properties": {
+    "IpAddressType": {
+      "type": "string",
+      "description": "The type of IP address used for this target group. The possible values are ipv4 and ipv6. "
+    },
+    "HealthCheckIntervalSeconds": {
+      "type": "integer",
+      "description": "The approximate amount of time, in seconds, between health checks of an individual target."
+    },
+    "LoadBalancerArns": {
+      "type": "array",
+      "insertionOrder": false,
+      "description": "The Amazon Resource Names (ARNs) of the load balancers that route traffic to this target group.",
+      "uniqueItems": false,
+      "items": {
+        "type": "string"
+      }
+    },
+    "Matcher": {
+      "$ref": "#/definitions/Matcher",
+      "description": "[HTTP/HTTPS health checks] The HTTP or gRPC codes to use when checking for a successful response from a target."
+    },
+    "HealthCheckPath": {
+      "type": "string",
+      "description": "[HTTP/HTTPS health checks] The destination for health checks on the targets. [HTTP1 or HTTP2 protocol version] The ping path. The default is /. [GRPC protocol version] The path of a custom health check method with the format /package.service/method. The default is /AWS.ALB/healthcheck."
+    },
+    "Port": {
+      "type": "integer",
+      "description": "The port on which the targets receive traffic. This port is used unless you specify a port override when registering the target. If the target is a Lambda function, this parameter does not apply. If the protocol is GENEVE, the supported port is 6081."
+    },
+    "Targets": {
+      "type": "array",
+      "description": "The targets.",
+      "uniqueItems": true,
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/TargetDescription"
+      }
+    },
+    "HealthCheckEnabled": {
+      "type": "boolean",
+      "description": "Indicates whether health checks are enabled. If the target type is lambda, health checks are disabled by default but can be enabled. If the target type is instance, ip, or alb, health checks are always enabled and cannot be disabled."
+    },
+    "ProtocolVersion": {
+      "type": "string",
+      "description": "[HTTP/HTTPS protocol] The protocol version. The possible values are GRPC, HTTP1, and HTTP2."
+    },
+    "UnhealthyThresholdCount": {
+      "type": "integer",
+      "description": "The number of consecutive health check failures required before considering a target unhealthy."
+    },
+    "HealthCheckTimeoutSeconds": {
+      "type": "integer",
+      "description": "The amount of time, in seconds, during which no response from a target means a failed health check."
+    },
+    "Name": {
+      "type": "string",
+      "description": "The name of the target group."
+    },
+    "VpcId": {
+      "type": "string",
+      "description": "The identifier of the virtual private cloud (VPC). If the target is a Lambda function, this parameter does not apply."
+    },
+    "TargetGroupFullName": {
+      "type": "string",
+      "description": "The full name of the target group."
+    },
+    "HealthyThresholdCount": {
+      "type": "integer",
+      "description": "The number of consecutive health checks successes required before considering an unhealthy target healthy. "
+    },
+    "HealthCheckProtocol": {
+      "type": "string",
+      "description": "The protocol the load balancer uses when performing health checks on targets. "
+    },
+    "TargetGroupAttributes": {
+      "type": "array",
+      "arrayType": "AttributeList",
+      "description": "The attributes.",
+      "uniqueItems": true,
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/TargetGroupAttribute"
+      }
+    },
+    "TargetType": {
+      "type": "string",
+      "description": "The type of target that you must specify when registering targets with this target group. You can't specify targets for a target group using more than one target type."
+    },
+    "HealthCheckPort": {
+      "type": "string",
+      "description": "The port the load balancer uses when performing health checks on targets. "
+    },
+    "TargetGroupArn": {
+      "type": "string",
+      "description": "The ARN of the Target Group"
+    },
+    "Protocol": {
+      "type": "string",
+      "description": "The protocol to use for routing traffic to the targets."
+    },
+    "TargetGroupName": {
+      "type": "string",
+      "description": "The name of the target group."
+    },
+    "Tags": {
+      "type": "array",
+      "description": "The tags.",
+      "uniqueItems": false,
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/Tag"
+      }
+    }
+  },
+  "definitions": {
+    "Matcher": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "GrpcCode": {
+          "type": "string",
+          "description": "You can specify values between 0 and 99. You can specify multiple values, or a range of values. The default value is 12."
+        },
+        "HttpCode": {
+          "type": "string",
+          "description": "For Application Load Balancers, you can specify values between 200 and 499, and the default value is 200. You can specify multiple values or a range of values. "
+        }
+      }
+    },
+    "TargetDescription": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "AvailabilityZone": {
+          "type": "string",
+          "description": "An Availability Zone or all. This determines whether the target receives traffic from the load balancer nodes in the specified Availability Zone or from all enabled Availability Zones for the load balancer."
+        },
+        "Id": {
+          "type": "string",
+          "description": "The ID of the target. If the target type of the target group is instance, specify an instance ID. If the target type is ip, specify an IP address. If the target type is lambda, specify the ARN of the Lambda function. If the target type is alb, specify the ARN of the Application Load Balancer target. "
+        },
+        "Port": {
+          "type": "integer",
+          "description": "The port on which the target is listening. If the target group protocol is GENEVE, the supported port is 6081. If the target type is alb, the targeted Application Load Balancer must have at least one listener whose port matches the target group port. Not used if the target is a Lambda function."
+        }
+      },
+      "required": [
+        "Id"
+      ]
+    },
+    "TargetGroupAttribute": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Value": {
+          "type": "string",
+          "description": "The name of the attribute."
+        },
+        "Key": {
+          "type": "string",
+          "description": "The value of the attribute."
+        }
+      }
+    },
+    "Tag": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Value": {
+          "type": "string",
+          "description": "The key name of the tag. "
+        },
+        "Key": {
+          "type": "string",
+          "description": "The value for the tag. "
+        }
+      },
+      "required": [
+        "Value",
+        "Key"
+      ]
+    }
+  },
+  "createOnlyProperties": [
+    "/properties/TargetType",
+    "/properties/ProtocolVersion",
+    "/properties/Port",
+    "/properties/Name",
+    "/properties/VpcId",
+    "/properties/Protocol",
+    "/properties/IpAddressType"
+  ],
+  "primaryIdentifier": [
+    "/properties/TargetGroupArn"
+  ],
+  "readOnlyProperties": [
+    "/properties/LoadBalancerArns",
+    "/properties/TargetGroupArn",
+    "/properties/TargetGroupName",
+    "/properties/TargetGroupFullName"
+  ],
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": false,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": false,
+    "tagProperty": "/properties/Tags"
+  },
+  "handlers": {
+    "create": {
+      "permissions": [
+        "elasticloadbalancing:CreateTargetGroup",
+        "elasticloadbalancing:DescribeTargetGroups",
+        "elasticloadbalancing:RegisterTargets",
+        "elasticloadbalancing:AddTags"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "elasticloadbalancing:DeleteTargetGroup",
+        "elasticloadbalancing:DescribeTargetGroups"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "elasticloadbalancing:DescribeTargetGroups"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "elasticloadbalancing:DescribeTargetGroups",
+        "elasticloadbalancing:DescribeTargetGroupAttributes",
+        "elasticloadbalancing:DescribeTargetHealth",
+        "elasticloadbalancing:DescribeTags"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "elasticloadbalancing:DescribeTargetGroups",
+        "elasticloadbalancing:ModifyTargetGroup",
+        "elasticloadbalancing:ModifyTargetGroupAttributes",
+        "elasticloadbalancing:RegisterTargets",
+        "elasticloadbalancing:DeregisterTargets",
+        "elasticloadbalancing:AddTags",
+        "elasticloadbalancing:RemoveTags"
+      ]
+    }
+  }
+}

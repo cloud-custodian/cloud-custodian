@@ -43,6 +43,7 @@
     },
     "Endpoint": {
       "type": "object",
+      "additionalProperties": false,
       "properties": {
         "Port": {
           "type": "string"
@@ -145,16 +146,17 @@
     "ClusterSecurityGroups": {
       "description": "A list of security groups to be associated with this cluster.",
       "type": "array",
+      "insertionOrder": false,
       "uniqueItems": false,
       "items": {
         "type": "string"
       }
     },
     "IamRoles": {
-      "description": "A list of AWS Identity and Access Management (IAM) roles that can be used by the cluster to access other AWS services. You must supply the IAM roles in their Amazon Resource Name (ARN) format. You can supply up to 10 IAM roles in a single request",
+      "description": "A list of AWS Identity and Access Management (IAM) roles that can be used by the cluster to access other AWS services. You must supply the IAM roles in their Amazon Resource Name (ARN) format. You can supply up to 50 IAM roles in a single request",
       "type": "array",
-      "maxItems": 10,
-      "uniqueItems": true,
+      "insertionOrder": false,
+      "maxItems": 50,
       "items": {
         "type": "string"
       }
@@ -162,6 +164,7 @@
     "Tags": {
       "description": "The list of tags for the cluster parameter group.",
       "type": "array",
+      "insertionOrder": false,
       "maxItems": 50,
       "uniqueItems": false,
       "items": {
@@ -171,6 +174,7 @@
     "VpcSecurityGroupIds": {
       "description": "A list of Virtual Private Cloud (VPC) security groups to be associated with the cluster.",
       "type": "array",
+      "insertionOrder": false,
       "uniqueItems": false,
       "items": {
         "type": "string"
@@ -302,6 +306,9 @@
   "writeOnlyProperties": [
     "/properties/MasterUserPassword"
   ],
+  "tagging": {
+    "taggable": true
+  },
   "handlers": {
     "create": {
       "permissions": [

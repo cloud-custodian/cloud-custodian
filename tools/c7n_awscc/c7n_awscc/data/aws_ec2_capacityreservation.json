@@ -1,0 +1,159 @@
+{
+  "typeName": "AWS::EC2::CapacityReservation",
+  "description": "Resource Type definition for AWS::EC2::CapacityReservation",
+  "additionalProperties": false,
+  "properties": {
+    "Tenancy": {
+      "type": "string"
+    },
+    "EndDateType": {
+      "type": "string"
+    },
+    "TagSpecifications": {
+      "type": "array",
+      "insertionOrder": false,
+      "uniqueItems": false,
+      "items": {
+        "$ref": "#/definitions/TagSpecification"
+      }
+    },
+    "AvailabilityZone": {
+      "type": "string"
+    },
+    "TotalInstanceCount": {
+      "type": "integer"
+    },
+    "EndDate": {
+      "type": "string"
+    },
+    "EbsOptimized": {
+      "type": "boolean"
+    },
+    "OutPostArn": {
+      "type": "string"
+    },
+    "InstanceCount": {
+      "type": "integer"
+    },
+    "PlacementGroupArn": {
+      "type": "string"
+    },
+    "AvailableInstanceCount": {
+      "type": "integer"
+    },
+    "InstancePlatform": {
+      "type": "string"
+    },
+    "Id": {
+      "type": "string"
+    },
+    "InstanceType": {
+      "type": "string"
+    },
+    "EphemeralStorage": {
+      "type": "boolean"
+    },
+    "InstanceMatchCriteria": {
+      "type": "string"
+    }
+  },
+  "definitions": {
+    "Tag": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Value": {
+          "type": "string"
+        },
+        "Key": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "Value",
+        "Key"
+      ]
+    },
+    "TagSpecification": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "ResourceType": {
+          "type": "string"
+        },
+        "Tags": {
+          "type": "array",
+          "insertionOrder": false,
+          "uniqueItems": false,
+          "items": {
+            "$ref": "#/definitions/Tag"
+          }
+        }
+      }
+    }
+  },
+  "required": [
+    "InstanceCount",
+    "AvailabilityZone",
+    "InstancePlatform",
+    "InstanceType"
+  ],
+  "createOnlyProperties": [
+    "/properties/Tenancy",
+    "/properties/InstanceMatchCriteria",
+    "/properties/InstancePlatform",
+    "/properties/InstanceType",
+    "/properties/AvailabilityZone",
+    "/properties/TagSpecifications",
+    "/properties/OutPostArn",
+    "/properties/EphemeralStorage",
+    "/properties/EbsOptimized",
+    "/properties/PlacementGroupArn"
+  ],
+  "primaryIdentifier": [
+    "/properties/Id"
+  ],
+  "readOnlyProperties": [
+    "/properties/Id",
+    "/properties/AvailableInstanceCount",
+    "/properties/TotalInstanceCount"
+  ],
+  "handlers": {
+    "create": {
+      "permissions": [
+        "ec2:CreateCapacityReservation",
+        "ec2:DescribeCapacityReservations",
+        "ec2:CancelCapacityReservation",
+        "ec2:CreateTags"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "ec2:CreateCapacityReservation",
+        "ec2:DescribeCapacityReservations",
+        "ec2:CancelCapacityReservation",
+        "ec2:DeleteTags"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "ec2:DescribeCapacityReservations"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "ec2:DescribeCapacityReservations"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "ec2:ModifyCapacityReservation",
+        "ec2:CreateCapacityReservation",
+        "ec2:DescribeCapacityReservations",
+        "ec2:CancelCapacityReservation",
+        "ec2:CreateTags",
+        "ec2:DeleteTags"
+      ]
+    }
+  }
+}

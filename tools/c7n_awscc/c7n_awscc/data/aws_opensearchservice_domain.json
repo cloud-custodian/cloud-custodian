@@ -45,6 +45,9 @@
         },
         "DedicatedMasterType": {
           "type": "string"
+        },
+        "MultiAZWithStandbyEnabled": {
+          "type": "boolean"
         }
       }
     },
@@ -152,6 +155,51 @@
         }
       }
     },
+    "Idp": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "MetadataContent": {
+          "type": "string",
+          "maxLength": 1048576,
+          "minLength": 1
+        },
+        "EntityId": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "MetadataContent",
+        "EntityId"
+      ]
+    },
+    "SAMLOptions": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Enabled": {
+          "type": "boolean"
+        },
+        "Idp": {
+          "$ref": "#/definitions/Idp"
+        },
+        "MasterUserName": {
+          "type": "string"
+        },
+        "MasterBackendRole": {
+          "type": "string"
+        },
+        "SubjectKey": {
+          "type": "string"
+        },
+        "RolesKey": {
+          "type": "string"
+        },
+        "SessionTimeoutMinutes": {
+          "type": "integer"
+        }
+      }
+    },
     "AdvancedSecurityOptionsInput": {
       "type": "object",
       "additionalProperties": false,
@@ -164,6 +212,15 @@
         },
         "InternalUserDatabaseEnabled": {
           "type": "boolean"
+        },
+        "AnonymousAuthEnabled": {
+          "type": "boolean"
+        },
+        "SAMLOptions": {
+          "$ref": "#/definitions/SAMLOptions"
+        },
+        "AnonymousAuthDisableDate": {
+          "type": "string"
         }
       }
     },
@@ -181,6 +238,9 @@
           "type": "integer"
         },
         "VolumeSize": {
+          "type": "integer"
+        },
+        "Throughput": {
           "type": "integer"
         }
       }
@@ -202,14 +262,16 @@
       "additionalProperties": false,
       "properties": {
         "Value": {
+          "description": "The key of the tag.",
           "type": "string",
-          "minLength": 1,
-          "maxLength": 255
+          "minLength": 0,
+          "maxLength": 256
         },
         "Key": {
+          "description": "The value of the tag.",
           "type": "string",
-          "minLength": 1,
-          "maxLength": 127
+          "minLength": 0,
+          "maxLength": 128
         }
       },
       "required": [
@@ -243,6 +305,56 @@
           "type": "string"
         },
         "OptionalDeployment": {
+          "type": "boolean"
+        }
+      }
+    },
+    "WindowStartTime": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Hours": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 23
+        },
+        "Minutes": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 59
+        }
+      },
+      "required": [
+        "Hours",
+        "Minutes"
+      ]
+    },
+    "OffPeakWindow": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "WindowStartTime": {
+          "$ref": "#/definitions/WindowStartTime"
+        }
+      }
+    },
+    "OffPeakWindowOptions": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Enabled": {
+          "type": "boolean"
+        },
+        "OffPeakWindow": {
+          "$ref": "#/definitions/OffPeakWindow"
+        }
+      }
+    },
+    "SoftwareUpdateOptions": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "AutoSoftwareUpdateEnabled": {
           "type": "boolean"
         }
       }
@@ -304,7 +416,7 @@
       "type": "object",
       "additionalProperties": false,
       "patternProperties": {
-        "^.$": {
+        "^.*$": {
           "type": "string"
         }
       }
@@ -334,12 +446,21 @@
     },
     "ServiceSoftwareOptions": {
       "$ref": "#/definitions/ServiceSoftwareOptions"
+    },
+    "OffPeakWindowOptions": {
+      "$ref": "#/definitions/OffPeakWindowOptions"
+    },
+    "SoftwareUpdateOptions": {
+      "$ref": "#/definitions/SoftwareUpdateOptions"
     }
   },
   "additionalProperties": false,
   "createOnlyProperties": [
-    "/properties/AdvancedSecurityOptions",
     "/properties/DomainName"
+  ],
+  "conditionalCreateOnlyProperties": [
+    "/properties/EncryptionAtRestOptions/properties",
+    "/properties/AdvancedSecurityOptions/properties/Enabled"
   ],
   "readOnlyProperties": [
     "/properties/Id",
@@ -347,10 +468,13 @@
     "/properties/DomainArn",
     "/properties/DomainEndpoint",
     "/properties/DomainEndpoints",
-    "/properties/ServiceSoftwareOptions"
+    "/properties/ServiceSoftwareOptions",
+    "/properties/AdvancedSecurityOptions/AnonymousAuthDisableDate"
   ],
   "writeOnlyProperties": [
-    "/properties/AdvancedSecurityOptions/MasterUserOptions"
+    "/properties/AdvancedSecurityOptions/MasterUserOptions",
+    "/properties/AdvancedSecurityOptions/SAMLOptions/MasterUserName",
+    "/properties/AdvancedSecurityOptions/SAMLOptions/MasterBackendRole"
   ],
   "primaryIdentifier": [
     "/properties/DomainName"
@@ -377,7 +501,8 @@
         "es:DescribeDomain",
         "es:AddTags",
         "es:RemoveTags",
-        "es:ListTags"
+        "es:ListTags",
+        "es:DescribeDomainChangeProgress"
       ]
     },
     "delete": {

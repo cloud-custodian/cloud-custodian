@@ -88,6 +88,13 @@
       "$ref": "#/definitions/TagMap"
     }
   },
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": false,
+    "tagProperty": "/properties/Tags"
+  },
   "additionalProperties": false,
   "required": [
     "PolicyName",
@@ -104,11 +111,13 @@
     "create": {
       "permissions": [
         "resiliencehub:CreateResiliencyPolicy",
+        "resiliencehub:DescribeResiliencyPolicy",
         "resiliencehub:TagResource"
       ]
     },
     "update": {
       "permissions": [
+        "resiliencehub:DescribeResiliencyPolicy",
         "resiliencehub:UpdateResiliencyPolicy",
         "resiliencehub:TagResource",
         "resiliencehub:UntagResource",

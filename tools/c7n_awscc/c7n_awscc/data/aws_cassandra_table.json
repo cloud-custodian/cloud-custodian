@@ -179,6 +179,10 @@
       "description": "Indicates whether point in time recovery is enabled (true) or disabled (false) on the table",
       "type": "boolean"
     },
+    "ClientSideTimestampsEnabled": {
+      "description": "Indicates whether client side timestamps are enabled (true) or disabled (false) on the table. False by default, once it is enabled it cannot be disabled again.",
+      "type": "boolean"
+    },
     "Tags": {
       "description": "An array of key-value pairs to apply to this resource",
       "type": "array",
@@ -207,7 +211,8 @@
     "/properties/KeyspaceName",
     "/properties/TableName",
     "/properties/PartitionKeyColumns",
-    "/properties/ClusteringKeyColumns"
+    "/properties/ClusteringKeyColumns",
+    "/properties/ClientSideTimestampsEnabled"
   ],
   "primaryIdentifier": [
     "/properties/KeyspaceName",
@@ -217,8 +222,11 @@
     "create": {
       "permissions": [
         "cassandra:Create",
+        "cassandra:CreateMultiRegionResource",
         "cassandra:Select",
+        "cassandra:SelectMultiRegionResource",
         "cassandra:TagResource",
+        "cassandra:TagMultiRegionResource",
         "kms:CreateGrant",
         "kms:DescribeKey",
         "kms:Encrypt",
@@ -227,15 +235,20 @@
     },
     "read": {
       "permissions": [
-        "cassandra:Select"
+        "cassandra:Select",
+        "cassandra:SelectMultiRegionResource"
       ]
     },
     "update": {
       "permissions": [
         "cassandra:Alter",
+        "cassandra:AlterMultiRegionResource",
         "cassandra:Select",
+        "cassandra:SelectMultiRegionResource",
         "cassandra:TagResource",
+        "cassandra:TagMultiRegionResource",
         "cassandra:UntagResource",
+        "cassandra:UntagMultiRegionResource",
         "kms:CreateGrant",
         "kms:DescribeKey",
         "kms:Encrypt",
@@ -245,12 +258,15 @@
     "delete": {
       "permissions": [
         "cassandra:Drop",
-        "cassandra:Select"
+        "cassandra:DropMultiRegionResource",
+        "cassandra:Select",
+        "cassandra:SelectMultiRegionResource"
       ]
     },
     "list": {
       "permissions": [
-        "cassandra:Select"
+        "cassandra:Select",
+        "cassandra:SelectMultiRegionResource"
       ]
     }
   }

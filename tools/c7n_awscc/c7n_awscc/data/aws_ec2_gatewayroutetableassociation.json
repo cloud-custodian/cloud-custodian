@@ -27,6 +27,7 @@
   "handlers": {
     "create": {
       "permissions": [
+        "ec2:DescribeRouteTables",
         "ec2:AssociateRouteTable"
       ]
     },

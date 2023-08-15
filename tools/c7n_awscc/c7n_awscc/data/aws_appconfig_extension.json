@@ -1,0 +1,206 @@
+{
+  "typeName": "AWS::AppConfig::Extension",
+  "description": "Resource Type definition for AWS::AppConfig::Extension",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git",
+  "properties": {
+    "Id": {
+      "type": "string"
+    },
+    "Arn": {
+      "type": "string"
+    },
+    "VersionNumber": {
+      "type": "integer"
+    },
+    "Name": {
+      "description": "Name of the extension.",
+      "type": "string"
+    },
+    "Description": {
+      "description": "Description of the extension.",
+      "type": "string"
+    },
+    "Actions": {
+      "type": "object",
+      "patternProperties": {
+        "^.+$": {
+          "$ref": "#/definitions/Actions"
+        }
+      },
+      "additionalProperties": false
+    },
+    "Parameters": {
+      "type": "object",
+      "patternProperties": {
+        "^.+$": {
+          "$ref": "#/definitions/Parameter"
+        }
+      },
+      "additionalProperties": false
+    },
+    "LatestVersionNumber": {
+      "type": "integer"
+    },
+    "Tags": {
+      "description": "An array of key-value tags to apply to this resource.",
+      "type": "array",
+      "uniqueItems": false,
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/Tag"
+      }
+    }
+  },
+  "definitions": {
+    "Tag": {
+      "description": "A key-value pair to associate with a resource.",
+      "type": "object",
+      "properties": {
+        "Key": {
+          "type": "string",
+          "description": "The key name of the tag. You can specify a value that is 1 to 128 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "Value": {
+          "type": "string",
+          "description": "The value for the tag. You can specify a value that is 0 to 256 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.",
+          "minLength": 0,
+          "maxLength": 256
+        }
+      },
+      "required": [
+        "Key",
+        "Value"
+      ],
+      "additionalProperties": false
+    },
+    "Actions": {
+      "description": "A list of actions for an extension to take at a specific action point.",
+      "uniqueItems": true,
+      "type": "array",
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/Action"
+      }
+    },
+    "Action": {
+      "description": "An action for an extension to take at a specific action point.",
+      "type": "object",
+      "properties": {
+        "Name": {
+          "type": "string",
+          "description": "The name of the extension action.",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "Description": {
+          "type": "string",
+          "description": "The description of the extension Action.",
+          "minLength": 0,
+          "maxLength": 1024
+        },
+        "Uri": {
+          "type": "string",
+          "description": "The URI of the extension action.",
+          "minLength": 1,
+          "maxLength": 2048
+        },
+        "RoleArn": {
+          "type": "string",
+          "description": "The ARN of the role for invoking the extension action.",
+          "minLength": 20,
+          "maxLength": 2048
+        }
+      },
+      "required": [
+        "Name",
+        "Uri"
+      ],
+      "additionalProperties": false
+    },
+    "Parameter": {
+      "description": "A parameter for the extension to send to a specific action.",
+      "type": "object",
+      "properties": {
+        "Description": {
+          "type": "string",
+          "description": "The description of the extension Parameter.",
+          "minLength": 0,
+          "maxLength": 1024
+        },
+        "Required": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "Required"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "Name",
+    "Actions"
+  ],
+  "createOnlyProperties": [
+    "/properties/Name",
+    "/properties/Tags",
+    "/properties/Tags/*/Key",
+    "/properties/Tags/*/Value"
+  ],
+  "readOnlyProperties": [
+    "/properties/Id",
+    "/properties/Arn",
+    "/properties/VersionNumber"
+  ],
+  "writeOnlyProperties": [
+    "/properties/LatestVersionNumber",
+    "/properties/Tags",
+    "/properties/Tags/*/Key",
+    "/properties/Tags/*/Value"
+  ],
+  "primaryIdentifier": [
+    "/properties/Id"
+  ],
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": true,
+    "tagProperty": "/properties/Tags"
+  },
+  "handlers": {
+    "create": {
+      "permissions": [
+        "appconfig:CreateExtension",
+        "appconfig:TagResource",
+        "iam:PassRole"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "appconfig:GetExtension"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "appconfig:UpdateExtension",
+        "appconfig:TagResource",
+        "appconfig:UntagResource"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "appconfig:DeleteExtension",
+        "appconfig:UntagResource"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "appconfig:ListExtensions"
+      ]
+    }
+  }
+}

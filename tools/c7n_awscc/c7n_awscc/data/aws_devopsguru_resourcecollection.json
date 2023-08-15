@@ -9,6 +9,9 @@
       "properties": {
         "CloudFormation": {
           "$ref": "#/definitions/CloudFormationCollectionFilter"
+        },
+        "Tags": {
+          "$ref": "#/definitions/TagCollections"
         }
       },
       "additionalProperties": false
@@ -27,7 +30,41 @@
             "pattern": "^[a-zA-Z*]+[a-zA-Z0-9-]*$"
           },
           "minItems": 1,
-          "maxItems": 200
+          "maxItems": 1000,
+          "insertionOrder": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "TagCollections": {
+      "description": "Tagged resources for DevOps Guru to monitor",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/TagCollection"
+      },
+      "insertionOrder": false
+    },
+    "TagCollection": {
+      "description": "Tagged resource for DevOps Guru to monitor",
+      "type": "object",
+      "properties": {
+        "AppBoundaryKey": {
+          "description": "A Tag key for DevOps Guru app boundary.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "TagValues": {
+          "description": "Tag values of DevOps Guru app boundary.",
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "minItems": 1,
+          "maxItems": 1000,
+          "insertionOrder": false
         }
       },
       "additionalProperties": false
@@ -41,7 +78,8 @@
       "description": "The type of ResourceCollection",
       "type": "string",
       "enum": [
-        "AWS_CLOUD_FORMATION"
+        "AWS_CLOUD_FORMATION",
+        "AWS_TAGS"
       ]
     }
   },
@@ -55,6 +93,9 @@
   "primaryIdentifier": [
     "/properties/ResourceCollectionType"
   ],
+  "tagging": {
+    "taggable": false
+  },
   "handlers": {
     "create": {
       "permissions": [
@@ -69,7 +110,13 @@
     },
     "delete": {
       "permissions": [
-        "devops-guru:UpdateResourceCollection"
+        "devops-guru:UpdateResourceCollection",
+        "devops-guru:GetResourceCollection"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "devops-guru:GetResourceCollection"
       ]
     },
     "update": {

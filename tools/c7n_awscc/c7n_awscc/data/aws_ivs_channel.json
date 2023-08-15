@@ -37,11 +37,18 @@
       "type": "string",
       "minLength": 0,
       "maxLength": 128,
-      "pattern": "^[a-zA-Z0-9-_]*$"
+      "pattern": "^[a-zA-Z0-9-_]*$",
+      "default": "-"
     },
     "Authorized": {
       "description": "Whether the channel is authorized.",
-      "type": "boolean"
+      "type": "boolean",
+      "default": false
+    },
+    "InsecureIngest": {
+      "description": "Whether the channel allows insecure ingest.",
+      "type": "boolean",
+      "default": false
     },
     "LatencyMode": {
       "description": "Channel latency mode.",
@@ -49,15 +56,19 @@
       "enum": [
         "NORMAL",
         "LOW"
-      ]
+      ],
+      "default": "LOW"
     },
     "Type": {
       "description": "Channel type, which determines the allowable resolution and bitrate. If you exceed the allowable resolution or bitrate, the stream probably will disconnect immediately.",
       "type": "string",
       "enum": [
         "STANDARD",
-        "BASIC"
-      ]
+        "BASIC",
+        "ADVANCED_SD",
+        "ADVANCED_HD"
+      ],
+      "default": "STANDARD"
     },
     "Tags": {
       "description": "A list of key-value pairs that contain metadata for the asset model.",
@@ -78,12 +89,20 @@
       "type": "string"
     },
     "RecordingConfigurationArn": {
-      "description": "Recording Configuration ARN. A value other than an empty string indicates that recording is enabled. Default: ?? (recording is disabled).",
+      "description": "Recording Configuration ARN. A value other than an empty string indicates that recording is enabled. Default: \"\" (recording is disabled).",
       "type": "string",
       "default": "",
       "pattern": "^$|arn:aws:ivs:[a-z0-9-]+:[0-9]+:recording-configuration/[a-zA-Z0-9-]+$",
       "minLength": 0,
       "maxLength": 128
+    },
+    "Preset": {
+      "description": "Optional transcode preset for the channel. This is selectable only for ADVANCED_HD and ADVANCED_SD channel types. For those channel types, the default preset is HIGHER_BANDWIDTH_DELIVERY. For other channel types (BASIC and STANDARD), preset is the empty string (\"\").",
+      "type": "string",
+      "enum": [
+        "HIGHER_BANDWIDTH_DELIVERY",
+        "CONSTRAINED_BANDWIDTH_DELIVERY"
+      ]
     }
   },
   "additionalProperties": false,
@@ -99,16 +118,19 @@
   "handlers": {
     "create": {
       "permissions": [
-        "ivs:CreateChannel"
+        "ivs:CreateChannel",
+        "ivs:TagResource"
       ]
     },
     "read": {
       "permissions": [
-        "ivs:GetChannel"
+        "ivs:GetChannel",
+        "ivs:ListTagsForResource"
       ]
     },
     "update": {
       "permissions": [
+        "ivs:GetChannel",
         "ivs:UpdateChannel",
         "ivs:TagResource",
         "ivs:UnTagResource",
@@ -117,12 +139,14 @@
     },
     "delete": {
       "permissions": [
-        "ivs:DeleteChannel"
+        "ivs:DeleteChannel",
+        "ivs:UnTagResource"
       ]
     },
     "list": {
       "permissions": [
-        "ivs:ListChannels"
+        "ivs:ListChannels",
+        "ivs:ListTagsForResource"
       ]
     }
   }

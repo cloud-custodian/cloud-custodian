@@ -50,12 +50,47 @@
       "description": "Id of the IPAM Pool.",
       "type": "string"
     },
-    "SourceIpamPoolId": {
-      "description": "The Id of this pool's source. If set, all space provisioned in this pool must be free space provisioned in the parent pool.",
+    "AddressFamily": {
+      "description": "The address family of the address space in this pool. Either IPv4 or IPv6.",
       "type": "string"
+    },
+    "AllocationMinNetmaskLength": {
+      "description": "The minimum allowed netmask length for allocations made from this pool.",
+      "type": "integer"
+    },
+    "AllocationDefaultNetmaskLength": {
+      "description": "The default netmask length for allocations made from this pool. This value is used when the netmask length of an allocation isn't specified.",
+      "type": "integer"
+    },
+    "AllocationMaxNetmaskLength": {
+      "description": "The maximum allowed netmask length for allocations made from this pool.",
+      "type": "integer"
+    },
+    "AllocationResourceTags": {
+      "description": "When specified, an allocation will not be allowed unless a resource has a matching set of tags.",
+      "type": "array",
+      "uniqueItems": true,
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/Tag"
+      }
     },
     "Arn": {
       "description": "The Amazon Resource Name (ARN) of the IPAM Pool.",
+      "type": "string"
+    },
+    "AutoImport": {
+      "description": "Determines what to do if IPAM discovers resources that haven't been assigned an allocation. If set to true, an allocation will be made automatically.",
+      "type": "boolean"
+    },
+    "AwsService": {
+      "description": "Limits which service in Amazon Web Services that the pool can be used in.",
+      "type": "string",
+      "enum": [
+        "ec2"
+      ]
+    },
+    "Description": {
       "type": "string"
     },
     "IpamScopeId": {
@@ -86,6 +121,31 @@
       "description": "The depth of this pool in the source pool hierarchy.",
       "type": "integer"
     },
+    "ProvisionedCidrs": {
+      "description": "A list of cidrs representing the address space available for allocation in this pool.",
+      "type": "array",
+      "uniqueItems": true,
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/ProvisionedCidr"
+      }
+    },
+    "PublicIpSource": {
+      "description": "The IP address source for pools in the public scope. Only used for provisioning IP address CIDRs to pools in the public scope. Default is `byoip`.",
+      "type": "string",
+      "enum": [
+        "byoip",
+        "amazon"
+      ]
+    },
+    "PubliclyAdvertisable": {
+      "description": "Determines whether or not address space from this pool is publicly advertised. Must be set if and only if the pool is IPv6.",
+      "type": "boolean"
+    },
+    "SourceIpamPoolId": {
+      "description": "The Id of this pool's source. If set, all space provisioned in this pool must be free space provisioned in the parent pool.",
+      "type": "string"
+    },
     "State": {
       "description": "The state of this pool. This can be one of the following values: \"create-in-progress\", \"create-complete\", \"modify-in-progress\", \"modify-complete\", \"delete-in-progress\", or \"delete-complete\"",
       "type": "string",
@@ -101,51 +161,6 @@
     "StateMessage": {
       "description": "An explanation of how the pool arrived at it current state.",
       "type": "string"
-    },
-    "Description": {
-      "type": "string"
-    },
-    "AutoImport": {
-      "description": "Determines what to do if IPAM discovers resources that haven't been assigned an allocation. If set to true, an allocation will be made automatically.",
-      "type": "boolean"
-    },
-    "PubliclyAdvertisable": {
-      "description": "Determines whether or not address space from this pool is publicly advertised. Must be set if and only if the pool is IPv6.",
-      "type": "boolean"
-    },
-    "AddressFamily": {
-      "description": "The address family of the address space in this pool. Either IPv4 or IPv6.",
-      "type": "string"
-    },
-    "AllocationMinNetmaskLength": {
-      "description": "The minimum allowed netmask length for allocations made from this pool.",
-      "type": "integer"
-    },
-    "AllocationDefaultNetmaskLength": {
-      "description": "The default netmask length for allocations made from this pool. This value is used when the netmask length of an allocation isn't specified.",
-      "type": "integer"
-    },
-    "AllocationMaxNetmaskLength": {
-      "description": "The maximum allowed netmask length for allocations made from this pool.",
-      "type": "integer"
-    },
-    "AllocationResourceTags": {
-      "description": "When specified, an allocation will not be allowed unless a resource has a matching set of tags.",
-      "type": "array",
-      "uniqueItems": true,
-      "insertionOrder": false,
-      "items": {
-        "$ref": "#/definitions/Tag"
-      }
-    },
-    "ProvisionedCidrs": {
-      "description": "A list of cidrs representing the address space available for allocation in this pool.",
-      "type": "array",
-      "uniqueItems": true,
-      "insertionOrder": false,
-      "items": {
-        "$ref": "#/definitions/ProvisionedCidr"
-      }
     },
     "Tags": {
       "description": "An array of key-value pairs to apply to this resource.",
@@ -178,15 +193,14 @@
     "/properties/State",
     "/properties/StateMessage"
   ],
-  "writeOnlyProperties": [
-    "/properties/IpamScopeId"
-  ],
   "createOnlyProperties": [
     "/properties/IpamScopeId",
     "/properties/SourceIpamPoolId",
     "/properties/Locale",
     "/properties/AddressFamily",
-    "/properties/PubliclyAdvertisable"
+    "/properties/PubliclyAdvertisable",
+    "/properties/PublicIpSource",
+    "/properties/AwsService"
   ],
   "handlers": {
     "create": {

@@ -1,0 +1,1100 @@
+{
+  "typeName": "AWS::SageMaker::ModelPackage",
+  "description": "Resource Type definition for AWS::SageMaker::ModelPackage",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-sagemaker",
+  "definitions": {
+    "Tag": {
+      "description": "A key-value pair to associate with a resource.",
+      "type": "object",
+      "properties": {
+        "Key": {
+          "type": "string",
+          "description": "The key name of the tag. You can specify a value that is 1 to 127 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^([\\p{L}\\p{Z}\\p{N}_.:/=+\\-@]*)$"
+        },
+        "Value": {
+          "type": "string",
+          "description": "The value for the tag. You can specify a value that is 1 to 255 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.",
+          "maxLength": 256,
+          "pattern": "^([\\p{L}\\p{Z}\\p{N}_.:/=+\\-@]*)$"
+        }
+      },
+      "required": [
+        "Key",
+        "Value"
+      ],
+      "additionalProperties": false
+    },
+    "AdditionalInferenceSpecifications": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 15,
+      "description": "An array of additional Inference Specification objects.",
+      "items": {
+        "$ref": "#/definitions/AdditionalInferenceSpecificationDefinition"
+      },
+      "insertionOrder": true
+    },
+    "AdditionalInferenceSpecificationDefinition": {
+      "description": "Additional Inference Specification specifies details about inference jobs that can be run with models based on this model package.AdditionalInferenceSpecifications can be added to existing model packages using AdditionalInferenceSpecificationsToAdd.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Containers": {
+          "description": "The Amazon ECR registry path of the Docker image that contains the inference code.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ModelPackageContainerDefinition"
+          },
+          "minItems": 1,
+          "maxItems": 15,
+          "insertionOrder": true
+        },
+        "Description": {
+          "description": "A description of the additional Inference specification.",
+          "type": "string",
+          "maxLength": 1024,
+          "pattern": ".*"
+        },
+        "Name": {
+          "description": "A unique name to identify the additional inference specification. The name must be unique within the list of your additional inference specifications for a particular model package.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 63,
+          "pattern": "^[a-zA-Z0-9](-*[a-zA-Z0-9]){0,62}$"
+        },
+        "SupportedContentTypes": {
+          "description": "The supported MIME types for the input data.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ContentType"
+          },
+          "insertionOrder": true
+        },
+        "SupportedRealtimeInferenceInstanceTypes": {
+          "description": "A list of the instance types that are used to generate inferences in real-time",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/InferenceInstanceType"
+          },
+          "insertionOrder": true
+        },
+        "SupportedResponseMIMETypes": {
+          "description": "The supported MIME types for the output data.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ResponseMIMEType"
+          },
+          "insertionOrder": true
+        },
+        "SupportedTransformInstanceTypes": {
+          "description": "A list of the instance types on which a transformation job can be run or on which an endpoint can be deployed.",
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/definitions/TransformInstanceType"
+          },
+          "insertionOrder": true
+        }
+      },
+      "required": [
+        "Containers",
+        "Name"
+      ]
+    },
+    "TransformInstanceType": {
+      "description": "Instance types on which a transformation job can be run or on which an endpoint can be deployed.",
+      "type": "string"
+    },
+    "InferenceInstanceType": {
+      "description": "Instance type that is used to generate inferences in real-time",
+      "type": "string"
+    },
+    "ContentType": {
+      "description": "The supported MIME type for the input data.",
+      "type": "string",
+      "maxLength": 256,
+      "pattern": ".*"
+    },
+    "ResponseMIMEType": {
+      "description": "The supported MIME types for the output data.",
+      "type": "string",
+      "maxLength": 1024,
+      "pattern": "^[-\\w]+\\/.+$"
+    },
+    "CertifyForMarketplace": {
+      "description": "Whether to certify the model package for listing on AWS Marketplace.",
+      "type": "boolean"
+    },
+    "ClientToken": {
+      "description": "A unique token that guarantees that the call to this API is idempotent.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 36,
+      "pattern": "^[a-zA-Z0-9-]+$"
+    },
+    "CustomerMetadataProperties": {
+      "type": "object",
+      "description": "The metadata properties associated with the model package versions.",
+      "maxProperties": 50,
+      "minProperties": 1,
+      "patternProperties": {
+        "^([\\p{L}\\p{Z}\\p{N}_.:\\/=+\\-@]*)${1,128}": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "^([\\p{L}\\p{Z}\\p{N}_.:\\/=+\\-@]*)${1,256}": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        }
+      },
+      "additionalProperties": false
+    },
+    "Domain": {
+      "description": "The machine learning domain of the model package you specified.",
+      "type": "string"
+    },
+    "DriftCheckBaselines": {
+      "description": "Represents the drift check baselines that can be used when the model monitor is set using the model package.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Bias": {
+          "$ref": "#/definitions/DriftCheckBias"
+        },
+        "Explainability": {
+          "$ref": "#/definitions/DriftCheckExplainability"
+        },
+        "ModelDataQuality": {
+          "$ref": "#/definitions/DriftCheckModelDataQuality"
+        },
+        "ModelQuality": {
+          "$ref": "#/definitions/DriftCheckModelQuality"
+        }
+      }
+    },
+    "DriftCheckBias": {
+      "description": "Represents the drift check bias baselines that can be used when the model monitor is set using the model package.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "PostTrainingConstraints": {
+          "$ref": "#/definitions/MetricsSource"
+        },
+        "PreTrainingConstraints": {
+          "$ref": "#/definitions/MetricsSource"
+        },
+        "ConfigFile": {
+          "$ref": "#/definitions/FileSource"
+        }
+      }
+    },
+    "DriftCheckExplainability": {
+      "description": "Contains explainability metrics for a model.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Constraints": {
+          "$ref": "#/definitions/MetricsSource"
+        },
+        "ConfigFile": {
+          "$ref": "#/definitions/FileSource"
+        }
+      }
+    },
+    "DriftCheckModelDataQuality": {
+      "description": "Represents the drift check data quality baselines that can be used when the model monitor is set using the model package.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Constraints": {
+          "$ref": "#/definitions/MetricsSource"
+        },
+        "Statistics": {
+          "$ref": "#/definitions/MetricsSource"
+        }
+      }
+    },
+    "DriftCheckModelQuality": {
+      "description": "Represents the drift check model quality baselines that can be used when the model monitor is set using the model package.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Constraints": {
+          "$ref": "#/definitions/MetricsSource"
+        },
+        "Statistics": {
+          "$ref": "#/definitions/MetricsSource"
+        }
+      }
+    },
+    "MetricsSource": {
+      "description": "Represents a Metric Source Object.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "ContentDigest": {
+          "description": "The digest of the metric source.",
+          "type": "string",
+          "maxLength": 72,
+          "pattern": "^[Ss][Hh][Aa]256:[0-9a-fA-F]{64}$"
+        },
+        "ContentType": {
+          "description": "The type of content stored in the metric source.",
+          "type": "string",
+          "maxLength": 256,
+          "pattern": ".*"
+        },
+        "S3Uri": {
+          "description": "The Amazon S3 URI for the metric source.",
+          "type": "string",
+          "maxLength": 1024,
+          "pattern": "^(https|s3)://([^/]+)/?(.*)$"
+        }
+      },
+      "required": [
+        "ContentType",
+        "S3Uri"
+      ]
+    },
+    "FileSource": {
+      "description": "Represents a File Source Object.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "ContentDigest": {
+          "description": "The digest of the file source.",
+          "type": "string",
+          "maxLength": 72,
+          "pattern": "^[Ss][Hh][Aa]256:[0-9a-fA-F]{64}$"
+        },
+        "ContentType": {
+          "description": "The type of content stored in the file source.",
+          "type": "string",
+          "maxLength": 256,
+          "pattern": ".*"
+        },
+        "S3Uri": {
+          "description": "The Amazon S3 URI for the file source.",
+          "type": "string",
+          "maxLength": 1024,
+          "pattern": "^(https|s3)://([^/]+)/?(.*)$"
+        }
+      },
+      "required": [
+        "S3Uri"
+      ]
+    },
+    "InferenceSpecification": {
+      "description": "Details about inference jobs that can be run with models based on this model package.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Containers": {
+          "description": "The Amazon ECR registry path of the Docker image that contains the inference code.",
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/definitions/ModelPackageContainerDefinition"
+          },
+          "minItems": 1,
+          "maxItems": 15,
+          "insertionOrder": true
+        },
+        "SupportedContentTypes": {
+          "description": "The supported MIME types for the input data.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ContentType"
+          },
+          "insertionOrder": true
+        },
+        "SupportedRealtimeInferenceInstanceTypes": {
+          "description": "A list of the instance types that are used to generate inferences in real-time",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/InferenceInstanceType"
+          },
+          "insertionOrder": true
+        },
+        "SupportedResponseMIMETypes": {
+          "description": "The supported MIME types for the output data.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ResponseMIMEType"
+          },
+          "insertionOrder": true
+        },
+        "SupportedTransformInstanceTypes": {
+          "description": "A list of the instance types on which a transformation job can be run or on which an endpoint can be deployed.",
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/definitions/TransformInstanceType"
+          },
+          "insertionOrder": true
+        }
+      },
+      "required": [
+        "Containers",
+        "SupportedContentTypes",
+        "SupportedResponseMIMETypes"
+      ]
+    },
+    "Environment": {
+      "type": "object",
+      "description": "Sets the environment variables in the Docker container",
+      "maxProperties": 16,
+      "patternProperties": {
+        "[a-zA-Z_][a-zA-Z0-9_]*": {
+          "type": "string",
+          "maxLength": 1024
+        },
+        "[\\S\\s]*": {
+          "type": "string",
+          "maxLength": 1024
+        }
+      },
+      "additionalProperties": false
+    },
+    "ModelPackageContainerDefinition": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Describes the Docker container for the model package.",
+      "properties": {
+        "ContainerHostname": {
+          "type": "string",
+          "description": "The DNS host name for the Docker container.",
+          "pattern": "^[a-zA-Z0-9](-*[a-zA-Z0-9]){0,62}",
+          "maxLength": 63
+        },
+        "Environment": {
+          "$ref": "#/definitions/Environment"
+        },
+        "ModelInput": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "DataInputConfig": {
+              "type": "string",
+              "description": "The input configuration object for the model.",
+              "pattern": "[\\S\\s]+",
+              "minLength": 1,
+              "maxLength": 1024
+            }
+          },
+          "required": [
+            "DataInputConfig"
+          ]
+        },
+        "Image": {
+          "type": "string",
+          "description": "The Amazon EC2 Container Registry (Amazon ECR) path where inference code is stored.",
+          "pattern": "[\\S]{1,255}",
+          "minLength": 1,
+          "maxLength": 255
+        },
+        "ImageDigest": {
+          "type": "string",
+          "description": "An MD5 hash of the training algorithm that identifies the Docker image used for training.",
+          "pattern": "^[Ss][Hh][Aa]256:[0-9a-fA-F]{64}$",
+          "maxLength": 72
+        },
+        "ModelDataUrl": {
+          "type": "string",
+          "description": "A structure with Model Input details.",
+          "pattern": "^(https|s3)://([^/]+)/?(.*)$",
+          "maxLength": 1024
+        },
+        "Framework": {
+          "type": "string",
+          "description": "The machine learning framework of the model package container image."
+        },
+        "FrameworkVersion": {
+          "type": "string",
+          "description": "The framework version of the Model Package Container Image.",
+          "pattern": "[0-9]\\.[A-Za-z0-9.]+",
+          "minLength": 3,
+          "maxLength": 10
+        },
+        "NearestModelName": {
+          "type": "string",
+          "description": "The name of a pre-trained machine learning benchmarked by Amazon SageMaker Inference Recommender model that matches your model."
+        }
+      },
+      "required": [
+        "Image"
+      ]
+    },
+    "MetadataProperties": {
+      "description": "Metadata properties of the tracking entity, trial, or trial component.",
+      "type": "object",
+      "properties": {
+        "CommitId": {
+          "type": "string",
+          "description": "The commit ID.",
+          "pattern": ".*",
+          "maxLength": 1024
+        },
+        "GeneratedBy": {
+          "type": "string",
+          "description": "The entity this entity was generated by.",
+          "pattern": ".*",
+          "maxLength": 1024
+        },
+        "ProjectId": {
+          "type": "string",
+          "description": "The project ID metadata.",
+          "pattern": ".*",
+          "maxLength": 1024
+        },
+        "Repository": {
+          "type": "string",
+          "description": "The repository metadata.",
+          "pattern": ".*",
+          "maxLength": 1024
+        }
+      },
+      "additionalProperties": false
+    },
+    "ModelApprovalStatus": {
+      "type": "string",
+      "description": "The approval status of the model package.",
+      "enum": [
+        "Approved",
+        "Rejected",
+        "PendingManualApproval"
+      ]
+    },
+    "ModelMetrics": {
+      "description": "A structure that contains model metrics reports.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Bias": {
+          "$ref": "#/definitions/Bias"
+        },
+        "Explainability": {
+          "$ref": "#/definitions/Explainability"
+        },
+        "ModelDataQuality": {
+          "$ref": "#/definitions/ModelDataQuality"
+        },
+        "ModelQuality": {
+          "$ref": "#/definitions/ModelQuality"
+        }
+      }
+    },
+    "Bias": {
+      "description": "Contains bias metrics for a model.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Report": {
+          "$ref": "#/definitions/MetricsSource"
+        },
+        "PreTrainingReport": {
+          "$ref": "#/definitions/MetricsSource"
+        },
+        "PostTrainingReport": {
+          "$ref": "#/definitions/MetricsSource"
+        }
+      }
+    },
+    "Explainability": {
+      "description": "Contains explainability metrics for a model.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Report": {
+          "$ref": "#/definitions/MetricsSource"
+        }
+      }
+    },
+    "ModelDataQuality": {
+      "description": "Metrics that measure the quality of the input data for a model.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Constraints": {
+          "$ref": "#/definitions/MetricsSource"
+        },
+        "Statistics": {
+          "$ref": "#/definitions/MetricsSource"
+        }
+      }
+    },
+    "ModelQuality": {
+      "description": "Metrics that measure the quality of a model.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Constraints": {
+          "$ref": "#/definitions/MetricsSource"
+        },
+        "Statistics": {
+          "$ref": "#/definitions/MetricsSource"
+        }
+      }
+    },
+    "ModelPackageDescription": {
+      "type": "string",
+      "description": "The description of the model package.",
+      "pattern": "[\\p{L}\\p{M}\\p{Z}\\p{S}\\p{N}\\p{P}]*",
+      "maxLength": 1024
+    },
+    "ModelPackageGroupName": {
+      "type": "string",
+      "description": "The name of the model package group.",
+      "pattern": "(arn:aws[a-z\\-]*:sagemaker:[a-z0-9\\-]*:[0-9]{12}:[a-z\\-]*\\/)?([a-zA-Z0-9]([a-zA-Z0-9-]){0,62})(?<!-)$",
+      "minLength": 1,
+      "maxLength": 170
+    },
+    "ModelPackageName": {
+      "type": "string",
+      "description": "The name or arn of the model package."
+    },
+    "SamplePayloadUrl": {
+      "description": "The Amazon Simple Storage Service (Amazon S3) path where the sample payload are stored pointing to single gzip compressed tar archive.",
+      "type": "string",
+      "maxLength": 1024,
+      "pattern": "^(https|s3)://([^/]+)/?(.*)$"
+    },
+    "SourceAlgorithmSpecification": {
+      "description": "Details about the algorithm that was used to create the model package.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "SourceAlgorithms": {
+          "description": "A list of algorithms that were used to create a model package.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/SourceAlgorithm"
+          },
+          "minItems": 1,
+          "maxItems": 1,
+          "insertionOrder": true
+        }
+      },
+      "required": [
+        "SourceAlgorithms"
+      ],
+      "insertionOrder": true
+    },
+    "SourceAlgorithm": {
+      "description": "Specifies an algorithm that was used to create the model package. The algorithm must be either an algorithm resource in your Amazon SageMaker account or an algorithm in AWS Marketplace that you are subscribed to.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "AlgorithmName": {
+          "description": "The name of an algorithm that was used to create the model package. The algorithm must be either an algorithm resource in your Amazon SageMaker account or an algorithm in AWS Marketplace that you are subscribed to.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 170,
+          "pattern": "(arn:aws[a-z\\-]*:sagemaker:[a-z0-9\\-]*:[0-9]{12}:[a-z\\-]*\\/)?([a-zA-Z0-9]([a-zA-Z0-9-]){0,62})(?<!-)$"
+        },
+        "ModelDataUrl": {
+          "description": "The Amazon S3 path where the model artifacts, which result from model training, are stored. This path must point to a single gzip compressed tar archive (.tar.gz suffix).",
+          "type": "string",
+          "maxLength": 1024,
+          "pattern": "^(https|s3)://([^/]+)/?(.*)$"
+        }
+      },
+      "required": [
+        "AlgorithmName"
+      ]
+    },
+    "ValidationSpecification": {
+      "description": "Specifies configurations for one or more transform jobs that Amazon SageMaker runs to test the model package.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "ValidationProfiles": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ValidationProfile"
+          },
+          "minItems": 1,
+          "maxItems": 1,
+          "insertionOrder": true
+        },
+        "ValidationRole": {
+          "description": "The IAM roles to be used for the validation of the model package.",
+          "type": "string",
+          "minLength": 20,
+          "maxLength": 2048,
+          "pattern": "^arn:aws[a-z\\-]*:iam::\\d{12}:role/?[a-zA-Z_0-9+=,.@\\-_/]+$"
+        }
+      },
+      "required": [
+        "ValidationProfiles",
+        "ValidationRole"
+      ],
+      "insertionOrder": true
+    },
+    "ValidationProfile": {
+      "description": "Contains data, such as the inputs and targeted instance types that are used in the process of validating the model package.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "TransformJobDefinition": {
+          "$ref": "#/definitions/TransformJobDefinition"
+        },
+        "ProfileName": {
+          "description": "The name of the profile for the model package.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 63,
+          "pattern": "^[a-zA-Z0-9](-*[a-zA-Z0-9]){0,62}$"
+        }
+      },
+      "required": [
+        "TransformJobDefinition",
+        "ProfileName"
+      ]
+    },
+    "TransformJobDefinition": {
+      "description": "Defines the input needed to run a transform job using the inference specification specified in the algorithm.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Environment": {
+          "$ref": "#/definitions/Environment"
+        },
+        "BatchStrategy": {
+          "description": "A string that determines the number of records included in a single mini-batch.",
+          "type": "string",
+          "enum": [
+            "MultiRecord",
+            "SingleRecord"
+          ]
+        },
+        "MaxConcurrentTransforms": {
+          "description": "The maximum number of parallel requests that can be sent to each instance in a transform job. The default value is 1.",
+          "type": "integer",
+          "minimum": 0
+        },
+        "MaxPayloadInMB": {
+          "description": "The maximum payload size allowed, in MB. A payload is the data portion of a record (without metadata).",
+          "type": "integer",
+          "minimum": 0
+        },
+        "TransformInput": {
+          "$ref": "#/definitions/TransformInput"
+        },
+        "TransformOutput": {
+          "$ref": "#/definitions/TransformOutput"
+        },
+        "TransformResources": {
+          "$ref": "#/definitions/TransformResources"
+        }
+      },
+      "required": [
+        "TransformResources",
+        "TransformOutput",
+        "TransformInput"
+      ]
+    },
+    "TransformInput": {
+      "description": "Describes the input source of a transform job and the way the transform job consumes it.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "CompressionType": {
+          "description": "If your transform data is compressed, specify the compression type. Amazon SageMaker automatically decompresses the data for the transform job accordingly. The default value is None.",
+          "type": "string",
+          "enum": [
+            "None",
+            "Gzip"
+          ]
+        },
+        "ContentType": {
+          "description": "The multipurpose internet mail extension (MIME) type of the data. Amazon SageMaker uses the MIME type with each http call to transfer data to the transform job.",
+          "type": "string",
+          "maxLength": 256,
+          "pattern": ".*"
+        },
+        "DataSource": {
+          "$ref": "#/definitions/DataSource"
+        },
+        "SplitType": {
+          "description": "The method to use to split the transform job's data files into smaller batches. ",
+          "type": "string",
+          "enum": [
+            "None",
+            "TFRecord",
+            "Line",
+            "RecordIO"
+          ]
+        }
+      },
+      "required": [
+        "DataSource"
+      ]
+    },
+    "DataSource": {
+      "description": "Describes the input source of a transform job and the way the transform job consumes it.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "S3DataSource": {
+          "$ref": "#/definitions/S3DataSource"
+        }
+      },
+      "required": [
+        "S3DataSource"
+      ]
+    },
+    "S3DataSource": {
+      "description": "Describes the S3 data source.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "S3DataType": {
+          "description": "The S3 Data Source Type",
+          "type": "string",
+          "enum": [
+            "ManifestFile",
+            "S3Prefix",
+            "AugmentedManifestFile"
+          ]
+        },
+        "S3Uri": {
+          "description": "Depending on the value specified for the S3DataType, identifies either a key name prefix or a manifest.",
+          "type": "string",
+          "maxLength": 1024,
+          "pattern": "^(https|s3)://([^/]+)/?(.*)$"
+        }
+      },
+      "required": [
+        "S3DataType",
+        "S3Uri"
+      ]
+    },
+    "TransformOutput": {
+      "description": "Describes the results of a transform job.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Accept": {
+          "description": "The MIME type used to specify the output data. Amazon SageMaker uses the MIME type with each http call to transfer data from the transform job.",
+          "type": "string",
+          "maxLength": 256,
+          "pattern": ".*"
+        },
+        "KmsKeyId": {
+          "description": "The AWS Key Management Service (AWS KMS) key that Amazon SageMaker uses to encrypt the model artifacts at rest using Amazon S3 server-side encryption.",
+          "type": "string",
+          "maxLength": 2048,
+          "pattern": ".*"
+        },
+        "S3OutputPath": {
+          "description": "The Amazon S3 path where you want Amazon SageMaker to store the results of the transform job.",
+          "type": "string",
+          "maxLength": 1024,
+          "pattern": "^(https|s3)://([^/]+)/?(.*)$"
+        },
+        "AssembleWith": {
+          "description": "Defines how to assemble the results of the transform job as a single S3 object.",
+          "type": "string",
+          "enum": [
+            "None",
+            "Line"
+          ]
+        }
+      },
+      "required": [
+        "S3OutputPath"
+      ]
+    },
+    "TransformResources": {
+      "description": "Describes the resources, including ML instance types and ML instance count, to use for transform job.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "InstanceCount": {
+          "description": "The number of ML compute instances to use in the transform job. For distributed transform jobs, specify a value greater than 1. The default value is 1.",
+          "type": "integer",
+          "minimum": 1
+        },
+        "InstanceType": {
+          "description": "The ML compute instance type for the transform job.",
+          "type": "string"
+        },
+        "VolumeKmsKeyId": {
+          "description": "The AWS Key Management Service (AWS KMS) key that Amazon SageMaker uses to encrypt model data on the storage volume attached to the ML compute instance(s) that run the batch transform job.",
+          "type": "string",
+          "maxLength": 2048,
+          "pattern": ".*"
+        }
+      },
+      "required": [
+        "InstanceCount",
+        "InstanceType"
+      ]
+    },
+    "ModelPackageArn": {
+      "type": "string",
+      "description": "The Amazon Resource Name (ARN) of the model package group.",
+      "pattern": "^arn:aws(-cn|-us-gov)?:sagemaker:[a-z0-9\\-]{9,16}:[0-9]{12}:model-package/[\\S]{1,2048}$",
+      "minLength": 1,
+      "maxLength": 2048
+    },
+    "ApprovalDescription": {
+      "description": "A description provided for the model approval.",
+      "type": "string",
+      "maxLength": 1024,
+      "pattern": ".*"
+    },
+    "CreationTime": {
+      "description": "The time at which the model package was created.",
+      "type": "string"
+    },
+    "LastModifiedTime": {
+      "description": "The time at which the model package was last modified.",
+      "type": "string"
+    },
+    "ModelPackageStatus": {
+      "description": "The current status of the model package.",
+      "type": "string",
+      "enum": [
+        "Pending",
+        "Deleting",
+        "InProgress",
+        "Completed",
+        "Failed"
+      ]
+    },
+    "ModelPackageStatusDetails": {
+      "description": "Details about the current status of the model package.",
+      "type": "object",
+      "properties": {
+        "ValidationStatuses": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ModelPackageStatusItem"
+          },
+          "insertionOrder": true
+        }
+      },
+      "additionalProperties": false
+    },
+    "ModelPackageStatusItem": {
+      "description": "Represents the overall status of a model package.",
+      "type": "object",
+      "properties": {
+        "FailureReason": {
+          "description": "If the overall status is Failed, the reason for the failure.",
+          "type": "string"
+        },
+        "Name": {
+          "description": "The name of the model package for which the overall status is being reported.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 63,
+          "pattern": "^[a-zA-Z0-9](-*[a-zA-Z0-9]){0,62}$"
+        },
+        "Status": {
+          "description": "The current status.",
+          "type": "string",
+          "enum": [
+            "NotStarted",
+            "Failed",
+            "InProgress",
+            "Completed"
+          ]
+        }
+      },
+      "required": [
+        "Name",
+        "Status"
+      ],
+      "additionalProperties": false
+    },
+    "ModelPackageVersion": {
+      "type": "integer",
+      "description": "The version of the model package.",
+      "minimum": 1
+    },
+    "Task": {
+      "description": "The machine learning task your model package accomplishes.",
+      "type": "string"
+    }
+  },
+  "properties": {
+    "Tags": {
+      "type": "array",
+      "maxItems": 50,
+      "description": "An array of key-value pairs to apply to this resource.",
+      "items": {
+        "$ref": "#/definitions/Tag"
+      }
+    },
+    "AdditionalInferenceSpecifications": {
+      "$ref": "#/definitions/AdditionalInferenceSpecifications"
+    },
+    "CertifyForMarketplace": {
+      "$ref": "#/definitions/CertifyForMarketplace"
+    },
+    "ClientToken": {
+      "$ref": "#/definitions/ClientToken"
+    },
+    "CustomerMetadataProperties": {
+      "$ref": "#/definitions/CustomerMetadataProperties"
+    },
+    "Domain": {
+      "$ref": "#/definitions/Domain"
+    },
+    "DriftCheckBaselines": {
+      "$ref": "#/definitions/DriftCheckBaselines"
+    },
+    "InferenceSpecification": {
+      "$ref": "#/definitions/InferenceSpecification"
+    },
+    "MetadataProperties": {
+      "$ref": "#/definitions/MetadataProperties"
+    },
+    "ModelApprovalStatus": {
+      "$ref": "#/definitions/ModelApprovalStatus"
+    },
+    "ModelMetrics": {
+      "$ref": "#/definitions/ModelMetrics"
+    },
+    "ModelPackageDescription": {
+      "$ref": "#/definitions/ModelPackageDescription"
+    },
+    "ModelPackageGroupName": {
+      "$ref": "#/definitions/ModelPackageGroupName"
+    },
+    "ModelPackageName": {
+      "$ref": "#/definitions/ModelPackageName"
+    },
+    "SamplePayloadUrl": {
+      "$ref": "#/definitions/SamplePayloadUrl"
+    },
+    "SourceAlgorithmSpecification": {
+      "$ref": "#/definitions/SourceAlgorithmSpecification"
+    },
+    "Task": {
+      "$ref": "#/definitions/Task"
+    },
+    "ValidationSpecification": {
+      "$ref": "#/definitions/ValidationSpecification"
+    },
+    "ModelPackageArn": {
+      "$ref": "#/definitions/ModelPackageArn"
+    },
+    "ApprovalDescription": {
+      "$ref": "#/definitions/ApprovalDescription"
+    },
+    "CreationTime": {
+      "$ref": "#/definitions/CreationTime"
+    },
+    "LastModifiedTime": {
+      "$ref": "#/definitions/LastModifiedTime"
+    },
+    "ModelPackageStatus": {
+      "$ref": "#/definitions/ModelPackageStatus"
+    },
+    "ModelPackageVersion": {
+      "$ref": "#/definitions/ModelPackageVersion"
+    },
+    "AdditionalInferenceSpecificationsToAdd": {
+      "$ref": "#/definitions/AdditionalInferenceSpecifications"
+    },
+    "ModelPackageStatusDetails": {
+      "$ref": "#/definitions/ModelPackageStatusDetails"
+    }
+  },
+  "additionalProperties": false,
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": false,
+    "tagProperty": "/properties/Tags"
+  },
+  "readOnlyProperties": [
+    "/properties/ModelPackageArn",
+    "/properties/CreationTime",
+    "/properties/ModelPackageStatus"
+  ],
+  "createOnlyProperties": [
+    "/properties/ModelPackageGroupName",
+    "/properties/ModelPackageDescription",
+    "/properties/InferenceSpecification",
+    "/properties/ValidationSpecification",
+    "/properties/SourceAlgorithmSpecification",
+    "/properties/MetadataProperties",
+    "/properties/ModelMetrics",
+    "/properties/ClientToken",
+    "/properties/DriftCheckBaselines",
+    "/properties/Domain",
+    "/properties/Task",
+    "/properties/SamplePayloadUrl"
+  ],
+  "writeOnlyProperties": [
+    "/properties/ClientToken",
+    "/properties/AdditionalInferenceSpecificationsToAdd"
+  ],
+  "primaryIdentifier": [
+    "/properties/ModelPackageArn"
+  ],
+  "handlers": {
+    "create": {
+      "permissions": [
+        "ecr:BatchGetImage",
+        "ecr:DescribeImages",
+        "ecr:StartImageScan",
+        "ecr:DescribeImageScanFindings",
+        "sagemaker:AddTags",
+        "sagemaker:CreateModel",
+        "sagemaker:CreateModelPackage",
+        "sagemaker:CreateTrainingJob",
+        "sagemaker:CreateTransformJob",
+        "sagemaker:DescribeTransformJob",
+        "sagemaker:DescribeModelPackage",
+        "sagemaker:ListTags",
+        "iam:PassRole",
+        "s3:GetObject"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "sagemaker:DescribeModelPackage",
+        "sagemaker:ListTags"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "sagemaker:UpdateModelPackage",
+        "sagemaker:DescribeModelPackage",
+        "sagemaker:ListTags",
+        "sagemaker:AddTags",
+        "sagemaker:DeleteTags"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "sagemaker:DeleteModelPackage",
+        "sagemaker:DescribeModelPackage"
+      ]
+    },
+    "list": {
+      "handlerSchema": {
+        "properties": {
+          "ModelPackageGroupName": {
+            "$ref": "resource-schema.json#/properties/ModelPackageGroupName"
+          }
+        }
+      },
+      "permissions": [
+        "sagemaker:ListModelPackages"
+      ]
+    }
+  }
+}

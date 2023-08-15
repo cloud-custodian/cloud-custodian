@@ -16,7 +16,7 @@
         "Arn": {
           "description": "Amazon Resource Name for the Registry.",
           "type": "string",
-          "pattern": "arn:(aws|aws-us-gov|aws-cn):glue:.*"
+          "pattern": "arn:aws(-(cn|us-gov|iso(-[bef])?))?:glue:.*"
         }
       },
       "additionalProperties": false
@@ -65,7 +65,7 @@
     "Arn": {
       "description": "Amazon Resource Name for the Schema.",
       "type": "string",
-      "pattern": "arn:(aws|aws-us-gov|aws-cn):glue:.*"
+      "pattern": "arn:aws(-(cn|us-gov|iso(-[bef])?))?:glue:.*"
     },
     "Registry": {
       "$ref": "#/definitions/Registry"

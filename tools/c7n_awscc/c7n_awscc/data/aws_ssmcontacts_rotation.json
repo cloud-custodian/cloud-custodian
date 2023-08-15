@@ -1,0 +1,312 @@
+{
+  "typeName": "AWS::SSMContacts::Rotation",
+  "description": "Resource Type definition for AWS::SSMContacts::Rotation.",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git",
+  "definitions": {
+    "Tag": {
+      "description": "A key-value pair to associate with a resource.",
+      "type": "object",
+      "properties": {
+        "Key": {
+          "description": "The key name of the tag",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "Value": {
+          "description": "The value for the tag.",
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 256
+        }
+      },
+      "required": [
+        "Key",
+        "Value"
+      ],
+      "additionalProperties": false
+    },
+    "HandOffTime": {
+      "type": "string",
+      "pattern": "^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$",
+      "description": "Details about when an on-call rotation shift begins or ends. Time of the day in format HH:MM"
+    },
+    "CoverageTime": {
+      "type": "object",
+      "description": "StartTime and EndTime for the Shift",
+      "properties": {
+        "StartTime": {
+          "$ref": "#/definitions/HandOffTime"
+        },
+        "EndTime": {
+          "$ref": "#/definitions/HandOffTime"
+        }
+      },
+      "required": [
+        "StartTime",
+        "EndTime"
+      ],
+      "additionalProperties": false
+    },
+    "ShiftCoverage": {
+      "type": "object",
+      "description": "Information about the days of the week included in on-call rotation coverage.",
+      "properties": {
+        "DayOfWeek": {
+          "$ref": "#/definitions/DayOfWeek"
+        },
+        "CoverageTimes": {
+          "description": "Information about when an on-call shift begins and ends.",
+          "type": "array",
+          "insertionOrder": false,
+          "items": {
+            "$ref": "#/definitions/CoverageTime"
+          }
+        }
+      },
+      "required": [
+        "DayOfWeek",
+        "CoverageTimes"
+      ],
+      "additionalProperties": false
+    },
+    "DayOfWeek": {
+      "description": "The day of the week when weekly recurring on-call shift rotations begin. ",
+      "type": "string",
+      "enum": [
+        "MON",
+        "TUE",
+        "WED",
+        "THU",
+        "FRI",
+        "SAT",
+        "SUN"
+      ]
+    },
+    "MonthlySetting": {
+      "type": "object",
+      "description": "DayOfWeek for Month and HandOff Time for Monthly Recurring Rotation.",
+      "properties": {
+        "DayOfMonth": {
+          "description": "The day of the month when monthly recurring on-call rotations begin.",
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 31
+        },
+        "HandOffTime": {
+          "$ref": "#/definitions/HandOffTime"
+        }
+      },
+      "required": [
+        "DayOfMonth",
+        "HandOffTime"
+      ],
+      "additionalProperties": false
+    },
+    "WeeklySetting": {
+      "type": "object",
+      "description": "DayOfWeek for Rotation and HandOff Time for Weekly Recurring Rotation.",
+      "properties": {
+        "DayOfWeek": {
+          "$ref": "#/definitions/DayOfWeek"
+        },
+        "HandOffTime": {
+          "$ref": "#/definitions/HandOffTime"
+        }
+      },
+      "required": [
+        "DayOfWeek",
+        "HandOffTime"
+      ],
+      "additionalProperties": false
+    },
+    "DailySetting": {
+      "type": "object",
+      "description": "Handoff time for Daily Recurring Rotation.",
+      "properties": {
+        "HandOffTime": {
+          "$ref": "#/definitions/HandOffTime"
+        }
+      },
+      "required": [
+        "HandOffTime"
+      ],
+      "additionalProperties": false
+    },
+    "RecurrenceSettings": {
+      "description": "Information about when an on-call rotation is in effect and how long the rotation period lasts.",
+      "type": "object",
+      "properties": {
+        "MonthlySettings": {
+          "description": "Information about on-call rotations that recur monthly.",
+          "type": "array",
+          "insertionOrder": false,
+          "items": {
+            "$ref": "#/definitions/MonthlySetting"
+          }
+        },
+        "WeeklySettings": {
+          "description": "Information about on-call rotations that recur weekly.",
+          "type": "array",
+          "insertionOrder": false,
+          "items": {
+            "$ref": "#/definitions/WeeklySetting"
+          }
+        },
+        "DailySettings": {
+          "description": "Information about on-call rotations that recur daily.",
+          "type": "array",
+          "insertionOrder": false,
+          "items": {
+            "$ref": "#/definitions/HandOffTime"
+          }
+        },
+        "NumberOfOnCalls": {
+          "type": "integer",
+          "description": "Number of Oncalls per shift.",
+          "minimum": 1
+        },
+        "RecurrenceMultiplier": {
+          "type": "integer",
+          "description": "The number of days, weeks, or months a single rotation lasts.",
+          "minimum": 1,
+          "maximum": 100
+        },
+        "ShiftCoverages": {
+          "type": "array",
+          "insertionOrder": false,
+          "description": "Information about the days of the week included in on-call rotation coverage.",
+          "items": {
+            "$ref": "#/definitions/ShiftCoverage"
+          }
+        }
+      },
+      "additionalProperties": false,
+      "oneOf": [
+        {
+          "required": [
+            "NumberOfOnCalls",
+            "RecurrenceMultiplier",
+            "WeeklySettings"
+          ]
+        },
+        {
+          "required": [
+            "NumberOfOnCalls",
+            "RecurrenceMultiplier",
+            "MonthlySettings"
+          ]
+        },
+        {
+          "required": [
+            "NumberOfOnCalls",
+            "RecurrenceMultiplier",
+            "DailySettings"
+          ]
+        }
+      ]
+    }
+  },
+  "properties": {
+    "Name": {
+      "description": "Name of the Rotation",
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9_]*$"
+    },
+    "ContactIds": {
+      "description": "Members of the rotation",
+      "type": "array",
+      "insertionOrder": false,
+      "items": {
+        "type": "string"
+      }
+    },
+    "StartTime": {
+      "description": "Start time of the first shift of Oncall Schedule",
+      "type": "string",
+      "pattern": "^(\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2})$"
+    },
+    "TimeZoneId": {
+      "description": "TimeZone Identifier for the Oncall Schedule",
+      "type": "string"
+    },
+    "Recurrence": {
+      "$ref": "#/definitions/RecurrenceSettings"
+    },
+    "Tags": {
+      "type": "array",
+      "insertionOrder": false,
+      "uniqueItems": false,
+      "items": {
+        "$ref": "#/definitions/Tag"
+      }
+    },
+    "Arn": {
+      "type": "string",
+      "description": "The Amazon Resource Name (ARN) of the rotation."
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "Name",
+    "ContactIds",
+    "StartTime",
+    "TimeZoneId",
+    "Recurrence"
+  ],
+  "readOnlyProperties": [
+    "/properties/Arn"
+  ],
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": false,
+    "cloudFormationSystemTags": false
+  },
+  "primaryIdentifier": [
+    "/properties/Arn"
+  ],
+  "handlers": {
+    "create": {
+      "permissions": [
+        "ssm-contacts:CreateRotation",
+        "ssm-contacts:GetRotation",
+        "ssm-contacts:TagResource",
+        "ssm-contacts:ListTagsForResource",
+        "ssm-contacts:UntagResource"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "ssm-contacts:GetRotation",
+        "ssm-contacts:TagResource",
+        "ssm-contacts:ListTagsForResource",
+        "ssm-contacts:UntagResource"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "ssm-contacts:UpdateRotation",
+        "ssm-contacts:GetRotation",
+        "ssm-contacts:TagResource",
+        "ssm-contacts:ListTagsForResource",
+        "ssm-contacts:UntagResource"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "ssm-contacts:DeleteRotation",
+        "ssm-contacts:GetRotation",
+        "ssm-contacts:ListTagsForResource",
+        "ssm-contacts:UntagResource"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "ssm-contacts:ListRotations",
+        "ssm-contacts:GetRotation",
+        "ssm-contacts:ListTagsForResource"
+      ]
+    }
+  }
+}

@@ -53,11 +53,17 @@
         },
         "MappingType": {
           "type": "string",
-          "pattern": "CfnStack|Resource"
+          "pattern": "CfnStack|Resource|Terraform|EKS"
         },
         "ResourceName": {
           "type": "string",
           "pattern": "^[A-Za-z0-9][A-Za-z0-9_\\-]{1,59}$"
+        },
+        "TerraformSourceName": {
+          "type": "string"
+        },
+        "EksSourceName": {
+          "type": "string"
         },
         "PhysicalResourceId": {
           "$ref": "#/definitions/PhysicalResourceId"
@@ -99,7 +105,7 @@
       "type": "string",
       "minLength": 0,
       "maxLength": 5000,
-      "pattern": "^[\\w\\s:,-\\.'{}\\[\\]:\"]+$"
+      "pattern": "^[\\w\\s:,-\\.'\\/{}\\[\\]:\"]+$"
     },
     "ResourceMappings": {
       "description": "An array of ResourceMapping objects.",
@@ -109,7 +115,22 @@
       "items": {
         "$ref": "#/definitions/ResourceMapping"
       }
+    },
+    "AppAssessmentSchedule": {
+      "description": "Assessment execution schedule.",
+      "type": "string",
+      "enum": [
+        "Disabled",
+        "Daily"
+      ]
     }
+  },
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": false,
+    "tagProperty": "/properties/Tags"
   },
   "additionalProperties": false,
   "required": [
@@ -131,11 +152,23 @@
       "permissions": [
         "cloudformation:DescribeStacks",
         "cloudformation:ListStackResources",
-        "resiliencehub:CreateApp",
-        "resiliencehub:TagResource",
-        "resiliencehub:PutDraftAppVersionTemplate",
-        "resiliencehub:AddDraftAppVersionResourceMappings",
-        "resiliencehub:PublishAppVersion"
+        "s3:GetBucketLocation",
+        "s3:GetObject",
+        "s3:ListAllMyBuckets",
+        "autoscaling:DescribeAutoScalingGroups",
+        "apigateway:GET",
+        "ec2:Describe*",
+        "ecs:DescribeServices",
+        "eks:DescribeCluster",
+        "elasticfilesystem:DescribeFileSystems",
+        "elasticloadbalancing:DescribeLoadBalancers",
+        "lambda:GetFunction",
+        "rds:Describe*",
+        "dynamodb:Describe*",
+        "sqs:GetQueueAttributes",
+        "sns:GetTopicAttributes",
+        "route53:List*",
+        "resiliencehub:*"
       ]
     },
     "read": {
@@ -150,14 +183,23 @@
       "permissions": [
         "cloudformation:DescribeStacks",
         "cloudformation:ListStackResources",
-        "resiliencehub:UpdateApp",
-        "resiliencehub:PutDraftAppVersionTemplate",
-        "resiliencehub:AddDraftAppVersionResourceMappings",
-        "resiliencehub:RemoveDraftAppVersionResourceMappings",
-        "resiliencehub:PublishAppVersion",
-        "resiliencehub:TagResource",
-        "resiliencehub:UntagResource",
-        "resiliencehub:ListTagsForResource"
+        "s3:GetBucketLocation",
+        "s3:GetObject",
+        "s3:ListAllMyBuckets",
+        "autoscaling:DescribeAutoScalingGroups",
+        "apigateway:GET",
+        "ec2:Describe*",
+        "ecs:DescribeServices",
+        "eks:DescribeCluster",
+        "elasticfilesystem:DescribeFileSystems",
+        "elasticloadbalancing:DescribeLoadBalancers",
+        "lambda:GetFunction",
+        "rds:Describe*",
+        "dynamodb:Describe*",
+        "sqs:GetQueueAttributes",
+        "sns:GetTopicAttributes",
+        "route53:List*",
+        "resiliencehub:*"
       ]
     },
     "delete": {

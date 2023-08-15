@@ -3,10 +3,6 @@
   "description": "Associates a set of DHCP options with a VPC, or associates no DHCP options with the VPC.",
   "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-ec2.git",
   "properties": {
-    "Id": {
-      "type": "string",
-      "description": "The ID of the VPC DHCPOptions Association."
-    },
     "DhcpOptionsId": {
       "type": "string",
       "description": "The ID of the DHCP options set, or default to associate no DHCP options with the VPC."
@@ -22,9 +18,6 @@
     "DhcpOptionsId"
   ],
   "taggable": false,
-  "readOnlyProperties": [
-    "/properties/Id"
-  ],
   "createOnlyProperties": [
     "/properties/DhcpOptionsId",
     "/properties/VpcId"

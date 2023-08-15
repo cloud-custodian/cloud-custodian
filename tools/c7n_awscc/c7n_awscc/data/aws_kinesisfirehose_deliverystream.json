@@ -28,6 +28,9 @@
     "AmazonopensearchserviceDestinationConfiguration": {
       "$ref": "#/definitions/AmazonopensearchserviceDestinationConfiguration"
     },
+    "AmazonOpenSearchServerlessDestinationConfiguration": {
+      "$ref": "#/definitions/AmazonOpenSearchServerlessDestinationConfiguration"
+    },
     "ExtendedS3DestinationConfiguration": {
       "$ref": "#/definitions/ExtendedS3DestinationConfiguration"
     },
@@ -226,6 +229,22 @@
         "RoleARN",
         "SubnetIds",
         "SecurityGroupIds"
+      ]
+    },
+    "DocumentIdOptions": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "DefaultDocumentIdFormat": {
+          "type": "string",
+          "enum": [
+            "FIREHOSE_DEFAULT",
+            "NO_DOCUMENT_ID"
+          ]
+        }
+      },
+      "required": [
+        "DefaultDocumentIdFormat"
       ]
     },
     "ExtendedS3DestinationConfiguration": {
@@ -475,6 +494,9 @@
         },
         "VpcConfiguration": {
           "$ref": "#/definitions/VpcConfiguration"
+        },
+        "DocumentIdOptions": {
+          "$ref": "#/definitions/DocumentIdOptions"
         }
       },
       "required": [
@@ -549,6 +571,62 @@
         },
         "VpcConfiguration": {
           "$ref": "#/definitions/VpcConfiguration"
+        },
+        "DocumentIdOptions": {
+          "$ref": "#/definitions/DocumentIdOptions"
+        }
+      },
+      "required": [
+        "IndexName",
+        "S3Configuration",
+        "RoleARN"
+      ]
+    },
+    "AmazonOpenSearchServerlessDestinationConfiguration": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "BufferingHints": {
+          "$ref": "#/definitions/AmazonOpenSearchServerlessBufferingHints"
+        },
+        "CloudWatchLoggingOptions": {
+          "$ref": "#/definitions/CloudWatchLoggingOptions"
+        },
+        "IndexName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "ProcessingConfiguration": {
+          "$ref": "#/definitions/ProcessingConfiguration"
+        },
+        "RetryOptions": {
+          "$ref": "#/definitions/AmazonOpenSearchServerlessRetryOptions"
+        },
+        "RoleARN": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "pattern": "arn:.*"
+        },
+        "S3BackupMode": {
+          "type": "string",
+          "enum": [
+            "FailedDocumentsOnly",
+            "AllDocuments"
+          ]
+        },
+        "S3Configuration": {
+          "$ref": "#/definitions/S3DestinationConfiguration"
+        },
+        "CollectionEndpoint": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "pattern": "https:.*"
+        },
+        "VpcConfiguration": {
+          "$ref": "#/definitions/VpcConfiguration"
         }
       },
       "required": [
@@ -604,6 +682,15 @@
       }
     },
     "AmazonopensearchserviceRetryOptions": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "DurationInSeconds": {
+          "type": "integer"
+        }
+      }
+    },
+    "AmazonOpenSearchServerlessRetryOptions": {
       "type": "object",
       "additionalProperties": false,
       "properties": {
@@ -712,6 +799,18 @@
       }
     },
     "AmazonopensearchserviceBufferingHints": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "IntervalInSeconds": {
+          "type": "integer"
+        },
+        "SizeInMBs": {
+          "type": "integer"
+        }
+      }
+    },
+    "AmazonOpenSearchServerlessBufferingHints": {
       "type": "object",
       "additionalProperties": false,
       "properties": {
@@ -1097,6 +1196,7 @@
     "/properties/DeliveryStreamType",
     "/properties/ElasticsearchDestinationConfiguration/VpcConfiguration",
     "/properties/AmazonopensearchserviceDestinationConfiguration/VpcConfiguration",
+    "/properties/AmazonOpenSearchServerlessDestinationConfiguration/VpcConfiguration",
     "/properties/KinesisStreamSourceConfiguration"
   ],
   "primaryIdentifier": [

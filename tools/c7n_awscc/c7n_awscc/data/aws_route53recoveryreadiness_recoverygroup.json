@@ -12,12 +12,7 @@
           "type": "string"
         },
         "Value": {
-          "type": "array",
-          "items": {
-            "type": "string",
-            "maxItems": 50
-          },
-          "insertionOrder": false
+          "type": "string"
         }
       },
       "required": [
@@ -70,27 +65,30 @@
   "primaryIdentifier": [
     "/properties/RecoveryGroupName"
   ],
-  "required": [
-    "RecoveryGroupName"
-  ],
   "handlers": {
     "create": {
       "permissions": [
         "route53-recovery-readiness:CreateRecoveryGroup",
         "route53-recovery-readiness:GetRecoveryGroup",
-        "route53-recovery-readiness:GetCell"
+        "route53-recovery-readiness:GetCell",
+        "route53-recovery-readiness:ListTagsForResources",
+        "route53-recovery-readiness:TagResource"
       ]
     },
     "read": {
       "permissions": [
-        "route53-recovery-readiness:GetRecoveryGroup"
+        "route53-recovery-readiness:GetRecoveryGroup",
+        "route53-recovery-readiness:ListTagsForResources"
       ]
     },
     "update": {
       "permissions": [
         "route53-recovery-readiness:UpdateRecoveryGroup",
         "route53-recovery-readiness:GetRecoveryGroup",
-        "route53-recovery-readiness:GetCell"
+        "route53-recovery-readiness:GetCell",
+        "route53-recovery-readiness:ListTagsForResources",
+        "route53-recovery-readiness:TagResource",
+        "route53-recovery-readiness:UntagResource"
       ]
     },
     "delete": {

@@ -1,0 +1,160 @@
+{
+  "typeName": "AWS::DeviceFarm::TestGridProject",
+  "description": "AWS::DeviceFarm::TestGridProject creates a new TestGrid Project",
+  "properties": {
+    "Description": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 2048,
+      "pattern": ".*\\S.*"
+    },
+    "Name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64,
+      "pattern": ".*\\S.*"
+    },
+    "VpcConfig": {
+      "$ref": "#/definitions/VpcConfig"
+    },
+    "Arn": {
+      "type": "string",
+      "minLength": 32,
+      "maxLength": 1011,
+      "pattern": "^arn:.+"
+    },
+    "Tags": {
+      "type": "array",
+      "uniqueItems": false,
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/Tag"
+      }
+    }
+  },
+  "definitions": {
+    "VpcConfig": {
+      "description": "The VPC security groups and subnets that are attached to a TestGrid project.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "SecurityGroupIds": {
+          "type": "array",
+          "description": "A list of VPC security group IDs in your Amazon VPC.",
+          "insertionOrder": false,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4096,
+            "pattern": ".*\\S.*"
+          },
+          "minItems": 1,
+          "maxItems": 5
+        },
+        "SubnetIds": {
+          "type": "array",
+          "description": "A list of VPC subnet IDs in your Amazon VPC.",
+          "insertionOrder": false,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4096,
+            "pattern": ".*\\S.*"
+          },
+          "minItems": 1,
+          "maxItems": 8
+        },
+        "VpcId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096,
+          "pattern": ".*\\S.*"
+        }
+      },
+      "required": [
+        "SecurityGroupIds",
+        "SubnetIds",
+        "VpcId"
+      ]
+    },
+    "Tag": {
+      "type": "object",
+      "additionalProperties": false,
+      "insertionOrder": false,
+      "properties": {
+        "Key": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "Value": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        }
+      },
+      "required": [
+        "Key",
+        "Value"
+      ]
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "Name"
+  ],
+  "primaryIdentifier": [
+    "/properties/Arn"
+  ],
+  "readOnlyProperties": [
+    "/properties/Arn"
+  ],
+  "writeOnlyProperties": [
+    "/properties/VpcConfig"
+  ],
+  "tagging": {
+    "taggable": true
+  },
+  "handlers": {
+    "create": {
+      "permissions": [
+        "devicefarm:CreateTestGridProject",
+        "devicefarm:TagResource",
+        "ec2:DescribeVpcs",
+        "ec2:DescribeSubnets",
+        "ec2:DescribeSecurityGroups",
+        "ec2:CreateNetworkInterface",
+        "iam:CreateServiceLinkedRole"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "devicefarm:GetTestGridProject",
+        "devicefarm:ListTagsForResource"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "devicefarm:UpdateTestGridProject",
+        "devicefarm:TagResource",
+        "devicefarm:UntagResource",
+        "devicefarm:ListTagsForResource",
+        "ec2:DescribeVpcs",
+        "ec2:DescribeSubnets",
+        "ec2:DescribeSecurityGroups",
+        "ec2:CreateNetworkInterface",
+        "iam:CreateServiceLinkedRole"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "devicefarm:DeleteTestGridProject"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "devicefarm:ListTestGridProjects"
+      ]
+    }
+  }
+}

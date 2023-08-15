@@ -1,7 +1,7 @@
 {
   "typeName": "AWS::AppRunner::Service",
   "description": "The AWS::AppRunner::Service resource specifies an AppRunner Service.",
-  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-fusion.git",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-apprunner.git",
   "definitions": {
     "SourceConfiguration": {
       "description": "Source Code configuration",
@@ -96,7 +96,15 @@
           "description": "Runtime",
           "enum": [
             "PYTHON_3",
-            "NODEJS_12"
+            "NODEJS_12",
+            "NODEJS_14",
+            "CORRETTO_8",
+            "CORRETTO_11",
+            "NODEJS_16",
+            "GO_1",
+            "DOTNET_6",
+            "PHP_81",
+            "RUBY_31"
           ]
         },
         "BuildCommand": {
@@ -116,6 +124,13 @@
           "items": {
             "$ref": "#/definitions/KeyValuePair"
           }
+        },
+        "RuntimeEnvironmentSecrets": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/KeyValuePair"
+          },
+          "description": "The secrets and parameters that get referenced by your service as environment variables"
         }
       },
       "required": [
@@ -169,6 +184,13 @@
           "items": {
             "$ref": "#/definitions/KeyValuePair"
           }
+        },
+        "RuntimeEnvironmentSecrets": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/KeyValuePair"
+          },
+          "description": "The secrets and parameters that get referenced by your service as environment variables"
         }
       },
       "additionalProperties": false
@@ -198,16 +220,16 @@
         "Cpu": {
           "type": "string",
           "description": "CPU",
-          "minLength": 4,
-          "maxLength": 6,
-          "pattern": "1024|2048|(1|2) vCPU"
+          "minLength": 3,
+          "maxLength": 9,
+          "pattern": "256|512|1024|2048|4096|(0.25|0.5|1|2|4) vCPU"
         },
         "Memory": {
           "type": "string",
           "description": "Memory",
-          "minLength": 4,
-          "maxLength": 4,
-          "pattern": "2048|3072|4096|(2|3|4) GB"
+          "minLength": 3,
+          "maxLength": 6,
+          "pattern": "512|1024|2048|3072|4096|6144|8192|10240|12288|(0.5|1|2|3|4|6|8|10|12) GB"
         },
         "InstanceRoleArn": {
           "description": "Instance Role Arn",
@@ -219,7 +241,7 @@
     "RoleArn": {
       "type": "string",
       "minLength": 29,
-      "maxLength": 102,
+      "maxLength": 1024,
       "pattern": "arn:(aws|aws-us-gov|aws-cn|aws-iso|aws-iso-b):iam::[0-9]{12}:role/[\\w+=,.@-]{1,64}"
     },
     "EncryptionConfiguration": {
@@ -278,6 +300,79 @@
           "maximum": 20
         }
       },
+      "additionalProperties": false
+    },
+    "EgressConfiguration": {
+      "description": "Network egress configuration",
+      "type": "object",
+      "properties": {
+        "EgressType": {
+          "description": "Network egress type.",
+          "type": "string",
+          "enum": [
+            "DEFAULT",
+            "VPC"
+          ]
+        },
+        "VpcConnectorArn": {
+          "description": "The Amazon Resource Name (ARN) of the App Runner VpcConnector.",
+          "type": "string",
+          "minLength": 44,
+          "maxLength": 1011,
+          "pattern": "arn:aws(-[\\w]+)*:[a-z0-9-\\\\.]{0,63}:[a-z0-9-\\\\.]{0,63}:[0-9]{12}:(\\w|\\/|-){1,1011}"
+        }
+      },
+      "required": [
+        "EgressType"
+      ],
+      "additionalProperties": false
+    },
+    "IngressConfiguration": {
+      "description": "Network ingress configuration",
+      "type": "object",
+      "properties": {
+        "IsPubliclyAccessible": {
+          "description": "It's set to true if the Apprunner service is publicly accessible. It's set to false otherwise.",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "IsPubliclyAccessible"
+      ],
+      "additionalProperties": false
+    },
+    "NetworkConfiguration": {
+      "description": "Network configuration",
+      "type": "object",
+      "properties": {
+        "EgressConfiguration": {
+          "$ref": "#/definitions/EgressConfiguration"
+        },
+        "IngressConfiguration": {
+          "$ref": "#/definitions/IngressConfiguration"
+        }
+      },
+      "additionalProperties": false
+    },
+    "ServiceObservabilityConfiguration": {
+      "description": "Service observability configuration",
+      "type": "object",
+      "properties": {
+        "ObservabilityEnabled": {
+          "description": "Observability enabled",
+          "type": "boolean"
+        },
+        "ObservabilityConfigurationArn": {
+          "description": "The Amazon Resource Name (ARN) of the App Runner ObservabilityConfiguration.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1011,
+          "pattern": "arn:aws(-[\\w]+)*:[a-z0-9-\\.]{0,63}:[a-z0-9-\\.]{0,63}:[0-9]{12}:(\\w|/|-){1,1011}"
+        }
+      },
+      "required": [
+        "ObservabilityEnabled"
+      ],
       "additionalProperties": false
     },
     "Tag": {
@@ -352,13 +447,26 @@
     "HealthCheckConfiguration": {
       "$ref": "#/definitions/HealthCheckConfiguration"
     },
+    "ObservabilityConfiguration": {
+      "$ref": "#/definitions/ServiceObservabilityConfiguration"
+    },
     "AutoScalingConfigurationArn": {
       "description": "Autoscaling configuration ARN",
       "type": "string",
       "minLength": 1,
       "maxLength": 1011,
       "pattern": "arn:aws(-[\\w]+)*:[a-z0-9-\\\\.]{0,63}:[a-z0-9-\\\\.]{0,63}:[0-9]{12}:(\\w|\\/|-){1,1011}"
+    },
+    "NetworkConfiguration": {
+      "$ref": "#/definitions/NetworkConfiguration"
     }
+  },
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": false,
+    "cloudFormationSystemTags": false,
+    "tagProperty": "/properties/Tags"
   },
   "required": [
     "SourceConfiguration"

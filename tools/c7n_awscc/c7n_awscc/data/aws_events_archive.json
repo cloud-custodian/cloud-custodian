@@ -28,8 +28,7 @@
     "SourceArn"
   ],
   "readOnlyProperties": [
-    "/properties/Arn",
-    "/properties/ArchiveName"
+    "/properties/Arn"
   ],
   "createOnlyProperties": [
     "/properties/ArchiveName",

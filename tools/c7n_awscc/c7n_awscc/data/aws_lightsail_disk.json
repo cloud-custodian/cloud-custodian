@@ -172,7 +172,8 @@
     "/properties/AttachmentState",
     "/properties/State",
     "/properties/ResourceType",
-    "/properties/Location",
+    "/properties/Location/AvailabilityZone",
+    "/properties/Location/RegionName",
     "/properties/SupportCode",
     "/properties/DiskArn"
   ],

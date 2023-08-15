@@ -70,6 +70,7 @@
         "ONEZONE_IA",
         "INTELLIGENT_TIERING",
         "GLACIER",
+        "GLACIER_INSTANT_RETRIEVAL",
         "DEEP_ARCHIVE"
       ],
       "default": "STANDARD"
@@ -98,9 +99,14 @@
     }
   },
   "additionalProperties": false,
-  "taggable": true,
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": true,
+    "tagProperty": "/properties/Tags"
+  },
   "required": [
-    "S3BucketArn",
     "S3Config"
   ],
   "readOnlyProperties": [
@@ -126,6 +132,7 @@
         "datasync:CreateLocationS3",
         "datasync:DescribeLocationS3",
         "datasync:ListTagsForResource",
+        "datasync:TagResource",
         "s3:ListAllMyBuckets",
         "s3:ListBucket",
         "iam:GetRole",

@@ -1,0 +1,115 @@
+{
+  "typeName": "AWS::Organizations::ResourcePolicy",
+  "description": "You can use AWS::Organizations::ResourcePolicy to delegate policy management for AWS Organizations to specified member accounts to perform policy actions that are by default available only to the management account.",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-organizations",
+  "properties": {
+    "Id": {
+      "description": "The unique identifier (ID) associated with this resource policy.",
+      "type": "string",
+      "pattern": "^rp-[0-9a-zA-Z_]{4,128}$",
+      "maxLength": 131
+    },
+    "Arn": {
+      "description": "The Amazon Resource Name (ARN) of the resource policy.",
+      "type": "string",
+      "pattern": "^arn:aws.*:organizations::\\d{12}:resourcepolicy\\/o-[a-z0-9]{10,32}\\/rp-[0-9a-zA-Z_]{4,128}"
+    },
+    "Content": {
+      "description": "The policy document. For AWS CloudFormation templates formatted in YAML, you can provide the policy in JSON or YAML format. AWS CloudFormation always converts a YAML policy to JSON format before submitting it.",
+      "type": [
+        "object",
+        "string"
+      ],
+      "pattern": "[\\s\\S]*",
+      "minLength": 1,
+      "maxLength": 40000
+    },
+    "Tags": {
+      "description": "A list of tags that you want to attach to the resource policy",
+      "type": "array",
+      "uniqueItems": true,
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/Tag"
+      }
+    }
+  },
+  "definitions": {
+    "Tag": {
+      "description": "A custom key-value pair associated with a resource within your organization.",
+      "type": "object",
+      "properties": {
+        "Key": {
+          "type": "string",
+          "description": "The key identifier, or name, of the tag.",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "Value": {
+          "type": "string",
+          "description": "The string value that's associated with the key of the tag. You can set the value of a tag to an empty string, but you can't set the value of a tag to null.",
+          "minLength": 0,
+          "maxLength": 256
+        }
+      },
+      "required": [
+        "Key",
+        "Value"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "handlers": {
+    "create": {
+      "permissions": [
+        "organizations:PutResourcePolicy",
+        "organizations:DescribeResourcePolicy",
+        "organizations:ListTagsForResource",
+        "organizations:TagResource"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "organizations:DescribeResourcePolicy",
+        "organizations:ListTagsForResource"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "organizations:DescribeResourcePolicy",
+        "organizations:PutResourcePolicy",
+        "organizations:ListTagsForResource",
+        "organizations:TagResource",
+        "organizations:UntagResource"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "organizations:DeleteResourcePolicy"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "organizations:DescribeResourcePolicy"
+      ]
+    }
+  },
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": false,
+    "tagProperty": "/properties/Tags"
+  },
+  "required": [
+    "Content"
+  ],
+  "readOnlyProperties": [
+    "/properties/Id",
+    "/properties/Arn"
+  ],
+  "primaryIdentifier": [
+    "/properties/Id"
+  ],
+  "additionalProperties": false
+}

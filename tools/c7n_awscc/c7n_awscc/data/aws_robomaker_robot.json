@@ -1,6 +1,6 @@
 {
   "typeName": "AWS::RoboMaker::Robot",
-  "description": "AWS::RoboMaker::Robot resource creates an AWS RoboMaker fleet.",
+  "description": "AWS::RoboMaker::Robot resource creates an AWS RoboMaker Robot.",
   "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-robomaker.git",
   "additionalProperties": false,
   "definitions": {

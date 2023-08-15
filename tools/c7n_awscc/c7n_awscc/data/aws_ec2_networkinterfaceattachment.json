@@ -1,0 +1,90 @@
+{
+  "typeName": "AWS::EC2::NetworkInterfaceAttachment",
+  "description": "Resource Type definition for AWS::EC2::NetworkInterfaceAttachment",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-ec2.git",
+  "properties": {
+    "AttachmentId": {
+      "description": "The ID of the network interface attachment.",
+      "type": "string"
+    },
+    "DeleteOnTermination": {
+      "description": "Whether to delete the network interface when the instance terminates. By default, this value is set to true.",
+      "type": "boolean",
+      "default": true
+    },
+    "DeviceIndex": {
+      "description": "The network interface's position in the attachment order. For example, the first attached network interface has a DeviceIndex of 0.",
+      "type": "string"
+    },
+    "InstanceId": {
+      "description": "The ID of the instance to which you will attach the ENI.",
+      "type": "string"
+    },
+    "NetworkInterfaceId": {
+      "description": "The ID of the ENI that you want to attach.",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "replacementStrategy": "delete_then_create",
+  "tagging": {
+    "taggable": false,
+    "tagOnCreate": false,
+    "tagUpdatable": false,
+    "cloudFormationSystemTags": false
+  },
+  "required": [
+    "DeviceIndex",
+    "InstanceId",
+    "NetworkInterfaceId"
+  ],
+  "readOnlyProperties": [
+    "/properties/AttachmentId"
+  ],
+  "createOnlyProperties": [
+    "/properties/DeviceIndex",
+    "/properties/InstanceId",
+    "/properties/NetworkInterfaceId"
+  ],
+  "primaryIdentifier": [
+    "/properties/AttachmentId"
+  ],
+  "additionalIdentifiers": [
+    [
+      "/properties/NetworkInterfaceId"
+    ]
+  ],
+  "handlers": {
+    "create": {
+      "permissions": [
+        "ec2:AttachNetworkInterface",
+        "ec2:DescribeNetworkInterfaces",
+        "ec2:ModifyNetworkInterfaceAttribute"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "ec2:DescribeNetworkInterfaces"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "ec2:DescribeNetworkInterfaces"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "ec2:ModifyNetworkInterfaceAttribute",
+        "ec2:DescribeNetworkInterfaces",
+        "ec2:AttachNetworkInterface",
+        "ec2:DetachNetworkInterface"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "ec2:DetachNetworkInterface",
+        "ec2:DescribeNetworkInterfaces"
+      ]
+    }
+  }
+}

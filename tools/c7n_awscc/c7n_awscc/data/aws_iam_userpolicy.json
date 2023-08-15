@@ -1,0 +1,63 @@
+{
+  "typeName": "AWS::IAM::UserPolicy",
+  "description": "Schema for IAM User Policy",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-iam.git",
+  "additionalProperties": false,
+  "properties": {
+    "PolicyDocument": {
+      "description": "The policy document.",
+      "type": "object"
+    },
+    "PolicyName": {
+      "description": "The name of the policy document.",
+      "type": "string"
+    },
+    "UserName": {
+      "description": "The name of the user to associate the policy with.",
+      "type": "string"
+    }
+  },
+  "required": [
+    "PolicyName",
+    "UserName"
+  ],
+  "createOnlyProperties": [
+    "/properties/PolicyName",
+    "/properties/UserName"
+  ],
+  "primaryIdentifier": [
+    "/properties/PolicyName",
+    "/properties/UserName"
+  ],
+  "tagging": {
+    "taggable": false,
+    "tagOnCreate": false,
+    "tagUpdatable": false,
+    "cloudFormationSystemTags": false
+  },
+  "handlers": {
+    "create": {
+      "permissions": [
+        "iam:PutUserPolicy",
+        "iam:GetUserPolicy"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "iam:GetUserPolicy"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "iam:PutUserPolicy",
+        "iam:GetUserPolicy"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "iam:DeleteUserPolicy",
+        "iam:GetUserPolicy"
+      ]
+    }
+  }
+}

@@ -51,6 +51,21 @@
       "description": "The Amazon Resource Name (ARN) of the IPAM.",
       "type": "string"
     },
+    "DefaultResourceDiscoveryId": {
+      "description": "The Id of the default resource discovery, created with this IPAM.",
+      "type": "string"
+    },
+    "DefaultResourceDiscoveryAssociationId": {
+      "description": "The Id of the default association to the default resource discovery, created with this IPAM.",
+      "type": "string"
+    },
+    "ResourceDiscoveryAssociationCount": {
+      "description": "The count of resource discoveries associated with this IPAM.",
+      "type": "integer"
+    },
+    "Description": {
+      "type": "string"
+    },
     "PublicDefaultScopeId": {
       "description": "The Id of the default scope for publicly routable IP space, created with this IPAM.",
       "type": "string",
@@ -63,9 +78,6 @@
     "ScopeCount": {
       "description": "The number of scopes that currently exist in this IPAM.",
       "type": "integer"
-    },
-    "Description": {
-      "type": "string"
     },
     "OperatingRegions": {
       "description": "The regions IPAM is enabled for. Allows pools to be created in these regions, as well as enabling monitoring",
@@ -96,12 +108,16 @@
     "/properties/Arn",
     "/properties/PublicDefaultScopeId",
     "/properties/PrivateDefaultScopeId",
-    "/properties/ScopeCount"
+    "/properties/ScopeCount",
+    "/properties/ResourceDiscoveryAssociationCount",
+    "/properties/DefaultResourceDiscoveryId",
+    "/properties/DefaultResourceDiscoveryAssociationId"
   ],
   "handlers": {
     "create": {
       "permissions": [
         "ec2:CreateIpam",
+        "iam:CreateServiceLinkedRole",
         "ec2:CreateTags"
       ]
     },

@@ -4,24 +4,17 @@
   "definitions": {
     "BorderStyle": {
       "type": "object",
-      "description": "<p>The display options for tile borders for visuals.</p>",
       "properties": {
         "Show": {
           "type": "boolean",
-          "description": "<p>The option to enable display of borders for visuals.</p>"
+          "default": null
         }
       },
       "additionalProperties": false
     },
     "DataColorPalette": {
       "type": "object",
-      "description": "<p>The theme colors that are used for data colors in charts. The colors description is a\n            hexadecimal color code that consists of six alphanumerical characters, prefixed with\n                <code>#</code>, for example #37BFF5. </p>",
       "properties": {
-        "EmptyFillColor": {
-          "type": "string",
-          "pattern": "^#[A-F0-9]{6}$",
-          "description": "<p>The hexadecimal code of a color that applies to charts where a lack of data is\n            highlighted.</p>"
-        },
         "Colors": {
           "type": "array",
           "items": {
@@ -29,8 +22,7 @@
             "pattern": "^#[A-F0-9]{6}$"
           },
           "maxItems": 100,
-          "minItems": 0,
-          "description": "<p>The hexadecimal codes for the colors.</p>"
+          "minItems": 0
         },
         "MinMaxGradient": {
           "type": "array",
@@ -39,8 +31,11 @@
             "pattern": "^#[A-F0-9]{6}$"
           },
           "maxItems": 100,
-          "minItems": 0,
-          "description": "<p>The minimum and maximum hexadecimal codes that describe a color gradient. </p>"
+          "minItems": 0
+        },
+        "EmptyFillColor": {
+          "type": "string",
+          "pattern": "^#[A-F0-9]{6}$"
         }
       },
       "additionalProperties": false
@@ -56,44 +51,42 @@
     },
     "GutterStyle": {
       "type": "object",
-      "description": "<p>The display options for gutter spacing between tiles on a sheet.</p>",
       "properties": {
         "Show": {
           "type": "boolean",
-          "description": "<p>This Boolean value controls whether to display a gutter space between sheet tiles.\n        </p>"
+          "default": null
         }
       },
       "additionalProperties": false
     },
     "MarginStyle": {
       "type": "object",
-      "description": "<p>The display options for margins around the outside edge of sheets.</p>",
       "properties": {
         "Show": {
           "type": "boolean",
-          "description": "<p>This Boolean value controls whether to display sheet margins.</p>"
+          "default": null
         }
       },
       "additionalProperties": false
     },
     "ResourcePermission": {
       "type": "object",
-      "description": "<p>Permission for the resource.</p>",
       "properties": {
+        "Principal": {
+          "type": "string",
+          "maxLength": 256,
+          "minLength": 1
+        },
+        "Resource": {
+          "type": "string"
+        },
         "Actions": {
           "type": "array",
           "items": {
             "type": "string"
           },
-          "maxItems": 16,
-          "minItems": 1,
-          "description": "<p>The IAM action to grant or revoke permissions on.</p>"
-        },
-        "Principal": {
-          "type": "string",
-          "maxLength": 256,
-          "minLength": 1,
-          "description": "<p>The Amazon Resource Name (ARN) of the principal. This can be one of the\n            following:</p>\n        <ul>\n            <li>\n                <p>The ARN of an Amazon QuickSight user or group associated with a data source or dataset. (This is common.)</p>\n            </li>\n            <li>\n                <p>The ARN of an Amazon QuickSight user, group, or namespace associated with an analysis, dashboard, template, or theme. (This is common.)</p>\n            </li>\n            <li>\n                <p>The ARN of an AWS account root: This is an IAM ARN rather than a QuickSight\n                    ARN. Use this option only to share resources (templates) across AWS accounts.\n                    (This is less common.) </p>\n            </li>\n         </ul>"
+          "maxItems": 20,
+          "minItems": 1
         }
       },
       "required": [
@@ -116,32 +109,28 @@
     },
     "SheetStyle": {
       "type": "object",
-      "description": "<p>The theme display options for sheets. </p>",
       "properties": {
-        "TileLayout": {
-          "$ref": "#/definitions/TileLayoutStyle"
-        },
         "Tile": {
           "$ref": "#/definitions/TileStyle"
+        },
+        "TileLayout": {
+          "$ref": "#/definitions/TileLayoutStyle"
         }
       },
       "additionalProperties": false
     },
     "Tag": {
       "type": "object",
-      "description": "<p>The key or keys of the key-value pairs for the resource tag or tags assigned to the\n            resource.</p>",
       "properties": {
-        "Value": {
-          "type": "string",
-          "maxLength": 256,
-          "minLength": 1,
-          "description": "<p>Tag value.</p>"
-        },
         "Key": {
           "type": "string",
           "maxLength": 128,
-          "minLength": 1,
-          "description": "<p>Tag key.</p>"
+          "minLength": 1
+        },
+        "Value": {
+          "type": "string",
+          "maxLength": 256,
+          "minLength": 1
         }
       },
       "required": [
@@ -152,7 +141,6 @@
     },
     "ThemeConfiguration": {
       "type": "object",
-      "description": "<p>The theme configuration. This configuration contains all of the display properties for\n            a theme.</p>",
       "properties": {
         "DataColorPalette": {
           "$ref": "#/definitions/DataColorPalette"
@@ -171,15 +159,13 @@
     },
     "ThemeError": {
       "type": "object",
-      "description": "<p>Theme error.</p>",
       "properties": {
         "Type": {
           "$ref": "#/definitions/ThemeErrorType"
         },
         "Message": {
           "type": "string",
-          "pattern": ".*\\S.*",
-          "description": "<p>The error message.</p>"
+          "pattern": ".*\\S.*"
         }
       },
       "additionalProperties": false
@@ -200,55 +186,47 @@
     },
     "ThemeVersion": {
       "type": "object",
-      "description": "<p>A version of a theme.</p>",
       "properties": {
-        "Status": {
-          "$ref": "#/definitions/ResourceStatus"
+        "VersionNumber": {
+          "type": "number",
+          "minimum": 1
+        },
+        "Arn": {
+          "type": "string"
+        },
+        "Description": {
+          "type": "string",
+          "maxLength": 512,
+          "minLength": 1
+        },
+        "BaseThemeId": {
+          "type": "string",
+          "maxLength": 512,
+          "minLength": 1,
+          "pattern": "[\\w\\-]+"
+        },
+        "CreatedTime": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "Configuration": {
+          "$ref": "#/definitions/ThemeConfiguration"
         },
         "Errors": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/ThemeError"
           },
-          "minItems": 1,
-          "description": "<p>Errors associated with the theme.</p>"
+          "minItems": 1
         },
-        "Description": {
-          "type": "string",
-          "maxLength": 512,
-          "minLength": 1,
-          "description": "<p>The description of the theme.</p>"
-        },
-        "CreatedTime": {
-          "type": "string",
-          "description": "<p>The date and time that this theme version was created.</p>",
-          "format": "string"
-        },
-        "Configuration": {
-          "$ref": "#/definitions/ThemeConfiguration"
-        },
-        "BaseThemeId": {
-          "type": "string",
-          "maxLength": 2048,
-          "minLength": 1,
-          "pattern": "[\\w\\-]+",
-          "description": "<p>The Amazon QuickSight-defined ID of the theme that a custom theme inherits from. All\n            themes initially inherit from a default QuickSight theme.</p>"
-        },
-        "Arn": {
-          "type": "string",
-          "description": "<p>The Amazon Resource Name (ARN) of the resource.</p>"
-        },
-        "VersionNumber": {
-          "type": "number",
-          "minimum": 1,
-          "description": "<p>The version number of the theme.</p>"
+        "Status": {
+          "$ref": "#/definitions/ResourceStatus"
         }
       },
       "additionalProperties": false
     },
     "TileLayoutStyle": {
       "type": "object",
-      "description": "<p>The display options for the layout of tiles on a sheet.</p>",
       "properties": {
         "Gutter": {
           "$ref": "#/definitions/GutterStyle"
@@ -261,7 +239,6 @@
     },
     "TileStyle": {
       "type": "object",
-      "description": "<p>Display options related to tiles on a sheet.</p>",
       "properties": {
         "Border": {
           "$ref": "#/definitions/BorderStyle"
@@ -271,7 +248,6 @@
     },
     "Typography": {
       "type": "object",
-      "description": "<p>The typeface for the theme.</p>",
       "properties": {
         "FontFamilies": {
           "type": "array",
@@ -286,87 +262,70 @@
     },
     "UIColorPalette": {
       "type": "object",
-      "description": "<p>The theme colors that apply to UI and to charts, excluding data colors. The colors\n            description is a hexadecimal color code that consists of six alphanumerical characters,\n            prefixed with <code>#</code>, for example #37BFF5. For more information, see <a href=\"https://docs.aws.amazon.com/quicksight/latest/user/themes-in-quicksight.html\">Using Themes in Amazon QuickSight</a> in the <i>Amazon QuickSight User\n                Guide.</i>\n        </p>",
       "properties": {
-        "Warning": {
+        "PrimaryForeground": {
           "type": "string",
-          "pattern": "^#[A-F0-9]{6}$",
-          "description": "<p>This color that applies to warning and informational messages.</p>"
-        },
-        "Accent": {
-          "type": "string",
-          "pattern": "^#[A-F0-9]{6}$",
-          "description": "<p>This color is that applies to selected states and buttons.</p>"
-        },
-        "AccentForeground": {
-          "type": "string",
-          "pattern": "^#[A-F0-9]{6}$",
-          "description": "<p>The foreground color that applies to any text or other elements that appear over the\n            accent color.</p>"
-        },
-        "SecondaryBackground": {
-          "type": "string",
-          "pattern": "^#[A-F0-9]{6}$",
-          "description": "<p>The background color that applies to the sheet background and sheet controls.</p>"
-        },
-        "DangerForeground": {
-          "type": "string",
-          "pattern": "^#[A-F0-9]{6}$",
-          "description": "<p>The foreground color that applies to any text or other elements that appear over the\n            error color.</p>"
+          "pattern": "^#[A-F0-9]{6}$"
         },
         "PrimaryBackground": {
           "type": "string",
-          "pattern": "^#[A-F0-9]{6}$",
-          "description": "<p>The background color that applies to visuals and other high emphasis UI.</p>"
-        },
-        "Dimension": {
-          "type": "string",
-          "pattern": "^#[A-F0-9]{6}$",
-          "description": "<p>The color that applies to the names of fields that are identified as\n            dimensions.</p>"
+          "pattern": "^#[A-F0-9]{6}$"
         },
         "SecondaryForeground": {
           "type": "string",
-          "pattern": "^#[A-F0-9]{6}$",
-          "description": "<p>The foreground color that applies to any sheet title, sheet control text, or UI that\n            appears over the secondary background.</p>"
+          "pattern": "^#[A-F0-9]{6}$"
         },
-        "WarningForeground": {
+        "SecondaryBackground": {
           "type": "string",
-          "pattern": "^#[A-F0-9]{6}$",
-          "description": "<p>The foreground color that applies to any text or other elements that appear over the\n            warning color.</p>"
+          "pattern": "^#[A-F0-9]{6}$"
         },
-        "DimensionForeground": {
+        "Accent": {
           "type": "string",
-          "pattern": "^#[A-F0-9]{6}$",
-          "description": "<p>The foreground color that applies to any text or other elements that appear over the\n            dimension color.</p>"
+          "pattern": "^#[A-F0-9]{6}$"
         },
-        "PrimaryForeground": {
+        "AccentForeground": {
           "type": "string",
-          "pattern": "^#[A-F0-9]{6}$",
-          "description": "<p>The color of text and other foreground elements that appear over the primary\n            background regions, such as grid lines, borders, table banding, icons, and so on.</p>"
-        },
-        "Success": {
-          "type": "string",
-          "pattern": "^#[A-F0-9]{6}$",
-          "description": "<p>The color that applies to success messages, for example the check mark for a\n            successful download.</p>"
+          "pattern": "^#[A-F0-9]{6}$"
         },
         "Danger": {
           "type": "string",
-          "pattern": "^#[A-F0-9]{6}$",
-          "description": "<p>The color that applies to error messages.</p>"
+          "pattern": "^#[A-F0-9]{6}$"
+        },
+        "DangerForeground": {
+          "type": "string",
+          "pattern": "^#[A-F0-9]{6}$"
+        },
+        "Warning": {
+          "type": "string",
+          "pattern": "^#[A-F0-9]{6}$"
+        },
+        "WarningForeground": {
+          "type": "string",
+          "pattern": "^#[A-F0-9]{6}$"
+        },
+        "Success": {
+          "type": "string",
+          "pattern": "^#[A-F0-9]{6}$"
         },
         "SuccessForeground": {
           "type": "string",
-          "pattern": "^#[A-F0-9]{6}$",
-          "description": "<p>The foreground color that applies to any text or other elements that appear over the\n            success color.</p>"
+          "pattern": "^#[A-F0-9]{6}$"
+        },
+        "Dimension": {
+          "type": "string",
+          "pattern": "^#[A-F0-9]{6}$"
+        },
+        "DimensionForeground": {
+          "type": "string",
+          "pattern": "^#[A-F0-9]{6}$"
         },
         "Measure": {
           "type": "string",
-          "pattern": "^#[A-F0-9]{6}$",
-          "description": "<p>The color that applies to the names of fields that are identified as measures.</p>"
+          "pattern": "^#[A-F0-9]{6}$"
         },
         "MeasureForeground": {
           "type": "string",
-          "pattern": "^#[A-F0-9]{6}$",
-          "description": "<p>The foreground color that applies to any text or other elements that appear over the\n            measure color.</p>"
+          "pattern": "^#[A-F0-9]{6}$"
         }
       },
       "additionalProperties": false
@@ -374,8 +333,7 @@
   },
   "properties": {
     "Arn": {
-      "type": "string",
-      "description": "<p>The Amazon Resource Name (ARN) of the theme.</p>"
+      "type": "string"
     },
     "AwsAccountId": {
       "type": "string",
@@ -385,29 +343,25 @@
     },
     "BaseThemeId": {
       "type": "string",
-      "maxLength": 2048,
+      "maxLength": 512,
       "minLength": 1,
-      "pattern": "[\\w\\-]+",
-      "description": "<p>The ID of the theme that a custom theme will inherit from. All themes inherit from one of\n\t\t\tthe starting themes defined by Amazon QuickSight. For a list of the starting themes, use\n\t\t\t\t<code>ListThemes</code> or choose <b>Themes</b> from\n\t\t\twithin a QuickSight analysis. </p>"
+      "pattern": "[\\w\\-]+"
     },
     "Configuration": {
       "$ref": "#/definitions/ThemeConfiguration"
     },
     "CreatedTime": {
       "type": "string",
-      "description": "<p>The date and time that the theme was created.</p>",
-      "format": "string"
+      "format": "date-time"
     },
     "LastUpdatedTime": {
       "type": "string",
-      "description": "<p>The date and time that the theme was last updated.</p>",
-      "format": "string"
+      "format": "date-time"
     },
     "Name": {
       "type": "string",
       "maxLength": 2048,
-      "minLength": 1,
-      "description": "<p>A display name for the theme.</p>"
+      "minLength": 1
     },
     "Permissions": {
       "type": "array",
@@ -415,8 +369,7 @@
         "$ref": "#/definitions/ResourcePermission"
       },
       "maxItems": 64,
-      "minItems": 1,
-      "description": "<p>A valid grouping of resource permissions to apply to the new theme.\n\t\t\t</p>"
+      "minItems": 1
     },
     "Tags": {
       "type": "array",
@@ -424,12 +377,11 @@
         "$ref": "#/definitions/Tag"
       },
       "maxItems": 200,
-      "minItems": 1,
-      "description": "<p>A map of the key-value pairs for the resource tag or tags that you want to add to the\n\t\t\tresource.</p>"
+      "minItems": 1
     },
     "ThemeId": {
       "type": "string",
-      "maxLength": 2048,
+      "maxLength": 512,
       "minLength": 1,
       "pattern": "[\\w\\-]+"
     },
@@ -442,15 +394,16 @@
     "VersionDescription": {
       "type": "string",
       "maxLength": 512,
-      "minLength": 1,
-      "description": "<p>A description of the first version of the theme that you're creating. Every time\n\t\t\t\t<code>UpdateTheme</code> is called, a new version is created. Each version of the\n\t\t\ttheme has a description of the version in the <code>VersionDescription</code>\n\t\t\tfield.</p>"
+      "minLength": 1
     }
   },
   "required": [
     "AwsAccountId",
-    "ThemeId"
+    "ThemeId",
+    "BaseThemeId",
+    "Configuration",
+    "Name"
   ],
-  "additionalProperties": false,
   "readOnlyProperties": [
     "/properties/ThemeError",
     "/properties/CreatedTime",
@@ -508,5 +461,6 @@
         "quicksight:DeleteTheme"
       ]
     }
-  }
+  },
+  "additionalProperties": false
 }

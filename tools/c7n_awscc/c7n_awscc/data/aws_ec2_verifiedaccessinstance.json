@@ -1,0 +1,287 @@
+{
+  "typeName": "AWS::EC2::VerifiedAccessInstance",
+  "description": "The AWS::EC2::VerifiedAccessInstance resource creates an AWS EC2 Verified Access Instance.",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-ec2-verified-access.aws-ec2-verifiedaccessinstance",
+  "properties": {
+    "VerifiedAccessInstanceId": {
+      "description": "The ID of the AWS Verified Access instance.",
+      "type": "string"
+    },
+    "VerifiedAccessTrustProviders": {
+      "description": "AWS Verified Access trust providers.",
+      "type": "array",
+      "uniqueItems": true,
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/VerifiedAccessTrustProvider"
+      }
+    },
+    "VerifiedAccessTrustProviderIds": {
+      "description": "The IDs of the AWS Verified Access trust providers.",
+      "type": "array",
+      "uniqueItems": true,
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/VerifiedAccessTrustProviderId"
+      }
+    },
+    "CreationTime": {
+      "description": "Time this Verified Access Instance was created.",
+      "type": "string"
+    },
+    "LastUpdatedTime": {
+      "description": "Time this Verified Access Instance was last updated.",
+      "type": "string"
+    },
+    "Description": {
+      "description": "A description for the AWS Verified Access instance.",
+      "type": "string"
+    },
+    "LoggingConfigurations": {
+      "description": "The configuration options for AWS Verified Access instances.",
+      "$ref": "#/definitions/VerifiedAccessLogs"
+    },
+    "Tags": {
+      "description": "An array of key-value pairs to apply to this resource.",
+      "type": "array",
+      "uniqueItems": true,
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/Tag"
+      }
+    }
+  },
+  "definitions": {
+    "VerifiedAccessTrustProvider": {
+      "description": "A Verified Access Trust Provider.",
+      "type": "object",
+      "properties": {
+        "VerifiedAccessTrustProviderId": {
+          "description": "The ID of the trust provider.",
+          "type": "string"
+        },
+        "Description": {
+          "description": "The description of trust provider.",
+          "type": "string"
+        },
+        "TrustProviderType": {
+          "description": "The type of trust provider (user- or device-based).",
+          "type": "string"
+        },
+        "UserTrustProviderType": {
+          "description": "The type of user-based trust provider.",
+          "type": "string"
+        },
+        "DeviceTrustProviderType": {
+          "description": "The type of device-based trust provider.",
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "VerifiedAccessTrustProviderId": {
+      "description": "The ID of the AWS Verified Access trust provider.",
+      "type": "string"
+    },
+    "VerifiedAccessLogs": {
+      "description": "The configuration options for AWS Verified Access instances.",
+      "type": "object",
+      "properties": {
+        "LogVersion": {
+          "description": "Select log version for Verified Access logs.",
+          "type": "string"
+        },
+        "IncludeTrustContext": {
+          "description": "Include claims from trust providers in Verified Access logs.",
+          "type": "boolean"
+        },
+        "CloudWatchLogs": {
+          "description": "Sends Verified Access logs to CloudWatch Logs.",
+          "type": "object",
+          "properties": {
+            "Enabled": {
+              "description": "Indicates whether logging is enabled.",
+              "type": "boolean"
+            },
+            "LogGroup": {
+              "description": "The ID of the CloudWatch Logs log group.",
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        },
+        "KinesisDataFirehose": {
+          "description": "Sends Verified Access logs to Kinesis.",
+          "type": "object",
+          "properties": {
+            "Enabled": {
+              "description": "Indicates whether logging is enabled.",
+              "type": "boolean"
+            },
+            "DeliveryStream": {
+              "description": "The ID of the delivery stream.",
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        },
+        "S3": {
+          "description": "Sends Verified Access logs to Amazon S3.",
+          "type": "object",
+          "properties": {
+            "Enabled": {
+              "description": "Indicates whether logging is enabled.",
+              "type": "boolean"
+            },
+            "BucketName": {
+              "description": "The bucket name.",
+              "type": "string"
+            },
+            "BucketOwner": {
+              "description": "The ID of the AWS account that owns the Amazon S3 bucket.",
+              "type": "string"
+            },
+            "Prefix": {
+              "description": "The bucket prefix.",
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "Tag": {
+      "description": "A key-value pair to associate with a resource.",
+      "type": "object",
+      "properties": {
+        "Key": {
+          "type": "string",
+          "description": "The key name of the tag. You can specify a value that is 1 to 128 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "Value": {
+          "type": "string",
+          "description": "The value for the tag. You can specify a value that is 0 to 256 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.",
+          "minLength": 0,
+          "maxLength": 256
+        }
+      },
+      "required": [
+        "Key",
+        "Value"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false,
+  "readOnlyProperties": [
+    "/properties/VerifiedAccessInstanceId",
+    "/properties/CreationTime",
+    "/properties/LastUpdatedTime"
+  ],
+  "primaryIdentifier": [
+    "/properties/VerifiedAccessInstanceId"
+  ],
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": false,
+    "tagProperty": "/properties/Tags"
+  },
+  "handlers": {
+    "create": {
+      "permissions": [
+        "ec2:CreateVerifiedAccessInstance",
+        "ec2:AttachVerifiedAccessTrustProvider",
+        "ec2:ModifyVerifiedAccessInstanceLoggingConfiguration",
+        "ec2:DescribeVerifiedAccessInstances",
+        "ec2:DescribeVerifiedAccessInstanceLoggingConfigurations",
+        "ec2:CreateTags",
+        "ec2:DescribeTags",
+        "logs:CreateLogDelivery",
+        "logs:GetLogDelivery",
+        "logs:UpdateLogDelivery",
+        "logs:PutDestination",
+        "logs:DeleteLogDelivery",
+        "logs:ListLogDeliveries",
+        "logs:PutLogEvents",
+        "logs:DescribeLogStreams",
+        "s3:listBuckets",
+        "s3:PutObject",
+        "s3:GetBucketPolicy",
+        "s3:PutBucketPolicy",
+        "logs:DescribeLogGroups",
+        "logs:PutResourcePolicy",
+        "firehose:TagDeliveryStream",
+        "logs:DescribeResourcePolicies",
+        "iam:CreateServiceLinkedRole",
+        "verified-access:AllowVerifiedAccess"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "ec2:DescribeVerifiedAccessInstances",
+        "ec2:DescribeVerifiedAccessInstanceLoggingConfigurations",
+        "ec2:DescribeTags",
+        "logs:GetLogDelivery",
+        "logs:ListLogDeliveries"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "ec2:ModifyVerifiedAccessInstance",
+        "ec2:ModifyVerifiedAccessInstanceLoggingConfiguration",
+        "ec2:DescribeVerifiedAccessInstances",
+        "ec2:DescribeVerifiedAccessInstanceLoggingConfigurations",
+        "ec2:DescribeTags",
+        "ec2:AttachVerifiedAccessTrustProvider",
+        "ec2:DetachVerifiedAccessTrustProvider",
+        "ec2:DeleteTags",
+        "ec2:CreateTags",
+        "ec2:DescribeTags",
+        "logs:CreateLogDelivery",
+        "logs:GetLogDelivery",
+        "logs:ListLogDeliveries",
+        "logs:UpdateLogDelivery",
+        "logs:DeleteLogDelivery",
+        "logs:PutDestination",
+        "logs:PutLogEvents",
+        "logs:DescribeLogStreams",
+        "s3:listBuckets",
+        "s3:PutObject",
+        "s3:GetBucketPolicy",
+        "s3:PutBucketPolicy",
+        "logs:DescribeLogGroups",
+        "logs:PutResourcePolicy",
+        "firehose:TagDeliveryStream",
+        "iam:CreateServiceLinkedRole",
+        "logs:DescribeResourcePolicies"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "ec2:DeleteVerifiedAccessInstance",
+        "ec2:DeleteTags",
+        "ec2:DescribeVerifiedAccessInstances",
+        "ec2:DescribeVerifiedAccessInstanceLoggingConfigurations",
+        "ec2:DetachVerifiedAccessTrustProvider",
+        "ec2:GetVerifiedAccessGroupPolicy",
+        "ec2:DescribeTags",
+        "logs:ListLogDeliveries",
+        "logs:GetLogDelivery",
+        "logs:DeleteLogDelivery"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "ec2:DescribeVerifiedAccessInstances",
+        "ec2:DescribeTags",
+        "logs:ListLogDeliveries",
+        "logs:GetLogDelivery"
+      ]
+    }
+  }
+}

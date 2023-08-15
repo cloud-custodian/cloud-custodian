@@ -8,12 +8,18 @@
       "type": "object",
       "properties": {
         "Key": {
-          "type": "string"
+          "type": "string",
+          "description": "The key name of the tag. You can specify a value that is 1 to 128 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -."
         },
         "Value": {
-          "type": "string"
+          "type": "string",
+          "description": "The value for the tag. You can specify a value that is 0 to 256 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -."
         }
       },
+      "required": [
+        "Key",
+        "Value"
+      ],
       "additionalProperties": false
     },
     "Location": {
@@ -52,6 +58,8 @@
     "Tags": {
       "description": "The tags for the site.",
       "type": "array",
+      "uniqueItems": true,
+      "insertionOrder": false,
       "items": {
         "$ref": "#/definitions/Tag"
       }
@@ -63,7 +71,18 @@
     "Location": {
       "description": "The location of the site.",
       "$ref": "#/definitions/Location"
+    },
+    "CreatedAt": {
+      "description": "The date and time that the device was created.",
+      "type": "string"
     }
+  },
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": false,
+    "tagProperty": "/properties/Tags"
   },
   "additionalProperties": false,
   "required": [
@@ -71,7 +90,8 @@
   ],
   "readOnlyProperties": [
     "/properties/SiteId",
-    "/properties/SiteArn"
+    "/properties/SiteArn",
+    "/properties/CreatedAt"
   ],
   "createOnlyProperties": [
     "/properties/GlobalNetworkId"
@@ -88,7 +108,9 @@
   "handlers": {
     "create": {
       "permissions": [
-        "networkmanager:CreateSite"
+        "networkmanager:CreateSite",
+        "networkmanager:GetSites",
+        "networkmanager:TagResource"
       ]
     },
     "read": {
@@ -98,6 +120,7 @@
     },
     "update": {
       "permissions": [
+        "networkmanager:GetSites",
         "networkmanager:ListTagsForResource",
         "networkmanager:TagResource",
         "networkmanager:UntagResource",
@@ -110,6 +133,16 @@
       ]
     },
     "list": {
+      "handlerSchema": {
+        "properties": {
+          "GlobalNetworkId": {
+            "$ref": "resource-schema.json#/properties/GlobalNetworkId"
+          }
+        },
+        "required": [
+          "GlobalNetworkId"
+        ]
+      },
       "permissions": [
         "networkmanager:GetSites"
       ]

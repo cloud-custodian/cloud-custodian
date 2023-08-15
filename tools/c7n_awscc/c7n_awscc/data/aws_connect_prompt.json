@@ -1,0 +1,134 @@
+{
+  "typeName": "AWS::Connect::Prompt",
+  "description": "Resource Type definition for AWS::Connect::Prompt",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-connect",
+  "definitions": {
+    "Tag": {
+      "description": "A key-value pair to associate with a resource.",
+      "type": "object",
+      "properties": {
+        "Key": {
+          "type": "string",
+          "description": "The key name of the tag. You can specify a value that is 1 to 128 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "Value": {
+          "type": "string",
+          "description": "The value for the tag. You can specify a value that is 0 to 256 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.",
+          "minLength": 0,
+          "maxLength": 256
+        }
+      },
+      "required": [
+        "Key",
+        "Value"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "properties": {
+    "InstanceArn": {
+      "description": "The identifier of the Amazon Connect instance.",
+      "type": "string",
+      "pattern": "^arn:aws[-a-z0-9]*:connect:[-a-z0-9]*:[0-9]{12}:instance/[-a-zA-Z0-9]*$"
+    },
+    "Name": {
+      "description": "The name of the prompt.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 127
+    },
+    "Description": {
+      "description": "The description of the prompt.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 250
+    },
+    "S3Uri": {
+      "description": "S3 URI of the customer's audio file for creating prompts resource..",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 512,
+      "pattern": "s3://\\S+/.+"
+    },
+    "PromptArn": {
+      "description": "The Amazon Resource Name (ARN) for the prompt.",
+      "type": "string",
+      "pattern": "^arn:aws[-a-z0-9]*:connect:[-a-z0-9]*:[0-9]{12}:instance/[-a-zA-Z0-9]*/prompt/[-a-zA-Z0-9]*$"
+    },
+    "Tags": {
+      "description": "An array of key-value pairs to apply to this resource.",
+      "type": "array",
+      "uniqueItems": true,
+      "insertionOrder": false,
+      "items": {
+        "$ref": "#/definitions/Tag"
+      }
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "InstanceArn",
+    "Name"
+  ],
+  "readOnlyProperties": [
+    "/properties/PromptArn"
+  ],
+  "primaryIdentifier": [
+    "/properties/PromptArn"
+  ],
+  "writeOnlyProperties": [
+    "/properties/S3Uri"
+  ],
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": true,
+    "tagProperty": "/properties/Tags"
+  },
+  "handlers": {
+    "create": {
+      "permissions": [
+        "connect:CreatePrompt",
+        "connect:TagResource",
+        "s3:GetObject",
+        "kms:Decrypt",
+        "s3:GetObjectAcl"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "connect:DescribePrompt"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "connect:UpdatePrompt",
+        "connect:TagResource",
+        "connect:UntagResource"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "connect:DeletePrompt"
+      ]
+    },
+    "list": {
+      "handlerSchema": {
+        "properties": {
+          "InstanceArn": {
+            "$ref": "resource-schema.json#/properties/InstanceArn"
+          }
+        },
+        "required": [
+          "InstanceArn"
+        ]
+      },
+      "permissions": [
+        "connect:ListPrompts"
+      ]
+    }
+  }
+}

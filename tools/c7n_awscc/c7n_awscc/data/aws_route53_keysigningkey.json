@@ -61,6 +61,7 @@
     },
     "update": {
       "permissions": [
+        "route53:GetDNSSEC",
         "route53:ActivateKeySigningKey",
         "route53:DeactivateKeySigningKey",
         "kms:DescribeKey",

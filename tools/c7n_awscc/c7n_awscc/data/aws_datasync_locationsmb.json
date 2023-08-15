@@ -13,6 +13,8 @@
           "type": "string",
           "enum": [
             "AUTOMATIC",
+            "SMB1",
+            "SMB2_0",
             "SMB2",
             "SMB3"
           ]
@@ -117,13 +119,16 @@
       "maxLength": 4356
     }
   },
-  "taggable": true,
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": true,
+    "tagProperty": "/properties/Tags"
+  },
   "additionalProperties": false,
   "required": [
     "User",
-    "Password",
-    "Subdirectory",
-    "ServerHostname",
     "AgentArns"
   ],
   "readOnlyProperties": [
@@ -146,7 +151,8 @@
       "permissions": [
         "datasync:CreateLocationSmb",
         "datasync:DescribeLocationSmb",
-        "datasync:ListTagsForResource"
+        "datasync:ListTagsForResource",
+        "datasync:TagResource"
       ]
     },
     "read": {

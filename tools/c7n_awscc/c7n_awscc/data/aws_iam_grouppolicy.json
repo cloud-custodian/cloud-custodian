@@ -1,0 +1,63 @@
+{
+  "typeName": "AWS::IAM::GroupPolicy",
+  "description": "Schema for IAM Group Policy",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-iam.git",
+  "additionalProperties": false,
+  "properties": {
+    "PolicyDocument": {
+      "description": "The policy document.",
+      "type": "object"
+    },
+    "PolicyName": {
+      "description": "The name of the policy document.",
+      "type": "string"
+    },
+    "GroupName": {
+      "description": "The name of the group to associate the policy with.",
+      "type": "string"
+    }
+  },
+  "required": [
+    "PolicyName",
+    "GroupName"
+  ],
+  "createOnlyProperties": [
+    "/properties/PolicyName",
+    "/properties/GroupName"
+  ],
+  "primaryIdentifier": [
+    "/properties/PolicyName",
+    "/properties/GroupName"
+  ],
+  "tagging": {
+    "taggable": false,
+    "tagOnCreate": false,
+    "tagUpdatable": false,
+    "cloudFormationSystemTags": false
+  },
+  "handlers": {
+    "create": {
+      "permissions": [
+        "iam:PutGroupPolicy",
+        "iam:GetGroupPolicy"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "iam:GetGroupPolicy"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "iam:PutGroupPolicy",
+        "iam:GetGroupPolicy"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "iam:DeleteGroupPolicy",
+        "iam:GetGroupPolicy"
+      ]
+    }
+  }
+}

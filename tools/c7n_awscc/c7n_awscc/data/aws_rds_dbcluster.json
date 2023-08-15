@@ -1,0 +1,520 @@
+{
+  "typeName": "AWS::RDS::DBCluster",
+  "description": "The AWS::RDS::DBCluster resource creates an Amazon Aurora DB cluster.",
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-rds",
+  "properties": {
+    "Endpoint": {
+      "$ref": "#/definitions/Endpoint"
+    },
+    "ReadEndpoint": {
+      "$ref": "#/definitions/ReadEndpoint"
+    },
+    "AllocatedStorage": {
+      "description": "The amount of storage in gibibytes (GiB) to allocate to each DB instance in the Multi-AZ DB cluster.",
+      "type": "integer"
+    },
+    "AssociatedRoles": {
+      "description": "Provides a list of the AWS Identity and Access Management (IAM) roles that are associated with the DB cluster. IAM roles that are associated with a DB cluster grant permission for the DB cluster to access other AWS services on your behalf.",
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/definitions/DBClusterRole"
+      }
+    },
+    "AvailabilityZones": {
+      "description": "A list of Availability Zones (AZs) where instances in the DB cluster can be created. For information on AWS Regions and Availability Zones, see Choosing the Regions and Availability Zones in the Amazon Aurora User Guide.",
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string"
+      }
+    },
+    "AutoMinorVersionUpgrade": {
+      "description": "A value that indicates whether minor engine upgrades are applied automatically to the DB cluster during the maintenance window. By default, minor engine upgrades are applied automatically.",
+      "type": "boolean"
+    },
+    "BacktrackWindow": {
+      "description": "The target backtrack window, in seconds. To disable backtracking, set this value to 0.",
+      "default": 0,
+      "minimum": 0,
+      "type": "integer"
+    },
+    "BackupRetentionPeriod": {
+      "description": "The number of days for which automated backups are retained.",
+      "default": 1,
+      "minimum": 1,
+      "type": "integer"
+    },
+    "CopyTagsToSnapshot": {
+      "description": "A value that indicates whether to copy all tags from the DB cluster to snapshots of the DB cluster. The default is not to copy them.",
+      "type": "boolean"
+    },
+    "DatabaseName": {
+      "description": "The name of your database. If you don't provide a name, then Amazon RDS won't create a database in this DB cluster. For naming constraints, see Naming Constraints in the Amazon RDS User Guide.",
+      "type": "string"
+    },
+    "DBClusterArn": {
+      "type": "string",
+      "description": "The Amazon Resource Name (ARN) for the DB cluster."
+    },
+    "DBClusterInstanceClass": {
+      "description": "The compute and memory capacity of each DB instance in the Multi-AZ DB cluster, for example db.m6g.xlarge.",
+      "type": "string"
+    },
+    "DBClusterResourceId": {
+      "description": "The AWS Region-unique, immutable identifier for the DB cluster.",
+      "type": "string"
+    },
+    "DBInstanceParameterGroupName": {
+      "description": "The name of the DB parameter group to apply to all instances of the DB cluster.",
+      "type": "string"
+    },
+    "DBSystemId": {
+      "description": "Reserved for future use.",
+      "type": "string"
+    },
+    "GlobalClusterIdentifier": {
+      "description": "If you are configuring an Aurora global database cluster and want your Aurora DB cluster to be a secondary member in the global database cluster, specify the global cluster ID of the global database cluster. To define the primary database cluster of the global cluster, use the AWS::RDS::GlobalCluster resource.\n\nIf you aren't configuring a global database cluster, don't specify this property.",
+      "type": "string",
+      "pattern": "^$|^[a-zA-Z]{1}(?:-?[a-zA-Z0-9]){0,62}$",
+      "minLength": 0,
+      "maxLength": 63
+    },
+    "DBClusterIdentifier": {
+      "description": "The DB cluster identifier. This parameter is stored as a lowercase string.",
+      "type": "string",
+      "pattern": "^[a-zA-Z]{1}(?:-?[a-zA-Z0-9]){0,62}$",
+      "minLength": 1,
+      "maxLength": 63
+    },
+    "DBClusterParameterGroupName": {
+      "description": "The name of the DB cluster parameter group to associate with this DB cluster.",
+      "type": "string",
+      "default": "default.aurora5.6"
+    },
+    "DBSubnetGroupName": {
+      "description": "A DB subnet group that you want to associate with this DB cluster.",
+      "type": "string"
+    },
+    "DeletionProtection": {
+      "description": "A value that indicates whether the DB cluster has deletion protection enabled. The database can't be deleted when deletion protection is enabled. By default, deletion protection is disabled.",
+      "type": "boolean"
+    },
+    "Domain": {
+      "description": "The Active Directory directory ID to create the DB cluster in.",
+      "type": "string"
+    },
+    "DomainIAMRoleName": {
+      "description": "Specify the name of the IAM role to be used when making API calls to the Directory Service.",
+      "type": "string"
+    },
+    "EnableCloudwatchLogsExports": {
+      "description": "The list of log types that need to be enabled for exporting to CloudWatch Logs. The values in the list depend on the DB engine being used. For more information, see Publishing Database Logs to Amazon CloudWatch Logs in the Amazon Aurora User Guide.",
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string"
+      }
+    },
+    "EnableHttpEndpoint": {
+      "description": "A value that indicates whether to enable the HTTP endpoint for an Aurora Serverless DB cluster. By default, the HTTP endpoint is disabled.",
+      "type": "boolean"
+    },
+    "EnableIAMDatabaseAuthentication": {
+      "description": "A value that indicates whether to enable mapping of AWS Identity and Access Management (IAM) accounts to database accounts. By default, mapping is disabled.",
+      "type": "boolean"
+    },
+    "Engine": {
+      "description": "The name of the database engine to be used for this DB cluster. Valid Values: aurora (for MySQL 5.6-compatible Aurora), aurora-mysql (for MySQL 5.7-compatible Aurora), and aurora-postgresql",
+      "type": "string"
+    },
+    "EngineMode": {
+      "description": "The DB engine mode of the DB cluster, either provisioned, serverless, parallelquery, global, or multimaster.",
+      "type": "string"
+    },
+    "EngineVersion": {
+      "description": "The version number of the database engine to use.",
+      "type": "string"
+    },
+    "ManageMasterUserPassword": {
+      "description": "A value that indicates whether to manage the master user password with AWS Secrets Manager.",
+      "type": "boolean"
+    },
+    "Iops": {
+      "description": "The amount of Provisioned IOPS (input/output operations per second) to be initially allocated for each DB instance in the Multi-AZ DB cluster.",
+      "type": "integer"
+    },
+    "KmsKeyId": {
+      "description": "The Amazon Resource Name (ARN) of the AWS Key Management Service master key that is used to encrypt the database instances in the DB cluster, such as arn:aws:kms:us-east-1:012345678910:key/abcd1234-a123-456a-a12b-a123b4cd56ef. If you enable the StorageEncrypted property but don't specify this property, the default master key is used. If you specify this property, you must set the StorageEncrypted property to true.",
+      "type": "string"
+    },
+    "MasterUsername": {
+      "description": "The name of the master user for the DB cluster. You must specify MasterUsername, unless you specify SnapshotIdentifier. In that case, don't specify MasterUsername.",
+      "type": "string",
+      "pattern": "^[a-zA-Z]{1}[a-zA-Z0-9_]*$",
+      "minLength": 1
+    },
+    "MasterUserPassword": {
+      "description": "The master password for the DB instance.",
+      "type": "string"
+    },
+    "MasterUserSecret": {
+      "$ref": "#/definitions/MasterUserSecret",
+      "description": "Contains the secret managed by RDS in AWS Secrets Manager for the master user password."
+    },
+    "MonitoringInterval": {
+      "description": "The interval, in seconds, between points when Enhanced Monitoring metrics are collected for the DB cluster. To turn off collecting Enhanced Monitoring metrics, specify 0. The default is 0.",
+      "type": "integer",
+      "default": 0
+    },
+    "MonitoringRoleArn": {
+      "description": "The Amazon Resource Name (ARN) for the IAM role that permits RDS to send Enhanced Monitoring metrics to Amazon CloudWatch Logs.",
+      "type": "string"
+    },
+    "NetworkType": {
+      "description": "The network type of the DB cluster.",
+      "type": "string"
+    },
+    "PerformanceInsightsEnabled": {
+      "description": "A value that indicates whether to turn on Performance Insights for the DB cluster.",
+      "type": "boolean"
+    },
+    "PerformanceInsightsKmsKeyId": {
+      "description": "The Amazon Web Services KMS key identifier for encryption of Performance Insights data.",
+      "type": "string"
+    },
+    "PerformanceInsightsRetentionPeriod": {
+      "description": "The amount of time, in days, to retain Performance Insights data.",
+      "type": "integer"
+    },
+    "Port": {
+      "description": "The port number on which the instances in the DB cluster accept connections. Default: 3306 if engine is set as aurora or 5432 if set to aurora-postgresql.",
+      "type": "integer"
+    },
+    "PreferredBackupWindow": {
+      "description": "The daily time range during which automated backups are created if automated backups are enabled using the BackupRetentionPeriod parameter. The default is a 30-minute window selected at random from an 8-hour block of time for each AWS Region. To see the time blocks available, see Adjusting the Preferred DB Cluster Maintenance Window in the Amazon Aurora User Guide.",
+      "type": "string"
+    },
+    "PreferredMaintenanceWindow": {
+      "description": "The weekly time range during which system maintenance can occur, in Universal Coordinated Time (UTC). The default is a 30-minute window selected at random from an 8-hour block of time for each AWS Region, occurring on a random day of the week. To see the time blocks available, see Adjusting the Preferred DB Cluster Maintenance Window in the Amazon Aurora User Guide.",
+      "type": "string"
+    },
+    "PubliclyAccessible": {
+      "description": "A value that indicates whether the DB cluster is publicly accessible.",
+      "type": "boolean"
+    },
+    "ReplicationSourceIdentifier": {
+      "description": "The Amazon Resource Name (ARN) of the source DB instance or DB cluster if this DB cluster is created as a Read Replica.",
+      "type": "string"
+    },
+    "RestoreToTime": {
+      "description": "The date and time to restore the DB cluster to. Value must be a time in Universal Coordinated Time (UTC) format. An example: 2015-03-07T23:45:00Z",
+      "type": "string"
+    },
+    "RestoreType": {
+      "description": "The type of restore to be performed. You can specify one of the following values:\nfull-copy - The new DB cluster is restored as a full copy of the source DB cluster.\ncopy-on-write - The new DB cluster is restored as a clone of the source DB cluster.",
+      "type": "string",
+      "default": "full-copy"
+    },
+    "ServerlessV2ScalingConfiguration": {
+      "description": "Contains the scaling configuration of an Aurora Serverless v2 DB cluster.",
+      "$ref": "#/definitions/ServerlessV2ScalingConfiguration"
+    },
+    "ScalingConfiguration": {
+      "description": "The ScalingConfiguration property type specifies the scaling configuration of an Aurora Serverless DB cluster.",
+      "$ref": "#/definitions/ScalingConfiguration"
+    },
+    "SnapshotIdentifier": {
+      "description": "The identifier for the DB snapshot or DB cluster snapshot to restore from.\nYou can use either the name or the Amazon Resource Name (ARN) to specify a DB cluster snapshot. However, you can use only the ARN to specify a DB snapshot.\nAfter you restore a DB cluster with a SnapshotIdentifier property, you must specify the same SnapshotIdentifier property for any future updates to the DB cluster. When you specify this property for an update, the DB cluster is not restored from the snapshot again, and the data in the database is not changed. However, if you don't specify the SnapshotIdentifier property, an empty DB cluster is created, and the original DB cluster is deleted. If you specify a property that is different from the previous snapshot restore property, the DB cluster is restored from the specified SnapshotIdentifier property, and the original DB cluster is deleted.",
+      "type": "string"
+    },
+    "SourceDBClusterIdentifier": {
+      "description": "The identifier of the source DB cluster from which to restore.",
+      "type": "string"
+    },
+    "SourceRegion": {
+      "description": "The AWS Region which contains the source DB cluster when replicating a DB cluster. For example, us-east-1.",
+      "type": "string"
+    },
+    "StorageEncrypted": {
+      "description": "Indicates whether the DB instance is encrypted.\nIf you specify the DBClusterIdentifier, SnapshotIdentifier, or SourceDBInstanceIdentifier property, don't specify this property. The value is inherited from the cluster, snapshot, or source DB instance.",
+      "type": "boolean"
+    },
+    "StorageType": {
+      "description": "Specifies the storage type to be associated with the DB cluster.",
+      "type": "string"
+    },
+    "Tags": {
+      "type": "array",
+      "maxItems": 50,
+      "uniqueItems": true,
+      "insertionOrder": false,
+      "description": "An array of key-value pairs to apply to this resource.",
+      "items": {
+        "$ref": "#/definitions/Tag"
+      }
+    },
+    "UseLatestRestorableTime": {
+      "description": "A value that indicates whether to restore the DB cluster to the latest restorable backup time. By default, the DB cluster is not restored to the latest restorable backup time.",
+      "type": "boolean"
+    },
+    "VpcSecurityGroupIds": {
+      "description": "A list of EC2 VPC security groups to associate with this DB cluster.",
+      "uniqueItems": true,
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    }
+  },
+  "definitions": {
+    "Endpoint": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Address": {
+          "description": "The connection endpoint for the DB cluster.",
+          "type": "string"
+        },
+        "Port": {
+          "description": "The port number that will accept connections on this DB cluster.",
+          "type": "string"
+        }
+      }
+    },
+    "ReadEndpoint": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Address": {
+          "description": "The reader endpoint for the DB cluster.",
+          "type": "string"
+        }
+      }
+    },
+    "DBClusterRole": {
+      "description": "Describes an AWS Identity and Access Management (IAM) role that is associated with a DB cluster.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "FeatureName": {
+          "description": "The name of the feature associated with the AWS Identity and Access Management (IAM) role. For the list of supported feature names, see DBEngineVersion in the Amazon RDS API Reference.",
+          "type": "string"
+        },
+        "RoleArn": {
+          "description": "The Amazon Resource Name (ARN) of the IAM role that is associated with the DB cluster.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "RoleArn"
+      ]
+    },
+    "ServerlessV2ScalingConfiguration": {
+      "description": "Contains the scaling configuration of an Aurora Serverless v2 DB cluster.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "MinCapacity": {
+          "description": "The minimum number of Aurora capacity units (ACUs) for a DB instance in an Aurora Serverless v2 cluster. You can specify ACU values in half-step increments, such as 8, 8.5, 9, and so on. The smallest value that you can use is 0.5.",
+          "type": "number",
+          "minimum": 0.5,
+          "maximum": 128
+        },
+        "MaxCapacity": {
+          "description": "The maximum number of Aurora capacity units (ACUs) for a DB instance in an Aurora Serverless v2 cluster. You can specify ACU values in half-step increments, such as 40, 40.5, 41, and so on. The largest value that you can use is 128.",
+          "type": "number",
+          "minimum": 0.5,
+          "maximum": 128
+        }
+      }
+    },
+    "ScalingConfiguration": {
+      "description": "The ScalingConfiguration property type specifies the scaling configuration of an Aurora Serverless DB cluster.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "AutoPause": {
+          "description": "A value that indicates whether to allow or disallow automatic pause for an Aurora DB cluster in serverless DB engine mode. A DB cluster can be paused only when it's idle (it has no connections).",
+          "type": "boolean"
+        },
+        "MaxCapacity": {
+          "description": "The maximum capacity for an Aurora DB cluster in serverless DB engine mode.\nFor Aurora MySQL, valid capacity values are 1, 2, 4, 8, 16, 32, 64, 128, and 256.\nFor Aurora PostgreSQL, valid capacity values are 2, 4, 8, 16, 32, 64, 192, and 384.\nThe maximum capacity must be greater than or equal to the minimum capacity.",
+          "type": "integer"
+        },
+        "MinCapacity": {
+          "description": "The minimum capacity for an Aurora DB cluster in serverless DB engine mode.\nFor Aurora MySQL, valid capacity values are 1, 2, 4, 8, 16, 32, 64, 128, and 256.\nFor Aurora PostgreSQL, valid capacity values are 2, 4, 8, 16, 32, 64, 192, and 384.\nThe minimum capacity must be less than or equal to the maximum capacity.",
+          "type": "integer"
+        },
+        "SecondsBeforeTimeout": {
+          "description": "The amount of time, in seconds, that Aurora Serverless v1 tries to find a scaling point to perform seamless scaling before enforcing the timeout action.\nThe default is 300.",
+          "type": "integer"
+        },
+        "SecondsUntilAutoPause": {
+          "description": "The time, in seconds, before an Aurora DB cluster in serverless mode is paused.",
+          "type": "integer"
+        },
+        "TimeoutAction": {
+          "description": "The action to take when the timeout is reached, either ForceApplyCapacityChange or RollbackCapacityChange.\nForceApplyCapacityChange sets the capacity to the specified value as soon as possible.\nRollbackCapacityChange, the default, ignores the capacity change if a scaling point isn't found in the timeout period.\n\nFor more information, see Autoscaling for Aurora Serverless v1 in the Amazon Aurora User Guide.",
+          "type": "string"
+        }
+      }
+    },
+    "Tag": {
+      "description": "A key-value pair to associate with a resource.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Key": {
+          "type": "string",
+          "description": "The key name of the tag. You can specify a value that is 1 to 128 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -. ",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "Value": {
+          "type": "string",
+          "description": "The value for the tag. You can specify a value that is 0 to 256 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -. ",
+          "minLength": 0,
+          "maxLength": 256
+        }
+      },
+      "required": [
+        "Key"
+      ]
+    },
+    "MasterUserSecret": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "SecretArn": {
+          "type": "string",
+          "description": "The Amazon Resource Name (ARN) of the secret."
+        },
+        "KmsKeyId": {
+          "type": "string",
+          "description": "The AWS KMS key identifier that is used to encrypt the secret."
+        }
+      }
+    }
+  },
+  "additionalProperties": false,
+  "propertyTransform": {
+    "/properties/DBClusterIdentifier": "$lowercase(DBClusterIdentifier)",
+    "/properties/DBClusterParameterGroupName": "$lowercase(DBClusterParameterGroupName)",
+    "/properties/DBSubnetGroupName": "$lowercase(DBSubnetGroupName)",
+    "/properties/EnableHttpEndpoint": "$lowercase($string(EngineMode)) = 'serverless' ? EnableHttpEndpoint : false",
+    "/properties/Engine": "$lowercase(Engine)",
+    "/properties/EngineVersion": "$join([$string(EngineVersion), \".*\"])",
+    "/properties/KmsKeyId": "$join([\"arn:(aws)[-]{0,1}[a-z]{0,2}[-]{0,1}[a-z]{0,3}:kms:[a-z]{2}[-]{1}[a-z]{3,10}[-]{0,1}[a-z]{0,10}[-]{1}[1-3]{1}:[0-9]{12}[:]{1}key\\/\", KmsKeyId])",
+    "/properties/MasterUserSecret/KmsKeyId": "$join([\"arn:(aws)[-]{0,1}[a-z]{0,2}[-]{0,1}[a-z]{0,3}:kms:[a-z]{2}[-]{1}[a-z]{3,10}[-]{0,1}[a-z]{0,10}[-]{1}[1-3]{1}:[0-9]{12}[:]{1}key\\/\", MasterUserSecret.KmsKeyId])",
+    "/properties/NetworkType": "$lowercase(NetworkType)",
+    "/properties/PerformanceInsightsKmsKeyId": "$join([\"arn:(aws)[-]{0,1}[a-z]{0,2}[-]{0,1}[a-z]{0,3}:kms:[a-z]{2}[-]{1}[a-z]{3,10}[-]{0,1}[a-z]{0,10}[-]{1}[1-3]{1}:[0-9]{12}[:]{1}key\\/\", PerformanceInsightsKmsKeyId])",
+    "/properties/PreferredMaintenanceWindow": "$lowercase(PreferredMaintenanceWindow)",
+    "/properties/SnapshotIdentifier": "$lowercase(SnapshotIdentifier)",
+    "/properties/SourceDBClusterIdentifier": "$lowercase(SourceDBClusterIdentifier)",
+    "/properties/StorageType": "$lowercase(StorageType)"
+  },
+  "readOnlyProperties": [
+    "/properties/DBClusterArn",
+    "/properties/DBClusterResourceId",
+    "/properties/Endpoint",
+    "/properties/Endpoint/Address",
+    "/properties/Endpoint/Port",
+    "/properties/ReadEndpoint/Port",
+    "/properties/ReadEndpoint/Address",
+    "/properties/MasterUserSecret/SecretArn"
+  ],
+  "createOnlyProperties": [
+    "/properties/AvailabilityZones",
+    "/properties/DBClusterIdentifier",
+    "/properties/DBSubnetGroupName",
+    "/properties/DBSystemId",
+    "/properties/DatabaseName",
+    "/properties/EngineMode",
+    "/properties/KmsKeyId",
+    "/properties/PubliclyAccessible",
+    "/properties/RestoreToTime",
+    "/properties/RestoreType",
+    "/properties/SnapshotIdentifier",
+    "/properties/SourceDBClusterIdentifier",
+    "/properties/SourceRegion",
+    "/properties/StorageEncrypted",
+    "/properties/UseLatestRestorableTime"
+  ],
+  "conditionalCreateOnlyProperties": [
+    "/properties/Engine",
+    "/properties/GlobalClusterIdentifier",
+    "/properties/MasterUsername"
+  ],
+  "primaryIdentifier": [
+    "/properties/DBClusterIdentifier"
+  ],
+  "writeOnlyProperties": [
+    "/properties/DBInstanceParameterGroupName",
+    "/properties/MasterUserPassword",
+    "/properties/RestoreToTime",
+    "/properties/RestoreType",
+    "/properties/SnapshotIdentifier",
+    "/properties/SourceDBClusterIdentifier",
+    "/properties/SourceRegion",
+    "/properties/UseLatestRestorableTime"
+  ],
+  "handlers": {
+    "create": {
+      "permissions": [
+        "iam:PassRole",
+        "rds:AddRoleToDBCluster",
+        "rds:AddTagsToResource",
+        "rds:CreateDBCluster",
+        "rds:CreateDBInstance",
+        "rds:DescribeDBClusters",
+        "rds:DescribeEvents",
+        "rds:ModifyDBCluster",
+        "rds:RestoreDBClusterFromSnapshot",
+        "rds:RestoreDBClusterToPointInTime",
+        "secretsmanager:CreateSecret",
+        "secretsmanager:TagResource"
+      ],
+      "timeoutInMinutes": 2160
+    },
+    "read": {
+      "permissions": [
+        "rds:DescribeDBClusters"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "ec2:DescribeSecurityGroups",
+        "iam:PassRole",
+        "rds:AddRoleToDBCluster",
+        "rds:AddTagsToResource",
+        "rds:DescribeDBClusters",
+        "rds:DescribeDBSubnetGroups",
+        "rds:DescribeEvents",
+        "rds:DescribeGlobalClusters",
+        "rds:ModifyDBCluster",
+        "rds:ModifyDBInstance",
+        "rds:RemoveFromGlobalCluster",
+        "rds:RemoveRoleFromDBCluster",
+        "rds:RemoveTagsFromResource",
+        "secretsmanager:CreateSecret",
+        "secretsmanager:TagResource"
+      ],
+      "timeoutInMinutes": 2160
+    },
+    "delete": {
+      "permissions": [
+        "rds:DeleteDBCluster",
+        "rds:DeleteDBInstance",
+        "rds:DescribeDBClusters",
+        "rds:DescribeGlobalClusters",
+        "rds:RemoveFromGlobalCluster"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "rds:DescribeDBClusters"
+      ]
+    }
+  }
+}

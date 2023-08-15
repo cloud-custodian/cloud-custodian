@@ -40,6 +40,16 @@
       },
       "additionalProperties": false
     },
+    "TlsConfig": {
+      "type": "object",
+      "properties": {
+        "SecurityPolicy": {
+          "type": "string",
+          "maxLength": 128
+        }
+      },
+      "additionalProperties": false
+    },
     "Tag": {
       "type": "object",
       "properties": {
@@ -76,6 +86,7 @@
       "type": "array",
       "minItems": 0,
       "maxItems": 1,
+      "insertionOrder": true,
       "items": {
         "type": "string",
         "pattern": "^arn:aws(-cn|-us-gov|-iso-b|-iso)?:acm:[a-z]{2}-(gov-|iso-|isob-)?[a-z]{4,9}-\\d{1}:\\d{12}:certificate/[a-zA-Z0-9/-]+$",
@@ -115,18 +126,29 @@
     },
     "ServerCertificates": {
       "type": "array",
+      "insertionOrder": true,
       "items": {
         "$ref": "#/definitions/ServerCertificateSummary"
       }
     },
+    "TlsConfig": {
+      "$ref": "#/definitions/TlsConfig"
+    },
     "Tags": {
       "type": "array",
+      "insertionOrder": true,
       "items": {
         "$ref": "#/definitions/Tag"
       }
     }
   },
-  "taggable": true,
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": true,
+    "tagProperty": "/properties/Tags"
+  },
   "additionalProperties": false,
   "required": [],
   "createOnlyProperties": [
@@ -142,6 +164,7 @@
     "/properties/ServerCertificates"
   ],
   "writeOnlyProperties": [
+    "/properties/ValidationCertificateArn",
     "/properties/ServerCertificateArns"
   ],
   "primaryIdentifier": [
@@ -152,22 +175,30 @@
       "permissions": [
         "iot:CreateDomainConfiguration",
         "iot:UpdateDomainConfiguration",
-        "iot:DescribeDomainConfiguration"
+        "iot:DescribeDomainConfiguration",
+        "iot:TagResource",
+        "iot:ListTagsForResource",
+        "acm:GetCertificate"
       ]
     },
     "read": {
       "permissions": [
-        "iot:DescribeDomainConfiguration"
+        "iot:DescribeDomainConfiguration",
+        "iot:ListTagsForResource"
       ]
     },
     "update": {
       "permissions": [
         "iot:UpdateDomainConfiguration",
-        "iot:DescribeDomainConfiguration"
+        "iot:DescribeDomainConfiguration",
+        "iot:ListTagsForResource",
+        "iot:TagResource",
+        "iot:UntagResource"
       ]
     },
     "delete": {
       "permissions": [
+        "iot:DescribeDomainConfiguration",
         "iot:DeleteDomainConfiguration",
         "iot:UpdateDomainConfiguration"
       ]

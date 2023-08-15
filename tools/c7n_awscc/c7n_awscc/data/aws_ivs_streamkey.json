@@ -53,6 +53,7 @@
     }
   },
   "additionalProperties": false,
+  "replacementStrategy": "delete_then_create",
   "required": [
     "ChannelArn"
   ],
@@ -69,16 +70,20 @@
   "handlers": {
     "create": {
       "permissions": [
+        "ivs:TagResource",
+        "ivs:UntagResource",
         "ivs:CreateStreamKey"
       ]
     },
     "read": {
       "permissions": [
-        "ivs:GetStreamKey"
+        "ivs:GetStreamKey",
+        "ivs:ListTagsForResource"
       ]
     },
     "update": {
       "permissions": [
+        "ivs:GetStreamKey",
         "ivs:TagResource",
         "ivs:UntagResource",
         "ivs:ListTagsForResource"
@@ -86,12 +91,24 @@
     },
     "delete": {
       "permissions": [
-        "ivs:DeleteStreamKey"
+        "ivs:DeleteStreamKey",
+        "ivs:UntagResource"
       ]
     },
     "list": {
+      "handlerSchema": {
+        "properties": {
+          "ChannelArn": {
+            "$ref": "resource-schema.json#/properties/ChannelArn"
+          }
+        },
+        "required": [
+          "ChannelArn"
+        ]
+      },
       "permissions": [
-        "ivs:ListStreamKeys"
+        "ivs:ListStreamKeys",
+        "ivs:ListTagsForResource"
       ]
     }
   }

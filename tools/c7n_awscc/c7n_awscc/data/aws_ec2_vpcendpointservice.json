@@ -1,0 +1,92 @@
+{
+  "typeName": "AWS::EC2::VPCEndpointService",
+  "description": "Resource Type definition for AWS::EC2::VPCEndpointService",
+  "additionalProperties": false,
+  "properties": {
+    "NetworkLoadBalancerArns": {
+      "type": "array",
+      "uniqueItems": false,
+      "items": {
+        "type": "string"
+      }
+    },
+    "ContributorInsightsEnabled": {
+      "type": "boolean"
+    },
+    "PayerResponsibility": {
+      "type": "string"
+    },
+    "ServiceId": {
+      "type": "string"
+    },
+    "AcceptanceRequired": {
+      "type": "boolean"
+    },
+    "GatewayLoadBalancerArns": {
+      "type": "array",
+      "uniqueItems": false,
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "primaryIdentifier": [
+    "/properties/ServiceId"
+  ],
+  "readOnlyProperties": [
+    "/properties/ServiceId"
+  ],
+  "writeOnlyProperties": [
+    "/properties/ContributorInsightsEnabled"
+  ],
+  "tagging": {
+    "taggable": false,
+    "tagOnCreate": false,
+    "tagUpdatable": false,
+    "cloudFormationSystemTags": false
+  },
+  "handlers": {
+    "create": {
+      "permissions": [
+        "ec2:CreateVpcEndpointServiceConfiguration",
+        "ec2:ModifyVpcEndpointServiceConfiguration",
+        "ec2:ModifyVpcEndpointServicePayerResponsibility",
+        "cloudwatch:ListManagedInsightRules",
+        "cloudwatch:DeleteInsightRules",
+        "cloudwatch:PutManagedInsightRules",
+        "ec2:DescribeVpcEndpointServiceConfigurations"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "ec2:ModifyVpcEndpointServiceConfiguration",
+        "ec2:DeleteVpcEndpointServiceConfigurations",
+        "ec2:DescribeVpcEndpointServiceConfigurations",
+        "ec2:ModifyVpcEndpointServicePayerResponsibility",
+        "cloudwatch:ListManagedInsightRules",
+        "cloudwatch:DeleteInsightRules",
+        "cloudwatch:PutManagedInsightRules"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "ec2:DescribeVpcEndpointServiceConfigurations",
+        "cloudwatch:ListManagedInsightRules"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "ec2:DeleteVpcEndpointServiceConfigurations",
+        "ec2:DescribeVpcEndpointServiceConfigurations",
+        "cloudwatch:ListManagedInsightRules",
+        "cloudwatch:DeleteInsightRules"
+      ]
+    },
+    "list": {
+      "permissions": [
+        "ec2:DescribeVpcEndpointServiceConfigurations",
+        "cloudwatch:ListManagedInsightRules"
+      ]
+    }
+  }
+}

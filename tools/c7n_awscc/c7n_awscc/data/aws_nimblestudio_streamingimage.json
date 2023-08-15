@@ -113,6 +113,7 @@
     "create": {
       "permissions": [
         "nimble:CreateStreamingImage",
+        "nimble:GetStreamingImage",
         "nimble:TagResource",
         "ec2:DescribeImages",
         "ec2:DescribeSnapshots",
@@ -134,12 +135,19 @@
     },
     "update": {
       "permissions": [
-        "nimble:UpdateStreamingImage"
+        "nimble:UpdateStreamingImage",
+        "nimble:GetStreamingImage",
+        "kms:Encrypt",
+        "kms:Decrypt",
+        "kms:CreateGrant",
+        "kms:ListGrants",
+        "kms:GenerateDataKey"
       ]
     },
     "delete": {
       "permissions": [
         "nimble:DeleteStreamingImage",
+        "nimble:GetStreamingImage",
         "nimble:UntagResource",
         "ec2:ModifyInstanceAttribute",
         "ec2:ModifySnapshotAttribute",
@@ -150,6 +158,16 @@
       ]
     },
     "list": {
+      "handlerSchema": {
+        "properties": {
+          "StudioId": {
+            "$ref": "resource-schema.json#/properties/StudioId"
+          }
+        },
+        "required": [
+          "StudioId"
+        ]
+      },
       "permissions": [
         "nimble:ListStreamingImages"
       ]

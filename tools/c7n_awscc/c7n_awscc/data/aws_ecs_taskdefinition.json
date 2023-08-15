@@ -6,9 +6,14 @@
     "ContainerDefinition": {
       "description": "List of container definitions that are passed to the Docker daemon on a container instance",
       "type": "object",
+      "required": [
+        "Name",
+        "Image"
+      ],
       "properties": {
         "Command": {
           "type": "array",
+          "insertionOrder": true,
           "items": {
             "type": "string"
           }
@@ -18,6 +23,7 @@
         },
         "DependsOn": {
           "type": "array",
+          "insertionOrder": false,
           "items": {
             "$ref": "#/definitions/ContainerDependency"
           }
@@ -27,12 +33,14 @@
         },
         "DnsSearchDomains": {
           "type": "array",
+          "insertionOrder": false,
           "items": {
             "type": "string"
           }
         },
         "DnsServers": {
           "type": "array",
+          "insertionOrder": false,
           "items": {
             "type": "string"
           }
@@ -48,12 +56,14 @@
         },
         "DockerSecurityOptions": {
           "type": "array",
+          "insertionOrder": false,
           "items": {
             "type": "string"
           }
         },
         "EntryPoint": {
           "type": "array",
+          "insertionOrder": true,
           "items": {
             "type": "string"
           }
@@ -61,6 +71,7 @@
         "Environment": {
           "description": "The environment variables to pass to a container",
           "type": "array",
+          "insertionOrder": true,
           "uniqueItems": true,
           "items": {
             "$ref": "#/definitions/KeyValuePair"
@@ -69,6 +80,7 @@
         "EnvironmentFiles": {
           "description": "The list of one or more files that contain the environment variables to pass to a container",
           "type": "array",
+          "insertionOrder": true,
           "items": {
             "$ref": "#/definitions/EnvironmentFile"
           }
@@ -78,6 +90,7 @@
         },
         "ExtraHosts": {
           "type": "array",
+          "insertionOrder": false,
           "items": {
             "$ref": "#/definitions/HostEntry"
           }
@@ -97,6 +110,7 @@
         },
         "Links": {
           "type": "array",
+          "insertionOrder": false,
           "uniqueItems": true,
           "items": {
             "type": "string"
@@ -117,6 +131,7 @@
         },
         "MountPoints": {
           "type": "array",
+          "insertionOrder": true,
           "uniqueItems": true,
           "items": {
             "$ref": "#/definitions/MountPoint"
@@ -129,6 +144,7 @@
         "PortMappings": {
           "description": "Port mappings allow containers to access ports on the host container instance to send or receive traffic.",
           "type": "array",
+          "insertionOrder": false,
           "uniqueItems": true,
           "items": {
             "$ref": "#/definitions/PortMapping"
@@ -145,12 +161,14 @@
         },
         "ResourceRequirements": {
           "type": "array",
+          "insertionOrder": false,
           "items": {
             "$ref": "#/definitions/ResourceRequirement"
           }
         },
         "Secrets": {
           "type": "array",
+          "insertionOrder": false,
           "items": {
             "$ref": "#/definitions/Secret"
           }
@@ -163,6 +181,7 @@
         },
         "Ulimits": {
           "type": "array",
+          "insertionOrder": false,
           "items": {
             "$ref": "#/definitions/Ulimit"
           }
@@ -172,6 +191,7 @@
         },
         "VolumesFrom": {
           "type": "array",
+          "insertionOrder": false,
           "uniqueItems": true,
           "items": {
             "$ref": "#/definitions/VolumeFrom"
@@ -188,6 +208,7 @@
         },
         "SystemControls": {
           "type": "array",
+          "insertionOrder": false,
           "items": {
             "$ref": "#/definitions/SystemControl"
           }
@@ -230,6 +251,7 @@
         },
         "Permissions": {
           "type": "array",
+          "insertionOrder": false,
           "uniqueItems": true,
           "items": {
             "type": "string"
@@ -310,7 +332,6 @@
           "type": "integer"
         },
         "AuthorizationConfig": {
-          "type": "object",
           "$ref": "#/definitions/AuthorizationConfig"
         }
       },
@@ -362,6 +383,7 @@
         "Command": {
           "description": "A string array representing the command that the container runs to determine if it is healthy.",
           "type": "array",
+          "insertionOrder": true,
           "items": {
             "type": "string"
           }
@@ -423,12 +445,14 @@
       "properties": {
         "Add": {
           "type": "array",
+          "insertionOrder": false,
           "items": {
             "type": "string"
           }
         },
         "Drop": {
           "type": "array",
+          "insertionOrder": false,
           "items": {
             "type": "string"
           }
@@ -456,6 +480,7 @@
         },
         "Devices": {
           "type": "array",
+          "insertionOrder": false,
           "items": {
             "$ref": "#/definitions/Device"
           }
@@ -474,6 +499,7 @@
         },
         "Tmpfs": {
           "type": "array",
+          "insertionOrder": false,
           "items": {
             "$ref": "#/definitions/Tmpfs"
           }
@@ -501,6 +527,7 @@
         },
         "SecretOptions": {
           "type": "array",
+          "insertionOrder": false,
           "items": {
             "$ref": "#/definitions/Secret"
           }
@@ -511,14 +538,28 @@
     "PortMapping": {
       "type": "object",
       "properties": {
+        "Name": {
+          "type": "string"
+        },
         "ContainerPort": {
           "type": "integer"
+        },
+        "ContainerPortRange": {
+          "type": "string"
         },
         "HostPort": {
           "type": "integer"
         },
         "Protocol": {
           "type": "string"
+        },
+        "AppProtocol": {
+          "type": "string",
+          "enum": [
+            "http",
+            "http2",
+            "grpc"
+          ]
         }
       },
       "additionalProperties": false
@@ -549,6 +590,7 @@
         },
         "ProxyConfigurationProperties": {
           "type": "array",
+          "insertionOrder": false,
           "uniqueItems": true,
           "items": {
             "$ref": "#/definitions/KeyValuePair"
@@ -639,6 +681,7 @@
         },
         "MountOptions": {
           "type": "array",
+          "insertionOrder": false,
           "items": {
             "type": "string"
           }
@@ -723,6 +766,7 @@
     },
     "ContainerDefinitions": {
       "type": "array",
+      "insertionOrder": false,
       "uniqueItems": true,
       "items": {
         "$ref": "#/definitions/ContainerDefinition"
@@ -739,6 +783,7 @@
     },
     "InferenceAccelerators": {
       "type": "array",
+      "insertionOrder": false,
       "uniqueItems": true,
       "items": {
         "$ref": "#/definitions/InferenceAccelerator"
@@ -752,6 +797,7 @@
     },
     "PlacementConstraints": {
       "type": "array",
+      "insertionOrder": false,
       "uniqueItems": true,
       "items": {
         "$ref": "#/definitions/TaskDefinitionPlacementConstraint"
@@ -762,6 +808,7 @@
     },
     "RequiresCompatibilities": {
       "type": "array",
+      "insertionOrder": false,
       "uniqueItems": true,
       "items": {
         "type": "string"
@@ -772,6 +819,7 @@
     },
     "Volumes": {
       "type": "array",
+      "insertionOrder": false,
       "uniqueItems": true,
       "items": {
         "$ref": "#/definitions/Volume"
@@ -788,10 +836,18 @@
     },
     "Tags": {
       "type": "array",
+      "insertionOrder": false,
       "items": {
         "$ref": "#/definitions/Tag"
       }
     }
+  },
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": true,
+    "tagProperty": "/properties/Tags"
   },
   "createOnlyProperties": [
     "/properties/Family",
@@ -817,10 +873,15 @@
   "primaryIdentifier": [
     "/properties/TaskDefinitionArn"
   ],
+  "propertyTransform": {
+    "/properties/TaskRoleArn": "TaskRoleArn $OR $split(TaskRoleArn, \"role/\")[-1]"
+  },
   "handlers": {
     "create": {
       "permissions": [
         "ecs:RegisterTaskDefinition",
+        "ecs:DescribeTaskDefinition",
+        "ecs:TagResource",
         "iam:GetRole",
         "iam:PassRole"
       ]
@@ -835,6 +896,7 @@
         "ecs:TagResource",
         "ecs:UntagResource",
         "ecs:ListTagsForResource",
+        "ecs:DescribeTaskDefinition",
         "iam:GetRole",
         "iam:PassRole"
       ]
@@ -842,6 +904,7 @@
     "delete": {
       "permissions": [
         "ecs:DeregisterTaskDefinition",
+        "ecs:DescribeTaskDefinition",
         "iam:GetRole",
         "iam:PassRole"
       ]

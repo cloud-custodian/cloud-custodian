@@ -110,7 +110,17 @@
     "list": {
       "permissions": [
         "wafv2:listRegexPatternSets"
-      ]
+      ],
+      "handlerSchema": {
+        "properties": {
+          "Scope": {
+            "$ref": "resource-schema.json#/properties/Scope"
+          }
+        },
+        "required": [
+          "Scope"
+        ]
+      }
     }
   }
 }
