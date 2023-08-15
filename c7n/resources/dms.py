@@ -5,7 +5,8 @@ from concurrent.futures import as_completed
 
 from c7n.actions import BaseAction
 from c7n.manager import resources
-from c7n.query import ConfigSource, QueryResourceManager, DescribeSource, TypeInfo
+from c7n.query import (
+    ConfigSource, QueryResourceManager, DescribeSource, TypeInfo, DescribeWithResourceTags)
 from c7n.utils import local_session, chunks, type_schema, get_retry
 from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter, VpcFilter
 from c7n.filters.kms import KmsRelatedFilter
@@ -399,3 +400,22 @@ class DeleteDmsEndpoint(BaseAction):
                 client.delete_endpoint(EndpointArn=EndpointArn)
             except client.exceptions.ResourceNotFoundFault:
                 continue
+
+
+
+@resources.register("dms-replication-task")
+class DMSReplicationTask(QueryResourceManager):
+    class resource_type(TypeInfo):
+        service = "dms"
+        enum_spec = ('describe_replication_tasks', 'ReplicationTasks', None)
+        arn_type = "task"
+        arn = "ReplicationTaskArn"
+        id = "ReplicationTaskArn"
+        name = "ReplicationTaskIdentifier"
+        cfn_type = config_type = "AWS::DMS::ReplicationTask"
+        universal_taggable = object()
+
+    source_mapping = {
+       "describe": DescribeWithResourceTags,
+       "config": ConfigSource
+    }
