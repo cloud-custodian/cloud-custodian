@@ -131,7 +131,7 @@ class TestDnsResourceRecordsFilter(BaseTest):
         policy = self.load_policy(
             {'name': 'dns-resource-record',
              'resource': 'gcp.dns-managed-zone',
-             'filters': [{'type': 'dns-zone-records-sets-filter',
+             'filters': [{'type': 'records-sets',
                           'key': 'type', 'op': 'eq', 'value': 'TXT'}]},
             session_factory=session_factory)
 

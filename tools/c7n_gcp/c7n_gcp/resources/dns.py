@@ -57,28 +57,28 @@ class DnsPolicy(QueryResourceManager):
                         'policy': resource_info['policy_name']})
 
 
-@DnsManagedZone.filter_registry.register('dns-zone-records-sets-filter')
+@DnsManagedZone.filter_registry.register('records-sets')
 class DNSZoneRecordsSetsFilter(ValueFilter):
-    schema = type_schema('dns-zone-records-sets-filter', rinherit=ValueFilter.schema)
+    schema = type_schema('records-sets', rinherit=ValueFilter.schema)
     permissions = ("dns.managedZones.list",)
 
     def process(self, resources, event=None):
         session = local_session(self.manager.session_factory)
         client = session.client(service_name='dns', version='v1', component='resourceRecordSets')
-        resulted = []
+        result = []
         op = OPERATORS[self.data.get('op')]
         project = session.get_default_project()
 
         for resource in resources:
-            rrsets = client.execute_query('list', {'project': project,
-                                                   'managedZone': resource['name']})
-            for rset in rrsets['rrsets']:
-                jmespath_key = jmespath_search(self.data.get('key'), rset)
-                if jmespath_key and op(self.data, jmespath_key, self.data.get('value')):
-                    resulted.append(resource)
+            sets = client.execute_query('list', {'project': project,
+                                                 'managedZone': resource['name']})
+            for s in sets['rrsets']:
+                jmespath_key = jmespath_search(self.data.get('key'), s)
+                if jmespath_key and op(jmespath_key, self.data.get('value')):
+                    result.append(resource)
                     break
 
-        return resulted
+        return result
 
 
 @DnsManagedZone.action_registry.register('delete')
