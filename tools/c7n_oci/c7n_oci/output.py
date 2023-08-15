@@ -16,49 +16,38 @@ class OCIObjectStorageOutput(BlobOutput):
 
     def __init__(self, ctx, config):
         super(OCIObjectStorageOutput, self).__init__(ctx, config)
-        if PROFILE in self.config.keys():
-            session = SessionFactory(profile=self.config.profile)()
-        else:
-            session = ctx.session_factory()
-        self.os_client = session.client("oci.object_storage.ObjectStorageClient")
-        self.namespace = self.os_client.get_namespace().data
-        self.create_bucket_if_does_not_exist()
+        self.session = SessionFactory(profile=self.config.get(PROFILE))()
+        self.os_client = None
+        self.namespace = None
+        self.bucket_exist = False
 
     def upload_file(self, path, key):
-        with open(path, 'rb') as f:
-            response = self.os_client.put_object(
-                namespace_name=self.namespace,
-                bucket_name=self.bucket,
-                object_name=key,
-                put_object_body=f,
-            )
-            self.log.debug(
-                f"Response status for sending {path} with the name {key} "
-                f"to object storage is {response.status}"
-            )
-
-    def create_bucket_if_does_not_exist(self):
-        try:
-            self.os_client.head_bucket(namespace_name=self.namespace, bucket_name=self.bucket)
-        except ServiceError:
-            self.log.warning(
-                f"The bucket {self.bucket} does not exist. "
-                f"Custodian will attempt to create a bucket in "
-                f"the compartment {os.environ.get(OCI_LOG_COMPARTMENT_ID)}. "
-                f"The compartment id is picked "
-                f"using the environment variable {OCI_LOG_COMPARTMENT_ID} "
-            )
-            try:
-                self.os_client.create_bucket(
+        if self.bucket_exist:
+            with open(path, 'rb') as f:
+                response = self.os_client.put_object(
                     namespace_name=self.namespace,
-                    create_bucket_details=oci.object_storage.models.CreateBucketDetails(
-                        name=self.bucket,
-                        compartment_id=os.environ.get(OCI_LOG_COMPARTMENT_ID),
-                        public_access_type="NoPublicAccess",
-                    ),
+                    bucket_name=self.bucket,
+                    object_name=key,
+                    put_object_body=f,
                 )
-            except Exception as e:
-                self.log.error(f"Unable to create a bucket with the name {self.bucket}. {e}")
+                self.log.debug(
+                    f"Response status for sending {path} with the name {key} "
+                    f"to object storage is {response.status}"
+                )
+        else:
+            self.os_client = self.session.client("oci.object_storage.ObjectStorageClient")
+            self.namespace = self.os_client.get_namespace().data
+            try:
+                self.os_client.head_bucket(namespace_name=self.namespace, bucket_name=self.bucket)
+            except ServiceError as se:
+                if se.status == 404:
+                    self.log.error(f"The bucket {self.bucket} does not exist.")
+                    raise ValueError(f"The bucket {self.bucket} does not exist.")
+                else:
+                    self.log.error(f"Unable to connect to the bucket {self.bucket} : {se.message}")
+                    raise ValueError(f"Unable to connect to the bucket {self.bucket} : {se.message}")
+            self.bucket_exist = True
+
 
 
 @log_outputs.register("oci")
