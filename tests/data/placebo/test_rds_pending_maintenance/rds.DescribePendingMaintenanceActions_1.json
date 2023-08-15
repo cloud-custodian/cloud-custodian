@@ -1,0 +1,26 @@
+{
+  "status_code": 200,
+  "data": {
+    "PendingMaintenanceActions": [
+      {
+        "ResourceIdentifier": "arn:aws:rds:us-west-2:644160558196:db:qbopp010",
+        "PendingMaintenanceActionDetails": [
+          {
+            "Action": "system-update",
+            "Description": "New Operating System update is available"
+          }
+        ]
+      },
+      {
+        "ResourceIdentifier": "arn:aws:rds:us-west-2:644160558196:db:qbopp011",
+        "PendingMaintenanceActionDetails": [
+          {
+            "Action": "system-update",
+            "Description": "New Operating System update is available"
+          }
+        ]
+      }
+    ],
+    "ResponseMetadata": {}
+  }
+}
