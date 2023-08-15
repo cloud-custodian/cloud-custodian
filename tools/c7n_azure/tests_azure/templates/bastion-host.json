@@ -1,0 +1,103 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "location": {
+            "defaultValue": "southcentralus",
+            "type": "string"
+        },
+        "bastionHostName_cctestvnet_name": {
+            "defaultValue": "cctestvnet",
+            "type": "string"
+        },
+        "virtualNetwork_cctestvnets_name": {
+            "defaultValue": "cctestvnets",
+            "type": "string"
+        },
+        "virtualNetworkName_cctestvnets_name": {
+            "defaultValue": "cctestvnet",
+            "type": "string"         
+        },
+        "virtualNetworkResourceGroup": {
+            "defaultValue": "[resourceGroup().name]",
+            "type": "string"
+        },     
+        "publicIpAddressName_cctestvnet_name": {
+            "defaultValue": "cctesstvnet",
+            "type": "string"
+        }
+    },
+    "variables": {
+        "computeApiVersion": "[providers('Microsoft.Compute','virtualMachines').apiVersions[0]]",
+        "networkApiVersion": "[providers('Microsoft.Network','virtualNetworks').apiVersions[0]]",
+
+        "location": "centralus",
+        "vNetSubnetName": "AzureBastionSubnet",
+        "vNetID": "[resourceId(parameters('virtualNetworkResourceGroup'), 'Microsoft.Network/virtualNetworks', parameters('virtualNetworkName_cctestvnets_name'))]",
+        "vNetSubnetReference": "[concat(variables('vNetID'), '/subnets/', variables('vNetSubnetName'))]",
+        "vNetPrefix": "10.0.0.0/16",
+        "vNetSubnetPrefix": "10.0.0.0/24"
+
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Network/virtualNetworks",
+            "name": "[parameters('virtualNetworkName_cctestvnets_name')]",
+            "apiVersion": "2017-06-01",
+            "location": "southcentralus",
+            "properties": {
+                "addressSpace": {
+                    "addressPrefixes": [
+                        "[variables('vNetPrefix')]"
+                    ]
+                },
+                "subnets": [
+                    {
+                        "name": "[variables('vNetSubnetName')]",
+                        "properties": {
+                            "addressPrefix": "[variables('vNetSubnetPrefix')]"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "2019-02-01",
+            "type": "Microsoft.Network/publicIPAddresses",
+            "name": "[parameters('publicIpAddressName_cctestvnet_name')]",
+            "location": "southcentralus",
+            "sku": {
+                "name": "Standard"
+            },
+            "properties": {
+                "publicIPAllocationMethod": "Static"
+            },
+            "tags": {}
+        },
+        {
+            "apiVersion": "2020-05-01",
+            "type": "Microsoft.Network/bastionHosts",
+            "name": "[parameters('bastionHostName_cctestvnet_name')]",
+            "location": "southcentralus",
+            "dependsOn": [
+                "[concat('Microsoft.Network/publicIPAddresses/', parameters('publicIpAddressName_cctestvnet_name'))]"
+            ],
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "IpConf",
+                        "properties": {
+                            "subnet": {
+                                "id": "[variables('vNetSubnetReference')]"
+                            },
+                            "publicIPAddress": {
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses',parameters('publicIpAddressName_cctestvnet_name'))]"
+                            }
+                        }
+                    }
+                ]
+            },
+            "tags": {}
+        }
+    ]
+} 
