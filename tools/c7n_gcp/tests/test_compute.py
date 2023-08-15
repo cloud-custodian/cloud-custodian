@@ -650,7 +650,7 @@ class TestInstanceGroupManager(BaseTest):
         factory = self.replay_flight_data('test_instance_group_manager_query', project_id=project_id)
         p = self.load_policy(
             {'name': 'gcp-instance-group-manager',
-             'resource': 'gcp.instance-group-managers'},
+             'resource': 'gcp.instance-group-manager'},
             session_factory=factory)
 
         resources = p.run()
