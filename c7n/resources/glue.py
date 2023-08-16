@@ -625,7 +625,8 @@ class GlueCatalogKmsFilter(KmsRelatedFilter):
         super().__init__(data, manager)
         key_type_to_related_ids = {
             'EncryptionAtRest': 'DataCatalogEncryptionSettings.EncryptionAtRest.SseAwsKmsKeyId',
-            'ConnectionPasswordEncryption': 'DataCatalogEncryptionSettings.ConnectionPasswordEncryption.AwsKmsKeyId'
+            'ConnectionPasswordEncryption':
+              'DataCatalogEncryptionSettings.ConnectionPasswordEncryption.AwsKmsKeyId'
         }
         key_type = self.data.get('key-type')
         self.RelatedIdsExpression = key_type_to_related_ids[key_type]

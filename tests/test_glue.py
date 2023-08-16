@@ -663,7 +663,8 @@ class TestGlueDataCatalog(BaseTest):
             {'CatalogEncryptionMode': 'SSE-KMS', 'SseAwsKmsKeyId': key_id})
         self.assertEqual(datacatlog.get('DataCatalogEncryptionSettings').get(
             'ConnectionPasswordEncryption'),
-            {'ReturnConnectionPasswordEncrypted': True, 'AwsKmsKeyId': 'alias/skunk/glue/encrypted'})
+            {'ReturnConnectionPasswordEncrypted': True,
+             'AwsKmsKeyId': 'alias/skunk/glue/encrypted'})
 
     def test_glue_catalog_cross_account(self):
         session_factory = self.replay_flight_data("test_glue_catalog_cross_account")
