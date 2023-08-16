@@ -607,6 +607,30 @@ class GlueDataCatalog(ResourceManager):
         return [{'CatalogId': self.config.account_id}]
 
 
+@GlueDataCatalog.filter_registry.register('kms-key')
+class GlueCatalogKmsFilter(KmsRelatedFilter):
+
+    schema = type_schema(
+        'kms-key',
+        rinherit=ValueFilter.schema,
+        **{'key-type': {'type': 'string', 'enum': [
+            'EncryptionAtRest', 'ConnectionPasswordEncryption']},
+            'required': ['key-type'],
+            'match-resource': {'type': 'boolean'},
+            'operator': {'enum': ['and', 'or']}})
+
+    RelatedIdsExpression = ''
+
+    def __init__(self, data, manager=None):
+        super().__init__(data, manager)
+        key_type_to_related_ids = {
+            'EncryptionAtRest': 'DataCatalogEncryptionSettings.EncryptionAtRest.SseAwsKmsKeyId',
+            'ConnectionPasswordEncryption': 'DataCatalogEncryptionSettings.ConnectionPasswordEncryption.AwsKmsKeyId'
+        }
+        key_type = self.data.get('key-type')
+        self.RelatedIdsExpression = key_type_to_related_ids[key_type]
+
+
 @GlueDataCatalog.action_registry.register('set-encryption')
 class GlueDataCatalogEncryption(BaseAction):
     """Modifies glue data catalog encryption based on specified parameter
@@ -666,9 +690,22 @@ class GlueDataCatalogEncryption(BaseAction):
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('glue')
+        self.process_catalog_encryption(client, resources)
+
+    def process_catalog_encryption(self, client, resources):
         # there is one glue data catalog per account
-        client.put_data_catalog_encryption_settings(
-            DataCatalogEncryptionSettings=self.data['attributes'])
+        enc_config = resources[0]['DataCatalogEncryptionSettings']
+        updatedConfig = {**enc_config, **self.data['attributes']}
+        if enc_config == updatedConfig:
+            return
+        try:
+            client.put_data_catalog_encryption_settings(
+                DataCatalogEncryptionSettings=updatedConfig)
+        except Exception as e:
+            self.log.warning(
+                "Exception trying to update encryption on glue catalog: error: %s",
+                e)
+            raise e
 
 
 @GlueDataCatalog.filter_registry.register('glue-security-config')
