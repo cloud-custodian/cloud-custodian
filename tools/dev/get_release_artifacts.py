@@ -63,7 +63,7 @@ def main():
     print('found artifact build candidate %s' % candidate)
     command = [gh_bin, "run", "download", str(candidate['databaseId']), "-n", "built-wheels"]
     subprocess.getoutput(" ".join(command))
-    print('artifacts download')
+    print('artifacts downloaded')
 
 
 if __name__ == '__main__':
