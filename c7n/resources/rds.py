@@ -1906,7 +1906,7 @@ class ModifyDb(BaseAction):
 
 @resources.register('rds-reserved')
 class ReservedRDS(QueryResourceManager):
-    """Lists all existing rds reservations
+    """Lists all active rds reservations
 
     :example:
 
@@ -1915,6 +1915,8 @@ class ReservedRDS(QueryResourceManager):
             policies:
               - name: existing-rds-reservations
                 resource: rds-reserved
+                filters:
+                    - State: active
     """
 
     class resource_type(TypeInfo):
