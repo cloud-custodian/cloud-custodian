@@ -1906,6 +1906,14 @@ class ModifyDb(BaseAction):
 
 @resources.register('rds-reserved')
 class ReservedRDS(QueryResourceManager):
+    """Lists all existing rds reservations
+
+    :example:
+    .. code-block:: yaml
+            policies:
+              - name: existing-rds-reservations
+                resource: rds-reserved
+    """
 
     class resource_type(TypeInfo):
         service = 'rds'
