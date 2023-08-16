@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 from c7n.utils import type_schema
 from c7n_gcp.actions import MethodAction, SetIamPolicy
+from c7n_gcp.filters import IamPolicyFilter
 from c7n_gcp.provider import resources
 from c7n_gcp.query import QueryResourceManager, TypeInfo, ChildTypeInfo, ChildResourceManager
 
@@ -42,6 +43,14 @@ class SpannerInstance(QueryResourceManager):
                             'labels': all_labels
                         },
                         'field_mask': ', '.join(['labels'])}}
+
+
+@SpannerInstance.filter_registry.register('iam-policy')
+class SpannerInstanceIamPolicyFilter(IamPolicyFilter):
+    """
+    Overrides the base implementation to process spanner instance resources correctly.
+    """
+    permissions = ('spanner.instances.getIamPolicy',)
 
 
 @SpannerInstance.action_registry.register('delete')
@@ -152,6 +161,14 @@ class SpannerDatabaseInstance(ChildResourceManager):
                 'get', {
                     'name': resource_info['resourceName']}
             )
+
+
+@SpannerDatabaseInstance.filter_registry.register('iam-policy')
+class SpannerDatabaseInstanceIamPolicyFilter(IamPolicyFilter):
+    """
+    Overrides the base implementation to process spanner database resources correctly.
+    """
+    permissions = ('spanner.databases.getIamPolicy',)
 
 
 SpannerDatabaseInstance.action_registry.register('set-iam-policy', SetIamPolicy)

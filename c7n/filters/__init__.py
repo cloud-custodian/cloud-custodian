@@ -22,3 +22,4 @@ from .iamaccess import CrossAccountAccessFilter, PolicyChecker
 from .iamanalyzer import AccessAnalyzer
 from .metrics import MetricsFilter, ShieldMetrics
 from .vpc import DefaultVpcBase
+from .waf import WafV2FilterBase, WafClassicRegionalFilterBase

@@ -830,3 +830,64 @@ class DeleteDataSync(Action):
                 client.delete_resource_data_sync(SyncName=r['SyncName'])
             except client.exceptions.ResourceDataSyncNotFoundException:
                 continue
+
+
+
+@resources.register("ssm-patch-group")
+class SsmPatchGroup(QueryResourceManager):
+    class resource_type(TypeInfo):
+        service = "ssm"
+        enum_spec = ('describe_patch_groups', 'Mappings', None)
+        arn = False
+        id = "PatchGroup"
+        name = "PatchGroup"
+
+
+@resources.register('ssm-session-manager')
+class SSMSessionManager(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'ssm'
+        enum_spec = ('describe_sessions', 'Sessions', None)
+        name = "SessionId"
+        id = "SessionId"
+        arn_type = 'session'
+
+    retry = staticmethod(get_retry(('Throttled',)))
+    permissions = ('ssm:DescribeSessions', 'ssm:TerminateSession', )
+
+    augment = universal_augment
+
+    def resources(self, query=None):
+        if query is None:
+            query = {}
+        if 'State' not in query:
+            # Default to Active if not given
+            query['State'] = 'Active'
+        return super(SSMSessionManager, self).resources(query=query)
+
+@SSMSessionManager.action_registry.register('terminate')
+class TerminateSession(Action):
+    """ Terminate a session.
+
+    This call will permanently end a session's connection to an instance.
+
+    :Example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: ssm-session-termination
+            resource: ssm-session-manager
+            actions:
+              - terminate
+    """
+    schema = type_schema('terminate')
+
+    def get_permissions(self):
+        return ('ssm:TerminateSession',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('ssm')
+        for r in resources:
+            client.terminate_session(SessionId=r['SessionId'])
