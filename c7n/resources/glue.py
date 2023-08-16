@@ -619,6 +619,8 @@ class GlueCatalogKmsFilter(KmsRelatedFilter):
             'match-resource': {'type': 'boolean'},
             'operator': {'enum': ['and', 'or']}})
 
+    permissions = ('glue:GetDataCatalogEncryptionSettings',)
+
     RelatedIdsExpression = ''
 
     def __init__(self, data, manager=None):
