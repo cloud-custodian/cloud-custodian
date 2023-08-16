@@ -696,12 +696,12 @@ class GlueDataCatalogEncryption(BaseAction):
     def process_catalog_encryption(self, client, resources):
         # there is one glue data catalog per account
         enc_config = resources[0]['DataCatalogEncryptionSettings']
-        updatedConfig = {**enc_config, **self.data['attributes']}
-        if enc_config == updatedConfig:
+        updated_config = {**enc_config, **self.data['attributes']}
+        if enc_config == updated_config:
             return
         try:
             client.put_data_catalog_encryption_settings(
-                DataCatalogEncryptionSettings=updatedConfig)
+                DataCatalogEncryptionSettings=updated_config)
         except Exception as e:
             self.log.warning(
                 "Exception trying to update encryption on glue catalog: error: %s",
