@@ -4,7 +4,6 @@
 import json
 import datetime
 import subprocess
-import os
 import shutil
 import sys
 
