@@ -25,6 +25,7 @@ from c7n.resources import s3
 from c7n.mu import LambdaManager
 from c7n.ufuncs import s3crypt
 from c7n.utils import get_account_alias_from_sts, jmespath_search
+import vcr
 
 from .common import (
     BaseTest,
@@ -4337,3 +4338,96 @@ class IntelligentTieringConfiguration(BaseTest):
         self.assertIn(
           'Access Denied Bucket:example-abc-123 while reading intelligent tiering configurations',
             log_output.getvalue())
+
+
+class BucketReplication(BaseTest):
+    def test_s3_bucket_replication_filter(self):
+        self.patch(s3.S3, "executor_factory", MainThreadExecutor)
+        self.patch(s3, "S3_AUGMENT_TABLE", [])
+        self.patch(s3, "S3_AUGMENT_TABLE", [('get_bucket_replication',
+        'Replication', None, None, 's3:GetReplicationConfiguration')])
+        session_factory = self.replay_flight_data("test_s3_bucket_replication_filter")
+        p = self.load_policy(
+            {
+                "name": "s3-replication-rule",
+                "resource": "s3",
+                "filters": [
+                        {
+                            "type": "bucket-replication",
+                            "attrs": [
+                            {"Status": "Enabled"},
+                            {"Filter": {
+                                "And": {
+                                    "Prefix": "abc", "Tags": [{"Key": "Owner", "Value": "c7n"}]}}},
+                            {"DestinationRegion": "us-west-2"},
+                            {"CrossRegion": True }
+                            ]
+                        }
+                    ],
+                },
+            session_factory=session_factory,
+        )
+        with vcr.use_cassette(
+          'tests/data/vcr_cassettes/test_s3/replication_rule.yaml',
+           record_mode='none'
+        ):
+            resources = p.run()
+            self.assertEqual(len(resources), 1)
+            self.assertTrue("Replication" in resources[0])
+            self.assertEqual(len(resources[0].get("c7n:ListItemMatches")), 1)
+
+    def test_s3_bucket_replication_filter_count(self):
+        self.patch(s3.S3, "executor_factory", MainThreadExecutor)
+        self.patch(s3, "S3_AUGMENT_TABLE", [])
+        self.patch(s3, "S3_AUGMENT_TABLE", [('get_bucket_replication',
+        'Replication', None, None, 's3:GetReplicationConfiguration')])
+        session_factory = self.replay_flight_data("test_s3_bucket_replication_filter_count")
+        p = self.load_policy(
+            {
+                "name": "s3-replication-filter-count",
+                "resource": "s3",
+                "filters": [
+                    {
+                        "type": "bucket-replication",
+                        "count": 1,
+                        "count_op": "eq"
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        with vcr.use_cassette(
+          'tests/data/vcr_cassettes/test_s3/replication_filter_count.yaml',
+           record_mode='none'
+        ):
+            resources = p.run()
+            self.assertEqual(len(resources), 1)
+            self.assertEqual(resources[0]['Name'],'custodian-replication-test-1')
+
+    def test_s3_bucket_no_replication_rule(self):
+        self.patch(s3.S3, "executor_factory", MainThreadExecutor)
+        self.patch(s3, "S3_AUGMENT_TABLE", [])
+        self.patch(s3, "S3_AUGMENT_TABLE", [('get_bucket_replication',
+        'Replication', None, None, 's3:GetReplicationConfiguration')])
+        session_factory = self.replay_flight_data("test_s3_bucket_no_replication_rule")
+        p = self.load_policy(
+            {
+                "name": "s3-no-replication-rule",
+                "resource": "s3",
+                "filters": [
+                    {
+                        "not": [
+                            "bucket-replication"
+                        ]
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        with vcr.use_cassette(
+          'tests/data/vcr_cassettes/test_s3/no_replication_rule.yaml',
+           record_mode='none'
+        ):
+            resources = p.run()
+            self.assertEqual(len(resources), 1)
+            self.assertEqual(resources[0]['Name'],'custodian-replication-west')

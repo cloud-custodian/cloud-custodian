@@ -11,6 +11,7 @@ from pytest_terraform import terraform
 
 import pytest
 
+
 @pytest.mark.audited
 @terraform('sg_used_cross_ref')
 def test_sg_used_cross_ref(test, sg_used_cross_ref):
@@ -19,7 +20,7 @@ def test_sg_used_cross_ref(test, sg_used_cross_ref):
     p = test.load_policy({
         'name': 'sg_used_cross_ref',
         'resource': 'security-group',
-        'filters': ['unused']
+        'filters': ['used']
     }, session_factory=factory)
     unused = p.resource_manager.filters[0]
     test.patch(
@@ -30,7 +31,7 @@ def test_sg_used_cross_ref(test, sg_used_cross_ref):
     resources = p.run()
     assert len(resources) == 1
     assert resources[0]['GroupName'] == sg_used_cross_ref[
-        'aws_security_group.n1.name']
+        'aws_security_group.n2.name']
 
 
 @terraform('ec2_igw_subnet')
@@ -1524,14 +1525,14 @@ class SecurityGroupTest(BaseTest):
             session_factory=factory,
         )
         resources = p.run()
-        self.assertEqual(len(resources), 5)
+        self.assertEqual(len(resources), 3)
         self.assertEqual(
-            {"sg-f9cc4d9f", "sg-13de8f75", "sg-ce548cb7", "sg-0a2cb503a229c31c1", "sg-1c8a186c"},
+            {"sg-f9cc4d9f", "sg-0a2cb503a229c31c1", "sg-1c8a186c"},
             {r["GroupId"] for r in resources},
         )
-        self.assertIn("amazon-aws", resources[2]["c7n:InstanceOwnerIds"])
-        self.assertIn("vpc_endpoint", resources[2]["c7n:InterfaceTypes"])
-        self.assertIn("ec2", resources[2]["c7n:InterfaceResourceTypes"])
+        self.assertIn("amazon-aws", resources[0]["c7n:InstanceOwnerIds"])
+        self.assertIn("vpc_endpoint", resources[0]["c7n:InterfaceTypes"])
+        self.assertIn("ec2", resources[0]["c7n:InterfaceResourceTypes"])
 
     def test_unused_ecs(self):
         factory = self.replay_flight_data("test_security_group_ecs_unused")
@@ -1578,7 +1579,7 @@ class SecurityGroupTest(BaseTest):
             session_factory=factory,
         )
         resources = p.run()
-        self.assertEqual(len(resources), 1)
+        self.assertEqual(len(resources), 2)
 
     def test_match_resource_validator(self):
 

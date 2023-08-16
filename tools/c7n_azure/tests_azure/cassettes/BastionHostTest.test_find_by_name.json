@@ -1,0 +1,78 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Network/bastionHosts?api-version=2020-08-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-ms-arm-service-request-id": [
+                        "07c4c195-efe0-4e46-a8ff-49c0c4235b79"
+                    ],
+                    "date": [
+                        "Tue, 15 Aug 2023 14:20:55 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-length": [
+                        "1707"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "name": "cctestvnet",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_bastion-host/providers/Microsoft.Network/bastionHosts/cctestvnet",
+                                "etag": "W/\"7cb13d56-3832-4c3f-9ded-d92f51c2278b\"",
+                                "type": "Microsoft.Network/bastionHosts",
+                                "location": "southcentralus",
+                                "tags": {
+                                    "product_id": "13742"
+                                },
+                                "properties": {
+                                    "provisioningState": "Succeeded",
+                                    "dnsName": "bst-aff0927e-c10b-4e33-85f3-dd2737ae5fee.bastion.azure.com",
+                                    "scaleUnits": 2,
+                                    "ipConfigurations": [
+                                        {
+                                            "name": "IpConf",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_bastion-host/providers/Microsoft.Network/bastionHosts/cctestvnet/bastionHostIpConfigurations/IpConf",
+                                            "etag": "W/\"7cb13d56-3832-4c3f-9ded-d92f51c2278b\"",
+                                            "type": "Microsoft.Network/bastionHosts/bastionHostIpConfigurations",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "privateIPAllocationMethod": "Dynamic",
+                                                "publicIPAddress": {
+                                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_bastion-host/providers/Microsoft.Network/publicIPAddresses/cctesstvnet"
+                                                },
+                                                "subnet": {
+                                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_bastion-host/providers/Microsoft.Network/virtualNetworks/cctestvnet/subnets/AzureBastionSubnet"
+                                                }
+                                            }
+                                        }
+                                    ]
+                                },
+                                "sku": {
+                                    "name": "Basic"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}

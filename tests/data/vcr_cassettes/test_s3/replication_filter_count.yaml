@@ -1,0 +1,66 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Connection:
+      - close
+      Host:
+      - s3.amazonaws.com
+      User-Agent:
+      - Python-urllib/3.11
+    method: HEAD
+    uri: https://s3.amazonaws.com/custodian-replication-west
+  response:
+    body:
+      string: ''
+    headers:
+      Connection:
+      - close
+      Content-Type:
+      - application/xml
+      Date:
+      - Tue, 01 Aug 2023 14:11:08 GMT
+      Server:
+      - AmazonS3
+      x-amz-bucket-region:
+      - us-west-2
+      x-amz-id-2:
+      - ocFZRbWdjU2wnd4KmOGplwtm5bCjR2jA31sLpeW9M55lNFXvsqON7q6Zhi4fl0xvt8VNnU3LO6g=
+      x-amz-request-id:
+      - XYQDPDDCHH6JTH60
+    status:
+      code: 301
+      message: Moved Permanently
+- request:
+    body: null
+    headers:
+      Connection:
+      - close
+      Host:
+      - s3.amazonaws.com
+      User-Agent:
+      - Python-urllib/3.11
+    method: HEAD
+    uri: https://s3.amazonaws.com/custodian-replication-west
+  response:
+    body:
+      string: ''
+    headers:
+      Connection:
+      - close
+      Content-Type:
+      - application/xml
+      Date:
+      - Tue, 01 Aug 2023 14:11:09 GMT
+      Server:
+      - AmazonS3
+      x-amz-bucket-region:
+      - us-west-2
+      x-amz-id-2:
+      - sQQAKVBFLxcy54Mh9vArg2RjZjVa/lFsOy8SRzXodHumCht8Jlb7oi6eMAyhqSExY0cZWcen674=
+      x-amz-request-id:
+      - XYQAKF1QXNPMHM69
+    status:
+      code: 301
+      message: Moved Permanently
+version: 1
