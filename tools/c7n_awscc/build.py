@@ -17,30 +17,32 @@ import zipfile
 # boto is listed as a build dependency.
 import boto3
 
-SCHEMA_URL = "https://schema.cloudformation.us-east-1.amazonaws.com/CloudformationSchema.zip"
+SCHEMA_URL = (
+    "https://schema.cloudformation.us-east-1.amazonaws.com/CloudformationSchema.zip"
+)
 
 
 def fake_session():
     session = boto3.Session(  # nosec nosemgrep
-        region_name='us-east-1',
-        aws_access_key_id='never',
-        aws_secret_access_key='found')
+        region_name="us-east-1",
+        aws_access_key_id="never",
+        aws_secret_access_key="found",
+    )
     return session
-
 
 
 ServiceMap = {
     "acmpca": "acm-pca",
     "amazonmq": "mq",
     "applicationinsights": "application-insights",
-    "applicationautoscaling": "application-autoscaling",    
+    "applicationautoscaling": "application-autoscaling",
     "aps": "amp",
-    "backupgateway": "backup-gateway",    
+    "backupgateway": "backup-gateway",
     "cassandra": "keyspaces",
     "certificatemanager": "acm",
     "codestarconnections": "codestar-connections",
     "codestarnotification": "codestar-notifications",
-    "cognito": "cognito-identity",    
+    "cognito": "cognito-identity",
     "customerprofiles": "customer-profiles",
     "devopsguru": "devops-guru",
     "elasticloadbalancingv2": "elbv2",
@@ -54,7 +56,7 @@ ServiceMap = {
     "kinesisfirehose": "kinesis-firehose",
     "lex": "lexv2-models",
     "licensemanager": "license-manager",
-    "msk": "kafka",    
+    "msk": "kafka",
     "networkfirewall": "network-firewall",
     "nimblestudio": "nimble",
     "opensearchservice": "es",
@@ -75,7 +77,7 @@ ServiceMap = {
 
 
 def build_index(data_dir):
-    index_path = data_dir / "index.json"    
+    index_path = data_dir / "index.json"
     index_data = {"resources": {}, "augment": {}}
     all_services = fake_session().get_available_services()
 
@@ -96,8 +98,8 @@ def build_index(data_dir):
         if not boto_service:
             print("service not found %s %s" % (rdata["typeName"], service))
             continue
-    
-        raugment = index_data["augment"].setdefault(rdata["typeName"], {})                  
+
+        raugment = index_data["augment"].setdefault(rdata["typeName"], {})
         raugment["service"] = boto_service
 
         rname = path.stem.split("_", 1)[-1]
@@ -112,19 +114,19 @@ def build_index(data_dir):
 
 
 def build(setup_kwargs):
-
-    data_dir = Path('c7n_awscc') / 'data'
+    data_dir = Path("c7n_awscc") / "data"
 
     with urlopen(SCHEMA_URL) as response:
         zipf = zipfile.ZipFile(BytesIO(response.read()))
         for f in zipf.namelist():
-            name = f.replace('-', '_')
+            name = f.replace("-", "_")
             (data_dir / name).write_bytes(zipf.read(f))
 
-    print('downloaded %d resource types' % (len(zipf.namelist())))
+    print("downloaded %d resource types" % (len(zipf.namelist())))
     build_index(data_dir)
 
     return setup_kwargs
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     build({})
