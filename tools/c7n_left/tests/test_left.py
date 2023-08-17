@@ -50,7 +50,8 @@ class ResultsReporter:
 def run_policy(policy, terraform_dir, tmp_path):
     (tmp_path / "policies.json").write_text(json.dumps({"policies": [policy]}, indent=2))
     config = Config.empty(
-        policy_dir=tmp_path, source_dir=terraform_dir, exec_filter=None, var_file="")
+        policy_dir=tmp_path, source_dir=terraform_dir, exec_filter=None, var_file=""
+    )
     policies = utils.load_policies(tmp_path, config)
     reporter = ResultsReporter()
     core.CollectionRunner(policies, config, reporter).run()
@@ -256,6 +257,66 @@ def test_provider_parse():
         "line_end": 8,
         "src_dir": Path("tests") / "terraform" / "ec2_stop_protection_disabled",
     }
+
+
+def test_var_file_flag_cli(tmp_path):
+    (tmp_path / "tf").mkdir()
+    (tmp_path / "vars.tf").write_text(
+        """
+        balancer_type = "network"
+        """
+    )
+    (tmp_path / "tf" / "main.tf").write_text(
+        """
+variable balancer_type {
+  type = string
+  default = "application"
+}
+
+resource "aws_alb" "positive1" {
+  name               = "test-lb-tf"
+  internal           = false
+  load_balancer_type = var.balancer_type
+  subnets            = aws_subnet.public.*.id
+}
+        """
+    )
+
+    (tmp_path / "policy.json").write_text(
+        json.dumps(
+            {
+                "policies": [
+                    {
+                        "name": "check-multi",
+                        "resource": ["terraform.aws_alb"],
+                        "filters": [{"load_balancer_type": "network"}],
+                    }
+                ]
+            }
+        )
+    )
+
+    # graph = TerraformProvider().parse(tmp_path / "tf", tmp_path / "vars.tf")
+    runner = CliRunner()
+    result = runner.invoke(
+        cli.cli,
+        [
+            "run",
+            "-p",
+            str(tmp_path),
+            "-d",
+            str(tmp_path / "tf"),
+            "--var-file",
+            str(tmp_path / "vars.tf"),
+            "-o",
+            "json",
+            "--output-file",
+            str(tmp_path / "output.json"),
+        ],
+    )
+    assert result.exit_code == 1
+    data = json.loads((tmp_path / "output.json").read_text())
+    assert len(data["results"]) == 1
 
 
 def test_multi_resource_list_policy(tmp_path):

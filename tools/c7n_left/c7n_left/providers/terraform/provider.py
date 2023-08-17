@@ -43,7 +43,10 @@ class TerraformProvider(IACSourceProvider):
         return policies
 
     def parse(self, source_dir, var_file=None):
-        graph = TerraformGraph(load_from_path(source_dir, allow_downloads=True), source_dir)
+        print(var_file)
+        graph = TerraformGraph(
+            load_from_path(source_dir, vars_path=var_file, allow_downloads=True), source_dir
+        )
         graph.build()
         log.debug("Loaded %d %s resources", len(graph), self.type)
         return graph
