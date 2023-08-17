@@ -14,7 +14,6 @@ log = logging.getLogger("c7n_awscc.query")
 
 
 class CloudControl:
-
     resources_expr = jmespath_compile("ResourceDescriptions[].Properties")
     ids_expr = jmespath_compile("ResourceDescriptions[].Identifier")
 

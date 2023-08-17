@@ -16,7 +16,6 @@ def get_resource_map():
 
 @clouds.register("awscc")
 class AwsCloudControl(AWS):
-
     display_name = "AWS Cloud Control"
     resource_prefix = ("awscc",)
     resources = PluginRegistry("%s.resources" % resource_prefix)
