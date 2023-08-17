@@ -88,7 +88,7 @@ class IPSecAlgorithmFilter(ValueFilter):
                  for conns in client.virtual_network_gateway_connections.list(vpnrg)]
         connections = set()
         for conn in conns:
-            if self.match(conn): 
+            if self.match(conn):
               conn_vpnname = conn['properties']['virtualNetworkGateway1']['id']
               if ResourceIdParser.get_resource_name(conn_vpnname) == vpnname:
                  connections.add(ResourceIdParser.get_resource_name(conn['id']))
