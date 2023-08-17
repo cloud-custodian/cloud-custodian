@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 import re
 
+from c7n.filters.core import ValueFilter
 from c7n_gcp.filters.iampolicy import IamPolicyFilter
 from c7n_gcp.provider import resources
 from c7n_gcp.query import (QueryResourceManager, TypeInfo, ChildTypeInfo,
@@ -143,6 +144,24 @@ class KubernetesClusterNodePool(ChildResourceManager):
 @KubernetesClusterNodePool.filter_registry.register('iam-policy')
 class KubernetesClusterNodePoolIamPolicyFilter(IamPolicyFilter):
     permissions = ('resourcemanager.projects.getIamPolicy',)
+
+    def process(self, resources, event=None):
+        session = local_session(self.manager.session_factory)
+        client = session.client(
+            service_name='cloudresourcemanager', version='v1', component='projects')
+        project = session.get_default_project()
+        iams = client.execute_command('getIamPolicy', {'resource': project}).get('bindings')
+        if 'doc' in self.data:
+            for resource in resources:
+                iam_policies = [iam for iam in iams
+                              if 'serviceAccount:' + resource.get('config').get('serviceAccount')
+                              in iam['members']]
+                resource["c7n:iamPolicy"] = iam_policies
+        return self.process_resources(resources)
+
+    def process_resources(self, resources):
+        value_filter = ValueFilter(self.data['doc'], self.manager)
+        return value_filter.process(resources)
 
 
 @KubernetesCluster.action_registry.register('delete')

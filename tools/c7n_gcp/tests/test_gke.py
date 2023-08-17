@@ -236,10 +236,12 @@ class KubernetesClusterNodePoolTest(BaseTest):
             {'name': 'iam-gke-nodepool-filter',
              'resource': 'gcp.gke-nodepool',
              'filters': [{
-                 'type': 'iam-gke-nodepool-filter',
-                 'key': 'role',
-                 'op': 'contains',
-                 'value': 'roles/viewer'
+                 'type': 'iam-policy',
+                 'doc': {
+                     'key': 'bindings[?(role==\'roles/viewer\')]',
+                     'op': 'ne',
+                     'value': []
+                 }
              }]},
             session_factory=factory
         )
@@ -247,23 +249,3 @@ class KubernetesClusterNodePoolTest(BaseTest):
 
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['name'], 'default-pool')
-
-    def test_gke_nodepool_filter_iam_query(self):
-        factory = self.replay_flight_data('bigtable-instance-table-filter-iam')
-        p = self.load_policy({
-            'name': 'bigtable-instance-table-filter-iam',
-            'resource': 'gcp.bigtable-instance-table',
-            'filters': [{
-                'type': 'iam-policy',
-                'doc': {
-                    'key': 'bindings[?(role==\'roles/owner\' || role==\'roles/editor\')]',
-                    'op': 'ne',
-                    'value': []
-                }
-            }]
-        }, session_factory=factory)
-        resources = p.run()
-
-        self.assertEqual(len(resources), 1)
-        self.assertEqual('projects/cloud-custodian/instances/custodian-test-instance/tables/custodian-table-red',
-                         resources[0]['name'])
