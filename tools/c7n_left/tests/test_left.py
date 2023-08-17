@@ -259,9 +259,9 @@ def test_provider_parse():
     }
 
 
-def test_var_file_flag_cli(tmp_path):
+def test_var_file(tmp_path):
     (tmp_path / "tf").mkdir()
-    (tmp_path / "vars.tf").write_text(
+    (tmp_path / "tf" / "vars.tf").write_text(
         """
         balancer_type = "network"
         """
@@ -296,27 +296,9 @@ resource "aws_alb" "positive1" {
         )
     )
 
-    # graph = TerraformProvider().parse(tmp_path / "tf", tmp_path / "vars.tf")
-    runner = CliRunner()
-    result = runner.invoke(
-        cli.cli,
-        [
-            "run",
-            "-p",
-            str(tmp_path),
-            "-d",
-            str(tmp_path / "tf"),
-            "--var-file",
-            str(tmp_path / "vars.tf"),
-            "-o",
-            "json",
-            "--output-file",
-            str(tmp_path / "output.json"),
-        ],
-    )
-    assert result.exit_code == 1
-    data = json.loads((tmp_path / "output.json").read_text())
-    assert len(data["results"]) == 1
+    graph = TerraformProvider().parse(tmp_path / "tf", "vars.tf")
+    resources = list(graph.get_resources_by_type("aws_alb"))
+    assert resources[0][1][0]['load_balancer_type'] == 'network'
 
 
 def test_multi_resource_list_policy(tmp_path):
