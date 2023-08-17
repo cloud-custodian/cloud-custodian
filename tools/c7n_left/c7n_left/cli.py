@@ -32,9 +32,10 @@ def cli():
 @click.option("-d", "--directory", type=click.Path())
 @click.option("-o", "--output", default="cli", type=click.Choice(report_outputs.keys()))
 @click.option("--output-file", type=click.File("w"), default="-")
+@click.option("--var-file", type=click.File("w"), default="-")
 @click.option("--output-query", default=None)
 @click.option("--summary", default="policy", type=click.Choice(summary_options.keys()))
-def run(format, policy_dir, directory, output, output_file, output_query, summary, filters):
+def run(format, policy_dir, directory, output, output_file, var_file, output_query, summary, filters):
     """evaluate policies against IaC sources.
 
     c7n-left -p policy_dir -d terraform_root --filters "severity=HIGH"
@@ -47,6 +48,7 @@ def run(format, policy_dir, directory, output, output_file, output_query, summar
         policy_dir=Path(policy_dir),
         output=output,
         output_file=output_file,
+        var_file=var_file,
         output_query=output_query,
         summary=summary,
         filters=filters,
@@ -75,6 +77,7 @@ def test(policy_dir, filters):
         policy_dir=policy_dir,
         output_file=sys.stdout,
         filters=filters,
+        var_file=None
     )
 
     reporter = TestReporter(None, config)

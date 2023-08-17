@@ -215,7 +215,7 @@ class CollectionRunner:
             log.warning("no %s source files found" % provider.type)
             return True
 
-        graph = provider.parse(self.options.source_dir)
+        graph = provider.parse(self.options.source_dir, self.options.var_file)
 
         for p in self.policies:
             p.expand_variables(p.get_variables())

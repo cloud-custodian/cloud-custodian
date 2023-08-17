@@ -49,7 +49,8 @@ class ResultsReporter:
 
 def run_policy(policy, terraform_dir, tmp_path):
     (tmp_path / "policies.json").write_text(json.dumps({"policies": [policy]}, indent=2))
-    config = Config.empty(policy_dir=tmp_path, source_dir=terraform_dir, exec_filter=None)
+    config = Config.empty(
+        policy_dir=tmp_path, source_dir=terraform_dir, exec_filter=None, var_file="")
     policies = utils.load_policies(tmp_path, config)
     reporter = ResultsReporter()
     core.CollectionRunner(policies, config, reporter).run()

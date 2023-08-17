@@ -42,7 +42,7 @@ class TerraformProvider(IACSourceProvider):
             p.data["mode"] = {"type": "terraform-source"}
         return policies
 
-    def parse(self, source_dir):
+    def parse(self, source_dir, var_file=None):
         graph = TerraformGraph(load_from_path(source_dir, allow_downloads=True), source_dir)
         graph.build()
         log.debug("Loaded %d %s resources", len(graph), self.type)
