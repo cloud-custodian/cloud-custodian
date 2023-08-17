@@ -30,6 +30,7 @@ ServiceMap = {
     "applicationinsights": "application-insights",
     "aps": "amp",
     # cassandra : no management api
+    "cassandra": "keyspaces",
     "certificatemanager": "acm",
     # chatbot: no management api
     "codestarconnections": "codestar-connections",

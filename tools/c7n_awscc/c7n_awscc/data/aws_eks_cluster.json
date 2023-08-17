@@ -1,304 +1,301 @@
 {
-  "taggable": true,
-  "typeName": "AWS::EKS::Cluster",
-  "readOnlyProperties": [
-    "/properties/Arn",
-    "/properties/Endpoint",
-    "/properties/CertificateAuthorityData",
-    "/properties/ClusterSecurityGroupId",
-    "/properties/EncryptionConfigKeyArn",
-    "/properties/OpenIdConnectIssuerUrl",
-    "/properties/KubernetesNetworkConfig/ServiceIpv6Cidr"
-  ],
-  "description": "An object representing an Amazon EKS cluster.",
-  "createOnlyProperties": [
-    "/properties/EncryptionConfig",
-    "/properties/KubernetesNetworkConfig",
-    "/properties/Name",
-    "/properties/RoleArn",
-    "/properties/ResourcesVpcConfig/SubnetIds",
-    "/properties/ResourcesVpcConfig/SecurityGroupIds"
-  ],
-  "primaryIdentifier": [
-    "/properties/Name"
-  ],
-  "required": [
-    "RoleArn",
-    "ResourcesVpcConfig"
-  ],
-  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-eks.git",
-  "handlers": {
-    "read": {
-      "permissions": [
-        "eks:DescribeCluster"
-      ]
-    },
-    "create": {
-      "permissions": [
-        "eks:CreateCluster",
-        "eks:DescribeCluster",
-        "eks:TagResource",
-        "iam:PassRole",
-        "kms:DescribeKey",
-        "kms:CreateGrant"
-      ]
-    },
-    "update": {
-      "permissions": [
-        "iam:PassRole",
-        "eks:UpdateClusterConfig",
-        "eks:UpdateClusterVersion",
-        "eks:DescribeCluster",
-        "eks:DescribeUpdate",
-        "eks:TagResource",
-        "eks:UntagResource"
-      ]
-    },
-    "list": {
-      "permissions": [
-        "eks:ListClusters"
-      ]
-    },
-    "delete": {
-      "permissions": [
-        "eks:DeleteCluster",
-        "eks:DescribeCluster"
-      ]
-    }
-  },
-  "additionalProperties": false,
-  "definitions": {
-    "Logging": {
-      "description": "Enable exporting the Kubernetes control plane logs for your cluster to CloudWatch Logs based on log types. By default, cluster control plane logs aren't exported to CloudWatch Logs.",
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "ClusterLogging": {
-          "description": "The cluster control plane logging configuration for your cluster. ",
-          "$ref": "#/definitions/ClusterLogging"
-        }
-      }
-    },
-    "EnabledTypes": {
-      "description": "Enable control plane logs for your cluster, all log types will be disabled if the array is empty",
-      "insertionOrder": false,
-      "type": "array",
-      "items": {
-        "$ref": "#/definitions/LoggingTypeConfig"
-      }
-    },
-    "Tag": {
-      "description": "A key-value pair to associate with a resource.",
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "Value": {
-          "minLength": 0,
-          "description": "The value for the tag. You can specify a value that is 0 to 256 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.",
-          "type": "string",
-          "maxLength": 256
+  "typeName" : "AWS::EKS::Cluster",
+  "description" : "An object representing an Amazon EKS cluster.",
+  "sourceUrl" : "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-eks.git",
+  "definitions" : {
+    "Tag" : {
+      "description" : "A key-value pair to associate with a resource.",
+      "type" : "object",
+      "properties" : {
+        "Key" : {
+          "type" : "string",
+          "description" : "The key name of the tag. You can specify a value that is 1 to 128 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.",
+          "minLength" : 1,
+          "maxLength" : 128
         },
-        "Key": {
-          "minLength": 1,
-          "description": "The key name of the tag. You can specify a value that is 1 to 128 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.",
-          "type": "string",
-          "maxLength": 128
+        "Value" : {
+          "type" : "string",
+          "description" : "The value for the tag. You can specify a value that is 0 to 256 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.",
+          "minLength" : 0,
+          "maxLength" : 256
         }
       },
-      "required": [
-        "Key",
-        "Value"
-      ]
+      "required" : [ "Key", "Value" ],
+      "additionalProperties" : false
     },
-    "EncryptionConfig": {
-      "description": "The encryption configuration for the cluster",
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "Resources": {
-          "description": "Specifies the resources to be encrypted. The only supported value is \"secrets\".",
-          "insertionOrder": false,
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "Provider": {
-          "description": "The encryption provider for the cluster.",
-          "additionalProperties": false,
-          "type": "object",
-          "properties": {
-            "KeyArn": {
-              "description": "Amazon Resource Name (ARN) or alias of the KMS key. The KMS key must be symmetric, created in the same region as the cluster, and if the KMS key was created in a different account, the user must have access to the KMS key.",
-              "type": "string"
-            }
-          }
+    "Provider" : {
+      "type" : "object",
+      "additionalProperties" : false,
+      "properties" : {
+        "KeyArn" : {
+          "description" : "Amazon Resource Name (ARN) or alias of the KMS key. The KMS key must be symmetric, created in the same region as the cluster, and if the KMS key was created in a different account, the user must have access to the KMS key.",
+          "type" : "string"
         }
       }
     },
-    "LoggingTypeConfig": {
-      "description": "Enabled Logging Type",
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "Type": {
-          "description": "name of the log type",
-          "type": "string",
-          "enum": [
-            "api",
-            "audit",
-            "authenticator",
-            "controllerManager",
-            "scheduler"
-          ]
-        }
-      }
-    },
-    "ResourcesVpcConfig": {
-      "description": "An object representing the VPC configuration to use for an Amazon EKS cluster.",
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "EndpointPublicAccess": {
-          "description": "Set this value to false to disable public access to your cluster's Kubernetes API server endpoint. If you disable public access, your cluster's Kubernetes API server can only receive requests from within the cluster VPC. The default value for this parameter is true, which enables public access for your Kubernetes API server.",
-          "type": "boolean"
+    "EncryptionConfig" : {
+      "description" : "The encryption configuration for the cluster",
+      "type" : "object",
+      "properties" : {
+        "Provider" : {
+          "description" : "The encryption provider for the cluster.",
+          "$ref" : "#/definitions/Provider"
         },
-        "PublicAccessCidrs": {
-          "description": "The CIDR blocks that are allowed access to your cluster's public Kubernetes API server endpoint. Communication to the endpoint from addresses outside of the CIDR blocks that you specify is denied. The default value is 0.0.0.0/0. If you've disabled private endpoint access and you have nodes or AWS Fargate pods in the cluster, then ensure that you specify the necessary CIDR blocks.",
-          "insertionOrder": false,
-          "type": "array",
-          "items": {
-            "minItems": 1,
-            "type": "string"
-          }
-        },
-        "EndpointPrivateAccess": {
-          "description": "Set this value to true to enable private access for your cluster's Kubernetes API server endpoint. If you enable private access, Kubernetes API requests from within your cluster's VPC use the private VPC endpoint. The default value for this parameter is false, which disables private access for your Kubernetes API server. If you disable private access and you have nodes or AWS Fargate pods in the cluster, then ensure that publicAccessCidrs includes the necessary CIDR blocks for communication with the nodes or Fargate pods.",
-          "type": "boolean"
-        },
-        "SecurityGroupIds": {
-          "description": "Specify one or more security groups for the cross-account elastic network interfaces that Amazon EKS creates to use to allow communication between your worker nodes and the Kubernetes control plane. If you don't specify a security group, the default security group for your VPC is used.",
-          "insertionOrder": false,
-          "type": "array",
-          "items": {
-            "minItems": 1,
-            "type": "string"
-          }
-        },
-        "SubnetIds": {
-          "description": "Specify subnets for your Amazon EKS nodes. Amazon EKS creates cross-account elastic network interfaces in these subnets to allow communication between your nodes and the Kubernetes control plane.",
-          "insertionOrder": false,
-          "type": "array",
-          "items": {
-            "minItems": 1,
-            "type": "string"
+        "Resources" : {
+          "description" : "Specifies the resources to be encrypted. The only supported value is \"secrets\".",
+          "type" : "array",
+          "insertionOrder" : false,
+          "items" : {
+            "type" : "string"
           }
         }
       },
-      "required": [
-        "SubnetIds"
-      ]
+      "additionalProperties" : false
     },
-    "ClusterLogging": {
-      "description": "The cluster control plane logging configuration for your cluster. ",
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "EnabledTypes": {
-          "$ref": "#/definitions/EnabledTypes"
+    "ResourcesVpcConfig" : {
+      "description" : "An object representing the VPC configuration to use for an Amazon EKS cluster.",
+      "type" : "object",
+      "additionalProperties" : false,
+      "properties" : {
+        "EndpointPrivateAccess" : {
+          "description" : "Set this value to true to enable private access for your cluster's Kubernetes API server endpoint. If you enable private access, Kubernetes API requests from within your cluster's VPC use the private VPC endpoint. The default value for this parameter is false, which disables private access for your Kubernetes API server. If you disable private access and you have nodes or AWS Fargate pods in the cluster, then ensure that publicAccessCidrs includes the necessary CIDR blocks for communication with the nodes or Fargate pods.",
+          "type" : "boolean"
+        },
+        "EndpointPublicAccess" : {
+          "description" : "Set this value to false to disable public access to your cluster's Kubernetes API server endpoint. If you disable public access, your cluster's Kubernetes API server can only receive requests from within the cluster VPC. The default value for this parameter is true, which enables public access for your Kubernetes API server.",
+          "type" : "boolean"
+        },
+        "PublicAccessCidrs" : {
+          "description" : "The CIDR blocks that are allowed access to your cluster's public Kubernetes API server endpoint. Communication to the endpoint from addresses outside of the CIDR blocks that you specify is denied. The default value is 0.0.0.0/0. If you've disabled private endpoint access and you have nodes or AWS Fargate pods in the cluster, then ensure that you specify the necessary CIDR blocks.",
+          "type" : "array",
+          "insertionOrder" : false,
+          "items" : {
+            "type" : "string",
+            "minItems" : 1
+          }
+        },
+        "SecurityGroupIds" : {
+          "description" : "Specify one or more security groups for the cross-account elastic network interfaces that Amazon EKS creates to use to allow communication between your worker nodes and the Kubernetes control plane. If you don't specify a security group, the default security group for your VPC is used.",
+          "type" : "array",
+          "insertionOrder" : false,
+          "items" : {
+            "type" : "string",
+            "minItems" : 1
+          }
+        },
+        "SubnetIds" : {
+          "description" : "Specify subnets for your Amazon EKS nodes. Amazon EKS creates cross-account elastic network interfaces in these subnets to allow communication between your nodes and the Kubernetes control plane.",
+          "type" : "array",
+          "insertionOrder" : false,
+          "items" : {
+            "type" : "string",
+            "minItems" : 1
+          }
+        }
+      },
+      "required" : [ "SubnetIds" ]
+    },
+    "LoggingTypeConfig" : {
+      "description" : "Enabled Logging Type",
+      "type" : "object",
+      "properties" : {
+        "Type" : {
+          "description" : "name of the log type",
+          "type" : "string",
+          "enum" : [ "api", "audit", "authenticator", "controllerManager", "scheduler" ]
+        }
+      },
+      "additionalProperties" : false
+    },
+    "EnabledTypes" : {
+      "description" : "Enable control plane logs for your cluster, all log types will be disabled if the array is empty",
+      "type" : "array",
+      "insertionOrder" : false,
+      "items" : {
+        "$ref" : "#/definitions/LoggingTypeConfig"
+      }
+    },
+    "ClusterLogging" : {
+      "description" : "The cluster control plane logging configuration for your cluster. ",
+      "type" : "object",
+      "additionalProperties" : false,
+      "properties" : {
+        "EnabledTypes" : {
+          "$ref" : "#/definitions/EnabledTypes"
         }
       }
     },
-    "KubernetesNetworkConfig": {
-      "description": "The Kubernetes network configuration for the cluster.",
-      "additionalProperties": false,
-      "type": "object",
-      "properties": {
-        "ServiceIpv4Cidr": {
-          "description": "The CIDR block to assign Kubernetes service IP addresses from. If you don't specify a block, Kubernetes assigns addresses from either the 10.100.0.0/16 or 172.20.0.0/16 CIDR blocks. We recommend that you specify a block that does not overlap with resources in other networks that are peered or connected to your VPC. ",
-          "type": "string"
-        },
-        "ServiceIpv6Cidr": {
-          "description": "The CIDR block to assign Kubernetes service IP addresses from.",
-          "type": "string"
-        },
-        "IpFamily": {
-          "description": "Ipv4 or Ipv6, Ipv6 is only supported on cluster with k8s version 1.21",
-          "type": "string",
-          "enum": [
-            "ipv4",
-            "ipv6"
-          ]
+    "Logging" : {
+      "description" : "Enable exporting the Kubernetes control plane logs for your cluster to CloudWatch Logs based on log types. By default, cluster control plane logs aren't exported to CloudWatch Logs.",
+      "type" : "object",
+      "additionalProperties" : false,
+      "properties" : {
+        "ClusterLogging" : {
+          "description" : "The cluster control plane logging configuration for your cluster. ",
+          "$ref" : "#/definitions/ClusterLogging"
         }
       }
+    },
+    "KubernetesNetworkConfig" : {
+      "description" : "The Kubernetes network configuration for the cluster.",
+      "additionalProperties" : false,
+      "type" : "object",
+      "properties" : {
+        "ServiceIpv4Cidr" : {
+          "description" : "The CIDR block to assign Kubernetes service IP addresses from. If you don't specify a block, Kubernetes assigns addresses from either the 10.100.0.0/16 or 172.20.0.0/16 CIDR blocks. We recommend that you specify a block that does not overlap with resources in other networks that are peered or connected to your VPC. ",
+          "type" : "string"
+        },
+        "ServiceIpv6Cidr" : {
+          "description" : "The CIDR block to assign Kubernetes service IP addresses from.",
+          "type" : "string"
+        },
+        "IpFamily" : {
+          "description" : "Ipv4 or Ipv6. You can only specify ipv6 for 1.21 and later clusters that use version 1.10.1 or later of the Amazon VPC CNI add-on",
+          "type" : "string",
+          "enum" : [ "ipv4", "ipv6" ]
+        }
+      }
+    },
+    "ControlPlanePlacement" : {
+      "description" : "Specify the placement group of the control plane machines for your cluster.",
+      "type" : "object",
+      "additionalProperties" : false,
+      "properties" : {
+        "GroupName" : {
+          "description" : "Specify the placement group name of the control place machines for your cluster.",
+          "type" : "string"
+        }
+      }
+    },
+    "OutpostConfig" : {
+      "description" : "An object representing the Outpost configuration to use for AWS EKS outpost cluster.",
+      "additionalProperties" : false,
+      "type" : "object",
+      "properties" : {
+        "OutpostArns" : {
+          "description" : "Specify one or more Arn(s) of Outpost(s) on which you would like to create your cluster.",
+          "type" : "array",
+          "insertionOrder" : false,
+          "items" : {
+            "type" : "string",
+            "minItems" : 1
+          }
+        },
+        "ControlPlaneInstanceType" : {
+          "description" : "Specify the Instance type of the machines that should be used to create your cluster.",
+          "type" : "string"
+        },
+        "ControlPlanePlacement" : {
+          "description" : "Specify the placement group of the control plane machines for your cluster.",
+          "$ref" : "#/definitions/ControlPlanePlacement"
+        }
+      },
+      "required" : [ "OutpostArns", "ControlPlaneInstanceType" ]
     }
   },
-  "properties": {
-    "Logging": {
-      "$ref": "#/definitions/Logging"
-    },
-    "EncryptionConfigKeyArn": {
-      "description": "Amazon Resource Name (ARN) or alias of the customer master key (CMK).",
-      "type": "string"
-    },
-    "CertificateAuthorityData": {
-      "description": "The certificate-authority-data for your cluster.",
-      "type": "string"
-    },
-    "EncryptionConfig": {
-      "insertionOrder": false,
-      "type": "array",
-      "items": {
-        "maxItems": 1,
-        "$ref": "#/definitions/EncryptionConfig"
+  "properties" : {
+    "EncryptionConfig" : {
+      "type" : "array",
+      "insertionOrder" : false,
+      "items" : {
+        "$ref" : "#/definitions/EncryptionConfig",
+        "maxItems" : 1
       }
     },
-    "KubernetesNetworkConfig": {
-      "$ref": "#/definitions/KubernetesNetworkConfig"
+    "KubernetesNetworkConfig" : {
+      "$ref" : "#/definitions/KubernetesNetworkConfig"
     },
-    "RoleArn": {
-      "description": "The Amazon Resource Name (ARN) of the IAM role that provides permissions for the Kubernetes control plane to make calls to AWS API operations on your behalf.",
-      "type": "string"
+    "Logging" : {
+      "$ref" : "#/definitions/Logging"
     },
-    "Name": {
-      "minLength": 1,
-      "pattern": "^[0-9A-Za-z][A-Za-z0-9\\-_]*",
-      "description": "The unique name to give to your cluster.",
-      "type": "string",
-      "maxLength": 100
+    "Name" : {
+      "description" : "The unique name to give to your cluster.",
+      "type" : "string",
+      "pattern" : "^[0-9A-Za-z][A-Za-z0-9\\-_]*",
+      "minLength" : 1,
+      "maxLength" : 100
     },
-    "Endpoint": {
-      "description": "The endpoint for your Kubernetes API server, such as https://5E1D0CEXAMPLEA591B746AFC5AB30262.yl4.us-west-2.eks.amazonaws.com.",
-      "type": "string"
+    "Id" : {
+      "description" : "The unique ID given to your cluster.",
+      "type" : "string"
     },
-    "Version": {
-      "pattern": "1\\.\\d\\d",
-      "description": "The desired Kubernetes version for your cluster. If you don't specify a value here, the latest version available in Amazon EKS is used.",
-      "type": "string"
+    "ResourcesVpcConfig" : {
+      "$ref" : "#/definitions/ResourcesVpcConfig"
     },
-    "ClusterSecurityGroupId": {
-      "description": "The cluster security group that was created by Amazon EKS for the cluster. Managed node groups use this security group for control plane to data plane communication.",
-      "type": "string"
+    "OutpostConfig" : {
+      "$ref" : "#/definitions/OutpostConfig"
     },
-    "Arn": {
-      "description": "The ARN of the cluster, such as arn:aws:eks:us-west-2:666666666666:cluster/prod.",
-      "type": "string"
+    "RoleArn" : {
+      "description" : "The Amazon Resource Name (ARN) of the IAM role that provides permissions for the Kubernetes control plane to make calls to AWS API operations on your behalf.",
+      "type" : "string"
     },
-    "ResourcesVpcConfig": {
-      "$ref": "#/definitions/ResourcesVpcConfig"
+    "Version" : {
+      "description" : "The desired Kubernetes version for your cluster. If you don't specify a value here, the latest version available in Amazon EKS is used.",
+      "type" : "string",
+      "pattern" : "1\\.\\d\\d"
     },
-    "Tags": {
-      "uniqueItems": true,
-      "description": "An array of key-value pairs to apply to this resource.",
-      "insertionOrder": false,
-      "type": "array",
-      "items": {
-        "$ref": "#/definitions/Tag"
+    "Tags" : {
+      "description" : "An array of key-value pairs to apply to this resource.",
+      "type" : "array",
+      "uniqueItems" : true,
+      "insertionOrder" : false,
+      "items" : {
+        "$ref" : "#/definitions/Tag"
       }
     },
-    "OpenIdConnectIssuerUrl": {
-      "description": "The issuer URL for the cluster's OIDC identity provider, such as https://oidc.eks.us-west-2.amazonaws.com/id/EXAMPLED539D4633E53DE1B716D3041E. If you need to remove https:// from this output value, you can include the following code in your template.",
-      "type": "string"
+    "Arn" : {
+      "description" : "The ARN of the cluster, such as arn:aws:eks:us-west-2:666666666666:cluster/prod.",
+      "type" : "string"
+    },
+    "Endpoint" : {
+      "description" : "The endpoint for your Kubernetes API server, such as https://5E1D0CEXAMPLEA591B746AFC5AB30262.yl4.us-west-2.eks.amazonaws.com.",
+      "type" : "string"
+    },
+    "CertificateAuthorityData" : {
+      "description" : "The certificate-authority-data for your cluster.",
+      "type" : "string"
+    },
+    "ClusterSecurityGroupId" : {
+      "description" : "The cluster security group that was created by Amazon EKS for the cluster. Managed node groups use this security group for control plane to data plane communication.",
+      "type" : "string"
+    },
+    "EncryptionConfigKeyArn" : {
+      "description" : "Amazon Resource Name (ARN) or alias of the customer master key (CMK).",
+      "type" : "string"
+    },
+    "OpenIdConnectIssuerUrl" : {
+      "description" : "The issuer URL for the cluster's OIDC identity provider, such as https://oidc.eks.us-west-2.amazonaws.com/id/EXAMPLED539D4633E53DE1B716D3041E. If you need to remove https:// from this output value, you can include the following code in your template.",
+      "type" : "string"
+    }
+  },
+  "tagging" : {
+    "taggable" : true,
+    "tagOnCreate" : true,
+    "tagUpdatable" : true,
+    "cloudFormationSystemTags" : true,
+    "tagProperty" : "/properties/Tags"
+  },
+  "additionalProperties" : false,
+  "required" : [ "RoleArn", "ResourcesVpcConfig" ],
+  "primaryIdentifier" : [ "/properties/Name" ],
+  "createOnlyProperties" : [ "/properties/OutpostConfig", "/properties/EncryptionConfig", "/properties/KubernetesNetworkConfig", "/properties/Name", "/properties/RoleArn", "/properties/ResourcesVpcConfig/SubnetIds", "/properties/ResourcesVpcConfig/SecurityGroupIds" ],
+  "readOnlyProperties" : [ "/properties/Id", "/properties/Arn", "/properties/Endpoint", "/properties/CertificateAuthorityData", "/properties/ClusterSecurityGroupId", "/properties/EncryptionConfigKeyArn", "/properties/OpenIdConnectIssuerUrl", "/properties/KubernetesNetworkConfig/ServiceIpv6Cidr" ],
+  "handlers" : {
+    "create" : {
+      "permissions" : [ "eks:CreateCluster", "eks:DescribeCluster", "eks:TagResource", "iam:PassRole", "iam:GetRole", "iam:ListAttachedRolePolicies", "iam:CreateServiceLinkedRole", "iam:CreateInstanceProfile", "iam:TagInstanceProfile", "iam:AddRoleToInstanceProfile", "iam:GetInstanceProfile", "iam:DeleteInstanceProfile", "iam:RemoveRoleFromInstanceProfile", "ec2:DescribeSubnets", "ec2:DescribeVpcs", "kms:DescribeKey", "kms:CreateGrant" ]
+    },
+    "read" : {
+      "permissions" : [ "eks:DescribeCluster" ]
+    },
+    "update" : {
+      "permissions" : [ "iam:PassRole", "eks:UpdateClusterConfig", "eks:UpdateClusterVersion", "eks:DescribeCluster", "eks:DescribeUpdate", "eks:TagResource", "eks:UntagResource" ],
+      "timeoutInMinutes" : 150
+    },
+    "delete" : {
+      "permissions" : [ "eks:DeleteCluster", "eks:DescribeCluster" ]
+    },
+    "list" : {
+      "permissions" : [ "eks:ListClusters" ]
     }
   }
 }
