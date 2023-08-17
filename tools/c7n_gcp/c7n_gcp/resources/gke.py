@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 import re
 
+from c7n_gcp.filters.iampolicy import IamPolicyFilter
 from c7n_gcp.provider import resources
 from c7n_gcp.query import (QueryResourceManager, TypeInfo, ChildTypeInfo,
                            ChildResourceManager)
@@ -137,6 +138,11 @@ class KubernetesClusterNodePool(ChildResourceManager):
         def _get_location(cls, resource):
             "Get the region from the parent - the cluster"
             return super()._get_location(cls.get_parent(resource))
+
+
+@KubernetesClusterNodePool.filter_registry.register('iam-policy')
+class KubernetesClusterNodePoolIamPolicyFilter(IamPolicyFilter):
+    permissions = ('resourcemanager.projects.getIamPolicy',)
 
 
 @KubernetesCluster.action_registry.register('delete')
