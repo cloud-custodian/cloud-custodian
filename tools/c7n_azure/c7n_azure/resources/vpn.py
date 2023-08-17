@@ -76,15 +76,23 @@ class IPSecAlgorithmFilter(ValueFilter):
 
     schema = type_schema('vpn-connections', rinherit=ValueFilter.schema)
     schema_alias = False
+    annotation_key = "c7n:MatchedVPNConnections"
 
     def process(self, resources, event=None):
       client = self.manager.get_client()
       matched = []
       for vpn in resources:
         vpnrg = ResourceIdParser.get_resource_group(vpn['id'])
+        vpnname = ResourceIdParser.get_resource_name(vpn['id'])
         conns = [conns.serialize(True)
                  for conns in client.virtual_network_gateway_connections.list(vpnrg)]
+        connections = set()
         for conn in conns:
-            if self.match(conn):
-              matched.append(conn)
-        return matched
+            if self.match(conn): 
+              conn_vpnname = conn['properties']['virtualNetworkGateway1']['id']
+              if ResourceIdParser.get_resource_name(conn_vpnname) == vpnname:
+                 connections.add(ResourceIdParser.get_resource_name(conn['id']))
+        if connections:
+           vpn[self.annotation_key] = list(connections)
+           matched.append(vpn)
+      return matched
