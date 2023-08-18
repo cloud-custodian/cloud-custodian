@@ -12,6 +12,7 @@ from c7n import query, utils
 from c7n.query import DescribeSource, ConfigSource
 from c7n.tags import Tag, TagDelayedAction, RemoveTag, TagActionFilter
 from c7n.actions import AutoTagUser, AutoscalingBase
+from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter
 import c7n.filters.vpc as net_filters
 
 
@@ -105,6 +106,17 @@ class ECSCluster(query.QueryResourceManager):
         'config': query.ConfigSource
     }
 
+@ECSCluster.filter_registry.register('subnet')
+class ECSSubnetFilter(SubnetFilter):
+
+    RelatedIdsExpression = "taskSets.networkConfiguration.awsvpcConfiguration.subnets[]"
+
+@ECSCluster.filter_registry.register('security-group')
+class ECSSGFilter(SecurityGroupFilter):
+
+    RelatedIdsExpression = "taskSets.networkConfiguration.awsvpcConfiguration.securityGroups[]"
+
+ECSCluster.filter_registry.register('network-location', net_filters.NetworkLocation)
 
 @ECSCluster.filter_registry.register('metrics')
 class ECSMetrics(MetricsFilter):

@@ -665,3 +665,68 @@ class TestEcsContainerInstance(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0].get('c7n:matched-subnets')[0], 'subnet-914763e7')
+
+    def test_network_location_filter(self):
+        factory = self.replay_flight_data("test_ecs_network_location_filter")
+
+        p = self.load_policy(
+            {
+                "name": "test_ecs_network_location_filter",
+                "resource": "ecs",
+                "filters": [
+                    {
+                        "type": "network-location",
+                        "compare": ["resource", "security-group"],
+                        "key": "tag:NetworkLocation",
+                        "match": "equal"
+                    }
+                ]
+            },
+            session_factory=factory
+        )
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        matched = resources.pop()
+        self.assertEqual(
+            matched["Tags"],
+            [
+                {
+                    'Key': 'NetworkLocation',
+                    'Value': 'Customer'
+                }
+            ]
+        )
+
+
+    def test_network_location_filter_subnet(self):
+        factory = self.replay_flight_data("test_ecs_network_location_filter_subnet")
+
+        p = self.load_policy(
+            {
+                "name": "test_ecs_network_location_filter_subnet",
+                "resource": "ecs",
+                "filters": [
+                    {
+                        "type": "network-location",
+                        "compare": ["resource", "subnet"],
+                        "key": "tag:NetworkLocation",
+                        "match": "equal"
+                    }
+                ]
+            },
+            session_factory=factory
+        )
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        matched = resources.pop()
+        self.assertEqual(
+            matched["Tags"],
+            [
+                {
+                    'Key': 'NetworkLocation',
+                    'Value': 'Customer'
+                }
+            ]
+        )
