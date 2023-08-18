@@ -702,14 +702,8 @@ class GlueDataCatalogEncryption(BaseAction):
         updated_config = {**enc_config, **self.data['attributes']}
         if enc_config == updated_config:
             return
-        try:
-            client.put_data_catalog_encryption_settings(
-                DataCatalogEncryptionSettings=updated_config)
-        except Exception as e:
-            self.log.warning(
-                "Exception trying to update encryption on glue catalog: error: %s",
-                e)
-            raise e
+        client.put_data_catalog_encryption_settings(
+            DataCatalogEncryptionSettings=updated_config)
 
 
 @GlueDataCatalog.filter_registry.register('glue-security-config')
