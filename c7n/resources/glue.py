@@ -630,8 +630,7 @@ class GlueCatalogKmsFilter(KmsRelatedFilter):
             'ConnectionPasswordEncryption':
               'DataCatalogEncryptionSettings.ConnectionPasswordEncryption.AwsKmsKeyId'
         }
-        key_type = self.data.get('key-type')
-        self.RelatedIdsExpression = key_type_to_related_ids[key_type]
+        self.RelatedIdsExpression = key_type_to_related_ids.get(self.data.get('key-type'))
 
 
 @GlueDataCatalog.action_registry.register('set-encryption')
@@ -697,6 +696,8 @@ class GlueDataCatalogEncryption(BaseAction):
 
     def process_catalog_encryption(self, client, resources):
         # there is one glue data catalog per account
+        if not 'DataCatalogEncryptionSettings' in resources[0]:
+            resources = self.manager.resources()
         enc_config = resources[0]['DataCatalogEncryptionSettings']
         updated_config = {**enc_config, **self.data['attributes']}
         if enc_config == updated_config:
