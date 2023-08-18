@@ -696,7 +696,7 @@ class GlueDataCatalogEncryption(BaseAction):
 
     def process_catalog_encryption(self, client, resources):
         # there is one glue data catalog per account
-        if not 'DataCatalogEncryptionSettings' in resources[0]:
+        if 'DataCatalogEncryptionSettings' not in resources[0]:
             resources = self.manager.resources()
         enc_config = resources[0]['DataCatalogEncryptionSettings']
         updated_config = {**enc_config, **self.data['attributes']}
