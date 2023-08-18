@@ -12,6 +12,7 @@ from distutils.version import LooseVersion
 import botocore
 from botocore.exceptions import ClientError
 from dateutil.parser import parse
+from datetime import date, timedelta
 from concurrent.futures import as_completed
 
 from c7n.actions import (
@@ -2479,3 +2480,49 @@ class HasSpecificManagedPolicy(SpecificIamProfileManagedPolicy):
                 results.append(r)
 
         return results
+
+
+@filters.register('instance-expiration-tag')
+class ExpirationTag(ValueFilter):
+    """Filter for expired EC2 with tag inspection.
+    *key* is instance tag to check.
+    *value* is maximum lifetime for instance.
+
+    - if instance expiration tag is higher than current date + *value* in days, \
+        instance is considered expired.
+    - if instance expiration tag is missing, instance is considered expired.
+    - if instance expiration tag is lower than current date, instance considered expired.
+    - otherwise, instance is considered valid.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: ec2-state-expired
+            resource: ec2
+            filters:
+              - type: instance-expiration-tag
+                key: Expire
+                value: 90
+    """
+
+    schema = type_schema('instance-expiration-tag', rinherit=ValueFilter.schema)
+    schema_alias = False
+
+    def __call__(self, ec2):
+        matched = False
+        expiration_tag = ''.join(
+            [tag['Value'] for tag in ec2.get('Tags') if tag['Key'] == self.data.get('key')]
+        )
+        if expiration_tag == "":
+            return True
+        ec2_expire_date = date(
+            int(expiration_tag[6:10]), int(expiration_tag[3:5]), int(expiration_tag[0:2])
+        )
+        today = date.today()
+        if today > ec2_expire_date:
+            return True
+        if today + timedelta(int(self.data.get('value', 1))) < ec2_expire_date:
+            return True
+        return matched
