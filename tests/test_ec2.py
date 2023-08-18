@@ -2357,19 +2357,19 @@ class TestEc2HasSpecificManagedPolicyFilter(BaseTest):
         self.assertEqual(len(resources), 1)
 
 
-class TestEc2HasExpirationTagPolicyFilter(BaseTest):
+class TestEc2HasExpirationTag(BaseTest):
 
-    def test_ec2_has_expiration_tag_policy_filter(self):
+    def test_ec2_has_expiration_tag_(self):
         factory = self.replay_flight_data("test_ec2_has_expiration_tag")
         p = self.load_policy(
             {
                 "name": "ec2-instance-age",
                 "resource": "ec2",
                 "filters": [
-                   {"type": "instance-expiration-tag", "days": 2}
+                   {"type": "instance-expiration-tag", "key": "Expire", "value": 90}
                 ],
             },
             session_factory=factory,
         )
         resources = p.run()
-        self.assertEqual(len(resources), 1)
+        self.assertEqual(len(resources), 3)
