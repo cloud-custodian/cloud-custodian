@@ -115,6 +115,7 @@ def build_index(data_dir):
 
 def build(setup_kwargs):
     data_dir = Path("c7n_awscc") / "data"
+    data_dir.mkdir(exists_ok=True)
 
     with urlopen(SCHEMA_URL) as response:
         zipf = zipfile.ZipFile(BytesIO(response.read()))
