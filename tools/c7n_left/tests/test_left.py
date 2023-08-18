@@ -50,7 +50,7 @@ class ResultsReporter:
 def run_policy(policy, terraform_dir, tmp_path):
     (tmp_path / "policies.json").write_text(json.dumps({"policies": [policy]}, indent=2))
     config = Config.empty(
-        policy_dir=tmp_path, source_dir=terraform_dir, exec_filter=None, var_file=""
+        policy_dir=tmp_path, source_dir=terraform_dir, exec_filter=None, var_file=()
     )
     policies = utils.load_policies(tmp_path, config)
     reporter = ResultsReporter()
@@ -296,7 +296,7 @@ resource "aws_alb" "positive1" {
         )
     )
 
-    graph = TerraformProvider().parse(tmp_path / "tf", "vars.tf")
+    graph = TerraformProvider().parse(tmp_path / "tf", ("vars.tf",))
     resources = list(graph.get_resources_by_type("aws_alb"))
     assert resources[0][1][0]['load_balancer_type'] == 'network'
 
