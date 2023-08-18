@@ -12,6 +12,7 @@ from distutils.version import LooseVersion
 import botocore
 from botocore.exceptions import ClientError
 from dateutil.parser import parse
+from datetime import date, timedelta
 from concurrent.futures import as_completed
 
 from c7n.actions import (
@@ -59,7 +60,7 @@ class DescribeEC2(query.DescribeSource):
         # tags can't be trusted in ec2 instances immediately post creation.
         if not resources or self.manager.data.get(
                 'mode', {}).get('type', '') in (
-                    'cloudtrail', 'ec2-instance-state'):
+                'cloudtrail', 'ec2-instance-state'):
             return resources
 
         # AWOL detector, so we don't make extraneous api calls.
@@ -96,7 +97,6 @@ class DescribeEC2(query.DescribeSource):
 
 @resources.register('ec2')
 class EC2(query.QueryResourceManager):
-
     class resource_type(query.TypeInfo):
         service = 'ec2'
         arn_type = 'instance'
@@ -160,19 +160,16 @@ class EC2(query.QueryResourceManager):
 
 @filters.register('security-group')
 class SecurityGroupFilter(net_filters.SecurityGroupFilter):
-
     RelatedIdsExpression = "SecurityGroups[].GroupId"
 
 
 @filters.register('subnet')
 class SubnetFilter(net_filters.SubnetFilter):
-
     RelatedIdsExpression = "NetworkInterfaces[].SubnetId"
 
 
 @filters.register('vpc')
 class VpcFilter(net_filters.VpcFilter):
-
     RelatedIdsExpression = "VpcId"
 
 
@@ -192,7 +189,7 @@ class ComputePermissions(CheckPermissions):
                 [p[0] for p in profile_arns],
                 self.manager.get_resource_manager(
                     'iam-profile').get_resources(
-                        [p[0].split('/', 1)[-1] for p in profile_arns]))}
+                    [p[0].split('/', 1)[-1] for p in profile_arns]))}
         return [
             profile_role_map.get(r.get('IamInstanceProfile', {}).get('Arn'))
             for r in resources]
@@ -473,7 +470,6 @@ class ImageAge(AgeFilter, InstanceImageBase):
 
 @filters.register('image')
 class InstanceImage(ValueFilter, InstanceImageBase):
-
     schema = type_schema('image', rinherit=ValueFilter.schema)
     schema_alias = False
 
@@ -566,7 +562,6 @@ class InstanceOffHour(OffHour):
 
 @filters.register('network-location')
 class EC2NetworkLocation(net_filters.NetworkLocation):
-
     valid_origin_states = ('pending', 'running', 'shutting-down', 'stopping',
                            'stopped')
 
@@ -682,7 +677,6 @@ class EphemeralInstanceFilter(Filter):
 
 @filters.register('instance-uptime')
 class UpTimeFilter(AgeFilter):
-
     date_attribute = "LaunchTime"
 
     schema = type_schema(
@@ -881,8 +875,8 @@ class SingletonFilter(Filter):
         for i in alarms['MetricAlarms']:
             for a in i['AlarmActions']:
                 if (
-                    a.startswith('arn:aws:automate:') and
-                    a.endswith(':ec2:recover')
+                        a.startswith('arn:aws:automate:') and
+                        a.endswith(':ec2:recover')
                 ):
                     return True
 
@@ -935,7 +929,7 @@ class SsmStatus(ValueFilter):
             info['InstanceId']: info for info in
             client.describe_instance_information(
                 Filters=[{'Key': 'InstanceIds', 'Values': instance_ids}]).get(
-                    'InstanceInformationList', [])}
+                'InstanceInformationList', [])}
         for r in resources:
             r[self.annotation] = info_map.get(r['InstanceId'], {})
 
@@ -980,9 +974,9 @@ class SsmCompliance(Filter):
            'severity': {'type': 'array', 'items': {'type': 'string'}},
            'op': {'enum': ['or', 'and']},
            'eval_filters': {'type': 'array', 'items': {
-                            'oneOf': [
-                                {'$ref': '#/definitions/filters/valuekv'},
-                                {'$ref': '#/definitions/filters/value'}]}},
+               'oneOf': [
+                   {'$ref': '#/definitions/filters/valuekv'},
+                   {'$ref': '#/definitions/filters/value'}]}},
            'states': {'type': 'array',
                       'default': ['NON_COMPLIANT'],
                       'items': {
@@ -1072,7 +1066,7 @@ class MonitorInstances(BaseAction):
      https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-cloudwatch-new.html
     """
     schema = type_schema('set-monitoring',
-        **{'state': {'enum': ['enable', 'disable']}})
+                         **{'state': {'enum': ['enable', 'disable']}})
     permissions = ('ec2:MonitorInstances', 'ec2:UnmonitorInstances')
 
     def process(self, resources, event=None):
@@ -1199,7 +1193,6 @@ class SetMetadataServerAccess(BaseAction):
 
 @EC2.action_registry.register("post-finding")
 class InstanceFinding(PostFinding):
-
     resource_type = 'AwsEc2Instance'
 
     def format_resource(self, r):
@@ -1526,8 +1519,8 @@ class Stop(BaseAction):
                 if e.response['Error']['Code'] == 'IncorrectInstanceState':
                     instance_ids.remove(extract_instance_id(e))
                 if (
-                    e.response['Error']['Code'] == 'OperationNotPermitted' and
-                    self.data.get('force')
+                        e.response['Error']['Code'] == 'OperationNotPermitted' and
+                        self.data.get('force')
                 ):
                     self.log.info("Disabling stop and termination protection on instances")
                     self.disable_protection(
@@ -2015,7 +2008,7 @@ class PropagateSpotTags(BaseAction):
             Filters=[{
                 'Name': 'spot-instance-request-id',
                 'Values': list(request_instance_map.keys())}]).get(
-                    'SpotInstanceRequests', [])
+            'SpotInstanceRequests', [])
 
         updated = []
         for r in requests:
@@ -2206,7 +2199,6 @@ class InstanceAttribute(ValueFilter):
 
 @resources.register('launch-template-version')
 class LaunchTemplate(query.QueryResourceManager):
-
     class resource_type(query.TypeInfo):
         id = 'LaunchTemplateId'
         id_prefix = 'lt-'
@@ -2228,7 +2220,7 @@ class LaunchTemplate(query.QueryResourceManager):
             template_versions.extend(
                 client.describe_launch_template_versions(
                     LaunchTemplateId=r['LaunchTemplateId']).get(
-                        'LaunchTemplateVersions', ()))
+                    'LaunchTemplateVersions', ()))
         return template_versions
 
     def get_resources(self, rids, cache=True):
@@ -2254,7 +2246,7 @@ class LaunchTemplate(query.QueryResourceManager):
             for tinfo in rids:
                 t_versions.setdefault(
                     tinfo['LaunchTemplateId'], []).append(
-                        tinfo.get('VersionNumber', tinfo.get('LatestVersionNumber')))
+                    tinfo.get('VersionNumber', tinfo.get('LatestVersionNumber')))
         elif isinstance(rids[0], str):
             for tid in rids:
                 t_versions[tid] = []
@@ -2267,7 +2259,7 @@ class LaunchTemplate(query.QueryResourceManager):
             try:
                 ltv = client.describe_launch_template_versions(
                     LaunchTemplateId=tid, Versions=tversions).get(
-                        'LaunchTemplateVersions')
+                    'LaunchTemplateVersions')
             except ClientError as e:
                 if e.response['Error']['Code'] == "InvalidLaunchTemplateId.NotFound":
                     continue
@@ -2301,7 +2293,6 @@ class LaunchTemplate(query.QueryResourceManager):
 
 @resources.register('ec2-reserved')
 class ReservedInstance(query.QueryResourceManager):
-
     class resource_type(query.TypeInfo):
         service = 'ec2'
         name = id = 'ReservedInstancesId'
@@ -2479,3 +2470,45 @@ class HasSpecificManagedPolicy(SpecificIamProfileManagedPolicy):
                 results.append(r)
 
         return results
+
+
+@EC2.filter_registry.register('instance-expiration-tag')
+class HasExpirationTagDate(AgeFilter):
+    """Age an instance has been in the given state.
+
+      .. code-block:: yaml
+
+          policies:
+            - name: ec2-state-running-90-days
+              resource: ec2
+              filters:
+                - type: has-expiration-tag-date
+                  op: ge
+                  days: 90
+      """
+    RE_PARSE_AGE = re.compile(r"\(.*?\)")
+
+    # this filter doesn't use date_attribute, but needs to define it
+    # to pass AgeFilter's validate method
+    date_attribute = "dummy"
+
+    schema = type_schema(
+        'state-age',
+        op={'$ref': '#/definitions/filters_common/comparison_operators'},
+        days={'type': 'number'})
+
+    def get_resource_date(self, i):
+        v = i.get('StateTransitionReason')
+        expiration_tag = ''.join([tag['Value'] for tag in i.get('Tags') if tag['Key'] == 'Expire'])
+        if expiration_tag == "":
+            return None
+        date_expire = date(int(expiration_tag[0:4]),
+                           int(expiration_tag[4:6]),
+                           int(expiration_tag[6:8]))
+
+        if date_expire > (date.today() + timedelta(91)):
+            return True
+        if date.today() + timedelta(self.data.get('days', 1)) > date_expire:
+            return None
+        else:
+            return True

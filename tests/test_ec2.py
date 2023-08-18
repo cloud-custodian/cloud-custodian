@@ -8,7 +8,6 @@ import time
 import datetime
 from dateutil import tz
 
-
 from c7n.testing import mock_datetime_now
 from c7n.exceptions import PolicyValidationError, ClientError
 from c7n.resources import ec2
@@ -19,6 +18,7 @@ from .common import BaseTest
 
 import pytest
 from pytest_terraform import terraform
+
 
 # this one doesn't work as a functional test as it enables stop protection, which prevents
 # the terraform teardown, we would need to also remove the stop protection in the test.
@@ -252,10 +252,10 @@ class TestSetMetadata(BaseTest):
             'name': 'ec2-imds-access',
             'resource': 'aws.ec2',
             'filters': [{
-                    'type': 'value',
-                    'key': 'InstanceId',
-                    'value': 'i-0d4526dcaa95692db',
-                    'op': 'eq'}],
+                'type': 'value',
+                'key': 'InstanceId',
+                'value': 'i-0d4526dcaa95692db',
+                'op': 'eq'}],
             'actions': [
                 {'type': 'set-metadata-access',
                  'tokens': 'required',
@@ -269,12 +269,12 @@ class TestSetMetadata(BaseTest):
             InstanceIds=[r['InstanceId'] for r in resources])
         self.assertJmes('[0].MetadataOptions.InstanceMetadataTags', resources, 'disabled')
         self.assertJmes('Reservations[].Instances[].MetadataOptions', results,
-            [{'State': 'applied',
-              'HttpTokens': 'required',
-              'HttpEndpoint': 'enabled',
-              'HttpPutResponseHopLimit': 1,
-              'HttpProtocolIpv6': 'disabled',
-              'InstanceMetadataTags': 'enabled'}])
+                        [{'State': 'applied',
+                          'HttpTokens': 'required',
+                          'HttpEndpoint': 'enabled',
+                          'HttpPutResponseHopLimit': 1,
+                          'HttpProtocolIpv6': 'disabled',
+                          'InstanceMetadataTags': 'enabled'}])
         self.assertEqual(len(resources), 1)
 
 
@@ -1249,7 +1249,7 @@ class TestStart(BaseTest):
         client.start_instances.side_effect = ClientError(
             {'Error': {
                 'Code': 'IncorrectInstanceState',
-                'Message': "The instance 'i-08270b9cfb568a1c4' is not in a state from which it can be started" # NOQA
+                'Message': "The instance 'i-08270b9cfb568a1c4' is not in a state from which it can be started"  # NOQA
             }}, 'StartInstances')
 
         start_action = policy.resource_manager.actions[0]
@@ -1477,7 +1477,7 @@ class TestSetInstanceProfile(BaseTest):
             ).get('IamInstanceProfileAssociations', ())}
         self.assertEqual(
             associations,
-            {resources[0]['InstanceId']: 'arn:aws:iam::644160558196:instance-profile/aws-opsworks-ec2-role'}) # noqa
+            {resources[0]['InstanceId']: 'arn:aws:iam::644160558196:instance-profile/aws-opsworks-ec2-role'})  # noqa
 
     def test_ec2_set_instance_profile_existing(self):
         factory = self.replay_flight_data(
@@ -1498,7 +1498,7 @@ class TestSetInstanceProfile(BaseTest):
             for i in resources}
         self.assertEqual(
             previous_associations,
-            {u'i-01b7ee380879d3fd8': u'arn:aws:iam::644160558196:instance-profile/CloudCustodianRole', # noqa
+            {u'i-01b7ee380879d3fd8': u'arn:aws:iam::644160558196:instance-profile/CloudCustodianRole',  # noqa
              u'i-06305b4b9f5e3f8b8': u'arn:aws:iam::644160558196:instance-profile/ecsInstanceRole',
              u'i-0aef5d5ffb60c8615': None})
 
@@ -1779,7 +1779,6 @@ class TestOnHoursFilter(BaseTest):
 class TestActions(unittest.TestCase):
 
     def test_action_construction(self):
-
         self.assertIsInstance(actions.factory("mark", None), tags.Tag)
 
         self.assertIsInstance(actions.factory("stop", None), ec2.Stop)
@@ -2053,8 +2052,8 @@ class TestModifySecurityGroupAction(BaseTest):
             "actions": [
                 {"type": "modify-security-groups",
                  "add-by-tag": {
-                      "key": "environment",
-                      "values": ["production"]}}]},
+                     "key": "environment",
+                     "values": ["production"]}}]},
             session_factory=session_factory, config={'region': 'us-west-2'}
         )
         resources = policy.run()
@@ -2065,6 +2064,7 @@ class TestModifySecurityGroupAction(BaseTest):
                 "Reservations[].Instances[].SecurityGroups[].GroupId",
                 client.describe_instances(InstanceIds=["i-08797f38d2e80c9d0"])),
             ['sg-0cba7a01d343d5c65', 'sg-02e14ba7dd2dbe44b', 'sg-0e630ac9094eff5c5'])
+
 
 class TestAutoRecoverAlarmAction(BaseTest):
 
@@ -2351,6 +2351,24 @@ class TestEc2HasSpecificManagedPolicyFilter(BaseTest):
                 ],
             },
             config={"region": "us-west-2"},
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+
+class TestEc2HasExpirationTagPolicyFilter(BaseTest):
+
+    def test_ec2_has_expiration_tag_policy_filter(self):
+        factory = self.replay_flight_data("test_ec2_has_expiration_tag")
+        p = self.load_policy(
+            {
+                "name": "ec2-instance-age",
+                "resource": "ec2",
+                "filters": [
+                   {"type": "instance-expiration-tag", "days": 2}
+                ],
+            },
             session_factory=factory,
         )
         resources = p.run()
