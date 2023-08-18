@@ -1,6 +1,6 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
-
+import importlib
 from urllib import parse as urlparse
 
 
@@ -17,3 +17,7 @@ def join_output(output_dir, suffix):
         path=output_url_parts.path.rstrip("/") + "/%s" % suffix
     )
     return urlparse.urlunparse(output_url_parts)
+
+
+def spec_version():
+    return importlib.metadata.version("c7n_oci")
