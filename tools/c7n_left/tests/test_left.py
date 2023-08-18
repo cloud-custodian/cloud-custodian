@@ -50,7 +50,7 @@ class ResultsReporter:
 def run_policy(policy, terraform_dir, tmp_path):
     (tmp_path / "policies.json").write_text(json.dumps({"policies": [policy]}, indent=2))
     config = Config.empty(
-        policy_dir=tmp_path, source_dir=terraform_dir, exec_filter=None, var_file=()
+        policy_dir=tmp_path, source_dir=terraform_dir, exec_filter=None, var_files=()
     )
     policies = utils.load_policies(tmp_path, config)
     reporter = ResultsReporter()
@@ -259,13 +259,9 @@ def test_provider_parse():
     }
 
 
-def test_var_file(tmp_path):
+@pytest.fixture
+def var_tf_setup(tmp_path):
     (tmp_path / "tf").mkdir()
-    (tmp_path / "tf" / "vars.tf").write_text(
-        """
-        balancer_type = "network"
-        """
-    )
     (tmp_path / "tf" / "main.tf").write_text(
         """
 variable balancer_type {
@@ -282,6 +278,24 @@ resource "aws_alb" "positive1" {
         """
     )
 
+
+def xtest_graph_var_env(test, tmp_path, var_tf_setup):
+    test.change_environment(TF_VAR_BALANCER_TYPE="application")
+    graph = TerraformProvider().parse(tmp_path / "tf")
+    resources = list(graph.get_resources_by_type("aws_alb"))
+    assert resources[0][1][0]['load_balancer_type'] == 'network'
+
+
+def test_graph_var_file(tmp_path, var_tf_setup):
+    # note var files currently have be to be under root module.
+    (tmp_path / "tf" / "vars.tf").write_text('balancer_type = "network"')
+    graph = TerraformProvider().parse(tmp_path / "tf", ("vars.tf",))
+    resources = list(graph.get_resources_by_type("aws_alb"))
+    assert resources[0][1][0]['load_balancer_type'] == 'network'
+
+
+def test_cli_var_file(tmp_path, var_tf_setup):
+    (tmp_path / "tf" / "vars.tf").write_text('balancer_type = "network"')
     (tmp_path / "policy.json").write_text(
         json.dumps(
             {
@@ -295,10 +309,27 @@ resource "aws_alb" "positive1" {
             }
         )
     )
-
-    graph = TerraformProvider().parse(tmp_path / "tf", ("vars.tf",))
-    resources = list(graph.get_resources_by_type("aws_alb"))
-    assert resources[0][1][0]['load_balancer_type'] == 'network'
+    runner = CliRunner()
+    result = runner.invoke(
+        cli.cli,
+        [
+            "run",
+            "-p",
+            str(tmp_path),
+            "-d",
+            str(tmp_path / "tf"),
+            "-o",
+            "json",
+            "--var-file",
+            "vars.tf",
+            "--output-file",
+            str(tmp_path / "output.json"),
+        ],
+        catch_exceptions=False,
+    )
+    assert result.exit_code == 1
+    data = json.loads((tmp_path / "output.json").read_text())
+    assert len(data["results"]) == 1
 
 
 def test_multi_resource_list_policy(tmp_path):

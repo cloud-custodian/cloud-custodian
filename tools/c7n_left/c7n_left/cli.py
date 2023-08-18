@@ -50,11 +50,12 @@ def run(
         policy_dir=Path(policy_dir),
         output=output,
         output_file=output_file,
-        var_file=var_file,
+        var_files=var_file,
         output_query=output_query,
         summary=summary,
         filters=filters,
     )
+
     exec_filter = ExecutionFilter.parse(config)
     config["exec_filter"] = exec_filter
     policies = exec_filter.filter_policies(load_policies(policy_dir, config))
@@ -79,7 +80,7 @@ def test(policy_dir, filters):
         policy_dir=policy_dir,
         output_file=sys.stdout,
         filters=filters,
-        var_file=(),
+        var_files=(),
     )
 
     reporter = TestReporter(None, config)
