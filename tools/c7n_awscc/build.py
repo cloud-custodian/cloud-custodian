@@ -96,7 +96,7 @@ def build_index(data_dir):
         else:
             boto_service = service
         if not boto_service:
-            print("service not found %s %s" % (rdata["typeName"], service))
+            print("awscc - service not found %s %s" % (rdata["typeName"], service))
             continue
 
         raugment = index_data["augment"].setdefault(rdata["typeName"], {})
@@ -115,7 +115,7 @@ def build_index(data_dir):
 
 def build(setup_kwargs):
     data_dir = Path("c7n_awscc") / "data"
-    data_dir.mkdir(exists_ok=True)
+    data_dir.mkdir(exist_ok=True)
 
     with urlopen(SCHEMA_URL) as response:
         zipf = zipfile.ZipFile(BytesIO(response.read()))
@@ -123,7 +123,7 @@ def build(setup_kwargs):
             name = f.replace("-", "_")
             (data_dir / name).write_bytes(zipf.read(f))
 
-    print("downloaded %d resource types" % (len(zipf.namelist())))
+    print("awscc - downloaded %d resource types" % (len(zipf.namelist())))
     build_index(data_dir)
 
     return setup_kwargs
