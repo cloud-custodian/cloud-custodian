@@ -9,9 +9,7 @@ from jmespath import search
 @click.command()
 @click.option("--output", type=click.File("w"), default="-")
 def main(output):
-    raw_output = subprocess.getoutput(
-        " ".join(["terraform", "providers", "schema", "-json"])
-    )
+    raw_output = subprocess.getoutput(" ".join(["terraform", "providers", "schema", "-json"]))
     schemas = json.loads(raw_output)
 
     taggable = {}
