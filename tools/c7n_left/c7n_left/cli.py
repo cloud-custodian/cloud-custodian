@@ -27,13 +27,29 @@ def cli():
 
 @cli.command()
 @click.option("--format", default="terraform")
-@click.option("--filters", help="filter policies or resources as k=v pairs with globbing")
-@click.option("-p", "--policy-dir", type=click.Path())
-@click.option("-d", "--directory", type=click.Path())
-@click.option("-o", "--output", default="cli", type=click.Choice(report_outputs.keys()))
-@click.option("--output-file", type=click.File("w"), default="-")
-@click.option("--var-file", type=click.Path(exists=True, dir_okay=False), default=(), multiple=True)
-@click.option("--output-query", default=None)
+@click.option("--filters", help="Filter policies or resources as k=v pairs with globbing")
+@click.option("-p", "--policy-dir", type=click.Path(), help="Directory with policies")
+@click.option("-d", "--directory", type=click.Path(), help="IaC directory to evaluate")
+@click.option(
+    "-o",
+    "--output",
+    default="cli",
+    help="Output format (default cli)",
+    type=click.Choice(report_outputs.keys()),
+)
+@click.option(
+    "--output-file", help="Output file (default stdout)", type=click.File("w"), default="-"
+)
+@click.option(
+    "--var-file",
+    help="Load variables from the given file, can be used more than once",
+    type=click.Path(exists=True, dir_okay=False),
+    default=(),
+    multiple=True,
+)
+@click.option(
+    "--output-query", default=None, help="Use a jmespath expression to filter json output"
+)
 @click.option("--summary", default="policy", type=click.Choice(summary_options.keys()))
 def run(
     format, policy_dir, directory, output, output_file, var_file, output_query, summary, filters
