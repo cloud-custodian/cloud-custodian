@@ -369,6 +369,52 @@ def test_cli_var_file(tmp_path, var_tf_setup, debug_cli_runner):
     assert len(data["results"]) == 1
 
 
+def test_multi_provider_resource_glob_policy(tmp_path, debug_cli_runner):
+    (tmp_path / "policy.yaml").write_text(
+        """
+        policies:
+          - name: check-multi-provider
+            resource: "terraform.*"
+        """
+    )
+    (tmp_path / "tf").mkdir()
+    (tmp_path / "tf" / "main.tf").write_text(
+        """
+resource "azurerm_resource_group" "example" {
+  name     = "example-resources"
+  location = "West Europe"
+}
+
+resource "aws_cloudwatch_log_group" "yada" {
+  name = "Yada"
+}
+
+resource "google_storage_bucket" "static-site" {
+  name     = "image-store.com"
+  location = "EU"
+}        """
+    )
+
+    result = debug_cli_runner.invoke(
+        cli.cli,
+        [
+            "run",
+            "-p",
+            str(tmp_path),
+            "-d",
+            str(tmp_path / "tf"),
+            "-o",
+            "json",
+            "--output-file",
+            str(tmp_path / "output.json"),
+        ],
+        catch_exceptions=False,
+    )
+    assert result.exit_code == 1
+    data = json.loads((tmp_path / "output.json").read_text())
+    assert len(data["results"]) == 3
+
+
 def test_multi_resource_list_policy(tmp_path):
     (tmp_path / "policy.json").write_text(
         json.dumps(
