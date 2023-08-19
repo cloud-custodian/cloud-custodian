@@ -279,23 +279,61 @@ resource "aws_alb" "positive1" {
     )
 
 
-def xtest_graph_var_env(test, tmp_path, var_tf_setup):
-    test.change_environment(TF_VAR_BALANCER_TYPE="application")
+#
+# we can't test env vars, as they need to be set before
+# we import tfparse. manually verified they work as expected.
+#
+# def xtest_graph_var_env(test, tmp_path, var_tf_setup):
+#    os.putenv("TF_VAR_balancer_type", "network")
+#    graph = TerraformProvider().parse(tmp_path / "tf")
+#    resources = list(graph.get_resources_by_type("aws_alb"))
+#    assert resources[0][1][0]['load_balancer_type'] == 'network'
+
+
+def test_graph_non_root_var_file(tmp_path, var_tf_setup):
+    (tmp_path / "vars.tfvars").write_text('balancer_type = "network"')
+    graph = TerraformProvider().parse(tmp_path / "tf", (tmp_path / "vars.tfvars",))
+    resources = list(graph.get_resources_by_type("aws_alb"))
+    assert resources[0][1][0]['load_balancer_type'] == 'network'
+
+
+def test_graph_var_auto_default_json(tmp_path, var_tf_setup):
+    (tmp_path / "tf" / "terraform.tfvars.json").write_text(json.dumps({'balancer_type': 'network'}))
     graph = TerraformProvider().parse(tmp_path / "tf")
     resources = list(graph.get_resources_by_type("aws_alb"))
     assert resources[0][1][0]['load_balancer_type'] == 'network'
 
 
-def test_graph_var_file(tmp_path, var_tf_setup):
-    # note var files currently have be to be under root module.
-    (tmp_path / "tf" / "vars.tf").write_text('balancer_type = "network"')
-    graph = TerraformProvider().parse(tmp_path / "tf", ("vars.tf",))
+def test_graph_var_auto_default(tmp_path, var_tf_setup):
+    (tmp_path / "tf" / "terraform.tfvars").write_text('balancer_type = "network"')
+    graph = TerraformProvider().parse(tmp_path / "tf")
     resources = list(graph.get_resources_by_type("aws_alb"))
     assert resources[0][1][0]['load_balancer_type'] == 'network'
 
 
-def test_cli_var_file(tmp_path, var_tf_setup):
-    (tmp_path / "tf" / "vars.tf").write_text('balancer_type = "network"')
+def test_graph_var_auto(tmp_path, var_tf_setup):
+    (tmp_path / "tf" / "vars.auto.tfvars").write_text('balancer_type = "network"')
+    graph = TerraformProvider().parse(tmp_path / "tf")
+    resources = list(graph.get_resources_by_type("aws_alb"))
+    assert resources[0][1][0]['load_balancer_type'] == 'network'
+
+
+def test_graph_var_file_abs(tmp_path, var_tf_setup):
+    (tmp_path / "tf" / "vars.tfvars").write_text('balancer_type = "network"')
+    graph = TerraformProvider().parse(tmp_path / "tf", (tmp_path / "tf" / "vars.tfvars",))
+    resources = list(graph.get_resources_by_type("aws_alb"))
+    assert resources[0][1][0]['load_balancer_type'] == 'network'
+
+
+def test_graph_var_file(tmp_path, var_tf_setup):
+    (tmp_path / "tf" / "vars.tfvars").write_text('balancer_type = "network"')
+    graph = TerraformProvider().parse(tmp_path / "tf", ("vars.tfvars",))
+    resources = list(graph.get_resources_by_type("aws_alb"))
+    assert resources[0][1][0]['load_balancer_type'] == 'network'
+
+
+def test_cli_var_file(tmp_path, var_tf_setup, debug_cli_runner):
+    (tmp_path / "tf" / "vars.tfvars").write_text('balancer_type = "network"')
     (tmp_path / "policy.json").write_text(
         json.dumps(
             {
@@ -309,8 +347,7 @@ def test_cli_var_file(tmp_path, var_tf_setup):
             }
         )
     )
-    runner = CliRunner()
-    result = runner.invoke(
+    result = debug_cli_runner.invoke(
         cli.cli,
         [
             "run",
@@ -321,7 +358,7 @@ def test_cli_var_file(tmp_path, var_tf_setup):
             "-o",
             "json",
             "--var-file",
-            "vars.tf",
+            tmp_path / "tf" / "vars.tfvars",
             "--output-file",
             str(tmp_path / "output.json"),
         ],

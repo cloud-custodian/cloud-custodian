@@ -32,7 +32,7 @@ def cli():
 @click.option("-d", "--directory", type=click.Path())
 @click.option("-o", "--output", default="cli", type=click.Choice(report_outputs.keys()))
 @click.option("--output-file", type=click.File("w"), default="-")
-@click.option("--var-file", type=click.Path(), default=(), multiple=True)
+@click.option("--var-file", type=click.Path(exists=True, dir_okay=False), default=(), multiple=True)
 @click.option("--output-query", default=None)
 @click.option("--summary", default="policy", type=click.Choice(summary_options.keys()))
 def run(
