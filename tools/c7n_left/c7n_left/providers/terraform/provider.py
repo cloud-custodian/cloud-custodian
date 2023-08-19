@@ -70,7 +70,7 @@ class TerraformProvider(IACSourceProvider):
         - pickup auto.tfvars
 
         note TF_VAR_ environment variables are handled by tfparse.
-        
+
         https://developer.hashicorp.com/terraform/language/values/variables#assigning-values-to-root-module-variables
         precedence
         https://www.ntweekly.com/2023/03/15/terraform-variables-precedence-and-order/
