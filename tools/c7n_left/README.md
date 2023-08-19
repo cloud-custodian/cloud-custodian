@@ -38,7 +38,6 @@ cosign verify $IMAGE \
 
 ```shell
 ❯ c7n-left run --help
-
 Usage: c7n-left run [OPTIONS]
 
   evaluate policies against IaC sources.
@@ -49,13 +48,16 @@ Usage: c7n-left run [OPTIONS]
 
 Options:
   --format TEXT
-  --filters TEXT                  filter policies or resources as k=v pairs
+  --filters TEXT                  Filter policies or resources as k=v pairs
                                   with globbing
-  -p, --policy-dir PATH
-  -d, --directory PATH
-  -o, --output [cli|github|json]
-  --output-file FILENAME
-  --output-query TEXT
+  -p, --policy-dir PATH           Directory with policies
+  -d, --directory PATH            IaC directory to evaluate
+  -o, --output [cli|github|json]  Output format (default cli)
+  --output-file FILENAME          Output file (default stdout)
+  --var-file FILE                 Load variables from the given file, can be
+                                  used more than once
+  --output-query TEXT             Use a jmespath expression to filter json
+                                  output
   --summary [policy|resource]
   --help                          Show this message and exit.
 ```
