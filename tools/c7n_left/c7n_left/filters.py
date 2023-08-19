@@ -2,6 +2,8 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 import itertools
+import json
+from pathlib import Path
 
 from c7n.filters import Filter, ValueFilter, OPERATORS
 from c7n.utils import type_schema
@@ -67,7 +69,7 @@ class Traverse(Filter):
             },
         },
         required=("resources",),
-        **{"count-op": {"$ref": "#/definitions/filters_common/comparison_operators"}}
+        **{"count-op": {"$ref": "#/definitions/filters_common/comparison_operators"}},
     )
 
     _vfilters = None
@@ -138,3 +140,42 @@ class Traverse(Filter):
 
     def resolve_refs(self, target_type, working_set, graph):
         return itertools.chain(*[graph.get_refs(w, target_type) for w in working_set])
+
+
+TAGGABLE_DATA_PATH = Path(__file__).parent / "data" / "taggable.json"
+
+
+class Taggable(Filter):
+    """Filter out resource types that are not taggable."""
+
+    _taggable = None
+
+    @classmethod
+    def get_tag_data(cls):
+        if cls._taggable:
+            return cls._taggable
+        with open(TAGGABLE_DATA_PATH) as fh:
+            taggable = json.load(fh)
+            for k, v in list(taggable.items()):
+                taggable[k] = set(v)
+            cls._taggable = taggable
+        return cls._taggable
+
+    def process(self, resources, event=None):
+        if self.manager.data['mode']['type'] != 'terraform-source':
+            return resources
+        results = []
+        tag_data = self.get_tag_data()
+        unknown_provider = set()
+        for r in resources:
+            tf_type = r['__tfmeta']['label']
+            provider, _ = tf_type.split('_', 1)
+            if provider not in tag_data:
+                unknown_provider.add(provider)
+                continue
+            if tf_type not in tag_data[provider]:
+                continue
+            results.append(r)
+        if unknown_provider:
+            self.log.warning(f'{unknown_provider} are not supported by taggable filter')
+        return results
