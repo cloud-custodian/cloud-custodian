@@ -3,6 +3,7 @@
 #
 import json
 import os
+import subprocess
 from unittest.mock import ANY
 
 import pytest
@@ -18,6 +19,7 @@ try:
     from c7n_left.providers.terraform.provider import (
         TerraformProvider,
         TerraformResourceManager,
+        extract_mod_stack,
     )
     from c7n_left.providers.terraform.graph import Resolver
 
@@ -97,6 +99,58 @@ def test_load_policy_dir(tmp_path):
     write_output_test_policy(tmp_path)
     policies = utils.load_policies(tmp_path, Config.empty())
     assert len(policies) == 1
+
+
+def test_extract_mod_stack():
+    stack = extract_mod_stack("module.db.module.db_instance.aws_db_instance.this[0]")
+    assert stack == [
+        "module.db",
+        "module.db.module.db_instance",
+        "module.db.module.db_instance.aws_db_instance.this[0]",
+    ]
+
+
+@pytest.mark.skipif(
+    os.environ.get('GITHUB_ACTIONS') is None,
+    reason="runs in github actions as it requires network access for tf init",
+)
+def test_mod_reference(tmp_path):
+    (tmp_path / "main.tf").write_text(
+        """
+module "db" {
+  source  = "terraform-aws-modules/rds/aws"
+  version = "~> 3.0"
+
+  identifier = "demodb"
+
+  engine            = "mysql"
+  engine_version    = "5.7.19"
+  instance_class    = "db.t2.large"
+  allocated_storage = 5
+  auto_minor_version_upgrade = true
+  backup_retention_period =  0
+
+  name     = "demodb"
+  username = "user"
+  port     = "3306"
+}
+        """
+    )
+    subprocess.check_call(args="terraform init", shell=True, cwd=tmp_path)
+    TerraformProvider().parse(tmp_path)
+    results = run_policy(
+        {
+            "name": "check-backup",
+            "resource": "terraform.aws_db_instance",
+            "filters": [{"backup_retention_period": 0}],
+        },
+        tmp_path,
+        tmp_path,
+    )
+    import pdb
+
+    pdb.set_trace()
+    print(results)
 
 
 def test_graph_resolver():

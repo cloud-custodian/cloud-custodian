@@ -277,9 +277,9 @@ class IACSourceMode(PolicyExecutionMode):
 
         resources = event["resources"]
         resources = self.manager.filter_resources(resources, event)
-        return self.as_results(resources)
+        return self.as_results(resources, event)
 
-    def as_results(self, resources):
+    def as_results(self, resources, event):
         return ResultSet([PolicyResourceResult(r, self.policy) for r in resources])
 
 

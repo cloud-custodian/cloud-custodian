@@ -17,6 +17,8 @@ from ...core import (
     IACSourceProvider,
     IACSourceMode,
     log,
+    ResultSet,
+    PolicyResourceResult,
 )
 from .graph import TerraformGraph
 
@@ -119,3 +121,31 @@ class TerraformProvider(IACSourceProvider):
 @execution.register("terraform-source")
 class TerraformSource(IACSourceMode):
     schema = type_schema("terraform-source")
+
+    def as_results(self, resources, event):
+        # for any module based results, we hoist back to the top level, with references
+        for idx, r in enumerate(list(resources)):
+            if not r['__tfmeta']['path'].startswith('module.'):
+                continue
+            resources[idx] = self.resolve_module_ref(r, event['graph'])
+
+        return ResultSet([PolicyResourceResult(r, self.policy) for r in resources])
+
+    def resolve_module_ref(self, mod_resource, graph):
+        mod_map = {}
+        for _, modules in graph.get_resources_by_type('module'):
+            for m in modules:
+                mod_map[m['__tfmeta']['path']] = m
+
+        call_stack = extract_mod_stack(mod_resource['__tfmeta']['path'])
+        ancestor = mod_map[call_stack[0]]
+        ancestor['__tfmeta'].setdefault('call_stack', {})[id(mod_resource)] = call_stack
+        return ancestor
+
+
+def extract_mod_stack(mr_path):
+    call_stack = []
+    parts = mr_path.split('.')
+    for step in range(2, len(parts) + 1, 2):
+        call_stack.append(".".join(parts[:step]))
+    return call_stack
