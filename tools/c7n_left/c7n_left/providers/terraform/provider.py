@@ -31,13 +31,18 @@ class TerraformResourceManager(IACResourceManager):
 
     def augment(self, resources, event):
         # aws is currently the only terraform provider that supports default_tags afaics
+        #
         # https://github.com/hashicorp/terraform-provider-azurerm/issues/13776
         # https://github.com/hashicorp/terraform-provider-google/issues/7325
-        if event.get('resource_type').startswith('aws_') and Taggable.is_taggable(resources):
+        if event.get('resource_type', '').startswith('aws_') and Taggable.is_taggable(resources):
             self.augment_provider_tags(resources, event)
         return resources
 
     def augment_provider_tags(self, resources, event):
+        # The one resource in aws that doesn't support default_tags
+        # https://registry.terraform.io/providers/hashicorp/aws/latest/docs#default_tags
+        if event['resource_type'] == 'aws_autoscaling_group':
+            return
         provider_tags = {}
         for type_name, blocks in event['graph'].get_resources_by_type(('provider',)):
             for block in blocks:
