@@ -190,7 +190,7 @@ A `taggable` filter is available that allows filtering to only resources that su
 In combination with resource wild card support, this allows using a single policy to enforce
 an organization's tag standards.
 
-```yaml
+```
 policies:
  - name: check-tag-policy
    resource: "terraform.aws*"
