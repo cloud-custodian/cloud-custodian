@@ -233,16 +233,16 @@ class CollectionRunner:
             for p in self.policies:
                 if not self.match_type(rtype, p):
                     continue
-                result_set = self.run_policy(p, graph, resources, event)
+                result_set = self.run_policy(p, graph, resources, event, rtype)
                 if result_set:
                     self.reporter.on_results(result_set)
                     found = True
         self.reporter.on_execution_ended()
         return found
 
-    def run_policy(self, policy, graph, resources, event):
+    def run_policy(self, policy, graph, resources, event, resource_type):
         event = dict(event)
-        event.update({"graph": graph, "resources": resources})
+        event.update({"graph": graph, "resources": resources, "resource_type": resource_type})
         return policy.push(event)
 
     def get_provider(self):
@@ -276,6 +276,7 @@ class IACSourceMode(PolicyExecutionMode):
             return []
 
         resources = event["resources"]
+        resources = self.manager.augment(resources, event)
         resources = self.manager.filter_resources(resources, event)
         return self.as_results(resources, event)
 
@@ -317,6 +318,9 @@ class IACResourceManager(ResourceManager):
 
     def get_resource_manager(self, resource_type, data=None):
         return self.__class__(self.ctx, data or {})
+
+    def augment(self, resources, event):
+        return resources
 
 
 IACResourceManager.filter_registry.register("traverse", Traverse)

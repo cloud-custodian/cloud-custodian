@@ -25,11 +25,11 @@ class TerraformGraph(ResourceGraph):
                         resources.append(self.as_resource(name, data))
                     yield "%s.%s" % (type_name, data_type), resources
             elif type_name == "moved":
-                yield type_name, self.as_resource(type_name, data)
+                yield type_name, [self.as_resource(type_name, d) for d in type_items]
             elif type_name == "locals":
-                yield type_name, self.as_resource(type_name, data)
+                yield type_name, [self.as_resource(type_name, d) for d in type_items]
             elif type_name == "terraform":
-                yield type_name, self.as_resource(type_name, data)
+                yield type_name, [self.as_resource(type_name, d) for d in type_items]
             else:
                 resources = []
                 for data in type_items:
