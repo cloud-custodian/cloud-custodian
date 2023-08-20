@@ -380,6 +380,14 @@ def test_multi_provider_resource_glob_policy(tmp_path, debug_cli_runner):
     (tmp_path / "tf").mkdir()
     (tmp_path / "tf" / "main.tf").write_text(
         """
+terraform {
+  required_providers {
+    oci = {
+      source = "oracle/oci"
+    }
+  }
+}
+
 resource "azurerm_resource_group" "example" {
   name     = "example-resources"
   location = "West Europe"
@@ -412,7 +420,7 @@ resource "google_storage_bucket" "static-site" {
     )
     assert result.exit_code == 1
     data = json.loads((tmp_path / "output.json").read_text())
-    assert len(data["results"]) == 3
+    assert len(data["results"]) == 4
 
 
 def test_multi_resource_list_policy(tmp_path):
