@@ -1,7 +1,10 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+import base64
+import json
 import logging
 import os
+import zlib
 
 import fakeredis
 from ldap3 import MOCK_SYNC, Connection, Server
@@ -43,11 +46,7 @@ MAILER_CONFIG = {
     "cache_engine": "sqlite",
     "role": "arn:aws:iam::xxxx:role/cloudcustodian-mailer",
     "ldap_uid_tags": ["CreatorName", "Owner"],
-    "templates_folders": [
-        os.path.abspath(os.path.dirname(__file__)),
-        os.path.abspath("/"),
-        ""
-    ],
+    "templates_folders": [os.path.abspath(os.path.dirname(__file__)), os.path.abspath("/"), ""],
 }
 MAILER_CONFIG_AZURE = {
     "queue_url": "asq://storageaccount.queue.core.windows.net/queuename",
@@ -57,7 +56,7 @@ MAILER_CONFIG_AZURE = {
         os.path.abspath(os.path.dirname(__file__)),
         os.path.abspath("/"),
         os.path.abspath(os.path.join(os.path.dirname(__file__), "test-templates")),
-        ""
+        "",
     ],
 }
 
@@ -69,11 +68,7 @@ MAILER_CONFIG_GCP = {
     "from_address": "devops@initech.com",
     "queue_url": "projects/c7n-dev/subscriptions/getnotify",
     "smtp_server": "smtp.inittech.com",
-    "templates_folders": [
-        os.path.abspath(os.path.dirname(__file__)),
-        os.path.abspath("/"),
-        ""
-    ],
+    "templates_folders": [os.path.abspath(os.path.dirname(__file__)), os.path.abspath("/"), ""],
 }
 
 RESOURCE_1 = {
@@ -119,6 +114,13 @@ RESOURCE_3 = {
     "State": "in-use",
 }
 
+RESOURCE_4 = {
+    "AvailabilityZone": "us-east-1a",
+    "Attachments": [],
+    "Tags": [{"Value": "someone@example.com", "Key": "SupportEmail"}],
+    "VolumeId": "vol-01a0e6ea6b89f0098",
+}
+
 SQS_MESSAGE_1 = {
     "account": "core-services-dev",
     "account_id": "000000000000",
@@ -151,6 +153,12 @@ SQS_MESSAGE_1 = {
     },
     "event": None,
     "resources": [RESOURCE_1],
+}
+
+SQS_MESSAGE_1_ENCODED = {
+    "Body": base64.b64encode(zlib.compress(json.dumps(SQS_MESSAGE_1).encode("utf8"))),
+    "MessageId": "1",
+    "Attributes": {"SentTimestamp": "2023-01-01T12:00:00"},
 }
 
 SQS_MESSAGE_2 = {
@@ -720,7 +728,6 @@ def get_ldap_lookup(cache_engine=None, uid_regex=None):
 
 
 class MockLdapLookup(LdapLookup):
-
     # allows us to instantiate this object and not need a redis daemon
     def get_redis_connection(self, redis_host, redis_port):
         return MockRedisLookup()

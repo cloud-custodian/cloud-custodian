@@ -12,7 +12,7 @@ from c7n_gcp.actions import MethodAction
 @resources.register('gke-cluster')
 class KubernetesCluster(QueryResourceManager):
     """GCP resource:
-    https://cloud.google.com/kubernetes-engine/docs/reference/rest/v1/projects.zones.clusters
+    https://cloud.google.com/kubernetes-engine/docs/reference/rest/v1/projects.locations.clusters
     """
 
     class resource_type(TypeInfo):
@@ -30,6 +30,10 @@ class KubernetesCluster(QueryResourceManager):
         asset_type = 'container.googleapis.com/Cluster'
         scc_type = 'google.container.Cluster'
         metric_key = 'resource.labels.cluster_name'
+        urn_component = 'cluster'
+        labels = True
+        labels_op = 'setResourceLabels'
+        urn_zonal = True
 
         @staticmethod
         def get(client, resource_info):
@@ -40,7 +44,33 @@ class KubernetesCluster(QueryResourceManager):
                         resource_info['location'],
                         resource_info['cluster_name'])})
 
+        @staticmethod
+        def get_label_params(resource, all_labels):
+            path_param_re = re.compile(
+                '.*?/projects/(.*?)/locations/(.*?)/clusters/(.*)')
+            project, zone, cluster_name = path_param_re.match(
+                resource['selfLink']).groups()
+            return {'name': 'projects/'+project+'/locations/'+zone+'/clusters/'+cluster_name,
+                    'body': {
+                        'resourceLabels': all_labels,
+                        'labelFingerprint': resource['labelFingerprint']
+                    }}
+
+        @classmethod
+        def refresh(cls, client, resource):
+            project_id = resource['selfLink'].split("/")[5]
+            return cls.get(
+                client,
+                {
+                    'project_id': project_id,
+                    'location': resource['zone'],
+                    'cluster_name': resource['name']
+                }
+            )
+
     def augment(self, resources):
+        if not resources:
+            return []
         for r in resources:
             if r.get('resourceLabels'):
                 r['labels'] = r['resourceLabels']
@@ -84,6 +114,8 @@ class KubernetesClusterNodePool(ChildResourceManager):
         asset_type = 'container.googleapis.com/NodePool'
         default_report_fields = ['name', 'status', 'version']
         permissions = ('container.nodes.list',)
+        urn_component = 'cluster-node-pool'
+        urn_zonal = True
 
         @staticmethod
         def get(client, resource_info):
@@ -100,6 +132,11 @@ class KubernetesClusterNodePool(ChildResourceManager):
                         resource_info['cluster_name'],
                         name)}
             )
+
+        @classmethod
+        def _get_location(cls, resource):
+            "Get the region from the parent - the cluster"
+            return super()._get_location(cls.get_parent(resource))
 
 
 @KubernetesCluster.action_registry.register('delete')

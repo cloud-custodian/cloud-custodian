@@ -24,7 +24,7 @@ class Traverse(Filter):
           filters:
             - not:
                - type: traverse
-                 resource: aws_s3_bucket_server_side_encryption_configuration
+                 resources: aws_s3_bucket_server_side_encryption_configuration
                  attrs:
                   - rule.apply_server_side_encryption_by_default.sse_algorithm: aws:kms
 
@@ -40,7 +40,7 @@ class Traverse(Filter):
           filters:
             - network_configuration: present
             - type: traverse
-              resource: [aws_apprunner_vpc_connector, aws_subnet, aws_vpc]
+              resources: [aws_apprunner_vpc_connector, aws_subnet, aws_vpc]
               attrs:
                - type: value
                  key: tag:Env
@@ -88,9 +88,7 @@ class Traverse(Filter):
         for r in resources:
             working_set = (r,)
             for target_type in self.type_chain:
-                working_set = self.resolve_refs(
-                    target_type, working_set, event["graph"]
-                )
+                working_set = self.resolve_refs(target_type, working_set, event["graph"])
             matched = self.match_attrs(working_set)
             if not self.match_cardinality(matched):
                 continue
@@ -103,8 +101,11 @@ class Traverse(Filter):
         if self._vfilters:
             return self._vfilters
         vfilters = []
+        filter_class = ValueFilter
         for v in self.data.get("attrs", []):
-            vf = ValueFilter(v)
+            if isinstance(v, dict) and v.get("type"):
+                filter_class = self.manager.filter_registry[v["type"]]
+            vf = filter_class(v, self.manager)
             vf.annotate = False
             vfilters.append(vf)
         self._vfilters = vfilters

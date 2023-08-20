@@ -9,16 +9,22 @@ import itertools
 import logging
 
 from concurrent.futures import as_completed
-import jmespath
 
 from c7n.actions import BaseAction
 from c7n.exceptions import ClientError, PolicyValidationError
 from c7n.filters import (
-    AgeFilter, Filter, CrossAccountAccessFilter)
+    AgeFilter, ValueFilter, Filter, CrossAccountAccessFilter)
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, DescribeSource, TypeInfo
 from c7n.resolver import ValuesFrom
-from c7n.utils import local_session, type_schema, chunks, merge_dict_list, parse_date
+from c7n.utils import (
+    local_session,
+    type_schema,
+    chunks,
+    merge_dict_list,
+    parse_date,
+    jmespath_compile
+)
 from c7n import deprecated
 
 
@@ -112,7 +118,7 @@ class Deregister(BaseAction):
 
     schema = type_schema('deregister', **{'delete-snapshots': {'type': 'boolean'}})
     permissions = ('ec2:DeregisterImage',)
-    snap_expr = jmespath.compile('BlockDeviceMappings[].Ebs.SnapshotId')
+    snap_expr = jmespath_compile('BlockDeviceMappings[].Ebs.SnapshotId')
 
     def process(self, images):
         client = local_session(self.manager.session_factory).client('ec2')
@@ -289,6 +295,51 @@ class RemoveLaunchPermissions(BaseAction):
             LaunchPermission={'Remove': remove},
             OperationType='remove')
 
+@AMI.action_registry.register('cancel-launch-permission')
+class CancelLaunchPermissions(BaseAction):
+    """Action to cancel this account's access to another another account's shared AMI
+
+    If another AWS account shares an image with your account, and you
+    no longer want to allow its use in your account, this action will
+    remove the permission for your account to laucnh from the image.
+
+    As this is not reversible without accessing the AMI source account, it defaults
+    to running in dryrun mode. Set dryrun to false to enforce.
+
+    Note this does not apply to AMIs shared by Organization or OU.
+    https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/cancel-sharing-an-AMI.html
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: ami-cancel-share-to-me-old
+                resource: ami
+                query:
+                  - ExecutableUsers: [self]
+                  - Owners: []
+                filters:
+                  - type: image-age
+                    days: 90
+                actions:
+                  - type: cancel-launch-permission
+
+    """
+    schema = type_schema('cancel-launch-permission', dryrun={'type': 'boolean'})
+
+    permissions = ('ec2:CancelImageLaunchPermission',)
+
+    def process(self, images):
+        client = local_session(self.manager.session_factory).client('ec2')
+        for i in images:
+            self.process_image(client, i)
+
+    def process_image(self, client, image):
+        client.cancel_image_launch_permission(
+            ImageId=image['ImageId'],
+            DryRun=self.data.get('dryrun', True))
+
 
 @AMI.action_registry.register('set-permissions')
 class SetPermissions(BaseAction):
@@ -381,8 +432,8 @@ class SetPermissions(BaseAction):
         remove = []
         add = []
         account_regex = re.compile('\\d{12}')
-        org_regex = re.compile('arn:[a-zA-Z-]+:organizations::\\d{12}:organization/o-.*')
-        ou_regex = re.compile('arn:[a-zA-Z-]+:organizations::\\d{12}:ou/o-.*/ou-.*')
+        org_regex = re.compile('arn:[a-zA-Z-]+:organizations:\\d{12}:organization/o-.*')
+        ou_regex = re.compile('arn:[a-zA-Z-]+:organizations:\\d{12}:ou/o-.*/ou-.*')
         if to_remove:
             if 'all' in to_remove:
                 remove.append({'Group': 'all'})
@@ -415,16 +466,17 @@ class SetPermissions(BaseAction):
                 if principals:
                     add.extend([{'OrganizationalUnitArn': a} for a in principals])
 
-        if not remove and not add:
-            return
-        self.manager.retry(client.modify_image_attribute,
-            ImageId=image['ImageId'],
-            LaunchPermission={'Remove': remove},
-            OperationType='remove')
-        self.manager.retry(client.modify_image_attribute,
-            ImageId=image['ImageId'],
-            LaunchPermission={'Add': add},
-            OperationType='add')
+        if remove:
+            self.manager.retry(client.modify_image_attribute,
+                ImageId=image['ImageId'],
+                LaunchPermission={'Remove': remove},
+                OperationType='remove')
+
+        if add:
+            self.manager.retry(client.modify_image_attribute,
+                ImageId=image['ImageId'],
+                LaunchPermission={'Add': add},
+                OperationType='add')
 
 
 @AMI.action_registry.register('copy')
@@ -609,3 +661,70 @@ class AmiCrossAccountFilter(CrossAccountAccessFilter):
                     continue
                 results.extend(f.result())
         return results
+
+
+@AMI.filter_registry.register('image-attribute')
+class ImageAttribute(ValueFilter):
+    """AMI Image Value Filter on a given image attribute.
+
+    Filters AMI's with the given AMI attribute
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: ami-unused-recently
+                resource: ami
+                filters:
+                  - type: image-attribute
+                    attribute: lastLaunchedTime
+                    key: "Value"
+                    op: gte
+                    value_type: age
+                    value: 30
+    """
+
+    valid_attrs = (
+        'description',
+        'kernel',
+        'ramdisk',
+        'launchPermissions',
+        'productCodes',
+        'blockDeviceMapping',
+        'sriovNetSupport',
+        'bootMode',
+        'tpmSupport',
+        'uefiData',
+        'lastLaunchedTime',
+        'imdsSupport'
+    )
+
+    schema = type_schema(
+        'image-attribute',
+        rinherit=ValueFilter.schema,
+        attribute={'enum': valid_attrs},
+        required=('attribute',))
+    schema_alias = False
+
+    def get_permissions(self):
+        return ('ec2:DescribeImageAttribute',)
+
+    def process(self, resources, event=None):
+        attribute = self.data['attribute']
+        self.get_image_attribute(resources, attribute)
+        return [resource for resource in resources
+                if self.match(resource['c7n:attribute-%s' % attribute])]
+
+    def get_image_attribute(self, resources, attribute):
+        client = local_session(
+            self.manager.session_factory).client('ec2')
+
+        for resource in resources:
+            image_id = resource['ImageId']
+            fetched_attribute = self.manager.retry(
+                client.describe_image_attribute,
+                ImageId=image_id,
+                Attribute=attribute)
+            keys = set(fetched_attribute) - {'ResponseMetadata', 'ImageId'}
+            resource['c7n:attribute-%s' % attribute] = fetched_attribute[keys.pop()]

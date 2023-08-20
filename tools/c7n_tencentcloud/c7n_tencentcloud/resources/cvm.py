@@ -1,12 +1,11 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
-import jmespath
 from retrying import RetryError
 from tencentcloud.common.exception import TencentCloudSDKException
 
 from c7n.exceptions import PolicyExecutionError
-from c7n.utils import type_schema, chunks
+from c7n.utils import type_schema, chunks, jmespath_search
 from c7n_tencentcloud.actions import TencentCloudBaseAction
 from c7n_tencentcloud.provider import resources
 from c7n_tencentcloud.query import ResourceTypeInfo, QueryResourceManager, DescribeSource
@@ -92,7 +91,7 @@ class CvmAction(TencentCloudBaseAction):
         try:
             client = self.get_client()
             resp = client.execute_query(self.t_api_method_name, params)
-            failed_resources = jmespath.search("Response.Error", resp)
+            failed_resources = jmespath_search("Response.Error", resp)
             if failed_resources is not None:
                 raise PolicyExecutionError(f"{self.data.get('type')} error")
             self.log.debug("%s resources: %s, cvm: %s",

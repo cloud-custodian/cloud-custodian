@@ -47,19 +47,19 @@ class SplunkHecDelivery:
         payloads = []
         events = self.get_splunk_events(msg)
         indices = self._splunk_indices_for_message(msg)
-        sourcetype = self.config.get('splunk_hec_sourcetype', '_json')
+        sourcetype = self.config.get("splunk_hec_sourcetype", "_json")
         for event in events:
             for index in indices:
-                payloads.append({
-                    'time': msg_timestamp,
-                    'host': 'cloud-custodian',
-                    'source': '%s-cloud-custodian' % event.get(
-                        'account', 'unknown'
-                    ),
-                    'sourcetype': sourcetype,
-                    'index': index,
-                    'event': event
-                })
+                payloads.append(
+                    {
+                        "time": msg_timestamp,
+                        "host": "cloud-custodian",
+                        "source": "%s-cloud-custodian" % event.get("account", "unknown"),
+                        "sourcetype": sourcetype,
+                        "index": index,
+                        "event": event,
+                    }
+                )
         return payloads
 
     def get_splunk_events(self, msg):
@@ -73,33 +73,33 @@ class SplunkHecDelivery:
         :rtype: list
         """
         # if an event is present, add it to the log
-        if msg.get('event', None) is not None:
+        if msg.get("event", None) is not None:
             # add user to the log message, at the top level...
-            user = get_aws_username_from_event(self.logger, msg['event'])
+            user = get_aws_username_from_event(self.logger, msg["event"])
             if user is not None:
-                msg['event_triggering_user'] = user
+                msg["event_triggering_user"] = user
         # get a copy of the message with no resources
         base_log = dict(msg)
-        base_log.pop('resources')
+        base_log.pop("resources")
         base_log = deepcopy(base_log)
         # if configured, build and add actions list
-        if self.config.get('splunk_actions_list', False):
-            base_log['actions'] = []
-            for a in msg['policy']['actions']:
+        if self.config.get("splunk_actions_list", False):
+            base_log["actions"] = []
+            for a in msg["policy"]["actions"]:
                 if isinstance(a, type({})):
-                    base_log['actions'].append(a['type'])
+                    base_log["actions"].append(a["type"])
                 else:
-                    base_log['actions'].append(a)
+                    base_log["actions"].append(a)
         # generate a separate Splunk message for each resource
         logs = []
-        for res in msg['resources']:
+        for res in msg["resources"]:
             x = dict(base_log)
-            x['resource'] = dict(res)
+            x["resource"] = dict(res)
             # ensure there's one "tags" element, and it's a dict
             tmp = self.tags_for_resource(res)
-            if 'Tags' in x['resource']:
-                del x['resource']['Tags']
-            x['resource']['tags'] = tmp
+            if "Tags" in x["resource"]:
+                del x["resource"]["Tags"]
+            x["resource"]["tags"] = tmp
             logs.append(self._prune_log_message(x))
         return logs
 
@@ -115,14 +115,14 @@ class SplunkHecDelivery:
         :return: msg dict with all ``splunk_remove_paths`` elements removed
         :rtype: dict
         """
-        paths = self.config.get('splunk_remove_paths', [])
+        paths = self.config.get("splunk_remove_paths", [])
         if not paths:
             return msg
         patches = []
         for path in paths:
             try:
                 resolve_pointer(msg, path)
-                patches.append({'op': 'remove', 'path': path})
+                patches.append({"op": "remove", "path": path})
             except JsonPointerException:
                 pass
         if not patches:
@@ -143,10 +143,8 @@ class SplunkHecDelivery:
                 failed += 1
         if failed != 0:
             raise RuntimeError(
-                'ERROR: {failed} of {count} Splunk HEC messages '
-                'failed to deliver.'.format(
-                    failed=failed, count=len(payloads)
-                )
+                "ERROR: {failed} of {count} Splunk HEC messages "
+                "failed to deliver.".format(failed=failed, count=len(payloads))
             )
 
     def _try_send(self, payload):
@@ -160,16 +158,18 @@ class SplunkHecDelivery:
         :return: True if sent successfully, False otherwise
         :rtype: bool
         """
-        max_attempts = self.config.get('splunk_max_attempts', 4)
-        maxlen = self.config.get('splunk_hec_max_length', None)
+        max_attempts = self.config.get("splunk_max_attempts", 4)
+        maxlen = self.config.get("splunk_hec_max_length", None)
         p = json.dumps(payload)
         if maxlen is not None and len(p) > maxlen:
             # This is in place for Splunk installations that are configured
             # with a short maximum message length (i.e. 10,000 characters).
             self.logger.error(
-                'ERROR: Sending %d characters to Splunk HEC; line length '
-                'limit is %d characters. Data will be truncated: %s',
-                len(p), maxlen, p
+                "ERROR: Sending %d characters to Splunk HEC; line length "
+                "limit is %d characters. Data will be truncated: %s",
+                len(p),
+                maxlen,
+                p,
             )
         for i in range(0, max_attempts):
             try:
@@ -181,13 +181,10 @@ class SplunkHecDelivery:
             except Exception:
                 sleep_sec = uniform(1, 4)  # random float 1 to 4
                 self.logger.warning(
-                    'Caught exception sending to Splunk; '
-                    'retry in %s seconds', sleep_sec
+                    "Caught exception sending to Splunk; " "retry in %s seconds", sleep_sec
                 )
                 sleep(sleep_sec)
-        self.logger.error(
-            'ERROR - Could not POST to Splunk after %d tries.', max_attempts
-        )
+        self.logger.error("ERROR - Could not POST to Splunk after %d tries.", max_attempts)
         return False
 
     def _send_splunk(self, payload):
@@ -198,41 +195,37 @@ class SplunkHecDelivery:
           event data
         :type payload: str
         """
-        url = self.config['splunk_hec_url']
-        self.logger.debug('Send to Splunk (%s): %s', url, payload)
+        url = self.config["splunk_hec_url"]
+        self.logger.debug("Send to Splunk (%s): %s", url, payload)
         try:
-            r = requests.post(
+            r = requests.post(  # nosec
                 url,
-                headers={
-                    'Authorization': 'Splunk %s' % self.config[
-                        'splunk_hec_token'
-                    ]
-                },
-                data=payload
+                headers={"Authorization": "Splunk %s" % self.config["splunk_hec_token"]},
+                data=payload,
             )
         except Exception:
-            self.logger.error('Exception during Splunk POST to %s of %s',
-                              url, payload, exc_info=True)
+            self.logger.error(
+                "Exception during Splunk POST to %s of %s", url, payload, exc_info=True
+            )
             raise
         self.logger.debug(
-            'Splunk POST got response code %s HEADERS=%s BODY: %s',
-            r.status_code, r.headers, r.text
+            "Splunk POST got response code %s HEADERS=%s BODY: %s", r.status_code, r.headers, r.text
         )
         if r.status_code not in [200, 201, 202]:
             self.logger.error(
-                'Splunk POST returned non-20x response: %s HEADERS=%s BODY: %s',
-                r.status_code, r.headers, r.text
+                "Splunk POST returned non-20x response: %s HEADERS=%s BODY: %s",
+                r.status_code,
+                r.headers,
+                r.text,
             )
-            raise RuntimeError('POST returned %s' % r.status_code)
+            raise RuntimeError("POST returned %s" % r.status_code)
         try:
             j = r.json()
         except Exception:
-            j = {'text': r.text}
-        if j['text'].lower() != 'success':
-            self.logger.error(
-                'Splunk POST returned non-success response: %s', j
-            )
-            raise RuntimeError('POST returned non-success response: %s' % j)
+            j = {"text": r.text}
+        if j["text"].lower() != "success":
+            self.logger.error("Splunk POST returned non-success response: %s", j)
+            raise RuntimeError("POST returned non-success response: %s" % j)
 
     def tags_for_resource(self, res):
         """
@@ -244,12 +237,9 @@ class SplunkHecDelivery:
         :return: dict of tags
         """
         try:
-            return {x['Key']: x['Value'] for x in res.get('Tags', [])}
+            return {x["Key"]: x["Value"] for x in res.get("Tags", [])}
         except Exception:
-            self.logger.warning(
-                'Exception building tags dict; Tags=%s',
-                res.get('Tags', None)
-            )
+            self.logger.warning("Exception building tags dict; Tags=%s", res.get("Tags", None))
             return {}
 
     @staticmethod
@@ -264,9 +254,9 @@ class SplunkHecDelivery:
         :rtype: list
         """
         indices = set()
-        if msg and msg.get('action', False) and msg['action'].get('to', False):
-            for to in msg['action'].get('to', []):
-                if not to.startswith('splunkhec://'):
+        if msg and msg.get("action", False) and msg["action"].get("to", False):
+            for to in msg["action"].get("to", []):
+                if not to.startswith("splunkhec://"):
                     continue
                 parsed = urlparse(to)
                 indices.add(parsed.netloc)

@@ -1,0 +1,166 @@
+{
+  "headers": {
+    "etag": "xoJSs756pa3il8jYTttSsc9rG8M=/FJNv68kOfRpG7zA1sOv7wbXxD_E=",
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Thu, 22 Jun 2023 11:47:45 GMT",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "4257",
+    "-content-encoding": "gzip",
+    "content-location": "https://compute.googleapis.com/compute/v1/projects/cloud-custodian/global/securityPolicies?alt=json"
+  },
+  "body": {
+    "kind": "compute#securityPolicyList",
+    "id": "projects/cloud-custodian/global/securityPolicies",
+    "items": [
+      {
+        "kind": "compute#securityPolicy",
+        "id": "2550272938411777319",
+        "creationTimestamp": "2021-07-26T09:33:12.769-07:00",
+        "name": "basic-cloud-armor-policy",
+        "description": "",
+        "rules": [
+          {
+            "kind": "compute#securityPolicyRule",
+            "description": "Cross-site scripting",
+            "priority": 1000,
+            "match": {
+              "expr": {
+                "expression": "evaluatePreconfiguredExpr('xss-stable')"
+              }
+            },
+            "action": "deny(403)",
+            "preview": false
+          },
+          {
+            "kind": "compute#securityPolicyRule",
+            "description": "SQL injection",
+            "priority": 1001,
+            "match": {
+              "expr": {
+                "expression": "evaluatePreconfiguredExpr('sqli-stable')"
+              }
+            },
+            "action": "deny(403)",
+            "preview": false
+          },
+          {
+            "kind": "compute#securityPolicyRule",
+            "description": "Local file inclusion",
+            "priority": 1002,
+            "match": {
+              "expr": {
+                "expression": "evaluatePreconfiguredExpr('lfi-stable')"
+              }
+            },
+            "action": "deny(403)",
+            "preview": false
+          },
+          {
+            "kind": "compute#securityPolicyRule",
+            "description": "Remote code execution",
+            "priority": 1003,
+            "match": {
+              "expr": {
+                "expression": "evaluatePreconfiguredExpr('rce-stable')"
+              }
+            },
+            "action": "deny(403)",
+            "preview": false
+          },
+          {
+            "kind": "compute#securityPolicyRule",
+            "description": "Remote file inclusion",
+            "priority": 1004,
+            "match": {
+              "expr": {
+                "expression": "evaluatePreconfiguredExpr('rfi-stable')"
+              }
+            },
+            "action": "deny(403)",
+            "preview": false
+          },
+          {
+            "kind": "compute#securityPolicyRule",
+            "description": "Session fixation attack",
+            "priority": 1005,
+            "match": {
+              "expr": {
+                "expression": "evaluatePreconfiguredExpr('sessionfixation-stable')"
+              }
+            },
+            "action": "deny(403)",
+            "preview": false
+          },
+          {
+            "kind": "compute#securityPolicyRule",
+            "description": "Scanner detection",
+            "priority": 1006,
+            "match": {
+              "expr": {
+                "expression": "evaluatePreconfiguredExpr('scannerdetection-stable')"
+              }
+            },
+            "action": "deny(403)",
+            "preview": false
+          },
+          {
+            "kind": "compute#securityPolicyRule",
+            "description": "protocol attack",
+            "priority": 1007,
+            "match": {
+              "expr": {
+                "expression": "evaluatePreconfiguredExpr('protocolattack-stable')"
+              }
+            },
+            "action": "deny(403)",
+            "preview": false
+          },
+          {
+            "kind": "compute#securityPolicyRule",
+            "description": "method enforcement",
+            "priority": 1008,
+            "match": {
+              "expr": {
+                "expression": "evaluatePreconfiguredExpr('methodenforcement-stable')"
+              }
+            },
+            "action": "deny(403)",
+            "preview": false
+          },
+          {
+            "kind": "compute#securityPolicyRule",
+            "description": "default rule",
+            "priority": 2147483647,
+            "match": {
+              "versionedExpr": "SRC_IPS_V1",
+              "config": {
+                "srcIpRanges": [
+                  "*"
+                ]
+              }
+            },
+            "action": "allow",
+            "preview": false
+          }
+        ],
+        "adaptiveProtectionConfig": {
+          "layer7DdosDefenseConfig": {
+            "enable": false
+          }
+        },
+        "fingerprint": "GfSbUfjM6cc=",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/securityPolicies/basic-cloud-armor-policy",
+        "type": "CLOUD_ARMOR",
+        "labelFingerprint": "42WmSpB8rSM="
+      }
+    ]
+  }
+}

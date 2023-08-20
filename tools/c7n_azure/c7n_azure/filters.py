@@ -18,8 +18,10 @@ from c7n_azure.utils import (IpRangeHelper, Math, ResourceIdParser,
 from dateutil.parser import parse
 from azure.core.exceptions import HttpResponseError
 
+from c7n_azure.provider import resources
 from c7n.filters import Filter, FilterValidationError, ValueFilter
 from c7n.filters.core import PolicyValidationError
+from c7n.filters.related import RelatedResourceFilter
 from c7n.filters.offhours import OffHour, OnHour, Time
 from c7n.utils import chunks, get_annotation_prefix, type_schema
 
@@ -554,6 +556,26 @@ class FirewallRulesFilter(Filter, metaclass=ABCMeta):
                         include:
                             - '131.107.160.2-131.107.160.3'
                             - 10.20.20.0/24
+
+    :example:
+
+    For SQL Server and Postresql Server, Azure represents the service bypass as firewall rule
+    allowing traffic from "0.0.0.0" (this allows traffic from all other azure services). By
+    default the firewall filter for these resources ignores this rule during evaluation. To
+    include it in the evaluation set the "include-azure-services" flag to true. For example,
+    to find all Postgresql Servers where traffic is allowed from all Azure services:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: postgres-servers-open-from-azure
+            resource: azure.sqlserver
+            filters:
+              - type: firewall-rules
+                include-azure-services: true
+                equal:
+                  - '0.0.0.0'
+
     """
 
     schema = {
@@ -564,7 +586,8 @@ class FirewallRulesFilter(Filter, metaclass=ABCMeta):
             'include': {'type': 'array', 'items': {'type': 'string'}},
             'any': {'type': 'array', 'items': {'type': 'string'}},
             'only': {'type': 'array', 'items': {'type': 'string'}},
-            'equal': {'type': 'array', 'items': {'type': 'string'}}
+            'equal': {'type': 'array', 'items': {'type': 'string'}},
+            'include-azure-services': {'type': 'boolean'}
         },
         'oneOf': [
             {"required": ["type", "include"]},
@@ -1014,3 +1037,78 @@ class ParentFilter(Filter):
         parent_resources_ids = [p['id'] for p in parent_resources]
         parent_key = self.manager.resource_type.parent_key
         return [r for r in resources if r[parent_key] in parent_resources_ids]
+
+
+class AzureAdvisorFilter(RelatedResourceFilter):
+    """
+    Filter resources by Azure Advisor Recommendations
+
+    Select all categories with 'all'
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: disks-with-cost-recommendations
+            resource: azure.disk
+            filters:
+              - type: advisor-recommendation
+                category: Cost
+                key: '[].properties.recommendationTypeId'
+                op: contains
+                value: '48eda464-1485-4dcf-a674-d0905df5054a'
+    """
+
+    RelatedResource = "c7n_azure.resources.advisor.AdvisorRecommendation"
+    RelatedIdsExpression = "id"
+    AnnotationKey = "AdvisorRecommendation"
+
+    schema = type_schema(
+        "advisor-recommendation",
+        category={'type': 'string'},
+        rinherit=RelatedResourceFilter.schema,
+        required=['category']
+    )
+
+    def _add_annotations(self, related_ids, resource):
+        resource[f"c7n:{self.AnnotationKey}"] = self._recommendation_map[
+            resource['id'].lower()
+        ]
+
+    def get_related(self, resources):
+        """
+        get_related works a little bit differently here compared to other
+        related resource filters namely due to the fact that the parent
+        resource (e.g. disk) doesn't have an attribute pointing to a
+        advisor recommendation. thus, we need to fetch all recommendations
+        first, then map the recommendations to resource ids
+        """
+
+        resource_manager = self.get_resource_manager()
+        category = self.data.get("category")
+
+        if category == 'all':
+            query = None
+        else:
+            query = {'filter': f"Category eq '{category}'"}
+
+        related = resource_manager.resources(query=[query])
+        self._recommendation_map = {}
+
+        for r in related:
+            self._recommendation_map.setdefault(
+                r["properties"]["resourceMetadata"]["resourceId"].lower(), []
+            ).append(r)
+        return self._recommendation_map
+
+    def get_related_ids(self, resource):
+        # normalize to lower case
+        return [i.lower() for i in super().get_related_ids(resource)]
+
+    @classmethod
+    def register_resource(cls, registry, resource_class):
+        resource_class.filter_registry.register("advisor-recommendation", cls)
+
+
+resources.subscribe(AzureAdvisorFilter.register_resource)

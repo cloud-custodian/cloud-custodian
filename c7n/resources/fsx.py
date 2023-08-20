@@ -13,6 +13,7 @@ from c7n.utils import type_schema, local_session, chunks
 from c7n.filters import Filter
 from c7n.filters.kms import KmsRelatedFilter
 from c7n.filters.vpc import SubnetFilter
+from c7n.filters.backup import ConsecutiveAwsBackupsFilter
 
 
 class DescribeFSx(DescribeSource):
@@ -341,7 +342,9 @@ class KmsFilterFsxBackup(KmsRelatedFilter):
 class ConsecutiveBackups(Filter):
     """Returns consecutive daily FSx backups, which are equal to/or greater than n days.
     :Example:
+
     .. code-block:: yaml
+
             policies:
               - name: fsx-daily-backup-count
                 resource: fsx
@@ -442,3 +445,5 @@ class ConsecutiveBackups(Filter):
 class Subnet(SubnetFilter):
 
     RelatedIdsExpression = 'SubnetIds[]'
+
+FSx.filter_registry.register('consecutive-aws-backups', ConsecutiveAwsBackupsFilter)

@@ -1,0 +1,9 @@
+{
+    "status_code": 200,
+    "data": {
+        "TableNames": [
+            "cc-testing-table"
+        ],
+        "ResponseMetadata": {}
+    }
+}

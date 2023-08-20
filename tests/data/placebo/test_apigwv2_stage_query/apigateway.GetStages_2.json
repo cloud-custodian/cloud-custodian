@@ -1,0 +1,42 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Items": [
+            {
+                "AutoDeploy": false,
+                "CreatedDate": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 8,
+                    "day": 8,
+                    "hour": 17,
+                    "minute": 9,
+                    "second": 55,
+                    "microsecond": 0
+                },
+                "DefaultRouteSettings": {
+                    "DataTraceEnabled": false,
+                    "DetailedMetricsEnabled": false,
+                    "LoggingLevel": "OFF"
+                },
+                "LastUpdatedDate": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 8,
+                    "day": 8,
+                    "hour": 17,
+                    "minute": 9,
+                    "second": 55,
+                    "microsecond": 0
+                },
+                "RouteSettings": {},
+                "StageName": "example-api-allowed-sheepdog",
+                "StageVariables": {},
+                "Tags": {
+                    "Env": "Dev"
+                }
+            }
+        ]
+    }
+}

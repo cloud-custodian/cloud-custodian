@@ -78,9 +78,9 @@ Testing
 -------
 
 Tests for c7n_azure run automatically with other Custodian tests.  See :ref:`Testing for Developers <developer-tests>`
-for information on how to run Tox.
+for information on how to run.
 
-If you'd like to run tests at the command line or in your IDE then reference `tox.ini` to see the required
+If you'd like to run tests at the command line or in your IDE then reference `Makefile` to see the required
 environment variables and command lines for running `pytest`.
 
 
@@ -141,7 +141,7 @@ For long standing operations cassette can be modified to reduce test execution t
 Running tests
 ~~~~~~~~~~~~~
 
-You can use `tox` to run all tests or instead you can use `pytest` and run only Azure tests (or only specific set of tests). Running recorded tests still requires some authentication, it is possible to use fake data for authorization token and subscription id.
+You can use `make test` to run all tests or instead you can use `pytest` and run only Azure tests (or only specific set of tests). Running recorded tests still requires some authentication, it is possible to use fake data for authorization token and subscription id.
 
 .. code-block:: bash
 

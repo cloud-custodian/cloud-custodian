@@ -21,6 +21,7 @@ def vcr_config():
     return {
         "filter_headers": ["authorization", "X-TC-Timestamp", "X-TC-RequestClient",
                            "X-TC-Language"],
+        "filter_query_parameters": ["max-keys"],
         "before_record_response": scrub_string(["IntranetUrl", "InternetUrl", "Url"]),
     }
 

@@ -15,12 +15,12 @@ from datetime import datetime, timedelta
 from dateutil import tz as tzutil
 from dateutil.parser import parse
 
-import jmespath
 import time
 
 from c7n.manager import resources as aws_resources
 from c7n.actions import BaseAction as Action, EventAction, AutoTagUser
 from c7n.exceptions import PolicyValidationError, PolicyExecutionError
+from c7n.resources import load_resources
 from c7n.filters import Filter, OPERATORS
 from c7n.filters.offhours import Time
 from c7n import deprecated, utils
@@ -270,8 +270,6 @@ class TagActionFilter(Filter):
         op={'type': 'string'})
     schema_alias = True
 
-    current_date = None
-
     def validate(self):
         op = self.data.get('op')
         if self.manager and op not in self.manager.action_registry.keys():
@@ -316,15 +314,14 @@ class TagActionFilter(Filter):
                 tag, v, i['InstanceId']))
             return False
 
-        if self.current_date is None:
-            self.current_date = datetime.now()
-
         if action_date.tzinfo:
             # if action_date is timezone aware, set to timezone provided
             action_date = action_date.astimezone(tz)
-            self.current_date = datetime.now(tz=tz)
+            current_date = datetime.now(tz=tz)
+        else:
+            current_date = datetime.now()
 
-        return self.current_date >= (
+        return current_date >= (
             action_date - timedelta(days=skew, hours=skew_hours))
 
 
@@ -433,7 +430,7 @@ class Tag(EventAction):
             'now': utils.FormatDate.utcnow(),
             'event': event,
             'region': self.manager.config.region}
-        return tag.format(**params)
+        return str(tag).format(**params)
 
     def interpolate_values(self, tags):
         """Interpolate in a list of tags - 'old' ec2 format
@@ -1059,6 +1056,9 @@ class CopyRelatedResourceTag(Tag):
 
     def validate(self):
         related_resource = self.data['resource']
+        if '.' in self.data['resource']:
+            related_resource = self.data['resource'].split('.')[-1]
+        load_resources((f'aws.{related_resource}', ))
         if (
             related_resource not in aws_resources.keys() and
             related_resource != "resourcegroupstaggingapi"
@@ -1083,7 +1083,7 @@ class CopyRelatedResourceTag(Tag):
         else:
             search_path = "[].[%s]" % self.data['key']
 
-        for rrid, r in zip(jmespath.search(search_path, resources),
+        for rrid, r in zip(utils.jmespath_search(search_path, resources),
                            resources):
             related_resources.append((rrid.pop(), r))
 

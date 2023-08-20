@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 from c7n.utils import type_schema
 from c7n_gcp.actions import MethodAction, SetIamPolicy
+from c7n_gcp.filters import IamPolicyFilter
 from c7n_gcp.provider import resources
 from c7n_gcp.query import QueryResourceManager, TypeInfo, ChildTypeInfo, ChildResourceManager
 
@@ -25,6 +26,8 @@ class SpannerInstance(QueryResourceManager):
         labels_op = 'patch'
         asset_type = "spanner.googleapis.com/Instance"
         metric_key = "resource.labels.instance_id"
+        urn_component = "instance"
+        urn_id_segments = (-1,)  # Just use the last segment of the id in the URN
 
         @staticmethod
         def get(client, resource_info):
@@ -40,6 +43,14 @@ class SpannerInstance(QueryResourceManager):
                             'labels': all_labels
                         },
                         'field_mask': ', '.join(['labels'])}}
+
+
+@SpannerInstance.filter_registry.register('iam-policy')
+class SpannerInstanceIamPolicyFilter(IamPolicyFilter):
+    """
+    Overrides the base implementation to process spanner instance resources correctly.
+    """
+    permissions = ('spanner.instances.getIamPolicy',)
 
 
 @SpannerInstance.action_registry.register('delete')
@@ -141,6 +152,8 @@ class SpannerDatabaseInstance(ChildResourceManager):
         }
         default_report_fields = ["name", "state", "createTime"]
         asset_type = "spanner.googleapis.com/Database"
+        urn_component = "database"
+        urn_id_segments = (3, 5)
 
         @staticmethod
         def get(client, resource_info):
@@ -148,6 +161,14 @@ class SpannerDatabaseInstance(ChildResourceManager):
                 'get', {
                     'name': resource_info['resourceName']}
             )
+
+
+@SpannerDatabaseInstance.filter_registry.register('iam-policy')
+class SpannerDatabaseInstanceIamPolicyFilter(IamPolicyFilter):
+    """
+    Overrides the base implementation to process spanner database resources correctly.
+    """
+    permissions = ('spanner.databases.getIamPolicy',)
 
 
 SpannerDatabaseInstance.action_registry.register('set-iam-policy', SetIamPolicy)

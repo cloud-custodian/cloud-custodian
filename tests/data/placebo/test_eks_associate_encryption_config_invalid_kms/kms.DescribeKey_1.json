@@ -1,0 +1,11 @@
+{
+    "status_code": 400,
+    "data": {
+        "Error": {
+            "Message": "Alias arn:aws:kms:us-east-1:644160558196:alias/eks_invalid_key is not found.",
+            "Code": "NotFoundException"
+        },
+        "ResponseMetadata": {},
+        "message": "Alias arn:aws:kms:us-east-1:644160558196:alias/eks_invalid_key is not found."
+    }
+}

@@ -43,7 +43,7 @@ RUN if [[ " ${{providers[*]}} " =~ "{pkg}" ]]; then \
 fi
 """
 
-default_providers = ["gcp", "azure", "kube", "openstack", "tencentcloud"]
+default_providers = ["gcp", "azure", "kube", "openstack", "tencentcloud", "oci"]
 
 PHASE_1_PKG_INSTALL_DEP = """\
 # We include `pyproject.toml` and `poetry.lock` first to allow
@@ -65,7 +65,7 @@ BUILD_STAGE = """\
 
 FROM {base_build_image} as build-env
 
-ARG POETRY_VERSION="1.2.2"
+ARG POETRY_VERSION="1.5.1"
 SHELL ["/bin/bash", "-c"]
 
 # pre-requisite distro deps, and build env setup
@@ -85,13 +85,14 @@ RUN . /usr/local/bin/activate && pip install -qU pip wheel aws-xray-sdk psutil j
 # dependency install
 RUN . /usr/local/bin/activate && poetry install --without dev --no-root
 
+# Now install the root package, we used to do this after dependencies of other providers
+# but since moving c7n to a main dependency in pyproject toml we have to do this one first.
+ADD c7n /src/c7n/
+RUN . /usr/local/bin/activate && poetry install --only-root
+
 ARG providers="{providers}"
 # Add provider packages
 {PHASE_1_PKG_INSTALL_DEP}
-
-# Now install the root package
-ADD c7n /src/c7n/
-RUN . /usr/local/bin/activate && poetry install --only-root
 
 {PHASE_2_PKG_INSTALL_ROOT}
 

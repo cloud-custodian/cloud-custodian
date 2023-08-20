@@ -13,7 +13,6 @@ import botocore
 from botocore.exceptions import ClientError
 from dateutil.parser import parse
 from concurrent.futures import as_completed
-import jmespath
 
 from c7n.actions import (
     ActionRegistry, BaseAction, ModifyVpcSecurityGroupsAction, AutoscalingBase
@@ -29,7 +28,7 @@ import c7n.filters.vpc as net_filters
 from c7n.manager import resources
 from c7n import query, utils
 from c7n.tags import coalesce_copy_user_tags
-from c7n.utils import type_schema, filter_empty
+from c7n.utils import type_schema, filter_empty, jmespath_search, jmespath_compile
 
 from c7n.resources.iam import CheckPermissions, SpecificIamProfileManagedPolicy
 from c7n.resources.securityhub import PostFinding
@@ -168,7 +167,7 @@ class SecurityGroupFilter(net_filters.SecurityGroupFilter):
 @filters.register('subnet')
 class SubnetFilter(net_filters.SubnetFilter):
 
-    RelatedIdsExpression = "SubnetId"
+    RelatedIdsExpression = "NetworkInterfaces[].SubnetId"
 
 
 @filters.register('vpc')
@@ -1204,7 +1203,7 @@ class InstanceFinding(PostFinding):
     resource_type = 'AwsEc2Instance'
 
     def format_resource(self, r):
-        ip_addresses = jmespath.search(
+        ip_addresses = jmespath_search(
             "NetworkInterfaces[].PrivateIpAddresses[].PrivateIpAddress", r)
 
         # limit to max 10 ip addresses, per security hub service limits
@@ -1444,7 +1443,7 @@ class Stop(BaseAction):
         },
     )
 
-    has_hibernate = jmespath.compile('[].HibernationOptions.Configured')
+    has_hibernate = jmespath_compile('[].HibernationOptions.Configured')
 
     def get_permissions(self):
         perms = ('ec2:StopInstances',)
@@ -1791,7 +1790,7 @@ class EC2ModifyVpcSecurityGroups(ModifyVpcSecurityGroupsAction):
     """Modify security groups on an instance."""
 
     permissions = ("ec2:ModifyNetworkInterfaceAttribute",)
-    sg_expr = jmespath.compile("Groups[].GroupId")
+    sg_expr = jmespath_compile("Groups[].GroupId")
 
     def process(self, instances):
         if not len(instances):
@@ -2219,6 +2218,7 @@ class LaunchTemplate(query.QueryResourceManager):
         filter_name = 'LaunchTemplateIds'
         filter_type = 'list'
         arn_type = "launch-template"
+        cfn_type = "AWS::EC2::LaunchTemplate"
 
     def augment(self, resources):
         client = utils.local_session(
@@ -2346,7 +2346,7 @@ class SpotFleetRequest(query.QueryResourceManager):
         filter_type = 'list'
         date = 'CreateTime'
         arn_type = 'spot-fleet-request'
-        cfn_type = 'AWS::EC2::SpotFleet'
+        config_type = cfn_type = 'AWS::EC2::SpotFleet'
         permissions_enum = ('ec2:DescribeSpotFleetRequests',)
 
 
@@ -2391,16 +2391,62 @@ class HasSpecificManagedPolicy(SpecificIamProfileManagedPolicy):
        a specific managed IAM policy. If an EC2 instance does not have a profile or the profile
        does not contain an IAM role, then it will be treated as not having the policy.
 
-    :Example:
+    :example:
 
     .. code-block:: yaml
 
         policies:
           - name: ec2-instance-has-admin-policy
-            resource: ec2
+            resource: aws.ec2
             filters:
               - type: has-specific-managed-policy
                 value: admin-policy
+
+    :example:
+
+    Check for EC2 instances with instance profile roles that have an
+    attached policy matching a given list:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: ec2-instance-with-selected-policies
+            resource: aws.ec2
+            filters:
+              - type: has-specific-managed-policy
+                op: in
+                value:
+                  - AmazonS3FullAccess
+                  - AWSOrganizationsFullAccess
+
+    :example:
+
+    Check for EC2 instances with instance profile roles that have
+    attached policy names matching a pattern:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: ec2-instance-with-full-access-policies
+            resource: aws.ec2
+            filters:
+              - type: has-specific-managed-policy
+                op: glob
+                value: "*FullAccess"
+
+    Check for EC2 instances with instance profile roles that have
+    attached policy ARNs matching a pattern:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: ec2-instance-with-aws-full-access-policies
+            resource: aws.ec2
+            filters:
+              - type: has-specific-managed-policy
+                key: PolicyArn
+                op: regex
+                value: "arn:aws:iam::aws:policy/.*FullAccess"
     """
 
     permissions = (
@@ -2425,7 +2471,11 @@ class HasSpecificManagedPolicy(SpecificIamProfileManagedPolicy):
             if not profile:
                 continue
 
-            if self.has_managed_policy(client, profile):
+            self.get_managed_policies(client, [profile])
+
+            matched_keys = [k for k in profile[self.annotation_key] if self.match(k)]
+            self.merge_annotation(profile, self.matched_annotation_key, matched_keys)
+            if matched_keys:
                 results.append(r)
 
         return results

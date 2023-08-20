@@ -1,0 +1,60 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Tue, 04 Jul 2023 21:48:23 GMT",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "950",
+    "-content-encoding": "gzip",
+    "content-location": "https://osconfig.googleapis.com/v1/projects/cloud-custodian/patchDeployments?alt=json"
+  },
+  "body": {
+    "patchDeployments": [
+      {
+        "name": "projects/cloud-custodian/patchDeployments/test",
+        "description": "test",
+        "instanceFilter": {
+          "groupLabels": [
+            {
+              "labels": {
+                "test": ""
+              }
+            }
+          ],
+          "zones": [
+            "asia-east1-a",
+            "us-central1-c"
+          ]
+        },
+        "patchConfig": {
+          "rebootConfig": "DEFAULT",
+          "apt": {},
+          "yum": {},
+          "zypper": {},
+          "windowsUpdate": {}
+        },
+        "duration": "3600s",
+        "oneTimeSchedule": {
+          "executeTime": "2023-07-27T21:00:00Z"
+        },
+        "createTime": "2023-07-04T21:48:09.221518Z",
+        "updateTime": "2023-07-04T21:48:09.221518Z",
+        "rollout": {
+          "mode": "ZONE_BY_ZONE",
+          "disruptionBudget": {
+            "percent": 25
+          }
+        },
+        "state": "ACTIVE"
+      }
+    ],
+    "nextPageToken": "ChVwcm9qZWN0cy80NDM3MzI0MjY0MDESBHRlc3Q="
+  }
+}

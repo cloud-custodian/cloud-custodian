@@ -61,6 +61,9 @@ There are three main components to a policy:
 * Filters: criteria to produce a specific subset of resources
 * Actions: directives to take on the filtered set of resources
 
+In the example below, we will write a policy that filters for pods with a label "custodian"
+and deletes it:
+
 First, lets create a pod resource that we want to target with the policy:
 
 .. code-block:: bash
@@ -220,4 +223,3 @@ attributes that way:
             "phase": "Available"
         }
     }
-

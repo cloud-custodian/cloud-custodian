@@ -1,10 +1,9 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import ipaddress
-import jmespath
 import pytz
 
-from c7n.utils import chunks
+from c7n.utils import chunks, jmespath_search
 from c7n_tencentcloud.filters import MetricsFilter
 from c7n_tencentcloud.provider import resources
 from c7n_tencentcloud.query import ResourceTypeInfo, QueryResourceManager
@@ -35,7 +34,7 @@ class CLB(QueryResourceManager):
         }
 
     def augment(self, resources_param):
-        instances = jmespath.search("filters[*].Instances", self.data)
+        instances = jmespath_search("filters[*].Instances", self.data)
         if instances:
             for resource in resources_param:
                 cli = self.get_client()
@@ -144,7 +143,7 @@ class CLBMetricsFilter(MetricsFilter):
         for batch in chunks(resources, self.batch_size):
             params = self._get_request_params(batch, namespace)
             resp = cli.execute_query("GetMonitorData", params)
-            data_points = jmespath.search("Response.DataPoints[]", resp)
+            data_points = jmespath_search("Response.DataPoints[]", resp)
             for point in data_points:
                 yield point
 
