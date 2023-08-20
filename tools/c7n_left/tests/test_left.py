@@ -137,7 +137,6 @@ module "db" {
         """
     )
     subprocess.check_call(args="terraform init", shell=True, cwd=tmp_path)
-    TerraformProvider().parse(tmp_path)
     results = run_policy(
         {
             "name": "check-backup",
