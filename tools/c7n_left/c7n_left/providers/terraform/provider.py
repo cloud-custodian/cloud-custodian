@@ -19,6 +19,7 @@ from ...core import (
     log,
 )
 from .graph import TerraformGraph
+from .filters import Taggable
 
 
 class TerraformResourceManager(IACResourceManager):
@@ -27,6 +28,9 @@ class TerraformResourceManager(IACResourceManager):
 
     def get_model(self):
         return self.resource_type
+
+
+TerraformResourceManager.filter_registry.register('taggable', Taggable)
 
 
 class TerraformResourceMap(IACResourceMap):

@@ -14,7 +14,7 @@ from c7n.manager import ResourceManager
 from c7n.provider import Provider, clouds
 from c7n.policy import PolicyExecutionMode
 
-from .filters import Traverse, Taggable
+from .filters import Traverse
 from .utils import SEVERITY_LEVELS
 
 log = logging.getLogger("c7n.iac")
@@ -320,7 +320,6 @@ class IACResourceManager(ResourceManager):
 
 
 IACResourceManager.filter_registry.register("traverse", Traverse)
-IACResourceManager.filter_registry.register("taggable", Taggable)
 
 
 class IACResourceMap(object):
