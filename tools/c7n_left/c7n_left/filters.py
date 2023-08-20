@@ -168,14 +168,15 @@ class Taggable(Filter):
         tag_data = self.get_tag_data()
         unknown_provider = set()
         for r in resources:
-            tf_type = r['__tfmeta']['label']
-            provider, _ = tf_type.split('_', 1)
+            tf_path = r['__tfmeta']['path']
+            provider = tf_path.split('_', 1)[0]
             if provider not in tag_data:
                 unknown_provider.add(provider)
                 continue
+            tf_type = tf_path.split('.')[0]
             if tf_type not in tag_data[provider]:
                 continue
             results.append(r)
         if unknown_provider:
-            self.log.warning(f'{unknown_provider} are not supported by taggable filter')
+            self.log.warning(f'{unknown_provider} resources are not supported by taggable filter')
         return results

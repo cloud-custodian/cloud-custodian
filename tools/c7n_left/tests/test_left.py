@@ -73,6 +73,10 @@ class PolicyEnv:
     def get_selection(self, filter_expression):
         return core.ExecutionFilter.parse(Config.empty(filters=filter_expression))
 
+    def write_tf(self, content, path="main.tf"):
+        tf_file = self.policy_dir / path
+        tf_file.write_text(content)
+
     def write_policy(self, policy, path="policy.json"):
         policy_file = self.policy_dir / path
         extant = {"policies": []}
@@ -80,6 +84,18 @@ class PolicyEnv:
             extant = json.loads(policy_file.read_text())
         extant["policies"].append(policy)
         policy_file.write_text(json.dumps(extant))
+
+    def run(self, policy_dir=None, terraform_dir=None):
+        config = Config.empty(
+            policy_dir=policy_dir or self.policy_dir,
+            source_dir=terraform_dir or self.policy_dir,
+            exec_filter=None,
+            var_files=(),
+        )
+        policies = utils.load_policies(config.policy_dir, config)
+        reporter = ResultsReporter()
+        core.CollectionRunner(policies, config, reporter).run()
+        return reporter.results
 
 
 @pytest.fixture
@@ -138,6 +154,26 @@ def test_graph_resolver_id():
     resolver = Resolver()
     assert resolver.is_id_ref("4b3db3ec-98ad-4382-a460-d8e392d128b7") is True
     assert resolver.is_id_ref("a" * 36) is False
+
+
+def test_taggable(policy_env):
+    policy_env.write_tf(
+        """
+resource "aws_cloudwatch_log_group" "yada" {
+  name = "Yada"
+}
+resource "aws_cloudwatch_log_stream" "foo" {
+  name           = "SampleLogStream1234"
+  log_group_name = aws_cloudwatch_log_group.yada.name
+}
+        """
+    )
+    policy_env.write_policy(
+        {"name": "check-tags", "resource": "terraform.*", "filters": ["taggable"]}
+    )
+    results = policy_env.run()
+    assert len(results) == 1
+    assert results[0].resource['name'] == 'Yada'
 
 
 def test_traverse_multi_resource_multi_set(tmp_path):
