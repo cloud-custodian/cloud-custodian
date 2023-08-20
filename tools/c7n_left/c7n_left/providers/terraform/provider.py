@@ -29,6 +29,31 @@ class TerraformResourceManager(IACResourceManager):
     def get_model(self):
         return self.resource_type
 
+    def augment(self, resources, event):
+        # aws is currently the only terraform provider that supports default_tags afaics
+        # https://github.com/hashicorp/terraform-provider-azurerm/issues/13776
+        # https://github.com/hashicorp/terraform-provider-google/issues/7325
+        if event.get('resource_type').startswith('aws_') and Taggable.is_taggable(resources):
+            self.augment_provider_tags(resources, event)
+        return resources
+
+    def augment_provider_tags(self, resources, event):
+        provider_tags = {}
+        for type_name, blocks in event['graph'].get_resources_by_type(('provider',)):
+            for block in blocks:
+                if block['__tfmeta']['label'] != 'aws':
+                    continue
+                provider_tags.update(block.get('default_tags', {}).get('tags', {}))
+
+        if not provider_tags:
+            return
+
+        for r in resources:
+            rtags = dict(provider_tags)
+            if 'tags' in r:
+                rtags.update(r['tags'])
+            r['tags'] = rtags
+
 
 TerraformResourceManager.filter_registry.register('taggable', Taggable)
 

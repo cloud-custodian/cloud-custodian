@@ -156,6 +156,58 @@ def test_graph_resolver_id():
     assert resolver.is_id_ref("a" * 36) is False
 
 
+def test_moved_and_local(policy_env):
+    # mostly for coverage
+    policy_env.write_tf(
+        """
+locals {
+   name = "Yada"
+}
+resource "aws_cloudwatch_log_group" "yada" {
+  name = local.name
+}
+moved {
+  from = aws_instance.known
+  to   = aws_cloudwatch_log_group.yada
+}
+    """
+    )
+    policy_env.write_policy({"name": "check-blocks", "resource": "terraform.*"})
+    results = policy_env.run()
+    assert len(results) == 3
+
+
+def test_provider_tag_augment(policy_env):
+    policy_env.write_tf(
+        """
+resource "aws_cloudwatch_log_group" "yada" {
+  name = "Yada"
+}
+resource "aws_cloudwatch_log_stream" "foo" {
+  name           = "SampleLogStream1234"
+  log_group_name = aws_cloudwatch_log_group.yada.name
+}
+provider "aws" {
+ default_tags {
+   tags = {
+     Env = "Test"
+   }
+ }
+}
+provider "google" {
+  project     = "my-project-id"
+  region      = "us-central1"
+}
+        """
+    )
+    policy_env.write_policy(
+        {"name": "check-tags", "resource": "terraform.*", "filters": [{"tag:Env": "Test"}]}
+    )
+    results = policy_env.run()
+    assert len(results) == 1
+    assert results[0].resource['name'] == 'Yada'
+
+
 def test_taggable(policy_env):
     policy_env.write_tf(
         """
