@@ -193,7 +193,7 @@ an organization's tag standards.
 ```yaml
 policies:
  - name: check-tag-policy
-   resource: terraform.aws*
+   resource: "terraform.aws*"
    filters:
      - taggable
      - tag:Env: absent
@@ -206,6 +206,7 @@ This filter supports resources from several terraform providers including aws, a
 terraform providers that support default_tags have those values automatically available on the applicable resources.
 
 ### traverse filter
+
 A `traverse` filter is available that allows for multi-hop graph traversal from a resource
 to any related resource.
 
