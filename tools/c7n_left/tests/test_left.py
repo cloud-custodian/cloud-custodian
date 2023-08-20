@@ -147,10 +147,8 @@ module "db" {
         tmp_path,
         tmp_path,
     )
-    import pdb
-
-    pdb.set_trace()
-    print(results)
+    assert len(results) == 1
+    assert results[0]['__tfmeta']['filename'] == 'main.tf'
 
 
 def test_graph_resolver():
