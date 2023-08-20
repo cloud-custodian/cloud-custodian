@@ -148,7 +148,7 @@ module "db" {
         tmp_path,
     )
     assert len(results) == 1
-    assert results[0]['__tfmeta']['filename'] == 'main.tf'
+    assert results[0].resource['__tfmeta']['filename'] == 'main.tf'
 
 
 def test_graph_resolver():
