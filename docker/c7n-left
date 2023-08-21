@@ -1,4 +1,4 @@
-FROM cgr.dev/chainguard/python:3.11-dev as builder
+FROM cgr.dev/chainguard/python:latest-dev as builder
 
 ARG POETRY_VERSION="1.4.0"
 
@@ -23,7 +23,7 @@ RUN python -m venv "${HOME}/venv" && \
     . "${HOME}/venv/bin/activate" && \
     ~/tools/bin/poetry install --no-dev
 
-FROM cgr.dev/chainguard/python:3.11
+FROM cgr.dev/chainguard/python:latest
 
 LABEL name="c7n-left" \
       repository="http://github.com/cloud-custodian/cloud-custodian"
