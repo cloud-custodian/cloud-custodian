@@ -207,6 +207,26 @@ def test_graph_resolver_id():
     assert resolver.is_id_ref("a" * 36) is False
 
 
+def test_data_policy(policy_env):
+    policy_env.write_tf(
+        """
+data "aws_ami" "ubuntu" {
+  most_recent = true
+
+  filter {
+    name   = "name"
+    values = ["ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*"]
+  }
+
+  owners = ["099720109477"] # Canonical
+}
+        """
+    )
+    policy_env.write_policy({"name": "check-data", "resource": "terraform.data.aws_ami"})
+    results = policy_env.run()
+    assert len(results) == 1
+
+
 def test_moved_and_local(policy_env):
     # mostly for coverage
     policy_env.write_tf(
