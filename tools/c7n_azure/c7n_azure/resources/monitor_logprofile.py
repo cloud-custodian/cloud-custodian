@@ -56,11 +56,12 @@ class MonitorLogStorageFilter(ValueFilter):
             resource: azure.monitor-log-profile
             filters:
                 - type: monitor-storage
-                  key: encryption.key_source
+                  key: properties.encryption.keySource
                   op: eq
-                  value: Microsoft.Keyvault
+                  value_type: normalize
+                  value: microsoft.keyvault
     """
-    schema = type_schema('storage', rinherit=ValueFilter.schema)
+    schema = type_schema('monitorlogstorage', rinherit=ValueFilter.schema)
     schema_alias = False
 
     def process(self, resources, event=None):
