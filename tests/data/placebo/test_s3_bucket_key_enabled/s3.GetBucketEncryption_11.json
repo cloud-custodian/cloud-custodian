@@ -6,7 +6,7 @@
             "Rules": [
                 {
                     "ApplyServerSideEncryptionByDefault": {
-                        "SSEAlgorithm": "aws:kms"
+                        "SSEAlgorithm": "AES256"
                     },
                     "BucketKeyEnabled": false
                 }

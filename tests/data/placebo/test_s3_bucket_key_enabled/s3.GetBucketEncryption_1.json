@@ -1,10 +1,16 @@
 {
-    "status_code": 403,
+    "status_code": 200,
     "data": {
-        "Error": {
-            "Code": "AccessDenied",
-            "Message": "Access Denied"
-        },
-        "ResponseMetadata": {}
+        "ResponseMetadata": {},
+        "ServerSideEncryptionConfiguration": {
+            "Rules": [
+                {
+                    "ApplyServerSideEncryptionByDefault": {
+                        "SSEAlgorithm": "AES256"
+                    },
+                    "BucketKeyEnabled": false
+                }
+            ]
+        }
     }
 }

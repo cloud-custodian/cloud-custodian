@@ -1,7 +1,0 @@
-{
-    "status_code": 200,
-    "data": {
-        "ResponseMetadata": {},
-        "Policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"Statement1\",\"Effect\":\"Deny\",\"Principal\":\"*\",\"Action\":\"s3:GetIntelligentTieringConfiguration\",\"Resource\":\"arn:aws:s3:::example-abc-123\"}]}"
-    }
-}
