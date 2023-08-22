@@ -8,7 +8,7 @@
                     "ApplyServerSideEncryptionByDefault": {
                         "SSEAlgorithm": "AES256"
                     },
-                    "BucketKeyEnabled": true
+                    "BucketKeyEnabled": false
                 }
             ]
         }
