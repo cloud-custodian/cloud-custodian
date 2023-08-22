@@ -36,7 +36,7 @@ class TestInstance(OciBaseTest):
                 "actions": [{"type": "update", "defined_tags": self.get_defined_tag("add_tag")}],
             },
             session_factory=session_factory,
-            cache=f"{tmp_path}/cache.db",
+            cache="memory",
         )
         policy.run()
         resource = self._fetch_instance_validation_data(policy.resource_manager, ocid)
