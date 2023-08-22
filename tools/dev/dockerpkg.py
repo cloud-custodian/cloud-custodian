@@ -62,6 +62,7 @@ PHASE_2_PKG_INSTALL_ROOT += "\n".join(
 
 
 BOOTSTRAP_STAGE = """\
+# Dockerfiles are generated from tools/dev/dockerpkg.py
 FROM {base_build_image} as build-env
 
 ARG POETRY_VERSION="1.5.1"

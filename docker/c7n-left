@@ -1,5 +1,5 @@
+# Dockerfiles are generated from tools/dev/dockerpkg.py
 FROM ubuntu:22.04 as build-env
-
 
 ARG POETRY_VERSION="1.5.1"
 SHELL ["/bin/bash", "-c"]
