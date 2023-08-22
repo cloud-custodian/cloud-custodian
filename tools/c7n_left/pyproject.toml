@@ -23,7 +23,7 @@ c7n = {path = "../..", develop = true}
 
 click = ">=8.0"
 rich = "^13.1"
-tfparse = "^0.5"
+tfparse = "^0.6"
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.1.3"

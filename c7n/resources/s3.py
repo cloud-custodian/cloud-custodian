@@ -64,6 +64,7 @@ from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction
 from c7n.utils import (
     chunks, local_session, set_annotation, type_schema, filter_empty,
     dumps, format_string_values, get_account_alias_from_sts)
+from c7n.resources.aws import inspect_bucket_region
 
 
 log = logging.getLogger('custodian.s3')
@@ -3707,3 +3708,66 @@ class BucketOwnershipControls(BucketFilterBase, ValueFilter):
                 raise
             controls = {}
         b[self.annotation_key] = controls.get('OwnershipControls')
+
+
+@filters.register('bucket-replication')
+class BucketReplication(ListItemFilter):
+    """Filter for S3 buckets to look at bucket replication configurations
+
+    The schema to supply to the attrs follows the schema here:
+     https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/s3/client/get_bucket_replication.html
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: s3-bucket-replication
+                resource: s3
+                filters:
+                  - type: bucket-replication
+                    attrs:
+                      - Status: Enabled
+                      - Filter:
+                          And:
+                            Prefix: test
+                            Tags:
+                              - Key: Owner
+                                Value: c7n
+                      - ExistingObjectReplication: Enabled
+
+    """
+    schema = type_schema(
+        'bucket-replication',
+        attrs={'$ref': '#/definitions/filters_common/list_item_attrs'},
+        count={'type': 'number'},
+        count_op={'$ref': '#/definitions/filters_common/comparison_operators'}
+    )
+
+    permissions = ("s3:GetReplicationConfiguration",)
+    annotation_key = 'Replication'
+    annotate_items = True
+
+    def __init__(self, data, manager=None):
+        super().__init__(data, manager)
+        self.data['key'] = self.annotation_key
+
+    def get_item_values(self, b):
+        client = bucket_client(local_session(self.manager.session_factory), b)
+        # replication configuration is called in S3_AUGMENT_TABLE:
+        bucket_replication = b[self.annotation_key]
+
+        rules = []
+        if bucket_replication is not None:
+            rules = bucket_replication.get('ReplicationConfiguration', {}).get('Rules', [])
+            for replication in rules:
+                self.augment_bucket_replication(b, replication, client)
+
+        return rules
+
+    def augment_bucket_replication(self, b, replication, client):
+        destination_bucket = replication.get('Destination').get('Bucket').split(':')[5]
+        destination_region = inspect_bucket_region(destination_bucket, client.meta.endpoint_url)
+        source_region = get_region(b)
+        replication['DestinationRegion'] = destination_region
+        replication['CrossRegion'] = destination_region != source_region

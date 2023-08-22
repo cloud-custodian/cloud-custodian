@@ -1,0 +1,17 @@
+{
+    "status_code": 200,
+    "data": {
+        "TagDescriptions": [
+            {
+                "ResourceArn": "arn:aws:elasticloadbalancing:us-east-1:123456789012:loadbalancer/app/cfbpjxvoqbw/7efac0cadd02fc5d",
+                "Tags": [
+                    {
+                        "Key": "TEST_ID",
+                        "Value": "E0938EC0-FAD0-4FB2-8834-11E1091C1CAA"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

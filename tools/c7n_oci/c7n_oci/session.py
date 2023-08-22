@@ -6,17 +6,23 @@ import logging
 import os
 
 import oci
-from c7n_oci.constants import ENV_FINGERPRINT, ENV_USER, ENV_KEY_FILE, ENV_REGION, ENV_TENANCY
+from c7n_oci.constants import (
+    ENV_FINGERPRINT,
+    ENV_USER,
+    ENV_KEY_FILE,
+    ENV_REGION,
+    ENV_TENANCY,
+)
 
 log = logging.getLogger("custodian.oci.session")
 
 
 class SessionFactory:
-    def __init__(self, profile=None):
+    def __init__(self, profile=None, region=None):
         self.profile = profile
         self.user_agent_name = "Oracle-CloudCustodian"
+        self.region = region
         self._config = self._set_oci_config()
-        self._authenticate_user()
 
     def _set_oci_config(self):
         config = None
@@ -38,21 +44,25 @@ class SessionFactory:
             if config.get("additional_user_agent")
             else self.user_agent_name
         )
+
+        # Override the region value passed in the option
+        # For global region value, we will consider the region mentioned in the Config file
+        if self.region and self.region != "global":
+            config["region"] = self.region
+
         return config
 
     def _check_environment_variables(self):
         return all(
             os.environ.get(env)
-            for env in [ENV_FINGERPRINT, ENV_KEY_FILE, ENV_REGION, ENV_TENANCY, ENV_USER]
+            for env in [
+                ENV_FINGERPRINT,
+                ENV_KEY_FILE,
+                ENV_REGION,
+                ENV_TENANCY,
+                ENV_USER,
+            ]
         )
-
-    def _authenticate_user(self):
-        try:
-            identity_client = oci.identity.IdentityClient(self._config)
-            response = identity_client.get_user(self._config.get("user"))
-            log.info(f"Successfully authenticated user [{response.data.name}]")
-        except Exception as e:
-            log.error("Failed to authenticate user.\nMessage: {}".format(e))
 
     def __call__(self):
         session = Session(self._config)
@@ -70,3 +80,6 @@ class Session:
         client_args = {"config": self._config}
         client = client_class(**client_args)
         return client
+
+    def get_config(self):
+        return self._config

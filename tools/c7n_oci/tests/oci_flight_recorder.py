@@ -36,6 +36,16 @@ FILTERED_HEADERS = [
     "connection",
     "expires",
     "content-location",
+    "access-control-allow-credentials",
+    "access-control-allow-methods",
+    "access-control-allow-origin",
+    "access-control-expose-headers",
+    "content-length",
+    "date",
+    "x-api-id",
+    "etag",
+    "pragma",
+    "x-content-type-options",
 ]
 
 
@@ -46,6 +56,7 @@ class OCIFlightRecorder(CustodianTestCore):
     multi_requests_map = {}
     multi_requests_history = {}
     running_req_count = {}
+    recording = False
 
     def cleanUp(self):
         threading.local().http = None

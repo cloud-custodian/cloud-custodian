@@ -1,0 +1,30 @@
+{
+  "headers": {
+    "x-debug-tracking-id": "15527530767978214889;o=0",
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Tue, 08 Aug 2023 00:34:01 GMT",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "174",
+    "-content-encoding": "gzip"
+  },
+  "body": {
+    "version": 1,
+    "etag": "BwYCXoFWPfQ=",
+    "bindings": [
+      {
+        "role": "roles/editor",
+        "members": [
+          "user:yauhen_shaliou@epam.com"
+        ]
+      }
+    ]
+  }
+}

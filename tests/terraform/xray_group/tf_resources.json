@@ -1,0 +1,22 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "aws_xray_group": {
+            "example": {
+                "arn": "arn:aws:xray:us-east-1:644160558196:group/example/4SNNSKC4UA4KCCP23LRVLHCAFFRFU5FT23LXC6C6T2AUFTHDXELQ",
+                "filter_expression": "responsetime > 5",
+                "group_name": "example",
+                "id": "arn:aws:xray:us-east-1:644160558196:group/example/4SNNSKC4UA4KCCP23LRVLHCAFFRFU5FT23LXC6C6T2AUFTHDXELQ",
+                "insights_configuration": [
+                    {
+                        "insights_enabled": true,
+                        "notifications_enabled": true
+                    }
+                ],
+                "tags": null,
+                "tags_all": {}
+            }
+        }
+    }
+}

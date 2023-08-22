@@ -194,6 +194,24 @@ class InstanceTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
+    def test_image_filter_iam_query(self):
+        project_id = 'cloud-custodian'
+        factory = self.replay_flight_data('image-filter-iam', project_id=project_id)
+        p = self.load_policy({
+            'name': 'image-filter-iam',
+            'resource': 'gcp.image',
+            'filters': [{
+                'type': 'iam-policy',
+                'doc': {'key': 'bindings[*].members[]',
+                        'op': 'intersect',
+                        'value': ['allUsers', 'allAuthenticatedUsers']}
+            }]
+        }, session_factory=factory)
+        resources = p.run()
+
+        self.assertEqual(1, len(resources))
+        self.assertEqual('image-1', resources[0]['name'])
+
 
 def test_instance_refresh(test):
     factory = test.replay_flight_data('instance-refresh', project_id='cloud-custodian')
