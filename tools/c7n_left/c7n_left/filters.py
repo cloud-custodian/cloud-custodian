@@ -67,7 +67,7 @@ class Traverse(Filter):
             },
         },
         required=("resources",),
-        **{"count-op": {"$ref": "#/definitions/filters_common/comparison_operators"}}
+        **{"count-op": {"$ref": "#/definitions/filters_common/comparison_operators"}},
     )
 
     _vfilters = None
