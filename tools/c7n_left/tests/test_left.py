@@ -207,6 +207,26 @@ def test_graph_resolver_id():
     assert resolver.is_id_ref("a" * 36) is False
 
 
+def test_data_policy(policy_env):
+    policy_env.write_tf(
+        """
+data "aws_ami" "ubuntu" {
+  most_recent = true
+
+  filter {
+    name   = "name"
+    values = ["ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*"]
+  }
+
+  owners = ["099720109477"] # Canonical
+}
+        """
+    )
+    policy_env.write_policy({"name": "check-data", "resource": "terraform.data.aws_ami"})
+    results = policy_env.run()
+    assert len(results) == 1
+
+
 def test_moved_and_local(policy_env):
     # mostly for coverage
     policy_env.write_tf(
@@ -277,6 +297,43 @@ resource "aws_cloudwatch_log_stream" "foo" {
     results = policy_env.run()
     assert len(results) == 1
     assert results[0].resource['name'] == 'Yada'
+
+
+def test_traverse_to_data(policy_env):
+    policy_env.write_tf(
+        """
+data "aws_ami" "ubuntu" {
+  most_recent = true
+
+  filter {
+    name   = "name"
+    values = ["ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*"]
+  }
+
+  owners = ["099720109477"] # Canonical
+}
+
+resource "aws_instance" "app" {
+  ami           = data.aws_ami.ubuntu.id
+  instance_type = "t3.micro"
+}
+        """
+    )
+    policy_env.write_policy(
+        {
+            "name": "check-image",
+            "resource": "terraform.aws_instance",
+            "filters": [
+                {"type": "traverse", "resources": "data.aws_ami", "attrs": [{"owners": "present"}]}
+            ],
+        }
+    )
+    graph = TerraformProvider().parse(policy_env.policy_dir)
+    assert not list(graph.get_resources_by_type('aws_ami'))
+    assert list(graph.get_resources_by_type('data.aws_ami'))
+
+    results = policy_env.run()
+    assert len(results) == 1
 
 
 def test_traverse_multi_resource_multi_set(tmp_path):
