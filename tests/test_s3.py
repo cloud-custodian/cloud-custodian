@@ -4435,9 +4435,8 @@ class BucketReplication(BaseTest):
 
     def test_s3_bucket_key_enabled(self):
         self.patch(s3.S3, "executor_factory", MainThreadExecutor)
+        self.patch(s3.BucketEncryption, "executor_factory", MainThreadExecutor)
         self.patch(s3, "S3_AUGMENT_TABLE", [])
-        self.patch(s3, "S3_AUGMENT_TABLE", [('get_bucket_encryption',
-        None, None, None, 's3:GetBucketEncryption')])
         factory = self.replay_flight_data('test_s3_bucket_key_enabled')
 
         p = self.load_policy(
@@ -4465,9 +4464,8 @@ class BucketReplication(BaseTest):
 
     def test_s3_bucket_key_disabled(self):
         self.patch(s3.S3, "executor_factory", MainThreadExecutor)
+        self.patch(s3.BucketEncryption, "executor_factory", MainThreadExecutor)
         self.patch(s3, "S3_AUGMENT_TABLE", [])
-        self.patch(s3, "S3_AUGMENT_TABLE", [('get_bucket_encryption',
-        None, None, None, 's3:GetBucketEncryption')])
         factory = self.replay_flight_data('test_s3_bucket_key_disabled')
 
         p = self.load_policy(
