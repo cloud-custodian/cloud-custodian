@@ -1,5 +1,6 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+import logging
 
 import pytest
 
@@ -17,7 +18,9 @@ class TestInstance(OciBaseTest):
         return self.fetch_validation_data(resource_manager, "get_instance", instance_id)
 
     @terraform("compute", scope="class")
-    def test_add_defined_tag_to_instance(self, test, compute, with_or_without_compartment):
+    def test_add_defined_tag_to_instance(
+        self, test, compute, with_or_without_compartment, tmp_path
+    ):
         """
         test adding defined_tags tag on compute instance
         """
@@ -33,11 +36,15 @@ class TestInstance(OciBaseTest):
                 "actions": [{"type": "update", "defined_tags": self.get_defined_tag("add_tag")}],
             },
             session_factory=session_factory,
+            cache=f"{tmp_path}/cache.db",
         )
         policy.run()
         resource = self._fetch_instance_validation_data(policy.resource_manager, ocid)
         test.assertEqual(resource["id"], ocid)
         test.assertEqual(self.get_defined_tag_value(resource["defined_tags"]), "true")
+        output = self.capture_logging(name=policy.resource_manager.log.name, level=logging.DEBUG)
+        policy.run()
+        test.assertEqual(True, 'Using cached c7n_oci.query' in output.getvalue())
 
     @terraform("compute", scope="class")
     def test_update_defined_tag_of_instance(self, test, compute):

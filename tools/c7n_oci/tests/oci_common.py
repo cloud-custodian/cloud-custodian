@@ -56,6 +56,9 @@ class OciBaseTest(CustodianTestCore):
         else:
             return oci.util.to_dict(resources.data)
 
+    def addCleanup(self, func, *args, **kw):
+        pass
+
 
 ## common functions
 def replace_ocid(data):
