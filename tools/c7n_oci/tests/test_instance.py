@@ -1,6 +1,7 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import logging
+import sys
 
 import pytest
 
@@ -17,6 +18,7 @@ class TestInstance(OciBaseTest):
     def _fetch_instance_validation_data(self, resource_manager, instance_id):
         return self.fetch_validation_data(resource_manager, "get_instance", instance_id)
 
+    @pytest.mark.skipif(sys.platform == "win32", reason="This test does not run on Windows")
     @terraform("compute", scope="class")
     def test_add_defined_tag_to_instance(
         self, test, compute, with_or_without_compartment, tmp_path
