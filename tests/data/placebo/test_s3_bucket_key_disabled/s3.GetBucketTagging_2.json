@@ -1,0 +1,20 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "TagSet": [
+            {
+                "Key": "aws:cloudformation:stack-id",
+                "Value": "arn:aws:cloudformation:us-east-1:644160558196:stack/CDKToolkit/b8e16500-b679-11ec-8259-0e3a79ee7dd1"
+            },
+            {
+                "Key": "aws:cloudformation:stack-name",
+                "Value": "CDKToolkit"
+            },
+            {
+                "Key": "aws:cloudformation:logical-id",
+                "Value": "StagingBucket"
+            }
+        ]
+    }
+}

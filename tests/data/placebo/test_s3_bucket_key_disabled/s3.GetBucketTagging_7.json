@@ -1,0 +1,20 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "TagSet": [
+            {
+                "Key": "c7n:FindingId:S3 Test",
+                "Value": "us-east-1/644160558196/6fabb474693a36aeb597da992e618aba/3210efe1f9d19e1ded07b17f0381881f:2021-07-01T20:44:07.273510+00:00"
+            },
+            {
+                "Key": "c7n:FindingId:S3 Bucket Encryption",
+                "Value": "us-east-1/644160558196/fac2930187dba3236dc58931fec5c9ed/3210efe1f9d19e1ded07b17f0381881f:2021-07-01T18:15:26.908809+00:00"
+            },
+            {
+                "Key": "c7n:FindingId:This is a test",
+                "Value": "us-east-1/644160558196/eb83b488dcde14e93930843b4e24a018/3210efe1f9d19e1ded07b17f0381881f:2021-07-13T20:22:43.840424+00:00"
+            }
+        ]
+    }
+}

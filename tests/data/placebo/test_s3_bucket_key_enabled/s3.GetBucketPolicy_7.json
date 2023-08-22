@@ -1,0 +1,7 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Policy": "{\"Version\":\"2008-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::644160558196:role/service-role/codebuild-test-service-role\"},\"Action\":\"s3:*\",\"Resource\":[\"arn:aws:s3:::c7n-ssm-build\",\"arn:aws:s3:::c7n-ssm-build/*\"]},{\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"serverlessrepo.amazonaws.com\"},\"Action\":\"s3:GetObject\",\"Resource\":\"arn:aws:s3:::c7n-ssm-build/*\"}]}"
+    }
+}

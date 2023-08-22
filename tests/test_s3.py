@@ -4431,3 +4431,55 @@ class BucketReplication(BaseTest):
             resources = p.run()
             self.assertEqual(len(resources), 1)
             self.assertEqual(resources[0]['Name'],'custodian-replication-west')
+
+
+    def test_s3_bucket_key_enabled(self):
+        factory = self.replay_flight_data('test_s3_bucket_key_enabled')
+
+        p = self.load_policy(
+            {
+                'name': 'test-s3-bucket-key-enabled',
+                'resource': 'aws.s3',
+                'filters': [
+                    {
+                        'type': 'bucket-encryption',
+                        'bucket_key_enabled': True
+                    },
+                    {
+                        'type': 'value',
+                        'key': 'Name',
+                        'value': 'c7n-test-s3-bucket',
+                        'op': 'contains'
+                    }
+                ]
+            },
+            session_factory=factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+
+    def test_s3_bucket_key_disabled(self):
+        factory = self.replay_flight_data('test_s3_bucket_key_disabled')
+
+        p = self.load_policy(
+            {
+                'name': 'test-s3-bucket-key-disabled',
+                'resource': 'aws.s3',
+                'filters': [
+                    {
+                        'type': 'bucket-encryption',
+                        'bucket_key_enabled': False
+                    },
+                    {
+                        'type': 'value',
+                        'key': 'Name',
+                        'value': 'c7n-test-s3-bucket',
+                        'op': 'contains'
+                    }
+                ]
+            },
+            session_factory=factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)

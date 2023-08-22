@@ -3402,11 +3402,18 @@ class BucketEncryption(KMSKeyResolverMixin, Filter):
                 filters:
                   - type: bucket-encryption
                     state: False
+              - name: s3-bucket-test-bucket-key-enabled
+                resource: s3
+                region: us-east-1
+                filters:
+                  - type: bucket-encryption
+                    bucket_key_enabled: True
     """
     schema = type_schema('bucket-encryption',
                          state={'type': 'boolean'},
                          crypto={'type': 'string', 'enum': ['AES256', 'aws:kms']},
-                         key={'type': 'string'})
+                         key={'type': 'string'},
+                         bucket_key_enabled={'type': 'boolean'})
 
     permissions = ('s3:GetEncryptionConfiguration', 'kms:DescribeKey', 'kms:ListAliases')
     annotation_key = 'c7n:bucket-encryption'
@@ -3445,6 +3452,13 @@ class BucketEncryption(KMSKeyResolverMixin, Filter):
         rules = be.get('ServerSideEncryptionConfiguration', {}).get('Rules', [])
         # default `state` to True as previous impl assumed state == True
         # to preserve backwards compatibility
+        if self.data.get('bucket_key_enabled'):
+            for rule in rules:
+                return self.filter_bucket_key_enabled(rule)
+        elif self.data.get('bucket_key_enabled') is False:
+            for rule in rules:
+                return not self.filter_bucket_key_enabled(rule)
+
         if self.data.get('state', True):
             for sse in rules:
                 return self.filter_bucket(b, sse)
@@ -3489,6 +3503,11 @@ class BucketEncryption(KMSKeyResolverMixin, Filter):
             # implies the AWS-managed key.
             key_ids = {key.get('Arn'), key.get('KeyId'), *key['Aliases']}
             return rule.get('KMSMasterKeyID', 'alias/aws/s3') in key_ids
+
+    def filter_bucket_key_enabled(self, rule) -> bool:
+        if not rule:
+            return False
+        return rule.get('BucketKeyEnabled')
 
 
 @actions.register('set-bucket-encryption')

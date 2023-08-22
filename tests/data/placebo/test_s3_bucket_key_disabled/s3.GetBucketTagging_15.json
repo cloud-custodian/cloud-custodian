@@ -1,0 +1,12 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "TagSet": [
+            {
+                "Key": "c7n:FindingId:This is a test",
+                "Value": "us-east-1/644160558196/1d86d52026f337fc5eda946ff044d20d/83df653749b238554bde9a26f81aced2:2021-07-18T17:14:56.583412+00:00"
+            }
+        ]
+    }
+}

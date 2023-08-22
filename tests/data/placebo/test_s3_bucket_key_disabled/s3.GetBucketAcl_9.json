@@ -1,0 +1,20 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Owner": {
+            "DisplayName": "mandeep.bal",
+            "ID": "e7c8bb65a5fc49cf906715eae09de9e4bb7861a96361ba79b833aa45f6833b15"
+        },
+        "Grants": [
+            {
+                "Grantee": {
+                    "DisplayName": "mandeep.bal",
+                    "ID": "e7c8bb65a5fc49cf906715eae09de9e4bb7861a96361ba79b833aa45f6833b15",
+                    "Type": "CanonicalUser"
+                },
+                "Permission": "FULL_CONTROL"
+            }
+        ]
+    }
+}

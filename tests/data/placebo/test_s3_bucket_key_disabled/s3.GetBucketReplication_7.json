@@ -1,0 +1,11 @@
+{
+    "status_code": 404,
+    "data": {
+        "Error": {
+            "Code": "ReplicationConfigurationNotFoundError",
+            "Message": "The replication configuration was not found",
+            "BucketName": "amazon-connect-f42013f3d380"
+        },
+        "ResponseMetadata": {}
+    }
+}
