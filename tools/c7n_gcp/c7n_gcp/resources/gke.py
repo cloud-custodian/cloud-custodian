@@ -138,6 +138,31 @@ class KubernetesClusterNodePool(ChildResourceManager):
         def _get_location(cls, resource):
             "Get the region from the parent - the cluster"
             return super()._get_location(cls.get_parent(resource))
+    
+    def _get_location(self, resource):
+        return resource['selfLink'].split('/')[-5]
+
+    def augment(self, resources):
+        if not resources:
+            return []
+        
+        session = local_session(self.session_factory)
+        project = session.get_default_project()
+        location = self._get_location(resources[0])
+
+        server_config_client = session.client(
+            self.resource_type.service, self.resource_type.version, 'projects.locations')
+        
+        
+        response = server_config_client.execute_command(
+            'getServerConfig', verb_arguments={
+                    'name': 'projects/{}/locations/{}'.format(project, location)}
+        )
+        
+        for r in resources:
+            r['validNodeVersions'] = response["validNodeVersions"]
+
+        return resources
 
 
 @KubernetesCluster.action_registry.register('delete')
