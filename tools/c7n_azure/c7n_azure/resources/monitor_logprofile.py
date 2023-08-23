@@ -61,7 +61,7 @@ class MonitorLogStorageFilter(ValueFilter):
                   value_type: normalize
                   value: microsoft.keyvault
     """
-    schema = type_schema('monitorlogstorage', rinherit=ValueFilter.schema)
+    schema = type_schema('monitor-storage', rinherit=ValueFilter.schema)
     schema_alias = False
 
     def process(self, resources, event=None):
