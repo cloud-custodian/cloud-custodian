@@ -5,7 +5,7 @@ SELF_MAKE := $(lastword $(MAKEFILE_LIST))
 
 PKG_REPO = testpypi
 PKG_INCREMENT := patch
-PKG_SET := tools/c7n_gcp tools/c7n_kube tools/c7n_openstack tools/c7n_mailer tools/c7n_logexporter tools/c7n_policystream tools/c7n_trailcreator tools/c7n_org tools/c7n_sphinxext tools/c7n_terraform tools/c7n_awscc tools/c7n_tencentcloud tools/c7n_azure tools/c7n_oci
+PKG_SET := tools/c7n_gcp tools/c7n_kube tools/c7n_openstack tools/c7n_mailer tools/c7n_logexporter tools/c7n_policystream tools/c7n_trailcreator tools/c7n_org tools/c7n_sphinxext tools/c7n_left tools/c7n_awscc tools/c7n_tencentcloud tools/c7n_azure tools/c7n_oci
 
 FMT_SET := tools/c7n_left tools/c7n_mailer tools/c7n_oci tools/c7n_kube
 
@@ -49,7 +49,6 @@ test-coverage:
             --cov tools/c7n_gcp/c7n_gcp \
             --cov tools/c7n_kube/c7n_kube \
             --cov tools/c7n_left/c7n_left \
-            --cov tools/c7n_terraform/c7n_terraform \
             --cov tools/c7n_mailer/c7n_mailer \
             --cov tools/c7n_policystream/c7n_policystream \
             --cov tools/c7n_tencentcloud/c7n_tencentcloud \
