@@ -21,7 +21,7 @@ distribution](https://www.chainguard.dev/unchained/introducing-wolfi-the-first-l
 is designed to be minimal, auditable, and secure.
 
 ```shell
-docker pull cloudcustodian/c7n_left:dev
+docker pull cloudcustodian/c7n-left:dev
 ```
 
 Images signatures can be verified using [cosign](https://github.com/sigstore/cosign)
@@ -149,7 +149,7 @@ policy values for severity and category are specified in its metadata section. i
 
 policies:
   - name: check-encryption
-    resource: [aws_ebs_volume, aws_sqs_queue]
+    resource: [terraform.aws_ebs_volume, terraform.aws_sqs_queue]
     metadata:
       category: [encryption, security]
       severity: high
