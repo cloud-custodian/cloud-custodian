@@ -44,7 +44,7 @@ ResourceMap = {
     "gcp.iam-role": "c7n_gcp.resources.iam.Role",
     "gcp.image": "c7n_gcp.resources.compute.Image",
     "gcp.instance": "c7n_gcp.resources.compute.Instance",
-    "gcp.instance-group-manager": "c7n_gcp.resources.compute.InstanceGroupManager",
+    "gcp.instance-group": "c7n_gcp.resources.compute.InstanceGroupManager",
     "gcp.instance-template": "c7n_gcp.resources.compute.InstanceTemplate",
     "gcp.interconnect": "c7n_gcp.resources.network.Interconnect",
     "gcp.interconnect-attachment": "c7n_gcp.resources.network.InterconnectAttachment",

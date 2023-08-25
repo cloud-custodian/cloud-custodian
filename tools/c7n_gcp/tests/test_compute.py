@@ -669,7 +669,7 @@ class TestInstanceGroupManager(BaseTest):
             'test_instance_group_manager_query', project_id=project_id)
         p = self.load_policy(
             {'name': 'gcp-instance-group-manager',
-             'resource': 'gcp.instance-group-manager'},
+             'resource': 'gcp.instance-group'},
             session_factory=factory)
 
         resources = p.run()
