@@ -695,7 +695,7 @@ class Project(QueryResourceManager):
                 'get', {'project': resource_info['project_id']})
 
 
-@resources.register('instance-group-manager')
+@resources.register('instance-group')
 class InstanceGroupManager(ChildResourceManager):
 
     class resource_type(ChildTypeInfo):
