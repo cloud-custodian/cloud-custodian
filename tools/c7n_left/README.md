@@ -149,7 +149,7 @@ policy values for severity and category are specified in its metadata section. i
 
 policies:
   - name: check-encryption
-    resource: [aws_ebs_volume, aws_sqs_queue]
+    resource: [terraform.aws_ebs_volume, terraform.aws_sqs_queue]
     metadata:
       category: [encryption, security]
       severity: high
