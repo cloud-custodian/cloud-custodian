@@ -76,18 +76,19 @@ def initialize_resource(resource_name):
         ),
     )
 
-    rtype.action_registry.register(
-        "update",
-        type(
-            class_name + "Update",
-            (Update,),
-            {
-                "schema": get_update_schema(rtype.schema, rname),
-                "permissions": rinfo["handlers"]["update"]["permissions"],
-                "__module__": mod_name,
-            },
-        ),
-    )
+    if "update" in rinfo["handlers"]:
+        rtype.action_registry.register(
+            "update",
+            type(
+                class_name + "Update",
+                (Update,),
+                {
+                    "schema": get_update_schema(rtype.schema, rname),
+                    "permissions": rinfo["handlers"]["update"]["permissions"],
+                    "__module__": mod_name,
+                },
+            ),
+        )
 
     process_supplementary_data(rtype)
     resources.register(rname, rtype)
