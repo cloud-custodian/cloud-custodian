@@ -121,7 +121,7 @@ def build(setup_kwargs):
         zipf = zipfile.ZipFile(BytesIO(response.read()))
         for f in zipf.namelist():
             name = f.replace("-", "_")
-            (data_dir / name).write_bytes(zipf.read(f))
+            (data_dir / name).write_text(zipf.read(f).encode('utf8'))
 
     print("awscc - downloaded %d resource types" % (len(zipf.namelist())))
     build_index(data_dir)
