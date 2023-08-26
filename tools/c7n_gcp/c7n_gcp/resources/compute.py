@@ -11,7 +11,7 @@ from c7n_gcp.actions import MethodAction
 from c7n_gcp.filters import IamPolicyFilter
 from c7n_gcp.filters.iampolicy import IamPolicyValueFilter
 from c7n_gcp.provider import resources
-from c7n_gcp.query import QueryResourceManager, TypeInfo
+from c7n_gcp.query import QueryResourceManager, TypeInfo, ChildResourceManager, ChildTypeInfo
 
 from c7n.filters.core import ValueFilter
 from c7n.filters.offhours import OffHour, OnHour
@@ -662,6 +662,21 @@ class AutoscalerSet(MethodAction):
         return result
 
 
+@resources.register('zone')
+class Zone(QueryResourceManager):
+    """GC resource: https://cloud.google.com/compute/docs/reference/rest/v1/zones"""
+    class resource_type(TypeInfo):
+        service = 'compute'
+        version = 'v1'
+        component = 'zones'
+        enum_spec = ('list', 'items[]', None)
+        scope = 'project'
+        name = id = 'name'
+        default_report_fields = ['id', 'name', 'dnsName', 'creationTime', 'visibility']
+        asset_type = "compute.googleapis.com/compute"
+        scc_type = "google.cloud.dns.ManagedZone"
+
+
 @resources.register('compute-project')
 class Project(QueryResourceManager):
     """GCP resource: https://cloud.google.com/compute/docs/reference/rest/v1/projects"""
@@ -678,3 +693,21 @@ class Project(QueryResourceManager):
         def get(client, resource_info):
             return client.execute_command(
                 'get', {'project': resource_info['project_id']})
+
+
+@resources.register('instance-group-manager')
+class InstanceGroupManager(ChildResourceManager):
+
+    class resource_type(ChildTypeInfo):
+        service = 'compute'
+        version = 'v1'
+        component = 'instanceGroupManagers'
+        enum_spec = ('list', 'items[]', None)
+        name = id = 'name'
+        parent_spec = {
+            'resource': 'zone',
+            'child_enum_params': {
+                ('name', 'zone')},
+            'use_child_query': False,
+        }
+        default_report_fields = ['id', 'name', 'dnsName', 'creationTime', 'visibility']

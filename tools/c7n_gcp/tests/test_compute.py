@@ -659,3 +659,20 @@ class ProjectTest(BaseTest):
 
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['name'], 'gcp-lab-custodian')
+
+
+class TestInstanceGroupManager(BaseTest):
+
+    def test_query(self):
+        project_id = 'cloud-custodian'
+        factory = self.replay_flight_data(
+            'test_instance_group_manager_query', project_id=project_id)
+        p = self.load_policy(
+            {'name': 'gcp-instance-group-manager',
+             'resource': 'gcp.instance-group-manager'},
+            session_factory=factory)
+
+        resources = p.run()
+
+        self.assertEqual(1, len(resources))
+        self.assertEqual('instance-group-2', resources[0]['name'])
