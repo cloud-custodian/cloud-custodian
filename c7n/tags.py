@@ -62,6 +62,7 @@ def register_universal_tags(filters, actions, compatibility=True):
         actions.register('untag', UniversalUntag)
 
     actions.register('remove-tag', UniversalUntag)
+    actions.register('rename-tag', UniversalTagRename)
 
 
 def universal_augment(self, resources):
@@ -911,6 +912,36 @@ class UniversalUntag(RemoveTag):
         arns = self.manager.get_arns(resource_set)
         return universal_retry(
             client.untag_resources, ResourceARNList=arns, TagKeys=tag_keys)
+
+
+class UniversalTagRename(Action):
+
+    schema = utils.type_schema(
+        'rename-tag',
+        old_key={'type': 'string'},
+        new_key={'type': 'string'},
+        required=['old_key', 'new_key']
+    )
+
+    def process(self, resources):
+        old_key = self.data['old_key']
+
+        # Collect by distinct tag value to minimize api calls
+        # via bulk api usage.
+        values_resources = {}
+        for r in resources:
+            v = r.get('Tags', {}).get(old_key)
+            if v is None:
+                continue
+            value_resources.setdefault(v, []).append(r)
+
+        new_key = self.data['new_key']
+        cleaner = UniversalUntag({'tags': [old_key]})
+        for value, rpopulation in values_resources.items():
+            tagger = UniversalTag({new_key: value})
+            tagger.process(rpopulation)
+            cleaner.process(rpopulation)
+
 
 
 class UniversalTagDelayedAction(TagDelayedAction):
