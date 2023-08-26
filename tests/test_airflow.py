@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 from .common import BaseTest
 from c7n.utils import jmespath_search
+import logging
 
 class TestApacheAirflow(BaseTest):
     def test_airflow_environment_value_filter(self):
@@ -154,3 +155,58 @@ class TestApacheAirflow(BaseTest):
         airflow = session_factory().client('mwaa')
         call = airflow.get_environment(Name=name)
         self.assertEqual("DELETING", call['Environment'].get('Status'))
+
+    def test_airflow_update_environment_except_clause(self):
+        session_factory = self.replay_flight_data('test_airflow_update_environment_except_clause')
+        p = self.load_policy(
+            {
+                "name": "airflow-update-webserver-access-mode",
+                "resource": "airflow",
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": "WebserverAccessMode",
+                        "op": "eq",
+                        "value": "PUBLIC_ONLY",
+                    }
+                ],
+                "actions": [
+                    {
+                        "type": "update-environment",
+                        "access_mode": "PRIVATE_ONLY",
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+        log_output = self.capture_logging("custodian.resources.airflow", level=logging.ERROR)
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+        self.assertFalse(log_output.getvalue())
+
+    def test_airflow_delete_environment_except_clause(self):
+        session_factory = self.replay_flight_data('test_airflow_delete_environment_except_clause')
+        p = self.load_policy(
+            {
+                "name": "airflow-update-webserver-access-mode",
+                "resource": "airflow",
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": "Name",
+                        "op": "eq",
+                        "value": "Test-MwaaEnvironment",
+                    }
+                ],
+                "actions": [
+                    {
+                        "type": "delete-environment"
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+        log_output = self.capture_logging("custodian.resources.airflow", level=logging.ERROR)
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+        self.assertFalse(log_output.getvalue())
