@@ -245,7 +245,7 @@ def test_instance_pause_resume(test, gcp_instance):
         'resource': 'gcp.instance',
         'filters': [{'name': gcp_instance['google_compute_instance.default.name']}],
         'actions': ['resume']
-    }, session_factory=factory)    
+    }, session_factory=factory)
     resources = policy.run()
     assert len(resources) == 1
 
