@@ -3,30 +3,30 @@
     "data": {
         "ResponseMetadata": {},
         "Environment": {
-            "AirflowVersion": "2.5.1",
+            "AirflowVersion": "2.6.3",
             "Arn": "arn:aws:airflow:us-east-1:644160558196:environment/TimmyTest-MwaaEnvironment",
             "CreatedAt": {
                 "__class__": "datetime",
                 "year": 2023,
                 "month": 8,
-                "day": 21,
+                "day": 26,
                 "hour": 10,
-                "minute": 40,
-                "second": 18,
+                "minute": 57,
+                "second": 51,
                 "microsecond": 0
             },
             "DagS3Path": "dags",
             "EnvironmentClass": "mw1.small",
-            "ExecutionRoleArn": "arn:aws:iam::644160558196:role/service-role/TimmyTest-MwaaExecutionRole-1GWPEET14VIDI",
+            "ExecutionRoleArn": "arn:aws:iam::644160558196:role/service-role/TimmyTest-MwaaExecutionRole-B2L8KXW2AQ19",
             "LastUpdate": {
                 "CreatedAt": {
                     "__class__": "datetime",
                     "year": 2023,
                     "month": 8,
-                    "day": 22,
-                    "hour": 8,
-                    "minute": 6,
-                    "second": 15,
+                    "day": 26,
+                    "hour": 10,
+                    "minute": 57,
+                    "second": 51,
                     "microsecond": 0
                 },
                 "Status": "SUCCESS"
@@ -63,21 +63,21 @@
             "Name": "TimmyTest-MwaaEnvironment",
             "NetworkConfiguration": {
                 "SecurityGroupIds": [
-                    "sg-0ac8b5b5f9015be49"
+                    "sg-031cac6ed03daf7ac"
                 ],
                 "SubnetIds": [
-                    "subnet-0442b8950acde51df",
-                    "subnet-05e259d8191f1b3fa"
+                    "subnet-06e4a58685fb609e6",
+                    "subnet-03c0d56abe1ae2e76"
                 ]
             },
             "Schedulers": 2,
             "ServiceRoleArn": "arn:aws:iam::644160558196:role/aws-service-role/airflow.amazonaws.com/AWSServiceRoleForAmazonMWAA",
-            "SourceBucketArn": "arn:aws:s3:::timmytest-environmentbucket-1d5kod17p8h1n",
+            "SourceBucketArn": "arn:aws:s3:::timmytest-environmentbucket-1anzx0el9n05h",
             "Status": "DELETING",
             "Tags": {},
-            "WebserverAccessMode": "PRIVATE_ONLY",
-            "WebserverUrl": "164c9d20-08b5-4ee1-bc71-bef7e4aca50e-vpce.c35.us-east-1.airflow.amazonaws.com",
-            "WeeklyMaintenanceWindowStart": "FRI:16:30"
+            "WebserverAccessMode": "PUBLIC_ONLY",
+            "WebserverUrl": "cd454bb2-8cc7-4a65-9d99-10ebd8fe6362.c2.us-east-1.airflow.amazonaws.com",
+            "WeeklyMaintenanceWindowStart": "THU:07:00"
         }
     }
 }

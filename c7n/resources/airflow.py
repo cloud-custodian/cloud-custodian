@@ -146,13 +146,10 @@ class UpdateApacheAirflowEnvironment(Action):
         client = local_session(self.manager.session_factory).client('mwaa')
         access_mode = self.data.get('access_mode')
         for r in resources:
-            try:
-                client.update_environment(
-                    Name=r['Name'],
-                    WebserverAccessMode=access_mode
-                )
-            except client.exceptions.ResourceNotFoundException:
-                continue
+          client.update_environment(
+              Name=r['Name'],
+              WebserverAccessMode=access_mode
+          )
 
 @ApacheAirflow.action_registry.register('delete-environment')
 class DeleteApacheAirflowEnvironment(Action):
@@ -177,9 +174,8 @@ class DeleteApacheAirflowEnvironment(Action):
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('mwaa')
         for r in resources:
-            try:
-                client.delete_environment(
-                    Name=r['Name']
-                )
-            except client.exceptions.ResourceNotFoundException:
-                continue
+          self.manager.retry(
+            client.delete_environment,
+            Name=r["Name"],
+            ignore_err_codes=("ResourceNotFoundException",)
+          )
