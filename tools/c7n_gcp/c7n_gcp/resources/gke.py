@@ -72,9 +72,23 @@ class KubernetesCluster(QueryResourceManager):
     def augment(self, resources):
         if not resources:
             return []
+        session = local_session(self.session_factory)
+        project = session.get_default_project()
+        location = resources[0]["location"]
+        server_config_client = session.client(
+            self.resource_type.service, self.resource_type.version, "projects.locations"
+        )
+        response = server_config_client.execute_command(
+            "getServerConfig",
+            verb_arguments={
+                "name": "projects/{}/locations/{}".format(project, location)
+            },
+        )
         for r in resources:
             if r.get('resourceLabels'):
                 r['labels'] = r['resourceLabels']
+            r["validMasterVersions"] = response["validMasterVersions"]
+            r["nodeConfig"]["validImageTypes"] = response["validImageTypes"]
         return resources
 
 
@@ -161,6 +175,7 @@ class KubernetesClusterNodePool(ChildResourceManager):
         
         for r in resources:
             r['validNodeVersions'] = response["validNodeVersions"]
+            r["config"]["validImageTypes"] = response["validImageTypes"]
 
         return resources
 
