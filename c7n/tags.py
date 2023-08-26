@@ -933,7 +933,7 @@ class UniversalTagRename(Action):
             v = r.get('Tags', {}).get(old_key)
             if v is None:
                 continue
-            value_resources.setdefault(v, []).append(r)
+            values_resources.setdefault(v, []).append(r)
 
         new_key = self.data['new_key']
         cleaner = UniversalUntag({'tags': [old_key]})
