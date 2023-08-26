@@ -1,0 +1,32 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Sat, 26 Aug 2023 13:21:26 GMT",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "753",
+    "-content-encoding": "gzip"
+  },
+  "body": {
+    "kind": "compute#operation",
+    "id": "25182100756120249",
+    "name": "operation-1693056085395-603d3568e0812-f22756bf-e539d3fa",
+    "zone": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-a",
+    "operationType": "resume",
+    "targetLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-a/instances/pro-narwhal",
+    "targetId": "6898528043909006062",
+    "status": "RUNNING",
+    "user": "kapil@stacklet.io",
+    "progress": 0,
+    "insertTime": "2023-08-26T06:21:26.059-07:00",
+    "startTime": "2023-08-26T06:21:26.084-07:00",
+    "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-a/operations/operation-1693056085395-603d3568e0812-f22756bf-e539d3fa"
+  }
+}

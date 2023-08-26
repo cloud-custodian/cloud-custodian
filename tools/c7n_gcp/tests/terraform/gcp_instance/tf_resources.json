@@ -1,0 +1,164 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "google_compute_instance": {
+            "default": {
+                "advanced_machine_features": [],
+                "allow_stopping_for_update": null,
+                "attached_disk": [],
+                "boot_disk": [
+                    {
+                        "auto_delete": true,
+                        "device_name": "persistent-disk-0",
+                        "disk_encryption_key_raw": "",
+                        "disk_encryption_key_sha256": "",
+                        "initialize_params": [
+                            {
+                                "image": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/images/ubuntu-2204-jammy-v20230727",
+                                "labels": {
+                                    "my_label": "value"
+                                },
+                                "resource_manager_tags": null,
+                                "size": 10,
+                                "type": "pd-standard"
+                            }
+                        ],
+                        "kms_key_self_link": "",
+                        "mode": "READ_WRITE",
+                        "source": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-a/disks/pro-narwhal"
+                    }
+                ],
+                "can_ip_forward": false,
+                "confidential_instance_config": [],
+                "cpu_platform": "Intel Broadwell",
+                "current_status": "RUNNING",
+                "deletion_protection": false,
+                "description": "",
+                "desired_status": null,
+                "enable_display": false,
+                "guest_accelerator": [],
+                "hostname": "",
+                "id": "projects/cloud-custodian/zones/us-central1-a/instances/pro-narwhal",
+                "instance_id": "6898528043909006062",
+                "label_fingerprint": "42WmSpB8rSM=",
+                "labels": null,
+                "machine_type": "e2-medium",
+                "metadata": null,
+                "metadata_fingerprint": "Vj5XvjedRmA=",
+                "metadata_startup_script": null,
+                "min_cpu_platform": "",
+                "name": "pro-narwhal",
+                "network_interface": [
+                    {
+                        "access_config": [
+                            {
+                                "nat_ip": "34.121.168.185",
+                                "network_tier": "PREMIUM",
+                                "public_ptr_domain_name": ""
+                            }
+                        ],
+                        "alias_ip_range": [],
+                        "ipv6_access_config": [],
+                        "ipv6_access_type": "",
+                        "name": "nic0",
+                        "network": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/networks/pro-narwhal-vpc",
+                        "network_ip": "10.2.0.2",
+                        "nic_type": "",
+                        "queue_count": 0,
+                        "stack_type": "IPV4_ONLY",
+                        "subnetwork": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-central1/subnetworks/pro-narwhal-subnet",
+                        "subnetwork_project": "stacklet-kapilt"
+                    }
+                ],
+                "network_performance_config": [],
+                "params": [],
+                "project": "stacklet-kapilt",
+                "reservation_affinity": [],
+                "resource_policies": null,
+                "scheduling": [
+                    {
+                        "automatic_restart": true,
+                        "instance_termination_action": "",
+                        "local_ssd_recovery_timeout": [],
+                        "min_node_cpus": 0,
+                        "node_affinities": [],
+                        "on_host_maintenance": "MIGRATE",
+                        "preemptible": false,
+                        "provisioning_model": "STANDARD"
+                    }
+                ],
+                "scratch_disk": [],
+                "self_link": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-a/instances/pro-narwhal",
+                "service_account": [],
+                "shielded_instance_config": [
+                    {
+                        "enable_integrity_monitoring": true,
+                        "enable_secure_boot": false,
+                        "enable_vtpm": true
+                    }
+                ],
+                "tags": [
+                    "bar",
+                    "foo"
+                ],
+                "tags_fingerprint": "1gqCRgrww4E=",
+                "timeouts": null,
+                "zone": "us-central1-a"
+            }
+        },
+        "google_compute_network": {
+            "vpc": {
+                "auto_create_subnetworks": false,
+                "delete_default_routes_on_create": false,
+                "description": "",
+                "enable_ula_internal_ipv6": false,
+                "gateway_ipv4": "",
+                "id": "projects/cloud-custodian/global/networks/pro-narwhal-vpc",
+                "internal_ipv6_range": "",
+                "mtu": 0,
+                "name": "pro-narwhal-vpc",
+                "network_firewall_policy_enforcement_order": "AFTER_CLASSIC_FIREWALL",
+                "project": "stacklet-kapilt",
+                "routing_mode": "GLOBAL",
+                "self_link": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/networks/pro-narwhal-vpc",
+                "timeouts": null
+            }
+        },
+        "google_compute_subnetwork": {
+            "network_subnet": {
+                "creation_timestamp": "2023-08-26T06:19:48.836-07:00",
+                "description": "",
+                "external_ipv6_prefix": "",
+                "fingerprint": null,
+                "gateway_address": "10.2.0.1",
+                "id": "projects/cloud-custodian/regions/us-central1/subnetworks/pro-narwhal-subnet",
+                "ip_cidr_range": "10.2.0.0/16",
+                "ipv6_access_type": "",
+                "ipv6_cidr_range": "",
+                "log_config": [],
+                "name": "pro-narwhal-subnet",
+                "network": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/networks/pro-narwhal-vpc",
+                "private_ip_google_access": false,
+                "private_ipv6_google_access": "DISABLE_GOOGLE_ACCESS",
+                "project": "stacklet-kapilt",
+                "purpose": "PRIVATE",
+                "region": "us-central1",
+                "role": "",
+                "secondary_ip_range": [],
+                "self_link": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/regions/us-central1/subnetworks/pro-narwhal-subnet",
+                "stack_type": "IPV4_ONLY",
+                "timeouts": null
+            }
+        },
+        "random_pet": {
+            "server": {
+                "id": "pro-narwhal",
+                "keepers": null,
+                "length": 2,
+                "prefix": null,
+                "separator": "-"
+            }
+        }
+    }
+}
