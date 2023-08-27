@@ -923,6 +923,8 @@ class UniversalTagRename(Action):
         required=['old_key', 'new_key']
     )
 
+    permissions = UniversalTag.permissions + UniversalUntag.permissions
+
     def process(self, resources):
         old_key = self.data['old_key']
 
