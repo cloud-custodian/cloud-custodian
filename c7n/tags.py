@@ -918,32 +918,40 @@ class UniversalTagRename(Action):
 
     schema = utils.type_schema(
         'rename-tag',
+        old_keys={'type': 'array', 'items': {'type': 'string'}},
         old_key={'type': 'string'},
         new_key={'type': 'string'},
-        required=['old_key', 'new_key']
+        required={'oneOf': [['old_keys', 'new_key'], ['old_key', 'new_key']]}
     )
 
     permissions = UniversalTag.permissions + UniversalUntag.permissions
 
     def process(self, resources):
-        old_key = self.data['old_key']
+        old_keys = set(self.data.get('old_keys', ()))
 
-        # Collect by distinct tag value to minimize api calls
-        # via bulk api usage.
+        # Collect by distinct tag value, and old_key value to minimize api calls
+        # via bulk api usage on add and remove.
+        old_key_resources = {}
         values_resources = {}
         for r in resources:
-            v = r.get('Tags', {}).get(old_key)
+            v = None
+            for t in r.get('Tags', ()):
+                if t['Key'] in old_keys:
+                    v = t['Value']
+                    old_key_resources.setdefault(t['Key'], []).append(r)
+                    break
             if v is None:
                 continue
             values_resources.setdefault(v, []).append(r)
 
         new_key = self.data['new_key']
-        cleaner = UniversalUntag({'tags': [old_key]})
-        for value, rpopulation in values_resources.items():
-            tagger = UniversalTag({new_key: value})
-            tagger.process(rpopulation)
-            cleaner.process(rpopulation)
 
+        for value, rpopulation in values_resources.items():
+            tagger = UniversalTag({'key': new_key, 'value': value}, self.manager)
+            tagger.process(rpopulation)
+        for old_key, rpopulation in old_key_resources.items():
+            cleaner = UniversalUntag({'tags': [old_key]}, self.manager)
+            cleaner.process(rpopulation)
 
 
 class UniversalTagDelayedAction(TagDelayedAction):

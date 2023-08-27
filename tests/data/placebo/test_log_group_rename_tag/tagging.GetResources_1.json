@@ -1,0 +1,36 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:logs:us-west-2:644160558196:log-group:good-moray-1",
+                "Tags": [
+                    {
+                        "Key": "Application",
+                        "Value": "greeter"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:logs:us-west-2:644160558196:log-group:good-moray-2",
+                "Tags": [
+                    {
+                        "Key": "Application",
+                        "Value": "login"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:logs:us-west-2:644160558196:log-group:good-moray-3",
+                "Tags": [
+                    {
+                        "Key": "Application",
+                        "Value": "login"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

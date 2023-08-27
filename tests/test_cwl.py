@@ -10,6 +10,44 @@ import pytest
 from pytest_terraform import terraform
 
 
+
+@terraform('log_group_rename_tag')
+def test_log_group_rename_tag(test, log_group_rename_tag):
+    factory = test.record_flight_data('test_log_group_rename_tag', region='us-west-2')
+    client = factory().client('logs')
+
+    p = test.load_policy({
+        'name': 'log-rename',
+        'resource': 'aws.log-group',
+        'filters': [{
+            'or': [
+                {"tag:Application": "present"}, {"tag:Bap": "present"}
+            ],
+        }],
+        'actions': [{
+            'type': 'rename-tag',
+            'old_keys': 'Application',
+            'new_key': 'App'}],
+        },
+    session_factory=factory, config={'region': 'us-west-2'})
+    resources = p.run()
+    assert len(resources) == 3
+
+    def get_tags(resource):
+        return client.list_tags_for_resource(resourceArn=resource['arn'][:-2]).get('tags')
+
+    extant_tags = list(map(get_tags, resources))
+    extant_keys = set()
+    extant_values = set()
+    for t in extant_tags:
+        extant_keys.update(t)
+    for t in extant_tags:
+        extant_values.update(t.values())
+
+    assert extant_keys == {'Application'}
+    assert extant_values == {'greeter', 'login'}
+
+
 @pytest.mark.audited
 @terraform('log_delete', teardown=terraform.TEARDOWN_IGNORE)
 def test_tagged_log_group_delete(test, log_delete):
