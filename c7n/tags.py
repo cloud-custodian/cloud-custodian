@@ -921,10 +921,14 @@ class UniversalTagRename(Action):
         old_keys={'type': 'array', 'items': {'type': 'string'}},
         old_key={'type': 'string'},
         new_key={'type': 'string'},
-        required={'oneOf': [['old_keys', 'new_key'], ['old_key', 'new_key']]}
     )
 
     permissions = UniversalTag.permissions + UniversalUntag.permissions
+
+    def valiate(self):
+        if 'old_keys' not in self.data or 'old_key' not in self.data:
+            raise PolicyValidationError(
+                f"{self.manager.policy.name}:{self.type} 'old_keys' or 'old_key' required")
 
     def process(self, resources):
         old_keys = set(self.data.get('old_keys', ()))
