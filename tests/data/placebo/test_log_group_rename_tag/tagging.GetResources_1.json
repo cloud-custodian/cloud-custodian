@@ -4,7 +4,7 @@
         "PaginationToken": "",
         "ResourceTagMappingList": [
             {
-                "ResourceARN": "arn:aws:logs:us-west-2:644160558196:log-group:good-moray-1",
+                "ResourceARN": "arn:aws:logs:us-west-2:644160558196:log-group:expert-cougar-1",
                 "Tags": [
                     {
                         "Key": "Application",
@@ -13,7 +13,7 @@
                 ]
             },
             {
-                "ResourceARN": "arn:aws:logs:us-west-2:644160558196:log-group:good-moray-2",
+                "ResourceARN": "arn:aws:logs:us-west-2:644160558196:log-group:expert-cougar-2",
                 "Tags": [
                     {
                         "Key": "Application",
@@ -22,11 +22,24 @@
                 ]
             },
             {
-                "ResourceARN": "arn:aws:logs:us-west-2:644160558196:log-group:good-moray-3",
+                "ResourceARN": "arn:aws:logs:us-west-2:644160558196:log-group:expert-cougar-3",
                 "Tags": [
                     {
-                        "Key": "Application",
+                        "Key": "Bap",
                         "Value": "login"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:logs:us-west-2:644160558196:log-group:expert-cougar-4",
+                "Tags": [
+                    {
+                        "Key": "Bap",
+                        "Value": "greeter"
+                    },
+                    {
+                        "Key": "Application",
+                        "Value": "greep"
                     }
                 ]
             }

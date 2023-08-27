@@ -27,24 +27,31 @@
                 "storedBytes": 0
             },
             {
-                "logGroupName": "good-moray-1",
-                "creationTime": 1693151254279,
+                "logGroupName": "expert-cougar-1",
+                "creationTime": 1693153186887,
                 "metricFilterCount": 0,
-                "arn": "arn:aws:logs:us-west-2:644160558196:log-group:good-moray-1:*",
+                "arn": "arn:aws:logs:us-west-2:644160558196:log-group:expert-cougar-1:*",
                 "storedBytes": 0
             },
             {
-                "logGroupName": "good-moray-2",
-                "creationTime": 1693151254290,
+                "logGroupName": "expert-cougar-2",
+                "creationTime": 1693153186887,
                 "metricFilterCount": 0,
-                "arn": "arn:aws:logs:us-west-2:644160558196:log-group:good-moray-2:*",
+                "arn": "arn:aws:logs:us-west-2:644160558196:log-group:expert-cougar-2:*",
                 "storedBytes": 0
             },
             {
-                "logGroupName": "good-moray-3",
-                "creationTime": 1693151254303,
+                "logGroupName": "expert-cougar-3",
+                "creationTime": 1693153186886,
                 "metricFilterCount": 0,
-                "arn": "arn:aws:logs:us-west-2:644160558196:log-group:good-moray-3:*",
+                "arn": "arn:aws:logs:us-west-2:644160558196:log-group:expert-cougar-3:*",
+                "storedBytes": 0
+            },
+            {
+                "logGroupName": "expert-cougar-4",
+                "creationTime": 1693153186866,
+                "metricFilterCount": 0,
+                "arn": "arn:aws:logs:us-west-2:644160558196:log-group:expert-cougar-4:*",
                 "storedBytes": 0
             }
         ],

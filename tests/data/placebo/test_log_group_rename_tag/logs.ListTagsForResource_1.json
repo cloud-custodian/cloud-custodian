@@ -2,7 +2,7 @@
     "status_code": 200,
     "data": {
         "tags": {
-            "Application": "login"
+            "App": "login"
         },
         "ResponseMetadata": {}
     }

@@ -933,16 +933,12 @@ class UniversalTagRename(Action):
         # via bulk api usage on add and remove.
         old_key_resources = {}
         values_resources = {}
+
         for r in resources:
-            v = None
             for t in r.get('Tags', ()):
                 if t['Key'] in old_keys:
-                    v = t['Value']
                     old_key_resources.setdefault(t['Key'], []).append(r)
-                    break
-            if v is None:
-                continue
-            values_resources.setdefault(v, []).append(r)
+                    values_resources.setdefault(t['Value'], []).append(r)
 
         new_key = self.data['new_key']
 

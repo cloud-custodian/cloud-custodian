@@ -13,7 +13,7 @@ from pytest_terraform import terraform
 
 @terraform('log_group_rename_tag')
 def test_log_group_rename_tag(test, log_group_rename_tag):
-    factory = test.record_flight_data('test_log_group_rename_tag', region='us-west-2')
+    factory = test.replay_flight_data('test_log_group_rename_tag', region='us-west-2')
     client = factory().client('logs')
 
     p = test.load_policy({
@@ -26,12 +26,12 @@ def test_log_group_rename_tag(test, log_group_rename_tag):
         }],
         'actions': [{
             'type': 'rename-tag',
-            'old_keys': 'Application',
+            'old_keys': ['Application', 'Bap'],
             'new_key': 'App'}],
         },
     session_factory=factory, config={'region': 'us-west-2'})
     resources = p.run()
-    assert len(resources) == 3
+    assert len(resources) == 4
 
     def get_tags(resource):
         return client.list_tags_for_resource(resourceArn=resource['arn'][:-2]).get('tags')
@@ -44,8 +44,8 @@ def test_log_group_rename_tag(test, log_group_rename_tag):
     for t in extant_tags:
         extant_values.update(t.values())
 
-    assert extant_keys == {'Application'}
-    assert extant_values == {'greeter', 'login'}
+    assert extant_keys == {'App'}
+    assert extant_values == {'greeter', 'login', 'greep'}
 
 
 @pytest.mark.audited
