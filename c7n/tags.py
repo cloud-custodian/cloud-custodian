@@ -925,10 +925,10 @@ class UniversalTagRename(Action):
 
     permissions = UniversalTag.permissions + UniversalUntag.permissions
 
-    def valiate(self):
-        if 'old_keys' not in self.data or 'old_key' not in self.data:
+    def validate(self):
+        if 'old_keys' not in self.data and 'old_key' not in self.data:
             raise PolicyValidationError(
-                f"{self.manager.policy.name}:{self.type} 'old_keys' or 'old_key' required")
+                f"{self.manager.ctx.policy.name}:{self.type} 'old_keys' or 'old_key' required")
 
     def process(self, resources):
         old_keys = set(self.data.get('old_keys', ()))
