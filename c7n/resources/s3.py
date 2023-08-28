@@ -3418,6 +3418,12 @@ class BucketEncryption(KMSKeyResolverMixin, Filter):
     permissions = ('s3:GetEncryptionConfiguration', 'kms:DescribeKey', 'kms:ListAliases')
     annotation_key = 'c7n:bucket-encryption'
 
+    def validate(self):
+        if self.data.get('bucket_key_enabled') is not None and self.data.get('state') is not None:
+            raise PolicyValidationError(
+                f'state and bucket_key_enabled attributes cannot both be set: {self.data}'
+            )
+
     def process(self, buckets, event=None):
         self.resolve_keys(buckets)
         results = []

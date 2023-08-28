@@ -4489,3 +4489,27 @@ class BucketReplication(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
+
+    def test_bucket_encryption_invalid(self):
+        self.assertRaises(
+            PolicyValidationError,
+            self.load_policy,
+            {
+                'name': 'test-s3-bucket-encryption-invalid',
+                'resource': 'aws.s3',
+                'filters': [
+                    {
+                        'type': 'bucket-encryption',
+                        'bucket_key_enabled': False,
+                        'state': False
+                    },
+                    {
+                        'type': 'value',
+                        'key': 'Name',
+                        'value': 'c7n-test-s3-bucket',
+                        'op': 'contains'
+                    }
+                ]
+            },
+        )
