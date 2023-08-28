@@ -932,6 +932,8 @@ class UniversalTagRename(Action):
 
     def process(self, resources):
         old_keys = set(self.data.get('old_keys', ()))
+        if 'old_key' in self.data:
+            old_keys.add(self.data['old_key'])
 
         # Collect by distinct tag value, and old_key value to minimize api calls
         # via bulk api usage on add and remove.
