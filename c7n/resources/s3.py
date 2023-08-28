@@ -3419,9 +3419,9 @@ class BucketEncryption(KMSKeyResolverMixin, Filter):
     annotation_key = 'c7n:bucket-encryption'
 
     def validate(self):
-        if self.data.get('bucket_key_enabled') is not None and self.data.get('state') is not None:
+        if self.data.get('bucket_key_enabled') is not None and self.data.get('key') is not None:
             raise PolicyValidationError(
-                f'state and bucket_key_enabled attributes cannot both be set: {self.data}'
+                f'key and bucket_key_enabled attributes cannot both be set: {self.data}'
             )
 
     def process(self, buckets, event=None):

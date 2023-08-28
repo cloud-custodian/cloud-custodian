@@ -4502,7 +4502,7 @@ class BucketReplication(BaseTest):
                     {
                         'type': 'bucket-encryption',
                         'bucket_key_enabled': False,
-                        'state': False
+                        'key': 'alias/foobar'
                     },
                     {
                         'type': 'value',
