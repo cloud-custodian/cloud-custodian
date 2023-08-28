@@ -180,7 +180,7 @@ class DeleteElastiCacheCluster(BaseAction):
     def fetch_global_ds_rpgs(self):
         global_rpgs = set()
         rpgs = self.manager.get_resource_manager('elasticache-group').resources()
-        global_rpgs = DeleteReplicationGroup(self.manager).get_gloabal_datastore_association(rpgs)
+        global_rpgs = DeleteReplicationGroup(self.manager).get_global_datastore_association(rpgs)
         return global_rpgs
 
 
@@ -536,7 +536,7 @@ class DeleteReplicationGroup(BaseAction):
             self.manager.retry(client.delete_replication_group, **params, ignore_err_codes=(
                 'ReplicationGroupNotFoundFault',))
 
-    def get_gloabal_datastore_association(self, resources):
+    def get_global_datastore_association(self, resources):
         global_ds_rpgs = set()
         for r in resources:
             global_ds_association = jmespath_search(
