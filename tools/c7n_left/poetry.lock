@@ -776,19 +776,19 @@ widechars = ["wcwidth"]
 
 [[package]]
 name = "tfparse"
-version = "0.5.0"
+version = "0.6.1"
 description = "Python HCL/Terraform parser via extension for AquaSecurity defsec"
 optional = false
 python-versions = "*"
 files = [
-    {file = "tfparse-0.5.0-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:b38f9942bfd84a939dbc8ed9ca455bce8877cebe352dd55b10053aa577fc26d4"},
-    {file = "tfparse-0.5.0-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:754ba5bd7a7c7aa75ca9653a3de39c580f7fcf195f7912a26337d2fc9edd96f8"},
-    {file = "tfparse-0.5.0-cp310-cp310-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:b46875dc7da35ae2e086343bf573a599e45224f10cbc409dfac422e2c2e2c71d"},
-    {file = "tfparse-0.5.0-cp310-cp310-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:80a4f93f95457887a30cab180dc5c0aa3144f29bd1933ea31313c74c8f8b6891"},
-    {file = "tfparse-0.5.0-cp311-cp311-macosx_10_9_x86_64.whl", hash = "sha256:ca8b92e064739fb9fcbd026bed0cba0150338792dafc49081b1a84596c55d4cb"},
-    {file = "tfparse-0.5.0-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:f80025ba6b7202f98f4d3f799766b1daa400bc68a7e512f6e66077561ca4fb95"},
-    {file = "tfparse-0.5.0-cp311-cp311-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:d5ef0a5c1bb5f0bae6e2be4d0715e5a3e62488bc55479c12c2b314b6a0c4f231"},
-    {file = "tfparse-0.5.0-cp311-cp311-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:84ae6e466c20190ce8b5ee6198504f247b0ea881f5564bbd9704830fc91f5081"},
+    {file = "tfparse-0.6.1-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:9c2a78ba942732570919b97d2535dbe8aded0cd3c399b5ec34a7975203846fce"},
+    {file = "tfparse-0.6.1-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:7b289de7db814fde9b07050b0ae80f17f4470847878eb92da6360086460b2dcb"},
+    {file = "tfparse-0.6.1-cp310-cp310-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:877d3ef95bb7cbc7ddfced7addd85d6acd326a72cab45157993772bead179600"},
+    {file = "tfparse-0.6.1-cp310-cp310-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:6750ae9b64f93e3423a24092cb38608420b7ef8169da5d843e73a03bdb795b1b"},
+    {file = "tfparse-0.6.1-cp311-cp311-macosx_10_9_x86_64.whl", hash = "sha256:df1ce46f45d97b8b5207687b008d51defd467424b9a613b5dda93db3433c8534"},
+    {file = "tfparse-0.6.1-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:87317b6e786ae3ea2ef6e5ab982f925ae38cd3c84c259378ad127c3b113e2d78"},
+    {file = "tfparse-0.6.1-cp311-cp311-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:330041600327e20ea9678a20491a2ae935a5dfb30501cfc6114f89fef1dd1e32"},
+    {file = "tfparse-0.6.1-cp311-cp311-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:a9026d3c7c03d6ea9744b563bc51254ebe12ad16103b7101c88a521fffb77a7d"},
 ]
 
 [package.dependencies]
@@ -850,4 +850,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "22bbd794bf690f985e89663759956a0eb6cd7ae3384c4b0ea3112f8595cf46cb"
+content-hash = "bbff8cad6b896221352b5775e6e69644df77dd67772c7c694d44c9aba3b8619e"
