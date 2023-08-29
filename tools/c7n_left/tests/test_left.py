@@ -279,6 +279,39 @@ provider "google" {
     assert results[0].resource['name'] == 'Yada'
 
 
+def test_value_tag_prefix(policy_env):
+    policy_env.write_tf(
+        """
+locals {
+  name = "forum"
+}
+
+resource "aws_cloudwatch_log_group" "test_group_1" {
+  name = "${local.name}-1"
+  tags = {
+    Application = "login"
+  }
+}
+
+resource "aws_cloudwatch_log_group" "test_group_2" {
+  name = "${local.name}-2"
+  tags = {
+    App = "AuthZ"
+    Env = "Dev"
+  }
+}
+        """
+    )
+    policy_env.write_policy(
+        {"name": "check-tags", "resource": "terraform.aws_*",
+         "filters": [{"tag:App": "absent"}, {"tag:Env": "absent"}]}
+    )
+
+    results = policy_env.run()
+    assert len(results) == 1
+    assert results[0].resource['name'] == 'forum-1'
+
+
 def test_taggable(policy_env):
     policy_env.write_tf(
         """
