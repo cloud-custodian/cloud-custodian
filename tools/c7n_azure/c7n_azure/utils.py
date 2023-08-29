@@ -308,7 +308,7 @@ class PortsRangeHelper:
             Returns an array of PortsRange tuples
         """
         properties = rule['properties']
-        if 'destinationPortRange' in properties:
+        if 'destinationPortRange' in properties and properties['destinationPortRange']:
             return [PortsRangeHelper._get_port_range(properties['destinationPortRange'])]
         else:
             return [PortsRangeHelper._get_port_range(r)
