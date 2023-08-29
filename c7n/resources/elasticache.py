@@ -524,9 +524,9 @@ class DeleteReplicationGroup(BaseAction):
     def process(self, resources):
         resources = self.filter_resources(resources, 'Status', self.valid_origin_states)
         client = local_session(self.manager.session_factory).client('elasticache')
-        gloabal_datastore_association_map = self.get_gloabal_datastore_association(resources)
+        global_datastore_association_map = self.get_global_datastore_association(resources)
         for r in resources:
-            if r['ReplicationGroupId'] in gloabal_datastore_association_map:
+            if r['ReplicationGroupId'] in global_datastore_association_map:
                 self.log.info(
                   f"Skipping {r['ReplicationGroupId']}: associated with a global datastore")
                 continue
