@@ -3,11 +3,13 @@
 ResourceMap = {
     "azure.advisor-recommendation": "c7n_azure.resources.advisor.AdvisorRecommendation",
     "azure.aks": "c7n_azure.resources.k8s_service.KubernetesService",
+    "azure.app-insights": "c7n_azure.resources.appinsights.AzureAppInsights",
     "azure.open-shift": "c7n_azure.resources.open_shift.OpenShiftService",
     "azure.api-management": "c7n_azure.resources.apimanagement.ApiManagement",
     "azure.appserviceplan": "c7n_azure.resources.appserviceplan.AppServicePlan",
     "azure.application-gateway": "c7n_azure.resources.app_gateway.ApplicationGateway",
     "azure.armresource": "c7n_azure.resources.generic_arm_resource.GenericArmResource",
+    "azure.bastion-host": "c7n_azure.resources.bastion_host.AzureBastionHost",
     "azure.batch": "c7n_azure.resources.batch.Batch",
     "azure.cdn-custom-domain": "c7n_azure.resources.cdn_custom_domain.CdnCustomDomain",
     "azure.cdn-endpoint": "c7n_azure.resources.cdn_endpoint.CdnEndpoint",
