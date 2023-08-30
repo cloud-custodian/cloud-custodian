@@ -144,10 +144,33 @@ class Start(InstanceAction):
 
 @Instance.action_registry.register('stop')
 class Stop(InstanceAction):
+    """
+    Caution: `stop` in GCP is closer to terminate in terms of effect.
+
+    `suspend` is closer to stop in other providers.
+
+    See https://cloud.google.com/compute/docs/instances/instance-life-cycle
+    """
 
     schema = type_schema('stop')
     method_spec = {'op': 'stop'}
     attr_filter = ('status', ('RUNNING',))
+
+
+@Instance.action_registry.register('suspend')
+class Suspend(InstanceAction):
+
+    schema = type_schema('suspend')
+    method_spec = {'op': 'suspend'}
+    attr_filter = ('status', ('RUNNING',))
+
+
+@Instance.action_registry.register('resume')
+class Resume(InstanceAction):
+
+    schema = type_schema('resume')
+    method_spec = {'op': 'resume'}
+    attr_filter = ('status', ('SUSPENDED',))
 
 
 @Instance.action_registry.register('delete')
@@ -155,6 +178,7 @@ class Delete(InstanceAction):
 
     schema = type_schema('delete')
     method_spec = {'op': 'delete'}
+
 
 
 @Instance.action_registry.register('detach-disks')

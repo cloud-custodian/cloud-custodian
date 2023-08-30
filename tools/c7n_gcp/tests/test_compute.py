@@ -7,6 +7,8 @@ import time
 from gcp_common import BaseTest, event_data
 from googleapiclient.errors import HttpError
 
+from pytest_terraform import terraform
+
 
 class InstanceTest(BaseTest):
 
@@ -211,6 +213,51 @@ class InstanceTest(BaseTest):
 
         self.assertEqual(1, len(resources))
         self.assertEqual('image-1', resources[0]['name'])
+
+
+@terraform('gcp_instance')
+def test_instance_pause_resume(test, gcp_instance):
+    project_id = 'stacklet-kapilt'
+    factory = test.replay_flight_data('instance-pause-resume', project_id=project_id)
+    policy = test.load_policy({
+        'name': 'gcp-instance',
+        'resource': 'gcp.instance',
+        'filters': [{'name': gcp_instance['google_compute_instance.default.name']}],
+        'actions': ['suspend']
+    }, session_factory=factory)
+
+    resources = policy.run()
+    assert len(resources) == 1
+    assert resources[0]['status'] == 'RUNNING'
+
+    if test.recording:
+        time.sleep(60)
+
+    instance = policy.resource_manager.get_resource({
+        "project_id": gcp_instance["google_compute_instance.default.project"],
+        "resourceName": gcp_instance["google_compute_instance.default.id"],
+        "zone": gcp_instance["google_compute_instance.default.zone"],
+    })
+    assert instance['status'] == 'SUSPENDED'
+
+    policy = test.load_policy({
+        'name': 'gcp-instance',
+        'resource': 'gcp.instance',
+        'filters': [{'name': gcp_instance['google_compute_instance.default.name']}],
+        'actions': ['resume']
+    }, session_factory=factory)
+    resources = policy.run()
+    assert len(resources) == 1
+
+    if test.recording:
+        time.sleep(60)
+
+    instance = policy.resource_manager.get_resource({
+        "project_id": gcp_instance["google_compute_instance.default.project"],
+        "resourceName": gcp_instance["google_compute_instance.default.id"],
+        "zone": gcp_instance["google_compute_instance.default.zone"],
+    })
+    assert instance['status'] == 'RUNNING'
 
 
 def test_instance_refresh(test):
@@ -676,3 +723,6 @@ class TestInstanceGroupManager(BaseTest):
 
         self.assertEqual(1, len(resources))
         self.assertEqual('instance-group-2', resources[0]['name'])
+
+
+
