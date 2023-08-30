@@ -7,48 +7,11 @@ interactions:
   response:
     body:
       data:
-        capabilities:
-          canUseApiKeys: true
-          canUseAuthTokens: true
-          canUseConsolePassword: false
-          canUseCustomerSecretKeys: true
-          canUseDbCredentials: true
-          canUseOAuth2ClientCredentials: true
-          canUseSmtpCredentials: true
-        compartmentId: ocid1.tenancy.oc1..<unique_ID>
-        definedTags:
-          Oracle-Tags:
-            CreatedBy: scim-service
-            CreatedOn: '2023-04-25T16:55:50.497Z'
-        description: user@example.com
-        emailVerified: true
-        externalIdentifier: fcf75b1a99fd4dbe9c8f5a11dd69a50c
-        freeformTags:
-          TagName: TagValue
-          key_old: 'true'
-          mfa_activated: 'false'
         id: ocid1.user.oc1..<unique_ID>
-        identityProviderId: ocid1.saml2idp.oc1..<unique_ID>
-        isMfaActivated: false
-        lifecycleState: ACTIVE
         name: user@example.com
-        timeCreated: '2023-04-25T16:55:50.537Z'
-        timeModified: '2023-06-08T07:59:25.623Z'
     headers:
-      cache-control:
-      - no-cache, no-store, must-revalidate
-      content-length:
-      - '990'
       content-type:
       - application/json
-      date:
-      - Fri, 09 Jun 2023 12:35:36 GMT
-      etag:
-      - e3d2cb864e2b0f74308b4ead60ac0e65f2b1d7e8
-      pragma:
-      - no-cache
-      x-content-type-options:
-      - nosniff
     status:
       code: 200
       message: OK
@@ -86,39 +49,9 @@ interactions:
         vcnId: ocid1.vcn.oc1..<unique_ID>
         virtualRouterIp: 10.1.20.1
         virtualRouterMac: 00:00:17:74:81:F8
-      - cidrBlock: 10.0.0.0/24
-        compartmentId: ocid1.compartment.oc1..<unique_ID>
-        definedTags:
-          Oracle-Tags:
-            CreatedBy: user@example.com
-            CreatedOn: '2023-06-08T16:44:39.077Z'
-        dhcpOptionsId: ocid1.dhcpoptions.oc1..<unique_ID>
-        displayName: subnet-20230608-2214
-        dnsLabel: subnet06082214
-        freeformTags: {}
-        id: ocid1.subnet.oc1..<unique_ID>
-        lifecycleState: AVAILABLE
-        prohibitInternetIngress: false
-        prohibitPublicIpOnVnic: false
-        routeTableId: ocid1.routetable.oc1..<unique_ID>
-        securityListIds:
-        - ocid1.securitylist.oc1..<unique_ID>
-        subnetDomainName: subnet06082214.vcn06082214.oraclevcn.com
-        timeCreated: '2023-06-08T16:44:39.136Z'
-        vcnId: ocid1.vcn.oc1..<unique_ID>
-        virtualRouterIp: 10.0.0.1
-        virtualRouterMac: 00:00:17:F4:A7:17
     headers:
-      content-encoding:
-      - gzip
-      content-length:
-      - '1031'
       content-type:
       - application/json
-      date:
-      - Fri, 09 Jun 2023 12:35:37 GMT
-      x-content-type-options:
-      - nosniff
     status:
       code: 200
       message: OK
@@ -146,27 +79,9 @@ interactions:
           Project: CNCF
         id: ocid1.subnet.oc1..<unique_ID>
         lifecycleState: AVAILABLE
-        prohibitInternetIngress: false
-        prohibitPublicIpOnVnic: false
-        routeTableId: ocid1.routetable.oc1..<unique_ID>
-        securityListIds:
-        - ocid1.securitylist.oc1..<unique_ID>
-        subnetDomainName: testsubnet.testvcn.oraclevcn.com
-        timeCreated: '2023-06-09T12:35:28.774Z'
-        vcnId: ocid1.vcn.oc1..<unique_ID>
-        virtualRouterIp: 10.1.20.1
-        virtualRouterMac: 00:00:17:74:81:F8
     headers:
-      content-length:
-      - '1360'
       content-type:
       - application/json
-      date:
-      - Fri, 09 Jun 2023 12:35:40 GMT
-      etag:
-      - 9ac8111e
-      x-content-type-options:
-      - nosniff
     status:
       code: 200
       message: OK
@@ -194,27 +109,9 @@ interactions:
           Project: CNCF
         id: ocid1.subnet.oc1..<unique_ID>
         lifecycleState: AVAILABLE
-        prohibitInternetIngress: false
-        prohibitPublicIpOnVnic: false
-        routeTableId: ocid1.routetable.oc1..<unique_ID>
-        securityListIds:
-        - ocid1.securitylist.oc1..<unique_ID>
-        subnetDomainName: testsubnet.testvcn.oraclevcn.com
-        timeCreated: '2023-06-09T12:35:28.774Z'
-        vcnId: ocid1.vcn.oc1..<unique_ID>
-        virtualRouterIp: 10.1.20.1
-        virtualRouterMac: 00:00:17:74:81:F8
     headers:
-      content-length:
-      - '1198'
       content-type:
       - application/json
-      date:
-      - Fri, 09 Jun 2023 12:35:41 GMT
-      etag:
-      - 9ac8111e
-      x-content-type-options:
-      - nosniff
     status:
       code: 200
       message: OK
