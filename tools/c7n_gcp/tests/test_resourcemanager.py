@@ -559,7 +559,8 @@ class TestEssentialContactsFilter(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 0)
-        
+
+
 class TestOrgPoliciesFilter(BaseTest):
 
     def test_org_policies_filter(self):

@@ -410,7 +410,8 @@ class OrgContactsFilter(ListItemFilter):
         for page in pages:
             contacts.extend(page.get('contacts', []))
         return contacts
-    
+
+
 @Organization.filter_registry.register('org-policy')
 class OrgPoliciesFilter(ListItemFilter):
     """Filter Resources based on orgpolicy configuration
