@@ -7,51 +7,11 @@ interactions:
   response:
     body:
       data:
-        capabilities:
-          canUseApiKeys: true
-          canUseAuthTokens: true
-          canUseConsolePassword: false
-          canUseCustomerSecretKeys: true
-          canUseDbCredentials: true
-          canUseOAuth2ClientCredentials: true
-          canUseSmtpCredentials: true
-        compartmentId: ocid1.tenancy.oc1..<unique_ID>
-        dbUserName: user@example.com
-        definedTags:
-          Oracle-Tags:
-            CreatedBy: Some
-          OracleInternalReserved:
-            Phonebook: '9800'
-        description: user@example.com
-        emailVerified: true
-        externalIdentifier: c5571b54909a443685e610af14bcf73b
-        freeformTags:
-          Contractor: 'True'
-          TagName: TagValue
-          key_old: 'true'
-          mfa_activated: 'false'
         id: ocid1.user.oc1..<unique_ID>
-        identityProviderId: ocid1.saml2idp.oc1..<unique_ID>
-        isMfaActivated: false
-        lifecycleState: ACTIVE
         name: user@example.com
-        timeCreated: '2022-07-15T08:25:13.055Z'
-        timeModified: '2023-06-21T09:20:37.521Z'
     headers:
-      cache-control:
-      - no-cache, no-store, must-revalidate
-      content-length:
-      - '1090'
       content-type:
       - application/json
-      date:
-      - Fri, 14 Jul 2023 05:25:22 GMT
-      etag:
-      - 31ff068d7314192e8d5de6e0397f28186f61005e
-      pragma:
-      - no-cache
-      x-content-type-options:
-      - nosniff
     status:
       code: 200
       message: OK
@@ -76,22 +36,8 @@ interactions:
         name: Cloud-Custodian-Test1
         timeCreated: '2023-06-21T07:19:29.326Z'
     headers:
-      cache-control:
-      - no-cache, no-store, must-revalidate
-      content-encoding:
-      - gzip
-      content-length:
-      - '338'
       content-type:
       - application/json
-      date:
-      - Fri, 14 Jul 2023 05:25:23 GMT
-      opc-limit:
-      - '98'
-      pragma:
-      - no-cache
-      x-content-type-options:
-      - nosniff
     status:
       code: 200
       message: OK
@@ -118,20 +64,8 @@ interactions:
         name: Cloud-Custodian-Test1
         timeCreated: '2023-06-21T07:19:29.326Z'
     headers:
-      cache-control:
-      - no-cache, no-store, must-revalidate
-      content-length:
-      - '655'
       content-type:
       - application/json
-      date:
-      - Fri, 14 Jul 2023 05:25:23 GMT
-      etag:
-      - 77c0e1f3d2de0771c2d8116b0e39f63add786b2c
-      pragma:
-      - no-cache
-      x-content-type-options:
-      - nosniff
     status:
       code: 200
       message: OK
@@ -158,20 +92,8 @@ interactions:
         name: Cloud-Custodian-Test1
         timeCreated: '2023-06-21T07:19:29.326Z'
     headers:
-      cache-control:
-      - no-cache, no-store, must-revalidate
-      content-length:
-      - '559'
       content-type:
       - application/json
-      date:
-      - Fri, 14 Jul 2023 05:25:24 GMT
-      etag:
-      - 77c0e1f3d2de0771c2d8116b0e39f63add786b2c
-      pragma:
-      - no-cache
-      x-content-type-options:
-      - nosniff
     status:
       code: 200
       message: OK

@@ -29,7 +29,9 @@ jobs:
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v2
         with:
-          terraform_wrapper: false          
+          terraform_wrapper: false
+          # last OSS version
+          terraform_version: "1.5.5"
       - name: Lint Check
         env:
           RUFF_FORMAT: github
@@ -146,6 +148,8 @@ jobs:
         uses: hashicorp/setup-terraform@v2
         with:
           terraform_wrapper: false
+          # last OSS version
+          terraform_version: "1.5.5"
 
       - name: Install Custodian
         uses: ./.github/composites/install
