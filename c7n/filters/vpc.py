@@ -368,15 +368,18 @@ class PortRangeFilter(Filter):
     Example 1: ports 10-20 are within 10, 11-25.
     Example 2: port 19 is within 18-22.
     Example 3: ports 20-24 are within 20-21, 22-24.
-    Example 4: ports 20-24 are NOT within 20-21, 23-24.
-               (or specify allow-partial: True)
+    Example 4: ports 20-24 are NOT within 20-21, 23-24. (or specify allow-partial: True)
     Example 5: ports 20,23-24 are within 20-21, 23-24.
-    Usage example:
-      filters:
-      - type: port-range
-        key: allowed[?IPProtocol=='tcp'].ports[]
-        required-ports: 20, 50-60
-        allow-partial: False
+
+    :Example:
+
+    .. code-block:: yaml
+
+        filters:
+          - type: port-range
+            key: allowed[?IPProtocol=='tcp'].ports[]
+            required-ports: 20, 50-60
+            allow-partial: False
     """
     key_key = 'key'
     ranges_key = 'required-ports'
