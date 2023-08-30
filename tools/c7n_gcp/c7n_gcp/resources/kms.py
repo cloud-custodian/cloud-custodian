@@ -61,6 +61,14 @@ class KmsKeyRing(QueryResourceManager):
         return key_rings
 
 
+@KmsKeyRing.filter_registry.register('iam-policy')
+class KmsKeyRingIamPolicyFilter(IamPolicyFilter):
+    """
+    Overrides the base implementation to process kms key ring resources correctly.
+    """
+    permissions = ('cloudkms.keyRings.getIamPolicy',)
+
+
 @resources.register('kms-cryptokey')
 class KmsCryptoKey(ChildResourceManager):
     """GCP Resource

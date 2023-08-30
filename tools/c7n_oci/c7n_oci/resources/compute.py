@@ -293,10 +293,11 @@ class InstanceMetrics(Filter):
         result = []
         for compartment_id in comp_resources.keys():
             query = self.data.get("query")
-            filter_resources = comp_resources.get(comp_id)
+            filter_resources = comp_resources.get(compartment_id)
             query = self.get_metrics_resource_query(query, filter_resources.keys())
             log.debug(
-                f"Monitoring client will execute query :{query} for resources in the compartment"
+                f"Monitoring client will execute query: {query} for resources in the compartment:"
+                f" {compartment_id}"
             )
             summarize_metrics = oci.monitoring.models.SummarizeMetricsDataDetails(
                 query=query,

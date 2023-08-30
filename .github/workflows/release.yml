@@ -32,7 +32,7 @@ jobs:
         shell: bash
         run: |
           python tools/dev/changelog.py --output release.md \
-             --path . --since last --sans-provider awscc
+             --path . --since last --skip-provider awscc
           cat release.md
 
       - uses: aws-actions/configure-aws-credentials@v2

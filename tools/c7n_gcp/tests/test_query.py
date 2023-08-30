@@ -27,6 +27,7 @@ def test_gcp_resource_metadata_asset_type():
         'dataflow-job',
         'dm-deployment',
         'datafusion-instance',
+        'instance-group-manager',
         'secret',
         'function',
         'loadbalancer-ssl-policy',
