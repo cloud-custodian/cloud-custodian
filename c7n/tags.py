@@ -940,11 +940,20 @@ class UniversalTagRename(Action):
         old_key_resources = {}
         values_resources = {}
 
+        # sort tags using ordering of old_keys
+        def key_func(a):
+            if a['Key'] in old_keys:
+                return self.data['old_keys'].index(a['Key'])
+            return 50
+
         for r in resources:
-            for t in r.get('Tags', ()):
+            found = False
+            for t in sorted(r.get('Tags', ()), key=key_func):
                 if t['Key'] in old_keys:
                     old_key_resources.setdefault(t['Key'], []).append(r)
-                    values_resources.setdefault(t['Value'], []).append(r)
+                    if not found:
+                        values_resources.setdefault(t['Value'], []).append(r)
+                        found = True
 
         new_key = self.data['new_key']
 
