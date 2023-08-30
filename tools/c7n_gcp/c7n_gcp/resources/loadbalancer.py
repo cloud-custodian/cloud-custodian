@@ -136,6 +136,7 @@ class LoadBalancingSslPolicy(QueryResourceManager):
             "name", "description", "profile", "minTlsVersion"
         ]
         urn_component = "ssl-policy"
+        asset_type = "compute.googleapis.com/SslPolicy"
 
         @staticmethod
         def get(client, resource_info):
@@ -467,7 +468,7 @@ class LoadBalancingForwardingRule(QueryResourceManager):
         name = id = 'name'
         default_report_fields = [
             "name", "description", "region", "IPAddress", "IPProtocol", "target",
-            "loadBalancerScheme", "serviceName",
+            "loadBalancingScheme", "serviceName", "network"
         ]
         asset_type = "compute.googleapis.com/ForwardingRule"
         urn_component = "forwarding-rule"
@@ -493,7 +494,7 @@ class LoadBalancingGlobalForwardingRule(QueryResourceManager):
         name = id = 'name'
         default_report_fields = [
             "name", "description", "creationTimestamp", "network",
-            "networkTier", "loadBalancerScheme", "subnetwork", "allowGlobalAccess"
+            "networkTier", "loadBalancingScheme", "subnetwork", "allowGlobalAccess"
         ]
         asset_type = "compute.googleapis.com/GlobalForwardingRule"
         urn_component = "global-forwarding-rule"

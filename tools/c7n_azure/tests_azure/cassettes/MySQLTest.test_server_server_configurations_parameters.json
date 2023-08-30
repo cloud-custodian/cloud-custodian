@@ -1,0 +1,120 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.DBForMySQL/servers?api-version=2017-12-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Mon, 07 Aug 2023 15:18:14 GMT"
+                    ],
+                    "content-length": [
+                        "940"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "sku": {
+                                    "name": "GP_Gen5_2",
+                                    "tier": "GeneralPurpose",
+                                    "family": "Gen5",
+                                    "capacity": 2
+                                },
+                                "properties": {
+                                    "administratorLogin": "adminuser",
+                                    "storageProfile": {
+                                        "storageMB": 51200,
+                                        "backupRetentionDays": 7,
+                                        "geoRedundantBackup": "Disabled",
+                                        "storageAutogrow": "Disabled"
+                                    },
+                                    "version": "5.7",
+                                    "sslEnforcement": "Disabled",
+                                    "minimalTlsVersion": "TLSEnforcementDisabled",
+                                    "userVisibleState": "Ready",
+                                    "fullyQualifiedDomainName": "ccmysqlc129bfa71a47.mysql.database.azure.com",
+                                    "earliestRestoreDate": "2023-08-07T14:58:04.753+00:00",
+                                    "replicationRole": "",
+                                    "masterServerId": "",
+                                    "byokEnforcement": "Disabled",
+                                    "privateEndpointConnections": [],
+                                    "infrastructureEncryption": "Disabled",
+                                    "publicNetworkAccess": "Enabled"
+                                },
+                                "location": "eastus",
+                                "tags": {
+                                    "product_id": "13742"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_mysql/providers/Microsoft.DBforMySQL/servers/ccmysqlc129bfa71a47",
+                                "name": "ccmysqlc129bfa71a47",
+                                "type": "Microsoft.DBforMySQL/servers"
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_mysql/providers/Microsoft.DBForMySQL/servers/ccmysqlc129bfa71a47/configurations/audit_log_enabled?api-version=2017-12-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Mon, 07 Aug 2023 15:18:15 GMT"
+                    ],
+                    "content-length": [
+                        "482"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "properties": {
+                            "value": "OFF",
+                            "description": "Allow to audit the log.",
+                            "defaultValue": "OFF",
+                            "dataType": "Enumeration",
+                            "allowedValues": "ON,OFF",
+                            "source": "system-default",
+                            "isConfigPendingRestart": "False",
+                            "isDynamicConfig": "True"
+                        },
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_mysql/providers/Microsoft.DBforMySQL/servers/ccmysqlc129bfa71a47/configurations/audit_log_enabled",
+                        "name": "audit_log_enabled",
+                        "type": "Microsoft.DBforMySQL/servers/configurations"
+                    }
+                }
+            }
+        }
+    ]
+}

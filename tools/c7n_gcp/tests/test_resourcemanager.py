@@ -542,8 +542,7 @@ class TestEssentialContactsFilter(BaseTest):
              'notificationCategorySubscriptions': ['PRODUCT_UPDATES', 'TECHNICAL'],
              'validateTime': '2023-02-16T19:44:02.003641Z',
              'validationState': 'VALID'},
-        ] 
-
+        ]
 
     def test_essentialcontacts_filter_false(self):
         session_factory = self.replay_flight_data("filter-essentialcontacts")

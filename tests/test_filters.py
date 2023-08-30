@@ -302,7 +302,7 @@ class TestValueFilter(unittest.TestCase):
             "op": "intersect"})
         res = vf.match(resource)
         self.assertEqual(res,False)
-        
+
 
 class TestAgeFilter(unittest.TestCase):
 

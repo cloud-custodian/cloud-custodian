@@ -23,7 +23,7 @@ class ArtifactRegistryRepository(RegionalResourceManager):
             'use_child_query': True,
         }
         permissions = ('artifactregistry.repositories.list',)
-        default_report_fields = ['displayName', 'expireTime']
+        default_report_fields = ['name', 'description', 'updateTime', 'sizeBytes']
 
     def _get_child_enum_args(self, parent_instance):
         return {

@@ -8,11 +8,10 @@ from c7n_gcp.query import (QueryResourceManager, TypeInfo, ChildTypeInfo,
 from c7n.utils import type_schema, local_session
 from c7n_gcp.actions import MethodAction
 
-
 @resources.register('gke-cluster')
 class KubernetesCluster(QueryResourceManager):
     """GCP resource:
-    https://cloud.google.com/kubernetes-engine/docs/reference/rest/v1/projects.zones.clusters
+    https://cloud.google.com/kubernetes-engine/docs/reference/rest/v1/projects.locations.clusters
     """
 
     class resource_type(TypeInfo):
@@ -31,6 +30,8 @@ class KubernetesCluster(QueryResourceManager):
         scc_type = 'google.container.Cluster'
         metric_key = 'resource.labels.cluster_name'
         urn_component = 'cluster'
+        labels = True
+        labels_op = 'setResourceLabels'
         urn_zonal = True
 
         @staticmethod
@@ -41,6 +42,32 @@ class KubernetesCluster(QueryResourceManager):
                         resource_info['project_id'],
                         resource_info['location'],
                         resource_info['cluster_name'])})
+
+        @staticmethod
+        def get_label_params(resource, all_labels):
+            location_str = "locations"
+            if resource['selfLink'].find(location_str) < 0:
+                location_str = "zones"
+            path_param_re = re.compile('.*?/projects/(.*?)/'+location_str+'/(.*?)/clusters/(.*)')
+            project, zone, cluster_name = path_param_re.match(
+                resource['selfLink']).groups()
+            return {'name': 'projects/'+project+'/locations/'+zone+'/clusters/'+cluster_name,
+                    'body': {
+                        'resourceLabels': all_labels,
+                        'labelFingerprint': resource['labelFingerprint']
+                    }}
+
+        @classmethod
+        def refresh(cls, client, resource):
+            project_id = resource['selfLink'].split("/")[5]
+            return cls.get(
+                client,
+                {
+                    'project_id': project_id,
+                    'location': resource['zone'],
+                    'cluster_name': resource['name']
+                }
+            )
 
     def augment(self, resources):
         if not resources:

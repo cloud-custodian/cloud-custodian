@@ -910,10 +910,12 @@ def get_eni_resource_type(eni):
         rtype = 'hsm'
     elif description.startswith('CloudHsm ENI'):
         rtype = 'hsmv2'
+    elif description.startswith('AWS Lambda VPC'):
+        rtype = 'lambda'
     elif description.startswith('AWS Lambda VPC ENI'):
         rtype = 'lambda'
     elif description.startswith('Interface for NAT Gateway'):
-        return 'nat'
+        rtype = 'nat'
     elif (description == 'RDSNetworkInterface' or
             description.startswith('Network interface for DBProxy')):
         rtype = 'rds'
@@ -923,6 +925,8 @@ def get_eni_resource_type(eni):
         rtype = 'tgw'
     elif description.startswith('VPC Endpoint Interface'):
         rtype = 'vpce'
+    elif description.startswith('aws-k8s-branch-eni'):
+        rtype = 'eks'
     else:
         rtype = 'unknown'
     return rtype

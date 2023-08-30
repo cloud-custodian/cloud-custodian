@@ -2,11 +2,12 @@
 # SPDX-License-Identifier: Apache-2.0
 import logging
 import unittest
+from unittest import mock
 import time
 
 import datetime
 from dateutil import tz
-from mock import mock
+
 
 from c7n.testing import mock_datetime_now
 from c7n.exceptions import PolicyValidationError, ClientError

@@ -3,6 +3,8 @@
 import json
 
 from .common import BaseTest, load_data
+from c7n.resources.directory import CloudDirectoryQueryParser
+from c7n.exceptions import PolicyValidationError
 
 
 class CloudDirectoryTest(BaseTest):
@@ -49,6 +51,51 @@ class CloudDirectoryTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
+    def test_cloud_directory_disable(self):
+        factory = self.replay_flight_data("test_cloud_directory_disable")
+        p = self.load_policy(
+            {
+                "name": "disable-cloud-directory",
+                "resource": "cloud-directory",
+                "filters": [{"Name": "test-cloud"}],
+                "actions": [{"type": "disable"}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            sorted([r["Name"] for r in resources]),
+            ["test-cloud"],
+        )
+        self.assertEqual(resources[0]["State"], "ENABLED")
+        client = factory().client("clouddirectory")
+        remainder = client.list_directories()["Directories"]
+        self.assertEqual(len(remainder), 1)
+        self.assertEqual(remainder[0]["State"], "DISABLED")
+
+    def test_cloud_directory_delete(self):
+        factory = self.replay_flight_data("test_cloud_directory_delete")
+        p = self.load_policy(
+            {
+                "name": "delete-cloud-directory",
+                "resource": "cloud-directory",
+                "filters": [{"Name": "test-cloud"}],
+                "actions": [{"type": "delete"}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            sorted([r["Name"] for r in resources]),
+            ["test-cloud"],
+        )
+        client = factory().client("clouddirectory")
+        remainder = client.list_directories()["Directories"]
+        self.assertEqual(len(remainder), 1)
+        self.assertEqual(remainder[0]["State"], "DELETED")
+
 
 class DirectoryTests(BaseTest):
 
@@ -88,3 +135,52 @@ class DirectoryTests(BaseTest):
         self.assertEqual(resources[0]["DirectoryId"], "d-90672a7419")
         tags = client.list_tags_for_resource(ResourceId="d-90672a7419")["Tags"]
         self.assertEqual(len(tags), 0)
+
+    def test_directory_delete(self):
+        factory = self.replay_flight_data("test_directory_delete")
+        p = self.load_policy(
+            {
+                "name": "delete-directory",
+                "resource": "directory",
+                "filters": [{"Name": "test.example.com"}],
+                "actions": ["delete"],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(
+            sorted([r["Name"] for r in resources]),
+            ["test.example.com"],
+        )
+        self.assertEqual(resources[0]["Stage"], "Creating")
+        client = factory().client("ds")
+        remainder = client.describe_directories()["DirectoryDescriptions"]
+        self.assertEqual(len(remainder), 2)
+        self.assertEqual(remainder[1]["Stage"], "Deleting")
+
+class CloudDirectoryQueryParse(BaseTest):
+
+    def test_query(self):
+        query_filters = [
+            {'Name': 'tag:Name', 'Values': ['Test']},
+            {'Name': 'state', 'Values': ['DISABLED']}]
+        self.assertEqual(query_filters, CloudDirectoryQueryParser.parse(query_filters))
+
+    def test_invalid_query(self):
+        self.assertRaises(
+            PolicyValidationError, CloudDirectoryQueryParser.parse, {})
+
+        self.assertRaises(
+            PolicyValidationError, CloudDirectoryQueryParser.parse, [None])
+
+        self.assertRaises(
+            PolicyValidationError, CloudDirectoryQueryParser.parse, [{'X': 1}])
+
+        self.assertRaises(
+            PolicyValidationError, CloudDirectoryQueryParser.parse, [
+                {'name': 'state', 'Values': 'disabled'}])
+
+        self.assertRaises(
+            PolicyValidationError, CloudDirectoryQueryParser.parse, [
+                {'name': 'state', 'Values': ['disabled']}])

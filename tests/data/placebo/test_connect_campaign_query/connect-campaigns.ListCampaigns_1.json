@@ -1,0 +1,21 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "campaignSummaryList": [
+            {
+                "arn": "arn:aws:connect-campaigns:us-east-1:644160558196:campaign/be86a7da-93d5-41f4-969e-cae6903faeaa",
+                "connectInstanceId": "25f1514d-14d0-4a06-b28f-9df132d33d3d",
+                "id": "be86a7da-93d5-41f4-969e-cae6903faeaa",
+                "name": "Test"
+            },
+            {
+                "arn": "arn:aws:connect-campaigns:us-east-1:644160558196:campaign/eb09f6bf-0c1b-416a-8c6f-3a4239491c10",
+                "connectInstanceId": "25f1514d-14d0-4a06-b28f-9df132d33d3d",
+                "id": "eb09f6bf-0c1b-416a-8c6f-3a4239491c10",
+                "name": "test2"
+            }
+        ],
+        "nextToken": ""
+    }
+}

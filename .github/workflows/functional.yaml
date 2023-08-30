@@ -15,7 +15,7 @@ jobs:
         with:
           python-version: "3.11"
 
-      - uses: aws-actions/configure-aws-credentials@v1-node16
+      - uses: aws-actions/configure-aws-credentials@v2
         with:
           role-to-assume: ${{ secrets.AWS_FTEST_ROLE }}
           aws-region: us-east-1
@@ -23,6 +23,8 @@ jobs:
       - uses: hashicorp/setup-terraform@v2
         with:
           terraform_wrapper: false
+          # last OSS version
+          terraform_version: "1.5.5"
 
       - name: Install Custodian
         uses: ./.github/composites/install

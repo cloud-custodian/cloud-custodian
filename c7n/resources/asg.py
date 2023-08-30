@@ -996,7 +996,7 @@ class Resize(Action):
                             # unless we were given a new value for min_size then
                             # ensure it is at least as low as current_size
                             update['MinSize'] = min(current_size, a['MinSize'])
-                    elif type(self.data['desired-size']) == int:
+                    elif isinstance(self.data['desired-size'], int):
                         update['DesiredCapacity'] = self.data['desired-size']
 
             if update:
@@ -1253,7 +1253,7 @@ class PropagateTags(Action):
                 k: v for k, v in tag_map.items()
                 if k in self.data['tags']}
 
-        if not tag_map and not self.get('trim', False):
+        if not tag_map and not self.data.get('trim', False):
             self.log.error(
                 'No tags found to propagate on asg:{} tags configured:{}'.format(
                     asg['AutoScalingGroupName'], self.data.get('tags')))
@@ -1403,7 +1403,7 @@ class RenameTag(Action):
              'PropagateAtLaunch': propagate,
              'Key': destination_tag,
              'Value': source['Value']}])
-        if propagate:
+        if propagate and asg['Instances']:
             self.propagate_instance_tag(source, destination_tag, asg)
 
     def propagate_instance_tag(self, source, destination_tag, asg):

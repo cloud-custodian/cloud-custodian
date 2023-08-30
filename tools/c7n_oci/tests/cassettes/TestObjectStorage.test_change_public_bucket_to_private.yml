@@ -1,0 +1,86 @@
+interactions:
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: https://identity.us-ashburn-1.oci.oraclecloud.com/20160918/users/ocid1.user.oc1..<unique_ID>
+  response:
+    body:
+      data:
+        id: ocid1.user.oc1..<unique_ID>
+        name: user@example.com
+    headers:
+      content-type:
+      - application/json
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: https://objectstorage.us-ashburn-1.oraclecloud.com/n
+  response:
+    body:
+      data: namespace
+    headers:
+      content-type:
+      - application/json
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: https://objectstorage.us-ashburn-1.oraclecloud.com/n/<namepsace>/b?compartmentId=ocid1.compartment.oc1..<unique_ID>&fields=tags
+  response:
+    body:
+      data:
+      - compartmentId: ocid1.compartment.oc1..<unique_ID>
+        name: test_bucket
+        namespace: <namespace>
+    headers:
+      content-type:
+      - application/json
+    status:
+      code: 200
+      message: OK
+- request:
+    body: mock_body
+    headers: {}
+    method: POST
+    uri: https://objectstorage.us-ashburn-1.oraclecloud.com/n/<namepsace>/b/test_bucket
+  response:
+    body:
+      data:
+        compartmentId: ocid1.compartment.oc1..<unique_ID>
+        id: ocid1.bucket.oc1..<unique_ID>
+        name: test_bucket
+        namespace: <namespace>
+        publicAccessType: NoPublicAccess
+    headers:
+      content-type:
+      - application/json
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: https://objectstorage.us-ashburn-1.oraclecloud.com/n/<namepsace>/b/test_bucket
+  response:
+    body:
+      data:
+        id: ocid1.bucket.oc1..<unique_ID>
+        name: test_bucket
+        namespace: <namespace>
+        publicAccessType: NoPublicAccess
+    headers:
+      content-type:
+      - application/json
+    status:
+      code: 200
+      message: OK
+version: 1

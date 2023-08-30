@@ -1,9 +1,10 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import time
+import pytest
 
 from gcp_common import BaseTest, event_data
-
+from c7n.config import Config
 
 class KubernetesClusterTest(BaseTest):
 
@@ -12,8 +13,10 @@ class KubernetesClusterTest(BaseTest):
 
         factory = self.replay_flight_data('gke-cluster-query', project_id)
         p = self.load_policy(
-            {'name': 'all-gke-cluster',
-             'resource': 'gcp.gke-cluster'},
+            {
+                'name': 'all-gke-cluster',
+                'resource': 'gcp.gke-cluster'
+            },
             session_factory=factory
         )
         resources = p.run()
@@ -47,12 +50,15 @@ class KubernetesClusterTest(BaseTest):
 
         factory = self.replay_flight_data('gke-cluster-get', project_id)
 
-        p = self.load_policy({
-            'name': 'one-gke-cluster',
-            'resource': 'gcp.gke-cluster',
-            'mode': {
-                'type': 'gcp-audit',
-                'methods': ['io.k8s.core.v1.nodes.create']}},
+        p = self.load_policy(
+            {
+                'name': 'one-gke-cluster',
+                'resource': 'gcp.gke-cluster',
+                'mode': {
+                    'type': 'gcp-audit',
+                    'methods': ['io.k8s.core.v1.nodes.create']
+                }
+            },
             session_factory=factory)
 
         exec_mode = p.get_execution_mode()
@@ -67,16 +73,169 @@ class KubernetesClusterTest(BaseTest):
             ],
         )
 
+    def test_cluster_set_labels(self):
+        project_id = 'cloud-custodian'
+        name = "standard-cluster-1"
+        factory = self.replay_flight_data('gke-cluster-set-label', project_id)
+        p = self.load_policy(
+            {
+                'name': 'label-gke-cluster-cache',
+                'resource': 'gcp.gke-cluster',
+                'filters': [{'name': name}],
+                'actions': [{'type': 'set-labels',
+                            'labels': {'test_label': 'new_value'}}]},
+            cache=True,
+            config=Config.empty(
+                cache='memory',
+                cache_period=10,
+                output_dir=self.get_temp_dir(),
+            ),
+            session_factory=factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        p = self.load_policy(
+            {
+                'name': 'label-gke-cluster',
+                'resource': 'gcp.gke-cluster',
+                'filters': [{'name': name}],
+                'actions': [{'type': 'set-labels',
+                            'labels': {'test_label': 'test_value'}}]},
+            cache=True,
+            config=Config.empty(
+                cache='memory',
+                cache_period=10,
+                output_dir=self.get_temp_dir(),
+            ),
+            session_factory=factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        if self.recording:
+            time.sleep(1)
+        client = p.resource_manager.get_client()
+        result = client.execute_query(
+            'list', {
+                        'parent': 'projects/{}/locations/{}'.format(
+                            project_id,
+                            resources[0]['zone'])
+                    }),
+        self.assertEqual(result[0]['clusters'][0]['resourceLabels']['test_label'], 'test_value')
+
+    @pytest.mark.skip("Works on record but not replay")
+    def test_cluster_zonal_set_labels(self):
+        project_id = 'cloud-custodian'
+        name = "zonal-cluster-1"
+        factory = self.replay_flight_data('gke-cluster-zonal-set-label', project_id)
+        p = self.load_policy(
+            {
+                'name': 'label-gke-zonal-cluster-cache',
+                'resource': 'gcp.gke-cluster',
+                'filters': [{'name': name}],
+                'actions': [{'type': 'set-labels',
+                            'labels': {'test_label': 'new_value'}}]},
+            cache=True,
+            config=Config.empty(
+                cache='memory',
+                cache_period=10,
+                output_dir=self.get_temp_dir(),
+            ),
+            session_factory=factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        p = self.load_policy(
+            {
+                'name': 'label-gke-zonal-cluster',
+                'resource': 'gcp.gke-cluster',
+                'filters': [{'name': name}],
+                'actions': [{'type': 'set-labels',
+                            'labels': {'test_label': 'test_value'}}]},
+            cache=True,
+            config=Config.empty(
+                cache='memory',
+                cache_period=10,
+                output_dir=self.get_temp_dir(),
+            ),
+            session_factory=factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        if self.recording:
+            time.sleep(1)
+        client = p.resource_manager.get_client()
+        result = client.execute_query(
+            'list', {
+                        'parent': 'projects/{}/locations/{}'.format(
+                            project_id,
+                            resources[0]['location'])
+                    }),
+        self.assertEqual(result[0]['clusters'][0]['resourceLabels']['test_label'], 'test_value')
+
+    def test_cluster_remove_labels(self):
+        project_id = 'cloud-custodian'
+        name = "standard-cluster-1"
+        factory = self.replay_flight_data('gke-cluster-remove-label', project_id)
+        p = self.load_policy(
+            {
+                'name': 'unlabel-gke-cluster',
+                'resource': 'gcp.gke-cluster',
+                'filters': [{'name': name}],
+                'actions': [{'type': 'set-labels',
+                            'remove': ['test_label']}]},
+            session_factory=factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        if self.recording:
+            time.sleep(1)
+        client = p.resource_manager.get_client()
+        result = client.execute_query(
+            'list', {
+                        'parent': 'projects/{}/locations/{}'.format(
+                            project_id,
+                            resources[0]['zone'])
+                    })
+        self.assertEqual(result['clusters'][0]['resourceLabels'].get('test_label'), None)
+
+    def test_cluster_zonal_remove_labels(self):
+        project_id = 'cloud-custodian'
+        name = "zonal-cluster-1"
+        factory = self.replay_flight_data('gke-cluster-zonal-remove-label', project_id)
+        p = self.load_policy(
+            {
+                'name': 'unlabel-zonal-gke-cluster',
+                'resource': 'gcp.gke-cluster',
+                'filters': [{'name': name}],
+                'actions': [{'type': 'set-labels',
+                            'remove': ['test_label']}]},
+            session_factory=factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        if self.recording:
+            time.sleep(1)
+        client = p.resource_manager.get_client()
+        result = client.execute_query(
+            'list', {
+                        'parent': 'projects/{}/locations/{}'.format(
+                            project_id,
+                            resources[0]['location'])
+                    })
+        self.assertEqual(result['clusters'][0]['resourceLabels'].get('test_label'), None)
+
     def test_cluster_delete(self):
         project_id = "cloud-custodian"
         resource_name = "custodian-cluster-delete-test"
 
         factory = self.replay_flight_data('gke-cluster-delete', project_id)
         p = self.load_policy(
-            {'name': 'delete-gke-cluster',
-             'resource': 'gcp.gke-cluster',
-             'filters': [{'name': resource_name}],
-             'actions': ['delete']},
+            {
+                'name': 'delete-gke-cluster',
+                'resource': 'gcp.gke-cluster',
+                'filters': [{'name': resource_name}],
+                'actions': ['delete']
+            },
             session_factory=factory
         )
         resources = p.run()
@@ -93,7 +252,6 @@ class KubernetesClusterTest(BaseTest):
 
         self.assertEqual(result['clusters'][0]['status'], 'STOPPING')
 
-
 class KubernetesClusterNodePoolTest(BaseTest):
 
     def test_cluster_node_pools_query(self):
@@ -102,8 +260,10 @@ class KubernetesClusterNodePoolTest(BaseTest):
         factory = self.replay_flight_data('gke-cluster-nodepool-query', project_id)
 
         p = self.load_policy(
-            {'name': 'all-gke-nodepools',
-             'resource': 'gcp.gke-nodepool'},
+            {
+                'name': 'all-gke-nodepools',
+                'resource': 'gcp.gke-nodepool'
+            },
             session_factory=factory)
         resources = p.run()
         self.assertEqual(resources[0]['status'], 'RUNNING')

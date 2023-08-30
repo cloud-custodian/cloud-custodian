@@ -163,6 +163,37 @@ class EventBusCrossAccountFilter(CrossAccountAccessFilter):
     permissions = ('events:ListEventBuses',)
 
 
+@EventBus.action_registry.register('delete')
+class EventBusDelete(BaseAction):
+    """Delete an event bus.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: cloudwatch-delete-event-bus
+                resource: aws.event-bus
+                filters:
+                    - Name: test-event-bus
+                actions:
+                  - delete
+    """
+
+    schema = type_schema('delete')
+    permissions = ('events:DeleteEventBus',)
+
+    def process(self, resources):
+        client = local_session(
+            self.manager.session_factory).client('events')
+
+        for resource_set in chunks(resources, size=100):
+            for r in resource_set:
+                self.manager.retry(
+                    client.delete_event_bus,
+                    Name=r['Name'])
+
+
 @resources.register('event-rule')
 class EventRule(QueryResourceManager):
     class resource_type(TypeInfo):
@@ -978,3 +1009,21 @@ class SubscriptionFilter(BaseAction):
         for r in resources:
             client.put_subscription_filter(
                 logGroupName=r['logGroupName'], **params)
+
+
+
+@resources.register("cloudwatch-dashboard")
+class CloudWatchDashboard(QueryResourceManager):
+    class resource_type(TypeInfo):
+        service = "cloudwatch"
+        enum_spec = ('list_dashboards', 'DashboardEntries', None)
+        arn_type = "dashboard"
+        arn = "DashboardArn"
+        id = "DashboardName"
+        name = "DashboardName"
+        cfn_type = "AWS::CloudWatch::Dashboard"
+        universal_taggable = object()
+
+    source_mapping = {
+       "describe": DescribeWithResourceTags,
+    }

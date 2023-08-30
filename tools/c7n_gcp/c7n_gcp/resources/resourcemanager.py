@@ -103,7 +103,7 @@ class Project(QueryResourceManager):
         enum_spec = ('list', 'projects', None)
         name = id = 'projectId'
         default_report_fields = [
-            "name", "displayName", "lifecycleState", "createTime", "parent"]
+            "name", "lifecycleState", "createTime", "parent.id"]
         asset_type = "cloudresourcemanager.googleapis.com/Project"
         scc_type = "google.cloud.resourcemanager.Project"
         perm_service = 'resourcemanager'

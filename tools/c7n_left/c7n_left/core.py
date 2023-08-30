@@ -62,9 +62,7 @@ class PolicyMetadata:
         categories = self.policy.data.get("metadata", {}).get("category", [])
         if isinstance(categories, str):
             categories = [categories]
-        if not isinstance(categories, list) or (
-            categories and not isinstance(categories[0], str)
-        ):
+        if not isinstance(categories, list) or (categories and not isinstance(categories[0], str)):
             categories = []
         return categories
 
@@ -130,17 +128,13 @@ class ExecutionFilter:
         if filters["severity"]:
             invalid_severities = set(filters["severity"]).difference(SEVERITY_LEVELS)
         if invalid_severities:
-            raise ValueError(
-                "invalid severity for filtering %s" % (", ".join(invalid_severities))
-            )
+            raise ValueError("invalid severity for filtering %s" % (", ".join(invalid_severities)))
 
     def filter_attribute(self, filter_name, attribute, items):
         if not self.filters[filter_name] or not items:
             return items
         results = []
-        op_class = (
-            isinstance(items[0], dict) and operator.itemgetter or operator.attrgetter
-        )
+        op_class = isinstance(items[0], dict) and operator.itemgetter or operator.attrgetter
         op = op_class(attribute)
         for f in self.filters[filter_name]:
             for i in items:
@@ -221,7 +215,7 @@ class CollectionRunner:
             log.warning("no %s source files found" % provider.type)
             return True
 
-        graph = provider.parse(self.options.source_dir)
+        graph = provider.parse(self.options.source_dir, self.options.var_files)
 
         for p in self.policies:
             p.expand_variables(p.get_variables())
@@ -239,16 +233,16 @@ class CollectionRunner:
             for p in self.policies:
                 if not self.match_type(rtype, p):
                     continue
-                result_set = self.run_policy(p, graph, resources, event)
+                result_set = self.run_policy(p, graph, resources, event, rtype)
                 if result_set:
                     self.reporter.on_results(result_set)
                     found = True
         self.reporter.on_execution_ended()
         return found
 
-    def run_policy(self, policy, graph, resources, event):
+    def run_policy(self, policy, graph, resources, event, resource_type):
         event = dict(event)
-        event.update({"graph": graph, "resources": resources})
+        event.update({"graph": graph, "resources": resources, "resource_type": resource_type})
         return policy.push(event)
 
     def get_provider(self):
@@ -282,10 +276,11 @@ class IACSourceMode(PolicyExecutionMode):
             return []
 
         resources = event["resources"]
+        resources = self.manager.augment(resources, event)
         resources = self.manager.filter_resources(resources, event)
-        return self.as_results(resources)
+        return self.as_results(resources, event)
 
-    def as_results(self, resources):
+    def as_results(self, resources, event):
         return ResultSet([PolicyResourceResult(r, self.policy) for r in resources])
 
 
@@ -323,6 +318,9 @@ class IACResourceManager(ResourceManager):
 
     def get_resource_manager(self, resource_type, data=None):
         return self.__class__(self.ctx, data or {})
+
+    def augment(self, resources, event):
+        return resources
 
 
 IACResourceManager.filter_registry.register("traverse", Traverse)

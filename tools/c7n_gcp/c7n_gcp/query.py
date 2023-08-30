@@ -4,6 +4,8 @@
 import json
 import itertools
 import logging
+import re
+import jmespath
 
 from googleapiclient.errors import HttpError
 
@@ -324,7 +326,12 @@ class ChildResourceManager(QueryResourceManager):
         result = {}
 
         for mapping in mappings:
-            result[mapping[1]] = jmespath_search(mapping[0], source)
+            result[mapping[1]] = jmespath.search(mapping[0], source)
+            # Support for regex in child_enum_params.
+            # Without this support you could only map parent-child elements with the raw data
+            # they hold, but with regex you could regex that data as well while you map.
+            if 'regex' in mapping:
+                result[mapping[1]] = re.search(mapping[3],result[mapping[1]]).group(1)
 
         return result
 
@@ -400,6 +407,9 @@ class TypeInfo(metaclass=TypeMeta):
     urn_has_project = True
     # The location element is a zone, not a region.
     urn_zonal = False
+
+    # If the type supports refreshing an individual resource
+    refresh = None
 
     @classmethod
     def get_metric_resource_name(cls, resource):

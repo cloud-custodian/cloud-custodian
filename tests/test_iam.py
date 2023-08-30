@@ -2,11 +2,11 @@
 # SPDX-License-Identifier: Apache-2.0
 import json
 import os
-import mock
 import tempfile
 import time
-
+from unittest import mock
 from unittest import TestCase
+
 from .common import load_data, BaseTest, functional
 
 import freezegun
@@ -1030,6 +1030,31 @@ class IamUserTest(BaseTest):
         )
         resources = p.run()
         self.assertEqual(resources[0]["UserName"], "alphabet_soup")
+
+    def test_iam_user_policy_include_via(self):
+        session_factory = self.replay_flight_data("test_iam_user_admin_policy_include_via")
+        self.patch(UserPolicy, "executor_factory", MainThreadExecutor)
+        p = self.load_policy(
+            {
+                "name": "iam-user-policy",
+                "resource": "iam-user",
+                "filters": [
+                    {
+                        "type": "policy",
+                        "key": "PolicyName",
+                        "value": "AdministratorAccess",
+                        "include-via": True,
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
+        self.assertEqual(resources[0]["UserName"], "alphabet_soup_1")
+        self.assertEqual(len(resources[0]["c7n:Policies"]), 2)
+        self.assertEqual(resources[1]["UserName"], "alphabet_soup_2")
+        self.assertEqual(len(resources[1]["c7n:Policies"]), 2)
 
     def test_iam_user_access_key_filter(self):
         session_factory = self.replay_flight_data("test_iam_user_access_key_active")

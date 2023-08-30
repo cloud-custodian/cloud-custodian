@@ -93,6 +93,26 @@ class SqlServerTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
+    def test_data_encryption_filter(self):
+        p = self.load_policy({
+            'name': 'test-azure-sql-server-tde',
+            'resource': 'azure.sql-server',
+            'filters': [
+                {
+                    'type': 'value',
+                    'key': 'name',
+                    'op': 'glob',
+                    'value_type': 'normalize',
+                    'value': 'cfb*'
+                },
+                {
+                    'type': 'transparent-data-encryption',
+                    'key_type': 'CustomerManaged'
+                }],
+        })
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
     def test_metric_database(self):
         p = self.load_policy({
             'name': 'test-azure-sql-server',

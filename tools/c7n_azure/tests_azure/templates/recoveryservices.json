@@ -1,0 +1,30 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "vaultName": {
+      "type": "string",
+      "defaultValue": "cfbukqrkhntars655e53akvrc4k",
+      "metadata": {
+        "description": "Name of the Vault"
+      }
+    },
+    "location": {
+      "type": "string",
+      "defaultValue": "East US"
+    }
+  },
+  "resources": [
+    {
+      "type": "Microsoft.RecoveryServices/vaults",
+      "apiVersion": "2020-10-01",
+      "name": "[parameters('vaultName')]",
+      "location": "eastus",
+      "properties": {},
+      "sku": {
+        "name": "RS0",
+        "tier": "Standard"
+      }
+    }
+ ]
+}

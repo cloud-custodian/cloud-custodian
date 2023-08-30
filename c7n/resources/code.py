@@ -14,6 +14,15 @@ from c7n import query
 from .securityhub import OtherResourcePostFinding
 
 
+class DescribeRepo(DescribeSource):
+
+    def augment(self, resources):
+        return universal_augment(
+            self.manager,
+            super().augment(resources)
+        )
+
+
 @resources.register('codecommit')
 class CodeRepository(QueryResourceManager):
 
@@ -29,7 +38,12 @@ class CodeRepository(QueryResourceManager):
         cfn_type = 'AWS::CodeCommit::Repository'
         universal_taggable = object()
 
-    def get_resources(self, ids, cache=True):
+    source_mapping = {
+        'describe': DescribeRepo,
+        'config': ConfigSource
+    }
+
+    def get_resources(self, ids, cache=True, augment=True):
         return universal_augment(self, self.augment([{'repositoryName': i} for i in ids]))
 
 

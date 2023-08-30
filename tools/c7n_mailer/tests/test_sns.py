@@ -26,6 +26,6 @@ class SnsTest(unittest.TestCase):
 
     def test_get_sns_to_resources_map(self):
         SQS_MESSAGE = copy.deepcopy(SQS_MESSAGE_1)
-        SQS_MESSAGE['action'].get('to', []).append(self.sns_topic_example)
+        SQS_MESSAGE["action"].get("to", []).append(self.sns_topic_example)
         sns_to_resources = self.sns_delivery.get_sns_addrs_to_resources_map(SQS_MESSAGE)
         self.assertEqual(sns_to_resources, {self.sns_topic_example: [RESOURCE_1]})

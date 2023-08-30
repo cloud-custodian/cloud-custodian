@@ -21,7 +21,7 @@ distribution](https://www.chainguard.dev/unchained/introducing-wolfi-the-first-l
 is designed to be minimal, auditable, and secure.
 
 ```shell
-docker pull cloudcustodian/c7n_left:dev
+docker pull cloudcustodian/c7n-left:dev
 ```
 
 Images signatures can be verified using [cosign](https://github.com/sigstore/cosign)
@@ -38,7 +38,6 @@ cosign verify $IMAGE \
 
 ```shell
 ❯ c7n-left run --help
-
 Usage: c7n-left run [OPTIONS]
 
   evaluate policies against IaC sources.
@@ -49,13 +48,16 @@ Usage: c7n-left run [OPTIONS]
 
 Options:
   --format TEXT
-  --filters TEXT                  filter policies or resources as k=v pairs
+  --filters TEXT                  Filter policies or resources as k=v pairs
                                   with globbing
-  -p, --policy-dir PATH
-  -d, --directory PATH
-  -o, --output [cli|github|json]
-  --output-file FILENAME
-  --output-query TEXT
+  -p, --policy-dir PATH           Directory with policies
+  -d, --directory PATH            IaC directory to evaluate
+  -o, --output [cli|github|json]  Output format (default cli)
+  --output-file FILENAME          Output file (default stdout)
+  --var-file FILE                 Load variables from the given file, can be
+                                  used more than once
+  --output-query TEXT             Use a jmespath expression to filter json
+                                  output
   --summary [policy|resource]
   --help                          Show this message and exit.
 ```
@@ -147,7 +149,7 @@ policy values for severity and category are specified in its metadata section. i
 
 policies:
   - name: check-encryption
-    resource: [aws_ebs_volume, aws_sqs_queue]
+    resource: [terraform.aws_ebs_volume, terraform.aws_sqs_queue]
     metadata:
       category: [encryption, security]
       severity: high
@@ -168,7 +170,10 @@ which can be enabled via `--summary resource`.
 
 ## Policy Language
 
+Standard Custodian filters ([value](https://cloudcustodian.io/docs/filters.html#value-filter), [list-item](https://cloudcustodian.io/docs/aws/resources/aws-common-filters.html#aws-common-filters-list-item), `and`, `or`, `not`, [`reduce`](https://cloudcustodian.io/docs/filters.html#reduce-filter) and `event`) are available
+
 Policies for c7n-left support a few additional capabilities beyond what's common for custodian policies.
+
 
 Policies can be specified against multiple resource types either as an array or glob.
 
@@ -177,6 +182,30 @@ policies:
   - name: check-encryption
     resource: [aws_ebs_volume, aws_sqs_queue]
 ```
+
+### taggable filter
+
+A `taggable` filter is available that allows filtering to only resources that support tagging.
+
+In combination with resource wild card support, this allows using a single policy to enforce
+an organization's tag standards.
+
+```
+policies:
+ - name: check-tag-policy
+   resource: "terraform.aws*"
+   filters:
+     - taggable
+     - tag:Env: absent
+	 - tag:Owner: absent
+	 - tag:App: absent
+```
+
+This filter supports resources from several terraform providers including aws, azure, gcp, oci, tencentcloud.
+
+terraform providers that support default_tags have those values automatically available on the applicable resources.
+
+### traverse filter
 
 A `traverse` filter is available that allows for multi-hop graph traversal from a resource
 to any related resource.

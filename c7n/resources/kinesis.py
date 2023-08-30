@@ -146,7 +146,7 @@ class DeliveryStream(QueryResourceManager):
         date = 'CreateTimestamp'
         dimension = 'DeliveryStreamName'
         universal_taggable = object()
-        cfn_type = 'AWS::KinesisFirehose::DeliveryStream'
+        config_type = cfn_type = 'AWS::KinesisFirehose::DeliveryStream'
 
     source_mapping = {
         'describe': DescribeWithResourceTags,
@@ -400,6 +400,7 @@ class KmsFilterVideoStream(KmsRelatedFilter):
 
     RelatedIdsExpression = 'KmsKeyId'
 
+
 @KinesisVideoStream.action_registry.register("tag")
 class TagVideoStream(Tag):
     """Action to add tag/tags to Kinesis Video streams resource
@@ -419,15 +420,16 @@ class TagVideoStream(Tag):
                     value: "KinesisVideo Tag Value"
     """
     permissions = ('kinesisvideo:TagResource',)
-    
+
     def process_resource_set(self, client, resource_set, tag_keys):
         for r in resource_set:
             self.manager.retry(
-                client.tag_resource, 
-                ResourceARN=r['StreamARN'], 
-                Tags=tag_keys, 
+                client.tag_resource,
+                ResourceARN=r['StreamARN'],
+                Tags=tag_keys,
                 ignore_err_codes=("ResourceNotFoundException",))
-            
+
+
 @KinesisVideoStream.action_registry.register('remove-tag')
 class VideoStreamRemoveTag(RemoveTag):
     """Action to remove tag/tags from a Kinesis Video streams resource
@@ -445,14 +447,14 @@ class VideoStreamRemoveTag(RemoveTag):
                   - type: remove-tag
                     tags: ["KinesisVideoTag"]
     """
-    
+
     permissions = ('kinesisvideo:UntagResource',)
-    
+
     def process_resource_set(self, client, resource_set, tag_keys):
         for r in resource_set:
             self.manager.retry(
-                client.untag_resource, 
-                ResourceARN=r['StreamARN'], 
-                TagKeyList=tag_keys, 
+                client.untag_resource,
+                ResourceARN=r['StreamARN'],
+                TagKeyList=tag_keys,
                 ignore_err_codes=("ResourceNotFoundException",))
 

@@ -5,7 +5,8 @@ import logging
 from .azure_common import BaseTest, arm_template
 from .azure_common import cassette_name
 from c7n_azure.session import Session
-from mock import mock, patch
+from unittest import mock
+from unittest.mock import patch
 
 from c7n.exceptions import ResourceLimitExceeded
 from c7n.utils import local_session
