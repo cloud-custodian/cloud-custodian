@@ -915,7 +915,28 @@ class UniversalUntag(RemoveTag):
 
 
 class UniversalTagRename(Action):
+    """Rename an existing tag key to a new value.
 
+    :example:
+
+    rename Application, and Bap to App, if a resource has both of the old keys
+    then we'll use the value specified by Application, which is based on the
+    order of values of old_keys.
+
+        .. code-block :: yaml
+
+            policies:
+            - name: rename-tags-example
+              resource: aws.log-group
+              filters:
+                - or:
+                  - "tag:Bap": present
+                  - "tag:Application": present
+              actions:
+                - type: rename-tag
+                  old_keys: [Application, Bap]
+                  new_key: App
+    """
     schema = utils.type_schema(
         'rename-tag',
         old_keys={'type': 'array', 'items': {'type': 'string'}},
