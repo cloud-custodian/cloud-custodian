@@ -5,6 +5,7 @@ from collections import defaultdict
 import fnmatch
 import logging
 import operator
+import os
 
 from c7n.actions import ActionRegistry
 from c7n.cache import NullCache
@@ -252,7 +253,7 @@ class CollectionRunner:
         return provider
 
     def get_event(self):
-        return {"config": self.options}
+        return {"config": self.options, "env": dict(os.environ)}
 
     @staticmethod
     def match_type(rtype, p):

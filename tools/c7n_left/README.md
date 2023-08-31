@@ -228,6 +228,64 @@ policies:
          - Ipv4: 0.0.0.0/0
 ```
 
+### terraform data resources
+
+Policies can also be written against data resources, note data
+resources are prefixed with `data.`.
+
+```yaml
+policies:
+ - name: check-ami-data
+   resource: terraform.data.aws_ami
+   filters:
+     - type: value
+	   key: owners
+	   op: contains
+	   value: "099720109477"  # Canonical/ubuntu
+```
+
+and you can `traverse` from a resource to its data usage as well.
+
+```yaml
+policies:
+ - name: check-owner-specified
+   resource: terraform.aws_instance
+   filters:
+    - type: traverse
+	  resources: data.aws_ami
+	  attrs: 
+	   - owners: present
+```
+
+
+### environment variables
+
+c7n-left is typically run in CI systems, which provide a wealth
+of information in environment variables. Policies can make use
+of these environment variables in two different ways.
+
+They can be used to interpolate the content of a policy, where they
+will they will be substituted prior to the policy execution. Note this
+uses python's [format capabilties](https://pyformat.info)
+
+```yaml
+policies:
+ - name: "check-{env[REPO]}-{env[PR_NUMBER]}"
+   resource: terraform.aws*
+```   
+
+Additionally they can be evaluated by the policy using the `event` filter
+
+```yaml
+policies:
+  - name: check-aws
+    resource: terraform.aws*
+    filters:
+	  - type: event
+	    key: env.REPO
+		value: "cloud-custodian/cloud-custodian"
+```
+
 
 ## Policy Testing
 

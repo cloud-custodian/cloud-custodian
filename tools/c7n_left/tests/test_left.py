@@ -207,7 +207,29 @@ def test_graph_resolver_id():
     assert resolver.is_id_ref("a" * 36) is False
 
 
-def test_value_from(policy_env, test):
+def test_event_env(policy_env, test):
+    policy_env.write_tf(
+        """
+resource "aws_cloudwatch_log_group" "yada" {
+  name = "Bar"
+}
+        """
+    )
+    policy_env.write_policy(
+        {
+            "name": "check-env",
+            "resource": "terraform.aws_cloudwatch_log_group",
+            "filters": [
+                {"type": "event", "key": "env.REPO", "value": "cloud-custodian/cloud-custodian"}
+            ],
+        }
+    )
+    test.change_environment(REPO="cloud-custodian/cloud-custodian")
+    results = policy_env.run()
+    assert len(results) == 1
+
+
+def test_value_from_with_env_interpolate(policy_env, test):
     policy_env.write_tf(
         """
 resource "aws_cloudwatch_log_group" "yada" {
