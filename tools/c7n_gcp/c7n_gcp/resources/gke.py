@@ -79,6 +79,75 @@ class KubernetesCluster(QueryResourceManager):
                 r['labels'] = r['resourceLabels']
         return resources
 
+@KubernetesCluster.filter_registry.register('effective-firewall')
+class EffectiveFirewall(ValueFilter):
+    """Filters gke clusters  by their effective firewall rules.
+    See `getEffectiveFirewalls
+    https://cloud.google.com/workflows/docs/reference/googleapis/compute/v1/networks/getEffectiveFirewalls`_
+    for valid fields.
+
+    :example:
+
+    Filter all gke clusters that have a firewall rule that allows public
+    access
+
+    .. code-block:: yaml
+
+        policies:
+           - name: find-publicly-accessable-clusters
+             resource: gcp.gke-cluster
+             filters:
+             - type: effective-firewall
+               key: sourceRanges[]
+               op: contains
+               value: "0.0.0.0/0"
+    """
+
+    schema = type_schema('effective-firewall', rinherit=ValueFilter.schema)
+    permissions = ('compute.instances.getEffectiveFirewalls',)
+
+    def get_resource_params(self, resource):
+        path_param_re = re.compile('.*?/projects/(.*?)/zones/(.*?)/clusters/.*')
+        project, zone = path_param_re.match(resource['selfLink']).groups()
+        return {'project': project, 'zone': zone, 'instance': resource["name"]}
+
+    def process_resource(self, client, p, network):
+        def get_port_ranges(ports):
+            port_ranges = []
+            for port in ports:
+                    if "-" in port:
+                        port_split = port.split("-")
+                        port_ranges.append({"beginPort": port_split[0], "endPort": port_split[1]})
+                    else:
+                        port_ranges.append({"beginPort": port, "endPort": port})
+            return port_ranges
+
+        firewalls = client.execute_command('getEffectiveFirewalls',
+                        verb_arguments={'project': p, 'network': network}).get('firewalls', [])
+        for firewall_index, firewall in enumerate(firewalls):
+            action = "allowed" if "allowed" in firewall else "denied"
+            for protocol_index, protocol in enumerate(firewall[action]):
+                if "ports" in protocol:
+                    protocol['portRanges']=get_port_ranges(protocol['ports'])
+                    firewall[action][protocol_index] = protocol
+            firewalls[firewall_index] = firewall
+        return super(EffectiveFirewall, self).process(firewalls, None)
+
+    def get_client(self, session, model):
+        return session.client(
+            model.service, model.version, model.component)
+
+    def process(self, resources, event=None):
+        session = local_session(self.manager.session_factory)
+        project = session.get_default_project()
+        network_client = session.client(
+            "compute", "v1", "networks"
+        )
+        resource_list = [r for r in resources
+                            if self.process_resource(network_client, project, r['network'])]
+        return resource_list
+
+
 @resources.register('gke-nodepool')
 class KubernetesClusterNodePool(ChildResourceManager):
     """GCP resource:

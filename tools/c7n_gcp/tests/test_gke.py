@@ -92,6 +92,26 @@ class KubernetesClusterTest(BaseTest):
         self.assertEqual('c7nnode-cluster-2',
                          resources[0]['name'])
 
+    def test_gke_cluster_filter_effective_firewall(self):
+        project_id = 'cloud-custodian'
+        factory = self.replay_flight_data('gke-cluster-filter-effective-firewall',
+                                            project_id=project_id)
+        p = self.load_policy({
+            'name': 'gke-cluster-filter-effective-firewall',
+            'resource': 'gcp.gke-cluster',
+            'filters': [{
+                'type': 'effective-firewall',
+                'key': "sourceRanges[]",
+                'op': "contains",
+                'value': "0.0.0.0/0"
+            }]
+        }, session_factory=factory)
+        resources = p.run()
+
+        self.assertEqual(1, len(resources))
+        self.assertEqual('c7nnode-cluster-2',
+                         resources[0]['name'])
+
     def test_cluster_set_labels(self):
         project_id = 'cloud-custodian'
         name = "standard-cluster-1"
