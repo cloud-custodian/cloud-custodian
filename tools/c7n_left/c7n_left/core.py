@@ -313,6 +313,7 @@ class IACResourceManager(ResourceManager):
         self.data = data
         self._cache = NullCache(None)
         self.session_factory = lambda: None
+        self.config = ctx.options
         self.filters = self.filter_registry.parse(self.data.get("filters", []), self)
         self.actions = self.action_registry.parse(self.data.get("actions", []), self)
 

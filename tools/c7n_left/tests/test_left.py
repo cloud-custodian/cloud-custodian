@@ -207,6 +207,45 @@ def test_graph_resolver_id():
     assert resolver.is_id_ref("a" * 36) is False
 
 
+def test_value_from(policy_env):
+    policy_env.write_tf(
+        """
+resource "aws_cloudwatch_log_group" "yada" {
+   name = "Bar"
+}
+resource "aws_cloudwatch_log_group" "bada" {
+   name = "Baz"
+}
+        """
+    )
+    (policy_env.policy_dir / "exceptions").mkdir()
+    exceptions_file = policy_env.policy_dir / "exceptions" / "exceptions.json"
+    exceptions_file.write_text(
+        json.dumps({"policy": {"tagging": ["aws_cloudwatch_log_group.yada"]}})
+    )
+    policy_env.write_policy(
+        {
+            "name": "check-exceptions",
+            "resource": "terraform.aws_cloudwatch_log_group",
+            "filters": [
+                {"tag:Env": "absent"},
+                {
+                    "type": "value",
+                    "value_from": {
+                        "url": "file://" + str(exceptions_file.absolute()),
+                        "expr": "policy.tagging",
+                    },
+                    "op": "not-in",
+                    "key": "__tfmeta.path",
+                },
+            ],
+        }
+    )
+
+    results = policy_env.run()
+    assert len(results) == 1
+
+
 def test_data_policy(policy_env):
     policy_env.write_tf(
         """
@@ -303,8 +342,11 @@ resource "aws_cloudwatch_log_group" "test_group_2" {
         """
     )
     policy_env.write_policy(
-        {"name": "check-tags", "resource": "terraform.aws_*",
-         "filters": [{"tag:App": "absent"}, {"tag:Env": "absent"}]}
+        {
+            "name": "check-tags",
+            "resource": "terraform.aws_*",
+            "filters": [{"tag:App": "absent"}, {"tag:Env": "absent"}],
+        }
     )
 
     results = policy_env.run()
