@@ -15,7 +15,7 @@ from c7n.config import Config
 from c7n.resources import load_resources
 
 try:
-    from c7n_left import cli, utils, core
+    from c7n_left import cli, core, policy as policy_core
     from c7n_left.providers.terraform.provider import (
         TerraformProvider,
         TerraformResourceManager,
@@ -54,7 +54,7 @@ def run_policy(policy, terraform_dir, tmp_path):
     config = Config.empty(
         policy_dir=tmp_path, source_dir=terraform_dir, exec_filter=None, var_files=()
     )
-    policies = utils.load_policies(tmp_path, config)
+    policies = policy_core.load_policies(tmp_path, config)
     reporter = ResultsReporter()
     core.CollectionRunner(policies, config, reporter).run()
     return reporter.results
@@ -66,7 +66,7 @@ class PolicyEnv:
 
     def get_policies(self):
         config = Config.empty(policy_dir=self.policy_dir)
-        policies = utils.load_policies(self.policy_dir, config)
+        policies = policy_core.load_policies(self.policy_dir, config)
         return policies
 
     def get_graph(self, root_module):
@@ -94,7 +94,7 @@ class PolicyEnv:
             exec_filter=None,
             var_files=(),
         )
-        policies = utils.load_policies(config.policy_dir, config)
+        policies = policy_core.load_policies(config.policy_dir, config)
         reporter = ResultsReporter()
         core.CollectionRunner(policies, config, reporter).run()
         return reporter.results
@@ -113,7 +113,7 @@ def test_load_policy(test):
 
 def test_load_policy_dir(tmp_path):
     write_output_test_policy(tmp_path)
-    policies = utils.load_policies(tmp_path, Config.empty())
+    policies = policy_core.load_policies(tmp_path, Config.empty())
     assert len(policies) == 1
 
 
@@ -207,7 +207,7 @@ def test_graph_resolver_id():
     assert resolver.is_id_ref("a" * 36) is False
 
 
-def test_value_from(policy_env):
+def test_value_from(policy_env, test):
     policy_env.write_tf(
         """
 resource "aws_cloudwatch_log_group" "yada" {
@@ -223,6 +223,7 @@ resource "aws_cloudwatch_log_group" "bada" {
     exceptions_file.write_text(
         json.dumps({"policy": {"tagging": ["aws_cloudwatch_log_group.yada"]}})
     )
+    test.change_environment(PWD=str(policy_env.policy_dir.absolute()))
     policy_env.write_policy(
         {
             "name": "check-exceptions",
@@ -232,7 +233,7 @@ resource "aws_cloudwatch_log_group" "bada" {
                 {
                     "type": "value",
                     "value_from": {
-                        "url": "file://" + str(exceptions_file.absolute()),
+                        "url": "file://{env[PWD]}/exceptions/exceptions.json",
                         "expr": "policy.tagging",
                     },
                     "op": "not-in",
