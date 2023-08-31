@@ -8,6 +8,7 @@ import operator
 
 from c7n.actions import ActionRegistry
 from c7n.cache import NullCache
+from c7n.config import Config
 from c7n.filters import FilterRegistry
 from c7n.manager import ResourceManager
 
@@ -313,7 +314,7 @@ class IACResourceManager(ResourceManager):
         self.data = data
         self._cache = NullCache(None)
         self.session_factory = lambda: None
-        self.config = ctx.options
+        self.config = ctx and ctx.options or Config.empty()
         self.filters = self.filter_registry.parse(self.data.get("filters", []), self)
         self.actions = self.action_registry.parse(self.data.get("actions", []), self)
 
