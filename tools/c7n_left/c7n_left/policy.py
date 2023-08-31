@@ -16,7 +16,7 @@ def load_policies(policy_dir, options):
         return ()
 
     providers = {p.provider_name for p in policies}
-    assert len(providers), "only a single provider per policy dir"
+    assert len(providers) == 1, "only a single provider per policy dir"
     provider_name = providers.pop()
     provider = clouds[provider_name]()
     p_options = provider.initialize(options)
