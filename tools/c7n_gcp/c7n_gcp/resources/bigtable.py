@@ -6,7 +6,7 @@ from c7n_gcp.query import (
     QueryResourceManager, TypeInfo, ChildResourceManager, ChildTypeInfo
 )
 from c7n.utils import local_session
-from filters.timerange import TimeRangeFilter
+from c7n_gcp.filters.timerange import TimeRangeFilter
 
 
 @resources.register('bigtable-instance')
