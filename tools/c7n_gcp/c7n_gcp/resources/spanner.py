@@ -94,7 +94,7 @@ class SpannerInstanceBackupTimeRangeFilter(TimeRangeFilter):
     create_time_field_name = 'createTime'
     expire_time_field_name = 'expireTime'
 
-    
+
 @SpannerInstance.filter_registry.register('iam-policy')
 class SpannerInstanceIamPolicyFilter(IamPolicyFilter):
     """
