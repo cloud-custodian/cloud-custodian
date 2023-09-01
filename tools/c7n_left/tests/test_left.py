@@ -22,6 +22,7 @@ try:
         extract_mod_stack,
     )
     from c7n_left.providers.terraform.graph import Resolver
+    from c7n_left.providers.terraform.filters import Taggable
 
     LEFT_INSTALLED = True
 except ImportError:
@@ -124,6 +125,22 @@ def test_extract_mod_stack():
         "module.db.module.db_instance",
         "module.db.module.db_instance.aws_db_instance.this[0]",
     ]
+
+
+def test_taggable_module_resource():
+    assert (
+        Taggable.is_taggable(
+            (
+                {
+                    '__tfmeta': {
+                        'label': 'aws_security_group',
+                        'path': 'module.my_module.aws_security_group.this_name_prefix[0]',
+                    }
+                },
+            )
+        )
+        is True
+    )
 
 
 @pytest.mark.skipif(
