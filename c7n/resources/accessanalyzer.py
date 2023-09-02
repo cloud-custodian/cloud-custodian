@@ -27,7 +27,8 @@ class DescribeAccessanalyzerFinding(query.DescribeSource):
         for analyzer in analyzers:
             if analyzer['status'] != 'ACTIVE':
                 continue
-            # If this account is the Management/delegated administrator for IAM Access Analyzer, organization analyzer is prefered
+            # If this account is the Management/delegated administrator for IAM Access Analyzer,
+            #  organization analyzer is prefered
             if analyzer['type'] == 'ORGANIZATION':
                 found = analyzer
                 break
