@@ -48,7 +48,10 @@ class AccessanalyzerFinding(query.QueryResourceManager):
         service = "accessanalyzer"
         enum_spec = ('list_findings', 'findings', None)
         id = "id"
+        arn_type = ""
         name = "resourceType"
+        permissions_enum = ('access-analyzer:ListAnalyzers','access-analyzer:ListFindings',)
+        permission_prefix = "access-analyzer"
 
     source_mapping = {
         "describe": DescribeAccessanalyzerFinding,
