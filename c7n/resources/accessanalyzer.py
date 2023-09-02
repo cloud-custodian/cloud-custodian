@@ -34,7 +34,7 @@ class DescribeAccessanalyzerFinding(query.DescribeSource):
             found = analyzer
         if not found:
             raise PolicyExecutionError(
-                f"policy:{self.manager.ctx.policy.name} no access analyzer found in account or org analyzer specified"
+                f"policy:{self.manager.ctx.policy.name} no active access analyzer found in account"
                 )
         return found['arn']
 
