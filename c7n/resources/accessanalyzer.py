@@ -1,11 +1,11 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+import logging
 from c7n.manager import resources
 from c7n import query
 from c7n.utils import local_session
-from c7n.exceptions import PolicyExecutionError
 
-
+log = logging.getLogger('custodian.access-analyzer')
 
 class DescribeAccessanalyzerFinding(query.DescribeSource):
 
@@ -22,7 +22,7 @@ class DescribeAccessanalyzerFinding(query.DescribeSource):
         """ Find Active Access Analyzer ARN
         """
         client = local_session(self.manager.session_factory).client('accessanalyzer')
-        analyzers = client.list_analyzers(type='ACCOUNT').get('analyzers', ())
+        analyzers = client.list_analyzers().get('analyzers', ())
         found = False
         for analyzer in analyzers:
             if analyzer['status'] != 'ACTIVE':
@@ -34,9 +34,9 @@ class DescribeAccessanalyzerFinding(query.DescribeSource):
                 break
             found = analyzer
         if not found:
-            raise PolicyExecutionError(
-                f"policy:{self.manager.ctx.policy.name} no active access analyzer found in account"
-                )
+            log.warning("policy: {} no active access analyzer found in account".format(
+                self.manager.ctx.policy.name))
+            return None
         return found['arn']
 
 
@@ -50,7 +50,7 @@ class AccessanalyzerFinding(query.QueryResourceManager):
         id = "id"
         arn_type = ""
         name = "resourceType"
-        permissions_enum = ('access-analyzer:ListAnalyzers','access-analyzer:ListFindings',)
+        permissions_enum = ('access-analyzer:ListAnalyzers','access-analyzer:ListFindings')
         permission_prefix = "access-analyzer"
 
     source_mapping = {
