@@ -104,6 +104,7 @@ ResourceMap = {
     "gcp.sourcerepo": "c7n_gcp.resources.source.SourceRepository",
     "gcp.spanner-database-instance": "c7n_gcp.resources.spanner.SpannerDatabaseInstance",
     "gcp.spanner-instance": "c7n_gcp.resources.spanner.SpannerInstance",
+    "gcp.spanner-backup": "c7n_gcp.resources.spanner.SpannerInstanceBackup",
     "gcp.sql-backup-run": "c7n_gcp.resources.sql.SqlBackupRun",
     "gcp.sql-instance": "c7n_gcp.resources.sql.SqlInstance",
     "gcp.sql-ssl-cert": "c7n_gcp.resources.sql.SqlSslCert",
