@@ -155,7 +155,7 @@ policies:
       severity: high
     filters:
        - kms_master_key_id: absent
-```       
+```
 
 
 ## Outputs
@@ -190,15 +190,15 @@ A `taggable` filter is available that allows filtering to only resources that su
 In combination with resource wild card support, this allows using a single policy to enforce
 an organization's tag standards.
 
-```
+```yaml
 policies:
  - name: check-tag-policy
    resource: "terraform.aws*"
    filters:
      - taggable
      - tag:Env: absent
-	 - tag:Owner: absent
-	 - tag:App: absent
+     - tag:Owner: absent
+     - tag:App: absent
 ```
 
 This filter supports resources from several terraform providers including aws, azure, gcp, oci, tencentcloud.
@@ -212,7 +212,7 @@ to any related resource.
 
 ie, here's a policy against an aws ec2 instance, that checks if any of the security
 groups attached to the instance, have a permission defined that allows access from
-0.0.0.0/0 
+0.0.0.0/0
 
 ```yaml
 policies:
@@ -228,6 +228,64 @@ policies:
          - Ipv4: 0.0.0.0/0
 ```
 
+### terraform data resources
+
+Policies can also be written against data resources, note data
+resources are prefixed with `data.`.
+
+```yaml
+policies:
+ - name: check-ami-data
+   resource: terraform.data.aws_ami
+   filters:
+     - type: value
+       key: owners
+       op: contains
+       value: "099720109477"  # Canonical/ubuntu
+```
+
+and you can `traverse` from a resource to its data usage as well.
+
+```yaml
+policies:
+ - name: check-owner-specified
+   resource: terraform.aws_instance
+   filters:
+    - type: traverse
+      resources: data.aws_ami
+      attrs:
+       - owners: present
+```
+
+
+### environment variables
+
+c7n-left is typically run in CI systems, which provide a wealth
+of information in environment variables. Policies can make use
+of these environment variables in two different ways.
+
+They can be used to interpolate the content of a policy, where they
+will they will be substituted prior to the policy execution. Note this
+uses python's [format capabilties](https://pyformat.info)
+
+```yaml
+policies:
+ - name: "check-{env[REPO]}-{env[PR_NUMBER]}"
+   resource: terraform.aws*
+```
+
+Additionally they can be evaluated by the policy using the `event` filter
+
+```yaml
+policies:
+  - name: check-aws
+    resource: terraform.aws*
+    filters:
+      - type: event
+        key: env.REPO
+        value: "cloud-custodian/cloud-custodian"
+```
+
 
 ## Policy Testing
 
@@ -237,7 +295,7 @@ To create a test for a policy, create a tests directory next to your policy file
 
 Within that tests directory, create a sub directory with the policy name.
 
-Next add terraform files to this sub directory. Typically you would add 
+Next add terraform files to this sub directory. Typically you would add
 both terraform files that would match the policy and those that should not.
 
 Finally you add assertions in a `left.plan[.yaml|.json]` file. The
@@ -260,7 +318,7 @@ policy-dir-a/
 
 3 directories, 4 files
 
-❯ cat policy-dir-a/alb.yaml 
+❯ cat policy-dir-a/alb.yaml
 policies:
   - name: alb-deletion-protection-disabled
     resource: [terraform.aws_lb, terraform.aws_alb]
@@ -272,7 +330,7 @@ policies:
     filters:
       - enable_deletion_protection: empty
 
-❯ cat policy-dir-a/tests/alb-deletion-protection-disabled/left.plan.yaml 
+❯ cat policy-dir-a/tests/alb-deletion-protection-disabled/left.plan.yaml
 - "resource.__tfmeta.filename": "positive1.tf"
 
 ```
@@ -282,7 +340,7 @@ and now we can run a test
 ```shell
 ❯ c7n-left test -p policy-dir-a/
 Discovered 1 Tests
-Failure alb-deletion-protection-disabled [{'resource.__tfmeta.filename': 
+Failure alb-deletion-protection-disabled [{'resource.__tfmeta.filename':
 'positive1.tf'}] checks not used
 
 1 Test Complete (0.05s) 1 Failure
