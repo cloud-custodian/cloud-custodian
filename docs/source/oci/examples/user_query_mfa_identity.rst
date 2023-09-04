@@ -8,7 +8,7 @@ The following example policy will filter and tag the users whose multi-factor au
 .. code-block:: yaml
 
     policies:
-    - name: filter-tag-user-with-mfa
+    - name: filter-tag-user-without-mfa
       description: |
         Filter and tag users whose MFA is not enabled
       resource: oci.user

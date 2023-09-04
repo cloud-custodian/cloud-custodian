@@ -5,9 +5,11 @@ from collections import defaultdict
 import fnmatch
 import logging
 import operator
+import os
 
 from c7n.actions import ActionRegistry
 from c7n.cache import NullCache
+from c7n.config import Config
 from c7n.filters import FilterRegistry
 from c7n.manager import ResourceManager
 
@@ -215,7 +217,7 @@ class CollectionRunner:
             log.warning("no %s source files found" % provider.type)
             return True
 
-        graph = provider.parse(self.options.source_dir)
+        graph = provider.parse(self.options.source_dir, self.options.var_files)
 
         for p in self.policies:
             p.expand_variables(p.get_variables())
@@ -233,16 +235,16 @@ class CollectionRunner:
             for p in self.policies:
                 if not self.match_type(rtype, p):
                     continue
-                result_set = self.run_policy(p, graph, resources, event)
+                result_set = self.run_policy(p, graph, resources, event, rtype)
                 if result_set:
                     self.reporter.on_results(result_set)
                     found = True
         self.reporter.on_execution_ended()
         return found
 
-    def run_policy(self, policy, graph, resources, event):
+    def run_policy(self, policy, graph, resources, event, resource_type):
         event = dict(event)
-        event.update({"graph": graph, "resources": resources})
+        event.update({"graph": graph, "resources": resources, "resource_type": resource_type})
         return policy.push(event)
 
     def get_provider(self):
@@ -251,7 +253,7 @@ class CollectionRunner:
         return provider
 
     def get_event(self):
-        return {"config": self.options}
+        return {"config": self.options, "env": dict(os.environ)}
 
     @staticmethod
     def match_type(rtype, p):
@@ -276,10 +278,11 @@ class IACSourceMode(PolicyExecutionMode):
             return []
 
         resources = event["resources"]
+        resources = self.manager.augment(resources, event)
         resources = self.manager.filter_resources(resources, event)
-        return self.as_results(resources)
+        return self.as_results(resources, event)
 
-    def as_results(self, resources):
+    def as_results(self, resources, event):
         return ResultSet([PolicyResourceResult(r, self.policy) for r in resources])
 
 
@@ -312,11 +315,15 @@ class IACResourceManager(ResourceManager):
         self.data = data
         self._cache = NullCache(None)
         self.session_factory = lambda: None
+        self.config = ctx and ctx.options or Config.empty()
         self.filters = self.filter_registry.parse(self.data.get("filters", []), self)
         self.actions = self.action_registry.parse(self.data.get("actions", []), self)
 
     def get_resource_manager(self, resource_type, data=None):
         return self.__class__(self.ctx, data or {})
+
+    def augment(self, resources, event):
+        return resources
 
 
 IACResourceManager.filter_registry.register("traverse", Traverse)

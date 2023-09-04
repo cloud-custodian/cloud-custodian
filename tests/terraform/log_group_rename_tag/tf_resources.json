@@ -1,0 +1,79 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "aws_cloudwatch_log_group": {
+            "test_group_1": {
+                "arn": "arn:aws:logs:us-west-2:644160558196:log-group:expert-cougar-1",
+                "id": "expert-cougar-1",
+                "kms_key_id": "",
+                "name": "expert-cougar-1",
+                "name_prefix": "",
+                "retention_in_days": 0,
+                "skip_destroy": false,
+                "tags": {
+                    "Application": "greeter"
+                },
+                "tags_all": {
+                    "Application": "greeter"
+                }
+            },
+            "test_group_2": {
+                "arn": "arn:aws:logs:us-west-2:644160558196:log-group:expert-cougar-2",
+                "id": "expert-cougar-2",
+                "kms_key_id": "",
+                "name": "expert-cougar-2",
+                "name_prefix": "",
+                "retention_in_days": 0,
+                "skip_destroy": false,
+                "tags": {
+                    "Application": "login"
+                },
+                "tags_all": {
+                    "Application": "login"
+                }
+            },
+            "test_group_3": {
+                "arn": "arn:aws:logs:us-west-2:644160558196:log-group:expert-cougar-3",
+                "id": "expert-cougar-3",
+                "kms_key_id": "",
+                "name": "expert-cougar-3",
+                "name_prefix": "",
+                "retention_in_days": 0,
+                "skip_destroy": false,
+                "tags": {
+                    "Bap": "login"
+                },
+                "tags_all": {
+                    "Bap": "login"
+                }
+            },
+            "test_group_4": {
+                "arn": "arn:aws:logs:us-west-2:644160558196:log-group:expert-cougar-4",
+                "id": "expert-cougar-4",
+                "kms_key_id": "",
+                "name": "expert-cougar-4",
+                "name_prefix": "",
+                "retention_in_days": 0,
+                "skip_destroy": false,
+                "tags": {
+                    "Application": "greep",
+                    "Bap": "greeter"
+                },
+                "tags_all": {
+                    "Application": "greep",
+                    "Bap": "greeter"
+                }
+            }
+        },
+        "random_pet": {
+            "names": {
+                "id": "expert-cougar",
+                "keepers": null,
+                "length": 2,
+                "prefix": null,
+                "separator": "-"
+            }
+        }
+    }
+}
