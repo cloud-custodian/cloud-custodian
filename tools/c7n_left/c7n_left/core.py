@@ -5,9 +5,11 @@ from collections import defaultdict
 import fnmatch
 import logging
 import operator
+import os
 
 from c7n.actions import ActionRegistry
 from c7n.cache import NullCache
+from c7n.config import Config
 from c7n.filters import FilterRegistry
 from c7n.manager import ResourceManager
 
@@ -251,7 +253,7 @@ class CollectionRunner:
         return provider
 
     def get_event(self):
-        return {"config": self.options}
+        return {"config": self.options, "env": dict(os.environ)}
 
     @staticmethod
     def match_type(rtype, p):
@@ -313,6 +315,7 @@ class IACResourceManager(ResourceManager):
         self.data = data
         self._cache = NullCache(None)
         self.session_factory = lambda: None
+        self.config = ctx and ctx.options or Config.empty()
         self.filters = self.filter_registry.parse(self.data.get("filters", []), self)
         self.actions = self.action_registry.parse(self.data.get("actions", []), self)
 

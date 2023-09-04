@@ -12,7 +12,7 @@ from .core import CollectionRunner, ExecutionFilter
 from .entry import initialize_iac
 from .output import get_reporter, report_outputs, summary_options
 from .test import TestReporter, TestRunner
-from .utils import load_policies
+from .policy import load_policies
 
 
 log = logging.getLogger("c7n.iac")

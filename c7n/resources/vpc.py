@@ -6,8 +6,7 @@ import re
 from c7n.actions import BaseAction, ModifyVpcSecurityGroupsAction
 from c7n.deprecated import DeprecatedField
 from c7n.exceptions import PolicyValidationError, ClientError
-from c7n.filters import (
-    DefaultVpcBase, Filter, ValueFilter, MetricsFilter, ListItemFilter)
+from c7n.filters import Filter, ValueFilter, MetricsFilter, ListItemFilter
 import c7n.filters.vpc as net_filters
 from c7n.filters.iamaccess import CrossAccountAccessFilter
 from c7n.filters.related import RelatedResourceFilter, RelatedResourceByIdFilter
@@ -1193,7 +1192,7 @@ class Stale(Filter):
 
 
 @SecurityGroup.filter_registry.register('default-vpc')
-class SGDefaultVpc(DefaultVpcBase):
+class SGDefaultVpc(net_filters.DefaultVpcBase):
     """Filter that returns any security group that exists within the default vpc
 
     :example:
