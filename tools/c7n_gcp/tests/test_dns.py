@@ -132,7 +132,13 @@ class TestDnsResourceRecordsFilter(BaseTest):
             {'name': 'dns-resource-record',
              'resource': 'gcp.dns-managed-zone',
              'filters': [{'type': 'records-sets',
-                          'key': 'type', 'op': 'eq', 'value': 'TXT'}]},
+                          'attrs': [{
+                              'type': 'value',
+                              'key': 'type',
+                              'op': 'eq',
+                              'value': 'TXT'
+                          }]
+            }]},
             session_factory=session_factory)
 
         policy_resources = policy.run()

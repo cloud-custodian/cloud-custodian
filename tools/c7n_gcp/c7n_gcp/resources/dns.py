@@ -5,7 +5,7 @@ from c7n_gcp.query import QueryResourceManager, TypeInfo
 from c7n_gcp.actions import MethodAction
 from c7n.utils import type_schema, local_session, jmespath_search
 from c7n.filters import ValueFilter
-from c7n.filters.core import OPERATORS
+from c7n.filters.core import OPERATORS, ListItemFilter
 
 
 @resources.register('dns-managed-zone')
@@ -58,26 +58,21 @@ class DnsPolicy(QueryResourceManager):
 
 
 @DnsManagedZone.filter_registry.register('records-sets')
-class DNSZoneRecordsSetsFilter(ValueFilter):
-    schema = type_schema('records-sets', rinherit=ValueFilter.schema)
+class DNSZoneRecordsSetsFilter(ListItemFilter):
+
+    schema = type_schema(
+        'records-sets',
+        attrs={'$ref': '#/definitions/filters_common/list_item_attrs'}
+    )
+    annotate_items = True
     permissions = ("dns.managedZones.list",)
 
-    def process(self, resources, event=None):
+    def get_item_values(self, resource):
         session = local_session(self.manager.session_factory)
         client = session.client(service_name='dns', version='v1', component='resourceRecordSets')
-        result = []
-        op = OPERATORS[self.data.get('op')]
         project = session.get_default_project()
-
-        for resource in resources:
-            sets = client.execute_query('list', {'project': project,
-                                                 'managedZone': resource['name']})
-            for s in sets['rrsets']:
-                jmespath_key = jmespath_search(self.data.get('key'), s)
-                if jmespath_key and op(jmespath_key, self.data.get('value')):
-                    result.append(resource)
-                    break
-
+        result = client.execute_query(
+            'list', {'project': project, 'managedZone': resource['name']}).get('rrsets')
         return result
 
 
