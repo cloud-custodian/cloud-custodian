@@ -40,7 +40,7 @@ class DescribeAccessanalyzerFinding(query.DescribeSource):
         return found['arn']
 
 
-@resources.register("iam-access-analyzer-finding")
+@resources.register("access-analyzer-finding")
 class AccessanalyzerFinding(query.QueryResourceManager):
     """AWS IAM Access Analyzer Findings resource
     """

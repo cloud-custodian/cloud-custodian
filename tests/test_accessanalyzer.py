@@ -12,7 +12,7 @@ class AccessanalyzerFindingTest(BaseTest):
         session_factory = self.replay_flight_data('test_access_analyzer_finding')
         policy = {
             'name': 'list-access-analyzer-findings',
-            'resource': 'aws.iam-access-analyzer-finding',
+            'resource': 'aws.access-analyzer-finding',
             'filters': [{'type': 'value',
                  'key': 'status',
                  'value': 'ACTIVE'}]
@@ -32,7 +32,7 @@ class AccessanalyzerFindingTest(BaseTest):
         session_factory = self.replay_flight_data('test_access_analyzer_finding_no_analyzer')
         policy = {
             'name': 'list-access-analyzer-findings',
-            'resource': 'aws.iam-access-analyzer-finding'
+            'resource': 'aws.access-analyzer-finding'
         }
 
         policy = self.load_policy(
@@ -49,7 +49,7 @@ class AccessanalyzerFindingTest(BaseTest):
         session_factory = self.replay_flight_data('test_access_analyzer_finding_org_analyzer')
         policy = {
             'name': 'list-access-analyzer-findings',
-            'resource': 'aws.iam-access-analyzer-finding'
+            'resource': 'aws.access-analyzer-finding'
         }
 
         policy = self.load_policy(

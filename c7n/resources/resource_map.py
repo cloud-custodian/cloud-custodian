@@ -1,6 +1,7 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 ResourceMap = {
+  "aws.access-analyzer-finding": "c7n.resources.accessanalyzer.AccessanalyzerFinding",
   "aws.account": "c7n.resources.account.Account",
   "aws.acm-certificate": "c7n.resources.acm.Certificate",
   "aws.advisor-check": "c7n.resources.support.AdvisorCheck",
@@ -126,7 +127,6 @@ ResourceMap = {
   "aws.hsm": "c7n.resources.hsm.CloudHSM",
   "aws.hsm-client": "c7n.resources.hsm.HSMClient",
   "aws.hsm-hapg": "c7n.resources.hsm.PartitionGroup",
-  "aws.iam-access-analyzer-finding": "c7n.resources.accessanalyzer.AccessanalyzerFinding",
   "aws.iam-certificate": "c7n.resources.iam.ServerCertificate",
   "aws.iam-group": "c7n.resources.iam.Group",
   "aws.iam-oidc-provider": "c7n.resources.iam.OpenIdProvider",
