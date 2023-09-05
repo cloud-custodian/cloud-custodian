@@ -182,6 +182,7 @@ module "db" {
     assert len(results) == 1
     assert results[0].resource['__tfmeta']['filename'] == 'main.tf'
     assert results[0].resource['__tfmeta']['type'] == 'module'
+    assert results[0].resource['__tfmeta']['refs'] == ['module.db.module.db_instance.aws_db_instance.this[0]']
 
 
 def test_graph_resolver():
