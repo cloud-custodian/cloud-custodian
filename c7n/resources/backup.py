@@ -192,7 +192,7 @@ class RemovePolicyStatement(RemovePolicyBase):
                     statement_ids: matched
     """
 
-    permissions = ('backup:GetBackupVaultAccessPolicy', 'backup:SetBackupVaultAccessPolicy')
+    permissions = ('backup:GetBackupVaultAccessPolicy', 'backup:DeleteBackupVaultAccessPolicy')
 
     def process(self, resources):
         results = []
