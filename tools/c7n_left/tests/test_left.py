@@ -15,13 +15,14 @@ from c7n.config import Config
 from c7n.resources import load_resources
 
 try:
-    from c7n_left import cli, utils, core
+    from c7n_left import cli, core, policy as policy_core
     from c7n_left.providers.terraform.provider import (
         TerraformProvider,
         TerraformResourceManager,
         extract_mod_stack,
     )
     from c7n_left.providers.terraform.graph import Resolver
+    from c7n_left.providers.terraform.filters import Taggable
 
     LEFT_INSTALLED = True
 except ImportError:
@@ -54,7 +55,7 @@ def run_policy(policy, terraform_dir, tmp_path):
     config = Config.empty(
         policy_dir=tmp_path, source_dir=terraform_dir, exec_filter=None, var_files=()
     )
-    policies = utils.load_policies(tmp_path, config)
+    policies = policy_core.load_policies(tmp_path, config)
     reporter = ResultsReporter()
     core.CollectionRunner(policies, config, reporter).run()
     return reporter.results
@@ -66,7 +67,7 @@ class PolicyEnv:
 
     def get_policies(self):
         config = Config.empty(policy_dir=self.policy_dir)
-        policies = utils.load_policies(self.policy_dir, config)
+        policies = policy_core.load_policies(self.policy_dir, config)
         return policies
 
     def get_graph(self, root_module):
@@ -94,7 +95,7 @@ class PolicyEnv:
             exec_filter=None,
             var_files=(),
         )
-        policies = utils.load_policies(config.policy_dir, config)
+        policies = policy_core.load_policies(config.policy_dir, config)
         reporter = ResultsReporter()
         core.CollectionRunner(policies, config, reporter).run()
         return reporter.results
@@ -113,7 +114,7 @@ def test_load_policy(test):
 
 def test_load_policy_dir(tmp_path):
     write_output_test_policy(tmp_path)
-    policies = utils.load_policies(tmp_path, Config.empty())
+    policies = policy_core.load_policies(tmp_path, Config.empty())
     assert len(policies) == 1
 
 
@@ -124,6 +125,22 @@ def test_extract_mod_stack():
         "module.db.module.db_instance",
         "module.db.module.db_instance.aws_db_instance.this[0]",
     ]
+
+
+def test_taggable_module_resource():
+    assert (
+        Taggable.is_taggable(
+            (
+                {
+                    '__tfmeta': {
+                        'label': 'aws_security_group',
+                        'path': 'module.my_module.aws_security_group.this_name_prefix[0]',
+                    }
+                },
+            )
+        )
+        is True
+    )
 
 
 @pytest.mark.skipif(
@@ -164,6 +181,7 @@ module "db" {
     )
     assert len(results) == 1
     assert results[0].resource['__tfmeta']['filename'] == 'main.tf'
+    assert results[0].resource['__tfmeta']['type'] == 'module'
 
 
 def test_graph_resolver():
@@ -207,6 +225,68 @@ def test_graph_resolver_id():
     assert resolver.is_id_ref("a" * 36) is False
 
 
+def test_event_env(policy_env, test):
+    policy_env.write_tf(
+        """
+resource "aws_cloudwatch_log_group" "yada" {
+  name = "Bar"
+}
+        """
+    )
+    policy_env.write_policy(
+        {
+            "name": "check-env",
+            "resource": "terraform.aws_cloudwatch_log_group",
+            "filters": [
+                {"type": "event", "key": "env.REPO", "value": "cloud-custodian/cloud-custodian"}
+            ],
+        }
+    )
+    test.change_environment(REPO="cloud-custodian/cloud-custodian")
+    results = policy_env.run()
+    assert len(results) == 1
+
+
+def test_value_from_with_env_interpolate(policy_env, test):
+    policy_env.write_tf(
+        """
+resource "aws_cloudwatch_log_group" "yada" {
+   name = "Bar"
+}
+resource "aws_cloudwatch_log_group" "bada" {
+   name = "Baz"
+}
+        """
+    )
+    (policy_env.policy_dir / "exceptions").mkdir()
+    exceptions_file = policy_env.policy_dir / "exceptions" / "exceptions.json"
+    exceptions_file.write_text(
+        json.dumps({"policy": {"tagging": ["aws_cloudwatch_log_group.yada"]}})
+    )
+    test.change_environment(PWD=str(policy_env.policy_dir.absolute()))
+    policy_env.write_policy(
+        {
+            "name": "check-exceptions",
+            "resource": "terraform.aws_cloudwatch_log_group",
+            "filters": [
+                {"tag:Env": "absent"},
+                {
+                    "type": "value",
+                    "value_from": {
+                        "url": "file://{env[PWD]}/exceptions/exceptions.json",
+                        "expr": "policy.tagging",
+                    },
+                    "op": "not-in",
+                    "key": "__tfmeta.path",
+                },
+            ],
+        }
+    )
+
+    results = policy_env.run()
+    assert len(results) == 1
+
+
 def test_data_policy(policy_env):
     policy_env.write_tf(
         """
@@ -227,8 +307,8 @@ data "aws_ami" "ubuntu" {
     assert len(results) == 1
 
 
-def test_moved_and_local(policy_env):
-    # mostly for coverage
+def test_block_types(policy_env):
+    # module block type handled separately
     policy_env.write_tf(
         """
 locals {
@@ -237,15 +317,38 @@ locals {
 resource "aws_cloudwatch_log_group" "yada" {
   name = local.name
 }
+terraform {
+  experiments = [example]
+}
 moved {
   from = aws_instance.known
   to   = aws_cloudwatch_log_group.yada
+}
+provider "aws" {
+  region = "us-east-1"
+}
+
+variable "name" {
+  type = string
+  default = "theodora"
+}
+output "news" {
+  value = "https://lwn.net"
 }
     """
     )
     policy_env.write_policy({"name": "check-blocks", "resource": "terraform.*"})
     results = policy_env.run()
-    assert len(results) == 3
+    assert len(results) == 7
+    assert {r.resource["__tfmeta"]["type"] for r in results} == {
+        "moved",
+        "local",
+        "resource",
+        "provider",
+        "variable",
+        "output",
+        "terraform",
+    }
 
 
 def test_provider_tag_augment(policy_env):
@@ -277,6 +380,42 @@ provider "google" {
     results = policy_env.run()
     assert len(results) == 1
     assert results[0].resource['name'] == 'Yada'
+
+
+def test_value_tag_prefix(policy_env):
+    policy_env.write_tf(
+        """
+locals {
+  name = "forum"
+}
+
+resource "aws_cloudwatch_log_group" "test_group_1" {
+  name = "${local.name}-1"
+  tags = {
+    Application = "login"
+  }
+}
+
+resource "aws_cloudwatch_log_group" "test_group_2" {
+  name = "${local.name}-2"
+  tags = {
+    App = "AuthZ"
+    Env = "Dev"
+  }
+}
+        """
+    )
+    policy_env.write_policy(
+        {
+            "name": "check-tags",
+            "resource": "terraform.aws_*",
+            "filters": [{"tag:App": "absent"}, {"tag:Env": "absent"}],
+        }
+    )
+
+    results = policy_env.run()
+    assert len(results) == 1
+    assert results[0].resource['name'] == 'forum-1'
 
 
 def test_taggable(policy_env):
