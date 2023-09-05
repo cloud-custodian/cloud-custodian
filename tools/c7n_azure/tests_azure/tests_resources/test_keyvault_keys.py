@@ -63,7 +63,7 @@ class KeyVaultKeyTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertTrue(resources[0]['c7n:kty'].lower(), 'rsa')
-    
+
     def test_key_vault_keys_rotation(self):
         p = self.load_policy({
             'name': 'test-key-vault',
