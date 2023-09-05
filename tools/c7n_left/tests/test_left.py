@@ -22,6 +22,7 @@ try:
         extract_mod_stack,
     )
     from c7n_left.providers.terraform.graph import Resolver
+    from c7n_left.providers.terraform.filters import Taggable
 
     LEFT_INSTALLED = True
 except ImportError:
@@ -126,6 +127,22 @@ def test_extract_mod_stack():
     ]
 
 
+def test_taggable_module_resource():
+    assert (
+        Taggable.is_taggable(
+            (
+                {
+                    '__tfmeta': {
+                        'label': 'aws_security_group',
+                        'path': 'module.my_module.aws_security_group.this_name_prefix[0]',
+                    }
+                },
+            )
+        )
+        is True
+    )
+
+
 @pytest.mark.skipif(
     os.environ.get('GITHUB_ACTIONS') is None,
     reason="runs in github actions as it requires network access for tf init",
@@ -164,6 +181,7 @@ module "db" {
     )
     assert len(results) == 1
     assert results[0].resource['__tfmeta']['filename'] == 'main.tf'
+    assert results[0].resource['__tfmeta']['type'] == 'module'
 
 
 def test_graph_resolver():
@@ -289,8 +307,8 @@ data "aws_ami" "ubuntu" {
     assert len(results) == 1
 
 
-def test_moved_and_local(policy_env):
-    # mostly for coverage
+def test_block_types(policy_env):
+    # module block type handled separately
     policy_env.write_tf(
         """
 locals {
@@ -299,15 +317,38 @@ locals {
 resource "aws_cloudwatch_log_group" "yada" {
   name = local.name
 }
+terraform {
+  experiments = [example]
+}
 moved {
   from = aws_instance.known
   to   = aws_cloudwatch_log_group.yada
+}
+provider "aws" {
+  region = "us-east-1"
+}
+
+variable "name" {
+  type = string
+  default = "theodora"
+}
+output "news" {
+  value = "https://lwn.net"
 }
     """
     )
     policy_env.write_policy({"name": "check-blocks", "resource": "terraform.*"})
     results = policy_env.run()
-    assert len(results) == 3
+    assert len(results) == 7
+    assert {r.resource["__tfmeta"]["type"] for r in results} == {
+        "moved",
+        "local",
+        "resource",
+        "provider",
+        "variable",
+        "output",
+        "terraform",
+    }
 
 
 def test_provider_tag_augment(policy_env):
