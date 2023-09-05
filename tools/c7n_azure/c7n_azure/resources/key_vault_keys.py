@@ -159,7 +159,7 @@ class KeyTypeFilter(Filter):
 
         return matched
 
-@KeyVaultKeys.filter_registry.register('keyvault-keys-rotation')
+@KeyVaultKeys.filter_registry.register('rotation-policy')
 class KeyVaultKeyRotationFilter(Filter):
     """Filters keyvault keys for rotation policy
 
@@ -173,10 +173,10 @@ class KeyVaultKeyRotationFilter(Filter):
            - name: key-vault-keys-rotation-is-disabled
              resource: azure.keyvault-keys
              filters:
-                - type: keyvault-keys-rotation
+                - type: rotation-policy
                   state: Disabled
     """
-    schema = type_schema('keyvault-keys-rotation',required=['state'],
+    schema = type_schema('rotation-policy',required=['state'],
                 state={'type': 'string', 'enum': ['Enabled', 'Disabled']})
 
     def process(self, resources, event=None):
