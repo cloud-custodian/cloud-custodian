@@ -178,8 +178,7 @@ class DeleteElastiCacheCluster(BaseAction):
                 replication_group)
 
     def fetch_global_ds_rpgs(self):
-        global_rpgs = set()
-        rpgs = self.manager.get_resource_manager('elasticache-group').resources()
+        rpgs = self.manager.get_resource_manager('elasticache-group').resources(augment=False)
         global_rpgs = DeleteReplicationGroup(self.manager).get_global_datastore_association(rpgs)
         return global_rpgs
 
