@@ -8,12 +8,12 @@ import oci
 
 from c7n.config import Config
 from c7n.schema import generate
-from c7n.testing import C7N_FUNCTIONAL, CustodianTestCore
+from c7n.testing import C7N_FUNCTIONAL, PyTestUtils
 
 FILTERED_FIELDS = ["metadata"]
 
 
-class OciBaseTest(CustodianTestCore):
+class OciBaseTest(PyTestUtils):
     custodian_schema = generate()
 
     def load_policy(self, data, *args, **kw):
@@ -55,9 +55,6 @@ class OciBaseTest(CustodianTestCore):
             return [oci.util.to_dict(resource.data) for resource in resources]
         else:
             return oci.util.to_dict(resources.data)
-
-    def addCleanup(self, func, *args, **kw):
-        pass
 
 
 ## common functions
