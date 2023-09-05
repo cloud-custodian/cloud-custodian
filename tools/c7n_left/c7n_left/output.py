@@ -80,11 +80,6 @@ class RichResult:
             yield f"  [red]Reason: {policy.data['description']}[/red]"
         yield f"  [purple]File: {resource.filename}:{resource.line_start}-{resource.line_end}"
 
-        refs = self.policy_resource.resource.get_references()
-        if refs:
-            yield "  [yellow]References:"
-            for r in refs:
-                yield f"   - {r}"
         lines = resource.get_source_lines()
         yield Syntax(
             "\n".join(lines),
@@ -92,6 +87,11 @@ class RichResult:
             line_numbers=True,
             lexer=resource.format,
         )
+        refs = self.policy_resource.resource.get_references()
+        if refs:
+            yield "  [yellow]References:"
+            for r in refs:
+                yield f"   - {r}"
         yield ""
 
 
