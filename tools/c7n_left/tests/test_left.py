@@ -881,6 +881,10 @@ def test_cli_no_policies(tmp_path, caplog):
     assert caplog.record_tuples == [("c7n.iac", 30, "no policies found")]
 
 
+@pytest.mark.skipif(
+    os.environ.get('GITHUB_ACTIONS') is None,
+    reason="runs in github actions as it requires network access for tf get",
+)
 def test_cli_output_rich_mod_resource_ref(tmp_path, debug_cli_runner):
     (tmp_path / "main.tf").write_text(DB_MODULE_TF)
     (tmp_path / "policy.json").write_text(
