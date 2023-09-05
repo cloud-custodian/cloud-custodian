@@ -18,6 +18,8 @@ class TerraformGraph(ResourceGraph):
         for type_name, type_items in self.resource_data.items():
             if types and (type_name not in types and f"data.{type_name}" not in types):
                 continue
+            elif type_name == "module":
+                yield type_name, [self.as_resource(type_name, d, "module") for d in type_items]
             elif type_name == "moved":
                 yield type_name, [self.as_resource(type_name, d, "moved") for d in type_items]
             elif type_name == "locals":
