@@ -1,0 +1,530 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.KeyVault/vaults?api-version=2019-09-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "date": [
+                        "Tue, 05 Sep 2023 14:19:34 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: C880D78A9B5A489C85AA0FEB86434E7E Ref B: SN4AA2022302035 Ref C: 2023-09-05T14:19:34Z"
+                    ],
+                    "content-length": [
+                        "216"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [],
+                        "nextLink": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.KeyVault/vaults?api-version=2019-09-01&$skiptoken=Y2ZiLW5qbHJzcHRnfGtleXZhdWx0LVN1Y2Nlc3M="
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.KeyVault/vaults?api-version=2019-09-01&$skiptoken=Y2ZiLW5qbHJzcHRnfGtleXZhdWx0LVN1Y2Nlc3M=",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "date": [
+                        "Tue, 05 Sep 2023 14:19:35 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 1C462769EA4F4B68AE3DFB2C8ABA519C Ref B: SN4AA2022302035 Ref C: 2023-09-05T14:19:35Z"
+                    ],
+                    "content-length": [
+                        "2096"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-qmbknzbm/providers/Microsoft.KeyVault/vaults/cfb-qmbknzbm-keyvault",
+                                "name": "cfb-qmbknzbm-keyvault",
+                                "type": "Microsoft.KeyVault/vaults",
+                                "location": "centralus",
+                                "tags": {
+                                    "product_id": "13742"
+                                },
+                                "properties": {
+                                    "sku": {
+                                        "family": "A",
+                                        "name": "premium"
+                                    },
+                                    "tenantId": "00000000-0000-0000-0000-000000000003",
+                                    "accessPolicies": [
+                                        {
+                                            "tenantId": "00000000-0000-0000-0000-000000000003",
+                                            "objectId": "2cc7cbda-e89a-46a4-852b-b7dc94c32db0",
+                                            "permissions": {
+                                                "certificates": [],
+                                                "keys": [
+                                                    "Create",
+                                                    "Delete",
+                                                    "Get",
+                                                    "Purge",
+                                                    "Recover",
+                                                    "Update",
+                                                    "GetRotationPolicy",
+                                                    "SetRotationPolicy",
+                                                    "List"
+                                                ],
+                                                "secrets": [
+                                                    "set"
+                                                ],
+                                                "storage": []
+                                            }
+                                        }
+                                    ],
+                                    "enabledForDeployment": false,
+                                    "enabledForDiskEncryption": false,
+                                    "enabledForTemplateDeployment": false,
+                                    "enableSoftDelete": true,
+                                    "softDeleteRetentionInDays": 7,
+                                    "enableRbacAuthorization": false,
+                                    "vaultUri": "https://cfb-qmbknzbm-keyvault.vault.azure.net/",
+                                    "provisioningState": "Succeeded"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-vpbanzbk/providers/Microsoft.KeyVault/vaults/cfb-vpbanzbk-keyvault",
+                                "name": "cfb-vpbanzbk-keyvault",
+                                "type": "Microsoft.KeyVault/vaults",
+                                "location": "centralus",
+                                "tags": {
+                                    "product_id": "13742"
+                                },
+                                "properties": {
+                                    "sku": {
+                                        "family": "A",
+                                        "name": "premium"
+                                    },
+                                    "tenantId": "00000000-0000-0000-0000-000000000003",
+                                    "accessPolicies": [
+                                        {
+                                            "tenantId": "00000000-0000-0000-0000-000000000003",
+                                            "objectId": "2cc7cbda-e89a-46a4-852b-b7dc94c32db0",
+                                            "permissions": {
+                                                "certificates": [],
+                                                "keys": [
+                                                    "Create",
+                                                    "Delete",
+                                                    "Get",
+                                                    "Purge",
+                                                    "Recover",
+                                                    "Update",
+                                                    "GetRotationPolicy",
+                                                    "SetRotationPolicy",
+                                                    "List"
+                                                ],
+                                                "secrets": [],
+                                                "storage": []
+                                            }
+                                        }
+                                    ],
+                                    "enabledForDeployment": false,
+                                    "enabledForDiskEncryption": false,
+                                    "enabledForTemplateDeployment": false,
+                                    "enableSoftDelete": true,
+                                    "softDeleteRetentionInDays": 7,
+                                    "enableRbacAuthorization": false,
+                                    "vaultUri": "https://cfb-vpbanzbk-keyvault.vault.azure.net/",
+                                    "provisioningState": "Succeeded"
+                                }
+                            }
+                        ],
+                        "nextLink": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.KeyVault/vaults?api-version=2019-09-01&$skiptoken=DEC0DEDITtVwMoyAuTz1LioKkC+gB/EpRlQKNIaszQEhVidjWyP1kLW1z+jo/MGFHKc+t+M20PxoraNCslng9w=="
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.KeyVault/vaults?api-version=2019-09-01&$skiptoken=Y2ZiLXZwYmFuemJrfGNmYi12cGJhbnpiay1rZXl2YXVsdA==",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "date": [
+                        "Tue, 05 Sep 2023 14:19:35 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: E65FCD31E3FA4A82BC7E2D069B39C847 Ref B: SN4AA2022302035 Ref C: 2023-09-05T14:19:35Z"
+                    ],
+                    "content-length": [
+                        "228"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [],
+                        "nextLink": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.KeyVault/vaults?api-version=2019-09-01&$skiptoken=a2V5LXJCa0Z2T3JnLXJzZ3xrZXktckJrRnZPcmctblJCQUMta2V5"
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.KeyVault/vaults?api-version=2019-09-01&$skiptoken=a2V5LXJCa0Z2T3JnLXJzZ3xrZXktckJrRnZPcmctblJCQUMta2V5",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "date": [
+                        "Tue, 05 Sep 2023 14:19:36 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 05BBF2D1464749C292A753CF498C897A Ref B: SN4AA2022302035 Ref C: 2023-09-05T14:19:35Z"
+                    ],
+                    "content-length": [
+                        "12"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": []
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://cfb-qmbknzbm-keyvault.vault.azure.net/keys?api-version=7.4",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 401,
+                    "message": "Unauthorized"
+                },
+                "headers": {
+                    "date": [
+                        "Tue, 05 Sep 2023 14:19:37 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "www-authenticate": [
+                        "Bearer authorization=\"https://login.microsoftonline.com/b0257c14-cacc-44c6-8927-5b4ce5de0874\", resource=\"https://vault.azure.net\""
+                    ],
+                    "content-length": [
+                        "97"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "error": {
+                            "code": "Unauthorized",
+                            "message": "AKV10000: Request is missing a Bearer or PoP token."
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://cfb-qmbknzbm-keyvault.vault.azure.net/keys?api-version=7.4",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "date": [
+                        "Tue, 05 Sep 2023 14:19:37 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "content-length": [
+                        "294"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "kid": "https://cfb-qmbknzbm-keyvault.vault.azure.net/keys/cfb-qmbknzbm-generated-certificate",
+                                "attributes": {
+                                    "enabled": true,
+                                    "created": 1692896587,
+                                    "updated": 1692896587,
+                                    "recoveryLevel": "CustomizedRecoverable+Purgeable",
+                                    "recoverableDays": 7,
+                                    "exportable": false
+                                },
+                                "tags": {}
+                            }
+                        ],
+                        "nextLink": null
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://cfb-vpbanzbk-keyvault.vault.azure.net/keys?api-version=7.4",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 401,
+                    "message": "Unauthorized"
+                },
+                "headers": {
+                    "date": [
+                        "Tue, 05 Sep 2023 14:19:38 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "www-authenticate": [
+                        "Bearer authorization=\"https://login.microsoftonline.com/b0257c14-cacc-44c6-8927-5b4ce5de0874\", resource=\"https://vault.azure.net\""
+                    ],
+                    "content-length": [
+                        "97"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "error": {
+                            "code": "Unauthorized",
+                            "message": "AKV10000: Request is missing a Bearer or PoP token."
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://cfb-vpbanzbk-keyvault.vault.azure.net/keys?api-version=7.4",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "date": [
+                        "Tue, 05 Sep 2023 14:19:38 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "content-length": [
+                        "294"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "kid": "https://cfb-vpbanzbk-keyvault.vault.azure.net/keys/cfb-vpbanzbk-generated-certificate",
+                                "attributes": {
+                                    "enabled": true,
+                                    "created": 1693427167,
+                                    "updated": 1693427167,
+                                    "recoveryLevel": "CustomizedRecoverable+Purgeable",
+                                    "recoverableDays": 7,
+                                    "exportable": false
+                                },
+                                "tags": {}
+                            }
+                        ],
+                        "nextLink": null
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://cfb-qmbknzbm-keyvault.vault.azure.net/keys/cfb-qmbknzbm-generated-certificate/rotationpolicy?api-version=7.4",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "date": [
+                        "Tue, 05 Sep 2023 14:19:38 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "content-length": [
+                        "340"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "id": "https://cfb-qmbknzbm-keyvault.vault.azure.net/keys/cfb-qmbknzbm-generated-certificate/rotationpolicy",
+                        "lifetimeActions": [
+                            {
+                                "trigger": {
+                                    "timeBeforeExpiry": "P30D"
+                                },
+                                "action": {
+                                    "type": "Rotate"
+                                }
+                            },
+                            {
+                                "trigger": {
+                                    "timeBeforeExpiry": "P29D"
+                                },
+                                "action": {
+                                    "type": "Notify"
+                                }
+                            }
+                        ],
+                        "attributes": {
+                            "expiryTime": "P90D",
+                            "created": 1692896587,
+                            "updated": 1692896587
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://cfb-vpbanzbk-keyvault.vault.azure.net/keys/cfb-vpbanzbk-generated-certificate/rotationpolicy?api-version=7.4",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "date": [
+                        "Tue, 05 Sep 2023 14:19:39 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "content-length": [
+                        "106"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "lifetimeActions": [
+                            {
+                                "trigger": {
+                                    "timeBeforeExpiry": "P30D"
+                                },
+                                "action": {
+                                    "type": "Notify"
+                                }
+                            }
+                        ],
+                        "attributes": null
+                    }
+                }
+            }
+        }
+    ]
+}

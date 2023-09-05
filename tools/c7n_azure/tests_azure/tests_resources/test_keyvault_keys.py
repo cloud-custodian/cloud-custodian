@@ -2,7 +2,6 @@
 # SPDX-License-Identifier: Apache-2.0
 from ..azure_common import BaseTest, arm_template
 
-
 class KeyVaultKeyTest(BaseTest):
 
     def tearDown(self, *args, **kwargs):
@@ -64,3 +63,16 @@ class KeyVaultKeyTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertTrue(resources[0]['c7n:kty'].lower(), 'rsa')
+
+    def test_key_vault_key_rotation(self):
+        p = self.load_policy({
+            'name': 'test-key-vault-keys-rotation',
+            'resource': 'azure.keyvault-key',
+            'filters': [
+                {'type': 'keyvault-keys-rotation',
+                 'state': 'Disabled',
+                }
+            ]
+        }, validate=True, cache=True)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)

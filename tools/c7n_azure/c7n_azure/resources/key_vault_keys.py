@@ -158,3 +158,37 @@ class KeyTypeFilter(Filter):
                 log.warning(error)
 
         return matched
+
+@KeyVaultKeys.filter_registry.register('keyvault-keys-rotation')
+class KeyVaultKeyRotationFilter(Filter):
+    """Filters keyvault keys for rotation policy
+
+    :example:
+
+    Find all keyvault key that don't have rotation policy enabled
+
+    .. code-block:: yaml
+
+        policies:
+           - name: key-vault-keys-rotation-is-disabled
+             resource: azure.keyvault-keys
+             filters:
+                - type: keyvault-keys-rotation
+                  state: Disabled
+    """
+    schema = type_schema('keyvault-keys-rotation',required=['state'],
+                state={'type': 'string', 'enum': ['Enabled', 'Disabled']})
+
+    def process(self, resources, event=None):
+        matched = []
+        for key in resources:
+            try:
+              id = KeyProperties(key_id=key['id'])
+              client = self.manager.get_client(vault_url=id.vault_url)
+              rotation = client.get_key_rotation_policy(id.name)
+              if (self.data.get('state') == 'Disabled' and not rotation.id) or \
+                (self.data.get('state')  == 'Enabled' and not rotation.id):
+                matched.append(key)
+            except Exception as error:
+                log.warning(error)
+        return matched
