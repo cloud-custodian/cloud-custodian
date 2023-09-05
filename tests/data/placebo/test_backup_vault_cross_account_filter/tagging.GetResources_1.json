@@ -1,0 +1,17 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:backup:us-east-1:644160558196:backup-vault:c7n-test-backup-vault",
+                "Tags": []
+            },
+            {
+                "ResourceARN": "arn:aws:backup:us-east-1:644160558196:backup-vault:myvault",
+                "Tags": []
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

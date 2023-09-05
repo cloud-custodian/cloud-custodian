@@ -99,3 +99,59 @@ class BackupVaultTest(BaseTest):
         self.assertEqual(len(resources), 1)
         aliases = kms.list_aliases(KeyId=resources[0]['EncryptionKeyArn'])
         self.assertEqual(aliases['Aliases'][0]['AliasName'], 'alias/aws/backup')
+
+
+    def test_backup_vault_cross_account_filter(self):
+        session_factory = self.replay_flight_data('test_backup_vault_cross_account_filter')
+        p = self.load_policy(
+            {
+                'name': 'test-backup-vault-cross-account-filter',
+                'resource': 'backup-vault',
+                'filters': [
+                    {
+                        'type': 'cross-account',
+                        'blacklist_orgids': ["o-4amkskbcf1"]
+                    },
+                    {
+                        'type': 'value',
+                        'key': 'BackupVaultName',
+                        'value': 'c7n-test-backup-vault',
+                        'op': 'equal'
+                    }
+                ]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['BackupVaultName'], 'c7n-test-backup-vault')
+
+
+    def test_backup_vault_cross_account_filter_remove(self):
+        session_factory = self.replay_flight_data('test_backup_vault_cross_account_filter_remove')
+        p = self.load_policy(
+            {
+                'name': 'test-backup-vault-cross-account-filter-remove',
+                'resource': 'backup-vault',
+                'filters': [
+                    {
+                        'type': 'cross-account',
+                        'blacklist_orgids': ["o-4amkskbcf1"]
+                    },
+                    {
+                        'type': 'value',
+                        'key': 'BackupVaultName',
+                        'value': 'c7n-test-backup-vault',
+                        'op': 'equal'
+                    }
+                ],
+                'actions': [{
+                    'type': 'remove-statements',
+                    'statement_ids': 'matched'
+                }]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['BackupVaultName'], 'c7n-test-backup-vault')

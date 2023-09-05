@@ -1,0 +1,9 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "BackupVaultName": "c7n-test-backup-vault",
+        "BackupVaultArn": "arn:aws:backup:us-east-1:644160558196:backup-vault:c7n-test-backup-vault",
+        "Policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":\"backup:CopyIntoBackupVault\",\"Resource\":\"*\",\"Condition\":{\"StringEquals\":{\"aws:PrincipalOrgID\":\"o-4amkskbcf1\"}}}]}"
+    }
+}

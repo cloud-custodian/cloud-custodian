@@ -1,0 +1,97 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "BackupVaultList": [
+            {
+                "BackupVaultName": "Default",
+                "BackupVaultArn": "arn:aws:backup:us-east-1:644160558196:backup-vault:Default",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 1,
+                    "day": 17,
+                    "hour": 8,
+                    "minute": 59,
+                    "second": 50,
+                    "microsecond": 374000
+                },
+                "EncryptionKeyArn": "arn:aws:kms:us-east-1:644160558196:key/5d97ffc0-5842-49ce-9daf-6d0a129bf6c8",
+                "CreatorRequestId": "Default",
+                "NumberOfRecoveryPoints": 1,
+                "Locked": false
+            },
+            {
+                "BackupVaultName": "aws/efs/automatic-backup-vault",
+                "BackupVaultArn": "arn:aws:backup:us-east-1:644160558196:backup-vault:aws/efs/automatic-backup-vault",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 11,
+                    "day": 2,
+                    "hour": 15,
+                    "minute": 21,
+                    "second": 7,
+                    "microsecond": 12000
+                },
+                "EncryptionKeyArn": "arn:aws:kms:us-east-1:644160558196:key/5d97ffc0-5842-49ce-9daf-6d0a129bf6c8",
+                "CreatorRequestId": "aws/efs/automatic-backup-644160558196-us-east-1",
+                "NumberOfRecoveryPoints": 70,
+                "Locked": false
+            },
+            {
+                "BackupVaultName": "c7n-test-backup-vault",
+                "BackupVaultArn": "arn:aws:backup:us-east-1:644160558196:backup-vault:c7n-test-backup-vault",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 9,
+                    "day": 5,
+                    "hour": 14,
+                    "minute": 0,
+                    "second": 21,
+                    "microsecond": 998000
+                },
+                "EncryptionKeyArn": "arn:aws:kms:us-east-1:644160558196:key/5d97ffc0-5842-49ce-9daf-6d0a129bf6c8",
+                "CreatorRequestId": "fa836dfa-2184-42ce-80c6-f54e123fae09",
+                "NumberOfRecoveryPoints": 0,
+                "Locked": false
+            },
+            {
+                "BackupVaultName": "myvault",
+                "BackupVaultArn": "arn:aws:backup:us-east-1:644160558196:backup-vault:myvault",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 3,
+                    "day": 2,
+                    "hour": 17,
+                    "minute": 10,
+                    "second": 51,
+                    "microsecond": 600000
+                },
+                "EncryptionKeyArn": "arn:aws:kms:us-east-1:644160558196:key/012af1cd-bef1-4ed5-b893-8b8d263ae6a4",
+                "CreatorRequestId": "dee5fec7-b6e7-4dcf-9d3c-e3915ae4286b",
+                "NumberOfRecoveryPoints": 0,
+                "Locked": false
+            },
+            {
+                "BackupVaultName": "test_backup_vault_policy_statement_filter",
+                "BackupVaultArn": "arn:aws:backup:us-east-1:644160558196:backup-vault:test_backup_vault_policy_statement_filter",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 5,
+                    "day": 20,
+                    "hour": 15,
+                    "minute": 45,
+                    "second": 1,
+                    "microsecond": 491000
+                },
+                "EncryptionKeyArn": "arn:aws:kms:us-east-1:644160558196:key/5d97ffc0-5842-49ce-9daf-6d0a129bf6c8",
+                "NumberOfRecoveryPoints": 0,
+                "Locked": false
+            }
+        ]
+    }
+}
