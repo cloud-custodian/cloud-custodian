@@ -1294,8 +1294,9 @@ class TargetGroupAttributeFilterBase:
         def _process_attributes(tg):
             if 'c7n:TargetGroupAttributes' not in tg:
                 tg['c7n:TargetGroupAttributes'] = {}
-                results = client.describe_target_group_attributes(
-                    TargetGroupArn=tg['TargetGroupArn'])
+                results = self.manager.retry(client.describe_target_group_attributes,
+                    TargetGroupArn=tg['TargetGroupArn'],
+                    ignore_err_codes=('TargetGroupNotFoundException',))
                 # flatten out the list of dicts and cast
                 for pair in results['Attributes']:
                     k = pair['Key']
