@@ -1,0 +1,49 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:logs:us-west-2:644160558196:log-group:expert-cougar-1",
+                "Tags": [
+                    {
+                        "Key": "Application",
+                        "Value": "greeter"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:logs:us-west-2:644160558196:log-group:expert-cougar-2",
+                "Tags": [
+                    {
+                        "Key": "Application",
+                        "Value": "login"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:logs:us-west-2:644160558196:log-group:expert-cougar-3",
+                "Tags": [
+                    {
+                        "Key": "Bap",
+                        "Value": "login"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:logs:us-west-2:644160558196:log-group:expert-cougar-4",
+                "Tags": [
+                    {
+                        "Key": "Bap",
+                        "Value": "greeter"
+                    },
+                    {
+                        "Key": "Application",
+                        "Value": "greep"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
