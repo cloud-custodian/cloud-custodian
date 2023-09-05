@@ -173,8 +173,7 @@ class TerraformSource(IACSourceMode):
 
         call_stack = extract_mod_stack(mod_resource['__tfmeta']['path'])
         ancestor = mod_map[call_stack[0]]
-        ancestor['__tfmeta'].setdefault('refs', []).append(
-            mod_resource['__tfmeta']['path'])
+        ancestor['__tfmeta'].setdefault('refs', []).append(mod_resource['__tfmeta']['path'])
         return ancestor
 
 
