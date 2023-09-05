@@ -587,11 +587,23 @@ class TaskSubnetFilter(net_filters.SubnetFilter):
 @Task.filter_registry.register('security-group')
 class TaskSGFilter(net_filters.SecurityGroupFilter):
 
+    ecs_group_cache = None
+
     RelatedIdsExpression = ""
     eni_expression = "attachments[].details[?name == 'networkInterfaceId'].value[]"
     sg_expression = "Groups[].GroupId[]"
 
     def get_related_ids(self, resources):
+        if self.ecs_group_cache:
+            group_ids = set()
+            cexp = jmespath_compile(self.eni_expression)
+            for r in resources:
+                ids = cexp.search(r)
+                for group_id in ids:
+                    group_ids.update(self.ecs_group_cache.get(group_id, ()))
+            return list(group_ids)
+
+        groups = dict()
         group_ids = set()
         eni_ids = set()
 
@@ -611,7 +623,9 @@ class TaskSGFilter(net_filters.SecurityGroupFilter):
                 for r in response["NetworkInterfaces"]:
                     ids = cexp.search(r)
                     if ids:
+                        groups[r["NetworkInterfaceId"]] = ids
                         group_ids.update(ids)
+                        self.ecs_group_cache = groups
 
         return list(group_ids)
 
