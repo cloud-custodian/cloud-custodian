@@ -179,7 +179,7 @@ class DeleteElastiCacheCluster(BaseAction):
 
     def fetch_global_ds_rpgs(self):
         rpgs = self.manager.get_resource_manager('elasticache-group').resources(augment=False)
-        global_rpgs = DeleteReplicationGroup(self.manager).get_global_datastore_association(rpgs)
+        global_rpgs = get_global_datastore_association(rpgs)
         return global_rpgs
 
 
@@ -494,6 +494,16 @@ class KmsFilter(KmsRelatedFilter):
     RelatedIdsExpression = 'KmsKeyId'
 
 
+def get_global_datastore_association(resources):
+    global_ds_rpgs = set()
+    for r in resources:
+        global_ds_association = jmespath_search(
+            'GlobalReplicationGroupInfo.GlobalReplicationGroupId', r)
+        if global_ds_association:
+            global_ds_rpgs.add(r['ReplicationGroupId'])
+    return global_ds_rpgs
+
+
 @ElastiCacheReplicationGroup.action_registry.register('delete')
 class DeleteReplicationGroup(BaseAction):
     """Action to delete a cache replication group
@@ -523,7 +533,7 @@ class DeleteReplicationGroup(BaseAction):
     def process(self, resources):
         resources = self.filter_resources(resources, 'Status', self.valid_origin_states)
         client = local_session(self.manager.session_factory).client('elasticache')
-        global_datastore_association_map = self.get_global_datastore_association(resources)
+        global_datastore_association_map = get_global_datastore_association(resources)
         for r in resources:
             if r['ReplicationGroupId'] in global_datastore_association_map:
                 self.log.info(
@@ -534,12 +544,3 @@ class DeleteReplicationGroup(BaseAction):
                 params.update({'FinalSnapshotIdentifier': r['ReplicationGroupId'] + '-snapshot'})
             self.manager.retry(client.delete_replication_group, **params, ignore_err_codes=(
                 'ReplicationGroupNotFoundFault',))
-
-    def get_global_datastore_association(self, resources):
-        global_ds_rpgs = set()
-        for r in resources:
-            global_ds_association = jmespath_search(
-                'GlobalReplicationGroupInfo.GlobalReplicationGroupId', r)
-            if global_ds_association:
-                global_ds_rpgs.add(r['ReplicationGroupId'])
-        return global_ds_rpgs
