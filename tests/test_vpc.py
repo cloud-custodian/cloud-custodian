@@ -3661,3 +3661,26 @@ class TrafficMirror(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["TrafficMirrorTargetId"], "tmt-02cc3955d41358894")
         self.assertEqual(resources[0]['Tags'], [{"Key": "Owner", "Value": "pratyush"}])
+
+
+@terraform("vpc_delete")
+def test_vpc_delete(test, vpc_delete):
+    factory = test.replay_flight_data("test_vpc_delete")
+    p = test.load_policy(
+        {
+            "name": "delete-vpc",
+            "resource": "vpc",
+            "filters": [{"tag:Name": "c7n-test"}],
+            "actions": [{"type": "delete-empty"}],
+        },
+        session_factory=factory,
+    )
+    resources = p.run()
+    test.assertEqual(len(resources), 1)
+    client = factory(region="us-east-1").client("ec2")
+    vpcs = client.describe_vpcs(
+        Filters=[{"Name": "resource-id", "Values": [resources[0]["VpcId"]]}]
+    )[
+        "Vpcs"
+    ]
+    test.assertFalse(vpcs)
