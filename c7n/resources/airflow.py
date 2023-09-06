@@ -175,6 +175,7 @@ class DeleteApacheAirflowEnvironment(Action):
     valid_origin_states = ('AVAILABLE', 'CREATE_FAILED', 'DELETE_FAILED',)
 
     def process(self, resources):
+        resources = self.filter_resources(resources, 'Status', self.valid_origin_states)
         client = local_session(self.manager.session_factory).client('mwaa')
         for r in resources:
           self.manager.retry(
