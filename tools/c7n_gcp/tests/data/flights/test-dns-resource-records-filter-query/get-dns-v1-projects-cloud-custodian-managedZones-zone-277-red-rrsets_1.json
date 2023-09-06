@@ -1,0 +1,56 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Mon, 30 May 2022 11:50:22 GMT",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000,h3-Q050=\":443\"; ma=2592000,h3-Q046=\":443\"; ma=2592000,h3-Q043=\":443\"; ma=2592000,quic=\":443\"; ma=2592000; v=\"46,43\"",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "922",
+    "-content-encoding": "gzip",
+    "content-location": "https://dns.googleapis.com/dns/v1/projects/cloud-custodian/managedZones/zone-277-red/rrsets?alt=json"
+  },
+  "body": {
+    "rrsets": [
+      {
+        "name": "dns-5a1e63c1.com.",
+        "type": "NS",
+        "ttl": 21600,
+        "rrdatas": [
+          "ns-cloud-c1.googledomains.com.",
+          "ns-cloud-c2.googledomains.com.",
+          "ns-cloud-c3.googledomains.com.",
+          "ns-cloud-c4.googledomains.com."
+        ],
+        "signatureRrdatas": [],
+        "kind": "dns#resourceRecordSet"
+      },
+      {
+        "name": "dns-5a1e63c1.com.",
+        "type": "SOA",
+        "ttl": 21600,
+        "rrdatas": [
+          "ns-cloud-c1.googledomains.com. cloud-dns-hostmaster.google.com. 1 21600 3600 259200 300"
+        ],
+        "signatureRrdatas": [],
+        "kind": "dns#resourceRecordSet"
+      },
+      {
+        "name": "frontend.dns-5a1e63c1.com.",
+        "type": "TXT",
+        "ttl": 300,
+        "rrdatas": [
+          "\"Hello world!\""
+        ],
+        "signatureRrdatas": [],
+        "kind": "dns#resourceRecordSet"
+      }
+    ],
+    "kind": "dns#resourceRecordSetsListResponse"
+  }
+}
