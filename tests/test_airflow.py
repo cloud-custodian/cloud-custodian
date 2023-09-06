@@ -137,7 +137,7 @@ class TestApacheAirflow(BaseTest):
                         "type": "value",
                         "key": "Name",
                         "op": "eq",
-                        "value": "TimmyTest-MwaaEnvironment",
+                        "value": "TimmyTestStack-MwaaEnvironment",
                     }
                 ],
                 "actions": [

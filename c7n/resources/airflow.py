@@ -141,8 +141,10 @@ class UpdateApacheAirflowEnvironment(Action):
         access_mode={'type': 'string', 'enum': ['PRIVATE_ONLY', 'PUBLIC_ONLY']},
         required=['access_mode']
     )
+    valid_origin_states = ('AVAILABLE', 'UPDATE_FAILED')
 
     def process(self, resources):
+        resources = self.filter_resources(resources, 'Status', self.valid_origin_states)
         client = local_session(self.manager.session_factory).client('mwaa')
         access_mode = self.data.get('access_mode')
         for r in resources:
@@ -170,6 +172,7 @@ class DeleteApacheAirflowEnvironment(Action):
     permissions = ('airflow:DeleteEnvironment',)
 
     schema = type_schema('delete-environment')
+    valid_origin_states = ('AVAILABLE', 'CREATE_FAILED', 'DELETE_FAILED',)
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('mwaa')
