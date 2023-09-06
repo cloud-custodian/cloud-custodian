@@ -206,9 +206,10 @@ class FlowLogv2Filter(ListItemFilter):
     flow_log_map = None
 
     def get_deprecations(self):
+        filter_name = self.data["type"]
         return [
-            DeprecatedField(f"{k} is deprecated", "use list-item style attrs and set operators")
-            for k in self.legacy_schema
+            DeprecatedField(f"{filter_name}.{k}", "use list-item style attrs and set operators")
+            for k in set(self.legacy_schema).intersection(self.data)
         ]
 
     def validate(self):
@@ -2824,9 +2825,10 @@ class SetFlowLogs(BaseAction):
     }
 
     def get_deprecations(self):
+        filter_name = self.data["type"]
         return [
-            DeprecatedField(f"{k} is deprecated", f"set {k} under attrs: block")
-            for k in self.legacy_schema
+            DeprecatedField(f"{filter_name}.{k}", f"set {k} under attrs: block")
+            for k in set(self.legacy_schema).intersection(self.data)
         ]
 
     def validate(self):
