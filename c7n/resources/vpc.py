@@ -2438,7 +2438,7 @@ class AddressRelease(BaseAction):
                         r['AllocationId'])
                 if e.response['Error']['Code'] == 'InvalidAddress.Locked':
                     self.log.warning(
-                        "EIP %d cannot be released because it is locked to your account. Please contact AWS Support to unlock it.",
+                        "EIP %d cannot be released because it is locked to your account.",
                         r['AllocationId'])
                 if e.response['Error']['Code'] != 'InvalidAllocationID.NotFound':
                     raise
