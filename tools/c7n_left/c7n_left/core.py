@@ -60,6 +60,10 @@ class PolicyMetadata:
         return " ".join(self.categories)
 
     @property
+    def url(self):
+        return self.policy.data.get("metadata", {}).get("url")
+
+    @property
     def categories(self):
         categories = self.policy.data.get("metadata", {}).get("category", [])
         if isinstance(categories, str):

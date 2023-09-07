@@ -390,23 +390,11 @@ class GitlabSAST(Output):
         self.results.extend(results)
 
     def on_execution_started(self, *args):
-        self.start_time = datetime.utcnow()
-
-    def get_scanner(self):
-        info = self.get_analyzer()
-        info["url"] = "https://cloudcustodian.io"
-        return info
-
-    def get_analyzer(self):
-        return {
-            "id": "c7n-left",
-            "name": "c7n-left",
-            "version": pkg_version("c7n-left"),
-            "vendor": "Cloud Custodian",
-        }
+        self.start_time = datetime.utcnow().replace(microsecond=0)
 
     def on_execution_ended(self):
         formatted_results = [self.format_result(r) for r in self.results]
+
         self.config.output_file.write(
             json.dumps(
                 {
@@ -416,7 +404,7 @@ class GitlabSAST(Output):
                         "type": "sast",
                         "status": "success",
                         "start_time": self.start_time.isoformat(),
-                        "end_time": datetime.utcnow().isoformat(),
+                        "end_time": datetime.utcnow().replace(microsecond=0).isoformat(),
                         "analyzer": self.get_analyzer(),
                         "scanner": self.get_scanner(),
                     },
@@ -434,7 +422,7 @@ class GitlabSAST(Output):
             id=str(uuid.uuid4()),
             name=md.name,
             description=md.description,
-            severity=md.severity,
+            severity=md.severity.title(),
             identifiers=[
                 filter_empty(dict(name=md.name, type="sinistral", value=md.name, url=md.url))
             ],
@@ -444,3 +432,16 @@ class GitlabSAST(Output):
                 "end": info["file_line_end"],
             },
         )
+
+    def get_scanner(self):
+        info = self.get_analyzer()
+        info["url"] = "https://cloudcustodian.io"
+        return info
+
+    def get_analyzer(self):
+        return {
+            "id": "c7n-left",
+            "name": "c7n-left",
+            "version": pkg_version("c7n-left"),
+            "vendor": {"name": "Cloud Custodian"},
+        }
