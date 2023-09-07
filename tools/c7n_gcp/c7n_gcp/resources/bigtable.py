@@ -5,9 +5,8 @@ from c7n_gcp.provider import resources
 from c7n_gcp.query import (
     QueryResourceManager, TypeInfo, ChildResourceManager, ChildTypeInfo
 )
-from c7n.utils import local_session, type_schema
-from c7n.filters import Filter
-import datetime
+from c7n.utils import local_session
+from c7n_gcp.filters.timerange import TimeRangeFilter
 
 
 @resources.register('bigtable-instance')
@@ -88,7 +87,7 @@ class BigTableInstanceClusterBackup(ChildResourceManager):
 
 
 @BigTableInstanceClusterBackup.filter_registry.register('time-range')
-class TimeRange(Filter):
+class TimeRange(TimeRangeFilter):
     """Filters bigtable instance clusters backups based on a time range
 
     .. code-block:: yaml
@@ -102,39 +101,9 @@ class TimeRange(Filter):
               - type: time-range
                 value: 29
     """
-    schema = type_schema('time-range',
-                         value={'$ref': '#/definitions/filters_common/value'})
+    create_time_field_name = 'startTime'
+    expire_time_field_name = 'expireTime'
     permissions = ('bigtable.backups.list',)
-
-    datetime1_pattern = "%Y-%m-%dT%H:%M:%S.%fZ"
-    datetime2_pattern = "%Y-%m-%dT%H:%M:%S"
-
-    def process(self, resources, event=None):
-        filtered_resources = []
-        value = self.data.get('value')
-        field1 = 'startTime'
-        field2 = 'expireTime'
-        for resource in resources:
-            start_time_pattern = self.datetime1_pattern
-            expired_time_pattern = self.datetime1_pattern
-            expired_time = resource[field2]
-            start_time = resource[field1]
-            if '.' not in expired_time and 'Z' in expired_time:
-                expired_time_pattern = self.datetime2_pattern
-                expired_time = expired_time[:-1]
-            if '.' not in start_time and 'Z' in start_time:
-                start_time_pattern = self.datetime2_pattern
-                start_time = start_time[:-1]
-
-            filtered_expired_time = datetime.datetime.strptime(
-                expired_time, expired_time_pattern)
-            filtered_start_time = datetime.datetime.strptime(
-                start_time, start_time_pattern)
-            result_time = filtered_expired_time - filtered_start_time
-            if int(result_time.days) < value:
-                filtered_resources.append(resource)
-
-        return filtered_resources
 
 
 @resources.register('bigtable-instance-table')

@@ -6,8 +6,7 @@ import re
 from c7n.actions import BaseAction, ModifyVpcSecurityGroupsAction
 from c7n.deprecated import DeprecatedField
 from c7n.exceptions import PolicyValidationError, ClientError
-from c7n.filters import (
-    DefaultVpcBase, Filter, ValueFilter, MetricsFilter, ListItemFilter)
+from c7n.filters import Filter, ValueFilter, MetricsFilter, ListItemFilter
 import c7n.filters.vpc as net_filters
 from c7n.filters.iamaccess import CrossAccountAccessFilter
 from c7n.filters.related import RelatedResourceFilter, RelatedResourceByIdFilter
@@ -83,6 +82,39 @@ class ModifyVpc(BaseAction):
             for r in resources:
                 params['VpcId'] = r['VpcId']
                 client.modify_vpc_attribute(**params)
+
+
+@Vpc.action_registry.register('delete-empty')
+class DeleteVpc(BaseAction):
+    """Delete an empty VPC
+
+    For example, if you want to delete an empty VPC
+
+    :example:
+
+      .. code-block:: yaml
+
+        - name: aws-ec2-vpc-delete
+          resource: vpc
+          actions:
+            - type: delete-empty
+
+    """
+    schema = type_schema('delete-empty',)
+    permissions = ('ec2:DeleteVpc',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('ec2')
+
+        for vpc in resources:
+            self.manager.retry(
+                client.delete_vpc,
+                VpcId=vpc['VpcId'],
+                ignore_err_codes=(
+                    'NoSuchEntityException',
+                    'DeleteConflictException',
+                ),
+            )
 
 
 class DescribeFlow(query.DescribeSource):
@@ -207,9 +239,10 @@ class FlowLogv2Filter(ListItemFilter):
     flow_log_map = None
 
     def get_deprecations(self):
+        filter_name = self.data["type"]
         return [
-            DeprecatedField(f"{k} is deprecated", "use list-item style attrs and set operators")
-            for k in self.legacy_schema
+            DeprecatedField(f"{filter_name}.{k}", "use list-item style attrs and set operators")
+            for k in set(self.legacy_schema).intersection(self.data)
         ]
 
     def validate(self):
@@ -1193,7 +1226,7 @@ class Stale(Filter):
 
 
 @SecurityGroup.filter_registry.register('default-vpc')
-class SGDefaultVpc(DefaultVpcBase):
+class SGDefaultVpc(net_filters.DefaultVpcBase):
     """Filter that returns any security group that exists within the default vpc
 
     :example:
@@ -2825,9 +2858,10 @@ class SetFlowLogs(BaseAction):
     }
 
     def get_deprecations(self):
+        filter_name = self.data["type"]
         return [
-            DeprecatedField(f"{k} is deprecated", f"set {k} under attrs: block")
-            for k in self.legacy_schema
+            DeprecatedField(f"{filter_name}.{k}", f"set {k} under attrs: block")
+            for k in set(self.legacy_schema).intersection(self.data)
         ]
 
     def validate(self):

@@ -60,7 +60,9 @@ class URIResolver:
         client = self.session_factory().client('s3', region_name=region)
         result = client.get_object(**params)
         body = result['Body'].read()
-        if isinstance(body, str):
+        if params['Key'].lower().endswith(('.gz', '.zip', '.gzip')):
+            return zlib.decompress(body, ZIP_OR_GZIP_HEADER_DETECT).decode('utf-8')
+        elif isinstance(body, str):
             return body
         else:
             return body.decode('utf-8')
