@@ -1,5 +1,7 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+import logging
+import sys
 
 import pytest
 
@@ -16,8 +18,11 @@ class TestInstance(OciBaseTest):
     def _fetch_instance_validation_data(self, resource_manager, instance_id):
         return self.fetch_validation_data(resource_manager, "get_instance", instance_id)
 
+    @pytest.mark.skipif(sys.platform == "win32", reason="This test does not run on Windows")
     @terraform("compute", scope="class")
-    def test_add_defined_tag_to_instance(self, test, compute, with_or_without_compartment):
+    def test_add_defined_tag_to_instance(
+        self, test, compute, with_or_without_compartment, tmp_path
+    ):
         """
         test adding defined_tags tag on compute instance
         """
@@ -33,11 +38,15 @@ class TestInstance(OciBaseTest):
                 "actions": [{"type": "update", "defined_tags": self.get_defined_tag("add_tag")}],
             },
             session_factory=session_factory,
+            cache="memory",
         )
         policy.run()
         resource = self._fetch_instance_validation_data(policy.resource_manager, ocid)
-        test.assertEqual(resource["id"], ocid)
-        test.assertEqual(self.get_defined_tag_value(resource["defined_tags"]), "true")
+        assert resource["id"] == ocid
+        assert self.get_defined_tag_value(resource["defined_tags"]) == "true"
+        output = test.capture_logging(name=policy.resource_manager.log.name, level=logging.DEBUG)
+        policy.run()
+        assert 'Using cached oci.instance' in output.getvalue()
 
     @terraform("compute", scope="class")
     def test_update_defined_tag_of_instance(self, test, compute):
