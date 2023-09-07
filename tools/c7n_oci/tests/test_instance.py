@@ -46,7 +46,9 @@ class TestInstance(OciBaseTest):
         test.assertEqual(self.get_defined_tag_value(resource["defined_tags"]), "true")
         output = test.capture_logging(name=policy.resource_manager.log.name, level=logging.DEBUG)
         policy.run()
-        test.assertEqual(True, 'Using cached c7n_oci.query' in output.getvalue())
+        test.assertEqual(
+            True, 'Using cached c7n_oci.resources.compute.Instance' in output.getvalue()
+        )
 
     @terraform("compute", scope="class")
     def test_update_defined_tag_of_instance(self, test, compute):
