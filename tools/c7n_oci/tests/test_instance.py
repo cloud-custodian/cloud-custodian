@@ -44,7 +44,7 @@ class TestInstance(OciBaseTest):
         resource = self._fetch_instance_validation_data(policy.resource_manager, ocid)
         test.assertEqual(resource["id"], ocid)
         test.assertEqual(self.get_defined_tag_value(resource["defined_tags"]), "true")
-        output = self.capture_logging(name=policy.resource_manager.log.name, level=logging.DEBUG)
+        output = test.capture_logging(name=policy.resource_manager.log.name, level=logging.DEBUG)
         policy.run()
         test.assertEqual(True, 'Using cached c7n_oci.query' in output.getvalue())
 
