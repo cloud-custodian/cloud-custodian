@@ -43,11 +43,10 @@ class TestInstance(OciBaseTest):
         policy.run()
         resource = self._fetch_instance_validation_data(policy.resource_manager, ocid)
         assert resource["id"] == ocid
-        assert self.get_defined_tag_value(resource["defined_tags"]) ==  "true"
+        assert self.get_defined_tag_value(resource["defined_tags"]) == "true"
         output = test.capture_logging(name=policy.resource_manager.log.name, level=logging.DEBUG)
         policy.run()
         assert 'Using cached oci.instance' in output.getvalue()
-
 
     @terraform("compute", scope="class")
     def test_update_defined_tag_of_instance(self, test, compute):

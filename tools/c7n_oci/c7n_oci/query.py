@@ -58,7 +58,7 @@ class DescribeSource:
             cached_resources = self.manager._cache.get(cache_key)
             if cached_resources:
                 self.manager.log.debug(
-                    "Using cached oci.%s: %d", 
+                    "Using cached oci.%s: %d",
                     self.manager.type,
                     len(cached_resources),
                 )
