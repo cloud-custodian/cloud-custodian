@@ -13,6 +13,6 @@ resource "google_kms_key_ring" "c7n" {
 }
 
 resource "google_kms_crypto_key" "c7n" {
-  name            = "keyname-${random_pet.server.id}-c7n"
-  key_ring        = data.google_kms_key_ring.c7n.id != null ? data.google_kms_key_ring.c7n.id : google_kms_key_ring.c7n[0].id
+  name     = "keyname-${random_pet.server.id}-c7n"
+  key_ring = data.google_kms_key_ring.c7n.id != null ? data.google_kms_key_ring.c7n.id : google_kms_key_ring.c7n[0].id
 }

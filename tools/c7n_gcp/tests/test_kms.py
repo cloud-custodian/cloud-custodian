@@ -311,8 +311,13 @@ def test_kms_keyring_filter(test, kms_location):
     policy = test.load_policy({
         'name': 'kms-location',
         'resource': 'gcp.kms-location',
-        'filters': [{'name': f'projects/{kms_location["google_kms_key_ring.c7n.project"]}/locations/{kms_location["google_kms_key_ring.c7n.location"]}'},
-            {'not': [{'type': 'kms-keyring','exist': True}]}]
+        'filters': [{
+            'name':
+                f'projects/{kms_location["google_kms_key_ring.c7n.project"]}/locations/us-central1'},
+            {
+            'not': [{
+                    'type': 'kms-keyring',
+                    'exist': True}]}]
     }, session_factory=session_factory)
 
     resources = policy.run()
@@ -321,8 +326,13 @@ def test_kms_keyring_filter(test, kms_location):
     policy = test.load_policy({
         'name': 'kms-location',
         'resource': 'gcp.kms-location',
-        'filters': [{'name': f'projects/{kms_location["google_kms_key_ring.c7n.project"]}/locations/us-west1'},
-            {'not': [{'type': 'kms-keyring','exist': True}]}]
+        'filters': [{
+            'name':
+                f'projects/{kms_location["google_kms_key_ring.c7n.project"]}/locations/us-west1'},
+            {
+            'not': [{
+                    'type': 'kms-keyring',
+                    'exist': True}]}]
     }, session_factory=session_factory)
 
     resources = policy.run()
