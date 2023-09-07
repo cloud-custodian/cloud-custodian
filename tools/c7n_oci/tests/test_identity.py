@@ -1,7 +1,6 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-id: Apache-2.0
 
-import unittest
 import os
 
 import pytest

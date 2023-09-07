@@ -60,7 +60,8 @@ class DescribeSource:
                 self.manager.log.debug(
                     "Using cached %s: %d"
                     % (
-                        "%s.%s" % (self.manager.__class__.__module__, self.manager.__class__.__name__),
+                        "%s.%s"
+                        % (self.manager.__class__.__module__, self.manager.__class__.__name__),
                         len(cached_resources),
                     )
                 )
