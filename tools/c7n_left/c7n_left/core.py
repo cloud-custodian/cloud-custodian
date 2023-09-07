@@ -74,7 +74,7 @@ class PolicyMetadata:
 
     @property
     def severity(self):
-        value = self.policy.data.get("metadata", {}).get("severity", "")
+        value = self.policy.data.get("metadata", {}).get("severity", "unknown")
         if isinstance(value, str):
             return value.lower()
         return ""
