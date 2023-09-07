@@ -41,7 +41,7 @@ class DescribeSource:
     def get_resources(self, query):
         resources = None
         compartment_ids = self._get_list_of_compartment_ids()
-        log.info(
+        log.debug(
             f"List of compartment IDs fetched using the environment variable ${COMPARTMENT_IDS}:"
             f" {compartment_ids}"
         )
@@ -58,12 +58,9 @@ class DescribeSource:
             cached_resources = self.manager._cache.get(cache_key)
             if cached_resources:
                 self.manager.log.debug(
-                    "Using cached %s: %d"
-                    % (
-                        "%s.%s"
-                        % (self.manager.__class__.__module__, self.manager.__class__.__name__),
-                        len(cached_resources),
-                    )
+                    "Using cached oci.%s: %d", 
+                    self.manager.type,
+                    len(cached_resources),
                 )
                 resources.extend(cached_resources)
             else:
@@ -136,11 +133,9 @@ class DescribeSearch(DescribeSource):
         cached_resources = self.manager._cache.get(cache_key)
         if cached_resources:
             self.manager.log.debug(
-                "Using cached %s: %d"
-                % (
-                    "%s.%s" % (self.__class__.__module__, self.__class__.__name__),
-                    len(cached_resources),
-                )
+                "Using cached oci.%s: %d",
+                self.manager.type,
+                len(cached_resources),
             )
             resources.extend(cached_resources)
         else:
