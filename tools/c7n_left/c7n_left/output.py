@@ -8,6 +8,7 @@ from pathlib import Path
 from importlib.metadata import version as pkg_version
 import time
 import uuid
+import xml.etree.ElementTree as etree
 
 from rich.console import Console
 from rich.syntax import Syntax
@@ -375,6 +376,60 @@ class Json(Output):
         formatted = result.as_dict()
         formatted["code_block"] = line_pairs
         return formatted
+
+
+@report_outputs.register("junit")
+class JunitReport(Output):
+    suite_name = 'c7n-left'
+
+    def __init__(self, ctx, config):
+        super().__init__(ctx, config)
+        self.results = []
+        self.start_time = None
+
+    def on_results(self, results):
+        self.results.extend(results)
+
+    def on_execution_started(self, policies, graph):
+        self.start_time = datetime.utcnow()
+        self.policies = {p.name: p for p in sorted(map(PolicyMetadata, policies), key=severity_key)}
+
+    def on_execution_ended(self):
+        builder = etree.TreeBuilder()
+        builder.start("testsuites", {})
+        builder.start(
+            "testsuite",
+            {
+                "name": self.suite_name,
+                "tests": str(len(self.policies)),
+                "time": "%0.2f" % (datetime.utcnow() - self.start_time).total_seconds(),
+                "failures": str(len(self.results)),
+            },
+        )
+        [self.format_result(r, builder) for r in self.results]
+        doc = builder.close()
+        self.config.output_file.write(etree.tostring(doc).decode('utf8'))
+
+    def format_result(self, result, builder):
+        md = self.policies[result.policy.name]
+        resource = result.resource
+        file_path = resource.src_dir / resource.filename
+        builder.start(
+            "testcase",
+            {
+                "name": md.title,
+                "classname": "%s.%s" % (str(file_path), resource.id),
+                "file": str(file_path),
+            },
+        )
+        text_data = []
+        lines = resource.get_source_lines()
+        line_idx = resource.line_start
+        for l in lines:
+            text_data.append("%d | %s" % (line_idx, l))
+            line_idx += 1
+        builder.data("\n".join(text_data))
+        builder.end("testcase")
 
 
 @report_outputs.register("gitlab_sast")
