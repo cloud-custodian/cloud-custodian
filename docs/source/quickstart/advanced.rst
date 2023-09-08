@@ -146,32 +146,31 @@ of the policy would evaluate these again, but will also include the
 triggering ``event``.  These events can be evaluated using a ``type:
 event`` condition.  This is useful for cases where you have a more complex
 condition than can be handled by an event ``pattern`` expression, but you
-want to short-circuit the execution before it queries the resources..
+want to short-circuit the execution before it queries the resources.
 
 For instance, the below example will only deploy the policy to the
-``us-west-2`` and ``us-east-2`` regions.  For those regions where it is
-deployed, the policy will stop execution before querying any resources if
-the event looks like it was created by a service or automation identity
-matching a complex regular expression.
+``us-west-2`` and ``us-east-2`` regions.  The policy will stop execution
+before querying any resources if the event looks like it was created by a
+service or automation identity matching a complex regular expression.
 
 .. code-block:: yaml
 
   policies:
-    - name: auto-tag-creator-ec2
+    - name: ec2-auto-tag-creator
       description: Auto-tag Creator on EC2 if not set.
       resource: aws.ec2
       mode:
         type: cloudtrail
         events: RunInstances
       conditions:
-        - type: value          # evaluated at deployment and execution
+        - type: value           ─▶ evaluated at deployment and execution
           key: region
           op: in
           value:
             - us-east-2
             - us-west-2
         - not:
-          - type: event        # evaluated at execution only
+          - type: event         ─▶ evaluated at execution only
             key: "detail.userIdentity.arn"
             op: regex-case
             value: '.*(CloudCustodian|Jenkins|AWS.*ServiceRole|LambdaFunction|\/sfr-|\/i-|\d{8,}$)'
