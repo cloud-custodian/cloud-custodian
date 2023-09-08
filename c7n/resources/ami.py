@@ -295,6 +295,51 @@ class RemoveLaunchPermissions(BaseAction):
             LaunchPermission={'Remove': remove},
             OperationType='remove')
 
+@AMI.action_registry.register('cancel-launch-permission')
+class CancelLaunchPermissions(BaseAction):
+    """Action to cancel this account's access to another another account's shared AMI
+
+    If another AWS account shares an image with your account, and you
+    no longer want to allow its use in your account, this action will
+    remove the permission for your account to laucnh from the image.
+
+    As this is not reversible without accessing the AMI source account, it defaults
+    to running in dryrun mode. Set dryrun to false to enforce.
+
+    Note this does not apply to AMIs shared by Organization or OU.
+    https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/cancel-sharing-an-AMI.html
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: ami-cancel-share-to-me-old
+                resource: ami
+                query:
+                  - ExecutableUsers: [self]
+                  - Owners: []
+                filters:
+                  - type: image-age
+                    days: 90
+                actions:
+                  - type: cancel-launch-permission
+
+    """
+    schema = type_schema('cancel-launch-permission', dryrun={'type': 'boolean'})
+
+    permissions = ('ec2:CancelImageLaunchPermission',)
+
+    def process(self, images):
+        client = local_session(self.manager.session_factory).client('ec2')
+        for i in images:
+            self.process_image(client, i)
+
+    def process_image(self, client, image):
+        client.cancel_image_launch_permission(
+            ImageId=image['ImageId'],
+            DryRun=self.data.get('dryrun', True))
+
 
 @AMI.action_registry.register('set-permissions')
 class SetPermissions(BaseAction):

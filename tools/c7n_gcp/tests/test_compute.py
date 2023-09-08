@@ -7,6 +7,8 @@ import time
 from gcp_common import BaseTest, event_data
 from googleapiclient.errors import HttpError
 
+from pytest_terraform import terraform
+
 
 class InstanceTest(BaseTest):
 
@@ -193,6 +195,69 @@ class InstanceTest(BaseTest):
             session_factory=factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
+    def test_image_filter_iam_query(self):
+        project_id = 'cloud-custodian'
+        factory = self.replay_flight_data('image-filter-iam', project_id=project_id)
+        p = self.load_policy({
+            'name': 'image-filter-iam',
+            'resource': 'gcp.image',
+            'filters': [{
+                'type': 'iam-policy',
+                'doc': {'key': 'bindings[*].members[]',
+                        'op': 'intersect',
+                        'value': ['allUsers', 'allAuthenticatedUsers']}
+            }]
+        }, session_factory=factory)
+        resources = p.run()
+
+        self.assertEqual(1, len(resources))
+        self.assertEqual('image-1', resources[0]['name'])
+
+
+@terraform('gcp_instance')
+def test_instance_pause_resume(test, gcp_instance):
+    project_id = 'stacklet-kapilt'
+    factory = test.replay_flight_data('instance-pause-resume', project_id=project_id)
+    policy = test.load_policy({
+        'name': 'gcp-instance',
+        'resource': 'gcp.instance',
+        'filters': [{'name': gcp_instance['google_compute_instance.default.name']}],
+        'actions': ['suspend']
+    }, session_factory=factory)
+
+    resources = policy.run()
+    assert len(resources) == 1
+    assert resources[0]['status'] == 'RUNNING'
+
+    if test.recording:
+        time.sleep(60)
+
+    instance = policy.resource_manager.get_resource({
+        "project_id": gcp_instance["google_compute_instance.default.project"],
+        "resourceName": gcp_instance["google_compute_instance.default.id"],
+        "zone": gcp_instance["google_compute_instance.default.zone"],
+    })
+    assert instance['status'] == 'SUSPENDED'
+
+    policy = test.load_policy({
+        'name': 'gcp-instance',
+        'resource': 'gcp.instance',
+        'filters': [{'name': gcp_instance['google_compute_instance.default.name']}],
+        'actions': ['resume']
+    }, session_factory=factory)
+    resources = policy.run()
+    assert len(resources) == 1
+
+    if test.recording:
+        time.sleep(60)
+
+    instance = policy.resource_manager.get_resource({
+        "project_id": gcp_instance["google_compute_instance.default.project"],
+        "resourceName": gcp_instance["google_compute_instance.default.id"],
+        "zone": gcp_instance["google_compute_instance.default.zone"],
+    })
+    assert instance['status'] == 'RUNNING'
 
 
 def test_instance_refresh(test):
@@ -641,3 +706,23 @@ class ProjectTest(BaseTest):
 
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['name'], 'gcp-lab-custodian')
+
+
+class TestInstanceGroupManager(BaseTest):
+
+    def test_query(self):
+        project_id = 'cloud-custodian'
+        factory = self.replay_flight_data(
+            'test_instance_group_manager_query', project_id=project_id)
+        p = self.load_policy(
+            {'name': 'gcp-instance-group-manager',
+             'resource': 'gcp.instance-group-manager'},
+            session_factory=factory)
+
+        resources = p.run()
+
+        self.assertEqual(1, len(resources))
+        self.assertEqual('instance-group-2', resources[0]['name'])
+
+
+

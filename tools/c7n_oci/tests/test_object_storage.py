@@ -1,7 +1,6 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
-import inspect
 
 import oci
 from pytest_terraform import terraform
@@ -26,9 +25,7 @@ class TestObjectStorage(OciBaseTest):
         test adding defined_tags tag on compute instance
         """
         namespace_name, bucket_name = self._get_bucket_details(object_storage)
-        session_factory = test.oci_session_factory(
-            self.__class__.__name__, inspect.currentframe().f_code.co_name
-        )
+        session_factory = test.oci_session_factory()
         policy = test.load_policy(
             {
                 "name": "add-defined-tag-to-bucket",
@@ -39,16 +36,35 @@ class TestObjectStorage(OciBaseTest):
                 "filters": [
                     {"type": "value", "key": "name", "value": bucket_name},
                 ],
-                "actions": [
-                    {
-                        "type": "update-bucket",
-                        "params": {
-                            "update_bucket_details": {
-                                "defined_tags": self.get_defined_tag("add_tag")
-                            }
-                        },
-                    }
+                "actions": [{"type": "update", "defined_tags": self.get_defined_tag("add_tag")}],
+            },
+            session_factory=session_factory,
+        )
+        policy.run()
+        resource = self._fetch_bucket_validation_data(
+            policy.resource_manager, namespace_name, bucket_name
+        )
+        test.assertEqual(resource["name"], bucket_name)
+        test.assertEqual(self.get_defined_tag_value(resource["defined_tags"]), "true")
+
+    @terraform("object_storage", scope="class")
+    def test_update_bucket(self, test, object_storage, with_or_without_compartment):
+        """
+        test adding defined_tags tag on compute instance
+        """
+        namespace_name, bucket_name = self._get_bucket_details(object_storage)
+        session_factory = test.oci_session_factory()
+        policy = test.load_policy(
+            {
+                "name": "add-defined-tag-to-bucket",
+                "resource": "oci.bucket",
+                "query": [
+                    {"namespace_name": namespace_name},
                 ],
+                "filters": [
+                    {"type": "value", "key": "name", "value": bucket_name},
+                ],
+                "actions": [{"type": "update", "defined_tags": self.get_defined_tag("add_tag")}],
             },
             session_factory=session_factory,
         )
@@ -65,9 +81,7 @@ class TestObjectStorage(OciBaseTest):
         test update defined_tags tag on bucket
         """
         namespace_name, bucket_name = self._get_bucket_details(object_storage)
-        session_factory = test.oci_session_factory(
-            self.__class__.__name__, inspect.currentframe().f_code.co_name
-        )
+        session_factory = test.oci_session_factory()
         policy = test.load_policy(
             {
                 "name": "update-defined-tag-to-bucket",
@@ -80,12 +94,8 @@ class TestObjectStorage(OciBaseTest):
                 ],
                 "actions": [
                     {
-                        "type": "update-bucket",
-                        "params": {
-                            "update_bucket_details": {
-                                "defined_tags": self.get_defined_tag("update_tag")
-                            }
-                        },
+                        "type": "update",
+                        "defined_tags": self.get_defined_tag("update_tag"),
                     }
                 ],
             },
@@ -104,9 +114,7 @@ class TestObjectStorage(OciBaseTest):
         test adding freeform tag to bucket
         """
         namespace_name, bucket_name = self._get_bucket_details(object_storage)
-        session_factory = test.oci_session_factory(
-            self.__class__.__name__, inspect.currentframe().f_code.co_name
-        )
+        session_factory = test.oci_session_factory()
         policy = test.load_policy(
             {
                 "name": "add-tag-to-bucket",
@@ -117,16 +125,7 @@ class TestObjectStorage(OciBaseTest):
                 "filters": [
                     {"type": "value", "key": "name", "value": bucket_name},
                 ],
-                "actions": [
-                    {
-                        "type": "update-bucket",
-                        "params": {
-                            "update_bucket_details": {
-                                "freeform_tags": {"Environment": "Development"}
-                            }
-                        },
-                    }
-                ],
+                "actions": [{"type": "update", "freeform_tags": {"Environment": "Development"}}],
             },
             session_factory=session_factory,
         )
@@ -143,9 +142,7 @@ class TestObjectStorage(OciBaseTest):
         test update freeform tag of bucket
         """
         namespace_name, bucket_name = self._get_bucket_details(object_storage)
-        session_factory = test.oci_session_factory(
-            self.__class__.__name__, inspect.currentframe().f_code.co_name
-        )
+        session_factory = test.oci_session_factory()
         policy = test.load_policy(
             {
                 "name": "update-freeform-tag-of-bucket",
@@ -156,16 +153,7 @@ class TestObjectStorage(OciBaseTest):
                 "filters": [
                     {"type": "value", "key": "name", "value": bucket_name},
                 ],
-                "actions": [
-                    {
-                        "type": "update-bucket",
-                        "params": {
-                            "update_bucket_details": {
-                                "freeform_tags": {"Environment": "Production"}
-                            }
-                        },
-                    }
-                ],
+                "actions": [{"type": "update", "freeform_tags": {"Environment": "Production"}}],
             },
             session_factory=session_factory,
         )
@@ -182,9 +170,7 @@ class TestObjectStorage(OciBaseTest):
         test get freeform tagged compute instances
         """
         namespace_name, bucket_name = self._get_bucket_details(object_storage)
-        session_factory = test.oci_session_factory(
-            self.__class__.__name__, inspect.currentframe().f_code.co_name
-        )
+        session_factory = test.oci_session_factory()
         policy = test.load_policy(
             {
                 "name": "get-freeform-tagged-instance",
@@ -209,9 +195,7 @@ class TestObjectStorage(OciBaseTest):
         test get freeform tagged compute instances
         """
         namespace_name, bucket_name = self._get_bucket_details(object_storage)
-        session_factory = test.oci_session_factory(
-            self.__class__.__name__, inspect.currentframe().f_code.co_name
-        )
+        session_factory = test.oci_session_factory()
         policy = test.load_policy(
             {
                 "name": "tag-public-buckets",
@@ -227,14 +211,7 @@ class TestObjectStorage(OciBaseTest):
                         "op": "eq",
                     },
                 ],
-                "actions": [
-                    {
-                        "type": "update-bucket",
-                        "params": {
-                            "update_bucket_details": {"freeform_tags": {"public_access": "true"}}
-                        },
-                    }
-                ],
+                "actions": [{"type": "update", "freeform_tags": {"public_access": "true"}}],
             },
             session_factory=session_factory,
         )
@@ -251,9 +228,7 @@ class TestObjectStorage(OciBaseTest):
         test get freeform tagged compute instances
         """
         namespace_name, bucket_name = self._get_bucket_details(object_storage)
-        session_factory = test.oci_session_factory(
-            self.__class__.__name__, inspect.currentframe().f_code.co_name
-        )
+        session_factory = test.oci_session_factory()
         policy = test.load_policy(
             {
                 "name": "change-public-bucket-to-private",
@@ -264,14 +239,35 @@ class TestObjectStorage(OciBaseTest):
                 "filters": [
                     {"type": "value", "key": "name", "value": bucket_name},
                 ],
-                "actions": [
-                    {
-                        "type": "update-bucket",
-                        "params": {
-                            "update_bucket_details": {"public_access_type": "NoPublicAccess"}
-                        },
-                    }
+                "actions": [{"type": "update", "public_access_type": "NoPublicAccess"}],
+            },
+            session_factory=session_factory,
+        )
+        policy.run()
+        resource = self._fetch_bucket_validation_data(
+            policy.resource_manager, namespace_name, bucket_name
+        )
+        test.assertEqual(resource["name"], bucket_name)
+        test.assertEqual(resource["public_access_type"], "NoPublicAccess")
+
+    @terraform("object_storage", scope="class")
+    def test_update_public_bucket_to_private(self, test, object_storage):
+        """
+        test get freeform tagged compute instances
+        """
+        namespace_name, bucket_name = self._get_bucket_details(object_storage)
+        session_factory = test.oci_session_factory()
+        policy = test.load_policy(
+            {
+                "name": "change-public-bucket-to-private",
+                "resource": "oci.bucket",
+                "query": [
+                    {"namespace_name": namespace_name},
                 ],
+                "filters": [
+                    {"type": "value", "key": "name", "value": bucket_name},
+                ],
+                "actions": [{"type": "update", "public_access_type": "NoPublicAccess"}],
             },
             session_factory=session_factory,
         )
@@ -288,9 +284,7 @@ class TestObjectStorage(OciBaseTest):
         test remove freeform tag
         """
         namespace_name, bucket_name = self._get_bucket_details(object_storage)
-        session_factory = test.oci_session_factory(
-            self.__class__.__name__, inspect.currentframe().f_code.co_name
-        )
+        session_factory = test.oci_session_factory()
         policy = test.load_policy(
             {
                 "name": "bucket-remove-tag",
@@ -320,9 +314,7 @@ class TestObjectStorage(OciBaseTest):
         test remove defined tag
         """
         namespace_name, bucket_name = self._get_bucket_details(object_storage)
-        session_factory = test.oci_session_factory(
-            self.__class__.__name__, inspect.currentframe().f_code.co_name
-        )
+        session_factory = test.oci_session_factory()
         policy = test.load_policy(
             {
                 "name": "bucket-remove-tag",

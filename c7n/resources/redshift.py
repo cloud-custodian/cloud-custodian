@@ -9,7 +9,7 @@ from concurrent.futures import as_completed
 from c7n.actions import BaseAction, ModifyVpcSecurityGroupsAction
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import (
-    ValueFilter, DefaultVpcBase, AgeFilter, CrossAccountAccessFilter, Filter)
+    ValueFilter, AgeFilter, CrossAccountAccessFilter, Filter)
 import c7n.filters.vpc as net_filters
 from c7n.filters.kms import KmsRelatedFilter
 from c7n.filters.offhours import OffHour, OnHour
@@ -48,7 +48,7 @@ Redshift.filter_registry.register('consecutive-aws-backups', ConsecutiveAwsBacku
 
 
 @Redshift.filter_registry.register('default-vpc')
-class DefaultVpc(DefaultVpcBase):
+class DefaultVpc(net_filters.DefaultVpcBase):
     """ Matches if an redshift database is in the default vpc
 
     :example:

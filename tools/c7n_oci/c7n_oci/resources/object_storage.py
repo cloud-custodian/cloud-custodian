@@ -40,8 +40,7 @@ class Bucket(QueryResourceManager):
         enum_spec = ("list_buckets", "items[]", {"fields": ["tags"]})
         extra_params = {"compartment_id", "namespace_name"}
         resource_type = "OCI.ObjectStorage/Bucket"
-        id = "id"
-        name = "name"
+        id = name = "name"
         search_resource_type = "bucket"
 
     def _get_extra_params(self):
@@ -50,8 +49,8 @@ class Bucket(QueryResourceManager):
         return kw
 
 
-@Bucket.action_registry.register("update-bucket")
-class UpdateBucket(OCIBaseAction):
+@Bucket.action_registry.register("update")
+class UpdateBucketAction(OCIBaseAction):
     """
         Update bucket Action
 
@@ -73,31 +72,34 @@ class UpdateBucket(OCIBaseAction):
                 - name: perform-update-bucket-action
                   resource: oci.bucket
                   actions:
-                    - type: update-bucket
+                    - type: update
+                      defined_tags:
+                         Cloud_Custodian: True
+                      freeform_tags:
+                         Environment: development
+                      public_access_type: "NoPublicAccess"
+
 
     """  # noqa
 
-    schema = type_schema("update-bucket", params={"type": "object"}, rinherit=OCIBaseAction.schema)
+    schema = type_schema(
+        "update",
+        **{
+            "freeform_tags": {"type": "object"},
+            "defined_tags": {"type": "object"},
+            "public_access_type": {"type": "string"},
+        },
+    )
 
     def perform_action(self, resource):
         client = self.manager.get_client()
-        params_dict = {}
-        params_model = {}
-        params_dict["namespace_name"] = resource.get("namespace")
-        if self.data.get("params") and self.data.get("params").get("bucket_name"):
-            params_dict["bucket_name"] = self.data.get("params").get("bucket_name")
-        else:
-            params_dict["bucket_name"] = resource.get("name")
-        if self.data.get("params").get("update_bucket_details"):
-            update_bucket_details_user = self.data.get("params").get("update_bucket_details")
-            params_model = self.update_params(resource, update_bucket_details_user)
-            params_dict["update_bucket_details"] = oci.object_storage.models.UpdateBucketDetails(
-                **params_model
-            )
+        update_bucket_details_user = self.extract_params(self.data)
+        params_model = self.update_params(resource, update_bucket_details_user)
+        update_bucket_details = oci.object_storage.models.UpdateBucketDetails(**params_model)
         response = client.update_bucket(
-            namespace_name=params_dict["namespace_name"],
-            bucket_name=params_dict["bucket_name"],
-            update_bucket_details=params_dict["update_bucket_details"],
+            namespace_name=resource.get("namespace"),
+            bucket_name=resource.get("name"),
+            update_bucket_details=update_bucket_details,
         )
         log.info(f"Received status {response.status} for POST:update_bucket {response.request_id}")
         return response

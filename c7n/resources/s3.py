@@ -53,7 +53,8 @@ from c7n.actions import (
 from c7n.exceptions import PolicyValidationError, PolicyExecutionError
 from c7n.filters import (
     FilterRegistry, Filter, CrossAccountAccessFilter, MetricsFilter,
-    ValueFilter)
+    ValueFilter, ListItemFilter)
+from .aws import shape_validate
 import c7n.filters.policystatement as polstmt_filter
 from c7n.manager import resources
 from c7n.output import NullBlobOutput
@@ -63,6 +64,7 @@ from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction
 from c7n.utils import (
     chunks, local_session, set_annotation, type_schema, filter_empty,
     dumps, format_string_values, get_account_alias_from_sts)
+from c7n.resources.aws import inspect_bucket_region
 
 
 log = logging.getLogger('custodian.s3')
@@ -2762,6 +2764,237 @@ class SetInventory(BucketActionBase):
         return found
 
 
+@filters.register('intelligent-tiering')
+class IntelligentTiering(ListItemFilter):
+    """Filter for S3 buckets to look at intelligent tiering configurations
+
+    The schema to supply to the attrs follows the schema here:
+     https://botocore.amazonaws.com/v1/documentation/api/latest/reference/services/s3/client/list_bucket_intelligent_tiering_configurations.html
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: s3-intelligent-tiering-configuration
+                resource: s3
+                filters:
+                  - type: intelligent-tiering
+                    attrs:
+                      - Status: Enabled
+                      - Filter:
+                          And:
+                            Prefix: test
+                            Tags:
+                              - Key: Owner
+                                Value: c7n
+                      - Tierings:
+                          - Days: 100
+                          - AccessTier: ARCHIVE_ACCESS
+
+    """
+    schema = type_schema(
+        'intelligent-tiering',
+        attrs={'$ref': '#/definitions/filters_common/list_item_attrs'},
+        count={'type': 'number'},
+        count_op={'$ref': '#/definitions/filters_common/comparison_operators'}
+    )
+    permissions = ('s3:GetIntelligentTieringConfiguration',)
+    annotation_key = "c7n:IntelligentTiering"
+    annotate_items = True
+
+    def __init__(self, data, manager=None):
+        super().__init__(data, manager)
+        self.data['key'] = self.annotation_key
+
+    def process(self, buckets, event=None):
+        with self.executor_factory(max_workers=2) as w:
+            futures = {w.submit(self.get_item_values, b): b for b in buckets}
+            for future in as_completed(futures):
+                b = futures[future]
+                if future.exception():
+                    self.log.error("Message: %s Bucket: %s", future.exception(), b['Name'])
+                    continue
+        return super().process(buckets, event)
+
+    def get_item_values(self, b):
+        if self.annotation_key not in b:
+            client = bucket_client(local_session(self.manager.session_factory), b)
+            try:
+                int_tier_config = client.list_bucket_intelligent_tiering_configurations(
+                    Bucket=b['Name'])
+                b[self.annotation_key] = int_tier_config.get(
+                    'IntelligentTieringConfigurationList', [])
+            except ClientError as e:
+                if e.response['Error']['Code'] == 'AccessDenied':
+                    method = 'list_bucket_intelligent_tiering_configurations'
+                    log.warning(
+                        "Bucket:%s unable to invoke method:%s error:%s ",
+                          b['Name'], method, e.response['Error']['Message'])
+                    b.setdefault('c7n:DeniedMethods', []).append(method)
+        return b.get(self.annotation_key)
+
+
+@actions.register('set-intelligent-tiering')
+class ConfigureIntelligentTiering(BucketActionBase):
+    """Action applies an intelligent tiering configuration to a S3 bucket
+
+    The schema to supply to the configuration follows the schema here:
+     https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/s3/client/put_bucket_intelligent_tiering_configuration.html
+
+    To delete a configuration, supply Status=delete with the either the Id or Id: matched
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: s3-apply-intelligent-tiering-config
+                resource: aws.s3
+                filters:
+                  - not:
+                    - type: intelligent-tiering
+                      attrs:
+                        - Status: Enabled
+                        - Filter:
+                            And:
+                              Prefix: helloworld
+                              Tags:
+                                - Key: Hello
+                                  Value: World
+                        - Tierings:
+                          - Days: 123
+                            AccessTier: ARCHIVE_ACCESS
+                actions:
+                  - type: set-intelligent-tiering
+                    Id: c7n-default
+                    IntelligentTieringConfiguration:
+                      Id: c7n-default
+                      Status: Enabled
+                      Tierings:
+                        - Days: 149
+                          AccessTier: ARCHIVE_ACCESS
+
+              - name: s3-delete-intelligent-tiering-configuration
+                resource: aws.s3
+                filters:
+                  - type: intelligent-tiering
+                    attrs:
+                      - Status: Enabled
+                      - Id: test-config
+                actions:
+                  - type: set-intelligent-tiering
+                    Id: test-config
+                    State: delete
+
+              - name: s3-delete-intelligent-tiering-matched-configs
+                resource: aws.s3
+                filters:
+                  - type: intelligent-tiering
+                    attrs:
+                      - Status: Enabled
+                      - Id: test-config
+                actions:
+                  - type: set-intelligent-tiering
+                    Id: matched
+                    State: delete
+
+    """
+
+    annotation_key = 'c7n:ListItemMatches'
+    shape = 'PutBucketIntelligentTieringConfigurationRequest'
+    schema = {
+        'type': 'object',
+        'additionalProperties': False,
+        'oneOf': [
+            {'required': ['type', 'Id', 'IntelligentTieringConfiguration']},
+            {'required': ['type', 'Id', 'State']}],
+        'properties': {
+            'type': {'enum': ['set-intelligent-tiering']},
+            'Id': {'type': 'string'},
+            # delete intelligent tier configurations via state: delete
+            'State': {'type': 'string', 'enum': ['delete']},
+            'IntelligentTieringConfiguration': {'type': 'object'}
+        },
+    }
+
+    permissions = ('s3:PutIntelligentTieringConfiguration',)
+
+    def validate(self):
+        # You can have up to 1,000 S3 Intelligent-Tiering configurations per bucket.
+        # Hence, always use it with a filter
+        found = False
+        for f in self.manager.iter_filters():
+            if isinstance(f, IntelligentTiering):
+                found = True
+                break
+        if not found:
+            raise PolicyValidationError(
+                '`set-intelligent-tiering` may only be used in '
+                'conjunction with `intelligent-tiering` filter on %s' % (self.manager.data,))
+        cfg = dict(self.data)
+        if 'IntelligentTieringConfiguration' in cfg:
+            cfg['Bucket'] = 'bucket'
+            cfg.pop('type')
+            return shape_validate(
+                cfg, self.shape, self.manager.resource_type.service)
+
+    def process(self, buckets):
+        with self.executor_factory(max_workers=3) as w:
+            futures = {}
+
+            for b in buckets:
+                futures[w.submit(self.process_bucket, b)] = b
+
+            for future in as_completed(futures):
+                if future.exception():
+                    bucket = futures[future]
+                    self.log.error(
+                      'error modifying bucket intelligent tiering configuration: %s\n%s',
+                        bucket['Name'], future.exception())
+                    continue
+
+    def process_bucket(self, bucket):
+        s3 = bucket_client(local_session(self.manager.session_factory), bucket)
+
+        if 'list_bucket_intelligent_tiering_configurations' in bucket.get(
+            'c7n:DeniedMethods', []):
+            log.warning("Access Denied Bucket:%s while reading intelligent tiering configurations"
+                        % bucket['Name'])
+            return
+
+        if self.data.get('Id') and self.data.get('IntelligentTieringConfiguration'):
+            try:
+                s3.put_bucket_intelligent_tiering_configuration(
+                    Bucket=bucket['Name'], Id=self.data.get(
+                      'Id'), IntelligentTieringConfiguration=self.data.get(
+                        'IntelligentTieringConfiguration'))
+            except ClientError as e:
+                if e.response['Error']['Code'] == 'AccessDenied':
+                    log.warning(
+                        "Access Denied Bucket:%s while applying intelligent tiering configuration"
+                          % bucket['Name'])
+        if self.data.get('State'):
+            if self.data.get('Id') == 'matched':
+                for config in bucket.get(self.annotation_key):
+                    self.delete_intelligent_tiering_configurations(s3, config.get('Id'), bucket)
+            else:
+                self.delete_intelligent_tiering_configurations(s3, self.data.get('Id'), bucket)
+
+    def delete_intelligent_tiering_configurations(self, s3_client, id, bucket):
+        try:
+            s3_client.delete_bucket_intelligent_tiering_configuration(Bucket=bucket['Name'], Id=id)
+        except ClientError as e:
+            if e.response['Error']['Code'] == 'AccessDenied':
+                log.warning(
+                    "Access Denied Bucket:%s while deleting intelligent tiering configuration"
+                      % bucket['Name'])
+            elif e.response['Error']['Code'] == 'NoSuchConfiguration':
+                log.warning(
+                  "No such configuration found:%s while deleting intelligent tiering configuration"
+                    % bucket['Name'])
+
+
 @actions.register('delete')
 class DeleteBucket(ScanBucket):
     """Action deletes a S3 bucket
@@ -3169,14 +3402,27 @@ class BucketEncryption(KMSKeyResolverMixin, Filter):
                 filters:
                   - type: bucket-encryption
                     state: False
+              - name: s3-bucket-test-bucket-key-enabled
+                resource: s3
+                region: us-east-1
+                filters:
+                  - type: bucket-encryption
+                    bucket_key_enabled: True
     """
     schema = type_schema('bucket-encryption',
                          state={'type': 'boolean'},
                          crypto={'type': 'string', 'enum': ['AES256', 'aws:kms']},
-                         key={'type': 'string'})
+                         key={'type': 'string'},
+                         bucket_key_enabled={'type': 'boolean'})
 
     permissions = ('s3:GetEncryptionConfiguration', 'kms:DescribeKey', 'kms:ListAliases')
     annotation_key = 'c7n:bucket-encryption'
+
+    def validate(self):
+        if self.data.get('bucket_key_enabled') is not None and self.data.get('key') is not None:
+            raise PolicyValidationError(
+                f'key and bucket_key_enabled attributes cannot both be set: {self.data}'
+            )
 
     def process(self, buckets, event=None):
         self.resolve_keys(buckets)
@@ -3212,6 +3458,13 @@ class BucketEncryption(KMSKeyResolverMixin, Filter):
         rules = be.get('ServerSideEncryptionConfiguration', {}).get('Rules', [])
         # default `state` to True as previous impl assumed state == True
         # to preserve backwards compatibility
+        if self.data.get('bucket_key_enabled'):
+            for rule in rules:
+                return self.filter_bucket_key_enabled(rule)
+        elif self.data.get('bucket_key_enabled') is False:
+            for rule in rules:
+                return not self.filter_bucket_key_enabled(rule)
+
         if self.data.get('state', True):
             for sse in rules:
                 return self.filter_bucket(b, sse)
@@ -3256,6 +3509,11 @@ class BucketEncryption(KMSKeyResolverMixin, Filter):
             # implies the AWS-managed key.
             key_ids = {key.get('Arn'), key.get('KeyId'), *key['Aliases']}
             return rule.get('KMSMasterKeyID', 'alias/aws/s3') in key_ids
+
+    def filter_bucket_key_enabled(self, rule) -> bool:
+        if not rule:
+            return False
+        return rule.get('BucketKeyEnabled')
 
 
 @actions.register('set-bucket-encryption')
@@ -3475,3 +3733,66 @@ class BucketOwnershipControls(BucketFilterBase, ValueFilter):
                 raise
             controls = {}
         b[self.annotation_key] = controls.get('OwnershipControls')
+
+
+@filters.register('bucket-replication')
+class BucketReplication(ListItemFilter):
+    """Filter for S3 buckets to look at bucket replication configurations
+
+    The schema to supply to the attrs follows the schema here:
+     https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/s3/client/get_bucket_replication.html
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: s3-bucket-replication
+                resource: s3
+                filters:
+                  - type: bucket-replication
+                    attrs:
+                      - Status: Enabled
+                      - Filter:
+                          And:
+                            Prefix: test
+                            Tags:
+                              - Key: Owner
+                                Value: c7n
+                      - ExistingObjectReplication: Enabled
+
+    """
+    schema = type_schema(
+        'bucket-replication',
+        attrs={'$ref': '#/definitions/filters_common/list_item_attrs'},
+        count={'type': 'number'},
+        count_op={'$ref': '#/definitions/filters_common/comparison_operators'}
+    )
+
+    permissions = ("s3:GetReplicationConfiguration",)
+    annotation_key = 'Replication'
+    annotate_items = True
+
+    def __init__(self, data, manager=None):
+        super().__init__(data, manager)
+        self.data['key'] = self.annotation_key
+
+    def get_item_values(self, b):
+        client = bucket_client(local_session(self.manager.session_factory), b)
+        # replication configuration is called in S3_AUGMENT_TABLE:
+        bucket_replication = b[self.annotation_key]
+
+        rules = []
+        if bucket_replication is not None:
+            rules = bucket_replication.get('ReplicationConfiguration', {}).get('Rules', [])
+            for replication in rules:
+                self.augment_bucket_replication(b, replication, client)
+
+        return rules
+
+    def augment_bucket_replication(self, b, replication, client):
+        destination_bucket = replication.get('Destination').get('Bucket').split(':')[5]
+        destination_region = inspect_bucket_region(destination_bucket, client.meta.endpoint_url)
+        source_region = get_region(b)
+        replication['DestinationRegion'] = destination_region
+        replication['CrossRegion'] = destination_region != source_region

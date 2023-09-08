@@ -1,0 +1,25 @@
+{
+    "status_code": 200,
+    "data": {
+        "WebACL": {
+            "WebACLId": "7b90d59f-16c7-470d-a7a3-937bd061e5eb",
+            "Name": "cfblcspievt",
+            "MetricName": "cfblcspievt",
+            "DefaultAction": {
+                "Type": "ALLOW"
+            },
+            "Rules": [
+                {
+                    "Priority": 1,
+                    "RuleId": "70b4af3b-ad68-4f91-b05d-63970ba1856d",
+                    "Action": {
+                        "Type": "BLOCK"
+                    },
+                    "Type": "REGULAR"
+                }
+            ],
+            "WebACLArn": "arn:aws:waf-regional:us-east-1:123456789012:webacl/7b90d59f-16c7-470d-a7a3-937bd061e5eb"
+        },
+        "ResponseMetadata": {}
+    }
+}

@@ -87,6 +87,11 @@ class RichResult:
             line_numbers=True,
             lexer=resource.format,
         )
+        refs = self.policy_resource.resource.get_references()
+        if refs:
+            yield "  [yellow]References:"
+            for r in refs:
+                yield f"   - {r}"
         yield ""
 
 

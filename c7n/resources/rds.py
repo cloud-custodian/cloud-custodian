@@ -53,6 +53,7 @@ from c7n.exceptions import PolicyValidationError
 from c7n.filters import (
     CrossAccountAccessFilter, FilterRegistry, Filter, ValueFilter, AgeFilter)
 from c7n.filters.offhours import OffHour, OnHour
+from c7n.filters import related
 import c7n.filters.vpc as net_filters
 from c7n.manager import resources
 from c7n.query import (
@@ -563,7 +564,8 @@ class Delete(BaseAction):
 
     def process(self, dbs):
         skip = self.data.get('skip-snapshot', False)
-
+        # Can't delete an instance in an aurora cluster, use a policy on the cluster
+        dbs = [r for r in dbs if not r.get('DBClusterIdentifier')]
         # Concurrency feels like overkill here.
         client = local_session(self.manager.session_factory).client('rds')
         for db in dbs:
@@ -1059,6 +1061,33 @@ class RDSSnapshot(QueryResourceManager):
 @RDSSnapshot.filter_registry.register('onhour')
 class RDSSnapshotOnHour(OnHour):
     """Scheduled action on rds snapshot."""
+
+
+@RDSSnapshot.filter_registry.register('instance')
+class SnapshotInstance(related.RelatedResourceFilter):
+    """Filter snapshots by their database attributes.
+
+    :example:
+
+      Find snapshots without an extant database
+
+    .. code-block:: yaml
+
+       policies:
+         - name: rds-snapshot-orphan
+           resource: aws.rds-snapshot
+           filters:
+            - type: instance
+              value: 0
+              value_type: resource_count
+    """
+    schema = type_schema(
+        'instance', rinherit=ValueFilter.schema
+    )
+
+    RelatedResource = "c7n.resources.rds.RDS"
+    RelatedIdsExpression = "DBInstanceIdentifier"
+    FetchThreshold = 5
 
 
 @RDSSnapshot.filter_registry.register('latest')
@@ -1876,6 +1905,18 @@ class ModifyDb(BaseAction):
 
 @resources.register('rds-reserved')
 class ReservedRDS(QueryResourceManager):
+    """Lists all active rds reservations
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: existing-rds-reservations
+                resource: rds-reserved
+                filters:
+                    - State: active
+    """
 
     class resource_type(TypeInfo):
         service = 'rds'
@@ -2045,6 +2086,57 @@ class RDSProxy(QueryResourceManager):
     }
 
 
+@RDSProxy.action_registry.register('delete')
+class DeleteRDSProxy(BaseAction):
+    """
+    Deletes a RDS Proxy
+
+    :example:
+
+    .. code-block:: yaml
+
+      policies:
+        - name: delete-rds-proxy
+          resource: aws.rds-proxy
+          filters:
+            - type: value
+              key: "DBProxyName"
+              op: eq
+              value: "proxy-test-1"
+          actions:
+            - type: delete
+    """
+
+    schema = type_schema('delete')
+
+    permissions = ('rds:DeleteDBProxy',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('rds')
+        for r in resources:
+            self.manager.retry(
+                client.delete_db_proxy, DBProxyName=r['DBProxyName'],
+                ignore_err_codes=('DBProxyNotFoundFault',
+                'InvalidDBProxyStateFault'))
+
+
+@RDSProxy.filter_registry.register('subnet')
+class RDSProxySubnetFilter(net_filters.SubnetFilter):
+
+    RelatedIdsExpression = "VpcSubnetIds[]"
+
+
+@RDSProxy.filter_registry.register('security-group')
+class RDSProxySecurityGroupFilter(net_filters.SecurityGroupFilter):
+
+    RelatedIdsExpression = "VpcSecurityGroupIds[]"
+
+@RDSProxy.filter_registry.register('vpc')
+class RDSProxyVpcFilter(net_filters.VpcFilter):
+
+    RelatedIdsExpression = "VpcId"
+
+
 @filters.register('db-option-groups')
 class DbOptionGroups(ValueFilter):
     """This filter describes RDS option groups for associated RDS instances.
@@ -2129,5 +2221,41 @@ class DbOptionGroups(ValueFilter):
                     })
                     results.append(resource)
                     break
+
+        return results
+
+
+@filters.register('pending-maintenance')
+class PendingMaintenance(Filter):
+    """ Scan DB instances for those with pending maintenance
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: rds-pending-maintenance
+            resource: aws.rds
+            filters:
+              - pending-maintenance
+    """
+
+    schema = type_schema('pending-maintenance')
+    permissions = ('rds:DescribePendingMaintenanceActions',)
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('rds')
+
+        results = []
+        pending_maintenance = set()
+        paginator = client.get_paginator('describe_pending_maintenance_actions')
+        for page in paginator.paginate():
+            pending_maintenance.update(
+                {action['ResourceIdentifier'] for action in page['PendingMaintenanceActions']}
+            )
+
+        for r in resources:
+            if r['DBInstanceArn'] in pending_maintenance:
+                results.append(r)
 
         return results

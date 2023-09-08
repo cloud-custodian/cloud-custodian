@@ -44,8 +44,10 @@ class Cross_connect(QueryResourceManager):
         search_resource_type = "crossconnect"
 
 
-@Cross_connect.action_registry.register("update-cross-connect")
-class UpdateCrossConnect(OCIBaseAction):
+Cross_connect.action_registry.register("update")
+
+
+class UpdateCrossConnectAction(OCIBaseAction):
     """
     Update cross connect Action
 
@@ -62,30 +64,26 @@ class UpdateCrossConnect(OCIBaseAction):
             - name: perform-update-cross-connect-action
               resource: oci.cross_connect
               actions:
-                - type: update-cross-connect
+                - type: update
+                  defined_tags:
+                     Cloud_Custodian: True
+                  freeform_tags:
+                     Environment: development
 
     """  # noqa
 
     schema = type_schema(
-        "update-cross-connect", params={"type": "object"}, rinherit=OCIBaseAction.schema
+        "update", **{"freeform_tags": {"type": "object"}, "defined_tags": {"type": "object"}}
     )
 
     def perform_action(self, resource):
         client = self.manager.get_client()
-        params_dict = {}
-        params_model = {}
-        params_dict["cross_connect_id"] = resource.get("id")
-        if self.data.get("params").get("update_cross_connect_details"):
-            update_cross_connect_details_user = self.data.get("params").get(
-                "update_cross_connect_details"
-            )
-            params_model = self.update_params(resource, update_cross_connect_details_user)
-            params_dict["update_cross_connect_details"] = oci.core.models.UpdateCrossConnectDetails(
-                **params_model
-            )
+        update_cross_connect_details_user = self.extract_params(self.data)
+        params_model = self.update_params(resource, update_cross_connect_details_user)
+        update_cross_connect_details = oci.core.models.UpdateCrossConnectDetails(**params_model)
         response = client.update_cross_connect(
-            cross_connect_id=params_dict["cross_connect_id"],
-            update_cross_connect_details=params_dict["update_cross_connect_details"],
+            cross_connect_id=resource.get("id"),
+            update_cross_connect_details=update_cross_connect_details,
         )
         log.info(
             f"Received status {response.status} for PUT:update_cross_connect {response.request_id}"
@@ -170,8 +168,8 @@ class Vcn(QueryResourceManager):
         search_resource_type = "vcn"
 
 
-@Vcn.action_registry.register("update-vcn")
-class UpdateVcn(OCIBaseAction):
+@Vcn.action_registry.register("update")
+class UpdateVcnAction(OCIBaseAction):
     """
     Update vcn Action
 
@@ -189,24 +187,25 @@ class UpdateVcn(OCIBaseAction):
             - name: perform-update-vcn-action
               resource: oci.vcn
               actions:
-                - type: update-vcn
+                - type: update
+                  defined_tags:
+                     Cloud_Custodian: True
+                  freeform_tags:
+                     Environment: development
 
     """  # noqa
 
-    schema = type_schema("update-vcn", params={"type": "object"}, rinherit=OCIBaseAction.schema)
+    schema = type_schema(
+        "update", **{"freeform_tags": {"type": "object"}, "defined_tags": {"type": "object"}}
+    )
 
     def perform_action(self, resource):
         client = self.manager.get_client()
-        params_dict = {}
-        params_model = {}
-        params_dict["vcn_id"] = resource.get("id")
-        if self.data.get("params").get("update_vcn_details"):
-            update_vcn_details_user = self.data.get("params").get("update_vcn_details")
-            params_model = self.update_params(resource, update_vcn_details_user)
-            params_dict["update_vcn_details"] = oci.core.models.UpdateVcnDetails(**params_model)
+        update_vcn_details_user = self.extract_params(self.data)
+        params_model = self.update_params(resource, update_vcn_details_user)
+        update_vcn_details = oci.core.models.UpdateVcnDetails(**params_model)
         response = client.update_vcn(
-            vcn_id=params_dict["vcn_id"],
-            update_vcn_details=params_dict["update_vcn_details"],
+            vcn_id=resource.get("id"), update_vcn_details=update_vcn_details
         )
         log.info(f"Received status {response.status} for PUT:update_vcn {response.request_id}")
         return response
@@ -287,8 +286,8 @@ class Subnet(QueryResourceManager):
         search_resource_type = "subnet"
 
 
-@Subnet.action_registry.register("update-subnet")
-class UpdateSubnet(OCIBaseAction):
+@Subnet.action_registry.register("update")
+class UpdateSubnetAction(OCIBaseAction):
     """
     Update subnet Action
 
@@ -306,26 +305,25 @@ class UpdateSubnet(OCIBaseAction):
             - name: perform-update-subnet-action
               resource: oci.subnet
               actions:
-                - type: update-subnet
+                - type: update
+                  defined_tags:
+                     Cloud_Custodian: True
+                  freeform_tags:
+                     Environment: development
 
     """  # noqa
 
-    schema = type_schema("update-subnet", params={"type": "object"}, rinherit=OCIBaseAction.schema)
+    schema = type_schema(
+        "update", **{"freeform_tags": {"type": "object"}, "defined_tags": {"type": "object"}}
+    )
 
     def perform_action(self, resource):
         client = self.manager.get_client()
-        params_dict = {}
-        params_model = {}
-        params_dict["subnet_id"] = resource.get("id")
-        if self.data.get("params").get("update_subnet_details"):
-            update_subnet_details_user = self.data.get("params").get("update_subnet_details")
-            params_model = self.update_params(resource, update_subnet_details_user)
-            params_dict["update_subnet_details"] = oci.core.models.UpdateSubnetDetails(
-                **params_model
-            )
+        update_subnet_details_user = self.extract_params(self.data)
+        params_model = self.update_params(resource, update_subnet_details_user)
+        update_subnet_details = oci.core.models.UpdateSubnetDetails(**params_model)
         response = client.update_subnet(
-            subnet_id=params_dict["subnet_id"],
-            update_subnet_details=params_dict["update_subnet_details"],
+            subnet_id=resource.get("id"), update_subnet_details=update_subnet_details
         )
         log.info(f"Received status {response.status} for PUT:update_subnet {response.request_id}")
         return response

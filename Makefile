@@ -1,3 +1,5 @@
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 SHELL := /bin/bash
 SELF_MAKE := $(lastword $(MAKEFILE_LIST))
 
@@ -5,7 +7,7 @@ PKG_REPO = testpypi
 PKG_INCREMENT := patch
 PKG_SET := tools/c7n_gcp tools/c7n_kube tools/c7n_openstack tools/c7n_mailer tools/c7n_logexporter tools/c7n_policystream tools/c7n_trailcreator tools/c7n_org tools/c7n_sphinxext tools/c7n_terraform tools/c7n_awscc tools/c7n_tencentcloud tools/c7n_azure tools/c7n_oci
 
-FMT_SET := tools/c7n_left tools/c7n_mailer tools/c7n_oci
+FMT_SET := tools/c7n_left tools/c7n_mailer tools/c7n_oci tools/c7n_kube
 
 PLATFORM_ARCH := $(shell python3 -c "import platform; print(platform.machine())")
 PLATFORM_OS := $(shell python3 -c "import platform; print(platform.system())")
@@ -93,6 +95,8 @@ pkg-rebase:
 	for pkg in $(PKG_SET); do cd $$pkg && echo $$pkg && git add poetry.lock && cd ../..; done
 
 pkg-clean:
+	rm -f release.md
+	rm -f wheels-manifest.txt
 	rm -f dist/*
 	for pkg in $(PKG_SET); do cd $$pkg && rm -f dist/* && cd ../..; done
 
@@ -127,10 +131,17 @@ pkg-build-wheel:
 
 pkg-publish-wheel:
 # upload to test pypi
+	set -e
 	twine upload -r $(PKG_REPO) dist/*
 	for pkg in $(PKG_SET); do cd $$pkg && twine upload -r $(PKG_REPO) dist/* && cd ../..; done
 
+release-get-artifacts:
+	@$(MAKE) -f $(SELF_MAKE) pkg-clean
+	python tools/dev/get_release_artifacts.py
+
 data-update:
+# terraform data sets
+	cd tools/c7n_left/scripts && terraform init && python get_taggable.py --output ../c7n_left/data/taggable.json
 # aws data sets
 	python tools/dev/cfntypedb.py -f tests/data/cfn-types.json
 	python tools/dev/arnref.py -f tests/data/arn-types.json

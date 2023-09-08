@@ -1,7 +1,6 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
-import inspect
 
 from pytest_terraform import terraform
 
@@ -22,9 +21,7 @@ class TestVcn(OciBaseTest):
         test adding defined_tags tag to vcn
         """
         vcn_ocid = self._get_vcn_details(vcn)
-        session_factory = test.oci_session_factory(
-            self.__class__.__name__, inspect.currentframe().f_code.co_name
-        )
+        session_factory = test.oci_session_factory()
         policy = test.load_policy(
             {
                 "name": "add-defined-tag-to-vcn",
@@ -32,14 +29,7 @@ class TestVcn(OciBaseTest):
                 "filters": [
                     {"type": "value", "key": "id", "value": vcn_ocid},
                 ],
-                "actions": [
-                    {
-                        "type": "update-vcn",
-                        "params": {
-                            "update_vcn_details": {"defined_tags": self.get_defined_tag("add_tag")}
-                        },
-                    }
-                ],
+                "actions": [{"type": "update", "defined_tags": self.get_defined_tag("add_tag")}],
             },
             session_factory=session_factory,
         )
@@ -54,9 +44,7 @@ class TestVcn(OciBaseTest):
         test update defined_tags tag on vcn
         """
         vcn_ocid = self._get_vcn_details(vcn)
-        session_factory = test.oci_session_factory(
-            self.__class__.__name__, inspect.currentframe().f_code.co_name
-        )
+        session_factory = test.oci_session_factory()
         policy = test.load_policy(
             {
                 "name": "update-defined-tag-of-vcn",
@@ -66,12 +54,8 @@ class TestVcn(OciBaseTest):
                 ],
                 "actions": [
                     {
-                        "type": "update-vcn",
-                        "params": {
-                            "update_vcn_details": {
-                                "defined_tags": self.get_defined_tag("update_tag")
-                            }
-                        },
+                        "type": "update",
+                        "defined_tags": self.get_defined_tag("update_tag"),
                     }
                 ],
             },
@@ -88,9 +72,7 @@ class TestVcn(OciBaseTest):
         test adding freeform tag to vcn
         """
         vcn_ocid = self._get_vcn_details(vcn)
-        session_factory = test.oci_session_factory(
-            self.__class__.__name__, inspect.currentframe().f_code.co_name
-        )
+        session_factory = test.oci_session_factory()
         policy = test.load_policy(
             {
                 "name": "add-tag-freeform-to-vcn",
@@ -98,14 +80,30 @@ class TestVcn(OciBaseTest):
                 "filters": [
                     {"type": "value", "key": "id", "value": vcn_ocid},
                 ],
-                "actions": [
-                    {
-                        "type": "update-vcn",
-                        "params": {
-                            "update_vcn_details": {"freeform_tags": {"Environment": "Development"}}
-                        },
-                    }
+                "actions": [{"type": "update", "freeform_tags": {"Environment": "Development"}}],
+            },
+            session_factory=session_factory,
+        )
+        policy.run()
+        resource = self._fetch_instance_validation_data(policy.resource_manager, vcn_ocid)
+        test.assertEqual(resource["id"], vcn_ocid)
+        test.assertEqual(resource["freeform_tags"]["Environment"], "Development")
+
+    @terraform("vcn", scope="class")
+    def test_update_vcn(self, test, vcn):
+        """
+        test adding freeform tag to vcn
+        """
+        vcn_ocid = self._get_vcn_details(vcn)
+        session_factory = test.oci_session_factory()
+        policy = test.load_policy(
+            {
+                "name": "add-tag-freeform-to-vcn",
+                "resource": "oci.vcn",
+                "filters": [
+                    {"type": "value", "key": "id", "value": vcn_ocid},
                 ],
+                "actions": [{"type": "update", "freeform_tags": {"Environment": "Development"}}],
             },
             session_factory=session_factory,
         )
@@ -120,9 +118,7 @@ class TestVcn(OciBaseTest):
         test update freeform tag of vcn
         """
         vcn_ocid = self._get_vcn_details(vcn)
-        session_factory = test.oci_session_factory(
-            self.__class__.__name__, inspect.currentframe().f_code.co_name
-        )
+        session_factory = test.oci_session_factory()
         policy = test.load_policy(
             {
                 "name": "update-freeform-tag-of-vcn",
@@ -130,14 +126,7 @@ class TestVcn(OciBaseTest):
                 "filters": [
                     {"type": "value", "key": "id", "value": vcn_ocid},
                 ],
-                "actions": [
-                    {
-                        "type": "update-vcn",
-                        "params": {
-                            "update_vcn_details": {"freeform_tags": {"Environment": "Production"}}
-                        },
-                    }
-                ],
+                "actions": [{"type": "update", "freeform_tags": {"Environment": "Production"}}],
             },
             session_factory=session_factory,
         )
@@ -152,9 +141,7 @@ class TestVcn(OciBaseTest):
         test get freeform tagged vcn
         """
         vcn_ocid = self._get_vcn_details(vcn)
-        session_factory = test.oci_session_factory(
-            self.__class__.__name__, inspect.currentframe().f_code.co_name
-        )
+        session_factory = test.oci_session_factory()
         policy = test.load_policy(
             {
                 "name": "get-freeform-tagged-vcn",
@@ -176,9 +163,7 @@ class TestVcn(OciBaseTest):
         test remove freeform tag
         """
         vcn_ocid = self._get_vcn_details(vcn)
-        session_factory = test.oci_session_factory(
-            self.__class__.__name__, inspect.currentframe().f_code.co_name
-        )
+        session_factory = test.oci_session_factory()
         policy = test.load_policy(
             {
                 "name": "vcn-remove-tag",
@@ -203,9 +188,7 @@ class TestVcn(OciBaseTest):
         test remove defined tag
         """
         vcn_ocid = self._get_vcn_details(vcn)
-        session_factory = test.oci_session_factory(
-            self.__class__.__name__, inspect.currentframe().f_code.co_name
-        )
+        session_factory = test.oci_session_factory()
         policy = test.load_policy(
             {
                 "name": "vcn-remove-tag",
