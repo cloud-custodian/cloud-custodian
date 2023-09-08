@@ -2434,11 +2434,11 @@ class AddressRelease(BaseAction):
                 # If its already been released, ignore, else raise.
                 if e.response['Error']['Code'] == 'InvalidAddress.PtrSet':
                     self.log.warning(
-                        "EIP %d cannot be released because it has a PTR record set.",
+                        "EIP %s cannot be released because it has a PTR record set.",
                         r['AllocationId'])
                 if e.response['Error']['Code'] == 'InvalidAddress.Locked':
                     self.log.warning(
-                        "EIP %d cannot be released because it is locked to your account.",
+                        "EIP %s cannot be released because it is locked to your account.",
                         r['AllocationId'])
                 if e.response['Error']['Code'] != 'InvalidAllocationID.NotFound':
                     raise
