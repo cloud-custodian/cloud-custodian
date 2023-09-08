@@ -2,8 +2,10 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import os
-
 import socket
+import configparser
+
+from typing import Union
 from retrying import retry
 from .utils import PageMethod
 from c7n.exceptions import PolicyExecutionError
@@ -14,6 +16,7 @@ from tencentcloud.common.exception.tencent_cloud_sdk_exception import TencentClo
 from tencentcloud.common.profile.client_profile import ClientProfile
 from tencentcloud.common.profile.http_profile import HttpProfile
 from tencentcloud.common.common_client import CommonClient
+from tencentcloud.common.credential import STSAssumeRoleCredential, CVMRoleCredential, Credential
 
 
 RETRYABLE_EXCEPTIONS = (socket.error, ConnectionError)
@@ -29,6 +32,68 @@ def retry_result(resp):
     if err:
         return err["Code"].find("RequestLimitExceeded") >= 0
     return False
+
+
+def profile_handel(
+        profile: str,
+        cred_path=os.path.join(os.path.expanduser('~'), '.tencentcloud/credentials')
+) -> Union[STSAssumeRoleCredential, Credential]:
+    """
+        params:
+            profile: the profile name
+            profile_path: the profile path, deafult path is '~/tencentcloud/credentials'
+        des:
+            support use profile to auth account and multi-account
+        credentials details:
+            ```
+                [default] (if 'source_profile' is default, this is required!)
+                secret_id:xxxx
+                secret_key:xxxx
+                [profile]
+                role_arn: xxx (required)
+                session_name: xxx (default is 'custodian-job')
+                duration_seconds: 3600 (default is 3600)
+                source_profile: xxx (required, must be in ('default', 'cvm_metadata'))
+            ```
+            parms:
+                source_profile: the auth method
+                    default: use ak/sk to assume role
+                        secret_id: secret_id
+                        secket_key: secket_key
+                    cvm_metadata: use cvm role to assume role
+    """
+    if not os.path.exists(cred_path):
+        raise TencentCloudSDKException(f'not find the cred path by "{cred_path}"')
+    parser = configparser.ConfigParser()
+    parser.read(cred_path, encoding='utf-8')
+    if profile not in parser.sections():
+        raise TencentCloudSDKException(f'not find the profile`s section by {profile}')
+    
+    profile_obj = parser[profile]
+    role_arn = profile_obj.get('role_arn', None)
+    session_name = profile_obj.get('session_name', 'custodian-job')
+    duration_seconds = profile_obj.get('duration_seconds', 3600)
+    source_profile = profile_obj.get('source_profile')
+
+    if source_profile == 'default':
+        source_profile = parser[source_profile]
+        secret_id, secret_key = source_profile.get('secret_id'), source_profile.get('secret_key')
+        return STSAssumeRoleCredential(secret_id, secret_key, role_arn, session_name, duration_seconds)
+    elif source_profile == 'cvm_metadata':
+        cred = CVMRoleCredential()
+        common_client = CommonClient(credential=cred, region="ap-guangzhou", version='2018-08-13', service="sts")
+        params = {
+            "RoleArn": role_arn,
+            "RoleSessionName": session_name,
+            "DurationSeconds": duration_seconds
+        }
+        rsp = common_client.call_json("AssumeRole", params)
+        token = rsp["Response"]["Credentials"]["Token"]
+        secret_id = rsp["Response"]["Credentials"]["TmpSecretId"]
+        secret_key = rsp["Response"]["Credentials"]["TmpSecretKey"]
+        return Credential(secret_id, secret_key, token=token)
+    else:
+        raise TencentCloudSDKException(f'source profile not support {source_profile}')
 
 
 class Client:
@@ -126,7 +191,7 @@ class Client:
 
 class Session:
     """Session"""
-    def __init__(self) -> None:
+    def __init__(self, profile: str = None) -> None:
         """
         credential_file contains secret_id and secret_key.
         the file content format likes:
@@ -135,6 +200,8 @@ class Session:
         # just using default get_credentials() method
         # steps: Environment Variable -> profile file -> CVM role
         # for reference: https://github.com/TencentCloud/tencentcloud-sdk-python
+
+        self.profile = profile
 
         cred_provider = credential.DefaultCredentialProvider()
 
@@ -155,8 +222,16 @@ class Session:
                 token=os.environ['TENCENTCLOUD_TOKEN']
             )
             cred_provider.cred = cred
+        
+        # add profile suport
+        if self.profile is not None:
+            cred_provider = profile_handel(profile=profile)
+            
 
         self._cred = cred_provider.get_credentials()
+    
+    def __call__(self):
+        return self
 
     @property
     def secret_id(self):

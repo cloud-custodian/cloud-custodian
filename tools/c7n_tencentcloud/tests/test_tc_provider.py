@@ -3,6 +3,8 @@
 
 
 import pytest
+
+from collections import namedtuple
 from c7n.config import Config
 from c7n_tencentcloud.client import Session
 from c7n_tencentcloud.provider import TencentCloud
@@ -15,7 +17,10 @@ def tc_provider():
 
 
 def test_get_session_factory(tc_provider):
-    session_factory = tc_provider.get_session_factory(None)
+    Option = namedtuple('option', ['profile'])
+    option = Option(profile=None)
+
+    session_factory = tc_provider.get_session_factory(option)
     session = session_factory()
     assert isinstance(session, Session)
 
@@ -49,3 +54,11 @@ def test_provider_initialize(tc_provider, option_case):
     })
     tc_provider.initialize(config)
     assert config.region == option_case[1]
+
+
+
+
+
+
+
+

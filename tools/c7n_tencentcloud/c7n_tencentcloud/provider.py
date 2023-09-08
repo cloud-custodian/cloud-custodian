@@ -69,7 +69,7 @@ class TencentCloud(Provider):
         :param options: A dictionary of options that are passed to the session factory
         :return: A session factory
         """
-        return Session
+        return Session(profile=options.profile)
 
 
 resources = TencentCloud.resources
