@@ -592,7 +592,6 @@ class LoadBalancingBackendFrontendSsl(ChildResourceManager):
         return []
 
 
-
 @resources.register('loadbalancer-target-https-proxy-ssl-policy')
 class LoadBalancingTargetHttpsProxySslPolicy(ChildResourceManager):
     """
