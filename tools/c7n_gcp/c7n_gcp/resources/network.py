@@ -44,6 +44,7 @@ class Network(QueryResourceManager):
 class VPCDNSPolicyFilter(ValueFilter):
     schema = type_schema('vpc-dns-policy-filter',
                          rinherit=ValueFilter.schema,)
+    permissions = ('dns.policies.list',)
 
     def _perform_op(self, a, b):
         op = OPERATORS[self.data.get('op', 'eq')]
@@ -209,6 +210,8 @@ class AttachedToClusterFirewallFilter(ValueFilter):
          filters:
          - attached-to-cluster
     """
+    permissions = ('container.clusters.list',)
+
     def process(self, resources, event=None):
         session = local_session(self.manager.session_factory)
         parent = 'projects/{}/locations/-'.format(session.get_default_project())
