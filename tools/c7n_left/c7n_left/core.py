@@ -60,6 +60,10 @@ class PolicyMetadata:
         return " ".join(self.categories)
 
     @property
+    def url(self):
+        return self.policy.data.get("metadata", {}).get("url")
+
+    @property
     def categories(self):
         categories = self.policy.data.get("metadata", {}).get("category", [])
         if isinstance(categories, str):
@@ -70,7 +74,7 @@ class PolicyMetadata:
 
     @property
     def severity(self):
-        value = self.policy.data.get("metadata", {}).get("severity", "")
+        value = self.policy.data.get("metadata", {}).get("severity", "unknown")
         if isinstance(value, str):
             return value.lower()
         return ""
