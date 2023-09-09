@@ -132,6 +132,29 @@ class NetworkTest(BaseTest):
 
         self.assertEqual(len(resources), 1)
 
+    def test_firewall_port_range_filter_allow_partial(self):
+        project_id = 'cloud-custodian'
+        factory = self.replay_flight_data(
+            'firewall-port-range-filter', project_id=project_id)
+        p = self.load_policy(
+            {'name': 'gcp-firewall',
+             'resource': 'gcp.firewall',
+             'filters': [{
+                 'type': 'value',
+                 'key': 'name',
+                 'op': 'regex',
+                 'value': 'example.*'
+             }, {
+                 'type': 'port-range',
+                 'key': 'allowed[?IPProtocol==\'tcp\'].ports[]',
+                 'required-ports': '20, 50',
+                 'allow-partial': True
+             }]}, validate=True, session_factory=factory)
+
+        resources = p.run()
+
+        self.assertEqual(len(resources), 3)
+
     def test_port_range_firewall_filter_is_port_range_token(self):
         tokens_and_expected_results = {'10-20': True, '15': False}
 
