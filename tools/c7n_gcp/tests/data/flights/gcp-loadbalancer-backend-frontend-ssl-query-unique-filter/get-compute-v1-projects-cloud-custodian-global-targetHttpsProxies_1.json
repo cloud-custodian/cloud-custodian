@@ -1,0 +1,40 @@
+{
+  "headers": {
+    "etag": "-D4q-VYkB2IPTpddTY77XSAQjG4=/MDIkr2uua9jWzWPnKhUPonKK10M=",
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Thu, 22 Apr 2021 06:45:51 GMT",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3-29=\":443\"; ma=2592000,h3-T051=\":443\"; ma=2592000,h3-Q050=\":443\"; ma=2592000,h3-Q046=\":443\"; ma=2592000,h3-Q043=\":443\"; ma=2592000,quic=\":443\"; ma=2592000; v=\"46,43\"",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "990",
+    "-content-encoding": "gzip",
+    "content-location": "https://compute.googleapis.com/compute/v1/projects/cloud-custodian/global/targetHttpsProxies?alt=json"
+  },
+  "body": {
+    "id": "projects/cloud-custodian/global/targetHttpsProxies",
+    "items": [
+      {
+        "id": "834344872712180411",
+        "creationTimestamp": "2021-04-21T06:44:52.601-07:00",
+        "name": "https-lb-target-proxy",
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/targetHttpsProxies/https-lb-target-proxy",
+        "urlMap": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/urlMaps/https-lb",
+        "sslCertificates": [
+          "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/sslCertificates/year"
+        ],
+        "quicOverride": "NONE",
+        "sslPolicy": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/sslPolicies/compatible-ssl",
+        "fingerprint": "J2MH_Vy4CPc=",
+        "kind": "compute#targetHttpsProxy"
+      }
+    ],
+    "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/targetHttpsProxies",
+    "kind": "compute#targetHttpsProxyList"
+  }
+}
