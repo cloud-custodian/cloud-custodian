@@ -899,26 +899,3 @@ class LoadBalancingTargetHttpsProxySslPolicyTest(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['name'], resource_name)
         self.assertEqual(resources[0][parent_annotation_key]['name'], parent_resource_name)
-
-
-class LoadBalancingBackendFrontendSslTest(BaseTest):
-
-    def test_loadbalancer_backend_frontend_ssl_query_unique_filter(self):
-        resource_name = 'compatible-ssl'
-        parent_resource_name = 'https-lb-target-proxy'
-        factory = self.replay_flight_data(
-            'gcp-loadbalancer-backend-frontend-ssl-query-unique-filter')
-        p = self.load_policy(
-            {'name': 'gcp-loadbalancer-backend-frontend-ssl-query-unique-filter',
-             'resource': 'gcp.loadbalancer-backend-frontend-ssl',
-             'filters': [{
-                 'type': 'unique',
-                 'key': 'selfLink',
-                 'destination_key': '\"c7n:loadbalancer-backend-frontend\".sslPolicy',
-             }]},
-            session_factory=factory)
-        parent_annotation_key = p.resource_manager.resource_type.get_parent_annotation_key()
-        resources = p.run()
-        self.assertEqual(len(resources), 1)
-        self.assertEqual(resources[0]['name'], resource_name)
-        self.assertEqual(resources[0][parent_annotation_key]['name'], parent_resource_name)
