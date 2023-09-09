@@ -273,7 +273,7 @@ class SetSslListenerPolicy(BaseAction):
         lb_name = elb['LoadBalancerName']
         attrs = self.data.get('attributes')
 
-        if type(attrs) is dict:
+        if isinstance(attrs, dict):
             policy_attributes = [{'AttributeName': name, 'AttributeValue': value}
                 for name, value in attrs.items()]
         else:

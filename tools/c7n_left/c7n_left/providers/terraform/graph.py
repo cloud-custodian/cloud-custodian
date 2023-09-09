@@ -18,12 +18,20 @@ class TerraformGraph(ResourceGraph):
         for type_name, type_items in self.resource_data.items():
             if types and (type_name not in types and f"data.{type_name}" not in types):
                 continue
+            elif type_name == "module":
+                yield type_name, [self.as_resource(type_name, d, "module") for d in type_items]
             elif type_name == "moved":
-                yield type_name, [self.as_resource(type_name, d) for d in type_items]
+                yield type_name, [self.as_resource(type_name, d, "moved") for d in type_items]
             elif type_name == "locals":
-                yield type_name, [self.as_resource(type_name, d) for d in type_items]
+                yield type_name, [self.as_resource(type_name, d, "local") for d in type_items]
             elif type_name == "terraform":
-                yield type_name, [self.as_resource(type_name, d) for d in type_items]
+                yield type_name, [self.as_resource(type_name, d, "terraform") for d in type_items]
+            elif type_name == "provider":
+                yield type_name, [self.as_resource(type_name, d, "provider") for d in type_items]
+            elif type_name == "variable":
+                yield type_name, [self.as_resource(type_name, d, "variable") for d in type_items]
+            elif type_name == "output":
+                yield type_name, [self.as_resource(type_name, d, "output") for d in type_items]
             else:
                 data_resources = []
                 resources = []
@@ -46,7 +54,9 @@ class TerraformGraph(ResourceGraph):
                     elif not types:
                         yield f"data.{type_name}", data_resources
 
-    def as_resource(self, name, data):
+    def as_resource(self, name, data, type_name=None):
+        if type_name and "type" not in data["__tfmeta"]:
+            data["__tfmeta"]["type"] = type_name
         data["__tfmeta"]["src_dir"] = self.src_dir
         return TerraformResource(name, data)
 

@@ -45,7 +45,7 @@ class Lookup:
 
     @staticmethod
     def is_lookup(source):
-        return type(source) is dict
+        return isinstance(source, dict)
 
     @staticmethod
     def get_value(source, data=None):
