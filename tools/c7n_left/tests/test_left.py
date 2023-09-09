@@ -4,18 +4,19 @@
 import json
 import os
 import subprocess
-from unittest.mock import ANY
-
-import pytest
 from pathlib import Path
+from unittest.mock import ANY
+from urllib.request import urlopen
 
+import jsonschema
+import pytest
 from click.testing import CliRunner
 
 from c7n.config import Config
 from c7n.resources import load_resources
 
 try:
-    from c7n_left import cli, core, policy as policy_core
+    from c7n_left import cli, core, output, policy as policy_core
     from c7n_left.providers.terraform.provider import (
         TerraformProvider,
         TerraformResourceManager,
@@ -883,6 +884,47 @@ def test_cli_no_policies(tmp_path, caplog):
 
 @pytest.mark.skipif(
     os.environ.get('GITHUB_ACTIONS') is None,
+    reason="runs in github actions as it requires network access for schema validation",
+)
+def test_cli_gitlab_sast_output(policy_env, tmp_path, debug_cli_runner):
+    policy_env.write_tf(
+        """
+resource "aws_cloudwatch_log_group" "yada" {
+  name = "Bar"
+}
+        """
+    )
+    policy_env.write_policy(
+        {
+            "name": "tag-required",
+            "description": "tags are required on log groups",
+            "metadata": {"url": "https://cloudcustodian.io", "severity": "high"},
+            "resource": "terraform.aws_cloudwatch_log_group",
+            "filters": [{"tags": "absent"}],
+        }
+    )
+    runner = debug_cli_runner  # CliRunner()
+    result = runner.invoke(
+        cli.cli,
+        [
+            "run",
+            "-p",
+            str(tmp_path),
+            "-d",
+            str(tmp_path),
+            "-o",
+            "gitlab_sast",
+            "--output-file",
+            str(tmp_path / "output.json"),
+        ],
+    )
+    report = json.loads((tmp_path / "output.json").read_text())
+    result = jsonschema.validate(report, json.loads(urlopen(output.GitlabSAST.SCHEMA_FILE).read()))
+    assert not result
+
+
+@pytest.mark.skipif(
+    os.environ.get('GITHUB_ACTIONS') is None,
     reason="runs in github actions as it requires network access for tf get",
 )
 def test_cli_output_rich_mod_resource_ref(tmp_path, debug_cli_runner):
@@ -1012,7 +1054,7 @@ def test_cli_output_github(tmp_path):
     assert result.exit_code == 1
     expected = (
         "::error file=tests/terraform/aws_s3_encryption_audit/main.tf,line=25,lineEnd=28,"
-        "title=terraform.aws_s3_bucket - policy:check-bucket::a description"
+        "title=terraform.aws_s3_bucket - policy:check-bucket severity:unknown::a description"
     )
     assert expected in result.output
 
