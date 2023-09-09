@@ -1,6 +1,7 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 ResourceMap = {
+  "aws.access-analyzer-finding": "c7n.resources.accessanalyzer.AccessanalyzerFinding",
   "aws.account": "c7n.resources.account.Account",
   "aws.acm-certificate": "c7n.resources.acm.Certificate",
   "aws.advisor-check": "c7n.resources.support.AdvisorCheck",
