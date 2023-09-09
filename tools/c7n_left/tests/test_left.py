@@ -4,18 +4,19 @@
 import json
 import os
 import subprocess
-from unittest.mock import ANY
-
-import pytest
 from pathlib import Path
+from unittest.mock import ANY
+from urllib.request import urlopen
 
+import jsonschema
+import pytest
 from click.testing import CliRunner
 
 from c7n.config import Config
 from c7n.resources import load_resources
 
 try:
-    from c7n_left import cli, core, policy as policy_core
+    from c7n_left import cli, core, output, policy as policy_core
     from c7n_left.providers.terraform.provider import (
         TerraformProvider,
         TerraformResourceManager,
@@ -143,13 +144,7 @@ def test_taggable_module_resource():
     )
 
 
-@pytest.mark.skipif(
-    os.environ.get('GITHUB_ACTIONS') is None,
-    reason="runs in github actions as it requires network access for tf init",
-)
-def test_mod_reference(tmp_path):
-    (tmp_path / "main.tf").write_text(
-        """
+DB_MODULE_TF = """
 module "db" {
   source  = "terraform-aws-modules/rds/aws"
   version = "~> 3.0"
@@ -167,8 +162,15 @@ module "db" {
   username = "user"
   port     = "3306"
 }
-        """
-    )
+"""
+
+
+@pytest.mark.skipif(
+    os.environ.get('GITHUB_ACTIONS') is None,
+    reason="runs in github actions as it requires network access for tf init",
+)
+def test_mod_reference(tmp_path):
+    (tmp_path / "main.tf").write_text(DB_MODULE_TF)
     subprocess.check_call(args="terraform init", shell=True, cwd=tmp_path)
     results = run_policy(
         {
@@ -181,6 +183,10 @@ module "db" {
     )
     assert len(results) == 1
     assert results[0].resource['__tfmeta']['filename'] == 'main.tf'
+    assert results[0].resource['__tfmeta']['type'] == 'module'
+    assert results[0].resource['__tfmeta']['refs'] == [
+        'module.db.module.db_instance.aws_db_instance.this[0]'
+    ]
 
 
 def test_graph_resolver():
@@ -306,8 +312,8 @@ data "aws_ami" "ubuntu" {
     assert len(results) == 1
 
 
-def test_moved_and_local(policy_env):
-    # mostly for coverage
+def test_block_types(policy_env):
+    # module block type handled separately
     policy_env.write_tf(
         """
 locals {
@@ -316,15 +322,38 @@ locals {
 resource "aws_cloudwatch_log_group" "yada" {
   name = local.name
 }
+terraform {
+  experiments = [example]
+}
 moved {
   from = aws_instance.known
   to   = aws_cloudwatch_log_group.yada
+}
+provider "aws" {
+  region = "us-east-1"
+}
+
+variable "name" {
+  type = string
+  default = "theodora"
+}
+output "news" {
+  value = "https://lwn.net"
 }
     """
     )
     policy_env.write_policy({"name": "check-blocks", "resource": "terraform.*"})
     results = policy_env.run()
-    assert len(results) == 3
+    assert len(results) == 7
+    assert {r.resource["__tfmeta"]["type"] for r in results} == {
+        "moved",
+        "local",
+        "resource",
+        "provider",
+        "variable",
+        "output",
+        "terraform",
+    }
 
 
 def test_provider_tag_augment(policy_env):
@@ -853,6 +882,75 @@ def test_cli_no_policies(tmp_path, caplog):
     assert caplog.record_tuples == [("c7n.iac", 30, "no policies found")]
 
 
+@pytest.mark.skipif(
+    os.environ.get('GITHUB_ACTIONS') is None,
+    reason="runs in github actions as it requires network access for schema validation",
+)
+def test_cli_gitlab_sast_output(policy_env, tmp_path, debug_cli_runner):
+    policy_env.write_tf(
+        """
+resource "aws_cloudwatch_log_group" "yada" {
+  name = "Bar"
+}
+        """
+    )
+    policy_env.write_policy(
+        {
+            "name": "tag-required",
+            "description": "tags are required on log groups",
+            "metadata": {"url": "https://cloudcustodian.io", "severity": "high"},
+            "resource": "terraform.aws_cloudwatch_log_group",
+            "filters": [{"tags": "absent"}],
+        }
+    )
+    runner = debug_cli_runner  # CliRunner()
+    result = runner.invoke(
+        cli.cli,
+        [
+            "run",
+            "-p",
+            str(tmp_path),
+            "-d",
+            str(tmp_path),
+            "-o",
+            "gitlab_sast",
+            "--output-file",
+            str(tmp_path / "output.json"),
+        ],
+    )
+    report = json.loads((tmp_path / "output.json").read_text())
+    result = jsonschema.validate(report, json.loads(urlopen(output.GitlabSAST.SCHEMA_FILE).read()))
+    assert not result
+
+
+@pytest.mark.skipif(
+    os.environ.get('GITHUB_ACTIONS') is None,
+    reason="runs in github actions as it requires network access for tf get",
+)
+def test_cli_output_rich_mod_resource_ref(tmp_path, debug_cli_runner):
+    (tmp_path / "main.tf").write_text(DB_MODULE_TF)
+    (tmp_path / "policy.json").write_text(
+        json.dumps(
+            {
+                "policies": [
+                    {
+                        "name": "check-backup",
+                        "resource": "terraform.aws_db_instance",
+                        "filters": [{"backup_retention_period": 0}],
+                    }
+                ]
+            }
+        )
+    )
+    subprocess.check_call(args="terraform get", shell=True, cwd=tmp_path)
+
+    runner = CliRunner()
+    result = runner.invoke(cli.cli, ["run", "-p", str(tmp_path), "-d", str(tmp_path), "-o", "cli"])
+    assert result.exit_code == 1
+    assert "References:" in result.output
+    assert 'module.db.module.db_instance.aws_db_instance.this[0]' in result.output
+
+
 def test_cli_output_rich(tmp_path):
     write_output_test_policy(tmp_path)
     runner = CliRunner()
@@ -956,7 +1054,7 @@ def test_cli_output_github(tmp_path):
     assert result.exit_code == 1
     expected = (
         "::error file=tests/terraform/aws_s3_encryption_audit/main.tf,line=25,lineEnd=28,"
-        "title=terraform.aws_s3_bucket - policy:check-bucket::a description"
+        "title=terraform.aws_s3_bucket - policy:check-bucket severity:unknown::a description"
     )
     assert expected in result.output
 

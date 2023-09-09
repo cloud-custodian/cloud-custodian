@@ -24,6 +24,10 @@ class SessionFactory:
         self.region = region
         self._config = self._set_oci_config()
 
+    @property
+    def config(self):
+        return self._config
+
     def _set_oci_config(self):
         config = None
         if self._check_environment_variables():
