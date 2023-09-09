@@ -31,7 +31,11 @@ class FirewallTest(BaseTest):
         p = self.load_policy(
             {'name': 'fdelete',
              'resource': 'gcp.firewall',
-             'filters': [{'name': 'test'}],
+             'filters': [{
+                 'type': 'value',
+                 'key': 'name',
+                 'value': 'test'
+             }],
              'actions': [{'type': 'modify', 'priority': 500, 'targetTags': ['newtag']}]
              },
             session_factory=factory)
@@ -50,7 +54,11 @@ class FirewallTest(BaseTest):
         p = self.load_policy(
             {'name': 'fdelete',
              'resource': 'gcp.firewall',
-             'filters': [{'name': 'test'}],
+             'filters': [{
+                 'type': 'value',
+                 'key': 'name',
+                 'value': 'test'
+             }],
              'actions': ['delete']},
             session_factory=factory)
         resources = p.run()
