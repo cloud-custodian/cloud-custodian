@@ -142,7 +142,7 @@ set of dates.
 If a policy is executing in a serverless mode, the above environment keys
 are evaluated *during the deployment* of the policy using ``type: value``
 conditions (any ``type: event`` conditions are skipped).  The *execution*
-of the policy would evaluate these again, but will also include the
+of the policy will evaluate these again, but will also include the
 triggering ``event``.  These events can be evaluated using a ``type:
 event`` condition.  This is useful for cases where you have a more complex
 condition than can be handled by an event ``pattern`` expression, but you
