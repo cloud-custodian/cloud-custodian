@@ -60,7 +60,12 @@ def test_load_array_expression(test):
             "query": [{"path": data_path("iam-actions.json"), "key": "account"}],
         }
     )
-    assert p.run() == ["DisableRegion", "EnableRegion", "ListRegions"]
+    assert p.run() == ['DeleteAlternateContact',
+                       'DisableRegion',
+                       'EnableRegion',
+                       'GetAlternateContact',
+                       'ListRegions',
+                       'PutAlternateContact']
 
 
 def test_disk_bad_path(tmpdir, test):
