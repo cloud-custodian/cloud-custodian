@@ -380,7 +380,11 @@ class Json(Output):
 
 @report_outputs.register("junit")
 class JunitReport(Output):
-    suite_name = 'c7n-left'
+    suite_name = "c7n-left"
+
+    SCHEMA_FILE = (
+        "https://raw.githubusercontent.com/windyroad/JUnit-Schema/master/JUnit.xsd"  # noqa
+    )
 
     def __init__(self, ctx, config):
         super().__init__(ctx, config)
@@ -408,7 +412,7 @@ class JunitReport(Output):
         )
         [self.format_result(r, builder) for r in self.results]
         doc = builder.close()
-        self.config.output_file.write(etree.tostring(doc).decode('utf8'))
+        self.config.output_file.write(etree.tostring(doc).decode("utf8"))
 
     def format_result(self, result, builder):
         md = self.policies[result.policy.name]

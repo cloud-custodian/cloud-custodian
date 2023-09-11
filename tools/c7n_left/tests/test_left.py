@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 import json
+from io import BytesIO
 import os
 import subprocess
 from pathlib import Path
@@ -880,6 +881,52 @@ def test_cli_no_policies(tmp_path, caplog):
         ],
     )
     assert caplog.record_tuples == [("c7n.iac", 30, "no policies found")]
+
+
+@pytest.mark.skipif(
+    os.environ.get('GITHUB_ACTIONS') is None,
+    reason="runs in github actions as it requires network access for schema validation",
+)
+def test_cli_junit_output(policy_env, tmp_path, debug_cli_runner):
+    policy_env.write_tf(
+        """
+resource "aws_cloudwatch_log_group" "yada" {
+  name = "Bar"
+}
+        """
+    )
+    policy_env.write_policy(
+        {
+            "name": "tag-required",
+            "description": "tags are required on log groups",
+            "metadata": {"url": "https://cloudcustodian.io", "severity": "high"},
+            "resource": "terraform.aws_cloudwatch_log_group",
+            "filters": [{"tags": "absent"}],
+        }
+    )
+    runner = debug_cli_runner  # CliRunner()
+    runner.invoke(
+        cli.cli,
+        [
+            "run",
+            "-p",
+            str(tmp_path),
+            "-d",
+            str(tmp_path),
+            "-o",
+            "junit",
+            "--output-file",
+            str(tmp_path / "output.xml"),
+        ],
+    )
+
+    from lxml import etree
+
+    report_text = (tmp_path / "output.xml").read_text()
+    report = etree.XML(report_text)
+    schema_text = urlopen(output.JunitReport.SCHEMA_FILE).read()
+    schema = etree.XMLSchema(etree.parse(BytesIO(schema_text)))
+    schema.validate(report)
 
 
 @pytest.mark.skipif(
