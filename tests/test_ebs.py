@@ -937,6 +937,27 @@ class PiopsMetricsFilterTest(BaseTest):
         resources = policy.run()
         self.assertEqual(len(resources), 1)
 
+        policy = self.load_policy(
+            {
+                "name": "ebs-unused-piops",
+                "resource": "ebs",
+                "filters": [
+                    {
+                        "type": "metrics",
+                        "name": "VolumeConsumedReadWriteOps",
+                        "op": "gt",
+                        "value": 50,
+                        "statistics": "Maximum",
+                        "days": 1,
+                        "percent-attr": "Iops",
+                    }
+                ],
+            },
+            session_factory=session,
+        )
+        resources = policy.run()
+        self.assertEqual(len(resources), 0)
+
 
 class HealthEventsFilterTest(BaseTest):
 
