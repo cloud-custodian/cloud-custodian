@@ -29,3 +29,20 @@ class CdnCustomDomainTest(BaseTest):
         })
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
+    @arm_template('cdn-custom-domain.json')
+    def test_cdn_tls_version(self):
+        p = self.load_policy({
+            'name': 'test-azure-cdn-endpoint-custom-domain-tls-version',
+            'resource': 'azure.cdn-custom-domain',
+            'filters': [
+                {
+                    'type': 'tls-version',
+                    'key': 'properties.customHttpsParameters.minimumTlsVersion',
+                    'op': 'eq',
+                    'value': 'TLS12'
+                }
+            ],
+        })
+        resources = p.run()
+        self.assertEqual(len(resources), 1)

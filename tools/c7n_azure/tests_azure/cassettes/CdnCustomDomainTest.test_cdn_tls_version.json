@@ -1,0 +1,227 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Cdn/profiles?api-version=2020-09-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-length": [
+                        "389"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: DF4E2AD95A644B97A31AC4A932ACCE07 Ref B: DM2AA1091211009 Ref C: 2023-09-11T19:21:50Z"
+                    ],
+                    "date": [
+                        "Mon, 11 Sep 2023 19:21:50 GMT"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-resource-requests": [
+                        "499"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/test_cdn-custom-domain/providers/Microsoft.Cdn/profiles/cctestcdnprofile",
+                                "type": "Microsoft.Cdn/profiles",
+                                "name": "cctestcdnprofile",
+                                "location": "EastUs",
+                                "kind": "cdn",
+                                "tags": {
+                                    "product_id": "13742"
+                                },
+                                "sku": {
+                                    "name": "Standard_Microsoft"
+                                },
+                                "properties": {
+                                    "resourceState": "Active",
+                                    "provisioningState": "Succeeded"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_cdn-custom-domain/providers/Microsoft.Cdn/profiles/cctestcdnprofile/endpoints?api-version=2020-09-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-length": [
+                        "1244"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 99ECE53097D147DBA5DD0019FEDE6DDB Ref B: DM2AA1091211009 Ref C: 2023-09-11T19:21:50Z"
+                    ],
+                    "date": [
+                        "Mon, 11 Sep 2023 19:21:50 GMT"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-resource-requests": [
+                        "499"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/test_cdn-custom-domain/providers/Microsoft.Cdn/profiles/cctestcdnprofile/endpoints/cctestcdnendpoint",
+                                "type": "Microsoft.Cdn/profiles/endpoints",
+                                "name": "cctestcdnendpoint",
+                                "location": "EastUs",
+                                "tags": {
+                                    "product_id": "13742"
+                                },
+                                "properties": {
+                                    "hostName": "cctestcdnendpoint.azureedge.net",
+                                    "originHostHeader": null,
+                                    "originPath": null,
+                                    "contentTypesToCompress": [],
+                                    "isCompressionEnabled": false,
+                                    "isHttpAllowed": true,
+                                    "isHttpsAllowed": true,
+                                    "queryStringCachingBehavior": "IgnoreQueryString",
+                                    "optimizationType": null,
+                                    "probePath": null,
+                                    "origins": [
+                                        {
+                                            "name": "host",
+                                            "properties": {
+                                                "hostName": "cdnowolabi.z13.web.core.windows.net",
+                                                "httpPort": 80,
+                                                "httpsPort": 443,
+                                                "originHostHeader": null,
+                                                "priority": 1,
+                                                "weight": 1000,
+                                                "enabled": true,
+                                                "privateLinkAlias": null,
+                                                "privateLinkResourceId": null,
+                                                "privateLinkLocation": null,
+                                                "privateEndpointStatus": null,
+                                                "privateLinkApprovalMessage": null
+                                            }
+                                        }
+                                    ],
+                                    "originGroups": [],
+                                    "defaultOriginGroup": null,
+                                    "customDomains": [
+                                        {
+                                            "name": "cctestcdndomain",
+                                            "properties": {
+                                                "hostName": "www.roromart.com",
+                                                "validationData": null
+                                            }
+                                        }
+                                    ],
+                                    "geoFilters": [],
+                                    "deliveryPolicy": null,
+                                    "urlSigningKeys": null,
+                                    "webApplicationFirewallPolicyLink": null,
+                                    "resourceState": "Running",
+                                    "provisioningState": "Succeeded"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_cdn-custom-domain/providers/Microsoft.Cdn/profiles/cctestcdnprofile/endpoints/cctestcdnendpoint/customDomains?api-version=2020-09-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-length": [
+                        "775"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 4EE3CA321E344852907D4E308CBA693C Ref B: DM2AA1091211009 Ref C: 2023-09-11T19:21:51Z"
+                    ],
+                    "date": [
+                        "Mon, 11 Sep 2023 19:21:50 GMT"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/test_cdn-custom-domain/providers/Microsoft.Cdn/profiles/cctestcdnprofile/endpoints/cctestcdnendpoint/customdomains/cctestcdndomain",
+                                "type": "Microsoft.Cdn/profiles/endpoints/customdomains",
+                                "name": "cctestcdndomain",
+                                "properties": {
+                                    "hostName": "www.roromart.com",
+                                    "validationData": null,
+                                    "resourceState": "Active",
+                                    "customHttpsProvisioningState": "Enabled",
+                                    "customHttpsProvisioningSubstate": "CertificateDeployed",
+                                    "customHttpsParameters": {
+                                        "certificateSource": "Cdn",
+                                        "certificateSourceParameters": {
+                                            "certificateType": "Dedicated",
+                                            "@odata.type": "#Microsoft.Azure.Cdn.Models.CdnCertificateSourceParameters"
+                                        },
+                                        "protocolType": "ServerNameIndication",
+                                        "minimumTlsVersion": "TLS12"
+                                    },
+                                    "provisioningState": "Succeeded"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}
