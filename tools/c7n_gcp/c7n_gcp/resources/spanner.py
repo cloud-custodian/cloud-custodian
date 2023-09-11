@@ -94,6 +94,14 @@ class SpannerInstanceBackupTimeRangeFilter(TimeRangeFilter):
     expire_time_field_name = 'expireTime'
 
 
+@SpannerInstanceBackup.filter_registry.register('iam-policy')
+class SpannerInstanceBackupIamPolicyFilter(IamPolicyFilter):
+    """
+    Overrides the base implementation to process spanner instance backup resources correctly.
+    """
+    permissions = ('spanner.backups.getIamPolicy',)
+
+
 @SpannerInstance.filter_registry.register('iam-policy')
 class SpannerInstanceIamPolicyFilter(IamPolicyFilter):
     """

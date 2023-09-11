@@ -400,3 +400,22 @@ class TestSpannerInstanceBackup(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['name'],
                          'projects/cloud-custodian/instances/spanner-instance-0/backups/backup-1')
+
+    def test_spanner_instance_backup_filter_iam_query(self):
+        project_id = 'gcp-lab-custodian'
+        factory = self.replay_flight_data('spanner-instance-backup-filter-iam', project_id=project_id)
+        p = self.load_policy({
+            'name': 'spanner-instance-backup-filter-iam',
+            'resource': 'gcp.spanner-backup',
+            'filters': [{
+                'type': 'iam-policy',
+                'doc': {
+                    'key': "bindings[?(role=='roles\\editor' || role=='roles\\owner')]",
+                    'op': 'ne',
+                    'value': []
+                }
+            }]
+        }, session_factory=factory)
+        resources = p.run()
+
+        self.assertEqual(1, len(resources))
