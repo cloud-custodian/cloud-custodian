@@ -6,6 +6,7 @@ from collections import Counter
 from datetime import datetime
 from pathlib import Path
 from importlib.metadata import version as pkg_version
+import sys
 import time
 import uuid
 import xml.etree.ElementTree as etree
@@ -378,7 +379,6 @@ class Json(Output):
         return formatted
 
 
-@report_outputs.register("junit")
 class JunitReport(Output):
     suite_name = "c7n-left"
 
@@ -434,6 +434,16 @@ class JunitReport(Output):
             line_idx += 1
         builder.data("\n".join(text_data))
         builder.end("testcase")
+
+
+@report_outputs.register("junit")
+class Junit(MultiOutput):
+    def __init__(self, ctx, config):
+        if config.output_file.isatty() is False:
+            parts = [RichCli(ctx, config.copy(output_file=sys.stdout)), JunitReport(ctx, config)]
+        else:
+            parts = [JunitReport(ctx, config)]
+        super().__init__(parts)
 
 
 @report_outputs.register("gitlab_sast")

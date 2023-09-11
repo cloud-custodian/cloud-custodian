@@ -904,8 +904,8 @@ resource "aws_cloudwatch_log_group" "yada" {
             "filters": [{"tags": "absent"}],
         }
     )
-    runner = debug_cli_runner  # CliRunner()
-    runner.invoke(
+    runner = CliRunner()
+    result = runner.invoke(
         cli.cli,
         [
             "run",
@@ -919,6 +919,8 @@ resource "aws_cloudwatch_log_group" "yada" {
             str(tmp_path / "output.xml"),
         ],
     )
+
+    assert "1 Failure" in result.output
 
     from lxml import etree
 
