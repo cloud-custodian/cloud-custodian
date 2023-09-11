@@ -36,10 +36,10 @@ class Network(QueryResourceManager):
                 'get', {'project': project, 'network': network})
 
 
-@Network.filter_registry.register('vpc-firewall-filter')
+@Network.filter_registry.register('firewall')
 class VPCFirewallFilter(ListItemFilter):
     schema = type_schema(
-        'vpc-firewall-filter',
+        'firewall',
         attrs={'$ref': '#/definitions/filters_common/list_item_attrs'}
     )
     annotate_items = True

@@ -279,7 +279,7 @@ class TestVPCFirewallFilter(BaseTest):
             {'name': 'vpc-firewall',
              'resource': 'gcp.vpc',
              'filters': [{
-                 'type': 'vpc-firewall-filter',
+                 'type': 'firewall',
                  'attrs': [{
                      'type': 'value',
                      'key': 'id',
