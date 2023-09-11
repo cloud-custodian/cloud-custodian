@@ -62,8 +62,7 @@ class CdnCustomDomain(ChildArmResourceManager):
 
 @CdnCustomDomain.filter_registry.register('tls-version')
 class CdnManagedHttpsParametersFilter(ValueFilter):
-    """
-     Find all Cdn Endpoint Custom Domain with minimum Tls Version set to TLS12
+    """Find all Cdn Endpoint Custom Domain with minimum Tls Version set to TLS12
 
     :example:
 
@@ -84,12 +83,11 @@ class CdnManagedHttpsParametersFilter(ValueFilter):
                     value: "TLS12"
 
     """
-
     schema = type_schema(
-          'tls-version',
-          rinherit=ValueFilter.schema,
-          value = {'type': 'string', 'enum':['None', 'TLS10', 'TLS12']})
-    
+        'tls-version',
+        rinherit=ValueFilter.schema,
+        value = {'type': 'string', 'enum':['None', 'TLS10', 'TLS12']})
+
     def process(self, resources, event=None):
         desired_version = self.data['value']
         for custom_domain in resources:
