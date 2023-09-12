@@ -249,6 +249,7 @@ class CollectionRunner:
     def run_policy(self, policy, graph, resources, event, resource_type):
         event = dict(event)
         event.update({"graph": graph, "resources": resources, "resource_type": resource_type})
+        self.reporter.on_policy_start(policy, event)
         return policy.push(event)
 
     def get_provider(self):

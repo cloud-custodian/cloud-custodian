@@ -48,6 +48,9 @@ class ResultsReporter:
     def on_execution_ended(self):
         pass
 
+    def on_policy_start(self, policy, event):
+        pass
+
     def on_results(self, results):
         self.results.extend(results)
 
@@ -928,7 +931,7 @@ resource "aws_cloudwatch_log_group" "yada" {
     report = etree.XML(report_text)
     schema_text = urlopen(output.JunitReport.SCHEMA_FILE).read()
     schema = etree.XMLSchema(etree.parse(BytesIO(schema_text)))
-    schema.validate(report)
+    schema.assertValid(report)
 
 
 @pytest.mark.skipif(

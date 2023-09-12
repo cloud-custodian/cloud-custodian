@@ -42,6 +42,9 @@ class Output:
     def on_execution_ended(self):
         pass
 
+    def on_policy_start(self, policy, event):
+        pass
+
     def on_results(self, results):
         pass
 
@@ -301,6 +304,10 @@ class MultiOutput:
         for o in self.outputs:
             o.on_execution_ended()
 
+    def on_policy_start(self, policy, event):
+        for o in self.outputs:
+            o.on_policy_start(policy, event)
+
     def on_results(self, results):
         for o in self.outputs:
             o.on_results(results)
@@ -380,11 +387,44 @@ class Json(Output):
 
 
 class JunitReport(Output):
-    suite_name = "c7n-left"
+    """Junit xml output
 
-    SCHEMA_FILE = (
-        "https://raw.githubusercontent.com/windyroad/JUnit-Schema/master/JUnit.xsd"  # noqa
-    )
+    Junit is a mess, without a useful canonical schema, and many informal
+    extensions without documentation. Which appears to be leading to a
+    proliferation of additional formats :(
+
+    The 'offical' schema is
+    https://raw.githubusercontent.com/junit-team/junit5/main/platform-tests/src/test/resources/jenkins-junit.xsd
+
+    which is relatively simple, but in practice that's not what tools
+    use, some documentation around common conventions exists at
+
+    https://github.com/testmoapp/junitxml
+
+    For gitlab, which only supports junit output, the parser is
+    https://gitlab.com/gitlab-org/gitlab-foss/-/blob/master/lib/gitlab/ci/parsers/test/junit.rb
+
+    for azure devops, its unclear what they support, but they link to
+    a different schema that's commonly linked
+    https://github.com/windyroad/JUnit-Schema/blob/master/JUnit.xsd
+
+    This schema is also incompatible with the canonical schema, and
+    references several required fields that are not in common use.
+
+    ibm also has a page which also documents its specific non standard
+    handling (filename prefix to message)
+    https://www.ibm.com/docs/en/developer-for-zos/16.0?topic=formats-junit-xml-format
+
+    Looking at pytest's junitxml generator which has fairly wide
+    adoption in the python ecosystem and broad tool integration, and
+    what they generate shows light conformance to yet another spec
+    https://github.com/pytest-dev/pytest/blob/main/src/_pytest/junitxml.py
+
+    which in turn references a different format.
+    https://github.com/jenkinsci/xunit-plugin/blob/master/src/main/resources/org/jenkinsci/plugins/xunit/types/model/xsd/junit-10.xsd
+    """  # noqa
+
+    suite_name = "c7n-left"
 
     def __init__(self, ctx, config):
         super().__init__(ctx, config)
@@ -398,21 +438,41 @@ class JunitReport(Output):
         self.start_time = datetime.utcnow()
         self.policies = {p.name: p for p in sorted(map(PolicyMetadata, policies), key=severity_key)}
 
+    def get_info(self):
+        return {
+            "id": "c7n-left",
+            "name": "Terraform Policy Compliance",
+            "time": "%0.2f" % (datetime.utcnow() - self.start_time).total_seconds(),
+            "tests": str(len(self.policies)),
+            "failures": str(len(self.results)),
+        }
+
     def on_execution_ended(self):
+        info = self.get_info()
+
         builder = etree.TreeBuilder()
-        builder.start("testsuites", {})
-        builder.start(
-            "testsuite",
-            {
-                "name": self.suite_name,
-                "tests": str(len(self.policies)),
-                "time": "%0.2f" % (datetime.utcnow() - self.start_time).total_seconds(),
-                "failures": str(len(self.results)),
-            },
-        )
+        builder.start("testsuites", info)
+        builder.start("testsuite", info)
+
+        policy_results = {}
+        for r in self.results:
+            policy_results.setdefault(r.policy.name, []).append(r)
+
+        for pname in self.policies:
+            self.format_test_case(builder, self.policies[pname], policy_results.get(pname))
+
         [self.format_result(r, builder) for r in self.results]
         doc = builder.close()
         self.config.output_file.write(etree.tostring(doc).decode("utf8"))
+
+    def format_test_case(self, builder, policy_md, results):
+        builder.start(
+            "testcase",
+            {
+                "name": f"[{policy_md.severity}] {policy_md.name}",
+                "classname": "",
+            },
+        )
 
     def format_result(self, result, builder):
         md = self.policies[result.policy.name]
