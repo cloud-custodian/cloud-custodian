@@ -89,14 +89,13 @@ class CdnManagedHttpsParametersFilter(ValueFilter):
         value = {'type': 'string', 'enum':['None', 'TLS10', 'TLS12']})
 
     def process(self, resources, event=None):
-        desired_version = self.data['value']
         for custom_domain in resources:
             properties = custom_domain.get('properties', {})
             if 'customHttpsParameters' not in properties:
                 http_params = {
                       "certificateSource": "Cdn",
                       "protocolType": "ServerNameIndication",
-                      "minimumTlsVersion": desired_version,
+                      "minimumTlsVersion": 'TLS12',
                       "certificateSource_parameters": {
                            "typeName": "CdnCertificateSourceParameters",
                             "certificateType": "Dedicated"
