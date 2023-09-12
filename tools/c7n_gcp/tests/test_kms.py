@@ -305,6 +305,7 @@ class KmsCryptoKeyVersionTest(BaseTest):
             ],
         )
 
+
 @terraform('kms_location')
 def test_kms_keyring_filter(test, kms_location):
     session_factory = test.replay_flight_data('kms-keyring-filter')
@@ -337,3 +338,4 @@ def test_kms_keyring_filter(test, kms_location):
 
     resources = policy.run()
     assert len(resources) == 1
+    assert resources[0]['name'] == 'projects/cloud-custodian/locations/us-west1'
