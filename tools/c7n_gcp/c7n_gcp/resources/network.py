@@ -9,7 +9,7 @@ from c7n.filters import PortRangeFilter
 from c7n_gcp.query import QueryResourceManager, TypeInfo
 
 from c7n_gcp.provider import resources
-from c7n.filters.core import ListItemFilter
+from c7n.filters.core import ListItemFilter, ValueFilter
 from c7n.utils import type_schema, local_session
 from c7n.filters.core import OPERATORS
 
