@@ -76,7 +76,7 @@ class VPCDNSPolicyFilter(ValueFilter):
                     return True
         return False
 
-      
+
 @Network.filter_registry.register('firewall')
 class VPCFirewallFilter(ListItemFilter):
     schema = type_schema(
