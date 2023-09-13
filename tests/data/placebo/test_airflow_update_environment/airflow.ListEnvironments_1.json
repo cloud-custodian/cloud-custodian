@@ -3,7 +3,7 @@
     "data": {
         "ResponseMetadata": {},
         "Environments": [
-            "TimmyTestStack-MwaaEnvironment"
+            "TestStack-MwaaEnvironment"
         ]
     }
 }

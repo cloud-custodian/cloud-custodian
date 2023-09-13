@@ -148,10 +148,12 @@ class UpdateApacheAirflowEnvironment(Action):
         client = local_session(self.manager.session_factory).client('mwaa')
         access_mode = self.data.get('access_mode')
         for r in resources:
-          client.update_environment(
-              Name=r['Name'],
-              WebserverAccessMode=access_mode
-          )
+          current_access_mode = r.get('WebserverAccessMode')
+          if current_access_mode != access_mode:
+              client.update_environment(
+                  Name=r['Name'],
+                  WebserverAccessMode=access_mode
+              )
 
 @ApacheAirflow.action_registry.register('delete-environment')
 class DeleteApacheAirflowEnvironment(Action):

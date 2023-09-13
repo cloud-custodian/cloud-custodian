@@ -2,6 +2,6 @@
     "status_code": 200,
     "data": {
         "ResponseMetadata": {},
-        "Arn": "arn:aws:airflow:us-east-1:644160558196:environment/TimmyTestStack-MwaaEnvironment"
+        "Arn": "arn:aws:airflow:us-east-1:644160558196:environment/TestStack-MwaaEnvironment"
     }
 }

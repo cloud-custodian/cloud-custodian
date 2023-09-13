@@ -4,80 +4,80 @@
         "ResponseMetadata": {},
         "Environment": {
             "AirflowVersion": "2.6.3",
-            "Arn": "arn:aws:airflow:us-east-1:644160558196:environment/TimmyTestStack-MwaaEnvironment",
+            "Arn": "arn:aws:airflow:us-east-1:644160558196:environment/TestStack-MwaaEnvironment",
             "CreatedAt": {
                 "__class__": "datetime",
                 "year": 2023,
                 "month": 9,
-                "day": 6,
-                "hour": 9,
-                "minute": 18,
-                "second": 30,
+                "day": 13,
+                "hour": 6,
+                "minute": 43,
+                "second": 40,
                 "microsecond": 0
             },
             "DagS3Path": "dags",
             "EnvironmentClass": "mw1.small",
-            "ExecutionRoleArn": "arn:aws:iam::644160558196:role/service-role/TimmyTestStack-MwaaExecutionRole-4BNK9O28OTC7",
+            "ExecutionRoleArn": "arn:aws:iam::644160558196:role/service-role/TestStack-MwaaExecutionRole-J13JXICOSM01",
             "LastUpdate": {
                 "CreatedAt": {
                     "__class__": "datetime",
                     "year": 2023,
                     "month": 9,
-                    "day": 6,
-                    "hour": 9,
-                    "minute": 50,
-                    "second": 11,
+                    "day": 13,
+                    "hour": 17,
+                    "minute": 29,
+                    "second": 9,
                     "microsecond": 0
                 },
                 "Status": "SUCCESS"
             },
             "LoggingConfiguration": {
                 "DagProcessingLogs": {
-                    "CloudWatchLogGroupArn": "arn:aws:logs:us-east-1:644160558196:log-group:airflow-TimmyTestStack-MwaaEnvironment-DAGProcessing",
+                    "CloudWatchLogGroupArn": "arn:aws:logs:us-east-1:644160558196:log-group:airflow-TestStack-MwaaEnvironment-DAGProcessing",
                     "Enabled": true,
                     "LogLevel": "INFO"
                 },
                 "SchedulerLogs": {
-                    "CloudWatchLogGroupArn": "arn:aws:logs:us-east-1:644160558196:log-group:airflow-TimmyTestStack-MwaaEnvironment-Scheduler",
+                    "CloudWatchLogGroupArn": "arn:aws:logs:us-east-1:644160558196:log-group:airflow-TestStack-MwaaEnvironment-Scheduler",
                     "Enabled": true,
                     "LogLevel": "INFO"
                 },
                 "TaskLogs": {
-                    "CloudWatchLogGroupArn": "arn:aws:logs:us-east-1:644160558196:log-group:airflow-TimmyTestStack-MwaaEnvironment-Task",
+                    "CloudWatchLogGroupArn": "arn:aws:logs:us-east-1:644160558196:log-group:airflow-TestStack-MwaaEnvironment-Task",
                     "Enabled": true,
                     "LogLevel": "INFO"
                 },
                 "WebserverLogs": {
-                    "CloudWatchLogGroupArn": "arn:aws:logs:us-east-1:644160558196:log-group:airflow-TimmyTestStack-MwaaEnvironment-WebServer",
+                    "CloudWatchLogGroupArn": "arn:aws:logs:us-east-1:644160558196:log-group:airflow-TestStack-MwaaEnvironment-WebServer",
                     "Enabled": true,
                     "LogLevel": "INFO"
                 },
                 "WorkerLogs": {
-                    "CloudWatchLogGroupArn": "arn:aws:logs:us-east-1:644160558196:log-group:airflow-TimmyTestStack-MwaaEnvironment-Worker",
+                    "CloudWatchLogGroupArn": "arn:aws:logs:us-east-1:644160558196:log-group:airflow-TestStack-MwaaEnvironment-Worker",
                     "Enabled": true,
                     "LogLevel": "INFO"
                 }
             },
             "MaxWorkers": 2,
             "MinWorkers": 1,
-            "Name": "TimmyTestStack-MwaaEnvironment",
+            "Name": "TestStack-MwaaEnvironment",
             "NetworkConfiguration": {
                 "SecurityGroupIds": [
-                    "sg-0a89989fc73d8cc58"
+                    "sg-014d3b1a314ccede1"
                 ],
                 "SubnetIds": [
-                    "subnet-009d6ffbd025d370c",
-                    "subnet-0c4cf001790ede792"
+                    "subnet-0e4d3bc0b5764db4f",
+                    "subnet-040942ec3da9ce524"
                 ]
             },
             "Schedulers": 2,
             "ServiceRoleArn": "arn:aws:iam::644160558196:role/aws-service-role/airflow.amazonaws.com/AWSServiceRoleForAmazonMWAA",
-            "SourceBucketArn": "arn:aws:s3:::timmyteststack-environmentbucket-1kl17amsiffcm",
+            "SourceBucketArn": "arn:aws:s3:::teststack-environmentbucket-f4ymk3qn4gj4",
             "Status": "AVAILABLE",
             "Tags": {},
             "WebserverAccessMode": "PRIVATE_ONLY",
-            "WebserverUrl": "546668ca-1cd1-4b56-aff9-574cca48b3dd-vpce.c71.us-east-1.airflow.amazonaws.com",
-            "WeeklyMaintenanceWindowStart": "MON:10:00"
+            "WebserverUrl": "915dda6f-4589-4d17-8228-5fb093cecf27-vpce.c61.us-east-1.airflow.amazonaws.com",
+            "WeeklyMaintenanceWindowStart": "WED:18:30"
         }
     }
 }
