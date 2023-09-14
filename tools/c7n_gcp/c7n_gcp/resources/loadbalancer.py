@@ -531,7 +531,6 @@ class LoadBalancingGlobalAddress(QueryResourceManager):
                 'address': resource_info['resourceName'].rsplit('/', 1)[-1]})
 
 
-
 @resources.register('loadbalancer-backend-frontend')
 class LoadBalancingBackendFrontend(ChildResourceManager):
 
