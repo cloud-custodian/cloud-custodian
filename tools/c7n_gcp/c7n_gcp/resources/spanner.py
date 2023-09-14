@@ -54,7 +54,7 @@ class SpannerInstanceBackup(ChildResourceManager):
         component = 'projects.instances.backups'
         enum_spec = ('list', 'backups[]', None)
         scope = 'parent'
-        name = id = 'backups'
+        name = id = 'name'
         parent_spec = {
             'resource': 'spanner-instance',
             'child_enum_params': {
