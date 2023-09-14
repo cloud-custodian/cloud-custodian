@@ -5,6 +5,8 @@ from googleapiclient.errors import HttpError
 
 from gcp_common import BaseTest, event_data
 
+from pytest_terraform import terraform
+
 
 class LogProjectSinkTest(BaseTest):
 
@@ -220,3 +222,18 @@ class LoggingSinkTest(BaseTest):
 
         self.assertEqual(1, len(resources))
         self.assertEqual(resources[0]['name'], sink_name)
+
+
+@terraform('logging_sink_bucket')
+def test_retention_policies_log_bucket(test, logging_sink_bucket):
+    session_factory = test.replay_flight_data('retention-policies-log-bucket')
+    policy = test.load_policy({
+        'name': 'logging-sink-bucket',
+        'resource': 'gcp.logging-sink-bucket',
+        'filters': [{'retentionPolicy.isLocked':
+                    logging_sink_bucket['google_storage_bucket.c7n.retention_policy.is_locked']}]
+    }, session_factory=session_factory)
+
+    resources = policy.run()
+    assert len(resources) == 1
+    assert resources[0]['retentionPolicy']['isLocked'] is not True
