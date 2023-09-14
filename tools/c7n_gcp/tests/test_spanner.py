@@ -402,8 +402,9 @@ class TestSpannerInstanceBackup(BaseTest):
                          'projects/cloud-custodian/instances/spanner-instance-0/backups/backup-1')
 
     def test_spanner_instance_backup_filter_iam_query(self):
-        project_id = 'gcp-lab-custodian'
-        factory = self.replay_flight_data('spanner-instance-backup-filter-iam', project_id=project_id)
+        project_id = 'cloud-custodian'
+        factory = self.replay_flight_data(
+            'spanner-instance-backup-filter-iam', project_id=project_id)
         p = self.load_policy({
             'name': 'spanner-instance-backup-filter-iam',
             'resource': 'gcp.spanner-backup',
