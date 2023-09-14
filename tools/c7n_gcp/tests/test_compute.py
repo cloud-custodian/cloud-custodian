@@ -312,7 +312,7 @@ class DiskTest(BaseTest):
 
     def test_disk_snapshot_availability(self):
         factory = self.replay_flight_data(
-            'disk-snapshot-availability', project_id='gcp-lab-custodian')
+            'disk-snapshot-availability', project_id='cloud-custodian')
         p = self.load_policy(
             {'name': 'test-disk-snapshot-availability',
              'resource': 'gcp.snapshot',
