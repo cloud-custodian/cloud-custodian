@@ -493,17 +493,17 @@ class CheckDiskAvailableSnapshotFilter(Filter):
         accepted_resources = []
         # Getting project_id from client
         project = session.get_default_project()
+        aggregated_disks = client.execute_query('aggregatedList', {'project': project})
         for resource in resources:
             if 'sourceDisk' in resource:
                 zone = resource['sourceDisk'].split('/')[-3]
                 disk_name = resource['sourceDisk'].split('/')[-1]
-                try:
-                    disks_availability = client.execute_query(
-                        'get', {'project': project, 'zone': zone, 'disk': disk_name})
-                    if disks_availability:
+                disks_in_zone = aggregated_disks["items"].get(f'zones/{zone}')
+                if disks_in_zone and disks_in_zone.get('disks'):
+                    disks = disks_in_zone.get('disks')
+                    filtered_disks = [disk for disk in disks if disk['name'] == disk_name]
+                    if filtered_disks:
                         accepted_resources.append(resource)
-                except ClientError:
-                    continue
         return accepted_resources
 
 
