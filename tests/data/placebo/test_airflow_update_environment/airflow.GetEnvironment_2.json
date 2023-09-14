@@ -9,24 +9,24 @@
                 "__class__": "datetime",
                 "year": 2023,
                 "month": 9,
-                "day": 13,
-                "hour": 6,
-                "minute": 43,
-                "second": 40,
+                "day": 14,
+                "hour": 8,
+                "minute": 28,
+                "second": 10,
                 "microsecond": 0
             },
             "DagS3Path": "dags",
             "EnvironmentClass": "mw1.small",
-            "ExecutionRoleArn": "arn:aws:iam::644160558196:role/service-role/TestStack-MwaaExecutionRole-J13JXICOSM01",
+            "ExecutionRoleArn": "arn:aws:iam::644160558196:role/service-role/TestStack-MwaaExecutionRole-SBLUFN7YFHRU",
             "LastUpdate": {
                 "CreatedAt": {
                     "__class__": "datetime",
                     "year": 2023,
                     "month": 9,
-                    "day": 13,
-                    "hour": 17,
-                    "minute": 29,
-                    "second": 9,
+                    "day": 14,
+                    "hour": 9,
+                    "minute": 5,
+                    "second": 5,
                     "microsecond": 0
                 },
                 "Status": "PENDING"
@@ -63,21 +63,21 @@
             "Name": "TestStack-MwaaEnvironment",
             "NetworkConfiguration": {
                 "SecurityGroupIds": [
-                    "sg-014d3b1a314ccede1"
+                    "sg-038d1f22f343477a6"
                 ],
                 "SubnetIds": [
-                    "subnet-0e4d3bc0b5764db4f",
-                    "subnet-040942ec3da9ce524"
+                    "subnet-0a1d5260c72c1969c",
+                    "subnet-0870aa18157ea3f08"
                 ]
             },
             "Schedulers": 2,
             "ServiceRoleArn": "arn:aws:iam::644160558196:role/aws-service-role/airflow.amazonaws.com/AWSServiceRoleForAmazonMWAA",
-            "SourceBucketArn": "arn:aws:s3:::teststack-environmentbucket-f4ymk3qn4gj4",
+            "SourceBucketArn": "arn:aws:s3:::teststack-environmentbucket-1uby1afpuyeec",
             "Status": "AVAILABLE",
             "Tags": {},
             "WebserverAccessMode": "PRIVATE_ONLY",
-            "WebserverUrl": "915dda6f-4589-4d17-8228-5fb093cecf27.c61.us-east-1.airflow.amazonaws.com",
-            "WeeklyMaintenanceWindowStart": "WED:18:30"
+            "WebserverUrl": "836a0ccd-034c-4386-bdb2-938be4ee0454.c21.us-east-1.airflow.amazonaws.com",
+            "WeeklyMaintenanceWindowStart": "THU:18:00"
         }
     }
 }
