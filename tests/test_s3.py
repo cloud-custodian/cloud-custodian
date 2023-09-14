@@ -9,7 +9,7 @@ import io
 import shutil
 import tempfile
 import time  # NOQA needed for some recordings
-import mock
+from unittest import mock
 
 from unittest import TestCase
 
@@ -25,6 +25,7 @@ from c7n.resources import s3
 from c7n.mu import LambdaManager
 from c7n.ufuncs import s3crypt
 from c7n.utils import get_account_alias_from_sts, jmespath_search
+import vcr
 
 from .common import (
     BaseTest,
@@ -3939,7 +3940,10 @@ def test_s3_encryption_audit(test, aws_s3_encryption_audit):
     assert actual_names == expected_names
 
 
-@pytest.mark.audited
+# s3 changed behavior for new buckets in 2023
+# https://aws.amazon.com/blogs/aws/heads-up-amazon-s3-security-changes-are-coming-in-april-of-2023/
+
+@pytest.mark.skiplive
 @terraform('s3_ownership', scope='class')
 class TestBucketOwnership:
     def test_s3_ownership_empty(self, test, s3_ownership):
@@ -4334,3 +4338,178 @@ class IntelligentTieringConfiguration(BaseTest):
         self.assertIn(
           'Access Denied Bucket:example-abc-123 while reading intelligent tiering configurations',
             log_output.getvalue())
+
+
+class BucketReplication(BaseTest):
+    def test_s3_bucket_replication_filter(self):
+        self.patch(s3.S3, "executor_factory", MainThreadExecutor)
+        self.patch(s3, "S3_AUGMENT_TABLE", [])
+        self.patch(s3, "S3_AUGMENT_TABLE", [('get_bucket_replication',
+        'Replication', None, None, 's3:GetReplicationConfiguration')])
+        session_factory = self.replay_flight_data("test_s3_bucket_replication_filter")
+        p = self.load_policy(
+            {
+                "name": "s3-replication-rule",
+                "resource": "s3",
+                "filters": [
+                        {
+                            "type": "bucket-replication",
+                            "attrs": [
+                            {"Status": "Enabled"},
+                            {"Filter": {
+                                "And": {
+                                    "Prefix": "abc", "Tags": [{"Key": "Owner", "Value": "c7n"}]}}},
+                            {"DestinationRegion": "us-west-2"},
+                            {"CrossRegion": True }
+                            ]
+                        }
+                    ],
+                },
+            session_factory=session_factory,
+        )
+        with vcr.use_cassette(
+          'tests/data/vcr_cassettes/test_s3/replication_rule.yaml',
+           record_mode='none'
+        ):
+            resources = p.run()
+            self.assertEqual(len(resources), 1)
+            self.assertTrue("Replication" in resources[0])
+            self.assertEqual(len(resources[0].get("c7n:ListItemMatches")), 1)
+
+    def test_s3_bucket_replication_filter_count(self):
+        self.patch(s3.S3, "executor_factory", MainThreadExecutor)
+        self.patch(s3, "S3_AUGMENT_TABLE", [])
+        self.patch(s3, "S3_AUGMENT_TABLE", [('get_bucket_replication',
+        'Replication', None, None, 's3:GetReplicationConfiguration')])
+        session_factory = self.replay_flight_data("test_s3_bucket_replication_filter_count")
+        p = self.load_policy(
+            {
+                "name": "s3-replication-filter-count",
+                "resource": "s3",
+                "filters": [
+                    {
+                        "type": "bucket-replication",
+                        "count": 1,
+                        "count_op": "eq"
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        with vcr.use_cassette(
+          'tests/data/vcr_cassettes/test_s3/replication_filter_count.yaml',
+           record_mode='none'
+        ):
+            resources = p.run()
+            self.assertEqual(len(resources), 1)
+            self.assertEqual(resources[0]['Name'],'custodian-replication-test-1')
+
+    def test_s3_bucket_no_replication_rule(self):
+        self.patch(s3.S3, "executor_factory", MainThreadExecutor)
+        self.patch(s3, "S3_AUGMENT_TABLE", [])
+        self.patch(s3, "S3_AUGMENT_TABLE", [('get_bucket_replication',
+        'Replication', None, None, 's3:GetReplicationConfiguration')])
+        session_factory = self.replay_flight_data("test_s3_bucket_no_replication_rule")
+        p = self.load_policy(
+            {
+                "name": "s3-no-replication-rule",
+                "resource": "s3",
+                "filters": [
+                    {
+                        "not": [
+                            "bucket-replication"
+                        ]
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        with vcr.use_cassette(
+          'tests/data/vcr_cassettes/test_s3/no_replication_rule.yaml',
+           record_mode='none'
+        ):
+            resources = p.run()
+            self.assertEqual(len(resources), 1)
+            self.assertEqual(resources[0]['Name'],'custodian-replication-west')
+
+
+    def test_s3_bucket_key_enabled(self):
+        self.patch(s3.S3, "executor_factory", MainThreadExecutor)
+        self.patch(s3.BucketEncryption, "executor_factory", MainThreadExecutor)
+        self.patch(s3, "S3_AUGMENT_TABLE", [])
+        factory = self.replay_flight_data('test_s3_bucket_key_enabled')
+
+        p = self.load_policy(
+            {
+                'name': 'test-s3-bucket-key-enabled',
+                'resource': 'aws.s3',
+                'filters': [
+                    {
+                        'type': 'bucket-encryption',
+                        'bucket_key_enabled': True
+                    },
+                    {
+                        'type': 'value',
+                        'key': 'Name',
+                        'value': 'c7n-test-s3-bucket',
+                        'op': 'contains'
+                    }
+                ]
+            },
+            session_factory=factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+
+    def test_s3_bucket_key_disabled(self):
+        self.patch(s3.S3, "executor_factory", MainThreadExecutor)
+        self.patch(s3.BucketEncryption, "executor_factory", MainThreadExecutor)
+        self.patch(s3, "S3_AUGMENT_TABLE", [])
+        factory = self.replay_flight_data('test_s3_bucket_key_disabled')
+
+        p = self.load_policy(
+            {
+                'name': 'test-s3-bucket-key-disabled',
+                'resource': 'aws.s3',
+                'filters': [
+                    {
+                        'type': 'bucket-encryption',
+                        'bucket_key_enabled': False
+                    },
+                    {
+                        'type': 'value',
+                        'key': 'Name',
+                        'value': 'c7n-test-s3-bucket',
+                        'op': 'contains'
+                    }
+                ]
+            },
+            session_factory=factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+
+    def test_bucket_encryption_invalid(self):
+        self.assertRaises(
+            PolicyValidationError,
+            self.load_policy,
+            {
+                'name': 'test-s3-bucket-encryption-invalid',
+                'resource': 'aws.s3',
+                'filters': [
+                    {
+                        'type': 'bucket-encryption',
+                        'bucket_key_enabled': False,
+                        'key': 'alias/foobar'
+                    },
+                    {
+                        'type': 'value',
+                        'key': 'Name',
+                        'value': 'c7n-test-s3-bucket',
+                        'op': 'contains'
+                    }
+                ]
+            },
+        )

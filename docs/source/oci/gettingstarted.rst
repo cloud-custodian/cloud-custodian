@@ -1,13 +1,11 @@
 .. _oci_gettingstarted:
 
-Getting Started (Alpha)
+Getting Started (Beta)
 =======================
 
-The Oracle Cloud Infrastructure (OCI) provider (Alpha) is an optional package. which can be installed to enable
+The Oracle Cloud Infrastructure (OCI) provider (Beta) is an optional package. which can be installed to enable
 writing policies which interact with OCI related resources.
 
-
-Alpha providers will potentially have non backwards compatible syntax changes to exposed policy language.
 
 
 .. _oci_install-custodian:

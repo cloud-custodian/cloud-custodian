@@ -1,0 +1,167 @@
+{
+    "status_code": 200,
+    "data": {
+        "DBInstances": [
+            {
+                "DBInstanceIdentifier": "qbopp011",
+                "DBInstanceClass": "db.r5.16xlarge",
+                "Engine": "oracle-ee",
+                "DBInstanceStatus": "available",
+                "MasterUsername": "intuadmin",
+                "DBName": "QBOPP011",
+                "Endpoint": {
+                    "Address": "qbopp011.cyiyqi08u9mg.us-west-2.rds.amazonaws.com",
+                    "Port": 1521,
+                    "HostedZoneId": "Z1PVIF0B656C1W"
+                },
+                "AllocatedStorage": 26000,
+                "InstanceCreateTime": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 4,
+                    "day": 1,
+                    "hour": 8,
+                    "minute": 49,
+                    "second": 51,
+                    "microsecond": 278000
+                },
+                "PreferredBackupWindow": "04:00-06:00",
+                "BackupRetentionPeriod": 35,
+                "DBSecurityGroups": [],
+                "VpcSecurityGroups": [
+                    {
+                        "VpcSecurityGroupId": "sg-2782b45c",
+                        "Status": "active"
+                    }
+                ],
+                "DBParameterGroups": [
+                    {
+                        "DBParameterGroupName": "oracle-ee-19-max-string-size-prod-clusterdb-vpc-3-opt12c",
+                        "ParameterApplyStatus": "in-sync"
+                    }
+                ],
+                "AvailabilityZone": "us-west-2b",
+                "DBSubnetGroup": {
+                    "DBSubnetGroupName": "prod-clusterdb-vpc-3",
+                    "DBSubnetGroupDescription": "prod-clusterdb-vpc-3 subnet group",
+                    "VpcId": "vpc-b78d99d0",
+                    "SubnetGroupStatus": "Complete",
+                    "Subnets": [
+                        {
+                            "SubnetIdentifier": "subnet-b62853ff",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2b"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        },
+                        {
+                            "SubnetIdentifier": "subnet-e661adbd",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2c"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        },
+                        {
+                            "SubnetIdentifier": "subnet-72f8d815",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2a"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        }
+                    ]
+                },
+                "PreferredMaintenanceWindow": "mon:06:00-mon:06:30",
+                "PendingModifiedValues": {},
+                "LatestRestorableTime": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 8,
+                    "day": 5,
+                    "hour": 6,
+                    "minute": 11,
+                    "second": 16,
+                    "microsecond": 0
+                },
+                "MultiAZ": true,
+                "EngineVersion": "19.0.0.0.ru-2021-10.rur-2021-10.r1",
+                "AutoMinorVersionUpgrade": false,
+                "ReadReplicaDBInstanceIdentifiers": [
+                    "arn:aws:rds:us-east-2:644160558196:db:qbosp011"
+                ],
+                "LicenseModel": "bring-your-own-license",
+                "Iops": 53000,
+                "OptionGroupMemberships": [
+                    {
+                        "OptionGroupName": "oracle-ee-19-prod-clusterdb-vpc-3-qbopp011",
+                        "Status": "in-sync"
+                    }
+                ],
+                "CharacterSetName": "AL32UTF8",
+                "NcharCharacterSetName": "AL16UTF16",
+                "SecondaryAvailabilityZone": "us-west-2a",
+                "PubliclyAccessible": false,
+                "StorageType": "io1",
+                "DbInstancePort": 0,
+                "StorageEncrypted": true,
+                "KmsKeyId": "arn:aws:kms:us-west-2:644160558196:key/5ed86f6c-fb30-45ee-a80b-7430216ede03",
+                "DbiResourceId": "db-K7FEYDY47XERTXMWED4SOZRXAM",
+                "CACertificateIdentifier": "rds-ca-2019",
+                "DomainMemberships": [],
+                "CopyTagsToSnapshot": false,
+                "MonitoringInterval": 60,
+                "EnhancedMonitoringResourceArn": "arn:aws:logs:us-west-2:644160558196:log-group:RDSOSMetrics:log-stream:db-K7FEYDY47XERTXMWED4SOZRXAM",
+                "MonitoringRoleArn": "arn:aws:iam::644160558196:role/rds-monitoring-role",
+                "DBInstanceArn": "arn:aws:rds:us-west-2:644160558196:db:qbopp011",
+                "IAMDatabaseAuthenticationEnabled": false,
+                "PerformanceInsightsEnabled": true,
+                "PerformanceInsightsKMSKeyId": "arn:aws:kms:us-west-2:644160558196:key/9ebd4724-2d78-4edb-a629-d0103a5fb9d7",
+                "PerformanceInsightsRetentionPeriod": 731,
+                "EnabledCloudwatchLogsExports": [
+                    "audit"
+                ],
+                "DeletionProtection": true,
+                "AssociatedRoles": [],
+                "TagList": [
+                    {
+                        "Key": "cluster",
+                        "Value": "c11"
+                    },
+                    {
+                        "Key": "intuit:asset_id",
+                        "Value": "145258680168756101"
+                    },
+                    {
+                        "Key": "env",
+                        "Value": "prd"
+                    },
+                    {
+                        "Key": "org_awsbackup_local_0700UTC",
+                        "Value": "31continuous"
+                    }
+                ],
+                "CustomerOwnedIpEnabled": false,
+                "AwsBackupRecoveryPointArn": "arn:aws:backup:us-west-2:644160558196:recovery-point:continuous:db-k7feydy47xertxmwed4sozrxam-1d0515c1",
+                "ActivityStreamStatus": "stopped",
+                "BackupTarget": "region",
+                "NetworkType": "IPV4",
+                "CertificateDetails": {
+                    "CAIdentifier": "rds-ca-2019",
+                    "ValidTill": {
+                        "__class__": "datetime",
+                        "year": 2024,
+                        "month": 8,
+                        "day": 22,
+                        "hour": 17,
+                        "minute": 8,
+                        "second": 50,
+                        "microsecond": 0
+                    }
+                }
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

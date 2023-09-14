@@ -4,10 +4,10 @@ from copy import deepcopy
 from datetime import datetime, timedelta
 import json
 import logging
-import mock
 import os
 import shutil
 import tempfile
+from unittest import mock
 
 from c7n import policy, manager
 from c7n.config import Config
@@ -203,7 +203,7 @@ class PolicyMetaLint(BaseTest):
         overrides = overrides.difference(
             {'account', 's3', 'hostedzone', 'log-group', 'rest-api', 'redshift-snapshot',
              'rest-stage', 'codedeploy-app', 'codedeploy-group', 'fis-template', 'dlm-policy',
-             'apigwv2', 'apigw-domain-name', 'fis-experiment'})
+             'apigwv2', 'apigwv2-stage', 'apigw-domain-name', 'fis-experiment'})
         if overrides:
             raise ValueError("unknown arn overrides in %s" % (", ".join(overrides)))
 
@@ -263,6 +263,7 @@ class PolicyMetaLint(BaseTest):
         whitelist = set(('AwsS3Object', 'Container'))
         todo = set((
             # q2 2023
+            'AwsAthenaWorkGroup',
             'AwsStepFunctionStateMachine',
             'AwsGuardDutyDetector',
             'AwsAmazonMqBroker',
@@ -363,6 +364,42 @@ class PolicyMetaLint(BaseTest):
         # of a resource.
 
         whitelist = {
+            # q3 2023
+            "AWS::ACMPCA::CertificateAuthority",
+            "AWS::Amplify::Branch",
+            "AWS::AppConfig::HostedConfigurationVersion",
+            "AWS::AppIntegrations::EventIntegration",
+            "AWS::AppMesh::Route",
+            "AWS::AppMesh::VirtualGateway",
+            "AWS::AppMesh::VirtualRouter",
+            "AWS::AppRunner::Service",
+            "AWS::Athena::PreparedStatement",
+            "AWS::CustomerProfiles::ObjectType",
+            "AWS::DMS::Endpoint",
+            "AWS::EC2::CapacityReservation",
+            "AWS::EC2::ClientVpnEndpoint",
+            "AWS::EC2::IPAMScope",
+            "AWS::Evidently::Launch",
+            "AWS::Forecast::DatasetGroup",
+            "AWS::GreengrassV2::ComponentVersion",
+            "AWS::GroundStation::MissionProfile",
+            "AWS::Kendra::Index",
+            "AWS::KinesisVideo::Stream",
+            "AWS::Logs::Destination",
+            "AWS::MSK::Configuration",
+            "AWS::MediaConnect::FlowEntitlement",
+            "AWS::MediaConnect::FlowVpcInterface",
+            "AWS::MediaTailor::PlaybackConfiguration",
+            "AWS::NetworkManager::CustomerGatewayAssociation",
+            "AWS::NetworkManager::LinkAssociation",
+            "AWS::Personalize::Dataset",
+            "AWS::Personalize::Schema",
+            "AWS::Personalize::Solution",
+            "AWS::Pinpoint::EmailChannel",
+            "AWS::Pinpoint::EmailTemplate",
+            "AWS::Pinpoint::EventStream",
+            "AWS::ResilienceHub::App",
+            "AWS::S3::AccessPoint",
             # q2 2023 wave 3
             "AWS::Amplify::App",
             "AWS::AppMesh::VirtualNode",
@@ -385,7 +422,6 @@ class PolicyMetaLint(BaseTest):
             "AWS::AuditManager::Assessment",
             "AWS::CloudWatch::MetricStream",
             "AWS::DeviceFarm::InstanceProfile",
-            "AWS::DeviceFarm::Project",
             "AWS::EC2::EC2Fleet",
             "AWS::EC2::SubnetRouteTableAssociation",
             "AWS::ECR::PullThroughCacheRule",
@@ -481,7 +517,6 @@ class PolicyMetaLint(BaseTest):
             'AWS::IoTSiteWise::Project',
             'AWS::IoTTwinMaker::Entity',
             'AWS::IoTTwinMaker::Workspace',
-            'AWS::Lex::Bot',
             'AWS::Lex::BotAlias',
             'AWS::Lightsail::Bucket',
             'AWS::Lightsail::Certificate',
@@ -505,7 +540,7 @@ class PolicyMetaLint(BaseTest):
             'AWS::ServiceDiscovery::HttpNamespace',
             'AWS::Transfer::Workflow',
             #
-            'AWS::ApiGatewayV2::Stage',
+            # 'AWS::ApiGatewayV2::Stage',
             'AWS::Athena::DataCatalog',
             'AWS::Athena::WorkGroup',
             'AWS::AutoScaling::ScalingPolicy',
@@ -518,7 +553,6 @@ class PolicyMetaLint(BaseTest):
             'AWS::Detective::Graph',
             'AWS::DMS::Certificate',
             'AWS::EC2::EgressOnlyInternetGateway',
-            'AWS::EC2::FlowLog',
             'AWS::EC2::LaunchTemplate',
             'AWS::EC2::RegisteredHAInstance',
             'AWS::EC2::TransitGatewayAttachment',
@@ -560,7 +594,7 @@ class PolicyMetaLint(BaseTest):
             'AWS::WAFv2::ManagedRuleSet',
             'AWS::WAFv2::RegexPatternSet',
             'AWS::WAFv2::RuleGroup',
-            'AWS::WAFv2::WebACL',
+            # 'AWS::WAFv2::WebACL',
             'AWS::XRay::EncryptionConfig',
             'AWS::ElasticLoadBalancingV2::Listener',
             'AWS::AccessAnalyzer::Analyzer',
@@ -581,7 +615,6 @@ class PolicyMetaLint(BaseTest):
             'AWS::Detective::Graph',
             'AWS::EC2::TransitGatewayRouteTable',
             'AWS::AppSync::GraphQLApi',
-            'AWS::DataSync::Task',
             'AWS::Glue::Job',
             'AWS::SageMaker::NotebookInstanceLifecycleConfig',
             'AWS::SES::ContactList',
@@ -613,6 +646,11 @@ class PolicyMetaLint(BaseTest):
         model = session.get_service_model('config')
         shape = model.shape_for('ResourceType')
 
+        present = resource_config_types.intersection(whitelist)
+        if present:
+            raise AssertionError(
+                "Supported config types \n %s" % ('\n'.join(sorted(present))))
+
         config_types = set(shape.enum).difference(whitelist)
         missing = config_types.difference(resource_config_types)
         if missing:
@@ -624,7 +662,7 @@ class PolicyMetaLint(BaseTest):
             'AWS::ECS::Service',
             'AWS::ECS::TaskDefinition',
             'AWS::NetworkFirewall::Firewall',
-            'AWS::WAFv2::WebACL'
+            'AWS::DMS::ReplicationTask',
         }
         bad_types = resource_config_types.difference(config_types)
         bad_types = bad_types.difference(invalid_ignore)
@@ -671,6 +709,8 @@ class PolicyMetaLint(BaseTest):
             'rest-api',
             'rest-stage',
             'apigw-domain-name',
+            # our check doesn't handle nested resource types in the arn
+            'guardduty-finding',
             # synthetics ~ ie. c7n introduced since non exist.
             # or in some cases where it exists but not usable in iam.
             'scaling-policy',
@@ -770,6 +810,8 @@ class PolicyMetaLint(BaseTest):
             'rest-stage', 'rest-resource', 'rest-vpclink', 'rest-client-certificate'}
         explicit = []
         whitelist_explicit = {
+            'securityhub-finding', 'ssm-patch-group',
+            'appdiscovery-agent', 'athena-named-query',
             'rest-account', 'shield-protection', 'shield-attack',
             'dlm-policy', 'efs', 'efs-mount-target', 'gamelift-build',
             'glue-connection', 'glue-dev-endpoint', 'cloudhsm-cluster',

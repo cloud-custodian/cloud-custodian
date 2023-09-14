@@ -996,7 +996,7 @@ class Resize(Action):
                             # unless we were given a new value for min_size then
                             # ensure it is at least as low as current_size
                             update['MinSize'] = min(current_size, a['MinSize'])
-                    elif type(self.data['desired-size']) == int:
+                    elif isinstance(self.data['desired-size'], int):
                         update['DesiredCapacity'] = self.data['desired-size']
 
             if update:
@@ -1403,7 +1403,7 @@ class RenameTag(Action):
              'PropagateAtLaunch': propagate,
              'Key': destination_tag,
              'Value': source['Value']}])
-        if propagate:
+        if propagate and asg['Instances']:
             self.propagate_instance_tag(source, destination_tag, asg)
 
     def propagate_instance_tag(self, source, destination_tag, asg):

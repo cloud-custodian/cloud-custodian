@@ -1,0 +1,317 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47?api-version=2019-11-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "date": [
+                        "Thu, 27 Jul 2023 17:27:47 GMT"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-length": [
+                        "440"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47",
+                        "authorizationSource": "RoleBased",
+                        "managedByTenants": [],
+                        "tags": {
+                            "test-owner": "kirill@stacklet.io"
+                        },
+                        "subscriptionId": "ea42f556-5106-4743-99b0-c129bfa71a47",
+                        "tenantId": "00000000-0000-0000-0000-000000000003",
+                        "displayName": "Root Subscription",
+                        "state": "Enabled",
+                        "subscriptionPolicies": {
+                            "locationPlacementId": "Public_2014-09-01",
+                            "quotaId": "PayAsYouGo_2014-09-01",
+                            "spendingLimit": "Off"
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Advisor/recommendations?api-version=2020-01-01&$filter=Category%20eq%20%27Cost%27",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "date": [
+                        "Thu, 27 Jul 2023 17:27:48 GMT"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-resource-requests": [
+                        "599"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-length": [
+                        "13297"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "properties": {
+                                    "category": "Cost",
+                                    "impact": "High",
+                                    "impactedField": "Microsoft.Subscriptions/subscriptions",
+                                    "impactedValue": "ea42f556-5106-4743-99b0-c129bfa71a47",
+                                    "lastUpdated": "2023-07-27T07:49:17.918645Z",
+                                    "recommendationTypeId": "84b1a508-fc21-49da-979e-96894f1665df",
+                                    "shortDescription": {
+                                        "problem": "Consider virtual machine reserved instance to save over your on-demand costs",
+                                        "solution": "Consider virtual machine reserved instance to save over your on-demand costs"
+                                    },
+                                    "extendedProperties": {
+                                        "reservedResourceType": "virtualmachines",
+                                        "subId": "ea42f556-5106-4743-99b0-c129bfa71a47",
+                                        "scope": "Single",
+                                        "sku": "Standard_B4ms",
+                                        "term": "P1Y",
+                                        "annualSavingsAmount": "575",
+                                        "savingsAmount": "47",
+                                        "qty": "1.0",
+                                        "savingsCurrency": "USD",
+                                        "region": "eastus",
+                                        "lookbackPeriod": "60",
+                                        "displayQty": "1.0",
+                                        "targetResourceCount": "1",
+                                        "location": "eastus",
+                                        "vmSize": "Standard_B4ms",
+                                        "displaySKU": "Standard_B4ms"
+                                    },
+                                    "resourceMetadata": {
+                                        "resourceId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47"
+                                    }
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Advisor/recommendations/eeec32af-7264-a29d-7600-6cf70f6d3246",
+                                "type": "Microsoft.Advisor/recommendations",
+                                "name": "eeec32af-7264-a29d-7600-6cf70f6d3246"
+                            },
+                            {
+                                "properties": {
+                                    "category": "Cost",
+                                    "impact": "High",
+                                    "impactedField": "Microsoft.Subscriptions/subscriptions",
+                                    "impactedValue": "ea42f556-5106-4743-99b0-c129bfa71a47",
+                                    "lastUpdated": "2023-07-27T07:49:17.918645Z",
+                                    "recommendationTypeId": "84b1a508-fc21-49da-979e-96894f1665df",
+                                    "shortDescription": {
+                                        "problem": "Consider virtual machine reserved instance to save over your on-demand costs",
+                                        "solution": "Consider virtual machine reserved instance to save over your on-demand costs"
+                                    },
+                                    "extendedProperties": {
+                                        "reservedResourceType": "virtualmachines",
+                                        "subId": "ea42f556-5106-4743-99b0-c129bfa71a47",
+                                        "scope": "Single",
+                                        "sku": "Standard_B4ms",
+                                        "term": "P3Y",
+                                        "annualSavingsAmount": "880",
+                                        "savingsAmount": "73",
+                                        "qty": "1.0",
+                                        "savingsCurrency": "USD",
+                                        "region": "eastus",
+                                        "lookbackPeriod": "60",
+                                        "displayQty": "1.0",
+                                        "targetResourceCount": "1",
+                                        "location": "eastus",
+                                        "vmSize": "Standard_B4ms",
+                                        "displaySKU": "Standard_B4ms"
+                                    },
+                                    "resourceMetadata": {
+                                        "resourceId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47"
+                                    }
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Advisor/recommendations/31c834e1-a988-b223-4e18-4103253b3276",
+                                "type": "Microsoft.Advisor/recommendations",
+                                "name": "31c834e1-a988-b223-4e18-4103253b3276"
+                            },
+                            {
+                                "properties": {
+                                    "category": "Cost",
+                                    "impact": "High",
+                                    "impactedField": "Microsoft.Subscriptions/subscriptions",
+                                    "impactedValue": "ea42f556-5106-4743-99b0-c129bfa71a47",
+                                    "lastUpdated": "2023-07-27T16:32:40.9282944Z",
+                                    "recommendationTypeId": "84b1a508-fc21-49da-979e-96894f1665df",
+                                    "shortDescription": {
+                                        "problem": "Consider virtual machine reserved instance to save over your on-demand costs",
+                                        "solution": "Consider virtual machine reserved instance to save over your on-demand costs"
+                                    },
+                                    "extendedProperties": {
+                                        "reservedResourceType": "virtualmachines",
+                                        "subId": "ea42f556-5106-4743-99b0-c129bfa71a47",
+                                        "scope": "Single",
+                                        "sku": "Standard_B4ms",
+                                        "term": "P1Y",
+                                        "annualSavingsAmount": "497",
+                                        "savingsAmount": "41",
+                                        "qty": "1.0",
+                                        "savingsCurrency": "USD",
+                                        "region": "eastus",
+                                        "lookbackPeriod": "7",
+                                        "displayQty": "1.0",
+                                        "targetResourceCount": "1",
+                                        "location": "eastus",
+                                        "vmSize": "Standard_B4ms",
+                                        "displaySKU": "Standard_B4ms"
+                                    },
+                                    "resourceMetadata": {
+                                        "resourceId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47"
+                                    }
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Advisor/recommendations/2dab5add-0413-e13a-983b-62ff71cc532d",
+                                "type": "Microsoft.Advisor/recommendations",
+                                "name": "2dab5add-0413-e13a-983b-62ff71cc532d"
+                            },
+                            {
+                                "properties": {
+                                    "category": "Cost",
+                                    "impact": "High",
+                                    "impactedField": "Microsoft.Subscriptions/subscriptions",
+                                    "impactedValue": "ea42f556-5106-4743-99b0-c129bfa71a47",
+                                    "lastUpdated": "2023-07-27T16:32:40.9282944Z",
+                                    "recommendationTypeId": "84b1a508-fc21-49da-979e-96894f1665df",
+                                    "shortDescription": {
+                                        "problem": "Consider virtual machine reserved instance to save over your on-demand costs",
+                                        "solution": "Consider virtual machine reserved instance to save over your on-demand costs"
+                                    },
+                                    "extendedProperties": {
+                                        "reservedResourceType": "virtualmachines",
+                                        "subId": "ea42f556-5106-4743-99b0-c129bfa71a47",
+                                        "scope": "Single",
+                                        "sku": "Standard_B4ms",
+                                        "term": "P3Y",
+                                        "annualSavingsAmount": "802",
+                                        "savingsAmount": "66",
+                                        "qty": "1.0",
+                                        "savingsCurrency": "USD",
+                                        "region": "eastus",
+                                        "lookbackPeriod": "7",
+                                        "displayQty": "1.0",
+                                        "targetResourceCount": "1",
+                                        "location": "eastus",
+                                        "vmSize": "Standard_B4ms",
+                                        "displaySKU": "Standard_B4ms"
+                                    },
+                                    "resourceMetadata": {
+                                        "resourceId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47"
+                                    }
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Advisor/recommendations/aeb03f8d-8666-75cc-f02f-73630e78022d",
+                                "type": "Microsoft.Advisor/recommendations",
+                                "name": "aeb03f8d-8666-75cc-f02f-73630e78022d"
+                            },
+                            {
+                                "properties": {
+                                    "category": "Cost",
+                                    "impact": "High",
+                                    "impactedField": "Microsoft.Subscriptions/subscriptions",
+                                    "impactedValue": "ea42f556-5106-4743-99b0-c129bfa71a47",
+                                    "lastUpdated": "2023-07-27T08:04:03.4837313Z",
+                                    "recommendationTypeId": "84b1a508-fc21-49da-979e-96894f1665df",
+                                    "shortDescription": {
+                                        "problem": "Consider virtual machine reserved instance to save over your on-demand costs",
+                                        "solution": "Consider virtual machine reserved instance to save over your on-demand costs"
+                                    },
+                                    "extendedProperties": {
+                                        "reservedResourceType": "virtualmachines",
+                                        "subId": "ea42f556-5106-4743-99b0-c129bfa71a47",
+                                        "scope": "Single",
+                                        "sku": "Standard_B4ms",
+                                        "term": "P1Y",
+                                        "annualSavingsAmount": "598",
+                                        "savingsAmount": "49",
+                                        "qty": "1.0",
+                                        "savingsCurrency": "USD",
+                                        "region": "eastus",
+                                        "lookbackPeriod": "30",
+                                        "displayQty": "1.0",
+                                        "targetResourceCount": "1",
+                                        "location": "eastus",
+                                        "vmSize": "Standard_B4ms",
+                                        "displaySKU": "Standard_B4ms"
+                                    },
+                                    "resourceMetadata": {
+                                        "resourceId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47"
+                                    }
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Advisor/recommendations/8be9daab-df3a-b750-08b9-68d68dc856da",
+                                "type": "Microsoft.Advisor/recommendations",
+                                "name": "8be9daab-df3a-b750-08b9-68d68dc856da"
+                            },
+                            {
+                                "properties": {
+                                    "category": "Cost",
+                                    "impact": "High",
+                                    "impactedField": "Microsoft.Subscriptions/subscriptions",
+                                    "impactedValue": "ea42f556-5106-4743-99b0-c129bfa71a47",
+                                    "lastUpdated": "2023-07-27T08:04:03.4837313Z",
+                                    "recommendationTypeId": "84b1a508-fc21-49da-979e-96894f1665df",
+                                    "shortDescription": {
+                                        "problem": "Consider virtual machine reserved instance to save over your on-demand costs",
+                                        "solution": "Consider virtual machine reserved instance to save over your on-demand costs"
+                                    },
+                                    "extendedProperties": {
+                                        "reservedResourceType": "virtualmachines",
+                                        "subId": "ea42f556-5106-4743-99b0-c129bfa71a47",
+                                        "scope": "Single",
+                                        "sku": "Standard_B4ms",
+                                        "term": "P3Y",
+                                        "annualSavingsAmount": "903",
+                                        "savingsAmount": "75",
+                                        "qty": "1.0",
+                                        "savingsCurrency": "USD",
+                                        "region": "eastus",
+                                        "lookbackPeriod": "30",
+                                        "displayQty": "1.0",
+                                        "targetResourceCount": "1",
+                                        "location": "eastus",
+                                        "vmSize": "Standard_B4ms",
+                                        "displaySKU": "Standard_B4ms"
+                                    },
+                                    "resourceMetadata": {
+                                        "resourceId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47"
+                                    }
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Advisor/recommendations/80aa1b25-20e4-f77c-c49a-bfed0ca36b15",
+                                "type": "Microsoft.Advisor/recommendations",
+                                "name": "80aa1b25-20e4-f77c-c49a-bfed0ca36b15"
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}

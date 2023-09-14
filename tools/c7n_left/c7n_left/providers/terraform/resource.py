@@ -33,6 +33,9 @@ class TerraformResource(dict):
     def src_dir(self):
         return self.location["src_dir"]
 
+    def get_references(self):
+        return self.location.get('refs', ())
+
     def get_source_lines(self):
         lines = (self.src_dir / self.filename).read_text().split("\n")
         return lines[self.line_start - 1 : self.line_end]  # noqa

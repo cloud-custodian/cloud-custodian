@@ -2,11 +2,12 @@
 # SPDX-License-Identifier: Apache-2.0
 import logging
 import unittest
+from unittest import mock
 import time
 
 import datetime
 from dateutil import tz
-from mock import mock
+
 
 from c7n.testing import mock_datetime_now
 from c7n.exceptions import PolicyValidationError, ClientError
@@ -291,6 +292,28 @@ class TestMetricFilter(BaseTest):
                         "name": "CPUUtilization",
                         "days": 3,
                         "value": 1.5,
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_metric_filter_multiple_datapoints(self):
+        session_factory = self.replay_flight_data("test_metric_filter_multiple_datapoints")
+        policy = self.load_policy(
+            {
+                "name": "ec2-utilization-per-day",
+                "resource": "ec2",
+                "filters": [
+                    {
+                        "type": "metrics",
+                        "name": "CPUUtilization",
+                        "days": 3,
+                        "period": 86400,
+                        "value": 1,
+                        "op": "lte"
                     }
                 ],
             },

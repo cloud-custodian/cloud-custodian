@@ -4,8 +4,8 @@ import logging
 import os
 import shutil
 from datetime import date
+from unittest import mock
 
-import mock
 from azure.common import AzureHttpError
 from .azure_common import BaseTest
 import re

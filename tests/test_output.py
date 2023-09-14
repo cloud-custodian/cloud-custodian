@@ -3,8 +3,8 @@
 import datetime
 import gzip
 import logging
-import mock
 import shutil
+from unittest import mock
 import os
 
 from dateutil.parser import parse as date_parse
