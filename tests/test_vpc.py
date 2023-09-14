@@ -9,6 +9,30 @@ from c7n.exceptions import PolicyValidationError
 from c7n.resources.aws import shape_validate
 from pytest_terraform import terraform
 
+import pytest
+
+
+@pytest.mark.audited
+@terraform('sg_used_cross_ref')
+def test_sg_used_cross_ref(test, sg_used_cross_ref):
+    aws_region = 'us-west-2'
+    factory = test.replay_flight_data('sg_used_cross_ref', region=aws_region)
+    p = test.load_policy({
+        'name': 'sg_used_cross_ref',
+        'resource': 'security-group',
+        'filters': ['used']
+    }, session_factory=factory)
+    unused = p.resource_manager.filters[0]
+    test.patch(
+        unused,
+        'get_scanners',
+        lambda: (("sg-perm-refs", unused.get_sg_refs),)
+    )
+    resources = p.run()
+    assert len(resources) == 1
+    assert resources[0]['GroupName'] == sg_used_cross_ref[
+        'aws_security_group.n2.name']
+
 
 @terraform('ec2_igw_subnet')
 def test_ec2_igw_subnet(test, ec2_igw_subnet):
@@ -1501,14 +1525,14 @@ class SecurityGroupTest(BaseTest):
             session_factory=factory,
         )
         resources = p.run()
-        self.assertEqual(len(resources), 5)
+        self.assertEqual(len(resources), 3)
         self.assertEqual(
-            {"sg-f9cc4d9f", "sg-13de8f75", "sg-ce548cb7", "sg-0a2cb503a229c31c1", "sg-1c8a186c"},
+            {"sg-f9cc4d9f", "sg-0a2cb503a229c31c1", "sg-1c8a186c"},
             {r["GroupId"] for r in resources},
         )
-        self.assertIn("amazon-aws", resources[2]["c7n:InstanceOwnerIds"])
-        self.assertIn("vpc_endpoint", resources[2]["c7n:InterfaceTypes"])
-        self.assertIn("ec2", resources[2]["c7n:InterfaceResourceTypes"])
+        self.assertIn("amazon-aws", resources[0]["c7n:InstanceOwnerIds"])
+        self.assertIn("vpc_endpoint", resources[0]["c7n:InterfaceTypes"])
+        self.assertIn("ec2", resources[0]["c7n:InterfaceResourceTypes"])
 
     def test_unused_ecs(self):
         factory = self.replay_flight_data("test_security_group_ecs_unused")
@@ -1555,7 +1579,7 @@ class SecurityGroupTest(BaseTest):
             session_factory=factory,
         )
         resources = p.run()
-        self.assertEqual(len(resources), 1)
+        self.assertEqual(len(resources), 2)
 
     def test_match_resource_validator(self):
 
@@ -3637,3 +3661,26 @@ class TrafficMirror(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["TrafficMirrorTargetId"], "tmt-02cc3955d41358894")
         self.assertEqual(resources[0]['Tags'], [{"Key": "Owner", "Value": "pratyush"}])
+
+
+@terraform("vpc_delete")
+def test_vpc_delete(test, vpc_delete):
+    factory = test.replay_flight_data("test_vpc_delete")
+    p = test.load_policy(
+        {
+            "name": "delete-vpc",
+            "resource": "vpc",
+            "filters": [{"tag:Name": "c7n-test"}],
+            "actions": [{"type": "delete-empty"}],
+        },
+        session_factory=factory,
+    )
+    resources = p.run()
+    test.assertEqual(len(resources), 1)
+    client = factory(region="us-east-1").client("ec2")
+    vpcs = client.describe_vpcs(
+        Filters=[{"Name": "resource-id", "Values": [resources[0]["VpcId"]]}]
+    )[
+        "Vpcs"
+    ]
+    test.assertFalse(vpcs)

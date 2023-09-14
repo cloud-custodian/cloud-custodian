@@ -36,6 +36,16 @@ FILTERED_HEADERS = [
     "connection",
     "expires",
     "content-location",
+    "access-control-allow-credentials",
+    "access-control-allow-methods",
+    "access-control-allow-origin",
+    "access-control-expose-headers",
+    "content-length",
+    "date",
+    "x-api-id",
+    "etag",
+    "pragma",
+    "x-content-type-options",
 ]
 
 

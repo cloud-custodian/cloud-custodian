@@ -109,6 +109,26 @@ class KmsKeyRingTest(BaseTest):
             ],
         )
 
+    def test_kms_keyring_filter_iam_query(self):
+        project_id = 'cloud-custodian'
+        factory = self.replay_flight_data('kms-keyring-filter-iam', project_id=project_id)
+        p = self.load_policy({
+            'name': 'kms-keyring-filter-iam',
+            'resource': 'gcp.kms-keyring',
+            'filters': [{
+                'type': 'iam-policy',
+                'doc': {'key': 'bindings[*].members[]',
+                        'op': 'intersect',
+                        'value': ['allUsers', 'allAuthenticatedUsers']}
+            }]
+        }, session_factory=factory)
+        resources = p.run()
+
+        self.assertEqual(1, len(resources))
+        self.assertEqual(
+            'projects/cloud-custodian/locations/us-central1/keyRings/custodian-test-keyring',
+            resources[0]['name'])
+
 
 class KmsCryptoKeyTest(BaseTest):
     def test_kms_cryptokey_query(self):

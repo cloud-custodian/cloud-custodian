@@ -50,7 +50,9 @@ class TestIamGen(BaseTest):
                 if s in perms:
                     found = True
             if not found:
-                missing.add("%s->%s" % (k, mgr.resource_type.service))
+                missing.add("%s->%s|%s" % (
+                    k, mgr.resource_type.service,
+                    mgr.resource_type.permission_prefix))
                 continue
             invalid.extend(self.check_permissions(perms, mgr.get_permissions(), k))
 
