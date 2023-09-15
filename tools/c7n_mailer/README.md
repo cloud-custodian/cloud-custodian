@@ -266,27 +266,34 @@ configuration you specify in a YAML file.  Here is [the
 schema](https://github.com/cloud-custodian/cloud-custodian/blob/18d4247e913d54f36a078ed61386695362a3b10d/tools/c7n_mailer/c7n_mailer/cli.py#L43) to which the file must conform,
 and here is a description of the options:
 
-| Required? | Key             | Type             | Notes                                                             |
-|:---------:|:----------------|:-----------------|:------------------------------------------------------------------|
-| &#x2705;  | `queue_url`     | string           | the queue to listen to for messages                               | 
-|           | `from_address`  | string           | default from address                                              |
-|           | `endpoint_url`  | string           | SQS API URL (for use with VPC Endpoints)                          |
-|           | `contact_tags`  | array of strings | tags that we should look at for address information               |
-|           | `email_base_url`| string           | Base URL to construct a valid email address from a resource owner |
+| Required? | Key                       | Type             | Notes                                                             |
+|:---------:|:--------------------------|:-----------------|:------------------------------------------------------------------|
+| &#x2705;  | `queue_url`               | string           | the queue to listen to for messages                               | 
+|           | `from_address`            | string           | default from address                                              |
+|           | `endpoint_url`            | string           | SQS API URL (for use with VPC Endpoints)                          |
+|           | `contact_tags`            | array of strings | tags that we should look at for address information               |
+|           | `email_base_url`          | string           | Base URL to construct a valid email address from a resource owner |
+|           | `additional_email_headers`| object           | Additional email headers. |
+|           | `org_domain`              | string           | Domain to add to AWS usernames to construct email addresses. |
+
 
 
 ### Standard Lambda Function Config
 
 | Required? | Key                  | Type             |
 |:---------:|:---------------------|:-----------------|
+| &#x2705;  | `role`               | string           |
 |           | `dead_letter_config` | object           |
 |           | `memory`             | integer          |
 |           | `region`             | string           |
-| &#x2705;  | `role`               | string           |
 |           | `runtime`            | string           |
 |           | `security_groups`    | array of strings |
 |           | `subnets`            | array of strings |
 |           | `timeout`            | integer          |
+|           | `lambda_name`        | string           |
+|           | `lambda_description` | string           |
+|           | `lambda_tags`        | object           |
+|           | `lambda_schedule`    | string           |
 
 ### Standard Azure Functions Config
 
