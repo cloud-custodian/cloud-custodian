@@ -4,6 +4,8 @@
 from gcp_common import BaseTest, event_data
 import time
 
+from pytest_terraform import terraform
+
 
 class SpannerInstanceTest(BaseTest):
 
@@ -419,3 +421,24 @@ class TestSpannerInstanceBackup(BaseTest):
         resources = p.run()
 
         self.assertEqual(1, len(resources))
+
+
+@terraform('spanner_backup')
+def test_spanner_backup_iam(test):
+    session_factory = test.replay_flight_data('spanner-backup-iam')
+    policy = test.load_policy({
+        'name': 'spanner-backup-iam',
+        'resource': 'gcp.spanner-backup',
+        'filters': [{
+            'type': 'iam-policy',
+            'doc': {
+                'key': 'bindings[*].role',
+                'op': 'intersect',
+                'value': ['roles/editor', 'roles/owner']
+            }
+        }]
+    }, session_factory=session_factory)
+
+    resources = policy.run()
+    assert len(resources) == 1
+    assert resources[0]['c7n:iamPolicy']['bindings'][0]['role'] == 'roles/editor'
