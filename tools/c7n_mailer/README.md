@@ -250,7 +250,7 @@ Custodian mailer.
 
 ## Usage & Configuration
 
-Once [installed](#Developer Install (OS X El Capitan)) you should have a
+Once [installed](#developer-install-os-x-el-capitan) you should have a
 `c7n-mailer` executable on your path:
 aws
 ```
@@ -472,7 +472,7 @@ policies:
 
 So breaking it down, you add an action of type `notify`. You can specify a
 template that's used to format the email; customizing templates is described
-[below](#Writing an email template).
+[below](#writing-an-email-template).
 
 The `to` list specifies the intended recipient for the email. You can specify
 either an email address, an SNS topic, a Datadog Metric, or a special value. The special values
