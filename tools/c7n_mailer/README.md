@@ -23,7 +23,7 @@ should be cross-account enabled for sending between accounts.
 Our goal in starting out with the Custodian mailer is to install the mailer,
 and run a policy that triggers an email to your inbox.
 
-1. [Install](#Developer Install (OS X El Capitan) the mailer on your laptop (if you are not running as a [Docker container](https://hub.docker.com/r/cloudcustodian/mailer)
+1. [Install](#developer-install-os-x-el-capitan) the mailer on your laptop (if you are not running as a [Docker container](https://hub.docker.com/r/cloudcustodian/mailer)
    - or use `pip install c7n-mailer`
 2. In your text editor, create a `mailer.yml` file to hold your mailer config.
 3. In the AWS console, create a new standard SQS queue (quick create is fine).
