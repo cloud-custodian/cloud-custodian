@@ -175,18 +175,18 @@ times, or alternatively with comma separated values.
 
 Groups of accounts can also be selected for execution by specifying
 the `-t` tag filter.  Account tags are specified in the config
-file. ie given the above accounts config file you can specify all prod
-accounts with `-t type:prod`. you can specify the -t flag multiple
+file. Given the above accounts config file, you can specify all prod
+accounts with `-t type:prod`. You can specify the `-t` flag multiple
 times or use a comma separated list.
 
 You can specify which policies to use for execution by either
 specifying `-p` or selecting groups of policies via their tags with
-`-l`, both options support being specified multiple times or using
+`-l`. Both options support being specified multiple times or using
 comma separated values.
 
-By default in aws, c7n-org will execute in parallel across regions,
-the '-r' flag can be specified multiple times, and defaults to
-(us-east-1, us-west-2).  a special value of `all` will execute across
+By default in AWS, c7n-org will execute in parallel across regions.
+The `-r` flag can be specified multiple times and defaults to
+`(us-east-1, us-west-2)`.  A special value of `all` will execute across
 all regions.
 
 
@@ -260,17 +260,17 @@ page](https://cloudcustodian.io/docs/azure/authentication.html).
 
 ## Additional OCI Instructions
 
-The script 'ocitenancies.py' accepts an optional argument '--add-child-tenancies'
-which adds all the child tenancies associated with the 'DEFAULT' profile's tenancy 
+The script `ocitenancies.py` accepts an optional argument `--add-child-tenancies`
+which adds all the child tenancies associated with the `DEFAULT` profile's tenancy 
 in the generated c7n-org configuration file. If the profile for child tenancy is not available in 
 the OCI configuration file, then either user can add the profile for the child tenancy to the
-OCI configuration file and replace <ADD_PROFILE> entry in the c7n-org configuration with the
+OCI configuration file and replace the `<ADD_PROFILE>` entry in the c7n-org configuration with the
 corresponding profile name or the user can delete the child tenancy entry from the
 c7n-org configuration file. For more info about config file, refer to this [page](https://docs.oracle.com/en-us/iaas/Content/API/Concepts/sdkconfig.htm).
 
-If user wants to query for the resources in the specific compartments in c7n-org, then user
-can pass the compartment OCID's to the 'oci_compartments' under 'vars' section like below. If the 
-'oci_comparments' is not passed under vars, then the resources will be fetched from the tenancy level.
+If the user wants to query for the resources in the specific compartments in c7n-org, then the user
+can pass the compartment OCID's to the `oci_compartments` under the `vars` section like below. If the 
+`oci_comparments` is not passed under `vars`, then the resources will be fetched from the tenancy level.
 
 ```yaml
 tenancies:
