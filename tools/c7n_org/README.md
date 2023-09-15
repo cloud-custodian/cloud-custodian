@@ -4,7 +4,7 @@
 % [comment]: # (This file is moved during document generation.)
 % [comment]: # (Only edit the original document at ./tools/c7n_org/README.md)
 
-c7n-org is a tool to run custodian against multiple AWS accounts,
+c7n-org is a tool to run Custodian against multiple AWS accounts,
 Azure subscriptions, GCP projects, or OCI tenancies in parallel.
 
 ## Installation
@@ -97,38 +97,40 @@ tenancies:
 
 ### Config File Generation
 
-We also distribute scripts to generate the necessary config file in the `scripts` folder.
+We also distribute scripts to generate the necessary config file in the [`scripts` folder](https://github.com/cloud-custodian/cloud-custodian/tree/main/tools/c7n_org/scripts).
 
-**Note:** Currently these are distributed only via git, per
-<https://github.com/cloud-custodian/cloud-custodian/issues/2420> we'll
+**Note:** Currently these are distributed only via git. Per
+<https://github.com/cloud-custodian/cloud-custodian/issues/2420>, we'll
 be looking to incorporate them into a new c7n-org subcommand.
 
 - For **AWS**, the script `orgaccounts.py` generates a config file
   from the AWS Organizations API.
+
+```shell
+python orgaccounts.py -f accounts.yml
+```
 
 - For **Azure**, the script `azuresubs.py` generates a config file
   from the Azure Resource Management API.
 
     - Please see the [Additional Azure Instructions](#additional-azure-instructions) for initial setup and other important info.
 
+```shell
+python azuresubs.py -f subscriptions.yml
+```
+
 - For **GCP**, the script `gcpprojects.py` generates a config file from
   the GCP Resource Management API.
+
+```shell
+python gcpprojects.py -f projects.yml
+```
 
 - For **OCI**, the script `ocitenancies.py` generates a config file
   using OCI Configuration file and OCI Organizations API.
   
     - Please refer to the [Additional OCI Instructions](#additional-oci-instructions) for additional information.
 
-
-```shell
-python orgaccounts.py -f accounts.yml
-```
-```shell
-python azuresubs.py -f subscriptions.yml
-```
-```shell
-python gcpprojects.py -f projects.yml
-```
 ```shell
 python ocitenancies.py -f tenancies.yml
 ```
@@ -143,6 +145,7 @@ To run a policy, the following arguments must be passed in:
 -u | policy
 ```
 
+For example:
 
 ```shell
 c7n-org run -c accounts.yml -s output -u test.yml --dryrun
@@ -230,7 +233,7 @@ c7n-org run-script -s . -c my-projects.yml gcp_check_{region}.sh
 c7n-org run-script -s . -c my-projects.yml use_another_policy_result.sh {output_dir}
 ```
 
-**Note** Variable interpolation is sensitive to proper quoting and spacing,
+**Note:** Variable interpolation is sensitive to proper quoting and spacing,
 i.e., `{ charge_code }` would be invalid due to the extra white space. Additionally,
 yaml parsing can transform a value like `{charge_code}` to null, unless it's quoted
 in strings like the above example. Values that do interpolation into other content
