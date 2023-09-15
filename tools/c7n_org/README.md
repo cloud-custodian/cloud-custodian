@@ -99,26 +99,25 @@ tenancies:
 
 We also distribute scripts to generate the necessary config file in the `scripts` folder.
 
-**Note** Currently these are distributed only via git, per
-https://github.com/cloud-custodian/cloud-custodian/issues/2420 we'll
+**Note:** Currently these are distributed only via git, per
+<https://github.com/cloud-custodian/cloud-custodian/issues/2420> we'll
 be looking to incorporate them into a new c7n-org subcommand.
 
 - For **AWS**, the script `orgaccounts.py` generates a config file
-  from the AWS Organizations API
+  from the AWS Organizations API.
 
 - For **Azure**, the script `azuresubs.py` generates a config file
-  from the Azure Resource Management API
+  from the Azure Resource Management API.
 
-    - Please see the [Additional Azure Instructions](#Additional Azure Instructions)
-    - for initial setup and other important info
+    - Please see the [Additional Azure Instructions](#additional-azure-instructions) for initial setup and other important info.
 
 - For **GCP**, the script `gcpprojects.py` generates a config file from
-  the GCP Resource Management API
+  the GCP Resource Management API.
 
 - For **OCI**, the script `ocitenancies.py` generates a config file
-  using OCI Configuration file and OCI Organizations API
+  using OCI Configuration file and OCI Organizations API.
   
-    - Please refer to the 'Additional OCI Instructions' for additional information
+    - Please refer to the [Additional OCI Instructions](#additional-oci-instructions) for additional information.
 
 
 ```shell
