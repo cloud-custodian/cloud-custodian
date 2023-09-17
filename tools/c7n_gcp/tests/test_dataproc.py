@@ -10,7 +10,7 @@ class DataprocTest(BaseTest):
         project_id = 'cloud-custodian'
         factory = self.replay_flight_data(
             'dataproc-clusters-filter-iam',
-            project_id=project_id,            
+            project_id=project_id,
         )
 
         p = self.load_policy({
