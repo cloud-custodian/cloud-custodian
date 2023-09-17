@@ -41,7 +41,7 @@ class DescribeSource:
     def get_resources(self, query):
         resources = None
         compartment_ids = self._get_list_of_compartment_ids()
-        log.info(
+        log.debug(
             f"List of compartment IDs fetched using the environment variable ${COMPARTMENT_IDS}:"
             f" {compartment_ids}"
         )
@@ -54,9 +54,25 @@ class DescribeSource:
     def _get_resources_for_list_of_compartment_ids(self, compartment_ids, list_func_ref):
         resources = []
         for compartment_id in compartment_ids:
-            results = self._get_resources_with_compartment_and_params(compartment_id, list_func_ref)
-            for result in results:
-                resources.append(oci.util.to_dict(result))
+            cache_key = self.get_cache_key_for_compartment(compartment_id)
+            cached_resources = self.manager._cache.get(cache_key)
+            if cached_resources:
+                self.manager.log.debug(
+                    "Using cached oci.%s: %d",
+                    self.manager.type,
+                    len(cached_resources),
+                )
+                resources.extend(cached_resources)
+            else:
+                results = self._get_resources_with_compartment_and_params(
+                    compartment_id, list_func_ref
+                )
+                cache_results = []
+                for result in results:
+                    resource = oci.util.to_dict(result)
+                    resources.append(resource)
+                    cache_results.append(resource)
+                self.manager._cache.save(cache_key, cache_results)
         return resources
 
     @staticmethod
@@ -92,6 +108,15 @@ class DescribeSource:
     def augment(self, resources):
         return resources
 
+    def get_cache_key_for_compartment(self, compartment_id):
+        return {
+            'tenancy': self.manager.session_factory.config.get('tenancy'),
+            'region': self.manager.session_factory.config.get('region'),
+            'resource': self.manager.resource_type.resource_type,
+            'compartment_id': compartment_id,
+            'q': self.manager.data.get('query'),
+        }
+
 
 @sources.register("describe-search")
 class DescribeSearch(DescribeSource):
@@ -103,7 +128,19 @@ class DescribeSearch(DescribeSource):
         params = {"search_details": self._get_search_details_model()}
         client_name = "oci.resource_search.ResourceSearchClient"
         operation = "search_resources"
-        resources = self.query.filter(self.manager, client_name, operation, params)
+        resources = []
+        cache_key = self.get_cache_key_for_search()
+        cached_resources = self.manager._cache.get(cache_key)
+        if cached_resources:
+            self.manager.log.debug(
+                "Using cached oci.%s: %d",
+                self.manager.type,
+                len(cached_resources),
+            )
+            resources.extend(cached_resources)
+        else:
+            resources = self.query.filter(self.manager, client_name, operation, params)
+            self.manager._cache.save(cache_key, resources)
         compartment_ids = set()
         for resource in resources:
             compartment_ids.add(resource.compartment_id)
@@ -127,6 +164,14 @@ class DescribeSearch(DescribeSource):
 
     def augment(self, resources):
         return resources
+
+    def get_cache_key_for_search(self):
+        return {
+            'tenancy': self.manager.session_factory.config.get('tenancy'),
+            'region': self.manager.session_factory.config.get('region'),
+            'resource': self.manager.resource_type.resource_type,
+            'q': self.manager.data.get('query'),
+        }
 
 
 class QueryMeta(type):
@@ -190,6 +235,7 @@ class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
     def resources(self, query=None):
         q = query or self.get_resource_query()
         resources = {}
+        self._cache.load()
         with self.ctx.tracer.subsegment("resource-fetch"):
             resources = self._fetch_resources(q)
         resource_count = len(resources)

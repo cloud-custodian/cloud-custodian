@@ -3,6 +3,37 @@
     "data": {
         "SecurityGroups": [
             {
+                "Description": "sincere-amoeba",
+                "GroupName": "sincere-amoeba",
+                "IpPermissions": [],
+                "OwnerId": "644160558196",
+                "GroupId": "sg-01ba3c57af54ef22c",
+                "IpPermissionsEgress": [],
+                "VpcId": "vpc-03a8ce8bb254b625b"
+            },
+            {
+                "Description": "oriented-sole",
+                "GroupName": "oriented-sole",
+                "IpPermissions": [],
+                "OwnerId": "644160558196",
+                "GroupId": "sg-073c8f4fb3b58731d",
+                "IpPermissionsEgress": [
+                    {
+                        "IpProtocol": "-1",
+                        "IpRanges": [],
+                        "Ipv6Ranges": [],
+                        "PrefixListIds": [],
+                        "UserIdGroupPairs": [
+                            {
+                                "GroupId": "sg-01ba3c57af54ef22c",
+                                "UserId": "644160558196"
+                            }
+                        ]
+                    }
+                ],
+                "VpcId": "vpc-03a8ce8bb254b625b"
+            },
+            {
                 "Description": "default VPC security group",
                 "GroupName": "default",
                 "IpPermissions": [
@@ -47,14 +78,14 @@
                         "PrefixListIds": [],
                         "UserIdGroupPairs": [
                             {
-                                "GroupId": "sg-0c947f3b4bda97fd3",
+                                "GroupId": "sg-0d1564b340cac910f",
                                 "UserId": "644160558196"
                             }
                         ]
                     }
                 ],
                 "OwnerId": "644160558196",
-                "GroupId": "sg-0c947f3b4bda97fd3",
+                "GroupId": "sg-0d1564b340cac910f",
                 "IpPermissionsEgress": [
                     {
                         "IpProtocol": "-1",
@@ -68,38 +99,7 @@
                         "UserIdGroupPairs": []
                     }
                 ],
-                "VpcId": "vpc-0763c6964bb24f0ea"
-            },
-            {
-                "Description": "moved-sawfly",
-                "GroupName": "moved-sawfly",
-                "IpPermissions": [],
-                "OwnerId": "644160558196",
-                "GroupId": "sg-0826c578f515cc65e",
-                "IpPermissionsEgress": [],
-                "VpcId": "vpc-0763c6964bb24f0ea"
-            },
-            {
-                "Description": "engaged-airedale",
-                "GroupName": "engaged-airedale",
-                "IpPermissions": [],
-                "OwnerId": "644160558196",
-                "GroupId": "sg-0c2f2b3dd6a9935aa",
-                "IpPermissionsEgress": [
-                    {
-                        "IpProtocol": "-1",
-                        "IpRanges": [],
-                        "Ipv6Ranges": [],
-                        "PrefixListIds": [],
-                        "UserIdGroupPairs": [
-                            {
-                                "GroupId": "sg-0826c578f515cc65e",
-                                "UserId": "644160558196"
-                            }
-                        ]
-                    }
-                ],
-                "VpcId": "vpc-0763c6964bb24f0ea"
+                "VpcId": "vpc-03a8ce8bb254b625b"
             }
         ],
         "ResponseMetadata": {}

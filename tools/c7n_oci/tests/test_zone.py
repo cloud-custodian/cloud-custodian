@@ -1,7 +1,6 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
-import inspect
 
 import oci
 from pytest_terraform import terraform
@@ -25,9 +24,7 @@ class TestZone(OciBaseTest):
         test adding defined_tags tag to zone
         """
         zone_ocid = self._get_zone_details(zone)
-        session_factory = test.oci_session_factory(
-            self.__class__.__name__, inspect.currentframe().f_code.co_name
-        )
+        session_factory = test.oci_session_factory()
 
         policy = test.load_policy(
             {
@@ -52,9 +49,7 @@ class TestZone(OciBaseTest):
         test adding defined_tags tag to zone
         """
         zone_ocid = self._get_zone_details(zone)
-        session_factory = test.oci_session_factory(
-            self.__class__.__name__, inspect.currentframe().f_code.co_name
-        )
+        session_factory = test.oci_session_factory()
 
         policy = test.load_policy(
             {
@@ -79,9 +74,7 @@ class TestZone(OciBaseTest):
         test update defined_tags tag on zone
         """
         zone_ocid = self._get_zone_details(zone)
-        session_factory = test.oci_session_factory(
-            self.__class__.__name__, inspect.currentframe().f_code.co_name
-        )
+        session_factory = test.oci_session_factory()
 
         policy = test.load_policy(
             {
@@ -111,9 +104,7 @@ class TestZone(OciBaseTest):
         test adding freeform tag to zone
         """
         zone_ocid = self._get_zone_details(zone)
-        session_factory = test.oci_session_factory(
-            self.__class__.__name__, inspect.currentframe().f_code.co_name
-        )
+        session_factory = test.oci_session_factory()
 
         policy = test.load_policy(
             {
@@ -143,9 +134,7 @@ class TestZone(OciBaseTest):
         test update freeform tag of zone
         """
         zone_ocid = self._get_zone_details(zone)
-        session_factory = test.oci_session_factory(
-            self.__class__.__name__, inspect.currentframe().f_code.co_name
-        )
+        session_factory = test.oci_session_factory()
 
         policy = test.load_policy(
             {
@@ -170,9 +159,7 @@ class TestZone(OciBaseTest):
         test get freeform tagged zone
         """
         zone_ocid = self._get_zone_details(zone)
-        session_factory = test.oci_session_factory(
-            self.__class__.__name__, inspect.currentframe().f_code.co_name
-        )
+        session_factory = test.oci_session_factory()
 
         policy = test.load_policy(
             {
@@ -196,9 +183,7 @@ class TestZone(OciBaseTest):
         test remove freeform tag
         """
         zone_ocid = self._get_zone_details(zone)
-        session_factory = test.oci_session_factory(
-            self.__class__.__name__, inspect.currentframe().f_code.co_name
-        )
+        session_factory = test.oci_session_factory()
         policy = test.load_policy(
             {
                 "name": "zone-remove-tag",
@@ -223,9 +208,7 @@ class TestZone(OciBaseTest):
         test remove defined tag
         """
         zone_ocid = self._get_zone_details(zone)
-        session_factory = test.oci_session_factory(
-            self.__class__.__name__, inspect.currentframe().f_code.co_name
-        )
+        session_factory = test.oci_session_factory()
         policy = test.load_policy(
             {
                 "name": "zone-remove-tag",

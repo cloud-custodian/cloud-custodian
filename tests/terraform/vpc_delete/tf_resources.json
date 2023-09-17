@@ -1,0 +1,37 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "aws_vpc": {
+            "main": {
+                "arn": "arn:aws:ec2:us-east-1:644160558196:vpc/vpc-06c5c2dac8670d8af",
+                "assign_generated_ipv6_cidr_block": false,
+                "cidr_block": "10.0.0.0/16",
+                "default_network_acl_id": "acl-08f986b16a1541010",
+                "default_route_table_id": "rtb-0dd39d80a06700d93",
+                "default_security_group_id": "sg-0d067db896d7738e7",
+                "dhcp_options_id": "dopt-05a00c7f",
+                "enable_dns_hostnames": false,
+                "enable_dns_support": true,
+                "enable_network_address_usage_metrics": false,
+                "id": "vpc-06c5c2dac8670d8af",
+                "instance_tenancy": "default",
+                "ipv4_ipam_pool_id": null,
+                "ipv4_netmask_length": null,
+                "ipv6_association_id": "",
+                "ipv6_cidr_block": "",
+                "ipv6_cidr_block_network_border_group": "",
+                "ipv6_ipam_pool_id": "",
+                "ipv6_netmask_length": 0,
+                "main_route_table_id": "rtb-0dd39d80a06700d93",
+                "owner_id": "644160558196",
+                "tags": {
+                    "Name": "c7n-test"
+                },
+                "tags_all": {
+                    "Name": "c7n-test"
+                }
+            }
+        }
+    }
+}

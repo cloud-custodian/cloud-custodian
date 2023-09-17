@@ -565,8 +565,7 @@ class Delete(BaseAction):
     def process(self, dbs):
         skip = self.data.get('skip-snapshot', False)
         # Can't delete an instance in an aurora cluster, use a policy on the cluster
-        dbs = self.filter_resources(dbs, "DBClusterIdentifier", [None])
-
+        dbs = [r for r in dbs if not r.get('DBClusterIdentifier')]
         # Concurrency feels like overkill here.
         client = local_session(self.manager.session_factory).client('rds')
         for db in dbs:
@@ -1906,6 +1905,18 @@ class ModifyDb(BaseAction):
 
 @resources.register('rds-reserved')
 class ReservedRDS(QueryResourceManager):
+    """Lists all active rds reservations
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: existing-rds-reservations
+                resource: rds-reserved
+                filters:
+                    - State: active
+    """
 
     class resource_type(TypeInfo):
         service = 'rds'

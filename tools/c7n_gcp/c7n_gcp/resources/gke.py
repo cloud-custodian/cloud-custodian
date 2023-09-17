@@ -8,7 +8,6 @@ from c7n_gcp.query import (QueryResourceManager, TypeInfo, ChildTypeInfo,
 from c7n.utils import type_schema, local_session
 from c7n_gcp.actions import MethodAction
 
-
 @resources.register('gke-cluster')
 class KubernetesCluster(QueryResourceManager):
     """GCP resource:
@@ -46,8 +45,10 @@ class KubernetesCluster(QueryResourceManager):
 
         @staticmethod
         def get_label_params(resource, all_labels):
-            path_param_re = re.compile(
-                '.*?/projects/(.*?)/locations/(.*?)/clusters/(.*)')
+            location_str = "locations"
+            if resource['selfLink'].find(location_str) < 0:
+                location_str = "zones"
+            path_param_re = re.compile('.*?/projects/(.*?)/'+location_str+'/(.*?)/clusters/(.*)')
             project, zone, cluster_name = path_param_re.match(
                 resource['selfLink']).groups()
             return {'name': 'projects/'+project+'/locations/'+zone+'/clusters/'+cluster_name,
