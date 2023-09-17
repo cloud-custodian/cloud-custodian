@@ -68,7 +68,7 @@ def profile_handel(
     parser.read(cred_path, encoding='utf-8')
     if profile not in parser.sections():
         raise TencentCloudSDKException(f'not find the profile`s section by {profile}')
-    
+
     profile_obj = parser[profile]
     role_arn = profile_obj.get('role_arn', None)
     session_name = profile_obj.get('session_name', 'custodian-job')
@@ -78,10 +78,12 @@ def profile_handel(
     if source_profile == 'default':
         source_profile = parser[source_profile]
         secret_id, secret_key = source_profile.get('secret_id'), source_profile.get('secret_key')
-        return STSAssumeRoleCredential(secret_id, secret_key, role_arn, session_name, duration_seconds)
+        return STSAssumeRoleCredential(
+            secret_id, secret_key, role_arn, session_name, duration_seconds)
     elif source_profile == 'cvm_metadata':
         cred = CVMRoleCredential()
-        common_client = CommonClient(credential=cred, region="ap-guangzhou", version='2018-08-13', service="sts")
+        common_client = CommonClient(
+            credential=cred, region="ap-guangzhou", version='2018-08-13', service="sts")
         params = {
             "RoleArn": role_arn,
             "RoleSessionName": session_name,
@@ -222,14 +224,13 @@ class Session:
                 token=os.environ['TENCENTCLOUD_TOKEN']
             )
             cred_provider.cred = cred
-        
+
         # add profile suport
         if self.profile is not None:
             cred_provider = profile_handel(profile=profile)
-            
 
         self._cred = cred_provider.get_credentials()
-    
+
     def __call__(self):
         return self
 
