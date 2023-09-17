@@ -54,6 +54,11 @@ To install Cloud Custodian for GCP, you will also need to run::
 
   pip install c7n_gcp   # Install GCP Package
 
+
+To install Cloud Custodian for Oracle Cloud Infrastructure (OCI), you will also need to run::
+
+    pip install c7n_oci # Install OCI Package
+
 Windows (CMD/PowerShell)
 +++++++++++++++++++++++++++
 

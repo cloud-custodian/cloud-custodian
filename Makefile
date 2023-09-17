@@ -95,6 +95,8 @@ pkg-rebase:
 	for pkg in $(PKG_SET); do cd $$pkg && echo $$pkg && git add poetry.lock && cd ../..; done
 
 pkg-clean:
+	rm -f release.md
+	rm -f wheels-manifest.txt
 	rm -f dist/*
 	for pkg in $(PKG_SET); do cd $$pkg && rm -f dist/* && cd ../..; done
 
@@ -133,7 +135,13 @@ pkg-publish-wheel:
 	twine upload -r $(PKG_REPO) dist/*
 	for pkg in $(PKG_SET); do cd $$pkg && twine upload -r $(PKG_REPO) dist/* && cd ../..; done
 
+release-get-artifacts:
+	@$(MAKE) -f $(SELF_MAKE) pkg-clean
+	python tools/dev/get_release_artifacts.py
+
 data-update:
+# terraform data sets
+	cd tools/c7n_left/scripts && terraform init && python get_taggable.py --output ../c7n_left/data/taggable.json
 # aws data sets
 	python tools/dev/cfntypedb.py -f tests/data/cfn-types.json
 	python tools/dev/updatearnref > tests/data/arn-types.json

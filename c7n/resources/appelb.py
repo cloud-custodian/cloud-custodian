@@ -13,7 +13,6 @@ from c7n.exceptions import PolicyValidationError
 from c7n.filters import (
     Filter,
     FilterRegistry,
-    DefaultVpcBase,
     MetricsFilter,
     ValueFilter,
     WafV2FilterBase,
@@ -1080,7 +1079,7 @@ class AppELBTargetGroupFilter(ValueFilter, AppELBTargetGroupFilterBase):
 
 
 @AppELB.filter_registry.register('default-vpc')
-class AppELBDefaultVpcFilter(DefaultVpcBase):
+class AppELBDefaultVpcFilter(net_filters.DefaultVpcBase):
     """Filter all ELB that exist within the default vpc
 
     :example:
@@ -1230,7 +1229,7 @@ class AppELBTargetGroupRemoveTagAction(tags.RemoveTag):
 
 
 @AppELBTargetGroup.filter_registry.register('default-vpc')
-class AppELBTargetGroupDefaultVpcFilter(DefaultVpcBase):
+class AppELBTargetGroupDefaultVpcFilter(net_filters.DefaultVpcBase):
     """Filter all application elb target groups within the default vpc
 
     :example:
@@ -1295,8 +1294,9 @@ class TargetGroupAttributeFilterBase:
         def _process_attributes(tg):
             if 'c7n:TargetGroupAttributes' not in tg:
                 tg['c7n:TargetGroupAttributes'] = {}
-                results = client.describe_target_group_attributes(
-                    TargetGroupArn=tg['TargetGroupArn'])
+                results = self.manager.retry(client.describe_target_group_attributes,
+                    TargetGroupArn=tg['TargetGroupArn'],
+                    ignore_err_codes=('TargetGroupNotFoundException',))
                 # flatten out the list of dicts and cast
                 for pair in results['Attributes']:
                     k = pair['Key']
