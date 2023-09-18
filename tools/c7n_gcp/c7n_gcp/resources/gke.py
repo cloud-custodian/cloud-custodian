@@ -8,6 +8,8 @@ from c7n_gcp.query import (QueryResourceManager, TypeInfo, ChildTypeInfo,
 from c7n.utils import type_schema, local_session
 from c7n_gcp.actions import MethodAction
 
+from c7n.filters import ValueFilter
+
 @resources.register('gke-cluster')
 class KubernetesCluster(QueryResourceManager):
     """GCP resource:
@@ -72,25 +74,62 @@ class KubernetesCluster(QueryResourceManager):
     def augment(self, resources):
         if not resources:
             return []
-        session = local_session(self.session_factory)
-        project = session.get_default_project()
-        location = resources[0]["location"]
-        server_config_client = session.client(
-            self.resource_type.service, self.resource_type.version, "projects.locations"
-        )
-        response = server_config_client.execute_command(
-            "getServerConfig",
-            verb_arguments={
-                "name": "projects/{}/locations/{}".format(project, location)
-            },
-        )
         for r in resources:
             if r.get('resourceLabels'):
                 r['labels'] = r['resourceLabels']
-            r["validMasterVersions"] = response["validMasterVersions"]
-            r["nodeConfig"]["validImageTypes"] = response["validImageTypes"]
         return resources
 
+
+@KubernetesCluster.filter_registry.register('server-config')
+class ClusterServerConfig(ValueFilter):
+    """Filters kubernetes nodepools by their server config.
+    See `getServerConfig
+    https://cloud.google.com/kubernetes-engine/docs/reference/rest/v1/projects.locations/getServerConfig
+    for valid fields.
+
+    :example:
+
+    Filter all instances that have a firewall rule that allows public
+    acess
+
+    .. code-block:: yaml
+
+        policies:
+           - name: find-unsupported-cluster-version
+             resource: gcp.gke-cluster
+             filters:
+             - type: server-config
+               key: contains(validNodeVersions,currentMasterVersion)
+               value: false
+    """
+
+    schema = type_schema('server-config', rinherit=ValueFilter.schema)
+    permissions = ('projects.locations.getServerConfig',)
+
+    def process_resource(self, client, project, resource):
+        location = resource['location']
+        response = client.execute_command(
+            'getServerConfig', verb_arguments={
+                    'name': 'projects/{}/locations/{}'.format(project, location)}
+        )
+        response['currentMasterVersion'] = resource['currentMasterVersion']
+
+        server_configs = []
+        server_configs.append(response)
+        return super(ClusterServerConfig, self).process(server_configs, None)
+
+    def get_client(self, session, model):
+        return session.client(
+            model.service, model.version, model.component)
+
+    def process(self, resources, event=None):
+        session = local_session(self.manager.session_factory)
+        project = session.get_default_project()
+        network_client = session.client(
+            "container", "v1", "projects.locations"
+        )
+        resource_list = [r for r in resources if self.process_resource(network_client, project, r)]
+        return resource_list
 
 @resources.register('gke-nodepool')
 class KubernetesClusterNodePool(ChildResourceManager):
@@ -152,24 +191,62 @@ class KubernetesClusterNodePool(ChildResourceManager):
         def _get_location(cls, resource):
             "Get the region from the parent - the cluster"
             return super()._get_location(cls.get_parent(resource))
+    
+
+@KubernetesClusterNodePool.filter_registry.register('server-config')
+class ServerConfig(ValueFilter):
+    """Filters kubernetes nodepools by their server config.
+    See `getServerConfig
+    https://cloud.google.com/kubernetes-engine/docs/reference/rest/v1/projects.locations/getServerConfig
+    for valid fields.
+
+    :example:
+
+    Filter all instances that have a firewall rule that allows public
+    acess
+
+    .. code-block:: yaml
+
+        policies:
+           - name: find-unsupported-cluster-nodepools-version
+             resource: gcp.gke-nodepool
+             filters:
+             - type: server-config
+               key: contains(validNodeVersions,version)
+               value: false
+    """
+
+    schema = type_schema('server-config', rinherit=ValueFilter.schema)
+    permissions = ('projects.locations.getServerConfig',)
+
     def _get_location(self, resource):
         return resource['selfLink'].split('/')[-5]
-    def augment(self, resources):
-        if not resources:
-            return []
-        session = local_session(self.session_factory)
-        project = session.get_default_project()
-        location = self._get_location(resources[0])
-        server_config_client = session.client(
-            self.resource_type.service, self.resource_type.version, 'projects.locations')
-        response = server_config_client.execute_command(
+
+    def process_resource(self, client, project, resource):
+        location = self._get_location(resource)
+        response = client.execute_command(
             'getServerConfig', verb_arguments={
                     'name': 'projects/{}/locations/{}'.format(project, location)}
         )
-        for r in resources:
-            r['validNodeVersions'] = response["validNodeVersions"]
-            r["config"]["validImageTypes"] = response["validImageTypes"]
-        return resources
+        response['version'] = resource['version']
+        response['imageType'] = resource["config"]['imageType']
+
+        server_configs = []
+        server_configs.append(response)
+        return super(ServerConfig, self).process(server_configs, None)
+
+    def get_client(self, session, model):
+        return session.client(
+            model.service, model.version, model.component)
+
+    def process(self, resources, event=None):
+        session = local_session(self.manager.session_factory)
+        project = session.get_default_project()
+        network_client = session.client(
+            "container", "v1", "projects.locations"
+        )
+        resource_list = [r for r in resources if self.process_resource(network_client, project, r)]
+        return resource_list
 
 
 @KubernetesCluster.action_registry.register('delete')
