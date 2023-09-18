@@ -1,0 +1,123 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47?api-version=2019-11-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "x-msedge-ref": [
+                        "Ref A: 939B05E9371E463ABD55B78046828047 Ref B: SJC211051204049 Ref C: 2023-09-15T18:37:11Z"
+                    ],
+                    "date": [
+                        "Fri, 15 Sep 2023 18:37:11 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-length": [
+                        "630"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47",
+                        "authorizationSource": "RoleBased",
+                        "managedByTenants": [
+                            {
+                                "tenantId": "00000000-0000-0000-0000-000000000003"
+                            }
+                        ],
+                        "tags": {
+                            "avm:subscription-object-name": "cbm-matter-npn/matter-compliance-dev-new",
+                            "avm:subscription-object-uid": "24338e43-e895-48aa-a450-ba219b0b49bf",
+                            "product_id": "13742"
+                        },
+                        "subscriptionId": "ea42f556-5106-4743-99b0-c129bfa71a47",
+                        "tenantId": "00000000-0000-0000-0000-000000000003",
+                        "displayName": "matter-compliance-dev-new",
+                        "state": "Enabled",
+                        "subscriptionPolicies": {
+                            "locationPlacementId": "Public_2014-09-01",
+                            "quotaId": "MSDNDevTest_2014-09-01",
+                            "spendingLimit": "Off"
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/providers/Microsoft.Subscription/policies/default?api-version=2021-10-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "mise-correlation-id": [
+                        "d1c3b195-056a-49b3-af95-a54de7e27375"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 715DAC0113C1422A93420C64ACB9568A Ref B: SJC211051204039 Ref C: 2023-09-15T18:37:12Z"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "x-gsm": [
+                        "1.0.0.0"
+                    ],
+                    "content-length": [
+                        "290"
+                    ],
+                    "request-id": [
+                        "e6c7b114-8aca-4d9c-bb05-e38facf540cf"
+                    ],
+                    "ms-cv": [
+                        "i0HuEY63kkKcP78XQKH4NA.0"
+                    ],
+                    "date": [
+                        "Fri, 15 Sep 2023 18:37:11 GMT"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "id": "providers/Microsoft.Subscription/policies/default",
+                        "name": "default",
+                        "type": "providers/Microsoft.Subscription/policies",
+                        "properties": {
+                            "policyId": "b0257c14-cacc-44c6-8927-5b4ce5de0874",
+                            "blockSubscriptionsLeavingTenant": true,
+                            "blockSubscriptionsIntoTenant": true,
+                            "exemptedPrincipals": []
+                        }
+                    }
+                }
+            }
+        }
+    ]
+}

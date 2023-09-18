@@ -78,6 +78,7 @@ ResourceMap = {
     "azure.storage": "c7n_azure.resources.storage.Storage",
     "azure.storage-container": "c7n_azure.resources.storage_container.StorageContainer",
     "azure.subscription": "c7n_azure.resources.subscription.Subscription",
+    "azure.subscription-policy": "c7n_azure.resources.subscription-policy.SubscriptionPolicy",
     "azure.traffic-manager-profile": "c7n_azure.resources.traffic_manager.TrafficManagerProfile",
     "azure.vm": "c7n_azure.resources.vm.VirtualMachine",
     "azure.vmss": "c7n_azure.resources.vmss.VMScaleSet",
