@@ -241,7 +241,7 @@ class CollectionRunner:
                     continue
                 result_set = self.run_policy(p, graph, resources, event, rtype)
                 if result_set:
-                    self.reporter.on_results(result_set)
+                    self.reporter.on_results(p, result_set)
                     found = True
         self.reporter.on_execution_ended()
         return found

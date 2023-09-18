@@ -45,7 +45,7 @@ class Output:
     def on_policy_start(self, policy, event):
         """called when a policy is about to be run"""
 
-    def on_results(self, results):
+    def on_results(self, policy, results):
         """called when a policy matches resources"""
 
 
@@ -68,7 +68,7 @@ class RichCli(Output):
             "Evaluation complete %0.2f seconds -> %s" % (time.time() - self.started, message)
         )
 
-    def on_results(self, results):
+    def on_results(self, policy, results):
         for r in results:
             self.console.print(RichResult(r))
         self.matches += len(results)
@@ -145,7 +145,7 @@ class Summary(Output):
         self.counter_policies_by_type = type_policies
         self.count_total_resources = resource_count
 
-    def on_results(self, results):
+    def on_results(self, policy, results):
         for r in results:
             self.count_policy_matches += 1
             self.resource_name_matches.add(r.resource.name)
@@ -202,8 +202,8 @@ class SummaryPolicy(Summary):
         super().on_execution_started(policies, graph)
         self.policies = sorted(map(PolicyMetadata, policies), key=severity_key)
 
-    def on_results(self, results):
-        super().on_results(results)
+    def on_results(self, policy, results):
+        super().on_results(policy, results)
         for r in results:
             self.counter_policy_matches[r.policy.name] += 1
 
@@ -244,8 +244,8 @@ class SummaryResource(Summary):
         super().on_execution_started(policies, graph)
         self.policies = {p.name: p for p in sorted(map(PolicyMetadata, policies), key=severity_key)}
 
-    def on_results(self, results):
-        super().on_results(results)
+    def on_results(self, policy, results):
+        super().on_results(policy, results)
         for r in results:
             self.resource_policy_matches.setdefault(r.resource.name, []).append(r)
 
@@ -308,15 +308,15 @@ class MultiOutput:
         for o in self.outputs:
             o.on_policy_start(policy, event)
 
-    def on_results(self, results):
+    def on_results(self, policy, results):
         for o in self.outputs:
-            o.on_results(results)
+            o.on_results(policy, results)
 
 
 class GithubFormat(Output):
     # https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#setting-an-error-message
 
-    def on_results(self, results):
+    def on_results(self, policy, results):
         for r in results:
             print(self.format_result(r), file=self.config.output_file)
 
@@ -360,7 +360,7 @@ class Json(Output):
         super().__init__(ctx, config)
         self.results = []
 
-    def on_results(self, results):
+    def on_results(self, policy, results):
         self.results.extend(results)
 
     def on_execution_ended(self):
@@ -428,24 +428,20 @@ class JunitReport(Output):
 
     def __init__(self, ctx, config):
         super().__init__(ctx, config)
-        self.results = []
+        self.policy_results = {}
         self.start_time = None
 
-    def on_results(self, results):
-        self.results.extend(results)
+    def on_results(self, policy, results):
+        self.policy_results[policy.name].extend(results)
 
     def on_execution_started(self, policies, graph):
         self.start_time = datetime.utcnow()
         self.policies = {p.name: p for p in sorted(map(PolicyMetadata, policies), key=severity_key)}
+        self.policy_resources = {pname: [] for pname in self.policies}
+        self.policy_results = {pname: [] for pname in self.policies}
 
-    def get_info(self):
-        return {
-            "id": "c7n-left",
-            "name": "Terraform Policy Compliance",
-            "time": "%0.2f" % (datetime.utcnow() - self.start_time).total_seconds(),
-            "tests": str(len(self.policies)),
-            "failures": str(len(self.results)),
-        }
+    def on_policy_start(self, policy, event):
+        self.policy_resources[policy.name] = list(event['resources'])
 
     def on_execution_ended(self):
         info = self.get_info()
@@ -454,45 +450,64 @@ class JunitReport(Output):
         builder.start("testsuites", info)
         builder.start("testsuite", info)
 
-        policy_results = {}
-        for r in self.results:
-            policy_results.setdefault(r.policy.name, []).append(r)
-
         for pname in self.policies:
-            self.format_test_case(builder, self.policies[pname], policy_results.get(pname))
-
-        [self.format_result(r, builder) for r in self.results]
+            p = self.policies[pname]
+            presources = self.policy_resources[pname]
+            matched = {m.resource.id for m in self.policy_results[pname]}
+            for r in presources:
+                if r.id in matched:
+                    continue
+                self.format_test_case(builder, p, r)
+            for m in self.policy_results[pname]:
+                self.format_result(builder, p, m)
         doc = builder.close()
         self.config.output_file.write(etree.tostring(doc).decode("utf8"))
 
-    def format_test_case(self, builder, policy_md, results):
-        builder.start(
-            "testcase",
-            {
-                "name": f"[{policy_md.severity}] {policy_md.name}",
-                "classname": "",
-            },
-        )
+    def get_info(self):
+        return {
+            "id": "c7n-left",
+            "name": "IaC Policy Compliance",
+            "time": "%0.2f" % (datetime.utcnow() - self.start_time).total_seconds(),
+            "tests": str(sum(map(len, self.policy_resources.values()))),
+            "failures": str(sum(map(len, self.policy_results.values()))),
+        }
 
-    def format_result(self, result, builder):
-        md = self.policies[result.policy.name]
-        resource = result.resource
+    def _start_case(self, builder, policy_md, resource):
         file_path = resource.src_dir / resource.filename
         builder.start(
             "testcase",
             {
-                "name": md.title,
-                "classname": "%s.%s" % (str(file_path), resource.id),
+                "name": f"[{policy_md.severity}] {policy_md.name}",
                 "file": str(file_path),
+                "classname": "%s.%s" % (str(file_path), resource.id),
             },
         )
-        text_data = []
+
+    def format_test_case(self, builder, policy_md, resource):
+        self._start_case(builder, policy_md, resource)
+        builder.end("testcase")
+
+    def format_result(self, builder, policy_md, result):
+        resource = result.resource
+        self._start_case(builder, policy_md, resource)
+        text_data = [
+            "",
+            "Resource: %s" % resource.id,
+            "File %s %d-%d" % (resource.filename, resource.line_start, resource.line_end),
+            "",
+        ]
+
         lines = resource.get_source_lines()
         line_idx = resource.line_start
         for l in lines:
-            text_data.append("%d | %s" % (line_idx, l))
+            text_data.append("    %d | %s" % (line_idx, l))
             line_idx += 1
+
+        builder.start(
+            "failure", {"type": "failure", "message": policy_md.description or policy_md.name}
+        )
         builder.data("\n".join(text_data))
+        builder.end("failure")
         builder.end("testcase")
 
 
@@ -515,7 +530,7 @@ class GitlabSAST(Output):
         self.results = []
         self.start_time = None
 
-    def on_results(self, results):
+    def on_results(self, policy, results):
         self.results.extend(results)
 
     def on_execution_started(self, *args):

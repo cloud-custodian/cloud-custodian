@@ -2,12 +2,12 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 import json
-from io import BytesIO
 import os
 import subprocess
 from pathlib import Path
 from unittest.mock import ANY
 from urllib.request import urlopen
+import xml.etree.ElementTree as etree
 
 import jsonschema
 import pytest
@@ -51,7 +51,7 @@ class ResultsReporter:
     def on_policy_start(self, policy, event):
         pass
 
-    def on_results(self, results):
+    def on_results(self, policy, results):
         self.results.extend(results)
 
 
@@ -886,15 +886,20 @@ def test_cli_no_policies(tmp_path, caplog):
     assert caplog.record_tuples == [("c7n.iac", 30, "no policies found")]
 
 
-@pytest.mark.skipif(
-    os.environ.get('GITHUB_ACTIONS') is None,
-    reason="runs in github actions as it requires network access for schema validation",
-)
 def test_cli_junit_output(policy_env, tmp_path, debug_cli_runner):
     policy_env.write_tf(
         """
 resource "aws_cloudwatch_log_group" "yada" {
   name = "Bar"
+}
+resource "aws_cloudwatch_log_group" "june" {
+  name = "June"
+}
+resource "aws_cloudwatch_log_group" "april" {
+  name = "April"
+  tags = {
+        Env = "Dev"
+  }
 }
         """
     )
@@ -923,15 +928,23 @@ resource "aws_cloudwatch_log_group" "yada" {
         ],
     )
 
-    assert "1 Failure" in result.output
-
-    from lxml import etree
+    assert "2 Failure" in result.output
 
     report_text = (tmp_path / "output.xml").read_text()
     report = etree.XML(report_text)
-    schema_text = urlopen(output.JunitReport.SCHEMA_FILE).read()
-    schema = etree.XMLSchema(etree.parse(BytesIO(schema_text)))
-    schema.assertValid(report)
+    assert report.attrib == {
+        'tests': '3',
+        'failures': '2',
+        'id': 'c7n-left',
+        'name': 'IaC Policy Compliance',
+        'time': '0.01',
+    }
+    cases = list(report.find('testsuite').findall('testcase'))
+    assert len(cases) == 3
+    assert cases[-1].find('failure').attrib == {
+        'type': 'failure',
+        'message': 'tags are required on log groups',
+    }
 
 
 @pytest.mark.skipif(
