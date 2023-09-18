@@ -60,6 +60,10 @@ class PolicyMetadata:
         return " ".join(self.categories)
 
     @property
+    def url(self):
+        return self.policy.data.get("metadata", {}).get("url")
+
+    @property
     def categories(self):
         categories = self.policy.data.get("metadata", {}).get("category", [])
         if isinstance(categories, str):
@@ -70,7 +74,7 @@ class PolicyMetadata:
 
     @property
     def severity(self):
-        value = self.policy.data.get("metadata", {}).get("severity", "")
+        value = self.policy.data.get("metadata", {}).get("severity", "unknown")
         if isinstance(value, str):
             return value.lower()
         return ""
@@ -237,7 +241,7 @@ class CollectionRunner:
                     continue
                 result_set = self.run_policy(p, graph, resources, event, rtype)
                 if result_set:
-                    self.reporter.on_results(result_set)
+                    self.reporter.on_results(p, result_set)
                     found = True
         self.reporter.on_execution_ended()
         return found
@@ -245,6 +249,7 @@ class CollectionRunner:
     def run_policy(self, policy, graph, resources, event, resource_type):
         event = dict(event)
         event.update({"graph": graph, "resources": resources, "resource_type": resource_type})
+        self.reporter.on_policy_start(policy, event)
         return policy.push(event)
 
     def get_provider(self):
