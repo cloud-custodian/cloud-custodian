@@ -593,16 +593,7 @@ class TaskSGFilter(net_filters.SecurityGroupFilter):
     eni_expression = "attachments[].details[?name == 'networkInterfaceId'].value[]"
     sg_expression = "Groups[].GroupId[]"
 
-    def get_related_ids(self, resources):
-        if self.ecs_group_cache:
-            group_ids = set()
-            cexp = jmespath_compile(self.eni_expression)
-            for r in resources:
-                ids = cexp.search(r)
-                for group_id in ids:
-                    group_ids.update(self.ecs_group_cache.get(group_id, ()))
-            return list(group_ids)
-
+    def _get_related_ids(self, resources):
         groups = dict()
         group_ids = set()
         eni_ids = set()
@@ -627,6 +618,18 @@ class TaskSGFilter(net_filters.SecurityGroupFilter):
                         group_ids.update(ids)
                         self.ecs_group_cache = groups
 
+        return groups
+
+    def get_related_ids(self, resources):
+        if not self.ecs_group_cache:
+            self.ecs_group_cache = self._get_related_ids(resources)
+
+        group_ids = set()
+        cexp = jmespath_compile(self.eni_expression)
+        for r in resources:
+            ids = cexp.search(r)
+            for group_id in ids:
+                group_ids.update(self.ecs_group_cache.get(group_id, ()))
         return list(group_ids)
 
 
