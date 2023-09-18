@@ -932,12 +932,13 @@ resource "aws_cloudwatch_log_group" "april" {
 
     report_text = (tmp_path / "output.xml").read_text()
     report = etree.XML(report_text)
-    assert report.attrib == {
+    attrib = dict(report.attrib)
+    attrib.pop('time')
+    assert attrib == {
         'tests': '3',
         'failures': '2',
         'id': 'c7n-left',
         'name': 'IaC Policy Compliance',
-        'time': '0.01',
     }
     cases = list(report.find('testsuite').findall('testcase'))
     assert len(cases) == 3
