@@ -18,6 +18,10 @@ class TerraformResource(dict):
         super().__init__(data)
 
     @property
+    def id(self):
+        return self.location['path']
+
+    @property
     def filename(self):
         return self.location["filename"]
 

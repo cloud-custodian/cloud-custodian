@@ -7,6 +7,7 @@ import subprocess
 from pathlib import Path
 from unittest.mock import ANY
 from urllib.request import urlopen
+import xml.etree.ElementTree as etree
 
 import jsonschema
 import pytest
@@ -47,7 +48,10 @@ class ResultsReporter:
     def on_execution_ended(self):
         pass
 
-    def on_results(self, results):
+    def on_policy_start(self, policy, event):
+        pass
+
+    def on_results(self, policy, results):
         self.results.extend(results)
 
 
@@ -880,6 +884,68 @@ def test_cli_no_policies(tmp_path, caplog):
         ],
     )
     assert caplog.record_tuples == [("c7n.iac", 30, "no policies found")]
+
+
+def test_cli_junit_output(policy_env, tmp_path, debug_cli_runner):
+    policy_env.write_tf(
+        """
+resource "aws_cloudwatch_log_group" "yada" {
+  name = "Bar"
+}
+resource "aws_cloudwatch_log_group" "june" {
+  name = "June"
+}
+resource "aws_cloudwatch_log_group" "april" {
+  name = "April"
+  tags = {
+        Env = "Dev"
+  }
+}
+        """
+    )
+    policy_env.write_policy(
+        {
+            "name": "tag-required",
+            "description": "tags are required on log groups",
+            "metadata": {"url": "https://cloudcustodian.io", "severity": "high"},
+            "resource": "terraform.aws_cloudwatch_log_group",
+            "filters": [{"tags": "absent"}],
+        }
+    )
+    runner = CliRunner()
+    result = runner.invoke(
+        cli.cli,
+        [
+            "run",
+            "-p",
+            str(tmp_path),
+            "-d",
+            str(tmp_path),
+            "-o",
+            "junit",
+            "--output-file",
+            str(tmp_path / "output.xml"),
+        ],
+    )
+
+    assert "2 Failure" in result.output
+
+    report_text = (tmp_path / "output.xml").read_text()
+    report = etree.XML(report_text)
+    attrib = dict(report.attrib)
+    attrib.pop('time')
+    assert attrib == {
+        'tests': '3',
+        'failures': '2',
+        'id': 'c7n-left',
+        'name': 'IaC Policy Compliance',
+    }
+    cases = list(report.find('testsuite').findall('testcase'))
+    assert len(cases) == 3
+    assert cases[-1].find('failure').attrib == {
+        'type': 'failure',
+        'message': 'tags are required on log groups',
+    }
 
 
 @pytest.mark.skipif(

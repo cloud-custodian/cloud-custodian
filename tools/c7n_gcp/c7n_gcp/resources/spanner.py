@@ -54,7 +54,7 @@ class SpannerInstanceBackup(ChildResourceManager):
         component = 'projects.instances.backups'
         enum_spec = ('list', 'backups[]', None)
         scope = 'parent'
-        name = id = 'backups'
+        name = id = 'name'
         parent_spec = {
             'resource': 'spanner-instance',
             'child_enum_params': {
@@ -92,6 +92,14 @@ class SpannerInstanceBackupTimeRangeFilter(TimeRangeFilter):
     permissions = ('spanner.backups.list',)
     create_time_field_name = 'createTime'
     expire_time_field_name = 'expireTime'
+
+
+@SpannerInstanceBackup.filter_registry.register('iam-policy')
+class SpannerInstanceBackupIamPolicyFilter(IamPolicyFilter):
+    """
+    Overrides the base implementation to process spanner instance backup resources correctly.
+    """
+    permissions = ('spanner.backups.getIamPolicy',)
 
 
 @SpannerInstance.filter_registry.register('iam-policy')

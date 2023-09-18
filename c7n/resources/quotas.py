@@ -308,7 +308,7 @@ class Increase(Action):
         multiplier = self.data.get('multiplier', 1.2)
         error = None
         for r in resources:
-            count = math.floor(multiplier * r['Value'])
+            count = math.ceil(multiplier * r['Value'])
             if not r['Adjustable']:
                 continue
             try:
