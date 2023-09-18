@@ -37,16 +37,16 @@ class Output:
         self.config = config
 
     def on_execution_started(self, policies, graph):
-        pass
+        """called when collection execution is about to start"""
 
     def on_execution_ended(self):
-        pass
+        """called when collection execution has ended."""
 
     def on_policy_start(self, policy, event):
-        pass
+        """called when a policy is about to be run"""
 
     def on_results(self, results):
-        pass
+        """called when a policy matches resources"""
 
 
 class RichCli(Output):
