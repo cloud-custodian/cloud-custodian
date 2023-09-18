@@ -84,6 +84,39 @@ class ModifyVpc(BaseAction):
                 client.modify_vpc_attribute(**params)
 
 
+@Vpc.action_registry.register('delete-empty')
+class DeleteVpc(BaseAction):
+    """Delete an empty VPC
+
+    For example, if you want to delete an empty VPC
+
+    :example:
+
+      .. code-block:: yaml
+
+        - name: aws-ec2-vpc-delete
+          resource: vpc
+          actions:
+            - type: delete-empty
+
+    """
+    schema = type_schema('delete-empty',)
+    permissions = ('ec2:DeleteVpc',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('ec2')
+
+        for vpc in resources:
+            self.manager.retry(
+                client.delete_vpc,
+                VpcId=vpc['VpcId'],
+                ignore_err_codes=(
+                    'NoSuchEntityException',
+                    'DeleteConflictException',
+                ),
+            )
+
+
 class DescribeFlow(query.DescribeSource):
 
     def get_resources(self, ids, cache=True):
@@ -206,9 +239,10 @@ class FlowLogv2Filter(ListItemFilter):
     flow_log_map = None
 
     def get_deprecations(self):
+        filter_name = self.data["type"]
         return [
-            DeprecatedField(f"{k} is deprecated", "use list-item style attrs and set operators")
-            for k in self.legacy_schema
+            DeprecatedField(f"{filter_name}.{k}", "use list-item style attrs and set operators")
+            for k in set(self.legacy_schema).intersection(self.data)
         ]
 
     def validate(self):
@@ -2398,6 +2432,14 @@ class AddressRelease(BaseAction):
                 client.release_address(AllocationId=r['AllocationId'])
             except ClientError as e:
                 # If its already been released, ignore, else raise.
+                if e.response['Error']['Code'] == 'InvalidAddress.PtrSet':
+                    self.log.warning(
+                        "EIP %s cannot be released because it has a PTR record set.",
+                        r['AllocationId'])
+                if e.response['Error']['Code'] == 'InvalidAddress.Locked':
+                    self.log.warning(
+                        "EIP %s cannot be released because it is locked to your account.",
+                        r['AllocationId'])
                 if e.response['Error']['Code'] != 'InvalidAllocationID.NotFound':
                     raise
 
@@ -2824,9 +2866,10 @@ class SetFlowLogs(BaseAction):
     }
 
     def get_deprecations(self):
+        filter_name = self.data["type"]
         return [
-            DeprecatedField(f"{k} is deprecated", f"set {k} under attrs: block")
-            for k in self.legacy_schema
+            DeprecatedField(f"{filter_name}.{k}", f"set {k} under attrs: block")
+            for k in set(self.legacy_schema).intersection(self.data)
         ]
 
     def validate(self):

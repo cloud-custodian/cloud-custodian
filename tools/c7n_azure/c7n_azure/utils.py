@@ -595,7 +595,7 @@ def get_keyvault_auth_endpoint(cloud_endpoints):
 # These objects store variables with an underscore prefix, so we strip it.
 def serialize(data):
     d = {}
-    if type(data) is dict:
+    if isinstance(data, dict):
         items = data.items()
     else:
         items = vars(data).items()

@@ -1,0 +1,74 @@
+{
+    "status_code": 200,
+    "data": {
+        "Vpcs": [
+            {
+                "CidrBlock": "10.0.0.0/16",
+                "DhcpOptionsId": "dopt-05a00c7f",
+                "State": "available",
+                "VpcId": "vpc-06c5c2dac8670d8af",
+                "OwnerId": "644160558196",
+                "InstanceTenancy": "default",
+                "CidrBlockAssociationSet": [
+                    {
+                        "AssociationId": "vpc-cidr-assoc-07a49405c8506d91b",
+                        "CidrBlock": "10.0.0.0/16",
+                        "CidrBlockState": {
+                            "State": "associated"
+                        }
+                    }
+                ],
+                "IsDefault": false,
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "c7n-test"
+                    }
+                ]
+            },
+            {
+                "CidrBlock": "10.10.0.0/16",
+                "DhcpOptionsId": "dopt-05a00c7f",
+                "State": "available",
+                "VpcId": "vpc-04f93f9b6fc514a9a",
+                "OwnerId": "644160558196",
+                "InstanceTenancy": "default",
+                "CidrBlockAssociationSet": [
+                    {
+                        "AssociationId": "vpc-cidr-assoc-0f36bc09c70b44c2b",
+                        "CidrBlock": "10.10.0.0/16",
+                        "CidrBlockState": {
+                            "State": "associated"
+                        }
+                    }
+                ],
+                "IsDefault": false,
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "cdunkelb-dev"
+                    }
+                ]
+            },
+            {
+                "CidrBlock": "172.31.0.0/16",
+                "DhcpOptionsId": "dopt-05a00c7f",
+                "State": "available",
+                "VpcId": "vpc-af696ad5",
+                "OwnerId": "644160558196",
+                "InstanceTenancy": "default",
+                "CidrBlockAssociationSet": [
+                    {
+                        "AssociationId": "vpc-cidr-assoc-0c7e6260",
+                        "CidrBlock": "172.31.0.0/16",
+                        "CidrBlockState": {
+                            "State": "associated"
+                        }
+                    }
+                ],
+                "IsDefault": true
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
