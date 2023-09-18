@@ -60,8 +60,7 @@ def test_load_array_expression(test):
             "query": [{"path": data_path("iam-actions.json"), "key": "account"}],
         }
     )
-    # account key contains many IAM actions, check existence of three actions in the returned list
-    assert all(x in p.run() for x in ["DisableRegion", "EnableRegion", "ListRegions"])
+    assert p.run() == ["DisableRegion", "EnableRegion", "ListRegions"]
 
 
 def test_disk_bad_path(tmpdir, test):
