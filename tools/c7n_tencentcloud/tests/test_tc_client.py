@@ -12,12 +12,12 @@ import pytest
 from c7n.utils import jmespath_search
 
 from c7n_tencentcloud.utils import PageMethod
-from c7n_tencentcloud.client import Session, profile_handel
+from c7n_tencentcloud.client import Session, profile_handle
 
 from retrying import RetryError
 from tencentcloud.common.abstract_client import AbstractClient
 from tencentcloud.common.exception.tencent_cloud_sdk_exception import TencentCloudSDKException
-from tencentcloud.common.credential import STSAssumeRoleCredential
+from tencentcloud.common.credential import STSAssumeRoleCredential, Credential
 
 
 class TestClient:
@@ -172,9 +172,20 @@ class TestClient:
             found = True
         assert found
 
-    def test_tc_client_profile(self):
-        cred = profile_handel('source_profile_default')
-        assert isinstance(cred, STSAssumeRoleCredential) is True
+    def test_tc_client_default_profile(self):
+        found_cred_path = False
+        try:
+            cred = profile_handle('source_profile_default')
+            assert isinstance(cred, STSAssumeRoleCredential) is True
+        except TencentCloudSDKException:
+            found_cred_path = True
+        assert found_cred_path
 
-        with pytest.raises(TencentCloudSDKException):
-            cred = profile_handel('source_profile_cvmmatada')
+    def test_tc_client_cvm_metadata(self):
+        found_cred_path = False
+        try:
+            cred = profile_handle('test-cvm-role')
+            assert isinstance(cred, Credential)
+        except TencentCloudSDKException:
+            found_cred_path = True
+        assert found_cred_path

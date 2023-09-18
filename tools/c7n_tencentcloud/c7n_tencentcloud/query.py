@@ -95,7 +95,7 @@ class ResourceQuery:
         :param resource_manager: The resource manager object that is calling the filter
         :param params: dict
         :return: A list of dictionaries.
-        """
+c7n_tencentcloud        """
         cli = self.session_factory.client(resource_type.endpoint,
                                           resource_type.service,
                                           resource_type.version,

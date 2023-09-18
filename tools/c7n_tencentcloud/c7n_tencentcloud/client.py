@@ -34,7 +34,7 @@ def retry_result(resp):
     return False
 
 
-def profile_handel(
+def profile_handle(
         profile: str,
         cred_path=os.path.join(os.path.expanduser('~'), '.tencentcloud/credentials')
 ) -> Union[STSAssumeRoleCredential, Credential]:
@@ -227,7 +227,7 @@ class Session:
 
         # add profile suport
         if self.profile is not None:
-            cred_provider = profile_handel(profile=profile)
+            cred_provider = profile_handle(profile=profile)
 
         self._cred = cred_provider.get_credentials()
 
