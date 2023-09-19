@@ -57,7 +57,7 @@ class TerraformResourceManager(IACResourceManager):
 
         for r in resources:
             rtags = dict(provider_tags)
-            if 'tags' in r:
+            if r.get('tags'):
                 rtags.update(r['tags'])
             r['tags'] = rtags
 
