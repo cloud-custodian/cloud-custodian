@@ -53,10 +53,6 @@ ResourceMap = {
     "gcp.kms-keyring": "c7n_gcp.resources.kms.KmsKeyRing",
     "gcp.loadbalancer-address": "c7n_gcp.resources.loadbalancer.LoadBalancingAddress",
     "gcp.loadbalancer-backend-bucket": "c7n_gcp.resources.loadbalancer.LoadBalancingBackendBucket",
-    "gcp.loadbalancer-backend-frontend":
-        "c7n_gcp.resources.loadbalancer.LoadBalancingBackendFrontend",
-    "gcp.loadbalancer-backend-frontend-ssl":
-        "c7n_gcp.resources.loadbalancer.LoadBalancingBackendFrontendSsl",
     "gcp.loadbalancer-backend-service": (
         "c7n_gcp.resources.loadbalancer.LoadBalancingBackendService"),
     "gcp.loadbalancer-forwarding-rule": (
@@ -75,14 +71,14 @@ ResourceMap = {
     "gcp.loadbalancer-target-http-proxy": (
         "c7n_gcp.resources.loadbalancer.LoadBalancingTargetHttpProxy"),
     "gcp.loadbalancer-target-https-proxy": (
-        "c7n_gcp.resources.loadbalancer.LoadBalancingTargetHttpsProxy"),
-    "gcp.loadbalancer-target-https-proxy-ssl-policy": (
-        "c7n_gcp.resources.loadbalancer.LoadBalancingTargetHttpsProxySslPolicy"),
+        "c7n_gcp.resources.loadbalancer.LoadBalancerTargetHttpsProxy"),
+    "gcp.loadbalancer-backend-ssl-policy": (
+        "c7n_gcp.resources.loadbalancer.LoadBalancerBackendSslPolicy"),
     "gcp.loadbalancer-target-instance": (
         "c7n_gcp.resources.loadbalancer.LoadBalancingTargetInstance"),
     "gcp.loadbalancer-target-pool": "c7n_gcp.resources.loadbalancer.LoadBalancingTargetPool",
     "gcp.loadbalancer-target-ssl-proxy": (
-        "c7n_gcp.resources.loadbalancer.LoadBalancingTargetSslProxy"),
+        "c7n_gcp.resources.loadbalancer.LoadBalancerSslPolicy"),
     "gcp.loadbalancer-target-tcp-proxy": (
         "c7n_gcp.resources.loadbalancer.LoadBalancingTargetTcpProxy"),
     "gcp.loadbalancer-url-map": "c7n_gcp.resources.loadbalancer.LoadBalancingUrlMap",

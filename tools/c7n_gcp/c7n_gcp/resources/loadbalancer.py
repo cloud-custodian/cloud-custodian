@@ -531,8 +531,8 @@ class LoadBalancingGlobalAddress(QueryResourceManager):
                 'address': resource_info['resourceName'].rsplit('/', 1)[-1]})
 
 
-@resources.register('loadbalancer-backend-frontend')
-class LoadBalancingBackendFrontend(ChildResourceManager):
+@resources.register('loadbalancer-target-https-proxy')
+class LoadBalancerTargetHttpsProxy(ChildResourceManager):
 
     class resource_type(ChildTypeInfo):
         service = 'compute'
@@ -557,8 +557,8 @@ class LoadBalancingBackendFrontend(ChildResourceManager):
                 })
 
 
-@resources.register('loadbalancer-backend-frontend-ssl')
-class LoadBalancingBackendFrontendSsl(ChildResourceManager):
+@resources.register('loadbalancer-backend-ssl-policy')
+class LoadBalancerBackendSslPolicy(ChildResourceManager):
     """
     GC resource: https://cloud.google.com/compute/docs/reference/rest/v1/sslPolicies
     """
@@ -570,7 +570,7 @@ class LoadBalancingBackendFrontendSsl(ChildResourceManager):
         id = name = 'name'
         default_report_fields = [id, 'profile', 'minTlsVersion']
         parent_spec = {
-            'resource': 'loadbalancer-backend-frontend',
+            'resource': 'loadbalancer-target-https-proxy',
         }
         asset_type = "compute.googleapis.com/SslPolicy"
 
@@ -591,8 +591,8 @@ class LoadBalancingBackendFrontendSsl(ChildResourceManager):
         return []
 
 
-@resources.register('loadbalancer-target-https-proxy-ssl-policy')
-class LoadBalancingTargetHttpsProxySslPolicy(ChildResourceManager):
+@resources.register('loadbalancer-ssl-policy')
+class LoadBalancerSslPolicy(ChildResourceManager):
     """
     GC resource: https://cloud.google.com/compute/docs/reference/rest/v1/sslPolicies
 
