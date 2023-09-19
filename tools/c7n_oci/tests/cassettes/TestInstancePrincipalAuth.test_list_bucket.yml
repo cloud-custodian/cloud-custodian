@@ -1,0 +1,1348 @@
+interactions:
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: http://169.254.169.254/opc/v2/identity/cert.pem
+  response:
+    body:
+      string: ''
+    headers:
+      content-type:
+      - application/x-x509-ca-cert
+      last-modified:
+      - Fri, 22 Sep 2023 01:30:41 GMT
+      server:
+      - server
+      transfer-encoding:
+      - chunked
+      x-request-id:
+      - d76b83c4-66ad-40fa-92fd-a044b9d3394b
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: http://169.254.169.254/opc/v2/identity/key.pem
+  response:
+    body:
+      string: ''
+    headers:
+      content-type:
+      - application/x-x509-ca-cert
+      last-modified:
+      - Fri, 22 Sep 2023 01:30:41 GMT
+      server:
+      - server
+      x-request-id:
+      - 10ab19d7-8020-4981-bcfb-7944abefc198
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: http://169.254.169.254/opc/v2/identity/intermediate.pem
+  response:
+    body:
+      string: ''
+    headers:
+      content-type:
+      - application/x-x509-ca-cert
+      last-modified:
+      - Fri, 22 Sep 2023 01:30:41 GMT
+      server:
+      - server
+      transfer-encoding:
+      - chunked
+      x-request-id:
+      - 0f2802e1-1a70-415a-a209-bef1bda1c6bc
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: http://169.254.169.254/opc/v2/instance/region
+  response:
+    body:
+      string: iad
+    headers:
+      content-type:
+      - application/octet-stream
+      last-modified:
+      - Fri, 22 Sep 2023 01:30:41 GMT
+      server:
+      - server
+      x-request-id:
+      - 33f2e1af-cebb-42de-bf9d-4a2a7bf91699
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: http://169.254.169.254/opc/v2/identity/cert.pem
+  response:
+    body:
+      string: '-----BEGIN CERTIFICATE-----
+
+MIICCzCCAbWgAwIBAgICA+gwDQYJKoZIhvcNAQELBQAweTESMBAGA1UEAwwJbG9j
+
+YWxob3N0MWMwYQYDVQQLDFpvcGMtdGVuYW50Om9jaWQxLnRlbmFuY3kub2MxLi5h
+
+YWFhYWFhYXl4Znd2ZTJoenhtYTN2amZuN2pvdXFkMm8yc3BxN29sZmhwa2NzZHdt
+
+M2l5NjN3bndhaHEwHhcNMjMwOTI3MTYxMjQ3WhcNMzMwOTI0MTYxMjQ3WjB5MRIw
+
+EAYDVQQDDAlsb2NhbGhvc3QxYzBhBgNVBAsMWm9wYy10ZW5hbnQ6b2NpZDEudGVu
+
+YW5jeS5vYzEuLmFhYWFhYWFheXhmd3ZlMmh6eG1hM3ZqZm43am91cWQybzJzcHE3
+
+b2xmaHBrY3Nkd20zaXk2M3dud2FocTBaMA0GCSqGSIb3DQEBAQUAA0kAMEYCQQDM
+
+wuWb3bOhvTLnPPHBnHTI/vI+Z9FRtUCVyo154fKqKu/Cu3wUP2gxjrhIN5EnYh3C
+
+/wc1bsfRR4yz+jkS2MTHAgEDoykwJzAPBgNVHRMECDAGAQH/AgEAMBQGA1UdEQQN
+
+MAuCCWxvY2FsaG9zdDANBgkqhkiG9w0BAQsFAANBAHiOn+D9MGnwMg+x6fH6CeX6
+
++z5/yuExKDeMq221mfYediwPHcnW1Wj3G44AYqQufSys2Fw9rBoAi7SD2WP1nBc=
+
+-----END CERTIFICATE-----'
+    headers:
+      content-type:
+      - application/x-x509-ca-cert
+      last-modified:
+      - Fri, 22 Sep 2023 01:30:41 GMT
+      server:
+      - server
+      transfer-encoding:
+      - chunked
+      x-request-id:
+      - 1f5a80cb-b110-49f8-8129-42c4d3b0562f
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: http://169.254.169.254/opc/v2/identity/key.pem
+  response:
+    body:
+      string: '-----BEGIN RSA PRIVATE KEY-----
+
+MIIBOwIBAAJBANESBSO/Ml54JuCr8hhZuC79HphVS+k9M6bfLz94lKlmzc4i1cyN
+
+TcfNivgyUTmzZcUvbunsJJokC547jp+D76MCAQMCQQCLYVjCf3bppW9AcqFlkSV0
+
+qL8QON1GKM0Z6h9/pbhw7f4Gt4cmpYqFaEtzom2LxNcRJ8qmVN5T0La6Vm+BVsaL
+
+AiEA/kmUR8Aow/SEvMo4r82jQ6mb5V+nepTSudyVzHrmyAsCIQDSentDUmw6Cyxd
+
+AIX9GmjfgdfZkMVch5g/qiQa4pr9yQIhAKmGYtqAGy1NrdMxex/ebNfGZ+4/xPxj
+
+NyaTDohR7zAHAiEAjFGngjby0VzIPgBZU2bwlQE6kQsuPa+61RwYEexnU9sCIQCP
+
+xckiCcqSW7uLD214+XzuI1dQQ0FLI5dVN5HScDEA0A==
+
+-----END RSA PRIVATE KEY-----'
+    headers:
+      content-type:
+      - application/x-x509-ca-cert
+      last-modified:
+      - Fri, 22 Sep 2023 01:30:41 GMT
+      server:
+      - server
+      x-request-id:
+      - 3515ed3d-bd17-4d4b-a989-1d8f62328462
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: http://169.254.169.254/opc/v2/identity/intermediate.pem
+  response:
+    body:
+      string: '-----BEGIN CERTIFICATE-----
+
+MIICCzCCAbWgAwIBAgICA+gwDQYJKoZIhvcNAQELBQAweTESMBAGA1UEAwwJbG9j
+
+YWxob3N0MWMwYQYDVQQLDFpvcGMtdGVuYW50Om9jaWQxLnRlbmFuY3kub2MxLi5h
+
+YWFhYWFhYXl4Znd2ZTJoenhtYTN2amZuN2pvdXFkMm8yc3BxN29sZmhwa2NzZHdt
+
+M2l5NjN3bndhaHEwHhcNMjMwOTI3MTYxMjQ3WhcNMzMwOTI0MTYxMjQ3WjB5MRIw
+
+EAYDVQQDDAlsb2NhbGhvc3QxYzBhBgNVBAsMWm9wYy10ZW5hbnQ6b2NpZDEudGVu
+
+YW5jeS5vYzEuLmFhYWFhYWFheXhmd3ZlMmh6eG1hM3ZqZm43am91cWQybzJzcHE3
+
+b2xmaHBrY3Nkd20zaXk2M3dud2FocTBaMA0GCSqGSIb3DQEBAQUAA0kAMEYCQQDM
+
+wuWb3bOhvTLnPPHBnHTI/vI+Z9FRtUCVyo154fKqKu/Cu3wUP2gxjrhIN5EnYh3C
+
+/wc1bsfRR4yz+jkS2MTHAgEDoykwJzAPBgNVHRMECDAGAQH/AgEAMBQGA1UdEQQN
+
+MAuCCWxvY2FsaG9zdDANBgkqhkiG9w0BAQsFAANBAHiOn+D9MGnwMg+x6fH6CeX6
+
++z5/yuExKDeMq221mfYediwPHcnW1Wj3G44AYqQufSys2Fw9rBoAi7SD2WP1nBc=
+
+-----END CERTIFICATE-----'
+    headers:
+      content-type:
+      - application/x-x509-ca-cert
+      last-modified:
+      - Fri, 22 Sep 2023 01:30:41 GMT
+      server:
+      - server
+      transfer-encoding:
+      - chunked
+      x-request-id:
+      - 736f1b51-1f39-479b-b618-863e6f75798d
+    status:
+      code: 200
+      message: OK
+- request:
+    body: mock_body
+    headers: {}
+    method: POST
+    uri: https://auth.us-ashburn-1.oraclecloud.com/v1/x509
+  response:
+    body:
+      data:
+        token: eyJraWQiOiJhc3dfb2MxX2o0eGQiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJvY2lkMS5pbnN0YW5jZS5vYzEuaWFkLmFudXdjbGp0dGx6bGlsYWNrZXYycXBpYjYzZ2x1aXN1bmQ1NXNnd3VuZ3lsd2Z5Zmg1bmdkNHl3enRmcSIsIm9wYy1jZXJ0dHlwZSI6Imluc3RhbmNlIiwiaXNzIjoiYXV0aFNlcnZpY2Uub3JhY2xlLmNvbSIsImZwcmludCI6IkE3OjQ4Ojc4OjYzOjREOkVGOjAzOjlBOkQ3OjhFOjNFOjc3OkZBOjU5OkMwOjUzOkI3OjI5OkFBOjAxIiwicHR5cGUiOiJpbnN0YW5jZSIsImF1ZCI6Im9jaSIsIm9wYy10YWciOiJWMyxvY2lkMS50ZW5hbmN5Lm9jMS4uYWFhYWFhYWF5eGZ3dmUyaHp4bWEzdmpmbjdqb3VxZDJvMnNwcTdvbGZocGtjc2R3bTNpeTYzd253YWhxLEFBQUFBUUFBQUFCXC9mMzlcL0FBQUFqdz09LEFBQUFBUUFBQUFBQUFBQ0EiLCJ0dHlwZSI6Ing1MDkiLCJvcGMtaW5zdGFuY2UiOiJvY2lkMS5pbnN0YW5jZS5vYzEuaWFkLmFudXdjbGp0dGx6bGlsYWNrZXYycXBpYjYzZ2x1aXN1bmQ1NXNnd3VuZ3lsd2Z5Zmg1bmdkNHl3enRmcSIsImV4cCI6MTY5NTM0NzQ3Mywib3BjLWNvbXBhcnRtZW50Ijoib2NpZDEuY29tcGFydG1lbnQub2MxLi5hYWFhYWFhYXA0NWpyY3d4cjQ2eGZuYWJ0Mmdpb2g2amFjeGtxMm1lcm4yZ21ibHJiaDZzYjN6ZmR5amEiLCJpYXQiOjE2OTUzNDYyNzMsImp0aSI6IjBjYTlhMGEyLTIzMTAtNGQ1Ni04MTNhLWVjZWZjNzVmMDYxMyIsInRlbmFudCI6Im9jaWQxLnRlbmFuY3kub2MxLi5hYWFhYWFhYXl4Znd2ZTJoenhtYTN2amZuN2pvdXFkMm8yc3BxN29sZmhwa2NzZHdtM2l5NjN3bndhaHEiLCJqd2siOiJ7XCJraWRcIjpcIkE3OjQ4Ojc4OjYzOjREOkVGOjAzOjlBOkQ3OjhFOjNFOjc3OkZBOjU5OkMwOjUzOkI3OjI5OkFBOjAxXCIsXCJuXCI6XCJ2b201LTB0SGxOWDRWbU14b2RjZ1NCZDR6Y0RsSnRhQTJZWWJvSlMtTUdoSVk0ZVdRNU1yY2xGaEgwdFhCUUk3UDJ1UjIwcUFlUjZoa0QyREkzc3dycnE3RlRzNGFxNGZqVGI4SzBIc2RVTnZUOGRwUWJsZGdmZ2FPSDVndDNNNzd0dTlYa3JkNmRlLTUxRGNZZ1drSFJfYzZjQkp5c2l2TDZaOGVCRmpGck9QSWdfdjdsRTM2ckFHcWdJRkhQVkh0aFRHYnhxbFhOemtyeFVUTkEyWTR2QTUtLUFKN1VfbU90RUFoNE9xa0hqMjM4TFhOb3ZXdDJFNXc4TTFXb2l3N0tic1VpZzkwYkt5RjJWdUpwWnlWbk1nWFBzY0tnZEZqZ2RxamlFVkV1M3ZmcFcwRVNMVElCV3hTeF9xUDNQTkFDNmhXQURoWksyNjJsa1FBbkpTSndcIixcImVcIjpcIkFRQUJcIixcImt0eVwiOlwiUlNBXCIsXCJhbGdcIjpcIlJTMjU2XCIsXCJ1c2VcIjpcInNpZ1wifSIsIm9wYy10ZW5hbnQiOiJvY2lkMS50ZW5hbmN5Lm9jMS4uYWFhYWFhYWF5eGZ3dmUyaHp4bWEzdmpmbjdqb3VxZDJvMnNwcTdvbGZocGtjc2R3bTNpeTYzd253YWhxIn0.ni3uQ2od16YYeSNlqD3sr5bJxm43OJQXM7DQsCGXLOYy4atRTpHb7X2anm1ODJBst3gA5vZEGUgvxqhlxBY6F2e61Unc6wV_iWSoYFX_U0t8RkzTGtJEJq7lgEBW0-FUGylLQPBq9WuwjFCD5ulTLChHJOhh6J0HXjWMPN_ddoCRM23qYF0wdCYa4B-C3abVhPtwYIVykc57M9bcZRaQDBTgloL-sOsCYmfNTmLEElfBUeTlEAV2jNZ9Shtky6ilcBVBM8TpDQSBgcWJWhPylCieGbN66jN2p5-l-4hPKPyEsbTGQK2U_FgvIFMx6lXujmuURlzz7AiuRBucGfVasA
+    headers:
+      content-type:
+      - application/json
+    status:
+      code: 200
+      message: OK
+- request:
+    body: mock_body
+    headers: {}
+    method: POST
+    uri: https://query.us-ashburn-1.oci.oraclecloud.com/20180409/resources
+  response:
+    body:
+      data:
+        items:
+        - additionalDetails: {}
+          availabilityDomain: ''
+          compartmentId: ocid1.compartment.oc1..<unique_ID>
+          definedTags:
+            Oracle-Tags:
+              CreatedBy: user@example.com
+              CreatedOn: '2023-02-03T04:08:41.958Z'
+          displayName: PaaSTest
+          freeformTags: {}
+          identifier: ocid1.bucket.oc1..<unique_ID>
+          identityContext: {}
+          lifecycleState: active
+          resourceType: Bucket
+          searchContext: null
+          systemTags: {}
+          timeCreated: '2023-02-03T04:08:41.973Z'
+        - additionalDetails: {}
+          availabilityDomain: ''
+          compartmentId: ocid1.compartment.oc1..<unique_ID>
+          definedTags:
+            Oracle-Tags:
+              CreatedBy: user@example.com
+              CreatedOn: '2022-12-16T17:46:34.720Z'
+          displayName: bucket-20221216-1146
+          freeformTags: {}
+          identifier: ocid1.bucket.oc1..<unique_ID>
+          identityContext: {}
+          lifecycleState: active
+          resourceType: Bucket
+          searchContext: null
+          systemTags: {}
+          timeCreated: '2022-12-16T17:46:34.731Z'
+        - additionalDetails: {}
+          availabilityDomain: ''
+          compartmentId: ocid1.tenancy.oc1..<unique_ID>
+          definedTags:
+            Oracle-Tags:
+              CreatedBy: user@example.com
+              CreatedOn: '2022-06-13T18:17:03.713Z'
+          displayName: bucket-20220613-1316
+          freeformTags:
+            app-name: acs
+          identifier: ocid1.bucket.oc1..<unique_ID>
+          identityContext: {}
+          lifecycleState: active
+          resourceType: Bucket
+          searchContext: null
+          systemTags: {}
+          timeCreated: '2022-06-13T18:17:03.722Z'
+    headers:
+      content-type:
+      - application/json
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: http://169.254.169.254/opc/v2/identity/cert.pem
+  response:
+    body:
+      string: ''
+    headers:
+      content-type:
+      - application/x-x509-ca-cert
+      last-modified:
+      - Fri, 22 Sep 2023 01:30:41 GMT
+      server:
+      - server
+      transfer-encoding:
+      - chunked
+      x-request-id:
+      - 7a9a1e29-859f-4543-a36a-1b64767136a6
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: http://169.254.169.254/opc/v2/identity/key.pem
+  response:
+    body:
+      string: ''
+    headers:
+      content-type:
+      - application/x-x509-ca-cert
+      last-modified:
+      - Fri, 22 Sep 2023 01:30:41 GMT
+      server:
+      - server
+      x-request-id:
+      - ce2089c9-39a7-467a-ab56-5aeb860de962
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: http://169.254.169.254/opc/v2/identity/intermediate.pem
+  response:
+    body:
+      string: ''
+    headers:
+      content-type:
+      - application/x-x509-ca-cert
+      last-modified:
+      - Fri, 22 Sep 2023 01:30:41 GMT
+      server:
+      - server
+      transfer-encoding:
+      - chunked
+      x-request-id:
+      - d2e1d87d-e95f-48df-999f-381d1907f2fb
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: http://169.254.169.254/opc/v2/instance/region
+  response:
+    body:
+      string: iad
+    headers:
+      content-type:
+      - application/octet-stream
+      last-modified:
+      - Fri, 22 Sep 2023 01:30:41 GMT
+      server:
+      - server
+      x-request-id:
+      - f25fcaf7-a493-4f48-bd80-18db0328561f
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: http://169.254.169.254/opc/v2/identity/cert.pem
+  response:
+    body:
+      string: '-----BEGIN CERTIFICATE-----
+
+MIICCzCCAbWgAwIBAgICA+gwDQYJKoZIhvcNAQELBQAweTESMBAGA1UEAwwJbG9j
+
+YWxob3N0MWMwYQYDVQQLDFpvcGMtdGVuYW50Om9jaWQxLnRlbmFuY3kub2MxLi5h
+
+YWFhYWFhYXl4Znd2ZTJoenhtYTN2amZuN2pvdXFkMm8yc3BxN29sZmhwa2NzZHdt
+
+M2l5NjN3bndhaHEwHhcNMjMwOTI3MTYxMjQ3WhcNMzMwOTI0MTYxMjQ3WjB5MRIw
+
+EAYDVQQDDAlsb2NhbGhvc3QxYzBhBgNVBAsMWm9wYy10ZW5hbnQ6b2NpZDEudGVu
+
+YW5jeS5vYzEuLmFhYWFhYWFheXhmd3ZlMmh6eG1hM3ZqZm43am91cWQybzJzcHE3
+
+b2xmaHBrY3Nkd20zaXk2M3dud2FocTBaMA0GCSqGSIb3DQEBAQUAA0kAMEYCQQDM
+
+wuWb3bOhvTLnPPHBnHTI/vI+Z9FRtUCVyo154fKqKu/Cu3wUP2gxjrhIN5EnYh3C
+
+/wc1bsfRR4yz+jkS2MTHAgEDoykwJzAPBgNVHRMECDAGAQH/AgEAMBQGA1UdEQQN
+
+MAuCCWxvY2FsaG9zdDANBgkqhkiG9w0BAQsFAANBAHiOn+D9MGnwMg+x6fH6CeX6
+
++z5/yuExKDeMq221mfYediwPHcnW1Wj3G44AYqQufSys2Fw9rBoAi7SD2WP1nBc=
+
+-----END CERTIFICATE-----'
+
+    headers:
+      content-type:
+      - application/x-x509-ca-cert
+      last-modified:
+      - Fri, 22 Sep 2023 01:30:41 GMT
+      server:
+      - server
+      transfer-encoding:
+      - chunked
+      x-request-id:
+      - dc065534-784a-40e6-90a2-c36e0f0bfe2b
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: http://169.254.169.254/opc/v2/identity/key.pem
+  response:
+    body:
+      string: '-----BEGIN RSA PRIVATE KEY-----
+
+MIIBOwIBAAJBANESBSO/Ml54JuCr8hhZuC79HphVS+k9M6bfLz94lKlmzc4i1cyN
+
+TcfNivgyUTmzZcUvbunsJJokC547jp+D76MCAQMCQQCLYVjCf3bppW9AcqFlkSV0
+
+qL8QON1GKM0Z6h9/pbhw7f4Gt4cmpYqFaEtzom2LxNcRJ8qmVN5T0La6Vm+BVsaL
+
+AiEA/kmUR8Aow/SEvMo4r82jQ6mb5V+nepTSudyVzHrmyAsCIQDSentDUmw6Cyxd
+
+AIX9GmjfgdfZkMVch5g/qiQa4pr9yQIhAKmGYtqAGy1NrdMxex/ebNfGZ+4/xPxj
+
+NyaTDohR7zAHAiEAjFGngjby0VzIPgBZU2bwlQE6kQsuPa+61RwYEexnU9sCIQCP
+
+xckiCcqSW7uLD214+XzuI1dQQ0FLI5dVN5HScDEA0A==
+
+-----END RSA PRIVATE KEY-----'
+    headers:
+      content-type:
+      - application/x-x509-ca-cert
+      last-modified:
+      - Fri, 22 Sep 2023 01:30:41 GMT
+      server:
+      - server
+      x-request-id:
+      - 7b72bc25-47e6-4317-88c4-90c63ac110b4
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: http://169.254.169.254/opc/v2/identity/intermediate.pem
+  response:
+    body:
+      string: '-----BEGIN CERTIFICATE-----
+
+MIICCzCCAbWgAwIBAgICA+gwDQYJKoZIhvcNAQELBQAweTESMBAGA1UEAwwJbG9j
+
+YWxob3N0MWMwYQYDVQQLDFpvcGMtdGVuYW50Om9jaWQxLnRlbmFuY3kub2MxLi5h
+
+YWFhYWFhYXl4Znd2ZTJoenhtYTN2amZuN2pvdXFkMm8yc3BxN29sZmhwa2NzZHdt
+
+M2l5NjN3bndhaHEwHhcNMjMwOTI3MTYxMjQ3WhcNMzMwOTI0MTYxMjQ3WjB5MRIw
+
+EAYDVQQDDAlsb2NhbGhvc3QxYzBhBgNVBAsMWm9wYy10ZW5hbnQ6b2NpZDEudGVu
+
+YW5jeS5vYzEuLmFhYWFhYWFheXhmd3ZlMmh6eG1hM3ZqZm43am91cWQybzJzcHE3
+
+b2xmaHBrY3Nkd20zaXk2M3dud2FocTBaMA0GCSqGSIb3DQEBAQUAA0kAMEYCQQDM
+
+wuWb3bOhvTLnPPHBnHTI/vI+Z9FRtUCVyo154fKqKu/Cu3wUP2gxjrhIN5EnYh3C
+
+/wc1bsfRR4yz+jkS2MTHAgEDoykwJzAPBgNVHRMECDAGAQH/AgEAMBQGA1UdEQQN
+
+MAuCCWxvY2FsaG9zdDANBgkqhkiG9w0BAQsFAANBAHiOn+D9MGnwMg+x6fH6CeX6
+
++z5/yuExKDeMq221mfYediwPHcnW1Wj3G44AYqQufSys2Fw9rBoAi7SD2WP1nBc=
+
+-----END CERTIFICATE-----'
+    headers:
+      content-type:
+      - application/x-x509-ca-cert
+      last-modified:
+      - Fri, 22 Sep 2023 01:30:41 GMT
+      server:
+      - server
+      transfer-encoding:
+      - chunked
+      x-request-id:
+      - bc848b07-6925-4d6e-84d9-dfc4e8e781a8
+    status:
+      code: 200
+      message: OK
+- request:
+    body: mock_body
+    headers: {}
+    method: POST
+    uri: https://auth.us-ashburn-1.oraclecloud.com/v1/x509
+  response:
+    body:
+      data:
+        token: eyJraWQiOiJhc3dfb2MxX2o0eGQiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJvY2lkMS5pbnN0YW5jZS5vYzEuaWFkLmFudXdjbGp0dGx6bGlsYWNrZXYycXBpYjYzZ2x1aXN1bmQ1NXNnd3VuZ3lsd2Z5Zmg1bmdkNHl3enRmcSIsIm9wYy1jZXJ0dHlwZSI6Imluc3RhbmNlIiwiaXNzIjoiYXV0aFNlcnZpY2Uub3JhY2xlLmNvbSIsImZwcmludCI6IkE3OjQ4Ojc4OjYzOjREOkVGOjAzOjlBOkQ3OjhFOjNFOjc3OkZBOjU5OkMwOjUzOkI3OjI5OkFBOjAxIiwicHR5cGUiOiJpbnN0YW5jZSIsImF1ZCI6Im9jaSIsIm9wYy10YWciOiJWMyxvY2lkMS50ZW5hbmN5Lm9jMS4uYWFhYWFhYWF5eGZ3dmUyaHp4bWEzdmpmbjdqb3VxZDJvMnNwcTdvbGZocGtjc2R3bTNpeTYzd253YWhxLEFBQUFBUUFBQUFCXC9mMzlcL0FBQUFqdz09LEFBQUFBUUFBQUFBQUFBQ0EiLCJ0dHlwZSI6Ing1MDkiLCJvcGMtaW5zdGFuY2UiOiJvY2lkMS5pbnN0YW5jZS5vYzEuaWFkLmFudXdjbGp0dGx6bGlsYWNrZXYycXBpYjYzZ2x1aXN1bmQ1NXNnd3VuZ3lsd2Z5Zmg1bmdkNHl3enRmcSIsImV4cCI6MTY5NTM0NzQ3NCwib3BjLWNvbXBhcnRtZW50Ijoib2NpZDEuY29tcGFydG1lbnQub2MxLi5hYWFhYWFhYXA0NWpyY3d4cjQ2eGZuYWJ0Mmdpb2g2amFjeGtxMm1lcm4yZ21ibHJiaDZzYjN6ZmR5amEiLCJpYXQiOjE2OTUzNDYyNzQsImp0aSI6IjJhYWQ3NjEyLWYzZGUtNGU2YS05ZTA0LTZjY2ZhZGQwYmQ4MSIsInRlbmFudCI6Im9jaWQxLnRlbmFuY3kub2MxLi5hYWFhYWFhYXl4Znd2ZTJoenhtYTN2amZuN2pvdXFkMm8yc3BxN29sZmhwa2NzZHdtM2l5NjN3bndhaHEiLCJqd2siOiJ7XCJraWRcIjpcIkE3OjQ4Ojc4OjYzOjREOkVGOjAzOjlBOkQ3OjhFOjNFOjc3OkZBOjU5OkMwOjUzOkI3OjI5OkFBOjAxXCIsXCJuXCI6XCJ0TzI0WXd0em13NmIybmNuREp3OEwyaTlnQVZIcWhsMXpVM1JXNlJaenFGWmV1UE9kRURGd00xVjNjWlI1djJYM3dTWkUyNGNVZldra1dtTHl0UFljbzdCRDNZamJneHcyY2VpejV0aFdTZllVbEM3TU16d1pzeTlXVlk3S24taDJyRHEzMG5kc3V2QzBLM0lWNVN4ZHRQQnhwNHQ1MjF4V1VoeENsNEF1d29mbTBodnZIMFV1WFo1NVBHQ3JsNS02cGxFdWR0VUtwZ184VEo0czVXeE9QSlVwQkdaVGxOWm5QVHVQVW9zQ3F5eVp4R1lIa0t0NEhubWJhb1U4YVRWQVQ2cEJHYVBfbVNvSGpadDM5OHFnRlF6OTk1dGphdld1RzMzNlJkOTlzaU1vMVl5bGpXQmZzb1EyT2M5TGxTdUtxNjN5U3VHVTlJNXBzODlrUlFnb1FcIixcImVcIjpcIkFRQUJcIixcImt0eVwiOlwiUlNBXCIsXCJhbGdcIjpcIlJTMjU2XCIsXCJ1c2VcIjpcInNpZ1wifSIsIm9wYy10ZW5hbnQiOiJvY2lkMS50ZW5hbmN5Lm9jMS4uYWFhYWFhYWF5eGZ3dmUyaHp4bWEzdmpmbjdqb3VxZDJvMnNwcTdvbGZocGtjc2R3bTNpeTYzd253YWhxIn0.v505hVZ9I8emPoOQata1K-bFkJCInP30Ue5dvjCeZE2ryrhwgD1OiFNqGPjX7ZajTu937XymEIqj-buSGAqaebprbeger2zsCsgqqgqw4ps9WPjH87NL_ztE_K1GlSD1lH9nH6uFS_sj75mtsC1AORRH7J7nJVVdrbDkYRmpBF3J6EvopkJnbTl0MK6GEFz1hNU4RYJZHEThZyOeLVoNo2ZAdKEROT8UNgnabh_XsFSbGvwvIUpOXqWRUjq38w065f_L8-H6CRNHhNBDP2KT_VA6vrI9ETzCSwT7BWhmCQRc7RHCdmYXwvc6PcAoFnDI60TkYqIi9e980zeTEkrGtQ
+    headers:
+      content-type:
+      - application/json
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: http://169.254.169.254/opc/v2/identity/cert.pem
+  response:
+    body:
+      string: ''
+    headers:
+      content-type:
+      - application/x-x509-ca-cert
+      last-modified:
+      - Fri, 22 Sep 2023 01:30:41 GMT
+      server:
+      - server
+      transfer-encoding:
+      - chunked
+      x-request-id:
+      - c86aeeeb-2a5a-45a9-a85e-5c642db72e99
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: http://169.254.169.254/opc/v2/identity/key.pem
+  response:
+    body:
+      string: ''
+    headers:
+      content-type:
+      - application/x-x509-ca-cert
+      last-modified:
+      - Fri, 22 Sep 2023 01:30:41 GMT
+      server:
+      - server
+      x-request-id:
+      - d69058f6-c92b-42f7-b020-9155ffaf4832
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: http://169.254.169.254/opc/v2/identity/intermediate.pem
+  response:
+    body:
+      string: ''
+    headers:
+      content-type:
+      - application/x-x509-ca-cert
+      last-modified:
+      - Fri, 22 Sep 2023 01:30:41 GMT
+      server:
+      - server
+      transfer-encoding:
+      - chunked
+      x-request-id:
+      - 89abca8a-09a0-4d96-8b86-858396d9ef53
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: http://169.254.169.254/opc/v2/instance/region
+  response:
+    body:
+      string: iad
+    headers:
+      content-type:
+      - application/octet-stream
+      last-modified:
+      - Fri, 22 Sep 2023 01:30:41 GMT
+      server:
+      - server
+      x-request-id:
+      - 07d24a32-6fbb-48d4-abd2-24e403e42a5a
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: http://169.254.169.254/opc/v2/identity/cert.pem
+  response:
+    body:
+      string: '-----BEGIN CERTIFICATE-----
+
+MIICCzCCAbWgAwIBAgICA+gwDQYJKoZIhvcNAQELBQAweTESMBAGA1UEAwwJbG9j
+
+YWxob3N0MWMwYQYDVQQLDFpvcGMtdGVuYW50Om9jaWQxLnRlbmFuY3kub2MxLi5h
+
+YWFhYWFhYXl4Znd2ZTJoenhtYTN2amZuN2pvdXFkMm8yc3BxN29sZmhwa2NzZHdt
+
+M2l5NjN3bndhaHEwHhcNMjMwOTI3MTYxMjQ3WhcNMzMwOTI0MTYxMjQ3WjB5MRIw
+
+EAYDVQQDDAlsb2NhbGhvc3QxYzBhBgNVBAsMWm9wYy10ZW5hbnQ6b2NpZDEudGVu
+
+YW5jeS5vYzEuLmFhYWFhYWFheXhmd3ZlMmh6eG1hM3ZqZm43am91cWQybzJzcHE3
+
+b2xmaHBrY3Nkd20zaXk2M3dud2FocTBaMA0GCSqGSIb3DQEBAQUAA0kAMEYCQQDM
+
+wuWb3bOhvTLnPPHBnHTI/vI+Z9FRtUCVyo154fKqKu/Cu3wUP2gxjrhIN5EnYh3C
+
+/wc1bsfRR4yz+jkS2MTHAgEDoykwJzAPBgNVHRMECDAGAQH/AgEAMBQGA1UdEQQN
+
+MAuCCWxvY2FsaG9zdDANBgkqhkiG9w0BAQsFAANBAHiOn+D9MGnwMg+x6fH6CeX6
+
++z5/yuExKDeMq221mfYediwPHcnW1Wj3G44AYqQufSys2Fw9rBoAi7SD2WP1nBc=
+
+-----END CERTIFICATE-----'
+    headers:
+      content-type:
+      - application/x-x509-ca-cert
+      last-modified:
+      - Fri, 22 Sep 2023 01:30:41 GMT
+      server:
+      - server
+      transfer-encoding:
+      - chunked
+      x-request-id:
+      - ca5e37b7-6fbd-480e-b218-3fbee4529b18
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: http://169.254.169.254/opc/v2/identity/key.pem
+  response:
+    body:
+      string: '-----BEGIN RSA PRIVATE KEY-----
+
+MIIBOwIBAAJBANESBSO/Ml54JuCr8hhZuC79HphVS+k9M6bfLz94lKlmzc4i1cyN
+
+TcfNivgyUTmzZcUvbunsJJokC547jp+D76MCAQMCQQCLYVjCf3bppW9AcqFlkSV0
+
+qL8QON1GKM0Z6h9/pbhw7f4Gt4cmpYqFaEtzom2LxNcRJ8qmVN5T0La6Vm+BVsaL
+
+AiEA/kmUR8Aow/SEvMo4r82jQ6mb5V+nepTSudyVzHrmyAsCIQDSentDUmw6Cyxd
+
+AIX9GmjfgdfZkMVch5g/qiQa4pr9yQIhAKmGYtqAGy1NrdMxex/ebNfGZ+4/xPxj
+
+NyaTDohR7zAHAiEAjFGngjby0VzIPgBZU2bwlQE6kQsuPa+61RwYEexnU9sCIQCP
+
+xckiCcqSW7uLD214+XzuI1dQQ0FLI5dVN5HScDEA0A==
+
+-----END RSA PRIVATE KEY-----'
+    headers:
+      content-type:
+      - application/x-x509-ca-cert
+      last-modified:
+      - Fri, 22 Sep 2023 01:30:41 GMT
+      server:
+      - server
+      x-request-id:
+      - 4742c01f-52b6-4550-8c41-f003703425b3
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: http://169.254.169.254/opc/v2/identity/intermediate.pem
+  response:
+    body:
+      string: '-----BEGIN CERTIFICATE-----
+
+MIICCzCCAbWgAwIBAgICA+gwDQYJKoZIhvcNAQELBQAweTESMBAGA1UEAwwJbG9j
+
+YWxob3N0MWMwYQYDVQQLDFpvcGMtdGVuYW50Om9jaWQxLnRlbmFuY3kub2MxLi5h
+
+YWFhYWFhYXl4Znd2ZTJoenhtYTN2amZuN2pvdXFkMm8yc3BxN29sZmhwa2NzZHdt
+
+M2l5NjN3bndhaHEwHhcNMjMwOTI3MTYxMjQ3WhcNMzMwOTI0MTYxMjQ3WjB5MRIw
+
+EAYDVQQDDAlsb2NhbGhvc3QxYzBhBgNVBAsMWm9wYy10ZW5hbnQ6b2NpZDEudGVu
+
+YW5jeS5vYzEuLmFhYWFhYWFheXhmd3ZlMmh6eG1hM3ZqZm43am91cWQybzJzcHE3
+
+b2xmaHBrY3Nkd20zaXk2M3dud2FocTBaMA0GCSqGSIb3DQEBAQUAA0kAMEYCQQDM
+
+wuWb3bOhvTLnPPHBnHTI/vI+Z9FRtUCVyo154fKqKu/Cu3wUP2gxjrhIN5EnYh3C
+
+/wc1bsfRR4yz+jkS2MTHAgEDoykwJzAPBgNVHRMECDAGAQH/AgEAMBQGA1UdEQQN
+
+MAuCCWxvY2FsaG9zdDANBgkqhkiG9w0BAQsFAANBAHiOn+D9MGnwMg+x6fH6CeX6
+
++z5/yuExKDeMq221mfYediwPHcnW1Wj3G44AYqQufSys2Fw9rBoAi7SD2WP1nBc=
+
+-----END CERTIFICATE-----'
+    headers:
+      content-type:
+      - application/x-x509-ca-cert
+      last-modified:
+      - Fri, 22 Sep 2023 01:30:41 GMT
+      server:
+      - server
+      transfer-encoding:
+      - chunked
+      x-request-id:
+      - e3bce512-6001-43a3-a0ea-39ddf67e36e1
+    status:
+      code: 200
+      message: OK
+- request:
+    body: mock_body
+    headers: {}
+    method: POST
+    uri: https://auth.us-ashburn-1.oraclecloud.com/v1/x509
+  response:
+    body:
+      data:
+        token: eyJraWQiOiJhc3dfb2MxX2o0eGQiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJvY2lkMS5pbnN0YW5jZS5vYzEuaWFkLmFudXdjbGp0dGx6bGlsYWNrZXYycXBpYjYzZ2x1aXN1bmQ1NXNnd3VuZ3lsd2Z5Zmg1bmdkNHl3enRmcSIsIm9wYy1jZXJ0dHlwZSI6Imluc3RhbmNlIiwiaXNzIjoiYXV0aFNlcnZpY2Uub3JhY2xlLmNvbSIsImZwcmludCI6IkE3OjQ4Ojc4OjYzOjREOkVGOjAzOjlBOkQ3OjhFOjNFOjc3OkZBOjU5OkMwOjUzOkI3OjI5OkFBOjAxIiwicHR5cGUiOiJpbnN0YW5jZSIsImF1ZCI6Im9jaSIsIm9wYy10YWciOiJWMyxvY2lkMS50ZW5hbmN5Lm9jMS4uYWFhYWFhYWF5eGZ3dmUyaHp4bWEzdmpmbjdqb3VxZDJvMnNwcTdvbGZocGtjc2R3bTNpeTYzd253YWhxLEFBQUFBUUFBQUFCXC9mMzlcL0FBQUFqdz09LEFBQUFBUUFBQUFBQUFBQ0EiLCJ0dHlwZSI6Ing1MDkiLCJvcGMtaW5zdGFuY2UiOiJvY2lkMS5pbnN0YW5jZS5vYzEuaWFkLmFudXdjbGp0dGx6bGlsYWNrZXYycXBpYjYzZ2x1aXN1bmQ1NXNnd3VuZ3lsd2Z5Zmg1bmdkNHl3enRmcSIsImV4cCI6MTY5NTM0NzQ3NCwib3BjLWNvbXBhcnRtZW50Ijoib2NpZDEuY29tcGFydG1lbnQub2MxLi5hYWFhYWFhYXA0NWpyY3d4cjQ2eGZuYWJ0Mmdpb2g2amFjeGtxMm1lcm4yZ21ibHJiaDZzYjN6ZmR5amEiLCJpYXQiOjE2OTUzNDYyNzQsImp0aSI6IjliMzYwMTA5LWM4MTMtNGJkOS04MmQ0LTRhN2U2MTRjZjUxZiIsInRlbmFudCI6Im9jaWQxLnRlbmFuY3kub2MxLi5hYWFhYWFhYXl4Znd2ZTJoenhtYTN2amZuN2pvdXFkMm8yc3BxN29sZmhwa2NzZHdtM2l5NjN3bndhaHEiLCJqd2siOiJ7XCJraWRcIjpcIkE3OjQ4Ojc4OjYzOjREOkVGOjAzOjlBOkQ3OjhFOjNFOjc3OkZBOjU5OkMwOjUzOkI3OjI5OkFBOjAxXCIsXCJuXCI6XCJ3Tl9BN3hZallSYUx1b1BPbk84Rmo0VmQxQzhLYmd3U3drR3h4eDNobnZJVGNQZ2V2aVA0Z1pXNEJtakZSTnVUQWhKalI1N3BaMk9KeHYxT05GOVVneElwcDRmRFdJR2JLckFSemZzM0RoT0tDVWJ2VVpLU2diUHc2TVZYN2FObmZuSklGVzNkZVJDa0RWNEl5aDRrTFk3X3g2d0NuVlZIbi1HOUVLUXM5N01jYTNYcVJ4M1ZkRHVVVGJvQTZ6TVdEY1JxRkQ3ODc3UlRaSkFiVmZLRl9wakIxenVUcEVHSVdWUlY2QXNkbWtKcVZwdGpCVEF4V0JYSUZhSHlBTE1WQXl1TlZ6bjVGV1dpOWQtajlyOTl2NmpZdWZEUy1nYlgxYWdSdHBTczFFLXQ0V3gtb0d6cTg2MHhmeDZub0kzM2c5bTl2OGJDWEhVWlFRUnMzeUR4THdcIixcImVcIjpcIkFRQUJcIixcImt0eVwiOlwiUlNBXCIsXCJhbGdcIjpcIlJTMjU2XCIsXCJ1c2VcIjpcInNpZ1wifSIsIm9wYy10ZW5hbnQiOiJvY2lkMS50ZW5hbmN5Lm9jMS4uYWFhYWFhYWF5eGZ3dmUyaHp4bWEzdmpmbjdqb3VxZDJvMnNwcTdvbGZocGtjc2R3bTNpeTYzd253YWhxIn0.zLwRDlEqoDC1bgSMmp3g12v4KqUUYBqokXlvGZhYZxQIXASiGErN4jsCebIv6giq1q75L_A1_H0sG_w6wFOk8MXM0RpdxeVsR7B3aIDJh9O9EE9kZV3nFXwMR6iZKnrtT7AYp2I7-vJ5NTJepao8vS-obkpmFsDMizUTasPrFBhT_wK49dBxc2ldw3gA7yYyJiRsqMLp_cX3qOfMKU6m5VR7gtCGmRkeMYvHeGgM_PJpfqXr463oat6ajwRsAcJ_uBBhcJaqFaMy35mFGEyY5eFVINZI_mPzU6RFGKcv3E8wsZTgY9yVd_rtQTcjZW7O07Up-FBCtwN6fCf_TtVUlQ
+    headers:
+      content-type:
+      - application/json
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: https://objectstorage.us-ashburn-1.oraclecloud.com/n
+  response:
+    body:
+      data: idpktreuauj2
+    headers:
+      content-type:
+      - application/json
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: https://objectstorage.us-ashburn-1.oraclecloud.com/n/<namepsace>/b?compartmentId=ocid1.compartment.oc1..<unique_ID>&fields=tags
+  response:
+    body:
+      data:
+      - compartmentId: ocid1.compartment.oc1..<unique_ID>
+        createdBy: ocid1.user.oc1..<unique_ID>
+        definedTags:
+          Oracle-Tags:
+            CreatedBy: user@example.com
+            CreatedOn: '2023-02-03T04:08:41.958Z'
+        etag: 88db0923-ef82-4e49-850f-ba7919c9cdc7
+        freeformTags: {}
+        name: PaaSTest
+        namespace: <namespace>
+        timeCreated: '2023-02-03T04:08:41.973Z'
+      - compartmentId: ocid1.compartment.oc1..<unique_ID>
+        createdBy: ocid1.saml2idp.oc1..<unique_ID>
+        definedTags:
+          Oracle-Tags:
+            CreatedBy: user@example.com
+            CreatedOn: '2022-12-16T17:46:34.720Z'
+        etag: 0ed0b9a9-4386-4f88-bb37-31632620fb09
+        freeformTags: {}
+        name: bucket-20221216-1146
+        namespace: <namespace>
+        timeCreated: '2022-12-16T17:46:34.731Z'
+      - compartmentId: ocid1.compartment.oc1..<unique_ID>
+        createdBy: ocid1.user.oc1..<unique_ID>
+        definedTags:
+          Oracle-Tags:
+            CreatedBy: user@example.com
+            CreatedOn: '2023-09-22T01:31:07.824Z'
+        etag: b7d4170c-7906-4ade-8a3f-461a799eee4d
+        freeformTags:
+          Project: CNCF
+        name: ip_test_bucket
+        namespace: <namespace>
+        timeCreated: '2023-09-22T01:31:07.917Z'
+    headers:
+      content-type:
+      - application/json
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: http://169.254.169.254/opc/v2/identity/cert.pem
+  response:
+    body:
+      string: ''
+    headers:
+      content-type:
+      - application/x-x509-ca-cert
+      last-modified:
+      - Fri, 22 Sep 2023 01:30:41 GMT
+      server:
+      - server
+      transfer-encoding:
+      - chunked
+      x-request-id:
+      - a48b71de-c804-49a3-86ca-9a4c305ee605
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: http://169.254.169.254/opc/v2/identity/key.pem
+  response:
+    body:
+      string: ''
+    headers:
+      content-type:
+      - application/x-x509-ca-cert
+      last-modified:
+      - Fri, 22 Sep 2023 01:30:41 GMT
+      server:
+      - server
+      x-request-id:
+      - 0d65669c-66e6-43f5-ba59-25bcaf48dcdd
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: http://169.254.169.254/opc/v2/identity/intermediate.pem
+  response:
+    body:
+      string: ''
+    headers:
+      content-type:
+      - application/x-x509-ca-cert
+      last-modified:
+      - Fri, 22 Sep 2023 01:30:41 GMT
+      server:
+      - server
+      transfer-encoding:
+      - chunked
+      x-request-id:
+      - ac7ff602-10e2-4ced-a96a-9f3f5e918fd1
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: http://169.254.169.254/opc/v2/instance/region
+  response:
+    body:
+      string: iad
+    headers:
+      content-type:
+      - application/octet-stream
+      last-modified:
+      - Fri, 22 Sep 2023 01:30:41 GMT
+      server:
+      - server
+      x-request-id:
+      - baf0cd87-878a-46b7-bfff-90bb61a51a03
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: http://169.254.169.254/opc/v2/identity/cert.pem
+  response:
+    body:
+      string: '-----BEGIN CERTIFICATE-----
+
+MIICCzCCAbWgAwIBAgICA+gwDQYJKoZIhvcNAQELBQAweTESMBAGA1UEAwwJbG9j
+
+YWxob3N0MWMwYQYDVQQLDFpvcGMtdGVuYW50Om9jaWQxLnRlbmFuY3kub2MxLi5h
+
+YWFhYWFhYXl4Znd2ZTJoenhtYTN2amZuN2pvdXFkMm8yc3BxN29sZmhwa2NzZHdt
+
+M2l5NjN3bndhaHEwHhcNMjMwOTI3MTYxMjQ3WhcNMzMwOTI0MTYxMjQ3WjB5MRIw
+
+EAYDVQQDDAlsb2NhbGhvc3QxYzBhBgNVBAsMWm9wYy10ZW5hbnQ6b2NpZDEudGVu
+
+YW5jeS5vYzEuLmFhYWFhYWFheXhmd3ZlMmh6eG1hM3ZqZm43am91cWQybzJzcHE3
+
+b2xmaHBrY3Nkd20zaXk2M3dud2FocTBaMA0GCSqGSIb3DQEBAQUAA0kAMEYCQQDM
+
+wuWb3bOhvTLnPPHBnHTI/vI+Z9FRtUCVyo154fKqKu/Cu3wUP2gxjrhIN5EnYh3C
+
+/wc1bsfRR4yz+jkS2MTHAgEDoykwJzAPBgNVHRMECDAGAQH/AgEAMBQGA1UdEQQN
+
+MAuCCWxvY2FsaG9zdDANBgkqhkiG9w0BAQsFAANBAHiOn+D9MGnwMg+x6fH6CeX6
+
++z5/yuExKDeMq221mfYediwPHcnW1Wj3G44AYqQufSys2Fw9rBoAi7SD2WP1nBc=
+
+-----END CERTIFICATE-----'
+    headers:
+      content-type:
+      - application/x-x509-ca-cert
+      last-modified:
+      - Fri, 22 Sep 2023 01:30:41 GMT
+      server:
+      - server
+      transfer-encoding:
+      - chunked
+      x-request-id:
+      - 87609d02-a273-418e-bca2-92b1eea4b57e
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: http://169.254.169.254/opc/v2/identity/key.pem
+  response:
+    body:
+      string: '-----BEGIN RSA PRIVATE KEY-----
+
+MIIBOwIBAAJBANESBSO/Ml54JuCr8hhZuC79HphVS+k9M6bfLz94lKlmzc4i1cyN
+
+TcfNivgyUTmzZcUvbunsJJokC547jp+D76MCAQMCQQCLYVjCf3bppW9AcqFlkSV0
+
+qL8QON1GKM0Z6h9/pbhw7f4Gt4cmpYqFaEtzom2LxNcRJ8qmVN5T0La6Vm+BVsaL
+
+AiEA/kmUR8Aow/SEvMo4r82jQ6mb5V+nepTSudyVzHrmyAsCIQDSentDUmw6Cyxd
+
+AIX9GmjfgdfZkMVch5g/qiQa4pr9yQIhAKmGYtqAGy1NrdMxex/ebNfGZ+4/xPxj
+
+NyaTDohR7zAHAiEAjFGngjby0VzIPgBZU2bwlQE6kQsuPa+61RwYEexnU9sCIQCP
+
+xckiCcqSW7uLD214+XzuI1dQQ0FLI5dVN5HScDEA0A==
+
+-----END RSA PRIVATE KEY-----'
+    headers:
+      content-type:
+      - application/x-x509-ca-cert
+      last-modified:
+      - Fri, 22 Sep 2023 01:30:41 GMT
+      server:
+      - server
+      x-request-id:
+      - 276571f1-15a0-4889-ac10-9fa5d536cd26
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: http://169.254.169.254/opc/v2/identity/intermediate.pem
+  response:
+    body:
+      string: '-----BEGIN CERTIFICATE-----
+
+MIICCzCCAbWgAwIBAgICA+gwDQYJKoZIhvcNAQELBQAweTESMBAGA1UEAwwJbG9j
+
+YWxob3N0MWMwYQYDVQQLDFpvcGMtdGVuYW50Om9jaWQxLnRlbmFuY3kub2MxLi5h
+
+YWFhYWFhYXl4Znd2ZTJoenhtYTN2amZuN2pvdXFkMm8yc3BxN29sZmhwa2NzZHdt
+
+M2l5NjN3bndhaHEwHhcNMjMwOTI3MTYxMjQ3WhcNMzMwOTI0MTYxMjQ3WjB5MRIw
+
+EAYDVQQDDAlsb2NhbGhvc3QxYzBhBgNVBAsMWm9wYy10ZW5hbnQ6b2NpZDEudGVu
+
+YW5jeS5vYzEuLmFhYWFhYWFheXhmd3ZlMmh6eG1hM3ZqZm43am91cWQybzJzcHE3
+
+b2xmaHBrY3Nkd20zaXk2M3dud2FocTBaMA0GCSqGSIb3DQEBAQUAA0kAMEYCQQDM
+
+wuWb3bOhvTLnPPHBnHTI/vI+Z9FRtUCVyo154fKqKu/Cu3wUP2gxjrhIN5EnYh3C
+
+/wc1bsfRR4yz+jkS2MTHAgEDoykwJzAPBgNVHRMECDAGAQH/AgEAMBQGA1UdEQQN
+
+MAuCCWxvY2FsaG9zdDANBgkqhkiG9w0BAQsFAANBAHiOn+D9MGnwMg+x6fH6CeX6
+
++z5/yuExKDeMq221mfYediwPHcnW1Wj3G44AYqQufSys2Fw9rBoAi7SD2WP1nBc=
+
+-----END CERTIFICATE-----'
+    headers:
+      content-type:
+      - application/x-x509-ca-cert
+      last-modified:
+      - Fri, 22 Sep 2023 01:30:41 GMT
+      server:
+      - server
+      transfer-encoding:
+      - chunked
+      x-request-id:
+      - 08f5cbdc-d0b9-491e-acfb-9c6ed3071319
+    status:
+      code: 200
+      message: OK
+- request:
+    body: mock_body
+    headers: {}
+    method: POST
+    uri: https://auth.us-ashburn-1.oraclecloud.com/v1/x509
+  response:
+    body:
+      data:
+        token: eyJraWQiOiJhc3dfb2MxX2o0eGQiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJvY2lkMS5pbnN0YW5jZS5vYzEuaWFkLmFudXdjbGp0dGx6bGlsYWNrZXYycXBpYjYzZ2x1aXN1bmQ1NXNnd3VuZ3lsd2Z5Zmg1bmdkNHl3enRmcSIsIm9wYy1jZXJ0dHlwZSI6Imluc3RhbmNlIiwiaXNzIjoiYXV0aFNlcnZpY2Uub3JhY2xlLmNvbSIsImZwcmludCI6IkE3OjQ4Ojc4OjYzOjREOkVGOjAzOjlBOkQ3OjhFOjNFOjc3OkZBOjU5OkMwOjUzOkI3OjI5OkFBOjAxIiwicHR5cGUiOiJpbnN0YW5jZSIsImF1ZCI6Im9jaSIsIm9wYy10YWciOiJWMyxvY2lkMS50ZW5hbmN5Lm9jMS4uYWFhYWFhYWF5eGZ3dmUyaHp4bWEzdmpmbjdqb3VxZDJvMnNwcTdvbGZocGtjc2R3bTNpeTYzd253YWhxLEFBQUFBUUFBQUFCXC9mMzlcL0FBQUFqdz09LEFBQUFBUUFBQUFBQUFBQ0EiLCJ0dHlwZSI6Ing1MDkiLCJvcGMtaW5zdGFuY2UiOiJvY2lkMS5pbnN0YW5jZS5vYzEuaWFkLmFudXdjbGp0dGx6bGlsYWNrZXYycXBpYjYzZ2x1aXN1bmQ1NXNnd3VuZ3lsd2Z5Zmg1bmdkNHl3enRmcSIsImV4cCI6MTY5NTM0NzQ3NSwib3BjLWNvbXBhcnRtZW50Ijoib2NpZDEuY29tcGFydG1lbnQub2MxLi5hYWFhYWFhYXA0NWpyY3d4cjQ2eGZuYWJ0Mmdpb2g2amFjeGtxMm1lcm4yZ21ibHJiaDZzYjN6ZmR5amEiLCJpYXQiOjE2OTUzNDYyNzUsImp0aSI6IjA4YmMwOTBkLTliZWYtNDk4Ny04NGJhLWI4ZjVjODE1N2QzOCIsInRlbmFudCI6Im9jaWQxLnRlbmFuY3kub2MxLi5hYWFhYWFhYXl4Znd2ZTJoenhtYTN2amZuN2pvdXFkMm8yc3BxN29sZmhwa2NzZHdtM2l5NjN3bndhaHEiLCJqd2siOiJ7XCJraWRcIjpcIkE3OjQ4Ojc4OjYzOjREOkVGOjAzOjlBOkQ3OjhFOjNFOjc3OkZBOjU5OkMwOjUzOkI3OjI5OkFBOjAxXCIsXCJuXCI6XCJtVEJmME8wSldYdmdnRmVqeVp3VWo4Qm5RZk5NLXJJNXBZTVlEc1p3UkRsd3FQam1nN0JkR0NhNjhWbzB4RW5NdjhTcnlYY29mejBheUNrSXFCQ3hkUy1LUTUzbk1ibU1vekFpVWxLSHkyQVBlSWVmeFcwYzR1c2t5QVpqaHRyY00yTHZTZ2liZ09aWEpaYWJCRkNPUlp0c3Zmd1dYcnloMnh5QVFEREtEVWtpNmw4c0E2Q2tpTDc2SFotZGxhQmtoTHVOM1c3YldkZzF5clNmdkw1WG9xUHVMNDVzUjVLWUF6RzBOMFpyM3l2cHhlalJCcXpGLVNHWlhfNWdhbG1XTlMwRHdJOHc4VjJnbnNJUEhrRkF5cGdxd0luV01LYmVJZTF6cTV3Mk1FU0hzV0ZrQzgxN244ZVFEalZZRWI2bE5jaHpZcnc5Zl9XNDR1NkdMMEpFMndcIixcImVcIjpcIkFRQUJcIixcImt0eVwiOlwiUlNBXCIsXCJhbGdcIjpcIlJTMjU2XCIsXCJ1c2VcIjpcInNpZ1wifSIsIm9wYy10ZW5hbnQiOiJvY2lkMS50ZW5hbmN5Lm9jMS4uYWFhYWFhYWF5eGZ3dmUyaHp4bWEzdmpmbjdqb3VxZDJvMnNwcTdvbGZocGtjc2R3bTNpeTYzd253YWhxIn0.A0PQDq3Z0N7AuNXprISFArHV5qgAdqSAokCDfHaIqmqikGkGKzoL22KQoaUsr4FB-srZDgCPsHC1OVj9KDqTOpOvozz1iH0JfLL9UZFzCRkSN65_d6rZ608xdtP0ntAOhsB0OizFbjjBkK7j1w5JqKdGuEy-i9wwhhjKhTrMABAhTseLaiXRY2rHYbXuv00dzwd3Vlr4HiQUWnhNlAp-BzJXXPMMFCTAkTCat_QbgX6VMYKWUsk0WkVwodXekQrpEJCPTrS53lWQqL7bIOnJRduD9fo6RIA2BI9rYniI9PeKZ9ogXAGm0eZXhBUXnAMp71N5CV3R7TtWP0BvQ5iw-w
+    headers:
+      content-type:
+      - application/json
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: https://objectstorage.us-ashburn-1.oraclecloud.com/n
+  response:
+    body:
+      data: idpktreuauj2
+    headers:
+      content-type:
+      - application/json
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: https://objectstorage.us-ashburn-1.oraclecloud.com/n/<namepsace>/b?compartmentId=ocid1.tenancy.oc1..<unique_ID>&fields=tags
+  response:
+    body:
+      data:
+      - compartmentId: ocid1.tenancy.oc1..<unique_ID>
+        createdBy: ocid1.saml2idp.oc1..<unique_ID>
+        definedTags:
+          Oracle-Tags:
+            CreatedBy: user@example.com
+            CreatedOn: '2022-06-13T18:17:03.713Z'
+        etag: 0ec45353-1beb-4cbf-8948-bd3555fe2f1c
+        freeformTags:
+          app-name: acs
+        name: bucket-20220613-1316
+        namespace: <namespace>
+        timeCreated: '2022-06-13T18:17:03.722Z'
+    headers:
+      content-type:
+      - application/json
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: http://169.254.169.254/opc/v2/identity/cert.pem
+  response:
+    body:
+      string: ''
+    headers:
+      content-type:
+      - application/x-x509-ca-cert
+      last-modified:
+      - Fri, 22 Sep 2023 01:30:41 GMT
+      server:
+      - server
+      transfer-encoding:
+      - chunked
+      x-request-id:
+      - dd997362-70e4-4d10-b0da-0238b7d781ed
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: http://169.254.169.254/opc/v2/identity/key.pem
+  response:
+    body:
+      string: ''
+    headers:
+      content-type:
+      - application/x-x509-ca-cert
+      last-modified:
+      - Fri, 22 Sep 2023 01:30:41 GMT
+      server:
+      - server
+      x-request-id:
+      - d52651cf-53cc-409c-be79-a55b031f70b9
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: http://169.254.169.254/opc/v2/identity/intermediate.pem
+  response:
+    body:
+      string: ''
+    headers:
+      content-type:
+      - application/x-x509-ca-cert
+      last-modified:
+      - Fri, 22 Sep 2023 01:30:41 GMT
+      server:
+      - server
+      transfer-encoding:
+      - chunked
+      x-request-id:
+      - 869e5c22-d2ab-4251-a981-c7f0bd4ee5a5
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: http://169.254.169.254/opc/v2/instance/region
+  response:
+    body:
+      string: iad
+    headers:
+      content-type:
+      - application/octet-stream
+      last-modified:
+      - Fri, 22 Sep 2023 01:30:41 GMT
+      server:
+      - server
+      x-request-id:
+      - 61625489-bf2e-4ffa-87e7-acab9e1e7b32
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: http://169.254.169.254/opc/v2/identity/cert.pem
+  response:
+    body:
+      string: '-----BEGIN CERTIFICATE-----
+
+MIICCzCCAbWgAwIBAgICA+gwDQYJKoZIhvcNAQELBQAweTESMBAGA1UEAwwJbG9j
+
+YWxob3N0MWMwYQYDVQQLDFpvcGMtdGVuYW50Om9jaWQxLnRlbmFuY3kub2MxLi5h
+
+YWFhYWFhYXl4Znd2ZTJoenhtYTN2amZuN2pvdXFkMm8yc3BxN29sZmhwa2NzZHdt
+
+M2l5NjN3bndhaHEwHhcNMjMwOTI3MTYxMjQ3WhcNMzMwOTI0MTYxMjQ3WjB5MRIw
+
+EAYDVQQDDAlsb2NhbGhvc3QxYzBhBgNVBAsMWm9wYy10ZW5hbnQ6b2NpZDEudGVu
+
+YW5jeS5vYzEuLmFhYWFhYWFheXhmd3ZlMmh6eG1hM3ZqZm43am91cWQybzJzcHE3
+
+b2xmaHBrY3Nkd20zaXk2M3dud2FocTBaMA0GCSqGSIb3DQEBAQUAA0kAMEYCQQDM
+
+wuWb3bOhvTLnPPHBnHTI/vI+Z9FRtUCVyo154fKqKu/Cu3wUP2gxjrhIN5EnYh3C
+
+/wc1bsfRR4yz+jkS2MTHAgEDoykwJzAPBgNVHRMECDAGAQH/AgEAMBQGA1UdEQQN
+
+MAuCCWxvY2FsaG9zdDANBgkqhkiG9w0BAQsFAANBAHiOn+D9MGnwMg+x6fH6CeX6
+
++z5/yuExKDeMq221mfYediwPHcnW1Wj3G44AYqQufSys2Fw9rBoAi7SD2WP1nBc=
+
+-----END CERTIFICATE-----'
+    headers:
+      content-type:
+      - application/x-x509-ca-cert
+      last-modified:
+      - Fri, 22 Sep 2023 01:30:41 GMT
+      server:
+      - server
+      transfer-encoding:
+      - chunked
+      x-request-id:
+      - 72451ec6-7609-402f-8d28-8700ce79bd51
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: http://169.254.169.254/opc/v2/identity/key.pem
+  response:
+    body:
+      string: '-----BEGIN RSA PRIVATE KEY-----
+
+MIIBOwIBAAJBANESBSO/Ml54JuCr8hhZuC79HphVS+k9M6bfLz94lKlmzc4i1cyN
+
+TcfNivgyUTmzZcUvbunsJJokC547jp+D76MCAQMCQQCLYVjCf3bppW9AcqFlkSV0
+
+qL8QON1GKM0Z6h9/pbhw7f4Gt4cmpYqFaEtzom2LxNcRJ8qmVN5T0La6Vm+BVsaL
+
+AiEA/kmUR8Aow/SEvMo4r82jQ6mb5V+nepTSudyVzHrmyAsCIQDSentDUmw6Cyxd
+
+AIX9GmjfgdfZkMVch5g/qiQa4pr9yQIhAKmGYtqAGy1NrdMxex/ebNfGZ+4/xPxj
+
+NyaTDohR7zAHAiEAjFGngjby0VzIPgBZU2bwlQE6kQsuPa+61RwYEexnU9sCIQCP
+
+xckiCcqSW7uLD214+XzuI1dQQ0FLI5dVN5HScDEA0A==
+
+-----END RSA PRIVATE KEY-----'
+    headers:
+      content-type:
+      - application/x-x509-ca-cert
+      last-modified:
+      - Fri, 22 Sep 2023 01:30:41 GMT
+      server:
+      - server
+      x-request-id:
+      - bae9d9ee-5b8e-40fe-b157-d88dbba27908
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: http://169.254.169.254/opc/v2/identity/intermediate.pem
+  response:
+    body:
+      string: '-----BEGIN CERTIFICATE-----
+
+MIICCzCCAbWgAwIBAgICA+gwDQYJKoZIhvcNAQELBQAweTESMBAGA1UEAwwJbG9j
+
+YWxob3N0MWMwYQYDVQQLDFpvcGMtdGVuYW50Om9jaWQxLnRlbmFuY3kub2MxLi5h
+
+YWFhYWFhYXl4Znd2ZTJoenhtYTN2amZuN2pvdXFkMm8yc3BxN29sZmhwa2NzZHdt
+
+M2l5NjN3bndhaHEwHhcNMjMwOTI3MTYxMjQ3WhcNMzMwOTI0MTYxMjQ3WjB5MRIw
+
+EAYDVQQDDAlsb2NhbGhvc3QxYzBhBgNVBAsMWm9wYy10ZW5hbnQ6b2NpZDEudGVu
+
+YW5jeS5vYzEuLmFhYWFhYWFheXhmd3ZlMmh6eG1hM3ZqZm43am91cWQybzJzcHE3
+
+b2xmaHBrY3Nkd20zaXk2M3dud2FocTBaMA0GCSqGSIb3DQEBAQUAA0kAMEYCQQDM
+
+wuWb3bOhvTLnPPHBnHTI/vI+Z9FRtUCVyo154fKqKu/Cu3wUP2gxjrhIN5EnYh3C
+
+/wc1bsfRR4yz+jkS2MTHAgEDoykwJzAPBgNVHRMECDAGAQH/AgEAMBQGA1UdEQQN
+
+MAuCCWxvY2FsaG9zdDANBgkqhkiG9w0BAQsFAANBAHiOn+D9MGnwMg+x6fH6CeX6
+
++z5/yuExKDeMq221mfYediwPHcnW1Wj3G44AYqQufSys2Fw9rBoAi7SD2WP1nBc=
+
+-----END CERTIFICATE-----'
+    headers:
+      content-type:
+      - application/x-x509-ca-cert
+      last-modified:
+      - Fri, 22 Sep 2023 01:30:41 GMT
+      server:
+      - server
+      transfer-encoding:
+      - chunked
+      x-request-id:
+      - e4e70542-a19c-4436-85c0-99feeca4e8f5
+    status:
+      code: 200
+      message: OK
+- request:
+    body: mock_body
+    headers: {}
+    method: POST
+    uri: https://auth.us-ashburn-1.oraclecloud.com/v1/x509
+  response:
+    body:
+      data:
+        token: eyJraWQiOiJhc3dfb2MxX2o0eGQiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJvY2lkMS5pbnN0YW5jZS5vYzEuaWFkLmFudXdjbGp0dGx6bGlsYWNrZXYycXBpYjYzZ2x1aXN1bmQ1NXNnd3VuZ3lsd2Z5Zmg1bmdkNHl3enRmcSIsIm9wYy1jZXJ0dHlwZSI6Imluc3RhbmNlIiwiaXNzIjoiYXV0aFNlcnZpY2Uub3JhY2xlLmNvbSIsImZwcmludCI6IkE3OjQ4Ojc4OjYzOjREOkVGOjAzOjlBOkQ3OjhFOjNFOjc3OkZBOjU5OkMwOjUzOkI3OjI5OkFBOjAxIiwicHR5cGUiOiJpbnN0YW5jZSIsImF1ZCI6Im9jaSIsIm9wYy10YWciOiJWMyxvY2lkMS50ZW5hbmN5Lm9jMS4uYWFhYWFhYWF5eGZ3dmUyaHp4bWEzdmpmbjdqb3VxZDJvMnNwcTdvbGZocGtjc2R3bTNpeTYzd253YWhxLEFBQUFBUUFBQUFCXC9mMzlcL0FBQUFqdz09LEFBQUFBUUFBQUFBQUFBQ0EiLCJ0dHlwZSI6Ing1MDkiLCJvcGMtaW5zdGFuY2UiOiJvY2lkMS5pbnN0YW5jZS5vYzEuaWFkLmFudXdjbGp0dGx6bGlsYWNrZXYycXBpYjYzZ2x1aXN1bmQ1NXNnd3VuZ3lsd2Z5Zmg1bmdkNHl3enRmcSIsImV4cCI6MTY5NTM0NzQ3Niwib3BjLWNvbXBhcnRtZW50Ijoib2NpZDEuY29tcGFydG1lbnQub2MxLi5hYWFhYWFhYXA0NWpyY3d4cjQ2eGZuYWJ0Mmdpb2g2amFjeGtxMm1lcm4yZ21ibHJiaDZzYjN6ZmR5amEiLCJpYXQiOjE2OTUzNDYyNzYsImp0aSI6IjVkOTBlYTc5LTFiYWYtNGU5ZS1iMGUwLTIzYzAxYTkwNmEyOSIsInRlbmFudCI6Im9jaWQxLnRlbmFuY3kub2MxLi5hYWFhYWFhYXl4Znd2ZTJoenhtYTN2amZuN2pvdXFkMm8yc3BxN29sZmhwa2NzZHdtM2l5NjN3bndhaHEiLCJqd2siOiJ7XCJraWRcIjpcIkE3OjQ4Ojc4OjYzOjREOkVGOjAzOjlBOkQ3OjhFOjNFOjc3OkZBOjU5OkMwOjUzOkI3OjI5OkFBOjAxXCIsXCJuXCI6XCJ1UExxbUdIZ0pyVXpxVC1pWGYyWkVYcnRyaHJoMGJ4cFpKTFRBT3RTSkx2S2JjVkQ1UXFZRkw2aklBa05JYkVQRUlrQXhqbENJc1k5aDdSa3ZvbVdFOE1nY2VJMW9WdmtGbXBGaDU2aEdzTlFYamJyZGhiN2N0dk5zZmtOenVRSTZiODh2bU5Rc2haNlotRG01V2hFd3kwUllqUjZKS21WTHdDd082dk5VRDB0a3FOZUtZTEdWbFZhN1owYVUtQXVIbkVicVJRR0VZeWJ5Z1RRSVpxY2ZXU0drYVNWTkFpMHNybnlacjJZZ1E3MWlRRkNUQnpJYkhvMnJmODJXZFRGMWltOUdvSFY5MXQ1NndQNC1CRGo5dlJKNDk4U0NPaUw1aXdQeExTaEN4MWQtcHp4RDNBWF9Mcm8wU3pNdXlTbkpHMjRmZUhkMFd0ak1OcUpPa3NjUFFcIixcImVcIjpcIkFRQUJcIixcImt0eVwiOlwiUlNBXCIsXCJhbGdcIjpcIlJTMjU2XCIsXCJ1c2VcIjpcInNpZ1wifSIsIm9wYy10ZW5hbnQiOiJvY2lkMS50ZW5hbmN5Lm9jMS4uYWFhYWFhYWF5eGZ3dmUyaHp4bWEzdmpmbjdqb3VxZDJvMnNwcTdvbGZocGtjc2R3bTNpeTYzd253YWhxIn0.IMyHYtULnSO7wsjG5dM9463SlMd0SnXJ4FS8NWjt-y9F-kIzYSh2n4qYCPhIMbI1BhU5zJWJ23kEC_tGLZ672Lj3IhOJG9T0xIi-_aVybHjQ9PWehL-ApWdxAeaIgsbczIIiaFUlJaRIpvBHWB72PzYQ5_XijpWPMowPHm7fhmsoXDD8w0CT_n9hPUlca0RMIQA2cfcVEND7ZsCfHs-lk0y0rrsJkyzvoZxWwVbJ2scINgfeJmxJwTJshkQkwMcaJJIDf2gSVhQ9cbP9v2fJ7DgrxciYT2ieeY4N7X-Hn1RQ9jbn0yBj_BfqeCtolSZ8tHLHZ__gBwVKIxeWc9-svA
+    headers:
+      content-type:
+      - application/json
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: https://objectstorage.us-ashburn-1.oraclecloud.com/n/<namepsace>/b/ip_test_bucket
+  response:
+    body:
+      data:
+        approximateCount: null
+        approximateSize: null
+        approximateSizeMultipartUploads: null
+        autoTiering: null
+        compartmentId: ocid1.compartment.oc1..<unique_ID>
+        createdBy: ocid1.user.oc1..<unique_ID>
+        definedTags:
+          Oracle-Tags:
+            CreatedBy: user@example.com
+            CreatedOn: '2023-09-22T01:31:07.824Z'
+        etag: b7d4170c-7906-4ade-8a3f-461a799eee4d
+        freeformTags:
+          Project: CNCF
+        id: ocid1.bucket.oc1..<unique_ID>
+        isReadOnly: false
+        kmsKeyId: null
+        metadata: {}
+        meterFlagSet:
+          empty: true
+        name: ip_test_bucket
+        namespace: <namespace>
+        objectEventsEnabled: false
+        objectLevelAuditMode: Disabled
+        publicAccessType: ObjectRead
+        replicationEnabled: false
+        storageTier: Standard
+        timeCreated: '2023-09-22T01:31:07.917Z'
+        versioning: Disabled
+    headers:
+      cache-control:
+      - no-store
+      content-type:
+      - application/json
+    status:
+      code: 200
+      message: OK
+version: 1
