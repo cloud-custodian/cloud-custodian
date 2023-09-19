@@ -8,7 +8,11 @@ class DataprocTest(BaseTest):
 
     def test_dataproc_clusters_filter_iam_query(self):
         project_id = 'cloud-custodian'
-        factory = self.replay_flight_data('dataproc-clusters-filter-iam', project_id=project_id)
+        factory = self.replay_flight_data(
+            'dataproc-clusters-filter-iam',
+            project_id=project_id,
+        )
+
         p = self.load_policy({
             'name': 'dataproc-filter-iam',
             'resource': 'gcp.dataproc-clusters',
@@ -18,7 +22,7 @@ class DataprocTest(BaseTest):
                         'op': 'intersect',
                         'value': ['user:yauhen_shaliou@epam.com']}
             }]
-        }, session_factory=factory)
+        }, session_factory=factory, config={'region': 'us-central1'})
         resources = p.run()
 
         self.assertEqual(1, len(resources))
