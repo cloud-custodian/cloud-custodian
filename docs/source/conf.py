@@ -64,6 +64,9 @@ source_suffix = ['.rst', '.md']
 # The master toctree document.
 master_doc = 'index'
 
+# Generate Markdown header links anchors
+myst_heading_anchors = 3
+
 # General information about the project.
 project = u'Cloud Custodian'
 author = u'Kapil Thangavelu'
