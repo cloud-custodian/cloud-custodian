@@ -185,7 +185,7 @@ class LogExclusionTest(BaseTest):
 class LoggingSinkBucketTest(BaseTest):
 
     def test_query(self):
-        project_id = 'cloud-custodian'
+        project_id = 'gcp-lab-custodian'
         bucket_name = 'for_test_12345678'
         factory = self.replay_flight_data('test-logging-sink-bucket-query', project_id)
         policy = self.load_policy({
