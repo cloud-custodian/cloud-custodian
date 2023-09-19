@@ -219,7 +219,7 @@ class KmsLocation(QueryResourceManager):
 @KmsLocation.filter_registry.register('keyring')
 class KmsLocationKmsKeyringFilter(Filter):
 
-    schema = type_schema('kms-keyring', **{
+    schema = type_schema('keyring', **{
         'exist': {'type': 'boolean'}},)
     permissions = ('cloudkms.keyRings.list',)
 
