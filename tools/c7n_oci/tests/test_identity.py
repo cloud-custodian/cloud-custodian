@@ -1,7 +1,6 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-id: Apache-2.0
 
-import unittest
 import os
 
 import pytest
@@ -471,7 +470,7 @@ class TestIdentityTerraformTest(OciBaseTest):
         assert test_user_found
 
 
-class IdentityUnitTest(unittest.TestCase, OciBaseTest):
+class TestIdentity(OciBaseTest):
     @staticmethod
     def get_policy(resource, filters=None, actions=None):
         policy = {
@@ -546,9 +545,9 @@ class IdentityUnitTest(unittest.TestCase, OciBaseTest):
         }
         return cross_filter
 
-    def test_identity_compartment_schema(self):
-        self.assertTrue(
-            self.load_policy(
+    def test_identity_compartment_schema(self, test):
+        test.assertTrue(
+            test.load_policy(
                 self.get_policy(
                     "compartment",
                     filters=None,
@@ -558,33 +557,33 @@ class IdentityUnitTest(unittest.TestCase, OciBaseTest):
             )
         )
 
-    def test_identity_group_schema(self):
-        self.assertTrue(
-            self.load_policy(
+    def test_identity_group_schema(self, test):
+        test.assertTrue(
+            test.load_policy(
                 self.get_policy("group", filters=None, actions=self.get_action("group")),
                 validate=True,
             )
         )
 
-    def test_identity_user_schema(self):
-        self.assertTrue(
-            self.load_policy(
+    def test_identity_user_schema(self, test):
+        test.assertTrue(
+            test.load_policy(
                 self.get_policy("user", filters=None, actions=self.get_action("user")),
                 validate=True,
             )
         )
 
-    def test_identity_api_key_schema(self):
-        self.assertTrue(
-            self.load_policy(
+    def test_identity_api_key_schema(self, test):
+        test.assertTrue(
+            test.load_policy(
                 self.get_policy("user", filters=None, actions=None),
                 validate=True,
             )
         )
 
-    def test_identity_auth_token_schema(self):
-        self.assertTrue(
-            self.load_policy(
+    def test_identity_auth_token_schema(self, test):
+        test.assertTrue(
+            test.load_policy(
                 self.get_policy(
                     "user",
                     filters=None,
@@ -594,9 +593,9 @@ class IdentityUnitTest(unittest.TestCase, OciBaseTest):
             )
         )
 
-    def test_identity_db_credential_schema(self):
-        self.assertTrue(
-            self.load_policy(
+    def test_identity_db_credential_schema(self, test):
+        test.assertTrue(
+            test.load_policy(
                 self.get_policy(
                     "user",
                     filters=None,
@@ -606,9 +605,9 @@ class IdentityUnitTest(unittest.TestCase, OciBaseTest):
             )
         )
 
-    def test_identity_customer_secret_key_schema(self):
-        self.assertTrue(
-            self.load_policy(
+    def test_identity_customer_secret_key_schema(self, test):
+        test.assertTrue(
+            test.load_policy(
                 self.get_policy(
                     "user",
                     filters=None,
@@ -618,9 +617,9 @@ class IdentityUnitTest(unittest.TestCase, OciBaseTest):
             )
         )
 
-    def test_identity_smtp_credential_schema(self):
-        self.assertTrue(
-            self.load_policy(
+    def test_identity_smtp_credential_schema(self, test):
+        test.assertTrue(
+            test.load_policy(
                 self.get_policy(
                     "user",
                     filters=None,
@@ -630,9 +629,9 @@ class IdentityUnitTest(unittest.TestCase, OciBaseTest):
             )
         )
 
-    def test_identity_oauth_credential_schema(self):
-        self.assertTrue(
-            self.load_policy(
+    def test_identity_oauth_credential_schema(self, test):
+        test.assertTrue(
+            test.load_policy(
                 self.get_policy(
                     "user",
                     filters=None,
@@ -642,318 +641,318 @@ class IdentityUnitTest(unittest.TestCase, OciBaseTest):
             )
         )
 
-    @patch("c7n_oci.resources.identity.User")
-    def test_oauth_size_identity(self, user_mock):
-        policy_str = {
-            "type": "o-auth2-client-credentials",
-            "key": "o_auth2_client_credentials",
-            "value": 1,
-            "op": "eq",
-            "value_type": "size",
-        }
-        identity_client = Mock()
-        response = Response(200, None, [{"display_name": "cloud_custodian_oauth"}], None)
-        identity_client.list_o_auth_client_credentials.return_value = response
-        user_mock.get_client.return_value = identity_client
-        resources = [{"id": "ocid1.user.oc1..<unique_ID>", "description": "Cloud Custodian"}]
-        filter = UserOAuth2ClientCredentialsValueFilter(policy_str)
-        filter.manager = user_mock
-        filtered_resources = filter.process(resources, None)
-        self.assertEqual(len(filtered_resources), 1)
-
-    @patch("c7n_oci.resources.identity.User")
-    def test_oauth_exists_identity(self, user_mock):
-        policy_str = {
-            "type": "o-auth2-client-credentials",
-            "key": "o_auth2_client_credentials",
-            "value": 1,
-            "op": "eq",
-            "value_type": "size",
-        }
-        identity_client = Mock()
-        oauth_data = [{"display_name": "cloud_custodian_oauth"}]
-        response = Response(200, None, oauth_data, None)
-        identity_client.list_o_auth_client_credentials.return_value = response
-        user_mock.get_client.return_value = identity_client
-        resources = [
-            {
-                "id": "ocid1.user.oc1..<unique_ID>",
-                "description": "Cloud Custodian",
-                "o_auth2_client_credentials": oauth_data,
+    def test_oauth_size_identity(self, test):
+        with patch("c7n_oci.resources.identity.User") as user_mock:
+            policy_str = {
+                "type": "o-auth2-client-credentials",
+                "key": "o_auth2_client_credentials",
+                "value": 1,
+                "op": "eq",
+                "value_type": "size",
             }
-        ]
-        filter = UserOAuth2ClientCredentialsValueFilter(policy_str)
-        filter.manager = user_mock
-        filtered_resources = filter.process(resources, None)
-        self.assertEqual(len(filtered_resources), 1)
+            identity_client = Mock()
+            response = Response(200, None, [{"display_name": "cloud_custodian_oauth"}], None)
+            identity_client.list_o_auth_client_credentials.return_value = response
+            user_mock.get_client.return_value = identity_client
+            resources = [{"id": "ocid1.user.oc1..<unique_ID>", "description": "Cloud Custodian"}]
+            filter = UserOAuth2ClientCredentialsValueFilter(policy_str)
+            filter.manager = user_mock
+            filtered_resources = filter.process(resources, None)
+            test.assertEqual(len(filtered_resources), 1)
 
-    @patch("c7n_oci.resources.identity.User")
-    def test_oauth_filter_identity(self, user_mock):
-        policy_str = {
-            "type": "o-auth2-client-credentials",
-            "key": "o_auth2_client_credential.lifecycle_state",
-            "value": "ACTIVE",
-            "op": "eq",
-        }
-        identity_client = Mock()
-        data = [{"display_name": "cloud_custodian_oauth", "lifecycle_state": "ACTIVE"}]
-        response = Response(200, None, data, None)
-        identity_client.list_o_auth_client_credentials.return_value = response
-        user_mock.get_client.return_value = identity_client
-        resources = [{"id": "ocid1.user.oc1..<unique_ID>", "description": "Cloud Custodian"}]
-        filter = UserOAuth2ClientCredentialsValueFilter(policy_str)
-        filter.manager = user_mock
-        filtered_resources = filter.process(resources, None)
-        self.assertEqual(len(filtered_resources), 1)
-
-    @patch("c7n_oci.resources.identity.User")
-    def test_apikeys_size_identity(self, user_mock):
-        policy_str = {
-            "type": "api-keys",
-            "key": "api_keys",
-            "value": 1,
-            "op": "eq",
-            "value_type": "size",
-        }
-        identity_client = Mock()
-        response = Response(200, None, [{"lifecycle_state": "ACTIVE"}], None)
-        identity_client.list_api_keys.return_value = response
-        user_mock.get_client.return_value = identity_client
-        resources = [{"id": "ocid1.user.oc1..<unique_ID>", "description": "Cloud Custodian"}]
-        filter = UserApiKeysValueFilter(policy_str)
-        filter.manager = user_mock
-        filtered_resources = filter.process(resources, None)
-        self.assertEqual(len(filtered_resources), 1)
-
-    @patch("c7n_oci.resources.identity.User")
-    def test_apikeys_exists_identity(self, user_mock):
-        policy_str = {
-            "type": "api-keys",
-            "key": "api_keys",
-            "value": 1,
-            "op": "eq",
-            "value_type": "size",
-        }
-        identity_client = Mock()
-        api_data = [{"lifecycle_state": "ACTIVE"}]
-        response = Response(200, None, api_data, None)
-        identity_client.list_api_keys.return_value = response
-        user_mock.get_client.return_value = identity_client
-        resources = [
-            {
-                "id": "ocid1.user.oc1..<unique_ID>",
-                "description": "Cloud Custodian",
-                "api_keys": api_data,
+    def test_oauth_exists_identity(self, test):
+        with patch("c7n_oci.resources.identity.User") as user_mock:
+            policy_str = {
+                "type": "o-auth2-client-credentials",
+                "key": "o_auth2_client_credentials",
+                "value": 1,
+                "op": "eq",
+                "value_type": "size",
             }
-        ]
-        filter = UserApiKeysValueFilter(policy_str)
-        filter.manager = user_mock
-        filtered_resources = filter.process(resources, None)
-        self.assertEqual(len(filtered_resources), 1)
+            identity_client = Mock()
+            oauth_data = [{"display_name": "cloud_custodian_oauth"}]
+            response = Response(200, None, oauth_data, None)
+            identity_client.list_o_auth_client_credentials.return_value = response
+            user_mock.get_client.return_value = identity_client
+            resources = [
+                {
+                    "id": "ocid1.user.oc1..<unique_ID>",
+                    "description": "Cloud Custodian",
+                    "o_auth2_client_credentials": oauth_data,
+                }
+            ]
+            filter = UserOAuth2ClientCredentialsValueFilter(policy_str)
+            filter.manager = user_mock
+            filtered_resources = filter.process(resources, None)
+            test.assertEqual(len(filtered_resources), 1)
 
-    @patch("c7n_oci.resources.identity.User")
-    def test_apikeys_filter_identity(self, user_mock):
-        policy_str = {
-            "type": "api-keys",
-            "key": "api_key.lifecycle_state",
-            "value": "ACTIVE",
-            "op": "eq",
-        }
-        identity_client = Mock()
-        response = Response(200, None, [{"lifecycle_state": "ACTIVE"}], None)
-        identity_client.list_api_keys.return_value = response
-        user_mock.get_client.return_value = identity_client
-        resources = [{"id": "ocid1.user.oc1..<unique_ID>", "description": "Cloud Custodian"}]
-        filter = UserApiKeysValueFilter(policy_str)
-        filter.manager = user_mock
-        filtered_resources = filter.process(resources, None)
-        self.assertEqual(len(filtered_resources), 1)
-
-    @patch("c7n_oci.resources.identity.User")
-    def test_dbcred_size_identity(self, user_mock):
-        policy_str = {
-            "type": "db-credentials",
-            "key": "db_credentials",
-            "value": 1,
-            "op": "eq",
-            "value_type": "size",
-        }
-        identity_client = Mock()
-        response = Response(200, None, [{"lifecycle_state": "ACTIVE"}], None)
-        identity_client.list_db_credentials.return_value = response
-        user_mock.get_client.return_value = identity_client
-        resources = [{"id": "ocid1.user.oc1..<unique_ID>", "description": "Cloud Custodian"}]
-        filter = UserDbCredentialsValueFilter(policy_str)
-        filter.manager = user_mock
-        filtered_resources = filter.process(resources, None)
-        self.assertEqual(len(filtered_resources), 1)
-
-    @patch("c7n_oci.resources.identity.User")
-    def test_dbcred_exists_identity(self, user_mock):
-        policy_str = {
-            "type": "db-credentials",
-            "key": "db_credentials",
-            "value": 1,
-            "op": "eq",
-            "value_type": "size",
-        }
-        identity_client = Mock()
-        dbcred_data = [{"lifecycle_state": "ACTIVE"}]
-        response = Response(200, None, dbcred_data, None)
-        identity_client.list_db_credentials.return_value = response
-        user_mock.get_client.return_value = identity_client
-        resources = [
-            {
-                "id": "ocid1.user.oc1..<unique_ID>",
-                "description": "Cloud Custodian",
-                "db_credentials": dbcred_data,
+    def test_oauth_filter_identity(self, test):
+        with patch("c7n_oci.resources.identity.User") as user_mock:
+            policy_str = {
+                "type": "o-auth2-client-credentials",
+                "key": "o_auth2_client_credential.lifecycle_state",
+                "value": "ACTIVE",
+                "op": "eq",
             }
-        ]
-        filter = UserDbCredentialsValueFilter(policy_str)
-        filter.manager = user_mock
-        filtered_resources = filter.process(resources, None)
-        self.assertEqual(len(filtered_resources), 1)
+            identity_client = Mock()
+            data = [{"display_name": "cloud_custodian_oauth", "lifecycle_state": "ACTIVE"}]
+            response = Response(200, None, data, None)
+            identity_client.list_o_auth_client_credentials.return_value = response
+            user_mock.get_client.return_value = identity_client
+            resources = [{"id": "ocid1.user.oc1..<unique_ID>", "description": "Cloud Custodian"}]
+            filter = UserOAuth2ClientCredentialsValueFilter(policy_str)
+            filter.manager = user_mock
+            filtered_resources = filter.process(resources, None)
+            test.assertEqual(len(filtered_resources), 1)
 
-    @patch("c7n_oci.resources.identity.User")
-    def test_dbcred_filter_identity(self, user_mock):
-        policy_str = {
-            "type": "db-credentials",
-            "key": "db_credential.lifecycle_state",
-            "value": "ACTIVE",
-            "op": "eq",
-        }
-        identity_client = Mock()
-        response = Response(200, None, [{"lifecycle_state": "ACTIVE"}], None)
-        identity_client.list_db_credentials.return_value = response
-        user_mock.get_client.return_value = identity_client
-        resources = [{"id": "ocid1.user.oc1..<unique_ID>", "description": "Cloud Custodian"}]
-        filter = UserDbCredentialsValueFilter(policy_str)
-        filter.manager = user_mock
-        filtered_resources = filter.process(resources, None)
-        self.assertEqual(len(filtered_resources), 1)
-
-    @patch("c7n_oci.resources.identity.User")
-    def test_cuskey_size_identity(self, user_mock):
-        policy_str = {
-            "type": "customer-secret-keys",
-            "key": "customer_secret_keys",
-            "value": 1,
-            "op": "eq",
-            "value_type": "size",
-        }
-        identity_client = Mock()
-        response = Response(200, None, [{"lifecycle_state": "ACTIVE"}], None)
-        identity_client.list_customer_secret_keys.return_value = response
-        user_mock.get_client.return_value = identity_client
-        resources = [{"id": "ocid1.user.oc1..<unique_ID>", "description": "Cloud Custodian"}]
-        filter = UserCustomerSecretKeysValueFilter(policy_str)
-        filter.manager = user_mock
-        filtered_resources = filter.process(resources, None)
-        self.assertEqual(len(filtered_resources), 1)
-
-    @patch("c7n_oci.resources.identity.User")
-    def test_cuskey_exists_identity(self, user_mock):
-        policy_str = {
-            "type": "customer-secret-keys",
-            "key": "customer_secret_keys",
-            "value": 1,
-            "op": "eq",
-            "value_type": "size",
-        }
-        identity_client = Mock()
-        cus_data = ([{"lifecycle_state": "ACTIVE"}],)
-        response = Response(200, None, cus_data, None)
-        identity_client.list_customer_secret_keys.return_value = response
-        user_mock.get_client.return_value = identity_client
-        resources = [
-            {
-                "id": "ocid1.user.oc1..<unique_ID>",
-                "description": "Cloud Custodian",
-                "customer_secret_keys": cus_data,
+    def test_apikeys_size_identity(self, test):
+        with patch("c7n_oci.resources.identity.User") as user_mock:
+            policy_str = {
+                "type": "api-keys",
+                "key": "api_keys",
+                "value": 1,
+                "op": "eq",
+                "value_type": "size",
             }
-        ]
-        filter = UserCustomerSecretKeysValueFilter(policy_str)
-        filter.manager = user_mock
-        filtered_resources = filter.process(resources, None)
-        self.assertEqual(len(filtered_resources), 1)
+            identity_client = Mock()
+            response = Response(200, None, [{"lifecycle_state": "ACTIVE"}], None)
+            identity_client.list_api_keys.return_value = response
+            user_mock.get_client.return_value = identity_client
+            resources = [{"id": "ocid1.user.oc1..<unique_ID>", "description": "Cloud Custodian"}]
+            filter = UserApiKeysValueFilter(policy_str)
+            filter.manager = user_mock
+            filtered_resources = filter.process(resources, None)
+            test.assertEqual(len(filtered_resources), 1)
 
-    @patch("c7n_oci.resources.identity.User")
-    def test_cuskey_filter_identity(self, user_mock):
-        policy_str = {
-            "type": "customer-secret-keys",
-            "key": "customer_secret_key.lifecycle_state",
-            "value": "ACTIVE",
-            "op": "eq",
-        }
-        identity_client = Mock()
-        response = Response(200, None, [{"lifecycle_state": "ACTIVE"}], None)
-        identity_client.list_customer_secret_keys.return_value = response
-        user_mock.get_client.return_value = identity_client
-        resources = [{"id": "ocid1.user.oc1..<unique_ID>", "description": "Cloud Custodian"}]
-        filter = UserCustomerSecretKeysValueFilter(policy_str)
-        filter.manager = user_mock
-        filtered_resources = filter.process(resources, None)
-        self.assertEqual(len(filtered_resources), 1)
-
-    @patch("c7n_oci.resources.identity.User")
-    def test_smtpcred_size_identity(self, user_mock):
-        policy_str = {
-            "type": "smtp-credentials",
-            "key": "smtp_credentials",
-            "value": 1,
-            "op": "eq",
-            "value_type": "size",
-        }
-        identity_client = Mock()
-        response = Response(200, None, [{"lifecycle_state": "ACTIVE"}], None)
-        identity_client.list_smtp_credentials.return_value = response
-        user_mock.get_client.return_value = identity_client
-        resources = [{"id": "ocid1.user.oc1..<unique_ID>", "description": "Cloud Custodian"}]
-        filter = UserSmtpCredentialsValueFilter(policy_str)
-        filter.manager = user_mock
-        filtered_resources = filter.process(resources, None)
-        self.assertEqual(len(filtered_resources), 1)
-
-    @patch("c7n_oci.resources.identity.User")
-    def test_smtpcred_exists_identity(self, user_mock):
-        policy_str = {
-            "type": "smtp-credentials",
-            "key": "smtp_credentials",
-            "value": 1,
-            "op": "eq",
-            "value_type": "size",
-        }
-        identity_client = Mock()
-        smtp_data = [{"lifecycle_state": "ACTIVE"}]
-        response = Response(200, None, smtp_data, None)
-        identity_client.list_smtp_credentials.return_value = response
-        user_mock.get_client.return_value = identity_client
-        resources = [
-            {
-                "id": "ocid1.user.oc1..<unique_ID>",
-                "description": "Cloud Custodian",
-                "smtp_credentials": smtp_data,
+    def test_apikeys_exists_identity(self, test):
+        with patch("c7n_oci.resources.identity.User") as user_mock:
+            policy_str = {
+                "type": "api-keys",
+                "key": "api_keys",
+                "value": 1,
+                "op": "eq",
+                "value_type": "size",
             }
-        ]
-        filter = UserSmtpCredentialsValueFilter(policy_str)
-        filter.manager = user_mock
-        filtered_resources = filter.process(resources, None)
-        self.assertEqual(len(filtered_resources), 1)
+            identity_client = Mock()
+            api_data = [{"lifecycle_state": "ACTIVE"}]
+            response = Response(200, None, api_data, None)
+            identity_client.list_api_keys.return_value = response
+            user_mock.get_client.return_value = identity_client
+            resources = [
+                {
+                    "id": "ocid1.user.oc1..<unique_ID>",
+                    "description": "Cloud Custodian",
+                    "api_keys": api_data,
+                }
+            ]
+            filter = UserApiKeysValueFilter(policy_str)
+            filter.manager = user_mock
+            filtered_resources = filter.process(resources, None)
+            test.assertEqual(len(filtered_resources), 1)
 
-    @patch("c7n_oci.resources.identity.User")
-    def test_smtpcred_filter_identity(self, user_mock):
-        policy_str = {
-            "type": "smtp-credentials",
-            "key": "smtp_credential.lifecycle_state",
-            "value": "ACTIVE",
-            "op": "eq",
-        }
-        identity_client = Mock()
-        response = Response(200, None, [{"lifecycle_state": "ACTIVE"}], None)
-        identity_client.list_smtp_credentials.return_value = response
-        user_mock.get_client.return_value = identity_client
-        resources = [{"id": "ocid1.user.oc1..<unique_ID>", "description": "Cloud Custodian"}]
-        filter = UserSmtpCredentialsValueFilter(policy_str)
-        filter.manager = user_mock
-        filtered_resources = filter.process(resources, None)
-        self.assertEqual(len(filtered_resources), 1)
+    def test_apikeys_filter_identity(self, test):
+        with patch("c7n_oci.resources.identity.User") as user_mock:
+            policy_str = {
+                "type": "api-keys",
+                "key": "api_key.lifecycle_state",
+                "value": "ACTIVE",
+                "op": "eq",
+            }
+            identity_client = Mock()
+            response = Response(200, None, [{"lifecycle_state": "ACTIVE"}], None)
+            identity_client.list_api_keys.return_value = response
+            user_mock.get_client.return_value = identity_client
+            resources = [{"id": "ocid1.user.oc1..<unique_ID>", "description": "Cloud Custodian"}]
+            filter = UserApiKeysValueFilter(policy_str)
+            filter.manager = user_mock
+            filtered_resources = filter.process(resources, None)
+            test.assertEqual(len(filtered_resources), 1)
+
+    def test_dbcred_size_identity(self, test):
+        with patch("c7n_oci.resources.identity.User") as user_mock:
+            policy_str = {
+                "type": "db-credentials",
+                "key": "db_credentials",
+                "value": 1,
+                "op": "eq",
+                "value_type": "size",
+            }
+            identity_client = Mock()
+            response = Response(200, None, [{"lifecycle_state": "ACTIVE"}], None)
+            identity_client.list_db_credentials.return_value = response
+            user_mock.get_client.return_value = identity_client
+            resources = [{"id": "ocid1.user.oc1..<unique_ID>", "description": "Cloud Custodian"}]
+            filter = UserDbCredentialsValueFilter(policy_str)
+            filter.manager = user_mock
+            filtered_resources = filter.process(resources, None)
+            test.assertEqual(len(filtered_resources), 1)
+
+    def test_dbcred_exists_identity(self, test):
+        with patch("c7n_oci.resources.identity.User") as user_mock:
+            policy_str = {
+                "type": "db-credentials",
+                "key": "db_credentials",
+                "value": 1,
+                "op": "eq",
+                "value_type": "size",
+            }
+            identity_client = Mock()
+            dbcred_data = [{"lifecycle_state": "ACTIVE"}]
+            response = Response(200, None, dbcred_data, None)
+            identity_client.list_db_credentials.return_value = response
+            user_mock.get_client.return_value = identity_client
+            resources = [
+                {
+                    "id": "ocid1.user.oc1..<unique_ID>",
+                    "description": "Cloud Custodian",
+                    "db_credentials": dbcred_data,
+                }
+            ]
+            filter = UserDbCredentialsValueFilter(policy_str)
+            filter.manager = user_mock
+            filtered_resources = filter.process(resources, None)
+            test.assertEqual(len(filtered_resources), 1)
+
+    def test_dbcred_filter_identity(self, test):
+        with patch("c7n_oci.resources.identity.User") as user_mock:
+            policy_str = {
+                "type": "db-credentials",
+                "key": "db_credential.lifecycle_state",
+                "value": "ACTIVE",
+                "op": "eq",
+            }
+            identity_client = Mock()
+            response = Response(200, None, [{"lifecycle_state": "ACTIVE"}], None)
+            identity_client.list_db_credentials.return_value = response
+            user_mock.get_client.return_value = identity_client
+            resources = [{"id": "ocid1.user.oc1..<unique_ID>", "description": "Cloud Custodian"}]
+            filter = UserDbCredentialsValueFilter(policy_str)
+            filter.manager = user_mock
+            filtered_resources = filter.process(resources, None)
+            test.assertEqual(len(filtered_resources), 1)
+
+    def test_cuskey_size_identity(self, test):
+        with patch("c7n_oci.resources.identity.User") as user_mock:
+            policy_str = {
+                "type": "customer-secret-keys",
+                "key": "customer_secret_keys",
+                "value": 1,
+                "op": "eq",
+                "value_type": "size",
+            }
+            identity_client = Mock()
+            response = Response(200, None, [{"lifecycle_state": "ACTIVE"}], None)
+            identity_client.list_customer_secret_keys.return_value = response
+            user_mock.get_client.return_value = identity_client
+            resources = [{"id": "ocid1.user.oc1..<unique_ID>", "description": "Cloud Custodian"}]
+            filter = UserCustomerSecretKeysValueFilter(policy_str)
+            filter.manager = user_mock
+            filtered_resources = filter.process(resources, None)
+            test.assertEqual(len(filtered_resources), 1)
+
+    def test_cuskey_exists_identity(self, test):
+        with patch("c7n_oci.resources.identity.User") as user_mock:
+            policy_str = {
+                "type": "customer-secret-keys",
+                "key": "customer_secret_keys",
+                "value": 1,
+                "op": "eq",
+                "value_type": "size",
+            }
+            identity_client = Mock()
+            cus_data = ([{"lifecycle_state": "ACTIVE"}],)
+            response = Response(200, None, cus_data, None)
+            identity_client.list_customer_secret_keys.return_value = response
+            user_mock.get_client.return_value = identity_client
+            resources = [
+                {
+                    "id": "ocid1.user.oc1..<unique_ID>",
+                    "description": "Cloud Custodian",
+                    "customer_secret_keys": cus_data,
+                }
+            ]
+            filter = UserCustomerSecretKeysValueFilter(policy_str)
+            filter.manager = user_mock
+            filtered_resources = filter.process(resources, None)
+            test.assertEqual(len(filtered_resources), 1)
+
+    def test_cuskey_filter_identity(self, test):
+        with patch("c7n_oci.resources.identity.User") as user_mock:
+            policy_str = {
+                "type": "customer-secret-keys",
+                "key": "customer_secret_key.lifecycle_state",
+                "value": "ACTIVE",
+                "op": "eq",
+            }
+            identity_client = Mock()
+            response = Response(200, None, [{"lifecycle_state": "ACTIVE"}], None)
+            identity_client.list_customer_secret_keys.return_value = response
+            user_mock.get_client.return_value = identity_client
+            resources = [{"id": "ocid1.user.oc1..<unique_ID>", "description": "Cloud Custodian"}]
+            filter = UserCustomerSecretKeysValueFilter(policy_str)
+            filter.manager = user_mock
+            filtered_resources = filter.process(resources, None)
+            test.assertEqual(len(filtered_resources), 1)
+
+    def test_smtpcred_size_identity(self, test):
+        with patch("c7n_oci.resources.identity.User") as user_mock:
+            policy_str = {
+                "type": "smtp-credentials",
+                "key": "smtp_credentials",
+                "value": 1,
+                "op": "eq",
+                "value_type": "size",
+            }
+            identity_client = Mock()
+            response = Response(200, None, [{"lifecycle_state": "ACTIVE"}], None)
+            identity_client.list_smtp_credentials.return_value = response
+            user_mock.get_client.return_value = identity_client
+            resources = [{"id": "ocid1.user.oc1..<unique_ID>", "description": "Cloud Custodian"}]
+            filter = UserSmtpCredentialsValueFilter(policy_str)
+            filter.manager = user_mock
+            filtered_resources = filter.process(resources, None)
+            test.assertEqual(len(filtered_resources), 1)
+
+    def test_smtpcred_exists_identity(self, test):
+        with patch("c7n_oci.resources.identity.User") as user_mock:
+            policy_str = {
+                "type": "smtp-credentials",
+                "key": "smtp_credentials",
+                "value": 1,
+                "op": "eq",
+                "value_type": "size",
+            }
+            identity_client = Mock()
+            smtp_data = [{"lifecycle_state": "ACTIVE"}]
+            response = Response(200, None, smtp_data, None)
+            identity_client.list_smtp_credentials.return_value = response
+            user_mock.get_client.return_value = identity_client
+            resources = [
+                {
+                    "id": "ocid1.user.oc1..<unique_ID>",
+                    "description": "Cloud Custodian",
+                    "smtp_credentials": smtp_data,
+                }
+            ]
+            filter = UserSmtpCredentialsValueFilter(policy_str)
+            filter.manager = user_mock
+            filtered_resources = filter.process(resources, None)
+            test.assertEqual(len(filtered_resources), 1)
+
+    def test_smtpcred_filter_identity(self, test):
+        with patch("c7n_oci.resources.identity.User") as user_mock:
+            policy_str = {
+                "type": "smtp-credentials",
+                "key": "smtp_credential.lifecycle_state",
+                "value": "ACTIVE",
+                "op": "eq",
+            }
+            identity_client = Mock()
+            response = Response(200, None, [{"lifecycle_state": "ACTIVE"}], None)
+            identity_client.list_smtp_credentials.return_value = response
+            user_mock.get_client.return_value = identity_client
+            resources = [{"id": "ocid1.user.oc1..<unique_ID>", "description": "Cloud Custodian"}]
+            filter = UserSmtpCredentialsValueFilter(policy_str)
+            filter.manager = user_mock
+            filtered_resources = filter.process(resources, None)
+            test.assertEqual(len(filtered_resources), 1)

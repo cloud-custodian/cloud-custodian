@@ -100,9 +100,10 @@ class WafClassicRegionalFilterBase(ValueFilter, metaclass=ABCMeta):
         return resource_arns
 
     def get_deprecations(self):
+        filter_name = self.data["type"]
         return [
-            DeprecatedField(f"{k} is deprecated", "Use the value filter attributes instead")
-            for k in ['web-acl', 'state']
+            DeprecatedField(f"{filter_name}.{k}", "Use the value filter attributes instead")
+            for k in {'web-acl', 'state'}.intersection(self.data)
         ]
 
     def get_web_acl_from_associations(self, resource_type, resource_arn):
@@ -266,9 +267,10 @@ class WafV2FilterBase(ValueFilter, metaclass=ABCMeta):
         return resource[self.cache_key]
 
     def get_deprecations(self):
+        filter_name = self.data["type"]
         return [
-            DeprecatedField(f"{k} is deprecated", "Use the value filter attributes instead")
-            for k in ['web-acl', 'state']
+            DeprecatedField(f"{filter_name}.{k}", "Use the value filter attributes instead")
+            for k in {'web-acl', 'state'}.intersection(self.data)
         ]
 
     # only needed for REGIONAL resources so no scope used as regional is default
