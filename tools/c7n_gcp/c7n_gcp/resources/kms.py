@@ -220,7 +220,7 @@ class KmsLocation(QueryResourceManager):
 class KmsLocationKmsKeyringFilter(Filter):
 
     schema = type_schema('kms-keyring', **{
-        'exist': {'anyOf': [{'type': 'boolean'}, {'type': 'string'}]}},)
+        'exist': {'anyOf': [{'type': 'boolean'}]}},)
     permissions = ('cloudkms.keyRings.list',)
 
     def process(self, resources, event=None):
