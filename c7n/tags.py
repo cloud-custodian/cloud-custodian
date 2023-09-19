@@ -431,7 +431,7 @@ class Tag(Action):
         """Interpolate in a single tag value.
         """
         params = {
-            'resource': resource,
+            'resource': utils.FormatResource(resource),
             'account_id': self.manager.config.account_id,
             'now': utils.FormatDate.utcnow(),
             'region': self.manager.config.region}

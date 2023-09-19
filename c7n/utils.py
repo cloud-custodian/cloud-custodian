@@ -732,6 +732,21 @@ class FormatDate:
             fmt = self.date_increment.sub("", fmt)
         return d.__format__(fmt)
 
+class FormatResource:
+    def __init__(self, d=None):
+        self._d = d
+
+    def __str__(self):
+        return str(self._d)
+
+    def __getattr__(self, k):
+        return getattr(self._d, k)
+
+    def __format__(self, fmt=None):
+        d = self._d
+        if not fmt:
+            return d
+        return str(jmespath_search(fmt, d))
 
 class QueryParser:
 
