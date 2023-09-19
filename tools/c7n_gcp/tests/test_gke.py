@@ -325,7 +325,8 @@ class KubernetesClusterNodePoolTest(BaseTest):
 
     def test_gke_cluster_nodepool_filter_server_config(self):
         project_id = 'cloud-custodian'
-        factory = self.replay_flight_data('gke-cluster-nodepool-filter-server-config', project_id=project_id)
+        factory = self.replay_flight_data('gke-cluster-nodepool-filter-server-config',
+                                          project_id=project_id)
         p = self.load_policy({
             'name': 'gke-cluster-nodepool-filter-server-config',
             'resource': 'gcp.gke-nodepool',

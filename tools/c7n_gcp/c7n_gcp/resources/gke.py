@@ -191,7 +191,6 @@ class KubernetesClusterNodePool(ChildResourceManager):
         def _get_location(cls, resource):
             "Get the region from the parent - the cluster"
             return super()._get_location(cls.get_parent(resource))
-    
 
 @KubernetesClusterNodePool.filter_registry.register('server-config')
 class ServerConfig(ValueFilter):
