@@ -806,7 +806,7 @@ class RedshiftSnapshot(QueryResourceManager):
         enum_spec = ('describe_cluster_snapshots', 'Snapshots', None)
         name = id = 'SnapshotIdentifier'
         date = 'SnapshotCreateTime'
-        config_type = cfn_type = "AWS::Redshift::ClusterSnapshot"
+        config_type = "AWS::Redshift::ClusterSnapshot"
         universal_taggable = True
 
     def get_arns(self, resources):

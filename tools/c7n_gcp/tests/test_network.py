@@ -267,3 +267,28 @@ class RouteTest(BaseTest):
             p.resource_manager.get_urns(routes),
             ["gcp:compute::cloud-custodian:route/test-route-2"],
         )
+
+
+class TestVPCFirewallFilter(BaseTest):
+
+    def test_vpc_firewall_filter_query(self):
+        project_id = 'cloud-custodian'
+        factory = self.replay_flight_data(
+            'test_vpc_firewall_filter_query', project_id=project_id)
+        p = self.load_policy(
+            {'name': 'vpc-firewall',
+             'resource': 'gcp.vpc',
+             'filters': [{
+                 'type': 'firewall',
+                 'attrs': [{
+                     'type': 'value',
+                     'key': 'id',
+                     'op': 'eq',
+                     'value': '2383043984399442858'
+                 }]
+             }]}, validate=True, session_factory=factory)
+
+        resources = p.run()
+
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['kind'], 'compute#network')

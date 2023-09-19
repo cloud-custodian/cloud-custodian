@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "c7n_left"
-version = "0.2.5"
+version = "0.3.0"
 description = "Custodian policies for IAAC definitions"
 authors = ["Cloud Custodian Project"]
 license = "Apache-2"
@@ -30,6 +30,9 @@ pytest = "^7.1.3"
 pytest-terraform = "^0.6.4"
 # needs a version pin due to c7n-sphinxext dep myst-parser
 markdown-it-py = ">1.0.0,<3.0.0"
+
+[tool.poetry.group.dev.dependencies]
+lxml = "^4.9.3"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
