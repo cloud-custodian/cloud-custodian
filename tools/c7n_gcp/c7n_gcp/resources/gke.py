@@ -144,6 +144,23 @@ class KubernetesClusterNodePool(ChildResourceManager):
 
 @KubernetesClusterNodePool.filter_registry.register('iam-policy')
 class KubernetesClusterNodePoolIamPolicyFilter(IamPolicyFilter):
+    """GKE node is configured with privileged service account
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: iam-gke-nodepool-filter
+            description: GKE node is configured with privileged service account
+            resource: gcp.gke-nodepool
+            filters:
+              - type: iam-policy
+                doc:
+                  key: bindings[?(role=='roles/owner') || ?(role=='roles/editor')]
+                  op: ne
+                  value: []
+    """
     permissions = ('resourcemanager.projects.getIamPolicy',)
 
     def process(self, resources, event=None):
