@@ -210,7 +210,7 @@ class MetricsFilter(Filter):
 
     def get_dimensions(self, resource):
         return [{'Name': self.model.dimension,
-                 'Value': resource[self.model.dimension]}]
+                 'Value': resource['TopicArn'].rsplit(':', 1)[-1]}]
 
     def get_user_dimensions(self):
         dims = []
