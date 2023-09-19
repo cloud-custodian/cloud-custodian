@@ -216,7 +216,7 @@ class KmsLocation(QueryResourceManager):
         return super_fetch_resources(self, {'name': 'projects/{}'.format(project)})
 
 
-@KmsLocation.filter_registry.register('kms-keyring')
+@KmsLocation.filter_registry.register('keyring')
 class KmsLocationKmsKeyringFilter(Filter):
 
     schema = type_schema('kms-keyring', **{
