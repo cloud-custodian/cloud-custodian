@@ -502,6 +502,23 @@ class TestSSM(BaseTest):
         data_syncs = p.run()
         self.assertEqual(len(data_syncs), 3)
 
+    def test_ssm_session_manager_terminate(self):
+        session_factory = self.replay_flight_data("test_ssm_session_manager_terminate")
+        p = self.load_policy({
+            'name': 'ssm-session-manager',
+            'resource': 'ssm-session-manager',
+            'actions': [
+                    {
+                        'type': 'terminate'
+                    }
+                ]},
+            session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = session_factory().client('ssm', region_name='us-east-1')
+        sessions = client.describe_sessions(State="Active")
+        self.assertEqual(len(sessions["Sessions"]), 0)
+
 
 @terraform("ssm_patch_group")
 def test_ssm_patch_group_query(test, ssm_patch_group):

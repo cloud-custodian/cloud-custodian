@@ -44,6 +44,7 @@ ResourceMap = {
     "gcp.iam-role": "c7n_gcp.resources.iam.Role",
     "gcp.image": "c7n_gcp.resources.compute.Image",
     "gcp.instance": "c7n_gcp.resources.compute.Instance",
+    "gcp.instance-group-manager": "c7n_gcp.resources.compute.InstanceGroupManager",
     "gcp.instance-template": "c7n_gcp.resources.compute.InstanceTemplate",
     "gcp.interconnect": "c7n_gcp.resources.network.Interconnect",
     "gcp.interconnect-attachment": "c7n_gcp.resources.network.InterconnectAttachment",
@@ -103,11 +104,13 @@ ResourceMap = {
     "gcp.sourcerepo": "c7n_gcp.resources.source.SourceRepository",
     "gcp.spanner-database-instance": "c7n_gcp.resources.spanner.SpannerDatabaseInstance",
     "gcp.spanner-instance": "c7n_gcp.resources.spanner.SpannerInstance",
+    "gcp.spanner-backup": "c7n_gcp.resources.spanner.SpannerInstanceBackup",
     "gcp.sql-backup-run": "c7n_gcp.resources.sql.SqlBackupRun",
     "gcp.sql-instance": "c7n_gcp.resources.sql.SqlInstance",
     "gcp.sql-ssl-cert": "c7n_gcp.resources.sql.SqlSslCert",
     "gcp.sql-user": "c7n_gcp.resources.sql.SqlUser",
     "gcp.subnet": "c7n_gcp.resources.network.Subnet",
     "gcp.vpc": "c7n_gcp.resources.network.Network",
+    "gcp.zone": "c7n_gcp.resources.compute.Zone",
 }
 # SPDX-License-Identifier: Apache-2.0

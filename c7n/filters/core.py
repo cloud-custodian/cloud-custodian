@@ -106,7 +106,7 @@ OPERATORS = {
 VALUE_TYPES = [
     'age', 'integer', 'expiration', 'normalize', 'size',
     'cidr', 'cidr_size', 'swap', 'resource_count', 'expr',
-    'unique_size', 'date', 'version']
+    'unique_size', 'date', 'version', 'float']
 
 
 class FilterRegistry(PluginRegistry):
@@ -684,6 +684,11 @@ class ValueFilter(BaseValueFilter):
                 value = int(str(value).strip())
             except ValueError:
                 value = 0
+        elif self.vtype == 'float':
+            try:
+                value = float(str(value).strip())
+            except ValueError:
+                value = 0.0
         elif self.vtype == 'size':
             try:
                 return sentinel, len(value)
