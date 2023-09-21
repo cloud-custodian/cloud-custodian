@@ -2595,8 +2595,9 @@ class DataEvents(Filter):
 
     def process(self, resources, event=None):
         trails = self.manager.get_resource_manager('cloudtrail').resources()
+        local_trails = self.filter_resources(trails, 'IsOrganizationTrail', (False,))
         session = local_session(self.manager.session_factory)
-        event_buckets = self.get_event_buckets(session, trails)
+        event_buckets = self.get_event_buckets(session, local_trails)
         ops = {
             'present': lambda x: (
                 x['Name'] in event_buckets or '' in event_buckets),
@@ -2604,7 +2605,7 @@ class DataEvents(Filter):
                 lambda x: x['Name'] not in event_buckets and ''
                 not in event_buckets)}
 
-        op = ops[self.data['state']]
+        op = ops[self.data.get('state', 'present')]
         results = []
         for b in resources:
             if op(b):
