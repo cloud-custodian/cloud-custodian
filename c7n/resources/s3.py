@@ -2564,6 +2564,11 @@ class RemoveBucketTag(RemoveTag):
 
 @filters.register('data-events')
 class DataEvents(Filter):
+    """Find buckets for which CloudTrail is logging data events.
+
+    Note that this filter only examines trails that are defined in the
+    current account. It ignores organization-level trails.
+    """
 
     schema = type_schema('data-events', state={'enum': ['present', 'absent']})
     permissions = (
