@@ -2567,7 +2567,7 @@ class DataEvents(Filter):
     """Find buckets for which CloudTrail is logging data events.
 
     Note that this filter only examines trails that are defined in the
-    current account. It ignores organization-level trails.
+    current account.
     """
 
     schema = type_schema('data-events', state={'enum': ['present', 'absent']})
@@ -2600,7 +2600,10 @@ class DataEvents(Filter):
 
     def process(self, resources, event=None):
         trails = self.manager.get_resource_manager('cloudtrail').resources()
-        local_trails = self.filter_resources(trails, 'IsOrganizationTrail', (False,))
+        local_trails = self.filter_resources(
+            trails,
+            "split(':', TrailARN)[4]", (self.manager.account_id,)
+        )
         session = local_session(self.manager.session_factory)
         event_buckets = self.get_event_buckets(session, local_trails)
         ops = {

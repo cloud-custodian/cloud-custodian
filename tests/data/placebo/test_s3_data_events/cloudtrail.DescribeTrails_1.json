@@ -33,11 +33,11 @@
             },
             {
                 "Name": "org-trail",
-                "S3BucketName": "aws-cloudtrail-logs-644160558196-3f556314",
+                "S3BucketName": "aws-cloudtrail-logs-123456789012-3f556314",
                 "IncludeGlobalServiceEvents": true,
                 "IsMultiRegionTrail": true,
                 "HomeRegion": "us-east-1",
-                "TrailARN": "arn:aws:cloudtrail:us-east-1:644160558196:trail/org-trail",
+                "TrailARN": "arn:aws:cloudtrail:us-east-1:123456789012:trail/org-trail",
                 "LogFileValidationEnabled": true,
                 "HasCustomEventSelectors": true,
                 "HasInsightSelectors": false,
