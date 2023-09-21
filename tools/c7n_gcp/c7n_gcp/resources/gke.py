@@ -79,58 +79,6 @@ class KubernetesCluster(QueryResourceManager):
                 r['labels'] = r['resourceLabels']
         return resources
 
-
-@KubernetesCluster.filter_registry.register('server-config')
-class ClusterServerConfig(ValueFilter):
-    """Filters kubernetes nodepools by their server config.
-    See `getServerConfig
-    https://cloud.google.com/kubernetes-engine/docs/reference/rest/v1/projects.locations/getServerConfig
-    for valid fields.
-
-    :example:
-
-    Filter all instances that have a firewall rule that allows public
-    acess
-
-    .. code-block:: yaml
-
-        policies:
-           - name: find-unsupported-cluster-version
-             resource: gcp.gke-cluster
-             filters:
-             - type: server-config
-               key: contains(validNodeVersions,currentMasterVersion)
-               value: false
-    """
-
-    schema = type_schema('server-config', rinherit=ValueFilter.schema)
-    permissions = ('projects.locations.getServerConfig',)
-
-    def process_resource(self, client, project, resource):
-        location = resource['location']
-        response = client.execute_command(
-            'getServerConfig', verb_arguments={
-                    'name': 'projects/{}/locations/{}'.format(project, location)}
-        )
-        response['currentMasterVersion'] = resource['currentMasterVersion']
-
-        server_configs = []
-        server_configs.append(response)
-        return super(ClusterServerConfig, self).process(server_configs, None)
-
-    def get_client(self, session, model):
-        return session.client(
-            model.service, model.version, model.component)
-
-    def process(self, resources, event=None):
-        session = local_session(self.manager.session_factory)
-        project = session.get_default_project()
-        network_client = session.client(
-            "container", "v1", "projects.locations"
-        )
-        resource_list = [r for r in resources if self.process_resource(network_client, project, r)]
-        return resource_list
-
 @resources.register('gke-nodepool')
 class KubernetesClusterNodePool(ChildResourceManager):
     """GCP resource:
@@ -192,17 +140,17 @@ class KubernetesClusterNodePool(ChildResourceManager):
             "Get the region from the parent - the cluster"
             return super()._get_location(cls.get_parent(resource))
 
+@KubernetesCluster.filter_registry.register('server-config')
 @KubernetesClusterNodePool.filter_registry.register('server-config')
 class ServerConfig(ValueFilter):
     """Filters kubernetes nodepools by their server config.
     See `getServerConfig
-    https://cloud.google.com/kubernetes-engine/docs/reference/rest/v1/projects.locations/getServerConfig
+    https://cloud.google.com/kubernetes-engine/docs/reference/rest/v1/projects.locations/getServerConfig`
     for valid fields.
 
     :example:
 
-    Filter all instances that have a firewall rule that allows public
-    acess
+    Filter all nodepools that does not have a supported version
 
     .. code-block:: yaml
 
@@ -216,35 +164,28 @@ class ServerConfig(ValueFilter):
     """
 
     schema = type_schema('server-config', rinherit=ValueFilter.schema)
-    permissions = ('projects.locations.getServerConfig',)
+    permissions = ('container.nodes.list',)
 
-    def _get_location(self, resource):
-        return resource['selfLink'].split('/')[-5]
+    def _get_location(self, r):
+        return r["location"] if "location" in r else r['selfLink'].split('/')[-5]
 
     def process_resource(self, client, project, resource):
         location = self._get_location(resource)
-        response = client.execute_command(
+        resource["serverConfig"] = client.execute_command(
             'getServerConfig', verb_arguments={
                     'name': 'projects/{}/locations/{}'.format(project, location)}
         )
-        response['version'] = resource['version']
-        response['imageType'] = resource["config"]['imageType']
+        resource = [resource]
 
-        server_configs = []
-        server_configs.append(response)
-        return super(ServerConfig, self).process(server_configs, None)
-
-    def get_client(self, session, model):
-        return session.client(
-            model.service, model.version, model.component)
+        return super(ServerConfig, self).process(resource, None)
 
     def process(self, resources, event=None):
         session = local_session(self.manager.session_factory)
         project = session.get_default_project()
-        network_client = session.client(
+        client = session.client(
             "container", "v1", "projects.locations"
         )
-        resource_list = [r for r in resources if self.process_resource(network_client, project, r)]
+        resource_list = [r for r in resources if self.process_resource(client, project, r)]
         return resource_list
 
 

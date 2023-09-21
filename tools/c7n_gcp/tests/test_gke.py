@@ -82,14 +82,14 @@ class KubernetesClusterTest(BaseTest):
             'resource': 'gcp.gke-cluster',
             'filters': [{
                 'type': 'server-config',
-                'key': "contains(validMasterVersions,currentMasterVersion)",
-                'value': True
+                'key': "contains(serverConfig.validMasterVersions,currentMasterVersion)",
+                'value': False
             }]
         }, session_factory=factory)
         resources = p.run()
 
         self.assertEqual(1, len(resources))
-        self.assertEqual('c7nsuccessnode-cluster-1',
+        self.assertEqual('c7nnode-cluster-2',
                          resources[0]['name'])
 
     def test_cluster_set_labels(self):
@@ -332,13 +332,13 @@ class KubernetesClusterNodePoolTest(BaseTest):
             'resource': 'gcp.gke-nodepool',
             'filters': [{
                 'type': 'server-config',
-                'key': "contains(validNodeVersions,version)",
-                'value': True
+                'key': "contains(serverConfig.validNodeVersions,version)",
+                'value': False
             }]
         }, session_factory=factory)
         resources = p.run()
         logging.info(resources)
 
         self.assertEqual(1, len(resources))
-        self.assertEqual('c7nsuccessnode-node-pool-1',
+        self.assertEqual('c7nnode-node-pool-1',
                         resources[0]['name'])
