@@ -13,7 +13,7 @@ from dateutil.tz import tzutc
 
 from c7n.actions import ActionRegistry, BaseAction
 from c7n.exceptions import PolicyValidationError
-from c7n.filters import Filter, FilterRegistry, ValueFilter
+from c7n.filters import Filter, FilterRegistry, ValueFilter, OPERATORS
 from c7n.filters.kms import KmsRelatedFilter
 from c7n.filters.multiattr import MultiAttrFilter
 from c7n.filters.missing import Missing
@@ -248,7 +248,8 @@ class CloudTrailEnabled(Filter):
            'kms': {'type': 'boolean'},
            'kms-key': {'type': 'string'},
            'include-management-events': {'type': 'boolean'},
-           'log-metric-filter-pattern': {'type': 'string'}})
+           'log-metric-filter-pattern': {'type': 'string'},
+           'op': {'type': 'string', 'enum': list(OPERATORS.keys())}})
 
     permissions = ('cloudtrail:DescribeTrails', 'cloudtrail:GetTrailStatus',
                    'cloudtrail:GetEventSelectors', 'cloudwatch:DescribeAlarmsForMetric',
@@ -259,6 +260,8 @@ class CloudTrailEnabled(Filter):
         client = session.client('cloudtrail')
         trails = client.describe_trails()['trailList']
         resources[0]['c7n:cloudtrails'] = trails
+        self.op = OPERATORS[self.data.get('op', 'equal')]
+
         if self.data.get('global-events'):
             trails = [t for t in trails if t.get('IncludeGlobalServiceEvents')]
         if self.data.get('current-region'):
@@ -294,6 +297,19 @@ class CloudTrailEnabled(Filter):
                     for s in selectors['EventSelectors']:
                         if s['IncludeManagementEvents'] and s['ReadWriteType'] == 'All':
                             matched.append(t)
+                elif 'AdvancedEventSelectors' in selectors.keys():
+                    management = False
+                    readonly = False
+                    for s in selectors['AdvancedEventSelectors']:
+                        for field_selector in s['FieldSelectors']:
+                            if field_selector['Field'] == 'eventCategory' and \
+                                    'Management' in field_selector['Equals']:
+                                management = True
+                            elif field_selector['Field'] == 'readOnly':
+                                readonly = True
+                        if management and not readonly:
+                            matched.append(t)
+
             trails = matched
         if self.data.get('log-metric-filter-pattern'):
             client_logs = session.client('logs')
@@ -314,7 +330,7 @@ class CloudTrailEnabled(Filter):
                 filter_matched = None
                 if metric_filters_log_group:
                     for f in metric_filters_log_group:
-                        if f['filterPattern'] == self.data.get('log-metric-filter-pattern'):
+                        if self.op(f['filterPattern'], self.data.get('log-metric-filter-pattern')):
                             filter_matched = f
                             break
                 if not filter_matched:
@@ -331,8 +347,10 @@ class CloudTrailEnabled(Filter):
                 alarm_actions = set(alarm_actions)
                 for a in alarm_actions:
                     try:
-                        subs = client_sns.list_subscriptions_by_topic(TopicArn=a)
-                        if len(subs['Subscriptions']) > 0:
+                        sns_topic_attributes = client_sns.get_topic_attributes(TopicArn=a)
+                        sns_topic_attributes = sns_topic_attributes.get('Attributes')
+                        if sns_topic_attributes.get('SubscriptionsConfirmed') is not None and \
+                                sns_topic_attributes.get('SubscriptionsConfirmed') > '0':
                             matched.append(t)
                     except client_sns.exceptions.InvalidParameterValueException:
                         # we can ignore any exception here, the alarm action might
