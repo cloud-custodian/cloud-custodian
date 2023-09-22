@@ -73,6 +73,10 @@ class TerraformProvider(IACSourceProvider):
     resource_prefix = "terraform"
     resource_map = TerraformResourceMap(resource_prefix)
     resources = resource_map
+    reporter = None
+
+    def initialize(self, options):
+        self.reporter = options.get('reporter')
 
     def initialize_policies(self, policies, options):
         for p in policies:
@@ -80,7 +84,7 @@ class TerraformProvider(IACSourceProvider):
         return policies
 
     def parse(self, source_dir, var_files=()):
-        resolver = VariableResolver(source_dir, var_files)
+        resolver = VariableResolver(source_dir, var_files, self.reporter)
         with resolver.get_variables() as var_files:
             graph = TerraformGraph(
                 load_from_path(source_dir, vars_paths=var_files, allow_downloads=True),

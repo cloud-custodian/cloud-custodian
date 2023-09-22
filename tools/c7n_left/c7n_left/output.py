@@ -48,6 +48,31 @@ class Output:
     def on_results(self, policy, results):
         """called when a policy matches resources"""
 
+    def on_vars_discovered(self, var_type, var_map, var_path=None):
+        """called when variables for graph resolution are discovered"""
+
+
+class JsonGraph(Output):
+    def __init__(self, ctx, config):
+        super().__init__(ctx, config)
+        self.graph = None
+        self.input_vars = {}
+
+    def on_vars_discovered(self, var_type, var_map, var_path=None):
+        var_key = var_type
+        if var_context:
+            var_key += f":{var_context}"
+        self.input_vars[var_key] = dict(var_map)
+
+    def on_execution_started(self, policies, graph):
+        self.graph = graph
+
+    def on_execution_ended(self):
+        data = {}
+        data['input_vars'] = self.input_vars
+        data['graph'] = dict(self.graph.resource_data)
+        self.config.output_file.write(json.dumps(data, cls=JSONEncoder, indent=2))
+
 
 class RichCli(Output):
     def __init__(self, ctx, config):
@@ -67,6 +92,10 @@ class RichCli(Output):
         self.console.print(
             "Evaluation complete %0.2f seconds -> %s" % (time.time() - self.started, message)
         )
+
+    def on_vars_discovered(self, var_type, var_map, var_path=None):
+        if var_type != "uninitialized":
+            self.console.print(f"Loaded {len(var_map)} vars from {var_type} {var_path}")
 
     def on_results(self, policy, results):
         for r in results:
@@ -312,6 +341,9 @@ class MultiOutput:
         for o in self.outputs:
             o.on_results(policy, results)
 
+    def on_vars_discovered(self, var_type, var_map, var_path=None):
+        for o in self.outputs:
+            o.on_vars_discovered(var_type, var_map, var_path)
 
 class GithubFormat(Output):
     # https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#setting-an-error-message
