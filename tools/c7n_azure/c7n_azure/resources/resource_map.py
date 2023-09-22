@@ -43,6 +43,7 @@ ResourceMap = {
     "azure.keyvault-secret": "c7n_azure.resources.key_vault_secret.KeyVaultSecret",
     "azure.keyvault-key": "c7n_azure.resources.key_vault_keys.KeyVaultKeys",
     "azure.keyvault-keys": "c7n_azure.resources.key_vault_keys.KeyVaultKeys",
+    "azure.kusto": "c7n_azure.resources.kusto.Kusto",
     "azure.loadbalancer": "c7n_azure.resources.load_balancer.LoadBalancer",
     "azure.logic-app-workflow": "c7n_azure.resources.logic_app.LogicAppWorkflow",
     "azure.mariadb": "c7n_azure.resources.mariadb.MariaDB",
