@@ -451,6 +451,42 @@ class AccountTests(BaseTest):
         self.assertNotRegexpMatches(logs_metrics['metricFilters'][0]['filterPattern'],
                                     pdata['filters'][0]['log-metric-filter-pattern'])
 
+    def test_cloudtrail_success_management_advanced_events_included(self):
+        session_factory = self.replay_flight_data\
+            ("test_cloudtrail_success_management_advanced_events_included")
+        p = self.load_policy(
+            {
+                "name": "trail-management-advanced-events-included",
+                "resource": "account",
+                "filters": [{
+                    "type": "check-cloudtrail",
+                    'include-management-events': True
+                }],
+            },
+            session_factory=session_factory,
+        )
+
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
+    def test_cloudtrail_fail_management_advanced_events_included(self):
+        session_factory = self.replay_flight_data\
+            ("test_cloudtrail_fail_management_advanced_events_included")
+        p = self.load_policy(
+            {
+                "name": "trail-management-advanced-events-included",
+                "resource": "account",
+                "filters": [{
+                    "type": "check-cloudtrail",
+                    'include-management-events': True
+                }],
+            },
+            session_factory=session_factory,
+        )
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
     def test_config_enabled(self):
         session_factory = self.replay_flight_data("test_account_config")
         p = self.load_policy(
