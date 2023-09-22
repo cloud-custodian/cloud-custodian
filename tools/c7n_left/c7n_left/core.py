@@ -376,7 +376,7 @@ class ResourceGraph:
     def __len__(self):
         raise NotImplementedError()
 
-    def get_resource_by_type(self):
+    def get_resources_by_type(self, types=()):
         raise NotImplementedError()
 
     def resolve_refs(self, resource, target_type):
