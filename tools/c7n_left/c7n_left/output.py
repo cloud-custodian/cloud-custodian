@@ -60,8 +60,8 @@ class JsonGraph(Output):
 
     def on_vars_discovered(self, var_type, var_map, var_path=None):
         var_key = var_type
-        if var_context:
-            var_key += f":{var_context}"
+        if var_path:
+            var_key += f":{var_path}"
         self.input_vars[var_key] = dict(var_map)
 
     def on_execution_started(self, policies, graph):
@@ -344,6 +344,7 @@ class MultiOutput:
     def on_vars_discovered(self, var_type, var_map, var_path=None):
         for o in self.outputs:
             o.on_vars_discovered(var_type, var_map, var_path)
+
 
 class GithubFormat(Output):
     # https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#setting-an-error-message
