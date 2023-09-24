@@ -3,7 +3,7 @@
 import json
 
 from c7n.actions import RemovePolicyBase, ModifyPolicyBase, BaseAction
-from c7n.filters import CrossAccountAccessFilter, PolicyChecker, ValueFilter
+from c7n.filters import CrossAccountAccessFilter, PolicyChecker, ValueFilter, MetricsFilter
 from c7n.filters.kms import KmsRelatedFilter
 import c7n.filters.policystatement as polstmt_filter
 from c7n.manager import resources
@@ -54,6 +54,7 @@ class SNS(QueryResourceManager):
 
 
 SNS.filter_registry.register('marked-for-op', TagActionFilter)
+
 
 
 @SNS.action_registry.register('post-finding')
@@ -447,6 +448,12 @@ class DeleteTopic(BaseAction):
             except client.exceptions.NotFoundException:
                 continue
 
+@SNS.filter_registry.register('metrics')
+class Metrics(MetricsFilter):
+
+    def get_dimensions(self, resource):
+        return [{'Name': self.model.dimension,
+                 'Value': resource['TopicArn'].rsplit(':', 1)[-1]}]
 
 @resources.register('sns-subscription')
 class SNSSubscription(QueryResourceManager):

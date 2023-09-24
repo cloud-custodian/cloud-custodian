@@ -1,0 +1,33 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Fri, 15 Sep 2023 14:29:11 GMT",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "server-timing": "gfet4t7; dur=781",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "465",
+    "-content-encoding": "gzip",
+    "content-location": "https://spanner.googleapis.com/v1/projects/cloud-custodian/instances?alt=json"
+  },
+  "body": {
+    "instances": [
+      {
+        "name": "projects/cloud-custodian/instances/terrapin-spanner-instance",
+        "config": "projects/cloud-custodian/instanceConfigs/regional-us-central1",
+        "displayName": "terrapin-spanner-instance",
+        "nodeCount": 1,
+        "state": "READY",
+        "processingUnits": 1000,
+        "instanceType": "PROVISIONED",
+        "createTime": "2023-09-15T14:28:33.298117Z",
+        "updateTime": "2023-09-15T14:28:33.298117Z"
+      }
+    ]
+  }
+}
