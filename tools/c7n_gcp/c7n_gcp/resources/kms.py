@@ -232,10 +232,7 @@ class KmsLocationKmsKeyringFilter(Filter):
 
         for resource in resources:
             kms_key_rings = client.execute_query('list', {'parent': resource['name']})
-            kms_key_rings_exist = (kms_key_rings.get('keyRings') is not None and
-                                   len(kms_key_rings.get('keyRings')) > 0)
-            if ((isinstance(expecting_exist, bool) and kms_key_rings_exist == expecting_exist) or
-                    (isinstance(expecting_exist, str)
-                     and kms_key_rings_exist == distutils.util.strtobool(expecting_exist))):
+            kms_key_rings_exist = bool(kms_key_rings.get('keyRings'))
+            if kms_key_rings_exist == expecting_exist:
                 accepted_resources.append(resource)
         return accepted_resources
