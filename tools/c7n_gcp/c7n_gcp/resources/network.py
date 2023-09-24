@@ -232,10 +232,7 @@ class AttachedToClusterFirewallFilter(ValueFilter):
     permissions = ('container.clusters.list',)
 
     def process(self, resources, event=None):
-        session = local_session(self.manager.session_factory)
-        parent = 'projects/{}/locations/-'.format(session.get_default_project())
-        client = session.client('container', 'v1', 'projects.locations.clusters')
-        clusters = client.execute_query('list', {'parent': parent}).get('clusters', [])
+        clusters = self.manager.get_resource_manager('gke-cluster').resources()
         networks = set([jmespath.search('networkConfig.network', cluster) for cluster in clusters])
         return self.filter_firewalls_if_attached_to_networks(resources, networks)
 
