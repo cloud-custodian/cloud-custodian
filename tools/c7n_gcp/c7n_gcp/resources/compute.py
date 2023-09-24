@@ -5,7 +5,6 @@ import re
 
 from datetime import datetime
 
-from c7n.exceptions import ClientError
 from c7n.utils import local_session, type_schema
 
 from c7n_gcp.actions import MethodAction
