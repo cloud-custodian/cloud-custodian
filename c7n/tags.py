@@ -444,7 +444,9 @@ class Tag(Action):
 
         for r in resources:
             for t in tags:
-                resolved_tags[t['Key'], self.interpolate_single_value(t['Value'], r)].append(r[self.manager.get_model().id])
+                resolved_tags[t['Key'], self.interpolate_single_value(t['Value'], r)].append(
+                    r[self.manager.get_model().id]
+                )
 
         return resolved_tags
 
@@ -900,7 +902,9 @@ class UniversalTag(Tag):
 
         for r in resources:
             for key in list(tags.keys()):
-                resolved_tags[key, self.interpolate_single_value(tags[key], r)].append(r[self.manager.get_model().id])
+                resolved_tags[key, self.interpolate_single_value(tags[key], r)].append(
+                    r[self.manager.get_model().id]
+                )
 
         return resolved_tags
 
