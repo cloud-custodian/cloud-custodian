@@ -24,7 +24,7 @@ class CloudRunService(QueryResourceManager):
         asset_type = "run.googleapis.com/Service"
 
 
-@CloudRunService.filter_registry.register('iam-policy')
+@CloudRunService.filter_registry.register("iam-policy")
 class CloudRunServiceIamPolicyFilter(IamPolicyFilter):
     """
     Overrides the base implementation to process cloudrun resources correctly.
@@ -35,14 +35,17 @@ class CloudRunServiceIamPolicyFilter(IamPolicyFilter):
         session = local_session(self.manager.session_factory)
         project = session.get_default_project()
         location = resource["metadata"]["labels"]["cloud.googleapis.com/location"]
-        verb_arguments = {"resource": f'projects/{project}/locations/{location}/services/{resource["metadata"]["name"]}'}
+        verb_arguments = {
+            "resource": f'projects/{project}/locations/{location}/services/' +
+                '{resource["metadata"]["name"]}'
+        }
         return verb_arguments
 
     def process_resources(self, resources):
-        value_filter = IamPolicyValueFilter(self.data['doc'], self.manager)
+        value_filter = IamPolicyValueFilter(self.data["doc"], self.manager)
         value_filter._verb_arguments = self._verb_arguments
         return value_filter.process(resources)
-    
+
 @resources.register("cloud-run-job")
 class CloudRunJob(QueryResourceManager):
     """GCP resource: https://cloud.google.com/run/docs/reference/rest/v2/projects.locations.jobs"""
