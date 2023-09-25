@@ -5,10 +5,8 @@ Monitoring Metrics suppport for resources
 """
 from datetime import datetime, timedelta
 
-import jmespath
-
 from c7n.filters.core import Filter, OPERATORS, FilterValidationError
-from c7n.utils import local_session, type_schema
+from c7n.utils import local_session, type_schema, jmespath_search
 
 from c7n_gcp.provider import resources as gcp_resources
 
@@ -111,7 +109,7 @@ class GCPMetricsFilter(Filter):
         self.reducer = self.data.get('reducer', 'REDUCE_NONE')
         self.group_by_fields = self.data.get('group-by-fields', [])
         self.missing_value = self.data.get('missing-value')
-        self.end = datetime.utcnow()
+        self.end = datetime.utcnow().replace(microsecond=0)
         self.start = self.end - duration
         self.period = str((self.end - self.start).total_seconds()) + 's'
         self.resource_metric_dict = {}
@@ -128,8 +126,8 @@ class GCPMetricsFilter(Filter):
         for batched_filter in self.get_batched_query_filter(resources):
             query_params = {
                 'filter': batched_filter,
-                'interval_startTime': self.start.isoformat(),
-                'interval_endTime': self.end.isoformat(),
+                'interval_startTime': self.start.isoformat() + 'Z',
+                'interval_endTime': self.end.isoformat() + 'Z',
                 'aggregation_alignmentPeriod': self.period,
                 "aggregation_perSeriesAligner": self.aligner,
                 "aggregation_crossSeriesReducer": self.reducer,
@@ -191,7 +189,7 @@ class GCPMetricsFilter(Filter):
 
     def split_by_resource(self, metric_list):
         for m in metric_list:
-            resource_name = jmespath.search(self.metric_key, m)
+            resource_name = jmespath_search(self.metric_key, m)
             self.resource_metric_dict[resource_name] = m
 
     def process_resource(self, resource):
@@ -212,7 +210,8 @@ class GCPMetricsFilter(Filter):
 
     @classmethod
     def register_resources(klass, registry, resource_class):
-        resource_class.filter_registry.register('metrics', klass)
+        if resource_class.filter_registry:
+            resource_class.filter_registry.register('metrics', klass)
 
 
 gcp_resources.subscribe(GCPMetricsFilter.register_resources)

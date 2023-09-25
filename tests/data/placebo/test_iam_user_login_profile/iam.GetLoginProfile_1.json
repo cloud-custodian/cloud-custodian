@@ -1,0 +1,20 @@
+{
+    "status_code": 200,
+    "data": {
+        "LoginProfile": {
+            "UserName": "test-user-console-access",
+            "CreateDate": {
+                "__class__": "datetime",
+                "year": 2022,
+                "month": 9,
+                "day": 27,
+                "hour": 0,
+                "minute": 35,
+                "second": 38,
+                "microsecond": 0
+            },
+            "PasswordResetRequired": true
+        },
+        "ResponseMetadata": {}
+    }
+}

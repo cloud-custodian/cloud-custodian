@@ -1,0 +1,76 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Functions": [
+            {
+                "FunctionName": "aws-controltower-NotificationForwarder",
+                "FunctionArn": "arn:aws:lambda:us-east-1:644160558196:function:aws-controltower-NotificationForwarder",
+                "Runtime": "python3.9",
+                "Role": "arn:aws:iam::644160558196:role/aws-controltower-ForwardSnsNotificationRole",
+                "Handler": "index.lambda_handler",
+                "CodeSize": 473,
+                "Description": "SNS message forwarding function for aggregating account notifications.",
+                "Timeout": 60,
+                "MemorySize": 128,
+                "LastModified": "2023-03-22T11:59:12.032+0000",
+                "CodeSha256": "Uo1APIVLv4Jal+NURkwPk2xb7wCv6PICS2RjTtpqa+w=",
+                "Version": "$LATEST",
+                "VpcConfig": {
+                    "SubnetIds": [],
+                    "SecurityGroupIds": [],
+                    "VpcId": ""
+                },
+                "Environment": {
+                    "Variables": {
+                        "sns_arn": "arn:aws:sns:us-east-1:644160558196:aws-controltower-AggregateSecurityNotifications"
+                    }
+                },
+                "TracingConfig": {
+                    "Mode": "PassThrough"
+                },
+                "RevisionId": "e7736cfd-266d-405c-83f1-cd9022ba820f",
+                "PackageType": "Zip",
+                "Architectures": [
+                    "x86_64"
+                ],
+                "EphemeralStorage": {
+                    "Size": 512
+                },
+                "SnapStart": {
+                    "ApplyOn": "None",
+                    "OptimizationStatus": "Off"
+                }
+            },
+            {
+                "FunctionName": "cfb-ygaovtob-fail",
+                "FunctionArn": "arn:aws:lambda:us-east-1:644160558196:function:cfb-ygaovtob-fail",
+                "Runtime": "nodejs16.x",
+                "Role": "arn:aws:iam::644160558196:role/iam_for_lambda1",
+                "Handler": "index.handler",
+                "CodeSize": 240,
+                "Description": "",
+                "Timeout": 3,
+                "MemorySize": 128,
+                "LastModified": "2023-04-10T19:18:36.535+0000",
+                "CodeSha256": "pA7z0vBKy3qR5PzAisdJ/2jqQ7z0SQF1qno9ui123K4=",
+                "Version": "$LATEST",
+                "TracingConfig": {
+                    "Mode": "PassThrough"
+                },
+                "RevisionId": "63f347ca-f836-4fe4-b427-564b11d13b81",
+                "PackageType": "Zip",
+                "Architectures": [
+                    "x86_64"
+                ],
+                "EphemeralStorage": {
+                    "Size": 512
+                },
+                "SnapStart": {
+                    "ApplyOn": "None",
+                    "OptimizationStatus": "Off"
+                }
+            }
+        ]
+    }
+}

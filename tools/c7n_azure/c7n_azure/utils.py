@@ -308,7 +308,7 @@ class PortsRangeHelper:
             Returns an array of PortsRange tuples
         """
         properties = rule['properties']
-        if 'destinationPortRange' in properties:
+        if 'destinationPortRange' in properties and properties['destinationPortRange']:
             return [PortsRangeHelper._get_port_range(properties['destinationPortRange'])]
         else:
             return [PortsRangeHelper._get_port_range(r)
@@ -595,7 +595,7 @@ def get_keyvault_auth_endpoint(cloud_endpoints):
 # These objects store variables with an underscore prefix, so we strip it.
 def serialize(data):
     d = {}
-    if type(data) is dict:
+    if isinstance(data, dict):
         items = data.items()
     else:
         items = vars(data).items()

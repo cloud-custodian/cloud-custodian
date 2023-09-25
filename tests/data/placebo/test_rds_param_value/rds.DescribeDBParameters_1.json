@@ -1,0 +1,18 @@
+{
+    "status_code": 200,
+    "data": {
+        "Parameters": [
+            {
+                "ParameterName": "application_name",
+                "Description": "Sets the application name to be reported in statistics and logs.",
+                "Source": "engine-default",
+                "ApplyType": "dynamic",
+                "DataType": "string",
+                "IsModifiable": true,
+                "ApplyMethod": "pending-reboot"
+            }
+        ],
+        "Marker": "Z2luX2Z1enp5X3NlYXJjaF9saW1pdA==",
+        "ResponseMetadata": {}
+    }
+}

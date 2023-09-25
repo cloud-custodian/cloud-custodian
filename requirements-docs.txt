@@ -1,8 +1,0 @@
-# Split out from requirements-dev.txt as sphinx
-# has dropped support for python2.7
-
--r tools/c7n_sphinxext/requirements.txt
-
-# Tools packages in editable setup
-# Local package required for Sphinx docs
--e tools/c7n_sphinxext

@@ -7,10 +7,9 @@ from c7n.exceptions import PolicyExecutionError
 from c7n.filters import MetricsFilter, ValueFilter, Filter
 from c7n.filters.offhours import OffHour, OnHour
 from c7n.manager import resources
-from c7n.utils import local_session, chunks, get_retry, type_schema, group_by
-from c7n import query
+from c7n.utils import local_session, chunks, get_retry, type_schema, group_by, jmespath_compile
+from c7n import query, utils
 from c7n.query import DescribeSource, ConfigSource
-import jmespath
 from c7n.tags import Tag, TagDelayedAction, RemoveTag, TagActionFilter
 from c7n.actions import AutoTagUser, AutoscalingBase
 import c7n.filters.vpc as net_filters
@@ -95,7 +94,7 @@ class ECSCluster(query.QueryResourceManager):
         service = 'ecs'
         enum_spec = ('list_clusters', 'clusterArns', None)
         batch_detail_spec = (
-            'describe_clusters', 'clusters', None, 'clusters', {'include': ['TAGS']})
+            'describe_clusters', 'clusters', None, 'clusters', {'include': ['TAGS', 'SETTINGS']})
         name = "clusterName"
         arn = id = "clusterArn"
         arn_type = 'cluster'
@@ -294,6 +293,87 @@ class ServiceTaskDefinitionFilter(RelatedTaskDefinitionFilter):
              - type: stop
     """
 
+@ECSCluster.filter_registry.register('ebs-storage')
+class Storage(ValueFilter):
+    """Filter clusters by configured EBS storage parameters.
+
+    :Example:
+
+    Find any ECS clusters that have instances that are using unencrypted EBS volumes.
+
+    .. code-block:: yaml
+
+        policies:
+          - name: encrypted-ebs-volumes
+            resource: ecs
+            filters:
+              - type: ebs-storage
+                key: Encrypted
+                value: true
+    """
+
+    schema = type_schema(
+        'ebs-storage', rinherit=ValueFilter.schema,
+        operator={'type': 'string', 'enum': ['or', 'and']},
+    )
+    schema_alias = False
+
+    def get_permissions(self):
+        return (self.manager.get_resource_manager('ebs').get_permissions() +
+                self.manager.get_resource_manager('ec2').get_permissions() +
+                self.manager.get_resource_manager('ecs').get_permissions()
+                )
+
+    def process(self, resources, event=None):
+        self.storage = self.get_storage(resources)
+        self.skip = []
+        self.operator = self.data.get(
+            'operator', 'or') == 'or' and any or all
+        return list(filter(self, resources))
+
+    def get_storage(self, resources):
+        manager = self.manager.get_resource_manager('ecs-container-instance')
+
+        storage = {}
+        for cluster_set in utils.chunks(resources, 200):
+            for cluster in cluster_set:
+                cluster["clusterArn"]
+                instances = manager.resources({
+                    "cluster": cluster['clusterArn'],
+                }, augment=False)
+                instances = manager.get_resources(instances, augment=False)
+                storage[cluster["clusterArn"]] = []
+
+                for instance in instances:
+                    storage[cluster["clusterArn"]].extend(self.get_ebs_volumes([instance["ec2InstanceId"]]))
+
+        return storage
+
+    def get_ebs_volumes(self, resources):
+        volumes = []
+        ec2_manager = self.manager.get_resource_manager('ec2')
+        ebs_manager = self.manager.get_resource_manager('ebs')
+        for instance_set in utils.chunks(resources, 200):
+            instance_set = ec2_manager.get_resources(instance_set)
+            volume_ids = []
+            for i in instance_set:
+                for bd in i.get('BlockDeviceMappings', ()):
+                    if 'Ebs' not in bd:
+                        continue
+                    volume_ids.append(bd['Ebs']['VolumeId'])
+            for v in ebs_manager.get_resources(volume_ids):
+                if not v['Attachments']:
+                    continue
+                volumes.append(v)
+        return volumes
+
+    def __call__(self, i):
+        storage = self.storage.get(i["clusterArn"])
+
+        if not storage:
+            return False
+        return self.operator(map(self.match, storage))
+
 
 @Service.filter_registry.register('subnet')
 class SubnetFilter(net_filters.SubnetFilter):
@@ -306,7 +386,7 @@ class SubnetFilter(net_filters.SubnetFilter):
     def get_related_ids(self, resources):
         subnet_ids = set()
         for exp in self.expressions:
-            cexp = jmespath.compile(exp)
+            cexp = jmespath_compile(exp)
             for r in resources:
                 ids = cexp.search(r)
                 if ids:
@@ -594,24 +674,55 @@ class DeleteTaskDefinition(BaseAction):
     The definition will be marked as InActive. Currently running
     services and task can still reference, new services & tasks
     can't.
+
+    force is False by default. When given as True, the task definition will
+    be permanently deleted.
+
+    .. code-block:: yaml
+
+       policies:
+         - name: deregister-task-definition
+           resource: ecs-task-definition
+           filters:
+             - family: test-task-def
+           actions:
+             - type: delete
+
+         - name: delete-task-definition
+           resource: ecs-task-definition
+           filters:
+             - family: test-task-def
+           actions:
+             - type: delete
+               force: True
     """
 
-    schema = type_schema('delete')
-    permissions = ('ecs:DeregisterTaskDefinition',)
+    schema = type_schema('delete', force={'type': 'boolean'})
+    permissions = ('ecs:DeregisterTaskDefinition','ecs:DeleteTaskDefinitions',)
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('ecs')
         retry = get_retry(('Throttling',))
+        force = self.data.get('force', False)
 
         for r in resources:
+            if r['status'] == 'INACTIVE':
+                continue
             try:
                 retry(client.deregister_task_definition,
                       taskDefinition=r['taskDefinitionArn'])
             except ClientError as e:
-                # No error code for not found.
                 if e.response['Error'][
-                        'Message'] != 'The specified task definition does not exist.':
+                    'Message'] != 'The specified task definition does not exist.':
                     raise
+
+        if force:
+            task_definitions_arns = [
+                r['taskDefinitionArn']
+                for r in resources
+            ]
+            for chunk in chunks(task_definitions_arns, size=10):
+                retry(client.delete_task_definitions, taskDefinitions=chunk)
 
 
 @resources.register('ecs-container-instance')

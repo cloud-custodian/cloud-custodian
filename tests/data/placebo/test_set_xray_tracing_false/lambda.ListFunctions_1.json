@@ -1,0 +1,57 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Functions": [
+            {
+                "FunctionName": "function1",
+                "FunctionArn": "arn:aws:lambda:us-east-1:1234567890:function:fucntion1",
+                "Runtime": "python2.7",
+                "Role": "arn:aws:iam::1234567890:role/lambdaToLogs",
+                "Handler": "lambda_function.handler",
+                "CodeSize": 648,
+                "Description": "",
+                "Timeout": 3,
+                "MemorySize": 128,
+                "LastModified": "2022-08-30T05:44:11.000+0000",
+                "CodeSha256": "bdHO4LM212345euK4MAbhonLEoXxppbY143gxzeu7alo=",
+                "Version": "$LATEST",
+                "TracingConfig": {
+                    "Mode": "Active"
+                },
+                "RevisionId": "a8484fd4-123-4c2b-1234-0427546404c4",
+                "PackageType": "Zip",
+                "Architectures": [
+                    "x86_64"
+                ],
+                "EphemeralStorage": {
+                    "Size": 512
+                }
+            },
+            {
+                "FunctionName": "fucntion2",
+                "FunctionArn": "arn:aws:lambda:us-east-1:1234567890:function:fucntio2",
+                "Role": "arn:aws:iam::1234567890:role/service-role/new-role-swx9g08r",
+                "CodeSize": 0,
+                "Description": "",
+                "Timeout": 3,
+                "MemorySize": 128,
+                "LastModified": "2022-08-30T05:18:05.000+0000",
+                "CodeSha256": "53b69ebf3aa1easdf2073982ecd2d6433a46e579958c0e15b77945513d95dcb",
+                "Version": "$LATEST",
+                "TracingConfig": {
+                    "Mode": "Active"
+                },
+                "RevisionId": "47ebc507-134-4202-123-ccf8a3cac45e",
+                "PackageType": "Image",
+                "ImageConfigResponse": {},
+                "Architectures": [
+                    "x86_64"
+                ],
+                "EphemeralStorage": {
+                    "Size": 512
+                }
+            }
+        ]
+    }
+}

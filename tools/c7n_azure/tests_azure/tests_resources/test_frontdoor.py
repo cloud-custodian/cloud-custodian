@@ -24,3 +24,17 @@ class FrontDoorTest(BaseTest):
         })
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
+    def test_waf_not_enabled(self):
+        p = self.load_policy({
+            'name': 'waf',
+            'resource': 'azure.front-door',
+             'filters': [
+                {
+                    'type': 'waf',
+                    'state': 'Disabled'
+                },
+            ]
+        })
+        resources = p.run()
+        self.assertEqual(len(resources), 1)

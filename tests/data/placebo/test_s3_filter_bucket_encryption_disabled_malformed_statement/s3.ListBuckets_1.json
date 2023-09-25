@@ -1,0 +1,26 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Buckets": [
+            {
+                "Name": "xcc-services-alb-access-logs-prod-eu-central-1",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 7,
+                    "day": 14,
+                    "hour": 12,
+                    "minute": 5,
+                    "second": 56,
+                    "microsecond": 0
+                }
+            }
+        ],
+        "Owner": {
+            "DisplayName": "cctestaccount",
+            "ID": "14ceabf5195df217c82064f90b5d1914f4649c4039c4de18ddde72ffc35298fa"
+        }
+    }
+}
+

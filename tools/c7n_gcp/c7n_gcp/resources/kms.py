@@ -24,6 +24,8 @@ class KmsKeyRing(QueryResourceManager):
         default_report_fields = [
             "name", "createTime"]
         asset_type = "cloudkms.googleapis.com/KeyRing"
+        urn_component = "keyring"
+        urn_id_segments = (-1,)  # Just use the last segment of the id in the URN
 
         @staticmethod
         def get(client, resource_info):
@@ -32,6 +34,10 @@ class KmsKeyRing(QueryResourceManager):
                         resource_info['location'],
                         resource_info['key_ring_id'])
             return client.execute_command('get', {'name': name})
+
+        @classmethod
+        def _get_location(cls, resource):
+            return resource["name"].split('/')[3]
 
     def get_resource_query(self):
         if 'query' in self.data:
@@ -53,6 +59,14 @@ class KmsKeyRing(QueryResourceManager):
         for location in project_locations:
             key_rings.extend(super_fetch_resources(self, {'parent': location}))
         return key_rings
+
+
+@KmsKeyRing.filter_registry.register('iam-policy')
+class KmsKeyRingIamPolicyFilter(IamPolicyFilter):
+    """
+    Overrides the base implementation to process kms key ring resources correctly.
+    """
+    permissions = ('cloudkms.keyRings.getIamPolicy',)
 
 
 @resources.register('kms-cryptokey')
@@ -91,6 +105,8 @@ class KmsCryptoKey(ChildResourceManager):
         }
         asset_type = "cloudkms.googleapis.com/CryptoKey"
         scc_type = "google.cloud.kms.CryptoKey"
+        urn_component = "cryptokey"
+        urn_id_segments = (5, 7)
 
         @staticmethod
         def get(client, resource_info):
@@ -100,6 +116,10 @@ class KmsCryptoKey(ChildResourceManager):
                         resource_info['key_ring_id'],
                         resource_info['crypto_key_id'])
             return client.execute_command('get', {'name': name})
+
+        @classmethod
+        def _get_location(cls, resource):
+            return resource["name"].split('/')[3]
 
 
 @KmsCryptoKey.filter_registry.register('iam-policy')
@@ -151,6 +171,8 @@ class KmsCryptoKeyVersion(ChildResourceManager):
             'use_child_query': True
         }
         asset_type = "cloudkms.googleapis.com/CryptoKeyVersion"
+        urn_component = "cryptokey-version"
+        urn_id_segments = (5, 7, 9)
 
         @staticmethod
         def get(client, resource_info):
@@ -161,3 +183,7 @@ class KmsCryptoKeyVersion(ChildResourceManager):
                         resource_info['crypto_key_id'],
                         resource_info['crypto_key_version_id'])
             return client.execute_command('get', {'name': name})
+
+        @classmethod
+        def _get_location(cls, resource):
+            return resource["name"].split('/')[3]

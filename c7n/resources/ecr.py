@@ -4,7 +4,7 @@ import json
 
 from c7n.actions import RemovePolicyBase, Action, ModifyPolicyBase
 from c7n.exceptions import PolicyValidationError
-from c7n.filters import CrossAccountAccessFilter, Filter, ValueFilter
+from c7n.filters import CrossAccountAccessFilter, Filter, ValueFilter, MetricsFilter
 from c7n.manager import resources
 from c7n.query import (
     ConfigSource, DescribeSource, QueryResourceManager, TypeInfo,
@@ -40,11 +40,18 @@ class ECR(QueryResourceManager):
         filter_name = 'repositoryNames'
         filter_type = 'list'
         config_type = cfn_type = 'AWS::ECR::Repository'
+        dimension = 'RepositoryName'
 
     source_mapping = {
         'describe': DescribeECR,
         'config': ConfigSource
     }
+
+
+@ECR.filter_registry.register('metrics')
+class ECRMetricsFilter(MetricsFilter):
+    def get_dimensions(self, resource):
+        return [{"Name": "RepositoryName", "Value": resource['repositoryName']}]
 
 
 class ECRImageQuery(ChildResourceQuery):
@@ -107,10 +114,10 @@ ECR_POLICY_SCHEMA = {
             {'type': 'string'},
             {'type': 'object'}, {'type': 'array'}]},
         'NotPrincipal': {'anyOf': [{'type': 'object'}, {'type': 'array'}]},
-        'Action': {'anyOf': [{'type': 'string', 'pattern': '^ecr:[a-zA-Z]*$'},
-            {'type': 'array', 'items': {'type': 'string', 'pattern': '^ecr:[a-zA-Z]*$'}}]},
-        'NotAction': {'anyOf': [{'type': 'string', 'pattern': '^ecr:[a-zA-Z]*$'},
-            {'type': 'array', 'items': {'type': 'string', 'pattern': '^ecr:[a-zA-Z]*$'}}]},
+        'Action': {'anyOf': [{'type': 'string', 'pattern': '^ecr:([a-zA-Z]*|[*])$'},
+            {'type': 'array', 'items': {'type': 'string', 'pattern': '^ecr:([a-zA-Z]*|[*])$'}}]},
+        'NotAction': {'anyOf': [{'type': 'string', 'pattern': '^ecr:([a-zA-Z]*|[*])$'},
+            {'type': 'array', 'items': {'type': 'string', 'pattern': '^ecr:([a-zA-Z]*|[*])$'}}]},
         'Resource': {'anyOf': [{'type': 'string'}, {'type': 'array'}]},
         'NotResource': {'anyOf': [{'type': 'string'}, {'type': 'array'}]},
         'Condition': {'type': 'object'}

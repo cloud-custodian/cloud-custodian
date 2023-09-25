@@ -6,11 +6,13 @@ import operator
 import random
 import re
 import zlib
+from typing import List
+from distutils.version import LooseVersion
 
+import botocore
 from botocore.exceptions import ClientError
 from dateutil.parser import parse
 from concurrent.futures import as_completed
-import jmespath
 
 from c7n.actions import (
     ActionRegistry, BaseAction, ModifyVpcSecurityGroupsAction, AutoscalingBase
@@ -18,7 +20,7 @@ from c7n.actions import (
 
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import (
-    FilterRegistry, AgeFilter, ValueFilter, Filter, DefaultVpcBase
+    FilterRegistry, AgeFilter, ValueFilter, Filter
 )
 from c7n.filters.offhours import OffHour, OnHour
 import c7n.filters.vpc as net_filters
@@ -26,9 +28,9 @@ import c7n.filters.vpc as net_filters
 from c7n.manager import resources
 from c7n import query, utils
 from c7n.tags import coalesce_copy_user_tags
-from c7n.utils import type_schema, filter_empty
+from c7n.utils import type_schema, filter_empty, jmespath_search, jmespath_compile
 
-from c7n.resources.iam import CheckPermissions
+from c7n.resources.iam import CheckPermissions, SpecificIamProfileManagedPolicy
 from c7n.resources.securityhub import PostFinding
 
 RE_ERROR_INSTANCE_ID = re.compile("'(?P<instance_id>i-.*?)'")
@@ -88,7 +90,7 @@ class DescribeEC2(query.DescribeSource):
 
         m = self.manager.get_model()
         for r in resources:
-            r['Tags'] = resource_tags.get(r[m.id], ())
+            r['Tags'] = resource_tags.get(r[m.id], [])
         return resources
 
 
@@ -165,7 +167,7 @@ class SecurityGroupFilter(net_filters.SecurityGroupFilter):
 @filters.register('subnet')
 class SubnetFilter(net_filters.SubnetFilter):
 
-    RelatedIdsExpression = "SubnetId"
+    RelatedIdsExpression = "NetworkInterfaces[].SubnetId"
 
 
 @filters.register('vpc')
@@ -293,6 +295,62 @@ class AttachedVolume(ValueFilter):
                     if a['Device'] in self.skip:
                         volumes.remove(v)
         return self.operator(map(self.match, volumes))
+
+
+@filters.register('stop-protected')
+class DisableApiStop(Filter):
+    """EC2 instances with ``disableApiStop`` attribute set
+
+    Filters EC2 instances with ``disableApiStop`` attribute set to true.
+
+    :Example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: stop-protection-enabled
+            resource: ec2
+            filters:
+              - type: stop-protected
+
+    :Example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: stop-protection-NOT-enabled
+            resource: ec2
+            filters:
+              - not:
+                - type: stop-protected
+    """
+
+    schema = type_schema('stop-protected')
+    permissions = ('ec2:DescribeInstanceAttribute',)
+
+    def process(self, resources: List[dict], event=None) -> List[dict]:
+        client = utils.local_session(
+            self.manager.session_factory).client('ec2')
+        return [r for r in resources
+                if self._is_stop_protection_enabled(client, r)]
+
+    def _is_stop_protection_enabled(self, client, instance: dict) -> bool:
+        attr_val = self.manager.retry(
+            client.describe_instance_attribute,
+            Attribute='disableApiStop',
+            InstanceId=instance['InstanceId']
+        )
+        return attr_val['DisableApiStop']['Value']
+
+    def validate(self) -> None:
+        botocore_min_version = '1.26.7'
+
+        if LooseVersion(botocore.__version__) < LooseVersion(botocore_min_version):
+            raise PolicyValidationError(
+                "'stop-protected' filter requires botocore version "
+                f'{botocore_min_version} or above. '
+                f'Installed version is {botocore.__version__}.'
+            )
 
 
 @filters.register('termination-protected')
@@ -675,7 +733,7 @@ class InstanceAgeFilter(AgeFilter):
 
 
 @filters.register('default-vpc')
-class DefaultVpc(DefaultVpcBase):
+class DefaultVpc(net_filters.DefaultVpcBase):
     """ Matches if an ec2 database is in the default vpc
     """
 
@@ -1080,12 +1138,22 @@ class SetMetadataServerAccess(BaseAction):
              - type: set-metadata-access
                endpoint: disabled
 
+       policies:
+         - name: ec2-enable-metadata-tags
+           resource: ec2
+           filters:
+             - MetadataOptions.InstanceMetadataTags: disabled
+           actions:
+             - type: set-metadata-access
+               metadata-tags: enabled
+
     Reference: https://amzn.to/2XOuxpQ
     """
 
     AllowedValues = {
         'HttpEndpoint': ['enabled', 'disabled'],
         'HttpTokens': ['required', 'optional'],
+        'InstanceMetadataTags': ['enabled', 'disabled'],
         'HttpPutResponseHopLimit': list(range(1, 65))
     }
 
@@ -1093,9 +1161,11 @@ class SetMetadataServerAccess(BaseAction):
         'set-metadata-access',
         anyOf=[{'required': ['endpoint']},
                {'required': ['tokens']},
+               {'required': ['metadatatags']},
                {'required': ['hop-limit']}],
         **{'endpoint': {'enum': AllowedValues['HttpEndpoint']},
            'tokens': {'enum': AllowedValues['HttpTokens']},
+           'metadata-tags': {'enum': AllowedValues['InstanceMetadataTags']},
            'hop-limit': {'type': 'integer', 'minimum': 1, 'maximum': 64}}
     )
     permissions = ('ec2:ModifyInstanceMetadataOptions',)
@@ -1104,6 +1174,7 @@ class SetMetadataServerAccess(BaseAction):
         return filter_empty({
             'HttpEndpoint': self.data.get('endpoint'),
             'HttpTokens': self.data.get('tokens'),
+            'InstanceMetadataTags': self.data.get('metadata-tags'),
             'HttpPutResponseHopLimit': self.data.get('hop-limit')})
 
     def process(self, resources):
@@ -1132,7 +1203,7 @@ class InstanceFinding(PostFinding):
     resource_type = 'AwsEc2Instance'
 
     def format_resource(self, r):
-        ip_addresses = jmespath.search(
+        ip_addresses = jmespath_search(
             "NetworkInterfaces[].PrivateIpAddresses[].PrivateIpAddress", r)
 
         # limit to max 10 ip addresses, per security hub service limits
@@ -1365,15 +1436,21 @@ class Stop(BaseAction):
 
     schema = type_schema(
         'stop',
-        **{'terminate-ephemeral': {'type': 'boolean'},
-           'hibernate': {'type': 'boolean'}})
+        **{
+            "terminate-ephemeral": {"type": "boolean"},
+            "hibernate": {"type": "boolean"},
+            "force": {"type": "boolean"},
+        },
+    )
 
-    has_hibernate = jmespath.compile('[].HibernationOptions.Configured')
+    has_hibernate = jmespath_compile('[].HibernationOptions.Configured')
 
     def get_permissions(self):
         perms = ('ec2:StopInstances',)
         if self.data.get('terminate-ephemeral', False):
             perms += ('ec2:TerminateInstances',)
+        if self.data.get("force"):
+            perms += ("ec2:ModifyInstanceAttribute",)
         return perms
 
     def split_on_storage(self, instances):
@@ -1404,29 +1481,61 @@ class Stop(BaseAction):
         # Ephemeral instance can't be stopped.
         ephemeral, persistent = self.split_on_storage(instances)
         if self.data.get('terminate-ephemeral', False) and ephemeral:
-            self._run_instances_op(
-                client.terminate_instances,
-                [i['InstanceId'] for i in ephemeral])
+            self._run_instances_op(client, 'terminate', ephemeral)
         if persistent:
             if self.data.get('hibernate', False):
                 enabled, persistent = self.split_on_hibernate(persistent)
                 if enabled:
-                    self._run_instances_op(
-                        client.stop_instances,
-                        [i['InstanceId'] for i in enabled],
-                        Hibernate=True)
-            self._run_instances_op(
-                client.stop_instances,
-                [i['InstanceId'] for i in persistent])
+                    self._run_instances_op(client, 'stop', enabled, Hibernate=True)
+            self._run_instances_op(client, 'stop', persistent)
         return instances
 
-    def _run_instances_op(self, op, instance_ids, **kwargs):
-        while instance_ids:
+    def disable_protection(self, client, op, instances):
+        def modify_instance(i, attribute):
             try:
-                return self.manager.retry(op, InstanceIds=instance_ids, **kwargs)
+                self.manager.retry(
+                    client.modify_instance_attribute,
+                    InstanceId=i['InstanceId'],
+                    Attribute=attribute,
+                    Value='false',
+                )
+            except ClientError as e:
+                if e.response['Error']['Code'] == 'IncorrectInstanceState':
+                    return
+                raise
+
+        def process_instance(i, op):
+            modify_instance(i, 'disableApiStop')
+            if op == 'terminate':
+                modify_instance(i, 'disableApiTermination')
+
+        with self.executor_factory(max_workers=2) as w:
+            list(w.map(process_instance, instances, [op] * len(instances)))
+
+    def _run_instances_op(self, client, op, instances, **kwargs):
+        client_op = client.stop_instances
+        if op == 'terminate':
+            client_op = client.terminate_instances
+
+        instance_ids = [i['InstanceId'] for i in instances]
+
+        while instances:
+            try:
+                return self.manager.retry(client_op, InstanceIds=instance_ids, **kwargs)
             except ClientError as e:
                 if e.response['Error']['Code'] == 'IncorrectInstanceState':
                     instance_ids.remove(extract_instance_id(e))
+                if (
+                    e.response['Error']['Code'] == 'OperationNotPermitted' and
+                    self.data.get('force')
+                ):
+                    self.log.info("Disabling stop and termination protection on instances")
+                    self.disable_protection(
+                        client,
+                        op,
+                        [i for i in instances if i.get('InstanceLifecycle') != 'spot'],
+                    )
+                    continue
                 raise
 
 
@@ -1502,7 +1611,7 @@ class Terminate(BaseAction):
     with api deletion termination protection, so we can't use the bulk call
     reliabily, we need to process the instances individually. Additionally
     If we're configured with 'force' then we'll turn off instance termination
-    protection.
+    and stop protection.
 
     :Example:
 
@@ -1528,36 +1637,53 @@ class Terminate(BaseAction):
             permissions += ('ec2:ModifyInstanceAttribute',)
         return permissions
 
-    def process(self, instances):
-        instances = self.filter_resources(instances, 'State.Name', self.valid_origin_states)
-        if not len(instances):
-            return
+    def process_terminate(self, instances):
         client = utils.local_session(
             self.manager.session_factory).client('ec2')
-        if self.data.get('force'):
-            self.log.info("Disabling termination protection on instances")
+        try:
+            self.manager.retry(
+                client.terminate_instances,
+                InstanceIds=[i['InstanceId'] for i in instances])
+            return
+        except ClientError as e:
+            if e.response['Error']['Code'] != 'OperationNotPermitted':
+                raise
+            if not self.data.get('force'):
+                raise
+
+            self.log.info("Disabling stop and termination protection on instances")
             self.disable_deletion_protection(
                 client,
                 [i for i in instances if i.get('InstanceLifecycle') != 'spot'])
-        # limit batch sizes to avoid api limits
-        for batch in utils.chunks(instances, 100):
             self.manager.retry(
                 client.terminate_instances,
                 InstanceIds=[i['InstanceId'] for i in instances])
 
+    def process(self, instances):
+        instances = self.filter_resources(instances, 'State.Name', self.valid_origin_states)
+        if not len(instances):
+            return
+        # limit batch sizes to avoid api limits
+        for batch in utils.chunks(instances, 100):
+            self.process_terminate(batch)
+
     def disable_deletion_protection(self, client, instances):
 
-        def process_instance(i):
+        def modify_instance(i, attribute):
             try:
                 self.manager.retry(
                     client.modify_instance_attribute,
                     InstanceId=i['InstanceId'],
-                    Attribute='disableApiTermination',
+                    Attribute=attribute,
                     Value='false')
             except ClientError as e:
                 if e.response['Error']['Code'] == 'IncorrectInstanceState':
                     return
                 raise
+
+        def process_instance(i):
+            modify_instance(i, 'disableApiTermination')
+            modify_instance(i, 'disableApiStop')
 
         with self.executor_factory(max_workers=2) as w:
             list(w.map(process_instance, instances))
@@ -1664,7 +1790,7 @@ class EC2ModifyVpcSecurityGroups(ModifyVpcSecurityGroupsAction):
     """Modify security groups on an instance."""
 
     permissions = ("ec2:ModifyNetworkInterfaceAttribute",)
-    sg_expr = jmespath.compile("Groups[].GroupId")
+    sg_expr = jmespath_compile("Groups[].GroupId")
 
     def process(self, instances):
         if not len(instances):
@@ -2092,6 +2218,7 @@ class LaunchTemplate(query.QueryResourceManager):
         filter_name = 'LaunchTemplateIds'
         filter_type = 'list'
         arn_type = "launch-template"
+        cfn_type = "AWS::EC2::LaunchTemplate"
 
     def augment(self, resources):
         client = utils.local_session(
@@ -2219,7 +2346,7 @@ class SpotFleetRequest(query.QueryResourceManager):
         filter_type = 'list'
         date = 'CreateTime'
         arn_type = 'spot-fleet-request'
-        cfn_type = 'AWS::EC2::SpotFleet'
+        config_type = cfn_type = 'AWS::EC2::SpotFleet'
         permissions_enum = ('ec2:DescribeSpotFleetRequests',)
 
 
@@ -2256,3 +2383,99 @@ class AutoscalingSpotFleetRequest(AutoscalingBase):
             SpotFleetRequestId=resource['SpotFleetRequestId'],
             TargetCapacity=desired,
         )
+
+
+@EC2.filter_registry.register('has-specific-managed-policy')
+class HasSpecificManagedPolicy(SpecificIamProfileManagedPolicy):
+    """Filter an EC2 instance that has an IAM instance profile that contains an IAM role that has
+       a specific managed IAM policy. If an EC2 instance does not have a profile or the profile
+       does not contain an IAM role, then it will be treated as not having the policy.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: ec2-instance-has-admin-policy
+            resource: aws.ec2
+            filters:
+              - type: has-specific-managed-policy
+                value: admin-policy
+
+    :example:
+
+    Check for EC2 instances with instance profile roles that have an
+    attached policy matching a given list:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: ec2-instance-with-selected-policies
+            resource: aws.ec2
+            filters:
+              - type: has-specific-managed-policy
+                op: in
+                value:
+                  - AmazonS3FullAccess
+                  - AWSOrganizationsFullAccess
+
+    :example:
+
+    Check for EC2 instances with instance profile roles that have
+    attached policy names matching a pattern:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: ec2-instance-with-full-access-policies
+            resource: aws.ec2
+            filters:
+              - type: has-specific-managed-policy
+                op: glob
+                value: "*FullAccess"
+
+    Check for EC2 instances with instance profile roles that have
+    attached policy ARNs matching a pattern:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: ec2-instance-with-aws-full-access-policies
+            resource: aws.ec2
+            filters:
+              - type: has-specific-managed-policy
+                key: PolicyArn
+                op: regex
+                value: "arn:aws:iam::aws:policy/.*FullAccess"
+    """
+
+    permissions = (
+        'iam:GetInstanceProfile',
+        'iam:ListInstanceProfiles',
+        'iam:ListAttachedRolePolicies')
+
+    def process(self, resources, event=None):
+        client = utils.local_session(self.manager.session_factory).client('iam')
+        iam_profiles = self.manager.get_resource_manager('iam-profile').resources()
+        iam_profiles_mapping = {profile['Arn']: profile for profile in iam_profiles}
+
+        results = []
+        for r in resources:
+            if r['State']['Name'] == 'terminated':
+                continue
+            instance_profile_arn = r.get('IamInstanceProfile', {}).get('Arn')
+            if not instance_profile_arn:
+                continue
+
+            profile = iam_profiles_mapping.get(instance_profile_arn)
+            if not profile:
+                continue
+
+            self.get_managed_policies(client, [profile])
+
+            matched_keys = [k for k in profile[self.annotation_key] if self.match(k)]
+            self.merge_annotation(profile, self.matched_annotation_key, matched_keys)
+            if matched_keys:
+                results.append(r)
+
+        return results

@@ -1,0 +1,227 @@
+{
+    "status_code": 200,
+    "data": {
+        "BackupSummaries": [
+            {
+                "TableName": "Test-DDBTable-backup",
+                "TableId": "0f64ca00-386f-4b55-b403-acd215e81072",
+                "TableArn": "arn:aws:dynamodb:us-west-2:123456789012:table/Test-DDBTable-backup",
+                "BackupArn": "arn:aws:dynamodb:us-west-2:123456789012:table/Test-DDBTable-backup/backup/01661373354159-fd0bfa7d",
+                "BackupName": "test-manual",
+                "BackupCreationDateTime": {
+                    "hour": 19,
+                    "__class__": "datetime",
+                    "month": 8,
+                    "second": 52,
+                    "microsecond": 776000,
+                    "year": 2022,
+                    "day": 31,
+                    "minute": 4
+                },
+                "BackupStatus": "AVAILABLE",
+                "BackupType": "USER",
+                "BackupSizeBytes": 11910
+            },
+            {
+                "TableName": "Test-DDBTable-backup",
+                "TableId": "0f64ca00-386f-4b55-b403-acd215e81072",
+                "TableArn": "arn:aws:dynamodb:us-west-2:123456789012:table/Test-DDBTable-backup",
+                "BackupArn": "arn:aws:dynamodb:us-west-2:123456789012:table/Test-DDBTable-backup/backup/01661384359139-e9ca2508",
+                "BackupName": "test-backup",
+                "BackupCreationDateTime": {
+                    "hour": 19,
+                    "__class__": "datetime",
+                    "month": 8,
+                    "second": 52,
+                    "microsecond": 776000,
+                    "year": 2022,
+                    "day": 30,
+                    "minute": 4
+                },
+                "BackupStatus": "AVAILABLE",
+                "BackupType": "USER",
+                "BackupSizeBytes": 0
+            },
+            {
+                "TableName": "Test-DDBTable-backup",
+                "TableId": "0f64ca00-386f-4b55-b403-acd215e81072",
+                "TableArn": "arn:aws:dynamodb:us-west-2:123456789012:table/Test-DDBTable-backup",
+                "BackupArn": "arn:aws:dynamodb:us-west-2:123456789012:table/Test-DDBTable-backup/backup/01661907413760-0659d0a9",
+                "BackupName": "test-another-9",
+                "BackupCreationDateTime": {
+                    "hour": 19,
+                    "__class__": "datetime",
+                    "month": 8,
+                    "second": 52,
+                    "microsecond": 776000,
+                    "year": 2022,
+                    "day": 29,
+                    "minute": 4
+                },
+                "BackupStatus": "AVAILABLE",
+                "BackupType": "USER",
+                "BackupSizeBytes": 0
+            },
+            {
+                "TableName": "Test-DDBTable-backup",
+                "TableId": "0f64ca00-386f-4b55-b403-acd215e81072",
+                "TableArn": "arn:aws:dynamodb:us-west-2:123456789012:table/Test-DDBTable-backup",
+                "BackupArn": "arn:aws:dynamodb:us-west-2:123456789012:table/Test-DDBTable-backup/backup/01661907413760-0659d0a8",
+                "BackupName": "test-anothe-8",
+                "BackupCreationDateTime": {
+                    "hour": 19,
+                    "__class__": "datetime",
+                    "month": 8,
+                    "second": 52,
+                    "microsecond": 776000,
+                    "year": 2022,
+                    "day": 28,
+                    "minute": 4
+                },
+                "BackupStatus": "AVAILABLE",
+                "BackupType": "USER",
+                "BackupSizeBytes": 0
+            },
+            {
+                "TableName": "Test-DDBTable-backup",
+                "TableId": "0f64ca00-386f-4b55-b403-acd215e81072",
+                "TableArn": "arn:aws:dynamodb:us-west-2:123456789012:table/Test-DDBTable-backup",
+                "BackupArn": "arn:aws:dynamodb:us-west-2:123456789012:table/Test-DDBTable-backup/backup/01661907413760-0659d0a7",
+                "BackupName": "test-another-7",
+                "BackupCreationDateTime": {
+                    "hour": 19,
+                    "__class__": "datetime",
+                    "month": 8,
+                    "second": 52,
+                    "microsecond": 776000,
+                    "year": 2022,
+                    "day": 27,
+                    "minute": 4
+                },
+                "BackupStatus": "AVAILABLE",
+                "BackupType": "USER",
+                "BackupSizeBytes": 0
+            },
+            {
+                "TableName": "Test-DDBTable-backup",
+                "TableId": "0f64ca00-386f-4b55-b403-acd215e81072",
+                "TableArn": "arn:aws:dynamodb:us-west-2:123456789012:table/Test-DDBTable-backup",
+                "BackupArn": "arn:aws:dynamodb:us-west-2:123456789012:table/Test-DDBTable-backup/backup/01661907413760-0659d0a6",
+                "BackupName": "test-another-6",
+                "BackupCreationDateTime": {
+                    "hour": 19,
+                    "__class__": "datetime",
+                    "month": 8,
+                    "second": 52,
+                    "microsecond": 776000,
+                    "year": 2022,
+                    "day": 26,
+                    "minute": 4
+                },
+                "BackupStatus": "AVAILABLE",
+                "BackupType": "USER",
+                "BackupSizeBytes": 0
+            },
+            {
+                "TableName": "Test-DDBTable-backup",
+                "TableId": "0f64ca00-386f-4b55-b403-acd215e81072",
+                "TableArn": "arn:aws:dynamodb:us-west-2:123456789012:table/Test-DDBTable-backup",
+                "BackupArn": "arn:aws:dynamodb:us-west-2:123456789012:table/Test-DDBTable-backup/backup/01661907413760-0659d0a5",
+                "BackupName": "test-another-5",
+                "BackupCreationDateTime": {
+                    "hour": 19,
+                    "__class__": "datetime",
+                    "month": 8,
+                    "second": 52,
+                    "microsecond": 776000,
+                    "year": 2022,
+                    "day": 25,
+                    "minute": 4
+                },
+                "BackupStatus": "AVAILABLE",
+                "BackupType": "USER",
+                "BackupSizeBytes": 0
+            },
+            {
+                "TableName": "Test-DDBTable-backup",
+                "TableId": "0f64ca00-386f-4b55-b403-acd215e81072",
+                "TableArn": "arn:aws:dynamodb:us-west-2:123456789012:table/Test-DDBTable-backup",
+                "BackupArn": "arn:aws:dynamodb:us-west-2:123456789012:table/Test-DDBTable-backup/backup/01661907413760-0659d0a4",
+                "BackupName": "test-another-4",
+                "BackupCreationDateTime": {
+                    "hour": 19,
+                    "__class__": "datetime",
+                    "month": 8,
+                    "second": 52,
+                    "microsecond": 776000,
+                    "year": 2022,
+                    "day": 24,
+                    "minute": 4
+                },
+                "BackupStatus": "AVAILABLE",
+                "BackupType": "USER",
+                "BackupSizeBytes": 0
+            },
+            {
+                "TableName": "Test-DDBTable-backup",
+                "TableId": "0f64ca00-386f-4b55-b403-acd215e81072",
+                "TableArn": "arn:aws:dynamodb:us-west-2:123456789012:table/Test-DDBTable-backup",
+                "BackupArn": "arn:aws:dynamodb:us-west-2:123456789012:table/Test-DDBTable-backup/backup/01661907413760-0659d0a3",
+                "BackupName": "test-another-3",
+                "BackupCreationDateTime": {
+                    "hour": 19,
+                    "__class__": "datetime",
+                    "month": 8,
+                    "second": 52,
+                    "microsecond": 776000,
+                    "year": 2022,
+                    "day": 23,
+                    "minute": 4
+                },
+                "BackupStatus": "AVAILABLE",
+                "BackupType": "USER",
+                "BackupSizeBytes": 0
+            },
+            {
+                "TableName": "Test-DDBTable-backup",
+                "TableId": "0f64ca00-386f-4b55-b403-acd215e81072",
+                "TableArn": "arn:aws:dynamodb:us-west-2:123456789012:table/Test-DDBTable-backup",
+                "BackupArn": "arn:aws:dynamodb:us-west-2:123456789012:table/Test-DDBTable-backup/backup/01661907413760-0659d0a2",
+                "BackupName": "test-another-2",
+                "BackupCreationDateTime": {
+                    "hour": 19,
+                    "__class__": "datetime",
+                    "month": 8,
+                    "second": 52,
+                    "microsecond": 776000,
+                    "year": 2022,
+                    "day": 22,
+                    "minute": 4
+                },
+                "BackupStatus": "AVAILABLE",
+                "BackupType": "USER",
+                "BackupSizeBytes": 0
+            },
+            {
+                "TableName": "Test-DDBTable-backup",
+                "TableId": "0f64ca00-386f-4b55-b403-acd215e81072",
+                "TableArn": "arn:aws:dynamodb:us-west-2:123456789012:table/Test-DDBTable-backup",
+                "BackupArn": "arn:aws:dynamodb:us-west-2:123456789012:table/Test-DDBTable-backup/backup/01661907413760-0659d0a1",
+                "BackupName": "test-another-1",
+                "BackupCreationDateTime": {
+                    "hour": 19,
+                    "__class__": "datetime",
+                    "month": 8,
+                    "second": 52,
+                    "microsecond": 776000,
+                    "year": 2022,
+                    "day": 21,
+                    "minute": 4
+                },
+                "BackupStatus": "AVAILABLE",
+                "BackupType": "USER",
+                "BackupSizeBytes": 0
+            }
+        ]
+    }
+}

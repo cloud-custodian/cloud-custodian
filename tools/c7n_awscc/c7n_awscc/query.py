@@ -1,12 +1,13 @@
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 import json
 import logging
 
 from botocore.exceptions import ClientError
 from botocore.paginate import Paginator
-import jmespath
 
 from c7n.query import RetryPageIterator
-from c7n.utils import local_session
+from c7n.utils import local_session, jmespath_compile
 
 
 log = logging.getLogger("c7n_awscc.query")
@@ -14,8 +15,8 @@ log = logging.getLogger("c7n_awscc.query")
 
 class CloudControl:
 
-    resources_expr = jmespath.compile("ResourceDescriptions[].Properties")
-    ids_expr = jmespath.compile("ResourceDescriptions[].Identifier")
+    resources_expr = jmespath_compile("ResourceDescriptions[].Properties")
+    ids_expr = jmespath_compile("ResourceDescriptions[].Identifier")
 
     def __init__(self, manager):
         self.manager = manager

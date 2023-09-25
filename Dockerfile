@@ -1,1 +1,1 @@
-docker/cli
+docker/c7n

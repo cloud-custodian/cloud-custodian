@@ -1,5 +1,6 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+import copy
 from botocore.exceptions import ClientError
 from concurrent.futures import as_completed
 
@@ -12,7 +13,11 @@ from c7n.tags import (
 from c7n.utils import (
     local_session, chunks, type_schema, snapshot_identifier)
 from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter
+from datetime import datetime, timedelta
+from c7n.filters import Filter
 from c7n.filters import ValueFilter
+from c7n.query import RetryPageIterator
+from c7n.filters.backup import ConsecutiveAwsBackupsFilter
 
 
 class ConfigTable(query.ConfigSource):
@@ -52,6 +57,7 @@ class Table(query.QueryResourceManager):
         dimension = 'TableName'
         cfn_type = config_type = 'AWS::DynamoDB::Table'
         universal_taggable = object()
+        arn = 'TableArn'
 
     source_mapping = {
         'describe': DescribeTable,
@@ -152,6 +158,48 @@ class TableContinuousBackupAction(BaseAction):
                     PointInTimeRecoverySpecification={
                         'PointInTimeRecoveryEnabled': self.data.get('state', True)
                     })
+            except client.exceptions.TableNotFoundException:
+                continue
+
+
+@Table.action_registry.register('update')
+class UpdateTable(BaseAction):
+    """Modifies the provisioned throughput settings, global secondary indexes,
+    or DynamoDB Streams settings for a given table.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: dynamodb-change-billing-mode
+                resource: aws.dynamodb-table
+                actions:
+                  - type: update
+                    BillingMode: PAY_PER_REQUEST
+
+    """
+    valid_status = ('ACTIVE',)
+    schema = type_schema(
+        'update',
+        BillingMode={'enum': ['PROVISIONED', 'PAY_PER_REQUEST']},
+        ProvisionedThroughput={'type': 'object',
+            'properties': {
+                'ReadCapacityUnits': {'type': 'integer'},
+                'WriteCapacityUnits': {'type': 'integer'}}})
+    permissions = ('dynamodb:UpdateTable',)
+
+    def process(self, resources):
+        resources = self.filter_resources(
+            resources, 'TableStatus', self.valid_status)
+        if not resources:
+            return
+        params = copy.deepcopy(self.data)
+        params.pop("type")
+        client = local_session(self.manager.session_factory).client('dynamodb')
+        for r in resources:
+            try:
+                client.update_table(TableName=r['TableName'], **params)
             except client.exceptions.TableNotFoundException:
                 continue
 
@@ -419,7 +467,7 @@ class DynamoDbAccelerator(query.QueryResourceManager):
 
     class resource_type(query.TypeInfo):
         service = 'dax'
-        arn_type = 'cluster'
+        arn_type = 'cache'
         enum_spec = ('describe_clusters', 'Clusters', None)
         arn = 'ClusterArn'
         id = name = 'ClusterName'
@@ -666,3 +714,81 @@ class DaxSubnetFilter(SubnetFilter):
         subnet_groups = client.describe_subnet_groups()['SubnetGroups']
         self.groups = {s['SubnetGroupName']: s for s in subnet_groups}
         return super(DaxSubnetFilter, self).process(resources)
+
+
+@Table.filter_registry.register('consecutive-backups')
+class TableConsecutiveBackups(Filter):
+    """Returns tables where number of consective daily backups is
+    equal to/or greater than n days.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: dynamodb-daily-backup-count
+                resource: dynamodb-table
+                filters:
+                  - type: consecutive-backups
+                    count: 7
+                    period: days
+                    backuptype: SYSTEM
+                    status: AVAILABLE
+    """
+    schema = type_schema('consecutive-backups', count={'type': 'number', 'minimum': 1},
+        period={'enum': ['hours', 'days', 'weeks']},
+        backuptype={'enum': ['SYSTEM', 'USER', 'AWS_BACKUP', 'ALL']},
+        status={'enum': ['AVAILABLE', 'CREATING', 'DELETED']},
+        required=['count', 'period', 'status', 'backuptype'])
+    permissions = ('dynamodb:ListBackups', 'dynamodb:DescribeBackup', 'dynamodb:DescribeTable', )
+    annotation = 'c7n:DynamodbBackups'
+
+    def process_resource_set(self, client, resources, lbdate):
+        paginator = client.get_paginator('list_backups')
+        paginator.PAGE_ITERATOR_CLS = RetryPageIterator
+        ddb_backups = paginator.paginate(BackupType=self.data.get('backuptype'),
+            TimeRangeLowerBound=lbdate).build_full_result().get('BackupSummaries', [])
+
+        table_map = {}
+        for backup in ddb_backups:
+            table_map.setdefault(backup['TableName'], []).append(backup)
+        for r in resources:
+            r[self.annotation] = table_map.get(r['TableName'], [])
+
+    def get_date(self, time):
+        period = self.data.get('period')
+        if period == 'weeks':
+            date = (datetime.utcnow() - timedelta(weeks=time)).strftime('%Y-%m-%d')
+        elif period == 'hours':
+            date = (datetime.utcnow() - timedelta(hours=time)).strftime('%Y-%m-%d-%H')
+        else:
+            date = (datetime.utcnow() - timedelta(days=time)).strftime('%Y-%m-%d')
+        return date
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('dynamodb')
+        results = []
+        retention = self.data.get('count')
+        lbdate = self.get_date(retention)
+        expected_dates = set()
+        for time in range(1, retention + 1):
+            expected_dates.add(self.get_date(time))
+
+        for resource_set in chunks(
+                [r for r in resources if self.annotation not in r], 50):
+            self.process_resource_set(client, resource_set, lbdate)
+
+        for r in resources:
+            backup_dates = set()
+            for backup in r[self.annotation]:
+                if backup['BackupStatus'] == self.data.get('status'):
+                    if self.data.get('period') == 'hours':
+                        backup_dates.add(backup['BackupCreationDateTime'].strftime('%Y-%m-%d-%H'))
+                    else:
+                        backup_dates.add(backup['BackupCreationDateTime'].strftime('%Y-%m-%d'))
+            if expected_dates.issubset(backup_dates):
+                results.append(r)
+        return results
+
+
+Table.filter_registry.register('consecutive-aws-backups', ConsecutiveAwsBackupsFilter)

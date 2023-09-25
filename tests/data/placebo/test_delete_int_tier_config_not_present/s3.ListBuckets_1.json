@@ -1,0 +1,38 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Buckets": [
+            {
+                "Name": "example-abc-123",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 10,
+                    "day": 17,
+                    "hour": 13,
+                    "minute": 24,
+                    "second": 10,
+                    "microsecond": 0
+                }
+            },
+            {
+                "Name": "test-c7n-firehose",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 7,
+                    "day": 5,
+                    "hour": 20,
+                    "minute": 11,
+                    "second": 53,
+                    "microsecond": 0
+                }
+            }
+        ],
+        "Owner": {
+            "DisplayName": "mandeep.bal",
+            "ID": "e7c8bb65a5fc49cf906715eae09de9e4bb7861a96361ba79b833aa45f6833b15"
+        }
+    }
+}
