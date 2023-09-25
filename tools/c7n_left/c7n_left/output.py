@@ -9,7 +9,7 @@ from importlib.metadata import version as pkg_version
 import sys
 import time
 import uuid
-import xml.etree.ElementTree as etree  # nosemgrep - used to build not parse.
+import xml.etree.ElementTree as etree  # nosec nosemgrep - used to build not parse.
 
 from rich.console import Console
 from rich.syntax import Syntax
