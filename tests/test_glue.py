@@ -619,6 +619,53 @@ class TestGlueDataCatalog(BaseTest):
             'EncryptionAtRest'),
             {'CatalogEncryptionMode': 'SSE-KMS', 'SseAwsKmsKeyId': 'alias/skunk/glue/encrypted'})
 
+    def test_glue_datacat_key_alias_apply_enc(self):
+        session_factory = self.replay_flight_data("test_glue_datacat_key_alias_apply_enc")
+        c = session_factory().client('kms')
+        key_id='arn:aws:kms:us-east-1:644160558196:key/7d9388c0-8c78-4acb-ad3c-b9d1764522b2'
+        key_alias = c.list_aliases(KeyId=key_id)
+        self.assertEqual(key_alias.get('Aliases')[0].get('AliasName'), 'alias/data-sync-kms-key')
+        client = session_factory().client('glue')
+        enc_setting = client.get_data_catalog_encryption_settings()
+        self.assertEqual(enc_setting.get('DataCatalogEncryptionSettings').get(
+            'EncryptionAtRest').get('SseAwsKmsKeyId'), key_id)
+        self.assertEqual(enc_setting.get('DataCatalogEncryptionSettings').get(
+            'ConnectionPasswordEncryption').get(
+              'ReturnConnectionPasswordEncrypted'), False)
+        p = self.load_policy(
+            {
+                'name': 'glue-catalog-encryption',
+                "resource": 'glue-catalog',
+                'filters': [{
+                    'type': 'kms-key',
+                    'key-type': 'EncryptionAtRest',
+                    'key': 'c7n:AliasName',
+                    'value': 'alias/data-sync-kms-key',
+                    'op': 'eq'},
+                ],
+                'actions': [{
+                    'type': 'set-encryption',
+                    'attributes': {
+                        'ConnectionPasswordEncryption': {
+                            'ReturnConnectionPasswordEncrypted': True,
+                            'AwsKmsKeyId': 'alias/skunk/glue/encrypted'},
+                    },
+                }]
+            },
+            session_factory=session_factory,)
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = session_factory().client("glue")
+        datacatlog = client.get_data_catalog_encryption_settings()
+        self.assertEqual(datacatlog.get('DataCatalogEncryptionSettings').get(
+            'EncryptionAtRest'),
+            {'CatalogEncryptionMode': 'SSE-KMS', 'SseAwsKmsKeyId': key_id})
+        self.assertEqual(datacatlog.get('DataCatalogEncryptionSettings').get(
+            'ConnectionPasswordEncryption'),
+            {'ReturnConnectionPasswordEncrypted': True,
+             'AwsKmsKeyId': 'alias/skunk/glue/encrypted'})
+
     def test_glue_catalog_cross_account(self):
         session_factory = self.replay_flight_data("test_glue_catalog_cross_account")
         p = self.load_policy(

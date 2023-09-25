@@ -607,6 +607,32 @@ class GlueDataCatalog(ResourceManager):
         return [{'CatalogId': self.config.account_id}]
 
 
+@GlueDataCatalog.filter_registry.register('kms-key')
+class GlueCatalogKmsFilter(KmsRelatedFilter):
+
+    schema = type_schema(
+        'kms-key',
+        rinherit=ValueFilter.schema,
+        **{'key-type': {'type': 'string', 'enum': [
+            'EncryptionAtRest', 'ConnectionPasswordEncryption']},
+            'required': ['key-type'],
+            'match-resource': {'type': 'boolean'},
+            'operator': {'enum': ['and', 'or']}})
+
+    permissions = ('glue:GetDataCatalogEncryptionSettings',)
+
+    RelatedIdsExpression = ''
+
+    def __init__(self, data, manager=None):
+        super().__init__(data, manager)
+        key_type_to_related_ids = {
+            'EncryptionAtRest': 'DataCatalogEncryptionSettings.EncryptionAtRest.SseAwsKmsKeyId',
+            'ConnectionPasswordEncryption':
+              'DataCatalogEncryptionSettings.ConnectionPasswordEncryption.AwsKmsKeyId'
+        }
+        self.RelatedIdsExpression = key_type_to_related_ids.get(self.data.get('key-type'))
+
+
 @GlueDataCatalog.action_registry.register('set-encryption')
 class GlueDataCatalogEncryption(BaseAction):
     """Modifies glue data catalog encryption based on specified parameter
@@ -666,9 +692,18 @@ class GlueDataCatalogEncryption(BaseAction):
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('glue')
+        self.process_catalog_encryption(client, resources)
+
+    def process_catalog_encryption(self, client, resources):
         # there is one glue data catalog per account
+        if 'DataCatalogEncryptionSettings' not in resources[0]:
+            resources = self.manager.resources()
+        enc_config = resources[0]['DataCatalogEncryptionSettings']
+        updated_config = {**enc_config, **self.data['attributes']}
+        if enc_config == updated_config:
+            return
         client.put_data_catalog_encryption_settings(
-            DataCatalogEncryptionSettings=self.data['attributes'])
+            DataCatalogEncryptionSettings=updated_config)
 
 
 @GlueDataCatalog.filter_registry.register('glue-security-config')
