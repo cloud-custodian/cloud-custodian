@@ -37,7 +37,7 @@ class CloudRunServiceIamPolicyFilter(IamPolicyFilter):
         location = resource["metadata"]["labels"]["cloud.googleapis.com/location"]
         verb_arguments = {
             "resource": f'projects/{project}/locations/{location}/services/' +
-                '{resource["metadata"]["name"]}'
+                f'{resource["metadata"]["name"]}'
         }
         return verb_arguments
 
