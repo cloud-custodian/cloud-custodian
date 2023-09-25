@@ -778,7 +778,7 @@ def test_cli_dump(policy_env, test, debug_cli_runner):
     assert data["input_vars"] == {
         "environment": {"repo": "cloud-custodian/cloud-custodian"},
         "uninitialized": {"env": ""},
-        "user:vars.tfvars": {"app": "riddle"}
+        "user:vars.tfvars": {"app": "riddle"},
     }
 
 
