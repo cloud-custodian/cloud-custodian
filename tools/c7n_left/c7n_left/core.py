@@ -29,10 +29,23 @@ class IACSourceProvider(Provider):
         return lambda *args, **kw: None
 
     def initialize(self, options):
-        pass
+        """Initialize the provider"""
 
     def initialize_policies(self, policies, options):
         return policies
+
+    def parse(self, source_dir, var_files):
+        """Return the resource graph for the provider"""
+
+
+def get_provider(source_dir):
+    """For a given source directory return an appropriate IaC provider"""
+    for name, provider_class in clouds.items():
+        if not issubclass(provider_class, IACSourceProvider):
+            continue
+        provider = provider_class()
+        if provider.match_dir(source_dir):
+            return provider
 
 
 class PolicyMetadata:
@@ -211,6 +224,7 @@ class CollectionRunner:
         self.policies = policies
         self.options = options
         self.reporter = reporter
+        self.provider = None
 
     def run(self) -> bool:
         # return value is used to signal process exit code.
@@ -221,7 +235,7 @@ class CollectionRunner:
             log.warning("no %s source files found" % provider.type)
             return True
 
-        graph = provider.parse(self.options.source_dir, self.options.var_files)
+        graph = self.provider.parse(self.options.source_dir, self.options.var_files)
 
         for p in self.policies:
             p.expand_variables(p.get_variables())
@@ -254,8 +268,9 @@ class CollectionRunner:
 
     def get_provider(self):
         provider_name = {p.provider_name for p in self.policies}.pop()
-        provider = clouds[provider_name]()
-        return provider
+        self.provider = clouds[provider_name]()
+        self.provider.initialize(self.options)
+        return self.provider
 
     def get_event(self):
         return {"config": self.options, "env": dict(os.environ)}
