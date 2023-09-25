@@ -143,14 +143,26 @@ class KubernetesClusterNodePool(ChildResourceManager):
 @KubernetesCluster.filter_registry.register('server-config')
 @KubernetesClusterNodePool.filter_registry.register('server-config')
 class ServerConfig(ValueFilter):
-    """Filters kubernetes nodepools by their server config.
+    """Filters kubernetes clusters or nodepools by their server config.
     See `getServerConfig
     https://cloud.google.com/kubernetes-engine/docs/reference/rest/v1/projects.locations/getServerConfig`
     for valid fields.
 
     :example:
 
-    Filter all nodepools that does not have a supported version
+    Filter all clusters that is not running a supported version
+
+    .. code-block:: yaml
+
+        policies:
+           - name: find-unsupported-cluster-version
+             resource: gcp.gke-cluster
+             filters:
+             - type: server-config
+               key: contains(serverConfig.validMasterVersions,currentMasterVersion)
+               value: false
+
+    Filter all nodepools that is not running a supported version
 
     .. code-block:: yaml
 
@@ -159,7 +171,7 @@ class ServerConfig(ValueFilter):
              resource: gcp.gke-nodepool
              filters:
              - type: server-config
-               key: contains(validNodeVersions,version)
+               key: contains(serverConfig.validNodeVersions,version)
                value: false
     """
 
