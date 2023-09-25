@@ -775,6 +775,11 @@ def test_cli_dump(policy_env, test, debug_cli_runner):
     assert result.exit_code == 0
     data = json.loads((policy_env.policy_dir / "output.json").read_text())
     assert data["graph"]["aws_cloudwatch_log_group"][0]["name"] == "riddle--logs"
+    assert data["input_vars"] == {
+        "environment": {"repo": "cloud-custodian/cloud-custodian"},
+        "uninitialized": {"env": ""},
+        "user:vars.tfvars": {"app": "riddle"}
+    }
 
 
 def test_cli_var_file(tmp_path, var_tf_setup, debug_cli_runner):

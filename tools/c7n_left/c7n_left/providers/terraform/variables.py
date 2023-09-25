@@ -97,7 +97,7 @@ class VariableResolver:
                     f_vars = json.loads((self.source_dir / f).read_text())
                 elif str(f).endswith(".tfvars"):
                     f_vars = hcl2.loads((self.source_dir / f).read_text())
-                self.report(type, f_vars, type == "user" and self.var_files[idx] or f)
+                self.report(type, f_vars, type == "user" and self.var_files[idx].name or f)
                 var_map.update(f_vars)
 
         uninitialized_vars = {}
