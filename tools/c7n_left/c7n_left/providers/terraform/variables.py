@@ -75,9 +75,9 @@ class VariableResolver:
 
     @contextlib.contextmanager
     def get_variables(self):
-        self.resolved_files['default'] = self.get_default_var_files()
-        self.resolved_files['user'] = self.get_user_var_files()
-        self.resolved_files['uninitialized'] = self.get_uninitialized_var_files()
+        self.resolved_files["default"] = self.get_default_var_files()
+        self.resolved_files["user"] = self.get_user_var_files()
+        self.resolved_files["uninitialized"] = self.get_uninitialized_var_files()
 
         try:
             yield list(itertools.chain(*self.resolved_files.values()))
@@ -97,7 +97,7 @@ class VariableResolver:
                     f_vars = json.loads((self.source_dir / f).read_text())
                 elif str(f).endswith(".tfvars"):
                     f_vars = hcl2.loads((self.source_dir / f).read_text())
-                self.report(type, f_vars, type == 'user' and self.var_files[idx] or f)
+                self.report(type, f_vars, type == "user" and self.var_files[idx] or f)
                 var_map.update(f_vars)
 
         uninitialized_vars = {}
@@ -116,7 +116,7 @@ class VariableResolver:
         if not uninitialized_vars:
             return []
 
-        log.debug('Using defaults for %d uninitialized variables', len(uninitialized_vars))
+        log.debug("Using defaults for %d uninitialized variables", len(uninitialized_vars))
         self.report("uninitialized", uninitialized_vars)
         return [
             Path(

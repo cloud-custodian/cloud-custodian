@@ -28,11 +28,11 @@ class Taggable(Filter):
             return False
         tag_data = cls.get_tag_data()
         r = resources[0]
-        tf_path = r['__tfmeta']['label']
-        provider = tf_path.split('_', 1)[0]
+        tf_path = r["__tfmeta"]["label"]
+        provider = tf_path.split("_", 1)[0]
         if provider not in tag_data:
             return False
-        tf_type = tf_path.split('.')[0]
+        tf_type = tf_path.split(".")[0]
         if tf_type not in tag_data[provider]:
             return False
         return True

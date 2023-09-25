@@ -52,6 +52,7 @@ class Output:
         """called when variables for graph resolution are discovered"""
 
 
+@report_outputs.register("jsongraph")
 class JsonGraph(Output):
     def __init__(self, ctx, config):
         super().__init__(ctx, config)
@@ -69,8 +70,8 @@ class JsonGraph(Output):
 
     def on_execution_ended(self):
         data = {}
-        data['input_vars'] = self.input_vars
-        data['graph'] = dict(self.graph.resource_data)
+        data["input_vars"] = self.input_vars
+        data["graph"] = dict(self.graph.resource_data)
         self.config.output_file.write(json.dumps(data, cls=JSONEncoder, indent=2))
 
 
@@ -474,7 +475,7 @@ class JunitReport(Output):
         self.policy_results = {pname: [] for pname in self.policies}
 
     def on_policy_start(self, policy, event):
-        self.policy_resources[policy.name] = list(event['resources'])
+        self.policy_resources[policy.name] = list(event["resources"])
 
     def on_execution_ended(self):
         info = self.get_info()
@@ -537,7 +538,8 @@ class JunitReport(Output):
             line_idx += 1
 
         builder.start(
-            "failure", {"type": "failure", "message": policy_md.description or policy_md.name}
+            "failure",
+            {"type": "failure", "message": policy_md.description or policy_md.name},
         )
         builder.data("\n".join(text_data))
         builder.end("failure")
@@ -548,7 +550,10 @@ class JunitReport(Output):
 class Junit(MultiOutput):
     def __init__(self, ctx, config):
         if config.output_file.isatty() is False:
-            parts = [RichCli(ctx, config.copy(output_file=sys.stdout)), JunitReport(ctx, config)]
+            parts = [
+                RichCli(ctx, config.copy(output_file=sys.stdout)),
+                JunitReport(ctx, config),
+            ]
         else:
             parts = [JunitReport(ctx, config)]
         super().__init__(parts)
