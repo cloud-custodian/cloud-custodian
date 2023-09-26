@@ -85,10 +85,10 @@ def build_index(data_dir):
         if path.name == "index.json":
             continue
 
-        rdata = json.loads(path.read_text(encoding='utf8'))
+        rdata = json.loads(path.read_text(encoding="utf8"))
 
-        if 'handlers' not in rdata:
-            print('awscc - resource has no handlers %s' % (rdata['typeName']))
+        if "handlers" not in rdata:
+            print("awscc - resource has no handlers %s" % (rdata["typeName"]))
             continue
 
         service = path.stem.split("_")[1]
@@ -125,7 +125,7 @@ def build(setup_kwargs):
         zipf = zipfile.ZipFile(BytesIO(response.read()))
         for f in zipf.namelist():
             name = f.replace("-", "_")
-            (data_dir / name).write_text(zipf.read(f).decode('utf8'), encoding='utf8')
+            (data_dir / name).write_text(zipf.read(f).decode("utf8"), encoding="utf8")
 
     print("awscc - downloaded %d resource types" % (len(zipf.namelist())))
     build_index(data_dir)
