@@ -12,10 +12,10 @@ import sys
 import tempfile
 import time
 import unittest
+from unittest import mock
+from unittest.mock import patch
 import zipfile
 
-import mock
-from mock import patch
 
 from c7n.config import Config
 from c7n.mu import (

@@ -1,9 +1,10 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import base64
+import http.server
 import json
 import os
-import http.server
+import tempfile
 
 from c7n.config import Config
 from c7n.loader import DirectoryLoader
@@ -22,19 +23,18 @@ class AdmissionControllerServer(http.server.HTTPServer):
     Admission Controller Server
     """
 
-    def __init__(self, policy_dir, on_exception='warn', *args, **kwargs):
+    def __init__(self, policy_dir, on_exception="warn", *args, **kwargs):
         self.policy_dir = policy_dir
         self.on_exception = on_exception
-        self.directory_loader = DirectoryLoader(Config.empty())
-        policy_collection = self.directory_loader.load_directory(
-            os.path.abspath(self.policy_dir))
-        self.policy_collection = policy_collection.filter(modes=['k8s-admission'])
+        temp_dir = tempfile.TemporaryDirectory()
+        self.directory_loader = DirectoryLoader(Config.empty(output_dir=temp_dir.name))
+        policy_collection = self.directory_loader.load_directory(os.path.abspath(self.policy_dir))
+        self.policy_collection = policy_collection.filter(modes=["k8s-admission"])
         log.info(f"Loaded {len(self.policy_collection)} policies")
         super().__init__(*args, **kwargs)
 
 
 class AdmissionControllerHandler(http.server.BaseHTTPRequestHandler):
-
     def run_policies(self, req):
         failed_policies = []
         warn_policies = []
@@ -46,41 +46,47 @@ class AdmissionControllerHandler(http.server.BaseHTTPRequestHandler):
             resources = None
             try:
                 resources = p.push(req)
-                action = p.data['mode'].get('on-match', 'deny')
+                action = p.data["mode"].get("on-match", "deny")
                 result = evaluate_result(action, resources)
-                if result in ('allow', 'warn',):
-                    verb = 'allowing'
+                if result in (
+                    "allow",
+                    "warn",
+                ):
+                    verb = "allowing"
                 else:
-                    verb = 'denying'
+                    verb = "denying"
 
-                log.info(f'{verb} admission because on-match:{action}, matched:{len(resources)}')
-            except (PolicyNotRunnableException, EventNotMatchedException, ):
-                result = 'allow'
+                log.info(f"{verb} admission because on-match:{action}, matched:{len(resources)}")
+            except (
+                PolicyNotRunnableException,
+                EventNotMatchedException,
+            ):
+                result = "allow"
                 resources = []
             except Exception as e:
                 # if a policy fails we simply warn
                 result = self.server.on_exception
-                if result == 'warn':
+                if result == "warn":
                     warning_message = f"Error in executing policy: {str(e)}"
-                if result == 'deny':
+                if result == "deny":
                     deny_message = f"Error in executing policy: {str(e)}"
 
-            if result == 'deny':
+            if result == "deny":
                 failed_policies.append(
                     {
                         "name": p.name,
-                        "description": deny_message or p.data.get('description', '')
+                        "description": deny_message or p.data.get("description", ""),
                     }
                 )
-            if result == 'warn':
+            if result == "warn":
                 warn_policies.append(
                     {
                         "name": p.name,
-                        "description": warning_message or p.data.get('description', '')
+                        "description": warning_message or p.data.get("description", ""),
                     }
                 )
             if resources:
-                patches.extend(resources[0].get('c7n:patches', []))
+                patches.extend(resources[0].get("c7n:patches", []))
         return failed_policies, warn_policies, patches
 
     def get_request_body(self):
@@ -97,7 +103,7 @@ class AdmissionControllerHandler(http.server.BaseHTTPRequestHandler):
         result = []
         for p in self.server.policy_collection.policies:
             result.append(p.data)
-        self.wfile.write(json.dumps(result).encode('utf-8'))
+        self.wfile.write(json.dumps(result).encode("utf-8"))
 
     def do_POST(self):
         """
@@ -109,37 +115,37 @@ class AdmissionControllerHandler(http.server.BaseHTTPRequestHandler):
             req = json.loads(req)
         except Exception as e:
             self.send_response(400)
-            self.send_header('Content-Type', 'application/json')
+            self.send_header("Content-Type", "application/json")
             self.end_headers()
-            self.wfile.write(json.dumps({"error": str(e)}).encode('utf-8'))
+            self.wfile.write(json.dumps({"error": str(e)}).encode("utf-8"))
             return
 
         failed_policies, warn_policies, patches = self.run_policies(req)
 
         self.send_response(200)
-        self.send_header('Content-Type', 'application/json')
+        self.send_header("Content-Type", "application/json")
         self.end_headers()
 
         if patches:
-            patches = base64.b64encode(json.dumps(patches).encode('utf-8')).decode()
+            patches = base64.b64encode(json.dumps(patches).encode("utf-8")).decode()
 
         response = self.create_admission_response(
-            uid=req['request']['uid'],
+            uid=req["request"]["uid"],
             failed_policies=failed_policies,
             warn_policies=warn_policies,
-            patches=patches
+            patches=patches,
         )
         log.info(response)
-        self.wfile.write(response.encode('utf-8'))
+        self.wfile.write(response.encode("utf-8"))
 
     def create_admission_response(
         self, uid, failed_policies=None, warn_policies=None, patches=None
     ):
         code = 200 if len(failed_policies) == 0 else 400
-        message = 'OK'
+        message = "OK"
         warnings = []
         if failed_policies:
-            message = f'Failed admission due to policies:{json.dumps(failed_policies)}'
+            message = f"Failed admission due to policies:{json.dumps(failed_policies)}"
         if warn_policies:
             for p in warn_policies:
                 warnings.append(f"{p['name']}:{p['description']}")
@@ -151,25 +157,26 @@ class AdmissionControllerHandler(http.server.BaseHTTPRequestHandler):
                 "allowed": False if failed_policies else True,
                 "warnings": warnings,
                 "uid": uid,
-                "status": {
-                    "code": code,
-                    "message": message
-                }
-            }
+                "status": {"code": code, "message": message},
+            },
         }
 
         if patches:
-            patch = {
-                "patchType": "JSONPatch",
-                "patch": patches
-            }
-            response['response'].update(patch)
+            patch = {"patchType": "JSONPatch", "patch": patches}
+            response["response"].update(patch)
         return json.dumps(response)
 
 
 def init(
-    host, port, policy_dir, on_exception='warn', serve_forever=True,
-    *, cert_path=None, cert_key_path=None, ca_cert_path=None,
+    host,
+    port,
+    policy_dir,
+    on_exception="warn",
+    serve_forever=True,
+    *,
+    cert_path=None,
+    cert_key_path=None,
+    ca_cert_path=None,
 ):
     use_tls = any((cert_path, cert_key_path))
     if use_tls and not (cert_path and cert_key_path):
@@ -185,6 +192,7 @@ def init(
     )
     if use_tls:
         import ssl
+
         server.socket = ssl.wrap_socket(
             server.socket,
             server_side=True,

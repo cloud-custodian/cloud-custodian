@@ -8,7 +8,7 @@ The following example policy will filter and tag the users with the expired cust
 .. code-block:: yaml
 
     policies:
-    - name: filter-tag-user-with-expired-secret-keys
+    - name: filter-tag-users-with-expired-customer-secret-keys
       description: |
         Filter and tag users with expired customer secret keys
       resource: oci.user

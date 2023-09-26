@@ -559,3 +559,37 @@ class TestEssentialContactsFilter(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 0)
+
+
+class TestOrgPoliciesFilter(BaseTest):
+
+    def test_org_policies_filter(self):
+        session_factory = self.replay_flight_data("filter-org-policies")
+        p = self.load_policy(
+            {
+                "name": "org-policy",
+                "resource": "gcp.organization",
+                "filters": [{
+                    "type": "org-policy",
+                    "attrs": [{
+                        "type": "value",
+                        "key": "constraint",
+                        "value": "constraints/iam.allowedPolicyMemberDomains",
+                        "op": "contains"
+                    }]
+                }]
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(resources[0]['c7n:ListItemMatches'], [{
+            'constraint': 'constraints/iam.allowedPolicyMemberDomains',
+            'etag': 'CPqZj6MGENDApK4C',
+            'updateTime': '2023-05-16T18:35:38.633938Z',
+            'listPolicy': {
+                'allowedValues': ['is:C03xgje4y'],
+                'inheritFromParent': True
+                },
+            'c7n:MatchedFilters': ['constraint']
+        }])
+        self.assertEqual(len(resources), 1)

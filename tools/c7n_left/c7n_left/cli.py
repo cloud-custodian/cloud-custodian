@@ -8,11 +8,11 @@ import sys
 import click
 from c7n.config import Config
 
-from .core import CollectionRunner, ExecutionFilter
+from .core import CollectionRunner, ExecutionFilter, get_provider
 from .entry import initialize_iac
 from .output import get_reporter, report_outputs, summary_options
 from .test import TestReporter, TestRunner
-from .utils import load_policies
+from .policy import load_policies
 
 
 log = logging.getLogger("c7n.iac")
@@ -26,15 +26,86 @@ def cli():
 
 
 @cli.command()
+@click.option("-d", "--directory", type=click.Path(), help="IaC directory to evaluate")
+@click.option(
+    "--var-file",
+    help="Load variables from the given file, can be used more than once",
+    type=click.Path(exists=True, dir_okay=False),
+    default=(),
+    multiple=True,
+)
+@click.option(
+    "--output-file",
+    help="Output file (default stdout)",
+    type=click.File("w"),
+    default="-",
+)
+@click.option(
+    "--output-query",
+    default=None,
+    help="Use a jmespath expression to filter json output",
+)
+def dump(directory, var_file, output_file, output_query):
+    """Dump the parsed resource graph or subset"""
+
+    config = Config.empty(
+        source_dir=Path(directory),
+        output="jsongraph",
+        output_file=output_file,
+        var_files=var_file,
+        output_query=output_query,
+    )
+    reporter = get_reporter(config)
+    config["reporter"] = reporter
+    provider = get_provider(config.source_dir)
+    provider.initialize(config)
+    graph = provider.parse(config.source_dir, config.var_files)
+    reporter.on_execution_started([], graph)
+    reporter.on_execution_ended()
+
+
+@cli.command()
 @click.option("--format", default="terraform")
-@click.option("--filters", help="filter policies or resources as k=v pairs with globbing")
-@click.option("-p", "--policy-dir", type=click.Path())
-@click.option("-d", "--directory", type=click.Path())
-@click.option("-o", "--output", default="cli", type=click.Choice(report_outputs.keys()))
-@click.option("--output-file", type=click.File("w"), default="-")
-@click.option("--output-query", default=None)
+@click.option("--filters", help="Filter policies or resources as k=v pairs with globbing")
+@click.option("-p", "--policy-dir", type=click.Path(), help="Directory with policies")
+@click.option("-d", "--directory", type=click.Path(), help="IaC directory to evaluate")
+@click.option(
+    "-o",
+    "--output",
+    default="cli",
+    help="Output format (default cli)",
+    type=click.Choice([k for k in report_outputs.keys() if not k == "jsongraph"]),
+)
+@click.option(
+    "--output-file",
+    help="Output file (default stdout)",
+    type=click.File("w"),
+    default="-",
+)
+@click.option(
+    "--var-file",
+    help="Load variables from the given file, can be used more than once",
+    type=click.Path(exists=True, dir_okay=False),
+    default=(),
+    multiple=True,
+)
+@click.option(
+    "--output-query",
+    default=None,
+    help="Use a jmespath expression to filter json output",
+)
 @click.option("--summary", default="policy", type=click.Choice(summary_options.keys()))
-def run(format, policy_dir, directory, output, output_file, output_query, summary, filters):
+def run(
+    format,
+    policy_dir,
+    directory,
+    output,
+    output_file,
+    var_file,
+    output_query,
+    summary,
+    filters,
+):
     """evaluate policies against IaC sources.
 
     c7n-left -p policy_dir -d terraform_root --filters "severity=HIGH"
@@ -47,10 +118,12 @@ def run(format, policy_dir, directory, output, output_file, output_query, summar
         policy_dir=Path(policy_dir),
         output=output,
         output_file=output_file,
+        var_files=var_file,
         output_query=output_query,
         summary=summary,
         filters=filters,
     )
+
     exec_filter = ExecutionFilter.parse(config)
     config["exec_filter"] = exec_filter
     policies = exec_filter.filter_policies(load_policies(policy_dir, config))
@@ -58,6 +131,7 @@ def run(format, policy_dir, directory, output, output_file, output_query, summar
         log.warning("no policies found")
         sys.exit(1)
     reporter = get_reporter(config)
+    config["reporter"] = reporter
     runner = CollectionRunner(policies, config, reporter)
     sys.exit(int(runner.run()))
 
@@ -75,6 +149,7 @@ def test(policy_dir, filters):
         policy_dir=policy_dir,
         output_file=sys.stdout,
         filters=filters,
+        var_files=(),
     )
 
     reporter = TestReporter(None, config)

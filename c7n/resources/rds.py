@@ -564,7 +564,8 @@ class Delete(BaseAction):
 
     def process(self, dbs):
         skip = self.data.get('skip-snapshot', False)
-
+        # Can't delete an instance in an aurora cluster, use a policy on the cluster
+        dbs = [r for r in dbs if not r.get('DBClusterIdentifier')]
         # Concurrency feels like overkill here.
         client = local_session(self.manager.session_factory).client('rds')
         for db in dbs:
@@ -1045,7 +1046,7 @@ class RDSSnapshot(QueryResourceManager):
         enum_spec = ('describe_db_snapshots', 'DBSnapshots', None)
         name = id = 'DBSnapshotIdentifier'
         date = 'SnapshotCreateTime'
-        config_type = cfn_type = "AWS::RDS::DBSnapshot"
+        config_type = "AWS::RDS::DBSnapshot"
         filter_name = "DBSnapshotIdentifier"
         filter_type = "scalar"
         universal_taggable = True
@@ -1904,6 +1905,18 @@ class ModifyDb(BaseAction):
 
 @resources.register('rds-reserved')
 class ReservedRDS(QueryResourceManager):
+    """Lists all active rds reservations
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: existing-rds-reservations
+                resource: rds-reserved
+                filters:
+                    - State: active
+    """
 
     class resource_type(TypeInfo):
         service = 'rds'
@@ -2208,5 +2221,41 @@ class DbOptionGroups(ValueFilter):
                     })
                     results.append(resource)
                     break
+
+        return results
+
+
+@filters.register('pending-maintenance')
+class PendingMaintenance(Filter):
+    """ Scan DB instances for those with pending maintenance
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: rds-pending-maintenance
+            resource: aws.rds
+            filters:
+              - pending-maintenance
+    """
+
+    schema = type_schema('pending-maintenance')
+    permissions = ('rds:DescribePendingMaintenanceActions',)
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('rds')
+
+        results = []
+        pending_maintenance = set()
+        paginator = client.get_paginator('describe_pending_maintenance_actions')
+        for page in paginator.paginate():
+            pending_maintenance.update(
+                {action['ResourceIdentifier'] for action in page['PendingMaintenanceActions']}
+            )
+
+        for r in resources:
+            if r['DBInstanceArn'] in pending_maintenance:
+                results.append(r)
 
         return results

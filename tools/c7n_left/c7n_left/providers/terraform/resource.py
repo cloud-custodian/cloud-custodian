@@ -18,6 +18,10 @@ class TerraformResource(dict):
         super().__init__(data)
 
     @property
+    def id(self):
+        return self.location["path"]
+
+    @property
     def filename(self):
         return self.location["filename"]
 
@@ -32,6 +36,9 @@ class TerraformResource(dict):
     @property
     def src_dir(self):
         return self.location["src_dir"]
+
+    def get_references(self):
+        return self.location.get("refs", ())
 
     def get_source_lines(self):
         lines = (self.src_dir / self.filename).read_text().split("\n")
