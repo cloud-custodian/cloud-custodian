@@ -364,6 +364,32 @@ output "news" {
     }
 
 
+def test_provider_augment_null(policy_env):
+    policy_env.write_tf(
+        """
+resource "aws_cloudwatch_log_group" "yada" {
+  name = "Yada"
+}
+
+provider "aws" {
+ default_tags {
+   tags = null
+ }
+}
+        """
+    )
+    policy_env.write_policy(
+        {
+            "name": "check-tags",
+            "resource": "terraform.aws_*",
+            "filters": [{"tag:Env": "absent"}],
+        }
+    )
+    results = policy_env.run()
+    assert len(results) == 1
+    assert results[0].resource["name"] == "Yada"
+
+
 def test_provider_tag_augment(policy_env):
     policy_env.write_tf(
         """

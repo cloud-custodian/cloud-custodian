@@ -48,7 +48,7 @@ class TerraformResourceManager(IACResourceManager):
             for block in blocks:
                 if block["__tfmeta"]["label"] != "aws":
                     continue
-                provider_tags.update(block.get("default_tags", {}).get("tags", {}))
+                provider_tags.update(block.get("default_tags", {}).get("tags") or {})
 
         if not provider_tags:
             return
