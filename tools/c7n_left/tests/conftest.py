@@ -16,7 +16,7 @@ def test(request):
 class DebugCliRunner(CliRunner):
     def invoke(self, cli, args=None, **kwargs):
         params = kwargs.copy()
-        params['catch_exceptions'] = False
+        params["catch_exceptions"] = False
         return super().invoke(cli, args=args, **params)
 
     @contextlib.contextmanager

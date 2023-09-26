@@ -217,16 +217,19 @@ importlib-resources = {version = ">=1.4.0", markers = "python_version < \"3.9\""
 referencing = ">=0.28.0"
 
 [[package]]
-name = "lark-parser"
-version = "0.10.1"
+name = "lark"
+version = "1.1.7"
 description = "a modern parsing library"
 optional = false
-python-versions = "*"
+python-versions = ">=3.6"
 files = [
-    {file = "lark-parser-0.10.1.tar.gz", hash = "sha256:42f367612a1bbc4cf9d8c8eb1b209d8a9b397d55af75620c9e6f53e502235996"},
+    {file = "lark-1.1.7-py3-none-any.whl", hash = "sha256:9e5dc5bbf93fa1840083707285262514a0ef8a6613874af7ea1cec60468d6e92"},
+    {file = "lark-1.1.7.tar.gz", hash = "sha256:be7437bf1f37ab08b355f29ff2571d77d777113d0a8c4352b0c513dced6c5a1e"},
 ]
 
 [package.extras]
+atomic-cache = ["atomicwrites"]
+interegular = ["interegular (>=0.3.1,<0.4.0)"]
 nearley = ["js2py"]
 regex = ["regex"]
 
@@ -257,16 +260,17 @@ six = ">=1.5"
 
 [[package]]
 name = "python-hcl2"
-version = "2.0.3"
+version = "4.3.2"
 description = "A parser for HCL2"
 optional = false
-python-versions = ">=3.6.0"
+python-versions = ">=3.7.0"
 files = [
-    {file = "python-hcl2-2.0.3.tar.gz", hash = "sha256:62bfe6a152e794700abd125bfb5c53913af8c8bc98eeef37bd30f87e3f19bfc2"},
+    {file = "python-hcl2-4.3.2.tar.gz", hash = "sha256:7122661438be27ccd8b8f3db71969d8ef2cce3b3cf183e88f8172575e7405a65"},
+    {file = "python_hcl2-4.3.2-py3-none-any.whl", hash = "sha256:e958fe52ca0519e3500eb621caa16be6be9c27870cbcd1879d8c538fb85067ea"},
 ]
 
 [package.dependencies]
-lark-parser = ">=0.10.0,<0.11.0"
+lark = ">=1,<2"
 
 [[package]]
 name = "pyyaml"
@@ -514,4 +518,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "e47acc90d8afbcd3aa4548c356afd9a7f1b0ee0f4eb6908ddf5a9554310987bf"
+content-hash = "7aa1f87d982e0b4fd597de656faf8c464742c39d7a24e5c1b842ea29cbb5e66d"
