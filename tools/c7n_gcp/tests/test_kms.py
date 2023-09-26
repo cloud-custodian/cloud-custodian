@@ -1,7 +1,7 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
-
 from gcp_common import BaseTest, event_data
+from pytest_terraform import terraform
 
 
 class KmsKeyRingTest(BaseTest):
@@ -304,3 +304,38 @@ class KmsCryptoKeyVersionTest(BaseTest):
                 'gcp:cloudkms:us-central1:cloud-custodian:cryptokey-version/cloud-custodian/cloud-custodian/1',  # noqa: E501
             ],
         )
+
+
+@terraform('kms_location')
+def test_kms_keyring_filter(test, kms_location):
+    session_factory = test.replay_flight_data('kms-keyring-filter')
+    policy = test.load_policy({
+        'name': 'kms-location',
+        'resource': 'gcp.kms-location',
+        'filters': [{
+            'name':
+                f'projects/{kms_location["google_kms_key_ring.c7n.project"]}/locations/us-central1'},
+            {
+            'not': [{
+                    'type': 'keyring',
+                    'exist': True}]}]
+    }, session_factory=session_factory)
+
+    resources = policy.run()
+    assert len(resources) == 0
+
+    policy = test.load_policy({
+        'name': 'kms-location',
+        'resource': 'gcp.kms-location',
+        'filters': [{
+            'name':
+                f'projects/{kms_location["google_kms_key_ring.c7n.project"]}/locations/us-west1'},
+            {
+            'not': [{
+                    'type': 'keyring',
+                    'exist': True}]}]
+    }, session_factory=session_factory)
+
+    resources = policy.run()
+    assert len(resources) == 1
+    assert resources[0]['name'] == 'projects/cloud-custodian/locations/us-west1'
