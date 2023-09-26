@@ -34,7 +34,7 @@ jobs:
           terraform_version: "1.5.5"
       - name: Lint Check
         env:
-          RUFF_FORMAT: github
+          RUFF_OUTPUT_FORMAT: github
         run: |
           make lint
       - name: Check Workflows
