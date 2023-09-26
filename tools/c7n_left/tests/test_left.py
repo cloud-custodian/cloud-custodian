@@ -387,7 +387,7 @@ provider "aws" {
     )
     results = policy_env.run()
     assert len(results) == 1
-    assert results[0].resource["name"] == "Yada"    
+    assert results[0].resource["name"] == "Yada"
 
 
 def test_provider_tag_augment(policy_env):
