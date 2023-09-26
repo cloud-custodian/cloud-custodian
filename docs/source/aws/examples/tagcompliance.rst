@@ -2,7 +2,7 @@ Tag Compliance Across Resources (EC2, ASG, ELB, S3, etc)
 ========================================================
 
 Tag
-  Tags instances matching filters with a 'c7n_status' tag by
+  Tags instances matching filters with a 'maid_status' tag by
   default and configurable value.
 
   Here's an example of renaming an extant tag
@@ -52,7 +52,7 @@ Enforce Tag Compliance
          to tagging policies, and tag them for stoppage in 1 days.
        filters:
          - "tag:aws:autoscaling:groupName": absent
-         - "tag:c7n_status": absent
+         - "tag:maid_status": absent
          - or:
              - "tag:Owner": absent
              - "tag:CostCenter": absent
@@ -72,10 +72,9 @@ Enforce Tag Compliance
          - "tag:Owner": not-null
          - "tag:CostCenter": not-null
          - "tag:Project": not-null
-         - "tag:c7n_status": not-null
+         - "tag:maid_status": not-null
        actions:
          - unmark
-         - start
 
      - name: ec2-tag-compliance-stop
        resource: ec2
