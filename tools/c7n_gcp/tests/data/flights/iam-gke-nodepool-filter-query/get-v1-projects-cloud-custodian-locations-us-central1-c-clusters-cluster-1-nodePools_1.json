@@ -1,0 +1,65 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Wed, 08 Jun 2022 10:03:29 GMT",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000,h3-Q050=\":443\"; ma=2592000,h3-Q046=\":443\"; ma=2592000,h3-Q043=\":443\"; ma=2592000,quic=\":443\"; ma=2592000; v=\"46,43\"",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "1420",
+    "-content-encoding": "gzip",
+    "content-location": "https://container.googleapis.com/v1/projects/cloud-custodian/locations/us-central1-c/clusters/cluster-1/nodePools?alt=json"
+  },
+  "body": {
+    "nodePools": [
+      {
+        "name": "default-pool",
+        "config": {
+          "machineType": "e2-micro",
+          "diskSizeGb": 10,
+          "oauthScopes": [
+            "https://www.googleapis.com/auth/cloud-platform"
+          ],
+          "metadata": {
+            "disable-legacy-endpoints": "true"
+          },
+          "imageType": "COS_CONTAINERD",
+          "serviceAccount": "iam-least-privilege-1eed69f5@gcp-lab-custodian.iam.gserviceaccount.com",
+          "diskType": "pd-standard",
+          "shieldedInstanceConfig": {}
+        },
+        "initialNodeCount": 1,
+        "autoscaling": {},
+        "management": {
+          "autoUpgrade": true,
+          "autoRepair": true
+        },
+        "maxPodsConstraint": {
+          "maxPodsPerNode": "110"
+        },
+        "podIpv4CidrSize": 24,
+        "locations": [
+          "us-central1-c"
+        ],
+        "networkConfig": {
+          "podRange": "gke-cluster-1-pods-e1215a46",
+          "podIpv4CidrBlock": "10.4.0.0/14"
+        },
+        "selfLink": "https://container.googleapis.com/v1/projects/cloud-custodian/zones/us-central1-c/clusters/cluster-1/nodePools/default-pool",
+        "version": "1.22.8-gke.201",
+        "instanceGroupUrls": [
+          "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-c/instanceGroupManagers/gke-cluster-1-default-pool-e80922e5-grp"
+        ],
+        "status": "RUNNING",
+        "upgradeSettings": {
+          "maxSurge": 1
+        }
+      }
+    ]
+  }
+}

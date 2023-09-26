@@ -1,0 +1,300 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Wed, 08 Jun 2022 10:03:30 GMT",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "server-timing": "gfet4t7; dur=822",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000,h3-Q050=\":443\"; ma=2592000,h3-Q046=\":443\"; ma=2592000,h3-Q043=\":443\"; ma=2592000,quic=\":443\"; ma=2592000; v=\"46,43\"",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "8753",
+    "-content-encoding": "gzip"
+  },
+  "body": {
+    "version": 1,
+    "etag": "BwXg7L5ub2k=",
+    "bindings": [
+      {
+        "role": "projects/cloud-custodian/roles/CustomRole469",
+        "members": [
+          "serviceAccount:service-443732426401@compute-system.iam.gserviceaccount.com"
+        ]
+      },
+      {
+        "role": "projects/cloud-custodian/roles/iam_least_privilege_1eed69f5",
+        "members": [
+          "serviceAccount:iam-least-privilege-1eed69f5@gcp-lab-custodian.iam.gserviceaccount.com"
+        ]
+      },
+      {
+        "role": "roles/anthosconfigmanagement.serviceAgent",
+        "members": [
+          "serviceAccount:service-443732426401@gcp-sa-anthosconfigmanagement.iam.gserviceaccount.com"
+        ]
+      },
+      {
+        "role": "roles/appengine.serviceAgent",
+        "members": [
+          "serviceAccount:service-443732426401@gcp-gae-service.iam.gserviceaccount.com"
+        ]
+      },
+      {
+        "role": "roles/bigquery.admin",
+        "members": [
+          "user:oleksii_shaina@epam.com"
+        ]
+      },
+      {
+        "role": "roles/bigtable.admin",
+        "members": [
+          "user:gcp.lab.cust1@epmcseclab.com"
+        ]
+      },
+      {
+        "role": "roles/binaryauthorization.serviceAgent",
+        "members": [
+          "serviceAccount:service-443732426401@gcp-sa-binaryauthorization.iam.gserviceaccount.com"
+        ]
+      },
+      {
+        "role": "roles/cloudbuild.builds.builder",
+        "members": [
+          "serviceAccount:443732426401@cloudbuild.gserviceaccount.com"
+        ]
+      },
+      {
+        "role": "roles/cloudbuild.serviceAgent",
+        "members": [
+          "serviceAccount:service-443732426401@gcp-sa-cloudbuild.iam.gserviceaccount.com"
+        ]
+      },
+      {
+        "role": "roles/cloudfunctions.serviceAgent",
+        "members": [
+          "serviceAccount:service-443732426401@gcf-admin-robot.iam.gserviceaccount.com"
+        ]
+      },
+      {
+        "role": "roles/cloudkms.admin",
+        "members": [
+          "serviceAccount:service-443732426401@container-engine-robot.iam.gserviceaccount.com",
+          "user:anna_andronnikova@epam.com",
+          "user:oleksandr_shulhin@epam.com",
+          "user:serhii_holubiev@epam.com"
+        ]
+      },
+      {
+        "role": "roles/cloudkms.cryptoKeyDecrypter",
+        "members": [
+          "user:oleksandr_shulhin@epam.com"
+        ]
+      },
+      {
+        "role": "roles/cloudkms.cryptoKeyEncrypterDecrypter",
+        "members": [
+          "serviceAccount:service-account-id-261-green@gcp-lab-custodian.iam.gserviceaccount.com",
+          "user:anna_andronnikova@epam.com"
+        ]
+      },
+      {
+        "role": "roles/cloudkms.serviceAgent",
+        "members": [
+          "serviceAccount:service-443732426401@gcp-sa-cloudkms.iam.gserviceaccount.com"
+        ]
+      },
+      {
+        "role": "roles/cloudscheduler.serviceAgent",
+        "members": [
+          "serviceAccount:service-443732426401@gcp-sa-cloudscheduler.iam.gserviceaccount.com"
+        ]
+      },
+      {
+        "role": "roles/compute.serviceAgent",
+        "members": [
+          "serviceAccount:service-443732426401@compute-system.iam.gserviceaccount.com"
+        ]
+      },
+      {
+        "role": "roles/container.nodeServiceAgent",
+        "members": [
+          "serviceAccount:service-443732426401@gcp-sa-gkenode.iam.gserviceaccount.com"
+        ]
+      },
+      {
+        "role": "roles/container.serviceAgent",
+        "members": [
+          "serviceAccount:service-443732426401@container-engine-robot.iam.gserviceaccount.com"
+        ]
+      },
+      {
+        "role": "roles/containerscanning.ServiceAgent",
+        "members": [
+          "serviceAccount:service-443732426401@gcp-sa-containerscanning.iam.gserviceaccount.com"
+        ]
+      },
+      {
+        "role": "roles/dataflow.serviceAgent",
+        "members": [
+          "serviceAccount:service-443732426401@dataflow-service-producer-prod.iam.gserviceaccount.com"
+        ]
+      },
+      {
+        "role": "roles/dataproc.admin",
+        "members": [
+          "serviceAccount:service-account-id-261-green@gcp-lab-custodian.iam.gserviceaccount.com"
+        ]
+      },
+      {
+        "role": "roles/dataproc.serviceAgent",
+        "members": [
+          "serviceAccount:service-443732426401@dataproc-accounts.iam.gserviceaccount.com"
+        ]
+      },
+      {
+        "role": "roles/editor",
+        "members": [
+          "serviceAccount:443732426401-compute@developer.gserviceaccount.com",
+          "serviceAccount:443732426401@cloudservices.gserviceaccount.com",
+          "serviceAccount:gcp-lab-custodian@appspot.gserviceaccount.com",
+          "serviceAccount:oleksandr-hrechenko@gcp-lab-custodian.iam.gserviceaccount.com",
+          "serviceAccount:service-443732426401@containerregistry.iam.gserviceaccount.com",
+          "user:oleksandr_hrechenko@epam.com",
+          "user:oleksandr_shulhin@epam.com",
+          "user:oleksii_shaina@epam.com",
+          "user:serhii_holubiev@epam.com",
+          "user:vitalii_kanivets@epam.com",
+          "user:vladyslav_yevsiukov@epam.com",
+          "user:volodymyr_vrydnyk@epam.com",
+          "user:yauhen_shaliou@epam.com",
+          "user:Yuliia_Strekozova@epam.com"
+        ]
+      },
+      {
+        "role": "roles/eventarc.serviceAgent",
+        "members": [
+          "serviceAccount:service-443732426401@gcp-sa-eventarc.iam.gserviceaccount.com"
+        ]
+      },
+      {
+        "role": "roles/firebaserules.system",
+        "members": [
+          "serviceAccount:service-443732426401@firebase-rules.iam.gserviceaccount.com"
+        ]
+      },
+      {
+        "role": "roles/firestore.serviceAgent",
+        "members": [
+          "serviceAccount:service-443732426401@gcp-sa-firestore.iam.gserviceaccount.com"
+        ]
+      },
+      {
+        "role": "roles/gkehub.serviceAgent",
+        "members": [
+          "serviceAccount:service-443732426401@gcp-sa-gkehub.iam.gserviceaccount.com"
+        ]
+      },
+      {
+        "role": "roles/iam.securityReviewer",
+        "members": [
+          "serviceAccount:docker-custodian-tikovka@gcp-lab-custodian.iam.gserviceaccount.com",
+          "serviceAccount:oleksandr-hrechenko@gcp-lab-custodian.iam.gserviceaccount.com"
+        ]
+      },
+      {
+        "role": "roles/iam.serviceAccountKeyAdmin",
+        "members": [
+          "user:oleksii_shaina@epam.com"
+        ]
+      },
+      {
+        "role": "roles/networkmanagement.serviceAgent",
+        "members": [
+          "serviceAccount:service-443732426401@gcp-sa-networkmanagement.iam.gserviceaccount.com"
+        ]
+      },
+      {
+        "role": "roles/owner",
+        "members": [
+          "group:lab_cust@epmcseclab.com",
+          "serviceAccount:eshaliov-custodian@gcp-lab-custodian.iam.gserviceaccount.com",
+          "user:gcp.lab.admin1@epmcseclab.com",
+          "user:gcp.lab.cust1@epmcseclab.com"
+        ]
+      },
+      {
+        "role": "roles/resourcemanager.projectIamAdmin",
+        "members": [
+          "user:yauhen_shaliou@epam.com"
+        ]
+      },
+      {
+        "role": "roles/resourcemanager.projectOwnerInvitee",
+        "members": [
+          "user:oleksii_shaina@epam.com"
+        ]
+      },
+      {
+        "role": "roles/run.invoker",
+        "members": [
+          "serviceAccount:crun-scheduler@gcp-lab-custodian.iam.gserviceaccount.com"
+        ]
+      },
+      {
+        "role": "roles/run.serviceAgent",
+        "members": [
+          "serviceAccount:service-443732426401@serverless-robot-prod.iam.gserviceaccount.com"
+        ]
+      },
+      {
+        "role": "roles/secretmanager.secretAccessor",
+        "members": [
+          "serviceAccount:docker-custodian-tikovka@gcp-lab-custodian.iam.gserviceaccount.com"
+        ]
+      },
+      {
+        "role": "roles/secretmanager.viewer",
+        "members": [
+          "serviceAccount:docker-custodian-tikovka@gcp-lab-custodian.iam.gserviceaccount.com"
+        ]
+      },
+      {
+        "role": "roles/storage.admin",
+        "members": [
+          "user:gcp.lab.cust1@epmcseclab.com"
+        ]
+      },
+      {
+        "role": "roles/storage.objectViewer",
+        "members": [
+          "serviceAccount:docker-custodian-tikovka@gcp-lab-custodian.iam.gserviceaccount.com",
+          "user:oleksii_shaina@epam.com"
+        ]
+      },
+      {
+        "role": "roles/viewer",
+        "members": [
+          "serviceAccount:cloudsploit@gcp-lab-custodian.iam.gserviceaccount.com",
+          "serviceAccount:docker-custodian-tikovka@gcp-lab-custodian.iam.gserviceaccount.com",
+          "serviceAccount:eshaliov-custodian@gcp-lab-custodian.iam.gserviceaccount.com",
+          "serviceAccount:iam-least-privilege-1eed69f5@gcp-lab-custodian.iam.gserviceaccount.com",
+          "serviceAccount:oleksandr-hrechenko@gcp-lab-custodian.iam.gserviceaccount.com",
+          "serviceAccount:service-443732426401@container-engine-robot.iam.gserviceaccount.com",
+          "serviceAccount:service-org-1061422208532@security-center-api.iam.gserviceaccount.com",
+          "serviceAccount:testing-purposes@gcp-lab-custodian.iam.gserviceaccount.com",
+          "user:anna_andronnikova@epam.com"
+        ]
+      },
+      {
+        "role": "roles/vpcaccess.serviceAgent",
+        "members": [
+          "serviceAccount:service-443732426401@gcp-sa-vpcaccess.iam.gserviceaccount.com"
+        ]
+      }
+    ]
+  }
+}

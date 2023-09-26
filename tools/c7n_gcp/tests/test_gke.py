@@ -303,3 +303,24 @@ class KubernetesClusterNodePoolTest(BaseTest):
                 'gcp:container:us-central1-a:cloud-custodian:cluster-node-pool/pool-1'
             ],
         )
+
+    def test_iam_gke_nodepool_filter_query(self):
+        project_id = "cloud-custodian"
+        factory = self.replay_flight_data('iam-gke-nodepool-filter-query', project_id)
+        p = self.load_policy(
+            {'name': 'iam-gke-nodepool-filter',
+             'resource': 'gcp.gke-nodepool',
+             'filters': [{
+                 'type': 'iam-policy',
+                 'doc': {
+                     'key': 'bindings[?(role==\'roles/viewer\')]',
+                     'op': 'ne',
+                     'value': []
+                 }
+             }]},
+            session_factory=factory
+        )
+        resources = p.run()
+
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['name'], 'default-pool')
