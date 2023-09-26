@@ -94,7 +94,7 @@ class Deployment:
 
     @staticmethod
     def write_values_to_file(values):
-        values_file_path = tempfile.mktemp(suffix='.yaml')
+        values_file_path = tempfile.NamedTemporaryFile(delete=False,suffix=".yaml").name
         with open(values_file_path, 'w') as values_file:
             yaml.dump(values, stream=values_file)
         return values_file_path

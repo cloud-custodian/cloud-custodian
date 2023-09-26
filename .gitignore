@@ -40,6 +40,8 @@ pip-wheel-metadata/
 pyvenv.cfg
 junit
 /.vs
+# this folder get generated during security scan by SonarQube
+.scannerwork/
 # these files get copied/generated during doc builds
 docs/source/overview\.rst
 docs/source/tools/*\.md
