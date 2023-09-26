@@ -87,6 +87,10 @@ def build_index(data_dir):
 
         rdata = json.loads(path.read_text())
 
+        if 'handlers' not in rdata:
+            print('awscc - resource has no handlers %s' % (rdata['typeName']))
+            continue
+
         service = path.stem.split("_")[1]
 
         if service not in all_services:

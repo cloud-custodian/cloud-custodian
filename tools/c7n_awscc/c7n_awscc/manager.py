@@ -48,9 +48,9 @@ def initialize_resource(resource_name):
         [s.lower().capitalize() for s in rinfo["typeName"].split("::")[1:]]
     )
     mod_name = f"c7n_awscc.resources.{resource_name}"
-    permissions = rinfo["handlers"].get("read", {}).get("permissions", []) + rinfo[
-        "handlers"
-    ].get("list", {}).get("permissions", [])
+
+    permissions = rinfo.get("handlers", {}).get("read", {}).get("permissions", []) + \
+        rinfo.get("handlers", {}).get("list", {}).get("permissions", [])
 
     rtype = type(
         class_name,
