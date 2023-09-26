@@ -22,7 +22,7 @@ def get_index():
         return _IndexData
 
     index_path = Path(__file__).parent / "data" / "index.json"
-    _IndexData = json.loads(index_path.read_text())
+    _IndexData = json.loads(index_path.read_text(encoding='utf8'))
     return _IndexData
 
 
@@ -31,7 +31,7 @@ def initialize_resource(resource_name):
     rpath = Path(__file__).parent / "data" / f"aws_{resource_name}.json"
     if not rpath.exists():
         return None
-    rinfo = json.loads(rpath.read_text())
+    rinfo = json.loads(rpath.read_text(encoding='utf8'))
 
     type_info = type(
         "resource_type",

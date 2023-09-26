@@ -85,7 +85,7 @@ def build_index(data_dir):
         if path.name == "index.json":
             continue
 
-        rdata = json.loads(path.read_text())
+        rdata = json.loads(path.read_text(encoding='utf8'))
 
         if 'handlers' not in rdata:
             print('awscc - resource has no handlers %s' % (rdata['typeName']))
