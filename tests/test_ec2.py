@@ -300,6 +300,28 @@ class TestMetricFilter(BaseTest):
         resources = policy.run()
         self.assertEqual(len(resources), 1)
 
+    def test_metric_filter_multiple_datapoints(self):
+        session_factory = self.replay_flight_data("test_metric_filter_multiple_datapoints")
+        policy = self.load_policy(
+            {
+                "name": "ec2-utilization-per-day",
+                "resource": "ec2",
+                "filters": [
+                    {
+                        "type": "metrics",
+                        "name": "CPUUtilization",
+                        "days": 3,
+                        "period": 86400,
+                        "value": 1,
+                        "op": "lte"
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+
 
 class TestPropagateSpotTags(BaseTest):
 
@@ -2167,6 +2189,10 @@ class TestLaunchTemplate(BaseTest):
         resources = p.resource_manager.get_resources([
             'lt-00b3b2755218e3fdd'])
         self.assertEqual(len(resources), 4)
+        self.assertIn(
+            'arn:aws:ec2:us-east-1:644160558196:launch-template/lt-00b3b2755218e3fdd/4',
+            p.resource_manager.get_arns(resources)
+        )
 
     def test_launch_template_versions(self):
         factory = self.replay_flight_data('test_launch_template_query')

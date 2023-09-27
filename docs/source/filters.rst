@@ -453,9 +453,13 @@ describe resource call as is the case in the ValueFilter
          events:
              - RunInstances
        filters:
-         - type: event                                                                           ─┐ The key is a JMESPath Query of
-           key: "detail.requestParameters.networkInterfaceSet.items[].associatePublicIpAddress"   ├▶the event JSON from CloudWatch
-           value: true                                                                           ─┘
+         - type: event
+           # The key is a JMESPath Query of the event JSON from CloudWatch.
+           key: "detail.requestParameters.networkInterfaceSet.items[].associatePublicIpAddress"
+           # The key expression returns a list. Combining "op: contains" with "value: true"
+           # allows this filter to match if any network interface has a public IP address.
+           op: contains
+           value: true
        actions:
          - type: terminate
            force: true

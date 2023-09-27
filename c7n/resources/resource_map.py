@@ -1,6 +1,7 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 ResourceMap = {
+  "aws.access-analyzer-finding": "c7n.resources.accessanalyzer.AccessanalyzerFinding",
   "aws.account": "c7n.resources.account.Account",
   "aws.acm-certificate": "c7n.resources.acm.Certificate",
   "aws.advisor-check": "c7n.resources.support.AdvisorCheck",
@@ -13,7 +14,6 @@ ResourceMap = {
   "aws.app-elb": "c7n.resources.appelb.AppELB",
   "aws.app-elb-target-group": "c7n.resources.appelb.AppELBTargetGroup",
   "aws.app-flow": "c7n.resources.appflow.AppFlow",
-  "aws.appdiscovery": "c7n.resources.discovery.Appdiscovery",
   "aws.appdiscovery-agent": "c7n.resources.discovery.AppdiscoveryAgent",
   "aws.appstream-fleet": "c7n.resources.appstream.AppStreamFleet",
   "aws.appstream-stack": "c7n.resources.appstream.AppStreamStack",
@@ -44,7 +44,6 @@ ResourceMap = {
   "aws.codedeploy-deployment": "c7n.resources.code.CodeDeployDeployment",
   "aws.codedeploy-group": "c7n.resources.code.CodeDeployDeploymentGroup",
   "aws.codepipeline": "c7n.resources.code.CodeDeployPipeline",
-  "aws.cognito-pool-role": "c7n.resources.cognito.CognitoIdentityPoolRoleAttachment",
   "aws.composite-alarm": "c7n.resources.cw.CompositeAlarm",
   "aws.config-recorder": "c7n.resources.config.ConfigRecorder",
   "aws.config-rule": "c7n.resources.config.ConfigRule",
@@ -138,6 +137,7 @@ ResourceMap = {
   "aws.iam-user": "c7n.resources.iam.User",
   "aws.identity-pool": "c7n.resources.cognito.CognitoIdentityPool",
   "aws.insight-rule": "c7n.resources.cw.InsightRule",
+  "aws.inspector2-finding": "c7n.resources.inspector2.Inspector2Finding",
   "aws.internet-gateway": "c7n.resources.vpc.InternetGateway",
   "aws.iot": "c7n.resources.iot.IoT",
   "aws.kafka": "c7n.resources.kafka.Kafka",
@@ -156,7 +156,6 @@ ResourceMap = {
   "aws.lightsail-db": "c7n.resources.lightsail.Database",
   "aws.lightsail-elb": "c7n.resources.lightsail.LoadBalancer",
   "aws.lightsail-instance": "c7n.resources.lightsail.Instance",
-  "aws.log-export": "c7n.resources.cw.LogExport",
   "aws.log-group": "c7n.resources.cw.LogGroup",
   "aws.log-metric": "c7n.resources.cw.LogMetric",
   "aws.message-broker": "c7n.resources.mq.MessageBroker",

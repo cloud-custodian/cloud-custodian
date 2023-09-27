@@ -3,8 +3,7 @@
     "data": {
         "DataCatalogEncryptionSettings": {
             "EncryptionAtRest": {
-                "CatalogEncryptionMode": "SSE-KMS",
-                "SseAwsKmsKeyId": "alias/aws/glue"
+                "CatalogEncryptionMode": "DISABLED"
             },
             "ConnectionPasswordEncryption": {
                 "ReturnConnectionPasswordEncrypted": false

@@ -4,24 +4,27 @@
 import json
 import os
 import subprocess
-from unittest.mock import ANY
-
-import pytest
 from pathlib import Path
+from unittest.mock import ANY
+from urllib.request import urlopen
+import xml.etree.ElementTree as etree
 
+import jsonschema
+import pytest
 from click.testing import CliRunner
 
 from c7n.config import Config
 from c7n.resources import load_resources
 
 try:
-    from c7n_left import cli, utils, core
+    from c7n_left import cli, core, output, policy as policy_core
     from c7n_left.providers.terraform.provider import (
         TerraformProvider,
         TerraformResourceManager,
         extract_mod_stack,
     )
     from c7n_left.providers.terraform.graph import Resolver
+    from c7n_left.providers.terraform.filters import Taggable
 
     LEFT_INSTALLED = True
 except ImportError:
@@ -45,7 +48,10 @@ class ResultsReporter:
     def on_execution_ended(self):
         pass
 
-    def on_results(self, results):
+    def on_policy_start(self, policy, event):
+        pass
+
+    def on_results(self, policy, results):
         self.results.extend(results)
 
 
@@ -54,7 +60,7 @@ def run_policy(policy, terraform_dir, tmp_path):
     config = Config.empty(
         policy_dir=tmp_path, source_dir=terraform_dir, exec_filter=None, var_files=()
     )
-    policies = utils.load_policies(tmp_path, config)
+    policies = policy_core.load_policies(tmp_path, config)
     reporter = ResultsReporter()
     core.CollectionRunner(policies, config, reporter).run()
     return reporter.results
@@ -66,7 +72,7 @@ class PolicyEnv:
 
     def get_policies(self):
         config = Config.empty(policy_dir=self.policy_dir)
-        policies = utils.load_policies(self.policy_dir, config)
+        policies = policy_core.load_policies(self.policy_dir, config)
         return policies
 
     def get_graph(self, root_module):
@@ -94,7 +100,7 @@ class PolicyEnv:
             exec_filter=None,
             var_files=(),
         )
-        policies = utils.load_policies(config.policy_dir, config)
+        policies = policy_core.load_policies(config.policy_dir, config)
         reporter = ResultsReporter()
         core.CollectionRunner(policies, config, reporter).run()
         return reporter.results
@@ -113,7 +119,7 @@ def test_load_policy(test):
 
 def test_load_policy_dir(tmp_path):
     write_output_test_policy(tmp_path)
-    policies = utils.load_policies(tmp_path, Config.empty())
+    policies = policy_core.load_policies(tmp_path, Config.empty())
     assert len(policies) == 1
 
 
@@ -126,13 +132,23 @@ def test_extract_mod_stack():
     ]
 
 
-@pytest.mark.skipif(
-    os.environ.get('GITHUB_ACTIONS') is None,
-    reason="runs in github actions as it requires network access for tf init",
-)
-def test_mod_reference(tmp_path):
-    (tmp_path / "main.tf").write_text(
-        """
+def test_taggable_module_resource():
+    assert (
+        Taggable.is_taggable(
+            (
+                {
+                    "__tfmeta": {
+                        "label": "aws_security_group",
+                        "path": "module.my_module.aws_security_group.this_name_prefix[0]",
+                    }
+                },
+            )
+        )
+        is True
+    )
+
+
+DB_MODULE_TF = """
 module "db" {
   source  = "terraform-aws-modules/rds/aws"
   version = "~> 3.0"
@@ -150,8 +166,15 @@ module "db" {
   username = "user"
   port     = "3306"
 }
-        """
-    )
+"""
+
+
+@pytest.mark.skipif(
+    os.environ.get("GITHUB_ACTIONS") is None,
+    reason="runs in github actions as it requires network access for tf init",
+)
+def test_mod_reference(tmp_path):
+    (tmp_path / "main.tf").write_text(DB_MODULE_TF)
     subprocess.check_call(args="terraform init", shell=True, cwd=tmp_path)
     results = run_policy(
         {
@@ -163,7 +186,11 @@ module "db" {
         tmp_path,
     )
     assert len(results) == 1
-    assert results[0].resource['__tfmeta']['filename'] == 'main.tf'
+    assert results[0].resource["__tfmeta"]["filename"] == "main.tf"
+    assert results[0].resource["__tfmeta"]["type"] == "module"
+    assert results[0].resource["__tfmeta"]["refs"] == [
+        "module.db.module.db_instance.aws_db_instance.this[0]"
+    ]
 
 
 def test_graph_resolver():
@@ -207,6 +234,72 @@ def test_graph_resolver_id():
     assert resolver.is_id_ref("a" * 36) is False
 
 
+def test_event_env(policy_env, test):
+    policy_env.write_tf(
+        """
+resource "aws_cloudwatch_log_group" "yada" {
+  name = "Bar"
+}
+        """
+    )
+    policy_env.write_policy(
+        {
+            "name": "check-env",
+            "resource": "terraform.aws_cloudwatch_log_group",
+            "filters": [
+                {
+                    "type": "event",
+                    "key": "env.REPO",
+                    "value": "cloud-custodian/cloud-custodian",
+                }
+            ],
+        }
+    )
+    test.change_environment(REPO="cloud-custodian/cloud-custodian")
+    results = policy_env.run()
+    assert len(results) == 1
+
+
+def test_value_from_with_env_interpolate(policy_env, test):
+    policy_env.write_tf(
+        """
+resource "aws_cloudwatch_log_group" "yada" {
+   name = "Bar"
+}
+resource "aws_cloudwatch_log_group" "bada" {
+   name = "Baz"
+}
+        """
+    )
+    (policy_env.policy_dir / "exceptions").mkdir()
+    exceptions_file = policy_env.policy_dir / "exceptions" / "exceptions.json"
+    exceptions_file.write_text(
+        json.dumps({"policy": {"tagging": ["aws_cloudwatch_log_group.yada"]}})
+    )
+    test.change_environment(PWD=str(policy_env.policy_dir.absolute()))
+    policy_env.write_policy(
+        {
+            "name": "check-exceptions",
+            "resource": "terraform.aws_cloudwatch_log_group",
+            "filters": [
+                {"tag:Env": "absent"},
+                {
+                    "type": "value",
+                    "value_from": {
+                        "url": "file://{env[PWD]}/exceptions/exceptions.json",
+                        "expr": "policy.tagging",
+                    },
+                    "op": "not-in",
+                    "key": "__tfmeta.path",
+                },
+            ],
+        }
+    )
+
+    results = policy_env.run()
+    assert len(results) == 1
+
+
 def test_data_policy(policy_env):
     policy_env.write_tf(
         """
@@ -227,8 +320,8 @@ data "aws_ami" "ubuntu" {
     assert len(results) == 1
 
 
-def test_moved_and_local(policy_env):
-    # mostly for coverage
+def test_block_types(policy_env):
+    # module block type handled separately
     policy_env.write_tf(
         """
 locals {
@@ -237,15 +330,64 @@ locals {
 resource "aws_cloudwatch_log_group" "yada" {
   name = local.name
 }
+terraform {
+  experiments = [example]
+}
 moved {
   from = aws_instance.known
   to   = aws_cloudwatch_log_group.yada
+}
+provider "aws" {
+  region = "us-east-1"
+}
+
+variable "name" {
+  type = string
+  default = "theodora"
+}
+output "news" {
+  value = "https://lwn.net"
 }
     """
     )
     policy_env.write_policy({"name": "check-blocks", "resource": "terraform.*"})
     results = policy_env.run()
-    assert len(results) == 3
+    assert len(results) == 7
+    assert {r.resource["__tfmeta"]["type"] for r in results} == {
+        "moved",
+        "local",
+        "resource",
+        "provider",
+        "variable",
+        "output",
+        "terraform",
+    }
+
+
+def test_provider_augment_null(policy_env):
+    policy_env.write_tf(
+        """
+resource "aws_cloudwatch_log_group" "yada" {
+  name = "Yada"
+}
+
+provider "aws" {
+ default_tags {
+   tags = null
+ }
+}
+        """
+    )
+    policy_env.write_policy(
+        {
+            "name": "check-tags",
+            "resource": "terraform.aws_*",
+            "filters": [{"tag:Env": "absent"}],
+        }
+    )
+    results = policy_env.run()
+    assert len(results) == 1
+    assert results[0].resource["name"] == "Yada"
 
 
 def test_provider_tag_augment(policy_env):
@@ -272,11 +414,51 @@ provider "google" {
         """
     )
     policy_env.write_policy(
-        {"name": "check-tags", "resource": "terraform.*", "filters": [{"tag:Env": "Test"}]}
+        {
+            "name": "check-tags",
+            "resource": "terraform.*",
+            "filters": [{"tag:Env": "Test"}],
+        }
     )
     results = policy_env.run()
     assert len(results) == 1
-    assert results[0].resource['name'] == 'Yada'
+    assert results[0].resource["name"] == "Yada"
+
+
+def test_value_tag_prefix(policy_env):
+    policy_env.write_tf(
+        """
+locals {
+  name = "forum"
+}
+
+resource "aws_cloudwatch_log_group" "test_group_1" {
+  name = "${local.name}-1"
+  tags = {
+    Application = "login"
+  }
+}
+
+resource "aws_cloudwatch_log_group" "test_group_2" {
+  name = "${local.name}-2"
+  tags = {
+    App = "AuthZ"
+    Env = "Dev"
+  }
+}
+        """
+    )
+    policy_env.write_policy(
+        {
+            "name": "check-tags",
+            "resource": "terraform.aws_*",
+            "filters": [{"tag:App": "absent"}, {"tag:Env": "absent"}],
+        }
+    )
+
+    results = policy_env.run()
+    assert len(results) == 1
+    assert results[0].resource["name"] == "forum-1"
 
 
 def test_taggable(policy_env):
@@ -296,7 +478,51 @@ resource "aws_cloudwatch_log_stream" "foo" {
     )
     results = policy_env.run()
     assert len(results) == 1
-    assert results[0].resource['name'] == 'Yada'
+    assert results[0].resource["name"] == "Yada"
+
+
+def test_graph_merge_unknown_variable(policy_env):
+    policy_env.write_tf(
+        """
+        variable component {
+           type = string
+        }
+        resource "aws_cloudwatch_log_group" "yada" {
+           name = "Yada"
+           tags = merge(
+              {"Env" = "Public"},
+              {"Component" = var.component}
+           )
+        }
+        """
+    )
+
+    graph = policy_env.get_graph(policy_env.policy_dir)
+    resource_types = list(graph.get_resources_by_type("aws_cloudwatch_log_group"))
+    log_group = resource_types.pop()[-1][0]
+    assert log_group["tags"] == {"Env": "Public", "Component": ""}
+
+
+def test_graph_merge_function(policy_env):
+    policy_env.write_tf(
+        """
+        variable component {
+           type = string
+           default = "application"
+        }
+        resource "aws_cloudwatch_log_group" "yada" {
+           name = "Yada"
+           tags = merge(
+              {"Env" = "Public"},
+              {"Component" = var.component}
+           )
+        }
+        """
+    )
+    graph = policy_env.get_graph(policy_env.policy_dir)
+    resource_types = list(graph.get_resources_by_type("aws_cloudwatch_log_group"))
+    log_group = resource_types.pop()[-1][0]
+    assert log_group["tags"] == {"Env": "Public", "Component": "application"}
 
 
 def test_traverse_to_data(policy_env):
@@ -324,13 +550,17 @@ resource "aws_instance" "app" {
             "name": "check-image",
             "resource": "terraform.aws_instance",
             "filters": [
-                {"type": "traverse", "resources": "data.aws_ami", "attrs": [{"owners": "present"}]}
+                {
+                    "type": "traverse",
+                    "resources": "data.aws_ami",
+                    "attrs": [{"owners": "present"}],
+                }
             ],
         }
     )
     graph = TerraformProvider().parse(policy_env.policy_dir)
-    assert not list(graph.get_resources_by_type('aws_ami'))
-    assert list(graph.get_resources_by_type('data.aws_ami'))
+    assert not list(graph.get_resources_by_type("aws_ami"))
+    assert list(graph.get_resources_by_type("data.aws_ami"))
 
     results = policy_env.run()
     assert len(results) == 1
@@ -490,42 +720,92 @@ def test_graph_non_root_var_file(tmp_path, var_tf_setup):
     (tmp_path / "vars.tfvars").write_text('balancer_type = "network"')
     graph = TerraformProvider().parse(tmp_path / "tf", (tmp_path / "vars.tfvars",))
     resources = list(graph.get_resources_by_type("aws_alb"))
-    assert resources[0][1][0]['load_balancer_type'] == 'network'
+    assert resources[0][1][0]["load_balancer_type"] == "network"
 
 
 def test_graph_var_auto_default_json(tmp_path, var_tf_setup):
-    (tmp_path / "tf" / "terraform.tfvars.json").write_text(json.dumps({'balancer_type': 'network'}))
+    (tmp_path / "tf" / "terraform.tfvars.json").write_text(json.dumps({"balancer_type": "network"}))
     graph = TerraformProvider().parse(tmp_path / "tf")
     resources = list(graph.get_resources_by_type("aws_alb"))
-    assert resources[0][1][0]['load_balancer_type'] == 'network'
+    assert resources[0][1][0]["load_balancer_type"] == "network"
 
 
 def test_graph_var_auto_default(tmp_path, var_tf_setup):
     (tmp_path / "tf" / "terraform.tfvars").write_text('balancer_type = "network"')
     graph = TerraformProvider().parse(tmp_path / "tf")
     resources = list(graph.get_resources_by_type("aws_alb"))
-    assert resources[0][1][0]['load_balancer_type'] == 'network'
+    assert resources[0][1][0]["load_balancer_type"] == "network"
 
 
 def test_graph_var_auto(tmp_path, var_tf_setup):
     (tmp_path / "tf" / "vars.auto.tfvars").write_text('balancer_type = "network"')
     graph = TerraformProvider().parse(tmp_path / "tf")
     resources = list(graph.get_resources_by_type("aws_alb"))
-    assert resources[0][1][0]['load_balancer_type'] == 'network'
+    assert resources[0][1][0]["load_balancer_type"] == "network"
 
 
 def test_graph_var_file_abs(tmp_path, var_tf_setup):
     (tmp_path / "tf" / "vars.tfvars").write_text('balancer_type = "network"')
     graph = TerraformProvider().parse(tmp_path / "tf", (tmp_path / "tf" / "vars.tfvars",))
     resources = list(graph.get_resources_by_type("aws_alb"))
-    assert resources[0][1][0]['load_balancer_type'] == 'network'
+    assert resources[0][1][0]["load_balancer_type"] == "network"
 
 
 def test_graph_var_file(tmp_path, var_tf_setup):
     (tmp_path / "tf" / "vars.tfvars").write_text('balancer_type = "network"')
     graph = TerraformProvider().parse(tmp_path / "tf", ("vars.tfvars",))
     resources = list(graph.get_resources_by_type("aws_alb"))
-    assert resources[0][1][0]['load_balancer_type'] == 'network'
+    assert resources[0][1][0]["load_balancer_type"] == "network"
+
+
+def test_cli_dump(policy_env, test, debug_cli_runner):
+    (policy_env.policy_dir / "vars.tfvars").write_text('app = "riddle"')
+    (policy_env.policy_dir / "vars2.tfvars").write_text('env = "dev"')
+    test.change_environment(TF_VAR_repo="cloud-custodian/cloud-custodian")
+
+    policy_env.write_tf(
+        """
+        variable "app" {
+          type = string
+        }
+        variable "env" {
+          type = string
+        }
+        variable "owner" {
+          type = string
+          default = "engineering"
+        }
+        resource "aws_cloudwatch_log_group" "yada" {
+          name = "${var.app}-${var.env}-logs"
+          tags = {
+            Owner = var.owner
+          }
+        }
+        """
+    )
+    runner = debug_cli_runner
+    result = runner.invoke(
+        cli.cli,
+        [
+            "dump",
+            "-d",
+            str(policy_env.policy_dir),
+            "--var-file",
+            policy_env.policy_dir / "vars.tfvars",
+            # "--var-file",
+            # policy_env.policy_dir / "vars2.tfvars",
+            "--output-file",
+            str(policy_env.policy_dir / "output.json"),
+        ],
+    )
+    assert result.exit_code == 0
+    data = json.loads((policy_env.policy_dir / "output.json").read_text())
+    assert data["graph"]["aws_cloudwatch_log_group"][0]["name"] == "riddle--logs"
+    assert data["input_vars"] == {
+        "environment": {"repo": "cloud-custodian/cloud-custodian"},
+        "uninitialized": {"env": ""},
+        "user:vars.tfvars": {"app": "riddle"},
+    }
 
 
 def test_cli_var_file(tmp_path, var_tf_setup, debug_cli_runner):
@@ -738,6 +1018,137 @@ def test_cli_no_policies(tmp_path, caplog):
     assert caplog.record_tuples == [("c7n.iac", 30, "no policies found")]
 
 
+def test_cli_junit_output(policy_env, tmp_path, debug_cli_runner):
+    policy_env.write_tf(
+        """
+resource "aws_cloudwatch_log_group" "yada" {
+  name = "Bar"
+}
+resource "aws_cloudwatch_log_group" "june" {
+  name = "June"
+}
+resource "aws_cloudwatch_log_group" "april" {
+  name = "April"
+  tags = {
+        Env = "Dev"
+  }
+}
+        """
+    )
+    policy_env.write_policy(
+        {
+            "name": "tag-required",
+            "description": "tags are required on log groups",
+            "metadata": {"url": "https://cloudcustodian.io", "severity": "high"},
+            "resource": "terraform.aws_cloudwatch_log_group",
+            "filters": [{"tags": "absent"}],
+        }
+    )
+    runner = CliRunner()
+    result = runner.invoke(
+        cli.cli,
+        [
+            "run",
+            "-p",
+            str(tmp_path),
+            "-d",
+            str(tmp_path),
+            "-o",
+            "junit",
+            "--output-file",
+            str(tmp_path / "output.xml"),
+        ],
+    )
+
+    assert "2 Failure" in result.output
+
+    report_text = (tmp_path / "output.xml").read_text()
+    report = etree.XML(report_text)
+    attrib = dict(report.attrib)
+    attrib.pop("time")
+    assert attrib == {
+        "tests": "3",
+        "failures": "2",
+        "id": "c7n-left",
+        "name": "IaC Policy Compliance",
+    }
+    cases = list(report.find("testsuite").findall("testcase"))
+    assert len(cases) == 3
+    assert cases[-1].find("failure").attrib == {
+        "type": "failure",
+        "message": "tags are required on log groups",
+    }
+
+
+@pytest.mark.skipif(
+    os.environ.get("GITHUB_ACTIONS") is None,
+    reason="runs in github actions as it requires network access for schema validation",
+)
+def test_cli_gitlab_sast_output(policy_env, tmp_path, debug_cli_runner):
+    policy_env.write_tf(
+        """
+resource "aws_cloudwatch_log_group" "yada" {
+  name = "Bar"
+}
+        """
+    )
+    policy_env.write_policy(
+        {
+            "name": "tag-required",
+            "description": "tags are required on log groups",
+            "metadata": {"url": "https://cloudcustodian.io", "severity": "high"},
+            "resource": "terraform.aws_cloudwatch_log_group",
+            "filters": [{"tags": "absent"}],
+        }
+    )
+    runner = debug_cli_runner  # CliRunner()
+    result = runner.invoke(
+        cli.cli,
+        [
+            "run",
+            "-p",
+            str(tmp_path),
+            "-d",
+            str(tmp_path),
+            "-o",
+            "gitlab_sast",
+            "--output-file",
+            str(tmp_path / "output.json"),
+        ],
+    )
+    report = json.loads((tmp_path / "output.json").read_text())
+    result = jsonschema.validate(report, json.loads(urlopen(output.GitlabSAST.SCHEMA_FILE).read()))
+    assert not result
+
+
+@pytest.mark.skipif(
+    os.environ.get("GITHUB_ACTIONS") is None,
+    reason="runs in github actions as it requires network access for tf get",
+)
+def test_cli_output_rich_mod_resource_ref(tmp_path, debug_cli_runner):
+    (tmp_path / "main.tf").write_text(DB_MODULE_TF)
+    (tmp_path / "policy.json").write_text(
+        json.dumps(
+            {
+                "policies": [
+                    {
+                        "name": "check-backup",
+                        "resource": "terraform.aws_db_instance",
+                        "filters": [{"backup_retention_period": 0}],
+                    }
+                ]
+            }
+        )
+    )
+    subprocess.check_call(args="terraform get", shell=True, cwd=tmp_path)
+
+    runner = CliRunner()
+    result = runner.invoke(cli.cli, ["run", "-p", str(tmp_path), "-d", str(tmp_path), "-o", "cli"])
+    assert result.exit_code == 1
+    assert "References:" in result.output
+    assert "module.db.module.db_instance.aws_db_instance.this[0]" in result.output
+
+
 def test_cli_output_rich(tmp_path):
     write_output_test_policy(tmp_path)
     runner = CliRunner()
@@ -841,7 +1252,7 @@ def test_cli_output_github(tmp_path):
     assert result.exit_code == 1
     expected = (
         "::error file=tests/terraform/aws_s3_encryption_audit/main.tf,line=25,lineEnd=28,"
-        "title=terraform.aws_s3_bucket - policy:check-bucket::a description"
+        "title=terraform.aws_s3_bucket - policy:check-bucket severity:unknown::a description"
     )
     assert expected in result.output
 

@@ -51,6 +51,8 @@ ResourceMap = {
     "gcp.kms-cryptokey": "c7n_gcp.resources.kms.KmsCryptoKey",
     "gcp.kms-cryptokey-version": "c7n_gcp.resources.kms.KmsCryptoKeyVersion",
     "gcp.kms-keyring": "c7n_gcp.resources.kms.KmsKeyRing",
+    "gcp.kms-location": "c7n_gcp.resources.kms.KmsLocation",
+    "gcp.kms-keyring-iam-policy-bindings": "c7n_gcp.resources.kms.KmsKeyRingsListGetIamPolicies",
     "gcp.loadbalancer-address": "c7n_gcp.resources.loadbalancer.LoadBalancingAddress",
     "gcp.loadbalancer-backend-bucket": "c7n_gcp.resources.loadbalancer.LoadBalancingBackendBucket",
     "gcp.loadbalancer-backend-service": (
@@ -104,6 +106,7 @@ ResourceMap = {
     "gcp.sourcerepo": "c7n_gcp.resources.source.SourceRepository",
     "gcp.spanner-database-instance": "c7n_gcp.resources.spanner.SpannerDatabaseInstance",
     "gcp.spanner-instance": "c7n_gcp.resources.spanner.SpannerInstance",
+    "gcp.spanner-backup": "c7n_gcp.resources.spanner.SpannerInstanceBackup",
     "gcp.sql-backup-run": "c7n_gcp.resources.sql.SqlBackupRun",
     "gcp.sql-instance": "c7n_gcp.resources.sql.SqlInstance",
     "gcp.sql-ssl-cert": "c7n_gcp.resources.sql.SqlSslCert",

@@ -1,0 +1,35 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Fri, 15 Sep 2023 14:29:13 GMT",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "server-timing": "gfet4t7; dur=1685",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "630",
+    "-content-encoding": "gzip",
+    "content-location": "https://spanner.googleapis.com/v1/projects/cloud-custodian/instances/terrapin-spanner-instance/backups?alt=json"
+  },
+  "body": {
+    "backups": [
+      {
+        "name": "projects/cloud-custodian/instances/terrapin-spanner-instance/backups/terrapin-backup",
+        "database": "projects/cloud-custodian/instances/terrapin-spanner-instance/databases/terrapin-spanner-database",
+        "expireTime": "2023-09-29T14:28:55.432567Z",
+        "createTime": "2023-09-15T14:29:01.419412Z",
+        "state": "CREATING",
+        "encryptionInfo": {
+          "encryptionType": "GOOGLE_DEFAULT_ENCRYPTION"
+        },
+        "versionTime": "2023-09-15T14:29:01.419412Z",
+        "databaseDialect": "GOOGLE_STANDARD_SQL",
+        "maxExpireTime": "2024-09-15T14:29:01.419412Z"
+      }
+    ]
+  }
+}
