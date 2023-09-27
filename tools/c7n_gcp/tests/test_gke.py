@@ -82,7 +82,7 @@ class KubernetesClusterTest(BaseTest):
             'resource': 'gcp.gke-cluster',
             'filters': [{
                 'type': 'server-config',
-                'key': "contains(serverConfig.validMasterVersions,currentMasterVersion)",
+                'key': "contains(serverConfig.validMasterVersions, resource.currentMasterVersion)",
                 'value': False
             }]
         }, session_factory=factory)
@@ -332,7 +332,7 @@ class KubernetesClusterNodePoolTest(BaseTest):
             'resource': 'gcp.gke-nodepool',
             'filters': [{
                 'type': 'server-config',
-                'key': "contains(serverConfig.validNodeVersions,version)",
+                'key': "contains(serverConfig.validNodeVersions, resource.version)",
                 'value': False
             }]
         }, session_factory=factory)
