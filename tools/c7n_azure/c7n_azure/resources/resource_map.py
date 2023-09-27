@@ -36,6 +36,7 @@ ResourceMap = {
     "azure.front-door": "c7n_azure.resources.front_door.FrontDoor",
     "azure.front-door-policy": "c7n_azure.resources.front_door_policy.FrontDoorPolicy",
     "azure.hdinsight": "c7n_azure.resources.hdinsight.Hdinsight",
+    "azure.host-pools": "c7n_azure.resources.host_pools.HostPools",
     "azure.image": "c7n_azure.resources.image.Image",
     "azure.iothub": "c7n_azure.resources.iot_hub.IoTHub",
     "azure.keyvault": "c7n_azure.resources.key_vault.KeyVault",
@@ -64,6 +65,8 @@ ResourceMap = {
     "azure.roledefinition": "c7n_azure.resources.access_control.RoleDefinition",
     "azure.routetable": "c7n_azure.resources.route_table.RouteTable",
     "azure.search": "c7n_azure.resources.search.SearchService",
+    "azure.session-hosts": "c7n_azure.resources.session_hosts.SessionHosts",
+    "azure.session-hosts-vm": "c7n_azure.resources.session_hosts.SessionHostsVM",
     "azure.servicebus-namespace": "c7n_azure.resources.servicebus_namespace.ServiceBusNamespace",
     "azure.servicebus-namespace-networkrules": "c7n_azure.resources.servicebus_namespace_networkrules.ServiceBusNamespaceNetworkrules", # noqa
     "azure.servicebus-namespace-authrules": "c7n_azure.resources.servicebus_namespace_authrules.ServiceBusNamespaceAuthRules", # noqa
