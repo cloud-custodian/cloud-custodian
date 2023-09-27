@@ -61,7 +61,7 @@ class VMInstanceViewFilter(ValueFilter):
 
         policies:
           - name: test-session-host-is-configured-with-managed-identity
-            resource: azure.session_hosts
+            resource: azure.session-hosts
             filters:
                 - type: session-hosts-vm
                   key: identity
