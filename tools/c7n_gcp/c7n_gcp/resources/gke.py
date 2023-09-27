@@ -176,7 +176,7 @@ class ServerConfig(ValueFilter):
     """
 
     schema = type_schema('server-config', rinherit=ValueFilter.schema)
-    permissions = ('container.nodePools.get', 'container.clusters.get')
+    permissions = ('container.nodes.get', 'container.clusters.get')
     annotation_key = "c7n:config"
 
     def _get_location(self, r):
