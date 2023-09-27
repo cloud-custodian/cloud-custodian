@@ -159,7 +159,7 @@ class ServerConfig(ValueFilter):
              resource: gcp.gke-cluster
              filters:
              - type: server-config
-               key: contains(serverConfig.validMasterVersions,currentMasterVersion)
+               key: contains(serverConfig.validMasterVersions, resource.currentMasterVersion)
                value: false
 
     Filter all nodepools that is not running a supported version
@@ -171,34 +171,36 @@ class ServerConfig(ValueFilter):
              resource: gcp.gke-nodepool
              filters:
              - type: server-config
-               key: contains(serverConfig.validNodeVersions,version)
+               key: contains(serverConfig.validNodeVersions, resource.version)
                value: false
     """
 
     schema = type_schema('server-config', rinherit=ValueFilter.schema)
-    permissions = ('container.nodes.list',)
+    permissions = ('container.nodePool.get', 'container.clusters.get')
+    annotation_key = "c7n:config"
 
     def _get_location(self, r):
         return r["location"] if "location" in r else r['selfLink'].split('/')[-5]
 
-    def process_resource(self, client, project, resource):
+    def get_config(self, client, project, resource):
+        if self.annotation_key in resource:
+            return
         location = self._get_location(resource)
-        resource["serverConfig"] = client.execute_command(
+        resource[self.annotation_key] = client.execute_command(
             'getServerConfig', verb_arguments={
-                    'name': 'projects/{}/locations/{}'.format(project, location)}
+                'name': 'projects/{}/locations/{}'.format(project, location)}
         )
-        resource = [resource]
 
-        return super(ServerConfig, self).process(resource, None)
+    def __call__(self, r):
+        return super().__call__({"serverConfig": r[self.annotation_key], "resource": r})
 
     def process(self, resources, event=None):
         session = local_session(self.manager.session_factory)
         project = session.get_default_project()
-        client = session.client(
-            "container", "v1", "projects.locations"
-        )
-        resource_list = [r for r in resources if self.process_resource(client, project, r)]
-        return resource_list
+        client = session.client("container", "v1", "projects.locations")
+        for r in resources:
+            self.get_config(client, project, r)
+        return super().process(resources)
 
 
 @KubernetesCluster.action_registry.register('delete')
