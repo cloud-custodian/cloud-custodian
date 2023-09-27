@@ -22,7 +22,7 @@ def get_index():
         return _IndexData
 
     index_path = Path(__file__).parent / "data" / "index.json"
-    _IndexData = json.loads(index_path.read_text(encoding="utf8"))
+    _IndexData = json.loads(index_path.read_text())
     return _IndexData
 
 
@@ -31,7 +31,7 @@ def initialize_resource(resource_name):
     rpath = Path(__file__).parent / "data" / f"aws_{resource_name}.json"
     if not rpath.exists():
         return None
-    rinfo = json.loads(rpath.read_text(encoding="utf8"))
+    rinfo = json.loads(rpath.read_text())
 
     type_info = type(
         "resource_type",
@@ -44,12 +44,13 @@ def initialize_resource(resource_name):
     )
 
     rname = "_".join([s.lower() for s in rinfo["typeName"].split("::")[1:]])
-    class_name = "".join([s.lower().capitalize() for s in rinfo["typeName"].split("::")[1:]])
+    class_name = "".join(
+        [s.lower().capitalize() for s in rinfo["typeName"].split("::")[1:]]
+    )
     mod_name = f"c7n_awscc.resources.{resource_name}"
-
-    permissions = rinfo.get("handlers", {}).get("read", {}).get("permissions", []) + rinfo.get(
-        "handlers", {}
-    ).get("list", {}).get("permissions", [])
+    permissions = rinfo["handlers"].get("read", {}).get("permissions", []) + rinfo[
+        "handlers"
+    ].get("list", {}).get("permissions", [])
 
     rtype = type(
         class_name,
@@ -75,19 +76,18 @@ def initialize_resource(resource_name):
         ),
     )
 
-    if "update" in rinfo["handlers"]:
-        rtype.action_registry.register(
-            "update",
-            type(
-                class_name + "Update",
-                (Update,),
-                {
-                    "schema": get_update_schema(rtype.schema, rname),
-                    "permissions": rinfo["handlers"]["update"]["permissions"],
-                    "__module__": mod_name,
-                },
-            ),
-        )
+    rtype.action_registry.register(
+        "update",
+        type(
+            class_name + "Update",
+            (Update,),
+            {
+                "schema": get_update_schema(rtype.schema, rname),
+                "permissions": rinfo["handlers"]["update"]["permissions"],
+                "__module__": mod_name,
+            },
+        ),
+    )
 
     process_supplementary_data(rtype)
     resources.register(rname, rtype)

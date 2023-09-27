@@ -2,7 +2,6 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 import contextlib
-import itertools
 import json
 import os
 from pathlib import Path
@@ -52,12 +51,11 @@ class VariableResolver:
         "object": {},
     }
 
-    def __init__(self, source_dir, var_files, reporter=None):
+    def __init__(self, source_dir, var_files):
         self.source_dir = source_dir
         self.var_files = var_files
-        self.resolved_files = {}
+        self.resolved_files = []
         self.temp_files = []
-        self.reporter = reporter
 
     def _write_file_content(self, content, suffix=".tfvars"):
         fh = tempfile.NamedTemporaryFile(
@@ -68,19 +66,14 @@ class VariableResolver:
         self.temp_files.append(fh)
         return fh
 
-    def report(self, var_type, var_map, path=None):
-        if not self.reporter:
-            return
-        self.reporter.on_vars_discovered(var_type, var_map, path)
-
     @contextlib.contextmanager
     def get_variables(self):
-        self.resolved_files["default"] = self.get_default_var_files()
-        self.resolved_files["user"] = self.get_user_var_files()
-        self.resolved_files["uninitialized"] = self.get_uninitialized_var_files()
+        self.resolved_files.extend(self.get_default_var_files())
+        self.resolved_files.extend(self.get_user_var_files())
+        self.resolved_files.extend(self.get_uninitialized_var_files())
 
         try:
-            yield list(itertools.chain(*self.resolved_files.values()))
+            yield self.resolved_files
         finally:
             for t in self.temp_files:
                 t.close()
@@ -90,19 +83,11 @@ class VariableResolver:
         # unknown / null results. to provide broad compatiblity we try to initialize
         # things with default values to facilitate attribute interpolation.
         var_map = self.get_env_variables()
-        self.report("environment", var_map)
-        for type, f_set in self.resolved_files.items():
-            for idx, f in enumerate(f_set):
-                if str(f).endswith(".tfvars.json"):
-                    f_vars = json.loads((self.source_dir / f).read_text())
-                elif str(f).endswith(".tfvars"):
-                    f_vars = hcl2.loads((self.source_dir / f).read_text())
-
-                fpath = type == "user" and self.var_files[idx] or f
-                if isinstance(fpath, Path):
-                    fpath = fpath.name
-                self.report(type, f_vars, fpath)
-                var_map.update(f_vars)
+        for f in self.resolved_files:
+            if str(f).endswith(".tfvars.json"):
+                var_map.update(json.loads((self.source_dir / f).read_text()))
+            elif str(f).endswith(".tfvars"):
+                var_map.update(hcl2.loads((self.source_dir / f).read_text()))
 
         uninitialized_vars = {}
         graph_data = tfparse.load_from_path(self.source_dir, allow_downloads=False)
@@ -120,8 +105,7 @@ class VariableResolver:
         if not uninitialized_vars:
             return []
 
-        log.debug("Using defaults for %d uninitialized variables", len(uninitialized_vars))
-        self.report("uninitialized", uninitialized_vars)
+        log.debug('Using defaults for %d uninitialized variables', len(uninitialized_vars))
         return [
             Path(
                 self._write_file_content(json.dumps(uninitialized_vars), ".tfvars.json").name

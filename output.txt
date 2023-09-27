@@ -1,0 +1,121 @@
+. /Users/Carol_Brothers/GitHub/cloud-custodian/test.env && poetry run pytest -n auto tests tools 
+============================= test session starts ==============================
+platform darwin -- Python 3.11.4, pytest-7.3.2, pluggy-1.2.0
+rootdir: /Users/Carol_Brothers/GitHub/cloud-custodian
+configfile: pyproject.toml
+plugins: recording-0.12.2, xdist-3.3.1, sugar-0.9.7, terraform-0.6.6, cov-3.0.0
+created: 10/10 workers
+10 workers [3619 items]
+
+........................................................................ [  1%]
+........................................................................ [  3%]
+........................................................................ [  5%]
+........................................................................ [  7%]
+........................................................................ [  9%]
+........................................................................ [ 11%]
+........................................................................ [ 13%]
+............................................................F........... [ 15%]
+.........ssssss......................................................... [ 17%]
+........................................................................ [ 19%]
+........................................................................ [ 21%]
+........................................................................ [ 23%]
+........................................................................ [ 25%]
+........................................................................ [ 27%]
+........................................................................ [ 29%]
+......................................................................... [ 31%]
+........................................................................ [ 33%]
+........................................................................ [ 35%]
+.......................s................................................ [ 37%]
+........................................................................ [ 39%]
+........................................................................ [ 41%]
+........................................................................ [ 43%]
+........................................................................ [ 45%]
+........................................................................ [ 47%]
+........................................................................ [ 49%]
+........................................................................ [ 51%]
+......................................................................... [ 53%]
+........................................................................ [ 55%]
+........................................................................ [ 57%]
+........................................................................ [ 59%]
+........................................................................ [ 61%]
+........................................................................ [ 63%]
+........................................................................ [ 65%]
+........................................................................ [ 67%]
+........................................................................ [ 69%]
+........................................................................ [ 71%]
+........................................................................ [ 73%]
+........................................................................ [ 75%]
+........................................................................ [ 77%]
+......................................................................... [ 79%]
+........................................................................ [ 81%]
+........................................................................ [ 83%]
+........................................................................ [ 85%]
+........................................................................ [ 87%]
+........................................................................ [ 89%]
+........................................................................ [ 91%]
+........................................................................ [ 93%]
+........................................................................ [ 95%]
+........................................................................ [ 97%]
+........................................................................ [ 99%]
+.............s..                                                         [100%]
+=================================== FAILURES ===================================
+___________________________ test_doc_examples[azure] ___________________________
+[gw3] darwin -- Python 3.11.4 /Users/Carol_Brothers/GitHub/cloud-custodian/.venv/bin/python
+Traceback (most recent call last):
+  File "/Users/Carol_Brothers/GitHub/cloud-custodian/tests/test_doc_examples.py", line 84, in test_doc_examples
+    policies = get_doc_policies(provider.resources)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/Carol_Brothers/GitHub/cloud-custodian/tests/test_doc_examples.py", line 59, in get_doc_policies
+    if p['name'] in policies:
+       ~^^^^^^^^
+TypeError: string indices must be integers, not 'str'
+=============================== warnings summary ===============================
+tests/test_ec2.py: 28 warnings
+  /Users/Carol_Brothers/GitHub/cloud-custodian/c7n/resources/ec2.py:348: DeprecationWarning: distutils Version classes are deprecated. Use packaging.version instead.
+    if LooseVersion(botocore.__version__) < LooseVersion(botocore_min_version):
+
+tests/test_filters.py::TestValueTypes::test_version
+tests/test_filters.py::TestValueTypes::test_version
+tests/test_filters.py::TestValueTypes::test_version
+tests/test_filters.py::TestValueTypes::test_version
+  /Users/Carol_Brothers/GitHub/cloud-custodian/c7n/filters/core.py:736: DeprecationWarning: distutils Version classes are deprecated. Use packaging.version instead.
+    s = ComparableVersion(sentinel)
+
+tests/test_filters.py::TestValueTypes::test_version
+tests/test_filters.py::TestValueTypes::test_version
+tests/test_filters.py::TestValueTypes::test_version
+tests/test_filters.py::TestValueTypes::test_version
+  /Users/Carol_Brothers/GitHub/cloud-custodian/c7n/filters/core.py:737: DeprecationWarning: distutils Version classes are deprecated. Use packaging.version instead.
+    v = ComparableVersion(value)
+
+tests/test_filters.py: 12 warnings
+  /Users/Carol_Brothers/GitHub/cloud-custodian/.venv/lib/python3.11/site-packages/setuptools/_distutils/version.py:345: DeprecationWarning: distutils Version classes are deprecated. Use packaging.version instead.
+    other = LooseVersion(other)
+
+tests/test_rds.py: 2114 warnings
+  /Users/Carol_Brothers/GitHub/cloud-custodian/c7n/resources/rds.py:242: DeprecationWarning: distutils Version classes are deprecated. Use packaging.version instead.
+    if LooseVersion(t['EngineVersion']) > LooseVersion(
+
+tests/test_utils.py::test_jmespath_parse_split
+tools/c7n_gcp/tests/test_resourcemanager.py::ProjectTest::test_compute_meta_filter
+tools/c7n_tencentcloud/tests/test_tc_cos.py::TestCos::test_bucket_lifecycle
+  /Users/Carol_Brothers/GitHub/cloud-custodian/.venv/lib/python3.11/site-packages/jmespath/lexer.py:169: PendingDeprecationWarning: deprecated string literal syntax
+    warnings.warn("deprecated string literal syntax",
+
+tools/c7n_azure/tests_azure/test_output.py::OutputTest::test_app_insights_logs
+tools/c7n_azure/tests_azure/test_output.py::OutputTest::test_app_insights_logs
+tools/c7n_azure/tests_azure/test_output.py::OutputTest::test_app_insights_metrics
+tools/c7n_azure/tests_azure/test_output.py::OutputTest::test_app_insights_metrics
+  /Users/Carol_Brothers/GitHub/cloud-custodian/.venv/lib/python3.11/site-packages/applicationinsights/channel/TelemetryContext.py:14: DeprecationWarning: Use setlocale(), getencoding() and getlocale() instead
+    self.locale = locale.getdefaultlocale()[0]
+
+tools/c7n_azure/tests_azure/tests_resources/test_keyvault.py::KeyVaultTest::test_whitelist
+tools/c7n_azure/tests_azure/tests_resources/test_datalake.py::DataLakeTest::test_find_by_name
+tools/c7n_azure/tests_azure/tests_resources/test_traffic_manager.py::TrafficManagerTest::test_find_by_name
+  /Users/Carol_Brothers/GitHub/cloud-custodian/.venv/lib/python3.11/site-packages/urllib3/util/retry.py:455: DeprecationWarning: Using 'method_whitelist' with Retry is deprecated and will be removed in v2.0. Use 'allowed_methods' instead
+    warnings.warn(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_doc_examples.py::test_doc_examples[azure] - TypeError: stri...
+===== 1 failed, 3610 passed, 8 skipped, 2172 warnings in 74.98s (0:01:14) ======

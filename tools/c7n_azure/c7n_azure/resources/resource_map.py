@@ -66,7 +66,6 @@ ResourceMap = {
     "azure.routetable": "c7n_azure.resources.route_table.RouteTable",
     "azure.search": "c7n_azure.resources.search.SearchService",
     "azure.session-hosts": "c7n_azure.resources.session_hosts.SessionHosts",
-    "azure.session-hosts-vm": "c7n_azure.resources.session_hosts.SessionHostsVM",
     "azure.servicebus-namespace": "c7n_azure.resources.servicebus_namespace.ServiceBusNamespace",
     "azure.servicebus-namespace-networkrules": "c7n_azure.resources.servicebus_namespace_networkrules.ServiceBusNamespaceNetworkrules", # noqa
     "azure.servicebus-namespace-authrules": "c7n_azure.resources.servicebus_namespace_authrules.ServiceBusNamespaceAuthRules", # noqa

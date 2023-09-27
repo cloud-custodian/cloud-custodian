@@ -21,6 +21,7 @@ class ControlAction(Action):
 
 
 class Delete(ControlAction):
+
     schema = type_schema("delete")
 
     def process(self, resources):
@@ -33,6 +34,7 @@ class Delete(ControlAction):
 
 
 class Update(ControlAction):
+
     # schema is setup at resource type initialization
 
     def process(self, resources):

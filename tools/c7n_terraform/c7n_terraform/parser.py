@@ -288,7 +288,7 @@ class TerraformVisitor:
         name = next(iter(data_block))
         default = data_block[name].get("default")
         if default:
-            default = default
+            default = default[0]
         data_path = ["variable", name]
         block = Block(
             type="variable",
