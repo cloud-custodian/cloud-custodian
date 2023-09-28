@@ -72,6 +72,8 @@ class JsonGraph(Output):
         data = {}
         data["input_vars"] = self.input_vars
         data["graph"] = dict(self.graph.resource_data)
+        if self.config.output_query:
+            data = jmespath_search(self.config.output_query, data)
         self.config.output_file.write(json.dumps(data, cls=JSONEncoder, indent=2))
 
 
