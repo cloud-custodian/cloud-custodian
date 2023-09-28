@@ -739,6 +739,22 @@ resource "aws_alb" "positive1" {
 #    assert resources[0][1][0]['load_balancer_type'] == 'network'
 
 
+def test_graph_var_file_abs_rel_source(tmp_path, monkeypatch, var_tf_setup):
+    monkeypatch.chdir(tmp_path)
+    (tmp_path / "vars.tfvars").write_text('balancer_type = "network"')
+    graph = TerraformProvider().parse(Path("tf"), (tmp_path / "vars.tfvars",))
+    resources = list(graph.get_resources_by_type("aws_alb"))
+    assert resources[0][1][0]["load_balancer_type"] == "network"
+
+
+def test_graph_var_file_rel_abs_source(tmp_path, monkeypatch, var_tf_setup):
+    monkeypatch.chdir(tmp_path)
+    (tmp_path / "vars.tfvars").write_text('balancer_type = "network"')
+    graph = TerraformProvider().parse(tmp_path / "tf", ("vars.tfvars",))
+    resources = list(graph.get_resources_by_type("aws_alb"))
+    assert resources[0][1][0]["load_balancer_type"] == "network"
+
+
 def test_graph_non_root_var_file(tmp_path, var_tf_setup):
     (tmp_path / "vars.tfvars").write_text('balancer_type = "network"')
     graph = TerraformProvider().parse(tmp_path / "tf", (tmp_path / "vars.tfvars",))

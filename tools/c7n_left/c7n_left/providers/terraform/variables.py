@@ -162,5 +162,5 @@ class VariableResolver:
             else:
                 suffix = str(v).endswith(".tfvars.json") and ".tfvars.json" or ".tfvars"
                 vfr = self._write_file_content(v.read_text(), suffix)
-                resolved_files.append(Path(vfr.name).relative_to(self.source_dir))
+                resolved_files.append(Path(vfr.name).relative_to(self.source_dir.absolute()))
         return resolved_files
