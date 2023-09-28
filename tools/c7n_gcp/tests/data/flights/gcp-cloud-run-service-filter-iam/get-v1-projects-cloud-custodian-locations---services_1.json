@@ -1,0 +1,232 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Fri, 31 Mar 2023 11:26:06 GMT",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "3366",
+    "-content-encoding": "gzip",
+    "content-location": "https://run.googleapis.com/v1/projects/cloud-custodian/locations/-/services?alt=json"
+  },
+  "body": {
+    "apiVersion": "serving.knative.dev/v1",
+    "kind": "ServiceList",
+    "items": [
+      {
+        "apiVersion": "serving.knative.dev/v1",
+        "kind": "Service",
+        "metadata": {
+          "name": "run-1",
+          "namespace": "1098479648729",
+          "selfLink": "/apis/serving.knative.dev/v1/namespaces/1098479648729/services/hello",
+          "uid": "46b28549-6c5c-4245-bc8d-9cec06d262b6",
+          "resourceVersion": "AAX4MAndusc",
+          "generation": 1,
+          "labels": {
+            "cloud.googleapis.com/location": "us-central1"
+          },
+          "annotations": {
+            "run.googleapis.com/client-name": "cloud-console",
+            "serving.knative.dev/creator": "kapil@stacklet.io",
+            "serving.knative.dev/lastModifier": "kapil@stacklet.io",
+            "run.googleapis.com/operation-id": "9c84c1e0-e556-44c5-91c8-eb3bd7701bfd",
+            "run.googleapis.com/ingress": "all",
+            "run.googleapis.com/ingress-status": "all"
+          },
+          "creationTimestamp": "2023-03-31T10:53:45.882066Z"
+        },
+        "spec": {
+          "template": {
+            "metadata": {
+              "name": "hello-00001-tiv",
+              "annotations": {
+                "run.googleapis.com/client-name": "cloud-console",
+                "autoscaling.knative.dev/maxScale": "5"
+              }
+            },
+            "spec": {
+              "containerConcurrency": 80,
+              "timeoutSeconds": 300,
+              "serviceAccountName": "1098479648729-compute@developer.gserviceaccount.com",
+              "containers": [
+                {
+                  "image": "us-docker.pkg.dev/cloudrun/container/hello",
+                  "resources": {
+                    "limits": {
+                      "cpu": "1000m",
+                      "memory": "512Mi"
+                    }
+                  },
+                  "ports": [
+                    {
+                      "name": "http1",
+                      "containerPort": 8080
+                    }
+                  ],
+                  "startupProbe": {
+                    "timeoutSeconds": 240,
+                    "periodSeconds": 240,
+                    "failureThreshold": 1,
+                    "tcpSocket": {
+                      "port": 8080
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "traffic": [
+            {
+              "percent": 100,
+              "latestRevision": true
+            }
+          ]
+        },
+        "status": {
+          "observedGeneration": 1,
+          "conditions": [
+            {
+              "type": "Ready",
+              "status": "True",
+              "lastTransitionTime": "2023-03-31T10:54:51.198151Z"
+            },
+            {
+              "type": "ConfigurationsReady",
+              "status": "True",
+              "lastTransitionTime": "2023-03-31T10:54:50.962435Z"
+            },
+            {
+              "type": "RoutesReady",
+              "status": "True",
+              "lastTransitionTime": "2023-03-31T10:54:51.198151Z"
+            }
+          ],
+          "latestReadyRevisionName": "hello-00001-tiv",
+          "latestCreatedRevisionName": "hello-00001-tiv",
+          "traffic": [
+            {
+              "revisionName": "hello-00001-tiv",
+              "percent": 100,
+              "latestRevision": true
+            }
+          ],
+          "url": "https://hello-g3kdvpt64a-uc.a.run.app",
+          "address": {
+            "url": "https://hello-g3kdvpt64a-uc.a.run.app"
+          }
+        }
+      },
+      {
+        "apiVersion": "serving.knative.dev/v1",
+        "kind": "Service",
+        "metadata": {
+          "name": "run-2",
+          "namespace": "1098479648729",
+          "selfLink": "/apis/serving.knative.dev/v1/namespaces/1098479648729/services/hello",
+          "uid": "46b28549-6c5c-4245-bc8d-9cec06d262b6",
+          "resourceVersion": "AAX4MAndusc",
+          "generation": 1,
+          "labels": {
+            "cloud.googleapis.com/location": "us-central1"
+          },
+          "annotations": {
+            "run.googleapis.com/client-name": "cloud-console",
+            "serving.knative.dev/creator": "kapil@stacklet.io",
+            "serving.knative.dev/lastModifier": "kapil@stacklet.io",
+            "run.googleapis.com/operation-id": "9c84c1e0-e556-44c5-91c8-eb3bd7701bfd",
+            "run.googleapis.com/ingress": "all",
+            "run.googleapis.com/ingress-status": "all"
+          },
+          "creationTimestamp": "2023-03-31T10:53:45.882066Z"
+        },
+        "spec": {
+          "template": {
+            "metadata": {
+              "name": "run-2",
+              "annotations": {
+                "run.googleapis.com/client-name": "cloud-console",
+                "autoscaling.knative.dev/maxScale": "5"
+              }
+            },
+            "spec": {
+              "containerConcurrency": 80,
+              "timeoutSeconds": 300,
+              "serviceAccountName": "1098479648729-compute@developer.gserviceaccount.com",
+              "containers": [
+                {
+                  "image": "us-docker.pkg.dev/cloudrun/container/hello",
+                  "resources": {
+                    "limits": {
+                      "cpu": "1000m",
+                      "memory": "512Mi"
+                    }
+                  },
+                  "ports": [
+                    {
+                      "name": "http1",
+                      "containerPort": 8080
+                    }
+                  ],
+                  "startupProbe": {
+                    "timeoutSeconds": 240,
+                    "periodSeconds": 240,
+                    "failureThreshold": 1,
+                    "tcpSocket": {
+                      "port": 8080
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "traffic": [
+            {
+              "percent": 100,
+              "latestRevision": true
+            }
+          ]
+        },
+        "status": {
+          "observedGeneration": 1,
+          "conditions": [
+            {
+              "type": "Ready",
+              "status": "True",
+              "lastTransitionTime": "2023-03-31T10:54:51.198151Z"
+            },
+            {
+              "type": "ConfigurationsReady",
+              "status": "True",
+              "lastTransitionTime": "2023-03-31T10:54:50.962435Z"
+            },
+            {
+              "type": "RoutesReady",
+              "status": "True",
+              "lastTransitionTime": "2023-03-31T10:54:51.198151Z"
+            }
+          ],
+          "latestReadyRevisionName": "hello-00001-tiv",
+          "latestCreatedRevisionName": "hello-00001-tiv",
+          "traffic": [
+            {
+              "revisionName": "hello-00001-tiv",
+              "percent": 100,
+              "latestRevision": true
+            }
+          ],
+          "url": "https://hello-g3kdvpt64a-uc.a.run.app",
+          "address": {
+            "url": "https://hello-g3kdvpt64a-uc.a.run.app"
+          }
+        }
+      }
+    ]
+  }
+}
