@@ -96,6 +96,7 @@ class RichCli(Output):
 
     def on_vars_discovered(self, var_type, var_map, var_path=None):
         if var_type != "uninitialized" and var_map:
+            var_path = var_path or ""
             self.console.print(f"Loaded {len(var_map)} vars from {var_type} {var_path}")
 
     def on_results(self, policy, results):
