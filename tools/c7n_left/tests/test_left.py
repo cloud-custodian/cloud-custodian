@@ -831,6 +831,8 @@ def test_cli_dump(policy_env, test, debug_cli_runner):
             str(policy_env.policy_dir),
             "--var-file",
             policy_env.policy_dir / "vars.tfvars",
+            "--output-query",
+            "input_vars",
             # "--var-file",
             # policy_env.policy_dir / "vars2.tfvars",
             "--output-file",
@@ -839,8 +841,7 @@ def test_cli_dump(policy_env, test, debug_cli_runner):
     )
     assert result.exit_code == 0
     data = json.loads((policy_env.policy_dir / "output.json").read_text())
-    assert data["graph"]["aws_cloudwatch_log_group"][0]["name"] == "riddle--logs"
-    assert data["input_vars"] == {
+    assert data == {
         "environment": {"repo": "cloud-custodian/cloud-custodian"},
         "uninitialized": {"env": ""},
         "user:vars.tfvars": {"app": "riddle"},
