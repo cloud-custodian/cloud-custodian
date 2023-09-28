@@ -125,7 +125,7 @@ class VariableResolver:
         return [
             Path(
                 self._write_file_content(json.dumps(uninitialized_vars), ".tfvars.json").name
-            ).relative_to(self.source_dir)
+            ).relative_to(self.source_dir.absolute())
         ]
 
     def get_env_variables(self):

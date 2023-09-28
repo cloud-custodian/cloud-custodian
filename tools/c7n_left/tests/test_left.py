@@ -481,6 +481,29 @@ resource "aws_cloudwatch_log_stream" "foo" {
     assert results[0].resource["name"] == "Yada"
 
 
+def test_graph_merge_unknown_variable_relative_path(policy_env, monkeypatch):
+    policy_env.write_tf(
+        """
+        variable component {
+           type = string
+        }
+        resource "aws_cloudwatch_log_group" "yada" {
+           name = "Yada"
+           tags = merge(
+              {"Env" = "Public"},
+              {"Component" = var.component}
+           )
+        }
+        """
+    )
+
+    monkeypatch.chdir(policy_env.policy_dir)
+    graph = policy_env.get_graph(Path("."))
+    resource_types = list(graph.get_resources_by_type("aws_cloudwatch_log_group"))
+    log_group = resource_types.pop()[-1][0]
+    assert log_group["tags"] == {"Env": "Public", "Component": ""}
+
+
 def test_graph_merge_unknown_variable(policy_env):
     policy_env.write_tf(
         """
