@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 import time
 import pytest
+import logging
 
 from gcp_common import BaseTest, event_data
 from c7n.config import Config
@@ -72,6 +73,24 @@ class KubernetesClusterTest(BaseTest):
                 'gcp:container:us-central1-a:cloud-custodian:cluster/standard-cluster-1'
             ],
         )
+
+    def test_gke_cluster_filter_server_config(self):
+        project_id = 'cloud-custodian'
+        factory = self.replay_flight_data('gke-cluster-filter-server-config', project_id=project_id)
+        p = self.load_policy({
+            'name': 'gke-cluster-filter-server-config',
+            'resource': 'gcp.gke-cluster',
+            'filters': [{
+                'type': 'server-config',
+                'key': "contains(serverConfig.validMasterVersions, resource.currentMasterVersion)",
+                'value': False
+            }]
+        }, session_factory=factory)
+        resources = p.run()
+
+        self.assertEqual(1, len(resources))
+        self.assertEqual('c7nnode-cluster-2',
+                         resources[0]['name'])
 
     def test_cluster_set_labels(self):
         project_id = 'cloud-custodian'
@@ -303,3 +322,23 @@ class KubernetesClusterNodePoolTest(BaseTest):
                 'gcp:container:us-central1-a:cloud-custodian:cluster-node-pool/pool-1'
             ],
         )
+
+    def test_gke_cluster_nodepool_filter_server_config(self):
+        project_id = 'cloud-custodian'
+        factory = self.replay_flight_data('gke-cluster-nodepool-filter-server-config',
+                                          project_id=project_id)
+        p = self.load_policy({
+            'name': 'gke-cluster-nodepool-filter-server-config',
+            'resource': 'gcp.gke-nodepool',
+            'filters': [{
+                'type': 'server-config',
+                'key': "contains(serverConfig.validNodeVersions, resource.version)",
+                'value': False
+            }]
+        }, session_factory=factory)
+        resources = p.run()
+        logging.info(resources)
+
+        self.assertEqual(1, len(resources))
+        self.assertEqual('c7nnode-node-pool-1',
+                        resources[0]['name'])
