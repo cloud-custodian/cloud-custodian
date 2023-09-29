@@ -17,7 +17,8 @@ class AppConfiguration(ArmResourceManager):
                 resource: azure.app-configuration
                 filters:
                   - type: value
-                    key: properties.privateEndpointConnections[].properties.privateLinkServiceConnectionState.status
+                    key: "properties.privateEndpointConnections[].properties.\
+                          privateLinkServiceConnectionState.status"
                     value: Approved
                     op: contains
     """
