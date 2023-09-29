@@ -361,6 +361,22 @@ azure-mgmt-core = ">=1.2.0,<2.0.0"
 msrest = ">=0.5.0"
 
 [[package]]
+name = "azure-mgmt-automation"
+version = "0.1.1"
+description = "Microsoft Azure Automation Client Library for Python"
+optional = false
+python-versions = "*"
+files = [
+    {file = "azure-mgmt-automation-0.1.1.zip", hash = "sha256:cb095da2ae1fada2f41d5f737eba0ccedb7f5e6d807e02ac5b04f631bfb92855"},
+    {file = "azure_mgmt_automation-0.1.1-py2.py3-none-any.whl", hash = "sha256:ffde4e1749c27082d34767112182f4d6d6b115fe892e3c3389970043d052d142"},
+]
+
+[package.dependencies]
+azure-common = ">=1.1,<2.0"
+msrest = ">=0.5.0"
+msrestazure = ">=0.4.32,<2.0.0"
+
+[[package]]
 name = "azure-mgmt-batch"
 version = "15.0.0"
 description = "Microsoft Azure Batch Management Client Library for Python"
@@ -2456,4 +2472,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "cca5a0852b78d25f4ddd691c6ab756c8754a813ba4a05a63e0f6f5d324d55899"
+content-hash = "6fe8bdc526c7a3a0a034deeac1183cf8ca788f9cba359eca9faad9905418f5fb"
