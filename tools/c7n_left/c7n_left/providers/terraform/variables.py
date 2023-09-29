@@ -112,6 +112,8 @@ class VariableResolver:
             for v in variables:
                 if v.get("default"):
                     continue
+                if not v["__tfmeta"]["path"].startswith("variable"):
+                    continue
                 if v["__tfmeta"]["label"] not in var_map:
                     uninitialized_vars[v["__tfmeta"]["label"]] = self.type_defaults[
                         v.get("type", "string") or "string"
