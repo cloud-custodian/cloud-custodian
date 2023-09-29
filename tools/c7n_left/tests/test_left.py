@@ -493,7 +493,7 @@ resource "aws_cloudwatch_log_stream" "foo" {
     assert results[0].resource["name"] == "Yada"
 
 
-def test_module_unknown_variable(policy_env, monkeypatch):
+def test_module_unknown_variable(policy_env, test):
     mod_dir = policy_env.policy_dir / "module" / "logs"
     mod_dir.mkdir(parents=True)
     (mod_dir / "main.tf").write_text(
@@ -544,10 +544,10 @@ def test_module_unknown_variable(policy_env, monkeypatch):
     )
 
     conf = Config.empty(reporter=ResultsReporter(), var_files=["vars.tfvars"])
-    monkeypatch.chdir(policy_env.policy_dir)
+    test.change_cwd(policy_env.policy_dir)
+    test.change_environment()
     policy_env.get_graph(config=conf)
     assert conf.reporter.input_vars == {
-        "environment": {},
         "user:vars.tfvars": {"component": "login"},
     }
 
