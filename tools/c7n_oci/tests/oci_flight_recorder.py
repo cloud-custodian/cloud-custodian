@@ -45,6 +45,7 @@ FILTERED_HEADERS = [
     "etag",
     "pragma",
     "x-content-type-options",
+    "location",
 ]
 
 

@@ -272,8 +272,6 @@ interactions:
       - no-cache, no-store, must-revalidate
       content-type:
       - application/json
-      location:
-      - https://identity-control-plane-core.svc.ad2.us-ashburn-1/20160918/dynamicGroups/ocid1.dynamicgroup.oc1..aaaaaaaaivntl27xxgx6ydvobs2fnqzizt5ve2nh74nlxvm7fqvjo6rbcdua
     status:
       code: 200
       message: OK
@@ -325,8 +323,6 @@ interactions:
       - no-cache, no-store, must-revalidate
       content-type:
       - application/json
-      location:
-      - https://identity-control-plane-core.svc.ad2.us-ashburn-1/20160918/policies/ocid1.policy.oc1..aaaaaaaa5wzn6pp7mugkdduug6o4z4zgbsviirbptdz3pzi76jbdt2wusrma
     status:
       code: 200
       message: OK
