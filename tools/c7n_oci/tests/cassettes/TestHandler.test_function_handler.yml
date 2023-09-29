@@ -1,0 +1,164 @@
+interactions:
+- request:
+    body: null
+    headers:
+      opc-request-id:
+      - FF6412A5BB434824BC5FA31295BDC477
+    method: GET
+    uri: https://objectstorage.us-ashburn-1.oraclecloud.com/n
+  response:
+    body:
+      data: idimd1fghobk
+    headers:
+      content-type:
+      - application/json
+      opc-request-id:
+      - iad-1:X1rX3qhUHtjfsSdiKS43bGJd08l_YL5QJ915shIqoQc8A_mQFKcH-ffIrnbEP27f
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      opc-request-id:
+      - 91FDA1B61FF14080B21D9E9067190F7A
+    method: GET
+    uri: https://objectstorage.us-ashburn-1.oraclecloud.com/n/<namepsace>/b/test_bucket
+  response:
+    body:
+      data:
+        approximateCount: null
+        approximateSize: null
+        approximateSizeMultipartUploads: null
+        autoTiering: null
+        compartmentId: ocid1.compartment.oc1..<unique_ID>
+        createdBy: ocid1.user.oc1..<unique_ID>
+        definedTags:
+          Oracle-Tags:
+            CreatedBy: user@example.com
+            CreatedOn: '2023-09-08T07:11:25.188Z'
+        etag: c7716af1-7642-4c65-83e6-799db8d9b2d2
+        freeformTags:
+          Project: CNCF
+        id: ocid1.bucket.oc1..<unique_ID>
+        isReadOnly: false
+        kmsKeyId: null
+        metadata: {}
+        meterFlagSet:
+          empty: true
+        name: test_bucket
+        namespace: <namespace>
+        objectEventsEnabled: false
+        objectLevelAuditMode: Disabled
+        publicAccessType: NoPublicAccess
+        replicationEnabled: false
+        storageTier: Standard
+        timeCreated: '2023-09-08T07:11:25.199Z'
+        versioning: Disabled
+    headers:
+      cache-control:
+      - no-store
+      content-type:
+      - application/json
+      opc-request-id:
+      - iad-1:EZ1-AqOPkpbGOp4wva85AEBCgAdgsbunbcg1TtjFUeXaEwQ-cyAJH9EvOvN4AmMC
+    status:
+      code: 200
+      message: OK
+- request:
+    body: mock_body
+    headers:
+      opc-request-id:
+      - 1EBC3CC6AED741608A975D7B9F2BB936
+    method: POST
+    uri: https://objectstorage.us-ashburn-1.oraclecloud.com/n/<namepsace>/b/test_bucket
+  response:
+    body:
+      data:
+        approximateCount: null
+        approximateSize: null
+        approximateSizeMultipartUploads: null
+        autoTiering: Disabled
+        compartmentId: ocid1.compartment.oc1..<unique_ID>
+        createdBy: ocid1.user.oc1..<unique_ID>
+        definedTags:
+          Oracle-Tags:
+            CreatedBy: user@example.com
+            CreatedOn: '2023-09-08T07:11:25.188Z'
+        etag: 22ccbba5-e954-4367-8988-61560326929a
+        freeformTags:
+          Project: CNCF
+          Source: Custodian-function
+        id: ocid1.bucket.oc1..<unique_ID>
+        isReadOnly: false
+        kmsKeyId: null
+        metadata: {}
+        meterFlagSet:
+          empty: true
+        name: test_bucket
+        namespace: <namespace>
+        objectEventsEnabled: false
+        objectLevelAuditMode: Disabled
+        publicAccessType: NoPublicAccess
+        replicationEnabled: false
+        storageTier: Standard
+        timeCreated: '2023-09-08T07:11:25.199Z'
+        versioning: Disabled
+    headers:
+      content-type:
+      - application/json
+      opc-request-id:
+      - iad-1:zGRYayJuKFWFROgnz6pnbrFjeQ4BbWMerQ5DPI2Vme9Zsu50mX_4DC6sbxZ5GUdd
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      opc-request-id:
+      - 1370465EB99742C1B26289EB82BAF06F
+    method: GET
+    uri: https://objectstorage.us-ashburn-1.oraclecloud.com/n/<namepsace>/b/test_bucket
+  response:
+    body:
+      data:
+        approximateCount: null
+        approximateSize: null
+        approximateSizeMultipartUploads: null
+        autoTiering: null
+        compartmentId: ocid1.compartment.oc1..<unique_ID>
+        createdBy: ocid1.user.oc1..<unique_ID>
+        definedTags:
+          Oracle-Tags:
+            CreatedBy: user@example.com
+            CreatedOn: '2023-09-08T07:11:25.188Z'
+        etag: 22ccbba5-e954-4367-8988-61560326929a
+        freeformTags:
+          Project: CNCF
+          Source: Custodian-function
+        id: ocid1.bucket.oc1..<unique_ID>
+        isReadOnly: false
+        kmsKeyId: null
+        metadata: {}
+        meterFlagSet:
+          empty: true
+        name: test_bucket
+        namespace: <namespace>
+        objectEventsEnabled: false
+        objectLevelAuditMode: Disabled
+        publicAccessType: NoPublicAccess
+        replicationEnabled: false
+        storageTier: Standard
+        timeCreated: '2023-09-08T07:11:25.199Z'
+        versioning: Disabled
+    headers:
+      cache-control:
+      - no-store
+      content-type:
+      - application/json
+      opc-request-id:
+      - iad-1:lz2FC9cWnNjfDKx9MSZT-CFFLoTUHOR2gB5yUmNji031Iof330276QJ_eSKMYWe-
+    status:
+      code: 200
+      message: OK
+version: 1

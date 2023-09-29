@@ -11,7 +11,7 @@ from c7n.filters import Filter, ValueFilter  # noqa
 from c7n.utils import type_schema
 from c7n_oci.actions.base import OCIBaseAction, RemoveTagBaseAction
 from c7n_oci.provider import resources
-from c7n_oci.query import QueryResourceManager
+from c7n_oci.query import QueryResourceManager, TypeInfo
 
 log = logging.getLogger("custodian.oci.resources.compute")
 
@@ -32,7 +32,7 @@ class Instance(QueryResourceManager):
 
     """
 
-    class resource_type:
+    class resource_type(TypeInfo):
         doc_groups = ["Compute"]
         service = "oci.core"
         client = "ComputeClient"
@@ -42,6 +42,8 @@ class Instance(QueryResourceManager):
         id = "id"
         name = "display_name"
         search_resource_type = "instance"
+        get = "get_instance"
+        event_service_name = "com.oraclecloud.computeapi"
 
 
 @Instance.action_registry.register("remove-tag")

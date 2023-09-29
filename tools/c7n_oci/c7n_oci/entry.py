@@ -6,7 +6,7 @@ from c7n_oci.provider import OCI  # noqa
 
 
 def initialize_oci():
-    import c7n_oci.session  # noqa
+    import c7n_oci.policy  # noqa
 
     # load the shared filters for all the OCI resources
     import c7n_oci.filters  # noqa

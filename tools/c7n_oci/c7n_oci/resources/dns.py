@@ -11,7 +11,7 @@ from c7n.filters import Filter, ValueFilter  # noqa
 from c7n.utils import type_schema
 from c7n_oci.actions.base import OCIBaseAction, RemoveTagBaseAction
 from c7n_oci.provider import resources
-from c7n_oci.query import QueryResourceManager
+from c7n_oci.query import QueryResourceManager, TypeInfo
 
 log = logging.getLogger("custodian.oci.resources.dns")
 
@@ -32,7 +32,7 @@ class Zone(QueryResourceManager):
 
     """
 
-    class resource_type:
+    class resource_type(TypeInfo):
         doc_groups = ["DNS"]
         service = "oci.dns"
         client = "DnsClient"

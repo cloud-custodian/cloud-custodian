@@ -82,6 +82,7 @@ Navigate below to your cloud provider and get started with Cloud Custodian!
    oci/testing
    oci/resources/index
    oci/advanced/index
+   oci/function.rst
 
 .. toctree::
    :maxdepth: 1
