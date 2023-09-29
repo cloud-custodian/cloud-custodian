@@ -17,9 +17,7 @@ from c7n.structure import StructureParser
 from c7n.utils import reset_session_cache
 
 log = logging.getLogger("custodian.oci.functions")
-# TODO:Change this to INFO before raising the PR
-logging.getLogger().setLevel(logging.DEBUG)
-
+logging.getLogger().setLevel(logging.INFO)
 
 def handler(ctx, data: io.BytesIO = None):
     log.info("Starting Function execution")
