@@ -1,11 +1,11 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
-
 import importlib
 import logging
 import os
 
 import oci
+
 from c7n_oci.constants import (
     ENV_FINGERPRINT,
     ENV_USER,
@@ -84,17 +84,16 @@ class Session:
         self.signer = None
 
     def client(self, client_string, **kwargs):
-        if self.signer or os.environ.get('OCI_CLI_AUTH') == 'instance_principal':
-            signer = oci.auth.signers.InstancePrincipalsSecurityTokenSigner()
-            client = eval(f"{client_string}(config=self._config, signer=signer, **kwargs)")
-            self._config['tenancy_id'] = signer.tenancy_id
-            self._config['region'] = signer.region
-            self.signer = signer
-            return client
         service_name, client_name = client_string.rsplit(".", 1)
         service_module = importlib.import_module(service_name)
         client_class = getattr(service_module, client_name)
         client_args = {"config": self._config, **kwargs}
+        if os.environ.get('OCI_CLI_AUTH') == 'instance_principal':
+            signer = self.signer or oci.auth.signers.InstancePrincipalsSecurityTokenSigner()
+            client_args['signer'] = signer
+            self._config['tenancy_id'] = signer.tenancy_id
+            self._config['region'] = signer.region
+            self.signer = signer
         client = client_class(**client_args)
         return client
 

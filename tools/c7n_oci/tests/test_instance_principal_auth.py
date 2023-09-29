@@ -1,4 +1,5 @@
 import os
+import sys
 from distutils.util import strtobool
 
 import oci
@@ -14,7 +15,10 @@ if (OCI_INSTANCE_PRINCIPAL and C7N_FUNCTIONAL) or not (OCI_INSTANCE_PRINCIPAL or
     skip_test = False
 
 
-@pytest.mark.skipif(skip_test, reason="This test can only run on a configured OCI Instance")
+@pytest.mark.skipif(
+    skip_test or sys.platform == "win32",
+    reason="This test can only run on a configured OCI Instance",
+)
 class TestInstancePrincipalAuth(OciBaseTest):
     def _get_bucket_details(self, object_storage):
         namespace = object_storage["oci_objectstorage_bucket.ip_test_bucket.namespace"]
