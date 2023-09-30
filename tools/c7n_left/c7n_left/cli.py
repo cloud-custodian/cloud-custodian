@@ -105,6 +105,7 @@ def run(
     output_query,
     summary,
     filters,
+    reporter=None
 ):
     """evaluate policies against IaC sources.
 
@@ -130,7 +131,8 @@ def run(
     if not policies:
         log.warning("no policies found")
         sys.exit(1)
-    reporter = get_reporter(config)
+    if reporter is None:
+        reporter = get_reporter(config)
     config["reporter"] = reporter
     runner = CollectionRunner(policies, config, reporter)
     sys.exit(int(runner.run()))
