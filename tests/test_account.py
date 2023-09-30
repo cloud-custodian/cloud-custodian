@@ -406,10 +406,14 @@ class AccountTests(BaseTest):
             'filters': [
                 {
                     'type': 'check-cloudtrail',
-                    'op': 'regex',
                     'log-metric-filter-pattern':
-                        '\\{ ?(\\()? ?\\$\\.eventName ?= ?(")?ConsoleLogin(")? ?(\\))? ?&& ?'
-                        '(\\()? ?\\$\\.errorMessage ?= ?(")?Failed authentication(")? ?(\\))? ?\\}'
+                        {
+                            'type': 'value',
+                            'op': 'regex',
+                            'value': '\\{ ?(\\()? ?\\$\\.eventName ?= ?(")?ConsoleLogin(")? '
+                                     '?(\\))? ?&& ?(\\()? ?\\$\\.errorMessage ?= '
+                                     '?(")?Failed authentication(")? ?(\\))? ?\\}'
+                        }
                 },
             ],
             }
@@ -422,7 +426,7 @@ class AccountTests(BaseTest):
         logs_client = local_session(session_factory).client("logs")
         logs_metrics = logs_client.describe_metric_filters(logGroupName='test_log_group')
         self.assertRegexpMatches(logs_metrics['metricFilters'][0]['filterPattern'],
-                                 pdata['filters'][0]['log-metric-filter-pattern'])
+                                 pdata['filters'][0]['log-metric-filter-pattern']['value'])
 
     def test_cloudtrail_fail_regex_log_metric_filter(self):
         session_factory = self.replay_flight_data("test_cloudtrail_fail_regex_log_metric_filter")
@@ -432,7 +436,6 @@ class AccountTests(BaseTest):
             'filters': [
                 {
                     'type': 'check-cloudtrail',
-                    'op': 'regex',
                     'log-metric-filter-pattern':
                         '\\{ ?(\\()? ?\\$\\.eventName ?= ?(")?ConsoleLogin(")? ?(\\))? ?&& ?'
                         '(\\()? ?\\$\\.errorMessage ?= ?(")?Failed authentication(")? ?(\\))? ?\\}'

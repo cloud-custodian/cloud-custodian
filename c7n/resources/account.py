@@ -236,6 +236,22 @@ class CloudTrailEnabled(Filter):
                     running: true
                     include-management-events: true
                     log-metric-filter-pattern: "{ ($.eventName = \\"ConsoleLogin\\") }"
+
+    Check for CloudWatch log group with a metric filter that has a filter pattern
+    matching a regex pattern:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: account-cloudtrail-with-matching-log-metric-filter
+                resource: account
+                region: us-east-1
+                filters:
+                  - type: check-cloudtrail
+                    log-metric-filter-pattern:
+                        type: value
+                        op: regex
+                        value: '\\{ ?(\\()? ?\\$\\.eventName ?= ?(")?ConsoleLogin(")? ?(\\))? ?\\}'
     """
     schema = type_schema(
         'check-cloudtrail',
@@ -248,19 +264,19 @@ class CloudTrailEnabled(Filter):
            'kms': {'type': 'boolean'},
            'kms-key': {'type': 'string'},
            'include-management-events': {'type': 'boolean'},
-           'log-metric-filter-pattern': {'type': 'string'},
-           'op': {'type': 'string', 'enum': list(OPERATORS.keys())}})
+           'log-metric-filter-pattern':  {'oneOf': [
+                {'$ref': '#/definitions/filters/value'},
+                {'type': 'string'}]}})
 
     permissions = ('cloudtrail:DescribeTrails', 'cloudtrail:GetTrailStatus',
                    'cloudtrail:GetEventSelectors', 'cloudwatch:DescribeAlarmsForMetric',
-                   'logs:DescribeMetricFilters', 'sns:ListSubscriptionsByTopic')
+                   'logs:DescribeMetricFilters', 'sns:GetTopicAttributes')
 
     def process(self, resources, event=None):
         session = local_session(self.manager.session_factory)
         client = session.client('cloudtrail')
         trails = client.describe_trails()['trailList']
         resources[0]['c7n:cloudtrails'] = trails
-        self.op = OPERATORS[self.data.get('op', 'equal')]
 
         if self.data.get('global-events'):
             trails = [t for t in trails if t.get('IncludeGlobalServiceEvents')]
@@ -316,6 +332,13 @@ class CloudTrailEnabled(Filter):
             client_cw = session.client('cloudwatch')
             client_sns = session.client('sns')
             matched = []
+            pattern = self.data.get('log-metric-filter-pattern')
+            if isinstance(pattern, str):
+                self.op = OPERATORS['equal']
+            else:
+                self.op = OPERATORS[pattern.get('op', 'equal')]
+                pattern = pattern.get('value')
+
             for t in list(trails):
                 if 'CloudWatchLogsLogGroupArn' not in t.keys():
                     continue
@@ -330,7 +353,7 @@ class CloudTrailEnabled(Filter):
                 filter_matched = None
                 if metric_filters_log_group:
                     for f in metric_filters_log_group:
-                        if self.op(f['filterPattern'], self.data.get('log-metric-filter-pattern')):
+                        if self.op(f['filterPattern'], pattern):
                             filter_matched = f
                             break
                 if not filter_matched:
@@ -349,8 +372,7 @@ class CloudTrailEnabled(Filter):
                     try:
                         sns_topic_attributes = client_sns.get_topic_attributes(TopicArn=a)
                         sns_topic_attributes = sns_topic_attributes.get('Attributes')
-                        if sns_topic_attributes.get('SubscriptionsConfirmed') is not None and \
-                                sns_topic_attributes.get('SubscriptionsConfirmed') > '0':
+                        if sns_topic_attributes.get('SubscriptionsConfirmed', '0') != '0':
                             matched.append(t)
                     except client_sns.exceptions.InvalidParameterValueException:
                         # we can ignore any exception here, the alarm action might
