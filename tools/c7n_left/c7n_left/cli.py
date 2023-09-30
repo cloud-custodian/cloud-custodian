@@ -150,7 +150,7 @@ def test(policy_dir, filters):
 
 
 def get_config(
-    source_dir=None,
+    directory=None,
     policy_dir=None,
     output=None,
     output_file=None,
@@ -160,7 +160,7 @@ def get_config(
     filters=None,
 ):
     config = Config.empty(
-        source_dir=source_dir and Path(source_dir),
+        source_dir=directory and Path(directory),
         policy_dir=policy_dir and Path(policy_dir),
         output=output,
         output_file=output_file,
