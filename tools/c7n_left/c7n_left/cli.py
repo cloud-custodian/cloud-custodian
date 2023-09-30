@@ -47,12 +47,11 @@ def cli():
 )
 def dump(directory, var_file, output_file, output_query):
     """Dump the parsed resource graph or subset"""
-
-    config = Config.empty(
-        source_dir=Path(directory),
+    config = get_config(
+        directory,
         output="jsongraph",
         output_file=output_file,
-        var_files=var_file,
+        var_file=var_file,
         output_query=output_query,
     )
     reporter = get_reporter(config)
@@ -105,7 +104,7 @@ def run(
     output_query,
     summary,
     filters,
-    reporter=None
+    reporter=None,
 ):
     """evaluate policies against IaC sources.
 
@@ -114,20 +113,17 @@ def run(
 
     WARNING - CLI interface subject to change.
     """
-    config = Config.empty(
-        source_dir=Path(directory),
-        policy_dir=Path(policy_dir),
+    config = get_config(
+        directory,
+        policy_dir,
         output=output,
         output_file=output_file,
-        var_files=var_file,
         output_query=output_query,
+        var_file=var_file,
         summary=summary,
         filters=filters,
     )
-
-    exec_filter = ExecutionFilter.parse(config)
-    config["exec_filter"] = exec_filter
-    policies = exec_filter.filter_policies(load_policies(policy_dir, config))
+    policies = config.exec_filter.filter_policies(load_policies(policy_dir, config))
     if not policies:
         log.warning("no policies found")
         sys.exit(1)
@@ -146,20 +142,36 @@ def test(policy_dir, filters):
     policy_dir = Path(policy_dir)
     source_dir = policy_dir / "tests"
 
-    config = Config.empty(
-        source_dir=source_dir,
-        policy_dir=policy_dir,
-        output_file=sys.stdout,
-        filters=filters,
-        var_files=(),
-    )
-
+    config = get_config(source_dir, policy_dir, output_file=sys.stdout, filters=filters)
     reporter = TestReporter(None, config)
-    exec_filter = ExecutionFilter.parse(config)
-    config["exec_filter"] = exec_filter
-    policies = exec_filter.filter_policies(load_policies(policy_dir, config))
+    policies = config.exec_filter.filter_policies(load_policies(policy_dir, config))
     runner = TestRunner(policies, config, reporter)
     sys.exit(int(runner.run()))
+
+
+def get_config(
+    source_dir=None,
+    policy_dir=None,
+    output=None,
+    output_file=None,
+    var_file=(),
+    output_query=None,
+    summary=None,
+    filters=None,
+):
+    config = Config.empty(
+        source_dir=source_dir and Path(source_dir),
+        policy_dir=policy_dir and Path(policy_dir),
+        output=output,
+        output_file=output_file,
+        var_files=var_file,
+        output_query=output_query,
+        summary=summary,
+        filters=filters,
+    )
+    exec_filter = ExecutionFilter.parse(config)
+    config["exec_filter"] = exec_filter
+    return config
 
 
 if __name__ == "__main__":  # pragma: no cover
