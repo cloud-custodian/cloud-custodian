@@ -13,7 +13,7 @@ from dateutil.tz import tzutc
 
 from c7n.actions import ActionRegistry, BaseAction
 from c7n.exceptions import PolicyValidationError
-from c7n.filters import Filter, FilterRegistry, ValueFilter, OPERATORS
+from c7n.filters import Filter, FilterRegistry, ValueFilter
 from c7n.filters.kms import KmsRelatedFilter
 from c7n.filters.multiattr import MultiAttrFilter
 from c7n.filters.missing import Missing
@@ -334,10 +334,10 @@ class CloudTrailEnabled(Filter):
             matched = []
             pattern = self.data.get('log-metric-filter-pattern')
             if isinstance(pattern, str):
-                self.op = OPERATORS['equal']
+                vf = ValueFilter({'key': 'filterPattern', 'value': pattern})
             else:
-                self.op = OPERATORS[pattern.get('op', 'equal')]
-                pattern = pattern.get('value')
+                pattern.setdefault('key', 'filterPattern')
+                vf = ValueFilter(pattern)
 
             for t in list(trails):
                 if 'CloudWatchLogsLogGroupArn' not in t.keys():
@@ -353,7 +353,7 @@ class CloudTrailEnabled(Filter):
                 filter_matched = None
                 if metric_filters_log_group:
                     for f in metric_filters_log_group:
-                        if self.op(f['filterPattern'], pattern):
+                        if vf(f):
                             filter_matched = f
                             break
                 if not filter_matched:
