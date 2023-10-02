@@ -158,6 +158,7 @@ def get_config(
     output_query=None,
     summary=None,
     filters=None,
+    format='terraform',
 ):
     config = Config.empty(
         source_dir=directory and Path(directory),
@@ -168,6 +169,7 @@ def get_config(
         output_query=output_query,
         summary=summary,
         filters=filters,
+        format=format,
     )
     exec_filter = ExecutionFilter.parse(config)
     config["exec_filter"] = exec_filter
