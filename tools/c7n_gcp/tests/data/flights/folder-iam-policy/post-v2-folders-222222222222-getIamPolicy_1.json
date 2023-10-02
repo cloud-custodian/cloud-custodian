@@ -27,8 +27,9 @@
       {
         "role": "roles/admin",
         "members": [
-          "user:hijklm@gmail.com",
-          "zzzzz"
+          "serviceAccount:abc@testproject.iam.gserviceaccount.com",
+          "user:abc@gmail.com",
+          "abcdefg"
         ]
       }
     ]

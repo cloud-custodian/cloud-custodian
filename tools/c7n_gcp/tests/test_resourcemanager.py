@@ -237,8 +237,8 @@ class FolderTest(BaseTest):
             'filters': [{
                 'type': 'iam-policy',
                 'user-role':
-                    {'user': "zzzzz",
-                    'has': False,
+                    {'user': "abcdefg",
+                    'has': True,
                     'role': 'roles/admin'}
             }]},
             session_factory=factory)
