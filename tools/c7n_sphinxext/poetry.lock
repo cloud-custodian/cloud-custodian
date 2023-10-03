@@ -100,7 +100,7 @@ crt = ["awscrt (==0.16.26)"]
 
 [[package]]
 name = "c7n"
-version = "0.9.31"
+version = "0.9.32"
 description = "Cloud Custodian - Policy Rules Engine"
 optional = false
 python-versions = "^3.8"
