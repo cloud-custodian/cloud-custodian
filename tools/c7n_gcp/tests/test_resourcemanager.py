@@ -8,7 +8,10 @@ from unittest import mock
 
 import pytest
 
-from c7n_gcp.resources.resourcemanager import FolderIamPolicyFilter, HierarchyAction, OrganizationIamPolicyFilter
+from c7n_gcp.resources.resourcemanager import (
+    FolderIamPolicyFilter, HierarchyAction, OrganizationIamPolicyFilter
+)
+
 from gcp_common import BaseTest
 
 
@@ -176,16 +179,16 @@ class OrganizationTest(BaseTest):
     @mock.patch("c7n_gcp.resources.resourcemanager.SetIamPolicy._verb_arguments")
     def test_organization_iam_policy_filter_verb_arguments(self, mock_base_verb_arguments):
         organization = {'id': 'example_organization_id'}
-        
+
         mock_manager = mock.Mock()
         mock_manager.resource_type = 'organization'
-        
+
         mock_base_verb_arguments.return_value = {'body': {}}
-        
+
         policy_filter = OrganizationIamPolicyFilter(data={}, manager=mock_manager)
-        
+
         params = policy_filter._verb_arguments(organization)
-        
+
         assert 'body' in params
         assert params['body'] == {}
 
@@ -270,18 +273,19 @@ class FolderTest(BaseTest):
     @mock.patch("c7n_gcp.resources.resourcemanager.SetIamPolicy._verb_arguments")
     def test_folder_iam_policy_filter_verb_arguments(self, mock_base_verb_arguments):
         folder = {'id': 'example_folder_id'}
-        
+
         mock_manager = mock.Mock()
         mock_manager.resource_type = 'folder'
-        
+
         mock_base_verb_arguments.return_value = {'body': {}}
-        
+
         policy_filter = FolderIamPolicyFilter(data={}, manager=mock_manager)
-        
+
         params = policy_filter._verb_arguments(folder)
-        
+
         assert 'body' in params
         assert params['body'] == {}
+
 
 class ProjectTest(BaseTest):
 
@@ -640,7 +644,6 @@ class TestAccessApprovalFilter(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
-
 
 
 class TestEssentialContactsFilter(BaseTest):
