@@ -38,7 +38,7 @@ class TerraformGraph(ResourceGraph):
                 for item in type_items:
                     name = item["__tfmeta"]["path"]
                     resource = self.as_resource(name, item)
-                    if item['__tfmeta'].get('type', 'resource') == 'data':
+                    if item["__tfmeta"].get("type", "resource") == "data":
                         data_resources.append(resource)
                     else:
                         resources.append(resource)

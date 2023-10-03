@@ -64,7 +64,7 @@ class BigQueryJob(QueryResourceManager):
         service = 'bigquery'
         version = 'v2'
         component = 'jobs'
-        enum_spec = ('list', 'jobs[]', {'allUsers': True})
+        enum_spec = ('list', 'jobs[]', {'allUsers': True, 'projection': 'full'})
         get_requires_event = True
         scope = 'project'
         scope_key = 'projectId'

@@ -1,0 +1,91 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Mon, 24 Jan 2022 12:15:34 GMT",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000,h3-Q050=\":443\"; ma=2592000,h3-Q046=\":443\"; ma=2592000,h3-Q043=\":443\"; ma=2592000,quic=\":443\"; ma=2592000; v=\"46,43\"",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "2750",
+    "-content-encoding": "gzip",
+    "content-location": "https://cloudkms.googleapis.com/v1/projects/cloud-custodian/locations/us-central1/keyRings?alt=json"
+  },
+  "body": {
+    "keyRings": [
+      {
+        "name": "projects/cloud-custodian/locations/us-central1/keyRings/gcs-key",
+        "createTime": "2021-02-12T10:47:42.831969663Z"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/us-central1/keyRings/key-ring-121c3d22-234-green",
+        "createTime": "2021-12-10T01:37:52.190765453Z"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/us-central1/keyRings/key-ring-d9358f51-234-green",
+        "createTime": "2021-12-10T09:54:15.304461801Z"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/us-central1/keyRings/keyring-132-green",
+        "createTime": "2021-10-08T11:50:47.214995416Z"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/us-central1/keyRings/keyring-213",
+        "createTime": "2021-10-15T11:11:22.789572504Z"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/us-central1/keyRings/keyring-213-green",
+        "createTime": "2021-09-28T12:34:14.608780001Z"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/us-central1/keyRings/keyring-213-test-green",
+        "createTime": "2021-10-06T08:51:49.829358566Z"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/us-central1/keyRings/keyring-214",
+        "createTime": "2021-09-28T09:44:22.022012057Z"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/us-central1/keyRings/keyring-214-green",
+        "createTime": "2021-09-28T10:05:49.993674524Z"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/us-central1/keyRings/keyring-214-test",
+        "createTime": "2021-09-28T09:48:35.275068525Z"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/us-central1/keyRings/keyring-example",
+        "createTime": "2021-09-28T08:21:32.541290808Z"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/us-central1/keyRings/keyring-example-",
+        "createTime": "2021-11-23T08:05:51.856568156Z"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/us-central1/keyRings/keyring-example-b83d6dc4-169-red",
+        "createTime": "2021-11-25T13:01:23.616041152Z"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/us-central1/keyRings/keyring-test",
+        "createTime": "2021-09-28T08:45:20.895839122Z"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/us-central1/keyRings/keyring-test-214",
+        "createTime": "2021-09-28T09:58:33.482366731Z"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/us-central1/keyRings/keyring214-test",
+        "createTime": "2021-09-28T11:47:37.642195014Z"
+      },
+      {
+        "name": "projects/cloud-custodian/locations/us-central1/keyRings/test-keyring-213",
+        "createTime": "2021-11-15T12:51:12.304847515Z"
+      }
+    ],
+    "totalSize": 17
+  }
+}

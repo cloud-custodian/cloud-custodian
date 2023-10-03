@@ -497,7 +497,7 @@ class IsQueryLoggingEnabled(Filter):
             logging = zid in enabled_zones
             if logging and state:
                 r['c7n:log-config'] = enabled_zones[zid]
-                log_group_name = r['c7n:log-config']['CloudWatchLogsLogGroupArn'].split(":")[-1]
+                log_group_name = r['c7n:log-config']['CloudWatchLogsLogGroupArn'].split(":")[6]
                 response = cw_client.describe_subscription_filters(logGroupName=log_group_name)
                 r['c7n:log-config']['loggroup_subscription'] = response['subscriptionFilters']
                 results.append(r)
