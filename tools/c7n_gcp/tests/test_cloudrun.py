@@ -34,6 +34,26 @@ class RunServiceTest(BaseTest):
         resources = p.run()
         assert len(resources) == 1
 
+    def test_cloudrun_filter_iam_query(self):
+        project_id = 'cloud-custodian'
+        factory = self.replay_flight_data('gcp-cloud-run-service-filter-iam', project_id=project_id)
+        p = self.load_policy({
+            'name': 'gcp-cloud-run-service-filter-iam',
+            'resource': 'gcp.cloud-run-service',
+            'filters': [{
+                'type': 'iam-policy',
+                'doc': {
+                    'key': "bindings[?(role=='roles\\editor' || role=='roles\\owner')]",
+                    'op': 'ne',
+                    'value': []
+                }
+            }]
+        }, session_factory=factory)
+        resources = p.run()
+
+        self.assertEqual(1, len(resources))
+        self.assertEqual('run-1',
+                         resources[0]["metadata"]['name'])
 
 class JobServiceTest(BaseTest):
     def test_query(self):

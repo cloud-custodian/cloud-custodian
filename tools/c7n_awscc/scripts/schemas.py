@@ -30,6 +30,7 @@ ServiceMap = {
     "applicationinsights": "application-insights",
     "aps": "amp",
     # cassandra : no management api
+    "cassandra": "keyspaces",
     "certificatemanager": "acm",
     # chatbot: no management api
     "codestarconnections": "codestar-connections",
@@ -71,7 +72,6 @@ def cli():
 @click.option("-o", "--index", required=True, type=click.Path())
 @click.option("-d", "--schema-dir", required=True, type=click.Path())
 def gen_index(index, schema_dir):
-
     index_path = Path(index)
     schema_dir = Path(schema_dir)
 
@@ -120,7 +120,6 @@ def gen_index(index, schema_dir):
 @cli.command()
 @click.option("-d", "--schema-dir", required=True, type=click.Path())
 def check_list(schema_dir):
-
     sdir = Path(str(schema_dir))
     control = boto3.client("cloudcontrol")
     with ThreadPoolExecutor(max_workers=4) as w:
