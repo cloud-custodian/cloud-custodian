@@ -3739,6 +3739,23 @@ class S3Test(BaseTest):
 
         assert mock_assumed_session.call_count == 1
 
+    def test_s3_data_events(self):
+        self.patch(s3.S3, "executor_factory", MainThreadExecutor)
+        self.patch(s3, "S3_AUGMENT_TABLE", [])
+        session_factory = self.replay_flight_data("test_s3_data_events")
+
+        p = self.load_policy(
+            {
+                "name": "s3-data-events",
+                "resource": "s3",
+                "filters": [{"type": "data-events"}],
+            },
+            session_factory=session_factory,
+        )
+
+        resources = p.run()
+        assert {bucket["Name"] for bucket in resources} == {"bucket-with-data-events"}
+
 
 class S3LifecycleTest(BaseTest):
 
