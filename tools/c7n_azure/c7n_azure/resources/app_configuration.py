@@ -6,21 +6,21 @@ from c7n_azure.resources.arm import ArmResourceManager
 class AppConfiguration(ArmResourceManager):
     """App Configuration Resource
 
-        :example:
+    :example:
 
-        The policy finds App Configurations whose Private Endpoint Connections have Approved status
+    The policy finds App Configurations whose Private Endpoint Connections have Approved status
 
-        .. code-block:: yaml
+    .. code-block:: yaml
 
-            policies:
-              - name: azure-app-configuration
-                resource: azure.app-configuration
-                filters:
-                  - type: value
-                    key: "properties.privateEndpointConnections[].properties.\
-                          privateLinkServiceConnectionState.status"
-                    value: Approved
-                    op: contains
+        policies:
+          - name: azure-app-configuration
+            resource: azure.app-configuration
+            filters:
+              - type: value
+                key: "properties.privateEndpointConnections[].properties.\
+                      privateLinkServiceConnectionState.status"
+                value: Approved
+                op: contains
     """
     class resource_type(ArmResourceManager.resource_type):
 
