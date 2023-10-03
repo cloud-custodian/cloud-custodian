@@ -157,7 +157,8 @@ class Summary(Output):
         resource_count = 0
 
         for rtype, resources in graph.get_resources_by_type():
-            resources = self.config.exec_filter.filter_resources(rtype, resources)
+            if self.config.exec_filter:
+                resources = self.config.exec_filter.filter_resources(rtype, resources)
             if "_" not in rtype:
                 continue
             if not resources:
