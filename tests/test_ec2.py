@@ -2189,6 +2189,10 @@ class TestLaunchTemplate(BaseTest):
         resources = p.resource_manager.get_resources([
             'lt-00b3b2755218e3fdd'])
         self.assertEqual(len(resources), 4)
+        self.assertIn(
+            'arn:aws:ec2:us-east-1:644160558196:launch-template/lt-00b3b2755218e3fdd/4',
+            p.resource_manager.get_arns(resources)
+        )
 
     def test_launch_template_versions(self):
         factory = self.replay_flight_data('test_launch_template_query')
