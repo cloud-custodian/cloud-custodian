@@ -5,9 +5,9 @@ from c7n_azure.provider import resources
 from c7n_azure.resources.arm import ArmResourceManager
 
 
-@resources.register('host-pools')
-class HostPools(ArmResourceManager):
-    """Host Pools Resource
+@resources.register('host-pool')
+class HostPool(ArmResourceManager):
+    """Host Pool Resource
 
     :example:
 
@@ -16,8 +16,8 @@ class HostPools(ArmResourceManager):
     .. code-block:: yaml
 
         policies:
-          - name: list-host-pools-missing-identity
-            resource: azure.host-pools
+          - name: list-host-pool-missing-identity
+            resource: azure.host-pool
             filters:
               - type: value
                 key: identity

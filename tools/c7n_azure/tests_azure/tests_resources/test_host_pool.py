@@ -3,18 +3,18 @@
 from ..azure_common import BaseTest
 
 
-class HostPoolsTest(BaseTest):
-    def test_host_pools_schema_validate(self):
+class HostPoolTest(BaseTest):
+    def test_host_pool_schema_validate(self):
         p = self.load_policy({
-            'name': 'test-host-pools',
-            'resource': 'azure.host-pools'
+            'name': 'test-host-pool-schema',
+            'resource': 'azure.host-pool'
         }, validate=True)
         self.assertTrue(p)
 
     def test_find_by_name(self):
         p = self.load_policy({
-            'name': 'test-host-pools-by-name',
-            'resource': 'azure.host-pools',
+            'name': 'test-host-pool-by-name',
+            'resource': 'azure.host-pool',
             'filters': [
                 {'type': 'value',
                  'key': 'name',

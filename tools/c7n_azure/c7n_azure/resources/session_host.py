@@ -8,8 +8,8 @@ from c7n.filters import ValueFilter
 from c7n.utils import local_session, type_schema
 
 
-@resources.register('session-hosts')
-class SessionHosts(ChildArmResourceManager):
+@resources.register('session-host')
+class SessionHost(ChildArmResourceManager):
     """Session Host Resource
 
     :example:
@@ -19,8 +19,8 @@ class SessionHosts(ChildArmResourceManager):
     .. code-block:: yaml
 
         policies:
-          - name: list-session-hosts-disconnected
-            resource: azure.session-hosts
+          - name: list-session-host-disconnected
+            resource: azure.session-host
             filters:
               - type: value
                 key: status
@@ -34,7 +34,7 @@ class SessionHosts(ChildArmResourceManager):
         service = 'azure.mgmt.desktopvirtualization'
         client = 'DesktopVirtualizationMgmtClient'
         enum_spec = ('session_hosts', 'list', None)
-        parent_manager_name = 'host-pools'
+        parent_manager_name = 'host-pool'
 
         resource_type = 'Microsoft.DesktopVirtualization/hostPools/sessionHost'
 
@@ -51,7 +51,7 @@ class SessionHosts(ChildArmResourceManager):
                 'initial_skip': None
             }
 
-@SessionHosts.filter_registry.register('session-hosts-vm')
+@SessionHost.filter_registry.register('session-host-vm')
 class VMInstanceViewFilter(ValueFilter):
     """Check session host virtual machine
 
@@ -61,14 +61,14 @@ class VMInstanceViewFilter(ValueFilter):
 
         policies:
           - name: test-session-host-is-configured-with-managed-identity
-            resource: azure.session-hosts
+            resource: azure.session-host
             filters:
-                - type: session-hosts-vm
+                - type: session-host-vm
                   key: identity
                   value: absent
 
     """
-    schema = type_schema('session-hosts-vm',
+    schema = type_schema('session-host-vm',
         rinherit=ValueFilter.schema
     )
 

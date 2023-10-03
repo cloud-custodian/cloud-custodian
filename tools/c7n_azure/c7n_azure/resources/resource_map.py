@@ -36,7 +36,7 @@ ResourceMap = {
     "azure.front-door": "c7n_azure.resources.front_door.FrontDoor",
     "azure.front-door-policy": "c7n_azure.resources.front_door_policy.FrontDoorPolicy",
     "azure.hdinsight": "c7n_azure.resources.hdinsight.Hdinsight",
-    "azure.host-pools": "c7n_azure.resources.host_pools.HostPools",
+    "azure.host-pool": "c7n_azure.resources.host_pool.HostPool",
     "azure.image": "c7n_azure.resources.image.Image",
     "azure.iothub": "c7n_azure.resources.iot_hub.IoTHub",
     "azure.keyvault": "c7n_azure.resources.key_vault.KeyVault",
@@ -70,7 +70,7 @@ ResourceMap = {
     "azure.servicebus-namespace-authrules": "c7n_azure.resources.servicebus_namespace_authrules.ServiceBusNamespaceAuthRules", # noqa
     "azure.service-fabric-cluster": "c7n_azure.resources.service_fabric.ServiceFabricCluster",
     "azure.service-fabric-cluster-managed": "c7n_azure.resources.service_fabric.ServiceFabricClusterManaged",  # noqa
-    "azure.session-hosts": "c7n_azure.resources.session_hosts.SessionHosts",
+    "azure.session-host": "c7n_azure.resources.session_host.SessionHost",
     "azure.spring-app": "c7n_azure.resources.spring.SpringApp",
     "azure.spring-service-instance": "c7n_azure.resources.spring.SpringServiceInstance",
     "azure.sql-database": "c7n_azure.resources.sqldatabase.SqlDatabase",
