@@ -41,6 +41,7 @@ terraform_dir = terraform_dir.relative_to(cur_dir)
 class ResultsReporter:
     def __init__(self):
         self.results = []
+        self.input_vars = {}
 
     def on_execution_started(self, policies, graph):
         pass
@@ -50,6 +51,10 @@ class ResultsReporter:
 
     def on_policy_start(self, policy, event):
         pass
+
+    def on_vars_discovered(self, var_type, var_map, var_path=None):
+        var_key = var_path and "%s:%s" % (var_type, var_path) or var_type
+        self.input_vars[var_key] = dict(var_map)
 
     def on_results(self, policy, results):
         self.results.extend(results)
@@ -75,8 +80,15 @@ class PolicyEnv:
         policies = policy_core.load_policies(self.policy_dir, config)
         return policies
 
-    def get_graph(self, root_module):
-        return TerraformProvider().parse(root_module)
+    def get_graph(self, root_module=None, config=None):
+        root_module = root_module or self.policy_dir
+        provider = TerraformProvider()
+        params = {"source_dir": root_module}
+        if config:
+            provider.initialize(config)
+        if config and config.var_files:
+            params["var_files"] = config.var_files
+        return provider.parse(**params)
 
     def get_selection(self, filter_expression):
         return core.ExecutionFilter.parse(Config.empty(filters=filter_expression))
@@ -481,16 +493,80 @@ resource "aws_cloudwatch_log_stream" "foo" {
     assert results[0].resource["name"] == "Yada"
 
 
+def test_module_unknown_variable(policy_env, test):
+    mod_dir = policy_env.policy_dir / "module" / "logs"
+    mod_dir.mkdir(parents=True)
+    (mod_dir / "main.tf").write_text(
+        """
+        variable env {
+           type = string
+           default = "Dev"
+        }
+        variable owner {
+           type = string
+        }
+        variable app {
+           type = string
+        }
+        variable component {
+           type = string
+        }
+        resource "aws_cloudwatch_log_group" "app_log" {
+           name = "bing"
+           tags = {
+              Env = var.env
+              Owner = var.owner
+              App = var.app
+              Component = var.component
+           }
+        }
+        """
+    )
+    (policy_env.policy_dir / "vars.tfvars").write_text('component = "login"')
+    policy_env.write_tf(
+        """
+        variable component {
+            type = string
+        }
+
+        variable owner {
+           type = string
+           default = "jello"
+        }
+
+        module "servers" {
+          source = "./module/logs"
+          owner = var.owner
+          app = "authz"
+          component = var.component
+        }
+        """
+    )
+
+    conf = Config.empty(reporter=ResultsReporter(), var_files=["vars.tfvars"])
+    test.change_cwd(policy_env.policy_dir)
+    test.change_environment()
+    policy_env.get_graph(config=conf)
+    assert conf.reporter.input_vars == {
+        "user:vars.tfvars": {"component": "login"},
+    }
+
+
 def test_graph_merge_unknown_variable_relative_path(policy_env, monkeypatch):
     policy_env.write_tf(
         """
         variable component {
            type = string
         }
+        variable owner {
+           type = string
+           default = "jello"
+        }
         resource "aws_cloudwatch_log_group" "yada" {
            name = "Yada"
            tags = merge(
               {"Env" = "Public"},
+              {"Owner" = var.owner},
               {"Component" = var.component}
            )
         }
@@ -501,7 +577,7 @@ def test_graph_merge_unknown_variable_relative_path(policy_env, monkeypatch):
     graph = policy_env.get_graph(Path("."))
     resource_types = list(graph.get_resources_by_type("aws_cloudwatch_log_group"))
     log_group = resource_types.pop()[-1][0]
-    assert log_group["tags"] == {"Env": "Public", "Component": ""}
+    assert log_group["tags"] == {"Env": "Public", "Component": "", "Owner": "jello"}
 
 
 def test_graph_merge_unknown_variable(policy_env):
