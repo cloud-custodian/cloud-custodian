@@ -1,0 +1,33 @@
+{
+    "status_code": 200,
+    "data": {
+        "clusters": [
+            {
+                "clusterArn": "arn:aws:ecs:us-east-1:644160558196:cluster/c7n-ecs-test-cluster",
+                "clusterName": "c7n-ecs-test-cluster",
+                "status": "ACTIVE",
+                "registeredContainerInstancesCount": 0,
+                "runningTasksCount": 1,
+                "pendingTasksCount": 0,
+                "activeServicesCount": 1,
+                "statistics": [],
+                "tags": [
+                    {
+                        "key": "NetworkLocation",
+                        "value": "Customer"
+                    }
+                ],
+                "settings": [
+                    {
+                        "name": "containerInsights",
+                        "value": "disabled"
+                    }
+                ],
+                "capacityProviders": [],
+                "defaultCapacityProviderStrategy": []
+            }
+        ],
+        "failures": [],
+        "ResponseMetadata": {}
+    }
+}
