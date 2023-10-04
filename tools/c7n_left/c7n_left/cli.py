@@ -67,7 +67,7 @@ def dump(directory, var_file, output_file, output_query):
 @click.option("--format", default="terraform")
 @click.option("--filters", help="Filter policies or resources as k=v pairs with globbing")
 @click.option(
-    "--warn-on", help="Select policies log instead of causing failure via k=v pairs with globbing"
+    "--warn-on", help="Select policies to log instead of fail on via k=v pairs with globbing"
 )
 @click.option("-p", "--policy-dir", type=click.Path(), help="Directory with policies")
 @click.option("-d", "--directory", type=click.Path(), help="IaC directory to evaluate")
