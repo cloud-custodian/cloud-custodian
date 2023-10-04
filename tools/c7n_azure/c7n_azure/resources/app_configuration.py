@@ -8,7 +8,7 @@ class AppConfiguration(ArmResourceManager):
 
     :example:
 
-    The policy finds App Configurations whose Private Endpoint Connections have Approved status
+    The policy finds App Configurations whose Provisioned State is Succeeded
 
     .. code-block:: yaml
 
@@ -17,9 +17,9 @@ class AppConfiguration(ArmResourceManager):
             resource: azure.app-configuration
             filters:
               - type: value
-                key: properties.privateEndpointConnections[].properties.privateLinkServiceConnectionState.status
-                value: Approved
-                op: contains
+                key: properties.provisioningState
+                value: Succeeded
+                op: eq
 
     """
     class resource_type(ArmResourceManager.resource_type):
