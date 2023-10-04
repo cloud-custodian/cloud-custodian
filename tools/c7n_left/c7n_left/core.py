@@ -118,16 +118,16 @@ class ExecutionFilter:
         return len(self.filters)
 
     @classmethod
-    def parse(cls, options):
+    def parse(cls, filters_config):
         """cli option filtering support
 
         --filters "type=aws_sqs_queue,aws_rds_* policy=*encryption* severity=high"
         """
-        if not options.filters:
+        if not filters_config:
             return cls(defaultdict(list))
 
         filters = defaultdict(list)
-        for kv in options.filters.split(" "):
+        for kv in filters_config.split(" "):
             if "=" not in kv:
                 raise ValueError("key=value pair missing `=`")
             k, v = kv.split("=")
@@ -256,6 +256,10 @@ class CollectionRunner:
                 result_set = self.run_policy(p, graph, resources, event, rtype)
                 if result_set:
                     self.reporter.on_results(p, result_set)
+                if result_set and (
+                    not self.options.warn_filter
+                    or not self.options.warn_filter.filter_policies((p,))
+                ):
                     found = True
         self.reporter.on_execution_ended()
         return found
