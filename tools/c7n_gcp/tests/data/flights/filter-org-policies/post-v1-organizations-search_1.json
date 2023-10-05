@@ -1,0 +1,30 @@
+{
+    "headers": {
+      "content-type": "application/json; charset=UTF-8",
+      "vary": "Origin, X-Origin, Referer",
+      "date": "Tue, 16 May 2023 18:42:52 GMT",
+      "server": "ESF",
+      "cache-control": "private",
+      "x-xss-protection": "0",
+      "x-frame-options": "SAMEORIGIN",
+      "x-content-type-options": "nosniff",
+      "server-timing": "gfet4t7; dur=210",
+      "transfer-encoding": "chunked",
+      "status": "200",
+      "content-length": "287",
+      "-content-encoding": "gzip"
+    },
+    "body": {
+      "organizations": [
+        {
+          "displayName": "gcp.matter.mckinsey.cloud",
+          "owner": {
+            "directoryCustomerId": "C01sxxt1i"
+          },
+          "creationTime": "2021-11-23T17:36:36.820Z",
+          "lifecycleState": "ACTIVE",
+          "name": "organizations/870080179722"
+        }
+      ]
+    }
+  }

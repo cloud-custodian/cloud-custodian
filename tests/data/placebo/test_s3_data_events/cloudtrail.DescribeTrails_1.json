@@ -1,0 +1,49 @@
+{
+    "status_code": 200,
+    "data": {
+        "trailList": [
+            {
+                "Name": "aws-controltower-BaselineCloudTrail",
+                "S3BucketName": "aws-controltower-logs-644160558196-us-east-1",
+                "S3KeyPrefix": "o-1234567890",
+                "SnsTopicName": "arn:aws:sns:us-east-1:644160558196:aws-controltower-AllConfigNotifications",
+                "SnsTopicARN": "arn:aws:sns:us-east-1:644160558196:aws-controltower-AllConfigNotifications",
+                "IncludeGlobalServiceEvents": true,
+                "IsMultiRegionTrail": true,
+                "HomeRegion": "us-east-1",
+                "TrailARN": "arn:aws:cloudtrail:us-east-1:644160558196:trail/aws-controltower-BaselineCloudTrail",
+                "LogFileValidationEnabled": true,
+                "CloudWatchLogsLogGroupArn": "arn:aws:logs:us-east-1:644160558196:log-group:aws-controltower/CloudTrailLogs:*",
+                "CloudWatchLogsRoleArn": "arn:aws:iam::644160558196:role/aws-controltower-CloudWatchLogsRole",
+                "HasCustomEventSelectors": false,
+                "HasInsightSelectors": false,
+                "IsOrganizationTrail": false
+            },
+            {
+                "Name": "data-events",
+                "S3BucketName": "aws-cloudtrail-logs-644160558196-ead919ec",
+                "IncludeGlobalServiceEvents": true,
+                "IsMultiRegionTrail": true,
+                "HomeRegion": "us-east-1",
+                "TrailARN": "arn:aws:cloudtrail:us-east-1:644160558196:trail/data-events",
+                "LogFileValidationEnabled": true,
+                "HasCustomEventSelectors": true,
+                "HasInsightSelectors": false,
+                "IsOrganizationTrail": false
+            },
+            {
+                "Name": "org-trail",
+                "S3BucketName": "aws-cloudtrail-logs-123456789012-3f556314",
+                "IncludeGlobalServiceEvents": true,
+                "IsMultiRegionTrail": true,
+                "HomeRegion": "us-east-1",
+                "TrailARN": "arn:aws:cloudtrail:us-east-1:123456789012:trail/org-trail",
+                "LogFileValidationEnabled": true,
+                "HasCustomEventSelectors": true,
+                "HasInsightSelectors": false,
+                "IsOrganizationTrail": true
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

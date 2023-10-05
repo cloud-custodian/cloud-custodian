@@ -1,0 +1,43 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "google_kms_key_ring": {
+            "c7n": {
+                "id": "projects/cloud-custodian/locations/us-central1/keyRings/keyring-c7n",
+                "location": "us-central1",
+                "name": "keyring-c7n",
+                "project": "cloud-custodian"
+            }
+        },
+        "google_kms_crypto_key": {
+            "c7n": {
+                "destroy_scheduled_duration": "86400s",
+                "id": "projects/cloud-custodian/locations/us-central1/keyRings/keyring-c7n/cryptoKeys/keyname-careful-hen-c7n",
+                "import_only": false,
+                "key_ring": "projects/cloud-custodian/locations/us-central1/keyRings/keyring-c7n",
+                "labels": null,
+                "name": "keyname-careful-hen-c7n",
+                "purpose": "ENCRYPT_DECRYPT",
+                "rotation_period": "",
+                "skip_initial_version_creation": false,
+                "timeouts": null,
+                "version_template": [
+                    {
+                        "algorithm": "GOOGLE_SYMMETRIC_ENCRYPTION",
+                        "protection_level": "SOFTWARE"
+                    }
+                ]
+            }
+        },
+        "random_pet": {
+            "server": {
+                "id": "careful-hen",
+                "keepers": null,
+                "length": 2,
+                "prefix": null,
+                "separator": "-"
+            }
+        }
+    }
+}
