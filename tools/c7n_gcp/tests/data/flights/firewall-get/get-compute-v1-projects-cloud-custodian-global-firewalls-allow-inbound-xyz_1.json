@@ -34,6 +34,12 @@
     "allowed": [
       {
         "IPProtocol": "all"
+      },
+      {
+        "IPProtocol": "tcp",
+        "ports": [
+          "80", "21-25"
+        ]
       }
     ],
     "direction": "INGRESS",
