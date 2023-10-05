@@ -595,7 +595,6 @@ class TaskSGFilter(net_filters.SecurityGroupFilter):
 
     def _get_related_ids(self, resources):
         groups = dict()
-        group_ids = set()
         eni_ids = set()
 
         cexp = jmespath_compile(self.eni_expression)
@@ -615,7 +614,6 @@ class TaskSGFilter(net_filters.SecurityGroupFilter):
                     ids = cexp.search(r)
                     if ids:
                         groups[r["NetworkInterfaceId"]] = ids
-                        group_ids.update(ids)
                         self.ecs_group_cache = groups
 
         return groups
