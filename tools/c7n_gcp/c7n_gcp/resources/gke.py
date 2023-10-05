@@ -106,11 +106,6 @@ class EffectiveFirewall(ValueFilter):
     schema = type_schema('effective-firewall', rinherit=ValueFilter.schema)
     permissions = ('compute.instances.getEffectiveFirewalls',)
 
-    def get_resource_params(self, resource):
-        path_param_re = re.compile('.*?/projects/(.*?)/zones/(.*?)/clusters/.*')
-        project, zone = path_param_re.match(resource['selfLink']).groups()
-        return {'project': project, 'zone': zone, 'instance': resource["name"]}
-
     def process_resource(self, client, p, network):
         def get_port_ranges(ports):
             port_ranges = []
@@ -132,10 +127,6 @@ class EffectiveFirewall(ValueFilter):
                     firewall[action][protocol_index] = protocol
             firewalls[firewall_index] = firewall
         return super(EffectiveFirewall, self).process(firewalls, None)
-
-    def get_client(self, session, model):
-        return session.client(
-            model.service, model.version, model.component)
 
     def process(self, resources, event=None):
         session = local_session(self.manager.session_factory)
