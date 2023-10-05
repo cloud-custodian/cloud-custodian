@@ -1,17 +1,19 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import json
+import os
 from unittest.mock import Mock, patch
 
 import oci
 import pytest
 from c7n_oci import mu
+from c7n_oci.constants import COMPARTMENT_IDS
 from c7n_oci.policy import EventMode
+from c7n_oci.session import SessionFactory
 from oci_common import OciBaseTest
 from pytest_terraform import terraform
 
 from c7n.testing import C7N_FUNCTIONAL
-from c7n_oci.session import SessionFactory
 
 
 class TestMuOci(OciBaseTest):
@@ -258,3 +260,34 @@ class TestMuOci(OciBaseTest):
         er = mu.EventRule(session_factory())
         event_rules = er.list_event_rules(compartments[0], function_object_name)
         assert len(event_rules) == 0
+
+    def test_update_dynamic_group(self, test):
+        dynamic_groups = None
+        permission_mgr = None
+        oci_policy = None
+        try:
+            session_factory = test.oci_session_factory_for_repeated_api_calls()
+            session = session_factory()
+            tenancy_id = os.environ.get('OCI_TENANCY')
+            permission_mgr = mu.PermissionManager(session, tenancy_id)
+            compartments = os.environ.get(COMPARTMENT_IDS).split(",")
+            permission_mgr.add_permissions(compartments[0], "test.function")
+
+            # Calling again to add new function in dynamic group
+            permission_mgr.add_permissions(compartments[0], "abc.function")
+
+            dynamic_groups = permission_mgr.get_dynamic_groups(
+                tenancy_id, f"custodian-fn-{compartments[0]}"
+            )
+
+            assert dynamic_groups[0].name == f"custodian-fn-{compartments[0]}"
+            assert ("abc.function" in dynamic_groups[0].matching_rule) is True
+
+            oci_policy = permission_mgr.get_oci_policy(tenancy_id)
+            assert oci_policy[0].name == permission_mgr.oci_policy_name
+
+        finally:
+            if dynamic_groups and permission_mgr:
+                permission_mgr.delete_dynamic_group(dynamic_groups[0].id)
+            if permission_mgr and oci_policy:
+                permission_mgr.delete_oci_policy(oci_policy[0].id)

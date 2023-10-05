@@ -1,0 +1,268 @@
+interactions:
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: https://identity.us-ashburn-1.oci.oraclecloud.com/20160918/dynamicGroups?compartmentId=ocid1.tenancy.oc1..<unique_ID>&name=custodian-fn-ocid1.compartment.oc1..<unique_ID>
+  response:
+    body:
+      data: []
+    headers:
+      cache-control:
+      - no-cache, no-store, must-revalidate
+      content-encoding:
+      - gzip
+      content-type:
+      - application/json
+      opc-limit:
+      - '99'
+    status:
+      code: 200
+      message: OK
+- request:
+    body: mock_body
+    headers: {}
+    method: POST
+    uri: https://identity.us-ashburn-1.oci.oraclecloud.com/20160918/dynamicGroups
+  response:
+    body:
+      data:
+        compartmentId: ocid1.tenancy.oc1..<unique_ID>
+        definedTags:
+          Oracle-Tags:
+            CreatedBy: user@example.com
+            CreatedOn: '2023-10-04T12:36:42.093Z'
+        description: Dynamic group for custodian functions of                     compartment
+          ocid1.compartment.oc1..<unique_ID>
+        freeformTags:
+          SourceTool: Custodian
+        id: ocid1.dynamicgroup.oc1..<unique_ID>
+        lifecycleState: ACTIVE
+        matchingRule: Any{resource.id='test.function'}
+        name: custodian-fn-ocid1.compartment.oc1..<unique_ID>
+        timeCreated: '2023-10-04T12:36:42.163Z'
+    headers:
+      cache-control:
+      - no-cache, no-store, must-revalidate
+      content-type:
+      - application/json
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: https://identity.us-ashburn-1.oci.oraclecloud.com/20160918/policies?compartmentId=ocid1.tenancy.oc1..<unique_ID>&name=custodian-function-policy
+  response:
+    body:
+      data: []
+    headers:
+      cache-control:
+      - no-cache, no-store, must-revalidate
+      content-encoding:
+      - gzip
+      content-type:
+      - application/json
+      opc-limit:
+      - '99'
+    status:
+      code: 200
+      message: OK
+- request:
+    body: mock_body
+    headers: {}
+    method: POST
+    uri: https://identity.us-ashburn-1.oci.oraclecloud.com/20160918/policies
+  response:
+    body:
+      data:
+        compartmentId: ocid1.tenancy.oc1..<unique_ID>
+        definedTags:
+          Oracle-Tags:
+            CreatedBy: user@example.com
+            CreatedOn: '2023-10-04T12:36:44.668Z'
+        description: Custodian policy to allow function to access resources.                     It
+          is managed by custodian tool, Please DO NOT DELETE OR UPDATE.
+        freeformTags:
+          SourceTool: Custodian
+        id: ocid1.policy.oc1..<unique_ID>
+        lifecycleState: ACTIVE
+        name: custodian-function-policy
+        statements:
+        - allow dynamic-group custodian-fn-ocid1.compartment.oc1..<unique_ID>
+        timeCreated: '2023-10-04T12:36:44.682Z'
+    headers:
+      cache-control:
+      - no-cache, no-store, must-revalidate
+      content-type:
+      - application/json
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: https://identity.us-ashburn-1.oci.oraclecloud.com/20160918/dynamicGroups?compartmentId=ocid1.tenancy.oc1..<unique_ID>&name=custodian-fn-ocid1.compartment.oc1..<unique_ID>
+  response:
+    body:
+      data:
+      - compartmentId: ocid1.tenancy.oc1..<unique_ID>
+        definedTags:
+          Oracle-Tags:
+            CreatedBy: user@example.com
+            CreatedOn: '2023-10-04T12:36:42.093Z'
+        description: Dynamic group for custodian functions of                     compartment
+          ocid1.compartment.oc1..<unique_ID>
+        freeformTags:
+          SourceTool: Custodian
+        id: ocid1.dynamicgroup.oc1..<unique_ID>
+        lifecycleState: ACTIVE
+        matchingRule: Any{resource.id='test.function'}
+        name: custodian-fn-ocid1.compartment.oc1..<unique_ID>
+        timeCreated: '2023-10-04T12:36:42.163Z'
+    headers:
+      cache-control:
+      - no-cache, no-store, must-revalidate
+      content-encoding:
+      - gzip
+      content-type:
+      - application/json
+      opc-limit:
+      - '98'
+    status:
+      code: 200
+      message: OK
+- request:
+    body: mock_body
+    headers: {}
+    method: PUT
+    uri: https://identity.us-ashburn-1.oci.oraclecloud.com/20160918/dynamicGroups/ocid1.dynamicgroup.oc1..<unique_ID>
+  response:
+    body:
+      data:
+        compartmentId: ocid1.tenancy.oc1..<unique_ID>
+        definedTags:
+          Oracle-Tags:
+            CreatedBy: user@example.com
+            CreatedOn: '2023-10-04T12:36:42.093Z'
+        description: Dynamic group for custodian functions of                     compartment
+          ocid1.compartment.oc1..<unique_ID>
+        freeformTags:
+          SourceTool: Custodian
+        id: ocid1.dynamicgroup.oc1..<unique_ID>
+        lifecycleState: ACTIVE
+        matchingRule: Any{resource.id='test.function', resource.id='abc.function'}
+        name: custodian-fn-ocid1.compartment.oc1..<unique_ID>
+        timeCreated: '2023-10-04T12:36:42.163Z'
+    headers:
+      cache-control:
+      - no-cache, no-store, must-revalidate
+      content-type:
+      - application/json
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: https://identity.us-ashburn-1.oci.oraclecloud.com/20160918/dynamicGroups?compartmentId=ocid1.tenancy.oc1..<unique_ID>&name=custodian-fn-ocid1.compartment.oc1..<unique_ID>
+  response:
+    body:
+      data:
+      - compartmentId: ocid1.tenancy.oc1..<unique_ID>
+        definedTags:
+          Oracle-Tags:
+            CreatedBy: user@example.com
+            CreatedOn: '2023-10-04T12:36:42.093Z'
+        description: Dynamic group for custodian functions of                     compartment
+          ocid1.compartment.oc1..<unique_ID>
+        freeformTags:
+          SourceTool: Custodian
+        id: ocid1.dynamicgroup.oc1..<unique_ID>
+        lifecycleState: ACTIVE
+        matchingRule: Any{resource.id='test.function', resource.id='abc.function'}
+        name: custodian-fn-ocid1.compartment.oc1..<unique_ID>
+        timeCreated: '2023-10-04T12:36:42.163Z'
+    headers:
+      cache-control:
+      - no-cache, no-store, must-revalidate
+      content-encoding:
+      - gzip
+      content-type:
+      - application/json
+      opc-limit:
+      - '98'
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: https://identity.us-ashburn-1.oci.oraclecloud.com/20160918/policies?compartmentId=ocid1.tenancy.oc1..<unique_ID>&name=custodian-function-policy
+  response:
+    body:
+      data:
+      - compartmentId: ocid1.tenancy.oc1..<unique_ID>
+        definedTags:
+          Oracle-Tags:
+            CreatedBy: user@example.com
+            CreatedOn: '2023-10-04T12:36:44.668Z'
+        description: Custodian policy to allow function to access resources.                     It
+          is managed by custodian tool, Please DO NOT DELETE OR UPDATE.
+        freeformTags:
+          SourceTool: Custodian
+        id: ocid1.policy.oc1..<unique_ID>
+        lifecycleState: ACTIVE
+        name: custodian-function-policy
+        statements:
+        - allow dynamic-group custodian-fn-ocid1.compartment.oc1..<unique_ID>
+        timeCreated: '2023-10-04T12:36:44.682Z'
+    headers:
+      cache-control:
+      - no-cache, no-store, must-revalidate
+      content-encoding:
+      - gzip
+      content-type:
+      - application/json
+      opc-limit:
+      - '98'
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers: {}
+    method: DELETE
+    uri: https://identity.us-ashburn-1.oci.oraclecloud.com/20160918/dynamicGroups/ocid1.dynamicgroup.oc1..<unique_ID>
+  response:
+    body:
+      string: ''
+    headers:
+      cache-control:
+      - no-cache, no-store, must-revalidate
+      content-type:
+      - application/json
+    status:
+      code: 204
+      message: No Content
+- request:
+    body: null
+    headers: {}
+    method: DELETE
+    uri: https://identity.us-ashburn-1.oci.oraclecloud.com/20160918/policies/ocid1.policy.oc1..<unique_ID>
+  response:
+    body:
+      string: ''
+    headers:
+      cache-control:
+      - no-cache, no-store, must-revalidate
+      content-type:
+      - application/json
+    status:
+      code: 204
+      message: No Content
+version: 1

@@ -114,8 +114,7 @@ class PermissionManager:
 
     def add_permissions(self, compartment_id, fn_id):
         group_name = self.dynamic_group_name.format(compartment_id)
-        response = self.identity_client.list_dynamic_groups(self.tenancy_id, name=group_name)
-        group_data = response.data
+        group_data = self.get_dynamic_groups(self.tenancy_id, group_name)
         if is_resource_exists(group_data):
             # dynamic group for this compartment exits add new function in it.
             fn_ids = []
@@ -132,20 +131,26 @@ class PermissionManager:
             self._create_dynamic_group(compartment_id, group_name, matching_rule)
 
             # creation/updation of policy required for new dynamic group
-            res = self.identity_client.list_policies(self.tenancy_id, name=self.oci_policy_name)
-            policy_data = res.data
+            policy_data = self.get_oci_policy(self.tenancy_id)
             if is_resource_exists(policy_data):
                 compartments = []
                 statements = policy_data[0].statements
                 if statements:
                     compartments = self._get_compartments_from_statement(statements)
                     if compartment_id not in compartments:
-                        compartments.append(compartment_id)
-                        statements.extend(self._construct_statements(compartments))
+                        statements.extend(self._construct_statements([compartment_id]))
                         self.update_oci_policy(policy_data[0].id, statements)
             else:
                 statements = self._construct_statements([compartment_id])
                 self.create_oci_policy(statements)
+
+    def get_dynamic_groups(self, tenancy_id, group_name):
+        response = self.identity_client.list_dynamic_groups(tenancy_id, name=group_name)
+        return response.data
+
+    def get_oci_policy(self, tenancy_id):
+        response = self.identity_client.list_policies(tenancy_id, name=self.oci_policy_name)
+        return response.data
 
     def _get_compartments_from_statement(self, statements):
         return [
@@ -177,7 +182,7 @@ class PermissionManager:
                             log.exception(e)
                     else:
                         try:
-                            self._delete_dynamic_group(group_data[0].id)
+                            self.delete_dynamic_group(group_data[0].id)
                         except Exception as e:
                             log.error("Error occured while deleting dynamic group")
                             log.exception(e)
@@ -225,7 +230,7 @@ class PermissionManager:
         return resp.data.id
 
     def _update_dynamic_group(self, group_id, matching_rule):
-        log.debug("updating dynamic group: %s", str(group_id))
+        log.debug("Updating dynamic group: %s", str(group_id))
         resp = self.identity_client.update_dynamic_group(
             dynamic_group_id=group_id,
             update_dynamic_group_details=oci.identity.models.UpdateDynamicGroupDetails(
@@ -234,7 +239,7 @@ class PermissionManager:
         )
         return resp
 
-    def _delete_dynamic_group(self, group_id):
+    def delete_dynamic_group(self, group_id):
         self.identity_client.delete_dynamic_group(group_id)
 
     def _construct_matching_rule(self, fn_ids):
@@ -268,8 +273,8 @@ class PermissionManager:
     def _construct_statements(self, compartment_ids):
         return [
             (
-                f"allow dynamic-group {self.dynamic_group_name.format(compartment_id)} to \
-                    manage all-resources in compartment id {compartment_id}"
+                f"allow dynamic-group {self.dynamic_group_name.format(compartment_id)} to"
+                f" manage all-resources in compartment id {compartment_id}"
             )
             for compartment_id in compartment_ids
         ]

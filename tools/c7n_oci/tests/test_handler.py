@@ -12,6 +12,7 @@ import yaml
 from c7n_oci import handler
 from oci_common import OciBaseTest
 from pytest_terraform import terraform
+import pytest
 
 
 class TestHandler(OciBaseTest):
@@ -70,3 +71,53 @@ class TestHandler(OciBaseTest):
         resource = self._fetch_bucket_validation_data(session_factory, namespace_name, bucket_name)
         test.assertEqual(resource["name"], bucket_name)
         test.assertEqual(resource["freeform_tags"]["Source"], "Custodian-function")
+
+    def test_invalid_json_payload(self):
+        data = ''
+        data = data.encode('utf-8')
+        data = io.BytesIO(data)
+        ctx = types.SimpleNamespace()
+        ctx.Config = lambda: os.environ
+
+        with pytest.raises(ValueError) as error:
+            with patch.dict(os.environ):
+                handler.handler(ctx, data)
+
+        assert str(error.value) == "Expecting value: line 1 column 1 (char 0)"
+
+    def test_no_policy_found(self, caplog):
+        data = '{"eventType": "com.oraclecloud.objectstorage.createbucket",\
+                  "cloudEventsVersion": "0.1", "eventTypeVersion": "2.0", \
+                    "source": "ObjectStorage", "data": \
+                    {"compartmentId": "ocid1.compartment.oc1..<unique_ID>", \
+                        "resourceName": "test", "resourceId": "abc", \
+                            "availabilityDomain": "IAD-AD-2", "freeformTags": {}}}'
+        data = data.encode('utf-8')
+        data = io.BytesIO(data)
+        ctx = types.SimpleNamespace()
+        ctx.Config = lambda: os.environ
+        handler.handler(ctx, data)
+        logs = caplog.records
+        error_logs = [log for log in logs if log.levelname == "ERROR"]
+
+        assert error_logs[0].msg == 'No policy found in function configuration'
+
+    def test_invalid_policy_config(self, caplog):
+        data = '{"eventType": "com.oraclecloud.objectstorage.createbucket",\
+                  "cloudEventsVersion": "0.1", "eventTypeVersion": "2.0", \
+                    "source": "ObjectStorage", "data": \
+                    {"compartmentId": "ocid1.compartment.oc1..<unique_ID>", \
+                        "resourceName": "test", "resourceId": "abc", \
+                            "availabilityDomain": "IAD-AD-2", "freeformTags": {}}}'
+        data = data.encode('utf-8')
+        data = io.BytesIO(data)
+        ctx = types.SimpleNamespace()
+        ctx.Config = lambda: os.environ
+
+        with patch.dict(os.environ, {'policy': yaml.dump({"policies": []})}):
+            handler.handler(ctx, data)
+
+        logs = caplog.records
+        error_logs = [log for log in logs if log.levelname == "ERROR"]
+
+        assert error_logs[0].msg == 'Invalid policy config'
