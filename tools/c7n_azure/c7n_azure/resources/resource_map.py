@@ -48,6 +48,7 @@ ResourceMap = {
     "azure.logic-app-workflow": "c7n_azure.resources.logic_app.LogicAppWorkflow",
     "azure.mariadb": "c7n_azure.resources.mariadb.MariaDB",
     "azure.monitor-log-profile": "c7n_azure.resources.monitor_logprofile.MonitorLogprofile",
+    "azure.mariadb-server": "c7n_azure.resources.mariadb_server.MariaDBServer",
     "azure.mysql": "c7n_azure.resources.mysql.MySQL",
     "azure.mysql-flexibleserver": "c7n_azure.resources.mysql_flexibleserver.MySQLFlexibleServer",
     "azure.networkinterface": "c7n_azure.resources.network_interface.NetworkInterface",
