@@ -1,0 +1,125 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.EventHub/namespaces?api-version=2018-01-01-preview",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "server-sb": [
+                        "Service-Bus-Resource-Provider/CH3"
+                    ],
+                    "date": [
+                        "Wed, 07 Sep 2022 12:02:10 GMT"
+                    ],
+                    "x-ms-inline-count": [
+                        ""
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "content-length": [
+                        "642"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "sku": {
+                                    "name": "Standard",
+                                    "tier": "Standard",
+                                    "capacity": 1
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/VV/providers/Microsoft.EventHub/namespaces/vvehn1",
+                                "name": "vvehn1",
+                                "type": "Microsoft.EventHub/Namespaces",
+                                "location": "East US",
+                                "tags": {},
+                                "properties": {
+                                    "zoneRedundant": true,
+                                    "isAutoInflateEnabled": false,
+                                    "maximumThroughputUnits": 0,
+                                    "kafkaEnabled": true,
+                                    "provisioningState": "Succeeded",
+                                    "metricId": "ea42f556-5106-4743-99b0-c129bfa71a47:vvehn1",
+                                    "createdAt": "2022-09-07T08:27:30.663Z",
+                                    "updatedAt": "2022-09-07T08:28:21.93Z",
+                                    "serviceBusEndpoint": "https://vvehn1.servicebus.windows.net:443/",
+                                    "status": "Active"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/VV/providers/Microsoft.EventHub/namespaces/vvehn1/privateEndpointConnections?api-version=2018-01-01-preview",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "server-sb": [
+                        "Service-Bus-Resource-Provider/CH3"
+                    ],
+                    "date": [
+                        "Wed, 07 Sep 2022 12:02:10 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "content-length": [
+                        "645"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/VV/providers/Microsoft.EventHub/namespaces/vvehn1/privateEndpointConnections/0a8f805d-de1d-465c-9aa5-ea859cf4da26",
+                                "name": "0a8f805d-de1d-465c-9aa5-ea859cf4da26",
+                                "type": "Microsoft.EventHub/Namespaces/PrivateEndpointConnections",
+                                "location": "East US",
+                                "properties": {
+                                    "provisioningState": "Succeeded",
+                                    "privateEndpoint": {
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/VV/providers/Microsoft.Network/privateEndpoints/vvendpc1"
+                                    },
+                                    "privateLinkServiceConnectionState": {
+                                        "status": "Approved",
+                                        "description": "Auto-Approved"
+                                    },
+                                    "groupIds": [
+                                        "namespace"
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}

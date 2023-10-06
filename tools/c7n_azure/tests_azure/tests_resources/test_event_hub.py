@@ -129,3 +129,21 @@ class EventHubTest(BaseTest):
         }, validate=True)
         resources = p.run()
         self.assertEqual(0, len(resources))
+
+
+class PrivateEndpointConnectionsFilterTest(BaseTest):
+
+    def test_private_endpoint_connection_filter_query(self):
+        p = self.load_policy({
+            'name': 'private-endpoint-filter',
+            'resource': 'azure.eventhub',
+            'filters': [
+                {'type': 'private-endpoint-connections',
+                 'key': 'id',
+                 'value': '.+',
+                 'op': 'regex'}],
+        })
+        resources = p.run()
+
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['name'], 'vvehn1')

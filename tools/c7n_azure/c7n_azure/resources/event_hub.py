@@ -1,10 +1,12 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
-from c7n_azure.filters import FirewallRulesFilter
+from c7n_azure.filters import FirewallRulesFilter, ValueFilter
 from c7n_azure.provider import resources
 from c7n_azure.resources.arm import ArmResourceManager
 from netaddr import IPSet
+from c7n.filters import OPERATORS
+from c7n.utils import type_schema
 
 
 @resources.register('eventhub')
@@ -62,3 +64,27 @@ class EventHubFirewallRulesFilter(FirewallRulesFilter):
         resource_rules = IPSet([r.ip_mask for r in query.ip_rules])
 
         return resource_rules
+
+
+@EventHub.filter_registry.register('private-endpoint-connections')
+class PrivateEndpointConnectionsFilter(ValueFilter):
+    schema = type_schema('private-endpoint-connections', rinherit=ValueFilter.schema)
+
+    def process(self, resources, event=None):
+        self.client = self.manager.get_client()
+        accepted = []
+
+        for resource in resources:
+            for end in self.client.private_endpoint_connections.list(
+                    namespace_name=resource['name'],
+                    resource_group_name=resource['resourceGroup']):
+                for_check = end.private_endpoint
+                from_policy = getattr(for_check, self.data.get('key'))
+                if from_policy is not None and self._op(from_policy, self.data.get('value')):
+                    accepted.append(resource)
+                    break
+        return accepted
+
+    def _op(self, a, b):
+        op = OPERATORS[self.data.get('op')]
+        return op(a, b)
