@@ -25,6 +25,7 @@ from netaddr import IPNetwork, IPRange, IPSet
 
 from c7n_azure import constants
 
+AZURE_SERVICES_IP_RANGE = IPRange('0.0.0.0', '0.0.0.0')
 resource_group_regex = re.compile(r'/subscriptions/[^/]+/resourceGroups/[^/]+(/)?$',
                                   re.IGNORECASE)
 
@@ -646,3 +647,21 @@ def cost_query_override_api_version(request):
     request.http_request.url = request.http_request.url.replace(
         'query?api-version=2020-06-01',
         'query?api-version=2019-11-01')
+
+
+def filter_firewall_rules_by_azure_services(client, resource):
+    query = client.firewall_rules.list_by_server(
+        resource['resourceGroup'],
+        resource['name'])
+
+    resource_rules = IPSet()
+    has_azure_services_ip_range = False
+
+    for r in query:
+        rule = IPRange(r.start_ip_address, r.end_ip_address)
+        if rule == AZURE_SERVICES_IP_RANGE:
+            has_azure_services_ip_range = True
+            continue
+        resource_rules.add(rule)
+
+    return resource_rules, has_azure_services_ip_range
