@@ -485,3 +485,29 @@ class AccessApprovalFilter(ValueFilter):
                 raise ex
 
         return access_approval
+
+
+@Organization.filter_registry.register('iam-policy')
+class OrganizationIamPolicyFilter(IamPolicyFilter):
+    """
+    Overrides the base implementation to process Organization resources correctly.
+    """
+    permissions = ('resourcemanager.organizations.getIamPolicy',)
+
+    def _verb_arguments(self, resource):
+        verb_arguments = SetIamPolicy._verb_arguments(self, resource)
+        verb_arguments['body'] = {}
+        return verb_arguments
+
+
+@Folder.filter_registry.register('iam-policy')
+class FolderIamPolicyFilter(IamPolicyFilter):
+    """
+    Overrides the base implementation to process Folder resources correctly.
+    """
+    permissions = ('resourcemanager.folders.getIamPolicy',)
+
+    def _verb_arguments(self, resource):
+        verb_arguments = SetIamPolicy._verb_arguments(self, resource)
+        verb_arguments['body'] = {}
+        return verb_arguments
