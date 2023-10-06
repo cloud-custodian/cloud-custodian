@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import uuid
-
+import re
 from c7n_azure.provider import resources
 from c7n_azure.resources.arm import ArmResourceManager
 from c7n_azure.utils import StringUtils, PortsRangeHelper
