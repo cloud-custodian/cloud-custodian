@@ -3,7 +3,7 @@
 
 from c7n.filters import Filter, ValueFilter
 from c7n.filters.core import op
-from c7n.utils import type_schema, local_session
+from c7n.utils import type_schema, local_session, jmespath_search
 from c7n_azure.provider import resources
 from c7n_azure.resources.arm import ArmResourceManager
 
@@ -86,12 +86,7 @@ class WebApplicationFirewallPolicies(ValueFilter):
         client = s.client('azure.mgmt.frontdoor.FrontDoorManagementClient')
         for resource in resources:
             for policy in client.policies.list(resource_group_name=resource['resourceGroup']):
-                try:
-                    pol = getattr(policy, self.data.get('key'))
-                except Exception as e:
-                    if 'list index out of range' in str(e):
-                        continue
-                    raise
+                pol = jmespath_search(self.data.get('key'), policy.as_dict())  # azure.mgmt.frontdoor.models._models_py3.WebApplicationFirewallPolicy # noqa
                 if pol and op(self.data, pol, self.data.get('value')):
                     filtered_resources.append(resource)
                     break
