@@ -87,7 +87,7 @@ class WebApplicationFirewallPolicies(ValueFilter):
         for resource in resources:
             for policy in client.policies.list(resource_group_name=resource['resourceGroup']):
                 try:
-                    pol = eval('policy.{}'.format(self.data.get('key')))
+                    pol = getattr(policy, self.data.get('key'))
                 except Exception as e:
                     if 'list index out of range' in str(e):
                         continue
