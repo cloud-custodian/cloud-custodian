@@ -86,6 +86,7 @@ azure-mgmt-security = "^1.0.0"
 azure-mgmt-servicebus = "^8.2.0"
 azure-mgmt-appplatform = "^8.0.0"
 azure-mgmt-recoveryservices = "^2.4.0"
+azure-mgmt-machinelearningservices = "1.0.0"
 
 [tool.poetry.group.dev.dependencies]
 vcrpy-unittest = ">=0.1.7"
