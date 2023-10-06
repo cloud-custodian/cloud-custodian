@@ -1,10 +1,11 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
-from c7n_azure.resources.arm import ArmResourceManager
+from c7n.filters import Filter, ValueFilter
+from c7n.filters.core import op
+from c7n.utils import type_schema, local_session
 from c7n_azure.provider import resources
-from c7n.filters import Filter
-from c7n.utils import type_schema
+from c7n_azure.resources.arm import ArmResourceManager
 
 
 @resources.register('front-door')
@@ -72,3 +73,27 @@ class WebAppFirewallFilter(Filter):
                 if self.check_state(front_endpoint.web_application_firewall_policy_link):
                     matched.append(front_door)
         return matched
+
+
+@FrontDoor.filter_registry.register('web-application-firewall-policies')
+class WebApplicationFirewallPolicies(ValueFilter):
+
+    schema = type_schema('web-application-firewall-policies', rinherit=ValueFilter.schema)
+
+    def process(self, resources, event=None):
+        filtered_resources = []
+        s = local_session(self.manager.session_factory)
+        client = s.client('azure.mgmt.frontdoor.FrontDoorManagementClient')
+        for resource in resources:
+            for policy in client.policies.list(resource_group_name=resource['resourceGroup']):
+                try:
+                    pol = eval('policy.{}'.format(self.data.get('key')))
+                except Exception as e:
+                    if 'list index out of range' in str(e):
+                        continue
+                    raise
+                if pol and op(self.data, pol, self.data.get('value')):
+                    filtered_resources.append(resource)
+                    break
+
+        return filtered_resources

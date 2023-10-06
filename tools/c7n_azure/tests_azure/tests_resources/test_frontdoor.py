@@ -38,3 +38,26 @@ class FrontDoorTest(BaseTest):
         })
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
+
+class TestWebApplicationFirewallPolicies(BaseTest):
+
+    def test_query(self):
+        p = self.load_policy(
+            {
+                "name": "test-front-door-resource",
+                "resource": "azure.front-door",
+                "filters": [
+                    {
+                        "type": "web-application-firewall-policies",
+                        "key": "resource_state",
+                        "op": "eq",
+                        "value": "Enabled",
+                    }
+                ],
+            }
+        )
+        resources = p.run()
+
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['name'], 'vvtestfd2')
