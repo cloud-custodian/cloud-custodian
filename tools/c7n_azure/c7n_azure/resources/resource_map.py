@@ -32,6 +32,7 @@ ResourceMap = {
     "azure.disk": "c7n_azure.resources.disk.Disk",
     "azure.dnszone": "c7n_azure.resources.dns_zone.DnsZone",
     "azure.event-grid-domain": "c7n_azure.resources.event_grid_domain.EventGridDomain",
+    "azure.event-grid-topic": "c7n_azure.resources.event_grid_topic.EventGridTopic",
     "azure.eventhub": "c7n_azure.resources.event_hub.EventHub",
     "azure.eventsubscription": "c7n_azure.resources.event_subscription.EventSubscription",
     "azure.front-door": "c7n_azure.resources.front_door.FrontDoor",
