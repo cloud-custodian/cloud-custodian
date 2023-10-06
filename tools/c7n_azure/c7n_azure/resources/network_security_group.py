@@ -9,7 +9,7 @@ from c7n_azure.utils import StringUtils, PortsRangeHelper
 from azure.core.exceptions import AzureError
 
 from c7n.actions import BaseAction
-from c7n.filters import Filter, FilterValidationError, ValueFilter
+from c7n.filters import Filter, FilterValidationError
 from c7n.filters.core import PolicyValidationError, ValueFilter
 from c7n.utils import type_schema
 
