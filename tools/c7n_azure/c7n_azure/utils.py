@@ -25,7 +25,7 @@ from netaddr import IPNetwork, IPRange, IPSet
 
 from c7n_azure import constants
 
-AZURE_SERVICES_IP_RANGE = IPRange('0.0.0.0', '0.0.0.0')
+AZURE_SERVICES_IP_RANGE = IPRange('0.0.0.0', '0.0.0.0')  # nosec
 resource_group_regex = re.compile(r'/subscriptions/[^/]+/resourceGroups/[^/]+(/)?$',
                                   re.IGNORECASE)
 
