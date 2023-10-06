@@ -3,6 +3,9 @@
 
 from c7n_azure.provider import resources
 from c7n_azure.resources.arm import ArmResourceManager
+from c7n.filters import ValueFilter
+from c7n.utils import type_schema
+from c7n.filters.core import op
 
 
 @resources.register('redis')
@@ -42,3 +45,26 @@ class Redis(ArmResourceManager):
             'properties.sku.[name, family, capacity]'
         )
         resource_type = 'Microsoft.Cache/Redis'
+
+
+@Redis.filter_registry.register('redis-firewall-filter')
+class RedisFirewallFilter(ValueFilter):
+    schema = type_schema('redis-firewall-filter', rinherit=ValueFilter.schema)
+
+    def process(self, resources, event=None):
+        accepted = []
+        client = self.manager.get_client('azure.mgmt.redis.RedisManagementClient')
+        for resource in resources:
+            firewall_rules = list(
+                client.firewall_rules.list_by_redis_resource(
+                    cache_name=resource['name'],
+                    resource_group_name=resource['resourceGroup']))
+            any_of = []
+            for rule in firewall_rules:
+                key = getattr(rule, self.data.get('key'))
+                if key and op(self.data, key, self.data.get('value')):
+                    any_of.append(True)
+            if any(any_of):
+                accepted.append(resource)
+
+        return accepted

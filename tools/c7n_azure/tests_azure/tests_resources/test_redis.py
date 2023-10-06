@@ -29,3 +29,21 @@ class RedisTest(BaseTest):
         })
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
+
+class TestRedisFirewallFilter(BaseTest):
+
+    def test_redis_firewall_filter_query(self):
+        p = self.load_policy({
+            'name': 'redis-firewall-filter',
+            'resource': 'azure.redis',
+            'filters': [
+                {'type': 'redis-firewall-filter',
+                 'key': 'start_ip',
+                 'op': 'eq',
+                 'value': '1.2.3.4'}],
+        })
+        resources = p.run()
+
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['name'], '301-redis-green')
