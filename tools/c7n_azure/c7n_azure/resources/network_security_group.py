@@ -9,7 +9,7 @@ from c7n_azure.utils import StringUtils, PortsRangeHelper
 from azure.core.exceptions import AzureError
 
 from c7n.actions import BaseAction
-from c7n.filters import Filter, FilterValidationError
+from c7n.filters import Filter, FilterValidationError, ValueFilter
 from c7n.filters.core import PolicyValidationError, ValueFilter
 from c7n.utils import type_schema
 
@@ -321,6 +321,42 @@ class FlowLogs(ValueFilter):
             resource['properties'][key] = {'logs': self._get_flow_logs(resource)}
 
         return super().__call__(resource['properties'][key])
+
+
+@NetworkSecurityGroup.filter_registry.register('flow-analytics-logging')
+class FlowAnalyticsLoggingFilter(ValueFilter):
+
+    schema = type_schema(
+        'flow-analytics-logging', rinherit=ValueFilter.schema
+    )
+
+    def process(self, resources, event=None):
+        client = self.manager.get_client('azure.mgmt.network.NetworkManagementClient')
+        filtered_resources = []
+        logs = self.flow_logs_list(client)
+        key = self.data.get('key')
+        for resource in resources:
+            for log in logs:
+                is_enabled = log.flow_analytics_configuration.\
+                network_watcher_flow_analytics_configuration
+                if log.target_resource_id == resource['id'] and \
+                getattr(is_enabled, key) == self.data.get('value'):
+                    filtered_resources.append(resource)
+                    break
+        return filtered_resources
+
+    def flow_logs_list(self, client):
+        flow_logs = []
+        network_watcher_id_re = re.compile(
+            '.*?/resourceGroups/(.*?)/providers/Microsoft.Network/networkWatchers/(.*)')
+        network_watchers = client.network_watchers.list_all()
+        for network_watcher in network_watchers:
+            resource_group_name, watcher_name = network_watcher_id_re.match(
+                network_watcher.id).groups()
+            current_list = client.flow_logs.list(resource_group_name, watcher_name)
+            for flow_log in current_list:
+                flow_logs.append(flow_log)
+        return flow_logs
 
 
 class NetworkSecurityGroupPortsAction(BaseAction):
