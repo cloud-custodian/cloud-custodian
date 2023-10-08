@@ -5,6 +5,7 @@ import io
 import json
 import logging
 import os
+import tempfile
 import uuid
 
 import yaml
@@ -24,7 +25,7 @@ def handler(ctx, data: io.BytesIO = None):
     log.info("Starting Function execution")
     try:
         body = json.loads(data.getvalue())
-        log.debug(f"Recieved Body {str(body)}")
+        log.debug(f"Received Body {str(body)}")
     except (Exception, ValueError) as ex:
         log.error("Error parsing json payload: ")
         log.exception(ex)
@@ -74,7 +75,7 @@ def run(event, ctx):
 
 
 def get_tmp_output_dir():
-    output_dir = "/tmp/" + str(uuid.uuid4())  # nosec
+    output_dir = os.path.join(tempfile.gettempdir(), str(uuid.uuid4()))  # nosec
     if not os.path.exists(output_dir):
         try:
             os.mkdir(output_dir)

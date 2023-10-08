@@ -70,7 +70,16 @@ class FunctionImageHandler:
 
     def pull(self):
         log.debug("Pulling the image: %s", self.docker_hub_image_name)
-        self.docker_client.images.pull(self.docker_hub_image_name)
+        for line in self.docker_client.api.pull(
+            self.docker_hub_image_name, tag=self.tag, stream=True, decode=True
+        ):
+            if "status" in line:
+                log.debug("%s id:%s" % (line["status"], line.get("id", "n/a")))
+            elif "error" in line:
+                log.warning("Pull error %s" % (line,))
+                raise RuntimeError("Docker Pull Failed\n %s" % (line,))
+            else:
+                log.info("other %s" % (line,))
 
     def retag(self):
         log.debug("Tagging the image: %s:%s", self.ocir_repo_path, self.tag)
@@ -80,6 +89,16 @@ class FunctionImageHandler:
     def push(self):
         log.debug("Pushing the image: %s:%s", self.ocir_repo_path, self.tag)
         self.docker_client.images.push(repository=self.ocir_repo_path, tag=self.tag)
+        for line in self.docker_client.images.push(
+            repository=self.ocir_repo_path, tag=self.tag, stream=True, decode=True
+        ):
+            if "status" in line:
+                log.debug("%s id:%s" % (line["status"], line.get("id", "n/a")))
+            elif "error" in line:
+                log.warning("Push error %s" % (line,))
+                raise RuntimeError("Docker Push Failed\n %s" % (line,))
+            else:
+                log.info("other %s" % (line,))
 
     def get_image_digest(self, image_name):
         # Importing here to avoid docker dependency at oracle function runtime
@@ -388,6 +407,7 @@ class FunctionManager:
             'policy': policy_yaml_string,
             'execution-options': self.get_exec_options(func.policy.options),
             'OCI_CLI_AUTH': 'resource_principal',
+            'OCI_FUNCTION_POLICY_RUNNING': 'yes',
         }
 
     def has_func_changed(self, func, fn_id):

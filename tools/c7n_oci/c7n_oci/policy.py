@@ -116,13 +116,12 @@ class EventMode(FunctionMode):
 
     def validate(self):
         super().validate()
-        if not os.environ.get('OCI_AUTH_TOKEN') and not all(
-            os.environ.get(env)
-            for env in [
-                'OCI_RESOURCE_PRINCIPAL_RPST',
-                'OCI_RESOURCE_PRINCIPAL_PRIVATE_PEM',
-                'OCI_RESOURCE_PRINCIPAL_REGION',
-            ]
+        if os.environ.get('OCI_FUNCTION_POLICY_RUNNING') != 'yes':
+            self.check_docker()
+
+        if (
+            not os.environ.get('OCI_AUTH_TOKEN')
+            and os.environ.get('OCI_FUNCTION_POLICY_RUNNING') != 'yes'
         ):
             # https://docs.oracle.com/en-us/iaas/Content/Registry/Tasks/registrygettingauthtoken.htm
             raise PolicyValidationError(
@@ -137,6 +136,17 @@ It is required to log in to Oracle Cloud Infrastructure Registry."
             raise PolicyValidationError(
                 "Resource:%s does not implement retrieval method" % (self.policy.resource_type)
             )
+
+    def check_docker(self):
+        import docker
+
+        try:
+            client = docker.from_env()
+            client.version()
+            self.policy.log.debug("Docker is installed and running.")
+        except docker.errors.DockerException as e:
+            self.policy.log.error(e)
+            raise PolicyValidationError("Docker is not installed or not running.")
 
     def run(self, event, context):
         from c7n.actions import EventAction

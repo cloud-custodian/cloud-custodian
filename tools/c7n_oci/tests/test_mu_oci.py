@@ -69,8 +69,8 @@ class TestMuOci(OciBaseTest):
             resource = self._fetch_bucket_validation_data(
                 policy.resource_manager, namespace_name, bucket_name
             )
-            test.assertEqual(resource["name"], bucket_name)
-            test.assertEqual(resource["freeform_tags"]["Source"], "Custodian-function")
+            assert resource["name"] == bucket_name
+            assert resource["freeform_tags"]["Source"] == "Custodian-function"
 
         finally:
             event_mode = EventMode(policy)
@@ -80,35 +80,30 @@ class TestMuOci(OciBaseTest):
     @pytest.mark.skipif((C7N_FUNCTIONAL), reason="Non Functional test")
     @terraform("mu_resources", scope="function")
     def test_create_function_event_mode(self, test, mu_resources):
+        policy = None
         try:
             policy_name = "test-create-function-event-mode"
             function_object_name = f"custodian-{policy_name}"
             session_factory = test.oci_session_factory_for_repeated_api_calls()
             _, subnet_ocid = self._get_subnet_details(mu_resources)
-            policy = test.load_policy(
-                {
-                    "name": policy_name,
-                    "resource": "oci.bucket",
-                    "mode": {
-                        "type": "oci-event",
-                        "subnets": [subnet_ocid],
-                        "events": ["createbucket"],
-                    },
-                    "actions": [
-                        {"type": "update", "freeform_tags": {"Source": "Custodian-function"}}
-                    ],
-                },
-                session_factory=session_factory,
-            )
             mock = Mock()
             registry_mock_public = Mock()
             registry_mock_ocir = Mock()
             with patch('docker.from_env') as mock_from_env:
-                mock_docker_client = Mock(spec_set=['images', 'login'])
+                mock_docker_client = Mock(spec_set=['version', 'login', 'api', 'images'])
                 mock_from_env.return_value = mock_docker_client
+                mock_docker_client.version.return_value = mock
                 mock_docker_client.login.return_value = mock
-                mock_docker_client.images.pull.return_value = mock
-                mock_docker_client.images.push.return_value = mock
+                mock_docker_client.api.pull.return_value = [
+                    {"status": "Downloading", "id": "12345"},
+                    {"status": "Extracting", "id": "12345"},
+                    {"status": "Pull complete", "id": "12345"},
+                ]
+                mock_docker_client.images.push.return_value = [
+                    {"status": "Pushing", "id": "12345"},
+                    {"status": "Pushed", "id": "12345"},
+                    {"status": "Push complete", "id": "12345"},
+                ]
                 mock_docker_client.images.tag.return_value = mock
                 registry_mock_public.attrs = {"Descriptor": {"digest": "sha:abc"}}
                 registry_mock_ocir.attrs = {"Descriptor": {"digest": "sha:def"}}
@@ -116,7 +111,21 @@ class TestMuOci(OciBaseTest):
                     registry_mock_public,
                     registry_mock_ocir,
                 ]
-
+                policy = test.load_policy(
+                    {
+                        "name": policy_name,
+                        "resource": "oci.bucket",
+                        "mode": {
+                            "type": "oci-event",
+                            "subnets": [subnet_ocid],
+                            "events": ["createbucket"],
+                        },
+                        "actions": [
+                            {"type": "update", "freeform_tags": {"Source": "Custodian-function"}}
+                        ],
+                    },
+                    session_factory=session_factory,
+                )
                 policy.run()
 
             fm = mu.FunctionManager(session_factory)
@@ -129,45 +138,57 @@ class TestMuOci(OciBaseTest):
             event_rules = er.list_event_rules(compartments[0], function_object_name)
             assert len(event_rules) == 1
             assert event_rules[0].display_name == function_object_name
-
         finally:
-            event_mode = EventMode(policy)
-            event_mode.deprovision()
+            if policy:
+                event_mode = EventMode(policy)
+                event_mode.deprovision()
 
     @pytest.mark.skipif((C7N_FUNCTIONAL), reason="Non Functional test")
     @terraform("mu_resources", scope="function")
     def test_update_function_event_mode(self, test, mu_resources):
+        policy = None
         try:
             policy_name = "test-update-function-event-mode"
             function_object_name = f"custodian-{policy_name}"
             session_factory = test.oci_session_factory_for_repeated_api_calls()
             _, subnet_ocid = self._get_subnet_details(mu_resources)
-            policy = test.load_policy(
-                {
-                    "name": policy_name,
-                    "resource": "oci.bucket",
-                    "mode": {
-                        "type": "oci-event",
-                        "subnets": [subnet_ocid],
-                        "events": ["createbucket"],
-                    },
-                    "actions": [
-                        {"type": "update", "freeform_tags": {"Source": "Custodian-function"}}
-                    ],
-                },
-                session_factory=session_factory,
-            )
+
             mock = Mock()
             registry_mock = Mock()
             with patch('docker.from_env') as mock_from_env:
-                mock_docker_client = Mock(spec_set=['images', 'login'])
+                mock_docker_client = Mock(spec_set=['version', 'login', 'api', 'images'])
                 mock_from_env.return_value = mock_docker_client
+                mock_docker_client.version.return_value = mock
                 mock_docker_client.login.return_value = mock
-                mock_docker_client.images.pull.return_value = mock
-                mock_docker_client.images.push.return_value = mock
+                mock_docker_client.api.pull.return_value = [
+                    {"status": "Downloading", "id": "12345"},
+                    {"status": "Extracting", "id": "12345"},
+                    {"status": "Pull complete", "id": "12345"},
+                ]
+                mock_docker_client.images.push.return_value = [
+                    {"status": "Pushing", "id": "12345"},
+                    {"status": "Pushed", "id": "12345"},
+                    {"status": "Push complete", "id": "12345"},
+                ]
                 mock_docker_client.images.tag.return_value = mock
                 registry_mock.attrs = {"Descriptor": {"digest": "sha:test"}}
                 mock_docker_client.images.get_registry_data.return_value = registry_mock
+
+                policy = test.load_policy(
+                    {
+                        "name": policy_name,
+                        "resource": "oci.bucket",
+                        "mode": {
+                            "type": "oci-event",
+                            "subnets": [subnet_ocid],
+                            "events": ["createbucket"],
+                        },
+                        "actions": [
+                            {"type": "update", "freeform_tags": {"Source": "Custodian-function"}}
+                        ],
+                    },
+                    session_factory=session_factory,
+                )
 
                 policy.run()
 
@@ -208,8 +229,9 @@ class TestMuOci(OciBaseTest):
             assert len(json.loads(event_rules[0].condition)['eventType']) == 2
 
         finally:
-            event_mode = EventMode(policy)
-            event_mode.deprovision()
+            if policy:
+                event_mode = EventMode(policy)
+                event_mode.deprovision()
 
     @pytest.mark.skipif((C7N_FUNCTIONAL), reason="Non Functional test")
     @terraform("mu_resources", scope="function")
@@ -218,28 +240,24 @@ class TestMuOci(OciBaseTest):
         function_object_name = f"custodian-{policy_name}"
         session_factory = test.oci_session_factory_for_repeated_api_calls()
         _, subnet_ocid = self._get_subnet_details(mu_resources)
-        policy = test.load_policy(
-            {
-                "name": policy_name,
-                "resource": "oci.bucket",
-                "mode": {
-                    "type": "oci-event",
-                    "subnets": [subnet_ocid],
-                    "events": ["createbucket"],
-                },
-                "actions": [{"type": "update", "freeform_tags": {"Source": "Custodian-function"}}],
-            },
-            session_factory=session_factory,
-        )
         mock = Mock()
         registry_mock_public = Mock()
         registry_mock_ocir = Mock()
         with patch('docker.from_env') as mock_from_env:
-            mock_docker_client = Mock(spec_set=['images', 'login'])
+            mock_docker_client = Mock(spec_set=['version', 'login', 'api', 'images'])
             mock_from_env.return_value = mock_docker_client
+            mock_docker_client.version.return_value = mock
             mock_docker_client.login.return_value = mock
-            mock_docker_client.images.pull.return_value = mock
-            mock_docker_client.images.push.return_value = mock
+            mock_docker_client.api.pull.return_value = [
+                {"status": "Downloading", "id": "12345"},
+                {"status": "Extracting", "id": "12345"},
+                {"status": "Pull complete", "id": "12345"},
+            ]
+            mock_docker_client.images.push.return_value = [
+                {"status": "Pushing", "id": "12345"},
+                {"status": "Pushed", "id": "12345"},
+                {"status": "Push complete", "id": "12345"},
+            ]
             mock_docker_client.images.tag.return_value = mock
             registry_mock_public.attrs = {"Descriptor": {"digest": "sha:abc"}}
             registry_mock_ocir.attrs = {"Descriptor": {"digest": "sha:def"}}
@@ -247,6 +265,22 @@ class TestMuOci(OciBaseTest):
                 registry_mock_public,
                 registry_mock_ocir,
             ]
+
+            policy = test.load_policy(
+                {
+                    "name": policy_name,
+                    "resource": "oci.bucket",
+                    "mode": {
+                        "type": "oci-event",
+                        "subnets": [subnet_ocid],
+                        "events": ["createbucket"],
+                    },
+                    "actions": [
+                        {"type": "update", "freeform_tags": {"Source": "Custodian-function"}}
+                    ],
+                },
+                session_factory=session_factory,
+            )
 
             policy.run()
 

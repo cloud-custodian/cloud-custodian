@@ -5,14 +5,14 @@ import io
 import json
 import os
 import types
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 import oci
+import pytest
 import yaml
 from c7n_oci import handler
 from oci_common import OciBaseTest
 from pytest_terraform import terraform
-import pytest
 
 
 class TestHandler(OciBaseTest):
@@ -66,8 +66,14 @@ class TestHandler(OciBaseTest):
         data = io.BytesIO(data)
         ctx = types.SimpleNamespace()
         ctx.Config = lambda: os.environ
-        with patch.dict(os.environ, self._get_env_vars(test)):
-            handler.handler(ctx, data)
+        mock = Mock()
+        with patch('docker.from_env') as mock_from_env:
+            mock_docker_client = Mock(spec_set=['version', 'login'])
+            mock_from_env.return_value = mock_docker_client
+            mock_docker_client.version.return_value = mock
+            mock_docker_client.login.return_value = mock
+            with patch.dict(os.environ, self._get_env_vars(test)):
+                handler.handler(ctx, data)
         resource = self._fetch_bucket_validation_data(session_factory, namespace_name, bucket_name)
         test.assertEqual(resource["name"], bucket_name)
         test.assertEqual(resource["freeform_tags"]["Source"], "Custodian-function")
