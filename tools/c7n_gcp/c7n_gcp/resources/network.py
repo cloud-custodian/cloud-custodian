@@ -190,7 +190,6 @@ class Firewall(QueryResourceManager):
                     protocol['portRanges']=get_port_ranges(protocol['ports'])
                     r[action][protocol_index] = protocol
             resources[r_index] = r
-        self.log.debug(resources)
         return resources
 
 @Firewall.action_registry.register('delete')
