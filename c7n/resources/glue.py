@@ -211,7 +211,7 @@ class GlueJobToggleMetrics(BaseAction):
             del params['Timeout']
 
         if self.data.get('enabled'):
-            if not 'DefaultArguments' in params:
+            if 'DefaultArguments' not in params:
                 params['DefaultArguments'] = {}
             params["DefaultArguments"]["--enable-metrics"] = ""
         else:
