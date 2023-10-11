@@ -258,7 +258,7 @@ or Azure Storage accounts::
 Mailer and Notifications Deployment
 -----------------------------------
 
-For instructions on how to deploy the mailer for notifications, see :doc:`/tools/c7n-mailer`
+For instructions on how to deploy the mailer for notifications, see :doc:`/tools/c7n-mailer`.
 
 .. _multi_account_execution:
 

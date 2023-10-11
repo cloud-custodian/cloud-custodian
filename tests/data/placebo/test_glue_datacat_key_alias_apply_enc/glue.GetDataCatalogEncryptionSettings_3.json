@@ -1,0 +1,16 @@
+{
+    "status_code": 200,
+    "data": {
+        "DataCatalogEncryptionSettings": {
+            "EncryptionAtRest": {
+                "CatalogEncryptionMode": "SSE-KMS",
+                "SseAwsKmsKeyId": "arn:aws:kms:us-east-1:644160558196:key/7d9388c0-8c78-4acb-ad3c-b9d1764522b2"
+            },
+            "ConnectionPasswordEncryption": {
+                "ReturnConnectionPasswordEncrypted": true,
+                "AwsKmsKeyId": "alias/skunk/glue/encrypted"
+            }
+        },
+        "ResponseMetadata": {}
+    }
+}

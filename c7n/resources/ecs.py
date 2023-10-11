@@ -394,6 +394,28 @@ class SubnetFilter(net_filters.SubnetFilter):
         return list(subnet_ids)
 
 
+@Service.filter_registry.register('security-group')
+class SGFilter(net_filters.SecurityGroupFilter):
+
+    RelatedIdsExpression = ""
+    expressions = ('taskSets[].networkConfiguration.awsvpcConfiguration.securityGroups[]',
+                'deployments[].networkConfiguration.awsvpcConfiguration.securityGroups[]',
+                'networkConfiguration.awsvpcConfiguration.securityGroups[]')
+
+    def get_related_ids(self, resources):
+        sg_ids = set()
+        for exp in self.expressions:
+            cexp = jmespath_compile(exp)
+            for r in resources:
+                ids = cexp.search(r)
+                if ids:
+                    sg_ids.update(ids)
+        return list(sg_ids)
+
+
+@Service.filter_registry.register('network-location', net_filters.NetworkLocation)
+
+
 @Service.action_registry.register('modify')
 class UpdateService(BaseAction):
     """Action to update service
@@ -560,6 +582,56 @@ class Task(query.ChildResourceManager):
 class TaskSubnetFilter(net_filters.SubnetFilter):
 
     RelatedIdsExpression = "attachments[].details[?name == 'subnetId'].value[]"
+
+
+@Task.filter_registry.register('security-group')
+class TaskSGFilter(net_filters.SecurityGroupFilter):
+
+    ecs_group_cache = None
+
+    RelatedIdsExpression = ""
+    eni_expression = "attachments[].details[?name == 'networkInterfaceId'].value[]"
+    sg_expression = "Groups[].GroupId[]"
+
+    def _get_related_ids(self, resources):
+        groups = dict()
+        eni_ids = set()
+
+        cexp = jmespath_compile(self.eni_expression)
+        for r in resources:
+            ids = cexp.search(r)
+            if ids:
+                eni_ids.update(ids)
+
+        if eni_ids:
+            client = local_session(self.manager.session_factory).client('ec2')
+            response = client.describe_network_interfaces(
+                NetworkInterfaceIds=list(eni_ids)
+            )
+            if response["NetworkInterfaces"]:
+                cexp = jmespath_compile(self.sg_expression)
+                for r in response["NetworkInterfaces"]:
+                    ids = cexp.search(r)
+                    if ids:
+                        groups[r["NetworkInterfaceId"]] = ids
+                        self.ecs_group_cache = groups
+
+        return groups
+
+    def get_related_ids(self, resources):
+        if not self.ecs_group_cache:
+            self.ecs_group_cache = self._get_related_ids(resources)
+
+        group_ids = set()
+        cexp = jmespath_compile(self.eni_expression)
+        for r in resources:
+            ids = cexp.search(r)
+            for group_id in ids:
+                group_ids.update(self.ecs_group_cache.get(group_id, ()))
+        return list(group_ids)
+
+
+@Task.filter_registry.register('network-location', net_filters.NetworkLocation)
 
 
 @Task.filter_registry.register('task-definition')

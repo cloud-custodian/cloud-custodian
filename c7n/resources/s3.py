@@ -2564,6 +2564,11 @@ class RemoveBucketTag(RemoveTag):
 
 @filters.register('data-events')
 class DataEvents(Filter):
+    """Find buckets for which CloudTrail is logging data events.
+
+    Note that this filter only examines trails that are defined in the
+    current account.
+    """
 
     schema = type_schema('data-events', state={'enum': ['present', 'absent']})
     permissions = (
@@ -2595,8 +2600,12 @@ class DataEvents(Filter):
 
     def process(self, resources, event=None):
         trails = self.manager.get_resource_manager('cloudtrail').resources()
+        local_trails = self.filter_resources(
+            trails,
+            "split(':', TrailARN)[4]", (self.manager.account_id,)
+        )
         session = local_session(self.manager.session_factory)
-        event_buckets = self.get_event_buckets(session, trails)
+        event_buckets = self.get_event_buckets(session, local_trails)
         ops = {
             'present': lambda x: (
                 x['Name'] in event_buckets or '' in event_buckets),
@@ -2604,7 +2613,7 @@ class DataEvents(Filter):
                 lambda x: x['Name'] not in event_buckets and ''
                 not in event_buckets)}
 
-        op = ops[self.data['state']]
+        op = ops[self.data.get('state', 'present')]
         results = []
         for b in resources:
             if op(b):
@@ -3402,14 +3411,27 @@ class BucketEncryption(KMSKeyResolverMixin, Filter):
                 filters:
                   - type: bucket-encryption
                     state: False
+              - name: s3-bucket-test-bucket-key-enabled
+                resource: s3
+                region: us-east-1
+                filters:
+                  - type: bucket-encryption
+                    bucket_key_enabled: True
     """
     schema = type_schema('bucket-encryption',
                          state={'type': 'boolean'},
                          crypto={'type': 'string', 'enum': ['AES256', 'aws:kms']},
-                         key={'type': 'string'})
+                         key={'type': 'string'},
+                         bucket_key_enabled={'type': 'boolean'})
 
     permissions = ('s3:GetEncryptionConfiguration', 'kms:DescribeKey', 'kms:ListAliases')
     annotation_key = 'c7n:bucket-encryption'
+
+    def validate(self):
+        if self.data.get('bucket_key_enabled') is not None and self.data.get('key') is not None:
+            raise PolicyValidationError(
+                f'key and bucket_key_enabled attributes cannot both be set: {self.data}'
+            )
 
     def process(self, buckets, event=None):
         self.resolve_keys(buckets)
@@ -3445,6 +3467,13 @@ class BucketEncryption(KMSKeyResolverMixin, Filter):
         rules = be.get('ServerSideEncryptionConfiguration', {}).get('Rules', [])
         # default `state` to True as previous impl assumed state == True
         # to preserve backwards compatibility
+        if self.data.get('bucket_key_enabled'):
+            for rule in rules:
+                return self.filter_bucket_key_enabled(rule)
+        elif self.data.get('bucket_key_enabled') is False:
+            for rule in rules:
+                return not self.filter_bucket_key_enabled(rule)
+
         if self.data.get('state', True):
             for sse in rules:
                 return self.filter_bucket(b, sse)
@@ -3489,6 +3518,11 @@ class BucketEncryption(KMSKeyResolverMixin, Filter):
             # implies the AWS-managed key.
             key_ids = {key.get('Arn'), key.get('KeyId'), *key['Aliases']}
             return rule.get('KMSMasterKeyID', 'alias/aws/s3') in key_ids
+
+    def filter_bucket_key_enabled(self, rule) -> bool:
+        if not rule:
+            return False
+        return rule.get('BucketKeyEnabled')
 
 
 @actions.register('set-bucket-encryption')

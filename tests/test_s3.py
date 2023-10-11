@@ -3739,6 +3739,23 @@ class S3Test(BaseTest):
 
         assert mock_assumed_session.call_count == 1
 
+    def test_s3_data_events(self):
+        self.patch(s3.S3, "executor_factory", MainThreadExecutor)
+        self.patch(s3, "S3_AUGMENT_TABLE", [])
+        session_factory = self.replay_flight_data("test_s3_data_events")
+
+        p = self.load_policy(
+            {
+                "name": "s3-data-events",
+                "resource": "s3",
+                "filters": [{"type": "data-events"}],
+            },
+            session_factory=session_factory,
+        )
+
+        resources = p.run()
+        assert {bucket["Name"] for bucket in resources} == {"bucket-with-data-events"}
+
 
 class S3LifecycleTest(BaseTest):
 
@@ -4431,3 +4448,85 @@ class BucketReplication(BaseTest):
             resources = p.run()
             self.assertEqual(len(resources), 1)
             self.assertEqual(resources[0]['Name'],'custodian-replication-west')
+
+
+    def test_s3_bucket_key_enabled(self):
+        self.patch(s3.S3, "executor_factory", MainThreadExecutor)
+        self.patch(s3.BucketEncryption, "executor_factory", MainThreadExecutor)
+        self.patch(s3, "S3_AUGMENT_TABLE", [])
+        factory = self.replay_flight_data('test_s3_bucket_key_enabled')
+
+        p = self.load_policy(
+            {
+                'name': 'test-s3-bucket-key-enabled',
+                'resource': 'aws.s3',
+                'filters': [
+                    {
+                        'type': 'bucket-encryption',
+                        'bucket_key_enabled': True
+                    },
+                    {
+                        'type': 'value',
+                        'key': 'Name',
+                        'value': 'c7n-test-s3-bucket',
+                        'op': 'contains'
+                    }
+                ]
+            },
+            session_factory=factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+
+    def test_s3_bucket_key_disabled(self):
+        self.patch(s3.S3, "executor_factory", MainThreadExecutor)
+        self.patch(s3.BucketEncryption, "executor_factory", MainThreadExecutor)
+        self.patch(s3, "S3_AUGMENT_TABLE", [])
+        factory = self.replay_flight_data('test_s3_bucket_key_disabled')
+
+        p = self.load_policy(
+            {
+                'name': 'test-s3-bucket-key-disabled',
+                'resource': 'aws.s3',
+                'filters': [
+                    {
+                        'type': 'bucket-encryption',
+                        'bucket_key_enabled': False
+                    },
+                    {
+                        'type': 'value',
+                        'key': 'Name',
+                        'value': 'c7n-test-s3-bucket',
+                        'op': 'contains'
+                    }
+                ]
+            },
+            session_factory=factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+
+    def test_bucket_encryption_invalid(self):
+        self.assertRaises(
+            PolicyValidationError,
+            self.load_policy,
+            {
+                'name': 'test-s3-bucket-encryption-invalid',
+                'resource': 'aws.s3',
+                'filters': [
+                    {
+                        'type': 'bucket-encryption',
+                        'bucket_key_enabled': False,
+                        'key': 'alias/foobar'
+                    },
+                    {
+                        'type': 'value',
+                        'key': 'Name',
+                        'value': 'c7n-test-s3-bucket',
+                        'op': 'contains'
+                    }
+                ]
+            },
+        )

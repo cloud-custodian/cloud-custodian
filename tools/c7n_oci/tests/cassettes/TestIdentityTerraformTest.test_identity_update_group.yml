@@ -7,51 +7,11 @@ interactions:
   response:
     body:
       data:
-        capabilities:
-          canUseApiKeys: true
-          canUseAuthTokens: true
-          canUseConsolePassword: false
-          canUseCustomerSecretKeys: true
-          canUseDbCredentials: true
-          canUseOAuth2ClientCredentials: true
-          canUseSmtpCredentials: true
-        compartmentId: ocid1.tenancy.oc1..<unique_ID>
-        dbUserName: user@example.com
-        definedTags:
-          Oracle-Tags:
-            CreatedBy: Some
-          OracleInternalReserved:
-            Phonebook: '9800'
-        description: user@example.com
-        emailVerified: true
-        externalIdentifier: c5571b54909a443685e610af14bcf73b
-        freeformTags:
-          Contractor: 'True'
-          TagName: TagValue
-          key_old: 'true'
-          mfa_activated: 'false'
         id: ocid1.user.oc1..<unique_ID>
-        identityProviderId: ocid1.saml2idp.oc1..<unique_ID>
-        isMfaActivated: false
-        lifecycleState: ACTIVE
         name: user@example.com
-        timeCreated: '2022-07-15T08:25:13.055Z'
-        timeModified: '2023-06-21T09:20:37.521Z'
     headers:
-      cache-control:
-      - no-cache, no-store, must-revalidate
-      content-length:
-      - '1090'
       content-type:
       - application/json
-      date:
-      - Fri, 14 Jul 2023 05:33:03 GMT
-      etag:
-      - 31ff068d7314192e8d5de6e0397f28186f61005e
-      pragma:
-      - no-cache
-      x-content-type-options:
-      - nosniff
     status:
       code: 200
       message: OK
@@ -63,14 +23,6 @@ interactions:
   response:
     body:
       data:
-      - compartmentId: ocid1.tenancy.oc1..<unique_ID>
-        definedTags: {}
-        description: Administrators
-        freeformTags: {}
-        id: ocid1.group.oc1..<unique_ID>
-        lifecycleState: ACTIVE
-        name: Administrators
-        timeCreated: '2021-02-01T14:28:04.809Z'
       - compartmentId: ocid1.tenancy.oc1..<unique_ID>
         definedTags:
           Oracle-Tags:
@@ -86,57 +38,9 @@ interactions:
         lifecycleState: ACTIVE
         name: cloud-custodian-group-dev
         timeCreated: '2023-02-20T21:08:31.397Z'
-      - compartmentId: ocid1.tenancy.oc1..<unique_ID>
-        definedTags:
-          Oracle-Tags:
-            CreatedBy: user@example.com
-            CreatedOn: '2023-07-14T05:33:00.233Z'
-        description: Custodian Test
-        freeformTags:
-          Cloud_Custodian: Present
-        id: ocid1.group.oc1..<unique_ID>
-        lifecycleState: ACTIVE
-        name: Custodian-Dev-Group
-        timeCreated: '2023-07-14T05:33:00.468Z'
-      - compartmentId: ocid1.tenancy.oc1..<unique_ID>
-        definedTags:
-          Oracle-Tags:
-            CreatedBy: user@example.com
-            CreatedOn: '2022-11-16T05:29:56.925Z'
-        description: Users in this group have the ability to manage fleets.
-        freeformTags: {}
-        id: ocid1.group.oc1..<unique_ID>
-        lifecycleState: ACTIVE
-        name: FLEET_MANAGERS
-        timeCreated: '2022-11-16T05:29:56.990Z'
-      - compartmentId: ocid1.tenancy.oc1..<unique_ID>
-        definedTags:
-          Oracle-Tags:
-            CreatedBy: user@example.com
-            CreatedOn: '2023-07-04T05:57:45.555Z'
-        description: Function_users
-        freeformTags: {}
-        id: ocid1.group.oc1..<unique_ID>
-        lifecycleState: ACTIVE
-        name: Function_users
-        timeCreated: '2023-07-04T05:57:45.605Z'
     headers:
-      cache-control:
-      - no-cache, no-store, must-revalidate
-      content-encoding:
-      - gzip
-      content-length:
-      - '778'
       content-type:
       - application/json
-      date:
-      - Fri, 14 Jul 2023 05:33:04 GMT
-      opc-limit:
-      - '99'
-      pragma:
-      - no-cache
-      x-content-type-options:
-      - nosniff
     status:
       code: 200
       message: OK
@@ -162,20 +66,8 @@ interactions:
         name: Custodian-Dev-Group
         timeCreated: '2023-07-14T05:33:00.468Z'
     headers:
-      cache-control:
-      - no-cache, no-store, must-revalidate
-      content-length:
-      - '616'
       content-type:
       - application/json
-      date:
-      - Fri, 14 Jul 2023 05:33:32 GMT
-      etag:
-      - 7cf729a74b36d6ba5ea6fab3ab7c312d449fd126
-      pragma:
-      - no-cache
-      x-content-type-options:
-      - nosniff
     status:
       code: 200
       message: OK
@@ -201,20 +93,8 @@ interactions:
         name: Custodian-Dev-Group
         timeCreated: '2023-07-14T05:33:00.468Z'
     headers:
-      cache-control:
-      - no-cache, no-store, must-revalidate
-      content-length:
-      - '525'
       content-type:
       - application/json
-      date:
-      - Fri, 14 Jul 2023 05:33:33 GMT
-      etag:
-      - 7cf729a74b36d6ba5ea6fab3ab7c312d449fd126
-      pragma:
-      - no-cache
-      x-content-type-options:
-      - nosniff
     status:
       code: 200
       message: OK

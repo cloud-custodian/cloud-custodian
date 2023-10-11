@@ -40,6 +40,10 @@ pip-wheel-metadata/
 pyvenv.cfg
 junit
 /.vs
+
+# awscc data files are downloaded when doing a dev install / and packaged up in binary wheels.
+tools/c7n_awscc/c7n_awscc/data/*.json
+
 # these files get copied/generated during doc builds
 docs/source/overview\.rst
 docs/source/tools/*\.md

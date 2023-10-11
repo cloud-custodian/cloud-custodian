@@ -886,6 +886,32 @@ class TestSNS(BaseTest):
         self.assertEqual(resources[0]["TopicArn"],
         "arn:aws:sns:ap-northeast-2:644160558196:sns-test-has-statement")
 
+    def test_sns_metrics(self):
+        session_factory = self.replay_flight_data(
+            "test_sns_metrics"
+        )
+        p = self.load_policy(
+            {
+                "name": "test_sns_metrics",
+                "resource": "sns",
+                "filters": [
+                    {
+                        "type": "metrics",
+                        "name": "NumberOfMessagesPublished",
+                        "statistics": "Sum",
+                        "missing-value": 0,
+                        "days": 30,
+                        "value": 0,
+                        "op": "eq",
+                        "period": 2592000
+                    }
+                ],
+            },
+            session_factory=session_factory,
+            config={'region': 'us-east-1'}
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
 
 class TestSubscription(BaseTest):
 

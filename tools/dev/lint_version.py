@@ -1,8 +1,12 @@
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 """
 extract from poetry lock on a package version.
 
 used in ci to ensure we used locked tool versions, but
-also can install fast.
+also can install fast (sans poetry install)
+
+see Lint section of .github/workflows/ci.yaml for usage.
 """
 
 # only use stdlib

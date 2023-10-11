@@ -1,0 +1,37 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Mon, 02 Oct 2023 21:09:44 GMT",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "server-timing": "gfet4t7; dur=181",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "1511",
+    "-content-encoding": "gzip"
+  },
+  "body": {
+    "version": 1,
+    "etag": "BwYDhvAWOho=",
+    "bindings": [
+      {
+        "role": "roles/resourcemanager.folderAdmin",
+        "members": [
+          "user:abc@gmail.com"
+        ]
+      },
+      {
+        "role": "roles/admin",
+        "members": [
+          "serviceAccount:abc@testproject.iam.gserviceaccount.com",
+          "user:abc@gmail.com",
+          "abcdefg"
+        ]
+      }
+    ]
+  }
+}
