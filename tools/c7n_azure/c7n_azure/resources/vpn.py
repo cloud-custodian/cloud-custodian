@@ -61,7 +61,7 @@ class IPSecAlgorithmFilter(ValueFilter):
     :example:
 
     This filter will find all Virtual Network Gateways that are not
-      configured with a cryptygraphic algorithm.
+      configured with a cryptographic algorithm.
 
     .. code-block:: yaml
 
