@@ -1,0 +1,14 @@
+{
+    "status_code": 200,
+    "data": {
+        "collectionSummaries": [
+            {
+                "arn": "arn:aws:aoss:us-east-1:644160558196:collection/94ao1y89mx514mgi0xa9",
+                "id": "94ao1y89mx514mgi0xa9",
+                "name": "test",
+                "status": "ACTIVE"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

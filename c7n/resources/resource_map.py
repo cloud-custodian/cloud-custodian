@@ -166,6 +166,7 @@ ResourceMap = {
   "aws.nat-gateway": "c7n.resources.vpc.NATGateway",
   "aws.network-acl": "c7n.resources.vpc.NetworkAcl",
   "aws.network-addr": "c7n.resources.vpc.NetworkAddress",
+  "aws.opensearch-serverless": "c7n.resources.opensearch.OpensearchServerless",
   "aws.ops-item": "c7n.resources.ssm.OpsItem",
   "aws.opswork-cm": "c7n.resources.opsworks.OpsworksCM",
   "aws.opswork-stack": "c7n.resources.opsworks.OpsworkStack",
