@@ -34,8 +34,11 @@ class OpensearchServerless(QueryResourceManager):
 @OpensearchServerless.action_registry.register('tag')
 class TagOpensearchServerlessResource(Tag):
     """Create tags on an OpenSearch Serverless resource
+
     :example:
+
     .. code-block:: yaml
+
         policies:
             - name: tag-opensearch-serverless
               resource: opensearch-serverless
@@ -55,8 +58,11 @@ class TagOpensearchServerlessResource(Tag):
 @OpensearchServerless.action_registry.register('remove-tag')
 class RemoveTagOpensearchServerlessResource(RemoveTag):
     """Remove tags from an OpenSearch serverless resource
+
     :example:
+
     .. code-block:: yaml
+
         policies:
             - name: remove-tag-opensearch-serverless
               resource: opensearch-serverless
@@ -74,8 +80,11 @@ OpensearchServerless.filter_registry.register('marked-for-op', TagActionFilter)
 @OpensearchServerless.action_registry.register('mark-for-op')
 class MarkOpensearchServerlessForOp(TagDelayedAction):
     """Mark OpenSearch Serverless for deferred action
+
     :example:
+
     .. code-block:: yaml
+
         policies:
           - name: opensearch-serverless-invalid-tag-mark
             resource: opensearch-serverless
@@ -90,8 +99,11 @@ class MarkOpensearchServerlessForOp(TagDelayedAction):
 @OpensearchServerless.action_registry.register('delete')
 class DeleteOpensearchServerless(BaseAction):
     """Delete an OpenSearch Serverless
+
     :example:
+
     .. code-block:: yaml
+
         policies:
           - name: delete-opensearch-serverless
             resource: opensearch-serverless
