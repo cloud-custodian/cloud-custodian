@@ -73,6 +73,7 @@ ResourceMap = {
     "azure.service-fabric-cluster": "c7n_azure.resources.service_fabric.ServiceFabricCluster",
     "azure.service-fabric-cluster-managed": "c7n_azure.resources.service_fabric.ServiceFabricClusterManaged",  # noqa
     "azure.session-host": "c7n_azure.resources.session_host.SessionHost",
+    "azure.signalr": "c7n_azure.resources.signalr.Signalr",
     "azure.spring-app": "c7n_azure.resources.spring.SpringApp",
     "azure.spring-service-instance": "c7n_azure.resources.spring.SpringServiceInstance",
     "azure.sql-database": "c7n_azure.resources.sqldatabase.SqlDatabase",
