@@ -1,0 +1,115 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.DesktopVirtualization/hostPools?api-version=2022-09-09",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "x-rate-limit-remaining": [
+                        "9223372036854775807"
+                    ],
+                    "content-length": [
+                        "2205"
+                    ],
+                    "set-cookie": [
+                        "ARRAffinity=13514adcb661fb415d9a4f08c25768b8b45590d41b88541506b5f51c7387b0d6;Path=/;HttpOnly;Secure;Domain=rdarmprovider-g-us-r0.wvd.microsoft.com",
+                        "ARRAffinitySameSite=13514adcb661fb415d9a4f08c25768b8b45590d41b88541506b5f51c7387b0d6;Path=/;HttpOnly;SameSite=None;Secure;Domain=rdarmprovider-g-us-r0.wvd.microsoft.com"
+                    ],
+                    "x-rate-limit-reset": [
+                        "0"
+                    ],
+                    "x-rate-limit-limit": [
+                        "0"
+                    ],
+                    "x-ms-lamport-ts": [
+                        "4751862745"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-ms-correlation-id": [
+                        "50c62c18-c216-42b0-9c8f-2be93eafda5b"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-ms-opsarmpath64": [
+                        "L3N1YnNjcmlwdGlvbnMvMjMwMGNjNTUtOGQ3OS00N2U2LTk5ZTItMDI3ZDdjZjk5Mjk5"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 54A0A8E5FE4E4B0ABF7CBE9648383CD6 Ref B: CO6AA3150220011 Ref C: 2023-09-25T17:50:50Z"
+                    ],
+                    "date": [
+                        "Mon, 25 Sep 2023 17:50:50 GMT"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "identity": null,
+                                "name": "cctesthostpools",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/cb-test-access/providers/Microsoft.DesktopVirtualization/hostpools/cb-test-host-pool",
+                                "type": "Microsoft.DesktopVirtualization/hostpools",
+                                "location": "centralus",
+                                "tags": {
+                                    "c7n": "true",
+                                    "product_id": "13742"
+                                },
+                                "kind": null,
+                                "systemData": {
+                                    "createdBy": "test@testy.com",
+                                    "createdByType": "User",
+                                    "createdAt": "2023-09-25T17:35:49.63Z",
+                                    "lastModifiedBy": "test@testy.com",
+                                    "lastModifiedByType": "User",
+                                    "lastModifiedAt": "2023-09-25T17:35:49.63Z"
+                                },
+                                "properties": {
+                                    "agentUpdate": null,
+                                    "friendlyName": null,
+                                    "description": "Created through the Azure Virtual Desktop extension",
+                                    "hostPoolType": "Personal",
+                                    "personalDesktopAssignmentType": "Automatic",
+                                    "applicationGroupReferences": [
+                                        "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/rg-test-access/providers/Microsoft.DesktopVirtualization/applicationgroups/cctesthostpools-DAG"
+                                    ],
+                                    "appAttachPackageReferences": [],
+                                    "customRdpProperty": "drivestoredirect:s:*;audiomode:i:0;videoplaybackmode:i:1;redirectclipboard:i:1;redirectprinters:i:1;devicestoredirect:s:*;redirectcomports:i:1;redirectsmartcards:i:1;usbdevicestoredirect:s:*;enablecredsspsupport:i:1;redirectwebauthn:i:1;use multimon:i:1;",
+                                    "maxSessionLimit": 999999,
+                                    "loadBalancerType": "Persistent",
+                                    "validationEnvironment": false,
+                                    "ring": null,
+                                    "registrationInfo": null,
+                                    "vmTemplate": "{\"domain\":\"testy.com\",\"galleryImageOffer\":\"windows-10\",\"galleryImagePublisher\":\"microsoftwindowsdesktop\",\"galleryImageSKU\":\"win10-21h2-ent-g2\",\"imageType\":\"Gallery\",\"customImageId\":null,\"namePrefix\":\"cb-test1\",\"osDiskType\":\"StandardSSD_LRS\",\"vmSize\":{\"id\":\"Standard_D2s_v3\",\"cores\":2,\"ram\":8},\"galleryItemId\":\"microsoftwindowsdesktop.windows-10win10-21h2-ent-g2\",\"hibernate\":false,\"diskSizeGB\":0,\"securityType\":\"TrustedLaunch\",\"secureBoot\":true,\"vTPM\":true}",
+                                    "preferredAppGroupType": "Desktop",
+                                    "migrationRequest": null,
+                                    "cloudPcResource": false,
+                                    "startVMOnConnect": false,
+                                    "ssoadfsAuthority": null,
+                                    "ssoClientId": null,
+                                    "ssoClientSecretKeyVaultPath": null,
+                                    "ssoSecretType": null,
+                                    "objectId": "e44fa2ea-68f8-45f1-9475-a3f7fd88bb5f"
+                                }
+                            }
+                        ],
+                        "nextLink": null
+                    }
+                }
+            }
+        }
+    ]
+}
