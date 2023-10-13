@@ -243,8 +243,7 @@ class DefenderJitPolicies(DefenderResourceManager, metaclass=QueryMeta):
 
 @DefenderJitPolicies.filter_registry.register('defender-jit-policies-filter')
 class DefenderJitPoliciesFilter(ValueFilter):
-    """
-    Filters resources by just-in-time network access policy. It filters resource in
+    """Filters resources by just-in-time network access policy. It filters resource in
     security-jit-policies resource with jmespath and searches all incoming results by
     value filter schema
 
@@ -252,18 +251,19 @@ class DefenderJitPoliciesFilter(ValueFilter):
 
     .. code-block:: yaml
 
-    policies:
-      - name: test
-        resource: azure.defender-jit-policies
-        filters:
-          - type: defender-jit-policies-filter
-            key: properties.virtualMachines[].ports[].number
-            op: eq
-            value: 22
-          - type: value
-            key: properties.provisioningState
-            op: eq
-            value: Succeeded
+        policies:
+          - name: test
+            resource: azure.defender-jit-policies
+            filters:
+              - type: defender-jit-policies-filter
+                key: properties.virtualMachines[].ports[].number
+                op: eq
+                value: 22
+              - type: value
+                key: properties.provisioningState
+                op: eq
+                value: Succeeded
+
     """
     schema = type_schema(
         'defender-jit-policies-filter', rinherit=ValueFilter.schema)
