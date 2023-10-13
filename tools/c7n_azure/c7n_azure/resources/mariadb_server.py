@@ -21,7 +21,7 @@ class MariaDBServer(ArmResourceManager):
                   value: []
 
     **Warning: Azure MariaDB will be retired on 19 September 2025. Details: https://azure.microsoft.com/en-us/updates/azure-database-for-mariadb-will-be-retired-on-19-september-2025-migrate-to-azure-database-for-mysql-flexible-server/**
-    """
+    """  # noqa
     class resource_type(ArmResourceManager.resource_type):
         doc_groups = ['Databases']
 
