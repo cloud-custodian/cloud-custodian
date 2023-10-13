@@ -26,6 +26,8 @@ ResourceMap = {
     "azure.databricks": "c7n_azure.resources.databricks.Databricks",
     "azure.datafactory": "c7n_azure.resources.data_factory.DataFactory",
     "azure.datalake": "c7n_azure.resources.datalake_store.DataLakeStore",
+    "azure.defender-alert": "c7n_azure.resources.defender.DefenderAlertSettings",
+    "azure.defender-assessment": "c7n_azure.resources.defender.DefenderAssessment",
     "azure.defender-autoprovisioning": "c7n_azure.resources.defender.DefenderAutoProvisioningSetting",  # noqa
     "azure.defender-pricing": "c7n_azure.resources.defender.DefenderPricing",
     "azure.defender-setting": "c7n_azure.resources.defender.DefenderSetting",
@@ -87,6 +89,5 @@ ResourceMap = {
     "azure.vmss": "c7n_azure.resources.vmss.VMScaleSet",
     "azure.vnet": "c7n_azure.resources.vnet.Vnet",
     "azure.webapp": "c7n_azure.resources.web_app.WebApp",
-    "azure.defender-alert": "c7n_azure.resources.defender.DefenderAlertSettings",
     "azure.alert-logs": "c7n_azure.resources.alertlogs.AlertLogs"
 }

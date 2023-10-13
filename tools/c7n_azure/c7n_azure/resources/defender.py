@@ -1,11 +1,13 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+from collections.abc import Iterator
 
 from azure.mgmt.security import SecurityCenter
-
+from c7n_azure.session import Session
 from c7n.utils import local_session
 from c7n_azure.provider import resources
 from c7n_azure.query import QueryResourceManager, QueryMeta, TypeInfo
+from c7n.exceptions import PolicyExecutionError
 
 
 class DefenderResourceManager(QueryResourceManager):
@@ -165,3 +167,28 @@ class DefenderAlertSettings(DefenderResourceManager, metaclass=QueryMeta):
         filter_name = None
         service = "security"
         resource_type = "Microsoft.Security/alertNotifications"
+
+
+@resources.register("defender-assessment")
+class DefenderAssessment(DefenderResourceManager, metaclass=QueryMeta):
+    class resource_type(TypeInfo):
+        class SubscriptionIdIterator(Iterator):
+            def __next__(self):
+                if hasattr(self, 'returned'):
+                    raise StopIteration
+                setattr(self, 'returned', True)
+                subscription_id = local_session(Session).get_subscription_id()
+                if not subscription_id:
+                    raise PolicyExecutionError(
+                        "Unknown subscription, try setting AZURE_SUBSCRIPTION_ID")
+                return 'scope', f'/subscriptions/{subscription_id}'
+
+        doc_groups = ['Security']
+
+        id = "id"
+        name = "name"
+        service = "security"
+        client = "securityContacts"
+        enum_spec = ('assessments', 'list', SubscriptionIdIterator())
+        resource_type = 'Microsoft.Security/assessments'
+        default_report_fields = ["id", "name"]
