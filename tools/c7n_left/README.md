@@ -50,6 +50,8 @@ Options:
   --format TEXT
   --filters TEXT                  Filter policies or resources as k=v pairs
                                   with globbing
+  --warn-on TEXT                  Select policies to log instead of fail on
+                                  via k=v pairs with globbing								  
   -p, --policy-dir PATH           Directory with policies
   -d, --directory PATH            IaC directory to evaluate
   -o, --output [cli|github|json]  Output format (default cli)
@@ -160,12 +162,29 @@ policies:
 
 ## Outputs
 
-if your using this in github actions, we have special output mode
-for reporting annotations directly into pull requests with `--output github`
+if your using this in github actions, we have special output mode for
+reporting annotations directly into pull requests with `--output
+github`
 
-We also display a summary output after displaying resource matches, there are
-two summary displays available, the default policy summary, and a resource summary
-which can be enabled via `--summary resource`.
+We also display a summary output after displaying resource matches,
+there are two summary displays available, the default policy summary,
+and a resource summary which can be enabled via `--summary resource`.
+
+By default any policy matches cause a run to exit code 1 to mark failure,
+this behavior can be controlled via the `--warn-on` cli flag. ie. given a policy
+with
+
+```yaml
+policies:
+  - name: check-encryption
+    resource: [terraform.aws_ebs_volume, terraform.aws_sqs_queue]
+    metadata:
+      category: [beta, security]
+      severity: high
+```
+
+running the policy with `--warn-on category=beta` will cause matches to be logged only instead
+of causing an exit code 1.
 
 
 ## Policy Language

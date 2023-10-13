@@ -1,0 +1,67 @@
+{
+    "status_code": 200,
+    "data": {
+        "NetworkInterfaces": [
+            {
+                "Association": {
+                    "IpOwnerId": "amazon",
+                    "PublicDnsName": "ec2-23-20-122-250.compute-1.amazonaws.com",
+                    "PublicIp": "23.20.122.250"
+                },
+                "Attachment": {
+                    "AttachTime": {
+                        "__class__": "datetime",
+                        "year": 2023,
+                        "month": 8,
+                        "day": 31,
+                        "hour": 18,
+                        "minute": 27,
+                        "second": 3,
+                        "microsecond": 0
+                    },
+                    "AttachmentId": "eni-attach-0a3eb8382fd97d8b5",
+                    "DeleteOnTermination": false,
+                    "DeviceIndex": 1,
+                    "NetworkCardIndex": 0,
+                    "InstanceOwnerId": "644160558196",
+                    "Status": "attached"
+                },
+                "AvailabilityZone": "us-east-1b",
+                "Description": "arn:aws:ecs:us-east-1:644160558196:attachment/c8773f8d-1317-457a-ba3c-b57775ac6a04",
+                "Groups": [
+                    {
+                        "GroupName": "EC2ContainerService-c7n-test-cluster-EcsSecurityGroup-GEHYCBY16V7V",
+                        "GroupId": "sg-045f7d0c2467c3bfb"
+                    }
+                ],
+                "InterfaceType": "interface",
+                "Ipv6Addresses": [],
+                "MacAddress": "0e:46:2e:26:86:81",
+                "NetworkInterfaceId": "eni-0a303493893652ca1",
+                "OwnerId": "644160558196",
+                "PrivateDnsName": "ip-10-0-1-232.ec2.internal",
+                "PrivateIpAddress": "10.0.1.232",
+                "PrivateIpAddresses": [
+                    {
+                        "Association": {
+                            "IpOwnerId": "amazon",
+                            "PublicDnsName": "ec2-23-20-122-250.compute-1.amazonaws.com",
+                            "PublicIp": "23.20.122.250"
+                        },
+                        "Primary": true,
+                        "PrivateDnsName": "ip-10-0-1-232.ec2.internal",
+                        "PrivateIpAddress": "10.0.1.232"
+                    }
+                ],
+                "RequesterId": "644160558196",
+                "RequesterManaged": true,
+                "SourceDestCheck": true,
+                "Status": "in-use",
+                "SubnetId": "subnet-0797208b821c08196",
+                "TagSet": [],
+                "VpcId": "vpc-0503a8b9ddbb3a5c5"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

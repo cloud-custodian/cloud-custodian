@@ -1,0 +1,69 @@
+{
+    "status_code": 200,
+    "data": {
+        "SecurityGroups": [
+            {
+                "Description": "ECS Allowed Ports",
+                "GroupName": "EC2ContainerService-c7n-test-cluster-EcsSecurityGroup-GEHYCBY16V7V",
+                "IpPermissions": [
+                    {
+                        "FromPort": 80,
+                        "IpProtocol": "tcp",
+                        "IpRanges": [
+                            {
+                                "CidrIp": "0.0.0.0/0"
+                            }
+                        ],
+                        "Ipv6Ranges": [],
+                        "PrefixListIds": [],
+                        "ToPort": 80,
+                        "UserIdGroupPairs": []
+                    }
+                ],
+                "OwnerId": "644160558196",
+                "GroupId": "sg-045f7d0c2467c3bfb",
+                "IpPermissionsEgress": [
+                    {
+                        "IpProtocol": "-1",
+                        "IpRanges": [
+                            {
+                                "CidrIp": "0.0.0.0/0"
+                            }
+                        ],
+                        "Ipv6Ranges": [],
+                        "PrefixListIds": [],
+                        "UserIdGroupPairs": []
+                    }
+                ],
+                "Tags": [
+                    {
+                        "Key": "aws:cloudformation:stack-name",
+                        "Value": "EC2ContainerService-c7n-test-cluster"
+                    },
+                    {
+                        "Key": "aws:cloudformation:logical-id",
+                        "Value": "EcsSecurityGroup"
+                    },
+                    {
+                        "Key": "aws:cloudformation:stack-id",
+                        "Value": "arn:aws:cloudformation:us-east-1:644160558196:stack/EC2ContainerService-c7n-test-cluster/0c488df0-4827-11ee-8f0c-12a58b5c38f1"
+                    },
+                    {
+                        "Key": "Description",
+                        "Value": "Created for ECS cluster c7n-test-cluster"
+                    },
+                    {
+                        "Key": "NetworkLocation",
+                        "Value": "Customer"
+                    },
+                    {
+                        "Key": "Name",
+                        "Value": "ECS c7n-test-cluster - ECS SecurityGroup"
+                    }
+                ],
+                "VpcId": "vpc-0503a8b9ddbb3a5c5"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
