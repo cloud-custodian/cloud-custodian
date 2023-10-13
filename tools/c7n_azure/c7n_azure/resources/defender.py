@@ -2,9 +2,12 @@
 # SPDX-License-Identifier: Apache-2.0
 from collections.abc import Iterator
 
+import jmespath
 from azure.mgmt.security import SecurityCenter
 from c7n_azure.session import Session
-from c7n.utils import local_session
+from c7n.utils import type_schema, local_session
+from c7n.filters import ValueFilter
+from c7n.filters.core import OPERATORS
 from c7n_azure.provider import resources
 from c7n_azure.query import QueryResourceManager, QueryMeta, TypeInfo
 from c7n.exceptions import PolicyExecutionError
@@ -174,22 +177,22 @@ class DefenderAssessment(DefenderResourceManager, metaclass=QueryMeta):
     class resource_type(TypeInfo):
         class SubscriptionIdIterator(Iterator):
             def __next__(self):
-                if hasattr(self, 'returned'):
+                if hasattr(self, "returned"):
                     raise StopIteration
-                setattr(self, 'returned', True)
+                setattr(self, "returned", True)
                 subscription_id = local_session(Session).get_subscription_id()
                 if not subscription_id:
                     raise PolicyExecutionError(
                         "Unknown subscription, try setting AZURE_SUBSCRIPTION_ID")
-                return 'scope', f'/subscriptions/{subscription_id}'
+                return "scope", f"/subscriptions/{subscription_id}"
 
-        doc_groups = ['Security']
+        doc_groups = ["Security"]
 
         id = "id"
         name = "name"
         service = "security"
         client = "SecurityCenter"
-        enum_spec = ('assessments', 'list', SubscriptionIdIterator())
+        enum_spec = ("assessments", "list", SubscriptionIdIterator())
         resource_type = 'Microsoft.Security/assessments'
         default_report_fields = ["id", "name"]
 
@@ -197,12 +200,48 @@ class DefenderAssessment(DefenderResourceManager, metaclass=QueryMeta):
 @resources.register("defender-contacts")
 class DefenderSecurityContacts(DefenderResourceManager, metaclass=QueryMeta):
     class resource_type(TypeInfo):
-        doc_groups = ['Security']
+        doc_groups = ["Security"]
 
         id = "id"
         name = "name"
         service = "security"
-        client = 'SecurityCenter'
-        enum_spec = ('security_contacts', 'list', None)
-        resource_type = 'Microsoft.Security/securityContacts'
+        client = "SecurityCenter"
+        enum_spec = ("security_contacts", "list", None)
+        resource_type = "Microsoft.Security/securityContacts"
         default_report_fields = ["id", "name"]
+
+
+@resources.register("defender-jit-policies")
+class DefenderJitPolicies(DefenderResourceManager, metaclass=QueryMeta):
+    class resource_type(TypeInfo):
+        doc_groups = ["Security"]
+
+        service = "security"
+        client = "SecurityCenter"
+        enum_spec = ("jit_network_access_policies", "list", None)
+        resource_type = "Microsoft.Security/jitNetworkAccessPolicies"
+        default_report_fields = ["id", "name"]
+
+
+@DefenderJitPolicies.filter_registry.register('defender-jit-policies-filter')
+class DefenderJitPoliciesFilter(ValueFilter):
+    schema = type_schema(
+        'defender-jit-policies-filter', rinherit=ValueFilter.schema)
+
+    def _perform_op(self, a, b):
+        op = OPERATORS[self.data.get('op', 'eq')]
+        return op(a, b)
+
+    def process(self, resources, event=None):
+        self.value = self.data['value']
+        return list(filter(self._is_valid_resource, resources))
+
+    def _is_valid_resource(self, resource):
+        jmespath_key = jmespath.search(self.data['key'], resource)
+        if jmespath_key and not isinstance(jmespath_key, list):
+            jmespath_key = [jmespath_key]
+        for data in jmespath_key:
+            if self._perform_op(data, self.value):
+                return True
+
+        return False

@@ -75,3 +75,32 @@ class DefenderTest(BaseTest):
             'resource': 'azure.defender-contacts',
         }, validate=True)
         self.assertTrue(p)
+
+    def test_azure_defender_jit_policies_query(self):
+        p = self.load_policy({
+            'name': 'test-security-jit-policies',
+            'resource': 'azure.defender-jit-policies',
+        })
+        resources = p.run()
+
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['name'], 'VVvm1')
+
+    def test_azure_defender_jit_policies_filter(self):
+        p = self.load_policy({
+            'name': 'test-security-jit-policies-filter',
+            'resource': 'azure.defender-jit-policies',
+            'filters': [{
+                'type': 'defender-jit-policies-filter',
+                'key': 'properties.virtualMachines[].ports[].number',
+                'op': 'eq',
+                'value': 22
+            }, {
+                'type': 'defender-jit-policies-filter',
+                'key': 'properties.virtualMachines[].id',
+                'op': 'regex',
+                'value': r'\/.+\/virtualMachines\/.+'}]})
+        resources = p.run()
+
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['name'], 'VVvm1')
