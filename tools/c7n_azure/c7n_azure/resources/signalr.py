@@ -22,7 +22,7 @@ class Signalr(ArmResourceManager):
                     value: Approved
                     op: contains
 
-    """
+    """  # noqa
     class resource_type(ArmResourceManager.resource_type):
         doc_groups = ['Networking']
         service = 'azure.mgmt.signalr'
