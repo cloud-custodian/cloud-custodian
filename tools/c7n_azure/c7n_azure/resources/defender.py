@@ -199,6 +199,24 @@ class DefenderAssessment(DefenderResourceManager, metaclass=QueryMeta):
 
 @resources.register("defender-contacts")
 class DefenderSecurityContacts(DefenderResourceManager, metaclass=QueryMeta):
+    """Security Contacts Resource
+
+    :example:
+
+    Finds security contacts with emails
+
+    .. code-block:: yaml
+
+        policies:
+          - name: test-security-contacts
+            resource: azure.defender-contacts
+            filters:
+              - type: value
+                key: properties.email
+                value: null
+                op: ne
+
+    """
     class resource_type(TypeInfo):
         doc_groups = ["Security"]
 
@@ -225,6 +243,28 @@ class DefenderJitPolicies(DefenderResourceManager, metaclass=QueryMeta):
 
 @DefenderJitPolicies.filter_registry.register('defender-jit-policies-filter')
 class DefenderJitPoliciesFilter(ValueFilter):
+    """
+    Filters resources by just-in-time network access policy. It filters resource in
+    security-jit-policies resource with jmespath and searches all incoming results by
+    value filter schema
+
+    :example:
+
+    .. code-block:: yaml
+
+    policies:
+      - name: test
+        resource: azure.defender-jit-policies
+        filters:
+          - type: defender-jit-policies-filter
+            key: properties.virtualMachines[].ports[].number
+            op: eq
+            value: 22
+          - type: value
+            key: properties.provisioningState
+            op: eq
+            value: Succeeded
+    """
     schema = type_schema(
         'defender-jit-policies-filter', rinherit=ValueFilter.schema)
 
