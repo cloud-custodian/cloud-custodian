@@ -29,6 +29,7 @@ ResourceMap = {
     "azure.defender-alert": "c7n_azure.resources.defender.DefenderAlertSettings",
     "azure.defender-assessment": "c7n_azure.resources.defender.DefenderAssessment",
     "azure.defender-autoprovisioning": "c7n_azure.resources.defender.DefenderAutoProvisioningSetting",  # noqa
+    "azure.defender-contacts": "c7n_azure.resources.defender.DefenderSecurityContacts",
     "azure.defender-pricing": "c7n_azure.resources.defender.DefenderPricing",
     "azure.defender-setting": "c7n_azure.resources.defender.DefenderSetting",
     "azure.disk": "c7n_azure.resources.disk.Disk",

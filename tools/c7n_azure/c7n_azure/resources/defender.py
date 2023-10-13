@@ -188,7 +188,21 @@ class DefenderAssessment(DefenderResourceManager, metaclass=QueryMeta):
         id = "id"
         name = "name"
         service = "security"
-        client = "securityContacts"
+        client = "SecurityCenter"
         enum_spec = ('assessments', 'list', SubscriptionIdIterator())
         resource_type = 'Microsoft.Security/assessments'
+        default_report_fields = ["id", "name"]
+
+
+@resources.register("defender-contacts")
+class DefenderSecurityContacts(DefenderResourceManager, metaclass=QueryMeta):
+    class resource_type(TypeInfo):
+        doc_groups = ['Security']
+
+        id = "id"
+        name = "name"
+        service = "security"
+        client = 'SecurityCenter'
+        enum_spec = ('security_contacts', 'list', None)
+        resource_type = 'Microsoft.Security/securityContacts'
         default_report_fields = ["id", "name"]
