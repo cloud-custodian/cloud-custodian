@@ -1,0 +1,350 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.DesktopVirtualization/hostPools?api-version=2022-09-09",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "date": [
+                        "Tue, 26 Sep 2023 16:49:49 GMT"
+                    ],
+                    "x-ms-correlation-id": [
+                        "19558d64-0cdb-4b2d-bcab-a78d0901f40c"
+                    ],
+                    "x-rate-limit-limit": [
+                        "0"
+                    ],
+                    "set-cookie": [
+                        "ARRAffinity=faf4dec0e866a78a704d6f50882bec16fc24fe887063009bbdffd2526cac326f;Path=/;HttpOnly;Secure;Domain=rdarmprovider-g-us-r0.wvd.microsoft.com",
+                        "ARRAffinitySameSite=faf4dec0e866a78a704d6f50882bec16fc24fe887063009bbdffd2526cac326f;Path=/;HttpOnly;SameSite=None;Secure;Domain=rdarmprovider-g-us-r0.wvd.microsoft.com"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-length": [
+                        "1753"
+                    ],
+                    "x-ms-opsarmpath64": [
+                        "L3N1YnNjcmlwdGlvbnMvMjMwMGNjNTUtOGQ3OS00N2U2LTk5ZTItMDI3ZDdjZjk5Mjk5"
+                    ],
+                    "x-rate-limit-reset": [
+                        "0"
+                    ],
+                    "x-ms-lamport-ts": [
+                        "4757108034"
+                    ],
+                    "x-rate-limit-remaining": [
+                        "9223372036854775807"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: CA20C1634C914446879094DC74C22B4D Ref B: CO6AA3150218021 Ref C: 2023-09-26T16:49:50Z"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "identity": null,
+                                "name": "fail-HostPool",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/cfb-sfescbnv/providers/Microsoft.DesktopVirtualization/hostpools/fail-HostPool",
+                                "type": "Microsoft.DesktopVirtualization/hostpools",
+                                "location": "eastus",
+                                "tags": {
+                                    "c7n": "true",
+                                    "product_id": "13742"
+                                },
+                                "kind": null,
+                                "systemData": {
+                                    "createdBy": "test@tester.com",
+                                    "createdByType": "User",
+                                    "createdAt": "2023-09-26T15:51:07.69Z",
+                                    "lastModifiedBy": "test@tester.com",
+                                    "lastModifiedByType": "User",
+                                    "lastModifiedAt": "2023-09-26T15:55:09.59Z"
+                                },
+                                "properties": {
+                                    "agentUpdate": null,
+                                    "friendlyName": "fail-HostPool",
+                                    "description": "fail Terraform HostPool",
+                                    "hostPoolType": "Pooled",
+                                    "personalDesktopAssignmentType": null,
+                                    "applicationGroupReferences": [],
+                                    "appAttachPackageReferences": [],
+                                    "customRdpProperty": "",
+                                    "maxSessionLimit": 16,
+                                    "loadBalancerType": "DepthFirst",
+                                    "validationEnvironment": false,
+                                    "ring": null,
+                                    "registrationInfo": null,
+                                    "vmTemplate": "{\"domain\":\"mckavm.onmicrosoft.com\",\"galleryImageOffer\":\"windows-10\",\"galleryImagePublisher\":\"microsoftwindowsdesktop\",\"galleryImageSKU\":\"win10-22h2-avd-g2\",\"imageType\":\"Gallery\",\"customImageId\":null,\"namePrefix\":\"cfb-test\",\"osDiskType\":\"StandardSSD_LRS\",\"vmSize\":{\"id\":\"Standard_D2s_v3\",\"cores\":2,\"ram\":8},\"galleryItemId\":\"microsoftwindowsdesktop.windows-10win10-22h2-avd-g2\",\"hibernate\":false,\"diskSizeGB\":0,\"securityType\":\"TrustedLaunch\",\"secureBoot\":true,\"vTPM\":true}",
+                                    "preferredAppGroupType": "Desktop",
+                                    "migrationRequest": null,
+                                    "cloudPcResource": false,
+                                    "startVMOnConnect": false,
+                                    "ssoadfsAuthority": null,
+                                    "ssoClientId": null,
+                                    "ssoClientSecretKeyVaultPath": null,
+                                    "ssoSecretType": null,
+                                    "objectId": "638b72c0-e8b5-4fcc-a5ed-7e8a081cb80c"
+                                }
+                            }
+                        ],
+                        "nextLink": null
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-sfescbnv/providers/Microsoft.DesktopVirtualization/hostPools/fail-HostPool/sessionHosts?api-version=2022-09-09",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "date": [
+                        "Tue, 26 Sep 2023 16:49:57 GMT"
+                    ],
+                    "x-ms-correlation-id": [
+                        "36b3d34b-fb72-46b3-b195-671ba9db1df5"
+                    ],
+                    "x-rate-limit-limit": [
+                        "5m"
+                    ],
+                    "set-cookie": [
+                        "ARRAffinity=7bcb77c12c21506594bbc84c20a4a2891f6d7f0bda0e4b28f63e983b7e57b6d3;Path=/;HttpOnly;Secure;Domain=rdarmprovider-g-us-r0.wvd.microsoft.com",
+                        "ARRAffinitySameSite=7bcb77c12c21506594bbc84c20a4a2891f6d7f0bda0e4b28f63e983b7e57b6d3;Path=/;HttpOnly;SameSite=None;Secure;Domain=rdarmprovider-g-us-r0.wvd.microsoft.com"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-length": [
+                        "6112"
+                    ],
+                    "x-ms-opsarmpath64": [
+                        "L3N1YnNjcmlwdGlvbnMvMjMwMGNjNTUtOGQ3OS00N2U2LTk5ZTItMDI3ZDdjZjk5Mjk5L3Jlc291cmNlR3JvdXBzL2NmYi1zZmVzY2Judi9wcm92aWRlcnMvTWljcm9zb2Z0LkRlc2t0b3BWaXJ0dWFsaXphdGlvbi9ob3N0UG9vbHMvZmFpbC1Ib3N0UG9vbA=="
+                    ],
+                    "x-rate-limit-reset": [
+                        "2023-09-26T16:50:16.2541425Z"
+                    ],
+                    "x-ms-lamport-ts": [
+                        "4757111414"
+                    ],
+                    "x-rate-limit-remaining": [
+                        "5997"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 8F5E4CF288A2412EB616FBF7FC91702F Ref B: CO6AA3150218021 Ref C: 2023-09-26T16:49:58Z"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "name": "fail-HostPool/cfb-test-0",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/cfb-sfescbnv/providers/Microsoft.DesktopVirtualization/hostpools/fail-HostPool/sessionhosts/cfb-test-0",
+                                "type": "Microsoft.DesktopVirtualization/hostpools/sessionhosts",
+                                "properties": {
+                                    "friendlyName": null,
+                                    "lastHeartBeat": "2023-09-26T16:21:44.89Z",
+                                    "statusTimestamp": "2023-09-26T16:36:37.67Z",
+                                    "lastUpdateTime": "2023-09-26T16:36:37.67Z",
+                                    "sessions": 0,
+                                    "agentVersion": "1.0.7255.1400",
+                                    "allowNewSession": true,
+                                    "assignedUser": null,
+                                    "status": "Unavailable",
+                                    "osVersion": "10.0.19045",
+                                    "sxSStackVersion": "rdp-sxs230428700",
+                                    "updateState": "Succeeded",
+                                    "updateErrorMessage": "",
+                                    "sessionHostHealthCheckResults": [
+                                        {
+                                            "healthCheckName": "DomainJoinedCheck",
+                                            "healthCheckResult": "HealthCheckFailed",
+                                            "additionalFailureDetails": {
+                                                "message": "SessionHost unhealthy: SessionHost is not joined to a domain",
+                                                "errorCode": -2147467259,
+                                                "lastHealthCheckDateTime": "2023-09-26T16:21:44.7726071Z"
+                                            }
+                                        },
+                                        {
+                                            "healthCheckName": "DomainTrustCheck",
+                                            "healthCheckResult": "HealthCheckFailed",
+                                            "additionalFailureDetails": {
+                                                "message": "SessionHost unhealthy: VerifyDomainTrust failed with exception The local computer is not joined to a domain or the domain cannot be contacted.",
+                                                "errorCode": -2146233088,
+                                                "lastHealthCheckDateTime": "2023-09-26T16:21:44.7726071Z"
+                                            }
+                                        },
+                                        {
+                                            "healthCheckName": "SxSStackListenerCheck",
+                                            "healthCheckResult": "HealthCheckSucceeded",
+                                            "additionalFailureDetails": {
+                                                "message": "SessionHost healthy: SessionHost healthy: SxS stack listener is ready",
+                                                "errorCode": 0,
+                                                "lastHealthCheckDateTime": "2023-09-26T16:06:34.9610021Z"
+                                            }
+                                        },
+                                        {
+                                            "healthCheckName": "MonitoringAgentCheck",
+                                            "healthCheckResult": "HealthCheckSucceeded",
+                                            "additionalFailureDetails": {
+                                                "message": "Located running process at C:\\Program Files\\Microsoft RDInfra\\RDMonitoringAgent_45.5.2\\Agent\\MonAgentLauncher.exe",
+                                                "errorCode": 0,
+                                                "lastHealthCheckDateTime": "2023-09-26T16:21:35.0850719Z"
+                                            }
+                                        },
+                                        {
+                                            "healthCheckName": "MetaDataServiceCheck",
+                                            "healthCheckResult": "HealthCheckSucceeded",
+                                            "additionalFailureDetails": {
+                                                "message": "{\r\n  \"Details\": \"IMDS pressumed available\",\r\n  \"AzureResourceId\": \"/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-sfescbnv/providers/Microsoft.Compute/virtualMachines/cfb-test-0\",\r\n  \"VmId\": \"740e4846-42f4-4008-87d0-312b3cbe2985\"\r\n}",
+                                                "errorCode": 0,
+                                                "lastHealthCheckDateTime": "2023-09-26T16:06:35.1953913Z"
+                                            }
+                                        },
+                                        {
+                                            "healthCheckName": "AppAttachHealthCheck",
+                                            "healthCheckResult": "HealthCheckSucceeded",
+                                            "additionalFailureDetails": {
+                                                "message": "SessionHost healthy: MSIX packages have been properly staged",
+                                                "errorCode": 0,
+                                                "lastHealthCheckDateTime": "2023-09-26T16:21:42.210059Z"
+                                            }
+                                        }
+                                    ],
+                                    "resourceId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-sfescbnv/providers/Microsoft.Compute/virtualMachines/cfb-test-0",
+                                    "virtualMachineId": "740e4846-42f4-4008-87d0-312b3cbe2985",
+                                    "objectId": "d5f965e6-e2d9-429a-bbec-1d4412de23d0"
+                                },
+                                "systemData": {
+                                    "createdBy": null,
+                                    "createdByType": null,
+                                    "createdAt": "2023-09-26T16:05:52.14Z",
+                                    "lastModifiedBy": null,
+                                    "lastModifiedByType": null,
+                                    "lastModifiedAt": null
+                                }
+                            },
+                            {
+                                "name": "fail-HostPool/cfb-test-1",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/cfb-sfescbnv/providers/Microsoft.DesktopVirtualization/hostpools/fail-HostPool/sessionhosts/cfb-test-1",
+                                "type": "Microsoft.DesktopVirtualization/hostpools/sessionhosts",
+                                "properties": {
+                                    "friendlyName": null,
+                                    "lastHeartBeat": "2023-09-26T16:22:01.98Z",
+                                    "statusTimestamp": "2023-09-26T16:36:52.45Z",
+                                    "lastUpdateTime": "2023-09-26T16:36:52.45Z",
+                                    "sessions": 0,
+                                    "agentVersion": "1.0.7255.1400",
+                                    "allowNewSession": true,
+                                    "assignedUser": null,
+                                    "status": "Unavailable",
+                                    "osVersion": "10.0.19045",
+                                    "sxSStackVersion": "rdp-sxs230428700",
+                                    "updateState": "Succeeded",
+                                    "updateErrorMessage": "",
+                                    "sessionHostHealthCheckResults": [
+                                        {
+                                            "healthCheckName": "DomainJoinedCheck",
+                                            "healthCheckResult": "HealthCheckFailed",
+                                            "additionalFailureDetails": {
+                                                "message": "SessionHost unhealthy: SessionHost is not joined to a domain",
+                                                "errorCode": -2147467259,
+                                                "lastHealthCheckDateTime": "2023-09-26T16:21:56.2587693Z"
+                                            }
+                                        },
+                                        {
+                                            "healthCheckName": "DomainTrustCheck",
+                                            "healthCheckResult": "HealthCheckFailed",
+                                            "additionalFailureDetails": {
+                                                "message": "SessionHost unhealthy: VerifyDomainTrust failed with exception The local computer is not joined to a domain or the domain cannot be contacted.",
+                                                "errorCode": -2146233088,
+                                                "lastHealthCheckDateTime": "2023-09-26T16:22:01.8525658Z"
+                                            }
+                                        },
+                                        {
+                                            "healthCheckName": "SxSStackListenerCheck",
+                                            "healthCheckResult": "HealthCheckSucceeded",
+                                            "additionalFailureDetails": {
+                                                "message": "SessionHost healthy: SessionHost healthy: SxS stack listener is ready",
+                                                "errorCode": 0,
+                                                "lastHealthCheckDateTime": "2023-09-26T16:06:49.3821978Z"
+                                            }
+                                        },
+                                        {
+                                            "healthCheckName": "MonitoringAgentCheck",
+                                            "healthCheckResult": "HealthCheckSucceeded",
+                                            "additionalFailureDetails": {
+                                                "message": "Located running process at C:\\Program Files\\Microsoft RDInfra\\RDMonitoringAgent_45.5.2\\Agent\\MonAgentLauncher.exe",
+                                                "errorCode": 0,
+                                                "lastHealthCheckDateTime": "2023-09-26T16:21:49.5087855Z"
+                                            }
+                                        },
+                                        {
+                                            "healthCheckName": "MetaDataServiceCheck",
+                                            "healthCheckResult": "HealthCheckSucceeded",
+                                            "additionalFailureDetails": {
+                                                "message": "{\r\n  \"Details\": \"IMDS pressumed available\",\r\n  \"AzureResourceId\": \"/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-sfescbnv/providers/Microsoft.Compute/virtualMachines/cfb-test-1\",\r\n  \"VmId\": \"4e93b3a2-a8d8-453a-8f79-08232e57ee84\"\r\n}",
+                                                "errorCode": 0,
+                                                "lastHealthCheckDateTime": "2023-09-26T16:06:49.6165731Z"
+                                            }
+                                        },
+                                        {
+                                            "healthCheckName": "AppAttachHealthCheck",
+                                            "healthCheckResult": "HealthCheckSucceeded",
+                                            "additionalFailureDetails": {
+                                                "message": "SessionHost healthy: MSIX packages have been properly staged",
+                                                "errorCode": 0,
+                                                "lastHealthCheckDateTime": "2023-09-26T16:21:58.1650334Z"
+                                            }
+                                        }
+                                    ],
+                                    "resourceId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-sfescbnv/providers/Microsoft.Compute/virtualMachines/cfb-test-1",
+                                    "virtualMachineId": "4e93b3a2-a8d8-453a-8f79-08232e57ee84",
+                                    "objectId": "2701888d-c2ac-4102-871e-79f56ea6d813"
+                                },
+                                "systemData": {
+                                    "createdBy": null,
+                                    "createdByType": null,
+                                    "createdAt": "2023-09-26T16:06:04.25Z",
+                                    "lastModifiedBy": null,
+                                    "lastModifiedByType": null,
+                                    "lastModifiedAt": null
+                                }
+                            }
+                        ],
+                        "nextLink": null
+                    }
+                }
+            }
+        }
+    ]
+}

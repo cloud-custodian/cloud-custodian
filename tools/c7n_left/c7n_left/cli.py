@@ -66,6 +66,9 @@ def dump(directory, var_file, output_file, output_query):
 @cli.command()
 @click.option("--format", default="terraform")
 @click.option("--filters", help="Filter policies or resources as k=v pairs with globbing")
+@click.option(
+    "--warn-on", help="Select policies to log instead of fail on via k=v pairs with globbing"
+)
 @click.option("-p", "--policy-dir", type=click.Path(), help="Directory with policies")
 @click.option("-d", "--directory", type=click.Path(), help="IaC directory to evaluate")
 @click.option(
@@ -104,6 +107,7 @@ def run(
     output_query,
     summary,
     filters,
+    warn_on,
     reporter=None,
 ):
     """evaluate policies against IaC sources.
@@ -121,6 +125,7 @@ def run(
         output_query=output_query,
         var_file=var_file,
         summary=summary,
+        warn_on=warn_on,
         filters=filters,
     )
     policies = config.exec_filter.filter_policies(load_policies(policy_dir, config))
@@ -158,6 +163,7 @@ def get_config(
     output_query=None,
     summary=None,
     filters=None,
+    warn_on=None,
     format='terraform',
 ):
     config = Config.empty(
@@ -169,10 +175,11 @@ def get_config(
         output_query=output_query,
         summary=summary,
         filters=filters,
+        warn_on=warn_on,
         format=format,
     )
-    exec_filter = ExecutionFilter.parse(config)
-    config["exec_filter"] = exec_filter
+    config["exec_filter"] = ExecutionFilter.parse(config.filters)
+    config["warn_filter"] = ExecutionFilter.parse(config.warn_on)
     return config
 
 

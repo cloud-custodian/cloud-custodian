@@ -62,9 +62,7 @@ class ResultsReporter:
 
 def run_policy(policy, terraform_dir, tmp_path):
     (tmp_path / "policies.json").write_text(json.dumps({"policies": [policy]}, indent=2))
-    config = Config.empty(
-        policy_dir=tmp_path, source_dir=terraform_dir, exec_filter=None, var_files=()
-    )
+    config = cli.get_config(policy_dir=tmp_path, directory=terraform_dir)
     policies = policy_core.load_policies(tmp_path, config)
     reporter = ResultsReporter()
     core.CollectionRunner(policies, config, reporter).run()
@@ -91,7 +89,7 @@ class PolicyEnv:
         return provider.parse(**params)
 
     def get_selection(self, filter_expression):
-        return core.ExecutionFilter.parse(Config.empty(filters=filter_expression))
+        return core.ExecutionFilter.parse(filter_expression)
 
     def write_tf(self, content, path="main.tf"):
         tf_file = self.policy_dir / path
@@ -106,12 +104,7 @@ class PolicyEnv:
         policy_file.write_text(json.dumps(extant))
 
     def run(self, policy_dir=None, terraform_dir=None):
-        config = Config.empty(
-            policy_dir=policy_dir or self.policy_dir,
-            source_dir=terraform_dir or self.policy_dir,
-            exec_filter=None,
-            var_files=(),
-        )
+        config = cli.get_config(terraform_dir or self.policy_dir, policy_dir or self.policy_dir)
         policies = policy_core.load_policies(config.policy_dir, config)
         reporter = ResultsReporter()
         core.CollectionRunner(policies, config, reporter).run()
@@ -1111,6 +1104,7 @@ def write_output_test_policy(tmp_path, policy=None, policy_path="policy.json"):
                     "name": "check-bucket",
                     "resource": "terraform.aws_s3_bucket",
                     "description": "a description",
+                    "metadata": {"category": ["test"]},
                     "filters": [{"server_side_encryption_configuration": "absent"}],
                 }
             ]
@@ -1285,6 +1279,28 @@ def test_cli_output_rich(tmp_path):
     assert "1 failed 2 passed" in result.output
 
 
+def test_cli_output_rich_warn_on(tmp_path):
+    write_output_test_policy(tmp_path)
+    runner = CliRunner()
+    result = runner.invoke(
+        cli.cli,
+        [
+            "run",
+            "-p",
+            str(tmp_path),
+            "-d",
+            str(terraform_dir / "aws_s3_encryption_audit"),
+            "--warn-on",
+            "category=test",
+            "-o",
+            "cli",
+        ],
+    )
+    assert result.exit_code == 0
+    assert "Reason: a description\n" in result.output
+    assert "1 failed 2 passed" in result.output
+
+
 def test_cli_selection(tmp_path):
     write_output_test_policy(
         tmp_path,
@@ -1368,7 +1384,7 @@ def test_cli_output_github(tmp_path):
     assert result.exit_code == 1
     expected = (
         "::error file=tests/terraform/aws_s3_encryption_audit/main.tf,line=25,lineEnd=28,"
-        "title=terraform.aws_s3_bucket - policy:check-bucket severity:unknown::a description"
+        "title=terraform.aws_s3_bucket - policy:check-bucket category:test severity:unknown::a description"  # noqa
     )
     assert expected in result.output
 
@@ -1437,6 +1453,7 @@ def test_cli_output_json(tmp_path):
             "file_path": "tests/terraform/aws_s3_encryption_audit/main.tf",
             "policy": {
                 "filters": [{"server_side_encryption_configuration": "absent"}],
+                "metadata": {"category": ["test"]},
                 "mode": {"type": "terraform-source"},
                 "name": "check-bucket",
                 "resource": "terraform.aws_s3_bucket",
