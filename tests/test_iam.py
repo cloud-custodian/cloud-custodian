@@ -1387,8 +1387,8 @@ def test_iam_delete_provider_oidc_action(test, iam_delete_provider_oidc):
     # The 'iam_delete_provider_oidc' argument allows us to access the
     # data in the 'tf_resources.json' file inside the
     # 'tests/terraform/iam_delete_provider_oidc' directory.  Here's how
-    # we access the provider's arn using a 'dotted' notation:
-    iam_provider_arn = iam_delete_provider_oidc['aws_iam_openid_connect_provider.test_oidc_provider.arn']
+    # we access the IAM provider's arn using a 'dotted' notation:
+    arn = iam_delete_provider_oidc['aws_iam_openid_connect_provider.test_oidc_provider.arn']
 
     # Uncomment to following line when you're recording the first time:
     # session_factory = test.record_flight_data('iam_delete_provider_oidc')
@@ -1425,12 +1425,12 @@ def test_iam_delete_provider_oidc_action(test, iam_delete_provider_oidc):
     # Here's the number of resources that the policy resolved,
     # i.e. the resources that passed the filters:
     assert len(resources) == 1
-    assert resources[0]['Arn'] == iam_provider_arn
+    assert resources[0]['Arn'] == arn
 
     # We're testing that our delete action worked because the iam
     # provider now no longer exists:
     with pytest.raises(client.exceptions.NoSuchEntityException):
-        client.get_open_id_connect_provider(OpenIDConnectProviderArn=iam_provider_arn)
+        client.get_open_id_connect_provider(OpenIDConnectProviderArn=arn)
 
 # The terraform fixture sets up resources, which happens before we
 # actually enter the test:
