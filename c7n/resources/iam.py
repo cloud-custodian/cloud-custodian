@@ -2994,7 +2994,7 @@ class OpenIdProviderDelete(BaseAction):
 
       .. code-block:: yaml
 
-        - name: aws-iam-oidc-provider-delete-expired
+        - name: aws-iam-oidc-provider-delete
           resource: iam-oidc-provider
           filters:
             - type: value
