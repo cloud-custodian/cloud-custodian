@@ -82,9 +82,17 @@ class DescribeS3(query.DescribeSource):
     def augment(self, buckets):
         with self.manager.executor_factory(
                 max_workers=min((10, len(buckets) + 1))) as w:
+            session = self.manager.session_factory()
+            client = session.client('s3')
             results = w.map(
                 assemble_bucket,
-                zip(itertools.repeat(self.manager.session_factory), buckets))
+                zip(
+                    itertools.repeat(session),
+                    itertools.repeat(client),
+                    buckets,
+                    itertools.repeat(None)
+                )
+            )
             results = list(filter(None, results))
             return results
 
@@ -424,9 +432,7 @@ def assemble_bucket(item):
 
     TODO: Refactor this, the logic here feels quite muddled.
     """
-    factory, b = item
-    s = factory()
-    c = s.client('s3')
+    s, c, b, augment_table = item
     # Bucket Location, Current Client Location, Default Location
     b_location = c_location = location = "us-east-1"
     methods = list(S3_AUGMENT_TABLE)
@@ -449,7 +455,6 @@ def assemble_bucket(item):
             if code.startswith("NoSuch") or "NotFound" in code:
                 v = default
             elif code == 'PermanentRedirect':
-                s = factory()
                 c = bucket_client(s, b)
                 # Requeue with the correct region given location constraint
                 methods.append((m, k, default, select))
