@@ -233,7 +233,6 @@ class RetentionWindow(BaseAction):
         current_retention = int(cluster.get('BackupRetentionPeriod', 0))
         new_retention = self.data['days']
         retention_type = self.data.get('enforce', 'min').lower()
-
         if retention_type == 'min':
             self.set_retention_window(
                 client, cluster, max(current_retention, new_retention))
@@ -244,14 +243,22 @@ class RetentionWindow(BaseAction):
             self.set_retention_window(client, cluster, new_retention)
 
     def set_retention_window(self, client, cluster, retention):
+        params = dict(
+            DBClusterIdentifier=cluster['DBClusterIdentifier'],
+            BackupRetentionPeriod=retention
+        )
+        if cluster.get('EngineMode') != 'serverless':
+            params.update(
+                dict(
+                    PreferredBackupWindow=cluster['PreferredBackupWindow'],
+                    PreferredMaintenanceWindow=cluster['PreferredMaintenanceWindow'])
+            )
         _run_cluster_method(
             client.modify_db_cluster,
-            dict(DBClusterIdentifier=cluster['DBClusterIdentifier'],
-                 BackupRetentionPeriod=retention,
-                 PreferredBackupWindow=cluster['PreferredBackupWindow'],
-                 PreferredMaintenanceWindow=cluster['PreferredMaintenanceWindow']),
+            params,
             (client.exceptions.DBClusterNotFoundFault, client.exceptions.ResourceNotFoundFault),
-            client.exceptions.InvalidDBClusterStateFault)
+            client.exceptions.InvalidDBClusterStateFault
+        )
 
 
 @RDSCluster.action_registry.register('stop')

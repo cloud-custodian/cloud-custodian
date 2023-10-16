@@ -1,0 +1,106 @@
+{
+    "status_code": 200,
+    "data": {
+        "Subnets": [
+            {
+                "AvailabilityZone": "us-east-1a",
+                "AvailabilityZoneId": "use1-az4",
+                "AvailableIpAddressCount": 251,
+                "CidrBlock": "10.0.0.0/24",
+                "DefaultForAz": false,
+                "MapPublicIpOnLaunch": false,
+                "MapCustomerOwnedIpOnLaunch": false,
+                "State": "available",
+                "SubnetId": "subnet-00872ab56d5fa4cdc",
+                "VpcId": "vpc-0503a8b9ddbb3a5c5",
+                "OwnerId": "644160558196",
+                "AssignIpv6AddressOnCreation": false,
+                "Ipv6CidrBlockAssociationSet": [],
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "ECS c7n-test-cluster - Public Subnet 1"
+                    },
+                    {
+                        "Key": "aws:cloudformation:stack-id",
+                        "Value": "arn:aws:cloudformation:us-east-1:644160558196:stack/EC2ContainerService-c7n-test-cluster/0c488df0-4827-11ee-8f0c-12a58b5c38f1"
+                    },
+                    {
+                        "Key": "aws:cloudformation:stack-name",
+                        "Value": "EC2ContainerService-c7n-test-cluster"
+                    },
+                    {
+                        "Key": "aws:cloudformation:logical-id",
+                        "Value": "PublicSubnetAz1"
+                    },
+                    {
+                        "Key": "NetworkLocation",
+                        "Value": "Customer"
+                    },
+                    {
+                        "Key": "Description",
+                        "Value": "Created for ECS cluster c7n-test-cluster"
+                    }
+                ],
+                "SubnetArn": "arn:aws:ec2:us-east-1:644160558196:subnet/subnet-00872ab56d5fa4cdc",
+                "EnableDns64": false,
+                "Ipv6Native": false,
+                "PrivateDnsNameOptionsOnLaunch": {
+                    "HostnameType": "ip-name",
+                    "EnableResourceNameDnsARecord": false,
+                    "EnableResourceNameDnsAAAARecord": false
+                }
+            },
+            {
+                "AvailabilityZone": "us-east-1b",
+                "AvailabilityZoneId": "use1-az6",
+                "AvailableIpAddressCount": 250,
+                "CidrBlock": "10.0.1.0/24",
+                "DefaultForAz": false,
+                "MapPublicIpOnLaunch": false,
+                "MapCustomerOwnedIpOnLaunch": false,
+                "State": "available",
+                "SubnetId": "subnet-0797208b821c08196",
+                "VpcId": "vpc-0503a8b9ddbb3a5c5",
+                "OwnerId": "644160558196",
+                "AssignIpv6AddressOnCreation": false,
+                "Ipv6CidrBlockAssociationSet": [],
+                "Tags": [
+                    {
+                        "Key": "NetworkLocation",
+                        "Value": "Customer"
+                    },
+                    {
+                        "Key": "aws:cloudformation:logical-id",
+                        "Value": "PublicSubnetAz2"
+                    },
+                    {
+                        "Key": "Description",
+                        "Value": "Created for ECS cluster c7n-test-cluster"
+                    },
+                    {
+                        "Key": "aws:cloudformation:stack-id",
+                        "Value": "arn:aws:cloudformation:us-east-1:644160558196:stack/EC2ContainerService-c7n-test-cluster/0c488df0-4827-11ee-8f0c-12a58b5c38f1"
+                    },
+                    {
+                        "Key": "aws:cloudformation:stack-name",
+                        "Value": "EC2ContainerService-c7n-test-cluster"
+                    },
+                    {
+                        "Key": "Name",
+                        "Value": "ECS c7n-test-cluster - Public Subnet 2"
+                    }
+                ],
+                "SubnetArn": "arn:aws:ec2:us-east-1:644160558196:subnet/subnet-0797208b821c08196",
+                "EnableDns64": false,
+                "Ipv6Native": false,
+                "PrivateDnsNameOptionsOnLaunch": {
+                    "HostnameType": "ip-name",
+                    "EnableResourceNameDnsARecord": false,
+                    "EnableResourceNameDnsAAAARecord": false
+                }
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

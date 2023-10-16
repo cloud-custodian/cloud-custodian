@@ -1,0 +1,16 @@
+{
+    "status_code": 200,
+    "data": {
+        "NamedQueries": [
+            {
+                "Name": "bar",
+                "Database": "tf_test_immune_swine",
+                "QueryString": "SELECT * FROM tf_test_immune_swine limit 10;",
+                "NamedQueryId": "5e0035f9-1f3d-4359-9ff4-36c974e8cf5a",
+                "WorkGroup": "primary"
+            }
+        ],
+        "UnprocessedNamedQueryIds": [],
+        "ResponseMetadata": {}
+    }
+}

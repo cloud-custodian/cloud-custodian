@@ -1,0 +1,30 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "items": [
+            {
+                "id": "643zr8zh9h",
+                "name": "cfbeheakuev-fail-classic-no-rules",
+                "createdDate": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 3,
+                    "day": 21,
+                    "hour": 11,
+                    "minute": 34,
+                    "second": 56,
+                    "microsecond": 0
+                },
+                "version": "1.0",
+                "apiKeySource": "HEADER",
+                "endpointConfiguration": {
+                    "types": [
+                        "REGIONAL"
+                    ]
+                },
+                "disableExecuteApiEndpoint": false
+            }
+        ]
+    }
+}

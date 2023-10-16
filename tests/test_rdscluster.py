@@ -239,6 +239,49 @@ class RDSClusterTest(BaseTest):
             DBClusterIdentifier='mytest')
         self.assertFalse(cluster['DBClusters'][0]['DeletionProtection'])
 
+
+    def test_modify_rds_cluster_provisoned(self):
+        session_factory = self.replay_flight_data("test_modify_rds_cluster_provisoned")
+        p = self.load_policy(
+            {
+                "name": "modify-db-cluster",
+                "resource": "rds-cluster",
+                "filters": [
+                    {"type": "value", "key": "DBClusterIdentifier", "value": "database-1"}
+                ],
+                "actions": [{"type": "retention", "days": 7}],
+            },
+            session_factory=session_factory, config={'account_id': '644160558196'}
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0].get("DBClusterIdentifier", 0), "database-1")
+        client = session_factory().client("rds")
+        cluster = client.describe_db_clusters(
+            DBClusterIdentifier="database-1")
+        self.assertEqual(cluster['DBClusters'][0]['BackupRetentionPeriod'], 7)
+
+    def test_modify_rds_cluster_serverless_v2(self):
+        session_factory = self.replay_flight_data("test_modify_rds_cluster_serverless_v2")
+        p = self.load_policy(
+            {
+                "name": "modify-db-cluster",
+                "resource": "rds-cluster",
+                "filters": [
+                    {"type": "value", "key": "DBClusterIdentifier", "value": "database-2"}
+                ],
+                "actions": [{"type": "retention", "days": 8}],
+            },
+            session_factory=session_factory, config={'account_id': '644160558196'}
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0].get("DBClusterIdentifier", 0), "database-2")
+        client = session_factory().client("rds")
+        cluster = client.describe_db_clusters(
+            DBClusterIdentifier="database-2")
+        self.assertEqual(cluster['DBClusters'][0]['BackupRetentionPeriod'],8)
+
     def test_rdscluster_tag_augment(self):
         session_factory = self.replay_flight_data("test_rdscluster_tag_augment")
         p = self.load_policy(

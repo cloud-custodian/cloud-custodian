@@ -923,6 +923,50 @@ class RDSTest(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["DBInstanceIdentifier"], "database-2")
 
+    def test_rds_pending_maintenance(self):
+        session_factory = self.replay_flight_data("test_rds_pending_maintenance")
+        p = self.load_policy(
+            {
+                "name": "rds-pending-maintenance",
+                "resource": "rds",
+                "query": [
+                    {
+                        "DBInstanceIdentifier": "qbopp011"
+                    }
+                ],
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": "DBInstanceIdentifier",
+                        "value": "qbopp011"
+                    },
+                    {
+                        "type": "pending-maintenance"
+                    }
+                ],
+            },
+            config={"region": "us-west-2"},
+            session_factory=session_factory,
+        )
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+
+def test_rds_snapshot_instance(test):
+    factory = test.replay_flight_data('test_rds_snapshot_instance')
+    p = test.load_policy(
+        {'name': 'check-instance',
+         'resource': 'aws.rds-snapshot',
+         'filters': [
+             {'type': 'instance',
+              'key': 'DeletionProtection',
+              'value': False}]},
+        session_factory=factory)
+    resources = p.run()
+    assert len(resources) == 1
+    resources[0]['DBSnapshotIdentifier'] == 'manual-testx'
+
 
 class RDSSnapshotTest(BaseTest):
 
