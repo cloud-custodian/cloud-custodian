@@ -180,12 +180,9 @@ class Session:
         if not credentials:
             # Only share the http object when using the default credentials.
             self._use_cached_http = True
-            """This line forces that the service account associated has to have access to the billing account which may not always be true causing an error.
-            Changing this to the standard google auth without the quota_project_id solves the issue.
             default_credentials, _ = google.auth.default(
                 quota_project_id=project_id or get_default_project()
-            )"""
-            default_credentials, _ = google.auth.default()
+            )
         impersonated_credentials = None
         if impersonate_service or GOOGLE_IMPERSONATE_SERVICE_ACCOUNT:
             impersonate_target = impersonate_service or GOOGLE_IMPERSONATE_SERVICE_ACCOUNT
