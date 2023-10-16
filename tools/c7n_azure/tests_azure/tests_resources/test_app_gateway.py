@@ -27,14 +27,37 @@ class ApplicationGatewayTest(BaseTest):
 
     # @arm_template('vm.json')
     @cassette_name('test_find_waf')
+    def test_find_app_gateway_wo_waf(self):
+        p = self.load_policy({
+            'name': 'test-app-gateway',
+            'resource': 'azure.application-gateway',
+            'filters': [
+                {'type': 'waf',
+                 'state': 'disabled'}],
+        })
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    @cassette_name('test_find_waf')
+    def test_find_app_gateway_with_waf(self):
+        p = self.load_policy({
+            'name': 'test-app-gateway',
+            'resource': 'azure.application-gateway',
+            'filters': [
+                {'type': 'waf',
+                 'state': 'enabled'}],
+        })
+        resources = p.run()
+        self.assertEqual(len(resources), 3)
+
+    @cassette_name('test_find_waf')
     def test_find_waf_disabled_rule(self):
         p = self.load_policy({
             'name': 'test-app-gateway',
             'resource': 'azure.application-gateway',
             'filters': [
                 {'type': 'waf',
-                 'override_rule': 944240,
-                 'state': 'disabled'}],
+                 'override_rule': 944240}],
         })
         resources = p.run()
         self.assertEqual(len(resources), 4)

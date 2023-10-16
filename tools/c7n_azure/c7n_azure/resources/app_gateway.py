@@ -41,7 +41,11 @@ class ApplicationGateway(ArmResourceManager):
 @ApplicationGateway.filter_registry.register('waf')
 class ApplicationGatewayWafFilter(Filter):
     """
-    Filter Application Gateways using WAF rule configuration
+    Filter Application Gateways using WAF rule configuration.
+    State is defaulted to 'disabled'.
+
+    WAF rule group with rule ids can be found here: 
+    https://learn.microsoft.com/en-us/azure/web-application-firewall/ag/application-gateway-crs-rulegroups-rules?tabs=owasp32#general-32
 
     :example:
 
@@ -55,12 +59,11 @@ class ApplicationGatewayWafFilter(Filter):
             filters:
               - type: waf
                 override_rule: 944240
-                state: disabled
     """
 
     schema = type_schema(
         'waf',
-        required=['override_rule', 'state'],
+        required=[],
         **{
             'override_rule': {'type': 'number'},
             'state': {'type': 'string', 'enum': ['enabled', 'disabled']}}
@@ -69,7 +72,7 @@ class ApplicationGatewayWafFilter(Filter):
     def process(self, resources, event=None):
 
         filter_override_rule = self.data.get('override_rule')
-        filter_state = self.data.get('state')
+        filter_state = self.data.get('state') if self.data.get('state') else 'disabled'
 
         client = self.manager.get_client()
         app_gate_wafs = list(client.web_application_firewall_policies.list_all())
@@ -79,6 +82,9 @@ class ApplicationGatewayWafFilter(Filter):
             if 'webApplicationFirewallConfiguration' in resource['properties']:
                 # If WAF configuration is part of the Application
                 # Gateway resource.
+                if filter_override_rule == None and filter_state == 'enabled':
+                    result.append(resource)
+                    continue
                 for disabled_rule_Group in resource['properties']\
                     ['webApplicationFirewallConfiguration']['disabledRuleGroups']:
                     if filter_override_rule in disabled_rule_Group['rules'] \
@@ -90,6 +96,9 @@ class ApplicationGatewayWafFilter(Filter):
             elif 'firewallPolicy' in resource['properties']:
                 # If WAF is configured as a separate resource and
                 # associated with the Application Gateway.
+                if filter_override_rule == None and filter_state == 'enabled':
+                    result.append(resource)
+                    continue
                 waf_policy_name = resource['properties']['firewallPolicy']['id']
                 for app_gate_waf in app_gate_wafs:
                     if app_gate_waf.id != waf_policy_name:
