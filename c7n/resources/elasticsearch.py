@@ -198,7 +198,7 @@ class ElasticSearchCrossClusterFilter(Filter):
                                     'Values': [r['DomainName']]}])
                         outbound.pop('ResponseMetadata')
                         r[self.annotation_key]["outbound"] = outbound
-                except client.exceptions.ResourceNotFoundExecption:
+                except client.exceptions.ResourceNotFoundException:
                     continue
             matchFound = False
             r[self.matched_key] = {}
@@ -455,7 +455,7 @@ class ElasticSearchAddTag(Tag):
         for d in domains:
             try:
                 client.add_tags(ARN=d['ARN'], TagList=tags)
-            except client.exceptions.ResourceNotFoundExecption:
+            except client.exceptions.ResourceNotFoundException:
                 continue
 
 
@@ -482,7 +482,7 @@ class ElasticSearchRemoveTag(RemoveTag):
         for d in domains:
             try:
                 client.remove_tags(ARN=d['ARN'], TagKeys=tags)
-            except client.exceptions.ResourceNotFoundExecption:
+            except client.exceptions.ResourceNotFoundException:
                 continue
 
 
