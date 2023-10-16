@@ -16,28 +16,47 @@ class TerraformGraph(ResourceGraph):
         if isinstance(types, str):
             types = (types,)
         for type_name, type_items in self.resource_data.items():
-            if types and type_name not in types:
+            if types and (type_name not in types and f"data.{type_name}" not in types):
                 continue
-            if type_name == "data":
-                for data_type, data_items in type_items.items():
-                    resources = []
-                    for name, data in data_items.items():
-                        resources.append(self.as_resource(name, data))
-                    yield "%s.%s" % (type_name, data_type), resources
+            elif type_name == "module":
+                yield type_name, [self.as_resource(type_name, d, "module") for d in type_items]
             elif type_name == "moved":
-                yield type_name, self.as_resource(type_name, data)
+                yield type_name, [self.as_resource(type_name, d, "moved") for d in type_items]
             elif type_name == "locals":
-                yield type_name, self.as_resource(type_name, data)
+                yield type_name, [self.as_resource(type_name, d, "local") for d in type_items]
             elif type_name == "terraform":
-                yield type_name, self.as_resource(type_name, data)
+                yield type_name, [self.as_resource(type_name, d, "terraform") for d in type_items]
+            elif type_name == "provider":
+                yield type_name, [self.as_resource(type_name, d, "provider") for d in type_items]
+            elif type_name == "variable":
+                yield type_name, [self.as_resource(type_name, d, "variable") for d in type_items]
+            elif type_name == "output":
+                yield type_name, [self.as_resource(type_name, d, "output") for d in type_items]
             else:
+                data_resources = []
                 resources = []
-                for data in type_items:
-                    name = data["__tfmeta"]["path"]
-                    resources.append(self.as_resource(name, data))
-                yield type_name, resources
+                for item in type_items:
+                    name = item["__tfmeta"]["path"]
+                    resource = self.as_resource(name, item)
+                    if item["__tfmeta"].get("type", "resource") == "data":
+                        data_resources.append(resource)
+                    else:
+                        resources.append(resource)
 
-    def as_resource(self, name, data):
+                if resources:
+                    if types and type_name in types:
+                        yield type_name, resources
+                    elif not types:
+                        yield type_name, resources
+                if data_resources:
+                    if types and f"data.{type_name}" in types:
+                        yield f"data.{type_name}", data_resources
+                    elif not types:
+                        yield f"data.{type_name}", data_resources
+
+    def as_resource(self, name, data, type_name=None):
+        if type_name and "type" not in data["__tfmeta"]:
+            data["__tfmeta"]["type"] = type_name
         data["__tfmeta"]["src_dir"] = self.src_dir
         return TerraformResource(name, data)
 
@@ -68,6 +87,8 @@ class Resolver:
         for rid in refs:
             r = self._id_map[rid]
             rtype = r["__tfmeta"]["label"]
+            if r["__tfmeta"].get("type") == "data":
+                rtype = f"data.{rtype}"
             if types and rtype not in types:
                 continue
             yield r

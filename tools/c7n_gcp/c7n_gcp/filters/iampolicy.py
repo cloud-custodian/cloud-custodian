@@ -37,8 +37,7 @@ class IamPolicyFilter(Filter):
     def process(self, resources, event=None):
         if 'doc' in self.data:
             try:
-                valueFilter = IamPolicyValueFilter(self.data['doc'], self.manager)
-                resources = valueFilter.process(resources)
+                resources = self.process_resources(resources)
             except TypeError:
                 valueFilter = IamPolicyValueFilter(self.data['doc'], self.manager, "bucket")
                 resources = valueFilter.process(resources)
@@ -52,6 +51,11 @@ class IamPolicyFilter(Filter):
             'op': op, 'value_type': value_type}, self.manager)
             resources = userRolePairFilter.process(resources)
 
+        return resources
+
+    def process_resources(self, resources):
+        valueFilter = IamPolicyValueFilter(self.data['doc'], self.manager)
+        resources = valueFilter.process(resources)
         return resources
 
 
@@ -143,7 +147,8 @@ class IamPolicyUserRolePairFilter(ValueFilter):
         client = self.get_client(session, model)
 
         for r in resources:
-            iam_policy = client.execute_command('getIamPolicy', {"resource": r["projectId"]})
+            resource_key = 'projectId' if 'projectId' in r else 'name'
+            iam_policy = client.execute_command('getIamPolicy', {"resource": r[resource_key]})
             r["c7n:iamPolicyUserRolePair"] = {}
             userToRolesMap = {}
 

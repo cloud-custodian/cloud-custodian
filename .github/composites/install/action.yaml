@@ -4,7 +4,7 @@ inputs:
   python-version:
     required: true
   poetry-version:
-    default: "1.4.0"
+    default: "1.5.1"
 outputs:
   poetry-version:
     description: "poetry version"
@@ -74,3 +74,8 @@ runs:
       shell: bash
       id: echo-poetry-version
       run: echo "poetry-version=${{ inputs.poetry-version }}" >> $GITHUB_OUTPUT
+
+    - name: Build awscc data files
+      shell: bash
+      run: cd tools/c7n_awscc && python build.py
+

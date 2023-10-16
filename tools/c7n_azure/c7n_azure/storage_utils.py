@@ -11,9 +11,10 @@ from azure.storage.queue import QueueClient
 
 class OldBlobServiceClient(BlobServiceClient):
 
-    def create_blob_from_path(self, container_name, blob_name, content):
+    def create_blob_from_path(self, container_name, blob_name, path):
         client = self.get_blob_client(container_name, blob_name)
-        client.upload_blob(content, overwrite=True)
+        with open(path, "rb") as data:
+            client.upload_blob(data, overwrite=True)
 
     def get_blob_to_bytes(self, container_name, blob_name):
         client = self.get_blob_client(container_name, blob_name)

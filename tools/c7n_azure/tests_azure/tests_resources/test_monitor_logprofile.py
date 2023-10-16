@@ -22,3 +22,18 @@ class MonitorLogprofileTest(BaseTest):
         })
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
+    def test_find_storage(self):
+        p = self.load_policy({
+            'name': 'test-azure-azure-monitor-log-profile-storage',
+            'resource': 'azure.monitor-log-profile',
+            'filters': [
+                {'type': 'monitor-storage',
+                 'key': 'properties.encryption.keySource',
+                 'op': 'eq',
+                 "value_type": "normalize",
+                 'value': 'microsoft.keyvault'
+                 }],
+        })
+        resources = p.run()
+        self.assertEqual(len(resources), 1)

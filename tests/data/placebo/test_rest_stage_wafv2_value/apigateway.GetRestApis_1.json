@@ -1,0 +1,30 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "items": [
+                        {
+                "id": "kzf9nach22",
+                "name": "cfb-raosbslb-fail-v2-no-rules",
+                "createdDate": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 3,
+                    "day": 21,
+                    "hour": 11,
+                    "minute": 32,
+                    "second": 31,
+                    "microsecond": 0
+                },
+                "version": "1.0",
+                "apiKeySource": "HEADER",
+                "endpointConfiguration": {
+                    "types": [
+                        "REGIONAL"
+                    ]
+                },
+                "disableExecuteApiEndpoint": false
+            }
+        ]
+    }
+}
