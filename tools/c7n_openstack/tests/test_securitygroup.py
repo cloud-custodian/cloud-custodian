@@ -6,7 +6,7 @@ from common_openstack import OpenStackTest
 class SecurityGroupTest(OpenStackTest):
 
     def test_securitygroup_query(self):
-        factory = self.replay_flight_data()
+        factory = self.replay_flight_data('test_securitygroup_query')
         p = self.load_policy({
             'name': 'all-security-groups',
             'resource': 'openstack.security-group'},
@@ -15,7 +15,7 @@ class SecurityGroupTest(OpenStackTest):
         self.assertEqual(len(resources), 2)
 
     def test_securitygroup_filter_ports(self):
-        factory = self.replay_flight_data()
+        factory = self.replay_flight_data('test_securitygroup_filter_ports')
         policy = {
             'name': 'get-security-group-test-1',
             'resource': 'openstack.security-group',
@@ -41,7 +41,7 @@ class SecurityGroupTest(OpenStackTest):
         self.assertEqual(len(resources), 2)
 
     def test_securitygroup_filter_ipaddress(self):
-        factory = self.replay_flight_data()
+        factory = self.replay_flight_data('test_securitygroup_filter_ipaddress')
         policy = {
             'name': 'get-security-group-test-2',
             'resource': 'openstack.security-group',
@@ -53,7 +53,6 @@ class SecurityGroupTest(OpenStackTest):
                     "value": 0,
                     "op": "gt",
                     "value_type": "size"
-
                 },
             ],
         }
