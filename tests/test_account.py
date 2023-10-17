@@ -7,12 +7,14 @@ from c7n.executor import MainThreadExecutor
 from c7n.utils import local_session, format_string_values
 from c7n.resources import account
 from c7n.testing import mock_datetime_now
+from botocore.exceptions import ClientError
 
 from pytest_terraform import terraform
 
 import datetime
 from dateutil import parser, tz
 import json
+import logging
 import time
 from unittest import mock
 
@@ -532,6 +534,30 @@ class AccountTests(BaseTest):
             resources = p.run()
         self.assertEqual(len(resources), 1)
 
+    def test_service_limit_exception_handling(self):
+        client = mock.MagicMock()
+        error_response = {
+            'Error': {
+                'Code': 'InvalidParameterValueException',
+                'Message': 'Invalid parameter value'
+            }
+        }
+        client.refresh_trusted_advisor_check.side_effect = [ClientError(error_response,
+            "RefreshTrustedAdvisorCheck")]
+        client.describe_trusted_advisor_check_result.side_effect = [
+            {'result': {'status': 'not_available'}},
+            {'result': True}]
+        client.describe_trusted_advisor_check_refresh_statuses.return_value = {
+            'statuses': [{'status': 'success'}]}
+
+        def time_sleep(interval):
+            return
+
+        self.patch(account.time, 'sleep', time_sleep)
+        self.assertEqual(
+            account.ServiceLimit.get_check_result(client, 'bogusid'),
+            None)
+
     def test_service_limit_poll_status(self):
 
         client = mock.MagicMock()
@@ -582,6 +608,82 @@ class AccountTests(BaseTest):
             {"DB instances"},
         )
         self.assertEqual(len(resources[0]["c7n:ServiceLimitsExceeded"]), 1)
+
+    def test_service_limit_specific_check_handles_exception(self):
+        session_factory = self.replay_flight_data("test_account_service_limit_exception")
+        client = mock.MagicMock()
+        error_response = {
+            'Error': {
+                'Code': 'InvalidParameterValueException',
+                'Message': 'Invalid parameter value'
+            }
+        }
+        client.refresh_trusted_advisor_check.side_effect = [ClientError(error_response,
+            "RefreshTrustedAdvisorCheck")]
+        client.describe_trusted_advisor_check_result.side_effect = [
+            {'result': {'status': 'not_available'}},
+            {'result': True}]
+        client.describe_trusted_advisor_check_refresh_statuses.return_value = {
+            'statuses': [{'status': 'success'}]}
+        p = self.load_policy(
+            {
+                "name": "service-limit",
+                "resource": "account",
+                "filters": [
+                    {
+                        "type": "service-limit",
+                        "names": ["RDS DB Instances"],
+                        "threshold": 1.0,
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        # use this to prevent attempts at refreshing check
+        with mock_datetime_now(parser.parse("2017-02-23T00:40:00+00:00"), datetime) and \
+         self.capture_logging(level=logging.WARNING) as log_output:
+            resources = p.run()
+            self.assertEqual(0, len(resources))
+            self.assertRegexpMatches(log_output.getvalue(), r"InvalidParameterValueException")
+
+
+    def test_service_limit_specific_check_handles_exception_on_date_refresh(self):
+        session_factory = self.replay_flight_data(
+            "test_account_service_limit_date_refresh_exception")
+        client = mock.MagicMock()
+        error_response = {
+            'Error': {
+                'Code': 'InvalidParameterValueException',
+                'Message': 'Invalid parameter value'
+            }
+        }
+        client.refresh_trusted_advisor_check.side_effect = [ClientError(error_response,
+            "RefreshTrustedAdvisorCheck")]
+        client.describe_trusted_advisor_check_result.side_effect = [
+            {'result': {'status': 'not_available'}},
+            {'result': True}]
+        client.describe_trusted_advisor_check_refresh_statuses.return_value = {
+            'statuses': [{'status': 'success'}]}
+        p = self.load_policy(
+            {
+                "name": "service-limit",
+                "resource": "account",
+                "filters": [
+                    {
+                        "type": "service-limit",
+                        "names": ["RDS DB Instances"],
+                        "threshold": 1.0,
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        # use this to prevent attempts at refreshing check
+        with mock_datetime_now(parser.parse("2017-02-23T00:40:00+00:00"), datetime) and \
+         self.capture_logging(level=logging.WARNING) as log_output:
+            resources = p.run()
+            self.assertEqual(0, len(resources))
+            self.assertRegexpMatches(log_output.getvalue(), r"InvalidParameterValueException")
 
     def test_service_limit_specific_service(self):
         session_factory = self.replay_flight_data("test_account_service_limit_specific_service")
