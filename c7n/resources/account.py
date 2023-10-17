@@ -314,9 +314,9 @@ class CloudTrailEnabled(Filter):
                         if s['IncludeManagementEvents'] and s['ReadWriteType'] == 'All':
                             matched.append(t)
                 elif 'AdvancedEventSelectors' in selectors.keys():
-                    management = False
-                    readonly = False
                     for s in selectors['AdvancedEventSelectors']:
+                        management = False
+                        readonly = False
                         for field_selector in s['FieldSelectors']:
                             if field_selector['Field'] == 'eventCategory' and \
                                     'Management' in field_selector['Equals']:
