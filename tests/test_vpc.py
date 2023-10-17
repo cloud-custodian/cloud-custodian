@@ -1,5 +1,6 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+import logging
 import time
 from .common import BaseTest, functional, event_data, load_data
 from unittest.mock import MagicMock
@@ -3182,6 +3183,26 @@ class InternetGatewayTest(BaseTest):
         except BotoClientError:
             self.fail('should not raise')
         mock_factory().client('ec2').delete_internet_gateway.assert_called_once()
+
+    def test_delete_internet_gateway_with_dependencies(self):
+        factory = self.replay_flight_data(
+            "test_internet_gateway_delete_with_dependencies",
+            region="us-east-2"
+        )
+        p = self.load_policy(
+            {
+                "name": "delete-internet-gateway-with-dependencies",
+                "resource": "internet-gateway",
+                "filters": [{"tag:Name": "dev"}],
+                "actions": [{"type": "delete"}],
+            },
+            session_factory=factory,
+            config={"region": "us-east-2"},
+        )
+        with self.capture_logging("custodian.actions", level=logging.WARNING) as log_output:
+            resources = p.run()
+            self.assertEqual(len(resources), 1)
+            self.assertRegexpMatches(log_output.getvalue(), "DependencyViolation error")
 
 
 class NATGatewayTest(BaseTest):
