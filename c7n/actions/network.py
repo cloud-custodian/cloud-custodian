@@ -265,7 +265,8 @@ class ModifyVpcSecurityGroupsAction(Action):
                 r, self._get_array('isolation-group'), resolved_groups)
 
             for sg in tag_filtered_groups:
-                if sg['VpcId'] == jmespath.search(self.manager.filter_registry.get('vpc').RelatedIdsExpression, r):
+                if sg['VpcId'] == jmespath.search(
+                    self.manager.filter_registry.get('vpc').RelatedIdsExpression, r):
                     add_groups.append(sg['GroupId'])
 
             for g in remove_groups:
