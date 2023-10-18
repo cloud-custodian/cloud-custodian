@@ -4,6 +4,7 @@ import itertools
 
 from c7n.exceptions import PolicyExecutionError, PolicyValidationError
 from c7n import utils
+import jmespath
 
 from .core import Action
 
@@ -92,12 +93,6 @@ class ModifyVpcSecurityGroupsAction(Action):
     sg_expr = None
     vpc_expr = None
 
-    def get_vpc_related_id(self):
-        vpc_filter = self.manager.filter_registry.get('vpc')
-        if not vpc_filter or not vpc_filter.RelatedIdsExpression:
-            return
-        return utils.jmespath_compile(vpc_filter.RelatedIdsExpression)
-
     def validate(self):
         sg_filter = self.manager.filter_registry.get('security-group')
         if not sg_filter or not sg_filter.RelatedIdsExpression:
@@ -105,11 +100,12 @@ class ModifyVpcSecurityGroupsAction(Action):
                 "policy:{policy} resource:{resource_type} does "
                 "not support {action_type} action")))
         if self.get_action_group_names():
-            if not self.get_vpc_related_id():
+            vpc_filter = self.manager.filter_registry.get('vpc')
+            if not vpc_filter or not vpc_filter.RelatedIdsExpression:
                 raise PolicyValidationError(self._format_error((
                     "policy:{policy} resource:{resource_type} does not support "
                     "security-group names only ids in action:{action_type}")))
-            self.vpc_expr = self.get_vpc_related_id()
+            self.vpc_expr = utils.jmespath_compile(vpc_filter.RelatedIdsExpression)
         if self.sg_expr is None:
             self.sg_expr = utils.jmespath_compile(
                 self.manager.filter_registry.get('security-group').RelatedIdsExpression)
@@ -269,7 +265,7 @@ class ModifyVpcSecurityGroupsAction(Action):
                 r, self._get_array('isolation-group'), resolved_groups)
 
             for sg in tag_filtered_groups:
-                if sg['VpcId'] == self.get_vpc_related_id().search(r):
+                if sg['VpcId'] == jmespath.search(self.manager.filter_registry.get('vpc').RelatedIdsExpression, r):
                     add_groups.append(sg['GroupId'])
 
             for g in remove_groups:

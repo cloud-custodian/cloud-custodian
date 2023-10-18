@@ -4,7 +4,7 @@
         "DBInstances": [
             {
                 "DBInstanceIdentifier": "database-1",
-                "DBInstanceClass": "db.m6gd.large",
+                "DBInstanceClass": "db.t3.micro",
                 "Engine": "mysql",
                 "DBInstanceStatus": "available",
                 "MasterUsername": "admin",
@@ -13,19 +13,19 @@
                     "Port": 3306,
                     "HostedZoneId": "Z2R2ITUGPM61AM"
                 },
-                "AllocatedStorage": 200,
+                "AllocatedStorage": 20,
                 "InstanceCreateTime": {
                     "__class__": "datetime",
                     "year": 2023,
                     "month": 10,
                     "day": 18,
-                    "hour": 16,
-                    "minute": 12,
-                    "second": 25,
-                    "microsecond": 568000
+                    "hour": 17,
+                    "minute": 46,
+                    "second": 34,
+                    "microsecond": 829000
                 },
-                "PreferredBackupWindow": "08:10-08:40",
-                "BackupRetentionPeriod": 0,
+                "PreferredBackupWindow": "09:04-09:34",
+                "BackupRetentionPeriod": 1,
                 "DBSecurityGroups": [],
                 "VpcSecurityGroups": [
                     {
@@ -39,7 +39,7 @@
                         "ParameterApplyStatus": "in-sync"
                     }
                 ],
-                "AvailabilityZone": "us-east-1b",
+                "AvailabilityZone": "us-east-1a",
                 "DBSubnetGroup": {
                     "DBSubnetGroupName": "default",
                     "DBSubnetGroupDescription": "default",
@@ -80,14 +80,23 @@
                         }
                     ]
                 },
-                "PreferredMaintenanceWindow": "thu:06:34-thu:07:04",
+                "PreferredMaintenanceWindow": "fri:06:44-fri:07:14",
                 "PendingModifiedValues": {},
+                "LatestRestorableTime": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 10,
+                    "day": 18,
+                    "hour": 17,
+                    "minute": 50,
+                    "second": 0,
+                    "microsecond": 0
+                },
                 "MultiAZ": false,
                 "EngineVersion": "8.0.33",
-                "AutoMinorVersionUpgrade": false,
+                "AutoMinorVersionUpgrade": true,
                 "ReadReplicaDBInstanceIdentifiers": [],
                 "LicenseModel": "general-public-license",
-                "Iops": 3000,
                 "OptionGroupMemberships": [
                     {
                         "OptionGroupName": "default:mysql-8-0",
@@ -95,17 +104,15 @@
                     }
                 ],
                 "PubliclyAccessible": false,
-                "StorageType": "gp3",
+                "StorageType": "gp2",
                 "DbInstancePort": 0,
                 "StorageEncrypted": true,
                 "KmsKeyId": "arn:aws:kms:us-east-1:644160558196:key/b10f842a-feb7-4318-92d5-0640a75b7688",
-                "DbiResourceId": "db-ZOMIWL4KNAUSGXTZIN762TSYDA",
+                "DbiResourceId": "db-5DJZIRR2BJA54CWPZYSDTXHU6U",
                 "CACertificateIdentifier": "rds-ca-2019",
                 "DomainMemberships": [],
                 "CopyTagsToSnapshot": true,
-                "MonitoringInterval": 60,
-                "EnhancedMonitoringResourceArn": "arn:aws:logs:us-east-1:644160558196:log-group:RDSOSMetrics:log-stream:db-ZOMIWL4KNAUSGXTZIN762TSYDA",
-                "MonitoringRoleArn": "arn:aws:iam::644160558196:role/rds-monitoring-role",
+                "MonitoringInterval": 0,
                 "DBInstanceArn": "arn:aws:rds:us-east-1:644160558196:db:database-1",
                 "IAMDatabaseAuthenticationEnabled": false,
                 "PerformanceInsightsEnabled": false,
@@ -117,7 +124,7 @@
                 "ActivityStreamStatus": "stopped",
                 "BackupTarget": "region",
                 "NetworkType": "IPV4",
-                "StorageThroughput": 125,
+                "StorageThroughput": 0,
                 "CertificateDetails": {
                     "CAIdentifier": "rds-ca-2019",
                     "ValidTill": {
