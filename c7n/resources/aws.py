@@ -781,9 +781,14 @@ class AWS(Provider):
             available_regions = service_region_map.get(
                 resource_service_map.get(resource_type), ())
 
-            # its a global service/endpoint, use user provided region
-            # or us-east-1.
-            if not available_regions and options.regions:
+            if resource_service_map.get(resource_type) == 'route53domains':
+                # Although route53domains service is global it's available
+                # only in one regional endpoint - us-east-1. This one endpoint
+                # is returned by get_available_regions('route53domains')
+                svc_regions = available_regions
+            elif not available_regions and options.regions:
+                # its a global service/endpoint, use user provided region
+                # or us-east-1.
                 candidates = [r for r in options.regions if r != 'all']
                 candidate = candidates and candidates[0] or 'us-east-1'
                 svc_regions = [candidate]
