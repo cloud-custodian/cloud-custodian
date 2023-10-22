@@ -208,6 +208,12 @@ class ArnTest(BaseTest):
             'arn:aws:s3:::my_corporate_bucket/exampleobject.png')
         self.assertEqual(arn.resource, 'my_corporate_bucket/exampleobject.png')
 
+    def test_invalid_arn(self):
+        try:
+            aws.Arn.parse('arn:aws')
+        except ValueError:
+            pass
+
 
 class UtilTest(BaseTest):
 

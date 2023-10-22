@@ -101,13 +101,13 @@ files = [
 
 [[package]]
 name = "azure-core"
-version = "1.29.4"
+version = "1.29.5"
 description = "Microsoft Azure Core Library for Python"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "azure-core-1.29.4.tar.gz", hash = "sha256:500b3aa9bf2e90c5ccc88bb105d056114ca0ce7d0ce73afb8bc4d714b2fc7568"},
-    {file = "azure_core-1.29.4-py3-none-any.whl", hash = "sha256:b03261bcba22c0b9290faf9999cedd23e849ed2577feee90515694cea6bc74bf"},
+    {file = "azure-core-1.29.5.tar.gz", hash = "sha256:52983c89d394c6f881a121e5101c5fa67278ca3b1f339c8fb2ef39230c70e9ac"},
+    {file = "azure_core-1.29.5-py3-none-any.whl", hash = "sha256:0fa04b7b1f7d44a4fb8468c4093deb2ea01fdf4faddbf802ed9205615f99d68c"},
 ]
 
 [package.dependencies]
@@ -313,6 +313,22 @@ azure-mgmt-core = ">=1.2.0,<2.0.0"
 msrest = ">=0.5.0"
 
 [[package]]
+name = "azure-mgmt-appconfiguration"
+version = "0.7.0"
+description = "Microsoft Azure App Configuration Management Client Library for Python"
+optional = false
+python-versions = "*"
+files = [
+    {file = "azure-mgmt-appconfiguration-0.7.0.zip", hash = "sha256:cac18f421f1b4310d97adf90229d53febe8c05c917e96dfd5cacceb3e08c528a"},
+    {file = "azure_mgmt_appconfiguration-0.7.0-py2.py3-none-any.whl", hash = "sha256:8c42a27f9353bc891738d9564b48aca38674ea079fc609104a744cf413b5a8fb"},
+]
+
+[package.dependencies]
+azure-common = ">=1.1,<2.0"
+msrest = ">=0.5.0"
+msrestazure = ">=0.4.32,<2.0.0"
+
+[[package]]
 name = "azure-mgmt-applicationinsights"
 version = "1.0.0"
 description = "Microsoft Azure Application Insights Management Client Library for Python"
@@ -359,6 +375,22 @@ files = [
 azure-common = ">=1.1,<2.0"
 azure-mgmt-core = ">=1.2.0,<2.0.0"
 msrest = ">=0.5.0"
+
+[[package]]
+name = "azure-mgmt-automation"
+version = "0.1.1"
+description = "Microsoft Azure Automation Client Library for Python"
+optional = false
+python-versions = "*"
+files = [
+    {file = "azure-mgmt-automation-0.1.1.zip", hash = "sha256:cb095da2ae1fada2f41d5f737eba0ccedb7f5e6d807e02ac5b04f631bfb92855"},
+    {file = "azure_mgmt_automation-0.1.1-py2.py3-none-any.whl", hash = "sha256:ffde4e1749c27082d34767112182f4d6d6b115fe892e3c3389970043d052d142"},
+]
+
+[package.dependencies]
+azure-common = ">=1.1,<2.0"
+msrest = ">=0.5.0"
+msrestazure = ">=0.4.32,<2.0.0"
 
 [[package]]
 name = "azure-mgmt-batch"
@@ -551,6 +583,22 @@ azure-mgmt-core = ">=1.2.0,<2.0.0"
 msrest = ">=0.5.0"
 
 [[package]]
+name = "azure-mgmt-datalake-analytics"
+version = "0.5.0"
+description = "Microsoft Azure Data Lake Analytics Management Client Library for Python"
+optional = false
+python-versions = "*"
+files = [
+    {file = "azure-mgmt-datalake-analytics-0.5.0.zip", hash = "sha256:1f5dc7d8012a11357bbf1d6fb5bf7ce35d31e5dc3da78412807a3c8d15896ae3"},
+    {file = "azure_mgmt_datalake_analytics-0.5.0-py2.py3-none-any.whl", hash = "sha256:c3dd997e807aaafa970e73e767398d2c680afe640a06a6aafd37a36a45c6cde5"},
+]
+
+[package.dependencies]
+azure-common = ">=1.1,<2.0"
+azure-mgmt-datalake-nspkg = ">=2.0.0"
+msrestazure = ">=0.4.27,<2.0.0"
+
+[[package]]
 name = "azure-mgmt-datalake-nspkg"
 version = "3.0.1"
 description = "Microsoft Azure Data Lake Management Namespace Package [Internal]"
@@ -734,6 +782,22 @@ python-versions = "*"
 files = [
     {file = "azure-mgmt-logic-9.0.0.zip", hash = "sha256:d3a780d299c4db59134bd984c4c9281b9b6ae5d4ba185bcbae43f6c3af04f85a"},
     {file = "azure_mgmt_logic-9.0.0-py2.py3-none-any.whl", hash = "sha256:abacd7b493119bb74050cbfa82f80298ead8aa4a13a3d4c92e918e88b9e23b77"},
+]
+
+[package.dependencies]
+azure-common = ">=1.1,<2.0"
+azure-mgmt-core = ">=1.2.0,<2.0.0"
+msrest = ">=0.5.0"
+
+[[package]]
+name = "azure-mgmt-machinelearningservices"
+version = "1.0.0"
+description = "Microsoft Azure Machine Learning Services Management Client Library for Python"
+optional = false
+python-versions = "*"
+files = [
+    {file = "azure-mgmt-machinelearningservices-1.0.0.zip", hash = "sha256:89badb0d3517e950964774afcc0f2faf0dd55dd558f9f4cb20cc949dc48b4dfb"},
+    {file = "azure_mgmt_machinelearningservices-1.0.0-py2.py3-none-any.whl", hash = "sha256:6881c55c5634648f1f92a98e7f9dda66ed368392406c71335efe78c8c4c392c7"},
 ]
 
 [package.dependencies]
@@ -997,6 +1061,22 @@ azure-mgmt-core = ">=1.2.0,<2.0.0"
 msrest = ">=0.6.21"
 
 [[package]]
+name = "azure-mgmt-signalr"
+version = "0.4.0"
+description = "Microsoft Azure SignalR Client Library for Python"
+optional = false
+python-versions = "*"
+files = [
+    {file = "azure-mgmt-signalr-0.4.0.zip", hash = "sha256:6503ddda9d6f4b634dfeb8eb4bcd14ede5e0900585f6c83bf9010cf82215c126"},
+    {file = "azure_mgmt_signalr-0.4.0-py2.py3-none-any.whl", hash = "sha256:43d2c63c18bbf4a20a4a8d630a2abc44e3d8b920a4354cc38326220f5f8dd839"},
+]
+
+[package.dependencies]
+azure-common = ">=1.1,<2.0"
+msrest = ">=0.5.0"
+msrestazure = ">=0.4.32,<2.0.0"
+
+[[package]]
 name = "azure-mgmt-sql"
 version = "1.0.0"
 description = "Microsoft Azure SQL Management Client Library for Python"
@@ -1210,17 +1290,17 @@ tzdata = ["tzdata"]
 
 [[package]]
 name = "boto3"
-version = "1.28.63"
+version = "1.28.68"
 description = "The AWS SDK for Python"
 optional = false
 python-versions = ">= 3.7"
 files = [
-    {file = "boto3-1.28.63-py3-none-any.whl", hash = "sha256:65d052ec13197460586ee385aa2d6bba0e7378d2d2c7f3e93c044c43ae1ca782"},
-    {file = "boto3-1.28.63.tar.gz", hash = "sha256:94218aba2feb5b404b665b8d76c172dc654f79b4c5fa0e9e92459c098da87bf4"},
+    {file = "boto3-1.28.68-py3-none-any.whl", hash = "sha256:0da96244df4771a8ee70b742c42759a440fdb9c8b7850584db7c5daf10e824e1"},
+    {file = "boto3-1.28.68.tar.gz", hash = "sha256:cbc76ed54278be8cdc44ce6ee1980296f764fdff72c6bbe668169c07d4ca08f0"},
 ]
 
 [package.dependencies]
-botocore = ">=1.31.63,<1.32.0"
+botocore = ">=1.31.68,<1.32.0"
 jmespath = ">=0.7.1,<2.0.0"
 s3transfer = ">=0.7.0,<0.8.0"
 
@@ -1229,13 +1309,13 @@ crt = ["botocore[crt] (>=1.21.0,<2.0a0)"]
 
 [[package]]
 name = "botocore"
-version = "1.31.63"
+version = "1.31.68"
 description = "Low-level, data-driven core of boto 3."
 optional = false
 python-versions = ">= 3.7"
 files = [
-    {file = "botocore-1.31.63-py3-none-any.whl", hash = "sha256:cb9db5db5af865b1fc2e1405b967db5d78dd0f4d84e5dc1974e082733c1034b7"},
-    {file = "botocore-1.31.63.tar.gz", hash = "sha256:6e582c811ea74f25bdb490ac372b2645de4a60286b42ddd8c69f3b6df82b6b12"},
+    {file = "botocore-1.31.68-py3-none-any.whl", hash = "sha256:7b7065c502f5faa6cc2aa4b42b5fa34e5c0cd171e2952d6a9aeb26bfd44a54c3"},
+    {file = "botocore-1.31.68.tar.gz", hash = "sha256:0813f02d00e46051364d9b5d5e697a90e988b336b87e949888c1444a59b8ba59"},
 ]
 
 [package.dependencies]
@@ -2262,13 +2342,13 @@ devenv = ["black", "check-manifest", "flake8", "pyroma", "pytest (>=4.3)", "pyte
 
 [[package]]
 name = "urllib3"
-version = "1.26.17"
+version = "1.26.18"
 description = "HTTP library with thread-safe connection pooling, file post, and more."
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*, !=3.5.*"
 files = [
-    {file = "urllib3-1.26.17-py2.py3-none-any.whl", hash = "sha256:94a757d178c9be92ef5539b8840d48dc9cf1b2709c9d6b588232a055c524458b"},
-    {file = "urllib3-1.26.17.tar.gz", hash = "sha256:24d6a242c28d29af46c3fae832c36db3bbebcc533dd1bb549172cd739c82df21"},
+    {file = "urllib3-1.26.18-py2.py3-none-any.whl", hash = "sha256:34b97092d7e0a3a8cf7cd10e386f401b3737364026c45e622aa02903dffe0f07"},
+    {file = "urllib3-1.26.18.tar.gz", hash = "sha256:f8ecc1bba5667413457c529ab955bf8c67b45db799d159066261719e328580a0"},
 ]
 
 [package.extras]
@@ -2496,4 +2576,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "fcf4a2e81b711021c71d8e1aa957e3c5f63ca161619acac897cb22465648946e"
+content-hash = "1131ddd2f0dbeb67f7daa2d4a6a9f00120dda242cd6fb023493185eb90278980"
