@@ -313,6 +313,22 @@ azure-mgmt-core = ">=1.2.0,<2.0.0"
 msrest = ">=0.5.0"
 
 [[package]]
+name = "azure-mgmt-appconfiguration"
+version = "0.7.0"
+description = "Microsoft Azure App Configuration Management Client Library for Python"
+optional = false
+python-versions = "*"
+files = [
+    {file = "azure-mgmt-appconfiguration-0.7.0.zip", hash = "sha256:cac18f421f1b4310d97adf90229d53febe8c05c917e96dfd5cacceb3e08c528a"},
+    {file = "azure_mgmt_appconfiguration-0.7.0-py2.py3-none-any.whl", hash = "sha256:8c42a27f9353bc891738d9564b48aca38674ea079fc609104a744cf413b5a8fb"},
+]
+
+[package.dependencies]
+azure-common = ">=1.1,<2.0"
+msrest = ">=0.5.0"
+msrestazure = ">=0.4.32,<2.0.0"
+
+[[package]]
 name = "azure-mgmt-applicationinsights"
 version = "1.0.0"
 description = "Microsoft Azure Application Insights Management Client Library for Python"
@@ -2528,4 +2544,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "7c1a41b464ebe24937e316789d2852df7b5cd25946c3703859e6490697b7f9f8"
+content-hash = "4676085819947eba58298300c8d58f3137087b7c00e636b69c16c11bddc988d4"
