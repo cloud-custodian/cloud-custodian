@@ -1,0 +1,11 @@
+{
+    "status_code": 404,
+    "data": {
+        "Error": {
+            "Type": "Sender",
+            "Code": "NoSuchEntity",
+            "Message": "OpenIDConnect Provider not found for arn arn:aws:iam::644160558196:oidc-provider/accounts.google.com"
+        },
+        "ResponseMetadata": {}
+    }
+}
