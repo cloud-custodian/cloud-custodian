@@ -205,10 +205,19 @@ class GlueJobToggleMetrics(BaseAction):
         if 'WorkerType' in params or 'NumberOfWorkers' in params:
             del params['MaxCapacity']
 
+        # Can't specify Timeout when updating Ray jobs.
+        # Removing Timeout preserves default setting.
+        if params['Command']['Name'] == 'glueray':
+            del params['Timeout']
+
         if self.data.get('enabled'):
+            if 'DefaultArguments' not in params:
+                params['DefaultArguments'] = {}
             params["DefaultArguments"]["--enable-metrics"] = ""
         else:
-            del params["DefaultArguments"]["--enable-metrics"]
+            if 'DefaultArguments' in params and \
+                '--enable-metrics' in params['DefaultArguments']:
+                del params["DefaultArguments"]["--enable-metrics"]
 
         return params
 
