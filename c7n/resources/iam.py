@@ -2984,6 +2984,42 @@ class OpenIdProvider(QueryResourceManager):
     source_mapping = {'describe': OpenIdDescribe}
 
 
+@OpenIdProvider.action_registry.register('delete')
+class OpenIdProviderDelete(BaseAction):
+    """Delete an OpenID Connect IAM Identity Provider
+
+    For example, if you want to automatically delete an OIDC IdP for example.com
+
+    :example:
+
+      .. code-block:: yaml
+
+        - name: aws-iam-oidc-provider-delete
+          resource: iam-oidc-provider
+          filters:
+            - type: value
+              key: Url
+              value: example.com
+          actions:
+            - type: delete
+
+    """
+    schema = type_schema('delete')
+    permissions = ('iam:DeleteOpenIDConnectProvider',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('iam')
+        for provider in resources:
+            self.manager.retry(
+                client.delete_open_id_connect_provider,
+                OpenIDConnectProviderArn=provider['Arn'],
+                ignore_err_codes=(
+                    'NoSuchEntityException',
+                    'DeleteConflictException',
+                ),
+            )
+
+
 @InstanceProfile.filter_registry.register('has-specific-managed-policy')
 class SpecificIamProfileManagedPolicy(ValueFilter):
     """Filter an IAM instance profile that contains an IAM role that has a specific managed IAM
