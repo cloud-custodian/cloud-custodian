@@ -2499,7 +2499,15 @@ class DeleteInternetGateway(BaseAction):
             try:
                 client.delete_internet_gateway(InternetGatewayId=r['InternetGatewayId'])
             except ClientError as err:
-                if not err.response['Error']['Code'] == 'InvalidInternetGatewayId.NotFound':
+                if err.response['Error']['Code'] == 'DependencyViolation':
+                    self.log.warning(
+                        "%s error hit deleting internetgateway: %s",
+                        err.response['Error']['Code'],
+                        err.response['Error']['Message'],
+                    )
+                elif err.response['Error']['Code'] == 'InvalidInternetGatewayId.NotFound':
+                    pass
+                else:
                     raise
 
 
