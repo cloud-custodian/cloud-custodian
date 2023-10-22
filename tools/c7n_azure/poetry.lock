@@ -377,6 +377,22 @@ azure-mgmt-core = ">=1.2.0,<2.0.0"
 msrest = ">=0.5.0"
 
 [[package]]
+name = "azure-mgmt-automation"
+version = "0.1.1"
+description = "Microsoft Azure Automation Client Library for Python"
+optional = false
+python-versions = "*"
+files = [
+    {file = "azure-mgmt-automation-0.1.1.zip", hash = "sha256:cb095da2ae1fada2f41d5f737eba0ccedb7f5e6d807e02ac5b04f631bfb92855"},
+    {file = "azure_mgmt_automation-0.1.1-py2.py3-none-any.whl", hash = "sha256:ffde4e1749c27082d34767112182f4d6d6b115fe892e3c3389970043d052d142"},
+]
+
+[package.dependencies]
+azure-common = ">=1.1,<2.0"
+msrest = ">=0.5.0"
+msrestazure = ">=0.4.32,<2.0.0"
+
+[[package]]
 name = "azure-mgmt-batch"
 version = "15.0.0"
 description = "Microsoft Azure Batch Management Client Library for Python"
@@ -766,6 +782,22 @@ python-versions = "*"
 files = [
     {file = "azure-mgmt-logic-9.0.0.zip", hash = "sha256:d3a780d299c4db59134bd984c4c9281b9b6ae5d4ba185bcbae43f6c3af04f85a"},
     {file = "azure_mgmt_logic-9.0.0-py2.py3-none-any.whl", hash = "sha256:abacd7b493119bb74050cbfa82f80298ead8aa4a13a3d4c92e918e88b9e23b77"},
+]
+
+[package.dependencies]
+azure-common = ">=1.1,<2.0"
+azure-mgmt-core = ">=1.2.0,<2.0.0"
+msrest = ">=0.5.0"
+
+[[package]]
+name = "azure-mgmt-machinelearningservices"
+version = "1.0.0"
+description = "Microsoft Azure Machine Learning Services Management Client Library for Python"
+optional = false
+python-versions = "*"
+files = [
+    {file = "azure-mgmt-machinelearningservices-1.0.0.zip", hash = "sha256:89badb0d3517e950964774afcc0f2faf0dd55dd558f9f4cb20cc949dc48b4dfb"},
+    {file = "azure_mgmt_machinelearningservices-1.0.0-py2.py3-none-any.whl", hash = "sha256:6881c55c5634648f1f92a98e7f9dda66ed368392406c71335efe78c8c4c392c7"},
 ]
 
 [package.dependencies]
@@ -2544,4 +2576,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "4676085819947eba58298300c8d58f3137087b7c00e636b69c16c11bddc988d4"
+content-hash = "1131ddd2f0dbeb67f7daa2d4a6a9f00120dda242cd6fb023493185eb90278980"
