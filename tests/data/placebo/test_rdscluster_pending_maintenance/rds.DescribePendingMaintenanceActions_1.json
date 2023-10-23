@@ -1,0 +1,89 @@
+{
+    "status_code": 200,
+    "data": {
+        "PendingMaintenanceActions": [
+            {
+                "ResourceIdentifier": "arn:aws:rds:us-west-2:644160558196:db:docdb-2022-01-13-21-04-08",
+                "PendingMaintenanceActionDetails": [
+                    {
+                        "Action": "system-update",
+                        "Description": "New Operating System upgrade is available"
+                    }
+                ]
+            },
+            {
+                "ResourceIdentifier": "arn:aws:rds:us-west-2:644160558196:db:docdb-2022-01-13-21-04-082",
+                "PendingMaintenanceActionDetails": [
+                    {
+                        "Action": "system-update",
+                        "Description": "New Operating System upgrade is available"
+                    }
+                ]
+            },
+            {
+                "ResourceIdentifier": "arn:aws:rds:us-west-2:644160558196:db:docdb-2022-01-13-21-04-083",
+                "PendingMaintenanceActionDetails": [
+                    {
+                        "Action": "system-update",
+                        "Description": "New Operating System upgrade is available"
+                    }
+                ]
+            },
+            {
+                "ResourceIdentifier": "arn:aws:rds:us-west-2:644160558196:db:ldmvevunf96iok",
+                "PendingMaintenanceActionDetails": [
+                    {
+                        "Action": "system-update",
+                        "Description": "New Operating System update is available"
+                    }
+                ]
+            },
+            {
+                "ResourceIdentifier": "arn:aws:rds:us-west-2:644160558196:db:ldonkix3h2cgj0",
+                "PendingMaintenanceActionDetails": [
+                    {
+                        "Action": "system-update",
+                        "Description": "New Operating System update is available"
+                    }
+                ]
+            },
+            {
+                "ResourceIdentifier": "arn:aws:rds:us-west-2:644160558196:db:sh-taxonomy-servicee2einstance1",
+                "PendingMaintenanceActionDetails": [
+                    {
+                        "Action": "system-update",
+                        "Description": "New Operating System upgrade is available"
+                    }
+                ]
+            },
+            {
+                "ResourceIdentifier": "arn:aws:rds:us-west-2:644160558196:db:sh-taxonomy-servicee2einstance2",
+                "PendingMaintenanceActionDetails": [
+                    {
+                        "Action": "system-update",
+                        "Description": "New Operating System upgrade is available"
+                    }
+                ]
+            },
+            {
+                "ResourceIdentifier": "arn:aws:rds:us-west-2:644160558196:db:sh-taxonomy-servicee2einstance3",
+                "PendingMaintenanceActionDetails": [
+                    {
+                        "Action": "system-update",
+                        "Description": "New Operating System upgrade is available"
+                    }
+                ]
+            },
+            {
+                "ResourceIdentifier": "arn:aws:rds:us-west-2:644160558196:db:sh-taxonomy-serviceqalinstance1",
+                "PendingMaintenanceActionDetails": [
+                    {
+                        "Action": "system-update",
+                        "Description": "New Operating System upgrade is available"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

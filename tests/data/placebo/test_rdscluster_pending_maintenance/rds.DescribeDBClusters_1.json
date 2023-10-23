@@ -1,0 +1,497 @@
+{
+    "status_code": 200,
+    "data": {
+        "DBClusters": [
+            {
+                "AllocatedStorage": 1,
+                "AvailabilityZones": [
+                    "us-west-2c",
+                    "us-west-2a",
+                    "us-west-2b"
+                ],
+                "BackupRetentionPeriod": 1,
+                "DBClusterIdentifier": "docdb-2022-01-13-21-04-08",
+                "DBClusterParameterGroup": "dbclusterparametergroup-pgzxifplmlkd",
+                "DBSubnetGroup": "dbsubnetgroup-mctyhw2p4e6x",
+                "Status": "available",
+                "EarliestRestorableTime": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 10,
+                    "day": 21,
+                    "hour": 9,
+                    "minute": 12,
+                    "second": 51,
+                    "microsecond": 902000
+                },
+                "Endpoint": "docdb-2022-01-13-21-04-08.cluster-c6k9ogejhpnz.us-west-2.docdb.amazonaws.com",
+                "ReaderEndpoint": "docdb-2022-01-13-21-04-08.cluster-ro-c6k9ogejhpnz.us-west-2.docdb.amazonaws.com",
+                "MultiAZ": true,
+                "Engine": "docdb",
+                "EngineVersion": "3.6.0",
+                "LatestRestorableTime": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 10,
+                    "day": 23,
+                    "hour": 7,
+                    "minute": 51,
+                    "second": 20,
+                    "microsecond": 114000
+                },
+                "Port": 27017,
+                "MasterUsername": "lc",
+                "PreferredBackupWindow": "08:57-09:27",
+                "PreferredMaintenanceWindow": "thu:08:17-thu:08:47",
+                "ReadReplicaIdentifiers": [],
+                "DBClusterMembers": [
+                    {
+                        "DBInstanceIdentifier": "docdb-2022-01-13-21-04-082",
+                        "IsClusterWriter": false,
+                        "DBClusterParameterGroupStatus": "in-sync",
+                        "PromotionTier": 1
+                    },
+                    {
+                        "DBInstanceIdentifier": "docdb-2022-01-13-21-04-083",
+                        "IsClusterWriter": false,
+                        "DBClusterParameterGroupStatus": "in-sync",
+                        "PromotionTier": 1
+                    },
+                    {
+                        "DBInstanceIdentifier": "docdb-2022-01-13-21-04-08",
+                        "IsClusterWriter": true,
+                        "DBClusterParameterGroupStatus": "in-sync",
+                        "PromotionTier": 1
+                    }
+                ],
+                "VpcSecurityGroups": [
+                    {
+                        "VpcSecurityGroupId": "sg-085ae6034885cab70",
+                        "Status": "active"
+                    }
+                ],
+                "HostedZoneId": "Z9PSE6HRXLC6K",
+                "StorageEncrypted": true,
+                "KmsKeyId": "arn:aws:kms:us-west-2:644160558196:key/8ecb248a-8ef1-439b-8eab-7e2530a8ab14",
+                "DbClusterResourceId": "cluster-SNOKGBPZWDDBYSUOOMDYYKWO6U",
+                "DBClusterArn": "arn:aws:rds:us-west-2:644160558196:cluster:docdb-2022-01-13-21-04-08",
+                "AssociatedRoles": [],
+                "IAMDatabaseAuthenticationEnabled": false,
+                "ClusterCreateTime": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 1,
+                    "day": 13,
+                    "hour": 21,
+                    "minute": 5,
+                    "second": 7,
+                    "microsecond": 723000
+                },
+                "EngineMode": "provisioned",
+                "DeletionProtection": true,
+                "HttpEndpointEnabled": false,
+                "ActivityStreamStatus": "stopped",
+                "CopyTagsToSnapshot": false,
+                "CrossAccountClone": false,
+                "DomainMemberships": [],
+                "TagList": [
+                    {
+                        "Key": "intuit:asset_id",
+                        "Value": "8073845824321253821"
+                    },
+                    {
+                        "Key": "CredentialPolicy",
+                        "Value": "arn:aws:secretsmanager:us-west-2:644160558196:secret:chapi/documentdb-sh-taxonomy-service-e2e-password-m1F2mA"
+                    },
+                    {
+                        "Key": "chp:chaplette:name",
+                        "Value": "chp-documentdb"
+                    },
+                    {
+                        "Key": "chp:chaplette:productUrl",
+                        "Value": "https://agi-intuit-public-artifacts-644160558196-us-west-2.s3.amazonaws.com/cloud-patterns/chp-documentdb/v0.1.0/product.yaml"
+                    },
+                    {
+                        "Key": "chp:chaplette:version",
+                        "Value": "0.1.0"
+                    },
+                    {
+                        "Key": "chp:chaplette:parentStackId",
+                        "Value": "arn:aws:cloudformation:us-west-2:644160558196:stack/app-deployment-e2e-01dwer73w8tajcqs8kfekfd1yb/b4d97620-7d44-11ea-8435-0ae10a278694"
+                    },
+                    {
+                        "Key": "chp:chaplette:logicalResourceId",
+                        "Value": "DocumentDB"
+                    }
+                ],
+                "AutoMinorVersionUpgrade": false,
+                "NetworkType": "IPV4"
+            },
+            {
+                "AllocatedStorage": 1,
+                "AvailabilityZones": [
+                    "us-west-2c",
+                    "us-west-2a",
+                    "us-west-2b"
+                ],
+                "BackupRetentionPeriod": 1,
+                "DBClusterIdentifier": "documentdb-sh-taxonomy-service-e2e",
+                "DBClusterParameterGroup": "dbclusterparametergroup-pgzxifplmlkd",
+                "DBSubnetGroup": "dbsubnetgroup-mctyhw2p4e6x",
+                "Status": "available",
+                "EarliestRestorableTime": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 10,
+                    "day": 21,
+                    "hour": 9,
+                    "minute": 2,
+                    "second": 0,
+                    "microsecond": 734000
+                },
+                "Endpoint": "documentdb-sh-taxonomy-service-e2e.cluster-c6k9ogejhpnz.us-west-2.docdb.amazonaws.com",
+                "ReaderEndpoint": "documentdb-sh-taxonomy-service-e2e.cluster-ro-c6k9ogejhpnz.us-west-2.docdb.amazonaws.com",
+                "MultiAZ": true,
+                "Engine": "docdb",
+                "EngineVersion": "3.6.0",
+                "LatestRestorableTime": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 10,
+                    "day": 23,
+                    "hour": 7,
+                    "minute": 52,
+                    "second": 50,
+                    "microsecond": 291000
+                },
+                "Port": 27017,
+                "MasterUsername": "lc",
+                "PreferredBackupWindow": "08:57-09:27",
+                "PreferredMaintenanceWindow": "thu:08:17-thu:08:47",
+                "ReadReplicaIdentifiers": [],
+                "DBClusterMembers": [
+                    {
+                        "DBInstanceIdentifier": "sh-taxonomy-servicee2einstance1",
+                        "IsClusterWriter": true,
+                        "DBClusterParameterGroupStatus": "in-sync",
+                        "PromotionTier": 1
+                    },
+                    {
+                        "DBInstanceIdentifier": "sh-taxonomy-servicee2einstance2",
+                        "IsClusterWriter": false,
+                        "DBClusterParameterGroupStatus": "in-sync",
+                        "PromotionTier": 1
+                    },
+                    {
+                        "DBInstanceIdentifier": "sh-taxonomy-servicee2einstance3",
+                        "IsClusterWriter": false,
+                        "DBClusterParameterGroupStatus": "in-sync",
+                        "PromotionTier": 1
+                    }
+                ],
+                "VpcSecurityGroups": [
+                    {
+                        "VpcSecurityGroupId": "sg-00d71418dec488538",
+                        "Status": "active"
+                    }
+                ],
+                "HostedZoneId": "Z9PSE6HRXLC6K",
+                "StorageEncrypted": true,
+                "KmsKeyId": "arn:aws:kms:us-west-2:644160558196:key/8ecb248a-8ef1-439b-8eab-7e2530a8ab14",
+                "DbClusterResourceId": "cluster-4YMJJ46VAI6FSIP2HTK5OUKCVE",
+                "DBClusterArn": "arn:aws:rds:us-west-2:644160558196:cluster:documentdb-sh-taxonomy-service-e2e",
+                "AssociatedRoles": [],
+                "IAMDatabaseAuthenticationEnabled": false,
+                "ClusterCreateTime": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 4,
+                    "day": 13,
+                    "hour": 5,
+                    "minute": 9,
+                    "second": 36,
+                    "microsecond": 667000
+                },
+                "EngineMode": "provisioned",
+                "DeletionProtection": true,
+                "HttpEndpointEnabled": false,
+                "ActivityStreamStatus": "stopped",
+                "CopyTagsToSnapshot": false,
+                "CrossAccountClone": false,
+                "DomainMemberships": [],
+                "TagList": [
+                    {
+                        "Key": "intuit:asset_id",
+                        "Value": "8073845824321253821"
+                    },
+                    {
+                        "Key": "CredentialPolicy",
+                        "Value": "arn:aws:secretsmanager:us-west-2:644160558196:secret:chapi/documentdb-sh-taxonomy-service-e2e-password-m1F2mA"
+                    },
+                    {
+                        "Key": "chp:chaplette:name",
+                        "Value": "chp-documentdb"
+                    },
+                    {
+                        "Key": "chp:chaplette:productUrl",
+                        "Value": "https://agi-intuit-public-artifacts-644160558196-us-west-2.s3.amazonaws.com/cloud-patterns/chp-documentdb/v0.1.0/product.yaml"
+                    },
+                    {
+                        "Key": "chp:chaplette:version",
+                        "Value": "0.1.0"
+                    },
+                    {
+                        "Key": "chp:chaplette:parentStackId",
+                        "Value": "arn:aws:cloudformation:us-west-2:644160558196:stack/app-deployment-e2e-01dwer73w8tajcqs8kfekfd1yb/b4d97620-7d44-11ea-8435-0ae10a278694"
+                    },
+                    {
+                        "Key": "chp:chaplette:logicalResourceId",
+                        "Value": "DocumentDB"
+                    }
+                ],
+                "AutoMinorVersionUpgrade": false,
+                "NetworkType": "IPV4"
+            },
+            {
+                "AllocatedStorage": 1,
+                "AvailabilityZones": [
+                    "us-west-2c",
+                    "us-west-2a",
+                    "us-west-2b"
+                ],
+                "BackupRetentionPeriod": 1,
+                "DBClusterIdentifier": "documentdb-sh-taxonomy-service-qal",
+                "DBClusterParameterGroup": "dbclusterparametergroup-rtcmbpdwtydx",
+                "DBSubnetGroup": "dbsubnetgroup-nfagt4g416px",
+                "Status": "available",
+                "EarliestRestorableTime": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 10,
+                    "day": 21,
+                    "hour": 12,
+                    "minute": 46,
+                    "second": 32,
+                    "microsecond": 527000
+                },
+                "Endpoint": "documentdb-sh-taxonomy-service-qal.cluster-c6k9ogejhpnz.us-west-2.docdb.amazonaws.com",
+                "ReaderEndpoint": "documentdb-sh-taxonomy-service-qal.cluster-ro-c6k9ogejhpnz.us-west-2.docdb.amazonaws.com",
+                "MultiAZ": false,
+                "Engine": "docdb",
+                "EngineVersion": "3.6.0",
+                "LatestRestorableTime": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 10,
+                    "day": 23,
+                    "hour": 7,
+                    "minute": 52,
+                    "second": 29,
+                    "microsecond": 566000
+                },
+                "Port": 27017,
+                "MasterUsername": "lc",
+                "PreferredBackupWindow": "12:33-13:03",
+                "PreferredMaintenanceWindow": "thu:10:16-thu:10:46",
+                "ReadReplicaIdentifiers": [],
+                "DBClusterMembers": [
+                    {
+                        "DBInstanceIdentifier": "sh-taxonomy-serviceqalinstance1",
+                        "IsClusterWriter": true,
+                        "DBClusterParameterGroupStatus": "in-sync",
+                        "PromotionTier": 1
+                    }
+                ],
+                "VpcSecurityGroups": [
+                    {
+                        "VpcSecurityGroupId": "sg-0208798eb403861b5",
+                        "Status": "active"
+                    }
+                ],
+                "HostedZoneId": "Z9PSE6HRXLC6K",
+                "StorageEncrypted": true,
+                "KmsKeyId": "arn:aws:kms:us-west-2:644160558196:key/8ecb248a-8ef1-439b-8eab-7e2530a8ab14",
+                "DbClusterResourceId": "cluster-GXZQNBCA4CLXGSDEPZVA36KARA",
+                "DBClusterArn": "arn:aws:rds:us-west-2:644160558196:cluster:documentdb-sh-taxonomy-service-qal",
+                "AssociatedRoles": [],
+                "IAMDatabaseAuthenticationEnabled": false,
+                "ClusterCreateTime": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 4,
+                    "day": 7,
+                    "hour": 17,
+                    "minute": 11,
+                    "second": 4,
+                    "microsecond": 575000
+                },
+                "EngineMode": "provisioned",
+                "DeletionProtection": true,
+                "HttpEndpointEnabled": false,
+                "ActivityStreamStatus": "stopped",
+                "CopyTagsToSnapshot": false,
+                "CrossAccountClone": false,
+                "DomainMemberships": [],
+                "TagList": [
+                    {
+                        "Key": "intuit:asset_id",
+                        "Value": "8073845824321253821"
+                    },
+                    {
+                        "Key": "CredentialPolicy",
+                        "Value": "arn:aws:secretsmanager:us-west-2:644160558196:secret:chapi/documentdb-sh-taxonomy-service-qal-password-mTov56"
+                    },
+                    {
+                        "Key": "chp:chaplette:name",
+                        "Value": "chp-documentdb"
+                    },
+                    {
+                        "Key": "chp:chaplette:productUrl",
+                        "Value": "https://agi-intuit-public-artifacts-644160558196-us-west-2.s3.amazonaws.com/cloud-patterns/chp-documentdb/v0.1.0/product.yaml"
+                    },
+                    {
+                        "Key": "chp:chaplette:version",
+                        "Value": "0.1.0"
+                    },
+                    {
+                        "Key": "chp:chaplette:parentStackId",
+                        "Value": "arn:aws:cloudformation:us-west-2:644160558196:stack/app-deployment-qal-01dwer73w8tajcqs8kfekfd1yb/7e57bf40-78f2-11ea-b368-0a59d1b75b46"
+                    },
+                    {
+                        "Key": "chp:chaplette:logicalResourceId",
+                        "Value": "DocumentDB"
+                    }
+                ],
+                "AutoMinorVersionUpgrade": false,
+                "NetworkType": "IPV4"
+            },
+            {
+                "AllocatedStorage": 1,
+                "AvailabilityZones": [
+                    "us-west-2c",
+                    "us-west-2a",
+                    "us-west-2b"
+                ],
+                "BackupRetentionPeriod": 2,
+                "DatabaseName": "dynamicads",
+                "DBClusterIdentifier": "managed-chaplette-1575357830918865129-dbcluster-17m53yp76zj0u",
+                "DBClusterParameterGroup": "managed-chaplette-1575357-dbclusterparametergroup-ivumq0983ciu",
+                "DBSubnetGroup": "managed-chaplette-1575357830918865129-dbsubnetgroup-25qbnublxtuk",
+                "Status": "available",
+                "EarliestRestorableTime": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 10,
+                    "day": 20,
+                    "hour": 8,
+                    "minute": 58,
+                    "second": 34,
+                    "microsecond": 53000
+                },
+                "Endpoint": "managed-chaplette-1575357830918865129-dbcluster-17m53yp76zj0u.cluster-c6k9ogejhpnz.us-west-2.rds.amazonaws.com",
+                "ReaderEndpoint": "managed-chaplette-1575357830918865129-dbcluster-17m53yp76zj0u.cluster-ro-c6k9ogejhpnz.us-west-2.rds.amazonaws.com",
+                "MultiAZ": true,
+                "Engine": "aurora-mysql",
+                "EngineVersion": "5.7.mysql_aurora.2.11.2",
+                "LatestRestorableTime": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 10,
+                    "day": 23,
+                    "hour": 7,
+                    "minute": 53,
+                    "second": 22,
+                    "microsecond": 478000
+                },
+                "Port": 3306,
+                "MasterUsername": "lcadmin",
+                "PreferredBackupWindow": "08:46-09:16",
+                "PreferredMaintenanceWindow": "fri:10:23-fri:10:53",
+                "ReadReplicaIdentifiers": [],
+                "DBClusterMembers": [
+                    {
+                        "DBInstanceIdentifier": "mdf3d7f9939afe",
+                        "IsClusterWriter": false,
+                        "DBClusterParameterGroupStatus": "in-sync",
+                        "PromotionTier": 1
+                    },
+                    {
+                        "DBInstanceIdentifier": "md4qibfz3c8wmn",
+                        "IsClusterWriter": true,
+                        "DBClusterParameterGroupStatus": "in-sync",
+                        "PromotionTier": 1
+                    }
+                ],
+                "VpcSecurityGroups": [
+                    {
+                        "VpcSecurityGroupId": "sg-09597e9f52dbd5c44",
+                        "Status": "active"
+                    }
+                ],
+                "HostedZoneId": "Z1PVIF0B656C1W",
+                "StorageEncrypted": true,
+                "KmsKeyId": "arn:aws:kms:us-west-2:644160558196:key/8ecb248a-8ef1-439b-8eab-7e2530a8ab14",
+                "DbClusterResourceId": "cluster-K3HBJTPUPTIXSMQZDNKY2LZYL4",
+                "DBClusterArn": "arn:aws:rds:us-west-2:644160558196:cluster:managed-chaplette-1575357830918865129-dbcluster-17m53yp76zj0u",
+                "AssociatedRoles": [],
+                "IAMDatabaseAuthenticationEnabled": false,
+                "ClusterCreateTime": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 12,
+                    "day": 3,
+                    "hour": 7,
+                    "minute": 29,
+                    "second": 13,
+                    "microsecond": 917000
+                },
+                "EnabledCloudwatchLogsExports": [
+                    "audit",
+                    "error",
+                    "general",
+                    "slowquery"
+                ],
+                "EngineMode": "provisioned",
+                "DeletionProtection": true,
+                "HttpEndpointEnabled": false,
+                "ActivityStreamStatus": "stopped",
+                "CopyTagsToSnapshot": false,
+                "CrossAccountClone": false,
+                "DomainMemberships": [],
+                "TagList": [
+                    {
+                        "Key": "pe_rdscluster_unused_stopped",
+                        "Value": "Yes"
+                    },
+                    {
+                        "Key": "pe_rdscluster_unused",
+                        "Value": "Resource does not meet policy: stop@2023/10/25"
+                    },
+                    {
+                        "Key": "chp:chaplette:name",
+                        "Value": "chp-rds-mysql-aurora"
+                    },
+                    {
+                        "Key": "chp:chaplette:productUrl",
+                        "Value": "https://agi-intuit-public-artifacts-644160558196-us-west-2.s3.amazonaws.com/cloud-patterns/chp-rds-mysql-aurora/v0.5.1/product.yaml"
+                    },
+                    {
+                        "Key": "chp:chaplette:version",
+                        "Value": "0.5.1"
+                    },
+                    {
+                        "Key": "chp:chaplette:parentStackId",
+                        "Value": "arn:aws:cloudformation:us-west-2:644160558196:stack/app-deployment-pod-2-qa-2-01dv58d156n12a01ym4g1dv05x/d03b2fd0-159d-11ea-8a39-021902f1267e"
+                    },
+                    {
+                        "Key": "chp:chaplette:logicalResourceId",
+                        "Value": "RDSDataBase"
+                    }
+                ],
+                "AutoMinorVersionUpgrade": true,
+                "NetworkType": "IPV4"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
