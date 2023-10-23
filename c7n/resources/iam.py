@@ -726,6 +726,8 @@ class CheckPermissions(Filter):
                 evaluations = eval_cache[arn]
             else:
                 evaluations = self.get_evaluations(client, arn, r, actions)
+                if not evaluations:
+                    continue
                 eval_cache[arn] = evaluations
             matches = []
             matched = []
