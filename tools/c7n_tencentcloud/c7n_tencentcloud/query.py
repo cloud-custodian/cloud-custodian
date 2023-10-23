@@ -1,7 +1,6 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
-import jmespath
 from retrying import RetryError
 from tencentcloud.common.exception.tencent_cloud_sdk_exception import TencentCloudSDKException
 
@@ -11,7 +10,7 @@ from c7n.exceptions import PolicyExecutionError
 from c7n.filters import FilterRegistry
 from c7n.manager import ResourceManager
 from c7n.query import sources
-from c7n.utils import local_session, chunks
+from c7n.utils import local_session, chunks, jmespath_search
 from .actions.tags import register_tag_actions, register_tag_filters
 from .client import Session
 
@@ -86,7 +85,7 @@ class ResourceQuery:
             params.update(extra_params)
         try:
             resp = cli.execute_query(action, params)
-            return jmespath.search(jsonpath, resp)
+            return jmespath_search(jsonpath, resp)
         except (RetryError, TencentCloudSDKException) as err:
             raise PolicyExecutionError(err) from err
 

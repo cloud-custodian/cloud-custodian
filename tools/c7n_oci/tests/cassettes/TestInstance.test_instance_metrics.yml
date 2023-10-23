@@ -1,0 +1,394 @@
+interactions:
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: https://www-proxy.us.oracle.com:80/20160918/users/ocid1.user.oc1..<unique_ID>
+  response:
+    body:
+      data:
+        capabilities:
+          canUseApiKeys: true
+          canUseAuthTokens: true
+          canUseConsolePassword: false
+          canUseCustomerSecretKeys: true
+          canUseDbCredentials: true
+          canUseOAuth2ClientCredentials: true
+          canUseSmtpCredentials: true
+        compartmentId: ocid1.tenancy.oc1..<unique_ID>
+        dbUserName: user@example.com
+        definedTags:
+          Oracle-Tags:
+            CreatedBy: Some
+          OracleInternalReserved:
+            Phonebook: '9800'
+        description: user@example.com
+        emailVerified: true
+        externalIdentifier: c5571b54909a443685e610af14bcf73b
+        freeformTags:
+          Contractor: 'True'
+          TagName: TagValue
+          key_old: 'true'
+          mfa_activated: 'false'
+        id: ocid1.user.oc1..<unique_ID>
+        identityProviderId: ocid1.saml2idp.oc1..<unique_ID>
+        isMfaActivated: false
+        lifecycleState: ACTIVE
+        name: user@example.com
+        timeCreated: '2022-07-15T08:25:13.055Z'
+        timeModified: '2023-06-21T09:20:37.521Z'
+    headers:
+      cache-control:
+      - no-cache, no-store, must-revalidate
+      content-length:
+      - '1090'
+      content-type:
+      - application/json
+      date:
+      - Thu, 13 Jul 2023 18:00:36 GMT
+      etag:
+      - 31ff068d7314192e8d5de6e0397f28186f61005e
+      pragma:
+      - no-cache
+      x-content-type-options:
+      - nosniff
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: https://www-proxy.us.oracle.com:80/20160918/instances?compartmentId=ocid1.compartment.oc1..<unique_ID>
+  response:
+    body:
+      data:
+      - agentConfig:
+          areAllPluginsDisabled: false
+          isManagementDisabled: false
+          isMonitoringDisabled: false
+          pluginsConfig:
+          - desiredState: DISABLED
+            name: Vulnerability Scanning
+          - desiredState: DISABLED
+            name: Oracle Java Management Service
+          - desiredState: ENABLED
+            name: OS Management Service Agent
+          - desiredState: DISABLED
+            name: Management Agent
+          - desiredState: ENABLED
+            name: Custom Logs Monitoring
+          - desiredState: ENABLED
+            name: Compute Instance Run Command
+          - desiredState: ENABLED
+            name: Compute Instance Monitoring
+          - desiredState: DISABLED
+            name: Block Volume Management
+          - desiredState: DISABLED
+            name: Bastion
+        availabilityConfig:
+          isLiveMigrationPreferred: null
+          recoveryAction: RESTORE_INSTANCE
+        availabilityDomain: NQNU:US-ASHBURN-AD-1
+        capacityReservationId: null
+        clusterPlacementGroupId: null
+        compartmentId: ocid1.compartment.oc1..<unique_ID>
+        dedicatedVmHostId: null
+        definedTags:
+          Oracle-Tags:
+            CreatedBy: user@example.com
+            CreatedOn: '2023-07-13T05:54:54.548Z'
+        displayName: instance-20230713-1124
+        extendedMetadata: {}
+        faultDomain: FAULT-DOMAIN-2
+        freeformTags: {}
+        id: ocid1.instance.oc1..<unique_ID>
+        imageId: ocid1.image.oc1..<unique_ID>
+        instanceConfigurationId: null
+        instanceOptions:
+          areLegacyImdsEndpointsDisabled: false
+        ipxeScript: null
+        isCrossNumaNode: false
+        launchMode: PARAVIRTUALIZED
+        launchOptions:
+          bootVolumeType: PARAVIRTUALIZED
+          firmware: UEFI_64
+          isConsistentVolumeNamingEnabled: true
+          isEncryptionInTransitEnabled: null
+          isPvEncryptionInTransitEnabled: true
+          networkType: PARAVIRTUALIZED
+          remoteDataVolumeType: PARAVIRTUALIZED
+        lifecycleState: TERMINATED
+        platformConfig: null
+        preemptibleInstanceConfig: null
+        preferredMaintenanceAction: null
+        region: iad
+        shape: VM.Standard.E4.Flex
+        shapeConfig:
+          baselineOcpuUtilization: null
+          gpuDescription: null
+          gpus: 0
+          localDiskDescription: null
+          localDisks: 0
+          localDisksTotalSizeInGBs: null
+          maxVnicAttachments: 2
+          memoryInGBs: 16.0
+          networkingBandwidthInGbps: 1.0
+          ocpus: 1.0
+          processorDescription: "2.55 GHz AMD EPYC\u2122 7J13 (Milan)"
+          vcpus: 2
+        sourceDetails:
+          bootVolumeSizeInGBs: null
+          bootVolumeVpusPerGB: null
+          imageId: ocid1.image.oc1..<unique_ID>
+          instanceSourceImageFilterDetails: null
+          kmsKeyId: null
+          sourceType: image
+        systemTags: {}
+        timeCreated: '2023-07-13T05:54:55.146Z'
+        timeMaintenanceRebootDue: null
+        timeStopScheduled: null
+    headers:
+      content-encoding:
+      - gzip
+      content-length:
+      - '2821'
+      content-type:
+      - application/json
+      date:
+      - Thu, 13 Jul 2023 18:00:37 GMT
+      x-content-type-options:
+      - nosniff
+    status:
+      code: 200
+      message: OK
+- request:
+    body: mock_body
+    headers: {}
+    method: POST
+    uri: https://www-proxy.us.oracle.com:80/20180401/metrics/actions/summarizeMetricsData?compartmentId=ocid1.compartment.oc1..<unique_ID>
+  response:
+    body:
+      data:
+      - aggregatedDatapoints:
+        - timestamp: '2023-07-13T15:01:00.000Z'
+          value: 1.0
+        - timestamp: '2023-07-13T15:02:00.000Z'
+          value: 1.0
+        - timestamp: '2023-07-13T15:03:00.000Z'
+          value: 1.0
+        - timestamp: '2023-07-13T15:04:00.000Z'
+          value: 1.0
+        - timestamp: '2023-07-13T15:05:00.000Z'
+          value: 1.0
+        - timestamp: '2023-07-13T15:06:00.000Z'
+          value: 1.0
+        - timestamp: '2023-07-13T15:07:00.000Z'
+          value: 1.0
+        - timestamp: '2023-07-13T15:08:00.000Z'
+          value: 1.0
+        - timestamp: '2023-07-13T15:09:00.000Z'
+          value: 1.0
+        - timestamp: '2023-07-13T15:10:00.000Z'
+          value: 1.0
+        - timestamp: '2023-07-13T15:11:00.000Z'
+          value: 1.0
+        - timestamp: '2023-07-13T15:12:00.000Z'
+          value: 1.0
+        - timestamp: '2023-07-13T15:13:00.000Z'
+          value: 1.0
+        - timestamp: '2023-07-13T15:14:00.000Z'
+          value: 1.0
+        - timestamp: '2023-07-13T15:15:00.000Z'
+          value: 1.0
+        - timestamp: '2023-07-13T15:16:00.000Z'
+          value: 1.0
+        - timestamp: '2023-07-13T15:17:00.000Z'
+          value: 1.0
+        - timestamp: '2023-07-13T15:18:00.000Z'
+          value: 1.0
+        - timestamp: '2023-07-13T15:19:00.000Z'
+          value: 1.0
+        - timestamp: '2023-07-13T15:20:00.000Z'
+          value: 1.0
+        - timestamp: '2023-07-13T15:21:00.000Z'
+          value: 1.0
+        - timestamp: '2023-07-13T15:22:00.000Z'
+          value: 1.0
+        - timestamp: '2023-07-13T15:23:00.000Z'
+          value: 1.0
+        - timestamp: '2023-07-13T15:24:00.000Z'
+          value: 1.0
+        - timestamp: '2023-07-13T15:25:00.000Z'
+          value: 1.0
+        - timestamp: '2023-07-13T15:26:00.000Z'
+          value: 1.0
+        - timestamp: '2023-07-13T15:27:00.000Z'
+          value: 1.0
+        - timestamp: '2023-07-13T15:28:00.000Z'
+          value: 1.0
+        - timestamp: '2023-07-13T15:29:00.000Z'
+          value: 1.0
+        - timestamp: '2023-07-13T15:30:00.000Z'
+          value: 1.0
+        - timestamp: '2023-07-13T15:31:00.000Z'
+          value: 1.0
+        - timestamp: '2023-07-13T15:32:00.000Z'
+          value: 1.0
+        - timestamp: '2023-07-13T15:33:00.000Z'
+          value: 1.0
+        - timestamp: '2023-07-13T15:34:00.000Z'
+          value: 1.0
+        - timestamp: '2023-07-13T15:35:00.000Z'
+          value: 1.0
+        - timestamp: '2023-07-13T15:36:00.000Z'
+          value: 1.0
+        - timestamp: '2023-07-13T15:37:00.000Z'
+          value: 1.0
+        - timestamp: '2023-07-13T15:38:00.000Z'
+          value: 1.0
+        - timestamp: '2023-07-13T15:39:00.000Z'
+          value: 1.0
+        - timestamp: '2023-07-13T15:40:00.000Z'
+          value: 1.0
+        - timestamp: '2023-07-13T15:41:00.000Z'
+          value: 1.0
+        - timestamp: '2023-07-13T15:42:00.000Z'
+          value: 1.0
+        - timestamp: '2023-07-13T15:43:00.000Z'
+          value: 1.0
+        - timestamp: '2023-07-13T15:44:00.000Z'
+          value: 1.0
+        - timestamp: '2023-07-13T15:45:00.000Z'
+          value: 1.0
+        - timestamp: '2023-07-13T15:46:00.000Z'
+          value: 1.0
+        - timestamp: '2023-07-13T15:47:00.000Z'
+          value: 1.0
+        - timestamp: '2023-07-13T15:48:00.000Z'
+          value: 1.0
+        - timestamp: '2023-07-13T15:49:00.000Z'
+          value: 1.0
+        - timestamp: '2023-07-13T15:50:00.000Z'
+          value: 1.0
+        - timestamp: '2023-07-13T15:51:00.000Z'
+          value: 1.0
+        - timestamp: '2023-07-13T15:52:00.000Z'
+          value: 1.0
+        - timestamp: '2023-07-13T15:53:00.000Z'
+          value: 1.0
+        - timestamp: '2023-07-13T15:54:00.000Z'
+          value: 1.0
+        - timestamp: '2023-07-13T15:55:00.000Z'
+          value: 1.0
+        - timestamp: '2023-07-13T15:56:00.000Z'
+          value: 1.0
+        - timestamp: '2023-07-13T15:57:00.000Z'
+          value: 1.0
+        - timestamp: '2023-07-13T15:58:00.000Z'
+          value: 1.0
+        - timestamp: '2023-07-13T15:59:00.000Z'
+          value: 1.0
+        - timestamp: '2023-07-13T16:00:00.000Z'
+          value: 1.0
+        - timestamp: '2023-07-13T16:01:00.000Z'
+          value: 1.0
+        - timestamp: '2023-07-13T16:02:00.000Z'
+          value: 1.0
+        - timestamp: '2023-07-13T16:03:00.000Z'
+          value: 1.0
+        - timestamp: '2023-07-13T16:04:00.000Z'
+          value: 1.0
+        - timestamp: '2023-07-13T16:05:00.000Z'
+          value: 1.0
+        - timestamp: '2023-07-13T16:06:00.000Z'
+          value: 1.0
+        - timestamp: '2023-07-13T16:07:00.000Z'
+          value: 1.0
+        - timestamp: '2023-07-13T16:08:00.000Z'
+          value: 1.0
+        - timestamp: '2023-07-13T16:09:00.000Z'
+          value: 1.0
+        - timestamp: '2023-07-13T16:10:00.000Z'
+          value: 1.0
+        - timestamp: '2023-07-13T16:11:00.000Z'
+          value: 1.0
+        - timestamp: '2023-07-13T16:12:00.000Z'
+          value: 1.0
+        - timestamp: '2023-07-13T16:13:00.000Z'
+          value: 1.0
+        - timestamp: '2023-07-13T16:14:00.000Z'
+          value: 1.0
+        - timestamp: '2023-07-13T16:15:00.000Z'
+          value: 1.0
+        - timestamp: '2023-07-13T16:16:00.000Z'
+          value: 1.0
+        - timestamp: '2023-07-13T16:17:00.000Z'
+          value: 1.0
+        - timestamp: '2023-07-13T16:18:00.000Z'
+          value: 1.0
+        - timestamp: '2023-07-13T16:19:00.000Z'
+          value: 1.0
+        - timestamp: '2023-07-13T16:20:00.000Z'
+          value: 1.0
+        - timestamp: '2023-07-13T16:21:00.000Z'
+          value: 1.0
+        - timestamp: '2023-07-13T16:22:00.000Z'
+          value: 1.0
+        - timestamp: '2023-07-13T16:23:00.000Z'
+          value: 1.0
+        - timestamp: '2023-07-13T16:24:00.000Z'
+          value: 1.0
+        - timestamp: '2023-07-13T16:25:00.000Z'
+          value: 1.0
+        - timestamp: '2023-07-13T16:26:00.000Z'
+          value: 1.0
+        - timestamp: '2023-07-13T16:27:00.000Z'
+          value: 1.0
+        - timestamp: '2023-07-13T16:28:00.000Z'
+          value: 1.0
+        - timestamp: '2023-07-13T16:29:00.000Z'
+          value: 1.0
+        - timestamp: '2023-07-13T16:30:00.000Z'
+          value: 1.0
+        - timestamp: '2023-07-13T16:31:00.000Z'
+          value: 1.0
+        - timestamp: '2023-07-13T16:32:00.000Z'
+          value: 1.0
+        - timestamp: '2023-07-13T16:33:00.000Z'
+          value: 1.0
+        - timestamp: '2023-07-13T16:34:00.000Z'
+          value: 1.0
+        - timestamp: '2023-07-13T16:35:00.000Z'
+          value: 1.0
+        compartmentId: ocid1.compartment.oc1..<unique_ID>
+        dimensions:
+          availabilityDomain: NQNU:US-ASHBURN-AD-1
+          faultDomain: FAULT-DOMAIN-1
+          imageId: ocid1.image.oc1..<unique_ID>
+          instancePoolId: Default
+          region: us-ashburn-1
+          resourceDisplayName: test
+          resourceId: ocid1.instance.oc1..<unique_ID>
+          shape: VM.Standard2.4
+        name: CpuUtilization
+        namespace: <namespace>
+        resolution: null
+        resourceGroup: null
+    headers:
+      content-encoding:
+      - gzip
+      content-type:
+      - application/json
+      date:
+      - Thu, 13 Jul 2023 18:00:38 GMT
+      transfer-encoding:
+      - chunked
+      vary:
+      - Accept-Encoding
+      x-content-type-options:
+      - nosniff
+    status:
+      code: 200
+      message: OK
+version: 1

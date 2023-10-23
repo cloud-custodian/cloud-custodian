@@ -5,7 +5,6 @@
 import json
 import time
 import datetime
-import jmespath
 from contextlib import suppress
 from botocore.exceptions import ClientError
 from fnmatch import fnmatch
@@ -19,7 +18,7 @@ from c7n.filters.kms import KmsRelatedFilter
 from c7n.filters.multiattr import MultiAttrFilter
 from c7n.filters.missing import Missing
 from c7n.manager import ResourceManager, resources
-from c7n.utils import local_session, type_schema, generate_arn, get_support_region
+from c7n.utils import local_session, type_schema, generate_arn, get_support_region, jmespath_search
 from c7n.query import QueryResourceManager, TypeInfo
 
 from c7n.resources.iam import CredentialReport
@@ -237,6 +236,22 @@ class CloudTrailEnabled(Filter):
                     running: true
                     include-management-events: true
                     log-metric-filter-pattern: "{ ($.eventName = \\"ConsoleLogin\\") }"
+
+    Check for CloudWatch log group with a metric filter that has a filter pattern
+    matching a regex pattern:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: account-cloudtrail-with-matching-log-metric-filter
+                resource: account
+                region: us-east-1
+                filters:
+                  - type: check-cloudtrail
+                    log-metric-filter-pattern:
+                        type: value
+                        op: regex
+                        value: '\\{ ?(\\()? ?\\$\\.eventName ?= ?(")?ConsoleLogin(")? ?(\\))? ?\\}'
     """
     schema = type_schema(
         'check-cloudtrail',
@@ -249,17 +264,20 @@ class CloudTrailEnabled(Filter):
            'kms': {'type': 'boolean'},
            'kms-key': {'type': 'string'},
            'include-management-events': {'type': 'boolean'},
-           'log-metric-filter-pattern': {'type': 'string'}})
+           'log-metric-filter-pattern':  {'oneOf': [
+                {'$ref': '#/definitions/filters/value'},
+                {'type': 'string'}]}})
 
     permissions = ('cloudtrail:DescribeTrails', 'cloudtrail:GetTrailStatus',
                    'cloudtrail:GetEventSelectors', 'cloudwatch:DescribeAlarmsForMetric',
-                   'logs:DescribeMetricFilters', 'sns:ListSubscriptions')
+                   'logs:DescribeMetricFilters', 'sns:GetTopicAttributes')
 
     def process(self, resources, event=None):
         session = local_session(self.manager.session_factory)
         client = session.client('cloudtrail')
         trails = client.describe_trails()['trailList']
         resources[0]['c7n:cloudtrails'] = trails
+
         if self.data.get('global-events'):
             trails = [t for t in trails if t.get('IncludeGlobalServiceEvents')]
         if self.data.get('current-region'):
@@ -295,12 +313,32 @@ class CloudTrailEnabled(Filter):
                     for s in selectors['EventSelectors']:
                         if s['IncludeManagementEvents'] and s['ReadWriteType'] == 'All':
                             matched.append(t)
+                elif 'AdvancedEventSelectors' in selectors.keys():
+                    for s in selectors['AdvancedEventSelectors']:
+                        management = False
+                        readonly = False
+                        for field_selector in s['FieldSelectors']:
+                            if field_selector['Field'] == 'eventCategory' and \
+                                    'Management' in field_selector['Equals']:
+                                management = True
+                            elif field_selector['Field'] == 'readOnly':
+                                readonly = True
+                        if management and not readonly:
+                            matched.append(t)
+
             trails = matched
         if self.data.get('log-metric-filter-pattern'):
             client_logs = session.client('logs')
             client_cw = session.client('cloudwatch')
-            sns_manager = self.manager.get_resource_manager('sns-subscription')
+            client_sns = session.client('sns')
             matched = []
+            pattern = self.data.get('log-metric-filter-pattern')
+            if isinstance(pattern, str):
+                vf = ValueFilter({'key': 'filterPattern', 'value': pattern})
+            else:
+                pattern.setdefault('key', 'filterPattern')
+                vf = ValueFilter(pattern)
+
             for t in list(trails):
                 if 'CloudWatchLogsLogGroupArn' not in t.keys():
                     continue
@@ -315,7 +353,7 @@ class CloudTrailEnabled(Filter):
                 filter_matched = None
                 if metric_filters_log_group:
                     for f in metric_filters_log_group:
-                        if f['filterPattern'] == self.data.get('log-metric-filter-pattern'):
+                        if vf(f):
                             filter_matched = f
                             break
                 if not filter_matched:
@@ -330,10 +368,16 @@ class CloudTrailEnabled(Filter):
                 if not alarm_actions:
                     continue
                 alarm_actions = set(alarm_actions)
-                sns_subscriptions = sns_manager.resources()
-                for s in sns_subscriptions:
-                    if s['TopicArn'] in alarm_actions:
-                        matched.append(t)
+                for a in alarm_actions:
+                    try:
+                        sns_topic_attributes = client_sns.get_topic_attributes(TopicArn=a)
+                        sns_topic_attributes = sns_topic_attributes.get('Attributes')
+                        if sns_topic_attributes.get('SubscriptionsConfirmed', '0') != '0':
+                            matched.append(t)
+                    except client_sns.exceptions.InvalidParameterValueException:
+                        # we can ignore any exception here, the alarm action might
+                        # not be an sns topic for instance
+                        continue
             trails = matched
         if trails:
             return []
@@ -1996,7 +2040,7 @@ class LakeformationFilter(Filter):
     def process_account(self, account):
         client = local_session(self.manager.session_factory).client('lakeformation')
         lake_buckets = {
-            Arn.parse(r).resource for r in jmespath.search(
+            Arn.parse(r).resource for r in jmespath_search(
                 'ResourceInfoList[].ResourceArn',
                 client.list_resources())
         }

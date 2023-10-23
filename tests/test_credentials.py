@@ -18,7 +18,7 @@ class Credential(BaseTest):
         factory = SessionFactory("us-east-1")
         session = factory()
         self.assertTrue(
-            session._session.user_agent().startswith("CloudCustodian/%s" % version)
+            session._session.user_agent().startswith("c7n/%s" % version)
         )
 
     def test_regional_sts(self):
@@ -65,9 +65,13 @@ class Credential(BaseTest):
         session.policy_name = "test-policy-name-ua"
         client = session().client('s3')
         self.assertTrue(
-            client._client_config.user_agent.startswith(
-                "CloudCustodian(test-policy-name-ua)/%s" % version
+            client.meta.config.user_agent.startswith(
+                f"c7n/{version}"
             )
+        )
+
+        self.assertTrue(
+            " c7n/policy#test-policy-name-ua" in client.meta.config.user_agent
         )
 
     def test_local_session_agent_update(self):

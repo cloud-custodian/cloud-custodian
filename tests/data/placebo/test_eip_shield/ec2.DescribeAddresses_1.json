@@ -1,0 +1,22 @@
+{
+    "status_code": 200,
+    "data": {
+        "Addresses": [
+            {
+                "PublicIp": "3.226.194.67",
+                "AllocationId": "eipalloc-053c2b4c29221d25d",
+                "Domain": "vpc",
+                "PublicIpv4Pool": "amazon",
+                "NetworkBorderGroup": "us-east-1"
+            },
+            {
+                "PublicIp": "54.204.18.58",
+                "AllocationId": "eipalloc-02882672512b9597b",
+                "Domain": "vpc",
+                "PublicIpv4Pool": "amazon",
+                "NetworkBorderGroup": "us-east-1"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

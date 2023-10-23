@@ -120,14 +120,14 @@ First, clone the repository:
     .. code-block:: bash
 
         git fetch upstream
-        git merge upstream/master
+        git merge upstream/main
 
 
 Now that the repository is set up, perform a developer installation using Poetry:
 
 .. code-block:: bash
 
-    make install-poetry
+    make install
 
 This creates a sandboxed "virtual environment" ("venv") inside the ``cloud-custodian``
 directory, and installs the full suite of Cloud Custodian packages.
@@ -136,7 +136,7 @@ You can run tests via Poetry as well:
 
 .. code-block:: bash
 
-    make test-poetry
+    make test
 
 To run executables from your Poetry environment, precede them with ``poetry run``:
 

@@ -2,7 +2,6 @@
 # SPDX-License-Identifier: Apache-2.0
 import functools
 import itertools
-import jmespath
 
 from c7n.actions import BaseAction
 from c7n.filters import ValueFilter
@@ -11,7 +10,7 @@ from c7n.manager import resources
 from c7n.query import QueryResourceManager, TypeInfo, DescribeSource, ConfigSource
 from c7n.tags import universal_augment
 from c7n.exceptions import PolicyValidationError, PolicyExecutionError
-from c7n.utils import get_retry, local_session, type_schema, chunks
+from c7n.utils import get_retry, local_session, type_schema, chunks, jmespath_search
 from c7n.filters.iamaccess import CrossAccountAccessFilter
 from c7n.resolver import ValuesFrom
 import c7n.filters.vpc as net_filters
@@ -271,7 +270,7 @@ class WorkspacesDirectorySG(net_filters.SecurityGroupFilter):
         sg_ids = set()
         for r in resources:
             for exp in self.expressions:
-                id = jmespath.search(exp, r)
+                id = jmespath_search(exp, r)
                 if id:
                     sg_ids.add(id)
         return list(sg_ids)

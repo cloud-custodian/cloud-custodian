@@ -16,7 +16,7 @@ from c7n.manager import resources
 from c7n.query import QueryResourceManager, TypeInfo
 from c7n.tags import universal_augment
 from c7n.utils import (
-    local_session, chunks, snapshot_identifier, type_schema)
+    local_session, chunks, snapshot_identifier, type_schema, jmespath_search)
 
 filters = FilterRegistry('elasticache.filters')
 actions = ActionRegistry('elasticache.actions')
@@ -129,6 +129,10 @@ class DeleteElastiCacheCluster(BaseAction):
         clusters_to_delete = []
         replication_groups_to_delete = set()
         for cluster in clusters:
+            if cluster.get('ReplicationGroupId') in self.fetch_global_ds_rpgs():
+                self.log.info(
+                  f"Skipping {cluster['CacheClusterId']}: associated with a global datastore")
+                continue
             if cluster.get('ReplicationGroupId', ''):
                 replication_groups_to_delete.add(cluster['ReplicationGroupId'])
             else:
@@ -149,7 +153,19 @@ class DeleteElastiCacheCluster(BaseAction):
                 'Deleted ElastiCache cluster: %s',
                 cluster['CacheClusterId'])
 
+        cacheClusterIds = set([c["CacheClusterId"] for c in clusters])
         for replication_group in replication_groups_to_delete:
+            # NOTE don't delete the group if it's not empty
+            rg = client.describe_replication_groups(
+                ReplicationGroupId=replication_group)["ReplicationGroups"][0]
+            if not all(cluster in cacheClusterIds for cluster in rg["MemberClusters"]):
+                # NOTE mark members for better presentation on notifications
+                for c in clusters:
+                    if c.get("ReplicationGroupId") == replication_group:
+                        c["MemberClusters"] = rg["MemberClusters"]
+                self.log.info(f'{replication_group} is not empty: {rg["MemberClusters"]}')
+                continue
+
             params = {'ReplicationGroupId': replication_group,
                       'RetainPrimaryCluster': False}
             if not skip:
@@ -160,6 +176,11 @@ class DeleteElastiCacheCluster(BaseAction):
             self.log.info(
                 'Deleted ElastiCache replication group: %s',
                 replication_group)
+
+    def fetch_global_ds_rpgs(self):
+        rpgs = self.manager.get_resource_manager('elasticache-group').resources(augment=False)
+        global_rpgs = get_global_datastore_association(rpgs)
+        return global_rpgs
 
 
 @actions.register('snapshot')
@@ -473,6 +494,16 @@ class KmsFilter(KmsRelatedFilter):
     RelatedIdsExpression = 'KmsKeyId'
 
 
+def get_global_datastore_association(resources):
+    global_ds_rpgs = set()
+    for r in resources:
+        global_ds_association = jmespath_search(
+            'GlobalReplicationGroupInfo.GlobalReplicationGroupId', r)
+        if global_ds_association:
+            global_ds_rpgs.add(r['ReplicationGroupId'])
+    return global_ds_rpgs
+
+
 @ElastiCacheReplicationGroup.action_registry.register('delete')
 class DeleteReplicationGroup(BaseAction):
     """Action to delete a cache replication group
@@ -502,7 +533,12 @@ class DeleteReplicationGroup(BaseAction):
     def process(self, resources):
         resources = self.filter_resources(resources, 'Status', self.valid_origin_states)
         client = local_session(self.manager.session_factory).client('elasticache')
+        global_datastore_association_map = get_global_datastore_association(resources)
         for r in resources:
+            if r['ReplicationGroupId'] in global_datastore_association_map:
+                self.log.info(
+                  f"Skipping {r['ReplicationGroupId']}: associated with a global datastore")
+                continue
             params = {'ReplicationGroupId': r['ReplicationGroupId']}
             if self.data.get('snapshot', False):
                 params.update({'FinalSnapshotIdentifier': r['ReplicationGroupId'] + '-snapshot'})

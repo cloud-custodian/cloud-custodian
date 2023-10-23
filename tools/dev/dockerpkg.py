@@ -43,7 +43,7 @@ RUN if [[ " ${{providers[*]}} " =~ "{pkg}" ]]; then \
 fi
 """
 
-default_providers = ["gcp", "azure", "kube", "openstack", "tencentcloud"]
+default_providers = ["gcp", "azure", "kube", "openstack", "tencentcloud", "oci"]
 
 PHASE_1_PKG_INSTALL_DEP = """\
 # We include `pyproject.toml` and `poetry.lock` first to allow
@@ -60,12 +60,12 @@ PHASE_2_PKG_INSTALL_ROOT += "\n".join(
     [PHASE_2_INSTALL_TMPL.format(pkg=pkg) for pkg in default_providers]
 )
 
-BUILD_STAGE = """\
-# Dockerfiles are generated from tools/dev/dockerpkg.py
 
+BOOTSTRAP_STAGE = """\
+# Dockerfiles are generated from tools/dev/dockerpkg.py
 FROM {base_build_image} as build-env
 
-ARG POETRY_VERSION="1.2.2"
+ARG POETRY_VERSION="1.5.1"
 SHELL ["/bin/bash", "-c"]
 
 # pre-requisite distro deps, and build env setup
@@ -73,10 +73,27 @@ RUN adduser --disabled-login --gecos "" custodian
 RUN apt-get --yes update
 RUN apt-get --yes install --no-install-recommends build-essential curl python3-venv python3-dev
 RUN python3 -m venv /usr/local
-RUN curl -sSL https://install.python-poetry.org | python3 - -y --version {poetry_version}
+RUN /usr/local/bin/pip install -U pip setuptools && \
+    /usr/local/bin/pip install "poetry=={poetry_version}"
 ARG PATH="/root/.local/bin:$PATH"
-WORKDIR /src
 
+WORKDIR /src
+"""
+
+LEFT_BUILD_STAGE = BOOTSTRAP_STAGE + """\
+ADD pyproject.toml poetry.lock README.md /src
+RUN . /usr/local/bin/activate && poetry install --without dev --no-root
+
+ADD c7n /src/c7n/
+RUN . /usr/local/bin/activate && poetry install --only-root
+
+ADD tools/c7n_left /src/tools/c7n_left
+RUN . /usr/local/bin/activate && cd tools/c7n_left && poetry install --without dev
+
+RUN mkdir /output
+"""
+
+BUILD_STAGE = BOOTSTRAP_STAGE + """\
 # Add core & aws packages
 ADD pyproject.toml poetry.lock README.md /src/
 RUN . /usr/local/bin/activate && pip install -qU pip wheel aws-xray-sdk psutil jsonpatch
@@ -85,13 +102,14 @@ RUN . /usr/local/bin/activate && pip install -qU pip wheel aws-xray-sdk psutil j
 # dependency install
 RUN . /usr/local/bin/activate && poetry install --without dev --no-root
 
+# Now install the root package, we used to do this after dependencies of other providers
+# but since moving c7n to a main dependency in pyproject toml we have to do this one first.
+ADD c7n /src/c7n/
+RUN . /usr/local/bin/activate && poetry install --only-root
+
 ARG providers="{providers}"
 # Add provider packages
 {PHASE_1_PKG_INSTALL_DEP}
-
-# Now install the root package
-ADD c7n /src/c7n/
-RUN . /usr/local/bin/activate && poetry install --only-root
 
 {PHASE_2_PKG_INSTALL_ROOT}
 
@@ -107,7 +125,7 @@ LABEL name="{name}" \\
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get --yes update \\
-        && apt-get --yes install python3 python3-venv --no-install-recommends \\
+        && apt-get --yes install python3 python3-venv {packages} --no-install-recommends \\
         && rm -Rf /var/cache/apt \\
         && rm -Rf /var/lib/apt/lists/* \\
         && rm -Rf /var/log/*
@@ -154,6 +172,12 @@ TARGET_CLI = """\
 LABEL "org.opencontainers.image.title"="cli"
 LABEL "org.opencontainers.image.description"="Cloud Management Rules Engine"
 LABEL "org.opencontainers.image.documentation"="https://cloudcustodian.io/docs"
+"""
+
+TARGET_LEFT = """
+LABEL "org.opencontainers.image.title"="left"
+LABEL "org.opencontainers.image.description"="Cloud Custodian IaC Engine"
+LABEL "org.opencontainers.image.documentation"="https://cloudcustodian.io/docs/tools/c7n-left.html"
 """
 
 BUILD_KUBE = """\
@@ -212,6 +236,7 @@ class Image:
         base_build_image="ubuntu:22.04",
         base_target_image="ubuntu:22.04",
         poetry_version="${POETRY_VERSION}",
+        packages="",
         providers=" ".join(default_providers),
         PHASE_1_PKG_INSTALL_DEP=PHASE_1_PKG_INSTALL_DEP,
         PHASE_2_PKG_INSTALL_ROOT=PHASE_2_PKG_INSTALL_ROOT,
@@ -254,6 +279,17 @@ ImageMap = {
         ),
         build=[BUILD_STAGE],
         target=[TARGET_UBUNTU_STAGE, TARGET_CLI],
+    ),
+    "docker/c7n-left": Image(
+        dict(
+            name="left",
+            repo="c7n",
+            description="Cloud Custodian IaC Governance",
+            entrypoint="/usr/local/bin/c7n-left",
+            packages="git"
+        ),
+        build=[LEFT_BUILD_STAGE],
+        target=[TARGET_UBUNTU_STAGE, TARGET_LEFT],
     ),
     "docker/c7n-kube": Image(
         dict(
@@ -608,6 +644,7 @@ def build_image(client, image_name, image_def, dfile_path, build_args):
 def generate():
     """Generate dockerfiles"""
     for df_path, image in ImageMap.items():
+        print(df_path)
         p = Path(df_path)
         p.write_text(image.render())
 

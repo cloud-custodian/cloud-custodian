@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from c7n.exceptions import PolicyValidationError
+from c7n.resources.aws import shape_validate
 from .common import BaseTest, event_data
 
 import logging
@@ -558,7 +559,7 @@ class SecurityHubTest(BaseTest):
                 "name": "rds-finding",
                 "resource": "rds",
                 "filters": [
-                ],
+                    {"DBInstanceArn": "arn:aws:rds:us-west-2:644160558196:db:test-instance-3"}],
                 "actions": [
                     {
                         "type": "post-finding",
@@ -570,49 +571,79 @@ class SecurityHubTest(BaseTest):
                     }
                 ],
             },
-            config={"account_id": "101010101111"},
+            config={'region': 'us-west-2', 'account_id': '644160558196'},
             session_factory=factory,
         )
 
         resources = policy.run()
         self.assertEqual(len(resources), 1)
+        rfinding = policy.resource_manager.actions[0].format_resource(resources[0])
+        shape_validate(
+            rfinding['Details']['AwsRdsDbInstance'],
+            'AwsRdsDbInstanceDetails', 'securityhub')
 
-        client = factory().client("securityhub")
+        client = factory().client("securityhub", region_name='us-west-2')
         findings = client.get_findings(
             Filters={
-                "ResourceId": [
+                'Title': [
                     {
-                        "Value": "arn:aws:rds:us-east-1:101010101111:db:testme",
-                        "Comparison": "EQUALS",
+                        'Value': 'rds-finding',
+                        'Comparison': 'EQUALS'
+                    }
+                ],
+                'ResourceId': [
+                    {
+                        'Value': 'arn:aws:rds:us-west-2:644160558196:db:test-instance-3',
+                        'Comparison': 'EQUALS'
                     }
                 ]
             }
-        ).get("Findings")
+        ).get('Findings', [])
         self.assertEqual(len(findings), 1)
+
         self.assertEqual(
             findings[0]["Resources"][0],
             {
-                "Details": {
-                    "Other": {
-                        "Engine": "mariadb",
-                        "VpcId": "vpc-d6fe6cb1",
-                        "PubliclyAccessible": "False",
-                        "DBName": "testme",
-                        "AvailabilityZone": "us-east-1a",
-                        "InstanceCreateTime": "2018-11-05T03:25:12.384000+00:00",
-                        "StorageEncrypted": "False",
-                        "AllocatedStorage": "20",
-                        "EngineVersion": "10.3.8",
-                        "DBInstanceClass": "db.t2.micro",
-                        "DBSubnetGroupName": "default"
+                'Type': 'AwsRdsDbInstance',
+                'Id': 'arn:aws:rds:us-west-2:644160558196:db:test-instance-3',
+                'Region': 'us-west-2',
+                'Details': {
+                    'AwsRdsDbInstance': {
+                        'CACertificateIdentifier': 'rds-ca-2019',
+                        'DBClusterIdentifier': 'test',
+                        'DBInstanceIdentifier': 'test-instance-3',
+                        'DBInstanceClass': 'db.m5d.xlarge',
+                        'DbiResourceId': 'db-EH6SVXMILRMDTBVY4GNOOI3OL4',
+                        'Engine': 'postgres',
+                        'EngineVersion': '13.7',
+                        'KmsKeyId': 'arn:aws:kms:us-west-2:644160558196:key/31e94e00-358a-4f53-8a0c-48ae90c8cc23',  # noqa
+                        'StorageEncrypted': True,
+                        'VpcSecurityGroups': [
+                            {
+                                'VpcSecurityGroupId': 'sg-0e255aed9188d1fba',
+                                'Status': 'active'
+                            }
+                        ],
+                        'MasterUsername': 'postgres',
+                        'AllocatedStorage': 400,
+                        'PreferredBackupWindow': '11:55-12:25',
+                        'BackupRetentionPeriod': 7,
+                        'AvailabilityZone': 'us-west-2b',
+                        'PreferredMaintenanceWindow': 'tue:07:49-tue:08:19',
+                        'LicenseModel': 'postgresql-license',
+                        'Iops': 3000,
+                        'OptionGroupMemberships': [
+                            {
+                                'OptionGroupName': 'default:postgres-13',
+                                'Status': 'in-sync'
+                            }
+                        ],
+                        'StorageType': 'io1',
+                        'PromotionTier': 1
                     }
-                },
-                "Region": "us-east-1",
-                "Type": "Other",
-                "Id": "arn:aws:rds:us-east-1:101010101111:db:testme",
-                "Tags": {
-                    "workload-type": "other"}
-            })
+                }
+            }
+        )
 
     def test_larger_batch_s3(self):
         factory = self.replay_flight_data("test_larger_batch")

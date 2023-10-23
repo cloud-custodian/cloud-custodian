@@ -5,12 +5,12 @@
 
 import csv
 from collections import Counter
+from datetime import timedelta, datetime
 import logging
 import os
 import time
 import subprocess  # nosec
 import sys
-from datetime import timedelta, datetime
 
 import multiprocessing
 from concurrent.futures import (
@@ -25,12 +25,14 @@ import jsonschema
 
 from c7n.credentials import assumed_session, SessionFactory
 from c7n.executor import MainThreadExecutor
+from c7n.exceptions import InvalidOutputConfig
 from c7n.config import Config
 from c7n.policy import PolicyCollection
-from c7n.provider import get_resource_class
+from c7n.provider import get_resource_class, clouds as cloud_providers
 from c7n.reports.csvout import Formatter, fs_record_set, record_set, strip_output_path
 from c7n.resources import load_available
-from c7n.utils import CONN_CACHE, dumps, filter_empty, format_string_values
+from c7n.utils import (
+    CONN_CACHE, dumps, filter_empty, format_string_values, get_policy_provider, join_output_path)
 
 from c7n_org.utils import environ, account_tags
 
@@ -101,14 +103,27 @@ CONFIG_SCHEMA = {
                 'vars': {'type': 'object'},
             }
         },
-    },
+        'tenancy': {
+            'type': 'object',
+            'additionalProperties': True,
+            'required': ['profile'],
+            'properties': {
+                'name': {'type': 'string'},
+                'profile': {'type': 'string', 'minLength': 2},
+                'tags': {'type': 'array', 'items': {'type': 'string'}},
+                'regions': {'type': 'array', 'items': {'type': 'string'}},
+                'vars': {'type': 'object'},
+                }
+            }
+        },
     'type': 'object',
     'additionalProperties': False,
     'oneOf': [
         {'required': ['accounts']},
         {'required': ['projects']},
-        {'required': ['subscriptions']}
-    ],
+        {'required': ['subscriptions']},
+        {'required': ['tenancies']}
+        ],
     'properties': {
         'vars': {'type': 'object'},
         'accounts': {
@@ -122,8 +137,12 @@ CONFIG_SCHEMA = {
         'projects': {
             'type': 'array',
             'items': {'$ref': '#/definitions/project'}
+        },
+        'tenancies': {
+            'type': 'array',
+            'items': {'$ref': '#/definitions/tenancy'}
+            }
         }
-    }
 }
 
 
@@ -509,6 +528,9 @@ def run_script(config, output_dir, accounts, tags, region, echo, serial, script_
 
     success = True
 
+    if "://" in output_dir:
+        raise InvalidOutputConfig('run-script only supports local directory outputs')
+
     with executor(max_workers=WORKER_COUNT) as w:
         futures = {}
         for a in accounts_config.get('accounts', ()):
@@ -565,6 +587,16 @@ def accounts_iterator(config):
              'tags': a.get('tags', ()),
              'vars': _update(a.get('vars', {}), org_vars)}
         yield d
+    for a in config.get("tenancies", ()):
+        d = {"account_id": a["profile"],
+             "name": a.get("name", a["profile"]),
+             "regions": a.get("regions", ["global"]),
+             "provider": "oci",
+             "profile": a["profile"],
+             "tags": a.get("tags", ()),
+             "oci_compartments": a.get("vars", {}).get("oci_compartments"),
+             "vars": _update(a.get("vars", {}), org_vars)}
+        yield d
 
 
 def _update(old, new):
@@ -582,9 +614,7 @@ def run_account(account, region, policies_config, output_path,
     CONN_CACHE.time = None
     load_available()
 
-    # allow users to specify interpolated output paths
-    if '{' not in output_path:
-        output_path = os.path.join(output_path, account['name'], region)
+    output_path = join_output_path(output_path, account['name'], region)
 
     cache_path = os.path.join(cache_path, "%s-%s.cache" % (account['account_id'], region))
 
@@ -606,6 +636,9 @@ def run_account(account, region, policies_config, output_path,
 
     elif account.get('profile'):
         config['profile'] = account['profile']
+
+    if account.get("oci_compartments"):
+        env_vars.update({"OCI_COMPARTMENTS": account.get("oci_compartments")})
 
     policies = PolicyCollection.from_data(policies_config, config)
     policy_counts = {}
@@ -660,6 +693,25 @@ def run_account(account, region, policies_config, output_path,
     return policy_counts, success
 
 
+def initialize_provider_output(policies_config, output_dir, regions):
+    """allow the provider an opportunity to initialize the output config.
+    """
+    # use just enough configuration to attempt to limit initialization
+    # to the output dir. we pass in dummy values for several settings
+    # that if missing would cause at least the aws or azure provider
+    # to do additional dynamic lookups that aren't meaningful in the
+    # context of c7n-org.
+    policy_config = Config.empty(
+        account_id='112233445566',
+        output_dir=output_dir,
+        region=regions and regions[0] or "us-east-1"
+    )
+    provider_name = get_policy_provider(policies_config['policies'][0])
+    provider = cloud_providers[provider_name]()
+    provider.initialize(policy_config)
+    return policy_config.output_dir
+
+
 @cli.command(name='run')
 @click.option('-c', '--config', required=True, help="Accounts config file")
 @click.option("-u", "--use", required=True)
@@ -690,6 +742,13 @@ def run(config, use, output_dir, accounts, not_accounts, tags, region,
     accounts_config, custodian_config, executor = init(
         config, use, debug, verbose, accounts, tags, policy, policy_tags=policy_tags,
         not_accounts=not_accounts)
+    if not (accounts_config["accounts"] and custodian_config["policies"]):
+        log.info(
+            "Targeting accounts: %d, policies: %d. Nothing to do." %
+            (len(accounts_config["accounts"]), len(custodian_config["policies"]))
+        )
+        return
+
     policy_counts = Counter()
     success = True
 
@@ -700,6 +759,8 @@ def run(config, use, output_dir, accounts, not_accounts, tags, region,
         cache_path = os.path.expanduser("~/.cache/c7n-org")
         if not os.path.exists(cache_path):
             os.makedirs(cache_path)
+
+    output_dir = initialize_provider_output(custodian_config, output_dir, region)
 
     with executor(max_workers=WORKER_COUNT) as w:
         futures = {}

@@ -12,10 +12,10 @@ import sys
 import tempfile
 import time
 import unittest
+from unittest import mock
+from unittest.mock import patch
 import zipfile
 
-import mock
-from mock import patch
 
 from c7n.config import Config
 from c7n.mu import (
@@ -167,6 +167,21 @@ class PolicyLambdaProvision(Publish):
             mgr = LambdaManager(session_factory)
             result = mgr.publish(pl)
             self.assertEqual(result["Architectures"], ["arm64"])
+
+    def test_deferred_interpolation(self):
+        p = self.load_policy({
+            'name': 'ec2-foo-bar',
+            'resource': 'aws.ec2',
+            'mode': {
+                'type': 'cloudtrail',
+                'role': 'arn:aws:iam::644160558196:role/custodian-mu',
+                'events': ['RunInstances']},
+            'actions': [{
+                'type': 'tag', 'key': 'LastMatch', 'value': '{now}'
+            }]})
+        p.expand_variables(p.get_variables())
+        pl = PolicyLambda(p)
+        pl.get_archive()
 
     def test_updated_lambda_architecture(self):
         session_factory = self.replay_flight_data("test_updated_lambda_architecture")
@@ -938,6 +953,11 @@ class PolicyLambdaProvision(Publish):
     def test_config_defaults(self):
         p = PolicyLambda(Bag({"name": "hello", "data": {"mode": {}}}))
         self.maxDiff = None
+        default_arch = platform.machine()
+        if default_arch in ('aarch64', 'arm64'):
+            default_arch = 'arm64'
+        else:
+            default_arch = 'x86_64'
         self.assertEqual(
             p.get_config(),
             {
@@ -949,7 +969,7 @@ class PolicyLambdaProvision(Publish):
                 "MemorySize": 512,
                 "Role": "",
                 "Runtime": "python3.9",
-                "Architectures": ["x86_64"],
+                "Architectures": [default_arch],
                 "Tags": {},
                 "Timeout": 900,
                 "TracingConfig": {"Mode": "PassThrough"},

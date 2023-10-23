@@ -1,0 +1,57 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "oci_dns_view": {
+            "test_view": {
+                "compartment_id": "ocid1.compartment.oc1..<unique_ID>",
+                "defined_tags": {
+                    "Oracle-Tags.CreatedBy": "user@example.com",
+                    "Oracle-Tags.CreatedOn": "2023-06-09T11:10:09.651Z"
+                },
+                "display_name": "testview",
+                "freeform_tags": {},
+                "id": "ocid1.dnsview.oc1..<unique_ID>",
+                "is_protected": false,
+                "scope": "PRIVATE",
+                "self": "https://dns.us-ashburn-1.oci.oraclecloud.com/20180115/views/ocid1.dnsview.oc1..<unique_ID>",
+                "state": "ACTIVE",
+                "time_created": "2023-06-09 11:10:09.894 +0000 UTC",
+                "time_updated": "2023-06-09 11:10:09.894 +0000 UTC",
+                "timeouts": null
+            }
+        },
+        "oci_dns_zone": {
+            "test_zone": {
+                "compartment_id": "ocid1.compartment.oc1..<unique_ID>",
+                "defined_tags": {
+                    "Oracle-Tags.CreatedBy": "user@example.com",
+                    "Oracle-Tags.CreatedOn": "2023-06-09T11:10:11.423Z"
+                },
+                "external_downstreams": [],
+                "external_masters": [],
+                "freeform_tags": {
+                    "Project": "CNCF"
+                },
+                "id": "ocid1.dns-zone.oc1..<unique_ID>",
+                "is_protected": false,
+                "name": "testzone.com",
+                "nameservers": [
+                    {
+                        "hostname": "vcn-dns.oraclevcn.com."
+                    }
+                ],
+                "scope": "PRIVATE",
+                "self": "https://dns.us-ashburn-1.oci.oraclecloud.com/20180115/zones/ocid1.dns-zone.oc1..<unique_ID>",
+                "serial": 1,
+                "state": "ACTIVE",
+                "time_created": "2023-06-09 11:10:11.52 +0000 UTC",
+                "timeouts": null,
+                "version": "1",
+                "view_id": "ocid1.dnsview.oc1..<unique_ID>",
+                "zone_transfer_servers": [],
+                "zone_type": "PRIMARY"
+            }
+        }
+    }
+}

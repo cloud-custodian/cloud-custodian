@@ -1,0 +1,41 @@
+{
+    "status_code": 200,
+    "data": {
+        "Tables": [
+            {
+                "Arn": "arn:aws:timestream:us-east-1:644160558196:database/asdfasdfasdf/table/IoTMulti",
+                "TableName": "IoTMulti",
+                "DatabaseName": "asdfasdfasdf",
+                "TableStatus": "ACTIVE",
+                "RetentionProperties": {
+                    "MemoryStoreRetentionPeriodInHours": 24,
+                    "MagneticStoreRetentionPeriodInDays": 1825
+                },
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 1,
+                    "day": 13,
+                    "hour": 16,
+                    "minute": 10,
+                    "second": 36,
+                    "microsecond": 181000
+                },
+                "LastUpdatedTime": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 1,
+                    "day": 13,
+                    "hour": 16,
+                    "minute": 10,
+                    "second": 36,
+                    "microsecond": 181000
+                },
+                "MagneticStoreWriteProperties": {
+                    "EnableMagneticStoreWrites": false
+                }
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

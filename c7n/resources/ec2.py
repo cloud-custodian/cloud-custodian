@@ -13,7 +13,6 @@ import botocore
 from botocore.exceptions import ClientError
 from dateutil.parser import parse
 from concurrent.futures import as_completed
-import jmespath
 
 from c7n.actions import (
     ActionRegistry, BaseAction, ModifyVpcSecurityGroupsAction, AutoscalingBase
@@ -21,7 +20,7 @@ from c7n.actions import (
 
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import (
-    FilterRegistry, AgeFilter, ValueFilter, Filter, DefaultVpcBase
+    FilterRegistry, AgeFilter, ValueFilter, Filter
 )
 from c7n.filters.offhours import OffHour, OnHour
 import c7n.filters.vpc as net_filters
@@ -29,7 +28,7 @@ import c7n.filters.vpc as net_filters
 from c7n.manager import resources
 from c7n import query, utils
 from c7n.tags import coalesce_copy_user_tags
-from c7n.utils import type_schema, filter_empty
+from c7n.utils import type_schema, filter_empty, jmespath_search, jmespath_compile
 
 from c7n.resources.iam import CheckPermissions, SpecificIamProfileManagedPolicy
 from c7n.resources.securityhub import PostFinding
@@ -91,7 +90,7 @@ class DescribeEC2(query.DescribeSource):
 
         m = self.manager.get_model()
         for r in resources:
-            r['Tags'] = resource_tags.get(r[m.id], ())
+            r['Tags'] = resource_tags.get(r[m.id], [])
         return resources
 
 
@@ -168,7 +167,7 @@ class SecurityGroupFilter(net_filters.SecurityGroupFilter):
 @filters.register('subnet')
 class SubnetFilter(net_filters.SubnetFilter):
 
-    RelatedIdsExpression = "SubnetId"
+    RelatedIdsExpression = "NetworkInterfaces[].SubnetId"
 
 
 @filters.register('vpc')
@@ -734,7 +733,7 @@ class InstanceAgeFilter(AgeFilter):
 
 
 @filters.register('default-vpc')
-class DefaultVpc(DefaultVpcBase):
+class DefaultVpc(net_filters.DefaultVpcBase):
     """ Matches if an ec2 database is in the default vpc
     """
 
@@ -1204,7 +1203,7 @@ class InstanceFinding(PostFinding):
     resource_type = 'AwsEc2Instance'
 
     def format_resource(self, r):
-        ip_addresses = jmespath.search(
+        ip_addresses = jmespath_search(
             "NetworkInterfaces[].PrivateIpAddresses[].PrivateIpAddress", r)
 
         # limit to max 10 ip addresses, per security hub service limits
@@ -1444,7 +1443,7 @@ class Stop(BaseAction):
         },
     )
 
-    has_hibernate = jmespath.compile('[].HibernationOptions.Configured')
+    has_hibernate = jmespath_compile('[].HibernationOptions.Configured')
 
     def get_permissions(self):
         perms = ('ec2:StopInstances',)
@@ -1791,7 +1790,7 @@ class EC2ModifyVpcSecurityGroups(ModifyVpcSecurityGroupsAction):
     """Modify security groups on an instance."""
 
     permissions = ("ec2:ModifyNetworkInterfaceAttribute",)
-    sg_expr = jmespath.compile("Groups[].GroupId")
+    sg_expr = jmespath_compile("Groups[].GroupId")
 
     def process(self, instances):
         if not len(instances):
@@ -2219,6 +2218,7 @@ class LaunchTemplate(query.QueryResourceManager):
         filter_name = 'LaunchTemplateIds'
         filter_type = 'list'
         arn_type = "launch-template"
+        cfn_type = "AWS::EC2::LaunchTemplate"
 
     def augment(self, resources):
         client = utils.local_session(
@@ -2230,6 +2230,12 @@ class LaunchTemplate(query.QueryResourceManager):
                     LaunchTemplateId=r['LaunchTemplateId']).get(
                         'LaunchTemplateVersions', ()))
         return template_versions
+
+    def get_arns(self, resources):
+        arns = []
+        for r in resources:
+            arns.append(self.generate_arn(f"{r['LaunchTemplateId']}/{r['VersionNumber']}"))
+        return arns
 
     def get_resources(self, rids, cache=True):
         # Launch template versions have a compound primary key
@@ -2346,7 +2352,7 @@ class SpotFleetRequest(query.QueryResourceManager):
         filter_type = 'list'
         date = 'CreateTime'
         arn_type = 'spot-fleet-request'
-        cfn_type = 'AWS::EC2::SpotFleet'
+        config_type = cfn_type = 'AWS::EC2::SpotFleet'
         permissions_enum = ('ec2:DescribeSpotFleetRequests',)
 
 

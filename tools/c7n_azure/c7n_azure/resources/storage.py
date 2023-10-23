@@ -348,7 +348,7 @@ class StorageDiagnosticSettingsFilter(ValueFilter):
     def _get_settings(self, storage_account, session=None):
         storage_prefix_property = get_annotation_prefix(self.storage_type)
 
-        if not (storage_prefix_property in storage_account):
+        if storage_prefix_property not in storage_account:
             settings = StorageSettingsUtilities.get_settings(
                 self.storage_type, storage_account, session)
             storage_account[storage_prefix_property] = serialize(settings)

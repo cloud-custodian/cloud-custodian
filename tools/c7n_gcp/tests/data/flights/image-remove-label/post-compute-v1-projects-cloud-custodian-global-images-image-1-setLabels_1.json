@@ -1,0 +1,30 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Fri, 23 Jun 2023 15:16:50 GMT",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "752",
+    "-content-encoding": "gzip"
+  },
+  "body": {
+    "kind": "compute#operation",
+    "id": "518914567392725389",
+    "name": "operation-1687533410325-5fecd7d78124c-183d30a0-1691e8e5",
+    "operationType": "setLabels",
+    "targetLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/images/image-1",
+    "targetId": "6295399062274840336",
+    "status": "DONE",
+    "progress": 100,
+    "insertTime": "2023-06-23T08:16:50.773-07:00",
+    "startTime": "2023-06-23T08:16:50.774-07:00",
+    "endTime": "2023-06-23T08:16:50.774-07:00",
+    "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/operations/operation-1687533410325-5fecd7d78124c-183d30a0-1691e8e5"
+  }
+}

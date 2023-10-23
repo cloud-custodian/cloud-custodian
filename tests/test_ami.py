@@ -1,10 +1,9 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
-import jmespath
-
 from c7n.exceptions import ClientError, PolicyValidationError
 from c7n.resources.ami import ErrorHandler
 from c7n.query import DescribeSource
+from c7n.utils import jmespath_search
 from .common import BaseTest
 
 
@@ -337,7 +336,7 @@ class TestAMI(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 2)
         client = factory().client('ec2')
-        snap_ids = jmespath.search(
+        snap_ids = jmespath_search(
             'BlockDeviceMappings[].Ebs.SnapshotId', resources[0])
         self.assertRaises(
             ClientError, client.describe_snapshots, SnapshotIds=snap_ids, OwnerIds=['self'])
@@ -392,6 +391,30 @@ class TestAMI(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 0)
 
+    def test_cancel_launch_permissions_true(self):
+        factory = self.replay_flight_data("test_cancel_launch_permissions")
+        p = self.load_policy(
+            {
+                "name": "test-cancel-launch-permissions",
+                "resource": "ami",
+                "actions": [{"type": "cancel-launch-permission",}]},
+                session_factory=factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_cancel_launch_permissions_false(self):
+        factory = self.replay_flight_data("test_cancel_launch_permissions")
+        p = self.load_policy(
+            {
+                "name": "test-cancel-launch-permission",
+                "resource": "ami",
+                "actions": [{"type": "cancel-launch-permission", "dryrun": False}]},
+                session_factory=factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
     def test_unused_ami_true(self):
         factory = self.replay_flight_data("test_unused_ami_true")
         p = self.load_policy(
@@ -426,3 +449,26 @@ class TestAMI(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
+    def test_ami_set_permissions_remove_matched_no_add(self):
+        factory = self.replay_flight_data('test_ami_set_permissions_remove_matched_no_add')
+        p = self.load_policy({
+            'name': 'ami-check',
+            'resource': 'aws.ami',
+            'filters': [{'type': 'cross-account'},
+            {'type': 'value',
+            'key': 'Name',
+            'value': 'test-ami'}],
+            'actions': [{
+                'type': 'set-permissions',
+                'remove': 'matched'
+            }]},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['c7n:CrossAccountViolations'], ['898786471159'])
+        client = factory().client('ec2')
+        perms = client.describe_image_attribute(
+            ImageId=resources[0]['ImageId'],
+            Attribute='launchPermission')['LaunchPermissions']
+        assert perms == []

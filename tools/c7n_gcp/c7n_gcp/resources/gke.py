@@ -8,11 +8,12 @@ from c7n_gcp.query import (QueryResourceManager, TypeInfo, ChildTypeInfo,
 from c7n.utils import type_schema, local_session
 from c7n_gcp.actions import MethodAction
 
+from c7n.filters import ValueFilter
 
 @resources.register('gke-cluster')
 class KubernetesCluster(QueryResourceManager):
     """GCP resource:
-    https://cloud.google.com/kubernetes-engine/docs/reference/rest/v1/projects.zones.clusters
+    https://cloud.google.com/kubernetes-engine/docs/reference/rest/v1/projects.locations.clusters
     """
 
     class resource_type(TypeInfo):
@@ -31,6 +32,8 @@ class KubernetesCluster(QueryResourceManager):
         scc_type = 'google.container.Cluster'
         metric_key = 'resource.labels.cluster_name'
         urn_component = 'cluster'
+        labels = True
+        labels_op = 'setResourceLabels'
         urn_zonal = True
 
         @staticmethod
@@ -42,6 +45,32 @@ class KubernetesCluster(QueryResourceManager):
                         resource_info['location'],
                         resource_info['cluster_name'])})
 
+        @staticmethod
+        def get_label_params(resource, all_labels):
+            location_str = "locations"
+            if resource['selfLink'].find(location_str) < 0:
+                location_str = "zones"
+            path_param_re = re.compile('.*?/projects/(.*?)/'+location_str+'/(.*?)/clusters/(.*)')
+            project, zone, cluster_name = path_param_re.match(
+                resource['selfLink']).groups()
+            return {'name': 'projects/'+project+'/locations/'+zone+'/clusters/'+cluster_name,
+                    'body': {
+                        'resourceLabels': all_labels,
+                        'labelFingerprint': resource['labelFingerprint']
+                    }}
+
+        @classmethod
+        def refresh(cls, client, resource):
+            project_id = resource['selfLink'].split("/")[5]
+            return cls.get(
+                client,
+                {
+                    'project_id': project_id,
+                    'location': resource['zone'],
+                    'cluster_name': resource['name']
+                }
+            )
+
     def augment(self, resources):
         if not resources:
             return []
@@ -49,7 +78,6 @@ class KubernetesCluster(QueryResourceManager):
             if r.get('resourceLabels'):
                 r['labels'] = r['resourceLabels']
         return resources
-
 
 @resources.register('gke-nodepool')
 class KubernetesClusterNodePool(ChildResourceManager):
@@ -111,6 +139,68 @@ class KubernetesClusterNodePool(ChildResourceManager):
         def _get_location(cls, resource):
             "Get the region from the parent - the cluster"
             return super()._get_location(cls.get_parent(resource))
+
+@KubernetesCluster.filter_registry.register('server-config')
+@KubernetesClusterNodePool.filter_registry.register('server-config')
+class ServerConfig(ValueFilter):
+    """Filters kubernetes clusters or nodepools by their server config.
+    See `getServerConfig
+    https://cloud.google.com/kubernetes-engine/docs/reference/rest/v1/projects.locations/getServerConfig`
+    for valid fields.
+
+    :example:
+
+    Filter all clusters that is not running a supported version
+
+    .. code-block:: yaml
+
+        policies:
+           - name: find-unsupported-cluster-version
+             resource: gcp.gke-cluster
+             filters:
+             - type: server-config
+               key: contains(serverConfig.validMasterVersions, resource.currentMasterVersion)
+               value: false
+
+    Filter all nodepools that is not running a supported version
+
+    .. code-block:: yaml
+
+        policies:
+           - name: find-unsupported-cluster-nodepools-version
+             resource: gcp.gke-nodepool
+             filters:
+             - type: server-config
+               key: contains(serverConfig.validNodeVersions, resource.version)
+               value: false
+    """
+
+    schema = type_schema('server-config', rinherit=ValueFilter.schema)
+    permissions = ('container.nodes.get', 'container.clusters.get')
+    annotation_key = "c7n:config"
+
+    def _get_location(self, r):
+        return r["location"] if "location" in r else r['selfLink'].split('/')[-5]
+
+    def get_config(self, client, project, resource):
+        if self.annotation_key in resource:
+            return
+        location = self._get_location(resource)
+        resource[self.annotation_key] = client.execute_command(
+            'getServerConfig', verb_arguments={
+                'name': 'projects/{}/locations/{}'.format(project, location)}
+        )
+
+    def __call__(self, r):
+        return super().__call__({"serverConfig": r[self.annotation_key], "resource": r})
+
+    def process(self, resources, event=None):
+        session = local_session(self.manager.session_factory)
+        project = session.get_default_project()
+        client = session.client("container", "v1", "projects.locations")
+        for r in resources:
+            self.get_config(client, project, r)
+        return super().process(resources)
 
 
 @KubernetesCluster.action_registry.register('delete')

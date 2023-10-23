@@ -2,11 +2,12 @@
 # SPDX-License-Identifier: Apache-2.0
 import re
 
-from c7n.actions import BaseAction
-from c7n.filters import Filter, ValueFilter
+from c7n.actions import BaseAction, Action
+from c7n.filters import ValueFilter, WafV2FilterBase
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, TypeInfo
 from c7n.utils import local_session, type_schema, get_retry
+from botocore.exceptions import ClientError
 
 
 @resources.register('graphql-api')
@@ -24,11 +25,15 @@ class GraphQLApi(QueryResourceManager):
         universal_taggable = True
 
 
+
 @GraphQLApi.filter_registry.register('wafv2-enabled')
-class WafV2Enabled(Filter):
+class WafV2Enabled(WafV2FilterBase):
     """Filter AppSync GraphQLApi by wafv2 web-acl
+
     :example:
+
     .. code-block:: yaml
+
             policies:
               - name: filter-graphql-api-wafv2
                 resource: graphql-api
@@ -44,43 +49,18 @@ class WafV2Enabled(Filter):
                     web-acl: .*FMManagedWebACLV2-?FMS-.*
     """
 
-    schema = type_schema(
-        'wafv2-enabled', **{
-            'web-acl': {'type': 'string'},
-            'state': {'type': 'boolean'}})
-
-    permissions = ('wafv2:ListWebACLs',)
-
-    def process(self, resources, event=None):
-        wafs = self.manager.get_resource_manager('wafv2').resources(augment=False)
-        waf_name_id_map = {w['Name']: w['ARN'] for w in wafs}
-
-        target_acl = self.data.get('web-acl', '')
-        state = self.data.get('state', False)
-        target_acl_ids = [v for k, v in waf_name_id_map.items() if
-                          re.match(target_acl, k)]
-
-        results = []
-        for r in resources:
-            r_web_acl_id = r.get('wafWebAclArn')
-            if state:
-                if not target_acl and r_web_acl_id:
-                    results.append(r)
-                elif target_acl and r_web_acl_id in target_acl_ids:
-                    results.append(r)
-            else:
-                if not target_acl and not r_web_acl_id:
-                    results.append(r)
-                elif target_acl and r_web_acl_id not in target_acl_ids:
-                    results.append(r)
-        return results
+    def get_associated_web_acl(self, resource):
+        return self.get_web_acl_by_arn(resource.get('wafWebAclArn'))
 
 
 @GraphQLApi.filter_registry.register('api-cache')
 class ApiCache(ValueFilter):
     """Filter AppSync GraphQLApi based on the api cache attributes
+
     :example:
+
     .. code-block:: yaml
+
        policies:
          - name: filter-graphql-api-cache
            resource: aws.graphql-api
@@ -206,3 +186,36 @@ class SetWafv2(BaseAction):
             else:
                 self.retry(client.disassociate_web_acl,
                            ResourceArn=r[arn_key])
+
+
+@GraphQLApi.action_registry.register('delete')
+class Delete(Action):
+    """Delete an AppSync GraphQL API.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: appsync-delete-unlogged-api
+                resource: graphql-api
+                filters:
+                  - type: value
+                    key: logConfig
+                    value: absent
+                actions:
+                  - delete
+
+    """
+    schema = type_schema('delete')
+    permissions = ("appsync:DeleteGraphqlApi",)
+
+    def process(self, apis):
+        client = local_session(self.manager.session_factory).client('appsync')
+        for api in apis:
+            try:
+                client.delete_graphql_api(apiId=api['apiId'])
+            except ClientError as e:
+                if e.response['Error']['Code'] == "ResourceNotFoundException":
+                    continue
+                raise

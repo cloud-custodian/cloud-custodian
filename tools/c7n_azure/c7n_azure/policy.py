@@ -7,7 +7,6 @@ import time
 
 from azure.mgmt.eventgrid.models import \
     StorageQueueEventSubscriptionDestination, StringInAdvancedFilter, EventSubscriptionFilter
-import jmespath
 
 from c7n_azure.azure_events import AzureEvents, AzureEventSubscription
 from c7n_azure.constants import (
@@ -28,7 +27,7 @@ from c7n.actions import EventAction
 from c7n.exceptions import PolicyValidationError, PolicyExecutionError
 from c7n.mu import generate_requirements
 from c7n.policy import PullMode, ServerlessExecutionMode, execution
-from c7n.utils import local_session
+from c7n.utils import local_session, jmespath_search
 
 
 class AzureFunctionMode(ServerlessExecutionMode):
@@ -119,7 +118,7 @@ class AzureFunctionMode(ServerlessExecutionMode):
 
     def validate(self):
         super().validate()
-        identity = jmespath.search(
+        identity = jmespath_search(
             'mode."provision-options".identity', self.policy.data)
         if (identity and identity['type'] == AUTH_TYPE_UAI and
                 'id' not in identity):
@@ -197,7 +196,7 @@ class AzureFunctionMode(ServerlessExecutionMode):
         return params
 
     def _get_identity(self, session):
-        identity = jmespath.search(
+        identity = jmespath_search(
             'mode."provision-options".identity', self.policy.data) or {
                 'type': AUTH_TYPE_EMBED}
         if identity['type'] != AUTH_TYPE_UAI:
@@ -255,7 +254,7 @@ class AzureFunctionMode(ServerlessExecutionMode):
     def provision(self):
         # Make sure we have auth data for function provisioning
         session = local_session(self.policy.session_factory)
-        if jmespath.search(
+        if jmespath_search(
                 'mode."provision-options".identity.type',
                 self.policy.data) in (AUTH_TYPE_EMBED, None):
             session.get_functions_auth_string("")
@@ -275,7 +274,7 @@ class AzureFunctionMode(ServerlessExecutionMode):
             self.function_params.function_app['name'])
 
         requirements = generate_requirements('c7n-azure',
-                                             ignore=['boto3', 'botocore', 'pywin32'],
+                                             ignore=['pywin32'],
                                              exclude='c7n')
         package = FunctionPackage(self.policy_name, target_sub_ids=target_subscription_ids)
         package.build(self.policy.data,

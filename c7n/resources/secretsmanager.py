@@ -1,16 +1,14 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import json
-import jmespath
 from c7n.manager import resources
 from c7n.actions import BaseAction, RemovePolicyBase
 from c7n.exceptions import PolicyValidationError
-from c7n.utils import type_schema
 from c7n.filters import iamaccess
 from c7n.query import QueryResourceManager, TypeInfo
 from c7n.filters.kms import KmsRelatedFilter
-from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction
-from c7n.utils import local_session
+from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction, Action
+from c7n.utils import local_session, type_schema, jmespath_search
 from c7n.filters.policystatement import HasStatementFilter
 
 
@@ -174,7 +172,7 @@ class DeleteSecretsManager(BaseAction):
 
         for r in resources:
             if 'ReplicationStatus' in r:
-                rep_regions = jmespath.search('ReplicationStatus[*].Region', r)
+                rep_regions = jmespath_search('ReplicationStatus[*].Region', r)
                 self.manager.retry(client.remove_regions_from_replication,
                   SecretId=r['ARN'], RemoveReplicaRegions=rep_regions)
             self.manager.retry(client.delete_secret,
@@ -235,3 +233,33 @@ class SecretsManagerRemovePolicyStatement(RemovePolicyBase):
             )
         else:
             client.delete_resource_policy(SecretId=resource['ARN'])
+
+
+@SecretsManager.action_registry.register('set-encryption')
+class SetEncryptionAction(Action):
+    """
+    Set kms encryption key for secrets, key supports ARN, ID, or alias
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+            - name: set-secret-encryption
+              resource: aws.secrets-manager
+              actions:
+                - type: set-encryption
+                  key: alias/foo/bar
+    """
+
+    schema = type_schema('set-encryption', key={'type': 'string'}, required=['key'])
+    permissions = ('secretsmanager:UpdateSecret', )
+
+    def process(self, resources):
+        key = self.data['key']
+        client = local_session(self.manager.session_factory).client('secretsmanager')
+        for r in resources:
+            client.update_secret(
+                SecretId=r['Name'],
+                KmsKeyId=key
+            )

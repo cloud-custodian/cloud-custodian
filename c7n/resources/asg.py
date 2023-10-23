@@ -15,6 +15,7 @@ from c7n.exceptions import PolicyValidationError
 from c7n.filters import ValueFilter, AgeFilter, Filter
 from c7n.filters.offhours import OffHour, OnHour
 import c7n.filters.vpc as net_filters
+import c7n.policy
 
 from c7n.manager import resources
 from c7n import query
@@ -244,7 +245,7 @@ class ConfigValidFilter(Filter):
                       'app-elb-target-group', 'ebs-snapshot', 'ami')]))
 
     def validate(self):
-        if self.manager.data.get('mode'):
+        if isinstance(self.manager.ctx.policy.get_execution_mode(), c7n.policy.LambdaMode):
             raise PolicyValidationError(
                 "invalid-config makes too many queries to be run in lambda")
         return self
@@ -602,12 +603,13 @@ class ImageFilter(ValueFilter):
         return super(ImageFilter, self).process(asgs, event)
 
     def __call__(self, i):
-        image = self.images.get(self.launch_info.get(i).get('ImageId', None))
+        image_id = self.launch_info.get(i).get('ImageId', None)
+        image = self.images.get(image_id)
         # Finally, if we have no image...
         if not image:
             self.log.warning(
-                "Could not locate image for instance:%s ami:%s" % (
-                    i['InstanceId'], i["ImageId"]))
+                "Could not locate image for asg:%s ami:%s" % (
+                    i['AutoScalingGroupName'], image_id ))
             # Match instead on empty skeleton?
             return False
         return self.match(image)
@@ -994,7 +996,7 @@ class Resize(Action):
                             # unless we were given a new value for min_size then
                             # ensure it is at least as low as current_size
                             update['MinSize'] = min(current_size, a['MinSize'])
-                    elif type(self.data['desired-size']) == int:
+                    elif isinstance(self.data['desired-size'], int):
                         update['DesiredCapacity'] = self.data['desired-size']
 
             if update:
@@ -1251,7 +1253,7 @@ class PropagateTags(Action):
                 k: v for k, v in tag_map.items()
                 if k in self.data['tags']}
 
-        if not tag_map and not self.get('trim', False):
+        if not tag_map and not self.data.get('trim', False):
             self.log.error(
                 'No tags found to propagate on asg:{} tags configured:{}'.format(
                     asg['AutoScalingGroupName'], self.data.get('tags')))
@@ -1401,7 +1403,7 @@ class RenameTag(Action):
              'PropagateAtLaunch': propagate,
              'Key': destination_tag,
              'Value': source['Value']}])
-        if propagate:
+        if propagate and asg['Instances']:
             self.propagate_instance_tag(source, destination_tag, asg)
 
     def propagate_instance_tag(self, source, destination_tag, asg):
