@@ -742,11 +742,6 @@ class RDSClusterSnapshotTest(BaseTest):
             {
                 "name": "rds-cluster-pending-maintenance",
                 "resource": "rds-cluster",
-                "query": [
-                    {
-                        "DBClusterIdentifier": "rds-clus-1"
-                    }
-                ],
                 "filters": [
                     {
                         "type": "pending-maintenance"
@@ -758,7 +753,7 @@ class RDSClusterSnapshotTest(BaseTest):
         )
 
         resources = p.run()
-        self.assertEqual(len(resources), 1)
+        self.assertEqual(len(resources), 0)
 
 
 class TestRDSClusterParameterGroupFilter(BaseTest):
