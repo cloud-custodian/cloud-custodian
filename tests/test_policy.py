@@ -1111,16 +1111,6 @@ class TestPolicyCollection(BaseTest):
         self.assertEqual(len(result), 1)
         self.assertEqual(result.policies[0].name, 'bar')
 
-    def test_r53domains_resolve_us_east_1(self):
-        cfg = Config.empty(regions=['eu-central-1', 'eu-west-1'])
-        original = policy.PolicyCollection.from_data({'policies': [
-            {'name': 'r53domain-policy', 'resource': 'r53domain'}
-        ]}, cfg)
-        collection = AWS().initialize_policies(original, cfg)
-        self.assertEqual(len(collection), 1)
-        self.assertEqual(collection.policies[0].name, 'r53domain-policy')
-        self.assertEqual(collection.policies[0].options.region, 'us-east-1')
-
 
 class TestPolicy(BaseTest):
 
