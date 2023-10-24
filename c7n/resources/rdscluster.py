@@ -745,7 +745,7 @@ class PendingMaintenance(Filter):
             )
 
         for r in resources:
-            if r['DBClusterIdentifier'] in pending_maintenance:
+            if r['DBClusterArn'] in pending_maintenance:
                 results.append(r)
 
         return results
