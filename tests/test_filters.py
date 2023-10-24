@@ -231,6 +231,22 @@ class TestValueFilter(unittest.TestCase):
             "key": "a"})
         self.assertTrue(vf.match(resource))
 
+    def test_value_case_insensitive_true(self):
+        resource = {"a": 1, "id":"Test"}
+        vf = filters.factory({"type": "value", "value": "test", "key": "id", "case-insensitive":True})
+
+        res = vf.match(resource)
+
+        self.assertTrue(res)
+
+    def test_value_case_insensitive_false(self):
+        resource = {"a": 1, "id":"Test"}
+        vf = filters.factory({"type": "value", "value": "test", "key": "id", "case-insensitive":False})
+
+        res = vf.match(resource)
+
+        self.assertFalse(res)
+
     def test_value_match(self):
         resource = {"a": 1, "Tags": [{"Key": "xtra", "Value": "hello"}]}
         vf = filters.factory({"type": "value", "value": None, "key": "tag:xtra"})
@@ -1010,8 +1026,21 @@ class TestInList(unittest.TestCase):
             }
         )
         self.assertEqual(f(instance(Thing="Foo")), True)
+        self.assertEqual(f(instance(Thing="foo")), False)
         self.assertEqual(f(instance(Thing="Baz")), False)
 
+    def test_in_case_insensitive(self):
+        f = filters.factory(
+            {
+                "type": "value",
+                "key": "Thing",
+                "value": ["Foo", "Bar", "Quux"],
+                "op": "in",
+                "case-insensitive": True
+            }
+        )
+        self.assertEqual(f(instance(Thing="foo")), True)
+        self.assertEqual(f(instance(Thing="Baz")), False)
 
 class TestNotInList(unittest.TestCase):
 

@@ -500,7 +500,8 @@ class ValueFilter(BaseValueFilter):
             'value_from': {'$ref': '#/definitions/filters_common/value_from'},
             'value': {'$ref': '#/definitions/filters_common/value'},
             'op': {'$ref': '#/definitions/filters_common/comparison_operators'},
-            'value_path': {'type':'string'}
+            'value_path': {'type':'string'},
+            'case-insensitive': {'type':'boolean'},
         }
     }
     schema_alias = True
@@ -640,8 +641,12 @@ class ValueFilter(BaseValueFilter):
         if i is None:
             return False
 
-        # value extract
-        r = self.get_resource_value(self.k, i)
+        # case-insensitive parameter extract
+        case_insensitive_filter = False
+        if 'case-insensitive' in self.data:
+            case_insensitive_filter = self.data['case-insensitive']
+
+        r = self.get_resource_value(self.k, i) # ikraemer
         if self.op in ('in', 'not-in') and r is None:
             r = ()
 
@@ -662,12 +667,19 @@ class ValueFilter(BaseValueFilter):
             return True
         elif self.op:
             op = OPERATORS[self.op]
+            if case_insensitive_filter:
+                try:
+                    return op(r.lower(), [x.lower() for x in v])
+                except TypeError:
+                    return False
             try:
                 return op(r, v)
             except TypeError:
                 return False
-        elif r == v:
-            return True
+        elif case_insensitive_filter:
+            return r.lower() == v.lower()
+        elif not case_insensitive_filter:
+            return r == v
 
         return False
 
