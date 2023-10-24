@@ -11,6 +11,7 @@ from c7n.resources.aws import shape_validate
 from pytest_terraform import terraform
 
 import pytest
+import jmespath
 
 
 @pytest.mark.audited
@@ -1016,6 +1017,85 @@ class NetworkInterfaceTest(BaseTest):
         response = client.describe_instances(InstanceIds=[instance])
         self.assertEqual(len(response["Reservations"][0]["Instances"][0]["NetworkInterfaces"]), 1)
 
+    def test_interface_detach_primary_nic_1(self):
+        session_factory = self.replay_flight_data("test_interface_detach_primary_nic_1")
+        client = session_factory().client("ec2")
+        eni = "eni-007ebb46d3795b43b"
+        instance = "i-042c20d5454745bbe"
+
+        p = self.load_policy(
+            {
+                "name": "detach-enis",
+                "resource": "eni",
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": "NetworkInterfaceId",
+                        "value": eni,
+                    },
+                    {
+                        "type": "value",
+                        "key": "Attachment.InstanceId",
+                        "value": "present",
+                    },
+                    {
+                        "type": "value",
+                        "key": "Association.PublicIp",
+                        "value": "present",
+                    },
+                ],
+                "actions": [
+                    {
+                        "type": "detach",
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+        response = client.describe_instances(InstanceIds=[instance])
+        self.assertEqual(len(response["Reservations"][0]["Instances"][0]["NetworkInterfaces"]), 1)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        response = client.describe_instances(InstanceIds=[instance])
+        self.assertEqual(len(response["Reservations"][0]["Instances"][0]["NetworkInterfaces"]), 1)
+
+    def test_interface_detach_primary_nic_2(self):
+        session_factory = self.replay_flight_data("test_interface_detach_primary_nic_2")
+        client = session_factory().client("ec2")
+
+        p = self.load_policy(
+            {
+                "name": "detach-enis",
+                "resource": "eni",
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": "Attachment.InstanceId",
+                        "value": "present",
+                    },
+                    {
+                        "type": "value",
+                        "key": "Association.PublicIp",
+                        "value": "present",
+                    },
+                ],
+                "actions": [
+                    {
+                        "type": "detach",
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+        response = client.describe_instances()
+        self.assertEqual(len(jmespath.search('Reservations[].Instances[].NetworkInterfaces[].NetworkInterfaceId', response)), 3)
+        resources = p.run()
+        if self.recording:
+            time.sleep(30)
+        self.assertEqual(len(resources), 3)
+        response = client.describe_instances()
+        self.assertEqual(len(jmespath.search('Reservations[].Instances[].NetworkInterfaces[].NetworkInterfaceId', response)), 2)
+
     def test_interface_delete(self):
         factory = self.replay_flight_data("test_network_interface_delete")
         client = factory().client("ec2")
@@ -1292,8 +1372,6 @@ class NetworkAddrTest(BaseTest):
         session_factory = self.replay_flight_data("test_address_disassociate")
         client = session_factory().client("ec2")
         allocation_id = "eipalloc-02b147389a1522f9d"
-        #eni = "eni-0605e38e04785b878"
-        #instance = "i-05fccf7da99ad47f7"
 
         p = self.load_policy(
             {
@@ -1318,6 +1396,38 @@ class NetworkAddrTest(BaseTest):
         self.assertEqual(len(resources), 1)
         if self.recording:
             time.sleep(5)
+        post_response = client.describe_addresses(AllocationIds=[allocation_id])
+        self.assertNotIn("AssociationId", post_response["Addresses"][0])
+
+    def test_address_disassociate_exception(self):
+        session_factory = self.replay_flight_data("test_address_disassociate_exception")
+        client = session_factory().client("ec2")
+        allocation_id = "eipalloc-064c7be63c6334ade"
+        association_id = "eipassoc-0478441923b77b671"
+
+        p = self.load_policy(
+            {
+                "name": "disassociate-network-addr",
+                "resource": "network-addr",
+                "filters": [
+                    {
+                        "AllocationId": allocation_id
+                    }
+                ],
+                "actions": [
+                    {
+                        "type": "disassociate"
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+        pre_response = client.describe_addresses(AllocationIds=[allocation_id])
+        self.assertIn("AssociationId", pre_response["Addresses"][0])
+        client.disassociate_address(AssociationId=association_id)
+        if self.recording:
+            time.sleep(5)
+        resources = p.run()
         post_response = client.describe_addresses(AllocationIds=[allocation_id])
         self.assertNotIn("AssociationId", post_response["Addresses"][0])
 
