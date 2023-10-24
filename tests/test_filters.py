@@ -232,16 +232,30 @@ class TestValueFilter(unittest.TestCase):
         self.assertTrue(vf.match(resource))
 
     def test_value_case_insensitive_true(self):
-        resource = {"a": 1, "id":"Test"}
-        vf = filters.factory({"type": "value", "value": "test", "key": "id", "case-insensitive":True})
+        resource = {"a": 1, "id": "Test"}
+        vf = filters.factory(
+            {
+                "type": "value",
+                "value": "test",
+                "key": "id",
+                "case-insensitive": True
+            }
+        )
 
         res = vf.match(resource)
 
         self.assertTrue(res)
 
     def test_value_case_insensitive_false(self):
-        resource = {"a": 1, "id":"Test"}
-        vf = filters.factory({"type": "value", "value": "test", "key": "id", "case-insensitive":False})
+        resource = {"a": 1, "id": "Test"}
+        vf = filters.factory(
+            {
+                "type": "value",
+                "value": "test",
+                "key": "id",
+                "case-insensitive": False
+            }
+        )
 
         res = vf.match(resource)
 
@@ -1039,6 +1053,7 @@ class TestInList(unittest.TestCase):
                 "case-insensitive": True
             }
         )
+        self.assertEqual(f(instance(Thing="Foo")), True)
         self.assertEqual(f(instance(Thing="foo")), True)
         self.assertEqual(f(instance(Thing="Baz")), False)
 

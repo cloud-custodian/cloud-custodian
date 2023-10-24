@@ -646,7 +646,7 @@ class ValueFilter(BaseValueFilter):
         if 'case-insensitive' in self.data:
             case_insensitive_filter = self.data['case-insensitive']
 
-        r = self.get_resource_value(self.k, i) # ikraemer
+        r = self.get_resource_value(self.k, i)
         if self.op in ('in', 'not-in') and r is None:
             r = ()
 
