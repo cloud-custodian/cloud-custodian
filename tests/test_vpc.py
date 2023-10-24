@@ -972,6 +972,50 @@ class NetworkInterfaceTest(BaseTest):
             [k for k in resources[0] if k.startswith("c7n")], ["c7n:MatchedFilters"]
         )
 
+    def test_interface_detach(self):
+        session_factory = self.replay_flight_data("test_network_interface_detach")
+        client = session_factory().client("ec2")
+        eni = "eni-0605e38e04785b878"
+        instance = "i-05fccf7da99ad47f7"
+
+        p = self.load_policy(
+            {
+                "name": "detach-enis",
+                "resource": "eni",
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": "NetworkInterfaceId",
+                        "value": eni,
+                    },
+                    {
+                        "type": "value",
+                        "key": "Attachment.InstanceId",
+                        "value": "present",
+                    },
+                    {
+                        "type": "value",
+                        "key": "Association.PublicIp",
+                        "value": "present",
+                    },
+                ],
+                "actions": [
+                    {
+                        "type": "detach",
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+        pre_response = client.describe_instances(InstanceIds=[instance])
+        self.assertEqual(len(pre_response["Reservations"][0]["Instances"][0]["NetworkInterfaces"]), 2)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        if self.recording:
+            time.sleep(30)
+        post_response = client.describe_instances(InstanceIds=[instance])
+        self.assertEqual(len(post_response["Reservations"][0]["Instances"][0]["NetworkInterfaces"]), 1)
+
     def test_interface_delete(self):
         factory = self.replay_flight_data("test_network_interface_delete")
         client = factory().client("ec2")
@@ -1243,6 +1287,39 @@ class NetworkAddrTest(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
+    def test_address_disassociate(self):
+        session_factory = self.replay_flight_data("test_address_disassociate")
+        client = session_factory().client("ec2")
+        allocation_id = "eipalloc-02b147389a1522f9d"
+        #eni = "eni-0605e38e04785b878"
+        #instance = "i-05fccf7da99ad47f7"
+
+        p = self.load_policy(
+            {
+                "name": "disassociate-network-addr",
+                "resource": "network-addr",
+                "filters": [
+                    {
+                        "AllocationId": allocation_id
+                    }
+                ],
+                "actions": [
+                    {
+                        "type": "disassociate"
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+        pre_response = client.describe_addresses(AllocationIds=[allocation_id])
+        self.assertIn("AssociationId", pre_response["Addresses"][0])
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        if self.recording:
+            time.sleep(5)
+        post_response = client.describe_addresses(AllocationIds=[allocation_id])
+        self.assertNotIn("AssociationId", post_response["Addresses"][0])
 
 
 class RouteTableTest(BaseTest):
