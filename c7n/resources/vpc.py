@@ -2062,10 +2062,14 @@ class DetachNetworkInterface(BaseAction):
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('ec2')
-        att_resources = [ ar for ar in resources if ('Attachment' in ar and ar['Attachment'].get('InstanceId') and ar['Attachment'].get('DeviceIndex') != 0) ]
+        att_resources = [ ar for ar in resources if ('Attachment' in ar \
+            and ar['Attachment'].get('InstanceId') \
+            and ar['Attachment'].get('DeviceIndex') != 0) ]
         if att_resources and (len(att_resources) < len(resources)):
-            self.log.warning("Filtered {} of {} non-primary network interfaces attatched to EC2".format(
-                len(att_resources), len(resources)))
+            self.log.warning(
+                "Filtered {} of {} non-primary network interfaces attatched to EC2".format(
+                len(att_resources), len(resources))
+            )
         elif not att_resources:
             self.log.warning("No non-primary EC2 interfaces indentified - revise c7n filters")
         for r in att_resources:

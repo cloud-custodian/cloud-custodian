@@ -1007,14 +1007,14 @@ class NetworkInterfaceTest(BaseTest):
             },
             session_factory=session_factory,
         )
-        pre_response = client.describe_instances(InstanceIds=[instance])
-        self.assertEqual(len(pre_response["Reservations"][0]["Instances"][0]["NetworkInterfaces"]), 2)
+        response = client.describe_instances(InstanceIds=[instance])
+        self.assertEqual(len(response["Reservations"][0]["Instances"][0]["NetworkInterfaces"]), 2)
         resources = p.run()
         self.assertEqual(len(resources), 1)
         if self.recording:
             time.sleep(30)
-        post_response = client.describe_instances(InstanceIds=[instance])
-        self.assertEqual(len(post_response["Reservations"][0]["Instances"][0]["NetworkInterfaces"]), 1)
+        response = client.describe_instances(InstanceIds=[instance])
+        self.assertEqual(len(response["Reservations"][0]["Instances"][0]["NetworkInterfaces"]), 1)
 
     def test_interface_delete(self):
         factory = self.replay_flight_data("test_network_interface_delete")
