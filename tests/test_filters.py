@@ -315,6 +315,15 @@ class TestValueFilter(unittest.TestCase):
             "key": "ingress"})
         self.assertRaises(TypeError, vf.match(resource))
 
+        resource = {"id": 1}
+        vf = filters.factory({
+            "type": "value",
+            "value": ["abc"],
+            "op": "in",
+            "key": "id",
+            "case-insensitive": True})
+        self.assertRaises(TypeError, vf.match(resource))
+
     def test_value_path(self):
         resource = {'list':[{'a':['one','two'],'b':'one'},{'a':['one'],'b':'two'}]}
         vf = filters.factory({

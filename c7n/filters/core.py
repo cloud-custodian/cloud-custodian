@@ -667,12 +667,9 @@ class ValueFilter(BaseValueFilter):
             return True
         elif self.op:
             op = OPERATORS[self.op]
-            if case_insensitive_filter:
-                try:
-                    return op(r.lower(), [x.lower() for x in v])
-                except TypeError:
-                    return False
             try:
+                if case_insensitive_filter and isinstance(r, str):
+                    return op(r.lower(), [x.lower() for x in v])
                 return op(r, v)
             except TypeError:
                 return False
@@ -680,7 +677,6 @@ class ValueFilter(BaseValueFilter):
             return r.lower() == v.lower()
         elif not case_insensitive_filter:
             return r == v
-
         return False
 
     def process_value_type(self, sentinel, value, resource):
