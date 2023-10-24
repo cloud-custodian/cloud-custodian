@@ -1088,13 +1088,19 @@ class NetworkInterfaceTest(BaseTest):
             session_factory=session_factory,
         )
         response = client.describe_instances()
-        self.assertEqual(len(jmespath.search('Reservations[].Instances[].NetworkInterfaces[].NetworkInterfaceId', response)), 3)
+        self.assertEqual(
+            len(jmespath.search(
+                'Reservations[].Instances[].NetworkInterfaces[].NetworkInterfaceId',
+                response)), 3)
         resources = p.run()
         if self.recording:
             time.sleep(30)
         self.assertEqual(len(resources), 3)
         response = client.describe_instances()
-        self.assertEqual(len(jmespath.search('Reservations[].Instances[].NetworkInterfaces[].NetworkInterfaceId', response)), 2)
+        self.assertEqual(
+            len(jmespath.search(
+                'Reservations[].Instances[].NetworkInterfaces[].NetworkInterfaceId'
+                , response)), 2)
 
     def test_interface_delete(self):
         factory = self.replay_flight_data("test_network_interface_delete")
@@ -1428,6 +1434,7 @@ class NetworkAddrTest(BaseTest):
         if self.recording:
             time.sleep(5)
         resources = p.run()
+        self.assertEqual(len(resources), 1)
         post_response = client.describe_addresses(AllocationIds=[allocation_id])
         self.assertNotIn("AssociationId", post_response["Addresses"][0])
 
