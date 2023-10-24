@@ -41,6 +41,7 @@ terraform_dir = terraform_dir.relative_to(cur_dir)
 class ResultsReporter:
     def __init__(self):
         self.results = []
+        self.input_vars = {}
 
     def on_execution_started(self, policies, graph):
         pass
@@ -51,15 +52,17 @@ class ResultsReporter:
     def on_policy_start(self, policy, event):
         pass
 
+    def on_vars_discovered(self, var_type, var_map, var_path=None):
+        var_key = var_path and "%s:%s" % (var_type, var_path) or var_type
+        self.input_vars[var_key] = dict(var_map)
+
     def on_results(self, policy, results):
         self.results.extend(results)
 
 
 def run_policy(policy, terraform_dir, tmp_path):
     (tmp_path / "policies.json").write_text(json.dumps({"policies": [policy]}, indent=2))
-    config = Config.empty(
-        policy_dir=tmp_path, source_dir=terraform_dir, exec_filter=None, var_files=()
-    )
+    config = cli.get_config(policy_dir=tmp_path, directory=terraform_dir)
     policies = policy_core.load_policies(tmp_path, config)
     reporter = ResultsReporter()
     core.CollectionRunner(policies, config, reporter).run()
@@ -75,11 +78,18 @@ class PolicyEnv:
         policies = policy_core.load_policies(self.policy_dir, config)
         return policies
 
-    def get_graph(self, root_module):
-        return TerraformProvider().parse(root_module)
+    def get_graph(self, root_module=None, config=None):
+        root_module = root_module or self.policy_dir
+        provider = TerraformProvider()
+        params = {"source_dir": root_module}
+        if config:
+            provider.initialize(config)
+        if config and config.var_files:
+            params["var_files"] = config.var_files
+        return provider.parse(**params)
 
     def get_selection(self, filter_expression):
-        return core.ExecutionFilter.parse(Config.empty(filters=filter_expression))
+        return core.ExecutionFilter.parse(filter_expression)
 
     def write_tf(self, content, path="main.tf"):
         tf_file = self.policy_dir / path
@@ -94,12 +104,7 @@ class PolicyEnv:
         policy_file.write_text(json.dumps(extant))
 
     def run(self, policy_dir=None, terraform_dir=None):
-        config = Config.empty(
-            policy_dir=policy_dir or self.policy_dir,
-            source_dir=terraform_dir or self.policy_dir,
-            exec_filter=None,
-            var_files=(),
-        )
+        config = cli.get_config(terraform_dir or self.policy_dir, policy_dir or self.policy_dir)
         policies = policy_core.load_policies(config.policy_dir, config)
         reporter = ResultsReporter()
         core.CollectionRunner(policies, config, reporter).run()
@@ -481,6 +486,93 @@ resource "aws_cloudwatch_log_stream" "foo" {
     assert results[0].resource["name"] == "Yada"
 
 
+def test_module_unknown_variable(policy_env, test):
+    mod_dir = policy_env.policy_dir / "module" / "logs"
+    mod_dir.mkdir(parents=True)
+    (mod_dir / "main.tf").write_text(
+        """
+        variable env {
+           type = string
+           default = "Dev"
+        }
+        variable owner {
+           type = string
+        }
+        variable app {
+           type = string
+        }
+        variable component {
+           type = string
+        }
+        resource "aws_cloudwatch_log_group" "app_log" {
+           name = "bing"
+           tags = {
+              Env = var.env
+              Owner = var.owner
+              App = var.app
+              Component = var.component
+           }
+        }
+        """
+    )
+    (policy_env.policy_dir / "vars.tfvars").write_text('component = "login"')
+    policy_env.write_tf(
+        """
+        variable component {
+            type = string
+        }
+
+        variable owner {
+           type = string
+           default = "jello"
+        }
+
+        module "servers" {
+          source = "./module/logs"
+          owner = var.owner
+          app = "authz"
+          component = var.component
+        }
+        """
+    )
+
+    conf = Config.empty(reporter=ResultsReporter(), var_files=["vars.tfvars"])
+    test.change_cwd(policy_env.policy_dir)
+    test.change_environment()
+    policy_env.get_graph(config=conf)
+    assert conf.reporter.input_vars == {
+        "user:vars.tfvars": {"component": "login"},
+    }
+
+
+def test_graph_merge_unknown_variable_relative_path(policy_env, monkeypatch):
+    policy_env.write_tf(
+        """
+        variable component {
+           type = string
+        }
+        variable owner {
+           type = string
+           default = "jello"
+        }
+        resource "aws_cloudwatch_log_group" "yada" {
+           name = "Yada"
+           tags = merge(
+              {"Env" = "Public"},
+              {"Owner" = var.owner},
+              {"Component" = var.component}
+           )
+        }
+        """
+    )
+
+    monkeypatch.chdir(policy_env.policy_dir)
+    graph = policy_env.get_graph(Path("."))
+    resource_types = list(graph.get_resources_by_type("aws_cloudwatch_log_group"))
+    log_group = resource_types.pop()[-1][0]
+    assert log_group["tags"] == {"Env": "Public", "Component": "", "Owner": "jello"}
+
+
 def test_graph_merge_unknown_variable(policy_env):
     policy_env.write_tf(
         """
@@ -716,6 +808,22 @@ resource "aws_alb" "positive1" {
 #    assert resources[0][1][0]['load_balancer_type'] == 'network'
 
 
+def test_graph_var_file_abs_rel_source(tmp_path, monkeypatch, var_tf_setup):
+    monkeypatch.chdir(tmp_path)
+    (tmp_path / "vars.tfvars").write_text('balancer_type = "network"')
+    graph = TerraformProvider().parse(Path("tf"), (tmp_path / "vars.tfvars",))
+    resources = list(graph.get_resources_by_type("aws_alb"))
+    assert resources[0][1][0]["load_balancer_type"] == "network"
+
+
+def test_graph_var_file_rel_abs_source(tmp_path, monkeypatch, var_tf_setup):
+    monkeypatch.chdir(tmp_path)
+    (tmp_path / "vars.tfvars").write_text('balancer_type = "network"')
+    graph = TerraformProvider().parse(tmp_path / "tf", ("vars.tfvars",))
+    resources = list(graph.get_resources_by_type("aws_alb"))
+    assert resources[0][1][0]["load_balancer_type"] == "network"
+
+
 def test_graph_non_root_var_file(tmp_path, var_tf_setup):
     (tmp_path / "vars.tfvars").write_text('balancer_type = "network"')
     graph = TerraformProvider().parse(tmp_path / "tf", (tmp_path / "vars.tfvars",))
@@ -792,6 +900,8 @@ def test_cli_dump(policy_env, test, debug_cli_runner):
             str(policy_env.policy_dir),
             "--var-file",
             policy_env.policy_dir / "vars.tfvars",
+            "--output-query",
+            "input_vars",
             # "--var-file",
             # policy_env.policy_dir / "vars2.tfvars",
             "--output-file",
@@ -800,8 +910,7 @@ def test_cli_dump(policy_env, test, debug_cli_runner):
     )
     assert result.exit_code == 0
     data = json.loads((policy_env.policy_dir / "output.json").read_text())
-    assert data["graph"]["aws_cloudwatch_log_group"][0]["name"] == "riddle--logs"
-    assert data["input_vars"] == {
+    assert data == {
         "environment": {"repo": "cloud-custodian/cloud-custodian"},
         "uninitialized": {"env": ""},
         "user:vars.tfvars": {"app": "riddle"},
@@ -995,6 +1104,7 @@ def write_output_test_policy(tmp_path, policy=None, policy_path="policy.json"):
                     "name": "check-bucket",
                     "resource": "terraform.aws_s3_bucket",
                     "description": "a description",
+                    "metadata": {"category": ["test"]},
                     "filters": [{"server_side_encryption_configuration": "absent"}],
                 }
             ]
@@ -1169,6 +1279,28 @@ def test_cli_output_rich(tmp_path):
     assert "1 failed 2 passed" in result.output
 
 
+def test_cli_output_rich_warn_on(tmp_path):
+    write_output_test_policy(tmp_path)
+    runner = CliRunner()
+    result = runner.invoke(
+        cli.cli,
+        [
+            "run",
+            "-p",
+            str(tmp_path),
+            "-d",
+            str(terraform_dir / "aws_s3_encryption_audit"),
+            "--warn-on",
+            "category=test",
+            "-o",
+            "cli",
+        ],
+    )
+    assert result.exit_code == 0
+    assert "Reason: a description\n" in result.output
+    assert "1 failed 2 passed" in result.output
+
+
 def test_cli_selection(tmp_path):
     write_output_test_policy(
         tmp_path,
@@ -1252,7 +1384,7 @@ def test_cli_output_github(tmp_path):
     assert result.exit_code == 1
     expected = (
         "::error file=tests/terraform/aws_s3_encryption_audit/main.tf,line=25,lineEnd=28,"
-        "title=terraform.aws_s3_bucket - policy:check-bucket severity:unknown::a description"
+        "title=terraform.aws_s3_bucket - policy:check-bucket category:test severity:unknown::a description"  # noqa
     )
     assert expected in result.output
 
@@ -1321,6 +1453,7 @@ def test_cli_output_json(tmp_path):
             "file_path": "tests/terraform/aws_s3_encryption_audit/main.tf",
             "policy": {
                 "filters": [{"server_side_encryption_configuration": "absent"}],
+                "metadata": {"category": ["test"]},
                 "mode": {"type": "terraform-source"},
                 "name": "check-bucket",
                 "resource": "terraform.aws_s3_bucket",

@@ -72,6 +72,8 @@ class JsonGraph(Output):
         data = {}
         data["input_vars"] = self.input_vars
         data["graph"] = dict(self.graph.resource_data)
+        if self.config.output_query:
+            data = jmespath_search(self.config.output_query, data)
         self.config.output_file.write(json.dumps(data, cls=JSONEncoder, indent=2))
 
 
@@ -95,7 +97,8 @@ class RichCli(Output):
         )
 
     def on_vars_discovered(self, var_type, var_map, var_path=None):
-        if var_type != "uninitialized":
+        if var_type != "uninitialized" and var_map:
+            var_path = var_path or ""
             self.console.print(f"Loaded {len(var_map)} vars from {var_type} {var_path}")
 
     def on_results(self, policy, results):
@@ -154,7 +157,8 @@ class Summary(Output):
         resource_count = 0
 
         for rtype, resources in graph.get_resources_by_type():
-            resources = self.config.exec_filter.filter_resources(rtype, resources)
+            if self.config.exec_filter:
+                resources = self.config.exec_filter.filter_resources(rtype, resources)
             if "_" not in rtype:
                 continue
             if not resources:

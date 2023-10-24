@@ -90,7 +90,8 @@ class VariableResolver:
         # unknown / null results. to provide broad compatiblity we try to initialize
         # things with default values to facilitate attribute interpolation.
         var_map = self.get_env_variables()
-        self.report("environment", var_map)
+        if var_map:
+            self.report("environment", var_map)
         for type, f_set in self.resolved_files.items():
             for idx, f in enumerate(f_set):
                 if str(f).endswith(".tfvars.json"):
@@ -101,7 +102,8 @@ class VariableResolver:
                 fpath = type == "user" and self.var_files[idx] or f
                 if isinstance(fpath, Path):
                     fpath = fpath.name
-                self.report(type, f_vars, fpath)
+                if f_vars:
+                    self.report(type, f_vars, fpath)
                 var_map.update(f_vars)
 
         uninitialized_vars = {}
@@ -111,6 +113,8 @@ class VariableResolver:
         ):
             for v in variables:
                 if v.get("default"):
+                    continue
+                if not v["__tfmeta"]["path"].startswith("variable"):
                     continue
                 if v["__tfmeta"]["label"] not in var_map:
                     uninitialized_vars[v["__tfmeta"]["label"]] = self.type_defaults[
@@ -125,7 +129,7 @@ class VariableResolver:
         return [
             Path(
                 self._write_file_content(json.dumps(uninitialized_vars), ".tfvars.json").name
-            ).relative_to(self.source_dir)
+            ).relative_to(self.source_dir.absolute())
         ]
 
     def get_env_variables(self):
@@ -162,5 +166,5 @@ class VariableResolver:
             else:
                 suffix = str(v).endswith(".tfvars.json") and ".tfvars.json" or ".tfvars"
                 vfr = self._write_file_content(v.read_text(), suffix)
-                resolved_files.append(Path(vfr.name).relative_to(self.source_dir))
+                resolved_files.append(Path(vfr.name).relative_to(self.source_dir.absolute()))
         return resolved_files
