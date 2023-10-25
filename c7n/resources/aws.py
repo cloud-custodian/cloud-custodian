@@ -299,6 +299,8 @@ class Arn(namedtuple('_Arn', (
         if isinstance(arn, Arn):
             return arn
         parts = arn.split(':', 5)
+        if len(parts) < 3:
+            raise ValueError("Invalid Arn")
         # a few resources use qualifiers without specifying type
         if parts[2] in ('s3', 'apigateway', 'execute-api', 'emr-serverless'):
             parts.append(None)
