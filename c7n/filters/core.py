@@ -6,6 +6,7 @@ Resource Filtering Logic
 import copy
 import datetime
 from datetime import timedelta
+from itertools import zip_longest
 import fnmatch
 import ipaddress
 import logging
@@ -470,14 +471,58 @@ class AnnotationSweeper:
             self.resource_map[rid].update(self.ra_map[rid])
 
 
-# The default LooseVersion will fail on comparing present strings, used
-# in the value as shorthand for certain options.
+# This updates the default LooseVersion to better support mixed strings (e.g. 1.2.a vs 1.2.3),
+# and handles some AWS specific cases such as `mysql_aurora`.
 class ComparableVersion(version.LooseVersion):
-    def __eq__(self, other):
-        try:
-            return super(ComparableVersion, self).__eq__(other)
-        except TypeError:
-            return False
+
+    SPECIAL_VALUES = {
+        "mysql_aurora": 9999, # This is considered a split point, so newer than all the others.
+    }
+
+    def parse(self, vstring):
+        self.vstring = vstring
+        components = vstring.split(".")
+        for i, obj in enumerate(components):
+            try:
+                components[i] = int(obj)
+            except ValueError:
+                pass
+        self.version = components
+
+    def _cmp(self, other):
+        # Normalise to a Comparable version if comparing to a string.
+        if not isinstance(other, ComparableVersion):
+            other = ComparableVersion(str(other))
+
+        v1 = self.version
+        v2 = other.version
+
+        def compare(left, right):
+            # Normalise known special values into a comparable integer.
+            left = self.SPECIAL_VALUES.get(left, left)
+            right = self.SPECIAL_VALUES.get(right, right)
+
+            lstr = isinstance(left, str)
+            rstr = isinstance(right, str)
+
+            if lstr and not rstr:
+                return -1 # The number should be higher.
+            elif rstr and not lstr:
+                return 1
+            elif left == right:
+                return 0
+            elif left < right:
+                return -1
+            else:
+                return 1
+
+        compared = 0
+        for (a, b) in zip_longest(v1, v2, fillvalue=0):
+            compared = compare(a, b)
+            if compared != 0:
+                return compared
+
+        return compared
 
 
 class ValueFilter(BaseValueFilter):
