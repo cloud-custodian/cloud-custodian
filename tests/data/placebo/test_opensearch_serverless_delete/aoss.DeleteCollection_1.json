@@ -2,8 +2,8 @@
     "status_code": 200,
     "data": {
         "deleteCollectionDetail": {
-            "id": "94ao1y89mx514mgi0xa9",
-            "name": "test",
+            "id": "3a0jzteyhu9w0jd5l2ka",
+            "name": "c7n-test",
             "status": "DELETING"
         },
         "ResponseMetadata": {}

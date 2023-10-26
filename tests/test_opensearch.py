@@ -64,7 +64,7 @@ class OpensearchServerless(BaseTest):
             {
                 'name': 'test-opensearch-serverless-delete',
                 'resource': 'opensearch-serverless',
-                'filters': [{'name': 'test'}],
+                'filters': [{'name': 'c7n-test'}],
                 'actions': [{'type': 'delete'}]
             },
             session_factory=session_factory

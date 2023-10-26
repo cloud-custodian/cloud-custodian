@@ -3,9 +3,9 @@
     "data": {
         "collectionSummaries": [
             {
-                "arn": "arn:aws:aoss:us-east-1:644160558196:collection/94ao1y89mx514mgi0xa9",
-                "id": "94ao1y89mx514mgi0xa9",
-                "name": "test",
+                "arn": "arn:aws:aoss:us-east-1:644160558196:collection/3a0jzteyhu9w0jd5l2ka",
+                "id": "3a0jzteyhu9w0jd5l2ka",
+                "name": "c7n-test",
                 "status": "DELETING"
             }
         ],

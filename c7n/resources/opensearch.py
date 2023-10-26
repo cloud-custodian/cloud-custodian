@@ -3,7 +3,7 @@
 
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, TypeInfo
-from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction
+from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction, universal_augment
 from c7n.utils import local_session, type_schema
 from c7n.actions import BaseAction
 
@@ -16,19 +16,12 @@ class OpensearchServerless(QueryResourceManager):
         enum_spec = ('list_collections', 'collectionSummaries[]', None)
         name = "name"
         id = "id"
-        universal_taggable = True
         cfn_type = 'AWS::OpenSearchServerless::Collection'
         arn = "arn"
         permission_prefix = 'aoss'
 
     def augment(self, resources):
-        client = local_session(self.session_factory).client('opensearchserverless')
-        arn_resources = []
-        for r in resources:
-            tags = client.list_tags_for_resource(resourceArn=r['arn'])
-            r['Tags'] = [{'Key': tag['key'], 'Value': tag['value']} for tag in tags.get('tags', [])]
-            arn_resources.append(r)
-        return arn_resources
+        return universal_augment(self, super().augment(resources))
 
 
 @OpensearchServerless.action_registry.register('tag')
@@ -116,6 +109,9 @@ class DeleteOpensearchServerless(BaseAction):
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('opensearchserverless')
         for r in resources:
+            if r.get("status") not in ["ACTIVE", "FAILED"]:
+              continue
+
             try:
               client.delete_collection(id=r['id'])
             except client.exceptions.ResourceNotFoundException:
