@@ -2,7 +2,7 @@
     "status_code": 200,
     "data": {
         "deleteCollectionDetail": {
-            "id": "3a0jzteyhu9w0jd5l2ka",
+            "id": "6ot2t518av2khgxr73sf",
             "name": "c7n-test",
             "status": "DELETING"
         },

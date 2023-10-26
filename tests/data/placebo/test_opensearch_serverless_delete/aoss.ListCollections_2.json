@@ -3,8 +3,8 @@
     "data": {
         "collectionSummaries": [
             {
-                "arn": "arn:aws:aoss:us-east-1:644160558196:collection/3a0jzteyhu9w0jd5l2ka",
-                "id": "3a0jzteyhu9w0jd5l2ka",
+                "arn": "arn:aws:aoss:us-east-1:644160558196:collection/6ot2t518av2khgxr73sf",
+                "id": "6ot2t518av2khgxr73sf",
                 "name": "c7n-test",
                 "status": "DELETING"
             }

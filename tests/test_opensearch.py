@@ -38,11 +38,6 @@ class OpensearchServerless(BaseTest):
             {
                 'name': 'test-opensearch-serverless-remove-tag',
                 'resource': 'opensearch-serverless',
-                'filters': [
-                    {
-                        'tag:foo': 'present',
-                    }
-                ],
                 'actions': [
                     {
                         'type': 'remove-tag',
@@ -52,7 +47,6 @@ class OpensearchServerless(BaseTest):
             }, session_factory=session_factory
         )
         resources = p.run()
-        print(resources)
         self.assertEqual(len(resources), 1)
         client = session_factory().client('opensearchserverless')
         tags = client.list_tags_for_resource(resourceArn=resources[0]['arn'])['tags']

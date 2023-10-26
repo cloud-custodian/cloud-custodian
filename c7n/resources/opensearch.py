@@ -19,10 +19,7 @@ class OpensearchServerless(QueryResourceManager):
         cfn_type = 'AWS::OpenSearchServerless::Collection'
         arn = "arn"
         permission_prefix = 'aoss'
-
-    def augment(self, resources):
-        return universal_augment(self, super().augment(resources))
-
+        augment = universal_augment
 
 @OpensearchServerless.action_registry.register('tag')
 class TagOpensearchServerlessResource(Tag):
@@ -105,13 +102,12 @@ class DeleteOpensearchServerless(BaseAction):
     """
     schema = type_schema('delete')
     permissions = ('aoss:DeleteCollection',)
+    valid_delete_states = ('ACTIVE', 'FAILED')
 
     def process(self, resources):
+        resources = self.filter_resources(resources, "status", self.valid_delete_states)
         client = local_session(self.manager.session_factory).client('opensearchserverless')
         for r in resources:
-            if r.get("status") not in ["ACTIVE", "FAILED"]:
-              continue
-
             try:
               client.delete_collection(id=r['id'])
             except client.exceptions.ResourceNotFoundException:
