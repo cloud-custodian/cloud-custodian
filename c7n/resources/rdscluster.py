@@ -721,13 +721,14 @@ class ClusterParameterFilter(ParameterFilter):
 @RDSCluster.filter_registry.register('pending-maintenance')
 class PendingMaintenance(Filter):
     """ Scan DB Clusters for those with pending maintenance
+
     :example:
     .. code-block:: yaml
         policies:
-          - name: rds-cluster-pending-maintenance
-            resource: rds-cluster
-            filters:
-              - pending-maintenance
+            - name: rds-cluster-pending-maintenance
+              resource: rds-cluster
+              filters:
+                - pending-maintenance
     """
 
     schema = type_schema('pending-maintenance')
