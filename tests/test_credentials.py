@@ -5,7 +5,9 @@ from botocore.exceptions import ClientError
 import placebo
 
 from c7n import credentials
-from c7n.credentials import SessionFactory, assumed_session, get_sts_client
+from c7n.credentials import (
+    CustodianSession, SessionFactory, assumed_session, get_sts_client
+)
 from c7n.version import version
 from c7n.utils import local_session
 
@@ -80,7 +82,7 @@ class Credential(BaseTest):
         client = local_session(factory).client('ec2')
         self.assertTrue(
             'check-ebs' in client._client_config.user_agent)
-
+        CustodianSession.close()
         factory.policy_name = "check-ec2"
         factory.update(local_session(factory))
         client = local_session(factory).client('ec2')
