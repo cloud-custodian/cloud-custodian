@@ -105,8 +105,9 @@ class EffectiveFirewall(ValueFilter):
 
     schema = type_schema('effective-firewall', rinherit=ValueFilter.schema)
     permissions = ('compute.instances.getEffectiveFirewalls',)
+    annotation_key = "c7n:firewall"
 
-    def process_resource(self, client, p, network):
+    def get_firewalls(self, client, p, r):
         def get_port_ranges(ports):
             port_ranges = []
             for port in ports:
@@ -117,25 +118,29 @@ class EffectiveFirewall(ValueFilter):
                         port_ranges.append({"beginPort": port, "endPort": port})
             return port_ranges
 
-        firewalls = client.execute_command('getEffectiveFirewalls',
-                        verb_arguments={'project': p, 'network': network}).get('firewalls', [])
-        for firewall_index, firewall in enumerate(firewalls):
-            action = "allowed" if "allowed" in firewall else "denied"
-            for protocol_index, protocol in enumerate(firewall[action]):
-                if "ports" in protocol:
-                    protocol['portRanges']=get_port_ranges(protocol['ports'])
-                    firewall[action][protocol_index] = protocol
-            firewalls[firewall_index] = firewall
-        return super(EffectiveFirewall, self).process(firewalls, None)
+        if self.annotation_key not in r:
+            fwalls = client.execute_command('getEffectiveFirewalls',
+                    verb_arguments = {'project': p, 'network': r['network']}).get('firewalls', [])
+
+            for firewall_index, firewall in enumerate(fwalls):
+                action = "allowed" if "allowed" in firewall else "denied"
+                for protocol_index, protocol in enumerate(firewall[action]):
+                    if "ports" in protocol:
+                        protocol['portRanges'] = get_port_ranges(protocol['ports'])
+                        firewall[action][protocol_index] = protocol
+                fwalls[firewall_index] = firewall
+
+            r[self.annotation_key] = fwalls
+        return super(EffectiveFirewall, self).process(r[self.annotation_key], None)
 
     def process(self, resources, event=None):
         session = local_session(self.manager.session_factory)
         project = session.get_default_project()
-        network_client = session.client(
+        client = session.client(
             "compute", "v1", "networks"
         )
         resource_list = [r for r in resources
-                            if self.process_resource(network_client, project, r['network'])]
+                            if self.get_firewalls(client, project, r)]
         return resource_list
 
 
