@@ -751,7 +751,8 @@ class StorageSingleLogProfileFilterTest(BaseTest):
     @arm_template('storage.json')
     @cassette_name('firewall')
     def test_run(self):
-        subscription_id_postfix = ('/providers/Microsoft.Storage/storageAccounts/storage037saactivlogs')
+        subscription_id_postfix = '/providers/Microsoft.Storage/storageAccounts/' \
+                                  'storage037saactivlogs'
         policy = self.load_policy({
             'name': 'azure-storage-single-log-profile',
             'resource': 'azure.storage',
