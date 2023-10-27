@@ -2,7 +2,8 @@
 # SPDX-License-Identifier: Apache-2.0
 import logging
 import uuid
-
+import jmespath
+from c7n.filters import OPERATORS
 from c7n_azure.actions.firewall import SetFirewallAction
 from c7n_azure.filters import FirewallRulesFilter, FirewallBypassFilter
 from c7n_azure.provider import resources
@@ -157,6 +158,30 @@ class TransparentDataEncryptionFilter(Filter):
                 result.append(resource)
 
         return result
+
+
+@SqlServer.filter_registry.register('failover-group-filter')
+class FailoverGroupFilter(ValueFilter):
+    schema = type_schema('failover-group-filter', rinherit=ValueFilter.schema)
+
+    def process(self, resources, event=None):
+        client = self.manager.get_client('azure.mgmt.sql.SqlManagementClient')
+        accepted = []
+        permanent_dict = {}
+        for resource in resources:
+            transited = client.failover_groups.list_by_server(
+                resource_group_name=resource['resourceGroup'],
+                server_name=resource['name'])
+            permanent_dict['failover_groups'] = list(transited)
+            jmespath_key = jmespath.search(self.data.get('key'), permanent_dict)
+            if self._op(jmespath_key, self.data.get('value')):
+                accepted.append(resource)
+
+        return accepted
+
+    def _op(self, a, b):
+        op = OPERATORS[self.data.get('op')]
+        return op(a, b)
 
 
 @SqlServer.filter_registry.register('azure-ad-administrators')

@@ -563,3 +563,20 @@ class SQLServerFirewallActionTest(BaseTest):
 
         _, args, _ = update.mock_calls[0]
         self.assertIn("test-prefix", args[2])
+
+
+class TestFailoverGroupFilter(BaseTest):
+    def test_failover_query(self):
+        policy = self.load_policy({
+            'name': 'test-azure-sql-server-failover-group-filter',
+            'resource': 'azure.sql-server',
+            'filters': [{
+                'type': 'failover-group-filter',
+                'key': 'length(failover_groups)',
+                'op': 'gt',
+                'value': 0
+            }],
+        })
+        resources = policy.run()
+        self.assertEqual(2, len(resources))
+        self.assertEqual('293-sql1-green', resources[0]['name'])
