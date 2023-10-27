@@ -43,6 +43,7 @@ test:
 
 test-coverage:
 	. $(PWD)/test.env && poetry run pytest -n auto \
+            --cov-config .coveragerc \
             --cov-report $(COVERAGE_TYPE) \
             --cov c7n \
             --cov tools/c7n_azure/c7n_azure \
