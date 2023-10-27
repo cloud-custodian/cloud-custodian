@@ -563,3 +563,19 @@ class SQLServerFirewallActionTest(BaseTest):
 
         _, args, _ = update.mock_calls[0]
         self.assertIn("test-prefix", args[2])
+
+
+class SqlServerVulnerabilityAssessmentsFilterTest(BaseTest):
+
+    @cassette_name('vulnerabilities_filter')
+    @arm_template('sqlserver.json')
+    def test_filter(self):
+        p = self.load_policy({
+            'name': 'test-azure-sql-server-vulnerability-assessments-disabled',
+            'resource': 'azure.sql-server',
+            'filters': [
+                {'type': 'vulnerability-assessments',
+                 'enabled': False}],
+        })
+        resources = p.run()
+        self.assertEqual(1, len(resources))

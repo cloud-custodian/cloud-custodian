@@ -474,6 +474,43 @@ class AuditingFilter(ValueFilter):
             return super().__call__(resource['properties'][self.cache_key])
 
 
+@SqlServer.filter_registry.register('vulnerability-assessments')
+class SqlServerVulnerabilityAssessmentsFilter(Filter):
+
+    schema = type_schema(
+        'vulnerability-assessments',
+        enabled={'type': 'boolean'},
+        required=['enabled']
+    )
+
+    def __call__(self, resource):
+        return resource
+
+    def process(self, resources, event=None):
+        client = self.manager.get_client('azure.mgmt.sql.SqlManagementClient')
+
+        expecting_recurring_scans_is_enabled = self.data['enabled']
+        filtered_resources = []
+
+        for resource in resources:
+            assessments = client.server_vulnerability_assessments.list_by_server(
+                resource['resourceGroup'],
+                resource['name']
+            )
+            add_to_filtered = True
+            for assessment in assessments:
+                recurring_scans_is_enabled = assessment.recurring_scans.is_enabled
+                if expecting_recurring_scans_is_enabled != recurring_scans_is_enabled:
+                    add_to_filtered = False
+                    break
+
+            if add_to_filtered:
+                filtered_resources.append(resource)
+
+        return super(SqlServerVulnerabilityAssessmentsFilter, self).process(
+            filtered_resources, event)
+
+
 @SqlServer.action_registry.register('set-firewall-rules')
 class SqlSetFirewallAction(SetFirewallAction):
     """ Set Firewall Rules Action

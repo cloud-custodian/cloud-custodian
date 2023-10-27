@@ -80,6 +80,7 @@ ResourceMap = {
     "azure.sql-database": "c7n_azure.resources.sqldatabase.SqlDatabase",
     "azure.sqldatabase": "c7n_azure.resources.sqldatabase.SqlDatabase",
     "azure.sql-server": "c7n_azure.resources.sqlserver.SqlServer",
+    "azure.sql-server-vulnerability-assessments": "c7n_azure.resources.sql.SqlServerVulnerabilityAssessments",  # noqa
     "azure.sqlserver": "c7n_azure.resources.sqlserver.SqlServer",
     "azure.storage": "c7n_azure.resources.storage.Storage",
     "azure.storage-container": "c7n_azure.resources.storage_container.StorageContainer",
