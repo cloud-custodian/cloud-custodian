@@ -2,7 +2,6 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import logging
-import jmespath
 from azure.common import AzureHttpError
 from azure.cosmosdb.table import TableService
 from azure.mgmt.storage.models import (IPRule, NetworkRuleSet,
@@ -426,7 +425,7 @@ class StorageDiagnosticSettingsFilter(ValueFilter, MultiConditionValueFilter):
     def _get_settings(self, storage_account, session=None):
         storage_prefix_property = get_annotation_prefix(self.storage_type)
 
-        if not (storage_prefix_property in storage_account):
+        if storage_prefix_property not in storage_account:
             try:
                 settings = StorageSettingsUtilities.get_settings(
                     self.storage_type, storage_account, session)
