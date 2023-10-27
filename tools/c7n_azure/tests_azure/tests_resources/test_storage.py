@@ -259,8 +259,11 @@ class StorageTest(BaseTest):
                  'value': 'cctstorage*'},
                 {'type': 'storage-diagnostic-settings',
                  'storage-type': 'blob',
-                 'key': 'logging.delete',
-                 'value': False}],
+                 'mode': 'and',
+                 'conditions': [{
+                     'key': 'logging.delete',
+                     'value': False
+                 }]}],
         }, validate=True)
 
         resources = p.run()
@@ -280,8 +283,11 @@ class StorageTest(BaseTest):
                  'value': 'cctstorage*'},
                 {'type': 'storage-diagnostic-settings',
                  'storage-type': 'file',
-                 'key': 'hour_metrics.enabled',
-                 'value': True}],
+                 'mode': 'and',
+                 'conditions': [{
+                     'key': 'hour_metrics.enabled',
+                     'value': True
+                 }]}],
         }, validate=True)
 
         resources = p.run()
@@ -301,8 +307,11 @@ class StorageTest(BaseTest):
                  'value': 'cctstorage*'},
                 {'type': 'storage-diagnostic-settings',
                  'storage-type': 'queue',
-                 'key': 'logging.delete',
-                 'value': False}],
+                 'mode': 'and',
+                 'conditions': [{
+                     'key': 'logging.delete',
+                     'value': False
+                 }]}],
         }, validate=True)
 
         resources = p.run()
@@ -322,8 +331,11 @@ class StorageTest(BaseTest):
                  'value': 'cctstorage*'},
                 {'type': 'storage-diagnostic-settings',
                  'storage-type': 'table',
-                 'key': 'logging.delete',
-                 'value': False}],
+                 'mode': 'and',
+                 'conditions': [{
+                     'key': 'logging.delete',
+                     'value': False
+                 }]}],
         }, validate=True)
 
         resources = p.run()

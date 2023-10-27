@@ -3,6 +3,7 @@
 
 import logging
 import jmespath
+from azure.common import AzureHttpError
 from azure.cosmosdb.table import TableService
 from azure.mgmt.storage.models import (IPRule, NetworkRuleSet,
                                        StorageAccountUpdateParameters,
@@ -17,7 +18,8 @@ from c7n.filters.related import RelatedResourceByIdFilter
 from c7n.utils import get_annotation_prefix, local_session
 from c7n_azure.actions.base import AzureBaseAction
 from c7n_azure.actions.firewall import SetFirewallAction
-from c7n_azure.constants import BLOB_TYPE, FILE_TYPE, QUEUE_TYPE, TABLE_TYPE
+from c7n_azure.constants import BLOB_TYPE, FILE_TYPE, INCREASED_MAX_THREAD_WORKERS, \
+    QUEUE_TYPE, TABLE_TYPE
 from c7n_azure.filters import (FirewallBypassFilter, FirewallRulesFilter,
                                LogProfileFilter, ValueFilter)
 from c7n_azure.provider import resources
@@ -292,10 +294,13 @@ class MultiConditionValueFilter(object):
 
 
 @Storage.filter_registry.register('storage-diagnostic-settings')
-class StorageDiagnosticSettingsFilter(ValueFilter):
+class StorageDiagnosticSettingsFilter(ValueFilter, MultiConditionValueFilter):
     """Filters storage accounts based on its diagnostic settings. The filter requires
     specifying the storage type (blob, queue, table, file) and will filter based on
     the settings for that specific type.
+
+    Note that having multiple conditions in a single filter is possible
+    only if storage-type is the same.
 
      :example:
 
@@ -310,19 +315,25 @@ class StorageDiagnosticSettingsFilter(ValueFilter):
                 - or:
                     - type: storage-diagnostic-settings
                       storage-type: blob
-                      key: logging.delete
-                      op: eq
-                      value: False
+                      mode: and
+                      conditions:
+                        - key: logging.delete
+                          op: eq
+                          value: False
                     - type: storage-diagnostic-settings
                       storage-type: queue
-                      key: logging.delete
-                      op: eq
-                      value: False
+                      mode: and
+                      conditions:
+                        - key: logging.delete
+                          op: eq
+                          value: False
                     - type: storage-diagnostic-settings
                       storage-type: table
-                      key: logging.delete
-                      op: eq
-                      value: False
+                      mode: and
+                      conditions:
+                        - key: logging.delete
+                          op: eq
+                          value: False
 
     :example:
 
@@ -367,8 +378,8 @@ class StorageDiagnosticSettingsFilter(ValueFilter):
     """
 
     schema = type_schema('storage-diagnostic-settings',
-                         rinherit=ValueFilter.schema,
                          required=['storage-type'],
+                         **MultiConditionValueFilter.multi_condition_filter_schema_part,
                          **{'storage-type': {
                              'type': 'string',
                              'enum': [BLOB_TYPE, QUEUE_TYPE, TABLE_TYPE, FILE_TYPE]}}
@@ -378,6 +389,7 @@ class StorageDiagnosticSettingsFilter(ValueFilter):
 
     def __init__(self, data, manager=None):
         super(StorageDiagnosticSettingsFilter, self).__init__(data, manager)
+        self.required_keys = []
         self.storage_type = data.get('storage-type')
 
     def process(self, resources, event=None):
@@ -387,6 +399,7 @@ class StorageDiagnosticSettingsFilter(ValueFilter):
             event=event,
             execution_method=self.process_resource_set,
             executor_factory=self.executor_factory,
+            max_workers=min(INCREASED_MAX_THREAD_WORKERS, len(resources)),
             log=self.log,
             session=session
         )
@@ -399,23 +412,37 @@ class StorageDiagnosticSettingsFilter(ValueFilter):
             # New SDK renamed the property, this code is to ensure back compat
             if 'analytics_logging' in settings.keys():
                 settings['logging'] = settings.pop('analytics_logging')
-            filtered_settings = super(StorageDiagnosticSettingsFilter, self).process([settings],
-                                                                                     event)
+            filtered_settings = MultiConditionValueFilter.process_multiple_resources(
+                self, settings, event)
 
             if filtered_settings:
                 matched.append(resource)
 
         return matched
 
+    def process_single_resource(self, settings, event):
+        return super(StorageDiagnosticSettingsFilter, self).process([settings], event)
+
     def _get_settings(self, storage_account, session=None):
         storage_prefix_property = get_annotation_prefix(self.storage_type)
 
-        if storage_prefix_property not in storage_account:
-            settings = StorageSettingsUtilities.get_settings(
-                self.storage_type, storage_account, session)
-            storage_account[storage_prefix_property] = serialize(settings)
+        if not (storage_prefix_property in storage_account):
+            try:
+                settings = StorageSettingsUtilities.get_settings(
+                    self.storage_type, storage_account, session)
+                serialized_settings = serialize(settings)
+                self._serialize_cors_rules(serialized_settings)
+                storage_account[storage_prefix_property] = serialized_settings
+            except AzureHttpError as e:
+                self.log.exception("Exception fetching settings:\n%s" % e)
+                return {}
 
         return storage_account[storage_prefix_property]
+
+    def _serialize_cors_rules(self, serialized_settings):
+        serialized_cors_rules = [serialize(cors_rule) for cors_rule
+                                 in serialized_settings.get('cors', [])]
+        serialized_settings['cors'] = serialized_cors_rules
 
 
 @Storage.filter_registry.register('activity-log')
