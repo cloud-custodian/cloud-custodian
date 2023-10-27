@@ -1,7 +1,7 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 from azure.mgmt.sql.models import DatabaseUpdate, Sku, BackupShortTermRetentionPolicy
-from ..azure_common import BaseTest, arm_template, requires_arm_polling
+from ..azure_common import BaseTest, arm_template, cassette_name, requires_arm_polling
 from c7n_azure.resources.sqldatabase import (
     BackupRetentionPolicyHelper, ShortTermBackupRetentionPolicyAction)
 from c7n_azure.session import Session
@@ -567,3 +567,21 @@ class LongTermBackupRetentionPolicyActionTest(BaseTest):
             *self.retention_policy_context
         )
         self.assertEqual(getattr(current_retention_period, retention_property), period)
+
+
+class SqlDatabaseDataEncryptionFilterTest(BaseTest):
+
+    @cassette_name('data_encryption_filter')
+    @arm_template('sqlserver.json')
+    def test_filter(self):
+        p = self.load_policy({
+            'name': 'test-azure-sql-data-encryption',
+            'resource': 'azure.sql-database',
+            'filters': [
+                {'type': 'data-encryption',
+                 'enabled': False}],
+        })
+        resources = p.run()
+        self.assertEqual(1, len(resources))
+        self.assertEqual('9958f24e-907d-4b98-8b89-a8ac1d748225',
+                         resources[0]['properties']['databaseId'])
