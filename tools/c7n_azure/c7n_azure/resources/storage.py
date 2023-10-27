@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import logging
-
+import jmespath
 from azure.cosmosdb.table import TableService
 from azure.mgmt.storage.models import (IPRule, NetworkRuleSet,
                                        StorageAccountUpdateParameters,
@@ -13,11 +13,13 @@ from azure.storage.file import FileService
 from azure.storage.queue import QueueServiceClient
 from c7n.exceptions import PolicyValidationError
 from c7n.filters.core import type_schema
+from c7n.filters.related import RelatedResourceByIdFilter
 from c7n.utils import get_annotation_prefix, local_session
 from c7n_azure.actions.base import AzureBaseAction
 from c7n_azure.actions.firewall import SetFirewallAction
 from c7n_azure.constants import BLOB_TYPE, FILE_TYPE, QUEUE_TYPE, TABLE_TYPE
-from c7n_azure.filters import (FirewallBypassFilter, FirewallRulesFilter, ValueFilter)
+from c7n_azure.filters import (FirewallBypassFilter, FirewallRulesFilter,
+                               LogProfileFilter, ValueFilter)
 from c7n_azure.provider import resources
 from c7n_azure.resources.arm import ArmResourceManager
 from c7n_azure.storage_utils import StorageUtilities
@@ -229,6 +231,66 @@ class StorageFirewallBypassFilter(FirewallBypassFilter):
         return list(filter(None, bypass_string.split(',')))
 
 
+class MultiConditionValueFilter(object):
+    """Combines multiple ValueFilter conditions rather than having multiple filter instances.
+
+    Typically the filter would work with ValueFilter implementations.
+    To make it possible, the original policy data is replaced by a single
+    condition upon each iteration in process_multiple_resources as well as
+    calling _reset_value_filter. Once all the conditions necessary to determine
+    the mode-wise result execute, the original data is restored.
+
+    The 'and' mode requires a resource to pass all the specified conditions
+    while the 'or' mode treats the resource as valid upon any true condition.
+    The overriding process_single_resource defines the way each condition
+    should be processed, therefore its return value should be treated
+    as True/False-like.
+    """
+
+    multi_condition_filter_schema_part = dict(
+        mode={'enum': ['and', 'or']},
+        conditions={'type': 'array', 'items': {
+            'type': 'object',
+            'additionalProperties': False,
+            'properties': {
+                # See ValueFilter
+                'key': {'type': 'string'},
+                'value_type': {'$ref': '#/definitions/filters_common/value_types'},
+                'default': {'type': 'object'},
+                'value_regex': {'type': 'string'},
+                'value_from': {'$ref': '#/definitions/filters_common/value_from'},
+                'value': {'$ref': '#/definitions/filters_common/value'},
+                'op': {'$ref': '#/definitions/filters_common/comparison_operators'}
+            }}})
+
+    def process_multiple_resources(self, *args):
+        original_self_data = self.data
+
+        or_mode = original_self_data['mode'] == 'or'
+        iteration_return_value = or_mode
+        exit_iteration_return_value = not iteration_return_value
+
+        try:
+            for condition in original_self_data['conditions']:
+                self._reset_value_filter()
+                self.data = condition
+                process_result = self.process_single_resource(*args)
+                if (or_mode and process_result) or not (or_mode or process_result):
+                    return iteration_return_value
+            return exit_iteration_return_value
+        finally:
+            self.data = original_self_data
+
+    def process_single_resource(self, *args):
+        raise NotImplementedError("subclass responsibility")
+
+    def _reset_value_filter(self):
+        """See ValueFilter.match(self, i) at its beginning."""
+        for attr_to_delete in ('content_initialized', 'k', 'op', 'v', 'vtype'):
+            if getattr(self, attr_to_delete, None) is not None:
+                delattr(self, attr_to_delete)
+
+
 @Storage.filter_registry.register('storage-diagnostic-settings')
 class StorageDiagnosticSettingsFilter(ValueFilter):
     """Filters storage accounts based on its diagnostic settings. The filter requires
@@ -354,6 +416,71 @@ class StorageDiagnosticSettingsFilter(ValueFilter):
             storage_account[storage_prefix_property] = serialize(settings)
 
         return storage_account[storage_prefix_property]
+
+
+@Storage.filter_registry.register('activity-log')
+class ActivityLogFilter(RelatedResourceByIdFilter, MultiConditionValueFilter):
+    """Filters Storage Resources based on their Activity Logs
+
+    :example:
+
+    Find Storage Resources which had a Regenerate Key Action event at least once.
+
+    .. code-block:: yaml
+
+            policies:
+              - name: azure-storage-activity-log-regenerate-key
+                resource: azure.storage
+                filters:
+                  - type: activity-log
+                    mode: or
+                    conditions:
+                      - key: operationName.value
+                        value: Microsoft.Storage/storageAccounts/regenerateKey/action
+    """
+    RelatedResource = "c7n_azure.resources.activity_log.ActivityLog"
+    RelatedIdsExpression = "id"
+    RelatedResourceByIdExpression = "resourceId"
+    AnnotationKey = "matched-activity-log"
+
+    schema = type_schema(
+        'activity-log',
+        **MultiConditionValueFilter.multi_condition_filter_schema_part)
+
+    def __init__(self, data, manager=None):
+        self.required_keys = ['mode', 'conditions']
+        super().__init__(data, manager)
+
+    def process_resource(self, resource, related):
+        return MultiConditionValueFilter.process_multiple_resources(self, resource, related)
+
+    def process_single_resource(self, resource, related):
+        return RelatedResourceByIdFilter.process_resource(self, resource, related)
+
+
+@Storage.filter_registry.register('single-log-profile')
+class StorageSingleLogProfileFilter(LogProfileFilter):
+    """Filters Storage Accounts based on their Log Profiles.
+
+    The filter does not require any parameters to specify.
+
+     :example:
+
+        Find all storage accounts that have exactly one log profile associated with them.
+
+     .. code-block:: yaml
+
+        policies:
+            - name: azure-storage-single-log-profile
+              resource: azure.storage
+              filters:
+                - single-log-profile
+    """
+
+    def __init__(self, data, manager=None):
+        super(StorageSingleLogProfileFilter, self).__init__(data, manager)
+        self.data[LogProfileFilter.resource_id_key] = 'id'
+        self.data[LogProfileFilter.resource_id_log_profile_path] = 'properties.storageAccountId'
 
 
 @Storage.action_registry.register('set-log-settings')

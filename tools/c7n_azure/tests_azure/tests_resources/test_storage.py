@@ -1,5 +1,7 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+import datetime
+from dateutil.parser import parse as date_parse
 import pytest
 from azure.mgmt.storage.models import StorageAccountUpdateParameters
 from c7n_azure.constants import BLOB_TYPE, FILE_TYPE, QUEUE_TYPE, TABLE_TYPE
@@ -11,6 +13,7 @@ from mock import patch, MagicMock, Mock
 from netaddr import IPSet
 from parameterized import parameterized
 
+from c7n.testing import mock_datetime_now
 from c7n.utils import get_annotation_prefix
 from c7n.utils import local_session
 from ..azure_common import BaseTest, arm_template, cassette_name
@@ -703,3 +706,47 @@ class StorageFirewallBypassFilterTest(BaseTest):
                                                    'bypass': bypass}}}
         f = StorageFirewallBypassFilter({'mode': 'equal', 'list': []})
         self.assertEqual(expected, f._query_bypass(resource))
+
+
+class StorageActivityLogFilterTest(BaseTest):
+
+    @arm_template('storage.json')
+    @cassette_name('firewall')
+    @pytest.mark.skip
+    def test_run(self):
+        id = 'testcissa'
+        subscription_id_postfix = f'/providers/Microsoft.Storage/storageAccounts/{id}'
+        policy = self.load_policy({
+            'name': 'azure-storage-activity-log-regenerate-key',
+            'resource': 'azure.storage',
+            'filters': [{
+                'type': 'activity-log',
+                'mode': 'or',
+                'conditions': [{
+                    'key': 'operationName.value',
+                    'value': 'Microsoft.Storage/storageAccounts/regenerateKey/action'
+                }],
+            }]
+        })
+        with mock_datetime_now(date_parse('2021/08/24 00:00'), datetime):
+            resources = policy.run()
+
+        self.assertTrue(resources[0]['id'].endswith(subscription_id_postfix))
+
+
+class StorageSingleLogProfileFilterTest(BaseTest):
+
+    @arm_template('storage.json')
+    @cassette_name('firewall')
+    def test_run(self):
+        subscription_id_postfix = ('/providers/Microsoft.Storage/storageAccounts/storage037saactivlogs')
+        policy = self.load_policy({
+            'name': 'azure-storage-single-log-profile',
+            'resource': 'azure.storage',
+            'filters': [
+                'single-log-profile'
+            ]
+        })
+        resources = policy.run()
+
+        self.assertTrue(resources[0]['id'].endswith(subscription_id_postfix))

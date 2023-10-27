@@ -1,0 +1,230 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Storage/storageAccounts?api-version=2019-06-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-length": [
+                        "11425"
+                    ],
+                    "date": [
+                        "Fri, 30 Jul 2021 10:35:58 GMT"
+                    ],
+                    "x-ms-original-request-ids": [
+                        "515a8d5c-4c17-4dc2-bcd8-ea00da4449ac",
+                        "2b84377b-eada-451e-afcb-a36f62d33f4b"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "identity": {
+                                    "principalId": "d3e901ed-8da0-4ede-99b5-c986f32db66e",
+                                    "tenantId": "00000000-0000-0000-0000-000000000003",
+                                    "type": "SystemAssigned"
+                                },
+                                "sku": {
+                                    "name": "Standard_LRS",
+                                    "tier": "Standard"
+                                },
+                                "kind": "StorageV2",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/RG-037saactivlogs/providers/Microsoft.Storage/storageAccounts/storage037saactivlogs",
+                                "name": "storage037saactivlogs",
+                                "type": "Microsoft.Storage/storageAccounts",
+                                "location": "eastus",
+                                "tags": {
+                                    "test": "Green",
+                                    "CreatorEmail": "452a64f3-f899-4a83-9b54-51291d41077e"
+                                },
+                                "properties": {
+                                    "privateEndpointConnections": [],
+                                    "minimumTlsVersion": "TLS1_0",
+                                    "allowBlobPublicAccess": false,
+                                    "isHnsEnabled": false,
+                                    "networkAcls": {
+                                        "bypass": "AzureServices",
+                                        "virtualNetworkRules": [],
+                                        "ipRules": [],
+                                        "defaultAction": "Allow"
+                                    },
+                                    "supportsHttpsTrafficOnly": true,
+                                    "encryption": {
+                                        "services": {
+                                            "file": {
+                                                "keyType": "Account",
+                                                "enabled": true,
+                                                "lastEnabledTime": "2021-07-30T08:10:18.5671262Z"
+                                            },
+                                            "blob": {
+                                                "keyType": "Account",
+                                                "enabled": true,
+                                                "lastEnabledTime": "2021-07-30T08:10:18.5671262Z"
+                                            }
+                                        },
+                                        "keySource": "Microsoft.Storage"
+                                    },
+                                    "accessTier": "Hot",
+                                    "provisioningState": "Succeeded",
+                                    "creationTime": "2021-07-30T08:10:18.4577584Z",
+                                    "primaryEndpoints": {
+                                        "dfs": "https://storage037saactivlogs.dfs.core.windows.net/",
+                                        "web": "https://storage037saactivlogs.z13.web.core.windows.net/",
+                                        "blob": "https://storage037saactivlogs.blob.core.windows.net/",
+                                        "queue": "https://storage037saactivlogs.queue.core.windows.net/",
+                                        "table": "https://storage037saactivlogs.table.core.windows.net/",
+                                        "file": "https://storage037saactivlogs.file.core.windows.net/"
+                                    },
+                                    "primaryLocation": "eastus",
+                                    "statusOfPrimary": "available"
+                                }
+                            },
+                            {
+                                "identity": {
+                                    "principalId": "1b89628a-da07-430f-88d1-8e478c2f223d",
+                                    "tenantId": "00000000-0000-0000-0000-000000000003",
+                                    "type": "SystemAssigned"
+                                },
+                                "sku": {
+                                    "name": "Standard_LRS",
+                                    "tier": "Standard"
+                                },
+                                "kind": "StorageV2",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/Test12CIS/providers/Microsoft.Storage/storageAccounts/testcissa",
+                                "name": "testcissa",
+                                "type": "Microsoft.Storage/storageAccounts",
+                                "location": "eastus",
+                                "tags": {},
+                                "properties": {
+                                    "privateEndpointConnections": [],
+                                    "azureFilesIdentityBasedAuthentication": {
+                                        "directoryServiceOptions": "None"
+                                    },
+                                    "minimumTlsVersion": "TLS1_2",
+                                    "allowBlobPublicAccess": true,
+                                    "allowSharedKeyAccess": true,
+                                    "networkAcls": {
+                                        "resourceAccessRules": [],
+                                        "bypass": "AzureServices",
+                                        "virtualNetworkRules": [],
+                                        "ipRules": [
+                                            {
+                                                "value": "134.249.137.173",
+                                                "action": "Allow"
+                                            }
+                                        ],
+                                        "defaultAction": "Deny"
+                                    },
+                                    "supportsHttpsTrafficOnly": true,
+                                    "encryption": {
+                                        "services": {
+                                            "file": {
+                                                "keyType": "Account",
+                                                "enabled": true,
+                                                "lastEnabledTime": "2021-02-24T07:42:39.9876667Z"
+                                            },
+                                            "blob": {
+                                                "keyType": "Account",
+                                                "enabled": true,
+                                                "lastEnabledTime": "2021-02-24T07:42:39.9876667Z"
+                                            }
+                                        },
+                                        "keySource": "Microsoft.Storage"
+                                    },
+                                    "accessTier": "Hot",
+                                    "provisioningState": "Succeeded",
+                                    "creationTime": "2021-02-24T07:42:39.8783316Z",
+                                    "primaryEndpoints": {
+                                        "dfs": "https://testcissa.dfs.core.windows.net/",
+                                        "web": "https://testcissa.z13.web.core.windows.net/",
+                                        "blob": "https://testcissa.blob.core.windows.net/",
+                                        "queue": "https://testcissa.queue.core.windows.net/",
+                                        "table": "https://testcissa.table.core.windows.net/",
+                                        "file": "https://testcissa.file.core.windows.net/"
+                                    },
+                                    "primaryLocation": "eastus",
+                                    "statusOfPrimary": "available"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/microsoft.insights/logprofiles?api-version=2016-03-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "date": [
+                        "Fri, 30 Jul 2021 10:36:00 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "content-length": [
+                        "564"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/microsoft.insights/logprofiles/log-profile-037saactivlogs",
+                                "type": null,
+                                "name": "log-profile-037saactivlogs",
+                                "location": null,
+                                "kind": null,
+                                "tags": null,
+                                "properties": {
+                                    "storageAccountId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/RG-037saactivlogs/providers/Microsoft.Storage/storageAccounts/storage037saactivlogs",
+                                    "serviceBusRuleId": null,
+                                    "locations": [
+                                        "eastus"
+                                    ],
+                                    "categories": [
+                                        "Delete",
+                                        "Action",
+                                        "Write"
+                                    ],
+                                    "retentionPolicy": {
+                                        "enabled": false,
+                                        "days": 0
+                                    }
+                                },
+                                "identity": null
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}

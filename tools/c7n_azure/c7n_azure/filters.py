@@ -1,5 +1,6 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+import jmespath
 import logging
 import isodate
 import operator
@@ -23,7 +24,7 @@ from c7n.filters import Filter, FilterValidationError, ValueFilter
 from c7n.filters.core import PolicyValidationError
 from c7n.filters.related import RelatedResourceFilter
 from c7n.filters.offhours import OffHour, OnHour, Time
-from c7n.utils import chunks, get_annotation_prefix, type_schema
+from c7n.utils import chunks, get_annotation_prefix, type_schema, local_session
 
 scalar_ops = {
     'eq': operator.eq,
@@ -1109,6 +1110,48 @@ class AzureAdvisorFilter(RelatedResourceFilter):
     @classmethod
     def register_resource(cls, registry, resource_class):
         resource_class.filter_registry.register("advisor-recommendation", cls)
+
+
+class LogProfileFilter(ValueFilter):
+    """Filters resources based on their Log Profiles.
+
+    The filter requires resource_id_key and resource_id_log_profile_path to be specified,
+    preferably in constructor. A target resource id is taken at resource_id_key and compared
+    to resource_id_log_profile_path from a log profile.
+    """
+
+    resource_id_key = 'id-key'
+    resource_id_log_profile_path = 'id-log-profile-path'
+    schema = type_schema('log-profile', rinherit=ValueFilter.schema)
+    log = logging.getLogger('custodian.azure.filters.LogProfilesFilter')
+
+    def validate(self):
+        return {LogProfileFilter.resource_id_log_profile_path,
+                LogProfileFilter.resource_id_key}.issubset(self.data)
+
+    def process(self, resources, event=None):
+        id_key = self.data[LogProfileFilter.resource_id_key]
+        resources_by_ids = {r[id_key]: r for r in resources}
+        valid_ids = self._fetch_resource_ids_with_single_log_profile()
+        valid_resources = [resources_by_ids[id] for id in valid_ids if id in resources_by_ids]
+        return valid_resources
+
+    def _fetch_resource_ids_with_single_log_profile(self):
+        id_log_profile_path = self.data[LogProfileFilter.resource_id_log_profile_path]
+        session = local_session(self.manager.session_factory)
+        client = session.client('azure.mgmt.monitor.MonitorManagementClient')
+        log_profiles = [r.serialize(True) for r in client.log_profiles.list()]
+        log_profile_lists_by_resource_ids = {}
+        for log_profile in log_profiles:
+            resource_id = jmespath.search(id_log_profile_path, log_profile)
+            if not resource_id:
+                continue
+            if resource_id in log_profile_lists_by_resource_ids:
+                profiles = log_profile_lists_by_resource_ids[resource_id]
+                profiles.append(log_profile)
+            else:
+                log_profile_lists_by_resource_ids[resource_id] = [log_profile]
+        return [resource_id for resource_id in log_profile_lists_by_resource_ids.keys()]
 
 
 resources.subscribe(AzureAdvisorFilter.register_resource)
