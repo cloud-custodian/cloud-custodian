@@ -6,7 +6,7 @@ import docker
 import json
 
 from collections import defaultdict
-from distutils import version
+from c7n.vendored.distutils import version
 from datetime import datetime, timedelta
 from dateutil.tz import tzoffset, tzutc
 from dateutil.parser import parse as parse_date

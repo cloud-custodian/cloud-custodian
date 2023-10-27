@@ -170,6 +170,27 @@ class Firewall(QueryResourceManager):
                 'get', {'project': resource_info['project_id'],
                         'firewall': resource_info['resourceName'].rsplit('/', 1)[-1]})
 
+    def augment(self, resources):
+        def get_port_ranges(ports):
+            port_ranges = []
+            for port in ports:
+                    if "-" in port:
+                        port_split = port.split("-")
+                        port_ranges.append({"beginPort": port_split[0], "endPort": port_split[1]})
+                    else:
+                        port_ranges.append({"beginPort": port, "endPort": port})
+            return port_ranges
+
+        if not resources:
+            return []
+        for r_index, r in enumerate(resources):
+            action = "allowed" if "allowed" in r else "denied"
+            for protocol_index, protocol in enumerate(r[action]):
+                if "ports" in protocol:
+                    protocol['portRanges']=get_port_ranges(protocol['ports'])
+                    r[action][protocol_index] = protocol
+            resources[r_index] = r
+        return resources
 
 @Firewall.action_registry.register('delete')
 class DeleteFirewall(MethodAction):
