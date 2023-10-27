@@ -1,7 +1,7 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import os
-from distutils.util import strtobool
+from c7n.vendored.distutils.util import strtobool
 
 import pytest
 from oci_common import replace_email, replace_namespace, replace_ocid

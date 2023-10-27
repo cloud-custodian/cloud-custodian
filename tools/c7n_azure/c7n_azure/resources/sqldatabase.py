@@ -694,3 +694,9 @@ class Resize(AzureBaseAction):
             database['name'],
             DatabaseUpdate(sku=sku, max_size_bytes=max_size_bytes)
         )
+
+
+@SqlDatabase.filter_registry.register('data-encryption')
+class SqlDatabaseDataEncryptionFilter(TransparentDataEncryptionFilter):
+
+    schema = type_schema('data-encryption', rinherit=TransparentDataEncryptionFilter.schema)

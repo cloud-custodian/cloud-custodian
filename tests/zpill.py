@@ -8,7 +8,7 @@ import shutil
 import zipfile
 import re
 from datetime import datetime, timedelta, tzinfo
-from distutils.util import strtobool
+from c7n.vendored.distutils.util import strtobool
 
 import boto3
 import placebo

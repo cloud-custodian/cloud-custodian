@@ -141,7 +141,7 @@ class Route53Domain(QueryResourceManager):
         arn_type = 'r53domain'
         enum_spec = ('list_domains', 'Domains', None)
         name = id = 'DomainName'
-        global_resource = True
+        global_resource = False
 
     permissions = ('route53domains:ListTagsForDomain',)
 
