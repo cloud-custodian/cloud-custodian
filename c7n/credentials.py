@@ -30,18 +30,27 @@ class CustodianSession(Session):
         if kw.get('config'):
             return super().client(service_name, region_name, *args, **kw)
 
-        client = self._clients.get((service_name, region_name))
+        key = self._cache_key(service_name, region_name)
+        client = self._clients.get(key)
         if client is not None:
             return client
 
         with self.lock:
-            client = self._clients.get((service_name, region_name))
+            client = self._clients.get(key)
             if client is not None:
                 return client
 
             client = super().client(service_name, region_name, *args, **kw)
-            self._clients[(service_name, region_name)] = client
+            self._clients[key] = client
             return client
+
+    def _cache_key(self, service_name, region_name):
+        return (
+            # namedtuple so stable comparison
+            hash(self.get_credentials().get_frozen_credentials()),
+            service_name,
+            region_name
+        )
 
     @classmethod
     def close(cls):
