@@ -45,6 +45,7 @@ class CustodianSession(Session):
             return client
 
     def _cache_key(self, service_name, region_name):
+        region_name = region_name or self.region_name
         return (
             # namedtuple so stable comparison
             hash(self.get_credentials().get_frozen_credentials()),
