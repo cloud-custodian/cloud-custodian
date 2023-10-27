@@ -4,7 +4,7 @@ import os
 import re
 import pytest
 
-from distutils.util import strtobool
+from c7n.vendored.distutils.util import strtobool
 from .constants import ACCOUNT_ID
 
 try:
