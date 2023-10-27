@@ -42,7 +42,7 @@ from datetime import timedelta
 
 from decimal import Decimal as D, ROUND_HALF_UP
 
-from distutils.version import LooseVersion
+from c7n.vendored.distutils.version import LooseVersion
 from botocore.exceptions import ClientError
 from concurrent.futures import as_completed
 

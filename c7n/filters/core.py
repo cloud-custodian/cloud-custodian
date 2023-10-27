@@ -14,7 +14,7 @@ import re
 
 from dateutil.tz import tzutc
 from dateutil.parser import parse
-from distutils import version
+from c7n.vendored.distutils import version
 from random import sample
 
 from c7n.element import Element
