@@ -580,3 +580,34 @@ class TestFailoverGroupFilter(BaseTest):
         resources = policy.run()
         self.assertEqual(2, len(resources))
         self.assertEqual('293-sql1-green', resources[0]['name'])
+
+
+class SqlServerSecurityAlertPoliciesFilterTest(BaseTest):
+
+    def test_sql_server_security_alert_policies_filter_validate(self):
+        policy = self.load_policy({
+            'name': 'test-azure-sql-server-security-alert-policies',
+            'resource': 'azure.sql-server',
+            'filters': [{
+                'type': 'sql-server-security-alert-policies',
+                'key': 'properties.state',
+                'value': 'Disabled'
+            }],
+        }, validate=True)
+        self.assertTrue(policy)
+
+    @arm_template('sqlserver.json')
+    def test_sql_server_security_alert_policies_filter(self):
+        policy = self.load_policy({
+            'name': 'test-azure-sql-server-security-alert-policies',
+            'resource': 'azure.sql-server',
+            'filters': [{
+                'type': 'sql-server-security-alert-policies',
+                'key': 'state',
+                'value': 'Disabled'
+            }],
+        })
+        resources = policy.run()
+        self.assertEqual(2, len(resources))
+        self.assertEqual('server-016cisads', resources[0]['name'])
+        self.assertEqual('cctestsqlserverp2fkgne6rt5vw', resources[1]['name'])

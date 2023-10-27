@@ -5,7 +5,7 @@ import uuid
 import jmespath
 from c7n.filters import OPERATORS
 from c7n_azure.actions.firewall import SetFirewallAction
-from c7n_azure.filters import FirewallRulesFilter, FirewallBypassFilter
+from c7n_azure.filters import FirewallRulesFilter, FirewallBypassFilter, scalar_ops
 from c7n_azure.provider import resources
 from c7n_azure.resources.arm import ArmResourceManager
 from c7n_azure.utils import ThreadHelper, StringUtils
@@ -497,6 +497,53 @@ class AuditingFilter(ValueFilter):
         # otherwise process the auditing settings using ValueFilter logic for full flexibility
         else:
             return super().__call__(resource['properties'][self.cache_key])
+
+
+@SqlServer.filter_registry.register('sql-server-security-alert-policies')
+class SqlServerSecurityAlertPoliciesFilter(ValueFilter):
+    """
+    Filters resources by SQL Server Security Alert Policies.
+    """
+
+    schema = type_schema(
+        'sql-server-security-alert-policies',
+        rinherit=ValueFilter.schema
+    )
+
+    def __call__(self, resource):
+        return resource
+
+    def _perform_op(self, a, b):
+        op = scalar_ops.get(self.data.get('op', 'eq'))
+        return op(a, b)
+
+    def process(self, resources, event=None):
+        client = self.manager.get_client('azure.mgmt.sql.SqlManagementClient')
+
+        filtered_resources = []
+
+        key = self.data.get('key')
+        data_value = self.data.get('value')
+
+        for resource in resources:
+            policies = client.server_security_alert_policies.list_by_server(
+                resource['resourceGroup'],
+                resource['name']
+            )
+            add_to_filtered = False
+            for policy in policies:
+                policy_dict = policy.as_dict()
+                if key in policy_dict:
+                    value = policy_dict[key]
+                    add_to_filtered = self._perform_op(data_value, value)
+                    if add_to_filtered:
+                        break
+
+            if add_to_filtered:
+                filtered_resources.append(resource)
+
+        return super(SqlServerSecurityAlertPoliciesFilter, self).process(
+            filtered_resources, event)
 
 
 @SqlServer.action_registry.register('set-firewall-rules')
