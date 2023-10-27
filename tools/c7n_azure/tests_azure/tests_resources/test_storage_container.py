@@ -99,3 +99,19 @@ class StorageContainerTest(BaseTest):
         return local_session(Session)\
             .client('azure.mgmt.storage.StorageManagementClient')\
             .DEFAULT_API_VERSION.replace("-", "_")
+
+    @arm_template('storage.json')
+    @cassette_name('storage-single-log-profile')
+    def test_run(self):
+        parent_id = '037storageaccred'
+        subscription_id_postfix = f'/providers/Microsoft.Storage/storageAccounts/{parent_id}'
+        policy = self.load_policy({
+            'name': 'azure-storage-container-single-log-profile',
+            'resource': 'azure.storage-container',
+            'filters': [
+                'storage-single-log-profile'
+            ]
+        })
+        resources = policy.run()
+
+        self.assertTrue(resources[0]['c7n:parent-id'].endswith(subscription_id_postfix))

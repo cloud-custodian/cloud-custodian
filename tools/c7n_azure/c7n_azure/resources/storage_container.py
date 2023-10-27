@@ -6,6 +6,7 @@ from c7n_azure.query import ChildTypeInfo
 from c7n_azure.actions.base import AzureBaseAction
 from c7n_azure.resources.arm import ChildArmResourceManager
 from c7n.filters.core import type_schema
+from c7n_azure.filters import LogProfileFilter
 from c7n_azure.utils import ResourceIdParser
 from msrestazure.tools import parse_resource_id
 
@@ -115,3 +116,29 @@ class StorageContainerSetPublicAccessAction(AzureBaseAction):
             resource['name'],
             blob_container
         )
+
+
+@StorageContainer.filter_registry.register('storage-single-log-profile')
+class StorageContainerSingleLogProfileFilter(LogProfileFilter):
+    """Filters Storage Containers based on the Log Profiles associated with their Storage Accounts.
+
+    The filter does not require any parameters to specify.
+
+    :example:
+
+      Find all storage containers whose storage accounts have exactly one log profile
+      associated with them.
+
+    .. code-block:: yaml
+
+      policies:
+          - name: azure-storage-container-single-log-profile
+            resource: azure.storage-container
+            filters:
+              - storage-single-log-profile
+    """
+
+    def __init__(self, data, manager=None):
+        super(StorageContainerSingleLogProfileFilter, self).__init__(data, manager)
+        self.data[LogProfileFilter.resource_id_key] = 'c7n:parent-id'
+        self.data[LogProfileFilter.resource_id_log_profile_path] = 'properties.storageAccountId'

@@ -1,0 +1,828 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Storage/storageAccounts?api-version=2019-06-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-length": [
+                        "10313"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-ms-original-request-ids": [
+                        "286ce44c-17a0-4556-a71b-7468b110617c",
+                        "d58ced31-cfd6-46fc-b080-2d65a8f6cc67"
+                    ],
+                    "date": [
+                        "Mon, 09 Aug 2021 09:35:44 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "identity": {
+                                    "principalId": "9c761a68-df79-43b0-aa9f-887b80cf5ff5",
+                                    "tenantId": "00000000-0000-0000-0000-000000000003",
+                                    "type": "SystemAssigned"
+                                },
+                                "sku": {
+                                    "name": "Standard_LRS",
+                                    "tier": "Standard"
+                                },
+                                "kind": "StorageV2",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/037-resource-group-red/providers/Microsoft.Storage/storageAccounts/037storageaccred",
+                                "name": "037storageaccred",
+                                "type": "Microsoft.Storage/storageAccounts",
+                                "location": "eastus",
+                                "tags": {
+                                    "ComplianceStatus": "Red",
+                                    "CustodianRule": "epam-azure-037-cis_log_sa_activ_logs"
+                                },
+                                "properties": {
+                                    "privateEndpointConnections": [],
+                                    "isNfsV3Enabled": false,
+                                    "minimumTlsVersion": "TLS1_0",
+                                    "allowBlobPublicAccess": false,
+                                    "allowSharedKeyAccess": true,
+                                    "isHnsEnabled": false,
+                                    "networkAcls": {
+                                        "bypass": "AzureServices",
+                                        "virtualNetworkRules": [],
+                                        "ipRules": [],
+                                        "defaultAction": "Allow"
+                                    },
+                                    "supportsHttpsTrafficOnly": true,
+                                    "encryption": {
+                                        "services": {
+                                            "file": {
+                                                "keyType": "Account",
+                                                "enabled": true,
+                                                "lastEnabledTime": "2021-08-09T07:44:50.1964006Z"
+                                            },
+                                            "blob": {
+                                                "keyType": "Account",
+                                                "enabled": true,
+                                                "lastEnabledTime": "2021-08-09T07:44:50.1964006Z"
+                                            }
+                                        },
+                                        "keySource": "Microsoft.Storage"
+                                    },
+                                    "accessTier": "Hot",
+                                    "provisioningState": "Succeeded",
+                                    "creationTime": "2021-08-09T07:44:50.1026577Z",
+                                    "primaryEndpoints": {
+                                        "dfs": "https://037storageaccred.dfs.core.windows.net/",
+                                        "web": "https://037storageaccred.z13.web.core.windows.net/",
+                                        "blob": "https://037storageaccred.blob.core.windows.net/",
+                                        "queue": "https://037storageaccred.queue.core.windows.net/",
+                                        "table": "https://037storageaccred.table.core.windows.net/",
+                                        "file": "https://037storageaccred.file.core.windows.net/"
+                                    },
+                                    "primaryLocation": "eastus",
+                                    "statusOfPrimary": "available"
+                                }
+                            },
+                            {
+                                "sku": {
+                                    "name": "Standard_LRS",
+                                    "tier": "Standard"
+                                },
+                                "kind": "StorageV2",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cloud-shell-storage-eastus/providers/Microsoft.Storage/storageAccounts/cs210032001279900ed",
+                                "name": "cs210032001279900ed",
+                                "type": "Microsoft.Storage/storageAccounts",
+                                "location": "eastus",
+                                "tags": {
+                                    "ms-resource-usage": "azure-cloud-shell"
+                                },
+                                "properties": {
+                                    "privateEndpointConnections": [],
+                                    "minimumTlsVersion": "TLS1_2",
+                                    "allowBlobPublicAccess": false,
+                                    "allowSharedKeyAccess": false,
+                                    "networkAcls": {
+                                        "resourceAccessRules": [],
+                                        "bypass": "AzureServices",
+                                        "virtualNetworkRules": [],
+                                        "ipRules": [],
+                                        "defaultAction": "Deny"
+                                    },
+                                    "supportsHttpsTrafficOnly": true,
+                                    "encryption": {
+                                        "services": {
+                                            "file": {
+                                                "keyType": "Account",
+                                                "enabled": true,
+                                                "lastEnabledTime": "2021-04-16T14:15:50.9788956Z"
+                                            },
+                                            "blob": {
+                                                "keyType": "Account",
+                                                "enabled": true,
+                                                "lastEnabledTime": "2021-04-16T14:15:50.9788956Z"
+                                            }
+                                        },
+                                        "keySource": "Microsoft.Storage"
+                                    },
+                                    "accessTier": "Hot",
+                                    "provisioningState": "Succeeded",
+                                    "creationTime": "2021-04-16T14:15:50.8694981Z",
+                                    "primaryEndpoints": {
+                                        "dfs": "https://cs210032001279900ed.dfs.core.windows.net/",
+                                        "web": "https://cs210032001279900ed.z13.web.core.windows.net/",
+                                        "blob": "https://cs210032001279900ed.blob.core.windows.net/",
+                                        "queue": "https://cs210032001279900ed.queue.core.windows.net/",
+                                        "table": "https://cs210032001279900ed.table.core.windows.net/",
+                                        "file": "https://cs210032001279900ed.file.core.windows.net/"
+                                    },
+                                    "primaryLocation": "eastus",
+                                    "statusOfPrimary": "available"
+                                }
+                            },
+                            {
+                                "identity": {
+                                    "principalId": "1b89628a-da07-430f-88d1-8e478c2f223d",
+                                    "tenantId": "00000000-0000-0000-0000-000000000003",
+                                    "type": "SystemAssigned"
+                                },
+                                "sku": {
+                                    "name": "Standard_LRS",
+                                    "tier": "Standard"
+                                },
+                                "kind": "StorageV2",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/Test12CIS/providers/Microsoft.Storage/storageAccounts/testcissa",
+                                "name": "testcissa",
+                                "type": "Microsoft.Storage/storageAccounts",
+                                "location": "eastus",
+                                "tags": {},
+                                "properties": {
+                                    "privateEndpointConnections": [],
+                                    "azureFilesIdentityBasedAuthentication": {
+                                        "directoryServiceOptions": "None"
+                                    },
+                                    "minimumTlsVersion": "TLS1_2",
+                                    "allowBlobPublicAccess": true,
+                                    "allowSharedKeyAccess": true,
+                                    "networkAcls": {
+                                        "resourceAccessRules": [],
+                                        "bypass": "AzureServices",
+                                        "virtualNetworkRules": [],
+                                        "ipRules": [
+                                            {
+                                                "value": "134.249.137.173",
+                                                "action": "Allow"
+                                            }
+                                        ],
+                                        "defaultAction": "Deny"
+                                    },
+                                    "supportsHttpsTrafficOnly": true,
+                                    "encryption": {
+                                        "services": {
+                                            "file": {
+                                                "keyType": "Account",
+                                                "enabled": true,
+                                                "lastEnabledTime": "2021-02-24T07:42:39.9876667Z"
+                                            },
+                                            "blob": {
+                                                "keyType": "Account",
+                                                "enabled": true,
+                                                "lastEnabledTime": "2021-02-24T07:42:39.9876667Z"
+                                            }
+                                        },
+                                        "keySource": "Microsoft.Storage"
+                                    },
+                                    "accessTier": "Hot",
+                                    "provisioningState": "Succeeded",
+                                    "creationTime": "2021-02-24T07:42:39.8783316Z",
+                                    "primaryEndpoints": {
+                                        "dfs": "https://testcissa.dfs.core.windows.net/",
+                                        "web": "https://testcissa.z13.web.core.windows.net/",
+                                        "blob": "https://testcissa.blob.core.windows.net/",
+                                        "queue": "https://testcissa.queue.core.windows.net/",
+                                        "table": "https://testcissa.table.core.windows.net/",
+                                        "file": "https://testcissa.file.core.windows.net/"
+                                    },
+                                    "primaryLocation": "eastus",
+                                    "statusOfPrimary": "available"
+                                }
+                            },
+                            {
+                                "sku": {
+                                    "name": "Standard_LRS",
+                                    "tier": "Standard"
+                                },
+                                "kind": "StorageV2",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cloud-shell-storage-westeurope/providers/Microsoft.Storage/storageAccounts/csb10032000fe3ba70c",
+                                "name": "csb10032000fe3ba70c",
+                                "type": "Microsoft.Storage/storageAccounts",
+                                "location": "westeurope",
+                                "tags": {
+                                    "ms-resource-usage": "azure-cloud-shell"
+                                },
+                                "properties": {
+                                    "privateEndpointConnections": [],
+                                    "minimumTlsVersion": "TLS1_2",
+                                    "allowBlobPublicAccess": false,
+                                    "networkAcls": {
+                                        "bypass": "AzureServices",
+                                        "virtualNetworkRules": [],
+                                        "ipRules": [],
+                                        "defaultAction": "Allow"
+                                    },
+                                    "supportsHttpsTrafficOnly": true,
+                                    "encryption": {
+                                        "services": {
+                                            "file": {
+                                                "keyType": "Account",
+                                                "enabled": true,
+                                                "lastEnabledTime": "2021-03-16T13:52:14.2697639Z"
+                                            },
+                                            "blob": {
+                                                "keyType": "Account",
+                                                "enabled": true,
+                                                "lastEnabledTime": "2021-03-16T13:52:14.2697639Z"
+                                            }
+                                        },
+                                        "keySource": "Microsoft.Storage"
+                                    },
+                                    "accessTier": "Hot",
+                                    "provisioningState": "Succeeded",
+                                    "creationTime": "2021-03-16T13:52:14.1759904Z",
+                                    "primaryEndpoints": {
+                                        "dfs": "https://csb10032000fe3ba70c.dfs.core.windows.net/",
+                                        "web": "https://csb10032000fe3ba70c.z6.web.core.windows.net/",
+                                        "blob": "https://csb10032000fe3ba70c.blob.core.windows.net/",
+                                        "queue": "https://csb10032000fe3ba70c.queue.core.windows.net/",
+                                        "table": "https://csb10032000fe3ba70c.table.core.windows.net/",
+                                        "file": "https://csb10032000fe3ba70c.file.core.windows.net/"
+                                    },
+                                    "primaryLocation": "westeurope",
+                                    "statusOfPrimary": "available"
+                                }
+                            },
+                            {
+                                "sku": {
+                                    "name": "Standard_LRS",
+                                    "tier": "Standard"
+                                },
+                                "kind": "StorageV2",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cloud-shell-storage-westeurope/providers/Microsoft.Storage/storageAccounts/csb10032000fe3ba7eb",
+                                "name": "csb10032000fe3ba7eb",
+                                "type": "Microsoft.Storage/storageAccounts",
+                                "location": "westeurope",
+                                "tags": {
+                                    "ms-resource-usage": "azure-cloud-shell"
+                                },
+                                "properties": {
+                                    "privateEndpointConnections": [],
+                                    "minimumTlsVersion": "TLS1_2",
+                                    "allowBlobPublicAccess": false,
+                                    "networkAcls": {
+                                        "bypass": "AzureServices",
+                                        "virtualNetworkRules": [],
+                                        "ipRules": [],
+                                        "defaultAction": "Allow"
+                                    },
+                                    "supportsHttpsTrafficOnly": true,
+                                    "encryption": {
+                                        "services": {
+                                            "file": {
+                                                "keyType": "Account",
+                                                "enabled": true,
+                                                "lastEnabledTime": "2021-03-11T08:22:47.4639172Z"
+                                            },
+                                            "blob": {
+                                                "keyType": "Account",
+                                                "enabled": true,
+                                                "lastEnabledTime": "2021-03-11T08:22:47.4639172Z"
+                                            }
+                                        },
+                                        "keySource": "Microsoft.Storage"
+                                    },
+                                    "accessTier": "Hot",
+                                    "provisioningState": "Succeeded",
+                                    "creationTime": "2021-03-11T08:22:47.3857606Z",
+                                    "primaryEndpoints": {
+                                        "dfs": "https://csb10032000fe3ba7eb.dfs.core.windows.net/",
+                                        "web": "https://csb10032000fe3ba7eb.z6.web.core.windows.net/",
+                                        "blob": "https://csb10032000fe3ba7eb.blob.core.windows.net/",
+                                        "queue": "https://csb10032000fe3ba7eb.queue.core.windows.net/",
+                                        "table": "https://csb10032000fe3ba7eb.table.core.windows.net/",
+                                        "file": "https://csb10032000fe3ba7eb.file.core.windows.net/"
+                                    },
+                                    "primaryLocation": "westeurope",
+                                    "statusOfPrimary": "available"
+                                }
+                            },
+                            {
+                                "sku": {
+                                    "name": "Standard_LRS",
+                                    "tier": "Standard"
+                                },
+                                "kind": "StorageV2",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cloud-shell-storage-westeurope/providers/Microsoft.Storage/storageAccounts/csb10032000fe3d644b",
+                                "name": "csb10032000fe3d644b",
+                                "type": "Microsoft.Storage/storageAccounts",
+                                "location": "westeurope",
+                                "tags": {
+                                    "ms-resource-usage": "azure-cloud-shell"
+                                },
+                                "properties": {
+                                    "privateEndpointConnections": [],
+                                    "minimumTlsVersion": "TLS1_2",
+                                    "allowBlobPublicAccess": false,
+                                    "networkAcls": {
+                                        "bypass": "AzureServices",
+                                        "virtualNetworkRules": [],
+                                        "ipRules": [],
+                                        "defaultAction": "Allow"
+                                    },
+                                    "supportsHttpsTrafficOnly": true,
+                                    "encryption": {
+                                        "services": {
+                                            "file": {
+                                                "keyType": "Account",
+                                                "enabled": true,
+                                                "lastEnabledTime": "2021-07-23T10:34:47.6556970Z"
+                                            },
+                                            "blob": {
+                                                "keyType": "Account",
+                                                "enabled": true,
+                                                "lastEnabledTime": "2021-07-23T10:34:47.6556970Z"
+                                            }
+                                        },
+                                        "keySource": "Microsoft.Storage"
+                                    },
+                                    "accessTier": "Hot",
+                                    "provisioningState": "Succeeded",
+                                    "creationTime": "2021-07-23T10:34:47.5307287Z",
+                                    "primaryEndpoints": {
+                                        "dfs": "https://csb10032000fe3d644b.dfs.core.windows.net/",
+                                        "web": "https://csb10032000fe3d644b.z6.web.core.windows.net/",
+                                        "blob": "https://csb10032000fe3d644b.blob.core.windows.net/",
+                                        "queue": "https://csb10032000fe3d644b.queue.core.windows.net/",
+                                        "table": "https://csb10032000fe3d644b.table.core.windows.net/",
+                                        "file": "https://csb10032000fe3d644b.file.core.windows.net/"
+                                    },
+                                    "primaryLocation": "westeurope",
+                                    "statusOfPrimary": "available"
+                                }
+                            },
+                            {
+                                "sku": {
+                                    "name": "Standard_LRS",
+                                    "tier": "Standard"
+                                },
+                                "kind": "StorageV2",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cloud-shell-storage-westeurope/providers/Microsoft.Storage/storageAccounts/csb10032000fe3d664c",
+                                "name": "csb10032000fe3d664c",
+                                "type": "Microsoft.Storage/storageAccounts",
+                                "location": "westeurope",
+                                "tags": {
+                                    "ms-resource-usage": "azure-cloud-shell"
+                                },
+                                "properties": {
+                                    "privateEndpointConnections": [],
+                                    "minimumTlsVersion": "TLS1_2",
+                                    "allowBlobPublicAccess": false,
+                                    "networkAcls": {
+                                        "bypass": "AzureServices",
+                                        "virtualNetworkRules": [],
+                                        "ipRules": [],
+                                        "defaultAction": "Allow"
+                                    },
+                                    "supportsHttpsTrafficOnly": true,
+                                    "encryption": {
+                                        "services": {
+                                            "file": {
+                                                "keyType": "Account",
+                                                "enabled": true,
+                                                "lastEnabledTime": "2021-03-29T15:53:58.9973239Z"
+                                            },
+                                            "blob": {
+                                                "keyType": "Account",
+                                                "enabled": true,
+                                                "lastEnabledTime": "2021-03-29T15:53:58.9973239Z"
+                                            }
+                                        },
+                                        "keySource": "Microsoft.Storage"
+                                    },
+                                    "accessTier": "Hot",
+                                    "provisioningState": "Succeeded",
+                                    "creationTime": "2021-03-29T15:53:58.9191878Z",
+                                    "primaryEndpoints": {
+                                        "dfs": "https://csb10032000fe3d664c.dfs.core.windows.net/",
+                                        "web": "https://csb10032000fe3d664c.z6.web.core.windows.net/",
+                                        "blob": "https://csb10032000fe3d664c.blob.core.windows.net/",
+                                        "queue": "https://csb10032000fe3d664c.queue.core.windows.net/",
+                                        "table": "https://csb10032000fe3d664c.table.core.windows.net/",
+                                        "file": "https://csb10032000fe3d664c.file.core.windows.net/"
+                                    },
+                                    "primaryLocation": "westeurope",
+                                    "statusOfPrimary": "available"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/037-resource-group-red/providers/Microsoft.Storage/storageAccounts/037storageaccred/blobServices/default/containers?api-version=2019-06-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json"
+                    ],
+                    "date": [
+                        "Mon, 09 Aug 2021 09:35:44 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-length": [
+                        "680"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/037-resource-group-red/providers/Microsoft.Storage/storageAccounts/037storageaccred/blobServices/default/containers/insights-operational-logs",
+                                "name": "insights-operational-logs",
+                                "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
+                                "etag": "\"0x8D95B0A1CE563D4\"",
+                                "properties": {
+                                    "deleted": false,
+                                    "remainingRetentionDays": 0,
+                                    "defaultEncryptionScope": "$account-encryption-key",
+                                    "denyEncryptionScopeOverride": false,
+                                    "publicAccess": "None",
+                                    "leaseStatus": "Unlocked",
+                                    "leaseState": "Available",
+                                    "lastModifiedTime": "2021-08-09T07:48:44.0000000Z",
+                                    "hasImmutabilityPolicy": false,
+                                    "hasLegalHold": false
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cloud-shell-storage-eastus/providers/Microsoft.Storage/storageAccounts/cs210032001279900ed/blobServices/default/containers?api-version=2019-06-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json"
+                    ],
+                    "date": [
+                        "Mon, 09 Aug 2021 09:35:45 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-length": [
+                        "2111"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cloud-shell-storage-eastus/providers/Microsoft.Storage/storageAccounts/cs210032001279900ed/blobServices/default/containers/bootdiagnostics-test12vml-2b105b52-088b-4a76-a409-f37f52f1fdde",
+                                "name": "bootdiagnostics-test12vml-2b105b52-088b-4a76-a409-f37f52f1fdde",
+                                "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
+                                "etag": "\"0x8D9259CD4D0210C\"",
+                                "properties": {
+                                    "deleted": false,
+                                    "remainingRetentionDays": 0,
+                                    "defaultEncryptionScope": "$account-encryption-key",
+                                    "denyEncryptionScopeOverride": false,
+                                    "publicAccess": "None",
+                                    "leaseStatus": "Unlocked",
+                                    "leaseState": "Available",
+                                    "lastModifiedTime": "2021-06-02T08:02:56.0000000Z",
+                                    "hasImmutabilityPolicy": false,
+                                    "hasLegalHold": false
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cloud-shell-storage-eastus/providers/Microsoft.Storage/storageAccounts/cs210032001279900ed/blobServices/default/containers/insights-logs-postgresqllogs",
+                                "name": "insights-logs-postgresqllogs",
+                                "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
+                                "etag": "\"0x8D903F63259122B\"",
+                                "properties": {
+                                    "deleted": false,
+                                    "remainingRetentionDays": 0,
+                                    "defaultEncryptionScope": "$account-encryption-key",
+                                    "denyEncryptionScopeOverride": false,
+                                    "publicAccess": "None",
+                                    "leaseStatus": "Unlocked",
+                                    "leaseState": "Available",
+                                    "lastModifiedTime": "2021-04-20T12:16:59.0000000Z",
+                                    "hasImmutabilityPolicy": false,
+                                    "hasLegalHold": false
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cloud-shell-storage-eastus/providers/Microsoft.Storage/storageAccounts/cs210032001279900ed/blobServices/default/containers/insights-metrics-pt1m",
+                                "name": "insights-metrics-pt1m",
+                                "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
+                                "etag": "\"0x8D903FA4EF25307\"",
+                                "properties": {
+                                    "deleted": false,
+                                    "remainingRetentionDays": 0,
+                                    "defaultEncryptionScope": "$account-encryption-key",
+                                    "denyEncryptionScopeOverride": false,
+                                    "publicAccess": "None",
+                                    "leaseStatus": "Unlocked",
+                                    "leaseState": "Available",
+                                    "lastModifiedTime": "2021-04-20T12:46:25.0000000Z",
+                                    "hasImmutabilityPolicy": false,
+                                    "hasLegalHold": false
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/Test12CIS/providers/Microsoft.Storage/storageAccounts/testcissa/blobServices/default/containers?api-version=2019-06-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json"
+                    ],
+                    "date": [
+                        "Mon, 09 Aug 2021 09:35:45 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-length": [
+                        "658"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/Test12CIS/providers/Microsoft.Storage/storageAccounts/testcissa/blobServices/default/containers/insights-logs-auditevent",
+                                "name": "insights-logs-auditevent",
+                                "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
+                                "etag": "\"0x8D90B017B378484\"",
+                                "properties": {
+                                    "deleted": false,
+                                    "remainingRetentionDays": 0,
+                                    "defaultEncryptionScope": "$account-encryption-key",
+                                    "denyEncryptionScopeOverride": false,
+                                    "publicAccess": "None",
+                                    "leaseStatus": "Unlocked",
+                                    "leaseState": "Available",
+                                    "lastModifiedTime": "2021-04-29T11:25:23.0000000Z",
+                                    "hasImmutabilityPolicy": false,
+                                    "hasLegalHold": false
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cloud-shell-storage-westeurope/providers/Microsoft.Storage/storageAccounts/csb10032000fe3ba70c/blobServices/default/containers?api-version=2019-06-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json"
+                    ],
+                    "date": [
+                        "Mon, 09 Aug 2021 09:35:45 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-length": [
+                        "12"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": []
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cloud-shell-storage-westeurope/providers/Microsoft.Storage/storageAccounts/csb10032000fe3ba7eb/blobServices/default/containers?api-version=2019-06-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json"
+                    ],
+                    "date": [
+                        "Mon, 09 Aug 2021 09:35:45 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-length": [
+                        "12"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": []
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cloud-shell-storage-westeurope/providers/Microsoft.Storage/storageAccounts/csb10032000fe3d644b/blobServices/default/containers?api-version=2019-06-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json"
+                    ],
+                    "date": [
+                        "Mon, 09 Aug 2021 09:35:45 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-length": [
+                        "12"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": []
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cloud-shell-storage-westeurope/providers/Microsoft.Storage/storageAccounts/csb10032000fe3d664c/blobServices/default/containers?api-version=2019-06-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json"
+                    ],
+                    "date": [
+                        "Mon, 09 Aug 2021 09:35:45 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-length": [
+                        "12"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": []
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/microsoft.insights/logprofiles?api-version=2016-03-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Mon, 09 Aug 2021 09:35:51 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-length": [
+                        "542"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/microsoft.insights/logprofiles/log-profile-red",
+                                "type": null,
+                                "name": "log-profile-red",
+                                "location": null,
+                                "kind": null,
+                                "tags": null,
+                                "properties": {
+                                    "storageAccountId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/037-resource-group-red/providers/Microsoft.Storage/storageAccounts/037storageaccred",
+                                    "serviceBusRuleId": null,
+                                    "locations": [
+                                        "eastus"
+                                    ],
+                                    "categories": [
+                                        "Delete",
+                                        "Action",
+                                        "Write"
+                                    ],
+                                    "retentionPolicy": {
+                                        "enabled": false,
+                                        "days": 0
+                                    }
+                                },
+                                "identity": null
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}
