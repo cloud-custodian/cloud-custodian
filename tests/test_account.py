@@ -7,7 +7,6 @@ from c7n.executor import MainThreadExecutor
 from c7n.utils import local_session, format_string_values
 from c7n.resources import account
 from c7n.testing import mock_datetime_now
-from botocore.exceptions import ClientError
 
 from pytest_terraform import terraform
 
