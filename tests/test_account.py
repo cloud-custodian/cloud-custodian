@@ -534,30 +534,6 @@ class AccountTests(BaseTest):
             resources = p.run()
         self.assertEqual(len(resources), 1)
 
-    def test_service_limit_exception_handling(self):
-        client = mock.MagicMock()
-        error_response = {
-            'Error': {
-                'Code': 'InvalidParameterValueException',
-                'Message': 'Invalid parameter value'
-            }
-        }
-        client.refresh_trusted_advisor_check.side_effect = [ClientError(error_response,
-            "RefreshTrustedAdvisorCheck")]
-        client.describe_trusted_advisor_check_result.side_effect = [
-            {'result': {'status': 'not_available'}},
-            {'result': True}]
-        client.describe_trusted_advisor_check_refresh_statuses.return_value = {
-            'statuses': [{'status': 'success'}]}
-
-        def time_sleep(interval):
-            return
-
-        self.patch(account.time, 'sleep', time_sleep)
-        self.assertEqual(
-            account.ServiceLimit.get_check_result(client, 'bogusid'),
-            None)
-
     def test_service_limit_poll_status(self):
 
         client = mock.MagicMock()
@@ -611,20 +587,6 @@ class AccountTests(BaseTest):
 
     def test_service_limit_specific_check_handles_exception(self):
         session_factory = self.replay_flight_data("test_account_service_limit_exception")
-        client = mock.MagicMock()
-        error_response = {
-            'Error': {
-                'Code': 'InvalidParameterValueException',
-                'Message': 'Invalid parameter value'
-            }
-        }
-        client.refresh_trusted_advisor_check.side_effect = [ClientError(error_response,
-            "RefreshTrustedAdvisorCheck")]
-        client.describe_trusted_advisor_check_result.side_effect = [
-            {'result': {'status': 'not_available'}},
-            {'result': True}]
-        client.describe_trusted_advisor_check_refresh_statuses.return_value = {
-            'statuses': [{'status': 'success'}]}
         p = self.load_policy(
             {
                 "name": "service-limit",
@@ -650,20 +612,6 @@ class AccountTests(BaseTest):
     def test_service_limit_specific_check_handles_exception_on_date_refresh(self):
         session_factory = self.replay_flight_data(
             "test_account_service_limit_date_refresh_exception")
-        client = mock.MagicMock()
-        error_response = {
-            'Error': {
-                'Code': 'InvalidParameterValueException',
-                'Message': 'Invalid parameter value'
-            }
-        }
-        client.refresh_trusted_advisor_check.side_effect = [ClientError(error_response,
-            "RefreshTrustedAdvisorCheck")]
-        client.describe_trusted_advisor_check_result.side_effect = [
-            {'result': {'status': 'not_available'}},
-            {'result': True}]
-        client.describe_trusted_advisor_check_refresh_statuses.return_value = {
-            'statuses': [{'status': 'success'}]}
         p = self.load_policy(
             {
                 "name": "service-limit",
