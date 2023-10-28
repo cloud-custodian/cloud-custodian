@@ -23,7 +23,6 @@ from oci_common import (
 
 FILTERED_HEADERS = [
     "authorization",
-    "opc-request-id",
     "opc-client-info",
     "opc-request-id",
     "x-content-sha256accept-encoding",
@@ -46,6 +45,7 @@ FILTERED_HEADERS = [
     "etag",
     "pragma",
     "x-content-type-options",
+    "location",
 ]
 
 
@@ -82,25 +82,29 @@ class OCIFlightRecorder(CustodianTestCore):
         cm = self.myvcr.use_cassette(cassette)
         cm.__enter__()
         self.addCleanup(cm.__exit__, None, None, None)
-        return SessionFactory()
+        return SessionFactory(region=os.environ.get("OCI_REGION"))
 
-    def replay_flight_data(self, test_class, test_case):
+    def replay_flight_data(
+        self, test_class, test_case, allow_playback_repeats=True, enable_matcher=True
+    ):
         self.myvcr = config.VCR(
             custom_patches=self._get_mock_triples(),
             record_mode="once",
             before_record_request=self._request_callback,
             before_record_response=self._response_callback,
         )
-        self.myvcr.register_matcher("oci-matcher", self._oci_matcher)
-        self.myvcr.match_on = ["oci-matcher", "method"]
+        if enable_matcher:
+            self.myvcr.register_matcher("oci-matcher", self._oci_matcher)
+            self.myvcr.match_on = ["oci-matcher", "method"]
         cm = self.myvcr.use_cassette(
-            self._get_cassette_name(test_class, test_case), allow_playback_repeats=True
+            self._get_cassette_name(test_class, test_case),
+            allow_playback_repeats=allow_playback_repeats,
         )
         self.cassette = None
         self.cassette_name = self._get_cassette_name(test_class, test_case)
         cm.__enter__()
         self.addCleanup(cm.__exit__, None, None, None)
-        return SessionFactory()
+        return SessionFactory(region=os.environ.get("OCI_REGION"))
 
     def _extract_caller(self):
         caller = inspect.currentframe().f_back.f_back
@@ -111,6 +115,14 @@ class OCIFlightRecorder(CustodianTestCore):
             test_class, test_case = self._extract_caller()
         if not C7N_FUNCTIONAL and self._cassette_file_exists(test_class, test_case):
             return self.replay_flight_data(test_class, test_case)
+        else:
+            return self.record_flight_data(test_class, test_case)
+
+    def oci_session_factory_for_repeated_api_calls(self, test_class=None, test_case=None):
+        if not test_class or not test_case:
+            test_class, test_case = self._extract_caller()
+        if not C7N_FUNCTIONAL and self._cassette_file_exists(test_class, test_case):
+            return self.replay_flight_data(test_class, test_case, False, False)
         else:
             return self.record_flight_data(test_class, test_case)
 
@@ -179,6 +191,9 @@ class OCIFlightRecorder(CustodianTestCore):
             for (k, v) in response["headers"].items()
             if k.lower() not in FILTERED_HEADERS
         }
+
+        if not response["body"]['string']:
+            return response
 
         content_type = response["headers"].get("content-type", (None,))[0]
         if not content_type or "application/json" not in content_type:

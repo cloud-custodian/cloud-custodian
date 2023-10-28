@@ -11,7 +11,7 @@ from c7n.filters import Filter, ValueFilter  # noqa
 from c7n.utils import type_schema
 from c7n_oci.actions.base import OCIBaseAction, RemoveTagBaseAction
 from c7n_oci.provider import resources
-from c7n_oci.query import QueryResourceManager
+from c7n_oci.query import QueryResourceManager, TypeInfo
 from c7n_oci.constants import STORAGE_NAMESPACE
 
 log = logging.getLogger("custodian.oci.resources.object_storage")
@@ -33,7 +33,7 @@ class Bucket(QueryResourceManager):
 
     """
 
-    class resource_type:
+    class resource_type(TypeInfo):
         doc_groups = ["ObjectStorage"]
         service = "oci.object_storage"
         client = "ObjectStorageClient"
@@ -42,8 +42,14 @@ class Bucket(QueryResourceManager):
         resource_type = "OCI.ObjectStorage/Bucket"
         id = name = "name"
         search_resource_type = "bucket"
+        get = "get_bucket"
+        get_params = (
+            STORAGE_NAMESPACE,
+            "resourceName",
+        )
+        event_service_name = "com.oraclecloud.objectstorage"
 
-    def _get_extra_params(self):
+    def get_extra_params(self):
         kw = {}
         kw[STORAGE_NAMESPACE] = self.get_client().get_namespace().data
         return kw

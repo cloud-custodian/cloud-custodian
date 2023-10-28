@@ -11,7 +11,7 @@ from c7n.filters import Filter, ValueFilter  # noqa
 from c7n.utils import type_schema
 from c7n_oci.actions.base import OCIBaseAction, RemoveTagBaseAction
 from c7n_oci.provider import resources
-from c7n_oci.query import QueryResourceManager
+from c7n_oci.query import QueryResourceManager, TypeInfo
 
 log = logging.getLogger("custodian.oci.resources.virtual_network")
 
@@ -32,7 +32,7 @@ class Cross_connect(QueryResourceManager):
 
     """
 
-    class resource_type:
+    class resource_type(TypeInfo):
         doc_groups = ["Network"]
         service = "oci.core"
         client = "VirtualNetworkClient"
@@ -156,7 +156,7 @@ class Vcn(QueryResourceManager):
 
     """
 
-    class resource_type:
+    class resource_type(TypeInfo):
         doc_groups = ["Network"]
         service = "oci.core"
         client = "VirtualNetworkClient"
@@ -166,6 +166,8 @@ class Vcn(QueryResourceManager):
         id = "id"
         name = "display_name"
         search_resource_type = "vcn"
+        get = "get_vcn"
+        event_service_name = "com.oraclecloud.virtualnetwork"
 
 
 @Vcn.action_registry.register("update")
@@ -274,7 +276,7 @@ class Subnet(QueryResourceManager):
 
     """
 
-    class resource_type:
+    class resource_type(TypeInfo):
         doc_groups = ["Network"]
         service = "oci.core"
         client = "VirtualNetworkClient"
@@ -284,6 +286,8 @@ class Subnet(QueryResourceManager):
         id = "id"
         name = "display_name"
         search_resource_type = "subnet"
+        get = "get_subnet"
+        event_service_name = "com.oraclecloud.virtualnetwork"
 
 
 @Subnet.action_registry.register("update")

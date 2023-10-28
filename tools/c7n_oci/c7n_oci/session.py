@@ -26,33 +26,35 @@ class SessionFactory:
 
     @property
     def config(self):
-        return self._config
+        return self._config['config']
 
     def _set_oci_config(self):
-        config = None
+        config = {"config": {}}
         if self._check_environment_variables():
-            config = {
+            config["config"] = {
                 "fingerprint": os.environ.get(ENV_FINGERPRINT),
                 "key_file": os.environ.get(ENV_KEY_FILE),
                 "region": os.environ.get(ENV_REGION),
                 "tenancy": os.environ.get(ENV_TENANCY),
                 "user": os.environ.get(ENV_USER),
             }
+        elif os.environ.get('OCI_CLI_AUTH') == 'resource_principal':
+            config['signer'] = oci.auth.signers.get_resource_principals_signer()
         elif self.profile:
-            config = oci.config.from_file(profile_name=self.profile)
+            config["config"] = oci.config.from_file(profile_name=self.profile)
         else:
-            config = oci.config.from_file()
+            config['config'] = oci.config.from_file()
 
-        config["additional_user_agent"] = (
-            f'{self.user_agent_name} {config["additional_user_agent"]}'
-            if config.get("additional_user_agent")
+        config['config']["additional_user_agent"] = (
+            f'{self.user_agent_name} {config["config"]["additional_user_agent"]}'
+            if config["config"].get("additional_user_agent")
             else self.user_agent_name
         )
 
         # Override the region value passed in the option
         # For global region value, we will consider the region mentioned in the Config file
         if self.region and self.region != "global":
-            config["region"] = self.region
+            config["config"]["region"] = self.region
 
         return config
 
@@ -81,9 +83,8 @@ class Session:
         service_name, client_name = client_string.rsplit(".", 1)
         service_module = importlib.import_module(service_name)
         client_class = getattr(service_module, client_name)
-        client_args = {"config": self._config}
-        client = client_class(**client_args)
+        client = client_class(**self._config)
         return client
 
     def get_config(self):
-        return self._config
+        return self._config['config']

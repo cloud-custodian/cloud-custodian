@@ -9,11 +9,34 @@ import oci.config
 from c7n.actions import ActionRegistry
 from c7n.filters import FilterRegistry
 from c7n.manager import ResourceManager
-from c7n.query import sources, MaxResourceLimit, TypeInfo
+from c7n.query import sources, MaxResourceLimit
 from c7n.utils import local_session
 from c7n_oci.constants import COMPARTMENT_IDS, STORAGE_NAMESPACE
 
 log = logging.getLogger("custodian.oci.query")
+
+
+class TypeMeta(type):
+    def __repr__(cls):
+        return "<TypeInfo service:%s client:%s" % (cls.service, cls.client)
+
+
+class TypeInfo(metaclass=TypeMeta):
+    # sdk client construction information
+    service = None
+    client = None
+
+    # resource enumeration parameters
+    enum_spec = ('list', 'items[]', None)
+
+    # individual resource retrieval method, for serverless policies.
+    get = None
+    # parameter name in the event payload recieved to a function, for serverless policies.
+    # If it is not defined by any resource then defualt get param is resourceId
+    get_params = None
+    # event service name is required for the rule condition in serverless policies
+    # https://docs.oracle.com/en-us/iaas/Content/Events/Reference/eventsproducers.htm,
+    event_service_name = None
 
 
 class ResourceQuery:
@@ -87,10 +110,10 @@ class DescribeSource:
     def _get_resources_with_compartment_and_params(self, compartment_id, list_func_ref):
         kw = self._get_fields_from_query()
         if (
-            self.manager._get_extra_params().get(STORAGE_NAMESPACE) is not None
+            self.manager.get_extra_params().get(STORAGE_NAMESPACE) is not None
             and kw.get(STORAGE_NAMESPACE) is None
         ):
-            kw[STORAGE_NAMESPACE] = self.manager._get_extra_params()[STORAGE_NAMESPACE]
+            kw[STORAGE_NAMESPACE] = self.manager.get_extra_params()[STORAGE_NAMESPACE]
         kw["compartment_id"] = compartment_id
         return oci.pagination.list_call_get_all_results(list_func_ref, **kw).data
 
@@ -261,5 +284,13 @@ class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
     def augment(self, resources):
         return resources
 
-    def _get_extra_params(self):
+    def get_extra_params(self):
         return {}
+
+    def get_resources_details(self, resources):
+        resources_detail = []
+        method = getattr(self.get_client(), self.resource_type.get)
+        for resource_params in resources:
+            result = method(*resource_params)
+            resources_detail.append(oci.util.to_dict(result.data))
+        return resources_detail

@@ -11,7 +11,7 @@ from c7n.filters import Filter, ValueFilter  # noqa
 from c7n.utils import type_schema
 from c7n_oci.actions.base import OCIBaseAction, RemoveTagBaseAction
 from c7n_oci.provider import resources
-from c7n_oci.query import QueryResourceManager
+from c7n_oci.query import QueryResourceManager, TypeInfo
 
 log = logging.getLogger("custodian.oci.resources.identity")
 
@@ -32,7 +32,7 @@ class Compartment(QueryResourceManager):
 
     """
 
-    class resource_type:
+    class resource_type(TypeInfo):
         doc_groups = ["Identity"]
         service = "oci.identity"
         client = "IdentityClient"
@@ -153,7 +153,7 @@ class Group(QueryResourceManager):
 
     """
 
-    class resource_type:
+    class resource_type(TypeInfo):
         doc_groups = ["Identity"]
         service = "oci.identity"
         client = "IdentityClient"
@@ -163,6 +163,8 @@ class Group(QueryResourceManager):
         id = "id"
         name = "name"
         search_resource_type = "group"
+        get = "get_group"
+        event_service_name = "com.oraclecloud.identitycontrolplane"
 
 
 @Group.action_registry.register("update")
@@ -270,7 +272,7 @@ class User(QueryResourceManager):
 
     """
 
-    class resource_type:
+    class resource_type(TypeInfo):
         doc_groups = ["Identity"]
         service = "oci.identity"
         client = "IdentityClient"
@@ -280,6 +282,8 @@ class User(QueryResourceManager):
         id = "id"
         name = "name"
         search_resource_type = "user"
+        get = "get_user"
+        event_service_name = "com.oraclecloud.identitycontrolplane"
 
 
 @User.action_registry.register("update")
