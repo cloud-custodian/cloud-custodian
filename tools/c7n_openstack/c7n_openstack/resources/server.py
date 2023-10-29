@@ -282,15 +282,27 @@ class SecurityGroupFilter(ListItemFilter):
     )
 
     annotate_items = True
+    _sg_map = dict()
+    _client = None
+
+    def get_client(self):
+        if self._client:
+            return self._client
+        self._client = local_session(self.manager.session_factory).client()
+        return self._client
 
     def get_item_values(self, resource):
         result = []
-        client = local_session(self.manager.session_factory).client()
-        attached_sgs = (client.compute.fetch_server_security_groups(resource.get('id'))
-                        .security_groups)
-        for sg_details in attached_sgs:
-            security_group = client.network.find_security_group(sg_details.get('id'),
-                                                                ignore_missing=True).toDict()
+        client = self.get_client()
+        sgs_details = (client.compute.fetch_server_security_groups(resource.get('id'))
+                       .security_groups)
+        attached_sgs_ids = [sg_details.get('id') for sg_details in sgs_details]
+
+        for attached_sg_id in attached_sgs_ids:
+            if attached_sg_id not in self._sg_map:
+                self._sg_map[attached_sg_id] = (client.network.find_security_group
+                                                (attached_sg_id,ignore_missing=True).toDict())
+            security_group = self._sg_map.get(attached_sg_id)
             if security_group is not None:
                 if 'key' in self.data:
                     key_values = self.expr.search(security_group)
