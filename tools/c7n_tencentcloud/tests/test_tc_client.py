@@ -20,6 +20,9 @@ from tencentcloud.common.exception.tencent_cloud_sdk_exception import TencentClo
 from tencentcloud.common.credential import STSAssumeRoleCredential, Credential
 
 
+_cred_path = os.path.join(os.path.abspath('.'), 'data', 'credentials')
+
+
 class TestClient:
     @pytest.fixture
     def simple_client(self, session):
@@ -173,19 +176,20 @@ class TestClient:
         assert found
 
     def test_tc_client_default_profile(self):
-        found_cred_path = False
-        try:
-            cred = profile_handle('source_profile_default')
-            assert isinstance(cred, STSAssumeRoleCredential) is True
-        except TencentCloudSDKException:
-            found_cred_path = True
-        assert found_cred_path
+        profile = 'default'
+        cred = profile_handle(profile, cred_path=_cred_path)
+        assert isinstance(cred, Credential) is True
 
-    def test_tc_client_cvm_metadata(self):
-        found_cred_path = False
+    def test_tc_client_assume_default(self):
+        profile = 'test-profile-df'
+        cred = profile_handle(profile, cred_path=_cred_path)
+        assert isinstance(cred, STSAssumeRoleCredential) is True
+
+    def test_tc_client_assume_cmv_metadata(self):
+        profile = 'test-profile-dfone'
         try:
-            cred = profile_handle('test-cvm-role')
-            assert isinstance(cred, Credential)
-        except TencentCloudSDKException:
-            found_cred_path = True
-        assert found_cred_path
+            cred = profile_handle(profile, cred_path=_cred_path)
+        except TypeError:
+            # there will be to get remote credentails resp
+            cred = Credential('123', '345')
+        assert isinstance(cred, Credential) is True

@@ -64,23 +64,30 @@ def profile_handle(
     """
     if not os.path.exists(cred_path):
         raise TencentCloudSDKException(f'not find the cred path by "{cred_path}"')
-    parser = configparser.ConfigParser()
-    parser.read(cred_path, encoding='utf-8')
-    if profile not in parser.sections():
-        raise TencentCloudSDKException(f'not find the profile`s section by {profile}')
 
-    profile_obj = parser[profile]
+    parser = configparser.ConfigParser()
+    parser.read(cred_path)
+    try:
+        profile_obj = parser[profile]
+    except KeyError:
+        raise TencentCloudSDKException(f'not find profile: {profile}, please check the porfile')
+
+    # if not find role_arn the profile is ak/sk'profile
     role_arn = profile_obj.get('role_arn', None)
-    session_name = profile_obj.get('session_name', 'custodian-job')
-    duration_seconds = profile_obj.get('duration_seconds', 3600)
+    if role_arn is None:
+        secret_id = profile_obj.get('secret_id')
+        secret_key = profile_obj.get('secret_key')
+        token = profile_obj.get('token')
+
+        return Credential(secret_id, secret_key, token)
+
+    session_name = profile_obj.get('session_name', 'tencentcloud-session')
+    duration_seconds = profile_obj.get('duration_seconds', 7200)
     source_profile = profile_obj.get('source_profile')
 
-    if source_profile == 'default':
-        source_profile = parser[source_profile]
-        secret_id, secret_key = source_profile.get('secret_id'), source_profile.get('secret_key')
-        return STSAssumeRoleCredential(
-            secret_id, secret_key, role_arn, session_name, duration_seconds)
-    elif source_profile == 'cvm_metadata':
+    # if the source_profile == 'cvm_metadata', you need add the role to cvm
+    # and the role must have assume the the role permmission
+    if source_profile == 'cvm_metadata':
         cred = CVMRoleCredential()
         common_client = CommonClient(
             credential=cred, region="ap-guangzhou", version='2018-08-13', service="sts")
@@ -93,9 +100,21 @@ def profile_handle(
         token = rsp["Response"]["Credentials"]["Token"]
         secret_id = rsp["Response"]["Credentials"]["TmpSecretId"]
         secret_key = rsp["Response"]["Credentials"]["TmpSecretKey"]
+
         return Credential(secret_id, secret_key, token=token)
     else:
-        raise TencentCloudSDKException(f'source profile not support {source_profile}')
+        try:
+            sp_obj = parser[source_profile]
+        except KeyError:
+            raise TencentCloudSDKException(
+                f'not find source_profile: {source_profile}, please check the source_profile')
+
+        secret_id = sp_obj.get('secret_id')
+        secret_key = sp_obj.get('secret_key')
+        token = sp_obj.get('token')
+
+        return STSAssumeRoleCredential(
+            secret_id, secret_key, role_arn, session_name, duration_seconds)
 
 
 class Client:
