@@ -1,0 +1,23 @@
+{
+    "status_code": 200,
+    "data": {
+        "SecurityGroups": [
+            {
+                "Description": "Isolation",
+                "GroupName": "isolate-sg",
+                "IpPermissions": [],
+                "OwnerId": "644160558196",
+                "GroupId": "sg-08398fd5994d8971d",
+                "IpPermissionsEgress": [],
+                "Tags": [
+                    {
+                        "Key": "c7n",
+                        "Value": "test"
+                    }
+                ],
+                "VpcId": "vpc-d2d616b5"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

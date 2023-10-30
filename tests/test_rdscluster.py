@@ -736,6 +736,25 @@ class RDSClusterSnapshotTest(BaseTest):
         )
         self.assertEqual(len(restore_permissions_after), 0)
 
+    def test_pending_maintenance(self):
+        session_factory = self.replay_flight_data("test_rdscluster_pending_maintenance")
+        p = self.load_policy(
+            {
+                "name": "rds-cluster-pending-maintenance",
+                "resource": "rds-cluster",
+                "filters": [
+                    {
+                        "type": "pending-maintenance"
+                    }
+                ],
+            },
+            config={"region": "us-west-2"},
+            session_factory=session_factory,
+        )
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
 
 class TestRDSClusterParameterGroupFilter(BaseTest):
 
