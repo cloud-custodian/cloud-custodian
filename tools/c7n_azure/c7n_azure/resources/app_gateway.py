@@ -72,7 +72,7 @@ class ApplicationGatewayWafFilter(Filter):
     def process(self, resources, event=None):
 
         filter_override_rule = self.data.get('override_rule')
-        filter_state = self.data.get('state') if self.data.get('state') else 'disabled'
+        filter_state = self.data.get('state', 'disabled')
 
         client = self.manager.get_client()
         app_gate_wafs = list(client.web_application_firewall_policies.list_all())
