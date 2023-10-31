@@ -1,0 +1,14 @@
+{
+    "status_code": 200,
+    "data": {
+        "collectionSummaries": [
+            {
+                "arn": "arn:aws:aoss:us-east-1:644160558196:collection/6ot2t518av2khgxr73sf",
+                "id": "6ot2t518av2khgxr73sf",
+                "name": "c7n-test",
+                "status": "DELETING"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
