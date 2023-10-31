@@ -859,7 +859,14 @@ class ServiceLimit(Filter):
 
         # Check status and if necessary refresh checks
         if checks['status'] == 'not_available':
-            client.refresh_trusted_advisor_check(checkId=check_id)
+            try:
+                client.refresh_trusted_advisor_check(checkId=check_id)
+            except ClientError as e:
+                if e.response['Error']['Code'] == 'InvalidParameterValueException':
+                    cls.log.warning("InvalidParameterValueException: %s",
+                     e.response['Error']['Message'])
+                    return
+
             for _ in range(cls.poll_max_intervals):
                 time.sleep(cls.poll_interval)
                 refresh_response = client.describe_trusted_advisor_check_refresh_statuses(
@@ -920,6 +927,9 @@ class ServiceLimit(Filter):
         region = self.manager.config.region
         results = self.get_check_result(client, check['id'])
 
+        if results is None or 'flaggedResources' not in results:
+            return []
+
         # trim to only results for this region
         results['flaggedResources'] = [
             r
@@ -936,7 +946,13 @@ class ServiceLimit(Filter):
         delta = datetime.timedelta(self.data.get('refresh_period', 1))
         check_date = parse_date(results['timestamp'])
         if datetime.datetime.now(tz=tzutc()) - delta > check_date:
-            client.refresh_trusted_advisor_check(checkId=check['id'])
+            try:
+                client.refresh_trusted_advisor_check(checkId=check['id'])
+            except ClientError as e:
+                if e.response['Error']['Code'] == 'InvalidParameterValueException':
+                    self.log.warning("InvalidParameterValueException: %s",
+                     e.response['Error']['Message'])
+                    return
 
         services = self.data.get('services')
         limits = self.data.get('limits')
