@@ -33,6 +33,8 @@ with the status to be stopped on that particular day.
    │ │ │ │
    │ │ │ │  actions: ─────────────────▶ For selected instances, run this action
    │ │ │ │    - type: mark-for-op ────▶ Mark instance for operation
+   │ │ │ │      tag: c7n_status ──────▶ Use the "c7n_status" tag instead of the
+   │ │ │ │                              legacy default "maid_status"
    │ │ │ │      op: stop ─────────────▶ Stop instance
    │ │ │ │      days: 4 ──────────────▶ After 4 days
    │ │ │ │
