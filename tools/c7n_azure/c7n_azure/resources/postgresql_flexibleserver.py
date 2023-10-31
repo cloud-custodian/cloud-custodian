@@ -5,8 +5,6 @@ from c7n.utils import type_schema
 from c7n_azure.provider import resources
 from c7n_azure.resources.arm import ArmResourceManager
 from c7n_azure.actions.base import AzureBaseAction
-from azure.mgmt.rdbms import postgresql_flexibleservers
-from azure.mgmt.rdbms.postgresql_flexibleservers import PostgreSQLManagementClient
 
 
 @resources.register('postgresql-flexible-server')
