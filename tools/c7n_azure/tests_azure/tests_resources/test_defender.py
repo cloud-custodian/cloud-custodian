@@ -62,8 +62,8 @@ class DefenderTest(BaseTest):
 
     def test_azure_defender_contacts(self):
         p = self.load_policy({
-            'name': 'test-security-contacts',
-            'resource': 'azure.defender-contacts'
+            'name': 'test-security-contact',
+            'resource': 'azure.defender-contact'
         })
         resources = p.run()
         self.assertEqual(1, len(resources))
@@ -72,14 +72,14 @@ class DefenderTest(BaseTest):
     def test_azure_defender_contacts_validate_schemas(self):
         p = self.load_policy({
             'name': 'test-security-contacts-schema-validate',
-            'resource': 'azure.defender-contacts',
+            'resource': 'azure.defender-contact',
         }, validate=True)
         self.assertTrue(p)
 
     def test_azure_defender_jit_policies_query(self):
         p = self.load_policy({
-            'name': 'test-security-jit-policies',
-            'resource': 'azure.defender-jit-policies',
+            'name': 'test-security-jit-policy',
+            'resource': 'azure.defender-jit-policy',
         })
         resources = p.run()
 
@@ -88,18 +88,23 @@ class DefenderTest(BaseTest):
 
     def test_azure_defender_jit_policies_filter(self):
         p = self.load_policy({
-            'name': 'test-security-jit-policies-filter',
-            'resource': 'azure.defender-jit-policies',
+            'name': 'test-security-jit-policy-filter',
+            'resource': 'azure.defender-jit-policy',
             'filters': [{
-                'type': 'defender-jit-policies-filter',
+                'type': 'value',
                 'key': 'properties.virtualMachines[].ports[].number',
-                'op': 'eq',
-                'value': 22
+                'op': 'contains',
+                'value': 22,
             }, {
-                'type': 'defender-jit-policies-filter',
-                'key': 'properties.virtualMachines[].id',
-                'op': 'regex',
-                'value': r'\/.+\/virtualMachines\/.+'}]})
+                'type': 'list-item',
+                'key': 'properties.virtualMachines[]',
+                'attrs': [{
+                    'type': 'value',
+                    'key': 'id',
+                    'op': 'regex',
+                    'value': r'\/.+\/virtualMachines\/.+',
+                }],
+            }]})
         resources = p.run()
 
         self.assertEqual(len(resources), 1)

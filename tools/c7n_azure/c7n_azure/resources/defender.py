@@ -2,15 +2,13 @@
 # SPDX-License-Identifier: Apache-2.0
 from collections.abc import Iterator
 
-import jmespath
 from azure.mgmt.security import SecurityCenter
-from c7n_azure.session import Session
-from c7n.utils import type_schema, local_session
-from c7n.filters import ValueFilter
-from c7n.filters.core import OPERATORS
+
+from c7n.exceptions import PolicyExecutionError
+from c7n.utils import local_session
 from c7n_azure.provider import resources
 from c7n_azure.query import QueryResourceManager, QueryMeta, TypeInfo
-from c7n.exceptions import PolicyExecutionError
+from c7n_azure.session import Session
 
 
 class DefenderResourceManager(QueryResourceManager):
@@ -197,8 +195,8 @@ class DefenderAssessment(DefenderResourceManager, metaclass=QueryMeta):
         default_report_fields = ["id", "name"]
 
 
-@resources.register("defender-contacts")
-class DefenderSecurityContacts(DefenderResourceManager, metaclass=QueryMeta):
+@resources.register("defender-contact")
+class DefenderSecurityContact(DefenderResourceManager, metaclass=QueryMeta):
     """Security Contacts Resource
 
     :example:
@@ -209,7 +207,7 @@ class DefenderSecurityContacts(DefenderResourceManager, metaclass=QueryMeta):
 
         policies:
           - name: test-security-contacts
-            resource: azure.defender-contacts
+            resource: azure.defender-contact
             filters:
               - type: value
                 key: properties.email
@@ -229,8 +227,8 @@ class DefenderSecurityContacts(DefenderResourceManager, metaclass=QueryMeta):
         default_report_fields = ["id", "name"]
 
 
-@resources.register("defender-jit-policies")
-class DefenderJitPolicies(DefenderResourceManager, metaclass=QueryMeta):
+@resources.register("defender-jit-policy")
+class DefenderJitPolicy(DefenderResourceManager, metaclass=QueryMeta):
     class resource_type(TypeInfo):
         doc_groups = ["Security"]
 
@@ -239,49 +237,3 @@ class DefenderJitPolicies(DefenderResourceManager, metaclass=QueryMeta):
         enum_spec = ("jit_network_access_policies", "list", None)
         resource_type = "Microsoft.Security/jitNetworkAccessPolicies"
         default_report_fields = ["id", "name"]
-
-
-@DefenderJitPolicies.filter_registry.register('defender-jit-policies-filter')
-class DefenderJitPoliciesFilter(ValueFilter):
-    """Filters resources by just-in-time network access policy. It filters resource in
-    security-jit-policies resource with jmespath and searches all incoming results by
-    value filter schema
-
-    :example:
-
-    .. code-block:: yaml
-
-        policies:
-          - name: test
-            resource: azure.defender-jit-policies
-            filters:
-              - type: defender-jit-policies-filter
-                key: properties.virtualMachines[].ports[].number
-                op: eq
-                value: 22
-              - type: value
-                key: properties.provisioningState
-                op: eq
-                value: Succeeded
-
-    """
-    schema = type_schema(
-        'defender-jit-policies-filter', rinherit=ValueFilter.schema)
-
-    def _perform_op(self, a, b):
-        op = OPERATORS[self.data.get('op', 'eq')]
-        return op(a, b)
-
-    def process(self, resources, event=None):
-        self.value = self.data['value']
-        return list(filter(self._is_valid_resource, resources))
-
-    def _is_valid_resource(self, resource):
-        jmespath_key = jmespath.search(self.data['key'], resource)
-        if jmespath_key and not isinstance(jmespath_key, list):
-            jmespath_key = [jmespath_key]
-        for data in jmespath_key:
-            if self._perform_op(data, self.value):
-                return True
-
-        return False
