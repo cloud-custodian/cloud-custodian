@@ -48,6 +48,7 @@ ResourceMap = {
     "azure.keyvault-keys": "c7n_azure.resources.key_vault_keys.KeyVaultKeys",
     "azure.loadbalancer": "c7n_azure.resources.load_balancer.LoadBalancer",
     "azure.logic-app-workflow": "c7n_azure.resources.logic_app.LogicAppWorkflow",
+    "azure.machine-learning-workspace": "c7n_azure.resources.machine_learning_workspace.MachineLearningWorkspace", # noqa
     "azure.mariadb": "c7n_azure.resources.mariadb.MariaDB",
     "azure.monitor-log-profile": "c7n_azure.resources.monitor_logprofile.MonitorLogprofile",
     "azure.mariadb-server": "c7n_azure.resources.mariadb_server.MariaDBServer",
