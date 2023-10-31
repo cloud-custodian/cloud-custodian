@@ -13,6 +13,7 @@ from pytest_terraform import terraform
 import datetime
 from dateutil import parser, tz
 import json
+import logging
 import time
 from unittest import mock
 
@@ -582,6 +583,54 @@ class AccountTests(BaseTest):
             {"DB instances"},
         )
         self.assertEqual(len(resources[0]["c7n:ServiceLimitsExceeded"]), 1)
+
+    def test_service_limit_specific_check_handles_exception(self):
+        session_factory = self.replay_flight_data("test_account_service_limit_exception")
+        p = self.load_policy(
+            {
+                "name": "service-limit",
+                "resource": "account",
+                "filters": [
+                    {
+                        "type": "service-limit",
+                        "names": ["RDS DB Instances"],
+                        "threshold": 1.0,
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        # use this to prevent attempts at refreshing check
+        with mock_datetime_now(parser.parse("2017-02-23T00:40:00+00:00"), datetime) and \
+         self.capture_logging(level=logging.WARNING) as log_output:
+            resources = p.run()
+            self.assertEqual(0, len(resources))
+            self.assertRegexpMatches(log_output.getvalue(), r"InvalidParameterValueException")
+
+
+    def test_service_limit_specific_check_handles_exception_on_date_refresh(self):
+        session_factory = self.replay_flight_data(
+            "test_account_service_limit_date_refresh_exception")
+        p = self.load_policy(
+            {
+                "name": "service-limit",
+                "resource": "account",
+                "filters": [
+                    {
+                        "type": "service-limit",
+                        "names": ["RDS DB Instances"],
+                        "threshold": 1.0,
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        # use this to prevent attempts at refreshing check
+        with mock_datetime_now(parser.parse("2017-02-23T00:40:00+00:00"), datetime) and \
+         self.capture_logging(level=logging.WARNING) as log_output:
+            resources = p.run()
+            self.assertEqual(0, len(resources))
+            self.assertRegexpMatches(log_output.getvalue(), r"InvalidParameterValueException")
 
     def test_service_limit_specific_service(self):
         session_factory = self.replay_flight_data("test_account_service_limit_specific_service")
