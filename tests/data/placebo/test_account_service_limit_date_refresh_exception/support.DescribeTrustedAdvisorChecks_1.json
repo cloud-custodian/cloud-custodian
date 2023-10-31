@@ -1,0 +1,77 @@
+{
+  "status_code": 200,
+  "data": {
+    "checks": [
+      {
+        "id": "XG0aXHpIEt",
+        "name": "RDS DB Instances",
+        "description": "Checks for usage that is more than 80% of the RDS DB Instances Limit. Values are based on a snapshot, so your current usage might differ. Limit and usage data can take up to 24 hours to reflect any changes. In cases where limits have been recently increased, you may temporarily see utilization that exceeds the limit.<br>\n<br>\n<b>Alert Criteria</b><br>\nYellow: 80% of limit reached.<br>\nRed: 100% of limit reached.<br>\nBlue: Trusted Advisor was unable to retrieve utilization or limits in one or more regions.<br>\n<br>\n<b>Recommended Action</b><br>\nIf you anticipate exceeding a service limit, open a case in Support Center to <a href=\"https://aws.amazon.com/support/createCase?type=service_limit_increase\" target=\"_blank\">request a limit increase</a>.<br>\n<br>\n<b>Additional Resources</b><br>\n<a href=\"https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_Limits.html\" target=\"_blank\">RDS Limits</a>",
+        "category": "service_limits",
+        "metadata": [
+          "Region",
+          "Service",
+          "Limit Name",
+          "Limit Amount",
+          "Current Usage",
+          "Status"
+        ]
+      },
+      {
+        "id": "dBkuNCvqn5",
+        "name": "RDS Max Auths per Security Group",
+        "description": "Checks for usage that is more than 80% of the RDS Max Auths per Security Group Limit. Values are based on a snapshot, so your current usage might differ. Limit and usage data can take up to 24 hours to reflect any changes. In cases where limits have been recently increased, you may temporarily see utilization that exceeds the limit.<br>\n<br>\n<b>Alert Criteria</b><br>\nYellow: 80% of limit reached.<br>\nRed: 100% of limit reached.<br>\nBlue: Trusted Advisor was unable to retrieve utilization or limits in one or more regions.<br>\n<br>\n<b>Recommended Action</b><br>\nIf you anticipate exceeding a service limit, open a case in Support Center to <a href=\"https://aws.amazon.com/support/createCase?type=service_limit_increase\" target=\"_blank\">request a limit increase</a>.<br>\n<br>\n<b>Additional Resources</b><br>\n<a href=\"https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_Limits.html\" target=\"_blank\">RDS Limits</a>",
+        "category": "service_limits",
+        "metadata": [
+          "Region",
+          "Service",
+          "Limit Name",
+          "Limit Amount",
+          "Current Usage",
+          "Status"
+        ]
+      },
+      {
+        "id": "wH7DD0l3J9",
+        "name": "EBS Throughput Optimized HDD (st1) Volume Storage",
+        "description": "Checks for usage that is more than 80% of the EBS Throughput Optimized HDD (st1) Volume Storage Limit. Values are based on a snapshot, so your current usage might differ. Limit and usage data can take up to 24 hours to reflect any changes. In cases where limits have been recently increased, you may temporarily see utilization that exceeds the limit.<br>\n<br>\n<b>Alert Criteria</b><br>\nYellow: 80% of limit reached.<br>\nRed: 100% of limit reached.<br>\nBlue: Trusted Advisor was unable to retrieve utilization or limits in one or more regions.<br>\n<br>\n<b>Recommended Action</b><br>\nIf you anticipate exceeding a service limit, open a case in Support Center to <a href=\"https://aws.amazon.com/support/createCase?type=service_limit_increase\" target=\"_blank\">request a limit increase</a>.<br>\n<br>\n<b>Additional Resources</b><br>\n<a href=\"https://docs.aws.amazon.com/general/latest/gr/aws_service_limits.html#limits_ebs\" target=\"_blank\">EBS Limits</a>",
+        "category": "service_limits",
+        "metadata": [
+          "Region",
+          "Service",
+          "Limit Name",
+          "Limit Amount",
+          "Current Usage",
+          "Status"
+        ]
+      },
+      {
+        "id": "gH5CC0e3J9",
+        "name": "EBS Cold HDD (sc1) Volume Storage",
+        "description": "Checks for usage that is more than 80% of the EBS Cold HDD (sc1) Volume Storage Limit. Values are based on a snapshot, so your current usage might differ. Limit and usage data can take up to 24 hours to reflect any changes. In cases where limits have been recently increased, you may temporarily see utilization that exceeds the limit.<br>\n<br>\n<b>Alert Criteria</b><br>\nYellow: 80% of limit reached.<br>\nRed: 100% of limit reached.<br>\nBlue: Trusted Advisor was unable to retrieve utilization or limits in one or more regions.<br>\n<br>\n<b>Recommended Action</b><br>\nIf you anticipate exceeding a service limit, open a case in Support Center to <a href=\"https://aws.amazon.com/support/createCase?type=service_limit_increase\" target=\"_blank\">request a limit increase</a>.<br>\n<br>\n<b>Additional Resources</b><br>\n<a href=\"https://docs.aws.amazon.com/general/latest/gr/aws_service_limits.html#limits_ebs\" target=\"_blank\">EBS Limits</a>",
+        "category": "service_limits",
+        "metadata": [
+          "Region",
+          "Service",
+          "Limit Name",
+          "Limit Amount",
+          "Current Usage",
+          "Status"
+        ]
+      },
+      {
+        "id": "TyfdMXG69d",
+        "name": "ENA Driver Version for EC2 Windows Instances",
+        "description": "Checks the version of the ENA driver for Amazon EC2 Windows instances, and then alerts you if the driver (a) is deprecated and no longer supported; (b) is deprecated with identified issues; or (c) has an available upgrade. Using the latest version of the AWS ENA driver for Windows optimizes ENA driver performance and minimizes runtime issues and security risks. <b>Note:</b> Results for this check are automatically refreshed several times daily, and refresh requests are not allowed. It might take a few hours for changes to appear.<br/> \n<b>Note:</b> This check displays information for EC2 instances in the following Regions: N. Virginia (us-east-1), N. California (us-west-1), Oregon (us-west-2), Ireland (eu-west-1), Sao Paolo (sa-east-1), Tokyo (ap-northeast-1), Singapore (ap-southeast-1), and Sydney (ap-southeast-2).<br/>\n<br/>\n<b>Alert Criteria:</b><br/>\nYellow: ENA driver upgrade available. <br/>\nRed: ENA driver version deprecated - known issues deprecated or driver no longer supported.<br/>\n<br/>\n<b>Recommended Actions:</b><br/>\nUpgrade to the latest AWS ENA driver available for Windows to optimize performance and minimize runtime issues and security risks. <br/>\n<br/>\n<b>Additional Resources:</b><br/>\n<a href=\"https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/enhanced-networking-ena.html\" target=\"blank\">Elastic Network Adapter</a><br/>\n",
+        "category": "fault_tolerance",
+        "metadata": [
+          "Status",
+          "Region",
+          "Timestamp",
+          "Instance ID",
+          "Driver Status"
+        ]
+      }
+    ],
+    "ResponseMetadata": {}
+  }
+}
