@@ -383,3 +383,76 @@ class WorkspacesTest(BaseTest):
         cp = client.describe_client_properties(ResourceIds=['d-90675153fc'])
         self.assertEqual({'ReconnectEnabled': 'DISABLED'}, cp.get(
             'ClientPropertiesList')[0].get('ClientProperties'))
+
+class TestWorkspacesWeb(BaseTest):
+
+    def test_workspaces_web_tag(self):
+        session_factory = self.replay_flight_data('test_workspaces_web_tag')
+        p = self.load_policy(
+            {
+                'name': 'test-workspaces-web-tag',
+                'resource': 'workspaces-web',
+                'filters': [
+                    {
+                        'tag:foo': 'absent',
+                    }
+                ],
+                'actions': [
+                    {
+                        'type': 'tag',
+                        'tags': {'foo': 'bar'}
+                    }
+                ]
+            }, session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = session_factory().client('workspaces-web')
+        tags = client.list_tags_for_resource(resourceArn=resources[0]["portalArn"])['tags']
+        self.assertEqual(len(tags), 1)
+        self.assertEqual(tags, [{'Key': 'foo', 'Value': 'bar'}])
+
+
+    def test_workspaces_web_remove_tag(self):
+        session_factory = self.replay_flight_data('test_workspaces_web_remove_tag')
+        p = self.load_policy(
+            {
+                'name': 'test-workspaces-web-remove-tag',
+                'resource': 'workspaces-web',
+                'filters': [
+                    {
+                        'tag:foo': 'present',
+                    }
+                ],
+                'actions': [
+                    {
+                        'type': 'remove-tag',
+                        'tags': ['foo']
+                    }
+                ]
+            }, session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = session_factory().client('workspaces-web')
+        tags = client.list_tags_for_resource(resourceArn=resources[0]['portalArn'])['tags']
+        self.assertEqual(len(tags), 0)
+
+    def test_workspaces_web_delete(self):
+        session_factory = self.replay_flight_data('test_workspaces_web_delete')
+        p = self.load_policy(
+            {
+                'name': 'test-workspaces-web-delete',
+                'resource': 'workspaces-web',
+                'filters': [{'displayName': 'test'}],
+                'actions': [{'type': 'delete'}]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = session_factory().client('workspaces-web')
+        if self.recording:
+            time.sleep(5)
+        portals = client.list_portals()['portals']
+        self.assertEqual(len(portals), 0)
