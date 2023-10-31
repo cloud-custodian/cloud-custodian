@@ -64,11 +64,11 @@ resource "aws_security_group" "public" {
   vpc_id = aws_vpc.this.id
 
   ingress {
-    description      = "public"
-    from_port        = 0
-    to_port          = 0
-    protocol         = "all"
-    cidr_blocks      = [_block]
+    description = "public"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "all"
+    cidr_blocks = [_block]
   }
 }
 
