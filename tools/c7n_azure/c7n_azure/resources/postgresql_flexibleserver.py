@@ -5,11 +5,8 @@ from c7n.utils import type_schema
 from c7n_azure.provider import resources
 from c7n_azure.resources.arm import ArmResourceManager
 from c7n_azure.actions.base import AzureBaseAction
-from netaddr import IPRange, IPSet
 from azure.mgmt.rdbms import postgresql_flexibleservers
 from azure.mgmt.rdbms.postgresql_flexibleservers import PostgreSQLManagementClient
-
-AZURE_SERVICES = IPRange('0.0.0.0', '0.0.0.0')  # nosec
 
 
 @resources.register('postgresql-flexible-server')
