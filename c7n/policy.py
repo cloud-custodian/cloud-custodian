@@ -420,8 +420,8 @@ class LambdaMode(ServerlessExecutionMode):
                 "Custodian Lambda policies have a max length with prefix of %s"
                 " policy:%s prefix:%s" % (
                     MAX_LAMBDA_FUNCTION_NAME_LENGTH,
-                    prefix,
-                    self.policy.name
+                    self.policy.name,
+                    prefix
                 )
             )
         MAX_LAMBDA_FUNCTION_DESCRIPTION_LENGTH = 256
