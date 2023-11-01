@@ -137,6 +137,7 @@ ResourceMap = {
   "aws.iam-user": "c7n.resources.iam.User",
   "aws.identity-pool": "c7n.resources.cognito.CognitoIdentityPool",
   "aws.insight-rule": "c7n.resources.cw.InsightRule",
+  "aws.inspector2-finding": "c7n.resources.inspector2.Inspector2Finding",
   "aws.internet-gateway": "c7n.resources.vpc.InternetGateway",
   "aws.iot": "c7n.resources.iot.IoT",
   "aws.kafka": "c7n.resources.kafka.Kafka",
@@ -165,6 +166,7 @@ ResourceMap = {
   "aws.nat-gateway": "c7n.resources.vpc.NATGateway",
   "aws.network-acl": "c7n.resources.vpc.NetworkAcl",
   "aws.network-addr": "c7n.resources.vpc.NetworkAddress",
+  "aws.opensearch-serverless": "c7n.resources.opensearch.OpensearchServerless",
   "aws.ops-item": "c7n.resources.ssm.OpsItem",
   "aws.opswork-cm": "c7n.resources.opsworks.OpsworksCM",
   "aws.opswork-stack": "c7n.resources.opsworks.OpsworkStack",
@@ -258,6 +260,7 @@ ResourceMap = {
   "aws.workspaces": "c7n.resources.workspaces.Workspace",
   "aws.workspaces-directory": "c7n.resources.workspaces.WorkspaceDirectory",
   "aws.workspaces-image": "c7n.resources.workspaces.WorkspaceImage",
+  "aws.workspaces-web": "c7n.resources.workspace.WorkspacesWeb",
   "aws.xray-group": "c7n.resources.xray.XRayGroup",
   "aws.xray-rule": "c7n.resources.xray.XRaySamplingRule"
 }

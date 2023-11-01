@@ -13,6 +13,7 @@ from pytest_terraform import terraform
 import datetime
 from dateutil import parser, tz
 import json
+import logging
 import time
 from unittest import mock
 
@@ -398,6 +399,98 @@ class AccountTests(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 0)
 
+    def test_cloudtrail_success_regex_log_metric_filter(self):
+        session_factory = self.replay_flight_data("test_cloudtrail_success_regex_log_metric_filter")
+        pdata = {
+            'name': 'success-regex-log-metric-filter',
+            'resource': 'account',
+            'filters': [
+                {
+                    'type': 'check-cloudtrail',
+                    'log-metric-filter-pattern':
+                        {
+                            'type': 'value',
+                            'op': 'regex',
+                            'value': '\\{ ?(\\()? ?\\$\\.eventName ?= ?(")?ConsoleLogin(")? '
+                                     '?(\\))? ?&& ?(\\()? ?\\$\\.errorMessage ?= '
+                                     '?(")?Failed authentication(")? ?(\\))? ?\\}'
+                        }
+                },
+            ],
+            }
+        p = self.load_policy(
+            pdata,
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+        logs_client = local_session(session_factory).client("logs")
+        logs_metrics = logs_client.describe_metric_filters(logGroupName='test_log_group')
+        self.assertRegexpMatches(logs_metrics['metricFilters'][0]['filterPattern'],
+                                 pdata['filters'][0]['log-metric-filter-pattern']['value'])
+
+    def test_cloudtrail_fail_regex_log_metric_filter(self):
+        session_factory = self.replay_flight_data("test_cloudtrail_fail_regex_log_metric_filter")
+        pdata = {
+            'name': 'success-regex-log-metric-filter',
+            'resource': 'account',
+            'filters': [
+                {
+                    'type': 'check-cloudtrail',
+                    'log-metric-filter-pattern':
+                        '\\{ ?(\\()? ?\\$\\.eventName ?= ?(")?ConsoleLogin(")? ?(\\))? ?&& ?'
+                        '(\\()? ?\\$\\.errorMessage ?= ?(")?Failed authentication(")? ?(\\))? ?\\}'
+                },
+            ],
+            }
+        p = self.load_policy(
+            pdata,
+            session_factory=session_factory
+        )
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        logs_client = local_session(session_factory).client("logs")
+        logs_metrics = logs_client.describe_metric_filters(logGroupName='test_log_group')
+        self.assertNotRegexpMatches(logs_metrics['metricFilters'][0]['filterPattern'],
+                                    pdata['filters'][0]['log-metric-filter-pattern'])
+
+    def test_cloudtrail_success_management_advanced_events_included(self):
+        session_factory = self.replay_flight_data\
+            ("test_cloudtrail_success_management_advanced_events_included")
+        p = self.load_policy(
+            {
+                "name": "trail-management-advanced-events-included",
+                "resource": "account",
+                "filters": [{
+                    "type": "check-cloudtrail",
+                    'include-management-events': True
+                }],
+            },
+            session_factory=session_factory,
+        )
+
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
+    def test_cloudtrail_fail_management_advanced_events_included(self):
+        session_factory = self.replay_flight_data\
+            ("test_cloudtrail_fail_management_advanced_events_included")
+        p = self.load_policy(
+            {
+                "name": "trail-management-advanced-events-included",
+                "resource": "account",
+                "filters": [{
+                    "type": "check-cloudtrail",
+                    'include-management-events': True
+                }],
+            },
+            session_factory=session_factory,
+        )
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
     def test_config_enabled(self):
         session_factory = self.replay_flight_data("test_account_config")
         p = self.load_policy(
@@ -490,6 +583,54 @@ class AccountTests(BaseTest):
             {"DB instances"},
         )
         self.assertEqual(len(resources[0]["c7n:ServiceLimitsExceeded"]), 1)
+
+    def test_service_limit_specific_check_handles_exception(self):
+        session_factory = self.replay_flight_data("test_account_service_limit_exception")
+        p = self.load_policy(
+            {
+                "name": "service-limit",
+                "resource": "account",
+                "filters": [
+                    {
+                        "type": "service-limit",
+                        "names": ["RDS DB Instances"],
+                        "threshold": 1.0,
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        # use this to prevent attempts at refreshing check
+        with mock_datetime_now(parser.parse("2017-02-23T00:40:00+00:00"), datetime) and \
+         self.capture_logging(level=logging.WARNING) as log_output:
+            resources = p.run()
+            self.assertEqual(0, len(resources))
+            self.assertRegexpMatches(log_output.getvalue(), r"InvalidParameterValueException")
+
+
+    def test_service_limit_specific_check_handles_exception_on_date_refresh(self):
+        session_factory = self.replay_flight_data(
+            "test_account_service_limit_date_refresh_exception")
+        p = self.load_policy(
+            {
+                "name": "service-limit",
+                "resource": "account",
+                "filters": [
+                    {
+                        "type": "service-limit",
+                        "names": ["RDS DB Instances"],
+                        "threshold": 1.0,
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        # use this to prevent attempts at refreshing check
+        with mock_datetime_now(parser.parse("2017-02-23T00:40:00+00:00"), datetime) and \
+         self.capture_logging(level=logging.WARNING) as log_output:
+            resources = p.run()
+            self.assertEqual(0, len(resources))
+            self.assertRegexpMatches(log_output.getvalue(), r"InvalidParameterValueException")
 
     def test_service_limit_specific_service(self):
         session_factory = self.replay_flight_data("test_account_service_limit_specific_service")

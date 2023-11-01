@@ -1,5 +1,6 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+import logging
 import time
 from .common import BaseTest, functional, event_data, load_data
 from unittest.mock import MagicMock
@@ -63,6 +64,40 @@ def test_ec2_igw_subnet(test, ec2_igw_subnet):
         ec2_igw_subnet['aws_instance.public_auto_assigned.id'],
         ec2_igw_subnet['aws_instance.public_primary_interface.id'],
         ec2_igw_subnet['aws_instance.public_secondary_interface.id'],
+    }
+    assert len(resources) == len(expected_instance_ids)
+    assert expected_instance_ids == result_instance_ids
+
+
+@terraform('ec2_security_group_filter_multi_enis')
+def test_ec2_security_group_filter_multi_enis(test, ec2_security_group_filter_multi_enis):
+    aws_region = 'us-east-1'
+    session_factory = test.replay_flight_data(
+        'ec2_security_group_filter_multi_enis', region=aws_region)
+
+    p = test.load_policy(
+        {
+            'name': 'ec2_security_group_filter_multi_enis',
+            'resource': 'ec2',
+            'filters': [
+                {
+                    'type': 'security-group',
+                    'key': 'length(IpPermissions[]|[?IpRanges[?CidrIp==`0.0.0.0/0`]])',
+                    'op': 'greater-than',
+                    'value': 0,
+                },
+            ],
+        },
+        session_factory=session_factory,
+        config={'region': aws_region},
+    )
+
+    resources = p.run()
+
+    result_instance_ids = set(i['InstanceId'] for i in resources)
+    expected_instance_ids = {
+        ec2_security_group_filter_multi_enis['aws_instance.primary_interface.id'],
+        ec2_security_group_filter_multi_enis['aws_instance.secondary_interface.id'],
     }
     assert len(resources) == len(expected_instance_ids)
     assert expected_instance_ids == result_instance_ids
@@ -3182,6 +3217,26 @@ class InternetGatewayTest(BaseTest):
         except BotoClientError:
             self.fail('should not raise')
         mock_factory().client('ec2').delete_internet_gateway.assert_called_once()
+
+    def test_delete_internet_gateway_with_dependencies(self):
+        factory = self.replay_flight_data(
+            "test_internet_gateway_delete_with_dependencies",
+            region="us-east-2"
+        )
+        p = self.load_policy(
+            {
+                "name": "delete-internet-gateway-with-dependencies",
+                "resource": "internet-gateway",
+                "filters": [{"tag:Name": "dev"}],
+                "actions": [{"type": "delete"}],
+            },
+            session_factory=factory,
+            config={"region": "us-east-2"},
+        )
+        with self.capture_logging("custodian.actions", level=logging.WARNING) as log_output:
+            resources = p.run()
+            self.assertEqual(len(resources), 1)
+            self.assertRegexpMatches(log_output.getvalue(), "DependencyViolation error")
 
 
 class NATGatewayTest(BaseTest):

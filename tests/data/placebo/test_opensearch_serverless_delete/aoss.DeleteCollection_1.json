@@ -1,0 +1,11 @@
+{
+    "status_code": 200,
+    "data": {
+        "deleteCollectionDetail": {
+            "id": "6ot2t518av2khgxr73sf",
+            "name": "c7n-test",
+            "status": "DELETING"
+        },
+        "ResponseMetadata": {}
+    }
+}
