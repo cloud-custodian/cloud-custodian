@@ -7,7 +7,7 @@ from c7n_gcp.query import (QueryResourceManager, TypeInfo, ChildTypeInfo,
                            ChildResourceManager)
 from c7n.utils import type_schema, local_session
 from c7n_gcp.actions import MethodAction
-from c7n_gcp.utils import get_firewall_port_ranges
+from c7n_gcp.utils import get_firewall_ranges
 
 from c7n.filters import ValueFilter
 
@@ -110,18 +110,10 @@ class EffectiveFirewall(ValueFilter):
 
     def get_firewalls(self, client, p, r):
         if self.annotation_key not in r:
-            fwalls = client.execute_command('getEffectiveFirewalls',
-                    verb_arguments = {'project': p, 'network': r['network']}).get('firewalls', [])
+            firewalls = client.execute_command('getEffectiveFirewalls',
+                verb_arguments = {'project': p, 'network': r['network']}).get('firewalls', [])
 
-            for firewall_index, firewall in enumerate(fwalls):
-                action = "allowed" if "allowed" in firewall else "denied"
-                for protocol_index, protocol in enumerate(firewall[action]):
-                    if "ports" in protocol:
-                        protocol['portRanges'] = get_firewall_port_ranges(protocol['ports'])
-                        firewall[action][protocol_index] = protocol
-                fwalls[firewall_index] = firewall
-
-            r[self.annotation_key] = fwalls
+            r[self.annotation_key] = get_firewall_ranges(firewalls)
         return super(EffectiveFirewall, self).process(r[self.annotation_key], None)
 
     def process(self, resources, event=None):

@@ -8,7 +8,7 @@ from c7n_gcp.query import QueryResourceManager, TypeInfo
 from c7n_gcp.provider import resources
 from c7n.filters.core import ListItemFilter
 from c7n.utils import type_schema, local_session
-from c7n_gcp.utils import get_firewall_port_ranges
+from c7n_gcp.utils import get_firewall_ranges
 
 
 @resources.register('vpc')
@@ -174,14 +174,7 @@ class Firewall(QueryResourceManager):
     def augment(self, resources):
         if not resources:
             return []
-        for r_index, r in enumerate(resources):
-            action = "allowed" if "allowed" in r else "denied"
-            for protocol_index, protocol in enumerate(r[action]):
-                if "ports" in protocol:
-                    protocol['portRanges']=get_firewall_port_ranges(protocol['ports'])
-                    r[action][protocol_index] = protocol
-            resources[r_index] = r
-        return resources
+        return get_firewall_ranges(resources)
 
 @Firewall.action_registry.register('delete')
 class DeleteFirewall(MethodAction):
