@@ -225,7 +225,7 @@ class DeleteTable(BaseAction):
     valid_status = ('ACTIVE',)
     schema = type_schema('delete',
         force={'type': 'boolean', 'default': False})
-    permissions = ("dynamodb:DeleteTable",)
+    permissions = ("dynamodb:UpdateTable", "dynamodb:DeleteTable",)
 
     def delete_table(self, client, table_set):
         if self.data.get('force', False):
