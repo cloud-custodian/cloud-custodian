@@ -69,6 +69,40 @@ def test_ec2_igw_subnet(test, ec2_igw_subnet):
     assert expected_instance_ids == result_instance_ids
 
 
+@terraform('ec2_security_group_filter_multi_enis')
+def test_ec2_security_group_filter_multi_enis(test, ec2_security_group_filter_multi_enis):
+    aws_region = 'us-east-1'
+    session_factory = test.replay_flight_data(
+        'ec2_security_group_filter_multi_enis', region=aws_region)
+
+    p = test.load_policy(
+        {
+            'name': 'ec2_security_group_filter_multi_enis',
+            'resource': 'ec2',
+            'filters': [
+                {
+                    'type': 'security-group',
+                    'key': 'length(IpPermissions[]|[?IpRanges[?CidrIp==`0.0.0.0/0`]])',
+                    'op': 'greater-than',
+                    'value': 0,
+                },
+            ],
+        },
+        session_factory=session_factory,
+        config={'region': aws_region},
+    )
+
+    resources = p.run()
+
+    result_instance_ids = set(i['InstanceId'] for i in resources)
+    expected_instance_ids = {
+        ec2_security_group_filter_multi_enis['aws_instance.primary_interface.id'],
+        ec2_security_group_filter_multi_enis['aws_instance.secondary_interface.id'],
+    }
+    assert len(resources) == len(expected_instance_ids)
+    assert expected_instance_ids == result_instance_ids
+
+
 def test_vpc_usage(test):
     factory = test.replay_flight_data(
         'test_vpc_usage_detect_set', region='us-west-1')
