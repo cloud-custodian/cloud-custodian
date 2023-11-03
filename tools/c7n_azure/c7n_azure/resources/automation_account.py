@@ -34,7 +34,7 @@ class AutomationAccount(ArmResourceManager):
         resource_type = 'Microsoft.Automation/automationAccounts'
 
 
-@AutomationAccount.filter_registry.register('variable-value')
+@AutomationAccount.filter_registry.register('variable')
 class VariableValueFilter(ValueFilter):
     """Azure Variable Value Filter
 
@@ -49,12 +49,12 @@ class VariableValueFilter(ValueFilter):
           - name: automation-account
             resource: azure.automation-account
             filters:
-              - type: variable-value
+              - type: variable
                 key: is_encrypted
                 op: eq
                 value: False
     """
-    schema = type_schema('variable-value', rinherit=ValueFilter.schema)
+    schema = type_schema('variable', rinherit=ValueFilter.schema)
 
     def _op(self, a, b):
         op = OPERATORS[self.data.get('op')]

@@ -39,7 +39,7 @@ class TestAutomationAccountFilter(BaseTest):
                 "resource": "azure.automation-account",
                 "filters": [
                     {
-                        "type": "variable-value",
+                        "type": "variable",
                         "key": "is_encrypted",
                         "op": "eq",
                         "value": False,
@@ -55,11 +55,11 @@ class TestAutomationAccountFilter(BaseTest):
     def test_schema_validate(self):
         with self.sign_out_patch():
             p = self.load_policy({
-                "name": "test-variable-value-filter",
+                "name": "test-variable-filter",
                 "resource": "azure.automation-account",
                 "filters": [
                     {
-                        "type": "variable-value",
+                        "type": "variable",
                         "key": "is_encrypted",
                         "op": "eq",
                         "value": False,
