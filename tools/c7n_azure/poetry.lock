@@ -679,19 +679,19 @@ msrest = ">=0.5.0"
 
 [[package]]
 name = "azure-mgmt-eventhub"
-version = "8.0.0"
-description = "Microsoft Azure EventHub Management Client Library for Python"
+version = "11.0.0"
+description = "Microsoft Azure Event Hub Management Client Library for Python"
 optional = false
-python-versions = "*"
+python-versions = ">=3.7"
 files = [
-    {file = "azure-mgmt-eventhub-8.0.0.zip", hash = "sha256:ae02b1e3ccbb9ec45849de544dea4d8ef36ea767707207d055ae2b4f756c0d79"},
-    {file = "azure_mgmt_eventhub-8.0.0-py2.py3-none-any.whl", hash = "sha256:ce46f5e583e0222a394a50cea804c819b8199d45a56a3010d0f8cd4613fc45c3"},
+    {file = "azure-mgmt-eventhub-11.0.0.zip", hash = "sha256:17107d4e85dde8f675794acc58302d6ce98a7254ee03f41d3fbd96b06ef36b96"},
+    {file = "azure_mgmt_eventhub-11.0.0-py3-none-any.whl", hash = "sha256:e8db29d76c6ebc914af225bc409b2be1184989b96877f6d9ac5efe3f09feb083"},
 ]
 
 [package.dependencies]
 azure-common = ">=1.1,<2.0"
-azure-mgmt-core = ">=1.2.0,<2.0.0"
-msrest = ">=0.5.0"
+azure-mgmt-core = ">=1.3.2,<2.0.0"
+isodate = ">=0.6.1,<1.0.0"
 
 [[package]]
 name = "azure-mgmt-frontdoor"
@@ -2592,4 +2592,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "992d7ee08bbde74438e1b8cd13bb7dbb237d5d16ba5fb3391cd4e9079e83c7f0"
+content-hash = "c39c38fa6a0aebe6e667f60b6c6c31797c319fa9dfe50f2df13d60b7ca7ffc76"
