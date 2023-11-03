@@ -1,0 +1,91 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Network/ApplicationGatewayWebApplicationFirewallPolicies?api-version=2020-08-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Thu, 18 May 2023 16:57:15 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "x-ms-original-request-ids": [
+                        "0cdd2159-b91e-4d6a-9ff3-a6a210bbd5d0",
+                        "c28af411-0587-4615-ba87-89383b761579"
+                    ],
+                    "content-length": [
+                        "1853"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "name": "cfb-yxemqwju-waf-policy",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-yxemqwju-test-group/providers/Microsoft.Network/ApplicationGatewayWebApplicationFirewallPolicies/cfb-yxemqwju-waf-policy",
+                                "etag": "W/\"787e1dce-42af-4ac9-bba1-a93df7469e35\"",
+                                "type": "Microsoft.Network/ApplicationGatewayWebApplicationFirewallPolicies",
+                                "location": "centralus",
+                                "tags": {
+                                    "c7n": "true",
+                                    "product_id": "13742",
+                                    "created_by": "abc@def.com"
+                                },
+                                "properties": {
+                                    "provisioningState": "Succeeded",
+                                    "customRules": [],
+                                    "policySettings": {
+                                        "requestBodyCheck": true,
+                                        "maxRequestBodySizeInKb": 128,
+                                        "fileUploadLimitInMb": 100,
+                                        "state": "Disabled",
+                                        "mode": "Detection"
+                                    },
+                                    "managedRules": {
+                                        "managedRuleSets": [
+                                            {
+                                                "ruleSetType": "OWASP",
+                                                "ruleSetVersion": "3.2",
+                                                "ruleGroupOverrides": [
+                                                    {
+                                                        "ruleGroupName": "REQUEST-944-APPLICATION-ATTACK-JAVA",
+                                                        "rules": [
+                                                            {
+                                                                "ruleId": "944240",
+                                                                "state": "Disabled"
+                                                            }
+                                                        ]
+                                                    }
+                                                ]
+                                            }
+                                        ],
+                                        "exclusions": []
+                                    },
+                                    "applicationGateways": [
+                                        {
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-yxemqwju-test-group/providers/Microsoft.Network/applicationGateways/cfb-yxemqwju-app-gateway-2"
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}
