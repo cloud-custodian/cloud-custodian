@@ -23,6 +23,7 @@ class AppConfiguration(ArmResourceManager):
 
     """
     class resource_type(ArmResourceManager.resource_type):
+        doc_groups = ['Integration']
 
         service = 'azure.mgmt.appconfiguration'
         client = 'AppConfigurationManagementClient'
