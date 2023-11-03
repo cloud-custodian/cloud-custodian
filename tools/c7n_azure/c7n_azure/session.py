@@ -228,8 +228,6 @@ class Session:
             # 2020-06-01 is not supported, but 2019-11-01 is working as expected.
             if client == 'azure.mgmt.costmanagement.CostManagementClient':
                 client_args['raw_request_hook'] = cost_query_override_api_version
-            elif client == 'azure.mgmt.eventhub.EventHubManagementClient':
-                client_args['api_version'] = '2018-01-01-preview'
 
             if 'subscription_id' in klass_parameters:
                 client_args['subscription_id'] = self.subscription_id
