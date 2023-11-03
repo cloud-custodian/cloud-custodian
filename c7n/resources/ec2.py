@@ -161,7 +161,7 @@ class EC2(query.QueryResourceManager):
 @filters.register('security-group')
 class SecurityGroupFilter(net_filters.SecurityGroupFilter):
 
-    RelatedIdsExpression = "SecurityGroups[].GroupId"
+    RelatedIdsExpression = "NetworkInterfaces[].Groups[].GroupId"
 
 
 @filters.register('subnet')
