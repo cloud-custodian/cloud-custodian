@@ -81,14 +81,17 @@ class WebApplicationFirewallPolicies(ValueFilter):
     schema = type_schema('firewall-policy', rinherit=ValueFilter.schema)
 
     def process(self, resources, event=None):
-        filtered_resources = []
         s = local_session(self.manager.session_factory)
         client = s.client('azure.mgmt.frontdoor.FrontDoorManagementClient')
-        for resource in resources:
-            for policy in client.policies.list(resource_group_name=resource['resourceGroup']):
+
+        group_resources = {}
+        for res in resources:
+            group_resources.setdefault(res['resourceGroup'], []).append(res)
+
+        result = []
+        for group in group_resources:
+            for policy in client.policies.list(resource_group_name=group):
                 pol = jmespath_search(self.data.get('key'), policy.as_dict())  # azure.mgmt.frontdoor.models._models_py3.WebApplicationFirewallPolicy # noqa
                 if pol and op(self.data, pol, self.data.get('value')):
-                    filtered_resources.append(resource)
-                    break
-
-        return filtered_resources
+                    result.extend(group_resources[group])
+        return result
