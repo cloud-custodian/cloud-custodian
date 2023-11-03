@@ -18,7 +18,7 @@ class DataLakeAnalytics(ArmResourceManager):
 
     """
     class resource_type(ArmResourceManager.resource_type):
-        doc_groups = ['Storage']
+        doc_groups = ['Analytics']
 
         service = 'azure.mgmt.datalake.analytics'
         client = 'DataLakeAnalyticsAccountManagementClient'
