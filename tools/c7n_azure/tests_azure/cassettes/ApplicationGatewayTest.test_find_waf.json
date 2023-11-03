@@ -1,0 +1,865 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Network/applicationGateways?api-version=2020-08-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Fri, 07 Jul 2023 20:28:30 GMT"
+                    ],
+                    "x-ms-arm-service-request-id": [
+                        "c3965da2-89f7-4f40-ac69-0f9d6b5af98c"
+                    ],
+                    "content-length": [
+                        "40265"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "name": "cfb-rypimkfr-app-gateway",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-rypimkfr-test-group/providers/Microsoft.Network/applicationGateways/cfb-rypimkfr-app-gateway",
+                                "etag": "W/\"01546f93-453c-4026-93a2-1e1bed1c16d8\"",
+                                "type": "Microsoft.Network/applicationGateways",
+                                "location": "centralus",
+                                "tags": {
+                                    "c7n": "true",
+                                    "product_id": "13742"
+                                },
+                                "properties": {
+                                    "provisioningState": "Succeeded",
+                                    "resourceGuid": "6e8b5020-fd6f-424e-bbc1-58385cec1a1f",
+                                    "sku": {
+                                        "name": "WAF_v2",
+                                        "tier": "WAF_v2",
+                                        "family": "Generation_1",
+                                        "capacity": 2
+                                    },
+                                    "operationalState": "Running",
+                                    "gatewayIPConfigurations": [
+                                        {
+                                            "name": "my-gateway-ip-configuration",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-rypimkfr-test-group/providers/Microsoft.Network/applicationGateways/cfb-rypimkfr-app-gateway/gatewayIPConfigurations/my-gateway-ip-configuration",
+                                            "etag": "W/\"01546f93-453c-4026-93a2-1e1bed1c16d8\"",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "subnet": {
+                                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-rypimkfr-test-group/providers/Microsoft.Network/virtualNetworks/cfb-rypimkfr-vnet/subnets/cfb-rypimkfr-frontend"
+                                                }
+                                            },
+                                            "type": "Microsoft.Network/applicationGateways/gatewayIPConfigurations"
+                                        }
+                                    ],
+                                    "sslCertificates": [],
+                                    "trustedRootCertificates": [],
+                                    "trustedClientCertificates": [],
+                                    "sslProfiles": [],
+                                    "frontendIPConfigurations": [
+                                        {
+                                            "name": "cfb-rypimkfr-vnet-feip",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-rypimkfr-test-group/providers/Microsoft.Network/applicationGateways/cfb-rypimkfr-app-gateway/frontendIPConfigurations/cfb-rypimkfr-vnet-feip",
+                                            "etag": "W/\"01546f93-453c-4026-93a2-1e1bed1c16d8\"",
+                                            "type": "Microsoft.Network/applicationGateways/frontendIPConfigurations",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "privateIPAllocationMethod": "Dynamic",
+                                                "publicIPAddress": {
+                                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-rypimkfr-test-group/providers/Microsoft.Network/publicIPAddresses/cfb-rypimkfr-pip"
+                                                },
+                                                "httpListeners": [
+                                                    {
+                                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-rypimkfr-test-group/providers/Microsoft.Network/applicationGateways/cfb-rypimkfr-app-gateway/httpListeners/cfb-rypimkfr-vnet-httplstn"
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ],
+                                    "frontendPorts": [
+                                        {
+                                            "name": "cfb-rypimkfr-vnet-feport",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-rypimkfr-test-group/providers/Microsoft.Network/applicationGateways/cfb-rypimkfr-app-gateway/frontendPorts/cfb-rypimkfr-vnet-feport",
+                                            "etag": "W/\"01546f93-453c-4026-93a2-1e1bed1c16d8\"",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "port": 80,
+                                                "httpListeners": [
+                                                    {
+                                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-rypimkfr-test-group/providers/Microsoft.Network/applicationGateways/cfb-rypimkfr-app-gateway/httpListeners/cfb-rypimkfr-vnet-httplstn"
+                                                    }
+                                                ]
+                                            },
+                                            "type": "Microsoft.Network/applicationGateways/frontendPorts"
+                                        }
+                                    ],
+                                    "backendAddressPools": [
+                                        {
+                                            "name": "cfb-rypimkfr-vnet-beap",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-rypimkfr-test-group/providers/Microsoft.Network/applicationGateways/cfb-rypimkfr-app-gateway/backendAddressPools/cfb-rypimkfr-vnet-beap",
+                                            "etag": "W/\"01546f93-453c-4026-93a2-1e1bed1c16d8\"",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "backendAddresses": [],
+                                                "requestRoutingRules": [
+                                                    {
+                                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-rypimkfr-test-group/providers/Microsoft.Network/applicationGateways/cfb-rypimkfr-app-gateway/requestRoutingRules/cfb-rypimkfr-vnet-rqrt"
+                                                    }
+                                                ]
+                                            },
+                                            "type": "Microsoft.Network/applicationGateways/backendAddressPools"
+                                        }
+                                    ],
+                                    "loadDistributionPolicies": [],
+                                    "backendHttpSettingsCollection": [
+                                        {
+                                            "name": "cfb-rypimkfr-vnet-be-htst",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-rypimkfr-test-group/providers/Microsoft.Network/applicationGateways/cfb-rypimkfr-app-gateway/backendHttpSettingsCollection/cfb-rypimkfr-vnet-be-htst",
+                                            "etag": "W/\"01546f93-453c-4026-93a2-1e1bed1c16d8\"",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "port": 80,
+                                                "protocol": "Http",
+                                                "cookieBasedAffinity": "Disabled",
+                                                "pickHostNameFromBackendAddress": false,
+                                                "path": "/path1/",
+                                                "requestTimeout": 60,
+                                                "requestRoutingRules": [
+                                                    {
+                                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-rypimkfr-test-group/providers/Microsoft.Network/applicationGateways/cfb-rypimkfr-app-gateway/requestRoutingRules/cfb-rypimkfr-vnet-rqrt"
+                                                    }
+                                                ]
+                                            },
+                                            "type": "Microsoft.Network/applicationGateways/backendHttpSettingsCollection"
+                                        }
+                                    ],
+                                    "httpListeners": [
+                                        {
+                                            "name": "cfb-rypimkfr-vnet-httplstn",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-rypimkfr-test-group/providers/Microsoft.Network/applicationGateways/cfb-rypimkfr-app-gateway/httpListeners/cfb-rypimkfr-vnet-httplstn",
+                                            "etag": "W/\"01546f93-453c-4026-93a2-1e1bed1c16d8\"",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "frontendIPConfiguration": {
+                                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-rypimkfr-test-group/providers/Microsoft.Network/applicationGateways/cfb-rypimkfr-app-gateway/frontendIPConfigurations/cfb-rypimkfr-vnet-feip"
+                                                },
+                                                "frontendPort": {
+                                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-rypimkfr-test-group/providers/Microsoft.Network/applicationGateways/cfb-rypimkfr-app-gateway/frontendPorts/cfb-rypimkfr-vnet-feport"
+                                                },
+                                                "protocol": "Http",
+                                                "hostNames": [],
+                                                "requireServerNameIndication": false,
+                                                "customErrorConfigurations": [],
+                                                "requestRoutingRules": [
+                                                    {
+                                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-rypimkfr-test-group/providers/Microsoft.Network/applicationGateways/cfb-rypimkfr-app-gateway/requestRoutingRules/cfb-rypimkfr-vnet-rqrt"
+                                                    }
+                                                ]
+                                            },
+                                            "type": "Microsoft.Network/applicationGateways/httpListeners"
+                                        }
+                                    ],
+                                    "urlPathMaps": [],
+                                    "requestRoutingRules": [
+                                        {
+                                            "name": "cfb-rypimkfr-vnet-rqrt",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-rypimkfr-test-group/providers/Microsoft.Network/applicationGateways/cfb-rypimkfr-app-gateway/requestRoutingRules/cfb-rypimkfr-vnet-rqrt",
+                                            "etag": "W/\"01546f93-453c-4026-93a2-1e1bed1c16d8\"",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "ruleType": "Basic",
+                                                "priority": 100,
+                                                "httpListener": {
+                                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-rypimkfr-test-group/providers/Microsoft.Network/applicationGateways/cfb-rypimkfr-app-gateway/httpListeners/cfb-rypimkfr-vnet-httplstn"
+                                                },
+                                                "backendAddressPool": {
+                                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-rypimkfr-test-group/providers/Microsoft.Network/applicationGateways/cfb-rypimkfr-app-gateway/backendAddressPools/cfb-rypimkfr-vnet-beap"
+                                                },
+                                                "backendHttpSettings": {
+                                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-rypimkfr-test-group/providers/Microsoft.Network/applicationGateways/cfb-rypimkfr-app-gateway/backendHttpSettingsCollection/cfb-rypimkfr-vnet-be-htst"
+                                                }
+                                            },
+                                            "type": "Microsoft.Network/applicationGateways/requestRoutingRules"
+                                        }
+                                    ],
+                                    "probes": [],
+                                    "rewriteRuleSets": [],
+                                    "redirectConfigurations": [],
+                                    "privateLinkConfigurations": [],
+                                    "privateEndpointConnections": [],
+                                    "sslPolicy": {
+                                        "policyType": "Predefined",
+                                        "policyName": "AppGwSslPolicy20150501"
+                                    },
+                                    "webApplicationFirewallConfiguration": {
+                                        "enabled": true,
+                                        "firewallMode": "Detection",
+                                        "ruleSetType": "OWASP",
+                                        "ruleSetVersion": "3.2",
+                                        "disabledRuleGroups": [
+                                            {
+                                                "ruleGroupName": "REQUEST-944-APPLICATION-ATTACK-JAVA",
+                                                "rules": [
+                                                    944240,
+                                                    944210
+                                                ]
+                                            }
+                                        ],
+                                        "requestBodyCheck": true,
+                                        "maxRequestBodySizeInKb": 128,
+                                        "fileUploadLimitInMb": 100
+                                    },
+                                    "enableHttp2": false,
+                                    "customErrorConfigurations": []
+                                }
+                            },
+                            {
+                                "name": "cfb-rypimkfr-app-gateway-2",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-rypimkfr-test-group/providers/Microsoft.Network/applicationGateways/cfb-rypimkfr-app-gateway-2",
+                                "etag": "W/\"aa4760f0-0bd6-4eeb-ae5c-2481eeda6123\"",
+                                "type": "Microsoft.Network/applicationGateways",
+                                "location": "centralus",
+                                "tags": {
+                                    "c7n": "true",
+                                    "product_id": "13742"
+                                },
+                                "properties": {
+                                    "provisioningState": "Succeeded",
+                                    "resourceGuid": "7e8e715c-2c05-43d5-b5e3-5a14fdd93ae6",
+                                    "sku": {
+                                        "name": "WAF_v2",
+                                        "tier": "WAF_v2",
+                                        "family": "Generation_1",
+                                        "capacity": 2
+                                    },
+                                    "operationalState": "Running",
+                                    "gatewayIPConfigurations": [
+                                        {
+                                            "name": "my-gateway-ip-configuration",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-rypimkfr-test-group/providers/Microsoft.Network/applicationGateways/cfb-rypimkfr-app-gateway-2/gatewayIPConfigurations/my-gateway-ip-configuration",
+                                            "etag": "W/\"aa4760f0-0bd6-4eeb-ae5c-2481eeda6123\"",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "subnet": {
+                                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-rypimkfr-test-group/providers/Microsoft.Network/virtualNetworks/cfb-rypimkfr-vnet-2/subnets/cfb-rypimkfr-frontend-2"
+                                                }
+                                            },
+                                            "type": "Microsoft.Network/applicationGateways/gatewayIPConfigurations"
+                                        }
+                                    ],
+                                    "sslCertificates": [],
+                                    "trustedRootCertificates": [],
+                                    "trustedClientCertificates": [],
+                                    "sslProfiles": [],
+                                    "frontendIPConfigurations": [
+                                        {
+                                            "name": "cfb-rypimkfr-vnet-2-feip-2",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-rypimkfr-test-group/providers/Microsoft.Network/applicationGateways/cfb-rypimkfr-app-gateway-2/frontendIPConfigurations/cfb-rypimkfr-vnet-2-feip-2",
+                                            "etag": "W/\"aa4760f0-0bd6-4eeb-ae5c-2481eeda6123\"",
+                                            "type": "Microsoft.Network/applicationGateways/frontendIPConfigurations",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "privateIPAllocationMethod": "Dynamic",
+                                                "publicIPAddress": {
+                                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-rypimkfr-test-group/providers/Microsoft.Network/publicIPAddresses/cfb-rypimkfr-pip-2"
+                                                },
+                                                "httpListeners": [
+                                                    {
+                                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-rypimkfr-test-group/providers/Microsoft.Network/applicationGateways/cfb-rypimkfr-app-gateway-2/httpListeners/cfb-rypimkfr-vnet-2-httplstn-2"
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ],
+                                    "frontendPorts": [
+                                        {
+                                            "name": "cfb-rypimkfr-vnet-2-feport-2",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-rypimkfr-test-group/providers/Microsoft.Network/applicationGateways/cfb-rypimkfr-app-gateway-2/frontendPorts/cfb-rypimkfr-vnet-2-feport-2",
+                                            "etag": "W/\"aa4760f0-0bd6-4eeb-ae5c-2481eeda6123\"",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "port": 80,
+                                                "httpListeners": [
+                                                    {
+                                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-rypimkfr-test-group/providers/Microsoft.Network/applicationGateways/cfb-rypimkfr-app-gateway-2/httpListeners/cfb-rypimkfr-vnet-2-httplstn-2"
+                                                    }
+                                                ]
+                                            },
+                                            "type": "Microsoft.Network/applicationGateways/frontendPorts"
+                                        }
+                                    ],
+                                    "backendAddressPools": [
+                                        {
+                                            "name": "cfb-rypimkfr-vnet-2-beap-2",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-rypimkfr-test-group/providers/Microsoft.Network/applicationGateways/cfb-rypimkfr-app-gateway-2/backendAddressPools/cfb-rypimkfr-vnet-2-beap-2",
+                                            "etag": "W/\"aa4760f0-0bd6-4eeb-ae5c-2481eeda6123\"",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "backendAddresses": [],
+                                                "requestRoutingRules": [
+                                                    {
+                                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-rypimkfr-test-group/providers/Microsoft.Network/applicationGateways/cfb-rypimkfr-app-gateway-2/requestRoutingRules/cfb-rypimkfr-vnet-2-rqrt-2"
+                                                    }
+                                                ]
+                                            },
+                                            "type": "Microsoft.Network/applicationGateways/backendAddressPools"
+                                        }
+                                    ],
+                                    "loadDistributionPolicies": [],
+                                    "backendHttpSettingsCollection": [
+                                        {
+                                            "name": "cfb-rypimkfr-vnet-2-be-htst-2",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-rypimkfr-test-group/providers/Microsoft.Network/applicationGateways/cfb-rypimkfr-app-gateway-2/backendHttpSettingsCollection/cfb-rypimkfr-vnet-2-be-htst-2",
+                                            "etag": "W/\"aa4760f0-0bd6-4eeb-ae5c-2481eeda6123\"",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "port": 80,
+                                                "protocol": "Http",
+                                                "cookieBasedAffinity": "Disabled",
+                                                "pickHostNameFromBackendAddress": false,
+                                                "path": "/path1/",
+                                                "requestTimeout": 60,
+                                                "requestRoutingRules": [
+                                                    {
+                                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-rypimkfr-test-group/providers/Microsoft.Network/applicationGateways/cfb-rypimkfr-app-gateway-2/requestRoutingRules/cfb-rypimkfr-vnet-2-rqrt-2"
+                                                    }
+                                                ]
+                                            },
+                                            "type": "Microsoft.Network/applicationGateways/backendHttpSettingsCollection"
+                                        }
+                                    ],
+                                    "httpListeners": [
+                                        {
+                                            "name": "cfb-rypimkfr-vnet-2-httplstn-2",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-rypimkfr-test-group/providers/Microsoft.Network/applicationGateways/cfb-rypimkfr-app-gateway-2/httpListeners/cfb-rypimkfr-vnet-2-httplstn-2",
+                                            "etag": "W/\"aa4760f0-0bd6-4eeb-ae5c-2481eeda6123\"",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "frontendIPConfiguration": {
+                                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-rypimkfr-test-group/providers/Microsoft.Network/applicationGateways/cfb-rypimkfr-app-gateway-2/frontendIPConfigurations/cfb-rypimkfr-vnet-2-feip-2"
+                                                },
+                                                "frontendPort": {
+                                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-rypimkfr-test-group/providers/Microsoft.Network/applicationGateways/cfb-rypimkfr-app-gateway-2/frontendPorts/cfb-rypimkfr-vnet-2-feport-2"
+                                                },
+                                                "protocol": "Http",
+                                                "hostNames": [],
+                                                "requireServerNameIndication": false,
+                                                "customErrorConfigurations": [],
+                                                "requestRoutingRules": [
+                                                    {
+                                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-rypimkfr-test-group/providers/Microsoft.Network/applicationGateways/cfb-rypimkfr-app-gateway-2/requestRoutingRules/cfb-rypimkfr-vnet-2-rqrt-2"
+                                                    }
+                                                ]
+                                            },
+                                            "type": "Microsoft.Network/applicationGateways/httpListeners"
+                                        }
+                                    ],
+                                    "urlPathMaps": [],
+                                    "requestRoutingRules": [
+                                        {
+                                            "name": "cfb-rypimkfr-vnet-2-rqrt-2",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-rypimkfr-test-group/providers/Microsoft.Network/applicationGateways/cfb-rypimkfr-app-gateway-2/requestRoutingRules/cfb-rypimkfr-vnet-2-rqrt-2",
+                                            "etag": "W/\"aa4760f0-0bd6-4eeb-ae5c-2481eeda6123\"",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "ruleType": "Basic",
+                                                "priority": 100,
+                                                "httpListener": {
+                                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-rypimkfr-test-group/providers/Microsoft.Network/applicationGateways/cfb-rypimkfr-app-gateway-2/httpListeners/cfb-rypimkfr-vnet-2-httplstn-2"
+                                                },
+                                                "backendAddressPool": {
+                                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-rypimkfr-test-group/providers/Microsoft.Network/applicationGateways/cfb-rypimkfr-app-gateway-2/backendAddressPools/cfb-rypimkfr-vnet-2-beap-2"
+                                                },
+                                                "backendHttpSettings": {
+                                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-rypimkfr-test-group/providers/Microsoft.Network/applicationGateways/cfb-rypimkfr-app-gateway-2/backendHttpSettingsCollection/cfb-rypimkfr-vnet-2-be-htst-2"
+                                                }
+                                            },
+                                            "type": "Microsoft.Network/applicationGateways/requestRoutingRules"
+                                        }
+                                    ],
+                                    "probes": [],
+                                    "rewriteRuleSets": [],
+                                    "redirectConfigurations": [],
+                                    "privateLinkConfigurations": [],
+                                    "privateEndpointConnections": [],
+                                    "sslPolicy": {
+                                        "policyType": "Predefined",
+                                        "policyName": "AppGwSslPolicy20150501"
+                                    },
+                                    "enableHttp2": false,
+                                    "forceFirewallPolicyAssociation": true,
+                                    "customErrorConfigurations": [],
+                                    "firewallPolicy": {
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-rypimkfr-test-group/providers/Microsoft.Network/ApplicationGatewayWebApplicationFirewallPolicies/cfb-rypimkfr-waf-policy"
+                                    }
+                                }
+                            },
+                            {
+                                "name": "cfb-rypimkfr-app-gateway-3",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-rypimkfr-test-group/providers/Microsoft.Network/applicationGateways/cfb-rypimkfr-app-gateway-3",
+                                "etag": "W/\"55d53a3d-96c1-4b6b-9f88-90b2d2e7388a\"",
+                                "type": "Microsoft.Network/applicationGateways",
+                                "location": "centralus",
+                                "tags": {
+                                    "c7n": "true",
+                                    "product_id": "13742"
+                                },
+                                "properties": {
+                                    "provisioningState": "Succeeded",
+                                    "resourceGuid": "67766354-344d-4eb6-a7fb-ec8ea93480da",
+                                    "sku": {
+                                        "name": "WAF_v2",
+                                        "tier": "WAF_v2",
+                                        "family": "Generation_1",
+                                        "capacity": 2
+                                    },
+                                    "operationalState": "Running",
+                                    "gatewayIPConfigurations": [
+                                        {
+                                            "name": "my-gateway-ip-configuration",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-rypimkfr-test-group/providers/Microsoft.Network/applicationGateways/cfb-rypimkfr-app-gateway-3/gatewayIPConfigurations/my-gateway-ip-configuration",
+                                            "etag": "W/\"55d53a3d-96c1-4b6b-9f88-90b2d2e7388a\"",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "subnet": {
+                                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-rypimkfr-test-group/providers/Microsoft.Network/virtualNetworks/cfb-rypimkfr-vnet-3/subnets/cfb-rypimkfr-frontend-3"
+                                                }
+                                            },
+                                            "type": "Microsoft.Network/applicationGateways/gatewayIPConfigurations"
+                                        }
+                                    ],
+                                    "sslCertificates": [],
+                                    "trustedRootCertificates": [],
+                                    "trustedClientCertificates": [],
+                                    "sslProfiles": [],
+                                    "frontendIPConfigurations": [
+                                        {
+                                            "name": "cfb-rypimkfr-vnet-3-feip-3",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-rypimkfr-test-group/providers/Microsoft.Network/applicationGateways/cfb-rypimkfr-app-gateway-3/frontendIPConfigurations/cfb-rypimkfr-vnet-3-feip-3",
+                                            "etag": "W/\"55d53a3d-96c1-4b6b-9f88-90b2d2e7388a\"",
+                                            "type": "Microsoft.Network/applicationGateways/frontendIPConfigurations",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "privateIPAllocationMethod": "Dynamic",
+                                                "publicIPAddress": {
+                                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-rypimkfr-test-group/providers/Microsoft.Network/publicIPAddresses/cfb-rypimkfr-pip-3"
+                                                },
+                                                "httpListeners": [
+                                                    {
+                                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-rypimkfr-test-group/providers/Microsoft.Network/applicationGateways/cfb-rypimkfr-app-gateway-3/httpListeners/cfb-rypimkfr-vnet-3-httplstn-3"
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ],
+                                    "frontendPorts": [
+                                        {
+                                            "name": "cfb-rypimkfr-vnet-3-feport-3",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-rypimkfr-test-group/providers/Microsoft.Network/applicationGateways/cfb-rypimkfr-app-gateway-3/frontendPorts/cfb-rypimkfr-vnet-3-feport-3",
+                                            "etag": "W/\"55d53a3d-96c1-4b6b-9f88-90b2d2e7388a\"",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "port": 80,
+                                                "httpListeners": [
+                                                    {
+                                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-rypimkfr-test-group/providers/Microsoft.Network/applicationGateways/cfb-rypimkfr-app-gateway-3/httpListeners/cfb-rypimkfr-vnet-3-httplstn-3"
+                                                    }
+                                                ]
+                                            },
+                                            "type": "Microsoft.Network/applicationGateways/frontendPorts"
+                                        }
+                                    ],
+                                    "backendAddressPools": [
+                                        {
+                                            "name": "cfb-rypimkfr-vnet-3-beap-3",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-rypimkfr-test-group/providers/Microsoft.Network/applicationGateways/cfb-rypimkfr-app-gateway-3/backendAddressPools/cfb-rypimkfr-vnet-3-beap-3",
+                                            "etag": "W/\"55d53a3d-96c1-4b6b-9f88-90b2d2e7388a\"",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "backendAddresses": [],
+                                                "requestRoutingRules": [
+                                                    {
+                                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-rypimkfr-test-group/providers/Microsoft.Network/applicationGateways/cfb-rypimkfr-app-gateway-3/requestRoutingRules/cfb-rypimkfr-vnet-3-rqrt-3"
+                                                    }
+                                                ]
+                                            },
+                                            "type": "Microsoft.Network/applicationGateways/backendAddressPools"
+                                        }
+                                    ],
+                                    "loadDistributionPolicies": [],
+                                    "backendHttpSettingsCollection": [
+                                        {
+                                            "name": "cfb-rypimkfr-vnet-3-be-htst-3",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-rypimkfr-test-group/providers/Microsoft.Network/applicationGateways/cfb-rypimkfr-app-gateway-3/backendHttpSettingsCollection/cfb-rypimkfr-vnet-3-be-htst-3",
+                                            "etag": "W/\"55d53a3d-96c1-4b6b-9f88-90b2d2e7388a\"",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "port": 80,
+                                                "protocol": "Http",
+                                                "cookieBasedAffinity": "Disabled",
+                                                "pickHostNameFromBackendAddress": false,
+                                                "path": "/path1/",
+                                                "requestTimeout": 60,
+                                                "requestRoutingRules": [
+                                                    {
+                                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-rypimkfr-test-group/providers/Microsoft.Network/applicationGateways/cfb-rypimkfr-app-gateway-3/requestRoutingRules/cfb-rypimkfr-vnet-3-rqrt-3"
+                                                    }
+                                                ]
+                                            },
+                                            "type": "Microsoft.Network/applicationGateways/backendHttpSettingsCollection"
+                                        }
+                                    ],
+                                    "httpListeners": [
+                                        {
+                                            "name": "cfb-rypimkfr-vnet-3-httplstn-3",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-rypimkfr-test-group/providers/Microsoft.Network/applicationGateways/cfb-rypimkfr-app-gateway-3/httpListeners/cfb-rypimkfr-vnet-3-httplstn-3",
+                                            "etag": "W/\"55d53a3d-96c1-4b6b-9f88-90b2d2e7388a\"",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "frontendIPConfiguration": {
+                                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-rypimkfr-test-group/providers/Microsoft.Network/applicationGateways/cfb-rypimkfr-app-gateway-3/frontendIPConfigurations/cfb-rypimkfr-vnet-3-feip-3"
+                                                },
+                                                "frontendPort": {
+                                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-rypimkfr-test-group/providers/Microsoft.Network/applicationGateways/cfb-rypimkfr-app-gateway-3/frontendPorts/cfb-rypimkfr-vnet-3-feport-3"
+                                                },
+                                                "protocol": "Http",
+                                                "hostNames": [],
+                                                "requireServerNameIndication": false,
+                                                "customErrorConfigurations": [],
+                                                "requestRoutingRules": [
+                                                    {
+                                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-rypimkfr-test-group/providers/Microsoft.Network/applicationGateways/cfb-rypimkfr-app-gateway-3/requestRoutingRules/cfb-rypimkfr-vnet-3-rqrt-3"
+                                                    }
+                                                ]
+                                            },
+                                            "type": "Microsoft.Network/applicationGateways/httpListeners"
+                                        }
+                                    ],
+                                    "urlPathMaps": [],
+                                    "requestRoutingRules": [
+                                        {
+                                            "name": "cfb-rypimkfr-vnet-3-rqrt-3",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-rypimkfr-test-group/providers/Microsoft.Network/applicationGateways/cfb-rypimkfr-app-gateway-3/requestRoutingRules/cfb-rypimkfr-vnet-3-rqrt-3",
+                                            "etag": "W/\"55d53a3d-96c1-4b6b-9f88-90b2d2e7388a\"",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "ruleType": "Basic",
+                                                "priority": 100,
+                                                "httpListener": {
+                                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-rypimkfr-test-group/providers/Microsoft.Network/applicationGateways/cfb-rypimkfr-app-gateway-3/httpListeners/cfb-rypimkfr-vnet-3-httplstn-3"
+                                                },
+                                                "backendAddressPool": {
+                                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-rypimkfr-test-group/providers/Microsoft.Network/applicationGateways/cfb-rypimkfr-app-gateway-3/backendAddressPools/cfb-rypimkfr-vnet-3-beap-3"
+                                                },
+                                                "backendHttpSettings": {
+                                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-rypimkfr-test-group/providers/Microsoft.Network/applicationGateways/cfb-rypimkfr-app-gateway-3/backendHttpSettingsCollection/cfb-rypimkfr-vnet-3-be-htst-3"
+                                                }
+                                            },
+                                            "type": "Microsoft.Network/applicationGateways/requestRoutingRules"
+                                        }
+                                    ],
+                                    "probes": [],
+                                    "rewriteRuleSets": [],
+                                    "redirectConfigurations": [],
+                                    "privateLinkConfigurations": [],
+                                    "privateEndpointConnections": [],
+                                    "sslPolicy": {
+                                        "policyType": "Predefined",
+                                        "policyName": "AppGwSslPolicy20150501"
+                                    },
+                                    "enableHttp2": false,
+                                    "forceFirewallPolicyAssociation": true,
+                                    "customErrorConfigurations": [],
+                                    "firewallPolicy": {
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-rypimkfr-test-group/providers/Microsoft.Network/ApplicationGatewayWebApplicationFirewallPolicies/cfb-rypimkfr-waf-policy"
+                                    }
+                                }
+                            },
+                            {
+                                "name": "cfb-rypimkfr-app-gateway-4",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-rypimkfr-test-group/providers/Microsoft.Network/applicationGateways/cfb-rypimkfr-app-gateway-4",
+                                "etag": "W/\"d638a1b0-2025-4032-b9eb-f49645e9c852\"",
+                                "type": "Microsoft.Network/applicationGateways",
+                                "location": "centralus",
+                                "tags": {
+                                    "c7n": "true",
+                                    "product_id": "13742"
+                                },
+                                "properties": {
+                                    "provisioningState": "Succeeded",
+                                    "resourceGuid": "9b7c9d67-4d06-4575-8c46-b11eb3905aa0",
+                                    "sku": {
+                                        "name": "Standard_Small",
+                                        "tier": "Standard",
+                                        "family": "Generation_1",
+                                        "capacity": 2
+                                    },
+                                    "operationalState": "Running",
+                                    "gatewayIPConfigurations": [
+                                        {
+                                            "name": "my-gateway-ip-configuration",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-rypimkfr-test-group/providers/Microsoft.Network/applicationGateways/cfb-rypimkfr-app-gateway-4/gatewayIPConfigurations/my-gateway-ip-configuration",
+                                            "etag": "W/\"d638a1b0-2025-4032-b9eb-f49645e9c852\"",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "subnet": {
+                                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-rypimkfr-test-group/providers/Microsoft.Network/virtualNetworks/cfb-rypimkfr-vnet-4/subnets/cfb-rypimkfr-frontend-4"
+                                                }
+                                            },
+                                            "type": "Microsoft.Network/applicationGateways/gatewayIPConfigurations"
+                                        }
+                                    ],
+                                    "sslCertificates": [],
+                                    "authenticationCertificates": [],
+                                    "frontendIPConfigurations": [
+                                        {
+                                            "name": "cfb-rypimkfr-vnet-4-feip-4",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-rypimkfr-test-group/providers/Microsoft.Network/applicationGateways/cfb-rypimkfr-app-gateway-4/frontendIPConfigurations/cfb-rypimkfr-vnet-4-feip-4",
+                                            "etag": "W/\"d638a1b0-2025-4032-b9eb-f49645e9c852\"",
+                                            "type": "Microsoft.Network/applicationGateways/frontendIPConfigurations",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "privateIPAllocationMethod": "Dynamic",
+                                                "publicIPAddress": {
+                                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-rypimkfr-test-group/providers/Microsoft.Network/publicIPAddresses/cfb-rypimkfr-pip-4"
+                                                },
+                                                "httpListeners": [
+                                                    {
+                                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-rypimkfr-test-group/providers/Microsoft.Network/applicationGateways/cfb-rypimkfr-app-gateway-4/httpListeners/cfb-rypimkfr-vnet-4-httplstn-4"
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ],
+                                    "frontendPorts": [
+                                        {
+                                            "name": "cfb-rypimkfr-vnet-4-feport-4",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-rypimkfr-test-group/providers/Microsoft.Network/applicationGateways/cfb-rypimkfr-app-gateway-4/frontendPorts/cfb-rypimkfr-vnet-4-feport-4",
+                                            "etag": "W/\"d638a1b0-2025-4032-b9eb-f49645e9c852\"",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "port": 80,
+                                                "httpListeners": [
+                                                    {
+                                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-rypimkfr-test-group/providers/Microsoft.Network/applicationGateways/cfb-rypimkfr-app-gateway-4/httpListeners/cfb-rypimkfr-vnet-4-httplstn-4"
+                                                    }
+                                                ]
+                                            },
+                                            "type": "Microsoft.Network/applicationGateways/frontendPorts"
+                                        }
+                                    ],
+                                    "backendAddressPools": [
+                                        {
+                                            "name": "cfb-rypimkfr-vnet-4-beap-4",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-rypimkfr-test-group/providers/Microsoft.Network/applicationGateways/cfb-rypimkfr-app-gateway-4/backendAddressPools/cfb-rypimkfr-vnet-4-beap-4",
+                                            "etag": "W/\"d638a1b0-2025-4032-b9eb-f49645e9c852\"",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "backendAddresses": [],
+                                                "requestRoutingRules": [
+                                                    {
+                                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-rypimkfr-test-group/providers/Microsoft.Network/applicationGateways/cfb-rypimkfr-app-gateway-4/requestRoutingRules/cfb-rypimkfr-vnet-4-rqrt-4"
+                                                    }
+                                                ]
+                                            },
+                                            "type": "Microsoft.Network/applicationGateways/backendAddressPools"
+                                        }
+                                    ],
+                                    "backendHttpSettingsCollection": [
+                                        {
+                                            "name": "cfb-rypimkfr-vnet-4-be-htst-4",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-rypimkfr-test-group/providers/Microsoft.Network/applicationGateways/cfb-rypimkfr-app-gateway-4/backendHttpSettingsCollection/cfb-rypimkfr-vnet-4-be-htst-4",
+                                            "etag": "W/\"d638a1b0-2025-4032-b9eb-f49645e9c852\"",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "port": 80,
+                                                "protocol": "Http",
+                                                "cookieBasedAffinity": "Disabled",
+                                                "pickHostNameFromBackendAddress": false,
+                                                "path": "/path1/",
+                                                "requestTimeout": 60,
+                                                "requestRoutingRules": [
+                                                    {
+                                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-rypimkfr-test-group/providers/Microsoft.Network/applicationGateways/cfb-rypimkfr-app-gateway-4/requestRoutingRules/cfb-rypimkfr-vnet-4-rqrt-4"
+                                                    }
+                                                ]
+                                            },
+                                            "type": "Microsoft.Network/applicationGateways/backendHttpSettingsCollection"
+                                        }
+                                    ],
+                                    "httpListeners": [
+                                        {
+                                            "name": "cfb-rypimkfr-vnet-4-httplstn-4",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-rypimkfr-test-group/providers/Microsoft.Network/applicationGateways/cfb-rypimkfr-app-gateway-4/httpListeners/cfb-rypimkfr-vnet-4-httplstn-4",
+                                            "etag": "W/\"d638a1b0-2025-4032-b9eb-f49645e9c852\"",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "frontendIPConfiguration": {
+                                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-rypimkfr-test-group/providers/Microsoft.Network/applicationGateways/cfb-rypimkfr-app-gateway-4/frontendIPConfigurations/cfb-rypimkfr-vnet-4-feip-4"
+                                                },
+                                                "frontendPort": {
+                                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-rypimkfr-test-group/providers/Microsoft.Network/applicationGateways/cfb-rypimkfr-app-gateway-4/frontendPorts/cfb-rypimkfr-vnet-4-feport-4"
+                                                },
+                                                "protocol": "Http",
+                                                "hostNames": [],
+                                                "requireServerNameIndication": false,
+                                                "customErrorConfigurations": [],
+                                                "requestRoutingRules": [
+                                                    {
+                                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-rypimkfr-test-group/providers/Microsoft.Network/applicationGateways/cfb-rypimkfr-app-gateway-4/requestRoutingRules/cfb-rypimkfr-vnet-4-rqrt-4"
+                                                    }
+                                                ]
+                                            },
+                                            "type": "Microsoft.Network/applicationGateways/httpListeners"
+                                        }
+                                    ],
+                                    "urlPathMaps": [],
+                                    "requestRoutingRules": [
+                                        {
+                                            "name": "cfb-rypimkfr-vnet-4-rqrt-4",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-rypimkfr-test-group/providers/Microsoft.Network/applicationGateways/cfb-rypimkfr-app-gateway-4/requestRoutingRules/cfb-rypimkfr-vnet-4-rqrt-4",
+                                            "etag": "W/\"d638a1b0-2025-4032-b9eb-f49645e9c852\"",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "ruleType": "Basic",
+                                                "httpListener": {
+                                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-rypimkfr-test-group/providers/Microsoft.Network/applicationGateways/cfb-rypimkfr-app-gateway-4/httpListeners/cfb-rypimkfr-vnet-4-httplstn-4"
+                                                },
+                                                "backendAddressPool": {
+                                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-rypimkfr-test-group/providers/Microsoft.Network/applicationGateways/cfb-rypimkfr-app-gateway-4/backendAddressPools/cfb-rypimkfr-vnet-4-beap-4"
+                                                },
+                                                "backendHttpSettings": {
+                                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-rypimkfr-test-group/providers/Microsoft.Network/applicationGateways/cfb-rypimkfr-app-gateway-4/backendHttpSettingsCollection/cfb-rypimkfr-vnet-4-be-htst-4"
+                                                }
+                                            },
+                                            "type": "Microsoft.Network/applicationGateways/requestRoutingRules"
+                                        }
+                                    ],
+                                    "probes": [],
+                                    "rewriteRuleSets": [],
+                                    "redirectConfigurations": [],
+                                    "sslPolicy": {
+                                        "policyType": "Predefined",
+                                        "policyName": "AppGwSslPolicy20150501"
+                                    },
+                                    "enableHttp2": false,
+                                    "customErrorConfigurations": []
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Network/ApplicationGatewayWebApplicationFirewallPolicies?api-version=2020-08-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Fri, 07 Jul 2023 20:28:31 GMT"
+                    ],
+                    "x-ms-arm-service-request-id": [
+                        "fe5ed256-d3f9-491c-90ca-98411e1496e0"
+                    ],
+                    "content-length": [
+                        "2183"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "name": "cfb-rypimkfr-waf-policy",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-rypimkfr-test-group/providers/Microsoft.Network/ApplicationGatewayWebApplicationFirewallPolicies/cfb-rypimkfr-waf-policy",
+                                "etag": "W/\"733d4388-7358-4156-bbd0-f9ccb95f6386\"",
+                                "type": "Microsoft.Network/ApplicationGatewayWebApplicationFirewallPolicies",
+                                "location": "centralus",
+                                "tags": {
+                                    "c7n": "true",
+                                    "product_id": "13742"
+                                },
+                                "properties": {
+                                    "provisioningState": "Succeeded",
+                                    "customRules": [],
+                                    "policySettings": {
+                                        "requestBodyCheck": true,
+                                        "maxRequestBodySizeInKb": 128,
+                                        "fileUploadLimitInMb": 100,
+                                        "state": "Disabled",
+                                        "mode": "Detection"
+                                    },
+                                    "managedRules": {
+                                        "managedRuleSets": [
+                                            {
+                                                "ruleSetType": "OWASP",
+                                                "ruleSetVersion": "3.2",
+                                                "ruleGroupOverrides": [
+                                                    {
+                                                        "ruleGroupName": "REQUEST-944-APPLICATION-ATTACK-JAVA",
+                                                        "rules": [
+                                                            {
+                                                                "ruleId": "944240",
+                                                                "state": "Disabled"
+                                                            },
+                                                            {
+                                                                "ruleId": "944210",
+                                                                "state": "Disabled"
+                                                            },
+                                                            {
+                                                                "ruleId": "944200",
+                                                                "state": "Enabled"
+                                                            }
+                                                        ]
+                                                    }
+                                                ]
+                                            }
+                                        ],
+                                        "exclusions": []
+                                    },
+                                    "applicationGateways": [
+                                        {
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-rypimkfr-test-group/providers/Microsoft.Network/applicationGateways/cfb-rypimkfr-app-gateway-3"
+                                        },
+                                        {
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-rypimkfr-test-group/providers/Microsoft.Network/applicationGateways/cfb-rypimkfr-app-gateway-2"
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}
