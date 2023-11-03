@@ -5,7 +5,7 @@ from c7n_azure.provider import resources
 @resources.register('kusto')
 class Kusto(ArmResourceManager):
     class resource_type(ArmResourceManager.resource_type):
-        doc_groups = ['Kusto']
+        doc_groups = ['Analytics']
         service = 'azure.mgmt.kusto'
         client = 'KustoManagementClient'
         enum_spec = ('clusters', 'list', None)
