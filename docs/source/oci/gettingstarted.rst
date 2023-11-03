@@ -63,6 +63,21 @@ Then run the following command:
 
 After the configuration is complete, Cloud Custodian will implicitly pick up your credentials when it runs.
 
+
+Instance Principal Authentication
+"""""""""""""""""""""""""""""""""
+
+Cloud custodian can also be run on an OCI instance to make use of instance principal auth.
+To enable authentication using instance principal, set the environment variable ``OCI_CLI_AUTH`` to ``instance_principal``.
+For e.g.
+
+.. code-block:: bash
+
+    export OCI_CLI_AUTH=instance_principal
+
+
+For more details on how to use instance principal auth please click `here <https://docs.oracle.com/en-us/iaas/Content/Identity/Tasks/callingservicesfrominstances.htm>`_.
+
 .. _oci_run-policy:
 
 Run your first policies

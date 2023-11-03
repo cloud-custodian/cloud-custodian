@@ -432,8 +432,14 @@ class SetPermissions(BaseAction):
         remove = []
         add = []
         account_regex = re.compile('\\d{12}')
-        org_regex = re.compile('arn:[a-zA-Z-]+:organizations:\\d{12}:organization/o-.*')
-        ou_regex = re.compile('arn:[a-zA-Z-]+:organizations:\\d{12}:ou/o-.*/ou-.*')
+        # https://docs.aws.amazon.com/organizations/latest/APIReference/API_Organization.html
+        org_regex = re.compile(
+            r'arn:[a-zA-Z-]+:organizations::\d{12}:organization\/o-[a-z0-9]{10,32}'
+        )
+        # https://docs.aws.amazon.com/organizations/latest/APIReference/API_OrganizationalUnit.html
+        ou_regex = re.compile(
+            r'arn:[a-zA-Z-]+:organizations::\d{12}:ou\/o-[a-z0-9]{10,32}\/ou-[0-9a-z]{4,32}-[0-9a-z]{8,32}'
+        )
         if to_remove:
             if 'all' in to_remove:
                 remove.append({'Group': 'all'})
