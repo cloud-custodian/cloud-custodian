@@ -104,10 +104,10 @@ class PostgresqlServerConfigurationFilter(Filter):
             filtered_resources, event)
 
 
-@PostgresqlServer.filter_registry.register('server-security-alert-policies-filter')
+@PostgresqlServer.filter_registry.register('security-alert-policy')
 class ServerSecurityAlertPoliciesFilter(Filter):
 
-    schema = type_schema('server-security-alert-policies-filter',
+    schema = type_schema('security-alert-policy',
                          rinherit=ValueFilter.schema)
 
     def _perform_op(self, a, b):
