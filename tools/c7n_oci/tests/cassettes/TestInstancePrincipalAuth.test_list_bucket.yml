@@ -1,0 +1,509 @@
+interactions:
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: http://169.254.169.254/opc/v2/identity/cert.pem
+  response:
+    body:
+      string: '-----BEGIN CERTIFICATE-----
+
+MIICCzCCAbWgAwIBAgICA+gwDQYJKoZIhvcNAQELBQAweTESMBAGA1UEAwwJbG9j
+
+YWxob3N0MWMwYQYDVQQLDFpvcGMtdGVuYW50Om9jaWQxLnRlbmFuY3kub2MxLi5h
+
+YWFhYWFhYXl4Znd2ZTJoenhtYTN2amZuN2pvdXFkMm8yc3BxN29sZmhwa2NzZHdt
+
+M2l5NjN3bndhaHEwHhcNMjMwOTI3MTYxMjQ3WhcNMzMwOTI0MTYxMjQ3WjB5MRIw
+
+EAYDVQQDDAlsb2NhbGhvc3QxYzBhBgNVBAsMWm9wYy10ZW5hbnQ6b2NpZDEudGVu
+
+YW5jeS5vYzEuLmFhYWFhYWFheXhmd3ZlMmh6eG1hM3ZqZm43am91cWQybzJzcHE3
+
+b2xmaHBrY3Nkd20zaXk2M3dud2FocTBaMA0GCSqGSIb3DQEBAQUAA0kAMEYCQQDM
+
+wuWb3bOhvTLnPPHBnHTI/vI+Z9FRtUCVyo154fKqKu/Cu3wUP2gxjrhIN5EnYh3C
+
+/wc1bsfRR4yz+jkS2MTHAgEDoykwJzAPBgNVHRMECDAGAQH/AgEAMBQGA1UdEQQN
+
+MAuCCWxvY2FsaG9zdDANBgkqhkiG9w0BAQsFAANBAHiOn+D9MGnwMg+x6fH6CeX6
+
++z5/yuExKDeMq221mfYediwPHcnW1Wj3G44AYqQufSys2Fw9rBoAi7SD2WP1nBc=
+
+-----END CERTIFICATE-----
+'
+    headers:
+      content-type:
+      - application/x-x509-ca-cert
+      last-modified:
+      - Fri, 29 Sep 2023 15:47:36 GMT
+      server:
+      - server
+      transfer-encoding:
+      - chunked
+      x-request-id:
+      - 4b0242ff-f78d-4b7e-b1b0-364988314110
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: http://169.254.169.254/opc/v2/identity/key.pem
+  response:
+    body:
+      string: '-----BEGIN RSA PRIVATE KEY-----
+
+MIIBOwIBAAJBANESBSO/Ml54JuCr8hhZuC79HphVS+k9M6bfLz94lKlmzc4i1cyN
+
+TcfNivgyUTmzZcUvbunsJJokC547jp+D76MCAQMCQQCLYVjCf3bppW9AcqFlkSV0
+
+qL8QON1GKM0Z6h9/pbhw7f4Gt4cmpYqFaEtzom2LxNcRJ8qmVN5T0La6Vm+BVsaL
+
+AiEA/kmUR8Aow/SEvMo4r82jQ6mb5V+nepTSudyVzHrmyAsCIQDSentDUmw6Cyxd
+
+AIX9GmjfgdfZkMVch5g/qiQa4pr9yQIhAKmGYtqAGy1NrdMxex/ebNfGZ+4/xPxj
+
+NyaTDohR7zAHAiEAjFGngjby0VzIPgBZU2bwlQE6kQsuPa+61RwYEexnU9sCIQCP
+
+xckiCcqSW7uLD214+XzuI1dQQ0FLI5dVN5HScDEA0A==
+
+-----END RSA PRIVATE KEY-----
+'
+    headers:
+      content-type:
+      - application/x-x509-ca-cert
+      last-modified:
+      - Fri, 29 Sep 2023 15:47:36 GMT
+      server:
+      - server
+      x-request-id:
+      - dfc49a69-e403-483e-af4b-e96c7aac41f1
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: http://169.254.169.254/opc/v2/identity/intermediate.pem
+  response:
+    body:
+      string: '-----BEGIN CERTIFICATE-----
+
+MIICCzCCAbWgAwIBAgICA+gwDQYJKoZIhvcNAQELBQAweTESMBAGA1UEAwwJbG9j
+
+YWxob3N0MWMwYQYDVQQLDFpvcGMtdGVuYW50Om9jaWQxLnRlbmFuY3kub2MxLi5h
+
+YWFhYWFhYXl4Znd2ZTJoenhtYTN2amZuN2pvdXFkMm8yc3BxN29sZmhwa2NzZHdt
+
+M2l5NjN3bndhaHEwHhcNMjMwOTI3MTYxMjQ3WhcNMzMwOTI0MTYxMjQ3WjB5MRIw
+
+EAYDVQQDDAlsb2NhbGhvc3QxYzBhBgNVBAsMWm9wYy10ZW5hbnQ6b2NpZDEudGVu
+
+YW5jeS5vYzEuLmFhYWFhYWFheXhmd3ZlMmh6eG1hM3ZqZm43am91cWQybzJzcHE3
+
+b2xmaHBrY3Nkd20zaXk2M3dud2FocTBaMA0GCSqGSIb3DQEBAQUAA0kAMEYCQQDM
+
+wuWb3bOhvTLnPPHBnHTI/vI+Z9FRtUCVyo154fKqKu/Cu3wUP2gxjrhIN5EnYh3C
+
+/wc1bsfRR4yz+jkS2MTHAgEDoykwJzAPBgNVHRMECDAGAQH/AgEAMBQGA1UdEQQN
+
+MAuCCWxvY2FsaG9zdDANBgkqhkiG9w0BAQsFAANBAHiOn+D9MGnwMg+x6fH6CeX6
+
++z5/yuExKDeMq221mfYediwPHcnW1Wj3G44AYqQufSys2Fw9rBoAi7SD2WP1nBc=
+
+-----END CERTIFICATE-----
+'
+    headers:
+      content-type:
+      - application/x-x509-ca-cert
+      last-modified:
+      - Fri, 29 Sep 2023 15:47:36 GMT
+      server:
+      - server
+      transfer-encoding:
+      - chunked
+      x-request-id:
+      - 7afcd187-00e5-448d-b96a-64ffd961c5dc
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: http://169.254.169.254/opc/v2/instance/region
+  response:
+    body:
+      string: iad
+    headers:
+      content-type:
+      - application/octet-stream
+      last-modified:
+      - Fri, 29 Sep 2023 15:47:36 GMT
+      server:
+      - server
+      x-request-id:
+      - 6b645122-cafd-4a91-a46c-f36a9272fe4a
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: http://169.254.169.254/opc/v2/identity/cert.pem
+  response:
+    body:
+      string: '-----BEGIN CERTIFICATE-----
+
+MIICCzCCAbWgAwIBAgICA+gwDQYJKoZIhvcNAQELBQAweTESMBAGA1UEAwwJbG9j
+
+YWxob3N0MWMwYQYDVQQLDFpvcGMtdGVuYW50Om9jaWQxLnRlbmFuY3kub2MxLi5h
+
+YWFhYWFhYXl4Znd2ZTJoenhtYTN2amZuN2pvdXFkMm8yc3BxN29sZmhwa2NzZHdt
+
+M2l5NjN3bndhaHEwHhcNMjMwOTI3MTYxMjQ3WhcNMzMwOTI0MTYxMjQ3WjB5MRIw
+
+EAYDVQQDDAlsb2NhbGhvc3QxYzBhBgNVBAsMWm9wYy10ZW5hbnQ6b2NpZDEudGVu
+
+YW5jeS5vYzEuLmFhYWFhYWFheXhmd3ZlMmh6eG1hM3ZqZm43am91cWQybzJzcHE3
+
+b2xmaHBrY3Nkd20zaXk2M3dud2FocTBaMA0GCSqGSIb3DQEBAQUAA0kAMEYCQQDM
+
+wuWb3bOhvTLnPPHBnHTI/vI+Z9FRtUCVyo154fKqKu/Cu3wUP2gxjrhIN5EnYh3C
+
+/wc1bsfRR4yz+jkS2MTHAgEDoykwJzAPBgNVHRMECDAGAQH/AgEAMBQGA1UdEQQN
+
+MAuCCWxvY2FsaG9zdDANBgkqhkiG9w0BAQsFAANBAHiOn+D9MGnwMg+x6fH6CeX6
+
++z5/yuExKDeMq221mfYediwPHcnW1Wj3G44AYqQufSys2Fw9rBoAi7SD2WP1nBc=
+
+-----END CERTIFICATE-----
+'
+    headers:
+      content-type:
+      - application/x-x509-ca-cert
+      last-modified:
+      - Fri, 29 Sep 2023 15:47:36 GMT
+      server:
+      - server
+      transfer-encoding:
+      - chunked
+      x-request-id:
+      - 81332d09-95ac-4a9b-83c3-db8fe586b13c
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: http://169.254.169.254/opc/v2/identity/key.pem
+  response:
+    body:
+      string: '-----BEGIN RSA PRIVATE KEY-----
+
+MIIBOwIBAAJBANESBSO/Ml54JuCr8hhZuC79HphVS+k9M6bfLz94lKlmzc4i1cyN
+
+TcfNivgyUTmzZcUvbunsJJokC547jp+D76MCAQMCQQCLYVjCf3bppW9AcqFlkSV0
+
+qL8QON1GKM0Z6h9/pbhw7f4Gt4cmpYqFaEtzom2LxNcRJ8qmVN5T0La6Vm+BVsaL
+
+AiEA/kmUR8Aow/SEvMo4r82jQ6mb5V+nepTSudyVzHrmyAsCIQDSentDUmw6Cyxd
+
+AIX9GmjfgdfZkMVch5g/qiQa4pr9yQIhAKmGYtqAGy1NrdMxex/ebNfGZ+4/xPxj
+
+NyaTDohR7zAHAiEAjFGngjby0VzIPgBZU2bwlQE6kQsuPa+61RwYEexnU9sCIQCP
+
+xckiCcqSW7uLD214+XzuI1dQQ0FLI5dVN5HScDEA0A==
+
+-----END RSA PRIVATE KEY-----
+'
+    headers:
+      content-type:
+      - application/x-x509-ca-cert
+      last-modified:
+      - Fri, 29 Sep 2023 15:47:36 GMT
+      server:
+      - server
+      x-request-id:
+      - 02af1b8e-f443-4eca-b57c-df529d4ec3a0
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: http://169.254.169.254/opc/v2/identity/intermediate.pem
+  response:
+    body:
+      string: '-----BEGIN CERTIFICATE-----
+
+MIICCzCCAbWgAwIBAgICA+gwDQYJKoZIhvcNAQELBQAweTESMBAGA1UEAwwJbG9j
+
+YWxob3N0MWMwYQYDVQQLDFpvcGMtdGVuYW50Om9jaWQxLnRlbmFuY3kub2MxLi5h
+
+YWFhYWFhYXl4Znd2ZTJoenhtYTN2amZuN2pvdXFkMm8yc3BxN29sZmhwa2NzZHdt
+
+M2l5NjN3bndhaHEwHhcNMjMwOTI3MTYxMjQ3WhcNMzMwOTI0MTYxMjQ3WjB5MRIw
+
+EAYDVQQDDAlsb2NhbGhvc3QxYzBhBgNVBAsMWm9wYy10ZW5hbnQ6b2NpZDEudGVu
+
+YW5jeS5vYzEuLmFhYWFhYWFheXhmd3ZlMmh6eG1hM3ZqZm43am91cWQybzJzcHE3
+
+b2xmaHBrY3Nkd20zaXk2M3dud2FocTBaMA0GCSqGSIb3DQEBAQUAA0kAMEYCQQDM
+
+wuWb3bOhvTLnPPHBnHTI/vI+Z9FRtUCVyo154fKqKu/Cu3wUP2gxjrhIN5EnYh3C
+
+/wc1bsfRR4yz+jkS2MTHAgEDoykwJzAPBgNVHRMECDAGAQH/AgEAMBQGA1UdEQQN
+
+MAuCCWxvY2FsaG9zdDANBgkqhkiG9w0BAQsFAANBAHiOn+D9MGnwMg+x6fH6CeX6
+
++z5/yuExKDeMq221mfYediwPHcnW1Wj3G44AYqQufSys2Fw9rBoAi7SD2WP1nBc=
+
+-----END CERTIFICATE-----
+'
+    headers:
+      content-type:
+      - application/x-x509-ca-cert
+      last-modified:
+      - Fri, 29 Sep 2023 15:47:36 GMT
+      server:
+      - server
+      transfer-encoding:
+      - chunked
+      x-request-id:
+      - 97ae564b-5208-4059-bade-3e6f9e3a5da4
+    status:
+      code: 200
+      message: OK
+- request:
+    body: mock_body
+    headers: {}
+    method: POST
+    uri: https://auth.us-ashburn-1.oraclecloud.com/v1/x509
+  response:
+    body:
+      data:
+        token: eyJraWQiOiJhc3dfb2MxX2o0eGQiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJvY2lkMS5pbnN0YW5jZS5vYzEuaWFkLmFudXdjbGp0dGx6bGlsYWNrZXYycXBpYjYzZ2x1aXN1bmQ1NXNnd3VuZ3lsd2Z5Zmg1bmdkNHl3enRmcSIsIm9wYy1jZXJ0dHlwZSI6Imluc3RhbmNlIiwiaXNzIjoiYXV0aFNlcnZpY2Uub3JhY2xlLmNvbSIsImZwcmludCI6Ijk5OkRFOjc1OjA4OjBBOjM0OjU0Ojg3OjJDOkQ4OjY3OkM4OjZFOjJFOkYzOkZGOkZDOjBBOkFBOkM2IiwicHR5cGUiOiJpbnN0YW5jZSIsImF1ZCI6Im9jaSIsIm9wYy10YWciOiJWMyxvY2lkMS50ZW5hbmN5Lm9jMS4uYWFhYWFhYWF5eGZ3dmUyaHp4bWEzdmpmbjdqb3VxZDJvMnNwcTdvbGZocGtjc2R3bTNpeTYzd253YWhxLEFBQUFBUUFBQUFCXC9mMzlcL0FBQUFqdz09LEFBQUFBUUFBQUFBQUFBQ0EiLCJ0dHlwZSI6Ing1MDkiLCJvcGMtaW5zdGFuY2UiOiJvY2lkMS5pbnN0YW5jZS5vYzEuaWFkLmFudXdjbGp0dGx6bGlsYWNrZXYycXBpYjYzZ2x1aXN1bmQ1NXNnd3VuZ3lsd2Z5Zmg1bmdkNHl3enRmcSIsImV4cCI6MTY5NjAwNDI2Miwib3BjLWNvbXBhcnRtZW50Ijoib2NpZDEuY29tcGFydG1lbnQub2MxLi5hYWFhYWFhYXA0NWpyY3d4cjQ2eGZuYWJ0Mmdpb2g2amFjeGtxMm1lcm4yZ21ibHJiaDZzYjN6ZmR5amEiLCJpYXQiOjE2OTYwMDMwNjIsImp0aSI6IjNkOWEzYzdlLTc3ZTgtNGQwYi1iNDA5LWJiYTQ1ODE1MTg5MyIsInRlbmFudCI6Im9jaWQxLnRlbmFuY3kub2MxLi5hYWFhYWFhYXl4Znd2ZTJoenhtYTN2amZuN2pvdXFkMm8yc3BxN29sZmhwa2NzZHdtM2l5NjN3bndhaHEiLCJqd2siOiJ7XCJraWRcIjpcIjk5OkRFOjc1OjA4OjBBOjM0OjU0Ojg3OjJDOkQ4OjY3OkM4OjZFOjJFOkYzOkZGOkZDOjBBOkFBOkM2XCIsXCJuXCI6XCIwblhXd1VPTTc5bzRWSG5xUnpOQjltODVpclFHQkVlblhRZndGUktibVlNWGptVEdqbjJrdjR5Y2FTMVFtdU8xVk5vZ1RkU1NLWjJzX2d4TG5tRlFoeG9JeTFEc1JjZ3Vqck5kWjdOOHRnd2Q1dkN3MklQSmxFdEtYUDE1U19mc1ZLcXU4V1p2XzVtWHd3TUpwSnFFekdaVkJCRjkyLXNWSlEzSXdnTUtoTUpSTm5zT19OaTlCeU5lSmRIQnVUTy1nbmZNTkxFWWdXV2c1NDNKb21Ta1lZUGtrM1MyazNjR1JXVXNackNsSHYyVkZhZExIZ3plQXhkNnFJOGNWdXBMZTVoSzhlME9uZmtzLVZCUEFuNG1iLXA1dFNIWDZVSXhUdlFqSnFvSXQtYllQcldDUndmdmhGMmtUd3N1TV83X2hwcEFJZkx3NjFldmNyV2xMVzVzVHdcIixcImVcIjpcIkFRQUJcIixcImt0eVwiOlwiUlNBXCIsXCJhbGdcIjpcIlJTMjU2XCIsXCJ1c2VcIjpcInNpZ1wifSIsIm9wYy10ZW5hbnQiOiJvY2lkMS50ZW5hbmN5Lm9jMS4uYWFhYWFhYWF5eGZ3dmUyaHp4bWEzdmpmbjdqb3VxZDJvMnNwcTdvbGZocGtjc2R3bTNpeTYzd253YWhxIn0.D03f_4YkA0MP5BggzcVfcuUTh2Q0eZ7Hxzi-PbUnjmS8yXn9hnOjQjUXdNpLOMcnPxliq8SF75Ho39f90W7L5PX-ouhKmnEqddEyZOpDr9oUIzfWyQl4f1p3glp8lkL8UuZFRiyBwsyJPGsOdY1esBplhTIIIthOjly6cZfuGIq4OAiMwZMDW7Y-7tOejN5d3FOK2sAAVhCmMIevAEvPULTSIq_E9yhbkMLa19JtG_8f4PIWMJ5khTZY7iNHUxKjKe9ZT7VCujo8np7u18tubNnXu0RIGjJaZOCdovPaWg12RTPCG71LrJANSS834F2jqXPmE8KafkIMQ2tQ31qszg
+    headers:
+      content-type:
+      - application/json
+    status:
+      code: 200
+      message: OK
+- request:
+    body: mock_body
+    headers: {}
+    method: POST
+    uri: https://query.us-ashburn-1.oci.oraclecloud.com/20180409/resources
+  response:
+    body:
+      data:
+        items:
+        - additionalDetails: {}
+          availabilityDomain: ''
+          compartmentId: ocid1.compartment.oc1..<unique_ID>
+          definedTags:
+            Oracle-Tags:
+              CreatedBy: user@example.com
+              CreatedOn: '2023-02-03T04:08:41.958Z'
+          displayName: PaaSTest
+          freeformTags: {}
+          identifier: ocid1.bucket.oc1..<unique_ID>
+          identityContext: {}
+          lifecycleState: active
+          resourceType: Bucket
+          searchContext: null
+          systemTags: {}
+          timeCreated: '2023-02-03T04:08:41.973Z'
+        - additionalDetails: {}
+          availabilityDomain: ''
+          compartmentId: ocid1.compartment.oc1..<unique_ID>
+          definedTags:
+            Oracle-Tags:
+              CreatedBy: user@example.com
+              CreatedOn: '2022-12-16T17:46:34.720Z'
+          displayName: bucket-20221216-1146
+          freeformTags: {}
+          identifier: ocid1.bucket.oc1..<unique_ID>
+          identityContext: {}
+          lifecycleState: active
+          resourceType: Bucket
+          searchContext: null
+          systemTags: {}
+          timeCreated: '2022-12-16T17:46:34.731Z'
+        - additionalDetails: {}
+          availabilityDomain: ''
+          compartmentId: ocid1.tenancy.oc1..<unique_ID>
+          definedTags:
+            Oracle-Tags:
+              CreatedBy: user@example.com
+              CreatedOn: '2022-06-13T18:17:03.713Z'
+          displayName: bucket-20220613-1316
+          freeformTags:
+            app-name: acs
+          identifier: ocid1.bucket.oc1..<unique_ID>
+          identityContext: {}
+          lifecycleState: active
+          resourceType: Bucket
+          searchContext: null
+          systemTags: {}
+          timeCreated: '2022-06-13T18:17:03.722Z'
+    headers:
+      content-type:
+      - application/json
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: https://objectstorage.us-ashburn-1.oraclecloud.com/n
+  response:
+    body:
+      data: idpktreuauj2
+    headers:
+      content-type:
+      - application/json
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: https://objectstorage.us-ashburn-1.oraclecloud.com/n/<namepsace>/b?compartmentId=ocid1.compartment.oc1..<unique_ID>&fields=tags
+  response:
+    body:
+      data:
+      - compartmentId: ocid1.compartment.oc1..<unique_ID>
+        createdBy: ocid1.user.oc1..<unique_ID>
+        definedTags:
+          Oracle-Tags:
+            CreatedBy: user@example.com
+            CreatedOn: '2023-02-03T04:08:41.958Z'
+        etag: 88db0923-ef82-4e49-850f-ba7919c9cdc7
+        freeformTags: {}
+        name: PaaSTest
+        namespace: <namespace>
+        timeCreated: '2023-02-03T04:08:41.973Z'
+      - compartmentId: ocid1.compartment.oc1..<unique_ID>
+        createdBy: ocid1.saml2idp.oc1..<unique_ID>
+        definedTags:
+          Oracle-Tags:
+            CreatedBy: user@example.com
+            CreatedOn: '2022-12-16T17:46:34.720Z'
+        etag: 0ed0b9a9-4386-4f88-bb37-31632620fb09
+        freeformTags: {}
+        name: bucket-20221216-1146
+        namespace: <namespace>
+        timeCreated: '2022-12-16T17:46:34.731Z'
+      - compartmentId: ocid1.compartment.oc1..<unique_ID>
+        createdBy: ocid1.user.oc1..<unique_ID>
+        definedTags:
+          Oracle-Tags:
+            CreatedBy: user@example.com
+            CreatedOn: '2023-09-29T15:57:37.551Z'
+        etag: 0c491a4c-b13d-46b8-9013-f2b96fa037d3
+        freeformTags:
+          Project: CNCF
+        name: ip_test_bucket
+        namespace: <namespace>
+        timeCreated: '2023-09-29T15:57:37.569Z'
+    headers:
+      content-type:
+      - application/json
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: https://objectstorage.us-ashburn-1.oraclecloud.com/n
+  response:
+    body:
+      data: idpktreuauj2
+    headers:
+      content-type:
+      - application/json
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: https://objectstorage.us-ashburn-1.oraclecloud.com/n/<namepsace>/b?compartmentId=ocid1.tenancy.oc1..<unique_ID>&fields=tags
+  response:
+    body:
+      data:
+      - compartmentId: ocid1.tenancy.oc1..<unique_ID>
+        createdBy: ocid1.saml2idp.oc1..<unique_ID>
+        definedTags:
+          Oracle-Tags:
+            CreatedBy: user@example.com
+            CreatedOn: '2022-06-13T18:17:03.713Z'
+        etag: 0ec45353-1beb-4cbf-8948-bd3555fe2f1c
+        freeformTags:
+          app-name: acs
+        name: bucket-20220613-1316
+        namespace: <namespace>
+        timeCreated: '2022-06-13T18:17:03.722Z'
+    headers:
+      content-type:
+      - application/json
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: https://objectstorage.us-ashburn-1.oraclecloud.com/n/<namepsace>/b/ip_test_bucket
+  response:
+    body:
+      data:
+        approximateCount: null
+        approximateSize: null
+        approximateSizeMultipartUploads: null
+        autoTiering: null
+        compartmentId: ocid1.compartment.oc1..<unique_ID>
+        createdBy: ocid1.user.oc1..<unique_ID>
+        definedTags:
+          Oracle-Tags:
+            CreatedBy: user@example.com
+            CreatedOn: '2023-09-29T15:57:37.551Z'
+        etag: 0c491a4c-b13d-46b8-9013-f2b96fa037d3
+        freeformTags:
+          Project: CNCF
+        id: ocid1.bucket.oc1..<unique_ID>
+        isReadOnly: false
+        kmsKeyId: null
+        metadata: {}
+        meterFlagSet:
+          empty: true
+        name: ip_test_bucket
+        namespace: <namespace>
+        objectEventsEnabled: false
+        objectLevelAuditMode: Disabled
+        publicAccessType: ObjectRead
+        replicationEnabled: false
+        storageTier: Standard
+        timeCreated: '2023-09-29T15:57:37.569Z'
+        versioning: Disabled
+    headers:
+      cache-control:
+      - no-store
+      content-type:
+      - application/json
+    status:
+      code: 200
+      message: OK
+version: 1
