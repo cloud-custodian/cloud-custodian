@@ -110,10 +110,10 @@ class ServerConfigurationsFilter(ValueFilter):
         return super().__call__(resource['properties'][key])
 
 
-@MySQL.filter_registry.register('mysql-server-security-alert-policies-filter')
+@MySQL.filter_registry.register('security-alert-policy')
 class MySqlServerSecurityAlertPoliciesFilter(ValueFilter):
 
-    schema = type_schema('mysql-server-security-alert-policies-filter',
+    schema = type_schema('security-alert-policy',
                          rinherit=ValueFilter.schema)
 
     def _perform_op(self, a, b):

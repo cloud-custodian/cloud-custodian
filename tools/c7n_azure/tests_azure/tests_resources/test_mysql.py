@@ -51,7 +51,7 @@ class MySQLSecurityAlertPoliciesFilterTest(BaseTest):
             'name': 'test-azure-mysql',
             'resource': 'azure.mysql',
             'filters': [
-                {'type': 'mysql-server-security-alert-policies-filter',
+                {'type': 'security-alert-policy',
                  'key': 'state',
                  'op': 'eq',
                  'value': 'Enabled'}]
@@ -63,7 +63,7 @@ class MySQLSecurityAlertPoliciesFilterTest(BaseTest):
             'name': 'test-azure-mysql',
             'resource': 'azure.mysql',
             'filters': [
-                {'type': 'mysql-server-security-alert-policies-filter',
+                {'type': 'security-alert-policy',
                  'key': 'state',
                  'op': 'eq',
                  'value': 'Enabled'}]
