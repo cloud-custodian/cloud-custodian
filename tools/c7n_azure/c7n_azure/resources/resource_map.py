@@ -89,6 +89,7 @@ ResourceMap = {
     "azure.vm": "c7n_azure.resources.vm.VirtualMachine",
     "azure.vmss": "c7n_azure.resources.vmss.VMScaleSet",
     "azure.vnet": "c7n_azure.resources.vnet.Vnet",
+    "azure.waf": "c7n_azure.resources.waf.WAF",
     "azure.webapp": "c7n_azure.resources.web_app.WebApp",
     "azure.defender-alert": "c7n_azure.resources.defender.DefenderAlertSettings",
     "azure.alert-logs": "c7n_azure.resources.alertlogs.AlertLogs"
