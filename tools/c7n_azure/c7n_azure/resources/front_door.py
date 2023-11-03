@@ -75,10 +75,10 @@ class WebAppFirewallFilter(Filter):
         return matched
 
 
-@FrontDoor.filter_registry.register('web-application-firewall-policies')
+@FrontDoor.filter_registry.register('firewall-policy')
 class WebApplicationFirewallPolicies(ValueFilter):
 
-    schema = type_schema('web-application-firewall-policies', rinherit=ValueFilter.schema)
+    schema = type_schema('firewall-policy', rinherit=ValueFilter.schema)
 
     def process(self, resources, event=None):
         filtered_resources = []

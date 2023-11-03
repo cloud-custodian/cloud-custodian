@@ -40,7 +40,7 @@ class FrontDoorTest(BaseTest):
         self.assertEqual(len(resources), 1)
 
 
-class TestWebApplicationFirewallPolicies(BaseTest):
+class TestFrontDoorFirewallPolicyFilter(BaseTest):
 
     def test_query(self):
         p = self.load_policy(
@@ -49,7 +49,7 @@ class TestWebApplicationFirewallPolicies(BaseTest):
                 "resource": "azure.front-door",
                 "filters": [
                     {
-                        "type": "web-application-firewall-policies",
+                        "type": "firewall-policy",
                         "key": "resource_state",
                         "op": "eq",
                         "value": "Enabled",
