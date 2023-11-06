@@ -94,7 +94,7 @@ def loads(body):
 
 
 def dumps(data, fh=None, indent=0):
-    encoder = multiple_json_encoders_factory(DateTimeEncoder, BytesDumpEncoder)
+    encoder = multiple_json_encoders_factory(DateTimeEncoder, BytesEncoder)
 
     if fh:
         return json.dump(data, fh, cls=encoder, indent=indent)
@@ -231,7 +231,7 @@ def multiple_json_encoders_factory(*encoder):
     
     return MultipleJsonEncoders
 
-class BytesDumpEncoder(json.JSONEncoder):
+class BytesEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj, bytes):
             return obj.decode()
