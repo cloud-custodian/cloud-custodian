@@ -220,7 +220,7 @@ def multiple_json_encoders_factory(*encoders):
         def __init__(self, *args, **kwargs):
             super().__init__(*args, **kwargs)
             self.encoders = [encoder(*args, **kwargs) for encoder in encoders]
-        
+
         def default(self, o):
             for encoder in self.encoders:
                 try:
@@ -228,7 +228,7 @@ def multiple_json_encoders_factory(*encoders):
                 except TypeError:
                     pass
             return super().default(o)
-    
+
     return MultipleJsonEncoders
 
 class BytesEncoder(json.JSONEncoder):
