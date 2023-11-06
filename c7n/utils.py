@@ -215,7 +215,7 @@ def type_schema(
 
 
 # Based on https://stackoverflow.com/a/76931520
-def multiple_json_encoders_factory(*encoder):
+def multiple_json_encoders_factory(*encoders):
     class MultipleJsonEncoders(json.JSONEncoder):
         def __init__(self, *args, **kwargs):
             super().__init__(*args, **kwargs)
