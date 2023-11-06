@@ -94,10 +94,12 @@ def loads(body):
 
 
 def dumps(data, fh=None, indent=0):
+    encoder = multiple_json_encoders_factory(DateTimeEncoder, BytesDumpEncoder)
+
     if fh:
-        return json.dump(data, fh, cls=DateTimeEncoder, indent=indent)
+        return json.dump(data, fh, cls=encoder, indent=indent)
     else:
-        return json.dumps(data, cls=DateTimeEncoder, indent=indent)
+        return json.dumps(data, cls=encoder, indent=indent)
 
 
 def format_event(evt):
@@ -211,6 +213,29 @@ def type_schema(
         s['allOf'].append(extended)
     return s
 
+
+# Based on https://stackoverflow.com/a/76931520
+def multiple_json_encoders_factory(*encoder):
+    class MultipleJsonEncoders(json.JSONEncoder):
+        def __init__(self, *args, **kwargs):
+            super().__init__(*args, **kwargs)
+            self.encoders = [encoder(*args, **kwargs) for encoder in encoders]
+        
+        def default(self, o):
+            for encoder in self.encoders:
+                try:
+                    return encoder.default(o)
+                except TypeError:
+                    pass
+            return super().default(o)
+    
+    return MultipleJsonEncoders
+
+class BytesDumpEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, bytes):
+            return obj.decode()
+        return json.JSONEncoder.default(self, obj)
 
 class DateTimeEncoder(json.JSONEncoder):
 
