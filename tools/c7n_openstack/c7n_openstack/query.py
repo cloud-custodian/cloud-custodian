@@ -27,7 +27,18 @@ class ResourceQuery:
         return self._invoke_client_enum(client, enum_op, params)
 
     def _invoke_client_enum(self, client, enum_op, params):
-        res = getattr(client, enum_op)(**params)
+        if isinstance(enum_op, list):
+            obj = None
+            res = []
+            for op in enum_op:
+                if obj is None:
+                    obj = getattr(client, op)
+                else:
+                    obj = getattr(obj, op)
+            for r in obj(**params):
+                res.append(r.toDict() if not isinstance(enum_op, dict) else r)
+        else:
+            res = getattr(client, enum_op)(**params)
         return res
 
 
