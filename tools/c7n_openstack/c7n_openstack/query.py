@@ -28,13 +28,10 @@ class ResourceQuery:
 
     def _invoke_client_enum(self, client, enum_op, params):
         if isinstance(enum_op, list):
-            obj = None
+            obj = client
             res = []
             for op in enum_op:
-                if obj is None:
-                    obj = getattr(client, op)
-                else:
-                    obj = getattr(obj, op)
+                obj = getattr(obj, op)
             for r in obj(**params):
                 res.append(r.toDict() if not isinstance(enum_op, dict) else r)
         else:
