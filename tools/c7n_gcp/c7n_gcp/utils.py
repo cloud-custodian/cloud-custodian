@@ -1,4 +1,4 @@
-def get_firewall_ranges(firewall_resources):
+def get_firewall_port_ranges(firewall_resources):
     for r_index, r in enumerate(firewall_resources):
         action = "allowed" if "allowed" in r else "denied"
         for protocol_index, protocol in enumerate(r[action]):
