@@ -260,7 +260,7 @@ ResourceMap = {
   "aws.workspaces": "c7n.resources.workspaces.Workspace",
   "aws.workspaces-directory": "c7n.resources.workspaces.WorkspaceDirectory",
   "aws.workspaces-image": "c7n.resources.workspaces.WorkspaceImage",
-  "aws.workspaces-web": "c7n.resources.workspace.WorkspacesWeb",
+  "aws.workspaces-web": "c7n.resources.workspaces.WorkspacesWeb",
   "aws.xray-group": "c7n.resources.xray.XRayGroup",
   "aws.xray-rule": "c7n.resources.xray.XRaySamplingRule"
 }

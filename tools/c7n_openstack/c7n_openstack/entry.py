@@ -7,7 +7,8 @@ from c7n_openstack.resources import (
     flavor,
     server,
     user,
-    security_group
+    security_group,
+    secret
 )
 
 log = logging.getLogger('custodian.openstack')
@@ -17,7 +18,9 @@ ALL = [
     project,
     server,
     user,
-    security_group]
+    security_group,
+    secret
+]
 
 
 def initialize_openstack():
