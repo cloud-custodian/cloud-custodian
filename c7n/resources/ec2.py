@@ -161,7 +161,7 @@ class EC2(query.QueryResourceManager):
 @filters.register('security-group')
 class SecurityGroupFilter(net_filters.SecurityGroupFilter):
 
-    RelatedIdsExpression = "SecurityGroups[].GroupId"
+    RelatedIdsExpression = "NetworkInterfaces[].Groups[].GroupId"
 
 
 @filters.register('subnet')
@@ -2230,6 +2230,12 @@ class LaunchTemplate(query.QueryResourceManager):
                     LaunchTemplateId=r['LaunchTemplateId']).get(
                         'LaunchTemplateVersions', ()))
         return template_versions
+
+    def get_arns(self, resources):
+        arns = []
+        for r in resources:
+            arns.append(self.generate_arn(f"{r['LaunchTemplateId']}/{r['VersionNumber']}"))
+        return arns
 
     def get_resources(self, rids, cache=True):
         # Launch template versions have a compound primary key

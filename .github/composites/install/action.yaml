@@ -74,3 +74,8 @@ runs:
       shell: bash
       id: echo-poetry-version
       run: echo "poetry-version=${{ inputs.poetry-version }}" >> $GITHUB_OUTPUT
+
+    - name: Build awscc data files
+      shell: bash
+      run: cd tools/c7n_awscc && python build.py
+

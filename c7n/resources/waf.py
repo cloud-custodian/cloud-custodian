@@ -82,6 +82,7 @@ class WAF(QueryResourceManager):
         # override defaults to casing issues
         permissions_enum = ('waf:ListWebACLs',)
         permissions_augment = ('waf:GetWebACL',)
+        global_resource = True
 
 
 @resources.register('waf-regional')

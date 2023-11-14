@@ -203,7 +203,8 @@ class PolicyMetaLint(BaseTest):
         overrides = overrides.difference(
             {'account', 's3', 'hostedzone', 'log-group', 'rest-api', 'redshift-snapshot',
              'rest-stage', 'codedeploy-app', 'codedeploy-group', 'fis-template', 'dlm-policy',
-             'apigwv2', 'apigwv2-stage', 'apigw-domain-name', 'fis-experiment'})
+             'apigwv2', 'apigwv2-stage', 'apigw-domain-name', 'fis-experiment',
+             'launch-template-version'})
         if overrides:
             raise ValueError("unknown arn overrides in %s" % (", ".join(overrides)))
 
@@ -262,6 +263,14 @@ class PolicyMetaLint(BaseTest):
 
         whitelist = set(('AwsS3Object', 'Container'))
         todo = set((
+            # q4 2023
+            'AwsMskCluster',
+            'AwsEventsEventbus',
+            'AwsEventsEndpoint',
+            'AwsDmsReplicationTask',
+            'AwsRoute53HostedZone',
+            'AwsDmsEndpoint',
+            'AwsDmsReplicationInstance',
             # q2 2023
             'AwsAthenaWorkGroup',
             'AwsStepFunctionStateMachine',
@@ -364,6 +373,26 @@ class PolicyMetaLint(BaseTest):
         # of a resource.
 
         whitelist = {
+            # q4 2023
+            "AWS::APS::RuleGroupsNamespace",
+            "AWS::AppStream::Stack",
+            "AWS::Batch::SchedulingPolicy",
+            "AWS::CodeBuild::ReportGroup",
+            "AWS::CodeGuruProfiler::ProfilingGroup",
+            "AWS::InspectorV2::Filter",
+            "AWS::IoT::JobTemplate",
+            "AWS::IoT::ProvisioningTemplate",
+            "AWS::IoTTwinMaker::ComponentType",
+            "AWS::IoTWireless::FuotaTask",
+            "AWS::IoTWireless::MulticastGroup",
+            "AWS::MSK::BatchScramSecret",
+            "AWS::MediaConnect::FlowSource",
+            "AWS::Personalize::DatasetGroup",
+            "AWS::Route53Resolver::ResolverQueryLoggingConfig",
+            "AWS::Route53Resolver::ResolverQueryLoggingConfigAssociation",
+            "AWS::SageMaker::FeatureGroup",
+            "AWS::ServiceDiscovery::Instance",
+            "AWS::Transfer::Certificate",
             # q3 2023
             "AWS::ACMPCA::CertificateAuthority",
             "AWS::Amplify::Branch",

@@ -23,9 +23,7 @@ def test_delete(test_awscc):
 
     client = factory().client("logs")
     assert (
-        client.describe_log_groups(logGroupNamePrefix="/aws/apigateway/welcome").get(
-            "logGroups"
-        )
+        client.describe_log_groups(logGroupNamePrefix="/aws/apigateway/welcome").get("logGroups")
         == []
     )
 

@@ -51,6 +51,8 @@ ResourceMap = {
     "gcp.kms-cryptokey": "c7n_gcp.resources.kms.KmsCryptoKey",
     "gcp.kms-cryptokey-version": "c7n_gcp.resources.kms.KmsCryptoKeyVersion",
     "gcp.kms-keyring": "c7n_gcp.resources.kms.KmsKeyRing",
+    "gcp.kms-location": "c7n_gcp.resources.kms.KmsLocation",
+    "gcp.kms-keyring-iam-policy-bindings": "c7n_gcp.resources.kms.KmsKeyRingsListGetIamPolicies",
     "gcp.loadbalancer-address": "c7n_gcp.resources.loadbalancer.LoadBalancingAddress",
     "gcp.loadbalancer-backend-bucket": "c7n_gcp.resources.loadbalancer.LoadBalancingBackendBucket",
     "gcp.loadbalancer-backend-service": (

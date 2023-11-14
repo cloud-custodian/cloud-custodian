@@ -1,0 +1,1718 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.DesktopVirtualization/hostPools?api-version=2022-09-09",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "x-ms-lamport-ts": [
+                        "4758452101"
+                    ],
+                    "x-ms-opsarmpath64": [
+                        "L3N1YnNjcmlwdGlvbnMvMjMwMGNjNTUtOGQ3OS00N2U2LTk5ZTItMDI3ZDdjZjk5Mjk5"
+                    ],
+                    "set-cookie": [
+                        "ARRAffinity=faf4dec0e866a78a704d6f50882bec16fc24fe887063009bbdffd2526cac326f;Path=/;HttpOnly;Secure;Domain=rdarmprovider-g-us-r0.wvd.microsoft.com",
+                        "ARRAffinitySameSite=faf4dec0e866a78a704d6f50882bec16fc24fe887063009bbdffd2526cac326f;Path=/;HttpOnly;SameSite=None;Secure;Domain=rdarmprovider-g-us-r0.wvd.microsoft.com"
+                    ],
+                    "content-length": [
+                        "1753"
+                    ],
+                    "x-rate-limit-limit": [
+                        "0"
+                    ],
+                    "x-rate-limit-reset": [
+                        "0"
+                    ],
+                    "date": [
+                        "Tue, 26 Sep 2023 22:53:45 GMT"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 22675E0287D845C1B4C257B9863560AB Ref B: CO6AA3150218019 Ref C: 2023-09-26T22:53:46Z"
+                    ],
+                    "x-rate-limit-remaining": [
+                        "9223372036854775807"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-ms-correlation-id": [
+                        "ebb50a20-77a3-427b-b326-bcfb212f4a0a"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "identity": null,
+                                "name": "fail-HostPool",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/cfb-sfescbnv/providers/Microsoft.DesktopVirtualization/hostpools/fail-HostPool",
+                                "type": "Microsoft.DesktopVirtualization/hostpools",
+                                "location": "eastus",
+                                "tags": {
+                                    "c7n": "true",
+                                    "product_id": "13742"
+                                },
+                                "kind": null,
+                                "systemData": {
+                                    "createdBy": "test@tester.com",
+                                    "createdByType": "User",
+                                    "createdAt": "2023-09-26T15:51:07.69Z",
+                                    "lastModifiedBy": "test@tester.com",
+                                    "lastModifiedByType": "User",
+                                    "lastModifiedAt": "2023-09-26T15:55:09.59Z"
+                                },
+                                "properties": {
+                                    "agentUpdate": null,
+                                    "friendlyName": "fail-HostPool",
+                                    "description": "fail Terraform HostPool",
+                                    "hostPoolType": "Pooled",
+                                    "personalDesktopAssignmentType": null,
+                                    "applicationGroupReferences": [],
+                                    "appAttachPackageReferences": [],
+                                    "customRdpProperty": "",
+                                    "maxSessionLimit": 16,
+                                    "loadBalancerType": "DepthFirst",
+                                    "validationEnvironment": false,
+                                    "ring": null,
+                                    "registrationInfo": null,
+                                    "vmTemplate": "{\"domain\":\"mckavm.onmicrosoft.com\",\"galleryImageOffer\":\"windows-10\",\"galleryImagePublisher\":\"microsoftwindowsdesktop\",\"galleryImageSKU\":\"win10-22h2-avd-g2\",\"imageType\":\"Gallery\",\"customImageId\":null,\"namePrefix\":\"cfb-test\",\"osDiskType\":\"StandardSSD_LRS\",\"vmSize\":{\"id\":\"Standard_D2s_v3\",\"cores\":2,\"ram\":8},\"galleryItemId\":\"microsoftwindowsdesktop.windows-10win10-22h2-avd-g2\",\"hibernate\":false,\"diskSizeGB\":0,\"securityType\":\"TrustedLaunch\",\"secureBoot\":true,\"vTPM\":true}",
+                                    "preferredAppGroupType": "Desktop",
+                                    "migrationRequest": null,
+                                    "cloudPcResource": false,
+                                    "startVMOnConnect": false,
+                                    "ssoadfsAuthority": null,
+                                    "ssoClientId": null,
+                                    "ssoClientSecretKeyVaultPath": null,
+                                    "ssoSecretType": null,
+                                    "objectId": "638b72c0-e8b5-4fcc-a5ed-7e8a081cb80c"
+                                }
+                            }
+                        ],
+                        "nextLink": null
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-sfescbnv/providers/Microsoft.DesktopVirtualization/hostPools/fail-HostPool/sessionHosts?api-version=2022-09-09",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "x-ms-lamport-ts": [
+                        "4758450689"
+                    ],
+                    "x-ms-opsarmpath64": [
+                        "L3N1YnNjcmlwdGlvbnMvMjMwMGNjNTUtOGQ3OS00N2U2LTk5ZTItMDI3ZDdjZjk5Mjk5L3Jlc291cmNlR3JvdXBzL2NmYi1zZmVzY2Judi9wcm92aWRlcnMvTWljcm9zb2Z0LkRlc2t0b3BWaXJ0dWFsaXphdGlvbi9ob3N0UG9vbHMvZmFpbC1Ib3N0UG9vbA=="
+                    ],
+                    "set-cookie": [
+                        "ARRAffinity=200de21427d0c1dd2d869b53e33412d0ea489a73f18ab9db8212a0998e7da59c;Path=/;HttpOnly;Secure;Domain=rdarmprovider-g-us-r0.wvd.microsoft.com",
+                        "ARRAffinitySameSite=200de21427d0c1dd2d869b53e33412d0ea489a73f18ab9db8212a0998e7da59c;Path=/;HttpOnly;SameSite=None;Secure;Domain=rdarmprovider-g-us-r0.wvd.microsoft.com"
+                    ],
+                    "content-length": [
+                        "6112"
+                    ],
+                    "x-rate-limit-limit": [
+                        "5m"
+                    ],
+                    "x-rate-limit-reset": [
+                        "2023-09-26T22:58:46.9490829Z"
+                    ],
+                    "date": [
+                        "Tue, 26 Sep 2023 22:53:46 GMT"
+                    ],
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 862894BC112A4EC4BD8239F2469FEED9 Ref B: CO6AA3150218019 Ref C: 2023-09-26T22:53:46Z"
+                    ],
+                    "x-rate-limit-remaining": [
+                        "5999"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-ms-correlation-id": [
+                        "70b949ae-d626-4f3a-933a-2ac96532851b"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "name": "fail-HostPool/cfb-test-0",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/cfb-sfescbnv/providers/Microsoft.DesktopVirtualization/hostpools/fail-HostPool/sessionhosts/cfb-test-0",
+                                "type": "Microsoft.DesktopVirtualization/hostpools/sessionhosts",
+                                "properties": {
+                                    "friendlyName": null,
+                                    "lastHeartBeat": "2023-09-26T16:21:44.89Z",
+                                    "statusTimestamp": "2023-09-26T16:36:37.67Z",
+                                    "lastUpdateTime": "2023-09-26T16:36:37.67Z",
+                                    "sessions": 0,
+                                    "agentVersion": "1.0.7255.1400",
+                                    "allowNewSession": true,
+                                    "assignedUser": null,
+                                    "status": "Unavailable",
+                                    "osVersion": "10.0.19045",
+                                    "sxSStackVersion": "rdp-sxs230716300",
+                                    "updateState": "Succeeded",
+                                    "updateErrorMessage": "",
+                                    "sessionHostHealthCheckResults": [
+                                        {
+                                            "healthCheckName": "DomainJoinedCheck",
+                                            "healthCheckResult": "HealthCheckFailed",
+                                            "additionalFailureDetails": {
+                                                "message": "SessionHost unhealthy: SessionHost is not joined to a domain",
+                                                "errorCode": -2147467259,
+                                                "lastHealthCheckDateTime": "2023-09-26T16:21:44.7726071Z"
+                                            }
+                                        },
+                                        {
+                                            "healthCheckName": "DomainTrustCheck",
+                                            "healthCheckResult": "HealthCheckFailed",
+                                            "additionalFailureDetails": {
+                                                "message": "SessionHost unhealthy: VerifyDomainTrust failed with exception The local computer is not joined to a domain or the domain cannot be contacted.",
+                                                "errorCode": -2146233088,
+                                                "lastHealthCheckDateTime": "2023-09-26T16:21:44.7726071Z"
+                                            }
+                                        },
+                                        {
+                                            "healthCheckName": "SxSStackListenerCheck",
+                                            "healthCheckResult": "HealthCheckSucceeded",
+                                            "additionalFailureDetails": {
+                                                "message": "SessionHost healthy: SessionHost healthy: SxS stack listener is ready",
+                                                "errorCode": 0,
+                                                "lastHealthCheckDateTime": "2023-09-26T16:06:34.9610021Z"
+                                            }
+                                        },
+                                        {
+                                            "healthCheckName": "MonitoringAgentCheck",
+                                            "healthCheckResult": "HealthCheckSucceeded",
+                                            "additionalFailureDetails": {
+                                                "message": "Located running process at C:\\Program Files\\Microsoft RDInfra\\RDMonitoringAgent_45.5.2\\Agent\\MonAgentLauncher.exe",
+                                                "errorCode": 0,
+                                                "lastHealthCheckDateTime": "2023-09-26T16:21:35.0850719Z"
+                                            }
+                                        },
+                                        {
+                                            "healthCheckName": "MetaDataServiceCheck",
+                                            "healthCheckResult": "HealthCheckSucceeded",
+                                            "additionalFailureDetails": {
+                                                "message": "{\r\n  \"Details\": \"IMDS pressumed available\",\r\n  \"AzureResourceId\": \"/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-sfescbnv/providers/Microsoft.Compute/virtualMachines/cfb-test-0\",\r\n  \"VmId\": \"740e4846-42f4-4008-87d0-312b3cbe2985\"\r\n}",
+                                                "errorCode": 0,
+                                                "lastHealthCheckDateTime": "2023-09-26T16:06:35.1953913Z"
+                                            }
+                                        },
+                                        {
+                                            "healthCheckName": "AppAttachHealthCheck",
+                                            "healthCheckResult": "HealthCheckSucceeded",
+                                            "additionalFailureDetails": {
+                                                "message": "SessionHost healthy: MSIX packages have been properly staged",
+                                                "errorCode": 0,
+                                                "lastHealthCheckDateTime": "2023-09-26T16:21:42.210059Z"
+                                            }
+                                        }
+                                    ],
+                                    "resourceId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-sfescbnv/providers/Microsoft.Compute/virtualMachines/cfb-test-0",
+                                    "virtualMachineId": "740e4846-42f4-4008-87d0-312b3cbe2985",
+                                    "objectId": "d5f965e6-e2d9-429a-bbec-1d4412de23d0"
+                                },
+                                "systemData": {
+                                    "createdBy": null,
+                                    "createdByType": null,
+                                    "createdAt": "2023-09-26T16:05:52.14Z",
+                                    "lastModifiedBy": null,
+                                    "lastModifiedByType": null,
+                                    "lastModifiedAt": null
+                                }
+                            },
+                            {
+                                "name": "fail-HostPool/cfb-test-1",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/cfb-sfescbnv/providers/Microsoft.DesktopVirtualization/hostpools/fail-HostPool/sessionhosts/cfb-test-1",
+                                "type": "Microsoft.DesktopVirtualization/hostpools/sessionhosts",
+                                "properties": {
+                                    "friendlyName": null,
+                                    "lastHeartBeat": "2023-09-26T16:22:01.98Z",
+                                    "statusTimestamp": "2023-09-26T16:36:52.45Z",
+                                    "lastUpdateTime": "2023-09-26T16:36:52.45Z",
+                                    "sessions": 0,
+                                    "agentVersion": "1.0.7255.1400",
+                                    "allowNewSession": true,
+                                    "assignedUser": null,
+                                    "status": "Unavailable",
+                                    "osVersion": "10.0.19045",
+                                    "sxSStackVersion": "rdp-sxs230716300",
+                                    "updateState": "Succeeded",
+                                    "updateErrorMessage": "",
+                                    "sessionHostHealthCheckResults": [
+                                        {
+                                            "healthCheckName": "DomainJoinedCheck",
+                                            "healthCheckResult": "HealthCheckFailed",
+                                            "additionalFailureDetails": {
+                                                "message": "SessionHost unhealthy: SessionHost is not joined to a domain",
+                                                "errorCode": -2147467259,
+                                                "lastHealthCheckDateTime": "2023-09-26T16:21:56.2587693Z"
+                                            }
+                                        },
+                                        {
+                                            "healthCheckName": "DomainTrustCheck",
+                                            "healthCheckResult": "HealthCheckFailed",
+                                            "additionalFailureDetails": {
+                                                "message": "SessionHost unhealthy: VerifyDomainTrust failed with exception The local computer is not joined to a domain or the domain cannot be contacted.",
+                                                "errorCode": -2146233088,
+                                                "lastHealthCheckDateTime": "2023-09-26T16:22:01.8525658Z"
+                                            }
+                                        },
+                                        {
+                                            "healthCheckName": "SxSStackListenerCheck",
+                                            "healthCheckResult": "HealthCheckSucceeded",
+                                            "additionalFailureDetails": {
+                                                "message": "SessionHost healthy: SessionHost healthy: SxS stack listener is ready",
+                                                "errorCode": 0,
+                                                "lastHealthCheckDateTime": "2023-09-26T16:06:49.3821978Z"
+                                            }
+                                        },
+                                        {
+                                            "healthCheckName": "MonitoringAgentCheck",
+                                            "healthCheckResult": "HealthCheckSucceeded",
+                                            "additionalFailureDetails": {
+                                                "message": "Located running process at C:\\Program Files\\Microsoft RDInfra\\RDMonitoringAgent_45.5.2\\Agent\\MonAgentLauncher.exe",
+                                                "errorCode": 0,
+                                                "lastHealthCheckDateTime": "2023-09-26T16:21:49.5087855Z"
+                                            }
+                                        },
+                                        {
+                                            "healthCheckName": "MetaDataServiceCheck",
+                                            "healthCheckResult": "HealthCheckSucceeded",
+                                            "additionalFailureDetails": {
+                                                "message": "{\r\n  \"Details\": \"IMDS pressumed available\",\r\n  \"AzureResourceId\": \"/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-sfescbnv/providers/Microsoft.Compute/virtualMachines/cfb-test-1\",\r\n  \"VmId\": \"4e93b3a2-a8d8-453a-8f79-08232e57ee84\"\r\n}",
+                                                "errorCode": 0,
+                                                "lastHealthCheckDateTime": "2023-09-26T16:06:49.6165731Z"
+                                            }
+                                        },
+                                        {
+                                            "healthCheckName": "AppAttachHealthCheck",
+                                            "healthCheckResult": "HealthCheckSucceeded",
+                                            "additionalFailureDetails": {
+                                                "message": "SessionHost healthy: MSIX packages have been properly staged",
+                                                "errorCode": 0,
+                                                "lastHealthCheckDateTime": "2023-09-26T16:21:58.1650334Z"
+                                            }
+                                        }
+                                    ],
+                                    "resourceId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-sfescbnv/providers/Microsoft.Compute/virtualMachines/cfb-test-1",
+                                    "virtualMachineId": "4e93b3a2-a8d8-453a-8f79-08232e57ee84",
+                                    "objectId": "2701888d-c2ac-4102-871e-79f56ea6d813"
+                                },
+                                "systemData": {
+                                    "createdBy": null,
+                                    "createdByType": null,
+                                    "createdAt": "2023-09-26T16:06:04.25Z",
+                                    "lastModifiedBy": null,
+                                    "lastModifiedByType": null,
+                                    "lastModifiedAt": null
+                                }
+                            }
+                        ],
+                        "nextLink": null
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-sfescbnv/providers/Microsoft.Compute/virtualMachines/cfb-test-0?$expand=instanceView&api-version=2020-12-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-length": [
+                        "21371"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 586E85EC919E4F6CA6CC249C9CB61FF7 Ref B: CO6AA3150217009 Ref C: 2023-09-26T22:53:48Z"
+                    ],
+                    "date": [
+                        "Tue, 26 Sep 2023 22:53:47 GMT"
+                    ],
+                    "x-ms-ratelimit-remaining-resource": [
+                        "Microsoft.Compute/LowCostGet3Min;3999,Microsoft.Compute/LowCostGet30Min;31999"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "name": "cfb-test-0",
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-sfescbnv/providers/Microsoft.Compute/virtualMachines/cfb-test-0",
+                        "type": "Microsoft.Compute/virtualMachines",
+                        "location": "eastus",
+                        "tags": {
+                            "cm-resource-parent": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-sfescbnv/providers/Microsoft.DesktopVirtualization/hostpools/fail-HostPool",
+                            "product_id": "13742"
+                        },
+                        "properties": {
+                            "hardwareProfile": {
+                                "vmSize": "Standard_D2s_v3"
+                            },
+                            "provisioningState": "Succeeded",
+                            "vmId": "740e4846-42f4-4008-87d0-312b3cbe2985",
+                            "additionalCapabilities": {},
+                            "storageProfile": {
+                                "imageReference": {
+                                    "publisher": "microsoftwindowsdesktop",
+                                    "offer": "windows-10",
+                                    "sku": "win10-22h2-avd-g2",
+                                    "version": "latest",
+                                    "exactVersion": "19045.3448.230831"
+                                },
+                                "osDisk": {
+                                    "osType": "Windows",
+                                    "name": "cfb-test-0_OsDisk_1_0bc53e46120248c39fd3fd06398ca889",
+                                    "createOption": "FromImage",
+                                    "caching": "ReadWrite",
+                                    "managedDisk": {
+                                        "storageAccountType": "StandardSSD_LRS",
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-sfescbnv/providers/Microsoft.Compute/disks/cfb-test-0_OsDisk_1_0bc53e46120248c39fd3fd06398ca889"
+                                    },
+                                    "diskSizeGB": 127
+                                },
+                                "dataDisks": []
+                            },
+                            "osProfile": {
+                                "computerName": "cfb-test-0",
+                                "adminUsername": "adminuser",
+                                "windowsConfiguration": {
+                                    "provisionVMAgent": true,
+                                    "enableAutomaticUpdates": true,
+                                    "patchSettings": {
+                                        "patchMode": "AutomaticByOS"
+                                    }
+                                },
+                                "secrets": [],
+                                "allowExtensionOperations": true,
+                                "requireGuestProvisionSignal": true
+                            },
+                            "securityProfile": {
+                                "uefiSettings": {
+                                    "secureBootEnabled": true,
+                                    "vTpmEnabled": true
+                                },
+                                "securityType": "TrustedLaunch"
+                            },
+                            "networkProfile": {
+                                "networkInterfaces": [
+                                    {
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-sfescbnv/providers/Microsoft.Network/networkInterfaces/cfb-test-0-nic"
+                                    }
+                                ]
+                            },
+                            "diagnosticsProfile": {
+                                "bootDiagnostics": {
+                                    "enabled": false
+                                }
+                            },
+                            "licenseType": "Windows_Client",
+                            "instanceView": {
+                                "computerName": "cfb-test-0",
+                                "osName": "Windows 10 Enterprise for Virtual Desktops",
+                                "osVersion": "10.0.19045.3448",
+                                "vmAgent": {
+                                    "vmAgentVersion": "2.7.41491.1095",
+                                    "statuses": [
+                                        {
+                                            "code": "ProvisioningState/succeeded",
+                                            "level": "Info",
+                                            "displayStatus": "Ready",
+                                            "message": "GuestAgent is running and processing the extensions.",
+                                            "time": "2023-09-26T22:53:43.885+00:00"
+                                        }
+                                    ],
+                                    "extensionHandlers": [
+                                        {
+                                            "type": "Microsoft.Azure.AzureDefenderForServers.MDE.Windows",
+                                            "typeHandlerVersion": "1.0.9.2",
+                                            "status": {
+                                                "code": "ProvisioningState/succeeded",
+                                                "level": "Info",
+                                                "displayStatus": "Ready"
+                                            }
+                                        },
+                                        {
+                                            "type": "Microsoft.Compute.JsonADDomainExtension",
+                                            "typeHandlerVersion": "1.3.11",
+                                            "status": {
+                                                "code": "ProvisioningState/succeeded",
+                                                "level": "Info",
+                                                "displayStatus": "Ready"
+                                            }
+                                        },
+                                        {
+                                            "type": "Microsoft.Powershell.DSC",
+                                            "typeHandlerVersion": "2.83.5",
+                                            "status": {
+                                                "code": "ProvisioningState/succeeded",
+                                                "level": "Info",
+                                                "displayStatus": "Ready"
+                                            }
+                                        }
+                                    ]
+                                },
+                                "disks": [
+                                    {
+                                        "name": "cfb-test-0_OsDisk_1_0bc53e46120248c39fd3fd06398ca889",
+                                        "statuses": [
+                                            {
+                                                "code": "ProvisioningState/succeeded",
+                                                "level": "Info",
+                                                "displayStatus": "Provisioning succeeded",
+                                                "time": "2023-09-26T15:55:47.3064956+00:00"
+                                            }
+                                        ]
+                                    }
+                                ],
+                                "extensions": [
+                                    {
+                                        "name": "joindomain",
+                                        "type": "Microsoft.Compute.JsonADDomainExtension",
+                                        "typeHandlerVersion": "1.3.11",
+                                        "substatuses": [
+                                            {
+                                                "code": "ComponentStatus/JoinDomainException for Option 3 meaning 'User Specified'/failed/1",
+                                                "level": "Error",
+                                                "displayStatus": "Provisioning failed",
+                                                "message": "ERROR - Failed to join domain='mckavm.onmicrosoft.com', ou='', user='tester@mckavm.onmicrosoft.com', option='NetSetupJoinDomain, NetSetupAcctCreate' (#3 meaning 'User Specified'). Error code 1355"
+                                            },
+                                            {
+                                                "code": "ComponentStatus/JoinDomainException for Option 1 meaning 'User Specified without NetSetupAcctCreate'/failed/1",
+                                                "level": "Error",
+                                                "displayStatus": "Provisioning failed",
+                                                "message": "ERROR - Failed to join domain='mckavm.onmicrosoft.com', ou='', user='tester@mckavm.onmicrosoft.com', option='NetSetupJoinDomain' (#1 meaning 'User Specified without NetSetupAcctCreate'). Error code 1355"
+                                            }
+                                        ],
+                                        "statuses": [
+                                            {
+                                                "code": "ProvisioningState/failed/1",
+                                                "level": "Error",
+                                                "displayStatus": "Provisioning failed",
+                                                "message": "Exception(s) occurred while joining Domain 'mckavm.onmicrosoft.com'"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "name": "MDE.Windows",
+                                        "type": "Microsoft.Azure.AzureDefenderForServers.MDE.Windows",
+                                        "typeHandlerVersion": "1.0.9.2",
+                                        "statuses": [
+                                            {
+                                                "code": "ProvisioningState/succeeded",
+                                                "level": "Info",
+                                                "displayStatus": "Provisioning succeeded",
+                                                "message": "{\r\n    \"azureResourceId\":  \"/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/CFB-SFESCBNV/providers/Microsoft.Compute/virtualMachines/cfb-test-0\",\r\n    \"securityWorkspaceId\":  \"ea42f556-5106-4743-99b0-c129bfa71a47\",\r\n    \"osDetails\":  {\r\n                      \"osMetadata\":  {\r\n                                         \"majorVersion\":  10,\r\n                                         \"minorVersion\":  0,\r\n                                         \"buildVersion\":  19045,\r\n                                         \"productType\":  3,\r\n                                         \"operatingSystemSku\":  175\r\n                                     },\r\n                      \"osName\":  \"Microsoft Windows 10 Enterprise for Virtual Desktops\"\r\n                  },\r\n    \"onboardingPackageOperationResultCode\":  \"Success\",\r\n    \"proxyUri\":  null,\r\n    \"machineId\":  \"61f969ae02e52ea947e570a5727e991787776734\"\r\n}",
+                                                "time": "2023-09-26T17:01:54+00:00"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "name": "Microsoft.PowerShell.DSC",
+                                        "type": "Microsoft.Powershell.DSC",
+                                        "typeHandlerVersion": "2.83.5",
+                                        "substatuses": [
+                                            {
+                                                "code": "ComponentStatus/DscConfigurationLog/succeeded",
+                                                "level": "Info",
+                                                "displayStatus": "Provisioning succeeded",
+                                                "message": "[2023-09-26 16:04:50Z] [VERBOSE] [cfb-test-0]:                            [[Script]ExecuteRdAgentInstallClient] GET https://rdweb.wvd.microsoft.com/agentdownload?skoid=bba5089f-29ec-428e-a09b-b4eef3ff0c91&sktid=33e01921-4d64-4f8c-a055-5bdaffd5e33d&skt=2023-09-25T17:41:24Z&ske=2023-09-27T17:41:24Z&sks=b&skv=2021-10-04&sv=2021-10-04&st=2023-09-25T17:41:24Z&se=2023-09-27T17:41:24Z&sr=b&sp=r&sig=vXp4dRD/xLPqrGHCzQGFZuITX/iyh9sfS8lNdwhSkpM=&type=/rdagent/Microsoft.RDInfra.RDAgent.Installer-x64-1.0.7255.1400.msi with 0-byte payload\r\n[2023-09-26 16:04:51Z] [VERBOSE] [cfb-test-0]:                            [[Script]ExecuteRdAgentInstallClient] received 18915328-byte response of content type application/octet-stream\r\n[2023-09-26 16:05:38Z] [VERBOSE] [cfb-test-0]: LCM:  [ End    Set      ]  [[Script]ExecuteRdAgentInstallClient]  in 49.6910 seconds.\r\n[2023-09-26 16:05:38Z] [VERBOSE] [cfb-test-0]: LCM:  [ End    Resource ]  [[Script]ExecuteRdAgentInstallClient]\r\n[2023-09-26 16:05:38Z] [VERBOSE] [cfb-test-0]: LCM:  [ End    Set      ]\r\n[2023-09-26 16:05:38Z] [VERBOSE] [cfb-test-0]: LCM:  [ End    Set      ]    in  51.9570 seconds.\r\n[2023-09-26 16:05:38Z] [VERBOSE] Operation 'Invoke CimMethod' complete.\r\n[2023-09-26 16:05:38Z] [VERBOSE] Time taken for configuration job to complete is 52.292 seconds\r\n[2023-09-26 16:05:42Z] [VERBOSE] Performing the operation \"Start-DscConfiguration: SendMetaConfigurationApply\" on target \"MSFT_DSCLocalConfigurationManager\".\r\n[2023-09-26 16:05:42Z] [VERBOSE] Perform operation 'Invoke CimMethod' with following parameters, ''methodName' = SendMetaConfigurationApply,'className' = MSFT_DSCLocalConfigurationManager,'namespaceName' = root/Microsoft/Windows/DesiredStateConfiguration'.\r\n[2023-09-26 16:05:42Z] [VERBOSE] An LCM method call arrived from computer cfb-test-0 with user sid S-1-5-18.\r\n[2023-09-26 16:05:42Z] [VERBOSE] [cfb-test-0]: LCM:  [ Start  Set      ]\r\n[2023-09-26 16:05:42Z] [VERBOSE] [cfb-test-0]: LCM:  [ Start  Resource ]  [MSFT_DSCMetaConfiguration]\r\n[2023-09-26 16:05:42Z] [VERBOSE] [cfb-test-0]: LCM:  [ Start  Set      ]  [MSFT_DSCMetaConfiguration]\r\n[2023-09-26 16:05:42Z] [VERBOSE] [cfb-test-0]: LCM:  [ End    Set      ]  [MSFT_DSCMetaConfiguration]  in 0.0470 seconds.\r\n[2023-09-26 16:05:42Z] [VERBOSE] [cfb-test-0]: LCM:  [ End    Resource ]  [MSFT_DSCMetaConfiguration]\r\n[2023-09-26 16:05:42Z] [VERBOSE] [cfb-test-0]: LCM:  [ End    Set      ]\r\n[2023-09-26 16:05:42Z] [VERBOSE] [cfb-test-0]: LCM:  [ End    Set      ]    in  0.1720 seconds.\r\n[2023-09-26 16:05:42Z] [VERBOSE] Operation 'Invoke CimMethod' complete.\r\n[2023-09-26 16:05:42Z] [VERBOSE] Set-DscLocalConfigurationManager finished in 0.418 seconds."
+                                            },
+                                            {
+                                                "code": "ComponentStatus/DscExtensionLog/succeeded",
+                                                "level": "Info",
+                                                "displayStatus": "Provisioning succeeded",
+                                                "message": "[2023-09-26 16:04:00Z] Creating Working directory: C:\\Packages\\Plugins\\Microsoft.Powershell.DSC\\2.83.5\\bin\\..\\DSCWork\\Configuration_1.0.02439.203.0\r\n[2023-09-26 16:04:00Z] Downloading configuration package\r\n[2023-09-26 16:04:00Z] Downloading https://wvdportalstorageblob.blob.core.windows.net/galleryartifacts/Configuration_1.0.02439.203.zip to C:\\Packages\\Plugins\\Microsoft.Powershell.DSC\\2.83.5\\bin\\..\\DSCWork\\Configuration_1.0.02439.203.0\\Configuration_1.0.02439.203.zip\r\n[2023-09-26 16:04:30Z] Extracting Configuration_1.0.02439.203.zip\r\n[2023-09-26 16:04:32Z] Looking for the definition of the configuration function.\r\n[2023-09-26 16:04:32Z] Executing C:\\Packages\\Plugins\\Microsoft.Powershell.DSC\\2.83.5\\bin\\..\\DSCWork\\Configuration_1.0.02439.203.0\\Configuration.ps1\r\n[2023-09-26 16:04:32Z] Preparing configuration arguments and configuration data.\r\n[2023-09-26 16:04:32Z] Creating MOF files.\r\n[2023-09-26 16:04:32Z] Executing the configuration function to generate the MOF files.\r\n[2023-09-26 16:04:34Z] Verifying metaconfiguration for reboot information...\r\n[2023-09-26 16:04:34Z] Backing up C:\\Packages\\Plugins\\Microsoft.Powershell.DSC\\2.83.5\\DSCWork\\Configuration_1.0.02439.203.0\\AddSessionHost\\localhost.meta.mof\r\n[2023-09-26 16:04:34Z] No match for RegistrationKey found in the meta mof file\r\n[2023-09-26 16:04:34Z] WMF 5 or newer, Injecting RebootNodeIfNeeded = False and ActionAfterReboot = \"StopConfiguration\"\r\n[2023-09-26 16:04:34Z] Executing Set-DscLocalConfigurationManager...\r\n[2023-09-26 16:04:40Z] Settings handler status to 'transitioning' (C:\\Packages\\Plugins\\Microsoft.Powershell.DSC\\2.83.5\\Status\\0.status)\r\n[2023-09-26 16:04:44Z] Settings handler status to 'transitioning' (C:\\Packages\\Plugins\\Microsoft.Powershell.DSC\\2.83.5\\Status\\0.status)\r\n[2023-09-26 16:04:44Z] Get-DscLocalConfigurationManager: \r\n\r\nActionAfterReboot              : StopConfiguration\r\nAgentId                        : 4833E769-5C86-11EE-B0A4-00224832873D\r\nAllowModuleOverWrite           : False\r\nCertificateID                  : \r\nConfigurationDownloadManagers  : {}\r\nConfigurationID                : \r\nConfigurationMode              : ApplyOnly\r\nConfigurationModeFrequencyMins : 15\r\nCredential                     : \r\nDebugMode                      : {NONE}\r\nDownloadManagerCustomData      : \r\nDownloadManagerName            : \r\nLCMCompatibleVersions          : {1.0, 2.0}\r\nLCMState                       : Idle\r\nLCMStateDetail                 : \r\nLCMVersion                     : 2.0\r\nStatusRetentionTimeInDays      : 10\r\nSignatureValidationPolicy      : NONE\r\nSignatureValidations           : {}\r\nMaximumDownloadSizeMB          : 500\r\nPartialConfigurations          : \r\nRebootNodeIfNeeded             : False\r\nRefreshFrequencyMins           : 30\r\nRefreshMode                    : PUSH\r\nReportManagers                 : {}\r\nResourceModuleManagers         : {}\r\nPSComputerName                 : \r\n\r\n\r\n\r\n\r\n[2023-09-26 16:04:44Z] Executing Start-DscConfiguration...\r\n[2023-09-26 16:04:44Z] Settings handler status to 'transitioning' (C:\\Packages\\Plugins\\Microsoft.Powershell.DSC\\2.83.5\\Status\\0.status)\r\n[2023-09-26 16:05:39Z] Settings handler status to 'transitioning' (C:\\Packages\\Plugins\\Microsoft.Powershell.DSC\\2.83.5\\Status\\0.status)\r\n[2023-09-26 16:05:39Z] Updating execution status (HKLM:\\SOFTWARE\\Microsoft\\Azure\\DSC\\2.83.5\\Status)\r\n[2023-09-26 16:05:39Z] LCM state is Idle\r\n[2023-09-26 16:05:39Z] DSC configuration completed.\r\n[2023-09-26 16:05:39Z] Resetting metaconfiguration...\r\n[2023-09-26 16:05:39Z] Restoring C:\\Packages\\Plugins\\Microsoft.Powershell.DSC\\2.83.5\\DSCWork\\Configuration_1.0.02439.203.0\\AddSessionHost\\localhost.meta.mof.bk...\r\n[2023-09-26 16:05:39Z] Executing Set-DscLocalConfigurationManager...\r\n[2023-09-26 16:05:40Z] Settings handler status to 'transitioning' (C:\\Packages\\Plugins\\Microsoft.Powershell.DSC\\2.83.5\\Status\\0.status)\r\n[2023-09-26 16:05:44Z] Settings handler status to 'transitioning' (C:\\Packages\\Plugins\\Microsoft.Powershell.DSC\\2.83.5\\Status\\0.status)\r\n[2023-09-26 16:05:44Z] Get-DscLocalConfigurationManager: \r\n\r\nActionAfterReboot              : ContinueConfiguration\r\nAgentId                        : 4833E769-5C86-11EE-B0A4-00224832873D\r\nAllowModuleOverWrite           : False\r\nCertificateID                  : \r\nConfigurationDownloadManagers  : {}\r\nConfigurationID                : \r\nConfigurationMode              : ApplyOnly\r\nConfigurationModeFrequencyMins : 15\r\nCredential                     : \r\nDebugMode                      : {NONE}\r\nDownloadManagerCustomData      : \r\nDownloadManagerName            : \r\nLCMCompatibleVersions          : {1.0, 2.0}\r\nLCMState                       : Idle\r\nLCMStateDetail                 : \r\nLCMVersion                     : 2.0\r\nStatusRetentionTimeInDays      : 10\r\nSignatureValidationPolicy      : NONE\r\nSignatureValidations           : {}\r\nMaximumDownloadSizeMB          : 500\r\nPartialConfigurations          : \r\nRebootNodeIfNeeded             : True\r\nRefreshFrequencyMins           : 30\r\nRefreshMode                    : PUSH\r\nReportManagers                 : {}\r\nResourceModuleManagers         : {}\r\nPSComputerName                 : \r\n\r\n\r\n\r\n\r\n[2023-09-26 16:05:44Z] Settings handler status to 'success' (C:\\Packages\\Plugins\\Microsoft.Powershell.DSC\\2.83.5\\Status\\0.status)"
+                                            },
+                                            {
+                                                "code": "ComponentStatus/Metadata/succeeded",
+                                                "level": "Info",
+                                                "displayStatus": "Provisioning succeeded",
+                                                "message": "VMUUId=740E4846-42F4-4008-87D0-312B3CBE2985;AgentId=4833E769-5C86-11EE-B0A4-00224832873D;"
+                                            }
+                                        ],
+                                        "statuses": [
+                                            {
+                                                "code": "ProvisioningState/succeeded",
+                                                "level": "Info",
+                                                "displayStatus": "Provisioning succeeded",
+                                                "message": "DSC configuration was applied successfully.",
+                                                "time": "2023-09-26T16:05:44+00:00"
+                                            }
+                                        ]
+                                    }
+                                ],
+                                "hyperVGeneration": "V2",
+                                "statuses": [
+                                    {
+                                        "code": "ProvisioningState/succeeded",
+                                        "level": "Info",
+                                        "displayStatus": "Provisioning succeeded",
+                                        "time": "2023-09-26T17:02:11.2276947+00:00"
+                                    },
+                                    {
+                                        "code": "PowerState/running",
+                                        "level": "Info",
+                                        "displayStatus": "VM running"
+                                    }
+                                ]
+                            }
+                        },
+                        "zones": [
+                            "1"
+                        ],
+                        "resources": [
+                            {
+                                "name": "joindomain",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-sfescbnv/providers/Microsoft.Compute/virtualMachines/cfb-test-0/extensions/joindomain",
+                                "type": "Microsoft.Compute/virtualMachines/extensions",
+                                "location": "eastus",
+                                "tags": {
+                                    "product_id": "13742"
+                                },
+                                "properties": {
+                                    "autoUpgradeMinorVersion": true,
+                                    "provisioningState": "Failed",
+                                    "publisher": "Microsoft.Compute",
+                                    "type": "JsonADDomainExtension",
+                                    "typeHandlerVersion": "1.3",
+                                    "settings": {
+                                        "name": "mckavm.onmicrosoft.com",
+                                        "ouPath": "",
+                                        "user": "tester@mckavm.onmicrosoft.com",
+                                        "restart": "true",
+                                        "options": "3"
+                                    }
+                                }
+                            },
+                            {
+                                "name": "MDE.Windows",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-sfescbnv/providers/Microsoft.Compute/virtualMachines/cfb-test-0/extensions/MDE.Windows",
+                                "type": "Microsoft.Compute/virtualMachines/extensions",
+                                "location": "eastus",
+                                "tags": {
+                                    "product_id": "13742"
+                                },
+                                "properties": {
+                                    "autoUpgradeMinorVersion": true,
+                                    "forceUpdateTag": "05940b2f-e06a-4c01-bad7-e330663af0d8",
+                                    "provisioningState": "Succeeded",
+                                    "publisher": "Microsoft.Azure.AzureDefenderForServers",
+                                    "type": "MDE.Windows",
+                                    "typeHandlerVersion": "1.0",
+                                    "settings": {
+                                        "azureResourceId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/CFB-SFESCBNV/providers/Microsoft.Compute/virtualMachines/cfb-test-0",
+                                        "forceReOnboarding": false,
+                                        "vNextEnabled": true,
+                                        "autoUpdate": true
+                                    }
+                                }
+                            },
+                            {
+                                "name": "Microsoft.PowerShell.DSC",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-sfescbnv/providers/Microsoft.Compute/virtualMachines/cfb-test-0/extensions/Microsoft.PowerShell.DSC",
+                                "type": "Microsoft.Compute/virtualMachines/extensions",
+                                "location": "eastus",
+                                "tags": {
+                                    "product_id": "13742"
+                                },
+                                "properties": {
+                                    "autoUpgradeMinorVersion": true,
+                                    "provisioningState": "Succeeded",
+                                    "publisher": "Microsoft.Powershell",
+                                    "type": "DSC",
+                                    "typeHandlerVersion": "2.73",
+                                    "settings": {
+                                        "modulesUrl": "https://wvdportalstorageblob.blob.core.windows.net/galleryartifacts/Configuration_1.0.02439.203.zip",
+                                        "configurationFunction": "Configuration.ps1\\AddSessionHost",
+                                        "properties": {
+                                            "hostPoolName": "fail-HostPool",
+                                            "registrationInfoToken": "eyJhbGciOiJSUzI1NiIsImtpZCI6IjQyRURFMjE4OERDMUYxMzk5QUJFNDREQTJGNzE1RDU0NDlEMjNBOUYiLCJ0eXAiOiJKV1QifQ.eyJSZWdpc3RyYXRpb25JZCI6IjhkNWRlZTU1LTQyMTUtNDBlNy1hZjE3LTBiMGJjNTUyYjQwMSIsIkJyb2tlclVyaSI6Imh0dHBzOi8vcmRicm9rZXItZy11cy1yMC53dmQubWljcm9zb2Z0LmNvbS8iLCJEaWFnbm9zdGljc1VyaSI6Imh0dHBzOi8vcmRkaWFnbm9zdGljcy1nLXVzLXIwLnd2ZC5taWNyb3NvZnQuY29tLyIsIkVuZHBvaW50UG9vbElkIjoiNjM4YjcyYzAtZThiNS00ZmNjLWE1ZWQtN2U4YTA4MWNiODBjIiwiR2xvYmFsQnJva2VyVXJpIjoiaHR0cHM6Ly9yZGJyb2tlci53dmQubWljcm9zb2Z0LmNvbS8iLCJHZW9ncmFwaHkiOiJVUyIsIkdsb2JhbEJyb2tlclJlc291cmNlSWRVcmkiOiJodHRwczovLzYzOGI3MmMwLWU4YjUtNGZjYy1hNWVkLTdlOGEwODFjYjgwYy5yZGJyb2tlci53dmQubWljcm9zb2Z0LmNvbS8iLCJCcm9rZXJSZXNvdXJjZUlkVXJpIjoiaHR0cHM6Ly82MzhiNzJjMC1lOGI1LTRmY2MtYTVlZC03ZThhMDgxY2I4MGMucmRicm9rZXItZy11cy1yMC53dmQubWljcm9zb2Z0LmNvbS8iLCJEaWFnbm9zdGljc1Jlc291cmNlSWRVcmkiOiJodHRwczovLzYzOGI3MmMwLWU4YjUtNGZjYy1hNWVkLTdlOGEwODFjYjgwYy5yZGRpYWdub3N0aWNzLWctdXMtcjAud3ZkLm1pY3Jvc29mdC5jb20vIiwiQUFEVGVuYW50SWQiOiJiMDI1N2MxNC1jYWNjLTQ0YzYtODkyNy01YjRjZTVkZTA4NzQiLCJuYmYiOjE2OTU3NDM0NzIsImV4cCI6MTY5ODE1MTM5MywiaXNzIjoiUkRJbmZyYVRva2VuTWFuYWdlciIsImF1ZCI6IlJEbWkifQ.es_CnBXhErL04xB0XrjSsHkwmDWmGB_p-hLyaHJ9ap_jil1QddDQcF3SheZmUqSByKFt1r-BxJotRzU01QQlJGoldeiggcZG7VBffmSDtvkxNUoZ4o2Feo6CYUZ8fJSAyNq0oNFyEDWhjGlQs0oU_p6EDOfPY5rwQnkbHpvCe6X2PAlFRDbqGIIRegHszAiT1zyVp1MDwfMa68Vyit-EH23N_8Gh8kWvHQlggyuslHYvvdb7o1wma1_gJ3otq_d6qEtocTCVOZMhY3ijVPnO2Zyy9lqckJvCs047UVFTYGQb9UlA0TeH4OixB7lf_KBOGg6Ax8846ivVg0tsrakWEQ",
+                                            "aadJoin": false,
+                                            "UseAgentDownloadEndpoint": true,
+                                            "aadJoinPreview": false,
+                                            "mdmId": "",
+                                            "sessionHostConfigurationLastUpdateTime": ""
+                                        }
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-sfescbnv/providers/Microsoft.Compute/virtualMachines/cfb-test-1?$expand=instanceView&api-version=2020-12-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-length": [
+                        "21371"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 07CED60E13B445E0989F60386BA26CAD Ref B: CO6AA3150217009 Ref C: 2023-09-26T22:54:01Z"
+                    ],
+                    "date": [
+                        "Tue, 26 Sep 2023 22:54:00 GMT"
+                    ],
+                    "x-ms-ratelimit-remaining-resource": [
+                        "Microsoft.Compute/LowCostGet3Min;3998,Microsoft.Compute/LowCostGet30Min;31998"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "name": "cfb-test-1",
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-sfescbnv/providers/Microsoft.Compute/virtualMachines/cfb-test-1",
+                        "type": "Microsoft.Compute/virtualMachines",
+                        "location": "eastus",
+                        "tags": {
+                            "cm-resource-parent": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-sfescbnv/providers/Microsoft.DesktopVirtualization/hostpools/fail-HostPool",
+                            "product_id": "13742"
+                        },
+                        "properties": {
+                            "hardwareProfile": {
+                                "vmSize": "Standard_D2s_v3"
+                            },
+                            "provisioningState": "Succeeded",
+                            "vmId": "4e93b3a2-a8d8-453a-8f79-08232e57ee84",
+                            "additionalCapabilities": {},
+                            "storageProfile": {
+                                "imageReference": {
+                                    "publisher": "microsoftwindowsdesktop",
+                                    "offer": "windows-10",
+                                    "sku": "win10-22h2-avd-g2",
+                                    "version": "latest",
+                                    "exactVersion": "19045.3448.230831"
+                                },
+                                "osDisk": {
+                                    "osType": "Windows",
+                                    "name": "cfb-test-1_OsDisk_1_1eb09d51a61b4a29821f1ac4bfe235ad",
+                                    "createOption": "FromImage",
+                                    "caching": "ReadWrite",
+                                    "managedDisk": {
+                                        "storageAccountType": "StandardSSD_LRS",
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-sfescbnv/providers/Microsoft.Compute/disks/cfb-test-1_OsDisk_1_1eb09d51a61b4a29821f1ac4bfe235ad"
+                                    },
+                                    "diskSizeGB": 127
+                                },
+                                "dataDisks": []
+                            },
+                            "osProfile": {
+                                "computerName": "cfb-test-1",
+                                "adminUsername": "adminuser",
+                                "windowsConfiguration": {
+                                    "provisionVMAgent": true,
+                                    "enableAutomaticUpdates": true,
+                                    "patchSettings": {
+                                        "patchMode": "AutomaticByOS"
+                                    }
+                                },
+                                "secrets": [],
+                                "allowExtensionOperations": true,
+                                "requireGuestProvisionSignal": true
+                            },
+                            "securityProfile": {
+                                "uefiSettings": {
+                                    "secureBootEnabled": true,
+                                    "vTpmEnabled": true
+                                },
+                                "securityType": "TrustedLaunch"
+                            },
+                            "networkProfile": {
+                                "networkInterfaces": [
+                                    {
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-sfescbnv/providers/Microsoft.Network/networkInterfaces/cfb-test-1-nic"
+                                    }
+                                ]
+                            },
+                            "diagnosticsProfile": {
+                                "bootDiagnostics": {
+                                    "enabled": false
+                                }
+                            },
+                            "licenseType": "Windows_Client",
+                            "instanceView": {
+                                "computerName": "cfb-test-1",
+                                "osName": "Windows 10 Enterprise for Virtual Desktops",
+                                "osVersion": "10.0.19045.3448",
+                                "vmAgent": {
+                                    "vmAgentVersion": "2.7.41491.1095",
+                                    "statuses": [
+                                        {
+                                            "code": "ProvisioningState/succeeded",
+                                            "level": "Info",
+                                            "displayStatus": "Ready",
+                                            "message": "GuestAgent is running and processing the extensions.",
+                                            "time": "2023-09-26T22:53:27.539+00:00"
+                                        }
+                                    ],
+                                    "extensionHandlers": [
+                                        {
+                                            "type": "Microsoft.Azure.AzureDefenderForServers.MDE.Windows",
+                                            "typeHandlerVersion": "1.0.9.2",
+                                            "status": {
+                                                "code": "ProvisioningState/succeeded",
+                                                "level": "Info",
+                                                "displayStatus": "Ready"
+                                            }
+                                        },
+                                        {
+                                            "type": "Microsoft.Compute.JsonADDomainExtension",
+                                            "typeHandlerVersion": "1.3.11",
+                                            "status": {
+                                                "code": "ProvisioningState/succeeded",
+                                                "level": "Info",
+                                                "displayStatus": "Ready"
+                                            }
+                                        },
+                                        {
+                                            "type": "Microsoft.Powershell.DSC",
+                                            "typeHandlerVersion": "2.83.5",
+                                            "status": {
+                                                "code": "ProvisioningState/succeeded",
+                                                "level": "Info",
+                                                "displayStatus": "Ready"
+                                            }
+                                        }
+                                    ]
+                                },
+                                "disks": [
+                                    {
+                                        "name": "cfb-test-1_OsDisk_1_1eb09d51a61b4a29821f1ac4bfe235ad",
+                                        "statuses": [
+                                            {
+                                                "code": "ProvisioningState/succeeded",
+                                                "level": "Info",
+                                                "displayStatus": "Provisioning succeeded",
+                                                "time": "2023-09-26T15:55:47.0877516+00:00"
+                                            }
+                                        ]
+                                    }
+                                ],
+                                "extensions": [
+                                    {
+                                        "name": "joindomain",
+                                        "type": "Microsoft.Compute.JsonADDomainExtension",
+                                        "typeHandlerVersion": "1.3.11",
+                                        "substatuses": [
+                                            {
+                                                "code": "ComponentStatus/JoinDomainException for Option 3 meaning 'User Specified'/failed/1",
+                                                "level": "Error",
+                                                "displayStatus": "Provisioning failed",
+                                                "message": "ERROR - Failed to join domain='mckavm.onmicrosoft.com', ou='', user='tester@mckavm.onmicrosoft.com', option='NetSetupJoinDomain, NetSetupAcctCreate' (#3 meaning 'User Specified'). Error code 1355"
+                                            },
+                                            {
+                                                "code": "ComponentStatus/JoinDomainException for Option 1 meaning 'User Specified without NetSetupAcctCreate'/failed/1",
+                                                "level": "Error",
+                                                "displayStatus": "Provisioning failed",
+                                                "message": "ERROR - Failed to join domain='mckavm.onmicrosoft.com', ou='', user='tester@mckavm.onmicrosoft.com', option='NetSetupJoinDomain' (#1 meaning 'User Specified without NetSetupAcctCreate'). Error code 1355"
+                                            }
+                                        ],
+                                        "statuses": [
+                                            {
+                                                "code": "ProvisioningState/failed/1",
+                                                "level": "Error",
+                                                "displayStatus": "Provisioning failed",
+                                                "message": "Exception(s) occurred while joining Domain 'mckavm.onmicrosoft.com'"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "name": "MDE.Windows",
+                                        "type": "Microsoft.Azure.AzureDefenderForServers.MDE.Windows",
+                                        "typeHandlerVersion": "1.0.9.2",
+                                        "statuses": [
+                                            {
+                                                "code": "ProvisioningState/succeeded",
+                                                "level": "Info",
+                                                "displayStatus": "Provisioning succeeded",
+                                                "message": "{\r\n    \"azureResourceId\":  \"/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/CFB-SFESCBNV/providers/Microsoft.Compute/virtualMachines/cfb-test-1\",\r\n    \"securityWorkspaceId\":  \"ea42f556-5106-4743-99b0-c129bfa71a47\",\r\n    \"osDetails\":  {\r\n                      \"osMetadata\":  {\r\n                                         \"majorVersion\":  10,\r\n                                         \"minorVersion\":  0,\r\n                                         \"buildVersion\":  19045,\r\n                                         \"productType\":  3,\r\n                                         \"operatingSystemSku\":  175\r\n                                     },\r\n                      \"osName\":  \"Microsoft Windows 10 Enterprise for Virtual Desktops\"\r\n                  },\r\n    \"onboardingPackageOperationResultCode\":  \"Success\",\r\n    \"proxyUri\":  null,\r\n    \"machineId\":  \"d2954c5426981e52249d18d5afd1b564a8aecd10\"\r\n}",
+                                                "time": "2023-09-26T17:01:38+00:00"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "name": "Microsoft.PowerShell.DSC",
+                                        "type": "Microsoft.Powershell.DSC",
+                                        "typeHandlerVersion": "2.83.5",
+                                        "substatuses": [
+                                            {
+                                                "code": "ComponentStatus/DscConfigurationLog/succeeded",
+                                                "level": "Info",
+                                                "displayStatus": "Provisioning succeeded",
+                                                "message": "[2023-09-26 16:05:11Z] [VERBOSE] [cfb-test-1]:                            [[Script]ExecuteRdAgentInstallClient] GET https://rdweb.wvd.microsoft.com/agentdownload?skoid=bba5089f-29ec-428e-a09b-b4eef3ff0c91&sktid=33e01921-4d64-4f8c-a055-5bdaffd5e33d&skt=2023-09-26T08:07:45Z&ske=2023-09-28T08:07:45Z&sks=b&skv=2021-10-04&sv=2021-10-04&st=2023-09-26T08:07:45Z&se=2023-09-28T08:07:45Z&sr=b&sp=r&sig=mkgZ6P4DKsKNQaBl/9CdcyS4m4sLRld0ujLegin/v8w=&type=/rdagent/Microsoft.RDInfra.RDAgent.Installer-x64-1.0.7255.1400.msi with 0-byte payload\r\n[2023-09-26 16:05:12Z] [VERBOSE] [cfb-test-1]:                            [[Script]ExecuteRdAgentInstallClient] received 18915328-byte response of content type application/octet-stream\r\n[2023-09-26 16:05:50Z] [VERBOSE] [cfb-test-1]: LCM:  [ End    Set      ]  [[Script]ExecuteRdAgentInstallClient]  in 40.2030 seconds.\r\n[2023-09-26 16:05:50Z] [VERBOSE] [cfb-test-1]: LCM:  [ End    Resource ]  [[Script]ExecuteRdAgentInstallClient]\r\n[2023-09-26 16:05:50Z] [VERBOSE] [cfb-test-1]: LCM:  [ End    Set      ]\r\n[2023-09-26 16:05:50Z] [VERBOSE] [cfb-test-1]: LCM:  [ End    Set      ]    in  41.8130 seconds.\r\n[2023-09-26 16:05:50Z] [VERBOSE] Operation 'Invoke CimMethod' complete.\r\n[2023-09-26 16:05:50Z] [VERBOSE] Time taken for configuration job to complete is 42.034 seconds\r\n[2023-09-26 16:05:53Z] [VERBOSE] Performing the operation \"Start-DscConfiguration: SendMetaConfigurationApply\" on target \"MSFT_DSCLocalConfigurationManager\".\r\n[2023-09-26 16:05:53Z] [VERBOSE] Perform operation 'Invoke CimMethod' with following parameters, ''methodName' = SendMetaConfigurationApply,'className' = MSFT_DSCLocalConfigurationManager,'namespaceName' = root/Microsoft/Windows/DesiredStateConfiguration'.\r\n[2023-09-26 16:05:54Z] [VERBOSE] An LCM method call arrived from computer cfb-test-1 with user sid S-1-5-18.\r\n[2023-09-26 16:05:54Z] [VERBOSE] [cfb-test-1]: LCM:  [ Start  Set      ]\r\n[2023-09-26 16:05:54Z] [VERBOSE] [cfb-test-1]: LCM:  [ Start  Resource ]  [MSFT_DSCMetaConfiguration]\r\n[2023-09-26 16:05:54Z] [VERBOSE] [cfb-test-1]: LCM:  [ Start  Set      ]  [MSFT_DSCMetaConfiguration]\r\n[2023-09-26 16:05:54Z] [VERBOSE] [cfb-test-1]: LCM:  [ End    Set      ]  [MSFT_DSCMetaConfiguration]  in 0.0630 seconds.\r\n[2023-09-26 16:05:54Z] [VERBOSE] [cfb-test-1]: LCM:  [ End    Resource ]  [MSFT_DSCMetaConfiguration]\r\n[2023-09-26 16:05:54Z] [VERBOSE] [cfb-test-1]: LCM:  [ End    Set      ]\r\n[2023-09-26 16:05:54Z] [VERBOSE] [cfb-test-1]: LCM:  [ End    Set      ]    in  0.1880 seconds.\r\n[2023-09-26 16:05:54Z] [VERBOSE] Operation 'Invoke CimMethod' complete.\r\n[2023-09-26 16:05:54Z] [VERBOSE] Set-DscLocalConfigurationManager finished in 0.417 seconds."
+                                            },
+                                            {
+                                                "code": "ComponentStatus/DscExtensionLog/succeeded",
+                                                "level": "Info",
+                                                "displayStatus": "Provisioning succeeded",
+                                                "message": "[2023-09-26 16:04:28Z] Creating Working directory: C:\\Packages\\Plugins\\Microsoft.Powershell.DSC\\2.83.5\\bin\\..\\DSCWork\\Configuration_1.0.02439.203.0\r\n[2023-09-26 16:04:28Z] Downloading configuration package\r\n[2023-09-26 16:04:28Z] Downloading https://wvdportalstorageblob.blob.core.windows.net/galleryartifacts/Configuration_1.0.02439.203.zip to C:\\Packages\\Plugins\\Microsoft.Powershell.DSC\\2.83.5\\bin\\..\\DSCWork\\Configuration_1.0.02439.203.0\\Configuration_1.0.02439.203.zip\r\n[2023-09-26 16:04:57Z] Extracting Configuration_1.0.02439.203.zip\r\n[2023-09-26 16:04:58Z] Looking for the definition of the configuration function.\r\n[2023-09-26 16:04:58Z] Executing C:\\Packages\\Plugins\\Microsoft.Powershell.DSC\\2.83.5\\bin\\..\\DSCWork\\Configuration_1.0.02439.203.0\\Configuration.ps1\r\n[2023-09-26 16:04:58Z] Preparing configuration arguments and configuration data.\r\n[2023-09-26 16:04:59Z] Creating MOF files.\r\n[2023-09-26 16:04:59Z] Executing the configuration function to generate the MOF files.\r\n[2023-09-26 16:05:00Z] Verifying metaconfiguration for reboot information...\r\n[2023-09-26 16:05:00Z] Backing up C:\\Packages\\Plugins\\Microsoft.Powershell.DSC\\2.83.5\\DSCWork\\Configuration_1.0.02439.203.0\\AddSessionHost\\localhost.meta.mof\r\n[2023-09-26 16:05:00Z] No match for RegistrationKey found in the meta mof file\r\n[2023-09-26 16:05:00Z] WMF 5 or newer, Injecting RebootNodeIfNeeded = False and ActionAfterReboot = \"StopConfiguration\"\r\n[2023-09-26 16:05:00Z] Executing Set-DscLocalConfigurationManager...\r\n[2023-09-26 16:05:04Z] Settings handler status to 'transitioning' (C:\\Packages\\Plugins\\Microsoft.Powershell.DSC\\2.83.5\\Status\\0.status)\r\n[2023-09-26 16:05:07Z] Settings handler status to 'transitioning' (C:\\Packages\\Plugins\\Microsoft.Powershell.DSC\\2.83.5\\Status\\0.status)\r\n[2023-09-26 16:05:07Z] Get-DscLocalConfigurationManager: \r\n\r\nActionAfterReboot              : StopConfiguration\r\nAgentId                        : 5A8862EA-5C86-11EE-B0A4-0022482FFADA\r\nAllowModuleOverWrite           : False\r\nCertificateID                  : \r\nConfigurationDownloadManagers  : {}\r\nConfigurationID                : \r\nConfigurationMode              : ApplyOnly\r\nConfigurationModeFrequencyMins : 15\r\nCredential                     : \r\nDebugMode                      : {NONE}\r\nDownloadManagerCustomData      : \r\nDownloadManagerName            : \r\nLCMCompatibleVersions          : {1.0, 2.0}\r\nLCMState                       : Idle\r\nLCMStateDetail                 : \r\nLCMVersion                     : 2.0\r\nStatusRetentionTimeInDays      : 10\r\nSignatureValidationPolicy      : NONE\r\nSignatureValidations           : {}\r\nMaximumDownloadSizeMB          : 500\r\nPartialConfigurations          : \r\nRebootNodeIfNeeded             : False\r\nRefreshFrequencyMins           : 30\r\nRefreshMode                    : PUSH\r\nReportManagers                 : {}\r\nResourceModuleManagers         : {}\r\nPSComputerName                 : \r\n\r\n\r\n\r\n\r\n[2023-09-26 16:05:07Z] Executing Start-DscConfiguration...\r\n[2023-09-26 16:05:07Z] Settings handler status to 'transitioning' (C:\\Packages\\Plugins\\Microsoft.Powershell.DSC\\2.83.5\\Status\\0.status)\r\n[2023-09-26 16:05:51Z] Settings handler status to 'transitioning' (C:\\Packages\\Plugins\\Microsoft.Powershell.DSC\\2.83.5\\Status\\0.status)\r\n[2023-09-26 16:05:51Z] Updating execution status (HKLM:\\SOFTWARE\\Microsoft\\Azure\\DSC\\2.83.5\\Status)\r\n[2023-09-26 16:05:51Z] LCM state is Idle\r\n[2023-09-26 16:05:51Z] DSC configuration completed.\r\n[2023-09-26 16:05:51Z] Resetting metaconfiguration...\r\n[2023-09-26 16:05:51Z] Restoring C:\\Packages\\Plugins\\Microsoft.Powershell.DSC\\2.83.5\\DSCWork\\Configuration_1.0.02439.203.0\\AddSessionHost\\localhost.meta.mof.bk...\r\n[2023-09-26 16:05:51Z] Executing Set-DscLocalConfigurationManager...\r\n[2023-09-26 16:05:52Z] Settings handler status to 'transitioning' (C:\\Packages\\Plugins\\Microsoft.Powershell.DSC\\2.83.5\\Status\\0.status)\r\n[2023-09-26 16:05:56Z] Settings handler status to 'transitioning' (C:\\Packages\\Plugins\\Microsoft.Powershell.DSC\\2.83.5\\Status\\0.status)\r\n[2023-09-26 16:05:56Z] Get-DscLocalConfigurationManager: \r\n\r\nActionAfterReboot              : ContinueConfiguration\r\nAgentId                        : 5A8862EA-5C86-11EE-B0A4-0022482FFADA\r\nAllowModuleOverWrite           : False\r\nCertificateID                  : \r\nConfigurationDownloadManagers  : {}\r\nConfigurationID                : \r\nConfigurationMode              : ApplyOnly\r\nConfigurationModeFrequencyMins : 15\r\nCredential                     : \r\nDebugMode                      : {NONE}\r\nDownloadManagerCustomData      : \r\nDownloadManagerName            : \r\nLCMCompatibleVersions          : {1.0, 2.0}\r\nLCMState                       : Idle\r\nLCMStateDetail                 : \r\nLCMVersion                     : 2.0\r\nStatusRetentionTimeInDays      : 10\r\nSignatureValidationPolicy      : NONE\r\nSignatureValidations           : {}\r\nMaximumDownloadSizeMB          : 500\r\nPartialConfigurations          : \r\nRebootNodeIfNeeded             : True\r\nRefreshFrequencyMins           : 30\r\nRefreshMode                    : PUSH\r\nReportManagers                 : {}\r\nResourceModuleManagers         : {}\r\nPSComputerName                 : \r\n\r\n\r\n\r\n\r\n[2023-09-26 16:05:56Z] Settings handler status to 'success' (C:\\Packages\\Plugins\\Microsoft.Powershell.DSC\\2.83.5\\Status\\0.status)"
+                                            },
+                                            {
+                                                "code": "ComponentStatus/Metadata/succeeded",
+                                                "level": "Info",
+                                                "displayStatus": "Provisioning succeeded",
+                                                "message": "VMUUId=4E93B3A2-A8D8-453A-8F79-08232E57EE84;AgentId=5A8862EA-5C86-11EE-B0A4-0022482FFADA;"
+                                            }
+                                        ],
+                                        "statuses": [
+                                            {
+                                                "code": "ProvisioningState/succeeded",
+                                                "level": "Info",
+                                                "displayStatus": "Provisioning succeeded",
+                                                "message": "DSC configuration was applied successfully.",
+                                                "time": "2023-09-26T16:05:56+00:00"
+                                            }
+                                        ]
+                                    }
+                                ],
+                                "hyperVGeneration": "V2",
+                                "statuses": [
+                                    {
+                                        "code": "ProvisioningState/succeeded",
+                                        "level": "Info",
+                                        "displayStatus": "Provisioning succeeded",
+                                        "time": "2023-09-26T17:02:01.3995798+00:00"
+                                    },
+                                    {
+                                        "code": "PowerState/running",
+                                        "level": "Info",
+                                        "displayStatus": "VM running"
+                                    }
+                                ]
+                            }
+                        },
+                        "zones": [
+                            "1"
+                        ],
+                        "resources": [
+                            {
+                                "name": "joindomain",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-sfescbnv/providers/Microsoft.Compute/virtualMachines/cfb-test-1/extensions/joindomain",
+                                "type": "Microsoft.Compute/virtualMachines/extensions",
+                                "location": "eastus",
+                                "tags": {
+                                    "product_id": "13742"
+                                },
+                                "properties": {
+                                    "autoUpgradeMinorVersion": true,
+                                    "provisioningState": "Failed",
+                                    "publisher": "Microsoft.Compute",
+                                    "type": "JsonADDomainExtension",
+                                    "typeHandlerVersion": "1.3",
+                                    "settings": {
+                                        "name": "mckavm.onmicrosoft.com",
+                                        "ouPath": "",
+                                        "user": "tester@mckavm.onmicrosoft.com",
+                                        "restart": "true",
+                                        "options": "3"
+                                    }
+                                }
+                            },
+                            {
+                                "name": "MDE.Windows",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-sfescbnv/providers/Microsoft.Compute/virtualMachines/cfb-test-1/extensions/MDE.Windows",
+                                "type": "Microsoft.Compute/virtualMachines/extensions",
+                                "location": "eastus",
+                                "tags": {
+                                    "product_id": "13742"
+                                },
+                                "properties": {
+                                    "autoUpgradeMinorVersion": true,
+                                    "forceUpdateTag": "db0fa344-aa55-4d55-8fc6-b154cfe3e378",
+                                    "provisioningState": "Succeeded",
+                                    "publisher": "Microsoft.Azure.AzureDefenderForServers",
+                                    "type": "MDE.Windows",
+                                    "typeHandlerVersion": "1.0",
+                                    "settings": {
+                                        "azureResourceId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/CFB-SFESCBNV/providers/Microsoft.Compute/virtualMachines/cfb-test-1",
+                                        "forceReOnboarding": false,
+                                        "vNextEnabled": true,
+                                        "autoUpdate": true
+                                    }
+                                }
+                            },
+                            {
+                                "name": "Microsoft.PowerShell.DSC",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-sfescbnv/providers/Microsoft.Compute/virtualMachines/cfb-test-1/extensions/Microsoft.PowerShell.DSC",
+                                "type": "Microsoft.Compute/virtualMachines/extensions",
+                                "location": "eastus",
+                                "tags": {
+                                    "product_id": "13742"
+                                },
+                                "properties": {
+                                    "autoUpgradeMinorVersion": true,
+                                    "provisioningState": "Succeeded",
+                                    "publisher": "Microsoft.Powershell",
+                                    "type": "DSC",
+                                    "typeHandlerVersion": "2.73",
+                                    "settings": {
+                                        "modulesUrl": "https://wvdportalstorageblob.blob.core.windows.net/galleryartifacts/Configuration_1.0.02439.203.zip",
+                                        "configurationFunction": "Configuration.ps1\\AddSessionHost",
+                                        "properties": {
+                                            "hostPoolName": "fail-HostPool",
+                                            "registrationInfoToken": "eyJhbGciOiJSUzI1NiIsImtpZCI6IjQyRURFMjE4OERDMUYxMzk5QUJFNDREQTJGNzE1RDU0NDlEMjNBOUYiLCJ0eXAiOiJKV1QifQ.eyJSZWdpc3RyYXRpb25JZCI6IjhkNWRlZTU1LTQyMTUtNDBlNy1hZjE3LTBiMGJjNTUyYjQwMSIsIkJyb2tlclVyaSI6Imh0dHBzOi8vcmRicm9rZXItZy11cy1yMC53dmQubWljcm9zb2Z0LmNvbS8iLCJEaWFnbm9zdGljc1VyaSI6Imh0dHBzOi8vcmRkaWFnbm9zdGljcy1nLXVzLXIwLnd2ZC5taWNyb3NvZnQuY29tLyIsIkVuZHBvaW50UG9vbElkIjoiNjM4YjcyYzAtZThiNS00ZmNjLWE1ZWQtN2U4YTA4MWNiODBjIiwiR2xvYmFsQnJva2VyVXJpIjoiaHR0cHM6Ly9yZGJyb2tlci53dmQubWljcm9zb2Z0LmNvbS8iLCJHZW9ncmFwaHkiOiJVUyIsIkdsb2JhbEJyb2tlclJlc291cmNlSWRVcmkiOiJodHRwczovLzYzOGI3MmMwLWU4YjUtNGZjYy1hNWVkLTdlOGEwODFjYjgwYy5yZGJyb2tlci53dmQubWljcm9zb2Z0LmNvbS8iLCJCcm9rZXJSZXNvdXJjZUlkVXJpIjoiaHR0cHM6Ly82MzhiNzJjMC1lOGI1LTRmY2MtYTVlZC03ZThhMDgxY2I4MGMucmRicm9rZXItZy11cy1yMC53dmQubWljcm9zb2Z0LmNvbS8iLCJEaWFnbm9zdGljc1Jlc291cmNlSWRVcmkiOiJodHRwczovLzYzOGI3MmMwLWU4YjUtNGZjYy1hNWVkLTdlOGEwODFjYjgwYy5yZGRpYWdub3N0aWNzLWctdXMtcjAud3ZkLm1pY3Jvc29mdC5jb20vIiwiQUFEVGVuYW50SWQiOiJiMDI1N2MxNC1jYWNjLTQ0YzYtODkyNy01YjRjZTVkZTA4NzQiLCJuYmYiOjE2OTU3NDM0NzIsImV4cCI6MTY5ODE1MTM5MywiaXNzIjoiUkRJbmZyYVRva2VuTWFuYWdlciIsImF1ZCI6IlJEbWkifQ.es_CnBXhErL04xB0XrjSsHkwmDWmGB_p-hLyaHJ9ap_jil1QddDQcF3SheZmUqSByKFt1r-BxJotRzU01QQlJGoldeiggcZG7VBffmSDtvkxNUoZ4o2Feo6CYUZ8fJSAyNq0oNFyEDWhjGlQs0oU_p6EDOfPY5rwQnkbHpvCe6X2PAlFRDbqGIIRegHszAiT1zyVp1MDwfMa68Vyit-EH23N_8Gh8kWvHQlggyuslHYvvdb7o1wma1_gJ3otq_d6qEtocTCVOZMhY3ijVPnO2Zyy9lqckJvCs047UVFTYGQb9UlA0TeH4OixB7lf_KBOGg6Ax8846ivVg0tsrakWEQ",
+                                            "aadJoin": false,
+                                            "UseAgentDownloadEndpoint": true,
+                                            "aadJoinPreview": false,
+                                            "mdmId": "",
+                                            "sessionHostConfigurationLastUpdateTime": ""
+                                        }
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-sfescbnv/providers/Microsoft.Compute/virtualMachines/cfb-test-0?$expand=instanceView&api-version=2020-12-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-length": [
+                        "21371"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: 26D79ACEA24246ED8AF9019457F130AA Ref B: CO6AA3150217009 Ref C: 2023-09-26T22:54:08Z"
+                    ],
+                    "date": [
+                        "Tue, 26 Sep 2023 22:54:07 GMT"
+                    ],
+                    "x-ms-ratelimit-remaining-resource": [
+                        "Microsoft.Compute/LowCostGet3Min;3997,Microsoft.Compute/LowCostGet30Min;31997"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "name": "cfb-test-0",
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-sfescbnv/providers/Microsoft.Compute/virtualMachines/cfb-test-0",
+                        "type": "Microsoft.Compute/virtualMachines",
+                        "location": "eastus",
+                        "tags": {
+                            "cm-resource-parent": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-sfescbnv/providers/Microsoft.DesktopVirtualization/hostpools/fail-HostPool",
+                            "product_id": "13742"
+                        },
+                        "properties": {
+                            "hardwareProfile": {
+                                "vmSize": "Standard_D2s_v3"
+                            },
+                            "provisioningState": "Succeeded",
+                            "vmId": "740e4846-42f4-4008-87d0-312b3cbe2985",
+                            "additionalCapabilities": {},
+                            "storageProfile": {
+                                "imageReference": {
+                                    "publisher": "microsoftwindowsdesktop",
+                                    "offer": "windows-10",
+                                    "sku": "win10-22h2-avd-g2",
+                                    "version": "latest",
+                                    "exactVersion": "19045.3448.230831"
+                                },
+                                "osDisk": {
+                                    "osType": "Windows",
+                                    "name": "cfb-test-0_OsDisk_1_0bc53e46120248c39fd3fd06398ca889",
+                                    "createOption": "FromImage",
+                                    "caching": "ReadWrite",
+                                    "managedDisk": {
+                                        "storageAccountType": "StandardSSD_LRS",
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-sfescbnv/providers/Microsoft.Compute/disks/cfb-test-0_OsDisk_1_0bc53e46120248c39fd3fd06398ca889"
+                                    },
+                                    "diskSizeGB": 127
+                                },
+                                "dataDisks": []
+                            },
+                            "osProfile": {
+                                "computerName": "cfb-test-0",
+                                "adminUsername": "adminuser",
+                                "windowsConfiguration": {
+                                    "provisionVMAgent": true,
+                                    "enableAutomaticUpdates": true,
+                                    "patchSettings": {
+                                        "patchMode": "AutomaticByOS"
+                                    }
+                                },
+                                "secrets": [],
+                                "allowExtensionOperations": true,
+                                "requireGuestProvisionSignal": true
+                            },
+                            "securityProfile": {
+                                "uefiSettings": {
+                                    "secureBootEnabled": true,
+                                    "vTpmEnabled": true
+                                },
+                                "securityType": "TrustedLaunch"
+                            },
+                            "networkProfile": {
+                                "networkInterfaces": [
+                                    {
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-sfescbnv/providers/Microsoft.Network/networkInterfaces/cfb-test-0-nic"
+                                    }
+                                ]
+                            },
+                            "diagnosticsProfile": {
+                                "bootDiagnostics": {
+                                    "enabled": false
+                                }
+                            },
+                            "licenseType": "Windows_Client",
+                            "instanceView": {
+                                "computerName": "cfb-test-0",
+                                "osName": "Windows 10 Enterprise for Virtual Desktops",
+                                "osVersion": "10.0.19045.3448",
+                                "vmAgent": {
+                                    "vmAgentVersion": "2.7.41491.1095",
+                                    "statuses": [
+                                        {
+                                            "code": "ProvisioningState/succeeded",
+                                            "level": "Info",
+                                            "displayStatus": "Ready",
+                                            "message": "GuestAgent is running and processing the extensions.",
+                                            "time": "2023-09-26T22:53:43.885+00:00"
+                                        }
+                                    ],
+                                    "extensionHandlers": [
+                                        {
+                                            "type": "Microsoft.Azure.AzureDefenderForServers.MDE.Windows",
+                                            "typeHandlerVersion": "1.0.9.2",
+                                            "status": {
+                                                "code": "ProvisioningState/succeeded",
+                                                "level": "Info",
+                                                "displayStatus": "Ready"
+                                            }
+                                        },
+                                        {
+                                            "type": "Microsoft.Compute.JsonADDomainExtension",
+                                            "typeHandlerVersion": "1.3.11",
+                                            "status": {
+                                                "code": "ProvisioningState/succeeded",
+                                                "level": "Info",
+                                                "displayStatus": "Ready"
+                                            }
+                                        },
+                                        {
+                                            "type": "Microsoft.Powershell.DSC",
+                                            "typeHandlerVersion": "2.83.5",
+                                            "status": {
+                                                "code": "ProvisioningState/succeeded",
+                                                "level": "Info",
+                                                "displayStatus": "Ready"
+                                            }
+                                        }
+                                    ]
+                                },
+                                "disks": [
+                                    {
+                                        "name": "cfb-test-0_OsDisk_1_0bc53e46120248c39fd3fd06398ca889",
+                                        "statuses": [
+                                            {
+                                                "code": "ProvisioningState/succeeded",
+                                                "level": "Info",
+                                                "displayStatus": "Provisioning succeeded",
+                                                "time": "2023-09-26T15:55:47.3064956+00:00"
+                                            }
+                                        ]
+                                    }
+                                ],
+                                "extensions": [
+                                    {
+                                        "name": "joindomain",
+                                        "type": "Microsoft.Compute.JsonADDomainExtension",
+                                        "typeHandlerVersion": "1.3.11",
+                                        "substatuses": [
+                                            {
+                                                "code": "ComponentStatus/JoinDomainException for Option 3 meaning 'User Specified'/failed/1",
+                                                "level": "Error",
+                                                "displayStatus": "Provisioning failed",
+                                                "message": "ERROR - Failed to join domain='mckavm.onmicrosoft.com', ou='', user='tester@mckavm.onmicrosoft.com', option='NetSetupJoinDomain, NetSetupAcctCreate' (#3 meaning 'User Specified'). Error code 1355"
+                                            },
+                                            {
+                                                "code": "ComponentStatus/JoinDomainException for Option 1 meaning 'User Specified without NetSetupAcctCreate'/failed/1",
+                                                "level": "Error",
+                                                "displayStatus": "Provisioning failed",
+                                                "message": "ERROR - Failed to join domain='mckavm.onmicrosoft.com', ou='', user='tester@mckavm.onmicrosoft.com', option='NetSetupJoinDomain' (#1 meaning 'User Specified without NetSetupAcctCreate'). Error code 1355"
+                                            }
+                                        ],
+                                        "statuses": [
+                                            {
+                                                "code": "ProvisioningState/failed/1",
+                                                "level": "Error",
+                                                "displayStatus": "Provisioning failed",
+                                                "message": "Exception(s) occurred while joining Domain 'mckavm.onmicrosoft.com'"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "name": "MDE.Windows",
+                                        "type": "Microsoft.Azure.AzureDefenderForServers.MDE.Windows",
+                                        "typeHandlerVersion": "1.0.9.2",
+                                        "statuses": [
+                                            {
+                                                "code": "ProvisioningState/succeeded",
+                                                "level": "Info",
+                                                "displayStatus": "Provisioning succeeded",
+                                                "message": "{\r\n    \"azureResourceId\":  \"/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/CFB-SFESCBNV/providers/Microsoft.Compute/virtualMachines/cfb-test-0\",\r\n    \"securityWorkspaceId\":  \"ea42f556-5106-4743-99b0-c129bfa71a47\",\r\n    \"osDetails\":  {\r\n                      \"osMetadata\":  {\r\n                                         \"majorVersion\":  10,\r\n                                         \"minorVersion\":  0,\r\n                                         \"buildVersion\":  19045,\r\n                                         \"productType\":  3,\r\n                                         \"operatingSystemSku\":  175\r\n                                     },\r\n                      \"osName\":  \"Microsoft Windows 10 Enterprise for Virtual Desktops\"\r\n                  },\r\n    \"onboardingPackageOperationResultCode\":  \"Success\",\r\n    \"proxyUri\":  null,\r\n    \"machineId\":  \"61f969ae02e52ea947e570a5727e991787776734\"\r\n}",
+                                                "time": "2023-09-26T17:01:54+00:00"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "name": "Microsoft.PowerShell.DSC",
+                                        "type": "Microsoft.Powershell.DSC",
+                                        "typeHandlerVersion": "2.83.5",
+                                        "substatuses": [
+                                            {
+                                                "code": "ComponentStatus/DscConfigurationLog/succeeded",
+                                                "level": "Info",
+                                                "displayStatus": "Provisioning succeeded",
+                                                "message": "[2023-09-26 16:04:50Z] [VERBOSE] [cfb-test-0]:                            [[Script]ExecuteRdAgentInstallClient] GET https://rdweb.wvd.microsoft.com/agentdownload?skoid=bba5089f-29ec-428e-a09b-b4eef3ff0c91&sktid=33e01921-4d64-4f8c-a055-5bdaffd5e33d&skt=2023-09-25T17:41:24Z&ske=2023-09-27T17:41:24Z&sks=b&skv=2021-10-04&sv=2021-10-04&st=2023-09-25T17:41:24Z&se=2023-09-27T17:41:24Z&sr=b&sp=r&sig=vXp4dRD/xLPqrGHCzQGFZuITX/iyh9sfS8lNdwhSkpM=&type=/rdagent/Microsoft.RDInfra.RDAgent.Installer-x64-1.0.7255.1400.msi with 0-byte payload\r\n[2023-09-26 16:04:51Z] [VERBOSE] [cfb-test-0]:                            [[Script]ExecuteRdAgentInstallClient] received 18915328-byte response of content type application/octet-stream\r\n[2023-09-26 16:05:38Z] [VERBOSE] [cfb-test-0]: LCM:  [ End    Set      ]  [[Script]ExecuteRdAgentInstallClient]  in 49.6910 seconds.\r\n[2023-09-26 16:05:38Z] [VERBOSE] [cfb-test-0]: LCM:  [ End    Resource ]  [[Script]ExecuteRdAgentInstallClient]\r\n[2023-09-26 16:05:38Z] [VERBOSE] [cfb-test-0]: LCM:  [ End    Set      ]\r\n[2023-09-26 16:05:38Z] [VERBOSE] [cfb-test-0]: LCM:  [ End    Set      ]    in  51.9570 seconds.\r\n[2023-09-26 16:05:38Z] [VERBOSE] Operation 'Invoke CimMethod' complete.\r\n[2023-09-26 16:05:38Z] [VERBOSE] Time taken for configuration job to complete is 52.292 seconds\r\n[2023-09-26 16:05:42Z] [VERBOSE] Performing the operation \"Start-DscConfiguration: SendMetaConfigurationApply\" on target \"MSFT_DSCLocalConfigurationManager\".\r\n[2023-09-26 16:05:42Z] [VERBOSE] Perform operation 'Invoke CimMethod' with following parameters, ''methodName' = SendMetaConfigurationApply,'className' = MSFT_DSCLocalConfigurationManager,'namespaceName' = root/Microsoft/Windows/DesiredStateConfiguration'.\r\n[2023-09-26 16:05:42Z] [VERBOSE] An LCM method call arrived from computer cfb-test-0 with user sid S-1-5-18.\r\n[2023-09-26 16:05:42Z] [VERBOSE] [cfb-test-0]: LCM:  [ Start  Set      ]\r\n[2023-09-26 16:05:42Z] [VERBOSE] [cfb-test-0]: LCM:  [ Start  Resource ]  [MSFT_DSCMetaConfiguration]\r\n[2023-09-26 16:05:42Z] [VERBOSE] [cfb-test-0]: LCM:  [ Start  Set      ]  [MSFT_DSCMetaConfiguration]\r\n[2023-09-26 16:05:42Z] [VERBOSE] [cfb-test-0]: LCM:  [ End    Set      ]  [MSFT_DSCMetaConfiguration]  in 0.0470 seconds.\r\n[2023-09-26 16:05:42Z] [VERBOSE] [cfb-test-0]: LCM:  [ End    Resource ]  [MSFT_DSCMetaConfiguration]\r\n[2023-09-26 16:05:42Z] [VERBOSE] [cfb-test-0]: LCM:  [ End    Set      ]\r\n[2023-09-26 16:05:42Z] [VERBOSE] [cfb-test-0]: LCM:  [ End    Set      ]    in  0.1720 seconds.\r\n[2023-09-26 16:05:42Z] [VERBOSE] Operation 'Invoke CimMethod' complete.\r\n[2023-09-26 16:05:42Z] [VERBOSE] Set-DscLocalConfigurationManager finished in 0.418 seconds."
+                                            },
+                                            {
+                                                "code": "ComponentStatus/DscExtensionLog/succeeded",
+                                                "level": "Info",
+                                                "displayStatus": "Provisioning succeeded",
+                                                "message": "[2023-09-26 16:04:00Z] Creating Working directory: C:\\Packages\\Plugins\\Microsoft.Powershell.DSC\\2.83.5\\bin\\..\\DSCWork\\Configuration_1.0.02439.203.0\r\n[2023-09-26 16:04:00Z] Downloading configuration package\r\n[2023-09-26 16:04:00Z] Downloading https://wvdportalstorageblob.blob.core.windows.net/galleryartifacts/Configuration_1.0.02439.203.zip to C:\\Packages\\Plugins\\Microsoft.Powershell.DSC\\2.83.5\\bin\\..\\DSCWork\\Configuration_1.0.02439.203.0\\Configuration_1.0.02439.203.zip\r\n[2023-09-26 16:04:30Z] Extracting Configuration_1.0.02439.203.zip\r\n[2023-09-26 16:04:32Z] Looking for the definition of the configuration function.\r\n[2023-09-26 16:04:32Z] Executing C:\\Packages\\Plugins\\Microsoft.Powershell.DSC\\2.83.5\\bin\\..\\DSCWork\\Configuration_1.0.02439.203.0\\Configuration.ps1\r\n[2023-09-26 16:04:32Z] Preparing configuration arguments and configuration data.\r\n[2023-09-26 16:04:32Z] Creating MOF files.\r\n[2023-09-26 16:04:32Z] Executing the configuration function to generate the MOF files.\r\n[2023-09-26 16:04:34Z] Verifying metaconfiguration for reboot information...\r\n[2023-09-26 16:04:34Z] Backing up C:\\Packages\\Plugins\\Microsoft.Powershell.DSC\\2.83.5\\DSCWork\\Configuration_1.0.02439.203.0\\AddSessionHost\\localhost.meta.mof\r\n[2023-09-26 16:04:34Z] No match for RegistrationKey found in the meta mof file\r\n[2023-09-26 16:04:34Z] WMF 5 or newer, Injecting RebootNodeIfNeeded = False and ActionAfterReboot = \"StopConfiguration\"\r\n[2023-09-26 16:04:34Z] Executing Set-DscLocalConfigurationManager...\r\n[2023-09-26 16:04:40Z] Settings handler status to 'transitioning' (C:\\Packages\\Plugins\\Microsoft.Powershell.DSC\\2.83.5\\Status\\0.status)\r\n[2023-09-26 16:04:44Z] Settings handler status to 'transitioning' (C:\\Packages\\Plugins\\Microsoft.Powershell.DSC\\2.83.5\\Status\\0.status)\r\n[2023-09-26 16:04:44Z] Get-DscLocalConfigurationManager: \r\n\r\nActionAfterReboot              : StopConfiguration\r\nAgentId                        : 4833E769-5C86-11EE-B0A4-00224832873D\r\nAllowModuleOverWrite           : False\r\nCertificateID                  : \r\nConfigurationDownloadManagers  : {}\r\nConfigurationID                : \r\nConfigurationMode              : ApplyOnly\r\nConfigurationModeFrequencyMins : 15\r\nCredential                     : \r\nDebugMode                      : {NONE}\r\nDownloadManagerCustomData      : \r\nDownloadManagerName            : \r\nLCMCompatibleVersions          : {1.0, 2.0}\r\nLCMState                       : Idle\r\nLCMStateDetail                 : \r\nLCMVersion                     : 2.0\r\nStatusRetentionTimeInDays      : 10\r\nSignatureValidationPolicy      : NONE\r\nSignatureValidations           : {}\r\nMaximumDownloadSizeMB          : 500\r\nPartialConfigurations          : \r\nRebootNodeIfNeeded             : False\r\nRefreshFrequencyMins           : 30\r\nRefreshMode                    : PUSH\r\nReportManagers                 : {}\r\nResourceModuleManagers         : {}\r\nPSComputerName                 : \r\n\r\n\r\n\r\n\r\n[2023-09-26 16:04:44Z] Executing Start-DscConfiguration...\r\n[2023-09-26 16:04:44Z] Settings handler status to 'transitioning' (C:\\Packages\\Plugins\\Microsoft.Powershell.DSC\\2.83.5\\Status\\0.status)\r\n[2023-09-26 16:05:39Z] Settings handler status to 'transitioning' (C:\\Packages\\Plugins\\Microsoft.Powershell.DSC\\2.83.5\\Status\\0.status)\r\n[2023-09-26 16:05:39Z] Updating execution status (HKLM:\\SOFTWARE\\Microsoft\\Azure\\DSC\\2.83.5\\Status)\r\n[2023-09-26 16:05:39Z] LCM state is Idle\r\n[2023-09-26 16:05:39Z] DSC configuration completed.\r\n[2023-09-26 16:05:39Z] Resetting metaconfiguration...\r\n[2023-09-26 16:05:39Z] Restoring C:\\Packages\\Plugins\\Microsoft.Powershell.DSC\\2.83.5\\DSCWork\\Configuration_1.0.02439.203.0\\AddSessionHost\\localhost.meta.mof.bk...\r\n[2023-09-26 16:05:39Z] Executing Set-DscLocalConfigurationManager...\r\n[2023-09-26 16:05:40Z] Settings handler status to 'transitioning' (C:\\Packages\\Plugins\\Microsoft.Powershell.DSC\\2.83.5\\Status\\0.status)\r\n[2023-09-26 16:05:44Z] Settings handler status to 'transitioning' (C:\\Packages\\Plugins\\Microsoft.Powershell.DSC\\2.83.5\\Status\\0.status)\r\n[2023-09-26 16:05:44Z] Get-DscLocalConfigurationManager: \r\n\r\nActionAfterReboot              : ContinueConfiguration\r\nAgentId                        : 4833E769-5C86-11EE-B0A4-00224832873D\r\nAllowModuleOverWrite           : False\r\nCertificateID                  : \r\nConfigurationDownloadManagers  : {}\r\nConfigurationID                : \r\nConfigurationMode              : ApplyOnly\r\nConfigurationModeFrequencyMins : 15\r\nCredential                     : \r\nDebugMode                      : {NONE}\r\nDownloadManagerCustomData      : \r\nDownloadManagerName            : \r\nLCMCompatibleVersions          : {1.0, 2.0}\r\nLCMState                       : Idle\r\nLCMStateDetail                 : \r\nLCMVersion                     : 2.0\r\nStatusRetentionTimeInDays      : 10\r\nSignatureValidationPolicy      : NONE\r\nSignatureValidations           : {}\r\nMaximumDownloadSizeMB          : 500\r\nPartialConfigurations          : \r\nRebootNodeIfNeeded             : True\r\nRefreshFrequencyMins           : 30\r\nRefreshMode                    : PUSH\r\nReportManagers                 : {}\r\nResourceModuleManagers         : {}\r\nPSComputerName                 : \r\n\r\n\r\n\r\n\r\n[2023-09-26 16:05:44Z] Settings handler status to 'success' (C:\\Packages\\Plugins\\Microsoft.Powershell.DSC\\2.83.5\\Status\\0.status)"
+                                            },
+                                            {
+                                                "code": "ComponentStatus/Metadata/succeeded",
+                                                "level": "Info",
+                                                "displayStatus": "Provisioning succeeded",
+                                                "message": "VMUUId=740E4846-42F4-4008-87D0-312B3CBE2985;AgentId=4833E769-5C86-11EE-B0A4-00224832873D;"
+                                            }
+                                        ],
+                                        "statuses": [
+                                            {
+                                                "code": "ProvisioningState/succeeded",
+                                                "level": "Info",
+                                                "displayStatus": "Provisioning succeeded",
+                                                "message": "DSC configuration was applied successfully.",
+                                                "time": "2023-09-26T16:05:44+00:00"
+                                            }
+                                        ]
+                                    }
+                                ],
+                                "hyperVGeneration": "V2",
+                                "statuses": [
+                                    {
+                                        "code": "ProvisioningState/succeeded",
+                                        "level": "Info",
+                                        "displayStatus": "Provisioning succeeded",
+                                        "time": "2023-09-26T17:02:11.2276947+00:00"
+                                    },
+                                    {
+                                        "code": "PowerState/running",
+                                        "level": "Info",
+                                        "displayStatus": "VM running"
+                                    }
+                                ]
+                            }
+                        },
+                        "zones": [
+                            "1"
+                        ],
+                        "resources": [
+                            {
+                                "name": "joindomain",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-sfescbnv/providers/Microsoft.Compute/virtualMachines/cfb-test-0/extensions/joindomain",
+                                "type": "Microsoft.Compute/virtualMachines/extensions",
+                                "location": "eastus",
+                                "tags": {
+                                    "product_id": "13742"
+                                },
+                                "properties": {
+                                    "autoUpgradeMinorVersion": true,
+                                    "provisioningState": "Failed",
+                                    "publisher": "Microsoft.Compute",
+                                    "type": "JsonADDomainExtension",
+                                    "typeHandlerVersion": "1.3",
+                                    "settings": {
+                                        "name": "mckavm.onmicrosoft.com",
+                                        "ouPath": "",
+                                        "user": "tester@mckavm.onmicrosoft.com",
+                                        "restart": "true",
+                                        "options": "3"
+                                    }
+                                }
+                            },
+                            {
+                                "name": "MDE.Windows",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-sfescbnv/providers/Microsoft.Compute/virtualMachines/cfb-test-0/extensions/MDE.Windows",
+                                "type": "Microsoft.Compute/virtualMachines/extensions",
+                                "location": "eastus",
+                                "tags": {
+                                    "product_id": "13742"
+                                },
+                                "properties": {
+                                    "autoUpgradeMinorVersion": true,
+                                    "forceUpdateTag": "05940b2f-e06a-4c01-bad7-e330663af0d8",
+                                    "provisioningState": "Succeeded",
+                                    "publisher": "Microsoft.Azure.AzureDefenderForServers",
+                                    "type": "MDE.Windows",
+                                    "typeHandlerVersion": "1.0",
+                                    "settings": {
+                                        "azureResourceId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/CFB-SFESCBNV/providers/Microsoft.Compute/virtualMachines/cfb-test-0",
+                                        "forceReOnboarding": false,
+                                        "vNextEnabled": true,
+                                        "autoUpdate": true
+                                    }
+                                }
+                            },
+                            {
+                                "name": "Microsoft.PowerShell.DSC",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-sfescbnv/providers/Microsoft.Compute/virtualMachines/cfb-test-0/extensions/Microsoft.PowerShell.DSC",
+                                "type": "Microsoft.Compute/virtualMachines/extensions",
+                                "location": "eastus",
+                                "tags": {
+                                    "product_id": "13742"
+                                },
+                                "properties": {
+                                    "autoUpgradeMinorVersion": true,
+                                    "provisioningState": "Succeeded",
+                                    "publisher": "Microsoft.Powershell",
+                                    "type": "DSC",
+                                    "typeHandlerVersion": "2.73",
+                                    "settings": {
+                                        "modulesUrl": "https://wvdportalstorageblob.blob.core.windows.net/galleryartifacts/Configuration_1.0.02439.203.zip",
+                                        "configurationFunction": "Configuration.ps1\\AddSessionHost",
+                                        "properties": {
+                                            "hostPoolName": "fail-HostPool",
+                                            "registrationInfoToken": "eyJhbGciOiJSUzI1NiIsImtpZCI6IjQyRURFMjE4OERDMUYxMzk5QUJFNDREQTJGNzE1RDU0NDlEMjNBOUYiLCJ0eXAiOiJKV1QifQ.eyJSZWdpc3RyYXRpb25JZCI6IjhkNWRlZTU1LTQyMTUtNDBlNy1hZjE3LTBiMGJjNTUyYjQwMSIsIkJyb2tlclVyaSI6Imh0dHBzOi8vcmRicm9rZXItZy11cy1yMC53dmQubWljcm9zb2Z0LmNvbS8iLCJEaWFnbm9zdGljc1VyaSI6Imh0dHBzOi8vcmRkaWFnbm9zdGljcy1nLXVzLXIwLnd2ZC5taWNyb3NvZnQuY29tLyIsIkVuZHBvaW50UG9vbElkIjoiNjM4YjcyYzAtZThiNS00ZmNjLWE1ZWQtN2U4YTA4MWNiODBjIiwiR2xvYmFsQnJva2VyVXJpIjoiaHR0cHM6Ly9yZGJyb2tlci53dmQubWljcm9zb2Z0LmNvbS8iLCJHZW9ncmFwaHkiOiJVUyIsIkdsb2JhbEJyb2tlclJlc291cmNlSWRVcmkiOiJodHRwczovLzYzOGI3MmMwLWU4YjUtNGZjYy1hNWVkLTdlOGEwODFjYjgwYy5yZGJyb2tlci53dmQubWljcm9zb2Z0LmNvbS8iLCJCcm9rZXJSZXNvdXJjZUlkVXJpIjoiaHR0cHM6Ly82MzhiNzJjMC1lOGI1LTRmY2MtYTVlZC03ZThhMDgxY2I4MGMucmRicm9rZXItZy11cy1yMC53dmQubWljcm9zb2Z0LmNvbS8iLCJEaWFnbm9zdGljc1Jlc291cmNlSWRVcmkiOiJodHRwczovLzYzOGI3MmMwLWU4YjUtNGZjYy1hNWVkLTdlOGEwODFjYjgwYy5yZGRpYWdub3N0aWNzLWctdXMtcjAud3ZkLm1pY3Jvc29mdC5jb20vIiwiQUFEVGVuYW50SWQiOiJiMDI1N2MxNC1jYWNjLTQ0YzYtODkyNy01YjRjZTVkZTA4NzQiLCJuYmYiOjE2OTU3NDM0NzIsImV4cCI6MTY5ODE1MTM5MywiaXNzIjoiUkRJbmZyYVRva2VuTWFuYWdlciIsImF1ZCI6IlJEbWkifQ.es_CnBXhErL04xB0XrjSsHkwmDWmGB_p-hLyaHJ9ap_jil1QddDQcF3SheZmUqSByKFt1r-BxJotRzU01QQlJGoldeiggcZG7VBffmSDtvkxNUoZ4o2Feo6CYUZ8fJSAyNq0oNFyEDWhjGlQs0oU_p6EDOfPY5rwQnkbHpvCe6X2PAlFRDbqGIIRegHszAiT1zyVp1MDwfMa68Vyit-EH23N_8Gh8kWvHQlggyuslHYvvdb7o1wma1_gJ3otq_d6qEtocTCVOZMhY3ijVPnO2Zyy9lqckJvCs047UVFTYGQb9UlA0TeH4OixB7lf_KBOGg6Ax8846ivVg0tsrakWEQ",
+                                            "aadJoin": false,
+                                            "UseAgentDownloadEndpoint": true,
+                                            "aadJoinPreview": false,
+                                            "mdmId": "",
+                                            "sessionHostConfigurationLastUpdateTime": ""
+                                        }
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-sfescbnv/providers/Microsoft.Compute/virtualMachines/cfb-test-1?$expand=instanceView&api-version=2020-12-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "x-cache": [
+                        "CONFIG_NOCACHE"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-length": [
+                        "21371"
+                    ],
+                    "x-msedge-ref": [
+                        "Ref A: F233696485314B9CAE546A29CEC70D17 Ref B: CO6AA3150217009 Ref C: 2023-09-26T22:54:23Z"
+                    ],
+                    "date": [
+                        "Tue, 26 Sep 2023 22:54:22 GMT"
+                    ],
+                    "x-ms-ratelimit-remaining-resource": [
+                        "Microsoft.Compute/LowCostGet3Min;3996,Microsoft.Compute/LowCostGet30Min;31996"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "name": "cfb-test-1",
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-sfescbnv/providers/Microsoft.Compute/virtualMachines/cfb-test-1",
+                        "type": "Microsoft.Compute/virtualMachines",
+                        "location": "eastus",
+                        "tags": {
+                            "cm-resource-parent": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-sfescbnv/providers/Microsoft.DesktopVirtualization/hostpools/fail-HostPool",
+                            "product_id": "13742"
+                        },
+                        "properties": {
+                            "hardwareProfile": {
+                                "vmSize": "Standard_D2s_v3"
+                            },
+                            "provisioningState": "Succeeded",
+                            "vmId": "4e93b3a2-a8d8-453a-8f79-08232e57ee84",
+                            "additionalCapabilities": {},
+                            "storageProfile": {
+                                "imageReference": {
+                                    "publisher": "microsoftwindowsdesktop",
+                                    "offer": "windows-10",
+                                    "sku": "win10-22h2-avd-g2",
+                                    "version": "latest",
+                                    "exactVersion": "19045.3448.230831"
+                                },
+                                "osDisk": {
+                                    "osType": "Windows",
+                                    "name": "cfb-test-1_OsDisk_1_1eb09d51a61b4a29821f1ac4bfe235ad",
+                                    "createOption": "FromImage",
+                                    "caching": "ReadWrite",
+                                    "managedDisk": {
+                                        "storageAccountType": "StandardSSD_LRS",
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-sfescbnv/providers/Microsoft.Compute/disks/cfb-test-1_OsDisk_1_1eb09d51a61b4a29821f1ac4bfe235ad"
+                                    },
+                                    "diskSizeGB": 127
+                                },
+                                "dataDisks": []
+                            },
+                            "osProfile": {
+                                "computerName": "cfb-test-1",
+                                "adminUsername": "adminuser",
+                                "windowsConfiguration": {
+                                    "provisionVMAgent": true,
+                                    "enableAutomaticUpdates": true,
+                                    "patchSettings": {
+                                        "patchMode": "AutomaticByOS"
+                                    }
+                                },
+                                "secrets": [],
+                                "allowExtensionOperations": true,
+                                "requireGuestProvisionSignal": true
+                            },
+                            "securityProfile": {
+                                "uefiSettings": {
+                                    "secureBootEnabled": true,
+                                    "vTpmEnabled": true
+                                },
+                                "securityType": "TrustedLaunch"
+                            },
+                            "networkProfile": {
+                                "networkInterfaces": [
+                                    {
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-sfescbnv/providers/Microsoft.Network/networkInterfaces/cfb-test-1-nic"
+                                    }
+                                ]
+                            },
+                            "diagnosticsProfile": {
+                                "bootDiagnostics": {
+                                    "enabled": false
+                                }
+                            },
+                            "licenseType": "Windows_Client",
+                            "instanceView": {
+                                "computerName": "cfb-test-1",
+                                "osName": "Windows 10 Enterprise for Virtual Desktops",
+                                "osVersion": "10.0.19045.3448",
+                                "vmAgent": {
+                                    "vmAgentVersion": "2.7.41491.1095",
+                                    "statuses": [
+                                        {
+                                            "code": "ProvisioningState/succeeded",
+                                            "level": "Info",
+                                            "displayStatus": "Ready",
+                                            "message": "GuestAgent is running and processing the extensions.",
+                                            "time": "2023-09-26T22:53:27.539+00:00"
+                                        }
+                                    ],
+                                    "extensionHandlers": [
+                                        {
+                                            "type": "Microsoft.Azure.AzureDefenderForServers.MDE.Windows",
+                                            "typeHandlerVersion": "1.0.9.2",
+                                            "status": {
+                                                "code": "ProvisioningState/succeeded",
+                                                "level": "Info",
+                                                "displayStatus": "Ready"
+                                            }
+                                        },
+                                        {
+                                            "type": "Microsoft.Compute.JsonADDomainExtension",
+                                            "typeHandlerVersion": "1.3.11",
+                                            "status": {
+                                                "code": "ProvisioningState/succeeded",
+                                                "level": "Info",
+                                                "displayStatus": "Ready"
+                                            }
+                                        },
+                                        {
+                                            "type": "Microsoft.Powershell.DSC",
+                                            "typeHandlerVersion": "2.83.5",
+                                            "status": {
+                                                "code": "ProvisioningState/succeeded",
+                                                "level": "Info",
+                                                "displayStatus": "Ready"
+                                            }
+                                        }
+                                    ]
+                                },
+                                "disks": [
+                                    {
+                                        "name": "cfb-test-1_OsDisk_1_1eb09d51a61b4a29821f1ac4bfe235ad",
+                                        "statuses": [
+                                            {
+                                                "code": "ProvisioningState/succeeded",
+                                                "level": "Info",
+                                                "displayStatus": "Provisioning succeeded",
+                                                "time": "2023-09-26T15:55:47.0877516+00:00"
+                                            }
+                                        ]
+                                    }
+                                ],
+                                "extensions": [
+                                    {
+                                        "name": "joindomain",
+                                        "type": "Microsoft.Compute.JsonADDomainExtension",
+                                        "typeHandlerVersion": "1.3.11",
+                                        "substatuses": [
+                                            {
+                                                "code": "ComponentStatus/JoinDomainException for Option 3 meaning 'User Specified'/failed/1",
+                                                "level": "Error",
+                                                "displayStatus": "Provisioning failed",
+                                                "message": "ERROR - Failed to join domain='mckavm.onmicrosoft.com', ou='', user='tester@mckavm.onmicrosoft.com', option='NetSetupJoinDomain, NetSetupAcctCreate' (#3 meaning 'User Specified'). Error code 1355"
+                                            },
+                                            {
+                                                "code": "ComponentStatus/JoinDomainException for Option 1 meaning 'User Specified without NetSetupAcctCreate'/failed/1",
+                                                "level": "Error",
+                                                "displayStatus": "Provisioning failed",
+                                                "message": "ERROR - Failed to join domain='mckavm.onmicrosoft.com', ou='', user='tester@mckavm.onmicrosoft.com', option='NetSetupJoinDomain' (#1 meaning 'User Specified without NetSetupAcctCreate'). Error code 1355"
+                                            }
+                                        ],
+                                        "statuses": [
+                                            {
+                                                "code": "ProvisioningState/failed/1",
+                                                "level": "Error",
+                                                "displayStatus": "Provisioning failed",
+                                                "message": "Exception(s) occurred while joining Domain 'mckavm.onmicrosoft.com'"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "name": "MDE.Windows",
+                                        "type": "Microsoft.Azure.AzureDefenderForServers.MDE.Windows",
+                                        "typeHandlerVersion": "1.0.9.2",
+                                        "statuses": [
+                                            {
+                                                "code": "ProvisioningState/succeeded",
+                                                "level": "Info",
+                                                "displayStatus": "Provisioning succeeded",
+                                                "message": "{\r\n    \"azureResourceId\":  \"/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/CFB-SFESCBNV/providers/Microsoft.Compute/virtualMachines/cfb-test-1\",\r\n    \"securityWorkspaceId\":  \"ea42f556-5106-4743-99b0-c129bfa71a47\",\r\n    \"osDetails\":  {\r\n                      \"osMetadata\":  {\r\n                                         \"majorVersion\":  10,\r\n                                         \"minorVersion\":  0,\r\n                                         \"buildVersion\":  19045,\r\n                                         \"productType\":  3,\r\n                                         \"operatingSystemSku\":  175\r\n                                     },\r\n                      \"osName\":  \"Microsoft Windows 10 Enterprise for Virtual Desktops\"\r\n                  },\r\n    \"onboardingPackageOperationResultCode\":  \"Success\",\r\n    \"proxyUri\":  null,\r\n    \"machineId\":  \"d2954c5426981e52249d18d5afd1b564a8aecd10\"\r\n}",
+                                                "time": "2023-09-26T17:01:38+00:00"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "name": "Microsoft.PowerShell.DSC",
+                                        "type": "Microsoft.Powershell.DSC",
+                                        "typeHandlerVersion": "2.83.5",
+                                        "substatuses": [
+                                            {
+                                                "code": "ComponentStatus/DscConfigurationLog/succeeded",
+                                                "level": "Info",
+                                                "displayStatus": "Provisioning succeeded",
+                                                "message": "[2023-09-26 16:05:11Z] [VERBOSE] [cfb-test-1]:                            [[Script]ExecuteRdAgentInstallClient] GET https://rdweb.wvd.microsoft.com/agentdownload?skoid=bba5089f-29ec-428e-a09b-b4eef3ff0c91&sktid=33e01921-4d64-4f8c-a055-5bdaffd5e33d&skt=2023-09-26T08:07:45Z&ske=2023-09-28T08:07:45Z&sks=b&skv=2021-10-04&sv=2021-10-04&st=2023-09-26T08:07:45Z&se=2023-09-28T08:07:45Z&sr=b&sp=r&sig=mkgZ6P4DKsKNQaBl/9CdcyS4m4sLRld0ujLegin/v8w=&type=/rdagent/Microsoft.RDInfra.RDAgent.Installer-x64-1.0.7255.1400.msi with 0-byte payload\r\n[2023-09-26 16:05:12Z] [VERBOSE] [cfb-test-1]:                            [[Script]ExecuteRdAgentInstallClient] received 18915328-byte response of content type application/octet-stream\r\n[2023-09-26 16:05:50Z] [VERBOSE] [cfb-test-1]: LCM:  [ End    Set      ]  [[Script]ExecuteRdAgentInstallClient]  in 40.2030 seconds.\r\n[2023-09-26 16:05:50Z] [VERBOSE] [cfb-test-1]: LCM:  [ End    Resource ]  [[Script]ExecuteRdAgentInstallClient]\r\n[2023-09-26 16:05:50Z] [VERBOSE] [cfb-test-1]: LCM:  [ End    Set      ]\r\n[2023-09-26 16:05:50Z] [VERBOSE] [cfb-test-1]: LCM:  [ End    Set      ]    in  41.8130 seconds.\r\n[2023-09-26 16:05:50Z] [VERBOSE] Operation 'Invoke CimMethod' complete.\r\n[2023-09-26 16:05:50Z] [VERBOSE] Time taken for configuration job to complete is 42.034 seconds\r\n[2023-09-26 16:05:53Z] [VERBOSE] Performing the operation \"Start-DscConfiguration: SendMetaConfigurationApply\" on target \"MSFT_DSCLocalConfigurationManager\".\r\n[2023-09-26 16:05:53Z] [VERBOSE] Perform operation 'Invoke CimMethod' with following parameters, ''methodName' = SendMetaConfigurationApply,'className' = MSFT_DSCLocalConfigurationManager,'namespaceName' = root/Microsoft/Windows/DesiredStateConfiguration'.\r\n[2023-09-26 16:05:54Z] [VERBOSE] An LCM method call arrived from computer cfb-test-1 with user sid S-1-5-18.\r\n[2023-09-26 16:05:54Z] [VERBOSE] [cfb-test-1]: LCM:  [ Start  Set      ]\r\n[2023-09-26 16:05:54Z] [VERBOSE] [cfb-test-1]: LCM:  [ Start  Resource ]  [MSFT_DSCMetaConfiguration]\r\n[2023-09-26 16:05:54Z] [VERBOSE] [cfb-test-1]: LCM:  [ Start  Set      ]  [MSFT_DSCMetaConfiguration]\r\n[2023-09-26 16:05:54Z] [VERBOSE] [cfb-test-1]: LCM:  [ End    Set      ]  [MSFT_DSCMetaConfiguration]  in 0.0630 seconds.\r\n[2023-09-26 16:05:54Z] [VERBOSE] [cfb-test-1]: LCM:  [ End    Resource ]  [MSFT_DSCMetaConfiguration]\r\n[2023-09-26 16:05:54Z] [VERBOSE] [cfb-test-1]: LCM:  [ End    Set      ]\r\n[2023-09-26 16:05:54Z] [VERBOSE] [cfb-test-1]: LCM:  [ End    Set      ]    in  0.1880 seconds.\r\n[2023-09-26 16:05:54Z] [VERBOSE] Operation 'Invoke CimMethod' complete.\r\n[2023-09-26 16:05:54Z] [VERBOSE] Set-DscLocalConfigurationManager finished in 0.417 seconds."
+                                            },
+                                            {
+                                                "code": "ComponentStatus/DscExtensionLog/succeeded",
+                                                "level": "Info",
+                                                "displayStatus": "Provisioning succeeded",
+                                                "message": "[2023-09-26 16:04:28Z] Creating Working directory: C:\\Packages\\Plugins\\Microsoft.Powershell.DSC\\2.83.5\\bin\\..\\DSCWork\\Configuration_1.0.02439.203.0\r\n[2023-09-26 16:04:28Z] Downloading configuration package\r\n[2023-09-26 16:04:28Z] Downloading https://wvdportalstorageblob.blob.core.windows.net/galleryartifacts/Configuration_1.0.02439.203.zip to C:\\Packages\\Plugins\\Microsoft.Powershell.DSC\\2.83.5\\bin\\..\\DSCWork\\Configuration_1.0.02439.203.0\\Configuration_1.0.02439.203.zip\r\n[2023-09-26 16:04:57Z] Extracting Configuration_1.0.02439.203.zip\r\n[2023-09-26 16:04:58Z] Looking for the definition of the configuration function.\r\n[2023-09-26 16:04:58Z] Executing C:\\Packages\\Plugins\\Microsoft.Powershell.DSC\\2.83.5\\bin\\..\\DSCWork\\Configuration_1.0.02439.203.0\\Configuration.ps1\r\n[2023-09-26 16:04:58Z] Preparing configuration arguments and configuration data.\r\n[2023-09-26 16:04:59Z] Creating MOF files.\r\n[2023-09-26 16:04:59Z] Executing the configuration function to generate the MOF files.\r\n[2023-09-26 16:05:00Z] Verifying metaconfiguration for reboot information...\r\n[2023-09-26 16:05:00Z] Backing up C:\\Packages\\Plugins\\Microsoft.Powershell.DSC\\2.83.5\\DSCWork\\Configuration_1.0.02439.203.0\\AddSessionHost\\localhost.meta.mof\r\n[2023-09-26 16:05:00Z] No match for RegistrationKey found in the meta mof file\r\n[2023-09-26 16:05:00Z] WMF 5 or newer, Injecting RebootNodeIfNeeded = False and ActionAfterReboot = \"StopConfiguration\"\r\n[2023-09-26 16:05:00Z] Executing Set-DscLocalConfigurationManager...\r\n[2023-09-26 16:05:04Z] Settings handler status to 'transitioning' (C:\\Packages\\Plugins\\Microsoft.Powershell.DSC\\2.83.5\\Status\\0.status)\r\n[2023-09-26 16:05:07Z] Settings handler status to 'transitioning' (C:\\Packages\\Plugins\\Microsoft.Powershell.DSC\\2.83.5\\Status\\0.status)\r\n[2023-09-26 16:05:07Z] Get-DscLocalConfigurationManager: \r\n\r\nActionAfterReboot              : StopConfiguration\r\nAgentId                        : 5A8862EA-5C86-11EE-B0A4-0022482FFADA\r\nAllowModuleOverWrite           : False\r\nCertificateID                  : \r\nConfigurationDownloadManagers  : {}\r\nConfigurationID                : \r\nConfigurationMode              : ApplyOnly\r\nConfigurationModeFrequencyMins : 15\r\nCredential                     : \r\nDebugMode                      : {NONE}\r\nDownloadManagerCustomData      : \r\nDownloadManagerName            : \r\nLCMCompatibleVersions          : {1.0, 2.0}\r\nLCMState                       : Idle\r\nLCMStateDetail                 : \r\nLCMVersion                     : 2.0\r\nStatusRetentionTimeInDays      : 10\r\nSignatureValidationPolicy      : NONE\r\nSignatureValidations           : {}\r\nMaximumDownloadSizeMB          : 500\r\nPartialConfigurations          : \r\nRebootNodeIfNeeded             : False\r\nRefreshFrequencyMins           : 30\r\nRefreshMode                    : PUSH\r\nReportManagers                 : {}\r\nResourceModuleManagers         : {}\r\nPSComputerName                 : \r\n\r\n\r\n\r\n\r\n[2023-09-26 16:05:07Z] Executing Start-DscConfiguration...\r\n[2023-09-26 16:05:07Z] Settings handler status to 'transitioning' (C:\\Packages\\Plugins\\Microsoft.Powershell.DSC\\2.83.5\\Status\\0.status)\r\n[2023-09-26 16:05:51Z] Settings handler status to 'transitioning' (C:\\Packages\\Plugins\\Microsoft.Powershell.DSC\\2.83.5\\Status\\0.status)\r\n[2023-09-26 16:05:51Z] Updating execution status (HKLM:\\SOFTWARE\\Microsoft\\Azure\\DSC\\2.83.5\\Status)\r\n[2023-09-26 16:05:51Z] LCM state is Idle\r\n[2023-09-26 16:05:51Z] DSC configuration completed.\r\n[2023-09-26 16:05:51Z] Resetting metaconfiguration...\r\n[2023-09-26 16:05:51Z] Restoring C:\\Packages\\Plugins\\Microsoft.Powershell.DSC\\2.83.5\\DSCWork\\Configuration_1.0.02439.203.0\\AddSessionHost\\localhost.meta.mof.bk...\r\n[2023-09-26 16:05:51Z] Executing Set-DscLocalConfigurationManager...\r\n[2023-09-26 16:05:52Z] Settings handler status to 'transitioning' (C:\\Packages\\Plugins\\Microsoft.Powershell.DSC\\2.83.5\\Status\\0.status)\r\n[2023-09-26 16:05:56Z] Settings handler status to 'transitioning' (C:\\Packages\\Plugins\\Microsoft.Powershell.DSC\\2.83.5\\Status\\0.status)\r\n[2023-09-26 16:05:56Z] Get-DscLocalConfigurationManager: \r\n\r\nActionAfterReboot              : ContinueConfiguration\r\nAgentId                        : 5A8862EA-5C86-11EE-B0A4-0022482FFADA\r\nAllowModuleOverWrite           : False\r\nCertificateID                  : \r\nConfigurationDownloadManagers  : {}\r\nConfigurationID                : \r\nConfigurationMode              : ApplyOnly\r\nConfigurationModeFrequencyMins : 15\r\nCredential                     : \r\nDebugMode                      : {NONE}\r\nDownloadManagerCustomData      : \r\nDownloadManagerName            : \r\nLCMCompatibleVersions          : {1.0, 2.0}\r\nLCMState                       : Idle\r\nLCMStateDetail                 : \r\nLCMVersion                     : 2.0\r\nStatusRetentionTimeInDays      : 10\r\nSignatureValidationPolicy      : NONE\r\nSignatureValidations           : {}\r\nMaximumDownloadSizeMB          : 500\r\nPartialConfigurations          : \r\nRebootNodeIfNeeded             : True\r\nRefreshFrequencyMins           : 30\r\nRefreshMode                    : PUSH\r\nReportManagers                 : {}\r\nResourceModuleManagers         : {}\r\nPSComputerName                 : \r\n\r\n\r\n\r\n\r\n[2023-09-26 16:05:56Z] Settings handler status to 'success' (C:\\Packages\\Plugins\\Microsoft.Powershell.DSC\\2.83.5\\Status\\0.status)"
+                                            },
+                                            {
+                                                "code": "ComponentStatus/Metadata/succeeded",
+                                                "level": "Info",
+                                                "displayStatus": "Provisioning succeeded",
+                                                "message": "VMUUId=4E93B3A2-A8D8-453A-8F79-08232E57EE84;AgentId=5A8862EA-5C86-11EE-B0A4-0022482FFADA;"
+                                            }
+                                        ],
+                                        "statuses": [
+                                            {
+                                                "code": "ProvisioningState/succeeded",
+                                                "level": "Info",
+                                                "displayStatus": "Provisioning succeeded",
+                                                "message": "DSC configuration was applied successfully.",
+                                                "time": "2023-09-26T16:05:56+00:00"
+                                            }
+                                        ]
+                                    }
+                                ],
+                                "hyperVGeneration": "V2",
+                                "statuses": [
+                                    {
+                                        "code": "ProvisioningState/succeeded",
+                                        "level": "Info",
+                                        "displayStatus": "Provisioning succeeded",
+                                        "time": "2023-09-26T17:02:01.3995798+00:00"
+                                    },
+                                    {
+                                        "code": "PowerState/running",
+                                        "level": "Info",
+                                        "displayStatus": "VM running"
+                                    }
+                                ]
+                            }
+                        },
+                        "zones": [
+                            "1"
+                        ],
+                        "resources": [
+                            {
+                                "name": "joindomain",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-sfescbnv/providers/Microsoft.Compute/virtualMachines/cfb-test-1/extensions/joindomain",
+                                "type": "Microsoft.Compute/virtualMachines/extensions",
+                                "location": "eastus",
+                                "tags": {
+                                    "product_id": "13742"
+                                },
+                                "properties": {
+                                    "autoUpgradeMinorVersion": true,
+                                    "provisioningState": "Failed",
+                                    "publisher": "Microsoft.Compute",
+                                    "type": "JsonADDomainExtension",
+                                    "typeHandlerVersion": "1.3",
+                                    "settings": {
+                                        "name": "mckavm.onmicrosoft.com",
+                                        "ouPath": "",
+                                        "user": "tester@mckavm.onmicrosoft.com",
+                                        "restart": "true",
+                                        "options": "3"
+                                    }
+                                }
+                            },
+                            {
+                                "name": "MDE.Windows",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-sfescbnv/providers/Microsoft.Compute/virtualMachines/cfb-test-1/extensions/MDE.Windows",
+                                "type": "Microsoft.Compute/virtualMachines/extensions",
+                                "location": "eastus",
+                                "tags": {
+                                    "product_id": "13742"
+                                },
+                                "properties": {
+                                    "autoUpgradeMinorVersion": true,
+                                    "forceUpdateTag": "db0fa344-aa55-4d55-8fc6-b154cfe3e378",
+                                    "provisioningState": "Succeeded",
+                                    "publisher": "Microsoft.Azure.AzureDefenderForServers",
+                                    "type": "MDE.Windows",
+                                    "typeHandlerVersion": "1.0",
+                                    "settings": {
+                                        "azureResourceId": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/CFB-SFESCBNV/providers/Microsoft.Compute/virtualMachines/cfb-test-1",
+                                        "forceReOnboarding": false,
+                                        "vNextEnabled": true,
+                                        "autoUpdate": true
+                                    }
+                                }
+                            },
+                            {
+                                "name": "Microsoft.PowerShell.DSC",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/cfb-sfescbnv/providers/Microsoft.Compute/virtualMachines/cfb-test-1/extensions/Microsoft.PowerShell.DSC",
+                                "type": "Microsoft.Compute/virtualMachines/extensions",
+                                "location": "eastus",
+                                "tags": {
+                                    "product_id": "13742"
+                                },
+                                "properties": {
+                                    "autoUpgradeMinorVersion": true,
+                                    "provisioningState": "Succeeded",
+                                    "publisher": "Microsoft.Powershell",
+                                    "type": "DSC",
+                                    "typeHandlerVersion": "2.73",
+                                    "settings": {
+                                        "modulesUrl": "https://wvdportalstorageblob.blob.core.windows.net/galleryartifacts/Configuration_1.0.02439.203.zip",
+                                        "configurationFunction": "Configuration.ps1\\AddSessionHost",
+                                        "properties": {
+                                            "hostPoolName": "fail-HostPool",
+                                            "registrationInfoToken": "eyJhbGciOiJSUzI1NiIsImtpZCI6IjQyRURFMjE4OERDMUYxMzk5QUJFNDREQTJGNzE1RDU0NDlEMjNBOUYiLCJ0eXAiOiJKV1QifQ.eyJSZWdpc3RyYXRpb25JZCI6IjhkNWRlZTU1LTQyMTUtNDBlNy1hZjE3LTBiMGJjNTUyYjQwMSIsIkJyb2tlclVyaSI6Imh0dHBzOi8vcmRicm9rZXItZy11cy1yMC53dmQubWljcm9zb2Z0LmNvbS8iLCJEaWFnbm9zdGljc1VyaSI6Imh0dHBzOi8vcmRkaWFnbm9zdGljcy1nLXVzLXIwLnd2ZC5taWNyb3NvZnQuY29tLyIsIkVuZHBvaW50UG9vbElkIjoiNjM4YjcyYzAtZThiNS00ZmNjLWE1ZWQtN2U4YTA4MWNiODBjIiwiR2xvYmFsQnJva2VyVXJpIjoiaHR0cHM6Ly9yZGJyb2tlci53dmQubWljcm9zb2Z0LmNvbS8iLCJHZW9ncmFwaHkiOiJVUyIsIkdsb2JhbEJyb2tlclJlc291cmNlSWRVcmkiOiJodHRwczovLzYzOGI3MmMwLWU4YjUtNGZjYy1hNWVkLTdlOGEwODFjYjgwYy5yZGJyb2tlci53dmQubWljcm9zb2Z0LmNvbS8iLCJCcm9rZXJSZXNvdXJjZUlkVXJpIjoiaHR0cHM6Ly82MzhiNzJjMC1lOGI1LTRmY2MtYTVlZC03ZThhMDgxY2I4MGMucmRicm9rZXItZy11cy1yMC53dmQubWljcm9zb2Z0LmNvbS8iLCJEaWFnbm9zdGljc1Jlc291cmNlSWRVcmkiOiJodHRwczovLzYzOGI3MmMwLWU4YjUtNGZjYy1hNWVkLTdlOGEwODFjYjgwYy5yZGRpYWdub3N0aWNzLWctdXMtcjAud3ZkLm1pY3Jvc29mdC5jb20vIiwiQUFEVGVuYW50SWQiOiJiMDI1N2MxNC1jYWNjLTQ0YzYtODkyNy01YjRjZTVkZTA4NzQiLCJuYmYiOjE2OTU3NDM0NzIsImV4cCI6MTY5ODE1MTM5MywiaXNzIjoiUkRJbmZyYVRva2VuTWFuYWdlciIsImF1ZCI6IlJEbWkifQ.es_CnBXhErL04xB0XrjSsHkwmDWmGB_p-hLyaHJ9ap_jil1QddDQcF3SheZmUqSByKFt1r-BxJotRzU01QQlJGoldeiggcZG7VBffmSDtvkxNUoZ4o2Feo6CYUZ8fJSAyNq0oNFyEDWhjGlQs0oU_p6EDOfPY5rwQnkbHpvCe6X2PAlFRDbqGIIRegHszAiT1zyVp1MDwfMa68Vyit-EH23N_8Gh8kWvHQlggyuslHYvvdb7o1wma1_gJ3otq_d6qEtocTCVOZMhY3ijVPnO2Zyy9lqckJvCs047UVFTYGQb9UlA0TeH4OixB7lf_KBOGg6Ax8846ivVg0tsrakWEQ",
+                                            "aadJoin": false,
+                                            "UseAgentDownloadEndpoint": true,
+                                            "aadJoinPreview": false,
+                                            "mdmId": "",
+                                            "sessionHostConfigurationLastUpdateTime": ""
+                                        }
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}

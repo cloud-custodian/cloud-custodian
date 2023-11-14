@@ -141,7 +141,7 @@ class Route53Domain(QueryResourceManager):
         arn_type = 'r53domain'
         enum_spec = ('list_domains', 'Domains', None)
         name = id = 'DomainName'
-        global_resource = True
+        global_resource = False
 
     permissions = ('route53domains:ListTagsForDomain',)
 
@@ -497,7 +497,7 @@ class IsQueryLoggingEnabled(Filter):
             logging = zid in enabled_zones
             if logging and state:
                 r['c7n:log-config'] = enabled_zones[zid]
-                log_group_name = r['c7n:log-config']['CloudWatchLogsLogGroupArn'].split(":")[-1]
+                log_group_name = r['c7n:log-config']['CloudWatchLogsLogGroupArn'].split(":")[6]
                 response = cw_client.describe_subscription_filters(logGroupName=log_group_name)
                 r['c7n:log-config']['loggroup_subscription'] = response['subscriptionFilters']
                 results.append(r)

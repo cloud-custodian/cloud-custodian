@@ -299,6 +299,8 @@ class Arn(namedtuple('_Arn', (
         if isinstance(arn, Arn):
             return arn
         parts = arn.split(':', 5)
+        if len(parts) < 3:
+            raise ValueError("Invalid Arn")
         # a few resources use qualifiers without specifying type
         if parts[2] in ('s3', 'apigateway', 'execute-api', 'emr-serverless'):
             parts.append(None)
@@ -853,10 +855,10 @@ def get_service_region_map(regions, resource_types, provider='aws'):
     resource_service_map = {
         r: clouds[provider].resources.get(r).resource_type.service
         for r in normalized_types if r != 'account'}
-    # support for govcloud and china, we only utilize these regions if they
+    # support for govcloud, china, and iso. We only utilize these regions if they
     # are explicitly passed in on the cli.
     partition_regions = {}
-    for p in ('aws-cn', 'aws-us-gov'):
+    for p in ('aws-cn', 'aws-us-gov', 'aws-iso'):
         for r in session.get_available_regions('s3', partition_name=p):
             partition_regions[r] = p
 
