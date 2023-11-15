@@ -2502,5 +2502,5 @@ class CapacityReservation(query.QueryResourceManager):
         arn = "CapacityReservationArn"
         filter_name = 'CapacityReservationIds'
         filter_type = 'list'
-        cfn_type = config_type = 'AWS::EC2::CapacityReservation'
+        cfn_type = 'AWS::EC2::CapacityReservation'
         permissions_enum = ('ec2:DescribeCapacityReservations',)
