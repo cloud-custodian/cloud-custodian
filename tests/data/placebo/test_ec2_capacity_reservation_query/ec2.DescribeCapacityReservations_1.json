@@ -1,0 +1,106 @@
+{
+    "status_code": 200,
+    "data": {
+        "CapacityReservations": [
+            {
+                "CapacityReservationId": "cr-0004ba84180b29fa3",
+                "OwnerId": "999999999999",
+                "CapacityReservationArn": "arn:aws:ec2:ap-southeast-1:999999999999:capacity-reservation/cr-0004ba84180b29fa3",
+                "AvailabilityZoneId": "apse1-az3",
+                "InstanceType": "c5.4xlarge",
+                "InstancePlatform": "Linux/UNIX",
+                "AvailabilityZone": "ap-southeast-1c",
+                "Tenancy": "default",
+                "TotalInstanceCount": 1,
+                "AvailableInstanceCount": 0,
+                "EbsOptimized": false,
+                "EphemeralStorage": false,
+                "State": "active",
+                "StartDate": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 3,
+                    "day": 9,
+                    "hour": 0,
+                    "minute": 0,
+                    "second": 20,
+                    "microsecond": 0
+                },
+                "EndDateType": "unlimited",
+                "InstanceMatchCriteria": "open",
+                "CreateDate": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 3,
+                    "day": 9,
+                    "hour": 0,
+                    "minute": 0,
+                    "second": 19,
+                    "microsecond": 0
+                },
+                "Tags": [
+                    {
+                        "Key": "app",
+                        "Value": "test"
+                    }
+                ],
+                "CapacityAllocations": [
+                    {
+                        "AllocationType": "used",
+                        "Count": 1
+                    }
+                ]
+            },
+            {
+                "CapacityReservationId": "cr-0004dfa40b26a5ca1",
+                "OwnerId": "999999999999",
+                "CapacityReservationArn": "arn:aws:ec2:ap-southeast-1:999999999999:capacity-reservation/cr-0004dfa40b26a5ca1",
+                "AvailabilityZoneId": "apse1-az2",
+                "InstanceType": "c5.large",
+                "InstancePlatform": "Linux/UNIX",
+                "AvailabilityZone": "ap-southeast-1a",
+                "Tenancy": "default",
+                "TotalInstanceCount": 1,
+                "AvailableInstanceCount": 0,
+                "EbsOptimized": false,
+                "EphemeralStorage": false,
+                "State": "active",
+                "StartDate": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 3,
+                    "day": 2,
+                    "hour": 4,
+                    "minute": 4,
+                    "second": 13,
+                    "microsecond": 0
+                },
+                "EndDateType": "unlimited",
+                "InstanceMatchCriteria": "open",
+                "CreateDate": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 3,
+                    "day": 2,
+                    "hour": 4,
+                    "minute": 4,
+                    "second": 13,
+                    "microsecond": 0
+                },
+                "Tags": [
+                    {
+                        "Key": "app",
+                        "Value": "test"
+                    }
+                ],
+                "CapacityAllocations": [
+                    {
+                        "AllocationType": "used",
+                        "Count": 1
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
