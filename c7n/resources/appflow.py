@@ -17,6 +17,7 @@ class AppFlow(QueryResourceManager):
         id = name = 'flowName'
         arn = 'flowArn'
         detail_spec = ('describe_flow', 'flowName', 'flowName', None)
+        config_type = "AWS::AppFlow::Flow"
 
     def augment(self, resources):
         resources = super(AppFlow, self).augment(resources)

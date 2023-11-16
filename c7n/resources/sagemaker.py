@@ -24,7 +24,7 @@ class NotebookInstance(QueryResourceManager):
         arn = id = 'NotebookInstanceArn'
         name = 'NotebookInstanceName'
         date = 'CreationTime'
-        cfn_type = 'AWS::SageMaker::NotebookInstance'
+        config_type = cfn_type = 'AWS::SageMaker::NotebookInstance'
         permissions_augment = ("sagemaker:ListTags",)
 
     permissions = ('sagemaker:ListTags',)
@@ -240,7 +240,7 @@ class SagemakerEndpointConfig(QueryResourceManager):
         arn = id = 'EndpointConfigArn'
         name = 'EndpointConfigName'
         date = 'CreationTime'
-        cfn_type = 'AWS::SageMaker::EndpointConfig'
+        config_type = cfn_type = 'AWS::SageMaker::EndpointConfig'
 
     permissions = ('sagemaker:ListTags',)
 

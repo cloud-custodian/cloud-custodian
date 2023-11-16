@@ -19,7 +19,7 @@ class ConfigRecorder(QueryResourceManager):
         filter_name = 'ConfigurationRecorderNames'
         filter_type = 'list'
         arn = False
-        cfn_type = 'AWS::Config::ConfigurationRecorder'
+        config_type = cfn_type = 'AWS::Config::ConfigurationRecorder'
 
     def augment(self, resources):
         # in general we don't to default augmentation beyond tags, to

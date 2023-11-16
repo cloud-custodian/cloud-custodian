@@ -30,7 +30,7 @@ class AppStreamStack(query.QueryResourceManager):
         arn = "Arn"
         id = "Name"
         name = "Name"
-        cfn_type = "AWS::AppStream::Stack"
+        config_type = cfn_type = "AWS::AppStream::Stack"
         universal_taggable = object()
 
     source_mapping = {

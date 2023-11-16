@@ -206,7 +206,7 @@ class EventRule(QueryResourceManager):
         id = "Name"
         filter_name = "NamePrefix"
         filter_type = "scalar"
-        cfn_type = 'AWS::Events::Rule'
+        config_type = cfn_type = 'AWS::Events::Rule'
         universal_taggable = object()
         permissions_augment = ("events:ListTagsForResource",)
 
