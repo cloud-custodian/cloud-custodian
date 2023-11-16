@@ -60,6 +60,7 @@ class ReplicationInstance(QueryResourceManager):
         arn = 'ReplicationInstanceArn'
         date = 'InstanceCreateTime'
         cfn_type = 'AWS::DMS::ReplicationInstance'
+        permissions_augment = ("dms:ListTagsForResource",)
 
     filters = FilterRegistry('dms-instance.filters')
     filters.register('marked-for-op', TagActionFilter)
@@ -83,6 +84,8 @@ class DmsEndpoints(QueryResourceManager):
         arn_type = 'endpoint'
         universal_taggable = object()
         cfn_type = 'AWS::DMS::Endpoint'
+        permissions_augment = ("dms:ListTagsForResource",)
+
 
     augment = universal_augment
 
@@ -414,6 +417,7 @@ class DMSReplicationTask(QueryResourceManager):
         name = "ReplicationTaskIdentifier"
         cfn_type = config_type = "AWS::DMS::ReplicationTask"
         universal_taggable = object()
+        permissions_augment = ("dms:ListTagsForResource",)
 
     source_mapping = {
        "describe": DescribeWithResourceTags,

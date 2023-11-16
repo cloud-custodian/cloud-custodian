@@ -45,6 +45,7 @@ class Alarm(QueryResourceManager):
         date = 'AlarmConfigurationUpdatedTimestamp'
         cfn_type = config_type = 'AWS::CloudWatch::Alarm'
         universal_taggable = object()
+        permissions_augment = ("cloudwatch:ListTagsForResource",)
 
     source_mapping = {
         'describe': DescribeAlarm,
@@ -152,6 +153,7 @@ class EventBus(QueryResourceManager):
         config_type = cfn_type = 'AWS::Events::EventBus'
         id = name = 'Name'
         universal_taggable = object()
+        permissions_augment = ("events:ListTagsForResource",)
 
     source_mapping = {'describe': DescribeWithResourceTags,
                       'config': ConfigSource}
@@ -206,6 +208,7 @@ class EventRule(QueryResourceManager):
         filter_type = "scalar"
         cfn_type = 'AWS::Events::Rule'
         universal_taggable = object()
+        permissions_augment = ("events:ListTagsForResource",)
 
     augment = universal_augment
 
@@ -506,6 +509,7 @@ class LogGroup(QueryResourceManager):
         date = 'creationTime'
         universal_taggable = True
         cfn_type = 'AWS::Logs::LogGroup'
+        permissions_augment = ("logs:ListTagsForResource",)
 
     augment = universal_augment
 

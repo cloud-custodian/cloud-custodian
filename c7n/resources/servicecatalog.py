@@ -31,6 +31,7 @@ class CatalogPortfolio(QueryResourceManager):
         date = 'CreatedTime'
         universal_taggable = object()
         cfn_type = config_type = 'AWS::ServiceCatalog::Portfolio'
+        permissions_augment = ("servicecatalog:ListTagsForResource",)
 
     source_mapping = {
         'describe': DescribePortfolio,
@@ -186,3 +187,4 @@ class CatalogProduct(QueryResourceManager):
         date = 'CreatedTime'
         universal_taggable = object()
         cfn_type = 'AWS::ServiceCatalog::CloudFormationProduct'
+        permissions_augment = ("servicecatalog:ListTagsForResource",)

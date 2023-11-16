@@ -20,6 +20,7 @@ class OpensearchServerless(QueryResourceManager):
         arn = "arn"
         permission_prefix = 'aoss'
         augment = universal_augment
+        permissions_augment = ("aoss:ListTagsForResource",)
 
 @OpensearchServerless.action_registry.register('tag')
 class TagOpensearchServerlessResource(Tag):

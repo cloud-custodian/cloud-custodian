@@ -43,6 +43,7 @@ class ASG(query.QueryResourceManager):
         filter_type = 'list'
         config_type = 'AWS::AutoScaling::AutoScalingGroup'
         cfn_type = 'AWS::AutoScaling::AutoScalingGroup'
+        permissions_augment = ("autoscaling:DescribeTags",)
 
         default_report_fields = (
             'AutoScalingGroupName',

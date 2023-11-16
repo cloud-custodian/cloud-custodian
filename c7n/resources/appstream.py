@@ -15,7 +15,7 @@ class AppStreamFleet(query.QueryResourceManager):
         name = "Name"
         cfn_type = "AWS::AppStream::Fleet"
         universal_taggable = object()
-
+        permissions_augment = ("appstream:ListTagsForResource",)
     source_mapping = {
         "describe": query.DescribeWithResourceTags,
     }

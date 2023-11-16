@@ -23,7 +23,7 @@ class GraphQLApi(QueryResourceManager):
         arn_type = 'apis'
         arn = 'arn'
         universal_taggable = True
-
+        permissions_augment = ("appsync:ListTagsForResource",)
 
 
 @GraphQLApi.filter_registry.register('wafv2-enabled')

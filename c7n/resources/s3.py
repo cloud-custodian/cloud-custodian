@@ -366,6 +366,18 @@ class S3(query.QueryResourceManager):
         enum_spec = ('list_buckets', 'Buckets[]', None)
         # not used but we want some consistency on the metadata
         detail_spec = ('get_bucket_location', 'Bucket', 'Name', 'LocationConstraint')
+        permissions_augment = (
+            "s3:GetBucketAcl",
+            "s3:GetBucketLocation",
+            "s3:GetBucketPolicy",
+            "s3:GetBucketTagging",
+            "s3:GetBucketVersioning",
+            "s3:GetBucketLogging",
+            "s3:GetBucketNotification",
+            "s3:GetBucketWebsite",
+            "s3:GetLifecycleConfiguration",
+            "s3:GetReplicationConfiguration"
+        )
         name = id = 'Name'
         date = 'CreationDate'
         dimension = 'BucketName'

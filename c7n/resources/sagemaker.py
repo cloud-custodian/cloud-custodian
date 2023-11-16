@@ -25,6 +25,7 @@ class NotebookInstance(QueryResourceManager):
         name = 'NotebookInstanceName'
         date = 'CreationTime'
         cfn_type = 'AWS::SageMaker::NotebookInstance'
+        permissions_augment = ("sagemaker:ListTags",)
 
     permissions = ('sagemaker:ListTags',)
 

@@ -32,6 +32,7 @@ class SESConfigurationSet(QueryResourceManager):
         name = id = 'Name'
         arn_type = 'configuration-set'
         universal_taggable = object()
+        permissions_augment = ("ses:ListTagsForResource",)
 
     source_mapping = {
         'describe': DescribeConfigurationSet

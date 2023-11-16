@@ -18,6 +18,7 @@ class TransferServer(QueryResourceManager):
         id = name = 'ServerId'
         arn_type = "server"
         cfn_type = 'AWS::Transfer::Server'
+        permissions_augment = ("transfer:ListTagsForResource",)
 
 
 @TransferServer.action_registry.register('stop')

@@ -77,6 +77,8 @@ class PolicyMetaLint(BaseTest):
                 "kinesis:DescribeStream",
                 "kinesis:ListStreams",
                 "kinesis:DeleteStream",
+                "kinesis:ListTagsForStream",
+                "tag:getResources"
             },
         )
 
@@ -1007,6 +1009,8 @@ class PolicyMeta(BaseTest):
                 "kinesis:DescribeStream",
                 "kinesis:ListStreams",
                 "kinesis:DeleteStream",
+                "kinesis:ListTagsForStream",
+                "tag:getResources"
             },
         )
 

@@ -3,9 +3,17 @@
 from c7n.actions import BaseAction
 from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter
 from c7n.manager import resources
-from c7n.query import QueryResourceManager, TypeInfo
+from c7n.query import QueryResourceManager, TypeInfo, DescribeSource, ConfigSource
 
 from c7n.utils import local_session, type_schema
+
+
+class DescribeBatch(DescribeSource):
+
+    def augment(self, resources):
+        for r in resources:
+            r['Tags'] = [{'Key': k, 'Value': v} for k, v in r.get('tags', {})]
+        return resources
 
 
 @resources.register('batch-compute')
@@ -21,6 +29,11 @@ class ComputeEnvironment(QueryResourceManager):
         enum_spec = (
             'describe_compute_environments', 'computeEnvironments', None)
         cfn_type = config_type = 'AWS::Batch::ComputeEnvironment'
+
+    source_mapping = {
+        'describe': DescribeBatch,
+        'config': ConfigSource
+    }
 
 
 @ComputeEnvironment.filter_registry.register('security-group')
@@ -49,6 +62,10 @@ class JobDefinition(QueryResourceManager):
             'describe_job_definitions', 'jobDefinitions', None)
         cfn_type = 'AWS::Batch::JobDefinition'
 
+    source_mapping = {
+        'describe': DescribeBatch,
+        'config': ConfigSource
+    }
 
 @ComputeEnvironment.action_registry.register('update-environment')
 class UpdateComputeEnvironment(BaseAction):
@@ -181,3 +198,8 @@ class BatchJobQueue(QueryResourceManager):
         enum_spec = (
             'describe_job_queues', 'jobQueues', None)
         cfn_type = config_type = 'AWS::Batch::JobQueue'
+
+    source_mapping = {
+        'describe': DescribeBatch,
+        'config': ConfigSource
+    }

@@ -149,6 +149,7 @@ class CloudDirectory(QueryResourceManager):
         name = "Name"
         arn_type = "directory"
         universal_taggable = object()
+        permissions_augment = ("clouddirectory:ListTagsForResource",)
 
     augment = universal_augment
 

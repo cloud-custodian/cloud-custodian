@@ -86,6 +86,7 @@ class HostedZone(Route53Base, QueryResourceManager):
         # Denotes this resource type exists across regions
         global_resource = True
         cfn_type = 'AWS::Route53::HostedZone'
+        permissions_augment = ("route53:ListTagsForResource",)
 
     def get_arns(self, resource_set):
         arns = []
@@ -118,6 +119,7 @@ class HealthCheck(Route53Base, QueryResourceManager):
         universal_taggable = True
         cfn_type = 'AWS::Route53::HealthCheck'
         global_resource = True
+        permissions_augment = ("route53:ListTagsForResource",)
 
 
 @resources.register('rrset')
@@ -142,6 +144,7 @@ class Route53Domain(QueryResourceManager):
         enum_spec = ('list_domains', 'Domains', None)
         name = id = 'DomainName'
         global_resource = False
+
 
     permissions = ('route53domains:ListTagsForDomain',)
 
