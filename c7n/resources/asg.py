@@ -1495,7 +1495,8 @@ class Suspend(Action):
         "AZRebalance",
         "AlarmNotification",
         "ScheduledActions",
-        "AddToLoadBalancer"]
+        "AddToLoadBalancer",
+        "InstanceRefresh"]
 
     schema = type_schema(
         'suspend',
