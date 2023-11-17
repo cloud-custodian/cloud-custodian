@@ -316,6 +316,21 @@ class NetworkSecurityGroupTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 0)
 
+    def test_flow_analytics_logging(self):
+        breakpoint()
+        p = self.load_policy({
+            'name': 'test_flow_analytics_logging',
+            'resource': 'azure.networksecuritygroup',
+            'filters': [
+                {'type': 'flow-analytics-logging',
+                 'key': 'enabled',
+                 'value': True
+                 }]})
+
+        resources = p.run()
+
+        self.assertEqual(1, len(resources))
+        self.assertEqual('nsgvv', resources[0]['name'])
 
 
 class NetworkSecurityGroupFlowLogsFilterTest(BaseTest):
