@@ -11,18 +11,18 @@
                 "MapPublicIpOnLaunch": false,
                 "MapCustomerOwnedIpOnLaunch": false,
                 "State": "available",
-                "SubnetId": "subnet-01a4ea345d1291c41",
-                "VpcId": "vpc-03e9ed7c6c8f86c1b",
+                "SubnetId": "subnet-061829d226e61ace3",
+                "VpcId": "vpc-056d49fcfc060b96b",
                 "OwnerId": "644160558196",
                 "AssignIpv6AddressOnCreation": false,
                 "Ipv6CidrBlockAssociationSet": [],
                 "Tags": [
                     {
                         "Key": "Location",
-                        "Value": "web"
+                        "Value": "invalid"
                     }
                 ],
-                "SubnetArn": "arn:aws:ec2:us-east-1:644160558196:subnet/subnet-01a4ea345d1291c41",
+                "SubnetArn": "arn:aws:ec2:us-east-1:644160558196:subnet/subnet-061829d226e61ace3",
                 "EnableDns64": false,
                 "Ipv6Native": false,
                 "PrivateDnsNameOptionsOnLaunch": {

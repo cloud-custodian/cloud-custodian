@@ -7,7 +7,7 @@
                 "GroupName": "web-tier",
                 "IpPermissions": [],
                 "OwnerId": "644160558196",
-                "GroupId": "sg-0b607ad625f7a9e64",
+                "GroupId": "sg-0175abc641eb497fe",
                 "IpPermissionsEgress": [
                     {
                         "IpProtocol": "-1",
@@ -21,13 +21,7 @@
                         "UserIdGroupPairs": []
                     }
                 ],
-                "Tags": [
-                    {
-                        "Key": "Location",
-                        "Value": "web"
-                    }
-                ],
-                "VpcId": "vpc-03e9ed7c6c8f86c1b"
+                "VpcId": "vpc-0ff744d8435d22e63"
             }
         ],
         "ResponseMetadata": {}

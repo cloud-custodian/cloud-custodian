@@ -361,7 +361,6 @@ class NetworkLocation(Filter):
             return r
 
     def process_match_in(self, r, resource_sgs, resource_subnets, key):
-        evaluation = []
         network_location_vals = set(self.data.get('value', []))
 
         if 'subnet' in self.compare:
@@ -370,54 +369,30 @@ class NetworkLocation(Filter):
                 for rsub in resource_subnets}
 
             if not self.missing_ok and None in subnet_values.values():
-                evaluation.append({
-                    'reason': 'SubnetLocationAbsent',
-                    'subnets': subnet_values})
+                return
+
             subnet_space = set(filter(None, subnet_values.values()))
-
-            if len(subnet_space) > self.max_cardinality:
-                evaluation.append({
-                    'reason': 'SubnetLocationCardinality',
-                    'subnets': subnet_values})
-
             if not subnet_space.issubset(network_location_vals):
-                evaluation.append({
-                    'reason': 'SubnetLocationMismatch',
-                    'subnets': subnet_values})
+                return
 
         if 'security-group' in self.compare:
             sg_values = {
                 rsg[self.sg_model.id]: self.sg.get_resource_value(key, rsg)
                 for rsg in resource_sgs}
             if not self.missing_ok and None in sg_values.values():
-                evaluation.append({
-                    'reason': 'SecurityGroupLocationAbsent',
-                    'security-groups': sg_values})
+                return
 
             sg_space = set(filter(None, sg_values.values()))
 
-            if len(sg_space) > self.max_cardinality:
-                evaluation.append({
-                    'reason': 'SecurityGroupLocationCardinality',
-                    'security-groups': sg_values})
-
             if not sg_space.issubset(network_location_vals):
-                evaluation.append({
-                    'reason': 'SecurityGroupLocationMismatch',
-                    'security-groups': sg_values})
+                return
 
         if 'resource' in self.compare:
             r_value = self.vf.get_resource_value(key, r)
             if not self.missing_ok and r_value is None:
-                evaluation.append({
-                    'reason': 'ResourceLocationAbsent',
-                    'resource': r_value})
+                return
 
             if r_value not in network_location_vals:
-                evaluation.append({
-                    'reason': 'ResourceLocationMismatch',
-                    'resource': r_value})
-        if evaluation:
-            r['c7n:NetworkLocation'] = evaluation
-        return r
+                return
 
+        return r

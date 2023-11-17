@@ -7,28 +7,28 @@
             "Groups": [
                 {
                     "GroupName": "web-tier",
-                    "GroupId": "sg-0b607ad625f7a9e64"
+                    "GroupId": "sg-0175abc641eb497fe"
                 }
             ],
             "InterfaceType": "interface",
             "Ipv6Addresses": [],
-            "MacAddress": "0e:7a:66:54:e3:49",
-            "NetworkInterfaceId": "eni-00efd6c07865c60f4",
+            "MacAddress": "0e:ba:cb:ba:7c:b1",
+            "NetworkInterfaceId": "eni-05b2ddf6cbef8ef26",
             "OwnerId": "644160558196",
-            "PrivateIpAddress": "10.4.9.242",
+            "PrivateIpAddress": "10.4.9.70",
             "PrivateIpAddresses": [
                 {
                     "Primary": true,
-                    "PrivateIpAddress": "10.4.9.242"
+                    "PrivateIpAddress": "10.4.9.70"
                 }
             ],
             "RequesterId": "AIDAZL6XWCR2EWD7AWUSK",
             "RequesterManaged": false,
             "SourceDestCheck": true,
             "Status": "pending",
-            "SubnetId": "subnet-01a4ea345d1291c41",
+            "SubnetId": "subnet-0c4da67a40fcf6b15",
             "TagSet": [],
-            "VpcId": "vpc-03e9ed7c6c8f86c1b"
+            "VpcId": "vpc-0ff744d8435d22e63"
         },
         "ResponseMetadata": {}
     }

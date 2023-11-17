@@ -3,6 +3,40 @@
     "data": {
         "NetworkInterfaces": [
             {
+                "AvailabilityZone": "us-east-1c",
+                "Description": "",
+                "Groups": [
+                    {
+                        "GroupName": "web-tier",
+                        "GroupId": "sg-0ca41b9aac7b6d471"
+                    }
+                ],
+                "InterfaceType": "interface",
+                "Ipv6Addresses": [],
+                "MacAddress": "02:b4:77:be:b3:6b",
+                "NetworkInterfaceId": "eni-06aa45ec05b7ed735",
+                "OwnerId": "644160558196",
+                "PrivateIpAddress": "10.4.9.27",
+                "PrivateIpAddresses": [
+                    {
+                        "Primary": true,
+                        "PrivateIpAddress": "10.4.9.27"
+                    }
+                ],
+                "RequesterId": "AIDAZL6XWCR2EWD7AWUSK",
+                "RequesterManaged": false,
+                "SourceDestCheck": true,
+                "Status": "available",
+                "SubnetId": "subnet-006d57c247b2f0b71",
+                "TagSet": [
+                    {
+                        "Key": "Location",
+                        "Value": "web1"
+                    }
+                ],
+                "VpcId": "vpc-0933b62c3f8064295"
+            },
+            {
                 "Attachment": {
                     "AttachmentId": "ela-attach-04f05d5ac624ea471",
                     "DeleteOnTermination": false,
@@ -42,36 +76,32 @@
             },
             {
                 "Attachment": {
-                    "AttachmentId": "ela-attach-02c6ca0a760ae5508",
+                    "AttachmentId": "ela-attach-070197f2f6a87ae12",
                     "DeleteOnTermination": false,
                     "DeviceIndex": 1,
                     "InstanceOwnerId": "amazon-aws",
                     "Status": "attached"
                 },
                 "AvailabilityZone": "us-east-1a",
-                "Description": "EFS mount target for fs-028d2a86fa813320a (fsmt-07e238762319765b9)",
+                "Description": "EFS mount target for fs-017557a9f00b1bec9 (fsmt-0fca46e06dcfff8e2)",
                 "Groups": [
                     {
                         "GroupName": "default",
                         "GroupId": "sg-6c7fa917"
-                    },
-                    {
-                        "GroupName": "c7n-test-eks-sg",
-                        "GroupId": "sg-093f8a75c1ecc3fd1"
                     }
                 ],
                 "InterfaceType": "efs",
                 "Ipv6Addresses": [],
-                "MacAddress": "0a:ab:98:d8:6f:31",
-                "NetworkInterfaceId": "eni-06a7f784c86ba0f34",
+                "MacAddress": "0a:c3:42:d4:7a:13",
+                "NetworkInterfaceId": "eni-0fdd63701abdf11c2",
                 "OwnerId": "644160558196",
-                "PrivateDnsName": "ip-172-31-7-53.ec2.internal",
-                "PrivateIpAddress": "172.31.7.53",
+                "PrivateDnsName": "ip-172-31-14-29.ec2.internal",
+                "PrivateIpAddress": "172.31.14.29",
                 "PrivateIpAddresses": [
                     {
                         "Primary": true,
-                        "PrivateDnsName": "ip-172-31-7-53.ec2.internal",
-                        "PrivateIpAddress": "172.31.7.53"
+                        "PrivateDnsName": "ip-172-31-14-29.ec2.internal",
+                        "PrivateIpAddress": "172.31.14.29"
                     }
                 ],
                 "RequesterId": "644160558196",
@@ -185,32 +215,36 @@
             },
             {
                 "Attachment": {
-                    "AttachmentId": "ela-attach-070197f2f6a87ae12",
+                    "AttachmentId": "ela-attach-02c6ca0a760ae5508",
                     "DeleteOnTermination": false,
                     "DeviceIndex": 1,
                     "InstanceOwnerId": "amazon-aws",
                     "Status": "attached"
                 },
                 "AvailabilityZone": "us-east-1a",
-                "Description": "EFS mount target for fs-017557a9f00b1bec9 (fsmt-0fca46e06dcfff8e2)",
+                "Description": "EFS mount target for fs-028d2a86fa813320a (fsmt-07e238762319765b9)",
                 "Groups": [
                     {
                         "GroupName": "default",
                         "GroupId": "sg-6c7fa917"
+                    },
+                    {
+                        "GroupName": "c7n-test-eks-sg",
+                        "GroupId": "sg-093f8a75c1ecc3fd1"
                     }
                 ],
                 "InterfaceType": "efs",
                 "Ipv6Addresses": [],
-                "MacAddress": "0a:c3:42:d4:7a:13",
-                "NetworkInterfaceId": "eni-0fdd63701abdf11c2",
+                "MacAddress": "0a:ab:98:d8:6f:31",
+                "NetworkInterfaceId": "eni-06a7f784c86ba0f34",
                 "OwnerId": "644160558196",
-                "PrivateDnsName": "ip-172-31-14-29.ec2.internal",
-                "PrivateIpAddress": "172.31.14.29",
+                "PrivateDnsName": "ip-172-31-7-53.ec2.internal",
+                "PrivateIpAddress": "172.31.7.53",
                 "PrivateIpAddresses": [
                     {
                         "Primary": true,
-                        "PrivateDnsName": "ip-172-31-14-29.ec2.internal",
-                        "PrivateIpAddress": "172.31.14.29"
+                        "PrivateDnsName": "ip-172-31-7-53.ec2.internal",
+                        "PrivateIpAddress": "172.31.7.53"
                     }
                 ],
                 "RequesterId": "644160558196",
@@ -267,44 +301,6 @@
                 "SubnetId": "subnet-0544e30702e2e1ad4",
                 "TagSet": [],
                 "VpcId": "vpc-0598080981e0332f9"
-            },
-            {
-                "Attachment": {
-                    "AttachmentId": "ela-attach-0c4502a6edfd49df1",
-                    "DeleteOnTermination": false,
-                    "DeviceIndex": 1,
-                    "InstanceOwnerId": "amazon-aws",
-                    "Status": "attached"
-                },
-                "AvailabilityZone": "us-east-1b",
-                "Description": "EFS mount target for fs-017557a9f00b1bec9 (fsmt-0fcbb40c868d404e8)",
-                "Groups": [
-                    {
-                        "GroupName": "AutoScaling-Security-Group-2",
-                        "GroupId": "sg-0616b55f1f99947fd"
-                    }
-                ],
-                "InterfaceType": "efs",
-                "Ipv6Addresses": [],
-                "MacAddress": "0e:98:ac:95:92:57",
-                "NetworkInterfaceId": "eni-0f028fdc238330d73",
-                "OwnerId": "644160558196",
-                "PrivateDnsName": "ip-172-31-29-132.ec2.internal",
-                "PrivateIpAddress": "172.31.29.132",
-                "PrivateIpAddresses": [
-                    {
-                        "Primary": true,
-                        "PrivateDnsName": "ip-172-31-29-132.ec2.internal",
-                        "PrivateIpAddress": "172.31.29.132"
-                    }
-                ],
-                "RequesterId": "644160558196",
-                "RequesterManaged": true,
-                "SourceDestCheck": true,
-                "Status": "in-use",
-                "SubnetId": "subnet-efbcccb7",
-                "TagSet": [],
-                "VpcId": "vpc-d2d616b5"
             },
             {
                 "Association": {
@@ -366,38 +362,42 @@
                 "VpcId": "vpc-0503a8b9ddbb3a5c5"
             },
             {
+                "Attachment": {
+                    "AttachmentId": "ela-attach-0c4502a6edfd49df1",
+                    "DeleteOnTermination": false,
+                    "DeviceIndex": 1,
+                    "InstanceOwnerId": "amazon-aws",
+                    "Status": "attached"
+                },
                 "AvailabilityZone": "us-east-1b",
-                "Description": "",
+                "Description": "EFS mount target for fs-017557a9f00b1bec9 (fsmt-0fcbb40c868d404e8)",
                 "Groups": [
                     {
-                        "GroupName": "web-tier",
-                        "GroupId": "sg-0b607ad625f7a9e64"
+                        "GroupName": "AutoScaling-Security-Group-2",
+                        "GroupId": "sg-0616b55f1f99947fd"
                     }
                 ],
-                "InterfaceType": "interface",
+                "InterfaceType": "efs",
                 "Ipv6Addresses": [],
-                "MacAddress": "0e:7a:66:54:e3:49",
-                "NetworkInterfaceId": "eni-00efd6c07865c60f4",
+                "MacAddress": "0e:98:ac:95:92:57",
+                "NetworkInterfaceId": "eni-0f028fdc238330d73",
                 "OwnerId": "644160558196",
-                "PrivateIpAddress": "10.4.9.242",
+                "PrivateDnsName": "ip-172-31-29-132.ec2.internal",
+                "PrivateIpAddress": "172.31.29.132",
                 "PrivateIpAddresses": [
                     {
                         "Primary": true,
-                        "PrivateIpAddress": "10.4.9.242"
+                        "PrivateDnsName": "ip-172-31-29-132.ec2.internal",
+                        "PrivateIpAddress": "172.31.29.132"
                     }
                 ],
-                "RequesterId": "AIDAZL6XWCR2EWD7AWUSK",
-                "RequesterManaged": false,
+                "RequesterId": "644160558196",
+                "RequesterManaged": true,
                 "SourceDestCheck": true,
-                "Status": "available",
-                "SubnetId": "subnet-01a4ea345d1291c41",
-                "TagSet": [
-                    {
-                        "Key": "Location",
-                        "Value": "invalid"
-                    }
-                ],
-                "VpcId": "vpc-03e9ed7c6c8f86c1b"
+                "Status": "in-use",
+                "SubnetId": "subnet-efbcccb7",
+                "TagSet": [],
+                "VpcId": "vpc-d2d616b5"
             }
         ],
         "ResponseMetadata": {}
