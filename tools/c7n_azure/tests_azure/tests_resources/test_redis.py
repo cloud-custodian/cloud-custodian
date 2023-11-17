@@ -33,12 +33,12 @@ class RedisTest(BaseTest):
 
 class TestRedisFirewallFilter(BaseTest):
 
-    def test_redis_firewall_filter_query(self):
+    def test_query(self):
         p = self.load_policy({
             'name': 'redis-firewall-filter',
             'resource': 'azure.redis',
             'filters': [
-                {'type': 'redis-firewall-filter',
+                {'type': 'firewall',
                  'key': 'start_ip',
                  'op': 'eq',
                  'value': '1.2.3.4'}],

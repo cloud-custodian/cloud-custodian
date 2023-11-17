@@ -47,9 +47,9 @@ class Redis(ArmResourceManager):
         resource_type = 'Microsoft.Cache/Redis'
 
 
-@Redis.filter_registry.register('redis-firewall-filter')
+@Redis.filter_registry.register('firewall')
 class RedisFirewallFilter(ValueFilter):
-    schema = type_schema('redis-firewall-filter', rinherit=ValueFilter.schema)
+    schema = type_schema('firewall', rinherit=ValueFilter.schema)
 
     def process(self, resources, event=None):
         accepted = []
