@@ -16,6 +16,7 @@ def test_update_schema():
     assert set(update_schema["properties"]) == {
         "Tags",
         "Version",
+        "AccessConfig",
         "ResourcesVpcConfig",
         "Logging",
         "type",

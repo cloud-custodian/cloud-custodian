@@ -316,3 +316,12 @@ class SecurityGroupFilter(ListItemFilter):
             else:
                 result.append(security_group)
         return result
+
+
+@resources.register('image')
+class Image(QueryResourceManager):
+    class resource_type(TypeInfo):
+        enum_spec = ('list_images', None)
+        id = 'id'
+        name = 'name'
+        default_report_fields = ['id', 'name', 'status', 'visibility']
