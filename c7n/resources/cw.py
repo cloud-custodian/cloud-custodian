@@ -195,6 +195,11 @@ class EventBusDelete(BaseAction):
                     client.delete_event_bus,
                     Name=r['Name'])
 
+class RuleDescribe(DescribeSource):
+
+    def augment(self, resources):
+        return universal_augment(self.manager, resources)
+
 
 @resources.register('event-rule')
 class EventRule(QueryResourceManager):
@@ -210,7 +215,10 @@ class EventRule(QueryResourceManager):
         universal_taggable = object()
         permissions_augment = ("events:ListTagsForResource",)
 
-    augment = universal_augment
+    source_mapping = {
+        'config': ConfigSource,
+        'describe': RuleDescribe
+    }
 
 
 @EventRule.filter_registry.register('metrics')

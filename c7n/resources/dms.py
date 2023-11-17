@@ -73,6 +73,12 @@ class ReplicationInstance(QueryResourceManager):
     }
 
 
+class EndpointDescribe(DescribeSource):
+
+    def augment(self, resources):
+        return universal_augment(self.manager, resources)
+
+
 @resources.register('dms-endpoint')
 class DmsEndpoints(QueryResourceManager):
 
@@ -86,7 +92,10 @@ class DmsEndpoints(QueryResourceManager):
         config_type = cfn_type = 'AWS::DMS::Endpoint'
         permissions_augment = ("dms:ListTagsForResource",)
 
-    augment = universal_augment
+    source_mapping = {
+        'describe': EndpointDescribe,
+        'config': ConfigSource
+    }
 
 
 @ReplicationInstance.filter_registry.register('kms-key')

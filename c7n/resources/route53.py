@@ -8,7 +8,8 @@ import os
 
 from botocore.paginate import Paginator
 
-from c7n.query import QueryResourceManager, ChildResourceManager, TypeInfo, RetryPageIterator
+from c7n.query import (
+    QueryResourceManager, ChildResourceManager, TypeInfo, RetryPageIterator)
 from c7n.manager import resources
 from c7n.utils import chunks, get_retry, generate_arn, local_session, type_schema
 from c7n.actions import BaseAction
