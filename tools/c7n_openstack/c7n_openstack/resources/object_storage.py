@@ -5,7 +5,7 @@ from c7n_openstack.query import QueryResourceManager, TypeInfo, DescribeSource
 from c7n_openstack.provider import resources
 from c7n.utils import local_session
 
-class ContainerMeta(DescribeSource):
+class StorageContainerMeta(DescribeSource):
 
     def augment(self, resources):
         client = local_session(self.manager.session_factory).client()
@@ -16,10 +16,10 @@ class ContainerMeta(DescribeSource):
                 results.append(container_metadata)
         return results
 
-@resources.register('container')
-class Container(QueryResourceManager):
+@resources.register('storage-container')
+class StorageContainer(QueryResourceManager):
 
-    source_mapping = {'describe-openstack': ContainerMeta}
+    source_mapping = {'describe-openstack': StorageContainerMeta}
 
     class resource_type(TypeInfo):
         enum_spec = (['object_store', 'containers'], None)

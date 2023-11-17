@@ -5,11 +5,11 @@ from common_openstack import OpenStackTest
 
 class UserTest(OpenStackTest):
 
-    def test_container_public(self):
-        factory = self.replay_flight_data('test_container_public')
+    def test_storage_container_public(self):
+        factory = self.replay_flight_data('test_storage_container_public')
         policy = {
-            'name': 'container-public',
-            'resource': 'openstack.container',
+            'name': 'storage-container-public',
+            'resource': 'openstack.storage-container',
             'filters': [
                 {
                     "type": "value",
