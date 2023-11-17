@@ -21,7 +21,7 @@ class AutomationAccount(ArmResourceManager):
     """
 
     class resource_type(ArmResourceManager.resource_type):
-        doc_groups = ['Network']
+        doc_groups = ['Integration']
 
         service = 'azure.mgmt.automation'
         client = 'AutomationClient'
