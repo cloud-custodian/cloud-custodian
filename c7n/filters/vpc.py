@@ -196,7 +196,7 @@ class NetworkLocation(Filter):
             'description': (
                 "How to handle missing keys on elements, by default this causes"
                 "resources to be considered not-equal")},
-           'match': {'type': 'string', 'enum': ['equal', 'not-equal'],
+           'match': {'type': 'string', 'enum': ['equal', 'not-equal', 'in'],
                      'default': 'non-equal'},
            'compare': {
             'type': 'array',
@@ -214,7 +214,7 @@ class NetworkLocation(Filter):
                'title': ''},
            'ignore': {'type': 'array', 'items': {'type': 'object'}},
            'required': ['key'],
-
+           'value': {'type': 'array', 'items': {'type': 'string'}}
            })
     schema_alias = True
     permissions = ('ec2:DescribeSecurityGroups', 'ec2:DescribeSubnets')
@@ -284,6 +284,9 @@ class NetworkLocation(Filter):
         evaluation = []
         sg_space = set()
         subnet_space = set()
+
+        if self.match == 'in':
+            return self.process_match_in(r, resource_sgs, resource_subnets, key)
 
         if 'subnet' in self.compare:
             subnet_values = {
@@ -356,3 +359,65 @@ class NetworkLocation(Filter):
             return r
         elif not evaluation and self.match == 'equal':
             return r
+
+    def process_match_in(self, r, resource_sgs, resource_subnets, key):
+        evaluation = []
+        network_location_vals = set(self.data.get('value', []))
+
+        if 'subnet' in self.compare:
+            subnet_values = {
+                rsub[self.subnet_model.id]: self.subnet.get_resource_value(key, rsub)
+                for rsub in resource_subnets}
+
+            if not self.missing_ok and None in subnet_values.values():
+                evaluation.append({
+                    'reason': 'SubnetLocationAbsent',
+                    'subnets': subnet_values})
+            subnet_space = set(filter(None, subnet_values.values()))
+
+            if len(subnet_space) > self.max_cardinality:
+                evaluation.append({
+                    'reason': 'SubnetLocationCardinality',
+                    'subnets': subnet_values})
+
+            if not subnet_space.issubset(network_location_vals):
+                evaluation.append({
+                    'reason': 'SubnetLocationMismatch',
+                    'subnets': subnet_values})
+
+        if 'security-group' in self.compare:
+            sg_values = {
+                rsg[self.sg_model.id]: self.sg.get_resource_value(key, rsg)
+                for rsg in resource_sgs}
+            if not self.missing_ok and None in sg_values.values():
+                evaluation.append({
+                    'reason': 'SecurityGroupLocationAbsent',
+                    'security-groups': sg_values})
+
+            sg_space = set(filter(None, sg_values.values()))
+
+            if len(sg_space) > self.max_cardinality:
+                evaluation.append({
+                    'reason': 'SecurityGroupLocationCardinality',
+                    'security-groups': sg_values})
+
+            if not sg_space.issubset(network_location_vals):
+                evaluation.append({
+                    'reason': 'SecurityGroupLocationMismatch',
+                    'security-groups': sg_values})
+
+        if 'resource' in self.compare:
+            r_value = self.vf.get_resource_value(key, r)
+            if not self.missing_ok and r_value is None:
+                evaluation.append({
+                    'reason': 'ResourceLocationAbsent',
+                    'resource': r_value})
+
+            if r_value not in network_location_vals:
+                evaluation.append({
+                    'reason': 'ResourceLocationMismatch',
+                    'resource': r_value})
+        if evaluation:
+            r['c7n:NetworkLocation'] = evaluation
+        return r
+
