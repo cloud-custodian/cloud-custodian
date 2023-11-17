@@ -317,7 +317,6 @@ class NetworkSecurityGroupTest(BaseTest):
         self.assertEqual(len(resources), 0)
 
     def test_flow_analytics_logging(self):
-        breakpoint()
         p = self.load_policy({
             'name': 'test_flow_analytics_logging',
             'resource': 'azure.networksecuritygroup',
