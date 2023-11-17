@@ -1,0 +1,35 @@
+{
+    "status_code": 200,
+    "data": {
+        "NetworkInterface": {
+            "AvailabilityZone": "us-east-1e",
+            "Description": "",
+            "Groups": [
+                {
+                    "GroupName": "web-tier",
+                    "GroupId": "sg-0fbd513c2b16369de"
+                }
+            ],
+            "InterfaceType": "interface",
+            "Ipv6Addresses": [],
+            "MacAddress": "06:cd:2e:f1:4a:1d",
+            "NetworkInterfaceId": "eni-0b25f2b54f8ebfffb",
+            "OwnerId": "644160558196",
+            "PrivateIpAddress": "10.4.9.108",
+            "PrivateIpAddresses": [
+                {
+                    "Primary": true,
+                    "PrivateIpAddress": "10.4.9.108"
+                }
+            ],
+            "RequesterId": "AIDAZL6XWCR2EWD7AWUSK",
+            "RequesterManaged": false,
+            "SourceDestCheck": true,
+            "Status": "pending",
+            "SubnetId": "subnet-02d36f97ae6116e53",
+            "TagSet": [],
+            "VpcId": "vpc-0b47a629c076c3047"
+        },
+        "ResponseMetadata": {}
+    }
+}

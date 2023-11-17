@@ -913,8 +913,8 @@ class NetworkLocationTest(BaseTest):
         self.assertEqual(len(resources), 1)
 
     @functional
-    def test_network_location_triple_intersect_match_in_mismatch(self):
-        self.factory = self.replay_flight_data("test_network_location_triple_intersect_match_in_mismatch")
+    def test_network_location_match_in_mismatch(self):
+        self.factory = self.replay_flight_data("test_network_location_match_in_mismatch")
         client = self.factory().client("ec2")
         vpc_id = client.create_vpc(CidrBlock="10.4.0.0/16")["Vpc"]["VpcId"]
         self.addCleanup(client.delete_vpc, VpcId=vpc_id)
@@ -942,15 +942,15 @@ class NetworkLocationTest(BaseTest):
 
         client.create_tags(
             Resources=[web_sg_id],
-            Tags=[{"Key": "Location", "Value": "web1"}],
+            Tags=[{"Key": "Location", "Value": "invalid1"}],
         )
         client.create_tags(
             Resources=[web_sub_id],
-            Tags=[{"Key": "Location", "Value": "web2"}],
+            Tags=[{"Key": "Location", "Value": "invalid2"}],
         )
         client.create_tags(
             Resources=[nic],
-            Tags=[{"Key": "Location", "Value": "invalid"}],
+            Tags=[{"Key": "Location", "Value": "invalid3"}],
         )
         p = self.load_policy(
             {
@@ -961,7 +961,7 @@ class NetworkLocationTest(BaseTest):
                     {"type": "network-location",
                      "key": "tag:Location",
                      "match": "in",
-                     "value": ["web1", "web2"]},
+                     "value": ["web"]},
                 ],
             },
             session_factory=self.factory,
@@ -972,7 +972,11 @@ class NetworkLocationTest(BaseTest):
         self.assertEqual(
             matched["c7n:NetworkLocation"],
             [
-                {'reason': 'ResourceLocationMismatch', 'resource': 'invalid'}
+                {'reason': 'SubnetLocationMismatch',
+                 'subnets': {'subnet-02d36f97ae6116e53': 'invalid2'}},
+                {'reason': 'SecurityGroupLocationMismatch',
+                 'security-groups': {'sg-0fbd513c2b16369de': 'invalid1'}},
+                {'reason': 'ResourceLocationMismatch', 'resource': 'invalid3'},
             ],
         )
 
