@@ -6,6 +6,7 @@ ResourceMap = {
     "azure.app-insights": "c7n_azure.resources.appinsights.AzureAppInsights",
     "azure.open-shift": "c7n_azure.resources.open_shift.OpenShiftService",
     "azure.api-management": "c7n_azure.resources.apimanagement.ApiManagement",
+    "azure.app-configuration": "c7n_azure.resources.app_configuration.AppConfiguration",
     "azure.appserviceplan": "c7n_azure.resources.appserviceplan.AppServicePlan",
     "azure.application-gateway": "c7n_azure.resources.app_gateway.ApplicationGateway",
     "azure.armresource": "c7n_azure.resources.generic_arm_resource.GenericArmResource",
@@ -26,6 +27,7 @@ ResourceMap = {
     "azure.databricks": "c7n_azure.resources.databricks.Databricks",
     "azure.datafactory": "c7n_azure.resources.data_factory.DataFactory",
     "azure.datalake": "c7n_azure.resources.datalake_store.DataLakeStore",
+    "azure.datalake-analytics": "c7n_azure.resources.datalake_analytics.DataLakeAnalytics",
     "azure.defender-alert": "c7n_azure.resources.defender.DefenderAlertSettings",
     "azure.defender-assessment": "c7n_azure.resources.defender.DefenderAssessment",
     "azure.defender-autoprovisioning": "c7n_azure.resources.defender.DefenderAutoProvisioningSetting",  # noqa
@@ -50,6 +52,7 @@ ResourceMap = {
     "azure.keyvault-secret": "c7n_azure.resources.key_vault_secret.KeyVaultSecret",
     "azure.keyvault-key": "c7n_azure.resources.key_vault_keys.KeyVaultKeys",
     "azure.keyvault-keys": "c7n_azure.resources.key_vault_keys.KeyVaultKeys",
+    "azure.kusto": "c7n_azure.resources.kusto.Kusto",
     "azure.loadbalancer": "c7n_azure.resources.load_balancer.LoadBalancer",
     "azure.logic-app-workflow": "c7n_azure.resources.logic_app.LogicAppWorkflow",
     "azure.machine-learning-workspace": "c7n_azure.resources.machine_learning_workspace.MachineLearningWorkspace", # noqa
