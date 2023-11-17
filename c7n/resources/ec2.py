@@ -2493,7 +2493,7 @@ class CapacityReservation(query.QueryResourceManager):
     """
 
     class resource_type(query.TypeInfo):
-        name = id = 'CapacityReservationIds'
+        name = id = 'CapacityReservationId'
         service = 'ec2'
         enum_spec = ('describe_capacity_reservations',
                      'CapacityReservations', None)
