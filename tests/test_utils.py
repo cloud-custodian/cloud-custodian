@@ -215,6 +215,13 @@ class UtilTest(BaseTest):
 
         self.assertEqual(utils.local_session(p.session_factory), previous)
 
+    def test_encode_bytes(self):
+        self.assertEqual(
+            json.loads(json.dumps(
+                {"bytes": b"123"}, cls=utils.JsonEncoder)),
+                {'bytes': '123'}
+            )
+
     def test_format_date(self):
         d = parse_date("2018-02-02 12:00")
         self.assertEqual("{}".format(utils.FormatDate(d)), "2018-02-02 12:00:00")
@@ -228,7 +235,7 @@ class UtilTest(BaseTest):
         self.assertEqual("{:+5M%M}".format(utils.FormatDate(d)), "05")
 
         self.assertEqual(json.dumps(utils.FormatDate(d),
-                                    cls=utils.DateTimeEncoder, indent=2),
+                                    cls=utils.JsonEncoder, indent=2),
                          '"2018-02-02T12:00:00"')
         self.assertEqual(str(d), '2018-02-02 12:00:00')
 
@@ -438,7 +445,7 @@ class UtilTest(BaseTest):
         self.assertEqual(json.loads(utils.format_event(event)), json.loads(event_json))
 
     def test_date_time_decoder(self):
-        dtdec = utils.DateTimeEncoder()
+        dtdec = utils.JsonEncoder()
         self.assertRaises(TypeError, dtdec.default, "test")
 
     def test_set_annotation(self):
