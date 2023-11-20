@@ -1,0 +1,35 @@
+{
+    "status_code": 200,
+    "data": {
+        "SecurityGroups": [
+            {
+                "Description": "for apps",
+                "GroupName": "web-tier",
+                "IpPermissions": [],
+                "OwnerId": "644160558196",
+                "GroupId": "sg-027a05ff783839aff",
+                "IpPermissionsEgress": [
+                    {
+                        "IpProtocol": "-1",
+                        "IpRanges": [
+                            {
+                                "CidrIp": "0.0.0.0/0"
+                            }
+                        ],
+                        "Ipv6Ranges": [],
+                        "PrefixListIds": [],
+                        "UserIdGroupPairs": []
+                    }
+                ],
+                "Tags": [
+                    {
+                        "Key": "Location",
+                        "Value": "web1"
+                    }
+                ],
+                "VpcId": "vpc-0be819c76a7d05fba"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
