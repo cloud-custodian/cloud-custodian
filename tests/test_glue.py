@@ -106,7 +106,7 @@ class TestGlueConnections(BaseTest):
 class TestGlueDevEndpoints(BaseTest):
 
     def test_dev_endpoints_query(self):
-        session_factory = self.replay_flight_data("test_glue_query_resources")
+        session_factory = self.replay_flight_data("test_dev_endpoints_query")
         p = self.load_policy(
             {"name": "list-glue-dev-endpoints", "resource": "glue-dev-endpoint"},
             session_factory=session_factory,
