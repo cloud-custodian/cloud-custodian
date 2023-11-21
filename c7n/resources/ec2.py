@@ -57,7 +57,8 @@ class DescribeEC2(query.DescribeSource):
                 qf_names.add(qd['Name'])
                 qf.append(qd)
         query_params = query_params or {}
-        return query_params['Filters'] = qf
+        query_params['Filters'] = qf
+        return query_params
 
     def augment(self, resources):
         """EC2 API and AWOL Tags
