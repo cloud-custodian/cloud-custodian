@@ -28,7 +28,11 @@ ResourceMap = {
     "azure.datafactory": "c7n_azure.resources.data_factory.DataFactory",
     "azure.datalake": "c7n_azure.resources.datalake_store.DataLakeStore",
     "azure.datalake-analytics": "c7n_azure.resources.datalake_analytics.DataLakeAnalytics",
+    "azure.defender-alert": "c7n_azure.resources.defender.DefenderAlertSettings",
+    "azure.defender-assessment": "c7n_azure.resources.defender.DefenderAssessment",
     "azure.defender-autoprovisioning": "c7n_azure.resources.defender.DefenderAutoProvisioningSetting",  # noqa
+    "azure.defender-contact": "c7n_azure.resources.defender.DefenderSecurityContact",
+    "azure.defender-jit-policy": "c7n_azure.resources.defender.DefenderJitPolicy",
     "azure.defender-pricing": "c7n_azure.resources.defender.DefenderPricing",
     "azure.defender-setting": "c7n_azure.resources.defender.DefenderSetting",
     "azure.disk": "c7n_azure.resources.disk.Disk",
@@ -94,6 +98,5 @@ ResourceMap = {
     "azure.vnet": "c7n_azure.resources.vnet.Vnet",
     "azure.waf": "c7n_azure.resources.waf.WAF",
     "azure.webapp": "c7n_azure.resources.web_app.WebApp",
-    "azure.defender-alert": "c7n_azure.resources.defender.DefenderAlertSettings",
     "azure.alert-logs": "c7n_azure.resources.alertlogs.AlertLogs",
 }
