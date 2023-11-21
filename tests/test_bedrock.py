@@ -10,7 +10,7 @@ class BedrockCustomModel(BaseTest):
         p = self.load_policy(
             {
                 'name': 'bedrock-custom-model-tag',
-                'resource': 'bedrock-custom-models',
+                'resource': 'bedrock-custom-model',
                 'filters': [
                     {'tag:foo': 'absent'},
                     {'tag:Owner': 'c7n'},
@@ -39,7 +39,7 @@ class BedrockCustomModel(BaseTest):
         p = self.load_policy(
             {
                 'name': 'custom-model-delete',
-                'resource': 'bedrock-custom-models',
+                'resource': 'bedrock-custom-model',
                 'filters': [{'modelName': 'c7n-test3'}],
                 'actions': [{'type': 'delete'}]
             },

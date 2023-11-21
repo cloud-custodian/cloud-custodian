@@ -8,15 +8,15 @@ from c7n.utils import local_session, type_schema
 from c7n.actions import BaseAction
 
 
-@resources.register('bedrock-custom-models')
-class BedrockCustomModels(QueryResourceManager):
+@resources.register('bedrock-custom-model')
+class BedrockCustomModel(QueryResourceManager):
     class resource_type(TypeInfo):
         service = 'bedrock'
         enum_spec = ('list_custom_models', 'modelSummaries[]', None)
         detail_spec = (
             'get_custom_model', 'modelIdentifier', 'modelArn', None)
-        id = name = "modelName"
-        arn = "modelArn"
+        name = "modelName"
+        id = arn = "modelArn"
         permission_prefix = 'bedrock'
 
     def augment(self, resources):
@@ -27,11 +27,11 @@ class BedrockCustomModels(QueryResourceManager):
                 resourceARN=r['modelArn'])['tags']
             r['Tags'] = [{'Key': t['key'], 'Value':t['value']} for t in tags]
             return r
-        resources = super(BedrockCustomModels, self).augment(resources)
+        resources = super(BedrockCustomModel, self).augment(resources)
         return list(map(_augment, resources))
 
 
-@BedrockCustomModels.action_registry.register('tag')
+@BedrockCustomModel.action_registry.register('tag')
 class TagBedrockCustomModel(Tag):
     """Create tags on Bedrock custom models
 
@@ -41,7 +41,7 @@ class TagBedrockCustomModel(Tag):
 
         policies:
             - name: bedrock-custom-models-tag
-              resource: aws.bedrock-custom-models
+              resource: aws.bedrock-custom-model
               actions:
                 - type: tag
                   key: test
@@ -55,7 +55,7 @@ class TagBedrockCustomModel(Tag):
             client.tag_resource(resourceARN=r["modelArn"], tags=tags)
 
 
-@BedrockCustomModels.action_registry.register('remove-tag')
+@BedrockCustomModel.action_registry.register('remove-tag')
 class RemoveTagBedrockCustomModel(RemoveTag):
     """Remove tags from a bedrock custom model
     :example:
@@ -64,7 +64,7 @@ class RemoveTagBedrockCustomModel(RemoveTag):
 
         policies:
             - name: bedrock-model-remove-tag
-              resource: aws.bedrock-custom-models
+              resource: aws.bedrock-custom-model
               actions:
                 - type: remove-tag
                   tags: ["tag-key"]
@@ -76,9 +76,9 @@ class RemoveTagBedrockCustomModel(RemoveTag):
             client.untag_resource(resourceARN=r['modelArn'], tagKeys=tags)
 
 
-BedrockCustomModels.filter_registry.register('marked-for-op', TagActionFilter)
-@BedrockCustomModels.action_registry.register('mark-for-op')
-class MarkOpensearchServerlessForOp(TagDelayedAction):
+BedrockCustomModel.filter_registry.register('marked-for-op', TagActionFilter)
+@BedrockCustomModel.action_registry.register('mark-for-op')
+class MarkBedrockCustomModelForOp(TagDelayedAction):
     """Mark custom models for future actions
 
     :example:
@@ -87,7 +87,7 @@ class MarkOpensearchServerlessForOp(TagDelayedAction):
 
         policies:
           - name: custom-model-tag-mark
-            resource: aws.bedrock-custom-models
+            resource: aws.bedrock-custom-model
             filters:
               - "tag:delete": present
             actions:
@@ -97,7 +97,7 @@ class MarkOpensearchServerlessForOp(TagDelayedAction):
     """
 
 
-@BedrockCustomModels.action_registry.register('delete')
+@BedrockCustomModel.action_registry.register('delete')
 class DeleteBedrockCustomModel(BaseAction):
     """Delete a bedrock custom model
 
@@ -107,7 +107,7 @@ class DeleteBedrockCustomModel(BaseAction):
 
         policies:
           - name: custom-model-delete
-            resource: aws.bedrock-custom-models
+            resource: aws.bedrock-custom-model
             actions:
               - type: delete
     """
