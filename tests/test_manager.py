@@ -123,12 +123,13 @@ class TestEC2Manager(BaseTest):
             "filters": [{"tag:ASV": "absent"}]}
         ).resource_manager
 
+        source = ec2_mgr.get_source(ec2_mgr.source_type)
         self.assertEqual(len(ec2_mgr.filters), 1)
-        self.assertEqual(len(ec2_mgr.queries), 1)
+
+        qf = source.get_query_params(None)
         self.assertEqual(
-            ec2_mgr.resource_query(),
-            [{"Values": ["CMDBEnvironment"], "Name": "tag-key"}],
-        )
+            qf,
+            {'Filters': [{"Values": ["CMDBEnvironment"], "Name": "tag-key"}]})
 
     def test_filters(self):
         ec2 = self.load_policy({
