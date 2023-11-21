@@ -161,7 +161,7 @@ class EC2(query.QueryResourceManager):
 @filters.register('security-group')
 class SecurityGroupFilter(net_filters.SecurityGroupFilter):
 
-    RelatedIdsExpression = "SecurityGroups[].GroupId"
+    RelatedIdsExpression = "NetworkInterfaces[].Groups[].GroupId"
 
 
 @filters.register('subnet')
@@ -2485,3 +2485,22 @@ class HasSpecificManagedPolicy(SpecificIamProfileManagedPolicy):
                 results.append(r)
 
         return results
+
+
+@resources.register('ec2-capacity-reservation')
+class CapacityReservation(query.QueryResourceManager):
+    """Custodian resource for managing EC2 Capacity Reservation.
+    """
+
+    class resource_type(query.TypeInfo):
+        name = id = 'CapacityReservationIds'
+        service = 'ec2'
+        enum_spec = ('describe_capacity_reservations',
+                     'CapacityReservations', None)
+
+        id_prefix = 'cr-'
+        arn = "CapacityReservationArn"
+        filter_name = 'CapacityReservationIds'
+        filter_type = 'list'
+        cfn_type = 'AWS::EC2::CapacityReservation'
+        permissions_enum = ('ec2:DescribeCapacityReservations',)

@@ -73,6 +73,7 @@ ResourceMap = {
   "aws.ec2-host": "c7n.resources.ec2.DedicatedHost",
   "aws.ec2-reserved": "c7n.resources.ec2.ReservedInstance",
   "aws.ec2-spot-fleet-request": "c7n.resources.ec2.SpotFleetRequest",
+  "aws.ec2-capacity-reservation": "c7n.resources.ec2.CapacityReservation",
   "aws.ecr": "c7n.resources.ecr.ECR",
   "aws.ecr-image": "c7n.resources.ecr.RepositoryImage",
   "aws.ecs": "c7n.resources.ecs.ECSCluster",
@@ -261,7 +262,7 @@ ResourceMap = {
   "aws.workspaces": "c7n.resources.workspaces.Workspace",
   "aws.workspaces-directory": "c7n.resources.workspaces.WorkspaceDirectory",
   "aws.workspaces-image": "c7n.resources.workspaces.WorkspaceImage",
-  "aws.workspaces-web": "c7n.resources.workspace.WorkspacesWeb",
+  "aws.workspaces-web": "c7n.resources.workspaces.WorkspacesWeb",
   "aws.xray-group": "c7n.resources.xray.XRayGroup",
   "aws.xray-rule": "c7n.resources.xray.XRaySamplingRule"
 }
