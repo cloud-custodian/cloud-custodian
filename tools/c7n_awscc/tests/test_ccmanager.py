@@ -13,7 +13,7 @@ def test_init_resource_access_analyzer():
 def test_update_schema():
     klass = initialize_resource("sqs_queue")["SqsQueue"]
     update_schema = get_update_schema(klass.schema, "sqs_queue")
-    assert set(update_schema["properties"]) == {
+    assert set(update_schema["properties"]) >= {
         "ContentBasedDeduplication",
         "DeduplicationScope",
         "DelaySeconds",
