@@ -296,7 +296,20 @@ def generate(resource_types=()):
                 'tags': {'type': 'array', 'items': {'type': 'string'}},
                 'metadata': {'type': 'object'},
                 'mode': {'$ref': '#/definitions/policy-mode'},
-                'source': {'enum': list(sources.keys())},
+                'source': {
+                    'anyOf': [
+                        {'enum': list(sources.keys())},
+                        {
+                            'type': 'object',
+                            # Other properties of the source other than the name itself
+                            # are up to the source itself to define.
+                            'required': ['name'],
+                            'properties': {
+                                'name': {'enum': list(sources.keys())},
+                            },
+                        },
+                    ]
+                },
                 'actions': {
                     'type': 'array',
                 },

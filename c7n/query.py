@@ -475,11 +475,22 @@ class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
 
     @property
     def source_type(self):
-        return self.data.get('source', 'describe')
+        value = self.data.get('source', 'describe')
+        if isinstance(value, str):
+            return value
+        # Here we assume that the data has been validated, so the other
+        # alternative is that the source is a dict with the name attribute
+        # being a valid source type.
+        return value["name"]
+
+    @property
+    def source_config(self):
+        value = self.data.get('source', 'describe')
+        return value if isinstance(value, dict) else {}
 
     def get_source(self, source_type):
         if source_type in self.source_mapping:
-            return self.source_mapping.get(source_type)(self)
+            return self.source_mapping[source_type](self)
         if source_type in sources:
             return sources[source_type](self)
         raise KeyError("Invalid Source %s" % source_type)
