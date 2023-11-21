@@ -44,17 +44,14 @@ class DescribeEC2(query.DescribeSource):
     def get_query_params(self, query_params):
         queries = QueryFilter.parse(self.manager.data.get('query', []))
         qf = []
-        qf_names = set()
-        # allow same name to be specified multiple times and append the queries
-        # under the same name
         for q in queries:
             qd = q.query()
-            if qd['Name'] in qf_names:
-                for qf in qf:
-                    if qd['Name'] == qf['Name']:
-                        qf['Values'].extend(qd['Values'])
-            else:
-                qf_names.add(qd['Name'])
+            found = False
+            for f in qf:
+                if qd['Name'] == f['Name']:
+                    f['Values'].extend(qd['Values'])
+                    found = True
+            if not found:
                 qf.append(qd)
         query_params = query_params or {}
         query_params['Filters'] = qf
