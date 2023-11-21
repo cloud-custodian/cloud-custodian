@@ -45,7 +45,7 @@ class TagBedrockCustomModel(Tag):
               actions:
                 - type: tag
                   key: test
-                  value: value
+                  value: something
     """
     permissions = ('bedrock:TagResource',)
 
