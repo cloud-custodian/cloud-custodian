@@ -1,0 +1,146 @@
+{
+    "status_code": 200,
+    "data": {
+        "AutoScalingGroups": [
+            {
+                "AutoScalingGroupName": "c7n-image-age-test",
+                "AutoScalingGroupARN": "arn:aws:autoscaling:us-east-1:644160558196:autoScalingGroup:9edc8896-61e5-4e7a-b4ab-62b41ea7064d:autoScalingGroupName/c7n-image-age-test",
+                "LaunchConfigurationName": "test-offhours",
+                "MinSize": 0,
+                "MaxSize": 0,
+                "DesiredCapacity": 0,
+                "DefaultCooldown": 300,
+                "AvailabilityZones": [
+                    "us-east-1a"
+                ],
+                "LoadBalancerNames": [],
+                "TargetGroupARNs": [],
+                "HealthCheckType": "EC2",
+                "HealthCheckGracePeriod": 300,
+                "Instances": [],
+                "CreatedTime": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 11,
+                    "day": 4,
+                    "hour": 2,
+                    "minute": 49,
+                    "second": 1,
+                    "microsecond": 105000
+                },
+                "SuspendedProcesses": [],
+                "VPCZoneIdentifier": "subnet-914763e7",
+                "EnabledMetrics": [],
+                "Tags": [
+                    {
+                        "ResourceId": "c7n-image-age-test",
+                        "ResourceType": "auto-scaling-group",
+                        "Key": "AmazonECSManaged",
+                        "Value": "Right",
+                        "PropagateAtLaunch": true
+                    }
+                ],
+                "TerminationPolicies": [
+                    "Default"
+                ],
+                "NewInstancesProtectedFromScaleIn": false,
+                "ServiceLinkedRoleARN": "arn:aws:iam::644160558196:role/aws-service-role/autoscaling.amazonaws.com/AWSServiceRoleForAutoScaling",
+                "TrafficSources": []
+            },
+            {
+                "AutoScalingGroupName": "public",
+                "AutoScalingGroupARN": "arn:aws:autoscaling:us-east-1:644160558196:autoScalingGroup:a81eff7e-fbf5-4623-9aa3-f16510c790df:autoScalingGroupName/public",
+                "LaunchConfigurationName": "public",
+                "MinSize": 0,
+                "MaxSize": 0,
+                "DesiredCapacity": 0,
+                "DefaultCooldown": 300,
+                "AvailabilityZones": [
+                    "us-east-1d"
+                ],
+                "LoadBalancerNames": [],
+                "TargetGroupARNs": [],
+                "HealthCheckType": "EC2",
+                "HealthCheckGracePeriod": 300,
+                "Instances": [],
+                "CreatedTime": {
+                    "__class__": "datetime",
+                    "year": 2020,
+                    "month": 6,
+                    "day": 22,
+                    "hour": 18,
+                    "minute": 3,
+                    "second": 25,
+                    "microsecond": 639000
+                },
+                "SuspendedProcesses": [],
+                "VPCZoneIdentifier": "subnet-3a334610",
+                "EnabledMetrics": [],
+                "Tags": [
+                    {
+                        "ResourceId": "public",
+                        "ResourceType": "auto-scaling-group",
+                        "Key": "AmazonECSManaged",
+                        "Value": "",
+                        "PropagateAtLaunch": true
+                    },
+                    {
+                        "ResourceId": "public",
+                        "ResourceType": "auto-scaling-group",
+                        "Key": "custodian-marked",
+                        "Value": "AutoScaleGroup does not meet org policy: delete@2023/09/27 1833 UTC",
+                        "PropagateAtLaunch": false
+                    }
+                ],
+                "TerminationPolicies": [
+                    "Default"
+                ],
+                "NewInstancesProtectedFromScaleIn": false,
+                "ServiceLinkedRoleARN": "arn:aws:iam::644160558196:role/aws-service-role/autoscaling.amazonaws.com/AWSServiceRoleForAutoScaling",
+                "TrafficSources": []
+            },
+            {
+                "AutoScalingGroupName": "test",
+                "AutoScalingGroupARN": "arn:aws:autoscaling:us-east-1:644160558196:autoScalingGroup:1d527d68-6043-462c-8fcd-2c2c5c46f410:autoScalingGroupName/test",
+                "LaunchTemplate": {
+                    "LaunchTemplateId": "lt-0fe86658990d7b147",
+                    "LaunchTemplateName": "c7n-test",
+                    "Version": "$Default"
+                },
+                "MinSize": 0,
+                "MaxSize": 0,
+                "DesiredCapacity": 0,
+                "DefaultCooldown": 300,
+                "AvailabilityZones": [
+                    "us-east-1a"
+                ],
+                "LoadBalancerNames": [],
+                "TargetGroupARNs": [],
+                "HealthCheckType": "EC2",
+                "HealthCheckGracePeriod": 300,
+                "Instances": [],
+                "CreatedTime": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 11,
+                    "day": 22,
+                    "hour": 19,
+                    "minute": 2,
+                    "second": 36,
+                    "microsecond": 917000
+                },
+                "SuspendedProcesses": [],
+                "VPCZoneIdentifier": "subnet-083ab4dd1a8b6eaa6",
+                "EnabledMetrics": [],
+                "Tags": [],
+                "TerminationPolicies": [
+                    "Default"
+                ],
+                "NewInstancesProtectedFromScaleIn": false,
+                "ServiceLinkedRoleARN": "arn:aws:iam::644160558196:role/aws-service-role/autoscaling.amazonaws.com/AWSServiceRoleForAutoScaling",
+                "TrafficSources": []
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

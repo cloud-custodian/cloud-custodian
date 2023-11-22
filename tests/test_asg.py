@@ -363,6 +363,21 @@ class AutoScalingTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
+    def test_asg_launch_template_filter(self):
+        factory = self.replay_flight_data("test_asg_launch_template_filter")
+        p = self.load_policy(
+            {
+                "name": "asg-cfg-filter",
+                "resource": "asg",
+                "filters": [
+                    {"type": "launch-config", "key": "AssociatePublicIpAddress", "value": True}
+                ],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
+
     def test_asg_scaling_policy_filter(self):
         factory = self.replay_flight_data("test_asg_scaling_policy_filter")
         p = self.load_policy(

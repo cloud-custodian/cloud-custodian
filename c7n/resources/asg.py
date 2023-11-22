@@ -226,14 +226,26 @@ class LaunchConfigFilter(ValueFilter):
     schema = type_schema(
         'launch-config', rinherit=ValueFilter.schema)
     schema_alias = False
-    permissions = ("autoscaling:DescribeLaunchConfigurations",)
+    permissions = ("autoscaling:DescribeLaunchConfigurations", "ec2:DescribeLaunchTemplates")
 
     def process(self, asgs, event=None):
         self.launch_info = LaunchInfo(self.manager).initialize(asgs)
         return super(LaunchConfigFilter, self).process(asgs, event)
 
     def __call__(self, asg):
-        return self.match(self.launch_info.get(asg))
+        launch_details = self.launch_info.get(asg)
+        if not launch_details:
+            return False
+
+        # In launch-config, AssociatePublicIpAddress its in the original dict
+        # For launch-template we need to look a level deeper
+        if 'NetworkInterfaces' in launch_details:
+            for network_interface in launch_details['NetworkInterfaces']:
+                if self.data.get('key') in network_interface and self.match(network_interface):
+                    return True
+            return False
+
+        return self.match(launch_details)
 
 
 class ConfigValidFilter(Filter):
