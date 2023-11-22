@@ -3,15 +3,15 @@
     "data": {
         "Vpc": {
             "CidrBlock": "10.4.0.0/16",
-            "DhcpOptionsId": "dopt-24ff1940",
+            "DhcpOptionsId": "dopt-78ab4f1c",
             "State": "pending",
-            "VpcId": "vpc-069365b14fa7fd2b8",
+            "VpcId": "vpc-08e32f695e1856693",
             "OwnerId": "644160558196",
             "InstanceTenancy": "default",
             "Ipv6CidrBlockAssociationSet": [],
             "CidrBlockAssociationSet": [
                 {
-                    "AssociationId": "vpc-cidr-assoc-02f3b0d7dc17fa480",
+                    "AssociationId": "vpc-cidr-assoc-01dad23a686d8e3bd",
                     "CidrBlock": "10.4.0.0/16",
                     "CidrBlockState": {
                         "State": "associated"
