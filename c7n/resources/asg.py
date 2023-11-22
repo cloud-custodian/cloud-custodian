@@ -243,7 +243,6 @@ class LaunchConfigFilter(ValueFilter):
             for network_interface in launch_details['NetworkInterfaces']:
                 if self.data.get('key') in network_interface and self.match(network_interface):
                     return True
-            return False
 
         return self.match(launch_details)
 
