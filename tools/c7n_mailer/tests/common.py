@@ -46,7 +46,11 @@ MAILER_CONFIG = {
     "cache_engine": "sqlite",
     "role": "arn:aws:iam::xxxx:role/cloudcustodian-mailer",
     "ldap_uid_tags": ["CreatorName", "Owner"],
-    "templates_folders": [os.path.abspath(os.path.dirname(__file__)), os.path.abspath("/"), ""],
+    "templates_folders": [
+        os.path.abspath(os.path.dirname(__file__)),
+        os.path.abspath("/"),
+        "",
+    ],
 }
 MAILER_CONFIG_AZURE = {
     "queue_url": "asq://storageaccount.queue.core.windows.net/queuename",
@@ -68,7 +72,11 @@ MAILER_CONFIG_GCP = {
     "from_address": "devops@initech.com",
     "queue_url": "projects/c7n-dev/subscriptions/getnotify",
     "smtp_server": "smtp.inittech.com",
-    "templates_folders": [os.path.abspath(os.path.dirname(__file__)), os.path.abspath("/"), ""],
+    "templates_folders": [
+        os.path.abspath(os.path.dirname(__file__)),
+        os.path.abspath("/"),
+        "",
+    ],
 }
 
 RESOURCE_1 = {
@@ -132,7 +140,7 @@ SQS_MESSAGE_1 = {
         "priority_header": "1",
         "type": "notify",
         "transport": {"queue": "xxx", "type": "sqs"},
-        "subject": "{{ account }} AWS EBS Volumes will be DELETED in 15 DAYS!",
+        "subject": "{{ account }} AWS EBS Volumes will be <DELETED> in 15 DAYS!",
     },
     "policy": {
         "filters": [{"Attachments": []}, {"tag:maid_status": "absent"}],
@@ -165,13 +173,19 @@ SQS_MESSAGE_2 = {
     "account": "core-services-dev",
     "account_id": "000000000000",
     "region": "us-east-1",
-    "action": {"type": "notify", "to": ["datadog://?metric_name=EBS_volume.available.size"]},
+    "action": {
+        "type": "notify",
+        "to": ["datadog://?metric_name=EBS_volume.available.size"],
+    },
     "policy": {
         "filters": [{"Attachments": []}, {"tag:maid_status": "absent"}],
         "resource": "ebs",
         "actions": [
             {"type": "mark-for-op", "days": 15, "op": "delete"},
-            {"type": "notify", "to": ["datadog://?metric_name=EBS_volume.available.size"]},
+            {
+                "type": "notify",
+                "to": ["datadog://?metric_name=EBS_volume.available.size"],
+            },
         ],
         "comments": "We are deleting your EBS volumes.",
         "name": "ebs-mark-unattached-deletion",
@@ -627,7 +641,10 @@ GCP_SMTP_MESSAGE = {
                 "template": "default",
                 "to": ["resource-owner", "ldap_uid_tags"],
                 "email_ldap_username_manager": True,
-                "transport": {"topic": "projects/c7n-dev/topics/c7n_notify", "type": "pubsub"},
+                "transport": {
+                    "topic": "projects/c7n-dev/topics/c7n_notify",
+                    "type": "pubsub",
+                },
                 "type": "notify",
             }
         ],

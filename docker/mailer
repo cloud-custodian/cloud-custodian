@@ -15,7 +15,7 @@ ARG PATH="/root/.local/bin:$PATH"
 WORKDIR /src
 # Add core & aws packages
 ADD pyproject.toml poetry.lock README.md /src/
-RUN . /usr/local/bin/activate && pip install -qU pip wheel aws-xray-sdk psutil jsonpatch
+RUN . /usr/local/bin/activate && pip install -qU pip wheel aws-xray-sdk psutil jsonpatch markupsafe
 
 # Ignore root first pass so if source changes we don't have to invalidate
 # dependency install

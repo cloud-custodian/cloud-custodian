@@ -5,6 +5,7 @@
 import builtins
 from datetime import datetime
 from importlib import reload
+import markupsafe
 import os
 from time import sleep
 import unittest
@@ -72,7 +73,8 @@ class ResourceFormat(unittest.TestCase):
     def test_efs(self):
         self.assertEqual(
             utils.resource_format(
-                {"Name": "abc", "FileSystemId": "fsid", "LifeCycleState": "available"}, "efs"
+                {"Name": "abc", "FileSystemId": "fsid", "LifeCycleState": "available"},
+                "efs",
             ),
             "name: abc  id: fsid  state: available",
         )
@@ -80,7 +82,8 @@ class ResourceFormat(unittest.TestCase):
     def test_eip(self):
         self.assertEqual(
             utils.resource_format(
-                {"PublicIp": "8.8.8.8", "Domain": "vpc", "AllocationId": "eipxyz"}, "network-addr"
+                {"PublicIp": "8.8.8.8", "Domain": "vpc", "AllocationId": "eipxyz"},
+                "network-addr",
             ),
             "ip: 8.8.8.8  id: eipxyz  scope: vpc",
         )
@@ -88,7 +91,8 @@ class ResourceFormat(unittest.TestCase):
     def test_nat(self):
         self.assertEqual(
             utils.resource_format(
-                {"NatGatewayId": "nat-xyz", "State": "available", "VpcId": "vpc-123"}, "nat-gateway"
+                {"NatGatewayId": "nat-xyz", "State": "available", "VpcId": "vpc-123"},
+                "nat-gateway",
             ),
             "id: nat-xyz  state: available  vpc: vpc-123",
         )
@@ -96,7 +100,8 @@ class ResourceFormat(unittest.TestCase):
     def test_igw(self):
         self.assertEqual(
             utils.resource_format(
-                {"InternetGatewayId": "igw-x", "Attachments": []}, "aws.internet-gateway"
+                {"InternetGatewayId": "igw-x", "Attachments": []},
+                "aws.internet-gateway",
             ),
             "id: igw-x  attachments: 0",
         )
@@ -381,8 +386,9 @@ class OtherTests(unittest.TestCase):
             [RESOURCE_1],
             logging.getLogger("c7n_mailer.utils.email"),
             "template",
-            "default",
+            "<default>",
             MAILER_CONFIG["templates_folders"],
+            is_email=True,
         )
         self.assertIsNotNone(body)
 
@@ -394,9 +400,16 @@ class OtherTests(unittest.TestCase):
 
     def test_get_message_subject(self):
         subject = utils.get_message_subject(SQS_MESSAGE_1)
+        expected = str(
+            markupsafe.escape(
+                SQS_MESSAGE_1["action"]["subject"].replace(
+                    "{{ account }}", SQS_MESSAGE_1["account"]
+                )
+            )
+        )
         self.assertEqual(
             subject,
-            SQS_MESSAGE_1["action"]["subject"].replace("{{ account }}", SQS_MESSAGE_1["account"]),
+            expected,
         )
 
     def test_kms_decrypt(self):

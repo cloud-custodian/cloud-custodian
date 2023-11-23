@@ -4,6 +4,7 @@ import base64
 from datetime import datetime, timedelta
 import functools
 import json
+import markupsafe
 import os
 import time
 import yaml
@@ -77,7 +78,14 @@ def get_jinja_env(template_folders):
 
 
 def get_rendered_jinja(
-    target, sqs_message, resources, logger, specified_template, default_template, template_folders
+    target,
+    sqs_message,
+    resources,
+    logger,
+    specified_template,
+    default_template,
+    template_folders,
+    is_email=False,
 ):
     env = get_jinja_env(template_folders)
     mail_template = sqs_message["action"].get(specified_template, default_template)
@@ -109,7 +117,11 @@ def get_rendered_jinja(
         execution_start=execution_start,
         region=sqs_message.get("region", ""),
     )
-    return rendered_jinja
+
+    if is_email:
+        return str(markupsafe.escape(rendered_jinja))
+    else:
+        return rendered_jinja
 
 
 # eg, target_tag_keys could be resource-owners ['Owners', 'SupportTeam']
@@ -141,7 +153,7 @@ def get_message_subject(sqs_message):
         policy=sqs_message["policy"],
         region=sqs_message.get("region", ""),
     )
-    return subject
+    return str(markupsafe.escape(subject))
 
 
 def setup_defaults(config):
