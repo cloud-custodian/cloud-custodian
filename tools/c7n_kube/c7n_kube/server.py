@@ -48,10 +48,7 @@ class AdmissionControllerHandler(http.server.BaseHTTPRequestHandler):
                 resources = p.push(req)
                 action = p.data["mode"].get("on-match", "deny")
                 result = evaluate_result(action, resources)
-                if result in (
-                    "allow",
-                    "warn"
-                ):
+                if result in ("allow", "warn"):
                     verb = "allowing"
                 else:
                     verb = "denying"
