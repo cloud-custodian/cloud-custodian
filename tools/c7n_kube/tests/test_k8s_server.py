@@ -1,6 +1,7 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import json
+import os
 import socket
 import tempfile
 import threading
@@ -307,11 +308,16 @@ class TestServer(KubeTest):
         policies = {"policies": []}
         with patch("c7n_kube.server.AdmissionControllerServer") as patched:
             with self._server(policies) as (server, port):
+                curr_path = os.path.dirname(os.path.realpath(__file__))
+                sample_key_path = os.path.join(curr_path, "sample_key")
                 init(
                     host="0.0.0.0",
                     port=port,
                     policy_dir="policies",
                     serve_forever=False,
+                    cert_path=os.path.join(sample_key_path, "cert.pem"),
+                    cert_key_path=os.path.join(sample_key_path, "key.pem"),
+                    ca_cert_path=os.path.join(sample_key_path, "cert.pem"),
                 )
                 patched.assert_called_once()
                 patched.assert_called_with(
