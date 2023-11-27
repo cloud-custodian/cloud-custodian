@@ -17,6 +17,7 @@ from c7n.utils import format_string_values, jmespath_search
 log = logging.getLogger('custodian.resolver')
 
 ZIP_OR_GZIP_HEADER_DETECT = zlib.MAX_WBITS | 32
+ZIP_OR_GZIP_CHUNK_SIZE = 1024
 
 
 class URIResolver:
@@ -45,9 +46,16 @@ class URIResolver:
         if response.info().get('Content-Encoding') != 'gzip':
             return response.read().decode('utf-8')
 
-        data = zlib.decompress(response.read(),
-                               ZIP_OR_GZIP_HEADER_DETECT).decode('utf8')
-        return data
+        decompress_object = zlib.decompressobj(ZIP_OR_GZIP_HEADER_DETECT)
+        buffer = response.read(ZIP_OR_GZIP_CHUNK_SIZE)
+        data = bytearray()
+
+        while buffer:
+            data.extend(decompress_object.decompress(buffer))
+            buffer = response.read(ZIP_OR_GZIP_CHUNK_SIZE)
+
+        data.extend(decompress_object.flush())
+        return data.decode('utf8')
 
     def get_s3_uri(self, uri):
         parsed = urlparse(uri)
@@ -61,7 +69,16 @@ class URIResolver:
         result = client.get_object(**params)
         body = result['Body'].read()
         if params['Key'].lower().endswith(('.gz', '.zip', '.gzip')):
-            return zlib.decompress(body, ZIP_OR_GZIP_HEADER_DETECT).decode('utf-8')
+            decompress_object = zlib.decompressobj(ZIP_OR_GZIP_HEADER_DETECT)
+            buffer = result['Body'].read(ZIP_OR_GZIP_CHUNK_SIZE)
+            data = bytearray()
+
+            while buffer:
+                data.extend(decompress_object.decompress(buffer))
+                buffer = result['Body'].read(ZIP_OR_GZIP_CHUNK_SIZE)
+
+            data.extend(decompress_object.flush())
+            return data.decode('utf-8')
         elif isinstance(body, str):
             return body
         else:
