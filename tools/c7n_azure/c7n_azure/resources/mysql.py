@@ -5,6 +5,7 @@ from c7n_azure.provider import resources
 from c7n_azure.resources.arm import ArmResourceManager
 from c7n.utils import type_schema
 from c7n.filters.core import ValueFilter
+from c7n_azure.filters import scalar_ops
 
 
 @resources.register('mysql')
@@ -107,3 +108,32 @@ class ServerConfigurationsFilter(ValueFilter):
             resource['properties'][key] = query.serialize(True).get('properties')
 
         return super().__call__(resource['properties'][key])
+
+
+@MySQL.filter_registry.register('security-alert-policy')
+class MySqlServerSecurityAlertPoliciesFilter(ValueFilter):
+
+    schema = type_schema('security-alert-policy',
+                         rinherit=ValueFilter.schema)
+
+    def _perform_op(self, a, b):
+        op = scalar_ops.get(self.data.get('op', 'eq'))
+        return op(a, b)
+
+    def process(self, resources, event=None):
+        client = self.manager.get_client('azure.mgmt.rdbms.mysql.MySQLManagementClient')
+        filtered_resources = []
+
+        for resource in resources:
+            if resource['sku']['tier'] == 'Basic':
+                continue
+            alert = client.server_security_alert_policies.get(
+                server_name=resource['name'],
+                resource_group_name=resource['resourceGroup'],
+                security_alert_policy_name='Default')
+            attribute = getattr(alert, self.data.get('key'))
+            if self._perform_op(attribute, self.data.get('value')):
+                filtered_resources.append(resource)
+                break
+
+        return filtered_resources
