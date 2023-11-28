@@ -391,7 +391,7 @@ class PolicyMetaLint(BaseTest):
             "AWS::Lambda::CodeSigningConfig",
             "AWS::NetworkManager::ConnectPeer",
             "AWS::ResourceExplorer2::Index",
-            # q4 2023        
+            # q4 2023
             "AWS::APS::RuleGroupsNamespace",
             "AWS::AppStream::Stack",
             "AWS::Batch::SchedulingPolicy",
