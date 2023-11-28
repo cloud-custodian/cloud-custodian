@@ -914,8 +914,7 @@ class NetworkLocationTest(BaseTest):
 
     @functional
     def test_network_location_match_in_mismatch(self):
-        self.factory = self.replay_flight_data("test_network_location_match_in_mismatch",
-                                               region='us-west-2')
+        self.factory = self.replay_flight_data("test_network_location_match_in_mismatch")
         client = self.factory().client("ec2")
         vpc_id = client.create_vpc(CidrBlock="10.4.0.0/16")["Vpc"]["VpcId"]
         self.addCleanup(client.delete_vpc, VpcId=vpc_id)
@@ -968,8 +967,7 @@ class NetworkLocationTest(BaseTest):
 
     @functional
     def test_network_location_match_in_mismatch_subnet(self):
-        self.factory = self.replay_flight_data("test_network_location_match_in_mismatch_subnet",
-                                               region='us-west-2')
+        self.factory = self.replay_flight_data("test_network_location_match_in_mismatch_subnet")
         client = self.factory().client("ec2")
         vpc_id = client.create_vpc(CidrBlock="10.4.0.0/16")["Vpc"]["VpcId"]
         self.addCleanup(client.delete_vpc, VpcId=vpc_id)
@@ -1026,8 +1024,7 @@ class NetworkLocationTest(BaseTest):
 
     @functional
     def test_network_location_match_in_mismatch_sg(self):
-        self.factory = self.replay_flight_data("test_network_location_match_in_mismatch_sg",
-                                               region='us-west-2')
+        self.factory = self.replay_flight_data("test_network_location_match_in_mismatch_sg")
         client = self.factory().client("ec2")
         vpc_id = client.create_vpc(CidrBlock="10.4.0.0/16")["Vpc"]["VpcId"]
         self.addCleanup(client.delete_vpc, VpcId=vpc_id)
@@ -1084,8 +1081,7 @@ class NetworkLocationTest(BaseTest):
 
     @functional
     def test_network_location_match_in_subnet_missing_ok(self):
-        self.factory = self.replay_flight_data("test_network_location_match_in_subnet_missing_ok",
-                                               region='us-west-2')
+        self.factory = self.replay_flight_data("test_network_location_match_in_subnet_missing_ok")
         client = self.factory().client("ec2")
         vpc_id = client.create_vpc(CidrBlock="10.4.0.0/16")["Vpc"]["VpcId"]
         self.addCleanup(client.delete_vpc, VpcId=vpc_id)
@@ -1112,7 +1108,7 @@ class NetworkLocationTest(BaseTest):
         self.addCleanup(client.delete_network_interface, NetworkInterfaceId=nic)
 
         client.create_tags(
-            Resources=[web_sub_id, nic],
+            Resources=[nic],
             Tags=[{"Key": "Location", "Value": "web"}],
         )
         p = self.load_policy(

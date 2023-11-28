@@ -367,7 +367,7 @@ class NetworkLocation(Filter):
             subnet_values = {
                 rsub[self.subnet_model.id]: self.subnet.get_resource_value(key, rsub)
                 for rsub in resource_subnets}
-
+            # import pdb; pdb.set_trace()
             if not self.missing_ok and None in subnet_values.values():
                 return
 
