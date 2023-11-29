@@ -24,8 +24,8 @@ class StopPostgresqlServer(AzureBaseAction):
     schema = type_schema('stop')
 
     def _prepare_processing(self):
-        flexibleserver_client = 'azure.mgmt.rdbms.postgresql_flexibleservers.PostgreSQLManagementClient'
-        self.client = self.manager.get_client(flexibleserver_client)
+        fs_client = 'azure.mgmt.rdbms.postgresql_flexibleservers.PostgreSQLManagementClient'
+        self.client = self.manager.get_client(fs_client)
 
     def _process_resource(self, resource):
         self.client.servers.begin_stop(resource['resourceGroup'], resource['name'])
@@ -36,8 +36,8 @@ class StartPostgresqlServer(AzureBaseAction):
     schema = type_schema('start')
 
     def _prepare_processing(self):
-        flexibleserver_client = 'azure.mgmt.rdbms.postgresql_flexibleservers.PostgreSQLManagementClient'
-        self.client = self.manager.get_client(flexibleserver_client)
+        fs_client = 'azure.mgmt.rdbms.postgresql_flexibleservers.PostgreSQLManagementClient'
+        self.client = self.manager.get_client(fs_client)
 
     def _process_resource(self, resource):
         self.client.servers.begin_start(resource['resourceGroup'], resource['name'])
