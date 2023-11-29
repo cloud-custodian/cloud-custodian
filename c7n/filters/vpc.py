@@ -1,5 +1,8 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+import jmespath
+import re
+
 from c7n.exceptions import PolicyValidationError
 from c7n.utils import local_session, type_schema
 
@@ -356,3 +359,220 @@ class NetworkLocation(Filter):
             return r
         elif not evaluation and self.match == 'equal':
             return r
+
+
+class PortRangeFilter(Filter):
+    """
+    Allows to check if all the ports specified in the policy
+    are within the ones stored in the firewall rule.
+    Example 1: ports 10-20 are within 10, 11-25.
+    Example 2: port 19 is within 18-22.
+    Example 3: ports 20-24 are within 20-21, 22-24.
+    Example 4: ports 20-24 are NOT within 20-21, 23-24. (or specify allow-partial: True)
+    Example 5: ports 20,23-24 are within 20-21, 23-24.
+
+    :Example:
+
+    .. code-block:: yaml
+
+        filters:
+          - type: port-range
+            key: allowed[?IPProtocol=='tcp'].ports[]
+            required-ports: 20, 50-60
+            allow-partial: False
+    """
+    key_key = 'key'
+    ranges_key = 'required-ports'
+    partial_key = 'allow-partial'
+    pattern = '^(-?\\d+)-(-?\\d+)$'
+    schema = type_schema(
+        'port-range',
+        required=[key_key, ranges_key],
+        **{
+            key_key: {'$ref': '#/definitions/filters_common/value'},
+            ranges_key: {'$ref': '#/definitions/filters_common/value'},
+            partial_key: {'type': 'boolean'}
+        })
+
+    def __init__(self, data, manager):
+        super(PortRangeFilter, self).__init__(data, manager)
+        if PortRangeFilter.partial_key not in self.data:
+            self.data[PortRangeFilter.partial_key] = False
+
+    def process(self, resources, event=None):
+        return list(filter(lambda resource: self.is_valid_resource(resource), resources))
+
+    def extract_policy_port_ranges(self) -> str:
+        return str(self.data[PortRangeFilter.ranges_key])
+
+    def extract_resource_port_ranges(self, resource) -> str:
+        ranges = jmespath.search(self.data[PortRangeFilter.key_key], resource)
+        return ','.join(ranges) if ranges else ''
+
+    def is_valid_resource(self, resource):
+        policy_ranges = self.extract_policy_port_ranges()
+        resource_ranges = self.extract_resource_port_ranges(resource)
+        return self.check_ranges_match(policy_ranges, resource_ranges)
+
+    def check_ranges_match(self, policy_ranges: str, resource_ranges: str):
+        """
+        :param policy_ranges: a comma-separated string containing either
+               integers or ranges; e.g. 0,25-443,1024,3389
+        :param resource_ranges: in the same format as policy_ranges
+        :return: True or False depending on PortRangeFilter.partial_key
+        """
+        unmerged_policy_ports = PortRangeFilter._parse_ranges(policy_ranges)
+        unmerged_resource_ports = PortRangeFilter._parse_ranges(resource_ranges)
+        policy_ports = PortRangeFilter._sort_and_merge_intersecting_ranges(
+            unmerged_policy_ports)
+        resource_ports = PortRangeFilter._sort_and_merge_intersecting_ranges(
+            unmerged_resource_ports)
+        if self.data[PortRangeFilter.partial_key]:
+            return PortRangeFilter._is_partial_match(policy_ports, resource_ports)
+        return PortRangeFilter._is_subset(policy_ports, resource_ports)
+
+    @classmethod
+    def _is_subset(cls, maybe_range_container_subset, range_container):
+        """
+        :param maybe_range_container_subset: sorted and merged
+        :param range_container: sorted and merged
+        """
+        range_container_index = 0
+        range_container_last_index = len(range_container) - 1
+        is_subset = True
+        for maybe_range_container_subset_element in maybe_range_container_subset:
+            is_subset_element = False
+            while range_container_index <= range_container_last_index:
+                range_container_element = range_container[range_container_index]
+                if cls._is_range_before_another_range(
+                        range_container_element, maybe_range_container_subset_element):
+                    pass
+                elif cls._is_range_within_another_range(
+                        maybe_range_container_subset_element, range_container_element):
+                    is_subset_element = True
+                    break
+                range_container_index += 1
+            if not is_subset_element:
+                is_subset = False
+            if not is_subset:
+                break
+        return is_subset
+
+    @classmethod
+    def _is_partial_match(cls, maybe_range_container_partial_match, range_container):
+        """
+        :param maybe_range_container_partial_match: sorted and merged
+        :param range_container: sorted and merged
+        """
+        a = range_container
+        b = maybe_range_container_partial_match
+        range_container_last_index = len(a) - 1
+        partial_match = False
+        for maybe_range_container_subset_element in b:
+            range_container_index = 0
+            while range_container_index <= range_container_last_index:
+                range_container_element = a[range_container_index]
+                if cls._is_range_intersecting_another_range(
+                        range_container_element, maybe_range_container_subset_element):
+                    partial_match = True
+                    break
+                range_container_index += 1
+            if partial_match:
+                break
+        return partial_match
+
+    @classmethod
+    def _is_range_within_another_range(cls, range_to_check, another_range):
+        return another_range[0] <= range_to_check[0] and range_to_check[1] <= another_range[1]
+
+    @classmethod
+    def _is_range_before_another_range(cls, range_to_check, another_range):
+        return range_to_check[1] < another_range[0]
+
+    @classmethod
+    def _is_range_before_and_next_to_another_range(cls, range_to_check, another_range):
+        return range_to_check[1] + 1 == another_range[0]
+
+    @classmethod
+    def _is_range_intersecting_or_touching_another_range(cls, range_to_check, another_range):
+        if cls._is_range_before_another_range(range_to_check, another_range):
+            return cls._is_range_before_and_next_to_another_range(range_to_check, another_range)
+        if cls._is_range_before_another_range(another_range, range_to_check):
+            return cls._is_range_before_and_next_to_another_range(another_range, range_to_check)
+        return True
+
+    @classmethod
+    def _is_range_intersecting_another_range(cls, range_to_check, another_range):
+        if cls._is_range_before_another_range(range_to_check, another_range):
+            return False
+        if cls._is_range_before_another_range(another_range, range_to_check):
+            return False
+        return True
+
+    @classmethod
+    def _sort_and_merge_intersecting_ranges(cls, ranges):
+        if len(ranges) > 1:
+            merged_ranges = []
+            sorted_ranges = sorted(ranges)
+            current_merged_range = [sorted_ranges[0][0], sorted_ranges[0][1]]
+            for current_range in sorted_ranges[1:]:
+                if cls._is_range_intersecting_or_touching_another_range(
+                        current_merged_range, current_range):
+                    current_merged_range_max = max(current_range[1], current_merged_range[1])
+                    current_merged_range = [current_merged_range[0], current_merged_range_max]
+                else:
+                    merged_ranges.append(tuple(current_merged_range))
+                    current_merged_range = [current_range[0], current_range[1]]
+            merged_ranges.append(tuple(current_merged_range))
+            return merged_ranges
+        return sorted(ranges)
+
+    @classmethod
+    def _parse_ranges(cls, raw_ranges):
+        tokens = cls._parse_tokens(raw_ranges)
+        ranges = cls._parse_port_range_or_port_tokens(tokens)
+        return ranges
+
+    @classmethod
+    def _parse_port_range_or_port_tokens(cls, port_range_or_port_tokens):
+        ranges = set()
+        for token in port_range_or_port_tokens:
+            ranges.add(ParseMaxAndMinPorts.parse_port_range_token(token)
+                       if cls._is_port_range_token(token)
+                       else cls._parse_port_token_as_port_range(token))
+        return ranges
+
+    @classmethod
+    def _parse_tokens(cls, raw_tokens):
+        tokens = [token.strip() for token in raw_tokens.split(',')]
+        if len(tokens) == 1 and tokens[0] == '':
+            tokens = []
+        return tokens
+
+    @classmethod
+    def _is_port_range_token(cls, token):
+        return re.match(PortRangeFilter.pattern, token) is not None
+
+    @classmethod
+    def _parse_port_token_as_port_range(cls, port_token):
+        port = ParseMaxAndMinPorts.parse_port_token(port_token)
+        return port, port
+
+
+class ParseMaxAndMinPorts:
+    pattern = '^(-?\\d+)-(-?\\d+)$'
+
+    @classmethod
+    def parse_port_range_token(cls, port_range_token):
+        (min_port, max_port) = re.match(ParseMaxAndMinPorts.pattern, port_range_token).groups()
+        parsed_min_port, parsed_max_port = cls.parse_port_token(
+            min_port), cls.parse_port_token(max_port)
+        if parsed_min_port == -1:
+            parsed_min_port = 0
+        if parsed_max_port == -1:
+            parsed_max_port = 65535
+        return parsed_min_port, parsed_max_port
+
+    @classmethod
+    def parse_port_token(cls, port_token):
+        return int(port_token)

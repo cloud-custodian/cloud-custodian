@@ -1,0 +1,81 @@
+{
+  "headers": {
+    "etag": "RF6vuHaaRKfpSc5FDmwUVK0iaRI=/-IjPexH5IikTSkrObB0jTPkTh8c=",
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Wed, 10 Nov 2021 13:31:16 GMT",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000,h3-Q050=\":443\"; ma=2592000,h3-Q046=\":443\"; ma=2592000,h3-Q043=\":443\"; ma=2592000,quic=\":443\"; ma=2592000; v=\"46,43\"",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "11704",
+    "-content-encoding": "gzip",
+    "content-location": "https://compute.googleapis.com/compute/v1/projects/cloud-custodian/global/firewalls?alt=json"
+  },
+  "body": {
+    "id": "projects/cloud-custodian/global/firewalls",
+    "items": [
+      {
+        "id": "2383043984399442858",
+        "creationTimestamp": "2021-07-14T10:22:13.246-07:00",
+        "name": "allow-defectdojo",
+        "description": "DefectDojo",
+        "network": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/networks/default",
+        "priority": 1000,
+        "sourceRanges": [
+          "185.38.216.32",
+          "0.0.0.0/0"
+        ],
+        "targetTags": [
+          "defect-dojo"
+        ],
+        "allowed": [
+          {
+            "IPProtocol": "tcp",
+            "ports": [
+              "8080",
+              "8443",
+              "22"
+            ]
+          }
+        ],
+        "direction": "INGRESS",
+        "logConfig": {
+          "enable": false
+        },
+        "disabled": false,
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/firewalls/allow-defectdojo",
+        "kind": "compute#firewall"
+      },
+      {
+        "id": "9179462708199047024",
+        "creationTimestamp": "2021-11-10T00:23:59.520-08:00",
+        "name": "firewall-129-green",
+        "description": "",
+        "network": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/networks/network-129-green",
+        "priority": 1000,
+        "sourceRanges": [
+          "10.0.0.0/16"
+        ],
+        "allowed": [
+          {
+            "IPProtocol": "all"
+          }
+        ],
+        "direction": "INGRESS",
+        "logConfig": {
+          "enable": false
+        },
+        "disabled": false,
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/firewalls/firewall-129-green",
+        "kind": "compute#firewall"
+      }
+    ],
+    "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/firewalls",
+    "kind": "compute#firewallList"
+  }
+}
