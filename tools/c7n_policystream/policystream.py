@@ -313,7 +313,7 @@ class PolicyRepo:
         return CollectionDelta(
             baseline_policies, target_policies, target, self.repo_uri).delta()
 
-    def delta_stream(self, target='HEAD', limit=None,
+    def delta_stream(self, target='HEAD', limit=65536,
                      sort=pygit2.GIT_SORT_TIME | pygit2.GIT_SORT_REVERSE,
                      after=None, before=None):
         """Return an iterator of policy changes along a commit lineage in a repo.
@@ -336,7 +336,7 @@ class PolicyRepo:
             if limit and len(commits) > limit:
                 break
 
-        if limit:
+        if limit and limit < len(commits):
             self.initialize_tree(commits[limit].tree)
             commits.pop(-1)
 
@@ -697,9 +697,11 @@ def github_repos(organization, github_url, github_token):
                     "(default stdout supports jsonline/kinesis/sqs/sqlalchemy)"))
 @click.option('--assume', '--assume',
               help="Assume role for cloud stream destinations")
+@click.option('-m', '--max-repo', default=1024,
+              help="Maximum number of repositories to process")
 @click.pass_context
 def org_stream(ctx, organization, github_url, github_token, clone_dir,
-               verbose, filter, exclude, stream_uri, assume):
+               verbose, filter, exclude, stream_uri, assume, max_repo):
     """Stream changes for repos in a GitHub organization.
     """
     logging.basicConfig(
@@ -719,7 +721,11 @@ def org_stream(ctx, organization, github_url, github_token, clone_dir,
 
     log.info('Streaming org changes')
     change_count = 0
+    repo_count = 0
     for r in repos:
+        if repo_count > max_repo:
+            break
+        repo_count += 1
         change_count += ctx.invoke(
             stream,
             repo_uri=r,
