@@ -41,6 +41,22 @@ actions = ActionRegistry('ec2.actions')
 
 class DescribeEC2(query.DescribeSource):
 
+    def get_query_params(self, query_params):
+        queries = QueryFilter.parse(self.manager.data.get('query', []))
+        qf = []
+        for q in queries:
+            qd = q.query()
+            found = False
+            for f in qf:
+                if qd['Name'] == f['Name']:
+                    f['Values'].extend(qd['Values'])
+                    found = True
+            if not found:
+                qf.append(qd)
+        query_params = query_params or {}
+        query_params['Filters'] = qf
+        return query_params
+
     def augment(self, resources):
         """EC2 API and AWOL Tags
 
@@ -129,33 +145,6 @@ class EC2(query.QueryResourceManager):
         'describe': DescribeEC2,
         'config': query.ConfigSource
     }
-
-    def __init__(self, ctx, data):
-        super(EC2, self).__init__(ctx, data)
-        self.queries = QueryFilter.parse(self.data.get('query', []))
-
-    def resources(self, query=None):
-        q = self.resource_query()
-        if q is not None:
-            query = query or {}
-            query['Filters'] = q
-        return super(EC2, self).resources(query=query)
-
-    def resource_query(self):
-        qf = []
-        qf_names = set()
-        # allow same name to be specified multiple times and append the queries
-        # under the same name
-        for q in self.queries:
-            qd = q.query()
-            if qd['Name'] in qf_names:
-                for qf in qf:
-                    if qd['Name'] == qf['Name']:
-                        qf['Values'].extend(qd['Values'])
-            else:
-                qf_names.add(qd['Name'])
-                qf.append(qd)
-        return qf
 
 
 @filters.register('security-group')
@@ -2493,7 +2482,7 @@ class CapacityReservation(query.QueryResourceManager):
     """
 
     class resource_type(query.TypeInfo):
-        name = id = 'CapacityReservationIds'
+        name = id = 'CapacityReservationId'
         service = 'ec2'
         enum_spec = ('describe_capacity_reservations',
                      'CapacityReservations', None)
