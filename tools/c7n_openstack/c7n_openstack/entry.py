@@ -8,7 +8,8 @@ from c7n_openstack.resources import (
     server,
     user,
     security_group,
-    secret
+    secret,
+    object_storage
 )
 
 log = logging.getLogger('custodian.openstack')
@@ -19,7 +20,8 @@ ALL = [
     server,
     user,
     security_group,
-    secret
+    secret,
+    object_storage
 ]
 
 
