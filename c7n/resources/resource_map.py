@@ -26,6 +26,7 @@ ResourceMap = {
   "aws.batch-compute": "c7n.resources.batch.ComputeEnvironment",
   "aws.batch-definition": "c7n.resources.batch.JobDefinition",
   "aws.batch-queue": "c7n.resources.batch.BatchJobQueue",
+  "aws.bedrock-custom-model": "c7n.resources.bedrock.BedrockCustomModel",
   "aws.budget": "c7n.resources.budgets.Budget",
   "aws.cache-cluster": "c7n.resources.elasticache.ElastiCacheCluster",
   "aws.cache-snapshot": "c7n.resources.elasticache.ElastiCacheSnapshot",
