@@ -7,6 +7,7 @@ from c7n_gcp.query import (QueryResourceManager, TypeInfo, ChildTypeInfo,
                            ChildResourceManager)
 from c7n.utils import type_schema, local_session
 from c7n_gcp.actions import MethodAction
+from c7n_gcp.utils import get_firewall_port_ranges
 
 from c7n.filters import ValueFilter
 
@@ -78,6 +79,53 @@ class KubernetesCluster(QueryResourceManager):
             if r.get('resourceLabels'):
                 r['labels'] = r['resourceLabels']
         return resources
+
+@KubernetesCluster.filter_registry.register('effective-firewall')
+class EffectiveFirewall(ValueFilter):
+    """Filters gke clusters  by their effective firewall rules.
+    See `getEffectiveFirewalls
+    https://cloud.google.com/workflows/docs/reference/googleapis/compute/v1/networks/getEffectiveFirewalls`_
+    for valid fields.
+
+    :example:
+
+    Filter all gke clusters that have a firewall rule that allows public
+    access
+
+    .. code-block:: yaml
+
+        policies:
+           - name: find-publicly-accessable-clusters
+             resource: gcp.gke-cluster
+             filters:
+             - type: effective-firewall
+               key: sourceRanges[]
+               op: contains
+               value: "0.0.0.0/0"
+    """
+
+    schema = type_schema('effective-firewall', rinherit=ValueFilter.schema)
+    permissions = ('compute.instances.getEffectiveFirewalls',)
+    annotation_key = "c7n:firewall"
+
+    def get_firewalls(self, client, p, r):
+        if self.annotation_key not in r:
+            firewalls = client.execute_command('getEffectiveFirewalls',
+                verb_arguments = {'project': p, 'network': r['network']}).get('firewalls', [])
+
+            r[self.annotation_key] = get_firewall_port_ranges(firewalls)
+        return super(EffectiveFirewall, self).process(r[self.annotation_key], None)
+
+    def process(self, resources, event=None):
+        session = local_session(self.manager.session_factory)
+        project = session.get_default_project()
+        client = session.client(
+            "compute", "v1", "networks"
+        )
+        resource_list = [r for r in resources
+                            if self.get_firewalls(client, project, r)]
+        return resource_list
+
 
 @resources.register('gke-nodepool')
 class KubernetesClusterNodePool(ChildResourceManager):
