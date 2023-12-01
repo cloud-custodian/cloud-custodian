@@ -3739,3 +3739,29 @@ def test_vpc_delete(test, vpc_delete):
         "Vpcs"
     ]
     test.assertFalse(vpcs)
+
+
+class ResolverRulesTest(BaseTest):
+
+    def test_traffic_mirror_target(self):
+        session_factory = self.record_flight_data('test_vpc_resolver_rules')
+        p = self.load_policy({
+            "name": "vpc-remediate-missing-resolver-rules",
+            "resource": "vpc",
+            "filters": [
+                {
+                    "type": "resolver-rules-associated",
+                    "name": "my-rule.*",
+                    "associated": False
+                }
+            ],
+            # "actions": [
+            #     {
+            #         "type": "associate-resolver-rules",
+            #         "remove": False
+            #     }
+            # ]
+        },
+        session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
