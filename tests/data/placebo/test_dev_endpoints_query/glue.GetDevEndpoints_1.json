@@ -1,0 +1,42 @@
+{
+    "status_code": 200,
+    "data": {
+        "DevEndpoints": [
+            {
+                "EndpointName": "endpoint1",
+                "RoleArn": "arn:aws:iam::644160558196:role/c7n-glue-test",
+                "SecurityGroupIds": [],
+                "ZeppelinRemoteSparkInterpreterPort": 0,
+                "Status": "PROVISIONING",
+                "GlueVersion": "1.0",
+                "NumberOfNodes": 3,
+                "AvailabilityZone": "us-east-1b",
+                "CreatedTimestamp": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 11,
+                    "day": 20,
+                    "hour": 17,
+                    "minute": 15,
+                    "second": 10,
+                    "microsecond": 982000
+                },
+                "LastModifiedTimestamp": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 11,
+                    "day": 20,
+                    "hour": 17,
+                    "minute": 15,
+                    "second": 10,
+                    "microsecond": 982000
+                },
+                "Arguments": {
+                    "GLUE_PYTHON_VERSION": "3"
+                }
+            }
+        ],
+        "NextToken": "",
+        "ResponseMetadata": {}
+    }
+}

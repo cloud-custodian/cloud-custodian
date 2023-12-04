@@ -102,11 +102,31 @@ class TestGlueConnections(BaseTest):
         tags = client.get_tags(ResourceArn=arn)
         self.assertEqual(tags.get('Tags'), {})
 
+    def test_glue_query_resources_no_subnet(self):
+        session_factory = self.replay_flight_data("test_glue_query_resources_no_subnet")
+        p = self.load_policy(
+            {
+                "name": "list-glue-connections",
+                "resource": "glue-connection",
+                "filters": [
+                    {
+                        "type": "subnet",
+                        "key": "tag:c7n-internal",
+                        "op": "ne",
+                        "value": "True",
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
 
 class TestGlueDevEndpoints(BaseTest):
 
     def test_dev_endpoints_query(self):
-        session_factory = self.replay_flight_data("test_glue_query_resources")
+        session_factory = self.replay_flight_data("test_dev_endpoints_query")
         p = self.load_policy(
             {"name": "list-glue-dev-endpoints", "resource": "glue-dev-endpoint"},
             session_factory=session_factory,

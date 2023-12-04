@@ -46,6 +46,10 @@ class RelatedResourceFilter(ValueFilter):
             related = resource_manager.get_resources(list(related_ids))
         else:
             related = resource_manager.resources()
+
+        if related is None:
+            return {}
+
         return {r[model.id]: r for r in related
                 if r[model.id] in related_ids}
 
