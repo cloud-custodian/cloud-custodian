@@ -931,14 +931,14 @@ class RDSTest(BaseTest):
                 "resource": "rds",
                 "query": [
                     {
-                        "DBInstanceIdentifier": "qbopp011"
+                        "DBInstanceIdentifier": "asset-sync-instance-1"
                     }
                 ],
                 "filters": [
                     {
                         "type": "value",
                         "key": "DBInstanceIdentifier",
-                        "value": "qbopp011"
+                        "value": "asset-sync-instance-1"
                     },
                     {
                         "type": "pending-maintenance"

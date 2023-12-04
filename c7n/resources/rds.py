@@ -2226,8 +2226,8 @@ class DbOptionGroups(ValueFilter):
 
 
 @filters.register('pending-maintenance')
-class PendingMaintenance(Filter):
-    """ Scan DB instances for those with pending maintenance
+class PendingMaintenance(ValueFilter):
+    """Scan DB instances for those with pending maintenance
 
     :example:
 
@@ -2238,24 +2238,32 @@ class PendingMaintenance(Filter):
             resource: aws.rds
             filters:
               - pending-maintenance
+              - type: value
+                key: '"c7n:PendingMaintenance".PendingMaintenanceActionDetails[].Action'
+                op: intersect
+                value:
+                  - system-update
     """
 
-    schema = type_schema('pending-maintenance')
+    annotation_key = 'c7n:PendingMaintenance'
+    schema = type_schema('pending-maintenance', rinherit=ValueFilter.schema)
     permissions = ('rds:DescribePendingMaintenanceActions',)
 
     def process(self, resources, event=None):
         client = local_session(self.manager.session_factory).client('rds')
 
         results = []
-        pending_maintenance = set()
+        pending_maintenances = []
         paginator = client.get_paginator('describe_pending_maintenance_actions')
         for page in paginator.paginate():
-            pending_maintenance.update(
-                {action['ResourceIdentifier'] for action in page['PendingMaintenanceActions']}
-            )
+            for action in page['PendingMaintenanceActions']:
+                pending_maintenances.append(action)
 
         for r in resources:
-            if r['DBInstanceArn'] in pending_maintenance:
-                results.append(r)
+            for action in pending_maintenances:
+                if r['DBInstanceArn'] == action['ResourceIdentifier']:
+                    r[self.annotation_key] = action
+                    results.append(r)
+                    break
 
         return results

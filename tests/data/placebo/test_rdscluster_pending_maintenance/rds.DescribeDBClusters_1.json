@@ -17,12 +17,12 @@
                 "EarliestRestorableTime": {
                     "__class__": "datetime",
                     "year": 2023,
-                    "month": 10,
-                    "day": 14,
+                    "month": 11,
+                    "day": 23,
                     "hour": 12,
                     "minute": 44,
-                    "second": 38,
-                    "microsecond": 409000
+                    "second": 16,
+                    "microsecond": 919000
                 },
                 "Endpoint": "apip-prd-auroracluster-vtmn1quuo8mc.cluster-cz2dumebtpyc.us-west-2.rds.amazonaws.com",
                 "ReaderEndpoint": "apip-prd-auroracluster-vtmn1quuo8mc.cluster-ro-cz2dumebtpyc.us-west-2.rds.amazonaws.com",
@@ -32,12 +32,12 @@
                 "LatestRestorableTime": {
                     "__class__": "datetime",
                     "year": 2023,
-                    "month": 10,
-                    "day": 25,
-                    "hour": 5,
-                    "minute": 5,
-                    "second": 33,
-                    "microsecond": 885000
+                    "month": 12,
+                    "day": 4,
+                    "hour": 9,
+                    "minute": 53,
+                    "second": 1,
+                    "microsecond": 864000
                 },
                 "Port": 3306,
                 "MasterUsername": "apip",
@@ -138,12 +138,12 @@
                 "EarliestRestorableTime": {
                     "__class__": "datetime",
                     "year": 2023,
-                    "month": 10,
-                    "day": 16,
+                    "month": 11,
+                    "day": 26,
                     "hour": 9,
-                    "minute": 38,
-                    "second": 51,
-                    "microsecond": 771000
+                    "minute": 39,
+                    "second": 31,
+                    "microsecond": 360000
                 },
                 "Endpoint": "ibadges-prd-auroracluster-agib5v3rkebi.cluster-cz2dumebtpyc.us-west-2.rds.amazonaws.com",
                 "ReaderEndpoint": "ibadges-prd-auroracluster-agib5v3rkebi.cluster-ro-cz2dumebtpyc.us-west-2.rds.amazonaws.com",
@@ -153,12 +153,12 @@
                 "LatestRestorableTime": {
                     "__class__": "datetime",
                     "year": 2023,
-                    "month": 10,
-                    "day": 25,
-                    "hour": 5,
-                    "minute": 4,
-                    "second": 13,
-                    "microsecond": 539000
+                    "month": 12,
+                    "day": 4,
+                    "hour": 9,
+                    "minute": 52,
+                    "second": 59,
+                    "microsecond": 911000
                 },
                 "Port": 3306,
                 "MasterUsername": "ibadges",
@@ -251,12 +251,12 @@
                 "EarliestRestorableTime": {
                     "__class__": "datetime",
                     "year": 2023,
-                    "month": 10,
-                    "day": 14,
+                    "month": 11,
+                    "day": 24,
                     "hour": 8,
-                    "minute": 11,
-                    "second": 36,
-                    "microsecond": 666000
+                    "minute": 12,
+                    "second": 17,
+                    "microsecond": 264000
                 },
                 "Endpoint": "sreg-prd-primary-cluster.cluster-cz2dumebtpyc.us-west-2.rds.amazonaws.com",
                 "ReaderEndpoint": "sreg-prd-primary-cluster.cluster-ro-cz2dumebtpyc.us-west-2.rds.amazonaws.com",
@@ -266,12 +266,12 @@
                 "LatestRestorableTime": {
                     "__class__": "datetime",
                     "year": 2023,
-                    "month": 10,
-                    "day": 25,
-                    "hour": 5,
-                    "minute": 4,
-                    "second": 10,
-                    "microsecond": 407000
+                    "month": 12,
+                    "day": 4,
+                    "hour": 9,
+                    "minute": 53,
+                    "second": 58,
+                    "microsecond": 579000
                 },
                 "Port": 3306,
                 "MasterUsername": "sreg",
@@ -374,12 +374,12 @@
                 "EarliestRestorableTime": {
                     "__class__": "datetime",
                     "year": 2023,
-                    "month": 10,
-                    "day": 14,
+                    "month": 11,
+                    "day": 23,
                     "hour": 11,
                     "minute": 38,
-                    "second": 40,
-                    "microsecond": 554000
+                    "second": 58,
+                    "microsecond": 218000
                 },
                 "Endpoint": "tep-prd-auroracluster-wpbswbngjuo6.cluster-cz2dumebtpyc.us-west-2.rds.amazonaws.com",
                 "ReaderEndpoint": "tep-prd-auroracluster-wpbswbngjuo6.cluster-ro-cz2dumebtpyc.us-west-2.rds.amazonaws.com",
@@ -389,12 +389,12 @@
                 "LatestRestorableTime": {
                     "__class__": "datetime",
                     "year": 2023,
-                    "month": 10,
-                    "day": 25,
-                    "hour": 5,
-                    "minute": 6,
-                    "second": 2,
-                    "microsecond": 578000
+                    "month": 12,
+                    "day": 4,
+                    "hour": 9,
+                    "minute": 52,
+                    "second": 53,
+                    "microsecond": 626000
                 },
                 "Port": 3306,
                 "MasterUsername": "tep",
