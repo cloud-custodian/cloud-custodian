@@ -3820,4 +3820,5 @@ class S3Directory(query.QueryResourceManager):
         date = 'CreationDate'
         dimension = 'BucketName'
         cfn_type = 'AWS::S3Express::DirectoryBucket'
+        permissions_enum = ("s3express:ListAllMyDirectoryBuckets",)
 
