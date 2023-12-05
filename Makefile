@@ -144,7 +144,7 @@ data-update:
 	cd tools/c7n_left/scripts && terraform init && python get_taggable.py --output ../c7n_left/data/taggable.json
 # aws data sets
 	python tools/dev/cfntypedb.py -f tests/data/cfn-types.json
-	python tools/dev/updatearnref > tests/data/arn-types.json
+	python tools/dev/updatearnref.py > tests/data/arn-types.json
 	python tools/dev/iamdb.py -f tests/data/iam-actions.json
 # gcp data sets
 	python tools/dev/gcpiamdb.py -f tools/c7n_gcp/tests/data/iam-permissions.json
