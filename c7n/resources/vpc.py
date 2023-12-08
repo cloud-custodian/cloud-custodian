@@ -2035,6 +2035,46 @@ class DeleteNetworkInterface(BaseAction):
                 if not err.response['Error']['Code'] == 'InvalidNetworkInterfaceID.NotFound':
                     raise
 
+@NetworkInterface.action_registry.register('detach')
+class DetachNetworkInterface(BaseAction):
+    """Detach a network interface from an EC2 instance.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: detach-enis
+            comment: Detach ENIs attached to EC2 with public IP addresses
+            resource: eni
+            filters:
+              - type: value
+                key: Attachment.InstanceId
+                value: present
+              - type: value
+                key: Association.PublicIp
+                value: present
+            actions:
+              - type: detach
+    """
+    permissions = ('ec2:DetachNetworkInterface',)
+    schema = type_schema('detach')
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('ec2')
+        att_resources = [ ar for ar in resources if ('Attachment' in ar \
+            and ar['Attachment'].get('InstanceId') \
+            and ar['Attachment'].get('DeviceIndex') != 0) ]
+        if att_resources and (len(att_resources) < len(resources)):
+            self.log.warning(
+                "Filtered {} of {} non-primary network interfaces attatched to EC2".format(
+                len(att_resources), len(resources))
+            )
+        elif not att_resources:
+            self.log.warning("No non-primary EC2 interfaces indentified - revise c7n filters")
+        for r in att_resources:
+            client.detach_network_interface(AttachmentId=r['Attachment']['AttachmentId'])
+
 
 @resources.register('route-table')
 class RouteTable(query.QueryResourceManager):
@@ -2442,6 +2482,39 @@ class AddressRelease(BaseAction):
                         r['AllocationId'])
                 if e.response['Error']['Code'] != 'InvalidAllocationID.NotFound':
                     raise
+
+@NetworkAddress.action_registry.register('disassociate')
+class DisassociateAddress(BaseAction):
+    """Disassociate elastic IP addresses from resources without releasing them.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: disassociate-network-addr
+                resource: network-addr
+                filters:
+                  - AllocationId: ...
+                actions:
+                  - type: disassociate
+    """
+
+    schema = type_schema('disassociate')
+    permissions = ('ec2:DisassociateAddress',)
+
+    def process(self, network_addrs):
+        client = local_session(self.manager.session_factory).client('ec2')
+        assoc_addrs = [addr for addr in network_addrs if 'AssociationId' in addr]
+
+        for aa in assoc_addrs:
+            try:
+                client.disassociate_address(AssociationId=aa['AssociationId'])
+            except ClientError as e:
+                # If its already been diassociated ignore, else raise.
+                if not(e.response['Error']['Code'] == 'InvalidAssocationID.NotFound' and
+                       aa['AssocationId'] in e.response['Error']['Message']):
+                    raise e
 
 
 @resources.register('customer-gateway')
