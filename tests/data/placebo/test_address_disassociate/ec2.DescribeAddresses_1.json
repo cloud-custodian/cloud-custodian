@@ -1,0 +1,20 @@
+{
+    "status_code": 200,
+    "data": {
+        "Addresses": [
+            {
+                "InstanceId": "i-05fccf7da99ad47f7",
+                "PublicIp": "107.20.239.31",
+                "AllocationId": "eipalloc-02b147389a1522f9d",
+                "AssociationId": "eipassoc-02808efcab0bcddd4",
+                "Domain": "vpc",
+                "NetworkInterfaceId": "eni-0605e38e04785b878",
+                "NetworkInterfaceOwnerId": "644160558196",
+                "PrivateIpAddress": "10.146.96.42",
+                "PublicIpv4Pool": "amazon",
+                "NetworkBorderGroup": "us-east-1"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
