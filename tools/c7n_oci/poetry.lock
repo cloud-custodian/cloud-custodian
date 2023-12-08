@@ -168,13 +168,13 @@ files = [
 
 [[package]]
 name = "oci"
-version = "2.116.0"
+version = "2.117.0"
 description = "Oracle Cloud Infrastructure Python SDK"
 optional = false
 python-versions = "*"
 files = [
-    {file = "oci-2.116.0-py3-none-any.whl", hash = "sha256:28b6ad954ea500fc2c752b3958643403f27c2708899fbccf1e12d938d423e9ef"},
-    {file = "oci-2.116.0.tar.gz", hash = "sha256:3098f04de6279206f41f5ec321fe1b01abf0884b5e547bdffe887518cf9da460"},
+    {file = "oci-2.117.0-py3-none-any.whl", hash = "sha256:dfae114e355c3dc758106e97c605368bac397fd3b4e18daafdb45c510125756e"},
+    {file = "oci-2.117.0.tar.gz", hash = "sha256:24bbbbded08f92ae2e72193d9a77dc09cfc43a0ed5383f3e22bd20585a1ac42d"},
 ]
 
 [package.dependencies]
