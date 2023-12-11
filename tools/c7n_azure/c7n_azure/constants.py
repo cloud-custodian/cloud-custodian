@@ -81,7 +81,6 @@ RESOURCE_GLOBAL_MGMT = 'https://management.azure.com/'
 Threading Variable
 """
 DEFAULT_MAX_THREAD_WORKERS = 3
-INCREASED_MAX_THREAD_WORKERS = 10
 DEFAULT_CHUNK_SIZE = 20
 
 """
