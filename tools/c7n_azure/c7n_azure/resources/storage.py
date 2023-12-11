@@ -2,7 +2,6 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import logging
-from azure.common import AzureHttpError
 from azure.cosmosdb.table import TableService
 from azure.mgmt.storage.models import (IPRule, NetworkRuleSet,
                                        StorageAccountUpdateParameters,
@@ -17,8 +16,7 @@ from c7n.filters.related import RelatedResourceByIdFilter
 from c7n.utils import get_annotation_prefix, local_session
 from c7n_azure.actions.base import AzureBaseAction
 from c7n_azure.actions.firewall import SetFirewallAction
-from c7n_azure.constants import BLOB_TYPE, FILE_TYPE, INCREASED_MAX_THREAD_WORKERS, \
-    QUEUE_TYPE, TABLE_TYPE
+from c7n_azure.constants import BLOB_TYPE, FILE_TYPE, QUEUE_TYPE, TABLE_TYPE
 from c7n_azure.filters import (FirewallBypassFilter, FirewallRulesFilter,
                                LogProfileFilter, ValueFilter)
 from c7n_azure.provider import resources
@@ -298,9 +296,6 @@ class StorageDiagnosticSettingsFilter(ValueFilter):
     specifying the storage type (blob, queue, table, file) and will filter based on
     the settings for that specific type.
 
-    Note that having multiple conditions in a single filter is possible
-    only if storage-type is the same.
-
      :example:
 
         Find all storage accounts that have a 'delete' logging setting disabled.
@@ -371,8 +366,8 @@ class StorageDiagnosticSettingsFilter(ValueFilter):
     """
 
     schema = type_schema('storage-diagnostic-settings',
-                         required=['storage-type'],
                          rinherit=ValueFilter.schema,
+                         required=['storage-type'],
                          **{'storage-type': {
                              'type': 'string',
                              'enum': [BLOB_TYPE, QUEUE_TYPE, TABLE_TYPE, FILE_TYPE]}}
