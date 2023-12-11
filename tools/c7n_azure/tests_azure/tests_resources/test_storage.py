@@ -708,32 +708,6 @@ class StorageFirewallBypassFilterTest(BaseTest):
         self.assertEqual(expected, f._query_bypass(resource))
 
 
-class StorageActivityLogFilterTest(BaseTest):
-
-    @arm_template('storage.json')
-    @cassette_name('firewall')
-    @pytest.mark.skip
-    def test_run(self):
-        id = 'testcissa'
-        subscription_id_postfix = f'/providers/Microsoft.Storage/storageAccounts/{id}'
-        policy = self.load_policy({
-            'name': 'azure-storage-activity-log-regenerate-key',
-            'resource': 'azure.storage',
-            'filters': [{
-                'type': 'activity-log',
-                'mode': 'or',
-                'conditions': [{
-                    'key': 'operationName.value',
-                    'value': 'Microsoft.Storage/storageAccounts/regenerateKey/action'
-                }],
-            }]
-        })
-        with mock_datetime_now(date_parse('2021/08/24 00:00'), datetime):
-            resources = policy.run()
-
-        self.assertTrue(resources[0]['id'].endswith(subscription_id_postfix))
-
-
 class StorageSingleLogProfileFilterTest(BaseTest):
 
     @arm_template('storage.json')
