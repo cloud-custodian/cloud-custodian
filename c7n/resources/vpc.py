@@ -3291,13 +3291,16 @@ class VpcResolverRulesAssociatedFilter(BaseAction):
                     name: my-rule.*
                     associated: False
     """
+    schema = type_schema(
+        'resolver-rules-associated',
+        name={'type': 'string'},
+        associated={'type': 'boolean'},
+        required=['name', 'associated']
+    )
     permissions = (
         'route53resolver:ListResolverRules',
-        'route53resolver:ListResolverRuleAssociations')
-    schema = type_schema('resolver-rules-associated',
-    name={'type': 'string'},
-    associated={'type': 'boolean'},
-    required=['name', 'associated'])
+        'route53resolver:ListResolverRuleAssociations'
+    )
 
     def get_all(self, client, type, key):
         paginator = client.get_paginator(type)
@@ -3361,17 +3364,21 @@ class AssociateResolverRule(BaseAction):
               - name: vpc-remediate-missing-resolver-rules
                 resource: vpc
                 filters:
-                  - type: resolver-rule-associated
+                  - type: resolver-rules-associated
                     name: my-rule.*
                     associated: False
                 actions:
                   - type: associate-resolver-rules
                     remove: False
     """
+    schema = type_schema(
+        'associate-resolver-rules',
+        remove={'type': 'boolean'}
+    )
     permissions = (
         'route53resolver:AssociateResolverRule',
-        'route53resolver:DisassociateResolverRule')
-    schema = type_schema('associate-resolver-rules', remove={'type': 'boolean'})
+        'route53resolver:DisassociateResolverRule'
+    )
 
     def validate(self):
         found = False
