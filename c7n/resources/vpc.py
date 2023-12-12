@@ -3206,17 +3206,17 @@ class VpcResolverRulesAssociatedFilter(BaseAction):
     """Filter VPCs which have either missing or matching groups
     of Route53 Resolver Rules and annotate for action.
 
-    :example:
+    :Example:
 
     .. code-block:: yaml
 
-        policies:
-            - name: vpcs-missing-resolver-rules
-              resource: vpc
-              filters:
-                - type: resolver-rules-associated
-                  name: my-rule.*
-                  associated: False
+            policies:
+              - name: vpcs-missing-resolver-rules
+                resource: vpc
+                filters:
+                  - type: resolver-rules-associated
+                    name: my-rule.*
+                    associated: False
     """
     permissions = (
         'route53resolver:ListResolverRules',
