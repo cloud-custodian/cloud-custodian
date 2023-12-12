@@ -3265,7 +3265,8 @@ class VpcResolverRulesAssociatedFilter(BaseAction):
             else:
                 if r['VpcId'] in vpc_rule_map:
                     r['c7n:MatchingResolverRules'] = list(rules_set.intersection(set(vpc_rule_map[r['VpcId']])))
-                    results.append(r)
+                    if len(r['c7n:MatchingResolverRules']) > 0:
+                        results.append(r)
 
         return results
 
