@@ -1,0 +1,33 @@
+{
+    "status_code": 200,
+    "data": {
+        "MaxResults": 30,
+        "ResolverRuleAssociations": [
+            {
+                "Id": "rslvr-autodefined-assoc-vpc-00b1cf44b6c724308-internet-resolver",
+                "ResolverRuleId": "rslvr-autodefined-rr-internet-resolver",
+                "Name": "System Rule Association",
+                "VPCId": "vpc-00b1cf44b6c724308",
+                "Status": "COMPLETE",
+                "StatusMessage": ""
+            },
+            {
+                "Id": "rslvr-rrassoc-e0b9b2ab2e7f4303a",
+                "ResolverRuleId": "rslvr-rr-7b28e551dc5e44d19",
+                "Name": "c7n Rule Association",
+                "VPCId": "vpc-00b1cf44b6c724308",
+                "Status": "CREATING",
+                "StatusMessage": "[Trace id: 1-6577aca2-7cf352f018e51b9566ffe942] Creating the association."
+            },
+            {
+                "Id": "rslvr-rrassoc-f3c176693ad442219",
+                "ResolverRuleId": "rslvr-rr-9a67e96f80a14eb8b",
+                "Name": "c7n Rule Association",
+                "VPCId": "vpc-00b1cf44b6c724308",
+                "Status": "CREATING",
+                "StatusMessage": "[Trace id: 1-6577aca2-06a1ded72e4e1e8135d87910] Creating the association."
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

@@ -1,0 +1,14 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResolverRuleAssociation": {
+            "Id": "rslvr-rrassoc-f3c176693ad442219",
+            "ResolverRuleId": "rslvr-rr-9a67e96f80a14eb8b",
+            "Name": "c7n Rule Association",
+            "VPCId": "vpc-00b1cf44b6c724308",
+            "Status": "CREATING",
+            "StatusMessage": "[Trace id: 1-6577aca2-06a1ded72e4e1e8135d87910] Creating the association."
+        },
+        "ResponseMetadata": {}
+    }
+}

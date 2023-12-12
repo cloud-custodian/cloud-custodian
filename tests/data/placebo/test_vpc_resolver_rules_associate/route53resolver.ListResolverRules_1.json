@@ -1,0 +1,76 @@
+{
+    "status_code": 200,
+    "data": {
+        "MaxResults": 30,
+        "ResolverRules": [
+            {
+                "Id": "rslvr-autodefined-rr-internet-resolver",
+                "CreatorRequestId": "",
+                "Arn": "arn:aws:route53resolver:us-east-1::autodefined-rule/rslvr-autodefined-rr-internet-resolver",
+                "DomainName": ".",
+                "Status": "COMPLETE",
+                "RuleType": "RECURSIVE",
+                "Name": "Internet Resolver",
+                "OwnerId": "Route 53 Resolver",
+                "ShareStatus": "NOT_SHARED"
+            },
+            {
+                "Id": "rslvr-rr-6dfccbca33114b2a9",
+                "CreatorRequestId": "AWSConsole.5.1702334897014",
+                "Arn": "arn:aws:route53resolver:us-east-1:644160558196:resolver-rule/rslvr-rr-6dfccbca33114b2a9",
+                "DomainName": "test-644160558196.test-test-2.",
+                "Status": "COMPLETE",
+                "StatusMessage": "[Trace id: 1-657791b1-17c379f52c87e1066e3f1f03] Successfully created Resolver Rule.",
+                "RuleType": "SYSTEM",
+                "Name": "test-rule-2",
+                "OwnerId": "644160558196",
+                "ShareStatus": "NOT_SHARED",
+                "CreationTime": "2023-12-11T22:48:17.385099Z",
+                "ModificationTime": "2023-12-11T22:48:17.385099Z"
+            },
+            {
+                "Id": "rslvr-rr-7b28e551dc5e44d19",
+                "CreatorRequestId": "AWSConsole.95.1701394314637",
+                "Arn": "arn:aws:route53resolver:us-east-1:644160558196:resolver-rule/rslvr-rr-7b28e551dc5e44d19",
+                "DomainName": "test-644160558196.test-2.",
+                "Status": "COMPLETE",
+                "StatusMessage": "[Trace id: 1-6569378a-4a863b0b1f3cda5f08bec45f] Successfully created Resolver Rule.",
+                "RuleType": "SYSTEM",
+                "Name": "my-rule-2",
+                "OwnerId": "644160558196",
+                "ShareStatus": "NOT_SHARED",
+                "CreationTime": "2023-12-01T01:31:54.806799Z",
+                "ModificationTime": "2023-12-01T01:31:54.806799Z"
+            },
+            {
+                "Id": "rslvr-rr-9a67e96f80a14eb8b",
+                "CreatorRequestId": "AWSConsole.43.1700609476823",
+                "Arn": "arn:aws:route53resolver:us-east-1:644160558196:resolver-rule/rslvr-rr-9a67e96f80a14eb8b",
+                "DomainName": "test-644160558196.test.",
+                "Status": "COMPLETE",
+                "StatusMessage": "[Trace id: 1-655d3dc5-2313651d61e702ad370bd03a] Successfully created Resolver Rule.",
+                "RuleType": "SYSTEM",
+                "Name": "my-rule",
+                "OwnerId": "644160558196",
+                "ShareStatus": "NOT_SHARED",
+                "CreationTime": "2023-11-21T23:31:17.449116Z",
+                "ModificationTime": "2023-11-21T23:31:17.449116Z"
+            },
+            {
+                "Id": "rslvr-rr-d303ea379ed44288b",
+                "CreatorRequestId": "AWSConsole.93.1701394344995",
+                "Arn": "arn:aws:route53resolver:us-east-1:644160558196:resolver-rule/rslvr-rr-d303ea379ed44288b",
+                "DomainName": "test-644160558196.test-test.",
+                "Status": "COMPLETE",
+                "StatusMessage": "[Trace id: 1-656937a9-207593716fbe02cf10f46143] Successfully created Resolver Rule.",
+                "RuleType": "SYSTEM",
+                "Name": "test-rule",
+                "OwnerId": "644160558196",
+                "ShareStatus": "NOT_SHARED",
+                "CreationTime": "2023-12-01T01:32:25.324690Z",
+                "ModificationTime": "2023-12-01T01:32:25.324690Z"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
