@@ -3280,19 +3280,20 @@ class AssociateResolverRule(BaseAction):
     """Associates or disasssociates VPC from Route53 Resolver Rules.
     Use in conjunction with filter "resolver-rules-associated".
 
-    :example:
+    :Example:
 
     .. code-block:: yaml
+
             policies:
-                - name: vpc-remediate-missing-resolver-rules
-                    resource: vpc
-                    filters:
-                        - type: resolver-rule-associated
-                        name: my-rule.*
-                        associated: False
-                    actions:
-                        - type: associate-resolver-rules
-                        remove: False
+              - name: vpc-remediate-missing-resolver-rules
+                resource: vpc
+                filters:
+                  - type: resolver-rule-associated
+                    name: my-rule.*
+                    associated: False
+                actions:
+                  - type: associate-resolver-rules
+                    remove: False
     """
     permissions = (
         'route53resolver:AssociateResolverRule',
