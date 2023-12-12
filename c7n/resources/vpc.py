@@ -3203,7 +3203,8 @@ class CrossAZRouteTable(Filter):
 
 @Vpc.filter_registry.register('resolver-rules-associated')
 class VpcResolverRulesAssociatedFilter(BaseAction):
-    """Filter VPCs which have either missing or matching groups of Route53 Resolver Rules and annotate for action.
+    """Filter VPCs which have either missing or matching groups
+    of Route53 Resolver Rules and annotate for action.
 
     :example:
 
@@ -3224,7 +3225,7 @@ class VpcResolverRulesAssociatedFilter(BaseAction):
     name={'type': 'string'},
     associated={'type': 'boolean'},
     required=['name', 'associated'])
-    
+
     def get_all(self, client, type, key):
         paginator = client.get_paginator(type)
         paginator.PAGE_ITERATOR_CLS = query.RetryPageIterator
@@ -3243,7 +3244,10 @@ class VpcResolverRulesAssociatedFilter(BaseAction):
             if re.match(target_rule_name, rule['Name']):
                 rules_set.add(rule['Id'])
 
-        rule_associations = self.get_all(client, 'list_resolver_rule_associations', 'ResolverRuleAssociations')
+        rule_associations = self.get_all(client,
+            'list_resolver_rule_associations',
+            'ResolverRuleAssociations'
+        )
         vpc_rule_map = {}
         for a in rule_associations:
             if a['VPCId'] in vpc_rule_map:
@@ -3262,7 +3266,9 @@ class VpcResolverRulesAssociatedFilter(BaseAction):
                     results.append(r)
             else:
                 if r['VpcId'] in vpc_rule_map:
-                    r['c7n:MatchingResolverRules'] = list(rules_set.intersection(set(vpc_rule_map[r['VpcId']])))
+                    r['c7n:MatchingResolverRules'] = list(
+                        rules_set.intersection(set(vpc_rule_map[r['VpcId']]))
+                    )
                     if len(r['c7n:MatchingResolverRules']) > 0:
                         results.append(r)
 
@@ -3271,10 +3277,11 @@ class VpcResolverRulesAssociatedFilter(BaseAction):
 
 @Vpc.action_registry.register('associate-resolver-rules')
 class AssociateResolverRule(BaseAction):
-    """Associates or disasssociates VPC from Route53 Resolver Rules. Use in conjunction with filter "resolver-rules-associated". 
-    
+    """Associates or disasssociates VPC from Route53 Resolver Rules.
+    Use in conjunction with filter "resolver-rules-associated".
+
     :example:
-    
+
     .. code-block:: yaml
         policies:
           - name: vpc-remediate-missing-resolver-rules
@@ -3291,7 +3298,7 @@ class AssociateResolverRule(BaseAction):
         'route53resolver:AssociateResolverRule',
         'route53resolver:DisassociateResolverRule')
     schema = type_schema('associate-resolver-rules', remove={'type': 'boolean'})
-    
+
     def validate(self):
         found = False
         for f in self.manager.iter_filters():
@@ -3304,7 +3311,7 @@ class AssociateResolverRule(BaseAction):
                 "'associate-resolver-rules' action should be used in conjunction \
                     with 'resolver-rules-associated' filter")
         return self
-    
+
     def process(self, resources, event=None):
         client = local_session(self.manager.session_factory).client('route53resolver')
         remove = self.data.get('remove', False)
