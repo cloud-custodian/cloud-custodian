@@ -3223,7 +3223,6 @@ class VpcResolverRulesAssociatedFilter(BaseAction):
     schema = type_schema('resolver-rules-associated',
     name={'type': 'string'},
     associated={'type': 'boolean'},
-    owner={'type': 'string'},
     required=['name', 'associated'])
     
     def get_all(self, client, type, key):
@@ -3236,7 +3235,6 @@ class VpcResolverRulesAssociatedFilter(BaseAction):
         results = []
         target_rule_name = self.data['name']
         associated = self.data['associated']
-        owner = self.data.get('owner', None)
         client = local_session(self.manager.session_factory).client('route53resolver')
 
         rules = self.get_all(client, 'list_resolver_rules', 'ResolverRules')
