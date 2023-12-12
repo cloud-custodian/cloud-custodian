@@ -801,6 +801,11 @@ class PolicyMetaLint(BaseTest):
                               'service': svc,
                               'resource': v.resource_type.arn_type}
 
+        # s3 directory has bucket in the arn, but its not in the iam ref docs
+        # we source arn types from.
+        for ignore in ('s3-directory',):
+            invalid.pop(ignore)
+
         if invalid:
             raise ValueError("%d %s have invalid arn types in metadata" % (
                 len(invalid), ", ".join(invalid)))
