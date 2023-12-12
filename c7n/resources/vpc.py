@@ -3283,16 +3283,16 @@ class AssociateResolverRule(BaseAction):
     :example:
 
     .. code-block:: yaml
-        policies:
-          - name: vpc-remediate-missing-resolver-rules
-            resource: vpc
-            filters:
-                - type: resolver-rule-associated
-                  name: my-rule.*
-                  associated: False
-            actions:
-                - type: associate-resolver-rules
-                  remove: False
+            policies:
+                - name: vpc-remediate-missing-resolver-rules
+                    resource: vpc
+                    filters:
+                        - type: resolver-rule-associated
+                        name: my-rule.*
+                        associated: False
+                    actions:
+                        - type: associate-resolver-rules
+                        remove: False
     """
     permissions = (
         'route53resolver:AssociateResolverRule',
