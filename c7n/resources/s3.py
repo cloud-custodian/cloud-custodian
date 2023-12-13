@@ -3654,7 +3654,7 @@ VALUE_FILTER_MAGIC_VALUES = ['absent', 'present', 'not-null', 'empty']
 
 
 @filters.regiser('lock')
-class BucketLock(BuckedFilterBase, ValueFilter):
+class BucketLock(BucketFilterBase, ValueFilter):
     """Filter buckets by object lock configuration (worm)
 
     """
