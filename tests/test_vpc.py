@@ -856,6 +856,279 @@ class NetworkLocationTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 0)
 
+    @functional
+    def test_network_location_match_in_triple_intersect(self):
+        self.factory = self.replay_flight_data("test_network_location_match_in_triple_intersect")
+        client = self.factory().client("ec2")
+        vpc_id = client.create_vpc(CidrBlock="10.4.0.0/16")["Vpc"]["VpcId"]
+        self.addCleanup(client.delete_vpc, VpcId=vpc_id)
+
+        web_sub_id = client.create_subnet(VpcId=vpc_id, CidrBlock="10.4.9.0/24")[
+            "Subnet"
+        ][
+            "SubnetId"
+        ]
+        self.addCleanup(client.delete_subnet, SubnetId=web_sub_id)
+
+        web_sg_id = client.create_security_group(
+            GroupName="web-tier", VpcId=vpc_id, Description="for apps"
+        )[
+            "GroupId"
+        ]
+        self.addCleanup(client.delete_security_group, GroupId=web_sg_id)
+
+        nic = client.create_network_interface(SubnetId=web_sub_id, Groups=[web_sg_id])[
+            "NetworkInterface"
+        ][
+            "NetworkInterfaceId"
+        ]
+        self.addCleanup(client.delete_network_interface, NetworkInterfaceId=nic)
+
+        client.create_tags(
+            Resources=[web_sg_id],
+            Tags=[{"Key": "Location", "Value": "web1"}],
+        )
+        client.create_tags(
+            Resources=[web_sub_id],
+            Tags=[{"Key": "Location", "Value": "web2"}],
+        )
+        client.create_tags(
+            Resources=[nic],
+            Tags=[{"Key": "Location", "Value": "web3"}],
+        )
+        p = self.load_policy(
+            {
+                "name": "netloc",
+                "resource": "eni",
+                "filters": [
+                    {"NetworkInterfaceId": nic},
+                    {"type": "network-location",
+                     "key": "tag:Location",
+                     "match": "in",
+                     "value": ["web1", "web2", "web3"]},
+                ],
+            },
+            session_factory=self.factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    @functional
+    def test_network_location_match_in_mismatch(self):
+        self.factory = self.replay_flight_data("test_network_location_match_in_mismatch")
+        client = self.factory().client("ec2")
+        vpc_id = client.create_vpc(CidrBlock="10.4.0.0/16")["Vpc"]["VpcId"]
+        self.addCleanup(client.delete_vpc, VpcId=vpc_id)
+
+        web_sub_id = client.create_subnet(VpcId=vpc_id, CidrBlock="10.4.9.0/24")[
+            "Subnet"
+        ][
+            "SubnetId"
+        ]
+        self.addCleanup(client.delete_subnet, SubnetId=web_sub_id)
+
+        web_sg_id = client.create_security_group(
+            GroupName="web-tier", VpcId=vpc_id, Description="for apps"
+        )[
+            "GroupId"
+        ]
+        self.addCleanup(client.delete_security_group, GroupId=web_sg_id)
+
+        nic = client.create_network_interface(SubnetId=web_sub_id, Groups=[web_sg_id])[
+            "NetworkInterface"
+        ][
+            "NetworkInterfaceId"
+        ]
+        self.addCleanup(client.delete_network_interface, NetworkInterfaceId=nic)
+
+        client.create_tags(
+            Resources=[web_sg_id, web_sub_id],
+            Tags=[{"Key": "Location", "Value": "web"}],
+        )
+        client.create_tags(
+            Resources=[nic],
+            Tags=[{"Key": "Location", "Value": "invalid"}],
+        )
+        p = self.load_policy(
+            {
+                "name": "netloc",
+                "resource": "eni",
+                "filters": [
+                    {"NetworkInterfaceId": nic},
+                    {"type": "network-location",
+                     "key": "tag:Location",
+                     "match": "in",
+                     "value": ["web"]},
+                ],
+            },
+            session_factory=self.factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
+    @functional
+    def test_network_location_match_in_mismatch_subnet(self):
+        self.factory = self.replay_flight_data("test_network_location_match_in_mismatch_subnet")
+        client = self.factory().client("ec2")
+        vpc_id = client.create_vpc(CidrBlock="10.4.0.0/16")["Vpc"]["VpcId"]
+        self.addCleanup(client.delete_vpc, VpcId=vpc_id)
+
+        web_sub_id = client.create_subnet(VpcId=vpc_id, CidrBlock="10.4.9.0/24")[
+            "Subnet"
+        ][
+            "SubnetId"
+        ]
+        self.addCleanup(client.delete_subnet, SubnetId=web_sub_id)
+
+        web_sg_id = client.create_security_group(
+            GroupName="web-tier", VpcId=vpc_id, Description="for apps"
+        )[
+            "GroupId"
+        ]
+        self.addCleanup(client.delete_security_group, GroupId=web_sg_id)
+
+        nic = client.create_network_interface(SubnetId=web_sub_id, Groups=[web_sg_id])[
+            "NetworkInterface"
+        ][
+            "NetworkInterfaceId"
+        ]
+        self.addCleanup(client.delete_network_interface, NetworkInterfaceId=nic)
+
+        client.create_tags(
+            Resources=[web_sg_id],
+            Tags=[{"Key": "Location", "Value": "web1"}],
+        )
+        client.create_tags(
+            Resources=[nic],
+            Tags=[{"Key": "Location", "Value": "web2"}],
+        )
+        client.create_tags(
+            Resources=[web_sub_id],
+            Tags=[{"Key": "Location", "Value": "invalid"}],
+        )
+        p = self.load_policy(
+            {
+                "name": "netloc",
+                "resource": "eni",
+                "filters": [
+                    {"NetworkInterfaceId": nic},
+                    {"type": "network-location",
+                     "key": "tag:Location",
+                     "match": "in",
+                     "value": ["web1", "web2"]},
+                ],
+            },
+            session_factory=self.factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
+    @functional
+    def test_network_location_match_in_mismatch_sg(self):
+        self.factory = self.replay_flight_data("test_network_location_match_in_mismatch_sg")
+        client = self.factory().client("ec2")
+        vpc_id = client.create_vpc(CidrBlock="10.4.0.0/16")["Vpc"]["VpcId"]
+        self.addCleanup(client.delete_vpc, VpcId=vpc_id)
+
+        web_sub_id = client.create_subnet(VpcId=vpc_id, CidrBlock="10.4.9.0/24")[
+            "Subnet"
+        ][
+            "SubnetId"
+        ]
+        self.addCleanup(client.delete_subnet, SubnetId=web_sub_id)
+
+        web_sg_id = client.create_security_group(
+            GroupName="web-tier", VpcId=vpc_id, Description="for apps"
+        )[
+            "GroupId"
+        ]
+        self.addCleanup(client.delete_security_group, GroupId=web_sg_id)
+
+        nic = client.create_network_interface(SubnetId=web_sub_id, Groups=[web_sg_id])[
+            "NetworkInterface"
+        ][
+            "NetworkInterfaceId"
+        ]
+        self.addCleanup(client.delete_network_interface, NetworkInterfaceId=nic)
+
+        client.create_tags(
+            Resources=[web_sub_id],
+            Tags=[{"Key": "Location", "Value": "invalid"}],
+        )
+        client.create_tags(
+            Resources=[nic],
+            Tags=[{"Key": "Location", "Value": "web1"}],
+        )
+        client.create_tags(
+            Resources=[web_sg_id],
+            Tags=[{"Key": "Location", "Value": "web2"}],
+        )
+        p = self.load_policy(
+            {
+                "name": "netloc",
+                "resource": "eni",
+                "filters": [
+                    {"NetworkInterfaceId": nic},
+                    {"type": "network-location",
+                     "key": "tag:Location",
+                     "match": "in",
+                     "value": ["web1", "web2"]},
+                ],
+            },
+            session_factory=self.factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
+    @functional
+    def test_network_location_match_in_subnet_missing_ok(self):
+        self.factory = self.replay_flight_data("test_network_location_match_in_subnet_missing_ok")
+        client = self.factory().client("ec2")
+        vpc_id = client.create_vpc(CidrBlock="10.4.0.0/16")["Vpc"]["VpcId"]
+        self.addCleanup(client.delete_vpc, VpcId=vpc_id)
+
+        web_sub_id = client.create_subnet(VpcId=vpc_id, CidrBlock="10.4.9.0/24")[
+            "Subnet"
+        ][
+            "SubnetId"
+        ]
+        self.addCleanup(client.delete_subnet, SubnetId=web_sub_id)
+
+        web_sg_id = client.create_security_group(
+            GroupName="web-tier", VpcId=vpc_id, Description="for apps"
+        )[
+            "GroupId"
+        ]
+        self.addCleanup(client.delete_security_group, GroupId=web_sg_id)
+
+        nic = client.create_network_interface(SubnetId=web_sub_id, Groups=[web_sg_id])[
+            "NetworkInterface"
+        ][
+            "NetworkInterfaceId"
+        ]
+        self.addCleanup(client.delete_network_interface, NetworkInterfaceId=nic)
+
+        client.create_tags(
+            Resources=[nic],
+            Tags=[{"Key": "Location", "Value": "web"}],
+        )
+        p = self.load_policy(
+            {
+                "name": "netloc",
+                "resource": "eni",
+                "filters": [
+                    {"NetworkInterfaceId": nic},
+                    {"type": "network-location",
+                     "key": "tag:Location",
+                     "match": "in",
+                     "value": ["web"]},
+                ],
+            },
+            session_factory=self.factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
 
 class NetworkAclTest(BaseTest):
 
