@@ -3653,7 +3653,7 @@ OWNERSHIP_CONTROLS = ['BucketOwnerEnforced', 'BucketOwnerPreferred', 'ObjectWrit
 VALUE_FILTER_MAGIC_VALUES = ['absent', 'present', 'not-null', 'empty']
 
 
-@filters.regiser('lock')
+@filters.register('lock')
 class BucketLock(BucketFilterBase, ValueFilter):
     """Filter buckets by object lock configuration (worm)
 
