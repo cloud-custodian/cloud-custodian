@@ -3653,6 +3653,33 @@ OWNERSHIP_CONTROLS = ['BucketOwnerEnforced', 'BucketOwnerPreferred', 'ObjectWrit
 VALUE_FILTER_MAGIC_VALUES = ['absent', 'present', 'not-null', 'empty']
 
 
+@filters.regiser('lock')
+class BucketLock(BuckedFilterBase, ValueFilter):
+    """Filter buckets by object lock configuration (worm)
+
+    """
+
+    lock_annotation = 'c7n:LockConfiguration'
+
+    def process_bucket(self, bucket):
+        s3 = bucket_client(local_session(self.manager.session_factory, bucket))
+        try:
+            configuration = s3.get_object_lock_configuration(bucket['Name'])
+        except ClientError as e:
+            if e.response['Error']['Code'] != 'ObjectLockConfigurationNotFoundError':
+                raise
+            configuration = {}
+        bucket[self.lock_annotation] = configuration
+
+    def process(self, resources):
+        for r in resources:
+            self.process_bucket(r)
+        return super().process(resources)
+
+    def __call__(self, r):
+        return super()(r[self.lock_annotation])
+
+
 @filters.register('ownership')
 class BucketOwnershipControls(BucketFilterBase, ValueFilter):
     """Filter for object ownership controls
