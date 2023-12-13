@@ -4170,7 +4170,7 @@ class IntelligentTieringConfiguration(BaseTest):
         ids = []
         configs = client.list_bucket_intelligent_tiering_configurations(
             Bucket=bname).get('IntelligentTieringConfigurationList')
-        self.assertEquals(len(configs), 2)
+        self.assertEqual(len(configs), 2)
         for config in configs:
             ids.append(jmespath_search("Id", config))
         self.assertTrue("c7n-default" in ids)
@@ -4201,7 +4201,7 @@ class IntelligentTieringConfiguration(BaseTest):
         self.assertEqual(resources[0].get("c7n:ListItemMatches")[0].get("Id"), "c7n-default")
         check_config = client.list_bucket_intelligent_tiering_configurations(
             Bucket=bname).get('IntelligentTieringConfigurationList')
-        self.assertEquals(len(check_config), 1)
+        self.assertEqual(len(check_config), 1)
         self.assertFalse('c7n-default' in check_config[0].get('Id'))
 
     def test_delete_int_tier_config_not_present(self):
@@ -4213,7 +4213,7 @@ class IntelligentTieringConfiguration(BaseTest):
         client = session.client("s3")
         config = client.list_bucket_intelligent_tiering_configurations(
             Bucket=bname).get('IntelligentTieringConfigurationList')
-        self.assertEquals(len(config), 1)
+        self.assertEqual(len(config), 1)
         id = config[0].get('Id')
         self.assertTrue("present" in id)
         log_output = self.capture_logging('custodian.s3', level=logging.WARNING)
@@ -4241,7 +4241,7 @@ class IntelligentTieringConfiguration(BaseTest):
         self.assertEqual(len(resources), 1)
         check_config = client.list_bucket_intelligent_tiering_configurations(
             Bucket=bname).get('IntelligentTieringConfigurationList')
-        self.assertEquals(len(check_config), 1)
+        self.assertEqual(len(check_config), 1)
         self.assertTrue('present' in check_config[0].get('Id'))
         self.assertIn(
           'No such configuration found:example-abc-123 while deleting '
