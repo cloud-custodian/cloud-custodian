@@ -263,7 +263,9 @@ class PolicyMetaLint(BaseTest):
 
         whitelist = set(('AwsS3Object', 'Container'))
         todo = set((
-            # q4 2023
+            # q4 2023,
+            'AwsEc2ClientVpnEndpoint',
+            'AwsS3AccessPoint',
             'AwsMskCluster',
             'AwsEventsEventbus',
             'AwsEventsEndpoint',
