@@ -178,10 +178,12 @@ class SnapshotLocked(ValueFilter):
     batch_size = 100
 
     def annotate_lock(self, client, resources):
-        for resource_set in utils.chunk(resources, self.batch_size):
-            lock_status = {l['SnapshotId']: l for l in client.describe_locked_snapshots(resource_set)['Snapshots']}
+        for resource_set in chunks(resources, self.batch_size):
+            lock_status = {
+                l['SnapshotId']: l for l in
+                client.describe_locked_snapshots(resource_set)['Snapshots']}
             for r in resource_set:
-                r[lock_annotation] = lock_status.get(r['SnapshotId'], {})
+                r[self.lock_annotation] = lock_status.get(r['SnapshotId'], {})
 
     def process(self, resources):
         self.annotate_lock(local_session(self.manager.session_factory).client('ec2'), resources)
