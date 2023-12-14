@@ -263,7 +263,9 @@ class PolicyMetaLint(BaseTest):
 
         whitelist = set(('AwsS3Object', 'Container'))
         todo = set((
-            # q4 2023
+            # q4 2023,
+            'AwsEc2ClientVpnEndpoint',
+            'AwsS3AccessPoint',
             'AwsMskCluster',
             'AwsEventsEventbus',
             'AwsEventsEndpoint',
@@ -800,6 +802,11 @@ class PolicyMetaLint(BaseTest):
                 invalid[k] = {'valid': sorted(svc_arn_types),
                               'service': svc,
                               'resource': v.resource_type.arn_type}
+
+        # s3 directory has bucket in the arn, but its not in the iam ref docs
+        # we source arn types from.
+        for ignore in ('s3-directory',):
+            invalid.pop(ignore)
 
         if invalid:
             raise ValueError("%d %s have invalid arn types in metadata" % (

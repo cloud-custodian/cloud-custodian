@@ -2,13 +2,13 @@
 
 [[package]]
 name = "argcomplete"
-version = "3.1.6"
+version = "3.2.1"
 description = "Bash tab completion for argparse"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "argcomplete-3.1.6-py3-none-any.whl", hash = "sha256:71f4683bc9e6b0be85f2b2c1224c47680f210903e23512cfebfe5a41edfd883a"},
-    {file = "argcomplete-3.1.6.tar.gz", hash = "sha256:3b1f07d133332547a53c79437527c00be48cca3807b1d4ca5cab1b26313386a6"},
+    {file = "argcomplete-3.2.1-py3-none-any.whl", hash = "sha256:30891d87f3c1abe091f2142613c9d33cac84a5e15404489f033b20399b691fec"},
+    {file = "argcomplete-3.2.1.tar.gz", hash = "sha256:437f67fb9b058da5a090df505ef9be0297c4883993f3f56cb186ff087778cfb4"},
 ]
 
 [package.extras]
@@ -34,17 +34,17 @@ tests-no-zope = ["cloudpickle", "hypothesis", "mypy (>=1.1.1)", "pympler", "pyte
 
 [[package]]
 name = "boto3"
-version = "1.33.6"
+version = "1.33.13"
 description = "The AWS SDK for Python"
 optional = false
 python-versions = ">= 3.7"
 files = [
-    {file = "boto3-1.33.6-py3-none-any.whl", hash = "sha256:b88f0f305186c5fd41f168e006baa45b7002a33029aec8e5bef373237a172fca"},
-    {file = "boto3-1.33.6.tar.gz", hash = "sha256:4f62fc1c7f3ea2d22917aa0aa07b86f119abd90bed3d815e4b52fb3d84773e15"},
+    {file = "boto3-1.33.13-py3-none-any.whl", hash = "sha256:5f278b95fb2b32f3d09d950759a05664357ba35d81107bab1537c4ddd212cd8c"},
+    {file = "boto3-1.33.13.tar.gz", hash = "sha256:0e966b8a475ecb06cc0846304454b8da2473d4c8198a45dfb2c5304871986883"},
 ]
 
 [package.dependencies]
-botocore = ">=1.33.6,<1.34.0"
+botocore = ">=1.33.13,<1.34.0"
 jmespath = ">=0.7.1,<2.0.0"
 s3transfer = ">=0.8.2,<0.9.0"
 
@@ -53,13 +53,13 @@ crt = ["botocore[crt] (>=1.21.0,<2.0a0)"]
 
 [[package]]
 name = "botocore"
-version = "1.33.6"
+version = "1.33.13"
 description = "Low-level, data-driven core of boto 3."
 optional = false
 python-versions = ">= 3.7"
 files = [
-    {file = "botocore-1.33.6-py3-none-any.whl", hash = "sha256:14282cd432c0683770eee932c43c12bb9ad5730e23755204ad102897c996693a"},
-    {file = "botocore-1.33.6.tar.gz", hash = "sha256:938056bab831829f90e09ecd70dd6b295afd52b1482f5582ee7a11d8243d9661"},
+    {file = "botocore-1.33.13-py3-none-any.whl", hash = "sha256:aeadccf4b7c674c7d47e713ef34671b834bc3e89723ef96d994409c9f54666e6"},
+    {file = "botocore-1.33.13.tar.gz", hash = "sha256:fb577f4cb175605527458b04571451db1bd1a2036976b626206036acd4496617"},
 ]
 
 [package.dependencies]
@@ -86,7 +86,7 @@ develop = true
 argcomplete = ">=1.12.3"
 boto3 = "^1.12.31"
 docutils = ">=0.18, <0.19"
-importlib-metadata = "^5.1"
+importlib-metadata = "^6.0"
 jsonschema = ">=4.18"
 python-dateutil = "^2.8.2"
 pyyaml = ">=5.4.0"
@@ -135,22 +135,22 @@ files = [
 
 [[package]]
 name = "importlib-metadata"
-version = "5.2.0"
+version = "6.11.0"
 description = "Read metadata from Python packages"
 optional = false
-python-versions = ">=3.7"
+python-versions = ">=3.8"
 files = [
-    {file = "importlib_metadata-5.2.0-py3-none-any.whl", hash = "sha256:0eafa39ba42bf225fc00e67f701d71f85aead9f878569caf13c3724f704b970f"},
-    {file = "importlib_metadata-5.2.0.tar.gz", hash = "sha256:404d48d62bba0b7a77ff9d405efd91501bef2e67ff4ace0bed40a0cf28c3c7cd"},
+    {file = "importlib_metadata-6.11.0-py3-none-any.whl", hash = "sha256:f0afba6205ad8f8947c7d338b5342d5db2afbfd82f9cbef7879a9539cc12eb9b"},
+    {file = "importlib_metadata-6.11.0.tar.gz", hash = "sha256:1231cf92d825c9e03cfc4da076a16de6422c863558229ea0b22b675657463443"},
 ]
 
 [package.dependencies]
 zipp = ">=0.5"
 
 [package.extras]
-docs = ["furo", "jaraco.packaging (>=9)", "jaraco.tidelift (>=1.4)", "rst.linker (>=1.9)", "sphinx (>=3.5)", "sphinx-lint"]
+docs = ["furo", "jaraco.packaging (>=9.3)", "jaraco.tidelift (>=1.4)", "rst.linker (>=1.9)", "sphinx (<7.2.5)", "sphinx (>=3.5)", "sphinx-lint"]
 perf = ["ipython"]
-testing = ["flake8 (<5)", "flufl.flake8", "importlib-resources (>=1.3)", "packaging", "pyfakefs", "pytest (>=6)", "pytest-black (>=0.3.7)", "pytest-checkdocs (>=2.4)", "pytest-cov", "pytest-enabler (>=1.3)", "pytest-flake8", "pytest-mypy (>=0.9.1)", "pytest-perf (>=0.9.2)"]
+testing = ["flufl.flake8", "importlib-resources (>=1.3)", "packaging", "pyfakefs", "pytest (>=6)", "pytest-black (>=0.3.7)", "pytest-checkdocs (>=2.4)", "pytest-cov", "pytest-enabler (>=2.2)", "pytest-mypy (>=0.9.1)", "pytest-perf (>=0.9.2)", "pytest-ruff"]
 
 [[package]]
 name = "importlib-resources"
@@ -295,13 +295,13 @@ files = [
 
 [[package]]
 name = "referencing"
-version = "0.31.1"
+version = "0.32.0"
 description = "JSON Referencing + Python"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "referencing-0.31.1-py3-none-any.whl", hash = "sha256:c19c4d006f1757e3dd75c4f784d38f8698d87b649c54f9ace14e5e8c9667c01d"},
-    {file = "referencing-0.31.1.tar.gz", hash = "sha256:81a1471c68c9d5e3831c30ad1dd9815c45b558e596653db751a2bfdd17b3b9ec"},
+    {file = "referencing-0.32.0-py3-none-any.whl", hash = "sha256:bdcd3efb936f82ff86f993093f6da7435c7de69a3b3a5a06678a6050184bee99"},
+    {file = "referencing-0.32.0.tar.gz", hash = "sha256:689e64fe121843dcfd57b71933318ef1f91188ffb45367332700a86ac8fd6161"},
 ]
 
 [package.dependencies]

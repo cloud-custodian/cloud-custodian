@@ -1,0 +1,49 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "jobDefinitions": [
+            {
+                "jobDefinitionName": "test-job",
+                "jobDefinitionArn": "arn:aws:batch:us-east-1:644160558196:job-definition/test-job:1",
+                "revision": 1,
+                "status": "ACTIVE",
+                "type": "container",
+                "schedulingPriority": 1,
+                "parameters": {},
+                "containerProperties": {
+                    "image": "public.ecr.aws/amazonlinux/amazonlinux:latest",
+                    "command": [
+                        "echo",
+                        "hello world"
+                    ],
+                    "volumes": [],
+                    "environment": [],
+                    "mountPoints": [],
+                    "ulimits": [],
+                    "resourceRequirements": [
+                        {
+                            "value": "1",
+                            "type": "VCPU"
+                        },
+                        {
+                            "value": "2048",
+                            "type": "MEMORY"
+                        }
+                    ],
+                    "secrets": []
+                },
+                "timeout": {
+                    "attemptDurationSeconds": 60
+                },
+                "tags": {
+                    "owner": "c7n"
+                },
+                "platformCapabilities": [
+                    "EC2"
+                ],
+                "containerOrchestrationType": "ECS"
+            }
+        ]
+    }
+}
