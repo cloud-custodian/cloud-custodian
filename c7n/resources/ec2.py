@@ -7,7 +7,7 @@ import random
 import re
 import zlib
 from typing import List
-from distutils.version import LooseVersion
+from c7n.vendored.distutils.version import LooseVersion
 
 import botocore
 from botocore.exceptions import ClientError
