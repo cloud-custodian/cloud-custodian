@@ -7,6 +7,8 @@ import pytest
 from c7n.vendored.distutils.util import strtobool
 from .constants import ACCOUNT_ID
 
+from vcr import stubs
+
 try:
     from .zpill import PillTest
     from c7n.testing import PyTestUtils, reset_session_cache
@@ -24,6 +26,13 @@ except ImportError: # noqa
 
     class LazyPluginCacheDir:
         pass
+
+
+# python 3.12 compatiblity till vcrpy 6 released w/ https://github.com/kevin1024/vcrpy/pull/754
+for vcrstub, baseclass in ((stubs.VCRHTTPConnection, stubs.HTTPConnection),
+                           (stubs.VCRHTTPSConnection, stubs.HTTPSConnection)):
+    vcrstub.debuglevel = baseclass.debuglevel
+    vcrstub._http_vsn = baseclass._http_vsn
 
 
 pytest_plugins = ("pytest_recording",)

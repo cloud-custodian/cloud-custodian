@@ -7,7 +7,7 @@ import random
 import re
 import zlib
 from typing import List
-from distutils.version import LooseVersion
+from c7n.vendored.distutils.version import LooseVersion
 
 import botocore
 from botocore.exceptions import ClientError
@@ -40,6 +40,22 @@ actions = ActionRegistry('ec2.actions')
 
 
 class DescribeEC2(query.DescribeSource):
+
+    def get_query_params(self, query_params):
+        queries = QueryFilter.parse(self.manager.data.get('query', []))
+        qf = []
+        for q in queries:
+            qd = q.query()
+            found = False
+            for f in qf:
+                if qd['Name'] == f['Name']:
+                    f['Values'].extend(qd['Values'])
+                    found = True
+            if not found:
+                qf.append(qd)
+        query_params = query_params or {}
+        query_params['Filters'] = qf
+        return query_params
 
     def augment(self, resources):
         """EC2 API and AWOL Tags
@@ -129,33 +145,6 @@ class EC2(query.QueryResourceManager):
         'describe': DescribeEC2,
         'config': query.ConfigSource
     }
-
-    def __init__(self, ctx, data):
-        super(EC2, self).__init__(ctx, data)
-        self.queries = QueryFilter.parse(self.data.get('query', []))
-
-    def resources(self, query=None):
-        q = self.resource_query()
-        if q is not None:
-            query = query or {}
-            query['Filters'] = q
-        return super(EC2, self).resources(query=query)
-
-    def resource_query(self):
-        qf = []
-        qf_names = set()
-        # allow same name to be specified multiple times and append the queries
-        # under the same name
-        for q in self.queries:
-            qd = q.query()
-            if qd['Name'] in qf_names:
-                for qf in qf:
-                    if qd['Name'] == qf['Name']:
-                        qf['Values'].extend(qd['Values'])
-            else:
-                qf_names.add(qd['Name'])
-                qf.append(qd)
-        return qf
 
 
 @filters.register('security-group')
@@ -2485,3 +2474,22 @@ class HasSpecificManagedPolicy(SpecificIamProfileManagedPolicy):
                 results.append(r)
 
         return results
+
+
+@resources.register('ec2-capacity-reservation')
+class CapacityReservation(query.QueryResourceManager):
+    """Custodian resource for managing EC2 Capacity Reservation.
+    """
+
+    class resource_type(query.TypeInfo):
+        name = id = 'CapacityReservationId'
+        service = 'ec2'
+        enum_spec = ('describe_capacity_reservations',
+                     'CapacityReservations', None)
+
+        id_prefix = 'cr-'
+        arn = "CapacityReservationArn"
+        filter_name = 'CapacityReservationIds'
+        filter_type = 'list'
+        cfn_type = 'AWS::EC2::CapacityReservation'
+        permissions_enum = ('ec2:DescribeCapacityReservations',)
