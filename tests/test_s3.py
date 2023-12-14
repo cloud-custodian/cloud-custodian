@@ -36,6 +36,20 @@ from .common import (
 )
 
 
+def test_s3_express(test):
+    session_factory = test.replay_flight_data('test_s3_express')
+    p = test.load_policy(
+        {'name': 's3-xpress',
+         'resource': 's3-directory'},
+        config={'account_id': '644160558196', 'region': 'us-east-1'},
+        session_factory=session_factory)
+    resources = p.run()
+    assert len(resources) ==  1
+    assert p.resource_manager.get_arns(resources) == [
+        'arn:aws:s3express:us-east-1:644160558196:bucket/test-zone--use1-az4--x-s3'
+    ]
+
+
 @pytest.mark.audited
 @terraform('s3_tag')
 def test_s3_tag(test, s3_tag):
@@ -4156,7 +4170,7 @@ class IntelligentTieringConfiguration(BaseTest):
         ids = []
         configs = client.list_bucket_intelligent_tiering_configurations(
             Bucket=bname).get('IntelligentTieringConfigurationList')
-        self.assertEquals(len(configs), 2)
+        self.assertEqual(len(configs), 2)
         for config in configs:
             ids.append(jmespath_search("Id", config))
         self.assertTrue("c7n-default" in ids)
@@ -4187,7 +4201,7 @@ class IntelligentTieringConfiguration(BaseTest):
         self.assertEqual(resources[0].get("c7n:ListItemMatches")[0].get("Id"), "c7n-default")
         check_config = client.list_bucket_intelligent_tiering_configurations(
             Bucket=bname).get('IntelligentTieringConfigurationList')
-        self.assertEquals(len(check_config), 1)
+        self.assertEqual(len(check_config), 1)
         self.assertFalse('c7n-default' in check_config[0].get('Id'))
 
     def test_delete_int_tier_config_not_present(self):
@@ -4199,7 +4213,7 @@ class IntelligentTieringConfiguration(BaseTest):
         client = session.client("s3")
         config = client.list_bucket_intelligent_tiering_configurations(
             Bucket=bname).get('IntelligentTieringConfigurationList')
-        self.assertEquals(len(config), 1)
+        self.assertEqual(len(config), 1)
         id = config[0].get('Id')
         self.assertTrue("present" in id)
         log_output = self.capture_logging('custodian.s3', level=logging.WARNING)
@@ -4227,7 +4241,7 @@ class IntelligentTieringConfiguration(BaseTest):
         self.assertEqual(len(resources), 1)
         check_config = client.list_bucket_intelligent_tiering_configurations(
             Bucket=bname).get('IntelligentTieringConfigurationList')
-        self.assertEquals(len(check_config), 1)
+        self.assertEqual(len(check_config), 1)
         self.assertTrue('present' in check_config[0].get('Id'))
         self.assertIn(
           'No such configuration found:example-abc-123 while deleting '
