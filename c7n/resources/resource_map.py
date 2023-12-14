@@ -206,6 +206,7 @@ ResourceMap = {
   "aws.route-table": "c7n.resources.vpc.RouteTable",
   "aws.rrset": "c7n.resources.route53.ResourceRecordSet",
   "aws.s3": "c7n.resources.s3.S3",
+  "aws.s3-directory": "c7n.resources.s3.S3Directory",
   "aws.s3-access-point": "c7n.resources.s3control.AccessPoint",
   "aws.s3-access-point-multi": "c7n.resources.s3control.MultiRegionAccessPoint",
   "aws.sagemaker-endpoint": "c7n.resources.sagemaker.SagemakerEndpoint",

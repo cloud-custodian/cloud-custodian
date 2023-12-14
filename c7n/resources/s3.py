@@ -3805,3 +3805,20 @@ class BucketReplication(ListItemFilter):
         source_region = get_region(b)
         replication['DestinationRegion'] = destination_region
         replication['CrossRegion'] = destination_region != source_region
+
+
+@resources.register('s3-directory')
+class S3Directory(query.QueryResourceManager):
+
+    class resource_type(query.TypeInfo):
+        service = 's3'
+        permission_prefix = "s3express"
+        arn_service = "s3express"
+        arn_type = 'bucket'
+        enum_spec = ('list_directory_buckets', 'Buckets[]', None)
+        name = id = 'Name'
+        date = 'CreationDate'
+        dimension = 'BucketName'
+        cfn_type = 'AWS::S3Express::DirectoryBucket'
+        permissions_enum = ("s3express:ListAllMyDirectoryBuckets",)
+
