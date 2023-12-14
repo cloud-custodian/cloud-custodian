@@ -1,6 +1,6 @@
 import os
 import sys
-from distutils.util import strtobool
+from c7n.vendored.distutils.util import strtobool
 
 import oci
 import pytest

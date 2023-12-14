@@ -426,8 +426,8 @@ class AccountTests(BaseTest):
         self.assertEqual(len(resources), 0)
         logs_client = local_session(session_factory).client("logs")
         logs_metrics = logs_client.describe_metric_filters(logGroupName='test_log_group')
-        self.assertRegexpMatches(logs_metrics['metricFilters'][0]['filterPattern'],
-                                 pdata['filters'][0]['log-metric-filter-pattern']['value'])
+        self.assertRegex(logs_metrics['metricFilters'][0]['filterPattern'],
+                         pdata['filters'][0]['log-metric-filter-pattern']['value'])
 
     def test_cloudtrail_fail_regex_log_metric_filter(self):
         session_factory = self.replay_flight_data("test_cloudtrail_fail_regex_log_metric_filter")
@@ -452,8 +452,8 @@ class AccountTests(BaseTest):
         self.assertEqual(len(resources), 1)
         logs_client = local_session(session_factory).client("logs")
         logs_metrics = logs_client.describe_metric_filters(logGroupName='test_log_group')
-        self.assertNotRegexpMatches(logs_metrics['metricFilters'][0]['filterPattern'],
-                                    pdata['filters'][0]['log-metric-filter-pattern'])
+        self.assertNotRegex(logs_metrics['metricFilters'][0]['filterPattern'],
+                            pdata['filters'][0]['log-metric-filter-pattern'])
 
     def test_cloudtrail_success_management_advanced_events_included(self):
         session_factory = self.replay_flight_data\
@@ -605,7 +605,7 @@ class AccountTests(BaseTest):
          self.capture_logging(level=logging.WARNING) as log_output:
             resources = p.run()
             self.assertEqual(0, len(resources))
-            self.assertRegexpMatches(log_output.getvalue(), r"InvalidParameterValueException")
+            self.assertRegex(log_output.getvalue(), r"InvalidParameterValueException")
 
 
     def test_service_limit_specific_check_handles_exception_on_date_refresh(self):
@@ -630,7 +630,7 @@ class AccountTests(BaseTest):
          self.capture_logging(level=logging.WARNING) as log_output:
             resources = p.run()
             self.assertEqual(0, len(resources))
-            self.assertRegexpMatches(log_output.getvalue(), r"InvalidParameterValueException")
+            self.assertRegex(log_output.getvalue(), r"InvalidParameterValueException")
 
     def test_service_limit_specific_service(self):
         session_factory = self.replay_flight_data("test_account_service_limit_specific_service")
