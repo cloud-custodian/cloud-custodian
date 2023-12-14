@@ -265,7 +265,9 @@ class PolicyMetaLint(BaseTest):
 
         whitelist = set(('AwsS3Object', 'Container'))
         todo = set((
-            # q4 2023
+            # q4 2023,
+            'AwsEc2ClientVpnEndpoint',
+            'AwsS3AccessPoint',
             'AwsMskCluster',
             'AwsEventsEventbus',
             'AwsEventsEndpoint',
@@ -375,6 +377,24 @@ class PolicyMetaLint(BaseTest):
         # of a resource.
 
         whitelist = {
+            # q4 2023 wave 2 (aka reinvent)
+            "AWS::ACMPCA::CertificateAuthorityActivation",
+            "AWS::AppMesh::GatewayRoute",
+            "AWS::AppMesh::Mesh",
+            "AWS::Connect::Instance",
+            "AWS::Connect::QuickConnect",
+            "AWS::EC2::CarrierGateway",
+            "AWS::EC2::IPAMPool",
+            "AWS::EC2::TransitGatewayConnect",
+            "AWS::EC2::TransitGatewayMulticastDomain",
+            "AWS::ECS::CapacityProvider",
+            "AWS::IAM::InstanceProfile",
+            "AWS::IoT::CACertificate",
+            "AWS::IoTTwinMaker::SyncJob",
+            "AWS::KafkaConnect::Connector",
+            "AWS::Lambda::CodeSigningConfig",
+            "AWS::NetworkManager::ConnectPeer",
+            "AWS::ResourceExplorer2::Index",
             # q4 2023
             "AWS::APS::RuleGroupsNamespace",
             "AWS::Batch::SchedulingPolicy",
@@ -774,6 +794,11 @@ class PolicyMetaLint(BaseTest):
                 invalid[k] = {'valid': sorted(svc_arn_types),
                               'service': svc,
                               'resource': v.resource_type.arn_type}
+
+        # s3 directory has bucket in the arn, but its not in the iam ref docs
+        # we source arn types from.
+        for ignore in ('s3-directory',):
+            invalid.pop(ignore)
 
         if invalid:
             raise ValueError("%d %s have invalid arn types in metadata" % (

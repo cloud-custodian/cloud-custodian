@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "c7n_mailer"
-version = "0.6.31"
+version = "0.6.32"
 description = "Cloud Custodian - Reference Mailer"
 authors = ["Cloud Custodian Project"]
 license = "Apache-2.0"
@@ -32,7 +32,7 @@ redis = "^3.4.1"
 jsonpointer = "^2.0"
 jsonpatch = "^1.25"
 types-six = "^1.16.10"
-importlib-metadata = ">=4.11.1, <6.0"
+importlib-metadata = "^6.0"
 
 # Optional packages for additional provider support
 c7n-gcp = { path = "../c7n_gcp/", develop = true, optional = true }
