@@ -215,7 +215,7 @@ policies:
    resource: "terraform.aws*"
    filters:
      - taggable
-	 - or:
+     - or:
        - tag:Env: absent
        - tag:Owner: absent
        - tag:App: absent
