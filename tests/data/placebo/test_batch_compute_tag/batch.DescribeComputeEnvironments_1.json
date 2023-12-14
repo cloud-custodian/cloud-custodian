@@ -1,0 +1,74 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "computeEnvironments": [
+            {
+                "computeEnvironmentName": "test-fargate",
+                "computeEnvironmentArn": "arn:aws:batch:us-east-1:644160558196:compute-environment/test-fargate",
+                "ecsClusterArn": "arn:aws:ecs:us-east-1:644160558196:cluster/AWSBatch-test-fargate-92731dda-398a-370a-b7ed-a0e38eb854a3",
+                "tags": {},
+                "type": "MANAGED",
+                "state": "ENABLED",
+                "status": "VALID",
+                "statusReason": "ComputeEnvironment Healthy",
+                "computeResources": {
+                    "type": "FARGATE",
+                    "maxvCpus": 8,
+                    "instanceTypes": [],
+                    "subnets": [
+                        "subnet-efbcccb7",
+                        "subnet-e3b194de",
+                        "subnet-914763e7"
+                    ],
+                    "securityGroupIds": [
+                        "sg-6c7fa917"
+                    ],
+                    "tags": {},
+                    "ec2Configuration": []
+                },
+                "serviceRole": "arn:aws:iam::644160558196:role/aws-service-role/batch.amazonaws.com/AWSServiceRoleForBatch",
+                "containerOrchestrationType": "ECS",
+                "uuid": "5e25196e-d633-3257-9517-78376ed89a48"
+            },
+            {
+                "computeEnvironmentName": "test-environment",
+                "computeEnvironmentArn": "arn:aws:batch:us-east-1:644160558196:compute-environment/test-environment",
+                "tags": {
+                    "owner": "c7n"
+                },
+                "type": "MANAGED",
+                "state": "ENABLED",
+                "status": "INVALID",
+                "statusReason": "CLIENT_ERROR - User: arn:aws:sts::644160558196:assumed-role/EcsService-us-east-1-prod-EcsTaskInstanceRoleE38DB-L7IX0BSO8JCB/ebf433c3860e46d19ed4844748e8b981 is not authorized to perform: sts:AssumeRole on resource: arn:aws:iam::644160558196:role/AWSBatchServiceRole",
+                "computeResources": {
+                    "type": "EC2",
+                    "minvCpus": 0,
+                    "maxvCpus": 4,
+                    "desiredvCpus": 0,
+                    "instanceTypes": [
+                        "optimal"
+                    ],
+                    "subnets": [
+                        "subnet-3a334610",
+                        "subnet-efbcccb7",
+                        "subnet-e3b194de",
+                        "subnet-914763e7"
+                    ],
+                    "securityGroupIds": [
+                        "sg-6c7fa917"
+                    ],
+                    "instanceRole": "ecsInstanceRole",
+                    "tags": {},
+                    "ec2Configuration": [
+                        {
+                            "imageType": "ECS_AL1"
+                        }
+                    ]
+                },
+                "serviceRole": "arn:aws:iam::644160558196:role/AWSBatchServiceRole",
+                "containerOrchestrationType": "ECS"
+            }
+        ]
+    }
+}
