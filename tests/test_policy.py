@@ -700,9 +700,10 @@ class PolicyMetaLint(BaseTest):
 
         # config service can't be bothered to update their sdk correctly
         invalid_ignore = {
-            'AWS::ECS::Service',
-            'AWS::ECS::TaskDefinition',
-            'AWS::NetworkFirewall::Firewall',
+            'AWS::Config::ConfigurationRecorder',
+            'AWS::SageMaker::NotebookInstance',
+            'AWS::SageMaker::EndpointConfig',
+            'AWS::DMS::ReplicationInstance',
             'AWS::DMS::ReplicationTask',
         }
         bad_types = resource_config_types.difference(config_types)
