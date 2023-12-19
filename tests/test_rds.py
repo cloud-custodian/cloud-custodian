@@ -942,6 +942,13 @@ class RDSTest(BaseTest):
                     },
                     {
                         "type": "pending-maintenance"
+                    },
+                    {
+                        "type": "value",
+                        "key": '"c7n:PendingMaintenance"[].PendingMaintenanceActionDetails['
+                               '].Action',
+                        "op": "intersect",
+                        "value": ["system-update"]
                     }
                 ],
             },
