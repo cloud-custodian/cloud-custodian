@@ -3660,6 +3660,7 @@ class BucketLock(BucketFilterBase, ValueFilter):
     """
 
     lock_annotation = 'c7n:LockConfiguration'
+    permissions = ('s3:GetBucketObjectLockConfiguration',)
 
     def process_bucket(self, bucket):
         s3 = bucket_client(local_session(self.manager.session_factory, bucket))
