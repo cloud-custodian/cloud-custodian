@@ -686,6 +686,23 @@ format = ["fqdn", "idna", "isoduration", "jsonpointer (>1.13)", "rfc3339-validat
 format-nongpl = ["fqdn", "idna", "isoduration", "jsonpointer (>1.13)", "rfc3339-validator", "rfc3986-validator (>0.1.0)", "uri-template", "webcolors (>=1.11)"]
 
 [[package]]
+name = "jsonschema-path"
+version = "0.3.2"
+description = "JSONSchema Spec with object-oriented paths"
+optional = false
+python-versions = ">=3.8.0,<4.0.0"
+files = [
+    {file = "jsonschema_path-0.3.2-py3-none-any.whl", hash = "sha256:271aedfefcd161a0f467bdf23e1d9183691a61eaabf4b761046a914e369336c7"},
+    {file = "jsonschema_path-0.3.2.tar.gz", hash = "sha256:4d0dababf341e36e9b91a5fb2a3e3fd300b0150e7fe88df4e55cc8253c5a3989"},
+]
+
+[package.dependencies]
+pathable = ">=0.4.1,<0.5.0"
+PyYAML = ">=5.1"
+referencing = ">=0.28.0,<0.32.0"
+requests = ">=2.31.0,<3.0.0"
+
+[[package]]
 name = "jsonschema-specifications"
 version = "2023.11.2"
 description = "The JSON Schema meta-schemas and vocabularies, exposed as a Registry"
@@ -723,6 +740,52 @@ SecretStorage = {version = ">=3.2", markers = "sys_platform == \"linux\""}
 completion = ["shtab (>=1.1.0)"]
 docs = ["furo", "jaraco.packaging (>=9.3)", "jaraco.tidelift (>=1.4)", "rst.linker (>=1.9)", "sphinx (<7.2.5)", "sphinx (>=3.5)", "sphinx-lint"]
 testing = ["pytest (>=6)", "pytest-black (>=0.3.7)", "pytest-checkdocs (>=2.4)", "pytest-cov", "pytest-enabler (>=2.2)", "pytest-mypy (>=0.9.1)", "pytest-ruff"]
+
+[[package]]
+name = "lazy-object-proxy"
+version = "1.10.0"
+description = "A fast and thorough lazy object proxy."
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "lazy-object-proxy-1.10.0.tar.gz", hash = "sha256:78247b6d45f43a52ef35c25b5581459e85117225408a4128a3daf8bf9648ac69"},
+    {file = "lazy_object_proxy-1.10.0-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:855e068b0358ab916454464a884779c7ffa312b8925c6f7401e952dcf3b89977"},
+    {file = "lazy_object_proxy-1.10.0-cp310-cp310-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:7ab7004cf2e59f7c2e4345604a3e6ea0d92ac44e1c2375527d56492014e690c3"},
+    {file = "lazy_object_proxy-1.10.0-cp310-cp310-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:dc0d2fc424e54c70c4bc06787e4072c4f3b1aa2f897dfdc34ce1013cf3ceef05"},
+    {file = "lazy_object_proxy-1.10.0-cp310-cp310-musllinux_1_1_aarch64.whl", hash = "sha256:e2adb09778797da09d2b5ebdbceebf7dd32e2c96f79da9052b2e87b6ea495895"},
+    {file = "lazy_object_proxy-1.10.0-cp310-cp310-musllinux_1_1_x86_64.whl", hash = "sha256:b1f711e2c6dcd4edd372cf5dec5c5a30d23bba06ee012093267b3376c079ec83"},
+    {file = "lazy_object_proxy-1.10.0-cp310-cp310-win32.whl", hash = "sha256:76a095cfe6045c7d0ca77db9934e8f7b71b14645f0094ffcd842349ada5c5fb9"},
+    {file = "lazy_object_proxy-1.10.0-cp310-cp310-win_amd64.whl", hash = "sha256:b4f87d4ed9064b2628da63830986c3d2dca7501e6018347798313fcf028e2fd4"},
+    {file = "lazy_object_proxy-1.10.0-cp311-cp311-macosx_10_9_x86_64.whl", hash = "sha256:fec03caabbc6b59ea4a638bee5fce7117be8e99a4103d9d5ad77f15d6f81020c"},
+    {file = "lazy_object_proxy-1.10.0-cp311-cp311-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:02c83f957782cbbe8136bee26416686a6ae998c7b6191711a04da776dc9e47d4"},
+    {file = "lazy_object_proxy-1.10.0-cp311-cp311-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:009e6bb1f1935a62889ddc8541514b6a9e1fcf302667dcb049a0be5c8f613e56"},
+    {file = "lazy_object_proxy-1.10.0-cp311-cp311-musllinux_1_1_aarch64.whl", hash = "sha256:75fc59fc450050b1b3c203c35020bc41bd2695ed692a392924c6ce180c6f1dc9"},
+    {file = "lazy_object_proxy-1.10.0-cp311-cp311-musllinux_1_1_x86_64.whl", hash = "sha256:782e2c9b2aab1708ffb07d4bf377d12901d7a1d99e5e410d648d892f8967ab1f"},
+    {file = "lazy_object_proxy-1.10.0-cp311-cp311-win32.whl", hash = "sha256:edb45bb8278574710e68a6b021599a10ce730d156e5b254941754a9cc0b17d03"},
+    {file = "lazy_object_proxy-1.10.0-cp311-cp311-win_amd64.whl", hash = "sha256:e271058822765ad5e3bca7f05f2ace0de58a3f4e62045a8c90a0dfd2f8ad8cc6"},
+    {file = "lazy_object_proxy-1.10.0-cp312-cp312-macosx_10_9_x86_64.whl", hash = "sha256:e98c8af98d5707dcdecc9ab0863c0ea6e88545d42ca7c3feffb6b4d1e370c7ba"},
+    {file = "lazy_object_proxy-1.10.0-cp312-cp312-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:952c81d415b9b80ea261d2372d2a4a2332a3890c2b83e0535f263ddfe43f0d43"},
+    {file = "lazy_object_proxy-1.10.0-cp312-cp312-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:80b39d3a151309efc8cc48675918891b865bdf742a8616a337cb0090791a0de9"},
+    {file = "lazy_object_proxy-1.10.0-cp312-cp312-musllinux_1_1_aarch64.whl", hash = "sha256:e221060b701e2aa2ea991542900dd13907a5c90fa80e199dbf5a03359019e7a3"},
+    {file = "lazy_object_proxy-1.10.0-cp312-cp312-musllinux_1_1_x86_64.whl", hash = "sha256:92f09ff65ecff3108e56526f9e2481b8116c0b9e1425325e13245abfd79bdb1b"},
+    {file = "lazy_object_proxy-1.10.0-cp312-cp312-win32.whl", hash = "sha256:3ad54b9ddbe20ae9f7c1b29e52f123120772b06dbb18ec6be9101369d63a4074"},
+    {file = "lazy_object_proxy-1.10.0-cp312-cp312-win_amd64.whl", hash = "sha256:127a789c75151db6af398b8972178afe6bda7d6f68730c057fbbc2e96b08d282"},
+    {file = "lazy_object_proxy-1.10.0-cp38-cp38-macosx_10_9_x86_64.whl", hash = "sha256:9e4ed0518a14dd26092614412936920ad081a424bdcb54cc13349a8e2c6d106a"},
+    {file = "lazy_object_proxy-1.10.0-cp38-cp38-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:5ad9e6ed739285919aa9661a5bbed0aaf410aa60231373c5579c6b4801bd883c"},
+    {file = "lazy_object_proxy-1.10.0-cp38-cp38-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:2fc0a92c02fa1ca1e84fc60fa258458e5bf89d90a1ddaeb8ed9cc3147f417255"},
+    {file = "lazy_object_proxy-1.10.0-cp38-cp38-musllinux_1_1_aarch64.whl", hash = "sha256:0aefc7591920bbd360d57ea03c995cebc204b424524a5bd78406f6e1b8b2a5d8"},
+    {file = "lazy_object_proxy-1.10.0-cp38-cp38-musllinux_1_1_x86_64.whl", hash = "sha256:5faf03a7d8942bb4476e3b62fd0f4cf94eaf4618e304a19865abf89a35c0bbee"},
+    {file = "lazy_object_proxy-1.10.0-cp38-cp38-win32.whl", hash = "sha256:e333e2324307a7b5d86adfa835bb500ee70bfcd1447384a822e96495796b0ca4"},
+    {file = "lazy_object_proxy-1.10.0-cp38-cp38-win_amd64.whl", hash = "sha256:cb73507defd385b7705c599a94474b1d5222a508e502553ef94114a143ec6696"},
+    {file = "lazy_object_proxy-1.10.0-cp39-cp39-macosx_10_9_x86_64.whl", hash = "sha256:366c32fe5355ef5fc8a232c5436f4cc66e9d3e8967c01fb2e6302fd6627e3d94"},
+    {file = "lazy_object_proxy-1.10.0-cp39-cp39-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:2297f08f08a2bb0d32a4265e98a006643cd7233fb7983032bd61ac7a02956b3b"},
+    {file = "lazy_object_proxy-1.10.0-cp39-cp39-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:18dd842b49456aaa9a7cf535b04ca4571a302ff72ed8740d06b5adcd41fe0757"},
+    {file = "lazy_object_proxy-1.10.0-cp39-cp39-musllinux_1_1_aarch64.whl", hash = "sha256:217138197c170a2a74ca0e05bddcd5f1796c735c37d0eee33e43259b192aa424"},
+    {file = "lazy_object_proxy-1.10.0-cp39-cp39-musllinux_1_1_x86_64.whl", hash = "sha256:9a3a87cf1e133e5b1994144c12ca4aa3d9698517fe1e2ca82977781b16955658"},
+    {file = "lazy_object_proxy-1.10.0-cp39-cp39-win32.whl", hash = "sha256:30b339b2a743c5288405aa79a69e706a06e02958eab31859f7f3c04980853b70"},
+    {file = "lazy_object_proxy-1.10.0-cp39-cp39-win_amd64.whl", hash = "sha256:a899b10e17743683b293a729d3a11f2f399e8a90c73b089e29f5d0fe3509f0dd"},
+    {file = "lazy_object_proxy-1.10.0-pp310.pp311.pp312.pp38.pp39-none-any.whl", hash = "sha256:80fa48bd89c8f2f456fc0765c11c23bf5af827febacd2f523ca5bc1893fcc09d"},
+]
 
 [[package]]
 name = "markupsafe"
@@ -963,6 +1026,40 @@ files = [
 ]
 
 [[package]]
+name = "openapi-schema-validator"
+version = "0.6.2"
+description = "OpenAPI schema validation for Python"
+optional = false
+python-versions = ">=3.8.0,<4.0.0"
+files = [
+    {file = "openapi_schema_validator-0.6.2-py3-none-any.whl", hash = "sha256:c4887c1347c669eb7cded9090f4438b710845cd0f90d1fb9e1b3303fb37339f8"},
+    {file = "openapi_schema_validator-0.6.2.tar.gz", hash = "sha256:11a95c9c9017912964e3e5f2545a5b11c3814880681fcacfb73b1759bb4f2804"},
+]
+
+[package.dependencies]
+jsonschema = ">=4.19.1,<5.0.0"
+jsonschema-specifications = ">=2023.5.2,<2024.0.0"
+rfc3339-validator = "*"
+
+[[package]]
+name = "openapi-spec-validator"
+version = "0.7.1"
+description = "OpenAPI 2.0 (aka Swagger) and OpenAPI 3 spec validator"
+optional = false
+python-versions = ">=3.8.0,<4.0.0"
+files = [
+    {file = "openapi_spec_validator-0.7.1-py3-none-any.whl", hash = "sha256:3c81825043f24ccbcd2f4b149b11e8231abce5ba84f37065e14ec947d8f4e959"},
+    {file = "openapi_spec_validator-0.7.1.tar.gz", hash = "sha256:8577b85a8268685da6f8aa30990b83b7960d4d1117e901d451b5d572605e5ec7"},
+]
+
+[package.dependencies]
+importlib-resources = {version = ">=5.8,<7.0", markers = "python_version < \"3.9\""}
+jsonschema = ">=4.18.0,<5.0.0"
+jsonschema-path = ">=0.3.1,<0.4.0"
+lazy-object-proxy = ">=1.7.1,<2.0.0"
+openapi-schema-validator = ">=0.6.0,<0.7.0"
+
+[[package]]
 name = "packaging"
 version = "23.2"
 description = "Core utilities for Python packages"
@@ -971,6 +1068,17 @@ python-versions = ">=3.7"
 files = [
     {file = "packaging-23.2-py3-none-any.whl", hash = "sha256:8c491190033a9af7e1d931d0b5dacc2ef47509b34dd0de67ed209b5203fc88c7"},
     {file = "packaging-23.2.tar.gz", hash = "sha256:048fb0e9405036518eaaf48a55953c750c11e1a1b68e0dd1a9d62ed0c092cfc5"},
+]
+
+[[package]]
+name = "pathable"
+version = "0.4.3"
+description = "Object-oriented paths"
+optional = false
+python-versions = ">=3.7.0,<4.0.0"
+files = [
+    {file = "pathable-0.4.3-py3-none-any.whl", hash = "sha256:cdd7b1f9d7d5c8b8d3315dbf5a86b2596053ae845f056f57d97c0eefff84da14"},
+    {file = "pathable-0.4.3.tar.gz", hash = "sha256:5c869d315be50776cc8a993f3af43e0c60dc01506b399643f919034ebf4cdcab"},
 ]
 
 [[package]]
@@ -1352,13 +1460,13 @@ md = ["cmarkgfm (>=0.8.0)"]
 
 [[package]]
 name = "referencing"
-version = "0.32.0"
+version = "0.31.1"
 description = "JSON Referencing + Python"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "referencing-0.32.0-py3-none-any.whl", hash = "sha256:bdcd3efb936f82ff86f993093f6da7435c7de69a3b3a5a06678a6050184bee99"},
-    {file = "referencing-0.32.0.tar.gz", hash = "sha256:689e64fe121843dcfd57b71933318ef1f91188ffb45367332700a86ac8fd6161"},
+    {file = "referencing-0.31.1-py3-none-any.whl", hash = "sha256:c19c4d006f1757e3dd75c4f784d38f8698d87b649c54f9ace14e5e8c9667c01d"},
+    {file = "referencing-0.31.1.tar.gz", hash = "sha256:81a1471c68c9d5e3831c30ad1dd9815c45b558e596653db751a2bfdd17b3b9ec"},
 ]
 
 [package.dependencies]
@@ -1418,6 +1526,20 @@ urllib3 = ">=1.25.10,<3.0"
 
 [package.extras]
 tests = ["coverage (>=6.0.0)", "flake8", "mypy", "pytest (>=7.0.0)", "pytest-asyncio", "pytest-cov", "pytest-httpserver", "tomli", "tomli-w", "types-PyYAML", "types-requests"]
+
+[[package]]
+name = "rfc3339-validator"
+version = "0.1.4"
+description = "A pure python RFC3339 validator"
+optional = false
+python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
+files = [
+    {file = "rfc3339_validator-0.1.4-py2.py3-none-any.whl", hash = "sha256:24f6ec1eda14ef823da9e36ec7113124b39c04d50a4d3d3a3c2859577e7791fa"},
+    {file = "rfc3339_validator-0.1.4.tar.gz", hash = "sha256:138a2abdf93304ad60530167e51d2dfb9549521a836871b88d7f4695d0022f6b"},
+]
+
+[package.dependencies]
+six = "*"
 
 [[package]]
 name = "rfc3986"
@@ -1980,4 +2102,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "c6b235fca3550251c19b282e3305e36ac8c89ede9457bf1509d333dff858d07b"
+content-hash = "18d7ebf0a6634a785f6fba09227ab5568f5a568bbe54e5fd10ccc51dc7ba19be"
