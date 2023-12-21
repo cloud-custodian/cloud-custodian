@@ -42,17 +42,14 @@ class CostHubRecommendation(Filter):
             'items': {'enum': ['VeryLow', 'Low', 'Medium', 'High', 'VeryHigh']},
         },
         action={
-            'type': 'array',
-            'items': {
-                'enum': [
-                    'Rightsize',
-                    'Stop',
-                    'Upgrade',
-                    'PurchaseSavingsPlans',
-                    'PurchaseReservedInstances',
-                    'MigrateToGraviton',
-                ]
-            },
+            'enum': [
+                'Rightsize',
+                'Stop',
+                'Upgrade',
+                'PurchaseSavingsPlans',
+                'PurchaseReservedInstances',
+                'MigrateToGraviton',
+            ]
         },
         attrs={'$ref': '#/definitions/filters_common/list_item_attrs'},
     )
@@ -64,11 +61,11 @@ class CostHubRecommendation(Filter):
         'ecs-service': 'EcsService',
         'asg': 'Ec2AutoScalingGroup',
     }
-    default_actions = {
-        'ec2': ['Rightsize', 'MigrateToGraviton', 'Stop'],
-        'ebs': ['Upgrade'],
-        'ecs-service': ['Rightsize', 'Stop'],
-        'lambda': ['Rightsize'],
+    default_action = {
+        'ec2': 'Rightsize',
+        'ebs': 'Upgrade',
+        'ecs-service': 'Rightsize',
+        'lambda': 'Rightsize',
     }
 
     permissions = ('cost-optimization-hub:ListRecommendations',)
@@ -78,10 +75,11 @@ class CostHubRecommendation(Filter):
         client = local_session(self.manager.session_factory).client('cost-optimization-hub')
         id_field = self.manager.resource_type.id
         filter_params = filter_empty({
-            'actionTypes': (
-                self.manager.data.get('action') and [self.manager.data.get('action')]
-                or self.default_actions.get(self.manager.type)
-            ),
+            'actionTypes': [
+                self.manager.data.get(
+                    'action', self.default_action[self.manager.type]
+                )
+            ],
             'regions': [self.manager.config.region] or None,
             'resourceTypes': [self.resource_type_map[self.manager.type]],
         })
@@ -101,7 +99,7 @@ class CostHubRecommendation(Filter):
             if not frm.filter_resources([rec], event):
                 continue
             r = r_map[rec['resourceId']]
-            r.setdefault(self.annotation, []).append(rec)
+            r[self.annotation] = rec
             results.add(rec['resourceId'])
         return [r for rid, r in r_map.items() if rid in results]
 
