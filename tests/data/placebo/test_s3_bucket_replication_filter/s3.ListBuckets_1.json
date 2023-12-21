@@ -1,0 +1,38 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Buckets": [
+            {
+                "Name": "custodian-replication-test-1",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 7,
+                    "day": 31,
+                    "hour": 21,
+                    "minute": 29,
+                    "second": 35,
+                    "microsecond": 0
+                }
+            },
+            {
+                "Name": "custodian-replication-west",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 7,
+                    "day": 31,
+                    "hour": 21,
+                    "minute": 30,
+                    "second": 9,
+                    "microsecond": 0
+                }
+            }
+        ],
+        "Owner": {
+            "DisplayName": "jerryhxu",
+            "ID": "3f7350bf5d3dab59930bea77eec4aeb7790ca043fbc1891bbabb70df0c63ff01"
+        }
+    }
+}

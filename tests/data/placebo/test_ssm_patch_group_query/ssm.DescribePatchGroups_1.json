@@ -1,0 +1,17 @@
+{
+    "status_code": 200,
+    "data": {
+        "Mappings": [
+            {
+                "PatchGroup": "patch-group-name",
+                "BaselineIdentity": {
+                    "BaselineId": "pb-0471366f0ea83647e",
+                    "BaselineName": "patch-baseline",
+                    "OperatingSystem": "WINDOWS",
+                    "DefaultBaseline": false
+                }
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

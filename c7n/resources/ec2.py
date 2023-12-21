@@ -7,7 +7,7 @@ import random
 import re
 import zlib
 from typing import List
-from distutils.version import LooseVersion
+from c7n.vendored.distutils.version import LooseVersion
 
 import botocore
 from botocore.exceptions import ClientError
@@ -20,7 +20,7 @@ from c7n.actions import (
 
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import (
-    FilterRegistry, AgeFilter, ValueFilter, Filter, DefaultVpcBase
+    FilterRegistry, AgeFilter, ValueFilter, Filter
 )
 from c7n.filters.offhours import OffHour, OnHour
 import c7n.filters.vpc as net_filters
@@ -40,6 +40,22 @@ actions = ActionRegistry('ec2.actions')
 
 
 class DescribeEC2(query.DescribeSource):
+
+    def get_query_params(self, query_params):
+        queries = QueryFilter.parse(self.manager.data.get('query', []))
+        qf = []
+        for q in queries:
+            qd = q.query()
+            found = False
+            for f in qf:
+                if qd['Name'] == f['Name']:
+                    f['Values'].extend(qd['Values'])
+                    found = True
+            if not found:
+                qf.append(qd)
+        query_params = query_params or {}
+        query_params['Filters'] = qf
+        return query_params
 
     def augment(self, resources):
         """EC2 API and AWOL Tags
@@ -90,7 +106,7 @@ class DescribeEC2(query.DescribeSource):
 
         m = self.manager.get_model()
         for r in resources:
-            r['Tags'] = resource_tags.get(r[m.id], ())
+            r['Tags'] = resource_tags.get(r[m.id], [])
         return resources
 
 
@@ -130,38 +146,11 @@ class EC2(query.QueryResourceManager):
         'config': query.ConfigSource
     }
 
-    def __init__(self, ctx, data):
-        super(EC2, self).__init__(ctx, data)
-        self.queries = QueryFilter.parse(self.data.get('query', []))
-
-    def resources(self, query=None):
-        q = self.resource_query()
-        if q is not None:
-            query = query or {}
-            query['Filters'] = q
-        return super(EC2, self).resources(query=query)
-
-    def resource_query(self):
-        qf = []
-        qf_names = set()
-        # allow same name to be specified multiple times and append the queries
-        # under the same name
-        for q in self.queries:
-            qd = q.query()
-            if qd['Name'] in qf_names:
-                for qf in qf:
-                    if qd['Name'] == qf['Name']:
-                        qf['Values'].extend(qd['Values'])
-            else:
-                qf_names.add(qd['Name'])
-                qf.append(qd)
-        return qf
-
 
 @filters.register('security-group')
 class SecurityGroupFilter(net_filters.SecurityGroupFilter):
 
-    RelatedIdsExpression = "SecurityGroups[].GroupId"
+    RelatedIdsExpression = "NetworkInterfaces[].Groups[].GroupId"
 
 
 @filters.register('subnet')
@@ -733,7 +722,7 @@ class InstanceAgeFilter(AgeFilter):
 
 
 @filters.register('default-vpc')
-class DefaultVpc(DefaultVpcBase):
+class DefaultVpc(net_filters.DefaultVpcBase):
     """ Matches if an ec2 database is in the default vpc
     """
 
@@ -2218,6 +2207,7 @@ class LaunchTemplate(query.QueryResourceManager):
         filter_name = 'LaunchTemplateIds'
         filter_type = 'list'
         arn_type = "launch-template"
+        cfn_type = "AWS::EC2::LaunchTemplate"
 
     def augment(self, resources):
         client = utils.local_session(
@@ -2229,6 +2219,12 @@ class LaunchTemplate(query.QueryResourceManager):
                     LaunchTemplateId=r['LaunchTemplateId']).get(
                         'LaunchTemplateVersions', ()))
         return template_versions
+
+    def get_arns(self, resources):
+        arns = []
+        for r in resources:
+            arns.append(self.generate_arn(f"{r['LaunchTemplateId']}/{r['VersionNumber']}"))
+        return arns
 
     def get_resources(self, rids, cache=True):
         # Launch template versions have a compound primary key
@@ -2345,7 +2341,7 @@ class SpotFleetRequest(query.QueryResourceManager):
         filter_type = 'list'
         date = 'CreateTime'
         arn_type = 'spot-fleet-request'
-        cfn_type = 'AWS::EC2::SpotFleet'
+        config_type = cfn_type = 'AWS::EC2::SpotFleet'
         permissions_enum = ('ec2:DescribeSpotFleetRequests',)
 
 
@@ -2478,3 +2474,22 @@ class HasSpecificManagedPolicy(SpecificIamProfileManagedPolicy):
                 results.append(r)
 
         return results
+
+
+@resources.register('ec2-capacity-reservation')
+class CapacityReservation(query.QueryResourceManager):
+    """Custodian resource for managing EC2 Capacity Reservation.
+    """
+
+    class resource_type(query.TypeInfo):
+        name = id = 'CapacityReservationId'
+        service = 'ec2'
+        enum_spec = ('describe_capacity_reservations',
+                     'CapacityReservations', None)
+
+        id_prefix = 'cr-'
+        arn = "CapacityReservationArn"
+        filter_name = 'CapacityReservationIds'
+        filter_type = 'list'
+        cfn_type = 'AWS::EC2::CapacityReservation'
+        permissions_enum = ('ec2:DescribeCapacityReservations',)

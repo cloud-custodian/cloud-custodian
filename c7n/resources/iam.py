@@ -454,6 +454,7 @@ class ServerCertificate(QueryResourceManager):
                      'ServerCertificateMetadataList',
                      None)
         name = id = 'ServerCertificateName'
+        config_type = "AWS::IAM::ServerCertificate"
         name = 'ServerCertificateName'
         date = 'Expiration'
         # Denotes this resource type exists across regions
@@ -726,6 +727,8 @@ class CheckPermissions(Filter):
             else:
                 evaluations = self.get_evaluations(client, arn, r, actions)
                 eval_cache[arn] = evaluations
+            if not evaluations:
+                continue
             matches = []
             matched = []
             for e in evaluations:
@@ -2955,6 +2958,7 @@ class SamlProvider(QueryResourceManager):
         detail_spec = ('get_saml_provider', 'SAMLProviderArn', 'Arn', None)
         arn = 'Arn'
         arn_type = 'saml-provider'
+        config_type = "AWS::IAM::SAMLProvider"
         global_resource = True
 
     source_mapping = {'describe': SamlProviderDescribe}
@@ -2980,6 +2984,42 @@ class OpenIdProvider(QueryResourceManager):
         global_resource = True
 
     source_mapping = {'describe': OpenIdDescribe}
+
+
+@OpenIdProvider.action_registry.register('delete')
+class OpenIdProviderDelete(BaseAction):
+    """Delete an OpenID Connect IAM Identity Provider
+
+    For example, if you want to automatically delete an OIDC IdP for example.com
+
+    :example:
+
+      .. code-block:: yaml
+
+        - name: aws-iam-oidc-provider-delete
+          resource: iam-oidc-provider
+          filters:
+            - type: value
+              key: Url
+              value: example.com
+          actions:
+            - type: delete
+
+    """
+    schema = type_schema('delete')
+    permissions = ('iam:DeleteOpenIDConnectProvider',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('iam')
+        for provider in resources:
+            self.manager.retry(
+                client.delete_open_id_connect_provider,
+                OpenIDConnectProviderArn=provider['Arn'],
+                ignore_err_codes=(
+                    'NoSuchEntityException',
+                    'DeleteConflictException',
+                ),
+            )
 
 
 @InstanceProfile.filter_registry.register('has-specific-managed-policy')

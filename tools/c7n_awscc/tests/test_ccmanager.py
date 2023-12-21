@@ -11,12 +11,22 @@ def test_init_resource_access_analyzer():
 
 
 def test_update_schema():
-    klass = initialize_resource("eks_cluster")["EksCluster"]
-    update_schema = get_update_schema(klass.schema, "eks_cluster")
-    assert set(update_schema["properties"]) == {
+    klass = initialize_resource("sqs_queue")["SqsQueue"]
+    update_schema = get_update_schema(klass.schema, "sqs_queue")
+    assert set(update_schema["properties"]) >= {
+        "ContentBasedDeduplication",
+        "DeduplicationScope",
+        "DelaySeconds",
+        "FifoThroughputLimit",
+        "KmsDataKeyReusePeriodSeconds",
+        "KmsMasterKeyId",
+        "MaximumMessageSize",
+        "MessageRetentionPeriod",
+        "ReceiveMessageWaitTimeSeconds",
+        "RedriveAllowPolicy",
+        "RedrivePolicy",
+        "SqsManagedSseEnabled",
         "Tags",
-        "Version",
-        "ResourcesVpcConfig",
-        "Logging",
+        "VisibilityTimeout",
         "type",
     }

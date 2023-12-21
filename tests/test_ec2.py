@@ -2,11 +2,12 @@
 # SPDX-License-Identifier: Apache-2.0
 import logging
 import unittest
+from unittest import mock
 import time
 
 import datetime
 from dateutil import tz
-from mock import mock
+
 
 from c7n.testing import mock_datetime_now
 from c7n.exceptions import PolicyValidationError, ClientError
@@ -291,6 +292,28 @@ class TestMetricFilter(BaseTest):
                         "name": "CPUUtilization",
                         "days": 3,
                         "value": 1.5,
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = policy.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_metric_filter_multiple_datapoints(self):
+        session_factory = self.replay_flight_data("test_metric_filter_multiple_datapoints")
+        policy = self.load_policy(
+            {
+                "name": "ec2-utilization-per-day",
+                "resource": "ec2",
+                "filters": [
+                    {
+                        "type": "metrics",
+                        "name": "CPUUtilization",
+                        "days": 3,
+                        "period": 86400,
+                        "value": 1,
+                        "op": "lte"
                     }
                 ],
             },
@@ -2166,6 +2189,10 @@ class TestLaunchTemplate(BaseTest):
         resources = p.resource_manager.get_resources([
             'lt-00b3b2755218e3fdd'])
         self.assertEqual(len(resources), 4)
+        self.assertIn(
+            'arn:aws:ec2:us-east-1:644160558196:launch-template/lt-00b3b2755218e3fdd/4',
+            p.resource_manager.get_arns(resources)
+        )
 
     def test_launch_template_versions(self):
         factory = self.replay_flight_data('test_launch_template_query')
@@ -2354,3 +2381,19 @@ class TestEc2HasSpecificManagedPolicyFilter(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
+
+class TestCapacityReservation(BaseTest):
+
+    def test_capacity_reservation_query(self):
+        factory = self.replay_flight_data('test_ec2_capacity_reservation_query')
+        p = self.load_policy(
+                {
+                    'name': 'list-ec2-capacity-reservation',
+                    'resource': 'aws.ec2-capacity-reservation'
+                },
+                session_factory=factory,
+                config={'region': 'ap-southeast-1'}
+            )
+        resources = p.run()
+        self.assertEqual(len(resources), 2)

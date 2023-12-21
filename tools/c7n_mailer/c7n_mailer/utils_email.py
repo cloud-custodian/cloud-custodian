@@ -119,7 +119,7 @@ def get_mimetext_message(config, logger, message, resources, to_addrs):
         subject=get_message_subject(message),
         from_addr=message["action"].get("from", config["from_address"]),
         to_addrs=to_addrs,
-        # FIXME cc has been processed and enhanced in get_email_to_addrs_to_resources_map
+        # FIXME cc has been processed and enhanced in get_emails_to_resources_map
         cc_addrs=message["action"].get("cc", []),
         additional_headers=config.get("additional_email_headers", {}),
         priority=message["action"].get("priority_header", None),

@@ -1,20 +1,20 @@
 {
     "status_code": 200, 
     "data": {
-        "VpcId": "vpc-d2d616b5", 
+        "VpcId": "vpc-f1516b97", 
         "ResponseMetadata": {
             "RetryAttempts": 0, 
             "HTTPStatusCode": 200, 
-            "RequestId": "911d83c6-f472-4c84-830f-734941fe819b", 
+            "RequestId": "e53f4689-2fe7-421d-a553-2540ab982ccf", 
             "HTTPHeaders": {
                 "transfer-encoding": "chunked", 
                 "vary": "Accept-Encoding", 
                 "server": "AmazonEC2", 
                 "content-type": "text/xml;charset=UTF-8", 
-                "date": "Fri, 22 Dec 2017 16:16:41 GMT"
+                "date": "Fri, 22 Dec 2017 16:16:40 GMT"
             }
         }, 
-        "EnableDnsHostnames": {
+        "EnableDnsSupport": {
             "Value": true
         }
     }

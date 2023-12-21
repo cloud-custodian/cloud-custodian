@@ -1,7 +1,7 @@
 {
     "status_code": 200,
     "data": {
-        "JobName": "testjob2",
+        "JobName": "test-job-3",
         "ResponseMetadata": {}
     }
 }
