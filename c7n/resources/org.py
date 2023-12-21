@@ -109,7 +109,7 @@ class OrgPolicy(QueryResourceManager, OrgAccess):
 
 
 @AWS.resources.register("org-account")
-class OrgAccount(QueryResourceManager):
+class OrgAccount(QueryResourceManager, OrgAccess):
 
     class resource_type(TypeInfo):
         service = "organizations"
