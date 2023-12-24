@@ -173,7 +173,7 @@ class TestClient:
 
     def test_tc_client_profile_session(self):
         profile = 'default'
-        cred_path = './data/credentials'
+        cred_path = os.path.join(os.path.dirname(__file__), 'data', 'credentials')
 
         session = Session(profile=profile, cred_path=cred_path)
         assert session.secret_key == '111'
