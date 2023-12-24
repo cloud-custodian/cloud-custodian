@@ -792,13 +792,13 @@ requests = ">=2.16.0"
 
 [[package]]
 name = "tencentcloud-sdk-python-ext"
-version = "0.1.3"
+version = "0.1.4"
 description = "腾讯云Python Sdk 插件"
 optional = false
 python-versions = ">=3.7,<4.0"
 files = [
-    {file = "tencentcloud_sdk_python_ext-0.1.3-py3-none-any.whl", hash = "sha256:41eed5fd5de832707181b646dde5b31f91671456d59e1bd477a1b980c81b22ee"},
-    {file = "tencentcloud_sdk_python_ext-0.1.3.tar.gz", hash = "sha256:3c47a444bce89e2783d496f43120d8aad337e015dc0fec75c44946f06a5d2e3d"},
+    {file = "tencentcloud_sdk_python_ext-0.1.4-py3-none-any.whl", hash = "sha256:44adc1d5f9d63acd6ef6dde2a1533c33781b98d4cab0fb14412becf1fb73e1ba"},
+    {file = "tencentcloud_sdk_python_ext-0.1.4.tar.gz", hash = "sha256:5e8d5e20d934e6504c5870992a9d00edc970602acc2961582eb2fd5752e75c26"},
 ]
 
 [package.dependencies]
