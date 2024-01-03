@@ -13,25 +13,16 @@ from c7n.executor import MainThreadExecutor
 from c7n.filters import Filter
 from c7n.query import QueryResourceManager, TypeInfo
 from c7n.resources.aws import AWS
+from c7n.tags import universal_augment
 from c7n.utils import local_session, type_schema
 
 
 log = logging.getLogger("custodian.org-accounts")
 
-
 ORG_ACCOUNT_SESSION_NAME = "CustodianOrgAccount"
 
 
-def org_augment_tags(manager, resources):
-    client = local_session(manager.session_factory).client('organizations')
-    for r in resources:
-        r["Tags"] = client.list_tags_for_resource(
-            ResourceId=r["Id"]).get("Tags", [])
-    return resources
-
-
 class OrgAccess:
-
     org_session = None
 
     def parse_access_role(self):
@@ -64,7 +55,6 @@ class OrgAccess:
         return self.org_session
 
 
-
 @AWS.resources.register("org-policy")
 class OrgPolicy(QueryResourceManager, OrgAccess):
     policy_types = (
@@ -83,6 +73,7 @@ class OrgPolicy(QueryResourceManager, OrgAccess):
         enum_spec = ("list_policies", "Policies", None)
         global_resource = True
         permissions_augment = ("organizations:ListTagsForResource",)
+        universal_augment = object()
 
     def resources(self, query=None):
         q = self.parse_query()
@@ -93,7 +84,7 @@ class OrgPolicy(QueryResourceManager, OrgAccess):
         return super().resources(query=query)
 
     def augment(self, resources):
-        return org_augment_tags(self, resources)
+        return universal_augment(self, resources)
 
     def parse_query(self, query=None):
         params = {}
@@ -107,7 +98,6 @@ class OrgPolicy(QueryResourceManager, OrgAccess):
 
 @AWS.resources.register("org-account")
 class OrgAccount(QueryResourceManager, OrgAccess):
-
     class resource_type(TypeInfo):
         service = "organizations"
         id = "Id"
@@ -117,12 +107,13 @@ class OrgAccount(QueryResourceManager, OrgAccess):
         enum_spec = ("list_accounts", "Accounts", None)
         global_resource = True
         permissions_augment = ("organizations:ListTagsForResource",)
+        universal_augment = object()
 
-    executor_factory = MainThreadExecutor
+    # executor_factory = MainThreadExecutor
     org_session = None
 
     def augment(self, resources):
-        return org_augment_tags(self, resources)
+        return universal_augment(self, resources)
 
     def validate(self):
         self.parse_query()

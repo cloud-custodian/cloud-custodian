@@ -64,7 +64,7 @@ def org_tree(request):
         )
 
         account_c = client.create_account(
-            Email="b@example.com",
+            Email="c@example.com",
             AccountName="c",
             Tags=[{"Key": "Owner", "Value": "eve"}],
         )["CreateAccountStatus"]
@@ -74,17 +74,17 @@ def org_tree(request):
             SourceParentId=root["Id"],
             DestinationParentId=group_c["Id"],
         )
-
-        yield dict(
-            org=org,
-            dept_a=dept_a,
-            dept_b=dept_b,
-            group_c=group_c,
-            account_a=account_a,
-            account_b=account_b,
-            account_c=account_c,
-            root=root,
-        )
+        with moto.mock_resourcegroupstaggingapi():
+            yield dict(
+                org=org,
+                dept_a=dept_a,
+                dept_b=dept_b,
+                group_c=group_c,
+                account_a=account_a,
+                account_b=account_b,
+                account_c=account_c,
+                root=root,
+            )
 
 
 def test_org_account_ou_filter(test, org_tree):
@@ -115,7 +115,7 @@ def test_org_account_moto(test, org_tree):
         {
             "name": "accounts",
             "resource": "aws.org-account",
-            "filters": [{"tag:Owner": "eve"}],
+            "filters": [{"Email": "c@example.com"}],
         },
     )
     resources = p.run()

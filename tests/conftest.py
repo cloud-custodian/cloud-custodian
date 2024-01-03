@@ -49,8 +49,12 @@ class TerraformAWSRewriteHooks:
     """
     def pytest_terraform_modify_state(self, tfstate):
         """ Sanitize functional testing account data """
-        tfstate.update(re.sub(r'\b\d{12}\b', ACCOUNT_ID, str(tfstate)))
-
+        tfstate.update(
+            re.sub(
+                r'^o-[a-z0-9]{10,32}$', ORG_ID,
+                re.sub(r'\b\d{12}\b', ACCOUNT_ID, str(tfstate))
+            )
+        )
 
 class CustodianAWSTesting(PyTestUtils, PillTest):
     """Pytest AWS Testing Fixture
