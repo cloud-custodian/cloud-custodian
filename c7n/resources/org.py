@@ -38,10 +38,7 @@ class OrgAccess:
         params = {}
         for q in self.data.get("query", ()):
             params.update(q)
-        org_access = {
-            k: v for k, v in params.items() if k in ("org-access-role",)
-        }
-        return org_access.get('org-access-role')
+        return params.get("org-access-role")
 
     def get_org_session(self):
         # so we have to do a three way dance
