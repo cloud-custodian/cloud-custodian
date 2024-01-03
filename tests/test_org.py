@@ -112,7 +112,7 @@ def test_org_describe(test):
     )
     resources = p.run()
     assert len(resources) == 1
-    assert resources[0]['Tags'] == {'Key': 'i-am', 'Value': 'TheOriginalTim'}
+    assert resources[0]['Tags'] == [{'Key': 'i-am', 'Value': 'TheOriginalTim'}]
 
 def test_org_account_moto(test, org_tree):
     p = test.load_policy(
