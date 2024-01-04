@@ -1,7 +1,7 @@
 """
 AppMesh Communications
 """
-import logging
+from botocore.exceptions import ClientError
 
 from c7n import query
 from c7n.exceptions import PolicyExecutionError
@@ -11,12 +11,6 @@ from c7n.query import ChildResourceManager, QueryResourceManager, TypeInfo, \
 from c7n.utils import (
     local_session)
 
-#log = logging.getLogger('custodian.appmesh')
-#logging.getLogger('botocore.client').setLevel(logging.DEBUG)
-#logging.getLogger('botocore.endpoint').setLevel(logging.DEBUG)
-#logging.getLogger('botocore.parsers').setLevel(logging.DEBUG)
-
-
 @resources.register('appmesh-mesh')
 class AppmeshMesh(QueryResourceManager):
 
@@ -25,19 +19,42 @@ class AppmeshMesh(QueryResourceManager):
         service = 'appmesh'
         arn_type = "mesh"
 
+        # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-appmesh-virtualnode.html
+        cfn_type = config_type = 'AWS::AppMesh::Mesh'
+
         # field in response containing the identifier
         # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-appmesh-mesh.html
         id = name = 'meshName'
 
-        # this defines the boto3 call for the resource as well as JMESPATH
-        # for accessing TL resources
-        # https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/appmesh/client/list_meshes.html
-        # enum_op - the aws api op
-        # path - path to the field in the response that is the collection of result objects
-        # extra_args - eg {'maxResults': 100}
+        # enum_spec defines the boto3 call used to find at least basic details all resources of the relevant type.
+        # the data per resource can be further enriched by a detail_spec function.
+        # enum_spec is also used when we've received an event in which case the results from enum_spec are filtered
+        # to include only those in the event.
+        #
+        # If the enum function chosen allows a filter param to be specified then the filtering can be done on the server
+        # side. For instance, ASG uses "describe_auto_scaling_groups" as the enum function and "AutoScalingGroupNames"
+        # as a filter param to that function to limit the server side work.
+        # However, it seems that most "cloud custodian" integrations do not use this approach.
+        # App mesh list_meshes doesn't support filtering.  ...
+        #     https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/appmesh/client/list_meshes.html
+        # and so when an event is received then the enum function gets called and the event id's get enriched.
+
+        # for example the specific identity found in an event. However, if the enum op doesn't support filtering
+        # then what will happen with events instead is a full list of resources followed by client side filtering.
+        # params:
+        #  enum_op - the aws api op
+        #  path - JMESPATH path to the field in the response that is the collection of result objects
+        #  extra_args - eg {'maxResults': 100}
+        #
         enum_spec = (
             'list_meshes', 'meshes', None
         )
+
+        # In many cases the enum_spec function is one of the "describe_" style functions that return a
+        # full'ish spec that is sufficient for the user detection, however in those cases where the enum_spec
+        # is a "list_" style funtion then the response to then enum call will be lacking in detail and might just be
+        # a list of id's. In these cases it is generally necessary to define a "detail_spec" which can be used to
+        # enrich the values provided by the enum_spec.
 
         # detail_op = boto api call name
         # param_name = name of argument to boto api call
@@ -48,19 +65,37 @@ class AppmeshMesh(QueryResourceManager):
             'describe_mesh', 'meshName', 'meshName', None
         )
 
-        # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-appmesh-virtualnode.html
-        cfn_type = config_type = 'AWS::AppMesh::Mesh'
+    # This function gets called with the id's retrieved from the event and is expected to return the
+    # enriched resource definition.
+    #
+    # Explanation of logic:
+    # The default impl on the superclass calls the enum_spec function, however for many resource types
+    # this is useless since the enum function provides little specification and often everything the enum
+    # function provides is also on the detail_spec function.
+    # So where we're going to have to have a detail_spec and where the enum_spec is redundant then why
+    # call the enum spec function at all?
+    # This is a small speed / cost saving as it reduces the number of AWS API calls made for each event.
+    # So, in the the case of the current resource we will simply skip the enum call entirely.
+    #
+    # TODO: Propose an improvement where we allow skipping of the enum_spec call self.source.get_resources(ids)
+    def get_resources(self, ids, cache=True, augment=True):
+        if not ids:
+            return []
+        if cache:
+            resources = self._get_cached_resources(ids)
+            if resources is not None:
+                return resources
+        try:
+            # default impl calls the enum function here - but we're not going to do that
+            # resources = self.source.get_resources(ids)
 
-
-        # filter_name:
-        # When fetching a single resource via enum_spec this
-        # is technically optional, but effectively required
-        # for serverless event policies else we have to
-        # enumerate the population. This parameter names a parameter
-        # to the boto call that can be used to narrow the results
-        # filter_name = ...
-        # filter_type = ...
-
+            # do the augment by mocking up a fake resource that has the field name (param_key)
+            # specified by the describe_spec
+            resources = [{"meshName": m} for m in ids]
+            return self.augment(resources)
+        except ClientError as e:
+            self.log.warning("event ids not resolved: %s error:%s" % (ids, e))
+            return []
 
 
 @resources.register('appmesh-virtual-gateway')
@@ -85,7 +120,7 @@ class AppmeshVirtualGateway(ChildResourceManager):
         id = name = 'meshName'
         date = 'createdAt'
 
-        # when we define a parent_spec then it uses the parent spec to provide the driving result set.
+        # when we define a parent_spec then it uses the parent sNpec to provide the driving result set.
         # this is then iterated across and the enum_spec is called for each parent instance.
         # appmesh-mesh - is ref to another resource above that provides the driving value for the enum_spec
         # meshName - is the field from the parent spec that will be pulled out and used to drive the enum_spec.
@@ -110,7 +145,6 @@ class AppmeshVirtualGateway(ChildResourceManager):
             source = 'describe-virtual-gateway'
         return source
 
-
     def get_resources(self, ids, cache=True, augment=True):
         return super(AppmeshVirtualGateway, self).get_resources(ids, cache, augment=False)
 
@@ -120,14 +154,13 @@ class DescribeGatewayDefinition(ChildDescribeSource):
     def __init__(self, manager):
         # based on ECSClusterResourceDescribeSource
         self.manager = manager
-        self.query = query.ChildResourceQuery(
-            self.manager.session_factory, self.manager)
+        self.query = query.ChildResourceQuery(self.manager.session_factory, self.manager)
         self.query.capture_parent_id = True
 
     # this method appears to be used only when in event mode and not pull mode
     def get_resources(self, ids, cache=True):
 
-        cluster_resources = {}
+        name_and_gw = {}
 
         # ids
         for i in ids:
@@ -142,12 +175,12 @@ class DescribeGatewayDefinition(ChildDescribeSource):
             meshName = parts[1]
             gwName = parts[3]
 
-            cluster_resources.setdefault(meshName, []).append(gwName)
+            name_and_gw.setdefault(meshName, []).append(gwName)
 
         results = []
         client = local_session(self.manager.session_factory).client('appmesh')
 
-        for meshName, gwIds in cluster_resources.items():
+        for meshName, gwIds in name_and_gw.items():
             res = self.describe_virtual_gateways(client, meshName, gwIds)
             results.extend(res)
 

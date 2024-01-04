@@ -1,0 +1,7 @@
+POISONED PILL - NOT EXPECTING TEST TO ACCESS THIS FILE.
+
+I am not expecting the test to make a second call but there is no way to make an assertion on that using
+the the request test library that cloud custodian uses, ie "placebo".
+The placebo test library cycles back to index 1 if a data file other than 1 cannot be found and this means
+instead of getting a missing file error that allows me to see the unexpected call then the test goes and reuses file 1.
+So, by placing this file here Im providing a file that if accessed will not parse and will cause test failure.

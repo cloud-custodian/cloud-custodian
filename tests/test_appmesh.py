@@ -4,23 +4,19 @@ import logging
 
 from .common import BaseTest, event_data
 
-import fnmatch
-import os
-import time
+# during recording create some sample resources in AWS the
+# set use a flight recorder and set the config region to wherever you want to read state from.
+# this will create recording files in the placebo dir.
+# session_factory = self.record_flight_data('test_appmesh_virtualgateway')
+# config = Config.empty(region="eu-west-2")
 
-from c7n.exceptions import PolicyExecutionError
+# File names in the placebo directory follow the pattern <servicename>.<OperationName>_<call#>.json
+# So boto3 "AppMesh.Client.describe_mesh()" becomes "appmesh.DescribeMesh"
+# and the _<call#> suffix corresponds with the file to load for each call to that api.
 
-log = logging.getLogger('custodian.appmesh')
-print("SETTING ALL DEBUG")
-logging.getLogger('botocore.client').setLevel(logging.DEBUG)
-logging.getLogger('botocore.endpoint').setLevel(logging.DEBUG)
-logging.getLogger('botocore.parsers').setLevel(logging.DEBUG)
-
-
-class TestMesh(BaseTest):
-    def test_appmesh_base(self):
-        session_factory = self.replay_flight_data(
-            'test_appmesh_base')
+class TestAppmeshMesh(BaseTest):
+    def test_appmesh(self):
+        session_factory = self.replay_flight_data('test_appmesh_mesh')
         p = self.load_policy(
             {
                 "name": "appmesh-mesh-policy",
@@ -33,8 +29,8 @@ class TestMesh(BaseTest):
         self.assertEqual(resources[0]["meshName"], "m1")
         self.assertEqual(resources[1]["meshName"], "m2")
 
-    def test_appmesh_event_base(self):
-        session_factory = self.replay_flight_data('test_appmesh_event_base')
+    def test_appmesh_event(self):
+        session_factory = self.replay_flight_data('test_appmesh_mesh_event')
         p = self.load_policy(
             {
                 "name": "appmesh-mesh-policy",
@@ -51,6 +47,8 @@ class TestMesh(BaseTest):
             },
             session_factory=session_factory,
         )
+        # event_data() names a file in tests/data/cwe that will drive the test execution.
+        # file contains an event matching that which AWS would generate in cloud trail.
         event = {
             "detail": event_data("event-appmesh-create-mesh.json"),
             "debug": True,
@@ -58,3 +56,61 @@ class TestMesh(BaseTest):
         resources = p.push(event, None)
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["meshName"], "m1")
+
+
+class TestAppmeshVirtualGateway(BaseTest):
+    def test_appmesh_virtualgateway(self):
+        session_factory = self.replay_flight_data('test_appmesh_virtualgateway')
+
+        # test data has 2 VGW but only 1 has a port of 123
+        p = self.load_policy(
+            {
+                "name": "appmesh-gateway-policy",
+                "resource": "aws.appmesh-virtual-gateway",
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": "spec.listeners[0].portMapping.port",
+                        "op": "eq",
+                        "value": 123
+                    }
+                ]
+            },
+            session_factory=session_factory,
+            #config=config,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual("m1", resources[0]["meshName"])
+        self.assertEqual("g1", resources[0]["virtualGatewayName"])
+        self.assertEqual(123, resources[0]["spec"]["listeners"][0]["portMapping"]["port"])
+
+    def test_appmesh_virtualgateway_event(self):
+        # the event should result in single call to
+
+        session_factory = self.replay_flight_data('test_appmesh_virtualgateway_event')
+        p = self.load_policy(
+            {
+                "name": "appmesh-gateway-policy",
+                "resource": "aws.appmesh-virtual-gateway",
+                "mode": {
+                    "type": "cloudtrail",
+                    "role": "CloudCustodian",
+                    "events": [{
+                        "source": "appmesh.amazonaws.com",
+                        "event": "CreateVirtualGateway",
+                        "ids": "responseElements.virtualGateway.metadata.arn",
+                    }]
+                }
+            },
+            session_factory=session_factory,
+        )
+        event = {
+            "detail": event_data("event-appmesh-create-virtual-gateway.json"),
+            "debug": True,
+        }
+        resources = p.push(event, None)
+        self.assertEqual(len(resources), 1)
+        self.assertEqual("m1", resources[0]["meshName"])
+        self.assertEqual("g1", resources[0]["virtualGatewayName"])
+        self.assertEqual(123, resources[0]["spec"]["listeners"][0]["portMapping"]["port"])

@@ -1,9 +1,9 @@
 {
     "eventVersion": "1.08",
     "userIdentity": {
-        "type": "Root",
+        "type": "IAMUser",
         "principalId": "00000",
-        "arn": "arn:aws:iam::00000:root",
+        "arn": "arn:aws:iam::00000:robot",
         "accountId": "00000",
         "accessKeyId": "XXXXXXXXXXXXXXXXX",
         "sessionContext": {
@@ -22,7 +22,7 @@
     "sourceIPAddress": "81.101.58.184",
     "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
     "requestParameters": {
-        "clientToken": "559ec1f1-bf26-4db0-abf4-c49147bb3771",
+        "clientToken": "559ec1f1-bf26-4db0-0000-c49147bb3771",
         "meshName": "m1",
         "spec": {
             "egressFilter": {
@@ -39,7 +39,7 @@
                 "lastUpdatedAt": "Nov 5, 2023, 4:29:11 AM",
                 "meshOwner": "00000",
                 "resourceOwner": "00000",
-                "uid": "92646b31-0475-59c9-bb6e-ec96629f4cf1",
+                "uid": "92646b31-0475-59c0-0000-ec96629f4cf1",
                 "version": 1
             },
             "spec": {
