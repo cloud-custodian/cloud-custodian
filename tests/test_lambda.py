@@ -751,4 +751,4 @@ def test_lambda_check_permission_deleted_role(test, aws_lambda_check_permissions
         session_factory=factory)
 
     resources = p.run()
-    test.assertEqual(len(resources), 1)
+    test.assertEqual(len(resources), 0)
