@@ -12,7 +12,7 @@ from c7n.credentials import assumed_session
 
 # from c7n.executor import MainThreadExecutor
 from c7n.filters import Filter
-from c7n.query import QueryResourceManager, TypeInfo
+from c7n.query import QueryResourceManager, TypeInfo, DescribeSource
 from c7n.resources.aws import AWS
 from c7n.tags import universal_augment
 from c7n.utils import local_session, type_schema
@@ -97,6 +97,13 @@ class OrgPolicy(QueryResourceManager, OrgAccess):
         return params
 
 
+class DescribeUnit(DescribeSource):
+
+    def get_permissions(self):
+        m = self.manager.get_model()
+        return list(m.permissions_augment)
+
+
 @AWS.resources.register("org-unit")
 class OrgUnit(QueryResourceManager):
     class resource_type(TypeInfo):
@@ -108,12 +115,13 @@ class OrgUnit(QueryResourceManager):
         global_resource = True
         permissions_augment = (
             "organizations:ListChildren",
-            "organizations:DescribeOrganizationUnit",
+            "organizations:DescribeOrganizationalUnit",
             "organizations:ListTagsForResource",
         )
         universal_augment = object()
 
     org_type = "ORGANIZATIONAL_UNIT"
+    source_mapping = {'describe': DescribeUnit}
 
     def resources(self, query=None):
         if query is None:
