@@ -5,12 +5,11 @@ import re
 import pytest
 
 from c7n.vendored.distutils.util import strtobool
-from .constants import ACCOUNT_ID, ORG_ID
 
 from vcr import stubs
 
 try:
-    from .zpill import PillTest
+    from .zpill import PillTest, ACCOUNT_ID, ORG_ID
     from c7n.testing import PyTestUtils, reset_session_cache
     from pytest_terraform.tf import LazyPluginCacheDir, LazyReplay
 except ImportError: # noqa

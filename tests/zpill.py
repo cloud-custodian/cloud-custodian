@@ -19,7 +19,8 @@ from c7n.testing import CustodianTestCore
 
 # Custodian Test Account. This is used only for testing.
 
-from .constants import ACCOUNT_ID, ORG_ID
+ACCOUNT_ID = "644160558196"
+ORG_ID = "o-abc123cc32"
 
 ###########################################################################
 # BEGIN PLACEBO MONKEY PATCH
