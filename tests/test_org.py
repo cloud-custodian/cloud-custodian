@@ -29,10 +29,10 @@ def org_tree(request):
         org = client.create_organization(FeatureSet="ALL")["Organization"]
         root = client.list_roots()["Roots"][0]
 
-        dept_a = client.create_organizational_unit(ParentId=org["Id"], Name="DeptA")[
+        dept_a = client.create_organizational_unit(ParentId=root["Id"], Name="DeptA")[
             "OrganizationalUnit"
         ]
-        dept_b = client.create_organizational_unit(ParentId=org["Id"], Name="DeptB")[
+        dept_b = client.create_organizational_unit(ParentId=root["Id"], Name="DeptB")[
             "OrganizationalUnit"
         ]
         group_c = client.create_organizational_unit(ParentId=dept_a["Id"], Name="GroupC")[
@@ -101,18 +101,25 @@ def test_org_account_ou_filter(test, org_tree):
         org_tree["account_c"]["AccountId"],
     }
 
-def test_org_describe(test):
 
+def test_org_describe(test):
     factory = test.replay_flight_data('test_org_account_describe')
     p = test.load_policy(
-        {"name": "accounts",
-         "resource": "aws.org-account",
-         "filters": []},
-        session_factory=factory
+        {"name": "accounts", "resource": "aws.org-account", "filters": []}, session_factory=factory
     )
     resources = p.run()
     assert len(resources) == 1
     assert resources[0]['Tags'] == [{'Key': 'i-am', 'Value': 'TheOriginalTim'}]
+
+
+def test_org_unit_moto(test, org_tree):
+    p = test.load_policy({"name": "units", "resource": "aws.org-unit"})
+    resources = p.run()
+    rmap = {r['Name']: r for r in resources}
+    assert set(rmap) == {"DeptA", "DeptB", "GroupC"}
+    assert rmap['GroupC']['Path'] == 'DeptA/GroupC'
+    assert rmap['GroupC']['Parents'] == [org_tree['root']['Id'], org_tree['dept_a']['Id']]
+
 
 def test_org_account_moto(test, org_tree):
     p = test.load_policy(
