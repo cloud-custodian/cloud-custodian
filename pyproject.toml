@@ -55,6 +55,8 @@ pytest-sugar = "^0.9.2"
 click = "^8.0"
 freezegun = "^1.2.2"
 pytest-recording = "^0.12.1"
+moto = "^4.2"
+openapi-spec-validator = "^0.7.1"
 
 [tool.black]
 skip-string-normalization = true
