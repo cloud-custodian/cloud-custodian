@@ -194,7 +194,25 @@ class OrgAccount(QueryResourceManager, OrgAccess):
 @OrgUnit.filter_registry.register('org-unit')
 @OrgAccount.filter_registry.register('org-unit')
 class OrgUnitFilter(ValueFilter):
-    """Filter resources by their containment within an ou."""
+    """Filter resources by their containment within an ou.
+
+    .. code-block:: yaml
+
+        policies:
+          - name: org-units-by-parent-ou
+            resource: aws.org-unit
+            filters:
+              - type: org-unit
+                key: Name
+                value: dev
+
+          - name: org-accounts-by-parent-ou
+            resource: aws.org-account
+            filters:
+              - type: org-unit
+                key: Name
+                value: dev
+    """
 
     schema = type_schema('org-unit', rinherit=ValueFilter.schema)
     annotation_parent_key = 'c7n:parents'
