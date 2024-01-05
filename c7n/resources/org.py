@@ -11,7 +11,7 @@ from botocore.exceptions import ClientError
 from c7n.credentials import assumed_session
 
 # from c7n.executor import MainThreadExecutor
-from c7n.filters import Filter
+from c7n.filters import Filter, ValueFilter
 from c7n.query import QueryResourceManager, TypeInfo, DescribeSource
 from c7n.resources.aws import AWS
 from c7n.tags import universal_augment
@@ -189,6 +189,61 @@ class OrgAccount(QueryResourceManager, OrgAccess):
             # Default Organizations Role with Control Tower
             if os.environ.get("AWS_CONTROL_TOWER_ORG"):
                 self.account_config["org-account-role"] = "AWSControlTowerExecution"
+
+
+@OrgUnit.filter_registry.register('org-unit')
+@OrgAccount.filter_registry.register('org-unit')
+class OrgUnitFilter(ValueFilter):
+    """Filter resources by their containment within an ou."""
+
+    schema = type_schema('org-unit', rinherit=ValueFilter.schema)
+    annotation_parent_key = 'c7n:parents'
+    ou_map = None
+    permissions = OrgUnit.resource_type.permissions_augment
+
+    def process(self, resources, event=None):
+        self.ou_map = {
+            ou['Id']: ou for ou in self.manager.get_resource_manager('org-unit').resources()
+        }
+        if self.manager.type == 'org-account':
+            self.process_accounts(resources, event)
+        return super().process(resources, event)
+
+    def process_accounts(self, resources, event):
+        client = local_session(self.manager.session_factory).client('organizations')
+        for r in resources:
+            if self.annotation_parent_key in r:
+                continue
+            # list parents only returns the immediate parent
+            parents = []
+            parent_info = client.list_parents(ChildId=r['Id']).get('Parents').pop()
+            if parent_info['Type'] == 'ROOT':
+                r[self.annotation_parent_key] = []
+                continue
+            parent = self.ou_map[parent_info['Id']]
+            parents.append(parent)
+            while parent['Parents']:
+                next_p = parent['Parents'][-1]
+                if next_p.startswith('r-'):
+                    break
+                parent = self.ou_map[next_p]
+                parents.append(parent)
+            r[self.annotation_parent_key] = parents
+        return super().process(resources, event)
+
+    def __call__(self, r):
+        if self.manager.type == 'org-unit':
+            # we annotate parents as we walk down the tree, allowing us to reuse
+            # the information for heirarchy filters.
+            for pid in r['Parents']:
+                if pid.startswith('ou-') and super().__call__(self.ou_map[pid]):
+                    return True
+            return False
+        else:
+            for parent in r[self.annotation_parent_key]:
+                if super().__call__(parent):
+                    return True
+            return False
 
 
 class AccountHierarchy:

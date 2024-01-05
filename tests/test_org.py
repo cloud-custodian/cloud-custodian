@@ -102,6 +102,32 @@ def test_org_account_ou_filter(test, org_tree):
     }
 
 
+def test_org_account_org_unit_filter(test, org_tree):
+    p = test.load_policy(
+        {
+            "name": "filtered-accounts",
+            "resource": "aws.org-account",
+            "filters": [{"type": "org-unit", "key": "Name", "value": "DeptA"}],
+        }
+    )
+    resources = p.run()
+    assert len(resources) == 2
+    assert {r['Email'] for r in resources} == {'a@example.com', 'c@example.com'}
+
+
+def test_org_unit_org_unit_filter(test, org_tree):
+    p = test.load_policy(
+        {
+            "name": "filtered-units",
+            "resource": "aws.org-unit",
+            "filters": [{"type": "org-unit", "key": "Name", "value": "DeptA"}],
+        }
+    )
+    resources = p.run()
+    assert len(resources) == 1
+    assert resources[0]['Name'] == 'GroupC'
+
+
 def test_org_describe(test):
     factory = test.replay_flight_data('test_org_account_describe')
     p = test.load_policy(
