@@ -19,6 +19,12 @@ from c7n.tags import universal_augment
 from .securityhub import PostFinding
 
 
+class DescribeAlias(DescribeSource):
+
+    def augment(self, resources):
+        return [r for r in resources if 'TargetKeyId' in r]
+
+
 @resources.register('kms')
 class KeyAlias(QueryResourceManager):
 
@@ -30,8 +36,7 @@ class KeyAlias(QueryResourceManager):
         id = "AliasArn"
         config_type = cfn_type = 'AWS::KMS::Alias'
 
-    def augment(self, resources):
-        return [r for r in resources if 'TargetKeyId' in r]
+    source_mapping = {'describe': DescribeAlias, 'config': ConfigSource}
 
 
 class DescribeKey(DescribeSource):
