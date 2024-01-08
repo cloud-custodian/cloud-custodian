@@ -9,9 +9,10 @@ import threading
 from botocore.exceptions import ClientError
 
 from c7n.credentials import assumed_session
+
 # from c7n.executor import MainThreadExecutor
-from c7n.filters import Filter
-from c7n.query import QueryResourceManager, TypeInfo
+from c7n.filters import Filter, ValueFilter
+from c7n.query import QueryResourceManager, TypeInfo, DescribeSource
 from c7n.resources.aws import AWS
 from c7n.tags import universal_augment
 from c7n.utils import local_session, type_schema
@@ -96,6 +97,61 @@ class OrgPolicy(QueryResourceManager, OrgAccess):
         return params
 
 
+class DescribeUnit(DescribeSource):
+    org_type = "ORGANIZATIONAL_UNIT"
+
+    def get_permissions(self):
+        m = self.manager.get_model()
+        return list(m.permissions_augment)
+
+    def resources(self, query=None):
+        if query is None:
+            query = {}
+        client = local_session(self.manager.session_factory).client('organizations')
+        if 'ParentId' not in query:
+            query['ParentId'] = client.list_roots().get('Roots', ())[0].get('Id')
+        ous = {}
+        self.fetch_ous(client, query['ParentId'], ous, [query['ParentId']])
+        return universal_augment(self.manager, list(ous.values()))
+
+    def fetch_ous(self, client, parent_id, units, stack):
+        pager = client.get_paginator('list_children')
+        ou_ids = [
+            o['Id']
+            for o in pager.paginate(ParentId=parent_id, ChildType=self.org_type)
+            .build_full_result()
+            .get('Children')
+        ]
+        for ou_id in ou_ids:
+            units[ou_id] = ou = client.describe_organizational_unit(
+                OrganizationalUnitId=ou_id,
+            )['OrganizationalUnit']
+            ou['Parents'] = list(stack)
+            stack.append(ou_id)
+            ou['Path'] = "/".join([units[p]['Name'] for p in stack if p.startswith('ou')])
+            self.fetch_ous(client, ou_id, units, stack)
+            stack.pop(-1)
+
+
+@AWS.resources.register("org-unit")
+class OrgUnit(QueryResourceManager):
+    class resource_type(TypeInfo):
+        service = "organizations"
+        arn = "Arn"
+        arn_type = "ou"
+        name = "Name"
+        id = "Id"
+        global_resource = True
+        permissions_augment = (
+            "organizations:ListChildren",
+            "organizations:DescribeOrganizationalUnit",
+            "organizations:ListTagsForResource",
+        )
+        universal_augment = object()
+
+    source_mapping = {'describe': DescribeUnit}
+
+
 @AWS.resources.register("org-account")
 class OrgAccount(QueryResourceManager, OrgAccess):
     class resource_type(TypeInfo):
@@ -133,6 +189,79 @@ class OrgAccount(QueryResourceManager, OrgAccess):
             # Default Organizations Role with Control Tower
             if os.environ.get("AWS_CONTROL_TOWER_ORG"):
                 self.account_config["org-account-role"] = "AWSControlTowerExecution"
+
+
+@OrgUnit.filter_registry.register('org-unit')
+@OrgAccount.filter_registry.register('org-unit')
+class OrgUnitFilter(ValueFilter):
+    """Filter resources by their containment within an ou.
+
+    .. code-block:: yaml
+
+        policies:
+          - name: org-units-by-parent-ou
+            resource: aws.org-unit
+            filters:
+              - type: org-unit
+                key: Name
+                value: dev
+
+          - name: org-accounts-by-parent-ou
+            resource: aws.org-account
+            filters:
+              - type: org-unit
+                key: Name
+                value: dev
+    """
+
+    schema = type_schema('org-unit', rinherit=ValueFilter.schema)
+    annotation_parent_key = 'c7n:parents'
+    ou_map = None
+    permissions = OrgUnit.resource_type.permissions_augment
+
+    def process(self, resources, event=None):
+        self.ou_map = {
+            ou['Id']: ou for ou in self.manager.get_resource_manager('org-unit').resources()
+        }
+        if self.manager.type == 'org-account':
+            self.process_accounts(resources, event)
+        return super().process(resources, event)
+
+    def process_accounts(self, resources, event):
+        client = local_session(self.manager.session_factory).client('organizations')
+        for r in resources:
+            if self.annotation_parent_key in r:
+                continue
+            # list parents only returns the immediate parent
+            parents = []
+            parent_info = client.list_parents(ChildId=r['Id']).get('Parents').pop()
+            if parent_info['Type'] == 'ROOT':
+                r[self.annotation_parent_key] = []
+                continue
+            parent = self.ou_map[parent_info['Id']]
+            parents.append(parent)
+            while parent['Parents']:
+                next_p = parent['Parents'][-1]
+                if next_p.startswith('r-'):
+                    break
+                parent = self.ou_map[next_p]
+                parents.append(parent)
+            r[self.annotation_parent_key] = parents
+        return super().process(resources, event)
+
+    def __call__(self, r):
+        if self.manager.type == 'org-unit':
+            # we annotate parents as we walk down the tree, allowing us to reuse
+            # the information for heirarchy filters.
+            for pid in r['Parents']:
+                if pid.startswith('ou-') and super().__call__(self.ou_map[pid]):
+                    return True
+            return False
+        else:
+            for parent in r[self.annotation_parent_key]:
+                if super().__call__(parent):
+                    return True
+            return False
 
 
 class AccountHierarchy:
