@@ -1,0 +1,73 @@
+{
+    "status_code": 200,
+    "data": {
+        "ProvisionedProducts": [
+            {
+                "Name": "test-provisioned-product",
+                "Arn": "arn:aws:servicecatalog:eu-central-1:123456789012:stack/test-provisioned-product/pp-6orqs3iobd7om",
+                "Type": "CFN_STACK",
+                "Id": "pp-6orqs3iobd7om",
+                "Status": "AVAILABLE",
+                "CreatedTime": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 1,
+                    "day": 9,
+                    "hour": 17,
+                    "minute": 35,
+                    "second": 1,
+                    "microsecond": 556000
+                },
+                "IdempotencyToken": "5bb513d8-1dfe-4ea8-a0bb-df33332d90zz",
+                "LastRecordId": "rec-6orqs3iobd7om",
+                "LastProvisioningRecordId": "rec-6orqs3iobd7om",
+                "LastSuccessfulProvisioningRecordId": "rec-6orqs3iobd7om",
+                "Tags": [
+                    {
+                        "Key": "aws:servicecatalog:productArn",
+                        "Value": "arn:aws:catalog:eu-central-1:123456789012:product/prod-6orqs3iobd7om"
+                    }
+                ],
+                "PhysicalId": "arn:aws:cloudformation:eu-central-1:123456789012:stack/SC-123456789012-pp-6orqs3iobd7om/67c51ee0-9f17-11ee-a157-0a4380bee7zz",
+                "ProductId": "prod-6orqs3iobd7om",
+                "ProductName": "test-product",
+                "ProvisioningArtifactId": "pa-6orqs3iobd7om",
+                "ProvisioningArtifactName": "1.0.0"
+            },
+            {
+                "Name": "test-provisioned-product-bis",
+                "Arn": "arn:aws:servicecatalog:eu-central-1:123456789012:stack/test-provisioned-product-bis/pp-6orqs3iobd7on",
+                "Type": "CFN_STACK",
+                "Id": "pp-6orqs3iobd7on",
+                "Status": "AVAILABLE",
+                "CreatedTime": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 1,
+                    "day": 8,
+                    "hour": 17,
+                    "minute": 35,
+                    "second": 1,
+                    "microsecond": 556000
+                },
+                "IdempotencyToken": "5bb513d8-1dfe-4ea8-a0bb-df33332d90aa",
+                "LastRecordId": "rec-6orqs3iobd7on",
+                "LastProvisioningRecordId": "rec-6orqs3iobd7on",
+                "LastSuccessfulProvisioningRecordId": "rec-6orqs3iobd7on",
+                "Tags": [
+                    {
+                        "Key": "aws:servicecatalog:productArn",
+                        "Value": "arn:aws:catalog:eu-central-1:123456789012:product/prod-6orqs3iobd7on"
+                    }
+                ],
+                "PhysicalId": "arn:aws:cloudformation:eu-central-1:123456789012:stack/SC-123456789012-pp-6orqs3iobd7on/67c51ee0-9f17-11ee-a157-0a4380bee7aa",
+                "ProductId": "prod-6orqs3iobd7on",
+                "ProductName": "test-product",
+                "ProvisioningArtifactId": "pa-6orqs3iobd7om",
+                "ProvisioningArtifactName": "0.1.0"
+            }
+        ],
+        "TotalResultsCount": 2
+    },
+    "ResponseMetadata": {}
+}

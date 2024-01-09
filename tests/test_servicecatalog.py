@@ -102,3 +102,143 @@ class TestServiceCatalog(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertTrue(resources[0]['Name'], 'testProduct')
+
+    def test_catalog_provisioned_product_resource(self):
+        aws_region = 'eu-central-1'
+        session_factory = self.replay_flight_data('test_catalog_provisioned_product_resource', region=aws_region)
+        p = self.load_policy(
+            {
+                'name': 'test-catalog-provisioned-product',
+                'resource': 'catalog-provisioned-product',
+                'filters': [
+                    {
+                        'type': 'value',
+                        'key': 'Id',
+                        'value': 'pp-6orqs3iobd7om'
+                    }
+                ]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertTrue(resources[0]['Name'], 'test-provisioned-product')
+        self.assertTrue(resources[0]['ProvisioningArtifactId'], 'pa-6orqs3iobd7om')
+
+    def test_catalog_provisioned_product_is_deprecated(self):
+        aws_region = 'eu-central-1'
+        session_factory = self.replay_flight_data('test_catalog_provisioned_product_is_deprecated', region=aws_region)
+        p = self.load_policy(
+            {
+                'name': 'test-catalog-provisioned-product',
+                'resource': 'catalog-provisioned-product',
+                'filters': [
+                    {
+                        'type': 'is-deprecated'
+                    }
+                ]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['Id'], 'pp-6orqs3iobd7on')
+
+    def test_catalog_provisioned_product_is_not_deprecated(self):
+        aws_region = 'eu-central-1'
+        session_factory = self.replay_flight_data('test_catalog_provisioned_product_is_deprecated', region=aws_region)
+        p = self.load_policy(
+            {
+                'name': 'test-catalog-provisioned-product',
+                'resource': 'catalog-provisioned-product',
+                'filters': [
+                    {
+                        'not': [
+                            {
+                                'type': 'is-deprecated'
+                            }
+                        ]
+                    }
+                ]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['Id'], 'pp-6orqs3iobd7om')
+
+    def test_catalog_provisioned_product_is_deprecated_permissions(test):
+        policy = test.load_policy(
+            {
+                'name': 'test-catalog-provisioned-product',
+                'resource': 'catalog-provisioned-product',
+                'filters': [{'type': 'is-deprecated'}],
+            },
+        )
+        permissions = policy.get_permissions()
+        test.assertEqual(
+            permissions,
+            {
+                'servicecatalog:DescribeProvisioningArtifact',
+                'servicecatalog:SearchProvisionedProducts',
+            },
+        )
+
+    def test_catalog_provisioned_product_is_active(self):
+        aws_region = 'eu-central-1'
+        session_factory = self.replay_flight_data('test_catalog_provisioned_product_is_active', region=aws_region)
+        p = self.load_policy(
+            {
+                'name': 'test-catalog-provisioned-product',
+                'resource': 'catalog-provisioned-product',
+                'filters': [
+                    {
+                        'type': 'is-active'
+                    }
+                ]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['Id'], 'pp-6orqs3iobd7on')
+
+    def test_catalog_provisioned_product_is_not_active(self):
+        aws_region = 'eu-central-1'
+        session_factory = self.replay_flight_data('test_catalog_provisioned_product_is_active', region=aws_region)
+        p = self.load_policy(
+            {
+                'name': 'test-catalog-provisioned-product',
+                'resource': 'catalog-provisioned-product',
+                'filters': [
+                    {
+                        'not': [
+                            {
+                                'type': 'is-active'
+                            }
+                        ]
+                    }
+                ]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['Id'], 'pp-6orqs3iobd7om')
+
+    def test_catalog_provisioned_product_is_active_permissions(test):
+        policy = test.load_policy(
+            {
+                'name': 'test-catalog-provisioned-product',
+                'resource': 'catalog-provisioned-product',
+                'filters': [{'type': 'is-active'}],
+            },
+        )
+        permissions = policy.get_permissions()
+        test.assertEqual(
+            permissions,
+            {
+                'servicecatalog:DescribeProvisioningArtifact',
+                'servicecatalog:SearchProvisionedProducts',
+            },
+        )

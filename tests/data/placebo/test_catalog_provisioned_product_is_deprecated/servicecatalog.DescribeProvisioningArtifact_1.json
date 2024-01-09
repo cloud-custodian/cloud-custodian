@@ -1,0 +1,26 @@
+{
+    "status_code": 200,
+    "data": {
+        "ProvisioningArtifactDetail": {
+            "Id": "pa-6orqs3iobd7om",
+            "Name": "1.0.0",
+            "Description": "Test Product",
+            "Type": "CLOUD_FORMATION_TEMPLATE",
+            "CreatedTime": {
+                "__class__": "datetime",
+                "year": 2024,
+                "month": 1,
+                "day": 9,
+                "hour": 18,
+                "minute": 35,
+                "second": 1,
+                "microsecond": 556000
+            },
+            "Active": true,
+            "Guidance": "DEFAULT"
+        },
+        "Info": {},
+        "Status": "AVAILABLE"
+    },
+    "ResponseMetadata": {}
+}

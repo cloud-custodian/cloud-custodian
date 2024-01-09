@@ -1,15 +1,17 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
+from typing import List
 
 from c7n.actions import BaseAction
-from c7n.filters import CrossAccountAccessFilter
+from c7n.filters import CrossAccountAccessFilter, Filter, FilterRegistry
 from c7n.query import ConfigSource, DescribeSource, QueryResourceManager, TypeInfo
 from c7n.manager import resources
 from c7n.exceptions import PolicyValidationError
 from c7n.tags import universal_augment
 from c7n.utils import local_session, type_schema
 
+pp_filters = FilterRegistry('catalog-provisioned-product.filters')
 
 class DescribePortfolio(DescribeSource):
 
@@ -186,3 +188,115 @@ class CatalogProduct(QueryResourceManager):
         date = 'CreatedTime'
         universal_taggable = object()
         cfn_type = 'AWS::ServiceCatalog::CloudFormationProduct'
+
+
+@resources.register('catalog-provisioned-product')
+class CatalogProvisionedProduct(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'servicecatalog'
+        enum_spec = ('search_provisioned_products', 'ProvisionedProducts', None)
+        id = 'Id'
+        name = 'Name'
+        arn = 'Arn'
+        arn_type = 'stack'
+        date = 'CreatedTime'
+        cfn_type = config_type = 'AWS::ServiceCatalog::CloudFormationProvisionedProduct'
+
+    filter_registry = pp_filters
+
+
+@pp_filters.register('is-deprecated')
+class IsDeprecated(Filter):
+    """AWS Service Catalog provisioned products with ``DEPRECATED`` guidance
+
+    Filters AWS Service Catalog provisioned products with ``DEPRECATED`` guidance.
+
+    :Example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: provisioned-product-is-deprecated
+            resource: catalog-provisioned-product
+            filters:
+              - type: is-deprecated
+
+    :Example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: provisioned-product-is-NOT-deprecated
+            resource: catalog-provisioned-product
+            filters:
+              - not:
+                - type: is-deprecated
+    """
+
+    schema = type_schema('is-deprecated')
+    permissions = ('servicecatalog:DescribeProvisioningArtifact',)
+
+    def get_permissions(self):
+        perms = list(self.permissions)
+        perms.extend(self.manager.get_permissions())
+        return perms
+
+    def process(self, resources: List[dict], event=None) -> List[dict]:
+        client = local_session(
+            self.manager.session_factory).client('servicecatalog')
+        return [r for r in resources
+                if self._is_deprecated(client, r)]
+
+    def _is_deprecated(self, client, provisioned_product: dict) -> bool:
+        provisioning_artifact = self.manager.retry(
+            client.describe_provisioning_artifact,
+            ProductId=provisioned_product['ProductId'],
+            ProvisioningArtifactId=provisioned_product['ProvisioningArtifactId'],
+        )
+        return provisioning_artifact['ProvisioningArtifactDetail']['Guidance'] == 'DEPRECATED'
+
+
+@pp_filters.register('is-active')
+class IsActive(Filter):
+    """AWS Service Catalog provisioned products is ``ACTIVE``.
+
+    Filters AWS Service Catalog provisioned products in ``ACTIVE`` status.
+
+    :Example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: provisioned-product-is-active
+            resource: catalog-provisioned-product
+            filters:
+              - type: is-active
+
+    :Example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: provisioned-product-is-NOT-active
+            resource: catalog-provisioned-product
+            filters:
+              - not:
+                - type: is-active
+    """
+
+    schema = type_schema('is-active')
+    permissions = ('servicecatalog:DescribeProvisioningArtifact',)
+
+    def process(self, resources: List[dict], event=None) -> List[dict]:
+        client = local_session(
+            self.manager.session_factory).client('servicecatalog')
+        return [r for r in resources
+                if self._is_deprecated(client, r)]
+
+    def _is_deprecated(self, client, provisioned_product: dict) -> bool:
+        provisioning_artifact = self.manager.retry(
+            client.describe_provisioning_artifact,
+            ProvisioningArtifactId=provisioned_product['ProvisioningArtifactId']
+        )
+        return provisioning_artifact['ProvisioningArtifactDetail']['Active']
