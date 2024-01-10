@@ -3,8 +3,9 @@
 #
 import json
 import os
-import subprocess
 from pathlib import Path
+import subprocess
+import sys
 from unittest.mock import ANY
 from urllib.request import urlopen
 import xml.etree.ElementTree as etree
