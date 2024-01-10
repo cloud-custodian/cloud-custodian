@@ -1413,7 +1413,7 @@ def test_cli_output_json_query(tmp_path):
     results = json.loads((tmp_path / "output.json").read_text())
     assert results == {
         "results": [
-            "tests/terraform/aws_s3_encryption_audit/main.tf",
+            str(Path("tests") / "terraform" / "aws_s3_encryption_audit" / "main.tf"),
         ]
     }
 
@@ -1450,7 +1450,7 @@ def test_cli_output_json(tmp_path):
             ],
             "file_line_end": 28,
             "file_line_start": 25,
-            "file_path": "tests/terraform/aws_s3_encryption_audit/main.tf",
+            "file_path": str(Path("tests") / "terraform" / "aws_s3_encryption_audit" / "main.tf"),
             "policy": {
                 "filters": [{"server_side_encryption_configuration": "absent"}],
                 "metadata": {"category": ["test"]},
@@ -1466,7 +1466,7 @@ def test_cli_output_json(tmp_path):
                     "line_end": 28,
                     "line_start": 25,
                     "path": "aws_s3_bucket.example_c",
-                    "src_dir": "tests/terraform/aws_s3_encryption_audit",
+                    "src_dir": str(Path("tests") / "terraform" / "aws_s3_encryption_audit"),
                     "type": "resource",
                 },
                 "acl": "private",
