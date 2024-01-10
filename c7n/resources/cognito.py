@@ -88,7 +88,7 @@ class CognitoUserPool(QueryResourceManager):
         name = 'Name'
         arn = 'Arn'
         arn_type = "userpool"
-        cfn_type = 'AWS::Cognito::UserPool'
+        config_type = cfn_type = 'AWS::Cognito::UserPool'
         universal_taggable = object()
         permissions_augment = ("cognito-idp:ListTagsForResource",)
 

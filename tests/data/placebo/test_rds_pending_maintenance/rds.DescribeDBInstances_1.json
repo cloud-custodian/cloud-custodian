@@ -3,148 +3,119 @@
     "data": {
         "DBInstances": [
             {
-                "DBInstanceIdentifier": "qbopp011",
-                "DBInstanceClass": "db.r5.16xlarge",
-                "Engine": "oracle-ee",
+                "DBInstanceIdentifier": "asset-sync-instance-1",
+                "DBInstanceClass": "db.t3.medium",
+                "Engine": "aurora-mysql",
                 "DBInstanceStatus": "available",
-                "MasterUsername": "intuadmin",
-                "DBName": "QBOPP011",
+                "MasterUsername": "admin",
+                "DBName": "asset_sync_db",
                 "Endpoint": {
-                    "Address": "qbopp011.cyiyqi08u9mg.us-west-2.rds.amazonaws.com",
-                    "Port": 1521,
+                    "Address": "asset-sync-instance-1.cordyoa7njfq.us-west-2.rds.amazonaws.com",
+                    "Port": 3306,
                     "HostedZoneId": "Z1PVIF0B656C1W"
                 },
-                "AllocatedStorage": 26000,
+                "AllocatedStorage": 1,
                 "InstanceCreateTime": {
                     "__class__": "datetime",
-                    "year": 2022,
-                    "month": 4,
-                    "day": 1,
-                    "hour": 8,
-                    "minute": 49,
-                    "second": 51,
-                    "microsecond": 278000
+                    "year": 2021,
+                    "month": 2,
+                    "day": 2,
+                    "hour": 9,
+                    "minute": 48,
+                    "second": 52,
+                    "microsecond": 965000
                 },
-                "PreferredBackupWindow": "04:00-06:00",
-                "BackupRetentionPeriod": 35,
+                "PreferredBackupWindow": "06:04-06:34",
+                "BackupRetentionPeriod": 7,
                 "DBSecurityGroups": [],
                 "VpcSecurityGroups": [
                     {
-                        "VpcSecurityGroupId": "sg-2782b45c",
+                        "VpcSecurityGroupId": "sg-acc97ad1",
+                        "Status": "active"
+                    },
+                    {
+                        "VpcSecurityGroupId": "sg-e9325993",
+                        "Status": "active"
+                    },
+                    {
+                        "VpcSecurityGroupId": "sg-e8c57695",
                         "Status": "active"
                     }
                 ],
                 "DBParameterGroups": [
                     {
-                        "DBParameterGroupName": "oracle-ee-19-max-string-size-prod-clusterdb-vpc-3-opt12c",
+                        "DBParameterGroupName": "default.aurora-mysql5.7",
                         "ParameterApplyStatus": "in-sync"
                     }
                 ],
-                "AvailabilityZone": "us-west-2b",
+                "AvailabilityZone": "us-west-2a",
                 "DBSubnetGroup": {
-                    "DBSubnetGroupName": "prod-clusterdb-vpc-3",
-                    "DBSubnetGroupDescription": "prod-clusterdb-vpc-3 subnet group",
-                    "VpcId": "vpc-b78d99d0",
+                    "DBSubnetGroupName": "default-vpc-96d27df0",
+                    "DBSubnetGroupDescription": "Created from the RDS Management Console",
+                    "VpcId": "vpc-96d27df0",
                     "SubnetGroupStatus": "Complete",
                     "Subnets": [
                         {
-                            "SubnetIdentifier": "subnet-b62853ff",
-                            "SubnetAvailabilityZone": {
-                                "Name": "us-west-2b"
-                            },
-                            "SubnetOutpost": {},
-                            "SubnetStatus": "Active"
-                        },
-                        {
-                            "SubnetIdentifier": "subnet-e661adbd",
-                            "SubnetAvailabilityZone": {
-                                "Name": "us-west-2c"
-                            },
-                            "SubnetOutpost": {},
-                            "SubnetStatus": "Active"
-                        },
-                        {
-                            "SubnetIdentifier": "subnet-72f8d815",
+                            "SubnetIdentifier": "subnet-ef64daa7",
                             "SubnetAvailabilityZone": {
                                 "Name": "us-west-2a"
+                            },
+                            "SubnetOutpost": {},
+                            "SubnetStatus": "Active"
+                        },
+                        {
+                            "SubnetIdentifier": "subnet-98841dfe",
+                            "SubnetAvailabilityZone": {
+                                "Name": "us-west-2b"
                             },
                             "SubnetOutpost": {},
                             "SubnetStatus": "Active"
                         }
                     ]
                 },
-                "PreferredMaintenanceWindow": "mon:06:00-mon:06:30",
+                "PreferredMaintenanceWindow": "mon:06:54-mon:07:24",
                 "PendingModifiedValues": {},
-                "LatestRestorableTime": {
-                    "__class__": "datetime",
-                    "year": 2023,
-                    "month": 8,
-                    "day": 5,
-                    "hour": 6,
-                    "minute": 11,
-                    "second": 16,
-                    "microsecond": 0
-                },
-                "MultiAZ": true,
-                "EngineVersion": "19.0.0.0.ru-2021-10.rur-2021-10.r1",
-                "AutoMinorVersionUpgrade": false,
-                "ReadReplicaDBInstanceIdentifiers": [
-                    "arn:aws:rds:us-east-2:644160558196:db:qbosp011"
-                ],
-                "LicenseModel": "bring-your-own-license",
-                "Iops": 53000,
+                "MultiAZ": false,
+                "EngineVersion": "5.7.mysql_aurora.2.11.2",
+                "AutoMinorVersionUpgrade": true,
+                "ReadReplicaDBInstanceIdentifiers": [],
+                "LicenseModel": "general-public-license",
                 "OptionGroupMemberships": [
                     {
-                        "OptionGroupName": "oracle-ee-19-prod-clusterdb-vpc-3-qbopp011",
+                        "OptionGroupName": "default:aurora-mysql-5-7",
                         "Status": "in-sync"
                     }
                 ],
-                "CharacterSetName": "AL32UTF8",
-                "NcharCharacterSetName": "AL16UTF16",
-                "SecondaryAvailabilityZone": "us-west-2a",
                 "PubliclyAccessible": false,
-                "StorageType": "io1",
+                "StorageType": "aurora",
                 "DbInstancePort": 0,
+                "DBClusterIdentifier": "asset-sync",
                 "StorageEncrypted": true,
-                "KmsKeyId": "arn:aws:kms:us-west-2:644160558196:key/5ed86f6c-fb30-45ee-a80b-7430216ede03",
-                "DbiResourceId": "db-K7FEYDY47XERTXMWED4SOZRXAM",
+                "KmsKeyId": "arn:aws:kms:us-west-2:644160558196:key/76395b6a-26c9-41a6-bde1-e9fbe776aa34",
+                "DbiResourceId": "db-2FZRTJIWJLXKIZT4SGJL6U6K6Y",
                 "CACertificateIdentifier": "rds-ca-2019",
                 "DomainMemberships": [],
                 "CopyTagsToSnapshot": false,
-                "MonitoringInterval": 60,
-                "EnhancedMonitoringResourceArn": "arn:aws:logs:us-west-2:644160558196:log-group:RDSOSMetrics:log-stream:db-K7FEYDY47XERTXMWED4SOZRXAM",
-                "MonitoringRoleArn": "arn:aws:iam::644160558196:role/rds-monitoring-role",
-                "DBInstanceArn": "arn:aws:rds:us-west-2:644160558196:db:qbopp011",
-                "IAMDatabaseAuthenticationEnabled": false,
-                "PerformanceInsightsEnabled": true,
-                "PerformanceInsightsKMSKeyId": "arn:aws:kms:us-west-2:644160558196:key/9ebd4724-2d78-4edb-a629-d0103a5fb9d7",
-                "PerformanceInsightsRetentionPeriod": 731,
+                "MonitoringInterval": 0,
+                "PromotionTier": 1,
+                "DBInstanceArn": "arn:aws:rds:us-west-2:644160558196:db:asset-sync-instance-1",
+                "IAMDatabaseAuthenticationEnabled": true,
+                "PerformanceInsightsEnabled": false,
                 "EnabledCloudwatchLogsExports": [
-                    "audit"
+                    "audit",
+                    "error",
+                    "general",
+                    "slowquery"
                 ],
-                "DeletionProtection": true,
+                "DeletionProtection": false,
                 "AssociatedRoles": [],
                 "TagList": [
                     {
-                        "Key": "cluster",
-                        "Value": "c11"
-                    },
-                    {
                         "Key": "intuit:asset_id",
-                        "Value": "145258680168756101"
-                    },
-                    {
-                        "Key": "env",
-                        "Value": "prd"
-                    },
-                    {
-                        "Key": "org_awsbackup_local_0700UTC",
-                        "Value": "31continuous"
+                        "Value": "2093065519385341093"
                     }
                 ],
                 "CustomerOwnedIpEnabled": false,
-                "AwsBackupRecoveryPointArn": "arn:aws:backup:us-west-2:644160558196:recovery-point:continuous:db-k7feydy47xertxmwed4sozrxam-1d0515c1",
-                "ActivityStreamStatus": "stopped",
                 "BackupTarget": "region",
                 "NetworkType": "IPV4",
                 "CertificateDetails": {
