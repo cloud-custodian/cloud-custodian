@@ -1368,7 +1368,7 @@ def test_cli_output_rich_resource_summary(tmp_path):
 def test_cli_output_github(tmp_path):
     write_output_test_policy(tmp_path)
 
-    runner = CliRunner()
+    runner = CliRunner(charset=sys.platform=='win32' and 'utf-16' or 'utf-8' )
     result = runner.invoke(
         cli.cli,
         [
