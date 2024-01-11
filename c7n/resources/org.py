@@ -10,8 +10,8 @@ from botocore.exceptions import ClientError
 
 from c7n.credentials import assumed_session
 
-# from c7n.executor import MainThreadExecutor
-from c7n.filters import Filter, ValueFilter
+from c7n.actions import Action
+from c7n.filters import Filter, ValueFilter, ListItemFilter
 from c7n.query import QueryResourceManager, TypeInfo, DescribeSource
 from c7n.resources.aws import AWS
 from c7n.tags import universal_augment
@@ -152,6 +152,114 @@ class OrgUnit(QueryResourceManager):
     source_mapping = {'describe': DescribeUnit}
 
 
+class PolicyFilter(ListItemFilter):
+    schema = type_schema(
+        'policy',
+        required=["policy-type"],
+        **{
+            "policy-type": {"enum": OrgPolicy.policy_types},
+            "inherited": {'type': 'boolean'},
+            'attrs': {'$ref': '#/definitions/filters_common/list_item_attrs'},
+            'count': {'type': 'number'},
+            'count_op': {'$ref': '#/definitions/filters_common/comparison_operators'},
+        },
+    )
+
+    target_policies = None
+    ou_root = None
+    client = None
+
+    def process(self, resources, event):
+        self.client = local_session(self.manager.session_factory).client('organizations')
+        if self.data.get('inherited') and self.manager.type == 'org-account':
+            # Get ou account hierarchy / parents
+            hierarchy_manager = self.manager.get_resource_manager(
+                'org-account', {'filters': ['org-unit']}
+            )
+            hierarchy_manager.filters[0].process_accounts(resources, event)
+            # also initialize root for accounts as we dont store it as a parent.
+            self.ou_root = self.client.list_roots()['Roots'][0]
+        self.target_policies = {}
+        return super().process(resources, event)
+
+    def get_targets(self, resource):
+        if not self.data.get('inherited'):
+            yield resource['Id']
+            return
+
+        # return self, parents, root
+
+        # handle ous
+        if self.manager.type == 'org-unit':
+            yield resource['Id']
+            for p in resource['Parents']:
+                yield p
+            return
+
+        # handle accounts
+        yield resource['Id']
+        for p in resource[OrgUnitFilter.annotation_parent_key]:
+            yield p['Id']
+        yield self.ou_root['Id']
+
+    def get_item_values(self, resource):
+        rpolicies = {}
+        for tgt_id in self.get_targets(r):
+            if tgt_id not in target_policies:
+                policies = client.list_policies_for_target(
+                    Filter=self.data['policy-type'], TargetId=tgt_id
+                ).get('Policies', ())
+                target_policies[tgt_id] = policies
+            for p in target_policies[tgt_id]:
+                rpolicies[p['Id']] = p
+        return list(rpolicies.values())
+
+
+class SetPolicy(Action):
+    """Set a policy on an org unit or account"""
+
+    schema = type_schema(
+        "set-policy",
+        required=["name", "contents", "policy-type"],
+        **{
+            "name": {"type": "string"},
+            "description": {"type": "string"},
+            "policy-type": {"enum": OrgPoicy.policy_types},
+            "contents": {"type": "object"},
+            "tags": {"$ref": "#/definitions/string_dict"},
+        },
+    )
+    permssions = ("organizations:AttachPolicy", "organizations:CreatePolicy")
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('organizations')
+        pid = self.ensure_scp(client)
+        for r in resources:
+            self.manager.retry(client.attach_policy, TargetId=r['Id'], PolicyId=pid)
+
+    def ensure_scp(self, client):
+        pmanager = self.manager.get_resource_manager(
+            'org-policy', {'query': [{'filter': self.data['policy-type']}]}
+        )
+        policies = pmanager.resources()
+        found = False
+        for p in policies:
+            if p['Name'] == self.data['name']:
+                found = p
+                break
+        if found:
+            # todo: perhaps modify/compare to match.
+            return found['Id']
+
+        response = client.create_policy(
+            Name=self.data['name'],
+            Description=self.data['description'],
+            Type=self.data['policy-type'],
+            Tags=[{'Key': k, 'Value': v} for k, v in self.data.get('tags', {})],
+        )
+        return response['Policy']['PolicySummary']['Id']
+
+
 @AWS.resources.register("org-account")
 class OrgAccount(QueryResourceManager, OrgAccess):
     class resource_type(TypeInfo):
@@ -165,7 +273,6 @@ class OrgAccount(QueryResourceManager, OrgAccess):
         permissions_augment = ("organizations:ListTagsForResource",)
         universal_augment = object()
 
-    # executor_factory = MainThreadExecutor
     org_session = None
 
     def augment(self, resources):
