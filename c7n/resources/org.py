@@ -204,13 +204,13 @@ class PolicyFilter(ListItemFilter):
 
     def get_item_values(self, resource):
         rpolicies = {}
-        for tgt_id in self.get_targets(r):
-            if tgt_id not in target_policies:
-                policies = client.list_policies_for_target(
+        for tgt_id in self.get_targets(resource):
+            if tgt_id not in self.target_policies:
+                policies = self.client.list_policies_for_target(
                     Filter=self.data['policy-type'], TargetId=tgt_id
                 ).get('Policies', ())
-                target_policies[tgt_id] = policies
-            for p in target_policies[tgt_id]:
+                self.target_policies[tgt_id] = policies
+            for p in self.target_policies[tgt_id]:
                 rpolicies[p['Id']] = p
         return list(rpolicies.values())
 
@@ -224,7 +224,7 @@ class SetPolicy(Action):
         **{
             "name": {"type": "string"},
             "description": {"type": "string"},
-            "policy-type": {"enum": OrgPoicy.policy_types},
+            "policy-type": {"enum": OrgPolicy.policy_types},
             "contents": {"type": "object"},
             "tags": {"$ref": "#/definitions/string_dict"},
         },
