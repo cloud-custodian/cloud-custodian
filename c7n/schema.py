@@ -48,12 +48,10 @@ def is_c7n_placeholder(checker, instance):
     that starts and ends with curly braces, we should avoid failing
     validation.
     """
-    return all(
-        (
-            is_string(checker, instance),
-            instance.startswith('{'),
-            instance.endswith('}'),
-        )
+    return (
+        is_string(checker, instance)
+        and instance.startswith('{')
+        and instance.endswith('}')
     )
 
 CustodianJsonSchemaValidator = validators.extend(
