@@ -195,6 +195,7 @@ class PolicyLambdaProvision(Publish):
                 'mode': {
                     'type': 'cloudtrail',
                     'role': 'arn:aws:iam::644160558196:role/custodian-mu',
+                    'runtime': 'python3.9',
                     'events': ['RunInstances']}})
             pl1 = PolicyLambda(p1)
             mgr = LambdaManager(session_factory)
@@ -499,7 +500,7 @@ class PolicyLambdaProvision(Publish):
                 "mode": {
                     "type": "cloudtrail",
                     "memory": 256,
-                    'runtime': 'python2.7',
+                    'runtime': 'python3.12',
                     "events": [
                         "CreateBucket",
                         {
@@ -854,7 +855,7 @@ class PolicyLambdaProvision(Publish):
         result = self.update_a_lambda(
             mgr,
             **{
-                "runtime": "python3.6",
+                "runtime": "python3.12",
                 "environment": {"Variables": {"FOO": "baz"}},
                 "kms_key_arn": "",
                 "dead_letter_config": {},
@@ -870,7 +871,7 @@ class PolicyLambdaProvision(Publish):
                 "FunctionName": "custodian-hello-world",
                 "Handler": "custodian_policy.run",
                 "MemorySize": 512,
-                "Runtime": "python3.6",
+                "Runtime": "python3.12",
                 "Timeout": 60,
                 "DeadLetterConfig": {"TargetArn": self.sns_arn},
                 "Environment": {"Variables": {"FOO": "baz"}},
@@ -968,7 +969,7 @@ class PolicyLambdaProvision(Publish):
                 "KMSKeyArn": "",
                 "MemorySize": 512,
                 "Role": "",
-                "Runtime": "python3.9",
+                "Runtime": "python3.11",
                 "Architectures": [default_arch],
                 "Tags": {},
                 "Timeout": 900,
@@ -990,7 +991,7 @@ class PolicyLambdaProvision(Publish):
                     "KMSKeyArn": "",
                     "MemorySize": 512,
                     "Role": "",
-                    "Runtime": "python3.9",
+                    "Runtime": "python3.11",
                     "Architectures": ["arm64"],
                     "Tags": {},
                     "Timeout": 900,
@@ -1009,7 +1010,7 @@ class PolicyLambdaProvision(Publish):
                     "KMSKeyArn": "",
                     "MemorySize": 512,
                     "Role": "",
-                    "Runtime": "python3.9",
+                    "Runtime": "python3.11",
                     "Architectures": ["x86_64"],
                     "Tags": {},
                     "Timeout": 900,
