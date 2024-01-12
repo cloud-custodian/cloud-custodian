@@ -13,7 +13,7 @@ class AppStreamFleet(query.QueryResourceManager):
         arn = "Arn"
         id = "Name"
         name = "Name"
-        cfn_type = "AWS::AppStream::Fleet"
+        config_type = cfn_type = "AWS::AppStream::Fleet"
         universal_taggable = object()
 
     source_mapping = {
