@@ -1,0 +1,26 @@
+{
+    "status_code": 200,
+    "data": {
+        "Accounts": [
+            {
+                "Id": "644160558196",
+                "Arn": "arn:aws:organizations::644160558196:account/o-r2x4ytpwhl/644160558196",
+                "Email": "sandbox-kapil@stacklet.io",
+                "Name": "Sandbox-Kapil",
+                "Status": "ACTIVE",
+                "JoinedMethod": "CREATED",
+                "JoinedTimestamp": {
+                    "__class__": "datetime",
+                    "year": 2021,
+                    "month": 8,
+                    "day": 10,
+                    "hour": 13,
+                    "minute": 24,
+                    "second": 25,
+                    "microsecond": 768000
+                }
+            }	    
+        ],
+        "ResponseMetadata": {}
+    }
+}
