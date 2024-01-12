@@ -1,0 +1,40 @@
+{
+    "status_code": 200,
+    "data": {
+        "items": [
+            {
+                "accountId": "644160558196",
+                "actionType": "Upgrade",
+                "currencyCode": "USD",
+                "currentResourceSummary": "gp2",
+                "currentResourceType": "EbsVolume",
+                "estimatedMonthlyCost": 2.56,
+                "estimatedMonthlySavings": 0.64,
+                "estimatedSavingsPercentage": 20.0,
+                "implementationEffort": "Low",
+                "lastRefreshTimestamp": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 12,
+                    "day": 18,
+                    "hour": 13,
+                    "minute": 3,
+                    "second": 20,
+                    "microsecond": 876000
+                },
+                "recommendationId": "NDkwMDY1ODg1ODYzX2FmNGM5YWE4LTMyZTgtNGQ3ZS1hMTY1LTJiZjBiZmUwOTQ1NQ==",
+                "recommendationLookbackPeriodInDays": 14,
+                "recommendedResourceSummary": "gp3",
+                "recommendedResourceType": "EbsVolume",
+                "region": "us-east-1",
+                "resourceArn": "arn:aws:ec2:us-east-1:644160558196:volume/vol-01d020e75fb456422",
+                "resourceId": "vol-01d020e75fb456422",
+                "restartNeeded": false,
+                "rollbackPossible": true,
+                "source": "ComputeOptimizer",
+                "tags": []
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

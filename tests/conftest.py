@@ -5,12 +5,11 @@ import re
 import pytest
 
 from c7n.vendored.distutils.util import strtobool
-from .constants import ACCOUNT_ID
 
 from vcr import stubs
 
 try:
-    from .zpill import PillTest
+    from .zpill import PillTest, ACCOUNT_ID, ORG_ID
     from c7n.testing import PyTestUtils, reset_session_cache
     from pytest_terraform.tf import LazyPluginCacheDir, LazyReplay
 except ImportError: # noqa
@@ -49,8 +48,12 @@ class TerraformAWSRewriteHooks:
     """
     def pytest_terraform_modify_state(self, tfstate):
         """ Sanitize functional testing account data """
-        tfstate.update(re.sub(r'\b\d{12}\b', ACCOUNT_ID, str(tfstate)))
-
+        tfstate.update(
+            re.sub(
+                r'^o-[a-z0-9]{10,32}$', ORG_ID,
+                re.sub(r'\b\d{12}\b', ACCOUNT_ID, str(tfstate))
+            )
+        )
 
 class CustodianAWSTesting(PyTestUtils, PillTest):
     """Pytest AWS Testing Fixture
