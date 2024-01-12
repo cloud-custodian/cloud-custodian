@@ -613,6 +613,7 @@ class SSMDocument(QueryResourceManager):
         name = id = 'Name'
         date = 'RegistrationDate'
         arn_type = 'document'
+        cfn_type = config_type = "AWS::SSM::Document"
 
     permissions = ('ssm:ListDocuments',)
 

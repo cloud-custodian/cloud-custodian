@@ -151,6 +151,7 @@ class TypeMeta(type):
 
 class TypeInfo(metaclass=TypeMeta):
     group = None
+    canonical_group = None
     version = None
     enum_spec = ()
     namespaced = True
@@ -160,5 +161,6 @@ class TypeInfo(metaclass=TypeMeta):
 
 class CustomTypeInfo(TypeInfo, metaclass=TypeMeta):
     group = "CustomObjects"
+    canonical_group = None
     version = ""
     enum_spec = ("list_cluster_custom_object", "items", None)
