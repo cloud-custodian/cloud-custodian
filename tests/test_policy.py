@@ -375,6 +375,21 @@ class PolicyMetaLint(BaseTest):
         # of a resource.
 
         whitelist = {
+            # q1 2024
+            "AWS::Cognito::UserPoolClient",
+            "AWS::Cognito::UserPoolGroup",
+            "AWS::EC2::NetworkInsightsAccessScope",
+            "AWS::EC2::NetworkInsightsAnalysis",
+            "AWS::Grafana::Workspace",
+            "AWS::GroundStation::DataflowEndpointGroup",
+            "AWS::ImageBuilder::ImageRecipe",
+            "AWS::M2::Environment",
+            "AWS::QuickSight::DataSource",
+            "AWS::QuickSight::Template",
+            "AWS::QuickSight::Theme",
+            "AWS::RDS::OptionGroup",
+            "AWS::Redshift::EndpointAccess",
+            "AWS::Route53Resolver::FirewallRuleGroup",
             # q4 2023 wave 2 (aka reinvent)
             "AWS::ACMPCA::CertificateAuthorityActivation",
             "AWS::AppMesh::GatewayRoute",
