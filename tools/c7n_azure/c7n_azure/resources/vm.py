@@ -5,8 +5,9 @@ from c7n_azure.actions.base import AzureBaseAction
 from c7n_azure.provider import resources
 from c7n_azure.resources.arm import ArmResourceManager
 
-from c7n.filters.core import ValueFilter, type_schema
+from c7n.filters.core import ValueFilter, type_schema, FilterValidationError
 from c7n.filters.related import RelatedResourceFilter
+from c7n.utils import local_session
 
 
 @resources.register('vm')
@@ -268,6 +269,53 @@ class NetworkInterfaceFilter(RelatedResourceFilter):
 
     RelatedResource = "c7n_azure.resources.network_interface.NetworkInterface"
     RelatedIdsExpression = "properties.networkProfile.networkInterfaces[0].id"
+
+
+@VirtualMachine.filter_registry.register('backup-status')
+class BackupStatusFilter(ValueFilter):
+    """Filters Virtual Machines by their backup protection status.
+
+    :example:
+
+    This policy will get Virtual Machine resources that Protected backup protection status.
+
+    .. code-block:: yaml
+
+        policies:
+          - name: vm-backup-status-protected
+            resource: azure.vm
+            filters:
+              - type: backup-status
+                protection-status: Protected
+    """
+    protection_status_key = 'protection-status'
+    schema = type_schema(
+        'backup-status',
+        required=[protection_status_key],
+        **{
+            protection_status_key: {'type': 'string'}
+        })
+
+    def validate(self):
+        required_key = BackupStatusFilter.protection_status_key
+        if required_key not in self.data:
+            raise FilterValidationError(f"Missing required key: {required_key}")
+
+    def process(self, resources, event=None):
+        s = local_session(self.manager.session_factory)
+        client = s.client('azure.mgmt.recoveryservicesbackup.RecoveryServicesBackupClient')
+        valid_status = self.data[BackupStatusFilter.protection_status_key]
+        valid_resources = []
+
+        for resource in resources:
+            r_id = resource['id']
+            region = resource['location']
+            parameters = {'resourceId': r_id, 'resourceType': 'VM'}
+            backup = client.backup_status.get(azure_region=region, parameters=parameters)
+            if backup.protection_status == valid_status:
+                valid_resources.append(resource)
+
+        return valid_resources
 
 
 @VirtualMachine.action_registry.register('poweroff')
