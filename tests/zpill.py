@@ -20,6 +20,7 @@ from c7n.testing import CustodianTestCore
 # Custodian Test Account. This is used only for testing.
 
 ACCOUNT_ID = "644160558196"
+ORG_ID = "o-abc123cc32"
 
 ###########################################################################
 # BEGIN PLACEBO MONKEY PATCH
@@ -256,6 +257,7 @@ class RedPill(pill.Pill):
 
         response_data = json.dumps(response_data, default=serialize)
         response_data = re.sub(r"\b\d{12}\b", ACCOUNT_ID, response_data)  # noqa
+        response_data = re.sub(r"^o-[a-z0-9]{10,32}$", ORG_ID, response_data)
         response_data = json.loads(response_data, object_hook=deserialize)
 
         super(RedPill, self).save_response(service, operation, response_data, http_response)
