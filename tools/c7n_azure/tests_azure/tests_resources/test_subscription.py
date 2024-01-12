@@ -104,3 +104,29 @@ class SubscriptionDiagnosticSettingsFilterTest(BaseTest):
         }, validate=True)
 
         self.assertEqual(0, len(p.run()))
+
+
+class TestNetworkWatcherFilter(BaseTest):
+
+    def test_query(self):
+        p = self.load_policy({
+            'name': 'test-network-watcher',
+            'resource': 'azure.subscription',
+            'filters': [{'not': [{
+                'type': 'network-watcher',
+            }]}],
+        })
+        resources = p.run()
+        self.assertEqual(1, len(resources))
+        self.assertEqual('ea42f556-5106-4743-99b0-c129bfa71a47', resources[0]['subscriptionId'])
+
+    def test_schema_validate(self):
+        with self.sign_out_patch():
+            p = self.load_policy({
+                'name': 'test-network-watcher',
+                'resource': 'azure.subscription',
+                'filters': [{'not': [{
+                    'type': 'network-watcher',
+                }]}],
+            }, validate=True)
+            self.assertTrue(p)

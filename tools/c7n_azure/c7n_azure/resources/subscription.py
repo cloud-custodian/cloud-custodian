@@ -8,7 +8,7 @@ from azure.mgmt.monitor import MonitorManagementClient
 from c7n.actions import BaseAction
 from c7n.exceptions import PolicyValidationError
 from c7n.filters.missing import Missing
-from c7n.filters.core import ValueFilter
+from c7n.filters.core import ValueFilter, Filter
 from c7n.manager import ResourceManager
 from c7n.utils import local_session, type_schema
 
@@ -71,7 +71,23 @@ class Subscription(ResourceManager, metaclass=QueryMeta):
         return details.serialize(True)
 
 
+@Subscription.filter_registry.register('network-watcher')
+class NetworkWatcherFilter(Filter):
+    schema = type_schema('network-watcher')
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client(
+            'azure.mgmt.network.NetworkManagementClient'
+        )
+        watchers_list = list(client.network_watchers.list_all())
+        if len(watchers_list) > 0:
+            return []
+
+        return [resources[0]]
+
+
 Subscription.filter_registry.register('missing', Missing)
+
 
 @Subscription.filter_registry.register('diagnostic-settings')
 class SubscriptionDiagnosticSettingFilter(ValueFilter):
