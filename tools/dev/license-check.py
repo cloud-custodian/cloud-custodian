@@ -7,6 +7,7 @@ accept = (
     'MIT',
     'BSD',
     'Apache License 2.0',
+    'Apache License, Version 2.0',
     'Apache 2.0',
     'MIT License',
     'Apache 2',
