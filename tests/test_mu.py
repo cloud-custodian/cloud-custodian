@@ -165,7 +165,7 @@ class PolicyLambdaProvision(Publish):
             self.addCleanup(mgr.remove, pl1)
 
     def test_config_poll_rule_evaluation(self):
-        session_factory = self.replay_flight_data("test_config_poll_rule_provision")
+        session_factory = self.replay_flight_data("test_config_poll_rule_evaluation")
 
         # config added support for kinesis streams after that test was written
         # disable that support so the original behavior check on config poll mode
