@@ -1074,12 +1074,24 @@ class CloudWatchEventSource(AWSEventBase):
         return resource_exists(self.client.describe_rule, Name=rule_name)
 
     @staticmethod
+    def update_tags(old_tags, new_tags):
+        dupl_tags = []
+        for v in old_tags:
+            for k in new_tags:
+                if v["Key"] == k["Key"]:
+                    dupl_tags.append(v)
+
+        only_old_tags = [x for x in old_tags if x not in dupl_tags]
+
+        return only_old_tags + new_tags
+
+    @staticmethod
     def delta(src, tgt):
         """Given two cwe rules determine if the configuration is the same.
 
         Name is already implied.
         """
-        for k in ['State', 'EventPattern', 'ScheduleExpression']:
+        for k in ['State', 'EventPattern', 'ScheduleExpression', 'Tags']:
             if src.get(k) != tgt.get(k):
                 return True
         return False
@@ -1180,11 +1192,23 @@ class CloudWatchEventSource(AWSEventBase):
         if schedule:
             params['ScheduleExpression'] = schedule
 
+        tags = self.data.get('tags', {})
+        if tags:
+            params['Tags'] = [{'Key': k, 'Value': v} for k, v in tags.items()]
+
         rule = self.get(func.event_name)
+
+        if rule:
+            old_tags = self.client.list_tags_for_resource(ResourceARN=rule['Arn']).get("Tags", [])
+            new_tags = self.update_tags(old_tags, params.get('Tags', []))
+
+            rule['Tags'] = sorted(old_tags, key=lambda x: x['Key'])
+            params['Tags'] = sorted(new_tags, key=lambda x: x['Key'])
 
         if rule and self.delta(rule, params):
             log.debug("Updating cwe rule for %s" % func.event_name)
             response = self.client.put_rule(**params)
+            self.client.tag_resource(ResourceARN=rule['Arn'], Tags=params['Tags'])
         elif not rule:
             log.debug("Creating cwe rule for %s" % (self))
             response = self.client.put_rule(**params)

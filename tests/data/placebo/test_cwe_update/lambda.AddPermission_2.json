@@ -1,0 +1,22 @@
+{
+    "status_code": 409, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 409, 
+            "RequestId": "452f1f9b-3ba8-11e7-878f-ffc43fcb3da4", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "452f1f9b-3ba8-11e7-878f-ffc43fcb3da4", 
+                "content-length": "167", 
+                "connection": "keep-alive", 
+                "date": "Thu, 18 May 2017 08:59:15 GMT", 
+                "content-type": "application/json", 
+                "x-amzn-errortype": "ResourceConflictException"
+            }
+        }, 
+        "Error": {
+            "Message": "The statement id (custodian-s3-bucket-policy) provided already exists. Please provide a new statement id, or remove the existing statement.", 
+            "Code": "ResourceConflictException"
+        }
+    }
+}

@@ -1,0 +1,38 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Code": {
+            "RepositoryType": "S3", 
+            "Location": "https://awslambda-us-west-2-tasks.s3-us-west-2.amazonaws.com/snapshots/644160558196/custodian-s3-bucket-policy-8b9536b2-78e0-4c4d-a516-85e0d59106b3?X-Amz-Security-Token=FQoDYXdzEEEaDEhtFicFGwW%2FvcQq%2FyK3AwEMqPRnES7h%2BLxHi7%2By8WxLU3w4nhGYWyOgwLADTVhj2cQDipoRr5FYzNIY57AFByfo6ggRo4rCEb8aBdghbzVX5%2BtyDAGD%2Bhy%2BtZL6C647l2vKIu4o8mOj03%2BlEVrXUsF4ib92UB4u42I%2FodXjo5IkXZI0QrmTj%2B%2FqpeRyiWlvxLNod0s9EBKN96zRdOMpdo5OFRiTBPh59Bsx0uNiT8lP1WPfMWA2omQL8vW8XudD3pA5icC68LXEOt4H6aRllyUP3kRECOPMc4Q7%2BkiYSLY7LWANplgGtUQYPwz96wSCSzdtNsERw1%2FOHv5EE%2BLOe6nyw1HIFfSFeWn9VqIs0LNNq%2Bkv1dwxMgZmeH0ofmlbhv6Ttar8isnOr2L0oTkBfLvyRWHMrfFsnykklRUq%2BDndSVg7aMGWPRJme7bNXpw1NUezD3xPohar%2Fh7vqfM24qcxk6KSgqX4pVydatx9ayy%2FwKOuLrL20jOWh6PrUhJS18EyVIM0Q8Ix%2B7%2FndIUoI4%2F4lImIC2IPZmWJzPZc52ILSwD5WKMqUk%2Fx3w%2F1OjM4IT%2BdQeeEyHaB%2BMiiXtXkC9JDeikP9%2B8o76D1yAU%3D&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20170518T085908Z&X-Amz-SignedHeaders=host&X-Amz-Expires=600&X-Amz-Credential=ASIAJT6PQD5FUZMABX6Q%2F20170518%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Signature=f547670423db078d6897932837e38462869646ed9745c7f84caf2031977433d9"
+        }, 
+        "Configuration": {
+            "TracingConfig": {
+                "Mode": "PassThrough"
+            }, 
+            "Version": "48", 
+            "CodeSha256": "kTfXZ8sWqfgO9X8QjwFAhvrpxk69clD6Ng+qC2gVt7w=", 
+            "FunctionName": "custodian-s3-bucket-policy", 
+            "MemorySize": 512, 
+            "CodeSize": 1363899, 
+            "FunctionArn": "arn:aws:lambda:us-west-2:644160558196:function:custodian-s3-bucket-policy:Dev", 
+            "Handler": "custodian_policy.run", 
+            "Role": "arn:aws:iam::644160558196:role/custodian-mu", 
+            "Timeout": 900, 
+            "LastModified": "2017-05-18T08:59:05.587+0000", 
+            "Runtime": "python2.7", 
+            "Description": "cloud-custodian lambda policy"
+        }, 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "40fdd177-3ba8-11e7-94da-957795f7073c", 
+            "HTTPHeaders": {
+                "date": "Thu, 18 May 2017 08:59:08 GMT", 
+                "x-amzn-requestid": "40fdd177-3ba8-11e7-94da-957795f7073c", 
+                "content-length": "1788", 
+                "content-type": "application/json", 
+                "connection": "keep-alive"
+            }
+        }
+    }
+}

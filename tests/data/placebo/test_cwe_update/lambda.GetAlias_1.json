@@ -1,0 +1,22 @@
+{
+    "status_code": 404, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 404, 
+            "RequestId": "3f585f0f-3ba8-11e7-a2e1-d96390ad95a7", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "3f585f0f-3ba8-11e7-a2e1-d96390ad95a7", 
+                "content-length": "128", 
+                "connection": "keep-alive", 
+                "date": "Thu, 18 May 2017 08:59:06 GMT", 
+                "content-type": "application/json", 
+                "x-amzn-errortype": "ResourceNotFoundException"
+            }
+        }, 
+        "Error": {
+            "Message": "Cannot find alias arn: arn:aws:lambda:us-west-2:644160558196:function:custodian-s3-bucket-policy:Dev", 
+            "Code": "ResourceNotFoundException"
+        }
+    }
+}

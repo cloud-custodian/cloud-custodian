@@ -1,0 +1,17 @@
+{
+    "status_code": 200, 
+    "data": {
+        "RuleArn": "arn:aws:events:us-west-2:644160558196:rule/custodian-s3-bucket-policy", 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "4041ad78-3ba8-11e7-b7e6-1777b240740d", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "4041ad78-3ba8-11e7-b7e6-1777b240740d", 
+                "date": "Thu, 18 May 2017 08:59:07 GMT", 
+                "content-length": "83", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }
+    }
+}

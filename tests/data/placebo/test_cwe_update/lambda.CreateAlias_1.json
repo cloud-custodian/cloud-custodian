@@ -1,0 +1,21 @@
+{
+    "status_code": 201, 
+    "data": {
+        "AliasArn": "arn:aws:lambda:us-west-2:644160558196:function:custodian-s3-bucket-policy:Dev", 
+        "FunctionVersion": "48", 
+        "Name": "Dev", 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 201, 
+            "RequestId": "3f699d81-3ba8-11e7-b067-e7d02f4f77d6", 
+            "HTTPHeaders": {
+                "date": "Thu, 18 May 2017 08:59:05 GMT", 
+                "x-amzn-requestid": "3f699d81-3ba8-11e7-b067-e7d02f4f77d6", 
+                "content-length": "145", 
+                "content-type": "application/json", 
+                "connection": "keep-alive"
+            }
+        }, 
+        "Description": ""
+    }
+}

@@ -1,0 +1,22 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Targets": [
+            {
+                "Id": "custodian-s3-bucket-policy", 
+                "Arn": "arn:aws:lambda:us-west-2:644160558196:function:custodian-s3-bucket-policy"
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "45425900-3ba8-11e7-b373-6d1bc9365cf2", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "45425900-3ba8-11e7-b373-6d1bc9365cf2", 
+                "date": "Thu, 18 May 2017 08:59:15 GMT", 
+                "content-length": "131", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }
+    }
+}

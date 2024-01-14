@@ -1,0 +1,21 @@
+{
+    "status_code": 200, 
+    "data": {
+        "Name": "custodian-s3-bucket-policy", 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "43f0d376-3ba8-11e7-b373-6d1bc9365cf2", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "43f0d376-3ba8-11e7-b373-6d1bc9365cf2", 
+                "date": "Thu, 18 May 2017 08:59:13 GMT", 
+                "content-length": "339", 
+                "content-type": "application/x-amz-json-1.1"
+            }
+        }, 
+        "EventPattern": "{\"detail\": {\"eventName\": [\"CreateBucket\"], \"eventSource\": [\"s3.amazonaws.com\"]}, \"detail-type\": [\"AWS API Call via CloudTrail\"]}", 
+        "State": "ENABLED", 
+        "Arn": "arn:aws:events:us-west-2:644160558196:rule/custodian-s3-bucket-policy", 
+        "Description": "cloud-custodian lambda policy"
+    }
+}
