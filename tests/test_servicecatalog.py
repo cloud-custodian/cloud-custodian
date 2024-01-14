@@ -105,7 +105,9 @@ class TestServiceCatalog(BaseTest):
 
     def test_catalog_provisioned_product_resource(self):
         aws_region = 'eu-central-1'
-        session_factory = self.replay_flight_data('test_catalog_provisioned_product_resource', region=aws_region)
+        session_factory = self.replay_flight_data(
+            'test_catalog_provisioned_product_resource',
+            region=aws_region)
         p = self.load_policy(
             {
                 'name': 'test-catalog-provisioned-product',
@@ -127,7 +129,10 @@ class TestServiceCatalog(BaseTest):
 
     def test_catalog_provisioned_product_is_deprecated(self):
         aws_region = 'eu-central-1'
-        session_factory = self.replay_flight_data('test_catalog_provisioned_product_is_deprecated', region=aws_region)
+        session_factory = self.replay_flight_data(
+            'test_catalog_provisioned_product_is_deprecated',
+            region=aws_region)
+
         p = self.load_policy(
             {
                 'name': 'test-catalog-provisioned-product',
@@ -146,7 +151,10 @@ class TestServiceCatalog(BaseTest):
 
     def test_catalog_provisioned_product_is_not_deprecated(self):
         aws_region = 'eu-central-1'
-        session_factory = self.replay_flight_data('test_catalog_provisioned_product_is_deprecated', region=aws_region)
+        session_factory = self.replay_flight_data(
+            'test_catalog_provisioned_product_is_deprecated',
+            region=aws_region)
+
         p = self.load_policy(
             {
                 'name': 'test-catalog-provisioned-product',
@@ -186,7 +194,10 @@ class TestServiceCatalog(BaseTest):
 
     def test_catalog_provisioned_product_is_active(self):
         aws_region = 'eu-central-1'
-        session_factory = self.replay_flight_data('test_catalog_provisioned_product_is_active', region=aws_region)
+        session_factory = self.replay_flight_data(
+            'test_catalog_provisioned_product_is_active',
+            region=aws_region)
+
         p = self.load_policy(
             {
                 'name': 'test-catalog-provisioned-product',
@@ -205,7 +216,10 @@ class TestServiceCatalog(BaseTest):
 
     def test_catalog_provisioned_product_is_not_active(self):
         aws_region = 'eu-central-1'
-        session_factory = self.replay_flight_data('test_catalog_provisioned_product_is_active', region=aws_region)
+        session_factory = self.replay_flight_data(
+            'test_catalog_provisioned_product_is_active',
+            region=aws_region)
+
         p = self.load_policy(
             {
                 'name': 'test-catalog-provisioned-product',
