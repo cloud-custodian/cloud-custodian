@@ -20,9 +20,7 @@ import inspect
 import logging
 
 from jsonschema import Draft7Validator as JsonSchemaValidator
-from jsonschema._types import is_integer, is_string, is_bool, is_number
 from jsonschema.exceptions import best_match
-from jsonschema import validators
 
 from c7n.policy import execution
 from c7n.provider import clouds
@@ -39,59 +37,53 @@ from c7n.filters.core import (
 )
 from c7n.structure import StructureParser # noqa
 
-def is_c7n_placeholder(checker, instance):
+def is_c7n_placeholder(instance):
     """Is this schema element a Custodian variable placeholder?
 
     Because policy validation can happen before we interpolate
     variable values, there are cases where we validate non-string
     types against variable placeholders. If a policy element is a string
     that starts and ends with curly braces, we should avoid failing
-    validation.
+    failing type checks.
     """
     return (
-        is_string(checker, instance)
+        isinstance(instance, str)
         and instance.startswith('{')
         and instance.endswith('}')
     )
-
-CustodianJsonSchemaValidator = validators.extend(
-    JsonSchemaValidator,
-    type_checker=JsonSchemaValidator.TYPE_CHECKER.redefine_many(
-        {
-            'integer': lambda checker, instance:
-                is_integer(checker, instance) or is_c7n_placeholder(checker, instance),
-            'boolean': lambda checker, instance:
-                is_bool(checker, instance) or is_c7n_placeholder(checker, instance),
-            'number': lambda checker, instance:
-                is_number(checker, instance) or is_c7n_placeholder(checker, instance),
-        }
-    )
-)
 
 def validate(data, schema=None, resource_types=()):
     if schema is None:
         schema = generate(resource_types)
         JsonSchemaValidator.check_schema(schema)
 
-    validator = CustodianJsonSchemaValidator(schema)
-    errors = list(validator.iter_errors(data))
+    validator = JsonSchemaValidator(schema)
+    errors = []
+    for error in validator.iter_errors(data):
+        try:
+            error = specific_error(error)
+
+            # ignore type checking errors against variable references that
+            # haven't yet been expanded
+            if error.validator == "type" and is_c7n_placeholder(error.instance):
+                continue
+
+            resp = policy_error_scope(error, data)
+            name = (
+                isinstance(error.instance, dict)
+                and error.instance.get('name', 'unknown') or 'unknown'
+            )
+            return [resp, name]
+        except Exception:
+            logging.exception(
+                "specific_error failed, traceback, followed by fallback")
+            errors.append(error)
     if not errors:
         return check_unique(data) or []
-    try:
-        resp = policy_error_scope(specific_error(errors[0]), data)
-        name = isinstance(
-            errors[0].instance,
-            dict) and errors[0].instance.get(
-            'name',
-            'unknown') or 'unknown'
-        return [resp, name]
-    except Exception:
-        logging.exception(
-            "specific_error failed, traceback, followed by fallback")
 
     return list(filter(None, [
         errors[0],
-        best_match(validator.iter_errors(data)),
+        best_match(errors),
     ]))
 
 
