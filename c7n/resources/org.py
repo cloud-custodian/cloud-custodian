@@ -9,9 +9,9 @@ import threading
 
 from botocore.exceptions import ClientError
 
-from c7n.credentials import assumed_session
-
 from c7n.actions import Action
+from c7n.credentials import assumed_session
+from c7n.exceptions import PolicyValidationError
 from c7n.filters import Filter, ValueFilter, ListItemFilter
 from c7n.query import QueryResourceManager, TypeInfo, DescribeSource
 from c7n.resources.aws import AWS
