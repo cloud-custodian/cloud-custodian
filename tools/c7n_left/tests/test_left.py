@@ -62,7 +62,9 @@ class ResultsReporter:
 
 
 def run_policy(policy, terraform_dir, tmp_path):
-    (tmp_path / "policies.json").write_text(json.dumps({"policies": [policy]}, indent=2))
+    (tmp_path / "policies.json").write_text(
+        json.dumps({"policies": [policy]}, indent=2)
+    )
     config = cli.get_config(policy_dir=tmp_path, directory=terraform_dir)
     policies = policy_core.load_policies(tmp_path, config)
     reporter = ResultsReporter()
@@ -105,7 +107,9 @@ class PolicyEnv:
         policy_file.write_text(json.dumps(extant))
 
     def run(self, policy_dir=None, terraform_dir=None):
-        config = cli.get_config(terraform_dir or self.policy_dir, policy_dir or self.policy_dir)
+        config = cli.get_config(
+            terraform_dir or self.policy_dir, policy_dir or self.policy_dir
+        )
         policies = policy_core.load_policies(config.policy_dir, config)
         reporter = ResultsReporter()
         core.CollectionRunner(policies, config, reporter).run()
@@ -118,8 +122,12 @@ def policy_env(tmp_path):
 
 
 def test_load_policy(test):
-    test.load_policy({"name": "check1", "resource": "terraform.aws_s3_bucket"}, validate=True)
-    test.load_policy({"name": "check2", "resource": ["terraform.aws_s3_bucket"]}, validate=True)
+    test.load_policy(
+        {"name": "check1", "resource": "terraform.aws_s3_bucket"}, validate=True
+    )
+    test.load_policy(
+        {"name": "check2", "resource": ["terraform.aws_s3_bucket"]}, validate=True
+    )
     test.load_policy({"name": "check3", "resource": ["terraform.aws_*"]}, validate=True)
 
 
@@ -321,7 +329,9 @@ data "aws_ami" "ubuntu" {
 }
         """
     )
-    policy_env.write_policy({"name": "check-data", "resource": "terraform.data.aws_ami"})
+    policy_env.write_policy(
+        {"name": "check-data", "resource": "terraform.data.aws_ami"}
+    )
     results = policy_env.run()
     assert len(results) == 1
 
@@ -833,7 +843,9 @@ def test_graph_non_root_var_file(tmp_path, var_tf_setup):
 
 
 def test_graph_var_auto_default_json(tmp_path, var_tf_setup):
-    (tmp_path / "tf" / "terraform.tfvars.json").write_text(json.dumps({"balancer_type": "network"}))
+    (tmp_path / "tf" / "terraform.tfvars.json").write_text(
+        json.dumps({"balancer_type": "network"})
+    )
     graph = TerraformProvider().parse(tmp_path / "tf")
     resources = list(graph.get_resources_by_type("aws_alb"))
     assert resources[0][1][0]["load_balancer_type"] == "network"
@@ -855,7 +867,9 @@ def test_graph_var_auto(tmp_path, var_tf_setup):
 
 def test_graph_var_file_abs(tmp_path, var_tf_setup):
     (tmp_path / "tf" / "vars.tfvars").write_text('balancer_type = "network"')
-    graph = TerraformProvider().parse(tmp_path / "tf", (tmp_path / "tf" / "vars.tfvars",))
+    graph = TerraformProvider().parse(
+        tmp_path / "tf", (tmp_path / "tf" / "vars.tfvars",)
+    )
     resources = list(graph.get_resources_by_type("aws_alb"))
     assert resources[0][1][0]["load_balancer_type"] == "network"
 
@@ -1228,7 +1242,9 @@ resource "aws_cloudwatch_log_group" "yada" {
         ],
     )
     report = json.loads((tmp_path / "output.json").read_text())
-    result = jsonschema.validate(report, json.loads(urlopen(output.GitlabSAST.SCHEMA_FILE).read()))
+    result = jsonschema.validate(
+        report, json.loads(urlopen(output.GitlabSAST.SCHEMA_FILE).read())
+    )
     assert not result
 
 
@@ -1254,7 +1270,9 @@ def test_cli_output_rich_mod_resource_ref(tmp_path, debug_cli_runner):
     subprocess.check_call(args="terraform get", shell=True, cwd=tmp_path)
 
     runner = CliRunner()
-    result = runner.invoke(cli.cli, ["run", "-p", str(tmp_path), "-d", str(tmp_path), "-o", "cli"])
+    result = runner.invoke(
+        cli.cli, ["run", "-p", str(tmp_path), "-d", str(tmp_path), "-o", "cli"]
+    )
     assert result.exit_code == 1
     assert "References:" in result.output
     assert "module.db.module.db_instance.aws_db_instance.this[0]" in result.output
@@ -1369,7 +1387,7 @@ def test_cli_output_rich_resource_summary(tmp_path):
 def test_cli_output_github(tmp_path):
     write_output_test_policy(tmp_path)
 
-    runner = CliRunner(charset=sys.platform=='win32' and 'utf-16' or 'utf-8' )
+    runner = CliRunner(charset=sys.platform == "win32" and "utf-16" or "utf-8")
     result = runner.invoke(
         cli.cli,
         [
@@ -1451,7 +1469,9 @@ def test_cli_output_json(tmp_path):
             ],
             "file_line_end": 28,
             "file_line_start": 25,
-            "file_path": str(Path("tests") / "terraform" / "aws_s3_encryption_audit" / "main.tf"),
+            "file_path": str(
+                Path("tests") / "terraform" / "aws_s3_encryption_audit" / "main.tf"
+            ),
             "policy": {
                 "filters": [{"server_side_encryption_configuration": "absent"}],
                 "metadata": {"category": ["test"]},
@@ -1467,7 +1487,9 @@ def test_cli_output_json(tmp_path):
                     "line_end": 28,
                     "line_start": 25,
                     "path": "aws_s3_bucket.example_c",
-                    "src_dir": str(Path("tests") / "terraform" / "aws_s3_encryption_audit"),
+                    "src_dir": str(
+                        Path("tests") / "terraform" / "aws_s3_encryption_audit"
+                    ),
                     "type": "resource",
                 },
                 "acl": "private",
@@ -1508,8 +1530,13 @@ def test_policy_metadata(policy_env):
     md = core.PolicyMetadata(policies[0])
     assert md.provider == "terraform"
     assert md.display_category == "network"
-    assert md.title == "terraform.aws_security_group - policy:test-a category:network severity:high"
-    assert repr(md) == "<PolicyMetadata name:test-a resource:terraform.aws_security_group>"
+    assert (
+        md.title
+        == "terraform.aws_security_group - policy:test-a category:network severity:high"
+    )
+    assert (
+        repr(md) == "<PolicyMetadata name:test-a resource:terraform.aws_security_group>"
+    )
 
 
 def test_selection_parse(policy_env):
