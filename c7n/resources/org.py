@@ -209,7 +209,7 @@ class PolicyFilter(ListItemFilter):
     permissions = ("organizations:ListRoots", "organizations:ListPoliciesForTarget")
 
     annotate_items = True
-    annotation_key = "c7n:PolicyMatches"
+    item_annotation_key = "c7n:PolicyMatches"
     target_policies = None
     ou_root = None
     client = None
@@ -237,8 +237,6 @@ class PolicyFilter(ListItemFilter):
             yield resource["Id"]
             return
 
-        # return self, parents, root
-
         # handle ous
         if self.manager.type == "org-unit":
             yield resource["Id"]
@@ -250,6 +248,8 @@ class PolicyFilter(ListItemFilter):
         yield resource["Id"]
         for p in resource[OrgUnitFilter.annotation_parent_key]:
             yield p["Id"]
+
+        # finally the root
         yield self.ou_root["Id"]
 
     def get_item_values(self, resource):
