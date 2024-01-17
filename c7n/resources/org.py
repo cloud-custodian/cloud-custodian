@@ -268,7 +268,53 @@ class PolicyFilter(ListItemFilter):
 @OrgAccount.action_registry.register("set-policy")
 @OrgUnit.action_registry.register("set-policy")
 class SetPolicy(Action):
-    """Set a policy on an org unit or account"""
+    """Set a policy on an org unit or account
+
+    .. code-block:: yaml
+
+        policies:
+          - name: attach-existing-scp
+            resource: aws.org-unit
+            filters:
+              - type: policy
+                policy-type: SERVICE_CONTROL_POLICY
+                count: 0
+                attrs:
+                  - Name: RestrictedRootAccount
+            actions:
+              - type: set-policy
+                policy-type: SERVICE_CONTROL_POLICY
+                name: RestrictedRootAccount
+
+    .. code-block:: yaml
+
+        policies:
+          - name: create-and-attach-scp
+            resource: aws.org-unit
+            filters:
+              - type: policy
+                policy-type: SERVICE_CONTROL_POLICY
+                count: 0
+                attrs:
+                  - Name: RestrictedRootAccount
+            actions:
+              - type: set-policy
+                policy-type: SERVICE_CONTROL_POLICY
+                name: RestrictedRootAccount
+                contents:
+                  Version: "2012-10-17"
+                  Statement:
+                    - Sid: RestrictEC2ForRoot
+                      Effect: Deny
+                      Action:
+                        - "ec2:*"
+                      Resource:
+                        - "*"
+                      Condition:
+                        StringLike:
+                          "aws:PrincipalArn":
+                            - arn:aws:iam::*:root
+    """
 
     schema = type_schema(
         "set-policy",
