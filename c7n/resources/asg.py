@@ -35,7 +35,8 @@ class ASG(query.QueryResourceManager):
         arn = 'AutoScalingGroupARN'
         arn_type = 'autoScalingGroup'
         arn_separator = ":"
-        id = name = 'AutoScalingGroupName'
+        name = 'AutoScalingGroupName'
+        id = 'AutoScalingGroupARN'
         date = 'CreatedTime'
         dimension = 'AutoScalingGroupName'
         enum_spec = ('describe_auto_scaling_groups', 'AutoScalingGroups', None)
