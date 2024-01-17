@@ -204,7 +204,11 @@ def test_org_ou_set_policy(test, policy_tree):
     policies = client.list_policies(Filter="SERVICE_CONTROL_POLICY").get("Policies")
     gpolicy = [p for p in policies if p["Name"] == "gopher"].pop()
     tags = client.list_tags_for_resource(ResourceId=gpolicy["Id"]).get("Tags")
-    assert {t["Key"]: t["Value"] for t in tags} == {"Env": "Dev", "Control": "Gov"}
+    assert {t["Key"]: t["Value"] for t in tags} == {
+        "Env": "Dev",
+        "Control": "Gov",
+        "managed-by": "CloudCustodian",
+    }
 
     p = test.load_policy(
         {

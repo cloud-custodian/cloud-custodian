@@ -352,12 +352,14 @@ class SetPolicy(Action):
             raise PolicyValidationError(
                 "Policy references not existant org policy " "without specifying contents"
             )
+        ptags = [{"Key": k, "Value": v} for k, v in self.data.get("tags", {}).items()]
+        ptags.append({"Key": "managed-by", "Value": "CloudCustodian"})
         response = client.create_policy(
             Name=self.data["name"],
             Description=self.data.get("description", "%s (custodian managed)" % self.data["name"]),
             Type=self.data["policy-type"],
             Content=json.dumps(self.data["contents"]),
-            Tags=[{"Key": k, "Value": v} for k, v in self.data.get("tags", {}).items()],
+            Tags=ptags,
         )
         return response["Policy"]["PolicySummary"]["Id"]
 
