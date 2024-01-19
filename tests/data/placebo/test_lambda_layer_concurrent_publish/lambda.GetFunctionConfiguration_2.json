@@ -23,16 +23,15 @@
         "TracingConfig": {
             "Mode": "PassThrough"
         },
-        "RevisionId": "ce86ae06-55ce-4329-a63e-eefd0859fbbb",
+        "RevisionId": "2f5768c7-580d-414e-a8b8-5eec7fa6e97c",
         "Layers": [
             {
                 "Arn": "arn:aws:lambda:us-east-1:644160558196:layer:AWSLambdaPowertoolsPythonV2:59",
                 "CodeSize": 4164937
             }
         ],
-        "State": "Pending",
-        "StateReason": "The function is being created.",
-        "StateReasonCode": "Creating",
+        "State": "Active",
+        "LastUpdateStatus": "Successful",
         "PackageType": "Zip",
         "Architectures": [
             "x86_64"
