@@ -1,7 +1,8 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+import base64
 import fnmatch
-from io import StringIO
+from io import BytesIO
 import json
 import os
 import shutil
@@ -64,7 +65,10 @@ def deserialize(obj):
     if class_name == "datetime":
         return datetime(tzinfo=utc, **target)
     if class_name == "StreamingBody":
-        return StringIO(target["body"])
+        b64_body = obj["body"]
+        decoded_body = base64.b64decode(b64_body)
+        raw_stream = BytesIO(decoded_body)
+        return StreamingBody(raw_stream, raw_stream.getbuffer().nbytes)
     # Return unrecognized structures as-is
     return obj
 
@@ -90,12 +94,12 @@ def serialize(obj):
         return result
     if isinstance(obj, StreamingBody):
         result["body"] = obj.read()
-        obj._raw_stream = StringIO(result["body"])
+        obj._raw_stream = BytesIO(result["body"])
         obj._amount_read = 0
         return result
     if isinstance(obj, bytes):
-        return obj.decode('utf8')
-
+        encoded = base64.b64encode(obj)
+        return encoded.decode('utf-8')
     # Raise a TypeError if the object isn't recognized
     raise TypeError("Type not serializable")
 
