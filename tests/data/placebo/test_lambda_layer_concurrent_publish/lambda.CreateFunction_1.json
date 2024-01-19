@@ -1,44 +1,55 @@
 {
     "status_code": 201,
     "data": {
-        "ResponseMetadata": {
-            "RequestId": "a3f1f0ad-2672-11e9-a537-1966109a85c7",
-            "HTTPStatusCode": 201,
-            "HTTPHeaders": {
-                "date": "Fri, 01 Feb 2019 22:42:26 GMT",
-                "content-type": "application/json",
-                "content-length": "807",
-                "connection": "keep-alive",
-                "x-amzn-requestid": "a3f1f0ad-2672-11e9-a537-1966109a85c7"
-            },
-            "RetryAttempts": 0
-        },
+        "ResponseMetadata": {},
         "FunctionName": "test-foo-bar",
         "FunctionArn": "arn:aws:lambda:us-east-1:644160558196:function:test-foo-bar",
-        "Runtime": "python2.7",
+        "Runtime": "python3.12",
         "Role": "arn:aws:iam::644160558196:role/custodian-mu",
         "Handler": "index.handler",
         "CodeSize": 168,
         "Description": "test",
         "Timeout": 3,
         "MemorySize": 128,
-        "LastModified": "2019-02-01T22:42:23.185+0000",
+        "LastModified": "2024-01-13T06:44:16.390+0000",
         "CodeSha256": "vGPycvFY/krzGmxtrdge41pUwYXQ5jyzBfyVO53ockM=",
-        "Version": "27",
+        "Version": "42",
         "VpcConfig": {
             "SubnetIds": [],
             "SecurityGroupIds": [],
-            "VpcId": ""
+            "VpcId": "",
+            "Ipv6AllowedForDualStack": false
         },
         "TracingConfig": {
             "Mode": "PassThrough"
         },
-        "RevisionId": "649d521c-a641-4094-8a7b-51d30875317b",
+        "RevisionId": "f3cde775-981c-442c-9dba-33d7684cd522",
         "Layers": [
             {
-                "Arn": "arn:aws:lambda:us-east-1:644160558196:layer:CustodianLayer:2",
-                "CodeSize": 5835287
+                "Arn": "arn:aws:lambda:us-east-1:644160558196:layer:AWSLambdaPowertoolsPythonV2:59",
+                "CodeSize": 4164937
             }
-        ]
+        ],
+        "State": "Pending",
+        "StateReason": "The function is being created.",
+        "StateReasonCode": "Creating",
+        "PackageType": "Zip",
+        "Architectures": [
+            "x86_64"
+        ],
+        "EphemeralStorage": {
+            "Size": 512
+        },
+        "SnapStart": {
+            "ApplyOn": "None",
+            "OptimizationStatus": "Off"
+        },
+        "RuntimeVersionConfig": {
+            "RuntimeVersionArn": "arn:aws:lambda:us-east-1::runtime:c9875014cbcc77e3455765804516f064d18fe7b27ae7bdb2b1d84ab01ba784f5"
+        },
+        "LoggingConfig": {
+            "LogFormat": "Text",
+            "LogGroup": "/aws/lambda/test-foo-bar"
+        }
     }
 }
