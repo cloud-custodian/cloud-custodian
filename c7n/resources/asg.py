@@ -1574,7 +1574,25 @@ class Resume(Action):
                     delay: 300
 
     """
-    schema = type_schema('resume', delay={'type': 'number'})
+    ASG_PROCESSES = [
+        "Launch",
+        "Terminate",
+        "HealthCheck",
+        "ReplaceUnhealthy",
+        "AZRebalance",
+        "AlarmNotification",
+        "ScheduledActions",
+        "AddToLoadBalancer",
+        "InstanceRefresh"]
+
+    schema = type_schema(
+        'resume',
+        exclude={
+            'type': 'array',
+            'title': 'ASG Processes to not resume',
+            'items': {'enum': ASG_PROCESSES}},
+        delay={'type': 'number'})
+    
     permissions = ("autoscaling:ResumeProcesses", "ec2:StartInstances")
 
     def process(self, asgs):
@@ -1625,8 +1643,12 @@ class Resume(Action):
     def resume_asg(self, asg_client, asg):
         """Resume asg processes.
         """
+        processes = list(self.ASG_PROCESSES.difference(
+            self.data.get('exclude', ())))
+
         self.manager.retry(
             asg_client.resume_processes,
+            ScalingProcesses=processes,
             AutoScalingGroupName=asg['AutoScalingGroupName'])
 
 
