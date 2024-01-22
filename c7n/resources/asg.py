@@ -1592,7 +1592,7 @@ class Resume(Action):
             'title': 'ASG Processes to not resume',
             'items': {'enum': ASG_PROCESSES}},
         delay={'type': 'number'})
-    
+
     permissions = ("autoscaling:ResumeProcesses", "ec2:StartInstances")
 
     def process(self, asgs):
