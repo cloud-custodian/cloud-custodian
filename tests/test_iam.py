@@ -1341,6 +1341,40 @@ class IamInstanceProfileActions(BaseTest):
                 )
                 self.assertEqual(len(policies['AttachedPolicies']), 0)
 
+    def test_iam_instance_profile_set_policy_nosuchentity(self):
+        session_factory = self.replay_flight_data("test_iam_instance_profile_set_policy_nosuchentity")
+        client = session_factory().client("iam")
+        p = self.load_policy(
+            {
+                "name": "iam-instance-profile-set-policy",
+                "resource": "iam-profile",
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": "Roles[].RoleName",
+                        "value": "AmazonSSMRoleForInstancesQuickSetup",
+                        "op": "in",
+                        "value_type": "swap"
+                    }
+                ],
+                "actions": [
+                    {
+                        "type": "set-policy",
+                        "state": "detached",
+                        "arn": "arn:aws:iam::aws:policy/AdministratorAccessDoesNotExist"
+                    }
+                ]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertRaises(
+            client.exceptions.NoSuchEntityException,
+            client.get_policy,
+            PolicyArn="arn:aws:iam::aws:policy/AdministratorAccessDoesNotExist")
+
+
 class IamPolicyFilterUsage(BaseTest):
 
     def test_iam_user_policy_permission(self):
