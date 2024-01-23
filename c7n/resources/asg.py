@@ -1574,23 +1574,12 @@ class Resume(Action):
                     delay: 300
 
     """
-    ASG_PROCESSES = [
-        "Launch",
-        "Terminate",
-        "HealthCheck",
-        "ReplaceUnhealthy",
-        "AZRebalance",
-        "AlarmNotification",
-        "ScheduledActions",
-        "AddToLoadBalancer",
-        "InstanceRefresh"]
-
     schema = type_schema(
         'resume',
         exclude={
             'type': 'array',
             'title': 'ASG Processes to not resume',
-            'items': {'enum': ASG_PROCESSES}},
+            'items': {'enum': Suspend.ASG_PROCESSES}},
         delay={'type': 'number'})
 
     permissions = ("autoscaling:ResumeProcesses", "ec2:StartInstances")
