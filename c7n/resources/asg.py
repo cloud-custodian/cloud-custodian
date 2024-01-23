@@ -1574,12 +1574,13 @@ class Resume(Action):
                     delay: 300
 
     """
+    ASG_PROCESSES = Suspend.ASG_PROCESSES
     schema = type_schema(
         'resume',
         exclude={
             'type': 'array',
             'title': 'ASG Processes to not resume',
-            'items': {'enum': Suspend.ASG_PROCESSES}},
+            'items': {'enum': ASG_PROCESSES}},
         delay={'type': 'number'})
 
     permissions = ("autoscaling:ResumeProcesses", "ec2:StartInstances")
