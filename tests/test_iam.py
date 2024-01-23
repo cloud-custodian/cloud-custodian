@@ -1305,6 +1305,41 @@ class IamInstanceProfileActions(BaseTest):
                 )
                 self.assertEqual(len(policies['AttachedPolicies']), 0)
 
+    def test_iam_instance_profile_set_policy_wildcard(self):
+        session_factory = self.replay_flight_data("test_iam_instance_profile_set_policy_wildcard")
+        client = session_factory().client("iam")
+        p = self.load_policy(
+            {
+                "name": "iam-instance-profile-set-policy",
+                "resource": "iam-profile",
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": "Roles[].RoleName",
+                        "value": "AmazonSSMRoleForInstancesQuickSetup",
+                        "op": "in",
+                        "value_type": "swap"
+                    }
+                ],
+                "actions": [
+                    {
+                        "type": "set-policy",
+                        "state": "detached",
+                        "arn": "*"
+                    }
+                ]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        instance_profiles = client.list_instance_profiles()
+        for profile in instance_profiles['InstanceProfiles']:
+            if profile['Roles'][0]['RoleName'] == "AmazonSSMRoleForInstancesQuickSetup":
+                policies = client.list_attached_role_policies(
+                        RoleName="AmazonSSMRoleForInstancesQuickSetup"
+                )
+                self.assertEqual(len(policies['AttachedPolicies']), 0)
 
 class IamPolicyFilterUsage(BaseTest):
 
