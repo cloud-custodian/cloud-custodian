@@ -1342,7 +1342,9 @@ class IamInstanceProfileActions(BaseTest):
                 self.assertEqual(len(policies['AttachedPolicies']), 0)
 
     def test_iam_instance_profile_set_policy_nosuchentity(self):
-        session_factory = self.replay_flight_data("test_iam_instance_profile_set_policy_nosuchentity")
+        session_factory = self.replay_flight_data(
+            "test_iam_instance_profile_set_policy_nosuchentity"
+        )
         client = session_factory().client("iam")
         p = self.load_policy(
             {
