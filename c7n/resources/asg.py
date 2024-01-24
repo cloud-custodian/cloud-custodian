@@ -1580,7 +1580,7 @@ class Resume(Action):
         exclude={
             'type': 'array',
             'title': 'ASG Processes to not resume',
-            'items': {'enum': ASG_PROCESSES}},
+            'items': {'enum': list(ASG_PROCESSES)}},
         delay={'type': 'number'})
 
     permissions = ("autoscaling:ResumeProcesses", "ec2:StartInstances")
