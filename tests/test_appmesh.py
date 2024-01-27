@@ -1,6 +1,5 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
-import logging
 
 from .common import BaseTest, event_data
 
@@ -14,14 +13,12 @@ from .common import BaseTest, event_data
 # So boto3 "AppMesh.Client.describe_mesh()" becomes "appmesh.DescribeMesh"
 # and the _<call#> suffix corresponds with the file to load for each call to that api.
 
+
 class TestAppmeshMesh(BaseTest):
     def test_appmesh(self):
         session_factory = self.replay_flight_data('test_appmesh_mesh')
         p = self.load_policy(
-            {
-                "name": "appmesh-mesh-policy",
-                "resource": "aws.appmesh-mesh"
-            },
+            {"name": "appmesh-mesh-policy", "resource": "aws.appmesh-mesh"},
             session_factory=session_factory,
         )
         resources = p.run()
@@ -38,12 +35,14 @@ class TestAppmeshMesh(BaseTest):
                 "mode": {
                     "type": "cloudtrail",
                     "role": "CloudCustodian",
-                    "events": [{
-                        "source": "appmesh.amazonaws.com",
-                        "event": "CreateMesh",
-                        "ids": "requestParameters.meshName"
-                    }]
-                }
+                    "events": [
+                        {
+                            "source": "appmesh.amazonaws.com",
+                            "event": "CreateMesh",
+                            "ids": "requestParameters.meshName",
+                        }
+                    ],
+                },
             },
             session_factory=session_factory,
         )
@@ -72,12 +71,12 @@ class TestAppmeshVirtualGateway(BaseTest):
                         "type": "value",
                         "key": "spec.listeners[0].portMapping.port",
                         "op": "eq",
-                        "value": 123
+                        "value": 123,
                     }
-                ]
+                ],
             },
             session_factory=session_factory,
-            #config=config,
+            # config=config,
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
@@ -96,12 +95,14 @@ class TestAppmeshVirtualGateway(BaseTest):
                 "mode": {
                     "type": "cloudtrail",
                     "role": "CloudCustodian",
-                    "events": [{
-                        "source": "appmesh.amazonaws.com",
-                        "event": "CreateVirtualGateway",
-                        "ids": "responseElements.virtualGateway.metadata.arn",
-                    }]
-                }
+                    "events": [
+                        {
+                            "source": "appmesh.amazonaws.com",
+                            "event": "CreateVirtualGateway",
+                            "ids": "responseElements.virtualGateway.metadata.arn",
+                        }
+                    ],
+                },
             },
             session_factory=session_factory,
         )
