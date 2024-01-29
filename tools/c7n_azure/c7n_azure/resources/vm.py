@@ -286,7 +286,8 @@ class BackupStatusFilter(ValueFilter):
             resource: azure.vm
             filters:
               - type: backup-status
-                protection-status: Protected
+                key: protectionStatus
+                value: Protected
     """
     schema = type_schema(
         'backup-status',
