@@ -71,7 +71,8 @@ class WebAppFirewallFilter(Filter):
                 front_endpoint = client.frontend_endpoints.get(
                     front_door['resourceGroup'], front_door['name'],front_endpoints['name'])
                 if self.check_state(front_endpoint.web_application_firewall_policy_link):
-                    matched.append(front_door)  # what if one front_door has multiple endpoints that match?
+                    # what if one front_door has multiple endpoints that match?
+                    matched.append(front_door)
         return matched
 
 
