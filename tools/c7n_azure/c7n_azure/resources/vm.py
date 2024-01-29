@@ -288,34 +288,30 @@ class BackupStatusFilter(ValueFilter):
               - type: backup-status
                 protection-status: Protected
     """
-    protection_status_key = 'protection-status'
     schema = type_schema(
         'backup-status',
-        required=[protection_status_key],
-        **{
-            protection_status_key: {'type': 'string'}
-        })
+        rinherit=ValueFilter.schema
+    )
 
-    def validate(self):
-        required_key = BackupStatusFilter.protection_status_key
-        if required_key not in self.data:
-            raise FilterValidationError(f"Missing required key: {required_key}")
+    backup_annotation_key = "c7n:BackupStatus"
+    annotate = False
 
     def process(self, resources, event=None):
         s = local_session(self.manager.session_factory)
         client = s.client('azure.mgmt.recoveryservicesbackup.RecoveryServicesBackupClient')
-        valid_status = self.data[BackupStatusFilter.protection_status_key]
-        valid_resources = []
 
         for resource in resources:
-            r_id = resource['id']
-            region = resource['location']
-            parameters = {'resourceId': r_id, 'resourceType': 'VM'}
-            backup = client.backup_status.get(azure_region=region, parameters=parameters)
-            if backup.protection_status == valid_status:
-                valid_resources.append(resource)
+            if self.backup_annotation_key in resource:
+                continue
+            resource[self.backup_annotation_key] = client.backup_status.get(
+                azure_region=resource['location'],
+                parameters=dict(resourceId=resource['id'], resourceType='VM')
+            ).serialize(True)
+        return super().process(resources, event)
 
-        return valid_resources
+    def __call__(self, r):
+        return super().__call__(r[self.backup_annotation_key])
+
 
 
 @VirtualMachine.action_registry.register('poweroff')

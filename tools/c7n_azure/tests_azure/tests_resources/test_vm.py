@@ -365,7 +365,9 @@ class VMTest(BaseTest):
             'resource': 'azure.vm',
             'filters': [
                 {'type': 'backup-status',
-                 'protection-status': 'Protected'}],
+                 "key": "protectionStatus",
+                 "value": "Protected"}
+            ]
         })
         resources = p.run()
 
