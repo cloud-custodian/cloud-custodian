@@ -50,9 +50,14 @@ class TestFrontDoorFirewallPolicyFilter(BaseTest):
                 "filters": [
                     {
                         "type": "firewall-policy",
-                        "key": "resource_state",
-                        "op": "eq",
-                        "value": "Enabled",
+                        "attrs": [
+                            {
+                                "type": "value",
+                                "key": "properties.managedRules.managedRuleSets[].ruleSetType",
+                                "value": "Microsoft_DefaultRuleSet",
+                                "op": "contains"
+                            }
+                        ]
                     }
                 ],
             }

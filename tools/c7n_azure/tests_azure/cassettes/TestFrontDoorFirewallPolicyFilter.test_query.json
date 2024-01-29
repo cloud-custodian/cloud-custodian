@@ -171,7 +171,7 @@
         {
             "request": {
                 "method": "GET",
-                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/VV/providers/Microsoft.Network/frontDoorWebApplicationFirewallPolicies?api-version=2020-11-01",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/VV/providers/Microsoft.Network/FrontDoorWebApplicationFirewallPolicies/test1?api-version=2022-05-01",
                 "body": null,
                 "headers": {}
             },
@@ -196,64 +196,60 @@
                 },
                 "body": {
                     "data": {
-                        "value": [
-                            {
-                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/VV/providers/Microsoft.Network/frontdoorwebapplicationfirewallpolicies/test1",
-                                "type": "Microsoft.Network/frontdoorwebapplicationfirewallpolicies",
-                                "name": "test1",
-                                "location": "Global",
-                                "tags": {},
-                                "sku": {
-                                    "name": "Classic_AzureFrontDoor"
-                                },
-                                "properties": {
-                                    "policySettings": {
-                                        "enabledState": "Enabled",
-                                        "mode": "Prevention",
-                                        "redirectUrl": null,
-                                        "customBlockResponseStatusCode": 403,
-                                        "customBlockResponseBody": null,
-                                        "requestBodyCheck": "Disabled"
-                                    },
-                                    "customRules": {
-                                        "rules": []
-                                    },
-                                    "managedRules": {
-                                        "managedRuleSets": [
+                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/VV/providers/Microsoft.Network/frontdoorwebapplicationfirewallpolicies/test1",
+                        "type": "Microsoft.Network/frontdoorwebapplicationfirewallpolicies",
+                        "name": "test1",
+                        "location": "Global",
+                        "tags": {},
+                        "sku": {
+                            "name": "Classic_AzureFrontDoor"
+                        },
+                        "properties": {
+                            "policySettings": {
+                                "enabledState": "Enabled",
+                                "mode": "Prevention",
+                                "redirectUrl": null,
+                                "customBlockResponseStatusCode": 403,
+                                "customBlockResponseBody": null,
+                                "requestBodyCheck": "Disabled"
+                            },
+                            "customRules": {
+                                "rules": []
+                            },
+                            "managedRules": {
+                                "managedRuleSets": [
+                                    {
+                                        "ruleSetType": "Microsoft_DefaultRuleSet",
+                                        "ruleSetVersion": "1.1",
+                                        "ruleSetAction": null,
+                                        "ruleGroupOverrides": [
                                             {
-                                                "ruleSetType": "Microsoft_DefaultRuleSet",
-                                                "ruleSetVersion": "1.1",
-                                                "ruleSetAction": null,
-                                                "ruleGroupOverrides": [
+                                                "ruleGroupName": "JAVA",
+                                                "rules": [
                                                     {
-                                                        "ruleGroupName": "JAVA",
-                                                        "rules": [
-                                                            {
-                                                                "ruleId": "944240",
-                                                                "enabledState": "Disabled",
-                                                                "action": "Block",
-                                                                "exclusions": []
-                                                            }
-                                                        ],
+                                                        "ruleId": "944240",
+                                                        "enabledState": "Disabled",
+                                                        "action": "Block",
                                                         "exclusions": []
                                                     }
                                                 ],
                                                 "exclusions": []
                                             }
-                                        ]
-                                    },
-                                    "frontendEndpointLinks": [
-                                        {
-                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/VV/providers/Microsoft.Network/frontdoors/vvtestfd2/frontendendpoints/vvtestfd2-azurefd-net"
-                                        }
-                                    ],
-                                    "securityPolicyLinks": [],
-                                    "routingRuleLinks": [],
-                                    "resourceState": "Enabled",
-                                    "provisioningState": "Succeeded"
+                                        ],
+                                        "exclusions": []
+                                    }
+                                ]
+                            },
+                            "frontendEndpointLinks": [
+                                {
+                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourcegroups/VV/providers/Microsoft.Network/frontdoors/vvtestfd2/frontendendpoints/vvtestfd2-azurefd-net"
                                 }
-                            }
-                        ]
+                            ],
+                            "securityPolicyLinks": [],
+                            "routingRuleLinks": [],
+                            "resourceState": "Enabled",
+                            "provisioningState": "Succeeded"
+                        }
                     }
                 }
             }

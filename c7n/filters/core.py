@@ -1201,9 +1201,3 @@ class ListItemFilter(Filter):
         if self.process((resource,)):
             return True
         return False
-
-
-# function for checking the values as at ValueFilter
-def op(data, a, b):
-    op = OPERATORS[data.get('op', 'eq')]
-    return op(a, b)

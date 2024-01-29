@@ -1,11 +1,11 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
-from c7n.filters import Filter, ValueFilter
-from c7n.filters.core import op
-from c7n.utils import type_schema, local_session, jmespath_search
-from c7n_azure.provider import resources
 from c7n_azure.resources.arm import ArmResourceManager
+from c7n_azure.provider import resources
+from c7n_azure.utils import ResourceIdParser
+from c7n.filters import Filter, ListItemFilter
+from c7n.utils import type_schema
 
 
 @resources.register('front-door')
@@ -71,27 +71,57 @@ class WebAppFirewallFilter(Filter):
                 front_endpoint = client.frontend_endpoints.get(
                     front_door['resourceGroup'], front_door['name'],front_endpoints['name'])
                 if self.check_state(front_endpoint.web_application_firewall_policy_link):
-                    matched.append(front_door)
+                    matched.append(front_door)  # what if one front_door has multiple endpoints that match?
         return matched
 
 
 @FrontDoor.filter_registry.register('firewall-policy')
-class WebApplicationFirewallPolicies(ValueFilter):
+class WAFPolicies(ListItemFilter):
+    """Filters front door resources based on their waf policies
 
-    schema = type_schema('firewall-policy', rinherit=ValueFilter.schema)
+    :example:
 
-    def process(self, resources, event=None):
-        s = local_session(self.manager.session_factory)
-        client = s.client('azure.mgmt.frontdoor.FrontDoorManagementClient')
+    .. code-block:: yaml
 
-        group_resources = {}
-        for res in resources:
-            group_resources.setdefault(res['resourceGroup'], []).append(res)
+        policies:
+          - name: front-dorr-firewall-policy-example
+            resource: azure.front-door
+            filters:
+              - type: firewall-policy
+                attrs:
+                  - type: value
+                    key: properties.managedRules.managedRuleSets[].ruleSetType
+                    value: DefaultRuleSet
+                    op: contains
 
-        result = []
-        for group in group_resources:
-            for policy in client.policies.list(resource_group_name=group):
-                pol = jmespath_search(self.data.get('key'), policy.as_dict())  # azure.mgmt.frontdoor.models._models_py3.WebApplicationFirewallPolicy # noqa
-                if pol and op(self.data, pol, self.data.get('value')):
-                    result.extend(group_resources[group])
-        return result
+    """
+    schema = type_schema(
+        'firewall-policy',
+        attrs={'$ref': '#/definitions/filters_common/list_item_attrs'}
+    )
+    annotate_items = True
+    item_annotation_key = 'c7n:WAFPolicies'
+    _cache = {}  # policy id to policy item
+
+    def get_item_values(self, resource):
+        ids = set()
+        for fe in resource['properties'].get('frontendEndpoints') or []:
+            data = fe['properties'].get('webApplicationFirewallPolicyLink')
+            if not isinstance(data, dict):
+                continue
+            identifier = data.get('id')
+            if not identifier:
+                continue
+            ids.add(identifier)
+        if not ids:
+            return []
+        client = self.manager.get_client()
+        items = []
+        for i in ids:
+            if i not in self._cache:
+                group = ResourceIdParser.get_resource_group(i)
+                name = ResourceIdParser.get_resource_name(i)
+                self._cache[i] = client.policies.get(group, name)
+            item = self._cache[i]
+            items.append(item.serialize(True))
+        return items
