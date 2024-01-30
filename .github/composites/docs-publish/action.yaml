@@ -21,6 +21,8 @@ runs:
     - name: Install Deps
       shell: bash
       run: |
+        rm -f ~/.pypirc
+        env
         pip install -U awscli
 
     - name: Publish
