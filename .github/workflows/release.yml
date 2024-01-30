@@ -92,7 +92,6 @@ jobs:
           role-to-assume: ${{ secrets.AWS_FTEST_ROLE }}
           aws-region: us-east-1
 
-
       - name: Auth Staging Repository
         shell: bash
         env:
