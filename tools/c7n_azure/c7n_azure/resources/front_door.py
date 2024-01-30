@@ -64,15 +64,14 @@ class WebAppFirewallFilter(Filter):
             return True
 
     def process(self, resources, event=None):
-        client = self.manager.get_client()
         matched = []
         for front_door in resources:
-            for front_endpoints in front_door['properties']['frontendEndpoints']:
-                front_endpoint = client.frontend_endpoints.get(
-                    front_door['resourceGroup'], front_door['name'],front_endpoints['name'])
-                if self.check_state(front_endpoint.web_application_firewall_policy_link):
-                    # what if one front_door has multiple endpoints that match?
+            for front_endpoint in front_door['properties']['frontendEndpoints']:
+                data = front_endpoint['properties'].get('webApplicationFirewallPolicyLink') or {}
+                link = data.get('id')
+                if self.check_state(link):
                     matched.append(front_door)
+                    break
         return matched
 
 
@@ -102,7 +101,10 @@ class WAFPolicies(ListItemFilter):
     )
     annotate_items = True
     item_annotation_key = 'c7n:WAFPolicies'
-    _cache = {}  # policy id to policy item
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._cache = {}  # policy id to policy item
 
     def get_item_values(self, resource):
         ids = set()
