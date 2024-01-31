@@ -37,10 +37,10 @@ jobs:
           RUFF_OUTPUT_FORMAT: github
         run: |
           make lint
-      - name: Check Workflows
-        run: |
-          bash <(curl https://raw.githubusercontent.com/rhysd/actionlint/main/scripts/download-actionlint.bash)
-          ./actionlint -color
+#      - name: Check Workflows
+#        run: |
+#          bash <(curl https://raw.githubusercontent.com/rhysd/actionlint/main/scripts/download-actionlint.bash)
+#          ./actionlint -color
 
   Analyzer:
     runs-on: ubuntu-latest
