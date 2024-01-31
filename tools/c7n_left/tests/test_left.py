@@ -1279,6 +1279,49 @@ def test_cli_output_rich(tmp_path):
     assert "1 failed 2 passed" in result.output
 
 
+def test_cli_output_rich_warn_on_severity(tmp_path):
+    (tmp_path / "policy.json").write_text(
+        json.dumps(
+            {
+                "policies": [
+                    {
+                        "name": "check-medium-bucket",
+                        "resource": "terraform.aws_s3_bucket",
+                        "description": "a description",
+                        "metadata": {"severity": "medium"},
+                        "filters": [{"server_side_encryption_configuration": "absent"}],
+                    },
+                    {
+                        "name": "check-high-bucket",
+                        "resource": "terraform.aws_s3_bucket",
+                        "description": "something else",
+                        "metadata": {"severity": "high"},
+                        "filters": [{"server_side_encryption_configuration": "absent"}],
+                    },
+                ]
+            }
+        )
+    )
+    runner = CliRunner()
+    result = runner.invoke(
+        cli.cli,
+        [
+            "run",
+            "-p",
+            str(tmp_path),
+            "-d",
+            str(terraform_dir / "aws_s3_encryption_audit"),
+            "--warn-on",
+            "severity=medium",
+            "-o",
+            "cli",
+        ],
+    )
+    assert result.exit_code == 1
+    assert "Reason: something else\n" in result.output
+    assert "1 failed 2 passed" in result.output
+
+
 def test_cli_output_rich_warn_on(tmp_path):
     write_output_test_policy(tmp_path)
     runner = CliRunner()
