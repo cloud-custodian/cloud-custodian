@@ -116,7 +116,7 @@ class TableContinuousBackupFilter(ValueFilter):
                 continue
 
     def __call__(self, r):
-        return super().__call__(r[self.annotation_key])
+        return super().__call__(r.get(self.annotation_key, {}))
 
 
 @Table.action_registry.register('set-continuous-backup')
