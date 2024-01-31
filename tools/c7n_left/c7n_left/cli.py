@@ -179,7 +179,7 @@ def get_config(
         format=format,
     )
     config["exec_filter"] = ExecutionFilter.parse(config.filters)
-    config["warn_filter"] = ExecutionFilter.parse(config.warn_on)
+    config["warn_filter"] = ExecutionFilter.parse(config.warn_on, severity_direction='gte')
     return config
 
 
