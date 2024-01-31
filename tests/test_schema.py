@@ -533,8 +533,8 @@ class SchemaTest(BaseTest):
             data['policies'][0]['mode']['runtime'] = runtime
             return self.policy_loader.validator.validate(data)
 
-        self.assertEqual(len(errors_with("python2.7")), 0)
-        self.assertEqual(len(errors_with("python3.6")), 0)
+        self.assertEqual(len(errors_with("python2.7")), 2)
+        self.assertEqual(len(errors_with("python3.11")), 0)
         self.assertEqual(len(errors_with("python4.5")), 2)
 
     def test_element_resolve(self):

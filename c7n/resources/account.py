@@ -20,6 +20,7 @@ from c7n.filters.missing import Missing
 from c7n.manager import ResourceManager, resources
 from c7n.utils import local_session, type_schema, generate_arn, get_support_region, jmespath_search
 from c7n.query import QueryResourceManager, TypeInfo
+from c7n.filters import ListItemFilter
 
 from c7n.resources.iam import CredentialReport
 from c7n.resources.securityhub import OtherResourcePostFinding
@@ -2390,3 +2391,103 @@ class SesConsecutiveStats(Filter):
         resources[0][self.max_bounce_annotation] = max_bounce_rate
 
         return resources
+
+
+@filters.register('bedrock-model-invocation-logging')
+class BedrockModelInvocationLogging(ListItemFilter):
+    """Filter for account to look at bedrock model invocation logging configuration
+
+    The schema to supply to the attrs follows the schema here:
+     https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/bedrock/client/get_model_invocation_logging_configuration.html
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: bedrock-model-invocation-logging-configuration
+                resource: account
+                filters:
+                  - type: bedrock-model-invocation-logging
+                    attrs:
+                      - imageDataDeliveryEnabled: True
+
+    """
+    schema = type_schema(
+        'bedrock-model-invocation-logging',
+        attrs={'$ref': '#/definitions/filters_common/list_item_attrs'},
+        count={'type': 'number'},
+        count_op={'$ref': '#/definitions/filters_common/comparison_operators'}
+    )
+    permissions = ('bedrock:GetModelInvocationLoggingConfiguration',)
+
+    def get_item_values(self, resource):
+        item_values = []
+        client = local_session(self.manager.session_factory).client('bedrock')
+        invocation_logging_config = client.get_model_invocation_logging_configuration()
+        item_values.append(invocation_logging_config['loggingConfig'])
+        return item_values
+
+
+@actions.register('set-bedrock-model-invocation-logging')
+class SetBedrockModelInvocationLogging(BaseAction):
+    """Set Bedrock Model Invocation Logging Configuration on an account.
+     https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/bedrock/client/put_model_invocation_logging_configuration.html
+
+     To delete a configuration, supply enabled to False
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: set-bedrock-model-invocation-logging
+                resource: account
+                actions:
+                  - type: set-bedrock-model-invocation-logging
+                    enabled: True
+                    loggingConfig:
+                      textDataDeliveryEnabled: True
+                      s3Config:
+                        bucketName: test-bedrock-1
+                        keyPrefix:  logging/
+
+              - name: delete-bedrock-model-invocation-logging
+                resource: account
+                actions:
+                  - type: set-bedrock-model-invocation-logging
+                    enabled: False
+    """
+
+    schema = {
+        'type': 'object',
+        'additionalProperties': False,
+        'properties': {
+            'type': {'enum': ['set-bedrock-model-invocation-logging']},
+            'enabled': {'type': 'boolean'},
+            'loggingConfig': {'type': 'object'}
+        },
+    }
+
+    permissions = ('bedrock:PutModelInvocationLoggingConfiguration',)
+    shape = 'PutModelInvocationLoggingConfigurationRequest'
+    service = 'bedrock'
+
+    def validate(self):
+        cfg = dict(self.data)
+        enabled = cfg.get('enabled')
+        if enabled:
+            cfg.pop('type')
+            cfg.pop('enabled')
+            return shape_validate(
+                cfg,
+                self.shape,
+                self.service)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('bedrock')
+        if self.data.get('enabled'):
+            params = self.data.get('loggingConfig')
+            client.put_model_invocation_logging_configuration(loggingConfig=params)
+        else:
+            client.delete_model_invocation_logging_configuration()
