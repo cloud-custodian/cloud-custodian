@@ -110,15 +110,17 @@ class PolicyMetadata:
 
 class ExecutionFilter:
     supported_filters = ("policy", "type", "severity", "category", "id")
+    severity_op_map = {'lte': operator.le, 'gte': operator.ge}
 
-    def __init__(self, filters):
+    def __init__(self, filters, severity_direction='lte'):
         self.filters = filters
+        self.severity_op = self.severity_op_map[severity_direction]
 
     def __len__(self):
         return len(self.filters)
 
     @classmethod
-    def parse(cls, filters_config):
+    def parse(cls, filters_config, severity_direction='lte'):
         """cli option filtering support
 
         --filters "type=aws_sqs_queue,aws_rds_* policy=*encryption* severity=high"
@@ -139,7 +141,7 @@ class ExecutionFilter:
                 v = [v]
             filters[k] = v
         cls._validate_severities(filters)
-        return cls(filters)
+        return cls(filters, severity_direction)
 
     @classmethod
     def _validate_severities(cls, filters):
@@ -179,7 +181,7 @@ class ExecutionFilter:
         def filter_severity(p):
             p_slevel = SEVERITY_LEVELS.get(p.severity) or SEVERITY_LEVELS.get("unknown")
             f_slevel = SEVERITY_LEVELS[self.filters["severity"][0]]
-            return p_slevel <= f_slevel
+            return self.severity_op(p_slevel, f_slevel)
 
         if len(self.filters["severity"]) == 1:
             return list(filter(filter_severity, policies))
