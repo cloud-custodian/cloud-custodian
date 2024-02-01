@@ -1,12 +1,7 @@
 {
     "status_code": 200,
     "data": {
-        "AttachedPolicies": [
-            {
-                "PolicyName": "AWSCloud9SSMInstanceProfile",
-                "PolicyArn": "arn:aws:iam::aws:policy/AWSCloud9SSMInstanceProfile"
-            }
-        ],
+        "AttachedPolicies": [],
         "IsTruncated": false,
         "ResponseMetadata": {}
     }

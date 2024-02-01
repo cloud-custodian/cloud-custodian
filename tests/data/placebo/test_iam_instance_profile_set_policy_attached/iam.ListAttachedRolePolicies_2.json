@@ -3,8 +3,8 @@
     "data": {
         "AttachedPolicies": [
             {
-                "PolicyName": "AWSCloud9SSMInstanceProfile",
-                "PolicyArn": "arn:aws:iam::aws:policy/AWSCloud9SSMInstanceProfile"
+                "PolicyName": "AdministratorAccess",
+                "PolicyArn": "arn:aws:iam::aws:policy/AdministratorAccess"
             }
         ],
         "IsTruncated": false,
