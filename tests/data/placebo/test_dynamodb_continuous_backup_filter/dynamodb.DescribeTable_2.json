@@ -1,0 +1,54 @@
+{
+    "status_code": 200,
+    "data": {
+        "Table": {
+            "AttributeDefinitions": [
+                {
+                    "AttributeName": "ArtistId",
+                    "AttributeType": "S"
+                }
+            ],
+            "TableName": "mosdef2-deleted",
+            "KeySchema": [
+                {
+                    "AttributeName": "ArtistId",
+                    "KeyType": "HASH"
+                }
+            ],
+            "TableStatus": "ACTIVE",
+            "CreationDateTime": {
+                "__class__": "datetime",
+                "year": 2019,
+                "month": 1,
+                "day": 29,
+                "hour": 13,
+                "minute": 39,
+                "second": 48,
+                "microsecond": 333000
+            },
+            "ProvisionedThroughput": {
+                "NumberOfDecreasesToday": 0,
+                "ReadCapacityUnits": 0,
+                "WriteCapacityUnits": 0
+            },
+            "TableSizeBytes": 0,
+            "ItemCount": 0,
+            "TableArn": "arn:aws:dynamodb:us-east-1:644160558196:table/mosdef2-deleted",
+            "TableId": "0f64ca00-386f-4b55-b403-acd215e81072",
+            "BillingModeSummary": {
+                "BillingMode": "PAY_PER_REQUEST",
+                "LastUpdateToPayPerRequestDateTime": {
+                    "__class__": "datetime",
+                    "year": 2019,
+                    "month": 1,
+                    "day": 29,
+                    "hour": 13,
+                    "minute": 39,
+                    "second": 48,
+                    "microsecond": 333000
+                }
+            }
+        },
+        "ResponseMetadata": {}
+    }
+}
