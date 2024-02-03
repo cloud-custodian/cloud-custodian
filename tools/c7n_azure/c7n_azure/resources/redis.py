@@ -1,11 +1,10 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
+from c7n.filters import ListItemFilter
+from c7n.utils import type_schema
 from c7n_azure.provider import resources
 from c7n_azure.resources.arm import ArmResourceManager
-from c7n.filters import ValueFilter
-from c7n.utils import type_schema
-from c7n.filters.core import op
 
 
 @resources.register('redis')
@@ -48,23 +47,43 @@ class Redis(ArmResourceManager):
 
 
 @Redis.filter_registry.register('firewall')
-class RedisFirewallFilter(ValueFilter):
-    schema = type_schema('firewall', rinherit=ValueFilter.schema)
+class RedisFirewallFilter(ListItemFilter):
+    """
+    Filter redis caches based on their firewall rules
 
-    def process(self, resources, event=None):
-        accepted = []
-        client = self.manager.get_client('azure.mgmt.redis.RedisManagementClient')
-        for resource in resources:
-            firewall_rules = list(
-                client.firewall_rules.list_by_redis_resource(
-                    cache_name=resource['name'],
-                    resource_group_name=resource['resourceGroup']))
-            any_of = []
-            for rule in firewall_rules:
-                key = getattr(rule, self.data.get('key'))
-                if key and op(self.data, key, self.data.get('value')):
-                    any_of.append(True)
-            if any(any_of):
-                accepted.append(resource)
+    :example:
 
-        return accepted
+    This policy will find all the redis caches exposed to the public Internet
+
+    .. code-block: yaml
+
+        policies:
+          - name: exposed-redis
+            resource: azure.redis
+            filters:
+              - type: firewall
+                attrs:
+                  - type: value
+                    key: properties.startIP
+                    value: 0.0.0.0
+                  - type: value
+                    key: properties.endIP
+                    value: 0.0.0.0
+
+    """
+    schema = type_schema(
+        "firewall",
+        attrs={"$ref": "#/definitions/filters_common/list_item_attrs"},
+        count={"type": "number"},
+        count_op={"$ref": "#/definitions/filters_common/comparison_operators"}
+    )
+    annotate_items = True
+    item_annotation_key = "c7n:FirewallRules"
+
+    def get_item_values(self, resource):
+        client = self.manager.get_client()
+        rules = client.firewall_rules.list_by_redis_resource(
+            cache_name=resource["name"],
+            resource_group_name=resource["resourceGroup"]
+        )
+        return [rule.serialize(True) for rule in rules]
