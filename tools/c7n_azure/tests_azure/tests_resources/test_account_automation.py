@@ -1,9 +1,9 @@
 from ..azure_common import BaseTest
 
 
-class TestAutomationAccountResource(BaseTest):
+class AutomationAccountTest(BaseTest):
 
-    def test_automation_account_resource(self):
+    def test_query(self):
         p = self.load_policy(
             {
                 "name": "test-automation-account-resource",
@@ -31,8 +31,8 @@ class TestAutomationAccountResource(BaseTest):
             self.assertTrue(p)
 
 
-class TestAutomationAccountFilter(BaseTest):
-    def test_automation_account_filter(self):
+class AutomationAccountVariableFilterTest(BaseTest):
+    def test_query(self):
         p = self.load_policy(
             {
                 "name": "test-automation-account-filter",
@@ -40,9 +40,13 @@ class TestAutomationAccountFilter(BaseTest):
                 "filters": [
                     {
                         "type": "variable",
-                        "key": "is_encrypted",
-                        "op": "eq",
-                        "value": False,
+                        "attrs": [
+                            {
+                                "type": "value",
+                                "key": "properties.isEncrypted",
+                                "value": False
+                            }
+                        ]
                     }
                 ],
             }
@@ -51,6 +55,7 @@ class TestAutomationAccountFilter(BaseTest):
 
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['name'], 'vvtestac')
+        self.assertEqual(len(resources[0]['c7n:Variables']), 1)
 
     def test_schema_validate(self):
         with self.sign_out_patch():
@@ -60,9 +65,13 @@ class TestAutomationAccountFilter(BaseTest):
                 "filters": [
                     {
                         "type": "variable",
-                        "key": "is_encrypted",
-                        "op": "eq",
-                        "value": False,
+                        "attrs": [
+                            {
+                                "type": "value",
+                                "key": "properties.isEncrypted",
+                                "value": False
+                            }
+                        ]
                     }
                 ],
             }, validate=True)
