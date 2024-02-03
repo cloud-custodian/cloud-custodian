@@ -40,7 +40,7 @@ class FrontDoorTest(BaseTest):
         self.assertEqual(len(resources), 1)
 
 
-class TestFrontDoorFirewallPolicyFilter(BaseTest):
+class FrontDoorFirewallPolicyFilterTest(BaseTest):
 
     def test_query(self):
         p = self.load_policy(

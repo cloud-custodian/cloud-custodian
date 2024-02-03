@@ -8,7 +8,7 @@ from c7n.filters import Filter, ListItemFilter
 from c7n.utils import type_schema
 
 
-@resources.register('front-door')
+@resources.register("front-door")
 class FrontDoor(ArmResourceManager):
     """Azure Front Door Resource
 
@@ -24,20 +24,20 @@ class FrontDoor(ArmResourceManager):
     """
 
     class resource_type(ArmResourceManager.resource_type):
-        doc_groups = ['Network']
+        doc_groups = ["Network"]
 
-        service = 'azure.mgmt.frontdoor'
-        client = 'FrontDoorManagementClient'
-        enum_spec = ('front_doors', 'list', None)
+        service = "azure.mgmt.frontdoor"
+        client = "FrontDoorManagementClient"
+        enum_spec = ("front_doors", "list", None)
         default_report_fields = (
-            'name',
-            'location',
-            'resourceGroup'
+            "name",
+            "location",
+            "resourceGroup"
         )
-        resource_type = 'Microsoft.Network/frontDoors'
+        resource_type = "Microsoft.Network/frontDoors"
 
 
-@FrontDoor.filter_registry.register('waf')
+@FrontDoor.filter_registry.register("waf")
 class WebAppFirewallFilter(Filter):
     """Frontdoor check waf enabled on front door profiles for Classic_AzureFrontDoor
 
@@ -54,28 +54,30 @@ class WebAppFirewallFilter(Filter):
 
 
     """
-    schema = type_schema('waf',required=['state'],
-            state={'type': 'string', 'enum': ['Enabled', 'Disabled']})
+    schema = type_schema(
+        "waf", required=["state"],
+        state={"type": "string", "enum": ["Enabled", "Disabled"]}
+    )
 
     def check_state(self, link):
-        if self.data.get('state') == 'Disabled' and link is None:
+        if self.data.get("state") == "Disabled" and link is None:
             return True
-        if self.data.get('state') == 'Enabled' and link is not None:
+        if self.data.get("state") == "Enabled" and link is not None:
             return True
 
     def process(self, resources, event=None):
         matched = []
         for front_door in resources:
-            for front_endpoint in front_door['properties']['frontendEndpoints']:
-                data = front_endpoint['properties'].get('webApplicationFirewallPolicyLink') or {}
-                link = data.get('id')
+            for front_endpoint in front_door["properties"]["frontendEndpoints"]:
+                data = front_endpoint["properties"].get("webApplicationFirewallPolicyLink") or {}
+                link = data.get("id")
                 if self.check_state(link):
                     matched.append(front_door)
                     break
         return matched
 
 
-@FrontDoor.filter_registry.register('firewall-policy')
+@FrontDoor.filter_registry.register("firewall-policy")
 class WAFPolicies(ListItemFilter):
     """Filters front door resources based on their waf policies
 
@@ -96,11 +98,11 @@ class WAFPolicies(ListItemFilter):
 
     """
     schema = type_schema(
-        'firewall-policy',
-        attrs={'$ref': '#/definitions/filters_common/list_item_attrs'}
+        "firewall-policy",
+        attrs={"$ref": "#/definitions/filters_common/list_item_attrs"}
     )
     annotate_items = True
-    item_annotation_key = 'c7n:WAFPolicies'
+    item_annotation_key = "c7n:WAFPolicies"
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -108,11 +110,11 @@ class WAFPolicies(ListItemFilter):
 
     def get_item_values(self, resource):
         ids = set()
-        for fe in resource['properties'].get('frontendEndpoints') or []:
-            data = fe['properties'].get('webApplicationFirewallPolicyLink')
+        for fe in resource["properties"].get("frontendEndpoints") or []:
+            data = fe["properties"].get("webApplicationFirewallPolicyLink")
             if not isinstance(data, dict):
                 continue
-            identifier = data.get('id')
+            identifier = data.get("id")
             if not identifier:
                 continue
             ids.add(identifier)
