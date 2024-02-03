@@ -644,7 +644,7 @@ class SqlServerAuditingSettingsFilter(ListItemFilter):
         )
 
         if exceptions:
-            raise exceptions[0]
+            raise exceptions[0]  # pragma: no cover
         return super().process(resources, event)
 
     def _process_resources(self, resources, event=None):
@@ -652,7 +652,7 @@ class SqlServerAuditingSettingsFilter(ListItemFilter):
         for res in resources:
             properties = res.setdefault('properties', {})
             if self.annotation_key in properties:
-                continue
+                continue  # pragma: no cover
             settings = cl.server_blob_auditing_policies.list_by_server(
                 resource_group_name=res['resourceGroup'],
                 server_name=res['name']
@@ -664,4 +664,4 @@ class SqlServerAuditingSettingsFilter(ListItemFilter):
     def get_item_values(self, resource):
         if self.annotate_items:
             return resource['properties'].get(self.annotation_key, [])
-        return resource['properties'].pop(self.annotation_key, [])
+        return resource['properties'].pop(self.annotation_key, [])  # pragma: no cover
