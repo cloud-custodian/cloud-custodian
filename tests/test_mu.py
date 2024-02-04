@@ -667,12 +667,13 @@ class PolicyLambdaProvision(Publish):
 
     def test_cwe_schedule(self):
         session_factory = self.replay_flight_data("test_cwe_schedule", zdata=True)
-        p = self.load_policy(
-            {
+        policy = {
                 "resource": "ec2",
                 "name": "periodic-ec2-checker",
-                "mode": {"type": "periodic", "schedule": "rate(1 day)"},
-            }, session_factory=session_factory)
+                "mode": {"type": "periodic", "schedule": "rate(1 day)", "copy_tags": True,
+                         "tags": {"a_key": "a_value"}},
+            }
+        p = self.load_policy(policy, session_factory=session_factory)
 
         pl = PolicyLambda(p)
         mgr = LambdaManager(session_factory)
@@ -688,6 +689,13 @@ class PolicyLambdaProvision(Publish):
                 "Timeout": 900,
             },
         )
+        lambda_svc = session_factory().client('lambda')
+        func_arn = result['FunctionArn']
+        if func_arn.count(':') > 6:
+            func_arn, version = func_arn.rsplit(':', 1)
+        lambda_tags = lambda_svc.list_tags(Resource=func_arn).get('Tags')
+        for key, value in pl.tags.items():
+            self.assertIn((key, value), lambda_tags.items())
 
         events = session_factory().client("events")
         result = events.list_rules(NamePrefix="custodian-periodic-ec2-checker")
@@ -699,6 +707,26 @@ class PolicyLambdaProvision(Publish):
                 "Name": "custodian-periodic-ec2-checker",
             },
         )
+        rule_tags = events.list_tags_for_resource(ResourceARN=result["Rules"][0]['Arn']).get('Tags')
+        for key, value in pl.tags.items():
+            self.assertIn({'Key': key, 'Value': value}, rule_tags)
+
+        # Update policy
+        policy['mode']['tags'] = {"another_key": "another_value"}
+        p = self.load_policy(policy, session_factory=session_factory)
+        pl = PolicyLambda(p)
+        self.addCleanup(mgr.remove, pl)
+        result = mgr.publish(pl, "Dev", role=ROLE)
+        func_arn = result['FunctionArn']
+        if func_arn.count(':') > 6:
+            func_arn, version = func_arn.rsplit(':', 1)
+        lambda_tags = lambda_svc.list_tags(Resource=func_arn).get('Tags')
+        for key, value in pl.tags.items():
+            self.assertIn((key, value), lambda_tags.items())
+        result = events.list_rules(NamePrefix="custodian-periodic-ec2-checker")
+        rule_tags = events.list_tags_for_resource(ResourceARN=result["Rules"][0]['Arn']).get('Tags')
+        for key, value in pl.tags.items():
+            self.assertIn({'Key': key, 'Value': value}, rule_tags)
 
     def test_eb_scheduler(self):
         session_factory = self.replay_flight_data("test_eb_scheduler")
