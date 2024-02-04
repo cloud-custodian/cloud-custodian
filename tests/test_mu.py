@@ -483,7 +483,7 @@ class PolicyLambdaProvision(Publish):
         lines = output.getvalue().strip().split("\n")
         self.assertTrue("Updating function custodian-s3-bucket-policy code" in lines)
         self.assertTrue(
-            "Updating function: custodian-s3-bucket-policy config MemorySize" in lines)
+            "Updating function: custodian-s3-bucket-policy config MemorySize, Role" in lines)
         self.assertEqual(result["FunctionName"], result2["FunctionName"])
         # drive by coverage
         functions = [
@@ -534,8 +534,8 @@ class PolicyLambdaProvision(Publish):
                 "FunctionName": "custodian-s3-bucket-policy",
                 "Handler": "custodian_policy.run",
                 "MemorySize": 512,
-                "Runtime": "python2.7",
-                "Timeout": 60,
+                "Runtime": "python3.11",
+                "Timeout": 900,
             },
         )
 
@@ -558,8 +558,8 @@ class PolicyLambdaProvision(Publish):
                 "FunctionName": "custodian-ec2-encrypted-vol",
                 "Handler": "custodian_policy.run",
                 "MemorySize": 512,
-                "Runtime": "python2.7",
-                "Timeout": 60,
+                "Runtime": "python3.11",
+                "Timeout": 900,
             },
         )
 
@@ -598,8 +598,8 @@ class PolicyLambdaProvision(Publish):
                 "FunctionName": "custodian-asg-spin-detector",
                 "Handler": "custodian_policy.run",
                 "MemorySize": 512,
-                "Runtime": "python2.7",
-                "Timeout": 60,
+                "Runtime": "python3.11",
+                "Timeout": 900,
             },
         )
 
@@ -684,8 +684,8 @@ class PolicyLambdaProvision(Publish):
                 "FunctionName": "custodian-periodic-ec2-checker",
                 "Handler": "custodian_policy.run",
                 "MemorySize": 512,
-                "Runtime": "python2.7",
-                "Timeout": 60,
+                "Runtime": "python3.11",
+                "Timeout": 900,
             },
         )
 
@@ -700,13 +700,55 @@ class PolicyLambdaProvision(Publish):
             },
         )
 
+    def test_eb_scheduler(self):
+        session_factory = self.replay_flight_data("test_eb_scheduler")
+        scheduler_role = "arn:aws:iam::644160558196:role/custodian-scheduler-mu"
+        p = self.load_policy(
+            {
+                "resource": "ec2",
+                "name": "periodic-ec2-checker",
+                "mode": {"type": "periodic", "schedule": "rate(1 day)",
+                         "scheduler_role": scheduler_role},
+            }, session_factory=session_factory)
+
+        pl = PolicyLambda(p)
+        mgr = LambdaManager(session_factory)
+        self.addCleanup(mgr.remove, pl)
+        result = mgr.publish(pl, "Dev", role=ROLE)
+        self.assert_items(
+            result,
+            {
+                "FunctionName": "custodian-periodic-ec2-checker",
+                "Handler": "custodian_policy.run",
+                "MemorySize": 512,
+                "Runtime": "python3.11",
+                "Timeout": 900,
+            },
+        )
+
+        scheduler = session_factory().client("scheduler")
+        result = scheduler.get_schedule(Name="custodian-periodic-ec2-checker")
+        self.assert_items(
+            result,
+            {
+                "State": "ENABLED",
+                "ScheduleExpression": "rate(1 day)",
+                "Name": "custodian-periodic-ec2-checker"
+            }
+        )
+        self.assert_items(
+            result['Target'],{
+                "RoleArn": scheduler_role
+            }
+        )
+
     key_arn = "arn:aws:kms:us-west-2:644160558196:key/" "44d25a5c-7efa-44ed-8436-b9511ea921b3"
     sns_arn = "arn:aws:sns:us-west-2:644160558196:config-topic"
 
     def create_a_lambda(self, flight, **extra):
         session_factory = self.replay_flight_data(flight, zdata=True)
         mode = {
-            "type": "config-rule", "role": "arn:aws:iam::644160558196:role/custodian-mu"
+            "type": "config-rule", "role": ROLE
         }
         mode.update(extra)
         p = self.load_policy({
@@ -725,6 +767,8 @@ class PolicyLambdaProvision(Publish):
                 time.sleep(60)
 
         self.addCleanup(cleanup)
+        if self.recording:
+            time.sleep(60)
         return mgr, mgr.publish(pl)
 
     def create_a_lambda_with_lots_of_config(self, flight):
@@ -739,7 +783,7 @@ class PolicyLambdaProvision(Publish):
 
     def update_a_lambda(self, mgr, **config):
         mode = {
-            "type": "config-rule", "role": "arn:aws:iam::644160558196:role/custodian-mu"
+            "type": "config-rule", "role": ROLE
         }
         mode.update(config)
         p = self.load_policy({
@@ -749,6 +793,8 @@ class PolicyLambdaProvision(Publish):
             "mode": mode,
         })
         pl = PolicyLambda(p)
+        if self.recording:
+            time.sleep(60)
         return mgr.publish(pl)
 
     def test_config_coverage_for_lambda_creation(self):
@@ -762,8 +808,8 @@ class PolicyLambdaProvision(Publish):
                 "FunctionName": "custodian-hello-world",
                 "Handler": "custodian_policy.run",
                 "MemorySize": 512,
-                "Runtime": "python2.7",
-                "Timeout": 60,
+                "Runtime": "python3.11",
+                "Timeout": 900,
                 "DeadLetterConfig": {"TargetArn": self.sns_arn},
                 "Environment": {"Variables": {"FOO": "bar"}},
                 "KMSKeyArn": self.key_arn,
@@ -795,8 +841,8 @@ class PolicyLambdaProvision(Publish):
                 "FunctionName": "custodian-hello-world",
                 "Handler": "custodian_policy.run",
                 "MemorySize": 512,
-                "Runtime": "python2.7",
-                "Timeout": 60,
+                "Runtime": "python3.11",
+                "Timeout": 900,
                 "DeadLetterConfig": {"TargetArn": self.sns_arn},
                 "Environment": {"Variables": {"FOO": "bloo"}},
                 "TracingConfig": {"Mode": "Active"},
@@ -829,10 +875,9 @@ class PolicyLambdaProvision(Publish):
                 "Handler": "custodian_policy.run",
                 "MemorySize": 512,
                 "Runtime": "python3.12",
-                "Timeout": 60,
-                "DeadLetterConfig": {"TargetArn": self.sns_arn},
+                "Timeout": 900,
                 "Environment": {"Variables": {"FOO": "baz"}},
-                "TracingConfig": {"Mode": "Active"},
+                "TracingConfig": {"Mode": "PassThrough"},
             },
         )
         tags = mgr.client.list_tags(Resource=result["FunctionArn"])["Tags"]

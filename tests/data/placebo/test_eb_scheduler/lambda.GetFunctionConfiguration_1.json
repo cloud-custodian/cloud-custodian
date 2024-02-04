@@ -2,17 +2,17 @@
     "status_code": 200,
     "data": {
         "ResponseMetadata": {},
-        "FunctionName": "custodian-ec2-foo-bar",
-        "FunctionArn": "arn:aws:lambda:us-east-1:644160558196:function:custodian-ec2-foo-bar",
+        "FunctionName": "custodian-periodic-ec2-checker",
+        "FunctionArn": "arn:aws:lambda:us-east-1:644160558196:function:custodian-periodic-ec2-checker",
         "Runtime": "python3.11",
         "Role": "arn:aws:iam::644160558196:role/custodian_read",
         "Handler": "custodian_policy.run",
-        "CodeSize": 610738,
+        "CodeSize": 610733,
         "Description": "cloud-custodian lambda policy",
         "Timeout": 900,
         "MemorySize": 512,
-        "LastModified": "2024-02-03T20:02:26.499+0000",
-        "CodeSha256": "VjvlX8rM7V36mRHFUU7UrHSbGdIlVNZBHutdwrVBhxw=",
+        "LastModified": "2024-02-04T02:50:33.495+0000",
+        "CodeSha256": "oi16ZGMr532YiONghsyJ9yA/wZHHS7u0dEtgwBzi8Oo=",
         "Version": "$LATEST",
         "VpcConfig": {
             "SubnetIds": [],
@@ -23,12 +23,13 @@
         "TracingConfig": {
             "Mode": "PassThrough"
         },
-        "RevisionId": "c72d58d7-7001-4b96-aba2-c923cffeddc1",
-        "State": "Active",
-        "LastUpdateStatus": "Successful",
+        "RevisionId": "4c4acb0c-c952-45e3-885f-4be37c05bccc",
+        "State": "Pending",
+        "StateReason": "The function is being created.",
+        "StateReasonCode": "Creating",
         "PackageType": "Zip",
         "Architectures": [
-            "arm64"
+            "x86_64"
         ],
         "EphemeralStorage": {
             "Size": 512
@@ -38,11 +39,11 @@
             "OptimizationStatus": "Off"
         },
         "RuntimeVersionConfig": {
-            "RuntimeVersionArn": "arn:aws:lambda:us-east-1::runtime:4b1873112448a94869033fc71f40a4470f15254e1afea10ebb5aabdefc18eb27"
+            "RuntimeVersionArn": "arn:aws:lambda:us-east-1::runtime:aaa0628b7c27cf9a6da9328d61875e549fca53968fbabf523c9ce564bb817574"
         },
         "LoggingConfig": {
             "LogFormat": "Text",
-            "LogGroup": "/aws/lambda/custodian-ec2-foo-bar"
+            "LogGroup": "/aws/lambda/custodian-periodic-ec2-checker"
         }
     }
 }

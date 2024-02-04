@@ -1,0 +1,11 @@
+{
+    "status_code": 201,
+    "data": {
+        "ResponseMetadata": {},
+        "AliasArn": "arn:aws:lambda:us-east-1:644160558196:function:custodian-periodic-ec2-checker:Dev",
+        "Name": "Dev",
+        "FunctionVersion": "87",
+        "Description": "",
+        "RevisionId": "0873020c-5168-478f-837d-914adf9207d9"
+    }
+}

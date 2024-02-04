@@ -1,0 +1,38 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "ScheduleGroups": [
+            {
+                "Arn": "arn:aws:scheduler:us-east-1:644160558196:schedule-group/default",
+                "Name": "default",
+                "State": "ACTIVE"
+            },
+            {
+                "Arn": "arn:aws:scheduler:us-east-1:644160558196:schedule-group/test",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 2,
+                    "day": 3,
+                    "hour": 10,
+                    "minute": 20,
+                    "second": 7,
+                    "microsecond": 800000
+                },
+                "LastModificationDate": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 2,
+                    "day": 3,
+                    "hour": 10,
+                    "minute": 20,
+                    "second": 7,
+                    "microsecond": 800000
+                },
+                "Name": "test",
+                "State": "ACTIVE"
+            }
+        ]
+    }
+}

@@ -933,6 +933,10 @@ class PolicyLambda(AbstractLambdaFunction):
         return self.policy.data['mode'].get('packages')
 
     @property
+    def copy_tags(self):
+        return self.policy.data['mode'].get('copy_tags', False)
+
+    @property
     def architectures(self):
         architecture = []
         arm64_arch = ('aarch64', 'arm64')
@@ -951,6 +955,11 @@ class PolicyLambda(AbstractLambdaFunction):
         elif self.policy.data['mode']['type'] == 'hub-action':
             events.append(
                 SecurityHubAction(self.policy, session_factory))
+        elif (self.policy.data['mode']['type'] == 'periodic'
+              and 'scheduler_role' in self.policy.data['mode']):
+            events.append(
+                EventBridgeScheduleSource(
+                    self.policy.data['mode'], session_factory))
         else:
             events.append(
                 CloudWatchEventSource(
@@ -1028,8 +1037,9 @@ class AWSEventBase:
                 StatementId=func.event_name,
             )
             return True
-        except client.ResourceNotFoundException:
-            pass
+        except ClientError as e:
+            if e.response['Error']['Code'] != 'ResourceNotFoundException':
+                raise
 
 
 class CloudWatchEventSource(AWSEventBase):
@@ -1074,14 +1084,24 @@ class CloudWatchEventSource(AWSEventBase):
         return resource_exists(self.client.describe_rule, Name=rule_name)
 
     @staticmethod
-    def delta(src, tgt):
+    def delta(src, tgt, check_tags=False, client=None):
         """Given two cwe rules determine if the configuration is the same.
 
         Name is already implied.
         """
-        for k in ['State', 'EventPattern', 'ScheduleExpression']:
+        for k in ['State', 'EventPattern', 'Description']:
             if src.get(k) != tgt.get(k):
                 return True
+
+        if check_tags:
+            src_tags = client.list_tags_for_resource(ResourceARN=src.get('Arn'))['Tags']
+            for tag in tgt.get('Tags'):
+                if tag not in src_tags:
+                    return True
+            for tag in src_tags:
+                if tag not in tgt.get('Tags'):
+                    return True
+
         return False
 
     def __repr__(self):
@@ -1169,9 +1189,34 @@ class CloudWatchEventSource(AWSEventBase):
             payload = merge_dict(payload, self.data['pattern'])
         return json.dumps(payload)
 
+    @staticmethod
+    def convert_tags(tags):
+        # convert tag list with items in the form {'key': 'value'}, to {'Key': key, 'Value': value}
+        tag_list = []
+        for key, value in tags.items():
+            tag_list.append({'Key': key, 'Value': value})
+        return tag_list
+
+    def diff_tags(self, rule_arn, policy_tags):
+        # keep it simple and produce a list of tags to add and remove based on equality of
+        # key/value pair rather than checking values for existing keys
+        # remove, then re-add when an existing key is changing value
+        rule_tags = self.client.list_tags_for_resource(ResourceARN=rule_arn)['Tags']
+        add_tags = []
+        remove_tags = []
+        for rule_tag in rule_tags:
+            if rule_tag not in policy_tags:
+                remove_tags.append(rule_tag['Key'])
+        for policy_tag in policy_tags:
+            if policy_tag not in rule_tags:
+                add_tags.append(policy_tag)
+        return add_tags, remove_tags
+
     def add(self, func):
         params = dict(
             Name=func.event_name, Description=func.description, State='ENABLED')
+        if self.data.get('copy_tags', False):
+            params['Tags'] = self.convert_tags(func.tags)
 
         pattern = self.render_event_pattern()
         if pattern:
@@ -1182,12 +1227,23 @@ class CloudWatchEventSource(AWSEventBase):
 
         rule = self.get(func.event_name)
 
-        if rule and self.delta(rule, params):
-            log.debug("Updating cwe rule for %s" % func.event_name)
+        if rule and self.delta(rule, params, 'Tags' in params, self.client):
+            log.debug(f'Updating cwe rule for {func.event_name}')
             response = self.client.put_rule(**params)
+            if 'Tags' in params:  # Tags in put_rule are ignored when updating an existing rule
+                log.debug(f'Updating cwe rule tags for {func.event_name}')
+                add_tags, remove_tags = self.diff_tags(rule.get('Arn'), params.get('Tags', []))
+                if remove_tags:
+                    self.client.untag_resource(ResourceARN=rule.get('Arn'), TagKeys=remove_tags)
+                if add_tags:
+                    self.client.tag_resource(ResourceARN=rule.get('Arn'), Tags=add_tags)
         elif not rule:
-            log.debug("Creating cwe rule for %s" % (self))
+            log.debug(f'Creating cwe rule for {self}')
             response = self.client.put_rule(**params)
+            # check if schedule exists for func.event_name and remove it to clean up
+            # when switching between scheduled event types
+            # must check all groups
+            EventBridgeScheduleSource.remove_from_groups(self.session.client('scheduler'), func)
         else:
             response = {'RuleArn': rule['Arn']}
 
@@ -1243,7 +1299,7 @@ class CloudWatchEventSource(AWSEventBase):
 
     def remove(self, func, func_deleted=True):
         if self.get(func.event_name):
-            log.info("Removing cwe targets and rule %s", func.event_name)
+            log.info(f'Removing cwe targets and rule {func.event_name}')
             try:
                 targets = self.client.list_targets_by_rule(
                     Rule=func.event_name)['Targets']
@@ -1252,11 +1308,126 @@ class CloudWatchEventSource(AWSEventBase):
                         Rule=func.event_name,
                         Ids=[t['Id'] for t in targets])
             except ClientError as e:
-                log.warning(
-                    "Could not remove targets for rule %s error: %s",
-                    func.name, e)
+                log.warning(f'Could not remove targets for rule {func.name} error: {e}')
             self.client.delete_rule(Name=func.event_name)
             self.remove_permissions(func, remove_permission=not func_deleted)
+            return True
+
+
+class EventBridgeScheduleSource(AWSEventBase):
+    """Invoke Lambda functions via EventBridge Scheduler.
+
+    Replaces CloudWatch scheduled event rules for periodic mode type
+    due to much higher quotas.
+    """
+
+    client_service = 'scheduler'
+
+    def get(self, schedule_name, group_name='default'):
+        return resource_exists(self.client.get_schedule,
+                               Name=schedule_name,
+                               GroupName=group_name)
+
+    @staticmethod
+    def delta(src, tgt):
+        """Given two schedules determine if the configuration is the same.
+
+        Name is already implied.
+        """
+        for k in ['State', 'StartDate', 'EndDate', 'ScheduleExpression',
+                  'ScheduleExpressionTimezone', 'Description', 'GroupName']:
+            if src.get(k) != tgt.get(k):
+                return True
+
+        for k in ['Arn', 'RoleArn']:
+            if src.get('Target', {}).get(k) != tgt.get('Target', {}).get(k):
+                return True
+
+        return False
+
+    def __repr__(self):
+        return (f'<CWEvent Type:{self.data.get("type")} Events:'
+                f'{", ".join(map(str, self.data.get("events", [])))}>')
+
+    def add(self, func):
+        params = dict(
+            Name=func.event_name,
+            Description=func.description,
+            State='ENABLED',
+            FlexibleTimeWindow={'Mode': 'OFF'},
+            ScheduleExpression=self.data.get('schedule'),
+            ScheduleExpressionTimezone=self.data.get('timezone', 'Etc/UTC'),
+            GroupName=self.data.get('group_name', 'default'),
+            Target={
+                'Arn': func.arn,
+                'RoleArn': self.data.get('scheduler_role')
+            }
+        )
+
+        schedule = self.get(func.event_name, params['GroupName'])
+
+        if schedule and self.delta(schedule, params):
+            log.debug(f'Updating schedule for {func.event_name} in group {params["GroupName"]}')
+            self.client.update_schedule(**params)
+        elif not schedule:
+            log.debug(f'Creating schedule for {self} in group {params["GroupName"]}')
+            self.client.create_schedule(**params)
+            # check if cwe exists for func.event_name and remove it to clean up
+            # when switching between scheduled event types
+            cwe = CloudWatchEventSource(self.data, self.session_factory)
+            cwe.remove(func, func_deleted=False)
+
+        # check for schedules with same func.event_name in any other group in case
+        # group_name has been changed
+        # there should only be one schedule across all groups for each policy lambda
+        self.remove_from_groups(self.client, func, params['GroupName'])
+
+        return True
+
+    @staticmethod
+    def remove_from_groups(client, func, skip_group=None):
+        try:
+            paginator = client.get_paginator('list_schedule_groups')
+            pages = paginator.paginate()
+            for page in pages:
+                for group in page['ScheduleGroups']:
+                    if group['Name'] != skip_group:
+                        schedule = resource_exists(client.get_schedule,
+                                                   Name=func.event_name,
+                                                   GroupName=group['Name'])
+                        if schedule:
+                            log.debug(f'Removing schedule {func.event_name} '
+                                      f'in group {group["Name"]}')
+                            client.delete_schedule(Name=func.event_name, GroupName=group['Name'])
+        except ClientError as e:
+            if e.response['Error']['Code'] == 'AccessDeniedException':
+                return
+            raise
+
+    def update(self, func):
+        self.add(func)
+
+    def pause(self, func):
+        try:
+            schedule = self.get(func.event_name, self.data.get('group_name', 'default'))
+            schedule['State'] = 'DISABLED'
+            self.client.update_schedule(**schedule)
+        except ClientError:
+            pass
+
+    def resume(self, func):
+        try:
+            schedule = self.get(func.event_name, self.data.get('group_name', 'default'))
+            schedule['State'] = 'ENABLED'
+            self.client.update_schedule(**schedule)
+        except ClientError:
+            pass
+
+    def remove(self, func, func_deleted=True):
+        if self.get(func.event_name):
+            group_name = self.data.get('group_name', 'default')
+            log.info(f'Removing schedule {func.event_name} in group {group_name}')
+            self.client.delete_schedule(Name=func.event_name, GroupName=group_name)
             return True
 
 

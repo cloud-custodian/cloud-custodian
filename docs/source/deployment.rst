@@ -144,8 +144,11 @@ In AWS, you will need ReadOnly access as well as the following permissions:
                     "ec2:DescribeNetworkInterfaces",
                     "ec2:DeleteNetworkInterface",
                     "ec2:CreateNetworkInterface",
+                    "events:ListTagsForResource",
                     "events:PutRule",
                     "events:PutTargets",
+                    "events:TagResource",
+                    "events:UntagResource",
                     "iam:PassRole",
                     "lambda:CreateFunction",
                     "lambda:TagResource",
@@ -166,7 +169,12 @@ In AWS, you will need ReadOnly access as well as the following permissions:
                     "lambda:CreateAlias",
                     "logs:CreateLogStream",
                     "logs:PutLogEvents",
-                    "logs:CreateLogGroup"
+                    "logs:CreateLogGroup",
+                    "scheduler:CreateSchedule",
+                    "scheduler:DeleteSchedule",
+                    "scheduler:GetSchedule",
+                    "scheduler:ListScheduleGroups",
+                    "scheduler:UpdateSchedule"
                 ],
                 "Resource": "*"
             }

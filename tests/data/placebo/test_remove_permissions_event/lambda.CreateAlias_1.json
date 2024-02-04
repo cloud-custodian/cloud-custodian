@@ -4,8 +4,8 @@
         "ResponseMetadata": {},
         "AliasArn": "arn:aws:lambda:us-east-1:644160558196:function:custodian-test:Dev",
         "Name": "Dev",
-        "FunctionVersion": "4",
+        "FunctionVersion": "3",
         "Description": "",
-        "RevisionId": "7503a91c-ae70-45e1-8b95-83c9ba72a28c"
+        "RevisionId": "b2cf1a6d-e15d-4049-a111-43a2aca960f6"
     }
 }
