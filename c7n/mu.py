@@ -1089,7 +1089,7 @@ class CloudWatchEventSource(AWSEventBase):
 
         Name is already implied.
         """
-        for k in ['State', 'EventPattern', 'Description']:
+        for k in ['State', 'EventPattern', 'ScheduleExpression', 'Description']:
             if src.get(k) != tgt.get(k):
                 return True
 
