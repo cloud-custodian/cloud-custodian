@@ -1411,6 +1411,15 @@ class EventBridgeScheduleSource(AWSEventBase):
         try:
             schedule = self.get(func.event_name, self.data.get('group_name', 'default'))
             schedule['State'] = 'DISABLED'
+            keys_to_delete = []
+            for key in schedule.keys():
+                if key not in ['ActionAfterCompletion', 'ClientToken', 'Description', 'EndDate',
+                               'FlexibleTimeWindow', 'GroupName', 'KmsKeyArn', 'Name',
+                               'ScheduleExpression', 'ScheduleExpressionTimezone', 'StartDate',
+                               'State', 'Target']:
+                    keys_to_delete.append(key)
+            for key in keys_to_delete:
+                del schedule[key]
             self.client.update_schedule(**schedule)
         except ClientError:
             pass
@@ -1419,6 +1428,15 @@ class EventBridgeScheduleSource(AWSEventBase):
         try:
             schedule = self.get(func.event_name, self.data.get('group_name', 'default'))
             schedule['State'] = 'ENABLED'
+            keys_to_delete = []
+            for key in schedule.keys():
+                if key not in ['ActionAfterCompletion', 'ClientToken', 'Description', 'EndDate',
+                               'FlexibleTimeWindow', 'GroupName', 'KmsKeyArn', 'Name',
+                               'ScheduleExpression', 'ScheduleExpressionTimezone', 'StartDate',
+                               'State', 'Target']:
+                    keys_to_delete.append(key)
+            for key in keys_to_delete:
+                del schedule[key]
             self.client.update_schedule(**schedule)
         except ClientError:
             pass

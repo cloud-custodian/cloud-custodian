@@ -4,8 +4,8 @@
         "ResponseMetadata": {},
         "AliasArn": "arn:aws:lambda:us-east-1:644160558196:function:custodian-periodic-ec2-checker:Dev",
         "Name": "Dev",
-        "FunctionVersion": "97",
+        "FunctionVersion": "104",
         "Description": "",
-        "RevisionId": "df1fc6cd-71b5-4335-886f-2cde7598537b"
+        "RevisionId": "70a96d9a-826b-42bd-9984-11c6a4697d56"
     }
 }

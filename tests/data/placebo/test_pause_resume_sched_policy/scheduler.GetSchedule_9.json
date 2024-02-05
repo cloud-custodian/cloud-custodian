@@ -10,9 +10,9 @@
             "month": 2,
             "day": 4,
             "hour": 20,
-            "minute": 21,
-            "second": 39,
-            "microsecond": 855000
+            "minute": 54,
+            "second": 30,
+            "microsecond": 148000
         },
         "Description": "cloud-custodian lambda policy",
         "FlexibleTimeWindow": {
@@ -25,9 +25,9 @@
             "month": 2,
             "day": 4,
             "hour": 20,
-            "minute": 21,
-            "second": 39,
-            "microsecond": 855000
+            "minute": 54,
+            "second": 30,
+            "microsecond": 735000
         },
         "Name": "custodian-periodic-ec2-checker",
         "ScheduleExpression": "rate(1 day)",

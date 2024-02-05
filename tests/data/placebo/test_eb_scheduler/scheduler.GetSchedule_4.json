@@ -8,11 +8,11 @@
             "__class__": "datetime",
             "year": 2024,
             "month": 2,
-            "day": 3,
-            "hour": 21,
-            "minute": 50,
+            "day": 4,
+            "hour": 20,
+            "minute": 21,
             "second": 39,
-            "microsecond": 279000
+            "microsecond": 855000
         },
         "Description": "cloud-custodian lambda policy",
         "FlexibleTimeWindow": {
@@ -23,11 +23,11 @@
             "__class__": "datetime",
             "year": 2024,
             "month": 2,
-            "day": 3,
-            "hour": 21,
-            "minute": 50,
+            "day": 4,
+            "hour": 20,
+            "minute": 21,
             "second": 39,
-            "microsecond": 279000
+            "microsecond": 855000
         },
         "Name": "custodian-periodic-ec2-checker",
         "ScheduleExpression": "rate(1 day)",

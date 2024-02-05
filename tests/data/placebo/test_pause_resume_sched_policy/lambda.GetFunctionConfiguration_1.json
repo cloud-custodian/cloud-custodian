@@ -7,12 +7,12 @@
         "Runtime": "python3.11",
         "Role": "arn:aws:iam::644160558196:role/custodian_read",
         "Handler": "custodian_policy.run",
-        "CodeSize": 610788,
+        "CodeSize": 610919,
         "Description": "cloud-custodian lambda policy",
         "Timeout": 900,
         "MemorySize": 512,
-        "LastModified": "2024-02-05T01:21:33.430+0000",
-        "CodeSha256": "J0jGljUM734OjxG1/Wqi1NZ7rr+t2fX3qVYnQVfFDJI=",
+        "LastModified": "2024-02-05T01:54:24.393+0000",
+        "CodeSha256": "3fV9+qe1QUE4m7yQ5+FwU+iCEG/jkLGlzPtJXsVwroM=",
         "Version": "$LATEST",
         "VpcConfig": {
             "SubnetIds": [],
@@ -23,7 +23,7 @@
         "TracingConfig": {
             "Mode": "PassThrough"
         },
-        "RevisionId": "25a0c521-1608-4f10-b167-d39d8b86c377",
+        "RevisionId": "81686e93-fcdd-40d2-b8f5-f710a85c1f7c",
         "State": "Pending",
         "StateReason": "The function is being created.",
         "StateReasonCode": "Creating",
