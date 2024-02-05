@@ -1,0 +1,17 @@
+{
+    "status_code": 200,
+    "data": {
+        "AttachedPolicies": [
+            {
+                "PolicyName": "AmazonSSMManagedInstanceCore",
+                "PolicyArn": "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+            },
+            {
+                "PolicyName": "AmazonS3ReadOnlyAccess",
+                "PolicyArn": "arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess"
+            }
+        ],
+        "IsTruncated": false,
+        "ResponseMetadata": {}
+    }
+}
