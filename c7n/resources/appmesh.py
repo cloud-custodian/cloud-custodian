@@ -14,41 +14,44 @@ class AppmeshMesh(QueryResourceManager):
     class resource_type(TypeInfo):
         service = 'appmesh'
 
-        # https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsappmesh.html#awsappmesh-resources-for-iam-policies
+        # https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsappmesh.html#awsappmesh-resources-for-iam-policies   # noqa
         arn_type = "mesh"
 
-        # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-appmesh-virtualnode.html
+        # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-appmesh-virtualnode.html  # noqa
         cfn_type = config_type = 'AWS::AppMesh::Mesh'
 
         # Field in response containing the identifier used in API's.
         # Therefore, this "id" field might be the arn field for some API's but
         # in the case of Appmesh" it needs to be the field that contains the
         # name of the mesh as that's what the appmesh API's expect.
-        # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-appmesh-mesh.html
+        # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-appmesh-mesh.html   # noqa
         id = name = 'meshName'
 
-        # arn : Defines a top level field in the resource definition that contains the ARN value.
-        # This value is accessed used by the 'get_arns(..)' fn on the super-class QueryResourceManager.
-        # The logic (Feb 2024) in 'get_arns' is that this must be a top level field name and NOT a path.
+        # arn : Defines a top level field in the resource definition that contains the ARN
+        # value. This value is accessed used by the 'get_arns(..)' fn on the super-class
+        # QueryResourceManager.
         #
         # If this value is not defined then 'get_arns' contains fallback logic.
         #
         # First fallback logic is to look at what's defined in the 'id' field.
         # If the value of the "id" field starts with "arn:" then that value is used as the arn.
         #
-        # The last resort is an attempt at generating (guessing!) the ARN by assembling it from various fields
-        # and runtime values based on a recipe defined in 'generate_arn()' on the super-class QueryResourceManager.
+        # The last resort is an attempt at generating (guessing!) the ARN by assembling it from
+        # various fields and runtime values based on a recipe defined in 'generate_arn()' on
+        # the super-class QueryResourceManager.
         #
-        # If you aren't going to define the "arn" field and can't rely on the "id" to be an ARN then
-        # you might get lucky that "generate_arn" works for your resource type. However, failing that then
-        # you should override "get_arns" function entirely and implement your own logic.
+        # If you aren't going to define the "arn" field and can't rely on the "id" to be an
+        # ARN then you might get lucky that "generate_arn" works for your resource type.
+        # However, failing that then you should override "get_arns" function entirely and
+        # implement your own logic.
         #
-        # TESTING: Whatever approach you use (above) you REALLY SHOULD (!!!) include a unit test that verifies that
-        # "get_arns" yields the right ARNs for your resources. This test should be implemented
-        # as an additional assertion within the unit tests you'll be already planning to create.
-        # For example test_appmesh.py includes a call to "get_arns(resources)" and asserts that the ARNs
-        # found by running the policy are the expected ones defined within the test data JSON files in the
-        # "placebo" directory.
+        # TESTING: Whatever approach you use (above) you REALLY SHOULD (!!!) include a unit
+        # test that verifies that "get_arns" yields the right ARNs for your resources.
+        # This test should be implemented as an additional assertion within the unit tests
+        # you'll be already planning to create.
+        # For example test_appmesh.py includes a call to "get_arns(resources)" and asserts
+        # that the ARNs found by running the policy are the expected ones defined within
+        # the test data JSON files in the "placebo" directory.
         arn = "arn"
 
         # enum_spec : Defines the boto3 call used to find at least basic
@@ -113,7 +116,7 @@ class AppmeshVirtualGateway(ChildResourceManager):
 
         service = 'appmesh'
 
-        # https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsappmesh.html#awsappmesh-resources-for-iam-policies
+        # https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsappmesh.html#awsappmesh-resources-for-iam-policies  # noqa
         arn_type = "mesh"
 
         # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-appmesh-virtualgateway.html  # noqa
@@ -122,7 +125,7 @@ class AppmeshVirtualGateway(ChildResourceManager):
         # id: Path to "id" field in the
         id = 'meshName'
 
-        # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-appmesh-virtualgateway.html
+        # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-appmesh-virtualgateway.html  # noqa
         arn = "metadata.arn"
 
         name = 'meshNameXXXXX'
@@ -145,14 +148,6 @@ class AppmeshVirtualGateway(ChildResourceManager):
             'virtualGateways',
             None,  # {'limit': 100} #"'meshName' # , None
         )
-
-
-    #
-    # def get_arns(self, resources):
-    #     """ the superclass default rule for deriving the ARN doesn't work so pick it out ourselves."""
-    #
-    #     print("!!!!!! resource " + str(resources[0]))
-    #     return list(r["metadata"]["arn"] for r in resources)
 
     # copied from ECS Task
     @property
