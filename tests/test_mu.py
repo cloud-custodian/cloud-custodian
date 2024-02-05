@@ -71,8 +71,8 @@ class Publish(BaseTest):
             handler="index.handler",
             memory_size=128,
             timeout=3,
-            role='custodian-mu',
-            runtime="python2.7",
+            role=ROLE,
+            runtime="python3.12",
             description="test",
         )
         func_data.update(kw)
@@ -84,49 +84,6 @@ class Publish(BaseTest):
         archive.close()
         self.addCleanup(archive.remove)
         return LambdaFunction(func_data, archive)
-
-    def test_publishes_a_lambda(self):
-        session_factory = self.replay_flight_data("test_publishes_a_lambda")
-        mgr = LambdaManager(session_factory)
-        func = self.make_func()
-        self.addCleanup(mgr.remove, func)
-        result = mgr.publish(func)
-        self.assertEqual(result["CodeSize"], 169)
-
-    def test_publish_a_lambda_with_layer_and_concurrency(self):
-        factory = self.replay_flight_data('test_lambda_layer_concurrent_publish')
-        mgr = LambdaManager(factory)
-        layers = ['arn:aws:lambda:us-east-1:644160558196:layer:CustodianLayer:2']
-        func = self.make_func(
-            concurrency=5,
-            layers=layers)
-        self.addCleanup(mgr.remove, func)
-
-        result = mgr.publish(func)
-        self.assertEqual(result['Layers'][0]['Arn'], layers[0])
-        state = mgr.get(func.name)
-        self.assertEqual(state['Concurrency']['ReservedConcurrentExecutions'], 5)
-
-        func = self.make_func(layers=layers)
-        output = self.capture_logging("custodian.serverless", level=logging.DEBUG)
-        result = mgr.publish(func)
-        self.assertEqual(result['Layers'][0]['Arn'], layers[0])
-
-        lines = output.getvalue().strip().split("\n")
-        self.assertFalse('Updating function: test-foo-bar config Layers' in lines)
-        self.assertTrue('Removing function: test-foo-bar concurrency' in lines)
-
-    def test_can_switch_runtimes(self):
-        session_factory = self.replay_flight_data("test_can_switch_runtimes")
-        func = self.make_func()
-        mgr = LambdaManager(session_factory)
-        self.addCleanup(mgr.remove, func)
-        result = mgr.publish(func)
-        self.assertEqual(result["Runtime"], "python2.7")
-
-        func.func_data["runtime"] = "python3.6"
-        result = mgr.publish(func)
-        self.assertEqual(result["Runtime"], "python3.6")
 
 
 class PolicyLambdaProvision(Publish):
@@ -195,6 +152,7 @@ class PolicyLambdaProvision(Publish):
                 'mode': {
                     'type': 'cloudtrail',
                     'role': 'arn:aws:iam::644160558196:role/custodian-mu',
+                    'runtime': 'python3.9',
                     'events': ['RunInstances']}})
             pl1 = PolicyLambda(p1)
             mgr = LambdaManager(session_factory)
@@ -207,7 +165,7 @@ class PolicyLambdaProvision(Publish):
             self.addCleanup(mgr.remove, pl1)
 
     def test_config_poll_rule_evaluation(self):
-        session_factory = self.record_flight_data("test_config_poll_rule_provision")
+        session_factory = self.replay_flight_data("test_config_poll_rule_evaluation")
 
         # config added support for kinesis streams after that test was written
         # disable that support so the original behavior check on config poll mode
@@ -480,7 +438,7 @@ class PolicyLambdaProvision(Publish):
             "resource": "s3",
             "name": "s3-bucket-policy",
             "mode": {"type": "cloudtrail",
-                     "events": ["CreateBucket"], 'runtime': 'python2.7'},
+                     "events": ["CreateBucket"], 'runtime': 'python3.12'},
             "filters": [
                 {"type": "missing-policy-statement",
                  "statement_ids": ["RequireEncryptedPutObject"]},
@@ -499,7 +457,7 @@ class PolicyLambdaProvision(Publish):
                 "mode": {
                     "type": "cloudtrail",
                     "memory": 256,
-                    'runtime': 'python2.7',
+                    'runtime': 'python3.12',
                     "events": [
                         "CreateBucket",
                         {
@@ -854,7 +812,7 @@ class PolicyLambdaProvision(Publish):
         result = self.update_a_lambda(
             mgr,
             **{
-                "runtime": "python3.6",
+                "runtime": "python3.12",
                 "environment": {"Variables": {"FOO": "baz"}},
                 "kms_key_arn": "",
                 "dead_letter_config": {},
@@ -870,7 +828,7 @@ class PolicyLambdaProvision(Publish):
                 "FunctionName": "custodian-hello-world",
                 "Handler": "custodian_policy.run",
                 "MemorySize": 512,
-                "Runtime": "python3.6",
+                "Runtime": "python3.12",
                 "Timeout": 60,
                 "DeadLetterConfig": {"TargetArn": self.sns_arn},
                 "Environment": {"Variables": {"FOO": "baz"}},
@@ -968,7 +926,7 @@ class PolicyLambdaProvision(Publish):
                 "KMSKeyArn": "",
                 "MemorySize": 512,
                 "Role": "",
-                "Runtime": "python3.9",
+                "Runtime": "python3.11",
                 "Architectures": [default_arch],
                 "Tags": {},
                 "Timeout": 900,
@@ -990,7 +948,7 @@ class PolicyLambdaProvision(Publish):
                     "KMSKeyArn": "",
                     "MemorySize": 512,
                     "Role": "",
-                    "Runtime": "python3.9",
+                    "Runtime": "python3.11",
                     "Architectures": ["arm64"],
                     "Tags": {},
                     "Timeout": 900,
@@ -1009,7 +967,7 @@ class PolicyLambdaProvision(Publish):
                     "KMSKeyArn": "",
                     "MemorySize": 512,
                     "Role": "",
-                    "Runtime": "python3.9",
+                    "Runtime": "python3.11",
                     "Architectures": ["x86_64"],
                     "Tags": {},
                     "Timeout": 900,
@@ -1155,6 +1113,51 @@ class PolicyLambdaProvision(Publish):
         self.assertTrue(found_function)
         with self.assertRaises(lambda_client.exceptions.ResourceNotFoundException):
             lambda_client.get_policy(FunctionName="test-foo-bar")
+
+    def test_publishes_a_lambda(self):
+        session_factory = self.replay_flight_data("test_publishes_a_lambda")
+        mgr = LambdaManager(session_factory)
+        func = self.make_func()
+        self.addCleanup(mgr.remove, func)
+        result = mgr.publish(func)
+        self.assertEqual(result["CodeSize"], 169)
+
+    def test_publish_a_lambda_with_layer_and_concurrency(self):
+        factory = self.replay_flight_data('test_lambda_layer_concurrent_publish')
+        mgr = LambdaManager(factory)
+        layers = ['arn:aws:lambda:us-east-1:644160558196:layer:AWSLambdaPowertoolsPythonV2:59']
+        func = self.make_func(
+            concurrency=5,
+            layers=layers)
+        self.addCleanup(mgr.remove, func)
+
+        result = mgr.publish(func)
+        self.assertEqual(result['Layers'][0]['Arn'], layers[0])
+        if self.recording:
+            time.sleep(10)
+        published = mgr.get(func.name)
+        self.assertEqual(published['Concurrency']['ReservedConcurrentExecutions'], 5)
+
+        func = self.make_func(layers=layers)
+        output = self.capture_logging("custodian.serverless", level=logging.DEBUG)
+        result = mgr.publish(func)
+        self.assertEqual(result['Layers'][0]['Arn'], layers[0])
+
+        lines = output.getvalue().strip().split("\n")
+        self.assertFalse('Updating function: test-foo-bar config Layers' in lines)
+        self.assertTrue('Removing function: test-foo-bar concurrency' in lines)
+
+    def test_can_switch_runtimes(self):
+        session_factory = self.replay_flight_data("test_can_switch_runtimes")
+        func = self.make_func()
+        mgr = LambdaManager(session_factory)
+        self.addCleanup(mgr.remove, func)
+        result = mgr.publish(func)
+        self.assertEqual(result["Runtime"], "python2.7")
+
+        func.func_data["runtime"] = "python3.6"
+        result = mgr.publish(func)
+        self.assertEqual(result["Runtime"], "python3.6")
 
 
 class PythonArchiveTest(unittest.TestCase):

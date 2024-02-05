@@ -1139,7 +1139,7 @@ class ListItemFilter(Filter):
 
     schema_alias = True
     annotate_items = False
-
+    item_annotation_key = "c7n:ListItemMatches"
     _expr = None
 
     @property
@@ -1189,8 +1189,8 @@ class ListItemFilter(Filter):
                     ]
                 else:
                     annotations = list_resources
-                r.setdefault('c7n:ListItemMatches', [])
-                r['c7n:ListItemMatches'].extend(annotations)
+                r.setdefault(self.item_annotation_key, [])
+                r[self.item_annotation_key].extend(annotations)
                 result.append(r)
         return result
 
