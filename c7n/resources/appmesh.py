@@ -1,8 +1,6 @@
 """
 AppMesh Communications
 """
-from botocore.exceptions import ClientError
-
 from c7n import query
 from c7n.exceptions import PolicyExecutionError
 from c7n.manager import resources
@@ -15,16 +13,45 @@ class AppmeshMesh(QueryResourceManager):
     # interior class that defines the aws metadata for resource
     class resource_type(TypeInfo):
         service = 'appmesh'
+
+        # https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsappmesh.html#awsappmesh-resources-for-iam-policies
         arn_type = "mesh"
 
         # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-appmesh-virtualnode.html
         cfn_type = config_type = 'AWS::AppMesh::Mesh'
 
-        # field in response containing the identifier
+        # Field in response containing the identifier used in API's.
+        # Therefore, this "id" field might be the arn field for some API's but
+        # in the case of Appmesh" it needs to be the field that contains the
+        # name of the mesh as that's what the appmesh API's expect.
         # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-appmesh-mesh.html
         id = name = 'meshName'
 
-        # enum_spec defines the boto3 call used to find at least basic
+        # arn : Defines a top level field in the resource definition that contains the ARN value.
+        # This value is accessed used by the 'get_arns(..)' fn on the super-class QueryResourceManager.
+        # The logic (Feb 2024) in 'get_arns' is that this must be a top level field name and NOT a path.
+        #
+        # If this value is not defined then 'get_arns' contains fallback logic.
+        #
+        # First fallback logic is to look at what's defined in the 'id' field.
+        # If the value of the "id" field starts with "arn:" then that value is used as the arn.
+        #
+        # The last resort is an attempt at generating (guessing!) the ARN by assembling it from various fields
+        # and runtime values based on a recipe defined in 'generate_arn()' on the super-class QueryResourceManager.
+        #
+        # If you aren't going to define the "arn" field and can't rely on the "id" to be an ARN then
+        # you might get lucky that "generate_arn" works for your resource type. However, failing that then
+        # you should override "get_arns" function entirely and implement your own logic.
+        #
+        # TESTING: Whatever approach you use (above) you REALLY SHOULD (!!!) include a unit test that verifies that
+        # "get_arns" yields the right ARNs for your resources. This test should be implemented
+        # as an additional assertion within the unit tests you'll be already planning to create.
+        # For example test_appmesh.py includes a call to "get_arns(resources)" and asserts that the ARNs
+        # found by running the policy are the expected ones defined within the test data JSON files in the
+        # "placebo" directory.
+        arn = "arn"
+
+        # enum_spec : Defines the boto3 call used to find at least basic
         # details all resources of the relevant type.  the data per
         # resource can be further enriched by a detail_spec function.
         # enum_spec is also used when we've received an event in which
@@ -44,8 +71,8 @@ class AppmeshMesh(QueryResourceManager):
         #
         # and so when an event is received then the enum function gets
         # called and the event id's get enriched.
-
-        # for example the specific identity found in an
+        #
+        # For example the specific identity found in an
         # event. However, if the enum op doesn't support filtering
         # then what will happen with events instead is a full list of
         # resources followed by client side filtering.
@@ -58,15 +85,15 @@ class AppmeshMesh(QueryResourceManager):
         #
         enum_spec = ('list_meshes', 'meshes', None)
 
-        # In many cases the enum_spec function is one of the
+        # detail_spec: In many cases the enum_spec function is one of the
         # "describe_" style functions that return a full'ish spec that
         # is sufficient for the user detection, however in those cases
-        # where the enum_spec is a "list_" style funtion then the
-        # response to then enum call will be lacking in detail and
+        # where the enum_spec is a "list_" style function then the
+        # response to then enum call will tend to be lacking in detail and
         # might just be a list of id's. In these cases it is generally
         # necessary to define a "detail_spec" which can be used to
         # enrich the values provided by the enum_spec.
-
+        #
         # detail_op = boto api call name
         # param_name = name of argument to boto api call
         # param_key = name of field in enum_spec response to drive this call
@@ -74,49 +101,6 @@ class AppmeshMesh(QueryResourceManager):
         #               return as the detail result if not provided
         #               then whole response is included in results
         detail_spec = ('describe_mesh', 'meshName', 'meshName', None)
-
-        # This function gets called with the id's retrieved from the
-        # event and is expected to return the enriched resource
-        # definition.
-        #
-        # Explanation of logic:
-        #
-        # The default impl on the superclass calls the enum_spec
-        # function, however for many resource types this is useless
-        # since the enum function provides little specification and
-        # often everything the enum function provides is also on the
-        # detail_spec function.
-        #
-        # So where we're going to have to have a detail_spec and where
-        # the enum_spec is redundant then why call the enum spec
-        # function at all?  This is a small speed / cost saving as it
-        # reduces the number of AWS API calls made for each event.
-        # So, in the the case of the current resource we will simply
-        # skip the enum call entirely.
-        #
-        # TODO: Propose an improvement where we allow skipping of the
-        # enum_spec call self.source.get_resources(ids)
-
-    def get_resources(self, ids, cache=True, augment=True):
-        if not ids:
-            return []
-        if cache:
-            resources = self._get_cached_resources(ids)
-            if resources is not None:
-                return resources
-        try:
-            # default impl calls the enum function here - but we're
-            # not going to do that
-            # resources = self.source.get_resources(ids)
-
-            # do the augment by mocking up a fake resource that has
-            # the field name (param_key)
-            # specified by the describe_spec
-            resources = [{"meshName": m} for m in ids]
-            return self.augment(resources)
-        except ClientError as e:
-            self.log.warning("event ids not resolved: %s error:%s" % (ids, e))
-            return []
 
 
 @resources.register('appmesh-virtual-gateway')
@@ -128,17 +112,25 @@ class AppmeshVirtualGateway(ChildResourceManager):
         supports_trailevents = True
 
         service = 'appmesh'
-        arn_type = "virtualGateway"
-        # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-appmesh-virtualgateway.html
-        # probably wrong as the arn is a different field
-        # OLD arn = "meshName"
-        # arn = "metadata.arn"
 
-        id = name = 'meshName'
+        # https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsappmesh.html#awsappmesh-resources-for-iam-policies
+        arn_type = "mesh"
+
+        # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-appmesh-virtualgateway.html  # noqa
+        cfn_type = config_type = 'AWS::AppMesh::VirtualGateway'
+
+        # id: Path to "id" field in the
+        id = 'meshName'
+
+        # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-appmesh-virtualgateway.html
+        arn = "metadata.arn"
+
+        name = 'meshNameXXXXX'
+
         date = 'createdAt'
 
-        # when we define a parent_spec then it uses the parent sNpec
-        # to provide the driving result set.  this is then iterated
+        # When we define a parent_spec then it uses the parent_spec
+        # to provide the driving result set.  This is then iterated
         # across and the enum_spec is called for each parent instance.
         # appmesh-mesh - is ref to another resource above that
         # provides the driving value for the enum_spec meshName - is
@@ -154,8 +146,13 @@ class AppmeshVirtualGateway(ChildResourceManager):
             None,  # {'limit': 100} #"'meshName' # , None
         )
 
-        # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-appmesh-virtualgateway.html  # noqa
-        cfn_type = config_type = 'AWS::AppMesh::VirtualGateway'
+
+    #
+    # def get_arns(self, resources):
+    #     """ the superclass default rule for deriving the ARN doesn't work so pick it out ourselves."""
+    #
+    #     print("!!!!!! resource " + str(resources[0]))
+    #     return list(r["metadata"]["arn"] for r in resources)
 
     # copied from ECS Task
     @property
@@ -184,7 +181,7 @@ class DescribeGatewayDefinition(ChildDescribeSource):
         # ids
         for i in ids:
             # split mesh gw arn :
-            # arn:aws:appmesh:eu-west-2:659775036450:mesh/Mesh7/virtualGateway/GW1  # noqa
+            # arn:aws:appmesh:eu-west-2:123456789012:mesh/Mesh7/virtualGateway/GW1  # noqa
 
             _, ident = i.rsplit(':', 1)
             parts = ident.split('/', 3)
@@ -252,7 +249,8 @@ class DescribeGatewayDefinition(ChildDescribeSource):
 #     # interior class that defines the aws metadata for resource
 #     class resource_type(TypeInfo):
 #         service = 'appmesh'
-#         arn_type = "virtualNode"
+#         arn_type = "mesh"
+#         # subtype is "virtualNode"
 #         # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-appmesh-virtualnode.html
 #         id = name = 'VirtualNodeName'
 #         #date = 'CreatedTime'

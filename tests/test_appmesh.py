@@ -1,6 +1,5 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
-
 from .common import BaseTest, event_data
 
 # during recording create some sample resources in AWS the
@@ -25,6 +24,19 @@ class TestAppmeshMesh(BaseTest):
         self.assertEqual(len(resources), 2)
         self.assertEqual(resources[0]["meshName"], "m1")
         self.assertEqual(resources[1]["meshName"], "m2")
+
+        # These assertions are necessary to be sure that the "get_arns" function is correctly deriving the ARN.
+        # See the documentation on the "arn" field in appmesh.py.
+        arns = p.resource_manager.get_arns(resources)
+        self.assertIn(
+            'arn:aws:appmesh:eu-west-2:123456789012:mesh/m1',
+            arns
+        )
+        self.assertIn(
+            'arn:aws:appmesh:eu-west-2:123456789012:mesh/m2',
+            arns
+        )
+
 
     def test_appmesh_event(self):
         session_factory = self.replay_flight_data('test_appmesh_mesh_event')
@@ -56,6 +68,14 @@ class TestAppmeshMesh(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["meshName"], "m1")
 
+        # These assertions are necessary to be sure that the "get_arns" function is correctly deriving the ARN.
+        # See the documentation on the "arn" field in appmesh.py.
+        arns = p.resource_manager.get_arns(resources)
+        self.assertIn(
+            'arn:aws:appmesh:eu-west-2:123456789012:mesh/m1',
+            arns
+        )
+
 
 class TestAppmeshVirtualGateway(BaseTest):
     def test_appmesh_virtualgateway(self):
@@ -76,16 +96,24 @@ class TestAppmeshVirtualGateway(BaseTest):
                 ],
             },
             session_factory=session_factory,
-            # config=config,
         )
+
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual("m1", resources[0]["meshName"])
         self.assertEqual("g1", resources[0]["virtualGatewayName"])
         self.assertEqual(123, resources[0]["spec"]["listeners"][0]["portMapping"]["port"])
 
+        # These assertions are necessary to be sure that the "get_arns" function is correctly deriving the ARN.
+        # See the documentation on the "arn" field in appmesh.py.
+        arns = p.resource_manager.get_arns(resources)
+        self.assertIn(
+            'arn:aws:appmesh:eu-west-2:123456789012:mesh/m1/virtualGateway/g1',
+            arns
+        )
+
+
     def test_appmesh_virtualgateway_event(self):
-        # the event should result in single call to
 
         session_factory = self.replay_flight_data('test_appmesh_virtualgateway_event')
         p = self.load_policy(
@@ -115,3 +143,11 @@ class TestAppmeshVirtualGateway(BaseTest):
         self.assertEqual("m1", resources[0]["meshName"])
         self.assertEqual("g1", resources[0]["virtualGatewayName"])
         self.assertEqual(123, resources[0]["spec"]["listeners"][0]["portMapping"]["port"])
+
+        # These assertions are necessary to be sure that the "get_arns" function is correctly deriving the ARN.
+        # See the documentation on the "arn" field in appmesh.py.
+        arns = p.resource_manager.get_arns(resources)
+        self.assertIn(
+            'arn:aws:appmesh:eu-west-2:123456789012:mesh/m1/virtualGateway/g1',
+            arns
+        )

@@ -5,7 +5,7 @@
         "virtualGateway": {
             "meshName": "m1",
             "metadata": {
-                "arn": "arn:aws:appmesh:eu-west-2:644160558196:mesh/m1/virtualGateway/g2",
+                "arn": "arn:aws:appmesh:eu-west-2:123456789012:mesh/m1/virtualGateway/g2",
                 "createdAt": "2023-11-03T02:36:27.877000+00:00",
                 "lastUpdatedAt": "2023-11-03T02:36:27.877000+00:00",
                 "meshOwner": "644160558196",

@@ -378,7 +378,6 @@ class PolicyMetaLint(BaseTest):
             # q4 2023 wave 2 (aka reinvent)
             "AWS::ACMPCA::CertificateAuthorityActivation",
             "AWS::AppMesh::GatewayRoute",
-            "AWS::AppMesh::Mesh",
             "AWS::Connect::Instance",
             "AWS::Connect::QuickConnect",
             "AWS::EC2::CarrierGateway",
@@ -419,7 +418,6 @@ class PolicyMetaLint(BaseTest):
             "AWS::AppConfig::HostedConfigurationVersion",
             "AWS::AppIntegrations::EventIntegration",
             "AWS::AppMesh::Route",
-            "AWS::AppMesh::VirtualGateway",
             "AWS::AppMesh::VirtualRouter",
             "AWS::AppRunner::Service",
             "AWS::Athena::PreparedStatement",
@@ -798,6 +796,10 @@ class PolicyMetaLint(BaseTest):
                 svc_arn_types.add(sa_type)
 
             svc_arn_types = overrides.get(svc, svc_arn_types)
+
+            print("============")
+            print(str(svc_arn_types))
+            print("============")
             if v.resource_type.arn_type not in svc_arn_types:
                 invalid[k] = {'valid': sorted(svc_arn_types),
                               'service': svc,

@@ -34,7 +34,7 @@
         "mesh": {
             "meshName": "m1",
             "metadata": {
-                "arn": "arn:aws:appmesh:eu-west-2:00000:mesh/m1",
+                "arn": "arn:aws:appmesh:eu-west-2:123456789012:mesh/m1",
                 "createdAt": "Nov 5, 2023, 4:29:11 AM",
                 "lastUpdatedAt": "Nov 5, 2023, 4:29:11 AM",
                 "meshOwner": "00000",

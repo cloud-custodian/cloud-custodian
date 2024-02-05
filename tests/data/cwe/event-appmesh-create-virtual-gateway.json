@@ -48,8 +48,8 @@
                 "arn": "arn:aws:appmesh:eu-west-2:0000:mesh/m1/virtualGateway/g1",
                 "createdAt": "Nov 3, 2023, 3:05:26 AM",
                 "lastUpdatedAt": "Nov 3, 2023, 3:05:26 AM",
-                "meshOwner": "659775036450",
-                "resourceOwner": "659775036450",
+                "meshOwner": "123456789012",
+                "resourceOwner": "123456789012",
                 "uid": "80ee4027-c8e1-49e8-99ba-cace20a57f0b",
                 "version": 1
             },
