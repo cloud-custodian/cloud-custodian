@@ -15,7 +15,9 @@ runs:
   steps:
     - name: Install poetry
       shell: bash
-      run: pipx install poetry==${{ inputs.poetry-version }}
+      run: |
+        pip install pipx
+        pipx install poetry==${{ inputs.poetry-version }}
 
     - name: Set up Python ${{ inputs.python-version }}
       uses: actions/setup-python@v5
