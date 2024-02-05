@@ -190,8 +190,7 @@ class AppmeshVirtualGateway(ChildResourceManager):
         # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-appmesh-virtualgateway.html  # noqa
         arn = "metadata.arn"
 
-        name = 'meshNameXXXXX'
-
+        name = 'virtualGatewayName'
         date = 'createdAt'
 
         # When we define a parent_spec then it uses the parent_spec
@@ -208,7 +207,7 @@ class AppmeshVirtualGateway(ChildResourceManager):
         enum_spec = (
             'list_virtual_gateways',
             'virtualGateways',
-            None,  # {'limit': 100} #"'meshName' # , None
+            None,
         )
 
     source_mapping = {
