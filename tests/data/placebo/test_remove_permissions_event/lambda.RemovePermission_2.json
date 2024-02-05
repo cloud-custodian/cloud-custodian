@@ -1,0 +1,12 @@
+{
+    "status_code": 404,
+    "data": {
+        "Error": {
+            "Message": "No policy is associated with the given resource.",
+            "Code": "ResourceNotFoundException"
+        },
+        "ResponseMetadata": {},
+        "Type": "User",
+        "Message": "No policy is associated with the given resource."
+    }
+}

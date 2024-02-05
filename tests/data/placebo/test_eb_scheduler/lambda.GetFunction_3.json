@@ -1,0 +1,54 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Configuration": {
+            "FunctionName": "custodian-periodic-ec2-checker",
+            "FunctionArn": "arn:aws:lambda:us-east-1:644160558196:function:custodian-periodic-ec2-checker:Dev",
+            "Runtime": "python3.11",
+            "Role": "arn:aws:iam::644160558196:role/custodian_read",
+            "Handler": "custodian_policy.run",
+            "CodeSize": 626873,
+            "Description": "cloud-custodian lambda policy",
+            "Timeout": 900,
+            "MemorySize": 512,
+            "LastModified": "2024-02-05T21:06:04.000+0000",
+            "CodeSha256": "SI5418E4Gr/asN984AzQNI1FfvbeXZKxYhQLKBjwBLI=",
+            "Version": "118",
+            "VpcConfig": {
+                "SubnetIds": [],
+                "SecurityGroupIds": [],
+                "VpcId": "",
+                "Ipv6AllowedForDualStack": false
+            },
+            "TracingConfig": {
+                "Mode": "PassThrough"
+            },
+            "RevisionId": "fdc9fc90-921f-4636-8559-153f7473ae1d",
+            "State": "Active",
+            "LastUpdateStatus": "Successful",
+            "PackageType": "Zip",
+            "Architectures": [
+                "x86_64"
+            ],
+            "EphemeralStorage": {
+                "Size": 512
+            },
+            "SnapStart": {
+                "ApplyOn": "None",
+                "OptimizationStatus": "Off"
+            },
+            "RuntimeVersionConfig": {
+                "RuntimeVersionArn": "arn:aws:lambda:us-east-1::runtime:aaa0628b7c27cf9a6da9328d61875e549fca53968fbabf523c9ce564bb817574"
+            },
+            "LoggingConfig": {
+                "LogFormat": "Text",
+                "LogGroup": "/aws/lambda/custodian-periodic-ec2-checker"
+            }
+        },
+        "Code": {
+            "RepositoryType": "S3",
+            "Location": "https://prod-04-2014-tasks.s3.us-east-1.amazonaws.com/snapshots/644160558196/custodian-periodic-ec2-checker-94e5a368-1a37-426a-ab83-2edbaf0a4631?versionId=7dU5uFRmx7VKlicqfwVqcS0N54EcQLf.&X-Amz-Security-Token=IQoJb3JpZ2luX2VjEOT%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FwEaCXVzLWVhc3QtMSJIMEYCIQCLI1cBO8ugP%2B43GU%2B7lzzU0CLPlQL%2FofaLrUk4H2tcCQIhAOR%2BpdiGh63OsoNX7fJ6%2BA%2BIkdOBdfjIz0anI0CWf6rkKrkFCK3%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FwEQABoMNzQ5Njc4OTAyODM5IgyKC0DMHb94%2BzltvnwqjQVgIVBK0%2F9L3fpULG8qfhFijIqacRi2NzwntLavQVbGgvxgzpmJamrLPlKBt1Hihf2cTqXy9aBQjL%2FbP4HLHWHUwqSfnbfOBWMGj7MfbIytVc5sXQkQOdfwthLKe%2Bs9cJjRwiZ%2BWoelIHHhhOIg94R9NJgL3n984I8fYRBSAIi%2FHDqmGJTcJPmLqP6L95rcQGv4PybcHYeFG3sjZkF4x%2FvTPSG85lIoWRUrgi4Rb6CTtTH%2B01RdV3Q6HmiziOvtQINRQbWKKe31GqmaJIbvUGgzJJScFB3UEeJBGSAHoqDdP0YCUGA%2BqkVAf8%2BXWXMdeFXTr9cxVn2n3AKiln8LjkuOr03M%2BUPyNimG7rPR3M%2BctrtKMMhMAlA8YniZ0UYjX9WE6uLa7kc2sDOllb4lmpU4QVUKk7qM1f7Mkc2lyB8EmQ9l3tLCiNLP6ljimgjQfmJcg6%2FwLuCMPsOcfYh4g4GIriN6a4Ajao3BYc35sDXqKmx%2F16E8qeEoB8lCAvWSSarBv08ITd1RPHLtyXDjsfGePB%2F4e2PZ2NAQ%2FJI6DZYyK1jKWwk1qblJI%2FfUj9J6UR70SKbjf9owjFgIgwrbP2qc39IpCQe7Mua13ycNaEAvK4q%2Bg4lYYbjv3vplJnuqtzJt7B7vjb4j%2F%2FFulZTL0QwY328Yb0NPglstV2sHv%2BLuIqYCZZLLIfFbAyf3penfIMYSBV41arLw%2BfrCE0EV5U%2BLG%2BqP1RqHi0K8uRuBflGTHVdfFW1nmAsaHOYbfzpizcDI9hKOVejS%2FKo%2FsJeoA4G00Ke4saAr29xLcNx7KA8BBUqLT9eR2BKWeCu0M2o2idOdb5jD10uOr8Qoypu7mDJp%2Fl9lWm77vZlcW%2FyICDCB%2FoSuBjqwAczXhgpeKmx5ruEH%2BtpiobUya5wfuHuhnW0bzm%2FGVIaAS6HPHx4kpdiI0RMXGXzYDuSgTFSI5XS3sN3IAgCPTay2O1hNy19LV6VS8mekRXlFazDJ7yXSEf3ipW39bAkFDpw0TfJfE9YBsX6M%2B1Z90eeylberwQgrdAFRuwBml%2FLV6U%2FhJtchI%2Fo8HShwPpSFDpHHtLxpIkaWewI3o6JVi6%2FnVsNusBTmXRTPSa95i2E2&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20240205T210610Z&X-Amz-SignedHeaders=host&X-Amz-Expires=600&X-Amz-Credential=ASIA25DCYHY3RLUDSX43%2F20240205%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=37cbb4a33f5843d3ac0a162a3bc3816740f703e7c5c8d6185591510f897df590"
+        }
+    }
+}

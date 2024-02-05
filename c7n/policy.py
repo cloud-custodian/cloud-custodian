@@ -586,13 +586,22 @@ class LambdaMode(ServerlessExecutionMode):
 class PeriodicMode(LambdaMode, PullMode):
     """A policy that runs in pull mode within lambda.
 
-    Runs Custodian in AWS lambda at user defined cron interval.
+    Runs Custodian in AWS lambda at user defined cron interval using either
+    EventBridge Scheduler (if scheduler_role provided) or EventBridge Rules.
     """
 
     POLICY_METRICS = ('ResourceCount', 'ResourceTime', 'ActionTime')
 
     schema = utils.type_schema(
-        'periodic', schedule={'type': 'string'}, rinherit=LambdaMode.schema)
+        'periodic',
+        schedule={'type': 'string'},
+        timezone={'type': 'string'},
+        start_date={'type': 'string'},
+        end_date={'type': 'string'},
+        scheduler_role={'type': 'string'},
+        group_name={'type': 'string'},
+        required=['schedule'],
+        rinherit=LambdaMode.schema)
 
     def run(self, event, lambda_context):
         return PullMode.run(self)

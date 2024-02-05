@@ -1,12 +1,54 @@
 {
-    "status_code": 404,
+    "status_code": 200,
     "data": {
-        "Error": {
-            "Message": "Function not found: arn:aws:lambda:us-east-1:644160558196:function:custodian-ec2-foo-bar",
-            "Code": "ResourceNotFoundException"
-        },
         "ResponseMetadata": {},
-        "Type": "User",
-        "Message": "Function not found: arn:aws:lambda:us-east-1:644160558196:function:custodian-ec2-foo-bar"
+        "Configuration": {
+            "FunctionName": "custodian-ec2-foo-bar",
+            "FunctionArn": "arn:aws:lambda:us-east-1:644160558196:function:custodian-ec2-foo-bar",
+            "Runtime": "python3.11",
+            "Role": "arn:aws:iam::644160558196:role/custodian_read",
+            "Handler": "custodian_policy.run",
+            "CodeSize": 610738,
+            "Description": "cloud-custodian lambda policy",
+            "Timeout": 900,
+            "MemorySize": 512,
+            "LastModified": "2024-02-03T20:02:32.593+0000",
+            "CodeSha256": "VjvlX8rM7V36mRHFUU7UrHSbGdIlVNZBHutdwrVBhxw=",
+            "Version": "$LATEST",
+            "VpcConfig": {
+                "SubnetIds": [],
+                "SecurityGroupIds": [],
+                "VpcId": "",
+                "Ipv6AllowedForDualStack": false
+            },
+            "TracingConfig": {
+                "Mode": "PassThrough"
+            },
+            "RevisionId": "7ce518cf-6f1f-4d08-ab33-daa27c81e38e",
+            "State": "Active",
+            "LastUpdateStatus": "Successful",
+            "PackageType": "Zip",
+            "Architectures": [
+                "arm64"
+            ],
+            "EphemeralStorage": {
+                "Size": 512
+            },
+            "SnapStart": {
+                "ApplyOn": "None",
+                "OptimizationStatus": "Off"
+            },
+            "RuntimeVersionConfig": {
+                "RuntimeVersionArn": "arn:aws:lambda:us-east-1::runtime:4b1873112448a94869033fc71f40a4470f15254e1afea10ebb5aabdefc18eb27"
+            },
+            "LoggingConfig": {
+                "LogFormat": "Text",
+                "LogGroup": "/aws/lambda/custodian-ec2-foo-bar"
+            }
+        },
+        "Code": {
+            "RepositoryType": "S3",
+            "Location": "https://prod-04-2014-tasks.s3.us-east-1.amazonaws.com/snapshots/644160558196/custodian-ec2-foo-bar-98a393c7-77ba-4f61-8aac-88f42dafe4d4?versionId=ZKpg._ggEqNzTOt4mFXkU0IEBXqo9HPc&X-Amz-Security-Token=IQoJb3JpZ2luX2VjEOT%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FwEaCXVzLWVhc3QtMSJIMEYCIQDS8XWP3M%2FbhnMjiSJ0rRt2kydtQQQdXBbY2Cn0960pmQIhALQb0JjxDTyddI6mFyZhFqCe07AL4hMk%2B7kVhedQbeEwKrsFCK3%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FwEQABoMNzQ5Njc4OTAyODM5IgyJEGTSk0vLovy0vfUqjwUUVRhnkg%2F4X8dOikJQi3f5W0C0d3C2asb2S1ldAMyeJ60LIb07NItP9Bd%2BGZM6JpDSSvFCmB%2BzL%2F7M%2FKHiGvHwDo7wP4RAzpB7WFC05MSd4E%2FUj%2BaMK3sLjURSoHEIFNX0Ht23Ho7WVQMTDAp9go0vV3ekz6WsH%2BEgdqan1FKVPfLPP%2FCED5X7VZBr3cirJT25%2F41oz6OAMDUNCJDh%2Fdww2EzxeZHVab8dzX0xImBSKQ5VWrYqypz4%2BWwn26i%2FKfXnA4jgkEo1%2BCZ0tOtF0VN7dAmsed2796egQBVUmUNDToaMLDCn55Ag%2BihJ4IXUFgbh67uPZTL5SdFawj0gKv%2Bs0N5FIckvzYJcCKY23NMPrIOmn0RcmgXMUBaVfYvtQXAXPIB%2BgJUPzZckTSUCulP%2FhPJmK2sNnrrdAgx8a67Nyib%2Bw8cHI3z3%2BhjEqleIggAknp5chPy7yTpfKqohImT%2FReS66%2FzHXTVvVmhTdjNpqvyOSlFzrzpp3XhyabJXwqd3Ifo5XCJRqyw4xnqpTYc87b45pypOFYEE5Kbb57Dtqaj%2FqO3y3zQlDy6szxm3K93%2FuvqwEFM6c8d83KGSyAeXPfBWi0vkvn1GGr32Vv0s2gvuUS6nLihsBtrqnyB0qMP2rY%2FlnBO5PbvHV2oUfIZs9PEs0zC6eCG93vnvb43iPKocHm8aZR75IpD6qpu%2FuU8ODGaUjmj%2FnGkTHIqEby0%2FuI8cNtuh5hEP7Es93tgK70RInkAnVxCllD0coi02JAyOBJqVxD57m6XSU7Obmn6VvIJOwI6sMsb2rsF7FfvbIStGUHJG3OEv%2F7iLcUg1wR8XswSJFRF%2FSIv6H5%2B%2F7itqadJNrmU%2BYJoXFCTDU%2BwhMLn1hK4GOrAB4ME6H0If5NdX%2FuHdCQ8w2rJskj5bCEU4QriIRrVDqDSdU4X8ZI1khL62RaiZ%2BWe42nz%2Faf3mfIZDTaNtpS2Uv7AIfcdmJK%2BtLSluLI2wv%2BERgKLRoAEaKhCqUmFctXAfE8GbdjR7ArBz%2FB8BasQMn1ZxsTNBhTXpgkvrxc01natnEUFwwfZVprKSpw4S9S7%2BXNhRJ7GbIWxyajGefd4A6ZhbD5IKqmVCPHCtEoQdF78%3D&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20240205T210056Z&X-Amz-SignedHeaders=host&X-Amz-Expires=600&X-Amz-Credential=ASIA25DCYHY3RG5QSI77%2F20240205%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=fcda15ab8c0b092fa0c39fab13198e9aaf5a80a96282071d70d966374ec6f4dd"
+        }
     }
 }

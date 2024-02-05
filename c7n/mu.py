@@ -951,6 +951,11 @@ class PolicyLambda(AbstractLambdaFunction):
         elif self.policy.data['mode']['type'] == 'hub-action':
             events.append(
                 SecurityHubAction(self.policy, session_factory))
+        elif (self.policy.data['mode']['type'] == 'periodic'
+              and 'scheduler_role' in self.policy.data['mode']):
+            events.append(
+                EventBridgeScheduleSource(
+                    self.policy.data['mode'], session_factory))
         else:
             events.append(
                 CloudWatchEventSource(
@@ -1186,8 +1191,12 @@ class CloudWatchEventSource(AWSEventBase):
             log.debug("Updating cwe rule for %s" % func.event_name)
             response = self.client.put_rule(**params)
         elif not rule:
-            log.debug("Creating cwe rule for %s" % (self))
+            log.debug(f'Creating cwe rule for {self}')
             response = self.client.put_rule(**params)
+            # check if schedule exists for func.event_name and remove it to clean up
+            # when switching between scheduled event types
+            # must check all groups
+            EventBridgeScheduleSource.remove_from_groups(self.session.client('scheduler'), func)
         else:
             response = {'RuleArn': rule['Arn']}
 
@@ -1257,6 +1266,141 @@ class CloudWatchEventSource(AWSEventBase):
                     func.name, e)
             self.client.delete_rule(Name=func.event_name)
             self.remove_permissions(func, remove_permission=not func_deleted)
+            return True
+
+
+class EventBridgeScheduleSource(AWSEventBase):
+    """Invoke Lambda functions via EventBridge Scheduler.
+
+    Replaces CloudWatch scheduled event rules for periodic mode type
+    due to much higher quotas.
+    """
+
+    client_service = 'scheduler'
+
+    def get(self, schedule_name, group_name='default'):
+        return resource_exists(self.client.get_schedule,
+                               Name=schedule_name,
+                               GroupName=group_name)
+
+    @staticmethod
+    def delta(src, tgt):
+        """Given two schedules determine if the configuration is the same.
+
+        Name is already implied.
+        """
+        for k in ['State', 'StartDate', 'EndDate', 'ScheduleExpression',
+                  'ScheduleExpressionTimezone', 'Description', 'GroupName']:
+            if src.get(k) != tgt.get(k):
+                return True
+
+        for k in ['Arn', 'RoleArn']:
+            if src.get('Target', {}).get(k) != tgt.get('Target', {}).get(k):
+                return True
+
+        return False
+
+    def __repr__(self):
+        return (f'<CWEvent Type:{self.data.get("type")} Events:'
+                f'{", ".join(map(str, self.data.get("events", [])))}>')
+
+    def add(self, func):
+        params = dict(
+            Name=func.event_name,
+            Description=func.description,
+            State='ENABLED',
+            FlexibleTimeWindow={'Mode': 'OFF'},
+            ScheduleExpression=self.data.get('schedule'),
+            ScheduleExpressionTimezone=self.data.get('timezone', 'Etc/UTC'),
+            GroupName=self.data.get('group_name', 'default'),
+            Target={
+                'Arn': func.arn,
+                'RoleArn': self.data.get('scheduler_role')
+            }
+        )
+
+        schedule = self.get(func.event_name, params['GroupName'])
+
+        if schedule and self.delta(schedule, params):
+            log.debug(f'Updating schedule for {func.event_name} in group {params["GroupName"]}')
+            self.client.update_schedule(**params)
+        elif not schedule:
+            log.debug(f'Creating schedule for {self} in group {params["GroupName"]}')
+            self.client.create_schedule(**params)
+            # check if cwe exists for func.event_name and remove it to clean up
+            # when switching between scheduled event types
+            cwe = CloudWatchEventSource(self.data, self.session_factory)
+            cwe.remove(func, func_deleted=False)
+
+        # check for schedules with same func.event_name in any other group in case
+        # group_name has been changed
+        # there should only be one schedule across all groups for each policy lambda
+        self.remove_from_groups(self.client, func, params['GroupName'])
+
+        return True
+
+    @staticmethod
+    def remove_from_groups(client, func, skip_group=None):
+        try:
+            paginator = client.get_paginator('list_schedule_groups')
+            pages = paginator.paginate()
+            for page in pages:
+                for group in page['ScheduleGroups']:
+                    if group['Name'] != skip_group:
+                        schedule = resource_exists(client.get_schedule,
+                                                   Name=func.event_name,
+                                                   GroupName=group['Name'])
+                        if schedule:
+                            log.debug(f'Removing schedule {func.event_name} '
+                                      f'in group {group["Name"]}')
+                            client.delete_schedule(Name=func.event_name, GroupName=group['Name'])
+        except ClientError as e:
+            if e.response['Error']['Code'] == 'AccessDeniedException':
+                return
+            raise
+
+    def update(self, func):
+        self.add(func)
+
+    def pause(self, func):
+        try:
+            schedule = self.get(func.event_name, self.data.get('group_name', 'default'))
+            schedule['State'] = 'DISABLED'
+            keys_to_delete = []
+            for key in schedule.keys():
+                if key not in ['ActionAfterCompletion', 'ClientToken', 'Description', 'EndDate',
+                               'FlexibleTimeWindow', 'GroupName', 'KmsKeyArn', 'Name',
+                               'ScheduleExpression', 'ScheduleExpressionTimezone', 'StartDate',
+                               'State', 'Target']:
+                    keys_to_delete.append(key)
+            for key in keys_to_delete:
+                del schedule[key]
+            self.client.update_schedule(**schedule)
+        except ClientError:
+            pass
+
+    def resume(self, func):
+        try:
+            schedule = self.get(func.event_name, self.data.get('group_name', 'default'))
+            schedule['State'] = 'ENABLED'
+            keys_to_delete = []
+            for key in schedule.keys():
+                if key not in ['ActionAfterCompletion', 'ClientToken', 'Description', 'EndDate',
+                               'FlexibleTimeWindow', 'GroupName', 'KmsKeyArn', 'Name',
+                               'ScheduleExpression', 'ScheduleExpressionTimezone', 'StartDate',
+                               'State', 'Target']:
+                    keys_to_delete.append(key)
+            for key in keys_to_delete:
+                del schedule[key]
+            self.client.update_schedule(**schedule)
+        except ClientError:
+            pass
+
+    def remove(self, func, func_deleted=True):
+        if self.get(func.event_name):
+            group_name = self.data.get('group_name', 'default')
+            log.info(f'Removing schedule {func.event_name} in group {group_name}')
+            self.client.delete_schedule(Name=func.event_name, GroupName=group_name)
             return True
 
 
