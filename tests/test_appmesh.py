@@ -25,7 +25,8 @@ class TestAppmeshMesh(BaseTest):
         self.assertEqual(resources[0]["meshName"], "m1")
         self.assertEqual(resources[1]["meshName"], "m2")
 
-        # These assertions are necessary to be sure that the "get_arns" function is correctly deriving the ARN.
+        # These assertions are necessary to be sure that the "get_arns" function is correctly
+        # deriving the ARN.
         # See the documentation on the "arn" field in appmesh.py.
         arns = p.resource_manager.get_arns(resources)
         self.assertIn(
@@ -68,7 +69,8 @@ class TestAppmeshMesh(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["meshName"], "m1")
 
-        # These assertions are necessary to be sure that the "get_arns" function is correctly deriving the ARN.
+        # These assertions are necessary to be sure that the "get_arns" function is correctly
+        # deriving the ARN.
         # See the documentation on the "arn" field in appmesh.py.
         arns = p.resource_manager.get_arns(resources)
         self.assertIn(
@@ -104,7 +106,8 @@ class TestAppmeshVirtualGateway(BaseTest):
         self.assertEqual("g1", resources[0]["virtualGatewayName"])
         self.assertEqual(123, resources[0]["spec"]["listeners"][0]["portMapping"]["port"])
 
-        # These assertions are necessary to be sure that the "get_arns" function is correctly deriving the ARN.
+        # These assertions are necessary to be sure that the "get_arns" function is correctly
+        # deriving the ARN.
         # See the documentation on the "arn" field in appmesh.py.
         arns = p.resource_manager.get_arns(resources)
         self.assertIn(
@@ -144,7 +147,8 @@ class TestAppmeshVirtualGateway(BaseTest):
         self.assertEqual("g1", resources[0]["virtualGatewayName"])
         self.assertEqual(123, resources[0]["spec"]["listeners"][0]["portMapping"]["port"])
 
-        # These assertions are necessary to be sure that the "get_arns" function is correctly deriving the ARN.
+        # These assertions are necessary to be sure that the "get_arns" function is
+        # correctly deriving the ARN.
         # See the documentation on the "arn" field in appmesh.py.
         arns = p.resource_manager.get_arns(resources)
         self.assertIn(

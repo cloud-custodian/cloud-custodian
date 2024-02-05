@@ -20,7 +20,8 @@ from c7n.manager import ResourceManager
 from c7n.registry import PluginRegistry
 from c7n.tags import register_ec2_tags, register_universal_tags, universal_augment
 from c7n.utils import (
-    local_session, generate_arn, get_retry, chunks, camelResource, jmespath_compile, jmespath_search)
+    local_session, generate_arn, get_retry, chunks, camelResource,
+    jmespath_compile, jmespath_search)
 
 
 try:
