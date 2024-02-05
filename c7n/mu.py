@@ -1290,16 +1290,19 @@ class EventBridgeScheduleSource(AWSEventBase):
 
         Name is already implied.
         """
+        result = False
         for k in ['State', 'StartDate', 'EndDate', 'ScheduleExpression',
                   'ScheduleExpressionTimezone', 'Description', 'GroupName']:
             if src.get(k) != tgt.get(k):
-                return True
+                result = True
+                break
 
         for k in ['Arn', 'RoleArn']:
             if src.get('Target', {}).get(k) != tgt.get('Target', {}).get(k):
-                return True
+                result = True
+                break
 
-        return False
+        return result
 
     def __repr__(self):
         return (f'<CWEvent Type:{self.data.get("type")} Events:'
