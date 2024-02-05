@@ -2,7 +2,8 @@
     "status_code": 200,
     "data": {
         "TableNames": [
-            "mosdef2-DDBTable-VV01OCO2TJ72"
+            "mosdef2-DDBTable-VV01OCO2TJ72",
+            "mosdef2-deleted"
         ],
         "ResponseMetadata": {}
     }
