@@ -1033,8 +1033,9 @@ class AWSEventBase:
                 StatementId=func.event_name,
             )
             return True
-        except client.ResourceNotFoundException:
-            pass
+        except ClientError as e:
+            if e.response['Error']['Code'] != 'ResourceNotFoundException':
+                raise
 
 
 class CloudWatchEventSource(AWSEventBase):
