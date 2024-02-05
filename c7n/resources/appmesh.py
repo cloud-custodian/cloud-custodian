@@ -153,11 +153,11 @@ class DescribeGatewayDefinition(ChildDescribeSource):
         # on pull modes, we're enriching the result of enum_spec
         results = []
         client = local_session(self.manager.session_factory).client('appmesh')
-        for parent_id, gateway_info in resources:
+        for gateway_info in resources:
             results.append(
                 self.manager.retry(
                     client.describe_virtual_gateway,
-                    meshName=parent_id,
+                    meshName=gateway_info['meshName'],
                     virtualGatewayName=gateway_info['virtualGatewayName'],
                 )['virtualGateway']
             )
