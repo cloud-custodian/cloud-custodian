@@ -662,6 +662,4 @@ class SqlServerAuditingSettingsFilter(ListItemFilter):
             ]
 
     def get_item_values(self, resource):
-        if self.annotate_items:
-            return resource['properties'].get(self.annotation_key, [])
-        return resource['properties'].pop(self.annotation_key, [])  # pragma: no cover
+        return resource['properties'].get(self.annotation_key, [])
