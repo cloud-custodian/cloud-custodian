@@ -811,10 +811,6 @@ class PolicyMetaLint(BaseTest):
                 svc_arn_types.add(sa_type)
 
             svc_arn_types = overrides.get(svc, svc_arn_types)
-
-            print("============")
-            print(str(svc_arn_types))
-            print("============")
             if v.resource_type.arn_type not in svc_arn_types:
                 invalid[k] = {'valid': sorted(svc_arn_types),
                               'service': svc,

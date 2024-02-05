@@ -20,8 +20,7 @@ from c7n.manager import ResourceManager
 from c7n.registry import PluginRegistry
 from c7n.tags import register_ec2_tags, register_universal_tags, universal_augment
 from c7n.utils import (
-    local_session, generate_arn, get_retry, chunks, camelResource,
-    jmespath_compile, jmespath_search)
+    local_session, generate_arn, get_retry, chunks, camelResource, jmespath_compile)
 
 
 try:
@@ -575,12 +574,7 @@ class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
                 return [r for r in resources if r[m.id] in id_set]
         return None
 
-
     def get_resources(self, ids, cache=True, augment=True):
-        """This method is used in event mode (not pull mode) to populate the model of the resource.
-        (see also augment())
-        ."""
-
         if not ids:
             return []
         if cache:
@@ -596,12 +590,8 @@ class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
             self.log.warning("event ids not resolved: %s error:%s" % (ids, e))
             return []
 
-
     def augment(self, resources):
-        """This method is used in pull mode (not event mode) to populate the model of the resource.
-        (See also "get_resources()")
-
-        subclasses may want to augment resources with additional information.
+        """subclasses may want to augment resources with additional information.
 
         ie. we want tags by default (rds, elb), and policy, location, acl for
         s3 buckets.
@@ -635,9 +625,9 @@ class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
         id_key = m.id
 
         for r in resources:
-            _id = jmespath_search(id_key, r)
+            _id = r[id_key]
             if arn_key:
-                arns.append(jmespath_search(arn_key, r))
+                arns.append(r[arn_key])
             elif 'arn' in _id[:3]:
                 arns.append(_id)
             else:
