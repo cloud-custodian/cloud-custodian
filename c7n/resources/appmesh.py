@@ -1,8 +1,6 @@
 """
 AppMesh Communications
 """
-from c7n import query
-from c7n.exceptions import PolicyExecutionError
 from c7n.manager import resources
 from c7n.tags import universal_augment
 from c7n.query import (
@@ -44,7 +42,8 @@ class AppmeshMesh(QueryResourceManager):
         # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-appmesh-mesh.html   # noqa
         id = name = 'meshName'
 
-        # if a resource type is supported by resource group tagging api setting this value get tag filters/actions
+        # if a resource type is supported by resource group tagging
+        # api setting this value get tag filters/actions
         universal_taggable = object()
 
         # arn : Defines a top level field in the resource definition that contains the ARN
@@ -181,7 +180,8 @@ class AppmeshVirtualGateway(ChildResourceManager):
         # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-appmesh-virtualgateway.html  # noqa
         cfn_type = config_type = 'AWS::AppMesh::VirtualGateway'
 
-        # if a resource type is supported by resource group tagging api setting this value get tag filters/actions
+        # if a resource type is supported by resource group tagging
+        # api setting this value get tag filters/actions
         universal_taggable = object()
 
         # id: Path to "id" field in the
