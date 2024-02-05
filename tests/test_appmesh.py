@@ -29,15 +29,8 @@ class TestAppmeshMesh(BaseTest):
         # deriving the ARN.
         # See the documentation on the "arn" field in appmesh.py.
         arns = p.resource_manager.get_arns(resources)
-        self.assertIn(
-            'arn:aws:appmesh:eu-west-2:123456789012:mesh/m1',
-            arns
-        )
-        self.assertIn(
-            'arn:aws:appmesh:eu-west-2:123456789012:mesh/m2',
-            arns
-        )
-
+        self.assertIn('arn:aws:appmesh:eu-west-2:123456789012:mesh/m1', arns)
+        self.assertIn('arn:aws:appmesh:eu-west-2:123456789012:mesh/m2', arns)
 
     def test_appmesh_event(self):
         session_factory = self.replay_flight_data('test_appmesh_mesh_event')
@@ -73,10 +66,7 @@ class TestAppmeshMesh(BaseTest):
         # deriving the ARN.
         # See the documentation on the "arn" field in appmesh.py.
         arns = p.resource_manager.get_arns(resources)
-        self.assertIn(
-            'arn:aws:appmesh:eu-west-2:123456789012:mesh/m1',
-            arns
-        )
+        self.assertIn('arn:aws:appmesh:eu-west-2:123456789012:mesh/m1', arns)
 
 
 class TestAppmeshVirtualGateway(BaseTest):
@@ -110,14 +100,9 @@ class TestAppmeshVirtualGateway(BaseTest):
         # deriving the ARN.
         # See the documentation on the "arn" field in appmesh.py.
         arns = p.resource_manager.get_arns(resources)
-        self.assertIn(
-            'arn:aws:appmesh:eu-west-2:123456789012:mesh/m1/virtualGateway/g1',
-            arns
-        )
-
+        self.assertIn('arn:aws:appmesh:eu-west-2:123456789012:mesh/m1/virtualGateway/g1', arns)
 
     def test_appmesh_virtualgateway_event(self):
-
         session_factory = self.replay_flight_data('test_appmesh_virtualgateway_event')
         p = self.load_policy(
             {
@@ -151,7 +136,4 @@ class TestAppmeshVirtualGateway(BaseTest):
         # correctly deriving the ARN.
         # See the documentation on the "arn" field in appmesh.py.
         arns = p.resource_manager.get_arns(resources)
-        self.assertIn(
-            'arn:aws:appmesh:eu-west-2:123456789012:mesh/m1/virtualGateway/g1',
-            arns
-        )
+        self.assertIn('arn:aws:appmesh:eu-west-2:123456789012:mesh/m1/virtualGateway/g1', arns)

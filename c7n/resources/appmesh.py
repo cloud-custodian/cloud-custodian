@@ -4,12 +4,29 @@ AppMesh Communications
 from c7n import query
 from c7n.exceptions import PolicyExecutionError
 from c7n.manager import resources
-from c7n.query import ChildResourceManager, QueryResourceManager, TypeInfo, ChildDescribeSource
+from c7n.tags import universal_augment
+from c7n.query import (
+    ChildResourceManager,
+    QueryResourceManager,
+    TypeInfo,
+    DescribeSource,
+    ChildDescribeSource,
+    ConfigSource,
+)
+from c7n.resources.aws import Arn
 from c7n.utils import local_session
+
+
+class DescribeMesh(DescribeSource):
+    # override default describe augment to get tags
+    def augment(self, resources):
+        return universal_augment(self.manager, resources)
 
 
 @resources.register('appmesh-mesh')
 class AppmeshMesh(QueryResourceManager):
+    source_mapping = {'describe': DescribeMesh, 'config': ConfigSource}
+
     # interior class that defines the aws metadata for resource
     class resource_type(TypeInfo):
         service = 'appmesh'
@@ -26,6 +43,9 @@ class AppmeshMesh(QueryResourceManager):
         # name of the mesh as that's what the appmesh API's expect.
         # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-appmesh-mesh.html   # noqa
         id = name = 'meshName'
+
+        # if a resource type is supported by resource group tagging api setting this value get tag filters/actions
+        universal_taggable = object()
 
         # arn : Defines a top level field in the resource definition that contains the ARN
         # value. This value is accessed used by the 'get_arns(..)' fn on the super-class
@@ -106,6 +126,48 @@ class AppmeshMesh(QueryResourceManager):
         detail_spec = ('describe_mesh', 'meshName', 'meshName', None)
 
 
+class DescribeGatewayDefinition(ChildDescribeSource):
+    def __init__(self, manager):
+        super().__init__(manager)
+        self.query.capture_parent_id = True
+
+    # this method appears to be used only when in event mode and not pull mode
+    def get_resources(self, ids, cache=True):
+        results = []
+        client = local_session(self.manager.session_factory).client('appmesh')
+        # ids for events should be arns
+        for i in ids:
+            # split mesh gw arn :
+            # arn:aws:appmesh:eu-west-2:123456789012:mesh/Mesh7/virtualGateway/GW1  # noqa
+            mesh_name, _, gw_name = Arn.parse(i).resource.split('/')
+            results.append(
+                self.manager.retry(
+                    client.describe_virtual_gateway,
+                    meshName=mesh_name,
+                    virtualGatewayName=gw_name,
+                )['virtualGateway']
+            )
+        return results
+
+    def augment(self, resources):
+        # on event modes the resource has already been fully fetched, just get tags
+        if resources and "metadata" in resources[0]:
+            return universal_augment(self.manager, resources)
+
+        # on pull modes, we're enriching the result of enum_spec
+        results = []
+        client = local_session(self.manager.session_factory).client('appmesh')
+        for parent_id, gateway_info in resources:
+            results.append(
+                self.manager.retry(
+                    client.describe_virtual_gateway,
+                    meshName=parent_id,
+                    virtualGatewayName=gateway_info['virtualGatewayName'],
+                )['virtualGateway']
+            )
+        return universal_augment(self.manager, results)
+
+
 @resources.register('appmesh-virtual-gateway')
 class AppmeshVirtualGateway(ChildResourceManager):
     # interior class that defines the aws metadata for resource
@@ -121,6 +183,9 @@ class AppmeshVirtualGateway(ChildResourceManager):
 
         # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-appmesh-virtualgateway.html  # noqa
         cfn_type = config_type = 'AWS::AppMesh::VirtualGateway'
+
+        # if a resource type is supported by resource group tagging api setting this value get tag filters/actions
+        universal_taggable = object()
 
         # id: Path to "id" field in the
         id = 'meshName'
@@ -149,92 +214,14 @@ class AppmeshVirtualGateway(ChildResourceManager):
             None,  # {'limit': 100} #"'meshName' # , None
         )
 
-    # copied from ECS Task
-    @property
-    def source_type(self):
-        source = self.data.get('source', 'describe')
-        if source in ('describe', 'describe-child'):
-            source = 'describe-virtual-gateway'
-        return source
+    source_mapping = {
+        'describe': DescribeGatewayDefinition,
+        'describe-child': DescribeGatewayDefinition,
+        'config': ConfigSource,
+    }
 
-    def get_resources(self, ids, cache=True, augment=True):
-        return super(AppmeshVirtualGateway, self).get_resources(ids, cache, augment=False)
-
-
-@query.sources.register('describe-virtual-gateway')
-class DescribeGatewayDefinition(ChildDescribeSource):
-    def __init__(self, manager):
-        # based on ECSClusterResourceDescribeSource
-        self.manager = manager
-        self.query = query.ChildResourceQuery(self.manager.session_factory, self.manager)
-        self.query.capture_parent_id = True
-
-    # this method appears to be used only when in event mode and not pull mode
-    def get_resources(self, ids, cache=True):
-        name_and_gw = {}
-
-        # ids
-        for i in ids:
-            # split mesh gw arn :
-            # arn:aws:appmesh:eu-west-2:123456789012:mesh/Mesh7/virtualGateway/GW1  # noqa
-
-            _, ident = i.rsplit(':', 1)
-            parts = ident.split('/', 3)
-
-            if len(parts) != 4:
-                raise PolicyExecutionError(
-                    f"Mesh Virtual Gateway arn (4 parts) required but got ({len(parts)} parts) : "
-                    + i
-                )
-
-            meshName = parts[1]
-            gwName = parts[3]
-
-            name_and_gw.setdefault(meshName, []).append(gwName)
-
-        results = []
-        client = local_session(self.manager.session_factory).client('appmesh')
-
-        for meshName, gwIds in name_and_gw.items():
-            res = self.describe_virtual_gateways(client, meshName, gwIds)
-            results.extend(res)
-
-        return results
-
-    # # this method appears to be used only when in pull mode and not event mode
-    def augment(self, resources):
-        results = []
-
-        client = local_session(self.manager.session_factory).client('appmesh')
-
-        for res in resources:
-            meshName, data = res
-
-            response = self.manager.retry(
-                client.describe_virtual_gateway,
-                meshName=meshName,
-                virtualGatewayName=data["virtualGatewayName"],
-            )
-
-            r = response['virtualGateway']
-            results.append(r)
-
-        return results
-
-    # from ecs ECSTaskDescribeSource process_cluster_resources
-    def describe_virtual_gateways(self, client, meshName, gwIds):
-        results = []
-        for gw in gwIds:
-            res = self.manager.retry(
-                client.describe_virtual_gateway,
-                meshName=meshName,
-                virtualGatewayName=gw
-                # include=['TAGS']
-            )
-            r = res['virtualGateway']
-            results.append(r)
-
-        return results
+    def get_arns(self, resources):
+        return [r['metadata']['arn'] for r in resources]
 
 
 # NOT TESTED
