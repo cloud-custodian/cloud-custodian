@@ -126,7 +126,6 @@ class AppmeshMesh(QueryResourceManager):
 
 
 class DescribeGatewayDefinition(ChildDescribeSource):
-
     # this method appears to be used only when in event mode and not pull mode
     def get_resources(self, ids, cache=True):
         results = []
@@ -218,39 +217,3 @@ class AppmeshVirtualGateway(ChildResourceManager):
 
     def get_arns(self, resources):
         return [r['metadata']['arn'] for r in resources]
-
-
-# NOT TESTED
-# @resources.register('appmesh-virtual-node')
-# class AppmeshVirtualNode(QueryResourceManager):
-#
-#     # interior class that defines the aws metadata for resource
-#     class resource_type(TypeInfo):
-#         service = 'appmesh'
-#         arn_type = "mesh"
-#         # subtype is "virtualNode"
-#         # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-appmesh-virtualnode.html
-#         id = name = 'VirtualNodeName'
-#         #date = 'CreatedTime'
-#
-#         # this defines the boto3 call for the resource as well as JMESPATH
-#         # for accessing TL resources
-#         # https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/appmesh/client/list_meshes.html
-#         enum_spec = (
-#             'list_meshes', 'meshes', None
-#         )
-#
-#         #  /mnt/c/Users/johnl/work/cloudcustodian/github/cloud-custodian/c7n/query.py 737
-#         #  detail_spec:
-#         #     detail_op = boto api call name
-#         #     param_name = name of argument to boto api call
-#         #     param_key = name of field in enum_spec response to drive this call
-#         #     detail_path = path to pull out of the boto response and return as the detail result
-#         #
-#         # https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/appmesh/client/list_virtual_nodes.html
-#         detail_spec = (
-#             'list_virtual_nodes', 'meshName', 'meshName', None
-#         )
-#
-#         # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-appmesh-virtualnode.html
-#         cfn_type = config_type = 'AWS::AppMesh::VirtualNode'
