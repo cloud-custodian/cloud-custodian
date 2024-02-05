@@ -127,9 +127,6 @@ class AppmeshMesh(QueryResourceManager):
 
 
 class DescribeGatewayDefinition(ChildDescribeSource):
-    def __init__(self, manager):
-        super().__init__(manager)
-        self.query.capture_parent_id = True
 
     # this method appears to be used only when in event mode and not pull mode
     def get_resources(self, ids, cache=True):
