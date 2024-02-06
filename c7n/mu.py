@@ -1035,7 +1035,7 @@ class AWSEventBase:
             return True
         except ClientError as e:
             if e.response['Error']['Code'] != 'ResourceNotFoundException':
-                raise
+                raise  # pragma: no cover
 
 
 class CloudWatchEventSource(AWSEventBase):
@@ -1358,7 +1358,7 @@ class EventBridgeScheduleSource(AWSEventBase):
                             log.debug(f'Removing schedule {func.event_name} '
                                       f'in group {group["Name"]}')
                             client.delete_schedule(Name=func.event_name, GroupName=group['Name'])
-        except ClientError as e:
+        except ClientError as e:  # pragma: no cover
             if e.response['Error']['Code'] == 'AccessDeniedException':
                 return
             raise
@@ -1380,7 +1380,7 @@ class EventBridgeScheduleSource(AWSEventBase):
             for key in keys_to_delete:
                 del schedule[key]
             self.client.update_schedule(**schedule)
-        except ClientError:
+        except ClientError:  # pragma: no cover
             pass
 
     def resume(self, func):
@@ -1397,7 +1397,7 @@ class EventBridgeScheduleSource(AWSEventBase):
             for key in keys_to_delete:
                 del schedule[key]
             self.client.update_schedule(**schedule)
-        except ClientError:
+        except ClientError:  # pragma: no cover
             pass
 
     def remove(self, func, func_deleted=True):
