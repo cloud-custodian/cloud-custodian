@@ -81,7 +81,7 @@ workload federation.
 
 For service account configuration see additional docs `here <https://cloud.google.com/iam/docs/service-account-overview>`_
 
-For workload configuration see additional docs `here <https://cloud.google.com/iam/docs/workload-identity-federation-with-other-clouds>`_
+For workload configuration see additional `docs <https://cloud.google.com/iam/docs/workload-identity-federation-with-other-clouds>`_
 
 If you are planning to impersonate a service account, then you may configure the environment
 variable `GOOGLE_IMPERSONATE_SERVICE_ACCOUNT` with the service account email address, you can also 
