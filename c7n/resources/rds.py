@@ -2076,7 +2076,7 @@ class RDSProxy(QueryResourceManager):
         enum_spec = ('describe_db_proxies', 'DBProxies', None)
         arn = 'DBProxyArn'
         arn_type = 'db-proxy'
-        cfn_type = config_type = 'AWS::RDS::DBInstance'
+        cfn_type = 'AWS::RDS::DBProxy'
         permissions_enum = ('rds:DescribeDBProxies',)
         universal_taggable = object()
 
