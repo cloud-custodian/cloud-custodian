@@ -1687,6 +1687,59 @@ class InstanceProfileSetRole(BaseAction):
                     self.add_role(client, r, role)
 
 
+@InstanceProfile.action_registry.register("set-policy")
+class SetInstanceProfileRolePolicy(SetPolicy):
+    """Set a specific IAM policy as attached or detached on an instance profile role.
+
+    You will identify the policy by its arn.
+
+    Returns a list of roles modified by the action.
+
+    For example, if you want to automatically attach a single policy while
+    detaching all exisitng policies:
+
+    :example:
+
+      .. code-block:: yaml
+
+        - name: iam-attach-instance-profile-role-policy
+          resource: iam-profile
+          filters:
+          - not:
+            - type: has-specific-managed-policy
+              value: my-iam-policy
+          actions:
+          - type: set-policy
+            state: attached
+            arn: arn:aws:iam::123456789012:policy/my-iam-policy
+
+    """
+
+    permissions = ('iam:AttachRolePolicy', 'iam:DetachRolePolicy', "iam:ListAttachedRolePolicies",)
+
+    def attach_policy(self, client, resource, policy_arn):
+        client.attach_role_policy(
+            RoleName=resource["Roles"][0]["RoleName"],
+            PolicyArn=policy_arn
+        )
+
+    def detach_policy(self, client, resource, policy_arn):
+        try:
+            client.detach_role_policy(
+                RoleName=resource["Roles"][0]["RoleName"],
+                PolicyArn=policy_arn
+            )
+        except client.exceptions.NoSuchEntityException:
+            return
+
+    def list_attached_policies(self, client, resource):
+        attached_policies = client.list_attached_role_policies(
+            RoleName=resource["Roles"][0]["RoleName"]
+        )
+        policy_arns = [p.get('PolicyArn') for p in attached_policies['AttachedPolicies']]
+        return policy_arns
+
+
 ###################
 #    IAM Users    #
 ###################
