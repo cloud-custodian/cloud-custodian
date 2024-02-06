@@ -11,6 +11,8 @@ ResourceMap = {
   "aws.apigw-domain-name": "c7n.resources.apigw.CustomDomainName",
   "aws.apigwv2": "c7n.resources.apigw.ApiGwV2",
   "aws.apigwv2-stage": "c7n.resources.apigw.ApiGatewayV2Stage",
+  "aws.appmesh-mesh": "c7n.resources.appmesh.AppmeshMesh",
+  "aws.appmesh-virtual-gateway": "c7n.resources.appmesh.AppmeshVirtualGateway",
   "aws.app-elb": "c7n.resources.appelb.AppELB",
   "aws.app-elb-target-group": "c7n.resources.appelb.AppELBTargetGroup",
   "aws.app-flow": "c7n.resources.appflow.AppFlow",

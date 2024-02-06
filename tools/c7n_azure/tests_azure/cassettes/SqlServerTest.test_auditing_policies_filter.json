@@ -1,0 +1,101 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Sql/servers?api-version=2015-05-01-preview",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Thu, 11 Feb 2021 19:11:23 GMT"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "content-length": [
+                        "438"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "kind": "v12.0",
+                                "properties": {
+                                    "administratorLogin": "4dm1n157r470r",
+                                    "version": "12.0",
+                                    "state": "Ready",
+                                    "fullyQualifiedDomainName": "chirvacustodian-sqlsvr.database.windows.net"
+                                },
+                                "location": "westeurope",
+                                "tags": {},
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/chirvacustodian-resources/providers/Microsoft.Sql/servers/chirvacustodian-sqlsvr",
+                                "name": "chirvacustodian-sqlsvr",
+                                "type": "Microsoft.Sql/servers"
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/chirvacustodian-resources/providers/Microsoft.Sql/servers/chirvacustodian-sqlsvr/auditingSettings?api-version=2017-03-01-preview",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Thu, 11 Feb 2021 19:11:23 GMT"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "content-length": [
+                        "498"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "properties": {
+                                    "retentionDays": 0,
+                                    "auditActionsAndGroups": [],
+                                    "isStorageSecondaryKeyInUse": false,
+                                    "isAzureMonitorTargetEnabled": true,
+                                    "state": "Disabled",
+                                    "storageEndpoint": "",
+                                    "storageAccountSubscriptionId": "00000000-0000-0000-0000-000000000000"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/chirvacustodian-resources/providers/Microsoft.Sql/servers/chirvacustodian-sqlsvr/auditingSettings/Default",
+                                "name": "Default",
+                                "type": "Microsoft.Sql/servers/auditingSettings"
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}
