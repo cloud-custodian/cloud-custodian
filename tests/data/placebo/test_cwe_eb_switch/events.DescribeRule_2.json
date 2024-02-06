@@ -1,0 +1,13 @@
+{
+    "status_code": 200,
+    "data": {
+        "Name": "custodian-periodic-ec2-checker",
+        "Arn": "arn:aws:events:us-east-1:644160558196:rule/custodian-periodic-ec2-checker",
+        "ScheduleExpression": "rate(1 day)",
+        "State": "ENABLED",
+        "Description": "cloud-custodian lambda policy",
+        "EventBusName": "default",
+        "CreatedBy": "644160558196",
+        "ResponseMetadata": {}
+    }
+}

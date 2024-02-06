@@ -797,6 +797,74 @@ class PolicyLambdaProvision(Publish):
         # subsequent calls to resume an already enabled rule should be a no-op
         events[0].resume(pl)
 
+    def test_cwe_eb_switch(self):
+        session_factory = self.replay_flight_data("test_cwe_eb_switch")
+        scheduler_role = "arn:aws:iam::644160558196:role/custodian-scheduler-mu"
+        policy = {
+            "resource": "ec2",
+            "name": "periodic-ec2-checker",
+            "mode": {"type": "periodic", "schedule": "rate(1 day)"},
+        }
+        p = self.load_policy(policy, session_factory=session_factory)
+        pl = PolicyLambda(p)
+        mgr = LambdaManager(session_factory)
+        self.addCleanup(mgr.remove, pl)
+        mgr.publish(pl, "Dev", role=ROLE)
+
+        events = session_factory().client("events")
+        scheduler = session_factory().client("scheduler")
+        result = events.list_rules(NamePrefix="custodian-periodic-ec2-checker")
+        self.assert_items(
+            result["Rules"][0],
+            {
+                "State": "ENABLED",
+                "ScheduleExpression": "rate(1 day)",
+                "Name": "custodian-periodic-ec2-checker",
+            },
+        )
+        with self.assertRaises(scheduler.exceptions.ResourceNotFoundException):
+            scheduler.get_schedule(Name="custodian-periodic-ec2-checker")
+
+        # convert cwe rule to schedule
+        policy['mode']['scheduler_role'] = scheduler_role
+        p = self.load_policy(policy, session_factory=session_factory)
+        pl = PolicyLambda(p)
+        mgr = LambdaManager(session_factory)
+        self.addCleanup(mgr.remove, pl)
+        mgr.publish(pl, "Dev", role=ROLE)
+
+        result = scheduler.get_schedule(Name="custodian-periodic-ec2-checker")
+        self.assert_items(
+            result,
+            {
+                "State": "ENABLED",
+                "ScheduleExpression": "rate(1 day)",
+                "Name": "custodian-periodic-ec2-checker"
+            }
+        )
+        result = events.list_rules(NamePrefix="custodian-periodic-ec2-checker")
+        self.assertEqual(len(result['Rules']), 0)
+
+        # switch back to cwe
+        del policy['mode']['scheduler_role']
+        p = self.load_policy(policy, session_factory=session_factory)
+        pl = PolicyLambda(p)
+        mgr = LambdaManager(session_factory)
+        self.addCleanup(mgr.remove, pl)
+        mgr.publish(pl, "Dev", role=ROLE)
+
+        result = events.list_rules(NamePrefix="custodian-periodic-ec2-checker")
+        self.assert_items(
+            result["Rules"][0],
+            {
+                "State": "ENABLED",
+                "ScheduleExpression": "rate(1 day)",
+                "Name": "custodian-periodic-ec2-checker",
+            },
+        )
+        with self.assertRaises(scheduler.exceptions.ResourceNotFoundException):
+            scheduler.get_schedule(Name="custodian-periodic-ec2-checker")
+
     key_arn = "arn:aws:kms:us-west-2:644160558196:key/" "44d25a5c-7efa-44ed-8436-b9511ea921b3"
     sns_arn = "arn:aws:sns:us-west-2:644160558196:config-topic"
 
