@@ -1,6 +1,9 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+from botocore.history import get_global_history_recorder
+
 from .common import BaseTest, event_data
+
 
 # during recording create some sample resources in AWS the
 # set use a flight recorder and set the config region to wherever you want to read state from.
@@ -17,13 +20,44 @@ class TestAppmeshMesh(BaseTest):
     def test_appmesh(self):
         session_factory = self.replay_flight_data('test_appmesh_mesh')
         p = self.load_policy(
-            {"name": "appmesh-mesh-policy", "resource": "aws.appmesh-mesh"},
+            {
+                "name": "appmesh-mesh-policy",
+                "resource": "aws.appmesh-mesh",
+                'filters': [{"or": [{'tag:MyTagName': 'm1'}, {'tag:MyTagName': 'm2'}]}],
+            },
             session_factory=session_factory,
         )
+
+        captor = ApiCallCaptor.start_capture()
+
         resources = p.run()
-        self.assertEqual(len(resources), 2)
-        self.assertEqual(resources[0]["meshName"], "m1")
-        self.assertEqual(resources[1]["meshName"], "m2")
+
+        self.assertEqual(
+            [
+                {
+                    'Tags': [{'Key': 'MyTagName', 'Value': 'm1'}],
+                    'c7n:MatchedFilters': ['tag:MyTagName'],
+                    'arn': 'arn:aws:appmesh:eu-west-2:123456789012:mesh/m1',
+                    'createdAt': '2023-11-03T02:36:27.877000+00:00',
+                    'lastUpdatedAt': '2023-11-03T02:36:27.877000+00:00',
+                    'meshName': 'm1',
+                    'meshOwner': '123456789012',
+                    'resourceOwner': '123456789012',
+                    'version': 1
+                },
+                {
+                    'Tags': [{'Key': 'MyTagName', 'Value': 'm2'}],
+                    'c7n:MatchedFilters': ['tag:MyTagName'],
+                    'arn': 'arn:aws:appmesh:eu-west-2:123456789012:mesh/m2',
+                    'createdAt': '2023-11-03T02:36:27.877000+00:00',
+                    'lastUpdatedAt': '2023-11-03T02:36:27.877000+00:00',
+                    'meshName': 'm2',
+                    'meshOwner': '123456789012',
+                    'resourceOwner': '123456789012',
+                    'version': 1
+                }
+            ],
+            resources)
 
         # These assertions are necessary to be sure that the "get_arns" function is correctly
         # deriving the ARN.
@@ -31,6 +65,21 @@ class TestAppmeshMesh(BaseTest):
         arns = p.resource_manager.get_arns(resources)
         self.assertIn('arn:aws:appmesh:eu-west-2:123456789012:mesh/m1', arns)
         self.assertIn('arn:aws:appmesh:eu-west-2:123456789012:mesh/m2', arns)
+
+        # The "placebo" testing library doesn't allow us to make assertions
+        # linking specific api's calls to the specific mock response file
+        # that will serve that request. So we will compensate here by
+        # making an assertion about all the api calls and the order
+        # of calls that must be made.
+        self.assertEqual(
+            [
+                {'operation': 'ListMeshes', 'params': {}, 'service': 'appmesh'},
+                {'operation': 'GetResources',
+                 'params': {'ResourceARNList': ['arn:aws:appmesh:eu-west-2:123456789012:mesh/m1',
+                                                'arn:aws:appmesh:eu-west-2:123456789012:mesh/m2']},
+                 'service': 'resourcegroupstaggingapi'}],
+            captor.calls
+        )
 
     def test_appmesh_event(self):
         session_factory = self.replay_flight_data('test_appmesh_mesh_event')
@@ -58,15 +107,45 @@ class TestAppmeshMesh(BaseTest):
             "detail": event_data("event-appmesh-create-mesh.json"),
             "debug": True,
         }
+
+        captor = ApiCallCaptor.start_capture()
+
         resources = p.push(event, None)
-        self.assertEqual(len(resources), 1)
-        self.assertEqual(resources[0]["meshName"], "m1")
+
+        self.assertEqual(
+            [
+                {
+                    'Tags': [{'Key': 'MyTagName', 'Value': 'm1'}],
+                    'arn': 'arn:aws:appmesh:eu-west-2:123456789012:mesh/m1',
+                    'createdAt': '2023-11-03T02:36:27.877000+00:00',
+                    'lastUpdatedAt': '2023-11-03T02:36:27.877000+00:00',
+                    'meshName': 'm1',
+                    'meshOwner': '123456789012',
+                    'resourceOwner': '123456789012',
+                    'version': 1
+                }
+            ],
+            resources)
 
         # These assertions are necessary to be sure that the "get_arns" function is correctly
         # deriving the ARN.
         # See the documentation on the "arn" field in appmesh.py.
         arns = p.resource_manager.get_arns(resources)
         self.assertIn('arn:aws:appmesh:eu-west-2:123456789012:mesh/m1', arns)
+
+        # The "placebo" testing library doesn't allow us to make assertions
+        # linking specific api's calls to the specific mock response file
+        # that will serve that request. So we will compensate here by
+        # making an assertion about all the api calls and the order
+        # of calls that must be made.
+        self.assertEqual(
+            [
+                {'operation': 'ListMeshes', 'params': {}, 'service': 'appmesh'},
+                {'operation': 'GetResources',
+                 'params': {'ResourceARNList': ['arn:aws:appmesh:eu-west-2:123456789012:mesh/m1']},
+                 'service': 'resourcegroupstaggingapi'}],
+            captor.calls
+        )
 
 
 class TestAppmeshVirtualGateway(BaseTest):
@@ -83,6 +162,7 @@ class TestAppmeshVirtualGateway(BaseTest):
                         "type": "value",
                         "key": "spec.listeners[0].portMapping.port",
                         "op": "eq",
+                        # ONLY ONE OF THE TWO RESOURCES HAS THIS PORT
                         "value": 123,
                     }
                 ],
@@ -90,17 +170,69 @@ class TestAppmeshVirtualGateway(BaseTest):
             session_factory=session_factory,
         )
 
+        captor = ApiCallCaptor.start_capture()
+
         resources = p.run()
-        self.assertEqual(len(resources), 1)
-        self.assertEqual("m1", resources[0]["meshName"])
-        self.assertEqual("g1", resources[0]["virtualGatewayName"])
-        self.assertEqual(123, resources[0]["spec"]["listeners"][0]["portMapping"]["port"])
+
+        self.assertEqual(
+            [
+                {
+                    'Tags': [{'Key': 'MyTagName', 'Value': 'm1/g1'}],
+                    'c7n:MatchedFilters': ['spec.listeners[0].portMapping.port'],
+                    'meshName': 'm1',
+                    'metadata': {'arn': 'arn:aws:appmesh:eu-west-2:123456789012:mesh/m1/virtualGateway/g1',
+                                 'createdAt': '2023-11-03T02:36:27.877000+00:00',
+                                 'lastUpdatedAt': '2023-11-03T02:36:27.877000+00:00',
+                                 'meshOwner': '644160558196',
+                                 'resourceOwner': '644160558196',
+                                 'uid': '80ee4027-c8e1-49e8-99ba-cace20a57f0b',
+                                 'version': 1},
+                    'spec': {'backendDefaults': {'clientPolicy': {}},
+                             'listeners': [{'portMapping': {'port': 123, 'protocol': 'http'}}],
+                             'logging': {}},
+                    'status': {'status': 'ACTIVE'},
+                    'virtualGatewayName': 'g1'
+                }
+            ],
+            resources)
 
         # These assertions are necessary to be sure that the "get_arns" function is correctly
         # deriving the ARN.
         # See the documentation on the "arn" field in appmesh.py.
         arns = p.resource_manager.get_arns(resources)
         self.assertIn('arn:aws:appmesh:eu-west-2:123456789012:mesh/m1/virtualGateway/g1', arns)
+
+        # The "placebo" testing library doesn't allow us to make assertions
+        # linking specific api's calls to the specific mock response file
+        # that will serve that request. So we will compensate here by
+        # making an assertion about all the api calls and the order
+        # of calls that must be made.
+        self.assertEqual(
+            [
+                {'operation': 'ListMeshes',
+                 'params': {},
+                 'service': 'appmesh'},
+                {'operation': 'ListVirtualGateways',
+                 'params': {'meshName': 'm1'},
+                 'service': 'appmesh'},
+                {'operation': 'ListVirtualGateways',
+                 'params': {'meshName': 'm2'},
+                 'service': 'appmesh'},
+                {'operation': 'DescribeVirtualGateway',
+                 'params': {'meshName': 'm1', 'virtualGatewayName': 'g1'},
+                 'service': 'appmesh'},
+                {'operation': 'DescribeVirtualGateway',
+                 'params': {'meshName': 'm1', 'virtualGatewayName': 'g2'},
+                 'service': 'appmesh'},
+                {'operation': 'GetResources',
+                 'params': {'ResourceARNList': [
+                     'arn:aws:appmesh:eu-west-2:123456789012:mesh/m1/virtualGateway/g1',
+                     'arn:aws:appmesh:eu-west-2:123456789012:mesh/m1/virtualGateway/g2'
+                 ]},
+                 'service': 'resourcegroupstaggingapi'}
+            ],
+            captor.calls
+        )
 
     def test_appmesh_virtualgateway_event(self):
         session_factory = self.replay_flight_data('test_appmesh_virtualgateway_event')
@@ -122,18 +254,80 @@ class TestAppmeshVirtualGateway(BaseTest):
             },
             session_factory=session_factory,
         )
+
+        captor = ApiCallCaptor.start_capture()
+
         event = {
             "detail": event_data("event-appmesh-create-virtual-gateway.json"),
             "debug": True,
         }
+
         resources = p.push(event, None)
-        self.assertEqual(len(resources), 1)
-        self.assertEqual("m1", resources[0]["meshName"])
-        self.assertEqual("g1", resources[0]["virtualGatewayName"])
-        self.assertEqual(123, resources[0]["spec"]["listeners"][0]["portMapping"]["port"])
+
+        self.assertEqual(
+            [
+                {
+                    'Tags': [{'Key': 'MyTagName', 'Value': 'm1/g1'}],
+                    'meshName': 'm1',
+                    'metadata': {'arn': 'arn:aws:appmesh:eu-west-2:123456789012:mesh/m1/virtualGateway/g1',
+                                 'createdAt': '2023-11-03T02:36:27.877000+00:00',
+                                 'lastUpdatedAt': '2023-11-03T02:36:27.877000+00:00',
+                                 'meshOwner': '644160558196',
+                                 'resourceOwner': '644160558196',
+                                 'uid': '80ee4027-c8e1-49e8-99ba-cace20a57f0b',
+                                 'version': 1},
+                    'spec': {'backendDefaults': {'clientPolicy': {}},
+                             'listeners': [{'portMapping': {'port': 123, 'protocol': 'http'}}],
+                             'logging': {}},
+                    'status': {'status': 'ACTIVE'},
+                    'virtualGatewayName': 'g1'
+                }
+            ],
+            resources)
 
         # These assertions are necessary to be sure that the "get_arns" function is
         # correctly deriving the ARN.
         # See the documentation on the "arn" field in appmesh.py.
         arns = p.resource_manager.get_arns(resources)
         self.assertIn('arn:aws:appmesh:eu-west-2:123456789012:mesh/m1/virtualGateway/g1', arns)
+
+        # The "placebo" testing library doesn't allow us to make assertions
+        # linking specific api's calls to the specific mock response file
+        # that will serve that request. So we will compensate here by
+        # making an assertion about all the api calls and the order
+        # of calls that must be made.
+        self.assertEqual(
+            [
+                {'operation': 'DescribeVirtualGateway',
+                 'params': {'meshName': 'm1', 'virtualGatewayName': 'g1'},
+                 'service': 'appmesh'},
+                {'operation': 'GetResources',
+                 'params': {'ResourceARNList': [
+                     'arn:aws:appmesh:eu-west-2:123456789012:mesh/m1/virtualGateway/g1']},
+                 'service': 'resourcegroupstaggingapi'}
+            ],
+            captor.calls
+        )
+
+
+class ApiCallCaptor:
+    _INSTANCE = None
+
+    def __init__(self):
+        self.calls = []
+
+    def emit(self, _event_type, payload, _source):
+        # print("API CALL : EventType:" + str(event_type) + " Payload:" + str(payload) + " Source:" + str(source))
+        self.calls.append(payload)
+
+    @classmethod
+    def start_capture(cls):
+        hist = get_global_history_recorder()
+        if not cls._INSTANCE:
+            cls._INSTANCE = ApiCallCaptor()
+            hist.add_handler(ApiCallCaptor._INSTANCE)
+
+        cls._INSTANCE.calls = []
+        hist.enable()
+
+        return cls._INSTANCE

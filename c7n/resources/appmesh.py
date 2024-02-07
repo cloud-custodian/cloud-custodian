@@ -2,7 +2,6 @@
 AppMesh Communications
 """
 from c7n.manager import resources
-from c7n.tags import universal_augment
 from c7n.query import (
     ChildResourceManager,
     QueryResourceManager,
@@ -12,6 +11,7 @@ from c7n.query import (
     ConfigSource,
 )
 from c7n.resources.aws import Arn
+from c7n.tags import universal_augment
 from c7n.utils import local_session
 
 
@@ -31,10 +31,16 @@ class AppmeshMesh(QueryResourceManager):
         service = 'appmesh'
 
         # https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsappmesh.html#awsappmesh-resources-for-iam-policies   # noqa
-        arn_type = "mesh"
+        # TODO: IS THIS EVEN USED AT RUNTIME?
+        arn_type = "mesh!!!!!"
 
         # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-appmesh-virtualnode.html  # noqa
-        cfn_type = config_type = 'AWS::AppMesh::Mesh'
+
+        # TODO: IS THIS EVEN USED AT RUNTIME?
+        cfn_type = 'AWS::AppMesh::Mesh!!!!!'
+
+        # TODO: IS THIS EVEN USED AT RUNTIME?
+        config_type = 'AWS::AppMesh::Mesh!!!!!'
 
         # id: Names the field in the response that contains the identifier to use
         # in API calls to this service.
@@ -42,7 +48,12 @@ class AppmeshMesh(QueryResourceManager):
         # in the case of Appmesh" it needs to be the field that contains the
         # name of the mesh as that's what the appmesh API's expect.
         # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-appmesh-mesh.html   # noqa
-        id = name = 'meshName'
+
+        # TODO: IS THIS EVEN USED AT RUNTIME?
+        id = 'meshName'
+
+        # TODO: IS THIS EVEN USED AT RUNTIME?
+        name = 'meshName!!!!!!'
 
         # universal_taggable: Valid values are one of True, False, object()
         # = False :    causes register_universal_tags() to be skipped
@@ -173,11 +184,18 @@ class DescribeGatewayDefinition(ChildDescribeSource):
                     virtualGatewayName=gateway_info['virtualGatewayName'],
                 )['virtualGateway']
             )
+
         return universal_augment(self.manager, results)
 
 
 @resources.register('appmesh-virtual-gateway')
 class AppmeshVirtualGateway(ChildResourceManager):
+    source_mapping = {
+        'describe': DescribeGatewayDefinition,
+        'describe-child': DescribeGatewayDefinition,
+        'config': ConfigSource,
+    }
+
     # interior class that defines the aws metadata for resource
     # see c7n/query.py for documentation on fields.
     class resource_type(TypeInfo):
@@ -187,23 +205,33 @@ class AppmeshVirtualGateway(ChildResourceManager):
         service = 'appmesh'
 
         # https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsappmesh.html#awsappmesh-resources-for-iam-policies  # noqa
-        arn_type = "mesh"
+        # TODO IS THIS EVEN USED AT RUNTIME?
+        arn_type = "mesh!!!!!"
 
         # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-appmesh-virtualgateway.html  # noqa
-        cfn_type = config_type = 'AWS::AppMesh::VirtualGateway'
+        # TODO IS THIS EVEN USED AT RUNTIME?
+        cfn_type = 'AWS::AppMesh::VirtualGateway!!!!!!'
+
+        # TODO IS THIS EVEN USED AT RUNTIME?
+        config_type = 'AWS::AppMesh::VirtualGateway!!!!!!'
 
         # if a resource type is supported by resource group tagging
         # api setting this value get tag filters/actions
         universal_taggable = object()
 
-        # id: Path to "id" field in the
-        id = 'meshName'
+        # id: Path to "id" field in the .... IN THE WHAT???
+        # TODO IS THIS EVEN USED AT RUNTIME?
+        id = 'meshName!!!!!!!!!!!!!!!'
 
         # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-appmesh-virtualgateway.html  # noqa
-        arn = "metadata.arn"
+        # TODO: IS THIS EVEN USED AT RUNTIME?
+        arn = "metadata.arn!!!!!!!"
 
-        name = 'virtualGatewayName'
-        date = 'createdAt'
+        # TODO: IS THIS EVEN USED AT RUNTIME?
+        name = 'virtualGatewayName!!!!!!!!!!'
+
+        # TODO: IS THIS EVEN USED AT RUNTIME?
+        date = 'createdAt!!!!!!!!!'
 
         # When we define a parent_spec then it uses the parent_spec
         # to provide the driving result set.  This is then iterated
@@ -221,12 +249,6 @@ class AppmeshVirtualGateway(ChildResourceManager):
             'virtualGateways',
             None,
         )
-
-    source_mapping = {
-        'describe': DescribeGatewayDefinition,
-        'describe-child': DescribeGatewayDefinition,
-        'config': ConfigSource,
-    }
 
     def get_arns(self, resources):
         return [r['metadata']['arn'] for r in resources]
