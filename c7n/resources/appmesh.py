@@ -27,6 +27,7 @@ class AppmeshMesh(QueryResourceManager):
 
     # interior class that defines the aws metadata for resource
     class resource_type(TypeInfo):
+        # service: is used by the boto client to look up the correct API for this resource.
         service = 'appmesh'
 
         # https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsappmesh.html#awsappmesh-resources-for-iam-policies   # noqa
@@ -35,15 +36,27 @@ class AppmeshMesh(QueryResourceManager):
         # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-appmesh-virtualnode.html  # noqa
         cfn_type = config_type = 'AWS::AppMesh::Mesh'
 
-        # Field in response containing the identifier used in API's.
-        # Therefore, this "id" field might be the arn field for some API's but
+        # id: Names the field in the response that contains the identifier to use
+        # in API calls to this service.
+        # Therefore, this "id" field might be the "arn" field for some API's but
         # in the case of Appmesh" it needs to be the field that contains the
         # name of the mesh as that's what the appmesh API's expect.
         # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-appmesh-mesh.html   # noqa
         id = name = 'meshName'
 
-        # if a resource type is supported by resource group tagging
-        # api setting this value get tag filters/actions
+        # universal_taggable: Valid values are one of True, False, object()
+        # = False :    causes register_universal_tags() to be skipped
+        # = True :     causes register_universal_tags(compatibility=True)
+        # = object() : causes register_universal_tags(compatibility=False)
+        #
+        # The only place this is read is in QueryMeta of query.py and from that
+        # code I have inferred the above meaning of this flag.
+        #
+        # I can only assume that True/False were the original API and then the need
+        # for a third state came along and so object() was used.
+        # The superclass documentation doesn't mention the "False" value which
+        # is likely because perhaps this was historically just a true/false and it was
+        # obvious, but things have changed. Maybe an enum would be better?
         universal_taggable = object()
 
         # arn : Defines a top level field in the resource definition that contains the ARN
