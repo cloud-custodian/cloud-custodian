@@ -2,16 +2,17 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from concurrent.futures import as_completed
+import json
 import logging
 import os
 import threading
 
 from botocore.exceptions import ClientError
 
+from c7n.actions import Action
 from c7n.credentials import assumed_session
-
-# from c7n.executor import MainThreadExecutor
-from c7n.filters import Filter, ValueFilter
+from c7n.exceptions import PolicyValidationError
+from c7n.filters import Filter, ValueFilter, ListItemFilter
 from c7n.query import QueryResourceManager, TypeInfo, DescribeSource
 from c7n.resources.aws import AWS
 from c7n.tags import universal_augment
@@ -59,10 +60,10 @@ class OrgAccess:
 @AWS.resources.register("org-policy")
 class OrgPolicy(QueryResourceManager, OrgAccess):
     policy_types = (
-        'SERVICE_CONTROL_POLICY',
-        'TAG_POLICY',
-        'BACKUP_POLICY',
-        'AISERVICES_OPT_OUT_POLICY',
+        "SERVICE_CONTROL_POLICY",
+        "TAG_POLICY",
+        "BACKUP_POLICY",
+        "AISERVICES_OPT_OUT_POLICY",
     )
 
     class resource_type(TypeInfo):
@@ -89,11 +90,11 @@ class OrgPolicy(QueryResourceManager, OrgAccess):
 
     def parse_query(self, query=None):
         params = {}
-        for q in self.data.get('query', ()):
-            if isinstance(q, dict) and 'filter' in q:
-                params['Filter'] = q['filter']
+        for q in self.data.get("query", ()):
+            if isinstance(q, dict) and "filter" in q:
+                params["Filter"] = q["filter"]
         if not params:
-            params['Filter'] = "SERVICE_CONTROL_POLICY"
+            params["Filter"] = "SERVICE_CONTROL_POLICY"
         return params
 
 
@@ -107,28 +108,28 @@ class DescribeUnit(DescribeSource):
     def resources(self, query=None):
         if query is None:
             query = {}
-        client = local_session(self.manager.session_factory).client('organizations')
-        if 'ParentId' not in query:
-            query['ParentId'] = client.list_roots().get('Roots', ())[0].get('Id')
+        client = local_session(self.manager.session_factory).client("organizations")
+        if "ParentId" not in query:
+            query["ParentId"] = client.list_roots().get("Roots", ())[0].get("Id")
         ous = {}
-        self.fetch_ous(client, query['ParentId'], ous, [query['ParentId']])
+        self.fetch_ous(client, query["ParentId"], ous, [query["ParentId"]])
         return universal_augment(self.manager, list(ous.values()))
 
     def fetch_ous(self, client, parent_id, units, stack):
-        pager = client.get_paginator('list_children')
+        pager = client.get_paginator("list_children")
         ou_ids = [
-            o['Id']
+            o["Id"]
             for o in pager.paginate(ParentId=parent_id, ChildType=self.org_type)
             .build_full_result()
-            .get('Children')
+            .get("Children")
         ]
         for ou_id in ou_ids:
             units[ou_id] = ou = client.describe_organizational_unit(
                 OrganizationalUnitId=ou_id,
-            )['OrganizationalUnit']
-            ou['Parents'] = list(stack)
+            )["OrganizationalUnit"]
+            ou["Parents"] = list(stack)
             stack.append(ou_id)
-            ou['Path'] = "/".join([units[p]['Name'] for p in stack if p.startswith('ou')])
+            ou["Path"] = "/".join([units[p]["Name"] for p in stack if p.startswith("ou")])
             self.fetch_ous(client, ou_id, units, stack)
             stack.pop(-1)
 
@@ -149,7 +150,7 @@ class OrgUnit(QueryResourceManager):
         )
         universal_augment = object()
 
-    source_mapping = {'describe': DescribeUnit}
+    source_mapping = {"describe": DescribeUnit}
 
 
 @AWS.resources.register("org-account")
@@ -165,7 +166,6 @@ class OrgAccount(QueryResourceManager, OrgAccess):
         permissions_augment = ("organizations:ListTagsForResource",)
         universal_augment = object()
 
-    # executor_factory = MainThreadExecutor
     org_session = None
 
     def augment(self, resources):
@@ -191,8 +191,181 @@ class OrgAccount(QueryResourceManager, OrgAccess):
                 self.account_config["org-account-role"] = "AWSControlTowerExecution"
 
 
-@OrgUnit.filter_registry.register('org-unit')
-@OrgAccount.filter_registry.register('org-unit')
+@OrgUnit.filter_registry.register("policy")
+@OrgAccount.filter_registry.register("policy")
+class PolicyFilter(ListItemFilter):
+    schema = type_schema(
+        "policy",
+        required=["policy-type"],
+        **{
+            "policy-type": {"enum": OrgPolicy.policy_types},
+            "inherited": {"type": "boolean"},
+            "attrs": {"$ref": "#/definitions/filters_common/list_item_attrs"},
+            "count": {"type": "number"},
+            "count_op": {"$ref": "#/definitions/filters_common/comparison_operators"},
+        },
+    )
+
+    permissions = ("organizations:ListRoots", "organizations:ListPoliciesForTarget")
+
+    annotate_items = True
+    item_annotation_key = "c7n:PolicyMatches"
+    target_policies = None
+    ou_root = None
+    client = None
+
+    def process(self, resources, event):
+        self.client = local_session(self.manager.session_factory).client("organizations")
+        if self.data.get("inherited") and self.manager.type == "org-account":
+            # Get ou account hierarchy / parents
+            hierarchy_manager = self.manager.get_resource_manager(
+                "org-account", {"filters": ["org-unit"]}
+            )
+
+            ou_assembly = hierarchy_manager.filters[0]
+            ou_assembly.ou_map = {
+                ou["Id"]: ou for ou in self.manager.get_resource_manager("org-unit").resources()
+            }
+            ou_assembly.process_accounts(resources, event)
+            # also initialize root for accounts as we dont store it as a parent.
+            self.ou_root = self.client.list_roots()["Roots"][0]
+        self.target_policies = {}
+        return super().process(resources, event)
+
+    def get_targets(self, resource):
+        if not self.data.get("inherited"):
+            yield resource["Id"]
+            return
+
+        # handle ous
+        if self.manager.type == "org-unit":
+            yield resource["Id"]
+            for p in resource["Parents"]:
+                yield p
+            return
+
+        # handle accounts
+        yield resource["Id"]
+        for p in resource[OrgUnitFilter.annotation_parent_key]:
+            yield p["Id"]
+
+        # finally the root
+        yield self.ou_root["Id"]
+
+    def get_item_values(self, resource):
+        rpolicies = {}
+        for tgt_id in self.get_targets(resource):
+            if tgt_id not in self.target_policies:
+                policies = self.client.list_policies_for_target(
+                    Filter=self.data["policy-type"], TargetId=tgt_id
+                ).get("Policies", ())
+                self.target_policies[tgt_id] = policies
+            for p in self.target_policies[tgt_id]:
+                rpolicies[p["Id"]] = p
+        return list(rpolicies.values())
+
+
+@OrgAccount.action_registry.register("set-policy")
+@OrgUnit.action_registry.register("set-policy")
+class SetPolicy(Action):
+    """Set a policy on an org unit or account
+
+    .. code-block:: yaml
+
+        policies:
+          - name: attach-existing-scp
+            resource: aws.org-unit
+            filters:
+              - type: policy
+                policy-type: SERVICE_CONTROL_POLICY
+                count: 0
+                attrs:
+                  - Name: RestrictedRootAccount
+            actions:
+              - type: set-policy
+                policy-type: SERVICE_CONTROL_POLICY
+                name: RestrictedRootAccount
+
+    .. code-block:: yaml
+
+        policies:
+          - name: create-and-attach-scp
+            resource: aws.org-unit
+            filters:
+              - type: policy
+                policy-type: SERVICE_CONTROL_POLICY
+                count: 0
+                attrs:
+                  - Name: RestrictedRootAccount
+            actions:
+              - type: set-policy
+                policy-type: SERVICE_CONTROL_POLICY
+                name: RestrictedRootAccount
+                contents:
+                  Version: "2012-10-17"
+                  Statement:
+                    - Sid: RestrictEC2ForRoot
+                      Effect: Deny
+                      Action:
+                        - "ec2:*"
+                      Resource:
+                        - "*"
+                      Condition:
+                        StringLike:
+                          "aws:PrincipalArn":
+                            - arn:aws:iam::*:root
+    """
+
+    schema = type_schema(
+        "set-policy",
+        required=["name", "policy-type"],
+        **{
+            "name": {"type": "string"},
+            "description": {"type": "string"},
+            "policy-type": {"enum": OrgPolicy.policy_types},
+            "contents": {"type": "object"},
+            "tags": {"$ref": "#/definitions/string_dict"},
+        },
+    )
+    permissions = ("organizations:AttachPolicy", "organizations:CreatePolicy")
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client("organizations")
+        pid = self.ensure_scp(client)
+        for r in resources:
+            self.manager.retry(client.attach_policy, TargetId=r["Id"], PolicyId=pid)
+
+    def ensure_scp(self, client):
+        pmanager = self.manager.get_resource_manager(
+            "org-policy", {"query": [{"filter": self.data["policy-type"]}]}
+        )
+        policies = pmanager.resources()
+        found = False
+        for p in policies:
+            if p["Name"] == self.data["name"]:
+                found = p
+                break
+        if found:
+            # todo: perhaps modify/compare to match.
+            return found["Id"]
+        elif not self.data.get("contents"):
+            raise PolicyValidationError(
+                "Policy references not existant org policy " "without specifying contents"
+            )
+        ptags = [{"Key": k, "Value": v} for k, v in self.data.get("tags", {}).items()]
+        ptags.append({"Key": "managed-by", "Value": "CloudCustodian"})
+        response = client.create_policy(
+            Name=self.data["name"],
+            Description=self.data.get("description", "%s (custodian managed)" % self.data["name"]),
+            Type=self.data["policy-type"],
+            Content=json.dumps(self.data["contents"]),
+            Tags=ptags,
+        )
+        return response["Policy"]["PolicySummary"]["Id"]
+
+
+@OrgUnit.filter_registry.register("org-unit")
+@OrgAccount.filter_registry.register("org-unit")
 class OrgUnitFilter(ValueFilter):
     """Filter resources by their containment within an ou.
 
@@ -214,35 +387,35 @@ class OrgUnitFilter(ValueFilter):
                 value: dev
     """
 
-    schema = type_schema('org-unit', rinherit=ValueFilter.schema)
-    annotation_parent_key = 'c7n:parents'
+    schema = type_schema("org-unit", rinherit=ValueFilter.schema)
+    annotation_parent_key = "c7n:parents"
     ou_map = None
     permissions = OrgUnit.resource_type.permissions_augment
 
     def process(self, resources, event=None):
         self.ou_map = {
-            ou['Id']: ou for ou in self.manager.get_resource_manager('org-unit').resources()
+            ou["Id"]: ou for ou in self.manager.get_resource_manager("org-unit").resources()
         }
-        if self.manager.type == 'org-account':
+        if self.manager.type == "org-account":
             self.process_accounts(resources, event)
         return super().process(resources, event)
 
     def process_accounts(self, resources, event):
-        client = local_session(self.manager.session_factory).client('organizations')
+        client = local_session(self.manager.session_factory).client("organizations")
         for r in resources:
             if self.annotation_parent_key in r:
                 continue
             # list parents only returns the immediate parent
             parents = []
-            parent_info = client.list_parents(ChildId=r['Id']).get('Parents').pop()
-            if parent_info['Type'] == 'ROOT':
+            parent_info = client.list_parents(ChildId=r["Id"]).get("Parents").pop()
+            if parent_info["Type"] == "ROOT":
                 r[self.annotation_parent_key] = []
                 continue
-            parent = self.ou_map[parent_info['Id']]
+            parent = self.ou_map[parent_info["Id"]]
             parents.append(parent)
-            while parent['Parents']:
-                next_p = parent['Parents'][-1]
-                if next_p.startswith('r-'):
+            while parent["Parents"]:
+                next_p = parent["Parents"][-1]
+                if next_p.startswith("r-"):
                     break
                 parent = self.ou_map[next_p]
                 parents.append(parent)
@@ -250,11 +423,11 @@ class OrgUnitFilter(ValueFilter):
         return super().process(resources, event)
 
     def __call__(self, r):
-        if self.manager.type == 'org-unit':
+        if self.manager.type == "org-unit":
             # we annotate parents as we walk down the tree, allowing us to reuse
             # the information for heirarchy filters.
-            for pid in r['Parents']:
-                if pid.startswith('ou-') and super().__call__(self.ou_map[pid]):
+            for pid in r["Parents"]:
+                if pid.startswith("ou-") and super().__call__(self.ou_map[pid]):
                     return True
             return False
         else:
@@ -408,7 +581,7 @@ class StackFilter(Filter, ProcessAccountSet):
         regions={"type": "array", "elements": {"type": "string"}},
     )
 
-    permissions = ('sts:AssumeRole', 'cloudformation:DescribeStacks')
+    permissions = ("sts:AssumeRole", "cloudformation:DescribeStacks")
     annotation = "c7n:cfn-stack"
 
     def process(self, resources, event=None):

@@ -143,8 +143,7 @@ class DynamodbTest(BaseTest):
                     {
                         "type": "continuous-backup",
                         "key": "PointInTimeRecoveryDescription.PointInTimeRecoveryStatus",
-                        "value": "ENABLED",
-                        "op": "ne"
+                        "value": "DISABLED",
                     }
                 ]
             },
