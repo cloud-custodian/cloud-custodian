@@ -165,6 +165,7 @@ ResourceMap = {
   "aws.message-broker": "c7n.resources.mq.MessageBroker",
   "aws.message-config": "c7n.resources.mq.MessageConfig",
   "aws.mirror-session": "c7n.resources.vpc.TrafficMirrorSession",
+  "aws.model-customization-job": "c7n.resources.bedrock.BedrockCustomizationJob",
   "aws.mirror-target": "c7n.resources.vpc.TrafficMirrorTarget",
   "aws.ml-model": "c7n.resources.ml.MLModel",
   "aws.nat-gateway": "c7n.resources.vpc.NATGateway",

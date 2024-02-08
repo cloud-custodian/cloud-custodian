@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from c7n.manager import resources
-from c7n.query import QueryResourceManager, TypeInfo
+from c7n.query import QueryResourceManager, TypeInfo, DescribeSource
 from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction
 from c7n.utils import local_session, type_schema
 from c7n.actions import BaseAction
@@ -121,3 +121,87 @@ class DeleteBedrockCustomModel(BaseAction):
               client.delete_custom_model(modelIdentifier=r['modelArn'])
             except client.exceptions.ResourceNotFoundException:
               continue
+
+
+class DescribeBedrockCustomizationJob(DescribeSource):
+
+    def augment(self, resources):
+        client = local_session(self.manager.session_factory).client('bedrock')
+
+        def _augment(r):
+            tags = client.list_tags_for_resource(resourceARN=r['jobArn'])['tags']
+            r['Tags'] = [{'Key': t['key'], 'Value':t['value']} for t in tags]
+            return r
+        resources = super().augment(resources)
+        return list(map(_augment, resources))
+
+    def get_resources(self, resource_ids, cache=True):
+        client = local_session(self.manager.session_factory).client('bedrock')
+        resources = []
+        for rid in resource_ids:
+            r = client.get_model_customization_job(jobIdentifier=rid)
+            if r.get('status') == 'InProgress':
+                resources.append(r)
+        return resources
+
+
+@resources.register('model-customization-job')
+class BedrockModelCustomizationJob(QueryResourceManager):
+    class resource_type(TypeInfo):
+        service = 'bedrock'
+        enum_spec = ('list_model_customization_jobs', 'modelCustomizationJobSummaries[]', {'statusEquals': 'InProgress'})
+        detail_spec = (
+            'get_model_customization_job', 'jobIdentifier', 'jobName', None)
+        name = "jobName"
+        id = arn = "jobArn"
+        permission_prefix = 'bedrock'
+
+    source_mapping = {
+        'describe': DescribeBedrockCustomizationJob
+    }
+
+
+@BedrockModelCustomizationJob.action_registry.register('tag')
+class TagModelCustomizationJob(Tag):
+    """Create tags on Bedrock model customization jobs
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+            - name: bedrock-model-customization-job-tag
+              resource: aws.model-customization-job
+              actions:
+                - type: tag
+                  key: test
+                  value: something
+    """
+    permissions = ('bedrock:TagResource',)
+
+    def process_resource_set(self, client, resources, new_tags):
+        tags = [{'key': item['Key'], 'value': item['Value']} for item in new_tags]
+        for r in resources:
+            client.tag_resource(resourceARN=r["jobArn"], tags=tags)
+
+
+@BedrockCustomModel.action_registry.register('remove-tag')
+class RemoveTagModelCustomizationJob(RemoveTag):
+    """Remove tags from Bedrock model customization jobs
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+            - name: bedrock-model-customization-job-remove-tag
+              resource: aws.model-customization-job
+              actions:
+                - type: remove-tag
+                  tags: ["tag-key"]
+    """
+    permissions = ('bedrock:UntagResource',)
+
+    def process_resource_set(self, client, resources, tags):
+        for r in resources:
+            client.untag_resource(resourceARN=r['jobArn'], tagKeys=tags)
