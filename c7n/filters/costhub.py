@@ -69,7 +69,7 @@ class CostHubRecommendation(Filter):
     }
 
     permissions = ('cost-optimization-hub:ListRecommendations',)
-    annotation = "c7n:cost_optimize"
+    annotation_key = "c7n:cost_optimize"
 
     def process(self, resources, event=None):
         client = local_session(self.manager.session_factory).client(
@@ -100,7 +100,7 @@ class CostHubRecommendation(Filter):
             if not frm.filter_resources([rec], event):
                 continue
             r = r_map[rec['resourceId']]
-            r[self.annotation] = rec
+            r[self.annotation_key] = rec
             results.add(rec['resourceId'])
         return [r for rid, r in r_map.items() if rid in results]
 
