@@ -32,15 +32,24 @@ class AppmeshMesh(QueryResourceManager):
 
         # https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsappmesh.html#awsappmesh-resources-for-iam-policies   # noqa
         # TODO: IS THIS EVEN USED AT RUNTIME?
-        arn_type = "mesh!!!!!"
+        # Junk value doesn't seem to affect the functionality of the extension
+        # but does fail the test PolicyMetaLint.test_valid_arn_type
+        # but that isn't a functional test.
+        arn_type = "mesh"
 
         # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-appmesh-virtualnode.html  # noqa
 
         # TODO: IS THIS EVEN USED AT RUNTIME?
-        cfn_type = 'AWS::AppMesh::Mesh!!!!!'
+        # Junk value doesn't seem to affect the functionality of the extension
+        # but does fail the test PolicyMetaLint.test_cfn_resource_validity
+        # but that isn't a functional test.
+        cfn_type = 'AWS::AppMesh::Mesh'
 
         # TODO: IS THIS EVEN USED AT RUNTIME?
-        config_type = 'AWS::AppMesh::Mesh!!!!!'
+        # Junk value doesn't seem to affect the functionality of the extension
+        # but does fail the test PolicyMetaLint.test_cfn_resource_validity
+        # but that isn't a functional test.
+        config_type = 'AWS::AppMesh::Mesh'
 
         # id: Names the field in the response that contains the identifier to use
         # in API calls to this service.
@@ -48,8 +57,6 @@ class AppmeshMesh(QueryResourceManager):
         # in the case of Appmesh" it needs to be the field that contains the
         # name of the mesh as that's what the appmesh API's expect.
         # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-appmesh-mesh.html   # noqa
-
-        # TODO: IS THIS EVEN USED AT RUNTIME?
         id = 'meshName'
 
         # TODO: IS THIS EVEN USED AT RUNTIME?
@@ -206,14 +213,23 @@ class AppmeshVirtualGateway(ChildResourceManager):
 
         # https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsappmesh.html#awsappmesh-resources-for-iam-policies  # noqa
         # TODO IS THIS EVEN USED AT RUNTIME?
-        arn_type = "mesh!!!!!"
+        # Junk value doesn't seem to affect the functionality of the extension
+        # but does fail the test PolicyMetaLint.test_valid_arn_type
+        # but that isn't a functional test.
+        arn_type = "mesh"
 
         # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-appmesh-virtualgateway.html  # noqa
         # TODO IS THIS EVEN USED AT RUNTIME?
-        cfn_type = 'AWS::AppMesh::VirtualGateway!!!!!!'
+        # Junk value doesn't seem to affect the functionality of the extension
+        # but does fail the test PolicyMetaLint.test_cfn_resource_validity
+        # but that isn't a functional test.
+        cfn_type = 'AWS::AppMesh::VirtualGateway'
 
         # TODO IS THIS EVEN USED AT RUNTIME?
-        config_type = 'AWS::AppMesh::VirtualGateway!!!!!!'
+        # Junk value doesn't seem to affect the functionality of the extension
+        # but does fail the test PolicyMetaLint.test_cfn_resource_validity
+        # but that isn't a functional test.
+        config_type = 'AWS::AppMesh::VirtualGateway'
 
         # if a resource type is supported by resource group tagging
         # api setting this value get tag filters/actions
