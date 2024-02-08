@@ -333,9 +333,9 @@ class UpdateLambda(Action):
     permissions = ("lambda:UpdateFunctionConfiguration",)
 
     def validate(self):
-        shape_validate(
-            self.data.get('properties', {}), 'UpdateFunctionConfigurationRequest', 'lambda'
-        )
+        props = self.data.get('properties', {})
+        props['FunctionName'] = 'validation'
+        shape_validate(props, 'UpdateFunctionConfigurationRequest', 'lambda')
 
     def process(self, resources):
         client = utils.local_session(self.manager.session_factory).client('lambda')
