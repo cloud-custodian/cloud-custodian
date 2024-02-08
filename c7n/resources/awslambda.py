@@ -312,7 +312,7 @@ class UpdateLambda(Action):
     """Update a lambda's configuration.
 
     This action also has specific support for enacting recommendations
-    from the AWS Cost Recommendation Hub for resizing.
+    from the AWS Cost Optimization Hub for resizing.
 
     :example:
 
@@ -322,7 +322,7 @@ class UpdateLambda(Action):
            - name: lambda-gc
              resource: aws.lambda
              filters:
-               - type: cost-recommendation
+               - type: cost-optimization
                  attrs:
                    - actionType: Rightsize
              actions:
