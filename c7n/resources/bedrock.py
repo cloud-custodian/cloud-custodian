@@ -149,7 +149,8 @@ class DescribeBedrockCustomizationJob(DescribeSource):
 class BedrockModelCustomizationJob(QueryResourceManager):
     class resource_type(TypeInfo):
         service = 'bedrock'
-        enum_spec = ('list_model_customization_jobs', 'modelCustomizationJobSummaries[]', {'statusEquals': 'InProgress'})
+        enum_spec = ('list_model_customization_jobs', 'modelCustomizationJobSummaries[]', {
+            'statusEquals': 'InProgress'})
         detail_spec = (
             'get_model_customization_job', 'jobIdentifier', 'jobName', None)
         name = "jobName"
