@@ -116,7 +116,7 @@ class TableContinuousBackupFilter(ValueFilter):
                 continue
 
     def __call__(self, r):
-        return super().__call__(r[self.annotation_key])
+        return super().__call__(r.get(self.annotation_key, {}))
 
 
 @Table.action_registry.register('set-continuous-backup')
@@ -183,6 +183,7 @@ class UpdateTable(BaseAction):
     schema = type_schema(
         'update',
         BillingMode={'enum': ['PROVISIONED', 'PAY_PER_REQUEST']},
+        DeletionProtectionEnabled={'enum': [True, False]},
         ProvisionedThroughput={'type': 'object',
             'properties': {
                 'ReadCapacityUnits': {'type': 'integer'},
@@ -222,10 +223,15 @@ class DeleteTable(BaseAction):
     """
 
     valid_status = ('ACTIVE',)
-    schema = type_schema('delete')
-    permissions = ("dynamodb:DeleteTable",)
+    schema = type_schema('delete',
+        force={'type': 'boolean', 'default': False})
+    permissions = ("dynamodb:UpdateTable", "dynamodb:DeleteTable",)
 
     def delete_table(self, client, table_set):
+        if self.data.get('force', False):
+            del_protection_updater = self.manager.action_registry['update'](
+                {'type': 'update', 'DeletionProtectionEnabled': False}, self.manager)
+            del_protection_updater.process(table_set)
         for t in table_set:
             client.delete_table(TableName=t['TableName'])
 

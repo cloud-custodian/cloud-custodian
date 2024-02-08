@@ -1,0 +1,109 @@
+{
+    "status_code": 200,
+    "data": {
+        "PendingMaintenanceActions": [
+            {
+                "ResourceIdentifier": "arn:aws:rds:us-west-2:644160558196:cluster:sreg-prd-primary-cluster",
+                "PendingMaintenanceActionDetails": [
+                    {
+                        "Action": "db-upgrade",
+                        "AutoAppliedAfterDate": {
+                            "__class__": "datetime",
+                            "year": 2023,
+                            "month": 12,
+                            "day": 22,
+                            "hour": 11,
+                            "minute": 2,
+                            "second": 0,
+                            "microsecond": 0
+                        },
+                        "CurrentApplyDate": {
+                            "__class__": "datetime",
+                            "year": 2023,
+                            "month": 12,
+                            "day": 22,
+                            "hour": 11,
+                            "minute": 2,
+                            "second": 0,
+                            "microsecond": 0
+                        },
+                        "Description": "Required upgrade to aurora-mysql 5.7.mysql_aurora.2.11.2"
+                    }
+                ]
+            },
+            {
+                "ResourceIdentifier": "arn:aws:rds:us-west-2:644160558196:db:apip-prdn0",
+                "PendingMaintenanceActionDetails": [
+                    {
+                        "Action": "system-update",
+                        "Description": "New Operating System patch is available"
+                    }
+                ]
+            },
+            {
+                "ResourceIdentifier": "arn:aws:rds:us-west-2:644160558196:db:apip-prdn1",
+                "PendingMaintenanceActionDetails": [
+                    {
+                        "Action": "system-update",
+                        "Description": "New Operating System patch is available"
+                    }
+                ]
+            },
+            {
+                "ResourceIdentifier": "arn:aws:rds:us-west-2:644160558196:db:apip-prdn2",
+                "PendingMaintenanceActionDetails": [
+                    {
+                        "Action": "system-update",
+                        "Description": "New Operating System patch is available"
+                    }
+                ]
+            },
+            {
+                "ResourceIdentifier": "arn:aws:rds:us-west-2:644160558196:db:ibadges-prdn0",
+                "PendingMaintenanceActionDetails": [
+                    {
+                        "Action": "system-update",
+                        "Description": "New Operating System patch is available"
+                    }
+                ]
+            },
+            {
+                "ResourceIdentifier": "arn:aws:rds:us-west-2:644160558196:db:ibadges-prdn1",
+                "PendingMaintenanceActionDetails": [
+                    {
+                        "Action": "system-update",
+                        "Description": "New Operating System patch is available"
+                    }
+                ]
+            },
+            {
+                "ResourceIdentifier": "arn:aws:rds:us-west-2:644160558196:db:tep-prdn0",
+                "PendingMaintenanceActionDetails": [
+                    {
+                        "Action": "system-update",
+                        "Description": "New Operating System patch is available"
+                    }
+                ]
+            },
+            {
+                "ResourceIdentifier": "arn:aws:rds:us-west-2:644160558196:db:tep-prdn1",
+                "PendingMaintenanceActionDetails": [
+                    {
+                        "Action": "system-update",
+                        "Description": "New Operating System patch is available"
+                    }
+                ]
+            },
+            {
+                "ResourceIdentifier": "arn:aws:rds:us-west-2:644160558196:db:tep-prdn2",
+                "PendingMaintenanceActionDetails": [
+                    {
+                        "Action": "system-update",
+                        "Description": "New Operating System patch is available"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

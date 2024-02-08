@@ -1,0 +1,22 @@
+{
+    "status_code": 200,
+    "data": {
+        "TrailARN": "arn:aws:cloudtrail:us-east-1:644160558196:trail/data-events",
+        "EventSelectors": [
+            {
+                "ReadWriteType": "WriteOnly",
+                "IncludeManagementEvents": false,
+                "DataResources": [
+                    {
+                        "Type": "AWS::S3::Object",
+                        "Values": [
+                            "arn:aws:s3:::bucket-with-data-events/"
+                        ]
+                    }
+                ],
+                "ExcludeManagementEventSources": []
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

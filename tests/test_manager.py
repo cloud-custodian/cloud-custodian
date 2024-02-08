@@ -119,16 +119,23 @@ class TestEC2Manager(BaseTest):
         ec2_mgr = self.load_policy({
             'name': 'xyz',
             'resource': 'aws.ec2',
-            "query": [{"tag-key": "CMDBEnvironment"}],
+            "query": [
+                {"instance-state-name": "stopped"},
+                {"tag-key": "CMDBEnvironment"}, {"tag-key": "Owner"}],
             "filters": [{"tag:ASV": "absent"}]}
         ).resource_manager
 
+        source = ec2_mgr.get_source(ec2_mgr.source_type)
         self.assertEqual(len(ec2_mgr.filters), 1)
-        self.assertEqual(len(ec2_mgr.queries), 1)
+
+        qf = source.get_query_params(None)
         self.assertEqual(
-            ec2_mgr.resource_query(),
-            [{"Values": ["CMDBEnvironment"], "Name": "tag-key"}],
-        )
+            qf,
+            {'Filters': [
+                {"Values": ["stopped"], "Name": "instance-state-name"},
+                {"Values": ["CMDBEnvironment", "Owner"], "Name": "tag-key"},
+            ]
+        })
 
     def test_filters(self):
         ec2 = self.load_policy({

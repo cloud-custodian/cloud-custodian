@@ -1,0 +1,17 @@
+{
+    "status_code": 200,
+    "data": {
+        "Reservations": [
+            {
+                "Groups": [],
+                "Instances": [
+                    {
+                        "InstanceId": "i-0ccca83be31e1577b",
+                        "KeyName": "dont delete"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

@@ -1,0 +1,53 @@
+# AWS Client Side Monitoring
+# You can use vector.dev to help monitor api calls of policy execution
+#
+# vector --config vector.toml
+#
+# you'll also need to export environment variables before running custodian
+#
+# ```shell
+# export AWS_CSM_PORT=31000
+# export AWS_CSM_ENABLED=true
+# ```
+#
+# and then run custodian normally
+
+
+[sources.aws_csm]
+type = "socket"
+address = "0.0.0.0:31000"
+max_length = 102_400
+mode = "udp"
+
+[transforms.aws_api_parse]
+type = "remap"
+inputs = [ "aws_csm" ]
+source = """
+. = parse_json!(.message)
+del(.SessionToken)
+# todo: figure out parsing nano seconds for to_timestamp or equiv.
+.Timestamp = now()
+"""
+
+
+[transforms.aws_api_filter]
+type = "filter"
+inputs = ["aws_api_parse"]
+condition = '.Type != "ApiCallAttempt" && .Service != "SSO"'
+
+
+[transforms.aws_console_format]
+type = "remap"
+inputs = [ "aws_api_filter" ]
+source = """
+.message = join!(["aws -", downcase!(.ClientId), "->", join!([.Service, ".", .Api])], separator: " ")
+"""
+
+
+[sinks.console]
+inputs = ["aws_console_format"]
+type = "console"
+
+
+[sinks.console.encoding]
+codec = "text"

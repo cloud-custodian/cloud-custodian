@@ -1,0 +1,96 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "experiment": {
+            "id": "EXP23yEZKCzYqWPQ7W2",
+            "experimentTemplateId": "EXT2oY9nKDt8iK4L",
+            "roleArn": "arn:aws:iam::644160558196:role/aws-service-role/fis.amazonaws.com/AWSServiceRoleForFIS",
+            "state": {
+                "status": "failed",
+                "reason": "Unable to stop all targets. Not enough privileges to perform the required action."
+            },
+            "targets": {
+                "c7n-test-ec2": {
+                    "resourceType": "aws:ec2:instance",
+                    "resourceTags": {
+                        "Name": "c7n-test-ec2"
+                    },
+                    "selectionMode": "ALL"
+                }
+            },
+            "actions": {
+                "c7n-test-fis-experiment-action": {
+                    "actionId": "aws:ec2:stop-instances",
+                    "description": "c7n-test-fis-experiment-action",
+                    "parameters": {},
+                    "targets": {
+                        "Instances": "c7n-test-ec2"
+                    },
+                    "state": {
+                        "status": "failed",
+                        "reason": "Unable to stop all targets. Not enough privileges to perform the required action."
+                    },
+                    "startTime": {
+                        "__class__": "datetime",
+                        "year": 2023,
+                        "month": 4,
+                        "day": 5,
+                        "hour": 9,
+                        "minute": 58,
+                        "second": 23,
+                        "microsecond": 125000
+                    },
+                    "endTime": {
+                        "__class__": "datetime",
+                        "year": 2023,
+                        "month": 4,
+                        "day": 5,
+                        "hour": 9,
+                        "minute": 58,
+                        "second": 23,
+                        "microsecond": 125000
+                    }
+                }
+            },
+            "stopConditions": [
+                {
+                    "source": "none"
+                }
+            ],
+            "creationTime": {
+                "__class__": "datetime",
+                "year": 2023,
+                "month": 4,
+                "day": 5,
+                "hour": 9,
+                "minute": 58,
+                "second": 11,
+                "microsecond": 261000
+            },
+            "startTime": {
+                "__class__": "datetime",
+                "year": 2023,
+                "month": 4,
+                "day": 5,
+                "hour": 9,
+                "minute": 58,
+                "second": 11,
+                "microsecond": 628000
+            },
+            "endTime": {
+                "__class__": "datetime",
+                "year": 2023,
+                "month": 4,
+                "day": 5,
+                "hour": 9,
+                "minute": 58,
+                "second": 23,
+                "microsecond": 648000
+            },
+            "tags": {
+                "foo": "bar"
+            }
+        }
+    }
+}

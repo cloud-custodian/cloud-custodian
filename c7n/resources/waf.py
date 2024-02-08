@@ -15,7 +15,24 @@ class DescribeRegionalWaf(DescribeSource):
 
 class DescribeWafV2(DescribeSource):
     def augment(self, resources):
-        return universal_augment(self.manager, resources)
+        client = local_session(self.manager.session_factory).client(
+            'wafv2',
+            region_name=self.manager.region
+        )
+
+        def _detail(webacl):
+            response = client.get_web_acl(
+                Name=webacl['Name'],
+                Id=webacl['Id'],
+                Scope=webacl['Scope']
+            )
+            detail = response.get('WebACL', {})
+
+            return {**webacl, **detail}
+
+        with_tags = universal_augment(self.manager, resources)
+
+        return list(map(_detail, with_tags))
 
     # set REGIONAL for Scope as default
     def get_query_params(self, query):
@@ -26,6 +43,28 @@ class DescribeWafV2(DescribeSource):
         else:
             q = {'Scope': 'REGIONAL'}
         return q
+
+    def resources(self, query):
+        scope = (query or {}).get('Scope', 'REGIONAL')
+
+        # The AWS API does not include the scope as part of the WebACL information, but scope
+        # is a required parameter for most API calls - we augment the resource with the desired
+        # scope here in order to use it downstream for API calls
+        return [
+            { 'Scope': scope, **r }
+            for r in super().resources(query)
+        ]
+
+    def get_resources(self, ids):
+        params = self.get_query_params(None)
+        scope = (params or {}).get('Scope', 'REGIONAL')
+
+        resources = self.query.filter(self.manager, **params)
+        return [
+            { 'Scope': scope, **r }
+            for r in resources
+            if r[self.manager.resource_type.id] in ids
+        ]
 
 
 @resources.register('waf')
@@ -43,6 +82,7 @@ class WAF(QueryResourceManager):
         # override defaults to casing issues
         permissions_enum = ('waf:ListWebACLs',)
         permissions_augment = ('waf:GetWebACL',)
+        global_resource = True
 
 
 @resources.register('waf-regional')
@@ -54,6 +94,7 @@ class RegionalWAF(QueryResourceManager):
         detail_spec = ("get_web_acl", "WebACLId", "WebACLId", "WebACL")
         name = "Name"
         id = "WebACLId"
+        arn = "WebACLArn"
         dimension = "WebACL"
         cfn_type = config_type = "AWS::WAFRegional::WebACL"
         arn_type = "webacl"
@@ -77,6 +118,7 @@ class WAFV2(QueryResourceManager):
         detail_spec = ("get_web_acl", "Id", "Id", "WebACL")
         name = "Name"
         id = "Id"
+        arn = "ARN"
         dimension = "WebACL"
         cfn_type = config_type = "AWS::WAFv2::WebACL"
         arn_type = "webacl"

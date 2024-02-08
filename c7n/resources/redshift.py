@@ -2,7 +2,6 @@
 # SPDX-License-Identifier: Apache-2.0
 import json
 import itertools
-import jmespath
 
 from botocore.exceptions import ClientError
 from concurrent.futures import as_completed
@@ -10,7 +9,7 @@ from concurrent.futures import as_completed
 from c7n.actions import BaseAction, ModifyVpcSecurityGroupsAction
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import (
-    ValueFilter, DefaultVpcBase, AgeFilter, CrossAccountAccessFilter, Filter)
+    ValueFilter, AgeFilter, CrossAccountAccessFilter, Filter)
 import c7n.filters.vpc as net_filters
 from c7n.filters.kms import KmsRelatedFilter
 from c7n.filters.offhours import OffHour, OnHour
@@ -19,7 +18,7 @@ from c7n.resolver import ValuesFrom
 from c7n.query import QueryResourceManager, TypeInfo, RetryPageIterator
 from c7n import tags
 from c7n.utils import (
-    type_schema, local_session, chunks, snapshot_identifier)
+    type_schema, local_session, chunks, snapshot_identifier, jmespath_search)
 from .aws import shape_validate
 from datetime import datetime, timedelta
 from c7n.filters.backup import ConsecutiveAwsBackupsFilter
@@ -49,7 +48,7 @@ Redshift.filter_registry.register('consecutive-aws-backups', ConsecutiveAwsBacku
 
 
 @Redshift.filter_registry.register('default-vpc')
-class DefaultVpc(DefaultVpcBase):
+class DefaultVpc(net_filters.DefaultVpcBase):
     """ Matches if an redshift database is in the default vpc
 
     :example:
@@ -625,7 +624,7 @@ class RedshiftSetAttributes(BaseAction):
             modify = {}
             for k, v in config.items():
                 if ((k in self.cluster_mapping and
-                v != jmespath.search(self.cluster_mapping[k], cluster)) or
+                v != jmespath_search(self.cluster_mapping[k], cluster)) or
                 v != cluster.get('PendingModifiedValues', {}).get(k, cluster.get(k))):
                     modify[k] = v
             if not modify:
@@ -807,7 +806,7 @@ class RedshiftSnapshot(QueryResourceManager):
         enum_spec = ('describe_cluster_snapshots', 'Snapshots', None)
         name = id = 'SnapshotIdentifier'
         date = 'SnapshotCreateTime'
-        config_type = cfn_type = "AWS::Redshift::ClusterSnapshot"
+        config_type = "AWS::Redshift::ClusterSnapshot"
         universal_taggable = True
 
     def get_arns(self, resources):

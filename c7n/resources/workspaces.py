@@ -2,16 +2,15 @@
 # SPDX-License-Identifier: Apache-2.0
 import functools
 import itertools
-import jmespath
 
 from c7n.actions import BaseAction
 from c7n.filters import ValueFilter
 from c7n.filters.kms import KmsRelatedFilter
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, TypeInfo, DescribeSource, ConfigSource
-from c7n.tags import universal_augment
+from c7n.tags import universal_augment, Tag, RemoveTag
 from c7n.exceptions import PolicyValidationError, PolicyExecutionError
-from c7n.utils import get_retry, local_session, type_schema, chunks
+from c7n.utils import get_retry, local_session, type_schema, chunks, jmespath_search
 from c7n.filters.iamaccess import CrossAccountAccessFilter
 from c7n.resolver import ValuesFrom
 import c7n.filters.vpc as net_filters
@@ -271,7 +270,7 @@ class WorkspacesDirectorySG(net_filters.SecurityGroupFilter):
         sg_ids = set()
         for r in resources:
             for exp in self.expressions:
-                id = jmespath.search(exp, r)
+                id = jmespath_search(exp, r)
                 if id:
                     sg_ids.add(id)
         return list(sg_ids)
@@ -459,3 +458,108 @@ class DeregisterWorkspaceDirectory(BaseAction):
                 'The following directories must be removed from WorkSpaces'
                 'and cannot be deregistered: %s ' % ''.join(map(str, exceptions))
             )
+
+@resources.register('workspaces-web')
+class WorkspacesWeb(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'workspaces-web'
+        enum_spec = ('list_portals', 'portals', None)
+        arn_type = 'portal'
+        name = 'displayName'
+        arn = id = "portalArn"
+
+    augment = universal_augment
+
+@WorkspacesWeb.action_registry.register('tag')
+class TagWorkspacesWebResource(Tag):
+    """Create tags on a Workspaces Web portal
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+            - name: tag-workspaces-web
+              resource: workspaces-web
+              actions:
+                - type: tag
+                  key: test-key
+                  value: test-value
+    """
+    permissions = ('workspaces-web:TagResource',)
+
+    def process_resource_set(self, client, resources, new_tags):
+        for r in resources:
+            client.tag_resource(resourceArn=r["portalArn"], tags=new_tags)
+
+@WorkspacesWeb.action_registry.register('remove-tag')
+class RemoveTagWorkspacesWebResource(RemoveTag):
+    """Remove tags from a Workspaces Web portal
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+            - name: remove-tag-workspaces-web
+              resource: workspaces-web
+              actions:
+                - type: remove-tag
+                  tags: ["tag-key"]
+    """
+    permissions = ('workspaces-web:UntagResource',)
+
+    def process_resource_set(self, client, resources, tags):
+        for r in resources:
+            client.untag_resource(resourceArn=r['portalArn'], tagKeys=tags)
+
+@WorkspacesWeb.action_registry.register('delete')
+class DeleteWorkspacesWeb(BaseAction):
+    """Delete a WorkSpaces Web portal
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: delete-workspaces-web
+            resource: workspaces-web
+            actions:
+              - type: delete
+    """
+    schema = type_schema('delete')
+    permissions = (
+        'workspaces-web:DeletePortal',
+        'workspaces-web:DisassociateNetworkSettings',
+        'workspaces-web:DisassociateBrowserSettings',
+        'workspaces-web:DisassociateUserSettings'
+    )
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('workspaces-web')
+        for r in resources:
+            self.disassociate_settings(client, r, 'networkSettingsArn',
+                                       'disassociate_network_settings')
+            self.disassociate_settings(client, r, 'browserSettingsArn',
+                                       'disassociate_browser_settings')
+            self.disassociate_settings(client, r, 'userSettingsArn',
+                                       'disassociate_user_settings')
+            self.delete_portal(client, r)
+
+    def disassociate_settings(self, client, resource, setting_arn_key, disassociate_method_name):
+        setting_arn = resource.get(setting_arn_key)
+        if setting_arn:
+            disassociate_method = getattr(client, disassociate_method_name)
+            try:
+                disassociate_method(portalArn=resource["portalArn"])
+            except client.exceptions.ResourceNotFoundException:
+                pass
+            except Exception as e:
+                self.log.error(
+                    "Failed to disassociate %s for portal %s: %s",
+                    setting_arn_key, resource['portalArn'], str(e)
+                )
+
+    def delete_portal(self, client, resource):
+        client.delete_portal(portalArn=resource['portalArn'])

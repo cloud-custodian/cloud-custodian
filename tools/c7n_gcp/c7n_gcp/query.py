@@ -1,10 +1,11 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
-import jmespath
 import json
 import itertools
 import logging
+import re
+import jmespath
 
 from googleapiclient.errors import HttpError
 
@@ -12,7 +13,7 @@ from c7n.actions import ActionRegistry
 from c7n.filters import FilterRegistry
 from c7n.manager import ResourceManager
 from c7n.query import sources, MaxResourceLimit
-from c7n.utils import local_session, chunks
+from c7n.utils import local_session, chunks, jmespath_search, jmespath_compile
 
 
 log = logging.getLogger('c7n_gcp.query')
@@ -53,12 +54,12 @@ class ResourceQuery:
         if client.supports_pagination(enum_op):
             results = []
             for page in client.execute_paged_query(enum_op, params):
-                page_items = jmespath.search(path, page)
+                page_items = jmespath_search(path, page)
                 if page_items:
                     results.extend(page_items)
             return results
         else:
-            return jmespath.search(path,
+            return jmespath_search(path,
                 client.execute_query(enum_op, verb_arguments=params))
 
 
@@ -154,8 +155,8 @@ class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
     type: str
     resource_type: 'TypeInfo'
 
-    def __init__(self, data, options):
-        super(QueryResourceManager, self).__init__(data, options)
+    def __init__(self, ctx, data):
+        super(QueryResourceManager, self).__init__(ctx, data)
         self.source = self.get_source(self.source_type)
 
     def get_permissions(self):
@@ -326,8 +327,24 @@ class ChildResourceManager(QueryResourceManager):
 
         for mapping in mappings:
             result[mapping[1]] = jmespath.search(mapping[0], source)
+            # Support for regex in child_enum_params.
+            # Without this support you could only map parent-child elements with the raw data
+            # they hold, but with regex you could regex that data as well while you map.
+            if 'regex' in mapping:
+                result[mapping[1]] = re.search(mapping[3],result[mapping[1]]).group(1)
 
         return result
+
+
+class RegionalResourceManager(ChildResourceManager):
+
+    def get_parent_resource_query(self):
+        query = None
+        if self.config.regions and 'all' not in self.config.regions:
+            query = [{'name': r} for r in self.config.regions]
+        elif self.config.region:
+            query = [{'name': self.config.region}]
+        return query
 
 
 class TypeMeta(type):
@@ -391,6 +408,9 @@ class TypeInfo(metaclass=TypeMeta):
     # The location element is a zone, not a region.
     urn_zonal = False
 
+    # If the type supports refreshing an individual resource
+    refresh = None
+
     @classmethod
     def get_metric_resource_name(cls, resource):
         return resource.get(cls.name)
@@ -432,7 +452,7 @@ class TypeInfo(metaclass=TypeMeta):
         path = cls.urn_id_path
         if path is None:
             path = cls.id
-        id = jmespath.search(path, resource)
+        id = jmespath_search(path, resource)
         if cls.urn_id_segments:
             parts = id.split('/')
             id = '/'.join([parts[index] for index in cls.urn_id_segments])
@@ -470,9 +490,9 @@ class ChildTypeInfo(TypeInfo):
         return resource[cls.get_parent_annotation_key()]
 
 
-ERROR_REASON = jmespath.compile('error.errors[0].reason')
-ERROR_CODE = jmespath.compile('error.code')
-ERROR_MESSAGE = jmespath.compile('error.message')
+ERROR_REASON = jmespath_compile('error.errors[0].reason')
+ERROR_CODE = jmespath_compile('error.code')
+ERROR_MESSAGE = jmespath_compile('error.message')
 
 
 def extract_errors(e):

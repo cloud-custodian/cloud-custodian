@@ -12,9 +12,12 @@ from c7n.exceptions import PolicyExecutionError, PolicyValidationError
 from c7n.utils import yaml_load
 
 from .common import BaseTest
+
+import pytest
 from pytest_terraform import terraform
 
 
+@pytest.mark.audited
 @terraform('tag_action_filter_call')
 def test_tag_action_filter_call(test, tag_action_filter_call):
     aws_region = 'us-east-1'
@@ -44,6 +47,8 @@ def test_tag_action_filter_call(test, tag_action_filter_call):
     test.assertEqual(len(resources), 1)
 
     stopped_ec2_instance_id = tag_action_filter_call['aws_instance.past_stop.id']
+    if test.recording:
+       time.sleep(0.25)
     ec2 = session_factory().resource('ec2')
     instance = ec2.Instance(stopped_ec2_instance_id)
     test.assertEqual(instance.state['Name'], 'stopping')
@@ -77,6 +82,7 @@ class TagInterpolationTest(BaseTest):
             },
             session_factory=mock_factory,
         )
+        policy.expand_variables(policy.get_variables())
         policy.resource_manager.actions[0].process(resources)
 
         return (create_tags, tag_resources)

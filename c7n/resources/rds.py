@@ -35,7 +35,6 @@ import functools
 import itertools
 import logging
 import operator
-import jmespath
 import re
 import datetime
 
@@ -43,7 +42,7 @@ from datetime import timedelta
 
 from decimal import Decimal as D, ROUND_HALF_UP
 
-from distutils.version import LooseVersion
+from c7n.vendored.distutils.version import LooseVersion
 from botocore.exceptions import ClientError
 from concurrent.futures import as_completed
 
@@ -54,6 +53,7 @@ from c7n.exceptions import PolicyValidationError
 from c7n.filters import (
     CrossAccountAccessFilter, FilterRegistry, Filter, ValueFilter, AgeFilter)
 from c7n.filters.offhours import OffHour, OnHour
+from c7n.filters import related
 import c7n.filters.vpc as net_filters
 from c7n.manager import resources
 from c7n.query import (
@@ -63,9 +63,10 @@ from c7n.tags import universal_augment
 
 from c7n.utils import (
     local_session, type_schema, get_retry, chunks, snapshot_identifier,
-    merge_dict_list, filter_empty)
+    merge_dict_list, filter_empty, jmespath_search)
 from c7n.resources.kms import ResourceKmsKeyAlias
 from c7n.resources.securityhub import PostFinding
+from c7n.filters.backup import ConsecutiveAwsBackupsFilter
 
 log = logging.getLogger('custodian.rds')
 
@@ -563,7 +564,8 @@ class Delete(BaseAction):
 
     def process(self, dbs):
         skip = self.data.get('skip-snapshot', False)
-
+        # Can't delete an instance in an aurora cluster, use a policy on the cluster
+        dbs = [r for r in dbs if not r.get('DBClusterIdentifier')]
         # Concurrency feels like overkill here.
         client = local_session(self.manager.session_factory).client('rds')
         for db in dbs:
@@ -1044,7 +1046,7 @@ class RDSSnapshot(QueryResourceManager):
         enum_spec = ('describe_db_snapshots', 'DBSnapshots', None)
         name = id = 'DBSnapshotIdentifier'
         date = 'SnapshotCreateTime'
-        config_type = cfn_type = "AWS::RDS::DBSnapshot"
+        config_type = "AWS::RDS::DBSnapshot"
         filter_name = "DBSnapshotIdentifier"
         filter_type = "scalar"
         universal_taggable = True
@@ -1059,6 +1061,33 @@ class RDSSnapshot(QueryResourceManager):
 @RDSSnapshot.filter_registry.register('onhour')
 class RDSSnapshotOnHour(OnHour):
     """Scheduled action on rds snapshot."""
+
+
+@RDSSnapshot.filter_registry.register('instance')
+class SnapshotInstance(related.RelatedResourceFilter):
+    """Filter snapshots by their database attributes.
+
+    :example:
+
+      Find snapshots without an extant database
+
+    .. code-block:: yaml
+
+       policies:
+         - name: rds-snapshot-orphan
+           resource: aws.rds-snapshot
+           filters:
+            - type: instance
+              value: 0
+              value_type: resource_count
+    """
+    schema = type_schema(
+        'instance', rinherit=ValueFilter.schema
+    )
+
+    RelatedResource = "c7n.resources.rds.RDS"
+    RelatedIdsExpression = "DBInstanceIdentifier"
+    FetchThreshold = 5
 
 
 @RDSSnapshot.filter_registry.register('latest')
@@ -1637,8 +1666,8 @@ class UnusedRDSSubnetGroup(Filter):
 
     def process(self, configs, event=None):
         rds = self.manager.get_resource_manager('rds').resources()
-        self.used = set(jmespath.search('[].DBSubnetGroup.DBSubnetGroupName', rds))
-        self.used.update(set(jmespath.search('[].DBSubnetGroup.DBSubnetGroupName',
+        self.used = set(jmespath_search('[].DBSubnetGroup.DBSubnetGroupName', rds))
+        self.used.update(set(jmespath_search('[].DBSubnetGroup.DBSubnetGroupName',
             self.manager.get_resource_manager('rds-cluster').resources(augment=False))))
         return super(UnusedRDSSubnetGroup, self).process(configs)
 
@@ -1861,7 +1890,7 @@ class ModifyDb(BaseAction):
                 u['property']: u['value'] for u in self.data.get('update')
                 if r.get(
                     u['property'],
-                    jmespath.search(
+                    jmespath_search(
                         self.conversion_map.get(u['property'], 'None'), r))
                     != u['value']}
             if not param:
@@ -1876,6 +1905,18 @@ class ModifyDb(BaseAction):
 
 @resources.register('rds-reserved')
 class ReservedRDS(QueryResourceManager):
+    """Lists all active rds reservations
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: existing-rds-reservations
+                resource: rds-reserved
+                filters:
+                    - State: active
+    """
 
     class resource_type(TypeInfo):
         service = 'rds'
@@ -1891,6 +1932,9 @@ class ReservedRDS(QueryResourceManager):
         universal_taggable = object()
 
     augment = universal_augment
+
+
+RDS.filter_registry.register('consecutive-aws-backups', ConsecutiveAwsBackupsFilter)
 
 
 @filters.register('consecutive-snapshots')
@@ -1931,7 +1975,7 @@ class ConsecutiveSnapshots(Filter):
         client = local_session(self.manager.session_factory).client('rds')
         results = []
         retention = self.data.get('days')
-        utcnow = datetime.utcnow()
+        utcnow = datetime.datetime.utcnow()
         expected_dates = set()
         for days in range(1, retention + 1):
             expected_dates.add((utcnow - timedelta(days=days)).strftime('%Y-%m-%d'))
@@ -2032,7 +2076,7 @@ class RDSProxy(QueryResourceManager):
         enum_spec = ('describe_db_proxies', 'DBProxies', None)
         arn = 'DBProxyArn'
         arn_type = 'db-proxy'
-        cfn_type = config_type = 'AWS::RDS::DBInstance'
+        cfn_type = 'AWS::RDS::DBProxy'
         permissions_enum = ('rds:DescribeDBProxies',)
         universal_taggable = object()
 
@@ -2042,9 +2086,62 @@ class RDSProxy(QueryResourceManager):
     }
 
 
+@RDSProxy.action_registry.register('delete')
+class DeleteRDSProxy(BaseAction):
+    """
+    Deletes a RDS Proxy
+
+    :example:
+
+    .. code-block:: yaml
+
+      policies:
+        - name: delete-rds-proxy
+          resource: aws.rds-proxy
+          filters:
+            - type: value
+              key: "DBProxyName"
+              op: eq
+              value: "proxy-test-1"
+          actions:
+            - type: delete
+    """
+
+    schema = type_schema('delete')
+
+    permissions = ('rds:DeleteDBProxy',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('rds')
+        for r in resources:
+            self.manager.retry(
+                client.delete_db_proxy, DBProxyName=r['DBProxyName'],
+                ignore_err_codes=('DBProxyNotFoundFault',
+                'InvalidDBProxyStateFault'))
+
+
+@RDSProxy.filter_registry.register('subnet')
+class RDSProxySubnetFilter(net_filters.SubnetFilter):
+
+    RelatedIdsExpression = "VpcSubnetIds[]"
+
+
+@RDSProxy.filter_registry.register('security-group')
+class RDSProxySecurityGroupFilter(net_filters.SecurityGroupFilter):
+
+    RelatedIdsExpression = "VpcSecurityGroupIds[]"
+
+@RDSProxy.filter_registry.register('vpc')
+class RDSProxyVpcFilter(net_filters.VpcFilter):
+
+    RelatedIdsExpression = "VpcId"
+
+
 @filters.register('db-option-groups')
 class DbOptionGroups(ValueFilter):
     """This filter describes RDS option groups for associated RDS instances.
+    Use this filter in conjunction with jmespath and value filter operators
+    to filter RDS instance based on their option groups
 
     :example:
 
@@ -2055,9 +2152,11 @@ class DbOptionGroups(ValueFilter):
             resource: aws.rds
             filters:
               - type: db-option-groups
-                key: OptionName
-                value: NATIVE_NETWORK_ENCRYPTION
-                op: eq
+                key: Options[].OptionName
+                op: intersect
+                value:
+                  - SSL
+                  - NATIVE_NETWORK_ENCRYPTION
 
     :example:
 
@@ -2069,7 +2168,7 @@ class DbOptionGroups(ValueFilter):
             filters:
               - Engine: oracle-ee
               - type: db-option-groups
-                key: OptionSettings[?Name == 'SQLNET.ENCRYPTION_SERVER'].Value
+                key: Options[].OptionSettings[?Name == 'SQLNET.ENCRYPTION_SERVER'].Value[]
                 value:
                   - REQUIRED
     """
@@ -2093,14 +2192,13 @@ class DbOptionGroups(ValueFilter):
                 if og_values is not None:
                     ogcache[og] = og_values
                     continue
-                option_list = list(itertools.chain(*[p['OptionGroupsList']
+                option_groups_list = list(itertools.chain(*[p['OptionGroupsList']
                     for p in paginator.paginate(OptionGroupName=og)]))
 
                 ogcache[og] = {}
-                for option in option_list:
-                    if option['Options']:
-                        for p in option['Options']:
-                            ogcache[og].update(p)
+                for option_group in option_groups_list:
+                    ogcache[og] = option_group
+
                 cache.save(cache_key, ogcache[og])
 
         return ogcache
@@ -2118,10 +2216,53 @@ class DbOptionGroups(ValueFilter):
                 og_values = optioncache[og['OptionGroupName']]
                 if self.match(og_values):
                     resource.setdefault(self.policy_annotation, []).append({
-                        k: jmespath.search(k, og_values)
-                        for k in {'OptionName', self.data.get('key')}
+                        k: jmespath_search(k, og_values)
+                        for k in {'OptionGroupName', self.data.get('key')}
                     })
                     results.append(resource)
                     break
+
+        return results
+
+
+@filters.register('pending-maintenance')
+class PendingMaintenance(Filter):
+    """Scan DB instances for those with pending maintenance
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: rds-pending-maintenance
+            resource: aws.rds
+            filters:
+              - pending-maintenance
+              - type: value
+                key: '"c7n:PendingMaintenance"[].PendingMaintenanceActionDetails[].Action'
+                op: intersect
+                value:
+                  - system-update
+    """
+
+    annotation_key = 'c7n:PendingMaintenance'
+    schema = type_schema('pending-maintenance')
+    permissions = ('rds:DescribePendingMaintenanceActions',)
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('rds')
+
+        results = []
+        resource_maintenances = {}
+        paginator = client.get_paginator('describe_pending_maintenance_actions')
+        for page in paginator.paginate():
+            for action in page['PendingMaintenanceActions']:
+                resource_maintenances.setdefault(action['ResourceIdentifier'], []).append(action)
+
+        for r in resources:
+            pending_maintenances = resource_maintenances.get(r['DBInstanceArn'], [])
+            if len(pending_maintenances) > 0:
+                r[self.annotation_key] = pending_maintenances
+                results.append(r)
 
         return results

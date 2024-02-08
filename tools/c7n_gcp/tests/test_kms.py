@@ -1,7 +1,7 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
-
 from gcp_common import BaseTest, event_data
+from pytest_terraform import terraform
 
 
 class KmsKeyRingTest(BaseTest):
@@ -108,6 +108,26 @@ class KmsKeyRingTest(BaseTest):
                 'gcp:cloudkms:us-central1:cloud-custodian:keyring/cloud-custodian',
             ],
         )
+
+    def test_kms_keyring_filter_iam_query(self):
+        project_id = 'cloud-custodian'
+        factory = self.replay_flight_data('kms-keyring-filter-iam', project_id=project_id)
+        p = self.load_policy({
+            'name': 'kms-keyring-filter-iam',
+            'resource': 'gcp.kms-keyring',
+            'filters': [{
+                'type': 'iam-policy',
+                'doc': {'key': 'bindings[*].members[]',
+                        'op': 'intersect',
+                        'value': ['allUsers', 'allAuthenticatedUsers']}
+            }]
+        }, session_factory=factory)
+        resources = p.run()
+
+        self.assertEqual(1, len(resources))
+        self.assertEqual(
+            'projects/cloud-custodian/locations/us-central1/keyRings/custodian-test-keyring',
+            resources[0]['name'])
 
 
 class KmsCryptoKeyTest(BaseTest):
@@ -284,3 +304,38 @@ class KmsCryptoKeyVersionTest(BaseTest):
                 'gcp:cloudkms:us-central1:cloud-custodian:cryptokey-version/cloud-custodian/cloud-custodian/1',  # noqa: E501
             ],
         )
+
+
+@terraform('kms_location')
+def test_kms_keyring_filter(test, kms_location):
+    session_factory = test.replay_flight_data('kms-keyring-filter')
+    policy = test.load_policy({
+        'name': 'kms-location',
+        'resource': 'gcp.kms-location',
+        'filters': [{
+            'name':
+                f'projects/{kms_location["google_kms_key_ring.c7n.project"]}/locations/us-central1'},
+            {
+            'not': [{
+                    'type': 'keyring',
+                    'exist': True}]}]
+    }, session_factory=session_factory)
+
+    resources = policy.run()
+    assert len(resources) == 0
+
+    policy = test.load_policy({
+        'name': 'kms-location',
+        'resource': 'gcp.kms-location',
+        'filters': [{
+            'name':
+                f'projects/{kms_location["google_kms_key_ring.c7n.project"]}/locations/us-west1'},
+            {
+            'not': [{
+                    'type': 'keyring',
+                    'exist': True}]}]
+    }, session_factory=session_factory)
+
+    resources = policy.run()
+    assert len(resources) == 1
+    assert resources[0]['name'] == 'projects/cloud-custodian/locations/us-west1'

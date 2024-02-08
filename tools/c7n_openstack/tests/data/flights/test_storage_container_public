@@ -1,0 +1,400 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept:
+      - application/json
+      Content-Type:
+      - application/json
+    method: GET
+    uri: http://keystone:5000/
+  response:
+    body:
+      string: '{"versions": {"values": [{"id": "v3.14", "status": "stable", "updated":
+        "2020-04-07T00:00:00Z", "links": [{"rel": "self", "href": "http://127.0.0.1:5000/v3/"}],
+        "media-types": [{"base": "application/json", "type": "application/vnd.openstack.identity-v3+json"}]}]}}'
+    headers:
+      Content-Type:
+      - application/json
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - application/json
+      Content-Type:
+      - application/json
+    method: POST
+    uri: http://keystone:5000/v3/auth/tokens
+  response:
+    body:
+      string: '{"token": {"methods": ["password"], "user": {"domain": {"id": "default",
+        "name": "Default"}, "id": "58e8dcfcbc8a45879bc566b2935ba5e4", "name": "admin",
+        "password_expires_at": null}, "audit_ids": ["MPTuwclRTSO0W5r3tQVPVQ"], "expires_at":
+        "2023-11-13T16:58:19.000000Z", "issued_at": "2023-11-13T15:58:19.000000Z",
+        "project": {"domain": {"id": "default", "name": "Default"}, "id": "314a347c744349479e901e57922b70e5",
+        "name": "demo"}, "is_domain": false, "roles": [{"id": "b7fe104b0d624e2d9629c2e41957c737",
+        "name": "reader"}, {"id": "87dbe14de84d4c62bd46c5629bf47e33", "name": "admin"},
+        {"id": "e5fd977cc1884282b1268968824eaca0", "name": "member"}, {"id": "4674b64a36964ab2abd0e82911afedc1",
+        "name": "manager"}], "catalog": [{"endpoints": [{"id": "87ce6e5381ee4e87bf2015f39ad1de7f",
+        "interface": "public", "region_id": "RegionOne", "url": "http://10.0.2.14/image",
+        "region": "RegionOne"}], "id": "0942a9f505fe413d9a51982cccaac5e5", "type":
+        "image", "name": "glance"}, {"endpoints": [{"id": "9be35accc8964ac3a7e3711f906222e9",
+        "interface": "public", "region_id": "RegionOne", "url": "http://10.0.2.14/share/v2",
+        "region": "RegionOne"}], "id": "1d6115ca51044e9c999e5cb595098702", "type":
+        "sharev2", "name": "manilav2"}, {"endpoints": [{"id": "7541e5d4bd7c4a54a11597bebc301463",
+        "interface": "public", "region_id": "RegionOne", "url": "http://10.0.2.14/volume/v3/314a347c744349479e901e57922b70e5",
+        "region": "RegionOne"}], "id": "22922a8a51e94f3ea7ab0f77c333755a", "type":
+        "volumev3", "name": "cinderv3"}, {"endpoints": [{"id": "ae6f6d86bc4041a39790df1ed62bc437",
+        "interface": "public", "region_id": "RegionOne", "url": "http://10.0.2.14/compute/v2.1",
+        "region": "RegionOne"}], "id": "22c861c637db498a82e8ffdaff3c0c1d", "type":
+        "compute", "name": "nova"}, {"endpoints": [{"id": "446817563ed94e24b21b6d1c47ca98ef",
+        "interface": "public", "region_id": "RegionOne", "url": "http://10.0.2.14/placement",
+        "region": "RegionOne"}], "id": "3b4e8e62dba74fb4aed61d9aad495129", "type":
+        "placement", "name": "placement"}, {"endpoints": [{"id": "21df59e8389e44fd864ce92eb7cade73",
+        "interface": "public", "region_id": "RegionOne", "url": "http://10.0.2.14/share/v2",
+        "region": "RegionOne"}], "id": "833724454f6249ed921520e0566837b0", "type":
+        "shared-file-system", "name": "shared-file-system"}, {"endpoints": [{"id":
+        "2651cfe5ab17461991d74759fe07bf7a", "interface": "public", "region_id": "RegionOne",
+        "url": "http://10.0.2.14/compute/v2/314a347c744349479e901e57922b70e5", "region":
+        "RegionOne"}], "id": "84131e4b6b3b4153a2e1ac34aeb1f093", "type": "compute_legacy",
+        "name": "nova_legacy"}, {"endpoints": [{"id": "c5958a4d002b475d87964400524c2da5",
+        "interface": "public", "region_id": "RegionOne", "url": "http://10.0.2.14/volume/v3/314a347c744349479e901e57922b70e5",
+        "region": "RegionOne"}], "id": "9786063907504ddaafdf28f78be1e44c", "type":
+        "block-storage", "name": "cinder"}, {"endpoints": [{"id": "3ec1bb6d2e484d7d8a69cae754a3d93c",
+        "interface": "public", "region_id": "RegionOne", "url": "http://10.0.2.14:9696/networking",
+        "region": "RegionOne"}], "id": "9c959e47acd34590b8a4e905220577a0", "type":
+        "network", "name": "neutron"}, {"endpoints": [{"id": "54454508ac5c483f97ac25806db9d2dc",
+        "interface": "internal", "region_id": "RegionOne", "url": "http://10.0.2.14/key-manager",
+        "region": "RegionOne"}, {"id": "86f464b7eac64877aa357c2838477d86", "interface":
+        "admin", "region_id": "RegionOne", "url": "http://10.0.2.14/key-manager",
+        "region": "RegionOne"}, {"id": "b55d2074f4da41f1ac9f78ebc20c4104", "interface":
+        "public", "region_id": "RegionOne", "url": "http://10.0.2.14/key-manager",
+        "region": "RegionOne"}], "id": "a0a5379ac20644a3b4510b79a5565191", "type":
+        "key-manager", "name": "barbican"}, {"endpoints": [{"id": "235d31f133f84a93a149a9a4de3c29b9",
+        "interface": "public", "region_id": "RegionOne", "url": "http://10.0.2.14:8080/v1/AUTH_314a347c744349479e901e57922b70e5",
+        "region": "RegionOne"}, {"id": "3c5f7fe4807d40b5866cba3347b92462", "interface":
+        "admin", "region_id": "RegionOne", "url": "http://10.0.2.14:8080", "region":
+        "RegionOne"}], "id": "b02de6eed0df4049a19338ec202fe362", "type": "object-store",
+        "name": "swift"}, {"endpoints": [{"id": "1c5ed69b88874920a0c7147569d28aeb",
+        "interface": "public", "region_id": "RegionOne", "url": "http://10.0.2.14/share/v2/314a347c744349479e901e57922b70e5",
+        "region": "RegionOne"}], "id": "bd7f0686312b43dbbd7244eb44737c16", "type":
+        "sharev2_legacy", "name": "manilav2_legacy"}, {"endpoints": [{"id": "072699a432754d749bea52570c98fd7e",
+        "interface": "internal", "region_id": "RegionOne", "url": "http://10.0.2.14/metric",
+        "region": "RegionOne"}, {"id": "3a6e589efb274b64aff38efa9d0440f3", "interface":
+        "public", "region_id": "RegionOne", "url": "http://10.0.2.14/metric", "region":
+        "RegionOne"}, {"id": "59078e49f2fb4ac5859385ed621c4ebd", "interface": "admin",
+        "region_id": "RegionOne", "url": "http://10.0.2.14/metric", "region": "RegionOne"}],
+        "id": "d29c4b57fac94546909b58394babf3c4", "type": "metric", "name": "gnocchi"},
+        {"endpoints": [{"id": "757ce9015b1c41dc936675685ec07fb2", "interface": "public",
+        "region_id": "RegionOne", "url": "http://10.0.2.14/share/v1/314a347c744349479e901e57922b70e5",
+        "region": "RegionOne"}], "id": "f210feb330f742c4a22524fcb1174411", "type":
+        "share", "name": "manila"}, {"endpoints": [{"id": "63ee54348ddf441b9d3c0ef12c2b2dae",
+        "interface": "public", "region_id": "RegionOne", "url": "http://10.0.2.14/identity",
+        "region": "RegionOne"}], "id": "fc0b9142361f42b988d426a988f06b64", "type":
+        "identity", "name": "keystone"}]}}'
+    headers:
+      Content-Type:
+      - application/json
+      X-Subject-Token: test-token
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - application/json
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - openstacksdk/0.52.0 keystoneauth1/5.3.0 python-requests/2.31.0 CPython/3.10.12
+      X-Auth-Token:
+      - gAAAAABlUkebFz9R4L3OqdopuZ20V95MrInuAF41pRo_AOBfBwUz0EHcLXvGRePdg2YWX3hacNXavkLlK7vr89EMbE3ybdACc2nmdEYG3oDgfzMWh1sjVLwNOpth9F2d2t5pLcK4AAu5-MYSEmlenjnJDQYl_62rqMD9ljSYZOJRwvntDRB_EIY
+    method: GET
+    uri: http://10.0.2.14:8080/v1/AUTH_314a347c744349479e901e57922b70e5/
+  response:
+    body:
+      string: '[{"name": "test1", "count": 2, "bytes": 505, "last_modified": "2023-11-13T09:12:39.030650"},
+        {"name": "test2", "count": 2, "bytes": 1184, "last_modified": "2023-11-13T09:12:48.647700"}]'
+    headers:
+      Accept-Ranges:
+      - bytes
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '185'
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Mon, 13 Nov 2023 15:58:19 GMT
+      Vary:
+      - Accept
+      X-Account-Bytes-Used:
+      - '1689'
+      X-Account-Container-Count:
+      - '2'
+      X-Account-Object-Count:
+      - '4'
+      X-Account-Storage-Policy-Policy-0-Bytes-Used:
+      - '1689'
+      X-Account-Storage-Policy-Policy-0-Container-Count:
+      - '2'
+      X-Account-Storage-Policy-Policy-0-Object-Count:
+      - '4'
+      X-Openstack-Request-Id:
+      - txbfaf38622f924539a027e-006552479b
+      X-Timestamp:
+      - '1699866759.00451'
+      X-Trans-Id:
+      - txbfaf38622f924539a027e-006552479b
+      x-account-project-domain-id:
+      - default
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - application/json
+      Content-Type:
+      - application/json
+    method: GET
+    uri: http://keystone:5000/
+  response:
+    body:
+      string: '{"versions": {"values": [{"id": "v3.14", "status": "stable", "updated":
+        "2020-04-07T00:00:00Z", "links": [{"rel": "self", "href": "http://127.0.0.1:5000/v3/"}],
+        "media-types": [{"base": "application/json", "type": "application/vnd.openstack.identity-v3+json"}]}]}}'
+    headers:
+      Content-Type:
+      - application/json
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - application/json
+      Content-Type:
+      - application/json
+    method: POST
+    uri: http://keystone:5000/v3/auth/tokens
+  response:
+    body:
+      string: '{"token": {"methods": ["password"], "user": {"domain": {"id": "default",
+        "name": "Default"}, "id": "58e8dcfcbc8a45879bc566b2935ba5e4", "name": "admin",
+        "password_expires_at": null}, "audit_ids": ["Zx9R9nA-QZa7SC8uDCmsuw"], "expires_at":
+        "2023-11-13T16:58:19.000000Z", "issued_at": "2023-11-13T15:58:19.000000Z",
+        "project": {"domain": {"id": "default", "name": "Default"}, "id": "314a347c744349479e901e57922b70e5",
+        "name": "demo"}, "is_domain": false, "roles": [{"id": "b7fe104b0d624e2d9629c2e41957c737",
+        "name": "reader"}, {"id": "87dbe14de84d4c62bd46c5629bf47e33", "name": "admin"},
+        {"id": "e5fd977cc1884282b1268968824eaca0", "name": "member"}, {"id": "4674b64a36964ab2abd0e82911afedc1",
+        "name": "manager"}], "catalog": [{"endpoints": [{"id": "87ce6e5381ee4e87bf2015f39ad1de7f",
+        "interface": "public", "region_id": "RegionOne", "url": "http://10.0.2.14/image",
+        "region": "RegionOne"}], "id": "0942a9f505fe413d9a51982cccaac5e5", "type":
+        "image", "name": "glance"}, {"endpoints": [{"id": "9be35accc8964ac3a7e3711f906222e9",
+        "interface": "public", "region_id": "RegionOne", "url": "http://10.0.2.14/share/v2",
+        "region": "RegionOne"}], "id": "1d6115ca51044e9c999e5cb595098702", "type":
+        "sharev2", "name": "manilav2"}, {"endpoints": [{"id": "7541e5d4bd7c4a54a11597bebc301463",
+        "interface": "public", "region_id": "RegionOne", "url": "http://10.0.2.14/volume/v3/314a347c744349479e901e57922b70e5",
+        "region": "RegionOne"}], "id": "22922a8a51e94f3ea7ab0f77c333755a", "type":
+        "volumev3", "name": "cinderv3"}, {"endpoints": [{"id": "ae6f6d86bc4041a39790df1ed62bc437",
+        "interface": "public", "region_id": "RegionOne", "url": "http://10.0.2.14/compute/v2.1",
+        "region": "RegionOne"}], "id": "22c861c637db498a82e8ffdaff3c0c1d", "type":
+        "compute", "name": "nova"}, {"endpoints": [{"id": "446817563ed94e24b21b6d1c47ca98ef",
+        "interface": "public", "region_id": "RegionOne", "url": "http://10.0.2.14/placement",
+        "region": "RegionOne"}], "id": "3b4e8e62dba74fb4aed61d9aad495129", "type":
+        "placement", "name": "placement"}, {"endpoints": [{"id": "21df59e8389e44fd864ce92eb7cade73",
+        "interface": "public", "region_id": "RegionOne", "url": "http://10.0.2.14/share/v2",
+        "region": "RegionOne"}], "id": "833724454f6249ed921520e0566837b0", "type":
+        "shared-file-system", "name": "shared-file-system"}, {"endpoints": [{"id":
+        "2651cfe5ab17461991d74759fe07bf7a", "interface": "public", "region_id": "RegionOne",
+        "url": "http://10.0.2.14/compute/v2/314a347c744349479e901e57922b70e5", "region":
+        "RegionOne"}], "id": "84131e4b6b3b4153a2e1ac34aeb1f093", "type": "compute_legacy",
+        "name": "nova_legacy"}, {"endpoints": [{"id": "c5958a4d002b475d87964400524c2da5",
+        "interface": "public", "region_id": "RegionOne", "url": "http://10.0.2.14/volume/v3/314a347c744349479e901e57922b70e5",
+        "region": "RegionOne"}], "id": "9786063907504ddaafdf28f78be1e44c", "type":
+        "block-storage", "name": "cinder"}, {"endpoints": [{"id": "3ec1bb6d2e484d7d8a69cae754a3d93c",
+        "interface": "public", "region_id": "RegionOne", "url": "http://10.0.2.14:9696/networking",
+        "region": "RegionOne"}], "id": "9c959e47acd34590b8a4e905220577a0", "type":
+        "network", "name": "neutron"}, {"endpoints": [{"id": "54454508ac5c483f97ac25806db9d2dc",
+        "interface": "internal", "region_id": "RegionOne", "url": "http://10.0.2.14/key-manager",
+        "region": "RegionOne"}, {"id": "86f464b7eac64877aa357c2838477d86", "interface":
+        "admin", "region_id": "RegionOne", "url": "http://10.0.2.14/key-manager",
+        "region": "RegionOne"}, {"id": "b55d2074f4da41f1ac9f78ebc20c4104", "interface":
+        "public", "region_id": "RegionOne", "url": "http://10.0.2.14/key-manager",
+        "region": "RegionOne"}], "id": "a0a5379ac20644a3b4510b79a5565191", "type":
+        "key-manager", "name": "barbican"}, {"endpoints": [{"id": "235d31f133f84a93a149a9a4de3c29b9",
+        "interface": "public", "region_id": "RegionOne", "url": "http://10.0.2.14:8080/v1/AUTH_314a347c744349479e901e57922b70e5",
+        "region": "RegionOne"}, {"id": "3c5f7fe4807d40b5866cba3347b92462", "interface":
+        "admin", "region_id": "RegionOne", "url": "http://10.0.2.14:8080", "region":
+        "RegionOne"}], "id": "b02de6eed0df4049a19338ec202fe362", "type": "object-store",
+        "name": "swift"}, {"endpoints": [{"id": "1c5ed69b88874920a0c7147569d28aeb",
+        "interface": "public", "region_id": "RegionOne", "url": "http://10.0.2.14/share/v2/314a347c744349479e901e57922b70e5",
+        "region": "RegionOne"}], "id": "bd7f0686312b43dbbd7244eb44737c16", "type":
+        "sharev2_legacy", "name": "manilav2_legacy"}, {"endpoints": [{"id": "072699a432754d749bea52570c98fd7e",
+        "interface": "internal", "region_id": "RegionOne", "url": "http://10.0.2.14/metric",
+        "region": "RegionOne"}, {"id": "3a6e589efb274b64aff38efa9d0440f3", "interface":
+        "public", "region_id": "RegionOne", "url": "http://10.0.2.14/metric", "region":
+        "RegionOne"}, {"id": "59078e49f2fb4ac5859385ed621c4ebd", "interface": "admin",
+        "region_id": "RegionOne", "url": "http://10.0.2.14/metric", "region": "RegionOne"}],
+        "id": "d29c4b57fac94546909b58394babf3c4", "type": "metric", "name": "gnocchi"},
+        {"endpoints": [{"id": "757ce9015b1c41dc936675685ec07fb2", "interface": "public",
+        "region_id": "RegionOne", "url": "http://10.0.2.14/share/v1/314a347c744349479e901e57922b70e5",
+        "region": "RegionOne"}], "id": "f210feb330f742c4a22524fcb1174411", "type":
+        "share", "name": "manila"}, {"endpoints": [{"id": "63ee54348ddf441b9d3c0ef12c2b2dae",
+        "interface": "public", "region_id": "RegionOne", "url": "http://10.0.2.14/identity",
+        "region": "RegionOne"}], "id": "fc0b9142361f42b988d426a988f06b64", "type":
+        "identity", "name": "keystone"}]}}'
+    headers:
+      Content-Type:
+      - application/json
+      X-Subject-Token: test-token
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - openstacksdk/0.52.0 keystoneauth1/5.3.0 python-requests/2.31.0 CPython/3.10.12
+      X-Auth-Token:
+      - gAAAAABlUkebTgRSknF0SFx6-p-KdmPKn3bKtkV3ChuQH8kPMiZlfV_wjvK033DU3t2WfHarVRatapiWWLenrsmy5_BlzGvmEs8OQY3F9Sh97bMqBKjLtTH7n0ESE4kcznZT9O9WdF2XV2dl2y0nsiQWFRYrz7tNittfvNk77caA7kfkMO2Wzcs
+    method: HEAD
+    uri: http://10.0.2.14:8080/v1/AUTH_314a347c744349479e901e57922b70e5/test1
+  response:
+    body:
+      string: ''
+    headers:
+      Accept-Ranges:
+      - bytes
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '0'
+      Content-Type:
+      - text/plain; charset=utf-8
+      Date:
+      - Mon, 13 Nov 2023 15:58:19 GMT
+      Last-Modified:
+      - Mon, 13 Nov 2023 09:12:40 GMT
+      Vary:
+      - Accept
+      X-Container-Bytes-Used:
+      - '505'
+      X-Container-Object-Count:
+      - '2'
+      X-Openstack-Request-Id:
+      - txb37f4038660645e1b31bb-006552479b
+      X-Storage-Policy:
+      - Policy-0
+      X-Timestamp:
+      - '1699866759.03654'
+      X-Trans-Id:
+      - txb37f4038660645e1b31bb-006552479b
+    status:
+      code: 204
+      message: No Content
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - openstacksdk/0.52.0 keystoneauth1/5.3.0 python-requests/2.31.0 CPython/3.10.12
+      X-Auth-Token:
+      - gAAAAABlUkebTgRSknF0SFx6-p-KdmPKn3bKtkV3ChuQH8kPMiZlfV_wjvK033DU3t2WfHarVRatapiWWLenrsmy5_BlzGvmEs8OQY3F9Sh97bMqBKjLtTH7n0ESE4kcznZT9O9WdF2XV2dl2y0nsiQWFRYrz7tNittfvNk77caA7kfkMO2Wzcs
+    method: HEAD
+    uri: http://10.0.2.14:8080/v1/AUTH_314a347c744349479e901e57922b70e5/test2
+  response:
+    body:
+      string: ''
+    headers:
+      Accept-Ranges:
+      - bytes
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '0'
+      Content-Type:
+      - text/plain; charset=utf-8
+      Date:
+      - Mon, 13 Nov 2023 15:58:20 GMT
+      Last-Modified:
+      - Mon, 13 Nov 2023 09:12:49 GMT
+      Vary:
+      - Accept
+      X-Container-Bytes-Used:
+      - '1184'
+      X-Container-Object-Count:
+      - '2'
+      X-Container-Read:
+      - .r:*,.rlistings
+      X-Openstack-Request-Id:
+      - txba7b3ca8b92843428d627-006552479c
+      X-Storage-Policy:
+      - Policy-0
+      X-Timestamp:
+      - '1699866768.66241'
+      X-Trans-Id:
+      - txba7b3ca8b92843428d627-006552479c
+    status:
+      code: 204
+      message: No Content
+- request:
+    body: null
+    headers:
+      Accept:
+      - application/json
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - openstacksdk/0.52.0 keystoneauth1/5.3.0 python-requests/2.31.0 CPython/3.10.12
+    method: GET
+    uri: http://10.0.2.14:8080/v1/AUTH_314a347c744349479e901e57922b70e5
+  response:
+    body:
+      string: <html><h1>Unauthorized</h1><p>This server could not verify that you
+        are authorized to access the document you requested.</p></html>
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '131'
+      Content-Type:
+      - text/html; charset=UTF-8
+      Date:
+      - Tue, 14 Nov 2023 09:30:36 GMT
+      WWW-Authenticate:
+      - Swift realm="AUTH_314a347c744349479e901e57922b70e5"
+      - Keystone uri="http://10.0.2.14/identity"
+      Www-Authenticate:
+      - Swift realm="AUTH_314a347c744349479e901e57922b70e5"
+      - Keystone uri="http://10.0.2.14/identity"
+      X-Openstack-Request-Id:
+      - tx43651dd32f274d3ab4869-0065533e3c
+      X-Trans-Id:
+      - tx43651dd32f274d3ab4869-0065533e3c
+    status:
+      code: 401
+      message: Unauthorized
+version: 1

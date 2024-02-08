@@ -1,0 +1,124 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "aws_athena_database": {
+            "hoge": {
+                "acl_configuration": [],
+                "bucket": "tf-test-intent-salmon",
+                "comment": "",
+                "encryption_configuration": [],
+                "expected_bucket_owner": null,
+                "force_destroy": false,
+                "id": "tf_test_immune_swine",
+                "name": "tf_test_immune_swine",
+                "properties": null
+            }
+        },
+        "aws_athena_named_query": {
+            "foo": {
+                "database": "tf_test_immune_swine",
+                "description": "",
+                "id": "5e0035f9-1f3d-4359-9ff4-36c974e8cf5a",
+                "name": "bar",
+                "query": "SELECT * FROM tf_test_immune_swine limit 10;",
+                "workgroup": "primary"
+            }
+        },
+        "aws_kms_key": {
+            "test": {
+                "arn": "arn:aws:kms:us-east-1:644160558196:key/e55b2877-20aa-4ed2-864f-ba9a2d5691d8",
+                "bypass_policy_lockout_safety_check": false,
+                "custom_key_store_id": "",
+                "customer_master_key_spec": "SYMMETRIC_DEFAULT",
+                "deletion_window_in_days": 7,
+                "description": "Athena KMS Key",
+                "enable_key_rotation": false,
+                "id": "e55b2877-20aa-4ed2-864f-ba9a2d5691d8",
+                "is_enabled": true,
+                "key_id": "e55b2877-20aa-4ed2-864f-ba9a2d5691d8",
+                "key_usage": "ENCRYPT_DECRYPT",
+                "multi_region": false,
+                "policy": "{\"Id\":\"key-default-1\",\"Statement\":[{\"Action\":\"kms:*\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::644160558196:root\"},\"Resource\":\"*\",\"Sid\":\"Enable IAM User Permissions\"}],\"Version\":\"2012-10-17\"}",
+                "tags": null,
+                "tags_all": {}
+            }
+        },
+        "aws_s3_bucket": {
+            "hoge": {
+                "acceleration_status": "",
+                "acl": null,
+                "arn": "arn:aws:s3:::tf-test-intent-salmon",
+                "bucket": "tf-test-intent-salmon",
+                "bucket_domain_name": "tf-test-intent-salmon.s3.amazonaws.com",
+                "bucket_prefix": "",
+                "bucket_regional_domain_name": "tf-test-intent-salmon.s3.us-east-1.amazonaws.com",
+                "cors_rule": [],
+                "force_destroy": true,
+                "grant": [
+                    {
+                        "id": "3c0057ac95bd3056dbf6c96929a82adf24fe68ddfb75c57499ab6016e693bc65",
+                        "permissions": [
+                            "FULL_CONTROL"
+                        ],
+                        "type": "CanonicalUser",
+                        "uri": ""
+                    }
+                ],
+                "hosted_zone_id": "Z3AQBSTGFYJSTF",
+                "id": "tf-test-intent-salmon",
+                "lifecycle_rule": [],
+                "logging": [],
+                "object_lock_configuration": [],
+                "object_lock_enabled": false,
+                "policy": "",
+                "region": "us-east-1",
+                "replication_configuration": [],
+                "request_payer": "BucketOwner",
+                "server_side_encryption_configuration": [
+                    {
+                        "rule": [
+                            {
+                                "apply_server_side_encryption_by_default": [
+                                    {
+                                        "kms_master_key_id": "",
+                                        "sse_algorithm": "AES256"
+                                    }
+                                ],
+                                "bucket_key_enabled": false
+                            }
+                        ]
+                    }
+                ],
+                "tags": null,
+                "tags_all": {},
+                "timeouts": null,
+                "versioning": [
+                    {
+                        "enabled": false,
+                        "mfa_delete": false
+                    }
+                ],
+                "website": [],
+                "website_domain": null,
+                "website_endpoint": null
+            }
+        },
+        "random_pet": {
+            "bucket": {
+                "id": "tf-test-intent-salmon",
+                "keepers": null,
+                "length": 2,
+                "prefix": "tf-test",
+                "separator": "-"
+            },
+            "db": {
+                "id": "tf_test_immune_swine",
+                "keepers": null,
+                "length": 2,
+                "prefix": "tf_test",
+                "separator": "_"
+            }
+        }
+    }
+}

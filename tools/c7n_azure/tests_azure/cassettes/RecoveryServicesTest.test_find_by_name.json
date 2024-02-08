@@ -1,0 +1,57 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.RecoveryServices/vaults?api-version=2023-01-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Wed, 24 May 2023 18:35:37 GMT"
+                    ],
+                    "content-length": [
+                        "487"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "location": "eastus",
+                                "name": "cfbukqrkhntars655e53akvrc4k",
+                                "etag": "W/\"datetime'2023-05-24T18%3A30%3A49.0624917Z'\"",
+                                "tags": {
+                                    "product_id": "13742"
+                                },
+                                "properties": {
+                                    "provisioningState": "Succeeded",
+                                    "publicNetworkAccess": "Enabled"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_recoveryservices/providers/Microsoft.RecoveryServices/vaults/cfbukqrkhntars655e53akvrc4k",
+                                "type": "Microsoft.RecoveryServices/vaults",
+                                "sku": {
+                                    "name": "RS0",
+                                    "tier": "Standard"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}

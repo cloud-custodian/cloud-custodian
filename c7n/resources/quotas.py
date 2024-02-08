@@ -11,6 +11,7 @@ import math
 from concurrent.futures import as_completed
 from datetime import timedelta, datetime
 from statistics import mean
+from time import sleep
 
 from c7n.actions import Action
 from c7n.exceptions import PolicyExecutionError
@@ -53,6 +54,13 @@ class ServiceQuota(QueryResourceManager):
         client = local_session(self.session_factory).client('service-quotas')
         retry = get_retry(('TooManyRequestsException',))
 
+        excl_sc = incl_sc = set()
+        for q in self.data.get("query", []):
+            if q.get("exclude_service_codes"):
+                excl_sc = set(q.get("exclude_service_codes"))
+            elif q.get("include_service_codes"):
+                incl_sc = set(q.get("include_service_codes"))
+
         def get_quotas(client, s):
             def _get_quotas(client, s, attr):
                 quotas = {}
@@ -73,6 +81,11 @@ class ServiceQuota(QueryResourceManager):
                     token = response.get('NextToken')
                     new = set(rquotas) - set(quotas)
                     quotas.update(rquotas)
+                    self.log.debug(f"{s['ServiceCode']} has {len(response['Quotas'])} quotas")
+
+                    # To fix TooManyRequestsException when calling the ListServiceQuotas
+                    # Sleep before any break, no better option so far; default quota is 10rps
+                    sleep(0.1)
                     if token is None:
                         break
                     # ssm, ec2, kms have bad behaviors.
@@ -92,9 +105,15 @@ class ServiceQuota(QueryResourceManager):
             return dquotas.values()
 
         results = []
-        with self.executor_factory(max_workers=self.max_workers) as w:
+        # NOTE TooManyRequestsException errors are reported in us-east-1 often
+        # when calling the ListServiceQuotas operation,
+        # set the max_workers to 1 instead of self.max_workers to slow down the rate
+        with self.executor_factory(max_workers=1) as w:
             futures = {}
             for r in resources:
+                # Leveraging metadata to exclude unwanted service codes to reduce masive API calls
+                if r["ServiceCode"] in excl_sc or incl_sc and r["ServiceCode"] not in incl_sc:
+                    continue
                 futures[w.submit(get_quotas, client, r)] = r
 
             for f in as_completed(futures):
@@ -111,7 +130,9 @@ class UsageFilter(MetricsFilter):
     Filter service quotas by usage, only compatible with service quotas
     that return a UsageMetric attribute.
 
-    Default limit is 80%
+    Default limit is 80%.
+    Default min_period (minimal period) is 300 seconds and is automatically
+    set to 60 seconds if users try to set it to anything lower than that.
 
     .. code-block:: yaml
 
@@ -127,7 +148,7 @@ class UsageFilter(MetricsFilter):
                   limit: 19
     """
 
-    schema = type_schema('usage-metric', limit={'type': 'integer'})
+    schema = type_schema('usage-metric', limit={'type': 'integer'}, min_period={'type': 'integer'})
 
     permisisons = ('cloudwatch:GetMetricStatistics',)
 
@@ -166,21 +187,31 @@ class UsageFilter(MetricsFilter):
         start_time = end_time - timedelta(1)
 
         limit = self.data.get('limit', 80)
+        min_period = max(self.data.get('min_period', 300), 60)
 
         result = []
 
         for r in resources:
             metric = r.get('UsageMetric')
-            if not metric:
+            quota = r.get('Value')
+            if not metric or quota is None:
                 continue
             stat = metric.get('MetricStatisticRecommendation', 'Maximum')
             if stat not in self.metric_map and self.percentile_regex.match(stat) is None:
                 continue
+
             if 'Period' in r:
                 period_unit = self.time_delta_map[r['Period']['PeriodUnit']]
                 period = int(timedelta(**{period_unit: r['Period']['PeriodValue']}).total_seconds())
             else:
                 period = int(timedelta(1).total_seconds())
+
+            # Use scaling to avoid CW limit of 1440 data points
+            metric_scale = 1
+            if period < min_period and stat == "Sum":
+                metric_scale = min_period / period
+                period = min_period
+
             res = client.get_metric_statistics(
                 Namespace=metric['MetricNamespace'],
                 MetricName=metric['MetricName'],
@@ -198,18 +229,22 @@ class UsageFilter(MetricsFilter):
                     # for all statistic types, but if the service quota API will return
                     # different preferred statistics, atm we will try to match that
                     op = self.metric_map['Maximum']
+                elif stat == 'Sum':
+                    op = self.metric_map['Maximum']
                 else:
                     op = self.metric_map[stat]
-                m = op([x[stat] for x in res['Datapoints']])
-                if m > (limit / 100) * r['Value']:
+                m = round(op([x[stat] for x in res['Datapoints']]) / metric_scale, 2)
+                self.log.info(f'{r.get("ServiceName")} {r.get("QuotaName")} usage: {m}/{quota}')
+                if m > (limit / 100) * quota:
                     r[self.annotation_key] = {
                         'metric': m,
-                        'period': period,
+                        'period': period / metric_scale,
                         'start_time': start_time,
                         'end_time': end_time,
                         'statistic': stat,
-                        'limit': limit / 100 * r['Value'],
-                        'quota': r['Value'],
+                        'limit': limit / 100 * quota,
+                        'quota': quota,
+                        'metric_scale': metric_scale,
                     }
                     result.append(r)
         return result
@@ -289,7 +324,7 @@ class Increase(Action):
         multiplier = self.data.get('multiplier', 1.2)
         error = None
         for r in resources:
-            count = math.floor(multiplier * r['Value'])
+            count = math.ceil(multiplier * r['Value'])
             if not r['Adjustable']:
                 continue
             try:

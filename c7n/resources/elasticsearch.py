@@ -1,7 +1,8 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
-import jmespath
 import json
+import time
+from collections import defaultdict
 
 from c7n.actions import Action, BaseAction, ModifyVpcSecurityGroupsAction, RemovePolicyBase
 from c7n.filters import MetricsFilter, CrossAccountAccessFilter, ValueFilter
@@ -9,7 +10,7 @@ from c7n.exceptions import PolicyValidationError
 from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter, VpcFilter, Filter
 from c7n.manager import resources
 from c7n.query import ConfigSource, DescribeSource, QueryResourceManager, TypeInfo
-from c7n.utils import chunks, local_session, type_schema
+from c7n.utils import chunks, local_session, type_schema, merge_dict_list, jmespath_search
 from c7n.tags import Tag, RemoveTag, TagActionFilter, TagDelayedAction
 from c7n.filters.kms import KmsRelatedFilter
 import c7n.filters.policystatement as polstmt_filter
@@ -57,6 +58,13 @@ class ElasticSearchDomain(QueryResourceManager):
         name = 'Name'
         dimension = "DomainName"
         cfn_type = config_type = 'AWS::Elasticsearch::Domain'
+
+    def resources(self, query=None):
+        if 'query' in self.data:
+            query = merge_dict_list(self.data['query'])
+        elif query is None:
+            query = {}
+        return super(ElasticSearchDomain, self).resources(query=query)
 
     source_mapping = {
         'describe': DescribeDomain,
@@ -128,9 +136,8 @@ class ElasticSearchCrossAccountAccessFilter(CrossAccountAccessFilter):
                     DomainName=r['DomainName'],
                     ignore_err_codes=('ResourceNotFoundException',))
                 if result:
-                    r[self.policy_attribute] = json.loads(
-                        result.get('DomainConfig').get('AccessPolicies').get('Options')
-                    )
+                    options = result.get('DomainConfig').get('AccessPolicies').get('Options')
+                    r[self.policy_attribute] = options and json.loads(options) or None
         return super().process(resources)
 
 
@@ -176,23 +183,20 @@ class ElasticSearchCrossClusterFilter(Filter):
         for r in resources:
             if self.annotation_key not in r:
                 r[self.annotation_key] = {}
-                try:
-                    if "inbound" in self.data:
-                        inbound = self.manager.retry(
-                            client.describe_inbound_cross_cluster_search_connections,
-                            Filters=[{'Name': 'destination-domain-info.domain-name',
-                                    'Values': [r['DomainName']]}])
-                        inbound.pop('ResponseMetadata')
-                        r[self.annotation_key]["inbound"] = inbound
-                    if "outbound" in self.data:
-                        outbound = self.manager.retry(
-                            client.describe_outbound_cross_cluster_search_connections,
-                            Filters=[{'Name': 'source-domain-info.domain-name',
-                                    'Values': [r['DomainName']]}])
-                        outbound.pop('ResponseMetadata')
-                        r[self.annotation_key]["outbound"] = outbound
-                except client.exceptions.ResourceNotFoundExecption:
-                    continue
+                if "inbound" in self.data:
+                    inbound = self.manager.retry(
+                        client.describe_inbound_cross_cluster_search_connections,
+                        Filters=[{'Name': 'destination-domain-info.domain-name',
+                                'Values': [r['DomainName']]}])
+                    inbound.pop('ResponseMetadata')
+                    r[self.annotation_key]["inbound"] = inbound
+                if "outbound" in self.data:
+                    outbound = self.manager.retry(
+                        client.describe_outbound_cross_cluster_search_connections,
+                        Filters=[{'Name': 'source-domain-info.domain-name',
+                                'Values': [r['DomainName']]}])
+                    outbound.pop('ResponseMetadata')
+                    r[self.annotation_key]["outbound"] = outbound
             matchFound = False
             r[self.matched_key] = {}
             for direction in r[self.annotation_key]:
@@ -231,8 +235,10 @@ class SourceIP(Filter):
     an ElasticSearch domain allows traffic from non approved IP addresses/CIDRs.
 
     :example:
+
     Find ElasticSearch domains that allow traffic from IP addresses
     not in the approved list (string matching)
+
     .. code-block: yaml
 
       - type: source-ip
@@ -240,11 +246,14 @@ class SourceIP(Filter):
         value: ["103.15.250.0/24", "173.240.160.0/21", "206.108.40.0/21"]
 
     Same  as above but using cidr matching instead of string matching
+
     .. code-block: yaml
+
       - type: source-ip
         op: not-in
         value_type: cidr
         value: ["103.15.250.0/24", "173.240.160.0/21", "206.108.40.0/21"]
+
     """
     schema = type_schema('source-ip', rinherit=ValueFilter.schema)
     permissions = ("es:DescribeElasticsearchDomainConfig",)
@@ -362,29 +371,29 @@ class ElasticSearchPostFinding(PostFinding):
             'Endpoint': r.get('Endpoint'),
             'Endpoints': r.get('Endpoints'),
             'DomainEndpointOptions': self.filter_empty({
-                'EnforceHTTPS': jmespath.search(
+                'EnforceHTTPS': jmespath_search(
                     'DomainEndpointOptions.EnforceHTTPS', r),
-                'TLSSecurityPolicy': jmespath.search(
+                'TLSSecurityPolicy': jmespath_search(
                     'DomainEndpointOptions.TLSSecurityPolicy', r)
             }),
             'ElasticsearchVersion': r['ElasticsearchVersion'],
             'EncryptionAtRestOptions': self.filter_empty({
-                'Enabled': jmespath.search(
+                'Enabled': jmespath_search(
                     'EncryptionAtRestOptions.Enabled', r),
-                'KmsKeyId': jmespath.search(
+                'KmsKeyId': jmespath_search(
                     'EncryptionAtRestOptions.KmsKeyId', r)
             }),
             'NodeToNodeEncryptionOptions': self.filter_empty({
-                'Enabled': jmespath.search(
+                'Enabled': jmespath_search(
                     'NodeToNodeEncryptionOptions.Enabled', r)
             }),
             'VPCOptions': self.filter_empty({
-                'AvailabilityZones': jmespath.search(
+                'AvailabilityZones': jmespath_search(
                     'VPCOptions.AvailabilityZones', r),
-                'SecurityGroupIds': jmespath.search(
+                'SecurityGroupIds': jmespath_search(
                     'VPCOptions.SecurityGroupIds', r),
-                'SubnetIds': jmespath.search('VPCOptions.SubnetIds', r),
-                'VPCId': jmespath.search('VPCOptions.VPCId', r)
+                'SubnetIds': jmespath_search('VPCOptions.SubnetIds', r),
+                'VPCId': jmespath_search('VPCOptions.VPCId', r)
             })
         }))
         return envelope
@@ -443,7 +452,7 @@ class ElasticSearchAddTag(Tag):
         for d in domains:
             try:
                 client.add_tags(ARN=d['ARN'], TagList=tags)
-            except client.exceptions.ResourceNotFoundExecption:
+            except client.exceptions.ValidationException:
                 continue
 
 
@@ -470,7 +479,7 @@ class ElasticSearchRemoveTag(RemoveTag):
         for d in domains:
             try:
                 client.remove_tags(ARN=d['ARN'], TagKeys=tags)
-            except client.exceptions.ResourceNotFoundExecption:
+            except client.exceptions.ValidationException:
                 continue
 
 
@@ -503,7 +512,9 @@ class RemoveMatchedSourceIps(BaseAction):
     ElasticSearch domain.
 
     :example:
+
     .. code-block:: yaml
+
             policies:
               - name: es-access-revoke
                 resource: elasticsearch
@@ -622,3 +633,115 @@ class UpdateTlsConfig(Action):
         for r in resources:
             client.update_elasticsearch_domain_config(DomainName=r['DomainName'],
                 DomainEndpointOptions={'EnforceHTTPS': True, 'TLSSecurityPolicy': tls_value})
+
+
+@ElasticSearchDomain.action_registry.register('enable-auditlog')
+class EnableAuditLog(Action):
+
+    """Action to enable audit logs on a domain endpoint
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: enable-auditlog
+                resource: elasticsearch
+                filters:
+                  - type: value
+                    key: 'LogPublishingOptions.AUDIT_LOGS.Enabled'
+                    op: eq
+                    value: false
+                actions:
+                  - type: enable-auditlog
+                    state: True
+                    loggroup_prefix: "/aws/es/domains"
+
+    """
+
+    schema = type_schema(
+        'enable-auditlog',
+        state={'type': 'boolean'},
+        loggroup_prefix={'type': 'string'},
+        delay={'type': 'number'},
+        required=['state'])
+
+    statement = {
+        "Sid": "OpenSearchCloudWatchLogs",
+        "Effect": "Allow",
+        "Principal": {"Service": ["es.amazonaws.com"]},
+        "Action": ["logs:PutLogEvents", "logs:CreateLogStream"],
+        "Resource": None}
+
+    permissions = (
+        'es:UpdateElasticsearchDomainConfig',
+        'es:ListDomainNames',
+        'logs:DescribeLogGroups',
+        'logs:CreateLogGroup',
+        'logs:PutResourcePolicy')
+
+    def get_loggroup_arn(self, domain, log_prefix=None):
+        if log_prefix:
+            log_group_name = "%s/%s/audit-logs" % (log_prefix, domain)
+        else:
+            log_group_name = "/aws/OpenSearchService/domains/%s/audit-logs" % (domain)
+        log_group_arn = "arn:aws:logs:{}:{}:log-group:{}:*".format(
+            self.manager.region, self.manager.account_id, log_group_name)
+        return log_group_arn
+
+    def merge_dict(self, d1, d2):
+        merged_dict = defaultdict(list)
+
+        for d in (d1, d2):
+            for key, value in d.items():
+                if key == 'Resource':
+                    if isinstance(value, list):
+                        merged_dict[key].extend(value)
+                    else:
+                        merged_dict[key].append(value)
+                else:
+                    merged_dict[key] = value
+
+        return dict(merged_dict)
+
+    def set_permissions(self, log_group_arn):
+        statement = dict(self.statement)
+        statement['Resource'] = [log_group_arn]
+        client = local_session(
+            self.manager.session_factory).client('logs')
+
+        try:
+            client.create_log_group(logGroupName=log_group_arn.split(":")[-2])
+        except client.exceptions.ResourceAlreadyExistsException:
+            pass
+
+        for policy in client.describe_resource_policies().get('resourcePolicies'):
+            if policy['policyName'] == "OpenSearchCloudwatchLogPermissions":
+                policy_doc = json.loads(policy['policyDocument'])
+                if log_group_arn not in policy_doc['Statement'][0]['Resource']:
+                    merged_statement = self.merge_dict(statement, policy_doc['Statement'][0])
+                    statement = merged_statement
+                continue
+
+        response = client.put_resource_policy(
+            policyName='OpenSearchCloudwatchLogPermissions',
+            policyDocument=json.dumps(
+                {"Version": "2012-10-17", "Statement": statement}))
+
+        return response
+
+    def process(self, resources):
+        client = local_session(
+            self.manager.session_factory).client('es')
+        state = self.data.get('state')
+        log_prefix = self.data.get('loggroup_prefix')
+        log_group_arns = {
+            r['DomainName']: self.get_loggroup_arn(r["DomainName"], log_prefix) for r in resources}
+
+        for r in resources:
+            if state:
+                self.set_permissions(log_group_arns[r["DomainName"]])
+                time.sleep(self.data.get('delay', 15))
+            client.update_elasticsearch_domain_config(DomainName=r['DomainName'],
+                LogPublishingOptions={"AUDIT_LOGS":
+                {'CloudWatchLogsLogGroupArn': log_group_arns[r["DomainName"]], 'Enabled': state}})

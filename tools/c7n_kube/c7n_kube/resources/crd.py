@@ -5,7 +5,7 @@ from c7n_kube.query import CustomResourceQueryManager, CustomTypeInfo
 from c7n_kube.provider import resources
 
 
-@resources.register('custom-namespaced-resource')
+@resources.register("custom-namespaced-resource")
 class CustomNamespacedResourceDefinition(CustomResourceQueryManager):
     """
     Query Custom Resources
@@ -21,12 +21,13 @@ class CustomNamespacedResourceDefinition(CustomResourceQueryManager):
             version: v1
             plural: crontabs
     """
+
     class resource_type(CustomTypeInfo):
         delete = "delete_namespaced_custom_object"
         patch = "patch_namespaced_custom_object"
 
 
-@resources.register('custom-cluster-resource')
+@resources.register("custom-cluster-resource")
 class CustomResourceDefinition(CustomResourceQueryManager):
     """
     Query Custom Resources
@@ -42,6 +43,7 @@ class CustomResourceDefinition(CustomResourceQueryManager):
             version: v1
             plural: crontabs
     """
+
     class resource_type(CustomTypeInfo):
         namespaced = False
         delete = "delete_cluster_custom_object"

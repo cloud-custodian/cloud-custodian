@@ -15,7 +15,6 @@ from datetime import datetime, timedelta
 from dateutil import tz as tzutil
 from dateutil.parser import parse
 
-import jmespath
 import time
 
 from c7n.manager import resources as aws_resources
@@ -63,6 +62,7 @@ def register_universal_tags(filters, actions, compatibility=True):
         actions.register('untag', UniversalUntag)
 
     actions.register('remove-tag', UniversalUntag)
+    actions.register('rename-tag', UniversalTagRename)
 
 
 def universal_augment(self, resources):
@@ -271,8 +271,6 @@ class TagActionFilter(Filter):
         op={'type': 'string'})
     schema_alias = True
 
-    current_date = None
-
     def validate(self):
         op = self.data.get('op')
         if self.manager and op not in self.manager.action_registry.keys():
@@ -317,15 +315,14 @@ class TagActionFilter(Filter):
                 tag, v, i['InstanceId']))
             return False
 
-        if self.current_date is None:
-            self.current_date = datetime.now()
-
         if action_date.tzinfo:
             # if action_date is timezone aware, set to timezone provided
             action_date = action_date.astimezone(tz)
-            self.current_date = datetime.now(tz=tz)
+            current_date = datetime.now(tz=tz)
+        else:
+            current_date = datetime.now()
 
-        return self.current_date >= (
+        return current_date >= (
             action_date - timedelta(days=skew, hours=skew_hours))
 
 
@@ -433,7 +430,7 @@ class Tag(Action):
             'account_id': self.manager.config.account_id,
             'now': utils.FormatDate.utcnow(),
             'region': self.manager.config.region}
-        return tag.format(**params)
+        return str(tag).format(**params)
 
     def interpolate_values(self, tags):
         """Interpolate in a list of tags - 'old' ec2 format
@@ -917,6 +914,78 @@ class UniversalUntag(RemoveTag):
             client.untag_resources, ResourceARNList=arns, TagKeys=tag_keys)
 
 
+class UniversalTagRename(Action):
+    """Rename an existing tag key to a new value.
+
+    :example:
+
+    rename Application, and Bap to App, if a resource has both of the old keys
+    then we'll use the value specified by Application, which is based on the
+    order of values of old_keys.
+
+        .. code-block :: yaml
+
+            policies:
+            - name: rename-tags-example
+              resource: aws.log-group
+              filters:
+                - or:
+                  - "tag:Bap": present
+                  - "tag:Application": present
+              actions:
+                - type: rename-tag
+                  old_keys: [Application, Bap]
+                  new_key: App
+    """
+    schema = utils.type_schema(
+        'rename-tag',
+        old_keys={'type': 'array', 'items': {'type': 'string'}},
+        old_key={'type': 'string'},
+        new_key={'type': 'string'},
+    )
+
+    permissions = UniversalTag.permissions + UniversalUntag.permissions
+
+    def validate(self):
+        if 'old_keys' not in self.data and 'old_key' not in self.data:
+            raise PolicyValidationError(
+                f"{self.manager.ctx.policy.name}:{self.type} 'old_keys' or 'old_key' required")
+
+    def process(self, resources):
+        old_keys = set(self.data.get('old_keys', ()))
+        if 'old_key' in self.data:
+            old_keys.add(self.data['old_key'])
+
+        # Collect by distinct tag value, and old_key value to minimize api calls
+        # via bulk api usage on add and remove.
+        old_key_resources = {}
+        values_resources = {}
+
+        # sort tags using ordering of old_keys
+        def key_func(a):
+            if a['Key'] in old_keys:
+                return self.data['old_keys'].index(a['Key'])
+            return 50
+
+        for r in resources:
+            found = False
+            for t in sorted(r.get('Tags', ()), key=key_func):
+                if t['Key'] in old_keys:
+                    old_key_resources.setdefault(t['Key'], []).append(r)
+                    if not found:
+                        values_resources.setdefault(t['Value'], []).append(r)
+                        found = True
+
+        new_key = self.data['new_key']
+
+        for value, rpopulation in values_resources.items():
+            tagger = UniversalTag({'key': new_key, 'value': value}, self.manager)
+            tagger.process(rpopulation)
+        for old_key, rpopulation in old_key_resources.items():
+            cleaner = UniversalUntag({'tags': [old_key]}, self.manager)
+            cleaner.process(rpopulation)
+
+
 class UniversalTagDelayedAction(TagDelayedAction):
     """Tag resources for future action.
 
@@ -1086,7 +1155,7 @@ class CopyRelatedResourceTag(Tag):
         else:
             search_path = "[].[%s]" % self.data['key']
 
-        for rrid, r in zip(jmespath.search(search_path, resources),
+        for rrid, r in zip(utils.jmespath_search(search_path, resources),
                            resources):
             related_resources.append((rrid.pop(), r))
 

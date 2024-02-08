@@ -1,0 +1,45 @@
+{
+    "status_code": 200,
+    "data": {
+        "Quotas": [
+            {
+                "ServiceCode": "logs",
+                "ServiceName": "Amazon CloudWatch Logs",
+                "QuotaArn": "arn:aws:servicequotas:ap-southeast-2:123456789012:logs/L-76507CEF",
+                "QuotaCode": "L-76507CEF",
+                "QuotaName": "CreateLogStream throttle limit in transactions per second",
+                "Value": 50.0,
+                "Unit": "None",
+                "Adjustable": true,
+                "GlobalQuota": false,
+                "UsageMetric": {
+                  "MetricNamespace": "AWS/Usage",
+                  "MetricName": "CallCount",
+                  "MetricDimensions": {
+                    "Class": "None",
+                    "Resource": "CreateLogStream",
+                    "Service": "Logs",
+                    "Type": "API"
+                  },
+                  "MetricStatisticRecommendation": "Sum"
+                },
+                "Period": {
+                  "PeriodValue": 1,
+                  "PeriodUnit": "SECOND"
+                }
+            }
+        ],
+        "ResponseMetadata": {
+            "RequestId": "2374979e-0783-4e70-b1d6-2266c159907f",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "date": "Thu, 31 Oct 2019 17:52:33 GMT",
+                "content-type": "application/x-amz-json-1.1",
+                "content-length": "555",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "2374979e-0783-4e70-b1d6-2266c159907f"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}
