@@ -14,6 +14,7 @@ from c7n.filters.kms import KmsRelatedFilter
 import c7n.filters.vpc as net_filters
 from c7n.manager import resources
 from c7n import query, utils
+from c7n.resources.aws import shape_validate
 from c7n.resources.iam import CheckPermissions, SpecificIamRoleManagedPolicy
 from c7n.tags import universal_augment
 from c7n.utils import (
@@ -304,6 +305,60 @@ class HasSpecificManagedPolicy(SpecificIamRoleManagedPolicy):
                 results.append(r)
 
         return results
+
+@AWSLambda.action_registry.register('update')
+class UpdateLambda(Action):
+    """Update a lambda's configuration.
+
+    This action also has specific support for enacting recommendations
+    from the AWS Cost Recommendation Hub for resizing.
+
+    :example:
+
+      .. code-block:: yaml
+
+         policies:
+           - name: lambda-gc
+             resource: aws.lambda
+             filters:
+               - type: cost-recommendation
+                 attrs:
+                   - actionType: Rightsize
+             actions:
+               - update
+
+    """
+    schema = type_schema('update', 'properties': {'type': 'object'})
+    permissions = ("lambda:UpdateFunctionConfiguration",)
+
+    def validate(self):
+        shape_validate(
+            self.data.get('properties', {}), 'UpdateFunctionConfigurationRequest', 'lambda'
+        )
+
+    def process(self, resources):
+        client = utils.local_session(self.manager.session_factory).client('lambda')
+        retry = get_retry(('TooManyRequestsException', 'ResourceConflictException'))
+
+        for r in resources:
+            params = self.get_parameters(r)
+            try:
+                retry(
+                    client.update_function_configuration,
+                    FunctionName=function_name,
+                    **params
+                )
+            except client.exceptions.ResourceNotFoundException:
+                continue
+
+    def get_params(self, r):
+        params = self.data.get('properties', {})
+        hub_recommendation = r.get(CostHubRecommendation.annotation_key)
+        if hub_recommendation and hub_recommendation['actionType'] == 'Rightsize':
+            size = int(hub_recommendation['recommenedResourceSummary'].split(' ')[0])
+            params['MemorySize'] = size
+        return params
+
 
 @AWSLambda.action_registry.register('set-xray-tracing')
 class LambdaEnableXrayTracing(Action):
