@@ -356,7 +356,7 @@ class UpdateLambda(Action):
         params = self.data.get('properties', {})
         hub_recommendation = r.get(CostHubRecommendation.annotation_key)
         if hub_recommendation and hub_recommendation['actionType'] == 'Rightsize':
-            size = int(hub_recommendation['recommenedResourceSummary'].split(' ')[0])
+            size = int(hub_recommendation['recommendedResourceSummary'].split(' ')[0])
             params['MemorySize'] = size
         return params
 
