@@ -1330,7 +1330,8 @@ class Resize(BaseAction):
 
     http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-resize.html
 
-    This action also has specific support for enacting recommendations from the AWS Cost Recommendation Hub for resizing.
+    This action also has specific support for enacting recommendations
+    from the AWS Cost Recommendation Hub for resizing.
 
     :example:
 
@@ -1345,6 +1346,7 @@ class Resize(BaseAction):
                   - actionType: Rightsize
              actions:
                - resize
+
     """
 
     schema = type_schema(
