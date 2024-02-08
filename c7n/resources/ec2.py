@@ -1329,6 +1329,22 @@ class Resize(BaseAction):
     hvm/pv, and ebs optimization at minimum.
 
     http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-resize.html
+
+    This action also has specific support for enacting recommendations from the AWS Cost Recommendation Hub for resizing.
+
+    :example:
+
+      .. code-block:: yaml
+
+         policies:
+           - name: ec2-rightsize
+             resource: aws.ec2
+             filters:
+               - type: cost-recommendation
+                 attrs:
+                  - actionType: Rightsize
+             actions:
+               - resize
     """
 
     schema = type_schema(
