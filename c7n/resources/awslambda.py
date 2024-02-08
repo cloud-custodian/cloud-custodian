@@ -10,6 +10,7 @@ from datetime import timedelta, datetime
 
 from c7n.actions import Action, RemovePolicyBase, ModifyVpcSecurityGroupsAction
 from c7n.filters import CrossAccountAccessFilter, ValueFilter, Filter
+from c7n.filters.costhub import CostHubRecommendation
 from c7n.filters.kms import KmsRelatedFilter
 import c7n.filters.vpc as net_filters
 from c7n.manager import resources
@@ -328,7 +329,7 @@ class UpdateLambda(Action):
                - update
 
     """
-    schema = type_schema('update', 'properties': {'type': 'object'})
+    schema = type_schema('update', properties={'type': 'object'})
     permissions = ("lambda:UpdateFunctionConfiguration",)
 
     def validate(self):
@@ -345,7 +346,7 @@ class UpdateLambda(Action):
             try:
                 retry(
                     client.update_function_configuration,
-                    FunctionName=function_name,
+                    FunctionName=r['FunctionName'],
                     **params
                 )
             except client.exceptions.ResourceNotFoundException:
