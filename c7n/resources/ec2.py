@@ -1341,7 +1341,7 @@ class Resize(BaseAction):
            - name: ec2-rightsize
              resource: aws.ec2
              filters:
-               - type: cost-recommendation
+               - type: cost-optimization
                  attrs:
                   - actionType: Rightsize
              actions:
