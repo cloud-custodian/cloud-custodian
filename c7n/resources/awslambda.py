@@ -352,7 +352,7 @@ class UpdateLambda(Action):
             except client.exceptions.ResourceNotFoundException:
                 continue
 
-    def get_params(self, r):
+    def get_parameters(self, r):
         params = self.data.get('properties', {})
         hub_recommendation = r.get(CostHubRecommendation.annotation_key)
         if hub_recommendation and hub_recommendation['actionType'] == 'Rightsize':
