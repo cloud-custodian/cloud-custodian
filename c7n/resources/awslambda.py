@@ -319,7 +319,7 @@ class UpdateLambda(Action):
       .. code-block:: yaml
 
          policies:
-           - name: lambda-gc
+           - name: lambda-rightsize
              resource: aws.lambda
              filters:
                - type: cost-optimization
