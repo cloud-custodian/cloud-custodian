@@ -1362,7 +1362,8 @@ class Resize(BaseAction):
                 self.log.exception(
                     "Exception stopping instances for resize:\n %s" % e)
 
-        client = utils.local_session(self.manager.session_factory).client('ec2')                
+        client = utils.local_session(self.manager.session_factory).client('ec2')
+
         for instance_set in utils.chunks(itertools.chain(
                 stopped_instances, running_instances), 20):
             self.process_resource_set(instance_set, client)

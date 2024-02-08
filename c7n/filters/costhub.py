@@ -72,7 +72,8 @@ class CostHubRecommendation(Filter):
     annotation = "c7n:cost_optimize"
 
     def process(self, resources, event=None):
-        client = local_session(self.manager.session_factory).client('cost-optimization-hub', region_name='us-east-1')
+        client = local_session(self.manager.session_factory).client(
+            'cost-optimization-hub', region_name='us-east-1')
         id_field = self.manager.resource_type.id
         filter_params = filter_empty({
             'actionTypes': [
