@@ -1,9 +1,9 @@
 .. _gcp_gettingstarted:
 
-Getting Started (Beta)
-======================
+Getting Started
+===============
 
-The GCP provider (Beta) is an optional package which can be installed to enable
+The GCP provider is an optional package which can be installed to enable
 writing policies which interact with GCP related resources.
 
 
