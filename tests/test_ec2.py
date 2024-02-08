@@ -588,7 +588,7 @@ class TestVolumeFilter(BaseTest):
 class TestResizeInstance(BaseTest):
 
     def test_ec2_resize_cost_hub(self):
-        factory = self.record_flight_data("test_ec2_costhub_resize", region="us-east-2")
+        factory = self.replay_flight_data("test_ec2_costhub_resize", region="us-east-2")
         policy = self.load_policy(
             {"name": "ec2-hub-resize",
              "resource": "ec2",
