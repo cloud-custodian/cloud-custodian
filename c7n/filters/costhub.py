@@ -74,7 +74,6 @@ class CostHubRecommendation(Filter):
     def process(self, resources, event=None):
         client = local_session(self.manager.session_factory).client(
             'cost-optimization-hub', region_name='us-east-1')
-        id_field = self.manager.resource_type.id
         filter_params = filter_empty({
             'actionTypes': [
                 self.manager.data.get(
@@ -85,8 +84,8 @@ class CostHubRecommendation(Filter):
             'resourceTypes': [self.resource_type_map[self.manager.type]],
         })
         r_map = {}
-        for r in resources:
-            r_map[r[id_field]] = r
+        for arn, r in zip(self.manager.get_arns(resources), resources):
+            r_map[arn] = r
 
         pager = client.get_paginator('list_recommendations')
         recommendations = pager.paginate(filter=filter_params).build_full_result()
@@ -95,13 +94,13 @@ class CostHubRecommendation(Filter):
         frm = RecommendationManager(self.manager.ctx, data={'filters': self.data.get('attrs', [])})
 
         for rec in recommendations['items']:
-            if rec['resourceId'] not in r_map:
+            if rec['resourceArn'] not in r_map:
                 continue
             if not frm.filter_resources([rec], event):
                 continue
-            r = r_map[rec['resourceId']]
+            r = r_map[rec['resourceArn']]
             r[self.annotation_key] = rec
-            results.add(rec['resourceId'])
+            results.add(rec['resourceArn'])
         return [r for rid, r in r_map.items() if rid in results]
 
     @classmethod

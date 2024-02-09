@@ -1,10 +1,12 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+import copy
 from botocore.exceptions import ClientError
 
 from c7n.actions import BaseAction
 from c7n.exceptions import PolicyExecutionError
 from c7n.filters import MetricsFilter, ValueFilter, Filter
+from c7n.filters.costhub import CostHubRecommendation
 from c7n.filters.offhours import OffHour, OnHour
 from c7n.manager import resources
 from c7n.utils import local_session, chunks, get_retry, type_schema, group_by, jmespath_compile
@@ -244,6 +246,10 @@ class RelatedTaskDefinitionFilter(ValueFilter):
     related_key = 'taskDefinition'
 
     def process(self, resources, event=None):
+        self.task_defs = {t['taskDefinitionArn']: t for t in self.get_task_defs(resources)}
+        return super(RelatedTaskDefinitionFilter, self).process(resources)
+
+    def get_task_defs(self, resources):
         task_def_ids = list({s[self.related_key] for s in resources})
         task_def_manager = self.manager.get_resource_manager(
             'ecs-task-definition')
@@ -260,8 +266,7 @@ class RelatedTaskDefinitionFilter(ValueFilter):
         # else just augment the ids
         else:
             task_defs = task_def_manager.augment(task_def_ids)
-        self.task_defs = {t['taskDefinitionArn']: t for t in task_defs}
-        return super(RelatedTaskDefinitionFilter, self).process(resources)
+        return task_defs
 
     def __call__(self, i):
         task = self.task_defs[i[self.related_key]]
@@ -414,6 +419,49 @@ class SGFilter(net_filters.SecurityGroupFilter):
 
 
 @Service.filter_registry.register('network-location', net_filters.NetworkLocation)
+
+@Service.action_registry.register('modify-definition')
+class UpdateTemplate(BaseAction):
+
+    schema = type_schema(
+        'modify-template',
+        properties={'type': 'object'},
+    )
+
+    def process(self, resources):
+        task_def_filter = ServiceTaskDefinitionFilter({}, self.manager)
+        task_defs = task_def_filter.get_task_defs(resources)
+        client = local_session(self.manager.session_factory).client('ecs')
+
+        # we can only modify task definition when ecs is controlling the deployment.
+        resources = self.filter_resources(resources, "deploymentController.type", ("ECS",))
+
+        for r in resources:
+            r_task_def = task_defs[task_def_filter.related_key]
+            m_task_def = self.get_target_task_def(r, r_task_def)
+            if m_task_def is None:
+                continue
+            response = client.register_task_definition(**m_task_def)
+            task_arn = response['taskDefinition']['taskDefinitionArn']
+            client.update_service(
+                cluster=r['cluster'],
+                service=r['service'],
+                taskDefinition=task_arn
+            )
+
+    def get_target_task_def(self, resource, current_task_def):
+        target_task_def = copy.deepcopy(current_task_def)
+        target_task_def.update(self.data.get('properties', {}))
+        cost_optimization = resource.get(CostHubRecommendation.annotation_key)
+        if cost_optimization and cost_optimization['actionType'] == 'Rightsize':
+            cpu, mem = cost_optimization["recommendedResourceSummary"].split("/")
+            cpu = int(cpu.split(" ")[0])
+            mem = int(mem.split(" ")[0])
+            target_task_def["cpu"] = str(cpu)
+            target_task_def["memory"] = str(mem)
+        if target_task_def == current_task_def:
+            return
+        return target_task_def
 
 
 @Service.action_registry.register('modify')
