@@ -50,6 +50,8 @@ class PolicyChecker:
     checker_config:
       - check_actions: only check one of the specified actions
       - everyone_only: only check for wildcard permission grants
+      - condition_scope: cross-account scope of conditions that are
+            considered enough.
       - allowed_accounts: permission grants to these accounts are okay
       - whitelist_conditions: a list of conditions that are considered
             sufficient enough to whitelist the statement.
@@ -65,6 +67,10 @@ class PolicyChecker:
     @property
     def everyone_only(self):
         return self.checker_config.get('everyone_only', False)
+
+    @property
+    def condition_scope(self):
+        return self.checker_config.get('condition_scope', 'all')
 
     @property
     def check_actions(self):
@@ -159,7 +165,13 @@ class PolicyChecker:
 
         results = []
         for c in conditions:
-            results.append(self.handle_condition(s, c))
+            handler_result = self.handle_condition(s, c)
+            if (
+                self.condition_scope == 'at-least-one'
+                and handler_result
+            ):
+                return True
+            results.append(handler_result)
 
         return all(results)
 
@@ -251,6 +263,12 @@ class CrossAccountAccessFilter(Filter):
         actions={'type': 'array', 'items': {'type': 'string'}},
         # only consider policies which grant to *
         everyone_only={'type': 'boolean'},
+        # Specifies the cross-account scope of conditions:
+        # 'all' means all conditions must comply with cross-account limits
+        # 'at-least-one' means at least one condition must comply with cross-account limits
+        condition_scope={'type': 'string',
+                         'enum': ['all', 'at-least-one'],
+                         'default': 'all'},
         # disregard statements using these conditions.
         whitelist_conditions={'type': 'array', 'items': {'type': 'string'}},
         # white list accounts
@@ -270,6 +288,7 @@ class CrossAccountAccessFilter(Filter):
 
     def process(self, resources, event=None):
         self.everyone_only = self.data.get('everyone_only', False)
+        self.condition_scope = self.data.get('condition_scope')
         self.conditions = set(self.data.get(
             'whitelist_conditions',
             ("aws:userid", "aws:username")))
@@ -286,6 +305,7 @@ class CrossAccountAccessFilter(Filter):
              'allowed_orgid': self.orgid,
              'check_actions': self.actions,
              'everyone_only': self.everyone_only,
+             'condition_scope': self.condition_scope,
              'whitelist_conditions': self.conditions})
         self.checker = self.checker_factory(self.checker_config)
         return super(CrossAccountAccessFilter, self).process(resources, event)
