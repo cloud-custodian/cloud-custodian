@@ -31,8 +31,7 @@ class TestAppmeshMesh(BaseTest):
         captor = ApiCallCaptor.start_capture()
 
         resources = p.run()
-
-        resources.sort(key=lambda r: r['arn'])
+        resources.sort(key=lambda r: r["arn"])
 
         self.assertEqual(
             [
@@ -113,7 +112,7 @@ class TestAppmeshMesh(BaseTest):
         captor = ApiCallCaptor.start_capture()
 
         resources = p.push(event, None)
-        resources.sort(key=lambda r: r['arn'])
+        resources.sort(key=lambda r: r["arn"])
 
         self.assertEqual(
             [
