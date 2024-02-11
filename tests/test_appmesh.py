@@ -183,13 +183,15 @@ class TestAppmeshVirtualGateway(BaseTest):
                     'Tags': [{'Key': 'MyTagName', 'Value': 'm1/g1'}],
                     'c7n:MatchedFilters': ['spec.listeners[0].portMapping.port'],
                     'meshName': 'm1',
-                    'metadata': {'arn': 'arn:aws:appmesh:eu-west-2:123456789012:mesh/m1/virtualGateway/g1',
-                                 'createdAt': '2023-11-03T02:36:27.877000+00:00',
-                                 'lastUpdatedAt': '2023-11-03T02:36:27.877000+00:00',
-                                 'meshOwner': '644160558196',
-                                 'resourceOwner': '644160558196',
-                                 'uid': '80ee4027-c8e1-49e8-99ba-cace20a57f0b',
-                                 'version': 1},
+                    'metadata': {
+                        'arn': 'arn:aws:appmesh:eu-west-2:123456789012:mesh/m1/virtualGateway/g1',
+                        'createdAt': '2023-11-03T02:36:27.877000+00:00',
+                        'lastUpdatedAt': '2023-11-03T02:36:27.877000+00:00',
+                        'meshOwner': '644160558196',
+                        'resourceOwner': '644160558196',
+                        'uid': '80ee4027-c8e1-49e8-99ba-cace20a57f0b',
+                        'version': 1
+                    },
                     'spec': {'backendDefaults': {'clientPolicy': {}},
                              'listeners': [{'portMapping': {'port': 123, 'protocol': 'http'}}],
                              'logging': {}},
@@ -273,13 +275,15 @@ class TestAppmeshVirtualGateway(BaseTest):
                 {
                     'Tags': [{'Key': 'MyTagName', 'Value': 'm1/g1'}],
                     'meshName': 'm1',
-                    'metadata': {'arn': 'arn:aws:appmesh:eu-west-2:123456789012:mesh/m1/virtualGateway/g1',
-                                 'createdAt': '2023-11-03T02:36:27.877000+00:00',
-                                 'lastUpdatedAt': '2023-11-03T02:36:27.877000+00:00',
-                                 'meshOwner': '644160558196',
-                                 'resourceOwner': '644160558196',
-                                 'uid': '80ee4027-c8e1-49e8-99ba-cace20a57f0b',
-                                 'version': 1},
+                    'metadata': {
+                        'arn': 'arn:aws:appmesh:eu-west-2:123456789012:mesh/m1/virtualGateway/g1',
+                        'createdAt': '2023-11-03T02:36:27.877000+00:00',
+                        'lastUpdatedAt': '2023-11-03T02:36:27.877000+00:00',
+                        'meshOwner': '644160558196',
+                        'resourceOwner': '644160558196',
+                        'uid': '80ee4027-c8e1-49e8-99ba-cace20a57f0b',
+                        'version': 1
+                    },
                     'spec': {'backendDefaults': {'clientPolicy': {}},
                              'listeners': [{'portMapping': {'port': 123, 'protocol': 'http'}}],
                              'logging': {}},
@@ -321,7 +325,7 @@ class ApiCallCaptor:
         self.calls = []
 
     def emit(self, _event_type, payload, _source):
-        # print("API CALL : EventType:" + str(event_type) + " Payload:" + str(payload) + " Source:" + str(source))
+        # print("API CALL : " + str(event_type) + " P:" + str(payload) + " S:" + str(source))
         self.calls.append(payload)
 
     @classmethod
