@@ -1,9 +1,9 @@
 .. _gcp_gettingstarted:
 
-Getting Started (Beta)
-======================
+Getting Started
+===============
 
-The GCP provider (Beta) is an optional package which can be installed to enable
+The GCP provider is an optional package which can be installed to enable
 writing policies which interact with GCP related resources.
 
 
@@ -79,9 +79,9 @@ configure your credentials using environment variables.
 `GOOGLE_APPLICATION_CREDENTIALS` should be set to a valid service account file or client config for
 workload federation.
 
-For service account configuration see additional docs `here <https://cloud.google.com/iam/docs/service-account-overview>`
+For service account configuration see additional docs `here <https://cloud.google.com/iam/docs/service-account-overview>`_
 
-For workload configuration see additional docs `here <https://cloud.google.com/iam/docs/workload-identity-federation-with-other-clouds>`
+For workload configuration see additional `docs <https://cloud.google.com/iam/docs/workload-identity-federation-with-other-clouds>`_
 
 If you are planning to impersonate a service account, then you may configure the environment
 variable `GOOGLE_IMPERSONATE_SERVICE_ACCOUNT` with the service account email address, you can also 

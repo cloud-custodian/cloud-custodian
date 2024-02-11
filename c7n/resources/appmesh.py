@@ -2,6 +2,7 @@
 AppMesh Communications
 """
 from c7n.manager import resources
+from c7n.tags import universal_augment
 from c7n.query import (
     ChildResourceManager,
     QueryResourceManager,
@@ -11,7 +12,6 @@ from c7n.query import (
     ConfigSource,
 )
 from c7n.resources.aws import Arn
-from c7n.tags import universal_augment
 from c7n.utils import local_session
 
 
@@ -237,7 +237,7 @@ class AppmeshVirtualGateway(ChildResourceManager):
 
         # id: Path to "id" field in the .... IN THE WHAT???
         # TODO: WHERE IS THIS EVEN USED AT RUNTIME?
-        id = 'meshName!!!!!!!!!!!!!!!'
+        id = 'meshName'
 
         # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-appmesh-virtualgateway.html  # noqa
         # TODO: WHERE IS THIS EVEN USED AT RUNTIME?
