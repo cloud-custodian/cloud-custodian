@@ -59,7 +59,7 @@ class AppmeshMesh(QueryResourceManager):
         # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-appmesh-mesh.html   # noqa
         id = 'meshName'
 
-        # TODO: IS THIS EVEN USED AT RUNTIME?
+        # TODO: WHERE IS THIS EVEN USED AT RUNTIME?
         name = 'meshName!!!!!!'
 
         # universal_taggable: Valid values are one of True, False, object()
@@ -236,17 +236,17 @@ class AppmeshVirtualGateway(ChildResourceManager):
         universal_taggable = object()
 
         # id: Path to "id" field in the .... IN THE WHAT???
-        # TODO IS THIS EVEN USED AT RUNTIME?
+        # TODO: WHERE IS THIS EVEN USED AT RUNTIME?
         id = 'meshName!!!!!!!!!!!!!!!'
 
         # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-appmesh-virtualgateway.html  # noqa
-        # TODO: IS THIS EVEN USED AT RUNTIME?
+        # TODO: WHERE IS THIS EVEN USED AT RUNTIME?
         arn = "metadata.arn!!!!!!!"
 
-        # TODO: IS THIS EVEN USED AT RUNTIME?
+        # TODO: WHERE IS THIS EVEN USED AT RUNTIME?
         name = 'virtualGatewayName!!!!!!!!!!'
 
-        # TODO: IS THIS EVEN USED AT RUNTIME?
+        # TODO: WHERE IS THIS EVEN USED AT RUNTIME?
         date = 'createdAt!!!!!!!!!'
 
         # When we define a parent_spec then it uses the parent_spec
