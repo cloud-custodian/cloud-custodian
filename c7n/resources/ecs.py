@@ -3,18 +3,18 @@
 import copy
 from botocore.exceptions import ClientError
 
-from c7n.actions import BaseAction
+from c7n.actions import AutoTagUser, AutoscalingBase, BaseAction
 from c7n.exceptions import PolicyExecutionError
 from c7n.filters import MetricsFilter, ValueFilter, Filter
 from c7n.filters.costhub import CostHubRecommendation
 from c7n.filters.offhours import OffHour, OnHour
+import c7n.filters.vpc as net_filters
 from c7n.manager import resources
 from c7n.utils import local_session, chunks, get_retry, type_schema, group_by, jmespath_compile
 from c7n import query, utils
 from c7n.query import DescribeSource, ConfigSource
+from c7n.resources.aws import Arn
 from c7n.tags import Tag, TagDelayedAction, RemoveTag, TagActionFilter
-from c7n.actions import AutoTagUser, AutoscalingBase
-import c7n.filters.vpc as net_filters
 
 
 def ecs_tag_normalize(resources):
@@ -424,43 +424,91 @@ class SGFilter(net_filters.SecurityGroupFilter):
 class UpdateTemplate(BaseAction):
 
     schema = type_schema(
-        'modify-template',
+        'modify-definition',
         properties={'type': 'object'},
     )
 
+    permissions = ("ecs:RegisterTaskDefinition", "ecs:UpdateService")
+
     def process(self, resources):
         task_def_filter = ServiceTaskDefinitionFilter({}, self.manager)
-        task_defs = task_def_filter.get_task_defs(resources)
+        task_defs = {t['taskDefinitionArn']: t for t in task_def_filter.get_task_defs(resources)}
         client = local_session(self.manager.session_factory).client('ecs')
 
         # we can only modify task definition when ecs is controlling the deployment.
         resources = self.filter_resources(resources, "deploymentController.type", ("ECS",))
 
         for r in resources:
-            r_task_def = task_defs[task_def_filter.related_key]
+            r_task_def = task_defs[r[task_def_filter.related_key]]
             m_task_def = self.get_target_task_def(r, r_task_def)
             if m_task_def is None:
                 continue
             response = client.register_task_definition(**m_task_def)
             task_arn = response['taskDefinition']['taskDefinitionArn']
+            cluster, _ = Arn.parse(r['serviceArn']).resource.split('/', 1)
             client.update_service(
-                cluster=r['cluster'],
-                service=r['service'],
+                cluster=cluster,
+                service=r['serviceName'],
                 taskDefinition=task_arn
             )
+
+    task_def_normalized = [
+        "taskDefinitionArn", "revision", "status",
+        "registeredAt", "registeredBy", "requiresAttributes",
+    ]
+
+    task_def_remap = {
+        "compatibilities": "requiresCompatibilities",
+    }
 
     def get_target_task_def(self, resource, current_task_def):
         target_task_def = copy.deepcopy(current_task_def)
         target_task_def.update(self.data.get('properties', {}))
         cost_optimization = resource.get(CostHubRecommendation.annotation_key)
+
         if cost_optimization and cost_optimization['actionType'] == 'Rightsize':
             cpu, mem = cost_optimization["recommendedResourceSummary"].split("/")
-            cpu = int(cpu.split(" ")[0])
+            cpu = int(float(cpu.split(" ")[0]))
             mem = int(mem.split(" ")[0])
             target_task_def["cpu"] = str(cpu)
             target_task_def["memory"] = str(mem)
-        if target_task_def == current_task_def:
+            target_task_def = self.update_target_containers_size(current_task_def, target_task_def)
+
+        if target_task_def == current_task_def or target_task_def is None:
             return
+
+        # normalize from describe to register formats
+        for k in self.task_def_normalized:
+            target_task_def.pop(k, None)
+        for ck, dk in self.task_def_remap.items():
+            if ck in target_task_def:
+                target_task_def[dk] = target_task_def.pop(ck)
+        tags = []
+        for t in target_task_def.pop('Tags', []):
+            tags.append({'key': t['Key'], 'value': t['Value']})
+        if tags:
+            target_task_def['tags'] = tags
+        return target_task_def
+
+    def update_target_containers_size(self, current_task_def, target_task_def):
+        """Update container memory/size targets.
+
+        We need to update memory/cpu requirements of the containers within
+        the task, so the total of the containers in the task def
+        matches the definition.
+
+        for a task w/ a single container this is simple, make the container match
+        the definition.
+
+        for a multi container task, we need select a heuristic
+        (proportional, largest) with some notion of a floor / min for
+        proportional. for now we punt on multi-container tasks.
+        """
+        if len(target_task_def['containerDefinitions']) > 1:
+            return
+        container_def = target_task_def['containerDefinitions'][0]
+        container_def['memory'] = int(target_task_def['memory'])
+        container_def['cpu'] = int(target_task_def['cpu'])
         return target_task_def
 
 

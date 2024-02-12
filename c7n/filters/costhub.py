@@ -94,13 +94,21 @@ class CostHubRecommendation(Filter):
         frm = RecommendationManager(self.manager.ctx, data={'filters': self.data.get('attrs', [])})
 
         for rec in recommendations['items']:
-            if rec['resourceArn'] not in r_map:
+            rec_rarn = rec['resourceArn']
+
+            # a few of the recommendation resources use a version
+            # qualifier which won't match the innate/latest arn coming
+            # from describe sources (sans qualifier)
+            if rec_rarn.count(':') == 7:
+                rec_rarn, _ = rec_rarn.rsplit(':', 1)
+
+            if rec_rarn not in r_map:
                 continue
             if not frm.filter_resources([rec], event):
                 continue
-            r = r_map[rec['resourceArn']]
+            r = r_map[rec_rarn]
             r[self.annotation_key] = rec
-            results.add(rec['resourceArn'])
+            results.add(rec_rarn)
         return [r for rid, r in r_map.items() if rid in results]
 
     @classmethod
