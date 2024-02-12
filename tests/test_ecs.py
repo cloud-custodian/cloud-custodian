@@ -185,8 +185,10 @@ class TestEcsService(BaseTest):
             services=[service_name]
         )["services"][0]
 
-        rtask = client.describe_task_definition(taskDefinition=rservice['taskDefinition'])['taskDefinition']
-        ctask = client.describe_task_definition(taskDefinition=cservice['taskDefinition'])['taskDefinition']
+        rtask = client.describe_task_definition(
+            taskDefinition=rservice['taskDefinition'])['taskDefinition']
+        ctask = client.describe_task_definition(
+            taskDefinition=cservice['taskDefinition'])['taskDefinition']
 
         assert cservice['taskDefinition'] != rservice['taskDefinition']
         assert rtask['cpu'] != ctask['cpu']
