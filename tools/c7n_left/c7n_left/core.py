@@ -257,7 +257,7 @@ class CollectionRunner:
                     continue
                 try:
                     result_set = self.run_policy(p, graph, resources, event, rtype)
-                except Exception as e:
+                except Exception:
                     log.exception("Policy:%s had an error while running" % p.name)
                     result_set = []
                     found = True
