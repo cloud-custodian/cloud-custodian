@@ -4,6 +4,7 @@
 import json
 import os
 from pathlib import Path
+import re
 import subprocess
 import sys
 from unittest.mock import ANY
@@ -282,7 +283,6 @@ resource "aws_cloudwatch_log_group" "bada" {
     exceptions_file.write_text(
         json.dumps({"policy": {"tagging": ["aws_cloudwatch_log_group.yada"]}})
     )
-    test.change_environment(PWD=str(policy_env.policy_dir.absolute()))
     policy_env.write_policy(
         {
             "name": "check-exceptions",
@@ -292,7 +292,7 @@ resource "aws_cloudwatch_log_group" "bada" {
                 {
                     "type": "value",
                     "value_from": {
-                        "url": "file://{env[PWD]}/exceptions/exceptions.json",
+                        "url": exceptions_file.as_uri(),
                         "expr": "policy.tagging",
                     },
                     "op": "not-in",
@@ -870,7 +870,7 @@ def test_graph_var_file(tmp_path, var_tf_setup):
 def test_cli_dump(policy_env, test, debug_cli_runner):
     (policy_env.policy_dir / "vars.tfvars").write_text('app = "riddle"')
     (policy_env.policy_dir / "vars2.tfvars").write_text('env = "dev"')
-    test.change_environment(TF_VAR_repo="cloud-custodian/cloud-custodian")
+    test.change_environment(TF_VAR_REPO="cloud-custodian/cloud-custodian")
 
     policy_env.write_tf(
         """
@@ -912,7 +912,7 @@ def test_cli_dump(policy_env, test, debug_cli_runner):
     assert result.exit_code == 0
     data = json.loads((policy_env.policy_dir / "output.json").read_text())
     assert data == {
-        "environment": {"repo": "cloud-custodian/cloud-custodian"},
+        "environment": {"REPO": "cloud-custodian/cloud-custodian"},
         "uninitialized": {"env": ""},
         "user:vars.tfvars": {"app": "riddle"},
     }
@@ -1384,10 +1384,10 @@ def test_cli_output_github(tmp_path):
     )
     assert result.exit_code == 1
     expected = (
-        "::error file=tests/terraform/aws_s3_encryption_audit/main.tf,line=25,lineEnd=28,"
+        "::error file=tests.*?main.tf,line=25,lineEnd=28,"
         "title=terraform.aws_s3_bucket - policy:check-bucket category:test severity:unknown::a description"  # noqa
     )
-    assert expected in result.output
+    assert re.search(expected, result.output)
 
 
 def test_cli_output_json_query(tmp_path):
