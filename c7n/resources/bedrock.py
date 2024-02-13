@@ -209,7 +209,7 @@ class RemoveTagModelCustomizationJob(RemoveTag):
 
 
 @BedrockModelCustomizationJob.action_registry.register('stop')
-class RemoveTagModelCustomizationJob(RemoveTag):
+class StopCustomizationJob(RemoveTag):
     """Stop model customization job
 
     :example:
