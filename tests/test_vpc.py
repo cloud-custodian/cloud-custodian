@@ -3703,7 +3703,7 @@ class InternetGatewayTest(BaseTest):
         with self.capture_logging("custodian.actions", level=logging.WARNING) as log_output:
             resources = p.run()
             self.assertEqual(len(resources), 1)
-            self.assertRegexpMatches(log_output.getvalue(), "DependencyViolation error")
+            self.assertRegex(log_output.getvalue(), "DependencyViolation error")
 
 
 class NATGatewayTest(BaseTest):

@@ -1,0 +1,18 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:organizations::644160558196:account/o-r2x4ytpwhl/644160558196",
+                "Tags": [
+                    {
+                        "Key": "i-am",
+                        "Value": "TheOriginalTim"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

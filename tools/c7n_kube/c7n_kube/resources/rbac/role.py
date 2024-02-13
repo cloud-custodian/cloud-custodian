@@ -9,6 +9,7 @@ from c7n_kube.provider import resources
 class ClusterRole(QueryResourceManager):
     class resource_type(TypeInfo):
         group = "RbacAuthorization"
+        canonical_group = "rbac.authorization.k8s.io"
         version = "V1"
         patch = "patch_cluster_role"
         delete = "delete_cluster_role"
@@ -21,6 +22,7 @@ class ClusterRole(QueryResourceManager):
 class NamespacedRole(QueryResourceManager):
     class resource_type(TypeInfo):
         group = "RbacAuthorization"
+        canonical_group = "rbac.authorization.k8s.io"
         version = "V1"
         patch = "patch_namespaced_role"
         delete = "delete_namespaced_role"

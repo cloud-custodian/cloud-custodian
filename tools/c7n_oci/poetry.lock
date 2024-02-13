@@ -168,13 +168,13 @@ files = [
 
 [[package]]
 name = "oci"
-version = "2.117.0"
+version = "2.119.0"
 description = "Oracle Cloud Infrastructure Python SDK"
 optional = false
 python-versions = "*"
 files = [
-    {file = "oci-2.117.0-py3-none-any.whl", hash = "sha256:dfae114e355c3dc758106e97c605368bac397fd3b4e18daafdb45c510125756e"},
-    {file = "oci-2.117.0.tar.gz", hash = "sha256:24bbbbded08f92ae2e72193d9a77dc09cfc43a0ed5383f3e22bd20585a1ac42d"},
+    {file = "oci-2.119.0-py3-none-any.whl", hash = "sha256:73fd2234792454fd3d5ca7802521a07e8b13eb288e104759ff154adf70029407"},
+    {file = "oci-2.119.0.tar.gz", hash = "sha256:9483dcac110dbebfc04e01df2408165eb06878a6dfc2ef48d4157e6ede917ffe"},
 ]
 
 [package.dependencies]
@@ -242,13 +242,13 @@ test = ["flaky", "pretend", "pytest (>=3.0.1)"]
 
 [[package]]
 name = "pytest"
-version = "7.4.3"
+version = "7.4.4"
 description = "pytest: simple powerful testing with Python"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "pytest-7.4.3-py3-none-any.whl", hash = "sha256:0d009c083ea859a71b76adf7c1d502e4bc170b80a8ef002da5806527b9591fac"},
-    {file = "pytest-7.4.3.tar.gz", hash = "sha256:d989d136982de4e3b29dabcc838ad581c64e8ed52c11fbe86ddebd9da0818cd5"},
+    {file = "pytest-7.4.4-py3-none-any.whl", hash = "sha256:b090cdf5ed60bf4c45261be03239c2c1c22df034fbffe691abe93cd80cea01d8"},
+    {file = "pytest-7.4.4.tar.gz", hash = "sha256:2cf0005922c6ace4a3e2ec8b4080eb0d9753fdc93107415332f50ce9e7994280"},
 ]
 
 [package.dependencies]

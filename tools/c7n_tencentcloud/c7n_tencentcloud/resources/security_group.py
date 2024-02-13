@@ -85,7 +85,7 @@ class SGPermission(Filter):
                 if self.any_ports_except:
                     # Ranges do not support equality
                     any_ports_except_found = True
-            else:
+            elif perm['Port']:
                 ports = {int(p) for p in perm['Port'].split(',')}
                 if self.ports:
                     intersection = ports.intersection(self.ports)
@@ -95,6 +95,8 @@ class SGPermission(Filter):
                         port_found = False
                 if self.any_ports_except:
                     any_ports_except_found = not ports.issubset(self.any_ports_except)
+            else:
+                port_found = False
         match = [k for k in (port_found, any_ports_except_found) if k is not None]
         if not match:
             return None

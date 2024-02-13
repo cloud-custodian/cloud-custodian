@@ -1216,6 +1216,166 @@ class IamInstanceProfileActions(BaseTest):
         for profile in instance_profiles['InstanceProfiles']:
             self.assertEqual(len(profile['Roles']), 0)
 
+    def test_iam_instance_profile_set_policy_attached(self):
+        session_factory = self.replay_flight_data("test_iam_instance_profile_set_policy_attached")
+        client = session_factory().client("iam")
+        p = self.load_policy(
+            {
+                "name": "iam-instance-profile-set-policy",
+                "resource": "iam-profile",
+                "filters": [
+                    {
+                        "not": [
+                            {
+                                "type": "has-specific-managed-policy",
+                                "key": "PolicyArn",
+                                "value": "arn:aws:iam::aws:policy/AdministratorAccess"
+                            }
+                        ],
+                    },
+                    {
+                        "type": "value",
+                        "key": "Roles[].RoleName",
+                        "value": "AmazonSSMRoleForInstancesQuickSetup",
+                        "op": "in",
+                        "value_type": "swap"
+                    }
+                ],
+                "actions": [
+                    {
+                        "type": "set-policy",
+                        "state": "attached",
+                        "arn": "arn:aws:iam::aws:policy/AdministratorAccess"
+                    }
+                ]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        instance_profiles = client.list_instance_profiles()
+        for profile in instance_profiles['InstanceProfiles']:
+            if profile['Roles'][0]['RoleName'] == "AmazonSSMRoleForInstancesQuickSetup":
+                policies = client.list_attached_role_policies(
+                        RoleName="AmazonSSMRoleForInstancesQuickSetup"
+                )
+                self.assertEqual(len(policies['AttachedPolicies']), 1)
+                self.assertEqual(
+                        policies['AttachedPolicies'][0]["PolicyName"], "AdministratorAccess"
+                )
+
+    def test_iam_instance_profile_set_policy_detached(self):
+        session_factory = self.replay_flight_data("test_iam_instance_profile_set_policy_detached")
+        client = session_factory().client("iam")
+        p = self.load_policy(
+            {
+                "name": "iam-instance-profile-set-policy",
+                "resource": "iam-profile",
+                "filters": [
+                    {
+                        "type": "has-specific-managed-policy",
+                        "key": "PolicyArn",
+                        "value": "arn:aws:iam::aws:policy/AdministratorAccess"
+                    },
+                    {
+                        "type": "value",
+                        "key": "Roles[].RoleName",
+                        "value": "AmazonSSMRoleForInstancesQuickSetup",
+                        "op": "in",
+                        "value_type": "swap"
+                    }
+                ],
+                "actions": [
+                    {
+                        "type": "set-policy",
+                        "state": "detached",
+                        "arn": "arn:aws:iam::aws:policy/AdministratorAccess"
+                    }
+                ]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        instance_profiles = client.list_instance_profiles()
+        for profile in instance_profiles['InstanceProfiles']:
+            if profile['Roles'][0]['RoleName'] == "AmazonSSMRoleForInstancesQuickSetup":
+                policies = client.list_attached_role_policies(
+                        RoleName="AmazonSSMRoleForInstancesQuickSetup"
+                )
+                self.assertEqual(len(policies['AttachedPolicies']), 0)
+
+    def test_iam_instance_profile_set_policy_wildcard(self):
+        session_factory = self.replay_flight_data("test_iam_instance_profile_set_policy_wildcard")
+        client = session_factory().client("iam")
+        p = self.load_policy(
+            {
+                "name": "iam-instance-profile-set-policy",
+                "resource": "iam-profile",
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": "Roles[].RoleName",
+                        "value": "AmazonSSMRoleForInstancesQuickSetup",
+                        "op": "in",
+                        "value_type": "swap"
+                    }
+                ],
+                "actions": [
+                    {
+                        "type": "set-policy",
+                        "state": "detached",
+                        "arn": "*"
+                    }
+                ]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        instance_profiles = client.list_instance_profiles()
+        for profile in instance_profiles['InstanceProfiles']:
+            if profile['Roles'][0]['RoleName'] == "AmazonSSMRoleForInstancesQuickSetup":
+                policies = client.list_attached_role_policies(
+                        RoleName="AmazonSSMRoleForInstancesQuickSetup"
+                )
+                self.assertEqual(len(policies['AttachedPolicies']), 0)
+
+    def test_iam_instance_profile_set_policy_nosuchentity(self):
+        session_factory = self.replay_flight_data(
+            "test_iam_instance_profile_set_policy_nosuchentity"
+        )
+        client = session_factory().client("iam")
+        p = self.load_policy(
+            {
+                "name": "iam-instance-profile-set-policy",
+                "resource": "iam-profile",
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": "Roles[].RoleName",
+                        "value": "AmazonSSMRoleForInstancesQuickSetup",
+                        "op": "in",
+                        "value_type": "swap"
+                    }
+                ],
+                "actions": [
+                    {
+                        "type": "set-policy",
+                        "state": "detached",
+                        "arn": "arn:aws:iam::aws:policy/AdministratorAccessDoesNotExist"
+                    }
+                ]
+            },
+            session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertRaises(
+            client.exceptions.NoSuchEntityException,
+            client.get_policy,
+            PolicyArn="arn:aws:iam::aws:policy/AdministratorAccessDoesNotExist")
+
 
 class IamPolicyFilterUsage(BaseTest):
 

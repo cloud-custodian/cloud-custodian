@@ -2076,7 +2076,7 @@ class RDSProxy(QueryResourceManager):
         enum_spec = ('describe_db_proxies', 'DBProxies', None)
         arn = 'DBProxyArn'
         arn_type = 'db-proxy'
-        cfn_type = config_type = 'AWS::RDS::DBInstance'
+        cfn_type = 'AWS::RDS::DBProxy'
         permissions_enum = ('rds:DescribeDBProxies',)
         universal_taggable = object()
 
@@ -2227,7 +2227,7 @@ class DbOptionGroups(ValueFilter):
 
 @filters.register('pending-maintenance')
 class PendingMaintenance(Filter):
-    """ Scan DB instances for those with pending maintenance
+    """Scan DB instances for those with pending maintenance
 
     :example:
 
@@ -2238,8 +2238,14 @@ class PendingMaintenance(Filter):
             resource: aws.rds
             filters:
               - pending-maintenance
+              - type: value
+                key: '"c7n:PendingMaintenance"[].PendingMaintenanceActionDetails[].Action'
+                op: intersect
+                value:
+                  - system-update
     """
 
+    annotation_key = 'c7n:PendingMaintenance'
     schema = type_schema('pending-maintenance')
     permissions = ('rds:DescribePendingMaintenanceActions',)
 
@@ -2247,15 +2253,16 @@ class PendingMaintenance(Filter):
         client = local_session(self.manager.session_factory).client('rds')
 
         results = []
-        pending_maintenance = set()
+        resource_maintenances = {}
         paginator = client.get_paginator('describe_pending_maintenance_actions')
         for page in paginator.paginate():
-            pending_maintenance.update(
-                {action['ResourceIdentifier'] for action in page['PendingMaintenanceActions']}
-            )
+            for action in page['PendingMaintenanceActions']:
+                resource_maintenances.setdefault(action['ResourceIdentifier'], []).append(action)
 
         for r in resources:
-            if r['DBInstanceArn'] in pending_maintenance:
+            pending_maintenances = resource_maintenances.get(r['DBInstanceArn'], [])
+            if len(pending_maintenances) > 0:
+                r[self.annotation_key] = pending_maintenances
                 results.append(r)
 
         return results
