@@ -186,7 +186,7 @@ class TagModelCustomizationJob(Tag):
             client.tag_resource(resourceARN=r["jobArn"], tags=tags)
 
 
-@BedrockCustomModel.action_registry.register('remove-tag')
+@BedrockModelCustomizationJob.action_registry.register('remove-tag')
 class RemoveTagModelCustomizationJob(RemoveTag):
     """Remove tags from Bedrock model customization jobs
 
@@ -206,3 +206,26 @@ class RemoveTagModelCustomizationJob(RemoveTag):
     def process_resource_set(self, client, resources, tags):
         for r in resources:
             client.untag_resource(resourceARN=r['jobArn'], tagKeys=tags)
+
+
+@BedrockModelCustomizationJob.action_registry.register('stop')
+class RemoveTagModelCustomizationJob(RemoveTag):
+    """Stop model customization job
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+            - name: bedrock-model-customization-untagged-stop
+              resource: aws.model-customization-job
+              filters:
+                - tag:Owner: absent
+              actions:
+                - type: stop
+    """
+    permissions = ('bedrock:StopModelCustomizationJob',)
+
+    def process_resource_set(self, client, resources, tags):
+        for r in resources:
+            client.stop_model_customization_job(jobIdentifier=r['jobArn'])
