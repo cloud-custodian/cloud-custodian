@@ -223,7 +223,9 @@ class StopCustomizationJob(BaseAction):
                 - tag:Owner: absent
               actions:
                 - type: stop
+
     """
+    schema = type_schema('stop')
     permissions = ('bedrock:StopModelCustomizationJob',)
 
     def process_resource_set(self, client, resources, tags):
