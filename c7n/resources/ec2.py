@@ -23,6 +23,7 @@ from c7n.filters import (
     FilterRegistry, AgeFilter, ValueFilter, Filter
 )
 from c7n.filters.offhours import OffHour, OnHour
+from c7n.filters.costhub import CostHubRecommendation
 import c7n.filters.vpc as net_filters
 
 from c7n.manager import resources
@@ -1319,7 +1320,7 @@ class Resize(BaseAction):
     """Change an instance's size.
 
     An instance can only be resized when its stopped, this action
-    can optionally restart an instance if needed to effect the instance
+    can optionally stop/start an instance if needed to effect the instance
     type change. Instances are always left in the run state they were
     found in.
 
@@ -1328,6 +1329,24 @@ class Resize(BaseAction):
     hvm/pv, and ebs optimization at minimum.
 
     http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-resize.html
+
+    This action also has specific support for enacting recommendations
+    from the AWS Cost Optimization Hub for resizing.
+
+    :example:
+
+      .. code-block:: yaml
+
+         policies:
+           - name: ec2-rightsize
+             resource: aws.ec2
+             filters:
+               - type: cost-optimization
+                 attrs:
+                  - actionType: Rightsize
+             actions:
+               - resize
+
     """
 
     schema = type_schema(
@@ -1361,27 +1380,26 @@ class Resize(BaseAction):
                 self.log.exception(
                     "Exception stopping instances for resize:\n %s" % e)
 
+        client = utils.local_session(self.manager.session_factory).client('ec2')
+
         for instance_set in utils.chunks(itertools.chain(
                 stopped_instances, running_instances), 20):
-            self.process_resource_set(instance_set)
+            self.process_resource_set(instance_set, client)
 
         if self.data.get('restart') and running_instances:
             client.start_instances(
                 InstanceIds=[i['InstanceId'] for i in running_instances])
         return list(itertools.chain(stopped_instances, running_instances))
 
-    def process_resource_set(self, instance_set):
-        type_map = self.data.get('type-map')
-        default_type = self.data.get('default')
-
-        client = utils.local_session(
-            self.manager.session_factory).client('ec2')
+    def process_resource_set(self, instance_set, client):
 
         for i in instance_set:
+            new_type = self.get_target_instance_type(i)
             self.log.debug(
-                "resizing %s %s" % (i['InstanceId'], i['InstanceType']))
-            new_type = type_map.get(i['InstanceType'], default_type)
-            if new_type == i['InstanceType']:
+                "resizing %s %s -> %s" % (i['InstanceId'], i['InstanceType'], new_type)
+            )
+
+            if not new_type or new_type == i['InstanceType']:
                 continue
             try:
                 client.modify_instance_attribute(
@@ -1391,6 +1409,14 @@ class Resize(BaseAction):
                 self.log.exception(
                     "Exception resizing instance:%s new:%s old:%s \n %s" % (
                         i['InstanceId'], new_type, i['InstanceType'], e))
+
+    def get_target_instance_type(self, i):
+        optimizer_recommend = i.get(CostHubRecommendation.annotation_key)
+        if optimizer_recommend and optimizer_recommend['actionType'] == 'Rightsize':
+            return optimizer_recommend['recommendedResourceSummary']
+        type_map = self.data.get('type-map', {})
+        default_type = self.data.get('default')
+        return type_map.get(i['InstanceType'], default_type)
 
 
 @actions.register('stop')
