@@ -300,6 +300,7 @@ class BedrockAgent(QueryResourceManager):
             tags = self.retry(client.list_tags_for_resource,
                 resourceArn=r['agentArn'])['tags']
             r['Tags'] = [{'Key': k, 'Value': v} for k, v in tags.items()]
+            r.pop('promptOverrideConfiguration', None)
             return r
         resources = super().augment(resources)
         return list(map(_augment, resources))
