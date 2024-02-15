@@ -6,6 +6,7 @@ from c7n.query import QueryResourceManager, TypeInfo, DescribeSource
 from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction
 from c7n.utils import local_session, type_schema
 from c7n.actions import BaseAction
+from c7n.filters.kms import KmsRelatedFilter
 
 
 @resources.register('bedrock-custom-model')
@@ -123,6 +124,29 @@ class DeleteBedrockCustomModel(BaseAction):
               continue
 
 
+@BedrockCustomModel.filter_registry.register('kms-key')
+class BedrockCustomModelKmsFilter(KmsRelatedFilter):
+    """
+
+    Filter bedrock custom models by its associcated kms key
+    and optionally the aliasname of the kms key by using 'c7n:AliasName'
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: bedrock-custom-model-kms-key-filter
+            resource: aws.bedrock-custom-model
+            filters:
+              - type: kms-key
+                key: c7n:AliasName
+                value: alias/aws/bedrock
+
+    """
+    RelatedIdsExpression = 'modelKmsKeyArn'
+
+
 class DescribeBedrockCustomizationJob(DescribeSource):
 
     def augment(self, resources):
@@ -160,6 +184,29 @@ class BedrockModelCustomizationJob(QueryResourceManager):
     source_mapping = {
         'describe': DescribeBedrockCustomizationJob
     }
+
+
+@BedrockModelCustomizationJob.filter_registry.register('kms-key')
+class BedrockCustomizationJobsKmsFilter(KmsRelatedFilter):
+    """
+
+    Filter bedrock customization jobs by its associcated kms key
+    and optionally the aliasname of the kms key by using 'c7n:AliasName'
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: bedrock-customization-job-kms-key-filter
+            resource: aws.model-customization-job
+            filters:
+              - type: kms-key
+                key: c7n:AliasName
+                value: alias/aws/bedrock
+
+    """
+    RelatedIdsExpression = 'outputModelKmsKeyArn'
 
 
 @BedrockModelCustomizationJob.action_registry.register('tag')

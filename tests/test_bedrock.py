@@ -90,15 +90,19 @@ class BedrockModelCustomizationJobs(BaseTest):
         self.assertEqual(len(tags), 1)
         self.assertEqual(tags, [{'key': 'foo', 'value': 'bar'}])
 
-    def test_bedrock_customization_job_no_tag_stop(self):
-        session_factory = self.replay_flight_data('test_bedrock_customization_job_no_tag_stop')
+    def test_bedrock_customization_job_no_enc_stop(self):
+        session_factory = self.replay_flight_data('test_bedrock_customization_job_no_enc_stop')
         p = self.load_policy(
             {
                 'name': 'bedrock-model-customization-job-tag',
                 'resource': 'model-customization-job',
                 'filters': [
                     {'status': 'InProgress'},
-                    {'tag:foo': 'absent'},
+                    {
+                        'type': 'kms-key',
+                        'key': 'c7n:AliasName',
+                        'value': 'alias/tes/pratyush',
+                    },
                 ],
                 'actions': [
                     {
@@ -110,7 +114,7 @@ class BedrockModelCustomizationJobs(BaseTest):
         resources = p.push(event_data(
             "event-cloud-trail-bedrock-create-customization-jobs.json"), None)
         self.assertEqual(len(resources), 1)
-        self.assertEqual(resources[0]['jobName'], 'c7n-test-abc')
+        self.assertEqual(resources[0]['jobName'], 'c7n-test-ab')
         client = session_factory().client('bedrock')
         status = client.get_model_customization_job(jobIdentifier=resources[0]['jobArn'])['status']
         self.assertEqual(status, 'Stopping')

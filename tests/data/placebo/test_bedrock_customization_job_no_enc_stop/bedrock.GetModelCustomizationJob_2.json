@@ -2,10 +2,10 @@
     "status_code": 200,
     "data": {
         "ResponseMetadata": {},
-        "jobArn": "arn:aws:bedrock:us-east-1:644160558196:model-customization-job/cohere.command-text-v14:7:4k/ntozgdqjbspv",
-        "jobName": "c7n-test-abc",
-        "outputModelName": "c7n-test-abc",
-        "clientRequestToken": "63773c77-f2f3-41e9-828e-03e1851ee493",
+        "jobArn": "arn:aws:bedrock:us-east-1:644160558196:model-customization-job/cohere.command-text-v14:7:4k/q4ad8z8tioq8",
+        "jobName": "c7n-test-ab",
+        "outputModelName": "c7n-test-ab",
+        "clientRequestToken": "24cc2d55-fb6d-40d6-a136-6d44b5f89ae0",
         "roleArn": "arn:aws:iam::644160558196:role/AmazonBedrockExecutionRoleForAgents_c7n_test",
         "status": "Stopping",
         "creationTime": {
@@ -13,20 +13,20 @@
             "year": 2024,
             "month": 2,
             "day": 15,
-            "hour": 7,
-            "minute": 46,
-            "second": 53,
-            "microsecond": 957000
+            "hour": 9,
+            "minute": 7,
+            "second": 57,
+            "microsecond": 356000
         },
         "lastModifiedTime": {
             "__class__": "datetime",
             "year": 2024,
             "month": 2,
             "day": 15,
-            "hour": 7,
-            "minute": 47,
-            "second": 31,
-            "microsecond": 626000
+            "hour": 9,
+            "minute": 12,
+            "second": 3,
+            "microsecond": 581000
         },
         "baseModelArn": "arn:aws:bedrock:us-east-1::foundation-model/cohere.command-text-v14:7:4k",
         "hyperParameters": {
@@ -44,6 +44,7 @@
             "s3Uri": "s3://test-bedrock-1"
         },
         "customizationType": "FINE_TUNING",
+        "outputModelKmsKeyArn": "arn:aws:kms:us-east-1:644160558196:key/082cd05f-96d1-49f6-a5ac-32093d2cfe38",
         "validationMetrics": []
     }
 }
