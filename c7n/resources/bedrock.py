@@ -26,9 +26,9 @@ class BedrockCustomModel(QueryResourceManager):
         def _augment(r):
             tags = self.retry(client.list_tags_for_resource,
                 resourceARN=r['modelArn'])['tags']
-            r['Tags'] = [{'Key': t['key'], 'Value':t['value']} for t in tags]
+            r['Tags'] = [{'Key': t['key'], 'Value': t['value']} for t in tags]
             return r
-        resources = super(BedrockCustomModel, self).augment(resources)
+        resources = super().augment(resources)
         return list(map(_augment, resources))
 
 
@@ -279,3 +279,50 @@ class StopCustomizationJob(BaseAction):
         client = local_session(self.manager.session_factory).client('bedrock')
         for r in resources:
             client.stop_model_customization_job(jobIdentifier=r['jobArn'])
+
+
+@resources.register('bedrock-agent')
+class BedrockAgent(QueryResourceManager):
+    class resource_type(TypeInfo):
+        service = 'bedrock-agent'
+        enum_spec = ('list_agents', 'agentSummaries[]', None)
+        detail_spec = (
+            'get_agent', 'agentId', 'agentId', 'agent')
+        name = "agentName"
+        id = "agentId"
+        arn = "agentArn"
+        permission_prefix = 'bedrock'
+
+    def augment(self, resources):
+        client = local_session(self.session_factory).client('bedrock-agent')
+
+        def _augment(r):
+            tags = self.retry(client.list_tags_for_resource,
+                resourceArn=r['agentArn'])['tags']
+            r['Tags'] = [{'Key': k, 'Value': v} for k, v in tags.items()]
+            return r
+        resources = super().augment(resources)
+        return list(map(_augment, resources))
+
+
+@BedrockAgent.filter_registry.register('kms-key')
+class BedrockCustomizationJobsKmsFilter(KmsRelatedFilter):
+    """
+
+    Filter bedrock agents by its associcated kms key
+    and optionally the aliasname of the kms key by using 'c7n:AliasName'
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: bedrock-agent-kms-key-filter
+            resource: aws.bedrock-agent
+            filters:
+              - type: kms-key
+                key: c7n:AliasName
+                value: alias/aws/bedrock
+
+    """
+    RelatedIdsExpression = 'customerEncryptionKeyArn'

@@ -125,3 +125,26 @@ class BedrockModelCustomizationJobs(BaseTest):
             session_factory=session_factory)
         resources = p.resource_manager.get_resources(["c7n-test-abcd"])
         self.assertEqual(len(resources), 1)
+
+
+class BedrockAgent(BaseTest):
+
+    def test_bedrock_agent_encryption(self):
+        session_factory = self.replay_flight_data('test_bedrock_agent_encryption')
+        p = self.load_policy(
+            {
+                'name': 'bedrock-agent',
+                'resource': 'bedrock-agent',
+                'filters': [
+                    {'tag:c7n': 'test'},
+                    {
+                        'type': 'kms-key',
+                        'key': 'c7n:AliasName',
+                        'value': 'alias/tes/pratyush',
+                    }
+                ],
+            }, session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['agentName'], 'c7n-test')
