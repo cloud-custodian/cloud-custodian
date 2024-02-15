@@ -228,6 +228,7 @@ class StopCustomizationJob(BaseAction):
     schema = type_schema('stop')
     permissions = ('bedrock:StopModelCustomizationJob',)
 
-    def process_resource_set(self, client, resources, tags):
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('bedrock')
         for r in resources:
             client.stop_model_customization_job(jobIdentifier=r['jobArn'])

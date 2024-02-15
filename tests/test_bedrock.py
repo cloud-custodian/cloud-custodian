@@ -1,6 +1,6 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
-from .common import BaseTest
+from .common import BaseTest, event_data
 
 
 class BedrockCustomModel(BaseTest):
@@ -89,3 +89,28 @@ class BedrockModelCustomizationJobs(BaseTest):
         tags = client.list_tags_for_resource(resourceARN=resources[0]['jobArn'])['tags']
         self.assertEqual(len(tags), 1)
         self.assertEqual(tags, [{'key': 'foo', 'value': 'bar'}])
+
+    def test_bedrock_customization_job_no_tag_stop(self):
+        session_factory = self.replay_flight_data('test_bedrock_customization_job_no_tag_stop')
+        p = self.load_policy(
+            {
+                'name': 'bedrock-model-customization-job-tag',
+                'resource': 'model-customization-job',
+                'filters': [
+                    {'status': 'InProgress'},
+                    {'tag:foo': 'absent'},
+                ],
+                'actions': [
+                    {
+                        'type': 'stop'
+                    }
+                ]
+            }, session_factory=session_factory
+        )
+        resources = p.push(event_data(
+            "event-cloud-trail-bedrock-create-customization-jobs.json"), None)
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['jobName'], 'c7n-test-abc')
+        client = session_factory().client('bedrock')
+        status = client.get_model_customization_job(jobIdentifier=resources[0]['jobArn'])['status']
+        self.assertEqual(status, 'Stopping')

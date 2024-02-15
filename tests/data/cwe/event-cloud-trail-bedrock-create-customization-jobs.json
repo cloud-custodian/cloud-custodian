@@ -1,0 +1,19 @@
+{
+    "eventVersion": "1.08",
+    "eventSource": "bedrock.amazonaws.com",
+    "eventName": "CreateModelCustomizationJob",
+    "awsRegion": "us-east-1",
+    "sourceIPAddress": "204.63.40.40",
+    "requestParameters": {
+        "jobName": "c7n-test-abc",
+        "customModelName": "c7n-test-abc"
+    },
+    "responseElements": {
+        "jobArn": "arn:aws:bedrock:us-east-1:644160558196:model-customization-job/cohere.command-text-v14:7:4k/ntozgdqjbspv"
+    },
+    "readOnly": false,
+    "eventType": "AwsApiCall",
+    "managementEvent": true,
+    "recipientAccountId": "644160558196",
+    "eventCategory": "Management"
+}
