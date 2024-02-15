@@ -1,5 +1,6 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+import copy
 import json
 
 import jsonpatch
@@ -46,9 +47,19 @@ class Update(ControlAction):
             )
 
     def get_patch(self, r):
-        tgt = dict(r)
+        # deep copy is expensive, but we need to remove read only and create only properties
+        # to generate a valid patch.
+        current = copy.deepcopy(r)
+
+        # the action's schema reflects updatable properties
+        updatable = {k for k in self.schema["properties"] if k != "type"}
+        for k in list(set(current) - updatable):
+            del current[k]
+
+        # shallow copy for patch generation
+        tgt = dict(current)
         for k, v in self.data.items():
             if k == "type":
                 continue
             tgt[k] = v
-        return jsonpatch.make_patch(r, tgt)
+        return jsonpatch.make_patch(current, tgt)
