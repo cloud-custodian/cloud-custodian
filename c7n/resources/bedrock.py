@@ -306,7 +306,7 @@ class BedrockAgent(QueryResourceManager):
 
 
 @BedrockAgent.filter_registry.register('kms-key')
-class BedrockCustomizationJobsKmsFilter(KmsRelatedFilter):
+class BedrockAgentKmsFilter(KmsRelatedFilter):
     """
 
     Filter bedrock agents by its associcated kms key
