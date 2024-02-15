@@ -114,3 +114,10 @@ class BedrockModelCustomizationJobs(BaseTest):
         client = session_factory().client('bedrock')
         status = client.get_model_customization_job(jobIdentifier=resources[0]['jobArn'])['status']
         self.assertEqual(status, 'Stopping')
+
+    def test_bedrock_customization_jobarn_in_event(self):
+        session_factory = self.replay_flight_data('test_bedrock_customization_jobarn_in_event')
+        p = self.load_policy({'name': 'test-bedrock-job', 'resource': 'model-customization-job'},
+            session_factory=session_factory)
+        resources = p.resource_manager.get_resources(["c7n-test-abcd"])
+        self.assertEqual(len(resources), 1)
