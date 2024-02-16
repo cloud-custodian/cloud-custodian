@@ -77,6 +77,27 @@ class AlarmTest(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertTrue({'Key': 'OwnerName', 'Value': 'SomeName'} in resources[0].get('Tags'))
 
+    def test_exclude_composite_filter(self):
+        factory = self.replay_flight_data("test_exclude_composite_filter")
+        p = self.load_policy(
+            {
+                "name": "exclude-composite-alarms",
+                "resource": "aws.alarm",
+                "filters": [
+                    {
+                        'type': 'exclude-composite-alarms',
+                    }
+                ],
+            },
+            session_factory=factory,
+        )
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        for alarm in resources:
+            self.assertNotIn(alarm['AlarmName'], "ExampleCompositeAlarm")
+
 
 class CompositeAlarmTest(BaseTest):
 

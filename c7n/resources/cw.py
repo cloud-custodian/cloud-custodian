@@ -22,7 +22,7 @@ from c7n.resolver import ValuesFrom
 from c7n.resources import load_resources
 from c7n.resources.aws import ArnResolver
 from c7n.tags import universal_augment
-from c7n.utils import type_schema, local_session, chunks, get_retry
+from c7n.utils import type_schema, local_session, chunks, get_retry, jmespath_search
 from botocore.config import Config
 
 
@@ -87,6 +87,19 @@ class AlarmDelete(BaseAction):
             self.manager.retry(
                 client.delete_alarms,
                 AlarmNames=[r['AlarmName'] for r in resource_set])
+
+
+@Alarm.filter_registry.register('exclude-composite-alarms')
+class ExcludeCompositeAlarms(Filter):
+    schema = type_schema('exclude-composite-alarms')
+    permissions = ('cloudwatch:DescribeAlarms',)
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('cloudwatch')
+        composite_alarms = client.describe_alarms(AlarmTypes=['CompositeAlarm'])
+        composite_alarm_names = jmespath_search('CompositeAlarms[].AlarmName', composite_alarms)
+
+        return [r for r in resources if r['AlarmName'] not in composite_alarm_names]
 
 
 @resources.register('composite-alarm')
