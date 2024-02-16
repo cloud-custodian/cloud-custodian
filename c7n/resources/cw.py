@@ -90,8 +90,8 @@ class AlarmDelete(BaseAction):
                 AlarmNames=[r['AlarmName'] for r in resource_set])
 
 
-@Alarm.filter_registry.register('exclude-composite-alarms')
-class ExcludeCompositeAlarms(Filter):
+@Alarm.filter_registry.register('exclude-composite-child')
+class ExcludeCompositeChild(Filter):
     schema = type_schema('exclude-composite-alarms')
     permissions = ('cloudwatch:DescribeAlarms',)
 
@@ -101,12 +101,12 @@ class ExcludeCompositeAlarms(Filter):
         composite_alarm_rules = jmespath_search('[].AlarmRule', composite_alarms)
 
         parent_alarm_names = set()
-        # Loop through, find parent alarm names
+        # Loop through, find child alarm names
         for rule in composite_alarm_rules:
             names = self.extract_alarm_names_from_rule(rule)
             parent_alarm_names.update(names)
 
-        # Return alarms that aren't a parent
+        # Return alarms that aren't a child alarm
         return [r for r in resources if r['AlarmName'] not in parent_alarm_names]
 
     def extract_alarm_names_from_rule(self, rule):
