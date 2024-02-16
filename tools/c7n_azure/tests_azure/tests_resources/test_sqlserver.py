@@ -606,9 +606,12 @@ class SqlServerSecurityAlertPoliciesFilterTest(BaseTest):
             'name': 'test-azure-sql-server-security-alert-policies',
             'resource': 'azure.sql-server',
             'filters': [{
-                'type': 'sql-server-security-alert-policies',
-                'key': 'properties.state',
-                'value': 'Disabled'
+                'type': 'security-alert-policies',
+                'attrs': [{
+                    'type': 'value',
+                    'key': 'state',
+                    'value': 'Disabled'
+                }]
             }],
         }, validate=True)
         self.assertTrue(policy)
@@ -619,9 +622,12 @@ class SqlServerSecurityAlertPoliciesFilterTest(BaseTest):
             'name': 'test-azure-sql-server-security-alert-policies',
             'resource': 'azure.sql-server',
             'filters': [{
-                'type': 'sql-server-security-alert-policies',
-                'key': 'state',
-                'value': 'Disabled'
+                'type': 'security-alert-policies',
+                'attrs': [{
+                    'type': 'value',
+                    'key': 'properties.state',
+                    'value': 'Disabled'
+                }]
             }],
         })
         resources = policy.run()
