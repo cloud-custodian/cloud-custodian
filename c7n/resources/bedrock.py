@@ -169,7 +169,7 @@ class DescribeBedrockCustomizationJob(DescribeSource):
         return resources
 
 
-@resources.register('model-customization-job')
+@resources.register('bedrock-customization-job')
 class BedrockModelCustomizationJob(QueryResourceManager):
     class resource_type(TypeInfo):
         service = 'bedrock'
@@ -199,7 +199,7 @@ class BedrockCustomizationJobsKmsFilter(KmsRelatedFilter):
 
         policies:
           - name: bedrock-customization-job-kms-key-filter
-            resource: aws.model-customization-job
+            resource: aws.bedrock-customization-job
             filters:
               - type: kms-key
                 key: c7n:AliasName
@@ -219,7 +219,7 @@ class TagModelCustomizationJob(Tag):
 
         policies:
             - name: bedrock-model-customization-job-tag
-              resource: aws.model-customization-job
+              resource: aws.bedrock-customization-job
               actions:
                 - type: tag
                   key: test
@@ -243,7 +243,7 @@ class RemoveTagModelCustomizationJob(RemoveTag):
 
         policies:
             - name: bedrock-model-customization-job-remove-tag
-              resource: aws.model-customization-job
+              resource: aws.bedrock-customization-job
               actions:
                 - type: remove-tag
                   tags: ["tag-key"]
@@ -265,7 +265,7 @@ class StopCustomizationJob(BaseAction):
 
         policies:
             - name: bedrock-model-customization-untagged-stop
-              resource: aws.model-customization-job
+              resource: aws.bedrock-customization-job
               filters:
                 - tag:Owner: absent
               actions:

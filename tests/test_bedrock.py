@@ -66,7 +66,7 @@ class BedrockModelCustomizationJobs(BaseTest):
         p = self.load_policy(
             {
                 'name': 'bedrock-model-customization-job-tag',
-                'resource': 'model-customization-job',
+                'resource': 'bedrock-customization-job',
                 'filters': [
                     {'tag:foo': 'absent'},
                     {'tag:Owner': 'Pratyush'},
@@ -95,7 +95,7 @@ class BedrockModelCustomizationJobs(BaseTest):
         p = self.load_policy(
             {
                 'name': 'bedrock-model-customization-job-tag',
-                'resource': 'model-customization-job',
+                'resource': 'bedrock-customization-job',
                 'filters': [
                     {'status': 'InProgress'},
                     {
@@ -121,7 +121,7 @@ class BedrockModelCustomizationJobs(BaseTest):
 
     def test_bedrock_customization_jobarn_in_event(self):
         session_factory = self.replay_flight_data('test_bedrock_customization_jobarn_in_event')
-        p = self.load_policy({'name': 'test-bedrock-job', 'resource': 'model-customization-job'},
+        p = self.load_policy({'name': 'test-bedrock-job', 'resource': 'bedrock-customization-job'},
             session_factory=session_factory)
         resources = p.resource_manager.get_resources(["c7n-test-abcd"])
         self.assertEqual(len(resources), 1)
