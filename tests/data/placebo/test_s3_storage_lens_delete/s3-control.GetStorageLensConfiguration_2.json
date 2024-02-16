@@ -1,0 +1,25 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "StorageLensConfiguration": {
+            "Id": "test-2",
+            "AccountLevel": {
+                "BucketLevel": {}
+            },
+            "DataExport": {
+                "S3BucketDestination": {
+                    "Format": "CSV",
+                    "OutputSchemaVersion": "V_1",
+                    "AccountId": "644160558196",
+                    "Arn": "arn:aws:s3:::test-bedrock-1"
+                },
+                "CloudWatchMetrics": {
+                    "IsEnabled": false
+                }
+            },
+            "IsEnabled": true,
+            "StorageLensArn": "arn:aws:s3:us-east-1:644160558196:storage-lens/test-2"
+        }
+    }
+}
