@@ -55,3 +55,7 @@ docs/source/tools/assets/
 .python-version
 # files generated during "make test"
 tests/data/vcr_cassettes/test_output/default_bucket_region_public.yaml
+
+# custodian docs suggest using a venv dir called "custodian" so ignore it
+custodian*/
+venv*/

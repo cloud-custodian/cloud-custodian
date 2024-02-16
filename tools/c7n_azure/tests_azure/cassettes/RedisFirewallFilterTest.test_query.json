@@ -1,0 +1,128 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Cache/Redis?api-version=2019-07-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "date": [
+                        "Fri, 18 Mar 2022 12:28:45 GMT"
+                    ],
+                    "x-rp-server-mvid": [
+                        "19a02dbb-9d02-4c5d-9811-de1a634c04aa"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-length": [
+                        "783"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/301-green-resources/providers/Microsoft.Cache/Redis/301-redis-green",
+                                "location": "East US",
+                                "name": "301-redis-green",
+                                "type": "Microsoft.Cache/Redis",
+                                "tags": {},
+                                "properties": {
+                                    "provisioningState": "Succeeded",
+                                    "redisVersion": "4.1.14",
+                                    "sku": {
+                                        "name": "Premium",
+                                        "family": "P",
+                                        "capacity": 1
+                                    },
+                                    "enableNonSslPort": false,
+                                    "instances": [
+                                        {
+                                            "sslPort": 15000,
+                                            "isMaster": true
+                                        },
+                                        {
+                                            "sslPort": 15001,
+                                            "isMaster": false
+                                        }
+                                    ],
+                                    "minimumTlsVersion": "1.0",
+                                    "redisConfiguration": {
+                                        "maxmemory-policy": "volatile-lru",
+                                        "maxclients": "7500",
+                                        "maxmemory-reserved": "642",
+                                        "maxfragmentationmemory-reserved": "642",
+                                        "maxmemory-delta": "642"
+                                    },
+                                    "accessKeys": null,
+                                    "hostName": "301-redis-green.redis.cache.windows.net",
+                                    "port": 6379,
+                                    "sslPort": 6380,
+                                    "linkedServers": []
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/301-green-resources/providers/Microsoft.Cache/Redis/301-redis-green/firewallRules?api-version=2019-07-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "date": [
+                        "Fri, 18 Mar 2022 12:28:46 GMT"
+                    ],
+                    "x-rp-server-mvid": [
+                        "19a02dbb-9d02-4c5d-9811-de1a634c04aa"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-length": [
+                        "316"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/301-green-resources/providers/Microsoft.Cache/Redis/301-redis-green/firewallRules/someIPrange",
+                                "name": "301-redis-green/someIPrange",
+                                "type": "Microsoft.Cache/Redis/firewallRules",
+                                "properties": {
+                                    "startIP": "1.2.3.4",
+                                    "endIP": "2.3.4.5"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}

@@ -215,9 +215,10 @@ policies:
    resource: "terraform.aws*"
    filters:
      - taggable
-     - tag:Env: absent
-     - tag:Owner: absent
-     - tag:App: absent
+     - or:
+       - tag:Env: absent
+       - tag:Owner: absent
+       - tag:App: absent
 ```
 
 This filter supports resources from several terraform providers including aws, azure, gcp, oci, tencentcloud.
