@@ -13,7 +13,7 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - uses: aws-actions/configure-aws-credentials@v2
+    - uses: aws-actions/configure-aws-credentials@v4
       with:
         role-to-assume: ${{ inputs.aws-role }}
         aws-region: ${{ inputs.aws-region }}
@@ -21,6 +21,7 @@ runs:
     - name: Install Deps
       shell: bash
       run: |
+        pip config --site unset global.index-url
         pip install -U awscli
 
     - name: Publish

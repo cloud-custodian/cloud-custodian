@@ -1,0 +1,49 @@
+{
+    "status_code": 200,
+    "data": {
+        "items": [
+            {
+                "accountId": "644160558196",
+                "actionType": "Rightsize",
+                "currencyCode": "USD",
+                "currentResourceSummary": "1024 MB memory",
+                "currentResourceType": "LambdaFunction",
+                "estimatedMonthlyCost": 0.0922,
+                "estimatedMonthlySavings": 0.0121,
+                "estimatedSavingsPercentage": 12.0,
+                "implementationEffort": "Low",
+                "lastRefreshTimestamp": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 2,
+                    "day": 7,
+                    "hour": 19,
+                    "minute": 7,
+                    "second": 17,
+                    "microsecond": 778000
+                },
+                "recommendationId": "NDkwMDY1ODg1ODYzX2U2ODg2YzBjLWE0N2YtNDk2My05ZjZhLTk2OTIyYWViNmNkNw==",
+                "recommendationLookbackPeriodInDays": 14,
+                "recommendedResourceSummary": "848 MB memory",
+                "recommendedResourceType": "LambdaFunction",
+                "region": "us-east-1",
+                "resourceArn": "arn:aws:lambda:us-east-1:644160558196:function:kapilt-assetdb-current-caches:$LATEST",
+                "resourceId": "kapilt-assetdb-current-caches",
+                "restartNeeded": false,
+                "rollbackPossible": true,
+                "source": "ComputeOptimizer",
+                "tags": [
+                    {
+                        "key": "App",
+                        "value": "AssetDB"
+                    },
+                    {
+                        "key": "stacklet:app",
+                        "value": "AssetDB"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
