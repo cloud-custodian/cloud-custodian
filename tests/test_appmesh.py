@@ -1,7 +1,10 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+
 from botocore.history import get_global_history_recorder
 
+from c7n.reports.csvout import Formatter
+from c7n.resources.appmesh import AppmeshMesh, AppmeshVirtualGateway
 from .common import BaseTest, event_data
 
 
@@ -64,8 +67,8 @@ class TestAppmeshMesh(BaseTest):
         # deriving the ARN.
         # See the documentation on the "arn" field in appmesh.py.
         arns = p.resource_manager.get_arns(resources)
-        self.assertIn('arn:aws:appmesh:eu-west-2:123456789012:mesh/m1', arns)
-        self.assertIn('arn:aws:appmesh:eu-west-2:123456789012:mesh/m2', arns)
+        self.assertEqual(['arn:aws:appmesh:eu-west-2:123456789012:mesh/m1',
+                          'arn:aws:appmesh:eu-west-2:123456789012:mesh/m2'], arns)
 
         # The "placebo" testing library doesn't allow us to make assertions
         # linking specific api's calls to the specific mock response file
@@ -133,7 +136,7 @@ class TestAppmeshMesh(BaseTest):
         # deriving the ARN.
         # See the documentation on the "arn" field in appmesh.py.
         arns = p.resource_manager.get_arns(resources)
-        self.assertIn('arn:aws:appmesh:eu-west-2:123456789012:mesh/m1', arns)
+        self.assertEqual(['arn:aws:appmesh:eu-west-2:123456789012:mesh/m1'], arns)
 
         # The "placebo" testing library doesn't allow us to make assertions
         # linking specific api's calls to the specific mock response file
@@ -148,6 +151,21 @@ class TestAppmeshMesh(BaseTest):
                  'service': 'resourcegroupstaggingapi'}],
             captor.calls
         )
+
+    def test_reporting(self):
+        f = Formatter(resource_type=AppmeshMesh.resource_type)
+
+        # provide a fake resource
+        report = f.to_csv(records=[{
+            "someField": "shouldBeIgnored",
+            "meshName": "MyMeshName",
+            "createdAt": "2024"
+        }])
+
+        # expect Formatter to inspect the definition of certain fields ("name" and "date") from the AppMesh def
+        # and to pick out those fields from a fake resource
+        self.assertEqual([["MyMeshName","2024"]], report)
+
 
 
 class TestAppmeshVirtualGateway(BaseTest):
@@ -205,7 +223,7 @@ class TestAppmeshVirtualGateway(BaseTest):
         # deriving the ARN.
         # See the documentation on the "arn" field in appmesh.py.
         arns = p.resource_manager.get_arns(resources)
-        self.assertIn('arn:aws:appmesh:eu-west-2:123456789012:mesh/m1/virtualGateway/g1', arns)
+        self.assertEqual(['arn:aws:appmesh:eu-west-2:123456789012:mesh/m1/virtualGateway/g1'], arns)
 
         # The "placebo" testing library doesn't allow us to make assertions
         # linking specific api's calls to the specific mock response file
@@ -297,7 +315,7 @@ class TestAppmeshVirtualGateway(BaseTest):
         # correctly deriving the ARN.
         # See the documentation on the "arn" field in appmesh.py.
         arns = p.resource_manager.get_arns(resources)
-        self.assertIn('arn:aws:appmesh:eu-west-2:123456789012:mesh/m1/virtualGateway/g1', arns)
+        self.assertEqual(['arn:aws:appmesh:eu-west-2:123456789012:mesh/m1/virtualGateway/g1'], arns)
 
         # The "placebo" testing library doesn't allow us to make assertions
         # linking specific api's calls to the specific mock response file
@@ -316,6 +334,22 @@ class TestAppmeshVirtualGateway(BaseTest):
             ],
             captor.calls
         )
+
+    def test_reporting(self):
+        f = Formatter(resource_type=AppmeshVirtualGateway.resource_type)
+
+        # provide a fake resource
+        report = f.to_csv(records=[{
+            "someField": "shouldBeIgnored",
+            "meshName": "shouldBeIgnored",
+            "arn": "MyArn",
+            "virtualGatewayName": "MyVgwName",
+            "createdAt": "2024"
+        }])
+
+        # expect Formatter to inspect the definition of certain fields ("id", "name" and "date") from the AppMesh def
+        # and to pick out those fields from a fake resource
+        self.assertEqual([["MyArn","MyVgwName", "2024"]], report)
 
 
 class ApiCallCaptor:

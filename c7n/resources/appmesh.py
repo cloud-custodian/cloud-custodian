@@ -27,133 +27,37 @@ class AppmeshMesh(QueryResourceManager):
 
     # interior class that defines the aws metadata for resource
     class resource_type(TypeInfo):
-        # service: is used by the boto client to look up the correct API for this resource.
         service = 'appmesh'
 
-        # https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsappmesh.html#awsappmesh-resources-for-iam-policies   # noqa
-        # TODO: IS THIS EVEN USED AT RUNTIME?
-        # Junk value doesn't seem to affect the functionality of the extension
-        # but does fail the test PolicyMetaLint.test_valid_arn_type
-        # but that isn't a functional test.
-        arn_type = "mesh"
-
-        # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-appmesh-virtualnode.html  # noqa
-
-        # TODO: IS THIS EVEN USED AT RUNTIME?
-        # Junk value doesn't seem to affect the functionality of the extension
-        # but does fail the test PolicyMetaLint.test_cfn_resource_validity
-        # but that isn't a functional test.
+        # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-template-resource-type-ref.html  # noqa
         cfn_type = 'AWS::AppMesh::Mesh'
 
-        # TODO: IS THIS EVEN USED AT RUNTIME?
-        # Junk value doesn't seem to affect the functionality of the extension
-        # but does fail the test PolicyMetaLint.test_cfn_resource_validity
-        # but that isn't a functional test.
+        # https://docs.aws.amazon.com/config/latest/developerguide/resource-config-reference.html  # noqa
         config_type = 'AWS::AppMesh::Mesh'
 
-        # id: Names the field in the response that contains the identifier to use
-        # in API calls to this service.
-        # Therefore, this "id" field might be the "arn" field for some API's but
-        # in the case of Appmesh" it needs to be the field that contains the
-        # name of the mesh as that's what the appmesh API's expect.
+        # id: Needs to be the field that contains the name of the mesh as that's
+        # what the appmesh API's expect.
         # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-appmesh-mesh.html   # noqa
         id = 'meshName'
 
-        # TODO: WHERE IS THIS EVEN USED AT RUNTIME?
-        name = 'meshName!!!!!!'
+        # This name value appears in the "report" command output.
+        # example: custodian  report --format json  -s report-out mesh-policy.yml
+        # See the meshName field here...
+        # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-appmesh-mesh.html   # noqa
+        name = 'meshName'
 
-        # universal_taggable: Valid values are one of True, False, object()
-        # = False :    causes register_universal_tags() to be skipped
-        # = True :     causes register_universal_tags(compatibility=True)
-        # = object() : causes register_universal_tags(compatibility=False)
-        #
-        # The only place this is read is in QueryMeta of query.py and from that
-        # code I have inferred the above meaning of this flag.
-        #
-        # I can only assume that True/False were the original API and then the need
-        # for a third state came along and so object() was used.
-        # The superclass documentation doesn't mention the "False" value which
-        # is likely because perhaps this was historically just a true/false and it was
-        # obvious, but things have changed. Maybe an enum would be better?
+        # Turn on collection of the tags for this resource
         universal_taggable = object()
 
-        # arn : Defines a top level field in the resource definition that contains the ARN
-        # value. This value is accessed used by the 'get_arns(..)' fn on the super-class
-        # QueryResourceManager.
-        #
-        # If this value is not defined then 'get_arns' contains fallback logic.
-        #
-        # First fallback logic is to look at what's defined in the 'id' field.
-        # If the value of the "id" field starts with "arn:" then that value is used as the arn.
-        #
-        # The last resort is an attempt at generating (guessing!) the ARN by assembling it from
-        # various fields and runtime values based on a recipe defined in 'generate_arn()' on
-        # the super-class QueryResourceManager.
-        #
-        # If you aren't going to define the "arn" field and can't rely on the "id" to be an
-        # ARN then you might get lucky that "generate_arn" works for your resource type.
-        # However, failing that then you should override "get_arns" function entirely and
-        # implement your own logic.
-        #
-        # TESTING: Whatever approach you use (above) you REALLY SHOULD (!!!) include a unit
-        # test that verifies that "get_arns" yields the right ARNs for your resources.
-        # This test should be implemented as an additional assertion within the unit tests
-        # you'll be already planning to create.
-        # For example test_appmesh.py includes a call to "get_arns(resources)" and asserts
-        # that the ARNs found by running the policy are the expected ones defined within
-        # the test data JSON files in the "placebo" directory.
         arn = "arn"
 
-        # enum_spec : Defines the boto3 call used to find at least basic
-        # details all resources of the relevant type.  the data per
-        # resource can be further enriched by a detail_spec function.
-        # enum_spec is also used when we've received an event in which
-        # case the results from enum_spec are filtered to include only
-        # those in the event.
-        #
-        # If the enum function chosen allows a filter param to be
-        # specified then the filtering can be done on the server
-        # side. For instance, ASG uses "describe_auto_scaling_groups"
-        # as the enum function and "AutoScalingGroupNames" as a filter
-        # param to that function to limit the server side work.
-        # However, it seems that most "cloud custodian" integrations
-        # do not use this approach.  App mesh list_meshes doesn't
-        # support filtering.  ...
-        #
-        # https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/appmesh/client/list_meshes.html  # noqa
-        #
-        # and so when an event is received then the enum function gets
-        # called and the event id's get enriched.
-        #
-        # For example the specific identity found in an
-        # event. However, if the enum op doesn't support filtering
-        # then what will happen with events instead is a full list of
-        # resources followed by client side filtering.
-        #
-        # params:
-        #  enum_op - the aws api op
-        #  path - JMESPATH path to the field in the response that is the collection of result
-        #         objects
-        #  extra_args - eg {'maxResults': 100}
-        #
         enum_spec = ('list_meshes', 'meshes', None)
 
-        # detail_spec: In many cases the enum_spec function is one of the
-        # "describe_" style functions that return a full'ish spec that
-        # is sufficient for the user detection, however in those cases
-        # where the enum_spec is a "list_" style function then the
-        # response to then enum call will tend to be lacking in detail and
-        # might just be a list of id's. In these cases it is generally
-        # necessary to define a "detail_spec" which can be used to
-        # enrich the values provided by the enum_spec.
-        #
-        # detail_op = boto api call name
-        # param_name = name of argument to boto api call
-        # param_key = name of field in enum_spec response to drive this call
-        # detail_path = path to pull out of the boto response and
-        #               return as the detail result if not provided
-        #               then whole response is included in results
         detail_spec = ('describe_mesh', 'meshName', 'meshName', None)
+
+        # refers to a field in the metadata response of the describe function
+        # https://docs.aws.amazon.com/cli/latest/reference/appmesh/describe-mesh.html
+        date = 'createdAt'
 
 
 class DescribeGatewayDefinition(ChildDescribeSource):
@@ -211,47 +115,45 @@ class AppmeshVirtualGateway(ChildResourceManager):
 
         service = 'appmesh'
 
-        # https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsappmesh.html#awsappmesh-resources-for-iam-policies  # noqa
-        # TODO IS THIS EVEN USED AT RUNTIME?
-        # Junk value doesn't seem to affect the functionality of the extension
-        # but does fail the test PolicyMetaLint.test_valid_arn_type
-        # but that isn't a functional test.
-        arn_type = "mesh"
+        # arn_type is used to manufacture arn's according to a recipe.
+        # however in this case we don't need it because we've defined our
+        # own get_arns function below.
+        # arn_type = None
 
-        # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-appmesh-virtualgateway.html  # noqa
-        # TODO IS THIS EVEN USED AT RUNTIME?
-        # Junk value doesn't seem to affect the functionality of the extension
-        # but does fail the test PolicyMetaLint.test_cfn_resource_validity
-        # but that isn't a functional test.
+        # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-template-resource-type-ref.html  # noqa
+        # Optional - don't know what functionality relies on this.but this is the correct value.
         cfn_type = 'AWS::AppMesh::VirtualGateway'
 
-        # TODO IS THIS EVEN USED AT RUNTIME?
-        # Junk value doesn't seem to affect the functionality of the extension
-        # but does fail the test PolicyMetaLint.test_cfn_resource_validity
-        # but that isn't a functional test.
+        # locate the right value here ...
+        # https://docs.aws.amazon.com/config/latest/developerguide/resource-config-reference.html  # noqa
         config_type = 'AWS::AppMesh::VirtualGateway'
 
-        # if a resource type is supported by resource group tagging
-        # api setting this value get tag filters/actions
+        # turn on automatic collection of tags and tag filtering
         universal_taggable = object()
 
-        # id: Path to "id" field in the .... IN THE WHAT???
-        # TODO: WHERE IS THIS EVEN USED AT RUNTIME?
-        id = 'meshName'
+        # id: is not used by the resource collection process because this is a child function
+        # and it is the parent_spec function that drives collection of "mesh id's".
+        # However, it is still used by reporting.
+        # The only unique field across all virtual gw resources is the ARN.
+        id = "arn"
 
         # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-appmesh-virtualgateway.html  # noqa
-        # TODO: WHERE IS THIS EVEN USED AT RUNTIME?
-        arn = "metadata.arn!!!!!!!"
+        # arn: not needed since we have defined our own "get_arns()" below
+        # arn = "arn"
 
-        # TODO: WHERE IS THIS EVEN USED AT RUNTIME?
-        name = 'virtualGatewayName!!!!!!!!!!'
+        # This "name" value appears in the "report" command output.
+        # example: custodian  report --format json  -s report-out mesh-policy.yml
+        # see the virtualGatewayName field here...
+        # https://docs.aws.amazon.com/cli/latest/reference/appmesh/describe-virtual-gateway.html # noqa
+        name = 'virtualGatewayName'
 
-        # TODO: WHERE IS THIS EVEN USED AT RUNTIME?
-        date = 'createdAt!!!!!!!!!'
+        # refers to a field in the metadata response of the describe function
+        # https://docs.aws.amazon.com/cli/latest/reference/appmesh/describe-virtual-gateway.html
+        date = 'createdAt'
 
-        # When we define a parent_spec then it uses the parent_spec
-        # to provide the driving result set.  This is then iterated
-        # across and the enum_spec is called for each parent instance.
+        # When we define a parent_spec then the parent_spec
+        # provides the driving result set from which resource id's will be picked.
+        # This is then iterated across and the enum_spec is called for each parent instance 'id'.
         # appmesh-mesh - is ref to another resource above that
         # provides the driving value for the enum_spec meshName - is
         # the field from the parent spec that will be pulled out and
