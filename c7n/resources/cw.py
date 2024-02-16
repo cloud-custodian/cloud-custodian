@@ -90,12 +90,13 @@ class AlarmDelete(BaseAction):
                 AlarmNames=[r['AlarmName'] for r in resource_set])
 
 
-@Alarm.filter_registry.register('exclude-composite-child')
-class ExcludeCompositeChild(Filter):
-    schema = type_schema('exclude-composite-child')
+@Alarm.filter_registry.register('is-composite-child')
+class IsCompositeChild(Filter):
+    schema = type_schema('is-composite-child', state={"type": "boolean"})
     permissions = ('cloudwatch:DescribeAlarms',)
 
     def process(self, resources, event=None):
+        state = self.data.get("state", True)
         # Get the composite alarms since filtered out in enum_spec
         composite_alarms = self.manager.get_resource_manager("composite-alarm").resources()
         composite_alarm_rules = jmespath_search('[].AlarmRule', composite_alarms)
@@ -106,8 +107,12 @@ class ExcludeCompositeChild(Filter):
             names = self.extract_alarm_names_from_rule(rule)
             parent_alarm_names.update(names)
 
-        # Return alarms that aren't a child alarm
-        return [r for r in resources if r['AlarmName'] not in parent_alarm_names]
+        if state:
+            # If we want to filter out alarms that are a child of a composite alarm
+            return [r for r in resources if r['AlarmName'] not in parent_alarm_names]
+
+        return [r for r in resources if r['AlarmName'] in parent_alarm_names]
+
 
     def extract_alarm_names_from_rule(self, rule):
         pattern = r"ALARM\(([^)]+)\)"
