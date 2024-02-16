@@ -1,0 +1,69 @@
+{
+    "eventVersion": "1.08",
+    "userIdentity": {
+        "type": "IAMUser",
+        "principalId": "00000",
+        "arn": "arn:aws:iam::00000:robot",
+        "accountId": "00000",
+        "accessKeyId": "XXXXXXXXXXXXXXXXX",
+        "sessionContext": {
+            "sessionIssuer": {},
+            "webIdFederationData": {},
+            "attributes": {
+                "creationDate": "2023-11-05T04:25:03Z",
+                "mfaAuthenticated": "true"
+            }
+        }
+    },
+    "eventTime": "2023-11-05T04:29:11Z",
+    "eventSource": "appmesh.amazonaws.com",
+    "eventName": "CreateMesh",
+    "awsRegion": "eu-west-2",
+    "sourceIPAddress": "81.101.58.184",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
+    "requestParameters": {
+        "clientToken": "559ec1f1-bf26-4db0-0000-c49147bb3771",
+        "meshName": "m1",
+        "spec": {
+            "egressFilter": {
+                "type": "DROP_ALL"
+            }
+        }
+    },
+    "responseElements": {
+        "mesh": {
+            "meshName": "m1",
+            "metadata": {
+                "arn": "arn:aws:appmesh:eu-west-2:123456789012:mesh/m1",
+                "createdAt": "Nov 5, 2023, 4:29:11 AM",
+                "lastUpdatedAt": "Nov 5, 2023, 4:29:11 AM",
+                "meshOwner": "00000",
+                "resourceOwner": "00000",
+                "uid": "92646b31-0475-59c0-0000-ec96629f4cf1",
+                "version": 1
+            },
+            "spec": {
+                "egressFilter": {
+                    "type": "DROP_ALL"
+                }
+            },
+            "status": {
+                "status": "ACTIVE"
+            }
+        }
+    },
+    "requestID": "665077e1-c131-4194-8ec1-de6201d7f79f",
+    "eventID": "3fa01fd9-3537-4cc0-88b0-a2dc297b5839",
+    "readOnly": false,
+    "eventType": "AwsApiCall",
+    "apiVersion": "2019-01-25",
+    "managementEvent": true,
+    "recipientAccountId": "00000",
+    "eventCategory": "Management",
+    "tlsDetails": {
+        "tlsVersion": "TLSv1.3",
+        "cipherSuite": "TLS_AES_128_GCM_SHA256",
+        "clientProvidedHostHeader": "appmesh.eu-west-2.amazonaws.com"
+    },
+    "sessionCredentialFromConsole": "true"
+}
