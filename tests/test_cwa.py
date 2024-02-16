@@ -93,10 +93,10 @@ class AlarmTest(BaseTest):
         )
 
         resources = p.run()
-        self.assertEqual(len(resources), 1)
+        self.assertEqual(len(resources), 0)
 
         for alarm in resources:
-            self.assertNotIn(alarm['AlarmName'], "ExampleCompositeAlarm")
+            self.assertNotIn(alarm['AlarmName'], "c7n-test-alarm-tags-filter")
 
 
 class CompositeAlarmTest(BaseTest):

@@ -24,6 +24,7 @@ from c7n.resources.aws import ArnResolver
 from c7n.tags import universal_augment
 from c7n.utils import type_schema, local_session, chunks, get_retry, jmespath_search
 from botocore.config import Config
+import re
 
 
 class DescribeAlarm(DescribeSource):
@@ -95,12 +96,23 @@ class ExcludeCompositeAlarms(Filter):
     permissions = ('cloudwatch:DescribeAlarms',)
 
     def process(self, resources, event=None):
-        client = local_session(self.manager.session_factory).client('cloudwatch')
-        composite_alarms = client.describe_alarms(AlarmTypes=['CompositeAlarm'])
-        composite_alarm_names = jmespath_search('CompositeAlarms[].AlarmName', composite_alarms)
+        # Get the composite alarms since filtered out in enum_spec
+        composite_alarms = self.manager.get_resource_manager("composite-alarm").resources()
+        composite_alarm_rules = jmespath_search('[].AlarmRule', composite_alarms)
 
-        return [r for r in resources if r['AlarmName'] not in composite_alarm_names]
+        parent_alarm_names = set()
+        # Loop through, find parent alarm names
+        for rule in composite_alarm_rules:
+            names = self.extract_alarm_names_from_rule(rule)
+            parent_alarm_names.update(names)
 
+        # Return alarms that aren't a parent
+        return [r for r in resources if r['AlarmName'] not in parent_alarm_names]
+
+    def extract_alarm_names_from_rule(self, rule):
+        pattern = r"ALARM\(([^)]+)\)"
+        matches = re.findall(pattern, rule)
+        return set(matches)
 
 @resources.register('composite-alarm')
 class CompositeAlarm(QueryResourceManager):
