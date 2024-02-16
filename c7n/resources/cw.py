@@ -92,7 +92,7 @@ class AlarmDelete(BaseAction):
 
 @Alarm.filter_registry.register('exclude-composite-child')
 class ExcludeCompositeChild(Filter):
-    schema = type_schema('exclude-composite-alarms')
+    schema = type_schema('exclude-composite-child')
     permissions = ('cloudwatch:DescribeAlarms',)
 
     def process(self, resources, event=None):
