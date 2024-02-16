@@ -588,10 +588,9 @@ class TestFailoverGroupFilter(BaseTest):
             'name': 'test-azure-sql-server-failover-group-filter',
             'resource': 'azure.sql-server',
             'filters': [{
-                'type': 'failover-group-filter',
-                'key': 'length(failover_groups)',
-                'op': 'gt',
-                'value': 0
+                'type': 'failover-group',
+                'count': 0,
+                'count_op': 'gt'
             }],
         })
         resources = policy.run()

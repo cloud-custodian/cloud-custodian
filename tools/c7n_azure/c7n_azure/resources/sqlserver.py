@@ -2,8 +2,6 @@
 # SPDX-License-Identifier: Apache-2.0
 import logging
 import uuid
-import jmespath
-from c7n.filters import OPERATORS
 from c7n_azure.actions.firewall import SetFirewallAction
 from c7n_azure.filters import FirewallRulesFilter, FirewallBypassFilter
 from c7n_azure.provider import resources
@@ -160,28 +158,23 @@ class TransparentDataEncryptionFilter(Filter):
         return result
 
 
-@SqlServer.filter_registry.register('failover-group-filter')
-class FailoverGroupFilter(ValueFilter):
-    schema = type_schema('failover-group-filter', rinherit=ValueFilter.schema)
+@SqlServer.filter_registry.register('failover-group')
+class FailoverGroupFilter(ListItemFilter):
+    schema = type_schema(
+        "failover-group",
+        attrs={"$ref": "#/definitions/filters_common/list_item_attrs"},
+        count={"type": "number"},
+        count_op={"$ref": "#/definitions/filters_common/comparison_operators"}
+    )
+    annotate_items = True
+    item_annotation_key = "c7n:FailoverGroups"
 
-    def process(self, resources, event=None):
-        client = self.manager.get_client('azure.mgmt.sql.SqlManagementClient')
-        accepted = []
-        permanent_dict = {}
-        for resource in resources:
-            transited = client.failover_groups.list_by_server(
-                resource_group_name=resource['resourceGroup'],
-                server_name=resource['name'])
-            permanent_dict['failover_groups'] = list(transited)
-            jmespath_key = jmespath.search(self.data.get('key'), permanent_dict)
-            if self._op(jmespath_key, self.data.get('value')):
-                accepted.append(resource)
-
-        return accepted
-
-    def _op(self, a, b):
-        op = OPERATORS[self.data.get('op')]
-        return op(a, b)
+    def get_item_values(self, resource):
+        groups = self.manager.get_client().failover_groups.list_by_server(
+            resource_group_name=resource['resourceGroup'],
+            server_name=resource['name']
+        )
+        return [g.serialize(True) for g in groups]
 
 
 @SqlServer.filter_registry.register('azure-ad-administrators')
