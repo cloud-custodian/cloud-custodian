@@ -400,6 +400,23 @@ class SqlServerTest(BaseTest):
         resources = p.run()
         self.assertEqual(1, len(resources))
 
+    def test_auditing_policies_filter(self):
+        p = self.load_policy({
+            'name': 'test-azure-auditing-policies',
+            'resource': 'azure.sqlserver',
+            'filters': [{
+                'type': 'auditing-policies',
+                'attrs': [{
+                    'type': 'value',
+                    'key': 'retentionDays',
+                    'value': 7,
+                    'op': 'less-than'
+                }]
+            }]
+        })
+        resources = p.run()
+        self.assertEqual(1, len(resources))
+
 
 class SQLServerFirewallFilterTest(BaseTest):
 
