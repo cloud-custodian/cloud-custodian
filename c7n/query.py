@@ -831,10 +831,10 @@ class TypeInfo(metaclass=TypeMeta):
         However, if the enum op doesn't support filtering then the enum op must return all
         instances of rhe resource and cloud custodian will perform client side filtering.
 
-        params to the enum_spec:
-         enum_op - the aws api operation
-         path - JMESPATH path to the field in the response that is the collection of result objects
-         extra_args - optional eg {'maxResults': 100}
+        Params to the enum_spec:
+        - enum_op - the aws api operation
+        - path - JMESPATH path to the field in the response that is the collection of result objects
+        - extra_args - optional eg {'maxResults': 100}
 
     **Permissions - Optional**
 
@@ -886,21 +886,21 @@ class TypeInfo(metaclass=TypeMeta):
     :param filter_type: filter_type, scalar or list
     :param detail_spec: Used to enrich the resource descriptions returned by enum_spec.
         In many cases the enum_spec function is one of the
-        "describe_" style functions that return a full'ish spec that
-        is sufficient for the user poliocy. However in other cases
-        the enum_spec is a "list_" style function then the
+        describe style functions that return a fullish spec that
+        is sufficient for the user policy. However, in other cases
+        the enum_spec is a list style function then the
         response to then enum call will be lacking in detail and
         might even just be a list of id's. In these cases it is generally
         necessary to define a "detail_spec" function that may be called for each id returned
         by the enum_spec which can be used to enrich the values provided by the enum_spec.
 
-        params to the defail_spec:
-          detail_op - the boto api call name
-          param_name - name of the identifier argument in the boto api call
-          param_key - name of field in enum_spec response tha that will be pushed into
-                        the identifier argument of the boto api call.
-          detail_path - path to extract from the boto response and merge into the resource model.
-                        if not provided then whole response is merged into the results
+        Params to the detail_spec:
+        - detail_op - the boto api call name
+        - param_name - name of the identifier argument in the boto api call
+        - param_key - name of field in enum_spec response tha that will be pushed into
+        the identifier argument of the boto api call.
+        - detail_path - path to extract from the boto response and merge into the resource model.
+        if not provided then whole response is merged into the results
 
     :param batch_detail_spec: Used when the api supports getting resource details enmasse
 
@@ -921,7 +921,7 @@ class TypeInfo(metaclass=TypeMeta):
     :param config_type: AWS Config Service resource type name.
         See https://docs.aws.amazon.com/config/latest/developerguide/resource-config-reference.html
         Typically cfn_type and config_type will have the sane value,
-         but there are some exceptions, so check.
+        but there are some exceptions, so check.
         The constants defined will be verified by the PolicyMetaLint tests during the build.
 
 
@@ -939,7 +939,7 @@ class TypeInfo(metaclass=TypeMeta):
     :param global_resource: Denotes if this resource exists across all regions (iam, cloudfront,
         r53)
     :param metrics_namespace: Generally we utilize a service to namespace mapping in the metrics
-        filter. However some resources have a type specific namespace (ig. ebs)
+        filter. However, some resources have a type specific namespace (ig. ebs)
     :param id_prefix: Specific to ec2 service resources used to disambiguate a resource by its id
 
     """
