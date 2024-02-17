@@ -61,17 +61,21 @@ class AppmeshMesh(QueryResourceManager):
 
 
 class DescribeGatewayDefinition(ChildDescribeSource):
-    # this method appears to be used only when in event mode and not pull mode
+    # This method is called in event mode and not pull mode.
+    # Its purpose is to take a list of virtual gatewas ARN's that the
+    # framework has extracted from the events according to the policy yml file
+    # and then calls the describe function for the virtual gateway.
     def get_resources(self, ids, cache=True):
         results = []
         client = local_session(self.manager.session_factory).client('appmesh')
         # ids for events should be arns
         for i in ids:
-            # split mesh gw arn :
-            # arn:aws:appmesh:eu-west-2:123456789012:mesh/Mesh7/virtualGateway/GW1  # noqa
+            # split mesh gw arn : arn:aws:appmesh:eu-west-2:123456789012:mesh/Mesh7/virtualGateway/GW1  # noqa
+            # and extract the id's needed to call the describe function.
             mesh_name, _, gw_name = Arn.parse(i).resource.split('/')
             results.append(
                 self.manager.retry(
+                    # https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/appmesh/client/delete_virtual_gateway.html #noa
                     client.describe_virtual_gateway,
                     meshName=mesh_name,
                     virtualGatewayName=gw_name,
@@ -79,20 +83,36 @@ class DescribeGatewayDefinition(ChildDescribeSource):
             )
         return results
 
+    # Called during event mode and pull mode, and it's function is to take id's
+    # from some provided details and return the complete description.
+    # In pull mode it is called with the results of the parent enum_function
+    # from which we can grab the mesh and vgw names (+arn).
+    # In event mode it is called with the results of the get_resources() function above.
     def augment(self, resources):
-        # on event modes the resource has already been fully fetched, just get tags
+        # Detect whether we are in event mode or pull mode.
+        # We can tell if we are in event mode because the event populates the "metadata" field.
+        # If we are in event mode then the resource will already be fully populated because
+        # augment() is called with the fully populated output of get_resources() above.
+        # But, it we are in pull mode then we only have some basic data returned from the
+        # "parent" query enum function.
         if resources and "metadata" in resources[0]:
+            # on event modes the resource has already been fully fetched, just get tags
             return universal_augment(self.manager, resources)
 
-        # on pull modes, we're enriching the result of enum_spec
+        # on pull modes, we're enriching the result of enum_spec of parent query
         results = []
         client = local_session(self.manager.session_factory).client('appmesh')
+
         for gateway_info in resources:
+            mesh_name=gateway_info['meshName']
+            gw_name=gateway_info['virtualGatewayName']
+
             results.append(
                 self.manager.retry(
+                    # https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/appmesh/client/delete_virtual_gateway.html #noa
                     client.describe_virtual_gateway,
-                    meshName=gateway_info['meshName'],
-                    virtualGatewayName=gateway_info['virtualGatewayName'],
+                    meshName=mesh_name,
+                    virtualGatewayName=gw_name,
                 )['virtualGateway']
             )
 
