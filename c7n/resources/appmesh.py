@@ -2,7 +2,6 @@
 AppMesh Communications
 """
 from c7n.manager import resources
-from c7n.tags import universal_augment
 from c7n.query import (
     ChildResourceManager,
     QueryResourceManager,
@@ -12,6 +11,7 @@ from c7n.query import (
     ConfigSource,
 )
 from c7n.resources.aws import Arn
+from c7n.tags import universal_augment
 from c7n.utils import local_session
 
 
@@ -23,7 +23,8 @@ class DescribeMesh(DescribeSource):
 
 @resources.register('appmesh-mesh')
 class AppmeshMesh(QueryResourceManager):
-    source_mapping = {'describe': DescribeMesh, 'config': ConfigSource}
+    source_mapping = {'describe': DescribeMesh,
+                      'config': ConfigSource}
 
     # interior class that defines the aws metadata for resource
     class resource_type(TypeInfo):
@@ -62,61 +63,56 @@ class AppmeshMesh(QueryResourceManager):
 
 class DescribeGatewayDefinition(ChildDescribeSource):
     # This method is called in event mode and not pull mode.
-    # Its purpose is to take a list of virtual gatewas ARN's that the
+    # Its purpose is to take a list of virtual gateway ARN's that the
     # framework has extracted from the events according to the policy yml file
-    # and then calls the describe function for the virtual gateway.
-    def get_resources(self, ids, cache=True):
+    # and then call the describe function for the virtual gateway.
+    def get_resources(self, arns, cache=True):
+        # Split each arn into its parts and then return an object
+        # that has the two names we need for the describe operation.
+        # Mesh gw arn looks like : arn:aws:appmesh:eu-west-2:123456789012:mesh/Mesh7/virtualGateway/GW1  # noqa
+
+        mesh_and_gw_names = [
+            {"meshName": parts[0], "virtualGatewayName": parts[2]} for parts in
+            [Arn.parse(arn).resource.split('/') for arn in arns]
+        ]
+
+        return  self._describe(mesh_and_gw_names)
+
+    # Called during event mode and pull mode, and it's function is to take id's
+    # from some provided data and return the complete description of the resource.
+    # The resources argument is a list of objects that contains at least
+    # the fields meshName and virtualGatewayName.
+    #
+    # If we are in event mode then the resources will already be fully populated because
+    # augment() is called with the fully populated output of get_resources() above.
+    # But, if we are in pull mode then we only have some basic data returned from the
+    # "parent" query enum function so we have to get the full details.
+    def augment(self, resources):
+        # Can detect if we are in event mode because the resource we get from
+        # the event has the metadata field present. By contrast when we are in pull
+        # mode then all we have is some skinny data from the parent's list function.
+        event_mode = resources and "metadata" in resources[0]
+        if not event_mode:
+            resources = self._describe(resources)
+
+        # fill in the tags
+        return universal_augment(self.manager, resources)
+
+    # takes a list of objects with fields meshName and virtualGatewayName
+    def _describe(self, mesh_and_gw_names):
         results = []
         client = local_session(self.manager.session_factory).client('appmesh')
-        # ids for events should be arns
-        for i in ids:
-            # split mesh gw arn : arn:aws:appmesh:eu-west-2:123456789012:mesh/Mesh7/virtualGateway/GW1  # noqa
-            # and extract the id's needed to call the describe function.
-            mesh_name, _, gw_name = Arn.parse(i).resource.split('/')
+
+        for names in mesh_and_gw_names:
             results.append(
+                # https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/appmesh/client/delete_virtual_gateway.html #noqa
                 self.manager.retry(
-                    # https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/appmesh/client/delete_virtual_gateway.html #noa
                     client.describe_virtual_gateway,
-                    meshName=mesh_name,
-                    virtualGatewayName=gw_name,
+                    meshName=names["meshName"],
+                    virtualGatewayName=names["virtualGatewayName"],
                 )['virtualGateway']
             )
         return results
-
-    # Called during event mode and pull mode, and it's function is to take id's
-    # from some provided details and return the complete description.
-    # In pull mode it is called with the results of the parent enum_function
-    # from which we can grab the mesh and vgw names (+arn).
-    # In event mode it is called with the results of the get_resources() function above.
-    def augment(self, resources):
-        # Detect whether we are in event mode or pull mode.
-        # We can tell if we are in event mode because the event populates the "metadata" field.
-        # If we are in event mode then the resource will already be fully populated because
-        # augment() is called with the fully populated output of get_resources() above.
-        # But, it we are in pull mode then we only have some basic data returned from the
-        # "parent" query enum function.
-        if resources and "metadata" in resources[0]:
-            # on event modes the resource has already been fully fetched, just get tags
-            return universal_augment(self.manager, resources)
-
-        # on pull modes, we're enriching the result of enum_spec of parent query
-        results = []
-        client = local_session(self.manager.session_factory).client('appmesh')
-
-        for gateway_info in resources:
-            mesh_name=gateway_info['meshName']
-            gw_name=gateway_info['virtualGatewayName']
-
-            results.append(
-                self.manager.retry(
-                    # https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/appmesh/client/delete_virtual_gateway.html #noa
-                    client.describe_virtual_gateway,
-                    meshName=mesh_name,
-                    virtualGatewayName=gw_name,
-                )['virtualGateway']
-            )
-
-        return universal_augment(self.manager, results)
 
 
 @resources.register('appmesh-virtual-gateway')
@@ -153,8 +149,7 @@ class AppmeshVirtualGateway(ChildResourceManager):
 
         # id: is not used by the resource collection process because this is a child function
         # and it is the parent_spec function that drives collection of "mesh id's".
-        # However, it is still used by reporting.
-        # The only unique field across all virtual gw resources is the ARN.
+        # However, it is still used by reporting so let's define it.
         id = "arn"
 
         # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-appmesh-virtualgateway.html  # noqa
@@ -172,21 +167,33 @@ class AppmeshVirtualGateway(ChildResourceManager):
         date = 'createdAt'
 
         # When we define a parent_spec then the parent_spec
-        # provides the driving result set from which resource id's will be picked.
-        # This is then iterated across and the enum_spec is called for each parent instance 'id'.
-        # appmesh-mesh - is ref to another resource above that
-        # provides the driving value for the enum_spec meshName - is
-        # the field from the parent spec that will be pulled out and
-        # used to drive the enum_spec.
+        # provides the driving result set from which parent resource id's will be picked.
+        # In this case the parent resource id is the meshName.
+        # This is then iterated across and the enum_spec is called once for each parent 'id'.
+        #
+        # "appmesh-mesh" - identifies the parent data source (ie AppmeshMesh).
+        # "meshName" - is the field from the parent spec result that will be pulled out and
+        # used to drive the vgw enum_spec.
         parent_spec = ('appmesh-mesh', 'meshName', None)
 
+        # enum_spec's list function is called once for each key (meshName) returned from
+        # the parent_spec.
+        # 'virtualGateways' - is path in the enum_spec response to locate the virtual
+        # gateways for the given meshName.
         # https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/appmesh/client/list_virtual_gateways.html  # noqa
-        # virtualGateways is path to collection to return from the list response
         enum_spec = (
             'list_virtual_gateways',
             'virtualGateways',
             None,
         )
 
+    # Purpose is to extract the ARN from the given resource description..
+    # The location of the ARN in the VGW resource is not at the top level
+    # so we need to override the function that does the extraction.
+    # If the arn had been at the top level of the data structure then it
+    # would have been enough to define the "arn" config field in the Typeinfo class.
+    # But at present we can't put a path line "metadata.arn" into
+    # that config field, and the authors tell me that allowing that would
+    # be too expensive. So we'll just DIY.
     def get_arns(self, resources):
         return [r['metadata']['arn'] for r in resources]

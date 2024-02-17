@@ -805,8 +805,9 @@ class TypeInfo(metaclass=TypeMeta):
         example: custodian report --format csv  -s . my-policy.yml
 
 
-    :param service: Which aws service (per sdk) has the api for this resource. See the "client" info for each
-    service in the boto documentation https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/index.html
+    :param service: Which aws service (per sdk) has the api for this resource.
+        See the "client" info for each service in the boto documentation.
+        https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/index.html #noqa
 
     :param enum_spec: Defines the boto3 call used to find at least basic
         details on all resource instances of the relevant type. The data per
@@ -825,7 +826,7 @@ class TypeInfo(metaclass=TypeMeta):
         do not use this approach. App mesh list_meshes for instance doesn't
         support filtering  ...
 
-        https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/appmesh/client/list_meshes.html  # noqa
+        https://boto3.amazonaws.com/v1/documentation/reference/services/appmesh/client/list_meshes.html
 
         However, if the enum op doesn't support filtering then the enum op must return all
         instances of rhe resource and cloud custodian will perform client side filtering.
@@ -869,8 +870,8 @@ class TypeInfo(metaclass=TypeMeta):
 
     :param arn_type: Type, used for arn construction. also required for universal tag augment
         Only required when you are NOT providing the ARN value directly via the "arn" cfg field.
-        When arn is not provided then QueryResourceManager.generate_arn uses the arn_type value, plus other fields, to
-        construct an ARN; basically, a best guess but not 100% reliable.
+        When arn is not provided then QueryResourceManager.generate_arn uses the arn_type value,
+        plus other fields, to construct an ARN; basically, a best guess but not 100% reliable.
         If generate_arn() isn't good enough for your needs then you should override the
         QueryResourceManager.get_arn() function and do it yourself.
 
@@ -897,8 +898,8 @@ class TypeInfo(metaclass=TypeMeta):
         params to the defail_spec:
           detail_op - the boto api call name
           param_name - name of the identifier argument in the boto api call
-          param_key - name of field in enum_spec response tha that will be pushed into the identifier
-                        argument of the boto api call.
+          param_key - name of field in enum_spec response tha that will be pushed into
+                        the identifier argument of the boto api call.
           detail_path - path to extract from the boto response and merge into the resource model.
                         if not provided then whole response is merged into the results
 
@@ -908,8 +909,8 @@ class TypeInfo(metaclass=TypeMeta):
 
     :param default_report_fields: Used for reporting, array of fields
     :param date: Latest date associated to resource, generally references either create date or
-        modified date. If this field is defined then it will appear in report output such as you would
-        get from ....
+        modified date. If this field is defined then it will appear in report output
+        such as you would get from ....
         example: custodian report --format csv  -s . my-policy.yml
 
     :param dimension: Defines that resource has cloud watch metrics and the resource id can be
@@ -920,7 +921,8 @@ class TypeInfo(metaclass=TypeMeta):
 
     :param config_type: AWS Config Service resource type name.
         See https://docs.aws.amazon.com/config/latest/developerguide/resource-config-reference.html
-        Typically cfn_type and config_type will have the sane value, but there are some exceptions, so check.
+        Typically cfn_type and config_type will have the sane value,
+         but there are some exceptions, so check.
         The constants defined will be verified by the PolicyMetaLint tests during the build.
 
 

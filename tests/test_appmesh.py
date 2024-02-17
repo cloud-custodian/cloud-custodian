@@ -162,7 +162,8 @@ class TestAppmeshMesh(BaseTest):
             "createdAt": "2024"
         }])
 
-        # expect Formatter to inspect the definition of certain fields ("name" and "date") from the AppMesh def
+        # expect Formatter to inspect the definition of certain
+        # fields ("name" and "date") from the AppMesh def
         # and to pick out those fields from a fake resource
         self.assertEqual([["MyMeshName","2024"]], report)
 
@@ -347,7 +348,8 @@ class TestAppmeshVirtualGateway(BaseTest):
             "createdAt": "2024"
         }])
 
-        # expect Formatter to inspect the definition of certain fields ("id", "name" and "date") from the AppMesh def
+        # expect Formatter to inspect the definition of certain
+        # fields ("id", "name" and "date") from the AppMesh def
         # and to pick out those fields from a fake resource
         self.assertEqual([["MyArn","MyVgwName", "2024"]], report)
 
