@@ -884,8 +884,7 @@ class TypeInfo(metaclass=TypeMeta):
         but effectively required for serverless event policies else we have to enumerate the
         population
     :param filter_type: filter_type, scalar or list
-    :
-    param detail_spec: Used to enrich the resource descriptions returned by enum_spec.
+    :param detail_spec: Used to enrich the resource descriptions returned by enum_spec.
         In many cases the enum_spec function is one of the
         "describe_" style functions that return a full'ish spec that
         is sufficient for the user poliocy. However in other cases
