@@ -1,12 +1,9 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
-
-from botocore.history import get_global_history_recorder
-
 from c7n.reports.csvout import Formatter
 from c7n.resources.appmesh import AppmeshMesh, AppmeshVirtualGateway
 from .common import BaseTest, event_data
-
+from .apicallcaptor import ApiCallCaptor
 
 # during recording create some sample resources in AWS the
 # set use a flight recorder and set the config region to wherever you want to read state from.
@@ -22,6 +19,7 @@ from .common import BaseTest, event_data
 class TestAppmeshMesh(BaseTest):
     def test_appmesh(self):
         session_factory = self.replay_flight_data('test_appmesh_mesh')
+
         p = self.load_policy(
             {
                 "name": "appmesh-mesh-policy",
@@ -33,6 +31,7 @@ class TestAppmeshMesh(BaseTest):
 
         captor = ApiCallCaptor.start_capture()
 
+        # RUN THE SUT
         resources = p.run()
         resources.sort(key=lambda r: r["arn"])
 
@@ -47,7 +46,7 @@ class TestAppmeshMesh(BaseTest):
                     'meshName': 'm1',
                     'meshOwner': '123456789012',
                     'resourceOwner': '123456789012',
-                    'version': 1
+                    'version': 1,
                 },
                 {
                     'Tags': [{'Key': 'MyTagName', 'Value': 'm2'}],
@@ -58,17 +57,23 @@ class TestAppmeshMesh(BaseTest):
                     'meshName': 'm2',
                     'meshOwner': '123456789012',
                     'resourceOwner': '123456789012',
-                    'version': 1
-                }
+                    'version': 1,
+                },
             ],
-            resources)
+            resources,
+        )
 
         # These assertions are necessary to be sure that the "get_arns" function is correctly
         # deriving the ARN.
         # See the documentation on the "arn" field in appmesh.py.
         arns = p.resource_manager.get_arns(resources)
-        self.assertEqual(['arn:aws:appmesh:eu-west-2:123456789012:mesh/m1',
-                          'arn:aws:appmesh:eu-west-2:123456789012:mesh/m2'], arns)
+        self.assertEqual(
+            [
+                'arn:aws:appmesh:eu-west-2:123456789012:mesh/m1',
+                'arn:aws:appmesh:eu-west-2:123456789012:mesh/m2',
+            ],
+            arns,
+        )
 
         # The "placebo" testing library doesn't allow us to make assertions
         # linking specific api's calls to the specific mock response file
@@ -78,11 +83,18 @@ class TestAppmeshMesh(BaseTest):
         self.assertEqual(
             [
                 {'operation': 'ListMeshes', 'params': {}, 'service': 'appmesh'},
-                {'operation': 'GetResources',
-                 'params': {'ResourceARNList': ['arn:aws:appmesh:eu-west-2:123456789012:mesh/m1',
-                                                'arn:aws:appmesh:eu-west-2:123456789012:mesh/m2']},
-                 'service': 'resourcegroupstaggingapi'}],
-            captor.calls
+                {
+                    'operation': 'GetResources',
+                    'params': {
+                        'ResourceARNList': [
+                            'arn:aws:appmesh:eu-west-2:123456789012:mesh/m1',
+                            'arn:aws:appmesh:eu-west-2:123456789012:mesh/m2',
+                        ]
+                    },
+                    'service': 'resourcegroupstaggingapi',
+                },
+            ],
+            captor.calls,
         )
 
     def test_appmesh_event(self):
@@ -105,6 +117,7 @@ class TestAppmeshMesh(BaseTest):
             },
             session_factory=session_factory,
         )
+
         # event_data() names a file in tests/data/cwe that will drive the test execution.
         # file contains an event matching that which AWS would generate in cloud trail.
         event = {
@@ -114,6 +127,7 @@ class TestAppmeshMesh(BaseTest):
 
         captor = ApiCallCaptor.start_capture()
 
+        # RUN THE SUT
         resources = p.push(event, None)
         resources.sort(key=lambda r: r["arn"])
 
@@ -127,10 +141,11 @@ class TestAppmeshMesh(BaseTest):
                     'meshName': 'm1',
                     'meshOwner': '123456789012',
                     'resourceOwner': '123456789012',
-                    'version': 1
+                    'version': 1,
                 }
             ],
-            resources)
+            resources,
+        )
 
         # These assertions are necessary to be sure that the "get_arns" function is correctly
         # deriving the ARN.
@@ -146,27 +161,31 @@ class TestAppmeshMesh(BaseTest):
         self.assertEqual(
             [
                 {'operation': 'ListMeshes', 'params': {}, 'service': 'appmesh'},
-                {'operation': 'GetResources',
-                 'params': {'ResourceARNList': ['arn:aws:appmesh:eu-west-2:123456789012:mesh/m1']},
-                 'service': 'resourcegroupstaggingapi'}],
-            captor.calls
+                {
+                    'operation': 'GetResources',
+                    'params': {
+                        'ResourceARNList': ['arn:aws:appmesh:eu-west-2:123456789012:mesh/m1']
+                    },
+                    'service': 'resourcegroupstaggingapi',
+                },
+            ],
+            captor.calls,
         )
 
     def test_reporting(self):
         f = Formatter(resource_type=AppmeshMesh.resource_type)
 
         # provide a fake resource
-        report = f.to_csv(records=[{
-            "someField": "shouldBeIgnored",
-            "meshName": "MyMeshName",
-            "createdAt": "2024"
-        }])
+        report = f.to_csv(
+            records=[
+                {"someField": "shouldBeIgnored", "meshName": "MyMeshName", "createdAt": "2024"}
+            ]
+        )
 
         # expect Formatter to inspect the definition of certain
         # fields ("name" and "date") from the AppMesh def
         # and to pick out those fields from a fake resource
-        self.assertEqual([["MyMeshName","2024"]], report)
-
+        self.assertEqual([["MyMeshName", "2024"]], report)
 
 
 class TestAppmeshVirtualGateway(BaseTest):
@@ -193,6 +212,7 @@ class TestAppmeshVirtualGateway(BaseTest):
 
         captor = ApiCallCaptor.start_capture()
 
+        # RUN THE SUT
         resources = p.run()
         resources.sort(key=lambda r: r['metadata']['arn'])
 
@@ -209,16 +229,19 @@ class TestAppmeshVirtualGateway(BaseTest):
                         'meshOwner': '644160558196',
                         'resourceOwner': '644160558196',
                         'uid': '80ee4027-c8e1-49e8-99ba-cace20a57f0b',
-                        'version': 1
+                        'version': 1,
                     },
-                    'spec': {'backendDefaults': {'clientPolicy': {}},
-                             'listeners': [{'portMapping': {'port': 123, 'protocol': 'http'}}],
-                             'logging': {}},
+                    'spec': {
+                        'backendDefaults': {'clientPolicy': {}},
+                        'listeners': [{'portMapping': {'port': 123, 'protocol': 'http'}}],
+                        'logging': {},
+                    },
                     'status': {'status': 'ACTIVE'},
-                    'virtualGatewayName': 'g1'
+                    'virtualGatewayName': 'g1',
                 }
             ],
-            resources)
+            resources,
+        )
 
         # These assertions are necessary to be sure that the "get_arns" function is correctly
         # deriving the ARN.
@@ -233,29 +256,39 @@ class TestAppmeshVirtualGateway(BaseTest):
         # of calls that must be made.
         self.assertEqual(
             [
-                {'operation': 'ListMeshes',
-                 'params': {},
-                 'service': 'appmesh'},
-                {'operation': 'ListVirtualGateways',
-                 'params': {'meshName': 'm1'},
-                 'service': 'appmesh'},
-                {'operation': 'ListVirtualGateways',
-                 'params': {'meshName': 'm2'},
-                 'service': 'appmesh'},
-                {'operation': 'DescribeVirtualGateway',
-                 'params': {'meshName': 'm1', 'virtualGatewayName': 'g1'},
-                 'service': 'appmesh'},
-                {'operation': 'DescribeVirtualGateway',
-                 'params': {'meshName': 'm1', 'virtualGatewayName': 'g2'},
-                 'service': 'appmesh'},
-                {'operation': 'GetResources',
-                 'params': {'ResourceARNList': [
-                     'arn:aws:appmesh:eu-west-2:123456789012:mesh/m1/virtualGateway/g1',
-                     'arn:aws:appmesh:eu-west-2:123456789012:mesh/m1/virtualGateway/g2'
-                 ]},
-                 'service': 'resourcegroupstaggingapi'}
+                {'operation': 'ListMeshes', 'params': {}, 'service': 'appmesh'},
+                {
+                    'operation': 'ListVirtualGateways',
+                    'params': {'meshName': 'm1'},
+                    'service': 'appmesh',
+                },
+                {
+                    'operation': 'ListVirtualGateways',
+                    'params': {'meshName': 'm2'},
+                    'service': 'appmesh',
+                },
+                {
+                    'operation': 'DescribeVirtualGateway',
+                    'params': {'meshName': 'm1', 'virtualGatewayName': 'g1'},
+                    'service': 'appmesh',
+                },
+                {
+                    'operation': 'DescribeVirtualGateway',
+                    'params': {'meshName': 'm1', 'virtualGatewayName': 'g2'},
+                    'service': 'appmesh',
+                },
+                {
+                    'operation': 'GetResources',
+                    'params': {
+                        'ResourceARNList': [
+                            'arn:aws:appmesh:eu-west-2:123456789012:mesh/m1/virtualGateway/g1',
+                            'arn:aws:appmesh:eu-west-2:123456789012:mesh/m1/virtualGateway/g2',
+                        ]
+                    },
+                    'service': 'resourcegroupstaggingapi',
+                },
             ],
-            captor.calls
+            captor.calls,
         )
 
     def test_appmesh_virtualgateway_event(self):
@@ -279,13 +312,16 @@ class TestAppmeshVirtualGateway(BaseTest):
             session_factory=session_factory,
         )
 
-        captor = ApiCallCaptor.start_capture()
-
+        # event_data() names a file in tests/data/cwe that will drive the test execution.
+        # file contains an event matching that which AWS would generate in cloud trail.
         event = {
             "detail": event_data("event-appmesh-create-virtual-gateway.json"),
             "debug": True,
         }
 
+        captor = ApiCallCaptor.start_capture()
+
+        # RUN THE SUT
         resources = p.push(event, None)
         resources.sort(key=lambda r: r['metadata']['arn'])
 
@@ -301,16 +337,19 @@ class TestAppmeshVirtualGateway(BaseTest):
                         'meshOwner': '644160558196',
                         'resourceOwner': '644160558196',
                         'uid': '80ee4027-c8e1-49e8-99ba-cace20a57f0b',
-                        'version': 1
+                        'version': 1,
                     },
-                    'spec': {'backendDefaults': {'clientPolicy': {}},
-                             'listeners': [{'portMapping': {'port': 123, 'protocol': 'http'}}],
-                             'logging': {}},
+                    'spec': {
+                        'backendDefaults': {'clientPolicy': {}},
+                        'listeners': [{'portMapping': {'port': 123, 'protocol': 'http'}}],
+                        'logging': {},
+                    },
                     'status': {'status': 'ACTIVE'},
-                    'virtualGatewayName': 'g1'
+                    'virtualGatewayName': 'g1',
                 }
             ],
-            resources)
+            resources,
+        )
 
         # These assertions are necessary to be sure that the "get_arns" function is
         # correctly deriving the ARN.
@@ -325,53 +364,41 @@ class TestAppmeshVirtualGateway(BaseTest):
         # of calls that must be made.
         self.assertEqual(
             [
-                {'operation': 'DescribeVirtualGateway',
-                 'params': {'meshName': 'm1', 'virtualGatewayName': 'g1'},
-                 'service': 'appmesh'},
-                {'operation': 'GetResources',
-                 'params': {'ResourceARNList': [
-                     'arn:aws:appmesh:eu-west-2:123456789012:mesh/m1/virtualGateway/g1']},
-                 'service': 'resourcegroupstaggingapi'}
+                {
+                    'operation': 'DescribeVirtualGateway',
+                    'params': {'meshName': 'm1', 'virtualGatewayName': 'g1'},
+                    'service': 'appmesh',
+                },
+                {
+                    'operation': 'GetResources',
+                    'params': {
+                        'ResourceARNList': [
+                            'arn:aws:appmesh:eu-west-2:123456789012:mesh/m1/virtualGateway/g1'
+                        ]
+                    },
+                    'service': 'resourcegroupstaggingapi',
+                },
             ],
-            captor.calls
+            captor.calls,
         )
 
     def test_reporting(self):
         f = Formatter(resource_type=AppmeshVirtualGateway.resource_type)
 
         # provide a fake resource
-        report = f.to_csv(records=[{
-            "someField": "shouldBeIgnored",
-            "meshName": "shouldBeIgnored",
-            "arn": "MyArn",
-            "virtualGatewayName": "MyVgwName",
-            "createdAt": "2024"
-        }])
+        report = f.to_csv(
+            records=[
+                {
+                    "someField": "shouldBeIgnored",
+                    "meshName": "shouldBeIgnored",
+                    "arn": "MyArn",
+                    "virtualGatewayName": "MyVgwName",
+                    "createdAt": "2024",
+                }
+            ]
+        )
 
         # expect Formatter to inspect the definition of certain
         # fields ("id", "name" and "date") from the AppMesh def
         # and to pick out those fields from a fake resource
-        self.assertEqual([["MyArn","MyVgwName", "2024"]], report)
-
-
-class ApiCallCaptor:
-    _INSTANCE = None
-
-    def __init__(self):
-        self.calls = []
-
-    def emit(self, _event_type, payload, _source):
-        # print("API CALL : " + str(event_type) + " P:" + str(payload) + " S:" + str(source))
-        self.calls.append(payload)
-
-    @classmethod
-    def start_capture(cls):
-        hist = get_global_history_recorder()
-        if not cls._INSTANCE:
-            cls._INSTANCE = ApiCallCaptor()
-            hist.add_handler(ApiCallCaptor._INSTANCE)
-
-        cls._INSTANCE.calls = []
-        hist.enable()
-
-        return cls._INSTANCE
+        self.assertEqual([["MyArn", "MyVgwName", "2024"]], report)
