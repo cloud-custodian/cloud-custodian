@@ -115,7 +115,8 @@ class IsCompositeChild(Filter):
 
 
     def extract_alarm_names_from_rule(self, rule):
-        pattern = r"ALARM\(([^)]+)\)"
+        # Check alarm references (OK/ALARM/INSUFFICIENT_DATA)
+        pattern = r"\b(?:ALARM|OK|INSUFFICIENT_DATA)\s*\(\s*([^\)]+)\s*\)"
         matches = re.findall(pattern, rule)
         return set(matches)
 
