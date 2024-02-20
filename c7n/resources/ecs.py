@@ -4,7 +4,7 @@ import copy
 from botocore.exceptions import ClientError
 
 from c7n.actions import AutoTagUser, AutoscalingBase, BaseAction
-from c7n.exceptions import PolicyExecutionError
+from c7n.exceptions import PolicyExecutionError, PolicyValidationError
 from c7n.filters import MetricsFilter, ValueFilter, Filter
 from c7n.filters.costhub import CostHubRecommendation
 from c7n.filters.offhours import OffHour, OnHour
@@ -430,6 +430,18 @@ class UpdateTemplate(BaseAction):
 
     permissions = ("ecs:RegisterTaskDefinition", "ecs:UpdateService")
 
+    def validate(self):
+        if self.data.get('properties'):
+            return
+        found = False
+        for f in self.manager.iter_filters():
+            if isinstance(f, CostHubRecommendation):
+                found = True
+        if not found:
+            raise PolicyValidationError(
+                "modify-definition: either properties specified or am optimization filter used"
+            )
+
     def process(self, resources):
         task_def_filter = ServiceTaskDefinitionFilter({}, self.manager)
         task_defs = {t['taskDefinitionArn']: t for t in task_def_filter.get_task_defs(resources)}
@@ -438,10 +450,12 @@ class UpdateTemplate(BaseAction):
         # we can only modify task definition when ecs is controlling the deployment.
         resources = self.filter_resources(resources, "deploymentController.type", ("ECS",))
 
+        nack = 0
         for r in resources:
             r_task_def = task_defs[r[task_def_filter.related_key]]
             m_task_def = self.get_target_task_def(r, r_task_def)
             if m_task_def is None:
+                nack += 1
                 continue
             response = client.register_task_definition(**m_task_def)
             task_arn = response['taskDefinition']['taskDefinitionArn']
@@ -451,6 +465,8 @@ class UpdateTemplate(BaseAction):
                 service=r['serviceName'],
                 taskDefinition=task_arn
             )
+        if nack:
+            self.log.warning("modify-definition %d services not modified", nack)
 
     task_def_normalized = [
         "taskDefinitionArn", "revision", "status",
