@@ -101,17 +101,17 @@ class IsCompositeChild(Filter):
         composite_alarms = self.manager.get_resource_manager("composite-alarm").resources()
         composite_alarm_rules = jmespath_search('[].AlarmRule', composite_alarms)
 
-        parent_alarm_names = set()
+        child_alarm_names = set()
         # Loop through, find child alarm names
         for rule in composite_alarm_rules:
             names = self.extract_alarm_names_from_rule(rule)
-            parent_alarm_names.update(names)
+            child_alarm_names.update(names)
 
         if state:
             # If we want to filter out alarms that are a child of a composite alarm
-            return [r for r in resources if r['AlarmName'] not in parent_alarm_names]
+            return [r for r in resources if r['AlarmName'] in child_alarm_names]
 
-        return [r for r in resources if r['AlarmName'] in parent_alarm_names]
+        return [r for r in resources if r['AlarmName'] not in child_alarm_names]
 
 
     def extract_alarm_names_from_rule(self, rule):

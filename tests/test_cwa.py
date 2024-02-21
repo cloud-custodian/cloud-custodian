@@ -86,7 +86,7 @@ class AlarmTest(BaseTest):
                 "filters": [
                     {
                         'type': 'is-composite-child',
-                        'state': True,
+                        'state': False,
                     }
                 ],
             },
@@ -108,7 +108,7 @@ class AlarmTest(BaseTest):
                 "filters": [
                     {
                         'type': 'is-composite-child',
-                        'state': False,
+                        'state': True,
                     }
                 ],
             },
