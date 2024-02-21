@@ -55,9 +55,7 @@ class Update(ControlAction):
             )
 
     def get_patch(self, r):
-        # deep copy is expensive, but we need to remove read only and create only properties
-        # to generate a valid patch.
-        current = copy.deepcopy(r)
+        current = dict(r)
 
         # the action's schema reflects updatable properties
         updatable = {k for k in self.schema["properties"] if k not in self._action_meta}
