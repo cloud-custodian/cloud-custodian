@@ -34,7 +34,14 @@ class Delete(ControlAction):
 
 
 class Update(ControlAction):
+    """Update a resource.
+
+    Supports either whole key/value replacement via an attribute mapping
+    or jsonpatch `patch:`
+    """
     # schema is setup at resource type initialization
+
+    _action_meta = ("type", "patch")
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client("cloudcontrol")
@@ -52,12 +59,18 @@ class Update(ControlAction):
         current = copy.deepcopy(r)
 
         # the action's schema reflects updatable properties
-        updatable = {k for k in self.schema["properties"] if k != "type"}
+        updatable = {k for k in self.schema["properties"] if k not in self._action_meta}
         for k in list(set(current) - updatable):
             del current[k]
 
         # shallow copy for patch generation
         tgt = dict(current)
+
+        # we support either using json patch to do a partial modification.
+        if self.data.get("patch"):
+            return jsonpatch.JsonPatch(self.data["patch"])
+
+        # or whole key value replacement.
         for k, v in self.data.items():
             if k == "type":
                 continue
