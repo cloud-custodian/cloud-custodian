@@ -54,6 +54,10 @@ class Update(ControlAction):
             )
 
     def get_patch(self, r):
+        # we support either using json patch to do a partial modification.
+        if self.data.get("patch"):
+            return jsonpatch.JsonPatch(self.data["patch"])
+
         current = dict(r)
 
         # the action's schema reflects updatable properties
@@ -63,10 +67,6 @@ class Update(ControlAction):
 
         # shallow copy for patch generation
         tgt = dict(current)
-
-        # we support either using json patch to do a partial modification.
-        if self.data.get("patch"):
-            return jsonpatch.JsonPatch(self.data["patch"])
 
         # or whole key value replacement.
         for k, v in self.data.items():
