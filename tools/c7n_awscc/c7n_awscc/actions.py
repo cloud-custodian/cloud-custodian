@@ -39,6 +39,7 @@ class Update(ControlAction):
     Supports either whole key/value replacement via an attribute mapping
     or jsonpatch `patch:`
     """
+
     # schema is setup at resource type initialization
 
     _action_meta = ("type", "patch")
