@@ -255,12 +255,12 @@ class CollectionRunner:
             for p in self.policies:
                 if not self.match_type(rtype, p):
                     continue
+                result_set = []
                 try:
                     result_set = self.run_policy(p, graph, resources, event, rtype)
-                except Exception:
-                    log.exception("Policy:%s had an error while running" % p.name)
-                    result_set = []
+                except Exception as e:
                     found = True
+                    self.reporter.on_policy_error(e, p, rtype, resources)
                 if result_set:
                     self.reporter.on_results(p, result_set)
                 if result_set and (
