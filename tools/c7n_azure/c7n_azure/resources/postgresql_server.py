@@ -7,9 +7,6 @@ from c7n_azure.provider import resources
 from c7n_azure.resources.arm import ArmResourceManager
 from c7n_azure.filters import FirewallRulesFilter, FirewallBypassFilter
 from netaddr import IPRange, IPSet
-from c7n_azure.utils import filter_firewall_rules_by_azure_services
-from c7n_azure.filters import scalar_ops
-from c7n.filters import Filter
 
 AZURE_SERVICES = IPRange('0.0.0.0', '0.0.0.0')  # nosec
 
@@ -99,7 +96,7 @@ class PostgresqlServerSecurityAlertPoliciesFilter(ListItemFilter):
         return [item.serialize(True) for item in it]
 
 
-@PostgresqlServer.filter_registry.register('firewall-bypass')
+@PostgresqlServer.filter_registry.register("firewall-bypass")
 class PostgresqlServerFirewallBypassFilter(FirewallBypassFilter):
     """
     Filters resources by the firewall bypass rules.
@@ -120,11 +117,19 @@ class PostgresqlServerFirewallBypassFilter(FirewallBypassFilter):
                     - AzureServices
     """
 
-    schema = FirewallBypassFilter.schema(['AzureServices'])
+    schema = FirewallBypassFilter.schema(["AzureServices"])
 
     def _query_bypass(self, resource):
-        _, is_azure_services = filter_firewall_rules_by_azure_services(self.client, resource)
-        return ['AzureServices'] if is_azure_services else []
+        query = self.client.firewall_rules.list_by_server(
+            resource_group_name=resource["resourceGroup"],
+            server_name=resource["name"]
+        )
+
+        for r in query:
+            rule = IPRange(r.start_ip_address, r.end_ip_address)
+            if rule == AZURE_SERVICES:
+                return ["AzureServices"]
+        return []
 
 
 @PostgresqlServer.filter_registry.register('firewall-rules')
