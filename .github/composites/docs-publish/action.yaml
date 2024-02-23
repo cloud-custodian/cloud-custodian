@@ -21,8 +21,7 @@ runs:
     - name: Install Deps
       shell: bash
       run: |
-        pip config --site unset global.index-url
-        pip install -U awscli
+        pip install -U awscli --index-url https://pypi.org/simple
 
     - name: Publish
       shell: bash

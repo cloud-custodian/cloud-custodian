@@ -1,0 +1,11 @@
+{
+    "status_code": 200,
+    "data": {
+        "TypeName": "AWS::Athena::WorkGroup",
+        "ResourceDescription": {
+            "Identifier": "primary",
+            "Properties": "{\"WorkGroupConfiguration\":{\"EnforceWorkGroupConfiguration\":false,\"EngineVersion\":{\"SelectedEngineVersion\":\"AUTO\",\"EffectiveEngineVersion\":\"Athena engine version 3\"},\"PublishCloudWatchMetricsEnabled\":false,\"ResultConfiguration\":{},\"RequesterPaysEnabled\":false},\"State\":\"ENABLED\",\"CreationTime\":\"1642008392\",\"Tags\":[],\"Name\":\"primary\"}"
+        },
+        "ResponseMetadata": {}
+    }
+}
