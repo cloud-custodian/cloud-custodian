@@ -52,9 +52,19 @@ class PostgresqlServerTest(BaseTest):
             'resource': 'azure.postgresql-server',
             'filters': [
                 {
-                    'type': 'server-configuration',
-                    'property': 'log_disconnections',
-                    'value': 'off'
+                    'type': 'server-configurations',
+                    'attrs': [
+                        {
+                            'type': 'value',
+                            'key': 'name',
+                            'value': 'log_disconnections',
+                        },
+                        {
+                            'type': 'value',
+                            'key': 'properties.value',
+                            'value': 'off',
+                        }
+                    ],
                 }
             ],
         })
@@ -69,10 +79,21 @@ class PostgresqlServerTest(BaseTest):
             'resource': 'azure.postgresql-server',
             'filters': [
                 {
-                    'type': 'server-configuration',
-                    'property': 'log_retention_days',
-                    'value': 2,
-                    'op': 'gt'
+                    'type': 'server-configurations',
+                    'attrs': [
+                        {
+                            'type': 'value',
+                            'key': 'name',
+                            'value': 'log_retention_days'
+                        },
+                        {
+                            'type': 'value',
+                            'key': 'properties.value',
+                            'value': 2,
+                            'value_type': 'integer',
+                            'op': 'gt'
+                        }
+                    ]
                 }
             ],
         })

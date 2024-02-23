@@ -1,7 +1,7 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
-from c7n.filters.core import ValueFilter
+from c7n.filters.core import ValueFilter, ListItemFilter
 from c7n.utils import type_schema
 from c7n_azure.provider import resources
 from c7n_azure.resources.arm import ArmResourceManager
@@ -60,48 +60,23 @@ class PostgresqlServer(ArmResourceManager):
         resource_type = 'Microsoft.DBforPostgreSQL/servers'
 
 
-@PostgresqlServer.filter_registry.register('server-configuration')
-class PostgresqlServerConfigurationFilter(Filter):
-
+@PostgresqlServer.filter_registry.register('server-configurations')
+class PostgresqlServerConfigurationFilter(ListItemFilter):
     schema = type_schema(
-        'server-configuration',
-        property={'$ref': '#/definitions/filters_common/value'},
-        value={'$ref': '#/definitions/filters_common/value'},
-        op={'$ref': '#/definitions/filters_common/value'},
-        required=['property', 'value']
+        'server-configurations',
+        attrs={'$ref': '#/definitions/filters_common/list_item_attrs'},
+        count={'type': 'number'},
+        count_op={'$ref': '#/definitions/filters_common/comparison_operators'}
     )
-    client_string = 'azure.mgmt.rdbms.postgresql.PostgreSQLManagementClient'
+    item_annotation_key = 'c7n:ServerConfigurations'
+    annotate_items = True
 
-    def __call__(self, resource):
-        return resource
-
-    def _perform_op(self, a, b):
-        op = scalar_ops.get(self.data.get('op', 'eq'))
-        return op(a, b)
-
-    def process(self, resources, event=None):
-        client = self.manager.get_client(self.client_string)
-        filtered_resources = []
-        property_name = self.data['property']
-        property_value = self.data['value']
-        property_value_type = type(property_value)
-
-        for resource in resources:
-            configurations = client.configurations.list_by_server(
-                resource['resourceGroup'],
-                resource['name']
-            )
-            for configuration in configurations:
-                if configuration.name == property_name:
-                    configuration_value = configuration.value
-                    if property_value_type == int:
-                        configuration_value = int(configuration_value)
-                    if self._perform_op(configuration_value, property_value):
-                        filtered_resources.append(resource)
-                    break
-
-        return super(PostgresqlServerConfigurationFilter, self).process(
-            filtered_resources, event)
+    def get_item_values(self, resource):
+        it = self.manager.get_client().configurations.list_by_server(
+            resource_group_name=resource['resourceGroup'],
+            server_name=resource['name']
+        )
+        return [item.serialize(True) for item in it]
 
 
 @PostgresqlServer.filter_registry.register('security-alert-policy')
