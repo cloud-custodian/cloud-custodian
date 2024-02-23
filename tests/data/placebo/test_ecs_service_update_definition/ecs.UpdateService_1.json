@@ -1,0 +1,195 @@
+{
+    "status_code": 200,
+    "data": {
+        "service": {
+            "serviceArn": "arn:aws:ecs:us-east-2:644160558196:service/dev-redash/redash-server",
+            "serviceName": "redash-server",
+            "clusterArn": "arn:aws:ecs:us-east-2:644160558196:cluster/dev-redash",
+            "loadBalancers": [
+                {
+                    "targetGroupArn": "arn:aws:elasticloadbalancing:us-east-2:644160558196:targetgroup/dev-redash/608e176bc37cd1d3",
+                    "containerName": "server",
+                    "containerPort": 5000
+                }
+            ],
+            "serviceRegistries": [
+                {
+                    "registryArn": "arn:aws:servicediscovery:us-east-2:644160558196:service/srv-bzzz6xsmtwv5uap7"
+                }
+            ],
+            "status": "ACTIVE",
+            "desiredCount": 1,
+            "runningCount": 1,
+            "pendingCount": 0,
+            "capacityProviderStrategy": [
+                {
+                    "capacityProvider": "FARGATE",
+                    "weight": 100,
+                    "base": 0
+                }
+            ],
+            "platformVersion": "LATEST",
+            "platformFamily": "Linux",
+            "taskDefinition": "arn:aws:ecs:us-east-2:644160558196:task-definition/dev-redash-server:77",
+            "deploymentConfiguration": {
+                "deploymentCircuitBreaker": {
+                    "enable": false,
+                    "rollback": false
+                },
+                "maximumPercent": 200,
+                "minimumHealthyPercent": 100
+            },
+            "deployments": [
+                {
+                    "id": "ecs-svc/5219324069200109376",
+                    "status": "PRIMARY",
+                    "taskDefinition": "arn:aws:ecs:us-east-2:644160558196:task-definition/dev-redash-server:77",
+                    "desiredCount": 0,
+                    "pendingCount": 0,
+                    "runningCount": 0,
+                    "failedTasks": 0,
+                    "createdAt": {
+                        "__class__": "datetime",
+                        "year": 2024,
+                        "month": 2,
+                        "day": 12,
+                        "hour": 12,
+                        "minute": 44,
+                        "second": 57,
+                        "microsecond": 956000
+                    },
+                    "updatedAt": {
+                        "__class__": "datetime",
+                        "year": 2024,
+                        "month": 2,
+                        "day": 12,
+                        "hour": 12,
+                        "minute": 44,
+                        "second": 57,
+                        "microsecond": 956000
+                    },
+                    "capacityProviderStrategy": [
+                        {
+                            "capacityProvider": "FARGATE",
+                            "weight": 100,
+                            "base": 0
+                        }
+                    ],
+                    "platformVersion": "1.4.0",
+                    "platformFamily": "Linux",
+                    "networkConfiguration": {
+                        "awsvpcConfiguration": {
+                            "subnets": [
+                                "subnet-0b829c7f54fd00883",
+                                "subnet-0d92e88c50ab9adac",
+                                "subnet-0e26958394c1a4fc7"
+                            ],
+                            "securityGroups": [
+                                "sg-037c67c516127610d",
+                                "sg-03067d2f64ae975d8",
+                                "sg-04e2c7d46a6745f0c"
+                            ],
+                            "assignPublicIp": "ENABLED"
+                        }
+                    },
+                    "rolloutState": "IN_PROGRESS",
+                    "rolloutStateReason": "ECS deployment ecs-svc/5219324069200109376 in progress."
+                },
+                {
+                    "id": "ecs-svc/5377507045281168538",
+                    "status": "ACTIVE",
+                    "taskDefinition": "arn:aws:ecs:us-east-2:644160558196:task-definition/dev-redash-server:75",
+                    "desiredCount": 1,
+                    "pendingCount": 0,
+                    "runningCount": 1,
+                    "failedTasks": 0,
+                    "createdAt": {
+                        "__class__": "datetime",
+                        "year": 2024,
+                        "month": 1,
+                        "day": 26,
+                        "hour": 15,
+                        "minute": 17,
+                        "second": 13,
+                        "microsecond": 482000
+                    },
+                    "updatedAt": {
+                        "__class__": "datetime",
+                        "year": 2024,
+                        "month": 1,
+                        "day": 26,
+                        "hour": 15,
+                        "minute": 20,
+                        "second": 13,
+                        "microsecond": 362000
+                    },
+                    "capacityProviderStrategy": [
+                        {
+                            "capacityProvider": "FARGATE",
+                            "weight": 100,
+                            "base": 0
+                        }
+                    ],
+                    "platformVersion": "1.4.0",
+                    "platformFamily": "Linux",
+                    "networkConfiguration": {
+                        "awsvpcConfiguration": {
+                            "subnets": [
+                                "subnet-0b829c7f54fd00883",
+                                "subnet-0d92e88c50ab9adac",
+                                "subnet-0e26958394c1a4fc7"
+                            ],
+                            "securityGroups": [
+                                "sg-037c67c516127610d",
+                                "sg-03067d2f64ae975d8",
+                                "sg-04e2c7d46a6745f0c"
+                            ],
+                            "assignPublicIp": "ENABLED"
+                        }
+                    },
+                    "rolloutState": "COMPLETED",
+                    "rolloutStateReason": "ECS deployment ecs-svc/5377507045281168538 completed."
+                }
+            ],
+            "roleArn": "arn:aws:iam::644160558196:role/aws-service-role/ecs.amazonaws.com/AWSServiceRoleForECS",
+            "events": [],
+            "createdAt": {
+                "__class__": "datetime",
+                "year": 2022,
+                "month": 5,
+                "day": 24,
+                "hour": 14,
+                "minute": 46,
+                "second": 50,
+                "microsecond": 746000
+            },
+            "placementConstraints": [],
+            "placementStrategy": [],
+            "networkConfiguration": {
+                "awsvpcConfiguration": {
+                    "subnets": [
+                        "subnet-0b829c7f54fd00883",
+                        "subnet-0d92e88c50ab9adac",
+                        "subnet-0e26958394c1a4fc7"
+                    ],
+                    "securityGroups": [
+                        "sg-037c67c516127610d",
+                        "sg-03067d2f64ae975d8",
+                        "sg-04e2c7d46a6745f0c"
+                    ],
+                    "assignPublicIp": "ENABLED"
+                }
+            },
+            "healthCheckGracePeriodSeconds": 0,
+            "schedulingStrategy": "REPLICA",
+            "deploymentController": {
+                "type": "ECS"
+            },
+            "createdBy": "arn:aws:iam::644160558196:role/stacklet-deployer",
+            "enableECSManagedTags": true,
+            "propagateTags": "SERVICE",
+            "enableExecuteCommand": false
+        },
+        "ResponseMetadata": {}
+    }
+}
