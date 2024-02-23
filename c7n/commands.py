@@ -28,105 +28,106 @@ from c7n.resources import (
 log = logging.getLogger('custodian.commands')
 
 
-def policy_command(f):
+def load_policies(options):
+    validate = True
+    if 'skip_validation' in options:
+        validate = not options.skip_validation
 
-    @wraps(f)
-    def _load_policies(options):
+    if not validate:
+        log.debug('Policy validation disabled')
 
-        validate = True
-        if 'skip_validation' in options:
-            validate = not options.skip_validation
+    vars = _load_vars(options)
 
-        if not validate:
-            log.debug('Policy validation disabled')
+    errors = 0
+    all_policies = PolicyCollection.from_data({}, options)
 
-        vars = _load_vars(options)
+    # for a default region for policy loading, we'll expand regions later.
+    options.region = ""
+    for fp in options.configs:
+        try:
+            collection = policy_load(options, fp, validate=validate, vars=vars)
+        except IOError:
+            log.error('policy file does not exist ({})'.format(fp))
+            errors += 1
+            continue
+        except yaml.YAMLError as e:
+            log.error(
+                "yaml syntax error loading policy file ({}) error:\n {}".format(
+                    fp, e))
+            errors += 1
+            continue
+        except ValueError as e:
+            log.error('problem loading policy file ({}) error: {}'.format(
+                fp, str(e)))
+            errors += 1
+            continue
+        except PolicyValidationError as e:
+            log.error('invalid policy file: {} error: {}'.format(
+                fp, str(e)))
+            errors += 1
+            continue
+        if collection is None:
+            log.debug('Loaded file {}. Contained no policies.'.format(fp))
+        else:
+            log.debug(
+                'Loaded file {}. Contains {} policies'.format(
+                    fp, len(collection)))
+            all_policies = all_policies + collection
 
-        errors = 0
-        all_policies = PolicyCollection.from_data({}, options)
+    if errors > 0:
+        log.error('Found {} errors.  Exiting.'.format(errors))
+        sys.exit(1)
 
-        # for a default region for policy loading, we'll expand regions later.
-        options.region = ""
-        for fp in options.configs:
-            try:
-                collection = policy_load(options, fp, validate=validate, vars=vars)
-            except IOError:
-                log.error('policy file does not exist ({})'.format(fp))
-                errors += 1
-                continue
-            except yaml.YAMLError as e:
-                log.error(
-                    "yaml syntax error loading policy file ({}) error:\n {}".format(
-                        fp, e))
-                errors += 1
-                continue
-            except ValueError as e:
-                log.error('problem loading policy file ({}) error: {}'.format(
-                    fp, str(e)))
-                errors += 1
-                continue
-            except PolicyValidationError as e:
-                log.error('invalid policy file: {} error: {}'.format(
-                    fp, str(e)))
-                errors += 1
-                continue
-            if collection is None:
-                log.debug('Loaded file {}. Contained no policies.'.format(fp))
-            else:
-                log.debug(
-                    'Loaded file {}. Contains {} policies'.format(
-                        fp, len(collection)))
-                all_policies = all_policies + collection
+    # filter by name and resource type
+    policies = all_policies.filter(
+        getattr(options, 'policy_filters', []),
+        getattr(options, 'resource_types', []))
 
-        if errors > 0:
-            log.error('Found {} errors.  Exiting.'.format(errors))
+    # provider initialization
+    provider_policies = {}
+    for p in policies:
+        provider_policies.setdefault(p.provider_name, []).append(p)
+
+    policies = PolicyCollection.from_data({}, options)
+    for provider_name in provider_policies:
+        provider = clouds[provider_name]()
+        p_options = provider.initialize(options)
+        policies += provider.initialize_policies(
+            PolicyCollection(provider_policies[provider_name], p_options),
+            p_options)
+
+    if len(policies) == 0:
+        _print_no_policies_warning(options, all_policies)
+        # If we filtered out all the policies we want to exit with a
+        # non-zero status. But if the policy file is empty then continue
+        # on to the specific command to determine the exit status.
+        if len(all_policies) > 0:
             sys.exit(1)
 
-        # filter by name and resource type
-        policies = all_policies.filter(
-            getattr(options, 'policy_filters', []),
-            getattr(options, 'resource_types', []))
-
-        # provider initialization
-        provider_policies = {}
-        for p in policies:
-            provider_policies.setdefault(p.provider_name, []).append(p)
-
-        policies = PolicyCollection.from_data({}, options)
-        for provider_name in provider_policies:
-            provider = clouds[provider_name]()
-            p_options = provider.initialize(options)
-            policies += provider.initialize_policies(
-                PolicyCollection(provider_policies[provider_name], p_options),
-                p_options)
-
-        if len(policies) == 0:
-            _print_no_policies_warning(options, all_policies)
-            # If we filtered out all the policies we want to exit with a
-            # non-zero status. But if the policy file is empty then continue
-            # on to the specific command to determine the exit status.
-            if len(all_policies) > 0:
+    # Do not allow multiple policies in a region with the same name,
+    # even across files
+    policies_by_region = defaultdict(list)
+    for p in policies:
+        policies_by_region[p.options.region].append(p)
+    for region in policies_by_region.keys():
+        counts = Counter([p.name for p in policies_by_region[region]])
+        for policy, count in counts.items():
+            if count > 1:
+                log.error("duplicate policy name '{}'".format(policy))
                 sys.exit(1)
 
-        # Do not allow multiple policies in a region with the same name,
-        # even across files
-        policies_by_region = defaultdict(list)
-        for p in policies:
-            policies_by_region[p.options.region].append(p)
-        for region in policies_by_region.keys():
-            counts = Counter([p.name for p in policies_by_region[region]])
-            for policy, count in counts.items():
-                if count > 1:
-                    log.error("duplicate policy name '{}'".format(policy))
-                    sys.exit(1)
+    # Variable expansion and non schema validation (not optional)
+    for p in policies:
+        p.expand_variables(p.get_variables())
+        p.validate()
 
-        # Variable expansion and non schema validation (not optional)
-        for p in policies:
-            p.expand_variables(p.get_variables())
-            p.validate()
+    return list(policies)
 
-        return f(options, list(policies))
 
+def policy_command(f):
+    @wraps(f)
+    def _load_policies(options):
+        return f(options, load_policies(options))
     return _load_policies
 
 
