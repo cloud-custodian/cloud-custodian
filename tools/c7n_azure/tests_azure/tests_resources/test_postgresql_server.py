@@ -162,10 +162,16 @@ class TestServerSecurityAlertPoliciesFilter(BaseTest):
         p = self.load_policy({
             'name': 'test-postgresql-server-filter',
             'resource': 'azure.postgresql-server',
-            'filters': [{'type': 'security-alert-policy',
-                         'key': 'state',
-                         'op': 'eq',
-                         'value': 'Disabled'}]
+            'filters': [
+                {
+                    'type': 'security-alert-policies',
+                    'attrs': [{
+                        'type': 'value',
+                        'key': 'properties.state',
+                        'value': 'Disabled'
+                    }]
+                }
+            ]
         }, validate=True)
 
         resources = p.run()

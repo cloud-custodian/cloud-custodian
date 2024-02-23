@@ -60,49 +60,43 @@ class PostgresqlServer(ArmResourceManager):
         resource_type = 'Microsoft.DBforPostgreSQL/servers'
 
 
-@PostgresqlServer.filter_registry.register('server-configurations')
+@PostgresqlServer.filter_registry.register("server-configurations")
 class PostgresqlServerConfigurationFilter(ListItemFilter):
     schema = type_schema(
-        'server-configurations',
-        attrs={'$ref': '#/definitions/filters_common/list_item_attrs'},
-        count={'type': 'number'},
-        count_op={'$ref': '#/definitions/filters_common/comparison_operators'}
+        "server-configurations",
+        attrs={"$ref": "#/definitions/filters_common/list_item_attrs"},
+        count={"type": "number"},
+        count_op={"$ref": "#/definitions/filters_common/comparison_operators"}
     )
-    item_annotation_key = 'c7n:ServerConfigurations'
+    item_annotation_key = "c7n:ServerConfigurations"
     annotate_items = True
 
     def get_item_values(self, resource):
         it = self.manager.get_client().configurations.list_by_server(
-            resource_group_name=resource['resourceGroup'],
-            server_name=resource['name']
+            resource_group_name=resource["resourceGroup"],
+            server_name=resource["name"]
         )
         return [item.serialize(True) for item in it]
 
 
-@PostgresqlServer.filter_registry.register('security-alert-policy')
-class ServerSecurityAlertPoliciesFilter(Filter):
+@PostgresqlServer.filter_registry.register('security-alert-policies')
+class PostgresqlServerSecurityAlertPoliciesFilter(ListItemFilter):
+    schema = type_schema(
+        "security-alert-policies",
+        attrs={"$ref": "#/definitions/filters_common/list_item_attrs"},
+        count={"type": "number"},
+        count_op={"$ref": "#/definitions/filters_common/comparison_operators"}
+    )
 
-    schema = type_schema('security-alert-policy',
-                         rinherit=ValueFilter.schema)
+    annotate_items = True
+    item_annotation_key = "c7n:SecurityAlertPolicies"
 
-    def _perform_op(self, a, b):
-        op = scalar_ops.get(self.data.get('op', 'eq'))
-        return op(a, b)
-
-    def process(self, resources, event=None):
-        client = self.manager.get_client('azure.mgmt.rdbms.postgresql.PostgreSQLManagementClient')
-        filtered_resources = []
-
-        for resource in resources:
-            for alert in list(client.server_security_alert_policies.list_by_server(
-                    server_name=resource['name'],
-                    resource_group_name=resource['resourceGroup'])):
-                attribute = getattr(alert, self.data.get('key'))
-                if self._perform_op(attribute, self.data.get('value')):
-                    filtered_resources.append(resource)
-                    break
-
-        return filtered_resources
+    def get_item_values(self, resource):
+        it = self.manager.get_client().server_security_alert_policies.list_by_server(
+            resource_group_name=resource["resourceGroup"],
+            server_name=resource["name"],
+        )
+        return [item.serialize(True) for item in it]
 
 
 @PostgresqlServer.filter_registry.register('firewall-bypass')
