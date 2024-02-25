@@ -1,0 +1,160 @@
+{
+    "status_code": 200,
+    "data": {
+        "LoadBalancers": [
+            {
+                "LoadBalancerArn": "arn:aws:elasticloadbalancing:us-east-1:644160558196:loadbalancer/net/nlb-allowed/85bc4c230334f70a",
+                "DNSName": "nlb-allowed-85bc4c230334f70a.elb.us-east-1.amazonaws.com",
+                "CanonicalHostedZoneId": "Z26RNL4JYFTOTI",
+                "CreatedTime": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 2,
+                    "day": 25,
+                    "hour": 21,
+                    "minute": 13,
+                    "second": 44,
+                    "microsecond": 222000
+                },
+                "LoadBalancerName": "nlb-allowed",
+                "Scheme": "internet-facing",
+                "VpcId": "vpc-066a4955032b41ca7",
+                "State": {
+                    "Code": "active"
+                },
+                "Type": "network",
+                "AvailabilityZones": [
+                    {
+                        "ZoneName": "us-east-1a",
+                        "SubnetId": "subnet-034475ac41bcb9abd",
+                        "LoadBalancerAddresses": []
+                    },
+                    {
+                        "ZoneName": "us-east-1b",
+                        "SubnetId": "subnet-0c31f5e6f8c2fcf57",
+                        "LoadBalancerAddresses": []
+                    }
+                ],
+                "SecurityGroups": [
+                    "sg-0ade5766c7964b4f2"
+                ],
+                "IpAddressType": "ipv4"
+            },
+            {
+                "LoadBalancerArn": "arn:aws:elasticloadbalancing:us-east-1:644160558196:loadbalancer/net/nlb-unallowed/a761c77f84282027",
+                "DNSName": "nlb-unallowed-a761c77f84282027.elb.us-east-1.amazonaws.com",
+                "CanonicalHostedZoneId": "Z26RNL4JYFTOTI",
+                "CreatedTime": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 2,
+                    "day": 25,
+                    "hour": 21,
+                    "minute": 13,
+                    "second": 44,
+                    "microsecond": 107000
+                },
+                "LoadBalancerName": "nlb-unallowed",
+                "Scheme": "internet-facing",
+                "VpcId": "vpc-066a4955032b41ca7",
+                "State": {
+                    "Code": "active"
+                },
+                "Type": "network",
+                "AvailabilityZones": [
+                    {
+                        "ZoneName": "us-east-1b",
+                        "SubnetId": "subnet-0c31f5e6f8c2fcf57",
+                        "LoadBalancerAddresses": []
+                    },
+                    {
+                        "ZoneName": "us-east-1a",
+                        "SubnetId": "subnet-034475ac41bcb9abd",
+                        "LoadBalancerAddresses": []
+                    }
+                ],
+                "SecurityGroups": [
+                    "sg-0c8d97a6602b4be43"
+                ],
+                "IpAddressType": "ipv4"
+            },
+            {
+                "LoadBalancerArn": "arn:aws:elasticloadbalancing:us-east-1:644160558196:loadbalancer/app/alb-unallowed/80b601d6253ea5b4",
+                "DNSName": "alb-unallowed-1522071122.us-east-1.elb.amazonaws.com",
+                "CanonicalHostedZoneId": "Z35SXDOTRQ7X7K",
+                "CreatedTime": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 2,
+                    "day": 25,
+                    "hour": 21,
+                    "minute": 13,
+                    "second": 44,
+                    "microsecond": 110000
+                },
+                "LoadBalancerName": "alb-unallowed",
+                "Scheme": "internet-facing",
+                "VpcId": "vpc-066a4955032b41ca7",
+                "State": {
+                    "Code": "active"
+                },
+                "Type": "application",
+                "AvailabilityZones": [
+                    {
+                        "ZoneName": "us-east-1a",
+                        "SubnetId": "subnet-034475ac41bcb9abd",
+                        "LoadBalancerAddresses": []
+                    },
+                    {
+                        "ZoneName": "us-east-1b",
+                        "SubnetId": "subnet-0c31f5e6f8c2fcf57",
+                        "LoadBalancerAddresses": []
+                    }
+                ],
+                "SecurityGroups": [
+                    "sg-0c8d97a6602b4be43"
+                ],
+                "IpAddressType": "ipv4"
+            },
+            {
+                "LoadBalancerArn": "arn:aws:elasticloadbalancing:us-east-1:644160558196:loadbalancer/app/alb-allowed/ae462e03fa09c5c7",
+                "DNSName": "alb-allowed-1616791576.us-east-1.elb.amazonaws.com",
+                "CanonicalHostedZoneId": "Z35SXDOTRQ7X7K",
+                "CreatedTime": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 2,
+                    "day": 25,
+                    "hour": 21,
+                    "minute": 13,
+                    "second": 44,
+                    "microsecond": 90000
+                },
+                "LoadBalancerName": "alb-allowed",
+                "Scheme": "internet-facing",
+                "VpcId": "vpc-066a4955032b41ca7",
+                "State": {
+                    "Code": "active"
+                },
+                "Type": "application",
+                "AvailabilityZones": [
+                    {
+                        "ZoneName": "us-east-1a",
+                        "SubnetId": "subnet-034475ac41bcb9abd",
+                        "LoadBalancerAddresses": []
+                    },
+                    {
+                        "ZoneName": "us-east-1b",
+                        "SubnetId": "subnet-0c31f5e6f8c2fcf57",
+                        "LoadBalancerAddresses": []
+                    }
+                ],
+                "SecurityGroups": [
+                    "sg-0ade5766c7964b4f2"
+                ],
+                "IpAddressType": "ipv4"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
