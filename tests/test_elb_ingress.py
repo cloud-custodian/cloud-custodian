@@ -12,9 +12,9 @@ test_data = [
 ]
 
 @pytest.mark.parametrize('elb_type, expected', test_data)
-@terraform('elb_ingress', replay=False)
+@terraform('elb_ingress')
 def test_elbv2_ingress(test, elb_ingress, elb_type, expected):
-    session_factory = test.record_flight_data(
+    session_factory = test.replay_flight_data(
         'elb_ingress',
         region=aws_region,
     )
