@@ -621,6 +621,32 @@ def test_graph_merge_function(policy_env):
     assert log_group["tags"] == {"Env": "Public", "Component": "application"}
 
 
+def test_null_tag_value(policy_env):
+    policy_env.write_tf(
+        """
+        variable app_tags {
+          type = map(string)
+        }
+        resource "aws_instance" "app" {
+          ami = "ami-123"
+          instance_type = "t4.medium"
+          tags = var.app_tags
+        }
+        """
+    )
+
+    policy_env.write_policy(
+        {
+            "name": "check-null-tags",
+            "resource": "terraform.aws_instance",
+            "filters": [{"tag:Env": "absent"}],
+        }
+    )
+
+    results = policy_env.run()
+    assert len(results) == 1
+
+
 def test_traverse_to_data(policy_env):
     policy_env.write_tf(
         """
