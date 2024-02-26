@@ -337,7 +337,6 @@ class PolicyResourceResult:
 
 
 class LeftValueFilter(ValueFilter):
-
     def get_resource_value(self, k, i):
         if k.startswith('tag:') and 'tags' in i:
             tk = k.split(':', 1)[1]
