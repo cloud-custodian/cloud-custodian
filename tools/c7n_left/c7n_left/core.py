@@ -337,12 +337,13 @@ class PolicyResourceResult:
 
 
 class LeftValueFilter(ValueFilter):
-    def get_resource_value(self, k, i, regex=None):
+
+    def get_resource_value(self, k, i):
         if k.startswith('tag:') and 'tags' in i:
             tk = k.split(':', 1)[1]
             r = (i.get('tags', {}) or {}).get(tk)
             return r
-        return super().get_resource_value(k, i, regex)
+        return super().get_resource_value(k, i)
 
 
 class IACResourceManager(ResourceManager):
