@@ -348,6 +348,8 @@ class LeftValueFilter(ValueFilter):
 class IACResourceManager(ResourceManager):
     filter_registry = FilterRegistry("iac.filters")
     filter_registry.register('value', LeftValueFilter)
+    filter_registry.value_filter_class = LeftValueFilter
+
     action_registry = ActionRegistry("iac.actions")
     log = log
 
