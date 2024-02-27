@@ -5,7 +5,7 @@ import json
 import os
 import subprocess
 from pathlib import Path
-from unittest.mock import ANY
+from unittest.mock import ANY, patch
 from urllib.request import urlopen
 import xml.etree.ElementTree as etree
 
@@ -38,10 +38,11 @@ terraform_dir = Path(__file__).parent.parent.parent.parent / "tests" / "terrafor
 terraform_dir = terraform_dir.relative_to(cur_dir)
 
 
-class ResultsReporter:
+class ResultsReporter(output.Output):
     def __init__(self):
         self.results = []
         self.input_vars = {}
+        self.errors = []
 
     def on_execution_started(self, policies, graph):
         pass
@@ -51,6 +52,9 @@ class ResultsReporter:
 
     def on_policy_start(self, policy, event):
         pass
+
+    def on_policy_error(self, exception, policy, rtype, resources):
+        self.errors.append((exception, policy, rtype, resources))
 
     def on_vars_discovered(self, var_type, var_map, var_path=None):
         var_key = var_path and "%s:%s" % (var_type, var_path) or var_type
@@ -864,6 +868,30 @@ def test_graph_var_file(tmp_path, var_tf_setup):
     graph = TerraformProvider().parse(tmp_path / "tf", ("vars.tfvars",))
     resources = list(graph.get_resources_by_type("aws_alb"))
     assert resources[0][1][0]["load_balancer_type"] == "network"
+
+
+def test_cli_execution_error(policy_env, test, debug_cli_runner):
+    policy_env.write_tf(
+        """
+        resource "aws_cloudwatch_log_group" "yada" {
+          name = "Bar"
+        }
+        """
+    )
+
+    policy_env.write_policy(
+        {
+            "name": "check-error",
+            "resource": "terraform.aws_cloudwatch_log_group",
+        }
+    )
+
+    runner = debug_cli_runner
+    with patch.object(core.CollectionRunner, 'run_policy', side_effect=KeyError("abc")):
+        result = runner.invoke(
+            cli.cli, ["run", "-p", policy_env.policy_dir, "-d", policy_env.policy_dir]
+        )
+        assert result.exit_code == 1
 
 
 def test_cli_dump(policy_env, test, debug_cli_runner):

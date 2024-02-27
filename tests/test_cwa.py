@@ -77,6 +77,50 @@ class AlarmTest(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertTrue({'Key': 'OwnerName', 'Value': 'SomeName'} in resources[0].get('Tags'))
 
+    def test_is_not_composite_child_filter(self):
+        factory = self.replay_flight_data("test_is_not_composite_child_filter")
+        p = self.load_policy(
+            {
+                "name": "is-composite-child",
+                "resource": "aws.alarm",
+                "filters": [
+                    {
+                        'type': 'is-composite-child',
+                        'state': False,
+                    }
+                ],
+            },
+            session_factory=factory,
+        )
+
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
+        for alarm in resources:
+            self.assertNotIn(alarm['AlarmName'], "c7n-test-alarm-tags-filter")
+
+    def test_is_composite_child_filter(self):
+        factory = self.replay_flight_data("test_is_composite_child_filter")
+        p = self.load_policy(
+            {
+                "name": "is-composite-child",
+                "resource": "aws.alarm",
+                "filters": [
+                    {
+                        'type': 'is-composite-child',
+                        'state': True,
+                    }
+                ],
+            },
+            session_factory=factory,
+        )
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        for alarm in resources:
+            self.assertIn(alarm['AlarmName'], "c7n-test-alarm-tags-filter")
+
 
 class CompositeAlarmTest(BaseTest):
 
