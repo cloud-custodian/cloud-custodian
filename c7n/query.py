@@ -20,7 +20,7 @@ from c7n.manager import ResourceManager
 from c7n.registry import PluginRegistry
 from c7n.tags import register_ec2_tags, register_universal_tags, universal_augment
 from c7n.utils import (
-    local_session, generate_arn, get_retry, chunks, camelResource, jmespath_compile)
+    local_session, generate_arn, get_retry, chunks, camelResource, jmespath_compile, get_path)
 
 try:
     from botocore.paginate import PageIterator, Paginator
@@ -623,9 +623,9 @@ class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
 
         for r in resources:
             if arn_key:
-                arns.append(r[arn_key])
+                arns.append(get_path(arn_key, r))
             else:
-                _id = r[m.id]
+                _id = get_path(m.id, r)
 
                 if 'arn' in _id[:3]:
                     arns.append(_id)

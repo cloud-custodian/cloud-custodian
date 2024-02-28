@@ -118,13 +118,6 @@ class DescribeVirtualGatewayDefinition(ChildDescribeSource):
                                           virtualGatewayName=names["virtualGatewayName"], )
             resource = response['virtualGateway']
 
-            # promote the fields in "metadata" up to the top level so that this resource's model
-            # matches the capability of CloudCustodian, which currently doesn't allow paths to
-            # the "arn" value or the "date" value. Ideally, CC would allow paths in more fields
-            # so the resource model can match the model returned by the Amazon API's.
-            resource.update(resource["metadata"])
-            del resource["metadata"]
-
             results.append(resource)
         return results
 
@@ -161,14 +154,14 @@ class AppmeshVirtualGateway(ChildResourceManager):
         # turn on automatic collection of tags and tag filtering
         universal_taggable = object()
 
-        # id: is not used by the resource collection process because this is a child function
-        # and it is the parent_spec function that drives collection of "mesh id's".
-        # However, it is still used by reporting so let's define it.
-        id = "arn"
+        # id: is not used by the resource collection process for this type because this is a ChildResourceManager
+        # and instead it is the parent_spec function that drives collection of "mesh id's".
+        # However, it is still used by "report" operation so let's define it as something even if not ideal.
+        id = "metadata.arn"
 
         # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-appmesh-virtualgateway.html  # noqa
         # arn: not needed since we have defined our own "get_arns()" below
-        arn = "arn"
+        arn = "metadata.arn"
 
         # This "name" value appears in the "report" command output.
         # example: custodian  report --format json  -s report-out mesh-policy.yml
@@ -179,7 +172,7 @@ class AppmeshVirtualGateway(ChildResourceManager):
         # refers to a field in the metadata response of the describe function
         # appears in the "report" operation
         # https://docs.aws.amazon.com/cli/latest/reference/appmesh/describe-virtual-gateway.html
-        date = 'createdAt'
+        date = 'metadata.createdAt'
 
         # When we define a parent_spec then the parent_spec
         # provides the driving result set from which parent resource id's will be picked.
@@ -201,14 +194,3 @@ class AppmeshVirtualGateway(ChildResourceManager):
             'virtualGateways',
             None,
         )
-
-    # Purpose is to extract the ARN from the given resource description..
-    # The location of the ARN in the VGW resource is not at the top level
-    # so we need to override the function that does the extraction.
-    # If the arn had been at the top level of the data structure then it
-    # would have been enough to define the "arn" config field in the Typeinfo class.
-    # But at present we can't put a path line "metadata.arn" into
-    # that config field, and the authors tell me that allowing that would
-    # be too expensive. So we'll just DIY.
-    # def get_arns(self, resources):
-    #      return [r['arn'] for r in resources]

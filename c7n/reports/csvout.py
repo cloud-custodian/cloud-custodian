@@ -43,7 +43,7 @@ from botocore.compat import OrderedDict
 from dateutil.parser import parse as date_parse
 
 from c7n.executor import ThreadPoolExecutor
-from c7n.utils import local_session, dumps, jmespath_search, jmespath_compile
+from c7n.utils import local_session, dumps, jmespath_search, jmespath_compile, get_path
 
 log = logging.getLogger('custodian.reports')
 
@@ -223,7 +223,7 @@ class Formatter:
                      self._date_field)
         if date_sort:
             records.sort(
-                key=lambda r: r[date_sort], reverse=reverse)
+                key=lambda r: get_path(date_sort, r), reverse=reverse)
 
         if unique:
             uniq = self.uniq_by_id(records)
