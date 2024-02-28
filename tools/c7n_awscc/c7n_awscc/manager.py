@@ -112,6 +112,19 @@ def get_update_schema(schema, rname):
         "properties": {u: schema["properties"][u] for u in updatable},
     }
     update_schema["properties"]["type"] = {"enum": ["update"]}
+    update_schema["properties"]["patch"] = {
+        # This schema is pretty minimal
+        "description": "Json patch to apply to resources",
+        "type": "array",
+        "items": {
+            "type": "object",
+            "required": ["op", "path"],
+            "properties": {
+                "path": {"type": "string"},
+                "op": {"enum": ["add", "remove", "update", "replace", "move", "copy", "test"]},
+            },
+        },
+    }
 
     if "definitions" in schema:
         update_schema["definitions"] = dict(schema["definitions"])
