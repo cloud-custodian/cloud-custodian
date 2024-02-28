@@ -1,4 +1,4 @@
-# Copyright The Cloud Custodian Authors.
+    # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 from botocore.history import get_global_history_recorder
 from typing import Callable
@@ -122,7 +122,7 @@ class ApiCallCaptor:
     def _default_on_err(payload, err):
         stderr.write(err)
 
-    def expect(self, calls: list[str], on_error: Callable[[dict, str], None] = _default_on_err):
+    def expect(self, calls: list[str], on_error: Callable[[{}, str], None] = _default_on_err):
         """
         use expect(...) if you want immediate notification when an unexpected call is made, for
         example to set a breakpoint and do debugging.
@@ -130,8 +130,11 @@ class ApiCallCaptor:
         calls: if we set an expection on the calls then by default the on_error handler
         will print an error if there is a deviation.
 
-        on_error: the default impl prints an error message, but you can override this
-        for instance to place a breakpoint in your own code if an erorr occurs
+        on_error: is a void function that takes a dict and a string as args,
+        the dict being the payload that was received from the api call and
+        the string being the ApiCallCaptor error message.
+        The default impl will print the error message, but you can override this
+        for instance to place a breakpoint in your own code if an error occurs
         or to change the action or pass None to disable.
         Because boto swallows any exceptions then throwing an exception is
         ineffectural, however it's still possible to exit the process if you want
