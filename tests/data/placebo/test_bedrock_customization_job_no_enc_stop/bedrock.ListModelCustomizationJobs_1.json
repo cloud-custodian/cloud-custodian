@@ -1,0 +1,36 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "modelCustomizationJobSummaries": [
+            {
+                "jobArn": "arn:aws:bedrock:us-east-1:644160558196:model-customization-job/cohere.command-text-v14:7:4k/q4ad8z8tioq8",
+                "baseModelArn": "arn:aws:bedrock:us-east-1::foundation-model/cohere.command-text-v14:7:4k",
+                "jobName": "c7n-test-ab",
+                "status": "InProgress",
+                "lastModifiedTime": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 2,
+                    "day": 15,
+                    "hour": 9,
+                    "minute": 8,
+                    "second": 26,
+                    "microsecond": 657000
+                },
+                "creationTime": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 2,
+                    "day": 15,
+                    "hour": 9,
+                    "minute": 7,
+                    "second": 57,
+                    "microsecond": 356000
+                },
+                "customModelName": "c7n-test-ab",
+                "customizationType": "FINE_TUNING"
+            }
+        ]
+    }
+}

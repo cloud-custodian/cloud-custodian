@@ -146,6 +146,23 @@ class LambdaLayerTest(BaseTest):
 
 class LambdaTest(BaseTest):
 
+    def test_lambda_update_optimization(self):
+        factory = self.replay_flight_data('test_lambda_resize')
+        p = self.load_policy(
+            {
+                'name': 'lambda-update-resize',
+                'resource': 'lambda',
+                'filters': ['cost-optimization'],
+                'actions': ['update']
+            },
+            session_factory=factory
+        )
+        resources = p.run()
+        assert len(resources) == 1
+        client = factory().client('lambda')
+        function = client.get_function(FunctionName=resources[0]['FunctionName'])
+        assert function['Configuration']['MemorySize'] != resources[0]['MemorySize']
+
     def test_lambda_trim_versions(self):
         factory = self.replay_flight_data('test_lambda_trim_versions')
         client = factory().client('lambda')

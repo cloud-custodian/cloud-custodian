@@ -7,6 +7,8 @@ import os
 import time
 
 from c7n.exceptions import PolicyExecutionError
+from c7n.resources.aws import Arn
+
 
 class TestEcs(BaseTest):
     def test_ecs_container_insights_enabled(self):
@@ -160,6 +162,37 @@ class TestEcsService(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertTrue("c7n.metrics" in resources[0])
+
+    def test_ecs_service_modify_definition(self):
+        factory = self.replay_flight_data("test_ecs_service_update_definition", region="us-east-2")
+        p = self.load_policy(
+            {"name": "update-definition",
+             "resource": "aws.ecs-service",
+             "filters": [
+                 {'serviceName': 'redash-server'},
+                 "cost-optimization"],
+             "actions": ["modify-definition"]},
+            config={"region": "us-east-2"},
+            session_factory=factory,
+        )
+        resources = p.run()
+        assert len(resources) == 1
+        rservice = resources.pop()
+        client = factory().client('ecs')
+        cluster, service_name = Arn.parse(rservice['serviceArn']).resource.split('/')
+        cservice = client.describe_services(
+            cluster=cluster,
+            services=[service_name]
+        )["services"][0]
+
+        rtask = client.describe_task_definition(
+            taskDefinition=rservice['taskDefinition'])['taskDefinition']
+        ctask = client.describe_task_definition(
+            taskDefinition=cservice['taskDefinition'])['taskDefinition']
+
+        assert cservice['taskDefinition'] != rservice['taskDefinition']
+        assert rtask['cpu'] != ctask['cpu']
+        assert rtask['memory'] != ctask['memory']
 
     def test_ecs_service_update(self):
         session_factory = self.replay_flight_data("test_ecs_service_update")
