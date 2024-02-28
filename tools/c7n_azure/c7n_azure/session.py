@@ -47,8 +47,10 @@ class AzureCredential:
                 'subscription_id': os.environ.get(constants.ENV_SUB_ID),
                 'keyvault_client_id': os.environ.get(constants.ENV_KEYVAULT_CLIENT_ID),
                 'keyvault_secret_id': os.environ.get(constants.ENV_KEYVAULT_SECRET_ID),
-                'client_certificate_path': os.environ.get(constants.ENV_AZURE_CLIENT_CERTIFICATE_PATH),
-                'client_certificate_password': os.environ.get(constants.ENV_AZURE_CLIENT_CERTIFICATE_PASSWORD),
+                'client_certificate_path': os.environ.get(
+                    constants.ENV_AZURE_CLIENT_CERTIFICATE_PATH),
+                'client_certificate_password': os.environ.get(
+                    constants.ENV_AZURE_CLIENT_CERTIFICATE_PASSWORD),
                 'enable_cli_auth': True
             }
 
