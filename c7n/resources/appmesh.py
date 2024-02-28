@@ -154,9 +154,11 @@ class AppmeshVirtualGateway(ChildResourceManager):
         # turn on automatic collection of tags and tag filtering
         universal_taggable = object()
 
-        # id: is not used by the resource collection process for this type because this is a ChildResourceManager
-        # and instead it is the parent_spec function that drives collection of "mesh id's".
-        # However, it is still used by "report" operation so let's define it as something even if not ideal.
+        # id: is not used by the resource collection process for this type because
+        # this is a ChildResourceManager and instead it is the parent_spec function that drives
+        # collection of "mesh id's".
+        # However, it is still used by "report" operation so let's define it as something
+        # even if not ideal.
         id = "metadata.arn"
 
         # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-appmesh-virtualgateway.html  # noqa

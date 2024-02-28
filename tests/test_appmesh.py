@@ -263,13 +263,14 @@ class TestAppmeshVirtualGateway(BaseTest):
             [{'Tags': [{'Key': 'MyTagName', 'Value': 'm1/g1'}],
               'c7n:MatchedFilters': ['spec.listeners[0].portMapping.port'],
               'meshName': 'm1',
-              'metadata': {'arn': 'arn:aws:appmesh:eu-west-2:123456789012:mesh/m1/virtualGateway/g1',
-                           'createdAt': '2023-11-03T02:36:27.877000+00:00',
-                           'lastUpdatedAt': '2023-11-03T02:36:27.877000+00:00',
-                           'meshOwner': '644160558196',
-                           'resourceOwner': '644160558196',
-                           'uid': '80ee4027-c8e1-49e8-99ba-cace20a57f0b',
-                           'version': 1},
+              'metadata': {
+                  'arn': 'arn:aws:appmesh:eu-west-2:123456789012:mesh/m1/virtualGateway/g1',
+                  'createdAt': '2023-11-03T02:36:27.877000+00:00',
+                  'lastUpdatedAt': '2023-11-03T02:36:27.877000+00:00',
+                  'meshOwner': '644160558196',
+                  'resourceOwner': '644160558196',
+                  'uid': '80ee4027-c8e1-49e8-99ba-cace20a57f0b',
+                  'version': 1},
               'spec': {'backendDefaults': {'clientPolicy': {}},
                        'listeners': [{'portMapping': {'port': 123, 'protocol': 'http'}}],
                        'logging': {}},
@@ -373,13 +374,14 @@ class TestAppmeshVirtualGateway(BaseTest):
             [{'Tags': [{'Key': 'MyTagName', 'Value': 'm1/g1'}],
               'c7n:MatchedFilters': ['spec.listeners[0].portMapping.port'],
               'meshName': 'm1',
-              'metadata': {'arn': 'arn:aws:appmesh:eu-west-2:123456789012:mesh/m1/virtualGateway/g1',
-                           'createdAt': '2023-11-03T02:36:27.877000+00:00',
-                           'lastUpdatedAt': '2023-11-03T02:36:27.877000+00:00',
-                           'meshOwner': '644160558196',
-                           'resourceOwner': '644160558196',
-                           'uid': '80ee4027-c8e1-49e8-99ba-cace20a57f0b',
-                           'version': 1},
+              'metadata': {
+                  'arn': 'arn:aws:appmesh:eu-west-2:123456789012:mesh/m1/virtualGateway/g1',
+                  'createdAt': '2023-11-03T02:36:27.877000+00:00',
+                  'lastUpdatedAt': '2023-11-03T02:36:27.877000+00:00',
+                  'meshOwner': '644160558196',
+                  'resourceOwner': '644160558196',
+                  'uid': '80ee4027-c8e1-49e8-99ba-cace20a57f0b',
+                  'version': 1},
               'spec': {'backendDefaults': {'clientPolicy': {}},
                        'listeners': [{'portMapping': {'port': 123, 'protocol': 'http'}}],
                        'logging': {}},
@@ -429,19 +431,20 @@ class TestAppmeshVirtualGateway(BaseTest):
                 {'Tags': [{'Key': 'MyTagName', 'Value': 'm1/g1'}],
                  'c7n:MatchedFilters': ['spec.listeners[0].portMapping.port'],
                  'meshName': 'm1',
-                 'metadata': {'arn': 'arn:aws:appmesh:eu-west-2:123456789012:mesh/m1/virtualGateway/g1',
-                              'createdAt': '2023-11-03T02:36:27.877000+00:00',
-                              'lastUpdatedAt': '2023-11-03T02:36:27.877000+00:00',
-                              'meshOwner': '644160558196',
-                              'resourceOwner': '644160558196',
-                              'uid': '80ee4027-c8e1-49e8-99ba-cace20a57f0b',
-                              'version': 1},
+                 'metadata': {
+                     'arn': 'arn:aws:appmesh:eu-west-2:123456789012:mesh/m1/virtualGateway/g1',
+                     'createdAt': '2023-11-03T02:36:27.877000+00:00',
+                     'lastUpdatedAt': '2023-11-03T02:36:27.877000+00:00',
+                     'meshOwner': '644160558196',
+                     'resourceOwner': '644160558196',
+                     'uid': '80ee4027-c8e1-49e8-99ba-cace20a57f0b',
+                     'version': 1},
                  'spec': {'backendDefaults': {'clientPolicy': {}},
                           'listeners': [{'portMapping': {'port': 123, 'protocol': 'http'}}],
                           'logging': {}},
                  'status': {'status': 'ACTIVE'},
                  'virtualGatewayName': 'g1'}
-                ],
+            ],
         )
 
         headers = list(f.headers())
@@ -449,7 +452,9 @@ class TestAppmeshVirtualGateway(BaseTest):
         # expect Formatter to inspect the definition of certain
         # fields ("id", "name" and "date") from the AppMesh def
         # and to pick out those fields from a fake resource
-        self.assertEqual(["metadata.arn", "virtualGatewayName", "metadata.createdAt", "mesh"], headers, "header")
+        self.assertEqual(["metadata.arn", "virtualGatewayName", "metadata.createdAt", "mesh"],
+                         headers, "header")
+
         self.assertEqual([["arn:aws:appmesh:eu-west-2:123456789012:mesh/m1/virtualGateway/g1",
                            "g1",
                            "2023-11-03T02:36:27.877000+00:00",
