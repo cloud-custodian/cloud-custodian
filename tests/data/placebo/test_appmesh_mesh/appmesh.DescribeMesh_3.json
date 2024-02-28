@@ -2,9 +2,9 @@
   "status_code": 200,
   "data": {
     "mesh": {
-      "meshName": "m2",
+      "meshName": "m3",
       "metadata": {
-        "arn": "arn:aws:appmesh:eu-west-2:123456789012:mesh/m2",
+        "arn": "arn:aws:appmesh:eu-west-2:123456789012:mesh/m3",
         "createdAt": "2023-11-03T02:36:27.877000+00:00",
         "lastUpdatedAt": "2023-11-03T02:36:27.877000+00:00",
         "meshOwner": "123456789012",

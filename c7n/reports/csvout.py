@@ -148,6 +148,15 @@ class Formatter:
 
     def __init__(self, resource_type, extra_fields=(), include_default_fields=True,
                  include_region=False, include_policy=False, fields=()):
+        """
+        :param resource_type: CloudCustodian model
+        :param extra_fields:  extra_fields=["headerName=fieldName", ...]
+        :param include_default_fields: True|False
+         if True then include the default fields (or the override of the default fields, below)
+        :param include_region: True|False
+        :param include_policy: True|False
+        :param fields: Override the "default" fields
+        """
 
         # Lookup default fields for resource type.
         model = resource_type

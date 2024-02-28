@@ -18,7 +18,9 @@ from c7n.utils import local_session
 class DescribeMesh(DescribeSource):
     # override default describe augment to get tags
     def augment(self, resources):
-        return universal_augment(self.manager, resources)
+        detailed_resources = super(DescribeMesh, self).augment(resources)
+        tagged_resources = universal_augment(self.manager, detailed_resources)
+        return tagged_resources
 
 
 @resources.register('appmesh-mesh')
@@ -50,18 +52,24 @@ class AppmeshMesh(QueryResourceManager):
         # Turn on collection of the tags for this resource
         universal_taggable = object()
 
+        # enum_spec (list_meshes) function has arn as a top level field
         arn = "arn"
 
         enum_spec = ('list_meshes', 'meshes', None)
 
-        detail_spec = ('describe_mesh', 'meshName', 'meshName', None)
+        # describe_mesh is the op to call
+        # meshName is the field in the detail call args to populate
+        # meshName is the field in the enum response to map into the call arg
+        # mesh is the path in the response to pull out and merge into the list
+        # response as the final product.
+        detail_spec = ('describe_mesh', 'meshName', 'meshName', 'mesh')
 
         # refers to a field in the metadata response of the describe function
         # https://docs.aws.amazon.com/cli/latest/reference/appmesh/describe-mesh.html
         date = 'createdAt'
 
 
-class DescribeGatewayDefinition(ChildDescribeSource):
+class DescribeVirtualGatewayDefinition(ChildDescribeSource):
     # This method is called in event mode and not pull mode.
     # Its purpose is to take a list of virtual gateway ARN's that the
     # framework has extracted from the events according to the policy yml file
@@ -71,12 +79,12 @@ class DescribeGatewayDefinition(ChildDescribeSource):
         # that has the two names we need for the describe operation.
         # Mesh gw arn looks like : arn:aws:appmesh:eu-west-2:123456789012:mesh/Mesh7/virtualGateway/GW1  # noqa
 
-        mesh_and_gw_names = [
+        mesh_and_child_names = [
             {"meshName": parts[0], "virtualGatewayName": parts[2]} for parts in
             [Arn.parse(arn).resource.split('/') for arn in arns]
         ]
 
-        return  self._describe(mesh_and_gw_names)
+        return self._describe(mesh_and_child_names)
 
     # Called during event mode and pull mode, and it's function is to take id's
     # from some provided data and return the complete description of the resource.
@@ -99,27 +107,33 @@ class DescribeGatewayDefinition(ChildDescribeSource):
         return universal_augment(self.manager, resources)
 
     # takes a list of objects with fields meshName and virtualGatewayName
-    def _describe(self, mesh_and_gw_names):
+    def _describe(self, mesh_and_child_names):
         results = []
         client = local_session(self.manager.session_factory).client('appmesh')
 
-        for names in mesh_and_gw_names:
-            results.append(
-                # https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/appmesh/client/delete_virtual_gateway.html #noqa
-                self.manager.retry(
-                    client.describe_virtual_gateway,
-                    meshName=names["meshName"],
-                    virtualGatewayName=names["virtualGatewayName"],
-                )['virtualGateway']
-            )
+        for names in mesh_and_child_names:
+            # https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/appmesh/client/delete_virtual_gateway.html #noqa
+            response = self.manager.retry(client.describe_virtual_gateway,
+                                          meshName=names["meshName"],
+                                          virtualGatewayName=names["virtualGatewayName"], )
+            resource = response['virtualGateway']
+
+            # promote the fields in "metadata" up to the top level so that this resource's model
+            # matches the capability of CloudCustodian, which currently doesn't allow paths to
+            # the "arn" value or the "date" value. Ideally, CC would allow paths in more fields
+            # so the resource model can match the model returned by the Amazon API's.
+            resource.update(resource["metadata"])
+            del resource["metadata"]
+
+            results.append(resource)
         return results
 
 
 @resources.register('appmesh-virtual-gateway')
 class AppmeshVirtualGateway(ChildResourceManager):
     source_mapping = {
-        'describe': DescribeGatewayDefinition,
-        'describe-child': DescribeGatewayDefinition,
+        'describe': DescribeVirtualGatewayDefinition,
+        'describe-child': DescribeVirtualGatewayDefinition,
         'config': ConfigSource,
     }
 
@@ -154,7 +168,7 @@ class AppmeshVirtualGateway(ChildResourceManager):
 
         # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-appmesh-virtualgateway.html  # noqa
         # arn: not needed since we have defined our own "get_arns()" below
-        # arn = "arn"
+        arn = "arn"
 
         # This "name" value appears in the "report" command output.
         # example: custodian  report --format json  -s report-out mesh-policy.yml
@@ -163,6 +177,7 @@ class AppmeshVirtualGateway(ChildResourceManager):
         name = 'virtualGatewayName'
 
         # refers to a field in the metadata response of the describe function
+        # appears in the "report" operation
         # https://docs.aws.amazon.com/cli/latest/reference/appmesh/describe-virtual-gateway.html
         date = 'createdAt'
 
@@ -195,5 +210,5 @@ class AppmeshVirtualGateway(ChildResourceManager):
     # But at present we can't put a path line "metadata.arn" into
     # that config field, and the authors tell me that allowing that would
     # be too expensive. So we'll just DIY.
-    def get_arns(self, resources):
-        return [r['metadata']['arn'] for r in resources]
+    # def get_arns(self, resources):
+    #      return [r['arn'] for r in resources]

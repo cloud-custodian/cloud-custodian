@@ -2,10 +2,11 @@
 # SPDX-License-Identifier: Apache-2.0
 from c7n.reports.csvout import Formatter
 from c7n.resources.appmesh import AppmeshMesh, AppmeshVirtualGateway
-from .common import BaseTest, event_data
 from .apicallcaptor import ApiCallCaptor
+from .common import BaseTest, event_data
 
-# during recording create some sample resources in AWS the
+
+# during recording create some sample resources in AWS then
 # set use a flight recorder and set the config region to wherever you want to read state from.
 # this will create recording files in the placebo dir.
 # session_factory = self.record_flight_data('test_appmesh_virtualgateway')
@@ -20,11 +21,27 @@ class TestAppmeshMesh(BaseTest):
     def test_appmesh(self):
         session_factory = self.replay_flight_data('test_appmesh_mesh')
 
+        # test tags are populated and also the "spec" section
+
         p = self.load_policy(
             {
                 "name": "appmesh-mesh-policy",
                 "resource": "aws.appmesh-mesh",
-                'filters': [{"or": [{'tag:MyTagName': 'm1'}, {'tag:MyTagName': 'm2'}]}],
+                'filters': [
+                    # only one resource should meet both conditions.
+                    {"and": [
+                        {"or": [
+                            {'tag:MyTagName': 'm1'},
+                            {'tag:MyTagName': 'm2'}
+                        ]},
+                        {
+                            "type": "value",
+                            "key": "spec.egressFilter.type",
+                            "op": "eq",
+                            "value": "DROP_ALL"
+                        }
+                    ]}
+                ],
             },
             session_factory=session_factory,
         )
@@ -38,25 +55,24 @@ class TestAppmeshMesh(BaseTest):
         self.assertEqual(
             [
                 {
-                    'Tags': [{'Key': 'MyTagName', 'Value': 'm1'}],
-                    'c7n:MatchedFilters': ['tag:MyTagName'],
-                    'arn': 'arn:aws:appmesh:eu-west-2:123456789012:mesh/m1',
-                    'createdAt': '2023-11-03T02:36:27.877000+00:00',
-                    'lastUpdatedAt': '2023-11-03T02:36:27.877000+00:00',
-                    'meshName': 'm1',
-                    'meshOwner': '123456789012',
-                    'resourceOwner': '123456789012',
-                    'version': 1,
-                },
-                {
                     'Tags': [{'Key': 'MyTagName', 'Value': 'm2'}],
-                    'c7n:MatchedFilters': ['tag:MyTagName'],
+                    'c7n:MatchedFilters': ['tag:MyTagName', 'spec.egressFilter.type'],
                     'arn': 'arn:aws:appmesh:eu-west-2:123456789012:mesh/m2',
                     'createdAt': '2023-11-03T02:36:27.877000+00:00',
                     'lastUpdatedAt': '2023-11-03T02:36:27.877000+00:00',
                     'meshName': 'm2',
                     'meshOwner': '123456789012',
+                    'metadata': {'arn': 'arn:aws:appmesh:eu-west-2:123456789012:mesh/m2',
+                                 'createdAt': '2023-11-03T02:36:27.877000+00:00',
+                                 'lastUpdatedAt': '2023-11-03T02:36:27.877000+00:00',
+                                 'meshOwner': '123456789012',
+                                 'resourceOwner': '123456789012',
+                                 'uid': '1013368a-8d58-4b30-b08e-67347af88525',
+                                 'version': 1},
                     'resourceOwner': '123456789012',
+                    'spec': {'egressFilter': {'type': 'DROP_ALL'},
+                             'serviceDiscovery': {'ipPreference': 'IPv6_PREFERRED'}},
+                    'status': {'status': 'ACTIVE'},
                     'version': 1,
                 },
             ],
@@ -69,7 +85,6 @@ class TestAppmeshMesh(BaseTest):
         arns = p.resource_manager.get_arns(resources)
         self.assertEqual(
             [
-                'arn:aws:appmesh:eu-west-2:123456789012:mesh/m1',
                 'arn:aws:appmesh:eu-west-2:123456789012:mesh/m2',
             ],
             arns,
@@ -83,12 +98,16 @@ class TestAppmeshMesh(BaseTest):
         self.assertEqual(
             [
                 {'operation': 'ListMeshes', 'params': {}, 'service': 'appmesh'},
+                {'operation': 'DescribeMesh', 'params': {'meshName': 'm1'}, 'service': 'appmesh'},
+                {'operation': 'DescribeMesh', 'params': {'meshName': 'm2'}, 'service': 'appmesh'},
+                {'operation': 'DescribeMesh', 'params': {'meshName': 'm3'}, 'service': 'appmesh'},
                 {
                     'operation': 'GetResources',
                     'params': {
                         'ResourceARNList': [
                             'arn:aws:appmesh:eu-west-2:123456789012:mesh/m1',
                             'arn:aws:appmesh:eu-west-2:123456789012:mesh/m2',
+                            'arn:aws:appmesh:eu-west-2:123456789012:mesh/m3',
                         ]
                     },
                     'service': 'resourcegroupstaggingapi',
@@ -140,7 +159,16 @@ class TestAppmeshMesh(BaseTest):
                     'lastUpdatedAt': '2023-11-03T02:36:27.877000+00:00',
                     'meshName': 'm1',
                     'meshOwner': '123456789012',
+                    'metadata': {'arn': 'arn:aws:appmesh:eu-west-2:123456789012:mesh/m1',
+                                 'createdAt': '2023-11-03T02:36:27.877000+00:00',
+                                 'lastUpdatedAt': '2023-11-03T02:36:27.877000+00:00',
+                                 'meshOwner': '123456789012',
+                                 'resourceOwner': '123456789012',
+                                 'uid': '1013368a-8d58-4b30-b08e-57347af88525',
+                                 'version': 1},
                     'resourceOwner': '123456789012',
+                    'spec': {'egressFilter': {'type': 'ALLOW_ALL'}},
+                    'status': {'status': 'ACTIVE'},
                     'version': 1,
                 }
             ],
@@ -161,6 +189,7 @@ class TestAppmeshMesh(BaseTest):
         self.assertEqual(
             [
                 {'operation': 'ListMeshes', 'params': {}, 'service': 'appmesh'},
+                {'operation': 'DescribeMesh', 'params': {'meshName': 'm1'}, 'service': 'appmesh'},
                 {
                     'operation': 'GetResources',
                     'params': {
@@ -178,14 +207,32 @@ class TestAppmeshMesh(BaseTest):
         # provide a fake resource
         report = f.to_csv(
             records=[
-                {"someField": "shouldBeIgnored", "meshName": "MyMeshName", "createdAt": "2024"}
+                {
+                    # REPRESENTATIVE EXAMPLE !!!
+                    'arn': 'arn:aws:appmesh:eu-west-2:123456789012:mesh/m1',
+                    'createdAt': '9999-11-03T02:36:27.877000+00:00',
+                    'lastUpdatedAt': '2023-11-03T02:36:27.877000+00:00',
+                    'meshName': 'm1',
+                    'meshOwner': '123456789012',
+                    'metadata': {'arn': 'arn:aws:appmesh:eu-west-2:123456789012:mesh/m1',
+                                 'createdAt': '2023-11-03T02:36:27.877000+00:00',
+                                 'lastUpdatedAt': '2023-11-03T02:36:27.877000+00:00',
+                                 'meshOwner': '123456789012',
+                                 'resourceOwner': '123456789012',
+                                 'uid': '1013368a-8d58-4b30-b08e-57347af88525',
+                                 'version': 1},
+                    'resourceOwner': '123456789012',
+                    'spec': {'egressFilter': {'type': 'ALLOW_ALL'}},
+                    'status': {'status': 'ACTIVE'},
+                    'version': 1,
+                }
             ]
         )
 
         # expect Formatter to inspect the definition of certain
         # fields ("name" and "date") from the AppMesh def
         # and to pick out those fields from a fake resource
-        self.assertEqual([["MyMeshName", "2024"]], report)
+        self.assertEqual([["m1", "9999-11-03T02:36:27.877000+00:00"]], report)
 
 
 class TestAppmeshVirtualGateway(BaseTest):
@@ -214,32 +261,25 @@ class TestAppmeshVirtualGateway(BaseTest):
 
         # RUN THE SUT
         resources = p.run()
-        resources.sort(key=lambda r: r['metadata']['arn'])
+        resources.sort(key=lambda r: r['arn'])
 
         self.assertEqual(
             [
-                {
-                    'Tags': [{'Key': 'MyTagName', 'Value': 'm1/g1'}],
-                    'c7n:MatchedFilters': ['spec.listeners[0].portMapping.port'],
-                    'meshName': 'm1',
-                    'metadata': {
-                        'arn': 'arn:aws:appmesh:eu-west-2:123456789012:mesh/m1/virtualGateway/g1',
-                        'createdAt': '2023-11-03T02:36:27.877000+00:00',
-                        'lastUpdatedAt': '2023-11-03T02:36:27.877000+00:00',
-                        'meshOwner': '644160558196',
-                        'resourceOwner': '644160558196',
-                        'uid': '80ee4027-c8e1-49e8-99ba-cace20a57f0b',
-                        'version': 1,
-                    },
-                    'spec': {
-                        'backendDefaults': {'clientPolicy': {}},
-                        'listeners': [{'portMapping': {'port': 123, 'protocol': 'http'}}],
-                        'logging': {},
-                    },
-                    'status': {'status': 'ACTIVE'},
-                    'virtualGatewayName': 'g1',
-                }
-            ],
+                {'Tags': [{'Key': 'MyTagName', 'Value': 'm1/g1'}],
+                 'arn': 'arn:aws:appmesh:eu-west-2:123456789012:mesh/m1/virtualGateway/g1',
+                 'c7n:MatchedFilters': ['spec.listeners[0].portMapping.port'],
+                 'createdAt': '2023-11-03T02:36:27.877000+00:00',
+                 'lastUpdatedAt': '2023-11-03T02:36:27.877000+00:00',
+                 'meshName': 'm1',
+                 'meshOwner': '644160558196',
+                 'resourceOwner': '644160558196',
+                 'spec': {'backendDefaults': {'clientPolicy': {}},
+                          'listeners': [{'portMapping': {'port': 123, 'protocol': 'http'}}],
+                          'logging': {}},
+                 'status': {'status': 'ACTIVE'},
+                 'uid': '80ee4027-c8e1-49e8-99ba-cace20a57f0b',
+                 'version': 1,
+                 'virtualGatewayName': 'g1'}],
             resources,
         )
 
@@ -308,6 +348,16 @@ class TestAppmeshVirtualGateway(BaseTest):
                         }
                     ],
                 },
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": "spec.listeners[0].portMapping.port",
+                        "op": "eq",
+                        # ONLY ONE OF THE TWO RESOURCES HAS THIS PORT
+                        "value": 123,
+                    },
+                ]
+
             },
             session_factory=session_factory,
         )
@@ -323,31 +373,25 @@ class TestAppmeshVirtualGateway(BaseTest):
 
         # RUN THE SUT
         resources = p.push(event, None)
-        resources.sort(key=lambda r: r['metadata']['arn'])
 
         self.assertEqual(
             [
-                {
-                    'Tags': [{'Key': 'MyTagName', 'Value': 'm1/g1'}],
-                    'meshName': 'm1',
-                    'metadata': {
-                        'arn': 'arn:aws:appmesh:eu-west-2:123456789012:mesh/m1/virtualGateway/g1',
-                        'createdAt': '2023-11-03T02:36:27.877000+00:00',
-                        'lastUpdatedAt': '2023-11-03T02:36:27.877000+00:00',
-                        'meshOwner': '644160558196',
-                        'resourceOwner': '644160558196',
-                        'uid': '80ee4027-c8e1-49e8-99ba-cace20a57f0b',
-                        'version': 1,
-                    },
-                    'spec': {
-                        'backendDefaults': {'clientPolicy': {}},
-                        'listeners': [{'portMapping': {'port': 123, 'protocol': 'http'}}],
-                        'logging': {},
-                    },
-                    'status': {'status': 'ACTIVE'},
-                    'virtualGatewayName': 'g1',
-                }
-            ],
+                {'Tags': [{'Key': 'MyTagName', 'Value': 'm1/g1'}],
+                 'arn': 'arn:aws:appmesh:eu-west-2:123456789012:mesh/m1/virtualGateway/g1',
+                 'c7n:MatchedFilters': ['spec.listeners[0].portMapping.port'],
+                 'createdAt': '2023-11-03T02:36:27.877000+00:00',
+                 'lastUpdatedAt': '2023-11-03T02:36:27.877000+00:00',
+                 'meshName': 'm1',
+                 'meshOwner': '644160558196',
+                 'resourceOwner': '644160558196',
+                 'spec': {'backendDefaults': {'clientPolicy': {}},
+                          'listeners': [{'portMapping': {'port': 123, 'protocol': 'http'}}],
+                          'logging': {}},
+                 'status': {'status': 'ACTIVE'},
+                 'uid': '80ee4027-c8e1-49e8-99ba-cace20a57f0b',
+                 'version': 1,
+                 'virtualGatewayName': 'g1'
+                 }],
             resources,
         )
 
@@ -369,6 +413,9 @@ class TestAppmeshVirtualGateway(BaseTest):
                     'params': {'meshName': 'm1', 'virtualGatewayName': 'g1'},
                     'service': 'appmesh',
                 },
+                {'operation': 'DescribeVirtualGateway',
+                 'params': {'meshName': 'm1', 'virtualGatewayName': 'g1'},
+                 'service': 'appmesh'},
                 {
                     'operation': 'GetResources',
                     'params': {
@@ -383,22 +430,37 @@ class TestAppmeshVirtualGateway(BaseTest):
         )
 
     def test_reporting(self):
-        f = Formatter(resource_type=AppmeshVirtualGateway.resource_type)
+        f = Formatter(resource_type=AppmeshVirtualGateway.resource_type,
+                      extra_fields=["mesh=meshName"])
 
         # provide a fake resource
         report = f.to_csv(
             records=[
-                {
-                    "someField": "shouldBeIgnored",
-                    "meshName": "shouldBeIgnored",
-                    "arn": "MyArn",
-                    "virtualGatewayName": "MyVgwName",
-                    "createdAt": "2024",
-                }
-            ]
+                {'Tags': [{'Key': 'MyTagName', 'Value': 'm1/g1'}],
+                 'arn': 'arn:aws:appmesh:eu-west-2:123456789012:mesh/m1/virtualGateway/g1',
+                 'c7n:MatchedFilters': ['spec.listeners[0].portMapping.port'],
+                 'createdAt': '2023-11-03T02:36:27.877000+00:00',
+                 'lastUpdatedAt': '2023-11-03T02:36:27.877000+00:00',
+                 'meshName': 'm1',
+                 'meshOwner': '644160558196',
+                 'resourceOwner': '644160558196',
+                 'spec': {'backendDefaults': {'clientPolicy': {}},
+                          'listeners': [{'portMapping': {'port': 123, 'protocol': 'http'}}],
+                          'logging': {}},
+                 'status': {'status': 'ACTIVE'},
+                 'uid': '80ee4027-c8e1-49e8-99ba-cace20a57f0b',
+                 'version': 1,
+                 'virtualGatewayName': 'g1'}],
         )
+
+        headers = list(f.headers())
 
         # expect Formatter to inspect the definition of certain
         # fields ("id", "name" and "date") from the AppMesh def
         # and to pick out those fields from a fake resource
-        self.assertEqual([["MyArn", "MyVgwName", "2024"]], report)
+        self.assertEqual(["arn", "virtualGatewayName", "createdAt", "mesh"], headers, "header")
+        self.assertEqual([["arn:aws:appmesh:eu-west-2:123456789012:mesh/m1/virtualGateway/g1",
+                           "g1",
+                           "2023-11-03T02:36:27.877000+00:00",
+                           "m1"]
+                          ], report, "data")

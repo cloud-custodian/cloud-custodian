@@ -22,7 +22,6 @@ from c7n.tags import register_ec2_tags, register_universal_tags, universal_augme
 from c7n.utils import (
     local_session, generate_arn, get_retry, chunks, camelResource, jmespath_compile)
 
-
 try:
     from botocore.paginate import PageIterator, Paginator
 except ImportError:
@@ -622,16 +621,17 @@ class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
         if arn_key is False:
             raise ValueError("%s do not have arns" % self.type)
 
-        id_key = m.id
-
         for r in resources:
-            _id = r[id_key]
             if arn_key:
                 arns.append(r[arn_key])
-            elif 'arn' in _id[:3]:
-                arns.append(_id)
             else:
-                arns.append(self.generate_arn(_id))
+                _id = r[m.id]
+
+                if 'arn' in _id[:3]:
+                    arns.append(_id)
+                else:
+                    arns.append(self.generate_arn(_id))
+
         return arns
 
     @property
@@ -792,7 +792,8 @@ class TypeInfo(metaclass=TypeMeta):
 
     **Required**
 
-    :param id: Names the field in the enum_spec response that contains the identifier to use
+    :param id:  For resource types that use QueryResourceManager this field
+        names the field in the enum_spec response that contains the identifier to use
         in calls to other API's of this service.
         Therefore, this "id" field might be the "arn" field for some API's but
         in other API's it's a name or other identifier value.
