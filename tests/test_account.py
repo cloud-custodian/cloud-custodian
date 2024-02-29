@@ -1297,6 +1297,25 @@ class AccountTests(BaseTest):
         self.assertEqual(resources[0]['c7n:ses-max-bounce-rate'], 6)
 
 
+    def test_bedrock_model_invocation_logging_disabled(self):
+        factory = self.replay_flight_data('test_bedrock_model_invocation_logging_disabled')
+        p = self.load_policy({
+            'name': 'bedrock-model-invocation-logging-disabled',
+            'resource': 'account',
+            'filters': [
+                            {
+                                "type": "bedrock-model-invocation-logging",
+                                "count": 0,
+                                "count_op": "eq"
+                            }
+                        ]
+                        },
+            config={'region': 'us-east-1'},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+
     def test_get_bedrock_model_invocation_logging(self):
         factory = self.replay_flight_data('test_get_bedrock_model_invocation_logging')
         p = self.load_policy({
