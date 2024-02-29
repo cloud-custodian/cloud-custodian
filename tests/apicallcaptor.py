@@ -84,7 +84,8 @@ class ApiCallCaptor:
         the name of this method is dictated by boto.
 
         :param _event_type - the type of the event eg "'API_CALL"
-        :param payload - an object capturing the call eg {'operation': 'ListMeshes', 'params': {}, 'service': 'appmesh'}
+        :param payload - an object capturing the call
+        eg {'operation': 'ListMeshes', 'params': {}, 'service': 'appmesh'}
         :param _source - where the call came from eg "BOTOCORE"
         """
         # print("API CALL : " + str(event_type) + " P:" + str(payload) + " S:" + str(source))
@@ -95,7 +96,7 @@ class ApiCallCaptor:
             configured_calls = len(self.expected_calls)
             if self.calls_made == configured_calls:
                 msg = (
-                        "ERROR: too many boto calls made: expected %d, but got %d ...\nunexpected: %s\n"
+                        "ERROR: too many boto calls made: expected %d, but got %d ...\nunexpected: %s\n" #noqa
                         % (
                             len(self.expected_calls),
                             self.calls_made + 1,
@@ -110,7 +111,7 @@ class ApiCallCaptor:
             expected_call = self.expected_calls[self.calls_made]
             if payload != expected_call:
                 msg = (
-                        "ERROR: incorrect boto call made at call #%d ...\nexpected: %s\n but got: %s\n"
+                        "ERROR: incorrect boto call made at call #%d ...\nexpected: %s\n but got: %s\n" #noqa
                         % (
                             self.calls_made + 1,
                             str(expected_call),
@@ -135,7 +136,8 @@ class ApiCallCaptor:
         use expect(...) if you want immediate notification when an unexpected call is made, for
         example to set a breakpoint and do debugging.
 
-        calls: is a list of object like that describe the API calls, eg :  {'service': 'appmesh', 'operation': 'DescribeMesh', 'params': {'meshName': 'm1'}}
+        calls: is a list of object like that describe the API calls,
+        eg :  {'service': 'appmesh', 'operation': 'DescribeMesh', 'params': {'meshName': 'm1'}}
 
         on_error: is a callback with the form  "(dict, str) -> void"
         where the dict is the call made
