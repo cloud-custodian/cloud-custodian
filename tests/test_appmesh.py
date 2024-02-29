@@ -47,7 +47,6 @@ class TestAppmeshMesh(BaseTest):
         )
 
         captor = ApiCallCaptor.start_capture()
-
         # RUN THE SUT
         resources = p.run()
 

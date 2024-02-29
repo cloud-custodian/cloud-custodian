@@ -1,9 +1,9 @@
-    # Copyright The Cloud Custodian Authors.
+# Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
-from botocore.history import get_global_history_recorder
-from typing import Callable
-from sys import stderr
 import unittest
+from sys import stderr
+
+from botocore.history import get_global_history_recorder
 
 
 class ApiCallCaptor:
@@ -66,7 +66,7 @@ class ApiCallCaptor:
     _INSTANCE = None
 
     def __init__(self):
-        # calls is an array of calls.
+        # calls is an array of call objects - see the expect() doco for more info.
         self.calls = []
         # inspect this after the policy exec to see if the 'expect(...)' was not met
 
@@ -74,13 +74,18 @@ class ApiCallCaptor:
 
         self.calls_made = 0
 
-        self.expected_calls: list[str] = None
+        # expected_calls is an array of call objects - see the expect() doco for more info
+        self.expected_calls = None
         self.on_error = None
 
     def emit(self, _event_type, payload, _source):
         """
         callback that will be installed into boto.
         the name of this method is dictated by boto.
+
+        :param _event_type - the type of the event eg "'API_CALL"
+        :param payload - an object capturing the call eg {'operation': 'ListMeshes', 'params': {}, 'service': 'appmesh'}
+        :param _source - where the call came from eg "BOTOCORE"
         """
         # print("API CALL : " + str(event_type) + " P:" + str(payload) + " S:" + str(source))
         self.calls.append(payload)
@@ -90,12 +95,12 @@ class ApiCallCaptor:
             configured_calls = len(self.expected_calls)
             if self.calls_made == configured_calls:
                 msg = (
-                    "ERROR: too many boto calls made: expected %d, but got %d ...\nunexpected: %s\n"
-                    % (
-                        len(self.expected_calls),
-                        self.calls_made + 1,
-                        str(payload),
-                    )
+                        "ERROR: too many boto calls made: expected %d, but got %d ...\nunexpected: %s\n"
+                        % (
+                            len(self.expected_calls),
+                            self.calls_made + 1,
+                            str(payload),
+                        )
                 )
                 if not self.first_error:
                     self.first_error = msg
@@ -105,12 +110,12 @@ class ApiCallCaptor:
             expected_call = self.expected_calls[self.calls_made]
             if payload != expected_call:
                 msg = (
-                    "ERROR: incorrect boto call made at call #%d ...\nexpected: %s\n but got: %s\n"
-                    % (
-                        self.calls_made + 1,
-                        str(expected_call),
-                        str(payload),
-                    )
+                        "ERROR: incorrect boto call made at call #%d ...\nexpected: %s\n but got: %s\n"
+                        % (
+                            self.calls_made + 1,
+                            str(expected_call),
+                            str(payload),
+                        )
                 )
                 if not self.first_error:
                     self.first_error = msg
@@ -122,23 +127,26 @@ class ApiCallCaptor:
     def _default_on_err(payload, err):
         stderr.write(err)
 
-    def expect(self, calls: list[str], on_error: Callable[[{}, str], None] = _default_on_err):
+    def expect(self, calls, on_error=_default_on_err):
         """
+        :param calls: is a list of object like that describe the API calls
+        :param on_error: is a callback with the form  "(dict, str) -> void"
+
         use expect(...) if you want immediate notification when an unexpected call is made, for
         example to set a breakpoint and do debugging.
 
-        calls: if we set an expection on the calls then by default the on_error handler
-        will print an error if there is a deviation.
+        calls: is a list of object like that describe the API calls, eg :  {'service': 'appmesh', 'operation': 'DescribeMesh', 'params': {'meshName': 'm1'}}
 
-        on_error: is a void function that takes a dict and a string as args,
-        the dict being the payload that was received from the api call and
-        the string being the ApiCallCaptor error message.
+        on_error: is a callback with the form  "(dict, str) -> void"
+        where the dict is the call made
+        eg {'service': 'appmesh', 'operation': 'DescribeMesh', 'params': {'meshName': 'm1'}}
+        and the string is an error message.
         The default impl will print the error message, but you can override this
         for instance to place a breakpoint in your own code if an error occurs
         or to change the action or pass None to disable.
         Because boto swallows any exceptions then throwing an exception is
         ineffectural, however it's still possible to exit the process if you want
-        a really agressive hook.
+        a really aggressive hook.
         """
         self.expected_calls = calls
         self.on_error = on_error
