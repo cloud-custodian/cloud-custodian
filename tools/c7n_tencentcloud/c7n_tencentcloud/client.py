@@ -14,6 +14,7 @@ from tencentcloud.common.exception.tencent_cloud_sdk_exception import TencentClo
 from tencentcloud.common.profile.client_profile import ClientProfile
 from tencentcloud.common.profile.http_profile import HttpProfile
 from tencentcloud.common.common_client import CommonClient
+from tcc_ext.credentials import ProfileCredential, _CRED_PATH
 
 
 RETRYABLE_EXCEPTIONS = (socket.error, ConnectionError)
@@ -126,11 +127,17 @@ class Client:
 
 class Session:
     """Session"""
-    def __init__(self) -> None:
+    def __init__(self, profile: str = None, cred_path: str = _CRED_PATH) -> None:
         """
         credential_file contains secret_id and secret_key.
         the file content format likes:
             {"TENCENTCLOUD_AK":"", "TENCENTCLOUD_SK":""}
+
+        profile:
+            by the local credentials, you can use the profile.
+            the doc details is 'https://github.com/mingyugg/tencentcloud-sdk-python-ext'
+        cred_path:
+            the local credentials path, default is '~/.tencentcloud/credentials'
         """
         # just using default get_credentials() method
         # steps: Environment Variable -> profile file -> CVM role
@@ -138,25 +145,34 @@ class Session:
 
         cred_provider = credential.DefaultCredentialProvider()
 
+        self.profile = profile
+        self.cred_path = cred_path
+
         # the DefaultCredentialProvider does not handle sts assumed role sessions
         # so we need to check for the token first
-        if 'TENCENTCLOUD_TOKEN' in os.environ:
-            if (
-                'TENCENTCLOUD_SECRET_ID' not in os.environ or
-                'TENCENTCLOUD_SECRET_KEY' not in os.environ
-            ):
-                raise TencentCloudSDKException(
-                    'TENCENTCLOUD_TOKEN provided, but one of TENCENTCLOUD_SECRET_ID'
-                    'or TENCENTCLOUD_SECRET_KEY missing'
+        if self.profile is None:
+            if 'TENCENTCLOUD_TOKEN' in os.environ:
+                if (
+                    'TENCENTCLOUD_SECRET_ID' not in os.environ or
+                    'TENCENTCLOUD_SECRET_KEY' not in os.environ
+                ):
+                    raise TencentCloudSDKException(
+                        'TENCENTCLOUD_TOKEN provided, but one of TENCENTCLOUD_SECRET_ID'
+                        'or TENCENTCLOUD_SECRET_KEY missing'
+                    )
+                cred = credential.Credential(
+                    secret_id=os.environ['TENCENTCLOUD_SECRET_ID'],
+                    secret_key=os.environ['TENCENTCLOUD_SECRET_KEY'],
+                    token=os.environ['TENCENTCLOUD_TOKEN']
                 )
-            cred = credential.Credential(
-                secret_id=os.environ['TENCENTCLOUD_SECRET_ID'],
-                secret_key=os.environ['TENCENTCLOUD_SECRET_KEY'],
-                token=os.environ['TENCENTCLOUD_TOKEN']
-            )
-            cred_provider.cred = cred
+                cred_provider.cred = cred
 
-        self._cred = cred_provider.get_credentials()
+            self._cred = cred_provider.get_credentials()
+        else:
+            self._cred = ProfileCredential(
+                profile=profile,
+                cred_path=self.cred_path
+            ).get_credential()
 
     @property
     def secret_id(self):
