@@ -31,6 +31,9 @@ pyyaml = ">=5.4.0"
 tabulate = "^0.9.0"
 importlib-metadata = "^6.0"
 docutils = ">=0.18, <0.19"
+# temporary work around for 
+# https://github.com/cloud-custodian/poetry-plugin-freeze/issues/18
+urllib3 = "<2"
 # temporary work around for
 # https://github.com/p1c2u/jsonschema-path/issues/98
 # which gets pulled in via moto
