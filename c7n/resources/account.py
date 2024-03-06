@@ -2424,8 +2424,10 @@ class BedrockModelInvocationLogging(ListItemFilter):
     def get_item_values(self, resource):
         item_values = []
         client = local_session(self.manager.session_factory).client('bedrock')
-        invocation_logging_config = client.get_model_invocation_logging_configuration()
-        item_values.append(invocation_logging_config['loggingConfig'])
+        invocation_logging_config = client \
+                .get_model_invocation_logging_configuration().get('loggingConfig')
+        if invocation_logging_config is not None:
+            item_values.append(invocation_logging_config)
         return item_values
 
 
