@@ -71,6 +71,16 @@ def _describe_route53_tags(
         return list(w.map(process_tags, chunks(resources, 20)))
 
 
+def generate_rrset(recordset):
+    keys = (
+        'Name', 'Type', 'TTL', 'SetIdentifier', 'Region', 'AliasTarget', 'ResourceRecords')
+    rrset_payload = dict()
+    for key in keys:
+        if key in recordset:
+            rrset_payload.update({key: recordset[key]})
+    return rrset_payload
+
+
 @resources.register('hostedzone')
 class HostedZone(Route53Base, QueryResourceManager):
 
@@ -208,6 +218,58 @@ class Route53DomainRemoveTag(RemoveTag):
                 TagsToDelete=keys)
 
 
+@ResourceRecordSet.action_registry.register('delete')
+class ResourceRecordSetRemove(BaseAction):
+    """Action to delete resource records from Route 53 hosted zones.
+
+    It is recommended to use a filter to avoid unwanted deletion
+    of R53 records from all hosted zones.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: route53-remove-filtered-records
+                resource: aws.rrset
+                filters:
+                  - type: value
+                    key: AliasTarget.DNSName
+                    value: "email.gc.example.com."
+                actions:
+                  - type: delete
+
+    """
+    schema = type_schema('delete',)
+    permissions = ('route53:ChangeResourceRecordSets',)
+
+    def process(self, recordsets):
+        client = local_session(self.manager.session_factory).client('route53')
+        try:
+            for rrset in recordsets:
+
+                # Exempt the two zone associated mandatory records
+                if rrset['Type'] in ('NS', 'SOA'):
+                    continue
+
+                rrsetdata = generate_rrset(rrset)
+                self.manager.retry(
+                    client.change_resource_record_sets,
+                    HostedZoneId=rrset['c7n:parent-id'],
+                    ChangeBatch={
+                        'Changes': [
+                            {
+                                'Action': 'DELETE',
+                                'ResourceRecordSet': rrsetdata,
+                            }
+                        ]
+                    },
+                    ignore_err_codes=('InvalidChangeBatch'))
+        except Exception as e:
+                self.log.warning(
+                    "ResourceRecordSet delete error: %s", e)
+
+
 @HostedZone.action_registry.register('delete')
 class Delete(BaseAction):
     """Action to delete Route 53 hosted zones.
@@ -234,6 +296,8 @@ class Delete(BaseAction):
 
     schema = type_schema('delete', force={'type': 'boolean'})
     permissions = ('route53:DeleteHostedZone',)
+    keys = (
+        'Name', 'Type', 'TTL', 'SetIdentifier', 'Region', 'AliasTarget', 'ResourceRecords')
 
     def process(self, hosted_zones):
         client = local_session(self.manager.session_factory).client('route53')
@@ -267,6 +331,7 @@ class Delete(BaseAction):
             # Exempt the two zone associated mandatory records
             if rrset['Name'] == hz['Name'] and rrset['Type'] in ('NS', 'SOA'):
                 continue
+            rrsetdata = generate_rrset(rrset)
             self.manager.retry(
                 client.change_resource_record_sets,
                 HostedZoneId=hz['Id'],
@@ -274,12 +339,7 @@ class Delete(BaseAction):
                     'Changes': [
                         {
                             'Action': 'DELETE',
-                            'ResourceRecordSet': {
-                                'Name': rrset['Name'],
-                                'Type': rrset['Type'],
-                                'TTL': rrset['TTL'],
-                                'ResourceRecords': rrset['ResourceRecords']
-                            },
+                            'ResourceRecordSet': rrsetdata,
                         }
                     ]
                 },

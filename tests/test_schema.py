@@ -1,7 +1,7 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 from unittest import mock
-from jsonschema.exceptions import best_match
+from jsonschema.exceptions import best_match, ValidationError
 
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import ValueFilter
@@ -575,3 +575,36 @@ class SchemaTest(BaseTest):
         self.assertEqual(ElementSchema.doc(F), "")
         self.assertEqual(
             ElementSchema.doc(B), "Hello World\n\nxyz")
+
+    def test_validate_variable_references(self):
+        data = {
+            "policies": [
+                {
+                    "name": "set-log-group-retention",
+                    "resource": "aws.log-group",
+                    "actions": [
+                        {
+                            "type": "retention",
+                        }
+                    ],
+                }
+            ]
+        }
+
+        validator = self.get_validator(data)
+        for days, expect_failure in [
+            (30, False),
+            (30.1, True),
+            (True, True),
+            ("foo", True),
+
+            ("{retention_days}", False),
+            ("foo{retention_days}", True),
+            ("{retention_days}bar", True),
+        ]:
+            data["policies"][0]["actions"][0]["days"] = days
+            failed = any(
+                isinstance(err, ValidationError)
+                for err in validate(data, validator.schema)
+            )
+            self.assertEqual(failed, expect_failure)

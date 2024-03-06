@@ -111,6 +111,8 @@ VALUE_TYPES = [
 
 class FilterRegistry(PluginRegistry):
 
+    value_filter_class = None
+
     def __init__(self, *args, **kw):
         super().__init__(*args, **kw)
         self.register('value', ValueFilter)
@@ -143,7 +145,7 @@ class FilterRegistry(PluginRegistry):
                 return self['and'](data, self, manager)
             elif op == 'not':
                 return self['not'](data, self, manager)
-            return ValueFilter(data, manager)
+            return self.value_filter_class(data, manager)
         if isinstance(data, str):
             filter_type = data
             data = {'type': data}
@@ -251,7 +253,7 @@ class BaseValueFilter(Filter):
             # as labels without values.
             # Azure schema: 'tags': {'key': 'value'}
             elif 'tags' in i:
-                r = i.get('tags', {}).get(tk, None)
+                r = (i.get('tags', {}) or {}).get(tk, None)
         elif k in i:
             r = i.get(k)
         elif k not in self.expr:
@@ -743,6 +745,9 @@ class ValueFilter(BaseValueFilter):
             return s, v
 
         return sentinel, value
+
+
+FilterRegistry.value_filter_class = ValueFilter
 
 
 class AgeFilter(Filter):

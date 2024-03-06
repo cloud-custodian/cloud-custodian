@@ -1,0 +1,82 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Configuration": {
+            "FunctionName": "kapilt-assetdb-current-caches",
+            "FunctionArn": "arn:aws:lambda:us-east-1:644160558196:function:kapilt-assetdb-current-caches",
+            "Role": "arn:aws:iam::644160558196:role/kapilt-assetdb-collector",
+            "CodeSize": 0,
+            "Description": "update current_* cache tables",
+            "Timeout": 60,
+            "MemorySize": 848,
+            "LastModified": "2024-02-08T21:13:35.000+0000",
+            "CodeSha256": "4c3a84c134c3d2a46c56fc34f167a8a048ff2f566dc64f5b7aea4bbf96609542",
+            "Version": "$LATEST",
+            "VpcConfig": {
+                "SubnetIds": [
+                    "subnet-0ba582f1e2af5d98a",
+                    "subnet-0395f575be6823738",
+                    "subnet-0867db2dcb1462488"
+                ],
+                "SecurityGroupIds": [
+                    "sg-0e9f83414783e14f6"
+                ],
+                "VpcId": "vpc-029654b93830acd5a",
+                "Ipv6AllowedForDualStack": false
+            },
+            "Environment": {
+                "Variables": {}
+            },
+            "KMSKeyArn": "arn:aws:kms:us-east-1:644160558196:key/ad5cd8f7-0c70-44a1-80d1-e1e5ac57f0bd",
+            "TracingConfig": {
+                "Mode": "PassThrough"
+            },
+            "RevisionId": "34bbe0f0-7841-4d5c-8950-c3adf68a99bd",
+            "State": "Active",
+            "LastUpdateStatus": "InProgress",
+            "LastUpdateStatusReason": "The function is being created.",
+            "LastUpdateStatusReasonCode": "Creating",
+            "PackageType": "Image",
+            "ImageConfigResponse": {
+                "ImageConfig": {
+                    "EntryPoint": [
+                        "/app/bin/python",
+                        "-m",
+                        "awslambdaric"
+                    ],
+                    "Command": [
+                        "stacklet.assetdb.handlers.current_caches.handle"
+                    ],
+                    "WorkingDirectory": ""
+                }
+            },
+            "Architectures": [
+                "arm64"
+            ],
+            "EphemeralStorage": {
+                "Size": 512
+            },
+            "SnapStart": {
+                "ApplyOn": "None",
+                "OptimizationStatus": "Off"
+            },
+            "LoggingConfig": {
+                "LogFormat": "Text",
+                "LogGroup": "/aws/lambda/kapilt-assetdb-current-caches"
+            }
+        },
+        "Code": {
+            "RepositoryType": "ECR",
+            "ImageUri": "644160558196.dkr.ecr.us-east-1.amazonaws.com/kapilt-assetdb:arm64-latest",
+            "ResolvedImageUri": "644160558196.dkr.ecr.us-east-1.amazonaws.com/kapilt-assetdb@sha256:4c3a84c134c3d2a46c56fc34f167a8a048ff2f566dc64f5b7aea4bbf96609542"
+        },
+        "Tags": {
+            "App": "AssetDB",
+            "stacklet:app": "AssetDB"
+        },
+        "Concurrency": {
+            "ReservedConcurrentExecutions": 1
+        }
+    }
+}
