@@ -1306,10 +1306,10 @@ class EventBridgeScheduleSource(AWSEventBase):
             FlexibleTimeWindow={'Mode': 'OFF'},
             ScheduleExpression=self.data.get('schedule'),
             ScheduleExpressionTimezone=self.data.get('timezone', 'Etc/UTC'),
-            GroupName=self.data.get('group_name', 'default'),
+            GroupName=self.data.get('group-name', 'default'),
             Target={
                 'Arn': func.arn,
-                'RoleArn': self.data.get('scheduler_role')
+                'RoleArn': self.data.get('scheduler-role')
             }
         )
 
@@ -1354,7 +1354,7 @@ class EventBridgeScheduleSource(AWSEventBase):
 
     def pause(self, func):
         try:
-            schedule = self.get(func.event_name, self.data.get('group_name', 'default'))
+            schedule = self.get(func.event_name, self.data.get('group-name', 'default'))
             schedule['State'] = 'DISABLED'
             self.update_schedule(schedule)
         except ClientError:  # pragma: no cover
@@ -1362,7 +1362,7 @@ class EventBridgeScheduleSource(AWSEventBase):
 
     def resume(self, func):
         try:
-            schedule = self.get(func.event_name, self.data.get('group_name', 'default'))
+            schedule = self.get(func.event_name, self.data.get('group-name', 'default'))
             schedule['State'] = 'ENABLED'
             self.update_schedule(schedule)
         except ClientError:  # pragma: no cover
@@ -1382,7 +1382,7 @@ class EventBridgeScheduleSource(AWSEventBase):
 
     def remove(self, func, func_deleted=True):
         if self.get(func.event_name):
-            group_name = self.data.get('group_name', 'default')
+            group_name = self.data.get('group-name', 'default')
             log.info(f'Removing schedule {func.event_name} in group {group_name}')
             self.client.delete_schedule(Name=func.event_name, GroupName=group_name)
             return True

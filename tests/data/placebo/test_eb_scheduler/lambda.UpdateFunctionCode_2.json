@@ -3,17 +3,17 @@
     "data": {
         "ResponseMetadata": {},
         "FunctionName": "custodian-schedule-ec2-checker",
-        "FunctionArn": "arn:aws:lambda:us-east-1:644160558196:function:custodian-schedule-ec2-checker:3",
+        "FunctionArn": "arn:aws:lambda:us-east-1:644160558196:function:custodian-schedule-ec2-checker:15",
         "Runtime": "python3.11",
         "Role": "arn:aws:iam::644160558196:role/custodian_read",
         "Handler": "custodian_policy.run",
-        "CodeSize": 613843,
+        "CodeSize": 613970,
         "Description": "cloud-custodian lambda policy",
         "Timeout": 900,
         "MemorySize": 512,
-        "LastModified": "2024-03-06T01:35:05.000+0000",
-        "CodeSha256": "jnBjEIPk7bFcAjuVEVHS8S66sjYwB1Y78AxUnEKoeO8=",
-        "Version": "3",
+        "LastModified": "2024-03-06T14:12:17.000+0000",
+        "CodeSha256": "gZWIoYZvt1kOz6nLU1l5ViB2VvxmVt9MhTwvOOFdEt4=",
+        "Version": "15",
         "VpcConfig": {
             "SubnetIds": [],
             "SecurityGroupIds": [],
@@ -23,7 +23,7 @@
         "TracingConfig": {
             "Mode": "PassThrough"
         },
-        "RevisionId": "d1192005-e2d9-464a-ae48-3a1f6be5974a",
+        "RevisionId": "dee37869-9193-4b2b-bab3-cf6cf7993f96",
         "State": "Pending",
         "StateReason": "The function is being created.",
         "StateReasonCode": "Creating",
@@ -39,7 +39,7 @@
             "OptimizationStatus": "Off"
         },
         "RuntimeVersionConfig": {
-            "RuntimeVersionArn": "arn:aws:lambda:us-east-1::runtime:7893bafe1f7e5c0681bc8da889edf656777a53c2a26e3f73436bdcbc87ccfbe8"
+            "RuntimeVersionArn": "arn:aws:lambda:us-east-1::runtime:2fb93380dac14772d30092f109b1784b517398458eef71a3f757425231fe6769"
         },
         "LoggingConfig": {
             "LogFormat": "Text",

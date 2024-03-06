@@ -618,10 +618,10 @@ class ScheduleMode(LambdaMode, PullMode):
         'schedule',
         schedule={'type': 'string'},
         timezone={'type': 'string'},
-        start_date={'type': 'string'},
-        end_date={'type': 'string'},
-        scheduler_role={'type': 'string'},
-        group_name={'type': 'string'},
+        **{'start-date': {'type': 'string'},
+           'end-date': {'type': 'string'},
+           'scheduler-role': {'type': 'string'},
+           'group-name': {'type': 'string'}},
         required=['schedule'],
         rinherit=LambdaMode.schema)
 

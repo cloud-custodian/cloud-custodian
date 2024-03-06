@@ -734,7 +734,7 @@ class PolicyLambdaProvision(Publish):
             "resource": "ec2",
             "name": "schedule-ec2-checker",
             "mode": {"type": "schedule", "schedule": "rate(1 day)",
-                     "scheduler_role": scheduler_role},
+                     "scheduler-role": scheduler_role},
         }
         p = self.load_policy(policy, session_factory=session_factory)
 
@@ -783,7 +783,7 @@ class PolicyLambdaProvision(Publish):
         )
 
         # modify scheduler role
-        policy['mode']['scheduler_role'] = f'{scheduler_role}2'
+        policy['mode']['scheduler-role'] = f'{scheduler_role}2'
         p = self.load_policy(policy, session_factory=session_factory)
         pl = PolicyLambda(p)
         self.addCleanup(mgr.remove, pl)
@@ -797,9 +797,9 @@ class PolicyLambdaProvision(Publish):
         p = self.load_policy(
             {
                 "resource": "ec2",
-                "name": "schedule-ec2-checker",
+                "name": "schedule-ec2-checker-2",
                 "mode": {"type": "schedule", "schedule": "rate(1 day)",
-                         "scheduler_role": scheduler_role},
+                         "scheduler-role": scheduler_role},
             },
             session_factory=session_factory)
         pl = PolicyLambda(p)

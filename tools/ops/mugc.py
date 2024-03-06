@@ -71,7 +71,7 @@ def region_gc(options, region, policy_config, policies):
                     tag_value = fn.get['Tags']['custodian-schedule']
                     tag_result = schedule_pattern.search(tag_value)
                     events.append(mu.EventBridgeScheduleSource({
-                        'group_name': tag_result.group(2)
+                        'group-name': tag_result.group(2)
                     }, session_factory))
                 else:
                     log.warning(

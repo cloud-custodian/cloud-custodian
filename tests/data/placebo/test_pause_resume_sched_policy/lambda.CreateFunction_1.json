@@ -2,18 +2,18 @@
     "status_code": 201,
     "data": {
         "ResponseMetadata": {},
-        "FunctionName": "custodian-schedule-ec2-checker",
-        "FunctionArn": "arn:aws:lambda:us-east-1:644160558196:function:custodian-schedule-ec2-checker",
+        "FunctionName": "custodian-schedule-ec2-checker-2",
+        "FunctionArn": "arn:aws:lambda:us-east-1:644160558196:function:custodian-schedule-ec2-checker-2",
         "Runtime": "python3.11",
         "Role": "arn:aws:iam::644160558196:role/custodian_read",
         "Handler": "custodian_policy.run",
-        "CodeSize": 613819,
+        "CodeSize": 613945,
         "Description": "cloud-custodian lambda policy",
         "Timeout": 900,
         "MemorySize": 512,
-        "LastModified": "2024-03-06T01:35:38.918+0000",
-        "CodeSha256": "cXAargfal7ESND6P/DPg/lkwGE7BOVnxcT+Z1vUqzB8=",
-        "Version": "4",
+        "LastModified": "2024-03-06T14:12:05.573+0000",
+        "CodeSha256": "i5cEfSSrRTTPOqSnBc83uvV7Nx3/43kB2UblQy5bePY=",
+        "Version": "1",
         "VpcConfig": {
             "SubnetIds": [],
             "SecurityGroupIds": [],
@@ -23,7 +23,7 @@
         "TracingConfig": {
             "Mode": "PassThrough"
         },
-        "RevisionId": "265bd722-17e2-4a12-88e9-cae91d66e131",
+        "RevisionId": "c5b425fb-bfae-41cd-ac90-90a02e084143",
         "State": "Pending",
         "StateReason": "The function is being created.",
         "StateReasonCode": "Creating",
@@ -39,11 +39,11 @@
             "OptimizationStatus": "Off"
         },
         "RuntimeVersionConfig": {
-            "RuntimeVersionArn": "arn:aws:lambda:us-east-1::runtime:7893bafe1f7e5c0681bc8da889edf656777a53c2a26e3f73436bdcbc87ccfbe8"
+            "RuntimeVersionArn": "arn:aws:lambda:us-east-1::runtime:2fb93380dac14772d30092f109b1784b517398458eef71a3f757425231fe6769"
         },
         "LoggingConfig": {
             "LogFormat": "Text",
-            "LogGroup": "/aws/lambda/custodian-schedule-ec2-checker"
+            "LogGroup": "/aws/lambda/custodian-schedule-ec2-checker-2"
         }
     }
 }
