@@ -951,8 +951,7 @@ class PolicyLambda(AbstractLambdaFunction):
         elif self.policy.data['mode']['type'] == 'hub-action':
             events.append(
                 SecurityHubAction(self.policy, session_factory))
-        elif (self.policy.data['mode']['type'] == 'periodic'
-              and 'scheduler_role' in self.policy.data['mode']):
+        elif self.policy.data['mode']['type'] == 'schedule':
             events.append(
                 EventBridgeScheduleSource(
                     self.policy.data['mode'], session_factory))
@@ -1192,12 +1191,8 @@ class CloudWatchEventSource(AWSEventBase):
             log.debug("Updating cwe rule for %s" % func.event_name)
             response = self.client.put_rule(**params)
         elif not rule:
-            log.debug(f'Creating cwe rule for {self}')
+            log.debug("Creating cwe rule for %s" % (self))
             response = self.client.put_rule(**params)
-            # check if schedule exists for func.event_name and remove it to clean up
-            # when switching between scheduled event types
-            # must check all groups
-            EventBridgeScheduleSource.remove_from_groups(self.session.client('scheduler'), func)
         else:
             response = {'RuleArn': rule['Arn']}
 
@@ -1271,10 +1266,8 @@ class CloudWatchEventSource(AWSEventBase):
 
 
 class EventBridgeScheduleSource(AWSEventBase):
-    """Invoke Lambda functions via EventBridge Scheduler.
-
-    Replaces CloudWatch scheduled event rules for periodic mode type
-    due to much higher quotas.
+    """
+    Invoke Lambda functions via EventBridge Scheduler.
     """
 
     client_service = 'scheduler'
@@ -1328,10 +1321,6 @@ class EventBridgeScheduleSource(AWSEventBase):
         elif not schedule:
             log.debug(f'Creating schedule for {self} in group {params["GroupName"]}')
             self.client.create_schedule(**params)
-            # check if cwe exists for func.event_name and remove it to clean up
-            # when switching between scheduled event types
-            cwe = CloudWatchEventSource(self.data, self.session_factory)
-            cwe.remove(func, func_deleted=False)
 
         # check for schedules with same func.event_name in any other group in case
         # group_name has been changed
@@ -1367,16 +1356,7 @@ class EventBridgeScheduleSource(AWSEventBase):
         try:
             schedule = self.get(func.event_name, self.data.get('group_name', 'default'))
             schedule['State'] = 'DISABLED'
-            keys_to_delete = []
-            for key in schedule.keys():
-                if key not in ['ActionAfterCompletion', 'ClientToken', 'Description', 'EndDate',
-                               'FlexibleTimeWindow', 'GroupName', 'KmsKeyArn', 'Name',
-                               'ScheduleExpression', 'ScheduleExpressionTimezone', 'StartDate',
-                               'State', 'Target']:
-                    keys_to_delete.append(key)
-            for key in keys_to_delete:
-                del schedule[key]
-            self.client.update_schedule(**schedule)
+            self.update_schedule(schedule)
         except ClientError:  # pragma: no cover
             pass
 
@@ -1384,18 +1364,21 @@ class EventBridgeScheduleSource(AWSEventBase):
         try:
             schedule = self.get(func.event_name, self.data.get('group_name', 'default'))
             schedule['State'] = 'ENABLED'
-            keys_to_delete = []
-            for key in schedule.keys():
-                if key not in ['ActionAfterCompletion', 'ClientToken', 'Description', 'EndDate',
-                               'FlexibleTimeWindow', 'GroupName', 'KmsKeyArn', 'Name',
-                               'ScheduleExpression', 'ScheduleExpressionTimezone', 'StartDate',
-                               'State', 'Target']:
-                    keys_to_delete.append(key)
-            for key in keys_to_delete:
-                del schedule[key]
-            self.client.update_schedule(**schedule)
+            self.update_schedule(schedule)
         except ClientError:  # pragma: no cover
             pass
+
+    def update_schedule(self, schedule):
+        keys_to_delete = []
+        for key in schedule.keys():
+            if key not in ['ActionAfterCompletion', 'ClientToken', 'Description', 'EndDate',
+                           'FlexibleTimeWindow', 'GroupName', 'KmsKeyArn', 'Name',
+                           'ScheduleExpression', 'ScheduleExpressionTimezone', 'StartDate',
+                           'State', 'Target']:
+                keys_to_delete.append(key)
+        for key in keys_to_delete:
+            del schedule[key]
+        self.client.update_schedule(**schedule)
 
     def remove(self, func, func_deleted=True):
         if self.get(func.event_name):

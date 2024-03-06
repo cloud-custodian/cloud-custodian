@@ -483,7 +483,7 @@ class PolicyLambdaProvision(Publish):
         lines = output.getvalue().strip().split("\n")
         self.assertTrue("Updating function custodian-s3-bucket-policy code" in lines)
         self.assertTrue(
-            "Updating function: custodian-s3-bucket-policy config MemorySize, Role" in lines)
+            "Updating function: custodian-s3-bucket-policy config MemorySize" in lines)
         self.assertEqual(result["FunctionName"], result2["FunctionName"])
         # drive by coverage
         functions = [
@@ -534,8 +534,8 @@ class PolicyLambdaProvision(Publish):
                 "FunctionName": "custodian-s3-bucket-policy",
                 "Handler": "custodian_policy.run",
                 "MemorySize": 512,
-                "Runtime": "python3.11",
-                "Timeout": 900,
+                "Runtime": "python2.7",
+                "Timeout": 60,
             },
         )
 
@@ -558,8 +558,8 @@ class PolicyLambdaProvision(Publish):
                 "FunctionName": "custodian-ec2-encrypted-vol",
                 "Handler": "custodian_policy.run",
                 "MemorySize": 512,
-                "Runtime": "python3.11",
-                "Timeout": 900,
+                "Runtime": "python2.7",
+                "Timeout": 60,
             },
         )
 
@@ -598,8 +598,8 @@ class PolicyLambdaProvision(Publish):
                 "FunctionName": "custodian-asg-spin-detector",
                 "Handler": "custodian_policy.run",
                 "MemorySize": 512,
-                "Runtime": "python3.11",
-                "Timeout": 900,
+                "Runtime": "python2.7",
+                "Timeout": 60,
             },
         )
 
@@ -684,8 +684,8 @@ class PolicyLambdaProvision(Publish):
                 "FunctionName": "custodian-periodic-ec2-checker",
                 "Handler": "custodian_policy.run",
                 "MemorySize": 512,
-                "Runtime": "python3.11",
-                "Timeout": 900,
+                "Runtime": "python2.7",
+                "Timeout": 60,
             },
         )
 
@@ -699,171 +699,6 @@ class PolicyLambdaProvision(Publish):
                 "Name": "custodian-periodic-ec2-checker",
             },
         )
-
-    def test_eb_scheduler(self):
-        session_factory = self.replay_flight_data("test_eb_scheduler")
-        scheduler_role = "arn:aws:iam::644160558196:role/custodian-scheduler-mu"
-        policy = {
-            "resource": "ec2",
-            "name": "periodic-ec2-checker",
-            "mode": {"type": "periodic", "schedule": "rate(1 day)",
-                     "scheduler_role": scheduler_role},
-        }
-        p = self.load_policy(policy, session_factory=session_factory)
-
-        pl = PolicyLambda(p)
-        mgr = LambdaManager(session_factory)
-        self.addCleanup(mgr.remove, pl)
-        result = mgr.publish(pl, "Dev", role=ROLE)
-        self.assert_items(
-            result,
-            {
-                "FunctionName": "custodian-periodic-ec2-checker",
-                "Handler": "custodian_policy.run",
-                "MemorySize": 512,
-                "Runtime": "python3.11",
-                "Timeout": 900,
-            },
-        )
-
-        scheduler = session_factory().client("scheduler")
-        result = scheduler.get_schedule(Name="custodian-periodic-ec2-checker")
-        self.assert_items(
-            result,
-            {
-                "State": "ENABLED",
-                "ScheduleExpression": "rate(1 day)",
-                "Name": "custodian-periodic-ec2-checker"
-            }
-        )
-        self.assert_items(result['Target'], {"RoleArn": scheduler_role})
-
-        # modify policy and re-publish
-        policy['mode']['timezone'] = 'America/New_York'
-        p = self.load_policy(policy, session_factory=session_factory)
-        pl = PolicyLambda(p)
-        self.addCleanup(mgr.remove, pl)
-        result = mgr.publish(pl, "Dev", role=ROLE)
-        result = scheduler.get_schedule(Name="custodian-periodic-ec2-checker")
-        self.assert_items(
-            result,
-            {
-                "State": "ENABLED",
-                "ScheduleExpression": "rate(1 day)",
-                "Name": "custodian-periodic-ec2-checker",
-                "ScheduleExpressionTimezone": 'America/New_York'
-            }
-        )
-
-        # modify scheduler role
-        policy['mode']['scheduler_role'] = f'{scheduler_role}2'
-        p = self.load_policy(policy, session_factory=session_factory)
-        pl = PolicyLambda(p)
-        self.addCleanup(mgr.remove, pl)
-        result = mgr.publish(pl, "Dev", role=ROLE)
-        result = scheduler.get_schedule(Name="custodian-periodic-ec2-checker")
-        self.assert_items(result['Target'], {"RoleArn": f'{scheduler_role}2'})
-
-    def test_pause_resume_sched_policy(self):
-        session_factory = self.replay_flight_data("test_pause_resume_sched_policy")
-        scheduler_role = "arn:aws:iam::644160558196:role/custodian-scheduler-mu"
-        p = self.load_policy(
-            {
-                "resource": "ec2",
-                "name": "periodic-ec2-checker",
-                "mode": {"type": "periodic", "schedule": "rate(1 day)",
-                         "scheduler_role": scheduler_role},
-            },
-            session_factory=session_factory)
-        pl = PolicyLambda(p)
-        mgr = LambdaManager(session_factory)
-        self.addCleanup(mgr.remove, pl, True)
-        mgr.publish(pl, "Dev", role=ROLE)
-        events = pl.get_events(session_factory)
-        self.assertEqual(len(events), 1)
-
-        scheduler = session_factory().client('scheduler')
-        events[0].pause(pl)
-        schedule = scheduler.get_schedule(Name=pl.event_name)
-        self.assertEqual(schedule["State"], "DISABLED")
-
-        # subsequent calls to pause an already paused rule should be a no-op
-        events[0].pause(pl)
-
-        events[0].resume(pl)
-        schedule = scheduler.get_schedule(Name=pl.event_name)
-        self.assertEqual(schedule["State"], "ENABLED")
-
-        # subsequent calls to resume an already enabled rule should be a no-op
-        events[0].resume(pl)
-
-    def test_cwe_eb_switch(self):
-        session_factory = self.replay_flight_data("test_cwe_eb_switch")
-        scheduler_role = "arn:aws:iam::644160558196:role/custodian-scheduler-mu"
-        policy = {
-            "resource": "ec2",
-            "name": "periodic-ec2-checker",
-            "mode": {"type": "periodic", "schedule": "rate(1 day)"},
-        }
-        p = self.load_policy(policy, session_factory=session_factory)
-        pl = PolicyLambda(p)
-        mgr = LambdaManager(session_factory)
-        self.addCleanup(mgr.remove, pl)
-        mgr.publish(pl, "Dev", role=ROLE)
-
-        events = session_factory().client("events")
-        scheduler = session_factory().client("scheduler")
-        result = events.list_rules(NamePrefix="custodian-periodic-ec2-checker")
-        self.assert_items(
-            result["Rules"][0],
-            {
-                "State": "ENABLED",
-                "ScheduleExpression": "rate(1 day)",
-                "Name": "custodian-periodic-ec2-checker",
-            },
-        )
-        with self.assertRaises(scheduler.exceptions.ResourceNotFoundException):
-            scheduler.get_schedule(Name="custodian-periodic-ec2-checker")
-
-        # convert cwe rule to schedule
-        policy['mode']['scheduler_role'] = scheduler_role
-        p = self.load_policy(policy, session_factory=session_factory)
-        pl = PolicyLambda(p)
-        mgr = LambdaManager(session_factory)
-        self.addCleanup(mgr.remove, pl)
-        mgr.publish(pl, "Dev", role=ROLE)
-
-        result = scheduler.get_schedule(Name="custodian-periodic-ec2-checker")
-        self.assert_items(
-            result,
-            {
-                "State": "ENABLED",
-                "ScheduleExpression": "rate(1 day)",
-                "Name": "custodian-periodic-ec2-checker"
-            }
-        )
-        result = events.list_rules(NamePrefix="custodian-periodic-ec2-checker")
-        self.assertEqual(len(result['Rules']), 0)
-
-        # switch back to cwe
-        del policy['mode']['scheduler_role']
-        p = self.load_policy(policy, session_factory=session_factory)
-        pl = PolicyLambda(p)
-        mgr = LambdaManager(session_factory)
-        self.addCleanup(mgr.remove, pl)
-        mgr.publish(pl, "Dev", role=ROLE)
-
-        result = events.list_rules(NamePrefix="custodian-periodic-ec2-checker")
-        self.assert_items(
-            result["Rules"][0],
-            {
-                "State": "ENABLED",
-                "ScheduleExpression": "rate(1 day)",
-                "Name": "custodian-periodic-ec2-checker",
-            },
-        )
-        with self.assertRaises(scheduler.exceptions.ResourceNotFoundException):
-            scheduler.get_schedule(Name="custodian-periodic-ec2-checker")
 
     key_arn = "arn:aws:kms:us-west-2:644160558196:key/" "44d25a5c-7efa-44ed-8436-b9511ea921b3"
     sns_arn = "arn:aws:sns:us-west-2:644160558196:config-topic"
@@ -891,6 +726,103 @@ class PolicyLambdaProvision(Publish):
 
         self.addCleanup(cleanup)
         return mgr, mgr.publish(pl)
+
+    def test_eb_schedule(self):
+        session_factory = self.replay_flight_data("test_eb_scheduler")
+        scheduler_role = "arn:aws:iam::644160558196:role/custodian-scheduler-mu"
+        policy = {
+            "resource": "ec2",
+            "name": "schedule-ec2-checker",
+            "mode": {"type": "schedule", "schedule": "rate(1 day)",
+                     "scheduler_role": scheduler_role},
+        }
+        p = self.load_policy(policy, session_factory=session_factory)
+
+        pl = PolicyLambda(p)
+        mgr = LambdaManager(session_factory)
+        self.addCleanup(mgr.remove, pl)
+        result = mgr.publish(pl, "Dev", role=ROLE)
+        self.assert_items(
+            result,
+            {
+                "FunctionName": "custodian-schedule-ec2-checker",
+                "Handler": "custodian_policy.run",
+                "MemorySize": 512,
+                "Runtime": "python3.11",
+                "Timeout": 900,
+            },
+        )
+
+        scheduler = session_factory().client("scheduler")
+        result = scheduler.get_schedule(Name="custodian-schedule-ec2-checker")
+        self.assert_items(
+            result,
+            {
+                "State": "ENABLED",
+                "ScheduleExpression": "rate(1 day)",
+                "Name": "custodian-schedule-ec2-checker"
+            }
+        )
+        self.assert_items(result['Target'], {"RoleArn": scheduler_role})
+
+        # modify policy and re-publish
+        policy['mode']['timezone'] = 'America/New_York'
+        p = self.load_policy(policy, session_factory=session_factory)
+        pl = PolicyLambda(p)
+        self.addCleanup(mgr.remove, pl)
+        result = mgr.publish(pl, "Dev", role=ROLE)
+        result = scheduler.get_schedule(Name="custodian-schedule-ec2-checker")
+        self.assert_items(
+            result,
+            {
+                "State": "ENABLED",
+                "ScheduleExpression": "rate(1 day)",
+                "Name": "custodian-schedule-ec2-checker",
+                "ScheduleExpressionTimezone": 'America/New_York'
+            }
+        )
+
+        # modify scheduler role
+        policy['mode']['scheduler_role'] = f'{scheduler_role}2'
+        p = self.load_policy(policy, session_factory=session_factory)
+        pl = PolicyLambda(p)
+        self.addCleanup(mgr.remove, pl)
+        result = mgr.publish(pl, "Dev", role=ROLE)
+        result = scheduler.get_schedule(Name="custodian-schedule-ec2-checker")
+        self.assert_items(result['Target'], {"RoleArn": f'{scheduler_role}2'})
+
+    def test_pause_resume_sched_policy(self):
+        session_factory = self.replay_flight_data("test_pause_resume_sched_policy")
+        scheduler_role = "arn:aws:iam::644160558196:role/custodian-scheduler-mu"
+        p = self.load_policy(
+            {
+                "resource": "ec2",
+                "name": "schedule-ec2-checker",
+                "mode": {"type": "schedule", "schedule": "rate(1 day)",
+                         "scheduler_role": scheduler_role},
+            },
+            session_factory=session_factory)
+        pl = PolicyLambda(p)
+        mgr = LambdaManager(session_factory)
+        self.addCleanup(mgr.remove, pl, True)
+        mgr.publish(pl, "Dev", role=ROLE)
+        events = pl.get_events(session_factory)
+        self.assertEqual(len(events), 1)
+
+        scheduler = session_factory().client('scheduler')
+        events[0].pause(pl)
+        schedule = scheduler.get_schedule(Name=pl.event_name)
+        self.assertEqual(schedule["State"], "DISABLED")
+
+        # subsequent calls to pause an already paused rule should be a no-op
+        events[0].pause(pl)
+
+        events[0].resume(pl)
+        schedule = scheduler.get_schedule(Name=pl.event_name)
+        self.assertEqual(schedule["State"], "ENABLED")
+
+        # subsequent calls to resume an already enabled rule should be a no-op
+        events[0].resume(pl)
 
     def create_a_lambda_with_lots_of_config(self, flight):
         extra = {

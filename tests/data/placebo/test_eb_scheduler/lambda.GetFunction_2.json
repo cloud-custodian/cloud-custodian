@@ -3,18 +3,18 @@
     "data": {
         "ResponseMetadata": {},
         "Configuration": {
-            "FunctionName": "custodian-periodic-ec2-checker",
-            "FunctionArn": "arn:aws:lambda:us-east-1:644160558196:function:custodian-periodic-ec2-checker:Dev",
+            "FunctionName": "custodian-schedule-ec2-checker",
+            "FunctionArn": "arn:aws:lambda:us-east-1:644160558196:function:custodian-schedule-ec2-checker:Dev",
             "Runtime": "python3.11",
             "Role": "arn:aws:iam::644160558196:role/custodian_read",
             "Handler": "custodian_policy.run",
-            "CodeSize": 626849,
+            "CodeSize": 613819,
             "Description": "cloud-custodian lambda policy",
             "Timeout": 900,
             "MemorySize": 512,
-            "LastModified": "2024-02-05T21:05:57.197+0000",
-            "CodeSha256": "leMae4EIUlTNwsiuv7EIeyGE9GexOfEw8z0EwGeSlFM=",
-            "Version": "117",
+            "LastModified": "2024-03-06T01:34:35.273+0000",
+            "CodeSha256": "cXAargfal7ESND6P/DPg/lkwGE7BOVnxcT+Z1vUqzB8=",
+            "Version": "1",
             "VpcConfig": {
                 "SubnetIds": [],
                 "SecurityGroupIds": [],
@@ -24,7 +24,7 @@
             "TracingConfig": {
                 "Mode": "PassThrough"
             },
-            "RevisionId": "b30fabcb-5768-4191-a572-c512d8c9d940",
+            "RevisionId": "9be79b81-0b0a-48cb-aed3-76af8a5f3c11",
             "State": "Active",
             "LastUpdateStatus": "Successful",
             "PackageType": "Zip",
@@ -39,16 +39,16 @@
                 "OptimizationStatus": "Off"
             },
             "RuntimeVersionConfig": {
-                "RuntimeVersionArn": "arn:aws:lambda:us-east-1::runtime:aaa0628b7c27cf9a6da9328d61875e549fca53968fbabf523c9ce564bb817574"
+                "RuntimeVersionArn": "arn:aws:lambda:us-east-1::runtime:7893bafe1f7e5c0681bc8da889edf656777a53c2a26e3f73436bdcbc87ccfbe8"
             },
             "LoggingConfig": {
                 "LogFormat": "Text",
-                "LogGroup": "/aws/lambda/custodian-periodic-ec2-checker"
+                "LogGroup": "/aws/lambda/custodian-schedule-ec2-checker"
             }
         },
         "Code": {
             "RepositoryType": "S3",
-            "Location": "https://prod-04-2014-tasks.s3.us-east-1.amazonaws.com/snapshots/644160558196/custodian-periodic-ec2-checker-2ab3b521-2790-4456-9d3c-cfb124734f3b?versionId=6J2axADaLjD5w7BiYkq8Vgz7xN2KFr1y&X-Amz-Security-Token=IQoJb3JpZ2luX2VjEOX%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FwEaCXVzLWVhc3QtMSJGMEQCIESCGLyqdLG6tBYbrNjCHaESJ%2BvsBOcEZj%2FY5gYrc%2FGBAiBgK4wu52SBPLbF9be3w8sS2qc3RJ0JqocgppRjO%2BhkMiq6BQit%2F%2F%2F%2F%2F%2F%2F%2F%2F%2F8BEAAaDDc0OTY3ODkwMjgzOSIMR7JI7Wxzs92wx9IJKo4FGa27oiFoXMX99Idh4TqFtQlWfaUilFW0etxiTlOfglHwQy0vtLjsJyv95Z7%2FNrpSN4u6Lq3XgcH%2B9%2Be3ocbRqcTafmiIeWIKwtnsUnnuhzkj1n4xJyfincUdzFnYT56H27s9Aj%2FyP1TO%2BTGdzjQ5XB2Waczi4YJjvRyMiABTPrJsBc2jxEGB7Dc5X2qo3Ymm5DKU%2BVXRjfOjRJJWxAWWzis2FYv5JAeS4qZs%2Bgf7aiugG1%2B1kdcvFQdgQQ53Hqp%2BFUI89heKYhWp0o1iQSsOWQui9iHXA4p%2BuLHkKub%2FvxpH6OrJ300cmJf9Ui%2BkaeTgU4VPqc6DGu%2BW2hELGI8NDWcCxiOMMpI%2Bp8CAEj5qZiffSZcbH4VxCvkBi32GX%2FAPfAkJjIgfXH%2BZ0uImiJRzEclIQJ%2F5JjvsIa8b9%2BCqRZ1xwBU2rEBb90pot8oi3%2Bhr8B3vcaGxAL%2BP3B08fCYpdVX9Wi0VOqtCQZpl%2BqsZh7WHXeKXuPE8yY%2B%2B4kEXX928k5xJvVv6CScOOjYto1YQ8lV0ah6yoEedkPKyvsPiqpVjhGXLsZy4oSfnVLeH458j8mkPNd2m8Ph7pRn%2BprhLJWPxkv0TjME6bXzZERrYn7rv4oPOwU9eEoeqhz9wcBra5HVdmdQ5DX%2BGvD8WxQPPygBHh87ViNP89UIZNY8T9POEm3h4TZ%2BfDKFwwITAHrGDRJf%2BdYpLQV2cu7ayGYNT0v1FwN6%2BjPdCeTTc77JBAv%2BS0Gcuacc8TCNjTnAtPQYyfcycuN0460W5FYYd3U9qKc0sWgkKJArAMcHOrzccuc63rA6d3IZ6qDo06FL%2BPy1yaz7kw6xC7BuGqtySImV1DJU6EIPe5asEID31BEGQMJ6Eha4GOrIBa8ZO3X4UzThZuB6r97bX98w8tbQED7mAtEzT4wLI1lkeJvDc48wUFUyKoHd%2B9%2BpBRCxjPlCdsLokzO9kfY%2Bc%2BLquxW5lVdWVldtu76QPd2HZ2hOBKZ9QpcdO3PUK7hlro3U4cuL5xr54V3KSp7nB1r%2FqsTYKsL1nk%2Bh0N0N7Cu2H4o3JqHiMYxEh1Xiwy4UomIlRUFelt58gHKtwzEl1JX0nKns3ruIGkQV%2F3h5aLuUjTA%3D%3D&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20240205T210604Z&X-Amz-SignedHeaders=host&X-Amz-Expires=600&X-Amz-Credential=ASIA25DCYHY3RSHKNPVX%2F20240205%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=e33f38d0e10f5393872a78688da52c6e29160b0043ab40fe1c957f0c31504be0"
+            "Location": "https://prod-04-2014-tasks.s3.us-east-1.amazonaws.com/snapshots/644160558196/custodian-schedule-ec2-checker-cd3f1621-d445-4399-9f99-5c983f3f94cb?versionId=_Rz6hf77CchwH_hBVH1._d9npOwil.Hn&X-Amz-Security-Token=IQoJb3JpZ2luX2VjEKD%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FwEaCXVzLWVhc3QtMSJGMEQCIEaU8i9XKomt%2FJSzJs32JBOvcX2Jxqi5At0e5iJFGKdIAiBFEsidzPQSH8zku6iBIXRZD5fFvv4wE7uL9%2FxFLWWjbCq6BQiZ%2F%2F%2F%2F%2F%2F%2F%2F%2F%2F8BEAAaDDc0OTY3ODkwMjgzOSIMKQzkGv4qqTW0lrICKo4FANtmKOjMFX4nydU87saVUqMaM7JMYRB1N2gme9ev%2B05nkOErA8mOzMaG7FM7WNr7Ga6Uqs3O45NeWaPB3oBcP1UjTRbojqwC0sbhr7Ivx2nS0%2ByLHZAsi%2FtNlHcjS6hNXOv5Rijvk%2BxYIaFdZx%2FJT7YqjqXrzP1GLfUaJxHsGMl18RG%2BqEM%2BeRiJrZFfzRULSD1FTwcROOSkcmCzdvg%2F8iIcs%2FC2xtfxR0rQ8VCG7vESJ8Y9GxcHGFYw0BcQmaPx%2FTJolljG2DIME4PWgd2%2Fvlh086huUKzW4eC6fZMqoKX3OyJYhVOQoAMih5%2FPZrXaL%2B68Q1LFUUOf7EfhpEDc639oPptd87FkomFeQsRh8wpIaes2zJtD3JX6an4XQGaHGEbSTtyobolUNBhDMuJvSETUWqi%2Farh6X6ZtPN%2FSItyEtR0l1EvjiaT3a4Ac8hB1BDOY%2FH8q4vdizMHrIs18zAFH7JtVMpm3G3qdzUBeSgi2jMeuA5roq7zT2xdgzP0e4CwfJgSJyXSM4Aw8qDZVuLAygo0gSZRqbRqOLBbRZ29czrU9o6O33UIX8S%2FxJ5wBVvMRu9xmlxrVew5%2BlWzQnHyz1qE5UoQ%2FQmX1wEL59YbB%2FlFZuWt1OFaw4aWhx3BsPJ44nrMuNN3qIIq3GLMgfVXLf7leBoFaT%2FQ7XL8f7JPylZhQwyQE91JrEJe21KRrkwFHpc3aisIB2XQbSuGtb1WNDl2oDaPbudYF52WlH0lFtHBY7vJg3bC4CKAvgwKt4x0h1Xz0jmOQTnMEmzEv3nEoS3Wz0zegGp%2FTRhegBe%2BI3Qz%2F7hCwrOMkdNwj1vt9PpbbU8MUBWSco6SGucD4yrE7MOt3NWDNxGF6Nw49MK%2Fjnq8GOrIBu9kbUTti8Bpd2VQSun9FqwKQr6FdUo%2FjmIlDvR88Ih2tPZkkTucENr7p%2FyQhTOvXCjK3EwxoIvHg3JN0%2BixrbYfTMvg9AN%2FzthgfOtWd8gsu5sk51ed4Efvn4d4WqCZqYln4WEGP7BLP2JlWmAKZXvSuQLslTc6TS2scPpSmiL1EZ15xzGOxk6DkIDGypIVp1wPkymPEhO85FsQaPGVVsptVtHLemk%2BjTkoaTMQ0gGE6tw%3D%3D&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20240306T013442Z&X-Amz-SignedHeaders=host&X-Amz-Expires=600&X-Amz-Credential=ASIA25DCYHY3WIO6J77Z%2F20240306%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=9bdce11b10616e26e9e638fff4b6f86f33f59ba937ac8c9ffaf218baa1163c42"
         }
     }
 }

@@ -2,17 +2,17 @@
     "status_code": 200,
     "data": {
         "ResponseMetadata": {},
-        "FunctionName": "custodian-periodic-ec2-checker",
-        "FunctionArn": "arn:aws:lambda:us-east-1:644160558196:function:custodian-periodic-ec2-checker",
+        "FunctionName": "custodian-schedule-ec2-checker",
+        "FunctionArn": "arn:aws:lambda:us-east-1:644160558196:function:custodian-schedule-ec2-checker",
         "Runtime": "python3.11",
         "Role": "arn:aws:iam::644160558196:role/custodian_read",
         "Handler": "custodian_policy.run",
-        "CodeSize": 626874,
+        "CodeSize": 613843,
         "Description": "cloud-custodian lambda policy",
         "Timeout": 900,
         "MemorySize": 512,
-        "LastModified": "2024-02-05T21:06:11.000+0000",
-        "CodeSha256": "uwmmbehBEjC3ZwhdVhHzzIGqErorz/7Kmh7c2cwHyUE=",
+        "LastModified": "2024-03-06T01:35:05.000+0000",
+        "CodeSha256": "jnBjEIPk7bFcAjuVEVHS8S66sjYwB1Y78AxUnEKoeO8=",
         "Version": "$LATEST",
         "VpcConfig": {
             "SubnetIds": [],
@@ -23,7 +23,7 @@
         "TracingConfig": {
             "Mode": "PassThrough"
         },
-        "RevisionId": "c28b18e5-0299-41e6-997c-9eed0b6a79f5",
+        "RevisionId": "fe8c6ed9-f9c1-4f0f-9dda-f9f14087b41b",
         "State": "Active",
         "LastUpdateStatus": "Successful",
         "PackageType": "Zip",
@@ -38,11 +38,11 @@
             "OptimizationStatus": "Off"
         },
         "RuntimeVersionConfig": {
-            "RuntimeVersionArn": "arn:aws:lambda:us-east-1::runtime:aaa0628b7c27cf9a6da9328d61875e549fca53968fbabf523c9ce564bb817574"
+            "RuntimeVersionArn": "arn:aws:lambda:us-east-1::runtime:7893bafe1f7e5c0681bc8da889edf656777a53c2a26e3f73436bdcbc87ccfbe8"
         },
         "LoggingConfig": {
             "LogFormat": "Text",
-            "LogGroup": "/aws/lambda/custodian-periodic-ec2-checker"
+            "LogGroup": "/aws/lambda/custodian-schedule-ec2-checker"
         }
     }
 }

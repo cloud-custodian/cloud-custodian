@@ -2,10 +2,10 @@
     "status_code": 200,
     "data": {
         "ResponseMetadata": {},
-        "AliasArn": "arn:aws:lambda:us-east-1:644160558196:function:custodian-periodic-ec2-checker:Dev",
+        "AliasArn": "arn:aws:lambda:us-east-1:644160558196:function:custodian-schedule-ec2-checker:Dev",
         "Name": "Dev",
-        "FunctionVersion": "119",
+        "FunctionVersion": "3",
         "Description": "",
-        "RevisionId": "cad9fe67-440f-4164-912e-46ebd07e7900"
+        "RevisionId": "cef6a2b3-33f3-4d75-a7ed-b90fb41d6372"
     }
 }
