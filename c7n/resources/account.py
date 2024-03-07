@@ -17,7 +17,7 @@ from c7n.filters import Filter, FilterRegistry, ValueFilter
 from c7n.filters.kms import KmsRelatedFilter
 from c7n.filters.multiattr import MultiAttrFilter
 from c7n.filters.missing import Missing
-from c7n.manager import ResourceManager, resources
+from c7n.manager import resources
 from c7n.utils import local_session, type_schema, generate_arn, get_support_region, jmespath_search
 from c7n.query import QueryResourceManager, TypeInfo, DescribeSource
 from c7n.filters import ListItemFilter
