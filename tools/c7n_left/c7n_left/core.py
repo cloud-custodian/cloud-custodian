@@ -10,7 +10,7 @@ import os
 from c7n.actions import ActionRegistry
 from c7n.cache import NullCache
 from c7n.config import Config
-from c7n.filters import FilterRegistry
+from c7n.filters import FilterRegistry, ValueFilter
 from c7n.manager import ResourceManager
 
 from c7n.provider import Provider, clouds
@@ -110,15 +110,17 @@ class PolicyMetadata:
 
 class ExecutionFilter:
     supported_filters = ("policy", "type", "severity", "category", "id")
+    severity_op_map = {'lte': operator.le, 'gte': operator.ge}
 
-    def __init__(self, filters):
+    def __init__(self, filters, severity_direction='lte'):
         self.filters = filters
+        self.severity_op = self.severity_op_map[severity_direction]
 
     def __len__(self):
         return len(self.filters)
 
     @classmethod
-    def parse(cls, filters_config):
+    def parse(cls, filters_config, severity_direction='lte'):
         """cli option filtering support
 
         --filters "type=aws_sqs_queue,aws_rds_* policy=*encryption* severity=high"
@@ -139,7 +141,7 @@ class ExecutionFilter:
                 v = [v]
             filters[k] = v
         cls._validate_severities(filters)
-        return cls(filters)
+        return cls(filters, severity_direction)
 
     @classmethod
     def _validate_severities(cls, filters):
@@ -179,7 +181,7 @@ class ExecutionFilter:
         def filter_severity(p):
             p_slevel = SEVERITY_LEVELS.get(p.severity) or SEVERITY_LEVELS.get("unknown")
             f_slevel = SEVERITY_LEVELS[self.filters["severity"][0]]
-            return p_slevel <= f_slevel
+            return self.severity_op(p_slevel, f_slevel)
 
         if len(self.filters["severity"]) == 1:
             return list(filter(filter_severity, policies))
@@ -253,7 +255,12 @@ class CollectionRunner:
             for p in self.policies:
                 if not self.match_type(rtype, p):
                     continue
-                result_set = self.run_policy(p, graph, resources, event, rtype)
+                result_set = []
+                try:
+                    result_set = self.run_policy(p, graph, resources, event, rtype)
+                except Exception as e:
+                    found = True
+                    self.reporter.on_policy_error(e, p, rtype, resources)
                 if result_set:
                     self.reporter.on_results(p, result_set)
                 if result_set and (
@@ -329,8 +336,20 @@ class PolicyResourceResult:
         }
 
 
+class LeftValueFilter(ValueFilter):
+    def get_resource_value(self, k, i):
+        if k.startswith('tag:') and 'tags' in i:
+            tk = k.split(':', 1)[1]
+            r = (i.get('tags') or {}).get(tk)
+            return r
+        return super().get_resource_value(k, i)
+
+
 class IACResourceManager(ResourceManager):
     filter_registry = FilterRegistry("iac.filters")
+    filter_registry.register('value', LeftValueFilter)
+    filter_registry.value_filter_class = LeftValueFilter
+
     action_registry = ActionRegistry("iac.actions")
     log = log
 

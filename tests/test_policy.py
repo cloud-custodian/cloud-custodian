@@ -204,7 +204,7 @@ class PolicyMetaLint(BaseTest):
             {'account', 's3', 'hostedzone', 'log-group', 'rest-api', 'redshift-snapshot',
              'rest-stage', 'codedeploy-app', 'codedeploy-group', 'fis-template', 'dlm-policy',
              'apigwv2', 'apigwv2-stage', 'apigw-domain-name', 'fis-experiment',
-             'launch-template-version'})
+             'appmesh-virtual-gateway', 'launch-template-version'})
         if overrides:
             raise ValueError("unknown arn overrides in %s" % (", ".join(overrides)))
 
@@ -393,7 +393,6 @@ class PolicyMetaLint(BaseTest):
             # q4 2023 wave 2 (aka reinvent)
             "AWS::ACMPCA::CertificateAuthorityActivation",
             "AWS::AppMesh::GatewayRoute",
-            "AWS::AppMesh::Mesh",
             "AWS::Connect::Instance",
             "AWS::Connect::QuickConnect",
             "AWS::EC2::CarrierGateway",
@@ -434,7 +433,6 @@ class PolicyMetaLint(BaseTest):
             "AWS::AppConfig::HostedConfigurationVersion",
             "AWS::AppIntegrations::EventIntegration",
             "AWS::AppMesh::Route",
-            "AWS::AppMesh::VirtualGateway",
             "AWS::AppMesh::VirtualRouter",
             "AWS::AppRunner::Service",
             "AWS::Athena::PreparedStatement",

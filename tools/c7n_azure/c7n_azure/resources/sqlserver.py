@@ -2,7 +2,6 @@
 # SPDX-License-Identifier: Apache-2.0
 import logging
 import uuid
-
 from c7n_azure.actions.firewall import SetFirewallAction
 from c7n_azure.filters import FirewallRulesFilter, FirewallBypassFilter
 from c7n_azure.provider import resources
@@ -13,7 +12,7 @@ from netaddr import IPRange, IPSet, IPNetwork, IPAddress
 from c7n.exceptions import PolicyValidationError
 from c7n.utils import type_schema
 from c7n.filters import Filter
-from c7n.filters.core import ValueFilter
+from c7n.filters.core import ValueFilter, ListItemFilter
 
 AZURE_SERVICES = IPRange('0.0.0.0', '0.0.0.0')  # nosec
 log = logging.getLogger('custodian.azure.sql-server')
@@ -157,6 +156,25 @@ class TransparentDataEncryptionFilter(Filter):
                 result.append(resource)
 
         return result
+
+
+@SqlServer.filter_registry.register('failover-group')
+class FailoverGroupFilter(ListItemFilter):
+    schema = type_schema(
+        "failover-group",
+        attrs={"$ref": "#/definitions/filters_common/list_item_attrs"},
+        count={"type": "number"},
+        count_op={"$ref": "#/definitions/filters_common/comparison_operators"}
+    )
+    annotate_items = True
+    item_annotation_key = "c7n:FailoverGroups"
+
+    def get_item_values(self, resource):
+        groups = self.manager.get_client().failover_groups.list_by_server(
+            resource_group_name=resource['resourceGroup'],
+            server_name=resource['name']
+        )
+        return [g.serialize(True) for g in groups]
 
 
 @SqlServer.filter_registry.register('azure-ad-administrators')
@@ -474,6 +492,39 @@ class AuditingFilter(ValueFilter):
             return super().__call__(resource['properties'][self.cache_key])
 
 
+@SqlServer.filter_registry.register('security-alert-policies')
+class SecurityAlertPoliciesFilter(ListItemFilter):
+    """
+    Filters sql servers by security alert policies
+
+    .. code-block:: yaml
+
+        policies:
+          - name: sql-server-filter
+            resource: azure.sql-server
+            filters:
+              - type: security-alert-policies
+                attrs: []
+
+    """
+    schema = type_schema(
+        "security-alert-policies",
+        attrs={"$ref": "#/definitions/filters_common/list_item_attrs"},
+        count={"type": "number"},
+        count_op={"$ref": "#/definitions/filters_common/comparison_operators"}
+    )
+    annotate_items = True
+    item_annotation_key = "c7n:SecurityAlertPolicies"
+
+    def get_item_values(self, resource):
+        client = self.manager.get_client()
+        policies = client.server_security_alert_policies.list_by_server(
+            resource['resourceGroup'],
+            resource['name']
+        )  # always only one item
+        return [p.serialize(True) for p in policies]
+
+
 @SqlServer.action_registry.register('set-firewall-rules')
 class SqlSetFirewallAction(SetFirewallAction):
     """ Set Firewall Rules Action
@@ -598,3 +649,68 @@ class SqlSetFirewallAction(SetFirewallAction):
         if rule == AZURE_SERVICES:
             return 'AllowAllWindowsAzureIps'
         return self.prefix + "-" + str(uuid.uuid4())
+
+
+@SqlServer.filter_registry.register('auditing-policies')
+class SqlServerAuditingSettingsFilter(ListItemFilter):
+    """
+    Filter sql servers by auditing policies.
+
+    :example:
+
+    Find SQL servers where there are auditing policies with retention less than a week
+
+    .. code-block:: yaml
+
+        policies:
+          - name: auditing-policy-retention-less-a-week
+            resource: azure.sql-server
+            filters:
+              - type: auditing-policies
+                attrs:
+                  - type: value
+                    key: retentionDays
+                    value: 7
+                    op: less-than
+
+
+    """
+    schema = type_schema(
+        'auditing-policies',
+        attrs={'$ref': '#/definitions/filters_common/list_item_attrs'},
+        count={'type': 'number'},
+        count_op={'$ref': '#/definitions/filters_common/comparison_operators'}
+    )
+
+    annotation_key = 'c7n:auditing-settings-list'
+    annotate_items = True
+
+    def process(self, resources, event=None):
+        _, exceptions = ThreadHelper.execute_in_parallel(
+            resources=resources,
+            event=event,
+            execution_method=self._process_resources,
+            executor_factory=self.executor_factory,
+            log=log
+        )
+
+        if exceptions:
+            raise exceptions[0]  # pragma: no cover
+        return super().process(resources, event)
+
+    def _process_resources(self, resources, event=None):
+        cl = self.manager.get_client()
+        for res in resources:
+            properties = res.setdefault('properties', {})
+            if self.annotation_key in properties:
+                continue  # pragma: no cover
+            settings = cl.server_blob_auditing_policies.list_by_server(
+                resource_group_name=res['resourceGroup'],
+                server_name=res['name']
+            )
+            properties[self.annotation_key] = [
+                s.serialize(True).get('properties', {}) for s in settings
+            ]
+
+    def get_item_values(self, resource):
+        return resource['properties'].get(self.annotation_key, [])

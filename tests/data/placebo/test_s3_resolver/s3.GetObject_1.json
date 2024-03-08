@@ -1,41 +1,27 @@
 {
-    "status_code": 200, 
+    "status_code": 200,
     "data": {
-        "Body": {
-            "body": "{\"moose\": {\"soup\": \"duck\"}}", 
-            "__module__": "botocore.response", 
-            "__class__": "StreamingBody"
-        }, 
-        "AcceptRanges": "bytes", 
-        "ContentType": "application/json", 
-        "ResponseMetadata": {
-            "HTTPStatusCode": 200, 
-            "HostId": "yG4BMgspqFZgEHShMaXJnNo+7EFp9Hl3X6MChOR8vIxLlv2pKhNlZnV7dI3Rd6xJNct/QB60jHA=", 
-            "RequestId": "8D4ACA998D99A7BF", 
-            "HTTPHeaders": {
-                "content-length": "27", 
-                "x-amz-id-2": "yG4BMgspqFZgEHShMaXJnNo+7EFp9Hl3X6MChOR8vIxLlv2pKhNlZnV7dI3Rd6xJNct/QB60jHA=", 
-                "accept-ranges": "bytes", 
-                "server": "AmazonS3", 
-                "last-modified": "Mon, 05 Sep 2016 17:54:51 GMT", 
-                "x-amz-request-id": "8D4ACA998D99A7BF", 
-                "etag": "\"a7efa1d0ddef5388659563b15ad0799d\"", 
-                "date": "Mon, 05 Sep 2016 17:54:52 GMT", 
-                "content-type": "application/json"
-            }
-        }, 
+        "ResponseMetadata": {},
+        "AcceptRanges": "bytes",
         "LastModified": {
-            "hour": 17, 
-            "__class__": "datetime", 
-            "month": 9, 
-            "second": 51, 
-            "microsecond": 0, 
-            "year": 2016, 
-            "day": 5, 
-            "minute": 54
-        }, 
-        "ContentLength": 27, 
-        "ETag": "\"a7efa1d0ddef5388659563b15ad0799d\"", 
-        "Metadata": {}
+            "__class__": "datetime",
+            "year": 2024,
+            "month": 1,
+            "day": 14,
+            "hour": 16,
+            "minute": 46,
+            "second": 21,
+            "microsecond": 0
+        },
+        "ContentLength": 27,
+        "ETag": "\"a7efa1d0ddef5388659563b15ad0799d\"",
+        "ContentType": "application/json",
+        "ServerSideEncryption": "AES256",
+        "Metadata": {},
+        "Body": {
+            "__class__": "StreamingBody",
+            "__module__": "botocore.response",
+            "body": "eyJtb29zZSI6IHsic291cCI6ICJkdWNrIn19"
+        }
     }
 }
