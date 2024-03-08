@@ -45,8 +45,6 @@ class DescribeAccount(DescribeSource):
                 'account_name': name}
 
     def resources(self, query=None):
-        if query is None:
-            query = {}
         return [self.get_account()]
 
     def get_resources(self, resource_ids):
