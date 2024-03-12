@@ -780,7 +780,7 @@ class AWS(Provider):
                 resource_type = p.resource_type
             available_regions = service_region_map.get(
                 resource_service_map.get(resource_type), ())
-            
+    
             # The Health service should be considered a global-level service.
             if resource_service_map.get(resource_type) == 'health':
                available_regions = []
