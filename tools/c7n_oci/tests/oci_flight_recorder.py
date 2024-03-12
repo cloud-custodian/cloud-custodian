@@ -1,6 +1,7 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import gzip
+import inspect
 import json
 import os
 import re
@@ -35,6 +36,16 @@ FILTERED_HEADERS = [
     "connection",
     "expires",
     "content-location",
+    "access-control-allow-credentials",
+    "access-control-allow-methods",
+    "access-control-allow-origin",
+    "access-control-expose-headers",
+    "content-length",
+    "date",
+    "x-api-id",
+    "etag",
+    "pragma",
+    "x-content-type-options",
 ]
 
 
@@ -45,6 +56,7 @@ class OCIFlightRecorder(CustodianTestCore):
     multi_requests_map = {}
     multi_requests_history = {}
     running_req_count = {}
+    recording = False
 
     def cleanUp(self):
         threading.local().http = None
@@ -90,7 +102,13 @@ class OCIFlightRecorder(CustodianTestCore):
         self.addCleanup(cm.__exit__, None, None, None)
         return SessionFactory()
 
-    def oci_session_factory(self, test_class, test_case):
+    def _extract_caller(self):
+        caller = inspect.currentframe().f_back.f_back
+        return (caller.f_locals["self"].__class__.__name__, caller.f_code.co_name)
+
+    def oci_session_factory(self, test_class=None, test_case=None):
+        if not test_class or not test_case:
+            test_class, test_case = self._extract_caller()
         if not C7N_FUNCTIONAL and self._cassette_file_exists(test_class, test_case):
             return self.replay_flight_data(test_class, test_case)
         else:
@@ -107,6 +125,7 @@ class OCIFlightRecorder(CustodianTestCore):
 
     def _get_mock_triples(self):
         import oci.base_client as ocibase
+        import oci._vendor.urllib3.connectionpool as conn
 
         mock_triples = (
             (ocibase, "OCIConnectionPool", requests_stubs.VCROCIConnectionPool),
@@ -115,6 +134,8 @@ class OCIFlightRecorder(CustodianTestCore):
                 "ConnectionCls",
                 requests_stubs.VCROCIConnection,
             ),
+            (conn.HTTPConnectionPool, "ConnectionCls", requests_stubs.VCRHTTPConnection),
+            (conn.HTTPSConnectionPool, "ConnectionCls", requests_stubs.VCRHTTPSConnection),
         )
         return mock_triples
 

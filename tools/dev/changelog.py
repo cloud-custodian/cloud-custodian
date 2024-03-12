@@ -6,7 +6,7 @@ import docker
 import json
 
 from collections import defaultdict
-from distutils import version
+from c7n.vendored.distutils import version
 from datetime import datetime, timedelta
 from dateutil.tz import tzoffset, tzutc
 from dateutil.parser import parse as parse_date
@@ -105,7 +105,7 @@ def link(provider='aws', resource=None, category=None, element=None):
         raise ValueError()
 
 
-def schema_diff(schema_old, schema_new):
+def schema_diff(schema_old, schema_new, skip_provider=()):
     def listify(items, bt=True):
         if bt:
             return ", ".join([f'`{i}`' for i in items])
@@ -115,6 +115,8 @@ def schema_diff(schema_old, schema_new):
     out = []
     resources_map = defaultdict(dict)
     for provider in schema_new:
+        if provider in skip_provider:
+            continue
         resources_old = schema_old.get(provider, [])
         resources_new = schema_new[provider]
         for resource in sorted(set(list(resources_old) + list(resources_new))):
@@ -194,8 +196,9 @@ def get_last_release(repo):
 @click.option('--output', required=True)
 @click.option('--since')
 @click.option('--end')
+@click.option('--skip-provider', multiple=True)
 @click.option('--user', multiple=True)
-def main(path, output, since, end, user):
+def main(path, output, since, end, user, skip_provider):
     repo = pygit2.Repository(path)
     if since in ('latest', 'current', 'last'):
         since = get_last_release(repo)
@@ -257,7 +260,7 @@ def main(path, output, since, end, user):
         schema_old = schema_outline_from_docker(since)
         load_available()
         schema_new = resource_outline()
-        diff_md = schema_diff(schema_old, schema_new)
+        diff_md = schema_diff(schema_old, schema_new, skip_provider)
 
     with open(output, 'w') as fh:
         for k in sorted(groups):

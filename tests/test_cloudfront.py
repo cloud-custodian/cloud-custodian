@@ -873,3 +873,21 @@ class CloudFrontWafV2(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 2)
+
+    def test_wafv2_value(self):
+        factory = self.replay_flight_data("test_distribution_wafv2_value")
+        p = self.load_policy(
+            {
+                "name": "wafv2-value-cfront",
+                "resource": "distribution",
+                "filters": [{
+                    "type": "wafv2-enabled",
+                    "key": "length(Rules)",
+                    "op": "gte",
+                    "value": 1
+                }]
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)

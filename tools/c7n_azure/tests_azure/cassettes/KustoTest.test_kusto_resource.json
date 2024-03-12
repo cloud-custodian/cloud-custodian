@@ -1,0 +1,138 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Kusto/clusters?api-version=2022-02-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "date": [
+                        "Wed, 15 Jun 2022 11:04:15 GMT"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-resource-requests": [
+                        "299"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "content-length": [
+                        "2502"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/324-rg-red/providers/Microsoft.Kusto/Clusters/kusto324red",
+                                "name": "kusto324red",
+                                "type": "Microsoft.Kusto/Clusters",
+                                "etag": "\"2022-06-15T10:37:25.9700129Z\"",
+                                "location": "East US",
+                                "sku": {
+                                    "name": "Standard_D13_v2",
+                                    "tier": "Standard",
+                                    "capacity": 2
+                                },
+                                "tags": {
+                                    "ComplianceStatus": "Red",
+                                    "CustodianRule": "epam-azure-324-data_explorer_double_encryption"
+                                },
+                                "properties": {
+                                    "state": "Running",
+                                    "stateReason": null,
+                                    "uri": "https://kusto324red.eastus.kusto.windows.net",
+                                    "dataIngestionUri": "https://ingest-kusto324red.eastus.kusto.windows.net",
+                                    "trustedExternalTenants": [],
+                                    "virtualNetworkConfiguration": null,
+                                    "optimizedAutoscale": null,
+                                    "enableDiskEncryption": false,
+                                    "enableStreamingIngest": false,
+                                    "keyVaultProperties": null,
+                                    "languageExtensions": {
+                                        "value": []
+                                    },
+                                    "enablePurge": false,
+                                    "enableDoubleEncryption": false,
+                                    "engineType": "V2",
+                                    "acceptedAudiences": [],
+                                    "restrictOutboundNetworkAccess": "Disabled",
+                                    "allowedFqdnList": [],
+                                    "publicNetworkAccess": "Enabled",
+                                    "allowedIpRangeList": [],
+                                    "enableAutoStop": true,
+                                    "publicIPType": "IPv4",
+                                    "virtualClusterGraduationProperties": null,
+                                    "privateEndpointConnections": [],
+                                    "provisioningState": "Succeeded"
+                                },
+                                "identity": {
+                                    "tenantId": "00000000-0000-0000-0000-000000000003",
+                                    "type": "None"
+                                }
+                            },
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/324-rg-green/providers/Microsoft.Kusto/Clusters/kusto324green",
+                                "name": "kusto324green",
+                                "type": "Microsoft.Kusto/Clusters",
+                                "etag": "\"2022-06-15T10:37:56.7079228Z\"",
+                                "location": "East US",
+                                "sku": {
+                                    "name": "Standard_D13_v2",
+                                    "tier": "Standard",
+                                    "capacity": 2
+                                },
+                                "tags": {
+                                    "ComplianceStatus": "Green",
+                                    "CustodianRule": "epam-azure-324-data_explorer_double_encryption"
+                                },
+                                "properties": {
+                                    "state": "Running",
+                                    "stateReason": null,
+                                    "uri": "https://kusto324green.eastus.kusto.windows.net",
+                                    "dataIngestionUri": "https://ingest-kusto324green.eastus.kusto.windows.net",
+                                    "trustedExternalTenants": [],
+                                    "virtualNetworkConfiguration": null,
+                                    "optimizedAutoscale": null,
+                                    "enableDiskEncryption": false,
+                                    "enableStreamingIngest": false,
+                                    "keyVaultProperties": null,
+                                    "languageExtensions": {
+                                        "value": []
+                                    },
+                                    "enablePurge": false,
+                                    "enableDoubleEncryption": true,
+                                    "engineType": "V2",
+                                    "acceptedAudiences": [],
+                                    "restrictOutboundNetworkAccess": "Disabled",
+                                    "allowedFqdnList": [],
+                                    "publicNetworkAccess": "Enabled",
+                                    "allowedIpRangeList": [],
+                                    "enableAutoStop": true,
+                                    "publicIPType": "IPv4",
+                                    "virtualClusterGraduationProperties": null,
+                                    "privateEndpointConnections": [],
+                                    "provisioningState": "Succeeded"
+                                },
+                                "identity": {
+                                    "tenantId": "00000000-0000-0000-0000-000000000003",
+                                    "type": "None"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}

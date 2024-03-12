@@ -7,7 +7,7 @@ import random
 import re
 import zlib
 from typing import List
-from distutils.version import LooseVersion
+from c7n.vendored.distutils.version import LooseVersion
 
 import botocore
 from botocore.exceptions import ClientError
@@ -20,9 +20,10 @@ from c7n.actions import (
 
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import (
-    FilterRegistry, AgeFilter, ValueFilter, Filter, DefaultVpcBase
+    FilterRegistry, AgeFilter, ValueFilter, Filter
 )
 from c7n.filters.offhours import OffHour, OnHour
+from c7n.filters.costhub import CostHubRecommendation
 import c7n.filters.vpc as net_filters
 
 from c7n.manager import resources
@@ -40,6 +41,22 @@ actions = ActionRegistry('ec2.actions')
 
 
 class DescribeEC2(query.DescribeSource):
+
+    def get_query_params(self, query_params):
+        queries = QueryFilter.parse(self.manager.data.get('query', []))
+        qf = []
+        for q in queries:
+            qd = q.query()
+            found = False
+            for f in qf:
+                if qd['Name'] == f['Name']:
+                    f['Values'].extend(qd['Values'])
+                    found = True
+            if not found:
+                qf.append(qd)
+        query_params = query_params or {}
+        query_params['Filters'] = qf
+        return query_params
 
     def augment(self, resources):
         """EC2 API and AWOL Tags
@@ -90,7 +107,7 @@ class DescribeEC2(query.DescribeSource):
 
         m = self.manager.get_model()
         for r in resources:
-            r['Tags'] = resource_tags.get(r[m.id], ())
+            r['Tags'] = resource_tags.get(r[m.id], [])
         return resources
 
 
@@ -130,38 +147,11 @@ class EC2(query.QueryResourceManager):
         'config': query.ConfigSource
     }
 
-    def __init__(self, ctx, data):
-        super(EC2, self).__init__(ctx, data)
-        self.queries = QueryFilter.parse(self.data.get('query', []))
-
-    def resources(self, query=None):
-        q = self.resource_query()
-        if q is not None:
-            query = query or {}
-            query['Filters'] = q
-        return super(EC2, self).resources(query=query)
-
-    def resource_query(self):
-        qf = []
-        qf_names = set()
-        # allow same name to be specified multiple times and append the queries
-        # under the same name
-        for q in self.queries:
-            qd = q.query()
-            if qd['Name'] in qf_names:
-                for qf in qf:
-                    if qd['Name'] == qf['Name']:
-                        qf['Values'].extend(qd['Values'])
-            else:
-                qf_names.add(qd['Name'])
-                qf.append(qd)
-        return qf
-
 
 @filters.register('security-group')
 class SecurityGroupFilter(net_filters.SecurityGroupFilter):
 
-    RelatedIdsExpression = "SecurityGroups[].GroupId"
+    RelatedIdsExpression = "NetworkInterfaces[].Groups[].GroupId"
 
 
 @filters.register('subnet')
@@ -733,7 +723,7 @@ class InstanceAgeFilter(AgeFilter):
 
 
 @filters.register('default-vpc')
-class DefaultVpc(DefaultVpcBase):
+class DefaultVpc(net_filters.DefaultVpcBase):
     """ Matches if an ec2 database is in the default vpc
     """
 
@@ -1330,7 +1320,7 @@ class Resize(BaseAction):
     """Change an instance's size.
 
     An instance can only be resized when its stopped, this action
-    can optionally restart an instance if needed to effect the instance
+    can optionally stop/start an instance if needed to effect the instance
     type change. Instances are always left in the run state they were
     found in.
 
@@ -1339,6 +1329,24 @@ class Resize(BaseAction):
     hvm/pv, and ebs optimization at minimum.
 
     http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-resize.html
+
+    This action also has specific support for enacting recommendations
+    from the AWS Cost Optimization Hub for resizing.
+
+    :example:
+
+      .. code-block:: yaml
+
+         policies:
+           - name: ec2-rightsize
+             resource: aws.ec2
+             filters:
+               - type: cost-optimization
+                 attrs:
+                  - actionType: Rightsize
+             actions:
+               - resize
+
     """
 
     schema = type_schema(
@@ -1372,27 +1380,26 @@ class Resize(BaseAction):
                 self.log.exception(
                     "Exception stopping instances for resize:\n %s" % e)
 
+        client = utils.local_session(self.manager.session_factory).client('ec2')
+
         for instance_set in utils.chunks(itertools.chain(
                 stopped_instances, running_instances), 20):
-            self.process_resource_set(instance_set)
+            self.process_resource_set(instance_set, client)
 
         if self.data.get('restart') and running_instances:
             client.start_instances(
                 InstanceIds=[i['InstanceId'] for i in running_instances])
         return list(itertools.chain(stopped_instances, running_instances))
 
-    def process_resource_set(self, instance_set):
-        type_map = self.data.get('type-map')
-        default_type = self.data.get('default')
-
-        client = utils.local_session(
-            self.manager.session_factory).client('ec2')
+    def process_resource_set(self, instance_set, client):
 
         for i in instance_set:
+            new_type = self.get_target_instance_type(i)
             self.log.debug(
-                "resizing %s %s" % (i['InstanceId'], i['InstanceType']))
-            new_type = type_map.get(i['InstanceType'], default_type)
-            if new_type == i['InstanceType']:
+                "resizing %s %s -> %s" % (i['InstanceId'], i['InstanceType'], new_type)
+            )
+
+            if not new_type or new_type == i['InstanceType']:
                 continue
             try:
                 client.modify_instance_attribute(
@@ -1402,6 +1409,14 @@ class Resize(BaseAction):
                 self.log.exception(
                     "Exception resizing instance:%s new:%s old:%s \n %s" % (
                         i['InstanceId'], new_type, i['InstanceType'], e))
+
+    def get_target_instance_type(self, i):
+        optimizer_recommend = i.get(CostHubRecommendation.annotation_key)
+        if optimizer_recommend and optimizer_recommend['actionType'] == 'Rightsize':
+            return optimizer_recommend['recommendedResourceSummary']
+        type_map = self.data.get('type-map', {})
+        default_type = self.data.get('default')
+        return type_map.get(i['InstanceType'], default_type)
 
 
 @actions.register('stop')
@@ -2231,6 +2246,12 @@ class LaunchTemplate(query.QueryResourceManager):
                         'LaunchTemplateVersions', ()))
         return template_versions
 
+    def get_arns(self, resources):
+        arns = []
+        for r in resources:
+            arns.append(self.generate_arn(f"{r['LaunchTemplateId']}/{r['VersionNumber']}"))
+        return arns
+
     def get_resources(self, rids, cache=True):
         # Launch template versions have a compound primary key
         #
@@ -2479,3 +2500,22 @@ class HasSpecificManagedPolicy(SpecificIamProfileManagedPolicy):
                 results.append(r)
 
         return results
+
+
+@resources.register('ec2-capacity-reservation')
+class CapacityReservation(query.QueryResourceManager):
+    """Custodian resource for managing EC2 Capacity Reservation.
+    """
+
+    class resource_type(query.TypeInfo):
+        name = id = 'CapacityReservationId'
+        service = 'ec2'
+        enum_spec = ('describe_capacity_reservations',
+                     'CapacityReservations', None)
+
+        id_prefix = 'cr-'
+        arn = "CapacityReservationArn"
+        filter_name = 'CapacityReservationIds'
+        filter_type = 'list'
+        cfn_type = 'AWS::EC2::CapacityReservation'
+        permissions_enum = ('ec2:DescribeCapacityReservations',)

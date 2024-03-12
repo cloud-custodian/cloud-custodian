@@ -1,0 +1,18 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "virtualGateways": [
+            {
+                "arn": "arn:aws:appmesh:eu-west-2:123456789012:mesh/m1/virtualGateway/g2",
+                "createdAt": "2023-11-03T02:36:27.877000+00:00",
+                "lastUpdatedAt": "2023-11-03T02:36:27.877000+00:00",
+                "meshName": "m1",
+                "meshOwner": "644160558196",
+                "resourceOwner": "644160558196",
+                "version": 1,
+                "virtualGatewayName": "g2"
+            }
+        ]
+    }
+}

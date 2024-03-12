@@ -233,7 +233,6 @@ class RetentionWindow(BaseAction):
         current_retention = int(cluster.get('BackupRetentionPeriod', 0))
         new_retention = self.data['days']
         retention_type = self.data.get('enforce', 'min').lower()
-
         if retention_type == 'min':
             self.set_retention_window(
                 client, cluster, max(current_retention, new_retention))
@@ -244,14 +243,22 @@ class RetentionWindow(BaseAction):
             self.set_retention_window(client, cluster, new_retention)
 
     def set_retention_window(self, client, cluster, retention):
+        params = dict(
+            DBClusterIdentifier=cluster['DBClusterIdentifier'],
+            BackupRetentionPeriod=retention
+        )
+        if cluster.get('EngineMode') != 'serverless':
+            params.update(
+                dict(
+                    PreferredBackupWindow=cluster['PreferredBackupWindow'],
+                    PreferredMaintenanceWindow=cluster['PreferredMaintenanceWindow'])
+            )
         _run_cluster_method(
             client.modify_db_cluster,
-            dict(DBClusterIdentifier=cluster['DBClusterIdentifier'],
-                 BackupRetentionPeriod=retention,
-                 PreferredBackupWindow=cluster['PreferredBackupWindow'],
-                 PreferredMaintenanceWindow=cluster['PreferredMaintenanceWindow']),
+            params,
             (client.exceptions.DBClusterNotFoundFault, client.exceptions.ResourceNotFoundFault),
-            client.exceptions.InvalidDBClusterStateFault)
+            client.exceptions.InvalidDBClusterStateFault
+        )
 
 
 @RDSCluster.action_registry.register('stop')
@@ -708,4 +715,48 @@ class ClusterParameterFilter(ParameterFilter):
                 resource.setdefault(self.policy_annotation, []).append(
                     self.data.get('key'))
                 results.append(resource)
+        return results
+
+
+@RDSCluster.filter_registry.register('pending-maintenance')
+class PendingMaintenance(Filter):
+    """
+    Scan DB Clusters for those with pending maintenance
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: rds-cluster-pending-maintenance
+                resource: rds-cluster
+                filters:
+                  - pending-maintenance
+                  - type: value
+                    key: '"c7n:PendingMaintenance".PendingMaintenanceActionDetails[].Action'
+                    op: intersect
+                    value:
+                      - system-update
+    """
+
+    annotation_key = 'c7n:PendingMaintenance'
+    schema = type_schema('pending-maintenance')
+    permissions = ('rds:DescribePendingMaintenanceActions',)
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('rds')
+
+        results = []
+        resource_maintenances = {}
+        paginator = client.get_paginator('describe_pending_maintenance_actions')
+        for page in paginator.paginate():
+            for action in page['PendingMaintenanceActions']:
+                resource_maintenances.setdefault(action['ResourceIdentifier'], []).append(action)
+
+        for r in resources:
+            pending_maintenances = resource_maintenances.get(r['DBClusterArn'], [])
+            if len(pending_maintenances) > 0:
+                r[self.annotation_key] = pending_maintenances
+                results.append(r)
+
         return results

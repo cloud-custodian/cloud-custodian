@@ -50,7 +50,7 @@ class Element:
             self.log.warning(
                 "%s implicitly filtered %d of %d resources key:%s on %s",
                 self.type, len(results), resource_count, key_expr,
-                (', '.join(allowed_values)))
+                (', '.join(map(str, allowed_values))))
         return results
 
     def get_deprecations(self):

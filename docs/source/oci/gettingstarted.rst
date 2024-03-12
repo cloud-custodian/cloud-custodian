@@ -1,13 +1,11 @@
 .. _oci_gettingstarted:
 
-Getting Started (Alpha)
+Getting Started (Beta)
 =======================
 
-The Oracle Cloud Infrastructure (OCI) provider (Alpha) is an optional package. which can be installed to enable
+The Oracle Cloud Infrastructure (OCI) provider (Beta) is an optional package. which can be installed to enable
 writing policies which interact with OCI related resources.
 
-
-Alpha providers will potentially have non backwards compatible syntax changes to exposed policy language.
 
 
 .. _oci_install-custodian:
@@ -64,6 +62,21 @@ Then run the following command:
     oci setup config
 
 After the configuration is complete, Cloud Custodian will implicitly pick up your credentials when it runs.
+
+
+Instance Principal Authentication
+"""""""""""""""""""""""""""""""""
+
+Cloud custodian can also be run on an OCI instance to make use of instance principal auth.
+To enable authentication using instance principal, set the environment variable ``OCI_CLI_AUTH`` to ``instance_principal``.
+For e.g.
+
+.. code-block:: bash
+
+    export OCI_CLI_AUTH=instance_principal
+
+
+For more details on how to use instance principal auth please click `here <https://docs.oracle.com/en-us/iaas/Content/Identity/Tasks/callingservicesfrominstances.htm>`_.
 
 .. _oci_run-policy:
 

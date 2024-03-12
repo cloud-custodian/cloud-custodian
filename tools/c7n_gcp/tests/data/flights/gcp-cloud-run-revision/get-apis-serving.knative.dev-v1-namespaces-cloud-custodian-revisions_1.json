@@ -1,0 +1,123 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Tue, 04 Jul 2023 21:04:19 GMT",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "3836",
+    "-content-encoding": "gzip",
+    "content-location": "https://run.googleapis.com/apis/serving.knative.dev/v1/namespaces/gcp-lab-custodian/revisions?alt=json"
+  },
+  "body": {
+    "apiVersion": "serving.knative.dev/v1",
+    "kind": "RevisionList",
+    "items": [
+      {
+        "apiVersion": "serving.knative.dev/v1",
+        "kind": "Revision",
+        "metadata": {
+          "name": "hello-00001-nvq",
+          "namespace": "443732426401",
+          "selfLink": "/apis/serving.knative.dev/v1/namespaces/443732426401/revisions/hello-00001-nvq",
+          "uid": "8514da23-cd3d-40fd-8cd7-ab9a6884be49",
+          "resourceVersion": "AAX/r4Vs5fg",
+          "generation": 1,
+          "labels": {
+            "serving.knative.dev/route": "hello",
+            "serving.knative.dev/configuration": "hello",
+            "serving.knative.dev/configurationGeneration": "1",
+            "serving.knative.dev/service": "hello",
+            "serving.knative.dev/serviceUid": "02472fc4-3f7b-4d85-8b4a-2dc9865329a0",
+            "cloud.googleapis.com/location": "us-central1",
+            "run.googleapis.com/startupProbeType": "Default"
+          },
+          "annotations": {
+            "run.googleapis.com/client-name": "cloud-console",
+            "serving.knative.dev/creator": "yauhen_shaliou@epam.com",
+            "autoscaling.knative.dev/maxScale": "1",
+            "run.googleapis.com/operation-id": "52843c94-dc24-4d1a-8159-4c3140fa660a",
+            "run.googleapis.com/cpu-throttling": "true"
+          },
+          "ownerReferences": [
+            {
+              "apiVersion": "serving.knative.dev/v1",
+              "kind": "Configuration",
+              "name": "hello",
+              "uid": "f86d5722-f4c9-4810-a503-a6cbbd89a4f2",
+              "controller": true,
+              "blockOwnerDeletion": true
+            }
+          ],
+          "creationTimestamp": "2023-07-04T20:56:22.994938Z"
+        },
+        "spec": {
+          "containerConcurrency": 80,
+          "timeoutSeconds": 300,
+          "serviceAccountName": "443732426401-compute@developer.gserviceaccount.com",
+          "containers": [
+            {
+              "name": "hello-1",
+              "image": "us-docker.pkg.dev/cloudrun/container/hello@sha256:e9cad8c3f185bc7ef07d976e8f260e94de0d954bf25f91a992f6445c8abc0940",
+              "resources": {
+                "limits": {
+                  "cpu": "1000m",
+                  "memory": "512Mi"
+                }
+              },
+              "ports": [
+                {
+                  "name": "http1",
+                  "containerPort": 8080
+                }
+              ],
+              "startupProbe": {
+                "timeoutSeconds": 240,
+                "periodSeconds": 240,
+                "failureThreshold": 1,
+                "tcpSocket": {
+                  "port": 8080
+                }
+              }
+            }
+          ]
+        },
+        "status": {
+          "observedGeneration": 1,
+          "conditions": [
+            {
+              "type": "Ready",
+              "status": "True",
+              "lastTransitionTime": "2023-07-04T20:56:30.375931Z"
+            },
+            {
+              "type": "Active",
+              "status": "True",
+              "severity": "Info",
+              "lastTransitionTime": "2023-07-04T20:56:46.424089Z"
+            },
+            {
+              "type": "ContainerHealthy",
+              "status": "True",
+              "lastTransitionTime": "2023-07-04T20:56:30.299711Z"
+            },
+            {
+              "type": "ResourcesAvailable",
+              "status": "True",
+              "severity": "Error",
+              "lastTransitionTime": "2023-07-04T20:56:29.979159Z"
+            }
+          ],
+          "logUrl": "https://console.cloud.google.com/logs/viewer?project=gcp-lab-custodian&resource=cloud_run_revision/service_name/hello/revision_name/hello-00001-nvq&advancedFilter=resource.type%3D%22cloud_run_revision%22%0Aresource.labels.service_name%3D%22hello%22%0Aresource.labels.revision_name%3D%22hello-00001-nvq%22",
+          "imageDigest": "us-docker.pkg.dev/cloudrun/container/hello@sha256:e9cad8c3f185bc7ef07d976e8f260e94de0d954bf25f91a992f6445c8abc0940"
+        }
+      }
+    ]
+  }
+}
