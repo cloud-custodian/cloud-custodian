@@ -963,7 +963,14 @@ class ConfigRuleMode(LambdaMode):
     See `AWS Config <https://aws.amazon.com/config/>`_ for more details.
     """
     cfg_event = None
-    schema = utils.type_schema('config-rule', rinherit=LambdaMode.schema)
+    schema = utils.type_schema('config-rule',
+                               schedule={'enum': [
+                                   "One_Hour",
+                                   "Three_Hours",
+                                   "Six_Hours",
+                                   "Twelve_Hours",
+                                   "TwentyFour_Hours"]},
+                               rinherit=LambdaMode.schema)
 
     def validate(self):
         super(ConfigRuleMode, self).validate()
