@@ -635,13 +635,22 @@ class DeleteService(BaseAction):
         retry = get_retry(('Throttling',))
         for r in resources:
             try:
-                primary = [d for d in r['deployments']
-                           if d['status'] == 'PRIMARY'].pop()
-                if primary['desiredCount'] > 0:
+                desiredCount = 0
+
+                # Two different types of responses:
+                # Deployments would appear for normal services
+                # TaskSets would show for Blue/Green deployment
+                if 'deployments' in r:
+                    primary = [d for d in r['deployments'] if d['status'] == 'PRIMARY'].pop()
+                    desiredCount = primary.get('desiredCount', 0)
+                elif 'taskSets' in r:
+                    primary = [t for t in r['taskSets'] if t['status'] == 'PRIMARY'].pop()
+                    desiredCount = primary.get('computedDesiredCount', 0)
+
+                if desiredCount > 0:
                     retry(client.update_service,
-                          cluster=r['clusterArn'],
-                          service=r['serviceName'],
-                          desiredCount=0)
+                          cluster=r['clusterArn'], service=r['serviceName'], desiredCount=0)
+
                 retry(client.delete_service,
                       cluster=r['clusterArn'], service=r['serviceName'])
             except ClientError as e:

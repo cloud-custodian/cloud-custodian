@@ -383,6 +383,37 @@ class TestEcsService(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["serviceName"], "c7n-test")
 
+    def test_ecs_service_taskset_delete(self):
+        session_factory = self.replay_flight_data("test_ecs_service_taskset_delete")
+        p = self.load_policy(
+            {
+                "name": "test-ecs-service-taskset-delete",
+                "resource": "ecs-service",
+                "filters": [{"serviceName": "test-task-set-delete"}],
+                "actions": ["delete"],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+
+        # Remove duplicate response
+        unique_services = {svc['serviceArn']: svc for svc in resources}.values()
+        self.assertEqual(len(unique_services), 1)
+        svc = resources.pop()
+        self.assertEqual(svc["serviceName"], "test-task-set-delete")
+        if self.recording:
+            time.sleep(1)
+        client = session_factory().client("ecs")
+        svc_current = client.describe_services(
+            cluster=svc["clusterArn"], services=[svc["serviceName"]]
+        )[
+            "services"
+        ][
+            0
+        ]
+        self.assertEqual(svc_current["serviceArn"], svc["serviceArn"])
+        self.assertNotEqual(svc_current["status"], svc["status"])
+
 
 class TestEcsTaskDefinition(BaseTest):
 

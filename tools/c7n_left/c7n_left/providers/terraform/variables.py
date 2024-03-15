@@ -61,10 +61,11 @@ class VariableResolver:
 
     def _write_file_content(self, content, suffix=".tfvars"):
         fh = tempfile.NamedTemporaryFile(
-            dir=self.source_dir, prefix="c7n-left-", suffix=suffix, mode="w+"
+            dir=self.source_dir, prefix="c7n-left-", suffix=suffix, mode="w+", delete=False
         )
         fh.write(content)
         fh.flush()
+        fh.close()
         self.temp_files.append(fh)
         return fh
 
@@ -84,6 +85,7 @@ class VariableResolver:
         finally:
             for t in self.temp_files:
                 t.close()
+                os.unlink(t.name)
 
     def get_uninitialized_var_files(self):
         # functions that operate on unknown values will typically result in
