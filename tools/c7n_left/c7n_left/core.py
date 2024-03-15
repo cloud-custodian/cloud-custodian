@@ -10,7 +10,7 @@ import os
 from c7n.actions import ActionRegistry
 from c7n.cache import NullCache
 from c7n.config import Config
-from c7n.filters import FilterRegistry
+from c7n.filters import FilterRegistry, ValueFilter
 from c7n.manager import ResourceManager
 
 from c7n.provider import Provider, clouds
@@ -336,8 +336,20 @@ class PolicyResourceResult:
         }
 
 
+class LeftValueFilter(ValueFilter):
+    def get_resource_value(self, k, i):
+        if k.startswith('tag:') and 'tags' in i:
+            tk = k.split(':', 1)[1]
+            r = (i.get('tags') or {}).get(tk)
+            return r
+        return super().get_resource_value(k, i)
+
+
 class IACResourceManager(ResourceManager):
     filter_registry = FilterRegistry("iac.filters")
+    filter_registry.register('value', LeftValueFilter)
+    filter_registry.value_filter_class = LeftValueFilter
+
     action_registry = ActionRegistry("iac.actions")
     log = log
 
