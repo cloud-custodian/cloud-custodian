@@ -1,0 +1,49 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "ResourceRecordSets": [
+            {
+                "Name": "subdomain.example.com.",
+                "Type": "NS",
+                "TTL": 172800,
+                "ResourceRecords": [
+                    {
+                        "Value": "ns-1536.awsdns-00.co.uk."
+                    },
+                    {
+                        "Value": "ns-0.awsdns-00.com."
+                    },
+                    {
+                        "Value": "ns-1024.awsdns-00.org."
+                    },
+                    {
+                        "Value": "ns-512.awsdns-00.net."
+                    }
+                ]
+            },
+            {
+                "Name": "subdomain.example.com.",
+                "Type": "SOA",
+                "TTL": 900,
+                "ResourceRecords": [
+                    {
+                        "Value": "ns-1536.awsdns-00.co.uk. awsdns-hostmaster.amazon.com. 1 7200 900 1209600 86400"
+                    }
+                ]
+            },
+            {
+                "Name": "mail.subdomain.example.com.",
+                "Type": "CNAME",
+                "TTL": 300,
+                "ResourceRecords": [
+                    {
+                        "Value": "mailserver01.subdomain.example.com."
+                    }
+                ]
+            }
+        ],
+        "IsTruncated": false,
+        "MaxItems": "100"
+    }
+}

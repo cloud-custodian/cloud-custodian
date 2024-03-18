@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "c7n"
-version = "0.9.34"
+version = "0.9.35"
 description = "Cloud Custodian - Policy Rules Engine"
 authors = ["Cloud Custodian Project"]
 readme = "README.md"
@@ -24,10 +24,6 @@ custodian = 'c7n.cli:main'
 [tool.poetry.dependencies]
 python = "^3.8"
 boto3 = "^1.12.31"
-# set an upper bound on urllib3 to avoid long dependency resolution times
-# botocore accepts a narrow range of urllib3 versions, while packages
-# like docker/requests/twine are happy with 2.0.
-urllib3 = "<2.0"
 jsonschema = ">=4.18"
 argcomplete = ">=1.12.3"
 python-dateutil = "^2.8.2"
@@ -35,6 +31,9 @@ pyyaml = ">=5.4.0"
 tabulate = "^0.9.0"
 importlib-metadata = "^6.0"
 docutils = ">=0.18, <0.19"
+# temporary work around for 
+# https://github.com/cloud-custodian/poetry-plugin-freeze/issues/18
+urllib3 = "<2"
 # temporary work around for
 # https://github.com/p1c2u/jsonschema-path/issues/98
 # which gets pulled in via moto

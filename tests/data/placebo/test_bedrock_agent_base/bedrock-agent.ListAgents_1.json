@@ -1,0 +1,38 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "agentSummaries": [
+            {
+                "agentId": "64XULLPD7A",
+                "agentName": "c7n-test",
+                "agentStatus": "PREPARED",
+                "updatedAt": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 2,
+                    "day": 15,
+                    "hour": 11,
+                    "minute": 2,
+                    "second": 53,
+                    "microsecond": 404185
+                }
+            },
+            {
+                "agentId": "VSSMEX8G6W",
+                "agentName": "c7n-test-2",
+                "agentStatus": "NOT_PREPARED",
+                "updatedAt": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 2,
+                    "day": 26,
+                    "hour": 17,
+                    "minute": 15,
+                    "second": 29,
+                    "microsecond": 891238
+                }
+            }
+        ]
+    }
+}
