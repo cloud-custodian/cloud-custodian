@@ -23,7 +23,7 @@ from c7n.filters import Filter, FilterValidationError, ValueFilter
 from c7n.filters.core import PolicyValidationError
 from c7n.filters.related import RelatedResourceFilter
 from c7n.filters.offhours import OffHour, OnHour, Time
-from c7n.utils import chunks, get_annotation_prefix, type_schema
+from c7n.utils import chunks, get_annotation_prefix, type_schema, get_retry
 
 scalar_ops = {
     'eq': operator.eq,
@@ -999,7 +999,8 @@ class CostFilter(ValueFilter):
 
         scope = '/subscriptions/' + subscription_id
 
-        query = client.query.usage(scope, definition)
+        retry = get_retry((429,))
+        query = retry(client.query.usage, scope, definition)
 
         if hasattr(query, '_derserializer'):
             original = query._derserializer._deserialize

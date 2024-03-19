@@ -25,6 +25,7 @@ from jmespath.parser import Parser, ParsedResult
 
 from c7n import config
 from c7n.exceptions import ClientError, PolicyValidationError
+from azure.core.exceptions import HttpResponseError
 
 # Try to play nice in a serverless environment, where we don't require yaml
 
@@ -467,6 +468,17 @@ def get_retry(retry_codes=(), max_attempts=8, min_delay=1, log_retries=False):
                         log_retries,
                         "retrying %s on error:%s attempt:%d last delay:%0.2f",
                         func, e.response['Error']['Code'], idx, delay)
+            except HttpResponseError as e:
+                if e.status_code in retry_codes:
+                    if idx == max_attempts - 1:
+                        raise
+                    if log_retries:
+                        retry_log.log(
+                            log_retries,
+                            "retrying %s on error:%s attempt:%d last delay:%0.2f",
+                            func, e.status_code, idx, delay)
+                else:
+                    raise
             time.sleep(delay)
     return _retry
 
