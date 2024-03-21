@@ -6,7 +6,6 @@ https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/resource-type-sch
 
 """
 
-
 import json
 from io import BytesIO
 from pathlib import Path
