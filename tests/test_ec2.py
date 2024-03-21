@@ -587,6 +587,25 @@ class TestVolumeFilter(BaseTest):
 
 class TestResizeInstance(BaseTest):
 
+    def test_ec2_resize_cost_hub(self):
+        factory = self.replay_flight_data("test_ec2_costhub_resize", region="us-east-2")
+        policy = self.load_policy(
+            {"name": "ec2-hub-resize",
+             "resource": "ec2",
+             "filters": ["cost-optimization"],
+             "actions": ["resize"]},
+            config={"region": "us-east-2"},
+            session_factory=factory
+        )
+
+        client = factory().client('ec2', region_name='us-east-2')
+        resources = policy.run()
+        assert len(resources) == 1
+        instances = utils.query_instances(
+            None, client=client, InstanceIds=[r["InstanceId"] for r in resources]
+        )
+        assert resources[0]["InstanceType"] != instances[0]["InstanceType"]
+
     def test_ec2_resize(self):
         # preconditions - three instances (2 m4.4xlarge, 1 m4.1xlarge)
         # one of the instances stopped
@@ -2381,3 +2400,19 @@ class TestEc2HasSpecificManagedPolicyFilter(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
+
+class TestCapacityReservation(BaseTest):
+
+    def test_capacity_reservation_query(self):
+        factory = self.replay_flight_data('test_ec2_capacity_reservation_query')
+        p = self.load_policy(
+                {
+                    'name': 'list-ec2-capacity-reservation',
+                    'resource': 'aws.ec2-capacity-reservation'
+                },
+                session_factory=factory,
+                config={'region': 'ap-southeast-1'}
+            )
+        resources = p.run()
+        self.assertEqual(len(resources), 2)

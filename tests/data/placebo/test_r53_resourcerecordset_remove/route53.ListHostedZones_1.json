@@ -1,0 +1,19 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "HostedZones": [
+            {
+                "Id": "/hostedzone/Z0703663WE3WTQ3FAPIF",
+                "Name": "subdomain.example.com.",
+                "CallerReference": "1560",
+                "Config": {
+                    "PrivateZone": true
+                },
+                "ResourceRecordSetCount": 4
+            }
+        ],
+        "IsTruncated": false,
+        "MaxItems": "100"
+    }
+}

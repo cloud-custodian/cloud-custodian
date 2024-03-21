@@ -1,0 +1,27 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:appmesh:eu-west-2:123456789012:mesh/m1/virtualGateway/g1",
+                "Tags": [
+                    {
+                        "Key": "MyTagName",
+                        "Value": "m1/g1"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:appmesh:eu-west-2:123456789012:mesh/m1/virtualGateway/g2",
+                "Tags": [
+                    {
+                        "Key": "MyTagName",
+                        "Value": "m1/g2"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

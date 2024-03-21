@@ -38,3 +38,31 @@ class FrontDoorTest(BaseTest):
         })
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
+
+class FrontDoorFirewallPolicyFilterTest(BaseTest):
+
+    def test_query(self):
+        p = self.load_policy(
+            {
+                "name": "test-front-door-resource",
+                "resource": "azure.front-door",
+                "filters": [
+                    {
+                        "type": "firewall-policy",
+                        "attrs": [
+                            {
+                                "type": "value",
+                                "key": "properties.managedRules.managedRuleSets[].ruleSetType",
+                                "value": "Microsoft_DefaultRuleSet",
+                                "op": "contains"
+                            }
+                        ]
+                    }
+                ],
+            }
+        )
+        resources = p.run()
+
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['name'], 'vvtestfd2')

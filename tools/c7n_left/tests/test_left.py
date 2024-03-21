@@ -3,9 +3,12 @@
 #
 import json
 import os
-import subprocess
 from pathlib import Path
-from unittest.mock import ANY
+import re
+import subprocess
+import sys
+from unittest.mock import ANY, patch
+
 from urllib.request import urlopen
 import xml.etree.ElementTree as etree
 
@@ -38,10 +41,11 @@ terraform_dir = Path(__file__).parent.parent.parent.parent / "tests" / "terrafor
 terraform_dir = terraform_dir.relative_to(cur_dir)
 
 
-class ResultsReporter:
+class ResultsReporter(output.Output):
     def __init__(self):
         self.results = []
         self.input_vars = {}
+        self.errors = []
 
     def on_execution_started(self, policies, graph):
         pass
@@ -51,6 +55,9 @@ class ResultsReporter:
 
     def on_policy_start(self, policy, event):
         pass
+
+    def on_policy_error(self, exception, policy, rtype, resources):
+        self.errors.append((exception, policy, rtype, resources))
 
     def on_vars_discovered(self, var_type, var_map, var_path=None):
         var_key = var_path and "%s:%s" % (var_type, var_path) or var_type
@@ -281,7 +288,6 @@ resource "aws_cloudwatch_log_group" "bada" {
     exceptions_file.write_text(
         json.dumps({"policy": {"tagging": ["aws_cloudwatch_log_group.yada"]}})
     )
-    test.change_environment(PWD=str(policy_env.policy_dir.absolute()))
     policy_env.write_policy(
         {
             "name": "check-exceptions",
@@ -291,7 +297,7 @@ resource "aws_cloudwatch_log_group" "bada" {
                 {
                     "type": "value",
                     "value_from": {
-                        "url": "file://{env[PWD]}/exceptions/exceptions.json",
+                        "url": exceptions_file.as_uri(),
                         "expr": "policy.tagging",
                     },
                     "op": "not-in",
@@ -617,6 +623,32 @@ def test_graph_merge_function(policy_env):
     assert log_group["tags"] == {"Env": "Public", "Component": "application"}
 
 
+def test_null_tag_value(policy_env):
+    policy_env.write_tf(
+        """
+        variable app_tags {
+          type = map(string)
+        }
+        resource "aws_instance" "app" {
+          ami = "ami-123"
+          instance_type = "t4.medium"
+          tags = var.app_tags
+        }
+        """
+    )
+
+    policy_env.write_policy(
+        {
+            "name": "check-null-tags",
+            "resource": "terraform.aws_instance",
+            "filters": [{"tag:Env": "absent"}],
+        }
+    )
+
+    results = policy_env.run()
+    assert len(results) == 1
+
+
 def test_traverse_to_data(policy_env):
     policy_env.write_tf(
         """
@@ -866,10 +898,34 @@ def test_graph_var_file(tmp_path, var_tf_setup):
     assert resources[0][1][0]["load_balancer_type"] == "network"
 
 
+def test_cli_execution_error(policy_env, test, debug_cli_runner):
+    policy_env.write_tf(
+        """
+        resource "aws_cloudwatch_log_group" "yada" {
+          name = "Bar"
+        }
+        """
+    )
+
+    policy_env.write_policy(
+        {
+            "name": "check-error",
+            "resource": "terraform.aws_cloudwatch_log_group",
+        }
+    )
+
+    runner = debug_cli_runner
+    with patch.object(core.CollectionRunner, 'run_policy', side_effect=KeyError("abc")):
+        result = runner.invoke(
+            cli.cli, ["run", "-p", policy_env.policy_dir, "-d", policy_env.policy_dir]
+        )
+        assert result.exit_code == 1
+
+
 def test_cli_dump(policy_env, test, debug_cli_runner):
     (policy_env.policy_dir / "vars.tfvars").write_text('app = "riddle"')
     (policy_env.policy_dir / "vars2.tfvars").write_text('env = "dev"')
-    test.change_environment(TF_VAR_repo="cloud-custodian/cloud-custodian")
+    test.change_environment(TF_VAR_REPO="cloud-custodian/cloud-custodian")
 
     policy_env.write_tf(
         """
@@ -911,7 +967,7 @@ def test_cli_dump(policy_env, test, debug_cli_runner):
     assert result.exit_code == 0
     data = json.loads((policy_env.policy_dir / "output.json").read_text())
     assert data == {
-        "environment": {"repo": "cloud-custodian/cloud-custodian"},
+        "environment": {"REPO": "cloud-custodian/cloud-custodian"},
         "uninitialized": {"env": ""},
         "user:vars.tfvars": {"app": "riddle"},
     }
@@ -1279,6 +1335,49 @@ def test_cli_output_rich(tmp_path):
     assert "1 failed 2 passed" in result.output
 
 
+def test_cli_output_rich_warn_on_severity(tmp_path):
+    (tmp_path / "policy.json").write_text(
+        json.dumps(
+            {
+                "policies": [
+                    {
+                        "name": "check-medium-bucket",
+                        "resource": "terraform.aws_s3_bucket",
+                        "description": "a description",
+                        "metadata": {"severity": "medium"},
+                        "filters": [{"server_side_encryption_configuration": "absent"}],
+                    },
+                    {
+                        "name": "check-high-bucket",
+                        "resource": "terraform.aws_s3_bucket",
+                        "description": "something else",
+                        "metadata": {"severity": "high"},
+                        "filters": [{"server_side_encryption_configuration": "absent"}],
+                    },
+                ]
+            }
+        )
+    )
+    runner = CliRunner()
+    result = runner.invoke(
+        cli.cli,
+        [
+            "run",
+            "-p",
+            str(tmp_path),
+            "-d",
+            str(terraform_dir / "aws_s3_encryption_audit"),
+            "--warn-on",
+            "severity=medium",
+            "-o",
+            "cli",
+        ],
+    )
+    assert result.exit_code == 1
+    assert "Reason: something else\n" in result.output
+    assert "1 failed 2 passed" in result.output
+
+
 def test_cli_output_rich_warn_on(tmp_path):
     write_output_test_policy(tmp_path)
     runner = CliRunner()
@@ -1368,7 +1467,7 @@ def test_cli_output_rich_resource_summary(tmp_path):
 def test_cli_output_github(tmp_path):
     write_output_test_policy(tmp_path)
 
-    runner = CliRunner()
+    runner = CliRunner(charset=sys.platform == "win32" and "utf-16" or "utf-8")
     result = runner.invoke(
         cli.cli,
         [
@@ -1383,10 +1482,10 @@ def test_cli_output_github(tmp_path):
     )
     assert result.exit_code == 1
     expected = (
-        "::error file=tests/terraform/aws_s3_encryption_audit/main.tf,line=25,lineEnd=28,"
+        "::error file=tests.*?main.tf,line=25,lineEnd=28,"
         "title=terraform.aws_s3_bucket - policy:check-bucket category:test severity:unknown::a description"  # noqa
     )
-    assert expected in result.output
+    assert re.search(expected, result.output)
 
 
 def test_cli_output_json_query(tmp_path):
@@ -1413,7 +1512,7 @@ def test_cli_output_json_query(tmp_path):
     results = json.loads((tmp_path / "output.json").read_text())
     assert results == {
         "results": [
-            "tests/terraform/aws_s3_encryption_audit/main.tf",
+            str(Path("tests") / "terraform" / "aws_s3_encryption_audit" / "main.tf"),
         ]
     }
 
@@ -1450,7 +1549,7 @@ def test_cli_output_json(tmp_path):
             ],
             "file_line_end": 28,
             "file_line_start": 25,
-            "file_path": "tests/terraform/aws_s3_encryption_audit/main.tf",
+            "file_path": str(Path("tests") / "terraform" / "aws_s3_encryption_audit" / "main.tf"),
             "policy": {
                 "filters": [{"server_side_encryption_configuration": "absent"}],
                 "metadata": {"category": ["test"]},
@@ -1466,7 +1565,7 @@ def test_cli_output_json(tmp_path):
                     "line_end": 28,
                     "line_start": 25,
                     "path": "aws_s3_bucket.example_c",
-                    "src_dir": "tests/terraform/aws_s3_encryption_audit",
+                    "src_dir": str(Path("tests") / "terraform" / "aws_s3_encryption_audit"),
                     "type": "resource",
                 },
                 "acl": "private",
