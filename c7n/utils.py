@@ -967,6 +967,23 @@ def jmespath_search(*args, **kwargs):
     )
 
 
+def get_path(path: str, resource: dict):
+    """
+    This function provides a wrapper to obtain a value from a resource
+    in an efficient manner.
+    jmespath_search is expensive and it's rarely the case that
+    there is a path in the id field, therefore this wrapper is an optimisation.
+
+    :param path: the path or field name to fetch
+    :param resource: the resource instance description
+    :return: the field/path value
+    """
+    if '.' in path:
+        return jmespath_search(path, resource)
+    return resource[path]
+
+
+
 def jmespath_compile(expression):
     parsed = C7NJMESPathParser().parse(expression)
     return parsed

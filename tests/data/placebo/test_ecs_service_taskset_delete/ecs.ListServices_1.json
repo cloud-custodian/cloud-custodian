@@ -1,0 +1,10 @@
+{
+    "status_code": 200,
+    "data": {
+        "serviceArns": [
+            "arn:aws:ecs:us-east-1:644160558196:service/c7n-test-cluster/test",
+            "arn:aws:ecs:us-east-1:644160558196:service/c7n-test-cluster/c7n-test-service"
+        ],
+        "ResponseMetadata": {}
+    }
+}

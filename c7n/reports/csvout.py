@@ -43,7 +43,7 @@ from botocore.compat import OrderedDict
 from dateutil.parser import parse as date_parse
 
 from c7n.executor import ThreadPoolExecutor
-from c7n.utils import local_session, dumps, jmespath_search, jmespath_compile
+from c7n.utils import local_session, dumps, jmespath_search, jmespath_compile, get_path
 
 log = logging.getLogger('custodian.reports')
 
@@ -148,6 +148,15 @@ class Formatter:
 
     def __init__(self, resource_type, extra_fields=(), include_default_fields=True,
                  include_region=False, include_policy=False, fields=()):
+        """
+        :param resource_type: CloudCustodian model
+        :param extra_fields:  extra_fields=["headerName=fieldName", ...]
+        :param include_default_fields: True|False
+         if True then include the default fields (or the override of the default fields, below)
+        :param include_region: True|False
+        :param include_policy: True|False
+        :param fields: Override the "default" fields
+        """
 
         # Lookup default fields for resource type.
         model = resource_type
@@ -214,7 +223,7 @@ class Formatter:
                      self._date_field)
         if date_sort:
             records.sort(
-                key=lambda r: r[date_sort], reverse=reverse)
+                key=lambda r: get_path(date_sort, r), reverse=reverse)
 
         if unique:
             uniq = self.uniq_by_id(records)

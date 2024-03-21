@@ -3,17 +3,25 @@
     "data": {
         "PaginationToken": "",
         "ResourceTagMappingList": [
-        ],
-        "ResponseMetadata": {
-            "RequestId": "0c874750-2525-11e8-829d-43b5004a1f4b",
-            "HTTPStatusCode": 200,
-            "HTTPHeaders": {
-                "x-amzn-requestid": "0c874750-2525-11e8-829d-43b5004a1f4b",
-                "content-type": "application/x-amz-json-1.1",
-                "content-length": "174",
-                "date": "Sun, 11 Mar 2018 12:09:28 GMT"
+            {
+                "ResourceARN": "arn:aws:appmesh:eu-west-2:123456789012:mesh/m1/virtualGateway/g1",
+                "Tags": [
+                    {
+                        "Key": "MyTagName",
+                        "Value": "m1/g1"
+                    }
+                ]
             },
-            "RetryAttempts": 0
-        }
+            {
+                "ResourceARN": "arn:aws:appmesh:eu-west-2:123456789012:mesh/m1/virtualGateway/g2",
+                "Tags": [
+                    {
+                        "Key": "MyTagName",
+                        "Value": "m1/g2"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
     }
 }
