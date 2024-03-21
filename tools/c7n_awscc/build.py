@@ -17,7 +17,9 @@ import zipfile
 # boto is listed as a build dependency.
 import boto3
 
-SCHEMA_URL = "https://schema.cloudformation.us-east-1.amazonaws.com/CloudformationSchema.zip"
+SCHEMA_URL = (
+    "https://schema.cloudformation.us-east-1.amazonaws.com/CloudformationSchema.zip"
+)
 
 
 def fake_session():
