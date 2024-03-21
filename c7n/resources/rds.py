@@ -454,7 +454,9 @@ START_STOP_ELIGIBLE_ENGINES = {
     'postgres', 'sqlserver-ee',
     'oracle-se2', 'mariadb', 'oracle-ee',
     'sqlserver-ex', 'sqlserver-se', 'oracle-se',
-    'mysql', 'oracle-se1', 'sqlserver-web'}
+    'mysql', 'oracle-se1', 'sqlserver-web',
+    'db2-ae', 'db2-se', 'oracle-ee-cdb',
+    'sqlserver-ee', 'oracle-se2-cdb'}
 
 
 def _eligible_start_stop(db, state="available"):

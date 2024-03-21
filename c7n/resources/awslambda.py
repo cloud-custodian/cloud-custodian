@@ -933,7 +933,7 @@ class LambdaEdgeFilter(Filter):
     def get_lambda_cf_map(self):
         cfs = self.manager.get_resource_manager('distribution').resources()
         func_expressions = ('DefaultCacheBehavior.LambdaFunctionAssociations.Items',
-          'CacheBehaviors.LambdaFunctionAssociations.Items')
+          'CacheBehaviors.Items[].LambdaFunctionAssociations.Items[]')
         lambda_dist_map = {}
         for d in cfs:
             for exp in func_expressions:
@@ -941,7 +941,7 @@ class LambdaEdgeFilter(Filter):
                     for function in jmespath_search(exp, d):
                         # Geting rid of the version number in the arn
                         lambda_edge_arn = ':'.join(function['LambdaFunctionARN'].split(':')[:-1])
-                        lambda_dist_map.setdefault(lambda_edge_arn, []).append(d['Id'])
+                        lambda_dist_map.setdefault(lambda_edge_arn, set()).add(d['Id'])
         return lambda_dist_map
 
     def process(self, resources, event=None):
@@ -952,7 +952,7 @@ class LambdaEdgeFilter(Filter):
         lambda_edge_cf_map = self.get_lambda_cf_map()
         for r in resources:
             if (r['FunctionArn'] in lambda_edge_cf_map and self.data.get('state')):
-                r[annotation_key] = lambda_edge_cf_map.get(r['FunctionArn'])
+                r[annotation_key] = list(lambda_edge_cf_map.get(r['FunctionArn']))
                 results.append(r)
             elif (r['FunctionArn'] not in lambda_edge_cf_map and not self.data.get('state')):
                 results.append(r)
