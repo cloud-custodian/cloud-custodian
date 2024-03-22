@@ -17,9 +17,9 @@ from c7n.filters import Filter, FilterRegistry, ValueFilter
 from c7n.filters.kms import KmsRelatedFilter
 from c7n.filters.multiattr import MultiAttrFilter
 from c7n.filters.missing import Missing
-from c7n.manager import ResourceManager, resources
+from c7n.manager import resources
 from c7n.utils import local_session, type_schema, generate_arn, get_support_region, jmespath_search
-from c7n.query import QueryResourceManager, TypeInfo
+from c7n.query import QueryResourceManager, TypeInfo, DescribeSource
 from c7n.filters import ListItemFilter
 
 from c7n.resources.iam import CredentialReport
@@ -34,18 +34,25 @@ retry = staticmethod(QueryResourceManager.retry)
 filters.register('missing', Missing)
 
 
-def get_account(session_factory, config):
-    session = local_session(session_factory)
-    client = session.client('iam')
-    aliases = client.list_account_aliases().get(
-        'AccountAliases', ('',))
-    name = aliases and aliases[0] or ""
-    return {'account_id': config.account_id,
-            'account_name': name}
+class DescribeAccount(DescribeSource):
+
+    def get_account(self):
+        client = local_session(self.manager.session_factory).client("iam")
+        aliases = client.list_account_aliases().get(
+            'AccountAliases', ('',))
+        name = aliases and aliases[0] or ""
+        return {'account_id': self.manager.config.account_id,
+                'account_name': name}
+
+    def resources(self, query=None):
+        return [self.get_account()]
+
+    def get_resources(self, resource_ids):
+        return [self.get_account()]
 
 
 @resources.register('account')
-class Account(ResourceManager):
+class Account(QueryResourceManager):
 
     filter_registry = filters
     action_registry = actions
@@ -62,6 +69,10 @@ class Account(ResourceManager):
         # for posting config rule evaluations
         cfn_type = 'AWS::::Account'
 
+    source_mapping = {
+        'describe': DescribeAccount
+    }
+
     @classmethod
     def get_permissions(cls):
         return ('iam:ListAccountAliases',)
@@ -72,15 +83,6 @@ class Account(ResourceManager):
 
     def get_arns(self, resources):
         return ["arn:::{account_id}".format(**r) for r in resources]
-
-    def get_model(self):
-        return self.resource_type
-
-    def resources(self):
-        return self.filter_resources([get_account(self.session_factory, self.config)])
-
-    def get_resources(self, resource_ids):
-        return [get_account(self.session_factory, self.config)]
 
 
 @filters.register('credential')
@@ -2420,12 +2422,16 @@ class BedrockModelInvocationLogging(ListItemFilter):
         count_op={'$ref': '#/definitions/filters_common/comparison_operators'}
     )
     permissions = ('bedrock:GetModelInvocationLoggingConfiguration',)
+    annotation_key = 'c7n:BedrockModelInvocationLogging'
 
     def get_item_values(self, resource):
         item_values = []
         client = local_session(self.manager.session_factory).client('bedrock')
-        invocation_logging_config = client.get_model_invocation_logging_configuration()
-        item_values.append(invocation_logging_config['loggingConfig'])
+        invocation_logging_config = client \
+                .get_model_invocation_logging_configuration().get('loggingConfig')
+        if invocation_logging_config is not None:
+            item_values.append(invocation_logging_config)
+            resource[self.annotation_key] = invocation_logging_config
         return item_values
 
 

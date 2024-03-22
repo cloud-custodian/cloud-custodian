@@ -3,9 +3,12 @@
 #
 import json
 import os
-import subprocess
 from pathlib import Path
+import re
+import subprocess
+import sys
 from unittest.mock import ANY, patch
+
 from urllib.request import urlopen
 import xml.etree.ElementTree as etree
 
@@ -285,7 +288,6 @@ resource "aws_cloudwatch_log_group" "bada" {
     exceptions_file.write_text(
         json.dumps({"policy": {"tagging": ["aws_cloudwatch_log_group.yada"]}})
     )
-    test.change_environment(PWD=str(policy_env.policy_dir.absolute()))
     policy_env.write_policy(
         {
             "name": "check-exceptions",
@@ -295,7 +297,7 @@ resource "aws_cloudwatch_log_group" "bada" {
                 {
                     "type": "value",
                     "value_from": {
-                        "url": "file://{env[PWD]}/exceptions/exceptions.json",
+                        "url": exceptions_file.as_uri(),
                         "expr": "policy.tagging",
                     },
                     "op": "not-in",
@@ -923,7 +925,7 @@ def test_cli_execution_error(policy_env, test, debug_cli_runner):
 def test_cli_dump(policy_env, test, debug_cli_runner):
     (policy_env.policy_dir / "vars.tfvars").write_text('app = "riddle"')
     (policy_env.policy_dir / "vars2.tfvars").write_text('env = "dev"')
-    test.change_environment(TF_VAR_repo="cloud-custodian/cloud-custodian")
+    test.change_environment(TF_VAR_REPO="cloud-custodian/cloud-custodian")
 
     policy_env.write_tf(
         """
@@ -965,7 +967,7 @@ def test_cli_dump(policy_env, test, debug_cli_runner):
     assert result.exit_code == 0
     data = json.loads((policy_env.policy_dir / "output.json").read_text())
     assert data == {
-        "environment": {"repo": "cloud-custodian/cloud-custodian"},
+        "environment": {"REPO": "cloud-custodian/cloud-custodian"},
         "uninitialized": {"env": ""},
         "user:vars.tfvars": {"app": "riddle"},
     }
@@ -1465,7 +1467,7 @@ def test_cli_output_rich_resource_summary(tmp_path):
 def test_cli_output_github(tmp_path):
     write_output_test_policy(tmp_path)
 
-    runner = CliRunner()
+    runner = CliRunner(charset=sys.platform == "win32" and "utf-16" or "utf-8")
     result = runner.invoke(
         cli.cli,
         [
@@ -1480,10 +1482,10 @@ def test_cli_output_github(tmp_path):
     )
     assert result.exit_code == 1
     expected = (
-        "::error file=tests/terraform/aws_s3_encryption_audit/main.tf,line=25,lineEnd=28,"
+        "::error file=tests.*?main.tf,line=25,lineEnd=28,"
         "title=terraform.aws_s3_bucket - policy:check-bucket category:test severity:unknown::a description"  # noqa
     )
-    assert expected in result.output
+    assert re.search(expected, result.output)
 
 
 def test_cli_output_json_query(tmp_path):
@@ -1510,7 +1512,7 @@ def test_cli_output_json_query(tmp_path):
     results = json.loads((tmp_path / "output.json").read_text())
     assert results == {
         "results": [
-            "tests/terraform/aws_s3_encryption_audit/main.tf",
+            str(Path("tests") / "terraform" / "aws_s3_encryption_audit" / "main.tf"),
         ]
     }
 
@@ -1547,7 +1549,7 @@ def test_cli_output_json(tmp_path):
             ],
             "file_line_end": 28,
             "file_line_start": 25,
-            "file_path": "tests/terraform/aws_s3_encryption_audit/main.tf",
+            "file_path": str(Path("tests") / "terraform" / "aws_s3_encryption_audit" / "main.tf"),
             "policy": {
                 "filters": [{"server_side_encryption_configuration": "absent"}],
                 "metadata": {"category": ["test"]},
@@ -1563,7 +1565,7 @@ def test_cli_output_json(tmp_path):
                     "line_end": 28,
                     "line_start": 25,
                     "path": "aws_s3_bucket.example_c",
-                    "src_dir": "tests/terraform/aws_s3_encryption_audit",
+                    "src_dir": str(Path("tests") / "terraform" / "aws_s3_encryption_audit"),
                     "type": "resource",
                 },
                 "acl": "private",

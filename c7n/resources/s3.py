@@ -3789,7 +3789,7 @@ class BucketReplication(ListItemFilter):
     def get_item_values(self, b):
         client = bucket_client(local_session(self.manager.session_factory), b)
         # replication configuration is called in S3_AUGMENT_TABLE:
-        bucket_replication = b[self.annotation_key]
+        bucket_replication = b.get(self.annotation_key)
 
         rules = []
         if bucket_replication is not None:
