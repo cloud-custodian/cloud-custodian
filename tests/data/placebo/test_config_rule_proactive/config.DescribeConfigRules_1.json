@@ -1,0 +1,10 @@
+{
+    "status_code": 400,
+    "data": {
+        "Error": {
+            "Message": "The ConfigRule 'custodian-sg-modified' provided in the request is invalid. Please check the configRule name.",
+            "Code": "NoSuchConfigRuleException"
+        },
+        "ResponseMetadata": {}
+    }
+}
