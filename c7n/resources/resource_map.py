@@ -37,6 +37,7 @@ ResourceMap = {
   "aws.cache-subnet-group": "c7n.resources.elasticache.ElastiCacheSubnetGroup",
   "aws.catalog-portfolio": "c7n.resources.servicecatalog.CatalogPortfolio",
   "aws.catalog-product": "c7n.resources.servicecatalog.CatalogProduct",
+  "aws.catalog-provisioned-product": "c7n.resources.servicecatalog.CatalogProvisionedProduct",
   "aws.cfn": "c7n.resources.cfn.CloudFormation",
   "aws.cloud-directory": "c7n.resources.directory.CloudDirectory",
   "aws.cloudhsm-cluster": "c7n.resources.hsm.CloudHSMCluster",

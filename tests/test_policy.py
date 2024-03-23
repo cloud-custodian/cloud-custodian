@@ -644,7 +644,6 @@ class PolicyMetaLint(BaseTest):
             'AWS::SSM::PatchCompliance',
             'AWS::SageMaker::CodeRepository',
             'AWS::ServiceCatalog::CloudFormationProduct',
-            'AWS::ServiceCatalog::CloudFormationProvisionedProduct',
             'AWS::ShieldRegional::Protection',
             'AWS::WAF::RateBasedRule',
             'AWS::WAF::Rule',

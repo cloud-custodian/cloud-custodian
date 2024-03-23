@@ -2025,7 +2025,8 @@
     "Application": "arn:${Partition}:servicecatalog:${Region}:${Account}:/applications/${ApplicationId}",
     "AttributeGroup": "arn:${Partition}:servicecatalog:${Region}:${Account}:/attribute-groups/${AttributeGroupId}",
     "Portfolio": "arn:${Partition}:catalog:${Region}:${Account}:portfolio/${PortfolioId}",
-    "Product": "arn:${Partition}:catalog:${Region}:${Account}:product/${ProductId}"
+    "Product": "arn:${Partition}:catalog:${Region}:${Account}:product/${ProductId}",
+    "provisioned-product": "arn:${Partition}:servicecatalog:${Region}:${Account}:stack/${ProvisionedProductName}/${ProvisionedProductId}"
   },
   "servicediscovery": {
     "namespace": "arn:${Partition}:servicediscovery:${Region}:${Account}:namespace/${NamespaceId}",
