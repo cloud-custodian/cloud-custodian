@@ -38,7 +38,7 @@ class SessionFactory:
 
     policy_name = property(None, _set_policy_name)
 
-    def __call__(self, assume=True, region=None):
+    def __call__(self, assume=True, region=None, profile=None):
         if self.assume_role and assume:
             session = Session(profile_name=self.profile)
             session = assumed_session(
@@ -46,7 +46,7 @@ class SessionFactory:
                 region or self.region, self.external_id)
         else:
             session = Session(
-                region_name=region or self.region, profile_name=self.profile)
+                region_name=region or self.region, profile_name=profile or self.profile)
 
         return self.update(session)
 
