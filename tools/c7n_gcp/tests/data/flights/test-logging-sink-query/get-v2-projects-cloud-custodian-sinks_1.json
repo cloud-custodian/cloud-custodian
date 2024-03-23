@@ -1,0 +1,30 @@
+{
+  "headers": {
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Fri, 16 Apr 2021 10:12:24 GMT",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3-29=\":443\"; ma=2592000,h3-T051=\":443\"; ma=2592000,h3-Q050=\":443\"; ma=2592000,h3-Q046=\":443\"; ma=2592000,h3-Q043=\":443\"; ma=2592000,quic=\":443\"; ma=2592000; v=\"46,43\"",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "5108",
+    "-content-encoding": "gzip",
+    "content-location": "https://logging.googleapis.com/v2/projects/cloud-custodian/sinks?alt=json"
+  },
+  "body": {
+    "sinks": [
+      {
+        "name": "datasets_are_not_anon_or_pub_accessible",
+        "destination": "pubsub.googleapis.com/projects/cloud-custodian/topics/datasets_are_not_anon_or_pub_accessible",
+        "filter": "logName = \"projects/cloud-custodian/logs/cloudaudit.googleapis.com%2Factivity\" AND protoPayload.methodName = (\"datasetservice.insert\" OR \"google.iam.v1.IAMPolicy.SetIamPolicy\")",
+        "writerIdentity": "serviceAccount:cloud-logs@system.gserviceaccount.com",
+        "createTime": "2021-03-23T11:27:41.466865098Z",
+        "updateTime": "2021-03-23T11:27:41.466865098Z"
+      }
+    ]
+  }
+}
