@@ -1113,7 +1113,7 @@ class DomainNameRemediateTls(BaseAction):
         client = utils.local_session(
             self.manager.session_factory).client('apigateway')
         retryable = ('TooManyRequestsException', 'ConflictException')
-        retry = utils.get_retry(retryable, max_attempts=8)
+        retry = utils.get_retry(retryable, max_attempts=12)
 
         for r in resources:
             try:
@@ -1129,6 +1129,8 @@ class DomainNameRemediateTls(BaseAction):
                       )
             except ClientError as e:
                 if e.response['Error']['Code'] in retryable:
+                    # If APIGateway exceeds 12 retries, it will continue and never enforce securityPolicy due to the
+                    # "Updating" condition. Depending on requirement customer may want to raise the exception.
                     continue
 
 
