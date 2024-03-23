@@ -496,6 +496,36 @@ class SchemaTest(BaseTest):
         errors = list(self.get_validator(data).iter_errors(data))
         self.assertEqual(len(errors), 0)
 
+    def test_value_from_headers(self):
+        secret_arn = 'arn:aws:secretsmanager:us-east-1:123456789012:secret:name-asdfgh'
+        data = {
+            "policies": [
+                {
+                    "name": "example",
+                    "resource": "ec2",
+                    "filters": [
+                        {
+                            'type': 'value',
+                            'key': 'InstanceId',
+                            'op': 'not-in',
+                            'value_from': {
+                                'url': 'example',
+                                'format': 'json',
+                                'headers': {
+                                    'header_1': 'example',
+                                    'header_2': {
+                                        'value_from': secret_arn
+                                    },
+                                },
+                            }
+                        }
+                    ],
+                }
+            ]
+        }
+        errors = list(self.get_validator(data).iter_errors(data))
+        self.assertEqual(len(errors), 0)
+
     def test_mark_for_op(self):
         data = {
             "policies": [

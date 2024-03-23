@@ -1,0 +1,38 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "aws_secretsmanager_secret": {
+            "this": {
+                "arn": "arn:aws:secretsmanager:us-east-1:644160558196:secret:secretsmanager_secret_string-XSQFTo",
+                "description": "",
+                "force_overwrite_replica_secret": false,
+                "id": "arn:aws:secretsmanager:us-east-1:644160558196:secret:secretsmanager_secret_string-XSQFTo",
+                "kms_key_id": "",
+                "name": "secretsmanager_secret_string",
+                "name_prefix": "",
+                "policy": "",
+                "recovery_window_in_days": 30,
+                "replica": [],
+                "rotation_enabled": false,
+                "rotation_lambda_arn": "",
+                "rotation_rules": [],
+                "tags": null,
+                "tags_all": {}
+            }
+        },
+        "aws_secretsmanager_secret_version": {
+            "this": {
+                "arn": "arn:aws:secretsmanager:us-east-1:644160558196:secret:secretsmanager_secret_string-XSQFTo",
+                "id": "arn:aws:secretsmanager:us-east-1:644160558196:secret:secretsmanager_secret_string-XSQFTo|9AACC73C-2EC2-4055-B051-BA7039E01A57",
+                "secret_binary": "",
+                "secret_id": "arn:aws:secretsmanager:us-east-1:644160558196:secret:secretsmanager_secret_string-XSQFTo",
+                "secret_string": "1234567890",
+                "version_id": "9AACC73C-2EC2-4055-B051-BA7039E01A57",
+                "version_stages": [
+                    "AWSCURRENT"
+                ]
+            }
+        }
+    }
+}
