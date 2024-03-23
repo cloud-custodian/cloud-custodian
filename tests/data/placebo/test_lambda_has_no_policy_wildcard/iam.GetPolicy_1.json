@@ -1,0 +1,38 @@
+{
+    "status_code": 200,
+    "data": {
+        "Policy": {
+            "PolicyName": "lambda-wildcard-managed-policy-fail",
+            "PolicyId": "ANPAXO263RKEMY2OS3ZI7",
+            "Arn": "arn:aws:iam::123456789012:policy/lambda-wildcard-managed-policy-fail",
+            "Path": "/",
+            "DefaultVersionId": "v1",
+            "AttachmentCount": 1,
+            "PermissionsBoundaryUsageCount": 0,
+            "IsAttachable": true,
+            "Description": "Lambda wildcard managed policy fail",
+            "CreateDate": {
+                "__class__": "datetime",
+                "year": 2023,
+                "month": 4,
+                "day": 19,
+                "hour": 20,
+                "minute": 29,
+                "second": 46,
+                "microsecond": 0
+            },
+            "UpdateDate": {
+                "__class__": "datetime",
+                "year": 2023,
+                "month": 4,
+                "day": 19,
+                "hour": 20,
+                "minute": 29,
+                "second": 46,
+                "microsecond": 0
+            },
+            "Tags": []
+        },
+        "ResponseMetadata": {}
+    }
+}

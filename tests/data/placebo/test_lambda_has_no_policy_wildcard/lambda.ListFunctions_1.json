@@ -1,0 +1,66 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "Functions": [
+            {
+                "FunctionName": "lambda-wildcard-inline-policy-fail",
+                "FunctionArn": "arn:aws:lambda:us-east-1:123456789012:function:lambda-wildcard-inline-policy-fail",
+                "Runtime": "nodejs16.x",
+                "Role": "arn:aws:iam::123456789012:role/lambda-wildcard-inline-policy-fail",
+                "Handler": "index.handler",
+                "CodeSize": 240,
+                "Description": "",
+                "Timeout": 3,
+                "MemorySize": 128,
+                "LastModified": "2023-04-19T20:30:09.621+0000",
+                "CodeSha256": "pA7z0vBKy3qR5PzAisdJ/2jqQ7z0SQF1qno9ui123K4=",
+                "Version": "$LATEST",
+                "TracingConfig": {
+                    "Mode": "PassThrough"
+                },
+                "RevisionId": "41203000-ee98-40be-85f7-b2e57e207de6",
+                "PackageType": "Zip",
+                "Architectures": [
+                    "x86_64"
+                ],
+                "EphemeralStorage": {
+                    "Size": 512
+                },
+                "SnapStart": {
+                    "ApplyOn": "None",
+                    "OptimizationStatus": "Off"
+                }
+            },
+            {
+                "FunctionName": "lambda-wildcard-managed-policy-fail",
+                "FunctionArn": "arn:aws:lambda:us-east-1:123456789012:function:lambda-wildcard-managed-policy-fail",
+                "Runtime": "nodejs16.x",
+                "Role": "arn:aws:iam::123456789012:role/lambda-wildcard-managed-policy-fail",
+                "Handler": "index.handler",
+                "CodeSize": 240,
+                "Description": "",
+                "Timeout": 3,
+                "MemorySize": 128,
+                "LastModified": "2023-04-19T20:30:03.545+0000",
+                "CodeSha256": "pA7z0vBKy3qR5PzAisdJ/2jqQ7z0SQF1qno9ui123K4=",
+                "Version": "$LATEST",
+                "TracingConfig": {
+                    "Mode": "PassThrough"
+                },
+                "RevisionId": "62281c97-fd6a-41cb-9221-8c9d5e77e521",
+                "PackageType": "Zip",
+                "Architectures": [
+                    "x86_64"
+                ],
+                "EphemeralStorage": {
+                    "Size": 512
+                },
+                "SnapStart": {
+                    "ApplyOn": "None",
+                    "OptimizationStatus": "Off"
+                }
+            }
+        ]
+    }
+}

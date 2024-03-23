@@ -1,0 +1,27 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:lambda:us-east-1:123456789012:function:lambda-wildcard-inline-policy-fail",
+                "Tags": [
+                    {
+                        "Key": "c7n",
+                        "Value": "true"
+                    }
+                ]
+            },
+            {
+                "ResourceARN": "arn:aws:lambda:us-east-1:123456789012:function:lambda-wildcard-managed-policy-fail",
+                "Tags": [
+                    {
+                        "Key": "c7n",
+                        "Value": "true"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
