@@ -797,3 +797,62 @@ class TestSagemakerEndpointConfig(BaseTest):
         self.assertEqual(len(resources), 1)
         aliases = kms.list_aliases(KeyId=resources[0]['KmsKeyId'])
         self.assertEqual(aliases['Aliases'][0]['AliasName'], 'alias/skunk/trails')
+
+
+class TestSagemakerDomain(BaseTest):
+
+    def test_tag_sagemaker_domain(self):
+        session_factory = self.replay_flight_data("test_tag_sagemaker_domain")
+        p = self.load_policy(
+            {
+                "name": "tag-sagemaker-domain",
+                "resource": "sagemaker-domain",
+                "filters": [{"tag:owner": "absent"}],
+                "actions": [{"type": "tag", "key": "owner", "value": "policy"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = session_factory().client("sagemaker")
+        tags = client.list_tags(ResourceArn=resources[0]["DomainArn"])["Tags"]
+        self.assertEqual(tags[0]['Key'], 'owner')
+        self.assertEqual(tags[0]['Value'], 'policy')
+
+        p = self.load_policy(
+            {
+                "name": "untag-sagemaker-domain",
+                "resource": "sagemaker-domain",
+                "filters": [{"tag:owner": "policy"}],
+                "actions": [{"type": "remove-tag", "tags": ["owner"]}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = session_factory().client("sagemaker")
+        tags = client.list_tags(ResourceArn=resources[0]["DomainArn"])["Tags"]
+        self.assertEqual(len(tags), 0)
+
+
+    def test_sagemaker_domain_kms_alias(self):
+        session_factory = self.replay_flight_data("test_sagemaker_domain_kms_key_filter")
+        kms = session_factory().client('kms')
+        p = self.load_policy(
+            {
+                "name": "sagemaker-domain-kms-alias",
+                "resource": "aws.sagemaker-domain",
+                "filters": [
+                    {
+                        "type": "kms-key",
+                        "key": "c7n:AliasName",
+                        "value": "alias/sagemaker",
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        aliases = kms.list_aliases(KeyId=resources[0]['KmsKeyId'])
+        self.assertEqual(aliases['Aliases'][0]['AliasName'], 'alias/sagemaker')

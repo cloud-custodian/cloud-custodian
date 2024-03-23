@@ -201,11 +201,11 @@ class DescribeVirtualNodeDefinition(ChildDescribeSource):
     # This method is called in event mode and not pull mode.
     # Its purpose is to take a list of virtual gateway ARN's that the
     # framework has extracted from the events according to the policy yml file
-    # and then call the describe function for the virtual gateway.
+    # and then call the describe function for the virtual node.
     def get_resources(self, arns, cache=True):
         # Split each arn into its parts and then return an object
         # that has the two names we need for the describe operation.
-        # Mesh gw arn looks like : arn:aws:appmesh:eu-west-2:123456789012:mesh/Mesh7/virtualGateway/GW1  # noqa
+        # Mesh virtual node arn looks like : arn:aws:appmesh:eu-west-2:123456789012:mesh/Mesh7/virtualNode/VN1  # noqa
 
         mesh_and_child_names = [
             {"meshName": parts[0], "virtualNodeName": parts[2]} for parts in
@@ -217,7 +217,7 @@ class DescribeVirtualNodeDefinition(ChildDescribeSource):
     # Called during event mode and pull mode, and it's function is to take id's
     # from some provided data and return the complete description of the resource.
     # The resources argument is a list of objects that contains at least
-    # the fields meshName and virtualGatewayName.
+    # the fields meshName and virtualNodeName.
     #
     # If we are in event mode then the resources will already be fully populated because
     # augment() is called with the fully populated output of get_resources() above.
@@ -240,7 +240,7 @@ class DescribeVirtualNodeDefinition(ChildDescribeSource):
         client = local_session(self.manager.session_factory).client('appmesh')
 
         for names in mesh_and_child_names:
-            # https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/appmesh/client/delete_virtual_gateway.html #noqa
+            # https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/appmesh/client/delete_virtual_node.html #noqa
             response = self.manager.retry(client.describe_virtual_node,
                                           meshName=names["meshName"],
                                           virtualNodeName=names["virtualNodeName"], )
@@ -288,19 +288,19 @@ class AppmeshVirtualNode(ChildResourceManager):
         # even if not ideal.
         id = "metadata.arn"
 
-        # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-appmesh-virtualgateway.html  # noqa
+        # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-appmesh-virtualnode.html  # noqa
         # arn: not needed since we have defined our own "get_arns()" below
         arn = "metadata.arn"
 
         # This "name" value appears in the "report" command output.
         # example: custodian  report --format json  -s report-out mesh-policy.yml
-        # see the virtualGatewayName field here...
-        # https://docs.aws.amazon.com/cli/latest/reference/appmesh/describe-virtual-gateway.html # noqa
+        # see the virtualNodeName field here...
+        # https://docs.aws.amazon.com/cli/latest/reference/appmesh/describe-virtual-node.html # noqa
         name = 'virtualNodeName'
 
         # refers to a field in the metadata response of the describe function
         # appears in the "report" operation
-        # https://docs.aws.amazon.com/cli/latest/reference/appmesh/describe-virtual-gateway.html
+        # https://docs.aws.amazon.com/cli/latest/reference/appmesh/describe-virtual-node.html
         date = 'metadata.createdAt'
 
         # When we define a parent_spec then the parent_spec
@@ -315,9 +315,9 @@ class AppmeshVirtualNode(ChildResourceManager):
 
         # enum_spec's list function is called once for each key (meshName) returned from
         # the parent_spec.
-        # 'virtualGateways' - is path in the enum_spec response to locate the virtual
-        # gateways for the given meshName.
-        # https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/appmesh/client/list_virtual_gateways.html  # noqa
+        # 'virtualNodes' - is path in the enum_spec response to locate the virtual
+        # nodes for the given meshName.
+        # https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/appmesh/client/list_virtual_nodes.html  # noqa
         enum_spec = (
             'list_virtual_nodes',
             'virtualNodes',

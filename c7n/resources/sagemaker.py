@@ -6,7 +6,7 @@ from c7n.exceptions import PolicyValidationError
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, TypeInfo, DescribeSource, ConfigSource
 from c7n.utils import local_session, type_schema
-from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction
+from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction, universal_augment
 from c7n.filters.vpc import SubnetFilter, SecurityGroupFilter
 from c7n.filters.kms import KmsRelatedFilter
 from c7n.filters.offhours import OffHour, OnHour
@@ -726,3 +726,31 @@ class SagemakerTransformJobStop(BaseAction):
                 client.stop_transform_job(TransformJobName=j['TransformJobName'])
             except client.exceptions.ResourceNotFound:
                 pass
+
+
+class SagemakerDomainDescribe(DescribeSource):
+
+    def augment(self, resources):
+        return universal_augment( self.manager, super().augment(resources))
+
+
+@resources.register('sagemaker-domain')
+class SagemakerDomain(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'sagemaker'
+        enum_spec = ('list_domains', 'Domains', None)
+        detail_spec = ('describe_domain', 'DomainId', 'DomainId', None)
+        id = 'DomainId'
+        arn = 'DomainArn'
+        name = 'DomainName'
+        cfn_type = 'AWS::SageMaker::Domain'
+        permission_prefix = 'sagemaker'
+        universal_taggable = object()
+
+    source_mapping = {'describe': SagemakerDomainDescribe}
+
+
+@SagemakerDomain.filter_registry.register('kms-key')
+class SagemakerDomainKmsFilter(KmsRelatedFilter):
+  RelatedIdsExpression = 'KmsKeyId'
