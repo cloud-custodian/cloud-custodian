@@ -204,7 +204,7 @@ class PolicyMetaLint(BaseTest):
             {'account', 's3', 'hostedzone', 'log-group', 'rest-api', 'redshift-snapshot',
              'rest-stage', 'codedeploy-app', 'codedeploy-group', 'fis-template', 'dlm-policy',
              'apigwv2', 'apigwv2-stage', 'apigw-domain-name', 'fis-experiment',
-             'appmesh-virtual-gateway', 'launch-template-version'})
+             'launch-template-version'})
         if overrides:
             raise ValueError("unknown arn overrides in %s" % (", ".join(overrides)))
 
@@ -464,7 +464,6 @@ class PolicyMetaLint(BaseTest):
             "AWS::S3::AccessPoint",
             # q2 2023 wave 3
             "AWS::Amplify::App",
-            "AWS::AppMesh::VirtualNode",
             "AWS::AppMesh::VirtualService",
             "AWS::AppRunner::VpcConnector",
             "AWS::AppStream::Application",
