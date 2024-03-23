@@ -1,0 +1,51 @@
+{
+  "headers": {
+    "etag": "J2Vb_ARB-RWpsithOWWzS_L4DTU=/Oimz2vXDQ1q69JIjb_y4KFJLSwM=",
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Thu, 14 Sep 2023 10:34:34 GMT",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "1166",
+    "-content-encoding": "gzip",
+    "content-location": "https://compute.googleapis.com/compute/v1/projects/cloud-custodian/global/snapshots?alt=json"
+  },
+  "body": {
+    "kind": "compute#snapshotList",
+    "id": "projects/cloud-custodian/global/snapshots",
+    "items": [
+      {
+        "kind": "compute#snapshot",
+        "id": "4969044965803909664",
+        "creationTimestamp": "2023-09-14T03:13:36.078-07:00",
+        "name": "test-snapshot",
+        "status": "READY",
+        "sourceDisk": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-a/disks/boot",
+        "sourceDiskId": "4543329357928535840",
+        "diskSizeGb": "10",
+        "storageBytes": "4005703424",
+        "storageBytesStatus": "UP_TO_DATE",
+        "licenses": [
+          "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/licenses/ubuntu-2004-lts"
+        ],
+        "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/snapshots/test-snapshot",
+        "labelFingerprint": "42WmSpB8rSM=",
+        "licenseCodes": [
+          "2211838267635035815"
+        ],
+        "storageLocations": [
+          "us-central1"
+        ],
+        "downloadBytes": "4005782443",
+        "creationSizeBytes": "4005703424"
+      }
+    ],
+    "selfLink": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/snapshots"
+  }
+}
