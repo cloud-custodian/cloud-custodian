@@ -1,10 +1,10 @@
 {
     "status_code": 200,
     "data": {
-        "tags": [
+        "Tags": [
             {
-                "key": "foo",
-                "value": "bar"
+                "Key": "owner",
+                "Value": "policy"
             }
         ],
         "ResponseMetadata": {}

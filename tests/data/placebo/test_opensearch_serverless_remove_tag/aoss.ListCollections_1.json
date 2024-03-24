@@ -3,9 +3,9 @@
     "data": {
         "collectionSummaries": [
             {
-                "arn": "arn:aws:aoss:us-east-1:644160558196:collection/6ot2t518av2khgxr73sf",
-                "id": "6ot2t518av2khgxr73sf",
-                "name": "c7n-test",
+                "arn": "arn:aws:aoss:us-east-1:644160558196:collection/z2nmacgaa5v8pekwi1h1",
+                "id": "z2nmacgaa5v8pekwi1h1",
+                "name": "bedrock-knowledge-base-141zzj",
                 "status": "ACTIVE"
             }
         ],
