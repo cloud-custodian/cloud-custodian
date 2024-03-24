@@ -1,0 +1,21 @@
+{
+    "status_code": 200,
+    "data": {
+        "PolicyVersion": {
+            "Document": "%7B%22Statement%22%3A%5B%7B%22Action%22%3A%5B%22%2A%22%5D%2C%22Effect%22%3A%22Allow%22%2C%22Resource%22%3A%22%2A%22%2C%22Sid%22%3A%22c7nfailpolicy2%22%7D%5D%2C%22Version%22%3A%222012-10-17%22%7D",
+            "VersionId": "v1",
+            "IsDefaultVersion": true,
+            "CreateDate": {
+                "__class__": "datetime",
+                "year": 2023,
+                "month": 1,
+                "day": 24,
+                "hour": 20,
+                "minute": 2,
+                "second": 17,
+                "microsecond": 0
+            }
+        },
+        "ResponseMetadata": {}
+    }
+}
