@@ -1468,6 +1468,19 @@ class MarkForOp(TagDelayedAction):
         return d
 
 
+def _eligible_ec2_start_stop(instance, state):
+    if instance.get('RootDeviceType') != 'ebs':
+        return False
+
+    if instance.get('SpotInstanceRequestId'):
+        return False
+
+    if instance.get('State', {}).get('Name') != state:
+        return False
+
+    return True
+
+
 @ASG.action_registry.register('suspend')
 class Suspend(Action):
     """Action to suspend ASG processes and instances
@@ -1534,10 +1547,24 @@ class Suspend(Action):
                 return
             raise
         ec2_client = session.client('ec2')
+        asg_instance_ids = [i['InstanceId'] for i in asg['Instances']]
+        if not asg_instance_ids:
+            log.info("No instances in asg to stop %s" % (
+                asg['AutoScalingGroupName']))
+            return
+
+        # Determine which EC2s in ASG can be stopped.
+        instances = self.manager.get_resource_manager('ec2').get_resources(
+            asg_instance_ids)
+        instance_ids = [i['InstanceId'] for i in
+                        filter(lambda x: _eligible_ec2_start_stop(x, 'running'),
+                               instances)]
+        if not instance_ids:
+            log.info("No asg instances were eligible to stop %s" % (
+                asg['AutoScalingGroupName']))
+            return
+
         try:
-            instance_ids = [i['InstanceId'] for i in asg['Instances']]
-            if not instance_ids:
-                return
             retry = get_retry((
                 'RequestLimitExceeded', 'Client.RequestLimitExceeded'))
             retry(ec2_client.stop_instances, InstanceIds=instance_ids)
@@ -1624,9 +1651,21 @@ class Resume(Action):
     def resume_asg_instances(self, ec2_client, asg):
         """Resume asg instances.
         """
-        instance_ids = [i['InstanceId'] for i in asg['Instances']]
-        if not instance_ids:
+        asg_instance_ids = [i['InstanceId'] for i in asg['Instances']]
+        if not asg_instance_ids:
             return
+
+        # Determine which EC2s in ASG can be started.
+        instances = self.manager.get_resource_manager('ec2').get_resources(
+            asg_instance_ids)
+        instance_ids = [i['InstanceId'] for i in
+                        filter(lambda x: _eligible_ec2_start_stop(x, 'stopped'),
+                               instances)]
+        if not instance_ids:
+            log.info("No asg instances were eligible to start %s" % (
+                asg['AutoScalingGroupName']))
+            return
+
         retry = get_retry((
             'RequestLimitExceeded', 'Client.RequestLimitExceeded'))
         retry(ec2_client.start_instances, InstanceIds=instance_ids)
