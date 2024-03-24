@@ -3,7 +3,7 @@
 
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, TypeInfo
-from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction, universal_augment
+from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction
 from c7n.utils import local_session, type_schema
 from c7n.actions import BaseAction
 from c7n.filters.kms import KmsRelatedFilter
