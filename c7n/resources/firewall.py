@@ -215,12 +215,12 @@ class DeleteNetworkFirewall(BaseAction):
             logging_updater.process(resources)
         for r in resources:
             try:
-              client.delete_firewall(
-                  FirewallName=r['FirewallName'],
-                  FirewallArn=r['FirewallArn']
-                  )
+                client.delete_firewall(
+                    FirewallName=r['FirewallName'],
+                    FirewallArn=r['FirewallArn']
+                )
             except client.exceptions.ResourceNotFoundException:
-              continue
+                continue
 
 
 @NetworkFirewall.action_registry.register('update-delete-protection')
@@ -231,7 +231,8 @@ class UpdateNetworkFirewallDeleteProtection(BaseAction):
 
     schema = type_schema(
         'update-delete-protection',
-        state={'type': 'boolean'})
+        state={'type': 'boolean'}
+    )
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('network-firewall')

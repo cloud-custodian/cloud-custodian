@@ -670,7 +670,7 @@ def pprint_schema_summary(vocabulary):
         if '.' not in type_name:
             non_providers[type_name] = len(rv)
         else:
-            provider, name = type_name.split('.', 1)
+            provider, _ = type_name.split('.', 1)
             stats = providers.setdefault(provider, {
                 'resources': 0, 'actions': Counter(), 'filters': Counter()})
             stats['resources'] += 1

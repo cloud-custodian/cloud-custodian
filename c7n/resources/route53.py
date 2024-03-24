@@ -266,8 +266,8 @@ class ResourceRecordSetRemove(BaseAction):
                     },
                     ignore_err_codes=('InvalidChangeBatch'))
         except Exception as e:
-                self.log.warning(
-                    "ResourceRecordSet delete error: %s", e)
+            self.log.warning(
+                "ResourceRecordSet delete error: %s", e)
 
 
 @HostedZone.action_registry.register('delete')

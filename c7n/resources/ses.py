@@ -16,7 +16,13 @@ class DescribeConfigurationSet(DescribeSource):
         client = local_session(self.manager.session_factory).client('ses')
         for r in resources:
             details = client.describe_configuration_set(ConfigurationSetName=r['Name'],
-                ConfigurationSetAttributeNames=['eventDestinations', 'trackingOptions', 'deliveryOptions', 'reputationOptions'])
+                ConfigurationSetAttributeNames=[
+                    'eventDestinations',
+                    'trackingOptions',
+                    'deliveryOptions',
+                    'reputationOptions'
+                ]
+            )
             r.update({
                 k: details[k]
                 for k in details

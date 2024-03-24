@@ -625,7 +625,7 @@ class RemovePolicyStatement(RemovePolicyBase):
 
         p = json.loads(resource['c7n:Policy'])
 
-        statements, found = self.process_policy(
+        _, found = self.process_policy(
             p, resource, CrossAccountAccessFilter.annotation_key)
         if not found:
             return
@@ -862,7 +862,7 @@ class LayerRemovePermissions(RemovePolicyBase):
 
         p = json.loads(r['c7n:Policy'])
 
-        statements, found = self.process_policy(
+        _, found = self.process_policy(
             p, r, CrossAccountAccessFilter.annotation_key)
 
         if not found:

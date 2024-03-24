@@ -925,7 +925,7 @@ class SecurityGroupPatch:
                 client.create_tags, Resources=[group['GroupId']], Tags=tags)
 
     def process_rules(self, client, rule_type, group, delta):
-        key, revoke_op, auth_op = self.RULE_TYPE_MAP[rule_type]
+        _, revoke_op, auth_op = self.RULE_TYPE_MAP[rule_type]
         revoke, authorize = getattr(
             client, revoke_op), getattr(client, auth_op)
 

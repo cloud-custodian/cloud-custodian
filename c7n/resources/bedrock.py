@@ -121,9 +121,9 @@ class DeleteBedrockCustomModel(BaseAction):
         client = local_session(self.manager.session_factory).client('bedrock')
         for r in resources:
             try:
-              client.delete_custom_model(modelIdentifier=r['modelArn'])
+                client.delete_custom_model(modelIdentifier=r['modelArn'])
             except client.exceptions.ResourceNotFoundException:
-              continue
+                continue
 
 
 @BedrockCustomModel.filter_registry.register('kms-key')
@@ -424,12 +424,12 @@ class DeleteBedrockAgentBase(BaseAction):
         client = local_session(self.manager.session_factory).client('bedrock-agent')
         for r in resources:
             try:
-              client.delete_agent(
-                  agentId=r['agentId'],
-                  skipResourceInUseCheck=skipResourceInUseCheck
-                  )
+                client.delete_agent(
+                    agentId=r['agentId'],
+                    skipResourceInUseCheck=skipResourceInUseCheck
+                )
             except client.exceptions.ResourceNotFoundException:
-              continue
+                continue
 
 
 @resources.register('bedrock-knowledge-base')
@@ -547,6 +547,6 @@ class DeleteBedrockKnowledgeBase(BaseAction):
         client = local_session(self.manager.session_factory).client('bedrock-agent')
         for r in resources:
             try:
-              client.delete_knowledge_base(knowledgeBaseId=r['knowledgeBaseId'])
+                client.delete_knowledge_base(knowledgeBaseId=r['knowledgeBaseId'])
             except client.exceptions.ResourceNotFoundException:
-              continue
+                continue

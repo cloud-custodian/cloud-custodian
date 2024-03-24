@@ -38,7 +38,7 @@ class OpensearchServerless(QueryResourceManager):
 
 @OpensearchServerless.filter_registry.register('kms-key')
 class OpensearchServerlessKmsFilter(KmsRelatedFilter):
-  RelatedIdsExpression = 'kmsKeyArn'
+    RelatedIdsExpression = 'kmsKeyArn'
 
 
 @OpensearchServerless.action_registry.register('tag')
@@ -133,6 +133,6 @@ class DeleteOpensearchServerless(BaseAction):
         client = local_session(self.manager.session_factory).client('opensearchserverless')
         for r in resources:
             try:
-              client.delete_collection(id=r['id'])
+                client.delete_collection(id=r['id'])
             except client.exceptions.ResourceNotFoundException:
-              continue
+                continue

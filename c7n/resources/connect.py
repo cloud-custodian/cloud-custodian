@@ -136,4 +136,4 @@ class ConnectCampaign(QueryResourceManager):
 
 @ConnectCampaign.filter_registry.register('kms-key')
 class ConnectCampaignKmsFilter(KmsRelatedFilter):
-  RelatedIdsExpression = 'connectInstanceConfig.encryptionConfig.keyArn'
+    RelatedIdsExpression = 'connectInstanceConfig.encryptionConfig.keyArn'
