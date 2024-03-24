@@ -39,3 +39,14 @@ class Disk(ArmResourceManager):
             'sku.name'
         )
         resource_type = 'Microsoft.Compute/disks'
+
+@Disk.action_registry.register('snapshot')
+class DiskSnapshotAction(AzureBaseAction):
+
+    schema = type_schema('snapshot')
+
+    def _prepare_processing(self,):
+        self.client = self.manager.get_client()
+
+    def _process_resource(self, resource):
+        self.client.snapshots.create_or_update(resource['resourceGroup'], resource['name']+'_'+datetime.today().strftime('%Y-%m-%d'), resource)
