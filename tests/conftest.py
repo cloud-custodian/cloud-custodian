@@ -55,6 +55,7 @@ class TerraformAWSRewriteHooks:
             )
         )
 
+
 class CustodianAWSTesting(PyTestUtils, PillTest):
     """Pytest AWS Testing Fixture
     """

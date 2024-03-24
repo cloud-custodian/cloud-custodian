@@ -31,7 +31,6 @@ class OpensearchServerless(BaseTest):
         self.assertEqual(len(tags), 1)
         self.assertEqual(tags, [{'key': 'foo', 'value': 'bar'}])
 
-
     def test_opensearch_serverless_remove_tag(self):
         session_factory = self.replay_flight_data('test_opensearch_serverless_remove_tag')
         p = self.load_policy(
@@ -87,9 +86,8 @@ class OpensearchServerless(BaseTest):
                         'value': 'alias/tes/pratyush'
                     }
                 ]
-            },session_factory=session_factory)
+            }, session_factory=session_factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]['kmsKeyArn'],
             'arn:aws:kms:us-east-1:644160558196:key/082cd05f-96d1-49f6-a5ac-32093d2cfe38')
-

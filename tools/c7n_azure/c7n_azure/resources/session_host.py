@@ -51,6 +51,7 @@ class SessionHost(ChildArmResourceManager):
                 'initial_skip': None
             }
 
+
 @SessionHost.filter_registry.register('session-host-vm')
 class VMInstanceViewFilter(ValueFilter):
     """Check session host virtual machine
@@ -79,7 +80,7 @@ class VMInstanceViewFilter(ValueFilter):
       for host in resources:
         rg = ResourceIdParser.get_resource_group(host['id'])
         vm = ResourceIdParser.get_resource_name(host['properties']['resourceId'])
-        vmachine = client.virtual_machines.get(rg,vm)
+        vmachine = client.virtual_machines.get(rg, vm)
         if self.match(vmachine.serialize(True)):
               matched.append(host)
       return matched

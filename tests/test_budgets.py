@@ -17,4 +17,3 @@ def test_budget_query(test, budgets_budget):
 
     resources = policy.run()
     assert len(resources) > 0
-

@@ -2071,7 +2071,7 @@ class SecurityGroupTest(BaseTest):
             lambda: (('batch', unused.get_batch_sgs),))
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        self.assertNotEqual(resources[0]["GroupId"], "sg-0f026884bba48e351") # used
+        self.assertNotEqual(resources[0]["GroupId"], "sg-0f026884bba48e351")  # used
         self.assertEqual(resources[0]["GroupId"], "sg-e2842c8b")             # not used
 
     def test_unused(self):
@@ -4046,7 +4046,6 @@ class TestUnusedKeys(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
-
 
     def test_vpc_unused_key_not_filtered_error(self):
         with self.assertRaises(PolicyValidationError):

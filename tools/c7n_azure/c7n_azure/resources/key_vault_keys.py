@@ -159,6 +159,7 @@ class KeyTypeFilter(Filter):
 
         return matched
 
+
 @KeyVaultKeys.filter_registry.register('rotation-policy')
 class KeyVaultKeyRotationFilter(Filter):
     """Filters keyvault keys for rotation policy
@@ -176,7 +177,7 @@ class KeyVaultKeyRotationFilter(Filter):
                 - type: rotation-policy
                   state: Disabled
     """
-    schema = type_schema('rotation-policy',required=['state'],
+    schema = type_schema('rotation-policy', required=['state'],
                 state={'type': 'string', 'enum': ['Enabled', 'Disabled']})
 
     def process(self, resources, event=None):

@@ -43,6 +43,7 @@ class MonitorLogprofile(ArmResourceManager):
         )
         resource_type = 'Microsoft.Insights/logprofiles'
 
+
 @MonitorLogprofile.filter_registry.register('monitor-storage')
 class MonitorLogStorageFilter(ValueFilter):
     """Check monitor log profile storage

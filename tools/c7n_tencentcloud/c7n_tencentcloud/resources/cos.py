@@ -215,7 +215,7 @@ class BucketEncryption(Filter):
             return False
         else:
             # If there is no configuration information,rules==[]
-            return rules is []
+            return rules == []
 
     def filter_bucket(self, sse):
         # only support ASE256 now

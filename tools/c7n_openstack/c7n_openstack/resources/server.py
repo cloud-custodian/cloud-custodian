@@ -7,6 +7,7 @@ from c7n.utils import type_schema
 from c7n.filters import Filter
 from c7n.filters import AgeFilter, ListItemFilter
 
+
 @resources.register('server')
 class Server(QueryResourceManager):
     class resource_type(TypeInfo):
@@ -277,7 +278,7 @@ class SecurityGroupFilter(ListItemFilter):
     """
     schema = type_schema(
         'security-group',
-        key= {'type': 'string'},
+        key={'type': 'string'},
         attrs={'$ref': '#/definitions/filters_common/list_item_attrs'}
     )
 
