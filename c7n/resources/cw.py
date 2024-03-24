@@ -226,6 +226,7 @@ class EventBusDelete(BaseAction):
                     client.delete_event_bus,
                     Name=r['Name'])
 
+
 class RuleDescribe(DescribeSource):
 
     def augment(self, resources):

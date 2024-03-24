@@ -68,6 +68,7 @@ class JobDefinition(QueryResourceManager):
         'config': ConfigSource
     }
 
+
 @ComputeEnvironment.action_registry.register('update-environment')
 class UpdateComputeEnvironment(BaseAction):
     """Updates an AWS batch compute environment

@@ -25,6 +25,7 @@ class GraphQLApi(QueryResourceManager):
         universal_taggable = True
         permissions_augment = ("appsync:ListTagsForResource",)
 
+
 @GraphQLApi.filter_registry.register('wafv2-enabled')
 class WafV2Enabled(WafV2FilterBase):
     """Filter AppSync GraphQLApi by wafv2 web-acl

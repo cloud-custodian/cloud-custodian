@@ -109,6 +109,7 @@ class WAF(QueryResourceManager):
         'config': ConfigSource
     }
 
+
 @resources.register('waf-regional')
 class RegionalWAF(QueryResourceManager):
 

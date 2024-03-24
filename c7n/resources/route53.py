@@ -156,7 +156,6 @@ class Route53Domain(QueryResourceManager):
         name = id = 'DomainName'
         global_resource = False
 
-
     permissions = ('route53domains:ListTagsForDomain',)
 
     def augment(self, domains):
