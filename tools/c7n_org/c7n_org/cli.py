@@ -518,7 +518,7 @@ def run_account_script(account, region, output_dir, debug, script_args):
 def run_script(config, output_dir, accounts, tags, region, echo, serial, script_args):
     """run an aws/azure/gcp script across accounts"""
     # TODO count up on success / error / error list by account
-    accounts_config, custodian_config, executor = init(
+    accounts_config, _, executor = init(
         config, None, serial, True, accounts, tags, (), ())
     if echo:
         print("command to run: `%s`" % (" ".join(script_args)))

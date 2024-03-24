@@ -183,10 +183,10 @@ class KeyVaultKeyRotationFilter(Filter):
     def process(self, resources, event=None):
         matched = []
         for key in resources:
-          id = KeyProperties(key_id=key['id'])
-          client = self.manager.get_client(vault_url=id.vault_url)
-          rotation = client.get_key_rotation_policy(id.name)
-          if (self.data.get('state') == 'Disabled' and not rotation.id) or \
-            (self.data.get('state')  == 'Enabled' and rotation.id):
-            matched.append(key)
+            id = KeyProperties(key_id=key['id'])
+            client = self.manager.get_client(vault_url=id.vault_url)
+            rotation = client.get_key_rotation_policy(id.name)
+            if (self.data.get('state') == 'Disabled' and not rotation.id) or \
+               (self.data.get('state')  == 'Enabled' and rotation.id):
+                matched.append(key)
         return matched

@@ -204,7 +204,7 @@ class OCIFlightRecorder(CustodianTestCore):
         multi_requests_map = {}
         tmp_requests_map = {}
         for t in self.cassette.data:
-            (r, b) = t
+            (r, _) = t
             k = f"{r.method}_{r.uri}"
             tmp_requests_map[k] = tmp_requests_map.get(k, 0) + 1
         for k, v in tmp_requests_map.items():

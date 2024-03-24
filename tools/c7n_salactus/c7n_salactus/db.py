@@ -21,7 +21,7 @@ class Database:
     def accounts(self, accounts=()):
         accounts = {}
         for k in self.data['bucket-size'].keys():
-            a, b = k.split(':')
+            a, _ = k.split(':')
             accounts.setdefault(a, []).append(k)
         return [Account(acct, [Bucket(bkt, self.data) for bkt in buckets])
                 for acct, buckets in accounts.items()]

@@ -63,12 +63,12 @@ class WebAppFirewallFilter(Filter):
               state={'type': 'string', 'enum': ['Enabled', 'Disabled']})
 
     def process(self, resources, event=None):
-      client = self.manager.get_client()
-      matched = []
-      for profiles in resources:
-        policies = list(client.security_policies.list_by_profile(
-                      profiles["resourceGroup"], profiles["name"]))
-        if (self.data.get('state') == 'Disabled' and not policies) or (self.data.get('state')
-                                                                      == 'Enabled' and policies):
+        client = self.manager.get_client()
+        matched = []
+        for profiles in resources:
+            policies = list(client.security_policies.list_by_profile(
+                profiles["resourceGroup"], profiles["name"]))
+        if ((self.data.get('state') == 'Disabled' and not policies)
+            or (self.data.get('state') == 'Enabled' and policies)):
             matched.append(profiles)
-      return matched
+        return matched

@@ -41,7 +41,7 @@ class DirOutputTest(BaseTest):
         )
 
     def test_dir_output(self):
-        work_dir, output = self.get_dir_output("file://myoutput")
+        work_dir, _ = self.get_dir_output("file://myoutput")
         self.assertEqual(os.listdir(work_dir), ["myoutput"])
         self.assertTrue(os.path.isdir(os.path.join(work_dir, "myoutput")))
 

@@ -234,6 +234,7 @@ class RuleDescribe(DescribeSource):
 
 @resources.register('event-rule')
 class EventRule(QueryResourceManager):
+
     class resource_type(TypeInfo):
         service = 'events'
         arn_type = 'rule'

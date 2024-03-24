@@ -86,6 +86,7 @@ class UpdateComputeEnvironment(BaseAction):
               - type: update-environment
                 state: DISABLED
     """
+
     schema = {
         'type': 'object',
         'additionalProperties': False,

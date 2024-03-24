@@ -37,9 +37,7 @@ class TestIdentityTerraformTest(OciBaseTest):
 
     @terraform("identity_compartment", scope="class")
     def test_identity_compartment(self, identity_compartment, test):
-        compartment_id, new_compartment_id = self._get_identity_compartment_details(
-            identity_compartment
-        )
+        _, new_compartment_id = self._get_identity_compartment_details(identity_compartment)
         session_factory = test.oci_session_factory()
         policy_str = {
             "name": "filter-and-add-tags-on-compartments",
@@ -69,9 +67,7 @@ class TestIdentityTerraformTest(OciBaseTest):
 
     @terraform("identity_compartment", scope="class")
     def test_identity_update_compartment(self, identity_compartment, test):
-        compartment_id, new_compartment_id = self._get_identity_compartment_details(
-            identity_compartment
-        )
+        _, new_compartment_id = self._get_identity_compartment_details(identity_compartment)
         session_factory = test.oci_session_factory()
         policy_str = {
             "name": "filter-and-add-tags-on-compartments",
@@ -100,9 +96,7 @@ class TestIdentityTerraformTest(OciBaseTest):
 
     @terraform("identity_compartment", scope="class")
     def test_remove_tag_compartment(self, identity_compartment, test):
-        compartment_id, new_compartment_id = self._get_identity_compartment_details(
-            identity_compartment
-        )
+        _, new_compartment_id = self._get_identity_compartment_details(identity_compartment)
         session_factory = test.oci_session_factory()
         policy_str = {
             "name": "remove-tag-from-compartment",
@@ -123,9 +117,7 @@ class TestIdentityTerraformTest(OciBaseTest):
 
     @terraform("identity_compartment", scope="class")
     def test_remove_invalidtag_compartment(self, identity_compartment, test):
-        compartment_id, new_compartment_id = self._get_identity_compartment_details(
-            identity_compartment
-        )
+        _, new_compartment_id = self._get_identity_compartment_details(identity_compartment)
         session_factory = test.oci_session_factory()
         policy_str = {
             "name": "remove-invalidtag-from-compartment",
@@ -252,7 +244,7 @@ class TestIdentityTerraformTest(OciBaseTest):
     @terraform("identity_user", scope="class")
     @pytest.mark.usefixtures("setCompartmentIdToTenancyOcid")
     def test_identity_user_tag(self, identity_user, test):
-        compartment_id, user_ocid = self._get_user_details(identity_user)
+        _, user_ocid = self._get_user_details(identity_user)
         policy_str = {
             "name": "filter-and-add-tags-on-user",
             "description": "Filter and add tags on the user",
@@ -278,7 +270,7 @@ class TestIdentityTerraformTest(OciBaseTest):
     @terraform("identity_user", scope="class")
     @pytest.mark.usefixtures("setCompartmentIdToTenancyOcid")
     def test_remove_tag_user(self, identity_user, test):
-        compartment_id, user_ocid = self._get_user_details(identity_user)
+        _, user_ocid = self._get_user_details(identity_user)
         policy_str = {
             "name": "remove-tag-from-user",
             "description": "Remove tag from the user",
@@ -296,7 +288,7 @@ class TestIdentityTerraformTest(OciBaseTest):
     @terraform("identity_user", scope="class")
     @pytest.mark.usefixtures("setCompartmentIdToTenancyOcid")
     def test_remove_invalidtag_user(self, identity_user, test):
-        compartment_id, user_ocid = self._get_user_details(identity_user)
+        _, user_ocid = self._get_user_details(identity_user)
         policy_str = {
             "name": "remove-invalid-tag-from-user",
             "description": "Remove tag from the user that doesn't exists",
@@ -314,7 +306,7 @@ class TestIdentityTerraformTest(OciBaseTest):
     @terraform("identity_user", scope="class")
     @pytest.mark.usefixtures("setCompartmentIdToTenancyOcid")
     def test_attributes_user(self, identity_user, test):
-        compartment_id, user_ocid = self._get_user_details(identity_user)
+        _, user_ocid = self._get_user_details(identity_user)
         policy_str = {
             "name": "fetch-attributes-from-user",
             "description": "Fetch all attributes from the user",
@@ -333,7 +325,7 @@ class TestIdentityTerraformTest(OciBaseTest):
         """
         Cross filter size policy testcase
         """
-        compartment_id, user_ocid = self._get_user_details(identity_user)
+        _, user_ocid = self._get_user_details(identity_user)
         policy_str = {
             "name": "filter_auth_tokens_based_on_size",
             "description": "Filter users with auth tokens equal to 2",
@@ -367,7 +359,7 @@ class TestIdentityTerraformTest(OciBaseTest):
         """
         Cross filter query filter based on the created time usecase
         """
-        compartment_id, user_ocid = self._get_user_details(identity_user)
+        _, user_ocid = self._get_user_details(identity_user)
         policy_str = {
             "name": "filter_auth_tokens_based_on_age",
             "description": "Filter users with age less than 1 year",
@@ -398,7 +390,7 @@ class TestIdentityTerraformTest(OciBaseTest):
         """
         Cross filter query filter with size & age filter
         """
-        compartment_id, user_ocid = self._get_user_details(identity_user)
+        _, user_ocid = self._get_user_details(identity_user)
         policy_str = {
             "name": "filter_auth_tokens_based_on_size_age",
             "description": "Filter users with age less than 1 year and size equal to 2",
@@ -437,7 +429,7 @@ class TestIdentityTerraformTest(OciBaseTest):
         """
         Cross filter query filter with age & size filter
         """
-        compartment_id, user_ocid = self._get_user_details(identity_user)
+        _, user_ocid = self._get_user_details(identity_user)
         policy_str = {
             "name": "filter_auth_tokens_based_on_age",
             "description": "Filter users with age less than 1 yr and size equal to 2",
