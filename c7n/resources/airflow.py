@@ -116,6 +116,7 @@ class UntagApacheAirflow(RemoveTag):
 ApacheAirflow.filter_registry.register('marked-for-op', TagActionFilter)
 ApacheAirflow.action_registry.register('mark-for-op', TagDelayedAction)
 
+
 @ApacheAirflow.action_registry.register('update-environment')
 class UpdateApacheAirflowEnvironment(Action):
     """
@@ -158,6 +159,7 @@ class UpdateApacheAirflowEnvironment(Action):
           Name=r['Name'],
           WebserverAccessMode=access_mode
         )
+
 
 @ApacheAirflow.action_registry.register('delete-environment')
 class DeleteApacheAirflowEnvironment(Action):

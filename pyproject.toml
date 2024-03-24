@@ -40,7 +40,7 @@ urllib3 = "<2"
 referencing = "==0.31.1"
 
 [tool.poetry.group.dev.dependencies]
-ruff = "~0.0.246"
+ruff = "~0.3"
 docker = "^6.0.1"
 black = ">=23.1,<25.0"
 pytest = "^7.1.2"
@@ -72,6 +72,9 @@ line-length = 100
 # E401 - multiple imports in a single line
 ignore = ["E741", "E401"]
 exclude = ["__init__.py"]
+
+[tool.ruff.lint]
+preview = true
 
 [tool.pytest.ini_options]
 junit_family = "xunit2"

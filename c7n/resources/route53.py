@@ -829,7 +829,6 @@ class ReadinessCheckCrossAccount(CrossAccountAccessFilter):
         return results
 
 
-
 class DescribeCluster(query.DescribeSource):
     def augment(self, clusters):
         for r in clusters:
@@ -859,7 +858,6 @@ class RecoveryCluster(QueryResourceManager):
     def get_client(self):
         return local_session(self.session_factory) \
             .client('route53-recovery-control-config', region_name=ARC_REGION)
-
 
 
 @RecoveryCluster.action_registry.register('tag')

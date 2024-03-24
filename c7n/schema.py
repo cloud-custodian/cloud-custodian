@@ -37,6 +37,7 @@ from c7n.filters.core import (
 )
 from c7n.structure import StructureParser # noqa
 
+
 def is_c7n_placeholder(instance):
     """Is this schema element a Custodian variable placeholder?
 
@@ -51,6 +52,7 @@ def is_c7n_placeholder(instance):
         and instance.startswith('{')
         and instance.endswith('}')
     )
+
 
 def validate(data, schema=None, resource_types=()):
     if schema is None:

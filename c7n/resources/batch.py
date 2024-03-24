@@ -184,6 +184,7 @@ class BatchJobQueue(QueryResourceManager):
         cfn_type = config_type = 'AWS::Batch::JobQueue'
         universal_taggable = object()
 
+
 @BatchJobQueue.action_registry.register('delete')
 class DeleteBatchJobQueue(BaseAction):
     """Delete an AWS batch job queue
@@ -217,6 +218,7 @@ class DeleteBatchJobQueue(BaseAction):
         client = local_session(self.manager.session_factory).client('batch')
         for e in resources:
             self.delete_job_queue(client, e)
+
 
 @BatchJobQueue.action_registry.register('update')
 class UpdateBatchJobQueue(BaseAction):

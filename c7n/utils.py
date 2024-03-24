@@ -983,7 +983,6 @@ def get_path(path: str, resource: dict):
     return resource[path]
 
 
-
 def jmespath_compile(expression):
     parsed = C7NJMESPathParser().parse(expression)
     return parsed

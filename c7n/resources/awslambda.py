@@ -307,6 +307,7 @@ class HasSpecificManagedPolicy(SpecificIamRoleManagedPolicy):
 
         return results
 
+
 @AWSLambda.action_registry.register('update')
 class UpdateLambda(Action):
     """Update a lambda's configuration.
@@ -908,7 +909,6 @@ class LayerPostFinding(PostFinding):
 
 
 @AWSLambda.filter_registry.register('lambda-edge')
-
 class LambdaEdgeFilter(Filter):
     """
     Filter for lambda@edge functions. Lambda@edge only exists in us-east-1

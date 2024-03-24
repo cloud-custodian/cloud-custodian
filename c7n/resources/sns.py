@@ -56,7 +56,6 @@ class SNS(QueryResourceManager):
 SNS.filter_registry.register('marked-for-op', TagActionFilter)
 
 
-
 @SNS.action_registry.register('post-finding')
 class SNSPostFinding(PostFinding):
 
@@ -448,12 +447,14 @@ class DeleteTopic(BaseAction):
             except client.exceptions.NotFoundException:
                 continue
 
+
 @SNS.filter_registry.register('metrics')
 class Metrics(MetricsFilter):
 
     def get_dimensions(self, resource):
         return [{'Name': self.model.dimension,
                  'Value': resource['TopicArn'].rsplit(':', 1)[-1]}]
+
 
 @resources.register('sns-subscription')
 class SNSSubscription(QueryResourceManager):

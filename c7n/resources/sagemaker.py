@@ -731,7 +731,7 @@ class SagemakerTransformJobStop(BaseAction):
 class SagemakerDomainDescribe(DescribeSource):
 
     def augment(self, resources):
-        return universal_augment( self.manager, super().augment(resources))
+        return universal_augment(self.manager, super().augment(resources))
 
 
 @resources.register('sagemaker-domain')

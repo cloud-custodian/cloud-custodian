@@ -26,6 +26,7 @@ class OpensearchServerless(QueryResourceManager):
 
     def augment(self, resources):
         client = local_session(self.session_factory).client('opensearchserverless')
+
         def _augment(r):
             tags = self.retry(client.list_tags_for_resource,
                 resourceArn=r['arn'])['tags']
@@ -85,7 +86,10 @@ class RemoveTagOpensearchServerlessResource(RemoveTag):
         for r in resources:
             client.untag_resource(resourceArn=r['arn'], tagKeys=tags)
 
+
 OpensearchServerless.filter_registry.register('marked-for-op', TagActionFilter)
+
+
 @OpensearchServerless.action_registry.register('mark-for-op')
 class MarkOpensearchServerlessForOp(TagDelayedAction):
     """Mark OpenSearch Serverless for deferred action
@@ -104,6 +108,7 @@ class MarkOpensearchServerlessForOp(TagDelayedAction):
                 op: delete
                 days: 1
     """
+
 
 @OpensearchServerless.action_registry.register('delete')
 class DeleteOpensearchServerless(BaseAction):
