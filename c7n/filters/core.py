@@ -563,7 +563,7 @@ class ValueFilter(BaseValueFilter):
             if self.data['op'] not in OPERATORS:
                 raise PolicyValidationError(
                     "Invalid operator in value filter %s" % self.data)
-            if self.data['op'] in {'regex', 'regex-case'}:
+            if self.data['op'] in {'regex', 'regex-case'} and self.data.get('value'):
                 # Sanity check that we can compile
                 try:
                     re.compile(self.data['value'])
