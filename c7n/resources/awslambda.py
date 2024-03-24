@@ -196,7 +196,7 @@ class LambdaEventSource(ValueFilter):
     # this uses iam policy, it should probably use
     # event source mapping api
 
-    annotation_key = "c7n:EventSources"
+    annotation_key = '"c7n:EventSources"'
     schema = type_schema('event-source', rinherit=ValueFilter.schema)
     schema_alias = False
     permissions = ('lambda:GetPolicy',)
@@ -219,8 +219,8 @@ class LambdaEventSource(ValueFilter):
                 continue
             if 'Service' in s['Principal']:
                 sources.add(s['Principal']['Service'])
-            if sources:
-                r[self.annotation_key] = list(sources)
+        if sources:
+            r[self.annotation_key] = list(sources)
         return self.match(r)
 
 
