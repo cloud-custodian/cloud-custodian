@@ -37,7 +37,7 @@ class AccessPoint(QueryResourceManager):
         arn = 'AccessPointArn'
         arn_service = 's3'
         arn_type = 'accesspoint'
-        cfn_type = 'AWS::S3::AccessPoint'
+        config_type = cfn_type = 'AWS::S3::AccessPoint'
         permission_prefix = 's3'
 
     source_mapping = {'describe': AccessPointDescribe}
@@ -93,7 +93,7 @@ class MultiRegionAccessPoint(QueryResourceManager):
         enum_spec = ('list_multi_region_access_points', 'AccessPoints', None)
         arn_service = 's3'
         arn_type = 'accesspoint'
-        cfn_type = 'AWS::S3::MultiRegionAccessPoint'
+        config_type = cfn_type = 'AWS::S3::MultiRegionAccessPoint'
         permission_prefix = 's3'
 
     source_mapping = {'describe': MultiRegionAccessPointDescribe}

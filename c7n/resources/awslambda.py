@@ -81,6 +81,7 @@ class AWSLambda(query.QueryResourceManager):
         config_type = 'AWS::Lambda::Function'
         cfn_type = 'AWS::Lambda::Function'
         universal_taggable = object()
+        permissions_augment = ("lambda:ListTags",)
 
     source_mapping = {
         'describe': DescribeLambda,

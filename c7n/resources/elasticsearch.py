@@ -58,6 +58,7 @@ class ElasticSearchDomain(QueryResourceManager):
         name = 'Name'
         dimension = "DomainName"
         cfn_type = config_type = 'AWS::Elasticsearch::Domain'
+        permissions_augment = ("es:ListTags",)
 
     def resources(self, query=None):
         if 'query' in self.data:

@@ -2,9 +2,19 @@
 # SPDX-License-Identifier: Apache-2.0
 from c7n.actions import BaseAction
 from c7n.manager import resources
-from c7n.query import QueryResourceManager, TypeInfo
+from c7n.query import QueryResourceManager, TypeInfo, DescribeSource, ConfigSource
 from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction
 from c7n.utils import local_session, type_schema
+
+
+class AppFlowDescribe(DescribeSource):
+
+    def augment(self, resources):
+        resources = super().augment(resources)
+        for r in resources:
+            if 'tags' in r:
+                r['Tags'] = [{'Key': k, 'Value': v} for k, v in r['tags'].items()]
+        return resources
 
 
 @resources.register('app-flow')
@@ -17,13 +27,9 @@ class AppFlow(QueryResourceManager):
         id = name = 'flowName'
         arn = 'flowArn'
         detail_spec = ('describe_flow', 'flowName', 'flowName', None)
+        config_type = "AWS::AppFlow::Flow"
 
-    def augment(self, resources):
-        resources = super(AppFlow, self).augment(resources)
-        for r in resources:
-            if 'tags' in r:
-                r['Tags'] = [{'Key': k, 'Value': v} for k, v in r['tags'].items()]
-        return resources
+    source_mapping = {'describe': AppFlowDescribe, 'config': ConfigSource}
 
 
 @AppFlow.action_registry.register('tag')

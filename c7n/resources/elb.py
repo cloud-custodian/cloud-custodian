@@ -52,6 +52,7 @@ class ELB(QueryResourceManager):
         date = 'CreatedTime'
         dimension = 'LoadBalancerName'
         cfn_type = config_type = "AWS::ElasticLoadBalancing::LoadBalancer"
+        permissions_augment = ("elasticloadbalancing:DescribeTags",)
         default_report_fields = (
             'LoadBalancerName',
             'DNSName',

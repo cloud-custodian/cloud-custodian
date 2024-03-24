@@ -73,6 +73,7 @@ class SQS(QueryResourceManager):
         date = 'CreatedTimestamp'
         dimension = 'QueueName'
         universal_taggable = object()
+        permissions_augment = ("sqs:ListQueueTags",)
         default_report_fields = (
             'QueueArn',
             'CreatedTimestamp',

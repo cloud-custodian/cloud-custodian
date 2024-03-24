@@ -32,6 +32,7 @@ class Workspace(QueryResourceManager):
         name = id = dimension = 'WorkspaceId'
         universal_taggable = True
         cfn_type = config_type = 'AWS::WorkSpaces::Workspace'
+        permissions_augment = ("workspaces:DescribeTags",)
 
     source_mapping = {
         'describe': DescribeWorkspace,
@@ -170,6 +171,7 @@ class WorkspaceImage(QueryResourceManager):
         arn_type = 'workspaceimage'
         name = id = 'ImageId'
         universal_taggable = True
+        permissions_augment = ("workspaces:DescribeTags",)
 
     augment = universal_augment
 

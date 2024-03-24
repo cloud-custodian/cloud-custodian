@@ -23,6 +23,7 @@ class OpensearchServerless(QueryResourceManager):
         cfn_type = 'AWS::OpenSearchServerless::Collection'
         arn = "arn"
         permission_prefix = 'aoss'
+        permissions_augment = ("aoss:ListTagsForResource",)
 
     def augment(self, resources):
         client = local_session(self.session_factory).client('opensearchserverless')
