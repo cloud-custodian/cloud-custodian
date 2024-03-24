@@ -11,7 +11,7 @@ class DescribeBatch(DescribeSource):
 
     def augment(self, resources):
         for r in resources:
-            r['Tags'] = [{'Key': k, 'Value': v} for k, v in r.get('tags', {})]
+            r['Tags'] = [{'Key': k, 'Value': v} for k, v in r.get('tags', {}).items()]
         return resources
 
 
