@@ -113,6 +113,7 @@ class Key(QueryResourceManager):
         arn = 'Arn'
         universal_taggable = True
         cfn_type = config_type = 'AWS::KMS::Key'
+        permissions_augment = ("kms:ListResourceTags",)
 
     source_mapping = {
         'config': ConfigKey,

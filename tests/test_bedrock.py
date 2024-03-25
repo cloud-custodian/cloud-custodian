@@ -169,6 +169,35 @@ class BedrockAgent(BaseTest):
             resources = client.get_agent(agentId=deleted_agentId)
         self.assertEqual(e.exception.response['Error']['Code'], 'ResourceNotFoundException')
 
+    def test_bedrock_agent_base(self):
+        session_factory = self.replay_flight_data('test_bedrock_agent_base')
+        p = self.load_policy(
+            {
+                "name": "bedrock-agent-base-test",
+                "resource": "bedrock-agent",
+                "filters": [
+                    {"tag:resource": "absent"},
+                    {"tag:owner": "policy"},
+                ],
+                "actions": [
+                   {
+                        "type": "tag",
+                        "tags": {"resource": "agent"}
+                   },
+                   {
+                        "type": "remove-tag",
+                        "tags": ["owner"]
+                   }
+                ]
+            }, session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = session_factory().client('bedrock-agent')
+        tags = client.list_tags_for_resource(resourceArn=resources[0]['agentArn'])['tags']
+        self.assertEqual(len(tags), 1)
+        self.assertEqual(tags, {'resource': 'agent'})
+
 
 class BedrockKnowledgeBase(BaseTest):
 

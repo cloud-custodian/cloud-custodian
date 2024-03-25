@@ -218,6 +218,7 @@ ResourceMap = {
   "aws.s3-access-point": "c7n.resources.s3control.AccessPoint",
   "aws.s3-access-point-multi": "c7n.resources.s3control.MultiRegionAccessPoint",
   "aws.s3-storage-lens": "c7n.resources.s3control.StorageLens",
+  "aws.sagemaker-domain": "c7n.resources.sagemaker.SagemakerDomain",
   "aws.sagemaker-endpoint": "c7n.resources.sagemaker.SagemakerEndpoint",
   "aws.sagemaker-endpoint-config": "c7n.resources.sagemaker.SagemakerEndpointConfig",
   "aws.sagemaker-job": "c7n.resources.sagemaker.SagemakerJob",

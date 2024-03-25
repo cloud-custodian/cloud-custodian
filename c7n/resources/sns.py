@@ -45,6 +45,7 @@ class SNS(QueryResourceManager):
             'SubscriptionsDeleted'
         )
         universal_taggable = True
+        permissions_augment = ("sns:ListTagsForResource",)
 
     permissions = ('sns:ListTagsForResource',)
     source_mapping = {

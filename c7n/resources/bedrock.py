@@ -329,6 +329,74 @@ class BedrockAgentKmsFilter(KmsRelatedFilter):
     RelatedIdsExpression = 'customerEncryptionKeyArn'
 
 
+@BedrockAgent.action_registry.register('tag')
+class TagBedrockAgent(Tag):
+    """Create tags on bedrock agent
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+            - name: bedrock-agent-tag
+              resource: aws.bedrock-agent
+              actions:
+                - type: tag
+                  key: test
+                  value: test-tag
+    """
+    permissions = ('bedrock:TagResource',)
+
+    def process_resource_set(self, client, resources, new_tags):
+        tags = {}
+        for t in new_tags:
+            tags[t['Key']] = t['Value']
+        for r in resources:
+            client.tag_resource(resourceArn=r["agentArn"], tags=tags)
+
+
+@BedrockAgent.action_registry.register('remove-tag')
+class RemoveTagBedrockAgent(RemoveTag):
+    """Remove tags from a bedrock agent
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+            - name: bedrock-agent-untag
+              resource: aws.bedrock-agent
+              actions:
+                - type: remove-tag
+                  tags: ["tag-key"]
+    """
+    permissions = ('bedrock:UntagResource',)
+
+    def process_resource_set(self, client, resources, tags):
+        for r in resources:
+            client.untag_resource(resourceArn=r['agentArn'], tagKeys=tags)
+
+
+BedrockAgent.filter_registry.register('marked-for-op', TagActionFilter)
+@BedrockAgent.action_registry.register('mark-for-op')
+class MarkBedrockAgentForOp(TagDelayedAction):
+    """Mark bedrock agent for future actions
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: bedrock-agent-tag-mark
+            resource: aws.bedrock-agent
+            filters:
+              - "tag:delete": present
+            actions:
+              - type: mark-for-op
+                op: delete
+                days: 1
+    """
+
+
 @BedrockAgent.action_registry.register('delete')
 class DeleteBedrockAgentBase(BaseAction):
     """Delete a bedrock agent
@@ -358,7 +426,6 @@ class DeleteBedrockAgentBase(BaseAction):
                   )
             except client.exceptions.ResourceNotFoundException:
               continue
-
 
 
 @resources.register('bedrock-knowledge-base')

@@ -45,6 +45,7 @@ class KinesisStream(QueryResourceManager):
         dimension = 'StreamName'
         universal_taggable = True
         config_type = cfn_type = 'AWS::Kinesis::Stream'
+        permissions_augment = ("kinesis:ListTagsForStream",)
 
     source_mapping = {
         'describe': DescribeWithResourceTags,

@@ -26,7 +26,7 @@ Option 1: Install released packages to local Python Environment
 .. code-block:: bash
 
     pip install c7n
-    pip install c7n_gcp
+    pip install c7n-gcp
 
 
 Option 2: Install latest from the repository

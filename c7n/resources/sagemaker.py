@@ -6,10 +6,27 @@ from c7n.exceptions import PolicyValidationError
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, TypeInfo, DescribeSource, ConfigSource
 from c7n.utils import local_session, type_schema
-from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction
+from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction, universal_augment
 from c7n.filters.vpc import SubnetFilter, SecurityGroupFilter
 from c7n.filters.kms import KmsRelatedFilter
 from c7n.filters.offhours import OffHour, OnHour
+
+
+class NotebookDescribe(DescribeSource):
+
+    def augment(self, resources):
+        client = local_session(self.manager.session_factory).client('sagemaker')
+
+        def _augment(r):
+            # List tags for the Notebook-Instance & set as attribute
+            tags = self.manager.retry(client.list_tags,
+                ResourceArn=r['NotebookInstanceArn'])['Tags']
+            r['Tags'] = tags
+            return r
+
+        # Describe notebook-instance & then list tags
+        resources = super().augment(resources)
+        return list(map(_augment, resources))
 
 
 @resources.register('sagemaker-notebook')
@@ -24,23 +41,10 @@ class NotebookInstance(QueryResourceManager):
         arn = id = 'NotebookInstanceArn'
         name = 'NotebookInstanceName'
         date = 'CreationTime'
-        cfn_type = 'AWS::SageMaker::NotebookInstance'
+        config_type = cfn_type = 'AWS::SageMaker::NotebookInstance'
+        permissions_augment = ("sagemaker:ListTags",)
 
-    permissions = ('sagemaker:ListTags',)
-
-    def augment(self, resources):
-        client = local_session(self.session_factory).client('sagemaker')
-
-        def _augment(r):
-            # List tags for the Notebook-Instance & set as attribute
-            tags = self.retry(client.list_tags,
-                ResourceArn=r['NotebookInstanceArn'])['Tags']
-            r['Tags'] = tags
-            return r
-
-        # Describe notebook-instance & then list tags
-        resources = super(NotebookInstance, self).augment(resources)
-        return list(map(_augment, resources))
+    source_mapping = {'describe': NotebookDescribe, 'config': ConfigSource}
 
 
 NotebookInstance.filter_registry.register('marked-for-op', TagActionFilter)
@@ -194,6 +198,22 @@ class QueryFilter:
         return {'Name': self.key, 'Value': value}
 
 
+class EndpointDescribe(DescribeSource):
+
+    def augment(self, resources):
+        client = local_session(self.manager.session_factory).client('sagemaker')
+
+        def _augment(e):
+            tags = self.manager.retry(client.list_tags,
+                ResourceArn=e['EndpointArn'])['Tags']
+            e['Tags'] = tags
+            return e
+
+        # Describe endpoints & then list tags
+        endpoints = super().augment(resources)
+        return list(map(_augment, endpoints))
+
+
 @resources.register('sagemaker-endpoint')
 class SagemakerEndpoint(QueryResourceManager):
 
@@ -210,21 +230,25 @@ class SagemakerEndpoint(QueryResourceManager):
 
     permissions = ('sagemaker:ListTags',)
 
-    def augment(self, endpoints):
-        client = local_session(self.session_factory).client('sagemaker')
-
-        def _augment(e):
-            tags = self.retry(client.list_tags,
-                ResourceArn=e['EndpointArn'])['Tags']
-            e['Tags'] = tags
-            return e
-
-        # Describe endpoints & then list tags
-        endpoints = super(SagemakerEndpoint, self).augment(endpoints)
-        return list(map(_augment, endpoints))
+    source_mapping = {'describe': EndpointDescribe}
 
 
 SagemakerEndpoint.filter_registry.register('marked-for-op', TagActionFilter)
+
+
+class EndpointConfigDescribe(DescribeSource):
+
+    def augment(self, resources):
+        client = local_session(self.manager.session_factory).client('sagemaker')
+
+        def _augment(e):
+            tags = self.manager.retry(client.list_tags,
+                ResourceArn=e['EndpointConfigArn'])['Tags']
+            e['Tags'] = tags
+            return e
+
+        endpoints = super().augment(resources)
+        return list(map(_augment, endpoints))
 
 
 @resources.register('sagemaker-endpoint-config')
@@ -239,21 +263,10 @@ class SagemakerEndpointConfig(QueryResourceManager):
         arn = id = 'EndpointConfigArn'
         name = 'EndpointConfigName'
         date = 'CreationTime'
-        cfn_type = 'AWS::SageMaker::EndpointConfig'
+        config_type = cfn_type = 'AWS::SageMaker::EndpointConfig'
+        permissions_augment = ('sagemaker:ListTags',)
 
-    permissions = ('sagemaker:ListTags',)
-
-    def augment(self, endpoints):
-        client = local_session(self.session_factory).client('sagemaker')
-
-        def _augment(e):
-            tags = self.retry(client.list_tags,
-                ResourceArn=e['EndpointConfigArn'])['Tags']
-            e['Tags'] = tags
-            return e
-
-        endpoints = super(SagemakerEndpointConfig, self).augment(endpoints)
-        return list(map(_augment, endpoints))
+    source_mapping = {'describe': EndpointConfigDescribe, 'config': ConfigSource}
 
 
 SagemakerEndpointConfig.filter_registry.register('marked-for-op', TagActionFilter)
@@ -726,3 +739,31 @@ class SagemakerTransformJobStop(BaseAction):
                 client.stop_transform_job(TransformJobName=j['TransformJobName'])
             except client.exceptions.ResourceNotFound:
                 pass
+
+
+class SagemakerDomainDescribe(DescribeSource):
+
+    def augment(self, resources):
+        return universal_augment( self.manager, super().augment(resources))
+
+
+@resources.register('sagemaker-domain')
+class SagemakerDomain(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'sagemaker'
+        enum_spec = ('list_domains', 'Domains', None)
+        detail_spec = ('describe_domain', 'DomainId', 'DomainId', None)
+        id = 'DomainId'
+        arn = 'DomainArn'
+        name = 'DomainName'
+        cfn_type = 'AWS::SageMaker::Domain'
+        permission_prefix = 'sagemaker'
+        universal_taggable = object()
+
+    source_mapping = {'describe': SagemakerDomainDescribe}
+
+
+@SagemakerDomain.filter_registry.register('kms-key')
+class SagemakerDomainKmsFilter(KmsRelatedFilter):
+  RelatedIdsExpression = 'KmsKeyId'

@@ -126,6 +126,7 @@ class EC2(query.QueryResourceManager):
         dimension = 'InstanceId'
         cfn_type = config_type = "AWS::EC2::Instance"
         id_prefix = 'i-'
+        permissions_augment = ('ec2:DescribeTags',)
 
         default_report_fields = (
             'CustodianDate',

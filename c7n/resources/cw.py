@@ -46,6 +46,7 @@ class Alarm(QueryResourceManager):
         date = 'AlarmConfigurationUpdatedTimestamp'
         cfn_type = config_type = 'AWS::CloudWatch::Alarm'
         universal_taggable = object()
+        permissions_augment = ("cloudwatch:ListTagsForResource",)
 
     source_mapping = {
         'describe': DescribeAlarm,
@@ -183,6 +184,7 @@ class EventBus(QueryResourceManager):
         config_type = cfn_type = 'AWS::Events::EventBus'
         id = name = 'Name'
         universal_taggable = object()
+        permissions_augment = ("events:ListTagsForResource",)
 
     source_mapping = {'describe': DescribeWithResourceTags,
                       'config': ConfigSource}
@@ -224,6 +226,11 @@ class EventBusDelete(BaseAction):
                     client.delete_event_bus,
                     Name=r['Name'])
 
+class RuleDescribe(DescribeSource):
+
+    def augment(self, resources):
+        return universal_augment(self.manager, resources)
+
 
 @resources.register('event-rule')
 class EventRule(QueryResourceManager):
@@ -235,10 +242,14 @@ class EventRule(QueryResourceManager):
         id = "Name"
         filter_name = "NamePrefix"
         filter_type = "scalar"
-        cfn_type = 'AWS::Events::Rule'
+        config_type = cfn_type = 'AWS::Events::Rule'
         universal_taggable = object()
+        permissions_augment = ("events:ListTagsForResource",)
 
-    augment = universal_augment
+    source_mapping = {
+        'config': ConfigSource,
+        'describe': RuleDescribe
+    }
 
 
 @EventRule.filter_registry.register('metrics')
@@ -537,6 +548,7 @@ class LogGroup(QueryResourceManager):
         date = 'creationTime'
         universal_taggable = True
         cfn_type = 'AWS::Logs::LogGroup'
+        permissions_augment = ("logs:ListTagsForResource",)
 
     augment = universal_augment
 

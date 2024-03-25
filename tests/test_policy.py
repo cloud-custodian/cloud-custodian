@@ -77,6 +77,8 @@ class PolicyMetaLint(BaseTest):
                 "kinesis:DescribeStream",
                 "kinesis:ListStreams",
                 "kinesis:DeleteStream",
+                "kinesis:ListTagsForStream",
+                "tag:GetResources"
             },
         )
 
@@ -409,7 +411,6 @@ class PolicyMetaLint(BaseTest):
             "AWS::ResourceExplorer2::Index",
             # q4 2023
             "AWS::APS::RuleGroupsNamespace",
-            "AWS::AppStream::Stack",
             "AWS::Batch::SchedulingPolicy",
             "AWS::CodeBuild::ReportGroup",
             "AWS::CodeGuruProfiler::ProfilingGroup",
@@ -437,7 +438,6 @@ class PolicyMetaLint(BaseTest):
             "AWS::AppRunner::Service",
             "AWS::Athena::PreparedStatement",
             "AWS::CustomerProfiles::ObjectType",
-            "AWS::DMS::Endpoint",
             "AWS::EC2::CapacityReservation",
             "AWS::EC2::ClientVpnEndpoint",
             "AWS::EC2::IPAMScope",
@@ -461,7 +461,6 @@ class PolicyMetaLint(BaseTest):
             "AWS::Pinpoint::EmailTemplate",
             "AWS::Pinpoint::EventStream",
             "AWS::ResilienceHub::App",
-            "AWS::S3::AccessPoint",
             # q2 2023 wave 3
             "AWS::Amplify::App",
             "AWS::AppMesh::VirtualNode",
@@ -480,7 +479,6 @@ class PolicyMetaLint(BaseTest):
             "AWS::Transfer::Connector",
             # q2 2023 wave 2
             "AWS::AppConfig::DeploymentStrategy",
-            "AWS::AppFlow::Flow",
             "AWS::AuditManager::Assessment",
             "AWS::CloudWatch::MetricStream",
             "AWS::DeviceFarm::InstanceProfile",
@@ -510,7 +508,6 @@ class PolicyMetaLint(BaseTest):
             "AWS::EC2::IPAM",
             "AWS::EC2::NetworkInsightsPath",
             "AWS::EC2::TrafficMirrorFilter",
-            "AWS::Events::Rule",
             "AWS::HealthLake::FHIRDatastore",
             "AWS::IoTTwinMaker::Scene",
             "AWS::KinesisVideo::SignalingChannel",
@@ -594,7 +591,6 @@ class PolicyMetaLint(BaseTest):
             'AWS::Route53RecoveryReadiness::Cell',
             'AWS::Route53RecoveryReadiness::RecoveryGroup',
             'AWS::Route53Resolver::FirewallDomainList',
-            'AWS::S3::MultiRegionAccessPoint',
             'AWS::S3::StorageLens',
             'AWS::SES::ReceiptFilter',
             'AWS::SES::ReceiptRuleSet',
@@ -605,7 +601,6 @@ class PolicyMetaLint(BaseTest):
             # 'AWS::ApiGatewayV2::Stage',
             'AWS::Athena::DataCatalog',
             'AWS::Athena::WorkGroup',
-            'AWS::AutoScaling::ScalingPolicy',
             'AWS::AutoScaling::ScheduledAction',
             'AWS::Backup::BackupSelection',
             'AWS::Backup::RecoveryPoint',
@@ -643,7 +638,6 @@ class PolicyMetaLint(BaseTest):
             'AWS::SSM::ManagedInstanceInventory',
             'AWS::SSM::PatchCompliance',
             'AWS::SageMaker::CodeRepository',
-            'AWS::ServiceCatalog::CloudFormationProduct',
             'AWS::ServiceCatalog::CloudFormationProvisionedProduct',
             'AWS::ShieldRegional::Protection',
             'AWS::WAF::RateBasedRule',
@@ -676,7 +670,6 @@ class PolicyMetaLint(BaseTest):
             'AWS::DMS::Certificate',
             'AWS::Detective::Graph',
             'AWS::EC2::TransitGatewayRouteTable',
-            'AWS::AppSync::GraphQLApi',
             'AWS::Glue::Job',
             'AWS::SageMaker::NotebookInstanceLifecycleConfig',
             'AWS::SES::ContactList',
@@ -689,7 +682,6 @@ class PolicyMetaLint(BaseTest):
             'AWS::EC2::NetworkInsightsAccessScopeAnalysis',
             'AWS::Route53::HostedZone',
             'AWS::GuardDuty::IPSet',
-            'AWS::SES::ConfigurationSet',
             'AWS::GuardDuty::ThreatIntelSet',
             'AWS::DataSync::LocationNFS',
             'AWS::DataSync::LocationEFS',
@@ -721,9 +713,10 @@ class PolicyMetaLint(BaseTest):
 
         # config service can't be bothered to update their sdk correctly
         invalid_ignore = {
-            'AWS::ECS::Service',
-            'AWS::ECS::TaskDefinition',
-            'AWS::NetworkFirewall::Firewall',
+            'AWS::Config::ConfigurationRecorder',
+            'AWS::SageMaker::NotebookInstance',
+            'AWS::SageMaker::EndpointConfig',
+            'AWS::DMS::ReplicationInstance',
             'AWS::DMS::ReplicationTask',
         }
         bad_types = resource_config_types.difference(config_types)
@@ -1045,6 +1038,8 @@ class PolicyMeta(BaseTest):
                 "kinesis:DescribeStream",
                 "kinesis:ListStreams",
                 "kinesis:DeleteStream",
+                "kinesis:ListTagsForStream",
+                "tag:GetResources"
             },
         )
 

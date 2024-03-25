@@ -27,7 +27,7 @@ Option 1: Install released packages to local Python Environment
 .. code-block:: bash
 
     pip install c7n
-    pip install c7n_oci
+    pip install c7n-oci
 
 
 Option 2: Install latest from the repository

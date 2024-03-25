@@ -9,10 +9,14 @@
         "lastUpdatedAt": "2023-11-03T02:36:27.877000+00:00",
         "meshOwner": "123456789012",
         "resourceOwner": "123456789012",
-        "uid": "2143368a-8d58-4b30-b08e-57347af88525",
+        "uid": "1013368a-8d58-4b30-b08e-57347af88525",
         "version": 1
       },
-      "spec": {},
+      "spec": {
+        "egressFilter" : {
+          "type" : "ALLOW_ALL"
+        }
+      },
       "status": {
         "status": "ACTIVE"
       }

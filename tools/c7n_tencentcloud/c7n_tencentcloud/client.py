@@ -1,10 +1,11 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
-
 import os
 
 import socket
 from retrying import retry
+
+from c7n import version
 from .utils import PageMethod
 from c7n.exceptions import PolicyExecutionError
 from c7n.utils import jmespath_search
@@ -14,7 +15,6 @@ from tencentcloud.common.exception.tencent_cloud_sdk_exception import TencentClo
 from tencentcloud.common.profile.client_profile import ClientProfile
 from tencentcloud.common.profile.http_profile import HttpProfile
 from tencentcloud.common.common_client import CommonClient
-
 
 RETRYABLE_EXCEPTIONS = (socket.error, ConnectionError)
 
@@ -62,6 +62,7 @@ class Client:
             need to refer to SDK documents.
         :return: A dictionary
         """
+        self._cli._sdkVersion = "Custodian-v" + version.version
         resp = self._cli.call_json(action, params)
         return resp
 
@@ -91,7 +92,7 @@ class Client:
         query_counter = 1
         while True:
             if (query_counter > self.MAX_REQUEST_TIMES
-            or len(results) > self.MAX_RESPONSE_DATA_COUNT):
+                    or len(results) > self.MAX_RESPONSE_DATA_COUNT):
                 raise PolicyExecutionError("get too many resources from cloud provider")
 
             # some api Offset and Limit fields are string
@@ -107,8 +108,8 @@ class Client:
                     if len(items) < int(paging_def["limit"]["value"]):
                         # no more data
                         break
-                    params[PageMethod.Offset.name] = int(params[PageMethod.Offset.name]) +\
-                        int(paging_def["limit"]["value"])
+                    params[PageMethod.Offset.name] = int(params[PageMethod.Offset.name]) + \
+                                                     int(paging_def["limit"]["value"])
                 elif paging_method == PageMethod.Page:
                     if len(items) < int(paging_def["limit"]["value"]):
                         # no more data
@@ -126,6 +127,7 @@ class Client:
 
 class Session:
     """Session"""
+
     def __init__(self) -> None:
         """
         credential_file contains secret_id and secret_key.
@@ -142,8 +144,8 @@ class Session:
         # so we need to check for the token first
         if 'TENCENTCLOUD_TOKEN' in os.environ:
             if (
-                'TENCENTCLOUD_SECRET_ID' not in os.environ or
-                'TENCENTCLOUD_SECRET_KEY' not in os.environ
+                    'TENCENTCLOUD_SECRET_ID' not in os.environ or
+                    'TENCENTCLOUD_SECRET_KEY' not in os.environ
             ):
                 raise TencentCloudSDKException(
                     'TENCENTCLOUD_TOKEN provided, but one of TENCENTCLOUD_SECRET_ID'
