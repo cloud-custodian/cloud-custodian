@@ -1,13 +1,10 @@
 {
-    "status_code": 200,
+    "status_code": 400,
     "data": {
-        "Name": "custodian-ec2-foo-bar",
-        "Arn": "arn:aws:events:us-east-1:644160558196:rule/custodian-ec2-foo-bar",
-        "EventPattern": "{\"detail-type\": [\"AWS API Call via CloudTrail\"], \"detail\": {\"eventSource\": [\"ec2.amazonaws.com\"], \"eventName\": [\"RunInstances\"]}}",
-        "State": "ENABLED",
-        "Description": "cloud-custodian lambda policy",
-        "EventBusName": "default",
-        "CreatedBy": "644160558196",
+        "Error": {
+            "Message": "Rule custodian-ec2-foo-bar does not exist on EventBus default.",
+            "Code": "ResourceNotFoundException"
+        },
         "ResponseMetadata": {}
     }
 }

@@ -1,12 +1,7 @@
 {
-    "status_code": 409,
+    "status_code": 201,
     "data": {
-        "Error": {
-            "Message": "The statement id (custodian-ec2-foo-bar) provided already exists. Please provide a new statement id, or remove the existing statement.",
-            "Code": "ResourceConflictException"
-        },
         "ResponseMetadata": {},
-        "Type": "User",
-        "message": "The statement id (custodian-ec2-foo-bar) provided already exists. Please provide a new statement id, or remove the existing statement."
+        "Statement": "{\"Sid\":\"custodian-ec2-foo-bar\",\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"events.amazonaws.com\"},\"Action\":\"lambda:InvokeFunction\",\"Resource\":\"arn:aws:lambda:us-east-1:644160558196:function:custodian-ec2-foo-bar\",\"Condition\":{\"ArnLike\":{\"AWS:SourceArn\":\"arn:aws:events:us-east-1:644160558196:rule/custodian-ec2-foo-bar\"}}}"
     }
 }
