@@ -1810,7 +1810,7 @@ class LambdaModeTest(BaseTest):
             'mode=schedule:version=%s' % version)
         self.assertEqual(
             policy_lambda[0].tags['custodian-schedule'],
-            f'name=custodian-foobar:group=default'
+            'name=custodian-foobar:group=default'
         )
 
 
