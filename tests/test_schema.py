@@ -211,7 +211,7 @@ class SchemaTest(BaseTest):
             len(errors[0].absolute_schema_path) < len(error.absolute_schema_path)
         )
         self.assertTrue("'scheduled' was unexpected" in str(error))
-        self.assertTrue(len(str(error)) < 2100)
+        self.assertTrue(len(str(error)) < 2000)
 
     def test_semantic_error_policy_scope(self):
         data = {

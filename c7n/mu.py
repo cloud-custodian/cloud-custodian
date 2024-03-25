@@ -1032,9 +1032,9 @@ class AWSEventBase:
                 StatementId=func.event_name,
             )
             return True
-        except ClientError as e:
+        except ClientError as e:  # pragma: no cover
             if e.response['Error']['Code'] != 'ResourceNotFoundException':
-                raise  # pragma: no cover
+                raise
 
 
 class CloudWatchEventSource(AWSEventBase):
@@ -1340,7 +1340,7 @@ class EventBridgeScheduleSource(AWSEventBase):
                         schedule = resource_exists(client.get_schedule,
                                                    Name=func.event_name,
                                                    GroupName=group['Name'])
-                        if schedule:
+                        if schedule:  # pragma: no cover
                             log.debug(f'Removing schedule {func.event_name} '
                                       f'in group {group["Name"]}')
                             client.delete_schedule(Name=func.event_name, GroupName=group['Name'])
