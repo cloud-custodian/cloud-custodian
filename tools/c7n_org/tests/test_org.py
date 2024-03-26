@@ -366,4 +366,3 @@ class OrgTest(TestUtils):
              "--debug", "-s", "output", "--cache-path", "cache"],
             catch_exceptions=False)
         self.assertEqual(result.exit_code, 0)
-

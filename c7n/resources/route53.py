@@ -156,7 +156,6 @@ class Route53Domain(QueryResourceManager):
         name = id = 'DomainName'
         global_resource = False
 
-
     permissions = ('route53domains:ListTagsForDomain',)
 
     def augment(self, domains):
@@ -270,8 +269,8 @@ class ResourceRecordSetRemove(BaseAction):
                     },
                     ignore_err_codes=('InvalidChangeBatch'))
         except Exception as e:
-                self.log.warning(
-                    "ResourceRecordSet delete error: %s", e)
+            self.log.warning(
+                "ResourceRecordSet delete error: %s", e)
 
 
 @HostedZone.action_registry.register('delete')
@@ -833,7 +832,6 @@ class ReadinessCheckCrossAccount(CrossAccountAccessFilter):
         return results
 
 
-
 class DescribeCluster(query.DescribeSource):
     def augment(self, clusters):
         for r in clusters:
@@ -863,7 +861,6 @@ class RecoveryCluster(QueryResourceManager):
     def get_client(self):
         return local_session(self.session_factory) \
             .client('route53-recovery-control-config', region_name=ARC_REGION)
-
 
 
 @RecoveryCluster.action_registry.register('tag')

@@ -216,6 +216,7 @@ class SqlInstanceTest(BaseTest):
             session_factory=factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
+
     def test_set_high_availability(self):
         project_id = 'cloud-custodian'
         instance_name = 'custodiantestsql'
@@ -247,7 +248,6 @@ class SqlInstanceTest(BaseTest):
             'get', {'project': project_id,
                     'instance': instance_name})
         self.assertEqual(result['settings']['availabilityType'], 'REGIONAL')
-
 
 
 class SqlUserTest(BaseTest):

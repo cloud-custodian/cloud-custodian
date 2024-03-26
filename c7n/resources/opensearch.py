@@ -27,6 +27,7 @@ class OpensearchServerless(QueryResourceManager):
 
     def augment(self, resources):
         client = local_session(self.session_factory).client('opensearchserverless')
+
         def _augment(r):
             tags = self.retry(client.list_tags_for_resource,
                 resourceArn=r['arn'])['tags']
@@ -38,7 +39,7 @@ class OpensearchServerless(QueryResourceManager):
 
 @OpensearchServerless.filter_registry.register('kms-key')
 class OpensearchServerlessKmsFilter(KmsRelatedFilter):
-  RelatedIdsExpression = 'kmsKeyArn'
+    RelatedIdsExpression = 'kmsKeyArn'
 
 
 @OpensearchServerless.action_registry.register('tag')
@@ -86,7 +87,10 @@ class RemoveTagOpensearchServerlessResource(RemoveTag):
         for r in resources:
             client.untag_resource(resourceArn=r['arn'], tagKeys=tags)
 
+
 OpensearchServerless.filter_registry.register('marked-for-op', TagActionFilter)
+
+
 @OpensearchServerless.action_registry.register('mark-for-op')
 class MarkOpensearchServerlessForOp(TagDelayedAction):
     """Mark OpenSearch Serverless for deferred action
@@ -105,6 +109,7 @@ class MarkOpensearchServerlessForOp(TagDelayedAction):
                 op: delete
                 days: 1
     """
+
 
 @OpensearchServerless.action_registry.register('delete')
 class DeleteOpensearchServerless(BaseAction):
@@ -129,6 +134,6 @@ class DeleteOpensearchServerless(BaseAction):
         client = local_session(self.manager.session_factory).client('opensearchserverless')
         for r in resources:
             try:
-              client.delete_collection(id=r['id'])
+                client.delete_collection(id=r['id'])
             except client.exceptions.ResourceNotFoundException:
-              continue
+                continue

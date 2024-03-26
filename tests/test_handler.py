@@ -107,7 +107,7 @@ class HandleTest(BaseTest):
 
     @mock.patch('c7n.handler.PolicyCollection')
     def test_dispatch_err_event(self, mock_collection):
-        output, executions = self.setupLambdaEnv({
+        output, _ = self.setupLambdaEnv({
             'execution-options': {
                 'output_dir': 's3://xyz?region=us-east-1',
                 'account_id': '004'},
@@ -123,7 +123,7 @@ class HandleTest(BaseTest):
         mock_collection.from_data.assert_called_once()
 
     def test_dispatch_err_handle(self):
-        output, executions = self.setupLambdaEnv({
+        output, _ = self.setupLambdaEnv({
             'execution-options': {
                 'output_dir': 's3://xyz?region=us-east-1', 'account_id': '004'},
             'policies': [{'resource': 'ec2', 'name': 'xyz'}]},
@@ -139,7 +139,7 @@ class HandleTest(BaseTest):
         self.assertEqual(output.getvalue().count('error during'), 2)
 
     def test_handler(self):
-        output, executions = self.setupLambdaEnv({
+        _, executions = self.setupLambdaEnv({
             'policies': [{
                 'resource': 'asg', 'name': 'auto'}]},
         )

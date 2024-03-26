@@ -63,7 +63,7 @@ class DescribeWafV2(DescribeSource):
         # is a required parameter for most API calls - we augment the resource with the desired
         # scope here in order to use it downstream for API calls
         return [
-            { 'Scope': scope, **r }
+            {'Scope': scope, **r}
             for r in super().resources(query)
         ]
 
@@ -73,7 +73,7 @@ class DescribeWafV2(DescribeSource):
 
         resources = self.query.filter(self.manager, **params)
         return [
-            { 'Scope': scope, **r }
+            {'Scope': scope, **r}
             for r in resources
             if r[self.manager.resource_type.id] in ids
         ]
@@ -108,6 +108,7 @@ class WAF(QueryResourceManager):
         'describe': DescribeWaf,
         'config': ConfigSource
     }
+
 
 @resources.register('waf-regional')
 class RegionalWAF(QueryResourceManager):

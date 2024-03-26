@@ -7,6 +7,7 @@ import logging
 from gcp_common import BaseTest, event_data
 from c7n.config import Config
 
+
 class KubernetesClusterTest(BaseTest):
 
     def test_cluster_query(self):
@@ -290,6 +291,7 @@ class KubernetesClusterTest(BaseTest):
                 'us-east1-b')})
 
         self.assertEqual(result['clusters'][0]['status'], 'STOPPING')
+
 
 class KubernetesClusterNodePoolTest(BaseTest):
 

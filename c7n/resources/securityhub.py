@@ -522,10 +522,10 @@ class PostFinding(Action):
                 self.manager.config.region,
                 self.manager.config.account_id,
                 # we use md5 for id, equiv to using crc32
-                hashlib.md5( # nosec nosemgrep
+                hashlib.md5(  # nosec nosemgrep
                     json.dumps(policy.data).encode('utf8'),
                     **params).hexdigest(),
-                hashlib.md5( # nosec nosemgrep
+                hashlib.md5(  # nosec nosemgrep
                     json.dumps(list(sorted([r[model.id] for r in resources]))).encode('utf8'),
                     **params).hexdigest()
             )
@@ -754,7 +754,7 @@ class SecurityhubFinding(query.QueryResourceManager):
     Reference for available filters:
 
     https://docs.aws.amazon.com/securityhub/1.0/APIReference/API_GetFindings.html#API_GetFindings_RequestSyntax
-    """ # noqa: E501
+    """  # noqa: E501
 
     class resource_type(query.TypeInfo):
         service = "securityhub"

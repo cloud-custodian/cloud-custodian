@@ -176,6 +176,7 @@ class Firewall(QueryResourceManager):
             return []
         return get_firewall_port_ranges(resources)
 
+
 @Firewall.action_registry.register('delete')
 class DeleteFirewall(MethodAction):
     """Delete filtered Firewall Rules

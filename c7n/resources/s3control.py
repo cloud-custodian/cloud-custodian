@@ -109,7 +109,7 @@ class StorageLensDescribe(DescribeSource):
         client = local_session(self.manager.session_factory).client('s3control')
         results = []
         for r in resources:
-            storage_lens_configuration = self.manager.retry( \
+            storage_lens_configuration = self.manager.retry(
                 client.get_storage_lens_configuration,
                 AccountId=self.manager.config.account_id,
                 ConfigId=r['Id']) \
@@ -164,6 +164,8 @@ class DeleteStorageLens(BaseAction):
 
 
 StorageLens.filter_registry.register('marked-for-op', TagActionFilter)
+
+
 @StorageLens.action_registry.register('mark-for-op')
 class MarkStorageLensForOp(TagDelayedAction):
     """Mark storage lens configuration for future actions

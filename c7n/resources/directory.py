@@ -110,6 +110,7 @@ class DirectoryRemoveTag(RemoveTag):
 Directory.filter_registry.register('marked-for-op', TagActionFilter)
 Directory.action_registry.register('mark-for-op', TagDelayedAction)
 
+
 @Directory.action_registry.register('delete')
 class DirectoryDelete(BaseAction):
     """Delete a directory.
@@ -160,6 +161,7 @@ class CloudDirectory(QueryResourceManager):
             query['Filters'] = query_filters
         return super(CloudDirectory, self).resources(query=query)
 
+
 @CloudDirectory.action_registry.register('delete')
 class CloudDirectoryDelete(BaseAction):
     """Delete a cloud directory.
@@ -191,6 +193,7 @@ class CloudDirectoryDelete(BaseAction):
                 client.delete_directory,
                 DirectoryArn=r['DirectoryArn'])
 
+
 @CloudDirectory.action_registry.register('disable')
 class CloudDirectoryDisable(BaseAction):
     """Disable a cloud directory.
@@ -215,6 +218,7 @@ class CloudDirectoryDisable(BaseAction):
             self.manager.retry(
                     client.disable_directory,
                     DirectoryArn=r['DirectoryArn'])
+
 
 class CloudDirectoryQueryParser(QueryParser):
     QuerySchema = {

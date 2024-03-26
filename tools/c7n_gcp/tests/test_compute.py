@@ -520,6 +520,7 @@ class ImageTest(BaseTest):
                      'filter': 'name = image-1'})
         self.assertEqual(result['items'][0]['labels'].get('test_label'), None)
 
+
 class InstanceTemplateTest(BaseTest):
 
     def test_instance_template_query(self):
@@ -723,6 +724,3 @@ class TestInstanceGroupManager(BaseTest):
 
         self.assertEqual(1, len(resources))
         self.assertEqual('instance-group-2', resources[0]['name'])
-
-
-

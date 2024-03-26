@@ -11,6 +11,7 @@ from c7n.utils import local_session, type_schema
 from .aws import shape_validate
 from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction
 
+
 class FirewallDescribe(DescribeSource):
 
     def augment(self, resources):
@@ -69,6 +70,7 @@ class FirewallSubnetFilter(SubnetFilter):
 
     RelatedIdsExpression = 'SubnetMappings[].SubnetId'
 
+
 @NetworkFirewall.action_registry.register('tag')
 class TagNetworkFirewall(Tag):
     """Create tags on Network Firewalls
@@ -114,6 +116,8 @@ class RemoveNetworkFirewall(RemoveTag):
 
 
 NetworkFirewall.filter_registry.register('marked-for-op', TagActionFilter)
+
+
 @NetworkFirewall.action_registry.register('mark-for-op')
 class MarkNetworkFirewallForOp(TagDelayedAction):
     """Mark network firewall for future actions
@@ -132,6 +136,7 @@ class MarkNetworkFirewallForOp(TagDelayedAction):
                 op: delete
                 days: 1
     """
+
 
 @NetworkFirewall.filter_registry.register('logging-config')
 class NetworkFirewallLogging(ListItemFilter):
@@ -212,12 +217,12 @@ class DeleteNetworkFirewall(BaseAction):
             logging_updater.process(resources)
         for r in resources:
             try:
-              client.delete_firewall(
-                  FirewallName=r['FirewallName'],
-                  FirewallArn =r['FirewallArn']
-                  )
+                client.delete_firewall(
+                    FirewallName=r['FirewallName'],
+                    FirewallArn=r['FirewallArn']
+                )
             except client.exceptions.ResourceNotFoundException:
-              continue
+                continue
 
 
 @NetworkFirewall.action_registry.register('update-delete-protection')
@@ -228,7 +233,8 @@ class UpdateNetworkFirewallDeleteProtection(BaseAction):
 
     schema = type_schema(
         'update-delete-protection',
-        state={'type': 'boolean'})
+        state={'type': 'boolean'}
+    )
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('network-firewall')
@@ -237,8 +243,8 @@ class UpdateNetworkFirewallDeleteProtection(BaseAction):
             try:
                 client.update_firewall_delete_protection(
                     FirewallName=r['FirewallName'],
-                    FirewallArn =r['FirewallArn'],
-                    DeleteProtection = state
+                    FirewallArn=r['FirewallArn'],
+                    DeleteProtection=state
                     )
             except client.exceptions.ResourceNotFoundException:
                 continue
@@ -314,8 +320,8 @@ class UpdateNetworkFirewallLoggingConfiguration(BaseAction):
                 try:
                     client.update_logging_configuration(
                         FirewallName=r['FirewallName'],
-                        FirewallArn =r['FirewallArn'],
-                        LoggingConfiguration = params
+                        FirewallArn=r['FirewallArn'],
+                        LoggingConfiguration=params
                         )
                 except client.exceptions.ResourceNotFoundException:
                     continue
@@ -329,8 +335,8 @@ class UpdateNetworkFirewallLoggingConfiguration(BaseAction):
                     try:
                         client.update_logging_configuration(
                             FirewallName=r['FirewallName'],
-                            FirewallArn =r['FirewallArn'],
-                            LoggingConfiguration = { 'LogDestinationConfigs': loggingConfigurations}
+                            FirewallArn=r['FirewallArn'],
+                            LoggingConfiguration={'LogDestinationConfigs': loggingConfigurations}
                         )
                     except client.exceptions.ResourceNotFoundException:
                         continue

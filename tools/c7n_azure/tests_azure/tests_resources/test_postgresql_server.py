@@ -284,7 +284,7 @@ class PostgresqlConfigurationParameterFilterTest(BaseTest):
 
     def _get_test_resources(self, count=1):
         return [
-            dict(name=f'test-name-{i+1}', resourceGroup=f'test-group-{i+1}', properties={})
+            dict(name=f'test-name-{i + 1}', resourceGroup=f'test-group-{i + 1}', properties={})
             for i in range(count)
         ]
 

@@ -13,7 +13,6 @@ from c7n.tags import (
     TagDelayedAction, RemoveTag, TagActionFilter, Tag)
 
 
-
 class ConfigStream(ConfigSource):
 
     def load_resource(self, item):
@@ -365,8 +364,10 @@ class KinesisVideoStream(QueryResourceManager):
         'config': ConfigSource
     }
 
+
 KinesisVideoStream.action_registry.register('mark-for-op', TagDelayedAction)
 KinesisVideoStream.filter_registry.register('marked-for-op', TagActionFilter)
+
 
 @KinesisVideoStream.action_registry.register('delete')
 class DeleteVideoStream(Action):
@@ -458,4 +459,3 @@ class VideoStreamRemoveTag(RemoveTag):
                 ResourceARN=r['StreamARN'],
                 TagKeyList=tag_keys,
                 ignore_err_codes=("ResourceNotFoundException",))
-

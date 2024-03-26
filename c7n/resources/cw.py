@@ -114,12 +114,12 @@ class IsCompositeChild(Filter):
 
         return [r for r in resources if r['AlarmName'] not in child_alarm_names]
 
-
     def extract_alarm_names_from_rule(self, rule):
         # Check alarm references (OK/ALARM/INSUFFICIENT_DATA)
         pattern = r"\b(?:ALARM|OK|INSUFFICIENT_DATA)\s*\(\s*([^\)]+)\s*\)"
         matches = re.findall(pattern, rule)
         return set(matches)
+
 
 @resources.register('composite-alarm')
 class CompositeAlarm(QueryResourceManager):
@@ -226,6 +226,7 @@ class EventBusDelete(BaseAction):
                     client.delete_event_bus,
                     Name=r['Name'])
 
+
 class RuleDescribe(DescribeSource):
 
     def augment(self, resources):
@@ -234,6 +235,7 @@ class RuleDescribe(DescribeSource):
 
 @resources.register('event-rule')
 class EventRule(QueryResourceManager):
+
     class resource_type(TypeInfo):
         service = 'events'
         arn_type = 'rule'
@@ -1052,7 +1054,6 @@ class SubscriptionFilter(BaseAction):
         for r in resources:
             client.put_subscription_filter(
                 logGroupName=r['logGroupName'], **params)
-
 
 
 @resources.register("cloudwatch-dashboard")

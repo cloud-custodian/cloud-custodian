@@ -54,7 +54,7 @@ class WebAppFirewallFilter(Filter):
 
 
     """
-    schema = type_schema('waf',required=['state'],
+    schema = type_schema('waf', required=['state'],
             state={'type': 'string', 'enum': ['Enabled', 'Disabled']})
 
     def check_state(self, link):

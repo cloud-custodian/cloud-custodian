@@ -26,7 +26,7 @@ class TestServer(KubeTest):
     def find_port(self):
         sock = socket.socket()
         sock.bind(("", 0))
-        ((server, port)) = sock.getsockname()
+        ((_, port)) = sock.getsockname()
         return port
 
     @contextmanager
@@ -130,7 +130,7 @@ class TestServer(KubeTest):
 
     def test_server_handle_get_empty_policies(self):
         policies = {"policies": []}
-        with self._server(policies) as ((server, port)):
+        with self._server(policies) as ((_, port)):
             res = requests.get(f"http://localhost:{port}")
             self.assertEqual(res.json(), [])
             self.assertEqual(res.status_code, 200)
@@ -151,14 +151,15 @@ class TestServer(KubeTest):
                 }
             ]
         }
-        with self._server(policies) as ((server, port)):
+        with self._server(policies) as ((_, port)):
             res = requests.get(f"http://localhost:{port}")
             self.assertEqual(res.json(), policies["policies"])
             self.assertEqual(res.status_code, 200)
 
     def test_server_handle_post_no_policies(self):
         policies = {"policies": []}
-        with self._server(policies) as ((server, port)):
+
+        with self._server(policies) as ((_, port)):
             event = self.get_event("create_pod")
             res = requests.post(f"http://localhost:{port}", json=event)
             self.assertEqual(res.status_code, 200)
@@ -192,7 +193,7 @@ class TestServer(KubeTest):
                 }
             ]
         }
-        with self._server(policies) as ((server, port)):
+        with self._server(policies) as ((_, port)):
             event = self.get_event("create_pod")
             res = requests.post(f"http://localhost:{port}", json=event)
             self.assertEqual(res.status_code, 200)
@@ -214,7 +215,7 @@ class TestServer(KubeTest):
                 }
             ]
         }
-        with self._server(policies) as ((server, port)):
+        with self._server(policies) as ((_, port)):
             event = self.get_event("create_pod")
             res = requests.post(f"http://localhost:{port}", json=event)
             self.assertEqual(res.status_code, 200)
@@ -261,7 +262,7 @@ class TestServer(KubeTest):
                 },
             ]
         }
-        with self._server(policies) as (server, port):
+        with self._server(policies) as (_, port):
             event = self.get_event("create_pod")
             res = requests.post(f"http://localhost:{port}", json=event)
             self.assertEqual(res.status_code, 200)
@@ -293,7 +294,7 @@ class TestServer(KubeTest):
                 },
             ]
         }
-        with self._server(policies) as (server, port):
+        with self._server(policies) as (_, port):
             event = self.get_event("create_pod")
             res = requests.post(f"http://localhost:{port}", json=event)
             self.assertEqual(res.status_code, 200)
@@ -306,7 +307,7 @@ class TestServer(KubeTest):
     def test_server_init(self):
         policies = {"policies": []}
         with patch("c7n_kube.server.AdmissionControllerServer") as patched:
-            with self._server(policies) as (server, port):
+            with self._server(policies) as (_, port):
                 init(
                     host="0.0.0.0",
                     port=port,
@@ -324,7 +325,7 @@ class TestServer(KubeTest):
 
     def test_server_bad_post(self):
         policies = {"policies": []}
-        with self._server(policies) as (server, port):
+        with self._server(policies) as (_, port):
             res = requests.post(f"http://localhost:{port}", data="bad data")
             self.assertEqual(res.status_code, 400)
             self.assertEqual(res.json(), {"error": "Expecting value: line 1 column 1 (char 0)"})
@@ -354,7 +355,7 @@ class TestServer(KubeTest):
                 },
             ]
         }
-        with self._server(policies) as (server, port):
+        with self._server(policies) as (_, port):
             event = self.get_event("create_pod")
             res = requests.post(f"http://localhost:{port}", json=event)
             self.assertEqual(res.status_code, 200)

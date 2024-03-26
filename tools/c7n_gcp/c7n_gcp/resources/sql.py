@@ -152,18 +152,19 @@ class SqlInstanceEnableDeletion(MethodAction):
             }
         }
 
+
 @SqlInstance.action_registry.register('set-high-availability')
 class SqlInstanceHighAvailability(MethodAction):
 
     schema = type_schema(
         'set-high-availability',
-        value={'type': 'boolean', 'required' : True})
+        value={'type': 'boolean', 'required': True})
     method_spec = {'op': 'patch'}
     path_param_re = re.compile('.*?/projects/(.*?)/instances/(.*)')
     method_perm = 'update'
 
     def get_resource_params(self, model, resource):
-        if self.data['value'] is False :
+        if self.data['value'] is False:
             availabilityType = 'ZONAL'
         else:
             availabilityType = 'REGIONAL'

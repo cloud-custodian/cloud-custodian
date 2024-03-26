@@ -323,6 +323,7 @@ class Kinesis(BaseTest):
         tags = client.list_tags_for_resource(ResourceARN=resources[0]['StreamARN'])['Tags']
         self.assertEqual(len(tags), 0)
 
+
 class KinesisAnalyticsAppV2(BaseTest):
 
     def test_kinesis_analyticsv2_app_delete(self):

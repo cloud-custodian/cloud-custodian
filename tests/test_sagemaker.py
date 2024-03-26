@@ -834,7 +834,6 @@ class TestSagemakerDomain(BaseTest):
         tags = client.list_tags(ResourceArn=resources[0]["DomainArn"])["Tags"]
         self.assertEqual(len(tags), 0)
 
-
     def test_sagemaker_domain_kms_alias(self):
         session_factory = self.replay_flight_data("test_sagemaker_domain_kms_key_filter")
         kms = session_factory().client('kms')

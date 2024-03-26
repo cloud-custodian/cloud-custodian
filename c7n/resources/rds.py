@@ -2133,6 +2133,7 @@ class RDSProxySecurityGroupFilter(net_filters.SecurityGroupFilter):
 
     RelatedIdsExpression = "VpcSecurityGroupIds[]"
 
+
 @RDSProxy.filter_registry.register('vpc')
 class RDSProxyVpcFilter(net_filters.VpcFilter):
 

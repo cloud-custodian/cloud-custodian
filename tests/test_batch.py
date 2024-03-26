@@ -30,8 +30,9 @@ class TestBatchComputeEnvironment(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         client = session_factory().client('batch')
-        tags = client.list_tags_for_resource(resourceArn=resources[0] \
-                                ['computeEnvironmentArn'])['tags']
+        tags = client.list_tags_for_resource(
+            resourceArn=resources[0]['computeEnvironmentArn']
+        )['tags']
         self.assertEqual(len(tags), 1)
         self.assertEqual(tags, {'team': 'policy'})
 

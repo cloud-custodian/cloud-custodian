@@ -239,7 +239,6 @@ class RDSClusterTest(BaseTest):
             DBClusterIdentifier='mytest')
         self.assertFalse(cluster['DBClusters'][0]['DeletionProtection'])
 
-
     def test_modify_rds_cluster_provisoned(self):
         session_factory = self.replay_flight_data("test_modify_rds_cluster_provisoned")
         p = self.load_policy(
@@ -280,7 +279,7 @@ class RDSClusterTest(BaseTest):
         client = session_factory().client("rds")
         cluster = client.describe_db_clusters(
             DBClusterIdentifier="database-2")
-        self.assertEqual(cluster['DBClusters'][0]['BackupRetentionPeriod'],8)
+        self.assertEqual(cluster['DBClusters'][0]['BackupRetentionPeriod'], 8)
 
     def test_rdscluster_tag_augment(self):
         session_factory = self.replay_flight_data("test_rdscluster_tag_augment")
@@ -533,6 +532,7 @@ class RDSClusterTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
+
 class RDSClusterSnapshotTest(BaseTest):
 
     def test_rdscluster_snapshot_config(self):
@@ -760,7 +760,6 @@ class RDSClusterSnapshotTest(BaseTest):
             resources[0]["DBClusterSnapshotIdentifier"]
         )
         self.assertEqual(len(restore_permissions_after), 0)
-
 
 
 class TestRDSClusterParameterGroupFilter(BaseTest):

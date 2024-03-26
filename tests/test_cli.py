@@ -28,7 +28,7 @@ class CliTest(BaseTest):
 
     def get_output(self, argv):
         """ Run cli.main with the supplied argv and return the output. """
-        out, err = self.run_and_expect_success(argv)
+        out, _ = self.run_and_expect_success(argv)
         return out
 
     def capture_output(self):
@@ -177,7 +177,7 @@ class ValidateTest(CliTest):
 class SchemaTest(CliTest):
 
     def test_schema_outline(self):
-        stdout, stderr = self.run_and_expect_success([
+        stdout, _ = self.run_and_expect_success([
             "custodian", "schema", "--outline", "--json", "aws"])
         data = json.loads(stdout)
         self.assertEqual(list(data.keys()), ["aws"])
@@ -187,19 +187,19 @@ class SchemaTest(CliTest):
         self.assertTrue(len(data['aws']['aws.ec2']['actions']) > 10)
 
     def test_schema_alias(self):
-        stdout, stderr = self.run_and_expect_success([
+        stdout, _ = self.run_and_expect_success([
             "custodian", "schema", "aws.network-addr"])
         self.assertIn("aws.elastic-ip:", stdout)
 
     def test_schema_alias_unqualified(self):
-        stdout, stderr = self.run_and_expect_success([
+        stdout, _ = self.run_and_expect_success([
             "custodian", "schema", "network-addr"])
         self.assertIn("aws.elastic-ip:", stdout)
 
     def test_schema(self):
 
         # no options
-        stdout, stderr = self.run_and_expect_success(["custodian", "schema"])
+        stdout, _ = self.run_and_expect_success(["custodian", "schema"])
         data = yaml_load(stdout)
         assert data['resources']
 
@@ -654,7 +654,7 @@ class MetricsTest(CliTest):
 class MiscTest(CliTest):
 
     def test_no_args(self):
-        stdout, stderr = self.run_and_expect_failure(["custodian"], 2)
+        _, stderr = self.run_and_expect_failure(["custodian"], 2)
         self.assertIn("metrics", stderr)
         self.assertIn("logs", stderr)
 

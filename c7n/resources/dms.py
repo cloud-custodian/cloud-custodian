@@ -413,7 +413,6 @@ class DeleteDmsEndpoint(BaseAction):
                 continue
 
 
-
 @resources.register("dms-replication-task")
 class DMSReplicationTask(QueryResourceManager):
     class resource_type(TypeInfo):

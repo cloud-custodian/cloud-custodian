@@ -829,7 +829,7 @@ def join_output(output_dir, suffix):
     # query string. make sure we add a suffix to
     # the path component.
     output_url_parts = output_url_parts._replace(
-        path = output_url_parts.path.rstrip('/') + '/%s' % suffix
+        path=output_url_parts.path.rstrip('/') + '/%s' % suffix
     )
     return urlparse.urlunparse(output_url_parts)
 

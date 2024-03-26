@@ -11,6 +11,7 @@ from c7n_gcp.utils import get_firewall_port_ranges
 
 from c7n.filters import ValueFilter
 
+
 @resources.register('gke-cluster')
 class KubernetesCluster(QueryResourceManager):
     """GCP resource:
@@ -51,10 +52,15 @@ class KubernetesCluster(QueryResourceManager):
             location_str = "locations"
             if resource['selfLink'].find(location_str) < 0:
                 location_str = "zones"
-            path_param_re = re.compile('.*?/projects/(.*?)/'+location_str+'/(.*?)/clusters/(.*)')
+            path_param_re = re.compile(
+                "%s%s%s" % (
+                    '.*?/projects/(.*?)/', location_str, '/(.*?)/clusters/(.*)'
+                )
+            )
             project, zone, cluster_name = path_param_re.match(
                 resource['selfLink']).groups()
-            return {'name': 'projects/'+project+'/locations/'+zone+'/clusters/'+cluster_name,
+            return {'name': "%s%s%s%s%s%s" % (
+                'projects/', project, '/locations/', zone, '/clusters/', cluster_name),
                     'body': {
                         'resourceLabels': all_labels,
                         'labelFingerprint': resource['labelFingerprint']
@@ -79,6 +85,7 @@ class KubernetesCluster(QueryResourceManager):
             if r.get('resourceLabels'):
                 r['labels'] = r['resourceLabels']
         return resources
+
 
 @KubernetesCluster.filter_registry.register('effective-firewall')
 class EffectiveFirewall(ValueFilter):
@@ -111,7 +118,7 @@ class EffectiveFirewall(ValueFilter):
     def get_firewalls(self, client, p, r):
         if self.annotation_key not in r:
             firewalls = client.execute_command('getEffectiveFirewalls',
-                verb_arguments = {'project': p, 'network': r['network']}).get('firewalls', [])
+                verb_arguments={'project': p, 'network': r['network']}).get('firewalls', [])
 
             r[self.annotation_key] = get_firewall_port_ranges(firewalls)
         return super(EffectiveFirewall, self).process(r[self.annotation_key], None)
@@ -187,6 +194,7 @@ class KubernetesClusterNodePool(ChildResourceManager):
         def _get_location(cls, resource):
             "Get the region from the parent - the cluster"
             return super()._get_location(cls.get_parent(resource))
+
 
 @KubernetesCluster.filter_registry.register('server-config')
 @KubernetesClusterNodePool.filter_registry.register('server-config')

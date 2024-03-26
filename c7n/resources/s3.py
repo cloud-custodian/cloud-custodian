@@ -2285,7 +2285,7 @@ class EncryptExtantKeys(ScanBucket):
 
 def restore_complete(restore):
     if ',' in restore:
-        ongoing, avail = restore.split(',', 1)
+        ongoing, _ = restore.split(',', 1)
     else:
         ongoing = restore
     return 'false' in ongoing
@@ -3833,4 +3833,3 @@ class S3Directory(query.QueryResourceManager):
         dimension = 'BucketName'
         cfn_type = 'AWS::S3Express::DirectoryBucket'
         permissions_enum = ("s3express:ListAllMyDirectoryBuckets",)
-
