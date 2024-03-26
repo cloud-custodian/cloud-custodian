@@ -1,0 +1,24 @@
+{
+    "status_code": 200,
+    "data": {
+        "TagDescriptions": [
+            {
+                "ResourceArn": "arn:aws:elasticloadbalancing:us-east-1:644160558196:loadbalancer/app/alb-unallowed/80b601d6253ea5b4",
+                "Tags": []
+            },
+            {
+                "ResourceArn": "arn:aws:elasticloadbalancing:us-east-1:644160558196:loadbalancer/net/nlb-allowed/85bc4c230334f70a",
+                "Tags": []
+            },
+            {
+                "ResourceArn": "arn:aws:elasticloadbalancing:us-east-1:644160558196:loadbalancer/net/nlb-unallowed/a761c77f84282027",
+                "Tags": []
+            },
+            {
+                "ResourceArn": "arn:aws:elasticloadbalancing:us-east-1:644160558196:loadbalancer/app/alb-allowed/ae462e03fa09c5c7",
+                "Tags": []
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

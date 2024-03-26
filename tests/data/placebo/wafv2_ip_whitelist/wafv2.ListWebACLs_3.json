@@ -1,0 +1,23 @@
+{
+    "status_code": 200,
+    "data": {
+        "NextMarker": "unallowed-addresses",
+        "WebACLs": [
+            {
+                "Name": "allowed-addresses-only",
+                "Id": "029995cf-302f-4108-b6ec-2015582115a4",
+                "Description": "",
+                "LockToken": "8098d8e2-f927-4d7e-b023-d5df3a007903",
+                "ARN": "arn:aws:wafv2:us-east-1:644160558196:regional/webacl/allowed-addresses-only/029995cf-302f-4108-b6ec-2015582115a4"
+            },
+            {
+                "Name": "unallowed-addresses",
+                "Id": "b4a90669-c7c9-49ae-85f3-b40df89e4c9f",
+                "Description": "",
+                "LockToken": "c1d5bb3e-daa7-4ce5-a3ff-e14cd3e461a1",
+                "ARN": "arn:aws:wafv2:us-east-1:644160558196:regional/webacl/unallowed-addresses/b4a90669-c7c9-49ae-85f3-b40df89e4c9f"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

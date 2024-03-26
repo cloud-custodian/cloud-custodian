@@ -1,0 +1,17 @@
+{
+    "status_code": 200,
+    "data": {
+        "IPSet": {
+            "Name": "allowed-addresses-only",
+            "Id": "e2193fb2-1020-44e9-85f5-8577be6552cd",
+            "ARN": "arn:aws:wafv2:us-east-1:644160558196:regional/ipset/allowed-addresses-only/e2193fb2-1020-44e9-85f5-8577be6552cd",
+            "Description": "",
+            "IPAddressVersion": "IPV4",
+            "Addresses": [
+                "192.168.0.0/28"
+            ]
+        },
+        "LockToken": "b8193474-d9a5-41dd-bb72-2cfcd32445e9",
+        "ResponseMetadata": {}
+    }
+}

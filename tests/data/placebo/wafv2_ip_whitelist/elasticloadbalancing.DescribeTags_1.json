@@ -1,0 +1,20 @@
+{
+    "status_code": 200,
+    "data": {
+        "TagDescriptions": [
+            {
+                "ResourceArn": "arn:aws:elasticloadbalancing:us-east-1:644160558196:loadbalancer/app/alb-wafv2-allowed-addresses-only/e407c71a3cd741ad",
+                "Tags": []
+            },
+            {
+                "ResourceArn": "arn:aws:elasticloadbalancing:us-east-1:644160558196:loadbalancer/app/alb-wafv2-unallowed-addresses/af785a5aff31d4d1",
+                "Tags": []
+            },
+            {
+                "ResourceArn": "arn:aws:elasticloadbalancing:us-east-1:644160558196:loadbalancer/app/alb-wafv2-assoc-missing/ddae56c934706596",
+                "Tags": []
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
