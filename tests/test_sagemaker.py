@@ -798,6 +798,7 @@ class TestSagemakerEndpointConfig(BaseTest):
         aliases = kms.list_aliases(KeyId=resources[0]['KmsKeyId'])
         self.assertEqual(aliases['Aliases'][0]['AliasName'], 'alias/skunk/trails')
 
+
 class TestSagemakerDomain(BaseTest):
 
     def test_tag_sagemaker_domain(self):
@@ -853,6 +854,7 @@ class TestSagemakerDomain(BaseTest):
         aliases = kms.list_aliases(KeyId=resources[0]['KmsKeyId'])
         self.assertEqual(aliases['Aliases'][0]['AliasName'], 'alias/sagemaker')
 
+
 class TestCluster(BaseTest):
 
     def test_list_clusters(self):
@@ -861,8 +863,12 @@ class TestCluster(BaseTest):
             {
                 "name": "list-sagemaker-clusters",
                 "resource": "sagemaker-cluster",
-            }
+            },
+            session_factory=session_factory,
         )
+
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
 
     def test_tag_clusters(self):
         session_factory = self.replay_flight_data(

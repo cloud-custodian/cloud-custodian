@@ -311,33 +311,35 @@ class Model(QueryResourceManager):
 
 Model.filter_registry.register('marked-for-op', TagActionFilter)
 
+
 @resources.register('sagemaker-cluster')
 class Cluster(QueryResourceManager):
 
-        class resource_type(TypeInfo):
-            service = 'sagemaker'
-            enum_spec = ('list_clusters', 'ClusterSummaries', None)
-            detail_spec = (
-                'describe_cluster', 'ClusterName',
-                'ClusterName', None)
-            arn = id = 'ClusterArn'
-            name = 'ClusterName'
-            date = 'CreationTime'
-            cfn_type = None
+    class resource_type(TypeInfo):
+        service = 'sagemaker'
+        enum_spec = ('list_clusters', 'ClusterSummaries', None)
+        detail_spec = (
+            'describe_cluster', 'ClusterName',
+            'ClusterName', None)
+        arn = id = 'ClusterArn'
+        name = 'ClusterName'
+        date = 'CreationTime'
+        cfn_type = None
 
-        permissions = ('sagemaker:ListTags',)
+    permissions = ('sagemaker:ListTags',)
 
-        def augment(self, clusters):
-            client = local_session(self.session_factory).client('sagemaker')
+    def augment(self, clusters):
+        client = local_session(self.session_factory).client('sagemaker')
 
-            def _augment(c):
-                tags = self.retry(client.list_tags,
-                    ResourceArn=c['ClusterArn'])['Tags']
-                c['Tags'] = tags
-                return c
+        def _augment(c):
+            tags = self.retry(client.list_tags,
+                ResourceArn=c['ClusterArn'])['Tags']
+            c['Tags'] = tags
+            return c
 
-            clusters = super(Cluster, self).augment(clusters)
-            return list(map(_augment, clusters))
+        clusters = super(Cluster, self).augment(clusters)
+        return list(map(_augment, clusters))
+
 
 Cluster.filter_registry.register('marked-for-op', TagActionFilter)
 
@@ -634,12 +636,12 @@ class ClusterSubnetFilter(SubnetFilter):
 
 
 @Cluster.filter_registry.register('network-location', NetworkLocation)
-
 @NotebookInstance.filter_registry.register('kms-key')
 @SagemakerEndpointConfig.filter_registry.register('kms-key')
 class NotebookKmsFilter(KmsRelatedFilter):
 
     RelatedIdsExpression = "KmsKeyId"
+
 
 @Model.action_registry.register('delete')
 class DeleteModel(BaseAction):
@@ -786,6 +788,7 @@ class SagemakerTransformJobStop(BaseAction):
             except client.exceptions.ResourceNotFound:
                 pass
 
+
 @Cluster.action_registry.register('delete')
 class ClusterDelete(BaseAction):
     """Deletes sagemaker-cluster(s)
@@ -813,6 +816,7 @@ class ClusterDelete(BaseAction):
                 client.delete_cluster(ClusterName=c['ClusterName'])
             except client.exceptions.ResourceNotFound:
                 pass
+
 
 class SagemakerDomainDescribe(DescribeSource):
 
