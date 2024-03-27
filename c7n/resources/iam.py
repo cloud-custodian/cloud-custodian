@@ -1931,7 +1931,7 @@ class CredentialReport(Filter):
             return vf(info)
 
         # access key matching
-        prefix, sk = k.split('.', 1)
+        prefix, _ = k.split('.', 1)
         vf = ValueFilter(self.matcher_config)
         vf.annotate = False
 

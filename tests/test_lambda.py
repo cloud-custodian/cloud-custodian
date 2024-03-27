@@ -232,6 +232,7 @@ class LambdaTest(BaseTest):
         p.data['filters'][1]['boundaries'] = False
         resources = p.run()
         assert len(resources) == 1
+
     def test_lambda_config_source(self):
         factory = self.replay_flight_data("test_aws_lambda_config_source")
         p = self.load_policy(
@@ -491,6 +492,23 @@ class LambdaTest(BaseTest):
 
     def test_lambda_edge(self):
         factory = self.replay_flight_data("test_aws_lambda_edge_filter")
+        p = self.load_policy(
+            {
+                "name": "lambda-edge-filter",
+                "resource": "lambda",
+                "filters": [{"type": "lambda-edge",
+                            "state": True}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
+        self.assertEqual(
+            [r["FunctionName"] for r in resources],
+            ["c7n-lambda-edge-new", "test-lambda-edge"])
+
+    def test_lambda_edge_multiple_associations_cache(self):
+        factory = self.replay_flight_data("test_lambda_edge_multiple_associations_cache")
         p = self.load_policy(
             {
                 "name": "lambda-edge-filter",

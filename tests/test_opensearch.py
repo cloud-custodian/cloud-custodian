@@ -31,13 +31,17 @@ class OpensearchServerless(BaseTest):
         self.assertEqual(len(tags), 1)
         self.assertEqual(tags, [{'key': 'foo', 'value': 'bar'}])
 
-
     def test_opensearch_serverless_remove_tag(self):
         session_factory = self.replay_flight_data('test_opensearch_serverless_remove_tag')
         p = self.load_policy(
             {
                 'name': 'test-opensearch-serverless-remove-tag',
                 'resource': 'opensearch-serverless',
+                'filters': [
+                    {
+                        'tag:foo': 'present',
+                    }
+                ],
                 'actions': [
                     {
                         'type': 'remove-tag',
@@ -58,7 +62,7 @@ class OpensearchServerless(BaseTest):
             {
                 'name': 'test-opensearch-serverless-delete',
                 'resource': 'opensearch-serverless',
-                'filters': [{'name': 'c7n-test'}],
+                'filters': [{'name': 'test-collection'}],
                 'actions': [{'type': 'delete'}]
             },
             session_factory=session_factory
@@ -68,3 +72,22 @@ class OpensearchServerless(BaseTest):
         client = session_factory().client('opensearchserverless')
         collections = client.list_collections()['collectionSummaries']
         self.assertEqual(collections[0]["status"], "DELETING")
+
+    def test_opensearch_serverless_kms_filter(self):
+        session_factory = self.replay_flight_data("test_opensearch_serverless_kms_filter")
+        p = self.load_policy(
+            {
+                "name": "opensearch-serverless-kms",
+                "resource": "opensearch-serverless",
+                'filters': [
+                    {
+                        'type': 'kms-key',
+                        'key': 'c7n:AliasName',
+                        'value': 'alias/tes/pratyush'
+                    }
+                ]
+            }, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['kmsKeyArn'],
+            'arn:aws:kms:us-east-1:644160558196:key/082cd05f-96d1-49f6-a5ac-32093d2cfe38')

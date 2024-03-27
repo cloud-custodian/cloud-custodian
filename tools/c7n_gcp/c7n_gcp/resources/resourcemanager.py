@@ -411,6 +411,7 @@ class OrgContactsFilter(ListItemFilter):
             contacts.extend(page.get('contacts', []))
         return contacts
 
+
 @Organization.filter_registry.register('org-policy')
 class OrgPoliciesFilter(ListItemFilter):
     """Filter Resources based on orgpolicy configuration
@@ -438,7 +439,7 @@ class OrgPoliciesFilter(ListItemFilter):
     def get_item_values(self, resource):
         session = local_session(self.manager.session_factory)
         client = session.client("cloudresourcemanager", "v1", "organizations")
-        pages = client.execute_paged_query('listOrgPolicies', { 'resource': resource['name'] })
+        pages = client.execute_paged_query('listOrgPolicies', {'resource': resource['name']})
         policies = []
         for page in pages:
             policies.extend(page.get('policies', []))

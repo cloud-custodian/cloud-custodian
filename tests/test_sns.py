@@ -913,6 +913,7 @@ class TestSNS(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
+
 class TestSubscription(BaseTest):
 
     def test_subscription_delete(self):

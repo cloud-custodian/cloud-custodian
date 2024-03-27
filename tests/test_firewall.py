@@ -115,8 +115,8 @@ class NetworkFirewallTest(BaseTest):
                         }
                     ],
                 },
-            session_factory = session_factory,
-            config = {'region': 'us-east-1'}
+            session_factory=session_factory,
+            config={'region': 'us-east-1'}
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
@@ -125,8 +125,7 @@ class NetworkFirewallTest(BaseTest):
         logging_config = client \
                 .describe_logging_configuration(FirewallName=resources[0]['FirewallName'])
         logDestination = logging_config.get('LoggingConfiguration').get('LogDestinationConfigs')[0]
-        self.assertEqual(logDestination['LogType'],'ALERT')
-
+        self.assertEqual(logDestination['LogType'], 'ALERT')
 
     def test_delete_firewall(self):
         session_factory = self.replay_flight_data("test_delete_firewall")
@@ -146,7 +145,6 @@ class NetworkFirewallTest(BaseTest):
         self.assertEqual(1, len(resources))
         self.assertEqual(resources[0]["FirewallName"], "test-firewall-2")
 
-
     def test_update_firewall_logging(self):
         session_factory = self.replay_flight_data("test_update_firewall_logging")
 
@@ -160,7 +158,7 @@ class NetworkFirewallTest(BaseTest):
                         "type": "update-logging-config",
                         "enabled": True,
                         "LoggingConfiguration": {
-                            "LogDestinationConfigs":[
+                            "LogDestinationConfigs": [
                                 {
                                     "LogType": "FLOW",
                                     "LogDestinationType": "S3",
@@ -182,9 +180,9 @@ class NetworkFirewallTest(BaseTest):
         logging_config = client \
                 .describe_logging_configuration(FirewallName=resources[0]['FirewallName'])
         logDestination = logging_config.get('LoggingConfiguration').get('LogDestinationConfigs')[0]
-        self.assertEqual(logDestination['LogType'],'FLOW')
-        self.assertEqual(logDestination['LogDestinationType'],'S3')
-        self.assertEqual(logDestination['LogDestination']['bucketName'],'c7n-firewall-logging')
+        self.assertEqual(logDestination['LogType'], 'FLOW')
+        self.assertEqual(logDestination['LogDestinationType'], 'S3')
+        self.assertEqual(logDestination['LogDestination']['bucketName'], 'c7n-firewall-logging')
 
     def test_update_firewall_logging_disabled(self):
         session_factory = self.replay_flight_data("test_update_firewall_logging_disabled")
@@ -237,6 +235,3 @@ class NetworkFirewallTest(BaseTest):
                 .describe_firewall(FirewallName=resources[0]['FirewallName'])
         deleteProtection = firewall.get('Firewall').get('DeleteProtection')
         self.assertEqual(deleteProtection, False)
-
-
-

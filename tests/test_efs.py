@@ -120,7 +120,6 @@ class ElasticFileSystem(BaseTest):
         resources = policy.push(event, None)
         self.assertEqual(len(resources), 1)
 
-
     def test_delete(self):
         factory = self.replay_flight_data("test_efs_delete")
         p = self.load_policy(

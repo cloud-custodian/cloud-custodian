@@ -8,7 +8,8 @@ import os
 
 from botocore.paginate import Paginator
 
-from c7n.query import QueryResourceManager, ChildResourceManager, TypeInfo, RetryPageIterator
+from c7n.query import (
+    QueryResourceManager, ChildResourceManager, TypeInfo, RetryPageIterator)
 from c7n.manager import resources
 from c7n.utils import chunks, get_retry, generate_arn, local_session, type_schema
 from c7n.actions import BaseAction
@@ -96,6 +97,7 @@ class HostedZone(Route53Base, QueryResourceManager):
         # Denotes this resource type exists across regions
         global_resource = True
         cfn_type = 'AWS::Route53::HostedZone'
+        permissions_augment = ("route53:ListTagsForResource",)
 
     def get_arns(self, resource_set):
         arns = []
@@ -128,6 +130,7 @@ class HealthCheck(Route53Base, QueryResourceManager):
         universal_taggable = True
         cfn_type = 'AWS::Route53::HealthCheck'
         global_resource = True
+        permissions_augment = ("route53:ListTagsForResource",)
 
 
 @resources.register('rrset')
@@ -266,8 +269,8 @@ class ResourceRecordSetRemove(BaseAction):
                     },
                     ignore_err_codes=('InvalidChangeBatch'))
         except Exception as e:
-                self.log.warning(
-                    "ResourceRecordSet delete error: %s", e)
+            self.log.warning(
+                "ResourceRecordSet delete error: %s", e)
 
 
 @HostedZone.action_registry.register('delete')
@@ -829,7 +832,6 @@ class ReadinessCheckCrossAccount(CrossAccountAccessFilter):
         return results
 
 
-
 class DescribeCluster(query.DescribeSource):
     def augment(self, clusters):
         for r in clusters:
@@ -859,7 +861,6 @@ class RecoveryCluster(QueryResourceManager):
     def get_client(self):
         return local_session(self.session_factory) \
             .client('route53-recovery-control-config', region_name=ARC_REGION)
-
 
 
 @RecoveryCluster.action_registry.register('tag')

@@ -5,11 +5,11 @@ from ..azure_common import BaseTest
 
 class SpringServiceInstanceTest(BaseTest):
     def test_azure_springserviceinstance_schema_validate(self):
-            p = self.load_policy({
-                'name': 'test-azure-springserviceinstance-schema-validate',
-                'resource': 'azure.spring-service-instance'
-            }, validate=True)
-            self.assertTrue(p)
+        p = self.load_policy({
+            'name': 'test-azure-springserviceinstance-schema-validate',
+            'resource': 'azure.spring-service-instance'
+        }, validate=True)
+        self.assertTrue(p)
 
     def test_find_by_name(self):
         p = self.load_policy({

@@ -81,7 +81,7 @@ class DescribeSource:
         return [comp.strip() for comp in comps_env_var if comp and comp.strip()]
 
     def _construct_list_func_ref(self):
-        operation, return_type, extra_args = self.manager.resource_type.enum_spec
+        operation, _, _ = self.manager.resource_type.enum_spec
         return getattr(self.manager.get_client(), operation)
 
     def _get_resources_with_compartment_and_params(self, compartment_id, list_func_ref):
@@ -208,7 +208,7 @@ class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
         )
 
     def _construct_list_func_ref(self):
-        operation, return_type, extra_args = self.resource_type.enum_spec
+        operation, _, _ = self.resource_type.enum_spec
         return getattr(self.get_client(), operation)
 
     # Get the session object for the respective region

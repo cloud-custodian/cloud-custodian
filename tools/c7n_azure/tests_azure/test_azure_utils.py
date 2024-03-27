@@ -116,7 +116,8 @@ class UtilsTest(BaseTest):
         self.assertEqual(PortsRangeHelper.get_ports_set_from_rule(rule), {10, 11, 12})
         rule = {'properties': {'destinationPortRanges': ['80', '10-12']}}
         self.assertEqual(PortsRangeHelper.get_ports_set_from_rule(rule), {10, 11, 12, 80})
-        rule = {'properties': {'destinationPortRange': '','destinationPortRanges': ['80', '10-12']}}
+        rule = {'properties': {
+            'destinationPortRange': '', 'destinationPortRanges': ['80', '10-12']}}
         self.assertEqual(PortsRangeHelper.get_ports_set_from_rule(rule), {10, 11, 12, 80})
 
     def test_validate_ports_string(self):

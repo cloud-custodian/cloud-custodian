@@ -38,6 +38,7 @@ def test_s3_access_point(test, s3_access_point):
             AccountId=p.options['account_id'], Name=resources[0]['Name']
         )
 
+
 class TestStorageLens(BaseTest):
 
     def test_s3_storage_lens(self):
@@ -78,7 +79,6 @@ class TestStorageLens(BaseTest):
             {'Key': 'resource', 'Value': 'storagelens'}
             ])
 
-
     def test_s3_storage_lens_delete(self):
         session_factory = self.replay_flight_data('test_s3_storage_lens_delete')
         p = self.load_policy(
@@ -105,4 +105,3 @@ class TestStorageLens(BaseTest):
                     ConfigId='test-3',
                     AccountId=self.account_id)
         self.assertEqual(e.exception.response['Error']['Code'], 'NoSuchConfiguration')
-

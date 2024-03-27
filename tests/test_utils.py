@@ -59,7 +59,7 @@ class Backoff(BaseTest):
 
     def test_delays_jitter(self):
         count = 0
-        while(count < 100000):
+        while (count < 100000):
             count += 1
             for idx, i in enumerate(utils.backoff_delays(1, 256, jitter=True)):
                 maxv = 2 ** idx

@@ -6,7 +6,8 @@ one of the other *util.py modules.
 Source: https://github.com/python/cpython/blob/6fea61a9e02260648fbec204e9caac6d5176cc7b/Lib/distutils/util.py
 """
 
-def strtobool (val):
+
+def strtobool(val):
     """Convert a string representation of truth to true (1) or false (0).
 
     True values are 'y', 'yes', 't', 'true', 'on', and '1'; false values

@@ -384,6 +384,7 @@ class WorkspacesTest(BaseTest):
         self.assertEqual({'ReconnectEnabled': 'DISABLED'}, cp.get(
             'ClientPropertiesList')[0].get('ClientProperties'))
 
+
 class TestWorkspacesWeb(BaseTest):
 
     def test_workspaces_web_tag(self):
@@ -411,7 +412,6 @@ class TestWorkspacesWeb(BaseTest):
         tags = client.list_tags_for_resource(resourceArn=resources[0]["portalArn"])['tags']
         self.assertEqual(len(tags), 1)
         self.assertEqual(tags, [{'Key': 'foo', 'Value': 'bar'}])
-
 
     def test_workspaces_web_remove_tag(self):
         session_factory = self.replay_flight_data('test_workspaces_web_remove_tag')

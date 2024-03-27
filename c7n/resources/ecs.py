@@ -298,6 +298,7 @@ class ServiceTaskDefinitionFilter(RelatedTaskDefinitionFilter):
              - type: stop
     """
 
+
 @ECSCluster.filter_registry.register('ebs-storage')
 class Storage(ValueFilter):
     """Filter clusters by configured EBS storage parameters.
@@ -419,7 +420,6 @@ class SGFilter(net_filters.SecurityGroupFilter):
 
 
 @Service.filter_registry.register('network-location', net_filters.NetworkLocation)
-
 @Service.action_registry.register('modify-definition')
 class UpdateTemplate(BaseAction):
 
@@ -753,8 +753,6 @@ class TaskSGFilter(net_filters.SecurityGroupFilter):
 
 
 @Task.filter_registry.register('network-location', net_filters.NetworkLocation)
-
-
 @Task.filter_registry.register('task-definition')
 class TaskTaskDefinitionFilter(RelatedTaskDefinitionFilter):
     """Filter tasks by their task definition.
@@ -891,7 +889,7 @@ class DeleteTaskDefinition(BaseAction):
     """
 
     schema = type_schema('delete', force={'type': 'boolean'})
-    permissions = ('ecs:DeregisterTaskDefinition','ecs:DeleteTaskDefinitions',)
+    permissions = ('ecs:DeregisterTaskDefinition', 'ecs:DeleteTaskDefinitions',)
 
     def process(self, resources):
         client = local_session(self.manager.session_factory).client('ecs')

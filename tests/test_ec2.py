@@ -20,6 +20,7 @@ from .common import BaseTest
 import pytest
 from pytest_terraform import terraform
 
+
 # this one doesn't work as a functional test as it enables stop protection, which prevents
 # the terraform teardown, we would need to also remove the stop protection in the test.
 @terraform('ec2_stop_protection_enabled')
@@ -2106,6 +2107,7 @@ class TestModifySecurityGroupAction(BaseTest):
                 "Reservations[].Instances[].SecurityGroups[].GroupId",
                 client.describe_instances(InstanceIds=["i-08797f38d2e80c9d0"])),
             ['sg-0cba7a01d343d5c65', 'sg-02e14ba7dd2dbe44b', 'sg-0e630ac9094eff5c5'])
+
 
 class TestAutoRecoverAlarmAction(BaseTest):
 

@@ -1540,6 +1540,7 @@ def test_iam_group_delete(test, iam_user_group):
     with pytest.raises(client.exceptions.NoSuchEntityException):
         client.get_group(GroupName=resources[0]['GroupName'])
 
+
 # The terraform fixture sets up resources, which happens before we
 # actually enter the test:
 @terraform('iam_delete_provider_oidc', teardown=terraform.TEARDOWN_IGNORE)
@@ -1591,6 +1592,7 @@ def test_iam_delete_provider_oidc_action(test, iam_delete_provider_oidc):
     # provider now no longer exists:
     with pytest.raises(client.exceptions.NoSuchEntityException):
         client.get_open_id_connect_provider(OpenIDConnectProviderArn=arn)
+
 
 # The terraform fixture sets up resources, which happens before we
 # actually enter the test:

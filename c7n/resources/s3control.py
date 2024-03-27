@@ -37,7 +37,7 @@ class AccessPoint(QueryResourceManager):
         arn = 'AccessPointArn'
         arn_service = 's3'
         arn_type = 'accesspoint'
-        cfn_type = 'AWS::S3::AccessPoint'
+        config_type = cfn_type = 'AWS::S3::AccessPoint'
         permission_prefix = 's3'
 
     source_mapping = {'describe': AccessPointDescribe}
@@ -93,7 +93,7 @@ class MultiRegionAccessPoint(QueryResourceManager):
         enum_spec = ('list_multi_region_access_points', 'AccessPoints', None)
         arn_service = 's3'
         arn_type = 'accesspoint'
-        cfn_type = 'AWS::S3::MultiRegionAccessPoint'
+        config_type = cfn_type = 'AWS::S3::MultiRegionAccessPoint'
         permission_prefix = 's3'
 
     source_mapping = {'describe': MultiRegionAccessPointDescribe}
@@ -109,7 +109,7 @@ class StorageLensDescribe(DescribeSource):
         client = local_session(self.manager.session_factory).client('s3control')
         results = []
         for r in resources:
-            storage_lens_configuration = self.manager.retry( \
+            storage_lens_configuration = self.manager.retry(
                 client.get_storage_lens_configuration,
                 AccountId=self.manager.config.account_id,
                 ConfigId=r['Id']) \
@@ -164,6 +164,8 @@ class DeleteStorageLens(BaseAction):
 
 
 StorageLens.filter_registry.register('marked-for-op', TagActionFilter)
+
+
 @StorageLens.action_registry.register('mark-for-op')
 class MarkStorageLensForOp(TagDelayedAction):
     """Mark storage lens configuration for future actions

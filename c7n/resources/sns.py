@@ -45,6 +45,7 @@ class SNS(QueryResourceManager):
             'SubscriptionsDeleted'
         )
         universal_taggable = True
+        permissions_augment = ("sns:ListTagsForResource",)
 
     permissions = ('sns:ListTagsForResource',)
     source_mapping = {
@@ -54,7 +55,6 @@ class SNS(QueryResourceManager):
 
 
 SNS.filter_registry.register('marked-for-op', TagActionFilter)
-
 
 
 @SNS.action_registry.register('post-finding')
@@ -300,7 +300,7 @@ class RemovePolicyStatement(RemovePolicyBase):
             return
 
         p = json.loads(resource['Policy'])
-        statements, found = self.process_policy(
+        _, found = self.process_policy(
             p, resource, CrossAccountAccessFilter.annotation_key)
 
         if not found:
@@ -448,12 +448,14 @@ class DeleteTopic(BaseAction):
             except client.exceptions.NotFoundException:
                 continue
 
+
 @SNS.filter_registry.register('metrics')
 class Metrics(MetricsFilter):
 
     def get_dimensions(self, resource):
         return [{'Name': self.model.dimension,
                  'Value': resource['TopicArn'].rsplit(':', 1)[-1]}]
+
 
 @resources.register('sns-subscription')
 class SNSSubscription(QueryResourceManager):

@@ -24,6 +24,7 @@ Every version number class implements the following interface:
 
 import re
 
+
 class Version:
     """Abstract base class for version numbering classes.  Just provides
     constructor (__init__) and reproducer (__repr__), because those
@@ -31,11 +32,11 @@ class Version:
     rich comparisons to _cmp.
     """
 
-    def __init__ (self, vstring=None):
+    def __init__(self, vstring=None):
         if vstring:
             self.parse(vstring)
 
-    def __repr__ (self):
+    def __repr__(self):
         return "%s ('%s')" % (self.__class__.__name__, str(self))
 
     def __eq__(self, other):
@@ -184,12 +185,11 @@ class LooseVersion (Version):
 
     component_re = re.compile(r'(\d+ | [a-z]+ | \.)', re.VERBOSE)
 
-    def __init__ (self, vstring=None):
+    def __init__(self, vstring=None):
         if vstring:
             self.parse(vstring)
 
-
-    def parse (self, vstring):
+    def parse(self, vstring):
         # I've given up on thinking I can reconstruct the version string
         # from the parsed tuple -- so I just store the string here for
         # use by __str__
@@ -204,16 +204,13 @@ class LooseVersion (Version):
 
         self.version = components
 
-
-    def __str__ (self):
+    def __str__(self):
         return self.vstring
 
-
-    def __repr__ (self):
+    def __repr__(self):
         return "LooseVersion ('%s')" % str(self)
 
-
-    def _cmp (self, other):
+    def _cmp(self, other):
         if isinstance(other, str):
             other = LooseVersion(other)
         elif not isinstance(other, LooseVersion):

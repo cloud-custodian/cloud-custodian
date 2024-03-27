@@ -145,7 +145,6 @@ class AppEngineFirewallIngressRule(ChildResourceManager):
                         'ingressRulesId': ingress_rules_id})
 
 
-
 @resources.register('app-engine-service')
 class AppEngineService(ChildResourceManager):
     """GCP resource:
