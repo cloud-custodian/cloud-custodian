@@ -1,0 +1,17 @@
+{
+    "status_code": 200,
+    "data": {
+        "MaxResults": 30,
+        "ResolverRuleAssociations": [
+            {
+                "Id": "rslvr-autodefined-assoc-vpc-00b1cf44b6c724308-internet-resolver",
+                "ResolverRuleId": "rslvr-autodefined-rr-internet-resolver",
+                "Name": "System Rule Association",
+                "VPCId": "vpc-00b1cf44b6c724308",
+                "Status": "COMPLETE",
+                "StatusMessage": ""
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
