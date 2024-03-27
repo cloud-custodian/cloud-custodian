@@ -1,0 +1,645 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Network/virtualNetworks?api-version=2019-11-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "x-ms-arm-service-request-id": [
+                        "68defbae-4641-4c59-a3b4-b0f43fa88dd3"
+                    ],
+                    "date": [
+                        "Thu, 05 Aug 2021 12:46:25 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "content-length": [
+                        "16423"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "name": "176_vnet_green",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/176resource_group_green/providers/Microsoft.Network/virtualNetworks/176_vnet_green",
+                                "etag": "W/\"ec823c6c-36ec-46ad-bd3a-24d2c0c91f2f\"",
+                                "type": "Microsoft.Network/virtualNetworks",
+                                "location": "eastus",
+                                "tags": {
+                                    "ComplianceStatus": "Green",
+                                    "CustodianRule": "epam-azure-176-asb_ddos_protection_enabled"
+                                },
+                                "properties": {
+                                    "provisioningState": "Succeeded",
+                                    "resourceGuid": "ce3f65e1-ad9d-44e1-b250-96299b2da7bb",
+                                    "addressSpace": {
+                                        "addressPrefixes": [
+                                            "10.0.0.0/16"
+                                        ]
+                                    },
+                                    "dhcpOptions": {
+                                        "dnsServers": []
+                                    },
+                                    "subnets": [
+                                        {
+                                            "name": "appgtwgreen",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/176resource_group_green/providers/Microsoft.Network/virtualNetworks/176_vnet_green/subnets/appgtwgreen",
+                                            "etag": "W/\"ec823c6c-36ec-46ad-bd3a-24d2c0c91f2f\"",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "addressPrefix": "10.0.1.0/24",
+                                                "applicationGatewayIPConfigurations": [
+                                                    {
+                                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/176resource_group_green/providers/Microsoft.Network/applicationGateways/176_app_gateway_green/gatewayIPConfigurations/176_gtw_ip_conf_green"
+                                                    }
+                                                ],
+                                                "serviceEndpoints": [],
+                                                "delegations": [],
+                                                "privateEndpointNetworkPolicies": "Enabled",
+                                                "privateLinkServiceNetworkPolicies": "Enabled"
+                                            },
+                                            "type": "Microsoft.Network/virtualNetworks/subnets"
+                                        }
+                                    ],
+                                    "virtualNetworkPeerings": [],
+                                    "enableDdosProtection": true,
+                                    "ddosProtectionPlan": {
+                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/176resource_group_green/providers/Microsoft.Network/ddosProtectionPlans/176-ddos_prot_plan"
+                                    }
+                                }
+                            },
+                            {
+                                "name": "176_vnet_red",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/176resource_group_red/providers/Microsoft.Network/virtualNetworks/176_vnet_red",
+                                "etag": "W/\"1b4cde3a-4f4e-4b4a-b7a1-ffd24c9ee346\"",
+                                "type": "Microsoft.Network/virtualNetworks",
+                                "location": "eastus",
+                                "tags": {
+                                    "ComplianceStatus": "Red",
+                                    "CustodianRule": "epam-azure-176-asb_ddos_protection_enabled"
+                                },
+                                "properties": {
+                                    "provisioningState": "Succeeded",
+                                    "resourceGuid": "6df79b48-edb2-49be-85b2-345862e5f538",
+                                    "addressSpace": {
+                                        "addressPrefixes": [
+                                            "10.0.0.0/16"
+                                        ]
+                                    },
+                                    "dhcpOptions": {
+                                        "dnsServers": []
+                                    },
+                                    "subnets": [
+                                        {
+                                            "name": "appgtwgred",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/176resource_group_red/providers/Microsoft.Network/virtualNetworks/176_vnet_red/subnets/appgtwgred",
+                                            "etag": "W/\"1b4cde3a-4f4e-4b4a-b7a1-ffd24c9ee346\"",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "addressPrefix": "10.0.1.0/24",
+                                                "applicationGatewayIPConfigurations": [
+                                                    {
+                                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/176resource_group_red/providers/Microsoft.Network/applicationGateways/176_app_gateway_red/gatewayIPConfigurations/176_gtw_ip_conf_red"
+                                                    }
+                                                ],
+                                                "serviceEndpoints": [],
+                                                "delegations": [],
+                                                "privateEndpointNetworkPolicies": "Enabled",
+                                                "privateLinkServiceNetworkPolicies": "Enabled"
+                                            },
+                                            "type": "Microsoft.Network/virtualNetworks/subnets"
+                                        }
+                                    ],
+                                    "virtualNetworkPeerings": [],
+                                    "enableDdosProtection": false
+                                }
+                            },
+                            {
+                                "name": "aks-vnet-41463261",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/MC_Test12-rg_Test12AKSCluster_eastus/providers/Microsoft.Network/virtualNetworks/aks-vnet-41463261",
+                                "etag": "W/\"1facb18a-9e7a-48af-af29-9bc32d488a2b\"",
+                                "type": "Microsoft.Network/virtualNetworks",
+                                "location": "eastus",
+                                "properties": {
+                                    "provisioningState": "Succeeded",
+                                    "resourceGuid": "99ec1b44-8fa6-4cf7-a878-b590ecd863cd",
+                                    "addressSpace": {
+                                        "addressPrefixes": [
+                                            "10.0.0.0/8"
+                                        ]
+                                    },
+                                    "subnets": [
+                                        {
+                                            "name": "aks-subnet",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/MC_Test12-rg_Test12AKSCluster_eastus/providers/Microsoft.Network/virtualNetworks/aks-vnet-41463261/subnets/aks-subnet",
+                                            "etag": "W/\"1facb18a-9e7a-48af-af29-9bc32d488a2b\"",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "addressPrefix": "10.240.0.0/16",
+                                                "networkSecurityGroup": {
+                                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/MC_Test12-rg_Test12AKSCluster_eastus/providers/Microsoft.Network/networkSecurityGroups/aks-agentpool-41463261-nsg"
+                                                },
+                                                "ipConfigurations": [
+                                                    {
+                                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/MC_Test12-rg_Test12AKSCluster_eastus/providers/Microsoft.Compute/virtualMachineScaleSets/aks-default-41463261-vmss/virtualMachines/0/networkInterfaces/aks-default-41463261-vmss/ipConfigurations/ipconfig1"
+                                                    },
+                                                    {
+                                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/MC_Test12-rg_Test12AKSCluster_eastus/providers/Microsoft.Compute/virtualMachineScaleSets/aks-default-41463261-vmss/virtualMachines/0/networkInterfaces/aks-default-41463261-vmss/ipConfigurations/ipconfig2"
+                                                    },
+                                                    {
+                                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/MC_Test12-rg_Test12AKSCluster_eastus/providers/Microsoft.Compute/virtualMachineScaleSets/aks-default-41463261-vmss/virtualMachines/0/networkInterfaces/aks-default-41463261-vmss/ipConfigurations/ipconfig3"
+                                                    },
+                                                    {
+                                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/MC_Test12-rg_Test12AKSCluster_eastus/providers/Microsoft.Compute/virtualMachineScaleSets/aks-default-41463261-vmss/virtualMachines/0/networkInterfaces/aks-default-41463261-vmss/ipConfigurations/ipconfig4"
+                                                    },
+                                                    {
+                                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/MC_Test12-rg_Test12AKSCluster_eastus/providers/Microsoft.Compute/virtualMachineScaleSets/aks-default-41463261-vmss/virtualMachines/0/networkInterfaces/aks-default-41463261-vmss/ipConfigurations/ipconfig5"
+                                                    },
+                                                    {
+                                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/MC_Test12-rg_Test12AKSCluster_eastus/providers/Microsoft.Compute/virtualMachineScaleSets/aks-default-41463261-vmss/virtualMachines/0/networkInterfaces/aks-default-41463261-vmss/ipConfigurations/ipconfig6"
+                                                    },
+                                                    {
+                                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/MC_Test12-rg_Test12AKSCluster_eastus/providers/Microsoft.Compute/virtualMachineScaleSets/aks-default-41463261-vmss/virtualMachines/0/networkInterfaces/aks-default-41463261-vmss/ipConfigurations/ipconfig7"
+                                                    },
+                                                    {
+                                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/MC_Test12-rg_Test12AKSCluster_eastus/providers/Microsoft.Compute/virtualMachineScaleSets/aks-default-41463261-vmss/virtualMachines/0/networkInterfaces/aks-default-41463261-vmss/ipConfigurations/ipconfig8"
+                                                    },
+                                                    {
+                                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/MC_Test12-rg_Test12AKSCluster_eastus/providers/Microsoft.Compute/virtualMachineScaleSets/aks-default-41463261-vmss/virtualMachines/0/networkInterfaces/aks-default-41463261-vmss/ipConfigurations/ipconfig9"
+                                                    },
+                                                    {
+                                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/MC_Test12-rg_Test12AKSCluster_eastus/providers/Microsoft.Compute/virtualMachineScaleSets/aks-default-41463261-vmss/virtualMachines/0/networkInterfaces/aks-default-41463261-vmss/ipConfigurations/ipconfig10"
+                                                    },
+                                                    {
+                                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/MC_Test12-rg_Test12AKSCluster_eastus/providers/Microsoft.Compute/virtualMachineScaleSets/aks-default-41463261-vmss/virtualMachines/0/networkInterfaces/aks-default-41463261-vmss/ipConfigurations/ipconfig11"
+                                                    },
+                                                    {
+                                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/MC_Test12-rg_Test12AKSCluster_eastus/providers/Microsoft.Compute/virtualMachineScaleSets/aks-default-41463261-vmss/virtualMachines/0/networkInterfaces/aks-default-41463261-vmss/ipConfigurations/ipconfig12"
+                                                    },
+                                                    {
+                                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/MC_Test12-rg_Test12AKSCluster_eastus/providers/Microsoft.Compute/virtualMachineScaleSets/aks-default-41463261-vmss/virtualMachines/0/networkInterfaces/aks-default-41463261-vmss/ipConfigurations/ipconfig13"
+                                                    },
+                                                    {
+                                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/MC_Test12-rg_Test12AKSCluster_eastus/providers/Microsoft.Compute/virtualMachineScaleSets/aks-default-41463261-vmss/virtualMachines/0/networkInterfaces/aks-default-41463261-vmss/ipConfigurations/ipconfig14"
+                                                    },
+                                                    {
+                                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/MC_Test12-rg_Test12AKSCluster_eastus/providers/Microsoft.Compute/virtualMachineScaleSets/aks-default-41463261-vmss/virtualMachines/0/networkInterfaces/aks-default-41463261-vmss/ipConfigurations/ipconfig15"
+                                                    },
+                                                    {
+                                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/MC_Test12-rg_Test12AKSCluster_eastus/providers/Microsoft.Compute/virtualMachineScaleSets/aks-default-41463261-vmss/virtualMachines/0/networkInterfaces/aks-default-41463261-vmss/ipConfigurations/ipconfig16"
+                                                    },
+                                                    {
+                                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/MC_Test12-rg_Test12AKSCluster_eastus/providers/Microsoft.Compute/virtualMachineScaleSets/aks-default-41463261-vmss/virtualMachines/0/networkInterfaces/aks-default-41463261-vmss/ipConfigurations/ipconfig17"
+                                                    },
+                                                    {
+                                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/MC_Test12-rg_Test12AKSCluster_eastus/providers/Microsoft.Compute/virtualMachineScaleSets/aks-default-41463261-vmss/virtualMachines/0/networkInterfaces/aks-default-41463261-vmss/ipConfigurations/ipconfig18"
+                                                    },
+                                                    {
+                                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/MC_Test12-rg_Test12AKSCluster_eastus/providers/Microsoft.Compute/virtualMachineScaleSets/aks-default-41463261-vmss/virtualMachines/0/networkInterfaces/aks-default-41463261-vmss/ipConfigurations/ipconfig19"
+                                                    },
+                                                    {
+                                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/MC_Test12-rg_Test12AKSCluster_eastus/providers/Microsoft.Compute/virtualMachineScaleSets/aks-default-41463261-vmss/virtualMachines/0/networkInterfaces/aks-default-41463261-vmss/ipConfigurations/ipconfig20"
+                                                    },
+                                                    {
+                                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/MC_Test12-rg_Test12AKSCluster_eastus/providers/Microsoft.Compute/virtualMachineScaleSets/aks-default-41463261-vmss/virtualMachines/0/networkInterfaces/aks-default-41463261-vmss/ipConfigurations/ipconfig21"
+                                                    },
+                                                    {
+                                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/MC_Test12-rg_Test12AKSCluster_eastus/providers/Microsoft.Compute/virtualMachineScaleSets/aks-default-41463261-vmss/virtualMachines/0/networkInterfaces/aks-default-41463261-vmss/ipConfigurations/ipconfig22"
+                                                    },
+                                                    {
+                                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/MC_Test12-rg_Test12AKSCluster_eastus/providers/Microsoft.Compute/virtualMachineScaleSets/aks-default-41463261-vmss/virtualMachines/0/networkInterfaces/aks-default-41463261-vmss/ipConfigurations/ipconfig23"
+                                                    },
+                                                    {
+                                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/MC_Test12-rg_Test12AKSCluster_eastus/providers/Microsoft.Compute/virtualMachineScaleSets/aks-default-41463261-vmss/virtualMachines/0/networkInterfaces/aks-default-41463261-vmss/ipConfigurations/ipconfig24"
+                                                    },
+                                                    {
+                                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/MC_Test12-rg_Test12AKSCluster_eastus/providers/Microsoft.Compute/virtualMachineScaleSets/aks-default-41463261-vmss/virtualMachines/0/networkInterfaces/aks-default-41463261-vmss/ipConfigurations/ipconfig25"
+                                                    },
+                                                    {
+                                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/MC_Test12-rg_Test12AKSCluster_eastus/providers/Microsoft.Compute/virtualMachineScaleSets/aks-default-41463261-vmss/virtualMachines/0/networkInterfaces/aks-default-41463261-vmss/ipConfigurations/ipconfig26"
+                                                    },
+                                                    {
+                                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/MC_Test12-rg_Test12AKSCluster_eastus/providers/Microsoft.Compute/virtualMachineScaleSets/aks-default-41463261-vmss/virtualMachines/0/networkInterfaces/aks-default-41463261-vmss/ipConfigurations/ipconfig27"
+                                                    },
+                                                    {
+                                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/MC_Test12-rg_Test12AKSCluster_eastus/providers/Microsoft.Compute/virtualMachineScaleSets/aks-default-41463261-vmss/virtualMachines/0/networkInterfaces/aks-default-41463261-vmss/ipConfigurations/ipconfig28"
+                                                    },
+                                                    {
+                                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/MC_Test12-rg_Test12AKSCluster_eastus/providers/Microsoft.Compute/virtualMachineScaleSets/aks-default-41463261-vmss/virtualMachines/0/networkInterfaces/aks-default-41463261-vmss/ipConfigurations/ipconfig29"
+                                                    },
+                                                    {
+                                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/MC_Test12-rg_Test12AKSCluster_eastus/providers/Microsoft.Compute/virtualMachineScaleSets/aks-default-41463261-vmss/virtualMachines/0/networkInterfaces/aks-default-41463261-vmss/ipConfigurations/ipconfig30"
+                                                    },
+                                                    {
+                                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/MC_Test12-rg_Test12AKSCluster_eastus/providers/Microsoft.Compute/virtualMachineScaleSets/aks-default-41463261-vmss/virtualMachines/0/networkInterfaces/aks-default-41463261-vmss/ipConfigurations/ipconfig31"
+                                                    }
+                                                ],
+                                                "delegations": [],
+                                                "privateEndpointNetworkPolicies": "Enabled",
+                                                "privateLinkServiceNetworkPolicies": "Enabled"
+                                            },
+                                            "type": "Microsoft.Network/virtualNetworks/subnets"
+                                        }
+                                    ],
+                                    "virtualNetworkPeerings": [],
+                                    "enableDdosProtection": false
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Network/applicationGateways?api-version=2019-11-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "x-ms-arm-service-request-id": [
+                        "923792d1-4fab-45d7-90eb-e16f69f46211"
+                    ],
+                    "date": [
+                        "Thu, 05 Aug 2021 12:46:25 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "content-length": [
+                        "18673"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "name": "176_app_gateway_green",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/176resource_group_green/providers/Microsoft.Network/applicationGateways/176_app_gateway_green",
+                                "etag": "W/\"28bae244-a4b7-408a-b0d9-03f67859a573\"",
+                                "type": "Microsoft.Network/applicationGateways",
+                                "location": "eastus",
+                                "tags": {
+                                    "ComplianceStatus": "Green",
+                                    "CustodianRule": "epam-azure-176-asb_ddos_protection_enabled"
+                                },
+                                "properties": {
+                                    "provisioningState": "Succeeded",
+                                    "resourceGuid": "f2ff253a-2833-428b-ba7e-c8fc31c6030e",
+                                    "sku": {
+                                        "name": "Standard_Small",
+                                        "tier": "Standard",
+                                        "capacity": 2
+                                    },
+                                    "operationalState": "Running",
+                                    "gatewayIPConfigurations": [
+                                        {
+                                            "name": "176_gtw_ip_conf_green",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/176resource_group_green/providers/Microsoft.Network/applicationGateways/176_app_gateway_green/gatewayIPConfigurations/176_gtw_ip_conf_green",
+                                            "etag": "W/\"28bae244-a4b7-408a-b0d9-03f67859a573\"",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "subnet": {
+                                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/176resource_group_green/providers/Microsoft.Network/virtualNetworks/176_vnet_green/subnets/appgtwgreen"
+                                                }
+                                            },
+                                            "type": "Microsoft.Network/applicationGateways/gatewayIPConfigurations"
+                                        }
+                                    ],
+                                    "sslCertificates": [],
+                                    "authenticationCertificates": [],
+                                    "frontendIPConfigurations": [
+                                        {
+                                            "name": "176_front_ip_conf_green",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/176resource_group_green/providers/Microsoft.Network/applicationGateways/176_app_gateway_green/frontendIPConfigurations/176_front_ip_conf_green",
+                                            "etag": "W/\"28bae244-a4b7-408a-b0d9-03f67859a573\"",
+                                            "type": "Microsoft.Network/applicationGateways/frontendIPConfigurations",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "privateIPAllocationMethod": "Dynamic",
+                                                "publicIPAddress": {
+                                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/176resource_group_green/providers/Microsoft.Network/publicIPAddresses/176_pip_green"
+                                                },
+                                                "httpListeners": [
+                                                    {
+                                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/176resource_group_green/providers/Microsoft.Network/applicationGateways/176_app_gateway_green/httpListeners/176_http_listener_green"
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ],
+                                    "frontendPorts": [
+                                        {
+                                            "name": "176_front_port_green",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/176resource_group_green/providers/Microsoft.Network/applicationGateways/176_app_gateway_green/frontendPorts/176_front_port_green",
+                                            "etag": "W/\"28bae244-a4b7-408a-b0d9-03f67859a573\"",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "port": 80,
+                                                "httpListeners": [
+                                                    {
+                                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/176resource_group_green/providers/Microsoft.Network/applicationGateways/176_app_gateway_green/httpListeners/176_http_listener_green"
+                                                    }
+                                                ]
+                                            },
+                                            "type": "Microsoft.Network/applicationGateways/frontendPorts"
+                                        }
+                                    ],
+                                    "backendAddressPools": [
+                                        {
+                                            "name": "176_back_adr_pool_green",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/176resource_group_green/providers/Microsoft.Network/applicationGateways/176_app_gateway_green/backendAddressPools/176_back_adr_pool_green",
+                                            "etag": "W/\"28bae244-a4b7-408a-b0d9-03f67859a573\"",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "backendAddresses": [],
+                                                "requestRoutingRules": [
+                                                    {
+                                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/176resource_group_green/providers/Microsoft.Network/applicationGateways/176_app_gateway_green/requestRoutingRules/176_routrule_green"
+                                                    }
+                                                ]
+                                            },
+                                            "type": "Microsoft.Network/applicationGateways/backendAddressPools"
+                                        }
+                                    ],
+                                    "backendHttpSettingsCollection": [
+                                        {
+                                            "name": "176_back_http_set_green",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/176resource_group_green/providers/Microsoft.Network/applicationGateways/176_app_gateway_green/backendHttpSettingsCollection/176_back_http_set_green",
+                                            "etag": "W/\"28bae244-a4b7-408a-b0d9-03f67859a573\"",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "port": 80,
+                                                "protocol": "Http",
+                                                "cookieBasedAffinity": "Disabled",
+                                                "pickHostNameFromBackendAddress": false,
+                                                "path": "/path1/",
+                                                "requestTimeout": 60,
+                                                "requestRoutingRules": [
+                                                    {
+                                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/176resource_group_green/providers/Microsoft.Network/applicationGateways/176_app_gateway_green/requestRoutingRules/176_routrule_green"
+                                                    }
+                                                ]
+                                            },
+                                            "type": "Microsoft.Network/applicationGateways/backendHttpSettingsCollection"
+                                        }
+                                    ],
+                                    "httpListeners": [
+                                        {
+                                            "name": "176_http_listener_green",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/176resource_group_green/providers/Microsoft.Network/applicationGateways/176_app_gateway_green/httpListeners/176_http_listener_green",
+                                            "etag": "W/\"28bae244-a4b7-408a-b0d9-03f67859a573\"",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "frontendIPConfiguration": {
+                                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/176resource_group_green/providers/Microsoft.Network/applicationGateways/176_app_gateway_green/frontendIPConfigurations/176_front_ip_conf_green"
+                                                },
+                                                "frontendPort": {
+                                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/176resource_group_green/providers/Microsoft.Network/applicationGateways/176_app_gateway_green/frontendPorts/176_front_port_green"
+                                                },
+                                                "protocol": "Http",
+                                                "hostNames": [],
+                                                "requireServerNameIndication": false,
+                                                "customErrorConfigurations": [],
+                                                "requestRoutingRules": [
+                                                    {
+                                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/176resource_group_green/providers/Microsoft.Network/applicationGateways/176_app_gateway_green/requestRoutingRules/176_routrule_green"
+                                                    }
+                                                ]
+                                            },
+                                            "type": "Microsoft.Network/applicationGateways/httpListeners"
+                                        }
+                                    ],
+                                    "urlPathMaps": [],
+                                    "requestRoutingRules": [
+                                        {
+                                            "name": "176_routrule_green",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/176resource_group_green/providers/Microsoft.Network/applicationGateways/176_app_gateway_green/requestRoutingRules/176_routrule_green",
+                                            "etag": "W/\"28bae244-a4b7-408a-b0d9-03f67859a573\"",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "ruleType": "Basic",
+                                                "httpListener": {
+                                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/176resource_group_green/providers/Microsoft.Network/applicationGateways/176_app_gateway_green/httpListeners/176_http_listener_green"
+                                                },
+                                                "backendAddressPool": {
+                                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/176resource_group_green/providers/Microsoft.Network/applicationGateways/176_app_gateway_green/backendAddressPools/176_back_adr_pool_green"
+                                                },
+                                                "backendHttpSettings": {
+                                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/176resource_group_green/providers/Microsoft.Network/applicationGateways/176_app_gateway_green/backendHttpSettingsCollection/176_back_http_set_green"
+                                                }
+                                            },
+                                            "type": "Microsoft.Network/applicationGateways/requestRoutingRules"
+                                        }
+                                    ],
+                                    "probes": [],
+                                    "rewriteRuleSets": [],
+                                    "redirectConfigurations": [],
+                                    "sslPolicy": {
+                                        "policyType": "Predefined",
+                                        "policyName": "AppGwSslPolicy20150501"
+                                    },
+                                    "enableHttp2": false,
+                                    "customErrorConfigurations": []
+                                }
+                            },
+                            {
+                                "name": "176_app_gateway_red",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/176resource_group_red/providers/Microsoft.Network/applicationGateways/176_app_gateway_red",
+                                "etag": "W/\"8951eb70-f3bb-44cc-a134-e1c9700c786d\"",
+                                "type": "Microsoft.Network/applicationGateways",
+                                "location": "eastus",
+                                "tags": {
+                                    "ComplianceStatus": "Red",
+                                    "CustodianRule": "epam-azure-176-asb_ddos_protection_enabled"
+                                },
+                                "properties": {
+                                    "provisioningState": "Succeeded",
+                                    "resourceGuid": "424ffcf8-1378-4f1f-8fdb-940f5f5fd033",
+                                    "sku": {
+                                        "name": "Standard_Small",
+                                        "tier": "Standard",
+                                        "capacity": 2
+                                    },
+                                    "operationalState": "Running",
+                                    "gatewayIPConfigurations": [
+                                        {
+                                            "name": "176_gtw_ip_conf_red",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/176resource_group_red/providers/Microsoft.Network/applicationGateways/176_app_gateway_red/gatewayIPConfigurations/176_gtw_ip_conf_red",
+                                            "etag": "W/\"8951eb70-f3bb-44cc-a134-e1c9700c786d\"",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "subnet": {
+                                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/176resource_group_red/providers/Microsoft.Network/virtualNetworks/176_vnet_red/subnets/appgtwgred"
+                                                }
+                                            },
+                                            "type": "Microsoft.Network/applicationGateways/gatewayIPConfigurations"
+                                        }
+                                    ],
+                                    "sslCertificates": [],
+                                    "authenticationCertificates": [],
+                                    "frontendIPConfigurations": [
+                                        {
+                                            "name": "176_front_ip_conf_red",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/176resource_group_red/providers/Microsoft.Network/applicationGateways/176_app_gateway_red/frontendIPConfigurations/176_front_ip_conf_red",
+                                            "etag": "W/\"8951eb70-f3bb-44cc-a134-e1c9700c786d\"",
+                                            "type": "Microsoft.Network/applicationGateways/frontendIPConfigurations",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "privateIPAllocationMethod": "Dynamic",
+                                                "publicIPAddress": {
+                                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/176resource_group_red/providers/Microsoft.Network/publicIPAddresses/176_pip_red"
+                                                },
+                                                "httpListeners": [
+                                                    {
+                                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/176resource_group_red/providers/Microsoft.Network/applicationGateways/176_app_gateway_red/httpListeners/176_http_listener_red"
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ],
+                                    "frontendPorts": [
+                                        {
+                                            "name": "176_front_port_red",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/176resource_group_red/providers/Microsoft.Network/applicationGateways/176_app_gateway_red/frontendPorts/176_front_port_red",
+                                            "etag": "W/\"8951eb70-f3bb-44cc-a134-e1c9700c786d\"",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "port": 80,
+                                                "httpListeners": [
+                                                    {
+                                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/176resource_group_red/providers/Microsoft.Network/applicationGateways/176_app_gateway_red/httpListeners/176_http_listener_red"
+                                                    }
+                                                ]
+                                            },
+                                            "type": "Microsoft.Network/applicationGateways/frontendPorts"
+                                        }
+                                    ],
+                                    "backendAddressPools": [
+                                        {
+                                            "name": "176_back_adr_pool_red",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/176resource_group_red/providers/Microsoft.Network/applicationGateways/176_app_gateway_red/backendAddressPools/176_back_adr_pool_red",
+                                            "etag": "W/\"8951eb70-f3bb-44cc-a134-e1c9700c786d\"",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "backendAddresses": [],
+                                                "requestRoutingRules": [
+                                                    {
+                                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/176resource_group_red/providers/Microsoft.Network/applicationGateways/176_app_gateway_red/requestRoutingRules/176_routrule_red"
+                                                    }
+                                                ]
+                                            },
+                                            "type": "Microsoft.Network/applicationGateways/backendAddressPools"
+                                        }
+                                    ],
+                                    "backendHttpSettingsCollection": [
+                                        {
+                                            "name": "176_back_http_set_red",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/176resource_group_red/providers/Microsoft.Network/applicationGateways/176_app_gateway_red/backendHttpSettingsCollection/176_back_http_set_red",
+                                            "etag": "W/\"8951eb70-f3bb-44cc-a134-e1c9700c786d\"",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "port": 80,
+                                                "protocol": "Http",
+                                                "cookieBasedAffinity": "Disabled",
+                                                "pickHostNameFromBackendAddress": false,
+                                                "path": "/path1/",
+                                                "requestTimeout": 60,
+                                                "requestRoutingRules": [
+                                                    {
+                                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/176resource_group_red/providers/Microsoft.Network/applicationGateways/176_app_gateway_red/requestRoutingRules/176_routrule_red"
+                                                    }
+                                                ]
+                                            },
+                                            "type": "Microsoft.Network/applicationGateways/backendHttpSettingsCollection"
+                                        }
+                                    ],
+                                    "httpListeners": [
+                                        {
+                                            "name": "176_http_listener_red",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/176resource_group_red/providers/Microsoft.Network/applicationGateways/176_app_gateway_red/httpListeners/176_http_listener_red",
+                                            "etag": "W/\"8951eb70-f3bb-44cc-a134-e1c9700c786d\"",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "frontendIPConfiguration": {
+                                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/176resource_group_red/providers/Microsoft.Network/applicationGateways/176_app_gateway_red/frontendIPConfigurations/176_front_ip_conf_red"
+                                                },
+                                                "frontendPort": {
+                                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/176resource_group_red/providers/Microsoft.Network/applicationGateways/176_app_gateway_red/frontendPorts/176_front_port_red"
+                                                },
+                                                "protocol": "Http",
+                                                "hostNames": [],
+                                                "requireServerNameIndication": false,
+                                                "customErrorConfigurations": [],
+                                                "requestRoutingRules": [
+                                                    {
+                                                        "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/176resource_group_red/providers/Microsoft.Network/applicationGateways/176_app_gateway_red/requestRoutingRules/176_routrule_red"
+                                                    }
+                                                ]
+                                            },
+                                            "type": "Microsoft.Network/applicationGateways/httpListeners"
+                                        }
+                                    ],
+                                    "urlPathMaps": [],
+                                    "requestRoutingRules": [
+                                        {
+                                            "name": "176_routrule_red",
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/176resource_group_red/providers/Microsoft.Network/applicationGateways/176_app_gateway_red/requestRoutingRules/176_routrule_red",
+                                            "etag": "W/\"8951eb70-f3bb-44cc-a134-e1c9700c786d\"",
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "ruleType": "Basic",
+                                                "httpListener": {
+                                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/176resource_group_red/providers/Microsoft.Network/applicationGateways/176_app_gateway_red/httpListeners/176_http_listener_red"
+                                                },
+                                                "backendAddressPool": {
+                                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/176resource_group_red/providers/Microsoft.Network/applicationGateways/176_app_gateway_red/backendAddressPools/176_back_adr_pool_red"
+                                                },
+                                                "backendHttpSettings": {
+                                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/176resource_group_red/providers/Microsoft.Network/applicationGateways/176_app_gateway_red/backendHttpSettingsCollection/176_back_http_set_red"
+                                                }
+                                            },
+                                            "type": "Microsoft.Network/applicationGateways/requestRoutingRules"
+                                        }
+                                    ],
+                                    "probes": [],
+                                    "rewriteRuleSets": [],
+                                    "redirectConfigurations": [],
+                                    "sslPolicy": {
+                                        "policyType": "Predefined",
+                                        "policyName": "AppGwSslPolicy20150501"
+                                    },
+                                    "enableHttp2": false,
+                                    "customErrorConfigurations": []
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}

@@ -1,0 +1,181 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Compute/virtualMachines?api-version=2020-12-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-ms-ratelimit-remaining-resource": [
+                        "Microsoft.Compute/HighCostGet3Min;139,Microsoft.Compute/HighCostGet30Min;687"
+                    ],
+                    "date": [
+                        "Thu, 17 Feb 2022 14:13:44 GMT"
+                    ],
+                    "content-length": [
+                        "2880"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "name": "dd2instance",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/VV/providers/Microsoft.Compute/virtualMachines/dd2instance",
+                                "type": "Microsoft.Compute/virtualMachines",
+                                "location": "eastus",
+                                "properties": {
+                                    "vmId": "58da85b5-87d2-4e2b-b582-52c8e7c25f92",
+                                    "hardwareProfile": {
+                                        "vmSize": "Standard_B2s"
+                                    },
+                                    "storageProfile": {
+                                        "imageReference": {
+                                            "publisher": "Canonical",
+                                            "offer": "UbuntuServer",
+                                            "sku": "18_04-lts-gen2",
+                                            "version": "latest",
+                                            "exactVersion": "18.04.202201180"
+                                        },
+                                        "osDisk": {
+                                            "osType": "Linux",
+                                            "name": "dd2instance_OsDisk_1_035fa0d359d84792b773f9d6f9a81edb",
+                                            "createOption": "FromImage",
+                                            "caching": "ReadWrite",
+                                            "managedDisk": {
+                                                "storageAccountType": "StandardSSD_LRS",
+                                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/VV/providers/Microsoft.Compute/disks/dd2instance_OsDisk_1_035fa0d359d84792b773f9d6f9a81edb"
+                                            },
+                                            "diskSizeGB": 30
+                                        },
+                                        "dataDisks": []
+                                    },
+                                    "osProfile": {
+                                        "computerName": "dd2instance",
+                                        "adminUsername": "ddsuperuser",
+                                        "linuxConfiguration": {
+                                            "disablePasswordAuthentication": true,
+                                            "ssh": {
+                                                "publicKeys": [
+                                                    {
+                                                        "path": "/home/ddsuperuser/.ssh/authorized_keys",
+                                                        "keyData": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCovx2czQGUi+RDibC5oWJtKCWz\r\nYyvKIjgYtSVEOxLMjtfCJRDCUWT8q3Y/arc3YLLQqGnACDIdaE9Nt6N1EDFqLOQw\r\nbta9lK6ahft8FDGQ89YFcp66GViPdI9LrktfKnrkwxbr/ob0LCv9k0goTMzxNkV9\r\nH0jeQsDtdQLRafEqTAURrEtRwhh+ZrRelcDaoWUjVGqH61eOnNQujILxsx4ZoaIL\r\ni9+MKTSCpl8YPvORBqgjRcA1oAMUtetpC2WA/Ea+hVV0dSu1QH8soQNpzH53Q661\r\n8sSR/V4Swgsj//lhgdN29rI96f2p3lUa1quP1JJVNoh8qyuviyu6T5lC763pkTbi\r\n5s27veZW8G8zznO2SMtoKVwN/PVHNZcUm4e96SiGD277WP3AYZ49bmRJCzJvjtGJ\r\nik1kR5yvmFq7seyoBV1Gbzui8qEge4AzxO7R462MSgUCRC+U1FujX8VxRPNrHd5T\r\nVtkj3IcuHY2mxxqrzlK7omrxFPVUmDi+To5JCbk= generated-by-azure\r\n"
+                                                    }
+                                                ]
+                                            },
+                                            "provisionVMAgent": true,
+                                            "patchSettings": {
+                                                "patchMode": "ImageDefault"
+                                            }
+                                        },
+                                        "secrets": [],
+                                        "allowExtensionOperations": true,
+                                        "requireGuestProvisionSignal": true
+                                    },
+                                    "networkProfile": {
+                                        "networkInterfaces": [
+                                            {
+                                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/VV/providers/Microsoft.Network/networkInterfaces/dd2instance380",
+                                                "properties": {
+                                                    "deleteOption": "Detach"
+                                                }
+                                            }
+                                        ]
+                                    },
+                                    "provisioningState": "Succeeded"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.Security/jitNetworkAccessPolicies?api-version=2020-01-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "content-length": [
+                        "731"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "date": [
+                        "Thu, 17 Feb 2022 14:13:45 GMT"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-resource-requests": [
+                        "749"
+                    ],
+                    "x-ms-original-request-ids": [
+                        "",
+                        "",
+                        ""
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "kind": "Basic",
+                                "properties": {
+                                    "virtualMachines": [
+                                        {
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/VV/providers/Microsoft.Compute/virtualMachines/dd2instance",
+                                            "ports": [
+                                                {
+                                                    "number": 22,
+                                                    "protocol": "*",
+                                                    "allowedSourceAddressPrefix": "*",
+                                                    "maxRequestAccessDuration": "PT3H"
+                                                },
+                                                {
+                                                    "number": 3389,
+                                                    "protocol": "*",
+                                                    "allowedSourceAddressPrefix": "*",
+                                                    "maxRequestAccessDuration": "PT3H"
+                                                }
+                                            ]
+                                        }
+                                    ],
+                                    "requests": [],
+                                    "provisioningState": "Succeeded",
+                                    "appendMode": false
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/VV/providers/Microsoft.Security/locations/eastus/jitNetworkAccessPolicies/dd2instance",
+                                "name": "dd2instance",
+                                "type": "Microsoft.Security/locations/jitNetworkAccessPolicies",
+                                "location": "eastus"
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}
