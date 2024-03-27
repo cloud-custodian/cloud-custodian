@@ -7,7 +7,7 @@ from c7n.manager import resources
 from c7n.query import QueryResourceManager, TypeInfo, DescribeSource, ConfigSource
 from c7n.utils import local_session, type_schema
 from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction
-from c7n.filters.vpc import SubnetFilter, SecurityGroupFilter
+from c7n.filters.vpc import SubnetFilter, SecurityGroupFilter, NetworkLocation
 from c7n.filters.kms import KmsRelatedFilter
 from c7n.filters.offhours import OffHour, OnHour
 
@@ -298,6 +298,36 @@ class Model(QueryResourceManager):
 
 Model.filter_registry.register('marked-for-op', TagActionFilter)
 
+@resources.register('sagemaker-cluster')
+class Cluster(QueryResourceManager):
+
+        class resource_type(TypeInfo):
+            service = 'sagemaker'
+            enum_spec = ('list_clusters', 'ClusterSummaries', None)
+            detail_spec = (
+                'describe_cluster', 'ClusterName',
+                'ClusterName', None)
+            arn = id = 'ClusterArn'
+            name = 'ClusterName'
+            date = 'CreationTime'
+            cfn_type = None
+
+        permissions = ('sagemaker:ListTags',)
+
+        def augment(self, clusters):
+            client = local_session(self.session_factory).client('sagemaker')
+
+            def _augment(c):
+                tags = self.retry(client.list_tags,
+                    ResourceArn=c['ClusterArn'])['Tags']
+                c['Tags'] = tags
+                return c
+
+            clusters = super(Cluster, self).augment(clusters)
+            return list(map(_augment, clusters))
+
+Cluster.filter_registry.register('marked-for-op', TagActionFilter)
+
 
 @SagemakerEndpoint.action_registry.register('tag')
 @SagemakerEndpointConfig.action_registry.register('tag')
@@ -305,6 +335,7 @@ Model.filter_registry.register('marked-for-op', TagActionFilter)
 @SagemakerJob.action_registry.register('tag')
 @SagemakerTransformJob.action_registry.register('tag')
 @Model.action_registry.register('tag')
+@Cluster.action_registry.register('tag')
 class TagNotebookInstance(Tag):
     """Action to create tag(s) on a SageMaker resource
     (notebook-instance, endpoint, endpoint-config)
@@ -364,6 +395,7 @@ class TagNotebookInstance(Tag):
 @SagemakerJob.action_registry.register('remove-tag')
 @SagemakerTransformJob.action_registry.register('remove-tag')
 @Model.action_registry.register('remove-tag')
+@Cluster.action_registry.register('remove-tag')
 class RemoveTagNotebookInstance(RemoveTag):
     """Remove tag(s) from SageMaker resources
     (notebook-instance, endpoint, endpoint-config)
@@ -416,6 +448,7 @@ class RemoveTagNotebookInstance(RemoveTag):
 @SagemakerEndpointConfig.action_registry.register('mark-for-op')
 @NotebookInstance.action_registry.register('mark-for-op')
 @Model.action_registry.register('mark-for-op')
+@Cluster.action_registry.register('mark-for-op')
 class MarkNotebookInstanceForOp(TagDelayedAction):
     """Mark SageMaker resources for deferred action
     (notebook-instance, endpoint, endpoint-config)
@@ -575,12 +608,25 @@ class NotebookSubnetFilter(SubnetFilter):
     RelatedIdsExpression = "SubnetId"
 
 
+@Cluster.filter_registry.register('security-group')
+class ClusterSecurityGroupFilter(SecurityGroupFilter):
+
+    RelatedIdsExpression = "VpcConfig.SecurityGroupIds[]"
+
+
+@Cluster.filter_registry.register('subnet')
+class ClusterSubnetFilter(SubnetFilter):
+
+    RelatedIdsExpression = "VpcConfig.Subnets[]"
+
+
+@Cluster.filter_registry.register('network-location', NetworkLocation)
+
 @NotebookInstance.filter_registry.register('kms-key')
 @SagemakerEndpointConfig.filter_registry.register('kms-key')
 class NotebookKmsFilter(KmsRelatedFilter):
 
     RelatedIdsExpression = "KmsKeyId"
-
 
 @Model.action_registry.register('delete')
 class DeleteModel(BaseAction):
@@ -724,5 +770,33 @@ class SagemakerTransformJobStop(BaseAction):
         for j in jobs:
             try:
                 client.stop_transform_job(TransformJobName=j['TransformJobName'])
+            except client.exceptions.ResourceNotFound:
+                pass
+
+@Cluster.action_registry.register('delete')
+class ClusterDelete(BaseAction):
+    """Deletes sagemaker-cluster(s)
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: delete-sagemaker-cluster
+            resource: sagemaker-cluster
+            filters:
+              - "tag:DeleteMe": present
+            actions:
+              - delete
+    """
+    schema = type_schema('delete')
+    permissions = ('sagemaker:DeleteCluster',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('sagemaker')
+
+        for c in resources:
+            try:
+                client.delete_cluster(ClusterName=c['ClusterName'])
             except client.exceptions.ResourceNotFound:
                 pass

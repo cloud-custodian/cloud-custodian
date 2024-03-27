@@ -797,3 +797,167 @@ class TestSagemakerEndpointConfig(BaseTest):
         self.assertEqual(len(resources), 1)
         aliases = kms.list_aliases(KeyId=resources[0]['KmsKeyId'])
         self.assertEqual(aliases['Aliases'][0]['AliasName'], 'alias/skunk/trails')
+
+class TestCluster(BaseTest):
+
+    def test_list_clusters(self):
+        session_factory = self.replay_flight_data("test_sagemaker_clusters")
+        p = self.load_policy(
+            {
+                "name": "list-sagemaker-clusters",
+                "resource": "sagemaker-cluster",
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_tag_clusters(self):
+        session_factory = self.replay_flight_data(
+            "test_sagemaker_tag_clusters"
+        )
+        p = self.load_policy(
+            {
+                "name": "tag-sagemaker-clusters",
+                "resource": "sagemaker-cluster",
+                "filters": [{"tag:Category": "absent"}],
+                "actions": [{"type": "tag", "key": "Category", "value": "TestValue"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        client = session_factory().client("sagemaker")
+        tags = client.list_tags(ResourceArn=resources[0]["ClusterArn"])["Tags"]
+        self.assertEqual(tags[0]["Value"], "TestValue")
+
+    def test_remove_tag_clusters(self):
+        session_factory = self.replay_flight_data(
+            "test_sagemaker_remove_tag_clusters"
+        )
+        p = self.load_policy(
+            {
+                "name": "untag-sagemaker-clusters",
+                "resource": "sagemaker-cluster",
+                "filters": [{"tag:Category": "TestValue"}],
+                "actions": [{"type": "remove-tag", "tags": ["Category"]}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        client = session_factory().client("sagemaker")
+        tags = client.list_tags(ResourceArn=resources[0]["ClusterArn"])["Tags"]
+        self.assertEqual(len(tags), 0)
+
+    def test_mark_for_op_cluster(self):
+        session_factory = self.replay_flight_data(
+            "test_sagemaker_mark_for_op_cluster"
+        )
+        p = self.load_policy(
+            {
+                "name": "sagemaker-cluster-untagged-delete",
+                "resource": "sagemaker-cluster",
+                "filters": [
+                    {"tag:Category": "absent"},
+                    {"tag:custodian_cleanup": "absent"},
+                    {"ClusterStatus": "InService"},
+                ],
+                "actions": [
+                    {
+                        "type": "mark-for-op",
+                        "tag": "custodian_cleanup",
+                        "op": "delete",
+                        "days": 1,
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        client = session_factory().client("sagemaker")
+        tags = client.list_tags(ResourceArn=resources[0]["ClusterArn"])["Tags"]
+        self.assertTrue(tags[0]["Key"], "custodian_cleanup")
+
+    def test_marked_for_op_cluster(self):
+        session_factory = self.replay_flight_data(
+            "test_sagemaker_marked_for_op_cluster"
+        )
+        p = self.load_policy(
+            {
+                "name": "sagemaker-clusters-untagged-delete",
+                "resource": "sagemaker-cluster",
+                "filters": [
+                    {
+                        "type": "marked-for-op",
+                        "tag": "custodian_cleanup",
+                        "op": "delete",
+                        "skew": 1,
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_delete_cluster(self):
+        session_factory = self.replay_flight_data(
+            "test_sagemaker_delete_cluster"
+        )
+        p = self.load_policy(
+            {
+                "name": "delete-sagemaker-cluster",
+                "resource": "sagemaker-cluster",
+                "filters": [{"ClusterName": "test-sagemaker-cluster"}],
+                "actions": [{"type": "delete"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        client = session_factory().client("sagemaker")
+        notebook = client.describe_cluster(
+            ClusterName=resources[0]["ClusterName"]
+        )
+        self.assertTrue(notebook["ClusterStatus"], "Deleting")
+
+    def test_cluster_subnet(self):
+        c = "c7n-test-cluster"
+        session_factory = self.replay_flight_data(
+            "test_sagemaker_cluster_subnet_filter"
+        )
+        p = self.load_policy(
+            {
+                "name": "sagemaker-cluster",
+                "resource": "sagemaker-cluster",
+                "filters": [{"type": "subnet", "key": "tag:Name", "value": "PrivateSubnetA"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["ClusterName"], c)
+
+    def test_cluster_security_group(self):
+        c = "c7n-test-cluster"
+        session_factory = self.replay_flight_data(
+            "test_sagemaker_cluster_security_group_filter"
+        )
+        p = self.load_policy(
+            {
+                "name": "sagemaker-cluster",
+                "resource": "sagemaker-cluster",
+                "filters": [
+                    {"type": "security-group", "key": "GroupName", "value": "default"}
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]["ClusterName"], c)

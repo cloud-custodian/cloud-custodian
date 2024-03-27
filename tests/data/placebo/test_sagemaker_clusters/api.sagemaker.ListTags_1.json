@@ -1,0 +1,12 @@
+{
+    "status_code": 200,
+    "data": {
+        "Tags": [
+            {
+                "Key": "OwnerContact",
+                "Value": "matthew.heidelbaugh@capitalone.com"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
