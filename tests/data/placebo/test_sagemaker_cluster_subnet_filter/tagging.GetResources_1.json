@@ -1,7 +1,8 @@
 {
     "status_code": 200,
     "data": {
-        "Tags": [],
+        "PaginationToken": "",
+        "ResourceTagMappingList": [],
         "ResponseMetadata": {}
     }
 }

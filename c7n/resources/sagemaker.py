@@ -312,6 +312,12 @@ class Model(QueryResourceManager):
 Model.filter_registry.register('marked-for-op', TagActionFilter)
 
 
+class SagemakerClusterDescribe(DescribeSource):
+
+    def augment(self, resources):
+        return universal_augment(self.manager, super().augment(resources))
+
+
 @resources.register('sagemaker-cluster')
 class Cluster(QueryResourceManager):
 
@@ -325,8 +331,11 @@ class Cluster(QueryResourceManager):
         name = 'ClusterName'
         date = 'CreationTime'
         cfn_type = None
+        permission_prefix = 'sagemaker'
+        universal_taggable = object()
 
-    permissions = ('sagemaker:ListTags',)
+    source_mapping = {'describe': SagemakerClusterDescribe}
+
 
     def augment(self, clusters):
         client = local_session(self.session_factory).client('sagemaker')

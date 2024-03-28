@@ -1,7 +1,7 @@
 {
     "status_code": 200,
     "data": {
-        "ClusterArn": "arn:aws:sagemaker:us-east-1:644160558196:cluster/0jaetsvt41ax",
+        "ClusterArn": "arn:aws:sagemaker:us-east-1:644160558196:cluster/n3spifw71llg",
         "ClusterName": "c7n-test-cluster",
         "ClusterStatus": "InService",
         "CreationTime": {
@@ -10,9 +10,9 @@
             "month": 3,
             "day": 28,
             "hour": 10,
-            "minute": 0,
-            "second": 5,
-            "microsecond": 692000
+            "minute": 31,
+            "second": 7,
+            "microsecond": 178000
         },
         "InstanceGroups": [
             {

@@ -4,17 +4,17 @@
         "NextToken": "",
         "ClusterSummaries": [
             {
-                "ClusterArn": "arn:aws:sagemaker:us-east-1:644160558196:cluster/xz412hrtvepi",
-                "ClusterName": "test-sagemaker-cluster",
+                "ClusterArn": "arn:aws:sagemaker:us-east-1:644160558196:cluster/n3spifw71llg",
+                "ClusterName": "c7n-test-cluster",
                 "CreationTime": {
                     "__class__": "datetime",
                     "year": 2024,
                     "month": 3,
-                    "day": 27,
-                    "hour": 14,
-                    "minute": 2,
-                    "second": 33,
-                    "microsecond": 589000
+                    "day": 28,
+                    "hour": 10,
+                    "minute": 31,
+                    "second": 7,
+                    "microsecond": 178000
                 },
                 "ClusterStatus": "InService"
             }

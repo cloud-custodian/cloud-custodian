@@ -4,17 +4,17 @@
         "NextToken": "",
         "ClusterSummaries": [
             {
-                "ClusterArn": "arn:aws:sagemaker:us-east-1:644160558196:cluster/swdbshi6ar63",
+                "ClusterArn": "arn:aws:sagemaker:us-east-1:644160558196:cluster/f5t2ouux778p",
                 "ClusterName": "c7n-test-cluster",
                 "CreationTime": {
                     "__class__": "datetime",
                     "year": 2024,
                     "month": 3,
-                    "day": 27,
-                    "hour": 14,
-                    "minute": 46,
+                    "day": 28,
+                    "hour": 10,
+                    "minute": 55,
                     "second": 5,
-                    "microsecond": 983000
+                    "microsecond": 376000
                 },
                 "ClusterStatus": "Creating"
             }
