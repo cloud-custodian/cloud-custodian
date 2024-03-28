@@ -896,7 +896,7 @@ class TestCluster(BaseTest):
             {
                 "name": "delete-sagemaker-cluster",
                 "resource": "sagemaker-cluster",
-                "filters": [{"ClusterName": "c7n-test-cluster"}],
+                "filters": [{"ClusterName": "test-c7n-cluster"}],
                 "actions": [{"type": "delete"}],
             },
             session_factory=session_factory,

@@ -4,7 +4,7 @@
         "PaginationToken": "",
         "ResourceTagMappingList": [
             {
-                "ResourceARN": "arn:aws:sagemaker:us-east-1:644160558196:cluster/n3spifw71llg",
+                "ResourceARN": "arn:aws:sagemaker:us-east-1:644160558196:cluster/u72dzcdx4scy",
                 "Tags": [
                     {
                         "Key": "Owner",

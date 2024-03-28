@@ -337,19 +337,6 @@ class Cluster(QueryResourceManager):
     source_mapping = {'describe': SagemakerClusterDescribe}
 
 
-    def augment(self, clusters):
-        client = local_session(self.session_factory).client('sagemaker')
-
-        def _augment(c):
-            tags = self.retry(client.list_tags,
-                ResourceArn=c['ClusterArn'])['Tags']
-            c['Tags'] = tags
-            return c
-
-        clusters = super(Cluster, self).augment(clusters)
-        return list(map(_augment, clusters))
-
-
 Cluster.filter_registry.register('marked-for-op', TagActionFilter)
 
 
