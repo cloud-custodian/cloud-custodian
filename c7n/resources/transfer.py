@@ -143,7 +143,7 @@ class DeleteServer(BaseAction):
     def process_server(self, client, server):
         try:
             client.delete_server(ServerId=server['ServerId'])
-        except client.exceptions.NotFoundException:
+        except client.exceptions.ResourceNotFoundException:
             pass
 
 
@@ -224,5 +224,5 @@ class DeleteUser(BaseAction):
             client.delete_user(
                 ServerId=user['Arn'].split('/')[1],
                 UserName=user['UserName'])
-        except client.exceptions.NotFoundException:
+        except client.exceptions.ResourceNotFoundException:
             pass
