@@ -1,0 +1,24 @@
+{
+    "status_code": 200,
+    "data": {
+        "NextToken": "",
+        "ClusterSummaries": [
+            {
+                "ClusterArn": "arn:aws:sagemaker:us-east-1:644160558196:cluster/u72dzcdx4scy",
+                "ClusterName": "test-c7n-cluster",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 3,
+                    "day": 28,
+                    "hour": 11,
+                    "minute": 15,
+                    "second": 18,
+                    "microsecond": 328000
+                },
+                "ClusterStatus": "InService"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
