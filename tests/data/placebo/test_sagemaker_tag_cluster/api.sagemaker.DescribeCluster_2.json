@@ -1,24 +1,24 @@
 {
     "status_code": 200,
     "data": {
-        "ClusterArn": "arn:aws:sagemaker:us-east-1:644160558196:cluster/u72dzcdx4scy",
-        "ClusterName": "test-c7n-cluster",
+        "ClusterArn": "arn:aws:sagemaker:us-east-1:644160558196:cluster/lk69hvxqwjpl",
+        "ClusterName": "c7n-test-cluster",
         "ClusterStatus": "InService",
         "CreationTime": {
             "__class__": "datetime",
             "year": 2024,
             "month": 3,
             "day": 28,
-            "hour": 11,
-            "minute": 15,
-            "second": 18,
-            "microsecond": 328000
+            "hour": 13,
+            "minute": 4,
+            "second": 14,
+            "microsecond": 846000
         },
         "InstanceGroups": [
             {
                 "CurrentCount": 1,
                 "TargetCount": 1,
-                "InstanceGroupName": "test-c7n-ig",
+                "InstanceGroupName": "c7n-test-ig",
                 "InstanceType": "ml.t3.medium",
                 "LifeCycleConfig": {
                     "SourceS3Uri": "s3://hyperpod-lifecycle-scripts-test/src/",
