@@ -18,6 +18,7 @@ import time
 import tempfile
 import zipfile
 import platform
+import re
 
 
 # We use this for freezing dependencies for serverless environments
@@ -43,6 +44,8 @@ LambdaRetry = get_retry(('InsufficientPermissionsException',
                          'InvalidParameterValueException',), max_attempts=5)
 LambdaConflictRetry = get_retry(('ResourceConflictException',), max_attempts=3)
 RuleRetry = get_retry(('ResourceNotFoundException',), max_attempts=2)
+
+schedule_tag_pattern = None  # store compiled regex pattern after first use
 
 
 class PythonPackageArchive:
@@ -385,7 +388,7 @@ class LambdaManager:
                     yield f
 
     def publish(self, func, alias=None, role=None, s3_uri=None):
-        result, changed = self._create_or_update(
+        result, changed, existing = self._create_or_update(
             func, role, s3_uri, qualifier=alias)
         func.arn = result['FunctionArn']
         if alias and changed:
@@ -395,7 +398,21 @@ class LambdaManager:
         else:
             func.alias = func.arn
 
-        for e in func.get_events(self.session_factory):
+        # process any previous lambda configuration
+        old_group_name = None
+        if existing:
+            # process eb schedule tag if it exists
+            old_schedule_tag = existing.get('Tags', {}).get('custodian-schedule', None)
+            if old_schedule_tag is not None:
+                global schedule_tag_pattern
+                if schedule_tag_pattern is None:
+                    # compile on first use only
+                    pattern = r'^name=[a-zA-Z0-9-_]{1,64}:group=([0-9a-zA-Z-_.]{1,64})$'
+                    schedule_tag_pattern = re.compile(pattern)
+                matches = schedule_tag_pattern.match(old_schedule_tag)
+                old_group_name = matches.group(1) if matches else None
+
+        for e in func.get_events(self.session_factory, old_group_name):
             if e.add(func):
                 log.debug(
                     "Added event source: %s to function: %s",
@@ -510,7 +527,7 @@ class LambdaManager:
             waiter.wait(FunctionName=func.name)
             changed = True
 
-        return result, changed
+        return result, changed, existing
 
     def _update_concurrency(self, existing, func):
         e_concurrency = None
@@ -832,7 +849,7 @@ class LambdaFunction(AbstractLambdaFunction):
     def tags(self):
         return self.func_data.get('tags', {})
 
-    def get_events(self, session_factory):
+    def get_events(self, session_factory, old_group_name=None):
         return self.func_data.get('events', ())
 
     def get_archive(self):
@@ -942,7 +959,7 @@ class PolicyLambda(AbstractLambdaFunction):
             architecture.append('x86_64')
         return architecture
 
-    def get_events(self, session_factory):
+    def get_events(self, session_factory, old_group_name=None):
         events = []
         if self.policy.data['mode']['type'] in (
                 'config-rule', 'config-poll-rule'):
@@ -951,6 +968,10 @@ class PolicyLambda(AbstractLambdaFunction):
         elif self.policy.data['mode']['type'] == 'hub-action':
             events.append(
                 SecurityHubAction(self.policy, session_factory))
+        elif self.policy.data['mode']['type'] == 'schedule':
+            events.append(
+                EventBridgeScheduleSource(
+                    self.policy.data['mode'], session_factory, old_group_name))
         else:
             events.append(
                 CloudWatchEventSource(
@@ -1028,8 +1049,9 @@ class AWSEventBase:
                 StatementId=func.event_name,
             )
             return True
-        except client.ResourceNotFoundException:
-            pass
+        except ClientError as e:  # pragma: no cover
+            if e.response['Error']['Code'] != 'ResourceNotFoundException':
+                raise
 
 
 class CloudWatchEventSource(AWSEventBase):
@@ -1257,6 +1279,114 @@ class CloudWatchEventSource(AWSEventBase):
                     func.name, e)
             self.client.delete_rule(Name=func.event_name)
             self.remove_permissions(func, remove_permission=not func_deleted)
+            return True
+
+
+class EventBridgeScheduleSource(AWSEventBase):
+    """
+    Invoke Lambda functions via EventBridge Scheduler.
+    """
+
+    client_service = 'scheduler'
+
+    def __init__(self, data, session_factory, old_group_name=None):
+        super().__init__(data, session_factory)
+        self.old_group_name = old_group_name
+
+    def get(self, schedule_name, group_name='default'):
+        return resource_exists(self.client.get_schedule,
+                               Name=schedule_name,
+                               GroupName=group_name)
+
+    @staticmethod
+    def delta(src, tgt):
+        """Given two schedules determine if the configuration is the same.
+
+        Name is already implied.
+        """
+        for k in ['State', 'StartDate', 'EndDate', 'ScheduleExpression',
+                  'ScheduleExpressionTimezone', 'Description', 'GroupName']:
+            if src.get(k) != tgt.get(k):
+                return True
+
+        for k in ['Arn', 'RoleArn']:
+            if src.get('Target', {}).get(k) != tgt.get('Target', {}).get(k):
+                return True
+
+        return False  # pragma: no cover
+
+    def __repr__(self):
+        return (f'<CWEvent Type:{self.data.get("type")} Events:'
+                f'{", ".join(map(str, self.data.get("events", [])))}>')
+
+    def add(self, func):
+        params = dict(
+            Name=func.event_name,
+            Description=func.description,
+            State='ENABLED',
+            FlexibleTimeWindow={'Mode': 'OFF'},
+            ScheduleExpression=self.data.get('schedule'),
+            ScheduleExpressionTimezone=self.data.get('timezone', 'Etc/UTC'),
+            GroupName=self.data.get('group-name', 'default'),
+            Target={
+                'Arn': func.arn,
+                'RoleArn': self.data.get('scheduler-role')
+            }
+        )
+
+        schedule = self.get(func.event_name, params['GroupName'])
+
+        if schedule and self.delta(schedule, params):
+            log.debug(f'Updating schedule for {func.event_name} in group {params["GroupName"]}')
+            self.client.update_schedule(**params)
+        elif not schedule:
+            log.debug(f'Creating schedule for {self} in group {params["GroupName"]}')
+            self.client.create_schedule(**params)
+
+        # check if old_group_name is set, and if so, is it different to the current group name
+        # if true, remove the old schedule from the old group
+        if self.old_group_name is not None and self.old_group_name != params['GroupName']:
+            log.debug(f'Removing schedule {func.event_name} in group {self.old_group_name}')
+            self.client.delete_schedule(Name=func.event_name, GroupName=self.old_group_name)
+
+        return True
+
+    def update(self, func):
+        self.add(func)
+
+    def pause(self, func):
+        try:
+            schedule = self.get(func.event_name, self.data.get('group-name', 'default'))
+            schedule['State'] = 'DISABLED'
+            self.update_schedule(schedule)
+        except ClientError:  # pragma: no cover
+            pass
+
+    def resume(self, func):
+        try:
+            schedule = self.get(func.event_name, self.data.get('group-name', 'default'))
+            schedule['State'] = 'ENABLED'
+            self.update_schedule(schedule)
+        except ClientError:  # pragma: no cover
+            pass
+
+    def update_schedule(self, schedule):
+        keys_to_delete = []
+        for key in schedule.keys():
+            if key not in ['ActionAfterCompletion', 'ClientToken', 'Description', 'EndDate',
+                           'FlexibleTimeWindow', 'GroupName', 'KmsKeyArn', 'Name',
+                           'ScheduleExpression', 'ScheduleExpressionTimezone', 'StartDate',
+                           'State', 'Target']:
+                keys_to_delete.append(key)
+        for key in keys_to_delete:
+            del schedule[key]
+        self.client.update_schedule(**schedule)
+
+    def remove(self, func, func_deleted=True):
+        if self.get(func.event_name):
+            group_name = self.data.get('group-name', 'default')
+            log.info(f'Removing schedule {func.event_name} in group {group_name}')
+            self.client.delete_schedule(Name=func.event_name, GroupName=group_name)
             return True
 
 

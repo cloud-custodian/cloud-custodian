@@ -58,22 +58,36 @@ def region_gc(options, region, policy_config, policies):
         elif not match:
             remove.append(f)
 
+    schedule_pattern = re.compile('^name=(.*):group=(.*)$')
     for n in remove:
         events = []
         try:
             result = client.get_policy(FunctionName=n['FunctionName'])
         except ClientError as e:
             if e.response['Error']['Code'] == 'ResourceNotFoundException':
-                log.warning(
-                    "Region:%s Lambda Function or Access Policy Statement missing: %s",
-                    region, n['FunctionName'])
+                # Is it a schedule mode policy function due to empty resource policy?
+                fn = client.get_function(FunctionName=n['FunctionName'])
+                if 'custodian-schedule' in fn.get('Tags', {}).keys():
+                    tag_value = fn.get['Tags']['custodian-schedule']
+                    tag_result = schedule_pattern.search(tag_value)
+                    events.append(mu.EventBridgeScheduleSource({
+                        'group-name': tag_result.group(2)
+                    }, session_factory))
+                else:
+                    log.warning(
+                        "Region:%s Lambda Function or Access Policy Statement missing: %s",
+                        region, n['FunctionName'])
             else:
                 log.warning(
                     "Region:%s Unexpected error: %s for function %s",
                     region, e, n['FunctionName'])
 
             # Continue on with next function instead of raising an exception
-            continue
+            # if not using an EventBridge schedule
+            if len(events) == 0:
+                continue
+            else:
+                result = {}
 
         if 'Policy' not in result:
             pass

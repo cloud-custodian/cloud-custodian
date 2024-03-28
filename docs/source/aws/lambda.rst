@@ -139,6 +139,53 @@ substituted so a policy can be used across accounts.
          schedule: "rate(1 day)"
          role: arn:aws:iam::{account_id}:role/some-role
 
+EventBridge Scheduler Function
+++++++++++++++++++++++++++++++
+
+We also support rate based, cron based and one time schedules, per `Schedule types on
+EventBridge Scheduler
+<https://docs.aws.amazon.com/scheduler/latest/UserGuide/schedule-types.html>`_.
+This includes support for `start-date`, `end-date` which should be ISO 8601 formatted
+strings compatible with Python's `datetime.datetime.fromisoformat
+<https://docs.python.org/3/library/datetime.html#datetime.datetime.fromisoformat>`_
+method, and `timezone` which should be a string from the `IANA Timezone Database <https://www.iana.org/time-zones>`_
+(defaults to `Etc/UTC`).
+
+EventBridge Scheduler requires an execution role to invoke the policy Lambda function per
+`Set up the execution role <https://docs.aws.amazon.com/scheduler/latest/UserGuide/setting-up.html#setting-up-execution-role>`_.
+The role ARN must be included in the mode block using the `scheduler-role` property.
+
+Schedules can also be placed into a schedule group with the `group-name` property.
+The group must already exist in EventBridge Scheduler. EventBridge Scheduler schedules do
+not support tagging, but groups do.
+
+.. code-block:: yaml
+
+   policies:
+     - name: s3-bucket-check
+       resource: s3
+       mode:
+         type: schedule
+         role: arn:aws:iam::{account_id}:role/some-role
+         schedule: "rate(1 day)"
+         schedule-role: arn:aws:iam::{account_id}:role/some-scheduler-role
+         timezone: Asia/Seoul
+         group-name: MySchedGroup
+         start-date: 2024-04-04T00:05:23
+
+Note:
+
+When switching from `periodic` mode to `schedule` mode for a policy that is already deployed,
+the `custodian run` command will not remove the old EventBridge Rule. The same is true when
+switching from `schedule` to `periodi`. The `custodian run` command cannot know what used to
+be in a policy file, only what is there now.
+
+Instead of deleting rules and schedules manually, `tools/ops/mugc.py` deletes any function in
+an AWS account that doesn't exist in a set of policy files, including rules and schedules.
+Comment out the policy in your policy file and run `mugc.py`. This will delete the existing policy
+Lambda function as well as any rules or schedules. Then remove the comments and redeploy with
+`custodian run` as normal.
+
 Event Pattern Filtering
 +++++++++++++++++++++++
 
