@@ -337,16 +337,12 @@ class Cluster(QueryResourceManager):
     source_mapping = {'describe': SagemakerClusterDescribe}
 
 
-Cluster.filter_registry.register('marked-for-op', TagActionFilter)
-
-
 @SagemakerEndpoint.action_registry.register('tag')
 @SagemakerEndpointConfig.action_registry.register('tag')
 @NotebookInstance.action_registry.register('tag')
 @SagemakerJob.action_registry.register('tag')
 @SagemakerTransformJob.action_registry.register('tag')
 @Model.action_registry.register('tag')
-@Cluster.action_registry.register('tag')
 class TagNotebookInstance(Tag):
     """Action to create tag(s) on a SageMaker resource
     (notebook-instance, endpoint, endpoint-config)
@@ -406,7 +402,6 @@ class TagNotebookInstance(Tag):
 @SagemakerJob.action_registry.register('remove-tag')
 @SagemakerTransformJob.action_registry.register('remove-tag')
 @Model.action_registry.register('remove-tag')
-@Cluster.action_registry.register('remove-tag')
 class RemoveTagNotebookInstance(RemoveTag):
     """Remove tag(s) from SageMaker resources
     (notebook-instance, endpoint, endpoint-config)
@@ -459,7 +454,6 @@ class RemoveTagNotebookInstance(RemoveTag):
 @SagemakerEndpointConfig.action_registry.register('mark-for-op')
 @NotebookInstance.action_registry.register('mark-for-op')
 @Model.action_registry.register('mark-for-op')
-@Cluster.action_registry.register('mark-for-op')
 class MarkNotebookInstanceForOp(TagDelayedAction):
     """Mark SageMaker resources for deferred action
     (notebook-instance, endpoint, endpoint-config)
