@@ -271,6 +271,7 @@ ResourceMap = {
   "aws.waf-regional": "c7n.resources.waf.RegionalWAF",
   "aws.wafv2": "c7n.resources.waf.WAFV2",
   "aws.workspaces": "c7n.resources.workspaces.Workspace",
+  "aws.workspaces-bundle": "c7n.resources.workspaces.WorkspacesBundle",
   "aws.workspaces-directory": "c7n.resources.workspaces.WorkspaceDirectory",
   "aws.workspaces-image": "c7n.resources.workspaces.WorkspaceImage",
   "aws.workspaces-web": "c7n.resources.workspaces.WorkspacesWeb",

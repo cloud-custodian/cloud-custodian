@@ -456,3 +456,62 @@ class TestWorkspacesWeb(BaseTest):
             time.sleep(5)
         portals = client.list_portals()['portals']
         self.assertEqual(len(portals), 0)
+
+class TestWorkspacesBundleDelete(BaseTest):
+
+    def test_workspaces_bundle_tag(self):
+        session_factory = self.replay_flight_data("test_workspaces_bundle_tag")
+        client = session_factory().client("workspaces")
+
+        p = self.load_policy({
+            'name': 'workspaces-bundle-tag',
+            'resource': 'workspaces-bundle',
+            'filters': [{'Name': 'test'}],
+            'actions': [{
+                'type': 'tag',
+                'tags': {'test': 'testval'}
+            }]
+        }, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        response = client.describe_tags(ResourceId=resources[0]['BundleId'])
+        self.assertIn({'Key': 'test', 'Value': 'testval'}, response.get('TagList', []))
+
+    def test_workspaces_bundle_untag(self):
+        session_factory = self.replay_flight_data("test_workspaces_bundle_untag")
+        client = session_factory().client("workspaces")
+
+        p = self.load_policy({
+            'name': 'workspaces-bundle-untag',
+            'resource': 'workspaces-bundle',
+            'filters': [{'Name': 'test'}],
+            'actions': [{
+                'type': 'remove-tag',
+                'tags': ['test']
+            }]
+        }, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        response = client.describe_tags(ResourceId=resources[0]['BundleId'])
+        self.assertNotIn({'Key': 'test', 'Value': 'testval'}, response.get('TagList', []))
+
+    def test_workspaces_bundle_delete(self):
+        session_factory = self.replay_flight_data("test_workspaces_bundle_delete")
+        client = session_factory().client("workspaces")
+
+        p = self.load_policy({
+            'name': 'workspaces-bundle-delete',
+            'resource': 'workspaces-bundle',
+            'filters': [{'Name': 'test'}],
+            'actions': [{'type': 'delete'}]
+        }, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['Name'], 'test')
+        if self.recording:
+            time.sleep(5)
+
+        response = client.describe_workspace_bundles()['Bundles']
+        self.assertFalse(any(b['Name'] == 'test' for b in response))
