@@ -31,4 +31,3 @@ class UserTest(OpenStackTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(len(resources[0]["c7n:ExtendedUserInfo"]["options"]), 0)
-

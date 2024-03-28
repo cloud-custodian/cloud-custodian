@@ -346,7 +346,7 @@ class RemovePolicyStatement(RemovePolicyBase):
         if p is None:
             return
 
-        statements, found = self.process_policy(
+        _, found = self.process_policy(
             p, resource, CrossAccountAccessFilter.annotation_key)
 
         if found:

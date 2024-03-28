@@ -6,6 +6,7 @@ from c7n_gcp.filters import IamPolicyFilter
 from c7n_gcp.filters.iampolicy import IamPolicyValueFilter
 from c7n.utils import local_session
 
+
 @resources.register("cloud-run-service")
 class CloudRunService(QueryResourceManager):
     """GCP resource: https://cloud.google.com/run/docs/reference/rest/v1/namespaces.services"""
@@ -45,6 +46,7 @@ class CloudRunServiceIamPolicyFilter(IamPolicyFilter):
         value_filter = IamPolicyValueFilter(self.data["doc"], self.manager)
         value_filter._verb_arguments = self._verb_arguments
         return value_filter.process(resources)
+
 
 @resources.register("cloud-run-job")
 class CloudRunJob(QueryResourceManager):

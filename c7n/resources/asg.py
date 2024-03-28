@@ -611,7 +611,7 @@ class ImageFilter(ValueFilter):
         if not image:
             self.log.warning(
                 "Could not locate image for asg:%s ami:%s" % (
-                    i['AutoScalingGroupName'], image_id ))
+                    i['AutoScalingGroupName'], image_id))
             # Match instead on empty skeleton?
             return False
         return self.match(image)

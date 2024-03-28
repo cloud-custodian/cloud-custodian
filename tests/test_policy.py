@@ -1652,14 +1652,14 @@ class PolicyConditionsTest(BaseTest):
 
         p = self.load_policy(p_json)
         p.conditions.env_vars['account'] = {'name': 'deputy'}
-        p.expand_variables({"var1":"value1"})
+        p.expand_variables({"var1": "value1"})
         p.validate()
         self.assertEqual("Test var extension value1", p.data["description"])
         self.assertTrue(p.is_runnable())
 
         p = self.load_policy(p_json)
         p.conditions.env_vars['account'] = {'name': 'mickey'}
-        p.expand_variables({"var1":"value2"})
+        p.expand_variables({"var1": "value2"})
         p.validate()
         self.assertEqual("Test var extension value2", p.data["description"])
         self.assertFalse(p.is_runnable())

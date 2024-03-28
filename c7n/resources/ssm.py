@@ -833,7 +833,6 @@ class DeleteDataSync(Action):
                 continue
 
 
-
 @resources.register("ssm-patch-group")
 class SsmPatchGroup(QueryResourceManager):
     class resource_type(TypeInfo):
@@ -866,6 +865,7 @@ class SSMSessionManager(QueryResourceManager):
             # Default to Active if not given
             query['State'] = 'Active'
         return super(SSMSessionManager, self).resources(query=query)
+
 
 @SSMSessionManager.action_registry.register('terminate')
 class TerminateSession(Action):

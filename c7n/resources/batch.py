@@ -68,6 +68,7 @@ class JobDefinition(QueryResourceManager):
         'config': ConfigSource
     }
 
+
 @ComputeEnvironment.action_registry.register('update-environment')
 class UpdateComputeEnvironment(BaseAction):
     """Updates an AWS batch compute environment
@@ -86,6 +87,7 @@ class UpdateComputeEnvironment(BaseAction):
               - type: update-environment
                 state: DISABLED
     """
+
     schema = {
         'type': 'object',
         'additionalProperties': False,
@@ -240,6 +242,7 @@ class DeleteBatchJobQueue(BaseAction):
         client = local_session(self.manager.session_factory).client('batch')
         for e in resources:
             self.delete_job_queue(client, e)
+
 
 @BatchJobQueue.action_registry.register('update')
 class UpdateBatchJobQueue(BaseAction):

@@ -19,4 +19,3 @@ class PatchDeploymentTest(BaseTest):
         assert p.resource_manager.get_urns(resources) == [
             "gcp:osconfig::cloud-custodian:patchDeployment/test"
         ]
-

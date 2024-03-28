@@ -101,8 +101,6 @@ class SecurityGroup(SecurityGroupFilter):
 
 
 @ElasticFileSystemMountTarget.filter_registry.register('network-location', NetworkLocation)
-
-
 @ElasticFileSystem.filter_registry.register('kms-key')
 class KmsFilter(KmsRelatedFilter):
 

@@ -58,7 +58,7 @@ def test_generate_requirements():
         'boto3', ignore=('docutils', 's3transfer', 'six'), exclude=['urllib3'])
     packages = []
     for l in lines.split('\n'):
-        pkg_name, version = l.split('==')
+        pkg_name, _ = l.split('==')
         packages.append(pkg_name)
     assert set(packages) == {'botocore', 'jmespath', 'python-dateutil'}
 

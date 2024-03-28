@@ -54,4 +54,3 @@ class SessionHostTest(BaseTest):
         })
         resources = p.run()
         self.assertEqual(len(resources), 2)
-

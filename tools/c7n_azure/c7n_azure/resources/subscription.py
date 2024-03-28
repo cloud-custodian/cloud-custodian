@@ -73,6 +73,7 @@ class Subscription(ResourceManager, metaclass=QueryMeta):
 
 Subscription.filter_registry.register('missing', Missing)
 
+
 @Subscription.filter_registry.register('diagnostic-settings')
 class SubscriptionDiagnosticSettingFilter(ValueFilter):
     """Filter by diagnostic settings for this subscription

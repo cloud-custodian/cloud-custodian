@@ -33,6 +33,7 @@ class ElasticBeanstalk(QueryResourceManager):
         cfn_type = config_type = 'AWS::ElasticBeanstalk::Application'
         permissions_augment = ("elasticbeanstalk:ListTagsForResource",)
 
+
 class DescribeEnvironment(DescribeSource):
 
     def augment(self, resources):

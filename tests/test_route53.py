@@ -649,5 +649,5 @@ class TestControlPanel(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        self.assertEqual(resources[0]['ControlPanelArn'], \
+        self.assertEqual(resources[0]['ControlPanelArn'],
             'arn:aws:route53-recovery-control::644160558196:controlpanel/fd5a6bfc73364a0dbd48d3915867a306')

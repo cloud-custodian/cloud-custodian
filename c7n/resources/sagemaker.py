@@ -744,7 +744,7 @@ class SagemakerTransformJobStop(BaseAction):
 class SagemakerDomainDescribe(DescribeSource):
 
     def augment(self, resources):
-        return universal_augment( self.manager, super().augment(resources))
+        return universal_augment(self.manager, super().augment(resources))
 
 
 @resources.register('sagemaker-domain')
@@ -766,4 +766,4 @@ class SagemakerDomain(QueryResourceManager):
 
 @SagemakerDomain.filter_registry.register('kms-key')
 class SagemakerDomainKmsFilter(KmsRelatedFilter):
-  RelatedIdsExpression = 'KmsKeyId'
+    RelatedIdsExpression = 'KmsKeyId'

@@ -220,7 +220,6 @@ class ElasticSearch(BaseTest):
         ]):
             p.run()
 
-
     def test_domain_mark_for_op(self):
         session_factory = self.replay_flight_data("test_elasticsearch_markforop")
         client = session_factory(region="us-east-1").client("es")

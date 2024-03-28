@@ -21,7 +21,7 @@ class TestSubnet(OciBaseTest):
         """
         test adding defined_tags tag to subnet
         """
-        compartment_id, subnet_ocid = self._get_subnet_details(subnet)
+        _, subnet_ocid = self._get_subnet_details(subnet)
         session_factory = test.oci_session_factory()
         policy = test.load_policy(
             {
@@ -44,7 +44,7 @@ class TestSubnet(OciBaseTest):
         """
         test adding defined_tags tag to subnet
         """
-        compartment_id, subnet_ocid = self._get_subnet_details(subnet)
+        _, subnet_ocid = self._get_subnet_details(subnet)
         session_factory = test.oci_session_factory()
         policy = test.load_policy(
             {
@@ -67,7 +67,7 @@ class TestSubnet(OciBaseTest):
         """
         test update defined_tags tag on subnet
         """
-        compartment_id, subnet_ocid = self._get_subnet_details(subnet)
+        _, subnet_ocid = self._get_subnet_details(subnet)
         session_factory = test.oci_session_factory()
         policy = test.load_policy(
             {
@@ -95,7 +95,7 @@ class TestSubnet(OciBaseTest):
         """
         test adding freeform tag to subnet
         """
-        compartment_id, subnet_ocid = self._get_subnet_details(subnet)
+        _, subnet_ocid = self._get_subnet_details(subnet)
         session_factory = test.oci_session_factory()
         policy = test.load_policy(
             {
@@ -118,7 +118,7 @@ class TestSubnet(OciBaseTest):
         """
         test update freeform tag of subnet
         """
-        compartment_id, subnet_ocid = self._get_subnet_details(subnet)
+        _, subnet_ocid = self._get_subnet_details(subnet)
         session_factory = test.oci_session_factory()
         policy = test.load_policy(
             {
@@ -141,7 +141,7 @@ class TestSubnet(OciBaseTest):
         """
         test get freeform tagged subnet
         """
-        compartment_id, subnet_ocid = self._get_subnet_details(subnet)
+        _, subnet_ocid = self._get_subnet_details(subnet)
         session_factory = test.oci_session_factory()
         policy = test.load_policy(
             {
@@ -163,7 +163,7 @@ class TestSubnet(OciBaseTest):
         """
         test remove freeform tag
         """
-        compartment_id, subnet_ocid = self._get_subnet_details(subnet)
+        _, subnet_ocid = self._get_subnet_details(subnet)
         session_factory = test.oci_session_factory()
         policy = test.load_policy(
             {
@@ -188,7 +188,7 @@ class TestSubnet(OciBaseTest):
         """
         test remove defined tag
         """
-        compartment_id, subnet_ocid = self._get_subnet_details(subnet)
+        _, subnet_ocid = self._get_subnet_details(subnet)
         session_factory = test.oci_session_factory()
         policy = test.load_policy(
             {

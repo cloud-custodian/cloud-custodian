@@ -222,7 +222,7 @@ class RemovePolicyStatement(RemovePolicyBase):
             return
 
         p = json.loads(resource['Policy'])
-        statements, found = self.process_policy(
+        _, found = self.process_policy(
             p, resource, CrossAccountAccessFilter.annotation_key)
 
         if not found:

@@ -43,6 +43,7 @@ class MonitorLogprofile(ArmResourceManager):
         )
         resource_type = 'Microsoft.Insights/logprofiles'
 
+
 @MonitorLogprofile.filter_registry.register('monitor-storage')
 class MonitorLogStorageFilter(ValueFilter):
     """Check monitor log profile storage
@@ -65,16 +66,16 @@ class MonitorLogStorageFilter(ValueFilter):
     schema_alias = False
 
     def process(self, resources, event=None):
-      self.session = local_session(self.manager.session_factory)
-      self.storageClient = self.session.client("azure.mgmt.storage.StorageManagementClient")
-      matched = []
-      for profile in resources:
-        storage_name = ResourceIdParser.get_resource_name(
-           profile['properties']['storageAccountId'])
-        storage_group = ResourceIdParser.get_resource_group(
-          profile['properties']['storageAccountId'])
-        storage_properties = self.storageClient.storage_accounts.get_properties(
-          storage_group, storage_name)
-        if self.match(storage_properties.serialize(True)):
-          matched.append(profile)
-      return matched
+        self.session = local_session(self.manager.session_factory)
+        self.storageClient = self.session.client("azure.mgmt.storage.StorageManagementClient")
+        matched = []
+        for profile in resources:
+            storage_name = ResourceIdParser.get_resource_name(
+                profile['properties']['storageAccountId'])
+            storage_group = ResourceIdParser.get_resource_group(
+                profile['properties']['storageAccountId'])
+            storage_properties = self.storageClient.storage_accounts.get_properties(
+                storage_group, storage_name)
+            if self.match(storage_properties.serialize(True)):
+                matched.append(profile)
+        return matched

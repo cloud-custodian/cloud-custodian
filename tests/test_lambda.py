@@ -232,6 +232,7 @@ class LambdaTest(BaseTest):
         p.data['filters'][1]['boundaries'] = False
         resources = p.run()
         assert len(resources) == 1
+
     def test_lambda_config_source(self):
         factory = self.replay_flight_data("test_aws_lambda_config_source")
         p = self.load_policy(
