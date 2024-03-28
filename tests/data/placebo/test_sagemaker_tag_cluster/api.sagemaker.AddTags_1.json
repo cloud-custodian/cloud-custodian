@@ -3,8 +3,8 @@
     "data": {
         "Tags": [
             {
-                "Key": "OwnerContact",
-                "Value": "matthew.heidelbaugh@capitalone.com"
+                "Key": "Owner",
+                "Value": "c7n"
             }
         ],
         "ResponseMetadata": {}
