@@ -4,8 +4,8 @@
         "ResponseMetadata": {},
         "AliasArn": "arn:aws:lambda:us-east-1:644160558196:function:custodian-schedule-ec2-checker:Dev",
         "Name": "Dev",
-        "FunctionVersion": "20",
+        "FunctionVersion": "32",
         "Description": "",
-        "RevisionId": "c3f88425-1085-40cd-99fd-b9f3546c0ba5"
+        "RevisionId": "c73a933f-afcd-4d39-a099-5681d98ebaa1"
     }
 }

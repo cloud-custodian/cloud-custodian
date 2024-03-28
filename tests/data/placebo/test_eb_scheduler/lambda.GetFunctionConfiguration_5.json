@@ -7,12 +7,12 @@
         "Runtime": "python3.11",
         "Role": "arn:aws:iam::644160558196:role/custodian-mu",
         "Handler": "custodian_policy.run",
-        "CodeSize": 624645,
+        "CodeSize": 625014,
         "Description": "cloud-custodian lambda policy",
         "Timeout": 900,
         "MemorySize": 512,
-        "LastModified": "2024-03-25T17:53:09.000+0000",
-        "CodeSha256": "fXqYzJ/DP8jcxAy2J9zU3YA3eJ3q6a5142dtfjsSd/g=",
+        "LastModified": "2024-03-28T12:57:09.000+0000",
+        "CodeSha256": "RQ8OVXg9a77CYJOchMP7wXHGCGqhuEIOg/bgy14Cv1Y=",
         "Version": "$LATEST",
         "VpcConfig": {
             "SubnetIds": [],
@@ -23,7 +23,7 @@
         "TracingConfig": {
             "Mode": "PassThrough"
         },
-        "RevisionId": "a6e73de6-3355-4a8a-9c97-517d274e1bc0",
+        "RevisionId": "7814ec16-5e65-4db6-93fb-ae38d6a1f94b",
         "State": "Active",
         "LastUpdateStatus": "InProgress",
         "LastUpdateStatusReason": "The function is being created.",

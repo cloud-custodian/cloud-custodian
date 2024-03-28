@@ -569,7 +569,7 @@ class LambdaMode(ServerlessExecutionMode):
         if self.policy.data['mode']['type'] == 'schedule':
             prefix = self.policy.data['mode'].get('function-prefix', 'custodian-')
             name = self.policy.data['name']
-            group = self.policy.data['mode'].get('group', 'default')
+            group = self.policy.data['mode'].get('group-name', 'default')
             tags['custodian-schedule'] = f'name={prefix + name}:group={group}'
 
         from c7n import mu

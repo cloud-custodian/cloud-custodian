@@ -18,6 +18,7 @@ import time
 import tempfile
 import zipfile
 import platform
+import re
 
 
 # We use this for freezing dependencies for serverless environments
@@ -43,6 +44,8 @@ LambdaRetry = get_retry(('InsufficientPermissionsException',
                          'InvalidParameterValueException',), max_attempts=5)
 LambdaConflictRetry = get_retry(('ResourceConflictException',), max_attempts=3)
 RuleRetry = get_retry(('ResourceNotFoundException',), max_attempts=2)
+
+schedule_tag_pattern = None  # store compiled regex pattern after first use
 
 
 class PythonPackageArchive:
@@ -385,7 +388,7 @@ class LambdaManager:
                     yield f
 
     def publish(self, func, alias=None, role=None, s3_uri=None):
-        result, changed = self._create_or_update(
+        result, changed, existing = self._create_or_update(
             func, role, s3_uri, qualifier=alias)
         func.arn = result['FunctionArn']
         if alias and changed:
@@ -395,7 +398,21 @@ class LambdaManager:
         else:
             func.alias = func.arn
 
-        for e in func.get_events(self.session_factory):
+        # process any previous lambda configuration
+        old_group_name = None
+        if existing:
+            # process eb schedule tag if it exists
+            old_schedule_tag = existing.get('Tags', {}).get('custodian-schedule', None)
+            if old_schedule_tag is not None:
+                global schedule_tag_pattern
+                if schedule_tag_pattern is None:
+                    # compile on first use only
+                    pattern = r'^name=[a-zA-Z0-9-_]{1,64}:group=([0-9a-zA-Z-_.]{1,64})$'
+                    schedule_tag_pattern = re.compile(pattern)
+                matches = schedule_tag_pattern.match(old_schedule_tag)
+                old_group_name = matches.group(1) if matches else None
+
+        for e in func.get_events(self.session_factory, old_group_name):
             if e.add(func):
                 log.debug(
                     "Added event source: %s to function: %s",
@@ -510,7 +527,7 @@ class LambdaManager:
             waiter.wait(FunctionName=func.name)
             changed = True
 
-        return result, changed
+        return result, changed, existing
 
     def _update_concurrency(self, existing, func):
         e_concurrency = None
@@ -832,7 +849,7 @@ class LambdaFunction(AbstractLambdaFunction):
     def tags(self):
         return self.func_data.get('tags', {})
 
-    def get_events(self, session_factory):
+    def get_events(self, session_factory, old_group_name=None):
         return self.func_data.get('events', ())
 
     def get_archive(self):
@@ -942,7 +959,7 @@ class PolicyLambda(AbstractLambdaFunction):
             architecture.append('x86_64')
         return architecture
 
-    def get_events(self, session_factory):
+    def get_events(self, session_factory, old_group_name=None):
         events = []
         if self.policy.data['mode']['type'] in (
                 'config-rule', 'config-poll-rule'):
@@ -954,7 +971,7 @@ class PolicyLambda(AbstractLambdaFunction):
         elif self.policy.data['mode']['type'] == 'schedule':
             events.append(
                 EventBridgeScheduleSource(
-                    self.policy.data['mode'], session_factory))
+                    self.policy.data['mode'], session_factory, old_group_name))
         else:
             events.append(
                 CloudWatchEventSource(
@@ -1272,6 +1289,10 @@ class EventBridgeScheduleSource(AWSEventBase):
 
     client_service = 'scheduler'
 
+    def __init__(self, data, session_factory, old_group_name=None):
+        super().__init__(data, session_factory)
+        self.old_group_name = old_group_name
+
     def get(self, schedule_name, group_name='default'):
         return resource_exists(self.client.get_schedule,
                                Name=schedule_name,
@@ -1322,32 +1343,13 @@ class EventBridgeScheduleSource(AWSEventBase):
             log.debug(f'Creating schedule for {self} in group {params["GroupName"]}')
             self.client.create_schedule(**params)
 
-        # check for schedules with same func.event_name in any other group in case
-        # group_name has been changed
-        # there should only be one schedule across all groups for each policy lambda
-        self.remove_from_groups(self.client, func, params['GroupName'])
+        # check if old_group_name is set, and if so, is it different to the current group name
+        # if true, remove the old schedule from the old group
+        if self.old_group_name is not None and self.old_group_name != params['GroupName']:
+            log.debug(f'Removing schedule {func.event_name} in group {self.old_group_name}')
+            self.client.delete_schedule(Name=func.event_name, GroupName=self.old_group_name)
 
         return True
-
-    @staticmethod
-    def remove_from_groups(client, func, skip_group=None):
-        try:
-            paginator = client.get_paginator('list_schedule_groups')
-            pages = paginator.paginate()
-            for page in pages:
-                for group in page['ScheduleGroups']:
-                    if group['Name'] != skip_group:
-                        schedule = resource_exists(client.get_schedule,
-                                                   Name=func.event_name,
-                                                   GroupName=group['Name'])
-                        if schedule:  # pragma: no cover
-                            log.debug(f'Removing schedule {func.event_name} '
-                                      f'in group {group["Name"]}')
-                            client.delete_schedule(Name=func.event_name, GroupName=group['Name'])
-        except ClientError as e:  # pragma: no cover
-            if e.response['Error']['Code'] == 'AccessDeniedException':
-                return
-            raise
 
     def update(self, func):
         self.add(func)
