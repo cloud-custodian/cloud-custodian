@@ -159,6 +159,7 @@ class KeyTypeFilter(Filter):
 
         return matched
 
+
 @KeyVaultKeys.filter_registry.register('rotation-policy')
 class KeyVaultKeyRotationFilter(Filter):
     """Filters keyvault keys for rotation policy
@@ -176,16 +177,16 @@ class KeyVaultKeyRotationFilter(Filter):
                 - type: rotation-policy
                   state: Disabled
     """
-    schema = type_schema('rotation-policy',required=['state'],
+    schema = type_schema('rotation-policy', required=['state'],
                 state={'type': 'string', 'enum': ['Enabled', 'Disabled']})
 
     def process(self, resources, event=None):
         matched = []
         for key in resources:
-          id = KeyProperties(key_id=key['id'])
-          client = self.manager.get_client(vault_url=id.vault_url)
-          rotation = client.get_key_rotation_policy(id.name)
-          if (self.data.get('state') == 'Disabled' and not rotation.id) or \
-            (self.data.get('state')  == 'Enabled' and rotation.id):
-            matched.append(key)
+            id = KeyProperties(key_id=key['id'])
+            client = self.manager.get_client(vault_url=id.vault_url)
+            rotation = client.get_key_rotation_policy(id.name)
+            if (self.data.get('state') == 'Disabled' and not rotation.id) or \
+               (self.data.get('state')  == 'Enabled' and rotation.id):
+                matched.append(key)
         return matched

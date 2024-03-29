@@ -81,6 +81,7 @@ class AWSLambda(query.QueryResourceManager):
         config_type = 'AWS::Lambda::Function'
         cfn_type = 'AWS::Lambda::Function'
         universal_taggable = object()
+        permissions_augment = ("lambda:ListTags",)
 
     source_mapping = {
         'describe': DescribeLambda,
@@ -306,6 +307,7 @@ class HasSpecificManagedPolicy(SpecificIamRoleManagedPolicy):
                 results.append(r)
 
         return results
+
 
 @AWSLambda.action_registry.register('update')
 class UpdateLambda(Action):
@@ -624,7 +626,7 @@ class RemovePolicyStatement(RemovePolicyBase):
 
         p = json.loads(resource['c7n:Policy'])
 
-        statements, found = self.process_policy(
+        _, found = self.process_policy(
             p, resource, CrossAccountAccessFilter.annotation_key)
         if not found:
             return
@@ -861,7 +863,7 @@ class LayerRemovePermissions(RemovePolicyBase):
 
         p = json.loads(r['c7n:Policy'])
 
-        statements, found = self.process_policy(
+        _, found = self.process_policy(
             p, r, CrossAccountAccessFilter.annotation_key)
 
         if not found:
@@ -908,7 +910,6 @@ class LayerPostFinding(PostFinding):
 
 
 @AWSLambda.filter_registry.register('lambda-edge')
-
 class LambdaEdgeFilter(Filter):
     """
     Filter for lambda@edge functions. Lambda@edge only exists in us-east-1

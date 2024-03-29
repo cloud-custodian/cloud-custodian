@@ -113,6 +113,7 @@ class Key(QueryResourceManager):
         arn = 'Arn'
         universal_taggable = True
         cfn_type = config_type = 'AWS::KMS::Key'
+        permissions_augment = ("kms:ListResourceTags",)
 
     source_mapping = {
         'config': ConfigKey,
@@ -353,7 +354,7 @@ class RemovePolicyStatement(RemovePolicyBase):
             return
 
         p = json.loads(resource['Policy'])
-        statements, found = self.process_policy(
+        _, found = self.process_policy(
             p, resource, CrossAccountAccessFilter.annotation_key)
 
         if not found:

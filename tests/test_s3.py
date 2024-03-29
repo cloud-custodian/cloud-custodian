@@ -4070,7 +4070,6 @@ class IntelligentTieringConfiguration(BaseTest):
         self.assertIn(
             "may only be used in conjunction with `intelligent-tiering`", str(e.exception))
 
-
     def test_s3_int_tiering_set_configurations(self):
         self.patch(s3.S3, "executor_factory", MainThreadExecutor)
         self.patch(s3, "S3_AUGMENT_TABLE", [])
@@ -4079,7 +4078,7 @@ class IntelligentTieringConfiguration(BaseTest):
         session = session_factory()
         client = session.client("s3")
         configs = client.list_bucket_intelligent_tiering_configurations(Bucket=bname)
-        filtered_config =  {
+        filtered_config = {
             'Id': 'test-config',
             'Filter': {'And': {'Prefix': 'test', 'Tags': [{'Key': 'Owner', 'Value': 'c7n'}]}},
             'Status': 'Enabled',
@@ -4391,7 +4390,7 @@ class BucketReplication(BaseTest):
                                 "And": {
                                     "Prefix": "abc", "Tags": [{"Key": "Owner", "Value": "c7n"}]}}},
                             {"DestinationRegion": "us-west-2"},
-                            {"CrossRegion": True }
+                            {"CrossRegion": True}
                             ]
                         }
                     ],
@@ -4433,7 +4432,7 @@ class BucketReplication(BaseTest):
         ):
             resources = p.run()
             self.assertEqual(len(resources), 1)
-            self.assertEqual(resources[0]['Name'],'custodian-replication-test-1')
+            self.assertEqual(resources[0]['Name'], 'custodian-replication-test-1')
 
     def test_s3_bucket_no_replication_rule(self):
         self.patch(s3.S3, "executor_factory", MainThreadExecutor)
@@ -4461,8 +4460,7 @@ class BucketReplication(BaseTest):
         ):
             resources = p.run()
             self.assertEqual(len(resources), 1)
-            self.assertEqual(resources[0]['Name'],'custodian-replication-west')
-
+            self.assertEqual(resources[0]['Name'], 'custodian-replication-west')
 
     def test_s3_bucket_key_enabled(self):
         self.patch(s3.S3, "executor_factory", MainThreadExecutor)
@@ -4492,7 +4490,6 @@ class BucketReplication(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
-
     def test_s3_bucket_key_disabled(self):
         self.patch(s3.S3, "executor_factory", MainThreadExecutor)
         self.patch(s3.BucketEncryption, "executor_factory", MainThreadExecutor)
@@ -4520,7 +4517,6 @@ class BucketReplication(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
-
 
     def test_bucket_encryption_invalid(self):
         self.assertRaises(

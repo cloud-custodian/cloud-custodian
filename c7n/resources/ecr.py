@@ -41,6 +41,7 @@ class ECR(QueryResourceManager):
         filter_type = 'list'
         config_type = cfn_type = 'AWS::ECR::Repository'
         dimension = 'RepositoryName'
+        permissions_augment = ("ecr:ListTagsForResource",)
 
     source_mapping = {
         'describe': DescribeECR,

@@ -295,6 +295,7 @@ class RemoveLaunchPermissions(BaseAction):
             LaunchPermission={'Remove': remove},
             OperationType='remove')
 
+
 @AMI.action_registry.register('cancel-launch-permission')
 class CancelLaunchPermissions(BaseAction):
     """Action to cancel this account's access to another another account's shared AMI

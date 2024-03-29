@@ -20,5 +20,3 @@ class PatchDeployment(QueryResourceManager):
         urn_component = "patchDeployment"
         urn_id_path = "name"
         urn_id_segments = (-1,)
-
-

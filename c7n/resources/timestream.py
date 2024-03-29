@@ -28,7 +28,7 @@ class TimestreamDatabase(QueryResourceManager):
         enum_spec = ('list_databases', 'Databases', {})
         permission_prefix = 'timestream'
         permissions = ('timestream:ListDatabases', )
-
+        permissions_augment = ("timestream:ListTagsForResource",)
     source_mapping = {
         'describe': DescribeTimestream,
     }

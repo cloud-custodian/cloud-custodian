@@ -85,7 +85,7 @@ class ServerTest(OpenStackTest):
                 {
                     "type": "security-group",
                     "key": "security_group_rules",
-                    "attrs":[
+                    "attrs": [
                         {
                             "type": "value",
                             "key": "direction",
@@ -109,7 +109,7 @@ class ServerTest(OpenStackTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0].name, "test1")
-        self.assertEqual(resources[0]["c7n:ListItemMatches"][0]["direction"],"ingress")
+        self.assertEqual(resources[0]["c7n:ListItemMatches"][0]["direction"], "ingress")
         self.assertIsNone(resources[0]["c7n:ListItemMatches"][0]["port_range_min"])
         self.assertIsNone(resources[0]["c7n:ListItemMatches"][0]["port_range_max"])
         self.assertEqual(resources[0]["c7n:ListItemMatches"][0]["remote_ip_prefix"], "0.0.0.0/0")
@@ -122,7 +122,7 @@ class ServerTest(OpenStackTest):
             'filters': [
                 {
                     "type": "security-group",
-                    "attrs":[
+                    "attrs": [
                         {
                             "type": "value",
                             "key": "stateful",

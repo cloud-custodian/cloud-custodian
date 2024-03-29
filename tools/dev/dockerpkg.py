@@ -280,17 +280,6 @@ ImageMap = {
         build=[BUILD_STAGE],
         target=[TARGET_UBUNTU_STAGE, TARGET_CLI],
     ),
-    "docker/c7n-left": Image(
-        dict(
-            name="left",
-            repo="c7n",
-            description="Cloud Custodian IaC Governance",
-            entrypoint="/usr/local/bin/c7n-left",
-            packages="git"
-        ),
-        build=[LEFT_BUILD_STAGE],
-        target=[TARGET_UBUNTU_STAGE, TARGET_LEFT],
-    ),
     "docker/c7n-kube": Image(
         dict(
             name="kube",

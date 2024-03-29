@@ -85,8 +85,8 @@ class ApplicationGatewayWafFilter(Filter):
                 if filter_override_rule is None and filter_state == 'enabled':
                     result.append(resource)
                     continue
-                for disabled_rule_Group in resource['properties']\
-                    ['webApplicationFirewallConfiguration']['disabledRuleGroups']:
+                for disabled_rule_Group in resource['properties'][
+                        'webApplicationFirewallConfiguration']['disabledRuleGroups']:
                     if filter_override_rule in disabled_rule_Group['rules'] \
                         and filter_state == 'disabled':
                         result.append(resource)

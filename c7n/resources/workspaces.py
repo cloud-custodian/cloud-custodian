@@ -32,6 +32,7 @@ class Workspace(QueryResourceManager):
         name = id = dimension = 'WorkspaceId'
         universal_taggable = True
         cfn_type = config_type = 'AWS::WorkSpaces::Workspace'
+        permissions_augment = ("workspaces:DescribeTags",)
 
     source_mapping = {
         'describe': DescribeWorkspace,
@@ -170,6 +171,7 @@ class WorkspaceImage(QueryResourceManager):
         arn_type = 'workspaceimage'
         name = id = 'ImageId'
         universal_taggable = True
+        permissions_augment = ("workspaces:DescribeTags",)
 
     augment = universal_augment
 
@@ -459,6 +461,7 @@ class DeregisterWorkspaceDirectory(BaseAction):
                 'and cannot be deregistered: %s ' % ''.join(map(str, exceptions))
             )
 
+
 @resources.register('workspaces-web')
 class WorkspacesWeb(QueryResourceManager):
 
@@ -470,6 +473,7 @@ class WorkspacesWeb(QueryResourceManager):
         arn = id = "portalArn"
 
     augment = universal_augment
+
 
 @WorkspacesWeb.action_registry.register('tag')
 class TagWorkspacesWebResource(Tag):
@@ -493,6 +497,7 @@ class TagWorkspacesWebResource(Tag):
         for r in resources:
             client.tag_resource(resourceArn=r["portalArn"], tags=new_tags)
 
+
 @WorkspacesWeb.action_registry.register('remove-tag')
 class RemoveTagWorkspacesWebResource(RemoveTag):
     """Remove tags from a Workspaces Web portal
@@ -513,6 +518,7 @@ class RemoveTagWorkspacesWebResource(RemoveTag):
     def process_resource_set(self, client, resources, tags):
         for r in resources:
             client.untag_resource(resourceArn=r['portalArn'], tagKeys=tags)
+
 
 @WorkspacesWeb.action_registry.register('delete')
 class DeleteWorkspacesWeb(BaseAction):

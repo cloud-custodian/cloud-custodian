@@ -3,8 +3,16 @@
 from c7n.actions import BaseAction
 from c7n.filters.vpc import SecurityGroupFilter, SubnetFilter
 from c7n.manager import resources
-from c7n.query import QueryResourceManager, TypeInfo
+from c7n.query import QueryResourceManager, TypeInfo, DescribeSource, ConfigSource
 from c7n.utils import local_session, type_schema
+
+
+class DescribeBatch(DescribeSource):
+
+    def augment(self, resources):
+        for r in resources:
+            r['Tags'] = [{'Key': k, 'Value': v} for k, v in r.get('tags', {}).items()]
+        return resources
 
 
 @resources.register('batch-compute')
@@ -21,6 +29,11 @@ class ComputeEnvironment(QueryResourceManager):
             'describe_compute_environments', 'computeEnvironments', None)
         cfn_type = config_type = 'AWS::Batch::ComputeEnvironment'
         universal_taggable = object()
+
+    source_mapping = {
+        'describe': DescribeBatch,
+        'config': ConfigSource
+    }
 
 
 @ComputeEnvironment.filter_registry.register('security-group')
@@ -50,6 +63,11 @@ class JobDefinition(QueryResourceManager):
         cfn_type = 'AWS::Batch::JobDefinition'
         universal_taggable = object()
 
+    source_mapping = {
+        'describe': DescribeBatch,
+        'config': ConfigSource
+    }
+
 
 @ComputeEnvironment.action_registry.register('update-environment')
 class UpdateComputeEnvironment(BaseAction):
@@ -69,6 +87,7 @@ class UpdateComputeEnvironment(BaseAction):
               - type: update-environment
                 state: DISABLED
     """
+
     schema = {
         'type': 'object',
         'additionalProperties': False,
@@ -184,6 +203,12 @@ class BatchJobQueue(QueryResourceManager):
         cfn_type = config_type = 'AWS::Batch::JobQueue'
         universal_taggable = object()
 
+    source_mapping = {
+        'describe': DescribeBatch,
+        'config': ConfigSource
+    }
+
+
 @BatchJobQueue.action_registry.register('delete')
 class DeleteBatchJobQueue(BaseAction):
     """Delete an AWS batch job queue
@@ -217,6 +242,7 @@ class DeleteBatchJobQueue(BaseAction):
         client = local_session(self.manager.session_factory).client('batch')
         for e in resources:
             self.delete_job_queue(client, e)
+
 
 @BatchJobQueue.action_registry.register('update')
 class UpdateBatchJobQueue(BaseAction):

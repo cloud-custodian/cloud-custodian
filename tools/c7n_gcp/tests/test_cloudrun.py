@@ -16,7 +16,6 @@ class RunServiceTest(BaseTest):
         assert len(resources) == 1
         assert resources[0]["metadata"]["name"] == "hello"
 
-
     def test_filter(self):
 
         factory = self.replay_flight_data("gcp-cloud-run-service")
@@ -54,6 +53,7 @@ class RunServiceTest(BaseTest):
         self.assertEqual(1, len(resources))
         self.assertEqual('run-1',
                          resources[0]["metadata"]['name'])
+
 
 class JobServiceTest(BaseTest):
     def test_query(self):

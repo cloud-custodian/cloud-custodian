@@ -58,6 +58,7 @@ class Table(query.QueryResourceManager):
         cfn_type = config_type = 'AWS::DynamoDB::Table'
         universal_taggable = object()
         arn = 'TableArn'
+        permissions_augment = ("dynamodb:ListTagsOfResource",)
 
     source_mapping = {
         'describe': DescribeTable,

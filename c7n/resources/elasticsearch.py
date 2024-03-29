@@ -58,6 +58,7 @@ class ElasticSearchDomain(QueryResourceManager):
         name = 'Name'
         dimension = "DomainName"
         cfn_type = config_type = 'AWS::Elasticsearch::Domain'
+        permissions_augment = ("es:ListTags",)
 
     def resources(self, query=None):
         if 'query' in self.data:
@@ -345,7 +346,7 @@ class RemovePolicyStatement(RemovePolicyBase):
         if p is None:
             return
 
-        statements, found = self.process_policy(
+        _, found = self.process_policy(
             p, resource, CrossAccountAccessFilter.annotation_key)
 
         if found:
