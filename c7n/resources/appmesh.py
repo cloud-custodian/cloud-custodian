@@ -122,7 +122,7 @@ class DescribeVirtualGatewayDefinition(ChildDescribeSource):
         return results
 
 
-@resources.register('appmesh-virtualgateway')
+@resources.register('appmesh-virtualgateway', aliases=['appmesh-virtual-gateway'])
 class AppmeshVirtualGateway(ChildResourceManager):
     source_mapping = {
         'describe': DescribeVirtualGatewayDefinition,
