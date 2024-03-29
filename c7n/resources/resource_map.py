@@ -13,6 +13,7 @@ ResourceMap = {
   "aws.apigwv2-stage": "c7n.resources.apigw.ApiGatewayV2Stage",
   "aws.appmesh-mesh": "c7n.resources.appmesh.AppmeshMesh",
   "aws.appmesh-virtualgateway": "c7n.resources.appmesh.AppmeshVirtualGateway",
+  "aws.appmesh-virtual-gateway": "c7n.resources.appmesh.AppmeshVirtualGateway",
   "aws.appmesh-virtualnode": "c7n.resources.appmesh.AppmeshVirtualNode",
   "aws.app-elb": "c7n.resources.appelb.AppELB",
   "aws.app-elb-target-group": "c7n.resources.appelb.AppELBTargetGroup",
