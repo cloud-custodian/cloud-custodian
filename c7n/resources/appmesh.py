@@ -197,6 +197,7 @@ class AppmeshVirtualGateway(ChildResourceManager):
             None,
         )
 
+
 class DescribeVirtualNodeDefinition(ChildDescribeSource):
     # This method is called in event mode and not pull mode.
     # Its purpose is to take a list of virtual gateway ARN's that the
