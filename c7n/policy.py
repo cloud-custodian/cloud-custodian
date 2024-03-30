@@ -1225,10 +1225,35 @@ class Policy:
         for a in self.resource_manager.actions:
             a.validate()
 
-    def get_variables(self, variables=None):
-        """Get runtime variables for policy interpolation.
+    @staticmethod
+    def get_env_variables():
+        """Get environment variables for policy interpolation.
 
-        Runtime variables are merged with the passed in variables
+        On operating systems where environment variable names are case-sensitive,
+        match the variable name exactly as given in configuration.
+        Otherwise the variable name is converted to lowercase string.
+        """
+        env_variable_prefix = 'C7N_VAR_'
+
+        env_variables = {}
+        for name, value in os.environ.items():
+            if not name.startswith(env_variable_prefix):
+                continue
+
+            if name == env_variable_prefix:
+                # seems invalid, so we'll ignore it
+                continue
+
+            name = name[len(env_variable_prefix):]
+            if os.name == 'nt':
+                name = name.lower()
+            env_variables[name] = value
+        return env_variables
+
+    def get_variables(self, variables=None):
+        """Get C7n environment and runtime variables for policy interpolation.
+
+        These variables are then merged with the passed in variables
         if any.
         """
         # Global policy variable expansion, we have to carry forward on
@@ -1236,8 +1261,14 @@ class Policy:
         # by using a format string.
         #
         # See https://github.com/cloud-custodian/cloud-custodian/issues/2330
-        if not variables:
-            variables = {}
+
+        # First we'll deal with environment variables, since they have the lowest
+        # precedence.
+        result = self.get_env_variables()
+
+        # Next up we load passed variables if any
+        if variables is not None:
+            result.update(variables)
 
         partition = utils.get_partition(self.options.region)
         if 'mode' in self.data:
@@ -1245,7 +1276,8 @@ class Policy:
                 self.data['mode']['role'] = "arn:%s:iam::%s:role/%s" % \
                     (partition, self.options.account_id, self.data['mode']['role'])
 
-        variables.update({
+        # Finally we load runtime variables
+        result.update({
             # standard runtime variables for interpolation
             'account': '{account}',
             'account_id': self.options.account_id,
@@ -1277,7 +1309,8 @@ class Policy:
             'target_prefix': '{target_prefix}',
             'LoadBalancerName': '{LoadBalancerName}'
         })
-        return variables
+
+        return result
 
     def expand_variables(self, variables):
         """Expand variables in policy data.
