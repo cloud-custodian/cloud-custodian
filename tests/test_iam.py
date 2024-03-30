@@ -2320,6 +2320,38 @@ class CrossAccountChecker(TestCase):
             self.assertEqual(
                 bool(checker.handle_statement(statement)), expected)
 
+    def test_at_least_one_condition(self):
+        statements = [
+            {
+                'Actions': ['Deploy', 'UnshareApplication'],
+                'Principal': ['*'],
+                'StatementId': 'cab89702-05f0-4751-818e-ced6e98ef5f9',
+                'Effect': 'Allow',
+                'Condition': {
+                    'StringEquals': {
+                        'aws:PrincipalOrgID': ['o-4pmkskbcf9']
+                    },
+                    "StringLike": {
+                        "aws:PrincipalArn": ["arn:aws:iam::*:role/*-wildcard-role", ]
+                    }
+                }
+            }
+        ]
+
+        checker = PolicyChecker({
+            'condition_scope': 'at-least-one',
+            'allowed_orgid': ['o-4pmkskbcf9']})
+
+        for statement, expected in zip(statements, [False]):
+            self.assertEqual(
+                bool(checker.handle_statement(statement)), expected)
+
+        checker = PolicyChecker({
+            'condition_scope': 'at-least-one'})
+        for statement, expected in zip(statements, [True]):
+            self.assertEqual(
+                bool(checker.handle_statement(statement)), expected)
+
     def test_s3_policies(self):
         policies = load_data("iam/s3-policies.json")
         checker = PolicyChecker(
