@@ -31,7 +31,8 @@ class VoiceConnector(QueryResourceManager):
         arn = 'VoiceConnectorArn'
         date = 'CreatedTimestamp'
 
-        cfn_type = None
-        config_type = None
+        # cfn_type = None
+        # config_type = None
+        permission_prefix = 'chime'
 
         universal_taggable = object()
