@@ -204,7 +204,14 @@ class SchemaTest(BaseTest):
                 {
                     "name": "test",
                     "resource": "aws.ec2",
-                    "conditions": [{'type': 'value', 'key': 'account_id', 'op': 'in', 'value': {'target_accounts': None}}],
+                    "conditions": [
+                        {
+                            'type': 'value',
+                            'key': 'account_id',
+                            'op': 'in',
+                            'value': {'target_accounts': None},
+                        }
+                    ],
                 }
             ]
         }
@@ -212,7 +219,9 @@ class SchemaTest(BaseTest):
         errors = list(validator.iter_errors(data))
         assert len(errors) == 1
         error = specific_error(errors[0])
-        assert error.message == "{'target_accounts': None} is not valid under any of the given schemas"
+        assert error.message == (
+            "{'target_accounts': None} is not valid under any of the given schemas"
+        )
 
     def test_semantic_error_common_filter_provider_prefixed(self):
         data = {
