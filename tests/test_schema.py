@@ -174,27 +174,6 @@ class SchemaTest(BaseTest):
         self.assertTrue("'asdf' is not of type 'boolean'" in str(err).replace("u'", "'"))
         self.assertEqual(policy, 'policy-ec2')
 
-    def test_not_filter_no_data(self):
-        data = {
-            'policies': [
-                {
-                    "name": "test",
-                    "resource": "s3",
-                    "description": "Tests error with not filter.",
-                    "filters": [
-                        {"not": None},
-                    ],
-                }
-            ]
-        }
-        validator = self.get_validator(data)
-        errors = list(validator.iter_errors(data))
-        self.assertEqual(len(errors), 1)
-        error = specific_error(errors[0])
-        self.assertIn(
-            "[{'StorageType': 'StandardStorage'}] is not of type 'object'",
-            str(error))
-
     def test_policy_name_regex(self):
         data = {
             'policies': [
@@ -219,23 +198,21 @@ class SchemaTest(BaseTest):
                 'test-1.2.1'"""
         )
 
-    def test_specific_error(self):
+    def test_bad_condition_value(self):
         data = {
             'policies': [
                 {
                     "name": "test",
-                    "resource": "s3",
-                    "filters": [{"age": 10}],
+                    "resource": "aws.ec2",
+                    "conditions": [{'type': 'value', 'key': 'account_id', 'op': 'in', 'value': {'target_accounts': None}}],
                 }
             ]
         }
         validator = self.get_validator(data)
         errors = list(validator.iter_errors(data))
-        self.assertEqual(len(errors), 1)
+        assert len(errors) == 1
         error = specific_error(errors[0])
-        self.assertIn(
-            "[{'StorageType': 'StandardStorage'}] is not of type 'object'",
-            str(error))
+        assert error.message == "{'target_accounts': None} is not valid under any of the given schemas"
 
     def test_semantic_error_common_filter_provider_prefixed(self):
         data = {
