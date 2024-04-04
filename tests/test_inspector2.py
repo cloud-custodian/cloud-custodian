@@ -24,7 +24,6 @@ class Inspector2FindingTest(BaseTest):
         resources = policy.run()
         self.assertEqual(len(resources), 6)
 
-
     def test_inspector2_finding_query_filter(self):
         """
         Test Inspector V2 Finding resource with filters

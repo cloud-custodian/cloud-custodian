@@ -122,6 +122,7 @@ DESTINATION = 'destination'
 
 CIDR = 'Cidr'
 
+
 class NetworkSecurityGroupFilter(Filter):
     """
     Filter Network Security Groups using opened/closed ports configuration

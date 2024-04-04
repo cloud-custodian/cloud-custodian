@@ -302,7 +302,7 @@ class TagActionFilter(Filter):
         if ':' not in v or '@' not in v:
             return False
 
-        msg, tgt = v.rsplit(':', 1)
+        _, tgt = v.rsplit(':', 1)
         action, action_date_str = tgt.strip().split('@', 1)
 
         if action != op:

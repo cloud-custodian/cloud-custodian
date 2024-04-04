@@ -648,7 +648,7 @@ def get_policy_provider(policy_data):
     if isinstance(policy_data['resource'], list):
         provider_name, _ = policy_data['resource'][0].split('.', 1)
     elif '.' in policy_data['resource']:
-        provider_name, resource_type = policy_data['resource'].split('.', 1)
+        provider_name, _ = policy_data['resource'].split('.', 1)
     else:
         provider_name = 'aws'
     return provider_name
@@ -965,6 +965,22 @@ def jmespath_search(*args, **kwargs):
         **kwargs,
         options=jmespath.Options(custom_functions=C7NJmespathFunctions())
     )
+
+
+def get_path(path: str, resource: dict):
+    """
+    This function provides a wrapper to obtain a value from a resource
+    in an efficient manner.
+    jmespath_search is expensive and it's rarely the case that
+    there is a path in the id field, therefore this wrapper is an optimisation.
+
+    :param path: the path or field name to fetch
+    :param resource: the resource instance description
+    :return: the field/path value
+    """
+    if '.' in path:
+        return jmespath_search(path, resource)
+    return resource[path]
 
 
 def jmespath_compile(expression):

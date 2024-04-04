@@ -5,6 +5,7 @@ import time
 from .common import BaseTest, load_data
 from c7n.utils import jmespath_search
 
+
 class KafkaTest(BaseTest):
 
     def test_tag_normalize(self):

@@ -41,6 +41,7 @@ class ElasticFileSystem(QueryResourceManager):
         universal_taggable = True
         config_type = cfn_type = 'AWS::EFS::FileSystem'
         arn = 'FileSystemArn'
+        permissions_augment = ("elasticfilesystem:ListTagsForResource",)
 
     source_mapping = {
         'describe': EFSDescribe,
@@ -100,8 +101,6 @@ class SecurityGroup(SecurityGroupFilter):
 
 
 @ElasticFileSystemMountTarget.filter_registry.register('network-location', NetworkLocation)
-
-
 @ElasticFileSystem.filter_registry.register('kms-key')
 class KmsFilter(KmsRelatedFilter):
 

@@ -337,6 +337,7 @@ class CloudWatchEventsFacadeTest(TestCase):
             json.dumps(expected_event, sort_keys=True, cls=JmespathEncoder),
         )
 
+
 class EventBusTest(BaseTest):
     def test_event_bus_delete(self):
         factory = self.replay_flight_data("test_event_bus_delete")

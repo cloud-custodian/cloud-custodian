@@ -1,0 +1,10 @@
+{
+    "status_code": 200,
+    "data": {
+        "FirewallArn": "arn:aws:network-firewall:us-east-1:644160558196:firewall/test-firewall-1",
+        "FirewallName": "test-firewall-1",
+        "DeleteProtection": false,
+        "UpdateToken": "0d480eed-98d5-4a8a-b66f-5c0c26fde8d6",
+        "ResponseMetadata": {}
+    }
+}

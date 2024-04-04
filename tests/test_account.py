@@ -456,8 +456,8 @@ class AccountTests(BaseTest):
                             pdata['filters'][0]['log-metric-filter-pattern'])
 
     def test_cloudtrail_success_management_advanced_events_included(self):
-        session_factory = self.replay_flight_data\
-            ("test_cloudtrail_success_management_advanced_events_included")
+        session_factory = self.replay_flight_data(
+            "test_cloudtrail_success_management_advanced_events_included")
         p = self.load_policy(
             {
                 "name": "trail-management-advanced-events-included",
@@ -474,8 +474,9 @@ class AccountTests(BaseTest):
         self.assertEqual(len(resources), 0)
 
     def test_cloudtrail_fail_management_advanced_events_included(self):
-        session_factory = self.replay_flight_data\
-            ("test_cloudtrail_fail_management_advanced_events_included")
+        session_factory = self.replay_flight_data(
+            "test_cloudtrail_fail_management_advanced_events_included"
+        )
         p = self.load_policy(
             {
                 "name": "trail-management-advanced-events-included",
@@ -606,7 +607,6 @@ class AccountTests(BaseTest):
             resources = p.run()
             self.assertEqual(0, len(resources))
             self.assertRegex(log_output.getvalue(), r"InvalidParameterValueException")
-
 
     def test_service_limit_specific_check_handles_exception_on_date_refresh(self):
         session_factory = self.replay_flight_data(
@@ -1296,6 +1296,23 @@ class AccountTests(BaseTest):
         self.assertEqual(resources[0]['c7n:ses-send-stats'], expected_send_stats)
         self.assertEqual(resources[0]['c7n:ses-max-bounce-rate'], 6)
 
+    def test_bedrock_model_invocation_logging_disabled(self):
+        factory = self.replay_flight_data('test_bedrock_model_invocation_logging_disabled')
+        p = self.load_policy({
+            'name': 'bedrock-model-invocation-logging-disabled',
+            'resource': 'account',
+            'filters': [
+                            {
+                                "type": "bedrock-model-invocation-logging",
+                                "count": 0,
+                                "count_op": "eq"
+                            }
+                        ]
+                        },
+            config={'region': 'us-east-1'},
+            session_factory=factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
 
     def test_get_bedrock_model_invocation_logging(self):
         factory = self.replay_flight_data('test_get_bedrock_model_invocation_logging')
@@ -1317,7 +1334,6 @@ class AccountTests(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
-
     def test_delete_bedrock_model_invocation_logging(self):
         factory = self.replay_flight_data('test_delete_bedrock_model_invocation_logging')
         p = self.load_policy({
@@ -1334,7 +1350,6 @@ class AccountTests(BaseTest):
             session_factory=factory)
         resources = p.run()
         self.assertEqual(len(resources), 1)
-
 
     def test_update_bedrock_model_invocation_logging(self):
         factory = self.replay_flight_data("test_update_bedrock_model_invocation_logging")

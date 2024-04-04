@@ -43,6 +43,7 @@ class Kafka(QueryResourceManager):
         filter_type = 'scalar'
         universal_taggable = object()
         cfn_type = config_type = 'AWS::MSK::Cluster'
+        permissions_augment = ("kafka:ListTagsForResource",)
 
     source_mapping = {
         'describe': DescribeKafka,

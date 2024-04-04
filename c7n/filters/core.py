@@ -111,6 +111,8 @@ VALUE_TYPES = [
 
 class FilterRegistry(PluginRegistry):
 
+    value_filter_class = None
+
     def __init__(self, *args, **kw):
         super().__init__(*args, **kw)
         self.register('value', ValueFilter)
@@ -143,7 +145,7 @@ class FilterRegistry(PluginRegistry):
                 return self['and'](data, self, manager)
             elif op == 'not':
                 return self['not'](data, self, manager)
-            return ValueFilter(data, manager)
+            return self.value_filter_class(data, manager)
         if isinstance(data, str):
             filter_type = data
             data = {'type': data}
@@ -251,7 +253,7 @@ class BaseValueFilter(Filter):
             # as labels without values.
             # Azure schema: 'tags': {'key': 'value'}
             elif 'tags' in i:
-                r = i.get('tags', {}).get(tk, None)
+                r = (i.get('tags', {}) or {}).get(tk, None)
         elif k in i:
             r = i.get(k)
         elif k not in self.expr:
@@ -500,7 +502,7 @@ class ValueFilter(BaseValueFilter):
             'value_from': {'$ref': '#/definitions/filters_common/value_from'},
             'value': {'$ref': '#/definitions/filters_common/value'},
             'op': {'$ref': '#/definitions/filters_common/comparison_operators'},
-            'value_path': {'type':'string'}
+            'value_path': {'type': 'string'}
         }
     }
     schema_alias = True
@@ -595,7 +597,7 @@ class ValueFilter(BaseValueFilter):
     def get_resource_value(self, k, i):
         return super(ValueFilter, self).get_resource_value(k, i, self.data.get('value_regex'))
 
-    def get_path_value(self,i):
+    def get_path_value(self, i):
         """Retrieve values using JMESPath.
 
         When using a Value Filter, a ``value_path`` can be specified.
@@ -619,7 +621,7 @@ class ValueFilter(BaseValueFilter):
         This implementation allows for the comparison of two separate lists of values
         within the same resource.
         """
-        return jmespath_search(self.data.get('value_path'),i)
+        return jmespath_search(self.data.get('value_path'), i)
 
     def match(self, i):
         if self.v is None and len(self.data) == 1:
@@ -743,6 +745,9 @@ class ValueFilter(BaseValueFilter):
             return s, v
 
         return sentinel, value
+
+
+FilterRegistry.value_filter_class = ValueFilter
 
 
 class AgeFilter(Filter):

@@ -1,0 +1,33 @@
+{
+    "status_code": 200,
+    "data": {
+        "KeyMetadata": {
+            "AWSAccountId": "644160558196",
+            "KeyId": "75d1e7ba-f9c5-46b9-97bc-28e6c834aa49",
+            "Arn": "arn:aws:kms:us-east-1:644160558196:key/75d1e7ba-f9c5-46b9-97bc-28e6c834aa49",
+            "CreationDate": {
+                "__class__": "datetime",
+                "year": 2018,
+                "month": 1,
+                "day": 18,
+                "hour": 10,
+                "minute": 59,
+                "second": 7,
+                "microsecond": 298000
+            },
+            "Enabled": true,
+            "Description": "",
+            "KeyUsage": "ENCRYPT_DECRYPT",
+            "KeyState": "Enabled",
+            "Origin": "AWS_KMS",
+            "KeyManager": "CUSTOMER",
+            "CustomerMasterKeySpec": "SYMMETRIC_DEFAULT",
+            "KeySpec": "SYMMETRIC_DEFAULT",
+            "EncryptionAlgorithms": [
+                "SYMMETRIC_DEFAULT"
+            ],
+            "MultiRegion": false
+        },
+        "ResponseMetadata": {}
+    }
+}

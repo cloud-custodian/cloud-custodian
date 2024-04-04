@@ -68,7 +68,7 @@ class StorageContainerTest(BaseTest):
             }, validate=True)
 
             p.run()
-            args, kwargs = update_container_mock.call_args_list[0]
+            args, _ = update_container_mock.call_args_list[0]
             self.assertEqual('test_storage', args[0])
             self.assertTrue(args[1].startswith('cctstorage'))
             self.assertEqual('containerone', args[2])

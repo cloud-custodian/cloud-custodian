@@ -96,7 +96,7 @@ class SqlDatabaseTest(BaseTest):
                                             max_size_bytes=21474836480)
 
         update_mock.assert_called_once()
-        name, args, kwargs = update_mock.mock_calls[0]
+        _, args, _ = update_mock.mock_calls[0]
         self.assertEqual('test_sqlserver', args[0])
         self.assertEqual(parent_id, args[1])
         self.assertEqual('cctestdb', args[2])

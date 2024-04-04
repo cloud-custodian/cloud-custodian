@@ -642,7 +642,7 @@ class TestGlueDataCatalog(BaseTest):
     def test_glue_datacat_key_alias_apply_enc(self):
         session_factory = self.replay_flight_data("test_glue_datacat_key_alias_apply_enc")
         c = session_factory().client('kms')
-        key_id='arn:aws:kms:us-east-1:644160558196:key/7d9388c0-8c78-4acb-ad3c-b9d1764522b2'
+        key_id = 'arn:aws:kms:us-east-1:644160558196:key/7d9388c0-8c78-4acb-ad3c-b9d1764522b2'
         key_alias = c.list_aliases(KeyId=key_id)
         self.assertEqual(key_alias.get('Aliases')[0].get('AliasName'), 'alias/data-sync-kms-key')
         client = session_factory().client('glue')

@@ -15,6 +15,7 @@ class XRayGroup(query.QueryResourceManager):
         name = "GroupName"
         cfn_type = "AWS::XRay::Group"
         universal_taggable = object()
+        permissions_augment = ("xray:ListTagsForResource",)
 
     source_mapping = {
         "describe": query.DescribeWithResourceTags,

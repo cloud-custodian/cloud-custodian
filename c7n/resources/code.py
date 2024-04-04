@@ -37,6 +37,7 @@ class CodeRepository(QueryResourceManager):
         date = 'creationDate'
         cfn_type = 'AWS::CodeCommit::Repository'
         universal_taggable = object()
+        permissions_augment = ("codecommit:ListTagsForResource",)
 
     source_mapping = {
         'describe': DescribeRepo,
@@ -349,6 +350,7 @@ class CodeDeployDeployment(QueryResourceManager):
         cfn_type = None
         arn_type = "deploymentgroup"
         date = 'createTime'
+        permissions_augment = ("codedeploy:ListTagsForResource",)
 
 
 class DescribeDeploymentGroup(query.ChildDescribeSource):

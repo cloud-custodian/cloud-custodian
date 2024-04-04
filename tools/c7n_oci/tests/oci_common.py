@@ -42,7 +42,7 @@ class OciBaseTest:
             return oci.util.to_dict(resources.data)
 
 
-## common functions
+# common functions
 def replace_ocid(data):
     return re.sub(r'\.oc1\..*?"', '.oc1..<unique_ID>"', data)
 

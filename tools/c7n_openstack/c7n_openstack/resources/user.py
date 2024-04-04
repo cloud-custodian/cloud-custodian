@@ -84,6 +84,7 @@ class RoleFilter(Filter):
                 results.append(user)
         return results
 
+
 @User.filter_registry.register('extended-info')
 class ExtendedInfoFilter(ValueFilter):
     """Filters Users based on their additional information.

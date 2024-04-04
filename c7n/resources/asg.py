@@ -44,6 +44,7 @@ class ASG(query.QueryResourceManager):
         filter_type = 'list'
         config_type = 'AWS::AutoScaling::AutoScalingGroup'
         cfn_type = 'AWS::AutoScaling::AutoScalingGroup'
+        permissions_augment = ("autoscaling:DescribeTags",)
 
         default_report_fields = (
             'AutoScalingGroupName',
@@ -610,7 +611,7 @@ class ImageFilter(ValueFilter):
         if not image:
             self.log.warning(
                 "Could not locate image for asg:%s ami:%s" % (
-                    i['AutoScalingGroupName'], image_id ))
+                    i['AutoScalingGroupName'], image_id))
             # Match instead on empty skeleton?
             return False
         return self.match(image)
@@ -1890,7 +1891,7 @@ class ScalingPolicy(query.QueryResourceManager):
         )
         filter_name = 'PolicyNames'
         filter_type = 'list'
-        cfn_type = 'AWS::AutoScaling::ScalingPolicy'
+        config_type = cfn_type = 'AWS::AutoScaling::ScalingPolicy'
 
 
 @ASG.filter_registry.register('scaling-policy')

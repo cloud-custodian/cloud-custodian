@@ -22,4 +22,3 @@ class UserTest(OpenStackTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
         self.assertIn("img_signature", resources[0])
-

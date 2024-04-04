@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 from ..azure_common import BaseTest, arm_template
 
+
 class KeyVaultKeyTest(BaseTest):
 
     def tearDown(self, *args, **kwargs):

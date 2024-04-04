@@ -7,6 +7,7 @@ from c7n.utils import local_session
 
 log = logging.getLogger('custodian.access-analyzer')
 
+
 class DescribeAccessanalyzerFinding(query.DescribeSource):
 
     def resources(self, query):
@@ -50,7 +51,7 @@ class AccessanalyzerFinding(query.QueryResourceManager):
         id = "id"
         arn_type = ""
         name = "resourceType"
-        permissions_enum = ('access-analyzer:ListAnalyzers','access-analyzer:ListFindings')
+        permissions_enum = ('access-analyzer:ListAnalyzers', 'access-analyzer:ListFindings')
         permission_prefix = "access-analyzer"
 
     source_mapping = {

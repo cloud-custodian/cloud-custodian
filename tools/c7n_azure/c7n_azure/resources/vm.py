@@ -314,7 +314,6 @@ class BackupStatusFilter(ValueFilter):
         return super().__call__(r[self.backup_annotation_key])
 
 
-
 @VirtualMachine.action_registry.register('poweroff')
 class VmPowerOffAction(AzureBaseAction):
 
