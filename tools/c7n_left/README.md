@@ -13,7 +13,7 @@ We currently only support python > 3.10 on mac and linux, to run on windows
 we recommend using our docker images.
 
 ```shell
-pip install c7n_left
+pip install c7n-left
 ```
 
 We also provide signed docker images. These images are built on top of chainguard's [wolfi linux

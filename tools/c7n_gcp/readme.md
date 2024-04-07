@@ -16,7 +16,7 @@ Status - Alpha
 ## via pip
 
 ```
-pip install c7n_gcp
+pip install c7n-gcp
 ```
 
 By default custodian will use credentials associated to the gcloud cli, which will generate

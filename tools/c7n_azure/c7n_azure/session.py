@@ -12,7 +12,7 @@ import types
 from azure.common.credentials import BasicTokenAuthentication
 from azure.core.credentials import AccessToken
 from azure.identity import (AzureCliCredential, ClientSecretCredential,
-                            ManagedIdentityCredential)
+                            ManagedIdentityCredential, CertificateCredential)
 from azure.identity._credentials.azure_cli import _run_command
 from msrestazure.azure_cloud import AZURE_PUBLIC_CLOUD
 from requests import HTTPError
@@ -47,6 +47,10 @@ class AzureCredential:
                 'subscription_id': os.environ.get(constants.ENV_SUB_ID),
                 'keyvault_client_id': os.environ.get(constants.ENV_KEYVAULT_CLIENT_ID),
                 'keyvault_secret_id': os.environ.get(constants.ENV_KEYVAULT_SECRET_ID),
+                'client_certificate_path': os.environ.get(
+                    constants.ENV_CLIENT_CERTIFICATE_PATH),
+                'client_certificate_password': os.environ.get(
+                    constants.ENV_CLIENT_CERTIFICATE_PASSWORD),
                 'enable_cli_auth': True
             }
 
@@ -83,6 +87,16 @@ class AzureCredential:
                 client_secret=self._auth_params['client_secret'],
                 tenant_id=self._auth_params['tenant_id'],
                 authority=self._auth_params['authority'])
+        elif (self._auth_params.get('client_id') and
+              self._auth_params.get('tenant_id') and
+              self._auth_params.get('client_certificate_path')):
+            auth_name = 'Certificate'
+            self._credential = CertificateCredential(
+                client_id=self._auth_params['client_id'],
+                tenant_id=self._auth_params['tenant_id'],
+                certificate_path=self._auth_params['client_certificate_path'],
+                password=self._auth_params['client_certificate_password'],
+            )
         elif self._auth_params.get('use_msi'):
             auth_name = 'MSI'
             self._credential = ManagedIdentityCredential(

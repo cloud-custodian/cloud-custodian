@@ -388,7 +388,6 @@ class SnapshotSetPermissions(BaseTest):
             Attribute='createVolumePermission')['CreateVolumePermissions']
         assert perms == []
 
-
     def test_add(self):
         # For this test, we assume only 665544332211 has permissions,
         # and we test adding 112233445566 and removing 665544332211

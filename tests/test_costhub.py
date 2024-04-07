@@ -24,6 +24,7 @@ def test_cost_hub_ebs(test):
             ],
         },
         session_factory=factory,
+        config={'account_id': '644160558196'}
     )
 
     resources = p.run()

@@ -25,7 +25,7 @@ class DescribeCos(DescribeSource):
 
     def resources(self, params=None):
         resp = self.get_cos_client(self.resource_manager.config.region).list_buckets()
-        action, jsonpath, extra_params = self.resource_type.enum_spec
+        _, jsonpath, _ = self.resource_type.enum_spec
         resources = jmespath_search(jsonpath, resp)
         if not resources:
             return []
@@ -215,7 +215,7 @@ class BucketEncryption(Filter):
             return False
         else:
             # If there is no configuration information,rules==[]
-            return rules is []
+            return rules == []
 
     def filter_bucket(self, sse):
         # only support ASE256 now

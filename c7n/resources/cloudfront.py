@@ -52,6 +52,7 @@ class Distribution(QueryResourceManager):
         cfn_type = config_type = "AWS::CloudFront::Distribution"
         # Denotes this resource type exists across regions
         global_resource = True
+        permission_augment = ("cloudfront:ListTagsForResource",)
 
     source_mapping = {
         'describe': DescribeDistribution,

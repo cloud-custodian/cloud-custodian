@@ -366,6 +366,18 @@ class S3(query.QueryResourceManager):
         enum_spec = ('list_buckets', 'Buckets[]', None)
         # not used but we want some consistency on the metadata
         detail_spec = ('get_bucket_location', 'Bucket', 'Name', 'LocationConstraint')
+        permissions_augment = (
+            "s3:GetBucketAcl",
+            "s3:GetBucketLocation",
+            "s3:GetBucketPolicy",
+            "s3:GetBucketTagging",
+            "s3:GetBucketVersioning",
+            "s3:GetBucketLogging",
+            "s3:GetBucketNotification",
+            "s3:GetBucketWebsite",
+            "s3:GetLifecycleConfiguration",
+            "s3:GetReplicationConfiguration"
+        )
         name = id = 'Name'
         date = 'CreationDate'
         dimension = 'BucketName'
@@ -2273,7 +2285,7 @@ class EncryptExtantKeys(ScanBucket):
 
 def restore_complete(restore):
     if ',' in restore:
-        ongoing, avail = restore.split(',', 1)
+        ongoing, _ = restore.split(',', 1)
     else:
         ongoing = restore
     return 'false' in ongoing
@@ -3789,7 +3801,7 @@ class BucketReplication(ListItemFilter):
     def get_item_values(self, b):
         client = bucket_client(local_session(self.manager.session_factory), b)
         # replication configuration is called in S3_AUGMENT_TABLE:
-        bucket_replication = b[self.annotation_key]
+        bucket_replication = b.get(self.annotation_key)
 
         rules = []
         if bucket_replication is not None:
@@ -3821,4 +3833,3 @@ class S3Directory(query.QueryResourceManager):
         dimension = 'BucketName'
         cfn_type = 'AWS::S3Express::DirectoryBucket'
         permissions_enum = ("s3express:ListAllMyDirectoryBuckets",)
-

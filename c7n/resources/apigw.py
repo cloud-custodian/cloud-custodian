@@ -1218,5 +1218,3 @@ class ApiGatewayV2Stage(query.ChildResourceManager):
                 partition, self.config.region, r['c7n:parent-id'], r['StageName']
             )
             for r in resources]
-
-

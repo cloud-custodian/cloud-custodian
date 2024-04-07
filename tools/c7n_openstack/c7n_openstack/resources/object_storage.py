@@ -5,6 +5,7 @@ from c7n_openstack.query import QueryResourceManager, TypeInfo, DescribeSource
 from c7n_openstack.provider import resources
 from c7n.utils import local_session
 
+
 class StorageContainerMeta(DescribeSource):
 
     def augment(self, resources):
@@ -15,6 +16,7 @@ class StorageContainerMeta(DescribeSource):
             if container_metadata:
                 results.append(container_metadata)
         return results
+
 
 @resources.register('storage-container')
 class StorageContainer(QueryResourceManager):

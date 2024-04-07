@@ -100,6 +100,7 @@ class Role(QueryResourceManager):
         enum_spec = ('list_roles', 'Roles', None)
         detail_spec = ('get_role', 'RoleName', 'RoleName', 'Role')
         id = name = 'RoleName'
+        config_id = 'RoleId'
         date = 'CreateDate'
         cfn_type = config_type = "AWS::IAM::Role"
         # Denotes this resource type exists across regions
@@ -1930,7 +1931,7 @@ class CredentialReport(Filter):
             return vf(info)
 
         # access key matching
-        prefix, sk = k.split('.', 1)
+        prefix, _ = k.split('.', 1)
         vf = ValueFilter(self.matcher_config)
         vf.annotate = False
 

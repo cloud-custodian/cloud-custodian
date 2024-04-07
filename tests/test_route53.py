@@ -290,6 +290,55 @@ class Route53DomainTest(BaseTest):
         self.assertEqual(len(tags), 0)
 
 
+class ResourceRecordSetTest(BaseTest):
+    def test_resourcerecordset_remove(self):
+        session_factory = self.replay_flight_data(
+            'test_r53_resourcerecordset_remove')
+        p = self.load_policy({
+            "name": "r53domain-remove-recordsets",
+            "resource": "rrset",
+            "filters": [{
+                'type': 'value',
+                'key': 'AliasTarget.DNSName',
+                'value': 'vpce-12345abcdefgh-mxpozkdy.us-west-2.vpce.amazonaws.com.',
+                }],
+            "actions": ["delete"]},
+            session_factory=session_factory,
+        )
+        resources = p.run()
+
+        self.assertEqual(len(resources), 1)
+        client = session_factory().client("route53")
+        records = client.list_resource_record_sets(
+            HostedZoneId=resources[0]["c7n:parent-id"]
+        )
+        self.assertEqual(len(records["ResourceRecordSets"]), 3)
+
+    def test_resourcerecordset_cname_remove(self):
+        session_factory = self.replay_flight_data(
+            'test_r53_resourcerecordset_cname_remove')
+        p = self.load_policy({
+            "name": "r53domain-remove-cname-recordsets",
+            "resource": "rrset",
+            "filters": [{
+                'type': 'value',
+                'key': 'ResourceRecords[].Value',
+                'op': 'intersect',
+                'value': ['mailserver01.subdomain.example.com.'],
+                }],
+            "actions": ["delete"]},
+            session_factory=session_factory,
+        )
+        resources = p.run()
+
+        self.assertEqual(len(resources), 1)
+        client = session_factory().client("route53")
+        records = client.list_resource_record_sets(
+            HostedZoneId=resources[0]["c7n:parent-id"]
+        )
+        self.assertEqual(len(records["ResourceRecordSets"]), 2)
+
+
 class Route53EnableDNSQueryLoggingTest(BaseTest):
 
     def test_hostedzone_set_query_log(self):
@@ -600,5 +649,5 @@ class TestControlPanel(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        self.assertEqual(resources[0]['ControlPanelArn'], \
+        self.assertEqual(resources[0]['ControlPanelArn'],
             'arn:aws:route53-recovery-control::644160558196:controlpanel/fd5a6bfc73364a0dbd48d3915867a306')

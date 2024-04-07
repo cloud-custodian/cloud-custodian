@@ -1,0 +1,23 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "knowledgeBaseSummaries": [
+            {
+                "knowledgeBaseId": "BNSFZQXP2G",
+                "name": "knowledge-base-quick-start-oq6tq",
+                "status": "ACTIVE",
+                "updatedAt": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 2,
+                    "day": 11,
+                    "hour": 16,
+                    "minute": 12,
+                    "second": 34,
+                    "microsecond": 430236
+                }
+            }
+        ]
+    }
+}

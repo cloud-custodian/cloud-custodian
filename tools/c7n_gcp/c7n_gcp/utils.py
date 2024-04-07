@@ -10,7 +10,7 @@ def get_firewall_port_ranges(firewall_resources):
                         port_ranges.append({"beginPort": port_split[0], "endPort": port_split[1]})
                     else:
                         port_ranges.append({"beginPort": port, "endPort": port})
-                protocol['portRanges']=port_ranges
+                protocol['portRanges'] = port_ranges
                 r[action][protocol_index] = protocol
         firewall_resources[r_index] = r
     return firewall_resources

@@ -3,9 +3,10 @@
 
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, TypeInfo
-from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction, universal_augment
+from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction
 from c7n.utils import local_session, type_schema
 from c7n.actions import BaseAction
+from c7n.filters.kms import KmsRelatedFilter
 
 
 @resources.register('opensearch-serverless')
@@ -14,12 +15,32 @@ class OpensearchServerless(QueryResourceManager):
         service = 'opensearchserverless'
         arn_type = 'arn'
         enum_spec = ('list_collections', 'collectionSummaries[]', None)
+        batch_detail_spec = (
+            'batch_get_collection', 'ids', 'id',
+            'collectionDetails', None)
         name = "name"
         id = "id"
         cfn_type = 'AWS::OpenSearchServerless::Collection'
         arn = "arn"
         permission_prefix = 'aoss'
-        augment = universal_augment
+        permissions_augment = ("aoss:ListTagsForResource",)
+
+    def augment(self, resources):
+        client = local_session(self.session_factory).client('opensearchserverless')
+
+        def _augment(r):
+            tags = self.retry(client.list_tags_for_resource,
+                resourceArn=r['arn'])['tags']
+            r['Tags'] = [{'Key': t['key'], 'Value': t['value']} for t in tags]
+            return r
+        resources = super().augment(resources)
+        return list(map(_augment, resources))
+
+
+@OpensearchServerless.filter_registry.register('kms-key')
+class OpensearchServerlessKmsFilter(KmsRelatedFilter):
+    RelatedIdsExpression = 'kmsKeyArn'
+
 
 @OpensearchServerless.action_registry.register('tag')
 class TagOpensearchServerlessResource(Tag):
@@ -66,7 +87,10 @@ class RemoveTagOpensearchServerlessResource(RemoveTag):
         for r in resources:
             client.untag_resource(resourceArn=r['arn'], tagKeys=tags)
 
+
 OpensearchServerless.filter_registry.register('marked-for-op', TagActionFilter)
+
+
 @OpensearchServerless.action_registry.register('mark-for-op')
 class MarkOpensearchServerlessForOp(TagDelayedAction):
     """Mark OpenSearch Serverless for deferred action
@@ -85,6 +109,7 @@ class MarkOpensearchServerlessForOp(TagDelayedAction):
                 op: delete
                 days: 1
     """
+
 
 @OpensearchServerless.action_registry.register('delete')
 class DeleteOpensearchServerless(BaseAction):
@@ -109,6 +134,6 @@ class DeleteOpensearchServerless(BaseAction):
         client = local_session(self.manager.session_factory).client('opensearchserverless')
         for r in resources:
             try:
-              client.delete_collection(id=r['id'])
+                client.delete_collection(id=r['id'])
             except client.exceptions.ResourceNotFoundException:
-              continue
+                continue

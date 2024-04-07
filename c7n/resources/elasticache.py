@@ -40,6 +40,7 @@ class ElastiCacheCluster(QueryResourceManager):
         dimension = 'CacheClusterId'
         universal_taggable = True
         cfn_type = 'AWS::ElastiCache::CacheCluster'
+        permissions_augment = ("elasticache:ListTagsForResource",)
 
     filter_registry = filters
     action_registry = actions

@@ -13,7 +13,6 @@ from c7n.tags import (
     TagDelayedAction, RemoveTag, TagActionFilter, Tag)
 
 
-
 class ConfigStream(ConfigSource):
 
     def load_resource(self, item):
@@ -45,6 +44,7 @@ class KinesisStream(QueryResourceManager):
         dimension = 'StreamName'
         universal_taggable = True
         config_type = cfn_type = 'AWS::Kinesis::Stream'
+        permissions_augment = ("kinesis:ListTagsForStream",)
 
     source_mapping = {
         'describe': DescribeWithResourceTags,
@@ -364,8 +364,10 @@ class KinesisVideoStream(QueryResourceManager):
         'config': ConfigSource
     }
 
+
 KinesisVideoStream.action_registry.register('mark-for-op', TagDelayedAction)
 KinesisVideoStream.filter_registry.register('marked-for-op', TagActionFilter)
+
 
 @KinesisVideoStream.action_registry.register('delete')
 class DeleteVideoStream(Action):
@@ -457,4 +459,3 @@ class VideoStreamRemoveTag(RemoveTag):
                 ResourceARN=r['StreamARN'],
                 TagKeyList=tag_keys,
                 ignore_err_codes=("ResourceNotFoundException",))
-

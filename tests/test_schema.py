@@ -1,7 +1,8 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+import textwrap
 from unittest import mock
-from jsonschema.exceptions import best_match
+from jsonschema.exceptions import best_match, ValidationError
 
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import ValueFilter
@@ -172,6 +173,55 @@ class SchemaTest(BaseTest):
         err, policy = result
         self.assertTrue("'asdf' is not of type 'boolean'" in str(err).replace("u'", "'"))
         self.assertEqual(policy, 'policy-ec2')
+
+    def test_policy_name_regex(self):
+        data = {
+            'policies': [
+                {
+                    "name": "test-1.2.1",
+                    "resource": "aws.ebs",
+                }
+            ]
+        }
+        validator = self.get_validator(data)
+        errors = list(validator.iter_errors(data))
+        self.assertEqual(len(errors), 1)
+        error = specific_error(errors[0])
+        assert str(error) == textwrap.dedent(
+            """\
+            'test-1.2.1' does not match '^[A-z][A-z0-9]*(-[A-z0-9]+)*$'
+
+            Failed validating 'pattern' in schema[0]['allOf'][0]['properties']['name']:
+                {'pattern': '^[A-z][A-z0-9]*(-[A-z0-9]+)*$', 'type': 'string'}
+
+            On instance['name']:
+                'test-1.2.1'"""
+        )
+
+    def test_bad_condition_value(self):
+        data = {
+            'policies': [
+                {
+                    "name": "test",
+                    "resource": "aws.ec2",
+                    "conditions": [
+                        {
+                            'type': 'value',
+                            'key': 'account_id',
+                            'op': 'in',
+                            'value': {'target_accounts': None},
+                        }
+                    ],
+                }
+            ]
+        }
+        validator = self.get_validator(data)
+        errors = list(validator.iter_errors(data))
+        assert len(errors) == 1
+        error = specific_error(errors[0])
+        assert error.message == (
+            "{'target_accounts': None} is not valid under any of the given schemas"
+        )
 
     def test_semantic_error_common_filter_provider_prefixed(self):
         data = {
@@ -575,3 +625,36 @@ class SchemaTest(BaseTest):
         self.assertEqual(ElementSchema.doc(F), "")
         self.assertEqual(
             ElementSchema.doc(B), "Hello World\n\nxyz")
+
+    def test_validate_variable_references(self):
+        data = {
+            "policies": [
+                {
+                    "name": "set-log-group-retention",
+                    "resource": "aws.log-group",
+                    "actions": [
+                        {
+                            "type": "retention",
+                        }
+                    ],
+                }
+            ]
+        }
+
+        validator = self.get_validator(data)
+        for days, expect_failure in [
+            (30, False),
+            (30.1, True),
+            (True, True),
+            ("foo", True),
+
+            ("{retention_days}", False),
+            ("foo{retention_days}", True),
+            ("{retention_days}bar", True),
+        ]:
+            data["policies"][0]["actions"][0]["days"] = days
+            failed = any(
+                isinstance(err, ValidationError)
+                for err in validate(data, validator.schema)
+            )
+            self.assertEqual(failed, expect_failure)

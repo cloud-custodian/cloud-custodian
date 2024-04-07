@@ -3,6 +3,7 @@
 
 from .common import BaseTest
 
+
 class AppSyncWafV2(BaseTest):
 
     def test_graphql_api_filter_wafv2(self):

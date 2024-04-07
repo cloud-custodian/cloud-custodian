@@ -18,13 +18,9 @@ ARGS :=
 IMAGE := c7n
 IMAGE_TAG := latest
 
-ifneq "$(findstring $(PLATFORM_OS), Linux Darwin)" ""
-  ifneq "$(findstring $(PY_VERSION), 3.10)" ""
+# we distribute tfparse binary wheels for 3.10+
+ifneq "$(findstring 3.1, $(PY_VERSION))" ""
     PKG_SET := tools/c7n_left $(PKG_SET)
-  endif
-  ifneq "$(findstring $(PY_VERSION), 3.11)" ""
-    PKG_SET := tools/c7n_left $(PKG_SET)
-  endif
 endif
 
 
@@ -64,13 +60,13 @@ sphinx:
 	make -f docs/Makefile.sphinx html
 
 lint:
-	ruff c7n tests tools
+	ruff check c7n tests tools
 	black --check $(FMT_SET)
 	type -P terraform && terraform fmt -check -recursive .
 
 format:
 	black $(FMT_SET)
-	ruff --fix c7n tests tools
+	ruff check --fix c7n tests tools
 	type -P terraform && terraform fmt -recursive .
 
 clean:

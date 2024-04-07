@@ -10,10 +10,12 @@ from datetime import timedelta, datetime
 
 from c7n.actions import Action, RemovePolicyBase, ModifyVpcSecurityGroupsAction
 from c7n.filters import CrossAccountAccessFilter, ValueFilter, Filter
+from c7n.filters.costhub import CostHubRecommendation
 from c7n.filters.kms import KmsRelatedFilter
 import c7n.filters.vpc as net_filters
 from c7n.manager import resources
 from c7n import query, utils
+from c7n.resources.aws import shape_validate
 from c7n.resources.iam import CheckPermissions, SpecificIamRoleManagedPolicy
 from c7n.tags import universal_augment
 from c7n.utils import (
@@ -79,6 +81,7 @@ class AWSLambda(query.QueryResourceManager):
         config_type = 'AWS::Lambda::Function'
         cfn_type = 'AWS::Lambda::Function'
         universal_taggable = object()
+        permissions_augment = ("lambda:ListTags",)
 
     source_mapping = {
         'describe': DescribeLambda,
@@ -304,6 +307,61 @@ class HasSpecificManagedPolicy(SpecificIamRoleManagedPolicy):
                 results.append(r)
 
         return results
+
+
+@AWSLambda.action_registry.register('update')
+class UpdateLambda(Action):
+    """Update a lambda's configuration.
+
+    This action also has specific support for enacting recommendations
+    from the AWS Cost Optimization Hub for resizing.
+
+    :example:
+
+      .. code-block:: yaml
+
+         policies:
+           - name: lambda-rightsize
+             resource: aws.lambda
+             filters:
+               - type: cost-optimization
+                 attrs:
+                   - actionType: Rightsize
+             actions:
+               - update
+
+    """
+    schema = type_schema('update', properties={'type': 'object'})
+    permissions = ("lambda:UpdateFunctionConfiguration",)
+
+    def validate(self):
+        props = self.data.get('properties', {})
+        props['FunctionName'] = 'validation'
+        shape_validate(props, 'UpdateFunctionConfigurationRequest', 'lambda')
+
+    def process(self, resources):
+        client = utils.local_session(self.manager.session_factory).client('lambda')
+        retry = get_retry(('TooManyRequestsException', 'ResourceConflictException'))
+
+        for r in resources:
+            params = self.get_parameters(r)
+            try:
+                retry(
+                    client.update_function_configuration,
+                    FunctionName=r['FunctionName'],
+                    **params
+                )
+            except client.exceptions.ResourceNotFoundException:
+                continue
+
+    def get_parameters(self, r):
+        params = self.data.get('properties', {})
+        hub_recommendation = r.get(CostHubRecommendation.annotation_key)
+        if hub_recommendation and hub_recommendation['actionType'] == 'Rightsize':
+            size = int(hub_recommendation['recommendedResourceSummary'].split(' ')[0])
+            params['MemorySize'] = size
+        return params
+
 
 @AWSLambda.action_registry.register('set-xray-tracing')
 class LambdaEnableXrayTracing(Action):
@@ -568,7 +626,7 @@ class RemovePolicyStatement(RemovePolicyBase):
 
         p = json.loads(resource['c7n:Policy'])
 
-        statements, found = self.process_policy(
+        _, found = self.process_policy(
             p, resource, CrossAccountAccessFilter.annotation_key)
         if not found:
             return
@@ -805,7 +863,7 @@ class LayerRemovePermissions(RemovePolicyBase):
 
         p = json.loads(r['c7n:Policy'])
 
-        statements, found = self.process_policy(
+        _, found = self.process_policy(
             p, r, CrossAccountAccessFilter.annotation_key)
 
         if not found:
@@ -852,7 +910,6 @@ class LayerPostFinding(PostFinding):
 
 
 @AWSLambda.filter_registry.register('lambda-edge')
-
 class LambdaEdgeFilter(Filter):
     """
     Filter for lambda@edge functions. Lambda@edge only exists in us-east-1
@@ -877,7 +934,7 @@ class LambdaEdgeFilter(Filter):
     def get_lambda_cf_map(self):
         cfs = self.manager.get_resource_manager('distribution').resources()
         func_expressions = ('DefaultCacheBehavior.LambdaFunctionAssociations.Items',
-          'CacheBehaviors.LambdaFunctionAssociations.Items')
+          'CacheBehaviors.Items[].LambdaFunctionAssociations.Items[]')
         lambda_dist_map = {}
         for d in cfs:
             for exp in func_expressions:
@@ -885,7 +942,7 @@ class LambdaEdgeFilter(Filter):
                     for function in jmespath_search(exp, d):
                         # Geting rid of the version number in the arn
                         lambda_edge_arn = ':'.join(function['LambdaFunctionARN'].split(':')[:-1])
-                        lambda_dist_map.setdefault(lambda_edge_arn, []).append(d['Id'])
+                        lambda_dist_map.setdefault(lambda_edge_arn, set()).add(d['Id'])
         return lambda_dist_map
 
     def process(self, resources, event=None):
@@ -896,7 +953,7 @@ class LambdaEdgeFilter(Filter):
         lambda_edge_cf_map = self.get_lambda_cf_map()
         for r in resources:
             if (r['FunctionArn'] in lambda_edge_cf_map and self.data.get('state')):
-                r[annotation_key] = lambda_edge_cf_map.get(r['FunctionArn'])
+                r[annotation_key] = list(lambda_edge_cf_map.get(r['FunctionArn']))
                 results.append(r)
             elif (r['FunctionArn'] not in lambda_edge_cf_map and not self.data.get('state')):
                 results.append(r)

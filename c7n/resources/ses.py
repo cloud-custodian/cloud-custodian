@@ -9,13 +9,20 @@ from c7n.query import DescribeSource, QueryResourceManager, TypeInfo
 from c7n.utils import local_session, type_schema, format_string_values
 from c7n.tags import universal_augment
 
+
 class DescribeConfigurationSet(DescribeSource):
 
     def augment(self, resources):
         client = local_session(self.manager.session_factory).client('ses')
         for r in resources:
             details = client.describe_configuration_set(ConfigurationSetName=r['Name'],
-                ConfigurationSetAttributeNames=['eventDestinations','trackingOptions','deliveryOptions','reputationOptions'])
+                ConfigurationSetAttributeNames=[
+                    'eventDestinations',
+                    'trackingOptions',
+                    'deliveryOptions',
+                    'reputationOptions'
+                ]
+            )
             r.update({
                 k: details[k]
                 for k in details
@@ -32,6 +39,8 @@ class SESConfigurationSet(QueryResourceManager):
         name = id = 'Name'
         arn_type = 'configuration-set'
         universal_taggable = object()
+        config_type = "AWS::SES::ConfigurationSet"
+        permissions_augment = ("ses:ListTagsForResource",)
 
     source_mapping = {
         'describe': DescribeConfigurationSet
@@ -152,6 +161,7 @@ class SESReceiptRuleSet(QueryResourceManager):
         name = id = 'Name'
         arn_type = 'receipt-rule-set'
 
+
 @SESReceiptRuleSet.action_registry.register('delete')
 class Delete(Action):
     """Delete an SES Receipt Rule Set resource.
@@ -180,6 +190,6 @@ class Delete(Action):
         for ruleset in rulesets:
             self.manager.retry(
                 client.delete_receipt_rule_set,
-                RuleSetName = ruleset["Metadata"]['Name'],
-                ignore_err_codes = ("CannotDeleteException",)
+                RuleSetName=ruleset["Metadata"]['Name'],
+                ignore_err_codes=("CannotDeleteException",)
             )

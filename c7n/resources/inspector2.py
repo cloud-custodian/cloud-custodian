@@ -5,7 +5,6 @@ from c7n import query
 from c7n.utils import merge_dict_list
 
 
-
 class DescribeInspector2Finding(query.DescribeSource):
     def resources(self, query):
         """Only show active Inspector V2 findings by default
@@ -31,6 +30,7 @@ class DescribeInspector2Finding(query.DescribeSource):
             ]
         )
         return super().resources(query=query)
+
 
 @resources.register("inspector2-finding")
 class Inspector2Finding(query.QueryResourceManager):
@@ -72,7 +72,7 @@ class Inspector2Finding(query.QueryResourceManager):
     Reference for available filters:
 
     https://docs.aws.amazon.com/inspector/v2/APIReference/API_FilterCriteria.html#inspector2-Type-FilterCriteria-findingType
-    """ # noqa: E501
+    """  # noqa: E501
 
     class resource_type(query.TypeInfo):
         service = "inspector2"
