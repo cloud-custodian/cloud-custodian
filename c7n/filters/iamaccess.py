@@ -242,12 +242,13 @@ class PolicyChecker:
 
     def handle_s3_dataaccesspointaccount(self, s, c):
         return bool(set(map(_account, c['values'])).difference(self.allowed_accounts))
-    
+
     def handle_s3_dataaccesspointarn(self, s, c):
         return bool(set(map(_account, c['values'])).difference(self.allowed_accounts))
-    
+
     def handle_s3_x_amz_acl(self, s, c):
         return False
+
 
 class CrossAccountAccessFilter(Filter):
     """Check a resource's embedded iam policy for cross account access.
