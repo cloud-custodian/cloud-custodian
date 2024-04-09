@@ -51,7 +51,7 @@ def _default_options(p, exclude=[]):
     provider.add_argument("--external-id", default=None, dest="external_id",
                           help="External Id to provide when assuming a role")
     provider.add_argument("--session-policy", default=None, dest="session_policy",
-                          help="IAM policy File in JSON format to be used as a session policy.")
+                          help="IAM policy File in JSON format to be used as a session policy")
 
     config = p.add_argument_group(
         "config", "Policy config file(s) and policy selectors")
