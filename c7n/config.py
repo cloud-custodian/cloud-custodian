@@ -35,6 +35,7 @@ class Config(Bag):
             'profile': None,
             'account_id': None,
             'assume_role': None,
+            'session_policy': None,
             'external_id': None,
             'log_group': None,
             'tracer': 'default',
