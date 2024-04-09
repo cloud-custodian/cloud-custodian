@@ -21,7 +21,8 @@ USE_STS_REGIONAL = os.environ.get(
 
 class SessionFactory:
 
-    def __init__(self, region, profile=None, assume_role=None, external_id=None, session_policy=None):
+    def __init__(
+            self, region, profile=None, assume_role=None, external_id=None, session_policy=None):
         self.region = region
         self.profile = profile
         self.session_policy = session_policy
@@ -66,7 +67,8 @@ class SessionFactory:
         self._subscribers = subscribers
 
 
-def assumed_session(role_arn, session_name, session_policy, session=None, region=None, external_id=None):
+def assumed_session(
+        role_arn, session_name, session_policy, session=None, region=None, external_id=None):
     """STS Role assume a boto3.Session
 
     With automatic credential renewal.
