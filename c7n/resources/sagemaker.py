@@ -139,6 +139,11 @@ class SagemakerTransformJob(QueryResourceManager):
 
 class SagemakerAutoMLDescribeV2(DescribeSource):
 
+    def get_permissions(self):
+        perms = super().get_permissions()
+        perms.remove('sagemaker:DescribeAutoMlJobV2')
+        return perms
+
     def augment(self, resources):
         return universal_augment(self.manager, super().augment(resources))
 
@@ -154,8 +159,9 @@ class SagemakerAutoMLJob(QueryResourceManager):
         arn = id = 'AutoMLJobArn'
         name = 'AutoMLJobName'
         date = 'CreationTime'
-        permission_augment = (
-            'sagemaker:DescribeAutoMLJobV2', 'sagemaker:ListAutoMLJobs')
+        # override defaults to casing issues
+        permissions_augment = ('sagemaker:DescribeAutoMLJobV2',)
+        permissions_enum = ('sagemaker:ListAutoMLJobs',)
         universal_taggable = object()
 
     source_mapping = {'describe': SagemakerAutoMLDescribeV2}
