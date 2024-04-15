@@ -154,7 +154,8 @@ class SagemakerAutoMLJob(QueryResourceManager):
         arn = id = 'AutoMLJobArn'
         name = 'AutoMLJobName'
         date = 'CreationTime'
-        permission_prefix = 'sagemaker'
+        permission_augment = (
+            'sagemaker:DescribeAutoMLJobV2', 'sagemaker:ListAutoMLJobs')
         universal_taggable = object()
 
     source_mapping = {'describe': SagemakerAutoMLDescribeV2}
