@@ -2,29 +2,31 @@
 FROM debian:10-slim as build-env
 
 ARG POETRY_VERSION="1.5.1"
-SHELL ["/bin/bash", "-c"]
+ARG PYTHON_VERSION="3.12"
 
 # pre-requisite distro deps, and build env setup
-RUN adduser --disabled-login --gecos "" custodian
-RUN apt-get --yes update
-RUN apt-get --yes install --no-install-recommends build-essential curl python3-venv python3-dev
-RUN python3 -m venv /usr/local
-RUN /usr/local/bin/pip install -U pip setuptools &&     /usr/local/bin/pip install "poetry==${POETRY_VERSION}"
+RUN adduser -D --gecos "" custodian
+RUN apk add curl bash python3-$${PYTHON_VERSION}
+
+SHELL ["/bin/bash", "-c"]
+
+RUN python3 -m venv /app
+RUN /app/bin/pip install -U pip setuptools &&     /app/bin/pip install "poetry==${POETRY_VERSION}"
 ARG PATH="/root/.local/bin:$PATH"
 
 WORKDIR /src
 # Add core & aws packages
 ADD pyproject.toml poetry.lock README.md /src/
-RUN . /usr/local/bin/activate && pip install -qU pip wheel aws-xray-sdk psutil jsonpatch
+RUN . /app/bin/activate && pip install -qU pip wheel aws-xray-sdk psutil jsonpatch
 
 # Ignore root first pass so if source changes we don't have to invalidate
 # dependency install
-RUN . /usr/local/bin/activate && poetry install --without dev --no-root
+RUN . /app/bin/activate && poetry install --without dev --no-root
 
 # Now install the root package, we used to do this after dependencies of other providers
 # but since moving c7n to a main dependency in pyproject toml we have to do this one first.
 ADD c7n /src/c7n/
-RUN . /usr/local/bin/activate && poetry install --only-root
+RUN . /app/bin/activate && poetry install --only-root
 
 ARG providers="gcp azure kube openstack tencentcloud oci"
 # Add provider packages
@@ -85,7 +87,7 @@ RUN mkdir /output
 
 # Install c7n-mailer
 ADD tools/c7n_mailer /src/tools/c7n_mailer
-RUN . /usr/local/bin/activate && cd tools/c7n_mailer && poetry install --all-extras
+RUN . /app/bin/activate && cd tools/c7n_mailer && poetry install --all-extras
 
 
 FROM gcr.io/distroless/python3-debian10
@@ -104,5 +106,5 @@ USER custodian
 WORKDIR /home/custodian
 ENV LC_ALL="C.UTF-8" LANG="C.UTF-8"
 VOLUME ["/home/custodian"]
-ENTRYPOINT ["/usr/local/bin/c7n-mailer"]
+ENTRYPOINT ["/app/bin/c7n-mailer"]
 CMD ["--help"]

@@ -28,7 +28,7 @@ log = logging.getLogger("dockerpkg")
 PHASE_1_INSTALL_TMPL = """
 ADD tools/c7n_{pkg}/pyproject.toml tools/c7n_{pkg}/poetry.lock /src/tools/c7n_{pkg}/
 RUN if [[ " ${{providers[*]}} " =~ "{pkg}" ]]; then \
-    . /usr/local/bin/activate && \
+    . /app/bin/activate && \
     cd tools/c7n_{pkg} && \
     poetry install --without dev --no-root; \
 fi
@@ -37,13 +37,13 @@ fi
 PHASE_2_INSTALL_TMPL = """
 ADD tools/c7n_{pkg} /src/tools/c7n_{pkg}
 RUN if [[ " ${{providers[*]}} " =~ "{pkg}" ]]; then \
-    . /usr/local/bin/activate && \
+    . /app/bin/activate && \
     cd tools/c7n_{pkg} && \
     poetry install --only-root; \
 fi
 """
 
-default_providers = ["gcp", "azure", "kube", "openstack", "tencentcloud", "oci"]
+default_providers = ["gcp", "azure", "kube", "tencentcloud", "oci"]
 
 PHASE_1_PKG_INSTALL_DEP = """\
 # We include `pyproject.toml` and `poetry.lock` first to allow
@@ -66,15 +66,17 @@ BOOTSTRAP_STAGE = """\
 FROM {base_build_image} as build-env
 
 ARG POETRY_VERSION="1.5.1"
-SHELL ["/bin/bash", "-c"]
+ARG PYTHON_VERSION="3.12"
 
 # pre-requisite distro deps, and build env setup
-RUN adduser --disabled-login --gecos "" custodian
-RUN apt-get --yes update
-RUN apt-get --yes install --no-install-recommends build-essential curl python3-venv python3-dev
-RUN python3 -m venv /usr/local
-RUN /usr/local/bin/pip install -U pip setuptools && \
-    /usr/local/bin/pip install "poetry=={poetry_version}"
+RUN adduser -D --gecos "" custodian
+RUN apk add curl bash python-${python_version}
+
+SHELL ["/bin/bash", "-c"]
+
+RUN python -m venv /app
+RUN /app/bin/pip install -U pip setuptools && \
+    /app/bin/pip install "poetry=={poetry_version}"
 ARG PATH="/root/.local/bin:$PATH"
 
 WORKDIR /src
@@ -82,13 +84,13 @@ WORKDIR /src
 
 LEFT_BUILD_STAGE = BOOTSTRAP_STAGE + """\
 ADD pyproject.toml poetry.lock README.md /src
-RUN . /usr/local/bin/activate && poetry install --without dev --no-root
+RUN . /app/bin/activate && poetry install --without dev --no-root
 
 ADD c7n /src/c7n/
-RUN . /usr/local/bin/activate && poetry install --only-root
+RUN . /app/bin/activate && poetry install --only-root
 
 ADD tools/c7n_left /src/tools/c7n_left
-RUN . /usr/local/bin/activate && cd tools/c7n_left && poetry install --without dev
+RUN . /app/bin/activate && cd tools/c7n_left && poetry install --without dev
 
 RUN mkdir /output
 """
@@ -96,16 +98,16 @@ RUN mkdir /output
 BUILD_STAGE = BOOTSTRAP_STAGE + """\
 # Add core & aws packages
 ADD pyproject.toml poetry.lock README.md /src/
-RUN . /usr/local/bin/activate && pip install -qU pip wheel aws-xray-sdk psutil jsonpatch
+RUN . /app/bin/activate && pip install -qU pip wheel aws-xray-sdk jsonpatch
 
 # Ignore root first pass so if source changes we don't have to invalidate
 # dependency install
-RUN . /usr/local/bin/activate && poetry install --without dev --no-root
+RUN . /app/bin/activate && poetry install --without dev --no-root
 
 # Now install the root package, we used to do this after dependencies of other providers
 # but since moving c7n to a main dependency in pyproject toml we have to do this one first.
 ADD c7n /src/c7n/
-RUN . /usr/local/bin/activate && poetry install --only-root
+RUN . /app/bin/activate && poetry install --only-root
 
 ARG providers="{providers}"
 # Add provider packages
@@ -116,28 +118,24 @@ ARG providers="{providers}"
 RUN mkdir /output
 """
 
-TARGET_UBUNTU_STAGE = """\
+TARGET_WOLFI_STAGE = """\
 FROM {base_target_image}
 
 LABEL name="{name}" \\
       repository="http://github.com/cloud-custodian/cloud-custodian"
 
-ENV DEBIAN_FRONTEND=noninteractive
+ARG PYTHON_VERSION="3.12"
 
-RUN apt-get --yes update \\
-        && apt-get --yes install python3 python3-venv {packages} --no-install-recommends \\
-        && rm -Rf /var/cache/apt \\
-        && rm -Rf /var/lib/apt/lists/* \\
-        && rm -Rf /var/log/*
+RUN apk add python-${python_version}
 
 # These should remain below any other commands because they will invalidate
 # the layer cache
 COPY --from=build-env /src /src
-COPY --from=build-env /usr/local /usr/local
+COPY --from=build-env /app /app
 COPY --from=build-env /output /output
 
 
-RUN adduser --disabled-login --gecos "" custodian
+RUN adduser -D -h /home/custodian --gecos "" custodian
 USER custodian
 WORKDIR /home/custodian
 ENV LC_ALL="C.UTF-8" LANG="C.UTF-8"
@@ -183,7 +181,7 @@ LABEL "org.opencontainers.image.documentation"="https://cloudcustodian.io/docs/t
 BUILD_KUBE = """\
 # Install c7n-kube
 ADD tools/c7n_kube /src/tools/c7n_kube
-RUN . /usr/local/bin/activate && cd tools/c7n_kube && poetry install
+RUN . /app/bin/activate && cd tools/c7n_kube && poetry install
 """
 
 TARGET_KUBE = """\
@@ -195,7 +193,7 @@ LABEL "org.opencontainers.image.documentation"="https://cloudcustodian.io/docs"
 BUILD_ORG = """\
 # Install c7n-org
 ADD tools/c7n_org /src/tools/c7n_org
-RUN . /usr/local/bin/activate && cd tools/c7n_org && poetry install
+RUN . /app/bin/activate && cd tools/c7n_org && poetry install
 """
 
 TARGET_ORG = """\
@@ -207,7 +205,7 @@ LABEL "org.opencontainers.image.documentation"="https://cloudcustodian.io/docs"
 BUILD_MAILER = """\
 # Install c7n-mailer
 ADD tools/c7n_mailer /src/tools/c7n_mailer
-RUN . /usr/local/bin/activate && cd tools/c7n_mailer && poetry install --all-extras
+RUN . /app/bin/activate && cd tools/c7n_mailer && poetry install --all-extras
 
 """
 
@@ -220,7 +218,7 @@ LABEL "org.opencontainers.image.documentation"="https://cloudcustodian.io/docs"
 BUILD_POLICYSTREAM = """\
 # Install c7n-policystream
 ADD tools/c7n_policystream /src/tools/c7n_policystream
-RUN . /usr/local/bin/activate && cd tools/c7n_policystream && poetry install
+RUN . /app/bin/activate && cd tools/c7n_policystream && poetry install
 """
 
 TARGET_POLICYSTREAM = """\
@@ -233,9 +231,10 @@ LABEL "org.opencontainers.image.documentation"="https://cloudcustodian.io/docs"
 class Image:
 
     defaults = dict(
-        base_build_image="ubuntu:22.04",
-        base_target_image="ubuntu:22.04",
+        base_build_image="chainguard/wolfi-base:latest",
+        base_target_image="chainguard/wolfi-base:latest",
         poetry_version="${POETRY_VERSION}",
+        python_version="{PYTHON_VERSION}",
         packages="",
         providers=" ".join(default_providers),
         PHASE_1_PKG_INSTALL_DEP=PHASE_1_PKG_INSTALL_DEP,
@@ -275,48 +274,59 @@ ImageMap = {
             name="cli",
             repo="c7n",
             description="Cloud Management Rules Engine",
-            entrypoint="/usr/local/bin/custodian",
+            entrypoint="/app/bin/custodian",
         ),
         build=[BUILD_STAGE],
-        target=[TARGET_UBUNTU_STAGE, TARGET_CLI],
+        target=[TARGET_WOLFI_STAGE, TARGET_CLI],
+    ),
+    "docker/c7n-left": Image(
+        dict(
+            name="left",
+            repo="c7n",
+            description="Cloud Custodian IaC Governance",
+            entrypoint="/app/bin/c7n-left",
+            packages="git"
+        ),
+        build=[LEFT_BUILD_STAGE],
+        target=[TARGET_WOLFI_STAGE, TARGET_LEFT],
     ),
     "docker/c7n-kube": Image(
         dict(
             name="kube",
             repo="c7n",
             description="Cloud Custodian Kubernetes Hooks",
-            entrypoint="/usr/local/bin/c7n-kates",
+            entrypoint="/app/bin/c7n-kates",
         ),
         build=[BUILD_STAGE, BUILD_KUBE],
-        target=[TARGET_UBUNTU_STAGE, TARGET_KUBE],
+        target=[TARGET_WOLFI_STAGE, TARGET_KUBE],
     ),
     "docker/c7n-org": Image(
         dict(
             name="org",
             repo="c7n-org",
             description="Cloud Custodian Organization Runner",
-            entrypoint="/usr/local/bin/c7n-org",
+            entrypoint="/app/bin/c7n-org",
         ),
         build=[BUILD_STAGE, BUILD_ORG],
-        target=[TARGET_UBUNTU_STAGE, TARGET_ORG],
+        target=[TARGET_WOLFI_STAGE, TARGET_ORG],
     ),
     "docker/mailer": Image(
         dict(
             name="mailer",
             description="Cloud Custodian Notification Delivery",
-            entrypoint="/usr/local/bin/c7n-mailer",
+            entrypoint="/app/bin/c7n-mailer",
         ),
         build=[BUILD_STAGE, BUILD_MAILER],
-        target=[TARGET_UBUNTU_STAGE, TARGET_MAILER],
+        target=[TARGET_WOLFI_STAGE, TARGET_MAILER],
     ),
     "docker/policystream": Image(
         dict(
             name="policystream",
             description="Custodian policy changes streamed from Git",
-            entrypoint="/usr/local/bin/c7n-policystream",
+            entrypoint="/app/bin/c7n-policystream",
         ),
         build=[BUILD_STAGE, BUILD_POLICYSTREAM],
-        target=[TARGET_UBUNTU_STAGE, TARGET_POLICYSTREAM],
+        target=[TARGET_WOLFI_STAGE, TARGET_POLICYSTREAM],
     ),
 }
 
@@ -344,16 +354,6 @@ def cli():
     )
     logging.getLogger("docker").setLevel(logging.INFO)
     logging.getLogger("urllib3").setLevel(logging.INFO)
-
-    for name, image in list(ImageMap.items()):
-        ImageMap[name + "-distroless"] = image.clone(
-            dict(
-                tag_prefix="distroless-",
-                base_build_image="debian:10-slim",
-                base_target_image="gcr.io/distroless/python3-debian10",
-            ),
-            target=[TARGET_DISTROLESS_STAGE],
-        )
 
 
 @cli.command()
@@ -639,4 +639,9 @@ def generate():
 
 
 if __name__ == "__main__":
-    cli()
+    try:
+        cli()
+    except Exception:
+        import pdb, sys, traceback
+        traceback.print_exc()
+        pdb.post_mortem(sys.exc_info()[-1])
