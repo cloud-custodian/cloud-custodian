@@ -137,6 +137,51 @@ class SagemakerTransformJob(QueryResourceManager):
         return list(map(_augment, super(SagemakerTransformJob, self).augment(jobs)))
 
 
+class SagemakerAutoMLDescribeV2(DescribeSource):
+
+    def get_permissions(self):
+        perms = super().get_permissions()
+        perms.remove('sagemaker:DescribeAutoMlJobV2')
+        return perms
+
+    def augment(self, resources):
+        return universal_augment(self.manager, super().augment(resources))
+
+
+@resources.register('sagemaker-auto-ml-job')
+class SagemakerAutoMLJob(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'sagemaker'
+        enum_spec = ('list_auto_ml_jobs', 'AutoMLJobSummaries', None)
+        detail_spec = (
+            'describe_auto_ml_job_v2', 'AutoMLJobName', 'AutoMLJobName', None)
+        arn = id = 'AutoMLJobArn'
+        name = 'AutoMLJobName'
+        date = 'CreationTime'
+        # override defaults to casing issues
+        permissions_augment = ('sagemaker:DescribeAutoMLJobV2',)
+        permissions_enum = ('sagemaker:ListAutoMLJobs',)
+        universal_taggable = object()
+
+    source_mapping = {'describe': SagemakerAutoMLDescribeV2}
+
+    def __init__(self, ctx, data):
+        super(SagemakerAutoMLJob, self).__init__(ctx, data)
+        self.queries = QueryFilter.parse(
+            self.data.get('query', [
+                {'StatusEquals': 'InProgress'}]))
+
+    def resources(self, query=None):
+        for q in self.queries:
+            if q is None:
+                continue
+            query = query or {}
+            for k, v in q.items():
+                query[k] = v
+        return super(SagemakerAutoMLJob, self).resources(query=query)
+
+
 class QueryFilter:
 
     JOB_FILTERS = ('StatusEquals', 'NameContains',)
@@ -775,6 +820,35 @@ class SagemakerTransformJobStop(BaseAction):
         for j in jobs:
             try:
                 client.stop_transform_job(TransformJobName=j['TransformJobName'])
+            except client.exceptions.ResourceNotFound:
+                pass
+
+
+@SagemakerAutoMLJob.action_registry.register('stop')
+class SagemakerAutoMLJobStop(BaseAction):
+    """Stops a SageMaker AutoML job
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: stop-automl-job
+            resource: sagemaker-auto-ml-job
+            filters:
+              - AutoMLJobName: ml-job-01
+            actions:
+              - stop
+    """
+    schema = type_schema('stop')
+    permissions = ('sagemaker:StopAutoMLJob',)
+
+    def process(self, jobs):
+        client = local_session(self.manager.session_factory).client('sagemaker')
+
+        for j in jobs:
+            try:
+                client.stop_auto_ml_job(AutoMLJobName=j['AutoMLJobName'])
             except client.exceptions.ResourceNotFound:
                 pass
 
