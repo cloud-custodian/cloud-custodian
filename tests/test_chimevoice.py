@@ -1,23 +1,23 @@
 from datetime import datetime, timezone
 
 from c7n.reports.csvout import Formatter
-from c7n.resources.chimesdkvoice import VoiceConnector
+from c7n.resources.chimevoice import VoiceConnector
 from .apicallcaptor import ApiCallCaptor
 from .common import BaseTest, event_data
 
 
-class TestChimeSDKVoice(BaseTest):
+class TestChimeVoice(BaseTest):
     def test_voiceconnector(self):
         # standard test runner ...
-        session_factory = self.replay_flight_data('test_chimesdkvoice_voiceconnector')
+        session_factory = self.replay_flight_data('test_chimevoice_voiceconnector')
 
         # test data recording runner ...
-        # session_factory = self.record_flight_data('test_chimesdkvoice_voiceconnector')
+        # session_factory = self.record_flight_data('test_chimevoice_voiceconnector')
 
         p = self.load_policy(
             {
                 "name": "my-voice-policy",
-                "resource": "aws.chimesdkvoice-voiceconnector",
+                "resource": "aws.chime-voice-voiceconnector",
                 'filters': [
                     {
                         "type": "value",
@@ -80,13 +80,13 @@ class TestChimeSDKVoice(BaseTest):
             captor.calls,
         )
 
-    def test_chimesdkvoice_event(self):
-        session_factory = self.replay_flight_data('test_chimesdkvoice_voiceconnector')
+    def test_chimevoice_event(self):
+        session_factory = self.replay_flight_data('test_chimevoice_voiceconnector')
         p = self.load_policy(
             {
 
                 "name": "my-voice-policy",
-                "resource": "aws.chimesdkvoice-voiceconnector",
+                "resource": "aws.chime-voice-voiceconnector",
                 'filters': [
                     {
                         "type": "value",
@@ -113,7 +113,7 @@ class TestChimeSDKVoice(BaseTest):
         # event_data() names a file in tests/data/cwe that will drive the test execution.
         # file contains an event matching that which AWS would generate in cloud trail.
         event = {
-            "detail": event_data("event-chimesdkvoice-create-voiceconnector.json"),
+            "detail": event_data("event-chimevoice-create-voiceconnector.json"),
             "debug": True,
         }
 

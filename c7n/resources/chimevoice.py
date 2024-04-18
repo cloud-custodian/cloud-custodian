@@ -15,7 +15,7 @@ class DescribeVoiceConnector(DescribeSource):
         return tagged_resources
 
 
-@resources.register('chimesdkvoice-voiceconnector')
+@resources.register('chime-voice-voiceconnector')
 class VoiceConnector(QueryResourceManager):
     source_mapping = {'describe': DescribeVoiceConnector,
                       'config': ConfigSource}
