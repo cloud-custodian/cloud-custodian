@@ -68,7 +68,7 @@ class SessionFactory:
 
 
 def assumed_session(
-        role_arn, session_name, session_policy, session=None, region=None, external_id=None):
+        role_arn, session_name, session_policy=None, session=None, region=None, external_id=None):
     """STS Role assume a boto3.Session
 
     With automatic credential renewal.
