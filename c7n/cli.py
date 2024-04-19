@@ -50,8 +50,6 @@ def _default_options(p, exclude=[]):
                           help="Role or Service Account to assume")
     provider.add_argument("--external-id", default=None, dest="external_id",
                           help="External Id to provide when assuming a role")
-    provider.add_argument("--session-policy", default=None, dest="session_policy",
-                          help="IAM policy File in JSON format to be used as a session policy")
 
     config = p.add_argument_group(
         "config", "Policy config file(s) and policy selectors")
@@ -100,6 +98,9 @@ def _default_options(p, exclude=[]):
             help="Cache validity in minutes (default %(default)i)")
     else:
         p.add_argument("--cache", default=None, help=argparse.SUPPRESS)
+    if 'session-policy' not in exclude:
+        p.add_argument("--session-policy", required=False, default=None,
+                       help="[OPTIONAL] Policy File in JSON format to be used as a session policy")
 
 
 def _report_options(p):

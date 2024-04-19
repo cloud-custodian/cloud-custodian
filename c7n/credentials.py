@@ -92,8 +92,7 @@ def assumed_session(
 
         parameters = {"RoleArn": role_arn, "RoleSessionName": session_name}
         if session_policy is not None:
-            with open(session_policy, 'r') as sp:
-                p = str(sp.read())
+            p = SessionPolicy(session_policy).read_session_policy()
             parameters['Policy'] = p
 
         if external_id is not None:
@@ -143,3 +142,14 @@ def get_sts_client(session, region):
         region_name = None
     return session.client(
         'sts', endpoint_url=endpoint_url, region_name=region_name)
+
+
+class SessionPolicy:
+    def __init__(self, session_policy):
+        self.session_policy = session_policy
+
+    def read_session_policy(self):
+        if self.session_policy:
+            with open(self.session_policy, 'r') as sp:
+                p = str(sp.read())
+        return p
