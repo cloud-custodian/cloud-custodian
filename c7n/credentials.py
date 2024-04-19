@@ -150,6 +150,9 @@ class SessionPolicy:
 
     def read_session_policy(self):
         if self.session_policy:
+            fmt = self.session_policy.rsplit('.', 1)[-1]
+            if fmt not in ('json',):
+                raise ValueError("The session policy file must end in .json")
             with open(self.session_policy, 'r') as sp:
                 p = str(sp.read())
         return p
