@@ -10,7 +10,6 @@ import functools
 import itertools
 import json
 from typing import List
-from c7n.exceptions import ClientError
 
 import os
 
