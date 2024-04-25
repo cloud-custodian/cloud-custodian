@@ -137,6 +137,44 @@ class SagemakerTransformJob(QueryResourceManager):
         return list(map(_augment, super(SagemakerTransformJob, self).augment(jobs)))
 
 
+class SagemakerHyperParameterTuningJobDescribe(DescribeSource):
+
+    def augment(self, resources):
+        return universal_augment(self.manager, super().augment(resources))
+
+
+@resources.register('sagemaker-hyperparameter-tuning-job')
+class SagemakerHyperParameterTuningJob(QueryResourceManager):
+    class resource_type(TypeInfo):
+        service = 'sagemaker'
+        enum_spec = ('list_hyper_parameter_tuning_jobs', 'HyperParameterTuningJobSummaries', None)
+        detail_spec = (
+            'describe_hyper_parameter_tuning_job', 'HyperParameterTuningJobName',
+            'HyperParameterTuningJobName', None)
+        arn = id = 'HyperParameterTuningJobArn'
+        name = 'HyperParameterTuningJobName'
+        date = 'CreationTime'
+        permission_prefix = 'sagemaker'
+        universal_taggable = object()
+
+    source_mapping = {'describe': SagemakerHyperParameterTuningJobDescribe}
+
+    def __init__(self, ctx, data):
+        super(SagemakerHyperParameterTuningJob, self).__init__(ctx, data)
+        self.queries = QueryFilter.parse(
+            self.data.get('query', [
+                {'StatusEquals': 'InProgress'}]))
+
+    def resources(self, query=None):
+        for q in self.queries:
+            if q is None:
+                continue
+            query = query or {}
+            for k, v in q.items():
+                query[k] = v
+        return super(SagemakerHyperParameterTuningJob, self).resources(query=query)
+
+
 class SagemakerAutoMLDescribeV2(DescribeSource):
 
     def get_permissions(self):
@@ -843,6 +881,35 @@ class SagemakerTransformJobStop(BaseAction):
         for j in jobs:
             try:
                 client.stop_transform_job(TransformJobName=j['TransformJobName'])
+            except client.exceptions.ResourceNotFound:
+                pass
+
+
+@SagemakerHyperParameterTuningJob.action_registry.register('stop')
+class SagemakerHyperParameterTuningJobStop(BaseAction):
+    """Stops a SageMaker Hyperparameter Tuning job
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: stop-hyperparameter-tuning-job
+            resource: sagemaker-hyperparameter-tuning-job
+            filters:
+              - HyperParameterTuningJobName: ml-job-10
+            actions:
+              - stop
+    """
+    schema = type_schema('stop')
+    permissions = ('sagemaker:StopHyperParameterTuningJob',)
+
+    def process(self, jobs):
+        client = local_session(self.manager.session_factory).client('sagemaker')
+
+        for j in jobs:
+            try:
+                client.stop_hyper_parameter_tuning_job(HyperParameterTuningJobName=j['HyperParameterTuningJobName'])
             except client.exceptions.ResourceNotFound:
                 pass
 
