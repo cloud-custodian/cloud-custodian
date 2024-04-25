@@ -1,0 +1,60 @@
+{
+    "status_code": 200,
+    "data": {
+        "HyperParameterTuningJobSummaries": [
+            {
+                "HyperParameterTuningJobName": "c7n-test",
+                "HyperParameterTuningJobArn": "arn:aws:sagemaker:us-east-1:644160558196:hyper-parameter-tuning-job/c7n-test",
+                "HyperParameterTuningJobStatus": "Failed",
+                "Strategy": "Bayesian",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 4,
+                    "day": 6,
+                    "hour": 14,
+                    "minute": 22,
+                    "second": 8,
+                    "microsecond": 179000
+                },
+                "HyperParameterTuningEndTime": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 4,
+                    "day": 6,
+                    "hour": 14,
+                    "minute": 22,
+                    "second": 22,
+                    "microsecond": 341000
+                },
+                "LastModifiedTime": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 4,
+                    "day": 6,
+                    "hour": 14,
+                    "minute": 22,
+                    "second": 22,
+                    "microsecond": 341000
+                },
+                "TrainingJobStatusCounters": {
+                    "Completed": 0,
+                    "InProgress": 0,
+                    "RetryableError": 0,
+                    "NonRetryableError": 2,
+                    "Stopped": 0
+                },
+                "ObjectiveStatusCounters": {
+                    "Succeeded": 0,
+                    "Pending": 0,
+                    "Failed": 2
+                },
+                "ResourceLimits": {
+                    "MaxNumberOfTrainingJobs": 2,
+                    "MaxParallelTrainingJobs": 2
+                }
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

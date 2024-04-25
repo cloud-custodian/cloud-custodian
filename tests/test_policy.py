@@ -206,7 +206,7 @@ class PolicyMetaLint(BaseTest):
             {'account', 's3', 'hostedzone', 'log-group', 'rest-api', 'redshift-snapshot',
              'rest-stage', 'codedeploy-app', 'codedeploy-group', 'fis-template', 'dlm-policy',
              'apigwv2', 'apigwv2-stage', 'apigw-domain-name', 'fis-experiment',
-             'appmesh-virtual-gateway', 'launch-template-version'})
+             'launch-template-version'})
         if overrides:
             raise ValueError("unknown arn overrides in %s" % (", ".join(overrides)))
 
@@ -463,7 +463,6 @@ class PolicyMetaLint(BaseTest):
             "AWS::ResilienceHub::App",
             # q2 2023 wave 3
             "AWS::Amplify::App",
-            "AWS::AppMesh::VirtualNode",
             "AWS::AppMesh::VirtualService",
             "AWS::AppRunner::VpcConnector",
             "AWS::AppStream::Application",
@@ -738,7 +737,7 @@ class PolicyMetaLint(BaseTest):
     def test_resource_type_empty_metadata(self):
         empty = set()
         for k, v in manager.resources.items():
-            if k in ('rest-account', 'account', 'codedeploy-deployment'):
+            if k in ('rest-account', 'account', 'codedeploy-deployment', 'sagemaker-cluster'):
                 continue
             for rk, rv in v.resource_type.__dict__.items():
                 if rk[0].isalnum() and rv is None:
