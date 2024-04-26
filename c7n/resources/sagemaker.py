@@ -433,7 +433,8 @@ class SagemakerModelBiasJobDefinition(QueryResourceManager):
         service = 'sagemaker'
         enum_spec = ('list_model_bias_job_definitions', 'JobDefinitionSummaries', None)
         detail_spec = (
-            'describe_model_bias_job_definition', 'JobDefinitionName', 'JobDefinitionName', None)
+            'describe_model_bias_job_definition', 'JobDefinitionName',
+            'MonitoringJobDefinitionName', None)
         arn = id = 'JobDefinitionArn'
         name = 'JobDefinitionName'
         date = 'CreationTime'
@@ -954,7 +955,8 @@ class SagemakerModelBiasJobDefinitionDelete(BaseAction):
 
         for d in definitions:
             try:
-                client.delete_model_bias_job_definition(JobDefinitionName=d['JobDefinitionName'])
+                client.delete_model_bias_job_definition(
+                    JobDefinitionName=d['JobDefinitionName'])
             except client.exceptions.ResourceNotFound:
                 pass
 

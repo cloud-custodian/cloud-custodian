@@ -227,11 +227,12 @@ ResourceMap = {
   "aws.sagemaker-endpoint-config": "c7n.resources.sagemaker.SagemakerEndpointConfig",
   "aws.sagemaker-job": "c7n.resources.sagemaker.SagemakerJob",
   "aws.sagemaker-model": "c7n.resources.sagemaker.Model",
-  "aws.sagemaker-model-bias-job-definition": "c7n.resources.sagemaker.ModelBiasJobDefinition",
   "aws.sagemaker-notebook": "c7n.resources.sagemaker.NotebookInstance",
   "aws.sagemaker-transform-job": "c7n.resources.sagemaker.SagemakerTransformJob",
   "aws.sagemaker-hyperparameter-tuning-job":
     "c7n.resources.sagemaker.SagemakerHyperParameterTuningJob",
+  "aws.sagemaker-model-bias-job-definition":
+    "c7n.resources.sagemaker.SagemakerModelBiasJobDefinition",
   "aws.scaling-policy": "c7n.resources.asg.ScalingPolicy",
   "aws.secrets-manager": "c7n.resources.secretsmanager.SecretsManager",
   "aws.security-group": "c7n.resources.vpc.SecurityGroup",
