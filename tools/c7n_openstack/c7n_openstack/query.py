@@ -27,7 +27,15 @@ class ResourceQuery:
         return self._invoke_client_enum(client, enum_op, params)
 
     def _invoke_client_enum(self, client, enum_op, params):
-        res = getattr(client, enum_op)(**params)
+        if isinstance(enum_op, list):
+            obj = client
+            res = []
+            for op in enum_op:
+                obj = getattr(obj, op)
+            for r in obj(**params):
+                res.append(r.toDict() if not isinstance(enum_op, dict) else r)
+        else:
+            res = getattr(client, enum_op)(**params)
         return res
 
 
@@ -63,15 +71,22 @@ class QueryMeta(type):
 
 
 class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
-    def __init__(self, data, options):
-        super(QueryResourceManager, self).__init__(data, options)
+
+    source_mapping = sources
+
+    def __init__(self, ctx, data):
+        super(QueryResourceManager, self).__init__(ctx, data)
         self.source = self.get_source(self.source_type)
 
     def get_permissions(self):
         return ()
 
     def get_source(self, source_type):
-        return sources.get(source_type)(self)
+        if source_type in self.source_mapping:
+            return self.source_mapping.get(source_type)(self)
+        if source_type in sources:
+            return sources.get(source_type)(self)
+        raise KeyError("Invalid Source %s" % source_type)
 
     def get_client(self):
         client = local_session(self.session_factory).client()
@@ -99,7 +114,7 @@ class QueryResourceManager(ResourceManager, metaclass=QueryMeta):
         return self.filter_resources(resources)
 
     def augment(self, resources):
-        return resources
+        return self.source.augment(resources)
 
 
 class TypeMeta(type):

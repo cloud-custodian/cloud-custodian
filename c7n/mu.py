@@ -419,7 +419,7 @@ class LambdaManager:
         for k in new_config:
             # Layers need special handling as they have extra info on describe.
             if k == 'Layers' and k in old_config and new_config[k]:
-                if sorted(new_config[k]) != sorted([l['Arn'] for l in old_config[k]]):
+                if sorted(new_config[k]) != sorted([lyr['Arn'] for lyr in old_config[k]]):
                     changed.append(k)
             # Vpc needs special handling as a dict with lists
             elif k == 'VpcConfig' and k in old_config and new_config[k]:
@@ -878,7 +878,7 @@ class PolicyLambda(AbstractLambdaFunction):
 
     @property
     def runtime(self):
-        return self.policy.data['mode'].get('runtime', 'python3.9')
+        return self.policy.data['mode'].get('runtime', 'python3.11')
 
     @property
     def memory_size(self):
@@ -1210,7 +1210,7 @@ class CloudWatchEventSource(AWSEventBase):
         func_arn = func.arn
 
         if func_arn.count(':') > 6:
-            func_arn, version = func_arn.rsplit(':', 1)
+            func_arn, _ = func_arn.rsplit(':', 1)
         for t in response['Targets']:
             if func_arn == t['Arn']:
                 found = True
@@ -1571,7 +1571,7 @@ class SNSSubscription:
         session = local_session(self.session_factory)
         lambda_client = session.client('lambda')
         for arn in self.topic_arns:
-            region, topic_name, statement_id = self._parse_arn(arn)
+            _, topic_name, statement_id = self._parse_arn(arn)
 
             log.info("Subscribing %s to %s" % (func.name, topic_name))
 
@@ -1600,7 +1600,7 @@ class SNSSubscription:
         sns_client = session.client('sns')
 
         for topic_arn in self.topic_arns:
-            region, topic_name, statement_id = self._parse_arn(topic_arn)
+            _, topic_name, statement_id = self._parse_arn(topic_arn)
 
             # if the function isn't deleted we need to do some cleanup
             if not func_deleted:
@@ -1690,7 +1690,7 @@ class ConfigRule(AWSEventBase):
         # config does not support versions/aliases on lambda funcs
         func_arn = func.arn
         if isinstance(func_arn, str) and func_arn.count(':') > 6:
-            func_arn, version = func_arn.rsplit(':', 1)
+            func_arn, _ = func_arn.rsplit(':', 1)
 
         params = dict(
             ConfigRuleName=func.name,

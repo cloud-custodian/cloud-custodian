@@ -1,0 +1,24 @@
+{
+    "status_code": 200,
+    "data": {
+        "Url": "accounts.google.com",
+        "ClientIDList": [
+            "644160558196-342342xasdasdasda-apps.googleusercontent.com"
+        ],
+        "ThumbprintList": [
+            "cf23df2207d99a74fbe169e3eba035e633b65d94"
+        ],
+        "CreateDate": {
+            "__class__": "datetime",
+            "year": 2023,
+            "month": 10,
+            "day": 14,
+            "hour": 3,
+            "minute": 51,
+            "second": 58,
+            "microsecond": 790000
+        },
+        "Tags": [],
+        "ResponseMetadata": {}
+    }
+}

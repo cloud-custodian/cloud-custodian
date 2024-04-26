@@ -146,6 +146,23 @@ class LambdaLayerTest(BaseTest):
 
 class LambdaTest(BaseTest):
 
+    def test_lambda_update_optimization(self):
+        factory = self.replay_flight_data('test_lambda_resize')
+        p = self.load_policy(
+            {
+                'name': 'lambda-update-resize',
+                'resource': 'lambda',
+                'filters': ['cost-optimization'],
+                'actions': ['update']
+            },
+            session_factory=factory
+        )
+        resources = p.run()
+        assert len(resources) == 1
+        client = factory().client('lambda')
+        function = client.get_function(FunctionName=resources[0]['FunctionName'])
+        assert function['Configuration']['MemorySize'] != resources[0]['MemorySize']
+
     def test_lambda_trim_versions(self):
         factory = self.replay_flight_data('test_lambda_trim_versions')
         client = factory().client('lambda')
@@ -188,6 +205,28 @@ class LambdaTest(BaseTest):
             session_factory=factory)
         resources = p.run()
         assert not resources
+
+        # Re-run, without respecting permission boundaries
+        p.data['filters'][1]['boundaries'] = False
+        resources = p.run()
+        assert len(resources) == 1
+
+    def test_lambda_has_specific_managed_policy(self):
+        # lots of pre-conditions, iam role with iam read only policy attached
+        # and a permission boundary with deny on iam read access.
+        factory = self.replay_flight_data('test_lambda_has_specific_managed_policy')
+        p = self.load_policy(
+            {
+                'name': 'lambda-check',
+                'resource': 'lambda',
+                'filters': [
+                    {'FunctionName': 'cfb-ygaovtob-fail'},
+                    {'type': 'has-specific-managed-policy',
+                     'value': 'AdministratorAccess'}]
+            },
+            session_factory=factory)
+        resources = p.run()
+        assert len(resources) == 1
 
         # Re-run, without respecting permission boundaries
         p.data['filters'][1]['boundaries'] = False
@@ -451,6 +490,40 @@ class LambdaTest(BaseTest):
             FunctionName=resources[0]['FunctionName'])
         self.assertEqual(response['Configuration']['TracingConfig']['Mode'], 'PassThrough')
 
+    def test_lambda_edge(self):
+        factory = self.replay_flight_data("test_aws_lambda_edge_filter")
+        p = self.load_policy(
+            {
+                "name": "lambda-edge-filter",
+                "resource": "lambda",
+                "filters": [{"type": "lambda-edge",
+                            "state": True}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
+        self.assertEqual(
+            [r["FunctionName"] for r in resources],
+            ["c7n-lambda-edge-new", "test-lambda-edge"])
+
+    def test_lambda_edge_multiple_associations_cache(self):
+        factory = self.replay_flight_data("test_lambda_edge_multiple_associations_cache")
+        p = self.load_policy(
+            {
+                "name": "lambda-edge-filter",
+                "resource": "lambda",
+                "filters": [{"type": "lambda-edge",
+                            "state": True}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
+        self.assertEqual(
+            [r["FunctionName"] for r in resources],
+            ["c7n-lambda-edge-new", "test-lambda-edge"])
+
 
 class LambdaTagTest(BaseTest):
 
@@ -713,4 +786,4 @@ def test_lambda_check_permission_deleted_role(test, aws_lambda_check_permissions
         session_factory=factory)
 
     resources = p.run()
-    test.assertEqual(len(resources), 1)
+    test.assertEqual(len(resources), 0)

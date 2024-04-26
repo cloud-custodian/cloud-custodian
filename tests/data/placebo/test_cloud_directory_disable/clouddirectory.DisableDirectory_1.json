@@ -1,0 +1,7 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "DirectoryArn": "arn:aws:clouddirectory:us-east-1:644160558196:directory/AZcvaFTzgUYLl7vFDgr8FJU"
+    }
+}

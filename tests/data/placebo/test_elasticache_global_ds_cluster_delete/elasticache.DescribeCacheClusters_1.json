@@ -1,0 +1,50 @@
+{
+    "status_code": 200,
+    "data": {
+        "CacheClusters": [
+            {
+                "CacheClusterId": "c7n-test-global-001",
+                "ClientDownloadLandingPage": "https://console.aws.amazon.com/elasticache/home#client-download:",
+                "CacheNodeType": "cache.m5.large",
+                "Engine": "redis",
+                "EngineVersion": "7.0.7",
+                "CacheClusterStatus": "available",
+                "NumCacheNodes": 1,
+                "PreferredAvailabilityZone": "us-east-1b",
+                "CacheClusterCreateTime": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 8,
+                    "day": 25,
+                    "hour": 22,
+                    "minute": 6,
+                    "second": 38,
+                    "microsecond": 192000
+                },
+                "PreferredMaintenanceWindow": "tue:06:00-tue:07:00",
+                "PendingModifiedValues": {},
+                "CacheSecurityGroups": [],
+                "CacheParameterGroup": {
+                    "CacheParameterGroupName": "global-datastore-c7n-test-globalesyd",
+                    "ParameterApplyStatus": "in-sync",
+                    "CacheNodeIdsToReboot": []
+                },
+                "CacheSubnetGroupName": "sandbox-dev-east-vpc-elasticache-subnet-group",
+                "AutoMinorVersionUpgrade": false,
+                "ReplicationGroupId": "c7n-test-global",
+                "SnapshotRetentionLimit": 0,
+                "SnapshotWindow": "09:30-10:30",
+                "AuthTokenEnabled": false,
+                "TransitEncryptionEnabled": true,
+                "AtRestEncryptionEnabled": true,
+                "ARN": "arn:aws:elasticache:us-east-1:644160558196:cluster:c7n-test-global-001",
+                "ReplicationGroupLogDeliveryEnabled": false,
+                "LogDeliveryConfigurations": [],
+                "NetworkType": "ipv4",
+                "IpDiscovery": "ipv4",
+                "TransitEncryptionMode": "required"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

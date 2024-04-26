@@ -54,6 +54,45 @@ class DynamodbTest(BaseTest):
         resources = p.run()
         self.assertEqual(resources[0]["TableName"], "c7n.DynamoDB.01")
 
+    def test_force_delete_dynamodb_tables(self):
+        session_factory = self.replay_flight_data("test_force_delete_dynamodb_tables")
+        client = session_factory().client("dynamodb")
+        self.patch(DeleteTable, "executor_factory", MainThreadExecutor)
+        p = self.load_policy(
+            {
+                "name": "delete-empty-tables",
+                "resource": "dynamodb-table",
+                "filters": [{"TableName": "c7n-test"}],
+                "actions": [
+                    {
+                        "type": "delete",
+                        "force": True
+                    }
+                ],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(resources[0]["DeletionProtectionEnabled"], True)
+        table = client.describe_table(TableName="c7n-test")["Table"]
+        self.assertEqual(table.get('TableStatus'), 'DELETING')
+
+    def test_update_tables(self):
+        session_factory = self.replay_flight_data("test_dynamodb_update_table")
+        client = session_factory().client("dynamodb")
+        p = self.load_policy(
+            {
+                "name": "update-empty-tables",
+                "resource": "dynamodb-table",
+                "actions": [{"type": "update", "BillingMode": "PAY_PER_REQUEST"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        assert resources[0]["TableName"] == "cc-testing-table"
+        t = client.describe_table(TableName="cc-testing-table")["Table"]
+        assert t["BillingModeSummary"]["BillingMode"] == "PAY_PER_REQUEST"
+
     def test_tag_filter(self):
         session_factory = self.replay_flight_data("test_dynamodb_tag_filter")
         client = session_factory().client("dynamodb")
@@ -104,8 +143,7 @@ class DynamodbTest(BaseTest):
                     {
                         "type": "continuous-backup",
                         "key": "PointInTimeRecoveryDescription.PointInTimeRecoveryStatus",
-                        "value": "ENABLED",
-                        "op": "ne"
+                        "value": "DISABLED",
                     }
                 ]
             },

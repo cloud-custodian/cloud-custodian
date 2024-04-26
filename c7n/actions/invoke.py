@@ -35,11 +35,11 @@ class LambdaInvoke(EventAction):
        function: my-function
        assume-role: iam-role-arn
 
-    Note if your synchronously invoking the lambda, you may also need
-    to configure the timeout, to avoid multiple invokes. The default
-    is 90s, if the lambda doesn't respond within that time the boto
+    Note, if you're synchronously invoking the lambda, you may also need
+    to configure the timeout to avoid multiple invocations. The default
+    timeout is 90s. If the lambda doesn't respond within that time, the boto
     sdk will invoke the lambda again with the same
-    arguments. Alternatively use async: true
+    arguments. Alternatively, use `async: true`
 
     """
     schema_alias = True

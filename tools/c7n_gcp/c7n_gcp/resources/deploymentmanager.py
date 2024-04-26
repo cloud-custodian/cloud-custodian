@@ -29,6 +29,19 @@ class DMDeployment(QueryResourceManager):
                 'get', {'project': resource_info['project_id'],
                         'deployment': resource_info['name']})
 
+    def augment(self, resources):
+        # normalize labels from array to mapping like other gcp resources.
+        for r in resources:
+            if isinstance(r.get('labels'), list):
+                r['labels'] = {l['key']: l['value'] for l in r['labels']}
+        return resources
+
+    def get_resource(self, resource_info):
+        resource = self.resource_type.get(self.get_client(), resource_info)
+        if resource:
+            self.augment((resource,))
+        return resource
+
 
 @DMDeployment.action_registry.register('delete')
 class DeleteInstanceGroupManager(MethodAction):

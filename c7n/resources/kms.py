@@ -19,6 +19,12 @@ from c7n.tags import universal_augment
 from .securityhub import PostFinding
 
 
+class DescribeAlias(DescribeSource):
+
+    def augment(self, resources):
+        return [r for r in resources if 'TargetKeyId' in r]
+
+
 @resources.register('kms')
 class KeyAlias(QueryResourceManager):
 
@@ -28,10 +34,9 @@ class KeyAlias(QueryResourceManager):
         enum_spec = ('list_aliases', 'Aliases', None)
         name = "AliasName"
         id = "AliasArn"
-        cfn_type = 'AWS::KMS::Alias'
+        config_type = cfn_type = 'AWS::KMS::Alias'
 
-    def augment(self, resources):
-        return [r for r in resources if 'TargetKeyId' in r]
+    source_mapping = {'describe': DescribeAlias, 'config': ConfigSource}
 
 
 class DescribeKey(DescribeSource):
@@ -108,6 +113,7 @@ class Key(QueryResourceManager):
         arn = 'Arn'
         universal_taggable = True
         cfn_type = config_type = 'AWS::KMS::Key'
+        permissions_augment = ("kms:ListResourceTags",)
 
     source_mapping = {
         'config': ConfigKey,
@@ -348,7 +354,7 @@ class RemovePolicyStatement(RemovePolicyBase):
             return
 
         p = json.loads(resource['Policy'])
-        statements, found = self.process_policy(
+        _, found = self.process_policy(
             p, resource, CrossAccountAccessFilter.annotation_key)
 
         if not found:

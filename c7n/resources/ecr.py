@@ -41,6 +41,7 @@ class ECR(QueryResourceManager):
         filter_type = 'list'
         config_type = cfn_type = 'AWS::ECR::Repository'
         dimension = 'RepositoryName'
+        permissions_augment = ("ecr:ListTagsForResource",)
 
     source_mapping = {
         'describe': DescribeECR,
@@ -114,10 +115,10 @@ ECR_POLICY_SCHEMA = {
             {'type': 'string'},
             {'type': 'object'}, {'type': 'array'}]},
         'NotPrincipal': {'anyOf': [{'type': 'object'}, {'type': 'array'}]},
-        'Action': {'anyOf': [{'type': 'string', 'pattern': '^ecr:[a-zA-Z]*$'},
-            {'type': 'array', 'items': {'type': 'string', 'pattern': '^ecr:[a-zA-Z]*$'}}]},
-        'NotAction': {'anyOf': [{'type': 'string', 'pattern': '^ecr:[a-zA-Z]*$'},
-            {'type': 'array', 'items': {'type': 'string', 'pattern': '^ecr:[a-zA-Z]*$'}}]},
+        'Action': {'anyOf': [{'type': 'string', 'pattern': '^ecr:([a-zA-Z]*|[*])$'},
+            {'type': 'array', 'items': {'type': 'string', 'pattern': '^ecr:([a-zA-Z]*|[*])$'}}]},
+        'NotAction': {'anyOf': [{'type': 'string', 'pattern': '^ecr:([a-zA-Z]*|[*])$'},
+            {'type': 'array', 'items': {'type': 'string', 'pattern': '^ecr:([a-zA-Z]*|[*])$'}}]},
         'Resource': {'anyOf': [{'type': 'string'}, {'type': 'array'}]},
         'NotResource': {'anyOf': [{'type': 'string'}, {'type': 'array'}]},
         'Condition': {'type': 'object'}

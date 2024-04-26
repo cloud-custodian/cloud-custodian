@@ -1,6 +1,7 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import copy
+from collections import UserString
 from datetime import datetime, timedelta
 from dateutil.tz import tzutc
 import json
@@ -16,8 +17,11 @@ import time
 from urllib import parse as urlparse
 from urllib.request import getproxies, proxy_bypass
 
-
 from dateutil.parser import ParserError, parse
+
+import jmespath
+from jmespath import functions
+from jmespath.parser import Parser, ParsedResult
 
 from c7n import config
 from c7n.exceptions import ClientError, PolicyValidationError
@@ -91,9 +95,9 @@ def loads(body):
 
 def dumps(data, fh=None, indent=0):
     if fh:
-        return json.dump(data, fh, cls=DateTimeEncoder, indent=indent)
+        return json.dump(data, fh, cls=JsonEncoder, indent=indent)
     else:
-        return json.dumps(data, cls=DateTimeEncoder, indent=indent)
+        return json.dumps(data, cls=JsonEncoder, indent=indent)
 
 
 def format_event(evt):
@@ -208,13 +212,15 @@ def type_schema(
     return s
 
 
-class DateTimeEncoder(json.JSONEncoder):
+class JsonEncoder(json.JSONEncoder):
 
     def default(self, obj):
         if isinstance(obj, datetime):
             return obj.isoformat()
         if isinstance(obj, FormatDate):
             return obj.datetime.isoformat()
+        if isinstance(obj, bytes):
+            return obj.decode('utf8', errors="ignore")
         return json.JSONEncoder.default(self, obj)
 
 
@@ -468,7 +474,7 @@ def backoff_delays(start, stop, factor=2.0, jitter=False):
     cur = start
     while cur <= stop:
         if jitter:
-            yield cur - (cur * random.random())
+            yield cur - (cur * random.random() / 5)
         else:
             yield cur
         cur = cur * factor
@@ -622,6 +628,32 @@ def parse_url_config(url):
     return conf
 
 
+def join_output_path(output_path, *parts):
+    # allow users to specify interpolated output paths
+    if '{' in output_path:
+        return output_path
+
+    if "://" not in output_path:
+        return os.path.join(output_path, *parts)
+
+    # handle urls with query strings
+    parsed = urlparse.urlparse(output_path)
+    updated_path = "/".join((parsed.path, *parts))
+    parts = list(parsed)
+    parts[2] = updated_path
+    return urlparse.urlunparse(parts)
+
+
+def get_policy_provider(policy_data):
+    if isinstance(policy_data['resource'], list):
+        provider_name, _ = policy_data['resource'][0].split('.', 1)
+    elif '.' in policy_data['resource']:
+        provider_name, _ = policy_data['resource'].split('.', 1)
+    else:
+        provider_name = 'aws'
+    return provider_name
+
+
 def get_proxy_url(url):
     proxies = getproxies()
     parsed = urlparse.urlparse(url)
@@ -654,6 +686,16 @@ def get_proxy_url(url):
     return None
 
 
+class DeferredFormatString(UserString):
+    """A string that returns itself when formatted
+
+    Let any format spec pass through. This lets us selectively defer
+    expansion of runtime variables without losing format spec details.
+    """
+    def __format__(self, format_spec):
+        return "".join(("{", self.data, f":{format_spec}" if format_spec else "", "}"))
+
+
 class FormatDate:
     """a datetime wrapper with extended pyformat syntax"""
 
@@ -661,6 +703,9 @@ class FormatDate:
 
     def __init__(self, d=None):
         self._d = d
+
+    def __str__(self):
+        return str(self._d)
 
     @property
     def datetime(self):
@@ -867,10 +912,12 @@ def get_eni_resource_type(eni):
         rtype = 'hsm'
     elif description.startswith('CloudHsm ENI'):
         rtype = 'hsmv2'
+    elif description.startswith('AWS Lambda VPC'):
+        rtype = 'lambda'
     elif description.startswith('AWS Lambda VPC ENI'):
         rtype = 'lambda'
     elif description.startswith('Interface for NAT Gateway'):
-        return 'nat'
+        rtype = 'nat'
     elif (description == 'RDSNetworkInterface' or
             description.startswith('Network interface for DBProxy')):
         rtype = 'rds'
@@ -880,6 +927,62 @@ def get_eni_resource_type(eni):
         rtype = 'tgw'
     elif description.startswith('VPC Endpoint Interface'):
         rtype = 'vpce'
+    elif description.startswith('aws-k8s-branch-eni'):
+        rtype = 'eks'
     else:
         rtype = 'unknown'
     return rtype
+
+
+class C7NJmespathFunctions(functions.Functions):
+    @functions.signature(
+        {'types': ['string']}, {'types': ['string']}
+    )
+    def _func_split(self, sep, string):
+        return string.split(sep)
+
+
+class C7NJMESPathParser(Parser):
+    def parse(self, expression):
+        result = super().parse(expression)
+        return ParsedResultWithOptions(
+            expression=result.expression,
+            parsed=result.parsed
+        )
+
+
+class ParsedResultWithOptions(ParsedResult):
+    def search(self, value, options=None):
+        # if options are explicitly passed in, we honor those
+        if not options:
+            options = jmespath.Options(custom_functions=C7NJmespathFunctions())
+        return super().search(value, options)
+
+
+def jmespath_search(*args, **kwargs):
+    return jmespath.search(
+        *args,
+        **kwargs,
+        options=jmespath.Options(custom_functions=C7NJmespathFunctions())
+    )
+
+
+def get_path(path: str, resource: dict):
+    """
+    This function provides a wrapper to obtain a value from a resource
+    in an efficient manner.
+    jmespath_search is expensive and it's rarely the case that
+    there is a path in the id field, therefore this wrapper is an optimisation.
+
+    :param path: the path or field name to fetch
+    :param resource: the resource instance description
+    :return: the field/path value
+    """
+    if '.' in path:
+        return jmespath_search(path, resource)
+    return resource[path]
+
+
+def jmespath_compile(expression):
+    parsed = C7NJMESPathParser().parse(expression)
+    return parsed

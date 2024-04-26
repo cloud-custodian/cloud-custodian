@@ -1,13 +1,148 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+import logging
 import time
-from .common import BaseTest, functional, event_data
+from .common import BaseTest, functional, event_data, load_data
 from unittest.mock import MagicMock
 
 from botocore.exceptions import ClientError as BotoClientError
 from c7n.exceptions import PolicyValidationError
 from c7n.resources.aws import shape_validate
 from pytest_terraform import terraform
+
+import pytest
+import jmespath
+
+
+@pytest.mark.audited
+@terraform('sg_used_cross_ref')
+def test_sg_used_cross_ref(test, sg_used_cross_ref):
+    aws_region = 'us-west-2'
+    factory = test.replay_flight_data('sg_used_cross_ref', region=aws_region)
+    p = test.load_policy({
+        'name': 'sg_used_cross_ref',
+        'resource': 'security-group',
+        'filters': ['used']
+    }, session_factory=factory)
+    unused = p.resource_manager.filters[0]
+    test.patch(
+        unused,
+        'get_scanners',
+        lambda: (("sg-perm-refs", unused.get_sg_refs),)
+    )
+    resources = p.run()
+    assert len(resources) == 1
+    assert resources[0]['GroupName'] == sg_used_cross_ref[
+        'aws_security_group.n2.name']
+
+
+@terraform('ec2_igw_subnet')
+def test_ec2_igw_subnet(test, ec2_igw_subnet):
+    aws_region = 'us-east-1'
+    session_factory = test.replay_flight_data('ec2_igw_subnet', region=aws_region)
+
+    p = test.load_policy(
+        {
+            'name': 'ec2_igw_subnet',
+            'resource': 'ec2',
+            'filters': [
+                {
+                    'type': 'subnet',
+                    'igw': True,
+                    'key': 'SubnetId',
+                    'value': 'present',
+                },
+            ],
+        },
+        session_factory=session_factory,
+        config={'region': aws_region},
+    )
+
+    resources = p.run()
+
+    result_instance_ids = set(i['InstanceId'] for i in resources)
+    expected_instance_ids = {
+        ec2_igw_subnet['aws_instance.public_auto_assigned.id'],
+        ec2_igw_subnet['aws_instance.public_primary_interface.id'],
+        ec2_igw_subnet['aws_instance.public_secondary_interface.id'],
+    }
+    assert len(resources) == len(expected_instance_ids)
+    assert expected_instance_ids == result_instance_ids
+
+
+@terraform('ec2_security_group_filter_multi_enis')
+def test_ec2_security_group_filter_multi_enis(test, ec2_security_group_filter_multi_enis):
+    aws_region = 'us-east-1'
+    session_factory = test.replay_flight_data(
+        'ec2_security_group_filter_multi_enis', region=aws_region)
+
+    p = test.load_policy(
+        {
+            'name': 'ec2_security_group_filter_multi_enis',
+            'resource': 'ec2',
+            'filters': [
+                {
+                    'type': 'security-group',
+                    'key': 'length(IpPermissions[]|[?IpRanges[?CidrIp==`0.0.0.0/0`]])',
+                    'op': 'greater-than',
+                    'value': 0,
+                },
+            ],
+        },
+        session_factory=session_factory,
+        config={'region': aws_region},
+    )
+
+    resources = p.run()
+
+    result_instance_ids = set(i['InstanceId'] for i in resources)
+    expected_instance_ids = {
+        ec2_security_group_filter_multi_enis['aws_instance.primary_interface.id'],
+        ec2_security_group_filter_multi_enis['aws_instance.secondary_interface.id'],
+    }
+    assert len(resources) == len(expected_instance_ids)
+    assert expected_instance_ids == result_instance_ids
+
+
+def test_vpc_usage(test):
+    factory = test.replay_flight_data(
+        'test_vpc_usage_detect_set', region='us-west-1')
+    p = test.load_policy({
+        'name': 'vpc-usage',
+        'resource': 'aws.vpc',
+        'filters': [
+            {'type': 'vpc-attributes',
+             'addressusage': False}],
+        'actions': [
+            {'type': 'modify',
+             'addressusage': True}],
+        }, session_factory=factory)
+    resources = p.run()
+    assert len(resources) == 1
+    client = factory().client('ec2')
+    result = client.describe_vpc_attribute(
+        VpcId=resources[0]['VpcId'],
+        Attribute='enableNetworkAddressUsageMetrics')
+    assert result['EnableNetworkAddressUsageMetrics']['Value'] is True
+
+
+def test_vpc_usage_metric(test):
+    factory = test.replay_flight_data(
+        'test_vpc_usage_metrics', region='us-west-1')
+    p = test.load_policy({
+        'name': 'vpc-usage',
+        'resource': 'aws.vpc',
+        'filters': [
+            {'type': 'metrics',
+             'statistics': 'Maximum',
+             'value': 0,
+             'op': 'gte',
+             'missing-value': 0,
+             'days': 2,
+             'name': 'NetworkAddressUsage'}
+        ]}, session_factory=factory)
+    resources = p.run()
+    assert resources[0]['VpcId'] == 'vpc-6d20940b'
 
 
 def test_eni_igw_subnet(test):
@@ -178,7 +313,6 @@ class VpcTest(BaseTest):
         factory = self.replay_flight_data("test_vpc_flow_logs_misconfigured")
 
         vpc_id1 = "vpc-4a9ff72e"
-
         traffic_type = "all"
         log_group = "/aws/lambda/myIOTFunction"
         status = "active"
@@ -207,7 +341,7 @@ class VpcTest(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        self.assertEqual(resources[0]["VpcId"], vpc_id1)
+        self.assertEqual(resources[0]['VpcId'], vpc_id1)
 
     def test_eni_vpc_filter(self):
         self.session_factory = self.replay_flight_data("test_eni_vpc_filter")
@@ -230,7 +364,9 @@ class VpcTest(BaseTest):
                 "name": "dns-hostnames-and-support-enabled",
                 "resource": "vpc",
                 "filters": [
-                    {"type": "vpc-attributes", "dnshostnames": True, "dnssupport": True}
+                    {"type": "vpc-attributes",
+                     "dnshostnames": True,
+                     "dnssupport": True}
                 ],
             },
             session_factory=self.session_factory,
@@ -312,6 +448,67 @@ class VpcTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 2)
         self.assertTrue("subnet-068dfbf3f275a6ae8" in resources[0]["c7n:matched-vpc-endpoint"])
+
+    def test_subnet_ip_address_usage_filter(self):
+        factory = self.replay_flight_data("test_subnet_ip_address_usage_filter", region="us-east-2")
+        p = self.load_policy(
+            {
+                "name": "subnet-no-ips-used",
+                "resource": "aws.subnet",
+                "filters": [
+                    {
+                        "type": "ip-address-usage",
+                        "key": "NumberUsed",
+                        "value": 0,
+                    }
+                ],
+            },
+            session_factory=factory,
+            config={"region": "us-east-2"},
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
+
+        p = self.load_policy(
+            {
+                "name": "subnet-almost-full",
+                "resource": "aws.subnet",
+                "filters": [
+                    {
+                        "type": "ip-address-usage",
+                        "key": "PercentUsed",
+                        "op": "greater-than",
+                        "value": 90,
+                    }
+                ],
+            },
+            session_factory=factory,
+            config={"region": "us-east-2"},
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_endpoint_policy_filter(self):
+        factory = self.replay_flight_data("test_endpoint_policy_filter")
+        p = self.load_policy(
+            {
+                "name": "endpoint-policy-filter",
+                "resource": "vpc-endpoint",
+                "filters": [
+                    {
+                        "type": "has-statement",
+                        "statements": [{
+                            "Effect": "Allow",
+                            "Action": "*"
+                        }],
+                    }
+                ],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertTrue("vpce-011d813b183878b82" in resources[0]["VpcEndpointId"])
 
 
 class NetworkLocationTest(BaseTest):
@@ -659,6 +856,279 @@ class NetworkLocationTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 0)
 
+    @functional
+    def test_network_location_match_in_triple_intersect(self):
+        self.factory = self.replay_flight_data("test_network_location_match_in_triple_intersect")
+        client = self.factory().client("ec2")
+        vpc_id = client.create_vpc(CidrBlock="10.4.0.0/16")["Vpc"]["VpcId"]
+        self.addCleanup(client.delete_vpc, VpcId=vpc_id)
+
+        web_sub_id = client.create_subnet(VpcId=vpc_id, CidrBlock="10.4.9.0/24")[
+            "Subnet"
+        ][
+            "SubnetId"
+        ]
+        self.addCleanup(client.delete_subnet, SubnetId=web_sub_id)
+
+        web_sg_id = client.create_security_group(
+            GroupName="web-tier", VpcId=vpc_id, Description="for apps"
+        )[
+            "GroupId"
+        ]
+        self.addCleanup(client.delete_security_group, GroupId=web_sg_id)
+
+        nic = client.create_network_interface(SubnetId=web_sub_id, Groups=[web_sg_id])[
+            "NetworkInterface"
+        ][
+            "NetworkInterfaceId"
+        ]
+        self.addCleanup(client.delete_network_interface, NetworkInterfaceId=nic)
+
+        client.create_tags(
+            Resources=[web_sg_id],
+            Tags=[{"Key": "Location", "Value": "web1"}],
+        )
+        client.create_tags(
+            Resources=[web_sub_id],
+            Tags=[{"Key": "Location", "Value": "web2"}],
+        )
+        client.create_tags(
+            Resources=[nic],
+            Tags=[{"Key": "Location", "Value": "web3"}],
+        )
+        p = self.load_policy(
+            {
+                "name": "netloc",
+                "resource": "eni",
+                "filters": [
+                    {"NetworkInterfaceId": nic},
+                    {"type": "network-location",
+                     "key": "tag:Location",
+                     "match": "in",
+                     "value": ["web1", "web2", "web3"]},
+                ],
+            },
+            session_factory=self.factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    @functional
+    def test_network_location_match_in_mismatch(self):
+        self.factory = self.replay_flight_data("test_network_location_match_in_mismatch")
+        client = self.factory().client("ec2")
+        vpc_id = client.create_vpc(CidrBlock="10.4.0.0/16")["Vpc"]["VpcId"]
+        self.addCleanup(client.delete_vpc, VpcId=vpc_id)
+
+        web_sub_id = client.create_subnet(VpcId=vpc_id, CidrBlock="10.4.9.0/24")[
+            "Subnet"
+        ][
+            "SubnetId"
+        ]
+        self.addCleanup(client.delete_subnet, SubnetId=web_sub_id)
+
+        web_sg_id = client.create_security_group(
+            GroupName="web-tier", VpcId=vpc_id, Description="for apps"
+        )[
+            "GroupId"
+        ]
+        self.addCleanup(client.delete_security_group, GroupId=web_sg_id)
+
+        nic = client.create_network_interface(SubnetId=web_sub_id, Groups=[web_sg_id])[
+            "NetworkInterface"
+        ][
+            "NetworkInterfaceId"
+        ]
+        self.addCleanup(client.delete_network_interface, NetworkInterfaceId=nic)
+
+        client.create_tags(
+            Resources=[web_sg_id, web_sub_id],
+            Tags=[{"Key": "Location", "Value": "web"}],
+        )
+        client.create_tags(
+            Resources=[nic],
+            Tags=[{"Key": "Location", "Value": "invalid"}],
+        )
+        p = self.load_policy(
+            {
+                "name": "netloc",
+                "resource": "eni",
+                "filters": [
+                    {"NetworkInterfaceId": nic},
+                    {"type": "network-location",
+                     "key": "tag:Location",
+                     "match": "in",
+                     "value": ["web"]},
+                ],
+            },
+            session_factory=self.factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
+    @functional
+    def test_network_location_match_in_mismatch_subnet(self):
+        self.factory = self.replay_flight_data("test_network_location_match_in_mismatch_subnet")
+        client = self.factory().client("ec2")
+        vpc_id = client.create_vpc(CidrBlock="10.4.0.0/16")["Vpc"]["VpcId"]
+        self.addCleanup(client.delete_vpc, VpcId=vpc_id)
+
+        web_sub_id = client.create_subnet(VpcId=vpc_id, CidrBlock="10.4.9.0/24")[
+            "Subnet"
+        ][
+            "SubnetId"
+        ]
+        self.addCleanup(client.delete_subnet, SubnetId=web_sub_id)
+
+        web_sg_id = client.create_security_group(
+            GroupName="web-tier", VpcId=vpc_id, Description="for apps"
+        )[
+            "GroupId"
+        ]
+        self.addCleanup(client.delete_security_group, GroupId=web_sg_id)
+
+        nic = client.create_network_interface(SubnetId=web_sub_id, Groups=[web_sg_id])[
+            "NetworkInterface"
+        ][
+            "NetworkInterfaceId"
+        ]
+        self.addCleanup(client.delete_network_interface, NetworkInterfaceId=nic)
+
+        client.create_tags(
+            Resources=[web_sg_id],
+            Tags=[{"Key": "Location", "Value": "web1"}],
+        )
+        client.create_tags(
+            Resources=[nic],
+            Tags=[{"Key": "Location", "Value": "web2"}],
+        )
+        client.create_tags(
+            Resources=[web_sub_id],
+            Tags=[{"Key": "Location", "Value": "invalid"}],
+        )
+        p = self.load_policy(
+            {
+                "name": "netloc",
+                "resource": "eni",
+                "filters": [
+                    {"NetworkInterfaceId": nic},
+                    {"type": "network-location",
+                     "key": "tag:Location",
+                     "match": "in",
+                     "value": ["web1", "web2"]},
+                ],
+            },
+            session_factory=self.factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
+    @functional
+    def test_network_location_match_in_mismatch_sg(self):
+        self.factory = self.replay_flight_data("test_network_location_match_in_mismatch_sg")
+        client = self.factory().client("ec2")
+        vpc_id = client.create_vpc(CidrBlock="10.4.0.0/16")["Vpc"]["VpcId"]
+        self.addCleanup(client.delete_vpc, VpcId=vpc_id)
+
+        web_sub_id = client.create_subnet(VpcId=vpc_id, CidrBlock="10.4.9.0/24")[
+            "Subnet"
+        ][
+            "SubnetId"
+        ]
+        self.addCleanup(client.delete_subnet, SubnetId=web_sub_id)
+
+        web_sg_id = client.create_security_group(
+            GroupName="web-tier", VpcId=vpc_id, Description="for apps"
+        )[
+            "GroupId"
+        ]
+        self.addCleanup(client.delete_security_group, GroupId=web_sg_id)
+
+        nic = client.create_network_interface(SubnetId=web_sub_id, Groups=[web_sg_id])[
+            "NetworkInterface"
+        ][
+            "NetworkInterfaceId"
+        ]
+        self.addCleanup(client.delete_network_interface, NetworkInterfaceId=nic)
+
+        client.create_tags(
+            Resources=[web_sub_id],
+            Tags=[{"Key": "Location", "Value": "invalid"}],
+        )
+        client.create_tags(
+            Resources=[nic],
+            Tags=[{"Key": "Location", "Value": "web1"}],
+        )
+        client.create_tags(
+            Resources=[web_sg_id],
+            Tags=[{"Key": "Location", "Value": "web2"}],
+        )
+        p = self.load_policy(
+            {
+                "name": "netloc",
+                "resource": "eni",
+                "filters": [
+                    {"NetworkInterfaceId": nic},
+                    {"type": "network-location",
+                     "key": "tag:Location",
+                     "match": "in",
+                     "value": ["web1", "web2"]},
+                ],
+            },
+            session_factory=self.factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
+    @functional
+    def test_network_location_match_in_subnet_missing_ok(self):
+        self.factory = self.replay_flight_data("test_network_location_match_in_subnet_missing_ok")
+        client = self.factory().client("ec2")
+        vpc_id = client.create_vpc(CidrBlock="10.4.0.0/16")["Vpc"]["VpcId"]
+        self.addCleanup(client.delete_vpc, VpcId=vpc_id)
+
+        web_sub_id = client.create_subnet(VpcId=vpc_id, CidrBlock="10.4.9.0/24")[
+            "Subnet"
+        ][
+            "SubnetId"
+        ]
+        self.addCleanup(client.delete_subnet, SubnetId=web_sub_id)
+
+        web_sg_id = client.create_security_group(
+            GroupName="web-tier", VpcId=vpc_id, Description="for apps"
+        )[
+            "GroupId"
+        ]
+        self.addCleanup(client.delete_security_group, GroupId=web_sg_id)
+
+        nic = client.create_network_interface(SubnetId=web_sub_id, Groups=[web_sg_id])[
+            "NetworkInterface"
+        ][
+            "NetworkInterfaceId"
+        ]
+        self.addCleanup(client.delete_network_interface, NetworkInterfaceId=nic)
+
+        client.create_tags(
+            Resources=[nic],
+            Tags=[{"Key": "Location", "Value": "web"}],
+        )
+        p = self.load_policy(
+            {
+                "name": "netloc",
+                "resource": "eni",
+                "filters": [
+                    {"NetworkInterfaceId": nic},
+                    {"type": "network-location",
+                     "key": "tag:Location",
+                     "match": "in",
+                     "value": ["web"]},
+                ],
+            },
+            session_factory=self.factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 0)
+
 
 class NetworkAclTest(BaseTest):
 
@@ -748,6 +1218,29 @@ class TransitGatewayTest(BaseTest):
         self.assertEqual(len(resources), 1)
 
 
+def test_tgw_attachment_metrics_filter(test):
+    factory = test.replay_flight_data("test_tgw_attachment_metrics_filter")
+    p = test.load_policy(
+        {
+            "name": "tgw_attachment-idle",
+            "resource": "aws.transit-attachment",
+            "filters": [
+                {
+                    "type": "metrics",
+                    "name": "BytesIn",
+                    "op": "le",
+                    "value": 0,
+                    "statistics": "Sum",
+                    "days": 1
+                }
+            ],
+        },
+        session_factory=factory,
+    )
+    resources = p.run()
+    test.assertEqual(len(resources), 1)
+
+
 class NetworkInterfaceTest(BaseTest):
 
     def test_and_or_nest(self):
@@ -786,6 +1279,135 @@ class NetworkInterfaceTest(BaseTest):
         self.assertEqual(
             [k for k in resources[0] if k.startswith("c7n")], ["c7n:MatchedFilters"]
         )
+
+    def test_interface_detach(self):
+        session_factory = self.replay_flight_data("test_network_interface_detach")
+        client = session_factory().client("ec2")
+        eni = "eni-0605e38e04785b878"
+        instance = "i-05fccf7da99ad47f7"
+
+        p = self.load_policy(
+            {
+                "name": "detach-enis",
+                "resource": "eni",
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": "NetworkInterfaceId",
+                        "value": eni,
+                    },
+                    {
+                        "type": "value",
+                        "key": "Attachment.InstanceId",
+                        "value": "present",
+                    },
+                    {
+                        "type": "value",
+                        "key": "Association.PublicIp",
+                        "value": "present",
+                    },
+                ],
+                "actions": [
+                    {
+                        "type": "detach",
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+        response = client.describe_instances(InstanceIds=[instance])
+        self.assertEqual(len(response["Reservations"][0]["Instances"][0]["NetworkInterfaces"]), 2)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        if self.recording:
+            time.sleep(30)
+        response = client.describe_instances(InstanceIds=[instance])
+        self.assertEqual(len(response["Reservations"][0]["Instances"][0]["NetworkInterfaces"]), 1)
+
+    def test_interface_detach_primary_nic_1(self):
+        session_factory = self.replay_flight_data("test_interface_detach_primary_nic_1")
+        client = session_factory().client("ec2")
+        eni = "eni-007ebb46d3795b43b"
+        instance = "i-042c20d5454745bbe"
+
+        p = self.load_policy(
+            {
+                "name": "detach-enis",
+                "resource": "eni",
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": "NetworkInterfaceId",
+                        "value": eni,
+                    },
+                    {
+                        "type": "value",
+                        "key": "Attachment.InstanceId",
+                        "value": "present",
+                    },
+                    {
+                        "type": "value",
+                        "key": "Association.PublicIp",
+                        "value": "present",
+                    },
+                ],
+                "actions": [
+                    {
+                        "type": "detach",
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+        response = client.describe_instances(InstanceIds=[instance])
+        self.assertEqual(len(response["Reservations"][0]["Instances"][0]["NetworkInterfaces"]), 1)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        response = client.describe_instances(InstanceIds=[instance])
+        self.assertEqual(len(response["Reservations"][0]["Instances"][0]["NetworkInterfaces"]), 1)
+
+    def test_interface_detach_primary_nic_2(self):
+        session_factory = self.replay_flight_data("test_interface_detach_primary_nic_2")
+        client = session_factory().client("ec2")
+
+        p = self.load_policy(
+            {
+                "name": "detach-enis",
+                "resource": "eni",
+                "filters": [
+                    {
+                        "type": "value",
+                        "key": "Attachment.InstanceId",
+                        "value": "present",
+                    },
+                    {
+                        "type": "value",
+                        "key": "Association.PublicIp",
+                        "value": "present",
+                    },
+                ],
+                "actions": [
+                    {
+                        "type": "detach",
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+        response = client.describe_instances()
+        self.assertEqual(
+            len(jmespath.search(
+                'Reservations[].Instances[].NetworkInterfaces[].NetworkInterfaceId',
+                response)), 3)
+        resources = p.run()
+        if self.recording:
+            time.sleep(30)
+        self.assertEqual(len(resources), 3)
+        response = client.describe_instances()
+        self.assertEqual(
+            len(jmespath.search(
+                'Reservations[].Instances[].NetworkInterfaces[].NetworkInterfaceId'
+                , response)), 2)
 
     def test_interface_delete(self):
         factory = self.replay_flight_data("test_network_interface_delete")
@@ -1042,6 +1664,86 @@ class NetworkAddrTest(BaseTest):
         )
 
         self.assert_policy_release_failed(factory, ec2, network_addrs["Addresses"][0])
+
+    def test_eip_shield(self):
+        session_factory = self.replay_flight_data("test_eip_shield")
+        p = self.load_policy(
+            {
+                "name": "eip-shield",
+                "resource": "network-addr",
+                "filters": [
+                    {"type": "shield-enabled", "state": False},
+                ],
+                "actions": ["set-shield"],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_address_disassociate(self):
+        session_factory = self.replay_flight_data("test_address_disassociate")
+        client = session_factory().client("ec2")
+        allocation_id = "eipalloc-02b147389a1522f9d"
+
+        p = self.load_policy(
+            {
+                "name": "disassociate-network-addr",
+                "resource": "network-addr",
+                "filters": [
+                    {
+                        "AllocationId": allocation_id
+                    }
+                ],
+                "actions": [
+                    {
+                        "type": "disassociate"
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+        pre_response = client.describe_addresses(AllocationIds=[allocation_id])
+        self.assertIn("AssociationId", pre_response["Addresses"][0])
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        if self.recording:
+            time.sleep(5)
+        post_response = client.describe_addresses(AllocationIds=[allocation_id])
+        self.assertNotIn("AssociationId", post_response["Addresses"][0])
+
+    def test_address_disassociate_exception(self):
+        session_factory = self.replay_flight_data("test_address_disassociate_exception")
+        client = session_factory().client("ec2")
+        allocation_id = "eipalloc-064c7be63c6334ade"
+        association_id = "eipassoc-0478441923b77b671"
+
+        p = self.load_policy(
+            {
+                "name": "disassociate-network-addr",
+                "resource": "network-addr",
+                "filters": [
+                    {
+                        "AllocationId": allocation_id
+                    }
+                ],
+                "actions": [
+                    {
+                        "type": "disassociate"
+                    }
+                ]
+            },
+            session_factory=session_factory,
+        )
+        pre_response = client.describe_addresses(AllocationIds=[allocation_id])
+        self.assertIn("AssociationId", pre_response["Addresses"][0])
+        client.disassociate_address(AssociationId=association_id)
+        if self.recording:
+            time.sleep(5)
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        post_response = client.describe_addresses(AllocationIds=[allocation_id])
+        self.assertNotIn("AssociationId", post_response["Addresses"][0])
 
 
 class RouteTableTest(BaseTest):
@@ -1308,6 +2010,16 @@ class SecurityGroupTest(BaseTest):
             ],
         )
 
+    def test_used_consumer_eni_in_producer(self):
+        p = self.load_policy(
+            {"name": "sg-used", "resource": "security-group", "filters": ["used"]},
+        )
+        used = p.resource_manager.filters[0]
+        used.nics = load_data('ram-producer-view-consumer-eni.json')['NetworkInterfaces']
+
+        group_enis = used._get_eni_attributes()
+        assert set(group_enis) == {'sg-123', 'sg-456', 'sg-789'}
+
     def test_used(self):
         factory = self.replay_flight_data("test_security_group_used")
         p = self.load_policy(
@@ -1315,14 +2027,14 @@ class SecurityGroupTest(BaseTest):
             session_factory=factory,
         )
         resources = p.run()
-        self.assertEqual(len(resources), 5)
+        self.assertEqual(len(resources), 3)
         self.assertEqual(
-            {"sg-f9cc4d9f", "sg-13de8f75", "sg-ce548cb7", "sg-0a2cb503a229c31c1", "sg-1c8a186c"},
+            {"sg-f9cc4d9f", "sg-0a2cb503a229c31c1", "sg-1c8a186c"},
             {r["GroupId"] for r in resources},
         )
-        self.assertIn("amazon-aws", resources[2]["c7n:InstanceOwnerIds"])
-        self.assertIn("vpc_endpoint", resources[2]["c7n:InterfaceTypes"])
-        self.assertIn("ec2", resources[2]["c7n:InterfaceResourceTypes"])
+        self.assertIn("amazon-aws", resources[0]["c7n:InstanceOwnerIds"])
+        self.assertIn("vpc_endpoint", resources[0]["c7n:InterfaceTypes"])
+        self.assertIn("ec2", resources[0]["c7n:InterfaceResourceTypes"])
 
     def test_unused_ecs(self):
         factory = self.replay_flight_data("test_security_group_ecs_unused")
@@ -1342,6 +2054,26 @@ class SecurityGroupTest(BaseTest):
         resources = p.run()
         assert resources == []
 
+    def test_unused_batch(self):
+        factory = self.replay_flight_data("test_security_group_batch_unused")
+        # 2 security groups in this flight data:
+        # * sg-0f026884bba48e351 (used by the compute environment)
+        # * sg-e2842c8b (not used -> should be returned as such)
+        p = self.load_policy(
+            {'name': 'sg-xyz',
+             'resource': 'security-group',
+             'filters': ['unused']},
+            session_factory=factory)
+        unused = p.resource_manager.filters[0]
+        self.patch(
+            unused,
+            'get_scanners',
+            lambda: (('batch', unused.get_batch_sgs),))
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertNotEqual(resources[0]["GroupId"], "sg-0f026884bba48e351")  # used
+        self.assertEqual(resources[0]["GroupId"], "sg-e2842c8b")             # not used
+
     def test_unused(self):
         factory = self.replay_flight_data("test_security_group_unused")
         p = self.load_policy(
@@ -1349,7 +2081,7 @@ class SecurityGroupTest(BaseTest):
             session_factory=factory,
         )
         resources = p.run()
-        self.assertEqual(len(resources), 1)
+        self.assertEqual(len(resources), 2)
 
     def test_match_resource_validator(self):
 
@@ -2885,6 +3617,29 @@ class EndpointTest(BaseTest):
              'ec2:RevokeSecurityGroupEgress'))
 
 
+def test_endpoint_metrics_filter(test):
+    factory = test.replay_flight_data("test_vpc_endpoint_metrics_filter")
+    p = test.load_policy(
+        {
+            "name": "vpc_endpoint-idle",
+            "resource": "aws.vpc-endpoint",
+            "filters": [
+                {
+                    "type": "metrics",
+                    "name": "ActiveConnections",
+                    "op": "le",
+                    "value": 0,
+                    "statistics": "Sum",
+                    "days": 1
+                }
+            ],
+        },
+        session_factory=factory,
+    )
+    resources = p.run()
+    test.assertEqual(len(resources), 0)
+
+
 class InternetGatewayTest(BaseTest):
 
     def test_delete_internet_gateways(self):
@@ -2929,6 +3684,26 @@ class InternetGatewayTest(BaseTest):
         except BotoClientError:
             self.fail('should not raise')
         mock_factory().client('ec2').delete_internet_gateway.assert_called_once()
+
+    def test_delete_internet_gateway_with_dependencies(self):
+        factory = self.replay_flight_data(
+            "test_internet_gateway_delete_with_dependencies",
+            region="us-east-2"
+        )
+        p = self.load_policy(
+            {
+                "name": "delete-internet-gateway-with-dependencies",
+                "resource": "internet-gateway",
+                "filters": [{"tag:Name": "dev"}],
+                "actions": [{"type": "delete"}],
+            },
+            session_factory=factory,
+            config={"region": "us-east-2"},
+        )
+        with self.capture_logging("custodian.actions", level=logging.WARNING) as log_output:
+            resources = p.run()
+            self.assertEqual(len(resources), 1)
+            self.assertRegex(log_output.getvalue(), "DependencyViolation error")
 
 
 class NATGatewayTest(BaseTest):
@@ -3102,42 +3877,6 @@ class FlowLogsTest(BaseTest):
         self.assertEqual(resources[0]['c7n:flow-logs'][0]['LogDestination'],
                          'arn:aws:s3:::c7n-vpc-flow-logs')
 
-    def test_vpc_set_flow_logs_validation(self):
-        with self.assertRaises(PolicyValidationError) as e:
-            self.load_policy({
-                'name': 'flow-set-validate-1',
-                'resource': 'vpc',
-                'actions': [{
-                    'type': 'set-flow-log',
-                    'LogDestination': 'arn:aws:s3:::c7n-vpc-flow-logs/test/'
-                }]})
-        self.assertIn(
-            "DeliverLogsPermissionArn missing", str(e.exception))
-        with self.assertRaises(PolicyValidationError) as e:
-            self.load_policy({
-                'name': 'flow-set-validate-2',
-                'resource': 'vpc',
-                'actions': [{
-                    'type': 'set-flow-log',
-                    'DeliverLogsPermissionArn': 'arn:aws:iam',
-                    'LogGroupName': '/cloudwatch/logs',
-                    'LogDestination': 'arn:aws:s3:::c7n-vpc-flow-logs/test/'
-                }]})
-        self.assertIn("Exactly one of", str(e.exception))
-        with self.assertRaises(PolicyValidationError) as e:
-            self.load_policy({
-                'name': 'flow-set-validate-3',
-                'resource': 'vpc',
-                'actions': [{
-                    'type': 'set-flow-log',
-                    'LogDestinationType': 's3',
-                    'DeliverLogsPermissionArn': 'arn:aws:iam',
-                    'LogDestination': 'arn:aws:s3:::c7n-vpc-flow-logs/test/'
-                }]})
-        self.assertIn(
-            "DeliverLogsPermissionArn is prohibited for destination-type:s3",
-            str(e.exception))
-
     def test_vpc_set_flow_logs_s3(self):
         session_factory = self.replay_flight_data("test_vpc_set_flow_logs_s3")
         p = self.load_policy(
@@ -3276,6 +4015,38 @@ class TestUnusedKeys(BaseTest):
         self.assertNotEqual(unused_key, keys)
         self.assertEqual(used_key, keys)
 
+    def test_unused_keypair_with_asg_launch_templates(self):
+        factory = self.replay_flight_data('test_unused_keypair_launch_template')
+        p = self.load_policy(
+            {"name": "test-unused-keypairs", "resource": "key-pair", "filters": ["unused"]},
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['KeyName'], 'delete')
+
+    def test_unused_keypair_true(self):
+        factory = self.replay_flight_data("test_unused_keypair")
+        p = self.load_policy(
+            {"name": "test-unused-keypairs", "resource": "key-pair", "filters": ["unused"]},
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+    def test_unused_keypair_false(self):
+        factory = self.replay_flight_data("test_unused_keypair")
+        p = self.load_policy(
+            {
+                "name": "test-unused-keypairs",
+                "resource": "key-pair",
+                "filters": [{"type": "unused", "state": False}],
+            },
+            session_factory=factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
     def test_vpc_unused_key_not_filtered_error(self):
         with self.assertRaises(PolicyValidationError):
             self.load_policy(
@@ -3411,3 +4182,26 @@ class TrafficMirror(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["TrafficMirrorTargetId"], "tmt-02cc3955d41358894")
         self.assertEqual(resources[0]['Tags'], [{"Key": "Owner", "Value": "pratyush"}])
+
+
+@terraform("vpc_delete")
+def test_vpc_delete(test, vpc_delete):
+    factory = test.replay_flight_data("test_vpc_delete")
+    p = test.load_policy(
+        {
+            "name": "delete-vpc",
+            "resource": "vpc",
+            "filters": [{"tag:Name": "c7n-test"}],
+            "actions": [{"type": "delete-empty"}],
+        },
+        session_factory=factory,
+    )
+    resources = p.run()
+    test.assertEqual(len(resources), 1)
+    client = factory(region="us-east-1").client("ec2")
+    vpcs = client.describe_vpcs(
+        Filters=[{"Name": "resource-id", "Values": [resources[0]["VpcId"]]}]
+    )[
+        "Vpcs"
+    ]
+    test.assertFalse(vpcs)

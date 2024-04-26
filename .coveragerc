@@ -1,7 +1,2 @@
 [run]
-omit =
-    # vendored file
-	c7n/ipaddress.py
-
-    # coverage too thin
-	tools/
+omit = c7n/vendored/*

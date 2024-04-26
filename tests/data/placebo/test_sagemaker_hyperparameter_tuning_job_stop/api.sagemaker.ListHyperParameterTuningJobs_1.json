@@ -1,0 +1,50 @@
+{
+    "status_code": 200,
+    "data": {
+        "HyperParameterTuningJobSummaries": [
+            {
+                "HyperParameterTuningJobName": "c7n-test-4",
+                "HyperParameterTuningJobArn": "arn:aws:sagemaker:us-east-1:644160558196:hyper-parameter-tuning-job/c7n-test-4",
+                "HyperParameterTuningJobStatus": "InProgress",
+                "Strategy": "Bayesian",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 4,
+                    "day": 10,
+                    "hour": 10,
+                    "minute": 39,
+                    "second": 40,
+                    "microsecond": 517000
+                },
+                "LastModifiedTime": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 4,
+                    "day": 10,
+                    "hour": 10,
+                    "minute": 40,
+                    "second": 43,
+                    "microsecond": 811000
+                },
+                "TrainingJobStatusCounters": {
+                    "Completed": 0,
+                    "InProgress": 3,
+                    "RetryableError": 0,
+                    "NonRetryableError": 0,
+                    "Stopped": 0
+                },
+                "ObjectiveStatusCounters": {
+                    "Succeeded": 0,
+                    "Pending": 3,
+                    "Failed": 0
+                },
+                "ResourceLimits": {
+                    "MaxNumberOfTrainingJobs": 20,
+                    "MaxParallelTrainingJobs": 3
+                }
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

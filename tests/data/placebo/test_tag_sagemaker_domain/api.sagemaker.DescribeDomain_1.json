@@ -1,0 +1,77 @@
+{
+    "status_code": 200,
+    "data": {
+        "DomainArn": "arn:aws:sagemaker:us-east-1:644160558196:domain/d-nzuqvexepjbz",
+        "DomainId": "d-nzuqvexepjbz",
+        "DomainName": "example-domain",
+        "HomeEfsFileSystemId": "fs-0c42d742085d7b2bd",
+        "Status": "InService",
+        "CreationTime": {
+            "__class__": "datetime",
+            "year": 2024,
+            "month": 3,
+            "day": 19,
+            "hour": 15,
+            "minute": 24,
+            "second": 35,
+            "microsecond": 63000
+        },
+        "LastModifiedTime": {
+            "__class__": "datetime",
+            "year": 2024,
+            "month": 3,
+            "day": 20,
+            "hour": 0,
+            "minute": 9,
+            "second": 28,
+            "microsecond": 743000
+        },
+        "AuthMode": "IAM",
+        "DefaultUserSettings": {
+            "ExecutionRole": "arn:aws:iam::644160558196:role/service-role/AmazonSageMaker-ExecutionRole-20180108T122369",
+            "SharingSettings": {
+                "NotebookOutputOption": "Allowed",
+                "S3OutputPath": "s3://sagemaker-studio-644160558196-122rryk5tpg"
+            },
+            "JupyterServerAppSettings": {
+                "DefaultResourceSpec": {
+                    "SageMakerImageArn": "arn:aws:sagemaker:us-east-1:644160558196:image/jupyter-server-3",
+                    "InstanceType": "system"
+                }
+            },
+            "CanvasAppSettings": {
+                "TimeSeriesForecastingSettings": {
+                    "Status": "DISABLED"
+                },
+                "ModelRegisterSettings": {
+                    "Status": "DISABLED"
+                },
+                "WorkspaceSettings": {
+                    "S3ArtifactPath": "s3://sagemaker-us-east-1-644160558196"
+                },
+                "DirectDeploySettings": {
+                    "Status": "DISABLED"
+                },
+                "KendraSettings": {
+                    "Status": "DISABLED"
+                }
+            },
+            "SpaceStorageSettings": {
+                "DefaultEbsStorageSettings": {
+                    "DefaultEbsVolumeSizeInGb": 5,
+                    "MaximumEbsVolumeSizeInGb": 100
+                }
+            },
+            "DefaultLandingUri": "studio::",
+            "StudioWebPortal": "ENABLED"
+        },
+        "AppNetworkAccessType": "PublicInternetOnly",
+        "SubnetIds": [
+            "subnet-044d9e3b66dccd75a"
+        ],
+        "Url": "https://d-nzuqvexepjbz.studio.us-east-1.sagemaker.aws",
+        "VpcId": "vpc-d2d616b5",
+        "KmsKeyId": "arn:aws:kms:us-east-1:644160558196:key/75d1e7ba-f9c5-46b9-97bc-28e6c834aa49",
+        "ResponseMetadata": {}
+    }
+}

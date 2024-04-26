@@ -16,6 +16,7 @@ class ArtifactDomain(QueryResourceManager):
         cfn_type = 'AWS::CodeArtifact::Domain'
         id = name = 'name'
         arn = 'arn'
+        permissions_augment = ("codeartifact:ListTagsForResource",)
 
 
 @ArtifactDomain.filter_registry.register('cross-account')
@@ -114,7 +115,7 @@ class ArtifactRepo(QueryResourceManager):
     class resource_type(TypeInfo):
         service = 'codeartifact'
         enum_spec = ('list_repositories', 'repositories', None)
-        cfn_type = 'AWS::CodeArtifact::Repository'
+        config_type = cfn_type = 'AWS::CodeArtifact::Repository'
         id = name = 'name'
         arn = 'arn'
 

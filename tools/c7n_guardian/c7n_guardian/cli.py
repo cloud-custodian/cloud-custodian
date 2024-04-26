@@ -43,7 +43,7 @@ def cli():
     multiple=True)
 def report(config, tags, accounts, master, debug, region):
     """report on guard duty enablement by account"""
-    accounts_config, master_info, executor = guardian_init(
+    _, _, executor = guardian_init(
         config, debug, master, accounts, tags)
 
     regions = expand_regions(region)
@@ -82,7 +82,7 @@ def report_one_region(
     region,
 ):
     """report on guard duty enablement by account"""
-    accounts_config, master_info, executor = guardian_init(
+    accounts_config, master_info, _ = guardian_init(
         config, debug, master, accounts, tags)
 
     master_session = get_session(
@@ -141,7 +141,7 @@ def report_one_region(
 def disable(config, tags, accounts, master, debug,
             suspend, disable_detector, delete_detector, dissociate, region):
     """suspend guard duty in the given accounts."""
-    accounts_config, master_info, executor = guardian_init(
+    accounts_config, master_info, _ = guardian_init(
         config, debug, master, accounts, tags)
 
     if sum(map(int, (suspend, disable_detector, dissociate))) != 1:
@@ -362,7 +362,7 @@ def enable_region(
     log.info(f"{region}\tInviting {len(accounts_not_members)} member accounts")
     unprocessed = []
     for account_set in chunks(
-        [m for m in accounts_not_members if not m['AccountId'] in invited_ids + resigned_ids],
+        [m for m in accounts_not_members if m['AccountId'] not in invited_ids + resigned_ids],
         25
     ):
         params = {
@@ -467,7 +467,7 @@ def get_master_info(accounts_config, master):
 
 
 def guardian_init(config, debug, master, accounts, tags):
-    accounts_config, custodian_config, executor = init(
+    accounts_config, _, executor = init(
         config, None, debug, False, None, None, None, None)
     master_info = get_master_info(accounts_config, master)
     filter_accounts(accounts_config, tags, accounts, not_accounts=[master_info['name']])

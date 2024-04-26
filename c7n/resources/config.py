@@ -4,9 +4,30 @@ from c7n.actions import BaseAction
 from c7n.filters import Filter, ValueFilter, CrossAccountAccessFilter
 from c7n.manager import resources
 from c7n.resolver import ValuesFrom
-from c7n.query import QueryResourceManager, TypeInfo
+from c7n.query import QueryResourceManager, TypeInfo, DescribeSource, ConfigSource
 from c7n.utils import local_session, chunks, type_schema
 from c7n.tags import universal_augment
+
+
+class RecorderDescribe(DescribeSource):
+
+    def augment(self, resources):
+        # in general we don't to default augmentation beyond tags, to
+        # avoid extraneous api calls. in this case config recorder is
+        # a singleton (so no cardinality issues in terms of api calls)
+        # and the common case is looking checking against all of the
+        # attributes to ensure proper configuration.
+        client = local_session(self.manager.session_factory).client('config')
+        for r in resources:
+            status = client.describe_configuration_recorder_status(
+                ConfigurationRecorderNames=[r['name']])['ConfigurationRecordersStatus']
+            if status:
+                r.update({'status': status.pop()})
+
+            channels = client.describe_delivery_channels().get('DeliveryChannels')
+            if channels:
+                r.update({'deliveryChannel': channels.pop()})
+        return resources
 
 
 @resources.register('config-recorder')
@@ -19,26 +40,9 @@ class ConfigRecorder(QueryResourceManager):
         filter_name = 'ConfigurationRecorderNames'
         filter_type = 'list'
         arn = False
-        cfn_type = 'AWS::Config::ConfigurationRecorder'
+        config_type = cfn_type = 'AWS::Config::ConfigurationRecorder'
 
-    def augment(self, resources):
-        # in general we don't to default augmentation beyond tags, to
-        # avoid extraneous api calls. in this case config recorder is
-        # a singleton (so no cardinality issues in terms of api calls)
-        # and the common case is looking checking against all of the
-        # attributes to ensure proper configuration.
-        client = local_session(self.session_factory).client('config')
-
-        for r in resources:
-            status = client.describe_configuration_recorder_status(
-                ConfigurationRecorderNames=[r['name']])['ConfigurationRecordersStatus']
-            if status:
-                r.update({'status': status.pop()})
-
-            channels = client.describe_delivery_channels().get('DeliveryChannels')
-            if channels:
-                r.update({'deliveryChannel': channels.pop()})
-        return resources
+    source_mapping = {'describe': RecorderDescribe, 'config': ConfigSource}
 
 
 @ConfigRecorder.filter_registry.register('cross-account')

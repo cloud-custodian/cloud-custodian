@@ -1,0 +1,17 @@
+{
+    "status_code": 200,
+    "data": {
+        "Attributes": {
+            "Policy": "{\"Version\":\"2008-10-17\",\"Id\":\"__default_policy_ID\",\"Statement\":[{\"Sid\":\"__default_statement_ID\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"*\"},\"Action\":[\"SNS:Publish\",\"SNS:RemovePermission\",\"SNS:SetTopicAttributes\",\"SNS:DeleteTopic\",\"SNS:ListSubscriptionsByTopic\",\"SNS:GetTopicAttributes\",\"SNS:AddPermission\",\"SNS:Subscribe\"],\"Resource\":\"arn:aws:sns:us-east-1:111111111111:test\",\"Condition\":{\"StringEquals\":{\"AWS:SourceOwner\":\"111111111111\"}}}]}",
+            "Owner": "111111111111",
+            "SubscriptionsPending": "0",
+            "TopicArn": "arn:aws:sns:us-east-1:111111111111:test",
+            "TracingConfig": "PassThrough",
+            "EffectiveDeliveryPolicy": "{\"http\":{\"defaultHealthyRetryPolicy\":{\"minDelayTarget\":20,\"maxDelayTarget\":20,\"numRetries\":3,\"numMaxDelayRetries\":0,\"numNoDelayRetries\":0,\"numMinDelayRetries\":0,\"backoffFunction\":\"linear\"},\"disableSubscriptionOverrides\":false,\"defaultRequestPolicy\":{\"headerContentType\":\"text/plain; charset=UTF-8\"}}}",
+            "SubscriptionsConfirmed": "0",
+            "DisplayName": "test",
+            "SubscriptionsDeleted": "0"
+        },
+        "ResponseMetadata": {}
+    }
+}

@@ -65,7 +65,8 @@ class AutoTagUser(EventAction):
                      'enum': [
                          'userName',
                          'arn',
-                         'sourceIPAddress'
+                         'sourceIPAddress',
+                         'principalId'
                      ]},
            }
     )
@@ -103,6 +104,8 @@ class AutoTagUser(EventAction):
             value = event['userIdentity'].get('arn', '')
         elif vtype == "sourceIPAddress":
             value = event.get('sourceIPAddress', '')
+        elif vtype == "principalId":
+            value = event['userIdentity'].get('principalId', '')
 
         return value
 
@@ -118,7 +121,7 @@ class AutoTagUser(EventAction):
             principal_id_value = event['userIdentity'].get('principalId', '')
         elif utype == "AssumedRole" or utype == "FederatedUser":
             user = event['userIdentity']['arn']
-            prefix, user = user.rsplit('/', 1)
+            _, user = user.rsplit('/', 1)
             principal_id_value = event['userIdentity'].get('principalId', '').split(':')[0]
             # instance role
             if user.startswith('i-'):

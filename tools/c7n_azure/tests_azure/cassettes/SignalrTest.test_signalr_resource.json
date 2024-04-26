@@ -1,0 +1,132 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.SignalRService/signalR?api-version=2020-05-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "x-rp-server-mvid": [
+                        "94fb32ca-55e5-4a02-b06b-565e8bd00d5a"
+                    ],
+                    "date": [
+                        "Fri, 03 Sep 2021 09:32:43 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "content-length": [
+                        "1724"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "sku": {
+                                    "name": "Standard_S1",
+                                    "tier": "Standard",
+                                    "size": "S1",
+                                    "capacity": 1
+                                },
+                                "properties": {
+                                    "provisioningState": "Succeeded",
+                                    "externalIP": "20.62.133.75",
+                                    "hostName": "vvnet1.service.signalr.net",
+                                    "publicPort": 443,
+                                    "serverPort": 443,
+                                    "version": "1.0",
+                                    "privateEndpointConnections": [
+                                        {
+                                            "properties": {
+                                                "provisioningState": "Succeeded",
+                                                "privateEndpoint": {
+                                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/VV/providers/Microsoft.Network/privateEndpoints/testvvend"
+                                                },
+                                                "privateLinkServiceConnectionState": {
+                                                    "status": "Approved",
+                                                    "description": "Auto-Approved",
+                                                    "actionsRequired": "None"
+                                                }
+                                            },
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/VV/providers/Microsoft.SignalRService/SignalR/vvnet1/privateEndpointConnections/vvnet1.8b07cb49-a7be-4efd-90e2-68ac2831ab3d",
+                                            "name": "vvnet1.8b07cb49-a7be-4efd-90e2-68ac2831ab3d",
+                                            "type": "Microsoft.SignalRService/SignalR/privateEndpointConnections"
+                                        }
+                                    ],
+                                    "hostNamePrefix": "vvnet1",
+                                    "features": [
+                                        {
+                                            "flag": "ServiceMode",
+                                            "value": "Default",
+                                            "properties": {}
+                                        },
+                                        {
+                                            "flag": "EnableConnectivityLogs",
+                                            "value": "True",
+                                            "properties": {}
+                                        },
+                                        {
+                                            "flag": "EnableMessagingLogs",
+                                            "value": "False",
+                                            "properties": {}
+                                        },
+                                        {
+                                            "flag": "EnableLiveTrace",
+                                            "value": "False",
+                                            "properties": {}
+                                        }
+                                    ],
+                                    "cors": {
+                                        "allowedOrigins": [
+                                            "*"
+                                        ]
+                                    },
+                                    "upstream": {
+                                        "templates": null
+                                    },
+                                    "networkACLs": {
+                                        "defaultAction": "Deny",
+                                        "publicNetwork": {
+                                            "allow": [],
+                                            "deny": []
+                                        },
+                                        "privateEndpoints": [
+                                            {
+                                                "name": "vvnet1.8b07cb49-a7be-4efd-90e2-68ac2831ab3d",
+                                                "allow": [
+                                                    "ServerConnection",
+                                                    "ClientConnection",
+                                                    "RESTAPI",
+                                                    "Trace"
+                                                ],
+                                                "deny": null
+                                            }
+                                        ]
+                                    }
+                                },
+                                "kind": "SignalR",
+                                "location": "eastus",
+                                "tags": {},
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/VV/providers/Microsoft.SignalRService/SignalR/vvnet1",
+                                "name": "vvnet1",
+                                "type": "Microsoft.SignalRService/SignalR"
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}

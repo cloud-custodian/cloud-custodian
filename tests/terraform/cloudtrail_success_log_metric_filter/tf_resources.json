@@ -21,9 +21,9 @@
         "aws_cloudtrail": {
             "success-2": {
                 "advanced_event_selector": [],
-                "arn": "arn:aws:cloudtrail:us-east-1:644160558196:trail/tf-trail-27632",
-                "cloud_watch_logs_group_arn": "arn:aws:logs:us-east-1:644160558196:log-group:cloudtrail-test-group20221118215751322600000003:*",
-                "cloud_watch_logs_role_arn": "arn:aws:iam::644160558196:role/testing-cloudtrail_cloudwatch_role20221118215753042100000008",
+                "arn": "arn:aws:cloudtrail:us-east-1:644160558196:trail/tf-trail-40313",
+                "cloud_watch_logs_group_arn": "arn:aws:logs:us-east-1:644160558196:log-group:cloudtrail-test-group20221122165720932700000003:*",
+                "cloud_watch_logs_role_arn": "arn:aws:iam::644160558196:role/testing-cloudtrail_cloudwatch_role20221122165721684900000008",
                 "enable_log_file_validation": false,
                 "enable_logging": true,
                 "event_selector": [
@@ -32,7 +32,7 @@
                             {
                                 "type": "AWS::S3::Object",
                                 "values": [
-                                    "arn:aws:s3:::trail-test-bucket20221118215751334000000006/"
+                                    "arn:aws:s3:::trail-test-bucket20221122165720942100000006/"
                                 ]
                             }
                         ],
@@ -42,14 +42,14 @@
                     }
                 ],
                 "home_region": "us-east-1",
-                "id": "tf-trail-27632",
+                "id": "tf-trail-40313",
                 "include_global_service_events": true,
                 "insight_selector": [],
                 "is_multi_region_trail": true,
                 "is_organization_trail": false,
                 "kms_key_id": "",
-                "name": "tf-trail-27632",
-                "s3_bucket_name": "trail-test-bucket20221118215751334000000006",
+                "name": "tf-trail-40313",
+                "s3_bucket_name": "trail-test-bucket20221122165720942100000006",
                 "s3_key_prefix": "prefix",
                 "sns_topic_name": "",
                 "tags": {
@@ -62,10 +62,10 @@
         },
         "aws_cloudwatch_log_group": {
             "success-5": {
-                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:cloudtrail-test-group20221118215751322600000003",
-                "id": "cloudtrail-test-group20221118215751322600000003",
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:cloudtrail-test-group20221122165720932700000003",
+                "id": "cloudtrail-test-group20221122165720932700000003",
                 "kms_key_id": "",
-                "name": "cloudtrail-test-group20221118215751322600000003",
+                "name": "cloudtrail-test-group20221122165720932700000003",
                 "name_prefix": "cloudtrail-test-group",
                 "retention_in_days": 0,
                 "skip_destroy": false,
@@ -79,8 +79,8 @@
         },
         "aws_cloudwatch_log_metric_filter": {
             "success-3": {
-                "id": "test-filter-name-27632",
-                "log_group_name": "cloudtrail-test-group20221118215751322600000003",
+                "id": "test-filter-name-40313",
+                "log_group_name": "cloudtrail-test-group20221122165720932700000003",
                 "metric_transformation": [
                     {
                         "default_value": "",
@@ -91,15 +91,15 @@
                         "value": "1"
                     }
                 ],
-                "name": "test-filter-name-27632",
+                "name": "test-filter-name-40313",
                 "pattern": "{ ($.eventName = ConsoleLogin) && ($.additionalEventData.MFAUsed != Yes) }"
             }
         },
         "aws_cloudwatch_log_stream": {
             "success-log-stream": {
-                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:cloudtrail-test-group20221118215751322600000003:log-stream:532725030595_CloudTrail_us-east-1",
+                "arn": "arn:aws:logs:us-east-1:644160558196:log-group:cloudtrail-test-group20221122165720932700000003:log-stream:532725030595_CloudTrail_us-east-1",
                 "id": "532725030595_CloudTrail_us-east-1",
-                "log_group_name": "cloudtrail-test-group20221118215751322600000003",
+                "log_group_name": "cloudtrail-test-group20221122165720932700000003",
                 "name": "532725030595_CloudTrail_us-east-1"
             }
         },
@@ -107,18 +107,18 @@
             "success-4": {
                 "actions_enabled": true,
                 "alarm_actions": [
-                    "arn:aws:sns:us-east-1:644160558196:mfa-notification-topic20221118215751327700000005"
+                    "arn:aws:sns:us-east-1:644160558196:mfa-notification-topic20221122165720935200000005"
                 ],
                 "alarm_description": "",
-                "alarm_name": "NoMFAConsoleLoginAlarm_27632",
-                "arn": "arn:aws:cloudwatch:us-east-1:644160558196:alarm:NoMFAConsoleLoginAlarm_27632",
+                "alarm_name": "NoMFAConsoleLoginAlarm_40313",
+                "arn": "arn:aws:cloudwatch:us-east-1:644160558196:alarm:NoMFAConsoleLoginAlarm_40313",
                 "comparison_operator": "GreaterThanThreshold",
                 "datapoints_to_alarm": 1,
                 "dimensions": null,
                 "evaluate_low_sample_count_percentiles": "",
                 "evaluation_periods": 1,
                 "extended_statistic": "",
-                "id": "NoMFAConsoleLoginAlarm_27632",
+                "id": "NoMFAConsoleLoginAlarm_40313",
                 "insufficient_data_actions": null,
                 "metric_name": "no_mfa_console_signin_metric_1",
                 "metric_query": [],
@@ -140,14 +140,14 @@
         },
         "aws_iam_policy": {
             "testing-policy": {
-                "arn": "arn:aws:iam::644160558196:policy/testing-trailtest_policy20221118215752342400000007",
+                "arn": "arn:aws:iam::644160558196:policy/testing-trailtest_policy20221122165721370000000007",
                 "description": "cloudtrail role policy",
-                "id": "arn:aws:iam::644160558196:policy/testing-trailtest_policy20221118215752342400000007",
-                "name": "testing-trailtest_policy20221118215752342400000007",
+                "id": "arn:aws:iam::644160558196:policy/testing-trailtest_policy20221122165721370000000007",
+                "name": "testing-trailtest_policy20221122165721370000000007",
                 "name_prefix": "testing-trailtest_policy",
                 "path": "/",
                 "policy": "{\"Statement\":[{\"Action\":[\"logs:CreateLogStream\",\"logs:PutLogEvents\"],\"Effect\":\"Allow\",\"Resource\":\"*\"}],\"Version\":\"2012-10-17\"}",
-                "policy_id": "ANPAXYCHC33B3Q4YI4WPN",
+                "policy_id": "ANPAXYCHC33BRKYBNYR6T",
                 "tags": {
                     "c7n": "true"
                 },
@@ -158,16 +158,16 @@
         },
         "aws_iam_role": {
             "testing-cloudtrail-cloudwatch-role": {
-                "arn": "arn:aws:iam::644160558196:role/testing-cloudtrail_cloudwatch_role20221118215753042100000008",
+                "arn": "arn:aws:iam::644160558196:role/testing-cloudtrail_cloudwatch_role20221122165721684900000008",
                 "assume_role_policy": "{\"Statement\":[{\"Action\":\"sts:AssumeRole\",\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"cloudtrail.amazonaws.com\"}}],\"Version\":\"2012-10-17\"}",
-                "create_date": "2022-11-18T21:57:53Z",
+                "create_date": "2022-11-22T16:57:22Z",
                 "description": "",
                 "force_detach_policies": false,
-                "id": "testing-cloudtrail_cloudwatch_role20221118215753042100000008",
+                "id": "testing-cloudtrail_cloudwatch_role20221122165721684900000008",
                 "inline_policy": [],
                 "managed_policy_arns": [],
                 "max_session_duration": 3600,
-                "name": "testing-cloudtrail_cloudwatch_role20221118215753042100000008",
+                "name": "testing-cloudtrail_cloudwatch_role20221122165721684900000008",
                 "name_prefix": "testing-cloudtrail_cloudwatch_role",
                 "path": "/",
                 "permissions_boundary": null,
@@ -177,25 +177,25 @@
                 "tags_all": {
                     "c7n": "true"
                 },
-                "unique_id": "AROAXYCHC33B222LMCWBJ"
+                "unique_id": "AROAXYCHC33B4VIUNBGGK"
             }
         },
         "aws_iam_role_policy_attachment": {
             "testing_cloudtrail_cloudwatch_role_policy_attachment": {
-                "id": "testing-cloudtrail_cloudwatch_role20221118215753042100000008-20221118215754074700000009",
-                "policy_arn": "arn:aws:iam::644160558196:policy/testing-trailtest_policy20221118215752342400000007",
-                "role": "testing-cloudtrail_cloudwatch_role20221118215753042100000008"
+                "id": "testing-cloudtrail_cloudwatch_role20221122165721684900000008-20221122165722402100000009",
+                "policy_arn": "arn:aws:iam::644160558196:policy/testing-trailtest_policy20221122165721370000000007",
+                "role": "testing-cloudtrail_cloudwatch_role20221122165721684900000008"
             }
         },
         "aws_s3_bucket": {
             "success-1": {
                 "acceleration_status": "",
                 "acl": null,
-                "arn": "arn:aws:s3:::trail-test-bucket20221118215751334000000006",
-                "bucket": "trail-test-bucket20221118215751334000000006",
-                "bucket_domain_name": "trail-test-bucket20221118215751334000000006.s3.amazonaws.com",
+                "arn": "arn:aws:s3:::trail-test-bucket20221122165720942100000006",
+                "bucket": "trail-test-bucket20221122165720942100000006",
+                "bucket_domain_name": "trail-test-bucket20221122165720942100000006.s3.amazonaws.com",
                 "bucket_prefix": "trail-test-bucket",
-                "bucket_regional_domain_name": "trail-test-bucket20221118215751334000000006.s3.amazonaws.com",
+                "bucket_regional_domain_name": "trail-test-bucket20221122165720942100000006.s3.amazonaws.com",
                 "cors_rule": [],
                 "force_destroy": true,
                 "grant": [
@@ -209,7 +209,7 @@
                     }
                 ],
                 "hosted_zone_id": "Z3AQBSTGFYJSTF",
-                "id": "trail-test-bucket20221118215751334000000006",
+                "id": "trail-test-bucket20221122165720942100000006",
                 "lifecycle_rule": [],
                 "logging": [],
                 "object_lock_configuration": [],
@@ -239,17 +239,17 @@
         },
         "aws_s3_bucket_policy": {
             "success-1-policy": {
-                "bucket": "trail-test-bucket20221118215751334000000006",
-                "id": "trail-test-bucket20221118215751334000000006",
-                "policy": "{\n    \"Version\": \"2012-10-17\",\n    \"Statement\": [\n        {\n            \"Sid\": \"AWSCloudTrailAclCheck20150319\",\n            \"Effect\": \"Allow\",\n            \"Principal\": {\n                \"Service\": \"cloudtrail.amazonaws.com\"\n            },\n            \"Action\": \"s3:GetBucketAcl\",\n            \"Resource\": \"arn:aws:s3:::trail-test-bucket20221118215751334000000006\",\n            \"Condition\": {\n                \"StringEquals\": {\n                    \"AWS:SourceArn\": \"arn:aws:cloudtrail:us-east-1:644160558196:trail/tf-trail-27632\"\n                }\n            }\n        },\n        {\n            \"Sid\": \"AWSCloudTrailWrite20150319\",\n            \"Effect\": \"Allow\",\n            \"Principal\": {\n                \"Service\": \"cloudtrail.amazonaws.com\"\n            },\n            \"Action\": \"s3:PutObject\",\n            \"Resource\": \"arn:aws:s3:::trail-test-bucket20221118215751334000000006/*\",\n            \"Condition\": {\n                \"StringEquals\": {\n                    \"AWS:SourceArn\": \"arn:aws:cloudtrail:us-east-1:644160558196:trail/tf-trail-27632\",\n                    \"s3:x-amz-acl\": \"bucket-owner-full-control\"\n                }\n            }\n        }\n    ]\n}\n"
+                "bucket": "trail-test-bucket20221122165720942100000006",
+                "id": "trail-test-bucket20221122165720942100000006",
+                "policy": "{\n    \"Version\": \"2012-10-17\",\n    \"Statement\": [\n        {\n            \"Sid\": \"AWSCloudTrailAclCheck20150319\",\n            \"Effect\": \"Allow\",\n            \"Principal\": {\n                \"Service\": \"cloudtrail.amazonaws.com\"\n            },\n            \"Action\": \"s3:GetBucketAcl\",\n            \"Resource\": \"arn:aws:s3:::trail-test-bucket20221122165720942100000006\",\n            \"Condition\": {\n                \"StringEquals\": {\n                    \"AWS:SourceArn\": \"arn:aws:cloudtrail:us-east-1:644160558196:trail/tf-trail-40313\"\n                }\n            }\n        },\n        {\n            \"Sid\": \"AWSCloudTrailWrite20150319\",\n            \"Effect\": \"Allow\",\n            \"Principal\": {\n                \"Service\": \"cloudtrail.amazonaws.com\"\n            },\n            \"Action\": \"s3:PutObject\",\n            \"Resource\": \"arn:aws:s3:::trail-test-bucket20221122165720942100000006/*\",\n            \"Condition\": {\n                \"StringEquals\": {\n                    \"AWS:SourceArn\": \"arn:aws:cloudtrail:us-east-1:644160558196:trail/tf-trail-40313\",\n                    \"s3:x-amz-acl\": \"bucket-owner-full-control\"\n                }\n            }\n        }\n    ]\n}\n"
             }
         },
         "aws_s3_bucket_public_access_block": {
             "block-access-bucket": {
                 "block_public_acls": true,
                 "block_public_policy": true,
-                "bucket": "trail-test-bucket20221118215751334000000006",
-                "id": "trail-test-bucket20221118215751334000000006",
+                "bucket": "trail-test-bucket20221122165720942100000006",
+                "id": "trail-test-bucket20221122165720942100000006",
                 "ignore_public_acls": true,
                 "restrict_public_buckets": true
             }
@@ -259,7 +259,7 @@
                 "application_failure_feedback_role_arn": "",
                 "application_success_feedback_role_arn": "",
                 "application_success_feedback_sample_rate": 0,
-                "arn": "arn:aws:sns:us-east-1:644160558196:mfa-notification-topic20221118215751327700000005",
+                "arn": "arn:aws:sns:us-east-1:644160558196:mfa-notification-topic20221122165720935200000005",
                 "content_based_deduplication": false,
                 "delivery_policy": "",
                 "display_name": "",
@@ -270,15 +270,15 @@
                 "http_failure_feedback_role_arn": "",
                 "http_success_feedback_role_arn": "",
                 "http_success_feedback_sample_rate": 0,
-                "id": "arn:aws:sns:us-east-1:644160558196:mfa-notification-topic20221118215751327700000005",
+                "id": "arn:aws:sns:us-east-1:644160558196:mfa-notification-topic20221122165720935200000005",
                 "kms_master_key_id": "",
                 "lambda_failure_feedback_role_arn": "",
                 "lambda_success_feedback_role_arn": "",
                 "lambda_success_feedback_sample_rate": 0,
-                "name": "mfa-notification-topic20221118215751327700000005",
+                "name": "mfa-notification-topic20221122165720935200000005",
                 "name_prefix": "mfa-notification-topic",
                 "owner": "644160558196",
-                "policy": "{\"Id\":\"__default_policy_ID\",\"Statement\":[{\"Action\":[\"SNS:GetTopicAttributes\",\"SNS:SetTopicAttributes\",\"SNS:AddPermission\",\"SNS:RemovePermission\",\"SNS:DeleteTopic\",\"SNS:Subscribe\",\"SNS:ListSubscriptionsByTopic\",\"SNS:Publish\"],\"Condition\":{\"StringEquals\":{\"AWS:SourceOwner\":\"644160558196\"}},\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"*\"},\"Resource\":\"arn:aws:sns:us-east-1:644160558196:mfa-notification-topic20221118215751327700000005\",\"Sid\":\"__default_statement_ID\"}],\"Version\":\"2008-10-17\"}",
+                "policy": "{\"Id\":\"__default_policy_ID\",\"Statement\":[{\"Action\":[\"SNS:GetTopicAttributes\",\"SNS:SetTopicAttributes\",\"SNS:AddPermission\",\"SNS:RemovePermission\",\"SNS:DeleteTopic\",\"SNS:Subscribe\",\"SNS:ListSubscriptionsByTopic\",\"SNS:Publish\"],\"Condition\":{\"StringEquals\":{\"AWS:SourceOwner\":\"644160558196\"}},\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"*\"},\"Resource\":\"arn:aws:sns:us-east-1:644160558196:mfa-notification-topic20221122165720935200000005\",\"Sid\":\"__default_statement_ID\"}],\"Version\":\"2008-10-17\"}",
                 "sqs_failure_feedback_role_arn": "",
                 "sqs_success_feedback_role_arn": "",
                 "sqs_success_feedback_sample_rate": 0,
@@ -292,37 +292,37 @@
         },
         "aws_sns_topic_subscription": {
             "user_updates_sqs_target": {
-                "arn": "arn:aws:sns:us-east-1:644160558196:mfa-notification-topic20221118215751327700000005:caede981-93f6-49c5-8389-fdaaf2b97cb2",
+                "arn": "arn:aws:sns:us-east-1:644160558196:mfa-notification-topic20221122165720935200000005:778d430f-fbc6-421e-8139-1db285ddfb75",
                 "confirmation_timeout_in_minutes": 1,
                 "confirmation_was_authenticated": true,
                 "delivery_policy": "",
-                "endpoint": "arn:aws:sqs:us-east-1:644160558196:mfa-sqs-topic20221118215751324400000004",
+                "endpoint": "arn:aws:sqs:us-east-1:644160558196:mfa-sqs-topic20221122165720934700000004",
                 "endpoint_auto_confirms": false,
                 "filter_policy": "",
-                "id": "arn:aws:sns:us-east-1:644160558196:mfa-notification-topic20221118215751327700000005:caede981-93f6-49c5-8389-fdaaf2b97cb2",
+                "id": "arn:aws:sns:us-east-1:644160558196:mfa-notification-topic20221122165720935200000005:778d430f-fbc6-421e-8139-1db285ddfb75",
                 "owner_id": "644160558196",
                 "pending_confirmation": false,
                 "protocol": "sqs",
                 "raw_message_delivery": false,
                 "redrive_policy": "",
                 "subscription_role_arn": "",
-                "topic_arn": "arn:aws:sns:us-east-1:644160558196:mfa-notification-topic20221118215751327700000005"
+                "topic_arn": "arn:aws:sns:us-east-1:644160558196:mfa-notification-topic20221122165720935200000005"
             }
         },
         "aws_sqs_queue": {
             "success_sqs_queue": {
-                "arn": "arn:aws:sqs:us-east-1:644160558196:mfa-sqs-topic20221118215751324400000004",
+                "arn": "arn:aws:sqs:us-east-1:644160558196:mfa-sqs-topic20221122165720934700000004",
                 "content_based_deduplication": false,
                 "deduplication_scope": "",
                 "delay_seconds": 0,
                 "fifo_queue": false,
                 "fifo_throughput_limit": "",
-                "id": "https://sqs.us-east-1.amazonaws.com/644160558196/mfa-sqs-topic20221118215751324400000004",
+                "id": "https://sqs.us-east-1.amazonaws.com/644160558196/mfa-sqs-topic20221122165720934700000004",
                 "kms_data_key_reuse_period_seconds": 300,
                 "kms_master_key_id": "",
                 "max_message_size": 262144,
                 "message_retention_seconds": 345600,
-                "name": "mfa-sqs-topic20221118215751324400000004",
+                "name": "mfa-sqs-topic20221122165720934700000004",
                 "name_prefix": "mfa-sqs-topic",
                 "policy": "",
                 "receive_wait_time_seconds": 0,
@@ -335,17 +335,17 @@
                 "tags_all": {
                     "c7n": "true"
                 },
-                "url": "https://sqs.us-east-1.amazonaws.com/644160558196/mfa-sqs-topic20221118215751324400000004",
+                "url": "https://sqs.us-east-1.amazonaws.com/644160558196/mfa-sqs-topic20221122165720934700000004",
                 "visibility_timeout_seconds": 30
             }
         },
         "random_integer": {
             "trail": {
-                "id": "27632",
+                "id": "40313",
                 "keepers": null,
                 "max": 50000,
                 "min": 1,
-                "result": 27632,
+                "result": 40313,
                 "seed": null
             }
         }

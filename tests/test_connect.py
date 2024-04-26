@@ -98,3 +98,50 @@ class ConnectTest(BaseTest):
         self.assertEqual(results[0]["Attribute"]["AttributeType"], "CONTACT_LENS")
         self.assertEqual(results[0]["Attribute"]["Value"], "false")
         self.assertEqual(len(resources), 1)
+
+
+class ConnectCampaignTest(BaseTest):
+    def test_connect_campaign_query(self):
+        session_factory = self.replay_flight_data("test_connect_campaign_query")
+        p = self.load_policy(
+            {
+                "name": "connect-campaign-query-test",
+                "resource": "connect-campaign"
+            }, session_factory=session_factory
+        )
+        resources = p.run()
+        self.assertEqual(2, len(resources))
+
+    def test_connect_campaign_instance_config(self):
+        session_factory = self.replay_flight_data("test_connect_campaign_instance_config_filter")
+        p = self.load_policy(
+            {
+                "name": "connect-instance-attribute-test",
+                "resource": "connect-campaign",
+                'filters': [
+                    {
+                        'type': 'value',
+                        'key': 'connectInstanceConfig.encryptionConfig.enabled',
+                        'value': True
+                    }
+                ]
+            }, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 2)
+
+    def test_connect_campaign_kms_filter(self):
+        session_factory = self.replay_flight_data("test_connect_campaign_kms_filter")
+        p = self.load_policy(
+            {
+                "name": "connect-instance-attribute-test",
+                "resource": "connect-campaign",
+                'filters': [
+                    {
+                        'type': 'kms-key',
+                        'key': 'c7n:AliasName',
+                        'value': 'alias/eks'
+                    }
+                ]
+            }, session_factory=session_factory)
+        resources = p.run()
+        self.assertEqual(len(resources), 2)

@@ -13,7 +13,6 @@ from collections import Counter
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import contextlib
 from dateutil.parser import parse
-import jmespath
 import json
 import jsonschema
 import logging
@@ -29,7 +28,7 @@ from c7n.credentials import SessionFactory
 from c7n.policy import PolicyCollection
 from c7n.resources import load_resources, aws
 from c7n.tags import UniversalTag
-from c7n.utils import local_session, chunks, reset_session_cache
+from c7n.utils import local_session, chunks, reset_session_cache, jmespath_search
 
 from c7n_org.cli import WORKER_COUNT, resolve_regions, get_session, _get_env_creds, init as org_init
 from c7n_org.utils import environ
@@ -159,7 +158,7 @@ def format_record(r):
 
     for rinfo in rinfos:
         # todo consider lite implementation
-        rid = jmespath.search(rinfo['ids'], r)
+        rid = jmespath_search(rinfo['ids'], r)
         if isinstance(rid, list):
             rid = " ,".join(rid)
         if rid:
@@ -368,21 +367,21 @@ class TrailDB:
         self.cursor.execute('''
             select rtype, count(*) as rcount
             from events
-            where account_id="%s"
-              and region="%s"
+            where account_id=:account_id
+              and region=:region
             group by rtype
-        ''' % (account_id, region))
+        ''', dict(account_id=account_id, region=region))
         return self.cursor.fetchall()
 
     def get_resource_owners(self, resource_type, account_id, region):  # nosec
         self.cursor.execute('''
            select user_id, resource_ids
            from events
-           where rtype="%s"
-             and account_id="%s"
-             and region="%s"
+           where rtype=:resource_type
+             and account_id=:account_id
+             and region=:region
            order by event_date
-        ''' % (resource_type, account_id, region))
+        ''', dict(resource_type=resource_type, account_id=account_id, region=region))
         return self.cursor.fetchall()
 
 
@@ -693,7 +692,7 @@ def tag_org(config, db, region, creator_tag, user_suffix, dryrun,
             accounts, tags, debug, verbose, type):
     """Tag an orgs resources
     """
-    accounts_config, custodian_config, executor = org_init(
+    accounts_config, _, executor = org_init(
         config, use=None, debug=debug, verbose=verbose,
         accounts=accounts or None, tags=tags, policies=None,
         resource=None, policy_tags=None)

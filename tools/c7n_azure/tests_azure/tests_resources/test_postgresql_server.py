@@ -3,7 +3,7 @@
 import collections
 from unittest.mock import call, Mock
 from netaddr import IPSet
-from ..azure_common import BaseTest, arm_template
+from ..azure_common import BaseTest, arm_template, cassette_name
 from c7n_azure.resources.postgresql_server import \
     ConfigurationParametersFilter, \
     PostgresqlServerFirewallRulesFilter
@@ -45,6 +45,76 @@ class PostgresqlServerTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
+    @arm_template('postgresql.json')
+    def test_find_server_by_configuration(self):
+        p = self.load_policy({
+            'name': 'test-azure-postgresql-server-configuration',
+            'resource': 'azure.postgresql-server',
+            'filters': [
+                {
+                    'type': 'server-configurations',
+                    'attrs': [
+                        {
+                            'type': 'value',
+                            'key': 'name',
+                            'value': 'log_disconnections',
+                        },
+                        {
+                            'type': 'value',
+                            'key': 'properties.value',
+                            'value': 'off',
+                        }
+                    ],
+                }
+            ],
+        })
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual('cctestpostgresqlserver2szkrfs64caaw', resources[0]['name'])
+
+    @arm_template('postgresql.json')
+    def test_find_server_by_configuration_int(self):
+        p = self.load_policy({
+            'name': 'test-azure-postgresql-server-configuration-int',
+            'resource': 'azure.postgresql-server',
+            'filters': [
+                {
+                    'type': 'server-configurations',
+                    'attrs': [
+                        {
+                            'type': 'value',
+                            'key': 'name',
+                            'value': 'log_retention_days'
+                        },
+                        {
+                            'type': 'value',
+                            'key': 'properties.value',
+                            'value': 2,
+                            'value_type': 'integer',
+                            'op': 'gt'
+                        }
+                    ]
+                }
+            ],
+        })
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+        self.assertEqual('cctestpostgresqlserver2szkrfs64caaw', resources[0]['name'])
+
+    @cassette_name('firewall-bypass')
+    def test_firewall_bypass(self):
+        p = self.load_policy({
+            'name': 'azure-postgresql-server-firewall-bypass',
+            'resource': 'azure.postgresql-server',
+            'filters': [
+                {'type': 'firewall-bypass',
+                 'mode': 'equal',
+                 'list': ['AzureServices']}],
+        })
+        resources = p.run()
+        self.assertEqual(1, len(resources))
+        self.assertTrue(resources[0]['id'].endswith('/server111postgresaccess'))
+
 
 class PostgresqlServerFirewallFilterTest(BaseTest):
 
@@ -68,12 +138,46 @@ class PostgresqlServerFirewallFilterTest(BaseTest):
         expected = IPSet(['8.8.8.8', '10.0.0.0/16'])
         self.assertEqual(expected, self._get_filter(rules)._query_rules(self.resource))
 
-    def _get_filter(self, rules, mode='equal'):
-        data = {mode: ['10.0.0.0/8', '127.0.0.1']}
+    def test_query_regular_rules_include_magic(self):
+        rules = [IpRange(start_ip_address='10.0.0.0', end_ip_address='10.0.255.255'),
+                 IpRange(start_ip_address='8.8.8.8', end_ip_address='8.8.8.8'),
+                 IpRange(start_ip_address='0.0.0.0', end_ip_address='0.0.0.0')]
+        expected = IPSet(['8.8.8.8', '10.0.0.0/16', '0.0.0.0'])
+        self.assertEqual(
+            expected,
+            self._get_filter(rules, include_magic=True)._query_rules(self.resource)
+        )
+
+    def _get_filter(self, rules, mode='equal', include_magic=False):
+        data = {mode: ['10.0.0.0/8', '127.0.0.1'], 'include-azure-services': include_magic}
         filter = PostgresqlServerFirewallRulesFilter(data, Mock())
         filter.client = Mock()
         filter.client.firewall_rules.list_by_server.return_value = rules
         return filter
+
+
+class TestServerSecurityAlertPoliciesFilter(BaseTest):
+
+    def test_server_security_alert_policies_filter(self):
+        p = self.load_policy({
+            'name': 'test-postgresql-server-filter',
+            'resource': 'azure.postgresql-server',
+            'filters': [
+                {
+                    'type': 'security-alert-policies',
+                    'attrs': [{
+                        'type': 'value',
+                        'key': 'properties.state',
+                        'value': 'Disabled'
+                    }]
+                }
+            ]
+        }, validate=True)
+
+        resources = p.run()
+
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0]['name'], 'postgresqlserver343-red')
 
 
 class PostgresqlConfigurationParameterFilterTest(BaseTest):
@@ -180,7 +284,7 @@ class PostgresqlConfigurationParameterFilterTest(BaseTest):
 
     def _get_test_resources(self, count=1):
         return [
-            dict(name=f'test-name-{i+1}', resourceGroup=f'test-group-{i+1}', properties={})
+            dict(name=f'test-name-{i + 1}', resourceGroup=f'test-group-{i + 1}', properties={})
             for i in range(count)
         ]
 

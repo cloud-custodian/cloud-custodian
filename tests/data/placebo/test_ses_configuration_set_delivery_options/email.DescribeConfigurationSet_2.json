@@ -1,0 +1,12 @@
+{
+    "status_code": 200,
+    "data": {
+        "ConfigurationSet": {
+            "Name": "c7n-test"
+        },
+        "DeliveryOptions": {
+            "TlsPolicy": "Require"
+        },
+        "ResponseMetadata": {}
+    }
+}

@@ -27,7 +27,7 @@ class SentrySenderTests(unittest.TestCase):
             'id': config['account_id'], 'username': config['account_name']})
 
     def test_preserve_full_message(self):
-        emsg, error = c7nsentry.parse_traceback(msg2)
+        _, error = c7nsentry.parse_traceback(msg2)
         self.assertIn(
             "FinalDBSnapshotIdentifier is not a valid identifier",
             error['value'])

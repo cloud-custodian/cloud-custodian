@@ -69,6 +69,29 @@ class LogProjectSinkTest(BaseTest):
         with self.assertRaises(HttpError):
             client.execute_query('get', {'sinkName': sinkName})
 
+    def test_bucket_filter(self):
+        factory = self.replay_flight_data(
+            'log-project-sink-bucket-filter',
+            'cloud-custodian'
+        )
+        policy_data = {
+            'name': 'log-project-sink-bucket-filter',
+            'resource': 'gcp.log-project-sink',
+            'filters': [
+                {
+                    'type': 'bucket',
+                    'key': 'retentionPolicy.isLocked',
+                    'op': 'ne',
+                    'value': True
+                }
+            ]
+        }
+
+        policy = self.load_policy(policy_data, session_factory=factory)
+        resources = policy.run()
+
+        self.assertEqual(len(resources), 1)
+
 
 class LogProjectMetricTest(BaseTest):
 
