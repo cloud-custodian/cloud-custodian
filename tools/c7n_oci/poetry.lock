@@ -152,13 +152,13 @@ test-randomorder = ["pytest-randomly"]
 
 [[package]]
 name = "exceptiongroup"
-version = "1.2.1"
+version = "1.2.0"
 description = "Backport of PEP 654 (exception groups)"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "exceptiongroup-1.2.1-py3-none-any.whl", hash = "sha256:5258b9ed329c5bbdd31a309f53cbfb0b155341807f6ff7606a1e801a891b29ad"},
-    {file = "exceptiongroup-1.2.1.tar.gz", hash = "sha256:a4785e48b045528f5bfe627b6ad554ff32def154f42372786903b7abcfe1aa16"},
+    {file = "exceptiongroup-1.2.0-py3-none-any.whl", hash = "sha256:4bfd3996ac73b41e9b9628b04e079f193850720ea5945fc96a08633c66912f14"},
+    {file = "exceptiongroup-1.2.0.tar.gz", hash = "sha256:91f5c769735f051a4290d52edd0858999b57e5876e9f85937691bd4c9fa3ed68"},
 ]
 
 [package.extras]
@@ -177,13 +177,13 @@ files = [
 
 [[package]]
 name = "oci"
-version = "2.126.0"
+version = "2.125.3"
 description = "Oracle Cloud Infrastructure Python SDK"
 optional = false
 python-versions = "*"
 files = [
-    {file = "oci-2.126.0-py3-none-any.whl", hash = "sha256:d9a9c87d8cbdab0c484bb840cb12695d23f91da398e8879b5ff1b1ca82f03eb2"},
-    {file = "oci-2.126.0.tar.gz", hash = "sha256:e561cfe45f942aafee12c0a6f92e549604821e3bee75aebc6c337633cfb7776a"},
+    {file = "oci-2.125.3-py3-none-any.whl", hash = "sha256:ac3dea4227b6dca93833a601e4fe3a4932256fc75b52c7b1d6b5958e5b909bd4"},
+    {file = "oci-2.125.3.tar.gz", hash = "sha256:6a97a1aea14b14689ada3542d8fb169df1a4ed37d4271af432584b61037dd1b8"},
 ]
 
 [package.dependencies]
@@ -207,13 +207,13 @@ files = [
 
 [[package]]
 name = "pluggy"
-version = "1.5.0"
+version = "1.4.0"
 description = "plugin and hook calling mechanisms for python"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "pluggy-1.5.0-py3-none-any.whl", hash = "sha256:44e1ad92c8ca002de6377e165f3e0f1be63266ab4d554740532335b9d75ea669"},
-    {file = "pluggy-1.5.0.tar.gz", hash = "sha256:2cffa88e94fdc978c4c574f15f9e59b7f4201d439195c3715ca9e2486f1d0cf1"},
+    {file = "pluggy-1.4.0-py3-none-any.whl", hash = "sha256:7db9f7b503d67d1c5b95f59773ebb58a8c1c288129a88665838012cfb07b8981"},
+    {file = "pluggy-1.4.0.tar.gz", hash = "sha256:8c85c2876142a764e5b7548e7d9a0e0ddb46f5185161049a79b7e974454223be"},
 ]
 
 [package.extras]

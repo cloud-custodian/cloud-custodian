@@ -35,17 +35,17 @@ tests-no-zope = ["attrs[tests-mypy]", "cloudpickle", "hypothesis", "pympler", "p
 
 [[package]]
 name = "boto3"
-version = "1.34.91"
+version = "1.34.84"
 description = "The AWS SDK for Python"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "boto3-1.34.91-py3-none-any.whl", hash = "sha256:97fac686c47647db4b44e4789317e4aeecd38511d71e84f8d20abe33eb630ff1"},
-    {file = "boto3-1.34.91.tar.gz", hash = "sha256:5077917041adaaae15eeca340289547ef905ca7e11516e9bd22d394fb5057d2a"},
+    {file = "boto3-1.34.84-py3-none-any.whl", hash = "sha256:7a02f44af32095946587d748ebeb39c3fa15b9d7275307ff612a6760ead47e04"},
+    {file = "boto3-1.34.84.tar.gz", hash = "sha256:91e6343474173e9b82f603076856e1d5b7b68f44247bdd556250857a3f16b37b"},
 ]
 
 [package.dependencies]
-botocore = ">=1.34.91,<1.35.0"
+botocore = ">=1.34.84,<1.35.0"
 jmespath = ">=0.7.1,<2.0.0"
 s3transfer = ">=0.10.0,<0.11.0"
 
@@ -54,13 +54,13 @@ crt = ["botocore[crt] (>=1.21.0,<2.0a0)"]
 
 [[package]]
 name = "botocore"
-version = "1.34.91"
+version = "1.34.84"
 description = "Low-level, data-driven core of boto 3."
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "botocore-1.34.91-py3-none-any.whl", hash = "sha256:4d1b13f2b1c28ce1743b1e5895ae62bb7e67f892b51882164ea19c27a130852b"},
-    {file = "botocore-1.34.91.tar.gz", hash = "sha256:93ef7071292a1b2b9fc26537f8ae3a8227da1177969241939ea3fbdb1a1a1d0c"},
+    {file = "botocore-1.34.84-py3-none-any.whl", hash = "sha256:da1ae0a912e69e10daee2a34dafd6c6c106450d20b8623665feceb2d96c173eb"},
+    {file = "botocore-1.34.84.tar.gz", hash = "sha256:a2b309bf5594f0eb6f63f355ade79ba575ce8bf672e52e91da1a7933caa245e6"},
 ]
 
 [package.dependencies]
@@ -72,11 +72,11 @@ urllib3 = [
 ]
 
 [package.extras]
-crt = ["awscrt (==0.20.9)"]
+crt = ["awscrt (==0.19.19)"]
 
 [[package]]
 name = "c7n"
-version = "0.9.36"
+version = "0.9.35"
 description = "Cloud Custodian - Policy Rules Engine"
 optional = false
 python-versions = "^3.8"
@@ -201,13 +201,13 @@ files = [
 
 [[package]]
 name = "exceptiongroup"
-version = "1.2.1"
+version = "1.2.0"
 description = "Backport of PEP 654 (exception groups)"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "exceptiongroup-1.2.1-py3-none-any.whl", hash = "sha256:5258b9ed329c5bbdd31a309f53cbfb0b155341807f6ff7606a1e801a891b29ad"},
-    {file = "exceptiongroup-1.2.1.tar.gz", hash = "sha256:a4785e48b045528f5bfe627b6ad554ff32def154f42372786903b7abcfe1aa16"},
+    {file = "exceptiongroup-1.2.0-py3-none-any.whl", hash = "sha256:4bfd3996ac73b41e9b9628b04e079f193850720ea5945fc96a08633c66912f14"},
+    {file = "exceptiongroup-1.2.0.tar.gz", hash = "sha256:91f5c769735f051a4290d52edd0858999b57e5876e9f85937691bd4c9fa3ed68"},
 ]
 
 [package.extras]
@@ -400,13 +400,13 @@ files = [
 
 [[package]]
 name = "pluggy"
-version = "1.5.0"
+version = "1.4.0"
 description = "plugin and hook calling mechanisms for python"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "pluggy-1.5.0-py3-none-any.whl", hash = "sha256:44e1ad92c8ca002de6377e165f3e0f1be63266ab4d554740532335b9d75ea669"},
-    {file = "pluggy-1.5.0.tar.gz", hash = "sha256:2cffa88e94fdc978c4c574f15f9e59b7f4201d439195c3715ca9e2486f1d0cf1"},
+    {file = "pluggy-1.4.0-py3-none-any.whl", hash = "sha256:7db9f7b503d67d1c5b95f59773ebb58a8c1c288129a88665838012cfb07b8981"},
+    {file = "pluggy-1.4.0.tar.gz", hash = "sha256:8c85c2876142a764e5b7548e7d9a0e0ddb46f5185161049a79b7e974454223be"},
 ]
 
 [package.extras]
@@ -803,26 +803,26 @@ widechars = ["wcwidth"]
 
 [[package]]
 name = "tfparse"
-version = "0.6.8"
+version = "0.6.7"
 description = "Python HCL/Terraform parser via extension for AquaSecurity defsec"
 optional = false
 python-versions = "*"
 files = [
-    {file = "tfparse-0.6.8-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:57cb96950b5520489a186fa3b73a12b84f3a53cdd4f370df58be591629815d63"},
-    {file = "tfparse-0.6.8-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:bd1dfddc60619adbd0e2fa4b51a7449d1b6505ad0ec7618999388441d28e0c23"},
-    {file = "tfparse-0.6.8-cp310-cp310-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:4807a113cd91f53d8087b48ea44ab2e1db63f0d134553666da64fa65c20256b0"},
-    {file = "tfparse-0.6.8-cp310-cp310-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:54668571c60010a1679669b1ec24d04e12320a0cfb202be27ecead322746393c"},
-    {file = "tfparse-0.6.8-cp310-cp310-win_amd64.whl", hash = "sha256:2733b1da48d1674009b03f122b705a2cad390ba492381a85a9fb29ccd98435e7"},
-    {file = "tfparse-0.6.8-cp311-cp311-macosx_10_9_x86_64.whl", hash = "sha256:3aabca2416a03c125f0bdbb5fc1465b70753bf49d2eeee1b3530d13d12602852"},
-    {file = "tfparse-0.6.8-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:9197b169a908a765884075a2038775657beb1de3f326477f58e838e619292b02"},
-    {file = "tfparse-0.6.8-cp311-cp311-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:6dbd583b5dc704c68ee65ffa9a2c5fa09217a8dd039bd18c118d37de35be622d"},
-    {file = "tfparse-0.6.8-cp311-cp311-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:2908555addf21e751dbeece6dacacb5d2da59ab71c711145c32e0746f0bd207e"},
-    {file = "tfparse-0.6.8-cp311-cp311-win_amd64.whl", hash = "sha256:885114c36be9e05a5522bafe9634092e3808213294d39ba5ba87ffc8ca961f1b"},
-    {file = "tfparse-0.6.8-cp312-cp312-macosx_10_9_x86_64.whl", hash = "sha256:a4b1678dd704b872ed0b54ed2580b17610c35c3b6181bf24e4a4aebe9e1fc9e8"},
-    {file = "tfparse-0.6.8-cp312-cp312-macosx_11_0_arm64.whl", hash = "sha256:4b3d50c79a37cb7c5e0982214313fa540dc4584b3bea37402de2b477b8d6de38"},
-    {file = "tfparse-0.6.8-cp312-cp312-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:f4bfb1aed1a3e69d788744ee33b757ecedbbb520a4f3de6b5bee706dff13c534"},
-    {file = "tfparse-0.6.8-cp312-cp312-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:5c4ad78276530bbe4bc9d5b8e98f9a276e302e5a78c63b1db54f38b390a009ee"},
-    {file = "tfparse-0.6.8-cp312-cp312-win_amd64.whl", hash = "sha256:040e5f29d52cb6bf86f04e7f1503cd8edda1dfdd415d5c0731e92fddc54bcd0a"},
+    {file = "tfparse-0.6.7-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:b92a0a49089b0d795f9b39f7ab6735675ffca66e71b3507b622195a5121667ee"},
+    {file = "tfparse-0.6.7-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:86710ceae53c3f47acdabdeb62c98d0181cd1c4b3690a431b4b193cf86ddd42a"},
+    {file = "tfparse-0.6.7-cp310-cp310-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:5d9a2010f1261c3d006676635676c3f6f2bcafcb30a49d43f4627f7109a0f595"},
+    {file = "tfparse-0.6.7-cp310-cp310-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:5561dc793190232f6f1678c9363e58351fff3f5fbd83a58cc87770123d15141f"},
+    {file = "tfparse-0.6.7-cp310-cp310-win_amd64.whl", hash = "sha256:1a910bc292928f18898f4f7e1d0f31b850b385fb812b55b85867714590d81fbd"},
+    {file = "tfparse-0.6.7-cp311-cp311-macosx_10_9_x86_64.whl", hash = "sha256:d13e43d4a40b61f7aca64ba924319e1c4ba4b57718efa161e89b18c6104a6fa5"},
+    {file = "tfparse-0.6.7-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:1a8a54cb45036bbcc4098af1a70acf04acf51c236da2c6c4ca07e61b49c61ffb"},
+    {file = "tfparse-0.6.7-cp311-cp311-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:cbfb28339005716abd765aade1c9928634a31bf510491db6e6162f696c9649e2"},
+    {file = "tfparse-0.6.7-cp311-cp311-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:743c76ca71cfc37ec3a886066c46d7e5a451b23996559520d5316fcdf2a1fc3e"},
+    {file = "tfparse-0.6.7-cp311-cp311-win_amd64.whl", hash = "sha256:2d1a2fc4abc5d54d704d9d230de939272fd2e532f1a18f41eb0745bfebf5ecdf"},
+    {file = "tfparse-0.6.7-cp312-cp312-macosx_10_9_x86_64.whl", hash = "sha256:6678b1d647e39150c2027af6a54ed347ced5ea97f8aa840e0a4483184cb4fe48"},
+    {file = "tfparse-0.6.7-cp312-cp312-macosx_11_0_arm64.whl", hash = "sha256:82091f1e119ae02ca8fd52de9b02c2965f7921536294f8839d5134266fb7d388"},
+    {file = "tfparse-0.6.7-cp312-cp312-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:0bccf06c69d493807634d72c524382fb828eda15a25ce6092df10db228f0d330"},
+    {file = "tfparse-0.6.7-cp312-cp312-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:86b1f5136b8c03d91dfbcc7a7815066eb22c96d936195f1f555071c96d2527ce"},
+    {file = "tfparse-0.6.7-cp312-cp312-win_amd64.whl", hash = "sha256:36b1e9042231488d94716f0be1d7c9a45051aa9ba9a0fb93fc34a378e53e615a"},
 ]
 
 [package.dependencies]
