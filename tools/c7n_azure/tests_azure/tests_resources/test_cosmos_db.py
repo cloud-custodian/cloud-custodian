@@ -380,7 +380,7 @@ class CosmosDBFirewallActionTest(BaseTest):
         self.assertEqual(len(resources), 1)
 
         self.assertEqual(1, len(update_mock.mock_calls))
-        name, args, kwargs = update_mock.mock_calls[0]
+        _, args, kwargs = update_mock.mock_calls[0]
 
         expected = set(['11.12.13.14', '21.22.23.24', get_ext_ip()])
         expected.update(get_portal_ips())
@@ -417,7 +417,7 @@ class CosmosDBFirewallActionTest(BaseTest):
         self.assertEqual(len(resources), 1)
 
         self.assertEqual(1, len(update_mock.mock_calls))
-        name, args, kwargs = update_mock.mock_calls[0]
+        _, args, kwargs = update_mock.mock_calls[0]
 
         expected = set(['11.12.13.14', '21.22.23.24', ext_ip])
         expected.update(get_portal_ips())
@@ -455,7 +455,7 @@ class CosmosDBFirewallActionTest(BaseTest):
         self.assertEqual(len(resources), 1)
 
         self.assertEqual(1, len(update_mock.mock_calls))
-        name, args, kwargs = update_mock.mock_calls[0]
+        _, args, kwargs = update_mock.mock_calls[0]
 
         expected = set(['11.12.13.14', '21.22.23.24', ext_ip, get_azuredc_ip()])
         expected.update(get_portal_ips())
@@ -493,7 +493,7 @@ class CosmosDBFirewallActionTest(BaseTest):
         self.assertEqual(len(resources), 1)
 
         self.assertEqual(1, len(update_mock.mock_calls))
-        name, args, kwargs = update_mock.mock_calls[0]
+        _, args, kwargs = update_mock.mock_calls[0]
 
         self.assertEqual(resources[0]['resourceGroup'], args[0])
         self.assertEqual(resources[0]['name'], args[1])
@@ -529,7 +529,7 @@ class CosmosDBFirewallActionTest(BaseTest):
         resources = p.run()
         self.assertEqual(len(resources), 1)
 
-        name, args, kwargs = update_mock.mock_calls[0]
+        _, args, kwargs = update_mock.mock_calls[0]
 
         expected = set(['11.12.13.14', '21.22.23.24', get_ext_ip()])
         expected.update(get_portal_ips())

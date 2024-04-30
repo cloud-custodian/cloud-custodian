@@ -28,6 +28,7 @@ class QLDB(QueryResourceManager):
         date = 'CreationDateTime'
         universal_taggable = object()
         cfn_type = config_type = 'AWS::QLDB::Ledger'
+        permissions_augment = ("qldb:ListTagsForResource",)
 
     source_mapping = {
         'describe': DescribeQLDB,

@@ -286,14 +286,14 @@ class TestValueFilter(unittest.TestCase):
         self.assertRaises(TypeError, vf.match(resource))
 
     def test_value_path(self):
-        resource = {'list':[{'a':['one','two'],'b':'one'},{'a':['one'],'b':'two'}]}
+        resource = {'list': [{'a': ['one', 'two'], 'b': 'one'}, {'a': ['one'], 'b': 'two'}]}
         vf = filters.factory({
             "type": "value",
             "key": "list[?(b=='one')].a[]",
             "value_path": "list[?(b=='two')].a[]",
             "op": "intersect"})
         res = vf.match(resource)
-        self.assertEqual(res,True)
+        self.assertEqual(res, True)
 
         vf = filters.factory({
             "type": "value",
@@ -301,8 +301,8 @@ class TestValueFilter(unittest.TestCase):
             "value_path": "list[?(b=='three')].a[]",
             "op": "intersect"})
         res = vf.match(resource)
-        self.assertEqual(res,False)
-        
+        self.assertEqual(res, False)
+
 
 class TestAgeFilter(unittest.TestCase):
 
@@ -403,6 +403,28 @@ class TestValueTypes(BaseFilterTest):
         self.assertFilter(fdata, i("abc"), False)
 
         fdata["op"] = "equal"
+        self.assertFilter(fdata, i("abc"), True)
+
+    def test_float(self):
+        fdata = {
+            "type": "value",
+            "key": "tag:Cost",
+            "op": "greater-than",
+            "value_type": "float",
+            "value": 10.0,
+        }
+
+        def i(d):
+            return instance(Tags=[{"Key": "Cost", "Value": d}])
+
+        self.assertFilter(fdata, i("9.9"), False)
+        self.assertFilter(fdata, i("42.1"), True)
+        self.assertFilter(fdata, i("42"), True)
+        self.assertFilter(fdata, i("abc"), False)
+
+        # set default value to 0.0 if the given value is not float
+        fdata["op"] = "equal"
+        fdata["value"] = 0.0
         self.assertFilter(fdata, i("abc"), True)
 
     def test_integer_with_value_regex(self):

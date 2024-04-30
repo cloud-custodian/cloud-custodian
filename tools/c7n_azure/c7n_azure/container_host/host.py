@@ -116,9 +116,11 @@ class Host:
         features.
         """
         if not self.policy_blob_client:
-            self.policy_blob_client = Storage.get_blob_client_by_uri(self.policy_storage_uri,
-                                                                     self.storage_session)
-        (client, container, prefix) = self.policy_blob_client
+            self.policy_blob_client = Storage.get_blob_client_by_uri(
+                self.policy_storage_uri,
+                self.storage_session
+            )
+        (client, container, _) = self.policy_blob_client
 
         try:
             # All blobs with YAML extension

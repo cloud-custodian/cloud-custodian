@@ -5,10 +5,10 @@ import ipaddress
 import os
 import tempfile
 import time
+from unittest import mock
 
 from botocore.exceptions import ClientError
 from dateutil.parser import parse as parse_date
-import mock
 
 from c7n import utils
 from c7n.config import Config
@@ -59,7 +59,7 @@ class Backoff(BaseTest):
 
     def test_delays_jitter(self):
         count = 0
-        while(count < 100000):
+        while (count < 100000):
             count += 1
             for idx, i in enumerate(utils.backoff_delays(1, 256, jitter=True)):
                 maxv = 2 ** idx
@@ -215,6 +215,13 @@ class UtilTest(BaseTest):
 
         self.assertEqual(utils.local_session(p.session_factory), previous)
 
+    def test_encode_bytes(self):
+        self.assertEqual(
+            json.loads(json.dumps(
+                {"bytes": b"123"}, cls=utils.JsonEncoder)),
+                {'bytes': '123'}
+            )
+
     def test_format_date(self):
         d = parse_date("2018-02-02 12:00")
         self.assertEqual("{}".format(utils.FormatDate(d)), "2018-02-02 12:00:00")
@@ -228,7 +235,7 @@ class UtilTest(BaseTest):
         self.assertEqual("{:+5M%M}".format(utils.FormatDate(d)), "05")
 
         self.assertEqual(json.dumps(utils.FormatDate(d),
-                                    cls=utils.DateTimeEncoder, indent=2),
+                                    cls=utils.JsonEncoder, indent=2),
                          '"2018-02-02T12:00:00"')
         self.assertEqual(str(d), '2018-02-02 12:00:00')
 
@@ -438,7 +445,7 @@ class UtilTest(BaseTest):
         self.assertEqual(json.loads(utils.format_event(event)), json.loads(event_json))
 
     def test_date_time_decoder(self):
-        dtdec = utils.DateTimeEncoder()
+        dtdec = utils.JsonEncoder()
         self.assertRaises(TypeError, dtdec.default, "test")
 
     def test_set_annotation(self):
@@ -687,3 +694,20 @@ def test_output_path_join():
     output_dir = './local-dir'
     assert utils.join_output_path(output_dir, 'Samuel', 'us-east-1') == (
         f"./local-dir{os.sep}Samuel{os.sep}us-east-1")
+
+
+def test_jmespath_parse_split():
+    result = utils.jmespath_search(
+        'foo.bar | split(`.`, @)',
+        {'foo': {'bar': 'abc.xyz'}}
+    )
+    assert result == ['abc', 'xyz']
+
+    compiled = utils.jmespath_compile(
+        'foo.bar | split(`.`, @)',
+    )
+    assert isinstance(compiled, utils.ParsedResultWithOptions)
+    result = compiled.search(
+        {'foo': {'bar': 'abc.xyz'}}
+    )
+    assert result == ['abc', 'xyz']

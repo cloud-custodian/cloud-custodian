@@ -66,6 +66,8 @@ def eperm(provider, el, r=None):
             r = Bag({'type': 'logs_loggroup'})
         elif provider == 'tencentcloud':
             r = Bag({'type': 'ami'})
+        elif provider == 'oci':
+            r = Bag({'type': 'instance'})
 
     # print(f'policy construction lookup {r.type}.{element_type}.{el.type}')
 
@@ -168,7 +170,7 @@ class CustodianResource(CustodianDirective):
     @classmethod
     def render_resource(cls, resource_path):
         resource_class = cls.resolve(resource_path)
-        provider_type, resource_name = resource_path.split('.', 1)
+        provider_type, _ = resource_path.split('.', 1)
         return cls._render('resource.rst',
             variables=dict(
                 provider_name=clouds[provider_type].display_name,

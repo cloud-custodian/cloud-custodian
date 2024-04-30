@@ -28,6 +28,24 @@ class DMDeploymentTest(BaseTest):
             ],
         )
 
+    def test_deployment_augment(self):
+        project_id = 'cloud-custodian'
+        session_factory = self.replay_flight_data('dm-deployment-augment', project_id=project_id)
+
+        policy = self.load_policy(
+            {'name': 'one-deployment', 'resource': 'gcp.dm-deployment'},
+            session_factory=session_factory)
+
+        deployment = policy.resource_manager.get_resource({
+            'project_id': project_id,
+            'name': 'example-deployment5'
+        })
+        assert deployment['labels'] == {'environment': 'production', 'storage': 'media'}
+
+        resources = policy.run()
+        assert len(resources) == 1
+        assert resources[0]['labels'] == {'environment': 'production', 'storage': 'media'}
+
     def test_deployment_get(self):
         project_id = 'cloud-custodian'
         session_factory = self.replay_flight_data('dm-deployment-get', project_id=project_id)

@@ -1,6 +1,7 @@
 name: "Docker Build"
 on:
-  # build a daily dev image  
+  workflow_dispatch: {}
+  # build a daily dev image
   schedule:
     - cron: "42 6 * * *"
   push:
@@ -21,7 +22,7 @@ jobs:
           - c7n-left
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: ${{ matrix.image }} build and push
         uses: ./.github/composites/docker-build-push
         env:

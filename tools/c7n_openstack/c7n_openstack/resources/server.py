@@ -5,7 +5,7 @@ from c7n_openstack.provider import resources
 from c7n.utils import local_session
 from c7n.utils import type_schema
 from c7n.filters import Filter
-from c7n.filters import AgeFilter
+from c7n.filters import AgeFilter, ListItemFilter
 
 
 @resources.register('server')
@@ -231,3 +231,98 @@ def find_object_by_property(collection, k, v):
         return None
     assert len(result) == 1
     return result[0]
+
+
+@Server.filter_registry.register('security-group')
+class SecurityGroupFilter(ListItemFilter):
+    """Filters Servers based on attached security groups attributes
+
+    :example:
+
+    Finds servers with a security group that is stateful
+    .. code-block:: yaml
+
+            policies:
+              - name: server-securitygroup-stateful
+                resource: openstack.server
+                filters:
+                  - type: security-group
+                    attrs:
+                      - type: value
+                        key: stateful
+                        value: true
+
+    :example:
+
+    Finds servers with a security group that has inbound rules which
+    include 0.0.0.0/0 and any port
+
+    .. code-block:: yaml
+
+            policies:
+              - name: server-securitygroup-open-to-internet
+                resource: openstack.server
+                filters:
+                  - type: security-group
+                    key: security_group_rules
+                    attrs:
+                      - type: value
+                        key: direction
+                        value: ingress
+                      - type: value
+                        key: !port_range_min && !port_range_max
+                        value: true
+                      - type: value
+                        key: remote_ip_prefix
+                        value: '0.0.0.0/0'
+    """
+    schema = type_schema(
+        'security-group',
+        key={'type': 'string'},
+        attrs={'$ref': '#/definitions/filters_common/list_item_attrs'}
+    )
+
+    annotate_items = True
+    _client = None
+
+    def get_client(self):
+        if self._client:
+            return self._client
+        self._client = local_session(self.manager.session_factory).client()
+        return self._client
+
+    def validate(self):
+        self._sg_map = {}
+        return super().validate()
+
+    def get_item_values(self, resource):
+        result = []
+        client = self.get_client()
+        sgs_details = client.compute.fetch_server_security_groups(
+            resource.get('id')).security_groups
+        attached_sgs_ids = [sg_details.get('id') for sg_details in sgs_details]
+
+        for attached_sg_id in attached_sgs_ids:
+            if attached_sg_id not in self._sg_map:
+                self._sg_map[attached_sg_id] = (
+                    client.network.find_security_group(
+                        attached_sg_id, ignore_missing=True
+                    ).toDict())
+            security_group = self._sg_map.get(attached_sg_id)
+            if security_group is None:
+                continue
+            if 'key' in self.data:
+                key_values = self.expr.search(security_group)
+                result.extend(key_values)
+            else:
+                result.append(security_group)
+        return result
+
+
+@resources.register('image')
+class Image(QueryResourceManager):
+    class resource_type(TypeInfo):
+        enum_spec = ('list_images', None)
+        id = 'id'
+        name = 'name'
+        default_report_fields = ['id', 'name', 'status', 'visibility']

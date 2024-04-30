@@ -1,6 +1,7 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import json
+from unittest.mock import patch
 
 from c7n.exceptions import PolicyValidationError
 from c7n.resources.aws import shape_validate
@@ -193,6 +194,31 @@ class ElasticSearch(BaseTest):
         self.assertEqual(resources[0]["DomainName"], "c7n-test")
         tags = client.list_tags(ARN=resources[0]["ARN"])["TagList"]
         self.assertEqual(len(tags), 0)
+
+    def test_deleted_domain_tag_operations(self):
+        """Expect an uninterrupted policy run, though there's nothing to do."""
+
+        session_factory = self.replay_flight_data("test_elasticsearch_deleted_domain_tag_ops")
+        p = self.load_policy(
+            {
+                "name": "manage-tags-for-deleted-es-domain",
+                "resource": "aws.elasticsearch",
+                "actions": [
+                    {"type": "tag", "key": "environment", "value": "test"},
+                    {"type": "remove-tag", "tags": ["owner"]}
+                ],
+            },
+            session_factory=session_factory,
+        )
+
+        with patch("c7n.resources.elasticsearch.ElasticSearchDomain.resources", return_value=[
+            {
+                "DomainName": "non-existent-domain",
+                "ARN": "arn:aws:es:us-east-1:644160558196:domain/non-existent-domain",
+                "Tags": {"owner": "me"}
+            },
+        ]):
+            p.run()
 
     def test_domain_mark_for_op(self):
         session_factory = self.replay_flight_data("test_elasticsearch_markforop")

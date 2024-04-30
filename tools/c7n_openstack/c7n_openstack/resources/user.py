@@ -5,7 +5,7 @@ from c7n_openstack.query import QueryResourceManager, TypeInfo
 from c7n_openstack.provider import resources
 from c7n.utils import local_session
 from c7n.utils import type_schema
-from c7n.filters import Filter
+from c7n.filters import Filter, ValueFilter
 
 
 @resources.register('user')
@@ -83,3 +83,45 @@ class RoleFilter(Filter):
                                     project_id, system_scope):
                 results.append(user)
         return results
+
+
+@User.filter_registry.register('extended-info')
+class ExtendedInfoFilter(ValueFilter):
+    """Filters Users based on their additional information.
+
+    Filters users with ``multi_factor_auth_enabled`` option set to false or absent.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: demo
+                resource: openstack.user
+                filters:
+                  - or:
+                    - type: extended-info
+                      key: options.multi_factor_auth_enabled
+                      value: absent
+                    - type: extended-info
+                      key: options.multi_factor_auth_enabled
+                      value: false
+    """
+
+    schema = type_schema('extended-info', rinherit=ValueFilter.schema)
+    schema_alias = False
+    annotation_key = 'c7n:ExtendedUserInfo'
+
+    def process(self, resources, event=None):
+        openstack = local_session(self.manager.session_factory).client()
+        keystoneauth_session = openstack.config.get_session_client('identity')
+        users_list = keystoneauth_session.get("/users").json().get("users")
+        users_dict = {user['id']: user for user in users_list}
+        for r in resources:
+            if self.annotation_key in r:
+                continue
+            r[self.annotation_key] = users_dict.get(r.get('id'))
+        return super().process(resources, event)
+
+    def __call__(self, r):
+        return super().__call__(r[self.annotation_key])

@@ -124,9 +124,7 @@ class TestPlan:
         cfg = Config.empty(session_factory=None, tracer=NullTracer(None), options=None)
         matchers = []
         for match_block in self.data:
-            matcher = DataMatcher(
-                cfg, {"filters": [{k: v} for k, v in match_block.items()]}
-            )
+            matcher = DataMatcher(cfg, {"filters": [{k: v} for k, v in match_block.items()]})
             for i in matcher.iter_filters():
                 i.annotate = False
             matchers.append(matcher)
@@ -210,6 +208,6 @@ class TestReporter(RichCli):
 
 
 class TestChecker(Output):
-    def on_results(self, results):
+    def on_results(self, policy, results):
         for r in results:
             self.ctx.check_execution_result(r)

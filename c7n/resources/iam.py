@@ -100,6 +100,7 @@ class Role(QueryResourceManager):
         enum_spec = ('list_roles', 'Roles', None)
         detail_spec = ('get_role', 'RoleName', 'RoleName', 'Role')
         id = name = 'RoleName'
+        config_id = 'RoleId'
         date = 'CreateDate'
         cfn_type = config_type = "AWS::IAM::Role"
         # Denotes this resource type exists across regions
@@ -454,6 +455,7 @@ class ServerCertificate(QueryResourceManager):
                      'ServerCertificateMetadataList',
                      None)
         name = id = 'ServerCertificateName'
+        config_type = "AWS::IAM::ServerCertificate"
         name = 'ServerCertificateName'
         date = 'Expiration'
         # Denotes this resource type exists across regions
@@ -726,6 +728,8 @@ class CheckPermissions(Filter):
             else:
                 evaluations = self.get_evaluations(client, arn, r, actions)
                 eval_cache[arn] = evaluations
+            if not evaluations:
+                continue
             matches = []
             matched = []
             for e in evaluations:
@@ -1684,6 +1688,59 @@ class InstanceProfileSetRole(BaseAction):
                     self.add_role(client, r, role)
 
 
+@InstanceProfile.action_registry.register("set-policy")
+class SetInstanceProfileRolePolicy(SetPolicy):
+    """Set a specific IAM policy as attached or detached on an instance profile role.
+
+    You will identify the policy by its arn.
+
+    Returns a list of roles modified by the action.
+
+    For example, if you want to automatically attach a single policy while
+    detaching all exisitng policies:
+
+    :example:
+
+      .. code-block:: yaml
+
+        - name: iam-attach-instance-profile-role-policy
+          resource: iam-profile
+          filters:
+          - not:
+            - type: has-specific-managed-policy
+              value: my-iam-policy
+          actions:
+          - type: set-policy
+            state: attached
+            arn: arn:aws:iam::123456789012:policy/my-iam-policy
+
+    """
+
+    permissions = ('iam:AttachRolePolicy', 'iam:DetachRolePolicy', "iam:ListAttachedRolePolicies",)
+
+    def attach_policy(self, client, resource, policy_arn):
+        client.attach_role_policy(
+            RoleName=resource["Roles"][0]["RoleName"],
+            PolicyArn=policy_arn
+        )
+
+    def detach_policy(self, client, resource, policy_arn):
+        try:
+            client.detach_role_policy(
+                RoleName=resource["Roles"][0]["RoleName"],
+                PolicyArn=policy_arn
+            )
+        except client.exceptions.NoSuchEntityException:
+            return
+
+    def list_attached_policies(self, client, resource):
+        attached_policies = client.list_attached_role_policies(
+            RoleName=resource["Roles"][0]["RoleName"]
+        )
+        policy_arns = [p.get('PolicyArn') for p in attached_policies['AttachedPolicies']]
+        return policy_arns
+
+
 ###################
 #    IAM Users    #
 ###################
@@ -1874,7 +1931,7 @@ class CredentialReport(Filter):
             return vf(info)
 
         # access key matching
-        prefix, sk = k.split('.', 1)
+        prefix, _ = k.split('.', 1)
         vf = ValueFilter(self.matcher_config)
         vf.annotate = False
 
@@ -1953,11 +2010,52 @@ class UserPolicy(ValueFilter):
               - type: policy
                 key: PolicyName
                 value: AdministratorAccess
+                include-via: true
     """
 
-    schema = type_schema('policy', rinherit=ValueFilter.schema)
+    schema = type_schema('policy', rinherit=ValueFilter.schema,
+        **{'include-via': {'type': 'boolean'}})
     schema_alias = False
-    permissions = ('iam:ListAttachedUserPolicies',)
+    permissions = (
+        'iam:ListAttachedUserPolicies',
+        'iam:ListGroupsForUser',
+        'iam:ListAttachedGroupPolicies',
+    )
+
+    def find_in_user_set(self, user_set, search_key, arn_key, arn):
+        for u in user_set:
+            if search_key in u:
+                searched = next((v for v in u[search_key] if v.get(arn_key) == arn), None)
+                if searched is not None:
+                    return searched
+
+        return None
+
+    def user_groups_policies(self, client, user_set, u):
+        u['c7n:Groups'] = client.list_groups_for_user(
+            UserName=u['UserName'])['Groups']
+
+        for ug in u['c7n:Groups']:
+            ug_searched = self.find_in_user_set(user_set, 'c7n:Groups', 'Arn', ug['Arn'])
+            if ug_searched and ug_searched.get('AttachedPolicies'):
+                ug['AttachedPolicies'] = ug_searched['AttachedPolicies']
+            else:
+                ug['AttachedPolicies'] = client.list_attached_group_policies(
+                    GroupName=ug['GroupName'])['AttachedPolicies']
+
+            for ap in ug['AttachedPolicies']:
+                p_searched = self.find_in_user_set([u], 'c7n:Policies', 'Arn', ap['PolicyArn'])
+                if not p_searched:
+                    p_searched = self.find_in_user_set(
+                        user_set, 'c7n:Policies', 'Arn', ap['PolicyArn']
+                    )
+                    if p_searched:
+                        u['c7n:Policies'].append(p_searched)
+                    else:
+                        u['c7n:Policies'].append(
+                            client.get_policy(PolicyArn=ap['PolicyArn'])['Policy'])
+
+        return u
 
     def user_policies(self, user_set):
         client = local_session(self.manager.session_factory).client('iam')
@@ -1969,6 +2067,8 @@ class UserPolicy(ValueFilter):
             for ap in aps:
                 u['c7n:Policies'].append(
                     client.get_policy(PolicyArn=ap['PolicyArn'])['Policy'])
+            if self.data.get('include-via'):
+                u = self.user_groups_policies(client, user_set, u)
 
     def process(self, resources, event=None):
         user_set = chunks(resources, size=50)
@@ -2912,6 +3012,7 @@ class SamlProvider(QueryResourceManager):
         detail_spec = ('get_saml_provider', 'SAMLProviderArn', 'Arn', None)
         arn = 'Arn'
         arn_type = 'saml-provider'
+        config_type = "AWS::IAM::SAMLProvider"
         global_resource = True
 
     source_mapping = {'describe': SamlProviderDescribe}
@@ -2937,6 +3038,42 @@ class OpenIdProvider(QueryResourceManager):
         global_resource = True
 
     source_mapping = {'describe': OpenIdDescribe}
+
+
+@OpenIdProvider.action_registry.register('delete')
+class OpenIdProviderDelete(BaseAction):
+    """Delete an OpenID Connect IAM Identity Provider
+
+    For example, if you want to automatically delete an OIDC IdP for example.com
+
+    :example:
+
+      .. code-block:: yaml
+
+        - name: aws-iam-oidc-provider-delete
+          resource: iam-oidc-provider
+          filters:
+            - type: value
+              key: Url
+              value: example.com
+          actions:
+            - type: delete
+
+    """
+    schema = type_schema('delete')
+    permissions = ('iam:DeleteOpenIDConnectProvider',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('iam')
+        for provider in resources:
+            self.manager.retry(
+                client.delete_open_id_connect_provider,
+                OpenIDConnectProviderArn=provider['Arn'],
+                ignore_err_codes=(
+                    'NoSuchEntityException',
+                    'DeleteConflictException',
+                ),
+            )
 
 
 @InstanceProfile.filter_registry.register('has-specific-managed-policy')

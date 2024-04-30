@@ -1,0 +1,29 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "experiments": [
+            {
+                "id": "EXP23yEZKCzYqWPQ7W2",
+                "experimentTemplateId": "EXT2oY9nKDt8iK4L",
+                "state": {
+                    "status": "failed",
+                    "reason": "Unable to stop all targets. Not enough privileges to perform the required action."
+                },
+                "creationTime": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 4,
+                    "day": 5,
+                    "hour": 9,
+                    "minute": 58,
+                    "second": 11,
+                    "microsecond": 261000
+                },
+                "tags": {
+                    "foo": "bar"
+                }
+            }
+        ]
+    }
+}

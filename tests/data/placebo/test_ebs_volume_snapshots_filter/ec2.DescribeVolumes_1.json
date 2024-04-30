@@ -1,0 +1,58 @@
+{
+  "status_code": 200,
+  "data": {
+    "ResponseMetadata": {
+      "HTTPStatusCode": 200,
+      "RequestId": "37d42735-bd60-460c-b3f5-c86fa29197a5"
+    },
+    "Volumes": [
+      {
+        "Attachments": [
+          {
+            "AttachTime": "2023-03-30T08:59:18+00:00",
+            "Device": "/dev/sda1",
+            "InstanceId": "i-0816a1c230997c6de",
+            "State": "attached",
+            "VolumeId": "vol-0c7930681fe5a17db",
+            "DeleteOnTermination": true
+          }
+        ],
+        "AvailabilityZone": "eu-west-1a",
+        "CreateTime": "2023-03-30T08:59:18.664000+00:00",
+        "Encrypted": true,
+        "KmsKeyId": "",
+        "Size": 40,
+        "SnapshotId": "snap-020ed23aed7ca65d2",
+        "State": "in-use",
+        "VolumeId": "vol-0c7930681fe5a17db",
+        "Iops": 3000,
+        "VolumeType": "gp3",
+        "MultiAttachEnabled": false,
+        "Throughput": 125
+      },
+      {
+        "Attachments": [
+          {
+            "AttachTime": "2023-06-21T11:31:54+00:00",
+            "Device": "/dev/sda1",
+            "InstanceId": "i-0b0c5aefffc7216d1",
+            "State": "attached",
+            "VolumeId": "vol-0706f8e126ff74d3a",
+            "DeleteOnTermination": true
+          }
+        ],
+        "AvailabilityZone": "eu-west-1b",
+        "CreateTime": "2023-06-21T11:31:54.638000+00:00",
+        "Encrypted": false,
+        "Size": 20,
+        "SnapshotId": "snap-067e737e13f6a8dc2",
+        "State": "in-use",
+        "VolumeId": "vol-0706f8e126ff74d3a",
+        "Iops": 3000,
+        "VolumeType": "gp3",
+        "MultiAttachEnabled": false,
+        "Throughput": 125
+      }
+    ]
+  }
+}

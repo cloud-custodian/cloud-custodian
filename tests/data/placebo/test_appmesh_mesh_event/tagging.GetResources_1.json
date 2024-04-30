@@ -1,0 +1,18 @@
+{
+  "status_code": 200,
+  "data": {
+    "PaginationToken": "",
+    "ResourceTagMappingList": [
+      {
+        "ResourceARN": "arn:aws:appmesh:eu-west-2:123456789012:mesh/m1",
+        "Tags": [
+          {
+            "Key": "MyTagName",
+            "Value": "m1"
+          }
+        ]
+      }
+    ],
+    "ResponseMetadata": {}
+  }
+}

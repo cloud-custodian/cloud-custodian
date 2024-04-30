@@ -1,0 +1,14 @@
+{
+    "status_code": 200,
+    "data": {
+        "Topics": [
+            {
+                "TopicArn": "arn:aws:sns:us-east-1:644160558196:c7n-test-rbp-no-sid"
+            },
+            {
+                "TopicArn": "arn:aws:sns:us-east-1:644160558196:test123"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

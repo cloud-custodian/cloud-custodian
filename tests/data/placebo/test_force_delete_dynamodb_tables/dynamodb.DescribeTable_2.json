@@ -1,0 +1,36 @@
+{
+    "status_code": 200,
+    "data": {
+        "Table": {
+            "TableName": "c7n-test",
+            "TableStatus": "DELETING",
+            "ProvisionedThroughput": {
+                "NumberOfDecreasesToday": 0,
+                "ReadCapacityUnits": 0,
+                "WriteCapacityUnits": 0
+            },
+            "TableSizeBytes": 0,
+            "ItemCount": 0,
+            "TableArn": "arn:aws:dynamodb:us-east-1:644160558196:table/c7n-test",
+            "TableId": "51a61234-5d77-43d7-8eaf-642b32bc241a",
+            "BillingModeSummary": {
+                "BillingMode": "PAY_PER_REQUEST",
+                "LastUpdateToPayPerRequestDateTime": {
+                    "__class__": "datetime",
+                    "year": 2023,
+                    "month": 10,
+                    "day": 30,
+                    "hour": 23,
+                    "minute": 22,
+                    "second": 56,
+                    "microsecond": 582000
+                }
+            },
+            "TableClassSummary": {
+                "TableClass": "STANDARD_INFREQUENT_ACCESS"
+            },
+            "DeletionProtectionEnabled": false
+        },
+        "ResponseMetadata": {}
+    }
+}

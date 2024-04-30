@@ -1,0 +1,13 @@
+{
+    "status_code": 400,
+    "data": {
+        "Error": {
+            "Message": "Unknown server",
+            "Code": "ResourceNotFoundException"
+        },
+        "ResponseMetadata": {},
+        "Message": "Unknown server",
+        "Resource": "s-e1445c881f5746b59",
+        "ResourceType": "Server"
+    }
+}

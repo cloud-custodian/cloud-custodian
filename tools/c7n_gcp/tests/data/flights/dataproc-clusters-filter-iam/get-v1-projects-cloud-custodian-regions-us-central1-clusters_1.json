@@ -1,0 +1,189 @@
+{
+  "headers": {
+    "x-debug-tracking-id": "9185634956174410628;o=0",
+    "content-type": "application/json; charset=UTF-8",
+    "vary": "Origin, X-Origin, Referer",
+    "date": "Tue, 08 Aug 2023 00:33:52 GMT",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "7764",
+    "-content-encoding": "gzip",
+    "content-location": "https://dataproc.googleapis.com/v1/projects/cloud-custodian/regions/us-central1/clusters?alt=json"
+  },
+  "body": {
+    "clusters": [
+      {
+        "projectId": "gcp-lab-custodian",
+        "clusterName": "cluster-8065",
+        "config": {
+          "configBucket": "dataproc-staging-us-central1-443732426401-ycm9atvs",
+          "tempBucket": "dataproc-temp-us-central1-443732426401-xltujtvk",
+          "gceClusterConfig": {
+            "zoneUri": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-c",
+            "networkUri": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/networks/default",
+            "serviceAccountScopes": [
+              "https://www.googleapis.com/auth/cloud-platform"
+            ],
+            "internalIpOnly": false,
+            "shieldedInstanceConfig": {
+              "enableSecureBoot": false,
+              "enableVtpm": false,
+              "enableIntegrityMonitoring": false
+            }
+          },
+          "masterConfig": {
+            "numInstances": 1,
+            "instanceNames": [
+              "cluster-8065-m"
+            ],
+            "imageUri": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/global/images/dataproc-2-1-deb11-20230801-184933-rc01",
+            "machineTypeUri": "https://www.googleapis.com/compute/v1/projects/cloud-custodian/zones/us-central1-c/machineTypes/n2-standard-4",
+            "diskConfig": {
+              "bootDiskSizeGb": 500,
+              "bootDiskType": "pd-standard"
+            },
+            "minCpuPlatform": "AUTOMATIC",
+            "preemptibility": "NON_PREEMPTIBLE"
+          },
+          "softwareConfig": {
+            "imageVersion": "2.1.20-debian11",
+            "properties": {
+              "capacity-scheduler:yarn.scheduler.capacity.root.default.ordering-policy": "fair",
+              "core:fs.gs.block.size": "134217728",
+              "core:fs.gs.metadata.cache.enable": "false",
+              "core:hadoop.ssl.enabled.protocols": "TLSv1,TLSv1.1,TLSv1.2",
+              "dataproc:dataproc.allow.zero.workers": "true",
+              "distcp:mapreduce.map.java.opts": "-Xmx768m",
+              "distcp:mapreduce.map.memory.mb": "1024",
+              "distcp:mapreduce.reduce.java.opts": "-Xmx768m",
+              "distcp:mapreduce.reduce.memory.mb": "1024",
+              "hadoop-env:HADOOP_DATANODE_OPTS": "-Xmx512m",
+              "hdfs:dfs.datanode.address": "0.0.0.0:9866",
+              "hdfs:dfs.datanode.http.address": "0.0.0.0:9864",
+              "hdfs:dfs.datanode.https.address": "0.0.0.0:9865",
+              "hdfs:dfs.datanode.ipc.address": "0.0.0.0:9867",
+              "hdfs:dfs.namenode.handler.count": "20",
+              "hdfs:dfs.namenode.http-address": "0.0.0.0:9870",
+              "hdfs:dfs.namenode.https-address": "0.0.0.0:9871",
+              "hdfs:dfs.namenode.lifeline.rpc-address": "cluster-8065-m:8050",
+              "hdfs:dfs.namenode.secondary.http-address": "0.0.0.0:9868",
+              "hdfs:dfs.namenode.secondary.https-address": "0.0.0.0:9869",
+              "hdfs:dfs.namenode.service.handler.count": "10",
+              "hdfs:dfs.namenode.servicerpc-address": "cluster-8065-m:8051",
+              "mapred-env:HADOOP_JOB_HISTORYSERVER_HEAPSIZE": "4000",
+              "mapred:mapreduce.job.maps": "9",
+              "mapred:mapreduce.job.reduce.slowstart.completedmaps": "0.95",
+              "mapred:mapreduce.job.reduces": "3",
+              "mapred:mapreduce.jobhistory.recovery.store.class": "org.apache.hadoop.mapreduce.v2.hs.HistoryServerLeveldbStateStoreService",
+              "mapred:mapreduce.map.cpu.vcores": "1",
+              "mapred:mapreduce.map.java.opts": "-Xmx2708m",
+              "mapred:mapreduce.map.memory.mb": "3386",
+              "mapred:mapreduce.reduce.cpu.vcores": "1",
+              "mapred:mapreduce.reduce.java.opts": "-Xmx2708m",
+              "mapred:mapreduce.reduce.memory.mb": "3386",
+              "mapred:mapreduce.task.io.sort.mb": "256",
+              "mapred:yarn.app.mapreduce.am.command-opts": "-Xmx2708m",
+              "mapred:yarn.app.mapreduce.am.resource.cpu-vcores": "1",
+              "mapred:yarn.app.mapreduce.am.resource.mb": "3386",
+              "spark-env:SPARK_DAEMON_MEMORY": "4000m",
+              "spark:spark.driver.maxResultSize": "2048m",
+              "spark:spark.driver.memory": "4096m",
+              "spark:spark.executor.cores": "2",
+              "spark:spark.executor.instances": "2",
+              "spark:spark.executor.memory": "6157m",
+              "spark:spark.executorEnv.OPENBLAS_NUM_THREADS": "1",
+              "spark:spark.extraListeners": "com.google.cloud.spark.performance.DataprocMetricsListener",
+              "spark:spark.scheduler.mode": "FAIR",
+              "spark:spark.sql.cbo.enabled": "true",
+              "spark:spark.ui.port": "0",
+              "spark:spark.yarn.am.memory": "640m",
+              "yarn-env:YARN_NODEMANAGER_HEAPSIZE": "1638",
+              "yarn-env:YARN_RESOURCEMANAGER_HEAPSIZE": "4000",
+              "yarn-env:YARN_TIMELINESERVER_HEAPSIZE": "4000",
+              "yarn:yarn.nodemanager.address": "0.0.0.0:8026",
+              "yarn:yarn.nodemanager.resource.cpu-vcores": "4",
+              "yarn:yarn.nodemanager.resource.memory-mb": "13544",
+              "yarn:yarn.resourcemanager.decommissioning-nodes-watcher.decommission-if-no-shuffle-data": "true",
+              "yarn:yarn.resourcemanager.nodemanager-graceful-decommission-timeout-secs": "86400",
+              "yarn:yarn.scheduler.maximum-allocation-mb": "13544",
+              "yarn:yarn.scheduler.minimum-allocation-mb": "1"
+            }
+          },
+          "encryptionConfig": {},
+          "securityConfig": {
+            "kerberosConfig": {}
+          },
+          "endpointConfig": {}
+        },
+        "status": {
+          "state": "RUNNING",
+          "stateStartTime": "2023-08-07T22:39:39.254772Z"
+        },
+        "clusterUuid": "f8e98afd-325c-4962-9df4-bd992a942008",
+        "statusHistory": [
+          {
+            "state": "CREATING",
+            "stateStartTime": "2023-08-07T22:37:46.097844Z"
+          }
+        ],
+        "labels": {
+          "goog-dataproc-cluster-name": "cluster-8065",
+          "goog-dataproc-cluster-uuid": "f8e98afd-325c-4962-9df4-bd992a942008",
+          "goog-dataproc-location": "us-central1"
+        },
+        "metrics": {
+          "hdfsMetrics": {
+            "dfs-capacity-used": "28672",
+            "dfs-nodes-running": "1",
+            "dfs-capacity-total": "528173547520",
+            "dfs-blocks-missing-repl-one": "0",
+            "dfs-nodes-decommissioned": "0",
+            "dfs-capacity-present": "491286298624",
+            "dfs-capacity-remaining": "491286269952",
+            "dfs-nodes-decommissioning": "0",
+            "dfs-blocks-missing": "0",
+            "dfs-blocks-pending-deletion": "0",
+            "dfs-blocks-under-replication": "0",
+            "dfs-blocks-corrupt": "0",
+            "dfs-blocks-default-replication-factor": "1"
+          },
+          "yarnMetrics": {
+            "yarn-nodes-shutdown": "0",
+            "yarn-nodes-unhealthy": "0",
+            "yarn-memory-mb-available": "13544",
+            "yarn-containers-reserved": "0",
+            "yarn-memory-mb-pending": "0",
+            "yarn-nodes-rebooted": "0",
+            "yarn-memory-mb-total": "13544",
+            "yarn-containers-pending": "0",
+            "yarn-apps-completed": "0",
+            "yarn-apps-running": "0",
+            "yarn-vcores-allocated": "0",
+            "yarn-vcores-reserved": "0",
+            "yarn-memory-mb-reserved": "0",
+            "yarn-nodes-active": "1",
+            "yarn-apps-pending": "0",
+            "yarn-apps-failed": "0",
+            "yarn-containers-allocated": "0",
+            "yarn-memory-mb-allocated": "0",
+            "yarn-apps-killed": "0",
+            "yarn-vcores-pending": "0",
+            "yarn-nodes-lost": "0",
+            "yarn-nodes-decommissioned": "0",
+            "yarn-nodes-new": "0",
+            "yarn-vcores-available": "4",
+            "yarn-vcores-total": "4",
+            "yarn-nodes-decommissioning": "0",
+            "yarn-apps-submitted": "0"
+          }
+        }
+      }
+    ]
+  }
+}

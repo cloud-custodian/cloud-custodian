@@ -17,7 +17,8 @@ $ mkdir sam-deploy
 $ python policylambda.py -o sam-deploy -c policies.yml
 
 $ cd sam-deploy
-$ aws cloudformation package --template-file deploy.yml --s3-bucket mybucket > cfn.yml
+$ aws cloudformation package --template-file deploy.yml \
+      --s3-bucket mybucket --output-template-file cfn.yml
 $ aws cloudformation deploy cfn.yml
 ```
 
@@ -135,6 +136,12 @@ def dispatch_render(p, sam):
         return None
     policy_lambda = mu.PolicyLambda(p)
     properties = render_func(p, policy_lambda, sam)
+    if properties['Role'].startswith('arn:') and "{account_id}" in properties['Role']:
+        properties['Role'] = {'Fn::Sub': properties['Role'].replace("{account_id}", "${AWS::AccountId}")}  # noqa: E501
+    elif properties['Role'].startswith('arn:'):
+        pass
+    else:
+        properties['Role'] = {'Fn::Sub': "arn:aws:iam::${AWS::AccountId}:role/%s" % policy_lambda.role}  # noqa: E501
     properties['CodeUri'] = "./%s.zip" % p.name
     sam['Resources'][resource_name(p.name)] = {
         'Type': 'AWS::Serverless::Function',

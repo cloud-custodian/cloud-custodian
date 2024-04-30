@@ -47,6 +47,8 @@ def test_tag_action_filter_call(test, tag_action_filter_call):
     test.assertEqual(len(resources), 1)
 
     stopped_ec2_instance_id = tag_action_filter_call['aws_instance.past_stop.id']
+    if test.recording:
+        time.sleep(0.25)
     ec2 = session_factory().resource('ec2')
     instance = ec2.Instance(stopped_ec2_instance_id)
     test.assertEqual(instance.state['Name'], 'stopping')

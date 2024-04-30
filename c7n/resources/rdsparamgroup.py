@@ -33,6 +33,7 @@ class RDSParamGroup(QueryResourceManager):
         permissions_enum = ('rds:DescribeDBParameterGroups',)
         cfn_type = 'AWS::RDS::DBParameterGroup'
         universal_taggable = object()
+        permissions_augment = ("rds:ListTagsForResource",)
 
     augment = universal_augment
 

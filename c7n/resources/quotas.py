@@ -11,6 +11,7 @@ import math
 from concurrent.futures import as_completed
 from datetime import timedelta, datetime
 from statistics import mean
+from time import sleep
 
 from c7n.actions import Action
 from c7n.exceptions import PolicyExecutionError
@@ -53,6 +54,13 @@ class ServiceQuota(QueryResourceManager):
         client = local_session(self.session_factory).client('service-quotas')
         retry = get_retry(('TooManyRequestsException',))
 
+        excl_sc = incl_sc = set()
+        for q in self.data.get("query", []):
+            if q.get("exclude_service_codes"):
+                excl_sc = set(q.get("exclude_service_codes"))
+            elif q.get("include_service_codes"):
+                incl_sc = set(q.get("include_service_codes"))
+
         def get_quotas(client, s):
             def _get_quotas(client, s, attr):
                 quotas = {}
@@ -73,6 +81,11 @@ class ServiceQuota(QueryResourceManager):
                     token = response.get('NextToken')
                     new = set(rquotas) - set(quotas)
                     quotas.update(rquotas)
+                    self.log.debug(f"{s['ServiceCode']} has {len(response['Quotas'])} quotas")
+
+                    # To fix TooManyRequestsException when calling the ListServiceQuotas
+                    # Sleep before any break, no better option so far; default quota is 10rps
+                    sleep(0.1)
                     if token is None:
                         break
                     # ssm, ec2, kms have bad behaviors.
@@ -93,11 +106,14 @@ class ServiceQuota(QueryResourceManager):
 
         results = []
         # NOTE TooManyRequestsException errors are reported in us-east-1 often
-        # when calling the ListServiceQuotas operation
+        # when calling the ListServiceQuotas operation,
         # set the max_workers to 1 instead of self.max_workers to slow down the rate
         with self.executor_factory(max_workers=1) as w:
             futures = {}
             for r in resources:
+                # Leveraging metadata to exclude unwanted service codes to reduce masive API calls
+                if r["ServiceCode"] in excl_sc or incl_sc and r["ServiceCode"] not in incl_sc:
+                    continue
                 futures[w.submit(get_quotas, client, r)] = r
 
             for f in as_completed(futures):
@@ -217,7 +233,7 @@ class UsageFilter(MetricsFilter):
                     op = self.metric_map['Maximum']
                 else:
                     op = self.metric_map[stat]
-                m = op([x[stat] for x in res['Datapoints']]) / metric_scale
+                m = round(op([x[stat] for x in res['Datapoints']]) / metric_scale, 2)
                 self.log.info(f'{r.get("ServiceName")} {r.get("QuotaName")} usage: {m}/{quota}')
                 if m > (limit / 100) * quota:
                     r[self.annotation_key] = {
@@ -308,7 +324,7 @@ class Increase(Action):
         multiplier = self.data.get('multiplier', 1.2)
         error = None
         for r in resources:
-            count = math.floor(multiplier * r['Value'])
+            count = math.ceil(multiplier * r['Value'])
             if not r['Adjustable']:
                 continue
             try:

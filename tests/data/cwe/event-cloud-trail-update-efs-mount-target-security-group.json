@@ -1,0 +1,46 @@
+{
+    "eventVersion": "1.08",
+    "userIdentity": {
+        "type": "IAMUser",
+        "principalId": "AIDAZL6XWCR2GMVVY4IYC",
+        "arn": "arn:aws:iam::644160558196:user/Jerry",
+        "accountId": "644160558196",
+        "accessKeyId": "ASIAZL6XWCR2JKBH7DUX",
+        "userName": "Jerry",
+        "sessionContext": {
+            "sessionIssuer": {},
+            "webIdFederationData": {},
+            "attributes": {
+                "creationDate": "2023-06-04T20:31:53Z",
+                "mfaAuthenticated": "false"
+            }
+        }
+    },
+    "eventTime": "2023-06-04T20:55:24Z",
+    "eventSource": "elasticfilesystem.amazonaws.com",
+    "eventName": "ModifyMountTargetSecurityGroups",
+    "awsRegion": "us-east-1",
+    "sourceIPAddress": "73.13.120.180",
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36",
+    "requestParameters": {
+        "mountTargetId": "fsmt-07e238762319765b9",
+        "securityGroups": [
+            "sg-6c7fa917"
+        ]
+    },
+    "responseElements": null,
+    "requestID": "f81715d4-4c3e-443f-ba5b-1f503bab3272",
+    "eventID": "736df08b-c066-4f53-beb8-c1e081037162",
+    "readOnly": false,
+    "eventType": "AwsApiCall",
+    "apiVersion": "2015-02-01",
+    "managementEvent": true,
+    "recipientAccountId": "644160558196",
+    "eventCategory": "Management",
+    "tlsDetails": {
+        "tlsVersion": "TLSv1.3",
+        "cipherSuite": "TLS_AES_128_GCM_SHA256",
+        "clientProvidedHostHeader": "elasticfilesystem.us-east-1.amazonaws.com"
+    },
+    "sessionCredentialFromConsole": "true"
+}

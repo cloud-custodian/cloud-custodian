@@ -17,8 +17,10 @@ from .core import (
     ReduceFilter,
 )
 from .config import ConfigCompliance
+from .costhub import CostHubRecommendation
 from .health import HealthEventFilter
 from .iamaccess import CrossAccountAccessFilter, PolicyChecker
 from .iamanalyzer import AccessAnalyzer
 from .metrics import MetricsFilter, ShieldMetrics
-from .vpc import DefaultVpcBase
+# from .vpc import DefaultVpcBase
+from .waf import WafV2FilterBase, WafClassicRegionalFilterBase

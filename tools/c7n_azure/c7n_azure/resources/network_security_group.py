@@ -120,6 +120,8 @@ PRIORITY_STEP = 10
 SOURCE = 'source'
 DESTINATION = 'destination'
 
+CIDR = 'Cidr'
+
 
 class NetworkSecurityGroupFilter(Filter):
     """
@@ -137,6 +139,7 @@ class NetworkSecurityGroupFilter(Filter):
             ACCESS: {'type': 'string', 'enum': [ALLOW_OPERATION, DENY_OPERATION]},
             SOURCE: {'type': 'string'},
             DESTINATION: {'type': 'string'},
+            CIDR: {}
         },
         'required': ['type', ACCESS]
     }
@@ -154,6 +157,8 @@ class NetworkSecurityGroupFilter(Filter):
         return True
 
     def process(self, network_security_groups, event=None):
+        # List of NSG matching the policies, to return
+        matched = []
         # Get variables
         self.ip_protocol = self.data.get(IP_PROTOCOL, '*')
         self.IsAllowed = StringUtils.equal(self.data.get(ACCESS), ALLOW_OPERATION)
@@ -168,8 +173,70 @@ class NetworkSecurityGroupFilter(Filter):
         self.source_address = self.data.get(SOURCE, None)
         self.destination_address = self.data.get(DESTINATION, None)
 
-        nsgs = [nsg for nsg in network_security_groups if self._check_nsg(nsg)]
-        return nsgs
+        match_op = self.data.get('match-operator', 'and') == 'and' and all or any
+        matching_nsg = {}
+        for nsg in network_security_groups:
+            matching_nsg['check_nsg'] = self._check_nsg(nsg)
+            if self.data.get(CIDR):
+                matching_nsg['check_cidr'] = False
+
+                permissions_to_expand = []
+                for security_rule in nsg['properties']['securityRules']:
+                    if security_rule['properties']['direction'] == self.direction_key:
+                        permissions_to_expand.append(security_rule['properties'])
+                for perm in self.expand_permissions(permissions_to_expand):
+                    if self._process_cidrs(perm):
+                        matching_nsg['check_cidr'] = True
+            matching_nsg_values = list(filter(
+                    lambda x: x is not None, matching_nsg.values()))
+
+            if match_op == all and not matching_nsg_values:
+                continue
+
+            match = match_op(matching_nsg_values)
+            if match:
+                matched.append(nsg)
+        return matched
+
+    def expand_permissions(self, permissions):
+        for p in permissions:
+            yield dict(p)
+
+    def _process_cidr(self, cidr_key, cidr_type, range_type, perm):
+        found = None
+        access_perms = self.data.get(ACCESS)
+        if perm['access'] != access_perms:
+            return False
+
+        ip_perms = perm.get(range_type, [])
+        if not ip_perms:
+            return False
+
+        if ip_perms.lower() == "internet":
+            return False
+
+        match_range = self.data[cidr_key]
+
+        if isinstance(match_range, dict):
+            match_range['key'] = cidr_type
+        else:
+            match_range = {cidr_type: match_range}
+
+        vf = ValueFilter(match_range, self.manager)
+        vf.annotate = False
+
+        found = vf({cidr_type: ip_perms})
+        return found
+
+    def _process_cidrs(self, perm):
+        found_v4 = False
+        if 'Cidr' in self.data:
+            found_v4 = self._process_cidr(
+                'Cidr',
+                'CidrIp',
+                f"{self.data['Cidr']['ipType'].lower()}AddressPrefix",
+                perm)
+        return found_v4
 
     def _check_nsg(self, nsg):
         nsg_ports = PortsRangeHelper.build_ports_dict(nsg, self.direction_key, self.ip_protocol,

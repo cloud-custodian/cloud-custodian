@@ -189,7 +189,6 @@ class EKS(BaseTest):
         aliases = kms.list_aliases(KeyId=kmsKeyId)
         self.assertEqual(aliases['Aliases'][0]['AliasName'], 'alias/eks')
 
-
     def test_network_location_filter(self):
         factory = self.replay_flight_data("test_eks_network_location_filter")
 
@@ -221,7 +220,6 @@ class EKS(BaseTest):
                 }
             ]
         )
-
 
     def test_associate_encryption_config(self):
         factory = self.replay_flight_data("test_eks_associate_encryption_config")
@@ -260,14 +258,13 @@ class EKS(BaseTest):
         self.assertEqual(len(resources), 1)
         matched = resources.pop()
         self.assertEqual(matched['status'], 'ACTIVE')
-        update_json = os.path.join(self.placebo_dir, "test_eks_associate_encryption_config", 
+        update_json = os.path.join(self.placebo_dir, "test_eks_associate_encryption_config",
         "eks.AssociateEncryptionConfig_1.json")
         with open(update_json) as f:
             data = json.load(f)
         self.assertEqual(data['status_code'], 200)
         self.assertEqual(data['data']['update']['type'], 'AssociateEncryptionConfig')
         self.assertEqual(data['data']['update']['status'], 'InProgress')
-
 
     def test_associate_encryption_config_key_arn(self):
         factory = self.replay_flight_data("test_eks_associate_encryption_config_key_arn")
@@ -289,7 +286,7 @@ class EKS(BaseTest):
                         'encryptionConfig': [
                             {
                                 'provider': {
-                                    'keyArn': 
+                                    'keyArn':
                                     'arn:aws:kms:us-east-1:644160558196:key/361001ad-9c5e-42cb-9a09-5de1e80e822f'
                                 },
                                 'resources': [
@@ -307,14 +304,15 @@ class EKS(BaseTest):
         self.assertEqual(len(resources), 1)
         matched = resources.pop()
         self.assertEqual(matched['status'], 'ACTIVE')
-        update_json = os.path.join(self.placebo_dir, 
-        "test_eks_associate_encryption_config_key_arn", "eks.AssociateEncryptionConfig_1.json")
+        update_json = os.path.join(
+            self.placebo_dir,
+            "test_eks_associate_encryption_config_key_arn", "eks.AssociateEncryptionConfig_1.json"
+        )
         with open(update_json) as f:
             data = json.load(f)
         self.assertEqual(data['status_code'], 200)
         self.assertEqual(data['data']['update']['type'], 'AssociateEncryptionConfig')
         self.assertEqual(data['data']['update']['status'], 'InProgress')
-
 
     def test_associate_encryption_config_invalid_kms(self):
         factory = self.replay_flight_data("test_eks_associate_encryption_config_invalid_kms")
@@ -352,7 +350,6 @@ class EKS(BaseTest):
             resources = p.run()
             self.assertEqual(len(resources), 1)
         self.assertEqual(error.exception.response['Error']['Code'], 'NotFoundException')
-
 
     def test_associate_encryption_config_invalid_kms_key(self):
         factory = self.replay_flight_data("test_eks_associate_encryption_config_invalid_kms_key")

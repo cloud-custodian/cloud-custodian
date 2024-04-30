@@ -1,0 +1,20 @@
+{
+    "status_code": 200,
+    "data": {
+        "collectionSummaries": [
+            {
+                "arn": "arn:aws:aoss:us-east-1:644160558196:collection/3is00jwsbn9eg183dxz7",
+                "id": "3is00jwsbn9eg183dxz7",
+                "name": "test-collection",
+                "status": "DELETING"
+            },
+            {
+                "arn": "arn:aws:aoss:us-east-1:644160558196:collection/z2nmacgaa5v8pekwi1h1",
+                "id": "z2nmacgaa5v8pekwi1h1",
+                "name": "bedrock-knowledge-base-141zzj",
+                "status": "ACTIVE"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

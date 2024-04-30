@@ -2,7 +2,6 @@
 # SPDX-License-Identifier: Apache-2.0
 import logging
 import uuid
-
 from c7n_azure.actions.firewall import SetFirewallAction
 from c7n_azure.filters import FirewallRulesFilter, FirewallBypassFilter
 from c7n_azure.provider import resources
@@ -12,7 +11,8 @@ from netaddr import IPRange, IPSet, IPNetwork, IPAddress
 
 from c7n.exceptions import PolicyValidationError
 from c7n.utils import type_schema
-from c7n.filters.core import ValueFilter, Filter
+from c7n.filters import Filter
+from c7n.filters.core import ValueFilter, ListItemFilter
 
 AZURE_SERVICES = IPRange('0.0.0.0', '0.0.0.0')  # nosec
 log = logging.getLogger('custodian.azure.sql-server')
@@ -83,6 +83,98 @@ class SqlServer(ArmResourceManager):
             'resourceGroup',
             'kind'
         )
+
+
+@SqlServer.filter_registry.register('transparent-data-encryption')
+class TransparentDataEncryptionFilter(Filter):
+    """
+    Filter by the current Transparent Data Encryption
+    configuration for this server.
+
+    :example:
+
+    Find SQL Server with TDE details
+
+    .. code-block:: yaml
+
+        policies:
+          - name: sql-server-tde
+            resource: azure.sql-server
+            filters:
+              - type: transparent-data-encryption
+                key_type: CustomerManaged
+
+    """
+
+    schema = type_schema(
+        'transparent-data-encryption',
+        required=['type', 'key_type'],
+        **{
+            'key_type': {'type': 'string', 'enum': ['ServiceManaged', 'CustomerManaged']}
+        }
+    )
+
+    log = logging.getLogger('custodian.azure.sqlserver.transparent-data-encryption-filter')
+
+    def __init__(self, data, manager=None):
+        super(TransparentDataEncryptionFilter, self).__init__(data, manager)
+        self.key_type = self.data['key_type']
+
+    def process(self, resources, event=None):
+        resources, exceptions = ThreadHelper.execute_in_parallel(
+            resources=resources,
+            event=event,
+            execution_method=self._process_resource_set,
+            executor_factory=self.executor_factory,
+            log=log
+        )
+        if exceptions:
+            raise exceptions[0]
+        return resources
+
+    def _process_resource_set(self, resources, event=None):
+        client = self.manager.get_client()
+        result = []
+        for resource in resources:
+
+            encryption_protector = client.encryption_protectors.get(
+                resource['resourceGroup'],
+                resource['name'],
+                "current")
+
+            resource['properties']['transparentDataEncryption'] = \
+                encryption_protector.serialize(True).get('properties', {})
+
+            if self.key_type == 'CustomerManaged':
+                encryption_type = 'AzureKeyVault'
+            elif self.key_type == 'ServiceManaged':
+                encryption_type = 'ServiceManaged'
+
+            if StringUtils.equal(
+                    resource['properties']['transparentDataEncryption'].get('serverKeyType'),
+                    encryption_type):
+                result.append(resource)
+
+        return result
+
+
+@SqlServer.filter_registry.register('failover-group')
+class FailoverGroupFilter(ListItemFilter):
+    schema = type_schema(
+        "failover-group",
+        attrs={"$ref": "#/definitions/filters_common/list_item_attrs"},
+        count={"type": "number"},
+        count_op={"$ref": "#/definitions/filters_common/comparison_operators"}
+    )
+    annotate_items = True
+    item_annotation_key = "c7n:FailoverGroups"
+
+    def get_item_values(self, resource):
+        groups = self.manager.get_client().failover_groups.list_by_server(
+            resource_group_name=resource['resourceGroup'],
+            server_name=resource['name']
+        )
+        return [g.serialize(True) for g in groups]
 
 
 @SqlServer.filter_registry.register('azure-ad-administrators')
@@ -315,7 +407,7 @@ class SqlServerFirewallBypassFilter(FirewallBypassFilter):
 
 
 @SqlServer.filter_registry.register('auditing')
-class AuditingFilter(Filter):
+class AuditingFilter(ValueFilter):
     """
     Filter by the current auditing
     policy for this sql server.
@@ -335,52 +427,102 @@ class AuditingFilter(Filter):
 
     """
 
+    cache_key = 'c7n:auditing-settings'
+
     schema = type_schema(
         'auditing',
-        required=['type', 'enabled'],
-        **{
-            'enabled': {"type": "boolean"},
-        }
+        rinherit=ValueFilter.schema,
+        enabled=dict(type='boolean')
     )
 
     log = logging.getLogger('custodian.azure.sqlserver.auditing-filter')
 
     def __init__(self, data, manager=None):
-        super(AuditingFilter, self).__init__(data, manager)
-        self.enabled = self.data['enabled']
+        super().__init__(data, manager)
+
+        self.enabled = self.data.get('enabled')
+        # track if we are using the legacy behavior
+        self.is_legacy = 'enabled' in self.data
+
+    def validate(self):
+        # only allow legacy behavior or new ValueFilter behavior, not both
+        # when in "legacy" mode the only entries should be "type" (required by schema) and
+        # "enabled" (required by is_legacy)
+        if self.is_legacy:
+            if len(self.data) > 2:
+                raise PolicyValidationError(
+                    "When using 'enabled', ValueFilter properties are not allowed")
+        # only validate value filter when not in "legacy" mode
+        else:
+            super().validate()
 
     def process(self, resources, event=None):
-        resources, exceptions = ThreadHelper.execute_in_parallel(
+        _, exceptions = ThreadHelper.execute_in_parallel(
             resources=resources,
             event=event,
             execution_method=self._process_resource_set,
             executor_factory=self.executor_factory,
             log=log
         )
+
         if exceptions:
             raise exceptions[0]
-        return resources
+
+        return super().process(resources, event)
 
     def _process_resource_set(self, resources, event=None):
         client = self.manager.get_client()
-        result = []
         for resource in resources:
-            if 'auditingSettings' not in resource['properties']:
+            if self.cache_key not in resource['properties']:
                 auditing_settings = client.server_blob_auditing_policies.get(
                     resource['resourceGroup'],
                     resource['name'])
 
-                resource['properties']['auditingSettings'] = \
+                resource['properties'][self.cache_key] = \
                     auditing_settings.serialize(True).get('properties', {})
 
-            required_status = 'Enabled' if self.enabled else 'Disabled'
+    def __call__(self, resource):
+        auditing_enabled = resource['properties'][self.cache_key].get('state') == 'Enabled'
 
-            if StringUtils.equal(
-                    resource['properties']['auditingSettings'].get('state'),
-                    required_status):
-                result.append(resource)
+        # Apply filter based on legacy behavior which only checks against enablement
+        if self.is_legacy:
+            return auditing_enabled == self.enabled
+        # otherwise process the auditing settings using ValueFilter logic for full flexibility
+        else:
+            return super().__call__(resource['properties'][self.cache_key])
 
-        return result
+
+@SqlServer.filter_registry.register('security-alert-policies')
+class SecurityAlertPoliciesFilter(ListItemFilter):
+    """
+    Filters sql servers by security alert policies
+
+    .. code-block:: yaml
+
+        policies:
+          - name: sql-server-filter
+            resource: azure.sql-server
+            filters:
+              - type: security-alert-policies
+                attrs: []
+
+    """
+    schema = type_schema(
+        "security-alert-policies",
+        attrs={"$ref": "#/definitions/filters_common/list_item_attrs"},
+        count={"type": "number"},
+        count_op={"$ref": "#/definitions/filters_common/comparison_operators"}
+    )
+    annotate_items = True
+    item_annotation_key = "c7n:SecurityAlertPolicies"
+
+    def get_item_values(self, resource):
+        client = self.manager.get_client()
+        policies = client.server_security_alert_policies.list_by_server(
+            resource['resourceGroup'],
+            resource['name']
+        )  # always only one item
+        return [p.serialize(True) for p in policies]
 
 
 @SqlServer.action_registry.register('set-firewall-rules')
@@ -507,3 +649,68 @@ class SqlSetFirewallAction(SetFirewallAction):
         if rule == AZURE_SERVICES:
             return 'AllowAllWindowsAzureIps'
         return self.prefix + "-" + str(uuid.uuid4())
+
+
+@SqlServer.filter_registry.register('auditing-policies')
+class SqlServerAuditingSettingsFilter(ListItemFilter):
+    """
+    Filter sql servers by auditing policies.
+
+    :example:
+
+    Find SQL servers where there are auditing policies with retention less than a week
+
+    .. code-block:: yaml
+
+        policies:
+          - name: auditing-policy-retention-less-a-week
+            resource: azure.sql-server
+            filters:
+              - type: auditing-policies
+                attrs:
+                  - type: value
+                    key: retentionDays
+                    value: 7
+                    op: less-than
+
+
+    """
+    schema = type_schema(
+        'auditing-policies',
+        attrs={'$ref': '#/definitions/filters_common/list_item_attrs'},
+        count={'type': 'number'},
+        count_op={'$ref': '#/definitions/filters_common/comparison_operators'}
+    )
+
+    annotation_key = 'c7n:auditing-settings-list'
+    annotate_items = True
+
+    def process(self, resources, event=None):
+        _, exceptions = ThreadHelper.execute_in_parallel(
+            resources=resources,
+            event=event,
+            execution_method=self._process_resources,
+            executor_factory=self.executor_factory,
+            log=log
+        )
+
+        if exceptions:
+            raise exceptions[0]  # pragma: no cover
+        return super().process(resources, event)
+
+    def _process_resources(self, resources, event=None):
+        cl = self.manager.get_client()
+        for res in resources:
+            properties = res.setdefault('properties', {})
+            if self.annotation_key in properties:
+                continue  # pragma: no cover
+            settings = cl.server_blob_auditing_policies.list_by_server(
+                resource_group_name=res['resourceGroup'],
+                server_name=res['name']
+            )
+            properties[self.annotation_key] = [
+                s.serialize(True).get('properties', {}) for s in settings
+            ]
+
+    def get_item_values(self, resource):
+        return resource['properties'].get(self.annotation_key, [])

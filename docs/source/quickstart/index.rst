@@ -3,7 +3,7 @@
 Getting Started
 ===============
 
-See also the readme in the GitHub repository.
+Also see the README in the `GitHub repository <https://github.com/cloud-custodian/cloud-custodian>`_.
 
 * :ref:`install-cc`
 * :ref:`explore-cc`
@@ -40,7 +40,7 @@ specific cloud.
 Linux and Mac OS
 +++++++++++++++++++++++++++
 
-To install Cloud Custodian ::
+To install Cloud Custodian::
 
   python3 -m venv custodian
   source custodian/bin/activate
@@ -48,16 +48,21 @@ To install Cloud Custodian ::
 
 To install Cloud Custodian for Azure, you will also need to run::
 
-  pip install c7n_azure # Install Azure package
+  pip install c7n-azure # Install Azure package
 
 To install Cloud Custodian for GCP, you will also need to run::
 
-  pip install c7n_gcp   # Install GCP Package
+  pip install c7n-gcp   # Install GCP Package
+
+
+To install Cloud Custodian for Oracle Cloud Infrastructure (OCI), you will also need to run::
+
+    pip install c7n-oci # Install OCI Package
 
 Windows (CMD/PowerShell)
 +++++++++++++++++++++++++++
 
-To install Cloud Custodian run::
+To install Cloud Custodian, run::
 
   python3 -m venv custodian
   .\custodian\Scripts\Activate.ps1   # For Powershell users  
@@ -66,21 +71,21 @@ To install Cloud Custodian run::
 
 To install Cloud Custodian for Azure, you will also need to run::
 
-  pip install c7n_azure
+  pip install c7n-azure
 
 To install Cloud Custodian for GCP, you will also need to run::
 
-  pip install c7n_gcp
+  pip install c7n-gcp
 
 Docker
 ++++++
 
-To install via docker, run::
+To install via Docker, run::
 
   docker pull cloudcustodian/c7n
 
-You'll need to export cloud provider credentials to the container
-when executing. One example, if you're using environment variables for provider
+You'll need to export your cloud provider credentials to the container
+when executing. For example, if you're using environment variables for provider
 credentials::
 
   docker run -it \
@@ -179,7 +184,7 @@ validate it separately:
 
   custodian validate custodian.yml
 
-You can also check which resources are identified by the policy, without
+You can also check which resources are identified by the policy without
 running any actions on the resources:
 
 .. code-block:: bash

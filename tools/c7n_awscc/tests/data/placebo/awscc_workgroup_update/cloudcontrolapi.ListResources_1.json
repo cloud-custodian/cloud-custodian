@@ -1,0 +1,17 @@
+{
+    "status_code": 200,
+    "data": {
+        "TypeName": "AWS::Athena::WorkGroup",
+        "ResourceDescriptions": [
+            {
+                "Identifier": "primary",
+                "Properties": "{\"Description\":\"\",\"State\":\"ENABLED\",\"CreationTime\":\"1642008392\",\"Name\":\"primary\"}"
+            },
+            {
+                "Identifier": "tf-test-loving-llama",
+                "Properties": "{\"Description\":\"\",\"State\":\"ENABLED\",\"CreationTime\":\"1708539251\",\"Name\":\"tf-test-loving-llama\"}"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

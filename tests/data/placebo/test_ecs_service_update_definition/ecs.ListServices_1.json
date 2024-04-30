@@ -1,0 +1,11 @@
+{
+    "status_code": 200,
+    "data": {
+        "serviceArns": [
+            "arn:aws:ecs:us-east-2:644160558196:service/dev-redash/redash-worker",
+            "arn:aws:ecs:us-east-2:644160558196:service/dev-redash/redash-server",
+            "arn:aws:ecs:us-east-2:644160558196:service/dev-redash/redash-scheduled-worker"
+        ],
+        "ResponseMetadata": {}
+    }
+}

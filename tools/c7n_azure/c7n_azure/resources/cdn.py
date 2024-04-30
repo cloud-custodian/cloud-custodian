@@ -3,6 +3,8 @@
 
 from c7n_azure.provider import resources
 from c7n_azure.resources.arm import ArmResourceManager
+from c7n.filters import Filter
+from c7n.utils import type_schema
 
 
 @resources.register('cdnprofile')
@@ -40,3 +42,35 @@ class CdnProfile(ArmResourceManager):
             'sku.name'
         )
         resource_type = 'Microsoft.Cdn/profiles'
+
+
+@CdnProfile.filter_registry.register('waf')
+class WebAppFirewallFilter(Filter):
+    """Check waf enabled/disabled on cdn profiles
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: test-waf-not-enabled
+            resource: azure.cdnprofile
+            filters:
+                - type: waf
+                  state: Disabled
+    """
+    schema = type_schema(
+        'waf',
+        required=['state'],
+        state={'type': 'string', 'enum': ['Enabled', 'Disabled']})
+
+    def process(self, resources, event=None):
+        client = self.manager.get_client()
+        matched = []
+        for profiles in resources:
+            policies = list(client.security_policies.list_by_profile(
+                profiles["resourceGroup"], profiles["name"]))
+            if (self.data.get('state') == 'Disabled' and not policies) \
+               or (self.data.get('state') == 'Enabled' and policies):
+                matched.append(profiles)
+        return matched
