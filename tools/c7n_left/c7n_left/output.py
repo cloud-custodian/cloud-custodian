@@ -126,7 +126,8 @@ class RichResult:
         yield "  [red]Failed[/red]"
         if policy.data.get("description"):
             yield f"  [red]Reason: {policy.data['description']}[/red]"
-        yield f"  [purple]File: {resource.filename}:{resource.line_start}-{resource.line_end}"
+        filename = f"{resource.src_dir}/{resource.filename}"
+        yield f"  [purple]File: {filename}:{resource.line_start}-{resource.line_end}"
 
         lines = resource.get_source_lines()
         yield Syntax(

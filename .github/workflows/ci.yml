@@ -173,7 +173,7 @@ jobs:
           fi
 
       - name: Upload Code Coverage
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v4
         if: contains(matrix.python-version, '3.10') && contains(matrix.os, 'ubuntu')
         with:
           files: ./coverage.xml

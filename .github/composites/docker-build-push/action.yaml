@@ -123,7 +123,7 @@ runs:
       if: "${{ inputs.push == 'true' }}"
       uses: sigstore/cosign-installer@v3
       with:
-        cosign-release: 'v1.13.0'
+        cosign-release: 'v1.13.6'
 
     - name: Sign
       if: "${{ inputs.push == 'true' }}"

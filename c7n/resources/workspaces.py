@@ -569,3 +569,42 @@ class DeleteWorkspacesWeb(BaseAction):
 
     def delete_portal(self, client, resource):
         client.delete_portal(portalArn=resource['portalArn'])
+
+
+@resources.register('workspaces-bundle')
+class WorkspacesBundle(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'workspaces'
+        enum_spec = ('describe_workspace_bundles', 'Bundles', None)
+        arn_type = 'workspacebundle'
+        name = id = 'BundleId'
+        universal_taggable = True
+
+
+@WorkspacesBundle.action_registry.register('delete')
+class DeleteWorkspaceBundle(BaseAction):
+    """
+    Deletes a WorkSpaces Bundle
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: delete-workspaces-bundle
+            resource: aws.workspaces-bundle
+            actions:
+              - delete
+    """
+
+    schema = type_schema('delete')
+    permissions = ('workspaces:DeleteWorkspaceBundle',)
+
+    def process(self, bundles):
+        client = local_session(self.manager.session_factory).client('workspaces')
+        for bundle in bundles:
+            try:
+                client.delete_workspace_bundle(BundleId=bundle['BundleId'])
+            except client.exceptions.ResourceNotFoundException:
+                self.log.warning("Bundle not found: %s" % bundle['BundleId'])
