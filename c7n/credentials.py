@@ -92,8 +92,7 @@ def assumed_session(
 
         parameters = {"RoleArn": role_arn, "RoleSessionName": session_name}
         if session_policy is not None:
-            p = SessionPolicy(session_policy).read_session_policy()
-            parameters['Policy'] = p
+            parameters['Policy'] = session_policy
 
         if external_id is not None:
             parameters['ExternalId'] = external_id
@@ -142,17 +141,3 @@ def get_sts_client(session, region):
         region_name = None
     return session.client(
         'sts', endpoint_url=endpoint_url, region_name=region_name)
-
-
-class SessionPolicy:
-    def __init__(self, session_policy):
-        self.session_policy = session_policy
-
-    def read_session_policy(self):
-        if self.session_policy:
-            fmt = self.session_policy.rsplit('.', 1)[-1]
-            if fmt not in ('json',):
-                raise ValueError("The session policy file must end in .json")
-            with open(self.session_policy, 'r') as sp:
-                p = str(sp.read())
-        return p
