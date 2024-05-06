@@ -604,6 +604,10 @@ class UtilTest(BaseTest):
                                                            'cn-north-1'), 'cn-north-1')
         self.assertEqual(utils.get_resource_tagging_region(resource_type,
                                                            'us-iso-east-1'), 'us-iso-east-1')
+        self.assertEqual(utils.get_resource_tagging_region(resource_type,
+                                                           'ap-southeast-1'), 'us-east-1')
+        self.assertEqual(utils.get_resource_tagging_region(resource_type,
+                                                              'eu-west-1'), 'us-east-1')
 
     def test_get_eni_resource_type(self):
         self.assertEqual(
