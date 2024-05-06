@@ -574,7 +574,7 @@ class UtilTest(BaseTest):
         mock_manager.config.region = "cn-north-1"
         res = utils.get_support_region(mock_manager)
         self.assertEqual("cn-north-1", res)
-    
+
     def test_get_resource_tagging_region(self):
 
         resource_type = query.TypeInfo()
