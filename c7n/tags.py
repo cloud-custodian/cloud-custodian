@@ -71,20 +71,10 @@ def universal_augment(self, resources):
     if not resources:
         return resources
 
-    # For global resources, tags don't populate in the get_resources call
-    # unless the call is being made to us-east-1. For govcloud this is us-gov-west-1.
-    partition = utils.get_partition(self.region)
-    r = ""
-    if partition == "aws-us-gov":
-        r = getattr(self.resource_type, 'global_resource', None) and 'us-gov-west-1' or self.region
-    elif partition == "aws":
-        r = getattr(self.resource_type, 'global_resource', None) and 'us-east-1' or self.region
-    else:
-        r = self.region
-
-    self.log.debug("Using region %s for resource tagging" % r)
+    region = utils.get_resource_tagging_region(self.resource_type, self.region)
+    self.log.debug("Using region %s for resource tagging" % region)
     client = utils.local_session(
-        self.session_factory).client('resourcegroupstaggingapi', region_name=r)
+        self.session_factory).client('resourcegroupstaggingapi', region_name=region)
 
     # Lazy for non circular :-(
     from c7n.query import RetryPageIterator
