@@ -580,29 +580,29 @@ class UtilTest(BaseTest):
         resource_type = query.TypeInfo()
 
         # Regional endpoint checks
-        self.assertEqual(utils.get_resource_tagging_region(resource_type, 
+        self.assertEqual(utils.get_resource_tagging_region(resource_type,
                                                            'us-east-2'), 'us-east-2')
-        self.assertEqual(utils.get_resource_tagging_region(resource_type, 
+        self.assertEqual(utils.get_resource_tagging_region(resource_type,
                                                            'ap-southeast-1'), 'ap-southeast-1')
-        self.assertEqual(utils.get_resource_tagging_region(resource_type, 
+        self.assertEqual(utils.get_resource_tagging_region(resource_type,
                                                            'eu-west-1'), 'eu-west-1')
-        self.assertEqual(utils.get_resource_tagging_region(resource_type, 
+        self.assertEqual(utils.get_resource_tagging_region(resource_type,
                                                            'us-gov-east-1'), 'us-gov-east-1')
-        self.assertEqual(utils.get_resource_tagging_region(resource_type, 
+        self.assertEqual(utils.get_resource_tagging_region(resource_type,
                                                            'cn-north-1'), 'cn-north-1')
-        self.assertEqual(utils.get_resource_tagging_region(resource_type, 
+        self.assertEqual(utils.get_resource_tagging_region(resource_type,
                                                            'us-iso-east-1'), 'us-iso-east-1')
-        
+
         # Global resource checks
         resource_type.global_resource = True
 
-        self.assertEqual(utils.get_resource_tagging_region(resource_type, 
+        self.assertEqual(utils.get_resource_tagging_region(resource_type,
                                                            'us-east-2'), 'us-east-1')
-        self.assertEqual(utils.get_resource_tagging_region(resource_type, 
+        self.assertEqual(utils.get_resource_tagging_region(resource_type,
                                                            'us-gov-east-1'), 'us-gov-west-1')
-        self.assertEqual(utils.get_resource_tagging_region(resource_type, 
+        self.assertEqual(utils.get_resource_tagging_region(resource_type,
                                                            'cn-north-1'), 'cn-north-1')
-        self.assertEqual(utils.get_resource_tagging_region(resource_type, 
+        self.assertEqual(utils.get_resource_tagging_region(resource_type,
                                                            'us-iso-east-1'), 'us-iso-east-1')
 
     def test_get_eni_resource_type(self):
