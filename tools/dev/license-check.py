@@ -1,3 +1,5 @@
+# Copyright The Cloud Custodian Authors.
+# SPDX-License-Identifier: Apache-2.0
 from importlib import metadata
 import sys
 
@@ -5,6 +7,7 @@ accept = (
     'MIT',
     'BSD',
     'Apache License 2.0',
+    'Apache License, Version 2.0',
     'Apache 2.0',
     'MIT License',
     'Apache 2',
@@ -12,6 +15,7 @@ accept = (
     'MPL 2.0',
     'BSD-3-Clause',
     'Apache-2.0',
+    'Apache-2',
 )
 
 accept_classifiers = set(
@@ -22,6 +26,7 @@ accept_classifiers = set(
         'License :: OSI Approved :: MIT License',
         'License :: OSI Approved :: BSD License',
         'License :: OSI Approved :: Mozilla Public License 2.0 (MPL 2.0)',
+        'License :: Public Domain'
         #    'License :: OSI Approved :: GNU Library or Lesser General Public License (LGPL)'
     )
 )
@@ -62,6 +67,10 @@ def main():
             continue
         if d.metadata['License'] in accept:
             continue
+        if d.metadata['License'] is not None and ' or ' in d.metadata['License']:
+            licenses = str(d.metadata['License']).split(' or ')
+            if any(i in licenses for i in accept):
+                continue
 
         classifiers = d.metadata.get_all('Classifier') or ()
         classifiers = [c for c in classifiers if c.startswith('License')]

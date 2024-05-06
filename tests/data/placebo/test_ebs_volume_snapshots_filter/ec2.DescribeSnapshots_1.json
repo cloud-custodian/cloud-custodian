@@ -1,0 +1,49 @@
+{
+  "status_code": 200,
+  "data": {
+    "Snapshots": [
+      {
+        "Description": "Created by CreateImage(i-0b0c5aefffc7216d1) for ami-0e4e53948fd366e0f",
+        "Encrypted": false,
+        "OwnerId": "",
+        "Progress": "100%",
+        "SnapshotId": "snap-053a2754a57c25283",
+        "StartTime": "2024-01-30T10:33:22.036000+00:00",
+        "State": "completed",
+        "VolumeId": "vol-0706f8e126ff74d3a",
+        "VolumeSize": 20,
+        "StorageTier": "standard"
+      },
+      {
+        "Description": "Created by CreateImage(i-0816a1c230997c6de) for ami-0a807fe24ab4122a0",
+        "Encrypted": true,
+        "KmsKeyId": "",
+        "OwnerId": "",
+        "Progress": "100%",
+        "SnapshotId": "snap-085062b022d569e74",
+        "StartTime": "2023-05-03T19:30:37.505000+00:00",
+        "State": "completed",
+        "VolumeId": "vol-0c7930681fe5a17db",
+        "VolumeSize": 20,
+        "StorageTier": "standard"
+      },
+      {
+        "Description": "Created by CreateImage(i-0816a1c230997c6de) for ami-0df87ebe087928330",
+        "Encrypted": true,
+        "KmsKeyId": "",
+        "OwnerId": "",
+        "Progress": "100%",
+        "SnapshotId": "snap-0893dfb561e99207c",
+        "StartTime": "2024-01-30T10:32:48.405000+00:00",
+        "State": "completed",
+        "VolumeId": "vol-0c7930681fe5a17db",
+        "VolumeSize": 40,
+        "StorageTier": "standard"
+      }
+    ],
+    "ResponseMetadata": {
+      "HTTPStatusCode": 200,
+      "RequestId": "37d42735-bd60-460c-b3f5-c86fa29197a5"
+    }
+  }
+}

@@ -19,6 +19,12 @@ class DnsManagedZoneTest(BaseTest):
 
         managed_zone_resources = policy.run()
         self.assertEqual(managed_zone_resources[0]['name'], managed_zone_name)
+        self.assertEqual(
+            policy.resource_manager.get_urns(managed_zone_resources),
+            [
+                'gcp:dns::cloud-custodian:managed-zone/custodian'
+            ],
+        )
 
     def test_managed_zone_get(self):
         project_id = 'cloud-custodian'
@@ -39,6 +45,12 @@ class DnsManagedZoneTest(BaseTest):
         resources = exec_mode.run(event, None)
 
         self.assertEqual(resources[0]['name'], resource_name)
+        self.assertEqual(
+            policy.resource_manager.get_urns(resources),
+            [
+                'gcp:dns::cloud-custodian:managed-zone/custodian'
+            ],
+        )
 
     def test_managed_zone_delete(self):
         project_id = "cloud-custodian"
@@ -75,6 +87,12 @@ class DnsPolicyTest(BaseTest):
 
         policy_resources = policy.run()
         self.assertEqual(policy_resources[0]['name'], policy_name)
+        self.assertEqual(
+            policy.resource_manager.get_urns(policy_resources),
+            [
+                'gcp:dns::cloud-custodian:policy/custodian'
+            ],
+        )
 
     def test_policy_get(self):
         project_id = 'cloud-custodian'
@@ -95,3 +113,35 @@ class DnsPolicyTest(BaseTest):
         resources = exec_mode.run(event, None)
 
         self.assertEqual(resources[0]['name'], policy_name)
+        self.assertEqual(
+            policy.resource_manager.get_urns(resources),
+            [
+                'gcp:dns::cloud-custodian:policy/custodian'
+            ],
+        )
+
+
+class TestDnsResourceRecordsFilter(BaseTest):
+
+    def test_query(self):
+        project_id = 'cloud-custodian'
+        session_factory = self.replay_flight_data(
+            'test-dns-resource-records-filter-query', project_id=project_id)
+
+        policy = self.load_policy(
+            {'name': 'dns-resource-record',
+             'resource': 'gcp.dns-managed-zone',
+             'filters': [{'type': 'records-sets',
+                          'attrs': [{
+                              'type': 'value',
+                              'key': 'type',
+                              'op': 'eq',
+                              'value': 'TXT'
+                          }]
+            }]},
+            session_factory=session_factory)
+
+        policy_resources = policy.run()
+
+        self.assertEqual(len(policy_resources), 1)
+        self.assertEqual(policy_resources[0]['name'], 'zone-277-red')

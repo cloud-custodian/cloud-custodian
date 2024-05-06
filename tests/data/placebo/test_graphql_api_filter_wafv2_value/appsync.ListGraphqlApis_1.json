@@ -1,0 +1,21 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "graphqlApis": [
+            {
+                "name": "0CD3EBE7-7984-4A22-9A6C-0C7AB7A29006",
+                "apiId": "pxl5tlqrxfbrvp2fdeyufum57y",
+                "authenticationType": "API_KEY",
+                "arn": "arn:aws:appsync:us-east-1:123456789012:apis/pxl5tlqrxfbrvp2fdeyufum57y",
+                "uris": {
+                    "REALTIME": "wss://v3ac54dhyzed3aslkcrkxgg3cu.appsync-realtime-api.us-east-1.amazonaws.com/graphql",
+                    "GRAPHQL": "https://v3ac54dhyzed3aslkcrkxgg3cu.appsync-api.us-east-1.amazonaws.com/graphql"
+                },
+                "tags": {},
+                "xrayEnabled": false,
+                "wafWebAclArn": "arn:aws:wafv2:us-east-1:123456789012:regional/webacl/cfb-ojcthdwu/6a83b788-d0fd-4300-a7e0-cf5f305a9a20"
+            }
+        ]
+    }
+}

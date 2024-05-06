@@ -1,0 +1,29 @@
+{
+    "status_code": 200,
+    "data": {
+        "Server": {
+            "Arn": "arn:aws:transfer:us-east-2:644160558196:server/s-2dd2891893c7443a8",
+            "ProtocolDetails": {
+                "PassiveIp": "AUTO",
+                "TlsSessionResumptionMode": "ENFORCED",
+                "SetStatOption": "DEFAULT"
+            },
+            "Domain": "S3",
+            "EndpointType": "PUBLIC",
+            "HostKeyFingerprint": "SHA256:38WSTeCkXbgkQguBh16+pkRxhZ9crosLQTR972puJf4=",
+            "IdentityProviderType": "SERVICE_MANAGED",
+            "Protocols": [
+                "SFTP"
+            ],
+            "SecurityPolicyName": "TransferSecurityPolicy-2024-01",
+            "ServerId": "s-2dd2891893c7443a8",
+            "State": "ONLINE",
+            "Tags": [],
+            "UserCount": 0,
+            "S3StorageOptions": {
+                "DirectoryListingOptimization": "DISABLED"
+            }
+        },
+        "ResponseMetadata": {}
+    }
+}

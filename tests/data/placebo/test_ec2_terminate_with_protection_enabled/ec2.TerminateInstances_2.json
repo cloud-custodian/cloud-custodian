@@ -1,0 +1,30 @@
+{
+    "status_code": 200, 
+    "data": {
+        "TerminatingInstances": [
+            {
+                "InstanceId": "i-017fc9a2a33b853fe", 
+                "CurrentState": {
+                    "Code": 32, 
+                    "Name": "shutting-down"
+                }, 
+                "PreviousState": {
+                    "Code": 16, 
+                    "Name": "running"
+                }
+            }
+        ], 
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "f4f3d38d-6a5e-4894-944a-d42fe679a33a", 
+            "HTTPHeaders": {
+                "transfer-encoding": "chunked", 
+                "vary": "Accept-Encoding", 
+                "server": "AmazonEC2", 
+                "content-type": "text/xml;charset=UTF-8", 
+                "date": "Sun, 06 Nov 2016 11:36:08 GMT"
+            }
+        }
+    }
+}

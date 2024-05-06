@@ -1,5 +1,6 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
+from c7n.filters.iamaccess import _account, PolicyChecker
 from botocore.exceptions import ClientError
 
 from datetime import datetime, timezone
@@ -18,6 +19,12 @@ from c7n.tags import universal_augment
 from .securityhub import PostFinding
 
 
+class DescribeAlias(DescribeSource):
+
+    def augment(self, resources):
+        return [r for r in resources if 'TargetKeyId' in r]
+
+
 @resources.register('kms')
 class KeyAlias(QueryResourceManager):
 
@@ -27,10 +34,9 @@ class KeyAlias(QueryResourceManager):
         enum_spec = ('list_aliases', 'Aliases', None)
         name = "AliasName"
         id = "AliasArn"
-        cfn_type = 'AWS::KMS::Alias'
+        config_type = cfn_type = 'AWS::KMS::Alias'
 
-    def augment(self, resources):
-        return [r for r in resources if 'TargetKeyId' in r]
+    source_mapping = {'describe': DescribeAlias, 'config': ConfigSource}
 
 
 class DescribeKey(DescribeSource):
@@ -107,6 +113,7 @@ class Key(QueryResourceManager):
         arn = 'Arn'
         universal_taggable = True
         cfn_type = config_type = 'AWS::KMS::Key'
+        permissions_augment = ("kms:ListResourceTags",)
 
     source_mapping = {
         'config': ConfigKey,
@@ -176,6 +183,21 @@ class KeyRotationStatus(ValueFilter):
                 r.get('KeyRotationEnabled', {}))]
 
 
+class KMSPolicyChecker(PolicyChecker):
+    # https://docs.aws.amazon.com/kms/latest/developerguide/policy-conditions.html#conditions-kms
+
+    def handle_kms_calleraccount(self, s, c):
+        return bool(set(map(_account, c['values'])).difference(self.allowed_accounts))
+
+    def handle_kms_viaservice(self, s, c):
+        # We dont filter on service so all are presumed allowed
+        return False
+
+    def handle_kms_grantoperations(self, s, c):
+        # We dont filter on GrantOperations so all are presumed allowed
+        return False
+
+
 @Key.filter_registry.register('cross-account')
 @KeyAlias.filter_registry.register('cross-account')
 class KMSCrossAccountAccessFilter(CrossAccountAccessFilter):
@@ -192,6 +214,8 @@ class KMSCrossAccountAccessFilter(CrossAccountAccessFilter):
                   - type: cross-account
     """
     permissions = ('kms:GetKeyPolicy',)
+
+    checker_factory = KMSPolicyChecker
 
     def process(self, resources, event=None):
         client = local_session(
@@ -330,7 +354,7 @@ class RemovePolicyStatement(RemovePolicyBase):
             return
 
         p = json.loads(resource['Policy'])
-        statements, found = self.process_policy(
+        _, found = self.process_policy(
             p, resource, CrossAccountAccessFilter.annotation_key)
 
         if not found:

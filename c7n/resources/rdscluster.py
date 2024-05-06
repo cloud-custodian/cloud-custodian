@@ -1,12 +1,12 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import logging
-
+import itertools
 from concurrent.futures import as_completed
 from datetime import datetime, timedelta
 
 from c7n.actions import BaseAction
-from c7n.filters import AgeFilter, CrossAccountAccessFilter, Filter
+from c7n.filters import AgeFilter, CrossAccountAccessFilter, Filter, ValueFilter
 from c7n.filters.offhours import OffHour, OnHour
 import c7n.filters.vpc as net_filters
 from c7n.manager import resources
@@ -18,6 +18,9 @@ from .aws import shape_validate
 from c7n.exceptions import PolicyValidationError
 from c7n.utils import (
     type_schema, local_session, snapshot_identifier, chunks)
+
+from c7n.resources.rds import ParameterFilter
+from c7n.filters.backup import ConsecutiveAwsBackupsFilter
 
 log = logging.getLogger('custodian.rds-cluster')
 
@@ -65,6 +68,7 @@ class RDSCluster(QueryResourceManager):
         arn_separator = ":"
         enum_spec = ('describe_db_clusters', 'DBClusters', None)
         name = id = 'DBClusterIdentifier'
+        config_id = 'DbClusterResourceId'
         dimension = 'DBClusterIdentifier'
         universal_taggable = True
         permissions_enum = ('rds:DescribeDBClusters',)
@@ -229,7 +233,6 @@ class RetentionWindow(BaseAction):
         current_retention = int(cluster.get('BackupRetentionPeriod', 0))
         new_retention = self.data['days']
         retention_type = self.data.get('enforce', 'min').lower()
-
         if retention_type == 'min':
             self.set_retention_window(
                 client, cluster, max(current_retention, new_retention))
@@ -240,14 +243,22 @@ class RetentionWindow(BaseAction):
             self.set_retention_window(client, cluster, new_retention)
 
     def set_retention_window(self, client, cluster, retention):
+        params = dict(
+            DBClusterIdentifier=cluster['DBClusterIdentifier'],
+            BackupRetentionPeriod=retention
+        )
+        if cluster.get('EngineMode') != 'serverless':
+            params.update(
+                dict(
+                    PreferredBackupWindow=cluster['PreferredBackupWindow'],
+                    PreferredMaintenanceWindow=cluster['PreferredMaintenanceWindow'])
+            )
         _run_cluster_method(
             client.modify_db_cluster,
-            dict(DBClusterIdentifier=cluster['DBClusterIdentifier'],
-                 BackupRetentionPeriod=retention,
-                 PreferredBackupWindow=cluster['PreferredBackupWindow'],
-                 PreferredMaintenanceWindow=cluster['PreferredMaintenanceWindow']),
+            params,
             (client.exceptions.DBClusterNotFoundFault, client.exceptions.ResourceNotFoundFault),
-            client.exceptions.InvalidDBClusterStateFault)
+            client.exceptions.InvalidDBClusterStateFault
+        )
 
 
 @RDSCluster.action_registry.register('stop')
@@ -603,6 +614,9 @@ class RDSClusterSnapshotDelete(BaseAction):
                 continue
 
 
+RDSCluster.filter_registry.register('consecutive-aws-backups', ConsecutiveAwsBackupsFilter)
+
+
 @RDSCluster.filter_registry.register('consecutive-snapshots')
 class ConsecutiveSnapshots(Filter):
     """Returns RDS clusters where number of consective daily snapshots is equal to/or greater
@@ -657,4 +671,92 @@ class ConsecutiveSnapshots(Filter):
                     snapshot_dates.add(snapshot['SnapshotCreateTime'].strftime('%Y-%m-%d'))
             if expected_dates.issubset(snapshot_dates):
                 results.append(r)
+        return results
+
+
+@RDSCluster.filter_registry.register('db-cluster-parameter')
+class ClusterParameterFilter(ParameterFilter):
+    """
+    Applies value type filter on set db cluster parameter values.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: rdscluster-pg
+                resource: rds-cluster
+                filters:
+                  - type: db-cluster-parameter
+                    key: someparam
+                    op: eq
+                    value: someval
+    """
+    schema = type_schema('db-cluster-parameter', rinherit=ValueFilter.schema)
+    schema_alias = False
+    permissions = ('rds:DescribeDBInstances', 'rds:DescribeDBParameters',)
+    policy_annotation = 'c7n:MatchedDBClusterParameter'
+    param_group_attribute = 'DBClusterParameterGroup'
+
+    def _get_param_list(self, pg):
+        client = local_session(self.manager.session_factory).client('rds')
+        paginator = client.get_paginator('describe_db_cluster_parameters')
+        param_list = list(itertools.chain(*[p['Parameters']
+            for p in paginator.paginate(DBClusterParameterGroupName=pg)]))
+        return param_list
+
+    def process(self, resources, event=None):
+        results = []
+        parameter_group_list = {db.get(self.param_group_attribute) for db in resources}
+        paramcache = self.handle_paramgroup_cache(parameter_group_list)
+        for resource in resources:
+            pg_values = paramcache[resource['DBClusterParameterGroup']]
+            if self.match(pg_values):
+                resource.setdefault(self.policy_annotation, []).append(
+                    self.data.get('key'))
+                results.append(resource)
+        return results
+
+
+@RDSCluster.filter_registry.register('pending-maintenance')
+class PendingMaintenance(Filter):
+    """
+    Scan DB Clusters for those with pending maintenance
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: rds-cluster-pending-maintenance
+                resource: rds-cluster
+                filters:
+                  - pending-maintenance
+                  - type: value
+                    key: '"c7n:PendingMaintenance".PendingMaintenanceActionDetails[].Action'
+                    op: intersect
+                    value:
+                      - system-update
+    """
+
+    annotation_key = 'c7n:PendingMaintenance'
+    schema = type_schema('pending-maintenance')
+    permissions = ('rds:DescribePendingMaintenanceActions',)
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('rds')
+
+        results = []
+        resource_maintenances = {}
+        paginator = client.get_paginator('describe_pending_maintenance_actions')
+        for page in paginator.paginate():
+            for action in page['PendingMaintenanceActions']:
+                resource_maintenances.setdefault(action['ResourceIdentifier'], []).append(action)
+
+        for r in resources:
+            pending_maintenances = resource_maintenances.get(r['DBClusterArn'], [])
+            if len(pending_maintenances) > 0:
+                r[self.annotation_key] = pending_maintenances
+                results.append(r)
+
         return results

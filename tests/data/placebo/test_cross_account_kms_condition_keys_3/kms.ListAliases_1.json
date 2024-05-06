@@ -1,0 +1,78 @@
+{
+    "status_code": 200,
+    "data": {
+        "Aliases": [
+            {
+                "AliasName": "alias/aws/dynamodb",
+                "AliasArn": "arn:aws:kms:af-south-1:644160558196:alias/aws/dynamodb"
+            },
+            {
+                "AliasName": "alias/aws/ebs",
+                "AliasArn": "arn:aws:kms:af-south-1:644160558196:alias/aws/ebs",
+                "TargetKeyId": "0a22fb1d-3cb7-4555-aa4b-c6fc2c97e13f",
+                "CreationDate": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 6,
+                    "day": 5,
+                    "hour": 15,
+                    "minute": 22,
+                    "second": 20,
+                    "microsecond": 661000
+                },
+                "LastUpdatedDate": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 6,
+                    "day": 5,
+                    "hour": 15,
+                    "minute": 22,
+                    "second": 20,
+                    "microsecond": 661000
+                }
+            },
+            {
+                "AliasName": "alias/aws/elasticfilesystem",
+                "AliasArn": "arn:aws:kms:af-south-1:644160558196:alias/aws/elasticfilesystem"
+            },
+            {
+                "AliasName": "alias/aws/es",
+                "AliasArn": "arn:aws:kms:af-south-1:644160558196:alias/aws/es"
+            },
+            {
+                "AliasName": "alias/aws/glue",
+                "AliasArn": "arn:aws:kms:af-south-1:644160558196:alias/aws/glue"
+            },
+            {
+                "AliasName": "alias/aws/kinesisvideo",
+                "AliasArn": "arn:aws:kms:af-south-1:644160558196:alias/aws/kinesisvideo"
+            },
+            {
+                "AliasName": "alias/aws/rds",
+                "AliasArn": "arn:aws:kms:af-south-1:644160558196:alias/aws/rds"
+            },
+            {
+                "AliasName": "alias/aws/redshift",
+                "AliasArn": "arn:aws:kms:af-south-1:644160558196:alias/aws/redshift"
+            },
+            {
+                "AliasName": "alias/aws/redshifttest",
+                "AliasArn": "arn:aws:kms:af-south-1:644160558196:alias/aws/redshifttest"
+            },
+            {
+                "AliasName": "alias/aws/s3",
+                "AliasArn": "arn:aws:kms:af-south-1:644160558196:alias/aws/s3"
+            },
+            {
+                "AliasName": "alias/aws/ssm",
+                "AliasArn": "arn:aws:kms:af-south-1:644160558196:alias/aws/ssm"
+            },
+            {
+                "AliasName": "alias/aws/xray",
+                "AliasArn": "arn:aws:kms:af-south-1:644160558196:alias/aws/xray"
+            }
+        ],
+        "Truncated": false,
+        "ResponseMetadata": {}
+    }
+}

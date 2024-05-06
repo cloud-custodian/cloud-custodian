@@ -1,0 +1,20 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "6ab9f141-ae5f-435a-b908-8672d5057050", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "6ab9f141-ae5f-435a-b908-8672d5057050",
+                "cache-control": "no-cache, no-store",
+                "strict-transport-security": "max-age=31536000; includeSubDomains",
+                "transfer-encoding": "chunked", 
+                "vary": "Accept-Encoding", 
+                "server": "AmazonEC2", 
+                "content-type": "text/xml;charset=UTF-8", 
+                "date": "Thu, 17 Nov 2022 10:45:06 GMT"
+            }
+        }
+    }
+}

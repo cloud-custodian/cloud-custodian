@@ -1,0 +1,118 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.DBforPostgreSQL/servers?api-version=2017-12-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "date": [
+                        "Sun, 15 Aug 2021 19:39:28 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "content-length": [
+                        "939"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "sku": {
+                                    "name": "B_Gen5_1",
+                                    "tier": "Basic",
+                                    "family": "Gen5",
+                                    "capacity": 1
+                                },
+                                "properties": {
+                                    "administratorLogin": "testuser1",
+                                    "storageProfile": {
+                                        "storageMB": 5120,
+                                        "backupRetentionDays": 7,
+                                        "geoRedundantBackup": "Disabled",
+                                        "storageAutogrow": "Disabled"
+                                    },
+                                    "version": "9.6",
+                                    "sslEnforcement": "Enabled",
+                                    "minimalTlsVersion": "TLS1_2",
+                                    "userVisibleState": "Ready",
+                                    "fullyQualifiedDomainName": "server111postgresaccess.postgres.database.azure.com",
+                                    "earliestRestoreDate": "2021-08-15T19:44:16.717+00:00",
+                                    "replicationRole": "",
+                                    "masterServerId": "",
+                                    "byokEnforcement": "Disabled",
+                                    "privateEndpointConnections": [],
+                                    "infrastructureEncryption": "Disabled",
+                                    "publicNetworkAccess": "Enabled"
+                                },
+                                "location": "eastus",
+                                "tags": {
+                                    "test": "Red"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/RG-111postgresaccess/providers/Microsoft.DBforPostgreSQL/servers/server111postgresaccess",
+                                "name": "server111postgresaccess",
+                                "type": "Microsoft.DBforPostgreSQL/servers"
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/RG-111postgresaccess/providers/Microsoft.DBforPostgreSQL/servers/server111postgresaccess/firewallRules?api-version=2017-12-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "date": [
+                        "Sun, 15 Aug 2021 19:39:49 GMT"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "content-length": [
+                        "357"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "properties": {
+                                    "startIpAddress": "0.0.0.0",
+                                    "endIpAddress": "0.0.0.0"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/RG-111postgresaccess/providers/Microsoft.DBforPostgreSQL/servers/server111postgresaccess/firewallRules/AllowAllAzureIps",
+                                "name": "AllowAllAzureIps",
+                                "type": "Microsoft.DBforPostgreSQL/servers/firewallRules"
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}

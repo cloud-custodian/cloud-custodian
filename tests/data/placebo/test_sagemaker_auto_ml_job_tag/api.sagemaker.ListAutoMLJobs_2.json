@@ -1,0 +1,44 @@
+{
+    "status_code": 200,
+    "data": {
+        "AutoMLJobSummaries": [
+            {
+                "AutoMLJobName": "Canvas-c7n-test",
+                "AutoMLJobArn": "arn:aws:sagemaker:us-east-1:644160558196:automl-job/Canvas-c7n-test",
+                "AutoMLJobStatus": "Completed",
+                "AutoMLJobSecondaryStatus": "Completed",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 4,
+                    "day": 12,
+                    "hour": 11,
+                    "minute": 39,
+                    "second": 34,
+                    "microsecond": 760000
+                },
+                "EndTime": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 4,
+                    "day": 12,
+                    "hour": 11,
+                    "minute": 43,
+                    "second": 10,
+                    "microsecond": 666000
+                },
+                "LastModifiedTime": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 4,
+                    "day": 12,
+                    "hour": 11,
+                    "minute": 43,
+                    "second": 10,
+                    "microsecond": 698000
+                }
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

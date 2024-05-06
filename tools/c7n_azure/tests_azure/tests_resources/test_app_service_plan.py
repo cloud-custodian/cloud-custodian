@@ -1,6 +1,5 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
-from azure.mgmt.web import WebSiteManagementClient
 from ..azure_common import BaseTest, arm_template, cassette_name
 from c7n_azure.session import Session
 from mock import patch
@@ -15,7 +14,7 @@ class AppServicePlanTest(BaseTest):
         super(AppServicePlanTest, self).setUp()
         self.session = local_session(Session)
         self.client = local_session(Session).client(
-            'azure.mgmt.web.WebSiteManagementClient')  # type: WebSiteManagementClient
+            'azure.mgmt.web.WebSiteManagementClient')
         self.update_mock_path =\
             'azure.mgmt.web.v{}.operations._app_service_plans_operations.' \
             'AppServicePlansOperations.update'\
@@ -77,7 +76,7 @@ class AppServicePlanTest(BaseTest):
             resources = p.run()
             self.assertEqual(1, len(resources))
 
-            name, args, kwargs = update_mock.mock_calls[0]
+            _, args, _ = update_mock.mock_calls[0]
             self.assertEqual('cctest-appserviceplan-win', args[1])
             self.assertEqual('B1', args[2].sku.name)
             self.assertEqual('BASIC', args[2].sku.tier)
@@ -109,7 +108,7 @@ class AppServicePlanTest(BaseTest):
             resources = p.run()
             self.assertEqual(1, len(resources))
 
-            name, args, kwargs = update_mock.mock_calls[0]
+            _, args, _ = update_mock.mock_calls[0]
             self.assertEqual('cctest-appserviceplan-linux', args[1])
             self.assertEqual('B1', args[2].sku.name)
             self.assertEqual('BASIC', args[2].sku.tier)
@@ -138,7 +137,7 @@ class AppServicePlanTest(BaseTest):
             resources = p.run()
             self.assertEqual(1, len(resources))
 
-            name, args, kwargs = update_mock.mock_calls[0]
+            _, args, _ = update_mock.mock_calls[0]
             self.assertEqual('cctest-appserviceplan-win', args[1])
             self.assertEqual('B1', args[2].sku.name)
             self.assertEqual('BASIC', args[2].sku.tier)
@@ -220,7 +219,7 @@ class AppServicePlanTest(BaseTest):
             resources = p.run()
             self.assertEqual(1, len(resources))
 
-            name, args, kwargs = update_mock.mock_calls[0]
+            _, args, _ = update_mock.mock_calls[0]
             self.assertEqual('cctest-appserviceplan-win', args[1])
             self.assertEqual('S1', args[2].sku.name)
             self.assertEqual('Standard', args[2].sku.tier)

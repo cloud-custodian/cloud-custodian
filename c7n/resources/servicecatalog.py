@@ -25,11 +25,13 @@ class CatalogPortfolio(QueryResourceManager):
         enum_spec = ('list_portfolios', 'PortfolioDetails', None)
         detail_spec = ('describe_portfolio', 'Id', 'Id', None)
         arn = 'ARN'
+        arn_type = 'portfolio'
         id = 'Id'
         name = 'DisplayName'
         date = 'CreatedTime'
         universal_taggable = object()
         cfn_type = config_type = 'AWS::ServiceCatalog::Portfolio'
+        permissions_augment = ("servicecatalog:ListTagsForResource",)
 
     source_mapping = {
         'describe': DescribePortfolio,
@@ -169,3 +171,20 @@ class RemoveSharedAccounts(BaseAction):
         client = local_session(self.manager.session_factory).client('servicecatalog')
         for p in portfolios:
             self.delete_shared_accounts(client, p)
+
+
+@resources.register('catalog-product')
+class CatalogProduct(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'servicecatalog'
+        arn_type = 'product'
+        enum_spec = ('search_products_as_admin', 'ProductViewDetails[].ProductViewSummary', None)
+        detail_spec = ('describe_product_as_admin', 'Id', 'ProductId', None)
+        id = 'ProductId'
+        name = 'Name'
+        arn = 'ProductARN'
+        date = 'CreatedTime'
+        universal_taggable = object()
+        config_type = cfn_type = 'AWS::ServiceCatalog::CloudFormationProduct'
+        permissions_augment = ("servicecatalog:ListTagsForResource",)

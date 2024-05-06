@@ -68,6 +68,8 @@ class LabelActionFilter(Filter):
             raise FilterValidationError(
                 "Invalid timezone specified '%s' in %s" % (
                     self.data.get('tz'), self.manager.data))
+        self.valid_actions = sorted(
+            self.manager.action_registry.keys(), key=lambda k: len(k), reverse=True)
         return self
 
     def process(self, resources, event=None):
@@ -78,6 +80,17 @@ class LabelActionFilter(Filter):
         self.tz = Time.get_tz(self.data.get('tz', 'utc'))
         return super(LabelActionFilter, self).process(resources, event)
 
+    def parse(self, v: str):
+        remainder, action_date = v.rsplit('-', 1)
+        found = False
+        msg = ""
+        for a in self.valid_actions:
+            if remainder.endswith(a):
+                found = a
+                msg = remainder[:-len(a) - 1]
+                break
+        return msg, found, action_date
+
     def __call__(self, i):
         v = i.get('labels', {}).get(self.label, None)
 
@@ -86,9 +99,9 @@ class LabelActionFilter(Filter):
         if '-' not in v or '_' not in v:
             return False
 
-        msg, action, action_date_str = v.rsplit('-', 2)
+        _, action, action_date_str = self.parse(v)
 
-        if action != self.op:
+        if action != self.op or not action:
             return False
 
         try:

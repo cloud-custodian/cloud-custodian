@@ -1,0 +1,38 @@
+{
+    "pytest-terraform": 1,
+    "outputs": {},
+    "resources": {
+        "oci_core_vcn": {
+            "test_virtual_network_vcn": {
+                "byoipv6cidr_blocks": [],
+                "byoipv6cidr_details": null,
+                "cidr_block": "10.1.0.0/16",
+                "cidr_blocks": [
+                    "10.1.0.0/16"
+                ],
+                "compartment_id": "ocid1.compartment.oc1..<unique_ID>",
+                "default_dhcp_options_id": "ocid1.dhcpoptions.oc1..<unique_ID>",
+                "default_route_table_id": "ocid1.routetable.oc1..<unique_ID>",
+                "default_security_list_id": "ocid1.securitylist.oc1..<unique_ID>",
+                "defined_tags": {
+                    "Oracle-Tags.CreatedBy": "user@example.com",
+                    "Oracle-Tags.CreatedOn": "2023-06-09T11:59:52.474Z"
+                },
+                "display_name": "TestVcn",
+                "dns_label": "testvcn",
+                "freeform_tags": {
+                    "Project": "CNCF"
+                },
+                "id": "ocid1.vcn.oc1..<unique_ID>",
+                "ipv6cidr_blocks": [],
+                "ipv6private_cidr_blocks": [],
+                "is_ipv6enabled": false,
+                "is_oracle_gua_allocation_enabled": null,
+                "state": "AVAILABLE",
+                "time_created": "2023-06-09 11:59:52.599 +0000 UTC",
+                "timeouts": null,
+                "vcn_domain_name": "testvcn.oraclevcn.com"
+            }
+        }
+    }
+}

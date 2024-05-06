@@ -3,11 +3,15 @@
 import json
 import os
 import re
+from inspect import signature
+import tempfile
+from datetime import datetime, timedelta
 
 import pytest
 from adal import AdalError
 from azure.core.credentials import AccessToken
 from azure.identity import (ClientSecretCredential, ManagedIdentityCredential)
+from azure.identity._credentials import azure_cli
 from c7n_azure import constants
 from c7n_azure.session import Session
 from mock import patch
@@ -16,6 +20,13 @@ from msrestazure.azure_cloud import (AZURE_CHINA_CLOUD, AZURE_US_GOV_CLOUD)
 from requests import HTTPError
 
 from .azure_common import DEFAULT_SUBSCRIPTION_ID, DEFAULT_TENANT_ID, BaseTest
+
+from cryptography.hazmat.primitives import serialization
+from cryptography.hazmat.primitives.asymmetric import rsa
+from cryptography import x509
+from cryptography.x509.oid import NameOID
+from cryptography.hazmat.primitives import hashes
+
 
 CUSTOM_SUBSCRIPTION_ID = '00000000-5106-4743-99b0-c129bfa71a47'
 
@@ -33,6 +44,34 @@ class SessionTest(BaseTest):
 
     def mock_init(self, client_id, secret, tenant, resource):
         pass
+
+    def generate_fake_cert(self, password):
+        cn = 'example.com'
+        private_key = rsa.generate_private_key(public_exponent=65537, key_size=2048)
+        public_key = private_key.public_key()
+
+        builder = x509.CertificateBuilder()
+        builder = builder.subject_name(x509.Name([
+            x509.NameAttribute(NameOID.COMMON_NAME, cn)]))
+        builder = builder.issuer_name(x509.Name([
+            x509.NameAttribute(NameOID.COMMON_NAME, cn)]))
+        builder = builder.not_valid_before(datetime.utcnow())
+        builder = builder.not_valid_after(datetime.utcnow() + timedelta(days=365))
+        builder = builder.serial_number(x509.random_serial_number())
+        builder = builder.public_key(public_key)
+        builder = builder.add_extension(
+            x509.SubjectAlternativeName([x509.DNSName(cn)]), critical=False)
+
+        certificate = builder.sign(private_key=private_key, algorithm=hashes.SHA256())
+
+        # serialize our certificate and private key to PEM format
+        pem_cert = certificate.public_bytes(serialization.Encoding.PEM)
+        pem_key = private_key.private_bytes(
+            encoding=serialization.Encoding.PEM,
+            format=serialization.PrivateFormat.TraditionalOpenSSL,
+            encryption_algorithm=serialization.BestAvailableEncryption(password.encode())
+        )
+        return pem_cert + pem_key
 
     def test_initialize_session_auth_file(self):
         s = Session(authorization_file=self.authorization_file)
@@ -86,6 +125,29 @@ class SessionTest(BaseTest):
             s = Session()
             self.assertEqual(s.get_subscription_id(), DEFAULT_SUBSCRIPTION_ID)
             self.assertEqual(s.get_tenant_id(), DEFAULT_TENANT_ID)
+
+    def test_run_command_signature(self):
+        """Catch signature changes in the internal method we use for CLI authentication
+
+        We use _run_command() to fetch default subscription information. This information
+        was previously accessible via azure-common but has been deprecated in favor
+        of azure-identity:
+
+        https://github.com/Azure/azure-sdk-for-python/blob/main/sdk/identity/azure-identity/migration_guide.md
+
+        It's not clear how to reliably get the CLI's default subscription purely from
+        azure-identity (avoiding an explicit azure-cli dependency). Azure CLI docs suggest
+        that while we can _usually_ pull default subscription info out of ~/.azure/azureProfile,
+        it might be elsewhere:
+
+        https://github.com/Azure/azure-cli/blob/813da51a0a6ac2d427e496f1dffc01c96af24d78/src/azure-cli-core/azure/cli/core/_profile.py#L20-L24
+
+        So continuing to rely on _run_command() may be more reliable, as long as we
+        catch signature changes to avoid accidental breakage.
+        """
+        expected_parameters = {"command", "timeout"}
+        actual_parameters = set(signature(azure_cli._run_command).parameters.keys())
+        self.assertSetEqual(expected_parameters, actual_parameters)
 
     @patch('azure.identity.ClientSecretCredential.get_token')
     @patch('c7n_azure.session.log.error')
@@ -162,6 +224,23 @@ class SessionTest(BaseTest):
             self.assertIsNone(s.get_credentials()._credential)
             self.assertEqual(s.get_subscription_id(), DEFAULT_SUBSCRIPTION_ID)
             self.assertEqual(s.get_credentials().get_token(), AccessToken('token', 0))
+
+    def test_initialize_certificate(self):
+        with tempfile.NamedTemporaryFile(delete=False) as fp:
+            fp.write(self.generate_fake_cert('password'))
+            filename = fp.name
+        with patch.dict(os.environ,
+                        {
+                            constants.ENV_TENANT_ID: 'tenant',
+                            constants.ENV_SUB_ID: DEFAULT_SUBSCRIPTION_ID,
+                            constants.ENV_CLIENT_ID: 'client',
+                            constants.ENV_CLIENT_CERTIFICATE_PATH: filename,
+                            constants.ENV_CLIENT_CERTIFICATE_PASSWORD: 'password'
+                        }, clear=True):
+            s = Session()
+            creds = s.get_credentials()
+            self.assertEqual(s.get_subscription_id(), DEFAULT_SUBSCRIPTION_ID)
+            self.assertIsNotNone(creds._credential)
 
     def test_get_functions_auth_string(self):
         with patch('azure.common.credentials.ServicePrincipalCredentials.__init__',
@@ -302,7 +381,9 @@ class SessionTest(BaseTest):
                             constants.ENV_USE_MSI: 'true',
                             constants.ENV_ACCESS_TOKEN: 'access_token',
                             constants.ENV_KEYVAULT_CLIENT_ID: 'kv_client',
-                            constants.ENV_KEYVAULT_SECRET_ID: 'kv_secret'
+                            constants.ENV_KEYVAULT_SECRET_ID: 'kv_secret',
+                            constants.ENV_CLIENT_CERTIFICATE_PATH: '/certificate',
+                            constants.ENV_CLIENT_CERTIFICATE_PASSWORD: 'password'
                         }, clear=True):
             env_params = Session().get_credentials().auth_params
 

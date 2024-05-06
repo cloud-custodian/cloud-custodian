@@ -1,0 +1,2596 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.DBforPostgreSQL/servers?api-version=2017-12-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "date": [
+                        "Wed, 21 Apr 2021 09:22:16 GMT"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-length": [
+                        "972"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "sku": {
+                                    "name": "GP_Gen5_2",
+                                    "tier": "GeneralPurpose",
+                                    "family": "Gen5",
+                                    "capacity": 2
+                                },
+                                "properties": {
+                                    "administratorLogin": "custodian",
+                                    "storageProfile": {
+                                        "storageMB": 5120,
+                                        "backupRetentionDays": 7,
+                                        "geoRedundantBackup": "Disabled",
+                                        "storageAutogrow": "Disabled"
+                                    },
+                                    "version": "10",
+                                    "sslEnforcement": "Enabled",
+                                    "minimalTlsVersion": "TLSEnforcementDisabled",
+                                    "userVisibleState": "Ready",
+                                    "fullyQualifiedDomainName": "cctestpostgresqlserver2szkrfs64caaw.postgres.database.azure.com",
+                                    "earliestRestoreDate": "2021-04-21T07:56:12.35+00:00",
+                                    "replicationRole": "",
+                                    "masterServerId": "",
+                                    "byokEnforcement": "Disabled",
+                                    "privateEndpointConnections": [],
+                                    "infrastructureEncryption": "Disabled",
+                                    "publicNetworkAccess": "Enabled"
+                                },
+                                "location": "eastus",
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw",
+                                "name": "cctestpostgresqlserver2szkrfs64caaw",
+                                "type": "Microsoft.DBforPostgreSQL/servers"
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations?api-version=2017-12-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "date": [
+                        "Wed, 21 Apr 2021 09:22:19 GMT"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-length": [
+                        "94643"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "properties": {
+                                    "value": "ON",
+                                    "description": "Enable input of NULL elements in arrays.",
+                                    "defaultValue": "on",
+                                    "dataType": "Boolean",
+                                    "allowedValues": "on,off",
+                                    "source": "user-override",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/array_nulls",
+                                "name": "array_nulls",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "safe_encoding",
+                                    "description": "Sets whether \"\\'\" is allowed in string literals.",
+                                    "defaultValue": "safe_encoding",
+                                    "dataType": "Enumeration",
+                                    "allowedValues": "safe_encoding,on,off",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/backslash_quote",
+                                "name": "backslash_quote",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "hex",
+                                    "description": "Sets the output format for bytea.",
+                                    "defaultValue": "hex",
+                                    "dataType": "Enumeration",
+                                    "allowedValues": "escape,hex",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/bytea_output",
+                                "name": "bytea_output",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "on",
+                                    "description": "Check function bodies during CREATE FUNCTION.",
+                                    "defaultValue": "on",
+                                    "dataType": "Boolean",
+                                    "allowedValues": "on,off",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/check_function_bodies",
+                                "name": "check_function_bodies",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "sql_ascii",
+                                    "description": "Sets the client's character set encoding.",
+                                    "defaultValue": "sql_ascii",
+                                    "dataType": "Enumeration",
+                                    "allowedValues": "BIG5,EUC_CN,EUC_JP,EUC_JIS_2004,EUC_KR,EUC_TW,GB18030,GBK,ISO_8859_5,ISO_8859_6,ISO_8859_7,ISO_8859_8,JOHAB,KOI8R,KOI8U,LATIN1,LATIN2,LATIN3,LATIN4,LATIN5,LATIN6,LATIN7,LATIN8,LATIN9,LATIN10,MULE_INTERNAL,SJIS,SHIFT_JIS_2004,SQL_ASCII,UHC,UTF8,WIN866,WIN874,WIN1250,WIN1251,WIN1252,WIN1253,WIN1254,WIN1255,WIN1256,WIN1257,WIN1258",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/client_encoding",
+                                "name": "client_encoding",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "notice",
+                                    "description": "Sets the message levels that are sent to the client.",
+                                    "defaultValue": "notice",
+                                    "dataType": "Enumeration",
+                                    "allowedValues": "debug5,debug4,debug3,debug2,debug1,log,notice,warning,error",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/client_min_messages",
+                                "name": "client_min_messages",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "partition",
+                                    "description": "Enables the planner to use constraints to optimize queries.",
+                                    "defaultValue": "partition",
+                                    "dataType": "Enumeration",
+                                    "allowedValues": "partition,on,off",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/constraint_exclusion",
+                                "name": "constraint_exclusion",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "0.005",
+                                    "description": "Sets the planner's estimate of the cost of processing each index entry during an index scan.",
+                                    "defaultValue": "0.005",
+                                    "dataType": "Numeric",
+                                    "allowedValues": "0-1.79769e+308",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/cpu_index_tuple_cost",
+                                "name": "cpu_index_tuple_cost",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "0.0025",
+                                    "description": "Sets the planner's estimate of the cost of processing each operator or function call.",
+                                    "defaultValue": "0.0025",
+                                    "dataType": "Numeric",
+                                    "allowedValues": "0-1.79769e+308",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/cpu_operator_cost",
+                                "name": "cpu_operator_cost",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "0.01",
+                                    "description": "Sets the planner's estimate of the cost of processing each tuple (row).",
+                                    "defaultValue": "0.01",
+                                    "dataType": "Numeric",
+                                    "allowedValues": "0-1.79769e+308",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/cpu_tuple_cost",
+                                "name": "cpu_tuple_cost",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "0.1",
+                                    "description": "Sets the planner's estimate of the fraction of a cursor's rows that will be retrieved.",
+                                    "defaultValue": "0.1",
+                                    "dataType": "Numeric",
+                                    "allowedValues": "0-1",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/cursor_tuple_fraction",
+                                "name": "cursor_tuple_fraction",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "iso, mdy",
+                                    "description": "Sets the display format for date and time values.",
+                                    "defaultValue": "iso, mdy",
+                                    "dataType": "String",
+                                    "allowedValues": "(iso|postgres|sql|german)\\,\\s(dmy|mdy|ymd)",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/datestyle",
+                                "name": "datestyle",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "1000",
+                                    "description": "Sets the amount of time, in milliseconds, to wait on a lock before checking for deadlock.",
+                                    "defaultValue": "1000",
+                                    "dataType": "Integer",
+                                    "allowedValues": "1-2147483647",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/deadlock_timeout",
+                                "name": "deadlock_timeout",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "off",
+                                    "description": "Logs each query's parse tree.",
+                                    "defaultValue": "off",
+                                    "dataType": "Boolean",
+                                    "allowedValues": "on,off",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/debug_print_parse",
+                                "name": "debug_print_parse",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "off",
+                                    "description": "Logs each query's execution plan.",
+                                    "defaultValue": "off",
+                                    "dataType": "Boolean",
+                                    "allowedValues": "on,off",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/debug_print_plan",
+                                "name": "debug_print_plan",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "off",
+                                    "description": "Logs each query's rewritten parse tree.",
+                                    "defaultValue": "off",
+                                    "dataType": "Boolean",
+                                    "allowedValues": "on,off",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/debug_print_rewritten",
+                                "name": "debug_print_rewritten",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "100",
+                                    "description": "Sets the default statistics target.",
+                                    "defaultValue": "100",
+                                    "dataType": "Integer",
+                                    "allowedValues": "1-10000",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/default_statistics_target",
+                                "name": "default_statistics_target",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "pg_catalog.english",
+                                    "description": "Sets default text search configuration.",
+                                    "defaultValue": "pg_catalog.english",
+                                    "dataType": "String",
+                                    "allowedValues": "[A-Za-z\\._]+",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/default_text_search_config",
+                                "name": "default_text_search_config",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "off",
+                                    "description": "Sets the default deferrable status of new transactions.",
+                                    "defaultValue": "off",
+                                    "dataType": "Boolean",
+                                    "allowedValues": "on,off",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/default_transaction_deferrable",
+                                "name": "default_transaction_deferrable",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "read committed",
+                                    "description": "Sets the transaction isolation level of each new transaction.",
+                                    "defaultValue": "read committed",
+                                    "dataType": "Enumeration",
+                                    "allowedValues": "serializable,repeatable read,read committed,read uncommitted",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/default_transaction_isolation",
+                                "name": "default_transaction_isolation",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "off",
+                                    "description": "Sets the default read-only status of new transactions.",
+                                    "defaultValue": "off",
+                                    "dataType": "Boolean",
+                                    "allowedValues": "on,off",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/default_transaction_read_only",
+                                "name": "default_transaction_read_only",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "off",
+                                    "description": "Create new tables with OIDs by default.",
+                                    "defaultValue": "off",
+                                    "dataType": "Boolean",
+                                    "allowedValues": "on,off",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/default_with_oids",
+                                "name": "default_with_oids",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "on",
+                                    "description": "Enables the planner's use of bitmap-scan plans.",
+                                    "defaultValue": "on",
+                                    "dataType": "Boolean",
+                                    "allowedValues": "on,off",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/enable_bitmapscan",
+                                "name": "enable_bitmapscan",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "on",
+                                    "description": "Enables the planner's use of hashed aggregation plans.",
+                                    "defaultValue": "on",
+                                    "dataType": "Boolean",
+                                    "allowedValues": "on,off",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/enable_hashagg",
+                                "name": "enable_hashagg",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "on",
+                                    "description": "Enables the planner's use of hash join plans.",
+                                    "defaultValue": "on",
+                                    "dataType": "Boolean",
+                                    "allowedValues": "on,off",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/enable_hashjoin",
+                                "name": "enable_hashjoin",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "on",
+                                    "description": "Enables the planner's use of index-only-scan plans.",
+                                    "defaultValue": "on",
+                                    "dataType": "Boolean",
+                                    "allowedValues": "on,off",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/enable_indexonlyscan",
+                                "name": "enable_indexonlyscan",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "on",
+                                    "description": "Enables the planner's use of index-scan plans.",
+                                    "defaultValue": "on",
+                                    "dataType": "Boolean",
+                                    "allowedValues": "on,off",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/enable_indexscan",
+                                "name": "enable_indexscan",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "on",
+                                    "description": "Enables the planner's use of materialization.",
+                                    "defaultValue": "on",
+                                    "dataType": "Boolean",
+                                    "allowedValues": "on,off",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/enable_material",
+                                "name": "enable_material",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "on",
+                                    "description": "Enables the planner's use of merge join plans.",
+                                    "defaultValue": "on",
+                                    "dataType": "Boolean",
+                                    "allowedValues": "on,off",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/enable_mergejoin",
+                                "name": "enable_mergejoin",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "on",
+                                    "description": "Enables the planner's use of nested-loop join plans.",
+                                    "defaultValue": "on",
+                                    "dataType": "Boolean",
+                                    "allowedValues": "on,off",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/enable_nestloop",
+                                "name": "enable_nestloop",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "on",
+                                    "description": "Enables the planner's use of sequential-scan plans.",
+                                    "defaultValue": "on",
+                                    "dataType": "Boolean",
+                                    "allowedValues": "on,off",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/enable_seqscan",
+                                "name": "enable_seqscan",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "on",
+                                    "description": "Enables the planner's use of explicit sort steps.",
+                                    "defaultValue": "on",
+                                    "dataType": "Boolean",
+                                    "allowedValues": "on,off",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/enable_sort",
+                                "name": "enable_sort",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "on",
+                                    "description": "Enables the planner's use of TID scan plans.",
+                                    "defaultValue": "on",
+                                    "dataType": "Boolean",
+                                    "allowedValues": "on,off",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/enable_tidscan",
+                                "name": "enable_tidscan",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "on",
+                                    "description": "Warn about backslash escapes in ordinary string literals.",
+                                    "defaultValue": "on",
+                                    "dataType": "Boolean",
+                                    "allowedValues": "on,off",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/escape_string_warning",
+                                "name": "escape_string_warning",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "off",
+                                    "description": "Terminate session on any error.",
+                                    "defaultValue": "off",
+                                    "dataType": "Boolean",
+                                    "allowedValues": "on,off",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/exit_on_error",
+                                "name": "exit_on_error",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "0",
+                                    "description": "Sets the number of digits displayed for floating-point values.",
+                                    "defaultValue": "0",
+                                    "dataType": "Integer",
+                                    "allowedValues": "-15-3",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/extra_float_digits",
+                                "name": "extra_float_digits",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "8",
+                                    "description": "Sets the FROM-list size beyond which subqueries are not collapsed.",
+                                    "defaultValue": "8",
+                                    "dataType": "Integer",
+                                    "allowedValues": "1-2147483647",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/from_collapse_limit",
+                                "name": "from_collapse_limit",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "on",
+                                    "description": "Enables genetic query optimization.",
+                                    "defaultValue": "on",
+                                    "dataType": "Boolean",
+                                    "allowedValues": "on,off",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/geqo",
+                                "name": "geqo",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "5",
+                                    "description": "GEQO: effort is used to set the default for other GEQO parameters.",
+                                    "defaultValue": "5",
+                                    "dataType": "Integer",
+                                    "allowedValues": "1-10",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/geqo_effort",
+                                "name": "geqo_effort",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "0",
+                                    "description": "GEQO: number of iterations of the algorithm.",
+                                    "defaultValue": "0",
+                                    "dataType": "Integer",
+                                    "allowedValues": "0-2147483647",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/geqo_generations",
+                                "name": "geqo_generations",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "0",
+                                    "description": "GEQO: number of individuals in the population.",
+                                    "defaultValue": "0",
+                                    "dataType": "Integer",
+                                    "allowedValues": "0-2147483647",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/geqo_pool_size",
+                                "name": "geqo_pool_size",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "0.0",
+                                    "description": "GEQO: seed for random path selection.",
+                                    "defaultValue": "0.0",
+                                    "dataType": "Numeric",
+                                    "allowedValues": "0-1",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/geqo_seed",
+                                "name": "geqo_seed",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "2.0",
+                                    "description": "GEQO: selective pressure within the population.",
+                                    "defaultValue": "2.0",
+                                    "dataType": "Numeric",
+                                    "allowedValues": "1.5-2",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/geqo_selection_bias",
+                                "name": "geqo_selection_bias",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "12",
+                                    "description": "Sets the threshold of FROM items beyond which GEQO is used.",
+                                    "defaultValue": "12",
+                                    "dataType": "Integer",
+                                    "allowedValues": "2-2147483647",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/geqo_threshold",
+                                "name": "geqo_threshold",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "0",
+                                    "description": "Sets the maximum allowed result for exact search by GIN.",
+                                    "defaultValue": "0",
+                                    "dataType": "Integer",
+                                    "allowedValues": "0-2147483647",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/gin_fuzzy_search_limit",
+                                "name": "gin_fuzzy_search_limit",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "postgres",
+                                    "description": "Sets the display format for interval values.",
+                                    "defaultValue": "postgres",
+                                    "dataType": "Enumeration",
+                                    "allowedValues": "postgres,postgres_verbose,sql_standard,iso_8601",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/intervalstyle",
+                                "name": "intervalstyle",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "8",
+                                    "description": "Sets the FROM-list size beyond which JOIN constructs are not flattened.",
+                                    "defaultValue": "8",
+                                    "dataType": "Integer",
+                                    "allowedValues": "1-2147483647",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/join_collapse_limit",
+                                "name": "join_collapse_limit",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "0",
+                                    "description": "Sets the maximum allowed duration (in milliseconds) of any wait for a lock. 0 turns this off.",
+                                    "defaultValue": "0",
+                                    "dataType": "Integer",
+                                    "allowedValues": "0-2147483647",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/lock_timeout",
+                                "name": "lock_timeout",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "on",
+                                    "description": "Logs each checkpoint.",
+                                    "defaultValue": "on",
+                                    "dataType": "Boolean",
+                                    "allowedValues": "on,off",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/log_checkpoints",
+                                "name": "log_checkpoints",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "on",
+                                    "description": "Logs each successful connection.",
+                                    "defaultValue": "on",
+                                    "dataType": "Boolean",
+                                    "allowedValues": "on,off",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/log_connections",
+                                "name": "log_connections",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "off",
+                                    "description": "Logs end of a session, including duration.",
+                                    "defaultValue": "off",
+                                    "dataType": "Boolean",
+                                    "allowedValues": "on,off",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/log_disconnections",
+                                "name": "log_disconnections",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "off",
+                                    "description": "Logs the duration of each completed SQL statement.",
+                                    "defaultValue": "off",
+                                    "dataType": "Boolean",
+                                    "allowedValues": "on,off",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/log_duration",
+                                "name": "log_duration",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "default",
+                                    "description": "Sets the verbosity of logged messages.",
+                                    "defaultValue": "default",
+                                    "dataType": "Enumeration",
+                                    "allowedValues": "terse,default,verbose",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/log_error_verbosity",
+                                "name": "log_error_verbosity",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "%t-%c-",
+                                    "description": "Sets the printf-style string that is output at the beginning of each log line.",
+                                    "defaultValue": "%t-%c-",
+                                    "dataType": "String",
+                                    "allowedValues": ".*",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/log_line_prefix",
+                                "name": "log_line_prefix",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "off",
+                                    "description": "Logs long lock waits.",
+                                    "defaultValue": "off",
+                                    "dataType": "Boolean",
+                                    "allowedValues": "on,off",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/log_lock_waits",
+                                "name": "log_lock_waits",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "-1",
+                                    "description": "Sets the minimum execution time (in milliseconds) above which statements will be logged. -1 disables logging statement durations.",
+                                    "defaultValue": "-1",
+                                    "dataType": "Integer",
+                                    "allowedValues": "-1-2147483647",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/log_min_duration_statement",
+                                "name": "log_min_duration_statement",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "error",
+                                    "description": "Causes all statements generating error at or above this level to be logged.",
+                                    "defaultValue": "error",
+                                    "dataType": "Enumeration",
+                                    "allowedValues": "debug5,debug4,debug3,debug2,debug1,info,notice,warning,error,log,fatal,panic",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/log_min_error_statement",
+                                "name": "log_min_error_statement",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "warning",
+                                    "description": "Sets the message levels that are logged.",
+                                    "defaultValue": "warning",
+                                    "dataType": "Enumeration",
+                                    "allowedValues": "debug5,debug4,debug3,debug2,debug1,info,notice,warning,error,log,fatal,panic",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/log_min_messages",
+                                "name": "log_min_messages",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "none",
+                                    "description": "Sets the type of statements logged.",
+                                    "defaultValue": "none",
+                                    "dataType": "Enumeration",
+                                    "allowedValues": "none,ddl,mod,all",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/log_statement",
+                                "name": "log_statement",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "off",
+                                    "description": "For each query, writes cumulative performance statistics to the server log.",
+                                    "defaultValue": "off",
+                                    "dataType": "Boolean",
+                                    "allowedValues": "on,off",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/log_statement_stats",
+                                "name": "log_statement_stats",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "64",
+                                    "description": "Sets the maximum number of locks per transaction. Any change requires restarting the server to take effect. When running a replica server, you must set this parameter to the same or higher value than on the master server.",
+                                    "defaultValue": "64",
+                                    "dataType": "Integer",
+                                    "allowedValues": "10-2147483647",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "False"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/max_locks_per_transaction",
+                                "name": "max_locks_per_transaction",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "0",
+                                    "description": "Sets the maximum number of simultaneously prepared transactions. Any change requires restarting the server to take effect. When running a replica server, you must set this parameter to the same or higher value than on the master server.",
+                                    "defaultValue": "0",
+                                    "dataType": "Integer",
+                                    "allowedValues": "0-8388607",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "False"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/max_prepared_transactions",
+                                "name": "max_prepared_transactions",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "off",
+                                    "description": "When generating SQL fragments, quote all identifiers.",
+                                    "defaultValue": "off",
+                                    "dataType": "Boolean",
+                                    "allowedValues": "on,off",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/quote_all_identifiers",
+                                "name": "quote_all_identifiers",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "4.0",
+                                    "description": "Sets the planner's estimate of the cost of a nonsequentially fetched disk page.",
+                                    "defaultValue": "4.0",
+                                    "dataType": "Numeric",
+                                    "allowedValues": "0-1.79769e+308",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/random_page_cost",
+                                "name": "random_page_cost",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "\"$user\", public",
+                                    "description": "Sets the schema search order for names that are not schema-qualified.",
+                                    "defaultValue": "\"$user\", public",
+                                    "dataType": "String",
+                                    "allowedValues": "[A-Za-z.\"$, ]+",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/search_path",
+                                "name": "search_path",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "1.0",
+                                    "description": "Sets the planner's estimate of the cost of a sequentially fetched disk page.",
+                                    "defaultValue": "1.0",
+                                    "dataType": "Numeric",
+                                    "allowedValues": "0-1.79769e+308",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/seq_page_cost",
+                                "name": "seq_page_cost",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "0",
+                                    "description": "Sets the maximum allowed duration (in milliseconds) of any statement. 0 turns this off.",
+                                    "defaultValue": "0",
+                                    "dataType": "Integer",
+                                    "allowedValues": "0-2147483647",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/statement_timeout",
+                                "name": "statement_timeout",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "on",
+                                    "description": "Enable synchronized sequential scans.",
+                                    "defaultValue": "on",
+                                    "dataType": "Boolean",
+                                    "allowedValues": "on,off",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/synchronize_seqscans",
+                                "name": "synchronize_seqscans",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "on",
+                                    "description": "Sets the current transaction's synchronization level.",
+                                    "defaultValue": "on",
+                                    "dataType": "Enumeration",
+                                    "allowedValues": "local,remote_write,on,off",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/synchronous_commit",
+                                "name": "synchronous_commit",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "off",
+                                    "description": "Treats \"expr=NULL\" as \"expr IS NULL\".",
+                                    "defaultValue": "off",
+                                    "dataType": "Boolean",
+                                    "allowedValues": "on,off",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/transform_null_equals",
+                                "name": "transform_null_equals",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "base64",
+                                    "description": "Sets how binary values are to be encoded in XML.",
+                                    "defaultValue": "base64",
+                                    "dataType": "Enumeration",
+                                    "allowedValues": "base64,hex",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/xmlbinary",
+                                "name": "xmlbinary",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "content",
+                                    "description": "Sets whether XML data in implicit parsing and serialization operations is to be considered as documents or content fragments.",
+                                    "defaultValue": "content",
+                                    "dataType": "Enumeration",
+                                    "allowedValues": "content,document",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/xmloption",
+                                "name": "xmloption",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "off",
+                                    "description": "Forces use of parallel query facilities.",
+                                    "defaultValue": "off",
+                                    "dataType": "Enumeration",
+                                    "allowedValues": "off,on,regress",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/force_parallel_mode",
+                                "name": "force_parallel_mode",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "0",
+                                    "description": "Sets the maximum allowed duration of any idling transaction. Unit is ms.",
+                                    "defaultValue": "0",
+                                    "dataType": "Integer",
+                                    "allowedValues": "0-2147483647",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/idle_in_transaction_session_timeout",
+                                "name": "idle_in_transaction_session_timeout",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "2",
+                                    "description": "Sets the maximum number of parallel processes per executor node.",
+                                    "defaultValue": "2",
+                                    "dataType": "Integer",
+                                    "allowedValues": "0-1024",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/max_parallel_workers_per_gather",
+                                "name": "max_parallel_workers_per_gather",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "1000",
+                                    "description": "Sets the planner's estimate of the cost of starting up worker processes for parallel query.",
+                                    "defaultValue": "1000",
+                                    "dataType": "Numeric",
+                                    "allowedValues": "0-1.79769e+308",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/parallel_setup_cost",
+                                "name": "parallel_setup_cost",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "0.1",
+                                    "description": "Sets the planner's estimate of the cost of passing each tuple (row) from worker to master backend.",
+                                    "defaultValue": "0.1",
+                                    "dataType": "Numeric",
+                                    "allowedValues": "0-1.79769e+308",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/parallel_tuple_cost",
+                                "name": "parallel_tuple_cost",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "4096",
+                                    "description": "Sets the amount of memory to be used by internal sort operations and hash tables before writing to temporary disk files. Unit is kb.",
+                                    "defaultValue": "4096",
+                                    "dataType": "Integer",
+                                    "allowedValues": "4096-2097151",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/work_mem",
+                                "name": "work_mem",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "8192",
+                                    "description": "Sets the maximum number of temporary buffers used by each database session. Unit is 8kb.",
+                                    "defaultValue": "8192",
+                                    "dataType": "Integer",
+                                    "allowedValues": "8192-16384",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/temp_buffers",
+                                "name": "temp_buffers",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "8388608",
+                                    "description": "Sets the minimum amount of table data for a parallel scan. Unit is 8kb.",
+                                    "defaultValue": "8388608",
+                                    "dataType": "Integer",
+                                    "allowedValues": "0-715827882",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/min_parallel_table_scan_size",
+                                "name": "min_parallel_table_scan_size",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "524288",
+                                    "description": "Sets the minimum amount of index data for a parallel scan. Unit is 8kb.",
+                                    "defaultValue": "524288",
+                                    "dataType": "Integer",
+                                    "allowedValues": "0-715827882",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/min_parallel_index_scan_size",
+                                "name": "min_parallel_index_scan_size",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "8",
+                                    "description": "Sets the maximum number of parallel workers than can be active at one time.",
+                                    "defaultValue": "8",
+                                    "dataType": "Integer",
+                                    "allowedValues": "0-1024",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/max_parallel_workers",
+                                "name": "max_parallel_workers",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "on",
+                                    "description": "Enables temporary connection throttling per IP for too many invalid password login failures.",
+                                    "defaultValue": "on",
+                                    "dataType": "Boolean",
+                                    "allowedValues": "on,off",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/connection_throttling",
+                                "name": "connection_throttling",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "3",
+                                    "description": "Sets how many days a log file is saved for.",
+                                    "defaultValue": "3",
+                                    "dataType": "Integer",
+                                    "allowedValues": "1-7",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/log_retention_days",
+                                "name": "log_retention_days",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "6000",
+                                    "description": "Sets the maximum query text length that will be saved; longer queries will be truncated.",
+                                    "defaultValue": "6000",
+                                    "dataType": "Integer",
+                                    "allowedValues": "100-10000",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/pg_qs.max_query_text_length",
+                                "name": "pg_qs.max_query_text_length",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "none",
+                                    "description": "Selects which statements are tracked by pg_qs.",
+                                    "defaultValue": "none",
+                                    "dataType": "Enumeration",
+                                    "allowedValues": "all,top,none",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/pg_qs.query_capture_mode",
+                                "name": "pg_qs.query_capture_mode",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "7",
+                                    "description": "Sets the retention period window in days for pg_qs - after this time data will be deleted.",
+                                    "defaultValue": "7",
+                                    "dataType": "Integer",
+                                    "allowedValues": "1-30",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/pg_qs.retention_period_in_days",
+                                "name": "pg_qs.retention_period_in_days",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "on",
+                                    "description": "Selects whether utility commands are tracked by pg_qs.",
+                                    "defaultValue": "on",
+                                    "dataType": "Boolean",
+                                    "allowedValues": "on,off",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/pg_qs.track_utility",
+                                "name": "pg_qs.track_utility",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "off",
+                                    "description": "Selects whether parameter placeholders are replaced in parameterized queries.",
+                                    "defaultValue": "off",
+                                    "dataType": "Boolean",
+                                    "allowedValues": "on,off",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/pg_qs.replace_parameter_placeholders",
+                                "name": "pg_qs.replace_parameter_placeholders",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "15",
+                                    "description": "Sets the query_store capture interval in minutes for pg_qs - this is the frequency of data persistence.",
+                                    "defaultValue": "15",
+                                    "dataType": "Integer",
+                                    "allowedValues": "1-30",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "False"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/pg_qs.interval_length_minutes",
+                                "name": "pg_qs.interval_length_minutes",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "none",
+                                    "description": "Controls which statements are counted by pg_stat_statements.",
+                                    "defaultValue": "none",
+                                    "dataType": "Enumeration",
+                                    "allowedValues": "top,all,none",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/pg_stat_statements.track",
+                                "name": "pg_stat_statements.track",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "none",
+                                    "description": "Selects which statements are tracked by the pgms_wait_sampling extension.",
+                                    "defaultValue": "none",
+                                    "dataType": "Enumeration",
+                                    "allowedValues": "all,none",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/pgms_wait_sampling.query_capture_mode",
+                                "name": "pgms_wait_sampling.query_capture_mode",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "100",
+                                    "description": "Set the frequency, in milliseconds, at which wait events are sampled.",
+                                    "defaultValue": "100",
+                                    "dataType": "Integer",
+                                    "allowedValues": "1-600000",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/pgms_wait_sampling.history_period",
+                                "name": "pgms_wait_sampling.history_period",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "DISABLE_ALL",
+                                    "description": "Controls postgis GDAL enabled driver settings.",
+                                    "defaultValue": "DISABLE_ALL",
+                                    "dataType": "Enumeration",
+                                    "allowedValues": "DISABLE_ALL,ENABLE_ALL",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/postgis.gdal_enabled_drivers",
+                                "name": "postgis.gdal_enabled_drivers",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "on",
+                                    "description": "Starts the autovacuum subprocess.",
+                                    "defaultValue": "on",
+                                    "dataType": "Boolean",
+                                    "allowedValues": "on,off",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/autovacuum",
+                                "name": "autovacuum",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "0.05",
+                                    "description": "Number of tuple inserts, updates, or deletes prior to analyze as a fraction of reltuples.",
+                                    "defaultValue": "0.05",
+                                    "dataType": "Numeric",
+                                    "allowedValues": "0-100",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/autovacuum_analyze_scale_factor",
+                                "name": "autovacuum_analyze_scale_factor",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "50",
+                                    "description": "Minimum number of tuple inserts, updates, or deletes prior to analyze.",
+                                    "defaultValue": "50",
+                                    "dataType": "Integer",
+                                    "allowedValues": "0-2147483647",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/autovacuum_analyze_threshold",
+                                "name": "autovacuum_analyze_threshold",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "200000000",
+                                    "description": "Age at which to autovacuum a table to prevent transaction ID wraparound. Any change requires restarting the server to take effect.",
+                                    "defaultValue": "200000000",
+                                    "dataType": "Integer",
+                                    "allowedValues": "100000-2000000000",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "False"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/autovacuum_freeze_max_age",
+                                "name": "autovacuum_freeze_max_age",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "400000000",
+                                    "description": "Multixact age at which to autovacuum a table to prevent multixact wraparound. Any change requires restarting the server to take effect.",
+                                    "defaultValue": "400000000",
+                                    "dataType": "Integer",
+                                    "allowedValues": "10000-2000000000",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "False"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/autovacuum_multixact_freeze_max_age",
+                                "name": "autovacuum_multixact_freeze_max_age",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "15",
+                                    "description": "Time to sleep between autovacuum runs. Unit is s.",
+                                    "defaultValue": "15",
+                                    "dataType": "Integer",
+                                    "allowedValues": "1-2147483",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/autovacuum_naptime",
+                                "name": "autovacuum_naptime",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "20",
+                                    "description": "Vacuum cost delay in milliseconds, for autovacuum.",
+                                    "defaultValue": "20",
+                                    "dataType": "Integer",
+                                    "allowedValues": "-1-100",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/autovacuum_vacuum_cost_delay",
+                                "name": "autovacuum_vacuum_cost_delay",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "-1",
+                                    "description": "Vacuum cost amount available before napping, for autovacuum.",
+                                    "defaultValue": "-1",
+                                    "dataType": "Integer",
+                                    "allowedValues": "-1-10000",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/autovacuum_vacuum_cost_limit",
+                                "name": "autovacuum_vacuum_cost_limit",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "0.05",
+                                    "description": "Number of tuple updates or deletes prior to vacuum as a fraction of reltuples.",
+                                    "defaultValue": "0.05",
+                                    "dataType": "Numeric",
+                                    "allowedValues": "0-100",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/autovacuum_vacuum_scale_factor",
+                                "name": "autovacuum_vacuum_scale_factor",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "50",
+                                    "description": "Minimum number of tuple updates or deletes prior to vacuum.",
+                                    "defaultValue": "50",
+                                    "dataType": "Integer",
+                                    "allowedValues": "0-2147483647",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/autovacuum_vacuum_threshold",
+                                "name": "autovacuum_vacuum_threshold",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "-1",
+                                    "description": "Sets the maximum memory to be used by each autovacuum worker process. Unit is kb.",
+                                    "defaultValue": "-1",
+                                    "dataType": "Integer",
+                                    "allowedValues": "-1-2097151",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/autovacuum_work_mem",
+                                "name": "autovacuum_work_mem",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "3",
+                                    "description": "Sets the maximum number of simultaneously running autovacuum worker processes. Any change requires restarting the server to take effect.",
+                                    "defaultValue": "3",
+                                    "dataType": "Integer",
+                                    "allowedValues": "1-262143",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "False"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/autovacuum_max_workers",
+                                "name": "autovacuum_max_workers",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "0",
+                                    "description": "Number of pages after which previously performed writes are flushed to disk. Unit is 8kb.",
+                                    "defaultValue": "0",
+                                    "dataType": "Integer",
+                                    "allowedValues": "0-256",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/backend_flush_after",
+                                "name": "backend_flush_after",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "20",
+                                    "description": "Background writer sleep time between rounds. Unit is ms.",
+                                    "defaultValue": "20",
+                                    "dataType": "Integer",
+                                    "allowedValues": "10-10000",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/bgwriter_delay",
+                                "name": "bgwriter_delay",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "64",
+                                    "description": "Number of pages after which previously performed writes are flushed to disk. Unit is 8kb.",
+                                    "defaultValue": "64",
+                                    "dataType": "Integer",
+                                    "allowedValues": "0-256",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/bgwriter_flush_after",
+                                "name": "bgwriter_flush_after",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "100",
+                                    "description": "Background writer maximum number of LRU pages to flush per round.",
+                                    "defaultValue": "100",
+                                    "dataType": "Integer",
+                                    "allowedValues": "0-1073741823",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/bgwriter_lru_maxpages",
+                                "name": "bgwriter_lru_maxpages",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "2",
+                                    "description": "Multiple of the average buffer usage to free per round.",
+                                    "defaultValue": "2",
+                                    "dataType": "Numeric",
+                                    "allowedValues": "0-10",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/bgwriter_lru_multiplier",
+                                "name": "bgwriter_lru_multiplier",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "0.9",
+                                    "description": "Time spent flushing dirty buffers during checkpoint, as fraction of checkpoint interval.",
+                                    "defaultValue": "0.9",
+                                    "dataType": "Numeric",
+                                    "allowedValues": "0-1",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/checkpoint_completion_target",
+                                "name": "checkpoint_completion_target",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "30",
+                                    "description": "Enables warnings if checkpoint segments are filled more frequently than this. Unit is s.",
+                                    "defaultValue": "30",
+                                    "dataType": "Integer",
+                                    "allowedValues": "0-2147483647",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/checkpoint_warning",
+                                "name": "checkpoint_warning",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "0",
+                                    "description": "Sets the delay in microseconds between transaction commit and flushing WAL to disk.",
+                                    "defaultValue": "0",
+                                    "dataType": "Integer",
+                                    "allowedValues": "0-100000",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/commit_delay",
+                                "name": "commit_delay",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "5",
+                                    "description": "Sets the minimum concurrent open transactions before performing commit_delay.",
+                                    "defaultValue": "5",
+                                    "dataType": "Integer",
+                                    "allowedValues": "0-1000",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/commit_siblings",
+                                "name": "commit_siblings",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "655360",
+                                    "description": "Sets the planner's assumption about the size of the disk cache. Unit is 8kb.",
+                                    "defaultValue": "917504",
+                                    "dataType": "Integer",
+                                    "allowedValues": "1-2147483647",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/effective_cache_size",
+                                "name": "effective_cache_size",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "4096",
+                                    "description": "Sets the maximum size of the pending list for GIN index. Unit is kb.",
+                                    "defaultValue": "4096",
+                                    "dataType": "Integer",
+                                    "allowedValues": "64-2097151",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/gin_pending_list_limit",
+                                "name": "gin_pending_list_limit",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "English_United States.1252",
+                                    "description": "Sets the locale for formatting monetary amounts.",
+                                    "defaultValue": "English_United States.1252",
+                                    "dataType": "String",
+                                    "allowedValues": "[A-Za-z0-9\\._\\s]+",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/lc_monetary",
+                                "name": "lc_monetary",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "English_United States.1252",
+                                    "description": "Sets the locale for formatting numbers.",
+                                    "defaultValue": "English_United States.1252",
+                                    "dataType": "String",
+                                    "allowedValues": "[A-Za-z0-9\\._\\s]+",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/lc_numeric",
+                                "name": "lc_numeric",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "off",
+                                    "description": "Enables backward compatibility mode for privilege checks on large objects.",
+                                    "defaultValue": "off",
+                                    "dataType": "Boolean",
+                                    "allowedValues": "on,off",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/lo_compat_privileges",
+                                "name": "lo_compat_privileges",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "-1",
+                                    "description": "Sets the minimum execution time above which autovacuum actions will be logged. Unit is ms.",
+                                    "defaultValue": "-1",
+                                    "dataType": "Integer",
+                                    "allowedValues": "-1-2147483647",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/log_autovacuum_min_duration",
+                                "name": "log_autovacuum_min_duration",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "off",
+                                    "description": "Logs each replication command.",
+                                    "defaultValue": "off",
+                                    "dataType": "Boolean",
+                                    "allowedValues": "on,off",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/log_replication_commands",
+                                "name": "log_replication_commands",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "-1",
+                                    "description": "Log the use of temporary files larger than this number of kilobytes.",
+                                    "defaultValue": "-1",
+                                    "dataType": "Integer",
+                                    "allowedValues": "-1-2147483647",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/log_temp_files",
+                                "name": "log_temp_files",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "30000",
+                                    "description": "Sets the maximum delay before canceling queries when a hot standby server is processing archived WAL data. Unit is ms.",
+                                    "defaultValue": "30000",
+                                    "dataType": "Integer",
+                                    "allowedValues": "-1-2147483647",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/max_standby_archive_delay",
+                                "name": "max_standby_archive_delay",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "30000",
+                                    "description": "Sets the maximum delay before canceling queries when a hot standby server is processing streamed WAL data. Unit is ms.",
+                                    "defaultValue": "30000",
+                                    "dataType": "Integer",
+                                    "allowedValues": "-1-2147483647",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/max_standby_streaming_delay",
+                                "name": "max_standby_streaming_delay",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "1024",
+                                    "description": "Sets the WAL size that triggers a checkpoint. Unit is mb.",
+                                    "defaultValue": "1024",
+                                    "dataType": "Integer",
+                                    "allowedValues": "2-2097151",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/max_wal_size",
+                                "name": "max_wal_size",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "256",
+                                    "description": "Sets the minimum size to shrink the WAL to. Unit is mb.",
+                                    "defaultValue": "512",
+                                    "dataType": "Integer",
+                                    "allowedValues": "2-2097151",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/min_wal_size",
+                                "name": "min_wal_size",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "-1",
+                                    "description": "Time before a snapshot is too old to read pages changed after the snapshot was taken. Any change requires restarting the server to take effect. Unit is min.",
+                                    "defaultValue": "-1",
+                                    "dataType": "Integer",
+                                    "allowedValues": "-1-86400",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "False"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/old_snapshot_threshold",
+                                "name": "old_snapshot_threshold",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "off",
+                                    "description": "Emit a warning for constructs that changed meaning since PostgreSQL 9.4.",
+                                    "defaultValue": "off",
+                                    "dataType": "Boolean",
+                                    "allowedValues": "on,off",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/operator_precedence_warning",
+                                "name": "operator_precedence_warning",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "5000",
+                                    "description": "Sets the maximum number of statements tracked by pg_stat_statements. Any change requires restarting the server to take effect.",
+                                    "defaultValue": "5000",
+                                    "dataType": "Integer",
+                                    "allowedValues": "100-2147483647",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "False"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/pg_stat_statements.max",
+                                "name": "pg_stat_statements.max",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "on",
+                                    "description": "Save pg_stat_statements statistics across server shutdowns.",
+                                    "defaultValue": "on",
+                                    "dataType": "Boolean",
+                                    "allowedValues": "on,off",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/pg_stat_statements.save",
+                                "name": "pg_stat_statements.save",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "on",
+                                    "description": "Selects whether utility commands are tracked by pg_stat_statements.",
+                                    "defaultValue": "on",
+                                    "dataType": "Boolean",
+                                    "allowedValues": "on,off",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/pg_stat_statements.track_utility",
+                                "name": "pg_stat_statements.track_utility",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "150000",
+                                    "description": "Sets the maximum number of tuples to be sorted using replacement selection.",
+                                    "defaultValue": "150000",
+                                    "dataType": "Integer",
+                                    "allowedValues": "0-2147483647",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/replacement_sort_tuples",
+                                "name": "replacement_sort_tuples",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "on",
+                                    "description": "Enable row security.",
+                                    "defaultValue": "on",
+                                    "dataType": "Boolean",
+                                    "allowedValues": "on,off",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/row_security",
+                                "name": "row_security",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "origin",
+                                    "description": "Sets the session's behavior for triggers and rewrite rules.",
+                                    "defaultValue": "origin",
+                                    "dataType": "Enumeration",
+                                    "allowedValues": "origin,replica,local",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/session_replication_role",
+                                "name": "session_replication_role",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "0",
+                                    "description": "Maximum number of TCP keepalive retransmits.",
+                                    "defaultValue": "0",
+                                    "dataType": "Integer",
+                                    "allowedValues": "0-2147483647",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/tcp_keepalives_count",
+                                "name": "tcp_keepalives_count",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "0",
+                                    "description": "Time between issuing TCP keepalives. Unit is s.",
+                                    "defaultValue": "0",
+                                    "dataType": "Integer",
+                                    "allowedValues": "0-2147483647",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/tcp_keepalives_idle",
+                                "name": "tcp_keepalives_idle",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "0",
+                                    "description": "Time between TCP keepalive retransmits. Unit is s.",
+                                    "defaultValue": "0",
+                                    "dataType": "Integer",
+                                    "allowedValues": "0-2147483647",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/tcp_keepalives_interval",
+                                "name": "tcp_keepalives_interval",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "on",
+                                    "description": "Collects information about executing commands.",
+                                    "defaultValue": "on",
+                                    "dataType": "Boolean",
+                                    "allowedValues": "on,off",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/track_activities",
+                                "name": "track_activities",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "1024",
+                                    "description": "Sets the size reserved for pg_stat_activity.query, in bytes. Any change requires restarting the server to take effect.",
+                                    "defaultValue": "1024",
+                                    "dataType": "Integer",
+                                    "allowedValues": "100-102400",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "False"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/track_activity_query_size",
+                                "name": "track_activity_query_size",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "off",
+                                    "description": "Collects transaction commit time. Any change requires restarting the server to take effect.",
+                                    "defaultValue": "off",
+                                    "dataType": "Boolean",
+                                    "allowedValues": "on,off",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "False"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/track_commit_timestamp",
+                                "name": "track_commit_timestamp",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "on",
+                                    "description": "Collects statistics on database activity.",
+                                    "defaultValue": "on",
+                                    "dataType": "Boolean",
+                                    "allowedValues": "on,off",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/track_counts",
+                                "name": "track_counts",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "none",
+                                    "description": "Collects function-level statistics on database activity.",
+                                    "defaultValue": "none",
+                                    "dataType": "Enumeration",
+                                    "allowedValues": "none,pl,all",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/track_functions",
+                                "name": "track_functions",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "on",
+                                    "description": "Collects timing statistics for database I/O activity.",
+                                    "defaultValue": "on",
+                                    "dataType": "Boolean",
+                                    "allowedValues": "on,off",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/track_io_timing",
+                                "name": "track_io_timing",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "UTC",
+                                    "description": "Sets the time zone for displaying and interpreting time stamps",
+                                    "defaultValue": "UTC",
+                                    "dataType": "String",
+                                    "allowedValues": "[A-Za-z0-9/+-_]+",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/timezone",
+                                "name": "timezone",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "",
+                                    "description": "Sets which shared libraries are preloaded at server start. Any change requires a restart to take effect.",
+                                    "defaultValue": "",
+                                    "dataType": "Set",
+                                    "allowedValues": ",auto_explain,pgaudit,timescaledb",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "False"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/shared_preload_libraries",
+                                "name": "shared_preload_libraries",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "0",
+                                    "description": "Vacuum cost delay in milliseconds.",
+                                    "defaultValue": "0",
+                                    "dataType": "Integer",
+                                    "allowedValues": "0-100",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/vacuum_cost_delay",
+                                "name": "vacuum_cost_delay",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "200",
+                                    "description": "Vacuum cost amount available before napping.",
+                                    "defaultValue": "200",
+                                    "dataType": "Integer",
+                                    "allowedValues": "1-10000",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/vacuum_cost_limit",
+                                "name": "vacuum_cost_limit",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "20",
+                                    "description": "Vacuum cost for a page dirtied by vacuum.",
+                                    "defaultValue": "20",
+                                    "dataType": "Integer",
+                                    "allowedValues": "0-10000",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/vacuum_cost_page_dirty",
+                                "name": "vacuum_cost_page_dirty",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "1",
+                                    "description": "Vacuum cost for a page found in the buffer cache.",
+                                    "defaultValue": "1",
+                                    "dataType": "Integer",
+                                    "allowedValues": "0-10000",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/vacuum_cost_page_hit",
+                                "name": "vacuum_cost_page_hit",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "10",
+                                    "description": "Vacuum cost for a page not found in the buffer cache.",
+                                    "defaultValue": "10",
+                                    "dataType": "Integer",
+                                    "allowedValues": "0-10000",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/vacuum_cost_page_miss",
+                                "name": "vacuum_cost_page_miss",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "0",
+                                    "description": "Number of transactions by which VACUUM and HOT cleanup should be deferred, if any.",
+                                    "defaultValue": "0",
+                                    "dataType": "Integer",
+                                    "allowedValues": "0-1000000",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/vacuum_defer_cleanup_age",
+                                "name": "vacuum_defer_cleanup_age",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "50000000",
+                                    "description": "Minimum age at which VACUUM should freeze a table row.",
+                                    "defaultValue": "50000000",
+                                    "dataType": "Integer",
+                                    "allowedValues": "0-1000000000",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/vacuum_freeze_min_age",
+                                "name": "vacuum_freeze_min_age",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "150000000",
+                                    "description": "Age at which VACUUM should scan whole table to freeze tuples.",
+                                    "defaultValue": "150000000",
+                                    "dataType": "Integer",
+                                    "allowedValues": "0-2000000000",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/vacuum_freeze_table_age",
+                                "name": "vacuum_freeze_table_age",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "5000000",
+                                    "description": "Minimum age at which VACUUM should freeze a MultiXactId in a table row.",
+                                    "defaultValue": "5000000",
+                                    "dataType": "Integer",
+                                    "allowedValues": "0-1000000000",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/vacuum_multixact_freeze_min_age",
+                                "name": "vacuum_multixact_freeze_min_age",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "150000000",
+                                    "description": "Multixact age at which VACUUM should scan whole table to freeze tuples.",
+                                    "defaultValue": "150000000",
+                                    "dataType": "Integer",
+                                    "allowedValues": "0-2000000000",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/vacuum_multixact_freeze_table_age",
+                                "name": "vacuum_multixact_freeze_table_age",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "8192",
+                                    "description": "Sets the number of disk-page buffers in shared memory for WAL. Any change requires restarting the server to take effect. Unit is 8kb.",
+                                    "defaultValue": "8192",
+                                    "dataType": "Integer",
+                                    "allowedValues": "-1-262143",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "False"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/wal_buffers",
+                                "name": "wal_buffers",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "10",
+                                    "description": "Sets the maximum interval between WAL receiver status reports to the primary. Unit is s.",
+                                    "defaultValue": "10",
+                                    "dataType": "Integer",
+                                    "allowedValues": "0-2147483",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/wal_receiver_status_interval",
+                                "name": "wal_receiver_status_interval",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "200",
+                                    "description": "Time between WAL flushes performed in the WAL writer. Unit is ms.",
+                                    "defaultValue": "200",
+                                    "dataType": "Integer",
+                                    "allowedValues": "1-10000",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/wal_writer_delay",
+                                "name": "wal_writer_delay",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "128",
+                                    "description": "Amount of WAL written out by WAL writer that triggers a flush. Unit is 8kb.",
+                                    "defaultValue": "128",
+                                    "dataType": "Integer",
+                                    "allowedValues": "0-2147483647",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/wal_writer_flush_after",
+                                "name": "wal_writer_flush_after",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "131072",
+                                    "description": "Sets the maximum memory to be used for maintenance operations. Unit is kb.",
+                                    "defaultValue": "131072",
+                                    "dataType": "Integer",
+                                    "allowedValues": "1024-2097151",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/maintenance_work_mem",
+                                "name": "maintenance_work_mem",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "REPLICA",
+                                    "description": "Sets the level of replication support (Read Replicas). Any change requires restarting the server to take effect.",
+                                    "defaultValue": "OFF",
+                                    "dataType": "Enumeration",
+                                    "allowedValues": "OFF,REPLICA,LOGICAL",
+                                    "source": "user-override",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "False"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/azure.replication_support",
+                                "name": "azure.replication_support",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "10",
+                                    "description": "Specifies the maximum number of concurrent connections from standby servers or streaming base backup clients (i.e., the maximum number of simultaneously running WAL sender processes).",
+                                    "defaultValue": "10",
+                                    "dataType": "Integer",
+                                    "allowedValues": "10-30",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "False"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/max_wal_senders",
+                                "name": "max_wal_senders",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "10",
+                                    "description": "Specifies the maximum number of replication slots that the server can support.",
+                                    "defaultValue": "10",
+                                    "dataType": "Integer",
+                                    "allowedValues": "10-25",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "False"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/max_replication_slots",
+                                "name": "max_replication_slots",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "on",
+                                    "description": "Allows feedback from a hot standby to the primary that will avoid query conflicts.",
+                                    "defaultValue": "on",
+                                    "dataType": "Boolean",
+                                    "allowedValues": "on,off",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "True"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/hot_standby_feedback",
+                                "name": "hot_standby_feedback",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            },
+                            {
+                                "properties": {
+                                    "value": "on",
+                                    "description": "Enable .log files. Setting is independent of Azure Monitor logging options. Any change requires restarting the server to take effect.",
+                                    "defaultValue": "on",
+                                    "dataType": "Boolean",
+                                    "allowedValues": "on,off",
+                                    "source": "system-default",
+                                    "isConfigPendingRestart": "False",
+                                    "isDynamicConfig": "False"
+                                },
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/test_postgresql/providers/Microsoft.DBforPostgreSQL/servers/cctestpostgresqlserver2szkrfs64caaw/configurations/logging_collector",
+                                "name": "logging_collector",
+                                "type": "Microsoft.DBforPostgreSQL/servers/configurations"
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}

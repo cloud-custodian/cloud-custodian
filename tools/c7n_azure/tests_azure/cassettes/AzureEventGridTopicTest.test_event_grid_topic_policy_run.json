@@ -1,0 +1,74 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.EventGrid/topics?api-version=2020-06-01",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "date": [
+                        "Wed, 24 Nov 2021 21:06:48 GMT"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "cache-control": [
+                        "no-cache"
+                    ],
+                    "content-length": [
+                        "1152"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "properties": {
+                                    "privateEndpointConnections": [
+                                        {
+                                            "properties": {
+                                                "privateEndpoint": {
+                                                    "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/VV/providers/Microsoft.Network/privateEndpoints/testendpegt"
+                                                },
+                                                "groupIds": [
+                                                    "topic"
+                                                ],
+                                                "privateLinkServiceConnectionState": {
+                                                    "status": "Approved",
+                                                    "description": "Auto-approved",
+                                                    "actionsRequired": "None"
+                                                },
+                                                "provisioningState": "Succeeded"
+                                            },
+                                            "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/VV/providers/Microsoft.EventGrid/topics/vvegtopic/privateEndpointConnections/testendpegt.23b1903a-b3cc-42d8-97b3-6a7503959747",
+                                            "name": "testendpegt.23b1903a-b3cc-42d8-97b3-6a7503959747",
+                                            "type": "Microsoft.EventGrid/topics/privateEndpointConnections"
+                                        }
+                                    ],
+                                    "provisioningState": "Succeeded",
+                                    "endpoint": "https://vvegtopic.eastus-1.eventgrid.azure.net/api/events",
+                                    "inputSchema": "EventGridSchema",
+                                    "metricResourceId": "0e711af2-fe6b-46c2-a8b3-a026d6d36382",
+                                    "publicNetworkAccess": "Disabled"
+                                },
+                                "location": "eastus",
+                                "tags": {},
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/VV/providers/Microsoft.EventGrid/topics/vvegtopic",
+                                "name": "vvegtopic",
+                                "type": "Microsoft.EventGrid/topics"
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}

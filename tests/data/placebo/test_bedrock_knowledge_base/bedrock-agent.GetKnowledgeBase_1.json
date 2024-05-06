@@ -1,0 +1,51 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {},
+        "knowledgeBase": {
+            "knowledgeBaseId": "FABMPSR0ZC",
+            "name": "knowledge-base-quick-start-e4hzu",
+            "knowledgeBaseArn": "arn:aws:bedrock:us-east-1:644160558196:knowledge-base/FABMPSR0ZC",
+            "roleArn": "arn:aws:iam::644160558196:role/service-role/AmazonBedrockExecutionRoleForKnowledgeBase_e4hzu",
+            "knowledgeBaseConfiguration": {
+                "type": "VECTOR",
+                "vectorKnowledgeBaseConfiguration": {
+                    "embeddingModelArn": "arn:aws:bedrock:us-east-1::foundation-model/amazon.titan-embed-text-v1"
+                }
+            },
+            "storageConfiguration": {
+                "type": "OPENSEARCH_SERVERLESS",
+                "opensearchServerlessConfiguration": {
+                    "collectionArn": "arn:aws:aoss:us-east-1:644160558196:collection/i4jn4zi5tme0nmlg2l3m",
+                    "vectorIndexName": "bedrock-knowledge-base-default-index",
+                    "fieldMapping": {
+                        "vectorField": "bedrock-knowledge-base-default-vector",
+                        "textField": "AMAZON_BEDROCK_TEXT_CHUNK",
+                        "metadataField": "AMAZON_BEDROCK_METADATA"
+                    }
+                }
+            },
+            "status": "ACTIVE",
+            "createdAt": {
+                "__class__": "datetime",
+                "year": 2024,
+                "month": 2,
+                "day": 8,
+                "hour": 3,
+                "minute": 52,
+                "second": 27,
+                "microsecond": 842916
+            },
+            "updatedAt": {
+                "__class__": "datetime",
+                "year": 2024,
+                "month": 2,
+                "day": 8,
+                "hour": 3,
+                "minute": 52,
+                "second": 27,
+                "microsecond": 842916
+            }
+        }
+    }
+}

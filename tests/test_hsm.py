@@ -1,6 +1,6 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
-from .common import BaseTest
+from .common import BaseTest, event_data
 import time
 
 
@@ -51,12 +51,12 @@ class CloudHSMClusterTest(BaseTest):
         )
         resources = p.run()
         self.assertEqual(len(resources), 1)
-        self.assertEqual(resources[0].get('ClusterId'), 'cluster-pqczsunscng')
+        self.assertEqual(resources[0].get('ClusterId'), 'cluster-mrq6aozbe5s')
         self.assertEqual(resources[0].get('SubnetMapping'), {"us-east-1a": "subnet-914763e7"})
         if self.recording:
             time.sleep(25)
         self.assertEqual(
-            client.describe_clusters(Filters={'clusterIds': ['cluster-pqczsunscng']}).get(
+            client.describe_clusters(Filters={'clusterIds': ['cluster-mrq6aozbe5s']}).get(
                 'Clusters')[0].get('State'), 'DELETED')
 
     def test_cloudhsm_tag(self):
@@ -77,3 +77,26 @@ class CloudHSMClusterTest(BaseTest):
         tags = client.list_tags(ResourceId=id)
         tag_map = {t["Key"]: t["Value"] for t in tags["TagList"]}
         self.assertTrue("c7n" in tag_map)
+
+    def test_cloudhsm_cluster_tag_event(self):
+        factory = self.replay_flight_data("test_cloudhsm_cluster_tag_event")
+        policy = self.load_policy(
+            {
+                "name": "cloudhsm-cluster-tag-event",
+                "resource": "aws.cloudhsm-cluster",
+                "mode": {"type": "cloudtrail", "events": [{
+                    "source": "cloudhsm.amazonaws.com",
+                    "ids": "responseElements.cluster.clusterId",
+                    "event": "CreateCluster"
+                }]},
+                "filters": [{"type": "value", "key": "tag:Owner", "value": "test"}]
+            },
+            session_factory=factory,
+        )
+        event = {
+            "detail": event_data("event-cloud-trail-hsm-create-cluster.json"),
+            "debug": True,
+        }
+        resources = policy.push(event)
+        self.assertEqual(len(resources), 1)
+        self.assertEqual(resources[0].get('Tags'), [{"Key": "Owner", "Value": "test"}])

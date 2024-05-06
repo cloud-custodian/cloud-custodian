@@ -1,20 +1,10 @@
 {
-    "status_code": 200, 
+    "status_code": 200,
     "data": {
         "AccountAliases": [
-            "custodian-skunk-works"
-        ], 
-        "IsTruncated": false, 
-        "ResponseMetadata": {
-            "RetryAttempts": 0, 
-            "HTTPStatusCode": 200, 
-            "RequestId": "cf1d538f-d426-11e6-aa54-495189d818bc", 
-            "HTTPHeaders": {
-                "x-amzn-requestid": "cf1d538f-d426-11e6-aa54-495189d818bc", 
-                "date": "Fri, 06 Jan 2017 15:43:02 GMT", 
-                "content-length": "400", 
-                "content-type": "text/xml"
-            }
-        }
+            "stacklet-sonny"
+        ],
+        "IsTruncated": false,
+        "ResponseMetadata": {}
     }
 }

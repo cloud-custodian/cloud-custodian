@@ -1,0 +1,26 @@
+{
+  "headers": {
+    "vary": "Origin, X-Origin, Referer",
+    "content-type": "application/json; charset=UTF-8",
+    "date": "Thu, 02 Mar 2023 20:54:39 GMT",
+    "server": "ESF",
+    "cache-control": "private",
+    "x-xss-protection": "0",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "transfer-encoding": "chunked",
+    "status": "200",
+    "content-length": "114",
+    "-content-encoding": "gzip"
+  },
+  "body": {
+    "name": "name",
+    "notificationEmails": [
+      "abc@def.com"
+    ],
+    "enrolledServices": {
+      "cloudProduct": "all",
+      "enrollmentLevel": "BLOCK_ALL"
+    }
+  }
+}

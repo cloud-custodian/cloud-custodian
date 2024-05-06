@@ -1,0 +1,31 @@
+{
+    "status_code": 200,
+    "data": {
+        "repositories": [
+            {
+                "repositoryArn": "arn:aws:ecr:us-east-1:644160558196:repository/foo",
+                "registryId": "644160558196",
+                "repositoryName": "foo",
+                "repositoryUri": "644160558196.dkr.ecr.us-east-1.amazonaws.com/foo",
+                "createdAt": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 3,
+                    "day": 29,
+                    "hour": 16,
+                    "minute": 22,
+                    "second": 40,
+                    "microsecond": 0
+                },
+                "imageTagMutability": "MUTABLE",
+                "imageScanningConfiguration": {
+                    "scanOnPush": true
+                },
+                "encryptionConfiguration": {
+                    "encryptionType": "AES256"
+                }
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

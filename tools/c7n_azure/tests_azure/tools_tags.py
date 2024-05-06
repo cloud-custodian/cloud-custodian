@@ -47,8 +47,8 @@ def get_resource_group_resource(existing_tags):
 
 
 def get_tags_parameter(update_tags_mock):
-    assert(len(update_tags_mock.call_args_list) == 1)
-    assert(len(update_tags_mock.call_args_list[0][0]) == 3)
+    assert len(update_tags_mock.call_args_list) == 1
+    assert len(update_tags_mock.call_args_list[0][0]) == 3
     return update_tags_mock.call_args_list[0][0][2]
 
 

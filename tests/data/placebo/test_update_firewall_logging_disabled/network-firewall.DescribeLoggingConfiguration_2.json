@@ -1,0 +1,10 @@
+{
+    "status_code": 200,
+    "data": {
+        "FirewallArn": "arn:aws:network-firewall:us-east-1:644160558196:firewall/test-firewall-2",
+        "LoggingConfiguration": {
+            "LogDestinationConfigs": []
+        },
+        "ResponseMetadata": {}
+    }
+}

@@ -1,0 +1,49 @@
+{
+    "status_code": 200,
+    "data": {
+        "items": [
+            {
+                "accountId": "644160558196",
+                "actionType": "Rightsize",
+                "currencyCode": "USD",
+                "currentResourceSummary": "1024.0 vCPU/2048 MB memory",
+                "currentResourceType": "EcsService",
+                "estimatedMonthlyCost": 18.02,
+                "estimatedMonthlySavings": 18.02,
+                "estimatedSavingsPercentage": 50.0,
+                "implementationEffort": "Medium",
+                "lastRefreshTimestamp": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 2,
+                    "day": 9,
+                    "hour": 13,
+                    "minute": 6,
+                    "second": 38,
+                    "microsecond": 923000
+                },
+                "recommendationId": "ODgwNTg0OTU3Nzk0XzJlZGMyNzE1LWQxMDUtNDBmYi05ZjQ4LTc2YmYxZjg2NWZhZA==",
+                "recommendationLookbackPeriodInDays": 14,
+                "recommendedResourceSummary": "512.0 vCPU/1024 MB memory",
+                "recommendedResourceType": "EcsService",
+                "region": "us-east-2",
+                "resourceArn": "arn:aws:ecs:us-east-2:644160558196:service/dev-redash/redash-server",
+                "resourceId": "dev-redash/redash-server",
+                "restartNeeded": true,
+                "rollbackPossible": true,
+                "source": "ComputeOptimizer",
+                "tags": [
+                    {
+                        "key": "App",
+                        "value": "Redash"
+                    },
+                    {
+                        "key": "stacklet:app",
+                        "value": "redash"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

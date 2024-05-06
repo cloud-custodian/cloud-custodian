@@ -1,19 +1,22 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 import functools
-import jmespath
+import re
 from botocore.exceptions import ClientError
 
 from concurrent.futures import as_completed
 from contextlib import suppress
 
 from c7n.actions import ActionRegistry, BaseAction
-from c7n.filters import FilterRegistry, ValueFilter, MetricsFilter
+from c7n.exceptions import PolicyValidationError
+from c7n.filters import (
+    FilterRegistry, ValueFilter, MetricsFilter, WafV2FilterBase,
+    WafClassicRegionalFilterBase)
 from c7n.filters.iamaccess import CrossAccountAccessFilter
 from c7n.filters.related import RelatedResourceFilter
 from c7n.manager import resources, ResourceManager
 from c7n import query, utils
-from c7n.utils import generate_arn, type_schema, get_retry
+from c7n.utils import generate_arn, type_schema, get_retry, jmespath_search, get_partition
 
 
 ANNOTATION_KEY_MATCHED_METHODS = 'c7n:matched-resource-methods'
@@ -174,6 +177,20 @@ class RestApiCrossAccount(CrossAccountAccessFilter):
     policy_attribute = 'policy'
     permissions = ('apigateway:GET',)
 
+    def get_resource_policy(self, r):
+        policy = super().get_resource_policy(r)
+        if policy:
+            policy = policy.replace('\\', '')
+        else:
+            # api gateway default iam policy is public
+            # authorizers and app code may mitigate but
+            # the iam policy intent here is clear.
+            policy = {'Statement': [{
+                'Action': 'execute-api:Invoke',
+                'Effect': 'Allow',
+                'Principal': '*'}]}
+        return policy
+
 
 @RestApi.action_registry.register('update')
 class UpdateApi(BaseAction):
@@ -251,6 +268,12 @@ class DeleteApi(BaseAction):
 @query.sources.register('describe-rest-stage')
 class DescribeRestStage(query.ChildDescribeSource):
 
+    def __init__(self, manager):
+        self.manager = manager
+        self.query = query.ChildResourceQuery(
+            self.manager.session_factory, self.manager)
+        self.query.capture_parent_id = True
+
     def get_query(self):
         query = super(DescribeRestStage, self).get_query()
         query.capture_parent_id = True
@@ -258,9 +281,21 @@ class DescribeRestStage(query.ChildDescribeSource):
 
     def augment(self, resources):
         results = []
+        rest_apis = self.manager.get_resource_manager(
+            'rest-api').resources()
         # Using capture parent, changes the protocol
         for parent_id, r in resources:
             r['restApiId'] = parent_id
+            for rest_api in rest_apis:
+                if rest_api['id'] == parent_id:
+                    r['restApiType'] = rest_api['endpointConfiguration']['types']
+            r['stageArn'] = "arn:aws:{service}:{region}::" \
+                            "/restapis/{rest_api_id}/stages/" \
+                            "{stage_name}".format(
+                service="apigateway",
+                region=self.manager.config.region,
+                rest_api_id=parent_id,
+                stage_name=r['stageName'])
             tags = r.setdefault('Tags', [])
             for k, v in r.pop('tags', {}).items():
                 tags.append({
@@ -268,6 +303,27 @@ class DescribeRestStage(query.ChildDescribeSource):
                     'Value': v})
             results.append(r)
         return results
+
+    def get_resources(self, ids, cache=True):
+        deployment_ids = []
+        client = utils.local_session(
+            self.manager.session_factory).client('apigateway')
+        for id in ids:
+            # if we get stage arn, we pick rest_api_id and stageName to get deploymentId
+            if id.startswith('arn:aws:apigateway'):
+                _, ident = id.rsplit(':', 1)
+                parts = ident.split('/', 4)
+                # if we get stage name in arn, use stage_name to get stage information
+                # from stage information, pick deploymentId
+                if len(parts) > 3:
+                    response = self.manager.retry(
+                        client.get_stage,
+                        restApiId=parts[2],
+                        stageName=parts[4])
+                    deployment_ids.append(response[self.manager.resource_type.id])
+            else:
+                deployment_ids.append(id)
+        return super(DescribeRestStage, self).get_resources(deployment_ids, cache)
 
 
 @resources.register('rest-stage')
@@ -277,12 +333,15 @@ class RestStage(query.ChildResourceManager):
         service = 'apigateway'
         parent_spec = ('rest-api', 'restApiId', None)
         enum_spec = ('get_stages', 'item', None)
-        name = id = 'stageName'
+        name = 'stageName'
+        id = 'deploymentId'
+        config_id = 'stageArn'
         date = 'createdDate'
         universal_taggable = True
         cfn_type = config_type = "AWS::ApiGateway::Stage"
         arn_type = 'stages'
         permissions_enum = ('apigateway:GET',)
+        supports_trailevents = True
 
     child_source = 'describe'
     source_mapping = {
@@ -302,7 +361,7 @@ class RestStage(query.ChildResourceManager):
         arns = []
         for r in resources:
             arns.append(self.generate_arn('/restapis/' + r['restApiId'] +
-             '/stages/' + r[self.get_model().id]))
+             '/stages/' + r[self.get_model().name]))
         return arns
 
 
@@ -482,8 +541,218 @@ class StageClientCertificateFilter(RelatedResourceFilter):
         rid = resource[self.RelatedIdsExpression]
         with suppress(KeyError):
             resource[self.annotation_key] = {
-                self.data['key']: jmespath.search(self.data['key'], related[rid])
+                self.data['key']: jmespath_search(self.data['key'], related[rid])
             }
+
+
+@RestStage.filter_registry.register('waf-enabled')
+class WafEnabled(WafClassicRegionalFilterBase):
+    """Filter API Gateway stage by waf-regional web-acl
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: filter-apigw-waf-regional
+                resource: rest-stage
+                filters:
+                  - type: waf-enabled
+                    state: false
+                    web-acl: test
+    """
+
+    def get_associated_web_acl(self, resource):
+        return self.get_web_acl_by_arn(resource.get('webAclArn'))
+
+
+@RestStage.action_registry.register('set-waf')
+class SetWaf(BaseAction):
+    """Enable waf protection on API Gateway stage.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: set-waf-for-stage
+                resource: rest-stage
+                filters:
+                  - type: waf-enabled
+                    state: false
+                    web-acl: test
+                actions:
+                  - type: set-waf
+                    state: true
+                    web-acl: test
+
+              - name: disassociate-wafv2-associate-waf-regional-apigw
+                resource: rest-stage
+                filters:
+                  - type: wafv2-enabled
+                    state: true
+                actions:
+                  - type: set-waf
+                    state: true
+                    web-acl: test
+
+    """
+    permissions = ('waf-regional:AssociateWebACL', 'waf-regional:ListWebACLs')
+
+    schema = type_schema(
+        'set-waf', required=['web-acl'], **{
+            'web-acl': {'type': 'string'},
+            # 'force': {'type': 'boolean'},
+            'state': {'type': 'boolean'}})
+
+    def validate(self):
+        found = False
+        for f in self.manager.iter_filters():
+            if isinstance(f, WafEnabled) or isinstance(f, WafV2Enabled):
+                found = True
+                break
+        if not found:
+            # try to ensure idempotent usage
+            raise PolicyValidationError(
+                "set-waf should be used in conjunction with waf-enabled or wafv2-enabled \
+                filter on %s" % (self.manager.data,))
+        return self
+
+    def process(self, resources):
+        wafs = self.manager.get_resource_manager('waf-regional').resources(augment=False)
+        name_id_map = {w['Name']: w['WebACLId'] for w in wafs}
+        target_acl = self.data.get('web-acl', '')
+        target_acl_id = name_id_map.get(target_acl, target_acl)
+        state = self.data.get('state', True)
+        if state and target_acl_id not in name_id_map.values():
+            raise ValueError("invalid web acl: %s" % (target_acl))
+
+        client = utils.local_session(
+            self.manager.session_factory).client('waf-regional')
+
+        for r in resources:
+            r_arn = self.manager.get_arns([r])[0]
+            if state:
+                client.associate_web_acl(WebACLId=target_acl_id, ResourceArn=r_arn)
+            else:
+                client.disassociate_web_acl(WebACLId=target_acl_id, ResourceArn=r_arn)
+
+
+@RestStage.filter_registry.register('wafv2-enabled')
+class WafV2Enabled(WafV2FilterBase):
+    """Filter API Gateway stage by wafv2 web-acl
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: filter-wafv2-apigw
+                resource: rest-stage
+                filters:
+                  - type: wafv2-enabled
+                    state: false
+                    web-acl: testv2
+    """
+
+    def get_associated_web_acl(self, resource):
+        return self.get_web_acl_by_arn(resource.get('webAclArn'))
+
+
+@RestStage.action_registry.register('set-wafv2')
+class SetWafv2(BaseAction):
+    """Enable wafv2 protection on API Gateway stage.
+
+    :example:
+
+    .. code-block:: yaml
+
+            policies:
+              - name: set-wafv2-for-stage
+                resource: rest-stage
+                filters:
+                  - type: wafv2-enabled
+                    state: false
+                    web-acl: testv2
+                actions:
+                  - type: set-wafv2
+                    state: true
+                    web-acl: testv2
+
+              - name: disassociate-waf-regional-associate-wafv2-apigw
+                resource: rest-stage
+                filters:
+                  - type: waf-enabled
+                    state: true
+                actions:
+                  - type: set-wafv2
+                    state: true
+                    web-acl: testv2
+
+    """
+    permissions = ('wafv2:AssociateWebACL', 'wafv2:ListWebACLs')
+
+    schema = type_schema(
+        'set-wafv2', **{
+            'web-acl': {'type': 'string'},
+            'state': {'type': 'boolean'}})
+
+    retry = staticmethod(get_retry((
+        'ThrottlingException',
+        'RequestLimitExceeded',
+        'Throttled',
+        'ThrottledException',
+        'Throttling',
+        'Client.RequestLimitExceeded')))
+
+    def validate(self):
+        found = False
+        for f in self.manager.iter_filters():
+            if isinstance(f, WafV2Enabled) or isinstance(f, WafEnabled):
+                found = True
+                break
+        if not found:
+            # try to ensure idempotent usage
+            raise PolicyValidationError(
+                "set-wafv2 should be used in conjunction with wafv2-enabled or waf-enabled \
+                    filter on %s" % (self.manager.data,))
+        if self.data.get('state'):
+            if 'web-acl' not in self.data:
+                raise PolicyValidationError((
+                    "set-wafv2 filter parameter state is true, "
+                    "requires `web-acl` on %s" % (self.manager.data,)))
+
+        return self
+
+    def process(self, resources):
+        wafs = self.manager.get_resource_manager('wafv2').resources(augment=False)
+        name_id_map = {w['Name']: w['ARN'] for w in wafs}
+        state = self.data.get('state', True)
+        target_acl_arn = ''
+
+        if state:
+            target_acl = self.data.get('web-acl', '')
+            target_acl_ids = [v for k, v in name_id_map.items() if
+                              re.match(target_acl, k)]
+            if len(target_acl_ids) != 1:
+                raise ValueError(f'{target_acl} matching to none or the '
+                                 f'multiple web-acls')
+            target_acl_arn = target_acl_ids[0]
+
+        if state and target_acl_arn not in name_id_map.values():
+            raise ValueError("invalid web acl: %s" % target_acl_arn)
+
+        client = utils.local_session(self.manager.session_factory).client('wafv2')
+
+        for r in resources:
+            r_arn = self.manager.get_arns([r])[0]
+            if state:
+                self.retry(client.associate_web_acl,
+                           WebACLArn=target_acl_arn,
+                           ResourceArn=r_arn)
+            else:
+                self.retry(client.disassociate_web_acl,
+                           ResourceArn=r_arn)
 
 
 @RestResource.filter_registry.register('rest-integration')
@@ -802,7 +1071,7 @@ class CustomDomainName(query.QueryResourceManager):
 
     class resource_type(query.TypeInfo):
         enum_spec = ('get_domain_names', 'items', None)
-        arn = False
+        arn_type = '/domainnames'
         id = name = 'domainName'
         service = 'apigateway'
         universal_taggable = True
@@ -813,9 +1082,20 @@ class CustomDomainName(query.QueryResourceManager):
     def get_permissions(cls):
         return ('apigateway:GET',)
 
-    @classmethod
-    def has_arn(self):
-        return False
+    @property
+    def generate_arn(self):
+        """
+         Sample arn: arn:aws:apigateway:us-east-1::/restapis/rest-api-id
+         This method overrides c7n.utils.generate_arn and drops
+         account id from the generic arn.
+        """
+        if self._generate_arn is None:
+            self._generate_arn = functools.partial(
+                generate_arn,
+                self.resource_type.service,
+                region=self.config.region,
+                resource_type=self.resource_type.arn_type)
+        return self._generate_arn
 
 
 @CustomDomainName.action_registry.register('update-security')
@@ -850,3 +1130,89 @@ class DomainNameRemediateTls(BaseAction):
             except ClientError as e:
                 if e.response['Error']['Code'] in retryable:
                     continue
+
+
+class ApiGwV2DescribeSource(query.DescribeSource):
+
+    def augment(self, resources):
+        # convert tags from {'Key': 'Value'} to standard aws format
+        for r in resources:
+            r['Tags'] = [
+                {'Key': k, 'Value': v} for k, v in r.pop('Tags', {}).items()]
+        return resources
+
+
+@resources.register('apigwv2')
+class ApiGwV2(query.QueryResourceManager):
+
+    class resource_type(query.TypeInfo):
+        service = 'apigatewayv2'
+        arn_type = '/apis'
+        enum_spec = ('get_apis', 'Items', None)
+        id = 'ApiId'
+        name = 'name'
+        date = 'createdDate'
+        dimension = 'ApiId'
+        cfn_type = config_type = "AWS::ApiGatewayV2::Api"
+        permission_prefix = 'apigateway'
+        permissions_enum = ('apigateway:GET',)
+        universal_taggable = object()
+
+    source_mapping = {
+        'config': query.ConfigSource,
+        'describe': ApiGwV2DescribeSource
+    }
+
+    @property
+    def generate_arn(self):
+        """
+         Sample arn: arn:aws:apigateway:us-east-1::/apis/api-id
+         This method overrides c7n.utils.generate_arn and drops
+         account id from the generic arn.
+        """
+        if self._generate_arn is None:
+            self._generate_arn = functools.partial(
+                generate_arn,
+                "apigateway",
+                region=self.config.region,
+                resource_type=self.resource_type.arn_type,
+            )
+
+        return self._generate_arn
+
+
+class StageDescribe(query.ChildDescribeSource):
+
+    def augment(self, resources):
+        # convert tags from {'Key': 'Value'} to standard aws format
+        for r in resources:
+            r['Tags'] = [
+                {'Key': k, 'Value': v} for k, v in r.pop('Tags', {}).items()]
+        return resources
+
+
+@resources.register("apigwv2-stage")
+class ApiGatewayV2Stage(query.ChildResourceManager):
+    class resource_type(query.TypeInfo):
+        service = "apigatewayv2"
+        enum_spec = ('get_stages', 'Items', None)
+        parent_spec = ('aws.apigwv2', 'ApiId', True)
+        arn_type = "/apis"
+        id = name = "StageName"
+        cfn_type = config_type = "AWS::ApiGatewayV2::Stage"
+        universal_taggable = object()
+        permission_prefix = 'apigateway'
+        permissions_enum = ('apigateway:GET',)
+
+    source_mapping = {
+        "describe-child": StageDescribe,
+        "config": query.ConfigSource
+    }
+
+    def get_arns(self, resources):
+        partition = get_partition(self.config.region)
+        return [
+            "arn:{}:apigateway:{}::/apis/{}/stages/{}".format(
+                partition, self.config.region, r['c7n:parent-id'], r['StageName']
+            )
+            for r in resources]

@@ -1,0 +1,82 @@
+{
+    "version": 1,
+    "interactions": [
+        {
+            "request": {
+                "method": "GET",
+                "uri": "https://management.azure.com/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/providers/Microsoft.StreamAnalytics/streamingjobs?api-version=2017-04-01-preview",
+                "body": null,
+                "headers": {}
+            },
+            "response": {
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "headers": {
+                    "date": [
+                        "Thu, 25 Nov 2021 14:28:48 GMT"
+                    ],
+                    "content-type": [
+                        "application/json; charset=utf-8"
+                    ],
+                    "x-ms-ratelimit-remaining-subscription-resource-requests": [
+                        "399"
+                    ],
+                    "cache-control": [
+                        "no-store, no-cache"
+                    ],
+                    "x-aspnetmvc-version": [
+                        "5.0"
+                    ],
+                    "content-length": [
+                        "1023"
+                    ]
+                },
+                "body": {
+                    "data": {
+                        "value": [
+                            {
+                                "id": "/subscriptions/ea42f556-5106-4743-99b0-c129bfa71a47/resourceGroups/218rg/providers/Microsoft.StreamAnalytics/streamingjobs/218stream_job",
+                                "name": "218stream_job",
+                                "type": "Microsoft.StreamAnalytics/streamingjobs",
+                                "location": "Central US",
+                                "properties": {
+                                    "sku": {
+                                        "name": "Standard"
+                                    },
+                                    "jobId": "2c178efa-cd2d-4cab-a92a-632c7454ca58",
+                                    "provisioningState": "Succeeded",
+                                    "jobState": "Created",
+                                    "eventsOutOfOrderPolicy": "Adjust",
+                                    "outputErrorPolicy": "Stop",
+                                    "eventsOutOfOrderMaxDelayInSeconds": 0,
+                                    "eventsLateArrivalMaxDelayInSeconds": 5,
+                                    "dataLocale": "en-US",
+                                    "createdDate": "2021-11-25T14:03:25.613Z",
+                                    "compatibilityLevel": "1.2",
+                                    "package": null,
+                                    "jobStorageAccount": {
+                                        "authenticationMode": "ConnectionString",
+                                        "accountName": "218storage"
+                                    },
+                                    "contentStoragePolicy": "SystemAccount",
+                                    "etag": "08676989-ff1b-43f4-bcf1-8ed6bdc9a5d5",
+                                    "jobType": "Cloud",
+                                    "subnetResourceId": null,
+                                    "cluster": null
+                                },
+                                "identity": {
+                                    "type": "SystemAssigned",
+                                    "principalId": "430ce04b-f4c8-434f-a8c9-4ec3322a2a53",
+                                    "tenantId": "00000000-0000-0000-0000-000000000003"
+                                }
+                            }
+                        ],
+                        "nextLink": null
+                    }
+                }
+            }
+        }
+    ]
+}

@@ -1,0 +1,130 @@
+interactions:
+- request:
+    body: '{"Registryids": ["tcr-cguc6m2c"], "Offset": 0, "Limit": 20}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '59'
+      Content-Type:
+      - application/json
+      Host:
+      - tcr.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.27.1
+      X-TC-Action:
+      - DescribeInstances
+      X-TC-Region:
+      - ap-singapore
+      X-TC-Version:
+      - '2019-09-24'
+    method: POST
+    uri: https://tcr.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"RequestId":"9da22e3b-520a-42ed-84d4-b6919767b894","TotalCount":1,"Registries":[{"RegistryId":"tcr-cguc6m2c","RegistryName":"custodian-test","RegionId":9,"RegionName":"ap-singapore","EnableAnonymous":true,"TokenValidTime":87600,"Status":"Running","RegistryType":"basic","PublicDomain":"custodian-test.tencentcloudcr.com","InternalEndpoint":"10.9.0.137","CreatedAt":"2022-10-26T18:52:52+08:00","TagSpecification":{"ResourceType":"instance","Tags":[{"Key":"test_pro_00001","Value":"this
+        is test"}]},"ExpiredAt":"","PayMod":0,"RenewFlag":0}]}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '553'
+      Content-Type:
+      - application/json
+      Date:
+      - Thu, 27 Oct 2022 07:09:25 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"ResourceList": ["qcs::tcr:ap-singapore:uin/100000750436:instance/tcr-cguc6m2c"]}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '82'
+      Content-Type:
+      - application/json
+      Host:
+      - tag.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.27.1
+      X-TC-Action:
+      - GetResources
+      X-TC-Region:
+      - ap-singapore
+      X-TC-Version:
+      - '2018-08-13'
+    method: POST
+    uri: https://tag.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"PaginationToken":"","ResourceTagMappingList":[{"Resource":"qcs::tcr:ap-singapore:uin\/100000750436:instance\/tcr-cguc6m2c","Tags":[{"TagKey":"test_pro_00001","TagValue":"this
+        is test"}]}],"RequestId":"4a7c7a3b-57c5-409b-aee0-7cfeb71e0f61"}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '254'
+      Content-Type:
+      - application/json
+      Date:
+      - Thu, 27 Oct 2022 07:09:26 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"RegistryId": "tcr-cguc6m2c", "Offset": 0, "Limit": 20}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '56'
+      Content-Type:
+      - application/json
+      Host:
+      - tcr.ap-singapore.tencentcloudapi.com
+      User-Agent:
+      - python-requests/2.27.1
+      X-TC-Action:
+      - DescribeTagRetentionRules
+      X-TC-Region:
+      - ap-singapore
+      X-TC-Version:
+      - '2019-09-24'
+    method: POST
+    uri: https://tcr.ap-singapore.tencentcloudapi.com/
+  response:
+    body:
+      string: '{"Response":{"RequestId":"980eaac0-2675-44f2-9794-9a1ad2e32b9f","RetentionPolicyList":[{"RetentionId":1,"NamespaceName":"custodian_test","RetentionRuleList":[{"Key":"latestPushedK","Value":2}],"CronSetting":"","NextExecutionTime":"0001-01-01T00:00:00Z","Disabled":false},{"RetentionId":2,"NamespaceName":"custodian-test-namespace-2","RetentionRuleList":[{"Key":"latestPushedK","Value":4}],"CronSetting":"","NextExecutionTime":"0001-01-01T00:00:00Z","Disabled":false}],"TotalCount":2}}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '484'
+      Content-Type:
+      - application/json
+      Date:
+      - Thu, 27 Oct 2022 07:09:26 GMT
+      Server:
+      - nginx
+    status:
+      code: 200
+      message: OK
+version: 1

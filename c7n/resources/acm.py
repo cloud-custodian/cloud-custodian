@@ -38,6 +38,7 @@ class Certificate(QueryResourceManager):
         config_type = "AWS::ACM::Certificate"
         arn_type = 'certificate'
         universal_taggable = object()
+        permissions_augment = ("acm:ListTagsForCertificate",)
 
     source_mapping = {
         'describe': DescribeCertificate,

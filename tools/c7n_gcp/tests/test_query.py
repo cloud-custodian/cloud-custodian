@@ -16,21 +16,32 @@ def test_gcp_resource_metadata_asset_type():
         'app-engine-certificate',
         'app-engine-firewall-ingress-rule',
         'app-engine-domain-mapping',
+        'bigtable-instance-table',
+        'bigtable-instance-cluster-backup',
+        'bigtable-instance',
+        'bigtable-instance-cluster',
+        'artifact-repository',
         'bq-job',
         'bq-project',
         'build',
         'dataflow-job',
         'dm-deployment',
+        'datafusion-instance',
+        'instance-group-manager',
+        'secret',
         'function',
         'loadbalancer-ssl-policy',
         'log-exclusion',
         'ml-job',
         'ml-model',
+        'notebook',
+        'patch-deployment',
         'sourcerepo',
         'sql-backup-run',
         'sql-ssl-cert',
         'sql-user',
-        'pubsub-snapshot'
+        'pubsub-snapshot',
+        'region'
     ))
     missing = set()
     for k, v in GoogleCloud.resources.items():

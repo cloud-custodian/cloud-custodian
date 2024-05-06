@@ -1,0 +1,11 @@
+{
+    "status_code": 200,
+    "data": {
+        "QueueUrls": [
+            "https://sqs.us-east-1.amazonaws.com/644160558196/devtest2",
+            "https://sqs.us-east-1.amazonaws.com/644160558196/hubalytics-dev-ArchiveHourlyQueue-1VHR8KVX2MY48",
+            "https://sqs.us-east-1.amazonaws.com/644160558196/maid-delivery"
+        ],
+        "ResponseMetadata": {}
+    }
+}

@@ -1,0 +1,122 @@
+{
+    "status_code": 200,
+    "data": {
+        "TransitGatewayAttachments": [
+            {
+                "TransitGatewayAttachmentId": "tgw-attach-015493eec8d86e8f7",
+                "TransitGatewayId": "tgw-008fe7d47ebe2dbeb",
+                "TransitGatewayOwnerId": "644160558196",
+                "ResourceOwnerId": "644160558196",
+                "ResourceType": "vpc",
+                "ResourceId": "vpc-0e2a48216548d753e",
+                "State": "deleted",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 11,
+                    "day": 9,
+                    "hour": 9,
+                    "minute": 14,
+                    "second": 34,
+                    "microsecond": 0
+                },
+                "Tags": []
+            },
+            {
+                "TransitGatewayAttachmentId": "tgw-attach-0814a77755bf02f0e",
+                "TransitGatewayId": "tgw-008fe7d47ebe2dbeb",
+                "TransitGatewayOwnerId": "644160558196",
+                "ResourceOwnerId": "644160558196",
+                "ResourceType": "vpc",
+                "ResourceId": "vpc-0e2a48216548d753e",
+                "State": "deleted",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 11,
+                    "day": 9,
+                    "hour": 9,
+                    "minute": 23,
+                    "second": 12,
+                    "microsecond": 0
+                },
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "test2"
+                    }
+                ]
+            },
+            {
+                "TransitGatewayAttachmentId": "tgw-attach-09c4d7c5461572bed",
+                "TransitGatewayId": "tgw-008fe7d47ebe2dbeb",
+                "TransitGatewayOwnerId": "644160558196",
+                "ResourceOwnerId": "644160558196",
+                "ResourceType": "vpc",
+                "ResourceId": "vpc-0e2a48216548d753e",
+                "State": "deleted",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 11,
+                    "day": 9,
+                    "hour": 8,
+                    "minute": 56,
+                    "second": 19,
+                    "microsecond": 0
+                },
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "test"
+                    }
+                ]
+            },
+            {
+                "TransitGatewayAttachmentId": "tgw-attach-0bdbce74e86c071be",
+                "TransitGatewayId": "tgw-008fe7d47ebe2dbeb",
+                "TransitGatewayOwnerId": "644160558196",
+                "ResourceOwnerId": "644160558196",
+                "ResourceType": "vpc",
+                "ResourceId": "vpc-0e2a48216548d753e",
+                "State": "available",
+                "Association": {
+                    "TransitGatewayRouteTableId": "tgw-rtb-0dd49d1ea80803d53",
+                    "State": "associated"
+                },
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 11,
+                    "day": 9,
+                    "hour": 9,
+                    "minute": 36,
+                    "second": 42,
+                    "microsecond": 0
+                },
+                "Tags": []
+            },
+            {
+                "TransitGatewayAttachmentId": "tgw-attach-0df5f90f7a0ea284a",
+                "TransitGatewayId": "tgw-008fe7d47ebe2dbeb",
+                "TransitGatewayOwnerId": "644160558196",
+                "ResourceOwnerId": "644160558196",
+                "ResourceType": "vpc",
+                "ResourceId": "vpc-0e2a48216548d753e",
+                "State": "deleted",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2022,
+                    "month": 11,
+                    "day": 9,
+                    "hour": 9,
+                    "minute": 10,
+                    "second": 12,
+                    "microsecond": 0
+                },
+                "Tags": []
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
