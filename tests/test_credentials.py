@@ -111,7 +111,7 @@ class Credential(BaseTest):
 
         # Anything except ListFunctions will get AccessDenied
         try:
-            l_layers = session.client("lambda").list_layers()
+            session.client("lambda").list_layers()
         except ClientError as e:
             self.assertEqual(e.response["Error"]["Code"], "AccessDeniedException")
 
