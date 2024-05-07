@@ -25,3 +25,24 @@ class MachineLearningWorkspaceTest(BaseTest):
         resources = p.run()
         self.assertEqual(1, len(resources))
         self.assertEqual('mlvvtest', resources[0]['name'])
+
+
+class MachineLearningWorkspaceComputeInstancesFilterTest(BaseTest):
+
+    def test_query(self):
+        p = self.load_policy({
+            'name': 'compute',
+            'resource': 'azure.machine-learning-workspace',
+            'filters': [{
+                'type': 'compute-instances',
+                'attrs': [{
+                    'type': 'value',
+                    'key': 'properties.properties.scaleSettings.minNodeCount',
+                    'value': 0
+                }]
+            }],
+        })
+        resources = p.run()
+
+        self.assertEqual(1, len(resources))
+        self.assertEqual('vvmlwrkspc', resources[0]['name'])

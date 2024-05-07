@@ -1,0 +1,166 @@
+{
+    "status_code": 200,
+    "data": {
+        "AutoMLJobName": "Canvas-c7n-test",
+        "AutoMLJobArn": "arn:aws:sagemaker:us-east-1:644160558196:automl-job/Canvas-c7n-test",
+        "AutoMLJobInputDataConfig": [
+            {
+                "ChannelType": "training",
+                "ContentType": "text/csv;header=present",
+                "CompressionType": "None",
+                "DataSource": {
+                    "S3DataSource": {
+                        "S3DataType": "S3Prefix",
+                        "S3Uri": "s3://sagemaker-us-east-1-644160558196/Canvas/default-20240412t112301/Datasets/f0521ca6-c23e-4fa1-833c-0d870106e6ea/1712936368.38937/output_1712936368"
+                    }
+                }
+            }
+        ],
+        "OutputDataConfig": {
+            "S3OutputPath": "s3://sagemaker-us-east-1-644160558196/Canvas/default-20240412t112301/Training/output/"
+        },
+        "RoleArn": "arn:aws:iam::644160558196:role/service-role/AmazonSageMaker-ExecutionRole-20240412T112301",
+        "AutoMLJobObjective": {
+            "MetricName": "MSE"
+        },
+        "AutoMLProblemTypeConfig": {
+            "TabularJobConfig": {
+                "CandidateGenerationConfig": {},
+                "CompletionCriteria": {
+                    "MaxCandidates": 1
+                },
+                "FeatureSpecificationS3Uri": "s3://sagemaker-us-east-1-644160558196/Canvas/default-20240412t112301/Training/Canvas1712936374430/feature_specification.json",
+                "Mode": "ENSEMBLING",
+                "GenerateCandidateDefinitionsOnly": false,
+                "ProblemType": "Regression",
+                "TargetAttributeName": "median_house_value"
+            }
+        },
+        "AutoMLProblemTypeConfigName": "Tabular",
+        "CreationTime": {
+            "__class__": "datetime",
+            "year": 2024,
+            "month": 4,
+            "day": 12,
+            "hour": 11,
+            "minute": 39,
+            "second": 34,
+            "microsecond": 760000
+        },
+        "EndTime": {
+            "__class__": "datetime",
+            "year": 2024,
+            "month": 4,
+            "day": 12,
+            "hour": 11,
+            "minute": 43,
+            "second": 10,
+            "microsecond": 666000
+        },
+        "LastModifiedTime": {
+            "__class__": "datetime",
+            "year": 2024,
+            "month": 4,
+            "day": 12,
+            "hour": 11,
+            "minute": 43,
+            "second": 10,
+            "microsecond": 698000
+        },
+        "BestCandidate": {
+            "CandidateName": "Canvas-c7n-test-trial-t1-1",
+            "FinalAutoMLJobObjectiveMetric": {
+                "Type": "Minimize",
+                "MetricName": "MSE",
+                "Value": 2309419520.0,
+                "StandardMetricName": "MSE"
+            },
+            "ObjectiveStatus": "Succeeded",
+            "CandidateSteps": [
+                {
+                    "CandidateStepType": "AWS::SageMaker::TrainingJob",
+                    "CandidateStepArn": "arn:aws:sagemaker:us-east-1:644160558196:training-job/Canvas-c7n-test-t1-1-d57d62ff57fd4ca2bd6cc622e3bbe307b3b897",
+                    "CandidateStepName": "Canvas-c7n-test-t1-1-d57d62ff57fd4ca2bd6cc622e3bbe307b3b897"
+                }
+            ],
+            "CandidateStatus": "Completed",
+            "InferenceContainers": [
+                {
+                    "Image": "644160558196.dkr.ecr.us-east-1.amazonaws.com/autogluon-inference:0.4.3-cpu-py38-ubuntu20.04",
+                    "ModelDataUrl": "s3://sagemaker-us-east-1-644160558196/Canvas/default-20240412t112301/Training/output/Canvas-c7n-test/sagemaker-automl-candidates/model/Canvas-c7n-test-trial-t1-1/model.tar.gz",
+                    "Environment": {
+                        "SAGEMAKER_DEFAULT_INVOCATIONS_ACCEPT": "text/csv",
+                        "SAGEMAKER_INFERENCE_OUTPUT": "predicted_label",
+                        "SAGEMAKER_INFERENCE_SUPPORTED": "predicted_label",
+                        "SAGEMAKER_PROGRAM": "tabular_serve.py",
+                        "SAGEMAKER_SUBMIT_DIRECTORY": "/opt/ml/model/code"
+                    }
+                }
+            ],
+            "CreationTime": {
+                "__class__": "datetime",
+                "year": 2024,
+                "month": 4,
+                "day": 12,
+                "hour": 11,
+                "minute": 39,
+                "second": 37,
+                "microsecond": 366000
+            },
+            "EndTime": {
+                "__class__": "datetime",
+                "year": 2024,
+                "month": 4,
+                "day": 12,
+                "hour": 11,
+                "minute": 43,
+                "second": 3,
+                "microsecond": 686000
+            },
+            "LastModifiedTime": {
+                "__class__": "datetime",
+                "year": 2024,
+                "month": 4,
+                "day": 12,
+                "hour": 11,
+                "minute": 43,
+                "second": 9,
+                "microsecond": 685000
+            },
+            "CandidateProperties": {
+                "CandidateArtifactLocations": {
+                    "Explainability": "s3://sagemaker-us-east-1-644160558196/Canvas/default-20240412t112301/Training/output/Canvas-c7n-test/documentation/explainability/output/Canvas-c7n-test-trial-t1-1",
+                    "ModelInsights": "s3://sagemaker-us-east-1-644160558196/Canvas/default-20240412t112301/Training/output/Canvas-c7n-test/documentation/model_monitor/output/Canvas-c7n-test-trial-t1-1"
+                },
+                "CandidateMetrics": [
+                    {
+                        "MetricName": "RMSE",
+                        "Value": 48056.41796875,
+                        "StandardMetricName": "RMSE"
+                    },
+                    {
+                        "MetricName": "MSE",
+                        "Value": 2309419520.0,
+                        "StandardMetricName": "MSE"
+                    },
+                    {
+                        "MetricName": "MAE",
+                        "Value": 33856.10546875,
+                        "StandardMetricName": "MAE"
+                    },
+                    {
+                        "MetricName": "R2",
+                        "Value": 0.7222872376441956,
+                        "StandardMetricName": "R2"
+                    }
+                ]
+            }
+        },
+        "AutoMLJobStatus": "Completed",
+        "AutoMLJobSecondaryStatus": "Completed",
+        "SecurityConfig": {
+            "EnableInterContainerTrafficEncryption": true
+        },
+        "ResponseMetadata": {}
+    }
+}

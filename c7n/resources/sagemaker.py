@@ -7,7 +7,7 @@ from c7n.manager import resources
 from c7n.query import QueryResourceManager, TypeInfo, DescribeSource, ConfigSource
 from c7n.utils import local_session, type_schema
 from c7n.tags import RemoveTag, Tag, TagActionFilter, TagDelayedAction, universal_augment
-from c7n.filters.vpc import SubnetFilter, SecurityGroupFilter
+from c7n.filters.vpc import SubnetFilter, SecurityGroupFilter, NetworkLocation
 from c7n.filters.kms import KmsRelatedFilter
 from c7n.filters.offhours import OffHour, OnHour
 
@@ -135,6 +135,89 @@ class SagemakerTransformJob(QueryResourceManager):
             return j
 
         return list(map(_augment, super(SagemakerTransformJob, self).augment(jobs)))
+
+
+class SagemakerHyperParameterTuningJobDescribe(DescribeSource):
+
+    def augment(self, resources):
+        return universal_augment(self.manager, super().augment(resources))
+
+
+@resources.register('sagemaker-hyperparameter-tuning-job')
+class SagemakerHyperParameterTuningJob(QueryResourceManager):
+    class resource_type(TypeInfo):
+        service = 'sagemaker'
+        enum_spec = ('list_hyper_parameter_tuning_jobs', 'HyperParameterTuningJobSummaries', None)
+        detail_spec = (
+            'describe_hyper_parameter_tuning_job', 'HyperParameterTuningJobName',
+            'HyperParameterTuningJobName', None)
+        arn = id = 'HyperParameterTuningJobArn'
+        name = 'HyperParameterTuningJobName'
+        date = 'CreationTime'
+        permission_prefix = 'sagemaker'
+        universal_taggable = object()
+
+    source_mapping = {'describe': SagemakerHyperParameterTuningJobDescribe}
+
+    def __init__(self, ctx, data):
+        super(SagemakerHyperParameterTuningJob, self).__init__(ctx, data)
+        self.queries = QueryFilter.parse(
+            self.data.get('query', [
+                {'StatusEquals': 'InProgress'}]))
+
+    def resources(self, query=None):
+        for q in self.queries:
+            if q is None:
+                continue
+            query = query or {}
+            for k, v in q.items():
+                query[k] = v
+        return super(SagemakerHyperParameterTuningJob, self).resources(query=query)
+
+
+class SagemakerAutoMLDescribeV2(DescribeSource):
+
+    def get_permissions(self):
+        perms = super().get_permissions()
+        perms.remove('sagemaker:DescribeAutoMlJobV2')
+        return perms
+
+    def augment(self, resources):
+        return universal_augment(self.manager, super().augment(resources))
+
+
+@resources.register('sagemaker-auto-ml-job')
+class SagemakerAutoMLJob(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'sagemaker'
+        enum_spec = ('list_auto_ml_jobs', 'AutoMLJobSummaries', None)
+        detail_spec = (
+            'describe_auto_ml_job_v2', 'AutoMLJobName', 'AutoMLJobName', None)
+        arn = id = 'AutoMLJobArn'
+        name = 'AutoMLJobName'
+        date = 'CreationTime'
+        # override defaults to casing issues
+        permissions_augment = ('sagemaker:DescribeAutoMLJobV2',)
+        permissions_enum = ('sagemaker:ListAutoMLJobs',)
+        universal_taggable = object()
+
+    source_mapping = {'describe': SagemakerAutoMLDescribeV2}
+
+    def __init__(self, ctx, data):
+        super(SagemakerAutoMLJob, self).__init__(ctx, data)
+        self.queries = QueryFilter.parse(
+            self.data.get('query', [
+                {'StatusEquals': 'InProgress'}]))
+
+    def resources(self, query=None):
+        for q in self.queries:
+            if q is None:
+                continue
+            query = query or {}
+            for k, v in q.items():
+                query[k] = v
+        return super(SagemakerAutoMLJob, self).resources(query=query)
 
 
 class QueryFilter:
@@ -310,6 +393,31 @@ class Model(QueryResourceManager):
 
 
 Model.filter_registry.register('marked-for-op', TagActionFilter)
+
+
+class SagemakerClusterDescribe(DescribeSource):
+
+    def augment(self, resources):
+        return universal_augment(self.manager, super().augment(resources))
+
+
+@resources.register('sagemaker-cluster')
+class Cluster(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'sagemaker'
+        enum_spec = ('list_clusters', 'ClusterSummaries', None)
+        detail_spec = (
+            'describe_cluster', 'ClusterName',
+            'ClusterName', None)
+        arn = id = 'ClusterArn'
+        name = 'ClusterName'
+        date = 'CreationTime'
+        cfn_type = None
+        permission_prefix = 'sagemaker'
+        universal_taggable = object()
+
+    source_mapping = {'describe': SagemakerClusterDescribe}
 
 
 @SagemakerEndpoint.action_registry.register('tag')
@@ -588,6 +696,19 @@ class NotebookSubnetFilter(SubnetFilter):
     RelatedIdsExpression = "SubnetId"
 
 
+@Cluster.filter_registry.register('security-group')
+class ClusterSecurityGroupFilter(SecurityGroupFilter):
+
+    RelatedIdsExpression = "VpcConfig.SecurityGroupIds[]"
+
+
+@Cluster.filter_registry.register('subnet')
+class ClusterSubnetFilter(SubnetFilter):
+
+    RelatedIdsExpression = "VpcConfig.Subnets[]"
+
+
+@Cluster.filter_registry.register('network-location', NetworkLocation)
 @NotebookInstance.filter_registry.register('kms-key')
 @SagemakerEndpointConfig.filter_registry.register('kms-key')
 class NotebookKmsFilter(KmsRelatedFilter):
@@ -737,6 +858,93 @@ class SagemakerTransformJobStop(BaseAction):
         for j in jobs:
             try:
                 client.stop_transform_job(TransformJobName=j['TransformJobName'])
+            except client.exceptions.ResourceNotFound:
+                pass
+
+
+@SagemakerHyperParameterTuningJob.action_registry.register('stop')
+class SagemakerHyperParameterTuningJobStop(BaseAction):
+    """Stops a SageMaker Hyperparameter Tuning job
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: stop-hyperparameter-tuning-job
+            resource: sagemaker-hyperparameter-tuning-job
+            filters:
+              - HyperParameterTuningJobName: ml-job-10
+            actions:
+              - stop
+    """
+    schema = type_schema('stop')
+    permissions = ('sagemaker:StopHyperParameterTuningJob',)
+
+    def process(self, jobs):
+        client = local_session(self.manager.session_factory).client('sagemaker')
+
+        for j in jobs:
+            try:
+                client.stop_hyper_parameter_tuning_job(HyperParameterTuningJobName=j['HyperParameterTuningJobName'])
+            except client.exceptions.ResourceNotFound:
+                pass
+
+
+@SagemakerAutoMLJob.action_registry.register('stop')
+class SagemakerAutoMLJobStop(BaseAction):
+    """Stops a SageMaker AutoML job
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: stop-automl-job
+            resource: sagemaker-auto-ml-job
+            filters:
+              - AutoMLJobName: ml-job-01
+            actions:
+              - stop
+    """
+    schema = type_schema('stop')
+    permissions = ('sagemaker:StopAutoMLJob',)
+
+    def process(self, jobs):
+        client = local_session(self.manager.session_factory).client('sagemaker')
+
+        for j in jobs:
+            try:
+                client.stop_auto_ml_job(AutoMLJobName=j['AutoMLJobName'])
+            except client.exceptions.ResourceNotFound:
+                pass
+
+
+@Cluster.action_registry.register('delete')
+class ClusterDelete(BaseAction):
+    """Deletes sagemaker-cluster(s)
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: delete-sagemaker-cluster
+            resource: sagemaker-cluster
+            filters:
+              - "tag:DeleteMe": present
+            actions:
+              - delete
+    """
+    schema = type_schema('delete')
+    permissions = ('sagemaker:DeleteCluster',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('sagemaker')
+
+        for c in resources:
+            try:
+                client.delete_cluster(ClusterName=c['ClusterName'])
             except client.exceptions.ResourceNotFound:
                 pass
 

@@ -1,6 +1,8 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 from .common import BaseTest
+from c7n.executor import MainThreadExecutor
+from c7n.resources.transfer import DeleteServer, DeleteUser
 
 
 class TestTransferServer(BaseTest):
@@ -43,7 +45,11 @@ class TestTransferServer(BaseTest):
         self.assertEqual(len(resources), 1)
 
     def test_delete_server(self):
-        session_factory = self.replay_flight_data("test_transfer_server_delete")
+        self.patch(DeleteServer, "executor_factory", MainThreadExecutor)
+        session_factory = self.replay_flight_data(
+            "test_transfer_server_delete",
+            region="us-east-2"
+        )
         p = self.load_policy(
             {
                 "name": "transfer-server-test-delete",
@@ -51,12 +57,13 @@ class TestTransferServer(BaseTest):
                 "actions": [{"type": "delete"}],
             },
             session_factory=session_factory,
+            config={"region": "us-east-2"},
         )
         resources = p.run()
-        self.assertEqual(len(resources), 1)
+        self.assertEqual(len(resources), 2)
 
 
-class TransferUser(BaseTest):
+class TestTransferUser(BaseTest):
 
     def test_resources(self):
         session_factory = self.replay_flight_data("test_transfer_user")
@@ -69,7 +76,11 @@ class TransferUser(BaseTest):
         self.assertEqual(resources[0]["UserName"], "test")
 
     def test_delete_user(self):
-        session_factory = self.replay_flight_data("test_transfer_user_delete")
+        self.patch(DeleteUser, "executor_factory", MainThreadExecutor)
+        session_factory = self.replay_flight_data(
+            "test_transfer_user_delete",
+            region="us-east-2"
+        )
         p = self.load_policy(
             {
                 "name": "transfer-user-test-delete",
@@ -77,6 +88,7 @@ class TransferUser(BaseTest):
                 "actions": [{"type": "delete"}],
             },
             session_factory=session_factory,
+            config={"region": "us-east-2"},
         )
         resources = p.run()
-        self.assertEqual(len(resources), 1)
+        self.assertEqual(len(resources), 2)
