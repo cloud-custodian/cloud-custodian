@@ -86,3 +86,34 @@ class Credential(BaseTest):
         client = local_session(factory).client('ec2')
         self.assertTrue(
             'check-ec2' in client._client_config.user_agent)
+
+    def test_assumed_session_session_policy(self):
+        factory = self.replay_flight_data("test_assumed_session_session_policy")
+
+        # Allow list function via session policy
+        inline_session_policy = '{"Version":"2012-10-17", "Statement":[{"Sid":"Statement1", \
+            "Effect":"Allow", "Action":["lambda:ListFunctions"], "Resource": "*"}]}'
+
+        session = assumed_session(
+            role_arn='arn:aws:iam::644160558196:role/CloudCustodianRole',
+            session_name="custodian-with-session-policy",
+            session_policy=str(inline_session_policy),
+            session=factory(),
+        )
+
+        pill = placebo.attach(
+            session, os.path.join(self.placebo_dir, "test_assumed_session_session_policy"))
+        if self.recording:
+            pill.record()
+        else:
+            pill.playback()
+        self.addCleanup(pill.stop)
+
+        # Anything except ListFunctions will get AccessDenied
+        try:
+            l_layers = session.client("lambda").list_layers()
+        except ClientError as e:
+            self.assertEqual(e.response["Error"]["Code"], "AccessDeniedException")
+
+        l_functions = session.client("lambda").list_functions()
+        self.assertGreater(len((l_functions).get('Functions')), 0)

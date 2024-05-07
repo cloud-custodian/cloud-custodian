@@ -1,0 +1,22 @@
+{
+    "status_code": 403,
+    "data": {
+        "Error": {
+            "Message": "User: arn:aws:sts::644160558196:assumed-role/CloudCustodianRole/custodian-with-session-policy is not authorized to perform: lambda:ListLayers on resource: * because no session policy allows the lambda:ListLayers action",
+            "Code": "AccessDeniedException"
+        },
+        "ResponseMetadata": {
+            "RequestId": "d472b251-d48f-47a0-abf9-85e77a3676fc",
+            "HTTPStatusCode": 403,
+            "HTTPHeaders": {
+                "date": "Tue, 07 May 2024 04:25:28 GMT",
+                "content-type": "application/json",
+                "content-length": "232",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "d472b251-d48f-47a0-abf9-85e77a3676fc",
+                "x-amzn-errortype": "AccessDeniedException"
+            },
+            "RetryAttempts": 0
+        }
+    }
+}

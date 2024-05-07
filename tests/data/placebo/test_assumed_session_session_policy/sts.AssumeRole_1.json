@@ -1,0 +1,22 @@
+{
+    "status_code": 200,
+    "data": {
+        "Credentials": {
+            "Expiration": {
+                "__class__": "datetime",
+                "year": 2024,
+                "month": 5,
+                "day": 7,
+                "hour": 5,
+                "minute": 25,
+                "second": 28,
+                "microsecond": 0
+            }
+        },
+        "AssumedRoleUser": {
+            "Arn": "arn:aws:sts::644160558196:assumed-role/CloudCustodianRole/custodian-with-session-policy"
+        },
+        "PackedPolicySize": 11,
+        "ResponseMetadata": {}
+    }
+}
