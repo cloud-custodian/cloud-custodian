@@ -14,7 +14,7 @@ from c7n.actions import BaseAction
 from c7n.exceptions import PolicyValidationError
 from c7n.filters import (
     CrossAccountAccessFilter, Filter, AgeFilter, ValueFilter,
-    ANNOTATION_KEY)
+    ANNOTATION_KEY, ListItemFilter)
 from c7n.filters.health import HealthEventFilter
 from c7n.filters.related import RelatedResourceFilter
 
@@ -32,7 +32,8 @@ from c7n.utils import (
     set_annotation,
     type_schema,
     QueryParser,
-    get_support_region
+    get_support_region,
+    group_by
 )
 from c7n.resources.ami import AMI
 
@@ -677,6 +678,72 @@ class EBS(QueryResourceManager):
                     continue
                 raise
         return []
+
+
+@EBS.filter_registry.register('snapshots')
+class EBSSnapshotsFilter(ListItemFilter):
+    """
+    Filter volumes by all their snapshots.
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: ebs-volumes
+            resource: aws.ebs
+            filters:
+              - not:
+                - type: snapshots
+                  attrs:
+                    - type: value
+                      key: StartTime
+                      value_type: age
+                      value: 2
+                      op: less-than
+    """
+    schema = type_schema(
+        'snapshots',
+        attrs={'$ref': '#/definitions/filters_common/list_item_attrs'},
+        count={'type': 'number'},
+        count_op={'$ref': '#/definitions/filters_common/comparison_operators'}
+    )
+    permissions = ('ec2:DescribeSnapshots', )
+    item_annotation_key = 'c7n:Snapshots'
+    annotate_items = True
+
+    def _process_resources_set(self, client, resources):
+        snapshots = client.describe_snapshots(
+            Filters=[{
+                'Name': 'volume-id',
+                'Values': [r['VolumeId'] for r in resources]
+            }]
+        ).get('Snapshots') or []
+        grouped = group_by(snapshots, 'VolumeId')
+        for res in resources:
+            res[self.item_annotation_key] = grouped.get(res['VolumeId']) or []
+
+    def process(self, resources, event=None):
+        client = local_session(self.manager.session_factory).client('ec2')
+        with self.manager.executor_factory(max_workers=3) as w:
+            futures = []
+            # 200 max value for a single call
+            for resources_set in chunks(resources, 30):
+                futures.append(w.submit(self._process_resources_set, client,
+                                        resources_set))
+            for f in as_completed(futures):
+                if f.exception():
+                    self.log.error(
+                        "Exception getting snapshots by volume ids \n %s" % (
+                            f.exception())
+                    )
+                    continue
+        return super().process(resources, event)
+
+    def get_item_values(self, resource):
+        if self.annotate_items:
+            return resource[self.item_annotation_key]
+        return resource.pop(self.item_annotation_key)
 
 
 @EBS.action_registry.register('post-finding')

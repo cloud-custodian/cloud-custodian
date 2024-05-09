@@ -3,13 +3,21 @@
     "data": {
         "Servers": [
             {
-                "Arn": "arn:aws:transfer:us-east-1:644160558196:server/s-4a6d521483294bd79",
+                "Arn": "arn:aws:transfer:us-east-2:644160558196:server/s-2dd2891893c7443a8",
                 "Domain": "S3",
                 "IdentityProviderType": "SERVICE_MANAGED",
                 "EndpointType": "PUBLIC",
-                "LoggingRole": "arn:aws:iam::644160558196:role/service-role/AWSTransferLoggingAccess",
-                "ServerId": "s-4a6d521483294bd79",
-                "State": "STARTING",
+                "ServerId": "s-2dd2891893c7443a8",
+                "State": "ONLINE",
+                "UserCount": 0
+            },
+            {
+                "Arn": "arn:aws:transfer:us-east-2:644160558196:server/s-e1445c881f5746b59",
+                "Domain": "S3",
+                "IdentityProviderType": "SERVICE_MANAGED",
+                "EndpointType": "PUBLIC",
+                "ServerId": "s-e1445c881f5746b59",
+                "State": "ONLINE",
                 "UserCount": 0
             }
         ],

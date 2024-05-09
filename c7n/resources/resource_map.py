@@ -223,13 +223,23 @@ ResourceMap = {
   "aws.s3-storage-lens": "c7n.resources.s3control.StorageLens",
   "aws.sagemaker-auto-ml-job": "c7n.resources.sagemaker.SagemakerAutoMLJob",
   "aws.sagemaker-cluster": "c7n.resources.sagemaker.Cluster",
+  "aws.sagemaker-compilation-job": "c7n.resources.sagemaker.SagemakerCompilationJob",
+  "aws.sagemaker-data-quality-job-definition":
+    "c7n.resources.sagemaker.SagemakerDataQualityJobDefinition",
   "aws.sagemaker-domain": "c7n.resources.sagemaker.SagemakerDomain",
   "aws.sagemaker-endpoint": "c7n.resources.sagemaker.SagemakerEndpoint",
   "aws.sagemaker-endpoint-config": "c7n.resources.sagemaker.SagemakerEndpointConfig",
+  "aws.sagemaker-model-explainability-job-definition":
+    "c7n.resources.sagemaker.SagemakerModelExplainabilityJobDefinition",
+  "aws.sagemaker-model-quality-job-definition":
+    "c7n.resources.sagemaker.SagemakerModelQualityJobDefinition",
+  "aws.sagemaker-processing-job": "c7n.resources.sagemaker.SagemakerProcessingJob",
   "aws.sagemaker-job": "c7n.resources.sagemaker.SagemakerJob",
   "aws.sagemaker-model": "c7n.resources.sagemaker.Model",
   "aws.sagemaker-notebook": "c7n.resources.sagemaker.NotebookInstance",
   "aws.sagemaker-transform-job": "c7n.resources.sagemaker.SagemakerTransformJob",
+  "aws.sagemaker-hyperparameter-tuning-job":
+    "c7n.resources.sagemaker.SagemakerHyperParameterTuningJob",
   "aws.scaling-policy": "c7n.resources.asg.ScalingPolicy",
   "aws.secrets-manager": "c7n.resources.secretsmanager.SecretsManager",
   "aws.security-group": "c7n.resources.vpc.SecurityGroup",
