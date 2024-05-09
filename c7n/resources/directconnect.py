@@ -37,18 +37,18 @@ class DirectConnectVirtualInterface(QueryResourceManager):
 
     augment = universal_augment
 
-    @resources.register('directconnect-gateway-association')
-    class DirectConnectGatewayAssociation(QueryResourceManager):
+@resources.register('directconnect-gateway-association')
+class DirectConnectGatewayAssociation(QueryResourceManager):
 
-        class resource_type(TypeInfo):
-            service = 'directconnect'
-            enum_spec = ('describe_direct_connect_gateway_associations', 'directConnectGatewayAssociations', None)
-            id = 'associationId'
-            name = 'associationId'
-            filter_name = 'associationId'
-            filter_type = 'scalar'
-            arn_type = 'dx-gateway'
-            universal_taggable = object()
-            permissions_augment = ("directconnect:DescribeTags",)
+    class resource_type(TypeInfo):
+        service = 'directconnect'
+        enum_spec = ('describe_direct_connect_gateway_associations', 'directConnectGatewayAssociations', None)
+        id = 'associationId'
+        name = 'associationId'
+        filter_name = 'associationId'
+        filter_type = 'scalar'
+        arn_type = 'dx-gateway'
+        universal_taggable = object()
+        permissions_augment = ("directconnect:DescribeTags",)
 
-        augment = universal_augment
+    augment = universal_augment
