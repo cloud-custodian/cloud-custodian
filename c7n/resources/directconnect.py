@@ -20,3 +20,19 @@ class DirectConnect(QueryResourceManager):
         permissions_augment = ("directconnect:DescribeTags",)
 
     augment = universal_augment
+
+@resources.register('directconnect-virtual-interface')
+class DirectConnectVirtualInterface(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'directconnect'
+        enum_spec = ('describe_virtual_interfaces', 'virtualInterfaces', None)
+        id = 'virtualInterfaceId'
+        name = 'virtualInterfaceName'
+        filter_name = 'virtualInterfaceId'
+        filter_type = 'scalar'
+        arn_type = "dxvif"
+        universal_taggable = object()
+        permissions_augment = ("directconnect:DescribeTags",)
+
+    augment = universal_augment

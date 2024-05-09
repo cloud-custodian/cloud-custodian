@@ -64,6 +64,7 @@ ResourceMap = {
   "aws.dax": "c7n.resources.dynamodb.DynamoDbAccelerator",
   "aws.devicefarm-project": "c7n.resources.devicefarm.DevicefarmProject",
   "aws.directconnect": "c7n.resources.directconnect.DirectConnect",
+  "aws.directconnect-virtual-interface": "c7n.resources.directconnect.DirectConnectVirtualInterface",
   "aws.directory": "c7n.resources.directory.Directory",
   "aws.distribution": "c7n.resources.cloudfront.Distribution",
   "aws.dlm-policy": "c7n.resources.dlm.DLMPolicy",
