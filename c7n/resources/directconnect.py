@@ -45,8 +45,8 @@ class DirectConnectGatewayAssociation(QueryResourceManager):
     class resource_type(TypeInfo):
         service = 'directconnect'
         enum_spec = (
-            'describe_direct_connect_gateway_associations', 
-            'directConnectGatewayAssociations', 
+            'describe_direct_connect_gateway_associations',
+            'directConnectGatewayAssociations',
             None
         )
         id = 'associationId'
