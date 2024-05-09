@@ -39,6 +39,14 @@ class DirectConnectVirtualInterface(QueryResourceManager):
     augment = universal_augment
 
 
+# TODO directconnect-gateway resource itself
+
+
+class DirectConnectGatewayAssociationDescribe(DescribeSource):
+
+    def augment(self, resources):
+        return universal_augment(self.manager, super().augment(resources))
+
 @resources.register('directconnect-gateway-association')
 class DirectConnectGatewayAssociation(QueryResourceManager):
 
