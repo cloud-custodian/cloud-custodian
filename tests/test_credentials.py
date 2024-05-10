@@ -86,4 +86,3 @@ class Credential(BaseTest):
         client = local_session(factory).client('ec2')
         self.assertTrue(
             'check-ec2' in client._client_config.user_agent)
-
