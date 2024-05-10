@@ -594,7 +594,7 @@ class LoadSessionPolicyJson(argparse.Action):
                 s_pol = json.load(sp)
             return s_pol
         except Exception as e:
-            raise argparse.ArgumentTypeError(e)
+            raise e
 
     def __call__(self, parser, namespace, values, option_string=None):
         file_name = values
