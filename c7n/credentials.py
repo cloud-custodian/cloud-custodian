@@ -93,7 +93,7 @@ def assumed_session(
 
         parameters = {"RoleArn": role_arn, "RoleSessionName": session_name}
         if session_policy is not None:
-            parameters['Policy'] = json.dumps(SessionPolicy(session_policy).get_session_policy())
+            parameters['Policy'] = json.dumps(session_policy)
 
         if external_id is not None:
             parameters['ExternalId'] = external_id
@@ -142,14 +142,3 @@ def get_sts_client(session, region):
         region_name = None
     return session.client(
         'sts', endpoint_url=endpoint_url, region_name=region_name)
-
-
-class SessionPolicy:
-    def __init__(self, session_policy):
-        self.session_policy = session_policy
-
-    def get_session_policy(self):
-        if self.session_policy:
-            with open(self.session_policy, 'r') as sp:
-                p = json.load(sp)
-        return p

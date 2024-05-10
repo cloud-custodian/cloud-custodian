@@ -14,6 +14,7 @@ import sys
 import traceback
 from datetime import datetime
 from dateutil.parser import parse as date_parse
+from c7n.commands import LoadSessionPolicyJson
 
 try:
     from setproctitle import setproctitle
@@ -100,6 +101,7 @@ def _default_options(p, exclude=[]):
         p.add_argument("--cache", default=None, help=argparse.SUPPRESS)
     if 'session-policy' not in exclude:
         p.add_argument("--session-policy", required=False, default=None,
+                       action=LoadSessionPolicyJson,
                        help="[OPTIONAL] Policy Document to be used as a session policy")
 
 
