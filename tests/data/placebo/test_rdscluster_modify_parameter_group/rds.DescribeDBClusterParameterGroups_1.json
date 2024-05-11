@@ -1,0 +1,25 @@
+{
+    "status_code": 200, 
+    "data": {
+        "ResponseMetadata": {
+            "RetryAttempts": 0, 
+            "HTTPStatusCode": 200, 
+            "RequestId": "a9c511ae-6521-11e7-9155-e9c3bd8d0047", 
+            "HTTPHeaders": {
+                "x-amzn-requestid": "a9c511ae-6521-11e7-9155-e9c3bd8d0047", 
+                "vary": "Accept-Encoding", 
+                "content-length": "4265", 
+                "content-type": "text/xml", 
+                "date": "Mon, 10 Jul 2017 03:41:31 GMT"
+            }
+        }, 
+        "DBClusterParameterGroups": [
+            {
+                "DBClusterParameterGroupArn": "arn:aws:rds:us-west-2:644160558196:pg:test", 
+                "DBClusterParameterGroupName": "test", 
+                "DBParameterGroupFamily": "mysql5.5", 
+                "Description": "test"
+            }
+        ]
+    }
+}
