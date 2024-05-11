@@ -22,6 +22,12 @@ Now you may run ``custodian`` with any flags in order to directly test changes t
 Adding New AWS Resources
 ==========================
 
+3rd Party Documentation
+------------------------
+
+`John Lonergan's guide to adding an extension.<https://gist.github.com/Johnlon/98e1e4b9aaedfedead428c89e7dab5bb>`
+
+
 Create New AWS Resource
 -------------------------
 
