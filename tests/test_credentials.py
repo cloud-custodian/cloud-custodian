@@ -23,22 +23,22 @@ class Credential(BaseTest):
 
     def test_session_policy_with_session_factory(self):
         role = "arn:aws:iam::644160558196:role/CloudCustodianRole"
-        inline_session_policy = {"Version":"2012-10-17", "Statement":[{"Sid":"Statement1", \
-            "Effect":"Allow", "Action":["lambda:ListFunctions"], "Resource": "*"}]}
-        factory = SessionFactory("us-east-1", assume_role=role, session_policy=inline_session_policy)
+        inline_session_policy = {"Version": "2012-10-17", "Statement": [{"Sid": "Statement1",
+            "Effect": "Allow", "Action": ["lambda:ListFunctions"], "Resource": "*"}]}
+        factory = SessionFactory("us-east-1", assume_role=role,
+                session_policy=inline_session_policy)
         session = factory()
         try:
-            l_layers = session.client("lambda").list_layers()
+            session.client("lambda").list_layers()
         except ClientError as e:
             self.assertEqual(e.response["Error"]["Code"], "AccessDeniedException")
             self.maxDiff = None
             self.assertEqual(e.response["Error"]["Message"],
-                "User: arn:aws:sts::644160558196:assumed-role/CloudCustodianRole/CloudCustodian " \
-                "is not authorized to perform: lambda:ListLayers on resource: * because no "  \
+                "User: arn:aws:sts::644160558196:assumed-role/CloudCustodianRole/CloudCustodian "
+                "is not authorized to perform: lambda:ListLayers on resource: * because no "
                 "session policy allows the lambda:ListLayers action")
         l_functions = session.client("lambda").list_functions()
         self.assertGreater(len((l_functions).get('Functions')), 0)
-
 
     def test_regional_sts(self):
         factory = self.replay_flight_data('test_credential_sts_regional')
