@@ -21,25 +21,6 @@ class Credential(BaseTest):
             session._session.user_agent().startswith("c7n/%s" % version)
         )
 
-    def test_session_policy_with_session_factory(self):
-        role = "arn:aws:iam::644160558196:role/CloudCustodianRole"
-        inline_session_policy = {"Version": "2012-10-17", "Statement": [{"Sid": "Statement1",
-            "Effect": "Allow", "Action": ["lambda:ListFunctions"], "Resource": "*"}]}
-        factory = SessionFactory("us-east-1", assume_role=role,
-                session_policy=inline_session_policy)
-        session = factory()
-        try:
-            session.client("lambda").list_layers()
-        except ClientError as e:
-            self.assertEqual(e.response["Error"]["Code"], "AccessDeniedException")
-            self.maxDiff = None
-            self.assertEqual(e.response["Error"]["Message"],
-                "User: arn:aws:sts::644160558196:assumed-role/CloudCustodianRole/CloudCustodian "
-                "is not authorized to perform: lambda:ListLayers on resource: * because no "
-                "session policy allows the lambda:ListLayers action")
-        l_functions = session.client("lambda").list_functions()
-        self.assertGreater(len((l_functions).get('Functions')), 0)
-
     def test_regional_sts(self):
         factory = self.replay_flight_data('test_credential_sts_regional')
 
@@ -78,6 +59,36 @@ class Credential(BaseTest):
         self.assertEqual(
             identity['Arn'],
             'arn:aws:sts::644160558196:assumed-role/CustodianGuardDuty/custodian-dev')
+
+    def test_session_policy_assumed_session(self):
+        factory = self.replay_flight_data("test_session_policy_assumed_session")
+        inline_session_policy = {"Version": "2012-10-17", "Statement": [{"Sid": "Statement1",
+            "Effect": "Allow", "Action": ["lambda:ListFunctions"], "Resource": "*"}]}
+        session = assumed_session(
+            role_arn='arn:aws:iam::644160558196:role/CloudCustodianRole',
+            session_name="CloudCustodian",
+            session_policy=inline_session_policy,
+            session=factory(),
+        )
+
+        pill = placebo.attach(
+            session, os.path.join(self.placebo_dir, "test_session_policy_assumed_session"))
+        if self.recording:
+            pill.record()
+        else:
+            pill.playback()
+        self.addCleanup(pill.stop)
+        try:
+            session.client("lambda").list_layers()
+        except ClientError as e:
+            self.assertEqual(e.response["Error"]["Code"], "AccessDeniedException")
+            self.maxDiff = None
+            self.assertEqual(e.response["Error"]["Message"],
+                "User: arn:aws:sts::644160558196:assumed-role/CloudCustodianRole/CloudCustodian "
+                "is not authorized to perform: lambda:ListLayers on resource: * because no "
+                "session policy allows the lambda:ListLayers action")
+        l_functions = session.client("lambda").list_functions()
+        self.assertGreater(len((l_functions).get('Functions')), 0)
 
     def test_policy_name_user_agent(self):
         session = SessionFactory("us-east-1")
