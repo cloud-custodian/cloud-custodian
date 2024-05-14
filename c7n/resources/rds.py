@@ -2296,7 +2296,7 @@ class ModifyRDSParamGroup(PGModify):
         'modify-pg',
         **{
             'required': ['params'],
-            'params' : {
+            'params': {
                 'type': 'array',
                 'items': {
                     'type': 'object',

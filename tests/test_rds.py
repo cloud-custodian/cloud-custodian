@@ -2214,6 +2214,7 @@ class RDSProxy(BaseTest):
         self.assertEqual(len(resources), 1)
         self.assertEqual(resources[0]["DBProxyName"], "proxy-test-1")
 
+
 class ModifyRDSParamGroupTest(BaseTest):
     def test_rds_modify_parameter_group(self):
         session_factory = self.replay_flight_data("test_rds_modify_parameter_group")
@@ -2233,8 +2234,8 @@ class ModifyRDSParamGroupTest(BaseTest):
                     {
                         "type": "modify-pg",
                         "params": [
-                            {"name":"auto_increment_offset", "value":"5"},
-                            {"name":"autocommit", "value":"1"},
+                            {"name": "auto_increment_offset", "value": "5"},
+                            {"name": "autocommit", "value": "1"},
                         ]
                     }
                 ]

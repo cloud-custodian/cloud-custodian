@@ -790,7 +790,7 @@ class ModifyRDSParamGroup(PGClusterModify):
         'modify-cluster-pg',
         **{
             'required': ['params'],
-            'params' : {
+            'params': {
                 'type': 'array',
                 'items': {
                     'type': 'object',
@@ -827,5 +827,5 @@ class ModifyRDSParamGroup(PGClusterModify):
             for param_set in chunks(changed_params, 5):
                 self.do_modify(client, pgname, param_set)
 
-            self.log.info('Modified RDS Cluster parameter group %s (%i parameters changed, %i unchanged)',
+            self.log.info('Modified RDS Cluster param group %s (%i params changed, %i unchanged)',
                           pgname, len(changed_params), len(params) - len(changed_params))

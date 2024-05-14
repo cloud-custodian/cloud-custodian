@@ -805,8 +805,8 @@ class ModifyRDSParamGroupTest(BaseTest):
                     {
                         "type": "modify-cluster-pg",
                         "params": [
-                            {"name":"auto_increment_offset", "value":"5"},
-                            {"name":"autocommit", "value":"1"},
+                            {"name": "auto_increment_offset", "value": "5"},
+                            {"name": "autocommit", "value": "1"},
                         ]
                     }
                 ]
