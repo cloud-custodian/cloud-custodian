@@ -1,0 +1,23 @@
+{
+    "status_code": 200,
+    "data": {
+        "JobDefinitionSummaries": [
+            {
+                "MonitoringJobDefinitionName": "c7n-test",
+                "MonitoringJobDefinitionArn": "arn:aws:sagemaker:us-east-1:644160558196:data-quality-job-definition/c7n-test",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 4,
+                    "day": 24,
+                    "hour": 15,
+                    "minute": 28,
+                    "second": 49,
+                    "microsecond": 175000
+                },
+                "EndpointName": "c7n-test-endpoint"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
