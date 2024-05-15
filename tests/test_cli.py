@@ -568,6 +568,7 @@ class RunTest(CliTest):
         )
 
     def test_session_policy(self):
+        bad_session_policy = "bad_policy"
         sample_policy = {
             "Version": "2012-10-17",
             "Statement": [{
@@ -580,6 +581,10 @@ class RunTest(CliTest):
         session_policy = self.write_policy_file(sample_policy, format="json")
         self.assertEqual(LoadSessionPolicyJson(dest=session_policy,
             option_strings=None).load_session_policy_from_file(session_policy), sample_policy)
+        with self.assertRaises(FileNotFoundError) as e:
+            LoadSessionPolicyJson(dest=session_policy,
+                option_strings=None).load_session_policy_from_file(bad_session_policy)
+        self.assertIn("No such file or directory", str(e.exception))
 
 
 class MetricsTest(CliTest):
