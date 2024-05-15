@@ -1,0 +1,44 @@
+{
+    "status_code": 200,
+    "data": {
+        "ProcessingJobSummaries": [
+            {
+                "ProcessingJobName": "c7n-test",
+                "ProcessingJobArn": "arn:aws:sagemaker:us-east-1:644160558196:processing-job/c7n-test",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 4,
+                    "day": 17,
+                    "hour": 10,
+                    "minute": 23,
+                    "second": 2,
+                    "microsecond": 537000
+                },
+                "ProcessingEndTime": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 4,
+                    "day": 17,
+                    "hour": 10,
+                    "minute": 24,
+                    "second": 44,
+                    "microsecond": 27000
+                },
+                "LastModifiedTime": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 4,
+                    "day": 17,
+                    "hour": 10,
+                    "minute": 24,
+                    "second": 44,
+                    "microsecond": 447000
+                },
+                "ProcessingJobStatus": "Failed",
+                "FailureReason": "ClientError: API error (404): pull access denied for 644160558196.dkr.ecr.us-east-1.amazonaws.com/ubuntu18.04, repository does not exist or may require 'docker login': denied: User: arn:aws:sts::644160558196:assumed-role/Instance_Role_For_Scopedown-pipeline-prod/SageMaker is not authorized to perform: ecr:BatchGetImage on resource: arn:aws:ecr:us-east-1:644160558196:repository/ubuntu18.04 because no resource-based policy allows the ecr:BatchGetImage action"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

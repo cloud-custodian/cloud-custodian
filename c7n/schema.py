@@ -154,7 +154,7 @@ def specific_error(error):
                     v['$ref'].rsplit('/', 2)[-1].rsplit('.', 1)[-1] == t):
                 found = idx
                 break
-            elif 'type' in v and t in v['properties']['type']['enum']:
+            elif 'type' in v and t in v['properties'].get('type', {}).get('enum', []):
                 found = idx
                 break
 

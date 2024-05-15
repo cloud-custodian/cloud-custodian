@@ -137,6 +137,165 @@ class SagemakerTransformJob(QueryResourceManager):
         return list(map(_augment, super(SagemakerTransformJob, self).augment(jobs)))
 
 
+class SagemakerHyperParameterTuningJobDescribe(DescribeSource):
+
+    def augment(self, resources):
+        return universal_augment(self.manager, super().augment(resources))
+
+
+@resources.register('sagemaker-hyperparameter-tuning-job')
+class SagemakerHyperParameterTuningJob(QueryResourceManager):
+    class resource_type(TypeInfo):
+        service = 'sagemaker'
+        enum_spec = ('list_hyper_parameter_tuning_jobs', 'HyperParameterTuningJobSummaries', None)
+        detail_spec = (
+            'describe_hyper_parameter_tuning_job', 'HyperParameterTuningJobName',
+            'HyperParameterTuningJobName', None)
+        arn = id = 'HyperParameterTuningJobArn'
+        name = 'HyperParameterTuningJobName'
+        date = 'CreationTime'
+        permission_prefix = 'sagemaker'
+        universal_taggable = object()
+
+    source_mapping = {'describe': SagemakerHyperParameterTuningJobDescribe}
+
+    def __init__(self, ctx, data):
+        super(SagemakerHyperParameterTuningJob, self).__init__(ctx, data)
+        self.queries = QueryFilter.parse(
+            self.data.get('query', [
+                {'StatusEquals': 'InProgress'}]))
+
+    def resources(self, query=None):
+        for q in self.queries:
+            if q is None:
+                continue
+            query = query or {}
+            for k, v in q.items():
+                query[k] = v
+        return super(SagemakerHyperParameterTuningJob, self).resources(query=query)
+
+
+class SagemakerAutoMLDescribeV2(DescribeSource):
+
+    def get_permissions(self):
+        perms = super().get_permissions()
+        perms.remove('sagemaker:DescribeAutoMlJobV2')
+        return perms
+
+    def augment(self, resources):
+        return universal_augment(self.manager, super().augment(resources))
+
+
+@resources.register('sagemaker-auto-ml-job')
+class SagemakerAutoMLJob(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'sagemaker'
+        enum_spec = ('list_auto_ml_jobs', 'AutoMLJobSummaries', None)
+        detail_spec = (
+            'describe_auto_ml_job_v2', 'AutoMLJobName', 'AutoMLJobName', None)
+        arn = id = 'AutoMLJobArn'
+        name = 'AutoMLJobName'
+        date = 'CreationTime'
+        # override defaults to casing issues
+        permissions_augment = ('sagemaker:DescribeAutoMLJobV2',)
+        permissions_enum = ('sagemaker:ListAutoMLJobs',)
+        universal_taggable = object()
+
+    source_mapping = {'describe': SagemakerAutoMLDescribeV2}
+
+    def __init__(self, ctx, data):
+        super(SagemakerAutoMLJob, self).__init__(ctx, data)
+        self.queries = QueryFilter.parse(
+            self.data.get('query', [
+                {'StatusEquals': 'InProgress'}]))
+
+    def resources(self, query=None):
+        for q in self.queries:
+            if q is None:
+                continue
+            query = query or {}
+            for k, v in q.items():
+                query[k] = v
+        return super(SagemakerAutoMLJob, self).resources(query=query)
+
+
+class SagemakerCompilationJobDescribe(DescribeSource):
+
+    def augment(self, resources):
+        return universal_augment(self.manager, super().augment(resources))
+
+
+@resources.register('sagemaker-compilation-job')
+class SagemakerCompilationJob(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'sagemaker'
+        enum_spec = ('list_compilation_jobs', 'CompilationJobSummaries', None)
+        detail_spec = (
+            'describe_compilation_job', 'CompilationJobName', 'CompilationJobName', None)
+        arn = id = 'CompilationJobArn'
+        name = 'CompilationJobName'
+        date = 'CreationTime'
+        permission_prefix = 'sagemaker'
+        universal_taggable = object()
+
+    source_mapping = {'describe': SagemakerCompilationJobDescribe}
+
+    def __init__(self, ctx, data):
+        super(SagemakerCompilationJob, self).__init__(ctx, data)
+        self.queries = QueryFilter.parse(
+            self.data.get('query', [
+                {'StatusEquals': 'INPROGRESS'}]))
+
+    def resources(self, query=None):
+        for q in self.queries:
+            if q is None:
+                continue
+            query = query or {}
+            for k, v in q.items():
+                query[k] = v
+        return super(SagemakerCompilationJob, self).resources(query=query)
+
+
+class SagemakerProcessingJobDescribe(DescribeSource):
+
+    def augment(self, resources):
+        return universal_augment(self.manager, super().augment(resources))
+
+
+@resources.register('sagemaker-processing-job')
+class SagemakerProcessingJob(QueryResourceManager):
+
+    class resource_type(TypeInfo):
+        service = 'sagemaker'
+        enum_spec = ('list_processing_jobs', 'ProcessingJobSummaries', None)
+        detail_spec = (
+            'describe_processing_job', 'ProcessingJobName', 'ProcessingJobName', None)
+        arn = id = 'ProcessingJobArn'
+        name = 'ProcessingJobName'
+        date = 'CreationTime'
+        permission_prefix = 'sagemaker'
+        universal_taggable = object()
+
+    source_mapping = {'describe': SagemakerProcessingJobDescribe}
+
+    def __init__(self, ctx, data):
+        super(SagemakerProcessingJob, self).__init__(ctx, data)
+        self.queries = QueryFilter.parse(
+            self.data.get('query', [
+                {'StatusEquals': 'InProgress'}]))
+
+    def resources(self, query=None):
+        for q in self.queries:
+            if q is None:
+                continue
+            query = query or {}
+            for k, v in q.items():
+                query[k] = v
+        return super(SagemakerProcessingJob, self).resources(query=query)
+
+
 class QueryFilter:
 
     JOB_FILTERS = ('StatusEquals', 'NameContains',)
@@ -335,6 +494,81 @@ class Cluster(QueryResourceManager):
         universal_taggable = object()
 
     source_mapping = {'describe': SagemakerClusterDescribe}
+
+
+class SagemakerDataQualityJobDefinitionDescribe(DescribeSource):
+
+    def augment(self, resources):
+        return universal_augment(self.manager, super().augment(resources))
+
+
+@resources.register('sagemaker-data-quality-job-definition')
+class SagemakerDataQualityJobDefinition(QueryResourceManager):
+    class resource_type(TypeInfo):
+        service = 'sagemaker'
+        enum_spec = ('list_data_quality_job_definitions', 'JobDefinitionSummaries', None)
+        detail_spec = ('describe_data_quality_job_definition', 'JobDefinitionName',
+                       'MonitoringJobDefinitionName', None)
+        arn = id = 'JobDefinitionArn'
+        name = 'JobDefinitionName'
+        date = 'CreationTime'
+        cfn_type = 'AWS::SageMaker::DataQualityJobDefinition'
+        permission_prefix = 'sagemaker'
+        filter_name = 'EndpointName'
+        filter_type = 'scalar'
+        universal_taggable = object()
+
+    source_mapping = {'describe': SagemakerDataQualityJobDefinitionDescribe}
+
+
+class SagemakerModelExplainabilityJobDefinitionDescribe(DescribeSource):
+
+    def augment(self, resources):
+        return universal_augment(self.manager, super().augment(resources))
+
+
+@resources.register('sagemaker-model-explainability-job-definition')
+class SagemakerModelExplainabilityJobDefinition(QueryResourceManager):
+    class resource_type(TypeInfo):
+        service = 'sagemaker'
+        enum_spec = ('list_model_explainability_job_definitions', 'JobDefinitionSummaries', None)
+        detail_spec = ('describe_model_explainability_job_definition', 'JobDefinitionName',
+                       'MonitoringJobDefinitionName', None)
+        arn = id = 'JobDefinitionArn'
+        name = 'JobDefinitionName'
+        date = 'CreationTime'
+        cfn_type = 'AWS::SageMaker::ModelExplainabilityJobDefinition'
+        permission_prefix = 'sagemaker'
+        filter_name = 'EndpointName'
+        filter_type = 'scalar'
+        universal_taggable = object()
+
+    source_mapping = {'describe': SagemakerModelExplainabilityJobDefinitionDescribe}
+
+
+class SagemakerModelQualityJobDefinitionDescribe(DescribeSource):
+
+    def augment(self, resources):
+        return universal_augment(self.manager, super().augment(resources))
+
+
+@resources.register('sagemaker-model-quality-job-definition')
+class SagemakerModelQualityJobDefinition(QueryResourceManager):
+    class resource_type(TypeInfo):
+        service = 'sagemaker'
+        enum_spec = ('list_model_quality_job_definitions', 'JobDefinitionSummaries', None)
+        detail_spec = ('describe_model_quality_job_definition', 'JobDefinitionName',
+                       'MonitoringJobDefinitionName', None)
+        arn = id = 'JobDefinitionArn'
+        name = 'JobDefinitionName'
+        date = 'CreationTime'
+        cfn_type = 'AWS::SageMaker::ModelQualityJobDefinition'
+        permission_prefix = 'sagemaker'
+        filter_name = 'EndpointName'
+        filter_type = 'scalar'
+        universal_taggable = object()
+
+    source_mapping = {'describe': SagemakerModelQualityJobDefinitionDescribe}
 
 
 @SagemakerEndpoint.action_registry.register('tag')
@@ -750,6 +984,93 @@ class SagemakerEndpointConfigDelete(BaseAction):
                 pass
 
 
+@SagemakerDataQualityJobDefinition.action_registry.register('delete')
+class SagemakerDataQualityJobDefinitionDelete(BaseAction):
+    """Delete a SageMaker Data Quality Job Definition
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: delete-sagemaker-data-quality-job-definition
+            resource: sagemaker-data-quality-job-definition
+            filters:
+              - JobDefinitionName: job-def-1
+            actions:
+              - delete
+    """
+    schema = type_schema('delete')
+    permissions = ('sagemaker:DeleteDataQualityJobDefinition',)
+
+    def process(self, job_definitions):
+        client = local_session(self.manager.session_factory).client('sagemaker')
+        for j in job_definitions:
+            try:
+                client.delete_data_quality_job_definition(
+                    JobDefinitionName=j['JobDefinitionName'])
+            except client.exceptions.ResourceNotFound:
+                pass
+
+
+@SagemakerModelExplainabilityJobDefinition.action_registry.register('delete')
+class SagemakerModelExplainabilityJobDefinitionDelete(BaseAction):
+    """Delete a SageMaker Model Explainability Job Definition
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: delete-sagemaker-model-explainability-job-definition
+            resource: sagemaker-model-explainability-job-definition
+            filters:
+              - JobDefinitionName: job-def-1
+            actions:
+              - delete
+    """
+    schema = type_schema('delete')
+    permissions = ('sagemaker:DeleteModelExplainabilityJobDefinition',)
+
+    def process(self, job_definitions):
+        client = local_session(self.manager.session_factory).client('sagemaker')
+        for j in job_definitions:
+            try:
+                client.delete_model_explainability_job_definition(
+                    JobDefinitionName=j['JobDefinitionName'])
+            except client.exceptions.ResourceNotFound:
+                pass
+
+
+@SagemakerModelQualityJobDefinition.action_registry.register('delete')
+class SagemakerModelQualityJobDefinitionDelete(BaseAction):
+    """Delete a SageMaker Model Quality Job Definition
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: delete-sagemaker-model-quality-job-definition
+            resource: sagemaker-model-quality-job-definition
+            filters:
+              - JobDefinitionName: job-def-1
+            actions:
+              - delete
+    """
+    schema = type_schema('delete')
+    permissions = ('sagemaker:DeleteModelQualityJobDefinition',)
+
+    def process(self, job_definitions):
+        client = local_session(self.manager.session_factory).client('sagemaker')
+        for j in job_definitions:
+            try:
+                client.delete_model_quality_job_definition(
+                    JobDefinitionName=j['JobDefinitionName'])
+            except client.exceptions.ResourceNotFound:
+                pass
+
+
 @SagemakerTransformJob.action_registry.register('stop')
 class SagemakerTransformJobStop(BaseAction):
     """Stops a SageMaker Transform job
@@ -775,6 +1096,122 @@ class SagemakerTransformJobStop(BaseAction):
         for j in jobs:
             try:
                 client.stop_transform_job(TransformJobName=j['TransformJobName'])
+            except client.exceptions.ResourceNotFound:
+                pass
+
+
+@SagemakerHyperParameterTuningJob.action_registry.register('stop')
+class SagemakerHyperParameterTuningJobStop(BaseAction):
+    """Stops a SageMaker Hyperparameter Tuning job
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: stop-hyperparameter-tuning-job
+            resource: sagemaker-hyperparameter-tuning-job
+            filters:
+              - HyperParameterTuningJobName: ml-job-10
+            actions:
+              - stop
+    """
+    schema = type_schema('stop')
+    permissions = ('sagemaker:StopHyperParameterTuningJob',)
+
+    def process(self, jobs):
+        client = local_session(self.manager.session_factory).client('sagemaker')
+
+        for j in jobs:
+            try:
+                client.stop_hyper_parameter_tuning_job(HyperParameterTuningJobName=j['HyperParameterTuningJobName'])
+            except client.exceptions.ResourceNotFound:
+                pass
+
+
+@SagemakerAutoMLJob.action_registry.register('stop')
+class SagemakerAutoMLJobStop(BaseAction):
+    """Stops a SageMaker AutoML job
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: stop-automl-job
+            resource: sagemaker-auto-ml-job
+            filters:
+              - AutoMLJobName: ml-job-01
+            actions:
+              - stop
+    """
+    schema = type_schema('stop')
+    permissions = ('sagemaker:StopAutoMLJob',)
+
+    def process(self, jobs):
+        client = local_session(self.manager.session_factory).client('sagemaker')
+
+        for j in jobs:
+            try:
+                client.stop_auto_ml_job(AutoMLJobName=j['AutoMLJobName'])
+            except client.exceptions.ResourceNotFound:
+                pass
+
+
+@SagemakerCompilationJob.action_registry.register('stop')
+class SagemakerCompilationJobStop(BaseAction):
+    """Stops a SageMaker Compilation job
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: stop-compilation-job
+            resource: sagemaker-compilation-job
+            filters:
+              - CompilationJobName: ml-job-10
+            actions:
+              - stop
+    """
+    schema = type_schema('stop')
+    permissions = ('sagemaker:StopCompilationJob',)
+
+    def process(self, jobs):
+        client = local_session(self.manager.session_factory).client('sagemaker')
+
+        for j in jobs:
+            try:
+                client.stop_compilation_job(CompilationJobName=j['CompilationJobName'])
+            except client.exceptions.ResourceNotFound:
+                pass
+
+
+@SagemakerProcessingJob.action_registry.register('stop')
+class SagemakerProcessingJobStop(BaseAction):
+    """Stops a Sagemaker Processing job
+
+    :example:
+
+    .. code-block:: yaml
+
+        policies:
+          - name: stop-processing-job
+            resource: sagemaker-processing-job
+            filters:
+              - ProcessingJobName: ml-job-10
+            actions:
+              - stop
+    """
+    schema = type_schema('stop')
+    permissions = ('sagemaker:StopProcessingJob',)
+
+    def process(self, jobs):
+        client = local_session(self.manager.session_factory).client('sagemaker')
+
+        for j in jobs:
+            try:
+                client.stop_processing_job(ProcessingJobName=j['ProcessingJobName'])
             except client.exceptions.ResourceNotFound:
                 pass
 

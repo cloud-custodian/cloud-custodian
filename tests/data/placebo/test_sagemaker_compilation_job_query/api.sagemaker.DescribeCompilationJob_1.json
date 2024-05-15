@@ -1,0 +1,64 @@
+{
+    "status_code": 200,
+    "data": {
+        "CompilationJobName": "c7n-test-1",
+        "CompilationJobArn": "arn:aws:sagemaker:us-east-1:644160558196:compilation-job/c7n-test-1",
+        "CompilationJobStatus": "FAILED",
+        "CompilationStartTime": {
+            "__class__": "datetime",
+            "year": 2024,
+            "month": 4,
+            "day": 16,
+            "hour": 13,
+            "minute": 31,
+            "second": 31,
+            "microsecond": 0
+        },
+        "CompilationEndTime": {
+            "__class__": "datetime",
+            "year": 2024,
+            "month": 4,
+            "day": 16,
+            "hour": 13,
+            "minute": 32,
+            "second": 56,
+            "microsecond": 0
+        },
+        "StoppingCondition": {
+            "MaxRuntimeInSeconds": 900
+        },
+        "InferenceImage": "644160558196.dkr.ecr.us-east-1.amazonaws.com/xgboost-neo:latest",
+        "CreationTime": {
+            "__class__": "datetime",
+            "year": 2024,
+            "month": 4,
+            "day": 16,
+            "hour": 13,
+            "minute": 29,
+            "second": 49,
+            "microsecond": 170000
+        },
+        "LastModifiedTime": {
+            "__class__": "datetime",
+            "year": 2024,
+            "month": 4,
+            "day": 16,
+            "hour": 13,
+            "minute": 32,
+            "second": 56,
+            "microsecond": 0
+        },
+        "FailureReason": "ClientError: InputConfiguration: Unable to untar input model.Please confirm the model is a tar.gz file')  For further troubleshooting common failures please visit: https://docs.aws.amazon.com/sagemaker/latest/dg/neo-troubleshooting-compilation.html",
+        "RoleArn": "arn:aws:iam::644160558196:role/service-role/AmazonSageMaker-ExecutionRole-20240319T150889",
+        "InputConfig": {
+            "S3Uri": "s3://c7n-test-s3-bucket/DEMO-automatic-model-tuning-xgboost-dm/train/train.csv",
+            "DataInputConfig": "{\"data\": [1, 2, 3, 4]}",
+            "Framework": "XGBOOST"
+        },
+        "OutputConfig": {
+            "S3OutputLocation": "s3://c7n-test-s3-bucket/DEMO-automatic-model-tuning-xgboost-dm/",
+            "TargetDevice": "ml_c4"
+        },
+        "ResponseMetadata": {}
+    }
+}

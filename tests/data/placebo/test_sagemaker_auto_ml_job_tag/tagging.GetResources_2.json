@@ -1,0 +1,26 @@
+{
+    "status_code": 200,
+    "data": {
+        "PaginationToken": "",
+        "ResourceTagMappingList": [
+            {
+                "ResourceARN": "arn:aws:sagemaker:us-east-1:644160558196:automl-job/Canvas-c7n-test",
+                "Tags": [
+                    {
+                        "Key": "JobTag",
+                        "Value": "JobTagValue"
+                    },
+                    {
+                        "Key": "CanvasModelName",
+                        "Value": "c7n-test"
+                    },
+                    {
+                        "Key": "Source",
+                        "Value": "SageMakerCanvas"
+                    }
+                ]
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

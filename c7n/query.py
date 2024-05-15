@@ -73,7 +73,7 @@ class ResourceQuery:
                 m.service, resource_manager.config.region)
         enum_op, path, extra_args = m.enum_spec
         if extra_args:
-            params.update(extra_args)
+            params = {**extra_args, **params}
         return self._invoke_client_enum(
             client, enum_op, params, path,
             getattr(resource_manager, 'retry', None)) or []
