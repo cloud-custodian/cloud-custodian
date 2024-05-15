@@ -3,6 +3,7 @@
 import json
 import os
 import sys
+import argparse
 
 from argparse import ArgumentTypeError
 from datetime import datetime, timedelta
@@ -568,6 +569,8 @@ class RunTest(CliTest):
         )
 
     def test_session_policy(self):
+        parser = argparse.ArgumentParser()
+        parser.add_argument('--session-policy', action=LoadSessionPolicyJson)
         bad_session_policy = "bad_policy"
         sample_policy = {
             "Version": "2012-10-17",
@@ -579,6 +582,8 @@ class RunTest(CliTest):
                 }]
             }
         session_policy = self.write_policy_file(sample_policy, format="json")
+        arguments = parser.parse_args(["--session-policy", session_policy])
+        self.assertEqual(vars(arguments).get('session_policy'), sample_policy)
         self.assertEqual(LoadSessionPolicyJson(dest=session_policy,
             option_strings=None).load_session_policy_from_file(session_policy), sample_policy)
         with self.assertRaises(FileNotFoundError) as e:
