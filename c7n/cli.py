@@ -102,7 +102,7 @@ def _default_options(p, exclude=[]):
     if 'session-policy' not in exclude:
         p.add_argument("--session-policy", required=False, default=None,
                        action=LoadSessionPolicyJson,
-                       help="[OPTIONAL] Policy Document to be used as a session policy")
+                       help="[OPTIONAL] AWS IAM Policy Document to be used as a session policy")
 
 
 def _report_options(p):
