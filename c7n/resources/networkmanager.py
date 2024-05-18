@@ -4,8 +4,7 @@
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, TypeInfo, DescribeSource, ConfigSource
 from c7n.utils import local_session
-from c7n.tags import RemoveTag, Tag, TagActionFilter
-from c7n.filters.offhours import OffHour, OnHour
+from c7n.tags import RemoveTag, Tag
 
 
 class GetCoreNetwork(DescribeSource):
@@ -14,13 +13,11 @@ class GetCoreNetwork(DescribeSource):
         client = local_session(self.manager.session_factory).client('networkmanager')
 
         def augment(r):
-            # List tags for the Notebook-Instance & set as attribute
             tags = self.manager.retry(client.list_tags_for_resource,
                 ResourceArn=r['CoreNetworkArn'])['TagList']
             r['Tags'] = tags
             return r
 
-        # Describe notebook-instance & then list tags
         resources = super().augment(resources)
         return list(map(augment, resources))
 
@@ -48,11 +45,6 @@ class CoreNetwork(QueryResourceManager):
         permissions_augment = ("networkmanager:ListTagsForResource",)
 
     source_mapping = {'describe': GetCoreNetwork, 'config': ConfigSource}
-
-
-CoreNetwork.filter_registry.register('marked-for-op', TagActionFilter)
-CoreNetwork.filter_registry.register('offhour', OffHour)
-CoreNetwork.filter_registry.register('onhour', OnHour)
 
 
 @resources.register('networkmanager-global-network')
@@ -94,7 +86,7 @@ class TagNetwork(Tag):
 class RemoveTagNetwork(RemoveTag):
     """Action to remove a tag from networkmanager resource
     """
-    permissions = ('networkmanager:DeleteTags',)
+    permissions = ('networkmanager:UntagResource',)
 
     def process_resource_set(self, client, resources, keys):
         mid = self.manager.resource_type.id
