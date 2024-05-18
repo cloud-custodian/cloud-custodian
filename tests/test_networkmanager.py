@@ -112,5 +112,6 @@ class TestNetworkManager(BaseTest):
         self.assertEqual(len(resources), 1)
 
         client = session_factory().client("networkmanager")
-        core_network = client.get_core_network(CoreNetworkId=resources[0]["CoreNetworkId"])['CoreNetwork']
+        core_network = client.get_core_network(
+            CoreNetworkId=resources[0]["CoreNetworkId"])['CoreNetwork']
         self.assertEqual(core_network['State'], "DELETING")
