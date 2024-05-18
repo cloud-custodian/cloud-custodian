@@ -4,8 +4,12 @@
         "ResponseMetadata": {},
         "TagList": [
             {
+                "Key": "Category",
+                "Value": "TestValue"
+            },
+            {
                 "Key": "Name",
-                "Value": "core-2"
+                "Value": "test-cloudwan"
             }
         ]
     }

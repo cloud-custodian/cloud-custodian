@@ -94,3 +94,23 @@ class TestNetworkManager(BaseTest):
         tags = client.list_tags_for_resource(ResourceArn=resources[0]["CoreNetworkArn"])["TagList"]
         self.assertEqual(len(tags), 1)
         self.assertEqual(tags[0]['Key'], "Name")
+
+    def test_delete_core_network(self):
+        session_factory = self.replay_flight_data("test_networkmanager_delete_core_network")
+        p = self.load_policy(
+            {
+                "name": "delete-core-network",
+                "resource": "networkmanager-core-network",
+                "filters": [
+                    {"tag:Name": "test-cloudwan"}
+                ],
+                "actions": [{"type": "delete"}],
+            },
+            session_factory=session_factory,
+        )
+        resources = p.run()
+        self.assertEqual(len(resources), 1)
+
+        client = session_factory().client("networkmanager")
+        core_network = client.get_core_network(CoreNetworkId=resources[0]["CoreNetworkId"])['CoreNetwork']
+        self.assertEqual(core_network['State'], "DELETING")

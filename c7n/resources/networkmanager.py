@@ -1,25 +1,19 @@
 # Copyright The Cloud Custodian Authors.
 # SPDX-License-Identifier: Apache-2.0
 
+from c7n.actions.core import BaseAction
 from c7n.manager import resources
 from c7n.query import QueryResourceManager, TypeInfo, DescribeSource, ConfigSource
-from c7n.utils import local_session
+from c7n.utils import local_session, type_schema
 from c7n.tags import RemoveTag, Tag
 
 
 class GetCoreNetwork(DescribeSource):
 
     def augment(self, resources):
-        client = local_session(self.manager.session_factory).client('networkmanager')
-
-        def augment(r):
-            tags = self.manager.retry(client.list_tags_for_resource,
-                ResourceArn=r['CoreNetworkArn'])['TagList']
-            r['Tags'] = tags
-            return r
 
         resources = super().augment(resources)
-        return list(map(augment, resources))
+        return resources
 
 
 class DescribeGlobalNetwork(DescribeSource):
@@ -38,11 +32,12 @@ class CoreNetwork(QueryResourceManager):
         detail_spec = (
             'get_core_network', 'CoreNetworkId',
             'CoreNetworkId', None)
-        arn = id = 'CoreNetworkArn'
-        name = 'CoreNetworkId'
+        arn = 'CoreNetworkArn'
+        id = 'CoreNetworkId'
         date = 'CreatedAt'
         config_type = cfn_type = 'AWS::NetworkManager::CoreNetwork'
         permissions_augment = ("networkmanager:ListTagsForResource",)
+        universal_taggable = object()
 
     source_mapping = {'describe': GetCoreNetwork, 'config': ConfigSource}
 
@@ -61,6 +56,7 @@ class GlobalNetwork(QueryResourceManager):
         date = 'CreatedAt'
         config_type = cfn_type = 'AWS::NetworkManager::GlobalNetwork'
         permissions_augment = ("networkmanager:ListTagsForResource",)
+        universal_taggable = object()
 
     source_mapping = {'describe': DescribeGlobalNetwork, 'config': ConfigSource}
 
@@ -95,3 +91,20 @@ class RemoveTagNetwork(RemoveTag):
                 client.untag_resource(ResourceArn=r[mid], TagKeys=keys)
             except client.exceptions.ResourceNotFoundException:
                 continue
+
+
+@CoreNetwork.action_registry.register('delete')
+class DeleteCoreNetwork(BaseAction):
+    """Action to delete a networkmanager core network
+    """
+    schema = type_schema('delete')
+    permissions = ('networkmanager:DeleteCoreNetwork',)
+
+    def process(self, resources):
+        client = local_session(self.manager.session_factory).client('networkmanager')
+
+        for r in resources:
+            try:
+                client.delete_core_network(CoreNetworkId=r['CoreNetworkId'])
+            except client.exceptions.ResourceNotFound:
+                pass
