@@ -341,6 +341,9 @@ def reset_session_cache():
     for k in [k for k in dir(CONN_CACHE) if not k.startswith('_')]:
         setattr(CONN_CACHE, k, {})
 
+    from .credentials import CustodianSession
+    CustodianSession.close()
+
 
 def annotation(i, k):
     return i.get(k, ())
