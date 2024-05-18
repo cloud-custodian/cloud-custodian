@@ -35,7 +35,8 @@ class CoreNetwork(QueryResourceManager):
         arn = 'CoreNetworkArn'
         id = 'CoreNetworkId'
         date = 'CreatedAt'
-        config_type = cfn_type = 'AWS::NetworkManager::CoreNetwork'
+        config_type = None
+        cfn_type = 'AWS::NetworkManager::CoreNetwork'
         permissions_augment = ("networkmanager:ListTagsForResource",)
         universal_taggable = object()
 
