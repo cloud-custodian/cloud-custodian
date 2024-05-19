@@ -376,6 +376,9 @@ class PullMode(PolicyExecutionMode):
             return resources
 
 
+SERVICE_ARN_REGEX = 'arn:(aws[a-z-]*):(%s):.*?:\d{12}:.*'  # NOQA
+
+
 class LambdaMode(ServerlessExecutionMode):
     """A policy that runs/executes in lambda."""
 
@@ -398,9 +401,33 @@ class LambdaMode(ServerlessExecutionMode):
             'handler': {'type': 'string'},
             'pattern': {'type': 'object', 'minProperties': 1},
             'timeout': {'type': 'number'},
-            'memory': {'type': 'number'},
+            'destination': {
+                # for the simple case of capturing success and failure
+                # allow for just setting the arn string to capture both.
+                'oneOf': [
+                    {'type': 'string'},
+                    {'type': 'object',
+                     'additionalProperties': False,
+                     'properties': {
+                         'success': {
+                             'type': 'string',
+                             'regex': SERVICE_ARN_REGEX % ('|'.join((
+                                 'sns', 'sqs', 'lambda', 'events')))},
+                         'failure': {
+                             'type': 'string',
+                             'regex': SERVICE_ARN_REGEX % ('|'.join((
+                                 'sns', 'sqs', 'lambda', 'events')))},
+                         'max-age': {
+                             'type': 'integer',
+                             'minimum': 60,
+                             'maximum': 60 * 60 * 6},
+                         'retry': {
+                             'type': 'integer',
+                             'minimum': 0, 'maximum': 2}}}]},
+            'memory': {'type': 'integer', 'minimum': 128, 'maximum': 3008},
             'environment': {'type': 'object'},
-            'tags': {'type': 'object'},
+            'tags': {'type': 'object',
+                     'patternProperties': {".*": {'type': 'string'}}},
             'dead_letter_config': {'type': 'object'},
             'kms_key_arn': {'type': 'string'},
             'tracing_config': {'type': 'object'},
@@ -437,10 +464,16 @@ class LambdaMode(ServerlessExecutionMode):
             return
         reserved_overlap = [t for t in tags if t.startswith('custodian-')]
         if reserved_overlap:
+            # TODO: turn this into an exception in 0.9
             log.warning((
                 'Custodian reserves policy lambda '
                 'tags starting with custodian - policy specifies %s' % (
                     ', '.join(reserved_overlap))))
+        if self.policy.data['mode'].get('memory') is not None:
+            if self.policy.data['mode']['memory'] % 64 != 0:
+                raise PolicyValidationError(
+                    "Lambda memory size must be a multiple of 64, policy:%s",
+                    self.policy.name)
 
     def get_member_account_id(self, event):
         return event.get('account')

@@ -510,7 +510,28 @@ class LambdaManager:
             waiter.wait(FunctionName=func.name)
             changed = True
 
+        if func.invoke_config:
+            changed = self._update_invoke_config(result, func) or changed
+
         return result, changed
+
+    def _update_invoke_config(self, extant, func):
+        try:
+            extant_invoke = self.client.get_function_event_invoke_config(
+                FunctionName=extant['FunctionArn'])
+        except self.client.exceptions.ResourceNotFoundException:
+            extant_invoke = {}
+        func_invoke = func.invoke_config
+        changed = []
+        for k, v in func_invoke.items():
+            if v != extant_invoke.get(k):
+                changed.append(k)
+        if changed:
+            log.debug('Setting invoke-config function: %s attributes: %s',
+                      func.name, ', '.join(changed))
+            self.client.put_function_event_invoke_config(
+                FunctionName=extant['FunctionArn'], **func_invoke)
+        return bool(changed)
 
     def _update_concurrency(self, existing, func):
         e_concurrency = None
@@ -684,6 +705,10 @@ class AbstractLambdaFunction:
     @abc.abstractproperty
     def tracing_config(self):
         """ """
+
+    @abc.abstractproperty
+    def invoke_config(self):
+        """event invoke configuration"""
 
     @abc.abstractproperty
     def tags(self):
@@ -909,6 +934,28 @@ class PolicyLambda(AbstractLambdaFunction):
     @property
     def kms_key_arn(self):
         return self.policy.data['mode'].get('kms_key_arn', '')
+
+    @property
+    def invoke_config(self):
+        destination = self.policy.data['mode'].get('destination')
+        if destination is None:
+            return destination
+        if isinstance(destination, str):
+            return {'DestinationConfig': {
+                'OnSuccess': {'Destination': destination},
+                'OnFailure': {'Destination': destination}}}
+        d = {}
+        if destination.get('failure'):
+            d.setdefault('DestinationConfig', {})[
+                'OnFailure'] = {'Destination': destination['failure']}
+        if destination.get('success'):
+            d.setdefault('DestinationConfig', {})[
+                'OnSuccess'] = {'Destination': destination['success']}
+        if destination.get('max-age'):
+            d['MaximumEventAgeInSeconds'] = destination['max-age']
+        if destination.get('retry') is not None:
+            d['MaximumRetryAttempts'] = destination['retry']
+        return d
 
     @property
     def tracing_config(self):
