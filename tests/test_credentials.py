@@ -14,6 +14,7 @@ from c7n.utils import local_session
 from .common import BaseTest
 
 import freezegun
+import pytest
 
 
 class Credential(BaseTest):
@@ -85,15 +86,14 @@ class Credential(BaseTest):
             pill.playback()
         self.addCleanup(pill.stop)
         with freezegun.freeze_time("Wed, 15 May 2024 14:25:24 GMT"):
-            try:
+            with pytest.raises(ClientError) as ecm:
                 session.client("lambda").list_layers()
-            except ClientError as e:
-                self.assertEqual(e.response["Error"]["Code"], "AccessDeniedException")
-                self.maxDiff = None
-                self.assertEqual(e.response["Error"]["Message"],
-                                 "User: arn:aws:sts::644160558196:assumed-role/CloudCustodianRole/CloudCustodian "
-                                 "is not authorized to perform: lambda:ListLayers on resource: * because no "
-                                 "session policy allows the lambda:ListLayers action")
+            self.assertEqual(ecm.value.response["Error"]["Code"], "AccessDeniedException")
+            self.assertEqual(
+                ecm.value.response["Error"]["Message"],
+                "User: arn:aws:sts::644160558196:assumed-role/CloudCustodianRole/CloudCustodian "
+                "is not authorized to perform: lambda:ListLayers on resource: * because no "
+                "session policy allows the lambda:ListLayers action")
             l_functions = session.client("lambda").list_functions()
             self.assertGreater(len((l_functions).get('Functions')), 0)
 
