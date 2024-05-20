@@ -1,0 +1,44 @@
+{
+    "status_code": 200,
+    "data": {
+        "CompilationJobSummaries": [
+            {
+                "CompilationJobName": "c7n-test-3",
+                "CompilationJobArn": "arn:aws:sagemaker:us-east-1:644160558196:compilation-job/c7n-test-3",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 4,
+                    "day": 16,
+                    "hour": 13,
+                    "minute": 46,
+                    "second": 52,
+                    "microsecond": 792000
+                },
+                "CompilationStartTime": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 4,
+                    "day": 16,
+                    "hour": 13,
+                    "minute": 49,
+                    "second": 13,
+                    "microsecond": 0
+                },
+                "CompilationTargetDevice": "ml_c4",
+                "LastModifiedTime": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 4,
+                    "day": 16,
+                    "hour": 13,
+                    "minute": 49,
+                    "second": 13,
+                    "microsecond": 0
+                },
+                "CompilationJobStatus": "INPROGRESS"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}

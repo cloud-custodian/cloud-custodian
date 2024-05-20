@@ -1,0 +1,58 @@
+{
+    "status_code": 200,
+    "data": {
+        "ResponseMetadata": {
+            "RequestId": "c479131a-58fb-40d4-9bc4-878b8a86ac11",
+            "HTTPStatusCode": 200,
+            "HTTPHeaders": {
+                "date": "Wed, 15 May 2024 14:25:23 GMT",
+                "content-type": "application/json",
+                "content-length": "31742",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "c479131a-58fb-40d4-9bc4-878b8a86ac11"
+            },
+            "RetryAttempts": 0
+        },
+        "Functions": [
+            {
+                "FunctionName": "custodian-post-ebs-snapshot-public-passed",
+                "FunctionArn": "arn:aws:lambda:us-east-1:644160558196:function:custodian-post-ebs-snapshot-public-passed",
+                "Runtime": "python3.9",
+                "Role": "arn:aws:iam::644160558196:role/CloudCustodianRole",
+                "Handler": "custodian_policy.run",
+                "CodeSize": 608048,
+                "Description": "post findings if snapshot shared outside of org which includes if public",
+                "Timeout": 900,
+                "MemorySize": 512,
+                "LastModified": "2024-02-07T14:06:02.803+0000",
+                "CodeSha256": "u1KqyaW5aY3nIcxdWt8zoQjRy3KDMZQQ1NEAUZ79Poc=",
+                "Version": "$LATEST",
+                "VpcConfig": {
+                    "SubnetIds": [],
+                    "SecurityGroupIds": [],
+                    "VpcId": "",
+                    "Ipv6AllowedForDualStack": false
+                },
+                "TracingConfig": {
+                    "Mode": "PassThrough"
+                },
+                "RevisionId": "6d36e1aa-4d47-4536-9a7a-3bfd915b80e8",
+                "PackageType": "Zip",
+                "Architectures": [
+                    "arm64"
+                ],
+                "EphemeralStorage": {
+                    "Size": 512
+                },
+                "SnapStart": {
+                    "ApplyOn": "None",
+                    "OptimizationStatus": "Off"
+                },
+                "LoggingConfig": {
+                    "LogFormat": "Text",
+                    "LogGroup": "/aws/lambda/custodian-post-ebs-snapshot-public-passed"
+                }
+            }
+        ]
+    }
+}
