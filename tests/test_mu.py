@@ -651,7 +651,7 @@ class PolicyLambdaProvision(Publish):
             "arn:aws:securityhub:us-east-1:644160558196:action/custom/sechub")
         self.assertEqual(
             hub_action.get(mu_policy.name), {'event': False, 'action': None})
-        hub_action.add(mu_policy)
+        hub_action.add(mu_policy, None)
         self.assertEqual(
             {'event': False,
              'action': {
@@ -1150,7 +1150,7 @@ class PolicyLambdaProvision(Publish):
             ],
             "foo"
         )
-        cwls.add(func)
+        cwls.add(func, None)
         lambda_client = session_factory().client("lambda")
         policy = lambda_client.get_policy(FunctionName="test-foo-bar")
         self.assertTrue(policy)
@@ -1198,7 +1198,7 @@ class PolicyLambdaProvision(Publish):
             bucket={"Name": "c7n-ci20210930214353595400000001"}
         )
 
-        bln.add(func)
+        bln.add(func, None)
         bln.remove(func, func_deleted=False)
 
         # we should be able to do idempotent removal

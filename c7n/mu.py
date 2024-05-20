@@ -398,22 +398,8 @@ class LambdaManager:
         else:
             func.alias = func.arn
 
-        # process any previous lambda configuration
-        old_group_name = None
-        if existing:
-            # process eb schedule tag if it exists
-            old_schedule_tag = existing.get('Tags', {}).get('custodian-schedule', None)
-            if old_schedule_tag is not None:
-                global schedule_tag_pattern
-                if schedule_tag_pattern is None:
-                    # compile on first use only
-                    pattern = r'^name=[a-zA-Z0-9-_]{1,64}:group=([0-9a-zA-Z-_.]{1,64})$'
-                    schedule_tag_pattern = re.compile(pattern)
-                matches = schedule_tag_pattern.match(old_schedule_tag)
-                old_group_name = matches.group(1) if matches else None
-
-        for e in func.get_events(self.session_factory, old_group_name):
-            if e.add(func):
+        for e in func.get_events(self.session_factory):
+            if e.add(func, existing):
                 log.debug(
                     "Added event source: %s to function: %s",
                     e, func.alias)
@@ -849,7 +835,7 @@ class LambdaFunction(AbstractLambdaFunction):
     def tags(self):
         return self.func_data.get('tags', {})
 
-    def get_events(self, session_factory, old_group_name=None):
+    def get_events(self, session_factory):
         return self.func_data.get('events', ())
 
     def get_archive(self):
@@ -959,7 +945,7 @@ class PolicyLambda(AbstractLambdaFunction):
             architecture.append('x86_64')
         return architecture
 
-    def get_events(self, session_factory, old_group_name=None):
+    def get_events(self, session_factory):
         events = []
         if self.policy.data['mode']['type'] in (
                 'config-rule', 'config-poll-rule'):
@@ -971,7 +957,8 @@ class PolicyLambda(AbstractLambdaFunction):
         elif self.policy.data['mode']['type'] == 'schedule':
             events.append(
                 EventBridgeScheduleSource(
-                    self.policy.data['mode'], session_factory, old_group_name))
+                    self.policy.data['mode'], session_factory)
+            )
         else:
             events.append(
                 CloudWatchEventSource(
@@ -1191,7 +1178,7 @@ class CloudWatchEventSource(AWSEventBase):
             payload = merge_dict(payload, self.data['pattern'])
         return json.dumps(payload)
 
-    def add(self, func):
+    def add(self, func, existing):
         params = dict(
             Name=func.event_name, Description=func.description, State='ENABLED')
 
@@ -1288,10 +1275,7 @@ class EventBridgeScheduleSource(AWSEventBase):
     """
 
     client_service = 'scheduler'
-
-    def __init__(self, data, session_factory, old_group_name=None):
-        super().__init__(data, session_factory)
-        self.old_group_name = old_group_name
+    schedule_tag_pattern = re.compile(r'^name=[a-zA-Z0-9-_]{1,64}:group=([0-9a-zA-Z-_.]{1,64})$')
 
     def get(self, schedule_name, group_name='default'):
         return resource_exists(self.client.get_schedule,
@@ -1319,7 +1303,7 @@ class EventBridgeScheduleSource(AWSEventBase):
         return (f'<CWEvent Type:{self.data.get("type")} Events:'
                 f'{", ".join(map(str, self.data.get("events", [])))}>')
 
-    def add(self, func):
+    def add(self, func, existing):
         params = dict(
             Name=func.event_name,
             Description=func.description,
@@ -1343,13 +1327,25 @@ class EventBridgeScheduleSource(AWSEventBase):
             log.debug(f'Creating schedule for {self} in group {params["GroupName"]}')
             self.client.create_schedule(**params)
 
+        previous_name = self._get_previous_group(existing)
+
         # check if old_group_name is set, and if so, is it different to the current group name
         # if true, remove the old schedule from the old group
-        if self.old_group_name is not None and self.old_group_name != params['GroupName']:
-            log.debug(f'Removing schedule {func.event_name} in group {self.old_group_name}')
-            self.client.delete_schedule(Name=func.event_name, GroupName=self.old_group_name)
+        if previous_name is not None and previous_name != params['GroupName']:
+            log.debug(f'Removing schedule {func.event_name} in group {previous_name}')
+            self.client.delete_schedule(Name=func.event_name, GroupName=previous_name)
 
         return True
+
+    def _get_previous_group(self, existing):
+        if not existing:
+            return None
+        old_schedule_tag = existing.get('Tags', {}).get('custodian-schedule', None)
+        old_group_name = None
+        if old_schedule_tag is not None:
+            matches = self.schedule_tag_pattern.match(old_schedule_tag)
+            old_group_name = matches.group(1) if matches else None
+        return old_group_name
 
     def update(self, func):
         self.add(func)
@@ -1427,7 +1423,7 @@ class SecurityHubAction:
         action = actions and actions.pop() or None
         return {'event': subscriber, 'action': action}
 
-    def add(self, func):
+    def add(self, func, existing):
         self.cwe.add(func)
         client = local_session(self.session_factory).client('securityhub')
         action = self.get(func.event_name).get('action')
@@ -1454,7 +1450,7 @@ class SecurityHubAction:
 
     def update(self, func):
         self.cwe.update(func)
-        self.add(func)
+        self.add(func, None)
 
     def remove(self, func, func_deleted=True):
         self.cwe.remove(func, func_deleted)
@@ -1487,7 +1483,7 @@ class BucketLambdaNotification:
             found = f
         return notifies, found
 
-    def add(self, func):
+    def add(self, func, existing):
         s3 = self.session.client('s3')
         notifies, found = self._get_notifies(s3, func)
         notifies.pop('ResponseMetadata', None)
@@ -1568,7 +1564,7 @@ class CloudWatchLogSubscription:
         self.session = session_factory()
         self.client = self.session.client('logs')
 
-    def add(self, func):
+    def add(self, func, existing):
         lambda_client = self.session.client('lambda')
         for group in self.log_groups:
             log.info(
@@ -1628,7 +1624,7 @@ class SQSSubscription:
         self.session_factory = session_factory
         self.batch_size = batch_size
 
-    def add(self, func):
+    def add(self, func, existing):
         client = local_session(self.session_factory).client('lambda')
         event_mappings = {
             m['EventSourceArn']: m for m in client.list_event_source_mappings(
@@ -1697,7 +1693,7 @@ class SNSSubscription:
         statement_id = 'sns-topic-' + topic_name
         return region, topic_name, statement_id
 
-    def add(self, func):
+    def add(self, func, existing):
         session = local_session(self.session_factory)
         lambda_client = session.client('lambda')
         for arn in self.topic_arns:
@@ -1885,7 +1881,7 @@ class ConfigRule(AWSEventBase):
             return True
         return False
 
-    def add(self, func):
+    def add(self, func, existing):
         rule = self.get(func.name)
         params = self.get_rule_params(func)
 
