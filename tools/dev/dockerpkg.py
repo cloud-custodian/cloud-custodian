@@ -245,6 +245,7 @@ LABEL "org.opencontainers.image.description"="Cloud Custodian AWS Control Contro
 LABEL "org.opencontainers.image.documentation"="https://cloudcustodian.io/docs"
 """
 
+
 class Image:
 
     defaults = dict(
