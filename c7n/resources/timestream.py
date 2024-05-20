@@ -1,5 +1,6 @@
 from c7n.manager import resources
 from c7n.actions import Action
+from c7n.filters.kms import KmsRelatedFilter
 from c7n.query import DescribeSource, QueryResourceManager, TypeInfo
 from c7n.utils import local_session, type_schema
 from c7n.tags import (
@@ -135,3 +136,8 @@ class TimestreamDatabaseDelete(Action):
                 client.delete_database(
                     DatabaseName=r['DatabaseName'],
                 )
+
+
+@TimestreamDatabase.filter_registry.register('kms-key')
+class KmsFilter(KmsRelatedFilter):
+    RelatedIdsExpression = 'KmsKeyId'

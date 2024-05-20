@@ -1,0 +1,54 @@
+{
+    "status_code": 200,
+    "data": {
+        "CompilationJobSummaries": [
+            {
+                "CompilationJobName": "c7n-test-1",
+                "CompilationJobArn": "arn:aws:sagemaker:us-east-1:644160558196:compilation-job/c7n-test-1",
+                "CreationTime": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 4,
+                    "day": 16,
+                    "hour": 13,
+                    "minute": 29,
+                    "second": 49,
+                    "microsecond": 170000
+                },
+                "CompilationStartTime": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 4,
+                    "day": 16,
+                    "hour": 13,
+                    "minute": 31,
+                    "second": 31,
+                    "microsecond": 0
+                },
+                "CompilationEndTime": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 4,
+                    "day": 16,
+                    "hour": 13,
+                    "minute": 32,
+                    "second": 56,
+                    "microsecond": 0
+                },
+                "CompilationTargetDevice": "ml_c4",
+                "LastModifiedTime": {
+                    "__class__": "datetime",
+                    "year": 2024,
+                    "month": 4,
+                    "day": 16,
+                    "hour": 13,
+                    "minute": 32,
+                    "second": 56,
+                    "microsecond": 0
+                },
+                "CompilationJobStatus": "FAILED"
+            }
+        ],
+        "ResponseMetadata": {}
+    }
+}
