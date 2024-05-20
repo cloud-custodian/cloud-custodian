@@ -69,6 +69,7 @@ class Credential(BaseTest):
         factory = self.replay_flight_data("test_session_policy_assumed_session")
         inline_session_policy = {"Version": "2012-10-17", "Statement": [{"Sid": "Statement1",
             "Effect": "Allow", "Action": ["lambda:ListFunctions"], "Resource": "*"}]}
+
         session = assumed_session(
             role_arn='arn:aws:iam::644160558196:role/CloudCustodianRole',
             session_name="CloudCustodian",
@@ -83,17 +84,18 @@ class Credential(BaseTest):
         else:
             pill.playback()
         self.addCleanup(pill.stop)
-        try:
-            session.client("lambda").list_layers()
-        except ClientError as e:
-            self.assertEqual(e.response["Error"]["Code"], "AccessDeniedException")
-            self.maxDiff = None
-            self.assertEqual(e.response["Error"]["Message"],
-                "User: arn:aws:sts::644160558196:assumed-role/CloudCustodianRole/CloudCustodian "
-                "is not authorized to perform: lambda:ListLayers on resource: * because no "
-                "session policy allows the lambda:ListLayers action")
-        l_functions = session.client("lambda").list_functions()
-        self.assertGreater(len((l_functions).get('Functions')), 0)
+        with freezegun.freeze_time("Wed, 15 May 2024 14:25:24 GMT"):
+            try:
+                session.client("lambda").list_layers()
+            except ClientError as e:
+                self.assertEqual(e.response["Error"]["Code"], "AccessDeniedException")
+                self.maxDiff = None
+                self.assertEqual(e.response["Error"]["Message"],
+                                 "User: arn:aws:sts::644160558196:assumed-role/CloudCustodianRole/CloudCustodian "
+                                 "is not authorized to perform: lambda:ListLayers on resource: * because no "
+                                 "session policy allows the lambda:ListLayers action")
+            l_functions = session.client("lambda").list_functions()
+            self.assertGreater(len((l_functions).get('Functions')), 0)
 
     def test_policy_name_user_agent(self):
         session = SessionFactory("us-east-1")
