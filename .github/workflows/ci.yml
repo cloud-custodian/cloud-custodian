@@ -11,7 +11,7 @@ concurrency:
   cancel-in-progress: true
 env:
   POETRY_VERSION: "1.5.1"
-  DEFAULT_PY_VERSION: "3.11"
+  DEFAULT_PY_VERSION: "3.12"
 
 jobs:
   Lint:
@@ -166,8 +166,6 @@ jobs:
         run: |
           if [[ "$COV_RUN" == "true" ]]
           then
-            python -m pip install slipcover
-            slipcover pytest --cov=./
             poetry run coverage xml
           else
             make test
