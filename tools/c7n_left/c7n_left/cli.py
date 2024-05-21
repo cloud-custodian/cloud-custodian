@@ -155,64 +155,62 @@ def test(policy_dir, filters):
     policies = config.exec_filter.filter_policies(load_policies(policy_dir, config))
     runner = TestRunner(policies, config, reporter)
     sys.exit(int(runner.run()))
-    
+
+
 @cli.command()
 @click.option("-p", "--policy-dir", type=click.Path(), help="Directory with policies")
 def validate(policy_dir=None):
-  """ Validate configuration files """
-  from c7n.commands import DuplicateKeyCheckLoader
-  from c7n.exceptions import PolicyValidationError
-  import c7n.schema as schema
-  
-  
-  # Terraform provider uses a single module for all types, so no consideration on lazy loading.
-  # additionally the schema is shared by all types, so no differential by terraform resource
-  resource_types = ("terraform.*",)
-  glob_patterns = ("*.yml", "*.yaml", "*.json")
-  policy_dir = Path(policy_dir)
-  
-  if not policy_dir.is_dir():
-    log.error(f"Policy directory {policy_dir} does not exist.")
-    sys.exit(1)
-  
-  # Find all policy files in the given directory that match the glob patterns
-  policy_files = list(itertools.chain(*(policy_dir.rglob(pattern) for pattern in glob_patterns)))
-  if not policy_files:
-    log.warning(f"No policy files found in {policy_dir} during validation.")
-    return
-  
-  # Begin validation on the policy files
-  parser = StructureParser()
-  all_errors = {}
-  for policy_file in policy_files:
-    fmt = policy_file.suffix[1:] # extension w/o period
-    
-    with open(policy_file) as fh:
-      if fmt not in ('yml', 'yaml', 'json'):
-        log.error("The config file must end in .json, .yml or .yaml.")
-        raise ValueError("The config file must end in .json, .yml or .yaml.")
-      
-      data = yaml.load(fh.read(), Loader=DuplicateKeyCheckLoader)  # nosec nosemgrep
-      try:
-        parser.validate(data) # Top level check
-      except PolicyValidationError as e:
-        all_errors[policy_file] = (e,)
-        continue # Don't continue processing if the structure is invalid
+    """Validate configuration files"""
+    from c7n.commands import DuplicateKeyCheckLoader
+    from c7n.exceptions import PolicyValidationError
+    import c7n.schema as schema
 
-      schm = schema.generate(resource_types)
-      errors = schema.validate(data, schm) # In-depth check per resource type
-      
-      all_errors.update(errors)
-  
-  # Print out the aggregate errors
-  if all_errors:
-    log.error(f"Validation failed with {len(all_errors)} errors")
-    for policy_file, errors in all_errors.items():
-      log.error(f"In file: {policy_file}")
-      for error in errors:
-        log.error(error)
-    sys.exit(1)
-        
+    # Terraform provider uses a single module for all types, so no consideration on lazy loading.
+    # additionally the schema is shared by all types, so no differential by terraform resource
+    resource_types = ("terraform.*",)
+    glob_patterns = ("*.yml", "*.yaml", "*.json")
+    policy_dir = Path(policy_dir)
+
+    if not policy_dir.is_dir():
+        log.error(f"Policy directory {policy_dir} does not exist.")
+        sys.exit(1)
+
+        # Find all policy files in the given directory that match the glob patterns
+    policy_files = list(itertools.chain(*(policy_dir.rglob(pattern) for pattern in glob_patterns)))
+    if not policy_files:
+        log.warning(f"No policy files found in {policy_dir} during validation.")
+        return
+
+    # Begin validation on the policy files
+    parser = StructureParser()
+    all_errors = {}
+    for policy_file in policy_files:
+        fmt = policy_file.suffix[1:]  # extension w/o period
+
+        with open(policy_file) as fh:
+            if fmt not in ('yml', 'yaml', 'json'):
+                log.error("The config file must end in .json, .yml or .yaml.")
+                raise ValueError("The config file must end in .json, .yml or .yaml.")
+
+            data = yaml.load(fh.read(), Loader=DuplicateKeyCheckLoader)  # nosec nosemgrep
+            try:
+                parser.validate(data)  # Top level check
+            except PolicyValidationError as e:
+                all_errors[policy_file] = (e,)
+                continue  # Don't continue processing if the structure is invalid
+            schm = schema.generate(resource_types)
+            errors = schema.validate(data, schm)  # In-depth check per resource type
+            all_errors.update(errors)
+
+        # Print out the aggregate errors
+        if all_errors:
+            log.error(f"Validation failed with {len(all_errors)} errors")
+            for policy_file, errors in all_errors.items():
+                log.error(f"In file: {policy_file}")
+                for error in errors:
+                    log.error(error)
+                sys.exit(1)
+
 
 def get_config(
     directory=None,
