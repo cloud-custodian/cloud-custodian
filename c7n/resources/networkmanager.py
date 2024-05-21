@@ -35,7 +35,7 @@ class CoreNetwork(QueryResourceManager):
         name = 'CoreNetworkId'
         id = 'CoreNetworkId'
         date = 'CreatedAt'
-        config_type = None
+        config_type = 'AWS::NetworkManager::CoreNetwork'
         cfn_type = 'AWS::NetworkManager::CoreNetwork'
         permissions_augment = ("networkmanager:ListTagsForResource",)
         universal_taggable = object()
@@ -53,7 +53,7 @@ class GlobalNetwork(QueryResourceManager):
         name = 'GlobalNetworkId'
         id = 'GlobalNetworkId'
         date = 'CreatedAt'
-        config_type = None
+        config_type = 'AWS::NetworkManager::GlobalNetwork'
         cfn_type = 'AWS::NetworkManager::GlobalNetwork'
         permissions_augment = ("networkmanager:ListTagsForResource",)
         universal_taggable = object()
